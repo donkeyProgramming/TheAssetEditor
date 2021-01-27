@@ -6,11 +6,12 @@
              xmlns:local="clr-namespace:AssetEditor.Views"
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls" 
              xmlns:e="http://schemas.microsoft.com/expression/2010/interactivity" 
-             xmlns:e1="http://schemas.microsoft.com/xaml/behaviors" xmlns:filetreeview="clr-namespace:AssetEditor.ViewModels.FileTreeView"
+             xmlns:e1="http://schemas.microsoft.com/xaml/behaviors" xmlns:filetreeview="clr-namespace:AssetEditor.ViewModels.FileTreeView" xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <filetreeview:PackFileToImageValueConverter x:Key="ImageValueConverter"/>
+        <valueconverters:InverseBooleanConverter x:Key="InvBoolConverter"/>
     </UserControl.Resources>
 
     <Grid>
@@ -30,14 +31,51 @@
             VirtualizingStackPanel.IsVirtualizing="True"
             VirtualizingStackPanel.VirtualizationMode="Recycling">
 
+
+            <TreeView.Resources>
+                <ContextMenu x:Key="NodeContextMenu">
+                    <MenuItem Header="Add">
+                        <MenuItem Header="From Directory"
+                                  Command="{Binding DataContext.AddFilesFromDirectory,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
+                                  CommandParameter="{Binding}"/>
+                        
+                        <MenuItem Header="File(s)"
+                                  Command="{Binding DataContext.AddFilesCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
+                                  CommandParameter="{Binding}"/>
+                        
+                        <MenuItem Header="Empty folder"
+                                  Command="{Binding DataContext.AddEmptyFolderCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
+                                  CommandParameter="{Binding}"/>
+                    </MenuItem>
+                    
+                    <MenuItem Header="Rename" 
+                              Command="{Binding DataContext.RenameNodeCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
+                              CommandParameter="{Binding}"
+                              IsEnabled="{Binding IsPackContainer, Converter={StaticResource InvBoolConverter}}"/>
+                    
+                    <MenuItem Header="Extract"/>
+                    
+                    <MenuItem Header="Delete"
+                              Command="{Binding DataContext.DeleteCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
+                              CommandParameter="{Binding}"/>
+                    
+                    <MenuItem Header="Close"
+                              Command="{Binding DataContext.CloseNodeCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
+                              CommandParameter="{Binding}"
+                              IsEnabled="{Binding IsPackContainer}"/>
+                </ContextMenu>
+            </TreeView.Resources>
+
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="behaviors:MouseDoubleClick.Command" 
                             Value="{Binding DataContext.DoubleClickCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}"/>
                     <Setter Property="behaviors:MouseDoubleClick.CommandParameter" Value="{Binding}"/>
                     <Setter Property="IsExpanded" Value="{Binding IsNodeExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                    <Setter Property="ContextMenu" Value="{StaticResource NodeContextMenu}"/>
                 </Style>
             </TreeView.ItemContainerStyle>
+
 
             <e1:Interaction.Behaviors>
                 <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedItem, Mode=TwoWay}" />
@@ -51,7 +89,6 @@
                             <ColumnDefinition Width="auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-
                         <Image Width="12" Grid.Column="0" Source="{Binding Item, Converter={StaticResource ImageValueConverter}}"/>
                         <TextBlock Margin="4,0,0,0" Grid.Column="1" Text="{Binding Item.Name}"/>
                     </Grid>

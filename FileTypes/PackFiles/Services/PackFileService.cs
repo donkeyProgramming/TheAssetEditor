@@ -108,5 +108,10 @@ namespace FileTypes.PackFiles.Services
         public void Unload() { }
         public void Save() {  }
         public void FindFile() { }
+
+        public void RenameFile(IPackFile packFile, string newName)
+        {
+            packFile.Name = newName;
+        }
     }
 }

@@ -6,6 +6,7 @@ namespace Common
 {
     public enum PackFileType
     {
+        PackContainer = 2,
         Data = 1,
         Directory = 0
     }

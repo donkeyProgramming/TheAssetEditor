@@ -1,4 +1,5 @@
 ﻿using AssetEditor.Views.Settings;
+using FileTypes.PackFiles.Services;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -11,15 +12,18 @@ namespace AssetEditor.ViewModels
     public class MenuBarViewModel
     {
         IServiceProvider _serviceProvider;
+        PackFileService _packfileService;
 
         public ICommand OpenSettingsWindowCommand { get; set; }
+        public ICommand CreateNewPackFileCommand { get; set; }
+        public ICommand OpenPackFileCommand { get; set; }
 
-        public MenuBarViewModel(IServiceProvider provider)
+        public MenuBarViewModel(IServiceProvider provider, PackFileService packfileService)
         {
             _serviceProvider = provider;
+            _packfileService = packfileService;
             OpenSettingsWindowCommand = new RelayCommand(OnButtonPressed);
         }
-
 
         void OnButtonPressed()
         {

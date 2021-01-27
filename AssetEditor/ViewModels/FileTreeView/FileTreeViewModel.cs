@@ -1,4 +1,5 @@
 ﻿using Common;
+using CommonControls.Simple;
 using FileTypes.PackFiles.Models;
 using FileTypes.PackFiles.Services;
 using GalaSoft.MvvmLight.CommandWpf;
@@ -16,41 +17,7 @@ using System.Windows.Threading;
 
 namespace AssetEditor.ViewModels.FileTreeView
 {
-    class Node : NotifyPropertyChangedImpl
-    {
-        public IPackFile Item { get; set; }
-        bool _isExpanded = false;
-        public bool IsNodeExpanded
-        {
-            get => _isExpanded;
-            set => SetAndNotify(ref _isExpanded, value);
-        }
 
-        public ICollectionView Children { get; set; }
-
-        public Node(IPackFile source)
-        {
-            Item = source;
-            if ( Item.Children.Count() != 0)
-            {
-                var temp_childList = new List<Node>(Item.Children.Count());
-                foreach (var child in Item.Children)
-                    temp_childList.Add(new Node(child));
-
-                Children = CollectionViewSource.GetDefaultView(temp_childList);
-            }
-        }
-
-        public void SetFilter(Predicate<object> filterFunc)
-        {
-            if (Children != null)
-            {
-                Children.Filter = filterFunc;
-                foreach (var child in Children)
-                    (child as Node).SetFilter(filterFunc);
-            }
-        }
-    }
 
     class FileTreeViewModel : NotifyPropertyChangedImpl
     {
@@ -66,11 +33,11 @@ namespace AssetEditor.ViewModels.FileTreeView
         public ICollectionView viewModelNodes { get; set; }
 
         public ICommand DoubleClickCommand { get; set; }
+        public ICommand RenameNodeCommand { get; set; }
 
 
-
-        Node _selectedItem;
-        public Node SelectedItem
+        TreeNode _selectedItem;
+        public TreeNode SelectedItem
         {
             get => _selectedItem;
             set => SetAndNotify(ref _selectedItem, value);
@@ -91,14 +58,14 @@ namespace AssetEditor.ViewModels.FileTreeView
         {
             _packFileService = packFileService;
 
-            List<Node> tempNodes  = new List<Node>();
+            List<TreeNode> tempNodes  = new List<TreeNode>();
 
             foreach (var packFileCollection in packFileService.Database.PackFiles)
             {
-                Node collectionNode = new Node(packFileCollection);
-                List<Node> collectionChildren = new List<Node>();
+                TreeNode collectionNode = new TreeNode(packFileCollection);
+                List<TreeNode> collectionChildren = new List<TreeNode>();
                 foreach (var file in packFileCollection.Children)
-                    collectionChildren.Add(new Node(file));
+                    collectionChildren.Add(new TreeNode(file));
 
                 collectionNode.Children = CollectionViewSource.GetDefaultView(collectionChildren);                
                 tempNodes.Add(collectionNode);
@@ -109,10 +76,21 @@ namespace AssetEditor.ViewModels.FileTreeView
             viewModelNodes = CollectionViewSource.GetDefaultView(tempNodes);
             tempNodes.FirstOrDefault().IsNodeExpanded = true;
 
-            DoubleClickCommand = new RelayCommand<Node>(OnDoubleClick);
+            DoubleClickCommand = new RelayCommand<TreeNode>(OnDoubleClick);
+            RenameNodeCommand = new RelayCommand<TreeNode>(OnRenameNode);
         }
 
-        void OnDoubleClick(Node t)
+        void OnRenameNode(TreeNode t) 
+        {
+            TextInputWindow window = new TextInputWindow("Rename", "dogs");
+            var res = window.ShowDialog();
+            var val = window.TextValue;
+            _packFileService.RenameFile(t.Item, "");
+            t.Item.Name = "Dosdgfsf";
+        }
+
+
+        void OnDoubleClick(TreeNode t)
         {
             if (t.Item.PackFileType() == PackFileType.Data)
                 FileOpen?.Invoke(t.Item);
@@ -137,9 +115,9 @@ namespace AssetEditor.ViewModels.FileTreeView
 
         void Filter(string text)
         {
-            viewModelNodes.Filter = (x) => HasChildWithFilterMatch((x as Node).Item, text);
+            viewModelNodes.Filter = (x) => HasChildWithFilterMatch((x as TreeNode).Item, text);
             foreach (var item in viewModelNodes)
-                (item as Node).SetFilter((x) => HasChildWithFilterMatch((x as Node).Item, text));
+                (item as TreeNode).SetFilter((x) => HasChildWithFilterMatch((x as TreeNode).Item, text));
         }
 
         bool HasChildWithFilterMatch(IPackFile file, string filterText)

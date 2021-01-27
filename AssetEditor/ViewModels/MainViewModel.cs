@@ -19,33 +19,6 @@ using TextEditor;
 
 namespace AssetEditor.ViewModels
 {
-
-
-
-    class TextEditor : IEditorViewModel
-    {
-        public string DisplayName { get; set; }
-        public IPackFile MainFile { get; set; }
-
-        public bool Save()
-        {
-            return true;
-            //t
-        }
-    }
-
-    class TextEditorB : IEditorViewModel
-    {
-        public string DisplayName { get; set; }
-        public IPackFile MainFile { get; set; }
-
-        public bool Save()
-        {
-            return true;
-            //t
-        }
-    }
-
     class MainViewModel : NotifyPropertyChangedImpl
     {
         ILogger _logger = Logging.Create<MainViewModel>();
@@ -62,23 +35,14 @@ namespace AssetEditor.ViewModels
 
         public MainViewModel(MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, GameInformationService gameInformationService, ToolFactory toolFactory)
         {
+            MenuBar = menuViewModel;
+
             ToolFactory = toolFactory;
             ToolFactory.RegisterToolAsDefault<TextEditorViewModel, TextEditorView>();
 
 
             //var res = ToolFactory.CreateToolAsWindow(new TextEditorViewModel());
             //res.ShowDialog();
-
-
-            MenuBar = menuViewModel;
-
-            //var n = typeof(BindableSelectedItemBehavior).Assembly.GetManifestResourceNames();
-            // Properties.Resources.
-            // var t = new BitmapImage(new Uri("pack://application:,,,/CommonControls;/Resources/Icons/icons8-3d-object-48.png", UriKind.Absolute));
-
-
-            //C:\Program Files (x86)\Steam\steamapps\common\Total War WARHAMMER II\data\variants_dds2_sc.pack
-            Startup();
 
             packfileService.LoadAllCaFiles(@"C:\Program Files (x86)\Steam\steamapps\common\Total War WARHAMMER II\data");
             FileTree = new FileTreeViewModel(packfileService);
@@ -107,11 +71,6 @@ namespace AssetEditor.ViewModels
             editorViewModel.MainFile = file;
             CurrentEditorsList.Add(editorViewModel);
             SelectedEditorIndex = CurrentEditorsList.Count - 1;
-        }
-
-        void Startup()
-        {
-          
         }
     }
 

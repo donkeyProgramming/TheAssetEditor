@@ -17,12 +17,12 @@ namespace FileTypes.PackFiles.Models
         public PFHeader Header { get; set; }
         public bool IsCaPackFile { get; set; } = false;
 
-        Dictionary<string, PackFileDirectory> _directoryMap = new Dictionary<string, PackFileDirectory>();
+        Dictionary<string, PackFileDirectory> _directoryMap = new Dictionary<string, PackFileDirectory>();  // used for loading, turn into a variable that is used by the loading code instead
 
         public IEnumerable<IPackFile> Children => InternalFileList.Values;
         Dictionary<string, IPackFile> InternalFileList { get; set; } = new Dictionary<string, IPackFile>();
 
-        public PackFileType PackFileType() { return Common.PackFileType.Directory; }
+        public PackFileType PackFileType() { return Common.PackFileType.PackContainer; }
 
         public PackFileContainer(string name)
         {

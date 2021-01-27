@@ -10,7 +10,7 @@ using System.Windows.Media.Imaging;
 
 namespace AssetEditor.ViewModels.FileTreeView
 {
-    [ValueConversion(typeof(Node), typeof(BitmapImage))]
+    [ValueConversion(typeof(TreeNode), typeof(BitmapImage))]
     public class PackFileToImageValueConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
