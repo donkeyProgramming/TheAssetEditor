@@ -1,4 +1,5 @@
-﻿using AssetEditor.ViewModels;
+﻿using AssetEditor.Services;
+using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
 using Common;
@@ -22,7 +23,6 @@ namespace AssetEditor
             ResourceController.Load();
             GameInformationFactory.Create();
 
-
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
 
@@ -32,17 +32,15 @@ namespace AssetEditor
         private void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<ApplicationSettingsService>();
+            services.AddSingleton<ToolFactory>();
+            services.AddSingleton<FileTypes.PackFiles.Models.PackFileDataBase>();
+
             services.AddTransient<GameInformationService>();
-            
             services.AddTransient<MainWindow>();
             services.AddTransient<MainViewModel>();
-
             services.AddTransient<SettingsWindow>();
             services.AddTransient<SettingsViewModel>();
-
             services.AddTransient<MenuBarViewModel>();
-
-            services.AddSingleton<FileTypes.PackFiles.Models.PackFileDataBase>();
             services.AddTransient<FileTypes.PackFiles.Services.PackFileService>();
         }
 
@@ -51,11 +49,6 @@ namespace AssetEditor
             var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
             mainWindow.DataContext = ServiceProvider.GetRequiredService<MainViewModel>();
             mainWindow.Show();
-        }
-
-        public void ShowSettingsWindow()
-        {
-
         }
     }
 

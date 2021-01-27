@@ -22,7 +22,7 @@ namespace FileTypes.PackFiles.Models
         public IEnumerable<IPackFile> Children => InternalFileList.Values;
         Dictionary<string, IPackFile> InternalFileList { get; set; } = new Dictionary<string, IPackFile>();
 
-        public PackFileType PackFileType() { return Models.PackFileType.Directory; }
+        public PackFileType PackFileType() { return Common.PackFileType.Directory; }
 
         public PackFileContainer(string name)
         {
@@ -34,9 +34,9 @@ namespace FileTypes.PackFiles.Models
             return $"{Name} - {Header?.LoadOrder}";
         }
 
-        public PackFileContainer(string name, BinaryReader reader)
+        public PackFileContainer(string packFileSystemPath, BinaryReader reader)
         {
-            Name = name;
+            Name = Path.GetFileNameWithoutExtension(packFileSystemPath);
             Header = new PFHeader(reader);
 
             long sizes = 0;
@@ -54,10 +54,7 @@ namespace FileTypes.PackFiles.Models
                 string packedFileName = IOFunctions.TheadUnsafeReadZeroTerminatedAscii(reader);
 
                 var packFileName = Path.GetFileName(packedFileName);
-                var fileContent = new PackFile(packFileName, packedFileName, 0, 0)
-                {
-                    ParentPackedFile = this
-                };
+                var fileContent = new PackFile(packFileSystemPath, packFileName, packedFileName, offset, size);
                 AddFile(fileContent, packedFileName);
                 offset += size;
             }
@@ -102,7 +99,7 @@ namespace FileTypes.PackFiles.Models
             foreach (var child in file.Children)
                 RecursivlyAddFile(child);
          
-            if (file.PackFileType() == Models.PackFileType.Data)
+            if (file.PackFileType() == Common.PackFileType.Data)
                 AddFile(file, (file as PackFile).FullPath); ;
         }
 
@@ -123,7 +120,7 @@ namespace FileTypes.PackFiles.Models
 
         int FileCount(IPackFile item)
         {
-            if (item.PackFileType() == Models.PackFileType.Data)
+            if (item.PackFileType() == Common.PackFileType.Data)
                 return 1;
         
             var count = 0;

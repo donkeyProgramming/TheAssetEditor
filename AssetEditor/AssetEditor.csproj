@@ -16,10 +16,8 @@
     <ProjectReference Include="..\CommonControls\CommonControls.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\FileTypes\FileTypes.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Services\" />
+    <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
+    <ProjectReference Include="..\TextEditor\TextEditor.csproj" />
   </ItemGroup>
 
 </Project>

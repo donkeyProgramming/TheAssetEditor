@@ -3,12 +3,19 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:AssetEditor" xmlns:views="clr-namespace:AssetEditor.Views"
+        xmlns:local="clr-namespace:AssetEditor" 
+        xmlns:views="clr-namespace:AssetEditor.Views" 
+        xmlns:test="clr-namespace:AssetEditor.Test"
         mc:Ignorable="d"
         Title="AssetEditor" Height="450" Width="800">
+    <Window.Resources>
+        <test:DeviceTypeSelector x:Key="MySelector" />
+
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
+            <ColumnDefinition Width="auto"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -17,19 +24,37 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <views:MenuBarView Grid.Row="0" Grid.ColumnSpan="2"/>
+        <views:MenuBarView Grid.Row="0" Grid.ColumnSpan="3"/>
 
         <views:FileTreeView Grid.Row="1" Grid.Column="0" DataContext="{Binding FileTree}"/>
 
+        <GridSplitter Grid.Row="1" Grid.RowSpan="3" Grid.Column="1"  HorizontalAlignment="Stretch">
+            <GridSplitter.Template>
+                <ControlTemplate TargetType="{x:Type GridSplitter}">
+                    <Grid>
+                        <Button Content="⁞" />
+                        <Rectangle Fill="#00FFFFFF" />
+                    </Grid>
+                </ControlTemplate>
+            </GridSplitter.Template>
+        </GridSplitter>
 
-        <TabControl  Grid.Row="1" Grid.Column="1">
-            <TabItem Header="asd">
+        <TabControl  Grid.Row="1" Grid.Column="2"  
+                     ItemsSource="{Binding CurrentEditorsList, UpdateSourceTrigger=PropertyChanged}"
+                     SelectedIndex = "{Binding SelectedEditorIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                     ContentTemplateSelector="{StaticResource MySelector}"
+                     test:DataTemplateParameters.ViewFactory="{Binding ToolFactory}">
 
-            </TabItem>
+            <TabControl.ItemTemplate >
+                <DataTemplate>
+                    <TextBlock Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}"/>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+
         </TabControl>
 
 
-        <StatusBar Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
+        <StatusBar Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
             <StatusBar.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Grid>

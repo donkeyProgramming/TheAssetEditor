@@ -39,7 +39,7 @@ namespace AssetEditor.ViewModels
                     {
                         GameName = game.DisplayName,
                         GameType = game.Type,
-                        Path = "I am a cool path"//_settingsService.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Type)?.Path
+                        Path = _settingsService.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Type)?.Path
                     });
             }
 

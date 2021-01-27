@@ -36,7 +36,7 @@ namespace FileTypes.PackFiles.Services
                 {
                     using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
                     {
-                        var pack = new PackFileContainer(Path.GetFileNameWithoutExtension(packFileSystemPath), reader);
+                        var pack = new PackFileContainer(packFileSystemPath, reader);
                         Database.AddPackFile(pack);
                     }
                 }
@@ -56,11 +56,12 @@ namespace FileTypes.PackFiles.Services
             var packList = new List<PackFileContainer>();
             foreach (var packFilePath in allCaPackFiles)
             {
-                using (var fileStram = File.OpenRead(gameDataFolder + "\\" + packFilePath))
+                var path = gameDataFolder + "\\" + packFilePath;
+                using (var fileStram = File.OpenRead(path))
                 {
                     using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
                     {
-                        var pack = new PackFileContainer(Path.GetFileNameWithoutExtension(packFilePath), reader);
+                        var pack = new PackFileContainer(path, reader);
                         packList.Add(pack);
                     }
                 }

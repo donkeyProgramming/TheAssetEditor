@@ -19,8 +19,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <TextBox Grid.Row="0" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    behaviors:TextBoxExtensions.Watermark="Search filter"/>
+        <TextBox Grid.Row="0" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" behaviors:TextBoxExtensions.Watermark="Search filter"/>
 
 
         <TreeView 
@@ -31,12 +30,15 @@
             VirtualizingStackPanel.IsVirtualizing="True"
             VirtualizingStackPanel.VirtualizationMode="Recycling">
 
-            <TreeView.Resources>
+            <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
-                    <Setter Property="IsExpanded" Value="{Binding IsNodeExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                    </Setter>
+                    <Setter Property="behaviors:MouseDoubleClick.Command" 
+                            Value="{Binding DataContext.DoubleClickCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}"/>
+                    <Setter Property="behaviors:MouseDoubleClick.CommandParameter" Value="{Binding}"/>
+                    <Setter Property="IsExpanded" Value="{Binding IsNodeExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                 </Style>
-            </TreeView.Resources>
+            </TreeView.ItemContainerStyle>
+
             <e1:Interaction.Behaviors>
                 <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedItem, Mode=TwoWay}" />
             </e1:Interaction.Behaviors>

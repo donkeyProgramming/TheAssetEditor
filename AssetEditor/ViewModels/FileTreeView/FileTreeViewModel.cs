@@ -1,6 +1,7 @@
 ﻿using Common;
 using FileTypes.PackFiles.Models;
 using FileTypes.PackFiles.Services;
+using GalaSoft.MvvmLight.CommandWpf;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Threading;
 
 namespace AssetEditor.ViewModels.FileTreeView
@@ -52,15 +54,23 @@ namespace AssetEditor.ViewModels.FileTreeView
 
     class FileTreeViewModel : NotifyPropertyChangedImpl
     {
+        public delegate void FileSelectedDelegate(IPackFile file);
+
+        //public event FileSelectedDelegate FilePreview;
+        public event FileSelectedDelegate FileOpen;
+
         ILogger _logger = Logging.Create<FileTreeViewModel>();
         DispatcherTimer _filterTimer;
         PackFileService _packFileService;
 
         public ICollectionView viewModelNodes { get; set; }
 
+        public ICommand DoubleClickCommand { get; set; }
 
-        object _selectedItem;
-        public object SelectedItem
+
+
+        Node _selectedItem;
+        public Node SelectedItem
         {
             get => _selectedItem;
             set => SetAndNotify(ref _selectedItem, value);
@@ -90,12 +100,22 @@ namespace AssetEditor.ViewModels.FileTreeView
                 foreach (var file in packFileCollection.Children)
                     collectionChildren.Add(new Node(file));
 
-                collectionNode.Children = CollectionViewSource.GetDefaultView(collectionChildren);
-                collectionNode.IsNodeExpanded = true;
+                collectionNode.Children = CollectionViewSource.GetDefaultView(collectionChildren);                
                 tempNodes.Add(collectionNode);
+                collectionNode.IsNodeExpanded = true;
             }
 
+           
             viewModelNodes = CollectionViewSource.GetDefaultView(tempNodes);
+            tempNodes.FirstOrDefault().IsNodeExpanded = true;
+
+            DoubleClickCommand = new RelayCommand<Node>(OnDoubleClick);
+        }
+
+        void OnDoubleClick(Node t)
+        {
+            if (t.Item.PackFileType() == PackFileType.Data)
+                FileOpen?.Invoke(t.Item);
         }
 
         private void StartFilterTimer()

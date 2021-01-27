@@ -4,8 +4,20 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AssetEditor.Views"
+             xmlns:System="clr-namespace:System;assembly=mscorlib" 
+             xmlns:gameinfo="clr-namespace:Common.GameInformation;assembly=Common" 
+             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls" 
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="GameTypeEnums" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="gameinfo:GameTypeEnum"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
+    
     <Grid HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition/>
@@ -32,7 +44,7 @@
                             </Grid.ColumnDefinitions>
                             
                             <TextBlock Grid.Column="0" Text="{Binding GameName}"/>
-                            <TextBox Grid.Column="1" Text="{Binding Path}"/>
+                            <TextBox Grid.Column="1" Text="{Binding Path}" behaviors:TextBoxExtensions.Watermark="Path to data folder"/>
                             <Button Grid.Column="2" Content="..." Command="{Binding BrowseCommand}"/>
                         </Grid>
                     </DataTemplate>
@@ -40,7 +52,7 @@
             </ItemsControl>
         </GroupBox>
 
-        <GroupBox Grid.Row="1" Header="Other">
+        <GroupBox Grid.Row="1" Header="Other" Margin="0,5,0,5">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
@@ -56,7 +68,9 @@
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Current Game"/>
                 <TextBlock Grid.Row="0" Grid.Column="1" Text=":"/>
-                <ComboBox Grid.Row="0" Grid.Column="2" Width="100"/>
+                <ComboBox  Grid.Row="0" Grid.Column="2" Width="100"
+                    SelectedItem="{Binding CurrentGame, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    ItemsSource="{Binding Source={StaticResource GameTypeEnums}}"/>
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Use TextEditor For Unknown Files"/>
                 <TextBlock Grid.Row="1" Grid.Column="1" Text=":"/>

@@ -8,32 +8,16 @@ using System.Text;
 
 namespace FileTypes.PackFiles.Models
 {
-
-    public enum PackFileType
-    { 
-        Data = 1,
-        Directory = 0
-    }
-
-
-    public interface IPackFile
-    {
-        IEnumerable<IPackFile> Children { get; }
-        string Name { get; set; }
-        PackFileType PackFileType();
-
-        void Sort();
-    }
-
     public class PackFile : NotifyPropertyChangedImpl, IPackFile
     {
-        public PackFile(string name, string fullPath, int dataStart = 0, int dataLength = 0)
+        public PackFile(string packContainerPath, string name, string fullPath, long dataOffset = 0, long dataLength = 0)
         {
             Name = name;
             FullPath = fullPath;
-            DataStart = dataStart;
-            DataLength = dataLength;
+            DataSource = new PackedFileSource(packContainerPath, dataOffset, dataLength);
         }
+
+        public IDataSource DataSource { get; private set; }
 
         string _name;
         public string Name
@@ -52,14 +36,9 @@ namespace FileTypes.PackFiles.Models
         }
 
 
-        public PackFileType PackFileType() { return Models.PackFileType.Data; }
+        public PackFileType PackFileType() { return Common.PackFileType.Data; }
 
-        public int DataStart { get; set; }
-        public int DataLength { get; set; }
         
-        public PackFileContainer ParentPackedFile { get; set; }
-
-
         public override string ToString()
         {
             return $"Data : {Name}";
@@ -105,7 +84,7 @@ namespace FileTypes.PackFiles.Models
                 item.Value.Sort();
         }
 
-        public PackFileType PackFileType() { return Models.PackFileType.Directory; }
+        public PackFileType PackFileType() { return Common.PackFileType.Directory; }
 
         Dictionary<string, IPackFile> InternalList { get; set; } = new Dictionary<string, IPackFile>();
 
