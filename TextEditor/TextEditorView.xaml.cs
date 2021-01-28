@@ -29,9 +29,6 @@ namespace TextEditor
         public TextEditorView()
         {
 			// Load our custom highlighting definition
-
-
-
 			InitializeComponent();
 
 			this.SetValue(TextOptions.TextFormattingModeProperty, TextFormattingMode.Display);

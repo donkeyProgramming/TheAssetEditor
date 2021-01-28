@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:AssetEditor.Views"
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls" 
              xmlns:e="http://schemas.microsoft.com/expression/2010/interactivity" 
-             xmlns:e1="http://schemas.microsoft.com/xaml/behaviors" xmlns:filetreeview="clr-namespace:AssetEditor.ViewModels.FileTreeView" xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
+             xmlns:e1="http://schemas.microsoft.com/xaml/behaviors" xmlns:filetreeview="clr-namespace:AssetEditor.ViewModels.FileTreeView" xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls" xmlns:cm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -20,17 +20,16 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <TextBox Grid.Row="0" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" behaviors:TextBoxExtensions.Watermark="Search filter"/>
-
+        <TextBox Grid.Row="0" Text="{Binding Filter.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" behaviors:TextBoxExtensions.Watermark="Search filter"/>
 
         <TreeView 
             Grid.Row="1" 
             behaviors:TreeViewExtension.SelectItemOnRightClick="True"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-            ItemsSource="{Binding Path=viewModelNodes, UpdateSourceTrigger=PropertyChanged}"
-            VirtualizingStackPanel.IsVirtualizing="True"
-            VirtualizingStackPanel.VirtualizationMode="Recycling">
-
+            ItemsSource="{Binding Path=PackFileNodes, UpdateSourceTrigger=PropertyChanged}"
+            VirtualizingPanel.IsVirtualizing="True"
+            VirtualizingPanel.VirtualizationMode="Recycling"
+            VirtualizingPanel.IsVirtualizingWhenGrouping="True">
 
             <TreeView.Resources>
                 <ContextMenu x:Key="NodeContextMenu">
@@ -65,6 +64,8 @@
                               IsEnabled="{Binding IsPackContainer}"/>
                 </ContextMenu>
             </TreeView.Resources>
+
+
 
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">

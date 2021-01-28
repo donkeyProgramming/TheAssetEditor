@@ -3,11 +3,10 @@ using Common.ApplicationSettings;
 using Common.GameInformation;
 using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
-using System.Text;
+using System.Windows;
 using System.Windows.Input;
 
 namespace AssetEditor.ViewModels
@@ -74,7 +73,7 @@ namespace AssetEditor.ViewModels
         string _path;
         public string Path { get => _path; set => SetAndNotify(ref _path, value); }
 
-        public ICommand BrowseCommand { get; set; }
+        public ICommand BrowseCommand { get; set; } 
 
         public GamePathItem()
         {
@@ -86,10 +85,15 @@ namespace AssetEditor.ViewModels
             var dialog = new CommonOpenFileDialog();
             dialog.IsFolderPicker = true;
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
                 Path = dialog.FileName;
+                var files = Directory.GetFiles(Path);
+                var packFiles = files.Count(x => System.IO.Path.GetExtension(x) == "pack");
+                var manifest = files.Count(x => x.Contains("manifest.txt"));
 
-
-
+                if (packFiles == 0 || manifest == 0)
+                    MessageBox.Show($"The selected directory contains {packFiles} packfiles and {manifest} manifest files. It is probably not a game directory");
+            }
         }
     }
 }

@@ -22,7 +22,7 @@ namespace FileTypes.PackFiles.Services
         }
 
 
-        public bool Load(string packFileSystemPath) 
+        public bool Load(string packFileSystemPath, bool suppresEvents = false) 
         {
             try
             {
@@ -38,6 +38,7 @@ namespace FileTypes.PackFiles.Services
                     {
                         var pack = new PackFileContainer(packFileSystemPath, reader);
                         Database.AddPackFile(pack);
+                       
                     }
                 }
             }
@@ -47,40 +48,51 @@ namespace FileTypes.PackFiles.Services
                 return false;
             }
 
+
+
             return true;
         }
 
         public bool LoadAllCaFiles(string gameDataFolder)
         {
-            var allCaPackFiles = GetPackFilesFromManifest(gameDataFolder);
-            var packList = new List<PackFileContainer>();
-            foreach (var packFilePath in allCaPackFiles)
+            try
             {
-                var path = gameDataFolder + "\\" + packFilePath;
-                using (var fileStram = File.OpenRead(path))
+                _logger.Here().Information($"Loading all ca packfiles located in {gameDataFolder}");
+                var allCaPackFiles = GetPackFilesFromManifest(gameDataFolder);
+                var packList = new List<PackFileContainer>();
+                foreach (var packFilePath in allCaPackFiles)
                 {
-                    using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
+                    var path = gameDataFolder + "\\" + packFilePath;
+                    using (var fileStram = File.OpenRead(path))
                     {
-                        var pack = new PackFileContainer(path, reader);
-                        packList.Add(pack);
+                        using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
+                        {
+                            var pack = new PackFileContainer(path, reader);
+                            packList.Add(pack);
+                        }
                     }
                 }
+
+                PackFileContainer caPackFileContainer = new PackFileContainer("All CA packs");
+                var packFilesOrderedByGroup = packList
+                    .GroupBy(x => x.Header.LoadOrder)
+                    .OrderBy(x => x.Key);
+
+                foreach (var group in packFilesOrderedByGroup)
+                {
+                    var packFilesOrderedByName = group.OrderBy(x => x.Name);
+                    foreach (var packfile in packFilesOrderedByName)
+                        caPackFileContainer.MergePackFileContainer(packfile);
+                }
+
+                caPackFileContainer.Sort();
+                Database.AddPackFile(caPackFileContainer);
             }
-
-            PackFileContainer caPackFileContainer = new PackFileContainer("All CA packs");
-            var packFilesOrderedByGroup = packList
-                .GroupBy(x => x.Header.LoadOrder)
-                .OrderBy(x => x.Key);
-
-            foreach (var group in packFilesOrderedByGroup)
+            catch (Exception e)
             {
-                var packFilesOrderedByName = group.OrderBy(x => x.Name);
-                foreach (var packfile in packFilesOrderedByName)
-                    caPackFileContainer.MergePackFileContainer(packfile);
+                _logger.Here().Error($"Trying to all ca packs in {gameDataFolder}. Error : {e.ToString()}");
+                return false;
             }
-
-            Database.AddPackFile(caPackFileContainer);
-            caPackFileContainer.Sort();
 
             return true;
         }

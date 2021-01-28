@@ -25,10 +25,10 @@ namespace AssetEditor.ViewModels.FileTreeView
         public TreeNode(IPackFile source)
         {
             Item = source;
-            if (Item.Children.Count() != 0)
+            if (Item.FileChildren.Count() != 0)
             {
-                var temp_childList = new List<TreeNode>(Item.Children.Count());
-                foreach (var child in Item.Children)
+                var temp_childList = new List<TreeNode>(Item.FileChildren.Count());
+                foreach (var child in Item.FileChildren)
                     temp_childList.Add(new TreeNode(child));
 
                 Children = CollectionViewSource.GetDefaultView(temp_childList);

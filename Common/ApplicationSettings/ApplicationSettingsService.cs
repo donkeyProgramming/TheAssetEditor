@@ -3,6 +3,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Common.ApplicationSettings
@@ -32,6 +33,15 @@ namespace Common.ApplicationSettings
         {
             _logger.Here().Information("Creating ApplicationSettingsService");
             Load();
+        }
+
+        public string GetGamePathForCurrentGame()
+        {
+            var game = CurrentSettings.CurrentGame;
+            if (game == GameInformation.GameTypeEnum.Unknown)
+                return null;
+            var gameDirInfo = CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game);
+            return gameDirInfo?.Path;
         }
 
         //public void AddLastUsedFile(string filePath)

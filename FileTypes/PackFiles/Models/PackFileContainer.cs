@@ -19,8 +19,14 @@ namespace FileTypes.PackFiles.Models
 
         Dictionary<string, PackFileDirectory> _directoryMap = new Dictionary<string, PackFileDirectory>();  // used for loading, turn into a variable that is used by the loading code instead
 
-        public IEnumerable<IPackFile> Children => InternalFileList.Values;
+        public IEnumerable<IPackFile> FileChildren => InternalFileList.Values;
         Dictionary<string, IPackFile> InternalFileList { get; set; } = new Dictionary<string, IPackFile>();
+
+        public IEnumerable<IPackFile> FileChildren => InternalFileList.Values;
+        Dictionary<string, IPackFile> InternalFileList2 { get; set; } = new Dictionary<string, IPackFile>();
+
+        //public IEnumerable<IPackFile> Children => InternalFileList.Values;
+        //        Dictionary<string, IPackFile> InternalFileList { get; set; } = new Dictionary<string, IPackFile>();
 
         public PackFileType PackFileType() { return Common.PackFileType.PackContainer; }
 
@@ -96,7 +102,7 @@ namespace FileTypes.PackFiles.Models
 
         void RecursivlyAddFile(IPackFile file)
         {
-            foreach (var child in file.Children)
+            foreach (var child in file.FileChildren)
                 RecursivlyAddFile(child);
          
             if (file.PackFileType() == Common.PackFileType.Data)
@@ -106,14 +112,14 @@ namespace FileTypes.PackFiles.Models
         public void Sort()
         {
             InternalFileList = new Dictionary<string, IPackFile>(InternalFileList.OrderBy(x => x.Value.PackFileType()).ThenBy(x => x.Value.Name));
-            foreach (var child in Children)
+            foreach (var child in FileChildren)
                 child.Sort();
         }
 
         public int FileCount()
         {
             var count = 0;
-            foreach (var file in Children)
+            foreach (var file in FileChildren)
                 count += FileCount(file);
             return count;
         }
@@ -124,7 +130,7 @@ namespace FileTypes.PackFiles.Models
                 return 1;
         
             var count = 0;
-            foreach (var child in item.Children)
+            foreach (var child in item.FileChildren)
                 count += FileCount(child);
         
             return count;

@@ -15,13 +15,13 @@ namespace TextEditor
 
         IPackFile _packFile;
         public IPackFile MainFile
-        { 
-            get => _packFile; 
-            set 
-            { 
+        {
+            get => _packFile;
+            set
+            {
                 _packFile = value;
                 SetCurrentPackFile(_packFile);
-            } 
+            }
         }
 
 
@@ -46,41 +46,6 @@ namespace TextEditor
                     Text = reader.ReadToEnd();
             }
 
-
-            //textEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(extention);
-            //HighlightingComboBox_SelectionChanged(null, null);
-            //return result;
-
-
-     
-
-
-
-
-                //file.ParentPackedFile.
-                //
-                //
-                //
-                //if (_packedFile != null && _dataChanged)
-                //    Commit();
-                //
-                //_packedFile = packedFile;
-                //if (packedFile != null)
-                //{
-                //    byte[] data = packedFile.Data;
-                //    using (MemoryStream stream = new MemoryStream(data, 0, data.Length))
-                //    {
-                //        var codec = new TextCodec();
-                //        var decodedData = codec.Decode(stream);
-                //        textEditor.Text = decodedData;
-                //        var extention = Path.GetExtension(_packedFile.Name);
-                //
-                //
-                //
-                //        textEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(extention);
-                //        HighlightingComboBox_SelectionChanged(null, null);
-                //    }
-                //}
-            }
         }
+    }
 }

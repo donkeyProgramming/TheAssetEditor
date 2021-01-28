@@ -10,8 +10,8 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
-                <MenuItem Header="New"/>
-                <MenuItem Header="Open"/>
+                <MenuItem Header="New Packfile"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
+                <MenuItem Header="Open" Command="{Binding MenuBar.OpenPackFileCommand}"/>
                 <MenuItem Header="Recent Files"/>
                 <Separator/>
                 <MenuItem Header="Save"/>

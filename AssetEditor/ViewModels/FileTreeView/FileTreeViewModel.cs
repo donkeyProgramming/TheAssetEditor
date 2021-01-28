@@ -6,6 +6,7 @@ using GalaSoft.MvvmLight.CommandWpf;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -17,121 +18,66 @@ using System.Windows.Threading;
 
 namespace AssetEditor.ViewModels.FileTreeView
 {
-
+    public delegate void FileSelectedDelegate(IPackFile file);
 
     class FileTreeViewModel : NotifyPropertyChangedImpl
     {
-        public delegate void FileSelectedDelegate(IPackFile file);
-
-        //public event FileSelectedDelegate FilePreview;
-        public event FileSelectedDelegate FileOpen;
-
         ILogger _logger = Logging.Create<FileTreeViewModel>();
-        DispatcherTimer _filterTimer;
         PackFileService _packFileService;
 
-        public ICollectionView viewModelNodes { get; set; }
+        public event FileSelectedDelegate FileOpen;
+
+        public ICollectionView PackFileNodes { get; set; }
+        ObservableCollection<TreeNode> _nodes = new ObservableCollection<TreeNode>();
+        public PackFileFilter Filter { get; private set; }
+
 
         public ICommand DoubleClickCommand { get; set; }
         public ICommand RenameNodeCommand { get; set; }
 
 
         TreeNode _selectedItem;
-        public TreeNode SelectedItem
-        {
-            get => _selectedItem;
-            set => SetAndNotify(ref _selectedItem, value);
-        }
+        public TreeNode SelectedItem{get => _selectedItem; set => SetAndNotify(ref _selectedItem, value);}
 
-        string _filterText = "";
-        public string FilterText
-        {
-            get => _filterText;
-            set 
-            { 
-                SetAndNotify(ref _filterText, value);
-                StartFilterTimer();
-            }
-        }
 
         public FileTreeViewModel(PackFileService packFileService)
         {
             _packFileService = packFileService;
+            _packFileService.Database.PackFileContainerLoaded += PackFileContainerLoaded;
 
-            List<TreeNode> tempNodes  = new List<TreeNode>();
-
-            foreach (var packFileCollection in packFileService.Database.PackFiles)
-            {
-                TreeNode collectionNode = new TreeNode(packFileCollection);
-                List<TreeNode> collectionChildren = new List<TreeNode>();
-                foreach (var file in packFileCollection.Children)
-                    collectionChildren.Add(new TreeNode(file));
-
-                collectionNode.Children = CollectionViewSource.GetDefaultView(collectionChildren);                
-                tempNodes.Add(collectionNode);
-                collectionNode.IsNodeExpanded = true;
-            }
-
-           
-            viewModelNodes = CollectionViewSource.GetDefaultView(tempNodes);
-            tempNodes.FirstOrDefault().IsNodeExpanded = true;
+            PackFileNodes = CollectionViewSource.GetDefaultView(_nodes);
+            Filter = new PackFileFilter(PackFileNodes);
 
             DoubleClickCommand = new RelayCommand<TreeNode>(OnDoubleClick);
             RenameNodeCommand = new RelayCommand<TreeNode>(OnRenameNode);
         }
 
-        void OnRenameNode(TreeNode t) 
+        private void PackFileContainerLoaded(PackFileContainer container)
         {
-            TextInputWindow window = new TextInputWindow("Rename", "dogs");
-            var res = window.ShowDialog();
-            var val = window.TextValue;
-            _packFileService.RenameFile(t.Item, "");
-            t.Item.Name = "Dosdgfsf";
-        }
+            TreeNode collectionNode = new TreeNode(container);
+            ObservableCollection<TreeNode> collectionChildren = new ObservableCollection<TreeNode>();
+            
+            foreach (var file in container.FileChildren)
+                collectionChildren.Add(new TreeNode(file));
+            
+            collectionNode.Children = CollectionViewSource.GetDefaultView(collectionChildren);
 
+
+            _nodes.Add(collectionNode);
+            _nodes.Last().IsNodeExpanded = true;
+        } 
+
+        void OnRenameNode(TreeNode treeNode) 
+        {
+            TextInputWindow window = new TextInputWindow("Rename file", treeNode.Item.Name);
+            if (window.ShowDialog() == true)
+                _packFileService.RenameFile(treeNode.Item, window.TextValue);
+        }
 
         void OnDoubleClick(TreeNode t)
         {
             if (t.Item.PackFileType() == PackFileType.Data)
                 FileOpen?.Invoke(t.Item);
-        }
-
-        private void StartFilterTimer()
-        {
-            if (_filterTimer != null)
-                _filterTimer.Stop();
-            _filterTimer = new DispatcherTimer();
-            _filterTimer.Interval = TimeSpan.FromMilliseconds(250);
-            _filterTimer.IsEnabled = true;
-            _filterTimer.Tick += FilterTimerTrigger;
-        }
-
-        private void FilterTimerTrigger(object sender, EventArgs e)
-        {
-            Filter(FilterText);
-            _filterTimer.Stop();
-            _filterTimer = null;
-        }
-
-        void Filter(string text)
-        {
-            viewModelNodes.Filter = (x) => HasChildWithFilterMatch((x as TreeNode).Item, text);
-            foreach (var item in viewModelNodes)
-                (item as TreeNode).SetFilter((x) => HasChildWithFilterMatch((x as TreeNode).Item, text));
-        }
-
-        bool HasChildWithFilterMatch(IPackFile file, string filterText)
-        {
-            if (file.PackFileType() == PackFileType.Data)
-                return string.IsNullOrWhiteSpace(filterText) || file.Name.Contains(filterText);
-
-            foreach (var child in file.Children)
-            {
-                if (HasChildWithFilterMatch(child, filterText))
-                    return true;
-            }
-
-            return false;
         }
     }
 }
