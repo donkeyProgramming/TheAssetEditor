@@ -1,6 +1,7 @@
 ﻿using Common;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -20,18 +21,23 @@ namespace AssetEditor.ViewModels.FileTreeView
 
         public bool IsPackContainer { get { return Item.PackFileType() == PackFileType.PackContainer; } }
 
-        public ICollectionView Children { get; set; }
+        ICollectionView _children;
+        public ICollectionView Children { get => _children; set => SetAndNotify(ref _children, value); }
 
         public TreeNode(IPackFile source)
         {
-            Item = source;
-            if (Item.FileChildren.Count() != 0)
-            {
-                var temp_childList = new List<TreeNode>(Item.FileChildren.Count());
-                foreach (var child in Item.FileChildren)
-                    temp_childList.Add(new TreeNode(child));
+            Build(source);
+        }
 
-                Children = CollectionViewSource.GetDefaultView(temp_childList);
+        public void Build(IPackFile source)
+        {
+            Item = source;
+            if (Item.Children.Count() != 0)
+            {
+                var _internalChildList = new List<TreeNode>(Item.Children.Count());
+                foreach (var child in Item.Children)
+                    _internalChildList.Add(new TreeNode(child));
+                Children = CollectionViewSource.GetDefaultView(_internalChildList);
             }
         }
 

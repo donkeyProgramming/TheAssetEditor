@@ -57,7 +57,7 @@ namespace AssetEditor.ViewModels.FileTreeView
             if (file.PackFileType() == PackFileType.Data)
                 return string.IsNullOrWhiteSpace(filterText) || file.Name.Contains(filterText);
 
-            foreach (var child in file.FileChildren)
+            foreach (var child in file.Children)
             {
                 if (HasChildWithFilterMatch(child, filterText))
                     return true;

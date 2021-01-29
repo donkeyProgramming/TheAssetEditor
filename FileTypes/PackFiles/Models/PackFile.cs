@@ -13,11 +13,11 @@ namespace FileTypes.PackFiles.Models
         public PackFileType PackFileType() { return Common.PackFileType.Data; }
         public IDataSource DataSource { get; private set; }
 
-        public PackFile(string packContainerPath, string name, string fullPath, long dataOffset = 0, long dataLength = 0)
+        public PackFile(string name, string fullPath, IDataSource dataSource)
         {
             Name = name;
             FullPath = fullPath;
-            DataSource = new PackedFileSource(packContainerPath, dataOffset, dataLength);
+            DataSource = dataSource;
         }
 
         string _name;
@@ -39,8 +39,14 @@ namespace FileTypes.PackFiles.Models
         public override string ToString() { return Name; }
         public void Sort(){}
 
-        IEnumerable<IPackFile> IPackFile.FileChildren => Enumerable.Empty<IPackFile>();
-        IEnumerable<IPackFile> IPackFile.FolderChildren => Enumerable.Empty<IPackFile>();
+        public void AddChild(IPackFile packFile)
+        {
+            throw new NotImplementedException();
+        }
+
+        IEnumerable<IPackFile> IPackFile.Children => Enumerable.Empty<IPackFile>();
+
+        public IPackFile Parent { get; set; }
     }
 
 
@@ -65,10 +71,8 @@ namespace FileTypes.PackFiles.Models
 
         public void AddChild(IPackFile file)
         {
-            if (file.PackFileType() == Common.PackFileType.Data)
-                InternalFileList.Add(file.Name, file);
-            else
-                InternalFolderList.Add(file.Name, file);
+            file.Parent = this;
+            InternalFileList.Add(file.Name, file);
         }
 
         public void Sort()
@@ -82,9 +86,9 @@ namespace FileTypes.PackFiles.Models
 
     
         Dictionary<string, IPackFile> InternalFileList { get; set; } = new Dictionary<string, IPackFile>();
-        Dictionary<string, IPackFile> InternalFolderList { get; set; } = new Dictionary<string, IPackFile>();
 
-        IEnumerable<IPackFile> IPackFile.FileChildren => InternalFileList.Values;
-        IEnumerable<IPackFile> IPackFile.FolderChildren => InternalFolderList.Values;
+        IEnumerable<IPackFile> IPackFile.Children => InternalFileList.Values;
+
+        IPackFile IPackFile.Parent { get; set; }
     }
 }

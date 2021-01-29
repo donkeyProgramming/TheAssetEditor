@@ -42,6 +42,11 @@ namespace FileTypes.PackFiles.Models
         {
             return data;
         }
+
+        public static MemorySource FromFile(string path)
+        {
+            return new MemorySource(File.ReadAllBytes(path));
+        }
     }
 
     public class PackedFileSource : IDataSource

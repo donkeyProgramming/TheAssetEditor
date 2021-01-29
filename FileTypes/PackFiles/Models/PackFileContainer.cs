@@ -19,14 +19,10 @@ namespace FileTypes.PackFiles.Models
 
         Dictionary<string, PackFileDirectory> _directoryMap = new Dictionary<string, PackFileDirectory>();  // used for loading, turn into a variable that is used by the loading code instead
 
-        public IEnumerable<IPackFile> FileChildren => InternalFileList.Values;
+        public IEnumerable<IPackFile> Children => InternalFileList.Values;
         Dictionary<string, IPackFile> InternalFileList { get; set; } = new Dictionary<string, IPackFile>();
 
-        public IEnumerable<IPackFile> FileChildren => InternalFileList.Values;
-        Dictionary<string, IPackFile> InternalFileList2 { get; set; } = new Dictionary<string, IPackFile>();
-
-        //public IEnumerable<IPackFile> Children => InternalFileList.Values;
-        //        Dictionary<string, IPackFile> InternalFileList { get; set; } = new Dictionary<string, IPackFile>();
+        IPackFile IPackFile.Parent { get; set; }
 
         public PackFileType PackFileType() { return Common.PackFileType.PackContainer; }
 
@@ -60,7 +56,7 @@ namespace FileTypes.PackFiles.Models
                 string packedFileName = IOFunctions.TheadUnsafeReadZeroTerminatedAscii(reader);
 
                 var packFileName = Path.GetFileName(packedFileName);
-                var fileContent = new PackFile(packFileSystemPath, packFileName, packedFileName, offset, size);
+                var fileContent = new PackFile(packFileName, packedFileName, new PackedFileSource(packFileSystemPath, offset, size));
                 AddFile(fileContent, packedFileName);
                 offset += size;
             }
@@ -72,6 +68,7 @@ namespace FileTypes.PackFiles.Models
 
             if (string.IsNullOrWhiteSpace(dirName))
             {
+                file.Parent = this;
                 InternalFileList.Add(file.Name, file);
             }
             else
@@ -90,6 +87,8 @@ namespace FileTypes.PackFiles.Models
                         parentDir = CreateVirtualDirectory(currentSubStr, dirSubPaths[i], parentDir);
                     }
                 }
+
+                file.Parent = _directoryMap[dirName];
                 _directoryMap[dirName].AddChild(file);
             }
         }
@@ -102,24 +101,24 @@ namespace FileTypes.PackFiles.Models
 
         void RecursivlyAddFile(IPackFile file)
         {
-            foreach (var child in file.FileChildren)
+            foreach (var child in file.Children)
                 RecursivlyAddFile(child);
          
             if (file.PackFileType() == Common.PackFileType.Data)
-                AddFile(file, (file as PackFile).FullPath); ;
+                AddFile(file, (file as PackFile).FullPath);
         }
 
         public void Sort()
         {
             InternalFileList = new Dictionary<string, IPackFile>(InternalFileList.OrderBy(x => x.Value.PackFileType()).ThenBy(x => x.Value.Name));
-            foreach (var child in FileChildren)
+            foreach (var child in Children)
                 child.Sort();
         }
 
         public int FileCount()
         {
             var count = 0;
-            foreach (var file in FileChildren)
+            foreach (var file in Children)
                 count += FileCount(file);
             return count;
         }
@@ -130,7 +129,7 @@ namespace FileTypes.PackFiles.Models
                 return 1;
         
             var count = 0;
-            foreach (var child in item.FileChildren)
+            foreach (var child in item.Children)
                 count += FileCount(child);
         
             return count;
@@ -149,6 +148,12 @@ namespace FileTypes.PackFiles.Models
                 return virtualDir;
             }
             return _directoryMap[fullPath];
+        }
+
+        public void AddChild(IPackFile file)
+        {
+            file.Parent = this;
+            InternalFileList.Add(file.Name, file);
         }
     }
 }

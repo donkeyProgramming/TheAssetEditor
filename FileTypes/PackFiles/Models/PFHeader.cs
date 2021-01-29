@@ -73,6 +73,26 @@ namespace FileTypes.PackFiles.Models
             DataStart += replacedPackFilenameLength;
         }
 
+        public PFHeader(string id)
+        {
+            PrecedenceByte = 3;
+            // headers starting from Rome II are longer
+            switch (id)
+            {
+                case "PFH4":
+                case "PFH5":
+                    DataStart = 0x28;
+                    break;
+                default:
+                    DataStart = 0x20;
+                    break;
+            }
+            PackIdentifier = id;
+            FileCount = 0;
+            Version = 0;
+            ReplacedPackFileNames = new List<string>();
+        }
+
         void SetDefaultsBasedOnId(string id)
         {
             PrecedenceByte = 3;
