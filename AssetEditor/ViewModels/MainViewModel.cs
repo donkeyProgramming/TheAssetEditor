@@ -20,6 +20,8 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using TextEditor;
+using View3D;
+using View3D.Scene;
 
 namespace AssetEditor.ViewModels
 {
@@ -44,7 +46,12 @@ namespace AssetEditor.ViewModels
             FileTree.FileOpen += OnFileOpen;
 
             ToolFactory = toolFactory;
-            ToolFactory.RegisterToolAsDefault<TextEditorViewModel, TextEditorView>();
+
+            ToolFactory.RegisterToolAsDefault<SceneViewModel, SceneView3D>();
+            //ToolFactory.RegisterToolAsDefault<TextEditorViewModel, TextEditorView>();
+
+
+           
 
            if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
            {
@@ -66,7 +73,11 @@ namespace AssetEditor.ViewModels
                         MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
                 }
             }
-          
+
+            var window = ToolFactory.CreateToolAsWindow(new SceneViewModel());
+            window.Width = 800;
+            window.Height = 600;
+            window.ShowDialog();
         }
 
         private void OnFileOpen(IPackFile file)
