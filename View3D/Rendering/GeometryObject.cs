@@ -2,8 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using View3D.Components.Gizmo;
 using View3D.Rendering.Geometry;
-using View3D.Scene.Gizmo;
 
 namespace View3D.Rendering
 {

@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <None Remove="1kweupxo.plr~" />
-    <None Remove="Scene\Gizmo\Microsoft Permissive License.rtf" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,11 +16,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Components\Component\" />
-    <Folder Include="Components\Gizmo\" />
   </ItemGroup>
 
 </Project>

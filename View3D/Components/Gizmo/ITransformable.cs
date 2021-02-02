@@ -19,7 +19,7 @@
 using Microsoft.Xna.Framework;
 using System;
 
-namespace View3D.Scene.Gizmo
+namespace View3D.Components.Gizmo
 {
     /// <summary>
     /// Interface describtion for any object in the world that is transformable by position, rotation and scale. 

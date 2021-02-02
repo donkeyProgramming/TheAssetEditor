@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 
-namespace View3D.Scene.Gizmo
+namespace View3D.Components.Gizmo
 {
     internal class GizmoModel
     {

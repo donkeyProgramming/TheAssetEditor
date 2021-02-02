@@ -5,23 +5,27 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace View3D
+namespace View3D.Components
 {
 
-    public class BaseComponent : WpfGameComponent, IDrawable
+    public class BaseComponent : IDrawable, IGameComponent, IUpdateable
     {
         #region Fields
 
         private readonly WpfGame _game;
         private bool _visible = true;
-        private int _drawOrder;
+        private int _drawOrder = (int)ComponentDrawOrderEnum.Default;
         private bool _initialized;
+        private bool _enabled = true;
+        private int _updateOrder = (int)ComponentUpdateOrderEnum.Default;
+
+        public WpfGame Game { get { return _game; } }
 
         #endregion
 
         #region Constructors
 
-        public BaseComponent(WpfGame game) : base(game)
+        public BaseComponent(WpfGame game)
         {
             _game = game;
         }
@@ -33,6 +37,10 @@ namespace View3D
         public event EventHandler<EventArgs> DrawOrderChanged;
 
         public event EventHandler<EventArgs> VisibleChanged;
+
+        public event EventHandler<EventArgs> EnabledChanged;
+
+        public event EventHandler<EventArgs> UpdateOrderChanged;
 
         #endregion
 
@@ -66,13 +74,40 @@ namespace View3D
             }
         }
 
+        public bool Enabled
+        {
+            get { return _enabled; }
+            set
+            {
+                if (_enabled == value)
+                    return;
+
+                _enabled = value;
+                var ev = EnabledChanged;
+                ev?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        public int UpdateOrder
+        {
+            get { return _updateOrder; }
+            set
+            {
+                if (_updateOrder == value)
+                    return;
+
+                _updateOrder = value;
+                var ev = UpdateOrderChanged;
+                ev?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
         #endregion
 
         #region Methods
 
-        public override void Initialize()
+        public virtual void Initialize()
         {
-            base.Initialize();
             if (!_initialized)
             {
                 _initialized = true;
@@ -83,6 +118,8 @@ namespace View3D
         public virtual void Draw(GameTime gameTime) { }
 
         protected virtual void LoadContent() { }
+
+        public virtual void Update(GameTime gameTime) { }
 
 
         protected T GetComponent<T>() where T : IGameComponent

@@ -1,14 +1,16 @@
 ﻿using Common;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System.Linq;
 using View3D.Commands;
-using View3D.Input;
+using View3D.Components.Input;
+using View3D.Components.Rendering;
 using View3D.Rendering;
 
-namespace View3D.Scene
+namespace View3D.Components.Component
 {
     public class PickingComponent : BaseComponent
     {
@@ -23,8 +25,8 @@ namespace View3D.Scene
 
         public PickingComponent(WpfGame game) : base(game)
         {
-            UpdateOrder = (int)UpdateOrderEnum.PickingComponent;
-            DrawOrder = (int)DrawOrderEnum.PickingComponent;
+            UpdateOrder = (int)ComponentUpdateOrderEnum.PickingComponent;
+            DrawOrder = (int)ComponentDrawOrderEnum.PickingComponent;
         }
 
         public override void Initialize()
@@ -41,7 +43,10 @@ namespace View3D.Scene
 
         public override void Update(GameTime gameTime)
         {
-            if (!_mouse.IsMouseButtonReleased(Input.MouseButton.Left))
+            if (!_mouse.IsMouseButtonReleased(MouseButton.Left))
+                return;
+
+            if (_keyboard.IsKeyDown(Keys.LeftAlt))
                 return;
 
             RenderItem bestItem = null;

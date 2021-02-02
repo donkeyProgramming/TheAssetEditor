@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using View3D.Rendering;
 using View3D.Scene;
 
-namespace View3D.Scene
+namespace View3D.Components.Component
 {
     public delegate void SelectionChangedDelegate(IEnumerable<RenderItem> items);
     public class SelectionManager : BaseComponent

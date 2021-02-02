@@ -5,26 +5,29 @@ using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using View3D.Components.Input;
 
-namespace View3D.Scene
+namespace View3D.Components.Rendering
 {
     public class ArcBallCamera : BaseComponent
     {
         GraphicsDevice _graphicsDevice;
-        Input.MouseComponent _mouse;
-        Input.KeyboardComponent _keyboard;
+        MouseComponent _mouse;
+        KeyboardComponent _keyboard;
 
         public ArcBallCamera(WpfGame game, Vector3 lookAt, float currentZoom) : base(game)
         {
             Zoom = currentZoom;
             _lookAt = lookAt;
+
+            UpdateOrder = (int)ComponentUpdateOrderEnum.Camera;
         }
 
         public override void Initialize()
         {
             _graphicsDevice = Game.GraphicsDevice;
-            _mouse = GetComponent<Input.MouseComponent>();
-            _keyboard = GetComponent<Input.KeyboardComponent>();
+            _mouse = GetComponent<MouseComponent>();
+            _keyboard = GetComponent<KeyboardComponent>();
             base.Initialize();
         }
 

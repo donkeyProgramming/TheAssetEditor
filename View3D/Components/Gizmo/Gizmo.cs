@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
 using Serilog;
 using Common;
+using View3D.Components.Rendering;
 
 // -------------------------------------------------------------
 // -- XNA 3D Gizmo (Component)
@@ -24,7 +25,7 @@ using Common;
 // -- You may find additional XNA resources and information on these sites.
 // ------------------------------------------------------------
 
-namespace View3D.Scene.Gizmo
+namespace View3D.Components.Gizmo
 {
     public class Gizmo
     {

@@ -5,11 +5,14 @@ using System.Collections.Generic;
 
 namespace MonoGame.Framework.WpfInterop
 {
+    public delegate void SceneInitializedDelegate(WpfGame scene);
+
     /// <summary>
     /// The replacement for <see cref="Game"/>. Unlike <see cref="Game"/> the <see cref="WpfGame"/> is a WPF control and can be hosted inside WPF windows.
     /// </summary>
     public abstract class WpfGame : D3D11Host
     {
+        public event SceneInitializedDelegate SceneInitialized;
         private readonly string _contentDir;
 
         #region Fields
@@ -125,6 +128,7 @@ namespace MonoGame.Framework.WpfInterop
             Components.ComponentRemoved += ComponentRemoved;
 
             LoadContent();
+            SceneInitialized?.Invoke(this);
         }
 
         /// <summary>

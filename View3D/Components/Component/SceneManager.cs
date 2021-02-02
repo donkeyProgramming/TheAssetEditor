@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using View3D.Rendering;
 
-namespace View3D.Scene
+namespace View3D.Components.Component
 {
     public class SceneManager : BaseComponent
     {

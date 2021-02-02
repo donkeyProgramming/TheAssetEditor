@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace View3D.Scene
+namespace View3D.Components.Rendering
 {
     public enum ShaderTypes
     { 

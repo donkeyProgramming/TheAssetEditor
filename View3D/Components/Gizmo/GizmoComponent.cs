@@ -5,13 +5,13 @@ using MonoGame.Framework.WpfInterop;
 using System;
 using System.Linq;
 using View3D.Commands;
-using View3D.Input;
 using View3D.Rendering;
-using View3D.Scene;
-using MouseComponent = View3D.Input.MouseComponent;
-using KeyboardComponent = View3D.Input.KeyboardComponent;
+using View3D.Components.Component;
+using System.Collections.Generic;
+using View3D.Components.Rendering;
+using View3D.Components.Input;
 
-namespace View3D.Scene.Gizmo
+namespace View3D.Components.Gizmo
 {
     public delegate void GizmoUpdated();
 
@@ -27,14 +27,12 @@ namespace View3D.Scene.Gizmo
 
         public GizmoComponent(WpfGame game) : base(game)
         {
-            UpdateOrder = (int)UpdateOrderEnum.Gizmo;
-            DrawOrder = (int)DrawOrderEnum.Gizmo;
+            UpdateOrder = (int)ComponentUpdateOrderEnum.Gizmo;
+            DrawOrder = (int)ComponentDrawOrderEnum.Gizmo;
         }
 
         public override void Initialize()
         {
-
-
             _commandManager = GetComponent<CommandManager>();
             _selectionManager = GetComponent<SelectionManager>();
             _keyboard = GetComponent<KeyboardComponent>();
@@ -71,7 +69,7 @@ namespace View3D.Scene.Gizmo
         }
 
 
-        private void OnSelectionChanged(System.Collections.Generic.IEnumerable<Rendering.RenderItem> items)
+        private void OnSelectionChanged(IEnumerable<RenderItem> items)
         {
             _gizmo.Selection.Clear();
             foreach (var item in items)

@@ -5,41 +5,35 @@ using MonoGame.Framework.WpfInterop;
 using MonoGame.Framework.WpfInterop.Input;
 using System;
 using System.Text;
+using View3D.Components.Component;
+using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
 
 namespace View3D.Scene
 {
-    public delegate void SceneInitializedDelegate(SceneContainer scene);
+
     public class SceneContainer : WpfGame
     {
-        public event SceneInitializedDelegate SceneInitialized;
         private BasicEffect _basicEffect;
 
-
         private bool _disposed;
-
-        public SceneManager SceneManager { get; set; }
-        //public Input.Keyboard Keyboard { get; set; }
-        //public Input.Mouse Mouse { get; set; }
-
-        IGeometry _cubeMesh;
 
         RasterizerState _wireframeState;
         BasicEffect _wireframeEffect;
         bool _drawWireFrame = false;
-       
+
+
+        ArcBallCamera _camera;
+        SceneManager _sceneManager;
+
 
         protected override void Initialize()
         {
 
-//            Components
 
             _disposed = false;
             new WpfGraphicsDeviceService(this);
-
-           
-
 
             _basicEffect = new BasicEffect(GraphicsDevice);
             _basicEffect.AmbientLightColor = new Vector3(0.1f, 0.1f, 0.1f);
@@ -79,14 +73,6 @@ namespace View3D.Scene
                 }
             }
 
-            //_cubeMesh = new CubeMesh(GraphicsDevice);
-            //SceneManager = new SceneManager();
-            //SceneManager.RenderItems.Add(new RenderItem(_cubeMesh, Matrix.CreateScale(.5f) * Matrix.CreateTranslation(2, 0, 0)) { Id = "Item0"});
-            //SceneManager.RenderItems.Add(new RenderItem(_cubeMesh, Matrix.CreateScale(.5f) * Matrix.CreateTranslation(-2, 0, 0)) { Id = "Item1" });
-            //SceneManager.RenderItems.Add(new RenderItem(_cubeMesh, Matrix.CreateScale(.5f) * Matrix.CreateTranslation(0, 0, 0)) { Id = "Item2" });
-
-
-     
             _wireframeState = new RasterizerState();
             _wireframeState.FillMode = FillMode.WireFrame;
             _wireframeState.CullMode = CullMode.CullClockwiseFace;
@@ -96,43 +82,25 @@ namespace View3D.Scene
             _wireframeEffect = new BasicEffect(GraphicsDevice);
             _wireframeEffect.DiffuseColor = Vector3.Zero;
 
-
-          
+            _camera = GetComponent<ArcBallCamera>();
+            _sceneManager = GetComponent<SceneManager>();
 
             base.Initialize();
-            SceneInitialized?.Invoke(this);
         }
 
 
-
-
-
-
-        protected override void Update(GameTime gameTime)
-        {
-            //Keyboard.Update();
-            //Mouse.Update();
-            //Camera.Update(Mouse, Keyboard);
-            //
-            //if (Keyboard.IsKeyReleased(Keys.F5))
-            //    _drawWireFrame = !_drawWireFrame;
-
-            base.Update(gameTime);
-        }
-
-        public ArcBallCamera Camera;
         protected override void Draw(GameTime time)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            if (SceneManager == null)
+            if (_sceneManager == null)
                 return;
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
-            _basicEffect.Projection = Camera.ProjectionMatrix;
-            _basicEffect.View = Camera.ViewMatrix;
-           foreach (var item in SceneManager.RenderItems)
+            _basicEffect.Projection = _camera.ProjectionMatrix;
+            _basicEffect.View = _camera.ViewMatrix;
+           foreach (var item in _sceneManager.RenderItems)
            {
                GraphicsDevice.SetVertexBuffer(item.Geometry.VertexBuffer);
                _basicEffect.World = item.ModelMatrix;
@@ -146,11 +114,11 @@ namespace View3D.Scene
 
             if (_drawWireFrame)
             {
-                _wireframeEffect.Projection = Camera.ProjectionMatrix;
-                _wireframeEffect.View = Camera.ViewMatrix;
+                _wireframeEffect.Projection = _camera.ProjectionMatrix;
+                _wireframeEffect.View = _camera.ViewMatrix;
 
                 GraphicsDevice.RasterizerState = _wireframeState;
-                foreach (var item in SceneManager.RenderItems)
+                foreach (var item in _sceneManager.RenderItems)
                 {
                     GraphicsDevice.SetVertexBuffer(item.Geometry.VertexBuffer);
 

@@ -1,6 +1,7 @@
 ﻿using Common;
 using Serilog;
 using System.Collections.Generic;
+using View3D.Components.Component;
 using View3D.Rendering;
 using View3D.Scene;
 

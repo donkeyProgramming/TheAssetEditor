@@ -5,8 +5,9 @@ using MonoGame.Framework.WpfInterop.Input;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using View3D.Components;
 
-namespace View3D.Input
+namespace View3D.Components.Input
 {
     public delegate void KeybordButtonReleasedDelegate(Keys key);
 
@@ -22,6 +23,7 @@ namespace View3D.Input
         public KeyboardComponent(WpfGame game) : base(game)
         {
             _wpfKeyboard = new WpfKeyboard(game);
+            UpdateOrder = (int)ComponentUpdateOrderEnum.Input;
         }
 
         public override void Update(GameTime t)
