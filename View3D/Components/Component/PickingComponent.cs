@@ -43,19 +43,33 @@ namespace View3D.Components.Component
 
         public override void Update(GameTime gameTime)
         {
-            if (!_mouse.IsMouseButtonReleased(MouseButton.Left))
+            if (_keyboard.IsKeyReleased(Keys.F1) && _selectionManager.GeometrySelectionMode != GeometrySelectionMode.Object)
+                _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(_selectionManager, GeometrySelectionMode.Object));
+            else if (_keyboard.IsKeyReleased(Keys.F2) && _selectionManager.GeometrySelectionMode != GeometrySelectionMode.Face)
+                _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(_selectionManager, GeometrySelectionMode.Face));
+
+            if (!_mouse.IsMouseButtonReleased(MouseButton.Left) || _keyboard.IsKeyDown(Keys.LeftAlt))
                 return;
 
-            if (_keyboard.IsKeyDown(Keys.LeftAlt))
-                return;
+            var ray = _camera.CreateCameraRay(_mouse.Position());
+
+            // if there is an object in face mode - Pick face
+            var selectedItem = _selectionManager.CurrentSelection().FirstOrDefault();
+            if (selectedItem != null && selectedItem.SelectionMode == GeometrySelectionMode.Face)
+            {
+                if (selectedItem.Geometry.IntersectFace(ray, selectedItem.ModelMatrix, out int selectedFace))
+                {
+                    _logger.Here().Information($"Selected face {selectedFace} in {selectedItem.Id}");
+                    return;
+                }
+            }
 
             RenderItem bestItem = null;
             float bestDistance = float.MaxValue;
-            var ray = _camera.CreateCameraRay(_mouse.Position());
 
             foreach (var item in _sceneManger.RenderItems)
             {
-                var distance = item.Geometry.Intersect(item.ModelMatrix, ray);
+                var distance = item.Geometry.Intersect(ray, item.ModelMatrix);
                 if (distance != null)
                 {
                     if (distance < bestDistance)
@@ -70,10 +84,10 @@ namespace View3D.Components.Component
             {
                 var currentSelection = _selectionManager.CurrentSelection();
                 if (currentSelection.Count == 1 && currentSelection.FirstOrDefault() == bestItem)
-                    return;
+                    return; // Dont trigger a selection if we are selecting the same object
 
-                var selectionCommand = new SelectionCommand(_selectionManager);
-                selectionCommand.IsModification = _keyboard.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftShift);
+                var selectionCommand = new ObjectSelectionCommand(_selectionManager);
+                selectionCommand.IsModification = _keyboard.IsKeyDown(Keys.LeftShift);
                 selectionCommand.Items.Add(bestItem);
                 _commandManager.ExecuteCommand(selectionCommand);
             }

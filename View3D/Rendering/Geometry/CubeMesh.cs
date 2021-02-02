@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using View3D.Utility;
 
 namespace View3D.Rendering.Geometry
 {
@@ -12,6 +13,8 @@ namespace View3D.Rendering.Geometry
         private VertexBuffer _vertexBuffer;
         private VertexDeclaration _vertexDeclaration;
         public VertexBuffer VertexBuffer { get { return _vertexBuffer; } }
+
+        VertexPositionNormalTexture[] _vertexData;
 
         public CubeMesh(GraphicsDevice device)
         {
@@ -52,62 +55,62 @@ namespace View3D.Rendering.Geometry
             Vector3 leftNormal = new Vector3(-1.0f, 0.0f, 0.0f);
             Vector3 rightNormal = new Vector3(1.0f, 0.0f, 0.0f);
 
-            var cubeVertices = new VertexPositionNormalTexture[36];
+            _vertexData = new VertexPositionNormalTexture[36];
 
             // Front face.
-            cubeVertices[0] = new VertexPositionNormalTexture(topLeftFront, frontNormal, textureTopLeft);
-            cubeVertices[1] = new VertexPositionNormalTexture(bottomLeftFront, frontNormal, textureBottomLeft);
-            cubeVertices[2] = new VertexPositionNormalTexture(topRightFront, frontNormal, textureTopRight);
-            cubeVertices[3] = new VertexPositionNormalTexture(bottomLeftFront, frontNormal, textureBottomLeft);
-            cubeVertices[4] = new VertexPositionNormalTexture(bottomRightFront, frontNormal, textureBottomRight);
-            cubeVertices[5] = new VertexPositionNormalTexture(topRightFront, frontNormal, textureTopRight);
+            _vertexData[0] = new VertexPositionNormalTexture(topLeftFront, frontNormal, textureTopLeft);
+            _vertexData[1] = new VertexPositionNormalTexture(bottomLeftFront, frontNormal, textureBottomLeft);
+            _vertexData[2] = new VertexPositionNormalTexture(topRightFront, frontNormal, textureTopRight);
+            _vertexData[3] = new VertexPositionNormalTexture(bottomLeftFront, frontNormal, textureBottomLeft);
+            _vertexData[4] = new VertexPositionNormalTexture(bottomRightFront, frontNormal, textureBottomRight);
+            _vertexData[5] = new VertexPositionNormalTexture(topRightFront, frontNormal, textureTopRight);
 
             // Back face.
-            cubeVertices[6] = new VertexPositionNormalTexture(topLeftBack, backNormal, textureTopRight);
-            cubeVertices[7] = new VertexPositionNormalTexture(topRightBack, backNormal, textureTopLeft);
-            cubeVertices[8] = new VertexPositionNormalTexture(bottomLeftBack, backNormal, textureBottomRight);
-            cubeVertices[9] = new VertexPositionNormalTexture(bottomLeftBack, backNormal, textureBottomRight);
-            cubeVertices[10] = new VertexPositionNormalTexture(topRightBack, backNormal, textureTopLeft);
-            cubeVertices[11] = new VertexPositionNormalTexture(bottomRightBack, backNormal, textureBottomLeft);
+            _vertexData[6] = new VertexPositionNormalTexture(topLeftBack, backNormal, textureTopRight);
+            _vertexData[7] = new VertexPositionNormalTexture(topRightBack, backNormal, textureTopLeft);
+            _vertexData[8] = new VertexPositionNormalTexture(bottomLeftBack, backNormal, textureBottomRight);
+            _vertexData[9] = new VertexPositionNormalTexture(bottomLeftBack, backNormal, textureBottomRight);
+            _vertexData[10] = new VertexPositionNormalTexture(topRightBack, backNormal, textureTopLeft);
+            _vertexData[11] = new VertexPositionNormalTexture(bottomRightBack, backNormal, textureBottomLeft);
 
             // Top face.
-            cubeVertices[12] = new VertexPositionNormalTexture(topLeftFront, topNormal, textureBottomLeft);
-            cubeVertices[13] = new VertexPositionNormalTexture(topRightBack, topNormal, textureTopRight);
-            cubeVertices[14] = new VertexPositionNormalTexture(topLeftBack, topNormal, textureTopLeft);
-            cubeVertices[15] = new VertexPositionNormalTexture(topLeftFront, topNormal, textureBottomLeft);
-            cubeVertices[16] = new VertexPositionNormalTexture(topRightFront, topNormal, textureBottomRight);
-            cubeVertices[17] = new VertexPositionNormalTexture(topRightBack, topNormal, textureTopRight);
+            _vertexData[12] = new VertexPositionNormalTexture(topLeftFront, topNormal, textureBottomLeft);
+            _vertexData[13] = new VertexPositionNormalTexture(topRightBack, topNormal, textureTopRight);
+            _vertexData[14] = new VertexPositionNormalTexture(topLeftBack, topNormal, textureTopLeft);
+            _vertexData[15] = new VertexPositionNormalTexture(topLeftFront, topNormal, textureBottomLeft);
+            _vertexData[16] = new VertexPositionNormalTexture(topRightFront, topNormal, textureBottomRight);
+            _vertexData[17] = new VertexPositionNormalTexture(topRightBack, topNormal, textureTopRight);
 
             // Bottom face.
-            cubeVertices[18] = new VertexPositionNormalTexture(bottomLeftFront, bottomNormal, textureTopLeft);
-            cubeVertices[19] = new VertexPositionNormalTexture(bottomLeftBack, bottomNormal, textureBottomLeft);
-            cubeVertices[20] = new VertexPositionNormalTexture(bottomRightBack, bottomNormal, textureBottomRight);
-            cubeVertices[21] = new VertexPositionNormalTexture(bottomLeftFront, bottomNormal, textureTopLeft);
-            cubeVertices[22] = new VertexPositionNormalTexture(bottomRightBack, bottomNormal, textureBottomRight);
-            cubeVertices[23] = new VertexPositionNormalTexture(bottomRightFront, bottomNormal, textureTopRight);
+            _vertexData[18] = new VertexPositionNormalTexture(bottomLeftFront, bottomNormal, textureTopLeft);
+            _vertexData[19] = new VertexPositionNormalTexture(bottomLeftBack, bottomNormal, textureBottomLeft);
+            _vertexData[20] = new VertexPositionNormalTexture(bottomRightBack, bottomNormal, textureBottomRight);
+            _vertexData[21] = new VertexPositionNormalTexture(bottomLeftFront, bottomNormal, textureTopLeft);
+            _vertexData[22] = new VertexPositionNormalTexture(bottomRightBack, bottomNormal, textureBottomRight);
+            _vertexData[23] = new VertexPositionNormalTexture(bottomRightFront, bottomNormal, textureTopRight);
 
             // Left face.
-            cubeVertices[24] = new VertexPositionNormalTexture(topLeftFront, leftNormal, textureTopRight);
-            cubeVertices[25] = new VertexPositionNormalTexture(bottomLeftBack, leftNormal, textureBottomLeft);
-            cubeVertices[26] = new VertexPositionNormalTexture(bottomLeftFront, leftNormal, textureBottomRight);
-            cubeVertices[27] = new VertexPositionNormalTexture(topLeftBack, leftNormal, textureTopLeft);
-            cubeVertices[28] = new VertexPositionNormalTexture(bottomLeftBack, leftNormal, textureBottomLeft);
-            cubeVertices[29] = new VertexPositionNormalTexture(topLeftFront, leftNormal, textureTopRight);
+            _vertexData[24] = new VertexPositionNormalTexture(topLeftFront, leftNormal, textureTopRight);
+            _vertexData[25] = new VertexPositionNormalTexture(bottomLeftBack, leftNormal, textureBottomLeft);
+            _vertexData[26] = new VertexPositionNormalTexture(bottomLeftFront, leftNormal, textureBottomRight);
+            _vertexData[27] = new VertexPositionNormalTexture(topLeftBack, leftNormal, textureTopLeft);
+            _vertexData[28] = new VertexPositionNormalTexture(bottomLeftBack, leftNormal, textureBottomLeft);
+            _vertexData[29] = new VertexPositionNormalTexture(topLeftFront, leftNormal, textureTopRight);
 
             // Right face.
-            cubeVertices[30] = new VertexPositionNormalTexture(topRightFront, rightNormal, textureTopLeft);
-            cubeVertices[31] = new VertexPositionNormalTexture(bottomRightFront, rightNormal, textureBottomLeft);
-            cubeVertices[32] = new VertexPositionNormalTexture(bottomRightBack, rightNormal, textureBottomRight);
-            cubeVertices[33] = new VertexPositionNormalTexture(topRightBack, rightNormal, textureTopRight);
-            cubeVertices[34] = new VertexPositionNormalTexture(topRightFront, rightNormal, textureTopLeft);
-            cubeVertices[35] = new VertexPositionNormalTexture(bottomRightBack, rightNormal, textureBottomRight);
+            _vertexData[30] = new VertexPositionNormalTexture(topRightFront, rightNormal, textureTopLeft);
+            _vertexData[31] = new VertexPositionNormalTexture(bottomRightFront, rightNormal, textureBottomLeft);
+            _vertexData[32] = new VertexPositionNormalTexture(bottomRightBack, rightNormal, textureBottomRight);
+            _vertexData[33] = new VertexPositionNormalTexture(topRightBack, rightNormal, textureTopRight);
+            _vertexData[34] = new VertexPositionNormalTexture(topRightFront, rightNormal, textureTopLeft);
+            _vertexData[35] = new VertexPositionNormalTexture(bottomRightBack, rightNormal, textureBottomRight);
 
-            var vertexBuffer = new VertexBuffer(device, _vertexDeclaration, cubeVertices.Length, BufferUsage.None);
-            vertexBuffer.SetData(cubeVertices);
+            var vertexBuffer = new VertexBuffer(device, _vertexDeclaration, _vertexData.Length, BufferUsage.None);
+            vertexBuffer.SetData(_vertexData);
             return vertexBuffer;
         }
 
-        public float? Intersect(Matrix modelMatrix, Ray ray)
+        public float? Intersect(Ray ray, Matrix modelMatrix)
         {
             var bb = new BoundingBox(new Vector3(-1), new Vector3(1));
 
@@ -116,6 +119,31 @@ namespace View3D.Rendering.Geometry
             ray.Direction = Vector3.TransformNormal(ray.Direction, inverseTransform);
 
             return ray.Intersects(bb);
+        }
+
+        public bool IntersectFace(Ray ray, Matrix modelMatrix, out int faceIndex)
+        {
+            Matrix inverseTransform = Matrix.Invert(modelMatrix);
+            ray.Position = Vector3.Transform(ray.Position, inverseTransform);
+            ray.Direction = Vector3.TransformNormal(ray.Direction, inverseTransform);
+
+            faceIndex = -1;
+            float bestDistance = float.MaxValue;
+            for (int i = 0; i < _vertexData.Length; i += 3)
+            {
+                var res = IntersectionMath.MollerTrumboreIntersection(ray, _vertexData[i].Position, _vertexData[i+1].Position, _vertexData[i+2].Position, out var intersectionPoint);
+                if (res)
+                {
+                    var dist = intersectionPoint.Value.Length();
+                    if (dist < bestDistance)
+                    {
+                        faceIndex = i;
+                        bestDistance = dist;
+                    }
+                }
+            }
+
+            return (faceIndex != -1);
         }
     }
 }

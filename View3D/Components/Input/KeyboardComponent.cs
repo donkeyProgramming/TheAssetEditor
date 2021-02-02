@@ -22,7 +22,7 @@ namespace View3D.Components.Input
 
         public KeyboardComponent(WpfGame game) : base(game)
         {
-            _wpfKeyboard = new WpfKeyboard(game);
+            _wpfKeyboard = new WpfKeyboard(Game);
             UpdateOrder = (int)ComponentUpdateOrderEnum.Input;
         }
 

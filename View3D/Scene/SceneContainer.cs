@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop;
 using MonoGame.Framework.WpfInterop.Input;
 using System;
+using System.Linq;
 using System.Text;
 using View3D.Components.Component;
 using View3D.Components.Rendering;
@@ -20,13 +21,20 @@ namespace View3D.Scene
         private bool _disposed;
 
         RasterizerState _wireframeState;
+
+
         BasicEffect _wireframeEffect;
+        
+        
+        BasicEffect _selectedFaceEffect;
+
+        RasterizerState _selectedFaceState;
         bool _drawWireFrame = false;
 
 
         ArcBallCamera _camera;
         SceneManager _sceneManager;
-
+        SelectionManager _selectionManager;
 
         protected override void Initialize()
         {
@@ -36,42 +44,8 @@ namespace View3D.Scene
             new WpfGraphicsDeviceService(this);
 
             _basicEffect = new BasicEffect(GraphicsDevice);
-            _basicEffect.AmbientLightColor = new Vector3(0.1f, 0.1f, 0.1f);
             _basicEffect.DiffuseColor = new Vector3(1.0f, 1.0f, 1.0f);
-            _basicEffect.SpecularColor = new Vector3(0.25f, 0.25f, 0.25f);
-            _basicEffect.SpecularPower = 5.0f;
-            _basicEffect.Alpha = 1.0f;
-
-            _basicEffect.LightingEnabled = true;
-            if (_basicEffect.LightingEnabled)
-            {
-                _basicEffect.DirectionalLight0.Enabled = true; // enable each light individually
-                if (_basicEffect.DirectionalLight0.Enabled)
-                {
-                    // x direction
-                    _basicEffect.DirectionalLight0.DiffuseColor = new Vector3(1, 0, 0); // range is 0 to 1
-                    _basicEffect.DirectionalLight0.Direction = Vector3.Normalize(new Vector3(-1, 0, 0));
-                    _basicEffect.DirectionalLight0.SpecularColor = Vector3.One;
-                }
-
-                _basicEffect.DirectionalLight1.Enabled = true;
-                if (_basicEffect.DirectionalLight1.Enabled)
-                {
-                    // y direction
-                    _basicEffect.DirectionalLight1.DiffuseColor = new Vector3(0, 0.75f, 0);
-                    _basicEffect.DirectionalLight1.Direction = Vector3.Normalize(new Vector3(0, -1, 0));
-                    _basicEffect.DirectionalLight1.SpecularColor = Vector3.One;
-                }
-
-                _basicEffect.DirectionalLight2.Enabled = true;
-                if (_basicEffect.DirectionalLight2.Enabled)
-                {
-                    // z direction
-                    _basicEffect.DirectionalLight2.DiffuseColor = new Vector3(0, 0, 0.5f);
-                    _basicEffect.DirectionalLight2.Direction = Vector3.Normalize(new Vector3(0, 0, -1));
-                    _basicEffect.DirectionalLight2.SpecularColor = Vector3.One;
-                }
-            }
+            _basicEffect.EnableDefaultLighting(); ;// ApplyLightToShader(_basicEffect);
 
             _wireframeState = new RasterizerState();
             _wireframeState.FillMode = FillMode.WireFrame;
@@ -79,11 +53,22 @@ namespace View3D.Scene
             _wireframeState.DepthBias = -0.00008f;
             _wireframeState.DepthClipEnable = true;
 
+            _selectedFaceState = new RasterizerState();
+            _selectedFaceState.FillMode = FillMode.Solid;
+            _selectedFaceState.CullMode = CullMode.CullClockwiseFace;
+            _selectedFaceState.DepthBias = -0.00008f;
+            _wireframeState.DepthClipEnable = true;
+
             _wireframeEffect = new BasicEffect(GraphicsDevice);
             _wireframeEffect.DiffuseColor = Vector3.Zero;
 
+            _selectedFaceEffect = new BasicEffect(GraphicsDevice);
+            _selectedFaceEffect.DiffuseColor = new Vector3(1,0,0);
+            _selectedFaceEffect.EnableDefaultLighting();// ApplyLightToShader(_selectedFaceEffect);
+
             _camera = GetComponent<ArcBallCamera>();
             _sceneManager = GetComponent<SceneManager>();
+            _selectionManager = GetComponent<SelectionManager>();
 
             base.Initialize();
         }
@@ -112,24 +97,47 @@ namespace View3D.Scene
                }
            }
 
-            if (_drawWireFrame)
+
+            if(_selectionManager.GeometrySelectionMode == GeometrySelectionMode.Face)
             {
-                _wireframeEffect.Projection = _camera.ProjectionMatrix;
-                _wireframeEffect.View = _camera.ViewMatrix;
-
-                GraphicsDevice.RasterizerState = _wireframeState;
-                foreach (var item in _sceneManager.RenderItems)
+                var faceModeItems = _selectionManager.CurrentSelection();
+                if (faceModeItems.Count() != 0)
                 {
-                    GraphicsDevice.SetVertexBuffer(item.Geometry.VertexBuffer);
 
-                    _wireframeEffect.World = item.ModelMatrix;
-                    foreach (var pass in _wireframeEffect.CurrentTechnique.Passes)
+                    _selectedFaceEffect.Projection = _camera.ProjectionMatrix;
+                    _selectedFaceEffect.View = _camera.ViewMatrix;
+
+                    GraphicsDevice.RasterizerState = _selectedFaceState;
+                    foreach (var item in faceModeItems)
                     {
-                        pass.Apply();
-                        GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 12);
+                        GraphicsDevice.SetVertexBuffer(item.Geometry.VertexBuffer);
+
+                        _selectedFaceEffect.World = item.ModelMatrix;
+                        foreach (var pass in _selectedFaceEffect.CurrentTechnique.Passes)
+                        {
+                            pass.Apply();
+                            GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 1);
+                        }
                     }
 
+                    _wireframeEffect.Projection = _camera.ProjectionMatrix;
+                    _wireframeEffect.View = _camera.ViewMatrix;
+
+                    GraphicsDevice.RasterizerState = _wireframeState;
+                    foreach (var item in faceModeItems)
+                    {
+                        GraphicsDevice.SetVertexBuffer(item.Geometry.VertexBuffer);
+
+                        _wireframeEffect.World = item.ModelMatrix;
+                        foreach (var pass in _wireframeEffect.CurrentTechnique.Passes)
+                        {
+                            pass.Apply();
+                            GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 12);
+                        }
+
+                    }
                 }
+               
             }
 
             base.Draw(time);

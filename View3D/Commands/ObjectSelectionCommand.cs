@@ -7,19 +7,19 @@ using View3D.Scene;
 
 namespace View3D.Commands
 {
-    public class SelectionCommand : ICommand
+    public class ObjectSelectionCommand : ICommand
     {
-        ILogger _logger = Logging.Create<SelectionCommand>();
+        ILogger _logger = Logging.Create<ObjectSelectionCommand>();
         private readonly SelectionManager _selectionManager;
         public List<RenderItem> Items { get; set; } = new List<RenderItem>();
         public bool IsModification { get; set; } = false;
 
-        List<RenderItem> _oldSelection;
+        SelectionManager.State _oldState;
 
-        public SelectionCommand(SelectionManager selectionManager)
+        public ObjectSelectionCommand(SelectionManager selectionManager)
         {
             _selectionManager = selectionManager;
-            _oldSelection = _selectionManager.CurrentSelection();
+            _oldState = _selectionManager.GetState();
         }
 
         public void Cancel()
@@ -32,12 +32,11 @@ namespace View3D.Commands
             _logger.Here().Information($"Executing SelectionCommand");
             if (!IsModification)
             {
+                _selectionManager.GeometrySelectionMode = GeometrySelectionMode.Object;
                 _selectionManager.ClearSelection();
 
                 foreach (var newSelectionItem in Items)
                     _selectionManager.AddToSelection(newSelectionItem);
-
-                return;
             }
             else
             {
@@ -49,7 +48,7 @@ namespace View3D.Commands
         public void Undo()
         {
             _logger.Here().Information($"Undoing SelectionCommand");
-            _selectionManager.SetCurrentSelection(_oldSelection);
+            _selectionManager.SetState(_oldState);
         }
     }
 }

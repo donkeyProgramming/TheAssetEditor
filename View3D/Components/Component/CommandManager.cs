@@ -8,7 +8,7 @@ using View3D.Components;
 using View3D.Components.Input;
 using View3D.Scene;
 
-namespace View3D.Components
+namespace View3D.Components.Component
 {
     public class CommandManager : BaseComponent
     {

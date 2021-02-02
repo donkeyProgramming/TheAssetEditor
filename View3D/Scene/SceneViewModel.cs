@@ -19,7 +19,7 @@ namespace View3D.Scene
     {
         public SceneContainer Scene { get; set; } 
 
-        string _displayName;
+        string _displayName = "3d viewer";
         public string DisplayName { get => _displayName; set => SetAndNotify(ref _displayName, value); }
 
 
@@ -36,7 +36,6 @@ namespace View3D.Scene
 
         public SceneViewModel()
         {
-            DisplayName = "3d viewer";
             Scene = new SceneContainer();
 
             Scene.Components.Add(new KeyboardComponent(Scene));
