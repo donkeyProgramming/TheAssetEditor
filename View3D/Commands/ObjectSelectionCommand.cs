@@ -13,6 +13,7 @@ namespace View3D.Commands
         private readonly SelectionManager _selectionManager;
         public List<RenderItem> Items { get; set; } = new List<RenderItem>();
         public bool IsModification { get; set; } = false;
+        public bool ClearSelection { get; set; } = false;
 
         SelectionManager.State _oldState;
 
@@ -30,18 +31,26 @@ namespace View3D.Commands
         public void Execute()
         {
             _logger.Here().Information($"Executing SelectionCommand");
-            if (!IsModification)
-            {
-                _selectionManager.GeometrySelectionMode = GeometrySelectionMode.Object;
-                _selectionManager.ClearSelection();
+            _selectionManager.GeometrySelectionMode = GeometrySelectionMode.Object;
+            _selectionManager.ClearFaceSelection();
 
-                foreach (var newSelectionItem in Items)
-                    _selectionManager.AddToSelection(newSelectionItem);
+            if (ClearSelection)
+            {
+                _selectionManager.ClearSelection();
             }
             else
             {
-                foreach (var newSelectionItem in Items)
-                    _selectionManager.ModifySelection(newSelectionItem);
+                if (!IsModification)
+                {
+                    _selectionManager.ClearSelection();
+                    foreach (var newSelectionItem in Items)
+                        _selectionManager.AddToSelection(newSelectionItem);
+                }
+                else
+                {
+                    foreach (var newSelectionItem in Items)
+                        _selectionManager.ModifySelection(newSelectionItem);
+                }
             }
         }
 

@@ -14,6 +14,7 @@ namespace View3D.Components.Rendering
         GraphicsDevice _graphicsDevice;
         MouseComponent _mouse;
         KeyboardComponent _keyboard;
+        bool _componentOwnsMouse = false;
 
         public ArcBallCamera(WpfGame game, Vector3 lookAt, float currentZoom) : base(game)
         {
@@ -195,7 +196,8 @@ namespace View3D.Components.Rendering
             Update(_mouse, _keyboard);
         }
 
-        public void Update(Input.MouseComponent mouse, Input.KeyboardComponent keyboard)
+       
+        public void Update(MouseComponent mouse, KeyboardComponent keyboard)
         {
             var deltaMouseX = mouse.DeltaPosition().X;
             var deltaMouseY = mouse.DeltaPosition().Y;
@@ -209,12 +211,12 @@ namespace View3D.Components.Rendering
 
             if (keyboard.IsKeyDown(Keys.LeftAlt))
             {
-                if (mouse.IsMouseButtonPressed(Input.MouseButton.Left))
+                if (mouse.IsMouseButtonPressed(MouseButton.Left))
                 {
                     Yaw += deltaMouseX * 0.01f;
                     Pitch += deltaMouseY * 0.01f;
                 }
-                if (mouse.IsMouseButtonPressed(Input.MouseButton.Right))
+                if (mouse.IsMouseButtonPressed(MouseButton.Right))
                 {
                     MoveCameraRight(deltaMouseX * 0.01f);
                     MoveCameraUp(-deltaMouseY * 0.01f);
@@ -223,6 +225,22 @@ namespace View3D.Components.Rendering
                 {
                     Zoom += deltaMouseWheel * 0.005f;
                 }
+
+                _componentOwnsMouse = mouse.IsMouseButtonPressed(MouseButton.Left);
+            }
+
+            // mouse key down, the component owns it 
+
+
+            //else if (!mouse.IsMouseButtonPressed(MouseButton.Left))
+            //{
+            //    movedLastFrame = false;
+            //}
+
+            if (_componentOwnsMouse && mouse.IsMouseButtonReleased(MouseButton.Left))
+            {
+                mouse.ClearStates();
+                _componentOwnsMouse = false;
             }
         }
 

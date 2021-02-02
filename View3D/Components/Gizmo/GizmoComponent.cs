@@ -97,6 +97,8 @@ namespace View3D.Components.Gizmo
 
         public override void Update(GameTime gameTime)
         {
+            if (_selectionManager.GeometrySelectionMode != GeometrySelectionMode.Object)
+                return;
             _gizmo.UpdateCameraProperties();
 
             // Toggle transform mode:
@@ -120,6 +122,8 @@ namespace View3D.Components.Gizmo
 
         public override void Draw(GameTime gameTime)
         {
+            if (_selectionManager.GeometrySelectionMode != GeometrySelectionMode.Object)
+                return;
             _gizmo.Draw(false);
         }
     }

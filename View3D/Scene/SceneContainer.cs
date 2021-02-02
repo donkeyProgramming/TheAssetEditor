@@ -59,6 +59,7 @@ namespace View3D.Scene
 
             _selectedFaceEffect = new BasicEffect(GraphicsDevice);
             _selectedFaceEffect.DiffuseColor = new Vector3(1,0,0);
+            _selectedFaceEffect.SpecularColor = new Vector3(1, 0, 0);
             _selectedFaceEffect.EnableDefaultLighting();// ApplyLightToShader(_selectedFaceEffect);
 
             _camera = GetComponent<ArcBallCamera>();

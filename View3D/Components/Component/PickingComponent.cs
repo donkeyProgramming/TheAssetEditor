@@ -98,6 +98,12 @@ namespace View3D.Components.Component
                 selectionCommand.Items.Add(bestItem);
                 _commandManager.ExecuteCommand(selectionCommand);
             }
+            else
+            {
+                var selectionCommand = new ObjectSelectionCommand(_selectionManager);
+                selectionCommand.ClearSelection = true;
+                _commandManager.ExecuteCommand(selectionCommand);
+            }
         }
     }
 }

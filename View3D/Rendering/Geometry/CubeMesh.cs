@@ -131,17 +131,17 @@ namespace View3D.Rendering.Geometry
             ray.Direction = Vector3.TransformNormal(ray.Direction, inverseTransform);
 
             int faceIndex = -1;
-            float bestDistance = float.MinValue;
+            float bestDistance = float.MaxValue;
             for (int i = 0; i < _vertexData.Length; i += 3)
             {
                 var res = IntersectionMath.MollerTrumboreIntersection(ray, _vertexData[i].Position, _vertexData[i+1].Position, _vertexData[i+2].Position, out var intersectionPoint);
                 if (res)
                 {
-                    var dist = intersectionPoint.Value.Length();
-                    if (dist > bestDistance)
+                    var dist = intersectionPoint;
+                    if (dist < bestDistance)
                     {
                         faceIndex = i;
-                        bestDistance = dist;
+                        bestDistance = dist.Value;
                     }
                 }
             }
