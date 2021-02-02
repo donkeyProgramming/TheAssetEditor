@@ -228,10 +228,10 @@ namespace View3D.Scene.Gizmo
 
        // private MouseState _lastMouseState, _currentMouseState;
         ArcBallCamera _camera;
-        Input.Mouse _mouse;
+        Input.MouseComponent _mouse;
 
 
-        public Gizmo(ArcBallCamera camera, Input.Mouse mouse, GraphicsDevice graphics, SpriteBatch spriteBatch, SpriteFont font)
+        public Gizmo(ArcBallCamera camera, Input.MouseComponent mouse, GraphicsDevice graphics, SpriteBatch spriteBatch, SpriteFont font)
         {
             SceneWorld = Matrix.Identity;
             _graphics = graphics;

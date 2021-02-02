@@ -20,9 +20,8 @@ namespace View3D.Scene
         private bool _disposed;
 
         public SceneManager SceneManager { get; set; }
-        public ArcBallCamera Camera { get; set; }
-        public Input.Keyboard Keyboard { get; set; }
-        public Input.Mouse Mouse { get; set; }
+        //public Input.Keyboard Keyboard { get; set; }
+        //public Input.Mouse Mouse { get; set; }
 
         IGeometry _cubeMesh;
 
@@ -39,9 +38,8 @@ namespace View3D.Scene
             _disposed = false;
             new WpfGraphicsDeviceService(this);
 
-            Camera = new ArcBallCamera(new Vector3(0), 10, GraphicsDevice);
-            Keyboard = new Input.Keyboard(new WpfKeyboard(this));
-            Mouse = new Input.Mouse(new WpfMouse(this));
+           
+
 
             _basicEffect = new BasicEffect(GraphicsDevice);
             _basicEffect.AmbientLightColor = new Vector3(0.1f, 0.1f, 0.1f);
@@ -112,17 +110,17 @@ namespace View3D.Scene
 
         protected override void Update(GameTime gameTime)
         {
-            Keyboard.Update();
-            Mouse.Update();
-            Camera.Update(Mouse, Keyboard);
-
-            if (Keyboard.IsKeyReleased(Keys.F5))
-                _drawWireFrame = !_drawWireFrame;
+            //Keyboard.Update();
+            //Mouse.Update();
+            //Camera.Update(Mouse, Keyboard);
+            //
+            //if (Keyboard.IsKeyReleased(Keys.F5))
+            //    _drawWireFrame = !_drawWireFrame;
 
             base.Update(gameTime);
         }
 
-
+        public ArcBallCamera Camera;
         protected override void Draw(GameTime time)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);

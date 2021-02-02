@@ -19,4 +19,9 @@
     <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Components\Component\" />
+    <Folder Include="Components\Gizmo\" />
+  </ItemGroup>
+
 </Project>

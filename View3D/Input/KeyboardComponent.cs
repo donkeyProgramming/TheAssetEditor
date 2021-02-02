@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+using MonoGame.Framework.WpfInterop;
 using MonoGame.Framework.WpfInterop.Input;
 using System;
 using System.Collections.Generic;
@@ -8,7 +10,7 @@ namespace View3D.Input
 {
     public delegate void KeybordButtonReleasedDelegate(Keys key);
 
-    public class Keyboard
+    public class KeyboardComponent : BaseComponent
     {
         public event KeybordButtonReleasedDelegate KeybordButtonReleased;
 
@@ -17,12 +19,12 @@ namespace View3D.Input
 
         WpfKeyboard _wpfKeyboard;
 
-        public Keyboard(WpfKeyboard wpfKeyboard)
+        public KeyboardComponent(WpfGame game) : base(game)
         {
-            _wpfKeyboard = wpfKeyboard;
+            _wpfKeyboard = new WpfKeyboard(game);
         }
 
-        public void Update()
+        public override void Update(GameTime t)
         {
             var keyboardState = _wpfKeyboard.GetState();
 

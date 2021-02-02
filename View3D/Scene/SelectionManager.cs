@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MonoGame.Framework.WpfInterop;
+using System;
 using System.Collections.Generic;
 using View3D.Rendering;
 using View3D.Scene;
@@ -6,12 +7,12 @@ using View3D.Scene;
 namespace View3D.Scene
 {
     public delegate void SelectionChangedDelegate(IEnumerable<RenderItem> items);
-    public class SelectionManager
+    public class SelectionManager : BaseComponent
     {
         public event SelectionChangedDelegate SelectionChanged;
         List<RenderItem> _selectionList = new List<RenderItem>();
 
-        public SelectionManager(SceneManager sceneManager)
+        public SelectionManager(WpfGame game ) : base(game)
         {
 
         }

@@ -1,21 +1,31 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace View3D.Scene
 {
-    public class ArcBallCamera
+    public class ArcBallCamera : BaseComponent
     {
         GraphicsDevice _graphicsDevice;
+        Input.MouseComponent _mouse;
+        Input.KeyboardComponent _keyboard;
 
-        public ArcBallCamera( Vector3 lookAt, float currentZoom, GraphicsDevice graphicsDevice)
+        public ArcBallCamera(WpfGame game, Vector3 lookAt, float currentZoom) : base(game)
         {
-            _graphicsDevice = graphicsDevice;
             Zoom = currentZoom;
             _lookAt = lookAt;
+        }
+
+        public override void Initialize()
+        {
+            _graphicsDevice = Game.GraphicsDevice;
+            _mouse = GetComponent<Input.MouseComponent>();
+            _keyboard = GetComponent<Input.KeyboardComponent>();
+            base.Initialize();
         }
 
         /// <summary>
@@ -177,7 +187,12 @@ namespace View3D.Scene
             return false;
         }
 
-        public void Update(Input.Mouse mouse, Input.Keyboard keyboard)
+        public override void Update(GameTime gameTime)
+        {
+            Update(_mouse, _keyboard);
+        }
+
+        public void Update(Input.MouseComponent mouse, Input.KeyboardComponent keyboard)
         {
             var deltaMouseX = mouse.DeltaPosition().X;
             var deltaMouseY = mouse.DeltaPosition().Y;

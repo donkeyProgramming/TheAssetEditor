@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Framework.WpfInterop;
 using MonoGame.Framework.WpfInterop.Input;
 using System;
 using System.Collections.Generic;
@@ -13,19 +14,19 @@ namespace View3D.Input
         Right,
     }
 
-    public class Mouse
+    public class MouseComponent : BaseComponent
     {
         MouseState  _currentMouseState;
         MouseState _lastMousesState;
         WpfMouse _wpfMouse;
 
-        public Mouse(WpfMouse wpfMouse)
+        public MouseComponent(WpfGame game) : base(game)
         {
-            _wpfMouse = wpfMouse;
-            _wpfMouse.CaptureMouseWithin = true;
-        }
+           _wpfMouse = new WpfMouse(game);
+           _wpfMouse.CaptureMouseWithin = true;
+        }  
 
-        public void Update()
+        public override void Update(GameTime t)
         {
             var currentState = _wpfMouse.GetState();
 
@@ -61,7 +62,6 @@ namespace View3D.Input
 
             throw new NotImplementedException("trying to use a mouse button which is not added");
         }
-
 
 
         public Vector2 Position()

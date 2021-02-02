@@ -1,53 +1,52 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Framework.WpfInterop;
 using System;
 using System.Linq;
 using View3D.Commands;
 using View3D.Input;
 using View3D.Rendering;
 using View3D.Scene;
+using MouseComponent = View3D.Input.MouseComponent;
+using KeyboardComponent = View3D.Input.KeyboardComponent;
 
 namespace View3D.Scene.Gizmo
 {
     public delegate void GizmoUpdated();
 
-    public class GizmoComponent : IGameComponent, IUpdateable, IDrawable
+    public class GizmoComponent : BaseComponent
     {
-
-        GraphicsArgs _graphicArgs;
-        InputSystems _input;
-
+        MouseComponent _mouse;
+        KeyboardComponent _keyboard;
         SelectionManager _selectionManager;
         CommandManager _commandManager;
-
-        public event EventHandler<EventArgs> EnabledChanged;
-        public event EventHandler<EventArgs> UpdateOrderChanged;
-        public event EventHandler<EventArgs> DrawOrderChanged;
-        public event EventHandler<EventArgs> VisibleChanged;
-
-        public bool Enabled => true;
-        public int UpdateOrder => (int)UpdateOrderEnum.Gizmo;
-        public int DrawOrder => (int)DrawOrderEnum.Gizmo;
-        public bool Visible => true;
-
-
         Gizmo _gizmo;
         SpriteBatch _spriteBatch;
-
         TransformCommand _activeCommand;
 
-        public GizmoComponent(GraphicsArgs graphicArgs, InputSystems input, SelectionManager selectionManager, CommandManager commandManager)
+        public GizmoComponent(WpfGame game) : base(game)
         {
-            _commandManager = commandManager;
-            _graphicArgs = graphicArgs;
-            _input = input;
-            _selectionManager = selectionManager;
+            UpdateOrder = (int)UpdateOrderEnum.Gizmo;
+            DrawOrder = (int)DrawOrderEnum.Gizmo;
+        }
+
+        public override void Initialize()
+        {
+
+
+            _commandManager = GetComponent<CommandManager>();
+            _selectionManager = GetComponent<SelectionManager>();
+            _keyboard = GetComponent<KeyboardComponent>();
+            _mouse = GetComponent<MouseComponent>();
+            var camera = GetComponent<ArcBallCamera>();
+            var resourceLibary = GetComponent<ResourceLibary>();
+
             _selectionManager.SelectionChanged += OnSelectionChanged;
 
-            var font = graphicArgs.ResourceLibary.XnaContentManager.Load<SpriteFont>("Fonts\\DefaultFont");
-            _spriteBatch = new SpriteBatch(graphicArgs.GraphicsDevice);
-            _gizmo = new Gizmo(graphicArgs.Camera, _input.Mouse, graphicArgs.GraphicsDevice, _spriteBatch, font);
+            var font = resourceLibary.XnaContentManager.Load<SpriteFont>("Fonts\\DefaultFont");
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            _gizmo = new Gizmo(camera, _mouse, GraphicsDevice, _spriteBatch, font);
 
             _gizmo.TranslateEvent += GizmoTranslateEvent;
             _gizmo.RotateEvent += GizmoRotateEvent;
@@ -67,7 +66,7 @@ namespace View3D.Scene.Gizmo
             {
                 _commandManager.ExecuteCommand(_activeCommand);
                 _activeCommand = null;
-                _input.Mouse.ClearStates();
+                _mouse.ClearStates();
             }
         }
 
@@ -81,9 +80,7 @@ namespace View3D.Scene.Gizmo
             _gizmo.ResetDeltas();
         }
 
-        public void Initialize()
-        { 
-        }
+
 
         private void GizmoTranslateEvent(ITransformable transformable, TransformationEventArgs e)
         {
@@ -100,30 +97,30 @@ namespace View3D.Scene.Gizmo
             transformable.Scale += (Vector3)e.Value;
         }
 
-        public void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
             _gizmo.UpdateCameraProperties();
 
             // Toggle transform mode:
-            if (_input.Keyboard.IsKeyReleased(Keys.R))
+            if (_keyboard.IsKeyReleased(Keys.R))
                 _gizmo.ActiveMode = GizmoMode.Rotate;
 
-            if (_input.Keyboard.IsKeyReleased(Keys.T))
+            if (_keyboard.IsKeyReleased(Keys.T))
                 _gizmo.ActiveMode = GizmoMode.Translate;
 
-            if (_input.Keyboard.IsKeyReleased(Keys.Y))
+            if (_keyboard.IsKeyReleased(Keys.Y))
                 _gizmo.ActiveMode = GizmoMode.NonUniformScale;
 
             // Toggle space mode:
-            if (_input.Keyboard.IsKeyReleased(Keys.Home))
+            if (_keyboard.IsKeyReleased(Keys.Home))
                 _gizmo.ToggleActiveSpace();
 
             // Workaround for camera roation causing movment
-            if (!_input.Keyboard.IsKeyDown(Keys.LeftAlt))
+            if (!_keyboard.IsKeyDown(Keys.LeftAlt))
                 _gizmo.Update(gameTime);
         }
 
-        public void Draw(GameTime gameTime)
+        public override void Draw(GameTime gameTime)
         {
             _gizmo.Draw(false);
         }

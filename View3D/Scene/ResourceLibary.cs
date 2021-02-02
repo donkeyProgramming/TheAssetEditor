@@ -1,6 +1,7 @@
 ﻿using Common;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.WpfInterop;
 //using Pfim;
 using Serilog;
 using System;
@@ -21,18 +22,17 @@ namespace View3D.Scene
         Phazer
     }
 
-    public class ResourceLibary
+    public class ResourceLibary : BaseComponent
     {
         ILogger _logger = Logging.Create<ResourceLibary>();
 
         Dictionary<string, Texture2D> _textureMap = new Dictionary<string, Texture2D>();
         Dictionary<ShaderTypes, Effect> _shaders = new Dictionary<ShaderTypes, Effect>();
 
-        public ContentManager XnaContentManager { get; set; }
+        public ContentManager XnaContentManager { get { return Game.Content; } }
 
-        public ResourceLibary(ContentManager contentManager)
+        public ResourceLibary(WpfGame game) : base(game)
         {
-            XnaContentManager = contentManager;
         }
 
         public Texture2D LoadTexture(string fileName, GraphicsDevice device)

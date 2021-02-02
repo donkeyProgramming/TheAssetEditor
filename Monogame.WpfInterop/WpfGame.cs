@@ -202,6 +202,17 @@ namespace MonoGame.Framework.WpfInterop
                 SortDrawables();
             }
         }
+        public T GetComponent<T>() where T : IGameComponent
+        {
+            var type = typeof(T);
+            foreach (var comp in Components)
+            {
+                if (comp.GetType() == type)
+                    return (T)comp;
+            }
+
+            return default(T);
+        }
 
         private void SortDrawables()
         {

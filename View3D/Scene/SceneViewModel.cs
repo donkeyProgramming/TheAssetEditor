@@ -30,42 +30,47 @@ namespace View3D.Scene
             }
         }
 
-        SceneManager _sceneManager;
-        PickingComponent _pickingController;
-        CommandManager _commandManager;
-        SelectionManager _selectionManager;
-        GizmoComponent _gizmo;
-
 
         CubeMesh _cubeMesh;
         public SceneViewModel()
         {
             DisplayName = "3d viewer";
             Scene = new SceneContainer();
+
+
+            Scene.Camera = new ArcBallCamera(Scene, new Vector3(0), 10);
+
+            Scene.Components.Add(new ResourceLibary(Scene));
+            Scene.Components.Add(new KeyboardComponent(Scene));
+            Scene.Components.Add(new MouseComponent(Scene));
+            Scene.Components.Add(Scene.Camera);
+            Scene.Components.Add(new PickingComponent(Scene));
+            Scene.Components.Add(new SceneManager(Scene));
+            Scene.Components.Add(new SelectionManager(Scene));
+            Scene.Components.Add(new CommandManager(Scene));
+            Scene.Components.Add(new GizmoComponent(Scene));
             Scene.SceneInitialized += OnSceneInitialized;
         }
 
         private void OnSceneInitialized(SceneContainer scene)
         {
-            var graphicsArgs = new GraphicsArgs(Scene.Camera, Scene.GraphicsDevice, new ResourceLibary(scene.Content));
-            var inputSystems = new InputSystems(scene.Mouse, scene.Keyboard);
+            //var graphicsArgs = new GraphicsArgs(Scene.Camera, Scene.GraphicsDevice, new ResourceLibary(scene.Content));
+            //var inputSystems = new InputSystems(scene.Mouse, scene.Keyboard);
 
-            _sceneManager = new SceneManager();         
-            _selectionManager = new SelectionManager(_sceneManager);
-            _commandManager = new CommandManager(Scene.Keyboard);
-            _pickingController = new PickingComponent(graphicsArgs, inputSystems, _sceneManager, _selectionManager, _commandManager);
-            _gizmo = new GizmoComponent(graphicsArgs, inputSystems, _selectionManager, _commandManager);
 
-           
-            scene.Components.Add(_pickingController);
-            scene.Components.Add(_gizmo);
+            // _commandManager = new CommandManager(Scene.Keyboard);
 
+            //_gizmo = new GizmoComponent(graphicsArgs, inputSystems, _selectionManager, _commandManager);
+            //scene.Components.Add(_pickingController);
+            //scene.Components.Add(_gizmo);
+
+            var sceneManager = scene.GetComponent<SceneManager>();
             _cubeMesh = new CubeMesh(Scene.GraphicsDevice);
-            _sceneManager.RenderItems.Add(new RenderItem(_cubeMesh, new Vector3(2,0,0), Quaternion.Identity, new Vector3(0.5f)) { Id = "Item0" });
-            _sceneManager.RenderItems.Add(new RenderItem(_cubeMesh, new Vector3(0,0,0), Quaternion.Identity, new Vector3(0.5f)) { Id = "Item1" });
-            _sceneManager.RenderItems.Add(new RenderItem(_cubeMesh, new Vector3(-2,0,0), Quaternion.Identity, new Vector3(0.5f)) { Id = "Item2" });
+            sceneManager.RenderItems.Add(new RenderItem(_cubeMesh, new Vector3(2,0,0), Quaternion.Identity, new Vector3(0.5f)) { Id = "Item0" });
+            sceneManager.RenderItems.Add(new RenderItem(_cubeMesh, new Vector3(0,0,0), Quaternion.Identity, new Vector3(0.5f)) { Id = "Item1" });
+            sceneManager.RenderItems.Add(new RenderItem(_cubeMesh, new Vector3(-2,0,0), Quaternion.Identity, new Vector3(0.5f)) { Id = "Item2" });
 
-            Scene.SceneManager = _sceneManager;
+            Scene.SceneManager = sceneManager;
         }
 
         public string Text { get; set; }

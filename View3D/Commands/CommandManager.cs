@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Input;
+using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,15 +7,20 @@ using View3D.Scene;
 
 namespace View3D.Commands
 {
-    public class CommandManager
+    public class CommandManager : BaseComponent
     {
-        private readonly Input.Keyboard _keyboard;
+        Input.KeyboardComponent _keyboard;
         Stack<ICommand> _commands = new Stack<ICommand>();
 
-        public CommandManager(Input.Keyboard keyboard )
+        public CommandManager(WpfGame game) : base(game)
         {
-            _keyboard = keyboard;
+        }
+
+        public override void Initialize()
+        {
+            _keyboard = GetComponent<Input.KeyboardComponent>();
             _keyboard.KeybordButtonReleased += OnUndoCommand;
+            base.Initialize();
         }
 
         private void OnUndoCommand(Keys key)

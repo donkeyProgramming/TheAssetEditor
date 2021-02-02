@@ -1,6 +1,7 @@
 ﻿using Common;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System.Linq;
 using View3D.Commands;
@@ -9,52 +10,43 @@ using View3D.Rendering;
 
 namespace View3D.Scene
 {
-    public class PickingComponent : IGameComponent, IDrawable, IUpdateable
+    public class PickingComponent : BaseComponent
     {
         ILogger _logger = Logging.Create<PickingComponent>();
 
-        private readonly ArcBallCamera _camera;
-        private readonly InputSystems _input;
-        private readonly SceneManager _sceneManger;
-        private readonly CommandManager _commandManager;
-        private readonly SelectionManager _selectionManager;
+        ArcBallCamera _camera;
+        SceneManager _sceneManger;
+        CommandManager _commandManager;
+        SelectionManager _selectionManager;
+        MouseComponent _mouse;
+        KeyboardComponent _keyboard;
 
-        public event System.EventHandler<System.EventArgs> DrawOrderChanged;
-        public event System.EventHandler<System.EventArgs> VisibleChanged;
-        public event System.EventHandler<System.EventArgs> EnabledChanged;
-        public event System.EventHandler<System.EventArgs> UpdateOrderChanged;
-        public bool Visible => true;
-        public bool Enabled => true;
-        public int UpdateOrder => (int)UpdateOrderEnum.PickingComponent;
-        public int DrawOrder => (int)DrawOrderEnum.PickingComponent;
-
-        public PickingComponent(GraphicsArgs graphicArgs, InputSystems input, SceneManager sceneManger, SelectionManager selectionManager, CommandManager commandManager)
+        public PickingComponent(WpfGame game) : base(game)
         {
-            _camera = graphicArgs.Camera;
-            _input = input;
-            _sceneManger = sceneManger;
-            _commandManager = commandManager;
-            _selectionManager = selectionManager;
+            UpdateOrder = (int)UpdateOrderEnum.PickingComponent;
+            DrawOrder = (int)DrawOrderEnum.PickingComponent;
         }
 
-        public void Initialize()
+        public override void Initialize()
         {
-       
+            _camera = GetComponent<ArcBallCamera>();
+            _mouse = GetComponent<MouseComponent>();
+            _keyboard = GetComponent<KeyboardComponent>();
+            _sceneManger = GetComponent<SceneManager>();
+            _commandManager = GetComponent<CommandManager>();
+            _selectionManager = GetComponent<SelectionManager>();
+
+            base.Initialize();     
         }
 
-        public void Draw(GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
-      
-        }
-
-        public void Update(GameTime gameTime)
-        {
-            if (!_input.Mouse.IsMouseButtonReleased(Input.MouseButton.Left))
+            if (!_mouse.IsMouseButtonReleased(Input.MouseButton.Left))
                 return;
 
             RenderItem bestItem = null;
             float bestDistance = float.MaxValue;
-            var ray = _camera.CreateCameraRay(_input.Mouse.Position());
+            var ray = _camera.CreateCameraRay(_mouse.Position());
 
             foreach (var item in _sceneManger.RenderItems)
             {
@@ -76,7 +68,7 @@ namespace View3D.Scene
                     return;
 
                 var selectionCommand = new SelectionCommand(_selectionManager);
-                selectionCommand.IsModification = _input.Keyboard.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftShift);
+                selectionCommand.IsModification = _keyboard.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftShift);
                 selectionCommand.Items.Add(bestItem);
                 _commandManager.ExecuteCommand(selectionCommand);
             }

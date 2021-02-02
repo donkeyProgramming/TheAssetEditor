@@ -84,6 +84,15 @@ namespace View3D
 
         protected virtual void LoadContent() { }
 
+
+        protected T GetComponent<T>() where T : IGameComponent
+        {
+            var comp = _game.GetComponent<T>();
+            if (comp == null)
+                throw new Exception($"Unable to resolve componenet - {typeof(T)}");
+            return comp;
+        }
+
         #endregion
     }
 }
