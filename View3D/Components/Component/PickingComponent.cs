@@ -55,11 +55,18 @@ namespace View3D.Components.Component
 
             // if there is an object in face mode - Pick face
             var selectedItem = _selectionManager.CurrentSelection().FirstOrDefault();
-            if (selectedItem != null && selectedItem.SelectionMode == GeometrySelectionMode.Face)
+            if (selectedItem != null && _selectionManager.GeometrySelectionMode == GeometrySelectionMode.Face)
             {
-                if (selectedItem.Geometry.IntersectFace(ray, selectedItem.ModelMatrix, out int selectedFace))
+                if (selectedItem.Geometry.IntersectFace(ray, selectedItem.ModelMatrix, out var selectedFace))
                 {
                     _logger.Here().Information($"Selected face {selectedFace} in {selectedItem.Id}");
+
+                    FaceSelectionCommand faceSelectionCommand = new FaceSelectionCommand(_selectionManager)
+                    {
+                        IsModification = _keyboard.IsKeyDown(Keys.LeftShift),
+                        SelectedFaces = selectedFace
+                    };
+                    _commandManager.ExecuteCommand(faceSelectionCommand);
                     return;
                 }
             }

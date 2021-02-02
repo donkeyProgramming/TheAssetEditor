@@ -878,6 +878,7 @@ namespace View3D.Components.Gizmo
         {
             if (!_isActive) return;
             _graphics.DepthStencilState = DepthStencilState.None;
+            _graphics.RasterizerState = RasterizerState.CullNone;
 
             if (_view == Matrix.Identity || _projection == Matrix.Identity)
                 throw new Exception("Error: Must call .UpdateCameraProperties() before .Draw()");

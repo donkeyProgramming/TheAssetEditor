@@ -11,7 +11,6 @@ namespace View3D.Rendering
 
     public class RenderItem : ITransformable
     {
-        public GeometrySelectionMode SelectionMode { get; set; } = GeometrySelectionMode.Object;
         public Matrix ModelMatrix { get; private set; } = Matrix.Identity;
         public IGeometry Geometry { get; set; }
         public string Id { get; set; } = String.Empty;

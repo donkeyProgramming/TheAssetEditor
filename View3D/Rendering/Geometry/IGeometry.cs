@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using View3D.Components.Component;
 
 namespace View3D.Rendering.Geometry
 {
@@ -10,6 +11,11 @@ namespace View3D.Rendering.Geometry
     {
         public VertexBuffer VertexBuffer { get; }
         float? Intersect(Ray ray, Matrix modelMatrix);
-        public bool IntersectFace(Ray ray, Matrix modelMatrix, out int faceIndex);
+        public bool IntersectFace(Ray ray, Matrix modelMatrix, out FaceSelection face);
+
+
+        public void ApplyMesh(Effect effect, GraphicsDevice device);
+
+        public void ApplyMeshPart(Effect effect, GraphicsDevice device, FaceSelection faceSelection);
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using View3D.Components.Component;
 using View3D.Utility;
 
 namespace View3D.Rendering.Geometry
@@ -121,29 +122,57 @@ namespace View3D.Rendering.Geometry
             return ray.Intersects(bb);
         }
 
-        public bool IntersectFace(Ray ray, Matrix modelMatrix, out int faceIndex)
+        public bool IntersectFace(Ray ray, Matrix modelMatrix, out FaceSelection face)
         {
+            face = null;
+
             Matrix inverseTransform = Matrix.Invert(modelMatrix);
             ray.Position = Vector3.Transform(ray.Position, inverseTransform);
             ray.Direction = Vector3.TransformNormal(ray.Direction, inverseTransform);
 
-            faceIndex = -1;
-            float bestDistance = float.MaxValue;
+            int faceIndex = -1;
+            float bestDistance = float.MinValue;
             for (int i = 0; i < _vertexData.Length; i += 3)
             {
                 var res = IntersectionMath.MollerTrumboreIntersection(ray, _vertexData[i].Position, _vertexData[i+1].Position, _vertexData[i+2].Position, out var intersectionPoint);
                 if (res)
                 {
                     var dist = intersectionPoint.Value.Length();
-                    if (dist < bestDistance)
+                    if (dist > bestDistance)
                     {
                         faceIndex = i;
                         bestDistance = dist;
                     }
                 }
             }
+          
+            if (faceIndex == -1)
+                return false;
 
-            return (faceIndex != -1);
+            face = new FaceSelection(faceIndex);
+            return true;
+        }
+
+        public void ApplyMesh(Effect effect, GraphicsDevice device)
+        {
+            device.SetVertexBuffer(VertexBuffer);
+            foreach (var pass in effect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                device.DrawPrimitives(PrimitiveType.TriangleList, 0, 12);
+            }
+        }
+
+        public void ApplyMeshPart(Effect effect, GraphicsDevice device, FaceSelection faceSelection)
+        {
+            device.SetVertexBuffer(VertexBuffer);
+            foreach (var pass in effect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                foreach(var item in faceSelection.SelectedFaces)
+                    device.DrawPrimitives(PrimitiveType.TriangleList, item, 1);
+            }
         }
     }
+
 }

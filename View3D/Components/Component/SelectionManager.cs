@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using View3D.Components.Input;
 using View3D.Rendering;
 using View3D.Scene;
@@ -19,6 +20,7 @@ namespace View3D.Components.Component
         {
             public List<RenderItem> SelectionList { get; set; } = new List<RenderItem>();
             public GeometrySelectionMode SelectionMode { get; set; } = GeometrySelectionMode.Object;
+            public FaceSelection SelectedFaces { get; set; } = new FaceSelection();
         }
 
         State _currentState = new State();
@@ -33,18 +35,12 @@ namespace View3D.Components.Component
             base.Initialize();
         }
 
-
-
+        // Objects ----
         public List<RenderItem> CurrentSelection()
         {
             return new List<RenderItem>(_currentState.SelectionList);
         }
 
-        public void SetCurrentSelection(List<RenderItem> renderItems)
-        {
-            _currentState.SelectionList = new List<RenderItem>(renderItems);
-            SelectionChanged?.Invoke(_currentState.SelectionList);
-        }
 
         internal void ClearSelection()
         {
@@ -68,6 +64,30 @@ namespace View3D.Components.Component
             SelectionChanged?.Invoke(_currentState.SelectionList);
         }
 
+
+        // Faces ----
+
+        public FaceSelection CurrentFaceSelection()
+        {
+            return _currentState.SelectedFaces?.Copy();
+        }
+
+        internal void ClearFaceSelection()
+        {
+            _currentState.SelectedFaces.SelectedFaces.Clear();
+            //SelectionChanged?.Invoke(_currentState.SelectionList);
+        }
+
+        internal void SetFaceSelection(FaceSelection face)
+        {
+            _currentState.SelectedFaces = face;
+            _currentState.SelectedFaces.EnsureSorted();
+            //SelectionChanged?.Invoke(_currentState.SelectionList);
+        }
+
+
+
+
         public GeometrySelectionMode GeometrySelectionMode { get { return _currentState.SelectionMode; } set { _currentState.SelectionMode = value; } }
 
         public State GetState()
@@ -75,7 +95,8 @@ namespace View3D.Components.Component
             return new State()
             {
                 SelectionList = new List<RenderItem>(_currentState.SelectionList),
-                SelectionMode = _currentState.SelectionMode
+                SelectionMode = _currentState.SelectionMode,
+                SelectedFaces = _currentState.SelectedFaces?.Copy()
             };
         }
 
@@ -83,6 +104,38 @@ namespace View3D.Components.Component
         {
             _currentState = state;
             SelectionChanged?.Invoke(_currentState.SelectionList);
+        }
+    }
+
+    public class FaceSelection
+    {
+        public List<int> SelectedFaces { get; set; } = new List<int>();
+
+        public FaceSelection(int selectedFace)
+        {
+            SelectedFaces.Add(selectedFace);
+        }
+
+        public FaceSelection() { }
+
+        //public void Merge(FaceSelection other)
+        //{
+        //    foreach (var item in other.SelectedFaces)
+        //        SelectedFaces.Add(item);
+        //
+        //    EnsureSorted();
+        //}
+
+        public void EnsureSorted()
+        {
+            SelectedFaces = SelectedFaces.Distinct().OrderBy(x => x).ToList();
+        }
+
+        public FaceSelection Copy()
+        {
+            var item = new FaceSelection();
+            item.SelectedFaces = new List<int>(SelectedFaces);
+            return item;
         }
     }
 }

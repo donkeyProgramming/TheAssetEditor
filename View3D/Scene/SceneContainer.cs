@@ -16,16 +16,13 @@ namespace View3D.Scene
 
     public class SceneContainer : WpfGame
     {
-        private BasicEffect _basicEffect;
+        
 
         private bool _disposed;
 
         RasterizerState _wireframeState;
-
-
+        BasicEffect _basicEffect;
         BasicEffect _wireframeEffect;
-        
-        
         BasicEffect _selectedFaceEffect;
 
         RasterizerState _selectedFaceState;
@@ -38,8 +35,6 @@ namespace View3D.Scene
 
         protected override void Initialize()
         {
-
-
             _disposed = false;
             new WpfGraphicsDeviceService(this);
 
@@ -87,14 +82,8 @@ namespace View3D.Scene
             _basicEffect.View = _camera.ViewMatrix;
            foreach (var item in _sceneManager.RenderItems)
            {
-               GraphicsDevice.SetVertexBuffer(item.Geometry.VertexBuffer);
-               _basicEffect.World = item.ModelMatrix;
-                
-               foreach (var pass in _basicEffect.CurrentTechnique.Passes)
-               {
-                   pass.Apply();
-                   GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 12);
-               }
+                _basicEffect.World = item.ModelMatrix;
+                item.Geometry.ApplyMesh(_basicEffect, GraphicsDevice);
            }
 
 
@@ -103,21 +92,14 @@ namespace View3D.Scene
                 var faceModeItems = _selectionManager.CurrentSelection();
                 if (faceModeItems.Count() != 0)
                 {
-
                     _selectedFaceEffect.Projection = _camera.ProjectionMatrix;
                     _selectedFaceEffect.View = _camera.ViewMatrix;
 
                     GraphicsDevice.RasterizerState = _selectedFaceState;
                     foreach (var item in faceModeItems)
                     {
-                        GraphicsDevice.SetVertexBuffer(item.Geometry.VertexBuffer);
-
                         _selectedFaceEffect.World = item.ModelMatrix;
-                        foreach (var pass in _selectedFaceEffect.CurrentTechnique.Passes)
-                        {
-                            pass.Apply();
-                            GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 1);
-                        }
+                        item.Geometry.ApplyMeshPart(_selectedFaceEffect, GraphicsDevice, _selectionManager.CurrentFaceSelection());
                     }
 
                     _wireframeEffect.Projection = _camera.ProjectionMatrix;
@@ -126,22 +108,15 @@ namespace View3D.Scene
                     GraphicsDevice.RasterizerState = _wireframeState;
                     foreach (var item in faceModeItems)
                     {
-                        GraphicsDevice.SetVertexBuffer(item.Geometry.VertexBuffer);
-
                         _wireframeEffect.World = item.ModelMatrix;
-                        foreach (var pass in _wireframeEffect.CurrentTechnique.Passes)
-                        {
-                            pass.Apply();
-                            GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 12);
-                        }
-
+                        item.Geometry.ApplyMesh(_wireframeEffect, GraphicsDevice);
                     }
                 }
-               
             }
 
             base.Draw(time);
         }
+
 
         protected override void Dispose(bool disposing)
         {
