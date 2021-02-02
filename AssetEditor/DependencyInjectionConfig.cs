@@ -10,12 +10,14 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using View3D;
 
 namespace AssetEditor
 {
     class DependencyInjectionConfig
     {
         public IServiceProvider ServiceProvider { get; private set; }
+        
 
         public DependencyInjectionConfig()
         {
@@ -27,6 +29,7 @@ namespace AssetEditor
             ConfigureServices(serviceCollection);
 
             ServiceProvider = serviceCollection.BuildServiceProvider();
+            RegisterTools(ServiceProvider.GetService<ToolFactory>());
         }
 
         private void ConfigureServices(IServiceCollection services)
@@ -42,6 +45,13 @@ namespace AssetEditor
             services.AddTransient<SettingsViewModel>();
             services.AddTransient<MenuBarViewModel>();
             services.AddTransient<FileTypes.PackFiles.Services.PackFileService>();
+
+            View3D_DependencyInjectionContainer.Register(services);
+        }
+
+        void RegisterTools(IToolFactory factory)
+        {
+            View3D_DependencyInjectionContainer.RegisterTools(factory);
         }
 
         public void ShowMainWindow()

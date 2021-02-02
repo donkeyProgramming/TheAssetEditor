@@ -9,19 +9,20 @@ using System.Windows.Controls;
 
 namespace AssetEditor.Services
 {
-    public class ToolFactory
+
+    public class ToolFactory : IToolFactory
     {
         ILogger _logger = Logging.Create<ToolFactory>();
-        ApplicationSettingsService _applicationSettings;
+        IServiceProvider _serviceProvider;
 
         Dictionary<Type, Type> _viewModelToViewMap = new Dictionary<Type, Type>();
         Dictionary<string, Type> _extentionToToolMap = new Dictionary<string, Type>();
 
         Type _defaultViewModelType;
 
-        public ToolFactory(ApplicationSettingsService applicationSettings)
+        public ToolFactory(IServiceProvider serviceProvider)
         {
-            _applicationSettings = applicationSettings;
+            _serviceProvider = serviceProvider;
         }
 
         public void RegisterTool<ViewModel, View>(params string[] extentions)
@@ -79,6 +80,24 @@ namespace AssetEditor.Services
 
             return newWindow;
         }
+
+        public Window CreateToolAsWindow<ViewModel>(out IEditorViewModel viewModelInstance) 
+            where ViewModel : IEditorViewModel
+        {
+            var viewType = _viewModelToViewMap[typeof(ViewModel)];
+            var viewModelType = typeof(ViewModel);
+
+            var view = _serviceProvider.GetService(viewType);
+            viewModelInstance = _serviceProvider.GetService(viewModelType) as IEditorViewModel;
+
+            Window newWindow = new Window();
+            newWindow.Content = view;
+            newWindow.DataContext = viewModelInstance;
+
+            return newWindow;
+        }
+
+
 
         public IEditorViewModel GetToolViewModelFromFileName(string filename)
         {

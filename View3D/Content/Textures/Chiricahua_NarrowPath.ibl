@@ -1,0 +1,39 @@
+[Header]
+ICOfile = "NarrowPath_thumb.jpg"
+PREVIEWfile = "NarrowPath_preview.jpg"
+Name = "Chiricahua NarrowPath"
+Author = "Blochi"
+Location = "Arizona"
+Comment = "Sunny day in the National Park, in the shade between big rock walls"
+GEOlat = 32.0026206969444470
+GEOlong = -109.3222808838888800
+Link = "http://www.hdrlabs.com/sibl/archive.html"
+Date = "2010:05:17"
+Time = "15:00:00"
+Height = 1.700000
+
+[Background]
+BGfile = "NarrowPath_8k.jpg"
+BGmap = 1
+BGu = 0.000000
+BGv = 0.000000
+BGheight = 4096
+
+[Enviroment]
+EVfile = "NarrowPath_Env.hdr"
+EVmap = 1
+EVu = 0.000000
+EVv = 0.000000
+EVheight = 180
+EVmulti = 1.000000
+EVgamma = 1.600000
+
+[Reflection]
+REFfile = "NarrowPath_3k.hdr"
+REFmap = 1
+REFu = 0.000000
+REFv = 0.000000
+REFheight = 1600
+REFmulti = 1.000000
+REFgamma = 1.600000
+

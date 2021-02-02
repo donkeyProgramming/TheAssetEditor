@@ -15,7 +15,7 @@ namespace MonoGame.Framework.WpfInterop.Input
     {
         #region Fields
 
-        private readonly WpfGame _focusElement;
+        private readonly FrameworkElement _focusElement;
 
         private MouseState _mouseState;
         private bool _captureMouseWithin = true;

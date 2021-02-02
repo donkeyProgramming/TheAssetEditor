@@ -83,6 +83,11 @@ namespace FileTypes.PackFiles.Models
         }
 
         public PackFileType PackFileType() { return Common.PackFileType.Directory; }
+        public IPackFile FindChild(string itemName)
+        {
+            InternalFileList.TryGetValue(itemName, out var value);
+            return value;
+        }
 
     
         Dictionary<string, IPackFile> InternalFileList { get; set; } = new Dictionary<string, IPackFile>();

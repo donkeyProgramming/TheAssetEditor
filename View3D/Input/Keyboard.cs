@@ -6,8 +6,12 @@ using System.Text;
 
 namespace View3D.Input
 {
+    public delegate void KeybordButtonReleasedDelegate(Keys key);
+
     public class Keyboard
     {
+        public event KeybordButtonReleasedDelegate KeybordButtonReleased;
+
         KeyboardState _currentKeyboardState;
         KeyboardState _lastKeyboardState;
 
@@ -27,6 +31,12 @@ namespace View3D.Input
 
             if (_lastKeyboardState == null)
                 _lastKeyboardState = keyboardState;
+
+            foreach (var key in _lastKeyboardState.GetPressedKeys())
+            {
+                if (IsKeyUp(key))
+                    KeybordButtonReleased?.Invoke(key);
+            }
         }
 
         public bool IsKeyReleased(Keys key)

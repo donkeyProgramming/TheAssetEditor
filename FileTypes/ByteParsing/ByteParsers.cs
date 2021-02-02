@@ -1,7 +1,4 @@
-﻿using Common.SystemHalf;
-using Filetypes.DB;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using SharpDX;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -153,7 +150,8 @@ namespace Filetypes.ByteParsing
 
         protected override Half Decode(byte[] buffer, int index)
         {
-            return Half.ToHalf(buffer, index);
+            var u = ((ushort)BitConverter.ToInt16(buffer, index));
+            return new Half(u);
         }
     }
 

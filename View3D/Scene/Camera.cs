@@ -9,18 +9,9 @@ namespace View3D.Scene
 {
     public class ArcBallCamera
     {
-
-        bool _isFirstPress = false;
-
-        float _mouseX;
-        float _mouseY;
-        int _lastScrollWheelValue = 0;
         GraphicsDevice _graphicsDevice;
 
-        public ArcBallCamera(float aspectRation, Vector3 lookAt, float currentZoom, GraphicsDevice graphicsDevice)
-           : this(aspectRation, MathHelper.PiOver4, lookAt, Vector3.Up, 0.1f, float.MaxValue, currentZoom, graphicsDevice) { }
-
-        public ArcBallCamera(float aspectRatio, float fieldOfView, Vector3 lookAt, Vector3 up, float nearPlane, float farPlane, float currentZoom, GraphicsDevice graphicsDevice)
+        public ArcBallCamera( Vector3 lookAt, float currentZoom, GraphicsDevice graphicsDevice)
         {
             _graphicsDevice = graphicsDevice;
             Zoom = currentZoom;
@@ -186,11 +177,11 @@ namespace View3D.Scene
             return false;
         }
 
-        public void Update(MouseState mouseState, Input.Keyboard keyboard)
+        public void Update(Input.Mouse mouse, Input.Keyboard keyboard)
         {
-            var deltaMouseX = _mouseX - mouseState.X;
-            var deltaMouseY = _mouseY - mouseState.Y;
-            var deltaMouseWheel = _lastScrollWheelValue - mouseState.ScrollWheelValue;
+            var deltaMouseX = mouse.DeltaPosition().X;
+            var deltaMouseY = mouse.DeltaPosition().Y;
+            var deltaMouseWheel = mouse.DeletaScrollWheel();
 
             if (keyboard.IsKeyReleased(Keys.F4))
             {
@@ -200,26 +191,21 @@ namespace View3D.Scene
 
             if (keyboard.IsKeyDown(Keys.LeftAlt))
             {
-                if (mouseState.LeftButton == ButtonState.Pressed)
+                if (mouse.IsMouseButtonPressed(Input.MouseButton.Left))
                 {
                     Yaw += deltaMouseX * 0.01f;
                     Pitch += deltaMouseY * 0.01f;
                 }
-                else if (mouseState.RightButton == ButtonState.Pressed)
+                if (mouse.IsMouseButtonPressed(Input.MouseButton.Right))
                 {
-                    MoveCameraRight(deltaMouseX * 0.005f);
-                    MoveCameraUp(-deltaMouseY * 0.005f);
+                    MoveCameraRight(deltaMouseX * 0.01f);
+                    MoveCameraUp(-deltaMouseY * 0.01f);
                 }
                 else if (deltaMouseWheel != 0)
                 {
                     Zoom += deltaMouseWheel * 0.005f;
                 }
             }
-
-            // Update
-            _mouseX = mouseState.X;
-            _mouseY = mouseState.Y;
-            _lastScrollWheelValue = mouseState.ScrollWheelValue;
         }
 
 
@@ -230,6 +216,28 @@ namespace View3D.Scene
                 (float)_graphicsDevice.Viewport.Width /
                 (float)_graphicsDevice.Viewport.Height,
                 .01f, 150);
+        }
+
+        public Ray CreateCameraRay(Vector2 mouseLocation)
+        {
+            var projection = ProjectionMatrix;
+
+            Vector3 nearPoint = _graphicsDevice.Viewport.Unproject(new Vector3(mouseLocation.X,
+                   mouseLocation.Y, 0.0f),
+                   projection,
+                   ViewMatrix,
+                   Matrix.Identity);
+
+            Vector3 farPoint = _graphicsDevice.Viewport.Unproject(new Vector3(mouseLocation.X,
+                    mouseLocation.Y, 1.0f),
+                    projection,
+                    ViewMatrix,
+                    Matrix.Identity);
+
+            Vector3 direction = farPoint - nearPoint;
+            direction.Normalize();
+
+            return new Ray(nearPoint, direction);
         }
     }
 }

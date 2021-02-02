@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 
 namespace Filetypes.RigidModel
-{
+{/*
     public class AnimationFile
     {
         public class BoneInfo
@@ -329,5 +329,5 @@ namespace Filetypes.RigidModel
             return frame;
         }
 
-    }
+    }*/
 }

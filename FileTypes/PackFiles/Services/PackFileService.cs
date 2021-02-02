@@ -120,7 +120,28 @@ namespace FileTypes.PackFiles.Services
 
         public void Unload() { }
         public void Save() {  }
-        public void FindFile() { }
+
+        public IPackFile FindFile(string path) 
+        {
+            _logger.Here().Information($"Searching for file {path}");
+            var dirName = Path.GetDirectoryName(path);
+            var fileName = Path.GetFileName(path);
+            foreach (var packFile in Database.PackFiles)
+            {
+                var dir = GetDirectory(packFile, dirName, false) as PackFileDirectory;
+                if (dir != null)
+                {
+                    var item = dir.FindChild(fileName);
+                    if (item != null)
+                    {
+                        _logger.Here().Information($"File found");
+                        return item;
+                    }
+                }
+            }
+            _logger.Here().Warning($"File not found");
+            return null;
+        }
 
         public void NewPackFile(string name) 
         {
@@ -153,7 +174,7 @@ namespace FileTypes.PackFiles.Services
                 var currentPath = filePaths[i];
                 var filename = Path.GetFileName(currentPath);
                 var dirPath = Path.GetDirectoryName(currentPath);
-                var directory = GetDirectory(parent, dirPath);
+                var directory = GetDirectory(parent, dirPath, true);
                 var source = MemorySource.FromFile(originalFilePaths[i]);
 
                 var file = new PackFile(filename, "AddFolderContent does not set full path", source);
@@ -166,31 +187,38 @@ namespace FileTypes.PackFiles.Services
         }
 
 
-        IPackFile GetDirectory(IPackFile parent, string name)
+        IPackFile GetDirectory(IPackFile parent, string name, bool createIfMissing)
         {
             if (string.IsNullOrWhiteSpace(name))
                 return parent;
             var dirPaths = name.Split('\\');
-            return CreatFolder(parent, dirPaths, 0);
+            return CreatFolder(parent, dirPaths, 0, createIfMissing);
         }
 
-        IPackFile CreatFolder(IPackFile pack, string[] directoryNames, int index)
+        IPackFile CreatFolder(IPackFile pack, string[] directoryNames, int index, bool createIfMissing)
         {
-            if (index == directoryNames.Length - 1)
+            if (index == directoryNames.Length)
                 return pack;
             foreach (var child in pack.Children)
             {
                 if (child.PackFileType() == PackFileType.Directory)
                 {
                     if (child.Name == directoryNames[index])
-                        return CreatFolder(child, directoryNames, index + 1);
+                        return CreatFolder(child, directoryNames, index + 1, createIfMissing);
                 }
             }
 
-            var newFolder = new PackFileDirectory(directoryNames[index]);
-            pack.AddChild(newFolder);
-            CreatFolder(newFolder, directoryNames, index + 1);
-            return newFolder;
+            if (createIfMissing)
+            {
+                var newFolder = new PackFileDirectory(directoryNames[index]);
+                pack.AddChild(newFolder);
+                CreatFolder(newFolder, directoryNames, index + 1, createIfMissing);
+                return newFolder;
+            }
+            else
+            {
+                return null;
+            }
         }
 
 

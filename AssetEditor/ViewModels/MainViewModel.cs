@@ -32,7 +32,7 @@ namespace AssetEditor.ViewModels
         public FileTreeViewModel FileTree { get; private set; }
         public MenuBarViewModel MenuBar { get; set; }
 
-        public ToolFactory ToolFactory { get; set; }
+        ToolFactory _toolFactory { get; set; }
         public ObservableCollection<IEditorViewModel> CurrentEditorsList { get; set; } = new ObservableCollection<IEditorViewModel>();
         
         int _selectedIndex;
@@ -45,13 +45,9 @@ namespace AssetEditor.ViewModels
             FileTree = new FileTreeViewModel(packfileService);
             FileTree.FileOpen += OnFileOpen;
 
-            ToolFactory = toolFactory;
+            _toolFactory = toolFactory;
+            _toolFactory.RegisterToolAsDefault<TextEditorViewModel, TextEditorView>();
 
-            ToolFactory.RegisterToolAsDefault<SceneViewModel, SceneView3D>();
-            //ToolFactory.RegisterToolAsDefault<TextEditorViewModel, TextEditorView>();
-
-
-           
 
            if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
            {
@@ -74,7 +70,9 @@ namespace AssetEditor.ViewModels
                 }
             }
 
-            var window = ToolFactory.CreateToolAsWindow(new SceneViewModel());
+            var packFile = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\dwf_hammerers.variantmeshdefinition");
+            var window = _toolFactory.CreateToolAsWindow<SceneViewModel>(out var editorViewModel);
+            editorViewModel.MainFile = packFile;
             window.Width = 800;
             window.Height = 600;
             window.ShowDialog();
@@ -96,7 +94,7 @@ namespace AssetEditor.ViewModels
                 return;
             }
 
-            var editorViewModel = ToolFactory.GetToolViewModelFromFileName(file.Name);
+            var editorViewModel = _toolFactory.GetToolViewModelFromFileName(file.Name);
             editorViewModel.MainFile = file;
             CurrentEditorsList.Add(editorViewModel);
             SelectedEditorIndex = CurrentEditorsList.Count - 1;
