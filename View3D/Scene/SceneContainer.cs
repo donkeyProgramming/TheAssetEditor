@@ -39,7 +39,7 @@ namespace View3D.Scene
             _selectedFaceState = new RasterizerState();
             _selectedFaceState.FillMode = FillMode.Solid;
             _selectedFaceState.CullMode = CullMode.None;
-            _selectedFaceState.DepthBias = -0.00008f;
+            _selectedFaceState.DepthBias = -0.000008f;
             _wireframeState.DepthClipEnable = true;
 
             _camera = GetComponent<ArcBallCamera>();
@@ -70,20 +70,15 @@ namespace View3D.Scene
             foreach (var item in _sceneManager.RenderItems)
                 item.DrawBasic(GraphicsDevice, Matrix.Identity, commonShaderParameters);
 
-            if(_selectionManager.GeometrySelectionMode == GeometrySelectionMode.Face)
+            var selectionState = _selectionManager.GetState();
+            var selectionFaceState = selectionState as FaceSelectionState;
+            if (selectionFaceState != null && selectionFaceState.RenderObject != null)
             {
-                var faceModeItems = _selectionManager.CurrentSelection();
-                if (faceModeItems.Count() != 0)
-                {
-                    GraphicsDevice.RasterizerState = _selectedFaceState;
-                    foreach (var item in faceModeItems)
-                        item.DrawSelectedFaces(GraphicsDevice, Matrix.Identity, commonShaderParameters, _selectionManager.CurrentFaceSelection());
+                GraphicsDevice.RasterizerState = _selectedFaceState;
+                selectionFaceState.RenderObject.DrawSelectedFaces(GraphicsDevice, Matrix.Identity, commonShaderParameters, selectionFaceState.CurrentSelection());
 
-                    GraphicsDevice.RasterizerState = _wireframeState;
-                    foreach (var item in faceModeItems)
-                        item.DrawWireframeOverlay(GraphicsDevice, Matrix.Identity, commonShaderParameters);
-       
-                }
+                GraphicsDevice.RasterizerState = _wireframeState;
+                selectionFaceState.RenderObject.DrawWireframeOverlay(GraphicsDevice, Matrix.Identity, commonShaderParameters);
             }
 
             base.Draw(time);

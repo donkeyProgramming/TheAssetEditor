@@ -55,7 +55,10 @@ namespace View3D.Components.Gizmo
 
         private void GizmoTransformStart()
         {
-            _activeCommand = new TransformCommand(_selectionManager.CurrentSelection());
+            if (_selectionManager.GetState().Mode != GeometrySelectionMode.Object)
+                return;
+
+            _activeCommand = new TransformCommand((_selectionManager.GetState() as ObjectSelectionState).CurrentSelection());
         }
 
         private void GizmoTransformEnd()
@@ -79,7 +82,6 @@ namespace View3D.Components.Gizmo
         }
 
 
-
         private void GizmoTranslateEvent(ITransformable transformable, TransformationEventArgs e)
         {
             transformable.Position += (Vector3)e.Value;
@@ -97,7 +99,7 @@ namespace View3D.Components.Gizmo
 
         public override void Update(GameTime gameTime)
         {
-            if (_selectionManager.GeometrySelectionMode != GeometrySelectionMode.Object)
+            if (_selectionManager.GetState().Mode != GeometrySelectionMode.Object)
                 return;
             _gizmo.UpdateCameraProperties();
 
@@ -122,7 +124,7 @@ namespace View3D.Components.Gizmo
 
         public override void Draw(GameTime gameTime)
         {
-            if (_selectionManager.GeometrySelectionMode != GeometrySelectionMode.Object)
+            if (_selectionManager.GetState().Mode != GeometrySelectionMode.Object)
                 return;
             _gizmo.Draw(false);
         }

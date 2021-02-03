@@ -61,8 +61,8 @@ namespace View3D.Scene
             //sceneManager.RenderItems.Add(RenderItemHelper.CreateRenderItem(planeMesh, new Vector3(2, 0, 0), new Vector3(0.5f), "Item0", scene.GraphicsDevice));
             var cubeMesh = new CubeMesh(Scene.GraphicsDevice);
             sceneManager.RenderItems.Add(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(2, 0, 0),  new Vector3(0.5f),"Item0", scene.GraphicsDevice));
-            //sceneManager.RenderItems.Add(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0),  new Vector3(0.5f),"Item1", scene.GraphicsDevice));
-            //sceneManager.RenderItems.Add(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(-2, 0, 0), new Vector3(0.5f),"Item2", scene.GraphicsDevice));
+            sceneManager.RenderItems.Add(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0),  new Vector3(0.5f),"Item1", scene.GraphicsDevice));
+            sceneManager.RenderItems.Add(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(-2, 0, 0), new Vector3(0.5f),"Item2", scene.GraphicsDevice));
             //
             //if (MainFile != null)
             //{

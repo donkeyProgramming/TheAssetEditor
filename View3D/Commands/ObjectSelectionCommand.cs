@@ -1,6 +1,7 @@
 ﻿using Common;
 using Serilog;
 using System.Collections.Generic;
+using System.Linq;
 using View3D.Components.Component;
 using View3D.Rendering;
 using View3D.Scene;
@@ -15,12 +16,12 @@ namespace View3D.Commands
         public bool IsModification { get; set; } = false;
         public bool ClearSelection { get; set; } = false;
 
-        SelectionManager.State _oldState;
+        ISelectionState _oldState;
 
         public ObjectSelectionCommand(SelectionManager selectionManager)
         {
             _selectionManager = selectionManager;
-            _oldState = _selectionManager.GetState();
+            _oldState = _selectionManager.GetStateCopy();
         }
 
         public void Cancel()
@@ -30,27 +31,24 @@ namespace View3D.Commands
 
         public void Execute()
         {
-            _logger.Here().Information($"Executing SelectionCommand");
-            _selectionManager.GeometrySelectionMode = GeometrySelectionMode.Object;
-            _selectionManager.ClearFaceSelection();
+            _logger.Here().Information($"Executing SelectionCommand Clear[{ClearSelection}] Mod[{IsModification}] Items[{string.Join(',', Items.Select(x=>x.Name))}]");
 
             if (ClearSelection)
             {
-                _selectionManager.ClearSelection();
+                _selectionManager.CreateSelectionSate(GeometrySelectionMode.Object);
             }
             else
             {
+                var currentState = _selectionManager.GetState();
+                if (currentState.Mode != GeometrySelectionMode.Object)
+                    currentState = _selectionManager.CreateSelectionSate(GeometrySelectionMode.Object);
+
+                var objectState = currentState as ObjectSelectionState;
                 if (!IsModification)
-                {
-                    _selectionManager.ClearSelection();
-                    foreach (var newSelectionItem in Items)
-                        _selectionManager.AddToSelection(newSelectionItem);
-                }
-                else
-                {
-                    foreach (var newSelectionItem in Items)
-                        _selectionManager.ModifySelection(newSelectionItem);
-                }
+                    objectState.Clear();
+
+                foreach (var newSelectionItem in Items)
+                    objectState.ModifySelection(newSelectionItem);
             }
         }
 

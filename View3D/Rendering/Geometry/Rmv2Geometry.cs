@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 using View3D.Components.Component;
 using View3D.Utility;
 
@@ -89,14 +90,14 @@ namespace View3D.Rendering.Geometry
             }
         }
 
-        public void ApplyMeshPart(Effect effect, GraphicsDevice device, FaceSelection faceSelection)
+        public void ApplyMeshPart(Effect effect, GraphicsDevice device, List<int> faceSelection)
         {
             device.Indices = _indexBuffer;
             device.SetVertexBuffer(_vertexBuffer);
             foreach (var pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                foreach (var item in faceSelection.SelectedFaces)
+                foreach (var item in faceSelection)
                     device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, item, 1);
             }
 
@@ -144,7 +145,7 @@ namespace View3D.Rendering.Geometry
             return null;
         }
 
-        public bool IntersectFace(Ray ray, Matrix modelMatrix, out FaceSelection face)
+        public bool IntersectFace(Ray ray, Matrix modelMatrix, out int? face)
         {
             face = null;
 
@@ -179,7 +180,7 @@ namespace View3D.Rendering.Geometry
             if (faceIndex == -1)
                 return false;
 
-            face = new FaceSelection(faceIndex);
+            face = (faceIndex);
             return true;
         }
 

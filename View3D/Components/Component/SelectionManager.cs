@@ -17,132 +17,175 @@ namespace View3D.Components.Component
         Vertex
     };
 
-    public delegate void SelectionChangedDelegate(IEnumerable<RenderItem> items);
-    public class SelectionManager : BaseComponent
+    
+    public delegate void SelectionStateChanged(ISelectionState state);
+    public interface ISelectionState
     {
-        public event SelectionChangedDelegate SelectionChanged;
-        KeyboardComponent _keyboard;
+        ISelectionState Clone();
+        void Clear();
+        void Restore();
+        GeometrySelectionMode Mode { get; }
+        public event SelectionStateChanged SelectionChanged;
+    }
 
-        public class State
+    public class ObjectSelectionState : ISelectionState
+    {
+        public event SelectionStateChanged SelectionChanged;
+        public GeometrySelectionMode Mode => GeometrySelectionMode.Object;
+
+        List<RenderItem> _selectionList { get; set; } = new List<RenderItem>();
+
+        public void ModifySelection(RenderItem newSelectionItem)
         {
-            public List<RenderItem> SelectionList { get; set; } = new List<RenderItem>();
-            public GeometrySelectionMode SelectionMode { get; set; } = GeometrySelectionMode.Object;
-            public FaceSelection SelectedFaces { get; set; } = new FaceSelection();
-        }
-
-        State _currentState = new State();
-
-        public SelectionManager(WpfGame game ) : base(game)
-        {
-        }
-
-        public override void Initialize()
-        {
-            _keyboard = GetComponent<KeyboardComponent>();
-            base.Initialize();
-        }
-
-        // Objects ----
-        public List<RenderItem> CurrentSelection()
-        {
-            return new List<RenderItem>(_currentState.SelectionList);
-        }
-
-
-        internal void ClearSelection()
-        {
-            _currentState.SelectionList.Clear();
-            SelectionChanged?.Invoke(_currentState.SelectionList);
-        }
-
-        internal void AddToSelection(RenderItem newSelectionItem)
-        {
-            _currentState.SelectionList.Add(newSelectionItem);
-            SelectionChanged?.Invoke(_currentState.SelectionList);
-        }
-
-        internal void ModifySelection(RenderItem newSelectionItem)
-        {
-            if (_currentState.SelectionList.Contains(newSelectionItem))
-                _currentState.SelectionList.Remove(newSelectionItem);
+            if (_selectionList.Contains(newSelectionItem))
+                _selectionList.Remove(newSelectionItem);
             else
-                _currentState.SelectionList.Add(newSelectionItem);
+                _selectionList.Add(newSelectionItem);
 
-            SelectionChanged?.Invoke(_currentState.SelectionList);
+            SelectionChanged?.Invoke(this);
         }
 
-
-        // Faces ----
-
-        public FaceSelection CurrentFaceSelection()
-        {
-            return _currentState.SelectedFaces?.Copy();
+        public List<RenderItem> CurrentSelection() 
+        { 
+            return _selectionList; 
         }
 
-        internal void ClearFaceSelection()
+        public void Clear()
         {
-            _currentState.SelectedFaces.SelectedFaces.Clear();
-            //SelectionChanged?.Invoke(_currentState.SelectionList);
+            _selectionList.Clear();
+            SelectionChanged?.Invoke(this);
         }
 
-        internal void SetFaceSelection(FaceSelection face)
+        public ISelectionState Clone()
         {
-            _currentState.SelectedFaces = face;
-            _currentState.SelectedFaces.EnsureSorted();
-            //SelectionChanged?.Invoke(_currentState.SelectionList);
-        }
-
-
-
-
-        public GeometrySelectionMode GeometrySelectionMode { get { return _currentState.SelectionMode; } set { _currentState.SelectionMode = value; } }
-
-        public State GetState()
-        {
-            return new State()
+            return new ObjectSelectionState()
             {
-                SelectionList = new List<RenderItem>(_currentState.SelectionList),
-                SelectionMode = _currentState.SelectionMode,
-                SelectedFaces = _currentState.SelectedFaces?.Copy()
+                _selectionList = new List<RenderItem>(_selectionList)
             };
         }
 
-        public void SetState(State state)
+        public void Restore()
         {
-            _currentState = state;
-            SelectionChanged?.Invoke(_currentState.SelectionList);
+            SelectionChanged?.Invoke(this);
         }
     }
 
-    public class FaceSelection
+    public class FaceSelectionState : ISelectionState
     {
+        public GeometrySelectionMode Mode => GeometrySelectionMode.Face;
+        public event SelectionStateChanged SelectionChanged;
+
+        public RenderItem RenderObject { get; set; }
         public List<int> SelectedFaces { get; set; } = new List<int>();
 
-        public FaceSelection(int selectedFace)
+
+        public void ModifySelection(int newSelectionItem)
         {
-            SelectedFaces.Add(selectedFace);
+            if (SelectedFaces.Contains(newSelectionItem))
+                SelectedFaces.Remove(newSelectionItem);
+            else
+                SelectedFaces.Add(newSelectionItem);
+
+            SelectionChanged?.Invoke(this);
         }
 
-        public FaceSelection() { }
+        public List<int> CurrentSelection()
+        {
+            return SelectedFaces;
+        }
 
-        //public void Merge(FaceSelection other)
-        //{
-        //    foreach (var item in other.SelectedFaces)
-        //        SelectedFaces.Add(item);
-        //
-        //    EnsureSorted();
-        //}
+        public void Clear()
+        {
+            SelectedFaces.Clear();
+            SelectionChanged?.Invoke(this);
+        }
+
 
         public void EnsureSorted()
         {
             SelectedFaces = SelectedFaces.Distinct().OrderBy(x => x).ToList();
         }
 
-        public FaceSelection Copy()
+
+        public ISelectionState Clone()
         {
-            var item = new FaceSelection();
-            item.SelectedFaces = new List<int>(SelectedFaces);
-            return item;
+            return new FaceSelectionState()
+            {
+                RenderObject = RenderObject,
+                SelectedFaces = new List<int>(SelectedFaces)
+            };
+        }
+
+        public void Restore()
+        {
+            
+        }
+    }
+
+    
+    public delegate void SelectionChangedDelegate(IEnumerable<RenderItem> items);
+    public class SelectionManager : BaseComponent
+    {
+        public event SelectionChangedDelegate SelectionChanged;
+        ISelectionState _currentState;
+
+        public SelectionManager(WpfGame game ) : base(game) {}
+
+        public override void Initialize()
+        {
+            CreateSelectionSate(GeometrySelectionMode.Object);
+            base.Initialize();
+        }
+
+        public ISelectionState CreateSelectionSate(GeometrySelectionMode mode)
+        {
+            if (_currentState != null)
+            {
+                _currentState.Clear();
+                _currentState.SelectionChanged -= SelectionManager_SelectionChanged;
+            }
+
+            switch (mode)
+            {
+                case GeometrySelectionMode.Object:
+                    _currentState = new ObjectSelectionState();
+                    break;
+
+                case GeometrySelectionMode.Face:
+                    _currentState = new FaceSelectionState();
+                    break;
+
+                default:
+                    throw new Exception();
+            }
+
+            _currentState.SelectionChanged += SelectionManager_SelectionChanged;
+            return _currentState;
+        }
+
+        private void SelectionManager_SelectionChanged(ISelectionState state)
+        {
+            if(state.Mode == GeometrySelectionMode.Object)
+                SelectionChanged?.Invoke((state as ObjectSelectionState).CurrentSelection());
+        }
+
+
+        public ISelectionState GetState()
+        {
+            return _currentState;
+        }
+
+        public ISelectionState GetStateCopy()
+        {
+            return _currentState.Clone();
+        }
+
+        public void SetState(ISelectionState state)
+        {
+            _currentState.SelectionChanged -= SelectionManager_SelectionChanged;
+            _currentState = state;
+            _currentState.SelectionChanged += SelectionManager_SelectionChanged;
+            _currentState.Restore();
         }
     }
 }

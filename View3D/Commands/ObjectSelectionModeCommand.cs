@@ -2,6 +2,7 @@
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using View3D.Components.Component;
 using View3D.Rendering;
@@ -14,14 +15,19 @@ namespace View3D.Commands
         ILogger _logger = Logging.Create<ObjectSelectionModeCommand>();
         private readonly SelectionManager _selectionManager;
         GeometrySelectionMode _newMode;
-
-        SelectionManager.State _oldState;
+        RenderItem _selectedItem;
+        ISelectionState _oldState;
 
         public ObjectSelectionModeCommand(SelectionManager selectionManager, GeometrySelectionMode newMode)
         {
             _newMode = newMode;
             _selectionManager = selectionManager;
-            _oldState = _selectionManager.GetState();
+            _oldState = _selectionManager.GetStateCopy();
+        }
+
+        public ObjectSelectionModeCommand(RenderItem selectedItem, SelectionManager selectionManager, GeometrySelectionMode newMode) : this(selectionManager, newMode)
+        {
+            _selectedItem = selectedItem;
         }
 
         public void Cancel()
@@ -32,7 +38,10 @@ namespace View3D.Commands
         public void Execute()
         {
             _logger.Here().Information($"Executing ObjectSelectionModeCommand");
-            _selectionManager.GeometrySelectionMode = _newMode;
+            var newSelectionState = _selectionManager.CreateSelectionSate(_newMode);
+
+            if (newSelectionState.Mode == GeometrySelectionMode.Face)
+                (newSelectionState as FaceSelectionState).RenderObject = _selectedItem;
         }
 
         public void Undo()

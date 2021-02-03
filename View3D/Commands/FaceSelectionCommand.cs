@@ -12,17 +12,15 @@ namespace View3D.Commands
     {
         ILogger _logger = Logging.Create<ObjectSelectionCommand>();
         private readonly SelectionManager _selectionManager;
-        
 
-        SelectionManager.State _oldState;
-
+        ISelectionState _oldState;
         public bool IsModification { get; set; } = false;
-        public FaceSelection SelectedFaces { get; set; }
+        public List<int> SelectedFaces { get; set; }
 
         public FaceSelectionCommand(SelectionManager selectionManager)
         {
             _selectionManager = selectionManager;
-            _oldState = _selectionManager.GetState();
+            _oldState = _selectionManager.GetStateCopy();
         }
 
         public void Cancel()
@@ -32,24 +30,16 @@ namespace View3D.Commands
 
         public void Execute()
         {
-            _logger.Here().Information($"Executing FaceSelectionCommand");
-            if (!IsModification)
-            {
-                _selectionManager.SetFaceSelection(SelectedFaces);
-            }
-            else
-            {
-                var selection = _selectionManager.CurrentFaceSelection();
-                foreach (var newSelectionItem in SelectedFaces.SelectedFaces)
-                {
-                    if (selection.SelectedFaces.Contains(newSelectionItem))
-                        selection.SelectedFaces.Remove(newSelectionItem);
-                    else
-                        selection.SelectedFaces.Add(newSelectionItem);
+            var currentState = _selectionManager.GetState() as FaceSelectionState;
+            _logger.Here().Information($"Executing FaceSelectionCommand Mod[{IsModification}] Item[{currentState.RenderObject.Name}] faces[{string.Join(',', SelectedFaces)}]");
 
-                    _selectionManager.SetFaceSelection(selection);
-                }
-            }
+            if (!IsModification)
+                currentState.Clear();
+
+            foreach (var newSelectionItem in SelectedFaces)
+                currentState.ModifySelection(newSelectionItem);
+
+            currentState.EnsureSorted();
         }
 
         public void Undo()

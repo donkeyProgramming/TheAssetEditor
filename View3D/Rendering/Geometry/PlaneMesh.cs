@@ -66,7 +66,7 @@ namespace View3D.Rendering.Geometry
             return ray.Intersects(bb);
         }
 
-        public bool IntersectFace(Ray ray, Matrix modelMatrix, out FaceSelection face)
+        public bool IntersectFace(Ray ray, Matrix modelMatrix, out int? face)
         {
             face = null;
 
@@ -93,7 +93,7 @@ namespace View3D.Rendering.Geometry
             if (faceIndex == -1)
                 return false;
 
-            face = new FaceSelection(faceIndex);
+            face = faceIndex;
             return true;
         }
 
@@ -107,13 +107,13 @@ namespace View3D.Rendering.Geometry
             }
         }
 
-        public void ApplyMeshPart(Effect effect, GraphicsDevice device, FaceSelection faceSelection)
+        public void ApplyMeshPart(Effect effect, GraphicsDevice device, List<int> faceSelection)
         {
             device.SetVertexBuffer(_vertexBuffer);
             foreach (var pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                foreach (var item in faceSelection.SelectedFaces)
+                foreach (var item in faceSelection)
                     device.DrawPrimitives(PrimitiveType.TriangleList, item, 1);
             }
         }

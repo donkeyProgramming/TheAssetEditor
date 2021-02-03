@@ -52,7 +52,7 @@ namespace View3D.Rendering
             Geometry.ApplyMesh(WireframeEffect, device);
         }
 
-        public void DrawSelectedFaces(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams, FaceSelection faces)
+        public void DrawSelectedFaces(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams, List<int> faces)
         {
             SelectedFacesEffect.Projection = shaderParams.Projection;
             SelectedFacesEffect.View = shaderParams.View;
@@ -79,7 +79,7 @@ namespace View3D.Rendering
             DefaultEffect.World = ModelMatrix;
             Geometry.ApplyMesh(DefaultEffect, device);
 
-            DrawVertexes(device, parentWorldMatrix, shaderParams);
+            //DrawVertexes(device, parentWorldMatrix, shaderParams);
         }
 
         //public void DrawCinematic(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams)

@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
+using System.Collections.Generic;
 using System.Linq;
 using View3D.Commands;
 using View3D.Components.Input;
@@ -43,34 +44,42 @@ namespace View3D.Components.Component
 
         public override void Update(GameTime gameTime)
         {
-            if (_keyboard.IsKeyReleased(Keys.F1) && _selectionManager.GeometrySelectionMode != GeometrySelectionMode.Object)
+            var currentState = _selectionManager.GetState();
+            if (_keyboard.IsKeyReleased(Keys.F1) && _selectionManager.GetState().Mode != GeometrySelectionMode.Object)
+            {
                 _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(_selectionManager, GeometrySelectionMode.Object));
-            else if (_keyboard.IsKeyReleased(Keys.F2) && _selectionManager.GeometrySelectionMode != GeometrySelectionMode.Face)
-                _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(_selectionManager, GeometrySelectionMode.Face));
+            }
+
+            else if (_keyboard.IsKeyReleased(Keys.F2) && _selectionManager.GetState().Mode != GeometrySelectionMode.Face)
+            {
+                var st = currentState as ObjectSelectionState;
+                if (st.CurrentSelection().Count == 1)
+                    _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(st.CurrentSelection().First(), _selectionManager, GeometrySelectionMode.Face));
+            }
 
             if (!_mouse.IsMouseButtonReleased(MouseButton.Left) || _keyboard.IsKeyDown(Keys.LeftAlt))
                 return;
 
             var ray = _camera.CreateCameraRay(_mouse.Position());
 
-            // if there is an object in face mode - Pick face
-            var currentSelection = _selectionManager.CurrentSelection();
-            var selectedItem = currentSelection.FirstOrDefault();
-            if (selectedItem != null && _selectionManager.GeometrySelectionMode == GeometrySelectionMode.Face)
+            if (_selectionManager.GetState().Mode == GeometrySelectionMode.Face)
             {
-                if (selectedItem.Geometry.IntersectFace(ray, selectedItem.ModelMatrix, out var selectedFace))
+                var faceState = currentState as FaceSelectionState;
+
+                if (faceState.RenderObject.Geometry.IntersectFace(ray, faceState.RenderObject.ModelMatrix, out var selectedFace))
                 {
-                    _logger.Here().Information($"Selected face {selectedFace} in {selectedItem.Name}");
+                    _logger.Here().Information($"Selected face {selectedFace} in {faceState.RenderObject.Name}");
 
                     FaceSelectionCommand faceSelectionCommand = new FaceSelectionCommand(_selectionManager)
                     {
                         IsModification = _keyboard.IsKeyDown(Keys.LeftShift),
-                        SelectedFaces = selectedFace
+                        SelectedFaces = new List<int>() { selectedFace.Value }
                     };
                     _commandManager.ExecuteCommand(faceSelectionCommand);
                     return;
                 }
             }
+
 
             RenderItem bestItem = null;
             float bestDistance = float.MaxValue;
@@ -88,10 +97,14 @@ namespace View3D.Components.Component
                 }
             }
 
-           
+
             if (bestItem != null)
             {
-                if (currentSelection.Count == 1 && currentSelection.FirstOrDefault() == bestItem)
+                var objectState = currentState as ObjectSelectionState;
+                var currentSelectionCount = objectState?.CurrentSelection().Count();
+                var currentItem = objectState?.CurrentSelection().FirstOrDefault();
+
+                if (currentSelectionCount == 1 && currentItem == bestItem)
                     return; // Dont trigger a selection if we are selecting the same object
 
                 var selectionCommand = new ObjectSelectionCommand(_selectionManager);
@@ -101,13 +114,17 @@ namespace View3D.Components.Component
             }
             else
             {
-                if (currentSelection.Count() != 0)
+                var objectState = currentState as ObjectSelectionState;
+                var currentSelectionCount = objectState?.CurrentSelection().Count();
+
+                if (currentSelectionCount != 0)
                 {
                     var selectionCommand = new ObjectSelectionCommand(_selectionManager);
                     selectionCommand.ClearSelection = true;
                     _commandManager.ExecuteCommand(selectionCommand);
                 }
             }
+            
         }
     }
 }
