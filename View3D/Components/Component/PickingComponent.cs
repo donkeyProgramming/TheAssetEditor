@@ -59,7 +59,7 @@ namespace View3D.Components.Component
             {
                 if (selectedItem.Geometry.IntersectFace(ray, selectedItem.ModelMatrix, out var selectedFace))
                 {
-                    _logger.Here().Information($"Selected face {selectedFace} in {selectedItem.Id}");
+                    _logger.Here().Information($"Selected face {selectedFace} in {selectedItem.Name}");
 
                     FaceSelectionCommand faceSelectionCommand = new FaceSelectionCommand(_selectionManager)
                     {

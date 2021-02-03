@@ -16,18 +16,10 @@ namespace View3D.Scene
 
     public class SceneContainer : WpfGame
     {
-        
-
         private bool _disposed;
 
         RasterizerState _wireframeState;
-        BasicEffect _basicEffect;
-        BasicEffect _wireframeEffect;
-        BasicEffect _selectedFaceEffect;
-
         RasterizerState _selectedFaceState;
-        bool _drawWireFrame = false;
-
 
         ArcBallCamera _camera;
         SceneManager _sceneManager;
@@ -37,10 +29,6 @@ namespace View3D.Scene
         {
             _disposed = false;
             new WpfGraphicsDeviceService(this);
-
-            _basicEffect = new BasicEffect(GraphicsDevice);
-            _basicEffect.DiffuseColor = new Vector3(1.0f, 1.0f, 1.0f);
-            _basicEffect.EnableDefaultLighting(); ;// ApplyLightToShader(_basicEffect);
 
             _wireframeState = new RasterizerState();
             _wireframeState.FillMode = FillMode.WireFrame;
@@ -53,14 +41,6 @@ namespace View3D.Scene
             _selectedFaceState.CullMode = CullMode.CullClockwiseFace;
             _selectedFaceState.DepthBias = -0.00008f;
             _wireframeState.DepthClipEnable = true;
-
-            _wireframeEffect = new BasicEffect(GraphicsDevice);
-            _wireframeEffect.DiffuseColor = Vector3.Zero;
-
-            _selectedFaceEffect = new BasicEffect(GraphicsDevice);
-            _selectedFaceEffect.DiffuseColor = new Vector3(1,0,0);
-            _selectedFaceEffect.SpecularColor = new Vector3(1, 0, 0);
-            _selectedFaceEffect.EnableDefaultLighting();// ApplyLightToShader(_selectedFaceEffect);
 
             _camera = GetComponent<ArcBallCamera>();
             _sceneManager = GetComponent<SceneManager>();
@@ -76,42 +56,33 @@ namespace View3D.Scene
             if (_sceneManager == null)
                 return;
 
+            CommonShaderParameters commonShaderParameters = new CommonShaderParameters()
+            {
+                Projection = _camera.ProjectionMatrix,
+                View = _camera.ViewMatrix,
+                CameraPosition = _camera.Position,
+                CameraLookAt = _camera.LookAt,
+                EnvRotate = 0
+            };
+
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
-
-            _basicEffect.Projection = _camera.ProjectionMatrix;
-            _basicEffect.View = _camera.ViewMatrix;
-           foreach (var item in _sceneManager.RenderItems)
-           {
-                _basicEffect.World = item.ModelMatrix;
-                item.Geometry.ApplyMesh(_basicEffect, GraphicsDevice);
-           }
-
+            foreach (var item in _sceneManager.RenderItems)
+                item.DrawBasic(GraphicsDevice, Matrix.Identity, commonShaderParameters);
 
             if(_selectionManager.GeometrySelectionMode == GeometrySelectionMode.Face)
             {
                 var faceModeItems = _selectionManager.CurrentSelection();
                 if (faceModeItems.Count() != 0)
                 {
-                    _selectedFaceEffect.Projection = _camera.ProjectionMatrix;
-                    _selectedFaceEffect.View = _camera.ViewMatrix;
-
                     GraphicsDevice.RasterizerState = _selectedFaceState;
                     foreach (var item in faceModeItems)
-                    {
-                        _selectedFaceEffect.World = item.ModelMatrix;
-                        item.Geometry.ApplyMeshPart(_selectedFaceEffect, GraphicsDevice, _selectionManager.CurrentFaceSelection());
-                    }
-
-                    _wireframeEffect.Projection = _camera.ProjectionMatrix;
-                    _wireframeEffect.View = _camera.ViewMatrix;
+                        item.DrawSelectedFaces(GraphicsDevice, Matrix.Identity, commonShaderParameters, _selectionManager.CurrentFaceSelection());
 
                     GraphicsDevice.RasterizerState = _wireframeState;
                     foreach (var item in faceModeItems)
-                    {
-                        _wireframeEffect.World = item.ModelMatrix;
-                        item.Geometry.ApplyMesh(_wireframeEffect, GraphicsDevice);
-                    }
+                        item.DrawWireframeOverlay(GraphicsDevice, Matrix.Identity, commonShaderParameters);
+       
                 }
             }
 
@@ -126,9 +97,6 @@ namespace View3D.Scene
 
             Components.Clear();
             _disposed = true;
-
-            _basicEffect.Dispose();
-            _basicEffect = null;
 
             base.Dispose(disposing);
         }

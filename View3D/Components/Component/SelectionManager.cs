@@ -10,6 +10,13 @@ using View3D.Scene;
 
 namespace View3D.Components.Component
 {
+    public enum GeometrySelectionMode
+    {
+        Object,
+        Face,
+        Vertex
+    };
+
     public delegate void SelectionChangedDelegate(IEnumerable<RenderItem> items);
     public class SelectionManager : BaseComponent
     {

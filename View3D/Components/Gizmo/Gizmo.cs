@@ -427,8 +427,8 @@ namespace View3D.Components.Gizmo
             _screenScale = vLength.Length() / scaleFactor;
             _screenScaleMatrix = Matrix.CreateScale(new Vector3(_screenScale));
 
-            _localForward = Selection[0].Forward;
-            _localUp = Selection[0].Up;
+            _localForward = Vector3.Transform(Vector3.Forward, Matrix.CreateFromQuaternion(Selection[0].Orientation)); //Selection[0].Forward;
+            _localUp = Vector3.Transform(Vector3.Up, Matrix.CreateFromQuaternion(Selection[0].Orientation));  //Selection[0].Up;
             // -- Vector Rotation (Local/World) -- //
             _localForward.Normalize();
             _localRight = Vector3.Cross(_localForward, _localUp);

@@ -56,9 +56,9 @@ namespace View3D.Scene
             var sceneManager = scene.GetComponent<SceneManager>();
 
             var cubeMesh = new CubeMesh(Scene.GraphicsDevice);
-            sceneManager.RenderItems.Add(new RenderItem(cubeMesh, new Vector3(2,0,0), Quaternion.Identity, new Vector3(0.5f)) { Id = "Item0" });
-            sceneManager.RenderItems.Add(new RenderItem(cubeMesh, new Vector3(0,0,0), Quaternion.Identity, new Vector3(0.5f)) { Id = "Item1" });
-            sceneManager.RenderItems.Add(new RenderItem(cubeMesh, new Vector3(-2,0,0), Quaternion.Identity, new Vector3(0.5f)) { Id = "Item2" });
+            sceneManager.RenderItems.Add(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(2, 0, 0),  new Vector3(0.5f),"Item0", scene.GraphicsDevice));
+            sceneManager.RenderItems.Add(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0),  new Vector3(0.5f),"Item1", scene.GraphicsDevice));
+            sceneManager.RenderItems.Add(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(-2, 0, 0), new Vector3(0.5f),"Item2", scene.GraphicsDevice));
         }
 
         public string Text { get; set; }

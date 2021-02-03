@@ -9,7 +9,6 @@ namespace View3D.Rendering.Geometry
 {
     public interface IGeometry : IDisposable
     {
-        public VertexBuffer VertexBuffer { get; }
         float? Intersect(Ray ray, Matrix modelMatrix);
         public bool IntersectFace(Ray ray, Matrix modelMatrix, out FaceSelection face);
 

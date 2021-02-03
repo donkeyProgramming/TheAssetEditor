@@ -29,8 +29,5 @@ namespace View3D.Components.Gizmo
         Vector3 Position { get; set; }
         Vector3 Scale { get; set; }
         Quaternion Orientation { get; set; }
-
-        Vector3 Forward { get; }
-        Vector3 Up { get; }
     }
 }
