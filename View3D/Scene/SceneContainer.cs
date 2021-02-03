@@ -32,13 +32,13 @@ namespace View3D.Scene
 
             _wireframeState = new RasterizerState();
             _wireframeState.FillMode = FillMode.WireFrame;
-            _wireframeState.CullMode = CullMode.CullClockwiseFace;
-            _wireframeState.DepthBias = -0.00008f;
+            _wireframeState.CullMode = CullMode.None;
+            _wireframeState.DepthBias = -0.000008f;
             _wireframeState.DepthClipEnable = true;
 
             _selectedFaceState = new RasterizerState();
             _selectedFaceState.FillMode = FillMode.Solid;
-            _selectedFaceState.CullMode = CullMode.CullClockwiseFace;
+            _selectedFaceState.CullMode = CullMode.None;
             _selectedFaceState.DepthBias = -0.00008f;
             _wireframeState.DepthClipEnable = true;
 

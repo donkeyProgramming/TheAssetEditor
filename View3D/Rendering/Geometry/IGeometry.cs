@@ -12,9 +12,11 @@ namespace View3D.Rendering.Geometry
         float? Intersect(Ray ray, Matrix modelMatrix);
         public bool IntersectFace(Ray ray, Matrix modelMatrix, out FaceSelection face);
 
-
         public void ApplyMesh(Effect effect, GraphicsDevice device);
 
         public void ApplyMeshPart(Effect effect, GraphicsDevice device, FaceSelection faceSelection);
+
+        public Vector3 GetVertex(int index);
+        public int VertexCount();
     }
 }

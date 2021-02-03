@@ -1,4 +1,6 @@
 ﻿using Common;
+using Filetypes.RigidModel;
+using FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using System;
@@ -55,10 +57,25 @@ namespace View3D.Scene
         {
             var sceneManager = scene.GetComponent<SceneManager>();
 
+            var planeMesh = new PlaneMesh(Scene.GraphicsDevice);
+            //sceneManager.RenderItems.Add(RenderItemHelper.CreateRenderItem(planeMesh, new Vector3(2, 0, 0), new Vector3(0.5f), "Item0", scene.GraphicsDevice));
             var cubeMesh = new CubeMesh(Scene.GraphicsDevice);
             sceneManager.RenderItems.Add(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(2, 0, 0),  new Vector3(0.5f),"Item0", scene.GraphicsDevice));
-            sceneManager.RenderItems.Add(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0),  new Vector3(0.5f),"Item1", scene.GraphicsDevice));
-            sceneManager.RenderItems.Add(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(-2, 0, 0), new Vector3(0.5f),"Item2", scene.GraphicsDevice));
+            //sceneManager.RenderItems.Add(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0),  new Vector3(0.5f),"Item1", scene.GraphicsDevice));
+            //sceneManager.RenderItems.Add(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(-2, 0, 0), new Vector3(0.5f),"Item2", scene.GraphicsDevice));
+            //
+            //if (MainFile != null)
+            //{
+            //    var file = MainFile as PackFile;
+            //    var m = new RmvRigidModel(file.DataSource.ReadData(), file.FullPath);
+            //    var meshesLod0 = m.MeshList[0];
+            //    foreach (var mesh in meshesLod0)
+            //    {
+            //        var meshInstance = new Rmv2Geometry(mesh, Scene.GraphicsDevice);
+            //        var newItem = RenderItemHelper.CreateRenderItem(meshInstance, new Vector3(0, 0, 0), new Vector3(1.0f), "model0", Scene.GraphicsDevice);
+            //        sceneManager.RenderItems.Add(newItem);
+            //    }
+            //}
         }
 
         public string Text { get; set; }
@@ -69,7 +86,9 @@ namespace View3D.Scene
         }
         void SetCurrentPackFile(IPackFile packedFile)
         {
-           
+        
+           // Rmv2Geometry
+           //
 
         }
     }

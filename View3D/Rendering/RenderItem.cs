@@ -19,6 +19,9 @@ namespace View3D.Rendering
         public IGeometry Geometry { get; set; }
         public string Name { get; set; } = "";
 
+
+        public IGeometry _selectedVertexGeo;
+
         public RenderItem(IGeometry geo, Vector3 position, Quaternion rotation, Vector3 scale)
         {
             Geometry = geo;
@@ -57,12 +60,26 @@ namespace View3D.Rendering
             Geometry.ApplyMeshPart(SelectedFacesEffect, device, faces);
         }
 
+        public void DrawVertexes(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams)
+        {
+            SelectedFacesEffect.Projection = shaderParams.Projection;
+            SelectedFacesEffect.View = shaderParams.View;
+            //var p = Vector3.Zero * ModelMatrix ;
+            for (int i = 0; i < Geometry.VertexCount(); i++)
+            {
+                SelectedFacesEffect.World = Matrix.CreateScale(0.1f) * Matrix.CreateFromQuaternion(Orientation) * Matrix.CreateTranslation(Vector3.Transform(Geometry.GetVertex(i), ModelMatrix));
+                _selectedVertexGeo.ApplyMesh(SelectedFacesEffect, device);
+            }
+        }
+
         public void DrawBasic(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams)
         {
             DefaultEffect.Projection = shaderParams.Projection;
             DefaultEffect.View = shaderParams.View;
             DefaultEffect.World = ModelMatrix;
             Geometry.ApplyMesh(DefaultEffect, device);
+
+            DrawVertexes(device, parentWorldMatrix, shaderParams);
         }
 
         //public void DrawCinematic(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams)
@@ -84,6 +101,9 @@ namespace View3D.Rendering
             item.SelectedFacesEffect.DiffuseColor = new Vector3(1, 0, 0);
             item.SelectedFacesEffect.SpecularColor = new Vector3(1, 0, 0);
             item.SelectedFacesEffect.EnableDefaultLighting();
+
+
+            item._selectedVertexGeo = new CubeMesh(device);
         }
 
         public static RenderItem CreateRenderItem(IGeometry geo, Vector3 position, Vector3 scale, string name, GraphicsDevice graphicsDevice)

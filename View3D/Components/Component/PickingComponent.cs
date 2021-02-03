@@ -54,7 +54,8 @@ namespace View3D.Components.Component
             var ray = _camera.CreateCameraRay(_mouse.Position());
 
             // if there is an object in face mode - Pick face
-            var selectedItem = _selectionManager.CurrentSelection().FirstOrDefault();
+            var currentSelection = _selectionManager.CurrentSelection();
+            var selectedItem = currentSelection.FirstOrDefault();
             if (selectedItem != null && _selectionManager.GeometrySelectionMode == GeometrySelectionMode.Face)
             {
                 if (selectedItem.Geometry.IntersectFace(ray, selectedItem.ModelMatrix, out var selectedFace))
@@ -87,9 +88,9 @@ namespace View3D.Components.Component
                 }
             }
 
+           
             if (bestItem != null)
             {
-                var currentSelection = _selectionManager.CurrentSelection();
                 if (currentSelection.Count == 1 && currentSelection.FirstOrDefault() == bestItem)
                     return; // Dont trigger a selection if we are selecting the same object
 
@@ -100,9 +101,12 @@ namespace View3D.Components.Component
             }
             else
             {
-                var selectionCommand = new ObjectSelectionCommand(_selectionManager);
-                selectionCommand.ClearSelection = true;
-                _commandManager.ExecuteCommand(selectionCommand);
+                if (currentSelection.Count() != 0)
+                {
+                    var selectionCommand = new ObjectSelectionCommand(_selectionManager);
+                    selectionCommand.ClearSelection = true;
+                    _commandManager.ExecuteCommand(selectionCommand);
+                }
             }
         }
     }

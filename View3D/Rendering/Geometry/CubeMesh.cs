@@ -10,11 +10,8 @@ namespace View3D.Rendering.Geometry
 {
     public class CubeMesh : IGeometry
     {
-
         private VertexBuffer _vertexBuffer;
         private VertexDeclaration _vertexDeclaration;
-        public VertexBuffer VertexBuffer { get { return _vertexBuffer; } }
-
         VertexPositionNormalTexture[] _vertexData;
 
         public CubeMesh(GraphicsDevice device)
@@ -24,7 +21,7 @@ namespace View3D.Rendering.Geometry
                 new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0),
                 new VertexElement(24, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0)
             );
-            _vertexBuffer = CreateCube(device, 1);
+            _vertexBuffer = CreateCube(device);
         }
 
         public void Dispose()
@@ -33,16 +30,16 @@ namespace View3D.Rendering.Geometry
             _vertexDeclaration?.Dispose();
         }
 
-        VertexBuffer CreateCube(GraphicsDevice device, float scale)
+        VertexBuffer CreateCube(GraphicsDevice device)
         {
-            Vector3 topLeftFront = new Vector3(-1.0f, 1.0f, 1.0f) * scale;
-            Vector3 bottomLeftFront = new Vector3(-1.0f, -1.0f, 1.0f) * scale;
-            Vector3 topRightFront = new Vector3(1.0f, 1.0f, 1.0f) * scale;
-            Vector3 bottomRightFront = new Vector3(1.0f, -1.0f, 1.0f) * scale;
-            Vector3 topLeftBack = new Vector3(-1.0f, 1.0f, -1.0f) * scale;
-            Vector3 topRightBack = new Vector3(1.0f, 1.0f, -1.0f) * scale;
-            Vector3 bottomLeftBack = new Vector3(-1.0f, -1.0f, -1.0f) * scale;
-            Vector3 bottomRightBack = new Vector3(1.0f, -1.0f, -1.0f) * scale;
+            Vector3 topLeftFront = new Vector3(-1.0f, 1.0f, 1.0f) ;
+            Vector3 bottomLeftFront = new Vector3(-1.0f, -1.0f, 1.0f);
+            Vector3 topRightFront = new Vector3(1.0f, 1.0f, 1.0f);
+            Vector3 bottomRightFront = new Vector3(1.0f, -1.0f, 1.0f);
+            Vector3 topLeftBack = new Vector3(-1.0f, 1.0f, -1.0f);
+            Vector3 topRightBack = new Vector3(1.0f, 1.0f, -1.0f);
+            Vector3 bottomLeftBack = new Vector3(-1.0f, -1.0f, -1.0f);
+            Vector3 bottomRightBack = new Vector3(1.0f, -1.0f, -1.0f);
 
             Vector2 textureTopLeft = new Vector2(0.0f, 0.0f);
             Vector2 textureTopRight = new Vector2(1.0f, 0.0f);
@@ -155,23 +152,33 @@ namespace View3D.Rendering.Geometry
 
         public void ApplyMesh(Effect effect, GraphicsDevice device)
         {
-            device.SetVertexBuffer(VertexBuffer);
+            device.SetVertexBuffer(_vertexBuffer);
             foreach (var pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                device.DrawPrimitives(PrimitiveType.TriangleList, 0, 12);
+                device.DrawPrimitives(PrimitiveType.TriangleList, 0, _vertexBuffer.VertexCount / 3);
             }
         }
 
         public void ApplyMeshPart(Effect effect, GraphicsDevice device, FaceSelection faceSelection)
         {
-            device.SetVertexBuffer(VertexBuffer);
+            device.SetVertexBuffer(_vertexBuffer);
             foreach (var pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
                 foreach(var item in faceSelection.SelectedFaces)
                     device.DrawPrimitives(PrimitiveType.TriangleList, item, 1);
             }
+        }
+
+        public Vector3 GetVertex(int index)
+        {
+            return _vertexData[index].Position;
+        }
+
+        public int VertexCount()
+        {
+            return _vertexBuffer.VertexCount / 3;
         }
     }
 
