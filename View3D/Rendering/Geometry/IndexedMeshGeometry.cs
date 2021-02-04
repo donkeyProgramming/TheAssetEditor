@@ -117,5 +117,27 @@ namespace View3D.Rendering.Geometry
 
             return false;
         }
+
+        public bool IntersectFaces(BoundingFrustum boundingFrustum, Matrix modelMatrix, out List<int> faces)
+        {
+            faces = new List<int>();
+            
+            for (int i = 0; i < _indexList.Length; i+=3)
+            {
+                var index = _indexList[i];
+                if (boundingFrustum.Contains(Vector3.Transform(GetVertex(_indexList[i]), modelMatrix)) != ContainmentType.Disjoint)
+                    faces.Add(i);
+                else if (boundingFrustum.Contains(Vector3.Transform(GetVertex(_indexList[i+1]), modelMatrix)) != ContainmentType.Disjoint)
+                    faces.Add(i);
+                else if (boundingFrustum.Contains(Vector3.Transform(GetVertex(_indexList[i+2]), modelMatrix)) != ContainmentType.Disjoint)
+                    faces.Add(i);
+            }
+
+            if (faces.Count() == 0)
+                faces = null;
+            return faces != null;
+        }
+
+
     }
 }

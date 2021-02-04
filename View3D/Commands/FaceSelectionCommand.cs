@@ -32,7 +32,7 @@ namespace View3D.Commands
         public void Execute()
         {
             var currentState = _selectionManager.GetState() as FaceSelectionState;
-            _logger.Here().Information($"Executing FaceSelectionCommand Mod[{IsModification}] Item[{currentState.RenderObject.Name}] faces[{string.Join(',', SelectedFaces)}]");
+            _logger.Here().Information($"Executing FaceSelectionCommand Mod[{IsModification}] Item[{currentState.RenderObject.Name}] faces[{SelectedFaces.Count}]");
 
             if (!IsModification)
                 currentState.Clear();

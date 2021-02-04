@@ -103,6 +103,17 @@ namespace View3D.Components.Component.Selection
             var currentState = _selectionManager.GetState();
             if (currentState.Mode == GeometrySelectionMode.Face)
             {
+                var faceState = currentState as FaceSelectionState;
+                if (faceState.RenderObject.Geometry.IntersectFaces(unprojectedSelectionRect, faceState.RenderObject.ModelMatrix, out var faces))
+                {
+                    FaceSelectionCommand faceSelectionCommand = new FaceSelectionCommand(_selectionManager)
+                    {
+                        IsModification = isSelectionModification,
+                        SelectedFaces = faces
+                    };
+                    _commandManager.ExecuteCommand(faceSelectionCommand);
+                    return;
+                }
             }
 
 

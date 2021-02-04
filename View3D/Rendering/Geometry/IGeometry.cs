@@ -15,7 +15,7 @@ namespace View3D.Rendering.Geometry
 
         // Intersection - Multiselect
         bool IntersectObject(BoundingFrustum boundingFrustum, Matrix modelMatrix);
-
+        bool IntersectFaces(BoundingFrustum boundingFrustum, Matrix modelMatrix, out List<int> faces);
 
         public void ApplyMesh(Effect effect, GraphicsDevice device);
         public void ApplyMeshPart(Effect effect, GraphicsDevice device, List<int> faceSelection);

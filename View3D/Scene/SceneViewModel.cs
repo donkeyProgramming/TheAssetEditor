@@ -46,13 +46,13 @@ namespace View3D.Scene
             Scene.Components.Add(new MouseComponent(Scene));
             Scene.Components.Add(new ResourceLibary(Scene));
             Scene.Components.Add(new ArcBallCamera(Scene, new Vector3(0), 10));
-            Scene.Components.Add(new PickingComponent(Scene));
             Scene.Components.Add(new SceneManager(Scene));
             Scene.Components.Add(new SelectionManager(Scene));
             Scene.Components.Add(new CommandManager(Scene));
             Scene.Components.Add(new GizmoComponent(Scene));
             Scene.Components.Add(new SelectionComponent(Scene));
-
+            Scene.Components.Add(new ObjectEditor(Scene));
+            Scene.Components.Add(new FaceEditor(Scene));
 
             Scene.SceneInitialized += OnSceneInitialized;
         }

@@ -100,7 +100,7 @@ namespace View3D.Scene
             {
                 GraphicsDevice.RasterizerState = _selectedFaceState;
                 selectionFaceState.RenderObject.DrawSelectedFaces(GraphicsDevice, Matrix.Identity, commonShaderParameters, selectionFaceState.CurrentSelection());
-                selectionFaceState.RenderObject.DrawVertexes(GraphicsDevice, Matrix.Identity, commonShaderParameters);
+                //selectionFaceState.RenderObject.DrawVertexes(GraphicsDevice, Matrix.Identity, commonShaderParameters);
                 
                 GraphicsDevice.RasterizerState = _wireframeState;
                 selectionFaceState.RenderObject.DrawWireframeOverlay(GraphicsDevice, Matrix.Identity, commonShaderParameters);
