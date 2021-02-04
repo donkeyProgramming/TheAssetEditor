@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using View3D.Components.Component;
 using View3D.Utility;
 
@@ -186,12 +187,13 @@ namespace View3D.Rendering.Geometry
 
         public Vector3 GetVertex(int index)
         {
-            throw new NotImplementedException();
+            var vertIndex = _indexList[index];
+            return new Vector3(_vertexArray[vertIndex].Position.X, _vertexArray[vertIndex].Position.Y, _vertexArray[vertIndex].Position.Z);
         }
 
         public int VertexCount()
         {
-            throw new NotImplementedException();
+            return _indexList.Count();
         }
     }
 }

@@ -45,42 +45,23 @@ namespace View3D.Components.Component
         public override void Update(GameTime gameTime)
         {
             var currentState = _selectionManager.GetState();
-            if (_keyboard.IsKeyReleased(Keys.F1) && _selectionManager.GetState().Mode != GeometrySelectionMode.Object)
-            {
-                _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(_selectionManager, GeometrySelectionMode.Object));
-            }
+            var ray = _camera.CreateCameraRay(_mouse.Position());
 
-            else if (_keyboard.IsKeyReleased(Keys.F2) && _selectionManager.GetState().Mode != GeometrySelectionMode.Face)
-            {
-                var st = currentState as ObjectSelectionState;
-                if (st.CurrentSelection().Count == 1)
-                    _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(st.CurrentSelection().First(), _selectionManager, GeometrySelectionMode.Face));
-            }
+            if (ChangeSelectionState(currentState))
+                return;
 
             if (!_mouse.IsMouseButtonReleased(MouseButton.Left) || _keyboard.IsKeyDown(Keys.LeftAlt))
                 return;
 
-            var ray = _camera.CreateCameraRay(_mouse.Position());
+            if (SelectFaces(ray, currentState))
+                return;
 
-            if (_selectionManager.GetState().Mode == GeometrySelectionMode.Face)
-            {
-                var faceState = currentState as FaceSelectionState;
-
-                if (faceState.RenderObject.Geometry.IntersectFace(ray, faceState.RenderObject.ModelMatrix, out var selectedFace))
-                {
-                    _logger.Here().Information($"Selected face {selectedFace} in {faceState.RenderObject.Name}");
-
-                    FaceSelectionCommand faceSelectionCommand = new FaceSelectionCommand(_selectionManager)
-                    {
-                        IsModification = _keyboard.IsKeyDown(Keys.LeftShift),
-                        SelectedFaces = new List<int>() { selectedFace.Value }
-                    };
-                    _commandManager.ExecuteCommand(faceSelectionCommand);
-                    return;
-                }
-            }
+            SelectObjects(ray, currentState);
+        }
 
 
+        void SelectObjects(Ray ray, ISelectionState currentState)
+        {
             RenderItem bestItem = null;
             float bestDistance = float.MaxValue;
 
@@ -96,7 +77,6 @@ namespace View3D.Components.Component
                     }
                 }
             }
-
 
             if (bestItem != null)
             {
@@ -124,7 +104,50 @@ namespace View3D.Components.Component
                     _commandManager.ExecuteCommand(selectionCommand);
                 }
             }
-            
+        }
+
+        bool SelectFaces(Ray ray, ISelectionState currentState )
+        {
+            if (currentState.Mode == GeometrySelectionMode.Face)
+            {
+                var faceState = currentState as FaceSelectionState;
+
+                if (faceState.RenderObject.Geometry.IntersectFace(ray, faceState.RenderObject.ModelMatrix, out var selectedFace))
+                {
+                    _logger.Here().Information($"Selected face {selectedFace} in {faceState.RenderObject.Name}");
+
+                    FaceSelectionCommand faceSelectionCommand = new FaceSelectionCommand(_selectionManager)
+                    {
+                        IsModification = _keyboard.IsKeyDown(Keys.LeftShift),
+                        SelectedFaces = new List<int>() { selectedFace.Value }
+                    };
+                    _commandManager.ExecuteCommand(faceSelectionCommand);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        bool ChangeSelectionState(ISelectionState selectionState)
+        {
+            if (_keyboard.IsKeyReleased(Keys.F1) && _selectionManager.GetState().Mode != GeometrySelectionMode.Object)
+            {
+                _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(_selectionManager, GeometrySelectionMode.Object));
+                return true;
+            }
+
+            else if (_keyboard.IsKeyReleased(Keys.F2) && _selectionManager.GetState().Mode != GeometrySelectionMode.Face)
+            {
+                var objectSelectonState = selectionState as ObjectSelectionState;
+                if (objectSelectonState.CurrentSelection().Count == 1)
+                {
+                    _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(objectSelectonState.CurrentSelection().First(), _selectionManager, GeometrySelectionMode.Face));
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

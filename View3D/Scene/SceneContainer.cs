@@ -49,6 +49,17 @@ namespace View3D.Scene
             base.Initialize();
         }
 
+        Instancing instancing;
+
+        protected override void LoadContent()
+        {
+            instancing = new Instancing();
+            instancing.Initialize(this.GraphicsDevice);
+            instancing.Load(Content);
+
+            base.LoadContent();
+        }
+
 
         protected override void Draw(GameTime time)
         {
@@ -65,10 +76,15 @@ namespace View3D.Scene
                 EnvRotate = 0
             };
 
+            instancing.Draw(_camera.ViewMatrix, _camera.ProjectionMatrix, GraphicsDevice);
+
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             foreach (var item in _sceneManager.RenderItems)
                 item.DrawBasic(GraphicsDevice, Matrix.Identity, commonShaderParameters);
+
+            foreach (var item in _sceneManager.RenderItems)
+                item.DrawVertexes(GraphicsDevice, Matrix.Identity, commonShaderParameters);
 
             var selectionState = _selectionManager.GetState();
             var selectionFaceState = selectionState as FaceSelectionState;
@@ -76,7 +92,8 @@ namespace View3D.Scene
             {
                 GraphicsDevice.RasterizerState = _selectedFaceState;
                 selectionFaceState.RenderObject.DrawSelectedFaces(GraphicsDevice, Matrix.Identity, commonShaderParameters, selectionFaceState.CurrentSelection());
-
+                selectionFaceState.RenderObject.DrawVertexes(GraphicsDevice, Matrix.Identity, commonShaderParameters);
+                
                 GraphicsDevice.RasterizerState = _wireframeState;
                 selectionFaceState.RenderObject.DrawWireframeOverlay(GraphicsDevice, Matrix.Identity, commonShaderParameters);
             }

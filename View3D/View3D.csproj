@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Content\obj\**" />
+    <EmbeddedResource Remove="Content\obj\**" />
+    <None Remove="Content\obj\**" />
+    <Page Remove="Content\obj\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="1kweupxo.plr~" />
   </ItemGroup>
 

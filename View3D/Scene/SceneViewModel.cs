@@ -40,6 +40,7 @@ namespace View3D.Scene
         {
             Scene = new SceneContainer();
 
+            Scene.Components.Add(new FpsComponent(Scene));
             Scene.Components.Add(new KeyboardComponent(Scene));
             Scene.Components.Add(new MouseComponent(Scene));
             Scene.Components.Add(new ResourceLibary(Scene));
@@ -55,6 +56,7 @@ namespace View3D.Scene
 
         private void OnSceneInitialized(WpfGame scene)
         {
+            return;
             var sceneManager = scene.GetComponent<SceneManager>();
 
             var planeMesh = new PlaneMesh(Scene.GraphicsDevice);
@@ -64,18 +66,18 @@ namespace View3D.Scene
             sceneManager.RenderItems.Add(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0),  new Vector3(0.5f),"Item1", scene.GraphicsDevice));
             sceneManager.RenderItems.Add(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(-2, 0, 0), new Vector3(0.5f),"Item2", scene.GraphicsDevice));
             //
-            //if (MainFile != null)
-            //{
-            //    var file = MainFile as PackFile;
-            //    var m = new RmvRigidModel(file.DataSource.ReadData(), file.FullPath);
-            //    var meshesLod0 = m.MeshList[0];
-            //    foreach (var mesh in meshesLod0)
-            //    {
-            //        var meshInstance = new Rmv2Geometry(mesh, Scene.GraphicsDevice);
-            //        var newItem = RenderItemHelper.CreateRenderItem(meshInstance, new Vector3(0, 0, 0), new Vector3(1.0f), "model0", Scene.GraphicsDevice);
-            //        sceneManager.RenderItems.Add(newItem);
-            //    }
-            //}
+            if (MainFile != null)
+            {
+                var file = MainFile as PackFile;
+                var m = new RmvRigidModel(file.DataSource.ReadData(), file.FullPath);
+                var meshesLod0 = m.MeshList[0];
+                foreach (var mesh in meshesLod0)
+                {
+                    var meshInstance = new Rmv2Geometry(mesh, Scene.GraphicsDevice);
+                    var newItem = RenderItemHelper.CreateRenderItem(meshInstance, new Vector3(0, 0, 0), new Vector3(1.0f), "model0", Scene.GraphicsDevice);
+                    sceneManager.RenderItems.Add(newItem);
+                }
+            }
         }
 
         public string Text { get; set; }

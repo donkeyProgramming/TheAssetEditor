@@ -62,12 +62,19 @@ namespace View3D.Rendering
 
         public void DrawVertexes(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams)
         {
+            return;
             SelectedFacesEffect.Projection = shaderParams.Projection;
             SelectedFacesEffect.View = shaderParams.View;
-            //var p = Vector3.Zero * ModelMatrix ;
+
+           
+
             for (int i = 0; i < Geometry.VertexCount(); i++)
             {
-                SelectedFacesEffect.World = Matrix.CreateScale(0.1f) * Matrix.CreateFromQuaternion(Orientation) * Matrix.CreateTranslation(Vector3.Transform(Geometry.GetVertex(i), ModelMatrix));
+                var vertPos = Vector3.Transform(Geometry.GetVertex(i), ModelMatrix);
+                var distance = (shaderParams.CameraPosition - vertPos).Length();
+                var distanceScale = distance * 1.5f;
+
+                SelectedFacesEffect.World = Matrix.CreateScale(0.0025f * distanceScale) * Matrix.CreateFromQuaternion(Orientation) * Matrix.CreateTranslation(vertPos);
                 _selectedVertexGeo.ApplyMesh(SelectedFacesEffect, device);
             }
         }
