@@ -18,8 +18,6 @@ namespace View3D.Rendering.Geometry
 
         public CubeMesh(GraphicsDevice device)
         {
-
-
             _vertexDeclaration = new VertexDeclaration(
              new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
              new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0),
@@ -27,8 +25,6 @@ namespace View3D.Rendering.Geometry
                 );
 
             _vertexArray = new VertexPositionNormalTexture[36];
-
-
 
             Vector3 topLeftFront = new Vector3(-1.0f, 1.0f, 1.0f);
             Vector3 bottomLeftFront = new Vector3(-1.0f, -1.0f, 1.0f);
@@ -108,6 +104,7 @@ namespace View3D.Rendering.Geometry
 
 
             CreateModelFromBuffers(device);
+            BuildBoundingBox();
         }
 
         void CreateModelFromBuffers(GraphicsDevice device)
@@ -121,9 +118,13 @@ namespace View3D.Rendering.Geometry
 
         public override Vector3 GetVertex(int index)
         {
-            var vertIndex = _indexList[index];
+            var vertIndex = index;// _indexList[index];
             return _vertexArray[vertIndex].Position;
+        }
 
+        public override int VertexCount()
+        {
+            return _vertexArray.Length;
         }
     }
 }

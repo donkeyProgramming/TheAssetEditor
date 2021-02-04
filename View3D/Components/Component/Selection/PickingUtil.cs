@@ -27,30 +27,18 @@ namespace View3D.Components.Component.Selection
             }
 
             return bestItem;
-            
         }
 
-       //bool SelectFaces(Ray ray, ISelectionState currentState)
-       //{
-       //    if (currentState.Mode == GeometrySelectionMode.Face)
-       //    {
-       //        var faceState = currentState as FaceSelectionState;
-       //
-       //        if (faceState.RenderObject.Geometry.IntersectFace(ray, faceState.RenderObject.ModelMatrix, out var selectedFace) != null)
-       //        {
-       //            _logger.Here().Information($"Selected face {selectedFace} in {faceState.RenderObject.Name}");
-       //
-       //            FaceSelectionCommand faceSelectionCommand = new FaceSelectionCommand(_selectionManager)
-       //            {
-       //                IsModification = _keyboard.IsKeyDown(Keys.LeftShift),
-       //                SelectedFaces = new List<int>() { selectedFace.Value }
-       //            };
-       //            _commandManager.ExecuteCommand(faceSelectionCommand);
-       //            return true;
-       //        }
-       //    }
-       //
-       //    return false;
-       //}
+        public static List<RenderItem> SelectObjects(BoundingFrustum frustrum, SceneManager scene)
+        {
+            List<RenderItem> output = new List<RenderItem>();
+            foreach (var item in scene.RenderItems)
+            {
+                if (item.Geometry.IntersectObject(frustrum, item.ModelMatrix))
+                    output.Add(item);
+            }
+
+            return output;
+        }
     }
 }

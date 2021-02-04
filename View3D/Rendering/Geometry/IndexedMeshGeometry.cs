@@ -18,12 +18,11 @@ namespace View3D.Rendering.Geometry
 
         public Vector3 Pivot { get; set; }
 
-        public abstract Vector3 GetVertex(int index);
+        BoundingBox _boundingBox;
+        public BoundingBox BoundingBox => _boundingBox;
 
-        public int VertexCount()
-        {
-            return _indexList.Count();
-        }
+        public abstract Vector3 GetVertex(int index);
+        public abstract int VertexCount();
 
         public void ApplyMesh(Effect effect, GraphicsDevice device)
         {
@@ -46,7 +45,15 @@ namespace View3D.Rendering.Geometry
                 foreach (var item in faceSelection)
                     device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, item, 1);
             }
+        }
 
+        protected void BuildBoundingBox()
+        {
+            var count = VertexCount();
+            var points = new Vector3[count];
+            for (int i = 0; i < count; i++)
+                points[i] = GetVertex(i);
+            _boundingBox = BoundingBox.CreateFromPoints(points);
         }
 
         public virtual void Dispose()
@@ -71,7 +78,7 @@ namespace View3D.Rendering.Geometry
 
             int faceIndex = -1;
             float bestDistance = float.MaxValue;
-            for (int i = 0; i < _indexList.Length; i += 3)
+            for (int i = 0; i < _indexList.Length; i +=3)
             {
                 var index0 = _indexList[i + 0];
                 var index1 = _indexList[i + 1];

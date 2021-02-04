@@ -6,6 +6,7 @@ using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using View3D.Commands;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
@@ -56,6 +57,8 @@ namespace View3D.Components.Component.Selection
             if (!_mouseComponent.IsMouseOwner(this))
                 return;
 
+            ChangeSelectionState();
+
             _currentMousePos = _mouseComponent.Position();
 
             if (_mouseComponent.IsMouseButtonPressed(MouseButton.Left))
@@ -72,14 +75,10 @@ namespace View3D.Components.Component.Selection
                 var selectionRectangle = CreateSelectionRectangle(_startDrag, _currentMousePos);
 
                 var rectArea = RectArea(selectionRectangle);
-                if (rectArea > 4)
-                {
-                    SelectFromRectangle(selectionRectangle);
-                }
+                if (rectArea > 8)
+                    SelectFromRectangle(selectionRectangle, _keyboardComponent.IsKeyDown(Keys.LeftShift));
                 else
-                {
                     SelectFromPoint(_currentMousePos, _keyboardComponent.IsKeyDown(Keys.LeftShift));
-                }
 
                 _isMouseDown = false;
             }
@@ -96,22 +95,61 @@ namespace View3D.Components.Component.Selection
             }
         }
 
-        void SelectFromRectangle(Rectangle screenRect)
+        void SelectFromRectangle(Rectangle screenRect, bool isSelectionModification)
         {
             var unprojectedSelectionRect = _camera.UnprojectRectangle(screenRect);
-            _logger.Here().Information("starting selection -> Rectangle");
+
+        
+            var currentState = _selectionManager.GetState();
+            if (currentState.Mode == GeometrySelectionMode.Face)
+            {
+            }
+
+
+            var selectedObjects = PickingUtil.SelectObjects(unprojectedSelectionRect, _sceneManger);
+            if (selectedObjects.Count() == 0 && isSelectionModification == false)
+            {
+                // Only clear selection if we are not in geometry mode and the selection count is not empty
+                if (currentState.Mode != GeometrySelectionMode.Object || currentState.SelectionCount() != 0)
+                {
+                    var selectionCommand = new ObjectSelectionCommand(_selectionManager);
+                    selectionCommand.ClearSelection = true;
+                    _commandManager.ExecuteCommand(selectionCommand);
+                }
+            }
+            else if (selectedObjects != null)
+            {
+                var selectionCommand = new ObjectSelectionCommand(_selectionManager);
+                selectionCommand.IsModification = isSelectionModification;
+                foreach(var item in selectedObjects)
+                    selectionCommand.Items.Add(item);
+                _commandManager.ExecuteCommand(selectionCommand);
+            }
         }
 
         void SelectFromPoint(Vector2 mousePosition, bool isSelectionModification)
         {
-            _logger.Here().Information("starting selection -> Point");
-
             var ray = _camera.CreateCameraRay(mousePosition);
             var currentState = _selectionManager.GetState();
             if (currentState.Mode == GeometrySelectionMode.Face)
             {
-                // Select facees, if no face try object
-                return;
+                if (currentState.Mode == GeometrySelectionMode.Face)
+                {
+                    var faceState = currentState as FaceSelectionState;
+
+                    if (faceState.RenderObject.Geometry.IntersectFace(ray, faceState.RenderObject.ModelMatrix, out var selectedFace) != null)
+                    {
+                        _logger.Here().Information($"Selected face {selectedFace} in {faceState.RenderObject.Name}");
+
+                        FaceSelectionCommand faceSelectionCommand = new FaceSelectionCommand(_selectionManager)
+                        {
+                            IsModification = isSelectionModification,
+                            SelectedFaces = new List<int>() { selectedFace.Value }
+                        };
+                        _commandManager.ExecuteCommand(faceSelectionCommand);
+                        return;
+                    }
+                }
             }
 
             // Pick object
@@ -119,7 +157,7 @@ namespace View3D.Components.Component.Selection
             if (selectedObject == null && isSelectionModification == false)
             {
                 // Only clear selection if we are not in geometry mode and the selection count is not empty
-                if (currentState.Mode == GeometrySelectionMode.Object && currentState.SelectionCount() != 0)
+                if (currentState.Mode != GeometrySelectionMode.Object || currentState.SelectionCount() != 0)
                 {
                     var selectionCommand = new ObjectSelectionCommand(_selectionManager);
                     selectionCommand.ClearSelection = true;
@@ -128,52 +166,35 @@ namespace View3D.Components.Component.Selection
             }
             else if(selectedObject != null)
             {
-                //var objectState = currentState as ObjectSelectionState;
-                //var currentSelectionCount = objectState?.CurrentSelection().Count();
-                //var currentItem = objectState?.CurrentSelection().FirstOrDefault();
-                
-                //if (currentSelectionCount == 1 && currentItem == bestItem)
-                //    return; // Dont trigger a selection if we are selecting the same object
-                
                 var selectionCommand = new ObjectSelectionCommand(_selectionManager);
                 selectionCommand.IsModification = isSelectionModification;
                 selectionCommand.Items.Add(selectedObject);
                 _commandManager.ExecuteCommand(selectionCommand);
             }
-
-            //if (bestItem != null)
-            //{
-            //    var objectState = currentState as ObjectSelectionState;
-            //    var currentSelectionCount = objectState?.CurrentSelection().Count();
-            //    var currentItem = objectState?.CurrentSelection().FirstOrDefault();
-            //
-            //    if (currentSelectionCount == 1 && currentItem == bestItem)
-            //        return; // Dont trigger a selection if we are selecting the same object
-            //
-            //    var selectionCommand = new ObjectSelectionCommand(_selectionManager);
-            //    selectionCommand.IsModification = _keyboard.IsKeyDown(Keys.LeftShift);
-            //    selectionCommand.Items.Add(bestItem);
-            //    _commandManager.ExecuteCommand(selectionCommand);
-            //}
-            //else
-            //{
-            //    var objectState = currentState as ObjectSelectionState;
-            //    var currentSelectionCount = objectState?.CurrentSelection().Count();
-            //
-            //    if (currentSelectionCount != 0)
-            //    {
-            //        var selectionCommand = new ObjectSelectionCommand(_selectionManager);
-            //        selectionCommand.ClearSelection = true;
-            //        _commandManager.ExecuteCommand(selectionCommand);
-            //    }
-            //}
-
         }
 
+        bool ChangeSelectionState()
+        {
+            var selectionState = _selectionManager.GetState();
 
+            if (_keyboardComponent.IsKeyReleased(Keys.F1) && _selectionManager.GetState().Mode != GeometrySelectionMode.Object)
+            {
+                _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(_selectionManager, GeometrySelectionMode.Object));
+                return true;
+            }
 
+            else if (_keyboardComponent.IsKeyReleased(Keys.F2) && _selectionManager.GetState().Mode != GeometrySelectionMode.Face)
+            {
+                var objectSelectonState = selectionState as ObjectSelectionState;
+                if (objectSelectonState.CurrentSelection().Count == 1)
+                {
+                    _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(objectSelectonState.CurrentSelection().First(), _selectionManager, GeometrySelectionMode.Face));
+                    return true;
+                }
+            }
 
-
+            return false;
+        }
 
         public override void Draw(GameTime gameTime)
         {

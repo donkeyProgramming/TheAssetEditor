@@ -60,6 +60,7 @@ namespace View3D.Rendering.Geometry
             }
 
             CreateModelFromBuffers(device);
+            BuildBoundingBox();
         }
 
         void CreateModelFromBuffers(GraphicsDevice device)
@@ -73,8 +74,13 @@ namespace View3D.Rendering.Geometry
 
         public override Vector3 GetVertex(int index)
         {
-            var vertIndex = _indexList[index];
+            var vertIndex = index;// _indexList[index];
             return new Vector3(_vertexArray[vertIndex].Position.X, _vertexArray[vertIndex].Position.Y, _vertexArray[vertIndex].Position.Z);
+        }
+
+        public override int VertexCount()
+        {
+            return _vertexArray.Length;
         }
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop;
 using MonoGame.Framework.WpfInterop.Input;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using View3D.Components.Component;
@@ -50,18 +51,16 @@ namespace View3D.Scene
             base.Initialize();
         }
 
-        VertexInstanceMesh instancing;
+        Effect _lineShader;
 
         protected override void LoadContent()
         {
-            //instancing = new VertexInstanceMesh();
-            //instancing.Initialize(this.GraphicsDevice);
-            //instancing.Load(Content);
-
+            _bondingBoxRenderer = new BoundingBoxRenderer();
+            _lineShader = Content.Load<Effect>("Shaders\\LineShader");
             base.LoadContent();
         }
 
-
+        BoundingBoxRenderer _bondingBoxRenderer;
         protected override void Draw(GameTime time)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
@@ -81,14 +80,21 @@ namespace View3D.Scene
                 EnvRotate = 0
             };
 
-            //instancing.Draw(_camera.ViewMatrix, _camera.ProjectionMatrix, GraphicsDevice);
+
+            var selectionState = _selectionManager.GetState();
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             foreach (var item in _sceneManager.RenderItems)
                 item.DrawBasic(GraphicsDevice, Matrix.Identity, commonShaderParameters);
 
-            var selectionState = _selectionManager.GetState();
+            // Draw selection bounding box
+            if (selectionState is ObjectSelectionState objectSelectionState)
+            { 
+                foreach(var item in objectSelectionState.CurrentSelection())
+                    _bondingBoxRenderer.Render(_lineShader, GraphicsDevice, commonShaderParameters, item.Geometry.BoundingBox, item.ModelMatrix);
+            }
+            
             var selectionFaceState = selectionState as FaceSelectionState;
             if (selectionFaceState != null && selectionFaceState.RenderObject != null)
             {
@@ -98,8 +104,11 @@ namespace View3D.Scene
                 
                 GraphicsDevice.RasterizerState = _wireframeState;
                 selectionFaceState.RenderObject.DrawWireframeOverlay(GraphicsDevice, Matrix.Identity, commonShaderParameters);
-            }
 
+
+                _bondingBoxRenderer.Render(_lineShader, GraphicsDevice, commonShaderParameters, selectionFaceState.RenderObject.Geometry.BoundingBox, selectionFaceState.RenderObject.ModelMatrix);
+            }
+            
             base.Draw(time);
         }
 
@@ -113,6 +122,54 @@ namespace View3D.Scene
             _disposed = true;
 
             base.Dispose(disposing);
+        }
+
+
+        class BoundingBoxRenderer
+        {
+            VertexPosition[] _originalVertecies;
+
+            public void CreateLineList((Vector3, Vector3)[] lines)
+            {
+                _originalVertecies = new VertexPosition[lines.Length * 2];
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    _originalVertecies[i * 2] = new VertexPosition(lines[i].Item1);
+                    _originalVertecies[i * 2 + 1] = new VertexPosition(lines[i].Item2);
+                }
+            }
+
+            public virtual void Render(Effect effect, GraphicsDevice device, CommonShaderParameters commonShaderParameters, BoundingBox b, Matrix ModelMatrix)
+            {
+                var corners = b.GetCorners();
+                var data = new (Vector3, Vector3)[12];
+                data[0] = (corners[0], corners[1]);
+                data[1] = (corners[2], corners[3]);
+                data[2] = (corners[0], corners[3]);
+                data[3] = (corners[1], corners[2]);
+
+                data[4] = (corners[4], corners[5]);
+                data[5] = (corners[6], corners[7]);
+                data[6] = (corners[4], corners[7]);
+                data[7] = (corners[5], corners[6]);
+
+                data[8] = (corners[0], corners[4]);
+                data[9] = (corners[1], corners[5]);
+                data[10] = (corners[2], corners[6]);
+                data[11] = (corners[3], corners[7]);
+
+                CreateLineList(data);
+
+                effect.Parameters["View"].SetValue(commonShaderParameters.View);
+                effect.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
+                effect.Parameters["World"].SetValue(Matrix.CreateScale(1.05f) * ModelMatrix);
+
+                foreach (var pass in effect.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    device.DrawUserPrimitives(PrimitiveType.LineList, _originalVertecies, 0, _originalVertecies.Count() / 2);
+                }
+            }
         }
     }
 }

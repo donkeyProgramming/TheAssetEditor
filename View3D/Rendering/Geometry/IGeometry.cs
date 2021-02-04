@@ -18,10 +18,12 @@ namespace View3D.Rendering.Geometry
 
 
         public void ApplyMesh(Effect effect, GraphicsDevice device);
-
         public void ApplyMeshPart(Effect effect, GraphicsDevice device, List<int> faceSelection);
 
+        
         public Vector3 GetVertex(int index);
         public int VertexCount();
+
+        BoundingBox BoundingBox { get; }
     }
 }

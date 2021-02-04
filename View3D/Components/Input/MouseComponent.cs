@@ -41,10 +41,10 @@ namespace View3D.Components.Input
                     }
 
                     _mouseOwner = value;
-                    if (_mouseOwner == null)
-                        _logger.Here().Information($"Setting MouseOwner = null");
-                    else
-                        _logger.Here().Information($"Setting MouseOwner = {_mouseOwner.GetType().Name}");
+                    //if (_mouseOwner == null)
+                    //    _logger.Here().Information($"Setting MouseOwner = null");
+                    //else
+                    //    _logger.Here().Information($"Setting MouseOwner = {_mouseOwner.GetType().Name}");
                 }
             } 
         }
