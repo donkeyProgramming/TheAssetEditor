@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using View3D.Components.Component;
+using View3D.Components.Component.Selection;
 using View3D.Rendering;
 
 namespace View3D.Commands

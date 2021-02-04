@@ -354,7 +354,7 @@ namespace View3D.Components.Gizmo
                 var rotationMatrixLocal = Matrix.Identity;
                 var translationVectorLocal = Vector3.Zero;
                 
-                if (_mouse.IsMouseButtonPressed(Input.MouseButton.Left) && ActiveAxis != GizmoAxis.None)
+                if (_mouse.IsMouseButtonDown(Input.MouseButton.Left) && ActiveAxis != GizmoAxis.None)
                 {
                     if (_mouse.LastState().LeftButton == ButtonState.Released)
                         StartEvent?.Invoke();
@@ -384,7 +384,7 @@ namespace View3D.Components.Gizmo
                 SetGizmoPosition();
 
                 // -- Trigger Translation, Rotation & Scale events -- //
-                if (_mouse.IsMouseButtonPressed(Input.MouseButton.Left))
+                if (_mouse.IsMouseButtonDown(Input.MouseButton.Left))
                 {
                     if (_translationDelta != Vector3.Zero)
                     {

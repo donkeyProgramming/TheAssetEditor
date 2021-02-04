@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,12 +17,11 @@ namespace View3D.Rendering
         public BasicEffect WireframeEffect { get; set; }
         public BasicEffect SelectedFacesEffect { get; set; }
 
+        public VertexInstanceMesh VertexRenderer { get; set; }
+
         public Matrix ModelMatrix { get; private set; } = Matrix.Identity;
         public IGeometry Geometry { get; set; }
         public string Name { get; set; } = "";
-
-
-        public IGeometry _selectedVertexGeo;
 
         public RenderItem(IGeometry geo, Vector3 position, Quaternion rotation, Vector3 scale)
         {
@@ -62,21 +63,28 @@ namespace View3D.Rendering
 
         public void DrawVertexes(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams)
         {
-            return;
-            SelectedFacesEffect.Projection = shaderParams.Projection;
-            SelectedFacesEffect.View = shaderParams.View;
 
-           
+            VertexRenderer.Update(Geometry, ModelMatrix, Orientation, shaderParams.CameraPosition);
+            VertexRenderer.Draw(shaderParams.View, shaderParams.Projection, device);
 
-            for (int i = 0; i < Geometry.VertexCount(); i++)
-            {
-                var vertPos = Vector3.Transform(Geometry.GetVertex(i), ModelMatrix);
-                var distance = (shaderParams.CameraPosition - vertPos).Length();
-                var distanceScale = distance * 1.5f;
 
-                SelectedFacesEffect.World = Matrix.CreateScale(0.0025f * distanceScale) * Matrix.CreateFromQuaternion(Orientation) * Matrix.CreateTranslation(vertPos);
-                _selectedVertexGeo.ApplyMesh(SelectedFacesEffect, device);
-            }
+
+
+            //return;
+            //SelectedFacesEffect.Projection = shaderParams.Projection;
+            //SelectedFacesEffect.View = shaderParams.View;
+            //
+            //
+            //
+            //for (int i = 0; i < Geometry.VertexCount(); i++)
+            //{
+            //    var vertPos = Vector3.Transform(Geometry.GetVertex(i), ModelMatrix);
+            //    var distance = (shaderParams.CameraPosition - vertPos).Length();
+            //    var distanceScale = distance * 1.5f;
+            //
+            //    SelectedFacesEffect.World = Matrix.CreateScale(0.0025f * distanceScale) * Matrix.CreateFromQuaternion(Orientation) * Matrix.CreateTranslation(vertPos);
+            //    _selectedVertexGeo.ApplyMesh(SelectedFacesEffect, device);
+            //}
         }
 
         public void DrawBasic(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams)
@@ -95,7 +103,7 @@ namespace View3D.Rendering
 
     public static class RenderItemHelper
     {
-        public static void CreateDefaultShaders(RenderItem item, GraphicsDevice device)
+        public static void CreateDefaultShaders(RenderItem item, GraphicsDevice device, ContentManager content)
         {
             item.DefaultEffect = new BasicEffect(device);
             item.DefaultEffect.DiffuseColor = new Vector3(1.0f, 1.0f, 1.0f);
@@ -110,14 +118,15 @@ namespace View3D.Rendering
             item.SelectedFacesEffect.EnableDefaultLighting();
 
 
-            item._selectedVertexGeo = new CubeMesh(device);
+            item.VertexRenderer = new VertexInstanceMesh();
+            item.VertexRenderer.Initialize(device, content, item.Geometry.VertexCount());
         }
 
-        public static RenderItem CreateRenderItem(IGeometry geo, Vector3 position, Vector3 scale, string name, GraphicsDevice graphicsDevice)
+        public static RenderItem CreateRenderItem(IGeometry geo, Vector3 position, Vector3 scale, string name, WpfGame game)
         {
             var item = new RenderItem(geo, position, Quaternion.Identity, scale);
             item.Name = name;
-            CreateDefaultShaders(item, graphicsDevice);
+            CreateDefaultShaders(item, game.GraphicsDevice, game.Content);
             return item;
         }
     }

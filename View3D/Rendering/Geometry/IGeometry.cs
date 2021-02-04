@@ -9,8 +9,13 @@ namespace View3D.Rendering.Geometry
 {
     public interface IGeometry : IDisposable
     {
-        float? Intersect(Ray ray, Matrix modelMatrix);
-        public bool IntersectFace(Ray ray, Matrix modelMatrix, out int? face);
+        // Intersection - Picking
+        float? IntersectObject(Ray ray, Matrix modelMatrix);
+        public float? IntersectFace(Ray ray, Matrix modelMatrix, out int? face);
+
+        // Intersection - Multiselect
+        bool IntersectObject(BoundingFrustum boundingFrustum, Matrix modelMatrix);
+
 
         public void ApplyMesh(Effect effect, GraphicsDevice device);
 

@@ -1,7 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Common;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop;
 using MonoGame.Framework.WpfInterop.Input;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,9 +19,42 @@ namespace View3D.Components.Input
 
     public class MouseComponent : BaseComponent
     {
-        MouseState  _currentMouseState;
+        ILogger _logger = Logging.Create<MouseComponent>();
+
+        MouseState _currentMouseState;
         MouseState _lastMousesState;
         WpfMouse _wpfMouse;
+
+        IGameComponent _mouseOwner;
+        public IGameComponent MouseOwner 
+        { 
+            get { return _mouseOwner; } 
+            set 
+            {
+                if (_mouseOwner != value)
+                {
+                    if (_mouseOwner != null && value != null)
+                    {
+                        var error = $"{value.GetType().Name} is trying to steal ownership {_mouseOwner.GetType().Name}";
+                        _logger.Here().Error(error);
+                        throw new Exception(error);
+                    }
+
+                    _mouseOwner = value;
+                    if (_mouseOwner == null)
+                        _logger.Here().Information($"Setting MouseOwner = null");
+                    else
+                        _logger.Here().Information($"Setting MouseOwner = {_mouseOwner.GetType().Name}");
+                }
+            } 
+        }
+
+        public bool IsMouseOwner(IGameComponent component)
+        {
+            if (MouseOwner == null || MouseOwner == component)
+                return true;
+            return false;
+        }
 
         public MouseComponent(WpfGame game) : base(game)
         {
@@ -52,7 +87,7 @@ namespace View3D.Components.Input
             throw new NotImplementedException("trying to use a mouse button which is not added");
         }
 
-        public bool IsMouseButtonPressed(MouseButton button)
+        public bool IsMouseButtonDown(MouseButton button)
         {
             switch (button)
             {
@@ -60,6 +95,19 @@ namespace View3D.Components.Input
                     return _currentMouseState.LeftButton == ButtonState.Pressed;
                 case MouseButton.Right:
                     return _currentMouseState.RightButton == ButtonState.Pressed;
+            }
+
+            throw new NotImplementedException("trying to use a mouse button which is not added");
+        }
+
+        public bool IsMouseButtonPressed(MouseButton button)
+        {
+            switch (button)
+            {
+                case MouseButton.Left:
+                    return _currentMouseState.LeftButton == ButtonState.Pressed && _lastMousesState.LeftButton == ButtonState.Released;
+                case MouseButton.Right:
+                    return _currentMouseState.RightButton == ButtonState.Pressed && _lastMousesState.RightButton == ButtonState.Released; 
             }
 
             throw new NotImplementedException("trying to use a mouse button which is not added");

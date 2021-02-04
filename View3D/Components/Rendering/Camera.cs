@@ -14,7 +14,6 @@ namespace View3D.Components.Rendering
         GraphicsDevice _graphicsDevice;
         MouseComponent _mouse;
         KeyboardComponent _keyboard;
-        bool _componentOwnsMouse = false;
 
         public ArcBallCamera(WpfGame game, Vector3 lookAt, float currentZoom) : base(game)
         {
@@ -199,6 +198,9 @@ namespace View3D.Components.Rendering
        
         public void Update(MouseComponent mouse, KeyboardComponent keyboard)
         {
+            if (!mouse.IsMouseOwner(this))
+                return;
+
             var deltaMouseX = mouse.DeltaPosition().X;
             var deltaMouseY = mouse.DeltaPosition().Y;
             var deltaMouseWheel = mouse.DeletaScrollWheel();
@@ -209,14 +211,31 @@ namespace View3D.Components.Rendering
                 _lookAt = Vector3.Zero;
             }
 
+            var ownsMouse = mouse.MouseOwner;
             if (keyboard.IsKeyDown(Keys.LeftAlt))
             {
-                if (mouse.IsMouseButtonPressed(MouseButton.Left))
+                mouse.MouseOwner = this;
+            }
+            else
+            {
+                if (ownsMouse == this)
+                {
+                    mouse.MouseOwner = null;
+                    mouse.ClearStates();
+                    return;
+                }
+            }
+
+
+            if (keyboard.IsKeyDown(Keys.LeftAlt))
+            {
+                mouse.MouseOwner = this;
+                if (mouse.IsMouseButtonDown(MouseButton.Left))
                 {
                     Yaw += deltaMouseX * 0.01f;
                     Pitch += deltaMouseY * 0.01f;
                 }
-                if (mouse.IsMouseButtonPressed(MouseButton.Right))
+                if (mouse.IsMouseButtonDown(MouseButton.Right))
                 {
                     MoveCameraRight(deltaMouseX * 0.01f);
                     MoveCameraUp(-deltaMouseY * 0.01f);
@@ -225,22 +244,6 @@ namespace View3D.Components.Rendering
                 {
                     Zoom += deltaMouseWheel * 0.005f;
                 }
-
-                _componentOwnsMouse = mouse.IsMouseButtonPressed(MouseButton.Left);
-            }
-
-            // mouse key down, the component owns it 
-
-
-            //else if (!mouse.IsMouseButtonPressed(MouseButton.Left))
-            //{
-            //    movedLastFrame = false;
-            //}
-
-            if (_componentOwnsMouse && mouse.IsMouseButtonReleased(MouseButton.Left))
-            {
-                mouse.ClearStates();
-                _componentOwnsMouse = false;
             }
         }
 
@@ -274,6 +277,30 @@ namespace View3D.Components.Rendering
             direction.Normalize();
 
             return new Ray(nearPoint, direction);
+        }
+
+        public BoundingFrustum UnprojectRectangle(Rectangle source)
+        {
+            //http://forums.create.msdn.com/forums/p/6690/35401.aspx , by "The Friggm"
+            // Many many thanks to him...
+
+            // Point in screen space of the center of the region selected
+            Vector2 regionCenterScreen = new Vector2(source.Center.X, source.Center.Y);
+
+            // Generate the projection matrix for the screen region
+            Matrix regionProjMatrix = ProjectionMatrix;
+
+            // Calculate the region dimensions in the projection matrix. M11 is inverse of width, M22 is inverse of height.
+            regionProjMatrix.M11 /= ((float)source.Width / (float)_graphicsDevice.Viewport.Width);
+            regionProjMatrix.M22 /= ((float)source.Height / (float)_graphicsDevice.Viewport.Height);
+
+            // Calculate the region center in the projection matrix. M31 is horizonatal center.
+            regionProjMatrix.M31 = (regionCenterScreen.X - (_graphicsDevice.Viewport.Width / 2f)) / ((float)source.Width / 2f);
+
+            // M32 is vertical center. Notice that the screen has low Y on top, projection has low Y on bottom.
+            regionProjMatrix.M32 = -(regionCenterScreen.Y - (_graphicsDevice.Viewport.Height / 2f)) / ((float)source.Height / 2f);
+
+            return new BoundingFrustum(ViewMatrix * regionProjMatrix);
         }
     }
 }

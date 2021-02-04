@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using System.Text;
 using View3D.Components.Component;
+using View3D.Components.Component.Selection;
 using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
@@ -49,13 +50,13 @@ namespace View3D.Scene
             base.Initialize();
         }
 
-        Instancing instancing;
+        VertexInstanceMesh instancing;
 
         protected override void LoadContent()
         {
-            instancing = new Instancing();
-            instancing.Initialize(this.GraphicsDevice);
-            instancing.Load(Content);
+            //instancing = new VertexInstanceMesh();
+            //instancing.Initialize(this.GraphicsDevice);
+            //instancing.Load(Content);
 
             base.LoadContent();
         }
@@ -67,6 +68,10 @@ namespace View3D.Scene
             if (_sceneManager == null)
                 return;
 
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+
+  
             CommonShaderParameters commonShaderParameters = new CommonShaderParameters()
             {
                 Projection = _camera.ProjectionMatrix,
@@ -76,15 +81,12 @@ namespace View3D.Scene
                 EnvRotate = 0
             };
 
-            instancing.Draw(_camera.ViewMatrix, _camera.ProjectionMatrix, GraphicsDevice);
+            //instancing.Draw(_camera.ViewMatrix, _camera.ProjectionMatrix, GraphicsDevice);
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             foreach (var item in _sceneManager.RenderItems)
                 item.DrawBasic(GraphicsDevice, Matrix.Identity, commonShaderParameters);
-
-            foreach (var item in _sceneManager.RenderItems)
-                item.DrawVertexes(GraphicsDevice, Matrix.Identity, commonShaderParameters);
 
             var selectionState = _selectionManager.GetState();
             var selectionFaceState = selectionState as FaceSelectionState;

@@ -10,6 +10,7 @@ using View3D.Components.Component;
 using System.Collections.Generic;
 using View3D.Components.Rendering;
 using View3D.Components.Input;
+using View3D.Components.Component.Selection;
 
 namespace View3D.Components.Gizmo
 {
@@ -58,6 +59,8 @@ namespace View3D.Components.Gizmo
             if (_selectionManager.GetState().Mode != GeometrySelectionMode.Object)
                 return;
 
+            _mouse.MouseOwner = this;
+
             _activeCommand = new TransformCommand((_selectionManager.GetState() as ObjectSelectionState).CurrentSelection());
         }
 
@@ -65,6 +68,7 @@ namespace View3D.Components.Gizmo
         {
             if (_activeCommand != null)
             {
+                _mouse.MouseOwner = null;
                 _commandManager.ExecuteCommand(_activeCommand);
                 _activeCommand = null;
                 _mouse.ClearStates();
@@ -99,6 +103,7 @@ namespace View3D.Components.Gizmo
 
         public override void Update(GameTime gameTime)
         {
+
             if (_selectionManager.GetState().Mode != GeometrySelectionMode.Object)
                 return;
             _gizmo.UpdateCameraProperties();

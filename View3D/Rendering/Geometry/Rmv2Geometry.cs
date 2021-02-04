@@ -2,24 +2,15 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using View3D.Components.Component;
-using View3D.Utility;
 
 namespace View3D.Rendering.Geometry
 {
-    class Rmv2Geometry : IGeometry
+    class Rmv2Geometry : IndexedMeshGeometry
     {
-        private VertexBuffer _vertexBuffer;
-        private IndexBuffer _indexBuffer;
-        private VertexDeclaration _vertexDeclaration;
-
+        VertexDeclaration _vertexDeclaration;
         VertexPositionNormalTextureCustom[] _vertexArray;
-        ushort[] _indexList;
 
         public int WeightCount { get; set; } = 0;
-        public Vector3 Pivot { get; set; }
 
         public Rmv2Geometry(RmvSubModel modelPart, GraphicsDevice device)
         {
@@ -80,120 +71,10 @@ namespace View3D.Rendering.Geometry
             _vertexBuffer.SetData(_vertexArray);
         }
 
-        public void ApplyMesh(Effect effect, GraphicsDevice device)
-        {
-            device.Indices = _indexBuffer;
-            device.SetVertexBuffer(_vertexBuffer);
-            foreach (var pass in effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-                device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, _indexBuffer.IndexCount);
-            }
-        }
-
-        public void ApplyMeshPart(Effect effect, GraphicsDevice device, List<int> faceSelection)
-        {
-            device.Indices = _indexBuffer;
-            device.SetVertexBuffer(_vertexBuffer);
-            foreach (var pass in effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-                foreach (var item in faceSelection)
-                    device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, item, 1);
-            }
-
-        }
-
-        public void Dispose()
-        {
-           // throw new NotImplementedException();
-        }
-
-        public float? Intersect(Ray ray, Matrix modelMatrix)
-        {
-            //face = null;
-
-            Matrix inverseTransform = Matrix.Invert(modelMatrix);
-            ray.Position = Vector3.Transform(ray.Position, inverseTransform);
-            ray.Direction = Vector3.TransformNormal(ray.Direction, inverseTransform);
-
-            int faceIndex = -1;
-            float bestDistance = float.MaxValue;
-            for (int i = 0; i < _indexList.Length; i += 3)
-            {
-                var index0 = _indexList[i + 0];
-                var index1 = _indexList[i + 1];
-                var index2 = _indexList[i + 2];
-
-                var vert0 = new Vector3(_vertexArray[index0].Position.X, _vertexArray[index0].Position.Y, _vertexArray[index0].Position.Z);
-                var vert1 = new Vector3(_vertexArray[index1].Position.X, _vertexArray[index1].Position.Y, _vertexArray[index1].Position.Z);
-                var vert2 = new Vector3(_vertexArray[index2].Position.X, _vertexArray[index2].Position.Y, _vertexArray[index2].Position.Z);
-
-                var res = IntersectionMath.MollerTrumboreIntersection(ray, vert0, vert1, vert2, out var intersectionPoint);
-                if (res)
-                {
-                    var dist = intersectionPoint;
-                    if (dist < bestDistance)
-                    {
-                        faceIndex = i;
-                        bestDistance = dist.Value;
-                    }
-                }
-            }
-
-            if(faceIndex != -1)
-                return bestDistance;
-            return null;
-        }
-
-        public bool IntersectFace(Ray ray, Matrix modelMatrix, out int? face)
-        {
-            face = null;
-
-            Matrix inverseTransform = Matrix.Invert(modelMatrix);
-            ray.Position = Vector3.Transform(ray.Position, inverseTransform);
-            ray.Direction = Vector3.TransformNormal(ray.Direction, inverseTransform);
-
-            int faceIndex = -1;
-            float bestDistance = float.MaxValue;
-            for (int i = 0; i < _indexList.Length; i += 3)
-            {
-                var index0 = _indexList[i + 0];
-                var index1 = _indexList[i + 1];
-                var index2 = _indexList[i + 2];
-
-                var vert0 = new Vector3(_vertexArray[index0].Position.X, _vertexArray[index0].Position.Y, _vertexArray[index0].Position.Z);
-                var vert1 = new Vector3(_vertexArray[index1].Position.X, _vertexArray[index1].Position.Y, _vertexArray[index1].Position.Z);
-                var vert2 = new Vector3(_vertexArray[index2].Position.X, _vertexArray[index2].Position.Y, _vertexArray[index2].Position.Z);
-
-                var res = IntersectionMath.MollerTrumboreIntersection(ray, vert0, vert1, vert2, out var intersectionPoint);
-                if (res)
-                {
-                    var dist = intersectionPoint;
-                    if (dist < bestDistance)
-                    {
-                        faceIndex = i;
-                        bestDistance = dist.Value;
-                    }
-                }
-            }
-
-            if (faceIndex == -1)
-                return false;
-
-            face = (faceIndex);
-            return true;
-        }
-
-        public Vector3 GetVertex(int index)
+        public override Vector3 GetVertex(int index)
         {
             var vertIndex = _indexList[index];
             return new Vector3(_vertexArray[vertIndex].Position.X, _vertexArray[vertIndex].Position.Y, _vertexArray[vertIndex].Position.Z);
-        }
-
-        public int VertexCount()
-        {
-            return _indexList.Count();
         }
     }
 }

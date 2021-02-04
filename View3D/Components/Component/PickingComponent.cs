@@ -7,6 +7,7 @@ using Serilog;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Commands;
+using View3D.Components.Component.Selection;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
 using View3D.Rendering;
@@ -44,6 +45,7 @@ namespace View3D.Components.Component
 
         public override void Update(GameTime gameTime)
         {
+            return;
             var currentState = _selectionManager.GetState();
             var ray = _camera.CreateCameraRay(_mouse.Position());
 
@@ -67,7 +69,7 @@ namespace View3D.Components.Component
 
             foreach (var item in _sceneManger.RenderItems)
             {
-                var distance = item.Geometry.Intersect(ray, item.ModelMatrix);
+                var distance = item.Geometry.IntersectObject(ray, item.ModelMatrix);
                 if (distance != null)
                 {
                     if (distance < bestDistance)
@@ -112,7 +114,7 @@ namespace View3D.Components.Component
             {
                 var faceState = currentState as FaceSelectionState;
 
-                if (faceState.RenderObject.Geometry.IntersectFace(ray, faceState.RenderObject.ModelMatrix, out var selectedFace))
+                if (faceState.RenderObject.Geometry.IntersectFace(ray, faceState.RenderObject.ModelMatrix, out var selectedFace) != null)
                 {
                     _logger.Here().Information($"Selected face {selectedFace} in {faceState.RenderObject.Name}");
 

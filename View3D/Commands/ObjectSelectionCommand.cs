@@ -3,6 +3,7 @@ using Serilog;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Components.Component;
+using View3D.Components.Component.Selection;
 using View3D.Rendering;
 using View3D.Scene;
 
