@@ -8,9 +8,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Commands;
+using View3D.Commands.Face;
+using View3D.Commands.Object;
+using View3D.Commands.Vertex;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
 using View3D.Rendering;
+using View3D.Rendering.Geometry;
 using View3D.Scene;
 
 namespace View3D.Components.Component.Selection
@@ -57,7 +61,7 @@ namespace View3D.Components.Component.Selection
             if (!_mouseComponent.IsMouseOwner(this))
                 return;
 
-            ChangeSelectionState();
+            ChangeSelectionMode();
 
             _currentMousePos = _mouseComponent.Position();
 
@@ -98,15 +102,13 @@ namespace View3D.Components.Component.Selection
         void SelectFromRectangle(Rectangle screenRect, bool isSelectionModification)
         {
             var unprojectedSelectionRect = _camera.UnprojectRectangle(screenRect);
-
-        
+  
             var currentState = _selectionManager.GetState();
-            if (currentState.Mode == GeometrySelectionMode.Face)
+            if (currentState.Mode == GeometrySelectionMode.Face && currentState is FaceSelectionState faceState)
             {
-                var faceState = currentState as FaceSelectionState;
-                if (faceState.RenderObject.Geometry.IntersectFaces(unprojectedSelectionRect, faceState.RenderObject.ModelMatrix, out var faces))
+                if (GeometryIntersection.IntersectFaces(unprojectedSelectionRect, faceState.RenderObject, out var faces))
                 {
-                    FaceSelectionCommand faceSelectionCommand = new FaceSelectionCommand(_selectionManager)
+                    var faceSelectionCommand = new FaceSelectionCommand(_selectionManager)
                     {
                         IsModification = isSelectionModification,
                         SelectedFaces = faces
@@ -115,9 +117,22 @@ namespace View3D.Components.Component.Selection
                     return;
                 }
             }
+            else if (currentState.Mode == GeometrySelectionMode.Vertex && currentState is VertexSelectionState vertexState)
+            {
+                if (GeometryIntersection.IntersectVertices(unprojectedSelectionRect, vertexState.RenderObject, out var vertices))
+                {
+                    var vertexSelectionCommand = new VertexSelectionCommand(_selectionManager)
+                    {
+                        IsModification = isSelectionModification,
+                        SelectedVertices = vertices
+                    };
+                    _commandManager.ExecuteCommand(vertexSelectionCommand);
+                    return;
+                }
+            }
 
 
-            var selectedObjects = PickingUtil.SelectObjects(unprojectedSelectionRect, _sceneManger);
+            var selectedObjects = _sceneManger.SelectObjects(unprojectedSelectionRect);
             if (selectedObjects.Count() == 0 && isSelectionModification == false)
             {
                 // Only clear selection if we are not in geometry mode and the selection count is not empty
@@ -148,10 +163,8 @@ namespace View3D.Components.Component.Selection
                 {
                     var faceState = currentState as FaceSelectionState;
 
-                    if (faceState.RenderObject.Geometry.IntersectFace(ray, faceState.RenderObject.ModelMatrix, out var selectedFace) != null)
+                    if (GeometryIntersection.IntersectFace(ray, faceState.RenderObject, out var selectedFace) != null)
                     {
-                        _logger.Here().Information($"Selected face {selectedFace} in {faceState.RenderObject.Name}");
-
                         FaceSelectionCommand faceSelectionCommand = new FaceSelectionCommand(_selectionManager)
                         {
                             IsModification = isSelectionModification,
@@ -164,7 +177,7 @@ namespace View3D.Components.Component.Selection
             }
 
             // Pick object
-            var selectedObject = PickingUtil.SelectObject(ray, _sceneManger);
+            var selectedObject = _sceneManger.SelectObject(ray);
             if (selectedObject == null && isSelectionModification == false)
             {
                 // Only clear selection if we are not in geometry mode and the selection count is not empty
@@ -184,24 +197,35 @@ namespace View3D.Components.Component.Selection
             }
         }
 
-        bool ChangeSelectionState()
+        bool ChangeSelectionMode()
         {
             var selectionState = _selectionManager.GetState();
 
             if (_keyboardComponent.IsKeyReleased(Keys.F1) && _selectionManager.GetState().Mode != GeometrySelectionMode.Object)
             {
-                _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(_selectionManager, GeometrySelectionMode.Object));
+                _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(selectionState.GetSingleSelectedObject(), _selectionManager, GeometrySelectionMode.Object));
                 return true;
             }
 
             else if (_keyboardComponent.IsKeyReleased(Keys.F2) && _selectionManager.GetState().Mode != GeometrySelectionMode.Face)
             {
-                var objectSelectonState = selectionState as ObjectSelectionState;
-                if (objectSelectonState.CurrentSelection().Count == 1)
+                var selectedObject = selectionState.GetSingleSelectedObject();
+                if (selectedObject != null)
                 {
-                    _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(objectSelectonState.CurrentSelection().First(), _selectionManager, GeometrySelectionMode.Face));
+                    _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(selectedObject, _selectionManager, GeometrySelectionMode.Face));
                     return true;
                 }
+            }
+
+            else if (_keyboardComponent.IsKeyReleased(Keys.F3) && _selectionManager.GetState().Mode != GeometrySelectionMode.Vertex)
+            {
+                var selectedObject = selectionState.GetSingleSelectedObject();
+                if(selectedObject != null)
+                { 
+                    _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(selectedObject, _selectionManager, GeometrySelectionMode.Vertex));
+                    return true;
+                }
+
             }
 
             return false;
@@ -211,17 +235,15 @@ namespace View3D.Components.Component.Selection
         {
             if (_isMouseDown)
             {
-                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-
                 var dest = CreateSelectionRectangle(_startDrag, _currentMousePos);
-
-                _spriteBatch.Draw(_textTexture, dest, Color.White * 0.5f);
-
                 var lineWidth = 2;
                 var top = new Rectangle(dest.X, dest.Y, dest.Width, lineWidth);
                 var bottom = new Rectangle(dest.X, dest.Y + dest.Height, dest.Width + 2, lineWidth);
                 var left = new Rectangle(dest.X, dest.Y, lineWidth, dest.Height);
                 var right = new Rectangle(dest.X + dest.Width, dest.Y, lineWidth, dest.Height);
+
+                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+                _spriteBatch.Draw(_textTexture, dest, Color.White * 0.5f);
                 _spriteBatch.Draw(_textTexture, top, Color.Red * 0.75f);
                 _spriteBatch.Draw(_textTexture, bottom, Color.Red * 0.75f);
                 _spriteBatch.Draw(_textTexture, left, Color.Red * 0.75f);

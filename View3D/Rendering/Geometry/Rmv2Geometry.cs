@@ -82,5 +82,7 @@ namespace View3D.Rendering.Geometry
         {
             return _vertexArray.Length;
         }
+
+
     }
 }

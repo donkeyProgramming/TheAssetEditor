@@ -9,20 +9,14 @@ namespace View3D.Rendering.Geometry
 {
     public interface IGeometry : IDisposable
     {
-        // Intersection - Picking
-        float? IntersectObject(Ray ray, Matrix modelMatrix);
-        public float? IntersectFace(Ray ray, Matrix modelMatrix, out int? face);
-
-        // Intersection - Multiselect
-        bool IntersectObject(BoundingFrustum boundingFrustum, Matrix modelMatrix);
-        bool IntersectFaces(BoundingFrustum boundingFrustum, Matrix modelMatrix, out List<int> faces);
-
         public void ApplyMesh(Effect effect, GraphicsDevice device);
         public void ApplyMeshPart(Effect effect, GraphicsDevice device, List<int> faceSelection);
 
-        
         public Vector3 GetVertex(int index);
         public int VertexCount();
+
+        public int GetIndex(int i);
+        public int GetIndexCount();
 
         BoundingBox BoundingBox { get; }
     }

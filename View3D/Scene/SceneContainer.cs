@@ -95,8 +95,7 @@ namespace View3D.Scene
                     _bondingBoxRenderer.Render(_lineShader, GraphicsDevice, commonShaderParameters, item.Geometry.BoundingBox, item.ModelMatrix);
             }
             
-            var selectionFaceState = selectionState as FaceSelectionState;
-            if (selectionFaceState != null && selectionFaceState.RenderObject != null)
+            if (selectionState is FaceSelectionState selectionFaceState && selectionFaceState.RenderObject != null)
             {
                 GraphicsDevice.RasterizerState = _selectedFaceState;
                 selectionFaceState.RenderObject.DrawSelectedFaces(GraphicsDevice, Matrix.Identity, commonShaderParameters, selectionFaceState.CurrentSelection());
@@ -105,10 +104,19 @@ namespace View3D.Scene
                 GraphicsDevice.RasterizerState = _wireframeState;
                 selectionFaceState.RenderObject.DrawWireframeOverlay(GraphicsDevice, Matrix.Identity, commonShaderParameters);
 
-
-                _bondingBoxRenderer.Render(_lineShader, GraphicsDevice, commonShaderParameters, selectionFaceState.RenderObject.Geometry.BoundingBox, selectionFaceState.RenderObject.ModelMatrix);
+                //_bondingBoxRenderer.Render(_lineShader, GraphicsDevice, commonShaderParameters, selectionFaceState.RenderObject.Geometry.BoundingBox, selectionFaceState.RenderObject.ModelMatrix);
             }
-            
+
+            if (selectionState is VertexSelectionState selectionVertexState && selectionVertexState.RenderObject != null)
+            {
+                GraphicsDevice.RasterizerState = _selectedFaceState;
+                //selectionFaceState.RenderObject.DrawSelectedFaces(GraphicsDevice, Matrix.Identity, commonShaderParameters, selectionFaceState.CurrentSelection());
+                selectionVertexState.RenderObject.DrawVertexes(GraphicsDevice, Matrix.Identity, commonShaderParameters);
+
+                GraphicsDevice.RasterizerState = _wireframeState;
+                selectionVertexState.RenderObject.DrawWireframeOverlay(GraphicsDevice, Matrix.Identity, commonShaderParameters);
+            }
+
             base.Draw(time);
         }
 

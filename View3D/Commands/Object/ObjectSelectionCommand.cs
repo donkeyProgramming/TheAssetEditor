@@ -7,7 +7,7 @@ using View3D.Components.Component.Selection;
 using View3D.Rendering;
 using View3D.Scene;
 
-namespace View3D.Commands
+namespace View3D.Commands.Object
 {
     public class ObjectSelectionCommand : ICommand
     {
@@ -23,11 +23,6 @@ namespace View3D.Commands
         {
             _selectionManager = selectionManager;
             _oldState = _selectionManager.GetStateCopy();
-        }
-
-        public void Cancel()
-        {
-            Undo();
         }
 
         public void Execute()

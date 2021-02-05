@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using View3D.Rendering;
 
 namespace View3D.Components.Component.Selection
 {
@@ -22,5 +23,6 @@ namespace View3D.Components.Component.Selection
         public event SelectionStateChanged SelectionChanged;
 
         int SelectionCount();
+        RenderItem GetSingleSelectedObject();
     }
 }

@@ -42,10 +42,6 @@ namespace View3D.Commands
             }
         }
 
-        public void Cancel()
-        {
-            Undo();
-        }
 
         public void Execute()
         {

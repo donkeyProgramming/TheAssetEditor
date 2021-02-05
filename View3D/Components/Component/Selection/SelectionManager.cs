@@ -47,6 +47,10 @@ namespace View3D.Components.Component.Selection
                     _currentState = new FaceSelectionState();
                     break;
 
+                case GeometrySelectionMode.Vertex:
+                    _currentState = new VertexSelectionState();
+                    break;
+
                 default:
                     throw new Exception();
             }

@@ -8,7 +8,7 @@ using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Rendering;
 
-namespace View3D.Commands
+namespace View3D.Commands.Object
 {
 
     public class ObjectSelectionModeCommand : ICommand
@@ -31,18 +31,17 @@ namespace View3D.Commands
             _selectedItem = selectedItem;
         }
 
-        public void Cancel()
-        {
-            Undo();
-        }
-
         public void Execute()
         {
             _logger.Here().Information($"Executing ObjectSelectionModeCommand");
             var newSelectionState = _selectionManager.CreateSelectionSate(_newMode);
 
-            if (newSelectionState.Mode == GeometrySelectionMode.Face)
+            if (newSelectionState.Mode == GeometrySelectionMode.Object && _selectedItem != null)
+                (newSelectionState as ObjectSelectionState).ModifySelection(_selectedItem);
+            else if (newSelectionState.Mode == GeometrySelectionMode.Face)
                 (newSelectionState as FaceSelectionState).RenderObject = _selectedItem;
+            else if(newSelectionState.Mode == GeometrySelectionMode.Vertex)
+                (newSelectionState as VertexSelectionState).RenderObject = _selectedItem;
         }
 
         public void Undo()

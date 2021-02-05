@@ -48,6 +48,13 @@ namespace View3D.Components.Component.Selection
         {
             return _selectionList.Count;
         }
+
+        public RenderItem GetSingleSelectedObject()
+        {
+            if (_selectionList.Count != 1)
+                return null;
+            return _selectionList[0];
+        }
     }
 }
 

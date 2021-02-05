@@ -6,19 +6,18 @@ using View3D.Components.Component.Selection;
 using View3D.Rendering;
 using View3D.Scene;
 
-namespace View3D.Commands
+namespace View3D.Commands.Vertex
 {
-
-    public class FaceSelectionCommand : ICommand
+    public class VertexSelectionCommand : ICommand
     {
-        ILogger _logger = Logging.Create<ObjectSelectionCommand>();
+        ILogger _logger = Logging.Create<VertexSelectionCommand>();
         private readonly SelectionManager _selectionManager;
 
         ISelectionState _oldState;
         public bool IsModification { get; set; } = false;
-        public List<int> SelectedFaces { get; set; }
+        public List<int> SelectedVertices { get; set; }
 
-        public FaceSelectionCommand(SelectionManager selectionManager)
+        public VertexSelectionCommand(SelectionManager selectionManager)
         {
             _selectionManager = selectionManager;
             _oldState = _selectionManager.GetStateCopy();
@@ -31,13 +30,13 @@ namespace View3D.Commands
 
         public void Execute()
         {
-            var currentState = _selectionManager.GetState() as FaceSelectionState;
-            _logger.Here().Information($"Executing FaceSelectionCommand Mod[{IsModification}] Item[{currentState.RenderObject.Name}] faces[{SelectedFaces.Count}]");
+            var currentState = _selectionManager.GetState() as VertexSelectionState;
+            _logger.Here().Information($"Executing VertexSelectionCommand Mod[{IsModification}] Item[{currentState.RenderObject.Name}] Vertices[{SelectedVertices.Count}]");
 
             if (!IsModification)
                 currentState.Clear();
 
-            foreach (var newSelectionItem in SelectedFaces)
+            foreach (var newSelectionItem in SelectedVertices)
                 currentState.ModifySelection(newSelectionItem);
 
             currentState.EnsureSorted();
@@ -45,7 +44,7 @@ namespace View3D.Commands
 
         public void Undo()
         {
-            _logger.Here().Information($"Undoing FaceSelectionCommand");
+            _logger.Here().Information($"Undoing VertexSelectionCommand");
             _selectionManager.SetState(_oldState);
         }
     }

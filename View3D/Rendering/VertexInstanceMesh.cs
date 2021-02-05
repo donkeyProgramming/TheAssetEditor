@@ -136,6 +136,7 @@ namespace View3D.Rendering
             _indexBuffer = new IndexBuffer(device, typeof(int), 36, BufferUsage.WriteOnly);
             _indexBuffer.SetData(indices);
         }
+
         public void Update(IGeometry geo, Matrix modelMatrix, Quaternion objectRotation, Vector3 cameraPos)
         {
             _currentInstanceCount = geo.VertexCount();
@@ -153,7 +154,6 @@ namespace View3D.Rendering
                 _instanceTransform[i].World3 = new Vector3(world[3, 0], world[3, 1], world[3, 2]);
             }
             _instanceBuffer.SetData(_instanceTransform, 0, _currentInstanceCount, SetDataOptions.None);
-
         }
 
         private void GenerateInstanceInformation(int count)
@@ -175,12 +175,13 @@ namespace View3D.Rendering
         }
 
         //view and projection should come from your camera
-        public void Draw(Matrix view, Matrix projection, GraphicsDevice device)
+        public void Draw(Matrix view, Matrix projection, GraphicsDevice device, Vector3 colour)
         {
             //GenerateInstanceInformation(instanceCount);
 
             _effect.CurrentTechnique = _effect.Techniques["Instancing"];
             _effect.Parameters["WVP"].SetValue(view * projection);
+            _effect.Parameters["VertexColour"].SetValue(colour);
 
             device.Indices = _indexBuffer;
             _effect.CurrentTechnique.Passes[0].Apply();

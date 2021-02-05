@@ -63,28 +63,8 @@ namespace View3D.Rendering
 
         public void DrawVertexes(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams)
         {
-
             VertexRenderer.Update(Geometry, ModelMatrix, Orientation, shaderParams.CameraPosition);
-            VertexRenderer.Draw(shaderParams.View, shaderParams.Projection, device);
-
-
-
-
-            //return;
-            //SelectedFacesEffect.Projection = shaderParams.Projection;
-            //SelectedFacesEffect.View = shaderParams.View;
-            //
-            //
-            //
-            //for (int i = 0; i < Geometry.VertexCount(); i++)
-            //{
-            //    var vertPos = Vector3.Transform(Geometry.GetVertex(i), ModelMatrix);
-            //    var distance = (shaderParams.CameraPosition - vertPos).Length();
-            //    var distanceScale = distance * 1.5f;
-            //
-            //    SelectedFacesEffect.World = Matrix.CreateScale(0.0025f * distanceScale) * Matrix.CreateFromQuaternion(Orientation) * Matrix.CreateTranslation(vertPos);
-            //    _selectedVertexGeo.ApplyMesh(SelectedFacesEffect, device);
-            //}
+            VertexRenderer.Draw(shaderParams.View, shaderParams.Projection, device, new Vector3(0,1,0));
         }
 
         public void DrawBasic(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams)
@@ -93,12 +73,7 @@ namespace View3D.Rendering
             DefaultEffect.View = shaderParams.View;
             DefaultEffect.World = ModelMatrix;
             Geometry.ApplyMesh(DefaultEffect, device);
-
-            //DrawVertexes(device, parentWorldMatrix, shaderParams);
         }
-
-        //public void DrawCinematic(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams)
-        //{ }
     }
 
     public static class RenderItemHelper

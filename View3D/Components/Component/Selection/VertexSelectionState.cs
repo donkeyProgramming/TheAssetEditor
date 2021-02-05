@@ -1,63 +1,63 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using View3D.Rendering;
 
 namespace View3D.Components.Component.Selection
 {
-    public class FaceSelectionState : ISelectionState
+    public class VertexSelectionState : ISelectionState
     {
-        public GeometrySelectionMode Mode => GeometrySelectionMode.Face;
+        public GeometrySelectionMode Mode => GeometrySelectionMode.Vertex;
         public event SelectionStateChanged SelectionChanged;
 
         public RenderItem RenderObject { get; set; }
-        public List<int> SelectedFaces { get; set; } = new List<int>();
+        public List<int> SelectedVertices { get; set; } = new List<int>();
 
 
         public void ModifySelection(int newSelectionItem)
         {
-            if (SelectedFaces.Contains(newSelectionItem))
-                SelectedFaces.Remove(newSelectionItem);
+            if (SelectedVertices.Contains(newSelectionItem))
+                SelectedVertices.Remove(newSelectionItem);
             else
-                SelectedFaces.Add(newSelectionItem);
+                SelectedVertices.Add(newSelectionItem);
 
             SelectionChanged?.Invoke(this);
         }
 
         public List<int> CurrentSelection()
         {
-            return SelectedFaces;
+            return SelectedVertices;
         }
 
         public void Clear()
         {
-            SelectedFaces.Clear();
+            SelectedVertices.Clear();
             SelectionChanged?.Invoke(this);
         }
 
-
         public void EnsureSorted()
         {
-            SelectedFaces = SelectedFaces.Distinct().OrderBy(x => x).ToList();
+            SelectedVertices = SelectedVertices.Distinct().OrderBy(x => x).ToList();
         }
-
 
         public ISelectionState Clone()
         {
-            return new FaceSelectionState()
+            return new VertexSelectionState()
             {
                 RenderObject = RenderObject,
-                SelectedFaces = new List<int>(SelectedFaces)
+                SelectedVertices = new List<int>(SelectedVertices)
             };
         }
 
         public void Restore()
         {
-            
+
         }
 
         public int SelectionCount()
         {
-            return SelectedFaces.Count();
+            return SelectedVertices.Count();
         }
 
         public RenderItem GetSingleSelectedObject()
@@ -66,4 +66,3 @@ namespace View3D.Components.Component.Selection
         }
     }
 }
-

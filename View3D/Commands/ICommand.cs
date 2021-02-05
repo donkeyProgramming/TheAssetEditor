@@ -4,7 +4,6 @@
     {
         void Undo();
         void Execute();
-        void Cancel();
     }
 }
 

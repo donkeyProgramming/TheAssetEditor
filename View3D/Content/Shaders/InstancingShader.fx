@@ -1,4 +1,5 @@
 ﻿float4x4 WVP;
+float3 VertexColour;
 
 struct VSInstanceInputSimple
 {
@@ -54,7 +55,7 @@ InstancingVSoutput InstancingVS(InstancingVSinput input, VSInstanceInputSimple i
 
 float4 InstancingPS(InstancingVSoutput input) : COLOR0
 {
-    return float4(1,0,0,1);
+    return float4(VertexColour,1);
 }
 
 technique Instancing
