@@ -7,12 +7,11 @@ namespace View3D.Rendering.Geometry
 {
     class Rmv2Geometry : IndexedMeshGeometry
     {
-        VertexDeclaration _vertexDeclaration;
         VertexPositionNormalTextureCustom[] _vertexArray;
 
         public int WeightCount { get; set; } = 0;
 
-        public Rmv2Geometry(RmvSubModel modelPart, GraphicsDevice device)
+        public Rmv2Geometry(RmvSubModel modelPart, GraphicsDevice device) : base(device)
         {
             Pivot = new Vector3(modelPart.Header.Transform.Pivot.X, modelPart.Header.Transform.Pivot.Y, modelPart.Header.Transform.Pivot.Z);
 
@@ -53,24 +52,49 @@ namespace View3D.Rendering.Geometry
                     _vertexArray[i].BlendWeights.X = vertex.BoneWeight[0];
                     WeightCount = 1;
                 }
-                else
-                {
-                    throw new Exception("Unknown vertex format");
-                }
+
             }
 
             CreateModelFromBuffers(device);
+            CreateIndexFromBuffers(device);
             BuildBoundingBox();
         }
 
+        public Rmv2Geometry(GraphicsDevice device) : base(device)
+        { }
+
+
         void CreateModelFromBuffers(GraphicsDevice device)
         {
-            _indexBuffer = new IndexBuffer(device, typeof(short), _indexList.Length, BufferUsage.None);
-            _indexBuffer.SetData(_indexList);
-
+        
             _vertexBuffer = new VertexBuffer(device, _vertexDeclaration, _vertexArray.Length, BufferUsage.None);
             _vertexBuffer.SetData(_vertexArray);
         }
+
+        public override IGeometry Clone()
+        {
+            var mesh = new Rmv2Geometry(_device);
+            mesh.Pivot = Pivot;
+            mesh._vertexDeclaration = _vertexDeclaration;
+            mesh._boundingBox = BoundingBox;
+
+            mesh._indexList = new ushort[_indexList.Length];
+            _indexList.CopyTo(mesh._indexList, 0);
+
+            mesh._indexBuffer = new IndexBuffer(_device, typeof(short), mesh._indexList.Length, BufferUsage.None);
+            mesh._indexBuffer.SetData(mesh._indexList);
+
+            mesh._vertexArray = new VertexPositionNormalTextureCustom[_vertexArray.Length];
+            _vertexArray.CopyTo(mesh._vertexArray, 0);
+
+            mesh._vertexBuffer = new VertexBuffer(_device, mesh._vertexDeclaration, mesh._vertexArray.Length, BufferUsage.None);
+            mesh._vertexBuffer.SetData(mesh._vertexArray);
+
+            return mesh;
+        }
+
+
+
 
         public override Vector3 GetVertex(int index)
         {

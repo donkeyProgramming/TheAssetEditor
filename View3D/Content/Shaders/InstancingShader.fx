@@ -7,6 +7,9 @@ struct VSInstanceInputSimple
     float3 InstanceForward : NORMAL1;
     float3 InstanceUp : NORMAL2;
     float3 InstanceLeft : NORMAL3;
+
+    float3 Colour : Normal4;
+
     //float InstanceTimeOrId : BLENDWEIGHT0;
 };
 
@@ -18,6 +21,7 @@ struct InstancingVSinput
 struct InstancingVSoutput
 {
     float4 Position : POSITION0;
+    float3 Colour: Normal4;
 };
 
 InstancingVSoutput InstancingVS(InstancingVSinput input, VSInstanceInputSimple instanceInput)
@@ -48,14 +52,14 @@ InstancingVSoutput InstancingVS(InstancingVSinput input, VSInstanceInputSimple i
     float4 worldViewProjection = mul(input.Position, world);
     float4 posVert = mul(worldViewProjection, WVP);
     output.Position = posVert;
-
+    output.Colour = instanceInput.Colour;
 
     return output;
 }
 
 float4 InstancingPS(InstancingVSoutput input) : COLOR0
 {
-    return float4(VertexColour,1);
+    return float4(input.Colour,1);
 }
 
 technique Instancing

@@ -10,14 +10,13 @@ namespace View3D.Rendering.Geometry
 {
     public class CubeMesh : IndexedMeshGeometry
     {
-
-        VertexDeclaration _vertexDeclaration;
         VertexPositionNormalTexture[] _vertexArray;
 
-
-
-        public CubeMesh(GraphicsDevice device)
+        public CubeMesh(GraphicsDevice device, bool createDefaultMesh = true) : base(device)
         {
+            if (createDefaultMesh == false)
+                return;
+
             _vertexDeclaration = new VertexDeclaration(
              new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
              new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0),
@@ -97,34 +96,60 @@ namespace View3D.Rendering.Geometry
             _vertexArray[34] = new VertexPositionNormalTexture(topRightFront, rightNormal, textureTopLeft);
             _vertexArray[35] = new VertexPositionNormalTexture(bottomRightBack, rightNormal, textureBottomRight);
 
-
             _indexList = new ushort[36];
             for (ushort i = 0; i < 36; i++)
                 _indexList[i] = i;
 
-
             CreateModelFromBuffers(device);
+            CreateIndexFromBuffers(device);
             BuildBoundingBox();
         }
 
         void CreateModelFromBuffers(GraphicsDevice device)
         {
-            _indexBuffer = new IndexBuffer(device, typeof(short), _indexList.Length, BufferUsage.None);
-            _indexBuffer.SetData(_indexList);
-
             _vertexBuffer = new VertexBuffer(device, _vertexDeclaration, _vertexArray.Length, BufferUsage.None);
             _vertexBuffer.SetData(_vertexArray);
         }
 
+        public override IGeometry Clone()
+        {
+            var mesh = new CubeMesh(_device, false);
+            mesh.Pivot = this.Pivot;
+            mesh._vertexDeclaration = _vertexDeclaration;
+            mesh._boundingBox = BoundingBox;
+
+            mesh._indexList = new ushort[_indexList.Length];
+            _indexList.CopyTo(mesh._indexList, 0);
+
+            mesh._indexBuffer = new IndexBuffer(_device, typeof(short), mesh._indexList.Length, BufferUsage.None);
+            mesh._indexBuffer.SetData(mesh._indexList);
+
+            mesh._vertexArray = new VertexPositionNormalTexture[_vertexArray.Length];
+            _vertexArray.CopyTo(mesh._vertexArray, 0);
+
+            mesh._vertexBuffer = new VertexBuffer(_device, mesh._vertexDeclaration, mesh._vertexArray.Length, BufferUsage.None);
+            mesh._vertexBuffer.SetData(mesh._vertexArray);
+
+            return mesh;
+        }
+
         public override Vector3 GetVertex(int index)
         {
-            var vertIndex = index;// _indexList[index];
-            return _vertexArray[vertIndex].Position;
+            return _vertexArray[index].Position;
         }
 
         public override int VertexCount()
         {
             return _vertexArray.Length;
+        }
+
+        public new void SetIndexBufferAndRebuild(List<ushort> buffer)
+        {
+            //_indexBuffer = buffer.ToArray();
+            //
+            //CreateModelFromBuffers(device);
+            //CreateIndexFromBuffers(device);
+            //BuildBoundingBox();
         }
     }
 }

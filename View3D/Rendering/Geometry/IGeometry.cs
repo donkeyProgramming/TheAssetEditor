@@ -18,6 +18,11 @@ namespace View3D.Rendering.Geometry
         public int GetIndex(int i);
         public int GetIndexCount();
 
+        public List<ushort> GetIndexBuffer();
+        public void SetIndexBufferAndRebuild(List<ushort> buffer);
+
         BoundingBox BoundingBox { get; }
+
+        IGeometry Clone();
     }
 }

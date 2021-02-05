@@ -17,11 +17,17 @@ namespace View3D.Rendering
         public BasicEffect WireframeEffect { get; set; }
         public BasicEffect SelectedFacesEffect { get; set; }
 
-        public VertexInstanceMesh VertexRenderer { get; set; }
-
         public Matrix ModelMatrix { get; private set; } = Matrix.Identity;
         public IGeometry Geometry { get; set; }
         public string Name { get; set; } = "";
+
+        Quaternion _orientation = Quaternion.Identity;
+        Vector3 _position = Vector3.Zero;
+        Vector3 _scale = Vector3.One;
+
+        public Vector3 Position { get { return _position; } set { _position = value; UpdateMatrix(); } }
+        public Vector3 Scale { get { return _scale; } set { _scale = value; UpdateMatrix(); } }
+        public Quaternion Orientation { get { return _orientation; } set { _orientation = value; UpdateMatrix(); } }
 
         public RenderItem(IGeometry geo, Vector3 position, Quaternion rotation, Vector3 scale)
         {
@@ -31,14 +37,6 @@ namespace View3D.Rendering
             _scale = scale;
             UpdateMatrix();
         }
-
-        Quaternion _orientation = Quaternion.Identity;
-        Vector3 _position = Vector3.Zero;
-        Vector3 _scale = Vector3.One;
-
-        public Vector3 Position { get { return _position; } set { _position = value; UpdateMatrix();  } }
-        public Vector3 Scale { get { return _scale; } set { _scale = value; UpdateMatrix();  } }
-        public Quaternion Orientation { get { return _orientation; } set { _orientation = value; UpdateMatrix();  } }
 
         void UpdateMatrix()
         {
@@ -61,18 +59,22 @@ namespace View3D.Rendering
             Geometry.ApplyMeshPart(SelectedFacesEffect, device, faces);
         }
 
-        public void DrawVertexes(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams)
-        {
-            VertexRenderer.Update(Geometry, ModelMatrix, Orientation, shaderParams.CameraPosition);
-            VertexRenderer.Draw(shaderParams.View, shaderParams.Projection, device, new Vector3(0,1,0));
-        }
-
         public void DrawBasic(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams)
         {
             DefaultEffect.Projection = shaderParams.Projection;
             DefaultEffect.View = shaderParams.View;
             DefaultEffect.World = ModelMatrix;
             Geometry.ApplyMesh(DefaultEffect, device);
+        }
+
+        public RenderItem Clone()
+        {
+            var newItem = new RenderItem(Geometry.Clone(), Position, Orientation, Scale);
+            newItem.DefaultEffect = (BasicEffect)DefaultEffect.Clone();
+            newItem.WireframeEffect = (BasicEffect)WireframeEffect.Clone();
+            newItem.SelectedFacesEffect = (BasicEffect)SelectedFacesEffect.Clone();
+            newItem.Name = Name + " - Clone";
+            return newItem;
         }
     }
 
@@ -91,10 +93,6 @@ namespace View3D.Rendering
             item.SelectedFacesEffect.DiffuseColor = new Vector3(1, 0, 0);
             item.SelectedFacesEffect.SpecularColor = new Vector3(1, 0, 0);
             item.SelectedFacesEffect.EnableDefaultLighting();
-
-
-            item.VertexRenderer = new VertexInstanceMesh();
-            item.VertexRenderer.Initialize(device, content, item.Geometry.VertexCount());
         }
 
         public static RenderItem CreateRenderItem(IGeometry geo, Vector3 position, Vector3 scale, string name, WpfGame game)

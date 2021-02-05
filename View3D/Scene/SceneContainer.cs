@@ -27,6 +27,8 @@ namespace View3D.Scene
         SceneManager _sceneManager;
         SelectionManager _selectionManager;
 
+        public VertexInstanceMesh VertexRenderer { get; set; }
+
         protected override void Initialize()
         {
             _disposed = false;
@@ -48,6 +50,9 @@ namespace View3D.Scene
             _sceneManager = GetComponent<SceneManager>();
             _selectionManager = GetComponent<SelectionManager>();
 
+
+
+
             base.Initialize();
         }
 
@@ -57,6 +62,9 @@ namespace View3D.Scene
         {
             _bondingBoxRenderer = new BoundingBoxRenderer();
             _lineShader = Content.Load<Effect>("Shaders\\LineShader");
+
+            VertexRenderer = new VertexInstanceMesh();
+            VertexRenderer.Initialize(GraphicsDevice, Content, 0);
             base.LoadContent();
         }
 
@@ -99,22 +107,22 @@ namespace View3D.Scene
             {
                 GraphicsDevice.RasterizerState = _selectedFaceState;
                 selectionFaceState.RenderObject.DrawSelectedFaces(GraphicsDevice, Matrix.Identity, commonShaderParameters, selectionFaceState.CurrentSelection());
-                //selectionFaceState.RenderObject.DrawVertexes(GraphicsDevice, Matrix.Identity, commonShaderParameters);
                 
                 GraphicsDevice.RasterizerState = _wireframeState;
                 selectionFaceState.RenderObject.DrawWireframeOverlay(GraphicsDevice, Matrix.Identity, commonShaderParameters);
 
-                //_bondingBoxRenderer.Render(_lineShader, GraphicsDevice, commonShaderParameters, selectionFaceState.RenderObject.Geometry.BoundingBox, selectionFaceState.RenderObject.ModelMatrix);
             }
 
             if (selectionState is VertexSelectionState selectionVertexState && selectionVertexState.RenderObject != null)
             {
                 GraphicsDevice.RasterizerState = _selectedFaceState;
-                //selectionFaceState.RenderObject.DrawSelectedFaces(GraphicsDevice, Matrix.Identity, commonShaderParameters, selectionFaceState.CurrentSelection());
-                selectionVertexState.RenderObject.DrawVertexes(GraphicsDevice, Matrix.Identity, commonShaderParameters);
+                var vertexObject = selectionVertexState.RenderObject;
+                VertexRenderer.Update(vertexObject.Geometry, vertexObject.ModelMatrix, vertexObject.Orientation, commonShaderParameters.CameraPosition, selectionVertexState.SelectedVertices);
+                VertexRenderer.Draw(commonShaderParameters.View, commonShaderParameters.Projection, GraphicsDevice, new Vector3(0, 1, 0));
+
 
                 GraphicsDevice.RasterizerState = _wireframeState;
-                selectionVertexState.RenderObject.DrawWireframeOverlay(GraphicsDevice, Matrix.Identity, commonShaderParameters);
+                vertexObject.DrawWireframeOverlay(GraphicsDevice, Matrix.Identity, commonShaderParameters);
             }
 
             base.Draw(time);

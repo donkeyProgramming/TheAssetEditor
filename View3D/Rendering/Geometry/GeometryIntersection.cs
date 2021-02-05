@@ -92,14 +92,14 @@ namespace View3D.Rendering.Geometry
         {
             vertices = new List<int>();
 
-            for (int i = 0; i < item.Geometry.GetIndexCount(); i += 3)
+            for (int i = 0; i < item.Geometry.GetIndexCount(); i++)
             {
-                var index0 = item.Geometry.GetIndex(i + 0);
+                var index = item.Geometry.GetIndex(i);
                 
-                if (boundingFrustum.Contains(Vector3.Transform(item.Geometry.GetVertex(index0), item.ModelMatrix)) != ContainmentType.Disjoint)
-                    vertices.Add(i);
+                if (boundingFrustum.Contains(Vector3.Transform(item.Geometry.GetVertex(index), item.ModelMatrix)) != ContainmentType.Disjoint)
+                    vertices.Add(index);
             }
-
+            vertices = vertices.Distinct().ToList();
             if (vertices.Count() == 0)
                 vertices = null;
             return vertices != null;

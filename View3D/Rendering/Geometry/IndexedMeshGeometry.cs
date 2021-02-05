@@ -11,6 +11,8 @@ namespace View3D.Rendering.Geometry
 {
     public abstract class IndexedMeshGeometry : IGeometry
     {
+        protected GraphicsDevice _device;
+        protected VertexDeclaration _vertexDeclaration;
         protected VertexBuffer _vertexBuffer;
         protected IndexBuffer _indexBuffer;
 
@@ -18,11 +20,24 @@ namespace View3D.Rendering.Geometry
 
         public Vector3 Pivot { get; set; }
 
-        BoundingBox _boundingBox;
+        protected BoundingBox _boundingBox;
         public BoundingBox BoundingBox => _boundingBox;
 
         public abstract Vector3 GetVertex(int index);
         public abstract int VertexCount();
+        public abstract IGeometry Clone();
+
+        protected IndexedMeshGeometry(GraphicsDevice device)
+        {
+            _device = device;
+        }
+
+        protected void CreateIndexFromBuffers(GraphicsDevice device)
+        {
+            _indexBuffer = new IndexBuffer(device, typeof(short), _indexList.Length, BufferUsage.None);
+            _indexBuffer.SetData(_indexList);
+        }
+
 
         public void ApplyMesh(Effect effect, GraphicsDevice device)
         {
@@ -54,6 +69,21 @@ namespace View3D.Rendering.Geometry
         public int GetIndexCount()
         {
             return _indexList.Length;
+        }
+
+        public List<ushort> GetIndexBuffer()
+        {
+            return _indexList.ToList();
+        }
+
+        public void SetIndexBufferAndRebuild(List<ushort> buffer)
+        {
+            GraphicsDevice de = null;
+            _indexList = buffer.ToArray();
+            _indexBuffer = new IndexBuffer(de, typeof(short), _indexList.Length, BufferUsage.None);
+            _indexBuffer.SetData(_indexList);
+
+            // Delete unused verts
         }
 
         protected void BuildBoundingBox()

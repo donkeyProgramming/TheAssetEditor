@@ -28,6 +28,7 @@ namespace View3D.Rendering
                     new VertexElement(sizeof(float) *3, VertexElementFormat.Vector3, VertexElementUsage.Normal, 1),
                     new VertexElement(sizeof(float) *6, VertexElementFormat.Vector3, VertexElementUsage.Normal, 2),
                     new VertexElement(sizeof(float) *9, VertexElementFormat.Vector3, VertexElementUsage.Normal, 3),
+                    new VertexElement(sizeof(float) *12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 4),
                     //new VertexElement(48, VertexElementFormat.Single, VertexElementUsage.BlendWeight, 0)
                     //new VertexElement( offset in bytes, VertexElementFormat.Single, VertexElementUsage. option, shader element usage id number )
                 };
@@ -57,16 +58,19 @@ namespace View3D.Rendering
             public Vector3 World1;
             public Vector3 World2;
             public Vector3 World3;
+            public Vector3 Colour;
         };
 
-        int _maxInstanceCount = 300;
+        int _maxInstanceCount = 50000;
         int _currentInstanceCount;
+
+        Vector3 _selectedColur = new Vector3(1, 0, 0);
+        Vector3 _deselectedColur = new Vector3(0, 1, 0);
 
         public void Initialize(GraphicsDevice device, ContentManager content, int instanceCount)
         {
             _effect = content.Load<Effect>("Shaders//InstancingShader");
 
-            _maxInstanceCount = instanceCount;
             _instanceVertexDeclaration = InstanceDataOrientation.VertexDeclaration;
             GenerateGeometry(device);
             _instanceBuffer = new DynamicVertexBuffer(device, _instanceVertexDeclaration, _maxInstanceCount, BufferUsage.WriteOnly);
@@ -137,7 +141,7 @@ namespace View3D.Rendering
             _indexBuffer.SetData(indices);
         }
 
-        public void Update(IGeometry geo, Matrix modelMatrix, Quaternion objectRotation, Vector3 cameraPos)
+        public void Update(IGeometry geo, Matrix modelMatrix, Quaternion objectRotation, Vector3 cameraPos, List<int> selectedVertexes)
         {
             _currentInstanceCount = geo.VertexCount();
             for (int i = 0; i < _currentInstanceCount; i++)
@@ -152,6 +156,11 @@ namespace View3D.Rendering
                 _instanceTransform[i].World1 = new Vector3(world[1, 0], world[1, 1], world[1, 2]);
                 _instanceTransform[i].World2 = new Vector3(world[2, 0], world[2, 1], world[2, 2]);
                 _instanceTransform[i].World3 = new Vector3(world[3, 0], world[3, 1], world[3, 2]);
+
+                if (selectedVertexes.Contains(i))
+                    _instanceTransform[i].Colour = _selectedColur;
+                else
+                    _instanceTransform[i].Colour = _deselectedColur;
             }
             _instanceBuffer.SetData(_instanceTransform, 0, _currentInstanceCount, SetDataOptions.None);
         }
