@@ -19,10 +19,11 @@ namespace View3D.Rendering.Geometry
         public int GetIndexCount();
 
         public List<ushort> GetIndexBuffer();
-        public void SetIndexBufferAndRebuild(List<ushort> buffer);
 
         BoundingBox BoundingBox { get; }
 
         IGeometry Clone();
+        void RemoveFaces(List<int> facesToDelete);
+        void RemoveUnusedVertexes(ushort[] newIndexList);
     }
 }

@@ -76,15 +76,6 @@ namespace View3D.Rendering.Geometry
             return _indexList.ToList();
         }
 
-        public void SetIndexBufferAndRebuild(List<ushort> buffer)
-        {
-            GraphicsDevice de = null;
-            _indexList = buffer.ToArray();
-            _indexBuffer = new IndexBuffer(de, typeof(short), _indexList.Length, BufferUsage.None);
-            _indexBuffer.SetData(_indexList);
-
-            // Delete unused verts
-        }
 
         protected void BuildBoundingBox()
         {
@@ -100,5 +91,33 @@ namespace View3D.Rendering.Geometry
             _vertexBuffer.Dispose();
             _indexBuffer.Dispose();
         }
+
+        public void RemoveFaces(List<int> facesToDelete)
+        {
+            var newIndexList = new ushort[_indexList.Length - (facesToDelete.Count * 3)];
+            var writeIndex = 0;
+            for (ushort i = 0; i < _indexList.Length; )
+            {
+                if (facesToDelete.Contains(i) == false)
+                {
+                    newIndexList[writeIndex++] = _indexList[i++];
+                }
+                else
+                {
+                    i+= 3;
+                }
+            }
+
+            RemoveUnusedVertexes(newIndexList);
+
+           // _indexList = newIndexList;
+           // _indexBuffer = new IndexBuffer(_device, typeof(short), _indexList.Length, BufferUsage.None);
+           // _indexBuffer.SetData(_indexList);
+
+            // Remove unused vertexes
+        }
+
+        public abstract void RemoveUnusedVertexes(ushort[] newIndexList);
+
     }
 }

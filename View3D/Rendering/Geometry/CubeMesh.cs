@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using View3D.Components.Component;
 using View3D.Utility;
@@ -143,13 +144,33 @@ namespace View3D.Rendering.Geometry
             return _vertexArray.Length;
         }
 
-        public new void SetIndexBufferAndRebuild(List<ushort> buffer)
+
+        public override void RemoveUnusedVertexes(ushort[] newIndexList)
         {
-            //_indexBuffer = buffer.ToArray();
-            //
-            //CreateModelFromBuffers(device);
-            //CreateIndexFromBuffers(device);
-            //BuildBoundingBox();
+            var uniqeIndexes = newIndexList.Distinct().ToList();
+            uniqeIndexes.Sort();
+
+            var newVertexList = new List<VertexPositionNormalTexture>();
+            Dictionary<ushort, ushort> remappingTable = new Dictionary<ushort, ushort>();
+            for (ushort i = 0; i < _vertexArray.Length; i++)
+            {
+                if (uniqeIndexes.Contains(i))
+                {
+                    remappingTable[i] = (ushort)remappingTable.Count();
+                    newVertexList.Add(_vertexArray[i]);
+                }
+            }
+
+            for (int i = 0; i < newIndexList.Length; i++)
+                newIndexList[i] = remappingTable[newIndexList[i]];
+
+            _indexList = newIndexList;
+            _indexBuffer = new IndexBuffer(_device, typeof(short), _indexList.Length, BufferUsage.None);
+            _indexBuffer.SetData(_indexList);
+
+            _vertexArray = newVertexList.ToArray();
+            _vertexBuffer = new VertexBuffer(_device, _vertexDeclaration, _vertexArray.Length, BufferUsage.None);
+            _vertexBuffer.SetData(_vertexArray);
         }
     }
 }
