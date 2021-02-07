@@ -20,29 +20,40 @@ namespace KitbasherEditor.ViewModels
         SceneContainer _sceneContainer;
         SceneManager _sceneManager;
 
+        Node _modelNodes;
+        Node _referenceNodes;
+
         public SceneExplorerViewModel(SceneContainer sceneContainer)
         {
             _sceneContainer = sceneContainer;
             _sceneManager = _sceneContainer.GetComponent<SceneManager>();
 
+            _sceneManager.SceneObjectAdded += _sceneManager_SceneObjectAdded;
+            _sceneManager.SceneObjectRemoved += _sceneManager_SceneObjectRemoved;
+
             var root = new RootNode();
 
             root.AddChild(new AnimationNode());
-            var models = root.AddChild(new ModelsNode());
-            models.AddChild(new ModelNode("Face"));
-            models.AddChild(new ModelNode("Ass"));
-
-            var refs = root.AddChild(new ReferenceModelsNode());
-            refs.AddChild(new ModelNode("Reference 0", true));
-            refs.AddChild(new ModelNode("Reference 1", true));
-
+            _modelNodes = root.AddChild(new ModelsNode());
+            _referenceNodes = root.AddChild(new ReferenceModelsNode());
             SceneGraphRootNodes.Add(root);
         }
 
+        private void _sceneManager_SceneObjectRemoved(View3D.Rendering.RenderItem item)
+        {
+            if(item.IsEditable)
+                _modelNodes.Children.Remove(new ModelNode(item.Name));
+            else
+                _referenceNodes.Children.Remove(new ModelNode(item.Name));
+        }
 
-
-
-
+        private void _sceneManager_SceneObjectAdded(View3D.Rendering.RenderItem item)
+        {
+            if (item.IsEditable)
+                _modelNodes.Children.Add(new ModelNode(item.Name));
+            else
+                _referenceNodes.Children.Add(new ModelNode(item.Name));
+        }
     }
 
 

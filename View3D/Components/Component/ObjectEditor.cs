@@ -40,7 +40,7 @@ namespace View3D.Components.Component
                 var command = new DeleteObjectsCommand(objectSelectionState.CurrentSelection(), _sceneManager, _selectionManager);
                 _commandManager.ExecuteCommand(command);
             }
-            else if (_keyboard.IsKeyReleased(Keys.D) && _keyboard.IsKeyDownOrReleased(Keys.LeftControl))
+            else if (_keyboard.IsKeyComboReleased(Keys.D, Keys.LeftControl))
             {
                 if (objectSelectionState.CurrentSelection().Count != 0)
                 {

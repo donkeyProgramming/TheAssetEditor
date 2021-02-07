@@ -17,6 +17,8 @@ namespace View3D.Rendering
         public BasicEffect WireframeEffect { get; set; }
         public BasicEffect SelectedFacesEffect { get; set; }
 
+        public bool IsEditable { get; set; }
+
         public Matrix ModelMatrix { get; private set; } = Matrix.Identity;
         public IGeometry Geometry { get; set; }
         public string Name { get; set; } = "";
@@ -95,10 +97,11 @@ namespace View3D.Rendering
             item.SelectedFacesEffect.EnableDefaultLighting();
         }
 
-        public static RenderItem CreateRenderItem(IGeometry geo, Vector3 position, Vector3 scale, string name, WpfGame game)
+        public static RenderItem CreateRenderItem(IGeometry geo, Vector3 position, Vector3 scale, string name, WpfGame game, bool isEditable = true)
         {
             var item = new RenderItem(geo, position, Quaternion.Identity, scale);
             item.Name = name;
+            item.IsEditable = isEditable;
             CreateDefaultShaders(item, game.GraphicsDevice, game.Content);
             return item;
         }

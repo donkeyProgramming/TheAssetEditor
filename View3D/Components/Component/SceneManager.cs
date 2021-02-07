@@ -6,8 +6,16 @@ using View3D.Rendering.Geometry;
 
 namespace View3D.Components.Component
 {
+
+    public delegate void SceneObjectAddedDelegate(RenderItem item);
+    public delegate void SceneObjectRemovedDelegate(RenderItem item);
+
+
     public class SceneManager : BaseComponent
     {
+        public event SceneObjectAddedDelegate SceneObjectAdded;
+        public event SceneObjectRemovedDelegate SceneObjectRemoved;
+
         public SceneManager(WpfGame game) : base(game) { }
 
         List<RenderItem> _renderItems = new List<RenderItem>();
@@ -17,11 +25,13 @@ namespace View3D.Components.Component
         public void AddObject(RenderItem item)
         {
             _renderItems.Add(item);
+            SceneObjectAdded?.Invoke(item);
         }
 
         public void RemoveObject(RenderItem item)
         {
             _renderItems.Remove(item);
+            SceneObjectRemoved?.Invoke(item);
         }
 
         public bool ContainsObject(RenderItem item)

@@ -50,6 +50,12 @@ namespace View3D.Components.Input
             return currentUp && lastDown;
         }
 
+        public bool IsKeyComboReleased(Keys key, Keys modificationKey)
+        {
+            return (IsKeyReleased(key) && IsKeyDownOrReleased(modificationKey)) ||
+                   (IsKeyDownOrReleased(key) && IsKeyReleased(modificationKey));
+        }
+
         public bool IsKeyDown(Keys key)
         {
             return _currentKeyboardState.IsKeyDown(key);

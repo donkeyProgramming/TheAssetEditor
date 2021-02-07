@@ -63,13 +63,12 @@ namespace KitbasherEditor.ViewModels
 
         private void OnSceneInitialized(WpfGame scene)
         {
-
             var sceneManager = scene.GetComponent<SceneManager>();
 
             var cubeMesh = new CubeMesh(Scene.GraphicsDevice);
-            sceneManager.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(2, 0, 0), new Vector3(0.5f), "Item0", scene));
+            sceneManager.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(2, 0, 0), new Vector3(0.5f), "Item0", scene, false) );
             sceneManager.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0), new Vector3(0.5f), "Item1", scene));
-            sceneManager.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(-2, 0, 0), new Vector3(0.5f), "Item2", scene));
+            sceneManager.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(-2, 0, 0), new Vector3(0.5f), "Item2", scene, false));
 
             if (MainFile != null)
             {

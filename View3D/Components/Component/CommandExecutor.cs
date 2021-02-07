@@ -28,7 +28,7 @@ namespace View3D.Components.Component
 
         private void OnUndoCommand(Keys key)
         {
-            if (key == Keys.Z && _keyboard.IsKeyDown(Keys.LeftControl))
+            if (_keyboard.IsKeyComboReleased(Keys.Z, Keys.LeftControl))
                 Undo();
         }
 
