@@ -76,7 +76,6 @@ namespace View3D.Rendering.Geometry
             return _indexList.ToList();
         }
 
-
         protected void BuildBoundingBox()
         {
             var count = VertexCount();
@@ -99,22 +98,13 @@ namespace View3D.Rendering.Geometry
             for (ushort i = 0; i < _indexList.Length; )
             {
                 if (facesToDelete.Contains(i) == false)
-                {
                     newIndexList[writeIndex++] = _indexList[i++];
-                }
                 else
-                {
                     i+= 3;
-                }
             }
 
             RemoveUnusedVertexes(newIndexList);
-
-           // _indexList = newIndexList;
-           // _indexBuffer = new IndexBuffer(_device, typeof(short), _indexList.Length, BufferUsage.None);
-           // _indexBuffer.SetData(_indexList);
-
-            // Remove unused vertexes
+            BuildBoundingBox();
         }
 
         public abstract void RemoveUnusedVertexes(ushort[] newIndexList);

@@ -6,6 +6,7 @@ using Common;
 using Common.ApplicationSettings;
 using Common.GameInformation;
 using CommonControls.Resources;
+using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -46,11 +47,13 @@ namespace AssetEditor
             services.AddTransient<MenuBarViewModel>();
             services.AddTransient<FileTypes.PackFiles.Services.PackFileService>();
 
+            KitbasherEditor_DependencyInjectionContainer.Register(services);
             View3D_DependencyInjectionContainer.Register(services);
         }
 
         void RegisterTools(IToolFactory factory)
         {
+            KitbasherEditor_DependencyInjectionContainer.RegisterTools(factory);
             View3D_DependencyInjectionContainer.RegisterTools(factory);
         }
 

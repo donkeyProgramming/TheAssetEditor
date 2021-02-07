@@ -10,12 +10,12 @@ using View3D.Scene;
 
 namespace View3D.Components.Component
 {
-    public class CommandManager : BaseComponent
+    public class CommandExecutor : BaseComponent
     {
         KeyboardComponent _keyboard;
         Stack<ICommand> _commands = new Stack<ICommand>();
 
-        public CommandManager(WpfGame game) : base(game)
+        public CommandExecutor(WpfGame game) : base(game)
         {
         }
 

@@ -15,12 +15,14 @@ using View3D.Components.Input;
 using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
+using View3D.Scene;
 
-namespace View3D.Scene
+namespace KitbasherEditor.ViewModels
 {
-    public class SceneViewModel : NotifyPropertyChangedImpl, IEditorViewModel
+    public class KitbasherViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
-        public SceneContainer Scene { get; set; } 
+        public SceneContainer Scene { get; set; }
+        public SceneExplorerViewModel SceneExplorer { get; set; }
 
         string _displayName = "3d viewer";
         public string DisplayName { get => _displayName; set => SetAndNotify(ref _displayName, value); }
@@ -37,7 +39,7 @@ namespace View3D.Scene
             }
         }
 
-        public SceneViewModel()
+        public KitbasherViewModel()
         {
             Scene = new SceneContainer();
 
@@ -54,19 +56,21 @@ namespace View3D.Scene
             Scene.Components.Add(new ObjectEditor(Scene));
             Scene.Components.Add(new FaceEditor(Scene));
 
+            SceneExplorer = new SceneExplorerViewModel(Scene);
+
             Scene.SceneInitialized += OnSceneInitialized;
         }
 
         private void OnSceneInitialized(WpfGame scene)
         {
-         
+
             var sceneManager = scene.GetComponent<SceneManager>();
 
             var cubeMesh = new CubeMesh(Scene.GraphicsDevice);
-            sceneManager.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(2, 0, 0),  new Vector3(0.5f),"Item0", scene));
-            sceneManager.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0),  new Vector3(0.5f),"Item1", scene));
-            sceneManager.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(-2, 0, 0), new Vector3(0.5f),"Item2", scene));
-            
+            sceneManager.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(2, 0, 0), new Vector3(0.5f), "Item0", scene));
+            sceneManager.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0), new Vector3(0.5f), "Item1", scene));
+            sceneManager.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(-2, 0, 0), new Vector3(0.5f), "Item2", scene));
+
             if (MainFile != null)
             {
                 var file = MainFile as PackFile;
@@ -91,15 +95,8 @@ namespace View3D.Scene
         }
         void SetCurrentPackFile(IPackFile packedFile)
         {
-        
-           
+
+
         }
     }
 }
-
-
-//https://github.com/VelcroPhysics/VelcroPhysics/tree/master/VelcroPhysics
-
-/*
- https://stackoverflow.com/questions/3142469/determining-the-intersection-of-a-triangle-and-a-plane
- */

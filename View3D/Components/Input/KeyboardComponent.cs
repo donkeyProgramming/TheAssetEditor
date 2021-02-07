@@ -55,6 +55,11 @@ namespace View3D.Components.Input
             return _currentKeyboardState.IsKeyDown(key);
         }
 
+        public bool IsKeyDownOrReleased(Keys key)
+        {
+            return _currentKeyboardState.IsKeyDown(key) || IsKeyReleased(key);
+        }
+
         public bool IsKeyUp(Keys key)
         {
             return _currentKeyboardState.IsKeyUp(key);

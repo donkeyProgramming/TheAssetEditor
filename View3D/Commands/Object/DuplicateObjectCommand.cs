@@ -40,7 +40,7 @@ namespace View3D.Commands.Object
             {
                 var clonedItem = item.Clone();
                 _clonedObjects.Add(clonedItem);
-                _sceneManager.RenderItems.Add(clonedItem);
+                _sceneManager.AddObject(clonedItem);
                 objectState.ModifySelection(clonedItem);
             }
         }
@@ -50,7 +50,7 @@ namespace View3D.Commands.Object
             _logger.Here().Information($"Undoing DuplicateObjectCommand");
             
             foreach(var item in _clonedObjects)
-                _sceneManager.RenderItems.Remove(item);
+                _sceneManager.RemoveObject(item);
 
             _selectionManager.SetState(_oldState);
         }

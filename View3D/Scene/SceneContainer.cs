@@ -110,7 +110,6 @@ namespace View3D.Scene
                 
                 GraphicsDevice.RasterizerState = _wireframeState;
                 selectionFaceState.RenderObject.DrawWireframeOverlay(GraphicsDevice, Matrix.Identity, commonShaderParameters);
-
             }
 
             if (selectionState is VertexSelectionState selectionVertexState && selectionVertexState.RenderObject != null)
@@ -120,10 +119,12 @@ namespace View3D.Scene
                 VertexRenderer.Update(vertexObject.Geometry, vertexObject.ModelMatrix, vertexObject.Orientation, commonShaderParameters.CameraPosition, selectionVertexState.SelectedVertices);
                 VertexRenderer.Draw(commonShaderParameters.View, commonShaderParameters.Projection, GraphicsDevice, new Vector3(0, 1, 0));
 
-
                 GraphicsDevice.RasterizerState = _wireframeState;
                 vertexObject.DrawWireframeOverlay(GraphicsDevice, Matrix.Identity, commonShaderParameters);
             }
+
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
             base.Draw(time);
         }

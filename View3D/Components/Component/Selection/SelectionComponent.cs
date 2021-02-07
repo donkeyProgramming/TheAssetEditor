@@ -32,7 +32,7 @@ namespace View3D.Components.Component.Selection
         ArcBallCamera _camera;
         SelectionManager _selectionManager;
         SceneManager _sceneManger;
-        CommandManager _commandManager;
+        CommandExecutor _commandManager;
 
         bool _isMouseDown = false;
         Vector2 _startDrag;
@@ -47,7 +47,7 @@ namespace View3D.Components.Component.Selection
             _camera = GetComponent<ArcBallCamera>();
             _sceneManger = GetComponent<SceneManager>();
             _selectionManager = GetComponent<SelectionManager>();
-            _commandManager = GetComponent<CommandManager>();
+            _commandManager = GetComponent<CommandExecutor>();
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _textTexture = new Texture2D(GraphicsDevice, 1, 1);

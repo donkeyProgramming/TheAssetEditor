@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace View3D.Rendering.Geometry
 {
-    class Rmv2Geometry : IndexedMeshGeometry
+    public class Rmv2Geometry : IndexedMeshGeometry
     {
         VertexPositionNormalTextureCustom[] _vertexArray;
 

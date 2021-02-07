@@ -8,6 +8,7 @@ using Common.GameInformation;
 using CommonControls.Behaviors;
 using FileTypes.PackFiles.Models;
 using FileTypes.PackFiles.Services;
+using KitbasherEditor.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
@@ -73,7 +74,7 @@ namespace AssetEditor.ViewModels
             //
             //variantmeshes\variantmeshdefinitions\dwf_hammerers.variantmeshdefinition"
             var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
-            var window = _toolFactory.CreateToolAsWindow<SceneViewModel>(out var editorViewModel);
+            var window = _toolFactory.CreateToolAsWindow<KitbasherViewModel>(out var editorViewModel);
             editorViewModel.MainFile = packFile;
             window.Width = 800;
             window.Height = 600;

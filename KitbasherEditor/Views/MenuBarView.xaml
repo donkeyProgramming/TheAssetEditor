@@ -1,0 +1,65 @@
+﻿<UserControl x:Class="KitbasherEditor.Views.MenuBarView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:KitbasherEditor.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="Import"  />
+                <MenuItem Header="Import reference"/>
+                <Separator/>
+                <MenuItem Header="Save"/>
+                <MenuItem Header="Save as"/>
+            </MenuItem>
+
+            <MenuItem Header="Mode">
+                <MenuItem Header="Active Lod">
+                    <MenuItem Header="1 - Higest"/>
+                    <MenuItem Header="2 "/>
+                    <MenuItem Header="3 "/>
+                    <MenuItem Header="4 - Lowest"/>
+                    <MenuItem Header="5 - Imposter"/>
+                </MenuItem>
+                <MenuItem Header="Edit"  />
+                <MenuItem Header="Animate"/>
+            </MenuItem>
+
+            <MenuItem Header="Camera">
+                <MenuItem Header="Shading mode">
+                    <MenuItem Header="Wireframe"/>
+                    <MenuItem Header="Flat"/>
+                    <MenuItem Header="Simple"/>
+                    <MenuItem Header="Cinematic"/>
+                </MenuItem>
+                <MenuItem Header="Focus on selected object"/>
+                <MenuItem Header="Reset"/>
+            </MenuItem>
+
+            <MenuItem Header="Tools">
+                <MenuItem Header="Freeze transform"  />
+                <MenuItem Header="Combine"/>
+                <MenuItem Header="Duplicate selection"/>
+                <MenuItem Header="Gizmo Pivot mode">
+                    <MenuItem Header="Pivot"/>
+                    <MenuItem Header="Center"/>
+                </MenuItem>
+                <MenuItem Header="Remap bone window"/>
+                <MenuItem Header="Create lod"/>
+                <MenuItem Header="Validate"/>
+            </MenuItem>
+
+            <MenuItem Header="Options">
+                <MenuItem Header="Game">
+                    <MenuItem Header="Open Game Dir"/>
+                    <MenuItem Header="Open Data Dir"/>
+                </MenuItem>
+                <MenuItem Header="Open AssetEditor folder"/>
+                <MenuItem Header="Settings" Command="{Binding MenuBar.OpenSettingsWindowCommand}"/>
+            </MenuItem>
+        </Menu>
+    </DockPanel>
+</UserControl>

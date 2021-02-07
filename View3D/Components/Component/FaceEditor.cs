@@ -6,13 +6,13 @@ using View3D.Components.Input;
 
 namespace View3D.Components.Component
 {
-    class FaceEditor : BaseComponent
+    public class FaceEditor : BaseComponent
     {
 
         KeyboardComponent _keyboard;
         SelectionManager _selectionManager;
         SceneManager _sceneManager;
-        CommandManager _commandManager;
+        CommandExecutor _commandManager;
 
         public FaceEditor(WpfGame game) : base(game)
         {
@@ -23,7 +23,7 @@ namespace View3D.Components.Component
             _keyboard = GetComponent<KeyboardComponent>();
             _selectionManager = GetComponent<SelectionManager>();
             _sceneManager = GetComponent<SceneManager>();
-            _commandManager = GetComponent<CommandManager>();
+            _commandManager = GetComponent<CommandExecutor>();
 
             _keyboard.KeybordButtonReleased += OnKeyReleased;
 

@@ -32,7 +32,7 @@ namespace View3D.Commands.Object
 
             _logger.Here().Information($"Executing DeleteObjectsCommand Items[{string.Join(',', _itemsToDelete.Select(x => x.Name))}]");
             foreach (var item in _itemsToDelete)
-                _sceneManager.RenderItems.Remove(item);
+                _sceneManager.RemoveObject(item);
 
             if (_selectionManager.GetState() is ObjectSelectionState objectState)
                 objectState.Clear();
@@ -42,7 +42,7 @@ namespace View3D.Commands.Object
         {
             _logger.Here().Information($"Undoing DeleteObjectsCommand"); 
             foreach (var item in _itemsToDelete)
-                _sceneManager.RenderItems.Add(item);
+                _sceneManager.AddObject(item);
 
             _selectionManager.SetState(_oldState);
         }

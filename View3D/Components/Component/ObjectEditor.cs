@@ -11,7 +11,7 @@ namespace View3D.Components.Component
         KeyboardComponent _keyboard;
         SelectionManager _selectionManager; 
         SceneManager _sceneManager;
-        CommandManager _commandManager;
+        CommandExecutor _commandManager;
 
         public ObjectEditor(WpfGame game) : base(game)
         {
@@ -22,7 +22,7 @@ namespace View3D.Components.Component
             _keyboard = GetComponent<KeyboardComponent>();
             _selectionManager = GetComponent<SelectionManager>();
             _sceneManager = GetComponent<SceneManager>();
-            _commandManager = GetComponent<CommandManager>();
+            _commandManager = GetComponent<CommandExecutor>();
 
             _keyboard.KeybordButtonReleased += OnKeyReleased;
 
@@ -40,7 +40,7 @@ namespace View3D.Components.Component
                 var command = new DeleteObjectsCommand(objectSelectionState.CurrentSelection(), _sceneManager, _selectionManager);
                 _commandManager.ExecuteCommand(command);
             }
-            else if (_keyboard.IsKeyReleased(Keys.D) && _keyboard.IsKeyDown(Keys.LeftControl))
+            else if (_keyboard.IsKeyReleased(Keys.D) && _keyboard.IsKeyDownOrReleased(Keys.LeftControl))
             {
                 if (objectSelectionState.CurrentSelection().Count != 0)
                 {

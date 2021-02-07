@@ -21,7 +21,7 @@ namespace View3D.Components.Gizmo
         MouseComponent _mouse;
         KeyboardComponent _keyboard;
         SelectionManager _selectionManager;
-        CommandManager _commandManager;
+        CommandExecutor _commandManager;
         Gizmo _gizmo;
         SpriteBatch _spriteBatch;
         TransformCommand _activeCommand;
@@ -34,7 +34,7 @@ namespace View3D.Components.Gizmo
 
         public override void Initialize()
         {
-            _commandManager = GetComponent<CommandManager>();
+            _commandManager = GetComponent<CommandExecutor>();
             _selectionManager = GetComponent<SelectionManager>();
             _keyboard = GetComponent<KeyboardComponent>();
             _mouse = GetComponent<MouseComponent>();

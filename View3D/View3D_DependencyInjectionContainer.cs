@@ -11,7 +11,6 @@ namespace View3D
     {
         public static void Register(IServiceCollection serviceCollection)
         {
-            // 
             serviceCollection.AddTransient<SceneViewModel>();
             serviceCollection.AddTransient<SceneView3D>();
         }
