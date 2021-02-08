@@ -11,7 +11,7 @@ using View3D.Rendering.Geometry;
 
 namespace View3D.Rendering
 {
-    public class RenderItem : ITransformable
+    /*public class RenderItem : ITransformable
     {
         public BasicEffect DefaultEffect { get; set; }
         public BasicEffect WireframeEffect { get; set; }
@@ -78,11 +78,11 @@ namespace View3D.Rendering
             newItem.Name = Name + " - Clone";
             return newItem;
         }
-    }
+    }*/
 
     public static class RenderItemHelper
     {
-        public static void CreateDefaultShaders(RenderItem item, GraphicsDevice device, ContentManager content)
+        public static void CreateDefaultShaders(MeshNode item, GraphicsDevice device)
         {
             item.DefaultEffect = new BasicEffect(device);
             item.DefaultEffect.DiffuseColor = new Vector3(1.0f, 1.0f, 1.0f);
@@ -97,12 +97,18 @@ namespace View3D.Rendering
             item.SelectedFacesEffect.EnableDefaultLighting();
         }
 
-        public static RenderItem CreateRenderItem(IGeometry geo, Vector3 position, Vector3 scale, string name, WpfGame game, bool isEditable = true)
+        public static MeshNode CreateRenderItem(IGeometry geo, Vector3 position, Vector3 scale, string name, GraphicsDevice device, bool isEditable = true)
         {
-            var item = new RenderItem(geo, position, Quaternion.Identity, scale);
-            item.Name = name;
-            item.IsEditable = isEditable;
-            CreateDefaultShaders(item, game.GraphicsDevice, game.Content);
+            var item = new MeshNode()
+            {
+                Name = name,
+                IsEditable = isEditable,
+                Geometry = geo,
+                Position = position,
+                Scale = scale,
+                Orientation = Quaternion.Identity,
+            };
+            CreateDefaultShaders(item, device);
             return item;
         }
     }

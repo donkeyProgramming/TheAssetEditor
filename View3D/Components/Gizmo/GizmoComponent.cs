@@ -61,7 +61,8 @@ namespace View3D.Components.Gizmo
 
             _mouse.MouseOwner = this;
 
-            _activeCommand = new TransformCommand((_selectionManager.GetState() as ObjectSelectionState).CurrentSelection());
+            var selection = (_selectionManager.GetState() as ObjectSelectionState).CurrentSelection();
+            _activeCommand = new TransformCommand(selection.Where(x=>x is ITransformable).Select(x=> (ITransformable)x).ToList());
         }
 
         private void GizmoTransformEnd()
@@ -76,10 +77,10 @@ namespace View3D.Components.Gizmo
         }
 
 
-        private void OnSelectionChanged(IEnumerable<RenderItem> items)
+        private void OnSelectionChanged(IEnumerable<ISelectable> items)
         {
             _gizmo.Selection.Clear();
-            foreach (var item in items)
+            foreach (ITransformable item in items.Where(x=>x is ITransformable))
                 _gizmo.Selection.Add(item);
 
             _gizmo.ResetDeltas();

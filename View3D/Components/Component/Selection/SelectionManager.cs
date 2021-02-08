@@ -13,7 +13,7 @@ using View3D.Scene;
 
 namespace View3D.Components.Component.Selection
 {
-    public delegate void SelectionChangedDelegate(IEnumerable<RenderItem> items);
+    public delegate void SelectionChangedDelegate(IEnumerable<ISelectable> items);
     public class SelectionManager : BaseComponent
     {
         public event SelectionChangedDelegate SelectionChanged;

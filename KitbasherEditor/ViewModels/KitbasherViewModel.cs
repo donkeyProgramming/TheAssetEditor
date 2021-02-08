@@ -18,6 +18,7 @@ using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.Scene;
+using View3D.Services;
 
 namespace KitbasherEditor.ViewModels
 {
@@ -43,8 +44,11 @@ namespace KitbasherEditor.ViewModels
             }
         }
 
+        PackFileService _packFileService;
+
         public KitbasherViewModel(PackFileService pf)
         {
+            _packFileService = pf;
             Scene = new SceneContainer();
 
             Scene.Components.Add(new FpsComponent(Scene));
@@ -70,9 +74,9 @@ namespace KitbasherEditor.ViewModels
             var sceneManager = scene.GetComponent<SceneManager>();
 
             var cubeMesh = new CubeMesh(Scene.GraphicsDevice);
-            sceneManager.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(2, 0, 0), new Vector3(0.5f), "Item0", scene, false) );
-            sceneManager.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0), new Vector3(0.5f), "Item1", scene));
-            sceneManager.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(-2, 0, 0), new Vector3(0.5f), "Item2", scene, false));
+            sceneManager.RootNode.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(2, 0, 0), new Vector3(0.5f), "Item0", Scene.GraphicsDevice, false) );
+            sceneManager.RootNode.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0), new Vector3(0.5f), "Item1", Scene.GraphicsDevice));
+            sceneManager.RootNode.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(-2, 0, 0), new Vector3(0.5f), "Item2", Scene.GraphicsDevice, false));
 
             if (MainFile != null)
             {
@@ -82,14 +86,28 @@ namespace KitbasherEditor.ViewModels
                 foreach (var mesh in meshesLod0)
                 {
                     var meshInstance = new Rmv2Geometry(mesh, Scene.GraphicsDevice);
-                    var newItem = RenderItemHelper.CreateRenderItem(meshInstance, new Vector3(0, 0, 0), new Vector3(1.0f), mesh.Header.ModelName, Scene);
-                    sceneManager.AddObject(newItem);
+                    var newItem = RenderItemHelper.CreateRenderItem(meshInstance, new Vector3(0, 0, 0), new Vector3(1.0f), mesh.Header.ModelName, Scene.GraphicsDevice);
+                    sceneManager.RootNode.AddObject(newItem);
                 }
             }
+
+            // Wmd
+
+            var refereneceMesh = _packFileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_paladin.variantmeshdefinition");
+
+            SceneLoader loader = new SceneLoader(_packFileService, Scene.GraphicsDevice);
+            var result = loader.Load(refereneceMesh as PackFile, null);
+            sceneManager.RootNode.AddObject(result);
+            //AddMesh(refereneceMesh, true);
         }
 
-        public void AddMesh(PackFile file, bool isReference)
-        { }
+        public void AddMesh(IPackFile file, bool isReference)
+        {
+            if (file is PackFile packFile)
+            {
+                var data = packFile.DataSource.ReadData();
+            }
+        }
 
         public string Text { get; set; }
 

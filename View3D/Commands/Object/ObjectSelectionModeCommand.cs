@@ -16,7 +16,7 @@ namespace View3D.Commands.Object
         ILogger _logger = Logging.Create<ObjectSelectionModeCommand>();
         private readonly SelectionManager _selectionManager;
         GeometrySelectionMode _newMode;
-        RenderItem _selectedItem;
+        ISelectable _selectedItem;
         ISelectionState _oldState;
 
         public ObjectSelectionModeCommand(SelectionManager selectionManager, GeometrySelectionMode newMode)
@@ -26,7 +26,7 @@ namespace View3D.Commands.Object
             _oldState = _selectionManager.GetStateCopy();
         }
 
-        public ObjectSelectionModeCommand(RenderItem selectedItem, SelectionManager selectionManager, GeometrySelectionMode newMode) : this(selectionManager, newMode)
+        public ObjectSelectionModeCommand(ISelectable selectedItem, SelectionManager selectionManager, GeometrySelectionMode newMode) : this(selectionManager, newMode)
         {
             _selectedItem = selectedItem;
         }

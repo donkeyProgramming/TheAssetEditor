@@ -63,24 +63,24 @@ namespace View3D.Scene
             var sceneManager = scene.GetComponent<SceneManager>();
 
             var cubeMesh = new CubeMesh(Scene.GraphicsDevice);
-            sceneManager.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(2, 0, 0),  new Vector3(0.5f),"Item0", scene));
-            sceneManager.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0),  new Vector3(0.5f),"Item1", scene));
-            sceneManager.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(-2, 0, 0), new Vector3(0.5f),"Item2", scene));
-            
-            if (MainFile != null)
-            {
-                var file = MainFile as PackFile;
-                var m = new RmvRigidModel(file.DataSource.ReadData(), file.FullPath);
-                var meshesLod0 = m.MeshList[0];
-                int counter = 0;
-                foreach (var mesh in meshesLod0)
-                {
-                    var meshInstance = new Rmv2Geometry(mesh, Scene.GraphicsDevice);
-                    var newItem = RenderItemHelper.CreateRenderItem(meshInstance, new Vector3(0, 0, 0), new Vector3(1.0f), "model3-sub" + counter.ToString(), Scene);
-                    sceneManager.AddObject(newItem);
-                    counter++;
-                }
-            }
+           // sceneManager.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(2, 0, 0),  new Vector3(0.5f),"Item0", scene));
+           // sceneManager.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0),  new Vector3(0.5f),"Item1", scene));
+           // sceneManager.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(-2, 0, 0), new Vector3(0.5f),"Item2", scene));
+           // 
+           // if (MainFile != null)
+           // {
+           //     var file = MainFile as PackFile;
+           //     var m = new RmvRigidModel(file.DataSource.ReadData(), file.FullPath);
+           //     var meshesLod0 = m.MeshList[0];
+           //     int counter = 0;
+           //     foreach (var mesh in meshesLod0)
+           //     {
+           //         var meshInstance = new Rmv2Geometry(mesh, Scene.GraphicsDevice);
+           //         var newItem = RenderItemHelper.CreateRenderItem(meshInstance, new Vector3(0, 0, 0), new Vector3(1.0f), "model3-sub" + counter.ToString(), Scene);
+           //         sceneManager.AddObject(newItem);
+           //         counter++;
+           //     }
+           // }
         }
 
         public string Text { get; set; }

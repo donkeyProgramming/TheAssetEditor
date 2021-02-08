@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -37,12 +38,14 @@ namespace FileTypes.PackFiles.Models
         }
 
         public override string ToString() { return Name; }
-        public void Sort(){}
+        public void Sort() { }
 
         public void AddChild(IPackFile packFile)
         {
-            throw new NotImplementedException();
+            throw new Exception("Files can not have children");
         }
+
+        public string Extention { get => Path.GetExtension(Name); }
 
         IEnumerable<IPackFile> IPackFile.Children => Enumerable.Empty<IPackFile>();
 

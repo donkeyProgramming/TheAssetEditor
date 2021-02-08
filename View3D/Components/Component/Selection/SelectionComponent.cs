@@ -106,7 +106,7 @@ namespace View3D.Components.Component.Selection
             var currentState = _selectionManager.GetState();
             if (currentState.Mode == GeometrySelectionMode.Face && currentState is FaceSelectionState faceState)
             {
-                if (GeometryIntersection.IntersectFaces(unprojectedSelectionRect, faceState.RenderObject, out var faces))
+                if (GeometryIntersection.IntersectFaces(unprojectedSelectionRect, faceState.RenderObject.Geometry, faceState.RenderObject.ModelMatrix, out var faces))
                 {
                     var faceSelectionCommand = new FaceSelectionCommand(_selectionManager)
                     {
@@ -119,7 +119,7 @@ namespace View3D.Components.Component.Selection
             }
             else if (currentState.Mode == GeometrySelectionMode.Vertex && currentState is VertexSelectionState vertexState)
             {
-                if (GeometryIntersection.IntersectVertices(unprojectedSelectionRect, vertexState.RenderObject, out var vertices))
+                if (GeometryIntersection.IntersectVertices(unprojectedSelectionRect, vertexState.RenderObject.Geometry, vertexState.RenderObject.ModelMatrix, out var vertices))
                 {
                     var vertexSelectionCommand = new VertexSelectionCommand(_selectionManager)
                     {
@@ -162,8 +162,8 @@ namespace View3D.Components.Component.Selection
                 if (currentState.Mode == GeometrySelectionMode.Face)
                 {
                     var faceState = currentState as FaceSelectionState;
-
-                    if (GeometryIntersection.IntersectFace(ray, faceState.RenderObject, out var selectedFace) != null)
+                    
+                    if (GeometryIntersection.IntersectFace(ray, faceState.RenderObject.Geometry, faceState.RenderObject.ModelMatrix, out var selectedFace) != null)
                     {
                         FaceSelectionCommand faceSelectionCommand = new FaceSelectionCommand(_selectionManager)
                         {
@@ -225,7 +225,6 @@ namespace View3D.Components.Component.Selection
                     _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(selectedObject, _selectionManager, GeometrySelectionMode.Vertex));
                     return true;
                 }
-
             }
 
             return false;

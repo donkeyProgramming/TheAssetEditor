@@ -9,31 +9,31 @@ namespace View3D.Rendering.Geometry
 {
     public static class GeometryIntersection
     {
-        public static float? IntersectObject(Ray ray, RenderItem item)
+        public static float? IntersectObject(Ray ray, IGeometry geometry, Matrix matrix)
         {
-            var res = IntersectFace(ray, item, out var _);
+            var res = IntersectFace(ray, geometry, matrix, out var _);
             return res;
         }
 
-        public static float? IntersectFace(Ray ray, RenderItem item, out int? face)
+        public static float? IntersectFace(Ray ray, IGeometry geometry, Matrix matrix, out int? face)
         {
             face = null;
 
-            Matrix inverseTransform = Matrix.Invert(item.ModelMatrix);
+            Matrix inverseTransform = Matrix.Invert(matrix);
             ray.Position = Vector3.Transform(ray.Position, inverseTransform);
             ray.Direction = Vector3.TransformNormal(ray.Direction, inverseTransform);
 
             int faceIndex = -1;
             float bestDistance = float.MaxValue;
-            for (int i = 0; i < item.Geometry.GetIndexCount(); i += 3)
+            for (int i = 0; i < geometry.GetIndexCount(); i += 3)
             {
-                var index0 = item.Geometry.GetIndex(i + 0);
-                var index1 = item.Geometry.GetIndex(i + 1);
-                var index2 = item.Geometry.GetIndex(i + 2);
+                var index0 = geometry.GetIndex(i + 0);
+                var index1 = geometry.GetIndex(i + 1);
+                var index2 = geometry.GetIndex(i + 2);
 
-                var vert0 = item.Geometry.GetVertex(index0);
-                var vert1 = item.Geometry.GetVertex(index1);
-                var vert2 = item.Geometry.GetVertex(index2);
+                var vert0 = geometry.GetVertex(index0);
+                var vert1 = geometry.GetVertex(index1);
+                var vert2 = geometry.GetVertex(index2);
 
                 var res = IntersectionMath.MollerTrumboreIntersection(ray, vert0, vert1, vert2, out var intersectionPoint);
                 if (res)
@@ -54,32 +54,32 @@ namespace View3D.Rendering.Geometry
             return bestDistance;
         }
 
-        public static bool IntersectObject(BoundingFrustum boundingFrustum, RenderItem item)
+        public static bool IntersectObject(BoundingFrustum boundingFrustum, IGeometry geometry, Matrix matrix)
         {
-            for (int i = 0; i < item.Geometry.VertexCount(); i++)
+            for (int i = 0; i < geometry.VertexCount(); i++)
             {
-                if (boundingFrustum.Contains(Vector3.Transform(item.Geometry.GetVertex(i), item.ModelMatrix)) != ContainmentType.Disjoint)
+                if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertex(i), matrix)) != ContainmentType.Disjoint)
                     return true;
             }
 
             return false;
         }
 
-        public static bool IntersectFaces(BoundingFrustum boundingFrustum, RenderItem item, out List<int> faces)
+        public static bool IntersectFaces(BoundingFrustum boundingFrustum, IGeometry geometry, Matrix matrix, out List<int> faces)
         {
             faces = new List<int>();
 
-            for (int i = 0; i < item.Geometry.GetIndexCount(); i += 3)
+            for (int i = 0; i < geometry.GetIndexCount(); i += 3)
             {
-                var index0 = item.Geometry.GetIndex(i + 0);
-                var index1 = item.Geometry.GetIndex(i + 1);
-                var index2 = item.Geometry.GetIndex(i + 2);
+                var index0 = geometry.GetIndex(i + 0);
+                var index1 = geometry.GetIndex(i + 1);
+                var index2 = geometry.GetIndex(i + 2);
 
-                if (boundingFrustum.Contains(Vector3.Transform(item.Geometry.GetVertex(index0), item.ModelMatrix)) != ContainmentType.Disjoint)
+                if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertex(index0), matrix)) != ContainmentType.Disjoint)
                     faces.Add(i);
-                else if (boundingFrustum.Contains(Vector3.Transform(item.Geometry.GetVertex(index1), item.ModelMatrix)) != ContainmentType.Disjoint)
+                else if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertex(index1), matrix)) != ContainmentType.Disjoint)
                     faces.Add(i);
-                else if (boundingFrustum.Contains(Vector3.Transform(item.Geometry.GetVertex(index2), item.ModelMatrix)) != ContainmentType.Disjoint)
+                else if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertex(index2), matrix)) != ContainmentType.Disjoint)
                     faces.Add(i);
             }
 
@@ -88,15 +88,15 @@ namespace View3D.Rendering.Geometry
             return faces != null;
         }
 
-        public static bool IntersectVertices(BoundingFrustum boundingFrustum, RenderItem item, out List<int> vertices)
+        public static bool IntersectVertices(BoundingFrustum boundingFrustum, IGeometry geometry, Matrix matrix, out List<int> vertices)
         {
             vertices = new List<int>();
 
-            for (int i = 0; i < item.Geometry.GetIndexCount(); i++)
+            for (int i = 0; i < geometry.GetIndexCount(); i++)
             {
-                var index = item.Geometry.GetIndex(i);
+                var index = geometry.GetIndex(i);
                 
-                if (boundingFrustum.Contains(Vector3.Transform(item.Geometry.GetVertex(index), item.ModelMatrix)) != ContainmentType.Disjoint)
+                if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertex(index), matrix)) != ContainmentType.Disjoint)
                     vertices.Add(index);
             }
             vertices = vertices.Distinct().ToList();

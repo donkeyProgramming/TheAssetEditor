@@ -14,14 +14,14 @@ namespace View3D.Commands.Object
     {
         ILogger _logger = Logging.Create<DeleteObjectsCommand>();
 
-        List<RenderItem> _itemsToDelete;
+        List<SceneNode> _itemsToDelete;
         SceneManager _sceneManager;
         SelectionManager _selectionManager;
 
         ISelectionState _oldState;
-        public DeleteObjectsCommand(List<RenderItem> itemsToDelete, SceneManager sceneManager, SelectionManager selectionManager)
+        public DeleteObjectsCommand(List<ISelectable> itemsToDelete, SceneManager sceneManager, SelectionManager selectionManager)
         {
-            _itemsToDelete = new List<RenderItem>(itemsToDelete);
+            _itemsToDelete = new List<SceneNode>(itemsToDelete.Select(x=>x as SceneNode));
             _sceneManager = sceneManager;
             _selectionManager = selectionManager;
         }
@@ -32,7 +32,7 @@ namespace View3D.Commands.Object
 
             _logger.Here().Information($"Executing DeleteObjectsCommand Items[{string.Join(',', _itemsToDelete.Select(x => x.Name))}]");
             foreach (var item in _itemsToDelete)
-                _sceneManager.RemoveObject(item);
+                item.Parent.RemoveObject(item);
 
             if (_selectionManager.GetState() is ObjectSelectionState objectState)
                 objectState.Clear();
@@ -40,9 +40,9 @@ namespace View3D.Commands.Object
 
         public void Undo()
         {
-            _logger.Here().Information($"Undoing DeleteObjectsCommand"); 
+            _logger.Here().Information($"Undoing DeleteObjectsCommand");
             foreach (var item in _itemsToDelete)
-                _sceneManager.AddObject(item);
+                item.Parent.AddObject(item);
 
             _selectionManager.SetState(_oldState);
         }

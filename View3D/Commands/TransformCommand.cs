@@ -28,12 +28,12 @@ namespace View3D.Commands
         }
 
 
-        List<RenderItem> _items;
-        Dictionary<RenderItem, TransformCopy> _originalTransforms;
-        public TransformCommand(List<RenderItem> items)
+        List<ITransformable> _items;
+        Dictionary<ITransformable, TransformCopy> _originalTransforms;
+        public TransformCommand(List<ITransformable> items)
         {
-            _items = new List<RenderItem>();
-            _originalTransforms = new Dictionary<RenderItem, TransformCopy>();
+            _items = new List<ITransformable>();
+            _originalTransforms = new Dictionary<ITransformable, TransformCopy>();
 
             foreach (var item in items)
             {

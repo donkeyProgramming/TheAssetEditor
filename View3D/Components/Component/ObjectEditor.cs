@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop;
+using System.Linq;
 using View3D.Commands.Object;
 using View3D.Components.Component.Selection;
 using View3D.Components.Input;
@@ -44,7 +45,7 @@ namespace View3D.Components.Component
             {
                 if (objectSelectionState.CurrentSelection().Count != 0)
                 {
-                    var command = new DuplicateObjectCommand(objectSelectionState.CurrentSelection(), _sceneManager, _selectionManager);
+                    var command = new DuplicateObjectCommand(objectSelectionState.CurrentSelection().Select(x=>(SceneNode)x).ToList(), _sceneManager, _selectionManager);
                     _commandManager.ExecuteCommand(command);
                 }
             }

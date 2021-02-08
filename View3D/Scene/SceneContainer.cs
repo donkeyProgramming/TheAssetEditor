@@ -93,8 +93,8 @@ namespace View3D.Scene
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
-            foreach (var item in _sceneManager.RenderItems)
-                item.DrawBasic(GraphicsDevice, Matrix.Identity, commonShaderParameters);
+
+            DrawBasicSceneHirarchy(_sceneManager.RootNode, GraphicsDevice, Matrix.Identity, commonShaderParameters);
 
             // Draw selection bounding box
             if (selectionState is ObjectSelectionState objectSelectionState)
@@ -103,19 +103,19 @@ namespace View3D.Scene
                     _bondingBoxRenderer.Render(_lineShader, GraphicsDevice, commonShaderParameters, item.Geometry.BoundingBox, item.ModelMatrix);
             }
             
-            if (selectionState is FaceSelectionState selectionFaceState && selectionFaceState.RenderObject != null)
+            if (selectionState is FaceSelectionState selectionFaceState &&  selectionFaceState.RenderObject is MeshNode meshNode)
             {
                 GraphicsDevice.RasterizerState = _selectedFaceState;
-                selectionFaceState.RenderObject.DrawSelectedFaces(GraphicsDevice, Matrix.Identity, commonShaderParameters, selectionFaceState.CurrentSelection());
+                meshNode.DrawSelectedFaces(GraphicsDevice, meshNode.ModelMatrix, commonShaderParameters, selectionFaceState.CurrentSelection());
                 
                 GraphicsDevice.RasterizerState = _wireframeState;
-                selectionFaceState.RenderObject.DrawWireframeOverlay(GraphicsDevice, Matrix.Identity, commonShaderParameters);
+                meshNode.DrawWireframeOverlay(GraphicsDevice, meshNode.ModelMatrix, commonShaderParameters);
             }
 
             if (selectionState is VertexSelectionState selectionVertexState && selectionVertexState.RenderObject != null)
             {
                 GraphicsDevice.RasterizerState = _selectedFaceState;
-                var vertexObject = selectionVertexState.RenderObject;
+                var vertexObject = selectionVertexState.RenderObject as MeshNode;
                 VertexRenderer.Update(vertexObject.Geometry, vertexObject.ModelMatrix, vertexObject.Orientation, commonShaderParameters.CameraPosition, selectionVertexState.SelectedVertices);
                 VertexRenderer.Draw(commonShaderParameters.View, commonShaderParameters.Projection, GraphicsDevice, new Vector3(0, 1, 0));
 
@@ -129,6 +129,15 @@ namespace View3D.Scene
             base.Draw(time);
         }
 
+
+        void DrawBasicSceneHirarchy(SceneNode root, GraphicsDevice device, Matrix parentMatrix, CommonShaderParameters commonShaderParameters)
+        {
+            if(root is IDrawableNode drawableNode)
+                drawableNode.DrawBasic(GraphicsDevice, parentMatrix, commonShaderParameters);
+
+            foreach (var child in root.Children)
+                DrawBasicSceneHirarchy(child, device, parentMatrix * child.ModelMatrix, commonShaderParameters);
+        }
 
         protected override void Dispose(bool disposing)
         {

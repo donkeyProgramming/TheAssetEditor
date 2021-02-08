@@ -23,6 +23,6 @@ namespace View3D.Components.Component.Selection
         public event SelectionStateChanged SelectionChanged;
 
         int SelectionCount();
-        RenderItem GetSingleSelectedObject();
+        ISelectable GetSingleSelectedObject();
     }
 }

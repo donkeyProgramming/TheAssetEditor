@@ -39,7 +39,7 @@ namespace KitbasherEditor.ViewModels
             SceneGraphRootNodes.Add(root);
         }
 
-        private void _sceneManager_SceneObjectRemoved(View3D.Rendering.RenderItem item)
+        private void _sceneManager_SceneObjectRemoved(SceneNode parent, SceneNode item)
         {
             if(item.IsEditable)
                 _modelNodes.Children.Remove(new ModelNode(item.Name));
@@ -47,7 +47,7 @@ namespace KitbasherEditor.ViewModels
                 _referenceNodes.Children.Remove(new ModelNode(item.Name));
         }
 
-        private void _sceneManager_SceneObjectAdded(View3D.Rendering.RenderItem item)
+        private void _sceneManager_SceneObjectAdded(SceneNode parent, SceneNode item)
         {
             if (item.IsEditable)
                 _modelNodes.Children.Add(new ModelNode(item.Name));

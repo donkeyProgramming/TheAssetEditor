@@ -9,7 +9,7 @@ namespace View3D.Components.Component.Selection
         public GeometrySelectionMode Mode => GeometrySelectionMode.Face;
         public event SelectionStateChanged SelectionChanged;
 
-        public RenderItem RenderObject { get; set; }
+        public ISelectable RenderObject { get; set; }
         public List<int> SelectedFaces { get; set; } = new List<int>();
 
 
@@ -60,7 +60,7 @@ namespace View3D.Components.Component.Selection
             return SelectedFaces.Count();
         }
 
-        public RenderItem GetSingleSelectedObject()
+        public ISelectable GetSingleSelectedObject()
         {
             return RenderObject;
         }

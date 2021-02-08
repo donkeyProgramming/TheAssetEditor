@@ -8,9 +8,9 @@ namespace View3D.Components.Component.Selection
         public event SelectionStateChanged SelectionChanged;
         public GeometrySelectionMode Mode => GeometrySelectionMode.Object;
 
-        List<RenderItem> _selectionList { get; set; } = new List<RenderItem>();
+        List<ISelectable> _selectionList { get; set; } = new List<ISelectable>();
 
-        public void ModifySelection(RenderItem newSelectionItem)
+        public void ModifySelection(ISelectable newSelectionItem)
         {
             if (_selectionList.Contains(newSelectionItem))
                 _selectionList.Remove(newSelectionItem);
@@ -20,7 +20,7 @@ namespace View3D.Components.Component.Selection
             SelectionChanged?.Invoke(this);
         }
 
-        public List<RenderItem> CurrentSelection() 
+        public List<ISelectable> CurrentSelection() 
         { 
             return _selectionList; 
         }
@@ -35,7 +35,7 @@ namespace View3D.Components.Component.Selection
         {
             return new ObjectSelectionState()
             {
-                _selectionList = new List<RenderItem>(_selectionList)
+                _selectionList = new List<ISelectable>(_selectionList)
             };
         }
 
@@ -49,7 +49,7 @@ namespace View3D.Components.Component.Selection
             return _selectionList.Count;
         }
 
-        public RenderItem GetSingleSelectedObject()
+        public ISelectable GetSingleSelectedObject()
         {
             if (_selectionList.Count != 1)
                 return null;

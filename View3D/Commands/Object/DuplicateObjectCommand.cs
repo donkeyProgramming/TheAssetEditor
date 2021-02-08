@@ -14,15 +14,15 @@ namespace View3D.Commands.Object
     {
         ILogger _logger = Logging.Create<DeleteObjectsCommand>();
 
-        List<RenderItem> _objectsToCopy;
-        List<RenderItem> _clonedObjects = new List<RenderItem>();
+        List<SceneNode> _objectsToCopy;
+        List<SceneNode> _clonedObjects = new List<SceneNode>();
         SceneManager _sceneManager;
         SelectionManager _selectionManager;
 
         ISelectionState _oldState;
-        public DuplicateObjectCommand(List<RenderItem> objectsToCopy, SceneManager sceneManager, SelectionManager selectionManager)
+        public DuplicateObjectCommand(List<SceneNode> objectsToCopy, SceneManager sceneManager, SelectionManager selectionManager)
         {
-            _objectsToCopy = new List<RenderItem>(objectsToCopy);
+            _objectsToCopy = new List<SceneNode>(objectsToCopy);
             _sceneManager = sceneManager;
             _selectionManager = selectionManager;
         }
@@ -40,17 +40,18 @@ namespace View3D.Commands.Object
             {
                 var clonedItem = item.Clone();
                 _clonedObjects.Add(clonedItem);
-                _sceneManager.AddObject(clonedItem);
-                objectState.ModifySelection(clonedItem);
+                item.Parent.AddObject(clonedItem);
+                if(clonedItem is ISelectable selectableNode)
+                    objectState.ModifySelection(selectableNode);
             }
         }
 
         public void Undo()
         {
             _logger.Here().Information($"Undoing DuplicateObjectCommand");
-            
-            foreach(var item in _clonedObjects)
-                _sceneManager.RemoveObject(item);
+
+            foreach (var item in _clonedObjects)
+                item.Parent.RemoveObject(item);
 
             _selectionManager.SetState(_oldState);
         }

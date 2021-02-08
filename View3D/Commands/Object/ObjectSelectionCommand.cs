@@ -13,7 +13,7 @@ namespace View3D.Commands.Object
     {
         ILogger _logger = Logging.Create<ObjectSelectionCommand>();
         private readonly SelectionManager _selectionManager;
-        public List<RenderItem> Items { get; set; } = new List<RenderItem>();
+        public List<ISelectable> Items { get; set; } = new List<ISelectable>();
         public bool IsModification { get; set; } = false;
         public bool ClearSelection { get; set; } = false;
 
