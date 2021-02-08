@@ -52,14 +52,6 @@
                 <MenuItem Header="Validate"/>
             </MenuItem>
 
-            <MenuItem Header="Options">
-                <MenuItem Header="Game">
-                    <MenuItem Header="Open Game Dir"/>
-                    <MenuItem Header="Open Data Dir"/>
-                </MenuItem>
-                <MenuItem Header="Open AssetEditor folder"/>
-                <MenuItem Header="Settings" Command="{Binding MenuBar.OpenSettingsWindowCommand}"/>
-            </MenuItem>
         </Menu>
     </DockPanel>
 </UserControl>

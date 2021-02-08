@@ -1,0 +1,173 @@
+﻿<UserControl x:Class="KitbasherEditor.Views.EditorViews.Rmv2.RigidModelMeshEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews.Rmv2" 
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls" 
+             xmlns:simple="clr-namespace:CommonControls.Simple;assembly=CommonControls"
+              xmlns:enumValue="clr-namespace:Filetypes.RigidModel;assembly=FileTypes"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <DockPanel LastChildFill="False">
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <Label Width="100">Material Type</Label>
+            <Label>:</Label>
+            <TextBlock Text="{Binding MaterialId}" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <Label Width="100">Render BBox</Label>
+            <Label>:</Label>
+            <CheckBox  HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding RenderBoundngBox, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <Label Width="100">Transforms</Label>
+            <Label>:</Label>
+            <Expander>
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Has Pivot = "/>
+                        <TextBlock Text="{Binding TransformHasPivot, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text=" ⁞ "/>
+                        <TextBlock Text="IdentityMatrix = "/>
+                        <TextBlock Text="{Binding TransformHasIdentityMatrices, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                </Expander.Header>
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <mathviews:Vector3View Vector3="{Binding Pivot, UpdateSourceTrigger=PropertyChanged}" />
+
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <mathviews:Matrix3x4View MatrixData="{Binding TransformMatrix[0], UpdateSourceTrigger=PropertyChanged}"/>
+                        <mathviews:Matrix3x4View MatrixData="{Binding TransformMatrix[1], UpdateSourceTrigger=PropertyChanged}"/>
+                        <mathviews:Matrix3x4View MatrixData="{Binding TransformMatrix[2], UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <Label Width="100">Vertex Type</Label>
+            <Label>:</Label>
+            <TextBlock Text="{Binding VertexFormat}" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <Label Width="100">Vertex Count</Label>
+            <Label>:</Label>
+            <TextBlock Text="{Binding VertexCount}" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <Label Width="100">Index Count</Label>
+            <Label>:</Label>
+            <TextBlock  Text="{Binding IndexCount}"  VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <Label Width="100">Attachments</Label>
+            <Label>:</Label>
+            <Expander>
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Count = "/>
+                        <TextBlock Text="{Binding AttachmentPoints.Count, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                </Expander.Header>
+
+                <ListView ItemsSource="{Binding AttachmentPoints}" MaxHeight="350" >
+
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"/>
+                            <GridViewColumn Header="BoneIndex" DisplayMemberBinding="{Binding BoneIndex}"/>
+                        </GridView>
+                    </ListView.View>
+
+                </ListView>
+            </Expander>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <Label Width="100">Bone information</Label>
+            <Label>:</Label>
+            <Expander>
+                <StackPanel Orientation="Horizontal">
+                    <Button Command="{Binding FixBoneCommand}">Fix bone shit</Button>
+
+                </StackPanel>
+
+            </Expander>
+        </StackPanel>
+
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <Label Width="100">BoneIdx Link</Label>
+            <Label>:</Label>
+            <TextBlock  Text="{Binding LinkDirectlyToBoneIndex}"  VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <Label Width="100">Shader Name</Label>
+            <Label>:</Label>
+            <TextBlock Text="{Binding ShaderName}" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <Label Width="100">Alpha Mode</Label>
+            <Label>:</Label>
+            <ComboBox  VerticalAlignment="Center" ItemsSource="{Binding PossibleAlphaModes}" SelectedItem="{Binding SelectedAlphaMode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+        </StackPanel>
+
+        <simple:BrowsableItemView DockPanel.Dock="Top" LabelLength="100" LabelName="Texture Directory"
+                                 PathTextReadOnly="true"
+                                 DisplayRemoveButton="False" 
+                                 DisplayPreviewButton="False" 
+                                 Browse="{Binding BrowseTextureDirCommand}" 
+                                 PathText="{Binding Path=TextureDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        <simple:BrowsableItemView DockPanel.Dock="Top" LabelLength="100" LabelName="Diffuse"
+                                 DisplayCheckBox="True" 
+                                 PathTextReadOnly="true"
+                                 Preview="{Binding PreviewCommand}" 
+                                 Browse="{Binding BrowseCommand}" 
+                                 Remove="{Binding RemoveCommand}" 
+                                 CheckBoxValue="{Binding Path=Textures[(enumValue:TexureType)Diffuse].UseTexture, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                 ItemValue="{Binding Path=Textures[(enumValue:TexureType)Diffuse]}" 
+                                 PathText="{Binding Path=Textures[(enumValue:TexureType)Diffuse].Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        <simple:BrowsableItemView DockPanel.Dock="Top" LabelLength="100" LabelName="Specular"
+                                 DisplayCheckBox="True" 
+                                 PathTextReadOnly="true"
+                                 Preview="{Binding PreviewCommand}" 
+                                 Browse="{Binding BrowseCommand}" 
+                                 Remove="{Binding RemoveCommand}" 
+                                 CheckBoxValue="{Binding Path=Textures[(enumValue:TexureType)Specular].UseTexture, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                 ItemValue="{Binding Path=Textures[(enumValue:TexureType)Specular]}" 
+                                 PathText="{Binding Path=Textures[(enumValue:TexureType)Specular].Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        <simple:BrowsableItemView DockPanel.Dock="Top" LabelLength="100" LabelName="Gloss"                                
+                                 DisplayCheckBox="True" 
+                                 PathTextReadOnly="true"
+                                 Preview="{Binding PreviewCommand}" 
+                                 Browse="{Binding BrowseCommand}" 
+                                 Remove="{Binding RemoveCommand}" 
+                                 CheckBoxValue="{Binding Path=Textures[(enumValue:TexureType)Gloss].UseTexture, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                 ItemValue="{Binding Path=Textures[(enumValue:TexureType)Gloss]}" 
+                                 PathText="{Binding Path=Textures[(enumValue:TexureType)Gloss].Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        <simple:BrowsableItemView DockPanel.Dock="Top" LabelLength="100" LabelName="Normal"                                 
+                                 DisplayCheckBox="True" 
+                                 PathTextReadOnly="true"
+                                 Preview="{Binding PreviewCommand}" 
+                                 Browse="{Binding BrowseCommand}" 
+                                 Remove="{Binding RemoveCommand}" 
+                                 CheckBoxValue="{Binding Path=Textures[(enumValue:TexureType)Normal].UseTexture, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                 ItemValue="{Binding Path=Textures[(enumValue:TexureType)Normal]}" 
+                                 PathText="{Binding Path=Textures[(enumValue:TexureType)Normal].Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+    </DockPanel>
+</UserControl>

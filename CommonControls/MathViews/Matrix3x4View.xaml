@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="CommonControls.MathViews.Matrix3x4View"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d"
+             x:Name="self">
+    <Grid>
+        <GroupBox Header="{Binding MatrixData.Name, ElementName=self, UpdateSourceTrigger=PropertyChanged}">
+            <StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
+                    <TextBox Text="{Binding MatrixData.Matrix[0].X, ElementName=self, UpdateSourceTrigger=PropertyChanged, StringFormat=N5}" Width="50" Margin="2,0,2,0"></TextBox>
+                    <TextBox Text="{Binding MatrixData.Matrix[0].Y, ElementName=self, UpdateSourceTrigger=PropertyChanged, StringFormat=N5}" Width="50" Margin="2,0,2,0"></TextBox>
+                    <TextBox Text="{Binding MatrixData.Matrix[0].Z, ElementName=self, UpdateSourceTrigger=PropertyChanged, StringFormat=N5}" Width="50" Margin="2,0,2,0"></TextBox>
+                    <TextBox Text="{Binding MatrixData.Matrix[0].W, ElementName=self, UpdateSourceTrigger=PropertyChanged, StringFormat=N5}" Width="50" Margin="2,0,2,0"></TextBox>
+                </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
+                    <TextBox Text="{Binding MatrixData.Matrix[1].X, ElementName=self, UpdateSourceTrigger=PropertyChanged, StringFormat=N5}" Width="50" Margin="2,0,2,0"></TextBox>
+                    <TextBox Text="{Binding MatrixData.Matrix[1].Y, ElementName=self, UpdateSourceTrigger=PropertyChanged, StringFormat=N5}" Width="50" Margin="2,0,2,0"></TextBox>
+                    <TextBox Text="{Binding MatrixData.Matrix[1].Z, ElementName=self, UpdateSourceTrigger=PropertyChanged, StringFormat=N5}" Width="50" Margin="2,0,2,0"></TextBox>
+                    <TextBox Text="{Binding MatrixData.Matrix[1].W, ElementName=self, UpdateSourceTrigger=PropertyChanged, StringFormat=N5}" Width="50" Margin="2,0,2,0"></TextBox>
+                </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
+                    <TextBox Text="{Binding MatrixData.Matrix[2].X, ElementName=self, UpdateSourceTrigger=PropertyChanged, StringFormat=N5}" Width="50" Margin="2,0,2,0"></TextBox>
+                    <TextBox Text="{Binding MatrixData.Matrix[2].Y, ElementName=self, UpdateSourceTrigger=PropertyChanged, StringFormat=N5}" Width="50" Margin="2,0,2,0"></TextBox>
+                    <TextBox Text="{Binding MatrixData.Matrix[2].Z, ElementName=self, UpdateSourceTrigger=PropertyChanged, StringFormat=N5}" Width="50" Margin="2,0,2,0"></TextBox>
+                    <TextBox Text="{Binding MatrixData.Matrix[2].W, ElementName=self, UpdateSourceTrigger=PropertyChanged, StringFormat=N5}" Width="50" Margin="2,0,2,0"></TextBox>
+                </StackPanel>
+
+        </StackPanel>
+        </GroupBox>
+    </Grid>
+</UserControl>

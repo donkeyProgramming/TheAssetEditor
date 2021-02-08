@@ -49,6 +49,6 @@
             </GridSplitter.Template>
         </GridSplitter>
 
-        <local:SceneItemEditorView  Grid.Row="3" Grid.Column="2"/>
+        <local:SceneItemEditorView DataContext="{Binding SceneExplorer}" Grid.Row="3" Grid.Column="2"/>
     </Grid>
 </UserControl>
