@@ -1,0 +1,21 @@
+﻿Next steps:
+	Import	-> code
+	Import reference -> code
+	Lod selector 
+	Context menu trieeview 
+		Delete
+		Make editable
+	Merge models
+	Vertex editing
+		Snap
+		Move
+
+
+
+
+Animation
+	Select skeleton
+		visualzise
+		error message
+	player
+	animation selection

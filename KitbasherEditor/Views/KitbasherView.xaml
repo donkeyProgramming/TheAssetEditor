@@ -15,16 +15,17 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="0.5*"/>
             <RowDefinition Height="5"/>
             <RowDefinition Height="0.5*"/>
         </Grid.RowDefinitions>
 
         <local:MenuBarView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"/>
-        <ContentControl Grid.Row="1" Grid.Column="0" Grid.RowSpan="3" Content="{Binding Scene}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+        <ContentControl Grid.Row="1" Grid.Column="0" Grid.RowSpan="4" Content="{Binding Scene}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
 
 
-        <GridSplitter Grid.Row="1" Grid.RowSpan="3" Grid.Column="1"  HorizontalAlignment="Stretch">
+        <GridSplitter Grid.Row="1" Grid.RowSpan="4" Grid.Column="1"  HorizontalAlignment="Stretch">
             <GridSplitter.Template>
                 <ControlTemplate TargetType="{x:Type GridSplitter}">
                     <Grid>
@@ -35,10 +36,21 @@
             </GridSplitter.Template>
         </GridSplitter>
 
-        <local:SceneExplorerView DataContext="{Binding SceneExplorer}"  Grid.Row="1" Grid.Column="2"/>
+        <Grid Grid.Row="1"  Grid.Column="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="Active Lod:" Margin="0,0,5,0"/>
+            <ComboBox Grid.Column="1"/>
+        </Grid>
+      
+        
+        <local:SceneExplorerView DataContext="{Binding SceneExplorer}"  Grid.Row="2" Grid.Column="2"/>
 
 
-        <GridSplitter Grid.Row="2"  Grid.Column="2" HorizontalAlignment="Stretch">
+        <GridSplitter Grid.Row="3"  Grid.Column="2" HorizontalAlignment="Stretch">
             <GridSplitter.Template>
                 <ControlTemplate TargetType="{x:Type GridSplitter}">
                     <Grid>
@@ -49,6 +61,6 @@
             </GridSplitter.Template>
         </GridSplitter>
 
-        <local:SceneItemEditorView DataContext="{Binding SceneExplorer}" Grid.Row="3" Grid.Column="2"/>
+        <local:SceneItemEditorView DataContext="{Binding SceneExplorer}" Grid.Row="4" Grid.Column="2"/>
     </Grid>
 </UserControl>

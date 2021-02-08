@@ -1,8 +1,10 @@
 ﻿using Common;
 using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
+using FileTypes.PackFiles.Services;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -21,6 +23,8 @@ namespace KitbasherEditor.ViewModels
 {
     public class KitbasherViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
+        ILogger _logger = Logging.Create<KitbasherViewModel>();
+
         public SceneContainer Scene { get; set; }
         public SceneExplorerViewModel SceneExplorer { get; set; }
 
@@ -39,7 +43,7 @@ namespace KitbasherEditor.ViewModels
             }
         }
 
-        public KitbasherViewModel()
+        public KitbasherViewModel(PackFileService pf)
         {
             Scene = new SceneContainer();
 
@@ -75,16 +79,17 @@ namespace KitbasherEditor.ViewModels
                 var file = MainFile as PackFile;
                 var m = new RmvRigidModel(file.DataSource.ReadData(), file.FullPath);
                 var meshesLod0 = m.MeshList[0];
-                int counter = 0;
                 foreach (var mesh in meshesLod0)
                 {
                     var meshInstance = new Rmv2Geometry(mesh, Scene.GraphicsDevice);
-                    var newItem = RenderItemHelper.CreateRenderItem(meshInstance, new Vector3(0, 0, 0), new Vector3(1.0f), "model3-sub" + counter.ToString(), Scene);
+                    var newItem = RenderItemHelper.CreateRenderItem(meshInstance, new Vector3(0, 0, 0), new Vector3(1.0f), mesh.Header.ModelName, Scene);
                     sceneManager.AddObject(newItem);
-                    counter++;
                 }
             }
         }
+
+        public void AddMesh(PackFile file, bool isReference)
+        { }
 
         public string Text { get; set; }
 

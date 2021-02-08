@@ -4,11 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:KitbasherEditor.Views"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             mc:Ignorable="d" >
     <DockPanel>
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File">
+            <MenuItem Header="_File" IsEnabled="False">
                 <MenuItem Header="Import"  />
                 <MenuItem Header="Import reference"/>
                 <Separator/>
@@ -16,7 +15,7 @@
                 <MenuItem Header="Save as"/>
             </MenuItem>
 
-            <MenuItem Header="Mode">
+            <MenuItem Header="Mode" IsEnabled="False">
                 <MenuItem Header="Active Lod">
                     <MenuItem Header="1 - Higest"/>
                     <MenuItem Header="2 "/>
@@ -28,7 +27,7 @@
                 <MenuItem Header="Animate"/>
             </MenuItem>
 
-            <MenuItem Header="Camera">
+            <MenuItem Header="Camera" IsEnabled="False">
                 <MenuItem Header="Shading mode">
                     <MenuItem Header="Wireframe"/>
                     <MenuItem Header="Flat"/>
@@ -39,7 +38,8 @@
                 <MenuItem Header="Reset"/>
             </MenuItem>
 
-            <MenuItem Header="Tools">
+            <MenuItem Header="Tools" IsEnabled="False">
+                <MenuItem Header="Break selection into logical objects"  />
                 <MenuItem Header="Freeze transform"  />
                 <MenuItem Header="Combine"/>
                 <MenuItem Header="Duplicate selection"/>
