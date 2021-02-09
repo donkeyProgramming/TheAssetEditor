@@ -63,6 +63,7 @@ namespace KitbasherEditor.ViewModels
             Scene.Components.Add(new SelectionComponent(Scene));
             Scene.Components.Add(new ObjectEditor(Scene));
             Scene.Components.Add(new FaceEditor(Scene));
+            Scene.Components.Add(new FocusSelectableObjectComponent(Scene));
 
             SceneExplorer = new SceneExplorerViewModel(Scene);
 
@@ -70,40 +71,30 @@ namespace KitbasherEditor.ViewModels
         }
 
 
-        SceneNode _editableMesh;
+        Rmv2ModelNode _editableRmvMesh;
         SceneNode _referenceMesh;
 
         private void OnSceneInitialized(WpfGame scene)
         {
             var sceneManager = scene.GetComponent<SceneManager>();
-
-
-            _editableMesh = sceneManager.RootNode.AddObject(new GroupNode("Editable mesh"));
+            
+            _editableRmvMesh = (Rmv2ModelNode)sceneManager.RootNode.AddObject(new Rmv2ModelNode("Editable Model"));
             _referenceMesh = sceneManager.RootNode.AddObject(new GroupNode("Reference meshs") { IsEditable = false});
-
-            var cubeMesh = new CubeMesh(Scene.GraphicsDevice);
-            _referenceMesh.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(2, 0, 0), new Vector3(0.5f), "Item0", Scene.GraphicsDevice, false) );
-            _editableMesh.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0), new Vector3(0.5f), "Item1", Scene.GraphicsDevice));
-            _referenceMesh.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(-2, 0, 0), new Vector3(0.5f), "Item2", Scene.GraphicsDevice, false));
-
+           
             if (MainFile != null)
             {
                 var file = MainFile as PackFile;
-                var m = new RmvRigidModel(file.DataSource.ReadData(), file.FullPath);
-                var meshesLod0 = m.MeshList[0];
-                foreach (var mesh in meshesLod0)
-                {
-                    var meshInstance = new Rmv2Geometry(mesh, Scene.GraphicsDevice);
-                    var newItem = RenderItemHelper.CreateRenderItem(meshInstance, new Vector3(0, 0, 0), new Vector3(1.0f), mesh.Header.ModelName, Scene.GraphicsDevice);
-                    _editableMesh.AddObject(newItem);
-                }
+                _editableRmvMesh.AddModel(new RmvRigidModel(file.DataSource.ReadData(), file.FullPath), Scene.GraphicsDevice);
+
+                var cubeMesh = new CubeMesh(Scene.GraphicsDevice);
+                _editableRmvMesh.Children[0].AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0), new Vector3(0.5f), "Item1", Scene.GraphicsDevice));
             }
 
-            // Wmd
+            // Wmd reference
             var refereneceMesh = _packFileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_paladin.variantmeshdefinition");
-
             SceneLoader loader = new SceneLoader(_packFileService, Scene.GraphicsDevice);
             var result = loader.Load(refereneceMesh as PackFile, null);
+            result.ForeachNode((node) => node.IsEditable = false);
             _referenceMesh.AddObject(result);
         }
 

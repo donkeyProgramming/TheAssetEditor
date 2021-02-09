@@ -132,11 +132,14 @@ namespace View3D.Scene
 
         void DrawBasicSceneHirarchy(SceneNode root, GraphicsDevice device, Matrix parentMatrix, CommonShaderParameters commonShaderParameters)
         {
-            if(root is IDrawableNode drawableNode)
-                drawableNode.DrawBasic(GraphicsDevice, parentMatrix, commonShaderParameters);
+            if (root.IsVisible)
+            {
+                if (root is IDrawableNode drawableNode)
+                    drawableNode.DrawBasic(GraphicsDevice, parentMatrix, commonShaderParameters);
 
-            foreach (var child in root.Children)
-                DrawBasicSceneHirarchy(child, device, parentMatrix * child.ModelMatrix, commonShaderParameters);
+                foreach (var child in root.Children)
+                    DrawBasicSceneHirarchy(child, device, parentMatrix * child.ModelMatrix, commonShaderParameters);
+            }
         }
 
         protected override void Dispose(bool disposing)

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:KitbasherEditor.Views"
+             xmlns:viewmodels="clr-namespace:KitbasherEditor.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -43,7 +44,9 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Column="0" Text="Active Lod:" Margin="0,0,5,0"/>
-            <ComboBox Grid.Column="1"/>
+            <ComboBox Grid.Column="1" 
+                      ItemsSource="{Binding Source={x:Static viewmodels:LodItem.GetAll}}" DisplayMemberPath="Name"    
+                      SelectedItem="{Binding SceneExplorer.SelectedLodLevel, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
         </Grid>
       
         

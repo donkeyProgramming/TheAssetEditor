@@ -7,6 +7,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Xml;
 using View3D.Components.Component;
@@ -66,15 +67,14 @@ namespace View3D.Services
             else
                 parent.AddObject(variantMeshElement);
 
-            var slotsElement = variantMeshElement.AddObject( new GroupNode("Slots"));
-
+            var slotsElement = variantMeshElement.AddObject( new SlotsNode("Slots"));
 
             var vmdContent = Encoding.Default.GetString(file.DataSource.ReadData());
             VariantMeshFile meshFile = VariantMeshDefinition.Create(vmdContent);
 
             foreach (var slot in meshFile.VARIANT_MESH.SLOT)
             {
-                var slotElement = slotsElement.AddObject(new GroupNode(slot.Name));
+                var slotElement = slotsElement.AddObject(new SlotNode(slot.Name));
 
                 foreach (var mesh in slot.VariantMeshes)
                 {
@@ -84,6 +84,18 @@ namespace View3D.Services
 
                 foreach (var meshReference in slot.VariantMeshReferences)
                     Load(meshReference.definition.ToLower(), slotElement);
+
+                for (int i = 0; i < slotElement.Children.Count(); i++)
+                {
+                    slotElement.Children[i].IsVisible = i == 0;
+                    slotElement.Children[i].IsExpanded = false;
+
+                    if (slotElement.Name.Contains("stump_"))
+                    {
+                        slotElement.IsVisible = false;
+                        slotElement.IsExpanded = false;
+                    }
+                }
             }
         }
 

@@ -86,7 +86,8 @@ namespace View3D.Rendering
         {
             item.DefaultEffect = new BasicEffect(device);
             item.DefaultEffect.DiffuseColor = new Vector3(1.0f, 1.0f, 1.0f);
-            item.DefaultEffect.EnableDefaultLighting(); 
+            item.DefaultEffect.EnableDefaultLighting();
+            item.DefaultEffect.Alpha = 1;
 
             item.WireframeEffect = new BasicEffect(device);
             item.WireframeEffect.DiffuseColor = Vector3.Zero;

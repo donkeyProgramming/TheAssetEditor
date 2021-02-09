@@ -34,8 +34,7 @@ namespace View3D.Commands.Object
             foreach (var item in _itemsToDelete)
                 item.Parent.RemoveObject(item);
 
-            if (_selectionManager.GetState() is ObjectSelectionState objectState)
-                objectState.Clear();
+            _selectionManager.CreateSelectionSate(GeometrySelectionMode.Object);
         }
 
         public void Undo()

@@ -130,7 +130,7 @@ namespace View3D.Rendering.Geometry
                 newIndexList[i] = remappingTable[newIndexList[i]];
 
             _indexList = newIndexList;
-            _indexBuffer = new IndexBuffer(_device, typeof(short), _indexList.Length, BufferUsage.None);
+             _indexBuffer = new IndexBuffer(_device, typeof(short), _indexList.Length, BufferUsage.None);
             _indexBuffer.SetData(_indexList);
 
             _vertexArray = newVertexList.ToArray();

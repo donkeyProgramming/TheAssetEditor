@@ -55,6 +55,11 @@ namespace View3D.Components.Component.Selection
                 return null;
             return _selectionList[0];
         }
+
+        public List<ISelectable> SelectedObjects()
+        {
+            return _selectionList;
+        }
     }
 }
 

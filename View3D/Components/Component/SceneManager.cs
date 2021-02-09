@@ -115,6 +115,22 @@ namespace View3D.Components.Component
             SceneObjectRemoved?.Invoke(parent, toRemove);
         }
 
+        public Matrix GetWorldPosition(INode node)
+        {
+            Queue<INode> nodes = new Queue<INode>();
+            while (node != null)
+            {
+                nodes.Enqueue(node);
+                node = node.Parent;
+            }
+
+            var matrix = Matrix.Identity;
+            while (nodes.Count != 0)
+                matrix *= nodes.Dequeue().ModelMatrix;
+
+            return matrix;
+        }
+
         public bool ContainsObject(SceneNode item)
         {
             foreach (var sceneItem in GetEnumerator)
@@ -130,44 +146,64 @@ namespace View3D.Components.Component
         {
             ISelectable bestItem = null;
             float bestDistance = float.MaxValue;
-
-            foreach (ISelectable item in GetEnumeratorConditional(x=>x is ISelectable))
-            {
-                var distance = GeometryIntersection.IntersectObject(ray, item.Geometry, item.ModelMatrix);
-                if (distance != null)
-                {
-                    if (distance < bestDistance)
-                    {
-                        bestDistance = distance.Value;
-                        bestItem = item;
-                    }
-                }
-            }
-
+            SelectObjectsHirarchy(RootNode, ray, ref bestItem, ref bestDistance);
             return bestItem;
         }
 
         public List<ISelectable> SelectObjects(BoundingFrustum frustrum)
         {
             var output = new List<ISelectable>();
-            foreach (ISelectable item in GetEnumeratorConditional(x => x is ISelectable))
-            {
-                if (GeometryIntersection.IntersectObject(frustrum, item.Geometry, item.ModelMatrix ))
-                    output.Add(item);
-            }
-
+            SelectObjectsHirarchy(RootNode, frustrum, output);
             return output;
+        }
+
+
+        void SelectObjectsHirarchy(SceneNode root, BoundingFrustum frustrum, List<ISelectable> output_selectedNodes)
+        {
+            if (root.IsSelectable)
+            {
+                if(root is ISelectable selectableNode)
+                if (GeometryIntersection.IntersectObject(frustrum, selectableNode.Geometry, selectableNode.ModelMatrix))
+                        output_selectedNodes.Add(selectableNode);
+
+                foreach (var child in root.Children)
+                    SelectObjectsHirarchy(child, frustrum, output_selectedNodes);
+            }
+        }
+
+        void SelectObjectsHirarchy(SceneNode root, Ray ray, ref ISelectable output_selectedNode, ref float bestDistance)
+        {
+            if (root.IsSelectable)
+            {
+                if (root is ISelectable selectableNode)
+                {
+                    var distance = GeometryIntersection.IntersectObject(ray, selectableNode.Geometry, selectableNode.ModelMatrix);
+                    if (distance != null)
+                    {
+                        if (distance < bestDistance)
+                        {
+                            bestDistance = distance.Value;
+                            output_selectedNode = selectableNode;
+                        }
+                    }
+                }
+
+                foreach (var child in root.Children)
+                    SelectObjectsHirarchy(child, ray, ref output_selectedNode, ref bestDistance);
+            }
         }
     }
 
     public abstract class SceneNode : NotifyPropertyChangedImpl, INode
     {
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public SceneManager SceneManager { get; set; }
 
         List<SceneNode> _children = new List<SceneNode>();
 
-        public IEnumerable<SceneNode> Children{ get { return _children; } }
+        public List<SceneNode> Children{ get { return _children; } }
 
+        public SceneNode Parent { get; set; }
 
         string _name = "";
         public string Name { get => _name; set => SetAndNotify(ref _name, value); }
@@ -177,15 +213,25 @@ namespace View3D.Components.Component
 
         bool _isEditable = true;
         public bool IsEditable { get => _isEditable; set => SetAndNotify(ref _isEditable, value); }
+        
         bool _isExpanded = true;
         public bool IsExpanded { get => _isExpanded; set => SetAndNotify(ref _isExpanded, value); }
 
+        bool _isSelectAble = true;
+        public bool IsSelectable 
+        { 
+            get => _isSelectAble && IsVisible && _isEditable; 
+            set => _isSelectAble = value;
+        }
+
         public Matrix ModelMatrix { get; protected set; } = Matrix.Identity;
-        public SceneNode Parent { get; protected set; }
+
 
         public SceneNode AddObject(SceneNode item)
         {
             item.SceneManager = SceneManager;
+            item.ForeachNode((node) => node.SceneManager = SceneManager);
+
             item.Parent = this;
             _children.Add(item);
             SceneManager?.TriggerAddObjectEvent(this, item);
@@ -205,12 +251,30 @@ namespace View3D.Components.Component
         }
 
         public abstract SceneNode Clone();
+
+        public void ForeachNode(Action<SceneNode> func)
+        {
+            func.Invoke(this);
+            foreach (var child in _children)
+                child.ForeachNode(func);
+        }
     }
 
     public class VariantMeshNode : GroupNode
     {
         public VariantMeshNode(string name) : base(name) { }
     }
+
+    public class SlotNode : GroupNode
+    {
+        public SlotNode(string name) : base(name) { }
+    }
+
+    public class SlotsNode : GroupNode
+    {
+        public SlotsNode(string name) : base(name) { }
+    }
+
 
     public class Rmv2LodNode : GroupNode
     {
@@ -232,11 +296,39 @@ namespace View3D.Components.Component
                     var geometry = new Rmv2Geometry(model.MeshList[lodIndex][modelIndex], device);
                     var node = RenderItemHelper.CreateRenderItem(geometry, new Vector3(0, 0, 0), new Vector3(1.0f), model.MeshList[lodIndex][modelIndex].Header.ModelName, device);
                     node.LodIndex = lodIndex;
-
                     lodNode.AddObject(node);
                 }
 
+                lodNode.IsVisible = lodIndex == 0;
                 AddObject(lodNode);
+            }
+        }
+
+        public Rmv2ModelNode(string name)
+        {
+            Name = name;
+
+            for (int lodIndex = 0; lodIndex < 4; lodIndex++)
+            {
+                var lodNode = new Rmv2LodNode("Lod " + lodIndex);
+                lodNode.IsVisible = lodIndex == 0;
+                AddObject(lodNode);
+            }
+        }
+
+        public void AddModel(RmvRigidModel model, GraphicsDevice device)
+        {
+            for (int lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
+            {
+                var lodNode = Children[lodIndex];
+
+                for (int modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
+                {
+                    var geometry = new Rmv2Geometry(model.MeshList[lodIndex][modelIndex], device);
+                    var node = RenderItemHelper.CreateRenderItem(geometry, new Vector3(0, 0, 0), new Vector3(1.0f), model.MeshList[lodIndex][modelIndex].Header.ModelName, device);
+                    node.LodIndex = lodIndex;
+                    lodNode.AddObject(node);
+                }
             }
         }
     }
@@ -332,12 +424,8 @@ namespace View3D.Components.Component
         }
     }
 
-
-
-
     public interface IDrawableNode : INode
     {
-        Matrix ModelMatrix { get; }
         IGeometry Geometry { get; set; }
 
         void DrawWireframeOverlay(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams);
@@ -347,12 +435,14 @@ namespace View3D.Components.Component
 
     public interface ISelectable : INode
     {
-        Matrix ModelMatrix { get; }
         IGeometry Geometry { get; set; }
+        bool IsSelectable { get; set; }
     }
 
     public interface INode
     {
         string Name { get; set; }
+        Matrix ModelMatrix { get; }
+        SceneNode Parent { get; set; }
     }
 }

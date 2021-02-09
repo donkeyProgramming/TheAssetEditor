@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Common;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.WpfInterop;
 using System;
@@ -8,7 +9,7 @@ using System.Text;
 namespace View3D.Components
 {
 
-    public class BaseComponent : IDrawable, IGameComponent, IUpdateable
+    public class BaseComponent : NotifyPropertyChangedImpl, IDrawable, IGameComponent, IUpdateable
     {
         #region Fields
 

@@ -35,6 +35,7 @@
                     <MenuItem Header="Cinematic"/>
                 </MenuItem>
                 <MenuItem Header="Focus on selected object"/>
+                <MenuItem Header="Focus current selection"/>
                 <MenuItem Header="Reset"/>
             </MenuItem>
 

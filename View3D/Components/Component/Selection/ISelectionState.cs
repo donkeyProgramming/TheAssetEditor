@@ -24,5 +24,6 @@ namespace View3D.Components.Component.Selection
 
         int SelectionCount();
         ISelectable GetSingleSelectedObject();
+        List<ISelectable> SelectedObjects();
     }
 }

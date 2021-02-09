@@ -1,6 +1,9 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop;
+using System.Collections.Generic;
+using System.Linq;
 using View3D.Commands.Face;
+using View3D.Commands.Object;
 using View3D.Components.Component.Selection;
 using View3D.Components.Input;
 
@@ -38,9 +41,22 @@ namespace View3D.Components.Component
 
             if (_keyboard.IsKeyReleased(Keys.Delete))
             {
-                var command = new DeleteFaceCommand(_selectionManager);
-                command.FacesToDelete = faceSelectionState.CurrentSelection();
-                _commandManager.ExecuteCommand(command);
+                var x = faceSelectionState.CurrentSelection().Count()*3;
+                var y = faceSelectionState.RenderObject.Geometry.GetIndexCount();
+
+                if (x == y)
+                {
+                    var command = new DeleteObjectsCommand(new List<ISelectable>() { faceSelectionState.RenderObject }, _sceneManager, _selectionManager);
+                    _commandManager.ExecuteCommand(command);
+                }
+                else
+                {
+                    var command = new DeleteFaceCommand(_selectionManager);
+                    command.FacesToDelete = faceSelectionState.CurrentSelection();
+                    _commandManager.ExecuteCommand(command);
+                }
+
+                
             }
             
         }

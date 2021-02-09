@@ -237,12 +237,12 @@ namespace View3D.Components.Rendering
                 }
                 if (mouse.IsMouseButtonDown(MouseButton.Right))
                 {
-                    MoveCameraRight(deltaMouseX * 0.01f);
-                    MoveCameraUp(-deltaMouseY * 0.01f);
+                    MoveCameraRight(deltaMouseX * 0.01f* Zoom * .1f);
+                    MoveCameraUp(-deltaMouseY * 0.01f * Zoom * .1f);
                 }
                 else if (deltaMouseWheel != 0)
                 {
-                    Zoom += deltaMouseWheel * 0.005f;
+                    Zoom += ( deltaMouseWheel * 0.005f)  * (Zoom / 10);
                 }
             }
         }

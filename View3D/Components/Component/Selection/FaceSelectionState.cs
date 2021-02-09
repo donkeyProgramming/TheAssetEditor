@@ -64,6 +64,11 @@ namespace View3D.Components.Component.Selection
         {
             return RenderObject;
         }
+
+        public List<ISelectable> SelectedObjects()
+        {
+            return new List<ISelectable>() { RenderObject };
+        }
     }
 }
 
