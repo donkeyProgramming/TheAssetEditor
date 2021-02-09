@@ -1,4 +1,5 @@
-﻿using Filetypes.RigidModel;
+﻿using Common;
+using Filetypes.RigidModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.WpfInterop;
@@ -94,7 +95,7 @@ namespace View3D.Components.Component
 
         public SceneManager(WpfGame game) : base(game) 
         {
-            RootNode = new SimpleNode() { SceneManager = this };
+            RootNode = new GroupNode("Root") { SceneManager = this };
         }
 
         public IEnumerable<SceneNode> GetEnumerator { get { return RootNode.Search(i => i.Children, i => true, SceneExtentions.GraphTraversal.BreadthFirst); } }
@@ -159,7 +160,7 @@ namespace View3D.Components.Component
         }
     }
 
-    public abstract class SceneNode
+    public abstract class SceneNode : NotifyPropertyChangedImpl, INode
     {
         public SceneManager SceneManager { get; set; }
 
@@ -167,9 +168,17 @@ namespace View3D.Components.Component
 
         public IEnumerable<SceneNode> Children{ get { return _children; } }
 
-        public string Name { get; set; } = "";
-        public bool IsVisible { get; set; }
-        public bool IsEditable { get; set; }
+
+        string _name = "";
+        public string Name { get => _name; set => SetAndNotify(ref _name, value); }
+
+        bool _isVisible = true;
+        public bool IsVisible { get => _isVisible; set => SetAndNotify(ref _isVisible, value); }
+
+        bool _isEditable = true;
+        public bool IsEditable { get => _isEditable; set => SetAndNotify(ref _isEditable, value); }
+        bool _isExpanded = true;
+        public bool IsExpanded { get => _isExpanded; set => SetAndNotify(ref _isExpanded, value); }
 
         public Matrix ModelMatrix { get; protected set; } = Matrix.Identity;
         public SceneNode Parent { get; protected set; }
@@ -198,12 +207,14 @@ namespace View3D.Components.Component
         public abstract SceneNode Clone();
     }
 
-    public class SimpleNode : SceneNode
+    public class VariantMeshNode : GroupNode
     {
-        public override SceneNode Clone()
-        {
-            throw new NotImplementedException();
-        }
+        public VariantMeshNode(string name) : base(name) { }
+    }
+
+    public class Rmv2LodNode : GroupNode
+    {
+        public Rmv2LodNode(string name) : base(name) { }
     }
 
     public class Rmv2ModelNode: GroupNode
@@ -214,14 +225,18 @@ namespace View3D.Components.Component
 
             for (int lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
             {
+                var lodNode = new Rmv2LodNode("Lod " + lodIndex);
+
                 for (int modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
                 {
                     var geometry = new Rmv2Geometry(model.MeshList[lodIndex][modelIndex], device);
                     var node = RenderItemHelper.CreateRenderItem(geometry, new Vector3(0, 0, 0), new Vector3(1.0f), model.MeshList[lodIndex][modelIndex].Header.ModelName, device);
                     node.LodIndex = lodIndex;
 
-                    AddObject(node);
+                    lodNode.AddObject(node);
                 }
+
+                AddObject(lodNode);
             }
         }
     }

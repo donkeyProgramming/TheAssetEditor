@@ -8,6 +8,11 @@
              xmlns:simple="clr-namespace:CommonControls.Simple;assembly=CommonControls" 
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
+             xmlns:valueconverters="clr-namespace:KitbasherEditor.ValueConverters"
+             xmlns:resources="clr-namespace:CommonControls.Resources;assembly=CommonControls"
+             
+             
+             
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -16,24 +21,32 @@
                 <ResourceDictionary Source="pack://application:,,,/CommonControls;component/Resources/OptionalRadioButtonStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-                <local:TreeItemDataTemplateSelector x:Key="TreeItemDataTemplateSelector"/>
+            <valueconverters:SceneNodeToImageConverter x:Key="ImageValueConverter"/>
 
-                <Style x:Key="TreeViewItemStyle" TargetType="{x:Type TreeViewItem}">
-                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" />
-                    <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
-                </Style>
+            <local:TreeItemDataTemplateSelector x:Key="TreeItemDataTemplateSelector"/>
 
-                <HierarchicalDataTemplate x:Key="DefaultTreeItemTemplate" ItemsSource="{Binding Children, UpdateSourceTrigger=PropertyChanged}">
-                    <StackPanel Orientation="Horizontal" >
-                    <simple:OptionalRadioButton Style="{StaticResource OptionalRadioButtonStyle}" Focusable="False"  IsChecked="{Binding IsChecked, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
-                        <ContentPresenter  Content="{Binding Path=DisplayName, UpdateSourceTrigger=PropertyChanged}" Margin="2,0"/>
-                    </StackPanel>
-                </HierarchicalDataTemplate>
+            <Style x:Key="TreeViewItemStyle" TargetType="{x:Type TreeViewItem}">
+                <Setter Property="IsExpanded" Value="{Binding IsExpanded, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" />
+                <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
+            </Style>
 
-            <HierarchicalDataTemplate x:Key="SlotTreeItemTemplate" ItemsSource="{Binding Children, UpdateSourceTrigger=PropertyChanged}">
+            <HierarchicalDataTemplate x:Key="DefaultTreeNodeStyle" ItemsSource="{Binding Children, UpdateSourceTrigger=PropertyChanged}">
+                <StackPanel Orientation="Horizontal">
+                    <simple:OptionalRadioButton Style="{StaticResource OptionalRadioButtonStyle}" Focusable="False"  IsChecked="{Binding IsVisible, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"  />
+                    <Image Width="18" Grid.Column="0" Source="{Binding Path=. , Converter={StaticResource ImageValueConverter}}" Margin="2,0"/>
+                    <TextBlock  Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" Margin="2,0"/>
+                </StackPanel>
+            </HierarchicalDataTemplate>
+
+            <HierarchicalDataTemplate x:Key="ReferenceTreeNodeStyle" ItemsSource="{Binding Children, UpdateSourceTrigger=PropertyChanged}">
                 <StackPanel Orientation="Horizontal" >
-                    <simple:OptionalRadioButton Style="{StaticResource OptionalRadioButtonStyle}" Focusable="False"  IsChecked="{Binding IsChecked, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"  />
-                    <TextBlock  Text="{Binding Path=DisplayName, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" Margin="2,0"/>
+                    <simple:OptionalRadioButton Style="{StaticResource OptionalRadioButtonStyle}" Focusable="False"  IsChecked="{Binding IsVisible, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"  />
+                    <Grid Width="18" Margin="2,0">
+                        <Image Source="{Binding Path=. , Converter={StaticResource ImageValueConverter}}" />
+                        <Image Width="10" Source="{Binding Source={x:Static resources:ResourceController.LockIcon}}" />
+                    </Grid>
+                    
+                    <TextBlock  Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" Margin="2,0" Foreground="Gray"/>
                 </StackPanel>
             </HierarchicalDataTemplate>
 

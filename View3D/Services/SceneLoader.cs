@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Xml;
 using View3D.Components.Component;
@@ -59,7 +60,7 @@ namespace View3D.Services
 
         void LoadVariantMesh(PackFile file, ref SceneNode parent)
         {
-            var variantMeshElement = new GroupNode(file.Name);
+            var variantMeshElement = new VariantMeshNode(file.Name);
             if (parent == null)
                 parent = variantMeshElement;
             else
@@ -89,7 +90,7 @@ namespace View3D.Services
         void LoadRigidMesh(PackFile file, ref SceneNode parent)
         {
             var rmvModel = new RmvRigidModel(file.DataSource.ReadData(), file.FullPath);
-            var model = new Rmv2ModelNode(rmvModel, _device,  rmvModel.FileName);
+            var model = new Rmv2ModelNode(rmvModel, _device,  Path.GetFileName( rmvModel.FileName));
 
             if (parent == null)
                 parent = model;

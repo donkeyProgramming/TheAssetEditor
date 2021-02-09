@@ -69,14 +69,22 @@ namespace KitbasherEditor.ViewModels
             Scene.SceneInitialized += OnSceneInitialized;
         }
 
+
+        SceneNode _editableMesh;
+        SceneNode _referenceMesh;
+
         private void OnSceneInitialized(WpfGame scene)
         {
             var sceneManager = scene.GetComponent<SceneManager>();
 
+
+            _editableMesh = sceneManager.RootNode.AddObject(new GroupNode("Editable mesh"));
+            _referenceMesh = sceneManager.RootNode.AddObject(new GroupNode("Reference meshs") { IsEditable = false});
+
             var cubeMesh = new CubeMesh(Scene.GraphicsDevice);
-            sceneManager.RootNode.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(2, 0, 0), new Vector3(0.5f), "Item0", Scene.GraphicsDevice, false) );
-            sceneManager.RootNode.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0), new Vector3(0.5f), "Item1", Scene.GraphicsDevice));
-            sceneManager.RootNode.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(-2, 0, 0), new Vector3(0.5f), "Item2", Scene.GraphicsDevice, false));
+            _referenceMesh.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(2, 0, 0), new Vector3(0.5f), "Item0", Scene.GraphicsDevice, false) );
+            _editableMesh.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0), new Vector3(0.5f), "Item1", Scene.GraphicsDevice));
+            _referenceMesh.AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(-2, 0, 0), new Vector3(0.5f), "Item2", Scene.GraphicsDevice, false));
 
             if (MainFile != null)
             {
@@ -87,18 +95,16 @@ namespace KitbasherEditor.ViewModels
                 {
                     var meshInstance = new Rmv2Geometry(mesh, Scene.GraphicsDevice);
                     var newItem = RenderItemHelper.CreateRenderItem(meshInstance, new Vector3(0, 0, 0), new Vector3(1.0f), mesh.Header.ModelName, Scene.GraphicsDevice);
-                    sceneManager.RootNode.AddObject(newItem);
+                    _editableMesh.AddObject(newItem);
                 }
             }
 
             // Wmd
-
             var refereneceMesh = _packFileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_paladin.variantmeshdefinition");
 
             SceneLoader loader = new SceneLoader(_packFileService, Scene.GraphicsDevice);
             var result = loader.Load(refereneceMesh as PackFile, null);
-            sceneManager.RootNode.AddObject(result);
-            //AddMesh(refereneceMesh, true);
+            _referenceMesh.AddObject(result);
         }
 
         public void AddMesh(IPackFile file, bool isReference)

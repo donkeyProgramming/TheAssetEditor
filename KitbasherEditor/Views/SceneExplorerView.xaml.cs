@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using View3D.Components.Component;
 
 namespace KitbasherEditor.Views
 {
@@ -27,8 +28,8 @@ namespace KitbasherEditor.Views
         private void TreeViewItem_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var treeView = sender as TreeView;
-            if (treeView.SelectedItem is Node item)
-                item.IsChecked = !item.IsChecked;
+            if (treeView.SelectedItem is SceneNode item)
+                item.IsVisible = !item.IsVisible;
             e.Handled = true;
         }
     }
@@ -39,13 +40,13 @@ namespace KitbasherEditor.Views
         {
             FrameworkElement element = container as FrameworkElement;
 
-            if (element != null && item != null && item is Node)
+            if (element != null && item != null && item is SceneNode)
             {
-                Node sceneElement = item as Node;
-                if(sceneElement.IsReference)
-                        return element.FindResource("SlotTreeItemTemplate") as HierarchicalDataTemplate; 
+                SceneNode sceneElement = item as SceneNode;
+                if(sceneElement.IsEditable)
+                    return element.FindResource("DefaultTreeNodeStyle") as HierarchicalDataTemplate;
                 else
-                        return element.FindResource("DefaultTreeItemTemplate") as HierarchicalDataTemplate;
+                    return element.FindResource("ReferenceTreeNodeStyle") as HierarchicalDataTemplate;
 
             }
 

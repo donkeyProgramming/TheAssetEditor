@@ -30,7 +30,7 @@ namespace View3D.Commands.Object
         {
             _oldState = _selectionManager.GetStateCopy();
 
-            _logger.Here().Information($"Executing DeleteObjectsCommand Items[{string.Join(',', _itemsToDelete.Select(x => x.Name))}]");
+           _logger.Here().Information($"Executing DeleteObjectsCommand Items[{string.Join(',', _itemsToDelete.Select(x => x.Name))}]");
             foreach (var item in _itemsToDelete)
                 item.Parent.RemoveObject(item);
 
