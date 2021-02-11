@@ -12,7 +12,8 @@ namespace View3D.Rendering.Geometry
         public void ApplyMesh(Effect effect, GraphicsDevice device);
         public void ApplyMeshPart(Effect effect, GraphicsDevice device, List<int> faceSelection);
 
-        public Vector3 GetVertex(int index);
+        public Vector3 GetVertexByIndex(int index);
+        public Vector3 GetVertexById(int id);
         public int VertexCount();
 
         public int GetIndex(int i);
@@ -25,5 +26,7 @@ namespace View3D.Rendering.Geometry
         IGeometry Clone();
         void RemoveFaces(List<int> facesToDelete);
         void RemoveUnusedVertexes(ushort[] newIndexList);
+        void UpdateVertexPosition(int vertexId, Vector3 position);
+        void RebuildVertexBuffer();
     }
 }

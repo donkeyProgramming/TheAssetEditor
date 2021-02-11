@@ -5,6 +5,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using View3D.Components;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Rendering;
@@ -18,6 +19,7 @@ namespace View3D.Commands.Object
         IDrawableNode _objectToSplit;
         List<MeshNode> _newMeshes = new List<MeshNode>();
 
+        IEditableMeshResolver _editableMeshResolver;
         SceneManager _sceneManager;
         SelectionManager _selectionManager;
         ISelectionState _originalSelectionState;
@@ -29,6 +31,7 @@ namespace View3D.Commands.Object
 
         public override void Initialize(IComponentManager componentManager)
         {
+            _editableMeshResolver = componentManager.GetComponent<IEditableMeshResolver>();
             _sceneManager = componentManager.GetComponent<SceneManager>();
             _selectionManager = componentManager.GetComponent<SelectionManager>();
         }
@@ -39,6 +42,7 @@ namespace View3D.Commands.Object
 
             var meshService = new MeshSplitterService();
             var newMeshes = meshService.SplitMesh(_objectToSplit.Geometry);
+
             _logger.Here().Information($"{newMeshes.Count} meshes generated from splitting");
 
             int counter = 0;
@@ -46,8 +50,10 @@ namespace View3D.Commands.Object
             {
                 var meshNode = RenderItemHelper.CreateRenderItem(mesh, new Vector3(0, 0, 0), new Vector3(1), $"{_objectToSplit.Name}_submesh_{counter++}", _sceneManager.GraphicsDevice);
                 _newMeshes.Add(meshNode);
-                _sceneManager.RootNode.AddObject(meshNode);
+                _editableMeshResolver.GetEditableMeshNode().AddObject(meshNode);
             }
+
+            _objectToSplit.Parent.RemoveObject(_objectToSplit as SceneNode);
 
             var newState = (ObjectSelectionState)_selectionManager.CreateSelectionSate(GeometrySelectionMode.Object);
             foreach (var node in _newMeshes)
@@ -61,6 +67,8 @@ namespace View3D.Commands.Object
                 if (item.Parent != null)
                     item.Parent.RemoveObject(item);
             }
+
+            _objectToSplit.Parent.AddObject(_objectToSplit as SceneNode);
 
             _selectionManager.SetState(_originalSelectionState);
         }

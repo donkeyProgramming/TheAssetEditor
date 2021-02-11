@@ -6,14 +6,16 @@ using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using View3D.Components.Gizmo;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
 using View3D.Rendering;
+using View3D.Rendering.Geometry;
 using View3D.Scene;
 
 namespace View3D.Components.Component.Selection
 {
-    public delegate void SelectionChangedDelegate(IEnumerable<ISelectable> items);
+    public delegate void SelectionChangedDelegate(ISelectionState state);
     public class SelectionManager : BaseComponent
     {
         public event SelectionChangedDelegate SelectionChanged;
@@ -79,9 +81,12 @@ namespace View3D.Components.Component.Selection
 
         private void SelectionManager_SelectionChanged(ISelectionState state)
         {
-            if(state.Mode == GeometrySelectionMode.Object)
-                SelectionChanged?.Invoke((state as ObjectSelectionState).CurrentSelection());
+            SelectionChanged?.Invoke(state);
         }
     }
+
+
+
+   
 }
 

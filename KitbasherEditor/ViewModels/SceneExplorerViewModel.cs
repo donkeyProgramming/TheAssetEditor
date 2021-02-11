@@ -1,5 +1,4 @@
-﻿
-using Common;
+﻿using Common;
 using GalaSoft.MvvmLight.Command;
 using System;
 using System.Collections.Generic;
@@ -14,7 +13,7 @@ using View3D.Scene;
 
 namespace KitbasherEditor.ViewModels
 {
-    public class SceneExplorerViewModel : NotifyPropertyChangedImpl
+    public class SceneExplorerViewModel : NotifyPropertyChangedImpl, IEditableMeshResolver
     {
         public ObservableCollection<SceneNode> _sceneGraphRootNodes = new ObservableCollection<SceneNode>();
         public ObservableCollection<SceneNode> SceneGraphRootNodes { get { return _sceneGraphRootNodes; } set { SetAndNotify(ref _sceneGraphRootNodes, value); } }
@@ -28,7 +27,6 @@ namespace KitbasherEditor.ViewModels
 
         SceneContainer _sceneContainer;
         SceneManager _sceneManager;
-        SelectionManager _selectionManager;
         CommandExecutor _commandExecutor;
 
         public ICommand MakeNodeEditableCommand { get; set; }
@@ -43,13 +41,14 @@ namespace KitbasherEditor.ViewModels
 
             _sceneContainer = sceneContainer;
             _sceneManager = _sceneContainer.GetComponent<SceneManager>();
-            _selectionManager = _sceneContainer.GetComponent<SelectionManager>();
             _commandExecutor = sceneContainer.GetComponent<CommandExecutor>();
 
             SceneGraphRootNodes.Add(_sceneManager.RootNode);
 
             _sceneManager.SceneObjectAdded += (a, b) => RebuildTree();
             _sceneManager.SceneObjectRemoved += (a, b) => RebuildTree();
+
+          
 
             MakeNodeEditableCommand = new RelayCommand<SceneNode>(MakeNodeEditable);
             DeleteNodeCommand = new RelayCommand<SceneNode>(DeleteNode);
@@ -96,6 +95,7 @@ namespace KitbasherEditor.ViewModels
             var collection = new ObservableCollection<SceneNode>(); ;
             collection.Add(_sceneManager.RootNode);
             SceneGraphRootNodes = collection;
+            UpdateLod(SelectedLodLevel.Value);
         }
 
         void UpdateLod(int newLodLevel)
@@ -104,8 +104,20 @@ namespace KitbasherEditor.ViewModels
             foreach (var item in allModelNodes)
             {
                 for (int i = 0; i < item.Children.Count(); i++)
+                {
                     item.Children[i].IsVisible = i == newLodLevel;
+                    item.Children[i].IsExpanded = i == newLodLevel;
+                }
             }
+        }
+
+        public SceneNode GetEditableMeshNode()
+        {
+            return EditableMeshNode.Children[SelectedLodLevel.Value];
+        }
+
+        public void Initialize()
+        {
         }
     }
 

@@ -49,8 +49,9 @@ namespace KitbasherEditor.ViewModels
         public KitbasherViewModel(PackFileService pf)
         {
             _packFileService = pf;
-            Scene = new SceneContainer();
 
+            Scene = new SceneContainer();
+            
             Scene.Components.Add(new FpsComponent(Scene));
             Scene.Components.Add(new KeyboardComponent(Scene));
             Scene.Components.Add(new MouseComponent(Scene));
@@ -66,6 +67,7 @@ namespace KitbasherEditor.ViewModels
             Scene.Components.Add(new FocusSelectableObjectComponent(Scene));
 
             SceneExplorer = new SceneExplorerViewModel(Scene);
+            Scene.Components.Add(SceneExplorer as IEditableMeshResolver);
 
             Scene.SceneInitialized += OnSceneInitialized;
         }

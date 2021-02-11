@@ -23,7 +23,7 @@ namespace View3D.Rendering.Geometry
         protected BoundingBox _boundingBox;
         public BoundingBox BoundingBox => _boundingBox;
 
-        public abstract Vector3 GetVertex(int index);
+        public abstract Vector3 GetVertexByIndex(int index);
         public abstract int VertexCount();
         public abstract IGeometry Clone();
 
@@ -81,7 +81,7 @@ namespace View3D.Rendering.Geometry
             var count = VertexCount();
             var points = new Vector3[count];
             for (int i = 0; i < count; i++)
-                points[i] = GetVertex(i);
+                points[i] = GetVertexByIndex(i);
             _boundingBox = BoundingBox.CreateFromPoints(points);
         }
 
@@ -109,5 +109,9 @@ namespace View3D.Rendering.Geometry
 
         public abstract void RemoveUnusedVertexes(ushort[] newIndexList);
 
+        public abstract Vector3 GetVertexById(int id);
+
+        public abstract void UpdateVertexPosition(int vertexId, Vector3 position);
+        public abstract void RebuildVertexBuffer();
     }
 }

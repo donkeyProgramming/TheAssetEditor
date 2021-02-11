@@ -27,8 +27,11 @@ namespace View3D.Components.Component.Selection
 
         public void Clear()
         {
-            _selectionList.Clear();
-            SelectionChanged?.Invoke(this);
+            if (_selectionList.Count != 0)
+            {
+                _selectionList.Clear();
+                SelectionChanged?.Invoke(this);
+            }
         }
 
         public ISelectionState Clone()

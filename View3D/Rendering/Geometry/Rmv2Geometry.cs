@@ -98,10 +98,15 @@ namespace View3D.Rendering.Geometry
 
 
 
-        public override Vector3 GetVertex(int index)
+        public override Vector3 GetVertexByIndex(int index)
         {
             var vertIndex = index;// _indexList[index];
             return new Vector3(_vertexArray[vertIndex].Position.X, _vertexArray[vertIndex].Position.Y, _vertexArray[vertIndex].Position.Z);
+        }
+
+        public override Vector3 GetVertexById(int id)
+        {
+            return new Vector3(_vertexArray[id].Position.X, _vertexArray[id].Position.Y, _vertexArray[id].Position.Z);
         }
 
         public override int VertexCount()
@@ -138,6 +143,20 @@ namespace View3D.Rendering.Geometry
             _vertexBuffer.SetData(_vertexArray);
 
             BuildBoundingBox();
+        }
+
+        public override void UpdateVertexPosition(int vertexId, Vector3 position)
+        {
+            _vertexArray[vertexId].Position = new Vector4(position, 1);
+        }
+
+        public override void RebuildVertexBuffer()
+        {
+            if (_vertexBuffer != null)
+                _vertexBuffer.Dispose();
+
+            _vertexBuffer = new VertexBuffer(_device, _vertexDeclaration, _vertexArray.Length, BufferUsage.None);
+            _vertexBuffer.SetData(_vertexArray);
         }
     }
 }

@@ -221,6 +221,8 @@ namespace MonoGame.Framework.WpfInterop
             {
                 if (comp.GetType() == type)
                     return (T)comp;
+                if(type.IsAssignableFrom(comp.GetType()))
+                    return (T)comp;
             }
 
             return default(T);

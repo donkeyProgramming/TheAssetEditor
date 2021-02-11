@@ -134,10 +134,16 @@ namespace View3D.Rendering.Geometry
             return mesh;
         }
 
-        public override Vector3 GetVertex(int index)
+        public override Vector3 GetVertexByIndex(int index)
         {
             return _vertexArray[index].Position;
         }
+
+        public override Vector3 GetVertexById(int id)
+        {
+            return _vertexArray[id].Position;
+        }
+
 
         public override int VertexCount()
         {
@@ -173,6 +179,20 @@ namespace View3D.Rendering.Geometry
             _vertexBuffer.SetData(_vertexArray);
 
             BuildBoundingBox();
+        }
+
+        public override void UpdateVertexPosition(int vertexId, Vector3 position)
+        {
+            _vertexArray[vertexId].Position = position;
+        }
+
+        public override void RebuildVertexBuffer()
+        {
+            if (_vertexBuffer != null)
+                _vertexBuffer.Dispose();
+
+            _vertexBuffer = new VertexBuffer(_device, _vertexDeclaration, _vertexArray.Length, BufferUsage.None);
+            _vertexBuffer.SetData(_vertexArray);
         }
     }
 }

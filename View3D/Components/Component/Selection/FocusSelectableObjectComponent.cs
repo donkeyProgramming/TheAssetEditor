@@ -21,8 +21,6 @@ namespace View3D.Components.Component.Selection
         ArcBallCamera _archballCamera;
         SceneManager _sceneManager;
 
-        bool _isEnabled = false;
-        bool IsEnabled { get => _isEnabled; set => SetAndNotify(ref _isEnabled, value); }
 
 
         public FocusSelectableObjectComponent(WpfGame game) : base(game) { }
@@ -34,8 +32,6 @@ namespace View3D.Components.Component.Selection
             _archballCamera = GetComponent<ArcBallCamera>();
             _sceneManager = GetComponent<SceneManager>();
 
-
-            _selectionManager.SelectionChanged += _selectionManager_SelectionChanged;
             base.Initialize();
         }
 
@@ -47,11 +43,6 @@ namespace View3D.Components.Component.Selection
             base.Update(gameTime);
         }
 
-        private void _selectionManager_SelectionChanged(IEnumerable<ISelectable> items)
-        {
-            if (IsEnabled)
-                Focus(items);
-        }
 
         void Focus(IEnumerable<ISelectable> items)
         {
@@ -59,11 +50,7 @@ namespace View3D.Components.Component.Selection
                 return;
             Vector3 finalPos = Vector3.Zero;
             foreach (var item in items)
-            {
-                var boxPos = GetCenter(item.Geometry.BoundingBox);
-                var worldPos = _sceneManager.GetWorldPosition(item);
-                finalPos = Vector3.Transform(boxPos, worldPos);
-            }
+                finalPos += Vector3.Transform(GetCenter(item.Geometry.BoundingBox), _sceneManager.GetWorldPosition(item));
 
             _archballCamera.LookAt = finalPos / items.Count();
         }

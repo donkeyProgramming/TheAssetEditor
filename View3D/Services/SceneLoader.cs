@@ -69,8 +69,21 @@ namespace View3D.Services
 
             var slotsElement = variantMeshElement.AddObject( new SlotsNode("Slots"));
 
-            var vmdContent = Encoding.Default.GetString(file.DataSource.ReadData());
-            VariantMeshFile meshFile = VariantMeshDefinition.Create(vmdContent);
+            var vmdContent = Encoding.UTF8.GetString(file.DataSource.ReadData());
+
+            VariantMeshFile meshFile = null;
+            try
+            {
+                meshFile = VariantMeshDefinition.Create(vmdContent);
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error("Failed to load file : " + file.Name);
+                _logger.Here().Error("File content : " + vmdContent);
+                _logger.Here().Error("Error : " + e.ToString());
+                throw e;
+            }
+           
 
             foreach (var slot in meshFile.VARIANT_MESH.SLOT)
             {
