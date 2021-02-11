@@ -7,16 +7,52 @@
 
   <ItemGroup>
     <None Remove="Resources\Icons\icons8-3d-object-48.png" />
+    <None Remove="Resources\Icons\icons8-add-folder-50.png" />
     <None Remove="Resources\Icons\icons8-animated-skeleton-40.png" />
+    <None Remove="Resources\Icons\icons8-animated-skeleton-50.png" />
     <None Remove="Resources\Icons\icons8-audio-file-48.png" />
+    <None Remove="Resources\Icons\icons8-clear-symbol-48.png" />
     <None Remove="Resources\Icons\icons8-collectibles-48.png" />
     <None Remove="Resources\Icons\icons8-database-48.png" />
+    <None Remove="Resources\Icons\icons8-documents-folder-50.png" />
     <None Remove="Resources\Icons\icons8-file-48.png" />
+    <None Remove="Resources\Icons\icons8-file-explorer-50.png" />
     <None Remove="Resources\Icons\icons8-folder-48.png" />
+    <None Remove="Resources\Icons\icons8-folder-50.png" />
+    <None Remove="Resources\Icons\icons8-folder-tree-50.png" />
+    <None Remove="Resources\Icons\icons8-group-objects-50.png" />
     <None Remove="Resources\Icons\icons8-json-48.png" />
+    <None Remove="Resources\Icons\icons8-lock-50.png" />
+    <None Remove="Resources\Icons\icons8-man-50.png" />
+    <None Remove="Resources\Icons\icons8-mesh-50.png" />
+    <None Remove="Resources\Icons\icons8-mesh-50_2.png" />
+    <None Remove="Resources\Icons\icons8-orthogonal-view-50.png" />
     <None Remove="Resources\Icons\icons8-question-mark-48.png" />
+    <None Remove="Resources\Icons\icons8-save-all-50.png" />
+    <None Remove="Resources\Icons\icons8-sugar-cube-100.png" />
+    <None Remove="Resources\Icons\icons8-sugar-cube-64.png" />
     <None Remove="Resources\Icons\icons8-txt-48.png" />
+    <None Remove="Resources\Icons\icons8-undo-50.png" />
     <None Remove="Resources\Icons\icons8-xml-file-48.png" />
+    <None Remove="Resources\Icons\Kitbasher\camera_focus.png" />
+    <None Remove="Resources\Icons\Kitbasher\DeleteHistory.png" />
+    <None Remove="Resources\Icons\Kitbasher\Gizmo_move.png" />
+    <None Remove="Resources\Icons\Kitbasher\Gizmo_rotate.png" />
+    <None Remove="Resources\Icons\Kitbasher\Gizmo_scale.png" />
+    <None Remove="Resources\Icons\Kitbasher\icons8-save-all-50.png" />
+    <None Remove="Resources\Icons\Kitbasher\icons8-undo-50.png" />
+    <None Remove="Resources\Icons\Kitbasher\Open ref.png" />
+    <None Remove="Resources\Icons\Kitbasher\Open.png" />
+    <None Remove="Resources\Icons\Kitbasher\SelectionMode_face.png" />
+    <None Remove="Resources\Icons\Kitbasher\SelectionMode_object.png" />
+    <None Remove="Resources\Icons\Kitbasher\SelectionMode_Vertex.png" />
+    <None Remove="Resources\Icons\Kitbasher\tool_combine.png" />
+    <None Remove="Resources\Icons\Kitbasher\tool_delete.png" />
+    <None Remove="Resources\Icons\Kitbasher\tool_duplicate.png" />
+    <None Remove="Resources\Icons\Kitbasher\tool_freezeTransform.png" />
+    <None Remove="Resources\Icons\Kitbasher\tool_makeEditable.png" />
+    <None Remove="Resources\Icons\Kitbasher\tool_split.png" />
+    <None Remove="Resources\Icons\Kitbasher\Undo.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,39 +61,141 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Resources\Icons\icons8-3d-object-48.png">
+    <Resource Include="Resources\Icons\icons8-3d-object-48.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\icons8-animated-skeleton-40.png">
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-add-folder-50.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\icons8-audio-file-48.png">
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-animated-skeleton-40.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\icons8-collectibles-48.png">
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-animated-skeleton-50.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\icons8-database-48.png">
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-audio-file-48.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\icons8-file-48.png">
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-clear-symbol-48.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\icons8-folder-48.png">
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-collectibles-48.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\icons8-json-48.png">
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-database-48.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\icons8-question-mark-48.png">
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-documents-folder-50.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\icons8-txt-48.png">
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-file-48.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\icons8-xml-file-48.png">
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-file-explorer-50.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-folder-48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-folder-50.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-folder-tree-50.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-group-objects-50.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-json-48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-lock-50.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-man-50.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-mesh-50.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-mesh-50_2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-orthogonal-view-50.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-question-mark-48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-sugar-cube-100.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-sugar-cube-64.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-txt-48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-xml-file-48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\camera_focus.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\DeleteHistory.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\Gizmo_move.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\Gizmo_rotate.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\Gizmo_scale.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\icons8-save-all-50.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\icons8-undo-50.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\Open ref.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\Open.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\SelectionMode_face.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\SelectionMode_object.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\SelectionMode_Vertex.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\tool_combine.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\tool_delete.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\tool_duplicate.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\tool_freezeTransform.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\tool_makeEditable.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\tool_split.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\Undo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>
@@ -66,30 +204,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Resources\Icons\icons8-animated-skeleton-50.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Icons\icons8-folder-50.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Icons\icons8-group-objects-50.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Icons\icons8-lock-50.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Icons\icons8-man-50.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Icons\icons8-mesh-50.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Icons\icons8-orthogonal-view-50.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

@@ -21,12 +21,13 @@ namespace CommonControls.Resources
 
         public static void Load()
         {
-            string iconsFolder = @"Resources\Icons\";
+            string iconsFolder = @"pack://application:,,,/CommonControls;component/Resources/Icons/";
+
             FolderIcon = BitmapToImageSource(iconsFolder + "icons8-folder-48.png");
             FileIcon = BitmapToImageSource(iconsFolder + "icons8-file-48.png");
             CollectionIcon = BitmapToImageSource(iconsFolder + "icons8-collectibles-48.png");
             LockIcon = BitmapToImageSource(iconsFolder + "icons8-lock-50.png");
-
+            
             VmdIcon = BitmapToImageSource(iconsFolder + "icons8-man-50.png");
             Rmv2ModelIcon = BitmapToImageSource(iconsFolder + "icons8-orthogonal-view-50.png");
             MeshIcon = BitmapToImageSource(iconsFolder + "icons8-mesh-50.png");
@@ -35,19 +36,20 @@ namespace CommonControls.Resources
 
         static BitmapImage BitmapToImageSource(string path)
         {
-            var bitmap = Bitmap.FromFile(path);
-            using (MemoryStream memory = new MemoryStream())
-            {
-                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Png);
-                memory.Position = 0;
-                BitmapImage bitmapimage = new BitmapImage();
-                bitmapimage.BeginInit();
-                bitmapimage.StreamSource = memory;
-                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapimage.EndInit();
-
-                return bitmapimage;
-            }
+            return new BitmapImage(new Uri(path));
+            //var bitmap = Bitmap.FromFile(path);
+            //using (MemoryStream memory = new MemoryStream())
+            //{
+            //    bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Png);
+            //    memory.Position = 0;
+            //    BitmapImage bitmapimage = new BitmapImage();
+            //    bitmapimage.BeginInit();
+            //    bitmapimage.StreamSource = memory;
+            //    bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
+            //    bitmapimage.EndInit();
+            //
+            //    return bitmapimage;
+            //}
         }
 
     }

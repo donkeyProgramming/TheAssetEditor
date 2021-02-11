@@ -5,6 +5,27 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:KitbasherEditor.Views"
              mc:Ignorable="d" >
+
+
+    <UserControl.Resources>
+        <Style x:Key="VerticalSeparatorStyle" 
+       TargetType="{x:Type Separator}"
+       BasedOn="{StaticResource {x:Type Separator}}">
+            <Setter Property="Margin" Value="6,0,6,0"/>
+            <Setter Property="LayoutTransform">
+                <Setter.Value>
+                    <TransformGroup>
+                        <TransformGroup.Children>
+                            <TransformCollection>
+                                <RotateTransform Angle="90"/>
+                            </TransformCollection>
+                        </TransformGroup.Children>
+                    </TransformGroup>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </UserControl.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
@@ -47,5 +68,106 @@
             </MenuItem>
 
         </Menu>
+        <DockPanel>
+            <ToolBarTray DockPanel.Dock="Top">
+                <ToolBar IsOverflowOpen="False">
+                    <Button ToolTip="This is a tooltip">
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-save-all-50.png"/>
+                    </Button>
+
+                    <Button ToolTip="This is a tooltip">
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/open.png"/>
+                    </Button>
+
+                    <Button ToolTip="This is a tooltip">
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/open ref.png"/>
+                    </Button>
+
+
+                    <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
+
+                    <Button ToolTip="This is a tooltip">
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/undo.png"/>
+                    </Button>
+                    <Button ToolTip="This is a tooltip">
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/DeleteHistory.png"/>
+                    </Button>
+
+
+                    <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
+
+                    <Button ToolTip="This is a tooltip">
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/camera_focus.png"/>
+                    </Button>
+
+                    <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
+                    <RadioButton GroupName="gizmo" IsChecked="True">
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Gizmo_move.png"/>
+                    </RadioButton>
+                    <RadioButton GroupName="gizmo">
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Gizmo_rotate.png"/>
+                    </RadioButton>
+
+                    <RadioButton GroupName="gizmo">
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Gizmo_scale.png"/>
+                    </RadioButton>
+
+                    <TextBlock VerticalAlignment="Center">Pivot:</TextBlock>
+                    <ComboBox>
+                        <ComboBoxItem IsSelected="True" Content="Center"/>
+                        <ComboBoxItem Content="Root"/>
+                    </ComboBox>
+
+
+                    <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
+
+                    <TextBlock VerticalAlignment="Center">SelectionMode:</TextBlock>
+                    <ComboBox>
+                        <ComboBoxItem IsSelected="True">
+                            <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_object.png"/>
+                        </ComboBoxItem>
+                        <ComboBoxItem>
+                            <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_face.png"/>
+                        </ComboBoxItem>
+                        <ComboBoxItem >
+                            <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_Vertex.png"/>
+                        </ComboBoxItem>
+                    </ComboBox>
+
+                    <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
+
+                    <Button ToolTip="This is a tooltip">
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_split.png"/>
+                    </Button>
+
+                    <Button ToolTip="This is a tooltip">
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_combine.png"/>
+                    </Button>
+
+                    <Button ToolTip="This is a tooltip">
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_freezeTransform.png"/>
+                    </Button>
+
+                    <Button ToolTip="This is a tooltip">
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_duplicate.png"/>
+                    </Button>
+
+                    <Button ToolTip="This is a tooltip">
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_delete.png"/>
+                    </Button>
+
+
+
+                    <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
+                    <TextBlock VerticalAlignment="Center">RenderMode:</TextBlock>
+                    <ComboBox>
+                        <ComboBoxItem Content="Default" IsSelected="True"/>
+                    </ComboBox>
+
+
+
+                </ToolBar>
+            </ToolBarTray>
+        </DockPanel>
     </DockPanel>
 </UserControl>
