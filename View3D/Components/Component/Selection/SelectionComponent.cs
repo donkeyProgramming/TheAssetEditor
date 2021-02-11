@@ -108,11 +108,7 @@ namespace View3D.Components.Component.Selection
             {
                 if (GeometryIntersection.IntersectFaces(unprojectedSelectionRect, faceState.RenderObject.Geometry, faceState.RenderObject.ModelMatrix, out var faces))
                 {
-                    var faceSelectionCommand = new FaceSelectionCommand(_selectionManager)
-                    {
-                        IsModification = isSelectionModification,
-                        SelectedFaces = faces
-                    };
+                    var faceSelectionCommand = new FaceSelectionCommand(faces, isSelectionModification);
                     _commandManager.ExecuteCommand(faceSelectionCommand);
                     return;
                 }
@@ -121,16 +117,11 @@ namespace View3D.Components.Component.Selection
             {
                 if (GeometryIntersection.IntersectVertices(unprojectedSelectionRect, vertexState.RenderObject.Geometry, vertexState.RenderObject.ModelMatrix, out var vertices))
                 {
-                    var vertexSelectionCommand = new VertexSelectionCommand(_selectionManager)
-                    {
-                        IsModification = isSelectionModification,
-                        SelectedVertices = vertices
-                    };
+                    var vertexSelectionCommand = new VertexSelectionCommand(vertices, isSelectionModification);
                     _commandManager.ExecuteCommand(vertexSelectionCommand);
                     return;
                 }
             }
-
 
             var selectedObjects = _sceneManger.SelectObjects(unprojectedSelectionRect);
             if (selectedObjects.Count() == 0 && isSelectionModification == false)
@@ -165,11 +156,7 @@ namespace View3D.Components.Component.Selection
                     
                     if (GeometryIntersection.IntersectFace(ray, faceState.RenderObject.Geometry, faceState.RenderObject.ModelMatrix, out var selectedFace) != null)
                     {
-                        FaceSelectionCommand faceSelectionCommand = new FaceSelectionCommand(_selectionManager)
-                        {
-                            IsModification = isSelectionModification,
-                            SelectedFaces = new List<int>() { selectedFace.Value }
-                        };
+                        FaceSelectionCommand faceSelectionCommand = new FaceSelectionCommand(selectedFace.Value, isSelectionModification);
                         _commandManager.ExecuteCommand(faceSelectionCommand);
                         return;
                     }
@@ -203,7 +190,7 @@ namespace View3D.Components.Component.Selection
 
             if (_keyboardComponent.IsKeyReleased(Keys.F1) && _selectionManager.GetState().Mode != GeometrySelectionMode.Object)
             {
-                _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(selectionState.GetSingleSelectedObject(), _selectionManager, GeometrySelectionMode.Object));
+                _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(selectionState.GetSingleSelectedObject(), GeometrySelectionMode.Object));
                 return true;
             }
 
@@ -212,7 +199,7 @@ namespace View3D.Components.Component.Selection
                 var selectedObject = selectionState.GetSingleSelectedObject();
                 if (selectedObject != null)
                 {
-                    _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(selectedObject, _selectionManager, GeometrySelectionMode.Face));
+                    _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(selectedObject, GeometrySelectionMode.Face));
                     return true;
                 }
             }
@@ -222,7 +209,7 @@ namespace View3D.Components.Component.Selection
                 var selectedObject = selectionState.GetSingleSelectedObject();
                 if(selectedObject != null)
                 { 
-                    _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(selectedObject, _selectionManager, GeometrySelectionMode.Vertex));
+                    _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(selectedObject, GeometrySelectionMode.Vertex));
                     return true;
                 }
             }

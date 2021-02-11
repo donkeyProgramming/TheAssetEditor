@@ -1,4 +1,5 @@
 ﻿using Common;
+using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -10,26 +11,28 @@ using View3D.Rendering;
 
 namespace View3D.Commands.Object
 {
-    public class DuplicateObjectCommand : ICommand
+    public class DuplicateObjectCommand : CommandBase<DuplicateObjectCommand>
     {
-        ILogger _logger = Logging.Create<DeleteObjectsCommand>();
-
         List<SceneNode> _objectsToCopy;
         List<SceneNode> _clonedObjects = new List<SceneNode>();
         SceneManager _sceneManager;
         SelectionManager _selectionManager;
 
         ISelectionState _oldState;
-        public DuplicateObjectCommand(List<SceneNode> objectsToCopy, SceneManager sceneManager, SelectionManager selectionManager)
+        public DuplicateObjectCommand(List<SceneNode> objectsToCopy)
         {
             _objectsToCopy = new List<SceneNode>(objectsToCopy);
-            _sceneManager = sceneManager;
-            _selectionManager = selectionManager;
         }
 
-        public void Execute()
+        public override void Initialize(IComponentManager componentManager)
         {
-            _logger.Here().Information($"Executing DuplicateObjectCommand Items[{string.Join(',', _objectsToCopy.Select(x => x.Name))}]");
+            _sceneManager = componentManager.GetComponent<SceneManager>();
+            _selectionManager = componentManager.GetComponent<SelectionManager>();
+        }
+
+        protected override void ExecuteCommand()
+        {
+            _logger.Here().Information($"Command info - Items[{string.Join(',', _objectsToCopy.Select(x => x.Name))}]");
 
             _oldState = _selectionManager.GetStateCopy();
 
@@ -47,10 +50,8 @@ namespace View3D.Commands.Object
             }
         }
 
-        public void Undo()
+        protected override void UndoCommand()
         {
-            _logger.Here().Information($"Undoing DuplicateObjectCommand");
-
             foreach (var item in _clonedObjects)
                 item.Parent.RemoveObject(item);
 

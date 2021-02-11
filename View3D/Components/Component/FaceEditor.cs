@@ -41,22 +41,19 @@ namespace View3D.Components.Component
 
             if (_keyboard.IsKeyReleased(Keys.Delete))
             {
-                var x = faceSelectionState.CurrentSelection().Count()*3;
-                var y = faceSelectionState.RenderObject.Geometry.GetIndexCount();
+                var selectedFaceCount = faceSelectionState.CurrentSelection().Count()*3;
+                var totalObjectFaceCount = faceSelectionState.RenderObject.Geometry.GetIndexCount();
 
-                if (x == y)
+                if (selectedFaceCount == totalObjectFaceCount)
                 {
-                    var command = new DeleteObjectsCommand(new List<ISelectable>() { faceSelectionState.RenderObject }, _sceneManager, _selectionManager);
+                    var command = new DeleteObjectsCommand(new List<ISelectable>() { faceSelectionState.RenderObject });
                     _commandManager.ExecuteCommand(command);
                 }
                 else
                 {
-                    var command = new DeleteFaceCommand(_selectionManager);
-                    command.FacesToDelete = faceSelectionState.CurrentSelection();
+                    var command = new DeleteFaceCommand(faceSelectionState.RenderObject.Geometry, faceSelectionState.CurrentSelection());
                     _commandManager.ExecuteCommand(command);
                 }
-
-                
             }
             
         }

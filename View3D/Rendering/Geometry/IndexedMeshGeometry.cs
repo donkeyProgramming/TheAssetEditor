@@ -104,7 +104,7 @@ namespace View3D.Rendering.Geometry
             }
 
             RemoveUnusedVertexes(newIndexList);
-            BuildBoundingBox();
+           
         }
 
         public abstract void RemoveUnusedVertexes(ushort[] newIndexList);

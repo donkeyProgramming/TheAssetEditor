@@ -1,4 +1,5 @@
 ﻿using Common;
+using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -10,36 +11,40 @@ using View3D.Rendering.Geometry;
 namespace View3D.Commands.Face
 {
 
-    public class DeleteFaceCommand : ICommand
+    public class DeleteFaceCommand : CommandBase<DeleteFaceCommand>
     {
-        ILogger _logger = Logging.Create<FaceSelectionCommand>();
-        private readonly SelectionManager _selectionManager;
+        SelectionManager _selectionManager;
 
         ISelectionState _oldState;
         IGeometry _oldGeometry;
 
-        public List<int> FacesToDelete { get; set; }
+        List<int> _facesToDelete;
+        IGeometry _geo;
 
-        public DeleteFaceCommand(SelectionManager selectionManager)
+        public DeleteFaceCommand(IGeometry geoObject, List<int> facesToDelete)
         {
-            _selectionManager = selectionManager;
-            _oldState = _selectionManager.GetStateCopy();
+            _facesToDelete = facesToDelete;
+            _geo = geoObject;
         }
 
-        public void Execute()
+        public override void Initialize(IComponentManager componentManager)
         {
-            _logger.Here().Information($"Executing DeleteFaceCommand");
+            _selectionManager = componentManager.GetComponent<SelectionManager>();
+        }
+
+        protected override void ExecuteCommand()
+        {
+            _oldState = _selectionManager.GetStateCopy();
+
+            _oldGeometry = _geo.Clone();
+            _geo.RemoveFaces(_facesToDelete);
+
             var faceSelectionState = _selectionManager.GetState() as FaceSelectionState;
-
-            _oldGeometry = faceSelectionState.RenderObject.Geometry.Clone();
-
-            faceSelectionState.RenderObject.Geometry.RemoveFaces(FacesToDelete);
             faceSelectionState.Clear();
         }
 
-        public void Undo()
+        protected override void UndoCommand()
         {
-            _logger.Here().Information($"Undoing DeleteFaceCommand");
             _selectionManager.SetState(_oldState);
             var faceSelectionState = _selectionManager.GetState() as FaceSelectionState;
             faceSelectionState.RenderObject.Geometry = _oldGeometry;

@@ -26,8 +26,16 @@ namespace View3D.Components.Input
             UpdateOrder = (int)ComponentUpdateOrderEnum.Input;
         }
 
+        public void Reset()
+        {
+            _currentKeyboardState = _wpfKeyboard.GetState();
+            _lastKeyboardState = _wpfKeyboard.GetState();
+        }
+
         public override void Update(GameTime t)
         {
+            
+
             var keyboardState = _wpfKeyboard.GetState();
 
             _lastKeyboardState = _currentKeyboardState;
@@ -50,10 +58,10 @@ namespace View3D.Components.Input
             return currentUp && lastDown;
         }
 
-        public bool IsKeyComboReleased(Keys key, Keys modificationKey)
+        public bool IsKeyComboReleased(Keys key, Keys modificationKey, bool consumeIfTrue = true)
         {
-            return (IsKeyReleased(key) && IsKeyDownOrReleased(modificationKey)) ||
-                   (IsKeyDownOrReleased(key) && IsKeyReleased(modificationKey));
+            var value = (IsKeyReleased(key) && IsKeyDownOrReleased(modificationKey));
+            return value;
         }
 
         public bool IsKeyDown(Keys key)

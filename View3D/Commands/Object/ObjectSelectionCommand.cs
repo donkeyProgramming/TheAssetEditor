@@ -9,9 +9,8 @@ using View3D.Scene;
 
 namespace View3D.Commands.Object
 {
-    public class ObjectSelectionCommand : ICommand
+    public class ObjectSelectionCommand : CommandBase<ObjectSelectionCommand>
     {
-        ILogger _logger = Logging.Create<ObjectSelectionCommand>();
         private readonly SelectionManager _selectionManager;
         public List<ISelectable> Items { get; set; } = new List<ISelectable>();
         public bool IsModification { get; set; } = false;
@@ -25,9 +24,9 @@ namespace View3D.Commands.Object
             _oldState = _selectionManager.GetStateCopy();
         }
 
-        public void Execute()
+        protected override void ExecuteCommand()
         {
-            _logger.Here().Information($"Executing SelectionCommand Clear[{ClearSelection}] Mod[{IsModification}] Items[{string.Join(',', Items.Select(x=>x.Name))}]");
+            _logger.Here().Information($"Command info - Clear[{ClearSelection}] Mod[{IsModification}] Items[{string.Join(',', Items.Select(x=>x.Name))}]");
 
             if (ClearSelection)
             {
@@ -48,9 +47,8 @@ namespace View3D.Commands.Object
             }
         }
 
-        public void Undo()
+        protected override void UndoCommand()
         {
-            _logger.Here().Information($"Undoing SelectionCommand");
             _selectionManager.SetState(_oldState);
         }
     }

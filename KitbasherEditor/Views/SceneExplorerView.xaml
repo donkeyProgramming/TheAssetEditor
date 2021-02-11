@@ -10,9 +10,6 @@
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
              xmlns:valueconverters="clr-namespace:KitbasherEditor.ValueConverters"
              xmlns:resources="clr-namespace:CommonControls.Resources;assembly=CommonControls"
-             
-             
-             
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -23,13 +20,8 @@
 
             <valueconverters:SceneNodeToImageConverter x:Key="ImageValueConverter"/>
             <valueconverters:SceneNodeToRadioButtonGroupingConverter x:Key="RadioButtonGroupConverter"/>
-
+            <valueconverters:SceneNodeContextMenuEnabledConverter x:Key="ContextMenuEnabledConverter"/>
             <local:TreeItemDataTemplateSelector x:Key="TreeItemDataTemplateSelector"/>
-
-            <Style x:Key="TreeViewItemStyle" TargetType="{x:Type TreeViewItem}">
-                <Setter Property="IsExpanded" Value="{Binding IsExpanded, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" />
-                <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
-            </Style>
 
             <HierarchicalDataTemplate x:Key="DefaultTreeNodeStyle" ItemsSource="{Binding Children, UpdateSourceTrigger=PropertyChanged}">
                 <StackPanel Orientation="Horizontal">
@@ -57,18 +49,45 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-
-
-
     <DockPanel>
         <TreeView 
-          TreeViewItem.PreviewMouseDoubleClick="TreeViewItem_PreviewMouseDoubleClick"
-          ItemContainerStyle="{StaticResource TreeViewItemStyle}"
-          ItemsSource="{Binding Path=SceneGraphRootNodes, UpdateSourceTrigger=PropertyChanged}"
-          ItemTemplateSelector="{StaticResource TreeItemDataTemplateSelector}">
+           behaviors:TreeViewExtension.SelectItemOnRightClick="True"
+           TreeViewItem.PreviewMouseDoubleClick="TreeViewItem_PreviewMouseDoubleClick"
+           ItemsSource="{Binding Path=SceneGraphRootNodes, UpdateSourceTrigger=PropertyChanged}"
+           ItemTemplateSelector="{StaticResource TreeItemDataTemplateSelector}">
+            
             <b:Interaction.Behaviors>
                 <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedNode, Mode=TwoWay}" />
             </b:Interaction.Behaviors>
+            
+            <TreeView.Resources>
+                <ContextMenu x:Key="NodeContextMenu">
+                    <MenuItem Header="Remove"
+                               Command="{Binding DataContext.DeleteNodeCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
+                               CommandParameter="{Binding}"
+                              
+                               IsEnabled="{Binding Path=., 
+                               Converter={StaticResource ContextMenuEnabledConverter}, 
+                               ConverterParameter={x:Static valueconverters:NodeConvertionMode.DeleteNode}}"/>
+                    
+                    <MenuItem Header="Make editable"
+                               Command="{Binding DataContext.MakeNodeEditableCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
+                               CommandParameter="{Binding}"
+                              
+                               IsEnabled="{Binding Path=., 
+                               Converter={StaticResource ContextMenuEnabledConverter}, 
+                               ConverterParameter={x:Static valueconverters:NodeConvertionMode.MakeEditable}}"/>
+                </ContextMenu>
+            </TreeView.Resources>
+
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" />
+                    <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
+                    <Setter Property="ContextMenu" Value="{StaticResource NodeContextMenu}"/>
+                </Style>
+            </TreeView.ItemContainerStyle>
+
 
         </TreeView>
     </DockPanel>

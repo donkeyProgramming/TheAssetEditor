@@ -7,22 +7,15 @@
              mc:Ignorable="d" >
     <DockPanel>
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File" IsEnabled="False">
+            <MenuItem Header="_File">
                 <MenuItem Header="Import"  />
                 <MenuItem Header="Import reference"/>
                 <Separator/>
-                <MenuItem Header="Save"/>
-                <MenuItem Header="Save as"/>
+                <MenuItem Header="Save"  IsEnabled="False"/>
+                <MenuItem Header="Save as"  IsEnabled="False"/>
             </MenuItem>
 
             <MenuItem Header="Mode" IsEnabled="False">
-                <MenuItem Header="Active Lod">
-                    <MenuItem Header="1 - Higest"/>
-                    <MenuItem Header="2 "/>
-                    <MenuItem Header="3 "/>
-                    <MenuItem Header="4 - Lowest"/>
-                    <MenuItem Header="5 - Imposter"/>
-                </MenuItem>
                 <MenuItem Header="Edit"  />
                 <MenuItem Header="Animate"/>
             </MenuItem>
@@ -41,8 +34,8 @@
 
             <MenuItem Header="Tools" IsEnabled="False">
                 <MenuItem Header="Break selection into logical objects"  />
-                <MenuItem Header="Freeze transform"  />
                 <MenuItem Header="Combine"/>
+                <MenuItem Header="Freeze transform"  />
                 <MenuItem Header="Duplicate selection"/>
                 <MenuItem Header="Gizmo Pivot mode">
                     <MenuItem Header="Pivot"/>

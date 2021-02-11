@@ -136,6 +136,8 @@ namespace View3D.Rendering.Geometry
             _vertexArray = newVertexList.ToArray();
             _vertexBuffer = new VertexBuffer(_device, _vertexDeclaration, _vertexArray.Length, BufferUsage.None);
             _vertexBuffer.SetData(_vertexArray);
+
+            BuildBoundingBox();
         }
     }
 }

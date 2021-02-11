@@ -9,10 +9,8 @@ using View3D.Rendering;
 
 namespace View3D.Commands
 {
-    class TransformCommand : ICommand
+    class TransformCommand : CommandBase<TransformCommand>
     {
-        ILogger _logger = Logging.Create<TransformCommand>();
-
         class TransformCopy
         {
             public TransformCopy(ITransformable item)
@@ -27,9 +25,9 @@ namespace View3D.Commands
             public Quaternion Orientation { get; set; }
         }
 
-
         List<ITransformable> _items;
         Dictionary<ITransformable, TransformCopy> _originalTransforms;
+
         public TransformCommand(List<ITransformable> items)
         {
             _items = new List<ITransformable>();
@@ -43,16 +41,13 @@ namespace View3D.Commands
         }
 
 
-        public void Execute()
+        protected override void ExecuteCommand()
         {
             // Not much to do, the transform is alreay applied 
-            _logger.Here().Information($"Executing TransformCommand");
         }
 
-        public void Undo()
+        protected override void UndoCommand()
         {
-            _logger.Here().Information($"Undoing TransformCommand");
-
             foreach (var item in _items)
             {
                 item.Position = _originalTransforms[item].Position;

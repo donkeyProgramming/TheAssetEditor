@@ -191,7 +191,7 @@ namespace View3D.Scene
 
                 effect.Parameters["View"].SetValue(commonShaderParameters.View);
                 effect.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
-                effect.Parameters["World"].SetValue(Matrix.CreateScale(1.05f) * ModelMatrix);
+                effect.Parameters["World"].SetValue(ModelMatrix);
 
                 foreach (var pass in effect.CurrentTechnique.Passes)
                 {

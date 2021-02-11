@@ -1,11 +1,15 @@
 ﻿
 using Common;
+using GalaSoft.MvvmLight.Command;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Windows.Input;
+using View3D.Commands.Object;
 using View3D.Components.Component;
+using View3D.Components.Component.Selection;
 using View3D.Scene;
 
 namespace KitbasherEditor.ViewModels
@@ -24,18 +28,67 @@ namespace KitbasherEditor.ViewModels
 
         SceneContainer _sceneContainer;
         SceneManager _sceneManager;
+        SelectionManager _selectionManager;
+        CommandExecutor _commandExecutor;
 
+        public ICommand MakeNodeEditableCommand { get; set; }
+        public ICommand DeleteNodeCommand { get; set; }
+
+
+        public Rmv2ModelNode EditableMeshNode { get; set; }
+        
         public SceneExplorerViewModel(SceneContainer sceneContainer)
         {
             _selectedLodLvl = LodItem.GetAll.First();
 
             _sceneContainer = sceneContainer;
             _sceneManager = _sceneContainer.GetComponent<SceneManager>();
+            _selectionManager = _sceneContainer.GetComponent<SelectionManager>();
+            _commandExecutor = sceneContainer.GetComponent<CommandExecutor>();
 
             SceneGraphRootNodes.Add(_sceneManager.RootNode);
 
             _sceneManager.SceneObjectAdded += (a, b) => RebuildTree();
             _sceneManager.SceneObjectRemoved += (a, b) => RebuildTree();
+
+            MakeNodeEditableCommand = new RelayCommand<SceneNode>(MakeNodeEditable);
+            DeleteNodeCommand = new RelayCommand<SceneNode>(DeleteNode);
+        }
+
+        void MakeNodeEditable(SceneNode node)
+        {
+            if (node is MeshNode meshNode)
+            {
+                EditableMeshNode.Children[SelectedLodLevel.Value].AddObject(meshNode);
+            }
+
+            if (node is Rmv2LodNode lodNode)
+            {
+                var index = lodNode.LodValue;
+                foreach(var lodModel in lodNode.Children)
+                    EditableMeshNode.Children[index].AddObject(lodModel);
+            }
+
+            if (node is Rmv2ModelNode modelNode)
+            {
+                foreach (var lodChild in modelNode.Children)
+                {
+                    if (lodChild is Rmv2LodNode lodNode0)
+                    {
+                        var index = lodNode0.LodValue;
+                        foreach (var lodModel in lodNode0.Children)
+                            EditableMeshNode.Children[index].AddObject(lodModel);
+                    }
+                }
+            }
+            node.Parent.RemoveObject(node);
+            node.ForeachNode(x => x.IsEditable = true);
+        }
+
+        void DeleteNode(SceneNode node)
+        {
+            var deleteCommand = new DeleteObjectsCommand(node);
+            _commandExecutor.ExecuteCommand(deleteCommand);
         }
 
         private void RebuildTree()
@@ -57,7 +110,7 @@ namespace KitbasherEditor.ViewModels
     }
 
 
-
+    
     public class LodItem
     { 
         public string Name { get; set; }

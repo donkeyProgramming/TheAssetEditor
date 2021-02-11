@@ -7,10 +7,18 @@ namespace MonoGame.Framework.WpfInterop
 {
     public delegate void SceneInitializedDelegate(WpfGame scene);
 
+
+    public interface IComponentManager
+    {
+        public T GetComponent<T>() where T : IGameComponent;
+    }
+
+
+
     /// <summary>
     /// The replacement for <see cref="Game"/>. Unlike <see cref="Game"/> the <see cref="WpfGame"/> is a WPF control and can be hosted inside WPF windows.
     /// </summary>
-    public abstract class WpfGame : D3D11Host
+    public abstract class WpfGame : D3D11Host, IComponentManager
     {
         public event SceneInitializedDelegate SceneInitialized;
         private readonly string _contentDir;

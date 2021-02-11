@@ -1,4 +1,5 @@
 ﻿using Common;
+using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System.Collections.Generic;
 using View3D.Components.Component;
@@ -8,38 +9,48 @@ using View3D.Scene;
 
 namespace View3D.Commands.Face
 {
-    public class FaceSelectionCommand : ICommand
+    public class FaceSelectionCommand : CommandBase<FaceSelectionCommand>
     {
-        ILogger _logger = Logging.Create<FaceSelectionCommand>();
-        private readonly SelectionManager _selectionManager;
+        SelectionManager _selectionManager;
 
         ISelectionState _oldState;
-        public bool IsModification { get; set; } = false;
-        public List<int> SelectedFaces { get; set; }
+        bool _isModification;
+        List<int> _selectedFaces;
 
-        public FaceSelectionCommand(SelectionManager selectionManager)
+        public FaceSelectionCommand(List<int> selectedFaces, bool isModification = false)
         {
-            _selectionManager = selectionManager;
-            _oldState = _selectionManager.GetStateCopy();
+            _selectedFaces = selectedFaces;
+            _isModification = isModification;
         }
 
-        public void Execute()
+        public FaceSelectionCommand(int selectedFace, bool isModification = false)
         {
-            var currentState = _selectionManager.GetState() as FaceSelectionState;
-            _logger.Here().Information($"Executing FaceSelectionCommand Mod[{IsModification}] Item[{currentState.RenderObject.Name}] faces[{SelectedFaces.Count}]");
+            _selectedFaces = new List<int>() { selectedFace };
+            _isModification = isModification;
+        }
 
-            if (!IsModification)
+        public override void Initialize(IComponentManager componentManager)
+        {
+            _selectionManager = componentManager.GetComponent<SelectionManager>();
+        }
+
+        protected override void ExecuteCommand()
+        {
+            _oldState = _selectionManager.GetStateCopy();
+            var currentState = _selectionManager.GetState() as FaceSelectionState;
+            _logger.Here().Information($"Command info - Mod[{_isModification}] Item[{currentState.RenderObject.Name}] faces[{_selectedFaces.Count}]");
+
+            if (!_isModification)
                 currentState.Clear();
 
-            foreach (var newSelectionItem in SelectedFaces)
+            foreach (var newSelectionItem in _selectedFaces)
                 currentState.ModifySelection(newSelectionItem);
 
             currentState.EnsureSorted();
         }
 
-        public void Undo()
+        protected override void UndoCommand()
         {
-            _logger.Here().Information($"Undoing FaceSelectionCommand");
             _selectionManager.SetState(_oldState);
         }
     }

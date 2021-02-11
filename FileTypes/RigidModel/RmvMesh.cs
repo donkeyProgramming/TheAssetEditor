@@ -82,11 +82,7 @@ namespace Filetypes.RigidModel
 
         UknownData _uknownData;
 
-
-        public VertexFormat VertextType
-        {
-            get => (VertexFormat)_vertexType;
-        }
+        public VertexFormat VertextType { get => (VertexFormat)_vertexType; }
 
         public string ModelName
         {
@@ -221,17 +217,13 @@ namespace Filetypes.RigidModel
         int _modelStart;
 
         public RmvSubModelHeader Header { get; private set; }
-
         public List<RmvAttachmentPoint> AttachmentPoints;
         public List<RmvTexture> Textures;
-
         public RmvMesh Mesh { get; private set; }
-
 
         public RmvSubModel(byte[] dataArray, int offset)
         {
             _modelStart = offset;
-     
 
             Header = LoadHeader(dataArray);
             AttachmentPoints = LoadAttachmentPoints(dataArray);
@@ -275,22 +267,13 @@ namespace Filetypes.RigidModel
             return textures;
         }
 
-
         RmvMesh LoadMesh(byte[] dataArray)
         {
             var vertexStart =  Header.VertexOffset + _modelStart; 
             var faceStart = Header.FaceOffset + _modelStart;
-            /*
-            var s0 = ByteHelper.GetSize(typeof(RmvMeshHeader));
-            var s1 = ByteHelper.GetSize(typeof(RmvTexture)) * Header.TextureCount;
-            var s2 = ByteHelper.GetSize(typeof(RmvAttachmentPoint)) *Header.AttachmentPointCount;
-            */
             return new RmvMesh(dataArray, Header.VertextType, (int)vertexStart, Header.VertexCount, (int)faceStart, Header.FaceCount);
         }
     }
-
-
-
 
     class ByteHelper
     {

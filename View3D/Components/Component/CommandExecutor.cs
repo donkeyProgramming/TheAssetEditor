@@ -1,5 +1,8 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using Common;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,6 +15,7 @@ namespace View3D.Components.Component
 {
     public class CommandExecutor : BaseComponent
     {
+        ILogger _logger = Logging.Create<CommandExecutor>();
         KeyboardComponent _keyboard;
         Stack<ICommand> _commands = new Stack<ICommand>();
 
@@ -35,6 +39,7 @@ namespace View3D.Components.Component
         public void ExecuteCommand(ICommand command)
         {
             _commands.Push(command);
+            command.Initialize(Game);
             command.Execute();
         }
 

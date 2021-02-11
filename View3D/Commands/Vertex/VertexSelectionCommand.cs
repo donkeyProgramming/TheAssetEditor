@@ -1,4 +1,5 @@
 ﻿using Common;
+using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System.Collections.Generic;
 using View3D.Components.Component;
@@ -8,43 +9,43 @@ using View3D.Scene;
 
 namespace View3D.Commands.Vertex
 {
-    public class VertexSelectionCommand : ICommand
+    public class VertexSelectionCommand : CommandBase<VertexSelectionCommand>
     {
-        ILogger _logger = Logging.Create<VertexSelectionCommand>();
-        private readonly SelectionManager _selectionManager;
-
+        SelectionManager _selectionManager;
         ISelectionState _oldState;
-        public bool IsModification { get; set; } = false;
-        public List<int> SelectedVertices { get; set; }
 
-        public VertexSelectionCommand(SelectionManager selectionManager)
+        bool _isModification;
+        List<int> _selectedVertices;
+
+        public VertexSelectionCommand(List<int> selectedVertices, bool isModification)
         {
-            _selectionManager = selectionManager;
+            _selectedVertices = selectedVertices;
+            _isModification = isModification;
+        }
+
+        public override void Initialize(IComponentManager componentManager)
+        {
+            _selectionManager = componentManager.GetComponent<SelectionManager>();
+        }
+
+
+        protected override void ExecuteCommand()
+        {
             _oldState = _selectionManager.GetStateCopy();
-        }
-
-        public void Cancel()
-        {
-            Undo();
-        }
-
-        public void Execute()
-        {
             var currentState = _selectionManager.GetState() as VertexSelectionState;
-            _logger.Here().Information($"Executing VertexSelectionCommand Mod[{IsModification}] Item[{currentState.RenderObject.Name}] Vertices[{SelectedVertices.Count}]");
+            _logger.Here().Information($"Command info - Mod[{_isModification}] Item[{currentState.RenderObject.Name}] Vertices[{_selectedVertices.Count}]");
 
-            if (!IsModification)
+            if (!_isModification)
                 currentState.Clear();
 
-            foreach (var newSelectionItem in SelectedVertices)
+            foreach (var newSelectionItem in _selectedVertices)
                 currentState.ModifySelection(newSelectionItem);
 
             currentState.EnsureSorted();
         }
 
-        public void Undo()
+        protected override void UndoCommand()
         {
-            _logger.Here().Information($"Undoing VertexSelectionCommand");
             _selectionManager.SetState(_oldState);
         }
     }

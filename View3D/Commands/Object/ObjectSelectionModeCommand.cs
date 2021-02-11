@@ -1,4 +1,5 @@
 ﻿using Common;
+using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -11,29 +12,33 @@ using View3D.Rendering;
 namespace View3D.Commands.Object
 {
 
-    public class ObjectSelectionModeCommand : ICommand
+    public class ObjectSelectionModeCommand : CommandBase<ObjectSelectionModeCommand>
     {
-        ILogger _logger = Logging.Create<ObjectSelectionModeCommand>();
-        private readonly SelectionManager _selectionManager;
+        SelectionManager _selectionManager;
+
         GeometrySelectionMode _newMode;
         ISelectable _selectedItem;
         ISelectionState _oldState;
 
-        public ObjectSelectionModeCommand(SelectionManager selectionManager, GeometrySelectionMode newMode)
+        public ObjectSelectionModeCommand(GeometrySelectionMode newMode)
         {
             _newMode = newMode;
-            _selectionManager = selectionManager;
-            _oldState = _selectionManager.GetStateCopy();
+           
         }
 
-        public ObjectSelectionModeCommand(ISelectable selectedItem, SelectionManager selectionManager, GeometrySelectionMode newMode) : this(selectionManager, newMode)
+        public ObjectSelectionModeCommand(ISelectable selectedItem, GeometrySelectionMode newMode) : this(newMode)
         {
             _selectedItem = selectedItem;
         }
 
-        public void Execute()
+        public override void Initialize(IComponentManager componentManager)
         {
-            _logger.Here().Information($"Executing ObjectSelectionModeCommand");
+            _selectionManager = componentManager.GetComponent<SelectionManager>();
+        }
+
+        protected override void ExecuteCommand()
+        {
+            _oldState = _selectionManager.GetStateCopy();
             var newSelectionState = _selectionManager.CreateSelectionSate(_newMode);
 
             if (newSelectionState.Mode == GeometrySelectionMode.Object && _selectedItem != null)
@@ -44,9 +49,8 @@ namespace View3D.Commands.Object
                 (newSelectionState as VertexSelectionState).RenderObject = _selectedItem;
         }
 
-        public void Undo()
+        protected override void UndoCommand()
         {
-            _logger.Here().Information($"Undoing ObjectSelectionModeCommand");
             _selectionManager.SetState(_oldState);
         }
     }

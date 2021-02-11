@@ -278,7 +278,8 @@ namespace View3D.Components.Component
 
     public class Rmv2LodNode : GroupNode
     {
-        public Rmv2LodNode(string name) : base(name) { }
+        public Rmv2LodNode(string name, int lodIndex) : base(name) { LodValue = lodIndex; }
+        public int LodValue { get; set; }
     }
 
     public class Rmv2ModelNode: GroupNode
@@ -289,7 +290,7 @@ namespace View3D.Components.Component
 
             for (int lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
             {
-                var lodNode = new Rmv2LodNode("Lod " + lodIndex);
+                var lodNode = new Rmv2LodNode("Lod " + lodIndex, lodIndex);
 
                 for (int modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
                 {
@@ -310,7 +311,7 @@ namespace View3D.Components.Component
 
             for (int lodIndex = 0; lodIndex < 4; lodIndex++)
             {
-                var lodNode = new Rmv2LodNode("Lod " + lodIndex);
+                var lodNode = new Rmv2LodNode("Lod " + lodIndex, lodIndex);
                 lodNode.IsVisible = lodIndex == 0;
                 AddObject(lodNode);
             }

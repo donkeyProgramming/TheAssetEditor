@@ -29,7 +29,7 @@ namespace KitbasherEditor.Views
         {
             var treeView = sender as TreeView;
             if (treeView.SelectedItem is SceneNode item)
-                item.IsVisible = !item.IsVisible;
+                item.IsExpanded = !item.IsExpanded;
             e.Handled = true;
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Common;
+using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -10,36 +11,40 @@ using View3D.Rendering;
 
 namespace View3D.Commands.Object
 {
-    public class DeleteObjectsCommand : ICommand
+    public class DeleteObjectsCommand : CommandBase<DeleteObjectsCommand>
     {
-        ILogger _logger = Logging.Create<DeleteObjectsCommand>();
-
         List<SceneNode> _itemsToDelete;
-        SceneManager _sceneManager;
         SelectionManager _selectionManager;
-
         ISelectionState _oldState;
-        public DeleteObjectsCommand(List<ISelectable> itemsToDelete, SceneManager sceneManager, SelectionManager selectionManager)
+
+        public DeleteObjectsCommand(List<ISelectable> itemsToDelete)
         {
             _itemsToDelete = new List<SceneNode>(itemsToDelete.Select(x=>x as SceneNode));
-            _sceneManager = sceneManager;
-            _selectionManager = selectionManager;
         }
 
-        public void Execute()
+        public DeleteObjectsCommand(SceneNode itemToDelete)
+        {
+            _itemsToDelete = new List<SceneNode>() { itemToDelete };
+        }
+
+        public override void Initialize(IComponentManager componentManager)
+        {
+            _selectionManager = componentManager.GetComponent<SelectionManager>();
+        }
+
+        protected override void ExecuteCommand()
         {
             _oldState = _selectionManager.GetStateCopy();
 
-           _logger.Here().Information($"Executing DeleteObjectsCommand Items[{string.Join(',', _itemsToDelete.Select(x => x.Name))}]");
+           _logger.Here().Information($"Command info - Items[{string.Join(',', _itemsToDelete.Select(x => x.Name))}]");
             foreach (var item in _itemsToDelete)
                 item.Parent.RemoveObject(item);
 
             _selectionManager.CreateSelectionSate(GeometrySelectionMode.Object);
         }
 
-        public void Undo()
+        protected override void UndoCommand()
         {
-            _logger.Here().Information($"Undoing DeleteObjectsCommand");
             foreach (var item in _itemsToDelete)
                 item.Parent.AddObject(item);
 
