@@ -76,6 +76,10 @@
                     </Button>
 
                     <Button ToolTip="This is a tooltip">
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Validate.png"/>
+                    </Button>
+
+                    <Button ToolTip="This is a tooltip">
                         <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/open.png"/>
                     </Button>
 
@@ -97,7 +101,7 @@
                     <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
 
                     <Button ToolTip="This is a tooltip">
-                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/camera_focus.png"/>
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Camera_Focus.png"/>
                     </Button>
 
                     <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
@@ -112,16 +116,23 @@
                         <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Gizmo_scale.png"/>
                     </RadioButton>
 
+                    <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
+                    
+                    <Button ToolTip="This is a tooltip">
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SnapVertex.png"/>
+                    </Button>
+
                     <TextBlock VerticalAlignment="Center">Pivot:</TextBlock>
                     <ComboBox>
                         <ComboBoxItem IsSelected="True" Content="Center"/>
                         <ComboBoxItem Content="Root"/>
                     </ComboBox>
 
+                  
 
                     <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
 
-                    <TextBlock VerticalAlignment="Center">SelectionMode:</TextBlock>
+                    <TextBlock VerticalAlignment="Center">Selection:</TextBlock>
                     <ComboBox>
                         <ComboBoxItem IsSelected="True">
                             <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_object.png"/>
@@ -154,6 +165,10 @@
 
                     <Button ToolTip="This is a tooltip">
                         <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_delete.png"/>
+                    </Button>
+
+                    <Button ToolTip="This is a tooltip">
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_mergeVertex.png"/>
                     </Button>
 
 
