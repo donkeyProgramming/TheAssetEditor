@@ -179,16 +179,6 @@ namespace View3D.Components.Gizmo
 
             _gizmo.UpdateCameraProperties();
 
-            // Toggle transform mode:
-            if (_keyboard.IsKeyReleased(Keys.R))
-                _gizmo.ActiveMode = GizmoMode.Rotate;
-
-            if (_keyboard.IsKeyReleased(Keys.T))
-                _gizmo.ActiveMode = GizmoMode.Translate;
-
-            if (_keyboard.IsKeyReleased(Keys.Y))
-                _gizmo.ActiveMode = GizmoMode.UniformScale;
-
             // Toggle space mode:
             if (_keyboard.IsKeyReleased(Keys.Home))
                 _gizmo.ToggleActiveSpace();
@@ -196,6 +186,11 @@ namespace View3D.Components.Gizmo
             // Workaround for camera roation causing movment
             if (!_keyboard.IsKeyDown(Keys.LeftAlt))
                 _gizmo.Update(gameTime);
+        }
+
+        public void SetGizmoMode(GizmoMode mode)
+        {
+            _gizmo.ActiveMode = mode;
         }
 
         public override void Draw(GameTime gameTime)

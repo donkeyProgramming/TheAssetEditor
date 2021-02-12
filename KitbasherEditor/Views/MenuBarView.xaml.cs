@@ -1,4 +1,6 @@
-﻿using System;
+﻿using KitbasherEditor.ViewModels;
+using KitbasherEditor.ViewModels.MenuBarViews;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
@@ -21,6 +23,22 @@ namespace KitbasherEditor.Views
         public MenuBarView()
         {
             InitializeComponent();
+        }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+           var window = Window.GetWindow(this);
+           window.KeyUp += HandleKeyPress;
+        }
+
+        private void HandleKeyPress(object sender, KeyEventArgs e)
+        {
+            if (DataContext is IKeyboardHandler keyboardHandler)
+            {
+                var res = keyboardHandler.HandleKeyUp(e.Key, Keyboard.Modifiers);
+                if (res)
+                    e.Handled = true;
+            }
         }
     }
 }

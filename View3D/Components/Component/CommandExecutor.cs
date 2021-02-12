@@ -13,27 +13,17 @@ using View3D.Scene;
 
 namespace View3D.Components.Component
 {
+    public delegate void CommandStackChangedDelegate();
     public class CommandExecutor : BaseComponent
     {
         ILogger _logger = Logging.Create<CommandExecutor>();
-        KeyboardComponent _keyboard;
         Stack<ICommand> _commands = new Stack<ICommand>();
+
+
+        public event CommandStackChangedDelegate CommandStackChanged;
 
         public CommandExecutor(WpfGame game) : base(game)
         {
-        }
-
-        public override void Initialize()
-        {
-            _keyboard = GetComponent<KeyboardComponent>();
-            _keyboard.KeybordButtonReleased += OnUndoCommand;
-            base.Initialize();
-        }
-
-        private void OnUndoCommand(Keys key)
-        {
-            if (_keyboard.IsKeyComboReleased(Keys.Z, Keys.LeftControl))
-                Undo();
         }
 
         public void ExecuteCommand(ICommand command)
@@ -41,14 +31,31 @@ namespace View3D.Components.Component
             _commands.Push(command);
             command.Initialize(Game);
             command.Execute();
+
+            CommandStackChanged?.Invoke();
+        }
+
+        public string GetUndoHint()
+        {
+            if (!CanUndo())
+                return "No items to undo";
+
+            var obj = _commands.Peek();
+            return obj.GetType().Name;
+        }
+
+        public bool CanUndo()
+        {
+            return _commands.Count != 0;
         }
 
         public void Undo()
         {
-            if (_commands.Count != 0)
+            if (CanUndo())
             {
                 var command = _commands.Pop();
                 command.Undo();
+                CommandStackChanged?.Invoke();
             }
         }
     }

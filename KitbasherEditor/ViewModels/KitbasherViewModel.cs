@@ -2,6 +2,7 @@
 using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
 using FileTypes.PackFiles.Services;
+using KitbasherEditor.ViewModels.MenuBarViews;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
@@ -28,6 +29,7 @@ namespace KitbasherEditor.ViewModels
 
         public SceneContainer Scene { get; set; }
         public SceneExplorerViewModel SceneExplorer { get; set; }
+        public MenuBarViewModel MenuBar { get; set; } 
 
         string _displayName = "3d viewer";
         public string DisplayName { get => _displayName; set => SetAndNotify(ref _displayName, value); }
@@ -68,6 +70,8 @@ namespace KitbasherEditor.ViewModels
 
             SceneExplorer = new SceneExplorerViewModel(Scene);
             Scene.Components.Add(SceneExplorer as IEditableMeshResolver);
+
+            MenuBar = new MenuBarViewModel(Scene);
 
             Scene.SceneInitialized += OnSceneInitialized;
         }

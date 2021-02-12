@@ -17,32 +17,25 @@ namespace View3D.Components.Component.Selection
         ILogger _logger = Logging.Create<FocusSelectableObjectComponent>();
 
         SelectionManager _selectionManager;
-        KeyboardComponent _keyboard;
         ArcBallCamera _archballCamera;
         SceneManager _sceneManager;
-
-
 
         public FocusSelectableObjectComponent(WpfGame game) : base(game) { }
 
         public override void Initialize()
         {
             _selectionManager = GetComponent<SelectionManager>();
-            _keyboard = GetComponent<KeyboardComponent>();
             _archballCamera = GetComponent<ArcBallCamera>();
             _sceneManager = GetComponent<SceneManager>();
 
             base.Initialize();
         }
 
-        public override void Update(GameTime gameTime)
+
+        public void FocusSelection()
         {
-            if (_keyboard.IsKeyComboReleased(Keys.F, Keys.LeftControl))
-                Focus(_selectionManager.GetState().SelectedObjects());
-
-            base.Update(gameTime);
+            Focus(_selectionManager.GetState().SelectedObjects());
         }
-
 
         void Focus(IEnumerable<ISelectable> items)
         {
@@ -63,6 +56,11 @@ namespace View3D.Components.Component.Selection
                 finalPos += corner;
 
             return finalPos / corners.Length;
+        }
+
+        public void ResetCamera()
+        {
+            throw new NotImplementedException();
         }
     }
 }

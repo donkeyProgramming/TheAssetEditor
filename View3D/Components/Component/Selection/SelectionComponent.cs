@@ -184,17 +184,21 @@ namespace View3D.Components.Component.Selection
             }
         }
 
-        bool ChangeSelectionMode()
+        public bool SetObjectSelectionMode()
         {
             var selectionState = _selectionManager.GetState();
-
-            if (_keyboardComponent.IsKeyReleased(Keys.F1) && _selectionManager.GetState().Mode != GeometrySelectionMode.Object)
+            if (_selectionManager.GetState().Mode != GeometrySelectionMode.Object)
             {
                 _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(selectionState.GetSingleSelectedObject(), GeometrySelectionMode.Object));
                 return true;
             }
+            return false;
+        }
 
-            else if (_keyboardComponent.IsKeyReleased(Keys.F2) && _selectionManager.GetState().Mode != GeometrySelectionMode.Face)
+        public bool SetFaceSelectionMode()
+        {
+            var selectionState = _selectionManager.GetState();
+            if (_selectionManager.GetState().Mode != GeometrySelectionMode.Face)
             {
                 var selectedObject = selectionState.GetSingleSelectedObject();
                 if (selectedObject != null)
@@ -202,16 +206,45 @@ namespace View3D.Components.Component.Selection
                     _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(selectedObject, GeometrySelectionMode.Face));
                     return true;
                 }
-            }
 
-            else if (_keyboardComponent.IsKeyReleased(Keys.F3) && _selectionManager.GetState().Mode != GeometrySelectionMode.Vertex)
+            }
+            return false;
+        }
+
+
+        public bool SetVertexSelectionMode()
+        {
+            var selectionState = _selectionManager.GetState();
+            if ( _selectionManager.GetState().Mode != GeometrySelectionMode.Vertex)
             {
                 var selectedObject = selectionState.GetSingleSelectedObject();
-                if(selectedObject != null)
-                { 
+                if (selectedObject != null)
+                {
                     _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(selectedObject, GeometrySelectionMode.Vertex));
                     return true;
                 }
+            }
+            return false;
+        }
+
+        bool ChangeSelectionMode()
+        {
+            if (_keyboardComponent.IsKeyReleased(Keys.F1))
+            {
+                if (SetObjectSelectionMode())
+                    return true;
+            }
+
+            else if (_keyboardComponent.IsKeyReleased(Keys.F2))
+            {
+                if (SetFaceSelectionMode())
+                    return true;
+            }
+
+            else if (_keyboardComponent.IsKeyReleased(Keys.F3))
+            {
+                if (SetVertexSelectionMode())
+                    return true;
             }
 
             return false;

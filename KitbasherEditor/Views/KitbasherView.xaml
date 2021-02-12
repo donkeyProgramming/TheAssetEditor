@@ -22,7 +22,7 @@
             <RowDefinition Height="0.5*"/>
         </Grid.RowDefinitions>
 
-        <local:MenuBarView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"/>
+        <local:MenuBarView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" DataContext="{Binding MenuBar}"/>
         <ContentControl Grid.Row="1" Grid.Column="0" Grid.RowSpan="4" Content="{Binding Scene}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
 
 
