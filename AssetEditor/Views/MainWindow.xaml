@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AssetEditor" 
         xmlns:views="clr-namespace:AssetEditor.Views" 
-        xmlns:test="clr-namespace:AssetEditor.Test"
+        xmlns:test="clr-namespace:AssetEditor.Test" xmlns:packfilebrowser="clr-namespace:CommonControls.PackFileBrowser;assembly=CommonControls"
         mc:Ignorable="d"
         Title="AssetEditor" Height="450" Width="800">
     <Window.Resources>
