@@ -1,0 +1,18 @@
+﻿<Window x:Class="CommonControls.PackFileBrowser.PackFileBrowserWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CommonControls.PackFileBrowser"
+        mc:Ignorable="d"
+        Title="PackFileBrowserWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <local:PackFileBrowserView Grid.Row="0" DataContext="{Binding ViewModel}"/>
+        <Button HorizontalAlignment="Right" Margin="5,2,5,2" Width="80" Grid.Row="1" Click="Button_Click">OK</Button>
+    </Grid>
+</Window>

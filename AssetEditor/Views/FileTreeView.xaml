@@ -7,41 +7,8 @@
              xmlns:pf="clr-namespace:CommonControls.PackFileBrowser;assembly=CommonControls" xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
-        <valueconverters:InverseBooleanConverter x:Key="InvBoolConverter"/>
 
-        <ContextMenu x:Key="NodeContextMenu">
-            <MenuItem Header="Add">
-                <MenuItem Header="From Directory"
-                                  Command="{Binding DataContext.AddFilesFromDirectory,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
-                                  CommandParameter="{Binding}"/>
 
-                <MenuItem Header="File(s)"
-                                  Command="{Binding DataContext.AddFilesCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
-                                  CommandParameter="{Binding}"/>
 
-                <MenuItem Header="Empty folder"
-                                  Command="{Binding DataContext.AddEmptyFolderCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
-                                  CommandParameter="{Binding}"/>
-            </MenuItem>
-
-            <MenuItem Header="Rename" 
-                              Command="{Binding DataContext.RenameNodeCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
-                              CommandParameter="{Binding}"
-                              IsEnabled="{Binding IsPackContainer, Converter={StaticResource InvBoolConverter}}"/>
-
-            <MenuItem Header="Extract"/>
-
-            <MenuItem Header="Delete"
-                              Command="{Binding DataContext.DeleteCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
-                              CommandParameter="{Binding}"/>
-
-            <MenuItem Header="Close"
-                              Command="{Binding DataContext.CloseNodeCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
-                              CommandParameter="{Binding}"
-                              IsEnabled="{Binding IsPackContainer}"/>
-        </ContextMenu>
-
-    </UserControl.Resources>
-    <pf:PackFileBrowserView CustomContextMenu="{StaticResource NodeContextMenu}"></pf:PackFileBrowserView>
+    <pf:PackFileBrowserView/>
 </UserControl>

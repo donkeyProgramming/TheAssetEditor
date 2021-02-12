@@ -4,6 +4,7 @@ using Common;
 using Common.ApplicationSettings;
 using Common.GameInformation;
 using CommonControls.Behaviors;
+using CommonControls.PackFileBrowser;
 using FileTypes.PackFiles.Models;
 using FileTypes.PackFiles.Services;
 using KitbasherEditor.ViewModels;
@@ -47,8 +48,9 @@ namespace AssetEditor.ViewModels
             _toolFactory = toolFactory;
             _toolFactory.RegisterToolAsDefault<TextEditorViewModel, TextEditorView>();
 
+       
 
-           if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
+            if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
            {
                 var settingsWindow = serviceProvider.GetRequiredService<SettingsWindow>();
                 settingsWindow.DataContext = serviceProvider.GetRequiredService<SettingsViewModel>();
@@ -69,9 +71,14 @@ namespace AssetEditor.ViewModels
                 }
             }
 
+
+            //PackFileBrowserWindow b = new PackFileBrowserWindow(packfileService);
+            //b.ShowDialog();
+            //
+
             //
             //variantmeshes\variantmeshdefinitions\dwf_hammerers.variantmeshdefinition"
-           var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
+            var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
            var window = _toolFactory.CreateToolAsWindow<KitbasherViewModel>(out var editorViewModel);
            editorViewModel.MainFile = packFile;
            window.Width = 800;

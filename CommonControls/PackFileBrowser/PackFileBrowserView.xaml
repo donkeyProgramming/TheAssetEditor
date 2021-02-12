@@ -12,6 +12,10 @@
     <UserControl.Resources>
         <nodevalueconverters:PackFileToImageValueConverter x:Key="ImageValueConverter"/>
         <valueconverters:InverseBooleanConverter x:Key="InvBoolConverter"/>
+
+
+       
+
     </UserControl.Resources>
 
     <Grid>
@@ -31,22 +35,53 @@
             VirtualizingPanel.VirtualizationMode="Recycling"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True">
 
+            <TreeView.Resources>
+                <ContextMenu x:Key="NodeContextMenu" Visibility="{Binding DataContext.ContextMenuVisibility,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" >
+                    <MenuItem Header="Add" >
+                        <MenuItem Header="From Directory"
+                                  Command="{Binding DataContext.AddFilesFromDirectory,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
+                                  CommandParameter="{Binding}"/>
+
+                        <MenuItem Header="File(s)"
+                                  Command="{Binding DataContext.AddFilesCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
+                                  CommandParameter="{Binding}"/>
+
+                        <MenuItem Header="Empty folder"
+                                  Command="{Binding DataContext.AddEmptyFolderCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
+                                  CommandParameter="{Binding}"/>
+                    </MenuItem>
+
+                    <MenuItem Header="Rename" 
+                              Command="{Binding DataContext.RenameNodeCommand,  UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
+                              CommandParameter="{Binding}"
+                              IsEnabled="{Binding IsPackContainer, Converter={StaticResource InvBoolConverter}}"/>
+
+                    <MenuItem Header="Extract"/>
+
+                    <MenuItem Header="Delete"
+                              Command="{Binding DataContext.DeleteCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
+                              CommandParameter="{Binding}"/>
+
+                    <MenuItem Header="Close"
+                              Command="{Binding DataContext.CloseNodeCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
+                              CommandParameter="{Binding}"
+                              IsEnabled="{Binding IsPackContainer}"/>
+                </ContextMenu>
+            </TreeView.Resources>
+
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="behaviors:MouseDoubleClick.Command" 
                             Value="{Binding DataContext.DoubleClickCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}"/>
                     <Setter Property="behaviors:MouseDoubleClick.CommandParameter" Value="{Binding}"/>
                     <Setter Property="IsExpanded" Value="{Binding IsNodeExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-
-
-                    <Setter Property="ContextMenu" 
-                            Value="{Binding CustomContextMenu,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}"/>
-
-                    <!--Setter Property="ContextMenu" Value="{StaticResource NodeContextMenu}"/-->
+                    <Setter Property="ContextMenu" Value="{StaticResource NodeContextMenu}"/>
                 </Style>
             </TreeView.ItemContainerStyle>
 
 
+       
+            
             <e1:Interaction.Behaviors>
                 <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedItem, Mode=TwoWay}" />
             </e1:Interaction.Behaviors>

@@ -22,5 +22,6 @@ namespace AssetEditor.Views
         {
             InitializeComponent();
         }
+
     }
 }

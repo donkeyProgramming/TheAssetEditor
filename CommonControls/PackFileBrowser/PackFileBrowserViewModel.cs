@@ -11,14 +11,21 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 
 namespace CommonControls.PackFileBrowser
 {
+
+    public delegate void FileSelectedDelegate(IPackFile file);
+
+    
+
     public class PackFileBrowserViewModel : NotifyPropertyChangedImpl
     {
         protected PackFileService _packFileService;
+        public event FileSelectedDelegate FileOpen;
 
         public ICollectionView PackFileNodes { get; set; }
         ObservableCollection<TreeNode> _nodes = new ObservableCollection<TreeNode>();
@@ -29,8 +36,20 @@ namespace CommonControls.PackFileBrowser
         public TreeNode SelectedItem { get => _selectedItem; set => SetAndNotify(ref _selectedItem, value); }
 
 
+        Visibility _contextMenuVisibility = Visibility.Visible;
+        public Visibility ContextMenuVisibility { get => _contextMenuVisibility; set => SetAndNotify(ref _contextMenuVisibility, value); }
+
+        //
+        public ICommand RenameNodeCommand { get; set; }
+        public ICommand AddEmptyFolderCommand { get; set; }
+        public ICommand AddFilesFromDirectory { get; set; }
+
         public PackFileBrowserViewModel(PackFileService packFileService)
         {
+            RenameNodeCommand = new RelayCommand<TreeNode>(OnRenameNode);
+            AddEmptyFolderCommand = new RelayCommand<TreeNode>(OnAddNewFolder);
+            AddFilesFromDirectory = new RelayCommand<TreeNode>(OnAddFilesFromDirectory);
+
             _packFileService = packFileService;
             _packFileService.Database.PackFileContainerLoaded += PackFileContainerLoaded;
             _packFileService.Database.FileAdded += FileAdded;
@@ -39,9 +58,40 @@ namespace CommonControls.PackFileBrowser
             Filter = new PackFileFilter(PackFileNodes);
 
             DoubleClickCommand = new RelayCommand<TreeNode>(OnDoubleClick);
+
+            foreach (var item in _packFileService.Database.PackFiles)
+                PackFileContainerLoaded(item);
         }
 
-        protected virtual void OnDoubleClick(TreeNode node) { }
+        void OnRenameNode(TreeNode treeNode)
+        {
+            TextInputWindow window = new TextInputWindow("Rename file", treeNode.Item.Name);
+            if (window.ShowDialog() == true)
+                _packFileService.RenameFile(treeNode.Item, window.TextValue);
+        }
+
+        void OnAddNewFolder(TreeNode node)
+        {
+            if (node.Item.PackFileType() != PackFileType.Data)
+                _packFileService.AddEmptyFolder(node.Item as PackFileDirectory, "name");
+        }
+
+        void OnAddFilesFromDirectory(TreeNode node)
+        {
+            var dialog = new CommonOpenFileDialog();
+            dialog.IsFolderPicker = true;
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                //_logger.Here().Information($"Adding content of {dialog.FileName} to pack");
+                _packFileService.AddFolderContent(node.Item, dialog.FileName);
+            }
+        }
+
+        protected virtual void OnDoubleClick(TreeNode node) 
+        {
+            if (node.Item.PackFileType() == PackFileType.Data)
+                FileOpen?.Invoke(node.Item); 
+        }
 
         private void FileAdded(IPackFile newNode, IPackFile parentNode)
         {
@@ -56,7 +106,7 @@ namespace CommonControls.PackFileBrowser
             ObservableCollection<TreeNode> collectionChildren = new ObservableCollection<TreeNode>();
 
             foreach (var file in container.Children)
-                collectionChildren.Add(new TreeNode(file));
+                collectionChildren.Add(new TreeNode(file));  
 
             collectionNode.Children = CollectionViewSource.GetDefaultView(collectionChildren);
 
