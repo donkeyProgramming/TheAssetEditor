@@ -8,7 +8,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using Serilog;
 using System.Windows.Input;
 
-namespace AssetEditor.ViewModels.FileTreeView
+namespace AssetEditor.ViewModels
 {
     public delegate void FileSelectedDelegate(IPackFile file);
 

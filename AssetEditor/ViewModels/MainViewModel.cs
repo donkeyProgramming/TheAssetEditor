@@ -1,6 +1,4 @@
 ﻿using AssetEditor.Services;
-using AssetEditor.Test;
-using AssetEditor.ViewModels.FileTreeView;
 using AssetEditor.Views.Settings;
 using Common;
 using Common.ApplicationSettings;
