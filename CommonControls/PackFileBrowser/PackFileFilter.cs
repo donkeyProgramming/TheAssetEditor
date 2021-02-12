@@ -5,9 +5,9 @@ using System.ComponentModel;
 using System.Text;
 using System.Windows.Threading;
 
-namespace AssetEditor.ViewModels.FileTreeView
+namespace CommonControls.PackFileBrowser
 {
-    class PackFileFilter : NotifyPropertyChangedImpl
+    public class PackFileFilter : NotifyPropertyChangedImpl
     {
         ICollectionView _nodeCollection;
         DispatcherTimer _filterTimer;

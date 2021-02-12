@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Windows.Data;
 
-namespace AssetEditor.ViewModels.FileTreeView
+namespace CommonControls.PackFileBrowser
 {
-    class TreeNode : NotifyPropertyChangedImpl
+    public class TreeNode : NotifyPropertyChangedImpl
     {
         public IPackFile Item { get; set; }
         bool _isExpanded = false;
@@ -51,5 +51,4 @@ namespace AssetEditor.ViewModels.FileTreeView
             }
         }
     }
-
 }

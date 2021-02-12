@@ -3,12 +3,10 @@ using FileTypes.PackFiles.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace AssetEditor.ViewModels.FileTreeView
+namespace CommonControls.PackFileBrowser
 {
     [ValueConversion(typeof(TreeNode), typeof(BitmapImage))]
     public class PackFileToImageValueConverter : IValueConverter
