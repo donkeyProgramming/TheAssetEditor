@@ -79,6 +79,7 @@ namespace View3D.Components.Gizmo
         CommandExecutor _commandManager;
        
         Gizmo _gizmo;
+        bool _isEnabled = false;
 
         public GizmoComponent(WpfGame game) : base(game)
         {
@@ -177,6 +178,9 @@ namespace View3D.Components.Gizmo
             if ( !(_selectionManager.GetState().Mode == GeometrySelectionMode.Object || _selectionManager.GetState().Mode == GeometrySelectionMode.Vertex))
                 return;
 
+            if (!_isEnabled)
+                return;
+
             _gizmo.UpdateCameraProperties();
 
             // Toggle space mode:
@@ -191,12 +195,21 @@ namespace View3D.Components.Gizmo
         public void SetGizmoMode(GizmoMode mode)
         {
             _gizmo.ActiveMode = mode;
+            _isEnabled = true;
+        }
+
+        public void Disable()
+        {
+            _isEnabled = false;
         }
 
         public override void Draw(GameTime gameTime)
         {
             if (!(_selectionManager.GetState().Mode == GeometrySelectionMode.Object || _selectionManager.GetState().Mode == GeometrySelectionMode.Vertex))
                 return;
+            if (!_isEnabled)
+                return;
+
             _gizmo.Draw(false);
         }
     }

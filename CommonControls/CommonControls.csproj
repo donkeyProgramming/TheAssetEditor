@@ -39,6 +39,7 @@
     <None Remove="Resources\Icons\Kitbasher\Gizmo_move.png" />
     <None Remove="Resources\Icons\Kitbasher\Gizmo_rotate.png" />
     <None Remove="Resources\Icons\Kitbasher\Gizmo_scale.png" />
+    <None Remove="Resources\Icons\Kitbasher\icons8-cursor-256.png" />
     <None Remove="Resources\Icons\Kitbasher\icons8-save-all-50.png" />
     <None Remove="Resources\Icons\Kitbasher\icons8-undo-50.png" />
     <None Remove="Resources\Icons\Kitbasher\Open ref.png" />
@@ -155,6 +156,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Icons\Kitbasher\Gizmo_scale.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\icons8-cursor-256.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Icons\Kitbasher\icons8-save-all-50.png">

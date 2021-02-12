@@ -8,7 +8,7 @@
 
 
 
-    
+
     <UserControl.Resources>
         <Style x:Key="VerticalSeparatorStyle" 
        TargetType="{x:Type Separator}"
@@ -48,115 +48,118 @@
 
 
         </Menu>
-        <DockPanel>
-            <ToolBarTray DockPanel.Dock="Top">
-                <ToolBar IsOverflowOpen="False">
-                    <Button ToolTip="Save">
-                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-save-all-50.png"/>
-                    </Button>
 
-                    <Button ToolTip="Import file">
-                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/open ref.png"/>
-                    </Button>
+        <ToolBarTray DockPanel.Dock="Top">
+            <ToolBar>
+                <Button ToolTip="Save">
+                    <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-save-all-50.png"/>
+                </Button>
 
-                    <Button ToolTip="Validate object">
-                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Validate.png"/>
-                    </Button>
+                <Button ToolTip="Import file">
+                    <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/open ref.png"/>
+                </Button>
 
-                    <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
+                <Button ToolTip="Validate object">
+                    <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Validate.png"/>
+                </Button>
 
-                    <Button ToolTip="{Binding General.UndoHintText}" Command="{Binding General.UndoCommand}" IsEnabled="{Binding General.UndoEnabled}">
-                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/undo.png"/>
-                    </Button>
-                    <Button ToolTip="Delete undo history">
-                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/DeleteHistory.png"/>
-                    </Button>
+                <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
+
+                <Button ToolTip="{Binding General.UndoHintText}" Command="{Binding General.UndoCommand}" IsEnabled="{Binding General.UndoEnabled}">
+                    <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/undo.png"/>
+                </Button>
+                <Button ToolTip="Delete undo history">
+                    <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/DeleteHistory.png"/>
+                </Button>
 
 
-                    <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
+                <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
 
-                    <Button ToolTip="Focus camera on selection" Command="{Binding General.FocusCamera}">
-                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Camera_Focus.png"/>
-                    </Button>
+                <Button ToolTip="Focus camera on selection" Command="{Binding General.FocusCamera}">
+                    <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Camera_Focus.png"/>
+                </Button>
 
-                    <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
-                    <RadioButton ToolTip="Move selection" GroupName="gizmo" Command="{Binding Gizmo.MoveCommand}" IsChecked="{Binding Gizmo.MoveActive, UpdateSourceTrigger=PropertyChanged}">
-                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Gizmo_move.png"/>
-                    </RadioButton>
-                    <RadioButton ToolTip="Rotate selection" GroupName="gizmo" Command="{Binding Gizmo.RotateCommand}" IsChecked="{Binding Gizmo.RotateActive, UpdateSourceTrigger=PropertyChanged}">
-                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Gizmo_rotate.png"/>
-                    </RadioButton>
-                    <RadioButton ToolTip="Scale selection" GroupName="gizmo" Command="{Binding Gizmo.ScaleCommand}" IsChecked="{Binding Gizmo.ScaleActive, UpdateSourceTrigger=PropertyChanged}">
-                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Gizmo_scale.png"/>
-                    </RadioButton>
+                <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
+                <RadioButton ToolTip="Move selection" GroupName="gizmo" Command="{Binding Gizmo.CursorCommand}" IsChecked="{Binding Gizmo.CursorActive, UpdateSourceTrigger=PropertyChanged}">
+                    <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-cursor-256.png"/>
+                </RadioButton>
+                <RadioButton ToolTip="Move selection" GroupName="gizmo" Command="{Binding Gizmo.MoveCommand}" IsChecked="{Binding Gizmo.MoveActive, UpdateSourceTrigger=PropertyChanged}">
+                    <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Gizmo_move.png"/>
+                </RadioButton>
+                <RadioButton ToolTip="Rotate selection" GroupName="gizmo" Command="{Binding Gizmo.RotateCommand}" IsChecked="{Binding Gizmo.RotateActive, UpdateSourceTrigger=PropertyChanged}">
+                    <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Gizmo_rotate.png"/>
+                </RadioButton>
+                <RadioButton ToolTip="Scale selection" GroupName="gizmo" Command="{Binding Gizmo.ScaleCommand}" IsChecked="{Binding Gizmo.ScaleActive, UpdateSourceTrigger=PropertyChanged}">
+                    <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Gizmo_scale.png"/>
+                </RadioButton>
 
-                    <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
-                    
-                    <Button ToolTip="This is a tooltip">
-                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SnapVertex.png"/>
-                    </Button>
+                <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
 
-                    <TextBlock VerticalAlignment="Center">Pivot:</TextBlock>
-                    <ComboBox>
-                        <ComboBoxItem IsSelected="True" Content="Center"/>
-                        <ComboBoxItem Content="Root"/>
-                    </ComboBox>
+                <Button ToolTip="This is a tooltip">
+                    <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SnapVertex.png"/>
+                </Button>
 
-                  
-
-                    <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
-
-                    <TextBlock VerticalAlignment="Center">Selection:</TextBlock>
-                    <ComboBox>
-                        <ComboBoxItem IsSelected="True">
-                            <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_object.png"/>
-                        </ComboBoxItem>
-                        <ComboBoxItem>
-                            <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_face.png"/>
-                        </ComboBoxItem>
-                        <ComboBoxItem >
-                            <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_Vertex.png"/>
-                        </ComboBoxItem>
-                    </ComboBox>
-
-                    <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
-
-                    <Button ToolTip="This is a tooltip">
-                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_split.png"/>
-                    </Button>
-
-                    <Button ToolTip="This is a tooltip">
-                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_combine.png"/>
-                    </Button>
-
-                    <Button ToolTip="This is a tooltip">
-                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_freezeTransform.png"/>
-                    </Button>
-
-                    <Button ToolTip="This is a tooltip">
-                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_duplicate.png"/>
-                    </Button>
-
-                    <Button ToolTip="This is a tooltip">
-                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_delete.png"/>
-                    </Button>
-
-                    <Button ToolTip="This is a tooltip">
-                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_mergeVertex.png"/>
-                    </Button>
+                <TextBlock VerticalAlignment="Center">Pivot:</TextBlock>
+                <ComboBox>
+                    <ComboBoxItem IsSelected="True" Content="Center"/>
+                    <ComboBoxItem Content="Root"/>
+                </ComboBox>
 
 
 
-                    <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
-                    <TextBlock VerticalAlignment="Center">RenderMode:</TextBlock>
-                    <ComboBox>
-                        <ComboBoxItem Content="Default" IsSelected="True"/>
-                    </ComboBox>
+                <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
+
+                <TextBlock VerticalAlignment="Center">Selection:</TextBlock>
+                <ComboBox>
+                    <ComboBoxItem IsSelected="True">
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_object.png"/>
+                    </ComboBoxItem>
+                    <ComboBoxItem>
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_face.png"/>
+                    </ComboBoxItem>
+                    <ComboBoxItem >
+                        <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_Vertex.png"/>
+                    </ComboBoxItem>
+                </ComboBox>
+
+                <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
+
+                <Button ToolTip="This is a tooltip">
+                    <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_split.png"/>
+                </Button>
+
+                <Button ToolTip="This is a tooltip">
+                    <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_combine.png"/>
+                </Button>
+
+                <Button ToolTip="This is a tooltip">
+                    <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_freezeTransform.png"/>
+                </Button>
+
+                <Button ToolTip="This is a tooltip">
+                    <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_duplicate.png"/>
+                </Button>
+
+                <Button ToolTip="This is a tooltip">
+                    <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_delete.png"/>
+                </Button>
+
+                <Button ToolTip="This is a tooltip">
+                    <Image Height="32" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_mergeVertex.png"/>
+                </Button>
 
 
 
-                </ToolBar>
-            </ToolBarTray>
-        </DockPanel>
+                <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
+                <TextBlock VerticalAlignment="Center">RenderMode:</TextBlock>
+                <ComboBox>
+                    <ComboBoxItem Content="Default" IsSelected="True"/>
+                </ComboBox>
+
+
+
+            </ToolBar>
+        </ToolBarTray>
+
     </DockPanel>
 </UserControl>

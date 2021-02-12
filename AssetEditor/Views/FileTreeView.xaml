@@ -12,6 +12,39 @@
     <UserControl.Resources>
         <filetreeview:PackFileToImageValueConverter x:Key="ImageValueConverter"/>
         <valueconverters:InverseBooleanConverter x:Key="InvBoolConverter"/>
+
+        <ContextMenu x:Key="NodeContextMenu">
+            <MenuItem Header="Add">
+                <MenuItem Header="From Directory"
+                                  Command="{Binding DataContext.AddFilesFromDirectory,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
+                                  CommandParameter="{Binding}"/>
+
+                <MenuItem Header="File(s)"
+                                  Command="{Binding DataContext.AddFilesCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
+                                  CommandParameter="{Binding}"/>
+
+                <MenuItem Header="Empty folder"
+                                  Command="{Binding DataContext.AddEmptyFolderCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
+                                  CommandParameter="{Binding}"/>
+            </MenuItem>
+
+            <MenuItem Header="Rename" 
+                              Command="{Binding DataContext.RenameNodeCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
+                              CommandParameter="{Binding}"
+                              IsEnabled="{Binding IsPackContainer, Converter={StaticResource InvBoolConverter}}"/>
+
+            <MenuItem Header="Extract"/>
+
+            <MenuItem Header="Delete"
+                              Command="{Binding DataContext.DeleteCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
+                              CommandParameter="{Binding}"/>
+
+            <MenuItem Header="Close"
+                              Command="{Binding DataContext.CloseNodeCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
+                              CommandParameter="{Binding}"
+                              IsEnabled="{Binding IsPackContainer}"/>
+        </ContextMenu>
+
     </UserControl.Resources>
 
     <Grid>
@@ -30,42 +63,6 @@
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.VirtualizationMode="Recycling"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True">
-
-            <TreeView.Resources>
-                <ContextMenu x:Key="NodeContextMenu">
-                    <MenuItem Header="Add">
-                        <MenuItem Header="From Directory"
-                                  Command="{Binding DataContext.AddFilesFromDirectory,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
-                                  CommandParameter="{Binding}"/>
-                        
-                        <MenuItem Header="File(s)"
-                                  Command="{Binding DataContext.AddFilesCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
-                                  CommandParameter="{Binding}"/>
-                        
-                        <MenuItem Header="Empty folder"
-                                  Command="{Binding DataContext.AddEmptyFolderCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
-                                  CommandParameter="{Binding}"/>
-                    </MenuItem>
-                    
-                    <MenuItem Header="Rename" 
-                              Command="{Binding DataContext.RenameNodeCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
-                              CommandParameter="{Binding}"
-                              IsEnabled="{Binding IsPackContainer, Converter={StaticResource InvBoolConverter}}"/>
-                    
-                    <MenuItem Header="Extract"/>
-                    
-                    <MenuItem Header="Delete"
-                              Command="{Binding DataContext.DeleteCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
-                              CommandParameter="{Binding}"/>
-                    
-                    <MenuItem Header="Close"
-                              Command="{Binding DataContext.CloseNodeCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
-                              CommandParameter="{Binding}"
-                              IsEnabled="{Binding IsPackContainer}"/>
-                </ContextMenu>
-            </TreeView.Resources>
-
-
 
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
