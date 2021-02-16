@@ -39,7 +39,7 @@ namespace AssetEditor.ViewModels
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 _logger.Here().Information($"Loading pack file {dialog.FileName}");
-                 if(! _packfileService.Load(dialog.FileName))
+                 if( _packfileService.Load(dialog.FileName) == null)
                     MessageBox.Show($"Unable to load packfiles {dialog.FileName}");
             }
         }

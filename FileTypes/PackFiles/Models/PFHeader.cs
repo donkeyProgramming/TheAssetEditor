@@ -6,126 +6,120 @@ using System.Text;
 
 namespace FileTypes.PackFiles.Models
 {
+
+    public enum PackFileCAType : Int32
+    { 
+        BOOT  = 0,
+        RELEASE= 1,
+        PATCH = 2,
+        MOD = 3,
+        MOVIE = 4,
+    }
+
+
     public class PFHeader
     {
+        /// Used to specify that the header of the PackFile is extended by 20 bytes. Used in Arena.
+        static int HAS_EXTENDED_HEADER = 0b0000_0001_0000_0000;
 
-        private byte PrecedenceByte { get; set; }
-        public int Version { get; set; }
-        public uint FileCount { get; set; }
-        public long DataStart { get; set; }
-        public string PackIdentifier { get; set; }
-        public uint Unknown { get; set; }
+        /// Used to specify that the PackedFile Index is encrypted. Used in Arena.
+        static int HAS_ENCRYPTED_INDEX = 0b0000_0000_1000_0000;
 
-        public uint AdditionalInfo { get; set; }
-        public List<string> ReplacedPackFileNames { get; set; } = new List<string>();
+        /// Used to specify that the PackedFile Index contains a timestamp of every PackFile.
+        static int HAS_INDEX_WITH_TIMESTAMPS = 0b0000_0000_0100_0000;
 
-        public bool HasAdditionalInfo
-        {
-            get
-            {
-                // bit 1000000 set?
-                return IsShader;
-            }
-        }
+        /// Used to specify that the PackedFile's data is encrypted. Seen in `music.pack` PackFiles and in Arena.
+        static int HAS_ENCRYPTED_DATA = 0b0000_0000_0001_0000;
 
-        public bool IsShader
-        {
-            get => (PrecedenceByte & 0x40) != 0;
-            set
-            {
-                if (value)
-                    PrecedenceByte |= 0x40;
-                else
-                    PrecedenceByte = (byte)(PrecedenceByte & ~0x40);
-            }
-        }
 
-        public int LoadOrder
-        {
-            get => PrecedenceByte & 7;
-        }
+        public string Version { get; private set; }
+        public PackFileCAType FileType { get; private set; }
+        public int ByteMask { get; set; }
+
+        public int ReferenceFileCount { get; private set; }
+        public int FileCount { get; private set; }
+        
+        public int LoadOrder { get; private set; }
+        private byte[] _buffer;
+
+        public int DataStart { get; private set; }
+
+        public bool HasAdditionalInfo { get; private set; }
+
+        List<string> _dependantFiles = new List<string>();
+
+        int _headerFlag;
 
         public PFHeader(BinaryReader reader)
         {
-            string packIdentifier = new string(reader.ReadChars(4));
-            SetDefaultsBasedOnId(packIdentifier);
-            int packType = reader.ReadInt32();
-            PrecedenceByte = (byte)packType;
-            Version = reader.ReadInt32();
-            int replacedPackFilenameLength = reader.ReadInt32();
-            reader.BaseStream.Seek(0x10L, SeekOrigin.Begin);
-            FileCount = reader.ReadUInt32();
-            UInt32 indexSize = reader.ReadUInt32();
-            var headerSize = GetHeaderSize();
-            DataStart = headerSize + indexSize;
+            Version = new string(reader.ReadChars(4));
+            _headerFlag = reader.ReadInt32();
+            FileType = (PackFileCAType)(_headerFlag & 15);
+            ByteMask = _headerFlag;
+            
+            ReferenceFileCount = reader.ReadInt32();
+            var pack_file_index_size  = reader.ReadInt32();
+            FileCount = reader.ReadInt32();
+            var packed_file_index_size  = reader.ReadInt32();
 
-            if (PackIdentifier == "PFH4" || PackIdentifier == "PFH5")
+            var headerOffset = 24;
+            if (Version == "PFH0")
             {
-                Unknown = reader.ReadUInt32();
+                _buffer = new byte[0];
+            }
+            else if (Version == "PFH2" || Version == "PFH3")
+            {
+                _buffer = reader.ReadBytes(32 - headerOffset);
+            }
+            else if(Version == "PFH4" || Version == "PFH5")
+            {
+                if ((ByteMask & HAS_EXTENDED_HEADER) != 0)
+                    _buffer = reader.ReadBytes(48 - headerOffset);
+                else
+                    _buffer = reader.ReadBytes(28 - headerOffset);
+            }
+            else if(Version == "PFH6")
+            {
+                _buffer = reader.ReadBytes(308 - headerOffset);
             }
 
-            // go to correct position
-            reader.BaseStream.Seek(headerSize, SeekOrigin.Begin);
-            for (int i = 0; i < Version; i++)
-            {
-                ReplacedPackFileNames.Add(IOFunctions.TheadUnsafeReadZeroTerminatedAscii(reader));
-            }
-            DataStart += replacedPackFilenameLength;
+            for (int i = 0; i < ReferenceFileCount; i++)
+                _dependantFiles.Add(IOFunctions.TheadUnsafeReadZeroTerminatedAscii(reader));
+
+            HasAdditionalInfo = (ByteMask & HAS_INDEX_WITH_TIMESTAMPS) != 0;
+            DataStart = headerOffset + _buffer.Length +  pack_file_index_size + packed_file_index_size;
         }
 
-        public PFHeader(string id)
+        public PFHeader(string version, PackFileCAType type)
         {
-            PrecedenceByte = 3;
-            // headers starting from Rome II are longer
-            switch (id)
-            {
-                case "PFH4":
-                case "PFH5":
-                    DataStart = 0x28;
-                    break;
-                default:
-                    DataStart = 0x20;
-                    break;
-            }
-            PackIdentifier = id;
-            FileCount = 0;
-            Version = 0;
-            ReplacedPackFileNames = new List<string>();
+            Version = version;
+            FileType = type;
+            ByteMask = 0;
         }
 
-        void SetDefaultsBasedOnId(string id)
+        public void Save(int fileCount, int fileContentSize, BinaryWriter binaryWriter)
         {
-            PrecedenceByte = 3;
-            // headers starting from Rome II are longer
-            switch (id)
-            {
-                case "PFH4":
-                case "PFH5":
-                    DataStart = 0x28;
-                    break;
-                default:
-                    DataStart = 0x20;
-                    break;
-            }
-            PackIdentifier = id;
-        }
+            foreach (byte c in Version)
+                binaryWriter.Write(c);
+            binaryWriter.Write(_headerFlag);
 
-        public int GetHeaderSize()
-        {
-            switch (PackIdentifier)
+            binaryWriter.Write(_dependantFiles.Count);
+
+            var pack_file_index_size = 0;
+            foreach (var file in _dependantFiles)
+                pack_file_index_size += file.Length + 2;
+
+            binaryWriter.Write(pack_file_index_size);
+            binaryWriter.Write(fileCount);
+            binaryWriter.Write(fileContentSize);
+            
+            binaryWriter.Write(_buffer);
+
+            foreach (var file in _dependantFiles)
             {
-                case "PFH0":
-                    return 0x18;
-                case "PFH2":
-                case "PFH3":
-                    // PFH2+ contain a FileTime at 0x1C (I think) in addition to PFH0's header
-                return 0x20;
-                case "PFH5":
-                case "PFH4":
-                    return 0x1C;
-                default:
-                    // if this ever happens, go have a word with MS
-                    throw new Exception("Unknown header ID " + PackIdentifier);
+                binaryWriter.Write((ushort)file.Length);
+                foreach(byte c in file)
+                    binaryWriter.Write(c);
             }
         }
     }

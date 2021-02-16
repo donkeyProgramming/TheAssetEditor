@@ -10,7 +10,6 @@ using System.Windows.Input;
 
 namespace AssetEditor.ViewModels
 {
-
    class FileTreeViewModel : PackFileBrowserViewModel
    {
        public FileTreeViewModel(PackFileService packFileService) : base(packFileService)

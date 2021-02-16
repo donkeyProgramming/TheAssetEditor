@@ -48,10 +48,11 @@ namespace FileTypes.PackFiles.Models
                 uint size = reader.ReadUInt32();
                 sizes += size;
                 if (Header.HasAdditionalInfo)
-                    Header.AdditionalInfo = reader.ReadUInt32();
+                   reader.ReadUInt32();
 
-                if (Header.PackIdentifier == "PFH5")
-                    reader.ReadByte();
+                byte isCompressed = 0;
+                if (Header.Version == "PFH5")
+                    isCompressed = reader.ReadByte();   // For warhammer 2, terrain files are compressed
 
                 string packedFileName = IOFunctions.TheadUnsafeReadZeroTerminatedAscii(reader);
 
@@ -154,6 +155,45 @@ namespace FileTypes.PackFiles.Models
         {
             file.Parent = this;
             InternalFileList.Add(file.Name, file);
+        }
+
+        public byte[] SaveToByteArray()
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                using (BinaryWriter writer = new BinaryWriter(ms))
+                {
+
+                    
+                }
+
+
+                return ms.ToArray();
+            }
+        }
+
+        public int ComputePackFileContentSize()
+        {
+            return 0;
+        }
+
+        public Dictionary<string, PackFile> CreateFileList()
+        {
+            var output = new Dictionary<string, PackFile>();
+            foreach (var child in Children)
+                CreateFileListRecursive(child, child.Name, output);
+            return output;
+        }
+
+        void CreateFileListRecursive(IPackFile root, string currentPath, Dictionary<string, PackFile> output)
+        {
+            foreach (var child in root.Children)
+            {
+                if (child is PackFile)
+                    output.Add(currentPath + "\\" + child.Name, child as PackFile);
+                else
+                    CreateFileListRecursive(child, currentPath + "\\" + child.Name, output);
+            }
         }
     }
 }

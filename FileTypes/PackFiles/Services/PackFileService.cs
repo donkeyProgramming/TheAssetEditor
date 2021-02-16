@@ -22,33 +22,36 @@ namespace FileTypes.PackFiles.Services
         }
 
 
-        public bool Load(string packFileSystemPath, bool suppresEvents = false) 
+        public PackFileContainer Load(string packFileSystemPath) 
         {
             try
             {
                 if (!File.Exists(packFileSystemPath))
                 {
                     _logger.Here().Error($"Trying to load file {packFileSystemPath}, which can not be located");
-                    return false;
+                    return null;
                 }
 
                 using (var fileStram = File.OpenRead(packFileSystemPath))
                 {
                     using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
                     {
-                        var pack = new PackFileContainer(packFileSystemPath, reader);
-                        Database.AddPackFile(pack);
-                       
+                        return Load(reader, packFileSystemPath);
                     }
                 }
             }
             catch (Exception e)
             {
-                _logger.Here().Error($"Trying to load file {packFileSystemPath}. Error : {e.ToString()}");
-                return false;
+                _logger.Here().Error($"Trying to load file {packFileSystemPath}. Error : {e}");
+                return null;
             }
+        }
 
-            return true;
+        public PackFileContainer Load(BinaryReader binaryReader, string packFileSystemPath)
+        {
+            var pack = new PackFileContainer(packFileSystemPath, binaryReader);
+            Database.AddPackFile(pack);
+            return pack;
         }
 
         public bool LoadAllCaFiles(string gameDataFolder)
@@ -118,7 +121,10 @@ namespace FileTypes.PackFiles.Services
             Database.TriggerFileAdded(newFolder, parent);
         }
 
-        public void Unload() { }
+        public void Unload(PackFileContainer pf) 
+        {
+            Database.RemovePackFile(pf);
+        }
         public void Save() {  }
 
         public IPackFile FindFile(string path) 
@@ -143,13 +149,14 @@ namespace FileTypes.PackFiles.Services
             return null;
         }
 
-        public void NewPackFile(string name) 
+        public PackFileContainer NewPackFile(string name, PackFileCAType type) 
         {
-            var newPackFile = new PackFileContainer(name)
-            { 
-                Header = new PFHeader("PFH5")
-            };
-            Database.AddPackFile(newPackFile);
+           var newPackFile = new PackFileContainer(name)
+           { 
+               Header = new PFHeader("PFH5", type)
+           };
+           Database.AddPackFile(newPackFile);
+            return newPackFile;
         }
 
         public void RenameFile(IPackFile packFile, string newName)

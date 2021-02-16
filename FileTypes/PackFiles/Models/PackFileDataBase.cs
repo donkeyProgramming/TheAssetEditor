@@ -9,19 +9,27 @@ namespace FileTypes.PackFiles.Models
     public delegate void FileAddedDelegate(IPackFile newNode, IPackFile parentNode);
     public delegate void FileRemovedDelegate(IPackFile deletedNode, IPackFile parentNode);
     public delegate void PackFileContainerLoadedDelegate(PackFileContainer container);
+    public delegate void PackFileContainerRemovedDelegate(PackFileContainer container);
 
     public class PackFileDataBase : NotifyPropertyChangedImpl
     {
         public event FileAddedDelegate FileAdded;
         public event FileRemovedDelegate FileRemoved;
         public event PackFileContainerLoadedDelegate PackFileContainerLoaded;
+        public event PackFileContainerRemovedDelegate PackFileContainerRemoved;
 
         public List<PackFileContainer> PackFiles { get; set; } = new List<PackFileContainer>();
 
         public void AddPackFile(PackFileContainer pf)
         {
             PackFiles.Add(pf);
-            TriggerPackFileContainerLoaded(pf);
+            PackFileContainerLoaded?.Invoke(pf);
+        }
+
+        public void RemovePackFile(PackFileContainer pf)
+        {
+            PackFiles.Remove(pf);
+            PackFileContainerRemoved?.Invoke(pf);
         }
 
         public void Clear()
@@ -37,11 +45,6 @@ namespace FileTypes.PackFiles.Models
         public void TriggerFileRemoved(IPackFile deletedNode, IPackFile parentNode)
         {
             FileRemoved?.Invoke(deletedNode, parentNode);
-        }
-
-        public void TriggerPackFileContainerLoaded(PackFileContainer container)
-        {
-            PackFileContainerLoaded?.Invoke(container);
         }
     }
 }
