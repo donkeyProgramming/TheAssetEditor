@@ -87,7 +87,6 @@ namespace FileTypes.PackFiles.Services
                         caPackFileContainer.MergePackFileContainer(packfile);
                 }
 
-                caPackFileContainer.Sort();
                 Database.AddPackFile(caPackFileContainer);
             }
             catch (Exception e)
@@ -98,7 +97,6 @@ namespace FileTypes.PackFiles.Services
 
             return true;
         }
-
 
         List<string> GetPackFilesFromManifest(string gameDataFolder)
         {
@@ -113,120 +111,121 @@ namespace FileTypes.PackFiles.Services
             return output;
         }
 
-        public void AddEmptyFolder(PackFileDirectory parent, string name)
+        // Add
+        // ---------------------------
+        public PackFileContainer CreateNewPackFile(string name, PackFileCAType type)
         {
-            var newFolder = new PackFileDirectory(name);
-            parent.AddChild(newFolder);
-            parent.Sort();
-            Database.TriggerFileAdded(newFolder, parent);
+            var newPackFile = new PackFileContainer(name)
+            {
+                Header = new PFHeader("PFH5", type)
+            };
+            Database.AddPackFile(newPackFile);
+            return newPackFile;
         }
 
-        public void Unload(PackFileContainer pf) 
+        public void AddEmptyFolder(PackFileContainer pf, string name)
+        {
+            var newFolder = new PackFileDirectory(name);
+            pf.FileList[name] = newFolder;
+            Database.TriggerContainerUpdated(pf);
+        }
+
+        public void AddFileToPack(PackFileContainer container, string path, IPackFile newFile)
+        {
+            if (!string.IsNullOrWhiteSpace(path))
+                path += "\\";
+            path += newFile.Name;
+            container.FileList[path.ToLower()] = newFile;
+            Database.TriggerContainerUpdated(container);
+        }
+
+        public void AddFolderContent(PackFileContainer container, string path, string folderDir)
+        {
+            var originalFilePaths = Directory.GetFiles(folderDir, "*", SearchOption.AllDirectories);
+            var filePaths = originalFilePaths.Select(x => x.Replace(folderDir + "\\", "")).ToList();
+            if (!string.IsNullOrWhiteSpace(path))
+                path += "\\";
+            for (int i = 0; i < filePaths.Count; i++)
+            {
+                var currentPath = filePaths[i];
+                var filename = Path.GetFileName(currentPath);
+
+                var source = MemorySource.FromFile(originalFilePaths[i]);
+                var file = new PackFile(filename, source);
+
+                container.FileList[path.ToLower() + currentPath.ToLower()] = file;
+            }
+
+            Database.TriggerContainerUpdated(container);
+        }
+
+        // Remove
+        // ---------------------------
+        public void UnloadPackContainer(PackFileContainer pf)
         {
             Database.RemovePackFile(pf);
         }
+
+        public void DeleteFolder(PackFileContainer pf, string folder)
+        {
+            var folderLower = folder.ToLower();
+            var itemsToDelete = pf.FileList.Where(x => x.Key.StartsWith(folderLower));
+            foreach (var item in itemsToDelete)
+            {
+                _logger.Here().Information($"Deleting file {item.Key} in directory {folder}");
+                pf.FileList.Remove(item.Key);
+            }
+
+            Database.TriggerContainerUpdated(pf);
+        }
+
+        public void DeleteFile(PackFileContainer pf, IPackFile file)
+        {
+            var key = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
+            _logger.Here().Information($"Deleting file {key}");
+            pf.FileList.Remove(key);
+        }
+
+        // Modify
+        // ---------------------------
+        public void RenameFile(PackFileContainer pf, IPackFile file, string newName)
+        {
+            var key = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
+            pf.FileList.Remove(key);
+
+            var dir = Path.GetDirectoryName(key);
+            file.Name = newName;
+            pf.FileList[dir + "\\" + file.Name] = file;
+
+            Database.TriggerContainerUpdated(pf);
+        }
+
+
         public void Save() {  }
 
         public IPackFile FindFile(string path) 
         {
-            _logger.Here().Information($"Searching for file {path}");
-            var dirName = Path.GetDirectoryName(path);
-            var fileName = Path.GetFileName(path);
+            var lowerPath = path.ToLower();
+            _logger.Here().Information($"Searching for file {lowerPath}");
             foreach (var packFile in Database.PackFiles)
             {
-                var dir = GetDirectory(packFile, dirName, false) as PackFileDirectory;
-                if (dir != null)
+                if (packFile.FileList.ContainsKey(lowerPath))
                 {
-                    var item = dir.FindChild(fileName);
-                    if (item != null)
-                    {
-                        _logger.Here().Information($"File found");
-                        return item;
-                    }
+                    _logger.Here().Information($"File found");
+                    return packFile.FileList[lowerPath];
                 }
             }
             _logger.Here().Warning($"File not found");
             return null;
         }
 
-        public PackFileContainer NewPackFile(string name, PackFileCAType type) 
-        {
-           var newPackFile = new PackFileContainer(name)
-           { 
-               Header = new PFHeader("PFH5", type)
-           };
-           Database.AddPackFile(newPackFile);
-            return newPackFile;
-        }
-
-        public void RenameFile(IPackFile packFile, string newName)
-        {
-            packFile.Name = newName;
-        }
-
-        public void AddFileToPack(PackFileDirectory parent, IPackFile newFile)
-        {
-            parent.AddChild(newFile);
-            parent.Sort();
-            Database.TriggerFileAdded(newFile, parent);
-        }
-
-        public void AddFolderContent(IPackFile parent, string folderDir)
-        {
-            var originalFilePaths = Directory.GetFiles(folderDir, "*", SearchOption.AllDirectories);
-            var filePaths = originalFilePaths.Select(x => x.Replace(folderDir+"\\", "")).ToList();
-
-            for (int i = 0; i < filePaths.Count; i++)
-            {
-                var currentPath = filePaths[i];
-                var filename = Path.GetFileName(currentPath);
-                var dirPath = Path.GetDirectoryName(currentPath);
-                var directory = GetDirectory(parent, dirPath, true);
-                var source = MemorySource.FromFile(originalFilePaths[i]);
-
-                var file = new PackFile(filename, "AddFolderContent does not set full path", source);
-                file.Parent = directory;
-                directory.AddChild(file);
-            }
-
-            parent.Sort();
-            Database.TriggerFileAdded(parent, parent);
-        }
 
 
-        IPackFile GetDirectory(IPackFile parent, string name, bool createIfMissing)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                return parent;
-            var dirPaths = name.Split('\\');
-            return CreatFolder(parent, dirPaths, 0, createIfMissing);
-        }
 
-        IPackFile CreatFolder(IPackFile pack, string[] directoryNames, int index, bool createIfMissing)
-        {
-            if (index == directoryNames.Length)
-                return pack;
-            foreach (var child in pack.Children)
-            {
-                if (child.PackFileType() == PackFileType.Directory)
-                {
-                    if (child.Name == directoryNames[index])
-                        return CreatFolder(child, directoryNames, index + 1, createIfMissing);
-                }
-            }
 
-            if (createIfMissing)
-            {
-                var newFolder = new PackFileDirectory(directoryNames[index]);
-                pack.AddChild(newFolder);
-                CreatFolder(newFolder, directoryNames, index + 1, createIfMissing);
-                return newFolder;
-            }
-            else
-            {
-                return null;
-            }
-        }
+
+
+
 
 
         public PackFileContainer GetRoot(IPackFile item)

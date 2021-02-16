@@ -14,10 +14,9 @@ namespace FileTypes.PackFiles.Models
         public PackFileType PackFileType() { return Common.PackFileType.Data; }
         public IDataSource DataSource { get; private set; }
 
-        public PackFile(string name, string fullPath, IDataSource dataSource)
+        public PackFile(string name, IDataSource dataSource)
         {
             Name = name;
-            FullPath = fullPath;
             DataSource = dataSource;
         }
 
@@ -27,8 +26,6 @@ namespace FileTypes.PackFiles.Models
             get => _name;
             set => SetAndNotify(ref _name, value);
         }
-        public string FullPath { get; set; }
-
 
         bool _isEdited;
         public bool IsEdited

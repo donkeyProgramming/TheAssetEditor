@@ -6,15 +6,13 @@ using System.Text;
 
 namespace FileTypes.PackFiles.Models
 {
-    public delegate void FileAddedDelegate(IPackFile newNode, IPackFile parentNode);
-    public delegate void FileRemovedDelegate(IPackFile deletedNode, IPackFile parentNode);
+    public delegate void ContainerUpdatedDelegate(PackFileContainer container);
     public delegate void PackFileContainerLoadedDelegate(PackFileContainer container);
     public delegate void PackFileContainerRemovedDelegate(PackFileContainer container);
 
     public class PackFileDataBase : NotifyPropertyChangedImpl
     {
-        public event FileAddedDelegate FileAdded;
-        public event FileRemovedDelegate FileRemoved;
+        public event ContainerUpdatedDelegate ContainerUpdated;
         public event PackFileContainerLoadedDelegate PackFileContainerLoaded;
         public event PackFileContainerRemovedDelegate PackFileContainerRemoved;
 
@@ -37,14 +35,10 @@ namespace FileTypes.PackFiles.Models
             PackFiles.Clear();
         }
 
-        public void TriggerFileAdded(IPackFile newNode, IPackFile parentNode)
+        public void TriggerContainerUpdated(PackFileContainer container)
         {
-            FileAdded?.Invoke(newNode, parentNode);
+            ContainerUpdated?.Invoke(container);
         }
 
-        public void TriggerFileRemoved(IPackFile deletedNode, IPackFile parentNode)
-        {
-            FileRemoved?.Invoke(deletedNode, parentNode);
-        }
     }
 }

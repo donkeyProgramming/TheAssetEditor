@@ -1,5 +1,7 @@
 ﻿using AssetEditor.Views.Settings;
 using Common;
+using CommonControls.Simple;
+using FileTypes.PackFiles.Models;
 using FileTypes.PackFiles.Services;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,6 +32,7 @@ namespace AssetEditor.ViewModels
             _packfileService = packfileService;
             OpenSettingsWindowCommand = new RelayCommand(ShowSettingsDialog);
             OpenPackFileCommand = new RelayCommand(OpenPackFile);
+            CreateNewPackFileCommand = new RelayCommand(CreatePackFile);
         }
 
         void OpenPackFile()
@@ -50,6 +53,15 @@ namespace AssetEditor.ViewModels
             var window = _serviceProvider.GetRequiredService<SettingsWindow>();
             window.DataContext = _serviceProvider.GetRequiredService<SettingsViewModel>();
             window.ShowDialog();
+        }
+
+        void CreatePackFile()
+        {
+            TextInputWindow window = new TextInputWindow("New Packfile name", "");
+            if (window.ShowDialog() == true)
+            {
+                _packfileService.CreateNewPackFile(window.TextValue, PackFileCAType.Mod);
+            }
         }
     }
 }

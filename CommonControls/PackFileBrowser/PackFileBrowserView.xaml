@@ -6,16 +6,13 @@
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors" 
              xmlns:e1="http://schemas.microsoft.com/xaml/behaviors" 
              xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters"
-             xmlns:nodevalueconverters="clr-namespace:CommonControls.PackFileBrowser"
+             xmlns:nodevalueconverters="clr-namespace:CommonControls.PackFileBrowser" xmlns:componentmodel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <nodevalueconverters:PackFileToImageValueConverter x:Key="ImageValueConverter"/>
         <valueconverters:InverseBooleanConverter x:Key="InvBoolConverter"/>
-
-
-       
-
+        <nodevalueconverters:SortedCollectionViewSource x:Key="SortedCollectionViewSource" Property0="NodeType" Property1="Name"/>
     </UserControl.Resources>
 
     <Grid>
@@ -30,7 +27,7 @@
             Grid.Row="1" 
             behaviors:TreeViewExtension.SelectItemOnRightClick="True"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-            ItemsSource="{Binding Path=PackFileNodes, UpdateSourceTrigger=PropertyChanged}"
+            ItemsSource="{Binding Path=Files, UpdateSourceTrigger=PropertyChanged}"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.VirtualizationMode="Recycling"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True">
@@ -46,9 +43,7 @@
                                   Command="{Binding DataContext.AddFilesCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
                                   CommandParameter="{Binding}"/>
 
-                        <MenuItem Header="Empty folder"
-                                  Command="{Binding DataContext.AddEmptyFolderCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
-                                  CommandParameter="{Binding}"/>
+
                     </MenuItem>
 
                     <MenuItem Header="Rename" 
@@ -67,6 +62,7 @@
                               CommandParameter="{Binding}"
                               IsEnabled="{Binding IsPackContainer}"/>
                 </ContextMenu>
+
             </TreeView.Resources>
 
             <TreeView.ItemContainerStyle>
@@ -76,29 +72,36 @@
                     <Setter Property="behaviors:MouseDoubleClick.CommandParameter" Value="{Binding}"/>
                     <Setter Property="IsExpanded" Value="{Binding IsNodeExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                     <Setter Property="ContextMenu" Value="{StaticResource NodeContextMenu}"/>
+                    <Setter Property="Visibility" Value="Visible" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsVisible}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
                 </Style>
             </TreeView.ItemContainerStyle>
 
-
-       
-            
             <e1:Interaction.Behaviors>
                 <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedItem, Mode=TwoWay}" />
             </e1:Interaction.Behaviors>
 
 
             <TreeView.ItemTemplate >
-                <HierarchicalDataTemplate ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}">
+                <HierarchicalDataTemplate ItemsSource="{Binding Children, Converter={StaticResource SortedCollectionViewSource}}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Image Width="12" Grid.Column="0" Source="{Binding Item, Converter={StaticResource ImageValueConverter}}"/>
-                        <TextBlock Margin="4,0,0,0" Grid.Column="1" Text="{Binding Item.Name}"/>
+                        <Image Width="12" Grid.Column="0" Source="{Binding Path=., Converter={StaticResource ImageValueConverter}}"/>
+                        <TextBlock Margin="4,0,0,0" Grid.Column="1" Text="{Binding Name}"/>
                     </Grid>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
+
+
+
+
 
         </TreeView>
     </Grid>

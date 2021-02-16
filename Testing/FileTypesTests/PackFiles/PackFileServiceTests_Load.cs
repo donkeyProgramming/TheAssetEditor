@@ -9,7 +9,7 @@ using System.Text;
 
 namespace FileTypesTests.PackFiles
 {
-    public class PackFileServiceTests
+    public class PackFileServiceTests_Load
     {
         [SetUp]
         public void Setup()
@@ -26,7 +26,7 @@ namespace FileTypesTests.PackFiles
 
             Assert.NotNull(result);
             Assert.AreEqual(1, packFileDb.PackFiles.Count);
-            var fileCount = packFileDb.PackFiles[0].FileCount();
+            var fileCount = packFileDb.PackFiles[0].FileList.Count;
             Assert.AreEqual(4, fileCount);
         }
 
@@ -49,7 +49,7 @@ namespace FileTypesTests.PackFiles
             Assert.NotNull(pack1);
 
             Assert.AreEqual(2, packFileService.Database.PackFiles.Count);
-            packFileService.Unload(pack0);
+            packFileService.UnloadPackContainer(pack0);
             Assert.AreEqual(1, packFileService.Database.PackFiles.Count);
         }
 
@@ -57,7 +57,7 @@ namespace FileTypesTests.PackFiles
         public void SaveNewPackFile()
         {
             PackFileService packFileService = new PackFileService(new PackFileDataBase());
-            packFileService.NewPackFile("Test", );
+           // packFileService.NewPackFile("Test", );
         }
 
 
@@ -80,16 +80,16 @@ namespace FileTypesTests.PackFiles
         [Test]
         public void SavePackFile()
         {
-            var origialBytes = File.ReadAllBytes(@"Data\warStuff.pack");
-
-            PackFileService packFileService = new PackFileService(new PackFileDataBase());
-            var packFile = packFileService.NewPackFile("CustomPackFile", PackFileCAType.MOD);
-            packFile.AddFile
-
-
-            var pack0 = packFileService.Load(@"Data\warStuff.pack");
-
-            var saveResult = pack0.SaveToByteArray();
+            //var origialBytes = File.ReadAllBytes(@"Data\warStuff.pack");
+            //
+            //PackFileService packFileService = new PackFileService(new PackFileDataBase());
+            //var packFile = packFileService.NewPackFile("CustomPackFile", PackFileCAType.MOD);
+            //packFile.AddFile
+            //
+            //
+            //var pack0 = packFileService.Load(@"Data\warStuff.pack");
+            //
+            //var saveResult = pack0.SaveToByteArray();
         }
     }
 }

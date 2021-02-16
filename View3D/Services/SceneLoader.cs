@@ -39,7 +39,7 @@ namespace View3D.Services
             if (file == null)
                 throw new Exception("File is null in SceneLoader::Load");
 
-            _logger.Here().Information($"Attempting to load file {file.FullPath}");
+            _logger.Here().Information($"Attempting to load file {file.Name}");
 
             switch (file.Extention)
             {
@@ -114,7 +114,7 @@ namespace View3D.Services
 
         void LoadRigidMesh(PackFile file, ref SceneNode parent)
         {
-            var rmvModel = new RmvRigidModel(file.DataSource.ReadData(), file.FullPath);
+            var rmvModel = new RmvRigidModel(file.DataSource.ReadData(), file.Name);
             var model = new Rmv2ModelNode(rmvModel, _device,  Path.GetFileName( rmvModel.FileName));
 
             if (parent == null)

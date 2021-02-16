@@ -90,7 +90,7 @@ namespace KitbasherEditor.ViewModels
             if (MainFile != null)
             {
                 var file = MainFile as PackFile;
-                _editableRmvMesh.AddModel(new RmvRigidModel(file.DataSource.ReadData(), file.FullPath), Scene.GraphicsDevice);
+                _editableRmvMesh.AddModel(new RmvRigidModel(file.DataSource.ReadData(), file.Name), Scene.GraphicsDevice);
 
                 var cubeMesh = new CubeMesh(Scene.GraphicsDevice);
                 _editableRmvMesh.Children[0].AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0), new Vector3(0.5f), "Item1", Scene.GraphicsDevice));

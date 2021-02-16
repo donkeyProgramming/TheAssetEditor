@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -17,18 +18,14 @@ using System.Windows.Input;
 
 namespace CommonControls.PackFileBrowser
 {
-
     public delegate void FileSelectedDelegate(IPackFile file);
-
-    
 
     public class PackFileBrowserViewModel : NotifyPropertyChangedImpl
     {
         protected PackFileService _packFileService;
         public event FileSelectedDelegate FileOpen;
 
-        public ICollectionView PackFileNodes { get; set; }
-        ObservableCollection<TreeNode> _nodes = new ObservableCollection<TreeNode>();
+        public ObservableCollection<TreeNode> Files { get; set; } = new ObservableCollection<TreeNode>();
         public PackFileFilter Filter { get; private set; }
         public ICommand DoubleClickCommand { get; set; }
 
@@ -39,25 +36,31 @@ namespace CommonControls.PackFileBrowser
         Visibility _contextMenuVisibility = Visibility.Visible;
         public Visibility ContextMenuVisibility { get => _contextMenuVisibility; set => SetAndNotify(ref _contextMenuVisibility, value); }
 
-        //
         public ICommand RenameNodeCommand { get; set; }
-        public ICommand AddEmptyFolderCommand { get; set; }
         public ICommand AddFilesFromDirectory { get; set; }
-
+        public ICommand AddFilesCommand { get; set; }
+        
+        public ICommand CloseNodeCommand { get; set; }
+        public ICommand DeleteCommand { get; set; }
+        
         public PackFileBrowserViewModel(PackFileService packFileService)
         {
             RenameNodeCommand = new RelayCommand<TreeNode>(OnRenameNode);
-            AddEmptyFolderCommand = new RelayCommand<TreeNode>(OnAddNewFolder);
+
+            AddFilesCommand = new RelayCommand<TreeNode>(OnAddFilesCommand);
             AddFilesFromDirectory = new RelayCommand<TreeNode>(OnAddFilesFromDirectory);
+            
+            CloseNodeCommand = new RelayCommand<TreeNode>(CloseNode);
+            DeleteCommand = new RelayCommand<TreeNode>(DeleteNode);
+
+            DoubleClickCommand = new RelayCommand<TreeNode>(OnDoubleClick);
 
             _packFileService = packFileService;
             _packFileService.Database.PackFileContainerLoaded += PackFileContainerLoaded;
-            _packFileService.Database.FileAdded += FileAdded;
+            _packFileService.Database.PackFileContainerRemoved += PackFileContainerRemoved;
+            _packFileService.Database.ContainerUpdated += ContainerUpdated;
 
-            PackFileNodes = CollectionViewSource.GetDefaultView(_nodes);
-            Filter = new PackFileFilter(PackFileNodes);
-
-            DoubleClickCommand = new RelayCommand<TreeNode>(OnDoubleClick);
+            Filter = new PackFileFilter(Files);
 
             foreach (var item in _packFileService.Database.PackFiles)
                 PackFileContainerLoaded(item);
@@ -65,15 +68,37 @@ namespace CommonControls.PackFileBrowser
 
         void OnRenameNode(TreeNode treeNode)
         {
-            TextInputWindow window = new TextInputWindow("Rename file", treeNode.Item.Name);
-            if (window.ShowDialog() == true)
-                _packFileService.RenameFile(treeNode.Item, window.TextValue);
+            if (treeNode.NodeType == NodeType.Directory)
+            {
+                MessageBox.Show("Not possible to rename a directory at this point");
+            }
+            else if (treeNode.NodeType == NodeType.File)
+            {
+                TextInputWindow window = new TextInputWindow("Rename file", treeNode.Item.Name);
+                if (window.ShowDialog() == true)
+                {
+                    _packFileService.RenameFile(treeNode.FileOwner, treeNode.Item, window.TextValue);
+                    treeNode.Name = treeNode.Item.Name;
+                }
+            }
         }
 
-        void OnAddNewFolder(TreeNode node)
+        void OnAddFilesCommand(TreeNode node)
         {
-            if (node.Item.PackFileType() != PackFileType.Data)
-                _packFileService.AddEmptyFolder(node.Item as PackFileDirectory, "name");
+            var dialog = new CommonOpenFileDialog();
+            dialog.IsFolderPicker = false;
+            dialog.Multiselect = true;
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                var parentPath = node.GetFullPath();
+                var files = dialog.FileNames;
+                foreach(var file in files)
+                {
+                    var fileName = Path.GetFileName(file);
+                    var packFile = new PackFile(fileName, new MemorySource(File.ReadAllBytes(file)));
+                    _packFileService.AddFileToPack(node.FileOwner, parentPath, packFile);
+                }
+            }
         }
 
         void OnAddFilesFromDirectory(TreeNode node)
@@ -82,55 +107,113 @@ namespace CommonControls.PackFileBrowser
             dialog.IsFolderPicker = true;
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                //_logger.Here().Information($"Adding content of {dialog.FileName} to pack");
-                _packFileService.AddFolderContent(node.Item, dialog.FileName);
+                var parentPath = node.GetFullPath();
+                _packFileService.AddFolderContent(node.FileOwner, parentPath, dialog.FileName);
             }
+        }
+
+        void DeleteNode(TreeNode node)
+        { 
+        
+        }
+
+        void CloseNode(TreeNode node)
+        {
+            _packFileService.UnloadPackContainer(node.FileOwner);
         }
 
         protected virtual void OnDoubleClick(TreeNode node) 
         {
-            if (node.Item.PackFileType() == PackFileType.Data)
+            if (node.NodeType == NodeType.File)
                 FileOpen?.Invoke(node.Item); 
         }
 
-        private void FileAdded(IPackFile newNode, IPackFile parentNode)
+        private void ContainerUpdated(PackFileContainer pf)
         {
-            var parent = Find(parentNode, _nodes.First());
-            parent.Build(parentNode);
-            parent.IsNodeExpanded = true;
+            PackFileContainerLoaded(pf);
         }
 
         private void PackFileContainerLoaded(PackFileContainer container)
         {
-            TreeNode collectionNode = new TreeNode(container);
-            ObservableCollection<TreeNode> collectionChildren = new ObservableCollection<TreeNode>();
+            var existingNode = Files.FirstOrDefault(x => x.FileOwner == container);
+            if(existingNode != null)
+                Files.Remove(existingNode);
 
-            foreach (var file in container.Children)
-                collectionChildren.Add(new TreeNode(file));  
+            var root = new TreeNode(container.Name, NodeType.Root, container, null);
+            Dictionary<string, TreeNode> directoryMap = new Dictionary<string, TreeNode>();
+           
+            foreach (var item in container.FileList)
+            {
+                var fullPath = item.Key;
+                var numSeperators = fullPath.Count(x=> x == Path.DirectorySeparatorChar);
 
-            collectionNode.Children = CollectionViewSource.GetDefaultView(collectionChildren);
+                var directoryEnd = fullPath.LastIndexOf(Path.DirectorySeparatorChar);
+                var fileName = fullPath.Substring(directoryEnd + 1);
 
-            _nodes.Add(collectionNode);
-            _nodes.Last().IsNodeExpanded = true;
+                if (numSeperators == 0)
+                {
+                    root.Children.Add(new TreeNode(fileName, NodeType.File, container, root, item.Value));
+                }
+                else
+                {
+                    var directory = fullPath.Substring(0, directoryEnd);
+                    var res = directoryMap.TryGetValue(directory, out var node);
+                    if (!res)
+                    {
+                        var currentIndex = 0;
+                        var lastIndex = 0;
+
+                        TreeNode lastNode = root;
+                        for (int i = 0; i < numSeperators; i++)
+                        {
+                            currentIndex = fullPath.IndexOf(Path.DirectorySeparatorChar, currentIndex);
+                            var subStr = fullPath.Substring(0, currentIndex);
+                            if (directoryMap.ContainsKey(subStr) == false)
+                            {
+                                var nodeName = subStr;
+                                if(lastIndex != 0)
+                                    nodeName = fullPath.Substring(lastIndex+1 , currentIndex - lastIndex-1);
+                                var currentNode = new TreeNode(nodeName, NodeType.Directory, container, lastNode);
+                                lastNode.Children.Add(currentNode);
+                                directoryMap.Add(subStr, currentNode);
+                                lastNode = currentNode;
+                            }
+                            else
+                            {
+                                lastNode = directoryMap[subStr];
+                            }
+                            lastIndex = currentIndex;
+                            currentIndex++;
+                        }
+                    }
+                    directoryMap[directory].Children.Add(new TreeNode(fileName, NodeType.File, container, directoryMap[directory], item.Value));
+                }
+            }
+            Files.Add(root);
+            root.IsNodeExpanded = true;
         }
 
-
+        private void PackFileContainerRemoved(PackFileContainer container)
+        {
+            var node = Files.FirstOrDefault(x => x.FileOwner == container);
+            Files.Remove(node);
+        }
 
         TreeNode Find(IPackFile pack, TreeNode node)
         {
-            if (node.Item == pack)
-                return node;
-
-            if (node.Children != null)
-            {
-                foreach (TreeNode child in node.Children)
-                {
-                    var res = Find(pack, child);
-                    if (res != null)
-                        return res;
-                }
-            }
-
+            //if (node.Item == pack)
+            //    return node;
+            //
+            //if (node.Children != null)
+            //{
+            //    foreach (TreeNode child in node.Children)
+            //    {
+            //        var res = Find(pack, child);
+            //        if (res != null)
+            //            return res;
+            //    }
+            //}
+            //
             return null;
         }
     }

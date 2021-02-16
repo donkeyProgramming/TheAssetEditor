@@ -12,7 +12,7 @@ namespace FileTypes.PackFiles.Models
         BOOT  = 0,
         RELEASE= 1,
         PATCH = 2,
-        MOD = 3,
+        Mod = 3,
         MOVIE = 4,
     }
 

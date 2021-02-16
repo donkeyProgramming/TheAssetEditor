@@ -1,7 +1,9 @@
 ﻿using Common;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Text;
 using System.Windows.Threading;
 
@@ -9,7 +11,7 @@ namespace CommonControls.PackFileBrowser
 {
     public class PackFileFilter : NotifyPropertyChangedImpl
     {
-        ICollectionView _nodeCollection;
+        ObservableCollection<TreeNode> _nodeCollection;
         DispatcherTimer _filterTimer;
 
         string _filterText = "";
@@ -23,7 +25,7 @@ namespace CommonControls.PackFileBrowser
             }
         }
 
-        public PackFileFilter(ICollectionView nodes)
+        public PackFileFilter(ObservableCollection<TreeNode> nodes)
         {
             _nodeCollection = nodes;
         }
@@ -47,23 +49,30 @@ namespace CommonControls.PackFileBrowser
 
         void Filter(string text)
         {
-            _nodeCollection.Filter = (x) => HasChildWithFilterMatch((x as TreeNode).Item, text);
             foreach (var item in _nodeCollection)
-                (item as TreeNode).SetFilter((x) => HasChildWithFilterMatch((x as TreeNode).Item, text));
+                HasChildWithFilterMatch(item, text);
         }
 
-        bool HasChildWithFilterMatch(IPackFile file, string filterText)
+        bool HasChildWithFilterMatch(TreeNode file, string filterText)
         {
-            if (file.PackFileType() == PackFileType.Data)
-                return string.IsNullOrWhiteSpace(filterText) || file.Name.Contains(filterText);
+            if (file.NodeType == NodeType.File)
+            {
+                if (string.IsNullOrWhiteSpace(filterText) || file.Name.Contains(filterText))
+                {
+                    file.IsVisible = true;
+                    return true;
+                }
+            }
 
+            var hasChildMatch = false;
             foreach (var child in file.Children)
             {
                 if (HasChildWithFilterMatch(child, filterText))
-                    return true;
+                    hasChildMatch = true; 
             }
 
-            return false;
+            file.IsVisible = hasChildMatch;
+            return hasChildMatch;
         }
     }
 }

@@ -13,12 +13,15 @@ namespace CommonControls.PackFileBrowser
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value is PackFileContainer)
-                return ResourceController.CollectionIcon;
-            else if (value is PackFile)
-                return ResourceController.FileIcon;
-            else if (value is PackFileDirectory)
-                return ResourceController.FolderIcon;
+            if(value is TreeNode node)
+            {
+                if(node.NodeType == NodeType.Root)
+                    return ResourceController.CollectionIcon;
+                else if (node.NodeType == NodeType.Directory)
+                    return ResourceController.FolderIcon;
+                if (node.NodeType == NodeType.File)
+                    return ResourceController.FileIcon;
+            }
 
             throw new Exception("Unknown type " + value.GetType().FullName);
         }
