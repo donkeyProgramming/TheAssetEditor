@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,6 +20,7 @@ namespace Filetypes
         }
     }
 
+
     class ByteHelper
     {
         public static T ByteArrayToStructure<T>(byte[] bytes, int offset) where T : struct
@@ -29,13 +32,34 @@ namespace Filetypes
                 var p = handle.AddrOfPinnedObject() + offset;
                 return (T)Marshal.PtrToStructure(p, typeof(T));
             }
-            catch (Exception e)
-            {
-                throw;
-            }
             finally
             {
                 handle.Free();
+            }
+        }
+
+        public static byte[] GetBytes<T>(T data) where T : struct
+        {
+            int size = Marshal.SizeOf(data);
+            byte[] arr = new byte[size];
+
+            IntPtr ptr = Marshal.AllocHGlobal(size);
+            Marshal.StructureToPtr(data, ptr, true);
+            Marshal.Copy(ptr, arr, 0, size);
+            Marshal.FreeHGlobal(ptr);
+            return arr;
+        }
+
+        static public T DeepCopy<T>(T obj)
+        {
+            BinaryFormatter s = new BinaryFormatter();
+            using (MemoryStream ms = new MemoryStream())
+            {
+                s.Serialize(ms, obj);
+                ms.Position = 0;
+                T t = (T)s.Deserialize(ms);
+
+                return t;
             }
         }
 

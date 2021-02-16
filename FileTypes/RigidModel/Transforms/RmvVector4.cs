@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Filetypes.RigidModel.Transforms
 {
+    [Serializable]
     public struct RmvVector4
     {
         public float X;

@@ -34,7 +34,7 @@ namespace Filetypes.RigidModel.Vertex
 
         }
 
-        Data _data;
+        public Data _data;
 
         public CinematicVertex(Data data)
         {

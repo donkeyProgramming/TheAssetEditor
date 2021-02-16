@@ -2,6 +2,7 @@
 using Filetypes.RigidModel.LodHeader;
 using Serilog;
 using System;
+using System.IO;
 
 namespace Filetypes.RigidModel
 {
@@ -76,7 +77,33 @@ namespace Filetypes.RigidModel
             return lodHeaders;
         }
 
-    
+        public void SaveToByteArray(BinaryWriter writer)
+        {
+            if (Header.Version != 7)
+                throw new Exception("Not a know version - can not save");
+
+            writer.Write(ByteHelper.GetBytes(Header));
+
+            for (int i = 0; i < LodHeaders.Length; i++)
+                writer.Write(ByteHelper.GetBytes((Rmv2LodHeader_V7)LodHeaders[i]));
+
+            for (int lodIndex = 0; lodIndex < Header.LodCount; lodIndex++)
+            {
+                var modelList = MeshList[lodIndex];
+                for(var modelIndex = 0; modelIndex < modelList.Length; modelIndex++)
+                {
+                    var model = modelList[modelIndex];
+                    writer.Write(ByteHelper.GetBytes(model.Header));
+                    for (var attachmentPointIndex = 0; attachmentPointIndex < model.AttachmentPoints.Count; attachmentPointIndex++)
+                        writer.Write(ByteHelper.GetBytes(model.AttachmentPoints[attachmentPointIndex]));
+
+                    for (var textureIndex = 0; textureIndex < model.Textures.Count; textureIndex++)
+                        writer.Write(ByteHelper.GetBytes(model.Textures[textureIndex]));
+
+                    model.Mesh.SaveToByteArray(writer, model.Header.VertextType);
+                }
+            }
+        }
 
     }
 }

@@ -97,12 +97,12 @@ namespace KitbasherEditor.ViewModels
             }
 
             // Wmd reference
-            var refereneceMesh = _packFileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_paladin.variantmeshdefinition");
-            SceneLoader loader = new SceneLoader(_packFileService, Scene.GraphicsDevice);
-            var result = loader.Load(refereneceMesh as PackFile, null);
-            loader.Simplify(result);
-            result.ForeachNode((node) => node.IsEditable = false);
-            _referenceMesh.AddObject(result);
+           //var refereneceMesh = _packFileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_paladin.variantmeshdefinition");
+           //SceneLoader loader = new SceneLoader(_packFileService, Scene.GraphicsDevice);
+           //var result = loader.Load(refereneceMesh as PackFile, null);
+           //loader.Simplify(result);
+           //result.ForeachNode((node) => node.IsEditable = false);
+           //_referenceMesh.AddObject(result);
 
 
 

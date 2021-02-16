@@ -3,6 +3,7 @@ using Common.ApplicationSettings;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -97,13 +98,18 @@ namespace AssetEditor.Services
             return newWindow;
         }
 
-
-
         public IEditorViewModel GetToolViewModelFromFileName(string filename)
         {
-            if (_defaultViewModelType != null)
+            var extention = Path.GetExtension(filename);
+            if (_extentionToToolMap.ContainsKey(extention))
             {
-                var instance = (IEditorViewModel)Activator.CreateInstance(_defaultViewModelType);
+                
+                var instance = (IEditorViewModel)_serviceProvider.GetService(_extentionToToolMap[extention]);
+                return instance;
+            }
+            else if (_defaultViewModelType != null)
+            {
+                var instance = (IEditorViewModel)_serviceProvider.GetService(_defaultViewModelType);
                 return instance;
             }
             else

@@ -18,7 +18,7 @@ namespace KitbasherEditor
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<KitbasherViewModel, KitbasherView>();
+            factory.RegisterTool<KitbasherViewModel, KitbasherView>(".rigid_model_v2");
         }
     }
 }

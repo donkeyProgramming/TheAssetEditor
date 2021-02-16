@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 namespace Filetypes.RigidModel.Transforms
 {
     [StructLayout(LayoutKind.Sequential, Size = 24)]
+    [Serializable]
     public struct RvmBoundingBox
     {
         public float MinimumX;

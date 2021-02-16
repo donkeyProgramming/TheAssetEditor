@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -47,6 +48,7 @@ namespace Filetypes.RigidModel
     };
 
     [StructLayout(LayoutKind.Sequential)]
+    [Serializable]
     public struct RmvSubModelHeader
     {
         public GroupTypeEnum MaterialId;
@@ -70,8 +72,8 @@ namespace Filetypes.RigidModel
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
         public byte[] ZeroPadding0;
 
-        byte _unknown0;
-        byte _unknown1;
+        public byte _unknown0;
+        public byte _unknown1;
 
         public RmvTransform Transform;
 
@@ -80,7 +82,7 @@ namespace Filetypes.RigidModel
         public uint AttachmentPointCount;
         public uint TextureCount;
 
-        UknownData _uknownData;
+        public UknownData _uknownData;
 
         public VertexFormat VertextType { get => (VertexFormat)_vertexType; }
 
@@ -112,6 +114,7 @@ namespace Filetypes.RigidModel
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    [Serializable]
     public struct RmvShaderParams
     {
 
@@ -136,6 +139,7 @@ namespace Filetypes.RigidModel
         }
     }
 
+    [Serializable]
     public struct UknownData
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
@@ -173,6 +177,25 @@ namespace Filetypes.RigidModel
             }
 
             throw new Exception($"Unkown vertex format - {vertexFormat}");
+        }
+
+        internal void SaveToByteArray(BinaryWriter writer, VertexFormat vertexFormat)
+        {
+            writer.Write(ByteHelper.GetBytes(AlphaSettings));
+            for (int i = 0; i < VertexList.Length; i++)
+            {
+                if (vertexFormat == VertexFormat.Default)
+                    writer.Write(ByteHelper.GetBytes(((DefaultVertex)VertexList[i])._data)); 
+                else if (vertexFormat == VertexFormat.Cinematic)
+                    writer.Write(ByteHelper.GetBytes(((CinematicVertex)VertexList[i])._data));
+                else if (vertexFormat == VertexFormat.Weighted)
+                    writer.Write(ByteHelper.GetBytes(((WeightedVertex)VertexList[i])._data));
+                else
+                    throw new Exception($"Unkown vertex format - {vertexFormat}");
+            }
+
+            for (int i = 0; i < _indexList.Length; i++)
+                writer.Write(_indexList[i]);
         }
 
         public RmvMesh(byte[] data, VertexFormat vertexFormat, int vertexStart, uint vertexCount, int faceStart, uint faceCount)
@@ -275,26 +298,5 @@ namespace Filetypes.RigidModel
         }
     }
 
-    class ByteHelper
-    {
-        public static T ByteArrayToStructure<T>(byte[] bytes, int offset) where T : struct
-        {
-            var handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
-
-            try
-            {
-                var p = handle.AddrOfPinnedObject() + offset;
-                return (T)Marshal.PtrToStructure(p, typeof(T));
-            }
-            finally
-            {
-                handle.Free();
-            }
-        }
-
-        public static int GetSize(Type type)
-        { 
-         return Marshal.SizeOf(type) ;
-        }
-    }
+   
 }

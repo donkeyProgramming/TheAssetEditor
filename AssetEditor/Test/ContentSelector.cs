@@ -15,16 +15,11 @@ namespace AssetEditor.Test
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
+            var parent = FindParent<TabControl>(container);
+            var toolFactory = (ToolFactory)parent.GetValue(DataTemplateParameters.ViewFactoryProperty);
+            var viewType = toolFactory.GetViewTypeFromViewModel(item.GetType());
 
-            var ss = FindParent<TabControl>(container);
-            //double valueToCompare = (double)ss.GetValue(DataTemplateParameters.ValueToCompareProperty);
-
-
-            var valueToCompare = (ToolFactory)ss.GetValue(DataTemplateParameters.ViewFactoryProperty);
-            var type = valueToCompare.GetViewTypeFromViewModel(item.GetType());
-
-
-            FrameworkElementFactory factory = new FrameworkElementFactory(type);
+            FrameworkElementFactory factory = new FrameworkElementFactory(viewType);
             DataTemplate dt = new DataTemplate();
             dt.VisualTree = factory;
             

@@ -14,10 +14,11 @@ namespace Filetypes.RigidModel.LodHeader
         uint _firstMeshOffset;
         float _lodCameraDistance;
         uint _lodLevel;
-        byte _qualityLvl;
-        byte _padding0;
-        byte _padding1;
-        byte _padding2;
+        
+        public byte _qualityLvl;
+        public byte _padding0;
+        public byte _padding1;
+        public byte _padding2;
 
         public uint MeshCount { get => _meshCount; set => _meshCount = value; }
         public uint TotalLodVertexSize { get => _totalLodVertexSize; set => _totalLodVertexSize = value; }

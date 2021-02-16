@@ -32,9 +32,9 @@ namespace AssetEditor.ViewModels
         public FileTreeViewModel FileTree { get; private set; }
         public MenuBarViewModel MenuBar { get; set; }
 
-        ToolFactory _toolFactory { get; set; }
+        public ToolFactory ToolsFactory { get; set; }
         public ObservableCollection<IEditorViewModel> CurrentEditorsList { get; set; } = new ObservableCollection<IEditorViewModel>();
-        
+
         int _selectedIndex;
         public int SelectedEditorIndex { get => _selectedIndex; set => SetAndNotify(ref _selectedIndex, value); }
 
@@ -45,20 +45,19 @@ namespace AssetEditor.ViewModels
             FileTree = new FileTreeViewModel(packfileService);
             FileTree.FileOpen += OnFileOpen;
 
-            _toolFactory = toolFactory;
-            _toolFactory.RegisterToolAsDefault<TextEditorViewModel, TextEditorView>();
+            ToolsFactory = toolFactory;
+            ToolsFactory.RegisterToolAsDefault<TextEditorViewModel, TextEditorView>();
 
-       
 
             if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
-           {
+            {
                 var settingsWindow = serviceProvider.GetRequiredService<SettingsWindow>();
                 settingsWindow.DataContext = serviceProvider.GetRequiredService<SettingsViewModel>();
                 settingsWindow.ShowDialog();
 
                 settingsService.CurrentSettings.IsFirstTimeStartingApplication = false;
                 settingsService.Save();
-           }
+            }
 
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
             {
@@ -78,12 +77,14 @@ namespace AssetEditor.ViewModels
 
             //
             //variantmeshes\variantmeshdefinitions\dwf_hammerers.variantmeshdefinition"
-         //  var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
-         // var window = _toolFactory.CreateToolAsWindow<KitbasherViewModel>(out var editorViewModel);
-         // editorViewModel.MainFile = packFile;
-         // window.Width = 800;
-         // window.Height = 600;
-         // window.ShowDialog();
+            // var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
+            var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc4\hef\hef_war_lion\hef_war_lion_02.rigid_model_v2");
+            OnFileOpen(packFile);
+            // var window = _toolFactory.CreateToolAsWindow<KitbasherViewModel>(out var editorViewModel);
+            // editorViewModel.MainFile = packFile;
+            // window.Width = 800;
+            // window.Height = 600;
+            // window.ShowDialog();
         }
 
         private void OnFileOpen(IPackFile file)
@@ -102,7 +103,7 @@ namespace AssetEditor.ViewModels
                 return;
             }
 
-            var editorViewModel = _toolFactory.GetToolViewModelFromFileName(file.Name);
+            var editorViewModel = ToolsFactory.GetToolViewModelFromFileName(file.Name);
             editorViewModel.MainFile = file;
             CurrentEditorsList.Add(editorViewModel);
             SelectedEditorIndex = CurrentEditorsList.Count - 1;

@@ -33,7 +33,7 @@ namespace Filetypes.RigidModel.Vertex
             public byte[] unknown1;     // 2 x 2
         }
 
-        Data _data;
+        public Data _data;
 
         public DefaultVertex(Data data)
         {
