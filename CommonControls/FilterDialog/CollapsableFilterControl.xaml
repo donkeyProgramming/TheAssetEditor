@@ -1,0 +1,50 @@
+﻿<UserControl x:Class="CommonControls.FilterDialog.CollapsableFilterControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:filterdialog1="clr-namespace:CommonControls.FilterDialog" 
+             xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             x:Name="self">
+    <UserControl.Resources>
+        <valueconverters:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Collapsed" />
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"></ColumnDefinition>
+            <ColumnDefinition Width="auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="auto"></ColumnDefinition>
+            <ColumnDefinition Width="auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <Label  Grid.Row="0" Grid.Column="0" Width="{Binding LabelTotalWidth, ElementName=self}"  
+                Content="{Binding LabelText, ElementName=self}"
+                Visibility="{Binding ShowLabel,ElementName=self, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}"/>
+
+        <Label Grid.Row="0" Grid.Column="1" Content=":"
+                 Visibility="{Binding ShowLabel, ElementName=self, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}"/>
+
+        <TextBox Grid.Row="0" Grid.Column="2" x:Name="SelectedFileName" VerticalContentAlignment="Center" IsReadOnly="True"/>
+        <Button Grid.Row="0" Grid.Column="3" x:Name="BrowseButton" DockPanel.Dock="Right" Width="70">Browse</Button>
+        <Button Grid.Row="0" Grid.Column="4" x:Name="ClearButton" DockPanel.Dock="Right" Width="30" Margin="10,0,0,0">X</Button>
+
+        <Grid Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3">
+            <filterdialog1:FilterUserControl  
+                SearchItems="{Binding SearchItems, ElementName=self, UpdateSourceTrigger=PropertyChanged}"  
+                SelectedItem="{Binding SelectedItem, ElementName=self, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                x:Name="FilterBox" 
+                DisplayMemberPath="{Binding DisplayMemberPath, ElementName=self}" 
+                InnerContent="{Binding InnerContent, ElementName=self}"  
+                OnSearch="{Binding OnSearch, ElementName=self}"/>
+        </Grid>
+    </Grid>
+</UserControl>

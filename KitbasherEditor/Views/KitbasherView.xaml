@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:KitbasherEditor.Views"
-             xmlns:viewmodels="clr-namespace:KitbasherEditor.ViewModels"
+             xmlns:viewmodels="clr-namespace:KitbasherEditor.ViewModels" xmlns:editorviews="clr-namespace:KitbasherEditor.Views.EditorViews"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -23,7 +23,17 @@
         </Grid.RowDefinitions>
 
         <local:MenuBarView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" DataContext="{Binding MenuBar}"/>
-        <ContentControl Grid.Row="1" Grid.Column="0" Grid.RowSpan="4" Content="{Binding Scene}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+
+        <Grid Grid.Row="1" Grid.Column="0" Grid.RowSpan="4" >
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <ContentControl Grid.Row="0"  Content="{Binding Scene}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+            <editorviews:AnimationView Grid.Row="1"/>
+        </Grid>
+
 
 
         <GridSplitter Grid.Row="1" Grid.RowSpan="4" Grid.Column="1"  HorizontalAlignment="Stretch">

@@ -77,8 +77,8 @@ namespace AssetEditor.ViewModels
 
             //
             //variantmeshes\variantmeshdefinitions\dwf_hammerers.variantmeshdefinition"
-            // var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
-            var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc4\hef\hef_war_lion\hef_war_lion_02.rigid_model_v2");
+            var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
+            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc4\hef\hef_war_lion\hef_war_lion_02.rigid_model_v2");
             OnFileOpen(packFile);
             // var window = _toolFactory.CreateToolAsWindow<KitbasherViewModel>(out var editorViewModel);
             // editorViewModel.MainFile = packFile;

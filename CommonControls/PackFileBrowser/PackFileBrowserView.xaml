@@ -6,7 +6,7 @@
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors" 
              xmlns:e1="http://schemas.microsoft.com/xaml/behaviors" 
              xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters"
-             xmlns:nodevalueconverters="clr-namespace:CommonControls.PackFileBrowser" xmlns:componentmodel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+             xmlns:nodevalueconverters="clr-namespace:CommonControls.PackFileBrowser"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -42,8 +42,6 @@
                         <MenuItem Header="File(s)"
                                   Command="{Binding DataContext.AddFilesCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
                                   CommandParameter="{Binding}"/>
-
-
                     </MenuItem>
 
                     <MenuItem Header="Rename" 
@@ -85,7 +83,6 @@
                 <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedItem, Mode=TwoWay}" />
             </e1:Interaction.Behaviors>
 
-
             <TreeView.ItemTemplate >
                 <HierarchicalDataTemplate ItemsSource="{Binding Children, Converter={StaticResource SortedCollectionViewSource}}">
                     <Grid>
@@ -98,11 +95,6 @@
                     </Grid>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
-
-
-
-
-
         </TreeView>
     </Grid>
 </UserControl>

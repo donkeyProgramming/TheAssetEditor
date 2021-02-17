@@ -27,8 +27,9 @@ namespace KitbasherEditor.Views
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-           var window = Window.GetWindow(this);
-           window.KeyUp += HandleKeyPress;
+            var window = Window.GetWindow(this);
+            if(window != null)
+                window.KeyUp += HandleKeyPress;
         }
 
         private void HandleKeyPress(object sender, KeyEventArgs e)
