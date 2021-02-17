@@ -13,6 +13,7 @@ using View3D.Components.Input;
 using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
 using View3D.Commands.Vertex;
+using View3D.Utility;
 
 namespace View3D.Components.Gizmo
 {
@@ -98,7 +99,7 @@ namespace View3D.Components.Gizmo
 
             _selectionManager.SelectionChanged += OnSelectionChanged;
 
-            var font = resourceLibary.XnaContentManager.Load<SpriteFont>("Fonts\\DefaultFont");
+            var font = resourceLibary.Content.Load<SpriteFont>("Fonts\\DefaultFont");
             _gizmo = new Gizmo(camera, _mouse, GraphicsDevice, new SpriteBatch(GraphicsDevice), font);
 
             _gizmo.TranslateEvent += GizmoTranslateEvent;

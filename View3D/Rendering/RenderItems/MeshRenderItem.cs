@@ -11,7 +11,7 @@ namespace View3D.Rendering.RenderItems
 {
     public class MeshRenderItem : IRenderItem
     {
-        public IDrawableNode Node { get; set; }
+        public MeshNode Node { get; set; }
         public Matrix World { get; set; }
 
         public void Draw(GraphicsDevice device, CommonShaderParameters parameters)

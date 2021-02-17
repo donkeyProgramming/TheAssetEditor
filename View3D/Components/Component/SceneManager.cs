@@ -145,13 +145,12 @@ namespace View3D.Components.Component
             base.Draw(gameTime);
         }
 
-
         void DrawBasicSceneHirarchy(SceneNode root,  Matrix parentMatrix)
         {
             if (root.IsVisible)
             {
                 if (root is IDrawableNode drawableNode)
-                    _renderEngine.AddRenderItem(RenderBuckedId.Normal, new MeshRenderItem() { World = parentMatrix, Node = drawableNode });
+                    drawableNode.Render(_renderEngine, parentMatrix);
 
                 foreach (var child in root.Children)
                     DrawBasicSceneHirarchy(child, parentMatrix * child.ModelMatrix);

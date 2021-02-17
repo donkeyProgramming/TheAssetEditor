@@ -5,6 +5,7 @@ using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using View3D.Components.Component;
+using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
 
@@ -23,7 +24,8 @@ namespace View3D.SceneNodes
 
         void DrawWireframeOverlay(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams);
         void DrawSelectedFaces(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams, List<int> faces);
-        void DrawBasic(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams);
+
+        void Render(RenderEngineComponent renderEngine, Matrix parentWorld);
     }
 
 

@@ -12,6 +12,7 @@ using View3D.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Services;
+using View3D.Utility;
 
 namespace View3D.Commands.Object
 {
@@ -24,6 +25,7 @@ namespace View3D.Commands.Object
         SceneManager _sceneManager;
         SelectionManager _selectionManager;
         ISelectionState _originalSelectionState;
+        ResourceLibary _resourceLib;
 
         public DivideObjectIntoSubmeshesCommand(IDrawableNode objectToSplit)
         {
@@ -35,6 +37,7 @@ namespace View3D.Commands.Object
             _editableMeshResolver = componentManager.GetComponent<IEditableMeshResolver>();
             _sceneManager = componentManager.GetComponent<SceneManager>();
             _selectionManager = componentManager.GetComponent<SelectionManager>();
+            _resourceLib = componentManager.GetComponent<ResourceLibary>();
         }
 
         protected override void ExecuteCommand()
@@ -49,7 +52,7 @@ namespace View3D.Commands.Object
             int counter = 0;
             foreach (var mesh in newMeshes)
             {
-                var meshNode = RenderItemHelper.CreateRenderItem(mesh, new Vector3(0, 0, 0), new Vector3(1), $"{_objectToSplit.Name}_submesh_{counter++}", _sceneManager.GraphicsDevice);
+                var meshNode = RenderItemHelper.CreateRenderItem(mesh, new Vector3(0, 0, 0), new Vector3(1), $"{_objectToSplit.Name}_submesh_{counter++}", _sceneManager.GraphicsDevice, _resourceLib);
                 _newMeshes.Add(meshNode);
                 _editableMeshResolver.GetEditableMeshNode().AddObject(meshNode);
             }

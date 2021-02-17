@@ -2,6 +2,7 @@
 using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
 using FileTypes.PackFiles.Services;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Serilog;
 using System;
@@ -13,6 +14,7 @@ using System.Xml;
 using View3D.Components.Component;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
+using View3D.Utility;
 using static Filetypes.RigidModel.VariantMeshDefinition;
 
 namespace View3D.Services
@@ -22,20 +24,18 @@ namespace View3D.Services
         ILogger _logger = Logging.Create<SceneLoader>();
         PackFileService _packFileService;
         GraphicsDevice _device;
+        ResourceLibary _resourceLibary;
 
-        public SceneLoader(PackFileService packFileService, GraphicsDevice device)
+        public SceneLoader(PackFileService packFileService, GraphicsDevice device, ResourceLibary resourceLibary)
         {
             _packFileService = packFileService;
             _device = device;
+            _resourceLibary = resourceLibary;
         }
 
         public void Load(string path, SceneNode parent)
         {
             var file = _packFileService.FindFile(path);
-            if (file == null)
-            { 
-            
-            }
             Load(file as PackFile, parent);
         }
 
@@ -120,7 +120,7 @@ namespace View3D.Services
         void LoadRigidMesh(PackFile file, ref SceneNode parent)
         {
             var rmvModel = new RmvRigidModel(file.DataSource.ReadData(), file.Name);
-            var model = new Rmv2ModelNode(rmvModel, _device,  Path.GetFileName( rmvModel.FileName));
+            var model = new Rmv2ModelNode(rmvModel, _device, _resourceLibary, Path.GetFileName( rmvModel.FileName));
 
             if (parent == null)
                 parent = model;

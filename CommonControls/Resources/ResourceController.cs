@@ -18,6 +18,7 @@ namespace CommonControls.Resources
         public static BitmapImage Rmv2ModelIcon { get; private set; }
         public static BitmapImage MeshIcon { get; private set; }
         public static BitmapImage GroupIcon { get; private set; }
+        public static BitmapImage SkeletonIcon { get; private set; }
 
         public static void Load()
         {
@@ -32,24 +33,12 @@ namespace CommonControls.Resources
             Rmv2ModelIcon = BitmapToImageSource(iconsFolder + "icons8-orthogonal-view-50.png");
             MeshIcon = BitmapToImageSource(iconsFolder + "icons8-mesh-50.png");
             GroupIcon = BitmapToImageSource(iconsFolder + "icons8-folder-50.png");
+            SkeletonIcon = BitmapToImageSource(iconsFolder + "icons8-animated-skeleton-50.png");
         }
 
         static BitmapImage BitmapToImageSource(string path)
         {
             return new BitmapImage(new Uri(path));
-            //var bitmap = Bitmap.FromFile(path);
-            //using (MemoryStream memory = new MemoryStream())
-            //{
-            //    bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Png);
-            //    memory.Position = 0;
-            //    BitmapImage bitmapimage = new BitmapImage();
-            //    bitmapimage.BeginInit();
-            //    bitmapimage.StreamSource = memory;
-            //    bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
-            //    bitmapimage.EndInit();
-            //
-            //    return bitmapimage;
-            //}
         }
 
     }

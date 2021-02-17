@@ -15,6 +15,7 @@ using View3D.Components.Rendering;
 using View3D.Scene;
 using View3D.SceneNodes;
 using View3D.Services;
+using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels
 {
@@ -43,7 +44,7 @@ namespace KitbasherEditor.ViewModels
             Scene.Components.Add(new FpsComponent(Scene));
             Scene.Components.Add(new KeyboardComponent(Scene));
             Scene.Components.Add(new MouseComponent(Scene));
-            Scene.Components.Add(new ResourceLibary(Scene));
+            Scene.Components.Add(new ResourceLibary(Scene, pf));
             Scene.Components.Add(new ArcBallCamera(Scene, new Vector3(0), 10));
             Scene.Components.Add(new SceneManager(Scene));
             Scene.Components.Add(new SelectionManager(Scene));
@@ -70,25 +71,35 @@ namespace KitbasherEditor.ViewModels
         private void OnSceneInitialized(WpfGame scene)
         {
             var sceneManager = scene.GetComponent<SceneManager>();
-            
+            var resourceLib = scene.GetComponent<ResourceLibary>();
+
+            sceneManager.RootNode.AddObject(new SkeletonNode("I own the skeletonRender"));
             _editableRmvMesh = (Rmv2ModelNode)sceneManager.RootNode.AddObject(new Rmv2ModelNode("Editable Model"));
+            
+            for (int lodIndex = 0; lodIndex < 4; lodIndex++)
+            {
+                var lodNode = new Rmv2LodNode("Lod " + lodIndex, lodIndex);
+                lodNode.IsVisible = lodIndex == 0;
+                _editableRmvMesh.AddObject(lodNode);
+            }
+
             _referenceMesh = sceneManager.RootNode.AddObject(new GroupNode("Reference meshs") { IsEditable = false});
            
             if (MainFile != null)
             {
                 var file = MainFile as PackFile;
                 var rmv = new RmvRigidModel(file.DataSource.ReadData(), file.Name);
-                _editableRmvMesh.AddModel(rmv, Scene.GraphicsDevice);
+                _editableRmvMesh.AddModel(rmv, Scene.GraphicsDevice, resourceLib);
                 Animation.SetActiveSkeleton(rmv.Header.SkeletonName);
                 DisplayName = file.Name;
 
                 //var cubeMesh = new CubeMesh(Scene.GraphicsDevice);
                 //_editableRmvMesh.Children[0].AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0), new Vector3(0.5f), "Item1", Scene.GraphicsDevice));
             }
-
+            
             // Wmd reference
             var refereneceMesh = _packFileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_paladin.variantmeshdefinition");
-            SceneLoader loader = new SceneLoader(_packFileService, Scene.GraphicsDevice);
+            SceneLoader loader = new SceneLoader(_packFileService, Scene.GraphicsDevice, resourceLib);
             var result = loader.Load(refereneceMesh as PackFile, null);
             loader.Simplify(result);
             result.ForeachNode((node) => node.IsEditable = false);
