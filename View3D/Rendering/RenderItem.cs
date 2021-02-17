@@ -8,6 +8,7 @@ using System.Text;
 using View3D.Components.Component;
 using View3D.Components.Gizmo;
 using View3D.Rendering.Geometry;
+using View3D.SceneNodes;
 
 namespace View3D.Rendering
 {

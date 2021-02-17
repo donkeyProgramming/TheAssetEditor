@@ -19,6 +19,7 @@ using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.Scene;
+using View3D.SceneNodes;
 using View3D.Services;
 
 namespace KitbasherEditor.ViewModels
@@ -67,6 +68,8 @@ namespace KitbasherEditor.ViewModels
             Scene.Components.Add(new ObjectEditor(Scene));
             Scene.Components.Add(new FaceEditor(Scene));
             Scene.Components.Add(new FocusSelectableObjectComponent(Scene));
+            Scene.Components.Add(new ClearScreenComponent(Scene));
+            Scene.Components.Add(new RenderEngineComponent(Scene));
 
             SceneExplorer = new SceneExplorerViewModel(Scene);
             Scene.Components.Add(SceneExplorer as IEditableMeshResolver);

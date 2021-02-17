@@ -8,6 +8,7 @@ using System.Text;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Rendering;
+using View3D.SceneNodes;
 
 namespace View3D.Commands.Object
 {

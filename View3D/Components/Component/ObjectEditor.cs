@@ -9,6 +9,7 @@ using View3D.Commands.Object;
 using View3D.Components.Component.Selection;
 using View3D.Components.Input;
 using View3D.Rendering;
+using View3D.SceneNodes;
 using View3D.Services;
 
 namespace View3D.Components.Component

@@ -12,6 +12,8 @@ using View3D.Components.Component.Selection;
 using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
+using View3D.Rendering.RenderItems;
+using View3D.SceneNodes;
 
 namespace View3D.Scene
 {
@@ -20,12 +22,12 @@ namespace View3D.Scene
     {
         private bool _disposed;
 
-        RasterizerState _wireframeState;
-        RasterizerState _selectedFaceState;
 
-        ArcBallCamera _camera;
         SceneManager _sceneManager;
         SelectionManager _selectionManager;
+
+
+        RenderEngineComponent _renderEngine;
 
         public VertexInstanceMesh VertexRenderer { get; set; }
 
@@ -34,21 +36,10 @@ namespace View3D.Scene
             _disposed = false;
             new WpfGraphicsDeviceService(this);
 
-            _wireframeState = new RasterizerState();
-            _wireframeState.FillMode = FillMode.WireFrame;
-            _wireframeState.CullMode = CullMode.None;
-            _wireframeState.DepthBias = -0.000008f;
-            _wireframeState.DepthClipEnable = true;
 
-            _selectedFaceState = new RasterizerState();
-            _selectedFaceState.FillMode = FillMode.Solid;
-            _selectedFaceState.CullMode = CullMode.None;
-            _selectedFaceState.DepthBias = -0.000008f;
-            _wireframeState.DepthClipEnable = true;
-
-            _camera = GetComponent<ArcBallCamera>();
             _sceneManager = GetComponent<SceneManager>();
             _selectionManager = GetComponent<SelectionManager>();
+            _renderEngine = GetComponent<RenderEngineComponent>();
 
 
 
@@ -56,12 +47,12 @@ namespace View3D.Scene
             base.Initialize();
         }
 
-        Effect _lineShader;
+
 
         protected override void LoadContent()
         {
-            _bondingBoxRenderer = new BoundingBoxRenderer();
-            _lineShader = Content.Load<Effect>("Shaders\\LineShader");
+            _bondingBoxRenderer = new BoundingBoxRenderer(Content);
+           // _lineShader = Content.Load<Effect>("Shaders\\LineShader");
 
             VertexRenderer = new VertexInstanceMesh();
             VertexRenderer.Initialize(GraphicsDevice, Content, 0);
@@ -69,78 +60,38 @@ namespace View3D.Scene
         }
 
         BoundingBoxRenderer _bondingBoxRenderer;
+
         protected override void Draw(GameTime time)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-            if (_sceneManager == null)
-                return;
 
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
-
-  
-            CommonShaderParameters commonShaderParameters = new CommonShaderParameters()
-            {
-                Projection = _camera.ProjectionMatrix,
-                View = _camera.ViewMatrix,
-                CameraPosition = _camera.Position,
-                CameraLookAt = _camera.LookAt,
-                EnvRotate = 0
-            };
-
+            //DrawBasicSceneHirarchy(_sceneManager.RootNode, GraphicsDevice, Matrix.Identity);
 
             var selectionState = _selectionManager.GetState();
 
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
-
-            DrawBasicSceneHirarchy(_sceneManager.RootNode, GraphicsDevice, Matrix.Identity, commonShaderParameters);
-
             // Draw selection bounding box
             if (selectionState is ObjectSelectionState objectSelectionState)
-            { 
-                foreach(var item in objectSelectionState.CurrentSelection())
-                    _bondingBoxRenderer.Render(_lineShader, GraphicsDevice, commonShaderParameters, item.Geometry.BoundingBox, item.ModelMatrix);
+            {
+                foreach (var item in objectSelectionState.CurrentSelection())
+                    _renderEngine.AddRenderItem(RenderBuckedId.Selection, new BoundingBoxRenderItem() { BoundingBox = item.Geometry.BoundingBox, World = item.ModelMatrix, BoundingBoxRenderer = _bondingBoxRenderer });
             }
-            
+
             if (selectionState is FaceSelectionState selectionFaceState &&  selectionFaceState.RenderObject is MeshNode meshNode)
             {
-                GraphicsDevice.RasterizerState = _selectedFaceState;
-                meshNode.DrawSelectedFaces(GraphicsDevice, meshNode.ModelMatrix, commonShaderParameters, selectionFaceState.CurrentSelection());
-                
-                GraphicsDevice.RasterizerState = _wireframeState;
-                meshNode.DrawWireframeOverlay(GraphicsDevice, meshNode.ModelMatrix, commonShaderParameters);
+                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new FaceRenderItem() {Node = meshNode, World = meshNode.ModelMatrix, SelectedFaces = selectionFaceState.CurrentSelection() });
+                _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new WireFrameRenderItem() { World = meshNode.ModelMatrix, Node = meshNode });
             }
 
             if (selectionState is VertexSelectionState selectionVertexState && selectionVertexState.RenderObject != null)
             {
-                GraphicsDevice.RasterizerState = _selectedFaceState;
                 var vertexObject = selectionVertexState.RenderObject as MeshNode;
-                VertexRenderer.Update(vertexObject.Geometry, vertexObject.ModelMatrix, vertexObject.Orientation, commonShaderParameters.CameraPosition, selectionVertexState.SelectedVertices);
-                VertexRenderer.Draw(commonShaderParameters.View, commonShaderParameters.Projection, GraphicsDevice, new Vector3(0, 1, 0));
-
-                GraphicsDevice.RasterizerState = _wireframeState;
-                vertexObject.DrawWireframeOverlay(GraphicsDevice, Matrix.Identity, commonShaderParameters);
+                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new VertexRenderItem() { Node = vertexObject, World = vertexObject.ModelMatrix, SelectedVertices = selectionVertexState.SelectedVertices, VertexRenderer = VertexRenderer });
+                _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new WireFrameRenderItem() { World = Matrix.Identity, Node = vertexObject });
             }
-
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
             base.Draw(time);
         }
 
 
-        void DrawBasicSceneHirarchy(SceneNode root, GraphicsDevice device, Matrix parentMatrix, CommonShaderParameters commonShaderParameters)
-        {
-            if (root.IsVisible)
-            {
-                if (root is IDrawableNode drawableNode)
-                    drawableNode.DrawBasic(GraphicsDevice, parentMatrix, commonShaderParameters);
-
-                foreach (var child in root.Children)
-                    DrawBasicSceneHirarchy(child, device, parentMatrix * child.ModelMatrix, commonShaderParameters);
-            }
-        }
 
         protected override void Dispose(bool disposing)
         {
@@ -151,54 +102,6 @@ namespace View3D.Scene
             _disposed = true;
 
             base.Dispose(disposing);
-        }
-
-
-        class BoundingBoxRenderer
-        {
-            VertexPosition[] _originalVertecies;
-
-            public void CreateLineList((Vector3, Vector3)[] lines)
-            {
-                _originalVertecies = new VertexPosition[lines.Length * 2];
-                for (int i = 0; i < lines.Length; i++)
-                {
-                    _originalVertecies[i * 2] = new VertexPosition(lines[i].Item1);
-                    _originalVertecies[i * 2 + 1] = new VertexPosition(lines[i].Item2);
-                }
-            }
-
-            public virtual void Render(Effect effect, GraphicsDevice device, CommonShaderParameters commonShaderParameters, BoundingBox b, Matrix ModelMatrix)
-            {
-                var corners = b.GetCorners();
-                var data = new (Vector3, Vector3)[12];
-                data[0] = (corners[0], corners[1]);
-                data[1] = (corners[2], corners[3]);
-                data[2] = (corners[0], corners[3]);
-                data[3] = (corners[1], corners[2]);
-
-                data[4] = (corners[4], corners[5]);
-                data[5] = (corners[6], corners[7]);
-                data[6] = (corners[4], corners[7]);
-                data[7] = (corners[5], corners[6]);
-
-                data[8] = (corners[0], corners[4]);
-                data[9] = (corners[1], corners[5]);
-                data[10] = (corners[2], corners[6]);
-                data[11] = (corners[3], corners[7]);
-
-                CreateLineList(data);
-
-                effect.Parameters["View"].SetValue(commonShaderParameters.View);
-                effect.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
-                effect.Parameters["World"].SetValue(ModelMatrix);
-
-                foreach (var pass in effect.CurrentTechnique.Passes)
-                {
-                    pass.Apply();
-                    device.DrawUserPrimitives(PrimitiveType.LineList, _originalVertecies, 0, _originalVertecies.Count() / 2);
-                }
-            }
         }
     }
 }

@@ -104,6 +104,5 @@ namespace Filetypes.RigidModel
                 }
             }
         }
-
     }
 }

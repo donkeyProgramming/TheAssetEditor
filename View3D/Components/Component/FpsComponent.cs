@@ -5,7 +5,7 @@ using MonoGame.Framework.WpfInterop;
 
 namespace View3D.Components.Component
 {
-    public class FpsComponent : WpfDrawableGameComponent
+    public class FpsComponent : BaseComponent
     {
         #region Fields
         private SpriteBatch _spriteBatch;

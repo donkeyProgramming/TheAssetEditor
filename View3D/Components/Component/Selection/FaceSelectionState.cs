@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using View3D.Rendering;
+using View3D.SceneNodes;
 
 namespace View3D.Components.Component.Selection
 {

@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using View3D.Components.Component;
+using View3D.SceneNodes;
 
 namespace KitbasherEditor.Views
 {

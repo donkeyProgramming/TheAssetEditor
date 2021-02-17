@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using View3D.Components.Component;
+using View3D.SceneNodes;
 
 namespace KitbasherEditor.ValueConverters
 {

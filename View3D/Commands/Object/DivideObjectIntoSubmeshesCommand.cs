@@ -10,6 +10,7 @@ using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
+using View3D.SceneNodes;
 using View3D.Services;
 
 namespace View3D.Commands.Object

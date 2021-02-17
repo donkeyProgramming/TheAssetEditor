@@ -52,8 +52,7 @@ namespace FileTypesTests.PackFiles
         [Test]
         public void AddFolderToRoot()
         {
-            var packFileDb = new PackFileDataBase();
-            PackFileService packFileService = new PackFileService(packFileDb);
+            PackFileService packFileService = new PackFileService(new PackFileDataBase());
             var loadedPackFile = packFileService.Load(@"Data\CaPackFile_01.pack");
 
             packFileService.AddFolderContent(loadedPackFile, "", @"Data\FolderData");
@@ -68,9 +67,7 @@ namespace FileTypesTests.PackFiles
         [Test]
         public void AddFolderToChild()
         {
-
-            var packFileDb = new PackFileDataBase();
-            PackFileService packFileService = new PackFileService(packFileDb);
+            PackFileService packFileService = new PackFileService(new PackFileDataBase());
             var loadedPackFile = packFileService.Load(@"Data\CaPackFile_01.pack");
 
             packFileService.AddFolderContent(loadedPackFile, @"warmachines\materials", @"Data\FolderData");

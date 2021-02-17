@@ -6,17 +6,20 @@ namespace View3D.Components
 {
     public enum ComponentUpdateOrderEnum
     {
+        RenderEngine,
         Input,
         Camera,
         Gizmo,
-        PickingComponent,
+        SelectionComponent,
         Default,
     }
 
     public enum ComponentDrawOrderEnum
     {
+        ClearScreenComponent,
         Gizmo,
-        PickingComponent,
         Default,
+        RenderEngine,
+        SelectionComponent,
     }
 }

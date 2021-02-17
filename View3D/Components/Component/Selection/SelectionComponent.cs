@@ -42,6 +42,9 @@ namespace View3D.Components.Component.Selection
 
         public override void Initialize()
         {
+            UpdateOrder = (int)ComponentUpdateOrderEnum.SelectionComponent;
+            DrawOrder = (int)ComponentDrawOrderEnum.SelectionComponent;
+
             _mouseComponent = GetComponent<MouseComponent>();
             _keyboardComponent = GetComponent<KeyboardComponent>();
             _camera = GetComponent<ArcBallCamera>();

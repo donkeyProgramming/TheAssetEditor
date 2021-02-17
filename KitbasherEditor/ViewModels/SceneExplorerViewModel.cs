@@ -10,6 +10,7 @@ using View3D.Commands.Object;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Scene;
+using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels
 {
