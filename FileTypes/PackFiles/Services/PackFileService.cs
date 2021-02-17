@@ -205,7 +205,7 @@ namespace FileTypes.PackFiles.Services
 
         public IPackFile FindFile(string path) 
         {
-            var lowerPath = path.ToLower();
+            var lowerPath = path.Replace('/', '\\').ToLower();
             _logger.Here().Information($"Searching for file {lowerPath}");
             foreach (var packFile in Database.PackFiles)
             {
@@ -220,23 +220,10 @@ namespace FileTypes.PackFiles.Services
         }
 
 
-
-
-
-
-
-
-
-
         public PackFileContainer GetRoot(IPackFile item)
         {
-            var root = item;
-            while ((root = item.Parent) != null)
-            {
-
-
-            }
-
+            IPackFile root;
+            while ((root = item.Parent) != null);
             return root as PackFileContainer;
         }
     }

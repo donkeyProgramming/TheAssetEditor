@@ -32,6 +32,10 @@ namespace View3D.Services
         public void Load(string path, SceneNode parent)
         {
             var file = _packFileService.FindFile(path);
+            if (file == null)
+            { 
+            
+            }
             Load(file as PackFile, parent);
         }
 

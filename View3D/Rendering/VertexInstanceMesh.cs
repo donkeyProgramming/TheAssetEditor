@@ -67,7 +67,12 @@ namespace View3D.Rendering
         Vector3 _selectedColur = new Vector3(1, 0, 0);
         Vector3 _deselectedColur = new Vector3(0, 1, 0);
 
-        public void Initialize(GraphicsDevice device, ContentManager content, int instanceCount)
+        public VertexInstanceMesh(GraphicsDevice device, ContentManager content)
+        {
+            Initialize(device, content);
+        }
+
+        void Initialize(GraphicsDevice device, ContentManager content)
         {
             _effect = content.Load<Effect>("Shaders//InstancingShader");
 

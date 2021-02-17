@@ -11,7 +11,9 @@ using View3D.Components.Input;
 using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
+using View3D.Rendering.RenderItems;
 using View3D.Scene;
+using View3D.SceneNodes;
 
 namespace View3D.Components.Component.Selection
 {
@@ -22,12 +24,22 @@ namespace View3D.Components.Component.Selection
 
         ILogger _logger = Logging.Create<SelectionManager>();
         ISelectionState _currentState;
+        RenderEngineComponent _renderEngine;
+
+        BoundingBoxRenderer BoundingBoxRenderer;
+        VertexInstanceMesh VertexRenderer;
 
         public SelectionManager(WpfGame game ) : base(game) {}
 
         public override void Initialize()
         {
             CreateSelectionSate(GeometrySelectionMode.Object);
+            _renderEngine = GetComponent<RenderEngineComponent>();
+
+
+            BoundingBoxRenderer = new BoundingBoxRenderer(Game.Content);
+            VertexRenderer = new VertexInstanceMesh(GraphicsDevice, Game.Content);
+
             base.Initialize();
         }
 
@@ -83,10 +95,32 @@ namespace View3D.Components.Component.Selection
         {
             SelectionChanged?.Invoke(state);
         }
+
+        public override void Draw(GameTime gameTime)
+        {
+            var selectionState = GetState();
+
+            if (selectionState is ObjectSelectionState objectSelectionState)
+            {
+                foreach (var item in objectSelectionState.CurrentSelection())
+                    _renderEngine.AddRenderItem(RenderBuckedId.Selection, new BoundingBoxRenderItem() { BoundingBox = item.Geometry.BoundingBox, World = item.ModelMatrix, BoundingBoxRenderer = BoundingBoxRenderer });
+            }
+
+            if (selectionState is FaceSelectionState selectionFaceState && selectionFaceState.RenderObject is MeshNode meshNode)
+            {
+                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new FaceRenderItem() { Node = meshNode, World = meshNode.ModelMatrix, SelectedFaces = selectionFaceState.CurrentSelection() });
+                _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new WireFrameRenderItem() { World = meshNode.ModelMatrix, Node = meshNode });
+            }
+
+            if (selectionState is VertexSelectionState selectionVertexState && selectionVertexState.RenderObject != null)
+            {
+                var vertexObject = selectionVertexState.RenderObject as MeshNode;
+                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new VertexRenderItem() { Node = vertexObject, World = vertexObject.ModelMatrix, SelectedVertices = selectionVertexState.SelectedVertices, VertexRenderer = VertexRenderer });
+                _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new WireFrameRenderItem() { World = Matrix.Identity, Node = vertexObject });
+            }
+
+            base.Draw(gameTime);
+        }
     }
-
-
-
-   
 }
 
