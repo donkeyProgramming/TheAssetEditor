@@ -33,6 +33,11 @@ namespace View3D.SceneNodes
         bool IsSelectable { get; set; }
     }
 
+    public interface IUpdateable : INode
+    {
+        void Update(GameTime time);
+    }
+
     public abstract class SceneNode : NotifyPropertyChangedImpl, INode
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();

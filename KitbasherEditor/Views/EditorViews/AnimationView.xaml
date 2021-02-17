@@ -11,11 +11,9 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-
-        
         <ToggleButton Grid.Row="0" Content="Animation" Click="ToggleButton_Click" Margin="10,1,1,1"/>
         <Grid Grid.Row="1" Margin="0,1,0,10" x:Name="AnimationContent">
-            
+
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
@@ -42,14 +40,7 @@
                 <Button  FontSize="20">⏭</Button>
             </StackPanel>
 
-
             <local:AnimationSelector Grid.Row="2"/>
-
-
-
         </Grid>
-        
-        
-        
     </Grid>
 </UserControl>

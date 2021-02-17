@@ -47,6 +47,50 @@ namespace FileTypes.PackFiles.Services
             }
         }
 
+        public List<PackFile> FindAllWithExtention(string extention)
+        {
+            extention = extention.ToLower();
+            List<PackFile> output = new List<PackFile>();
+            foreach (var pf in Database.PackFiles)
+            {
+                foreach (var file in pf.FileList)
+                {
+                    var fileExtention = Path.GetExtension(file.Key);
+                    if(fileExtention == extention)
+                        output.Add(file.Value as PackFile);
+                }
+            }
+
+            return output;
+        }
+
+        public List<PackFile> FindAllFilesInDirectory(string dir)
+        {
+            dir = dir.ToLower();
+            List<PackFile> output = new List<PackFile>();
+            foreach (var pf in Database.PackFiles)
+            {
+                foreach (var file in pf.FileList)
+                {
+                    if(file.Key.IndexOf(dir) == 0)
+                        output.Add(file.Value as PackFile);
+                }
+            }
+
+            return output;
+        }
+
+        public string GetFullPath(PackFile file)
+        {
+            foreach (var pf in Database.PackFiles)
+            {
+                var res = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
+                if (string.IsNullOrWhiteSpace(res) == false)
+                    return res;
+            }
+            throw new Exception("Unknown path for " + file.Name);
+        }
+
         public PackFileContainer Load(BinaryReader binaryReader, string packFileSystemPath)
         {
             var pack = new PackFileContainer(packFileSystemPath, binaryReader);

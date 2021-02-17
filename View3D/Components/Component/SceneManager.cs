@@ -120,11 +120,31 @@ namespace View3D.Components.Component
             }
         }
 
+
+        public override void Update(GameTime gameTime)
+        {
+            UpdateSceneHirarchy(RootNode, gameTime);
+            base.Update(gameTime);
+        }
+
+        void UpdateSceneHirarchy(SceneNode root, GameTime gameTime)
+        {
+            if (root.IsVisible)
+            {
+                if (root is SceneNodes.IUpdateable updatableNode)
+                    updatableNode.Update(gameTime);
+
+                foreach (var child in root.Children)
+                    UpdateSceneHirarchy(child, gameTime);
+            }
+        }
+
         public override void Draw(GameTime gameTime)
         {
             DrawBasicSceneHirarchy(RootNode, Matrix.Identity);
             base.Draw(gameTime);
         }
+
 
         void DrawBasicSceneHirarchy(SceneNode root,  Matrix parentMatrix)
         {

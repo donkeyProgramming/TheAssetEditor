@@ -1,20 +1,27 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using View3D.Animation;
 using View3D.Components.Gizmo;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
 
 namespace View3D.SceneNodes
 {
-    public class MeshNode : GroupNode, ITransformable, IDrawableNode, ISelectable
+    public class MeshNode : GroupNode, ITransformable, IDrawableNode, ISelectable, IUpdateable
     {
+        public AnimationPlayer AnimationPlayer;
         public BasicEffect DefaultEffect { get; set; }
         public BasicEffect WireframeEffect { get; set; }
         public BasicEffect SelectedFacesEffect { get; set; }
 
         public int LodIndex { get; set; } = -1;
         public IGeometry Geometry { get; set; }
+
+        public void Update(GameTime time)
+        {
+            // 
+        }
 
         public void DrawWireframeOverlay(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams)
         {
@@ -53,12 +60,15 @@ namespace View3D.SceneNodes
                 IsVisible = IsVisible,
                 LodIndex = LodIndex,
                 Name = Name + " - Clone",
+                AnimationPlayer = AnimationPlayer,
             };
             newItem.DefaultEffect = (BasicEffect)DefaultEffect.Clone();
             newItem.WireframeEffect = (BasicEffect)WireframeEffect.Clone();
             newItem.SelectedFacesEffect = (BasicEffect)SelectedFacesEffect.Clone();
             return newItem;
         }
+
+
     }
 
  

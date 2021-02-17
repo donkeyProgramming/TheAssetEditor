@@ -11,7 +11,11 @@ namespace View3D.SceneNodes
         // AnimationData
 
         public void Update()
-        { }
+        {
+        
+        
+            // Updathe the shader?
+        }
 
 
         public void Render()

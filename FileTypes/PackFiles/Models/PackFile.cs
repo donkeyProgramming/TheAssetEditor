@@ -47,6 +47,7 @@ namespace FileTypes.PackFiles.Models
         IEnumerable<IPackFile> IPackFile.Children => Enumerable.Empty<IPackFile>();
 
         public IPackFile Parent { get; set; }
+
     }
 
 

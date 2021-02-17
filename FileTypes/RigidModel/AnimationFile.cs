@@ -1,5 +1,7 @@
 ﻿using Common;
 using Filetypes.ByteParsing;
+using Filetypes.RigidModel.Transforms;
+using FileTypes.PackFiles.Models;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -7,7 +9,7 @@ using System.IO;
 using System.Linq;
 
 namespace Filetypes.RigidModel
-{/*
+{
     public class AnimationFile
     {
         public class BoneInfo
@@ -19,8 +21,8 @@ namespace Filetypes.RigidModel
 
         public class Frame
         {
-            public List<FileVector3> Transforms { get; set; } = new List<FileVector3>();
-            public List<FileVector4> Quaternion { get; set; } = new List<FileVector4>();
+            public List<RmvVector3> Transforms { get; set; } = new List<RmvVector3>();
+            public List<RmvVector4> Quaternion { get; set; } = new List<RmvVector4>();
         }
 
         public class AnimationHeader
@@ -43,9 +45,9 @@ namespace Filetypes.RigidModel
 
         public AnimationHeader Header { get; set; } = new AnimationHeader();
 
-        public static AnimationHeader GetAnimationHeader(PackedFile file)
+        public static AnimationHeader GetAnimationHeader(PackFile file)
         {
-            var data = file?.Data;
+            var data = file.DataSource.ReadData();
             try
             {
                 return GetAnimationHeader(new ByteChunk(data));
@@ -139,10 +141,10 @@ namespace Filetypes.RigidModel
         }
 
 
-        public static AnimationFile Create(PackedFile file)
+        public static AnimationFile Create(PackFile file)
         {
             ILogger logger = Logging.Create<AnimationFile>();
-            var data = file?.Data;
+            var data = file.DataSource.ReadData();
             logger.Here().Information($"Loading animation: {file} Size:{data.Length}");
             return Create(new ByteChunk(data));
         }
@@ -314,7 +316,7 @@ namespace Filetypes.RigidModel
             var frame = new Frame();
             for (int j = 0; j < positions; j++)
             {
-                var vector = new FileVector3(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
+                var vector = new RmvVector3(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
                 frame.Transforms.Add(vector);
             }
 
@@ -323,11 +325,11 @@ namespace Filetypes.RigidModel
                 var maxValue = 1.0f / (float)short.MaxValue;
                 var quat = new short[4] { chunk.ReadShort(), chunk.ReadShort(), chunk.ReadShort(), chunk.ReadShort() };
 
-                var quaternion = new FileVector4(quat[0] * maxValue, quat[1] * maxValue, quat[2] * maxValue, quat[3] * maxValue);
+                var quaternion = new RmvVector4(quat[0] * maxValue, quat[1] * maxValue, quat[2] * maxValue, quat[3] * maxValue);
                 frame.Quaternion.Add(quaternion);
             }
             return frame;
         }
 
-    }*/
+    }
 }

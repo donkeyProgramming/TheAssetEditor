@@ -35,6 +35,7 @@ namespace FileTypes.PackFiles.Models
             Name = Path.GetFileNameWithoutExtension(packFileSystemPath);
             Header = new PFHeader(reader);
 
+            FileList = new Dictionary<string, IPackFile>(Header.FileCount);
             long sizes = 0;
             long offset = Header.DataStart;
             for (int i = 0; i < Header.FileCount; i++)

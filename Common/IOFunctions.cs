@@ -12,13 +12,13 @@ namespace Common
         {
             var index = 0;
             byte ch2 = reader.ReadByte();
-            while (ch2 != '\0')
+            while (ch2 != 0)
             {
                 staticBuffer[index++] = ch2;
                 ch2 = reader.ReadByte();
             }
 
-            return Encoding.ASCII.GetString(staticBuffer, 0, index);
+            return Encoding.UTF8.GetString(staticBuffer, 0, index);
         }
     }
 }

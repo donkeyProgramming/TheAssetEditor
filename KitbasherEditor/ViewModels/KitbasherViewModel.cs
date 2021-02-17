@@ -7,17 +7,11 @@ using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using View3D.Commands;
-using View3D.Components;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Components.Gizmo;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
-using View3D.Rendering;
-using View3D.Rendering.Geometry;
 using View3D.Scene;
 using View3D.SceneNodes;
 using View3D.Services;
@@ -27,27 +21,18 @@ namespace KitbasherEditor.ViewModels
     public class KitbasherViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
         ILogger _logger = Logging.Create<KitbasherViewModel>();
+        PackFileService _packFileService;
 
         public SceneContainer Scene { get; set; }
         public SceneExplorerViewModel SceneExplorer { get; set; }
         public MenuBarViewModel MenuBar { get; set; } 
+        public AnimationControllerViewModel Animation { get; set; }
+
 
         string _displayName = "3d viewer";
         public string DisplayName { get => _displayName; set => SetAndNotify(ref _displayName, value); }
 
-
-        IPackFile _packFile;
-        public IPackFile MainFile
-        {
-            get => _packFile;
-            set
-            {
-                _packFile = value;
-                SetCurrentPackFile(_packFile);
-            }
-        }
-
-        PackFileService _packFileService;
+        public IPackFile MainFile { get; set; }
 
         public KitbasherViewModel(PackFileService pf)
         {
@@ -75,10 +60,9 @@ namespace KitbasherEditor.ViewModels
             Scene.Components.Add(SceneExplorer as IEditableMeshResolver);
 
             MenuBar = new MenuBarViewModel(Scene);
-
+            Animation = new AnimationControllerViewModel(Scene, _packFileService);
             Scene.SceneInitialized += OnSceneInitialized;
         }
-
 
         Rmv2ModelNode _editableRmvMesh;
         SceneNode _referenceMesh;
@@ -93,10 +77,13 @@ namespace KitbasherEditor.ViewModels
             if (MainFile != null)
             {
                 var file = MainFile as PackFile;
-                _editableRmvMesh.AddModel(new RmvRigidModel(file.DataSource.ReadData(), file.Name), Scene.GraphicsDevice);
+                var rmv = new RmvRigidModel(file.DataSource.ReadData(), file.Name);
+                _editableRmvMesh.AddModel(rmv, Scene.GraphicsDevice);
+                Animation.SetActiveSkeleton(rmv.Header.SkeletonName);
+                DisplayName = file.Name;
 
-                var cubeMesh = new CubeMesh(Scene.GraphicsDevice);
-                _editableRmvMesh.Children[0].AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0), new Vector3(0.5f), "Item1", Scene.GraphicsDevice));
+                //var cubeMesh = new CubeMesh(Scene.GraphicsDevice);
+                //_editableRmvMesh.Children[0].AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0), new Vector3(0.5f), "Item1", Scene.GraphicsDevice));
             }
 
             // Wmd reference
@@ -107,29 +94,12 @@ namespace KitbasherEditor.ViewModels
             result.ForeachNode((node) => node.IsEditable = false);
             _referenceMesh.AddObject(result);
 
-
-
             SceneExplorer.EditableMeshNode = _editableRmvMesh;
         }
-
-        public void AddMesh(IPackFile file, bool isReference)
-        {
-            if (file is PackFile packFile)
-            {
-                var data = packFile.DataSource.ReadData();
-            }
-        }
-
-        public string Text { get; set; }
 
         public bool Save()
         {
             throw new NotImplementedException();
-        }
-        void SetCurrentPackFile(IPackFile packedFile)
-        {
-
-
         }
     }
 }
