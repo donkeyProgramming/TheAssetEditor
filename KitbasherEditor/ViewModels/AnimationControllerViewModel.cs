@@ -11,6 +11,7 @@ using System.Text;
 using View3D.Scene;
 using View3D.SceneNodes;
 using View3D.Utility;
+using static CommonControls.FilterDialog.FilterUserControl;
 
 namespace KitbasherEditor.ViewModels
 {
@@ -27,18 +28,23 @@ namespace KitbasherEditor.ViewModels
         ObservableCollection<PackFile> _animationList = new ObservableCollection<PackFile>();
         public ObservableCollection<PackFile> AnimationsForCurrentSkeleton { get { return _animationList; } set { SetAndNotify(ref _animationList, value); } }
 
-        List<PackFile> _skeletonList = new List<PackFile>();
-        public List<PackFile> SkeletonList { get { return _skeletonList; } set { SetAndNotify(ref _skeletonList, value); } }
+        List<string> _skeletonList = new List<string>();
+        public List<string> SkeletonList { get { return _skeletonList; } set { SetAndNotify(ref _skeletonList, value); } }
 
-        PackFile _selectedSkeleton;
-        public PackFile SelectedSkeleton { get { return _selectedSkeleton; } set { SetAndNotify(ref _selectedSkeleton, value); SkeletonChanged(_selectedSkeleton); } }
-
-
-
-        PackFile _selectedAnimation;
-        public PackFile SelectedAnimation { get { return _selectedAnimation; } set { SetAndNotify(ref _selectedAnimation, value); AnimationChanged(_selectedAnimation); } }
+        string _selectedSkeleton;
+        public string SelectedSkeleton { get { return _selectedSkeleton; } set { SetAndNotify(ref _selectedSkeleton, value); SkeletonChanged(_selectedSkeleton); } }
 
 
+
+        string _selectedAnimation;
+        public string SelectedAnimation { get { return _selectedAnimation; } set { SetAndNotify(ref _selectedAnimation, value); AnimationChanged(_selectedAnimation); } }
+
+        public OnSeachDelegate FilterByFullPath { get { return (item, expression) => { return expression.Match((item as PackFile).Name).Success; }; } }
+
+
+
+        PackFile Skeleton;
+        PackFile Animation;
 
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         public AnimationControllerViewModel(SceneContainer scene, PackFileService pf)
@@ -49,7 +55,7 @@ namespace KitbasherEditor.ViewModels
             _skeletonAnimationLookUpHelper.FindAllAnimations(_packFileService);
 
             var allFilesInFolder = _packFileService.FindAllFilesInDirectory("animations\\skeletons");
-            SkeletonList = allFilesInFolder.Where(x => Path.GetExtension(x.Name) == ".anim").ToList();
+            SkeletonList = allFilesInFolder.Where(x => Path.GetExtension(x.Name) == ".anim").Select(x=>pf.GetFullPath(x)).ToList();
         }
 
         public void SetActiveSkeleton(string skeletonName)
@@ -57,23 +63,36 @@ namespace KitbasherEditor.ViewModels
             string animationFolder = "animations\\skeletons\\";
             var skeletonFilePath = animationFolder + skeletonName + ".anim";
 
-            SelectedSkeleton = _packFileService.FindFile(skeletonFilePath) as PackFile;
+            SelectedSkeleton = skeletonFilePath;;
             SelectedAnimation = null;
         }
 
-        private void SkeletonChanged(PackFile selectedSkeleton)
+        private void SkeletonChanged(string selectedSkeletonPath)
         {
+            // 
+
+            HeaderText = "";
+            Skeleton = null;
             AnimationsForCurrentSkeleton.Clear();
-            var anims = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(Path.GetFileNameWithoutExtension(selectedSkeleton.Name));
-            foreach (var anim in anims)
-                AnimationsForCurrentSkeleton.Add(anim);
+            if (!string.IsNullOrWhiteSpace(selectedSkeletonPath))
+            {
+                Skeleton = _packFileService.FindFile(selectedSkeletonPath) as PackFile;
+                HeaderText = Skeleton.Name + " - No Animation";
+                var anims = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(Path.GetFileNameWithoutExtension(Skeleton.Name));
+                foreach (var anim in anims)
+                    AnimationsForCurrentSkeleton.Add(anim);
+            }
 
             SelectedAnimation = null;
         }
 
-        private void AnimationChanged(PackFile selectedAnimation)
+        private void AnimationChanged(string selectedAnimationPath)
         {
-           // throw new NotImplementedException();
+           //HeaderText = SelectedSkeleton.Name + " - No Animation";
+           //if (selectedAnimation != null)
+           //{
+           //    HeaderText = SelectedSkeleton.Name + " - " + selectedAnimation.Name;
+           //}
         }
     }
 }

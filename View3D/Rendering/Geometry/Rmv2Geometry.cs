@@ -19,7 +19,7 @@ namespace View3D.Rendering.Geometry
 
             _vertexDeclaration = VertexPositionNormalTextureCustom.VertexDeclaration;
             _vertexArray = new VertexPositionNormalTextureCustom[modelPart.Mesh.VertexList.Length];
-            _indexList = (ushort[])modelPart.Mesh._indexList.Clone();
+            _indexList = (ushort[])modelPart.Mesh.IndexList.Clone();
 
             for (int i = 0; i < modelPart.Mesh.VertexList.Length; i++)
             {

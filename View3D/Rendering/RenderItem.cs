@@ -51,19 +51,19 @@ namespace View3D.Rendering
              */
         }
 
-        public static MeshNode CreateRenderItem(IGeometry geo, Vector3 position, Vector3 scale, string name, GraphicsDevice device, ResourceLibary resourceLib,  bool isEditable = true)
-        {
-            var item = new MeshNode()
-            {
-                Name = name,
-                IsEditable = isEditable,
-                Geometry = geo,
-                Position = position,
-                Scale = scale,
-                Orientation = Quaternion.Identity,
-            };
-            CreateDefaultShaders(item, device, resourceLib);
-            return item;
-        }
+        //public static MeshNode CreateRenderItem(IGeometry geo, Vector3 position, Vector3 scale, string name, GraphicsDevice device, ResourceLibary resourceLib,  bool isEditable = true)
+        //{
+        //    var item = new MeshNode()
+        //    {
+        //        Name = name,
+        //        IsEditable = isEditable,
+        //        Geometry = geo,
+        //        Position = position,
+        //        Scale = scale,
+        //        Orientation = Quaternion.Identity,
+        //    };
+        //    CreateDefaultShaders(item, device, resourceLib);
+        //    return item;
+        //}
     }
 }

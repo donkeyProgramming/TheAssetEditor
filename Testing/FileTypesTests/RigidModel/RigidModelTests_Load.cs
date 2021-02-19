@@ -84,6 +84,9 @@ namespace FileTypesTests.RigidModel
         {
             var meshData = GetMeshData();
             RmvRigidModel model = new RmvRigidModel(meshData, "UnitTestModel");
+
+            model.UpdateOffsets();
+
             using (MemoryStream ms = new MemoryStream())
             {
                 using (BinaryWriter writer = new BinaryWriter(ms))

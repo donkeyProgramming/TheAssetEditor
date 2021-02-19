@@ -9,13 +9,14 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="5"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
+            
             <RowDefinition Height="auto"/>
             <RowDefinition Height="0.5*"/>
             <RowDefinition Height="5"/>
@@ -30,12 +31,10 @@
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <ContentControl Grid.Row="0"  Content="{Binding Scene}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
-            <editorviews:AnimationView Grid.Row="1"/>
+            <ContentControl Grid.Row="0"  Content="{Binding Scene}"/>
+            <editorviews:AnimationView DataContext="{Binding Animation}" Grid.Row="1"/>
         </Grid>
-
-
-
+        
         <GridSplitter Grid.Row="1" Grid.RowSpan="4" Grid.Column="1"  HorizontalAlignment="Stretch">
             <GridSplitter.Template>
                 <ControlTemplate TargetType="{x:Type GridSplitter}">

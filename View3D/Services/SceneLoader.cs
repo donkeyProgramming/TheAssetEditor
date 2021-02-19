@@ -149,19 +149,5 @@ namespace View3D.Services
                 LoadRigidMesh(modelFile, ref modelAsBase);
             }
         }
-
-        public void Simplify(SceneNode node)
-        {
-            //if (node is SlotNode slotNode)
-            //{
-            //    if (slotNode.Name.Contains("stump_"))
-            //        slotNode.Parent.RemoveObject(slotNode);
-            //    else if(slotNode.Children.Count == 0)
-            //        slotNode.Parent.RemoveObject(slotNode);
-            //}
-            //
-            //foreach (var child in node.Children)
-            //    Simplify(child);
-        }
     }
 }

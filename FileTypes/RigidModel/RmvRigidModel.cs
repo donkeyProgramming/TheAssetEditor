@@ -3,6 +3,7 @@ using Filetypes.RigidModel.LodHeader;
 using Serilog;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace Filetypes.RigidModel
 {
@@ -102,6 +103,31 @@ namespace Filetypes.RigidModel
 
                     model.Mesh.SaveToByteArray(writer, model.Header.VertextType);
                 }
+            }
+        }
+
+
+        public void UpdateOffsets()
+        {
+            for (int lodIndex = 0; lodIndex < Header.LodCount; lodIndex++)
+            {
+                var modelList = MeshList[lodIndex];
+                for (var modelIndex = 0; modelIndex < modelList.Length; modelIndex++)
+                {
+                    var model = modelList[modelIndex];
+                    model.Header.UpdateHeader(model.Mesh, model.Textures, model.AttachmentPoints);
+                }
+            }
+            var headerOffset = (uint)(ByteHelper.GetSize<RmvModelHeader>() + GetLodHeaderSize() * Header.LodCount);
+            uint modelOffset = 0;
+            for (int lodIndex = 0; lodIndex < Header.LodCount; lodIndex++)
+            {
+                var lodHeader = LodHeaders[lodIndex];
+                lodHeader.MeshCount = (uint)MeshList[lodIndex].Length;
+                lodHeader.TotalLodVertexSize = (uint)MeshList[lodIndex].Sum(x=>x.Header.VertexCount * RmvMesh.GetVertexSize(x.Header.VertextType));
+                lodHeader.TotalLodIndexSize = (uint)MeshList[lodIndex].Sum(x => x.Header.FaceCount * sizeof(ushort));
+                lodHeader.FirstMeshOffset = headerOffset + modelOffset;
+                modelOffset += (uint)MeshList[lodIndex].Sum(x => x.Header.ModelSize);
             }
         }
     }

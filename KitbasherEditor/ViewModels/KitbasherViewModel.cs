@@ -101,7 +101,6 @@ namespace KitbasherEditor.ViewModels
             var refereneceMesh = _packFileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_paladin.variantmeshdefinition");
             SceneLoader loader = new SceneLoader(_packFileService, Scene.GraphicsDevice, resourceLib);
             var result = loader.Load(refereneceMesh as PackFile, null);
-            loader.Simplify(result);
             result.ForeachNode((node) => node.IsEditable = false);
             _referenceMesh.AddObject(result);
 

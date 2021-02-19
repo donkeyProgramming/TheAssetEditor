@@ -33,8 +33,13 @@ namespace CommonControls.FilterDialog
             var selectedItem = FilterBox.SelectedItem;
             if (selectedItem != null)
             {
-                var val = selectedItem.GetType().GetProperty(DisplayMemberPath).GetValue(selectedItem, null);
-                SelectedFileName.Text = val.ToString();
+                if (string.IsNullOrWhiteSpace(DisplayMemberPath))
+                    SelectedFileName.Text = selectedItem.ToString();
+                else
+                {
+                    var val = selectedItem.GetType().GetProperty(DisplayMemberPath).GetValue(selectedItem, null);
+                    SelectedFileName.Text = val.ToString();
+                }
             }
             else
             {

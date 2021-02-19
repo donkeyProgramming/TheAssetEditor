@@ -32,6 +32,10 @@ namespace View3D.Utility
         PackFileService _pf;
         public ContentManager Content { get; set; }
 
+        public TextureCube PbrDiffuse { get; private set; }
+        public TextureCube PbrSpecular { get; private set; }
+        public Texture2D PbrLut{ get; private set; }
+
 
         public ResourceLibary(WpfGame game, PackFileService pf) : base(game)
         {
@@ -44,15 +48,20 @@ namespace View3D.Utility
 
             // Load default shaders
             LoadEffect("Shaders\\Phazer\\main", ShaderTypes.Phazer);
+
+
+            PbrDiffuse = Content.Load<TextureCube>("textures\\phazer\\rustig_koppie_DiffuseHDR");
+            PbrSpecular = PbrDiffuse;// resourceLibary.XnaContentManager.Load<TextureCube>("textures\\phazer\\rustig_koppie_SpecularHDR");
+            PbrLut = Content.Load<Texture2D>("textures\\phazer\\Brdf_rgba32f_raw");
         }
 
 
-        public Texture2D LoadTexture(string fileName, GraphicsDevice device)
+        public Texture2D LoadTexture(string fileName)
         {
             if (_textureMap.ContainsKey(fileName))
                 return _textureMap[fileName];
 
-            var texture = LoadTextureAsTexture2d(fileName, device);
+            var texture = LoadTextureAsTexture2d(fileName, Game.GraphicsDevice);
             if (texture != null)
                 _textureMap[fileName] = texture;
             return texture;

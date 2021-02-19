@@ -67,5 +67,10 @@ namespace Filetypes
         {
             return Marshal.SizeOf(type);
         }
+
+        public static int GetSize<T>()
+        {
+            return Marshal.SizeOf(typeof(T));
+        }
     }
 }

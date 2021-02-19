@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews" 
              xmlns:filterdialog="clr-namespace:CommonControls.FilterDialog;assembly=CommonControls" 
              xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
              mc:Ignorable="d" 
@@ -30,16 +29,7 @@
                     <RowDefinition Height="auto"/>
 
                 </Grid.RowDefinitions>
-                <DockPanel Grid.Row="0"
-                           Visibility="{Binding EnableSkeltonBrowsing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToHiddenConverterInverted}}">
-                    <TextBlock Text="Skeleton" Width="110" DockPanel.Dock="Left" Height="20"/>
-                    <TextBlock Text=" : " DockPanel.Dock="Left"/>
-                    <TextBlock Text="{Binding CurrentSkeletonName, UpdateSourceTrigger=PropertyChanged}"/>
-                </DockPanel>
-
-
-                <Grid  Grid.Row="0" 
-                       Visibility="{Binding EnableSkeltonBrowsing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToHiddenConverter}}">
+                <Grid  Grid.Row="0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto" />
@@ -53,7 +43,6 @@
                             OnSearch="{Binding FilterByFullPath, UpdateSourceTrigger=PropertyChanged}"   
                             IsManipulationEnabled="False"
                             LabelTotalWidth="0"   
-                            DisplayMemberPath="FullPath"
                             ShowLabel="False"
                             LabelText="External Skeleton"/>
                     </DockPanel>
@@ -69,12 +58,10 @@
                                 OnSearch="{Binding FilterByFullPath, UpdateSourceTrigger=PropertyChanged}"   
                                 IsManipulationEnabled="False"
                                 LabelTotalWidth="0"   
-                                DisplayMemberPath="FullPath"
                                 DockPanel.Dock="top"
                                 MaxHeight="400"
                                 ShowLabel="false"
                                 LabelText="Target Anim">
-
                     </filterdialog:CollapsableFilterControl>
                 </DockPanel>
             </Grid>

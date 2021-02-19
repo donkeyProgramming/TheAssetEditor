@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Filetypes.RigidModel;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using View3D.Animation;
@@ -7,12 +8,71 @@ using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.Rendering.RenderItems;
+using View3D.Utility;
 
 namespace View3D.SceneNodes
 {
     public class MeshNode : GroupNode, ITransformable, IDrawableNode, ISelectable, IUpdateable
     {
         public AnimationPlayer AnimationPlayer;
+
+        private MeshNode()
+        { }
+
+        public MeshNode(IGeometry geo, string name, GraphicsDevice device, ResourceLibary resourceLib)
+        {
+            Geometry = geo;
+
+            Name = name;
+            Position = Vector3.Zero;
+            Scale = Vector3.One;
+            Orientation = Quaternion.Identity;
+
+            DefaultEffect = resourceLib.GetEffect(ShaderTypes.Phazer);
+
+            WireframeEffect = new BasicEffect(device);
+            WireframeEffect.DiffuseColor = Vector3.Zero;
+
+            SelectedFacesEffect = new BasicEffect(device);
+            SelectedFacesEffect.DiffuseColor = new Vector3(1, 0, 0);
+            SelectedFacesEffect.SpecularColor = new Vector3(1, 0, 0);
+            SelectedFacesEffect.EnableDefaultLighting();
+        }
+
+        public MeshNode(RmvSubModel rmvSubModel, GraphicsDevice device, ResourceLibary resourceLib)
+        {
+            Geometry = new Rmv2Geometry(rmvSubModel, device);
+
+            Name = rmvSubModel.Header.ModelName;
+            Position = Vector3.Zero;
+            Scale = Vector3.One;
+            Orientation = Quaternion.Identity;
+
+            DefaultEffect = resourceLib.GetEffect(ShaderTypes.Phazer);
+
+            WireframeEffect = new BasicEffect(device);
+            WireframeEffect.DiffuseColor = Vector3.Zero;
+
+            SelectedFacesEffect = new BasicEffect(device);
+            SelectedFacesEffect.DiffuseColor = new Vector3(1, 0, 0);
+            SelectedFacesEffect.SpecularColor = new Vector3(1, 0, 0);
+            SelectedFacesEffect.EnableDefaultLighting();
+
+            var diffuse = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Diffuse).Path);
+            var specTexture = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Specular).Path);
+            var normalTexture = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Normal).Path);
+            var glossTexture = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Gloss).Path);
+
+            DefaultEffect.Parameters["DiffuseTexture"].SetValue(diffuse);
+            DefaultEffect.Parameters["SpecularTexture"].SetValue(specTexture);
+            DefaultEffect.Parameters["NormalTexture"].SetValue(normalTexture);
+            DefaultEffect.Parameters["GlossTexture"].SetValue(glossTexture);
+
+            DefaultEffect.Parameters["tex_cube_diffuse"].SetValue(resourceLib.PbrDiffuse);
+            DefaultEffect.Parameters["tex_cube_specular"].SetValue(resourceLib.PbrSpecular);
+            DefaultEffect.Parameters["specularBRDF_LUT"].SetValue(resourceLib.PbrLut);
+        }
+
         public Effect DefaultEffect { get; set; }
         public BasicEffect WireframeEffect { get; set; }
         public BasicEffect SelectedFacesEffect { get; set; }
@@ -54,7 +114,7 @@ namespace View3D.SceneNodes
 
         public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)
         {
-            renderEngine.AddRenderItem(RenderBuckedId.Normal, new MeshRenderItem() { World = parentWorld, Node = this });
+            renderEngine.AddRenderItem(RenderBuckedId.Normal, new MeshRenderItem() { Node = this });
         }
 
         public void DrawWireframeOverlay(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams)
@@ -73,7 +133,7 @@ namespace View3D.SceneNodes
             Geometry.ApplyMeshPart(SelectedFacesEffect, device, faces);
         }
 
-        public void DrawBasic(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams)
+        public void DrawBasic(GraphicsDevice device, CommonShaderParameters shaderParams)
         {
             DefaultEffect.Parameters["View"].SetValue(shaderParams.View);
             DefaultEffect.Parameters["Projection"].SetValue(shaderParams.Projection);
@@ -83,9 +143,9 @@ namespace View3D.SceneNodes
             DefaultEffect.Parameters["EnvMapTransform"].SetValue((Matrix.CreateRotationY(shaderParams.EnvRotate)));
 
             // Pivot stuff
-            DefaultEffect.Parameters["World"].SetValue(ModelMatrix * parentWorldMatrix);
+            DefaultEffect.Parameters["World"].SetValue(ModelMatrix);
 
-            DefaultEffect.Parameters["UseAlpha"].SetValue(false);
+            DefaultEffect.Parameters["UseAlpha"].SetValue(true);
             DefaultEffect.Parameters["doAnimation"].SetValue(true);
 
             //DefaultEffect.Projection = shaderParams.Projection;

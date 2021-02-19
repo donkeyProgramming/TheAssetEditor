@@ -16,6 +16,12 @@ namespace View3D.Components.Rendering
         Line,
     }
 
+    public enum RenderMode
+    { 
+        Cinematic,
+        Simple
+    }
+
     public interface IRenderItem
     {
         void Draw(GraphicsDevice device, CommonShaderParameters parameters);
@@ -28,8 +34,10 @@ namespace View3D.Components.Rendering
 
         ArcBallCamera _camera;
 
-
         Dictionary<RenderBuckedId, List<IRenderItem>> _renderItems = new Dictionary<RenderBuckedId, List<IRenderItem>>();
+
+        public RenderMode RenderMode { get; set; } = RenderMode.Cinematic;
+
 
         public RenderEngineComponent(WpfGame game) : base(game)
         {

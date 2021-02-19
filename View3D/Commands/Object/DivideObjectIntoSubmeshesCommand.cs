@@ -52,7 +52,7 @@ namespace View3D.Commands.Object
             int counter = 0;
             foreach (var mesh in newMeshes)
             {
-                var meshNode = RenderItemHelper.CreateRenderItem(mesh, new Vector3(0, 0, 0), new Vector3(1), $"{_objectToSplit.Name}_submesh_{counter++}", _sceneManager.GraphicsDevice, _resourceLib);
+                var meshNode = new MeshNode(mesh, $"{_objectToSplit.Name}_submesh_{counter++}", _sceneManager.GraphicsDevice, _resourceLib); 
                 _newMeshes.Add(meshNode);
                 _editableMeshResolver.GetEditableMeshNode().AddObject(meshNode);
             }

@@ -95,6 +95,17 @@ namespace Filetypes.RigidModel
                     throw new Exception();
                 return Util.SanatizeFixedString(value);
             }
+            set 
+            {
+                for (int i = 0; i < 32; i++)
+                    _modelName[i] = 0;
+
+                var byteValues = Encoding.UTF8.GetBytes(value);
+                for (int i = 0; i < byteValues.Length; i++)
+                {
+                    _modelName[i] = byteValues[i];
+                }
+            }
         }
 
         public string TextureDirectory
@@ -110,6 +121,34 @@ namespace Filetypes.RigidModel
             {
                 throw new NotImplementedException();
             }
+        }
+
+        internal void UpdateHeader(RmvMesh mesh, List<RmvTexture> textures, List<RmvAttachmentPoint> attachmentPoints)
+        {
+            VertexCount = (uint)mesh.VertexList.Length;
+            FaceCount = (uint)mesh.IndexList.Length;
+            AttachmentPointCount = (uint)attachmentPoints.Count;
+            TextureCount = (uint)textures.Count;
+
+            var nonMeshSize = (uint)(ByteHelper.GetSize<RmvSubModelHeader>() +
+                (ByteHelper.GetSize<RmvAttachmentPoint>() * AttachmentPointCount) +
+                (ByteHelper.GetSize<RmvTexture>() * TextureCount) +
+                ByteHelper.GetSize<MeshAlphaSettings>());
+
+            ModelSize = +nonMeshSize +
+                (uint)
+                ((RmvMesh.GetVertexSize(VertextType) * VertexCount) +
+                (sizeof(ushort) * FaceCount));
+
+            VertexOffset = nonMeshSize;
+            FaceOffset = nonMeshSize + (uint)(RmvMesh.GetVertexSize(VertextType) * VertexCount);
+
+            BoundingBox.Recompute(mesh);
+        }
+
+        public void UpdateOffsets(int modelStart)
+        { 
+        
         }
     }
 
@@ -161,10 +200,10 @@ namespace Filetypes.RigidModel
     public class RmvMesh
     {
         public BaseVertex[] VertexList { get; private set; }
-        public ushort[] _indexList;
+        public ushort[] IndexList;
         public MeshAlphaSettings AlphaSettings { get; private set; }
 
-        int GetVertexSize(VertexFormat vertexFormat)
+        public static int GetVertexSize(VertexFormat vertexFormat)
         {
             switch (vertexFormat)
             {
@@ -194,8 +233,8 @@ namespace Filetypes.RigidModel
                     throw new Exception($"Unkown vertex format - {vertexFormat}");
             }
 
-            for (int i = 0; i < _indexList.Length; i++)
-                writer.Write(_indexList[i]);
+            for (int i = 0; i < IndexList.Length; i++)
+                writer.Write(IndexList[i]);
         }
 
         public RmvMesh(byte[] data, VertexFormat vertexFormat, int vertexStart, uint vertexCount, int faceStart, uint faceCount)
@@ -229,9 +268,9 @@ namespace Filetypes.RigidModel
                 }
             }
 
-            _indexList = new ushort[faceCount];
+            IndexList = new ushort[faceCount];
             for (int i = 0; i < faceCount; i++)
-                _indexList[i] =  BitConverter.ToUInt16(data, faceStart + sizeof(ushort) * i);
+                IndexList[i] =  BitConverter.ToUInt16(data, faceStart + sizeof(ushort) * i);
         }
     }
 
@@ -261,8 +300,8 @@ namespace Filetypes.RigidModel
 
         List<RmvAttachmentPoint> LoadAttachmentPoints(byte[] dataArray)
         {
-            var attachmentPointStart = _modelStart + Marshal.SizeOf(typeof(RmvSubModelHeader));
-            var attachmentPointSize = Marshal.SizeOf(typeof(RmvAttachmentPoint));
+            var attachmentPointStart = _modelStart + ByteHelper.GetSize<RmvSubModelHeader>();
+            var attachmentPointSize = ByteHelper.GetSize<RmvAttachmentPoint>();
 
             var attachmentPoints = new List<RmvAttachmentPoint>();
             for (int i = 0; i < Header.AttachmentPointCount; i++)
@@ -276,9 +315,9 @@ namespace Filetypes.RigidModel
 
         List<RmvTexture> LoadTextures(byte[] dataArray)
         {
-            var attachmentsPointOffset = Marshal.SizeOf(typeof(RmvAttachmentPoint)) * Header.AttachmentPointCount;
-            var textureStart = _modelStart + Marshal.SizeOf(typeof(RmvSubModelHeader)) + attachmentsPointOffset;
-            var textureSize = Marshal.SizeOf(typeof(RmvTexture));
+            var attachmentsPointOffset = ByteHelper.GetSize<RmvAttachmentPoint>() * Header.AttachmentPointCount;
+            var textureStart = _modelStart + ByteHelper.GetSize<RmvSubModelHeader>() + attachmentsPointOffset;
+            var textureSize = ByteHelper.GetSize<RmvTexture>();
 
             var textures = new List<RmvTexture>();
             for (int i = 0; i < Header.TextureCount; i++)
@@ -290,11 +329,34 @@ namespace Filetypes.RigidModel
             return textures;
         }
 
+        public RmvTexture GetTexture(TexureType texureType)
+        {
+            return Textures.FirstOrDefault(x => x.TexureType == texureType);
+        }
+
         RmvMesh LoadMesh(byte[] dataArray)
         {
             var vertexStart =  Header.VertexOffset + _modelStart; 
             var faceStart = Header.FaceOffset + _modelStart;
+
             return new RmvMesh(dataArray, Header.VertextType, (int)vertexStart, Header.VertexCount, (int)faceStart, Header.FaceCount);
+        }
+
+
+        void Fix()
+        {
+            //Header = new RmvSubModelHeader()
+            //{
+            //    
+            //};
+            //
+            //
+            //Header.VertexCount = (uint)Mesh.VertexList.Length;
+            //
+            //
+            //model.Header = header;
+            //
+
         }
     }
 
