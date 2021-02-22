@@ -35,23 +35,12 @@ namespace FileTypes.PackFiles.Models
         }
 
         public override string ToString() { return Name; }
-        public void Sort() { }
-
-        public void AddChild(IPackFile packFile)
-        {
-            throw new Exception("Files can not have children");
-        }
 
         public string Extention { get => Path.GetExtension(Name); }
-
-        IEnumerable<IPackFile> IPackFile.Children => Enumerable.Empty<IPackFile>();
-
-        public IPackFile Parent { get; set; }
-
     }
 
 
-    public class PackFileDirectory : NotifyPropertyChangedImpl, IPackFile
+    /*public class PackFileDirectory : NotifyPropertyChangedImpl, IPackFile
     {
         public PackFileDirectory(string name) 
         {
@@ -70,11 +59,6 @@ namespace FileTypes.PackFiles.Models
             set => SetAndNotify(ref _name, value);
         }
 
-        public void AddChild(IPackFile file)
-        {
-            file.Parent = this;
-            InternalFileList.Add(file.Name, file);
-        }
 
         public void Sort()
         {
@@ -96,5 +80,5 @@ namespace FileTypes.PackFiles.Models
         IEnumerable<IPackFile> IPackFile.Children => InternalFileList.Values;
 
         IPackFile IPackFile.Parent { get; set; }
-    }
+    }*/
 }

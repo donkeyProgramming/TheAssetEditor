@@ -80,7 +80,7 @@ namespace FileTypesTests.RigidModel
 
 
         [Test]
-        public void FixAndSaveWarLion()
+        public void UpdateOffsets()
         {
             var meshData = GetMeshData();
             RmvRigidModel model = new RmvRigidModel(meshData, "UnitTestModel");

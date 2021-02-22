@@ -80,13 +80,22 @@ namespace Filetypes.RigidModel
 
         public void SaveToByteArray(BinaryWriter writer)
         {
-            if (Header.Version != 7)
-                throw new Exception("Not a know version - can not save");
-
             writer.Write(ByteHelper.GetBytes(Header));
 
-            for (int i = 0; i < LodHeaders.Length; i++)
-                writer.Write(ByteHelper.GetBytes((Rmv2LodHeader_V7)LodHeaders[i]));
+            if (Header.Version == 7)
+            {
+                for (int i = 0; i < LodHeaders.Length; i++)
+                    writer.Write(ByteHelper.GetBytes((Rmv2LodHeader_V7)LodHeaders[i]));
+            }
+            else if (Header.Version == 6)
+            {
+                for (int i = 0; i < LodHeaders.Length; i++)
+                    writer.Write(ByteHelper.GetBytes((Rmv2LodHeader_V6)LodHeaders[i]));
+            }
+            else
+            {
+                throw new Exception("Not a know version - can not save");
+            }
 
             for (int lodIndex = 0; lodIndex < Header.LodCount; lodIndex++)
             {

@@ -161,18 +161,13 @@ namespace FileTypes.PackFiles.Services
         {
             var newPackFile = new PackFileContainer(name)
             {
-                Header = new PFHeader("PFH5", type)
+                Header = new PFHeader("PFH5", type),
+                
             };
             Database.AddPackFile(newPackFile);
             return newPackFile;
         }
 
-        public void AddEmptyFolder(PackFileContainer pf, string name)
-        {
-            var newFolder = new PackFileDirectory(name);
-            pf.FileList[name] = newFolder;
-            Database.TriggerContainerUpdated(pf);
-        }
 
         public void AddFileToPack(PackFileContainer container, string path, IPackFile newFile)
         {
@@ -245,7 +240,12 @@ namespace FileTypes.PackFiles.Services
         }
 
 
-        public void Save() {  }
+        public void Save(PackFileContainer pf, BinaryWriter writer)
+        {
+            pf.SaveToByteArray(writer);
+            // Compute the size of all the files
+           
+        }
 
         public IPackFile FindFile(string path) 
         {
@@ -261,14 +261,6 @@ namespace FileTypes.PackFiles.Services
             }
             _logger.Here().Warning($"File not found");
             return null;
-        }
-
-
-        public PackFileContainer GetRoot(IPackFile item)
-        {
-            IPackFile root;
-            while ((root = item.Parent) != null);
-            return root as PackFileContainer;
         }
     }
 }

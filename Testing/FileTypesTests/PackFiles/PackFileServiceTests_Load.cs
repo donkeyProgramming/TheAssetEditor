@@ -30,6 +30,22 @@ namespace FileTypesTests.PackFiles
             Assert.AreEqual(4, fileCount);
         }
 
+
+
+        //[Test]
+        //public void LoadCaPackFile2()
+        //{
+        //    var packFileDb = new PackFileDataBase();
+        //    PackFileService packFileService = new PackFileService(packFileDb);
+        //    var result = packFileService.Load(@"C:\Users\ole_k\Desktop\Boom!\animData.pack");
+        //
+        //    Assert.NotNull(result);
+        //    Assert.AreEqual(1, packFileDb.PackFiles.Count);
+        //    var fileCount = packFileDb.PackFiles[0].FileList.Count;
+        //    Assert.AreEqual(4, fileCount);
+        //}
+
+
         [Test]
         public void LoadAllCaPacks()
         {

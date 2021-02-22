@@ -14,12 +14,8 @@ namespace Common
 
     public interface IPackFile
     {
-        IEnumerable<IPackFile> Children { get; }
         string Name { get; set; }
         PackFileType PackFileType();
-        void Sort();
-        void AddChild(IPackFile packFile);
-        IPackFile Parent { get; set; }
     }
 
 }

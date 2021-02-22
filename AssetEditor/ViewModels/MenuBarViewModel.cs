@@ -60,7 +60,7 @@ namespace AssetEditor.ViewModels
             TextInputWindow window = new TextInputWindow("New Packfile name", "");
             if (window.ShowDialog() == true)
             {
-                _packfileService.CreateNewPackFile(window.TextValue, PackFileCAType.Mod);
+                _packfileService.CreateNewPackFile(window.TextValue, PackFileCAType.MOD);
             }
         }
     }

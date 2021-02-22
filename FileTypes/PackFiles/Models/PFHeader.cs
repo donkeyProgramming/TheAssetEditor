@@ -12,13 +12,15 @@ namespace FileTypes.PackFiles.Models
         BOOT  = 0,
         RELEASE= 1,
         PATCH = 2,
-        Mod = 3,
+        MOD = 3,
         MOVIE = 4,
     }
 
 
     public class PFHeader
     {
+        public static byte[] DefaultTimeStemp = new byte[] { 67, 205, 210, 95 };
+
         /// Used to specify that the header of the PackFile is extended by 20 bytes. Used in Arena.
         static int HAS_EXTENDED_HEADER = 0b0000_0001_0000_0000;
 
@@ -33,7 +35,7 @@ namespace FileTypes.PackFiles.Models
 
 
         public string Version { get; private set; }
-        public PackFileCAType FileType { get; private set; }
+        public PackFileCAType FileType { get { return (PackFileCAType)(ByteMask & 15); } }
         public int ByteMask { get; set; }
 
         public int ReferenceFileCount { get; private set; }
@@ -48,14 +50,11 @@ namespace FileTypes.PackFiles.Models
 
         List<string> _dependantFiles = new List<string>();
 
-        int _headerFlag;
 
         public PFHeader(BinaryReader reader)
         {
             Version = new string(reader.ReadChars(4));
-            _headerFlag = reader.ReadInt32();
-            FileType = (PackFileCAType)(_headerFlag & 15);
-            ByteMask = _headerFlag;
+            ByteMask = reader.ReadInt32();
             
             ReferenceFileCount = reader.ReadInt32();
             var pack_file_index_size  = reader.ReadInt32();
@@ -76,7 +75,7 @@ namespace FileTypes.PackFiles.Models
                 if ((ByteMask & HAS_EXTENDED_HEADER) != 0)
                     _buffer = reader.ReadBytes(48 - headerOffset);
                 else
-                    _buffer = reader.ReadBytes(28 - headerOffset);
+                    _buffer = reader.ReadBytes(28 - headerOffset);  // 4 bytes for timestamp
             }
             else if(Version == "PFH6")
             {
@@ -93,21 +92,21 @@ namespace FileTypes.PackFiles.Models
         public PFHeader(string version, PackFileCAType type)
         {
             Version = version;
-            FileType = type;
-            ByteMask = 0;
+            ByteMask = (int)type;
+            _buffer = DefaultTimeStemp;
         }
 
         public void Save(int fileCount, int fileContentSize, BinaryWriter binaryWriter)
         {
             foreach (byte c in Version)
                 binaryWriter.Write(c);
-            binaryWriter.Write(_headerFlag);
+            binaryWriter.Write(ByteMask);
 
             binaryWriter.Write(_dependantFiles.Count);
 
             var pack_file_index_size = 0;
             foreach (var file in _dependantFiles)
-                pack_file_index_size += file.Length + 2;
+                pack_file_index_size += file.Length + 1;
 
             binaryWriter.Write(pack_file_index_size);
             binaryWriter.Write(fileCount);
@@ -117,9 +116,9 @@ namespace FileTypes.PackFiles.Models
 
             foreach (var file in _dependantFiles)
             {
-                binaryWriter.Write((ushort)file.Length);
                 foreach(byte c in file)
                     binaryWriter.Write(c);
+                binaryWriter.Write((byte)0);
             }
         }
     }
