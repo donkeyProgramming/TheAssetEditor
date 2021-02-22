@@ -148,9 +148,6 @@ namespace View3D.SceneNodes
             DefaultEffect.Parameters["UseAlpha"].SetValue(true);
             DefaultEffect.Parameters["doAnimation"].SetValue(true);
 
-            //DefaultEffect.Projection = shaderParams.Projection;
-            //DefaultEffect.View = shaderParams.View;
-            //DefaultEffect.World = ModelMatrix;
             Geometry.ApplyMesh(DefaultEffect, device);
         }
 

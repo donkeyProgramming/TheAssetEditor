@@ -27,7 +27,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextEditor", "TextEditor\Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "View3D", "View3D\View3D.csproj", "{8494EA8F-DBD8-4E4C-880C-7401CE2FB240}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KitbasherEditor", "KitbasherEditor\KitbasherEditor.csproj", "{D7225D7F-87E4-4FAD-A3BE-9165DFDC315E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KitbasherEditor", "KitbasherEditor\KitbasherEditor.csproj", "{D7225D7F-87E4-4FAD-A3BE-9165DFDC315E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{ECAC322F-8FA4-4F98-98D5-5E18464025C7}"
+	ProjectSection(SolutionItems) = preProject
+		ActiveTodoList.txt = ActiveTodoList.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

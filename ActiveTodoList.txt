@@ -1,0 +1,34 @@
+Feature list before V1 done:
+	PackFile
+		Save packfile dialog - create folder
+	
+	General
+		General error handling
+		Differnt filetypes for xml files
+		File changed must show in packfile tree
+		Clean up selection code?
+		Clean up sceen tree nodes?
+	
+	Editor:
+		Animation playback
+		UI
+			UI linking
+			Update when different buttons are enabled
+			Hotkeys
+			Show info header
+			Show info rmv2
+			
+		Transform:
+			Scale
+			Rotate
+			Different gizmo modes
+		
+		Saving packfiles
+		Textures
+			Show
+			Change
+		Different shader modes 
+		Grid
+
+	New editors:
+		Model preview

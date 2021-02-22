@@ -31,21 +31,6 @@ namespace FileTypesTests.PackFiles
         }
 
 
-
-        //[Test]
-        //public void LoadCaPackFile2()
-        //{
-        //    var packFileDb = new PackFileDataBase();
-        //    PackFileService packFileService = new PackFileService(packFileDb);
-        //    var result = packFileService.Load(@"C:\Users\ole_k\Desktop\Boom!\animData.pack");
-        //
-        //    Assert.NotNull(result);
-        //    Assert.AreEqual(1, packFileDb.PackFiles.Count);
-        //    var fileCount = packFileDb.PackFiles[0].FileList.Count;
-        //    Assert.AreEqual(4, fileCount);
-        //}
-
-
         [Test]
         public void LoadAllCaPacks()
         {
@@ -69,13 +54,6 @@ namespace FileTypesTests.PackFiles
             Assert.AreEqual(1, packFileService.Database.PackFiles.Count);
         }
 
-        [Test]
-        public void SaveNewPackFile()
-        {
-            PackFileService packFileService = new PackFileService(new PackFileDataBase());
-           // packFileService.NewPackFile("Test", );
-        }
-
 
         [Test]
         public void LoadBootPack()
@@ -92,20 +70,5 @@ namespace FileTypesTests.PackFiles
             Assert.NotNull(pack0);
         }
 
-
-        [Test]
-        public void SavePackFile()
-        {
-            //var origialBytes = File.ReadAllBytes(@"Data\warStuff.pack");
-            //
-            //PackFileService packFileService = new PackFileService(new PackFileDataBase());
-            //var packFile = packFileService.NewPackFile("CustomPackFile", PackFileCAType.MOD);
-            //packFile.AddFile
-            //
-            //
-            //var pack0 = packFileService.Load(@"Data\warStuff.pack");
-            //
-            //var saveResult = pack0.SaveToByteArray();
-        }
     }
 }
