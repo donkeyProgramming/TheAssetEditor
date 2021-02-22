@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using TextEditor;
 using View3D;
 
 namespace AssetEditor
@@ -47,12 +48,14 @@ namespace AssetEditor
             services.AddTransient<MenuBarViewModel>();
             services.AddTransient<FileTypes.PackFiles.Services.PackFileService>();
 
+            TextEditor_DependencyInjectionContainer.Register(services);
             KitbasherEditor_DependencyInjectionContainer.Register(services);
             View3D_DependencyInjectionContainer.Register(services);
         }
 
         void RegisterTools(IToolFactory factory)
         {
+            TextEditor_DependencyInjectionContainer.RegisterTools(factory);
             KitbasherEditor_DependencyInjectionContainer.RegisterTools(factory);
             View3D_DependencyInjectionContainer.RegisterTools(factory);
         }

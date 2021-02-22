@@ -145,7 +145,7 @@ namespace View3D.SceneNodes
             // Pivot stuff
             DefaultEffect.Parameters["World"].SetValue(ModelMatrix);
 
-            DefaultEffect.Parameters["UseAlpha"].SetValue(true);
+            DefaultEffect.Parameters["UseAlpha"].SetValue(false);
             DefaultEffect.Parameters["doAnimation"].SetValue(true);
 
             Geometry.ApplyMesh(DefaultEffect, device);
@@ -167,13 +167,18 @@ namespace View3D.SceneNodes
                 AnimationPlayer = AnimationPlayer,
             };
             newItem.DefaultEffect = DefaultEffect.Clone();
+            newItem.DefaultEffect.Parameters["DiffuseTexture"].SetValue(DefaultEffect.Parameters["DiffuseTexture"].GetValueTexture2D());
+            newItem.DefaultEffect.Parameters["SpecularTexture"].SetValue(DefaultEffect.Parameters["SpecularTexture"].GetValueTexture2D());
+            newItem.DefaultEffect.Parameters["NormalTexture"].SetValue(DefaultEffect.Parameters["NormalTexture"].GetValueTexture2D());
+            newItem.DefaultEffect.Parameters["GlossTexture"].SetValue(DefaultEffect.Parameters["GlossTexture"].GetValueTexture2D());
+
+            newItem.DefaultEffect.Parameters["tex_cube_diffuse"].SetValue(DefaultEffect.Parameters["tex_cube_diffuse"].GetValueTextureCube());
+            newItem.DefaultEffect.Parameters["tex_cube_specular"].SetValue(DefaultEffect.Parameters["tex_cube_specular"].GetValueTextureCube());
+            newItem.DefaultEffect.Parameters["specularBRDF_LUT"].SetValue(DefaultEffect.Parameters["specularBRDF_LUT"].GetValueTexture2D());
+
             newItem.WireframeEffect = (BasicEffect)WireframeEffect.Clone();
             newItem.SelectedFacesEffect = (BasicEffect)SelectedFacesEffect.Clone();
             return newItem;
         }
-
-
     }
-
- 
 }

@@ -3,13 +3,17 @@ Feature list before V1 done:
 		Save packfile dialog - create folder
 	
 	General
-		General error handling
-		Differnt filetypes for xml files
-		File changed must show in packfile tree
-		Clean up selection code?
-		Clean up sceen tree nodes?
+		[Done]General error handling
+		[Done]Differnt filetypes for xml files
+		Files changed must show in packfile tree
+		Create new file => VMD, XML, TXT
+		Copy file to main
+		Set main Packfile (the one files are saved to)
+		Close and save treeView items
+		Recently used files
 	
 	Editor:
+		Better shader handling
 		Animation playback
 		UI
 			UI linking
@@ -17,6 +21,9 @@ Feature list before V1 done:
 			Hotkeys
 			Show info header
 			Show info rmv2
+			Selecting in tree view should select in scene
+			Focus camera - work on selected faces and verts
+			Reset camera
 			
 		Transform:
 			Scale
@@ -29,6 +36,17 @@ Feature list before V1 done:
 			Change
 		Different shader modes 
 		Grid
+		Pivot
+			Edit
+			Display
+			Scale/rotate around?
 
 	New editors:
 		Model preview
+		
+		
+Thursday:
+	Grid
+	Animation basics
+	Better shader handling
+	Different shaders 

@@ -18,8 +18,6 @@ namespace View3D.Components.Component
     {
         ILogger _logger = Logging.Create<ObjectEditor>();
 
-        KeyboardComponent _keyboard;
-        SelectionManager _selectionManager; 
         CommandExecutor _commandManager;
 
         public ObjectEditor(WpfGame game) : base(game)
@@ -28,39 +26,36 @@ namespace View3D.Components.Component
 
         public override void Initialize()
         {
-            _keyboard = GetComponent<KeyboardComponent>();
-            _selectionManager = GetComponent<SelectionManager>();
             _commandManager = GetComponent<CommandExecutor>();
-
             base.Initialize();
         }
 
-        public override void Update(GameTime gameTime)
-        {
-            var objectSelectionState = _selectionManager.GetState() as ObjectSelectionState;
-            if (objectSelectionState == null)
-                return;
 
-            if (_keyboard.IsKeyReleased(Keys.Delete))
+        public void DeleteObject(ObjectSelectionState objectSelectionState)
+        {
+            var selection = objectSelectionState.CurrentSelection();
+            if (selection.Count != 0)
             {
-                var command = new DeleteObjectsCommand(objectSelectionState.CurrentSelection());
+                var command = new DeleteObjectsCommand(selection);
                 _commandManager.ExecuteCommand(command);
             }
-            else if (_keyboard.IsKeyComboReleased(Keys.D, Keys.LeftControl))
+        }
+
+        public void DuplicateObject(ObjectSelectionState objectSelectionState)
+        {
+            if (objectSelectionState.CurrentSelection().Count != 0)
             {
-                if (objectSelectionState.CurrentSelection().Count != 0)
-                {
-                    var command = new DuplicateObjectCommand(objectSelectionState.CurrentSelection().Select(x=>(SceneNode)x).ToList());
-                    _commandManager.ExecuteCommand(command);
-                }
+                var command = new DuplicateObjectCommand(objectSelectionState.CurrentSelection().Select(x => (SceneNode)x).ToList());
+                _commandManager.ExecuteCommand(command);
             }
-            else if (_keyboard.IsKeyComboReleased(Keys.S, Keys.LeftAlt))
+        }
+
+        public void DivideIntoSubmeshes(ObjectSelectionState objectSelectionState)
+        {
+            if (objectSelectionState.GetSingleSelectedObject() is IDrawableNode drawableNode)
             {
-                if (objectSelectionState.GetSingleSelectedObject() is IDrawableNode drawableNode)
-                {
-                    var command = new DivideObjectIntoSubmeshesCommand(drawableNode);
-                    _commandManager.ExecuteCommand(command);
-                }
+                var command = new DivideObjectIntoSubmeshesCommand(drawableNode);
+                _commandManager.ExecuteCommand(command);
             }
         }
     }

@@ -12,10 +12,6 @@ namespace View3D.Components.Component
 {
     public class FaceEditor : BaseComponent
     {
-
-        KeyboardComponent _keyboard;
-        SelectionManager _selectionManager;
-        SceneManager _sceneManager;
         CommandExecutor _commandManager;
 
         public FaceEditor(WpfGame game) : base(game)
@@ -24,39 +20,26 @@ namespace View3D.Components.Component
 
         public override void Initialize()
         {
-            _keyboard = GetComponent<KeyboardComponent>();
-            _selectionManager = GetComponent<SelectionManager>();
-            _sceneManager = GetComponent<SceneManager>();
             _commandManager = GetComponent<CommandExecutor>();
-
-            _keyboard.KeybordButtonReleased += OnKeyReleased;
 
             base.Initialize();
         }
 
-        private void OnKeyReleased(Keys key)
+        public void DeleteFaces(FaceSelectionState faceSelectionState)
         {
-            var faceSelectionState = _selectionManager.GetState() as FaceSelectionState;
-            if (faceSelectionState == null)
-                return;
+            var selectedFaceCount = faceSelectionState.CurrentSelection().Count() * 3;
+            var totalObjectFaceCount = faceSelectionState.RenderObject.Geometry.GetIndexCount();
 
-            if (_keyboard.IsKeyReleased(Keys.Delete))
+            if (selectedFaceCount == totalObjectFaceCount)
             {
-                var selectedFaceCount = faceSelectionState.CurrentSelection().Count()*3;
-                var totalObjectFaceCount = faceSelectionState.RenderObject.Geometry.GetIndexCount();
-
-                if (selectedFaceCount == totalObjectFaceCount)
-                {
-                    var command = new DeleteObjectsCommand(new List<ISelectable>() { faceSelectionState.RenderObject });
-                    _commandManager.ExecuteCommand(command);
-                }
-                else
-                {
-                    var command = new DeleteFaceCommand(faceSelectionState.RenderObject.Geometry, faceSelectionState.CurrentSelection());
-                    _commandManager.ExecuteCommand(command);
-                }
+                var command = new DeleteObjectsCommand(new List<ISelectable>() { faceSelectionState.RenderObject });
+                _commandManager.ExecuteCommand(command);
             }
-            
+            else
+            {
+                var command = new DeleteFaceCommand(faceSelectionState.RenderObject.Geometry, faceSelectionState.CurrentSelection());
+                _commandManager.ExecuteCommand(command);
+            }
         }
     }
 }

@@ -103,7 +103,6 @@ namespace AssetEditor.Services
             var extention = Path.GetExtension(filename);
             if (_extentionToToolMap.ContainsKey(extention))
             {
-                
                 var instance = (IEditorViewModel)_serviceProvider.GetService(_extentionToToolMap[extention]);
                 return instance;
             }

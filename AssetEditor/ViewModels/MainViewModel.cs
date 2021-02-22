@@ -46,7 +46,7 @@ namespace AssetEditor.ViewModels
             FileTree.FileOpen += OnFileOpen;
 
             ToolsFactory = toolFactory;
-            ToolsFactory.RegisterToolAsDefault<TextEditorViewModel, TextEditorView>();
+            //ToolsFactory.RegisterToolAsDefault<TextEditorViewModel, TextEditorView>();
 
 
             if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
@@ -104,6 +104,13 @@ namespace AssetEditor.ViewModels
             }
 
             var editorViewModel = ToolsFactory.GetToolViewModelFromFileName(file.Name);
+            if (editorViewModel == null)
+            {
+                _logger.Here().Warning($"Trying to open file {file.Name}, but there are no valid tools for it.");
+                return;
+            }
+
+            _logger.Here().Information($"Opening {file.Name} with {editorViewModel.GetType().Name}");
             editorViewModel.MainFile = file;
             CurrentEditorsList.Add(editorViewModel);
             SelectedEditorIndex = CurrentEditorsList.Count - 1;
