@@ -21,20 +21,11 @@ namespace View3D.Scene
     public class SceneContainer : WpfGame
     {
         private bool _disposed;
-        SelectionManager _selectionManager;
-
-
-        RenderEngineComponent _renderEngine;
-
-        public VertexInstanceMesh VertexRenderer { get; set; }
 
         protected override void Initialize()
         {
             _disposed = false;
             new WpfGraphicsDeviceService(this);
-
-            _selectionManager = GetComponent<SelectionManager>();
-            _renderEngine = GetComponent<RenderEngineComponent>();
 
             base.Initialize();
         }
@@ -43,16 +34,11 @@ namespace View3D.Scene
 
         protected override void LoadContent()
         {
-
             base.LoadContent();
         }
 
-        BoundingBoxRenderer _bondingBoxRenderer;
-
         protected override void Draw(GameTime time)
         {
-
-
             base.Draw(time);
         }
 

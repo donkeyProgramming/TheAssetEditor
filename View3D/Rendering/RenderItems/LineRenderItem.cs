@@ -7,16 +7,15 @@ using View3D.Components.Rendering;
 
 namespace View3D.Rendering.RenderItems
 {
-    public class BoundingBoxRenderItem : IRenderItem
+    public class LineRenderItem : IRenderItem
     {
-        public BoundingBoxRenderer BoundingBoxRenderer { get; set; }
+        public LineMeshRender LineMesh { get; set; }
 
-        public BoundingBox BoundingBox { get; set; }
         public Matrix World { get; set; }
 
         public void Draw(GraphicsDevice device, CommonShaderParameters parameters)
         {
-            BoundingBoxRenderer.Render(device, parameters, BoundingBox, World);
+            LineMesh.Render(device, parameters, World);
         }
     }
 }

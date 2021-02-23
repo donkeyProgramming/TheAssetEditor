@@ -9,22 +9,22 @@ using View3D.Components.Rendering;
 
 namespace View3D.Rendering
 {
-    public class BoundingBoxRenderer
+    public class LineMeshRender
     {
         Effect _shader;
         VertexPosition[] _originalVertecies;
 
-        public BoundingBoxRenderer(Effect effect)
+        public LineMeshRender(Effect effect)
         {
             _shader = effect;
         }
 
-        public BoundingBoxRenderer(ContentManager content)
+        public LineMeshRender(ContentManager content)
         {
             _shader = content.Load<Effect>("Shaders\\LineShader");
         }
 
-        void CreateLineList((Vector3, Vector3)[] lines)
+        public void CreateLineList((Vector3, Vector3)[] lines)
         {
             _originalVertecies = new VertexPosition[lines.Length * 2];
             for (int i = 0; i < lines.Length; i++)
@@ -34,7 +34,31 @@ namespace View3D.Rendering
             }
         }
 
-        public void Render(GraphicsDevice device, CommonShaderParameters commonShaderParameters, BoundingBox b, Matrix ModelMatrix)
+        public void CreateGrid()
+        {
+            int lineCount = 10;
+            float spacing = 1;
+            float length = 10;
+            float offset = (lineCount * spacing) / 2;
+
+            var list = new List<(Vector3, Vector3)>();
+            for (int i = 0; i <= lineCount; i++)
+            {
+                var start = new Vector3((i * spacing) - offset, 0, -length * 0.5f);
+                var stop = new Vector3((i * spacing) - offset, 0, length * 0.5f);
+                list.Add((start, stop));
+            }
+
+            for (int i = 0; i <= lineCount; i++)
+            {
+                var start = new Vector3(-length * 0.5f, 0, (i * spacing) - offset);
+                var stop = new Vector3(length * 0.5f, 0, (i * spacing) - offset);
+                list.Add((start, stop));
+            }
+            CreateLineList(list.ToArray());
+        }
+
+        public void CreateFromBoundingBox(BoundingBox b)
         {
             var corners = b.GetCorners();
             var data = new (Vector3, Vector3)[12];
@@ -54,7 +78,10 @@ namespace View3D.Rendering
             data[11] = (corners[3], corners[7]);
 
             CreateLineList(data);
+        }
 
+        public void Render(GraphicsDevice device, CommonShaderParameters commonShaderParameters, Matrix ModelMatrix)
+        {
             _shader.Parameters["View"].SetValue(commonShaderParameters.View);
             _shader.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
             _shader.Parameters["World"].SetValue(ModelMatrix);
@@ -66,6 +93,4 @@ namespace View3D.Rendering
             }
         }
     }
-
-
 }

@@ -110,6 +110,9 @@ namespace View3D.Components.Rendering
             foreach (var item in _renderItems[RenderBuckedId.Selection])
                 item.Draw(GraphicsDevice, commonShaderParameters);
 
+            foreach (var item in _renderItems[RenderBuckedId.Line])
+                item.Draw(GraphicsDevice, commonShaderParameters);
+
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
         }

@@ -56,6 +56,7 @@ namespace KitbasherEditor.ViewModels
             Scene.Components.Add(new FocusSelectableObjectComponent(Scene));
             Scene.Components.Add(new ClearScreenComponent(Scene));
             Scene.Components.Add(new RenderEngineComponent(Scene));
+            Scene.Components.Add(new GridComponent(Scene));
 
             SceneExplorer = new SceneExplorerViewModel(Scene);
             Scene.Components.Add(SceneExplorer as IEditableMeshResolver);

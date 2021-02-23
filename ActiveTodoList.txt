@@ -35,7 +35,7 @@ Feature list before V1 done:
 			Show
 			Change
 		Different shader modes 
-		Grid
+		[Done]Grid
 		Pivot
 			Edit
 			Display
