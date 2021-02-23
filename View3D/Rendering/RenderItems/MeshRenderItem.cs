@@ -17,10 +17,15 @@ namespace View3D.Rendering.RenderItems
         public IShader Shader { get; set; }
         public Matrix ModelMatrix { get; set; }
 
+        public List<int> Faces { get; set; }
+
         public void Draw(GraphicsDevice device, CommonShaderParameters parameters)
         {
             Shader.SetCommonParmeters(parameters, ModelMatrix);
-            Geometry.ApplyMesh(Shader, device);
+            if(Faces != null)
+                Geometry.ApplyMeshPart(Shader, device, Faces);
+            else
+                Geometry.ApplyMesh(Shader, device);
         }
     }
 }

@@ -15,6 +15,18 @@ namespace View3D.Rendering.Shading
         void SetCommonParmeters(CommonShaderParameters commonShaderParameters, Matrix modelMatrix);
     }
 
+    public interface IShaderTextures
+    {
+        bool UseAlpha { set; }
+         void SetTexture(Texture2D texture, TexureType type);
+    }
+
+    public interface IShaderAnimation
+    {
+        public bool UseAnimation { set; }
+        public void SetAnimationParameters(Matrix[] transforms, int weightCount = 4);
+    }
+
 
     public class BasicShader : IShader
     {
@@ -47,7 +59,7 @@ namespace View3D.Rendering.Shading
         }
     }
 
-    public class PbrShader : IShader
+    public class PbrShader : IShader, IShaderTextures, IShaderAnimation
     {
         public Effect Effect { get; private set; }
 
@@ -68,6 +80,7 @@ namespace View3D.Rendering.Shading
             _resourceLibary = resourceLibary;
         }
 
+        public bool UseAlpha { set { Effect.Parameters["UseAlpha"].SetValue(value); } }
         public void SetTexture(Texture2D texture, TexureType type)
         {
             _textures[type].SetValue(texture);
@@ -85,7 +98,7 @@ namespace View3D.Rendering.Shading
         }
 
         public bool UseAnimation { set { Effect.Parameters["doAnimation"].SetValue(value); } }
-        public bool UseAlpha { set { Effect.Parameters["UseAlpha"].SetValue(value); } }
+        
 
         public void SetAnimationParameters(Matrix[] transforms, int weightCount = 4)
         {

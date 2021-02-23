@@ -123,7 +123,7 @@ namespace View3D.Components.Component.Selection
 
             if (selectionState is FaceSelectionState selectionFaceState && selectionFaceState.RenderObject is MeshNode meshNode)
             {
-                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new FaceRenderItem() { ModelMatrix = meshNode.ModelMatrix, Geometry = meshNode.Geometry, Shader = _selectedFacesEffect, SelectedFaces = selectionFaceState.SelectedFaces });
+                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new GeoRenderItem() { ModelMatrix = meshNode.ModelMatrix, Geometry = meshNode.Geometry, Shader = _selectedFacesEffect, Faces = selectionFaceState.SelectedFaces });
                 _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeoRenderItem() { ModelMatrix = meshNode.ModelMatrix, Geometry = meshNode.Geometry, Shader = _wireframeEffect});
             }
 

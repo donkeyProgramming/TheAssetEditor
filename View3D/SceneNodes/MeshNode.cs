@@ -31,7 +31,7 @@ namespace View3D.SceneNodes
             Scale = Vector3.One;
             Orientation = Quaternion.Identity;
 
-            DefaultEffect = shader;
+            Effect = shader;
         }
 
         public MeshNode(RmvSubModel rmvSubModel, GraphicsDevice device, ResourceLibary resourceLib, AnimationPlayer animationPlayer)
@@ -44,49 +44,54 @@ namespace View3D.SceneNodes
             Scale = Vector3.One;
             Orientation = Quaternion.Identity;
 
-            DefaultEffect = new PbrShader(resourceLib);
+            Effect = new PbrShader(resourceLib);
             var diffuse = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Diffuse).Path);
             var specTexture = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Specular).Path);
             var normalTexture = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Normal).Path);
             var glossTexture = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Gloss).Path);
-            DefaultEffect.SetTexture(diffuse, TexureType.Diffuse);
-            DefaultEffect.SetTexture(specTexture, TexureType.Specular);
-            DefaultEffect.SetTexture(normalTexture, TexureType.Normal);
-            DefaultEffect.SetTexture(glossTexture, TexureType.Gloss);
+
+            (Effect as PbrShader).SetTexture(diffuse, TexureType.Diffuse);
+            (Effect as PbrShader).SetTexture(specTexture, TexureType.Specular);
+            (Effect as PbrShader).SetTexture(normalTexture, TexureType.Normal);
+            (Effect as PbrShader).SetTexture(glossTexture, TexureType.Gloss);
         }
 
-        public PbrShader DefaultEffect { get; set; }
+        public IShader Effect { get; set; }
         public int LodIndex { get; set; } = -1;
         public IGeometry Geometry { get; set; }
 
         public void Update(GameTime time)
         {
-            Matrix[] data = new Matrix[256];
-            for (int i = 0; i < 256; i++)
-                data[i] = Matrix.Identity;
-
-            var player = AnimationPlayer;
-            if (player != null)
+            if (Effect is IShaderAnimation animationEffect)
             {
-                var frame = player.GetCurrentFrame();
-                if (frame != null)
-                {
-                    for (int i = 0; i < frame.BoneTransforms.Count(); i++)
-                        data[i] = frame.BoneTransforms[i].WorldTransform;
-                }
-            }
+                Matrix[] data = new Matrix[256];
+                for (int i = 0; i < 256; i++)
+                    data[i] = Matrix.Identity;
 
-            DefaultEffect.SetAnimationParameters(data, 4);
-            DefaultEffect.UseAlpha = false;
-            DefaultEffect.UseAnimation = AnimationPlayer.IsEnabled;
+                var player = AnimationPlayer;
+                if (player != null)
+                {
+                    var frame = player.GetCurrentFrame();
+                    if (frame != null)
+                    {
+                        for (int i = 0; i < frame.BoneTransforms.Count(); i++)
+                            data[i] = frame.BoneTransforms[i].WorldTransform;
+                    }
+                }
+
+                animationEffect.SetAnimationParameters(data, 4);
+                animationEffect.UseAnimation = AnimationPlayer.IsEnabled;
+            }
+            if (Effect is IShaderTextures tetureEffect)
+            {
+                tetureEffect.UseAlpha = false;
+            }
         }
 
         public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)
         {
-            renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeoRenderItem() { Geometry = Geometry, ModelMatrix = ModelMatrix, Shader = DefaultEffect });
+            renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeoRenderItem() { Geometry = Geometry, ModelMatrix = ModelMatrix, Shader = Effect });
         }
-
-
 
         public override SceneNode Clone()
         {
@@ -103,7 +108,7 @@ namespace View3D.SceneNodes
                 Name = Name + " - Clone",
                 AnimationPlayer = AnimationPlayer,
             };
-            newItem.DefaultEffect = (PbrShader)DefaultEffect.Clone();
+            newItem.Effect = Effect.Clone();
             return newItem;
         }
     }

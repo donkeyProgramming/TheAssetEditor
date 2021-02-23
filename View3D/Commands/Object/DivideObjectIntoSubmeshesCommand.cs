@@ -54,7 +54,7 @@ namespace View3D.Commands.Object
             foreach (var mesh in newMeshes)
             {
                 var hack = _objectToSplit as MeshNode;
-                var meshNode = new MeshNode(mesh, $"{_objectToSplit.Name}_submesh_{counter++}", hack.AnimationPlayer, hack.DefaultEffect.Clone() as PbrShader); 
+                var meshNode = new MeshNode(mesh, $"{_objectToSplit.Name}_submesh_{counter++}", hack.AnimationPlayer, hack.Effect.Clone() as PbrShader); 
                 _newMeshes.Add(meshNode);
                 _editableMeshResolver.GetEditableMeshNode().AddObject(meshNode);
             }

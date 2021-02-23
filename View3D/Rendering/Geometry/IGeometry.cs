@@ -25,6 +25,7 @@ namespace View3D.Rendering.Geometry
         BoundingBox BoundingBox { get; }
 
         IGeometry Clone();
+
         void RemoveFaces(List<int> facesToDelete);
         void RemoveUnusedVertexes(ushort[] newIndexList);
         void UpdateVertexPosition(int vertexId, Vector3 position);

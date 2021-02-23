@@ -881,7 +881,8 @@ namespace View3D.Components.Gizmo
             _graphics.RasterizerState = RasterizerState.CullNone;
 
             if (_view == Matrix.Identity || _projection == Matrix.Identity)
-                throw new Exception("Error: Must call .UpdateCameraProperties() before .Draw()");
+                return;
+                //throw new Exception("Error: Must call .UpdateCameraProperties() before .Draw()");
 
             #region Draw: Axis-Lines
 
