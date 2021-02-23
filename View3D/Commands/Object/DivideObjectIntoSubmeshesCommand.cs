@@ -10,6 +10,7 @@ using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
+using View3D.Rendering.Shading;
 using View3D.SceneNodes;
 using View3D.Services;
 using View3D.Utility;
@@ -53,7 +54,7 @@ namespace View3D.Commands.Object
             foreach (var mesh in newMeshes)
             {
                 var hack = _objectToSplit as MeshNode;
-                var meshNode = new MeshNode(mesh, $"{_objectToSplit.Name}_submesh_{counter++}", _sceneManager.GraphicsDevice, _resourceLib, hack.AnimationPlayer); 
+                var meshNode = new MeshNode(mesh, $"{_objectToSplit.Name}_submesh_{counter++}", hack.AnimationPlayer, hack.DefaultEffect.Clone() as PbrShader); 
                 _newMeshes.Add(meshNode);
                 _editableMeshResolver.GetEditableMeshNode().AddObject(meshNode);
             }

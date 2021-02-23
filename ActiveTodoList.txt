@@ -14,7 +14,8 @@ Feature list before V1 done:
 	
 	Editor:
 		Better shader handling
-		Animation playback
+		[Done]Animation playback beginning
+		Animation playback cleanup
 		UI
 			UI linking
 			Update when different buttons are enabled
@@ -50,3 +51,7 @@ Thursday:
 	Better shader handling
 	Different shaders 
 	Reset camera
+	Animation polish
+	
+Known bugs:
+	Select face, then swap to vertex mode, need to call update before draw error

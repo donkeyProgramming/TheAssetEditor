@@ -16,6 +16,7 @@ using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.Scene;
+using View3D.Utility;
 
 namespace View3D.Components.Component.Selection
 {

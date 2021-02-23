@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Components.Component;
+using View3D.Rendering.Shading;
 using View3D.Utility;
 
 namespace View3D.Rendering.Geometry
@@ -39,22 +40,22 @@ namespace View3D.Rendering.Geometry
         }
 
 
-        public void ApplyMesh(Effect effect, GraphicsDevice device)
+        public void ApplyMesh(IShader effect, GraphicsDevice device)
         {
             device.Indices = _indexBuffer;
             device.SetVertexBuffer(_vertexBuffer);
-            foreach (var pass in effect.CurrentTechnique.Passes)
+            foreach (var pass in effect.Effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
                 device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, _indexBuffer.IndexCount);
             }
         }
 
-        public void ApplyMeshPart(Effect effect, GraphicsDevice device, List<int> faceSelection)
+        public void ApplyMeshPart(IShader effect, GraphicsDevice device, List<int> faceSelection)
         {
             device.Indices = _indexBuffer;
             device.SetVertexBuffer(_vertexBuffer);
-            foreach (var pass in effect.CurrentTechnique.Passes)
+            foreach (var pass in effect.Effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
                 foreach (var item in faceSelection)

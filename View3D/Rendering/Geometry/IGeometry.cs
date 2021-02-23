@@ -4,13 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using View3D.Components.Component;
+using View3D.Rendering.Shading;
 
 namespace View3D.Rendering.Geometry
 {
     public interface IGeometry : IDisposable
     {
-        public void ApplyMesh(Effect effect, GraphicsDevice device);
-        public void ApplyMeshPart(Effect effect, GraphicsDevice device, List<int> faceSelection);
+        public void ApplyMesh(IShader effect, GraphicsDevice device);
+        public void ApplyMeshPart(IShader effect, GraphicsDevice device, List<int> faceSelection);
 
         public Vector3 GetVertexByIndex(int index);
         public Vector3 GetVertexById(int id);

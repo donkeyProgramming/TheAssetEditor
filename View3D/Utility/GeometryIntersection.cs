@@ -3,9 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using View3D.Rendering.Geometry;
 using View3D.Utility;
 
-namespace View3D.Rendering.Geometry
+namespace View3D.Utility
 {
     public static class GeometryIntersection
     {

@@ -5,17 +5,22 @@ using System.Collections.Generic;
 using System.Text;
 using View3D.Components.Component;
 using View3D.Components.Rendering;
+using View3D.Rendering.Geometry;
+using View3D.Rendering.Shading;
 using View3D.SceneNodes;
 
 namespace View3D.Rendering.RenderItems
 {
-    public class MeshRenderItem : IRenderItem
+    public class GeoRenderItem : IRenderItem
     {
-        public MeshNode Node { get; set; }
+        public IGeometry Geometry { get; set; }
+        public IShader Shader { get; set; }
+        public Matrix ModelMatrix { get; set; }
 
         public void Draw(GraphicsDevice device, CommonShaderParameters parameters)
         {
-            Node.DrawBasic(device, parameters);
+            Shader.SetCommonParmeters(parameters, ModelMatrix);
+            Geometry.ApplyMesh(Shader, device);
         }
     }
 }
