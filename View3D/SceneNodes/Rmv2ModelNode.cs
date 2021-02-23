@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using View3D.Animation;
 using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
@@ -26,7 +27,7 @@ namespace View3D.SceneNodes
             // Add to render qeueue.
         }
 
-        public Rmv2ModelNode(RmvRigidModel model, GraphicsDevice device, ResourceLibary resourceLib, string name)
+        public Rmv2ModelNode(RmvRigidModel model, GraphicsDevice device, ResourceLibary resourceLib, string name, AnimationPlayer animationPlayer)
         {
             Name = name;
 
@@ -36,7 +37,7 @@ namespace View3D.SceneNodes
 
                 for (int modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
                 {
-                    var node = new MeshNode(model.MeshList[lodIndex][modelIndex], device, resourceLib);
+                    var node = new MeshNode(model.MeshList[lodIndex][modelIndex], device, resourceLib, animationPlayer);
                     node.LodIndex = lodIndex;
                     lodNode.AddObject(node);
                 }
@@ -51,7 +52,7 @@ namespace View3D.SceneNodes
             Name = name;
         }
 
-        public void AddModel(RmvRigidModel model, GraphicsDevice device, ResourceLibary resourceLibary)
+        public void AddModel(RmvRigidModel model, GraphicsDevice device, ResourceLibary resourceLibary, AnimationPlayer animationPlayer)
         {
             for (int lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
             {
@@ -59,7 +60,7 @@ namespace View3D.SceneNodes
 
                 for (int modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
                 {
-                    var node = new MeshNode(model.MeshList[lodIndex][modelIndex], device, resourceLibary);
+                    var node = new MeshNode(model.MeshList[lodIndex][modelIndex], device, resourceLibary, animationPlayer);
                     node.LodIndex = lodIndex;
                     lodNode.AddObject(node);
                 }

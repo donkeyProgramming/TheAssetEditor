@@ -18,13 +18,18 @@ namespace View3D.SceneNodes
         SceneNode Parent { get; set; }
     }
 
-    public interface IDrawableNode : INode
+    public interface IEditableGeometry : INode
     {
         IGeometry Geometry { get; set; }
 
         void DrawWireframeOverlay(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams);
         void DrawSelectedFaces(GraphicsDevice device, Matrix parentWorldMatrix, CommonShaderParameters shaderParams, List<int> faces);
 
+        
+    }
+
+    public interface IDrawableItem : INode
+    {
         void Render(RenderEngineComponent renderEngine, Matrix parentWorld);
     }
 

@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
+using View3D.Animation;
 using View3D.Components.Component;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
@@ -33,13 +34,13 @@ namespace View3D.Services
             _resourceLibary = resourceLibary;
         }
 
-        public void Load(string path, SceneNode parent)
+        public void Load(string path, SceneNode parent, AnimationPlayer player)
         {
             var file = _packFileService.FindFile(path);
-            Load(file as PackFile, parent);
+            Load(file as PackFile, parent, player);
         }
 
-        public SceneNode Load(PackFile file, SceneNode parent)
+        public SceneNode Load(PackFile file, SceneNode parent, AnimationPlayer player)
         {
             if (file == null)
                 throw new Exception("File is null in SceneLoader::Load");
@@ -49,22 +50,22 @@ namespace View3D.Services
             switch (file.Extention)
             {
                 case ".variantmeshdefinition":
-                    LoadVariantMesh(file, ref parent);
+                    LoadVariantMesh(file, ref parent, player);
                     break;
 
                 case ".rigid_model_v2":
-                    LoadRigidMesh(file, ref parent);
+                    LoadRigidMesh(file, ref parent, player);
                     break;
 
                 case ".wsmodel":
-                    LoadWsModel(file, ref parent);
+                    LoadWsModel(file, ref parent, player);
                     break;
             }
 
             return parent;
         }
 
-        void LoadVariantMesh(PackFile file, ref SceneNode parent)
+        void LoadVariantMesh(PackFile file, ref SceneNode parent, AnimationPlayer player)
         {
             var variantMeshElement = new VariantMeshNode(file.Name);
             if (parent == null)
@@ -97,11 +98,11 @@ namespace View3D.Services
                 foreach (var mesh in slot.VariantMeshes)
                 {
                     if (mesh.Name != null)
-                        Load(mesh.Name.ToLower(), slotElement);
+                        Load(mesh.Name.ToLower(), slotElement, player);
                 }
 
                 foreach (var meshReference in slot.VariantMeshReferences)
-                    Load(meshReference.definition.ToLower(), slotElement);
+                    Load(meshReference.definition.ToLower(), slotElement, player);
 
                 for (int i = 0; i < slotElement.Children.Count(); i++)
                 {
@@ -117,10 +118,10 @@ namespace View3D.Services
             }
         }
 
-        void LoadRigidMesh(PackFile file, ref SceneNode parent)
+        void LoadRigidMesh(PackFile file, ref SceneNode parent, AnimationPlayer player)
         {
             var rmvModel = new RmvRigidModel(file.DataSource.ReadData(), file.Name);
-            var model = new Rmv2ModelNode(rmvModel, _device, _resourceLibary, Path.GetFileName( rmvModel.FileName));
+            var model = new Rmv2ModelNode(rmvModel, _device, _resourceLibary, Path.GetFileName( rmvModel.FileName), player);
 
             if (parent == null)
                 parent = model;
@@ -128,7 +129,7 @@ namespace View3D.Services
                 parent.AddObject(model);
         }
 
-        void LoadWsModel(PackFile file, ref SceneNode parent)
+        void LoadWsModel(PackFile file, ref SceneNode parent, AnimationPlayer player)
         {
             var wsModelNode = new GroupNode("WsModel - " + file.Name);
             if (parent == null)
@@ -146,7 +147,7 @@ namespace View3D.Services
             {
                 var modelFile = _packFileService.FindFile( node.InnerText) as PackFile;
                 var modelAsBase = wsModelNode as SceneNode;
-                LoadRigidMesh(modelFile, ref modelAsBase);
+                LoadRigidMesh(modelFile, ref modelAsBase, player);
             }
         }
     }

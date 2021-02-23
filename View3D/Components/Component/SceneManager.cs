@@ -149,8 +149,10 @@ namespace View3D.Components.Component
         {
             if (root.IsVisible)
             {
-                if (root is IDrawableNode drawableNode)
+                if (root is IDrawableItem drawableNode)
                     drawableNode.Render(_renderEngine, parentMatrix);
+
+
 
                 foreach (var child in root.Children)
                     DrawBasicSceneHirarchy(child, parentMatrix * child.ModelMatrix);

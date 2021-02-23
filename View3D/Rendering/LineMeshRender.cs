@@ -12,7 +12,7 @@ namespace View3D.Rendering
     public class LineMeshRender
     {
         Effect _shader;
-        VertexPosition[] _originalVertecies;
+        List<VertexPosition> _originalVertecies = new List<VertexPosition>();
 
         public LineMeshRender(Effect effect)
         {
@@ -24,14 +24,51 @@ namespace View3D.Rendering
             _shader = content.Load<Effect>("Shaders\\LineShader");
         }
 
-        public void CreateLineList((Vector3, Vector3)[] lines)
+        public void Clear()
         {
-            _originalVertecies = new VertexPosition[lines.Length * 2];
-            for (int i = 0; i < lines.Length; i++)
-            {
-                _originalVertecies[i * 2] = new VertexPosition(lines[i].Item1);
-                _originalVertecies[i * 2 + 1] = new VertexPosition(lines[i].Item2);
-            }
+            _originalVertecies = new List<VertexPosition>();
+        }
+
+        public void CreateLineList(List<(Vector3, Vector3)> lines)
+        {
+            Clear();
+            for (int i = 0; i < lines.Count; i++)
+                AddLine(lines[i].Item1, lines[i].Item2);
+        }
+
+        public void AddCube(Matrix transform)
+        {
+            var offset = new Vector3(-0.5f, -0.5f, -0.5f);
+            var a0 = Vector3.Transform(new Vector3(0, 0, 0) + offset, transform);
+            var b0 = Vector3.Transform(new Vector3(1, 0, 0) + offset, transform);
+            var c0 = Vector3.Transform(new Vector3(1, 1, 0) + offset, transform);
+            var d0 = Vector3.Transform(new Vector3(0, 1, 0) + offset, transform);
+
+            var a1 = Vector3.Transform(new Vector3(0, 0, 1) + offset, transform);
+            var b1 = Vector3.Transform(new Vector3(1, 0, 1) + offset, transform);
+            var c1 = Vector3.Transform(new Vector3(1, 1, 1) + offset, transform);
+            var d1 = Vector3.Transform(new Vector3(0, 1, 1) + offset, transform);
+
+            AddLine(a0, b0);
+            AddLine(c0, d0);
+            AddLine(b0, c0);
+            AddLine(a0, d0);
+
+            AddLine(a1, b1);
+            AddLine(c1, d1);
+            AddLine(b1, c1);
+            AddLine(a1, d1);
+
+            AddLine(a0, a1);
+            AddLine(b0, b1);
+            AddLine(c0, c1);
+            AddLine(d0, d1);
+        }
+
+        public void AddLine(Vector3 pointA, Vector3 pointB)
+        {
+            _originalVertecies.Add(new VertexPosition(pointA));
+            _originalVertecies.Add(new VertexPosition(pointB));
         }
 
         public void CreateGrid()
@@ -55,27 +92,27 @@ namespace View3D.Rendering
                 var stop = new Vector3(length * 0.5f, 0, (i * spacing) - offset);
                 list.Add((start, stop));
             }
-            CreateLineList(list.ToArray());
+            CreateLineList(list);
         }
 
         public void CreateFromBoundingBox(BoundingBox b)
         {
             var corners = b.GetCorners();
-            var data = new (Vector3, Vector3)[12];
-            data[0] = (corners[0], corners[1]);
-            data[1] = (corners[2], corners[3]);
-            data[2] = (corners[0], corners[3]);
-            data[3] = (corners[1], corners[2]);
+            var data = new List< (Vector3, Vector3)>(12);
+            data.Add((corners[0], corners[1]));
+            data.Add((corners[2], corners[3]));
+            data.Add((corners[0], corners[3]));
+            data.Add((corners[1], corners[2]));
 
-            data[4] = (corners[4], corners[5]);
-            data[5] = (corners[6], corners[7]);
-            data[6] = (corners[4], corners[7]);
-            data[7] = (corners[5], corners[6]);
+            data.Add( (corners[4], corners[5]));
+            data.Add( (corners[6], corners[7]));
+            data.Add( (corners[4], corners[7]));
+            data.Add((corners[5], corners[6]));
 
-            data[8] = (corners[0], corners[4]);
-            data[9] = (corners[1], corners[5]);
-            data[10] = (corners[2], corners[6]);
-            data[11] = (corners[3], corners[7]);
+            data.Add((corners[0], corners[4]));
+            data.Add((corners[1], corners[5]));
+            data.Add( (corners[2], corners[6]));
+            data.Add((corners[3], corners[7]));
 
             CreateLineList(data);
         }
@@ -89,7 +126,7 @@ namespace View3D.Rendering
             foreach (var pass in _shader.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                device.DrawUserPrimitives(PrimitiveType.LineList, _originalVertecies, 0, _originalVertecies.Count() / 2);
+                device.DrawUserPrimitives(PrimitiveType.LineList, _originalVertecies.ToArray(), 0, _originalVertecies.Count() / 2);
             }
         }
     }

@@ -76,8 +76,10 @@ namespace View3D.Animation
         public bool OnlySnapTranslations { get; set; } = false;
     }
 
+    public delegate void FrameChanged(int currentFrame);
     public class AnimationPlayer
     {
+        public event FrameChanged OnFrameChanged;
         public AnimationPlayerSettings Settings { get; set; } = new AnimationPlayerSettings();
         public ExternalAnimationAttachmentResolver ExternalAnimationRef { get; set; } = new ExternalAnimationAttachmentResolver();
 
@@ -90,6 +92,7 @@ namespace View3D.Animation
         public double SpeedMultiplication { get; set; }
         public bool ApplyStaticFrame { get; set; } = true;
         public bool ApplyDynamicFrames { get; set; } = true;
+        public bool IsEnabled { get; set; } = true;
 
         public int CurrentFrame
         {
@@ -104,6 +107,11 @@ namespace View3D.Animation
                         int newFrame = value;
                         _timeSinceStart = TimeSpan.FromMilliseconds(newFrame * (1f / 20f) * 1000);
                     }
+                    OnFrameChanged?.Invoke(CurrentFrame);
+                }
+                else
+                {
+                    OnFrameChanged?.Invoke(0);
                 }
 
                 UpdateAnimationFrame();
@@ -151,6 +159,8 @@ namespace View3D.Animation
 
                 if (ExternalAnimationRef != null)
                     ExternalAnimationRef.UpdateNode(gameTime);
+
+                OnFrameChanged?.Invoke(CurrentFrame);
             }
 
             UpdateAnimationFrame();
@@ -158,6 +168,12 @@ namespace View3D.Animation
 
         void UpdateAnimationFrame()
         {
+            if (IsEnabled == false)
+            {
+                _currentAnimFrame = null;
+                return;
+            }
+
             float sampleT = 0;
             float animationLengthMs = GetAnimationLengthMs();
             if (animationLengthMs != 0)

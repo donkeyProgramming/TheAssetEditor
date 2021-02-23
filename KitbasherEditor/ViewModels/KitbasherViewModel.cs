@@ -35,6 +35,9 @@ namespace KitbasherEditor.ViewModels
 
         public IPackFile MainFile { get; set; }
 
+
+        SkeletonNode _skeletonNode;
+
         public KitbasherViewModel(PackFileService pf)
         {
             _packFileService = pf;
@@ -57,9 +60,12 @@ namespace KitbasherEditor.ViewModels
             Scene.Components.Add(new ClearScreenComponent(Scene));
             Scene.Components.Add(new RenderEngineComponent(Scene));
             Scene.Components.Add(new GridComponent(Scene));
+            Scene.Components.Add(new AnimationsContainerComponent(Scene));
+
+            
 
             SceneExplorer = new SceneExplorerViewModel(Scene);
-            Scene.Components.Add(SceneExplorer as IEditableMeshResolver);
+            Scene.Components.Add(SceneExplorer);
 
             MenuBar = new MenuBarViewModel(Scene);
             Animation = new AnimationControllerViewModel(Scene, _packFileService);
@@ -74,7 +80,9 @@ namespace KitbasherEditor.ViewModels
             var sceneManager = scene.GetComponent<SceneManager>();
             var resourceLib = scene.GetComponent<ResourceLibary>();
 
-            sceneManager.RootNode.AddObject(new SkeletonNode("I own the skeletonRender"));
+            Animation.SkeletonTreeNode = new SkeletonNode(scene.Content);
+            sceneManager.RootNode.AddObject(Animation.SkeletonTreeNode);
+
             _editableRmvMesh = (Rmv2ModelNode)sceneManager.RootNode.AddObject(new Rmv2ModelNode("Editable Model"));
             
             for (int lodIndex = 0; lodIndex < 4; lodIndex++)
@@ -90,7 +98,7 @@ namespace KitbasherEditor.ViewModels
             {
                 var file = MainFile as PackFile;
                 var rmv = new RmvRigidModel(file.DataSource.ReadData(), file.Name);
-                _editableRmvMesh.AddModel(rmv, Scene.GraphicsDevice, resourceLib);
+                _editableRmvMesh.AddModel(rmv, Scene.GraphicsDevice, resourceLib, Animation.Player);
                 Animation.SetActiveSkeleton(rmv.Header.SkeletonName);
                 DisplayName = file.Name;
 
@@ -101,7 +109,7 @@ namespace KitbasherEditor.ViewModels
             // Wmd reference
             var refereneceMesh = _packFileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_paladin.variantmeshdefinition");
             SceneLoader loader = new SceneLoader(_packFileService, Scene.GraphicsDevice, resourceLib);
-            var result = loader.Load(refereneceMesh as PackFile, null);
+            var result = loader.Load(refereneceMesh as PackFile, null, Animation.Player);
             result.ForeachNode((node) => node.IsEditable = false);
             _referenceMesh.AddObject(result);
 

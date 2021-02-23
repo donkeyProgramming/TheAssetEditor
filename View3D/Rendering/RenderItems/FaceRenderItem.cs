@@ -11,7 +11,7 @@ namespace View3D.Rendering.RenderItems
 {
     public class FaceRenderItem : IRenderItem
     {
-        public IDrawableNode Node { get; set; }
+        public IEditableGeometry Node { get; set; }
         public Matrix World { get; set; }
         public List<int> SelectedFaces { get; set; }
 

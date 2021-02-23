@@ -11,7 +11,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <ToggleButton Grid.Row="0" Content="Animation" Click="ToggleButton_Click" Margin="10,1,10,1"/>
+        <ToggleButton Grid.Row="0" Content="Animation" Click="ToggleButton_Click" IsChecked="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="10,1,10,1"/>
         <Grid Grid.Row="1" Margin="0,1,0,10" x:Name="AnimationContent">
 
             <Grid.ColumnDefinitions>
@@ -29,15 +29,15 @@
                 <TextBlock Text="Frame "/>
                 <TextBlock Text="{Binding CurrentFrame, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Text=" / "/>
-                <TextBlock Text="{Binding MaxFames, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="{Binding MaxFrames, UpdateSourceTrigger=PropertyChanged}"/>
             </StackPanel>
 
             <StackPanel Grid.Row="1" Orientation="Horizontal"  HorizontalAlignment="Center" Margin="2,2,2,2">
-                <Button FontSize="20">⏮︎</Button>
-                <Button  FontSize="20">⏪</Button>
-                <ToggleButton FontSize="20">⏯︎</ToggleButton>
-                <Button FontSize="20">⏩</Button>
-                <Button  FontSize="20">⏭</Button>
+                <Button Command="{Binding FirstFrameCommand}" FontSize="20">⏮︎</Button>
+                <Button Command="{Binding PrivFrameCommand}" FontSize="20">⏪</Button>
+                <ToggleButton Command="{Binding PausePlayCommand}" FontSize="20">⏯︎</ToggleButton>
+                <Button Command="{Binding NextFrameCommand}" FontSize="20">⏩</Button>
+                <Button Command="{Binding LastFrameCommand}" FontSize="20">⏭</Button>
             </StackPanel>
 
             <local:AnimationSelector Grid.Row="2"/>

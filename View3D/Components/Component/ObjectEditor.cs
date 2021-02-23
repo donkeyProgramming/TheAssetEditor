@@ -52,7 +52,7 @@ namespace View3D.Components.Component
 
         public void DivideIntoSubmeshes(ObjectSelectionState objectSelectionState)
         {
-            if (objectSelectionState.GetSingleSelectedObject() is IDrawableNode drawableNode)
+            if (objectSelectionState.GetSingleSelectedObject() is IEditableGeometry drawableNode)
             {
                 var command = new DivideObjectIntoSubmeshesCommand(drawableNode);
                 _commandManager.ExecuteCommand(command);

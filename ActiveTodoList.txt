@@ -46,7 +46,7 @@ Feature list before V1 done:
 		
 		
 Thursday:
-	Grid
 	Animation basics
 	Better shader handling
 	Different shaders 
+	Reset camera

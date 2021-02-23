@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Linq;
 using View3D.Animation;
 using View3D.Components.Gizmo;
 using View3D.Components.Rendering;
@@ -12,16 +13,17 @@ using View3D.Utility;
 
 namespace View3D.SceneNodes
 {
-    public class MeshNode : GroupNode, ITransformable, IDrawableNode, ISelectable, IUpdateable
+    public class MeshNode : GroupNode, ITransformable, IEditableGeometry, ISelectable, IUpdateable, IDrawableItem
     {
         public AnimationPlayer AnimationPlayer;
 
         private MeshNode()
         { }
 
-        public MeshNode(IGeometry geo, string name, GraphicsDevice device, ResourceLibary resourceLib)
+        public MeshNode(IGeometry geo, string name, GraphicsDevice device, ResourceLibary resourceLib, AnimationPlayer animationPlayer)
         {
             Geometry = geo;
+            AnimationPlayer = animationPlayer;
 
             Name = name;
             Position = Vector3.Zero;
@@ -39,9 +41,10 @@ namespace View3D.SceneNodes
             SelectedFacesEffect.EnableDefaultLighting();
         }
 
-        public MeshNode(RmvSubModel rmvSubModel, GraphicsDevice device, ResourceLibary resourceLib)
+        public MeshNode(RmvSubModel rmvSubModel, GraphicsDevice device, ResourceLibary resourceLib, AnimationPlayer animationPlayer)
         {
             Geometry = new Rmv2Geometry(rmvSubModel, device);
+            AnimationPlayer = animationPlayer;
 
             Name = rmvSubModel.Header.ModelName;
             Position = Vector3.Zero;
@@ -82,18 +85,17 @@ namespace View3D.SceneNodes
 
         public void Update(GameTime time)
         {
+            // Get animaiton player
+
             // Animation Handling goes here! 
-            /*
+            
               Matrix[] data = new Matrix[256];
             for (int i = 0; i < 256; i++)
                 data[i] = Matrix.Identity;
-           
-            var animatedModel = _model as Rmv2RenderModel;
-            if (animatedModel != null)
-            {
-                _shader.Parameters["WeightCount"].SetValue(animatedModel.WeightCount);
 
-                var player = animatedModel._animationPlayer;
+                DefaultEffect.Parameters["WeightCount"].SetValue(4);// animatedModel.WeightCount);
+
+                var player = AnimationPlayer;
                 if (player != null)
                 {
                     var frame = player.GetCurrentFrame();
@@ -104,12 +106,10 @@ namespace View3D.SceneNodes
                     }
                 }
 
-               // animatedModel.UpdateVertexBuffer();
-            }
+   
 
-           
-            _shader.Parameters["tranforms"].SetValue(data);
-             */
+            DefaultEffect.Parameters["tranforms"].SetValue(data);
+             
         }
 
         public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)
@@ -146,7 +146,7 @@ namespace View3D.SceneNodes
             DefaultEffect.Parameters["World"].SetValue(ModelMatrix);
 
             DefaultEffect.Parameters["UseAlpha"].SetValue(false);
-            DefaultEffect.Parameters["doAnimation"].SetValue(true);
+            DefaultEffect.Parameters["doAnimation"].SetValue(AnimationPlayer.IsEnabled);
 
             Geometry.ApplyMesh(DefaultEffect, device);
         }

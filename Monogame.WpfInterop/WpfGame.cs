@@ -11,6 +11,7 @@ namespace MonoGame.Framework.WpfInterop
     public interface IComponentManager
     {
         public T GetComponent<T>() where T : IGameComponent;
+        public void AddComponent<T>(T comp) where T : IGameComponent;
     }
 
 
@@ -228,6 +229,11 @@ namespace MonoGame.Framework.WpfInterop
             return default(T);
         }
 
+        public void AddComponent<T>(T comp) where T : IGameComponent
+        {
+            Components.Add(comp);
+        }
+
         private void SortDrawables()
         {
             _sortedDrawables.Sort((a, b) => a.DrawOrder.CompareTo(b.DrawOrder));
@@ -247,6 +253,8 @@ namespace MonoGame.Framework.WpfInterop
         {
             _sortedUpdateables.Sort((a, b) => a.UpdateOrder.CompareTo(b.UpdateOrder));
         }
+
+
 
 
         #endregion

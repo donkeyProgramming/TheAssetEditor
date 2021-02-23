@@ -18,7 +18,7 @@ namespace View3D.Commands.Object
 {
     class DivideObjectIntoSubmeshesCommand : CommandBase<DivideObjectIntoSubmeshesCommand>
     {
-        IDrawableNode _objectToSplit;
+        IEditableGeometry _objectToSplit;
         List<MeshNode> _newMeshes = new List<MeshNode>();
 
         IEditableMeshResolver _editableMeshResolver;
@@ -27,7 +27,7 @@ namespace View3D.Commands.Object
         ISelectionState _originalSelectionState;
         ResourceLibary _resourceLib;
 
-        public DivideObjectIntoSubmeshesCommand(IDrawableNode objectToSplit)
+        public DivideObjectIntoSubmeshesCommand(IEditableGeometry objectToSplit)
         {
             _objectToSplit = objectToSplit;
         }
@@ -52,7 +52,8 @@ namespace View3D.Commands.Object
             int counter = 0;
             foreach (var mesh in newMeshes)
             {
-                var meshNode = new MeshNode(mesh, $"{_objectToSplit.Name}_submesh_{counter++}", _sceneManager.GraphicsDevice, _resourceLib); 
+                var hack = _objectToSplit as MeshNode;
+                var meshNode = new MeshNode(mesh, $"{_objectToSplit.Name}_submesh_{counter++}", _sceneManager.GraphicsDevice, _resourceLib, hack.AnimationPlayer); 
                 _newMeshes.Add(meshNode);
                 _editableMeshResolver.GetEditableMeshNode().AddObject(meshNode);
             }

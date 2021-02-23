@@ -8,7 +8,7 @@
         xmlns:test="clr-namespace:AssetEditor.Test" 
         xmlns:packfilebrowser="clr-namespace:CommonControls.PackFileBrowser;assembly=CommonControls"
         mc:Ignorable="d"
-        Title="AssetEditor" Height="800" Width="1024">
+        Title="AssetEditor" Height="1024" Width="2000">
     <Window.Resources>
         <test:DeviceTypeSelector x:Key="MySelector" />
 
