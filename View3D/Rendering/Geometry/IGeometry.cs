@@ -13,7 +13,6 @@ namespace View3D.Rendering.Geometry
         public void ApplyMesh(IShader effect, GraphicsDevice device);
         public void ApplyMeshPart(IShader effect, GraphicsDevice device, List<int> faceSelection);
 
-        public Vector3 GetVertexByIndex(int index);
         public Vector3 GetVertexById(int id);
         public int VertexCount();
 

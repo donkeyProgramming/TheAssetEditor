@@ -151,7 +151,7 @@ namespace View3D.Rendering
             _currentInstanceCount = geo.VertexCount();
             for (int i = 0; i < _currentInstanceCount; i++)
             {
-                var vertPos = Vector3.Transform(geo.GetVertexByIndex(i), modelMatrix);
+                var vertPos = Vector3.Transform(geo.GetVertexById(i), modelMatrix);
                 var distance = (cameraPos - vertPos).Length();
                 var distanceScale = distance * 1.5f;
 

@@ -62,6 +62,11 @@ namespace View3D.SceneNodes
 
         public void Update(GameTime time)
         {
+
+        }
+
+        public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)
+        {
             if (Effect is IShaderAnimation animationEffect)
             {
                 Matrix[] data = new Matrix[256];
@@ -82,14 +87,12 @@ namespace View3D.SceneNodes
                 animationEffect.SetAnimationParameters(data, 4);
                 animationEffect.UseAnimation = AnimationPlayer.IsEnabled;
             }
+
             if (Effect is IShaderTextures tetureEffect)
             {
                 tetureEffect.UseAlpha = false;
             }
-        }
 
-        public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)
-        {
             renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeoRenderItem() { Geometry = Geometry, ModelMatrix = ModelMatrix, Shader = Effect });
         }
 

@@ -13,11 +13,11 @@ Feature list before V1 done:
 		Recently used files
 	
 	Editor:
-		Better shader handling
+		[Done]Better shader handling
 		[Done]Animation playback beginning
 		Animation playback cleanup
 		UI
-			UI linking
+			UI linking (commands visible/clickable in toolbar)
 			Update when different buttons are enabled
 			Hotkeys
 			Show info header
@@ -30,6 +30,9 @@ Feature list before V1 done:
 			Scale
 			Rotate
 			Different gizmo modes
+				object pos
+				object pivot 
+				mesh boundingbox center
 		
 		Saving packfiles
 		Textures
@@ -44,14 +47,15 @@ Feature list before V1 done:
 
 	New editors:
 		Model preview
+		VMD editor
 		
 		
 Thursday:
-	Animation basics
-	Better shader handling
-	Different shaders 
 	Reset camera
+	Focus camera on face/vertex
 	Animation polish
+	Different shader modes
+	
 	
 Known bugs:
-	Select face, then swap to vertex mode, need to call update before draw error
+	[Done]Select face, then swap to vertex mode, need to call update before draw error

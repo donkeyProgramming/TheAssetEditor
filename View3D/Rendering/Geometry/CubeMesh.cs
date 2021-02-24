@@ -134,11 +134,6 @@ namespace View3D.Rendering.Geometry
             return mesh;
         }
 
-        public override Vector3 GetVertexByIndex(int index)
-        {
-            return _vertexArray[index].Position;
-        }
-
         public override Vector3 GetVertexById(int id)
         {
             return _vertexArray[id].Position;

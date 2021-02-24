@@ -27,7 +27,7 @@ namespace View3D.Components.Component.Selection
         ISelectionState _currentState;
         RenderEngineComponent _renderEngine;
 
-        LineMeshRender BoundingBoxRenderer;
+        LineMeshRender _lineGeometry;
         VertexInstanceMesh VertexRenderer;
 
         public SelectionManager(WpfGame game ) : base(game) {}
@@ -41,7 +41,7 @@ namespace View3D.Components.Component.Selection
             _renderEngine = GetComponent<RenderEngineComponent>();
 
 
-            BoundingBoxRenderer = new LineMeshRender(Game.Content);
+            _lineGeometry = new LineMeshRender(Game.Content);
             VertexRenderer = new VertexInstanceMesh(GraphicsDevice, Game.Content);
 
             _wireframeEffect = new BasicShader(GraphicsDevice);
@@ -112,12 +112,13 @@ namespace View3D.Components.Component.Selection
         {
             var selectionState = GetState();
 
+            _lineGeometry.Clear();
             if (selectionState is ObjectSelectionState objectSelectionState)
             {
                 foreach (var item in objectSelectionState.CurrentSelection())
                 {
-                    BoundingBoxRenderer.CreateFromBoundingBox(item.Geometry.BoundingBox);
-                    _renderEngine.AddRenderItem(RenderBuckedId.Selection, new LineRenderItem() { World = item.ModelMatrix, LineMesh = BoundingBoxRenderer });
+                    _lineGeometry.AddBoundingBox(item.Geometry.BoundingBox);
+                    _renderEngine.AddRenderItem(RenderBuckedId.Selection, new LineRenderItem() { World = item.ModelMatrix, LineMesh = _lineGeometry });
                 }
             }
 

@@ -35,18 +35,63 @@ namespace View3D.Components.Component.Selection
 
         public void FocusSelection()
         {
-            Focus(_selectionManager.GetState().SelectedObjects());
+            Focus(_selectionManager.GetState());
         }
 
-        void Focus(IEnumerable<ISelectable> items)
+        void Focus(ISelectionState selectionState)
         {
-            if (items.Count() == 0)
-                return;
-            Vector3 finalPos = Vector3.Zero;
-            foreach (var item in items)
-                finalPos += Vector3.Transform(GetCenter(item.Geometry.BoundingBox), _sceneManager.GetWorldPosition(item));
+            if (selectionState is ObjectSelectionState objectState)
+            {
+                if (objectState.SelectedObjects().Count == 0)
+                    return;
+                Vector3 finalPos = Vector3.Zero;
+                foreach (var item in objectState.SelectedObjects())
+                    finalPos += Vector3.Transform(GetCenter(item.Geometry.BoundingBox), _sceneManager.GetWorldPosition(item));
 
-            _archballCamera.LookAt = finalPos / items.Count();
+                _archballCamera.LookAt = finalPos / objectState.SelectedObjects().Count();
+            }
+            else if (selectionState is VertexSelectionState vertexSelection)
+            {
+                var vertexList = vertexSelection.SelectedVertices;
+                var objectPos = _sceneManager.GetWorldPosition(vertexSelection.RenderObject).Translation;
+                if (vertexList.Count == 0)
+                {
+                    _archballCamera.LookAt = objectPos;
+                    return;
+                }
+               
+                var averageVertexPos = Vector3.Zero;
+                foreach (var vertexIndex in vertexList)
+                    averageVertexPos += vertexSelection.RenderObject.Geometry.GetVertexById(vertexIndex);
+
+                averageVertexPos = averageVertexPos / vertexList.Count;
+                _archballCamera.LookAt = averageVertexPos + objectPos;
+            }
+            else if (selectionState is FaceSelectionState faceSelection)
+            {
+                var faceList = faceSelection.SelectedFaces;
+                var objectPos = _sceneManager.GetWorldPosition(faceSelection.RenderObject).Translation;
+                if (faceList.Count == 0)
+                {
+                    _archballCamera.LookAt = objectPos;
+                    return;
+                }
+
+                var averageFacePos = Vector3.Zero;
+                foreach (var faceIndex in faceList)
+                {
+                    var index0 = faceSelection.RenderObject.Geometry.GetIndex(faceIndex+0);
+                    var index1 = faceSelection.RenderObject.Geometry.GetIndex(faceIndex+1);
+                    var index2 = faceSelection.RenderObject.Geometry.GetIndex(faceIndex+2);
+
+                    var face0 = faceSelection.RenderObject.Geometry.GetVertexById(index0);
+                    var face1 = faceSelection.RenderObject.Geometry.GetVertexById(index1);
+                    var face2 = faceSelection.RenderObject.Geometry.GetVertexById(index2);
+                    averageFacePos += (face0 + face1 + face2) / 3;
+                }
+                averageFacePos = averageFacePos / faceList.Count;
+                _archballCamera.LookAt = averageFacePos + objectPos;
+            }
         }
 
         Vector3 GetCenter(BoundingBox box)
@@ -61,7 +106,8 @@ namespace View3D.Components.Component.Selection
 
         public void ResetCamera()
         {
-            throw new NotImplementedException();
+            _archballCamera.LookAt = Vector3.Zero;
+            _archballCamera.Zoom = 10;
         }
     }
 }

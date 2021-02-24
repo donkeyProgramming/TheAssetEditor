@@ -103,11 +103,11 @@ namespace View3D.Services
 
         bool ContainsVertex(List<ushort> mesh, ushort possibleVertexIndex, IGeometry geo, float tolerance = 0.0000001f )
         {
-            var possibleVertex = geo.GetVertexByIndex(possibleVertexIndex);
+            var possibleVertex = geo.GetVertexById(possibleVertexIndex);
             var uniqeIndexes = mesh.Distinct();
             foreach (var index in uniqeIndexes)
             {
-                var vert = geo.GetVertexByIndex(index);
+                var vert = geo.GetVertexById(index);
                 if ( (Math.Abs(vert.X - possibleVertex.X) < tolerance)  && 
                      (Math.Abs(vert.Y - possibleVertex.Y) < tolerance) &&
                     (Math.Abs(vert.Z - possibleVertex.Z) < tolerance) )

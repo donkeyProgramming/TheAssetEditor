@@ -32,9 +32,9 @@ namespace View3D.Utility
                 var index1 = geometry.GetIndex(i + 1);
                 var index2 = geometry.GetIndex(i + 2);
 
-                var vert0 = geometry.GetVertexByIndex(index0);
-                var vert1 = geometry.GetVertexByIndex(index1);
-                var vert2 = geometry.GetVertexByIndex(index2);
+                var vert0 = geometry.GetVertexById(index0);
+                var vert1 = geometry.GetVertexById(index1);
+                var vert2 = geometry.GetVertexById(index2);
 
                 var res = IntersectionMath.MollerTrumboreIntersection(ray, vert0, vert1, vert2, out var intersectionPoint);
                 if (res)
@@ -59,7 +59,7 @@ namespace View3D.Utility
         {
             for (int i = 0; i < geometry.VertexCount(); i++)
             {
-                if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertexByIndex(i), matrix)) != ContainmentType.Disjoint)
+                if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertexById(i), matrix)) != ContainmentType.Disjoint)
                     return true;
             }
 
@@ -76,11 +76,11 @@ namespace View3D.Utility
                 var index1 = geometry.GetIndex(i + 1);
                 var index2 = geometry.GetIndex(i + 2);
 
-                if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertexByIndex(index0), matrix)) != ContainmentType.Disjoint)
+                if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertexById(index0), matrix)) != ContainmentType.Disjoint)
                     faces.Add(i);
-                else if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertexByIndex(index1), matrix)) != ContainmentType.Disjoint)
+                else if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertexById(index1), matrix)) != ContainmentType.Disjoint)
                     faces.Add(i);
-                else if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertexByIndex(index2), matrix)) != ContainmentType.Disjoint)
+                else if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertexById(index2), matrix)) != ContainmentType.Disjoint)
                     faces.Add(i);
             }
 
@@ -97,7 +97,7 @@ namespace View3D.Utility
             {
                 var index = geometry.GetIndex(i);
                 
-                if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertexByIndex(index), matrix)) != ContainmentType.Disjoint)
+                if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertexById(index), matrix)) != ContainmentType.Disjoint)
                     vertices.Add(index);
             }
             vertices = vertices.Distinct().ToList();

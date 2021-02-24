@@ -95,26 +95,23 @@ namespace View3D.Rendering
             CreateLineList(list);
         }
 
-        public void CreateFromBoundingBox(BoundingBox b)
+        public void AddBoundingBox(BoundingBox b)
         {
             var corners = b.GetCorners();
-            var data = new List< (Vector3, Vector3)>(12);
-            data.Add((corners[0], corners[1]));
-            data.Add((corners[2], corners[3]));
-            data.Add((corners[0], corners[3]));
-            data.Add((corners[1], corners[2]));
-
-            data.Add( (corners[4], corners[5]));
-            data.Add( (corners[6], corners[7]));
-            data.Add( (corners[4], corners[7]));
-            data.Add((corners[5], corners[6]));
-
-            data.Add((corners[0], corners[4]));
-            data.Add((corners[1], corners[5]));
-            data.Add( (corners[2], corners[6]));
-            data.Add((corners[3], corners[7]));
-
-            CreateLineList(data);
+            AddLine(corners[0], corners[1]);
+            AddLine(corners[2], corners[3]);
+            AddLine(corners[0], corners[3]);
+            AddLine(corners[1], corners[2]);
+            
+            AddLine(corners[4], corners[5]);
+            AddLine(corners[6], corners[7]);
+            AddLine(corners[4], corners[7]);
+            AddLine(corners[5], corners[6]);
+            
+            AddLine(corners[0], corners[4]);
+            AddLine(corners[1], corners[5]);
+            AddLine(corners[2], corners[6]);
+            AddLine(corners[3], corners[7]);
         }
 
         public void Render(GraphicsDevice device, CommonShaderParameters commonShaderParameters, Matrix ModelMatrix)

@@ -24,7 +24,6 @@ namespace View3D.Rendering.Geometry
         protected BoundingBox _boundingBox;
         public BoundingBox BoundingBox => _boundingBox;
 
-        public abstract Vector3 GetVertexByIndex(int index);
         public abstract int VertexCount();
         public abstract IGeometry Clone();
 
@@ -82,7 +81,7 @@ namespace View3D.Rendering.Geometry
             var count = VertexCount();
             var points = new Vector3[count];
             for (int i = 0; i < count; i++)
-                points[i] = GetVertexByIndex(i);
+                points[i] = GetVertexById(i);
             _boundingBox = BoundingBox.CreateFromPoints(points);
         }
 

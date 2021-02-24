@@ -26,11 +26,11 @@ namespace AssetEditor
             _config.ShowMainWindow();
         }
 
-
         void DispatcherUnhandledExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs args)
         {
             Logging.Create<App>().Here().Fatal(args.Exception.ToString());
             MessageBox.Show(args.Exception.ToString(), "Error");
+            args.Handled = true;
         }
     }
 }

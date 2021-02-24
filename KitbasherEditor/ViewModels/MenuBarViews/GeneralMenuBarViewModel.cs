@@ -18,7 +18,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public ICommand FocusCameraCommand { get; set; }
         public ICommand ResetCameraCommand { get; set; }
 
-
+         
         string _undoHintText;
         public string UndoHintText { get => _undoHintText; set => SetAndNotify(ref _undoHintText, value); }
 
