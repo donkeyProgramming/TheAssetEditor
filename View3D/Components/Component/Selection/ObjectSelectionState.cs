@@ -42,12 +42,6 @@ namespace View3D.Components.Component.Selection
                 _selectionList = new List<ISelectable>(_selectionList)
             };
         }
-
-        public void Restore()
-        {
-            SelectionChanged?.Invoke(this);
-        }
-
         public int SelectionCount()
         {
             return _selectionList.Count;

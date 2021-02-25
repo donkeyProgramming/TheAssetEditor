@@ -51,11 +51,6 @@ namespace View3D.Components.Component.Selection
             };
         }
 
-        public void Restore()
-        {
-            
-        }
-
         public int SelectionCount()
         {
             return SelectedFaces.Count();

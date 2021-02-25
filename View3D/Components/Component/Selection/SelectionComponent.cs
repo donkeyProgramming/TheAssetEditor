@@ -78,13 +78,18 @@ namespace View3D.Components.Component.Selection
                     _mouseComponent.MouseOwner = this;
             }
 
-            if (_mouseComponent.IsMouseButtonReleased(MouseButton.Left) && _isMouseDown)
+            if (_mouseComponent.IsMouseButtonReleased(MouseButton.Left))
             {
-                var selectionRectangle = CreateSelectionRectangle(_startDrag, _currentMousePos);
+                if (_isMouseDown)
+                {
+                    var selectionRectangle = CreateSelectionRectangle(_startDrag, _currentMousePos);
 
-                var rectArea = RectArea(selectionRectangle);
-                if (rectArea > 8)
-                    SelectFromRectangle(selectionRectangle, _keyboardComponent.IsKeyDown(Keys.LeftShift));
+                    var rectArea = RectArea(selectionRectangle);
+                    if (rectArea > 8)
+                        SelectFromRectangle(selectionRectangle, _keyboardComponent.IsKeyDown(Keys.LeftShift));
+                    else
+                        SelectFromPoint(_currentMousePos, _keyboardComponent.IsKeyDown(Keys.LeftShift));
+                }
                 else
                     SelectFromPoint(_currentMousePos, _keyboardComponent.IsKeyDown(Keys.LeftShift));
 

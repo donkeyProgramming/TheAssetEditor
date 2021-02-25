@@ -82,6 +82,7 @@ namespace View3D.Components.Component.Selection
             }
 
             _currentState.SelectionChanged += SelectionManager_SelectionChanged;
+            SelectionManager_SelectionChanged(_currentState);
             return _currentState;
         }
 
@@ -100,7 +101,7 @@ namespace View3D.Components.Component.Selection
             _currentState.SelectionChanged -= SelectionManager_SelectionChanged;
             _currentState = state;
             _currentState.SelectionChanged += SelectionManager_SelectionChanged;
-            _currentState.Restore();
+            SelectionManager_SelectionChanged(_currentState);
         }
 
         private void SelectionManager_SelectionChanged(ISelectionState state)

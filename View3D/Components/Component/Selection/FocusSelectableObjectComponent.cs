@@ -10,6 +10,7 @@ using System.Text;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
 using View3D.SceneNodes;
+using View3D.Utility;
 
 namespace View3D.Components.Component.Selection
 {
@@ -46,7 +47,7 @@ namespace View3D.Components.Component.Selection
                     return;
                 Vector3 finalPos = Vector3.Zero;
                 foreach (var item in objectState.SelectedObjects())
-                    finalPos += Vector3.Transform(GetCenter(item.Geometry.BoundingBox), _sceneManager.GetWorldPosition(item));
+                    finalPos += Vector3.Transform(MathUtil.GetCenter(item.Geometry.BoundingBox), _sceneManager.GetWorldPosition(item));
 
                 _archballCamera.LookAt = finalPos / objectState.SelectedObjects().Count();
             }
@@ -94,15 +95,6 @@ namespace View3D.Components.Component.Selection
             }
         }
 
-        Vector3 GetCenter(BoundingBox box)
-        {
-            Vector3 finalPos = Vector3.Zero;
-            var corners = box.GetCorners();
-            foreach (var corner in corners)
-                finalPos += corner;
-
-            return finalPos / corners.Length;
-        }
 
         public void ResetCamera()
         {

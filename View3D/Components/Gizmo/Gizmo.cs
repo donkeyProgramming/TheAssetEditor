@@ -344,11 +344,11 @@ namespace View3D.Components.Gizmo
             _intersectPosition = Vector3.Zero;
         }
 
-        public void Update(GameTime gameTime)
+        public void Update(GameTime gameTime, bool enableMove)
         {
             Vector2 mousePosition = _mouse.Position();
 
-            if (_isActive)
+            if (_isActive && enableMove)
             {
                 _lastIntersectionPosition = _intersectPosition;
                 var rotationMatrixLocal = Matrix.Identity;
@@ -386,7 +386,7 @@ namespace View3D.Components.Gizmo
                 // -- Trigger Translation, Rotation & Scale events -- //
                 if (_mouse.IsMouseButtonDown(Input.MouseButton.Left))
                 {
-                    if (_translationDelta != Vector3.Zero)
+                    if (_translationDelta != Vector3.Zero && ActiveMode == GizmoMode.Translate)
                     {
                         foreach (var entity in Selection)
                             OnTranslateEvent(entity, _translationDelta, translationVectorLocal);
@@ -398,11 +398,10 @@ namespace View3D.Components.Gizmo
                             OnRotateEvent(entity, _rotationDelta, rotationMatrixLocal);
                         _rotationDelta = Matrix.Identity;
                     }
-                    if (_scaleDelta != Vector3.Zero)
+                    if (translationVectorLocal != Vector3.Zero && (ActiveMode == GizmoMode.UniformScale || ActiveMode == GizmoMode.NonUniformScale))
                     {
                         foreach (var entity in Selection)
-                            OnScaleEvent(entity, _scaleDelta);
-                        _scaleDelta = Vector3.Zero;
+                            OnScaleEvent(entity, translationVectorLocal);
                     }
                 }
             }
@@ -481,13 +480,13 @@ namespace View3D.Components.Gizmo
             Matrix transform = Matrix.Invert(_rotationMatrix);
             ray.Position = Vector3.Transform(ray.Position, transform);
             ray.Direction = Vector3.TransformNormal(ray.Direction, transform);
+
             switch (ActiveAxis)
             {
                 case GizmoAxis.XY:
                 case GizmoAxis.X:
                     {
-                        Plane plane = new Plane(Vector3.Forward,
-                                                Vector3.Transform(_position, Matrix.Invert(_rotationMatrix)).Z);
+                        Plane plane = new Plane(Vector3.Forward, Vector3.Transform(_position, Matrix.Invert(_rotationMatrix)).Z);
 
                         float? intersection = ray.Intersects(plane);
                         if (intersection.HasValue)
@@ -517,6 +516,7 @@ namespace View3D.Components.Gizmo
                             {
                                 _tDelta = _intersectPosition - _lastIntersectionPosition;
                             }
+
                             switch (ActiveAxis)
                             {
                                 case GizmoAxis.Y:
@@ -550,43 +550,15 @@ namespace View3D.Components.Gizmo
                     break;
             }
 
-
-            if (SnapEnabled)
-            {
-                float snapValue = TranslationSnapValue;
-                if (ActiveMode == GizmoMode.UniformScale || ActiveMode == GizmoMode.NonUniformScale)
-                    snapValue = ScaleSnapValue;
-                if (PrecisionModeEnabled)
-                {
-                    delta *= PRECISION_MODE_SCALE;
-                    snapValue *= PRECISION_MODE_SCALE;
-                }
-
-                _translationScaleSnapDelta += delta;
-
-                delta = new Vector3(
-                  (int)(_translationScaleSnapDelta.X / snapValue) * snapValue,
-                  (int)(_translationScaleSnapDelta.Y / snapValue) * snapValue,
-                  (int)(_translationScaleSnapDelta.Z / snapValue) * snapValue);
-
-                _translationScaleSnapDelta -= delta;
-            }
-            else if (PrecisionModeEnabled)
-                delta *= PRECISION_MODE_SCALE;
-
-
             if (ActiveMode == GizmoMode.Translate)
             {
-                // transform (local or world)
-                var tempDelta = Vector3.Transform(delta, _rotationMatrix);
-                translationVectorLocal = Vector3.Transform(delta, SceneWorld);
-                delta = tempDelta;
-                _translationDelta = delta;
+                // transform (local and world)
+                translationVectorLocal = Vector3.Transform(delta, SceneWorld);  // local
+                _translationDelta = Vector3.Transform(delta, _rotationMatrix);  // World
             }
             else if (ActiveMode == GizmoMode.NonUniformScale || ActiveMode == GizmoMode.UniformScale)
             {
-                // -- Apply Scale -- //
-                _scaleDelta += delta;
+                translationVectorLocal = delta;
             }
             return translationVectorLocal;
         }
@@ -839,7 +811,7 @@ namespace View3D.Components.Gizmo
             {
                 case PivotType.ObjectCenter:
                     if (Selection.Count > 0)
-                        _position = Selection[0].Position;
+                        _position = Selection[0].GetObjectCenter();
                     break;
                 case PivotType.SelectionCenter:
                     _position = GetSelectionCenter();
@@ -1073,18 +1045,18 @@ namespace View3D.Components.Gizmo
 
         private void OnTranslateEvent(ITransformable transformable, Vector3 delta, Vector3 delta2)
         {
-            TranslateEvent?.Invoke(transformable, new TransformationEventArgs(delta, delta2));
+            TranslateEvent?.Invoke(transformable, new TransformationEventArgs(delta, ActivePivot));
         }
 
         private void OnRotateEvent(ITransformable transformable, Matrix delta, Matrix deleta2)
         {
       
-            RotateEvent?.Invoke(transformable, new TransformationEventArgs(delta, deleta2));
+            RotateEvent?.Invoke(transformable, new TransformationEventArgs(delta, ActivePivot));
         }
 
         private void OnScaleEvent(ITransformable transformable, Vector3 delta)
         {
-            ScaleEvent?.Invoke(transformable, new TransformationEventArgs(delta));
+            ScaleEvent?.Invoke(transformable, new TransformationEventArgs(delta, ActivePivot));
         }
 
         #endregion
@@ -1180,11 +1152,11 @@ namespace View3D.Components.Gizmo
     public class TransformationEventArgs
     {
         public ValueType Value;
-        public ValueType Value2;
-        public TransformationEventArgs(ValueType value, ValueType value2 = null)
+        public PivotType Pivot;
+        public TransformationEventArgs(ValueType value, PivotType pivot)
         {
             Value = value;
-            Value2 = value2;
+            Pivot = pivot;
         }
     }
     public delegate void TransformationStartDelegate();

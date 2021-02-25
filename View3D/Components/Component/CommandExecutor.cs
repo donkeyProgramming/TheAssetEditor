@@ -28,6 +28,8 @@ namespace View3D.Components.Component
 
         public void ExecuteCommand(ICommand command)
         {
+            if (command == null)
+                throw new ArgumentNullException("Command is null");
             _commands.Push(command);
             command.Initialize(Game);
             command.Execute();

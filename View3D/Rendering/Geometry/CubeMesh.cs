@@ -9,10 +9,8 @@ using View3D.Utility;
 
 namespace View3D.Rendering.Geometry
 {
-    public class CubeMesh : IndexedMeshGeometry
+    public class CubeMesh : IndexedMeshGeometry<VertexPositionNormalTexture>
     {
-        VertexPositionNormalTexture[] _vertexArray;
-
         public CubeMesh(GraphicsDevice device, bool createDefaultMesh = true) : base(device)
         {
             if (createDefaultMesh == false)
@@ -101,36 +99,14 @@ namespace View3D.Rendering.Geometry
             for (ushort i = 0; i < 36; i++)
                 _indexList[i] = i;
 
-            CreateModelFromBuffers(device);
-            CreateIndexFromBuffers(device);
-            BuildBoundingBox();
-        }
-
-        void CreateModelFromBuffers(GraphicsDevice device)
-        {
-            _vertexBuffer = new VertexBuffer(device, _vertexDeclaration, _vertexArray.Length, BufferUsage.None);
-            _vertexBuffer.SetData(_vertexArray);
+            RebuildVertexBuffer();
+            CreateIndexFromBuffers();
         }
 
         public override IGeometry Clone()
         {
             var mesh = new CubeMesh(_device, false);
-            mesh.Pivot = this.Pivot;
-            mesh._vertexDeclaration = _vertexDeclaration;
-            mesh._boundingBox = BoundingBox;
-
-            mesh._indexList = new ushort[_indexList.Length];
-            _indexList.CopyTo(mesh._indexList, 0);
-
-            mesh._indexBuffer = new IndexBuffer(_device, typeof(short), mesh._indexList.Length, BufferUsage.None);
-            mesh._indexBuffer.SetData(mesh._indexList);
-
-            mesh._vertexArray = new VertexPositionNormalTexture[_vertexArray.Length];
-            _vertexArray.CopyTo(mesh._vertexArray, 0);
-
-            mesh._vertexBuffer = new VertexBuffer(_device, mesh._vertexDeclaration, mesh._vertexArray.Length, BufferUsage.None);
-            mesh._vertexBuffer.SetData(mesh._vertexArray);
-
+            CopyInto(mesh);
             return mesh;
         }
 
@@ -139,55 +115,9 @@ namespace View3D.Rendering.Geometry
             return _vertexArray[id].Position;
         }
 
-
-        public override int VertexCount()
-        {
-            return _vertexArray.Length;
-        }
-
-
-        public override void RemoveUnusedVertexes(ushort[] newIndexList)
-        {
-            var uniqeIndexes = newIndexList.Distinct().ToList();
-            uniqeIndexes.Sort();
-
-            var newVertexList = new List<VertexPositionNormalTexture>();
-            Dictionary<ushort, ushort> remappingTable = new Dictionary<ushort, ushort>();
-            for (ushort i = 0; i < _vertexArray.Length; i++)
-            {
-                if (uniqeIndexes.Contains(i))
-                {
-                    remappingTable[i] = (ushort)remappingTable.Count();
-                    newVertexList.Add(_vertexArray[i]);
-                }
-            }
-
-            for (int i = 0; i < newIndexList.Length; i++)
-                newIndexList[i] = remappingTable[newIndexList[i]];
-
-            _indexList = newIndexList;
-            _indexBuffer = new IndexBuffer(_device, typeof(short), _indexList.Length, BufferUsage.None);
-            _indexBuffer.SetData(_indexList);
-
-            _vertexArray = newVertexList.ToArray();
-            _vertexBuffer = new VertexBuffer(_device, _vertexDeclaration, _vertexArray.Length, BufferUsage.None);
-            _vertexBuffer.SetData(_vertexArray);
-
-            BuildBoundingBox();
-        }
-
         public override void UpdateVertexPosition(int vertexId, Vector3 position)
         {
             _vertexArray[vertexId].Position = position;
-        }
-
-        public override void RebuildVertexBuffer()
-        {
-            if (_vertexBuffer != null)
-                _vertexBuffer.Dispose();
-
-            _vertexBuffer = new VertexBuffer(_device, _vertexDeclaration, _vertexArray.Length, BufferUsage.None);
-            _vertexBuffer.SetData(_vertexArray);
         }
     }
 }

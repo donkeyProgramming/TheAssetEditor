@@ -19,7 +19,6 @@ namespace View3D.Components.Component.Selection
     {
         ISelectionState Clone();
         void Clear();
-        void Restore();
         GeometrySelectionMode Mode { get; }
         public event SelectionStateChanged SelectionChanged;
 

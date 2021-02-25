@@ -7,10 +7,8 @@ using System.Linq;
 
 namespace View3D.Rendering.Geometry
 {
-    public class Rmv2Geometry : IndexedMeshGeometry
+    public class Rmv2Geometry : IndexedMeshGeometry<VertexPositionNormalTextureCustom>
     {
-        VertexPositionNormalTextureCustom[] _vertexArray;
-
         public int WeightCount { get; set; } = 0;
 
         public Rmv2Geometry(RmvSubModel modelPart, GraphicsDevice device) : base(device)
@@ -54,101 +52,31 @@ namespace View3D.Rendering.Geometry
                     _vertexArray[i].BlendWeights.X = vertex.BoneWeight[0];
                     WeightCount = 1;
                 }
-
             }
 
-            CreateModelFromBuffers(device);
-            CreateIndexFromBuffers(device);
-            BuildBoundingBox();
+            RebuildVertexBuffer();
+            CreateIndexFromBuffers();
         }
 
-        public Rmv2Geometry(GraphicsDevice device) : base(device)
+        protected Rmv2Geometry(GraphicsDevice device) : base(device)
         { }
-
-
-        void CreateModelFromBuffers(GraphicsDevice device)
-        {
-        
-            _vertexBuffer = new VertexBuffer(device, _vertexDeclaration, _vertexArray.Length, BufferUsage.None);
-            _vertexBuffer.SetData(_vertexArray);
-        }
 
         public override IGeometry Clone()
         {
             var mesh = new Rmv2Geometry(_device);
-            mesh.Pivot = Pivot;
-            mesh._vertexDeclaration = _vertexDeclaration;
-            mesh._boundingBox = BoundingBox;
-
-            mesh._indexList = new ushort[_indexList.Length];
-            _indexList.CopyTo(mesh._indexList, 0);
-
-            mesh._indexBuffer = new IndexBuffer(_device, typeof(short), mesh._indexList.Length, BufferUsage.None);
-            mesh._indexBuffer.SetData(mesh._indexList);
-
-            mesh._vertexArray = new VertexPositionNormalTextureCustom[_vertexArray.Length];
-            _vertexArray.CopyTo(mesh._vertexArray, 0);
-
-            mesh._vertexBuffer = new VertexBuffer(_device, mesh._vertexDeclaration, mesh._vertexArray.Length, BufferUsage.None);
-            mesh._vertexBuffer.SetData(mesh._vertexArray);
-
+            CopyInto(mesh);
+            mesh.WeightCount = WeightCount;
             return mesh;
         }
-
 
         public override Vector3 GetVertexById(int id)
         {
             return new Vector3(_vertexArray[id].Position.X, _vertexArray[id].Position.Y, _vertexArray[id].Position.Z);
         }
 
-        public override int VertexCount()
-        {
-            return _vertexArray.Length;
-        }
-
-
-        public override void RemoveUnusedVertexes(ushort[] newIndexList)
-        {
-            var uniqeIndexes = newIndexList.Distinct().ToList();
-            uniqeIndexes.Sort();
-
-            List<VertexPositionNormalTextureCustom> newVertexList = new List<VertexPositionNormalTextureCustom>();
-            Dictionary<ushort, ushort> remappingTable = new Dictionary<ushort, ushort>();
-            for (ushort i = 0; i < _vertexArray.Length; i++)
-            {
-                if (uniqeIndexes.Contains(i))
-                {
-                    remappingTable[i] = (ushort)remappingTable.Count();
-                    newVertexList.Add(_vertexArray[i]);
-                }
-            }
-
-            for (int i = 0; i < newIndexList.Length; i++)
-                newIndexList[i] = remappingTable[newIndexList[i]];
-
-            _indexList = newIndexList;
-             _indexBuffer = new IndexBuffer(_device, typeof(short), _indexList.Length, BufferUsage.None);
-            _indexBuffer.SetData(_indexList);
-
-            _vertexArray = newVertexList.ToArray();
-            _vertexBuffer = new VertexBuffer(_device, _vertexDeclaration, _vertexArray.Length, BufferUsage.None);
-            _vertexBuffer.SetData(_vertexArray);
-
-            BuildBoundingBox();
-        }
-
         public override void UpdateVertexPosition(int vertexId, Vector3 position)
         {
             _vertexArray[vertexId].Position = new Vector4(position, 1);
-        }
-
-        public override void RebuildVertexBuffer()
-        {
-            if (_vertexBuffer != null)
-                _vertexBuffer.Dispose();
-
-            _vertexBuffer = new VertexBuffer(_device, _vertexDeclaration, _vertexArray.Length, BufferUsage.None);
-            _vertexBuffer.SetData(_vertexArray);
         }
     }
 }

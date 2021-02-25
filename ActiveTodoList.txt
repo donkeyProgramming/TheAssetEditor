@@ -13,8 +13,8 @@ Feature list before V1 done:
 		Recently used files
 	
 	Editor:
-		[Done]Better shader handling
-		[Done]Animation playback beginning
+		[DONE]Better shader handling
+		[DONE]Animation playback beginning
 		Animation playback cleanup
 		UI
 			UI linking (commands visible/clickable in toolbar)
@@ -23,8 +23,8 @@ Feature list before V1 done:
 			Show info header
 			Show info rmv2
 			Selecting in tree view should select in scene
-			Focus camera - work on selected faces and verts
-			Reset camera
+			[DONE]Focus camera - work on selected faces and verts
+			[DONE]Reset camera
 			
 		Transform:
 			Scale
@@ -39,7 +39,7 @@ Feature list before V1 done:
 			Show
 			Change
 		Different shader modes 
-		[Done]Grid
+		[DONE]Grid
 		Pivot
 			Edit
 			Display
@@ -51,11 +51,10 @@ Feature list before V1 done:
 		
 		
 Thursday:
-	Reset camera
-	Focus camera on face/vertex
 	Animation polish
 	Different shader modes
 	
 	
 Known bugs:
-	[Done]Select face, then swap to vertex mode, need to call update before draw error
+	[DONE]Select face, then swap to vertex mode, need to call update before draw error
+	Bug with selection in rotation mode, can not select when an axis is active

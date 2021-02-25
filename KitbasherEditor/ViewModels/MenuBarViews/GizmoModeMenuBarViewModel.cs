@@ -1,7 +1,9 @@
 ﻿using Common;
 using GalaSoft.MvvmLight.CommandWpf;
 using MonoGame.Framework.WpfInterop;
+using System;
 using System.Windows.Input;
+using View3D.Components.Component.Selection;
 using View3D.Components.Gizmo;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
@@ -26,8 +28,27 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public bool ScaleActive { get { return _scaleActive; } set { SetAndNotify(ref _scaleActive, value); } }
 
 
+        int _selectionModeIndex = 0;
+        public int SelectionModeIndex 
+        { 
+            get { return _selectionModeIndex; } 
+            set 
+            {
+                if (value != _selectionModeIndex)
+                {
+                    SetAndNotify(ref _selectionModeIndex, value);
+                    UpdateSelectionMode(value);
+                }
+            } 
+        }
+
+        int _pivotModeModeIndex = 1;
+        public int PivotModeModeIndex { get { return _pivotModeModeIndex; } set { SetAndNotify(ref _pivotModeModeIndex, value); UpdatePivotMode(value); } }
+
         ToolbarCommandFactory _commandFactory;
         GizmoComponent _gizmoComponent;
+        SelectionManager _selectionManager;
+        SelectionComponent _selectionComponent;
 
         public GizmoModeMenuBarViewModel(IComponentManager componentManager, ToolbarCommandFactory commandFactory)
         {
@@ -39,7 +60,47 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             ScaleCommand = _commandFactory.Register(new RelayCommand(Scale), Key.R, ModifierKeys.None);
 
             _gizmoComponent = componentManager.GetComponent<GizmoComponent>();
+            _selectionManager = componentManager.GetComponent<SelectionManager>();
+            _selectionManager.SelectionChanged += OnSelectionChanged;
+            _selectionComponent = componentManager.GetComponent<SelectionComponent>();
         }
+
+        private void OnSelectionChanged(ISelectionState state)
+        {
+            if (state.Mode == GeometrySelectionMode.Object)
+                SelectionModeIndex = 0;
+            else if (state.Mode == GeometrySelectionMode.Face)
+                SelectionModeIndex = 1;
+            else if (state.Mode == GeometrySelectionMode.Vertex)
+                SelectionModeIndex = 2;
+            else
+                throw new NotImplementedException("Unkown state");
+        }
+
+        void UpdateSelectionMode(int index)
+        {
+            if (index == 0)
+                _selectionComponent.SetObjectSelectionMode();
+            else if(index == 1)
+                _selectionComponent.SetFaceSelectionMode();
+            else if (index == 2)
+                _selectionComponent.SetVertexSelectionMode();
+            else
+                throw new NotImplementedException("Unkown state");
+        }
+
+        private void UpdatePivotMode(int value)
+        {
+            if (value == 0)
+                _gizmoComponent.SetGizmoPivot(PivotType.SelectionCenter);
+            else if (value == 1)
+                _gizmoComponent.SetGizmoPivot(PivotType.ObjectCenter);
+            //else if (value == 2)
+            //    _gizmoComponent.SetGizmoPivot(PivotType.WorldOrigin);
+            else
+                throw new NotImplementedException("Unkown state");
+        }
+
 
         void Cursor()
         {

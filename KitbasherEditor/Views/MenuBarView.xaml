@@ -58,15 +58,15 @@
 
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBar>
-                <Button ToolTip="Save">
+                <Button ToolTip="Save" IsEnabled="False">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-save-all-50.png"/>
                 </Button>
 
-                <Button ToolTip="Import file">
+                <Button ToolTip="Import file" IsEnabled="False">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/open ref.png"/>
                 </Button>
 
-                <Button ToolTip="Validate object">
+                <Button ToolTip="Validate object" IsEnabled="False">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Validate.png"/>
                 </Button>
 
@@ -75,50 +75,30 @@
                 <Button ToolTip="{Binding General.UndoHintText}" Command="{Binding General.UndoCommand}" IsEnabled="{Binding General.UndoEnabled}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/undo.png"/>
                 </Button>
-                <Button ToolTip="Delete undo history">
+                <Button ToolTip="Delete undo history" IsEnabled="False">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/DeleteHistory.png"/>
                 </Button>
 
 
                 <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
-
-                <Button ToolTip="Focus camera on selection" Command="{Binding General.FocusCamera}">
-                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Camera_Focus.png"/>
-                </Button>
-
-                <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
-                <RadioButton ToolTip="Move selection" GroupName="gizmo" Command="{Binding Gizmo.CursorCommand}" IsChecked="{Binding Gizmo.CursorActive, UpdateSourceTrigger=PropertyChanged}">
+                <RadioButton ToolTip="Object selector" GroupName="gizmo" Command="{Binding Gizmo.CursorCommand}" IsChecked="{Binding Gizmo.CursorActive, UpdateSourceTrigger=PropertyChanged}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-cursor-256.png"/>
                 </RadioButton>
-                <RadioButton ToolTip="Move selection" GroupName="gizmo" Command="{Binding Gizmo.MoveCommand}" IsChecked="{Binding Gizmo.MoveActive, UpdateSourceTrigger=PropertyChanged}">
+                <RadioButton ToolTip="Move gizmo" GroupName="gizmo" Command="{Binding Gizmo.MoveCommand}" IsChecked="{Binding Gizmo.MoveActive, UpdateSourceTrigger=PropertyChanged}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Gizmo_move.png"/>
                 </RadioButton>
-                <RadioButton ToolTip="Rotate selection" GroupName="gizmo" Command="{Binding Gizmo.RotateCommand}" IsChecked="{Binding Gizmo.RotateActive, UpdateSourceTrigger=PropertyChanged}">
+                <RadioButton ToolTip="Rotate gizmo" GroupName="gizmo" Command="{Binding Gizmo.RotateCommand}" IsChecked="{Binding Gizmo.RotateActive, UpdateSourceTrigger=PropertyChanged}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Gizmo_rotate.png"/>
                 </RadioButton>
-                <RadioButton ToolTip="Scale selection" GroupName="gizmo" Command="{Binding Gizmo.ScaleCommand}" IsChecked="{Binding Gizmo.ScaleActive, UpdateSourceTrigger=PropertyChanged}">
+                <RadioButton ToolTip="Scale gizmo" GroupName="gizmo" Command="{Binding Gizmo.ScaleCommand}" IsChecked="{Binding Gizmo.ScaleActive, UpdateSourceTrigger=PropertyChanged}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Gizmo_scale.png"/>
                 </RadioButton>
 
                 <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
 
-                <Button ToolTip="This is a tooltip">
-                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SnapVertex.png"/>
-                </Button>
-
-                <TextBlock VerticalAlignment="Center">Pivot:</TextBlock>
-                <ComboBox>
-                    <ComboBoxItem IsSelected="True" Content="Center"/>
-                    <ComboBoxItem Content="Root"/>
-                </ComboBox>
-
-
-
-                <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
-
-                <TextBlock VerticalAlignment="Center">Selection:</TextBlock>
-                <ComboBox>
-                    <ComboBoxItem IsSelected="True">
+                <TextBlock VerticalAlignment="Center" Text="Selection:"/>
+                <ComboBox SelectedIndex="{Binding Gizmo.SelectionModeIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                    <ComboBoxItem>
                         <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_object.png"/>
                     </ComboBoxItem>
                     <ComboBoxItem>
@@ -128,6 +108,15 @@
                         <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_Vertex.png"/>
                     </ComboBoxItem>
                 </ComboBox>
+
+                <TextBlock VerticalAlignment="Center"  Margin="3,0,0,0" Text="Pivot:"/>
+                <ComboBox IsEditable="False" SelectedIndex="{Binding Gizmo.PivotModeModeIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                    <ComboBoxItem Content="Object postions"/>
+                    <ComboBoxItem Content="Selection center"/>
+                    
+                </ComboBox>
+
+
 
                 <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
 
@@ -165,6 +154,9 @@
                         Command="{Binding Tools.MergeVertexCommand}"
                         IsEnabled="{Binding Tools.MergeVertexEnabled, UpdateSourceTrigger=PropertyChanged}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_mergeVertex.png"/>
+                </Button>
+                <Button ToolTip="Snap vertex" IsEnabled="False">
+                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SnapVertex.png"/>
                 </Button>
 
 

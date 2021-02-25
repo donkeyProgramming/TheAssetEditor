@@ -51,11 +51,6 @@ namespace View3D.Components.Component.Selection
             };
         }
 
-        public void Restore()
-        {
-            SelectionChanged?.Invoke(this);
-        }
-
         public int SelectionCount()
         {
             return SelectedVertices.Count();

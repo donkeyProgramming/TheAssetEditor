@@ -18,6 +18,7 @@
 
 using Microsoft.Xna.Framework;
 using System;
+using View3D.Rendering.Geometry;
 
 namespace View3D.Components.Gizmo
 {
@@ -29,5 +30,8 @@ namespace View3D.Components.Gizmo
         Vector3 Position { get; set; }
         Vector3 Scale { get; set; }
         Quaternion Orientation { get; set; }
+        Vector3 GetObjectCenter();
+        IGeometry Geometry { get; set; }
+
     }
 }

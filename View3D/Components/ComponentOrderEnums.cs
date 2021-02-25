@@ -9,6 +9,7 @@ namespace View3D.Components
         RenderEngine,
         Input,
         Camera,
+       
         Gizmo,
         SelectionComponent,
         Default,

@@ -18,10 +18,10 @@ namespace View3D.Rendering.Geometry
 
         public int GetIndex(int i);
         public int GetIndexCount();
-
         public List<ushort> GetIndexBuffer();
 
         BoundingBox BoundingBox { get; }
+        Vector3 MeshCenter { get; }
 
         IGeometry Clone();
 

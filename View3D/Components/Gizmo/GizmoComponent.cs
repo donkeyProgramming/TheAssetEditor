@@ -14,6 +14,7 @@ using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
 using View3D.Commands.Vertex;
 using View3D.Utility;
+using View3D.SceneNodes;
 
 namespace View3D.Components.Gizmo
 {
@@ -27,6 +28,9 @@ namespace View3D.Components.Gizmo
 
         Quaternion _orientation = Quaternion.Identity;
         public Quaternion Orientation { get => _orientation; set { _orientation = value; HandlePositionUpdate(); } }
+
+        public Matrix ModelMatrix { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public IGeometry Geometry { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         IGeometry _geo;
         List<int> _vertexList;
@@ -65,10 +69,13 @@ namespace View3D.Components.Gizmo
             _startOrientation = Orientation;
             _geo.RebuildVertexBuffer();
         }
+
+        public Vector3 GetObjectCenter()
+        {
+            return Position;
+            //throw new NotImplementedException();
+        }
     }
-
-
-    public delegate void GizmoUpdated();
 
     public class GizmoComponent : BaseComponent
     {
@@ -76,7 +83,7 @@ namespace View3D.Components.Gizmo
         KeyboardComponent _keyboard;
         SelectionManager _selectionManager;
 
-        ICommand _activeCommand;
+
         CommandExecutor _commandManager;
        
         Gizmo _gizmo;
@@ -87,6 +94,8 @@ namespace View3D.Components.Gizmo
             UpdateOrder = (int)ComponentUpdateOrderEnum.Gizmo;
             DrawOrder = (int)ComponentDrawOrderEnum.Gizmo;
         }
+
+        CustomTransfromWrapper _wrapper;
 
         public override void Initialize()
         {
@@ -101,7 +110,7 @@ namespace View3D.Components.Gizmo
 
             var font = resourceLibary.Content.Load<SpriteFont>("Fonts\\DefaultFont");
             _gizmo = new Gizmo(camera, _mouse, GraphicsDevice, new SpriteBatch(GraphicsDevice), font);
-
+            _gizmo.ActivePivot = PivotType.ObjectCenter;
             _gizmo.TranslateEvent += GizmoTranslateEvent;
             _gizmo.RotateEvent += GizmoRotateEvent;
             _gizmo.ScaleEvent += GizmoScaleEvent;
@@ -112,24 +121,31 @@ namespace View3D.Components.Gizmo
         private void OnSelectionChanged(ISelectionState state)
         {
             _gizmo.Selection.Clear();
-
+            _wrapper = null;
             if (state is ObjectSelectionState objectSelectionState)
             {
-                foreach (ITransformable item in objectSelectionState.CurrentSelection().Where(x => x is ITransformable))
-                    _gizmo.Selection.Add(item);
+                var transformables = objectSelectionState.CurrentSelection().Where(x => x is ITransformable).Select(x=>x as ITransformable);
+                if (transformables.Any())
+                {
+                    _wrapper = new CustomTransfromWrapper(transformables.ToList());
+                    _gizmo.Selection.Add(_wrapper);
+                }
             }
-            else if (state is VertexSelectionState vertexSelectionState)
-            {
-                var position = Vector3.Zero;
-                for (int i = 0; i < vertexSelectionState.SelectedVertices.Count; i++)
-                    position += vertexSelectionState.RenderObject.Geometry.GetVertexById(vertexSelectionState.SelectedVertices[i]);
-                position = position / vertexSelectionState.SelectedVertices.Count;
-                position = Vector3.Transform(position, vertexSelectionState.RenderObject.ModelMatrix);
-
-                var wrapper = new VertexTransformationWrapper(vertexSelectionState.RenderObject.Geometry, vertexSelectionState.SelectedVertices, position);
-
-                _gizmo.Selection.Add(wrapper);
-            }
+            //else if (state is VertexSelectionState vertexSelectionState)
+            //{
+            //    if (vertexSelectionState.SelectedVertices.Count == 0)
+            //        return;
+            //
+            //    var position = Vector3.Zero;
+            //    for (int i = 0; i < vertexSelectionState.SelectedVertices.Count; i++)
+            //        position += vertexSelectionState.RenderObject.Geometry.GetVertexById(vertexSelectionState.SelectedVertices[i]);
+            //    position = position / vertexSelectionState.SelectedVertices.Count;
+            //    position = Vector3.Transform(position, vertexSelectionState.RenderObject.ModelMatrix);
+            //
+            //    var wrapper = new VertexTransformationWrapper(vertexSelectionState.RenderObject.Geometry, vertexSelectionState.SelectedVertices, position);
+            //
+            //    _gizmo.Selection.Add(wrapper);
+            //}
 
             _gizmo.ResetDeltas();
         }
@@ -139,39 +155,39 @@ namespace View3D.Components.Gizmo
             if (_selectionManager.GetState() is ObjectSelectionState objectSelectionState)
             {
                 _mouse.MouseOwner = this;
-
-                var selection = objectSelectionState.CurrentSelection();
-                _activeCommand = new TransformCommand(selection.Where(x => x is ITransformable).Select(x => (ITransformable)x).ToList());
+                _wrapper.Start(_gizmo.ActivePivot, _gizmo.ActiveMode);
             }
             if (_selectionManager.GetState() is VertexSelectionState vertexSelectionState)
             {
                 _mouse.MouseOwner = this;
-                _activeCommand = new TransformVertexCommand(vertexSelectionState.RenderObject);
+                _wrapper.Start(_gizmo.ActivePivot, _gizmo.ActiveMode);
             }
+
         }
         private void GizmoTransformEnd()
         {
-            if (_activeCommand != null)
-                _commandManager.ExecuteCommand(_activeCommand);
-
-            _mouse.MouseOwner = null;
-            _activeCommand = null;
+            _wrapper.Stop(_commandManager);
+            if (_mouse.MouseOwner == this)
+            {
+                _mouse.MouseOwner = null;
+                _mouse.ClearStates();
+            }
         }
 
 
         private void GizmoTranslateEvent(ITransformable transformable, TransformationEventArgs e)
         {
-            transformable.Position += (Vector3)e.Value;
-        }  
+            _wrapper.GizmoTranslateEvent(e);
+        }
 
         private void GizmoRotateEvent(ITransformable transformable, TransformationEventArgs e)
         {
-            transformable.Orientation = Quaternion.CreateFromRotationMatrix(Matrix.CreateFromQuaternion(transformable.Orientation) * (Matrix)e.Value);
+            _wrapper.GizmoRotateEvent(e); 
         }
 
         private void GizmoScaleEvent(ITransformable transformable, TransformationEventArgs e)
         {
-            transformable.Scale += (Vector3)e.Value;
+            _wrapper.GizmoScaleEvent(e);
         }
 
         public override void Update(GameTime gameTime)
@@ -184,19 +200,23 @@ namespace View3D.Components.Gizmo
 
             _gizmo.UpdateCameraProperties();
 
-            // Toggle space mode:
-            if (_keyboard.IsKeyReleased(Keys.Home))
-                _gizmo.ToggleActiveSpace();
+           //// Toggle space mode:
+           //if (_keyboard.IsKeyReleased(Keys.Home))
+           //    _gizmo.ToggleActiveSpace();
 
-            // Workaround for camera roation causing movment
-            if (!_keyboard.IsKeyDown(Keys.LeftAlt))
-                _gizmo.Update(gameTime);
+            var isCameraMoving = _keyboard.IsKeyDown(Keys.LeftAlt);
+            _gizmo.Update(gameTime, !isCameraMoving);
         }
 
         public void SetGizmoMode(GizmoMode mode)
         {
             _gizmo.ActiveMode = mode;
             _isEnabled = true;
+        }
+
+        public void SetGizmoPivot(PivotType type)
+        {
+            _gizmo.ActivePivot = type;
         }
 
         public void Disable()
