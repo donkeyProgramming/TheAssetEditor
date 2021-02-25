@@ -198,8 +198,6 @@ namespace View3D.Components.Gizmo
             if (!_isEnabled)
                 return;
 
-            _gizmo.UpdateCameraProperties();
-
            //// Toggle space mode:
            //if (_keyboard.IsKeyReleased(Keys.Home))
            //    _gizmo.ToggleActiveSpace();
@@ -231,7 +229,7 @@ namespace View3D.Components.Gizmo
             if (!_isEnabled)
                 return;
 
-            _gizmo.Draw(false);
+            _gizmo.Draw();
         }
     }
 }

@@ -47,12 +47,7 @@ namespace View3D.Components.Gizmo
         private readonly BasicEffect _meshEffect;
         private readonly SpriteFont _font;
 
-        private Matrix _view = Matrix.Identity;
-        private Matrix _projection = Matrix.Identity;
-        private Vector3 _cameraPosition;
-
         // -- Screen Scale -- //
-        private Matrix _screenScaleMatrix;
         private float _screenScale;
 
         // -- Position - Rotation -- //
@@ -84,16 +79,12 @@ namespace View3D.Components.Gizmo
         private const float LINE_LENGTH = 3f;
         private const float LINE_OFFSET = 1f;
 
-        // -- Quads -- //
-        private Quad[] _quads;
-        private readonly BasicEffect _quadEffect;
-
         // -- Colors -- //
-        private Color[] _axisColors;
-        private Color _highlightColor;
+        private Color[] _axisColors = new Color[3] { Color.Red, Color.Green, Color.Blue };
+        private Color _highlightColor = Color.Gold;
 
         // -- UI Text -- //
-        private string[] _axisText;
+        private string[] _axisText = new string[3] { "X", "Y", "Z" };
         private Vector3 _axisTextOffset = new Vector3(0, 0.5f, 0);
 
         // -- Modes & Selections -- //
@@ -103,70 +94,6 @@ namespace View3D.Components.Gizmo
         public TransformSpace GizmoValueSpace = TransformSpace.Local;
         public PivotType ActivePivot = PivotType.SelectionCenter;
 
-        // -- BoundingBoxes -- //
-
-        #region BoundingBoxes
-
-        private const float MULTI_AXIS_THICKNESS = 0.05f;
-        private const float SINGLE_AXIS_THICKNESS = 0.2f;
-
-        private static BoundingBox XAxisBox
-        {
-            get
-            {
-                return new BoundingBox(new Vector3(LINE_OFFSET, 0, 0),
-                                       new Vector3(LINE_OFFSET + LINE_LENGTH, SINGLE_AXIS_THICKNESS, SINGLE_AXIS_THICKNESS));
-            }
-        }
-
-        private static BoundingBox YAxisBox
-        {
-            get
-            {
-                return new BoundingBox(new Vector3(0, LINE_OFFSET, 0),
-                                       new Vector3(SINGLE_AXIS_THICKNESS, LINE_OFFSET + LINE_LENGTH, SINGLE_AXIS_THICKNESS));
-            }
-        }
-
-        private static BoundingBox ZAxisBox
-        {
-            get
-            {
-                return new BoundingBox(new Vector3(0, 0, LINE_OFFSET),
-                                       new Vector3(SINGLE_AXIS_THICKNESS, SINGLE_AXIS_THICKNESS, LINE_OFFSET + LINE_LENGTH));
-            }
-        }
-
-        private static BoundingBox XZAxisBox
-        {
-            get
-            {
-                return new BoundingBox(Vector3.Zero,
-                                       new Vector3(LINE_OFFSET, MULTI_AXIS_THICKNESS, LINE_OFFSET));
-            }
-        }
-
-        private BoundingBox XYBox
-        {
-            get
-            {
-                return new BoundingBox(Vector3.Zero,
-                                       new Vector3(LINE_OFFSET, LINE_OFFSET, MULTI_AXIS_THICKNESS));
-            }
-        }
-
-        private BoundingBox YZBox
-        {
-            get
-            {
-                return new BoundingBox(Vector3.Zero,
-                                       new Vector3(MULTI_AXIS_THICKNESS, LINE_OFFSET, LINE_OFFSET));
-            }
-        }
-
-        #endregion
-
-        // -- BoundingSpheres -- //
 
         #region BoundingSpheres
 
@@ -176,8 +103,7 @@ namespace View3D.Components.Gizmo
         {
             get
             {
-                return new BoundingSphere(Vector3.Transform(_translationLineVertices[1].Position, _gizmoWorld),
-                                          RADIUS * _screenScale);
+                return new BoundingSphere(Vector3.Transform(_translationLineVertices[1].Position, _gizmoWorld), RADIUS * _screenScale);
             }
         }
 
@@ -185,8 +111,7 @@ namespace View3D.Components.Gizmo
         {
             get
             {
-                return new BoundingSphere(Vector3.Transform(_translationLineVertices[7].Position, _gizmoWorld),
-                                          RADIUS * _screenScale);
+                return new BoundingSphere(Vector3.Transform(_translationLineVertices[7].Position, _gizmoWorld), RADIUS * _screenScale);
             }
         }
 
@@ -194,40 +119,27 @@ namespace View3D.Components.Gizmo
         {
             get
             {
-                return new BoundingSphere(Vector3.Transform(_translationLineVertices[13].Position, _gizmoWorld),
-                                          RADIUS * _screenScale);
+                return new BoundingSphere(Vector3.Transform(_translationLineVertices[13].Position, _gizmoWorld), RADIUS * _screenScale);
             }
         }
 
         #endregion
 
-        /// <summary>
-        /// The value to adjust all transformation when precisionMode is active.
-        /// </summary>
-        private const float PRECISION_MODE_SCALE = 0.1f;
+
 
         // -- Selection -- //
         public List<ITransformable> Selection = new List<ITransformable>();
 
-        private Vector3 _translationDelta = Vector3.Zero;
-        private Matrix _rotationDelta = Matrix.Identity;
-        private Vector3 _scaleDelta = Vector3.Zero;
 
         // -- Translation Variables -- //
-        private Vector3 _tDelta;
         private Vector3 _lastIntersectionPosition;
         private Vector3 _intersectPosition;
 
         public bool SnapEnabled = false;
-        public bool PrecisionModeEnabled;
-        public float TranslationSnapValue = 5;
         public float RotationSnapValue = 30;
-        public float ScaleSnapValue = 0.5f;
-
-        private Vector3 _translationScaleSnapDelta;
         private float _rotationSnapDelta;
 
-       // private MouseState _lastMouseState, _currentMouseState;
+    
         ArcBallCamera _camera;
         Input.MouseComponent _mouse;
 
@@ -245,8 +157,6 @@ namespace View3D.Components.Gizmo
 
             _lineEffect = new BasicEffect(graphics) { VertexColorEnabled = true, AmbientLightColor = Vector3.One, EmissiveColor = Vector3.One };
             _meshEffect = new BasicEffect(graphics);
-            _quadEffect = new BasicEffect(graphics) { World = Matrix.Identity, DiffuseColor = _highlightColor.ToVector3(), Alpha = 0.5f };
-            _quadEffect.EnableDefaultLighting();
 
             Initialize();
         }
@@ -259,24 +169,8 @@ namespace View3D.Components.Gizmo
             _modelLocalSpace[1] = Matrix.CreateWorld(new Vector3(0, LINE_LENGTH, 0), Vector3.Down, Vector3.Left);
             _modelLocalSpace[2] = Matrix.CreateWorld(new Vector3(0, 0, LINE_LENGTH), Vector3.Forward, Vector3.Up);
 
-            _axisColors = new Color[3] { Color.Red, Color.Green, Color.Blue};
-            _highlightColor = Color.Gold;
-            _axisText = new string[3] { "X", "Y", "Z"};
-
-            // translucent quads
-
-            #region Translucent Quads
-
             const float halfLineOffset = LINE_OFFSET / 2;
-            _quads = new Quad[3];
-            _quads[0] = new Quad(new Vector3(halfLineOffset, halfLineOffset, 0), Vector3.Backward, Vector3.Up, LINE_OFFSET,
-                                 LINE_OFFSET); //XY
-            _quads[1] = new Quad(new Vector3(halfLineOffset, 0, halfLineOffset), Vector3.Up, Vector3.Right, LINE_OFFSET,
-                                 LINE_OFFSET); //XZ
-            _quads[2] = new Quad(new Vector3(0, halfLineOffset, halfLineOffset), Vector3.Right, Vector3.Up, LINE_OFFSET,
-                                 LINE_OFFSET); //ZY 
 
-            #endregion
 
             // fill array with vertex-data
 
@@ -326,34 +220,22 @@ namespace View3D.Components.Gizmo
             #endregion
         }
 
-
-
-        public void NextPivotType()
-        {
-            if (ActivePivot == PivotType.WorldOrigin)
-                ActivePivot = PivotType.ObjectCenter;
-            else
-                ActivePivot++;
-        }
-
-
         public void ResetDeltas()
         {
-            _tDelta = Vector3.Zero;
             _lastIntersectionPosition = Vector3.Zero;
             _intersectPosition = Vector3.Zero;
         }
 
         public void Update(GameTime gameTime, bool enableMove)
         {
-            Vector2 mousePosition = _mouse.Position();
-
             if (_isActive && enableMove)
             {
-                _lastIntersectionPosition = _intersectPosition;
-                var rotationMatrixLocal = Matrix.Identity;
-                var translationVectorLocal = Vector3.Zero;
-                
+                Vector3 translateScaleLocal = Vector3.Zero;
+                Vector3 translateScaleWorld = Vector3.Zero;
+
+                Matrix rotationLocal = Matrix.Identity;
+                Matrix rotationWorld = Matrix.Identity;
+
                 if (_mouse.IsMouseButtonDown(Input.MouseButton.Left) && ActiveAxis != GizmoAxis.None)
                 {
                     if (_mouse.LastState().LeftButton == ButtonState.Released)
@@ -364,10 +246,10 @@ namespace View3D.Components.Gizmo
                         case GizmoMode.UniformScale:
                         case GizmoMode.NonUniformScale:
                         case GizmoMode.Translate:
-                            translationVectorLocal = HandleTranslateAndScale(mousePosition, translationVectorLocal);
+                            HandleTranslateAndScale(_mouse.Position(), out translateScaleLocal, out translateScaleWorld);
                             break;
                         case GizmoMode.Rotate:
-                            rotationMatrixLocal = HandleRotation(gameTime);
+                            HandleRotation(gameTime, out rotationLocal, out rotationWorld);
                             break;
                     }
                 }
@@ -378,56 +260,58 @@ namespace View3D.Components.Gizmo
 
                     ResetDeltas();
                     if (_mouse.State().LeftButton == ButtonState.Released && _mouse.State().RightButton == ButtonState.Released)
-                        SelectAxis(mousePosition);
+                        SelectAxis(_mouse.Position());
                 }
 
-                SetGizmoPosition();
+                UpdateGizmoPosition();
 
                 // -- Trigger Translation, Rotation & Scale events -- //
                 if (_mouse.IsMouseButtonDown(Input.MouseButton.Left))
                 {
-                    if (_translationDelta != Vector3.Zero && ActiveMode == GizmoMode.Translate)
+                    if (translateScaleWorld != Vector3.Zero)
                     {
-                        foreach (var entity in Selection)
-                            OnTranslateEvent(entity, _translationDelta, translationVectorLocal);
-                        _translationDelta = Vector3.Zero;
+                        if (ActiveMode == GizmoMode.Translate)
+                        {
+                            foreach (var entity in Selection)
+                                OnTranslateEvent(entity, translateScaleWorld, translateScaleLocal);
+                        }
+                        else
+                        {
+                            foreach (var entity in Selection)
+                                OnScaleEvent(entity, translateScaleWorld);
+                        }
                     }
-                    if (_rotationDelta != Matrix.Identity)
+                    if (rotationWorld != Matrix.Identity)
                     {
                         foreach (var entity in Selection)
-                            OnRotateEvent(entity, _rotationDelta, rotationMatrixLocal);
-                        _rotationDelta = Matrix.Identity;
-                    }
-                    if (translationVectorLocal != Vector3.Zero && (ActiveMode == GizmoMode.UniformScale || ActiveMode == GizmoMode.NonUniformScale))
-                    {
-                        foreach (var entity in Selection)
-                            OnScaleEvent(entity, translationVectorLocal);
+                            OnRotateEvent(entity, rotationWorld, rotationLocal);
                     }
                 }
             }
 
-
-            if (Selection.Count < 1)
+            if (Selection.Count == 0)
             {
                 _isActive = false;
                 ActiveAxis = GizmoAxis.None;
                 return;
             }
+            
             // helps solve visual lag (1-frame-lag) after selecting a new entity
             if (!_isActive)
-                SetGizmoPosition();
+                UpdateGizmoPosition();
 
             _isActive = true;
 
             // -- Scale Gizmo to fit on-screen -- //
-            Vector3 vLength = _cameraPosition - _position;
+            Vector3 vLength = _camera.Position - _position;
             const float scaleFactor = 25;
 
             _screenScale = vLength.Length() / scaleFactor;
-            _screenScaleMatrix = Matrix.CreateScale(new Vector3(_screenScale));
+            var screenScaleMatrix = Matrix.CreateScale(new Vector3(_screenScale));
 
             _localForward = Vector3.Transform(Vector3.Forward, Matrix.CreateFromQuaternion(Selection[0].Orientation)); //Selection[0].Forward;
             _localUp = Vector3.Transform(Vector3.Up, Matrix.CreateFromQuaternion(Selection[0].Orientation));  //Selection[0].Up;
+            
             // -- Vector Rotation (Local/World) -- //
             _localForward.Normalize();
             _localRight = Vector3.Cross(_localForward, _localUp);
@@ -436,8 +320,8 @@ namespace View3D.Components.Gizmo
             _localUp.Normalize();
 
             // -- Create Both World Matrices -- //
-            _objectOrientedWorld = _screenScaleMatrix * Matrix.CreateWorld(_position, _localForward, _localUp);
-            _axisAlignedWorld = _screenScaleMatrix * Matrix.CreateWorld(_position, SceneWorld.Forward, SceneWorld.Up);
+            _objectOrientedWorld = screenScaleMatrix * Matrix.CreateWorld(_position, _localForward, _localUp);
+            _axisAlignedWorld = screenScaleMatrix * Matrix.CreateWorld(_position, SceneWorld.Forward, SceneWorld.Up);
 
             // Assign World
             if (GizmoDisplaySpace == TransformSpace.World ||
@@ -469,125 +353,82 @@ namespace View3D.Components.Gizmo
 
             // -- Apply Highlight -- //
             ApplyColor(ActiveAxis, _highlightColor);
-
         }
 
-        private Vector3 HandleTranslateAndScale(Vector2 mousePosition, Vector3 translationVectorLocal)
+        private void HandleTranslateAndScale(Vector2 mousePosition, out Vector3 out_transformLocal, out Vector3 out_transfromWorld)
         {
-            Vector3 delta = Vector3.Zero;
             Ray ray = _camera.CreateCameraRay(mousePosition); 
 
             Matrix transform = Matrix.Invert(_rotationMatrix);
             ray.Position = Vector3.Transform(ray.Position, transform);
             ray.Direction = Vector3.TransformNormal(ray.Direction, transform);
 
+            Plane plane;
             switch (ActiveAxis)
             {
-                case GizmoAxis.XY:
                 case GizmoAxis.X:
-                    {
-                        Plane plane = new Plane(Vector3.Forward, Vector3.Transform(_position, Matrix.Invert(_rotationMatrix)).Z);
-
-                        float? intersection = ray.Intersects(plane);
-                        if (intersection.HasValue)
-                        {
-                            _intersectPosition = (ray.Position + (ray.Direction * intersection.Value));
-                            if (_lastIntersectionPosition != Vector3.Zero)
-                            {
-                                _tDelta = _intersectPosition - _lastIntersectionPosition;
-                            }
-                            delta = ActiveAxis == GizmoAxis.X
-                                      ? new Vector3(_tDelta.X, 0, 0)
-                                      : new Vector3(_tDelta.X, _tDelta.Y, 0);
-                        }
-                    }
+                    plane = new Plane(Vector3.Forward, Vector3.Transform(_position, Matrix.Invert(_rotationMatrix)).Z);
                     break;
                 case GizmoAxis.Z:
-                case GizmoAxis.YZ:
                 case GizmoAxis.Y:
-                    {
-                        Plane plane = new Plane(Vector3.Left, Vector3.Transform(_position, Matrix.Invert(_rotationMatrix)).X);
-
-                        float? intersection = ray.Intersects(plane);
-                        if (intersection.HasValue)
-                        {
-                            _intersectPosition = (ray.Position + (ray.Direction * intersection.Value));
-                            if (_lastIntersectionPosition != Vector3.Zero)
-                            {
-                                _tDelta = _intersectPosition - _lastIntersectionPosition;
-                            }
-
-                            switch (ActiveAxis)
-                            {
-                                case GizmoAxis.Y:
-                                    delta = new Vector3(0, _tDelta.Y, 0);
-                                    break;
-                                case GizmoAxis.Z:
-                                    delta = new Vector3(0, 0, _tDelta.Z);
-                                    break;
-                                default:
-                                    delta = new Vector3(0, _tDelta.Y, _tDelta.Z);
-                                    break;
-                            }
-                        }
-                    }
+                    plane = new Plane(Vector3.Left, Vector3.Transform(_position, Matrix.Invert(_rotationMatrix)).X);
                     break;
-                case GizmoAxis.ZX:
-                    {
-                        Plane plane = new Plane(Vector3.Down, Vector3.Transform(_position, Matrix.Invert(_rotationMatrix)).Y);
+                default:
+                    throw new Exception("This should never happen - No axis inside HandleTranslateAndScale");
+            }
 
-                        float? intersection = ray.Intersects(plane);
-                        if (intersection.HasValue)
-                        {
-                            _intersectPosition = (ray.Position + (ray.Direction * intersection.Value));
-                            if (_lastIntersectionPosition != Vector3.Zero)
-                            {
-                                _tDelta = _intersectPosition - _lastIntersectionPosition;
-                            }
-                        }
-                        delta = new Vector3(_tDelta.X, 0, _tDelta.Z);
-                    }
-                    break;
+            Vector3 deltaTransform = Vector3.Zero;
+            float? intersection = ray.Intersects(plane);
+            if (intersection.HasValue)
+            {
+                _intersectPosition = (ray.Position + (ray.Direction * intersection.Value));
+                var mouseDragDelta = Vector3.Zero;
+                if (_lastIntersectionPosition != Vector3.Zero)
+                    mouseDragDelta = _intersectPosition - _lastIntersectionPosition;
+                switch (ActiveAxis)
+                {
+                    case GizmoAxis.X:
+                        deltaTransform = new Vector3(mouseDragDelta.X, 0, 0);
+                        break;
+                    case GizmoAxis.Y:
+                        deltaTransform = new Vector3(0, mouseDragDelta.Y, 0);
+                        break;
+                    case GizmoAxis.Z:
+                        deltaTransform = new Vector3(0, 0, mouseDragDelta.Z);
+                        break;
+                }
+
+                _lastIntersectionPosition = _intersectPosition;
             }
 
             if (ActiveMode == GizmoMode.Translate)
             {
-                // transform (local and world)
-                translationVectorLocal = Vector3.Transform(delta, SceneWorld);  // local
-                _translationDelta = Vector3.Transform(delta, _rotationMatrix);  // World
+                out_transformLocal = Vector3.Transform(deltaTransform, SceneWorld);  // local;
+                out_transfromWorld = Vector3.Transform(deltaTransform, _rotationMatrix);  // World;
             }
             else if (ActiveMode == GizmoMode.NonUniformScale || ActiveMode == GizmoMode.UniformScale)
             {
-                translationVectorLocal = delta;
+                out_transformLocal = deltaTransform;
+                out_transfromWorld = deltaTransform;
             }
-            return translationVectorLocal;
+            else
+            {
+                throw new Exception("This should never happen - Not scale or translate inside HandleTranslateAndScale");
+            }
         }
 
-        private Matrix HandleRotation(GameTime gameTime)
+        private void HandleRotation(GameTime gameTime, out Matrix out_transformLocal, out Matrix out_transfromWorld)
         {
-            Matrix rotationMatrixLocal;
-
-            float delta = _mouse.DeltaPosition().X;
-            delta *= (float)gameTime.ElapsedGameTime.TotalSeconds;
-
+            float delta = _mouse.DeltaPosition().X * (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (SnapEnabled)
             {
                 float snapValue = MathHelper.ToRadians(RotationSnapValue);
-                if (PrecisionModeEnabled)
-                {
-                    delta *= PRECISION_MODE_SCALE;
-                    snapValue *= PRECISION_MODE_SCALE;
-                }
-
                 _rotationSnapDelta += delta;
-
                 float snapped = (int)(_rotationSnapDelta / snapValue) * snapValue;
                 _rotationSnapDelta -= snapped;
-
                 delta = snapped;
             }
-            else if (PrecisionModeEnabled)
-                delta *= PRECISION_MODE_SCALE;
+
 
             // rotation matrix to transform - if more than one objects selected, always use world-space.
             Matrix rot = Matrix.Identity;
@@ -595,29 +436,29 @@ namespace View3D.Components.Gizmo
             rot.Up = SceneWorld.Up;
             rot.Right = SceneWorld.Right;
 
-            Matrix rot2 = Matrix.Identity;
-            rot2.Forward = SceneWorld.Forward;
-            rot2.Up = SceneWorld.Up;
-            rot2.Right = SceneWorld.Right;
-            //delta = 0;
+            Matrix rotationMatrixLocal = Matrix.Identity;
+            rotationMatrixLocal.Forward = SceneWorld.Forward;
+            rotationMatrixLocal.Up = SceneWorld.Up;
+            rotationMatrixLocal.Right = SceneWorld.Right;
+        
             switch (ActiveAxis)
             {
                 case GizmoAxis.X:
                     rot *= Matrix.CreateFromAxisAngle(_rotationMatrix.Right, delta);
-                    rot2 *= Matrix.CreateFromAxisAngle(SceneWorld.Right, delta);
+                    rotationMatrixLocal *= Matrix.CreateFromAxisAngle(SceneWorld.Right, delta);
                     break;
                 case GizmoAxis.Y:
                     rot *= Matrix.CreateFromAxisAngle(_rotationMatrix.Up, delta);
-                    rot2 *= Matrix.CreateFromAxisAngle(SceneWorld.Up, delta);
+                    rotationMatrixLocal *= Matrix.CreateFromAxisAngle(SceneWorld.Up, delta);
                     break;
                 case GizmoAxis.Z:
                     rot *= Matrix.CreateFromAxisAngle(_rotationMatrix.Forward, delta);
-                    rot2 *= Matrix.CreateFromAxisAngle(SceneWorld.Forward, delta);
+                    rotationMatrixLocal *= Matrix.CreateFromAxisAngle(SceneWorld.Forward, delta);
                     break;
             }
-            _rotationDelta = rot;
-            rotationMatrixLocal = rot2;
-            return rotationMatrixLocal;
+
+            out_transformLocal = rotationMatrixLocal;
+            out_transfromWorld = rot;
         }
 
 
@@ -640,21 +481,6 @@ namespace View3D.Components.Gizmo
                             break;
                         case GizmoAxis.Z:
                             ApplyLineColor(12, 6, color);
-                            break;
-                        case GizmoAxis.XY:
-                            ApplyLineColor(0, 4, color);
-                            ApplyLineColor(6, 4, color);
-                            break;
-                        case GizmoAxis.YZ:
-                            ApplyLineColor(6, 2, color);
-                            ApplyLineColor(12, 2, color);
-                            ApplyLineColor(10, 2, color);
-                            ApplyLineColor(16, 2, color);
-                            break;
-                        case GizmoAxis.ZX:
-                            ApplyLineColor(0, 2, color);
-                            ApplyLineColor(4, 2, color);
-                            ApplyLineColor(12, 4, color);
                             break;
                     }
                     break;
@@ -679,15 +505,10 @@ namespace View3D.Components.Gizmo
             }
         }
 
-        /// <summary>
-        /// Apply color on the lines associated with translation mode (re-used in Scale)
-        /// </summary>
         private void ApplyLineColor(int startindex, int count, Color color)
         {
             for (int i = startindex; i < (startindex + count); i++)
-            {
                 _translationLineVertices[i].Color = color;
-            }
         }
 
         /// <summary>
@@ -701,102 +522,28 @@ namespace View3D.Components.Gizmo
             float closestintersection = float.MaxValue;
             Ray ray = _camera.CreateCameraRay(mousePosition);
 
-            if (ActiveMode == GizmoMode.Translate)
-            {
-                // transform ray into local-space of the boundingboxes.
-                ray.Direction = Vector3.TransformNormal(ray.Direction, Matrix.Invert(_gizmoWorld));
-                ray.Position = Vector3.Transform(ray.Position, Matrix.Invert(_gizmoWorld));
-            }
-
-            #region X,Y,Z Boxes
-            float? intersection = XAxisBox.Intersects(ray);
+            var intersection = XSphere.Intersects(ray);
             if (intersection.HasValue)
                 if (intersection.Value < closestintersection)
                 {
                     ActiveAxis = GizmoAxis.X;
                     closestintersection = intersection.Value;
                 }
-            intersection = YAxisBox.Intersects(ray);
+            intersection = YSphere.Intersects(ray);
             if (intersection.HasValue)
-            {
                 if (intersection.Value < closestintersection)
                 {
                     ActiveAxis = GizmoAxis.Y;
                     closestintersection = intersection.Value;
                 }
-            }
-            intersection = ZAxisBox.Intersects(ray);
+            intersection = ZSphere.Intersects(ray);
             if (intersection.HasValue)
-            {
                 if (intersection.Value < closestintersection)
                 {
                     ActiveAxis = GizmoAxis.Z;
                     closestintersection = intersection.Value;
                 }
-            }
-            #endregion
 
-            if (ActiveMode == GizmoMode.Rotate || ActiveMode == GizmoMode.UniformScale ||
-                ActiveMode == GizmoMode.NonUniformScale)
-            {
-                #region BoundingSpheres
-
-                intersection = XSphere.Intersects(ray);
-                if (intersection.HasValue)
-                    if (intersection.Value < closestintersection)
-                    {
-                        ActiveAxis = GizmoAxis.X;
-                        closestintersection = intersection.Value;
-                    }
-                intersection = YSphere.Intersects(ray);
-                if (intersection.HasValue)
-                    if (intersection.Value < closestintersection)
-                    {
-                        ActiveAxis = GizmoAxis.Y;
-                        closestintersection = intersection.Value;
-                    }
-                intersection = ZSphere.Intersects(ray);
-                if (intersection.HasValue)
-                    if (intersection.Value < closestintersection)
-                    {
-                        ActiveAxis = GizmoAxis.Z;
-                        closestintersection = intersection.Value;
-                    }
-
-                #endregion
-            }
-            if (ActiveMode == GizmoMode.Translate || ActiveMode == GizmoMode.NonUniformScale ||
-                ActiveMode == GizmoMode.UniformScale)
-            {
-                // if no axis was hit (x,y,z) set value to lowest possible to select the 'farthest' intersection for the XY,XZ,YZ boxes. 
-                // This is done so you may still select multi-axis if you're looking at the gizmo from behind!
-                if (closestintersection >= float.MaxValue)
-                    closestintersection = float.MinValue;
-
-                #region BoundingBoxes
-                intersection = XYBox.Intersects(ray);
-                if (intersection.HasValue)
-                    if (intersection.Value > closestintersection)
-                    {
-                        ActiveAxis = GizmoAxis.XY;
-                        closestintersection = intersection.Value;
-                    }
-                intersection = XZAxisBox.Intersects(ray);
-                if (intersection.HasValue)
-                    if (intersection.Value > closestintersection)
-                    {
-                        ActiveAxis = GizmoAxis.ZX;
-                        closestintersection = intersection.Value;
-                    }
-                intersection = YZBox.Intersects(ray);
-                if (intersection.HasValue)
-                    if (intersection.Value > closestintersection)
-                    {
-                        ActiveAxis = GizmoAxis.YZ;
-                        closestintersection = intersection.Value;
-                    }
-                #endregion
-            }
             if (closestintersection >= float.MaxValue || closestintersection <= float.MinValue)
                 ActiveAxis = GizmoAxis.None;
         }
@@ -805,7 +552,7 @@ namespace View3D.Components.Gizmo
         /// <summary>
         /// Set position of the gizmo, position will be center of all selected entities.
         /// </summary>
-        private void SetGizmoPosition()
+        private void UpdateGizmoPosition()
         {
             switch (ActivePivot)
             {
@@ -820,7 +567,6 @@ namespace View3D.Components.Gizmo
                     _position = SceneWorld.Translation;
                     break;
             }
-            _position += _translationDelta;
         }
 
         /// <summary>
@@ -838,105 +584,29 @@ namespace View3D.Components.Gizmo
             return center / Selection.Count;
         }
 
-        public void UpdateCameraProperties()
-        {
-            _view = _camera.ViewMatrix;
-            _projection = _camera.ProjectionMatrix;
-            _cameraPosition = _camera.Position;
-        }
-
         #region Draw
-        public void Draw(bool drawHelperText)
+        public void Draw()
         {
-            if (!_isActive) return;
+            if (!_isActive) 
+                return;
+
             _graphics.DepthStencilState = DepthStencilState.None;
             _graphics.RasterizerState = RasterizerState.CullNone;
 
-            if (_view == Matrix.Identity || _projection == Matrix.Identity)
-                return;
-                //throw new Exception("Error: Must call .UpdateCameraProperties() before .Draw()");
+            var view = _camera.ViewMatrix;
+            var projection = _camera.ProjectionMatrix;
+      
 
-            #region Draw: Axis-Lines
 
             // -- Draw Lines -- //
             _lineEffect.World = _gizmoWorld;
-            _lineEffect.View = _view;
-            _lineEffect.Projection = _projection;
+            _lineEffect.View = view;
+            _lineEffect.Projection = projection;
 
             _lineEffect.CurrentTechnique.Passes[0].Apply();
-            _graphics.DrawUserPrimitives(PrimitiveType.LineList, _translationLineVertices, 0,
-                                         _translationLineVertices.Length / 2);
+            _graphics.DrawUserPrimitives(PrimitiveType.LineList, _translationLineVertices, 0, _translationLineVertices.Length / 2);
 
-            #endregion
-
-            switch (ActiveMode)
-            {
-                case GizmoMode.NonUniformScale:
-                case GizmoMode.Translate:
-                    switch (ActiveAxis)
-                    {
-                        #region Draw Quads
-                        case GizmoAxis.ZX:
-                        case GizmoAxis.YZ:
-                        case GizmoAxis.XY:
-                            {
-                                _graphics.BlendState = BlendState.AlphaBlend;
-                                _graphics.RasterizerState = RasterizerState.CullNone;
-
-                                _quadEffect.World = _gizmoWorld;
-                                _quadEffect.View = _view;
-                                _quadEffect.Projection = _projection;
-
-                                _quadEffect.CurrentTechnique.Passes[0].Apply();
-
-                                Quad activeQuad = new Quad();
-                                switch (ActiveAxis)
-                                {
-                                    case GizmoAxis.XY:
-                                        activeQuad = _quads[0];
-                                        break;
-                                    case GizmoAxis.ZX:
-                                        activeQuad = _quads[1];
-                                        break;
-                                    case GizmoAxis.YZ:
-                                        activeQuad = _quads[2];
-                                        break;
-                                }
-
-                                _graphics.DrawUserIndexedPrimitives(PrimitiveType.TriangleList,
-                                                                    activeQuad.Vertices, 0, 4,
-                                                                    activeQuad.Indexes, 0, 2);
-
-                                _graphics.BlendState = BlendState.Opaque;
-                                _graphics.RasterizerState = RasterizerState.CullCounterClockwise;
-                            }
-                            break;
-                        #endregion
-                    }
-                    break;
-                case GizmoMode.UniformScale:
-                    #region Draw Quads
-                    if (ActiveAxis != GizmoAxis.None)
-                    {
-                        _graphics.BlendState = BlendState.AlphaBlend;
-                        _graphics.RasterizerState = RasterizerState.CullNone;
-
-                        _quadEffect.World = _gizmoWorld;
-                        _quadEffect.View = _view;
-                        _quadEffect.Projection = _projection;
-                        _quadEffect.CurrentTechnique.Passes[0].Apply();
-
-                        for (int i = 0; i < _quads.Length; i++)
-                            _graphics.DrawUserIndexedPrimitives(PrimitiveType.TriangleList,
-                                                                _quads[i].Vertices, 0, 4,
-                                                                _quads[i].Indexes, 0, 2);
-                        _graphics.BlendState = BlendState.Opaque;
-                        _graphics.RasterizerState = RasterizerState.CullCounterClockwise;
-                    }
-                    #endregion
-                    break;
-            }
-
+        
             // draw the 3d meshes
             for (int i = 0; i < 3; i++) //(order: x, y, z)
             {
@@ -966,8 +636,8 @@ namespace View3D.Components.Gizmo
                 }
 
                 _meshEffect.World = _modelLocalSpace[i] * _gizmoWorld;
-                _meshEffect.View = _view;
-                _meshEffect.Projection = _projection;
+                _meshEffect.View = view;
+                _meshEffect.Projection = projection;
 
                 _meshEffect.DiffuseColor = color;
                 _meshEffect.EmissiveColor = color;
@@ -980,10 +650,10 @@ namespace View3D.Components.Gizmo
             }
 
             _graphics.DepthStencilState = DepthStencilState.Default;
-            Draw2D();
+            Draw2D(view, projection);
         }
 
-        private void Draw2D()
+        private void Draw2D(Matrix view, Matrix projection)
         {
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
 
@@ -992,7 +662,7 @@ namespace View3D.Components.Gizmo
             {
                 Vector3 screenPos =
                   _graphics.Viewport.Project(_modelLocalSpace[i].Translation + _modelLocalSpace[i].Backward + _axisTextOffset,
-                                             _projection, _view, _gizmoWorld);
+                                             projection, view, _gizmoWorld);
 
                 if (screenPos.Z < 0f || screenPos.Z > 1.0f)
                     continue;
@@ -1001,15 +671,15 @@ namespace View3D.Components.Gizmo
                 switch (i)
                 {
                     case 0:
-                        if (ActiveAxis == GizmoAxis.X || ActiveAxis == GizmoAxis.XY || ActiveAxis == GizmoAxis.ZX)
+                        if (ActiveAxis == GizmoAxis.X)
                             color = _highlightColor;
                         break;
                     case 1:
-                        if (ActiveAxis == GizmoAxis.Y || ActiveAxis == GizmoAxis.XY || ActiveAxis == GizmoAxis.YZ)
+                        if (ActiveAxis == GizmoAxis.Y)
                             color = _highlightColor;
                         break;
                     case 2:
-                        if (ActiveAxis == GizmoAxis.Z || ActiveAxis == GizmoAxis.YZ || ActiveAxis == GizmoAxis.ZX)
+                        if (ActiveAxis == GizmoAxis.Z)
                             color = _highlightColor;
                         break;
                 }
@@ -1017,12 +687,6 @@ namespace View3D.Components.Gizmo
                 _spriteBatch.DrawString(_font, _axisText[i], new Vector2(screenPos.X, screenPos.Y), color);
             }
 
-            // -- Draw StatusInfo -- //
-            //string statusInfo = GetStatusInfo();
-            //Vector2 stringDims = _font.MeasureString(statusInfo);
-            //Vector2 position = new Vector2(_graphics.Viewport.Width - stringDims.X, _graphics.Viewport.Height - stringDims.Y);
-            //
-            //_spriteBatch.DrawString(_font, statusInfo, position, Color.White);
             _spriteBatch.End();
         }
 
@@ -1042,7 +706,6 @@ namespace View3D.Components.Gizmo
         public event TransformationStartDelegate StartEvent;
         public event TransformationStopDelegate StopEvent;
 
-
         private void OnTranslateEvent(ITransformable transformable, Vector3 delta, Vector3 delta2)
         {
             TranslateEvent?.Invoke(transformable, new TransformationEventArgs(delta, ActivePivot));
@@ -1050,7 +713,6 @@ namespace View3D.Components.Gizmo
 
         private void OnRotateEvent(ITransformable transformable, Matrix delta, Matrix deleta2)
         {
-      
             RotateEvent?.Invoke(transformable, new TransformationEventArgs(delta, ActivePivot));
         }
 
@@ -1059,80 +721,6 @@ namespace View3D.Components.Gizmo
             ScaleEvent?.Invoke(transformable, new TransformationEventArgs(delta, ActivePivot));
         }
 
-        #endregion
-
-        #region Private Quad Struct
-
-        private struct Quad
-        {
-            public Vector3 Origin;
-            public Vector3 UpperLeft;
-            public Vector3 LowerLeft;
-            public Vector3 UpperRight;
-            public Vector3 LowerRight;
-            public Vector3 Normal;
-            public Vector3 Up;
-            public Vector3 Left;
-
-            public VertexPositionNormalTexture[] Vertices;
-            public short[] Indexes;
-
-            public Quad(Vector3 origin, Vector3 normal, Vector3 up,
-                        float width, float height)
-            {
-                Vertices = new VertexPositionNormalTexture[4];
-                Indexes = new short[6];
-                Origin = origin;
-                Normal = normal;
-                Up = up;
-
-                // Calculate the quad corners
-                Left = Vector3.Cross(normal, Up);
-                Vector3 uppercenter = (Up * height / 2) + origin;
-                UpperLeft = uppercenter + (Left * width / 2);
-                UpperRight = uppercenter - (Left * width / 2);
-                LowerLeft = UpperLeft - (Up * height);
-                LowerRight = UpperRight - (Up * height);
-
-                FillVertices();
-            }
-
-            private void FillVertices()
-            {
-                // Fill in texture coordinates to display full texture
-                // on quad
-                Vector2 textureUpperLeft = new Vector2(0.0f, 0.0f);
-                Vector2 textureUpperRight = new Vector2(1.0f, 0.0f);
-                Vector2 textureLowerLeft = new Vector2(0.0f, 1.0f);
-                Vector2 textureLowerRight = new Vector2(1.0f, 1.0f);
-
-                // Provide a normal for each vertex
-                for (int i = 0; i < Vertices.Length; i++)
-                {
-                    Vertices[i].Normal = Normal;
-                }
-
-                // Set the position and texture coordinate for each
-                // vertex
-                Vertices[0].Position = LowerLeft;
-                Vertices[0].TextureCoordinate = textureLowerLeft;
-                Vertices[1].Position = UpperLeft;
-                Vertices[1].TextureCoordinate = textureUpperLeft;
-                Vertices[2].Position = LowerRight;
-                Vertices[2].TextureCoordinate = textureLowerRight;
-                Vertices[3].Position = UpperRight;
-                Vertices[3].TextureCoordinate = textureUpperRight;
-
-                // Set the index buffer for each vertex, using
-                // clockwise winding
-                Indexes[0] = 0;
-                Indexes[1] = 1;
-                Indexes[2] = 2;
-                Indexes[3] = 2;
-                Indexes[4] = 1;
-                Indexes[5] = 3;
-            }
-        }
         #endregion
 
         #region Helper Functions
@@ -1144,8 +732,6 @@ namespace View3D.Components.Gizmo
         #endregion
     }
 
-    // An enum of buttons on the mouse, since XNA doesn't provide one
-    internal enum MouseButtons { Left, Right, Middle, X1, X2 };
 
     #region Gizmo EventHandlers
 
@@ -1172,9 +758,6 @@ namespace View3D.Components.Gizmo
         X,
         Y,
         Z,
-        XY,
-        ZX,
-        YZ,
         None
     }
 

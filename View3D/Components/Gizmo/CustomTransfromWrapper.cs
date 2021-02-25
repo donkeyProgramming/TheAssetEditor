@@ -111,23 +111,17 @@ namespace View3D.Components.Gizmo
                 geo.RebuildVertexBuffer();
             }
 
-            Orientation += Quaternion.CreateFromRotationMatrix((Matrix)e.Value);
+            //Orientation += Quaternion.CreateFromRotationMatrix((Matrix)e.Value);
             _totalGizomTransform *= (Matrix)e.Value;
         }
 
         public void GizmoScaleEvent(TransformationEventArgs e)
         {
             var scalefactor = (Vector3)e.Value;
-            //if (scalefactor.X == 0)
-            //    scalefactor.X = 1;
-            //if (scalefactor.Y == 0)
-            //    scalefactor.Y = 1;
-            //if (scalefactor.Z == 0)
-            //    scalefactor.Z = 1;
+
 
             scalefactor = (scalefactor) + Vector3.One;
-            _logger.Here().Information($"{scalefactor.X},{scalefactor.Y},{scalefactor.Z}");
-
+  
             var scaleMatrix = Matrix.CreateScale(scalefactor);
             foreach (var obj in _effectedObjects)
             {
