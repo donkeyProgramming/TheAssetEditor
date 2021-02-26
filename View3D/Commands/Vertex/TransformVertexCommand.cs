@@ -45,9 +45,8 @@ namespace View3D.Commands.Vertex
 
     class TransformVertexCommand2 : CommandBase<TransformVertexCommand2>
     {
-        List<IGeometry> _geometrys;
+        List<IGeometry> _geometryList;
         Vector3 _pivotPoint;
-        bool _transformOffset;
         List<int> _affectVertexes;
         bool _applyToNormals;
         public Matrix Transform { get; set; }
@@ -55,15 +54,12 @@ namespace View3D.Commands.Vertex
         SelectionManager _selectionManager;
         ISelectionState _oldSelectionState;
 
-        public TransformVertexCommand2(List<IGeometry> node, Vector3 pivotPoint, bool transformOffset, bool applyToNormals = false, List<int> affectVertexes = null)
+        public TransformVertexCommand2(List<IGeometry> geometryList, Vector3 pivotPoint, bool applyToNormals = false, List<int> affectVertexes = null)
         {
-            _geometrys = node;
+            _geometryList = geometryList;
             _pivotPoint = pivotPoint;
-            _transformOffset = transformOffset;
             _applyToNormals = applyToNormals;
             _affectVertexes = affectVertexes;
-
-          
         }
 
         public override void Initialize(IComponentManager componentManager)
@@ -80,9 +76,9 @@ namespace View3D.Commands.Vertex
         protected override void UndoCommand()
         {
             var inv = Matrix.Invert(Transform);
-            for(int i = 0; i < _geometrys.Count; i++)
+            for(int i = 0; i < _geometryList.Count; i++)
             {
-                var geo = _geometrys[i];
+                var geo = _geometryList[i];
                 if (_affectVertexes != null)
                 {
                     for (int v = 0; v < _affectVertexes.Count; v++)

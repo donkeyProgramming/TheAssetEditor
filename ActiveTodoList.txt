@@ -58,4 +58,4 @@ Thursday:
 Known bugs:
 	[DONE]Select face, then swap to vertex mode, need to call update before draw error
 	[DONE]Bug with selection in rotation mode, can not select when an axis is active
-	selecting mesh while transforming the gizmo causes undo to be correct
+	[DONE]selecting mesh while transforming the gizmo causes undo to be correct

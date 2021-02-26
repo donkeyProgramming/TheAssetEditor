@@ -82,8 +82,6 @@ namespace View3D.Components.Gizmo
         MouseComponent _mouse;
         KeyboardComponent _keyboard;
         SelectionManager _selectionManager;
-
-
         CommandExecutor _commandManager;
        
         Gizmo _gizmo;
@@ -95,7 +93,7 @@ namespace View3D.Components.Gizmo
             DrawOrder = (int)ComponentDrawOrderEnum.Gizmo;
         }
 
-        CustomTransfromWrapper _wrapper;
+        TransformGizmoWrapper _wrapper;
 
         public override void Initialize()
         {
@@ -124,46 +122,31 @@ namespace View3D.Components.Gizmo
             _wrapper = null;
             if (state is ObjectSelectionState objectSelectionState)
             {
-                var transformables = objectSelectionState.CurrentSelection().Where(x => x is ITransformable).Select(x=>x as ITransformable);
+                var transformables = objectSelectionState.CurrentSelection().Where(x => x is ITransformable).Select(x=>x.Geometry);
                 if (transformables.Any())
                 {
-                    _wrapper = new CustomTransfromWrapper(transformables.ToList());
+                    _wrapper = new TransformGizmoWrapper(transformables.ToList());
                     _gizmo.Selection.Add(_wrapper);
                 }
             }
-            //else if (state is VertexSelectionState vertexSelectionState)
-            //{
-            //    if (vertexSelectionState.SelectedVertices.Count == 0)
-            //        return;
-            //
-            //    var position = Vector3.Zero;
-            //    for (int i = 0; i < vertexSelectionState.SelectedVertices.Count; i++)
-            //        position += vertexSelectionState.RenderObject.Geometry.GetVertexById(vertexSelectionState.SelectedVertices[i]);
-            //    position = position / vertexSelectionState.SelectedVertices.Count;
-            //    position = Vector3.Transform(position, vertexSelectionState.RenderObject.ModelMatrix);
-            //
-            //    var wrapper = new VertexTransformationWrapper(vertexSelectionState.RenderObject.Geometry, vertexSelectionState.SelectedVertices, position);
-            //
-            //    _gizmo.Selection.Add(wrapper);
-            //}
+            else if (state is VertexSelectionState vertexSelectionState)
+            {
+                if (vertexSelectionState.SelectedVertices.Count == 0)
+                    return;
+            
+                _wrapper = new TransformGizmoWrapper( vertexSelectionState.RenderObject.Geometry, vertexSelectionState.SelectedVertices);
+                _gizmo.Selection.Add(_wrapper);
+            }
 
             _gizmo.ResetDeltas();
         }
 
         private void GizmoTransformStart()
         {
-            if (_selectionManager.GetState() is ObjectSelectionState objectSelectionState)
-            {
-                _mouse.MouseOwner = this;
-                _wrapper.Start(_gizmo.ActivePivot, _gizmo.ActiveMode);
-            }
-            if (_selectionManager.GetState() is VertexSelectionState vertexSelectionState)
-            {
-                _mouse.MouseOwner = this;
-                _wrapper.Start(_gizmo.ActivePivot, _gizmo.ActiveMode);
-            }
-
+            _mouse.MouseOwner = this;
+            _wrapper.Start(_gizmo.ActiveMode);
         }
+
         private void GizmoTransformEnd()
         {
             _wrapper.Stop(_commandManager);

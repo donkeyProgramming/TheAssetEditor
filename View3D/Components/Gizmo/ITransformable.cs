@@ -31,7 +31,6 @@ namespace View3D.Components.Gizmo
         Vector3 Scale { get; set; }
         Quaternion Orientation { get; set; }
         Vector3 GetObjectCenter();
-        IGeometry Geometry { get; set; }
 
     }
 }
