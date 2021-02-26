@@ -26,15 +26,12 @@ Feature list before V1 done:
 			[DONE]Focus camera - work on selected faces and verts
 			[DONE]Reset camera
 			
-		Transform:
-			Scale
-			Rotate
-			Different gizmo modes
-				object pos
-				object pivot 
-				mesh boundingbox center
+		[DONE]Transform:
+		[DONE]	Scale
+		[DONE]	Rotate
+		[DONE]	Translate
 		
-		Saving packfiles
+		Saving model to packfile
 		Textures
 			Show
 			Change
