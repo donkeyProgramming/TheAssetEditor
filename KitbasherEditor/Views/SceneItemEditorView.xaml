@@ -5,17 +5,24 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:KitbasherEditor.Views" 
              xmlns:rmv2="clr-namespace:KitbasherEditor.Views.EditorViews.Rmv2"
+             xmlns:nodeViewModels="clr-namespace:KitbasherEditor.ViewModels.SceneExplorerNodeViews"
              xmlns:nodeTypes="clr-namespace:View3D.SceneNodes;assembly=View3D" 
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
 
-        <DataTemplate DataType="{ x:Type nodeTypes:SceneNode}">
+        <DataTemplate DataType="{ x:Type nodeViewModels:ModelSceneNodeViewModel}">
+            <rmv2:RigidModelEditorView/>
+        </DataTemplate>
+        <DataTemplate DataType="{ x:Type nodeViewModels:LodSceneNodeViewModel}">
+            <rmv2:RigidModelLodEditorView/>
+        </DataTemplate>
+        <DataTemplate DataType="{ x:Type nodeViewModels:MeshSceneNodeViewModel}">
             <rmv2:RigidModelMeshEditorView/>
         </DataTemplate>
 
     </UserControl.Resources>
     <ScrollViewer>
-        <ContentControl Grid.Row="2" Content="{Binding Path=SelectedNode, UpdateSourceTrigger=PropertyChanged}" />
+        <ContentControl Grid.Row="2" Content="{Binding Path=SelectedNodeViewModel, UpdateSourceTrigger=PropertyChanged}"  />
     </ScrollViewer>
 </UserControl>

@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="KitbasherEditor.Views.EditorViews.Rmv2.RigidModelLodEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews.Rmv2"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <DockPanel>
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <Label Width="80">Quality Lvl</Label>
+            <Label>:</Label>
+            <TextBlock Text="{Binding MaterialId}" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <Label Width="80">Lod distance</Label>
+            <Label>:</Label>
+            <TextBlock Text="{Binding MaterialId}" VerticalAlignment="Center"/>
+        </StackPanel>
+    </DockPanel>
+</UserControl>

@@ -1,5 +1,6 @@
 ﻿using Common;
 using GalaSoft.MvvmLight.Command;
+using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,6 +15,10 @@ using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels
 {
+   
+
+
+
     public class SceneExplorerViewModel : NotifyPropertyChangedImpl, IEditableMeshResolver
     {
         public ObservableCollection<SceneNode> _sceneGraphRootNodes = new ObservableCollection<SceneNode>();
@@ -21,7 +26,10 @@ namespace KitbasherEditor.ViewModels
 
 
         SceneNode _selectedNode;
-        public SceneNode SelectedNode { get { return _selectedNode; } set { SetAndNotify(ref _selectedNode, value); } }
+        public SceneNode SelectedNode { get { return _selectedNode; } set { SetAndNotify(ref _selectedNode, value); CreateNodeViewModel(_selectedNode); } }
+
+        ISceneNodeViewModel _selectedNodeViewModel;
+        public ISceneNodeViewModel SelectedNodeViewModel { get { return _selectedNodeViewModel; } set { SetAndNotify(ref _selectedNodeViewModel, value); } }
 
         LodItem _selectedLodLvl;
         public LodItem SelectedLodLevel { get { return _selectedLodLvl; } set { SetAndNotify(ref _selectedLodLvl, value); UpdateLod(_selectedLodLvl.Value); } }
@@ -119,6 +127,11 @@ namespace KitbasherEditor.ViewModels
 
         public void Initialize()
         {
+        }
+
+        private void CreateNodeViewModel(SceneNode selectedNode)
+        {
+            SelectedNodeViewModel = SceneNodeViewFactory.Create(selectedNode);
         }
     }
 

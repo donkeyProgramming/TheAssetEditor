@@ -15,7 +15,7 @@ Feature list before V1 done:
 	Editor:
 		[DONE]Better shader handling
 		[DONE]Animation playback beginning
-		Animation playback cleanup
+		[DONE]Animation playback cleanup
 		UI
 			UI linking (commands visible/clickable in toolbar)
 			Update when different buttons are enabled
@@ -49,7 +49,15 @@ Feature list before V1 done:
 		
 		
 Thursday:
-	Animation polish
+	Show whole model info
+		- Skeleton
+		- Attachment points
+		
+		- Summary
+	Show info rmv2
+		- Skeleton bone mapping
+	Show info rmv2 lod
+	Selecting in tree view should select in scene
 	Different shader modes
 	
 	
