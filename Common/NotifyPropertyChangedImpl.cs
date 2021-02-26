@@ -37,6 +37,16 @@ namespace Common
                 valueChangedDelegate?.Invoke(newValue);
         }
 
+        protected virtual void SetAndNotifyWhenChanged<T>(ref T variable, T newValue, ValueChangedDelegate<T> valueChangedDelegate = null, [CallerMemberName] String propertyName = "")
+        {
+            if (EqualityComparer<T>.Default.Equals(variable, newValue))
+                return;
+            variable = newValue;
+            NotifyPropertyChanged(propertyName);
+            if (DisableCallbacks == false)
+                valueChangedDelegate?.Invoke(newValue);
+        }
+
         protected virtual void SetAndNotifyWithSender<T>(T value, ValueAndSenderChangedDelegate<T> valueChangedDelegate, [CallerMemberName] String propertyName = "")
         {
             NotifyPropertyChanged(propertyName);

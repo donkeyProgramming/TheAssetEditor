@@ -18,65 +18,6 @@ using View3D.SceneNodes;
 
 namespace View3D.Components.Gizmo
 {
-    public class VertexTransformationWrapper : ITransformable
-    {
-        Vector3 _pos;
-        public Vector3 Position { get=> _pos; set { _pos = value; HandlePositionUpdate(); } }
-
-        Vector3 _scale = Vector3.One;
-        public Vector3 Scale { get => _scale; set { _scale = value; HandlePositionUpdate(); } }
-
-        Quaternion _orientation = Quaternion.Identity;
-        public Quaternion Orientation { get => _orientation; set { _orientation = value; HandlePositionUpdate(); } }
-
-        public Matrix ModelMatrix { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public IGeometry Geometry { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-        IGeometry _geo;
-        List<int> _vertexList;
-
-
-        Vector3 _startPos;
-        Vector3 _startScale;
-        Quaternion _startOrientation;
-
-        public VertexTransformationWrapper(IGeometry geo, List<int> vertexList, Vector3 startPos)
-        {
-            _geo = geo;
-            _vertexList = vertexList;
-            _startPos = startPos;
-            _pos = _startPos;
-
-            _startScale = Scale;
-            _startOrientation = Orientation;
-        }
-
-        void HandlePositionUpdate()
-        {
-            foreach (var vertexId in _vertexList)
-            {
-               //var posDif = (Position - _startPos);
-               //var rotDif = Orientation - Quaternion.Inverse(_startOrientation);
-               //var scaleDif = (Scale - _startScale);
-               //var m = Matrix.CreateScale(Vector3.One + scaleDif) * Matrix.CreateFromQuaternion(rotDif) * Matrix.CreateTranslation(posDif);
-                var dpos = (Position - _startPos) + _geo.GetVertexById(vertexId);
-                //var newPos = Vector3.Transform(_geo.GetVertexById(vertexId), m);
-                _geo.UpdateVertexPosition(vertexId, dpos);
-            }
-
-            _startPos = Position;
-            _startScale = Scale;
-            _startOrientation = Orientation;
-            _geo.RebuildVertexBuffer();
-        }
-
-        public Vector3 GetObjectCenter()
-        {
-            return Position;
-            //throw new NotImplementedException();
-        }
-    }
-
     public class GizmoComponent : BaseComponent
     {
         MouseComponent _mouse;
@@ -86,15 +27,14 @@ namespace View3D.Components.Gizmo
        
         Gizmo _gizmo;
         bool _isEnabled = false;
+        TransformGizmoWrapper _activeTransformation;
 
         public GizmoComponent(WpfGame game) : base(game)
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.Gizmo;
             DrawOrder = (int)ComponentDrawOrderEnum.Gizmo;
         }
-
-        TransformGizmoWrapper _wrapper;
-
+       
         public override void Initialize()
         {
             _commandManager = GetComponent<CommandExecutor>();
@@ -119,14 +59,14 @@ namespace View3D.Components.Gizmo
         private void OnSelectionChanged(ISelectionState state)
         {
             _gizmo.Selection.Clear();
-            _wrapper = null;
+            _activeTransformation = null;
             if (state is ObjectSelectionState objectSelectionState)
             {
                 var transformables = objectSelectionState.CurrentSelection().Where(x => x is ITransformable).Select(x=>x.Geometry);
                 if (transformables.Any())
                 {
-                    _wrapper = new TransformGizmoWrapper(transformables.ToList());
-                    _gizmo.Selection.Add(_wrapper);
+                    _activeTransformation = new TransformGizmoWrapper(transformables.ToList());
+                    _gizmo.Selection.Add(_activeTransformation);
                 }
             }
             else if (state is VertexSelectionState vertexSelectionState)
@@ -134,8 +74,8 @@ namespace View3D.Components.Gizmo
                 if (vertexSelectionState.SelectedVertices.Count == 0)
                     return;
             
-                _wrapper = new TransformGizmoWrapper( vertexSelectionState.RenderObject.Geometry, vertexSelectionState.SelectedVertices);
-                _gizmo.Selection.Add(_wrapper);
+                _activeTransformation = new TransformGizmoWrapper( vertexSelectionState.RenderObject.Geometry, vertexSelectionState.SelectedVertices);
+                _gizmo.Selection.Add(_activeTransformation);
             }
 
             _gizmo.ResetDeltas();
@@ -144,12 +84,12 @@ namespace View3D.Components.Gizmo
         private void GizmoTransformStart()
         {
             _mouse.MouseOwner = this;
-            _wrapper.Start(_gizmo.ActiveMode);
+            _activeTransformation.Start(_gizmo.ActiveMode);
         }
 
         private void GizmoTransformEnd()
         {
-            _wrapper.Stop(_commandManager);
+            _activeTransformation.Stop(_commandManager);
             if (_mouse.MouseOwner == this)
             {
                 _mouse.MouseOwner = null;
@@ -160,17 +100,17 @@ namespace View3D.Components.Gizmo
 
         private void GizmoTranslateEvent(ITransformable transformable, TransformationEventArgs e)
         {
-            _wrapper.GizmoTranslateEvent(e);
+            _activeTransformation.GizmoTranslateEvent(e);
         }
 
         private void GizmoRotateEvent(ITransformable transformable, TransformationEventArgs e)
         {
-            _wrapper.GizmoRotateEvent(e); 
+            _activeTransformation.GizmoRotateEvent(e); 
         }
 
         private void GizmoScaleEvent(ITransformable transformable, TransformationEventArgs e)
         {
-            _wrapper.GizmoScaleEvent(e);
+            _activeTransformation.GizmoScaleEvent(e);
         }
 
         public override void Update(GameTime gameTime)

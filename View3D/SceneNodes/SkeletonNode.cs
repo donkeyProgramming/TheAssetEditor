@@ -12,10 +12,15 @@ using View3D.Rendering.RenderItems;
 
 namespace View3D.SceneNodes
 {
+    public interface IAnimationProvider
+    { 
+        bool IsActive { get; }
+        GameSkeleton Skeleton { get; set; }
+    }
+
     public class SkeletonNode : GroupNode, IDrawableItem
     {
-        public GameSkeleton Skeleton { get; set; }
-
+        IAnimationProvider _animationProvider;
         LineMeshRender _lineRenderer;
 
         public Vector3 NodeColour = new Vector3(.25f, 1, .25f);
@@ -25,22 +30,27 @@ namespace View3D.SceneNodes
         public int? SelectedBoneIndex { get; set; }
         public float SkeletonScale { get; set; } = 1;
 
-        public SkeletonNode(ContentManager content, string name = "Skeleton") : base(name)
+        public SkeletonNode(ContentManager content, IAnimationProvider animationProvider, string name = "Skeleton") : base(name)
         {
             _lineRenderer = new LineMeshRender(content);
+            _animationProvider = animationProvider;
         }
-
 
         public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)
         {
-            if (IsVisible && Skeleton != null)
+            var skeleton = _animationProvider.Skeleton;
+            Name = "Skeleton ";
+            if (skeleton != null)
+                Name = _animationProvider.Skeleton.SkeletonName;
+
+            if (IsVisible && skeleton != null && _animationProvider.IsActive)
             {
-                Skeleton.Update();
+                //skeleton.Update();
                 _lineRenderer.Clear();
 
-                for (int i = 0; i < Skeleton.BoneCount; i++)
+                for (int i = 0; i < skeleton.BoneCount; i++)
                 {
-                    var parentIndex = Skeleton.GetParentBone(i);
+                    var parentIndex = skeleton.GetParentBone(i);
                     if (parentIndex == -1)
                         continue;
 
@@ -52,8 +62,8 @@ namespace View3D.SceneNodes
                         scale *= 1.5f;
                     }
 
-                    var boneMatrix = Skeleton.GetAnimatedWorldTranform(i);
-                    var parentBoneMatrix = Skeleton.GetAnimatedWorldTranform(parentIndex);
+                    var boneMatrix = skeleton.GetAnimatedWorldTranform(i);
+                    var parentBoneMatrix = skeleton.GetAnimatedWorldTranform(parentIndex);
 
                     _lineRenderer.AddCube(Matrix.CreateScale(scale) * Matrix.CreateScale(0.05f) * boneMatrix * parentWorld);
                     _lineRenderer.AddLine(Vector3.Transform(boneMatrix.Translation, parentWorld), Vector3.Transform(parentBoneMatrix.Translation, parentWorld));

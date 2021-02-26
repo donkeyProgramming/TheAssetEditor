@@ -12,6 +12,7 @@ using View3D.Components.Component.Selection;
 using View3D.Components.Gizmo;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
+using View3D.Rendering.Geometry;
 using View3D.Scene;
 using View3D.SceneNodes;
 using View3D.Services;
@@ -34,9 +35,6 @@ namespace KitbasherEditor.ViewModels
         public string DisplayName { get => _displayName; set => SetAndNotify(ref _displayName, value); }
 
         public IPackFile MainFile { get; set; }
-
-
-        SkeletonNode _skeletonNode;
 
         public KitbasherViewModel(PackFileService pf)
         {
@@ -62,7 +60,6 @@ namespace KitbasherEditor.ViewModels
             Scene.Components.Add(new GridComponent(Scene));
             Scene.Components.Add(new AnimationsContainerComponent(Scene));
 
-            
 
             SceneExplorer = new SceneExplorerViewModel(Scene);
             Scene.Components.Add(SceneExplorer);
@@ -80,8 +77,7 @@ namespace KitbasherEditor.ViewModels
             var sceneManager = scene.GetComponent<SceneManager>();
             var resourceLib = scene.GetComponent<ResourceLibary>();
 
-            Animation.SkeletonTreeNode = new SkeletonNode(scene.Content);
-            sceneManager.RootNode.AddObject(Animation.SkeletonTreeNode);
+            sceneManager.RootNode.AddObject(new SkeletonNode(scene.Content, Animation));
 
             _editableRmvMesh = (Rmv2ModelNode)sceneManager.RootNode.AddObject(new Rmv2ModelNode("Editable Model"));
             
@@ -103,7 +99,7 @@ namespace KitbasherEditor.ViewModels
                 DisplayName = file.Name;
 
                 //var cubeMesh = new CubeMesh(Scene.GraphicsDevice);
-                //_editableRmvMesh.Children[0].AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0), new Vector3(0.5f), "Item1", Scene.GraphicsDevice));
+                //editableRmvMesh.Children[0].AddObject(RenderItemHelper.CreateRenderItem(cubeMesh, new Vector3(0, 0, 0), new Vector3(0.5f), "Item1", Scene.GraphicsDevice));
             }
             
             // Wmd reference

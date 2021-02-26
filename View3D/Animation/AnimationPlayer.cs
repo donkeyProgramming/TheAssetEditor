@@ -179,6 +179,8 @@ namespace View3D.Animation
             if (animationLengthMs != 0)
                 sampleT = (float)(_timeSinceStart.TotalMilliseconds / animationLengthMs);
             _currentAnimFrame = AnimationSampler.Sample(sampleT, _skeleton, _animationClips, ApplyStaticFrame, ApplyDynamicFrames);
+            if(_skeleton != null)
+                _skeleton.Update();
         }
 
 

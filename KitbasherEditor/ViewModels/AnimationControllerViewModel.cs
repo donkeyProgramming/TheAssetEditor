@@ -20,13 +20,11 @@ using static CommonControls.FilterDialog.FilterUserControl;
 namespace KitbasherEditor.ViewModels
 {
 
-    public class AnimationControllerViewModel : NotifyPropertyChangedImpl
+    public class AnimationControllerViewModel : NotifyPropertyChangedImpl, IAnimationProvider
     {
         ILogger _logger = Logging.Create<AnimationControllerViewModel>();
         IComponentManager _componentManager;
         PackFileService _packFileService;
-
-
 
 
         string _headerText = "No animation selected";
@@ -48,13 +46,10 @@ namespace KitbasherEditor.ViewModels
         public OnSeachDelegate FilterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 
 
-        PackFile Skeleton;
+        PackFile _skeletonPackFile;
         PackFile Animation;
 
-
-        //
         public AnimationPlayer Player { get; set; }
-        public SkeletonNode SkeletonTreeNode { get; set; }
 
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
@@ -74,6 +69,11 @@ namespace KitbasherEditor.ViewModels
 
         bool _isEnabled;
         public bool IsEnabled { get { return _isEnabled; } set { SetAndNotify(ref _isEnabled, value); Player.IsEnabled = value; } }
+
+        // interface - ISkeletonProvider
+        public bool IsActive => IsEnabled;
+
+        public GameSkeleton Skeleton { get; set; }
 
         public AnimationControllerViewModel(IComponentManager componentManager, PackFileService pf)
         {
@@ -151,15 +151,20 @@ namespace KitbasherEditor.ViewModels
         private void SkeletonChanged(string selectedSkeletonPath)
         {
             HeaderText = "";
+            _skeletonPackFile = null;
             Skeleton = null;
             AnimationsForCurrentSkeleton.Clear();
             if (!string.IsNullOrWhiteSpace(selectedSkeletonPath))
             {
-                Skeleton = _packFileService.FindFile(selectedSkeletonPath) as PackFile;
-                HeaderText = Skeleton.Name + " - No Animation";
-                var animations = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(Path.GetFileNameWithoutExtension(Skeleton.Name));
+                _skeletonPackFile = _packFileService.FindFile(selectedSkeletonPath) as PackFile;
+                HeaderText = _skeletonPackFile.Name + " - No Animation";
+                var animations = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(Path.GetFileNameWithoutExtension(_skeletonPackFile.Name));
                 foreach (var anim in animations)
                     AnimationsForCurrentSkeleton.Add(_packFileService.GetFullPath(anim));
+
+                var skeletonAnimationFile = AnimationFile.Create(_skeletonPackFile);
+                Skeleton = new GameSkeleton(skeletonAnimationFile, Player);
+
             }
 
             SelectedAnimation = null;
@@ -172,25 +177,21 @@ namespace KitbasherEditor.ViewModels
                 Animation = _packFileService.FindFile(selectedAnimationPath) as PackFile;
 
             if (Animation != null)
-                HeaderText = Skeleton.Name + " - " + Animation.Name;
-            else if(Skeleton != null)
-                HeaderText = Skeleton.Name + " - No Animation";
+                HeaderText = _skeletonPackFile.Name + " - " + Animation.Name;
+            else if(_skeletonPackFile != null)
+                HeaderText = _skeletonPackFile.Name + " - No Animation";
             else
                 HeaderText = "No Skeleton - No Animation";
 
-            if (Animation != null && Skeleton != null)
+            if (Animation != null)
             {
-                var skelFile = AnimationFile.Create(Skeleton);
-                var gameSkel = new GameSkeleton(skelFile, Player);
-
                 var animFile = AnimationFile.Create(Animation);
                 var animClip = new AnimationClip(animFile);
 
                 MaxFrames = animClip.DynamicFrames.Count;
                 CurrentFrame = 0;
 
-                Player.SetAnimation(animClip, gameSkel);
-                SkeletonTreeNode.Skeleton = gameSkel;
+                Player.SetAnimation(animClip, Skeleton);
                 Player.Play();
             }
         }

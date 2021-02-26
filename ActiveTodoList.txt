@@ -40,7 +40,8 @@ Feature list before V1 done:
 		Pivot
 			Edit
 			Display
-			Scale/rotate around?
+		Combine meshes
+		Skeleton id remapper
 
 	New editors:
 		Model preview

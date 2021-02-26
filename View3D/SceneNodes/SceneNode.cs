@@ -52,7 +52,7 @@ namespace View3D.SceneNodes
         public SceneNode Parent { get; set; }
 
         string _name = "";
-        public string Name { get => _name; set => SetAndNotify(ref _name, value); }
+        public string Name { get => _name; set => SetAndNotifyWhenChanged(ref _name, value); }
 
         bool _isVisible = true;
         public bool IsVisible { get => _isVisible; set => SetAndNotify(ref _isVisible, value); }
