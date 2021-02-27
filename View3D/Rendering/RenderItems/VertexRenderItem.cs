@@ -13,7 +13,7 @@ namespace View3D.Rendering.RenderItems
     {
         public VertexInstanceMesh VertexRenderer { get; set; }
 
-        public MeshNode Node { get; set; }
+        public Rmv2MeshNode Node { get; set; }
         public Matrix World { get; set; }
         public List<int> SelectedVertices { get; set; }
 

@@ -39,6 +39,20 @@ namespace CommonControls.MathViews
             set { SetAndNotify(ref _z, value); OnValueChanged?.Invoke(this); }
         }
 
+        public void Set(float x, float y, float z)
+        {
+            X.Value = x;
+            Y.Value = y;
+            Z.Value = z;
+        }
+
+        public void Set(float value)
+        {
+            X.Value = value;
+            Y.Value = value;
+            Z.Value = value;
+        }
+
         public override string ToString()
         {
             return $"{X}, {Y}, {Z}";

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using View3D.Commands.Vertex;
 using View3D.Components.Component;
+using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
 
 namespace View3D.Components.Gizmo
@@ -23,7 +24,7 @@ namespace View3D.Components.Gizmo
         Quaternion _orientation = Quaternion.Identity;
         public Quaternion Orientation { get => _orientation; set { _orientation = value; } }
 
-        TransformVertexCommand2 _activeCommand;
+        TransformVertexCommand _activeCommand;
 
         List<IGeometry> _effectedObjects;
         List<int> _selectedVertexes;
@@ -55,7 +56,7 @@ namespace View3D.Components.Gizmo
         public void Start(GizmoMode mode)
         {
             _totalGizomTransform = Matrix.Identity;
-            _activeCommand = new TransformVertexCommand2(_effectedObjects, Position, mode == GizmoMode.Rotate, _selectedVertexes);
+            _activeCommand = new TransformVertexCommand(_effectedObjects, Position, mode == GizmoMode.Rotate, _selectedVertexes);
         }
 
         public void Stop(CommandExecutor commandManager)
@@ -68,26 +69,26 @@ namespace View3D.Components.Gizmo
             }
         }
 
-        public void GizmoTranslateEvent(TransformationEventArgs e)
+        public void GizmoTranslateEvent(Vector3 translation, PivotType pivot)
         {
-            ApplyTransform(Matrix.CreateTranslation((Vector3)e.Value), e.Pivot);
-            Position += (Vector3)e.Value;
-            _totalGizomTransform *= Matrix.CreateTranslation((Vector3)e.Value);
+            ApplyTransform(Matrix.CreateTranslation(translation), pivot);
+            Position += translation;
+            _totalGizomTransform *= Matrix.CreateTranslation(translation);
         }
 
-        public void GizmoRotateEvent(TransformationEventArgs e)
+        public void GizmoRotateEvent(Matrix rotation, PivotType pivot)
         {
-            ApplyTransform((Matrix)e.Value, e.Pivot);// Rotate normal, bi normals and all that shit
+            ApplyTransform(rotation, pivot);// Rotate normal, bi normals and all that shit
             //Orientation += Quaternion.CreateFromRotationMatrix((Matrix)e.Value);  -> This enables the roation gizmo to update
-            _totalGizomTransform *= (Matrix)e.Value;
+            _totalGizomTransform *= rotation;
         }
 
-        public void GizmoScaleEvent(TransformationEventArgs e)
+        public void GizmoScaleEvent(Vector3 scale, PivotType pivot)
         {
-            var scaleMatrix = Matrix.CreateScale(((Vector3)e.Value) + Vector3.One);
-            ApplyTransform(scaleMatrix, e.Pivot);
+            var scaleMatrix = Matrix.CreateScale(scale + Vector3.One);
+            ApplyTransform(scaleMatrix, pivot);
 
-            Scale += (Vector3)e.Value;
+            Scale += scale;
             _totalGizomTransform *= scaleMatrix;
         }
 
@@ -127,5 +128,22 @@ namespace View3D.Components.Gizmo
         {
             return Position;
         }
+
+        public static TransformGizmoWrapper CreateFromSelectionState(ISelectionState state)
+        {
+            if (state is ObjectSelectionState objectSelectionState)
+            {
+                var transformables = objectSelectionState.CurrentSelection().Where(x => x is ITransformable).Select(x => x.Geometry);
+                if (transformables.Any())
+                    return new TransformGizmoWrapper(transformables.ToList());
+            }
+            else if (state is VertexSelectionState vertexSelectionState)
+            {
+                if (vertexSelectionState.SelectedVertices.Count != 0)
+                    return new  TransformGizmoWrapper(vertexSelectionState.RenderObject.Geometry, vertexSelectionState.SelectedVertices);
+            }
+            return null;
+        }
+       
     }
 }

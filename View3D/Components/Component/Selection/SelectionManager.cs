@@ -123,7 +123,7 @@ namespace View3D.Components.Component.Selection
                 }
             }
 
-            if (selectionState is FaceSelectionState selectionFaceState && selectionFaceState.RenderObject is MeshNode meshNode)
+            if (selectionState is FaceSelectionState selectionFaceState && selectionFaceState.RenderObject is Rmv2MeshNode meshNode)
             {
                 _renderEngine.AddRenderItem(RenderBuckedId.Selection, new GeoRenderItem() { ModelMatrix = meshNode.ModelMatrix, Geometry = meshNode.Geometry, Shader = _selectedFacesEffect, Faces = selectionFaceState.SelectedFaces });
                 _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeoRenderItem() { ModelMatrix = meshNode.ModelMatrix, Geometry = meshNode.Geometry, Shader = _wireframeEffect});
@@ -131,7 +131,7 @@ namespace View3D.Components.Component.Selection
 
             if (selectionState is VertexSelectionState selectionVertexState && selectionVertexState.RenderObject != null)
             {
-                var vertexObject = selectionVertexState.RenderObject as MeshNode;
+                var vertexObject = selectionVertexState.RenderObject as Rmv2MeshNode;
                 _renderEngine.AddRenderItem(RenderBuckedId.Selection, new VertexRenderItem() { Node = vertexObject, World = vertexObject.ModelMatrix, SelectedVertices = selectionVertexState.SelectedVertices, VertexRenderer = VertexRenderer });
                 _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeoRenderItem() { ModelMatrix = vertexObject.ModelMatrix, Geometry = vertexObject.Geometry, Shader = _wireframeEffect });
             }

@@ -14,7 +14,7 @@ using View3D.Utility;
 
 namespace View3D.SceneNodes
 {
-    public class MeshNode : SceneNode, ITransformable, IEditableGeometry, ISelectable, IUpdateable, IDrawableItem
+    public class Rmv2MeshNode : SceneNode, ITransformable, IEditableGeometry, ISelectable, IUpdateable, IDrawableItem
     {
 
         Quaternion _orientation = Quaternion.Identity;
@@ -33,10 +33,10 @@ namespace View3D.SceneNodes
 
         public AnimationPlayer AnimationPlayer;
 
-        private MeshNode()
+        private Rmv2MeshNode()
         { }
 
-        public MeshNode(IGeometry geo, string name, AnimationPlayer animationPlayer, PbrShader shader)
+        public Rmv2MeshNode(IGeometry geo, string name, AnimationPlayer animationPlayer, PbrShader shader)
         {
             Geometry = geo;
             AnimationPlayer = animationPlayer;
@@ -49,7 +49,7 @@ namespace View3D.SceneNodes
             Effect = shader;
         }
 
-        public MeshNode(RmvSubModel rmvSubModel, GraphicsDevice device, ResourceLibary resourceLib, AnimationPlayer animationPlayer)
+        public Rmv2MeshNode(RmvSubModel rmvSubModel, GraphicsDevice device, ResourceLibary resourceLib, AnimationPlayer animationPlayer)
         {
             Geometry = new Rmv2Geometry(rmvSubModel, device);
             AnimationPlayer = animationPlayer;
@@ -118,7 +118,7 @@ namespace View3D.SceneNodes
 
         public override SceneNode Clone()
         {
-            var newItem = new MeshNode()
+            var newItem = new Rmv2MeshNode()
             {
                 Geometry = Geometry.Clone(),
                 Position = Position,

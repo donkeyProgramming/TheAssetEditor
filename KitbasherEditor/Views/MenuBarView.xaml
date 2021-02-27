@@ -110,10 +110,9 @@
                 </ComboBox>
 
                 <TextBlock VerticalAlignment="Center"  Margin="3,0,0,0" Text="Pivot:"/>
-                <ComboBox IsEditable="False" SelectedIndex="{Binding Gizmo.PivotModeModeIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                <ComboBox IsEnabled="False" SelectedIndex="{Binding Gizmo.PivotModeModeIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                     <ComboBoxItem Content="Object postions"/>
                     <ComboBoxItem Content="Selection center"/>
-                    
                 </ComboBox>
 
 

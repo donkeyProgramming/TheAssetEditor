@@ -59,24 +59,9 @@ namespace View3D.Components.Gizmo
         private void OnSelectionChanged(ISelectionState state)
         {
             _gizmo.Selection.Clear();
-            _activeTransformation = null;
-            if (state is ObjectSelectionState objectSelectionState)
-            {
-                var transformables = objectSelectionState.CurrentSelection().Where(x => x is ITransformable).Select(x=>x.Geometry);
-                if (transformables.Any())
-                {
-                    _activeTransformation = new TransformGizmoWrapper(transformables.ToList());
-                    _gizmo.Selection.Add(_activeTransformation);
-                }
-            }
-            else if (state is VertexSelectionState vertexSelectionState)
-            {
-                if (vertexSelectionState.SelectedVertices.Count == 0)
-                    return;
-            
-                _activeTransformation = new TransformGizmoWrapper( vertexSelectionState.RenderObject.Geometry, vertexSelectionState.SelectedVertices);
+            _activeTransformation = TransformGizmoWrapper.CreateFromSelectionState(state);
+            if(_activeTransformation != null)
                 _gizmo.Selection.Add(_activeTransformation);
-            }
 
             _gizmo.ResetDeltas();
         }
@@ -100,17 +85,17 @@ namespace View3D.Components.Gizmo
 
         private void GizmoTranslateEvent(ITransformable transformable, TransformationEventArgs e)
         {
-            _activeTransformation.GizmoTranslateEvent(e);
+            _activeTransformation.GizmoTranslateEvent((Vector3)e.Value, e.Pivot);
         }
 
         private void GizmoRotateEvent(ITransformable transformable, TransformationEventArgs e)
         {
-            _activeTransformation.GizmoRotateEvent(e); 
+            _activeTransformation.GizmoRotateEvent((Matrix)e.Value, e.Pivot); 
         }
 
         private void GizmoScaleEvent(ITransformable transformable, TransformationEventArgs e)
         {
-            _activeTransformation.GizmoScaleEvent(e);
+            _activeTransformation.GizmoScaleEvent((Vector3)e.Value, e.Pivot);
         }
 
         public override void Update(GameTime gameTime)

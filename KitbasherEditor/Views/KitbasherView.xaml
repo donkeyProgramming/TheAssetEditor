@@ -4,9 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:KitbasherEditor.Views"
-             xmlns:viewmodels="clr-namespace:KitbasherEditor.ViewModels" xmlns:editorviews="clr-namespace:KitbasherEditor.Views.EditorViews"
+             xmlns:viewmodels="clr-namespace:KitbasherEditor.ViewModels" xmlns:editorviews="clr-namespace:KitbasherEditor.Views.EditorViews" xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls" xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    
+    <UserControl.Resources>
+        <valueconverters:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Collapsed" />
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width=".75*"/>
@@ -25,16 +29,41 @@
 
         <local:MenuBarView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" DataContext="{Binding MenuBar}"/>
 
+    
+        
+        <!-- Main editor window, contains the 3d view, animation panel and active tools window -->
         <Grid Grid.Row="1" Grid.Column="0" Grid.RowSpan="4" >
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <ContentControl Grid.Row="0"  Content="{Binding Scene}"/>
-            <editorviews:AnimationView DataContext="{Binding Animation}" Grid.Row="1"/>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <ContentControl Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"  Content="{Binding Scene}"/>
+            <editorviews:AnimationView DataContext="{Binding Animation}" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"/>
+
+            <Grid Grid.Row="0" Grid.Column="1" 
+                  Visibility="{Binding MenuBar.TransformTool.IsVisible, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToHiddenConverter}}">
+                <DockPanel HorizontalAlignment="Right" VerticalAlignment="Top">
+                    <Border BorderThickness="2" BorderBrush="DarkGray" Background="LightGray">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding MenuBar.TransformTool.Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            <mathviews:Vector3View Width="200" Vector3="{Binding MenuBar.TransformTool.Vector3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            <Button Content="Apply"
+                                    Command="{Binding MenuBar.TransformTool.ApplyCommand}"
+                                    IsEnabled="{Binding MenuBar.TransformTool.ButtonEnabled, UpdateSourceTrigger=PropertyChanged}"/> 
+                        </StackPanel>
+                    </Border>
+                </DockPanel>
+            </Grid>
         </Grid>
-        
+
+    
+
         <GridSplitter Grid.Row="1" Grid.RowSpan="4" Grid.Column="1"  HorizontalAlignment="Stretch">
             <GridSplitter.Template>
                 <ControlTemplate TargetType="{x:Type GridSplitter}">

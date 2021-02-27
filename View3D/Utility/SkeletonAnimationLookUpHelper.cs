@@ -5,6 +5,7 @@ using FileTypes.PackFiles.Services;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -14,12 +15,16 @@ namespace View3D.Utility
     {
         ILogger _logger = Logging.Create<SkeletonAnimationLookUpHelper>();
         Dictionary<string, List<PackFile>> _skeletonNameToAnimationMap = new Dictionary<string, List<PackFile>>();
+        PackFileService _pf;
 
-        public void FindAllAnimations(PackFileService packFileService)
+        List<string> _skeletonFilesNames = new List<string>();
+
+        public void Initialize(PackFileService packFileService)
         {
             _logger.Here().Information("Finding all animations");
 
-            var AllAnimations = packFileService.FindAllWithExtention(".anim");
+            _pf = packFileService;
+            var AllAnimations = _pf.FindAllWithExtention(".anim");
 
             _logger.Here().Information("Animations found =" + AllAnimations.Count());
 
@@ -35,11 +40,29 @@ namespace View3D.Utility
                 }
                 catch (Exception e)
                 {
-                    _logger.Here().Error("Parsing failed for " + packFileService.GetFullPath(animation)+ "\n" + e.ToString());
+                    _logger.Here().Error("Parsing failed for " + _pf.GetFullPath(animation)+ "\n" + e.ToString());
                 }
             }
 
+
+            _logger.Here().Information("Finding all skeletons");
+
+            var allFilesInFolder = _pf.FindAllFilesInDirectory("animations\\skeletons");
+            _skeletonFilesNames = allFilesInFolder.Where(x => Path.GetExtension(x.Name) == ".anim").Select(x => _pf.GetFullPath(x)).ToList();
+
+            _logger.Here().Information("Skeletons found =" + _skeletonFilesNames.Count());
+
             _logger.Here().Information("Finding all done");
+        }
+
+        public List<string> GetAllSkeletonFileNames()
+        {
+            return _skeletonFilesNames;
+        }
+
+        public List<string> GetAllSkeletonNames()
+        {
+            return _skeletonFilesNames.Select(x => Path.GetFileNameWithoutExtension(x)).ToList();
         }
 
         public List<PackFile> GetAnimationsForSkeleton(string skeletonName)

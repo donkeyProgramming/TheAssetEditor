@@ -20,9 +20,10 @@ Feature list before V1 done:
 			UI linking (commands visible/clickable in toolbar)
 			Update when different buttons are enabled
 			Hotkeys
+			Show info model
 			Show info header
 			Show info rmv2
-			Selecting in tree view should select in scene
+			[DONE]electing in tree view should select in scene
 			[DONE]Focus camera - work on selected faces and verts
 			[DONE]Reset camera
 			

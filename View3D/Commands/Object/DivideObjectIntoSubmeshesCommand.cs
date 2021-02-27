@@ -20,7 +20,7 @@ namespace View3D.Commands.Object
     class DivideObjectIntoSubmeshesCommand : CommandBase<DivideObjectIntoSubmeshesCommand>
     {
         IEditableGeometry _objectToSplit;
-        List<MeshNode> _newMeshes = new List<MeshNode>();
+        List<Rmv2MeshNode> _newMeshes = new List<Rmv2MeshNode>();
 
         IEditableMeshResolver _editableMeshResolver;
         SceneManager _sceneManager;
@@ -53,8 +53,8 @@ namespace View3D.Commands.Object
             int counter = 0;
             foreach (var mesh in newMeshes)
             {
-                var hack = _objectToSplit as MeshNode;
-                var meshNode = new MeshNode(mesh, $"{_objectToSplit.Name}_submesh_{counter++}", hack.AnimationPlayer, hack.Effect.Clone() as PbrShader); 
+                var hack = _objectToSplit as Rmv2MeshNode;
+                var meshNode = new Rmv2MeshNode(mesh, $"{_objectToSplit.Name}_submesh_{counter++}", hack.AnimationPlayer, hack.Effect.Clone() as PbrShader); 
                 _newMeshes.Add(meshNode);
                 _editableMeshResolver.GetEditableMeshNode().AddObject(meshNode);
             }

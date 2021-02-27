@@ -12,13 +12,14 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public GizmoModeMenuBarViewModel Gizmo { get; set; }
         public GeneralMenuBarViewModel General { get; set; }
         public ToolsMenuBarViewModel Tools { get; set; }
+        public TransformToolViewModel TransformTool { get; set; }
 
-
-        ToolbarCommandFactory _commandFactory = new ToolbarCommandFactory();
+        public ToolbarCommandFactory _commandFactory = new ToolbarCommandFactory();
 
         public MenuBarViewModel(IComponentManager componentManager)
         {
-            Gizmo = new GizmoModeMenuBarViewModel(componentManager, _commandFactory);
+            TransformTool = new TransformToolViewModel(componentManager);
+            Gizmo = new GizmoModeMenuBarViewModel(TransformTool, componentManager, _commandFactory);
             General = new GeneralMenuBarViewModel(componentManager, _commandFactory);
             Tools = new ToolsMenuBarViewModel(componentManager, _commandFactory);
         }

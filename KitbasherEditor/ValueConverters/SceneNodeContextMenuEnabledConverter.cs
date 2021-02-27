@@ -43,7 +43,7 @@ namespace KitbasherEditor.ValueConverters
                         return true;
                     if (node is Rmv2LodNode)
                         return true;
-                    if (node is MeshNode)
+                    if (node is Rmv2MeshNode)
                         return true;
 
                     return false;

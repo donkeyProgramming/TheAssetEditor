@@ -18,7 +18,7 @@ namespace KitbasherEditor.ValueConverters
                 return ResourceController.VmdIcon;
             else if (value is Rmv2ModelNode)
                 return ResourceController.Rmv2ModelIcon;
-            else if (value is MeshNode)
+            else if (value is Rmv2MeshNode)
                 return ResourceController.MeshIcon;
             else if (value is SkeletonNode)
                 return ResourceController.SkeletonIcon;

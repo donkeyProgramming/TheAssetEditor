@@ -11,39 +11,10 @@ using View3D.SceneNodes;
 
 namespace View3D.Commands.Vertex
 {
-    class TransformVertexCommand : CommandBase<VertexSelectionCommand>
-    {
-        ISelectable _node;
-        IGeometry _oldGeo;
-
-        SelectionManager _selectionManager;
-        ISelectionState _oldSelectionState;
-        public TransformVertexCommand(ISelectable node)
-        {
-            _node = node;
-            _oldGeo = _node.Geometry.Clone();
-        }
-
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-        }
-
-        protected override void ExecuteCommand()
-        {
-            _oldSelectionState = _selectionManager.GetStateCopy();
-            // Nothing to do, vertexes already updated
-        }
-
-        protected override void UndoCommand()
-        {
-            _node.Geometry = _oldGeo;
-            _selectionManager.SetState(_oldSelectionState);
-        }
-    }
 
 
-    class TransformVertexCommand2 : CommandBase<TransformVertexCommand2>
+
+    public class TransformVertexCommand : CommandBase<TransformVertexCommand>
     {
         List<IGeometry> _geometryList;
         Vector3 _pivotPoint;
@@ -54,7 +25,7 @@ namespace View3D.Commands.Vertex
         SelectionManager _selectionManager;
         ISelectionState _oldSelectionState;
 
-        public TransformVertexCommand2(List<IGeometry> geometryList, Vector3 pivotPoint, bool applyToNormals = false, List<int> affectVertexes = null)
+        public TransformVertexCommand(List<IGeometry> geometryList, Vector3 pivotPoint, bool applyToNormals = false, List<int> affectVertexes = null)
         {
             _geometryList = geometryList;
             _pivotPoint = pivotPoint;

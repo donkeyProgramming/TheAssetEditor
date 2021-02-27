@@ -155,13 +155,19 @@ namespace View3D.Rendering.Geometry
             _vertexBuffer = new VertexBuffer(_device, _vertexDeclaration, _vertexArray.Length, BufferUsage.None);
             _vertexBuffer.SetData(_vertexArray);
 
-            _meshCenter = Vector3.Zero;
-            for (int i = 0; i < VertexCount(); i++)
-                _meshCenter += GetVertexById(i);
-
-            _meshCenter = _meshCenter / VertexCount();
+            //_meshCenter = Vector3.Zero;
+            //for (int i = 0; i < VertexCount(); i++)
+            //    _meshCenter += GetVertexById(i);
+            //
+            //_meshCenter = _meshCenter / VertexCount();
 
             BuildBoundingBox();
+
+            var corners = _boundingBox.GetCorners();
+            _meshCenter = Vector3.Zero;
+            for (int i = 0; i < corners.Length; i++)
+                _meshCenter += corners[i];
+            _meshCenter = _meshCenter / corners.Length;
         }
 
         protected virtual void CopyInto(IndexedMeshGeometry<VertexType> mesh)

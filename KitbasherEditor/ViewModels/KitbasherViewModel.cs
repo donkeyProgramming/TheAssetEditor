@@ -24,6 +24,7 @@ namespace KitbasherEditor.ViewModels
     {
         ILogger _logger = Logging.Create<KitbasherViewModel>();
         PackFileService _packFileService;
+        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
         public SceneContainer Scene { get; set; }
         public SceneExplorerViewModel SceneExplorer { get; set; }
@@ -39,6 +40,8 @@ namespace KitbasherEditor.ViewModels
         public KitbasherViewModel(PackFileService pf)
         {
             _packFileService = pf;
+            _skeletonAnimationLookUpHelper = new SkeletonAnimationLookUpHelper();
+            _skeletonAnimationLookUpHelper.Initialize(_packFileService);
 
             Scene = new SceneContainer();
             
@@ -61,11 +64,11 @@ namespace KitbasherEditor.ViewModels
             Scene.Components.Add(new AnimationsContainerComponent(Scene));
 
 
-            SceneExplorer = new SceneExplorerViewModel(Scene);
+            SceneExplorer = new SceneExplorerViewModel(Scene, _skeletonAnimationLookUpHelper);
             Scene.Components.Add(SceneExplorer);
 
             MenuBar = new MenuBarViewModel(Scene);
-            Animation = new AnimationControllerViewModel(Scene, _packFileService);
+            Animation = new AnimationControllerViewModel(Scene, _packFileService, _skeletonAnimationLookUpHelper);
             Scene.SceneInitialized += OnSceneInitialized;
         }
 
@@ -94,7 +97,7 @@ namespace KitbasherEditor.ViewModels
             {
                 var file = MainFile as PackFile;
                 var rmv = new RmvRigidModel(file.DataSource.ReadData(), file.Name);
-                _editableRmvMesh.AddModel(rmv, Scene.GraphicsDevice, resourceLib, Animation.Player);
+                _editableRmvMesh.SetModel(rmv, Scene.GraphicsDevice, resourceLib, Animation.Player);
                 Animation.SetActiveSkeleton(rmv.Header.SkeletonName);
                 DisplayName = file.Name;
 

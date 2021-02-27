@@ -12,6 +12,7 @@ using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Scene;
 using View3D.SceneNodes;
+using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels
 {
@@ -26,7 +27,7 @@ namespace KitbasherEditor.ViewModels
 
 
         SceneNode _selectedNode;
-        public SceneNode SelectedNode { get { return _selectedNode; } set { SetAndNotify(ref _selectedNode, value); CreateNodeViewModel(_selectedNode); } }
+        public SceneNode SelectedNode { get { return _selectedNode; } set { SetAndNotify(ref _selectedNode, value); OnNodeSelected(_selectedNode); } }
 
         ISceneNodeViewModel _selectedNodeViewModel;
         public ISceneNodeViewModel SelectedNodeViewModel { get { return _selectedNodeViewModel; } set { SetAndNotify(ref _selectedNodeViewModel, value); } }
@@ -37,20 +38,24 @@ namespace KitbasherEditor.ViewModels
         SceneContainer _sceneContainer;
         SceneManager _sceneManager;
         CommandExecutor _commandExecutor;
+        SelectionManager _selectionManager;
 
         public ICommand MakeNodeEditableCommand { get; set; }
         public ICommand DeleteNodeCommand { get; set; }
 
 
         public Rmv2ModelNode EditableMeshNode { get; set; }
-        
-        public SceneExplorerViewModel(SceneContainer sceneContainer)
+
+        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        public SceneExplorerViewModel(SceneContainer sceneContainer, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             _selectedLodLvl = LodItem.GetAll.First();
 
             _sceneContainer = sceneContainer;
+            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _sceneManager = _sceneContainer.GetComponent<SceneManager>();
             _commandExecutor = sceneContainer.GetComponent<CommandExecutor>();
+            _selectionManager = sceneContainer.GetComponent<SelectionManager>();
 
             SceneGraphRootNodes.Add(_sceneManager.RootNode);
 
@@ -58,14 +63,13 @@ namespace KitbasherEditor.ViewModels
             _sceneManager.SceneObjectRemoved += (a, b) => RebuildTree();
 
           
-
             MakeNodeEditableCommand = new RelayCommand<SceneNode>(MakeNodeEditable);
             DeleteNodeCommand = new RelayCommand<SceneNode>(DeleteNode);
         }
 
         void MakeNodeEditable(SceneNode node)
         {
-            if (node is MeshNode meshNode)
+            if (node is Rmv2MeshNode meshNode)
             {
                 EditableMeshNode.Children[SelectedLodLevel.Value].AddObject(meshNode);
             }
@@ -129,9 +133,18 @@ namespace KitbasherEditor.ViewModels
         {
         }
 
-        private void CreateNodeViewModel(SceneNode selectedNode)
+        private void OnNodeSelected(SceneNode selectedNode)
         {
-            SelectedNodeViewModel = SceneNodeViewFactory.Create(selectedNode);
+            SelectedNodeViewModel = SceneNodeViewFactory.Create(selectedNode, _skeletonAnimationLookUpHelper);
+
+            var objectState = new ObjectSelectionState();
+            if (selectedNode != null)
+            {
+                if (selectedNode is ISelectable selectableNode && selectableNode.IsSelectable)          
+                    objectState.ModifySelection(selectableNode);
+            }
+
+            _selectionManager.SetState(objectState);
         }
     }
 

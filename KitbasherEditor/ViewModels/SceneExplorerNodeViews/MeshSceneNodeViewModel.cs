@@ -5,7 +5,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
     public class MeshSceneNodeViewModel : NotifyPropertyChangedImpl, ISceneNodeViewModel
     {
-        public MeshSceneNodeViewModel(MeshNode node)
+        public MeshSceneNodeViewModel(Rmv2MeshNode node)
         { }
 
     }

@@ -49,12 +49,14 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         GizmoComponent _gizmoComponent;
         SelectionManager _selectionManager;
         SelectionComponent _selectionComponent;
+        TransformToolViewModel _transformToolViewModel;
 
-        public GizmoModeMenuBarViewModel(IComponentManager componentManager, ToolbarCommandFactory commandFactory)
+        public GizmoModeMenuBarViewModel(TransformToolViewModel transformToolViewModel, IComponentManager componentManager, ToolbarCommandFactory commandFactory)
         {
+            _transformToolViewModel = transformToolViewModel;
             _commandFactory = commandFactory;
 
-            MoveCommand = _commandFactory.Register(new RelayCommand(Cursor), Key.Q, ModifierKeys.None);
+            CursorCommand = _commandFactory.Register(new RelayCommand(Cursor), Key.Q, ModifierKeys.None);
             MoveCommand = _commandFactory.Register(new RelayCommand(Move), Key.W, ModifierKeys.None);
             RotateCommand = _commandFactory.Register(new RelayCommand(Rotate), Key.E, ModifierKeys.None);
             ScaleCommand = _commandFactory.Register(new RelayCommand(Scale), Key.R, ModifierKeys.None);
@@ -104,6 +106,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         void Cursor()
         {
+            _transformToolViewModel.SetMode(TransformToolViewModel.TransformMode.None);
             _gizmoComponent.Disable();
             CursorActive = true;
             MoveActive = false;
@@ -113,6 +116,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         void Move()
         {
+            _transformToolViewModel.SetMode(TransformToolViewModel.TransformMode.Translate);
             _gizmoComponent.SetGizmoMode(GizmoMode.Translate);
             CursorActive = false;
             MoveActive = true;
@@ -122,6 +126,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         void Rotate()
         {
+            _transformToolViewModel.SetMode(TransformToolViewModel.TransformMode.Rotate);
             _gizmoComponent.SetGizmoMode(GizmoMode.Rotate);
             CursorActive = false;
             MoveActive = false;
@@ -131,6 +136,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         void Scale()
         {
+            _transformToolViewModel.SetMode(TransformToolViewModel.TransformMode.Scale);
             _gizmoComponent.SetGizmoMode(GizmoMode.NonUniformScale);
             CursorActive = false;
             MoveActive = false;

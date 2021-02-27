@@ -75,15 +75,12 @@ namespace KitbasherEditor.ViewModels
 
         public GameSkeleton Skeleton { get; set; }
 
-        public AnimationControllerViewModel(IComponentManager componentManager, PackFileService pf)
+        public AnimationControllerViewModel(IComponentManager componentManager, PackFileService pf, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             _componentManager = componentManager;
             _packFileService = pf;
-            _skeletonAnimationLookUpHelper = new SkeletonAnimationLookUpHelper();
-            _skeletonAnimationLookUpHelper.FindAllAnimations(_packFileService);
-
-            var allFilesInFolder = _packFileService.FindAllFilesInDirectory("animations\\skeletons");
-            SkeletonList = allFilesInFolder.Where(x => Path.GetExtension(x.Name) == ".anim").Select(x=>pf.GetFullPath(x)).ToList();
+            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
+            SkeletonList = _skeletonAnimationLookUpHelper.GetAllSkeletonFileNames();
 
             var animCollection = _componentManager.GetComponent<AnimationsContainerComponent>();
             Player = animCollection.RegisterAnimationPlayer(new AnimationPlayer(), "MainPlayer");
