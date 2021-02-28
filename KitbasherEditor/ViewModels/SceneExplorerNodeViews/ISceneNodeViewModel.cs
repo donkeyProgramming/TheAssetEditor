@@ -22,7 +22,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                     return new LodSceneNodeViewModel(l);
 
                 case Rmv2MeshNode m:
-                    return new MeshSceneNodeViewModel(m);
+                    return new MeshSceneNodeViewModel(m, skeletonAnimationLookUpHelper);
 
                 default:
                     return null;

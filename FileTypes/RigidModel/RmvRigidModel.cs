@@ -35,7 +35,7 @@ namespace Filetypes.RigidModel
                 for (int meshIndex = 0; meshIndex < lodMeshCount; meshIndex++)
                 {
                     var offset = LodHeaders[lodIndex].FirstMeshOffset + sizeOffset;
-                    MeshList[lodIndex][meshIndex] = new RmvSubModel(data, (int)offset);
+                    MeshList[lodIndex][meshIndex] = new RmvSubModel(data, (int)offset, Header.SkeletonName);
                     sizeOffset += (int)MeshList[lodIndex][meshIndex].Header.ModelSize;
                 }
             }

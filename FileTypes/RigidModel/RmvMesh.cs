@@ -146,10 +146,6 @@ namespace Filetypes.RigidModel
             BoundingBox.Recompute(mesh);
         }
 
-        public void UpdateOffsets(int modelStart)
-        { 
-        
-        }
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -282,11 +278,12 @@ namespace Filetypes.RigidModel
         public List<RmvAttachmentPoint> AttachmentPoints;
         public List<RmvTexture> Textures;
         public RmvMesh Mesh { get; private set; }
+        public string ParentSkeletonName { get; set; }    // Not part of the model definition
 
-        public RmvSubModel(byte[] dataArray, int offset)
+        public RmvSubModel(byte[] dataArray, int offset, string skeletonName)
         {
             _modelStart = offset;
-
+            ParentSkeletonName = skeletonName;
             Header = LoadHeader(dataArray);
             AttachmentPoints = LoadAttachmentPoints(dataArray);
             Textures = LoadTextures(dataArray);
@@ -342,21 +339,9 @@ namespace Filetypes.RigidModel
             return new RmvMesh(dataArray, Header.VertextType, (int)vertexStart, Header.VertexCount, (int)faceStart, Header.FaceCount);
         }
 
-
-        void Fix()
+        public List<byte> UsedAnimationBones()
         {
-            //Header = new RmvSubModelHeader()
-            //{
-            //    
-            //};
-            //
-            //
-            //Header.VertexCount = (uint)Mesh.VertexList.Length;
-            //
-            //
-            //model.Header = header;
-            //
-
+            return Mesh.VertexList.SelectMany(x => x.BoneIndex).Distinct().ToList();
         }
     }
 

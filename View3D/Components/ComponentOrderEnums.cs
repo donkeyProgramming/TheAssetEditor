@@ -18,9 +18,10 @@ namespace View3D.Components
     public enum ComponentDrawOrderEnum
     {
         ClearScreenComponent,
-        Gizmo,
         Default,
+        Gizmo,
         RenderEngine,
+       
         SelectionComponent,
     }
 }

@@ -16,6 +16,8 @@ namespace View3D.SceneNodes
 {
     public class Rmv2MeshNode : SceneNode, ITransformable, IEditableGeometry, ISelectable, IUpdateable, IDrawableItem
     {
+        public RmvSubModel MeshModel { get; set; }
+
 
         Quaternion _orientation = Quaternion.Identity;
         Vector3 _position = Vector3.Zero;
@@ -47,10 +49,13 @@ namespace View3D.SceneNodes
             Orientation = Quaternion.Identity;
 
             Effect = shader;
+
+            // Create rmvModel?
         }
 
         public Rmv2MeshNode(RmvSubModel rmvSubModel, GraphicsDevice device, ResourceLibary resourceLib, AnimationPlayer animationPlayer)
         {
+            MeshModel = rmvSubModel;
             Geometry = new Rmv2Geometry(rmvSubModel, device);
             AnimationPlayer = animationPlayer;
 
@@ -130,6 +135,7 @@ namespace View3D.SceneNodes
                 LodIndex = LodIndex,
                 Name = Name + " - Clone",
                 AnimationPlayer = AnimationPlayer,
+                MeshModel = MeshModel
             };
             newItem.Effect = Effect.Clone();
             return newItem;

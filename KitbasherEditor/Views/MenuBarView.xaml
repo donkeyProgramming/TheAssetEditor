@@ -117,9 +117,9 @@
 
 
 
-                <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
+                <ToolBar>
 
-                <Button ToolTip="Divide selected mesh into submeshes" 
+                    <Button ToolTip="Divide selected mesh into submeshes" 
                         Command="{Binding Tools.DivideSubMeshCommand}"
                         IsEnabled="{Binding Tools.DivideSubMeshEnabled, UpdateSourceTrigger=PropertyChanged}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_split.png"/>
@@ -148,6 +148,7 @@
                         IsEnabled="{Binding Tools.DeleteEnabled, UpdateSourceTrigger=PropertyChanged}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_delete.png"/>
                 </Button>
+                </ToolBar>
 
                 <Button ToolTip="Merge selected vertexes" 
                         Command="{Binding Tools.MergeVertexCommand}"

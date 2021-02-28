@@ -1,4 +1,4 @@
-Feature list before V1 done:
+Feature list before V_1 done:
 	PackFile
 		Save packfile dialog - create folder
 	
@@ -9,8 +9,10 @@ Feature list before V1 done:
 		Create new file => VMD, XML, TXT
 		Copy file to main
 		Set main Packfile (the one files are saved to)
-		Close and save treeView items
+		Close and save tabcontrol items
 		Recently used files
+		Right click rmv2 model files => Edit
+		Open editor from file menu
 	
 	Editor:
 		[DONE]Better shader handling
@@ -23,15 +25,57 @@ Feature list before V1 done:
 			Show info model
 			Show info header
 			Show info rmv2
+				How to handle changing skeleton? => SkeletonName + attachmentpoints + vertex bone id
+					Button => use parent
+				
+				Animation:
+					Different skeleton bone ids
+					AttachmentPoints
+					BoneIndexLink
+				
+				General:
+					VertexType	=> Only downgrade => Later, not important (support for one bone for all vertexes is needed)
+					Vertex count
+					Index count
+					ModelName
+					Pivotpoint
+				
+				Graphics:
+					ShaderName
+					MaterialID
+					TextureDir
+					Textures
+					AlphaMode
+				
+				
+				
+				
+			
+			
+					
+				
 			[DONE]electing in tree view should select in scene
 			[DONE]Focus camera - work on selected faces and verts
 			[DONE]Reset camera
+			
+		Different toolbar tools for selection mode (object, vertex, face)
+			Face => Select all faces in part, split selectin into mesh, delete
+			Object => Split, combine, duplicate, delete
+			Vertex => merge, enable snap vertex
+			remove FreezeTransformCommand
 			
 		[DONE]Transform:
 		[DONE]	Scale
 		[DONE]	Rotate
 		[DONE]	Translate
+				When scaling, if ctrl is pressed, scale uniform
+				
+		Group/Ungroup meshses in selection
 		
+		[DONE]Transform window
+		[DONE]	Scale / Flip
+		[DONE]	Rotate 45/90
+			
 		Saving model to packfile
 		Textures
 			Show
@@ -42,18 +86,20 @@ Feature list before V1 done:
 			Edit
 			Display
 		Combine meshes
+		Validate
+		Transparance
 		Skeleton id remapper
+		Scale gizmo with +- keys on numpad. Reset option
 
 	New editors:
 		Model preview
 		VMD editor
 		
 		
-Thursday:
+Planned order:
 	Show whole model info
 		- Skeleton
 		- Attachment points
-		
 		- Summary
 	Show info rmv2
 		- Skeleton bone mapping
@@ -66,3 +112,7 @@ Known bugs:
 	[DONE]Select face, then swap to vertex mode, need to call update before draw error
 	[DONE]Bug with selection in rotation mode, can not select when an axis is active
 	[DONE]selecting mesh while transforming the gizmo causes undo to be correct
+	Splitting mesh sets wrong offset for gizmo
+	Selection manager can not select over gizmo when multiselecting
+	[DONE]Gizmo not rendering correctly behind other meshes -> always render last?
+	

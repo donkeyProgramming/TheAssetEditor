@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using View3D.Animation;
 
 namespace View3D.Utility
 {
@@ -70,6 +71,20 @@ namespace View3D.Utility
             if (_skeletonNameToAnimationMap.ContainsKey(skeletonName) == false)
                 return new List<PackFile>();
             return _skeletonNameToAnimationMap[skeletonName];
+        }
+
+        public AnimationFile GetSkeletonFileFromName(string skeletonName)
+        {
+            foreach (var name in _skeletonFilesNames)
+            {
+                if (name.Contains(skeletonName))
+                {
+                    var file = _pf.FindFile(name);
+                    if (file != null)
+                        return AnimationFile.Create(file as PackFile);
+                }
+            }
+            return null;
         }
     }
 }
