@@ -29,5 +29,7 @@ namespace View3D.Rendering.Geometry
         void RemoveUnusedVertexes(ushort[] newIndexList);
         void UpdateVertexPosition(int vertexId, Vector3 position);
         void RebuildVertexBuffer();
+
+        List<byte> GetUniqeBlendIndices();
     }
 }

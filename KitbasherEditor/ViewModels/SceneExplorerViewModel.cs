@@ -1,4 +1,5 @@
 ﻿using Common;
+using Common.ApplicationSettings;
 using GalaSoft.MvvmLight.Command;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using System;
@@ -16,10 +17,6 @@ using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels
 {
-   
-
-
-
     public class SceneExplorerViewModel : NotifyPropertyChangedImpl, IEditableMeshResolver
     {
         public ObservableCollection<SceneNode> _sceneGraphRootNodes = new ObservableCollection<SceneNode>();
@@ -47,15 +44,19 @@ namespace KitbasherEditor.ViewModels
         public Rmv2ModelNode EditableMeshNode { get; set; }
 
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+
+        bool _updateSelectionManagerOnNodeSelect = true;
         public SceneExplorerViewModel(SceneContainer sceneContainer, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             _selectedLodLvl = LodItem.GetAll.First();
 
             _sceneContainer = sceneContainer;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
+
             _sceneManager = _sceneContainer.GetComponent<SceneManager>();
             _commandExecutor = sceneContainer.GetComponent<CommandExecutor>();
             _selectionManager = sceneContainer.GetComponent<SelectionManager>();
+            _selectionManager.SelectionChanged += SelectionChanged;
 
             SceneGraphRootNodes.Add(_sceneManager.RootNode);
 
@@ -66,6 +67,34 @@ namespace KitbasherEditor.ViewModels
             MakeNodeEditableCommand = new RelayCommand<SceneNode>(MakeNodeEditable);
             DeleteNodeCommand = new RelayCommand<SceneNode>(DeleteNode);
         }
+
+        private void SelectionChanged(ISelectionState state)
+        {
+            if (state is ObjectSelectionState objectSelection)
+            {
+                if (objectSelection.SelectedObjects().Count == 1)
+                {
+                    var obj = objectSelection.SelectedObjects().First();
+                    if (obj != SelectedNode)
+                    {
+                        _updateSelectionManagerOnNodeSelect = false;
+                        SelectedNode = obj as SceneNode;
+                        _updateSelectionManagerOnNodeSelect = true;
+                    }
+
+                    return;
+                }
+            }
+
+            if(SelectedNode != null)
+            {
+                _updateSelectionManagerOnNodeSelect = false;
+                SelectedNode = null;
+                _updateSelectionManagerOnNodeSelect = true;
+            }
+        }
+
+        
 
         void MakeNodeEditable(SceneNode node)
         {
@@ -135,16 +164,19 @@ namespace KitbasherEditor.ViewModels
 
         private void OnNodeSelected(SceneNode selectedNode)
         {
+         
             SelectedNodeViewModel = SceneNodeViewFactory.Create(selectedNode, _skeletonAnimationLookUpHelper);
-
-            var objectState = new ObjectSelectionState();
-            if (selectedNode != null)
+            if (_updateSelectionManagerOnNodeSelect)
             {
-                if (selectedNode is ISelectable selectableNode && selectableNode.IsSelectable)          
-                    objectState.ModifySelection(selectableNode);
-            }
+                var objectState = new ObjectSelectionState();
+                if (selectedNode != null)
+                {
+                    if (selectedNode is ISelectable selectableNode && selectableNode.IsSelectable)
+                        objectState.ModifySelection(selectableNode);
+                }
 
-            _selectionManager.SetState(objectState);
+                _selectionManager.SetState(objectState);
+            }
         }
     }
 

@@ -9,7 +9,8 @@ using View3D.Utility;
 
 namespace View3D.Rendering.Geometry
 {
-    public class CubeMesh : IndexedMeshGeometry<VertexPositionNormalTexture>
+    // If this is ever needed, re-create it as a Rmv2Geometry
+    /*public class CubeMesh : IndexedMeshGeometry<VertexPositionNormalTexture>
     {
         public CubeMesh(GraphicsDevice device, bool createDefaultMesh = true) : base(device)
         {
@@ -119,5 +120,5 @@ namespace View3D.Rendering.Geometry
         {
             _vertexArray[vertexId].Position = position;
         }
-    }
+    }*/
 }

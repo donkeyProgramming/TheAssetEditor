@@ -191,5 +191,7 @@ namespace View3D.Rendering.Geometry
 
         public abstract Vector3 GetVertexById(int id);
         public abstract void UpdateVertexPosition(int vertexId, Vector3 position);
+
+        public abstract List<byte> GetUniqeBlendIndices();
     }
 }

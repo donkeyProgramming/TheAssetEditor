@@ -268,6 +268,11 @@ namespace Filetypes.RigidModel
             for (int i = 0; i < faceCount; i++)
                 IndexList[i] =  BitConverter.ToUInt16(data, faceStart + sizeof(ushort) * i);
         }
+
+        public RmvMesh(MeshAlphaSettings alphaSettings)
+        {
+            AlphaSettings = alphaSettings;
+        }
     }
 
     public class RmvSubModel
@@ -289,6 +294,9 @@ namespace Filetypes.RigidModel
             Textures = LoadTextures(dataArray);
             Mesh = LoadMesh(dataArray);
         }
+
+        private RmvSubModel()
+        { }
 
         RmvSubModelHeader LoadHeader(byte[] dataArray)
         {
@@ -339,10 +347,18 @@ namespace Filetypes.RigidModel
             return new RmvMesh(dataArray, Header.VertextType, (int)vertexStart, Header.VertexCount, (int)faceStart, Header.FaceCount);
         }
 
-        public List<byte> UsedAnimationBones()
-        {
-            return Mesh.VertexList.SelectMany(x => x.BoneIndex).Distinct().ToList();
-        }
+       public RmvSubModel Clone(bool includeMesh = false)
+       {       
+           return new RmvSubModel()
+           {
+               _modelStart = _modelStart,
+               ParentSkeletonName = ParentSkeletonName,
+               Header = Header,
+               AttachmentPoints = AttachmentPoints.Select(x => x).ToList(),
+               Textures = Textures.Select(x => x).ToList(),
+               Mesh = new RmvMesh(Mesh.AlphaSettings)
+           };
+       }
     }
 
    

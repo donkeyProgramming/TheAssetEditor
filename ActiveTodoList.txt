@@ -112,7 +112,8 @@ Known bugs:
 	[DONE]Select face, then swap to vertex mode, need to call update before draw error
 	[DONE]Bug with selection in rotation mode, can not select when an axis is active
 	[DONE]selecting mesh while transforming the gizmo causes undo to be correct
-	Splitting mesh sets wrong offset for gizmo
-	Selection manager can not select over gizmo when multiselecting
 	[DONE]Gizmo not rendering correctly behind other meshes -> always render last?
+	Splitting mesh sets wrong offset for gizmo before moved once
+	Selection manager can not select over gizmo when multiselecting
+	
 	

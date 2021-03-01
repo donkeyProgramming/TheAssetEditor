@@ -24,7 +24,7 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="0.5*"/>
             <RowDefinition Height="5"/>
-            <RowDefinition Height="0.25*"/>
+            <RowDefinition Height="0.5*"/>
         </Grid.RowDefinitions>
 
         <local:MenuBarView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" DataContext="{Binding MenuBar}"/>

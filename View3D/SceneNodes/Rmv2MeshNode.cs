@@ -38,25 +38,13 @@ namespace View3D.SceneNodes
         private Rmv2MeshNode()
         { }
 
-        public Rmv2MeshNode(IGeometry geo, string name, AnimationPlayer animationPlayer, PbrShader shader)
-        {
-            Geometry = geo;
-            AnimationPlayer = animationPlayer;
 
-            Name = name;
-            Position = Vector3.Zero;
-            Scale = Vector3.One;
-            Orientation = Quaternion.Identity;
-
-            Effect = shader;
-
-            // Create rmvModel?
-        }
-
-        public Rmv2MeshNode(RmvSubModel rmvSubModel, GraphicsDevice device, ResourceLibary resourceLib, AnimationPlayer animationPlayer)
+        public Rmv2MeshNode(RmvSubModel rmvSubModel, ResourceLibary resourceLib, AnimationPlayer animationPlayer, IGeometry geometry = null)
         {
             MeshModel = rmvSubModel;
-            Geometry = new Rmv2Geometry(rmvSubModel, device);
+            Geometry = geometry;
+            if (Geometry == null)
+                Geometry = new Rmv2Geometry(rmvSubModel, resourceLib.GraphicsDevice);
             AnimationPlayer = animationPlayer;
 
             Name = rmvSubModel.Header.ModelName;
@@ -76,6 +64,7 @@ namespace View3D.SceneNodes
             (Effect as PbrShader).SetTexture(glossTexture, TexureType.Gloss);
         }
 
+
         public IShader Effect { get; set; }
         public int LodIndex { get; set; } = -1;
         public IGeometry Geometry { get; set; }
@@ -83,6 +72,19 @@ namespace View3D.SceneNodes
         public void Update(GameTime time)
         {
 
+        }
+
+        public Rmv2ModelNode GetParentModel()
+        {
+            var parent = Parent;
+            while (parent != null)
+            {
+                if (parent is Rmv2ModelNode modelNode)
+                    return modelNode;
+                parent = parent.Parent;
+            }
+
+            return null;
         }
 
         public Vector3 GetObjectCenter()
@@ -98,10 +100,9 @@ namespace View3D.SceneNodes
                 for (int i = 0; i < 256; i++)
                     data[i] = Matrix.Identity;
 
-                var player = AnimationPlayer;
-                if (player != null)
+                if (AnimationPlayer != null)
                 {
-                    var frame = player.GetCurrentFrame();
+                    var frame = AnimationPlayer.GetCurrentFrame();
                     if (frame != null)
                     {
                         for (int i = 0; i < frame.BoneTransforms.Count(); i++)
@@ -129,6 +130,7 @@ namespace View3D.SceneNodes
                 Position = Position,
                 Orientation = Orientation,
                 Scale = Scale,
+                Parent = Parent,
                 SceneManager = SceneManager,
                 IsEditable = IsEditable,
                 IsVisible = IsVisible,

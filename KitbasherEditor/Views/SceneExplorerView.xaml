@@ -57,7 +57,7 @@
            ItemTemplateSelector="{StaticResource TreeItemDataTemplateSelector}">
             
             <b:Interaction.Behaviors>
-                <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedNode, Mode=TwoWay}" />
+                <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedNode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
             </b:Interaction.Behaviors>
             
             <TreeView.Resources>

@@ -40,7 +40,7 @@ namespace View3D.SceneNodes
 
                 for (int modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
                 {
-                    var node = new Rmv2MeshNode(model.MeshList[lodIndex][modelIndex], device, resourceLib, animationPlayer);
+                    var node = new Rmv2MeshNode(model.MeshList[lodIndex][modelIndex], resourceLib, animationPlayer);
                     node.LodIndex = lodIndex;
                     lodNode.AddObject(node);
                 }
@@ -64,7 +64,7 @@ namespace View3D.SceneNodes
 
                 for (int modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
                 {
-                    var node = new Rmv2MeshNode(model.MeshList[lodIndex][modelIndex], device, resourceLibary, animationPlayer);
+                    var node = new Rmv2MeshNode(model.MeshList[lodIndex][modelIndex], resourceLibary, animationPlayer);
                     node.LodIndex = lodIndex;
                     lodNode.AddObject(node);
                 }

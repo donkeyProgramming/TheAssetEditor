@@ -78,5 +78,36 @@ namespace View3D.Rendering.Geometry
         {
             _vertexArray[vertexId].Position = new Vector4(position, 1);
         }
+
+        public override List<byte> GetUniqeBlendIndices()
+        {
+            if (WeightCount == 0)
+            {
+                return new List<byte>();
+            }
+            else if (WeightCount == 1 || WeightCount == 4)
+            {
+                var output = new List<byte>();
+                for (int i = 0; i < _vertexArray.Count(); i++)
+                {
+                    if (WeightCount == 1)
+                        output.Add((byte)_vertexArray[i].BlendIndices.X);
+                    else if (WeightCount == 4)
+                    {
+                        output.Add((byte)_vertexArray[i].BlendIndices.X);
+                        output.Add((byte)_vertexArray[i].BlendIndices.Y);
+                        output.Add((byte)_vertexArray[i].BlendIndices.Z);
+                        output.Add((byte)_vertexArray[i].BlendIndices.W);
+                    }
+                    else
+                        throw new Exception("Unknown weight count");
+                }
+
+                return output.Distinct().ToList();
+            }
+            else
+                throw new Exception("Unknown weight count"); 
+
+        }
     }
 }

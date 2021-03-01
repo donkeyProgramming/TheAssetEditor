@@ -1,4 +1,5 @@
 ﻿using Common;
+using Common.ApplicationSettings;
 using Filetypes.RigidModel;
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor.Services;
@@ -29,7 +30,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public string SkeletonName { get { return _skeletonName; } set { SetAndNotify(ref _skeletonName, value); } }
         public OnSeachDelegate FilterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 
-        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+
 
         ObservableCollection<RmvAttachmentPoint> _attachmentPoints;
         public ObservableCollection<RmvAttachmentPoint> AttachmentPoints { get { return _attachmentPoints; } set { SetAndNotify(ref _attachmentPoints, value); } }
@@ -44,6 +45,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public ICommand RemoveAttachmentPointCommand { get; set; }
 
         Rmv2ModelNode _modelNode;
+        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        
 
         public ModelSceneNodeViewModel(Rmv2ModelNode node, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
@@ -52,7 +55,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
              FileName = node.Model.FileName;
             SelectedVersion = "7";
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
-
+ 
             SkeletonNameList = _skeletonAnimationLookUpHelper.GetAllSkeletonFileNames();
             SkeletonName = SkeletonNameList.FirstOrDefault(x => x.Contains(node.Model.Header.SkeletonName));
 

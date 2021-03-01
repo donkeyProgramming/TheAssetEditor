@@ -24,6 +24,7 @@ namespace AssetEditor
         public DependencyInjectionConfig()
         {
             Logging.Configure(Serilog.Events.LogEventLevel.Information);
+            DirectoryHelper.EnsureCreated();
             ResourceController.Load();
             GameInformationFactory.Create();
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common.ApplicationSettings;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using View3D.SceneNodes;

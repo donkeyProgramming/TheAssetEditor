@@ -1,4 +1,5 @@
 ﻿using Common;
+using Filetypes.RigidModel;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
@@ -46,15 +47,27 @@ namespace View3D.Commands.Object
             _originalSelectionState = _selectionManager.GetStateCopy();
 
             var meshService = new MeshSplitterService();
-            var newMeshes = meshService.SplitMesh(_objectToSplit.Geometry);
 
+
+            var newMeshes = meshService.SplitMesh(_objectToSplit.Geometry);
             _logger.Here().Information($"{newMeshes.Count} meshes generated from splitting");
 
             int counter = 0;
             foreach (var mesh in newMeshes)
             {
+
+                //var newMeshHeader = originalRmvModel.Clone();
+                // Create the model from mesh
+
+
+
                 var hack = _objectToSplit as Rmv2MeshNode;
-                var meshNode = new Rmv2MeshNode(mesh, $"{_objectToSplit.Name}_submesh_{counter++}", hack.AnimationPlayer, hack.Effect.Clone() as PbrShader); 
+                var originalRmvModel = hack.MeshModel;
+
+
+
+                var meshNode = new Rmv2MeshNode(hack.MeshModel.Clone(), _resourceLib,  hack.AnimationPlayer, mesh);
+                meshNode.Name = $"{_objectToSplit.Name}_submesh_{counter++}";
                 _newMeshes.Add(meshNode);
                 _editableMeshResolver.GetEditableMeshNode().AddObject(meshNode);
             }

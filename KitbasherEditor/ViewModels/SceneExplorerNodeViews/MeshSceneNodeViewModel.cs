@@ -1,9 +1,14 @@
 ﻿using Common;
+using Common.ApplicationSettings;
 using CommonControls.MathViews;
 using Filetypes.RigidModel;
 using GalaSoft.MvvmLight.CommandWpf;
+using KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping;
+using KitbasherEditor.Views.EditorViews;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 using View3D.SceneNodes;
@@ -37,8 +42,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public VertexFormat VertexType { get { return _vertexType; } set { SetAndNotify(ref _vertexType, value); } }
         public IEnumerable<VertexFormat> PossibleVertexTypes { get; set; }
 
-        public int VertexCount { get => _meshNode.MeshModel.Mesh.VertexList.Length; }
-        public int IndexCount { get => _meshNode.MeshModel.Mesh.IndexList.Length; }
+        public int VertexCount { get => _meshNode.Geometry.VertexCount(); }
+        public int IndexCount { get => _meshNode.Geometry.GetIndexCount(); }
 
 
         bool _drawPivotPoint = false;
@@ -63,6 +68,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
     public class MeshSceneNodeViewModel_Animation : NotifyPropertyChangedImpl
     {
         Rmv2MeshNode _meshNode;
+        SkeletonAnimationLookUpHelper _animLookUp;
 
         string _skeletonName;
         public string SkeletonName { get { return _skeletonName; } set { SetAndNotify(ref _skeletonName, value); } }
@@ -80,9 +86,10 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public List<AnimatedBone> AnimatedBones { get { return _animatedBones; } set { SetAndNotify(ref _animatedBones, value); } }
         public ICommand OpenBoneRemappingToolCommand { get; set; }
 
-        public MeshSceneNodeViewModel_Animation(Rmv2MeshNode meshNode, SkeletonAnimationLookUpHelper animLookUp)
+        public MeshSceneNodeViewModel_Animation(Rmv2MeshNode meshNode, SkeletonAnimationLookUpHelper animLookUp )
         {
             _meshNode = meshNode;
+            _animLookUp = animLookUp;
 
             SkeletonName = _meshNode.MeshModel.ParentSkeletonName;
             UseParentSkeletonCommand = new RelayCommand(UseParentSkeleton);
@@ -90,9 +97,9 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             AttachmentPoints = _meshNode.MeshModel.AttachmentPoints.OrderBy(x => x.BoneIndex).ToList();
             UseParentAttachmentPointsCommand = new RelayCommand(UseParentAttachmentPoints);
 
-            var skeletonFile = animLookUp.GetSkeletonFileFromName(SkeletonName);
-            var bones = _meshNode.MeshModel.UsedAnimationBones();
-            AnimatedBones = bones.Select(x => new AnimatedBone() { BoneIndex = x, Name = skeletonFile.Bones[x].Name }).OrderBy(x=>x.BoneIndex).ToList();
+            var skeletonFile = _animLookUp.GetSkeletonFileFromName(SkeletonName);
+            var bones = _meshNode.Geometry.GetUniqeBlendIndices();
+            AnimatedBones = bones.Select(x => new AnimatedBone() { BoneIndex = x, Name = skeletonFile.Bones[x].Name }).OrderBy(x => x.BoneIndex).ToList();
             OpenBoneRemappingToolCommand = new RelayCommand(OpenBoneRemappingTool);
         }
 
@@ -101,16 +108,122 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         void UseParentAttachmentPoints() { }
 
-        void OpenBoneRemappingTool() { }
+        void OpenBoneRemappingTool()
+        {
+            RemappedAnimatedBoneConfiguration config = new RemappedAnimatedBoneConfiguration();
+
+            var existingSkeletonFile = _animLookUp.GetSkeletonFileFromName(SkeletonName);
+            config.MeshSkeletonName = SkeletonName;
+            config.MeshBones = AnimatedBone.CreateFromSkeleton(existingSkeletonFile, AnimatedBones.Select(x=>x.BoneIndex).ToList());
+
+            var modelNode = _meshNode.GetParentModel();
+            var newSkeletonFile = _animLookUp.GetSkeletonFileFromName(modelNode.Model.Header.SkeletonName);
+            config.ParnetModelSkeletonName = modelNode.Model.Header.SkeletonName;
+            config.ParentModelBones = AnimatedBone.CreateFromSkeleton(newSkeletonFile);
+
+            AnimatedBlendIndexRemappingWindow w = new AnimatedBlendIndexRemappingWindow()
+            {
+                DataContext = new AnimatedBlendIndexRemappingViewModel(config)
+            };
+
+            w.ShowDialog();
+        }
+
     }
 
-    public class AnimatedBone
+    public class AnimatedBone : NotifyPropertyChangedImpl
     {
         string _name;
         public string Name { get { return _name; } set { _name = value; } }
 
         int _boneIndex;
         public int BoneIndex { get { return _boneIndex; } set { _boneIndex = value; } }
+
+        public ObservableCollection<AnimatedBone> Children { get; set; } = new ObservableCollection<AnimatedBone>();
+
+        public bool IsUsedByCurrentModel { get; set; } = false;
+
+        string _mappedBoneName;
+        public string MappedBoneName { get { return _mappedBoneName; } set { SetAndNotify(ref _mappedBoneName, value); } }
+
+        int _mappedBoneIndex = -1;
+        public int MappedBoneIndex { get { return _mappedBoneIndex; } set { SetAndNotify(ref _mappedBoneIndex, value); } }
+
+        public override string ToString()
+        {
+            return Name + " -> " + MappedBoneName;
+        }
+
+        bool isVisible = true;
+        [JsonIgnore]
+        public bool IsVisible { get { return isVisible; } set { SetAndNotify(ref isVisible, value); } }
+
+        public void ClearMapping()
+        {
+            MappedBoneName = "";
+            MappedBoneIndex = -1;
+
+            foreach (var child in Children)
+                child.ClearMapping();
+        }
+
+        public AnimatedBone Copy(bool includeChildren = false)
+        {
+            if (includeChildren)
+                throw new NotImplementedException();
+
+            return new AnimatedBone()
+            {
+                Name = Name,
+                BoneIndex = BoneIndex,
+                MappedBoneIndex = MappedBoneIndex,
+                MappedBoneName = MappedBoneName,
+                IsUsedByCurrentModel = IsUsedByCurrentModel
+            };
+        }
+
+        public static ObservableCollection<AnimatedBone> CreateFromSkeleton(AnimationFile file, List<int> boneIndexUsedByModel = null)
+        {
+            var output = new ObservableCollection<AnimatedBone>();
+
+            foreach (var boneInfo in file.Bones)
+            {
+                var parent = FindBoneInList(boneInfo.ParentId, output);
+                var newNode = new AnimatedBone() { BoneIndex = boneInfo.Id, Name = boneInfo.Name };
+                if (boneIndexUsedByModel == null)
+                    newNode.IsUsedByCurrentModel = true;
+                else
+                    newNode.IsUsedByCurrentModel = boneIndexUsedByModel.Contains((byte)boneInfo.Id);
+
+                if (parent == null)
+                    output.Add(newNode);
+                else
+                    parent.Children.Add(newNode);
+            }
+            return output;
+        }
+
+        static AnimatedBone FindBoneInList(int parentId, IEnumerable<AnimatedBone> boneList)
+        {
+            foreach (var bone in boneList)
+            {
+                if (bone.BoneIndex == parentId)
+                    return bone;
+            }
+
+            foreach (var bone in boneList)
+            {
+                var res = FindBoneInList(parentId, bone.Children);
+                if (res != null)
+                    return res;
+            }
+
+            return null;
+        }
     }
+
+
+
+
 }
 

@@ -1,0 +1,272 @@
+﻿<UserControl x:Class="KitbasherEditor.Views.EditorViews.AnimatedBlendIndexRemappingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews"
+      
+             xmlns:editorviews="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
+             xmlns:ei1="http://schemas.microsoft.com/xaml/behaviors" 
+             xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+
+        <valueconverters:BoolToColourConverter x:Key="ColourConverter" TrueValue="Black" FalseValue="Gray"/>
+        <valueconverters:BoolToVisibilityConverter x:Key="BoolToVisConverter" TrueValue="Visible" FalseValue="Collapsed"/>
+        <PathGeometry x:Key="TreeArrow" Figures="M0,0 L0,6 L6,0 z"/>
+
+        <Style x:Key="ExpandCollapseToggleStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Width" Value="16"/>
+            <Setter Property="Height" Value="16"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border Width="16" Height="16" Background="Transparent" Padding="5,5,5,5">
+                            <Path x:Name="ExpandPath" Fill="Transparent" Stroke="#FF989898" Data="{StaticResource TreeArrow}">
+                                <Path.RenderTransform>
+                                    <RotateTransform Angle="135" CenterX="3" CenterY="3"/>
+                                </Path.RenderTransform>
+                            </Path>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Stroke" TargetName="ExpandPath" Value="#FF1BBBFA"/>
+                                <Setter Property="Fill" TargetName="ExpandPath" Value="Transparent"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="RenderTransform" TargetName="ExpandPath">
+                                    <Setter.Value>
+                                        <RotateTransform Angle="180" CenterX="3" CenterY="3"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Fill" TargetName="ExpandPath" Value="#FF595959"/>
+                                <Setter Property="Stroke" TargetName="ExpandPath" Value="#FF262626"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="BoneTreeViewStyle" TargetType="{x:Type TreeViewItem}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="HorizontalContentAlignment" Value="{Binding Path=HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="VerticalContentAlignment" Value="{Binding Path=VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="Padding" Value="1,0,0,0"/>
+            <Setter Property="IsExpanded" Value="True"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="Visibility" Value="Visible" />
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TreeViewItem}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition MinWidth="19" Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <ToggleButton x:Name="Expander" Style="{StaticResource ExpandCollapseToggleStyle}" ClickMode="Press" IsChecked="{Binding Path=IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"/>
+                            <Border x:Name="Bd" SnapsToDevicePixels="true" Grid.Column="1" Grid.ColumnSpan="2" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter x:Name="PART_Header" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" ContentSource="Header"/>
+                            </Border>
+                            <ItemsPresenter x:Name="ItemsHost" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded" Value="false">
+                                <Setter Property="Visibility" TargetName="ItemsHost" Value="Collapsed"/>
+                            </Trigger>
+                     
+                            <Trigger Property="HasItems" Value="false">
+                                <Setter Property="Visibility" TargetName="Expander" Value="Hidden"/>
+                            </Trigger>
+                            <DataTrigger Binding="{Binding IsVisible}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                            <Trigger Property="IsSelected" Value="true">
+                                <Setter Property="Background" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsSelected" Value="true"/>
+                                    <Condition Property="IsSelectionActive" Value="false"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                            </MultiTrigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+
+
+        </Style>
+
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Column="0" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel  Grid.Row="0" Orientation="Horizontal">
+                <TextBlock  Text="Existing Skeleton bones - " FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
+                <TextBlock  Text="{Binding MeshBones.SkeletonName, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
+            </StackPanel>
+
+
+            <TextBox Grid.Row="1" BorderBrush="Black" Text="{Binding MeshBones.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <Button Grid.Row="1" Grid.Column ="1"  Content="Clear" IsEnabled="False" />
+
+
+            <CheckBox Grid.Row="2" VerticalContentAlignment="Center"
+                      Content="Only show used bones"
+                      IsChecked="{Binding MeshBones.OnlyShowUsedBones, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+            <TreeView 
+                Grid.Row="3"
+                Grid.ColumnSpan="2"
+                HorizontalContentAlignment="Stretch" 
+                ItemsSource="{Binding MeshBones.VisibleBones}" 
+                ItemContainerStyle="{StaticResource BoneTreeViewStyle}">
+
+                <b:Interaction.Behaviors>
+                    <editorviews:BindableSelectedItemBehavior SelectedItem="{Binding MeshBones.SelectedBone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </b:Interaction.Behaviors>
+
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                        <Grid HorizontalAlignment="Stretch" >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock  Grid.Column="0" 
+                                        Text="{Binding Name}"
+                                        Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+
+                            <TextBlock Grid.Column="1" Text="{Binding MappedBoneName, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+            <Grid Grid.Row="4" Grid.ColumnSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Button Grid.Row="0" Grid.Column="0"  Command="{Binding AutoMapSelfAndChildrenByNameCommand}" CommandParameter="{Binding SelectedOriginalBone}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock>Auto map "</TextBlock>
+                        <TextBlock Text="{Binding MeshBones.SelectedBone.Name, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock>" based on name</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button Grid.Row="0" Grid.Column="1" Command="{Binding AutoMapSelfAndChildrenByHierarchyCommand}" CommandParameter="{Binding SelectedOriginalBone}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock>Auto map "</TextBlock>
+                        <TextBlock Text="{Binding MeshBones.SelectedBone.Name, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock>" based on hierarchy</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button Grid.Row="1" Grid.Column="0" Command="{Binding ClearBindingSelfAndChildrenCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock>Clear mapping for "</TextBlock>
+                        <TextBlock Text="{Binding MeshBones.SelectedBone.Name, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock>"</TextBlock>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+
+
+            <StackPanel  Grid.Row="0" Orientation="Horizontal">
+                <TextBlock  Text="Parnet Model Skeleton bones - " FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
+                <TextBlock  Text="{Binding ParnetModelBones.SkeletonName, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
+            </StackPanel>
+
+            <TextBox Grid.Row="1" BorderBrush="Black" Text="{Binding ParnetModelBones.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <Button Grid.Row="1" Grid.Column ="1"  Content="Clear" IsEnabled="False"/>
+            <TreeView 
+                Grid.Row="2"
+                Grid.ColumnSpan="2"
+                HorizontalContentAlignment="Stretch" 
+                ItemsSource="{Binding ParnetModelBones.VisibleBones}" 
+                ItemContainerStyle="{StaticResource BoneTreeViewStyle}">
+
+ 
+                <b:Interaction.Behaviors>
+                    <editorviews:BindableSelectedItemBehavior SelectedItem="{Binding ParnetModelBones.SelectedBone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </b:Interaction.Behaviors>
+
+                <TreeView.ItemTemplate >
+                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                        <TextBlock  Grid.Column="0" Text="{Binding Name}"/>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+        </Grid>
+
+
+        <DockPanel Grid.Row="1" Grid.Column="0" Margin="0,3,0,3">
+            <TextBlock Text="Config:" VerticalAlignment="Center" />
+            <Button Command="{Binding LoadConfigurationCommand}" DockPanel.Dock="Right" Width="50">Load</Button>
+            <Button Command="{Binding SaveConfigurationCommand}" DockPanel.Dock="Right" Width="50">Save</Button>
+            <ComboBox ItemsSource="{Binding AllConfigPaths, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedItem="{Binding CurrentConfigPath, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                      DockPanel.Dock="Right" Margin="5,0,2,0"/>
+        </DockPanel>
+
+    </Grid>
+</UserControl>
