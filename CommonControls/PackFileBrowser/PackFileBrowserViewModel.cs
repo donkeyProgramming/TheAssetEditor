@@ -198,23 +198,5 @@ namespace CommonControls.PackFileBrowser
             var node = Files.FirstOrDefault(x => x.FileOwner == container);
             Files.Remove(node);
         }
-
-        TreeNode Find(IPackFile pack, TreeNode node)
-        {
-            //if (node.Item == pack)
-            //    return node;
-            //
-            //if (node.Children != null)
-            //{
-            //    foreach (TreeNode child in node.Children)
-            //    {
-            //        var res = Find(pack, child);
-            //        if (res != null)
-            //            return res;
-            //    }
-            //}
-            //
-            return null;
-        }
     }
 }

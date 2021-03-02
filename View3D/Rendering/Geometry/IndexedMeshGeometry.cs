@@ -88,6 +88,8 @@ namespace View3D.Rendering.Geometry
             for (int i = 0; i < count; i++)
                 points[i] = GetVertexById(i);
             _boundingBox = BoundingBox.CreateFromPoints(points);
+
+            UpdateMeshCenter();
         }
 
         public virtual void Dispose()
@@ -162,7 +164,10 @@ namespace View3D.Rendering.Geometry
             //_meshCenter = _meshCenter / VertexCount();
 
             BuildBoundingBox();
+        }
 
+        void UpdateMeshCenter()
+        {
             var corners = _boundingBox.GetCorners();
             _meshCenter = Vector3.Zero;
             for (int i = 0; i < corners.Length; i++)
@@ -193,5 +198,6 @@ namespace View3D.Rendering.Geometry
         public abstract void UpdateVertexPosition(int vertexId, Vector3 position);
 
         public abstract List<byte> GetUniqeBlendIndices();
+        public abstract void UpdateAnimationIndecies(List<IndexRemapping> remapping);
     }
 }

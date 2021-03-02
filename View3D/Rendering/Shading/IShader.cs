@@ -59,6 +59,60 @@ namespace View3D.Rendering.Shading
         }
     }
 
+    public class NewShader : IShader, IShaderTextures
+    {
+        public Effect Effect { get; private set; }
+        Dictionary<TexureType, EffectParameter> _textures = new Dictionary<TexureType, EffectParameter>();
+
+        public NewShader(ResourceLibary resourceLibary)
+        {
+            Effect = resourceLibary.GetEffect(ShaderTypes.BasicEffect);
+            _textures.Add(TexureType.Normal, Effect.Parameters["NormalTexture"]);
+
+            Effect.Parameters["DiffuseColor"].SetValue(Vector3.One);
+            Effect.Parameters["SpecularColor"].SetValue(Vector3.One);
+            Effect.Parameters["SpecularPower"].SetValue(16.0f);
+
+            SetLight(0, new Vector3(-0.5265408f, -0.5735765f, -0.6275069f), new Vector3(1, 0.9607844f, 0.8078432f), new Vector3(1, 0.9607844f, 0.8078432f));
+            SetLight(1, new Vector3(0.7198464f, 0.3420201f, 0.6040227f), new Vector3(0.9647059f, 0.7607844f, 0.4078432f), Vector3.Zero);
+            SetLight(2, new Vector3(0.4545195f, -0.7660444f, 0.4545195f), new Vector3(0.3231373f, 0.3607844f, 0.3937255f), new Vector3(0.3231373f, 0.3607844f, 0.3937255f));
+        }
+
+        void SetLight(int lightIndex, Vector3 direction, Vector3 diffuseColour, Vector3 specularColour)
+        {
+            Effect.Parameters[$"DirLight{lightIndex}Direction"].SetValue(direction);
+            Effect.Parameters[$"DirLight{lightIndex}DiffuseColor"].SetValue(diffuseColour);
+            Effect.Parameters[$"DirLight{lightIndex}SpecularColor"].SetValue(specularColour);
+        }
+
+        public bool UseAlpha { set { /*Effect.Parameters["UseAlpha"].SetValue(value); */} }
+        public void SetTexture(Texture2D texture, TexureType type)
+        {
+            _textures[type].SetValue(texture);
+        }
+
+        public IShader Clone()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetCommonParmeters(CommonShaderParameters commonShaderParameters, Matrix modelMatrix)
+        {
+            Effect.Parameters["EyePosition"].SetValue(commonShaderParameters.CameraPosition);
+            Effect.Parameters["World"].SetValue(modelMatrix);
+            Effect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(modelMatrix)));
+            Effect.Parameters["WorldViewProj"].SetValue(modelMatrix * commonShaderParameters.View * commonShaderParameters.Projection);
+
+            //Effect.Parameters["View"].SetValue(commonShaderParameters.View);
+            //Effect.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
+            //
+            //Effect.Parameters["cameraLookAt"].SetValue(commonShaderParameters.CameraLookAt);
+            //Effect.Parameters["ViewInverse"].SetValue(Matrix.Invert(commonShaderParameters.View));
+            //Effect.Parameters["EnvMapTransform"].SetValue((Matrix.CreateRotationY(commonShaderParameters.EnvRotate)));
+            
+        }
+    }
+
     public class PbrShader : IShader, IShaderTextures, IShaderAnimation
     {
         public Effect Effect { get; private set; }

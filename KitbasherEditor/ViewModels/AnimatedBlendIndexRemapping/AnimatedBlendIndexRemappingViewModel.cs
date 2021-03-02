@@ -42,8 +42,8 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
             get { return _selectedBone; }
             set
             {
-                if (_selectedBone == value)
-                    return;
+                //if (_selectedBone == value)
+                //    return;
                 SetAndNotify(ref _selectedBone, value);
                 BoneSelected?.Invoke(_selectedBone);
             }
@@ -199,7 +199,6 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
                     AllConfigPaths.Add(saveFileDialog.FileName);
 
                 CurrentConfigPath = saveFileDialog.FileName;
-
             }
         }
 

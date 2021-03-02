@@ -43,7 +43,7 @@ namespace View3D.SceneNodes
             if (skeleton != null)
                 Name = _animationProvider.Skeleton.SkeletonName;
 
-            if (IsVisible && skeleton != null && _animationProvider.IsActive)
+            if (IsVisible && skeleton != null/* && _animationProvider.IsActive*/)
             {
                 //skeleton.Update();
                 _lineRenderer.Clear();

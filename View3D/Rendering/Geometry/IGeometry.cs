@@ -8,6 +8,9 @@ using View3D.Rendering.Shading;
 
 namespace View3D.Rendering.Geometry
 {
+
+
+
     public interface IGeometry : IDisposable
     {
         public void ApplyMesh(IShader effect, GraphicsDevice device);
@@ -31,5 +34,18 @@ namespace View3D.Rendering.Geometry
         void RebuildVertexBuffer();
 
         List<byte> GetUniqeBlendIndices();
+        void UpdateAnimationIndecies(List<IndexRemapping> remapping);
+    }
+
+    public class IndexRemapping
+    {
+        public IndexRemapping(byte originalValue, byte newValue)
+        {
+            OriginalValue = originalValue;
+            NewValue = newValue;
+        }
+
+        public byte OriginalValue { get; set; }
+        public byte NewValue { get; set; }
     }
 }

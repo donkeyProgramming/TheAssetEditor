@@ -68,7 +68,9 @@ namespace KitbasherEditor.ViewModels
         public ICommand LastFrameCommand { get; set; }
 
         bool _isEnabled;
-        public bool IsEnabled { get { return _isEnabled; } set { SetAndNotify(ref _isEnabled, value); Player.IsEnabled = value; } }
+        public bool IsEnabled { get { return _isEnabled; } set { SetAndNotify(ref _isEnabled, value); OnEnableChanged(IsEnabled); } }
+
+
 
         // interface - ISkeletonProvider
         public bool IsActive => IsEnabled;
@@ -191,6 +193,26 @@ namespace KitbasherEditor.ViewModels
                 Player.SetAnimation(animClip, Skeleton);
                 Player.Play();
             }
+        }
+
+        private void OnEnableChanged(bool isEnabled)
+        {
+            if (isEnabled && Animation != null)
+            {
+                var animFile = AnimationFile.Create(Animation);
+                var animClip = new AnimationClip(animFile);
+
+                MaxFrames = animClip.DynamicFrames.Count;
+                CurrentFrame = 0;
+
+                Player.SetAnimation(animClip, Skeleton);
+            }
+            else
+            {
+                Player.SetAnimation(null, Skeleton);
+            }
+
+            Player.IsEnabled = isEnabled;
         }
     }
 }

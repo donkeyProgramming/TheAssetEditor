@@ -1,4 +1,5 @@
 ﻿using Common;
+using FileTypes.PackFiles.Models;
 using FileTypes.PackFiles.Services;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ namespace CommonControls.PackFileBrowser
     /// </summary>
     public partial class PackFileBrowserWindow : Window
     {
+        public PackFile SelectedFile { get; set; }
         public PackFileBrowserViewModel ViewModel { get; set; }
         public PackFileBrowserWindow(PackFileService packfileService)
         {
@@ -30,12 +32,16 @@ namespace CommonControls.PackFileBrowser
 
         private void ViewModel_FileOpen(IPackFile file)
         {
-
+            SelectedFile = file as PackFile;
+            DialogResult = true;
+            Close();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-
+            SelectedFile = ViewModel.SelectedItem?.Item as PackFile;
+            DialogResult = true;
+            Close();
         }
     }
 }

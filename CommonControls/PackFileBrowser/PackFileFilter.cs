@@ -25,6 +25,9 @@ namespace CommonControls.PackFileBrowser
             }
         }
 
+        List<string> _extentionFilter;
+
+
         public PackFileFilter(ObservableCollection<TreeNode> nodes)
         {
             _nodeCollection = nodes;
@@ -53,14 +56,37 @@ namespace CommonControls.PackFileBrowser
                 HasChildWithFilterMatch(item, text);
         }
 
+        public void SetExtentions(List<string> extentions)
+        {
+            _extentionFilter = extentions;
+            Filter(FilterText);
+        }
+
         bool HasChildWithFilterMatch(TreeNode file, string filterText)
         {
             if (file.NodeType == NodeType.File)
             {
-                if (string.IsNullOrWhiteSpace(filterText) || file.Name.Contains(filterText))
+                bool hasValidExtention = true;
+                if (_extentionFilter != null)
                 {
-                    file.IsVisible = true;
-                    return true;
+                    hasValidExtention = false;
+                    foreach (var extention in _extentionFilter)
+                    {
+                        if (file.Name.Contains(extention))
+                        {
+                            hasValidExtention = true; 
+                            continue;
+                        }
+                    }
+                }
+
+                if (hasValidExtention)
+                {
+                    if (string.IsNullOrWhiteSpace(filterText) || file.Name.Contains(filterText))
+                    {
+                        file.IsVisible = true;
+                        return true;
+                    }
                 }
             }
 

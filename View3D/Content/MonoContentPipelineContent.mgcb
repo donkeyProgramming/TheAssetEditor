@@ -108,6 +108,12 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/DefaultFont.spritefont
 
+#begin Shaders/Geometry/BasicShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/Geometry/BasicShader.fx
+
 #begin Shaders/InstancingShader.fx
 /importer:EffectImporter
 /processor:EffectProcessor

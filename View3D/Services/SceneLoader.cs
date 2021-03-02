@@ -27,10 +27,10 @@ namespace View3D.Services
         GraphicsDevice _device;
         ResourceLibary _resourceLibary;
 
-        public SceneLoader(PackFileService packFileService, GraphicsDevice device, ResourceLibary resourceLibary)
+        public SceneLoader(PackFileService packFileService, ResourceLibary resourceLibary)
         {
             _packFileService = packFileService;
-            _device = device;
+            _device = resourceLibary.GraphicsDevice;
             _resourceLibary = resourceLibary;
         }
 

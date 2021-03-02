@@ -109,5 +109,26 @@ namespace View3D.Rendering.Geometry
                 throw new Exception("Unknown weight count"); 
 
         }
+
+        public override void UpdateAnimationIndecies(List<IndexRemapping> remapping)
+        {
+            for(int i = 0; i < _vertexArray.Length; i++)
+            {
+                _vertexArray[i].BlendIndices.X = GetValue((byte)_vertexArray[i].BlendIndices.X, remapping);
+                _vertexArray[i].BlendIndices.Y = GetValue((byte)_vertexArray[i].BlendIndices.Y, remapping);
+                _vertexArray[i].BlendIndices.Z = GetValue((byte)_vertexArray[i].BlendIndices.Z, remapping);
+                _vertexArray[i].BlendIndices.W = GetValue((byte)_vertexArray[i].BlendIndices.W, remapping);
+            }
+
+            RebuildVertexBuffer();
+        }
+
+        byte GetValue(byte currentValue, List<IndexRemapping> remappingList)
+        {
+            var remappingItem = remappingList.FirstOrDefault(x => x.OriginalValue == currentValue);
+            if (remappingItem != null)
+                return remappingItem.NewValue;
+            return currentValue;
+        }
     }
 }

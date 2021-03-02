@@ -55,16 +55,8 @@ namespace View3D.Commands.Object
             int counter = 0;
             foreach (var mesh in newMeshes)
             {
-
-                //var newMeshHeader = originalRmvModel.Clone();
-                // Create the model from mesh
-
-
-
                 var hack = _objectToSplit as Rmv2MeshNode;
                 var originalRmvModel = hack.MeshModel;
-
-
 
                 var meshNode = new Rmv2MeshNode(hack.MeshModel.Clone(), _resourceLib,  hack.AnimationPlayer, mesh);
                 meshNode.Name = $"{_objectToSplit.Name}_submesh_{counter++}";

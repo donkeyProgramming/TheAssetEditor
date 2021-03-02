@@ -1,4 +1,5 @@
-﻿using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
+﻿using KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping;
+using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

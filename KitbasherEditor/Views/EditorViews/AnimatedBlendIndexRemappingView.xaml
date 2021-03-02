@@ -143,7 +143,7 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel  Grid.Row="0" Orientation="Horizontal">
-                <TextBlock  Text="Existing Skeleton bones - " FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
+                <TextBlock  Text="Current model bones - " FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
                 <TextBlock  Text="{Binding MeshBones.SkeletonName, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
             </StackPanel>
 
@@ -176,11 +176,39 @@
                                 <ColumnDefinition Width="auto"/>
                             </Grid.ColumnDefinitions>
 
-                            <TextBlock  Grid.Column="0" 
-                                        Text="{Binding Name}"
+                            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                <TextBlock  
+                                            Text="{Binding Name}"
+                                            Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                                <TextBlock  
+                                        Text="["
                                         Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
 
-                            <TextBlock Grid.Column="1" Text="{Binding MappedBoneName, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock  
+                                        Text="{Binding BoneIndex}"
+                                        Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                                
+                                <TextBlock  
+                                        Text="]"
+                                        Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <TextBlock  
+                                            Text="{Binding MappedBoneName}"
+                                            Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                                <TextBlock  
+                                        Text="["
+                                        Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+
+                                <TextBlock  
+                                        Text="{Binding MappedBoneIndex}"
+                                        Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+
+                                <TextBlock  
+                                        Text="]"
+                                        Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                            </StackPanel>
                         </Grid>
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
@@ -232,7 +260,7 @@
 
 
             <StackPanel  Grid.Row="0" Orientation="Horizontal">
-                <TextBlock  Text="Parnet Model Skeleton bones - " FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
+                <TextBlock  Text="Parnet Model bones - " FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
                 <TextBlock  Text="{Binding ParnetModelBones.SkeletonName, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
             </StackPanel>
 
@@ -252,7 +280,10 @@
 
                 <TreeView.ItemTemplate >
                     <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                        <TextBlock  Grid.Column="0" Text="{Binding Name}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock  Text="{Binding Name}"/>
+                        </StackPanel>
+                       
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
             </TreeView>

@@ -135,6 +135,7 @@ namespace View3D.Animation
 
             _animationClips = animation;
             _timeSinceStart = TimeSpan.FromSeconds(0);
+            UpdateAnimationFrame();
         }
 
         float GetAnimationLengthMs()

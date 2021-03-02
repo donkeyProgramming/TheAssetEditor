@@ -12,7 +12,12 @@ Feature list before V_1 done:
 		Close and save tabcontrol items
 		Recently used files
 		Right click rmv2 model files => Edit
-		Open editor from file menu
+		Remove animation invert by fixing veiw matrix
+		[DONE]Open editor from file menu
+		[DONE]	Double click open
+		[DONE]	Ok open
+		[DONE]	File extention filter
+		
 	
 	Editor:
 		[DONE]Better shader handling
@@ -47,13 +52,7 @@ Feature list before V_1 done:
 					Textures
 					AlphaMode
 				
-				
-				
-				
-			
-			
-					
-				
+
 			[DONE]electing in tree view should select in scene
 			[DONE]Focus camera - work on selected faces and verts
 			[DONE]Reset camera
@@ -81,6 +80,9 @@ Feature list before V_1 done:
 			Show
 			Change
 		Different shader modes 
+			Wireframe
+			Semi-Transparent
+			Normal
 		[DONE]Grid
 		Pivot
 			Edit
@@ -113,7 +115,9 @@ Known bugs:
 	[DONE]Bug with selection in rotation mode, can not select when an axis is active
 	[DONE]selecting mesh while transforming the gizmo causes undo to be correct
 	[DONE]Gizmo not rendering correctly behind other meshes -> always render last?
-	Splitting mesh sets wrong offset for gizmo before moved once
+	[DONE]Splitting mesh sets wrong offset for gizmo before moved once
 	Selection manager can not select over gizmo when multiselecting
+	Ctrl to multi deselect not working
+	Using the translate view tool does not make an undo stack
 	
 	

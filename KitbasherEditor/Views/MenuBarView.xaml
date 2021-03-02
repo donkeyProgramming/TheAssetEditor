@@ -41,6 +41,10 @@
             <MenuItem Header="_File">
                 <MenuItem Header="Save"  IsEnabled="False"/>
                 <MenuItem Header="Save as"  IsEnabled="False"/>
+                <Separator/>
+                <MenuItem Header="Import reference" Command="{Binding ImportReferenceCommand}"/>
+                <MenuItem Header="Import reference - Ork torso" Command="{Binding ImportReferenceCommand_OrcTorso}"/>
+                <MenuItem Header="Import reference - Paladin vmd" Command="{Binding ImportReferenceCommand_PaladinVMD}"/>
             </MenuItem>
 
             <MenuItem Header="Mode" IsEnabled="False">

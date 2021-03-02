@@ -62,14 +62,6 @@
             
             <TreeView.Resources>
                 <ContextMenu x:Key="NodeContextMenu">
-                    <MenuItem Header="Remove"
-                               Command="{Binding DataContext.DeleteNodeCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
-                               CommandParameter="{Binding}"
-                              
-                               IsEnabled="{Binding Path=., 
-                               Converter={StaticResource ContextMenuEnabledConverter}, 
-                               ConverterParameter={x:Static valueconverters:NodeConvertionMode.DeleteNode}}"/>
-                    
                     <MenuItem Header="Make editable"
                                Command="{Binding DataContext.MakeNodeEditableCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
                                CommandParameter="{Binding}"
@@ -77,6 +69,14 @@
                                IsEnabled="{Binding Path=., 
                                Converter={StaticResource ContextMenuEnabledConverter}, 
                                ConverterParameter={x:Static valueconverters:NodeConvertionMode.MakeEditable}}"/>
+
+                    <MenuItem Header="Remove"
+                               Command="{Binding DataContext.DeleteNodeCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
+                               CommandParameter="{Binding}"
+                              
+                               IsEnabled="{Binding Path=., 
+                               Converter={StaticResource ContextMenuEnabledConverter}, 
+                               ConverterParameter={x:Static valueconverters:NodeConvertionMode.DeleteNode}}"/>
                 </ContextMenu>
             </TreeView.Resources>
 

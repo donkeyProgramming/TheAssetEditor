@@ -66,7 +66,7 @@ namespace View3D.Animation
                     var parentindex = currentFrame.BoneTransforms[i].ParentBoneIndex;
                     if (parentindex == -1)
                     {
-                        var scale = Matrix.CreateScale(-1, 1, 1);
+                        var scale = Matrix.CreateScale(1, 1, 1);
                         currentFrame.BoneTransforms[i].WorldTransform = (scale * currentFrame.BoneTransforms[i].WorldTransform);
                         continue;
                     }

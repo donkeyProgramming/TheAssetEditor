@@ -1,4 +1,5 @@
-﻿using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
+﻿using KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping;
+using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,6 @@ namespace KitbasherEditor.Services
 {
     public static class BoneMappingHelper
     {
-       
         public static void AutomapDirectBoneLinksBasedOnNames(AnimatedBone boneToGetMapping, IEnumerable<AnimatedBone> externalBonesList)
         {
             var otherBone = FindBoneBasedOnName(boneToGetMapping.Name, externalBonesList);
