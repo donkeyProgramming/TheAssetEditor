@@ -28,6 +28,7 @@ namespace View3D.Components.Gizmo
         Gizmo _gizmo;
         bool _isEnabled = false;
         TransformGizmoWrapper _activeTransformation;
+        bool _isCtrlPressed = false;
 
         public GizmoComponent(WpfGame game) : base(game)
         {
@@ -95,7 +96,18 @@ namespace View3D.Components.Gizmo
 
         private void GizmoScaleEvent(ITransformable transformable, TransformationEventArgs e)
         {
-            _activeTransformation.GizmoScaleEvent((Vector3)e.Value, e.Pivot);
+            var value = (Vector3)e.Value;
+            if (_isCtrlPressed)
+            {
+                if(value.X != 0)
+                    value = new Vector3(value.X);
+                else if (value.Y != 0)
+                    value = new Vector3(value.Y);
+                else if (value.Z != 0)
+                    value = new Vector3(value.Z);
+            }
+
+            _activeTransformation.GizmoScaleEvent(value, e.Pivot);
         }
 
         public override void Update(GameTime gameTime)
@@ -106,9 +118,15 @@ namespace View3D.Components.Gizmo
             if (!_isEnabled)
                 return;
 
-           //// Toggle space mode:
-           //if (_keyboard.IsKeyReleased(Keys.Home))
-           //    _gizmo.ToggleActiveSpace();
+            _isCtrlPressed = _keyboard.IsKeyDown(Keys.LeftControl);
+            if (_gizmo.ActiveMode == GizmoMode.NonUniformScale && _isCtrlPressed)
+                _gizmo.ActiveMode = GizmoMode.UniformScale;
+            else if (_gizmo.ActiveMode == GizmoMode.UniformScale && !_isCtrlPressed)
+                _gizmo.ActiveMode = GizmoMode.NonUniformScale;
+
+            //// Toggle space mode:
+            //if (_keyboard.IsKeyReleased(Keys.Home))
+            //    _gizmo.ToggleActiveSpace();
 
             var isCameraMoving = _keyboard.IsKeyDown(Keys.LeftAlt);
             _gizmo.Update(gameTime, !isCameraMoving);
@@ -138,6 +156,16 @@ namespace View3D.Components.Gizmo
                 return;
 
             _gizmo.Draw();
+        }
+
+        public void ResetScale()
+        {
+            _gizmo.ScaleModifier = 1;
+        }
+
+        public void ModifyGizmoScale(float v)
+        {
+            _gizmo.ScaleModifier += v;
         }
     }
 }

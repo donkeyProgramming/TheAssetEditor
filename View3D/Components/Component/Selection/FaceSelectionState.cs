@@ -14,11 +14,11 @@ namespace View3D.Components.Component.Selection
         public List<int> SelectedFaces { get; set; } = new List<int>();
 
 
-        public void ModifySelection(int newSelectionItem)
+        public void ModifySelection(int newSelectionItem, bool onlyRemove)
         {
             if (SelectedFaces.Contains(newSelectionItem))
                 SelectedFaces.Remove(newSelectionItem);
-            else
+            else if(!onlyRemove)
                 SelectedFaces.Add(newSelectionItem);
 
             SelectionChanged?.Invoke(this);

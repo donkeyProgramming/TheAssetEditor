@@ -67,11 +67,14 @@ namespace View3D.Rendering.Shading
         public NewShader(ResourceLibary resourceLibary)
         {
             Effect = resourceLibary.GetEffect(ShaderTypes.BasicEffect);
+            _textures.Add(TexureType.Diffuse, Effect.Parameters["DiffuseTexture"]);
+            //_textures.Add(TexureType.Specular, Effect.Parameters["SpecularTexture"]);
             _textures.Add(TexureType.Normal, Effect.Parameters["NormalTexture"]);
+            //_textures.Add(TexureType.Gloss, Effect.Parameters["GlossTexture"]);
 
             Effect.Parameters["DiffuseColor"].SetValue(Vector3.One);
-            Effect.Parameters["SpecularColor"].SetValue(Vector3.One);
-            Effect.Parameters["SpecularPower"].SetValue(16.0f);
+           // Effect.Parameters["SpecularColor"].SetValue(Vector3.One);
+           // Effect.Parameters["SpecularPower"].SetValue(16.0f);
 
             SetLight(0, new Vector3(-0.5265408f, -0.5735765f, -0.6275069f), new Vector3(1, 0.9607844f, 0.8078432f), new Vector3(1, 0.9607844f, 0.8078432f));
             SetLight(1, new Vector3(0.7198464f, 0.3420201f, 0.6040227f), new Vector3(0.9647059f, 0.7607844f, 0.4078432f), Vector3.Zero);
@@ -88,7 +91,8 @@ namespace View3D.Rendering.Shading
         public bool UseAlpha { set { /*Effect.Parameters["UseAlpha"].SetValue(value); */} }
         public void SetTexture(Texture2D texture, TexureType type)
         {
-            _textures[type].SetValue(texture);
+            if(_textures.ContainsKey(type))
+                _textures[type].SetValue(texture);
         }
 
         public IShader Clone()
@@ -144,9 +148,6 @@ namespace View3D.Rendering.Shading
         {
             Effect.Parameters["View"].SetValue(commonShaderParameters.View);
             Effect.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
-            Effect.Parameters["cameraPosition"].SetValue(commonShaderParameters.CameraPosition);
-            Effect.Parameters["cameraLookAt"].SetValue(commonShaderParameters.CameraLookAt);
-            Effect.Parameters["ViewInverse"].SetValue(Matrix.Invert(commonShaderParameters.View));
             Effect.Parameters["EnvMapTransform"].SetValue((Matrix.CreateRotationY(commonShaderParameters.EnvRotate)));
             Effect.Parameters["World"].SetValue(modelMatrix);
         }

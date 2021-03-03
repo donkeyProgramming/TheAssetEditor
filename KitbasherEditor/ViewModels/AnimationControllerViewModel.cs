@@ -136,8 +136,6 @@ namespace KitbasherEditor.ViewModels
             Player.CurrentFrame = Player.FrameCount();
         }
 
-
-
         public void SetActiveSkeleton(string skeletonName)
         {
             string animationFolder = "animations\\skeletons\\";
@@ -145,6 +143,11 @@ namespace KitbasherEditor.ViewModels
 
             SelectedSkeleton = skeletonFilePath;;
             SelectedAnimation = null;
+
+            // Try to set a default animation
+            var defaultIdleAnim = AnimationsForCurrentSkeleton.FirstOrDefault(x => x.Contains("stand_idle"));
+            if (defaultIdleAnim != null)
+                AnimationChanged(defaultIdleAnim);
         }
 
         private void SkeletonChanged(string selectedSkeletonPath)

@@ -47,10 +47,10 @@ namespace View3D.Components.Gizmo
             _effectedObjects = new List<IGeometry>() { vertexGeometry };
             _selectedVertexes = selectedVertexes;
 
-            foreach (var item in _effectedObjects)
-                Position += item.MeshCenter;
+            for (int i = 0; i < _selectedVertexes.Count; i++)
+                Position += vertexGeometry.GetVertexById(_selectedVertexes[i]);
 
-            Position = (Position / _effectedObjects.Count);
+            Position = (Position / _selectedVertexes.Count);
         }
 
         public void Start(GizmoMode mode)

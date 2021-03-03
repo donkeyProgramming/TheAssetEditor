@@ -15,18 +15,21 @@ namespace View3D.Commands.Face
 
         ISelectionState _oldState;
         bool _isModification;
+        bool _isRemove;
         List<int> _selectedFaces;
 
-        public FaceSelectionCommand(List<int> selectedFaces, bool isModification = false)
+        public FaceSelectionCommand(List<int> selectedFaces, bool isModification = false, bool removeSelection = false)
         {
             _selectedFaces = selectedFaces;
             _isModification = isModification;
+            _isRemove = removeSelection;
         }
 
-        public FaceSelectionCommand(int selectedFace, bool isModification = false)
+        public FaceSelectionCommand(int selectedFace, bool isModification = false, bool removeSelection = false)
         {
             _selectedFaces = new List<int>() { selectedFace };
             _isModification = isModification;
+            _isRemove = removeSelection;
         }
 
         public override void Initialize(IComponentManager componentManager)
@@ -40,11 +43,11 @@ namespace View3D.Commands.Face
             var currentState = _selectionManager.GetState() as FaceSelectionState;
             _logger.Here().Information($"Command info - Mod[{_isModification}] Item[{currentState.RenderObject.Name}] faces[{_selectedFaces.Count}]");
 
-            if (!_isModification)
+            if (!(_isModification || _isRemove))
                 currentState.Clear();
 
             foreach (var newSelectionItem in _selectedFaces)
-                currentState.ModifySelection(newSelectionItem);
+                currentState.ModifySelection(newSelectionItem, _isRemove);
 
             currentState.EnsureSorted();
         }

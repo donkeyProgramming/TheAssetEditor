@@ -164,7 +164,6 @@ namespace KitbasherEditor.ViewModels
 
         private void OnNodeSelected(SceneNode selectedNode)
         {
-         
             SelectedNodeViewModel = SceneNodeViewFactory.Create(selectedNode, _skeletonAnimationLookUpHelper);
             if (_updateSelectionManagerOnNodeSelect)
             {
@@ -172,7 +171,7 @@ namespace KitbasherEditor.ViewModels
                 if (selectedNode != null)
                 {
                     if (selectedNode is ISelectable selectableNode && selectableNode.IsSelectable)
-                        objectState.ModifySelection(selectableNode);
+                        objectState.ModifySelection(selectableNode, false);
                 }
 
                 _selectionManager.SetState(objectState);

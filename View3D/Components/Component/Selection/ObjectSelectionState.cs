@@ -11,11 +11,11 @@ namespace View3D.Components.Component.Selection
 
         List<ISelectable> _selectionList { get; set; } = new List<ISelectable>();
 
-        public void ModifySelection(ISelectable newSelectionItem)
+        public void ModifySelection(ISelectable newSelectionItem, bool onlyRemove)
         {
             if (_selectionList.Contains(newSelectionItem))
                 _selectionList.Remove(newSelectionItem);
-            else
+            else if (!onlyRemove)
                 _selectionList.Add(newSelectionItem);
 
             SelectionChanged?.Invoke(this);

@@ -99,6 +99,13 @@ Feature list before V_1 done:
 		
 		
 Planned order:
+	Groups
+	Combine	 - Validate
+	Select Model from face
+	Split face selection into model
+	Cltr selection for objects
+	Overall info when selecting Editable model node
+	
 	Show whole model info
 		- Skeleton
 		- Attachment points
@@ -106,7 +113,6 @@ Planned order:
 	Show info rmv2
 		- Skeleton bone mapping
 	Show info rmv2 lod
-	Selecting in tree view should select in scene
 	Different shader modes
 	
 	
@@ -116,8 +122,9 @@ Known bugs:
 	[DONE]selecting mesh while transforming the gizmo causes undo to be correct
 	[DONE]Gizmo not rendering correctly behind other meshes -> always render last?
 	[DONE]Splitting mesh sets wrong offset for gizmo before moved once
+	[DONE]Ctrl to multi deselect not working
+	[DONE]Using the translate view tool does not make an undo stack
 	Selection manager can not select over gizmo when multiselecting
-	Ctrl to multi deselect not working
-	Using the translate view tool does not make an undo stack
+	Gizmo behaves strangly when camera look directly forward towards model
 	
 	

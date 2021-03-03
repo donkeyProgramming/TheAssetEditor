@@ -52,16 +52,16 @@ namespace View3D.SceneNodes
             Scale = Vector3.One;
             Orientation = Quaternion.Identity;
 
-            Effect = new NewShader(resourceLib);
-            //var diffuse = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Diffuse).Path);
-            //var specTexture = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Specular).Path);
+            Effect = new PbrShader(resourceLib);
+            var diffuse = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Diffuse).Path);
+            var specTexture = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Specular).Path);
             var normalTexture = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Normal).Path);
-            //var glossTexture = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Gloss).Path);
+            var glossTexture = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Gloss).Path);
             //
-            //(Effect as PbrShader).SetTexture(diffuse, TexureType.Diffuse);
-            //(Effect as PbrShader).SetTexture(specTexture, TexureType.Specular);
+            (Effect as IShaderTextures).SetTexture(diffuse, TexureType.Diffuse);
+            (Effect as IShaderTextures).SetTexture(specTexture, TexureType.Specular);
             (Effect as IShaderTextures).SetTexture(normalTexture, TexureType.Normal);
-            //(Effect as PbrShader).SetTexture(glossTexture, TexureType.Gloss);
+            (Effect as IShaderTextures).SetTexture(glossTexture, TexureType.Gloss);
         }
 
 

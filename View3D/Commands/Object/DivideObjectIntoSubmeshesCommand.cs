@@ -1,4 +1,5 @@
 ﻿using Common;
+using CommonControls.Common;
 using Filetypes.RigidModel;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
@@ -46,29 +47,30 @@ namespace View3D.Commands.Object
         {
             _originalSelectionState = _selectionManager.GetStateCopy();
 
-            var meshService = new MeshSplitterService();
-
-
-            var newMeshes = meshService.SplitMesh(_objectToSplit.Geometry);
-            _logger.Here().Information($"{newMeshes.Count} meshes generated from splitting");
-
-            int counter = 0;
-            foreach (var mesh in newMeshes)
+            using (new WaitCursor())
             {
-                var hack = _objectToSplit as Rmv2MeshNode;
-                var originalRmvModel = hack.MeshModel;
+                var meshService = new MeshSplitterService();
+                var newMeshes = meshService.SplitMesh(_objectToSplit.Geometry);
+                _logger.Here().Information($"{newMeshes.Count} meshes generated from splitting");
 
-                var meshNode = new Rmv2MeshNode(hack.MeshModel.Clone(), _resourceLib,  hack.AnimationPlayer, mesh);
-                meshNode.Name = $"{_objectToSplit.Name}_submesh_{counter++}";
-                _newMeshes.Add(meshNode);
-                _editableMeshResolver.GetEditableMeshNode().AddObject(meshNode);
+                int counter = 0;
+                foreach (var mesh in newMeshes)
+                {
+                    var hack = _objectToSplit as Rmv2MeshNode;
+                    var originalRmvModel = hack.MeshModel;
+
+                    var meshNode = new Rmv2MeshNode(hack.MeshModel.Clone(), _resourceLib, hack.AnimationPlayer, mesh);
+                    meshNode.Name = $"{_objectToSplit.Name}_submesh_{counter++}";
+                    _newMeshes.Add(meshNode);
+                    _editableMeshResolver.GetEditableMeshNode().AddObject(meshNode);
+                }
+
+                _objectToSplit.Parent.RemoveObject(_objectToSplit as SceneNode);
+
+                var newState = (ObjectSelectionState)_selectionManager.CreateSelectionSate(GeometrySelectionMode.Object);
+                foreach (var node in _newMeshes)
+                    newState.ModifySelection(node, false);
             }
-
-            _objectToSplit.Parent.RemoveObject(_objectToSplit as SceneNode);
-
-            var newState = (ObjectSelectionState)_selectionManager.CreateSelectionSate(GeometrySelectionMode.Object);
-            foreach (var node in _newMeshes)
-                newState.ModifySelection(node);
         }
 
         protected override void UndoCommand()

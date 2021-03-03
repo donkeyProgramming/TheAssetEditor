@@ -16,6 +16,7 @@ using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.Scene;
+using View3D.SceneNodes;
 using View3D.Utility;
 
 namespace View3D.Components.Component.Selection
@@ -86,12 +87,12 @@ namespace View3D.Components.Component.Selection
 
                     var rectArea = RectArea(selectionRectangle);
                     if (rectArea > 8)
-                        SelectFromRectangle(selectionRectangle, _keyboardComponent.IsKeyDown(Keys.LeftShift));
+                        SelectFromRectangle(selectionRectangle, _keyboardComponent.IsKeyDown(Keys.LeftShift), _keyboardComponent.IsKeyDown(Keys.LeftControl));
                     else
-                        SelectFromPoint(_currentMousePos, _keyboardComponent.IsKeyDown(Keys.LeftShift));
+                        SelectFromPoint(_currentMousePos, _keyboardComponent.IsKeyDown(Keys.LeftShift), _keyboardComponent.IsKeyDown(Keys.LeftControl));
                 }
                 else
-                    SelectFromPoint(_currentMousePos, _keyboardComponent.IsKeyDown(Keys.LeftShift));
+                    SelectFromPoint(_currentMousePos, _keyboardComponent.IsKeyDown(Keys.LeftShift), _keyboardComponent.IsKeyDown(Keys.LeftControl));
 
                 _isMouseDown = false;
             }
@@ -108,7 +109,7 @@ namespace View3D.Components.Component.Selection
             }
         }
 
-        void SelectFromRectangle(Rectangle screenRect, bool isSelectionModification)
+        void SelectFromRectangle(Rectangle screenRect, bool isSelectionModification, bool removeSelection)
         {
             var unprojectedSelectionRect = _camera.UnprojectRectangle(screenRect);
   
@@ -117,7 +118,7 @@ namespace View3D.Components.Component.Selection
             {
                 if (GeometryIntersection.IntersectFaces(unprojectedSelectionRect, faceState.RenderObject.Geometry, faceState.RenderObject.ModelMatrix, out var faces))
                 {
-                    var faceSelectionCommand = new FaceSelectionCommand(faces, isSelectionModification);
+                    var faceSelectionCommand = new FaceSelectionCommand(faces, isSelectionModification, removeSelection);
                     _commandManager.ExecuteCommand(faceSelectionCommand);
                     return;
                 }
@@ -126,7 +127,7 @@ namespace View3D.Components.Component.Selection
             {
                 if (GeometryIntersection.IntersectVertices(unprojectedSelectionRect, vertexState.RenderObject.Geometry, vertexState.RenderObject.ModelMatrix, out var vertices))
                 {
-                    var vertexSelectionCommand = new VertexSelectionCommand(vertices, isSelectionModification);
+                    var vertexSelectionCommand = new VertexSelectionCommand(vertices, isSelectionModification, removeSelection);
                     _commandManager.ExecuteCommand(vertexSelectionCommand);
                     return;
                 }
@@ -138,22 +139,18 @@ namespace View3D.Components.Component.Selection
                 // Only clear selection if we are not in geometry mode and the selection count is not empty
                 if (currentState.Mode != GeometrySelectionMode.Object || currentState.SelectionCount() != 0)
                 {
-                    var selectionCommand = new ObjectSelectionCommand(_selectionManager);
-                    selectionCommand.ClearSelection = true;
+                    var selectionCommand = new ObjectSelectionCommand(new List<ISelectable>(), false, false);
                     _commandManager.ExecuteCommand(selectionCommand);
                 }
             }
             else if (selectedObjects != null)
             {
-                var selectionCommand = new ObjectSelectionCommand(_selectionManager);
-                selectionCommand.IsModification = isSelectionModification;
-                foreach(var item in selectedObjects)
-                    selectionCommand.Items.Add(item);
+                var selectionCommand = new ObjectSelectionCommand(selectedObjects, isSelectionModification, removeSelection);
                 _commandManager.ExecuteCommand(selectionCommand);
             }
         }
 
-        void SelectFromPoint(Vector2 mousePosition, bool isSelectionModification)
+        void SelectFromPoint(Vector2 mousePosition, bool isSelectionModification, bool removeSelection)
         {
             var ray = _camera.CreateCameraRay(mousePosition);
             var currentState = _selectionManager.GetState();
@@ -165,7 +162,7 @@ namespace View3D.Components.Component.Selection
                     
                     if (GeometryIntersection.IntersectFace(ray, faceState.RenderObject.Geometry, faceState.RenderObject.ModelMatrix, out var selectedFace) != null)
                     {
-                        FaceSelectionCommand faceSelectionCommand = new FaceSelectionCommand(selectedFace.Value, isSelectionModification);
+                        FaceSelectionCommand faceSelectionCommand = new FaceSelectionCommand(selectedFace.Value, isSelectionModification, removeSelection);
                         _commandManager.ExecuteCommand(faceSelectionCommand);
                         return;
                     }
@@ -179,16 +176,13 @@ namespace View3D.Components.Component.Selection
                 // Only clear selection if we are not in geometry mode and the selection count is not empty
                 if (currentState.Mode != GeometrySelectionMode.Object || currentState.SelectionCount() != 0)
                 {
-                    var selectionCommand = new ObjectSelectionCommand(_selectionManager);
-                    selectionCommand.ClearSelection = true;
+                    var selectionCommand = new ObjectSelectionCommand(new List<ISelectable>(), false, false);
                     _commandManager.ExecuteCommand(selectionCommand);
                 }
             }
             else if(selectedObject != null)
             {
-                var selectionCommand = new ObjectSelectionCommand(_selectionManager);
-                selectionCommand.IsModification = isSelectionModification;
-                selectionCommand.Items.Add(selectedObject);
+                var selectionCommand = new ObjectSelectionCommand(selectedObject, isSelectionModification, removeSelection);
                 _commandManager.ExecuteCommand(selectionCommand);
             }
         }

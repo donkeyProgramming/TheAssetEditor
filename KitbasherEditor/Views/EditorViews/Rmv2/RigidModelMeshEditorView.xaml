@@ -72,55 +72,63 @@
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                     <Label Width="100">Attachments</Label>
                     <Label>:</Label>
-                    <Expander>
-                        <Expander.Header>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Count = "/>
-                                <TextBlock Text="{Binding Animation.AttachmentPoints.Count, UpdateSourceTrigger=PropertyChanged}"/>
+                    <StackPanel>
+                        <Button Command="{Binding Animation.UseParentAttachemntPointsCommand}" Content="Take from parent" Width="130"/>
+                  
+                        <Expander>
+                            <Expander.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Count = "/>
+                                    <TextBlock Text="{Binding Animation.AttachmentPoints.Count, UpdateSourceTrigger=PropertyChanged}"/>
+                               
+                                </StackPanel>
+                            </Expander.Header>
+
+                            <StackPanel>
+                                <ListView ItemsSource="{Binding Animation.AttachmentPoints}" MaxHeight="350" >
+
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"/>
+                                            <GridViewColumn Header="BoneIndex" DisplayMemberBinding="{Binding BoneIndex}"/>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                            
                             </StackPanel>
-                        </Expander.Header>
-
-                        <StackPanel>
-                            <ListView ItemsSource="{Binding Animation.AttachmentPoints}" MaxHeight="350" >
-
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"/>
-                                    <GridViewColumn Header="BoneIndex" DisplayMemberBinding="{Binding BoneIndex}"/>
-                                </GridView>
-                            </ListView.View>
-
-                        </ListView>
-                            <Button Command="{Binding Animation.UseParentAttachemntPointsCommand}" Content="Take from parent"/>
-                        </StackPanel>
-                    </Expander>
+                        </Expander>
+                    </StackPanel>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                     <Label Width="100">Animation Bones</Label>
                     <Label>:</Label>
-                    <Expander>
-                        <Expander.Header>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Count = "/>
-                                <TextBlock Text="{Binding Animation.AnimatedBones.Count, UpdateSourceTrigger=PropertyChanged}"/>
+                    <StackPanel>
+                        <Button Command="{Binding Animation.OpenBoneRemappingToolCommand}" Content="Open Remapping tool" Width="130"/>
+                        <Expander>
+                            <Expander.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Count = "/>
+                                    <TextBlock Text="{Binding Animation.AnimatedBones.Count, UpdateSourceTrigger=PropertyChanged}"/>
+                                    
+                                </StackPanel>
+                            </Expander.Header>
+
+                            <StackPanel>
+                                <ListView ItemsSource="{Binding Animation.AnimatedBones}" MaxHeight="650" >
+
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"/>
+                                            <GridViewColumn Header="BoneIndex" DisplayMemberBinding="{Binding BoneIndex}"/>
+                                        </GridView>
+                                    </ListView.View>
+
+                                </ListView>
+                          
                             </StackPanel>
-                        </Expander.Header>
-
-                        <StackPanel>
-                            <ListView ItemsSource="{Binding Animation.AnimatedBones}" MaxHeight="650" >
-
-                                <ListView.View>
-                                    <GridView>
-                                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"/>
-                                        <GridViewColumn Header="BoneIndex" DisplayMemberBinding="{Binding BoneIndex}"/>
-                                    </GridView>
-                                </ListView.View>
-
-                            </ListView>
-                            <Button Command="{Binding Animation.OpenBoneRemappingToolCommand}">Open Remapping tool</Button>
-                        </StackPanel>
-                    </Expander>
+                        </Expander>
+                    </StackPanel>
                 </StackPanel>
 
             </DockPanel>

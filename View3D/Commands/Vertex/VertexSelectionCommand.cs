@@ -15,12 +15,14 @@ namespace View3D.Commands.Vertex
         ISelectionState _oldState;
 
         bool _isModification;
+        bool _isRemove;
         List<int> _selectedVertices;
 
-        public VertexSelectionCommand(List<int> selectedVertices, bool isModification)
+        public VertexSelectionCommand(List<int> selectedVertices, bool isModification, bool isRemove)
         {
             _selectedVertices = selectedVertices;
             _isModification = isModification;
+            _isRemove = isRemove;
         }
 
         public override void Initialize(IComponentManager componentManager)
@@ -35,11 +37,11 @@ namespace View3D.Commands.Vertex
             var currentState = _selectionManager.GetState() as VertexSelectionState;
             _logger.Here().Information($"Command info - Mod[{_isModification}] Item[{currentState.RenderObject.Name}] Vertices[{_selectedVertices.Count}]");
 
-            if (!_isModification)
+            if (!(_isModification || _isRemove))
                 currentState.Clear();
 
             foreach (var newSelectionItem in _selectedVertices)
-                currentState.ModifySelection(newSelectionItem);
+                currentState.ModifySelection(newSelectionItem, _isRemove);
 
             currentState.EnsureSorted();
         }

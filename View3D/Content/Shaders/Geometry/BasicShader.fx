@@ -21,7 +21,37 @@ float4x4 World;
 float3x3 WorldInverseTranspose;
 float4x4 WorldViewProj;
 
+// Textures
+Texture2D<float4> DiffuseTexture;
+Texture2D<float4> SpecularTexture;
 Texture2D<float4> NormalTexture;
+Texture2D<float4> GlossTexture;
+
+SamplerState SampleType
+{
+	//Texture = <tex_cube_specular>;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+	Mipfilter = LINEAR;
+	Filter = Anisotropic;
+	MaxAnisotropy = 16;
+	AddressU = Wrap;
+	AddressV = Wrap;
+};
+
+
+sampler2D DiffuseSampler = sampler_state {
+
+	Texture = <DiffuseTexture>;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+	Mipfilter = LINEAR;
+	Filter = Anisotropic;
+	MaxAnisotropy = 16;
+	AddressU = Wrap;
+	AddressV = Wrap;
+};
+
 
 SamplerState s_normal
 {
@@ -34,7 +64,6 @@ SamplerState s_normal
 	AddressU = Wrap;
 	AddressV = Wrap;
 };
-
 	//////////Helper function
 struct ColorPair
 {
@@ -47,7 +76,7 @@ void AddSpecular(inout float4 color, float3 specular)
 	color.rgb += specular * color.a;
 }
 
-ColorPair ComputeLights(float3 eyeVector, float3 worldNormal, uniform int numLights)
+ColorPair ComputeLights(float3 eyeVector, float3 worldNormal, uniform int numLights, float3 specColour, float specPow)
 {
 	float3x3 lightDirections = 0;
 	float3x3 lightDiffuse = 0;
@@ -70,33 +99,15 @@ ColorPair ComputeLights(float3 eyeVector, float3 worldNormal, uniform int numLig
 	float3 zeroL = step(0, dotL);
 
 	float3 diffuse = zeroL * dotL;
-	float3 specular = pow(max(dotH, 0) * zeroL, SpecularPower);
+	float3 specular = pow(max(dotH, 0) * zeroL, specPow);
 
 	ColorPair result;
 
 	result.Diffuse = mul(diffuse, lightDiffuse) * DiffuseColor.rgb + EmissiveColor;
-	result.Specular = mul(specular, lightSpecular) * SpecularColor;
+	result.Specular = mul(specular, lightSpecular) * specColour;
 
 	return result;
 }
-//
-//CommonVSOutput ComputeCommonVSOutputWithLighting(float4 position, float3 normal, uniform int numLights)
-//{
-//	CommonVSOutput vout;
-//
-//	float4 pos_ws = mul(position, World);
-//	float3 eyeVector = normalize(EyePosition - pos_ws.xyz);
-//	float3 worldNormal = normalize(mul(normal, WorldInverseTranspose));
-//
-//	ColorPair lightResult = ComputeLights(eyeVector, worldNormal, numLights);
-//
-//	vout.Pos_ps = mul(position, WorldViewProj);
-//	vout.Diffuse = float4(lightResult.Diffuse, DiffuseColor.a);
-//	vout.Specular = lightResult.Specular;
-//
-//	return vout;
-//}
-
 //---------------------
 
 
@@ -134,7 +145,6 @@ PixelInputType MainVS(in VertexInputType input)
 	output.WorldPosition = mul(input.Position, World);
 	output.Position = mul(input.Position, WorldViewProj);
 
-
 	output.normal = normalize(mul(input.normal, WorldInverseTranspose));	// World
 	output.tangent = normalize(mul(input.tangent, WorldInverseTranspose));	// World
 	output.binormal = normalize(mul(input.binormal, WorldInverseTranspose));	// World
@@ -147,9 +157,21 @@ PixelInputType MainVS(in VertexInputType input)
 float4 MainPS(PixelInputType pin) : COLOR
 {
 
-	float4 color = float4(0.5f,0,0,1);///pin.Diffuse;
+	//float4 color = float4(0.5f,0,0,1);///pin.Diffuse;
 
+
+
+	float4 DiffuseTex = tex2D(DiffuseSampler, pin.tex); ;// DiffuseSampler.Sample(input.tex);// DiffuseTexture.Sample(SampleType, input.tex);
+   // FactionMaskTex = shaderTextures[3].Sample(SampleType, input.tex);
+	float4 SpecTex = SpecularTexture.Sample(SampleType, pin.tex);
+	float4 GlossTex = GlossTexture.Sample(SampleType, pin.tex);
 	
+	DiffuseTex = pow(DiffuseTex, 2.2);
+	SpecTex = pow(SpecTex, 2.2);
+	//DiffuseTex.rgb = DiffuseTex.rgb * (1 - max(SpecTex.b, max(SpecTex.r, SpecTex.g)));
+
+	float4 color = DiffuseTex;
+	color.a = 1;
 	//float3 worldNormal = normalize(pin.normal);
 
 	float4 NormalTex = NormalTexture.Sample(s_normal, pin.tex);
@@ -162,10 +184,11 @@ float4 MainPS(PixelInputType pin) : COLOR
 	float3 Normal = Np.yzx; // Works
 
 	float3x3 basis = float3x3(normalize(pin.tangent), normalize(pin.normal), normalize(pin.binormal)); // -- WOWRK2!pp§
+	//float3x3 basis = float3x3(normalize(pin.tangent), normalize(pin.normal), normalize(pin.binormal)); // -- WOWRK2!pp§
 	float3 worldNormal = normalize(mul(normalize(Np), basis));
 	
 	float3 eyeVector = normalize(EyePosition - pin.WorldPosition.xyz);
-	ColorPair lightResult = ComputeLights(eyeVector, worldNormal, 3);
+	ColorPair lightResult = ComputeLights(eyeVector, worldNormal, 1, float3(1,1,1), 16);
 
 	color.rgb *= lightResult.Diffuse;
 

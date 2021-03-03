@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CommonControls\CommonControls.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\FileTypes\FileTypes.csproj" />
     <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />

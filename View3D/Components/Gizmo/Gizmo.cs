@@ -49,6 +49,7 @@ namespace View3D.Components.Gizmo
 
         // -- Screen Scale -- //
         private float _screenScale;
+        public float ScaleModifier { get; set; } = 1;
 
         // -- Position - Rotation -- //
         private Vector3 _position = Vector3.Zero;
@@ -103,7 +104,7 @@ namespace View3D.Components.Gizmo
         {
             get
             {
-                return new BoundingSphere(Vector3.Transform(_translationLineVertices[1].Position, _gizmoWorld), RADIUS * _screenScale);
+                return new BoundingSphere(Vector3.Transform(_translationLineVertices[1].Position, _gizmoWorld), RADIUS * _screenScale* ScaleModifier);
             }
         }
 
@@ -111,7 +112,7 @@ namespace View3D.Components.Gizmo
         {
             get
             {
-                return new BoundingSphere(Vector3.Transform(_translationLineVertices[7].Position, _gizmoWorld), RADIUS * _screenScale);
+                return new BoundingSphere(Vector3.Transform(_translationLineVertices[7].Position, _gizmoWorld), RADIUS * _screenScale* ScaleModifier);
             }
         }
 
@@ -119,7 +120,7 @@ namespace View3D.Components.Gizmo
         {
             get
             {
-                return new BoundingSphere(Vector3.Transform(_translationLineVertices[13].Position, _gizmoWorld), RADIUS * _screenScale);
+                return new BoundingSphere(Vector3.Transform(_translationLineVertices[13].Position, _gizmoWorld), RADIUS * _screenScale* ScaleModifier);
             }
         }
 
@@ -307,7 +308,7 @@ namespace View3D.Components.Gizmo
             const float scaleFactor = 25;
 
             _screenScale = vLength.Length() / scaleFactor;
-            var screenScaleMatrix = Matrix.CreateScale(new Vector3(_screenScale));
+            var screenScaleMatrix = Matrix.CreateScale(new Vector3(_screenScale * ScaleModifier));
 
             _localForward = Vector3.Transform(Vector3.Forward, Matrix.CreateFromQuaternion(Selection[0].Orientation)); //Selection[0].Forward;
             _localUp = Vector3.Transform(Vector3.Up, Matrix.CreateFromQuaternion(Selection[0].Orientation));  //Selection[0].Up;

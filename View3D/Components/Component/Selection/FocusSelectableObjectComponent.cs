@@ -41,6 +41,8 @@ namespace View3D.Components.Component.Selection
 
         void Focus(ISelectionState selectionState)
         {
+            _logger.Here().Information("Focusing on selection");
+
             if (selectionState is ObjectSelectionState objectState)
             {
                 if (objectState.SelectedObjects().Count == 0)

@@ -12,10 +12,6 @@ float4x4 World;
 float4x4 View;
 float4x4 Projection;
 
-float3 cameraPosition;
-float3 cameraLookAt;
-
-float4x4  ViewInverse;    // Inverse view?
 
 float4x4  EnvMapTransform;
 bool UseAlpha = false;
@@ -120,7 +116,6 @@ struct PixelInputType
 	float2 tex : TEXCOORD0;
 
 	float3 normal : NORMAL0;
-	float3 normal2 : NORMAL1;
 	float3 tangent : TANGENT;
 	float3 binormal : BINORMAL;
 
@@ -153,7 +148,7 @@ float3 sample_environment_specular(in float roughness_in, in float3 reflected_vi
     const float env_map_lod_smoothness = adjust_linear_smoothness(1 - roughness_in);
     const float roughness = 1.0f - pow(env_map_lod_smoothness, env_lod_pow);
 
-    float texture_num_lods = 5;
+    float texture_num_lods = 3;
     float env_map_lod = roughness * (texture_num_lods - 1);//<------- LOWER = more reflective
     float3 environment_colour = get_environment_colour(reflected_view_vec, env_map_lod);
 
@@ -193,7 +188,6 @@ PixelInputType main(in VertexInputType input) // main is the default function na
 
 		output.position = pos;
 		output.normal = normal.xyz;
-        output.normal2 = normal.xyz;
 		output.tangent = tangent.xyz;
 		output.binormal = biNormal.xyz;
 	}
@@ -203,32 +197,21 @@ PixelInputType main(in VertexInputType input) // main is the default function na
 		output.normal = input.normal;
 		output.tangent = input.tangent;
 		output.binormal = input.binormal;
-		output.normal2 = input.normal;
 	}
 
 	output.position = mul(output.position, World);
-	float3 worldPosition = output.position.xyz;
+    output.worldPosition = output.position.xyz;
 	output.position = mul(output.position, View);
 	output.position = mul(output.position, Projection);
 
     output.tex = input.tex;
 
-	output.normal = mul(output.normal, (float3x3) World);
-
-    output.normal2 = float4(mul(input.normal, (float3x3) EnvMapTransform), 0).xyz;
-	output.normal2 = mul(output.normal2, (float3x3) World);
-
-    output.tangent = mul(output.tangent, (float3x3) World);
-    output.binormal = mul(output.binormal, (float3x3) World);
-    
-    output.normal = normalize(output.normal);
-    output.normal2 = normalize(output.normal2);
-    output.tangent = normalize(output.tangent);
-    output.binormal = normalize(output.binormal);
+	output.normal = normalize(mul(output.normal, (float3x3) World));
+    output.tangent = normalize(mul(output.tangent, (float3x3) World));
+    output.binormal = normalize(mul(output.binormal, (float3x3) World));
 
 	// Calculate the position of the vertex in the world.
-	output.worldPosition = worldPosition;
-	output.viewDirection = normalize(cameraPosition - worldPosition);
+	output.viewDirection = normalize(View[3] - output.worldPosition);
 	return output;
 
 }
@@ -279,60 +262,41 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
     float4 GlossTex = GlossTexture.Sample(SampleType, input.tex);
 
 
-
-
     DiffuseTex = pow(DiffuseTex, 2.2);
     SpecTex = pow(SpecTex, 2.2);
     DiffuseTex.rgb = DiffuseTex.rgb * (1 - max(SpecTex.b, max(SpecTex.r, SpecTex.g)));
 
-    float spec_intensity = 1.0;
 
     float smoothness = substance_smoothness_get_our_smoothness(GlossTex.r);  
 	float roughness = saturate((1 - smoothness));
 
-    float3x3 basis = float3x3(normalize(input.tangent), normalize(input.normal), normalize(input.binormal)); // -- WOWRK2!pp§
-    float3x3 basis2 = float3x3(normalize(input.tangent), normalize(input.normal2), normalize(input.binormal)); // -- WOWRK2!pp§
 
 
     // Deccode the TW nortex_cube_specular with orthogonal projection
     float3 Np;
-    float4 n;
 
-    Np.x = NormalTex.r * NormalTex.a;
+    Np.x = NormalTex.r* NormalTex.a;
     Np.y = NormalTex.g;
     Np = (Np * 2.0f) - 1.0f;
-
     Np.z = sqrt(1 - Np.x * Np.x - Np.y * Np.y);
-
     float3 _N = Np.yzx; // Works
 
+    //float3x3 basis = float3x3(normalize(input.tangent), normalize(input.normal), normalize(input.binormal)); 
+    //float3 bumpNormal = normalize(mul(normalize(_N), basis));
 
-    //float3 bumpMap = NormalTex.xyz;
-    //bumpMap.z = sqrt(1.0 - (bumpMap.x * bumpMap.x + bumpMap.y * bumpMap.y));
-    //bumpMap = bumpMap * 2.0 - 1.0;
-    //
-    ////float3 bumpNormal = input.normal + (bumpMap.x * input.tangent + bumpMap.y * input.binormal);
-    //float3 bumpNormal = (bumpMap.x * input.tangent) + (bumpMap.y * input.binormal) + (bumpMap.z * input.normal);
-    //bumpNormal = normalize(bumpNormal);
+    float3x3 basis = float3x3(normalize(input.tangent), normalize(input.binormal), normalize(input.normal));
+    float3 bumpNormal = normalize(mul(normalize(Np), basis));
 
 
-
-
-
-    float3 bumpNormal = normalize(mul(normalize(_N), basis));
-    float3 bumpNormal2 = normalize(mul(normalize(_N), basis));
     // ************************************************************************
     //bumpNormal = input.normal; // enable to DISABLE normal tex_cube_specular
-    //bumpNormal2 = input.normal2; // enable to DISABLE normal tex_cube_specular
+
     // ************************************************************************	
-
     float3 N = normalize(bumpNormal);
-    float3 N2 = normalize(bumpNormal2);
-
-    N2 = mul(N, (float3x3) EnvMapTransform);
+    float3 N2 = mul(bumpNormal, (float3x3) EnvMapTransform);
     N2 = normalize(N2);
 
-
+    //float3 Lo = float3(0,0,1);
     float3 Lo = normalize(input.viewDirection);
 
     // Angle between surface normal and outgoing light direction.
