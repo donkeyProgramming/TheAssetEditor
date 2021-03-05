@@ -89,7 +89,7 @@ namespace View3D.SceneNodes
                 .ToList();
         }
 
-        public override SceneNode Clone()
+        public override ISceneNode Clone()
         {
             var newItem = new Rmv2ModelNode(Name + " - Clone")
             {

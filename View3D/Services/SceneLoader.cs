@@ -34,13 +34,13 @@ namespace View3D.Services
             _resourceLibary = resourceLibary;
         }
 
-        public void Load(string path, SceneNode parent, AnimationPlayer player)
+        public void Load(string path, ISceneNode parent, AnimationPlayer player)
         {
             var file = _packFileService.FindFile(path);
             Load(file as PackFile, parent, player);
         }
 
-        public SceneNode Load(PackFile file, SceneNode parent, AnimationPlayer player)
+        public ISceneNode Load(PackFile file, ISceneNode parent, AnimationPlayer player)
         {
             if (file == null)
                 throw new Exception("File is null in SceneLoader::Load");
@@ -65,7 +65,7 @@ namespace View3D.Services
             return parent;
         }
 
-        void LoadVariantMesh(PackFile file, ref SceneNode parent, AnimationPlayer player)
+        void LoadVariantMesh(PackFile file, ref ISceneNode parent, AnimationPlayer player)
         {
             var variantMeshElement = new VariantMeshNode(file.Name);
             if (parent == null)
@@ -118,7 +118,7 @@ namespace View3D.Services
             }
         }
 
-        void LoadRigidMesh(PackFile file, ref SceneNode parent, AnimationPlayer player)
+        void LoadRigidMesh(PackFile file, ref ISceneNode parent, AnimationPlayer player)
         {
             var rmvModel = new RmvRigidModel(file.DataSource.ReadData(), file.Name);
             var model = new Rmv2ModelNode(rmvModel, _device, _resourceLibary, Path.GetFileName( rmvModel.FileName), player);
@@ -129,7 +129,7 @@ namespace View3D.Services
                 parent.AddObject(model);
         }
 
-        void LoadWsModel(PackFile file, ref SceneNode parent, AnimationPlayer player)
+        void LoadWsModel(PackFile file, ref ISceneNode parent, AnimationPlayer player)
         {
             var wsModelNode = new GroupNode("WsModel - " + file.Name);
             if (parent == null)
@@ -146,7 +146,7 @@ namespace View3D.Services
             foreach (XmlNode node in nodes)
             {
                 var modelFile = _packFileService.FindFile( node.InnerText) as PackFile;
-                var modelAsBase = wsModelNode as SceneNode;
+                var modelAsBase = wsModelNode as ISceneNode;
                 LoadRigidMesh(modelFile, ref modelAsBase, player);
             }
         }

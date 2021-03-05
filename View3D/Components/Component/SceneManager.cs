@@ -15,8 +15,8 @@ using View3D.Utility;
 
 namespace View3D.Components.Component
 {
-    public delegate void SceneObjectAddedDelegate(SceneNode parent, SceneNode added);
-    public delegate void SceneObjectRemovedDelegate(SceneNode parent, SceneNode toRemove);
+    public delegate void SceneObjectAddedDelegate(ISceneNode parent, ISceneNode added);
+    public delegate void SceneObjectRemovedDelegate(ISceneNode parent, ISceneNode toRemove);
 
 
     public class SceneManager : BaseComponent
@@ -24,7 +24,7 @@ namespace View3D.Components.Component
         public event SceneObjectAddedDelegate SceneObjectAdded;
         public event SceneObjectRemovedDelegate SceneObjectRemoved;
 
-        public SceneNode RootNode { get; private set; }
+        public ISceneNode RootNode { get; private set; }
 
         RenderEngineComponent _renderEngine;
 
@@ -39,24 +39,24 @@ namespace View3D.Components.Component
             base.Initialize();
         }
 
-        public IEnumerable<SceneNode> GetEnumeratorConditional(Func<SceneNode, bool> condition)
+        public IEnumerable<ISceneNode> GetEnumeratorConditional(Func<ISceneNode, bool> condition)
         {
             return RootNode.Search(i => i.Children, condition, SceneExtentions.GraphTraversal.BreadthFirst);
         }
       
-        public void TriggerAddObjectEvent(SceneNode parent, SceneNode added)
+        public void TriggerAddObjectEvent(ISceneNode parent, ISceneNode added)
         {
             SceneObjectAdded?.Invoke(parent, added);
         }
 
-        public void TriggerRemoveObjectEvent(SceneNode parent, SceneNode toRemove)
+        public void TriggerRemoveObjectEvent(ISceneNode parent, ISceneNode toRemove)
         {
             SceneObjectRemoved?.Invoke(parent, toRemove);
         }
 
-        public Matrix GetWorldPosition(INode node)
+        public Matrix GetWorldPosition(ISceneNode node)
         {
-            Queue<INode> nodes = new Queue<INode>();
+            Queue<ISceneNode> nodes = new Queue<ISceneNode>();
             while (node != null)
             {
                 nodes.Enqueue(node);
@@ -86,24 +86,26 @@ namespace View3D.Components.Component
         }
 
 
-        void SelectObjectsHirarchy(SceneNode root, BoundingFrustum frustrum, List<ISelectable> output_selectedNodes)
+        void SelectObjectsHirarchy(ISceneNode root, BoundingFrustum frustrum, List<ISelectable> output_selectedNodes)
         {
-            if (root.IsSelectable)
+            if (root.IsVisible)
             {
-                if(root is ISelectable selectableNode)
-                if (GeometryIntersection.IntersectObject(frustrum, selectableNode.Geometry, selectableNode.ModelMatrix))
+                if (root is ISelectable selectableNode && selectableNode.IsSelectable)
+                {
+                    if (GeometryIntersection.IntersectObject(frustrum, selectableNode.Geometry, selectableNode.ModelMatrix))
                         output_selectedNodes.Add(selectableNode);
+                }
 
                 foreach (var child in root.Children)
                     SelectObjectsHirarchy(child, frustrum, output_selectedNodes);
             }
         }
 
-        void SelectObjectsHirarchy(SceneNode root, Ray ray, ref ISelectable output_selectedNode, ref float bestDistance)
+        void SelectObjectsHirarchy(ISceneNode root, Ray ray, ref ISelectable output_selectedNode, ref float bestDistance)
         {
-            if (root.IsSelectable)
+            if(root.IsVisible)
             {
-                if (root is ISelectable selectableNode)
+                if (root is ISelectable selectableNode && selectableNode.IsSelectable)
                 {
                     var distance = GeometryIntersection.IntersectObject(ray, selectableNode.Geometry, selectableNode.ModelMatrix);
                     if (distance != null)
@@ -128,7 +130,7 @@ namespace View3D.Components.Component
             base.Update(gameTime);
         }
 
-        void UpdateSceneHirarchy(SceneNode root, GameTime gameTime)
+        void UpdateSceneHirarchy(ISceneNode root, GameTime gameTime)
         {
             if (root.IsVisible)
             {
@@ -146,14 +148,12 @@ namespace View3D.Components.Component
             base.Draw(gameTime);
         }
 
-        void DrawBasicSceneHirarchy(SceneNode root,  Matrix parentMatrix)
+        void DrawBasicSceneHirarchy(ISceneNode root,  Matrix parentMatrix)
         {
             if (root.IsVisible)
             {
                 if (root is IDrawableItem drawableNode)
                     drawableNode.Render(_renderEngine, parentMatrix);
-
-
 
                 foreach (var child in root.Children)
                     DrawBasicSceneHirarchy(child, parentMatrix * child.ModelMatrix);

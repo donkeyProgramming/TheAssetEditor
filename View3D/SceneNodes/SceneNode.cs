@@ -11,45 +11,38 @@ using View3D.Rendering.Geometry;
 
 namespace View3D.SceneNodes
 {
-    public interface INode
-    {
-        string Name { get; set; }
-        Matrix ModelMatrix { get; }
-        SceneNode Parent { get; set; }
-    }
-
-    public interface IEditableGeometry : INode
+    public interface IEditableGeometry : ISceneNode
     {
         IGeometry Geometry { get; set; }
     }
 
-    public interface IDrawableItem : INode
+    public interface IDrawableItem : ISceneNode
     {
         void Render(RenderEngineComponent renderEngine, Matrix parentWorld);
     }
 
-
-    public interface ISelectable : INode
+    public interface ISelectable : ISceneNode
     {
         IGeometry Geometry { get; set; }
         bool IsSelectable { get; set; }
     }
 
-    public interface IUpdateable : INode
+    public interface IUpdateable : ISceneNode
     {
         void Update(GameTime time);
     }
 
-    public abstract class SceneNode : NotifyPropertyChangedImpl, INode
+    public abstract class SceneNode : NotifyPropertyChangedImpl, ISceneNode
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public SceneManager SceneManager { get; set; }
 
-        List<SceneNode> _children = new List<SceneNode>();
+        List<ISceneNode> _children = new List<ISceneNode>();
 
-        public List<SceneNode> Children { get { return _children; } }
+        public List<ISceneNode> Children { get { return _children; } }
 
-        public SceneNode Parent { get; set; }
+        public ISceneNode _parent;
+        public ISceneNode Parent { get => _parent; set => SetAndNotifyWhenChanged(ref _parent, value); }
 
         string _name = "";
         public string Name { get => _name; set => SetAndNotifyWhenChanged(ref _name, value); }
@@ -63,17 +56,11 @@ namespace View3D.SceneNodes
         bool _isExpanded = true;
         public bool IsExpanded { get => _isExpanded; set => SetAndNotify(ref _isExpanded, value); }
 
-        bool _isSelectAble = true;
-        public bool IsSelectable
-        {
-            get => _isSelectAble && IsVisible && _isEditable;
-            set => _isSelectAble = value;
-        }
 
         public Matrix ModelMatrix { get; protected set; } = Matrix.Identity;
 
 
-        public SceneNode AddObject(SceneNode item)
+        public ISceneNode AddObject(ISceneNode item)
         {
             item.SceneManager = SceneManager;
             item.ForeachNode((node) => node.SceneManager = SceneManager);
@@ -84,7 +71,7 @@ namespace View3D.SceneNodes
             return item;
         }
 
-        public SceneNode RemoveObject(SceneNode item)
+        public ISceneNode RemoveObject(ISceneNode item)
         {
             _children.Remove(item);
             SceneManager?.TriggerRemoveObjectEvent(this, item);
@@ -96,9 +83,9 @@ namespace View3D.SceneNodes
             return Name;
         }
 
-        public abstract SceneNode Clone();
+        public abstract ISceneNode Clone();
 
-        public void ForeachNode(Action<SceneNode> func)
+        public void ForeachNode(Action<ISceneNode> func)
         {
             func.Invoke(this);
             foreach (var child in _children)

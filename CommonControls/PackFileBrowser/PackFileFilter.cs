@@ -47,6 +47,7 @@ namespace CommonControls.PackFileBrowser
         {
             Filter(FilterText);
             _filterTimer.Stop();
+            _filterTimer.Tick -= FilterTimerTrigger;
             _filterTimer = null;
         }
 

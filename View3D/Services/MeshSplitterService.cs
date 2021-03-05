@@ -13,7 +13,7 @@ namespace View3D.Services
         {
             List<IGeometry> output = new List<IGeometry>();
 
-            var subModels = SlitIntoSubModels(geometry.GetIndexBuffer(), geometry);
+            var subModels = SplitIntoSubModels(geometry.GetIndexBuffer(), geometry);
             foreach (var subModel in subModels)
             {
                 var duplicate = geometry.Clone();
@@ -22,10 +22,9 @@ namespace View3D.Services
             }
 
             return output;
-
         }
 
-        public List<List<ushort>> SlitIntoSubModels(List<ushort> indexList, IGeometry geo)
+        public List<List<ushort>> SplitIntoSubModels(List<ushort> indexList, IGeometry geo)
         {
             if (indexList.Count == 0)
                 return null;
@@ -80,7 +79,7 @@ namespace View3D.Services
         {
             foreach (var outerMesh in meshs)
             {
-                var destinct = outerMesh.Distinct();
+                var destinct = outerMesh.Distinct().ToLookup(x=>x);
                 foreach (var innerMesh in meshs)
                 {
                     if (innerMesh == outerMesh)

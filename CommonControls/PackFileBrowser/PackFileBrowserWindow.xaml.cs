@@ -18,7 +18,7 @@ namespace CommonControls.PackFileBrowser
     /// <summary>
     /// Interaction logic for PackFileBrowserWindow.xaml
     /// </summary>
-    public partial class PackFileBrowserWindow : Window
+    public partial class PackFileBrowserWindow : Window, IDisposable
     {
         public PackFile SelectedFile { get; set; }
         public PackFileBrowserViewModel ViewModel { get; set; }
@@ -42,6 +42,11 @@ namespace CommonControls.PackFileBrowser
             SelectedFile = ViewModel.SelectedItem?.Item as PackFile;
             DialogResult = true;
             Close();
+        }
+
+        public void Dispose()
+        {
+            ViewModel.Dispose();
         }
     }
 }

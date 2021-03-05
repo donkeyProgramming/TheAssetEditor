@@ -99,11 +99,18 @@ Feature list before V_1 done:
 		
 		
 Planned order:
-	Groups
+	Wireframe mode
+	Apply skeleton bone to all unmapped while re-rigging
 	Combine	 - Validate
+	
+	Zoom bug!
+	Active pack file
+	Save packfile
+	Import files to pack file
+	
+	
 	Select Model from face
 	Split face selection into model
-	Cltr selection for objects
 	Overall info when selecting Editable model node
 	
 	Show whole model info

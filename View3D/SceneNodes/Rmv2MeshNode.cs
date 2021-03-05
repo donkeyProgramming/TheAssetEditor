@@ -18,7 +18,6 @@ namespace View3D.SceneNodes
     {
         public RmvSubModel MeshModel { get; set; }
 
-
         Quaternion _orientation = Quaternion.Identity;
         Vector3 _position = Vector3.Zero;
         Vector3 _scale = Vector3.One;
@@ -68,6 +67,7 @@ namespace View3D.SceneNodes
         public IShader Effect { get; set; }
         public int LodIndex { get; set; } = -1;
         public IGeometry Geometry { get; set; }
+        public bool IsSelectable { get; set; } = true;
 
         public void Update(GameTime time)
         {
@@ -122,7 +122,7 @@ namespace View3D.SceneNodes
             renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeoRenderItem() { Geometry = Geometry, ModelMatrix = ModelMatrix, Shader = Effect });
         }
 
-        public override SceneNode Clone()
+        public override ISceneNode Clone()
         {
             var newItem = new Rmv2MeshNode()
             {
@@ -134,6 +134,7 @@ namespace View3D.SceneNodes
                 SceneManager = SceneManager,
                 IsEditable = IsEditable,
                 IsVisible = IsVisible,
+                IsSelectable= IsSelectable,
                 LodIndex = LodIndex,
                 Name = Name + " - Clone",
                 AnimationPlayer = AnimationPlayer,

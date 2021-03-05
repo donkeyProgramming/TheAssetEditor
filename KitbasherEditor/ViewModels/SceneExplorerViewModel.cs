@@ -19,12 +19,12 @@ namespace KitbasherEditor.ViewModels
 {
     public class SceneExplorerViewModel : NotifyPropertyChangedImpl, IEditableMeshResolver
     {
-        public ObservableCollection<SceneNode> _sceneGraphRootNodes = new ObservableCollection<SceneNode>();
-        public ObservableCollection<SceneNode> SceneGraphRootNodes { get { return _sceneGraphRootNodes; } set { SetAndNotify(ref _sceneGraphRootNodes, value); } }
+        public ObservableCollection<ISceneNode> _sceneGraphRootNodes = new ObservableCollection<ISceneNode>();
+        public ObservableCollection<ISceneNode> SceneGraphRootNodes { get { return _sceneGraphRootNodes; } set { SetAndNotify(ref _sceneGraphRootNodes, value); } }
 
 
-        SceneNode _selectedNode;
-        public SceneNode SelectedNode { get { return _selectedNode; } set { SetAndNotify(ref _selectedNode, value); OnNodeSelected(_selectedNode); } }
+        ISceneNode _selectedNode;
+        public ISceneNode SelectedNode { get { return _selectedNode; } set { SetAndNotify(ref _selectedNode, value); OnNodeSelected(_selectedNode); } }
 
         ISceneNodeViewModel _selectedNodeViewModel;
         public ISceneNodeViewModel SelectedNodeViewModel { get { return _selectedNodeViewModel; } set { SetAndNotify(ref _selectedNodeViewModel, value); } }
@@ -94,20 +94,22 @@ namespace KitbasherEditor.ViewModels
             }
         }
 
-        
-
         void MakeNodeEditable(SceneNode node)
         {
             if (node is Rmv2MeshNode meshNode)
             {
+                meshNode.IsSelectable = true;
                 EditableMeshNode.Children[SelectedLodLevel.Value].AddObject(meshNode);
             }
 
             if (node is Rmv2LodNode lodNode)
             {
                 var index = lodNode.LodValue;
-                foreach(var lodModel in lodNode.Children)
+                foreach (var lodModel in lodNode.Children)
+                {
+                    (lodModel as Rmv2MeshNode).IsSelectable = true;
                     EditableMeshNode.Children[index].AddObject(lodModel);
+                }
             }
 
             if (node is Rmv2ModelNode modelNode)
@@ -118,7 +120,12 @@ namespace KitbasherEditor.ViewModels
                     {
                         var index = lodNode0.LodValue;
                         foreach (var lodModel in lodNode0.Children)
+                        {
+                            if (index > 3)
+                                continue;
+                            (lodModel as Rmv2MeshNode).IsSelectable = true;
                             EditableMeshNode.Children[index].AddObject(lodModel);
+                        }
                     }
                 }
             }
@@ -134,7 +141,7 @@ namespace KitbasherEditor.ViewModels
 
         private void RebuildTree()
         {
-            var collection = new ObservableCollection<SceneNode>(); ;
+            var collection = new ObservableCollection<ISceneNode>(); ;
             collection.Add(_sceneManager.RootNode);
             SceneGraphRootNodes = collection;
             UpdateLod(SelectedLodLevel.Value);
@@ -153,7 +160,7 @@ namespace KitbasherEditor.ViewModels
             }
         }
 
-        public SceneNode GetEditableMeshNode()
+        public ISceneNode GetEditableMeshNode()
         {
             return EditableMeshNode.Children[SelectedLodLevel.Value];
         }
@@ -162,16 +169,28 @@ namespace KitbasherEditor.ViewModels
         {
         }
 
-        private void OnNodeSelected(SceneNode selectedNode)
+        private void OnNodeSelected(ISceneNode selectedNode)
         {
+
             SelectedNodeViewModel = SceneNodeViewFactory.Create(selectedNode, _skeletonAnimationLookUpHelper);
             if (_updateSelectionManagerOnNodeSelect)
             {
                 var objectState = new ObjectSelectionState();
                 if (selectedNode != null)
                 {
-                    if (selectedNode is ISelectable selectableNode && selectableNode.IsSelectable)
-                        objectState.ModifySelection(selectableNode, false);
+                    if (selectedNode is GroupNode groupNode && groupNode.IsSelectable == true)
+                    {
+                        foreach (var child in groupNode.Children)
+                        {
+                            if (child is ISelectable selectableNode && selectableNode.IsSelectable)
+                                objectState.ModifySelection(selectableNode, false);
+                        }
+                    }
+                    else
+                    {
+                        if (selectedNode is ISelectable selectableNode && selectableNode.IsSelectable)
+                            objectState.ModifySelection(selectableNode, false);
+                    }
                 }
 
                 _selectionManager.SetState(objectState);

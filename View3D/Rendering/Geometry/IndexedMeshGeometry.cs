@@ -102,10 +102,10 @@ namespace View3D.Rendering.Geometry
         {
             var newIndexList = new ushort[_indexList.Length - (facesToDelete.Count * 3)];
             var writeIndex = 0;
-            for (ushort i = 0; i < _indexList.Length; )
+            for (int i = 0; i < _indexList.Length; )
             {
                 if (facesToDelete.Contains(i) == false)
-                    newIndexList[writeIndex++] = _indexList[i++];
+                    newIndexList[writeIndex++] = (_indexList[i++]);
                 else
                     i+= 3;
             }

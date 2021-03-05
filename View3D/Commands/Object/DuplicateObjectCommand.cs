@@ -14,20 +14,18 @@ namespace View3D.Commands.Object
 {
     public class DuplicateObjectCommand : CommandBase<DuplicateObjectCommand>
     {
-        List<SceneNode> _objectsToCopy;
-        List<SceneNode> _clonedObjects = new List<SceneNode>();
-        SceneManager _sceneManager;
+        List<ISceneNode> _objectsToCopy;
+        List<ISceneNode> _clonedObjects = new List<ISceneNode>();
         SelectionManager _selectionManager;
 
         ISelectionState _oldState;
-        public DuplicateObjectCommand(List<SceneNode> objectsToCopy)
+        public DuplicateObjectCommand(List<ISceneNode> objectsToCopy)
         {
-            _objectsToCopy = new List<SceneNode>(objectsToCopy);
+            _objectsToCopy = new List<ISceneNode>(objectsToCopy);
         }
 
         public override void Initialize(IComponentManager componentManager)
         {
-            _sceneManager = componentManager.GetComponent<SceneManager>();
             _selectionManager = componentManager.GetComponent<SelectionManager>();
         }
 

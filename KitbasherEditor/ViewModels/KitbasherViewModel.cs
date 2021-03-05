@@ -29,7 +29,7 @@ namespace KitbasherEditor.ViewModels
         ILogger _logger = Logging.Create<ModelLoader>();
 
         public Rmv2ModelNode EditableMeshNode { get; private set; }
-        public SceneNode ReferenceMeshRoot { get; private set; }
+        public ISceneNode ReferenceMeshRoot { get; private set; }
 
         PackFileService _packFileService;
         ResourceLibary _resourceLibary;
@@ -75,6 +75,8 @@ namespace KitbasherEditor.ViewModels
                 return;
             }
 
+       
+           
             LoadReference(refereneceMesh as PackFile);
         }
 
@@ -90,7 +92,12 @@ namespace KitbasherEditor.ViewModels
                 return;
             }
 
-            result.ForeachNode((node) => node.IsEditable = false);
+            result.ForeachNode((node) => 
+            { 
+                node.IsEditable = false;
+                if (node is ISelectable selectable)
+                    selectable.IsSelectable = false;
+            });
             ReferenceMeshRoot.AddObject(result);
         }
     }

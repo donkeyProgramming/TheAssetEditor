@@ -1,9 +1,13 @@
 ﻿using Common;
 using GalaSoft.MvvmLight.CommandWpf;
+using KitbasherEditor.Services;
 using MonoGame.Framework.WpfInterop;
+using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
+using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
@@ -15,7 +19,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         public ICommand DivideSubMeshCommand { get; set; }
         public ICommand MergeObjectCommand { get; set; }
-        public ICommand FreezeTransformCommand { get; set; }
         public ICommand DuplicateObjectCommand { get; set; }
         public ICommand DeleteObjectCommand { get; set; }
         public ICommand MergeVertexCommand { get; set; }
@@ -26,9 +29,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         bool _mergeMeshEnabled;
         public bool MergeMeshEnabled { get => _mergeMeshEnabled; set => SetAndNotify(ref _mergeMeshEnabled, value); }
-
-        bool _freezeTransformEnabled;
-        public bool FreezeTransformEnabled { get => _freezeTransformEnabled; set => SetAndNotify(ref _freezeTransformEnabled, value); }
 
         bool _duplicateEnabled;
         public bool DuplicateEnabled { get => _duplicateEnabled; set => SetAndNotify(ref _duplicateEnabled, value); }
@@ -44,7 +44,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         {
             DivideSubMeshCommand = new RelayCommand(DivideSubMesh);
             MergeObjectCommand = commandFactory.Register(new RelayCommand(MergeObjects), Key.M, ModifierKeys.Control);
-            FreezeTransformCommand = new RelayCommand(FreezeObject);
             DuplicateObjectCommand = commandFactory.Register(new RelayCommand(DubplicateObject), Key.D, ModifierKeys.Control);
             DeleteObjectCommand = commandFactory.Register(new RelayCommand(DeleteObject), Key.Delete, ModifierKeys.None);
             MergeVertexCommand = new RelayCommand(MergeVertex);
@@ -66,15 +65,18 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                     DivideSubMeshEnabled = true;
                     DuplicateEnabled = true;
                     DeleteEnabled = true;
+                    MergeMeshEnabled = false;
                 }
                 else if (objectSelection.SelectedObjects().Count > 0)
                 {
+                    MergeMeshEnabled = true; 
                     DivideSubMeshEnabled = false;
                     DuplicateEnabled = true;
                     DeleteEnabled = true;
                 }
                 else
                 {
+                    MergeMeshEnabled = false;
                     DivideSubMeshEnabled = false;
                     DuplicateEnabled = false;
                     DeleteEnabled = false;
@@ -92,12 +94,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 DuplicateEnabled = false;
                 DeleteEnabled = false;
             }
-
-            MergeMeshEnabled = false;
-            FreezeTransformEnabled = false;
+            
             MergeVertexEnabled = false;
         }
-
 
         void DivideSubMesh() 
         {
@@ -105,8 +104,23 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 _objectEditor.DivideIntoSubmeshes(objectSelectionState);
         }
 
-        void MergeObjects() { }
-        void FreezeObject() { }
+        void MergeObjects() 
+        {
+            
+            if (_selectionManager.GetState() is ObjectSelectionState objectSelectionState)
+            {
+                if (objectSelectionState.CurrentSelection().Count >= 2)
+                {
+                    var modelValidator = new ModelValidator();
+                    var objs = objectSelectionState.SelectedObjects().Where(x => x is Rmv2MeshNode).Select(x => x as Rmv2MeshNode);
+                    if (!modelValidator.CanCombine(objs.ToList(), out var errors))
+                    {
+                        var longError = string.Join("\n", errors);
+                        MessageBox.Show("Errors trying to combine meshes:\n\n" + longError);
+                    }
+                }                
+            }
+        }
 
         void DubplicateObject() 
         {
@@ -122,7 +136,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 _faceEditor.DeleteFaces(faceSelection);
         }
 
-        void MergeVertex() { }
+        void MergeVertex()
+        {
+        }
 
 
     }

@@ -49,12 +49,13 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         void ImportReference()
         {
-          
-            var browser = new PackFileBrowserWindow(_packFileService);
-            browser.ViewModel.Filter.SetExtentions(new List<string>() { ".variantmeshdefinition", ".wsmodel", ".rigid_model_v2"});
-            if (browser.ShowDialog() == true && browser.SelectedFile != null)
+            using (var browser = new PackFileBrowserWindow(_packFileService))
             {
-                ModelLoader.LoadReference(browser.SelectedFile);
+                browser.ViewModel.Filter.SetExtentions(new List<string>() { ".variantmeshdefinition", ".wsmodel", ".rigid_model_v2" });
+                if (browser.ShowDialog() == true && browser.SelectedFile != null)
+                {
+                    ModelLoader.LoadReference(browser.SelectedFile);
+                }
             }
         }
 

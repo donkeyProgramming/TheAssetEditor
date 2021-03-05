@@ -129,19 +129,13 @@
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_split.png"/>
                 </Button>
 
-                <Button ToolTip="Merge selected meshes into one mesh" 
+                    <Button ToolTip="Merge selected meshes into one mesh" 
                         Command="{Binding Tools.MergeObjectCommand}"
                         IsEnabled="{Binding Tools.MergeMeshEnabled, UpdateSourceTrigger=PropertyChanged}">
-                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_combine.png"/>
-                </Button>
+                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_combine.png"/>
+                    </Button>
 
-                <Button ToolTip="Freeze transform. Moves vertex information so that the object is at 0,0,0, but the vertex has the same world" 
-                        Command="{Binding Tools.FreezeTransformCommand}"
-                        IsEnabled="{Binding Tools.FreezeTransformEnabled, UpdateSourceTrigger=PropertyChanged}">
-                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_freezeTransform.png"/>
-                </Button>
-
-                <Button ToolTip="Duplicated selected (Ctr+D)" 
+                    <Button ToolTip="Duplicated selected (Ctr+D)" 
                         Command="{Binding Tools.DuplicateObjectCommand}"
                         IsEnabled="{Binding Tools.DuplicateEnabled, UpdateSourceTrigger=PropertyChanged}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_duplicate.png"/>

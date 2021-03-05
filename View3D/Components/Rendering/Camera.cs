@@ -1,7 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Common;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,6 +13,7 @@ namespace View3D.Components.Rendering
 {
     public class ArcBallCamera : BaseComponent
     {
+        ILogger _logger = Logging.Create<ArcBallCamera>();
         GraphicsDevice _graphicsDevice;
         MouseComponent _mouse;
         KeyboardComponent _keyboard;
@@ -242,7 +245,12 @@ namespace View3D.Components.Rendering
                 }
                 else if (deltaMouseWheel != 0)
                 {
-                    Zoom += ( deltaMouseWheel * 0.005f)  * (Zoom / 10);
+                    if (Math.Abs(deltaMouseWheel) > 1000)   // Weird bug, sometimes this value is very large, probably related to state clearing. Temp fix
+                        return;
+
+                    var oldZoom = (Zoom / 10);
+                    Zoom += ( deltaMouseWheel * 0.005f)  * oldZoom;
+                    //_logger.Here().Information($"Setting zoom {Zoom} - {deltaMouseWheel} - {oldZoom}");
                 }
             }
         }

@@ -12,7 +12,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
     public static class SceneNodeViewFactory
     {
-        public static ISceneNodeViewModel Create(SceneNode node, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        public static ISceneNodeViewModel Create(ISceneNode node, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             switch (node)
             {

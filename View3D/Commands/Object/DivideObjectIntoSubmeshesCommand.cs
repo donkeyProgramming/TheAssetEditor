@@ -22,7 +22,8 @@ namespace View3D.Commands.Object
     class DivideObjectIntoSubmeshesCommand : CommandBase<DivideObjectIntoSubmeshesCommand>
     {
         IEditableGeometry _objectToSplit;
-        List<Rmv2MeshNode> _newMeshes = new List<Rmv2MeshNode>();
+       
+        GroupNode _newGroupNode;
 
         IEditableMeshResolver _editableMeshResolver;
         SceneManager _sceneManager;
@@ -53,7 +54,10 @@ namespace View3D.Commands.Object
                 var newMeshes = meshService.SplitMesh(_objectToSplit.Geometry);
                 _logger.Here().Information($"{newMeshes.Count} meshes generated from splitting");
 
+                _newGroupNode = (GroupNode)_editableMeshResolver.GetEditableMeshNode().AddObject(new GroupNode(_objectToSplit.Name + "_Collection") { IsSelectable = true, IsUngroupable = true});
+
                 int counter = 0;
+                List<Rmv2MeshNode> _newMeshes = new List<Rmv2MeshNode>();
                 foreach (var mesh in newMeshes)
                 {
                     var hack = _objectToSplit as Rmv2MeshNode;
@@ -62,7 +66,7 @@ namespace View3D.Commands.Object
                     var meshNode = new Rmv2MeshNode(hack.MeshModel.Clone(), _resourceLib, hack.AnimationPlayer, mesh);
                     meshNode.Name = $"{_objectToSplit.Name}_submesh_{counter++}";
                     _newMeshes.Add(meshNode);
-                    _editableMeshResolver.GetEditableMeshNode().AddObject(meshNode);
+                    _newGroupNode.AddObject(meshNode);
                 }
 
                 _objectToSplit.Parent.RemoveObject(_objectToSplit as SceneNode);
@@ -75,12 +79,7 @@ namespace View3D.Commands.Object
 
         protected override void UndoCommand()
         {
-            foreach (var item in _newMeshes)
-            {
-                if (item.Parent != null)
-                    item.Parent.RemoveObject(item);
-            }
-
+            _newGroupNode.Parent.RemoveObject(_newGroupNode);
             _objectToSplit.Parent.AddObject(_objectToSplit as SceneNode);
 
             _selectionManager.SetState(_originalSelectionState);

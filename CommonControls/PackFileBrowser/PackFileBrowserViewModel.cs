@@ -20,7 +20,7 @@ namespace CommonControls.PackFileBrowser
 {
     public delegate void FileSelectedDelegate(IPackFile file);
 
-    public class PackFileBrowserViewModel : NotifyPropertyChangedImpl
+    public class PackFileBrowserViewModel : NotifyPropertyChangedImpl, IDisposable
     {
         protected PackFileService _packFileService;
         public event FileSelectedDelegate FileOpen;
@@ -197,6 +197,13 @@ namespace CommonControls.PackFileBrowser
         {
             var node = Files.FirstOrDefault(x => x.FileOwner == container);
             Files.Remove(node);
+        }
+
+        public void Dispose()
+        {
+            _packFileService.Database.PackFileContainerLoaded -= PackFileContainerLoaded;
+            _packFileService.Database.PackFileContainerRemoved -= PackFileContainerRemoved;
+            _packFileService.Database.ContainerUpdated -= ContainerUpdated;
         }
     }
 }

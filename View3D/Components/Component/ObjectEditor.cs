@@ -45,7 +45,7 @@ namespace View3D.Components.Component
         {
             if (objectSelectionState.CurrentSelection().Count != 0)
             {
-                var command = new DuplicateObjectCommand(objectSelectionState.CurrentSelection().Select(x => (SceneNode)x).ToList());
+                var command = new DuplicateObjectCommand(objectSelectionState.CurrentSelection().Select(x => (ISceneNode)x).ToList());
                 _commandManager.ExecuteCommand(command);
             }
         }
