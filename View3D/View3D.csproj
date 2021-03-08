@@ -25,6 +25,7 @@
     <ProjectReference Include="..\CommonControls\CommonControls.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\FileTypes\FileTypes.csproj" />
+    <ProjectReference Include="..\MeshDecimator\MeshDecimator.csproj" />
     <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
   </ItemGroup>
 

@@ -30,8 +30,6 @@ namespace CommonControls.PackFileBrowser
             set => SetAndNotify(ref _isExpanded, value);
         }
 
-        public bool IsPackContainer { get => NodeType == NodeType.Root; }
-
         public NodeType NodeType { get; set; }
         public TreeNode Parent { get; set; }
 

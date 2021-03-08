@@ -37,6 +37,11 @@ namespace FileTypes.PackFiles.Models
 
             FileList = new Dictionary<string, IPackFile>(Header.FileCount);
 
+            PackedFileSourceParent packedFileSourceParent = new PackedFileSourceParent()
+            {
+                FilePath = packFileSystemPath,
+            };
+
             long offset = Header.DataStart;
             for (int i = 0; i < Header.FileCount; i++)
             {
@@ -52,10 +57,8 @@ namespace FileTypes.PackFiles.Models
                 string packedFileName = IOFunctions.TheadUnsafeReadZeroTerminatedAscii(reader);
 
                 var packFileName = Path.GetFileName(packedFileName);
-                var fileContent = new PackFile(packFileName, new PackedFileSource(packFileSystemPath, offset, size));
+                var fileContent = new PackFile(packFileName, new PackedFileSource(packedFileSourceParent, offset, size));
 
-                //var d = fileContent.DataSource.ReadData();
-                //var k = reader.ReadByte();
                 FileList.Add(packedFileName, fileContent);
                 offset += size;
             }

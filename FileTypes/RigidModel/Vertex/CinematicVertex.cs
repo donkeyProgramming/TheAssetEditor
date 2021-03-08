@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Filetypes.RigidModel.Transforms;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -48,6 +49,20 @@ namespace Filetypes.RigidModel.Vertex
 
             BoneIndex = new byte[] { _data.boneIndex[0], _data.boneIndex[1], _data.boneIndex[2], _data.boneIndex[3] };
             BoneWeight = new float[] { _data.boneWeight[0] / 255.0f, _data.boneWeight[1] / 255.0f, _data.boneWeight[2] / 255.0f, _data.boneWeight[3] / 255.0f };
+        }
+
+        public CinematicVertex()
+        {
+            Postition = new RmvVector4(0);
+
+            Postition = new RmvVector4(0);
+            Uv = new RmvVector2() { X = 0, Y = 0};
+            Normal = new RmvVector4(0);
+            BiNormal = new RmvVector4(0);
+            Tangent = new RmvVector4(0);
+
+            BoneIndex = new byte[] {0,0,0,0 };
+            BoneWeight = new float[] { 0,0,0,0 };
         }
     }
 }

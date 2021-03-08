@@ -40,6 +40,9 @@ namespace FileTypes.PackFiles.Models
     }
 
 
+
+
+
     /*public class PackFileDirectory : NotifyPropertyChangedImpl, IPackFile
     {
         public PackFileDirectory(string name) 

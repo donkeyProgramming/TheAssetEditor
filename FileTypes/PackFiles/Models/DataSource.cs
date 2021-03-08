@@ -52,27 +52,34 @@ namespace FileTypes.PackFiles.Models
     public class PackedFileSource : IDataSource
     {
         public long Size { get; private set; }
-        private string filepath;
+       
         public long Offset
         {
             get;
             private set;
         }
-        public PackedFileSource(string packfilePath, long offset, long length)
+
+        PackedFileSourceParent _parent;
+        public PackedFileSource(PackedFileSourceParent parent, long offset, long length)
         {
             Offset = offset;
-            filepath = packfilePath;
+            _parent = parent;
             Size = length;
         }
         public byte[] ReadData()
         {
             byte[] data = new byte[Size];
-            using (Stream stream = File.OpenRead(filepath))
+            using (Stream stream = File.OpenRead(_parent.FilePath))
             {
                 stream.Seek(Offset, SeekOrigin.Begin);
                 stream.Read(data, 0, data.Length);
             }
             return data;
         }
+    }
+
+    public class PackedFileSourceParent
+    {
+        public string FilePath { get; set; }
     }
 }

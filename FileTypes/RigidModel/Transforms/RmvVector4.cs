@@ -21,5 +21,13 @@ namespace Filetypes.RigidModel.Transforms
             Z = z;
             W = w;
         }
+
+        public RmvVector4(float value = 0)
+        {
+            X = value;
+            Y = value;
+            Z = value;
+            W = value;
+        }
     }
 }

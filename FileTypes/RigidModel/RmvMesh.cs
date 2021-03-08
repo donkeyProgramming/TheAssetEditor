@@ -195,7 +195,7 @@ namespace Filetypes.RigidModel
 
     public class RmvMesh
     {
-        public BaseVertex[] VertexList { get; private set; }
+        public BaseVertex[] VertexList { get; set; }
         public ushort[] IndexList;
         public MeshAlphaSettings AlphaSettings { get; private set; }
 
@@ -295,7 +295,7 @@ namespace Filetypes.RigidModel
             Mesh = LoadMesh(dataArray);
         }
 
-        private RmvSubModel()
+        public RmvSubModel()
         { }
 
         RmvSubModelHeader LoadHeader(byte[] dataArray)

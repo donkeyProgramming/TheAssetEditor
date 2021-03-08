@@ -3,6 +3,7 @@ using Common.ApplicationSettings;
 using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
 using FileTypes.PackFiles.Services;
+using g3;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
