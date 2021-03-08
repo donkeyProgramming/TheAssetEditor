@@ -40,6 +40,8 @@ namespace View3D.Rendering.Geometry
 
         protected void CreateIndexFromBuffers()
         {
+            if (_indexBuffer != null)
+                _indexBuffer.Dispose();
             _indexBuffer = new IndexBuffer(_device, typeof(short), _indexList.Length, BufferUsage.None);
             _indexBuffer.SetData(_indexList);
         }

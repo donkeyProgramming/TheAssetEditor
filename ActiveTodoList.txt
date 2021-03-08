@@ -67,9 +67,9 @@ Feature list before V_1 done:
 		[DONE]	Scale
 		[DONE]	Rotate
 		[DONE]	Translate
-				When scaling, if ctrl is pressed, scale uniform
+		[DONE]		When scaling, if ctrl is pressed, scale uniform
 				
-		Group/Ungroup meshses in selection
+		[DONE]Group/Ungroup meshses in selection
 		
 		[DONE]Transform window
 		[DONE]	Scale / Flip
@@ -87,11 +87,11 @@ Feature list before V_1 done:
 		Pivot
 			Edit
 			Display
-		Combine meshes
-		Validate
+		[DONE]Combine meshes
+		[DONE]Validate
 		Transparance
-		Skeleton id remapper
-		Scale gizmo with +- keys on numpad. Reset option
+		[DONE]Skeleton id remapper
+		[DONE]Scale gizmo with +- keys on numpad. Reset option
 
 	New editors:
 		Model preview
@@ -99,28 +99,9 @@ Feature list before V_1 done:
 		
 		
 Planned order:
-	Wireframe mode
-	Apply skeleton bone to all unmapped while re-rigging
-	Combine	 - Validate
-	
-	Zoom bug!
-	Active pack file
-	Save packfile
-	Import files to pack file
-	
-	
-	Select Model from face
-	Split face selection into model
-	Overall info when selecting Editable model node
-	
-	Show whole model info
-		- Skeleton
-		- Attachment points
-		- Summary
-	Show info rmv2
-		- Skeleton bone mapping
-	Show info rmv2 lod
-	Different shader modes
+	Ws model
+	Textures
+	Alpha mode
 	
 	
 Known bugs:

@@ -5,6 +5,7 @@ using MonoGame.Framework.WpfInterop;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using View3D.Commands.Object;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
@@ -22,7 +23,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public ICommand DuplicateObjectCommand { get; set; }
         public ICommand DeleteObjectCommand { get; set; }
         public ICommand MergeVertexCommand { get; set; }
-
+        public ICommand ReduceMeshCommand { get; set; }
+        
 
         bool _divideSubMeshEnabled;
         public bool DivideSubMeshEnabled { get => _divideSubMeshEnabled; set => SetAndNotify(ref _divideSubMeshEnabled, value); }
@@ -39,6 +41,11 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         bool _mergeVertexEnabled;
         public bool MergeVertexEnabled { get => _mergeVertexEnabled; set => SetAndNotify(ref _mergeVertexEnabled, value); }
 
+        bool _reduceMeshEnabled;
+        public bool ReduceMeshEnabled { get => _reduceMeshEnabled; set => SetAndNotify(ref _reduceMeshEnabled, value); }
+
+        
+
 
         public ToolsMenuBarViewModel(IComponentManager componentManager, ToolbarCommandFactory commandFactory)
         {
@@ -47,6 +54,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             DuplicateObjectCommand = commandFactory.Register(new RelayCommand(DubplicateObject), Key.D, ModifierKeys.Control);
             DeleteObjectCommand = commandFactory.Register(new RelayCommand(DeleteObject), Key.Delete, ModifierKeys.None);
             MergeVertexCommand = new RelayCommand(MergeVertex);
+            ReduceMeshCommand = new RelayCommand(ReduceMesh);
 
             _selectionManager = componentManager.GetComponent<SelectionManager>();
             _selectionManager.SelectionChanged += OnSelectionChanged;
@@ -58,44 +66,29 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         private void OnSelectionChanged(ISelectionState state)
         {
+            DivideSubMeshEnabled = false;
+            DuplicateEnabled = false;
+            DeleteEnabled = false;
+            MergeMeshEnabled = false;
+            ReduceMeshEnabled = false;
+            MergeVertexEnabled = false;
+
             if (state is ObjectSelectionState objectSelection)
             {
-                if (objectSelection.SelectedObjects().Count == 1)
-                {
-                    DivideSubMeshEnabled = true;
-                    DuplicateEnabled = true;
-                    DeleteEnabled = true;
-                    MergeMeshEnabled = false;
-                }
-                else if (objectSelection.SelectedObjects().Count > 0)
-                {
-                    MergeMeshEnabled = true; 
-                    DivideSubMeshEnabled = false;
-                    DuplicateEnabled = true;
-                    DeleteEnabled = true;
-                }
-                else
-                {
-                    MergeMeshEnabled = false;
-                    DivideSubMeshEnabled = false;
-                    DuplicateEnabled = false;
-                    DeleteEnabled = false;
-                }
+                DivideSubMeshEnabled = objectSelection.SelectedObjects().Count == 1;
+                MergeMeshEnabled = objectSelection.SelectedObjects().Count >= 2;
+                DuplicateEnabled = objectSelection.SelectedObjects().Count > 0;
+                DeleteEnabled = objectSelection.SelectedObjects().Count > 0;
+                ReduceMeshEnabled = objectSelection.SelectedObjects().Count > 0;
             }
             else if (state is FaceSelectionState faceSelection && faceSelection.SelectedFaces.Count != 0)
             {
-                DivideSubMeshEnabled = false;
-                DuplicateEnabled = false;
                 DeleteEnabled = true;
             }
             else
             {
-                DivideSubMeshEnabled = false;
-                DuplicateEnabled = false;
-                DeleteEnabled = false;
+                // Vertex state
             }
-            
-            MergeVertexEnabled = false;
         }
 
         void DivideSubMesh() 
@@ -111,11 +104,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             {
                 if (objectSelectionState.CurrentSelection().Count >= 2)
                 {
-                    var modelValidator = new ModelValidator();
-                    var objs = objectSelectionState.SelectedObjects().Where(x => x is Rmv2MeshNode).Select(x => x as Rmv2MeshNode);
-                    if (!modelValidator.CanCombine(objs.ToList(), out var errors))
+                    if (!_objectEditor.CombineMeshes(objectSelectionState, out var errorMessage))
                     {
-                        var longError = string.Join("\n", errors);
+                        var longError = string.Join("\n", errorMessage);
                         MessageBox.Show("Errors trying to combine meshes:\n\n" + longError);
                     }
                 }                
@@ -138,6 +129,12 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         void MergeVertex()
         {
+        }
+
+        void ReduceMesh()
+        {
+            if (_selectionManager.GetState() is ObjectSelectionState objectSelectionState && objectSelectionState.SelectionCount() != 0)
+                _objectEditor.ReduceSelection(objectSelectionState.SelectedObjects(), 0.5f);
         }
 
 

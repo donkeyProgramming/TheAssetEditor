@@ -126,8 +126,8 @@
                     <Button ToolTip="Divide selected mesh into submeshes" 
                         Command="{Binding Tools.DivideSubMeshCommand}"
                         IsEnabled="{Binding Tools.DivideSubMeshEnabled, UpdateSourceTrigger=PropertyChanged}">
-                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_split.png"/>
-                </Button>
+                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_split.png"/>
+                    </Button>
 
                     <Button ToolTip="Merge selected meshes into one mesh" 
                         Command="{Binding Tools.MergeObjectCommand}"
@@ -138,14 +138,21 @@
                     <Button ToolTip="Duplicated selected (Ctr+D)" 
                         Command="{Binding Tools.DuplicateObjectCommand}"
                         IsEnabled="{Binding Tools.DuplicateEnabled, UpdateSourceTrigger=PropertyChanged}">
-                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_duplicate.png"/>
-                </Button>
+                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_duplicate.png"/>
+                    </Button>
 
-                <Button ToolTip="Delete selected object or faces (Del)" 
+                    <Button ToolTip="Delete selected object or faces (Del)" 
                         Command="{Binding Tools.DeleteObjectCommand}"
                         IsEnabled="{Binding Tools.DeleteEnabled, UpdateSourceTrigger=PropertyChanged}">
-                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_delete.png"/>
-                </Button>
+                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_delete.png"/>
+                    </Button>
+
+                    <Button ToolTip="Reduce mesh" 
+                        Command="{Binding Tools.ReduceMeshCommand}"
+                        IsEnabled="{Binding Tools.ReduceMeshEnabled, UpdateSourceTrigger=PropertyChanged}">
+                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-compress-64.png"/>
+                    </Button>
+                    
                 </ToolBar>
 
                 <Button ToolTip="Merge selected vertexes" 

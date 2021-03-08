@@ -63,6 +63,9 @@
 
             </TreeView.Resources>
 
+            <e1:Interaction.Behaviors>
+                <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedItem, Mode=TwoWay}" />
+            </e1:Interaction.Behaviors>
 
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">

@@ -15,7 +15,6 @@ namespace Common
     public interface IPackFile
     {
         string Name { get; set; }
-        PackFileType PackFileType();
     }
 
 }

@@ -51,28 +51,28 @@ namespace View3D.Commands.Object
             using (new WaitCursor())
             {
                 var meshService = new MeshSplitterService();
-                var newMeshes = meshService.SplitMesh(_objectToSplit.Geometry);
-                _logger.Here().Information($"{newMeshes.Count} meshes generated from splitting");
+                var splitMeshes = meshService.SplitMesh(_objectToSplit.Geometry);
+                _logger.Here().Information($"{splitMeshes.Count} meshes generated from splitting");
 
                 _newGroupNode = (GroupNode)_editableMeshResolver.GetEditableMeshNode().AddObject(new GroupNode(_objectToSplit.Name + "_Collection") { IsSelectable = true, IsUngroupable = true});
 
                 int counter = 0;
-                List<Rmv2MeshNode> _newMeshes = new List<Rmv2MeshNode>();
-                foreach (var mesh in newMeshes)
+                List<Rmv2MeshNode> createdMeshes = new List<Rmv2MeshNode>();
+                foreach (var mesh in splitMeshes)
                 {
                     var hack = _objectToSplit as Rmv2MeshNode;
                     var originalRmvModel = hack.MeshModel;
 
                     var meshNode = new Rmv2MeshNode(hack.MeshModel.Clone(), _resourceLib, hack.AnimationPlayer, mesh);
                     meshNode.Name = $"{_objectToSplit.Name}_submesh_{counter++}";
-                    _newMeshes.Add(meshNode);
+                    createdMeshes.Add(meshNode);
                     _newGroupNode.AddObject(meshNode);
                 }
 
                 _objectToSplit.Parent.RemoveObject(_objectToSplit as SceneNode);
 
                 var newState = (ObjectSelectionState)_selectionManager.CreateSelectionSate(GeometrySelectionMode.Object);
-                foreach (var node in _newMeshes)
+                foreach (var node in createdMeshes)
                     newState.ModifySelection(node, false);
             }
         }

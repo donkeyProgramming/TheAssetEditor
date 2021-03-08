@@ -3,11 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 
-namespace KitbasherEditor.Services
+namespace View3D.Utility
 {
-    public class ModelValidator
+    public class ModelCombiner
     {
         public bool CanCombine(List<Rmv2MeshNode> items, out List<string> errors)
         {
@@ -37,7 +38,7 @@ namespace KitbasherEditor.Services
                         errors.Add($"AlphaSettings Mode -> {outerLoopItem.MeshModel.Header.ModelName} has a different AlphaSettings mode then {innerLoopItem.MeshModel.Header.ModelName}");
                     }
 
-                  
+
                     // Skeleton stuff
                     //if(ValidateSkeletonInfo(outerLoopItem.Geometry, ))
                 }
@@ -53,7 +54,7 @@ namespace KitbasherEditor.Services
                 //config.ParentModelBones = AnimatedBone.CreateFromSkeleton(newSkeletonFile);
             }
 
-            
+
             return errors.Count == 0;
         }
 
@@ -78,5 +79,7 @@ namespace KitbasherEditor.Services
             textureErrorMsg = null;
             return true;
         }
+
+  
     }
 }

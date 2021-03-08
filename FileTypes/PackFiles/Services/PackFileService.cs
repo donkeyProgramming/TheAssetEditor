@@ -178,6 +178,19 @@ namespace FileTypes.PackFiles.Services
             Database.TriggerContainerUpdated(container);
         }
 
+        public void CopyFileFromOtherPackFile(PackFileContainer source, string path, PackFileContainer target)
+        {
+            var lowerPath = path.ToLower();
+            if (source.FileList.ContainsKey(lowerPath))
+            {
+                var file = source.FileList[lowerPath] as PackFile;
+                var newFile = new PackFile(file.Name, file.DataSource);
+                target.FileList.Add(lowerPath, newFile);
+            }
+
+            Database.TriggerContainerUpdated(target);
+        }
+
         public void AddFolderContent(PackFileContainer container, string path, string folderDir)
         {
             var originalFilePaths = Directory.GetFiles(folderDir, "*", SearchOption.AllDirectories);

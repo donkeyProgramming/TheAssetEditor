@@ -8,7 +8,6 @@ namespace View3D.Services
 {
     public class MeshSplitterService
     {
-
         public List<IGeometry> SplitMesh(IGeometry geometry)
         {
             List<IGeometry> output = new List<IGeometry>();

@@ -130,5 +130,46 @@ namespace View3D.Rendering.Geometry
                 return remappingItem.NewValue;
             return currentValue;
         }
+
+
+        public void Merge(List<Rmv2Geometry> others)
+        {
+            var newVertexBufferSize = others.Sum(x => x.VertexCount()) + VertexCount();
+            var newVertexArray = new VertexPositionNormalTextureCustom[newVertexBufferSize];
+
+            // Copy current vertex buffer
+            int currentVertexIndex = 0;
+            for (; currentVertexIndex < VertexCount(); currentVertexIndex++)
+                newVertexArray[currentVertexIndex] = _vertexArray[currentVertexIndex];
+
+            // Index buffers
+            var newIndexBufferSize = others.Sum(x => x.GetIndexCount()) + GetIndexCount();
+            var newIndexArray = new ushort[newIndexBufferSize];
+
+            // Copy current index buffer
+            int currentIndexIndex = 0;
+            for (; currentIndexIndex < GetIndexCount(); currentIndexIndex++)
+                newIndexArray[currentIndexIndex] = _indexList[currentIndexIndex];
+
+            // Copy others into main
+            foreach (var geo in others)
+            {
+                ushort geoOffset = (ushort)(currentVertexIndex);
+                int geoVertexIndex = 0;
+                for (; geoVertexIndex < geo.VertexCount();)
+                    newVertexArray[currentVertexIndex++] = geo._vertexArray[geoVertexIndex++];
+
+                int geoIndexIndex = 0;
+                for (; geoIndexIndex < geo.GetIndexCount();)
+                    newIndexArray[currentIndexIndex++] = (ushort)(geo._indexList[geoIndexIndex++] + geoOffset); ;
+            }
+
+
+            _vertexArray = newVertexArray;
+            _indexList = newIndexArray;
+
+            CreateIndexFromBuffers();
+            RebuildVertexBuffer();
+        }
     }
 }

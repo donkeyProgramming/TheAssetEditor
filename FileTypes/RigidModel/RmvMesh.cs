@@ -347,7 +347,7 @@ namespace Filetypes.RigidModel
             return new RmvMesh(dataArray, Header.VertextType, (int)vertexStart, Header.VertexCount, (int)faceStart, Header.FaceCount);
         }
 
-       public RmvSubModel Clone(bool includeMesh = false)
+       public RmvSubModel Clone()
        {       
            return new RmvSubModel()
            {

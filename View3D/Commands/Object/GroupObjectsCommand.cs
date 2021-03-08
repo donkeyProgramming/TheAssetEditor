@@ -59,5 +59,55 @@ namespace View3D.Commands.Object
 
             _selectionManager.SetState(_oldState);
         }
+
+        public class UnGroupObjectsCommand : CommandBase<UnGroupObjectsCommand>
+        {
+            SelectionManager _selectionManager;
+            ISelectionState _oldState;
+
+            ISceneNode _parent;
+            List<ISelectable> _itemsToUngroup { get; set; } = new List<ISelectable>();
+            ISceneNode _oldGroupNode;
+
+            public UnGroupObjectsCommand(ISceneNode parent, List<ISelectable> itemsToUngroup, ISceneNode groupNode)
+            {
+                _itemsToUngroup = itemsToUngroup;
+                _parent = parent;
+                _oldGroupNode = groupNode;
+            }
+
+            public override void Initialize(IComponentManager componentManager)
+            {
+                _selectionManager = componentManager.GetComponent<SelectionManager>();
+            }
+
+            protected override void ExecuteCommand()
+            {
+                _oldState = _selectionManager.GetStateCopy();
+
+                foreach (var item in _itemsToUngroup)
+                {
+                    item.Parent.RemoveObject(item);
+                    _parent.AddObject(item);
+                }
+
+                var currentState = _selectionManager.GetState() as ObjectSelectionState;
+                currentState.Clear();
+                
+                foreach (var item in _itemsToUngroup)
+                    currentState.ModifySelection(item, false);
+            }
+
+            protected override void UndoCommand()
+            {
+                foreach (var item in _itemsToUngroup)
+                {
+                    item.Parent.RemoveObject(item);
+                    _oldGroupNode.AddObject(item);
+                }
+
+                _selectionManager.SetState(_oldState);
+            }
+        }
     }
 }
