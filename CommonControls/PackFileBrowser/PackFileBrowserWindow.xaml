@@ -12,7 +12,7 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <local:PackFileBrowserView Grid.Row="0" DataContext="{Binding ViewModel}"/>
+        <local:PackFileBrowserView Grid.Row="0" DataContext="{Binding ViewModel, Mode=OneTime}"/>
         <Button HorizontalAlignment="Right" Margin="5,2,5,2" Width="80" Grid.Row="1" Click="Button_Click">OK</Button>
     </Grid>
 </Window>

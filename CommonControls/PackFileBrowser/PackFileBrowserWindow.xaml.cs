@@ -47,6 +47,8 @@ namespace CommonControls.PackFileBrowser
         public void Dispose()
         {
             ViewModel.Dispose();
+            ViewModel = null;
+            DataContext = null;
         }
     }
 }

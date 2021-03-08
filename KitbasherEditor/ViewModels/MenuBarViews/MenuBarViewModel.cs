@@ -57,6 +57,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                     ModelLoader.LoadReference(browser.SelectedFile);
                 }
             }
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
 
         void ImportReference_OrcTorso()

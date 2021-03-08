@@ -22,7 +22,7 @@
         </Grid.RowDefinitions>
 
         <TextBox Grid.Row="0" Text="{Binding Filter.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" behaviors:TextBoxExtensions.Watermark="Search filter"/>
-
+        
         <TreeView 
             Grid.Row="1" 
             behaviors:TreeViewExtension.SelectItemOnRightClick="True"
@@ -31,9 +31,9 @@
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.VirtualizationMode="Recycling"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True">
-
+            
             <TreeView.Resources>
-                <ContextMenu x:Key="NodeContextMenu" Visibility="{Binding DataContext.ContextMenuVisibility,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" >
+                <ContextMenu x:Key="NodeContextMenu" Visibility="{Binding DataContext.ContextMenuVisibility, Mode=OneTime,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" >
                     <MenuItem Header="Add" >
                         <MenuItem Header="From Directory"
                                   Command="{Binding DataContext.AddFilesFromDirectory,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
@@ -63,11 +63,11 @@
 
             </TreeView.Resources>
 
+
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
-                    <Setter Property="behaviors:MouseDoubleClick.Command" 
-                            Value="{Binding DataContext.DoubleClickCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}"/>
-                    <Setter Property="behaviors:MouseDoubleClick.CommandParameter" Value="{Binding}"/>
+                    <!--Setter Property="behaviors:MouseDoubleClick.Command" Value="{Binding DataContext.DoubleClickCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}, Mode=OneTime}/-->
+                    <!--Setter Property="behaviors:MouseDoubleClick.CommandParameter" Value="{Binding, Mode=OneTime}" / TODO MEMORY LEAK-->
                     <Setter Property="IsExpanded" Value="{Binding IsNodeExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                     <Setter Property="ContextMenu" Value="{StaticResource NodeContextMenu}"/>
                     <Setter Property="Visibility" Value="Visible" />
@@ -79,10 +79,6 @@
                 </Style>
             </TreeView.ItemContainerStyle>
 
-            <e1:Interaction.Behaviors>
-                <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedItem, Mode=TwoWay}" />
-            </e1:Interaction.Behaviors>
-
             <TreeView.ItemTemplate >
                 <HierarchicalDataTemplate ItemsSource="{Binding Children, Converter={StaticResource SortedCollectionViewSource}}">
                     <Grid>
@@ -90,8 +86,8 @@
                             <ColumnDefinition Width="auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Image Width="12" Grid.Column="0" Source="{Binding Path=., Converter={StaticResource ImageValueConverter}}"/>
-                        <TextBlock Margin="4,0,0,0" Grid.Column="1" Text="{Binding Name}"/>
+                        <Image Width="12" Grid.Column="0" Source="{Binding Path=., Converter={StaticResource ImageValueConverter}, Mode=OneTime}"/>
+                        <TextBlock Margin="4,0,0,0" Grid.Column="1" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
