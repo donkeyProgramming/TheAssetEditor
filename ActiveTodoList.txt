@@ -24,9 +24,9 @@ Feature list before V_1 done:
 		[DONE]Animation playback beginning
 		[DONE]Animation playback cleanup
 		UI
-			UI linking (commands visible/clickable in toolbar)
-			Update when different buttons are enabled
-			Hotkeys
+			[DONE]UI linking (commands visible/clickable in toolbar)
+			[DONE]Update when different buttons are enabled
+			[DONE]Hotkeys
 			Show info model
 			Show info header
 			Show info rmv2
@@ -75,13 +75,16 @@ Feature list before V_1 done:
 		[DONE]	Scale / Flip
 		[DONE]	Rotate 45/90
 			
-		Saving model to packfile
+		
 		Textures
 			Show
 			Change
+			Transparance
 		Different shader modes 
 			Wireframe
 			Semi-Transparent
+			No alpha
+			No texture
 			Normal
 		[DONE]Grid
 		Pivot
@@ -89,9 +92,9 @@ Feature list before V_1 done:
 			Display
 		[DONE]Combine meshes
 		[DONE]Validate
-		Transparance
 		[DONE]Skeleton id remapper
 		[DONE]Scale gizmo with +- keys on numpad. Reset option
+		Saving model to packfile
 
 	New editors:
 		Model preview
@@ -99,9 +102,16 @@ Feature list before V_1 done:
 		
 		
 Planned order:
-	Ws model
-	Textures
 	Alpha mode
+	Textures	
+	Ws model
+	Change animation vertex type (down grade, make sure it works in validation)
+	Set active packfile
+	Stop saving to CA packfile! 
+	Copy item from other packfile using ui
+	Open from packfile explore
+	Close tab control
+	Saving to packfile
 	
 	
 Known bugs:

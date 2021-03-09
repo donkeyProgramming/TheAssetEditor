@@ -24,7 +24,6 @@ using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels
 {
-
     public class ModelLoader
     {
         ILogger _logger = Logging.Create<ModelLoader>();
@@ -149,7 +148,7 @@ namespace KitbasherEditor.ViewModels
             Scene.Components.Add(new AnimationsContainerComponent(Scene)); 
 
 
-            SceneExplorer = new SceneExplorerViewModel(Scene, _skeletonAnimationLookUpHelper);
+            SceneExplorer = new SceneExplorerViewModel(Scene, _skeletonAnimationLookUpHelper, _packFileService);
             Scene.Components.Add(SceneExplorer);
 
             MenuBar = new MenuBarViewModel(Scene, _packFileService);

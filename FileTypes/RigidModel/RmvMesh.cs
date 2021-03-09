@@ -197,7 +197,7 @@ namespace Filetypes.RigidModel
     {
         public BaseVertex[] VertexList { get; set; }
         public ushort[] IndexList;
-        public MeshAlphaSettings AlphaSettings { get; private set; }
+        public MeshAlphaSettings AlphaSettings { get; set; }
 
         public static int GetVertexSize(VertexFormat vertexFormat)
         {
@@ -279,7 +279,7 @@ namespace Filetypes.RigidModel
     {
         int _modelStart;
 
-        public RmvSubModelHeader Header { get; private set; }
+        public RmvSubModelHeader Header { get; set; }
         public List<RmvAttachmentPoint> AttachmentPoints;
         public List<RmvTexture> Textures;
         public RmvMesh Mesh { get; private set; }
@@ -334,9 +334,11 @@ namespace Filetypes.RigidModel
             return textures;
         }
 
-        public RmvTexture GetTexture(TexureType texureType)
+        public RmvTexture? GetTexture(TexureType texureType)
         {
-            return Textures.FirstOrDefault(x => x.TexureType == texureType);
+            if(Textures.Count(x => x.TexureType == texureType) != 0)
+                return Textures.FirstOrDefault(x => x.TexureType == texureType);
+            return null;
         }
 
         RmvMesh LoadMesh(byte[] dataArray)

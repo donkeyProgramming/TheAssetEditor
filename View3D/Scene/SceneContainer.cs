@@ -17,7 +17,6 @@ using View3D.SceneNodes;
 
 namespace View3D.Scene
 {
-
     public class SceneContainer : WpfGame
     {
         private bool _disposed;
@@ -30,8 +29,6 @@ namespace View3D.Scene
             base.Initialize();
         }
 
-
-
         protected override void LoadContent()
         {
             base.LoadContent();
@@ -41,8 +38,6 @@ namespace View3D.Scene
         {
             base.Draw(time);
         }
-
-
 
         protected override void Dispose(bool disposing)
         {

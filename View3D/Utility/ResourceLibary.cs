@@ -50,6 +50,7 @@ namespace View3D.Utility
             // Load default shaders
             LoadEffect("Shaders\\Phazer\\main", ShaderTypes.Phazer);
             LoadEffect("Shaders\\Geometry\\BasicShader", ShaderTypes.BasicEffect);
+            LoadEffect("Shaders\\TexturePreview", ShaderTypes.TexturePreview);
 
             PbrDiffuse = Content.Load<TextureCube>("textures\\phazer\\rustig_koppie_DiffuseHDR");
             PbrSpecular = PbrDiffuse;// resourceLibary.XnaContentManager.Load<TextureCube>("textures\\phazer\\rustig_koppie_SpecularHDR");

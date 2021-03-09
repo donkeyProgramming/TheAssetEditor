@@ -413,6 +413,11 @@ namespace MonoGame.Framework.WpfInterop
             }
         }
 
+        public void ForceCreate()
+        {
+            OnLoaded(null, null);
+        }
+
         private void OnLoaded(object sender, RoutedEventArgs eventArgs)
         {
             if (IsInDesignMode || _loaded)

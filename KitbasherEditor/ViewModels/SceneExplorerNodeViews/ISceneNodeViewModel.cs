@@ -1,4 +1,5 @@
 ﻿using Common.ApplicationSettings;
+using FileTypes.PackFiles.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,7 +13,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
     public static class SceneNodeViewFactory
     {
-        public static ISceneNodeViewModel Create(ISceneNode node, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        public static ISceneNodeViewModel Create(ISceneNode node, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService pf)
         {
             switch (node)
             {
@@ -23,7 +24,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                     return new LodSceneNodeViewModel(l);
 
                 case Rmv2MeshNode m:
-                    return new MeshSceneNodeViewModel(m, skeletonAnimationLookUpHelper);
+                    return new MeshSceneNodeViewModel(m, pf, skeletonAnimationLookUpHelper);
 
                 default:
                     return null;

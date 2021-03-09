@@ -1,5 +1,6 @@
 ﻿using Common;
 using Common.ApplicationSettings;
+using FileTypes.PackFiles.Services;
 using GalaSoft.MvvmLight.Command;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using System;
@@ -44,15 +45,15 @@ namespace KitbasherEditor.ViewModels
         public Rmv2ModelNode EditableMeshNode { get; set; }
 
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-
+        PackFileService _packFileService;
         bool _updateSelectionManagerOnNodeSelect = true;
-        public SceneExplorerViewModel(SceneContainer sceneContainer, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        public SceneExplorerViewModel(SceneContainer sceneContainer, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService packFileService)
         {
             _selectedLodLvl = LodItem.GetAll.First();
 
             _sceneContainer = sceneContainer;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
-
+            _packFileService = packFileService;
             _sceneManager = _sceneContainer.GetComponent<SceneManager>();
             _commandExecutor = sceneContainer.GetComponent<CommandExecutor>();
             _selectionManager = sceneContainer.GetComponent<SelectionManager>();
@@ -171,8 +172,7 @@ namespace KitbasherEditor.ViewModels
 
         private void OnNodeSelected(ISceneNode selectedNode)
         {
-
-            SelectedNodeViewModel = SceneNodeViewFactory.Create(selectedNode, _skeletonAnimationLookUpHelper);
+            SelectedNodeViewModel = SceneNodeViewFactory.Create(selectedNode, _skeletonAnimationLookUpHelper, _packFileService);
             if (_updateSelectionManagerOnNodeSelect)
             {
                 var objectState = new ObjectSelectionState();
