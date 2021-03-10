@@ -1,6 +1,7 @@
 ﻿using CommonControls.PackFileBrowser;
 using FileTypes.PackFiles.Services;
 using GalaSoft.MvvmLight.CommandWpf;
+using KitbasherEditor.Services;
 using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;

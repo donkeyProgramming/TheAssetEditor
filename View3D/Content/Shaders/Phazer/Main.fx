@@ -14,7 +14,7 @@ float4x4 Projection;
 
 
 float4x4  EnvMapTransform;
-bool UseAlpha = false;
+
 
 bool debug = true;
 float debugVal = 0;
@@ -38,6 +38,12 @@ Texture2D<float4> GlossTexture;
 TextureCube<float4> tex_cube_diffuse;
 TextureCube<float4> tex_cube_specular;
 Texture2D<float4> specularBRDF_LUT;
+
+bool UseDiffuse = true;
+bool UseSpecular = true;
+bool UseNormal = true;
+bool UseGloss = true;
+bool UseAlpha = false;
 
 
 float4x4 tranforms[256];
@@ -254,19 +260,33 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
         input.binormal *= -1;
     }
 
-
-    float4 NormalTex = NormalTexture.Sample(s_normal, input.tex);
-    float4 DiffuseTex = tex2D(DiffuseSampler, input.tex); ;// DiffuseSampler.Sample(input.tex);// DiffuseTexture.Sample(SampleType, input.tex);
-   // FactionMaskTex = shaderTextures[3].Sample(SampleType, input.tex);
-    float4 SpecTex = SpecularTexture.Sample(SampleType, input.tex);
-    float4 GlossTex = GlossTexture.Sample(SampleType, input.tex);
-
-
-    DiffuseTex = pow(DiffuseTex, 2.2);
-    SpecTex = pow(SpecTex, 2.2);
-    DiffuseTex.rgb = DiffuseTex.rgb * (1 - max(SpecTex.b, max(SpecTex.r, SpecTex.g)));
+    float4 SpecTex = float4(0, 0, 0, 1);
+    if (UseSpecular)
+    {
+        SpecTex = SpecularTexture.Sample(SampleType, input.tex);
+        SpecTex = pow(SpecTex, 2.2);
+    }
 
 
+    float4 DiffuseTex = float4(0.5f, 0.5f, 0.5f, 1);
+    if (UseDiffuse)
+    {
+        DiffuseTex = tex2D(DiffuseSampler, input.tex);
+        DiffuseTex = pow(DiffuseTex, 2.2);
+        DiffuseTex.rgb = DiffuseTex.rgb * (1 - max(SpecTex.b, max(SpecTex.r, SpecTex.g)));
+    }
+
+
+    float4 GlossTex = float4(0, 0, 0, 1);
+    if (UseGloss)
+        GlossTex = GlossTexture.Sample(SampleType, input.tex);
+
+    float4 NormalTex = float4(0, 0, 0, 1);
+    if (UseNormal)
+        NormalTex = NormalTexture.Sample(s_normal, input.tex);
+
+    
+    
     float smoothness = substance_smoothness_get_our_smoothness(GlossTex.r);  
 	float roughness = saturate((1 - smoothness));
 

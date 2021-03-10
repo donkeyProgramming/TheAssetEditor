@@ -20,31 +20,29 @@ using System.Windows.Media.Imaging;
 using TextureEditor.Views;
 using View3D.Scene;
 using View3D.Utility;
-//using Viewer.Scene;
-//using WpfTest.Scenes;
-
 
 namespace TextureEditor.ViewModels
 {
-    public class TexturePreviewController
+    public class TexturePreviewController : IDisposable
     {
-        public static void Create(string imagePath, PackFileService packFileService)
+        public static void CreateVindow(string imagePath, PackFileService packFileService)
         {
             TexturePreviewViewModel viewModel = new TexturePreviewViewModel()
             {
                 Format = "DDS0",
-                Name = "MyTestImage.png",
-                Height = 512,
-                Width = 1024,
+                Name = imagePath,
+                //Height = 512,
+                //Width = 1024,
             };
 
-            var controller = new TexturePreviewController(imagePath, viewModel, packFileService);
-            var containingWindow = new Window();
-            containingWindow.Title = "Texture Preview Window";
-            containingWindow.Content = new TexturePreviewView() { DataContext = viewModel };
-            containingWindow.ShowDialog();
+            using (var controller = new TexturePreviewController(imagePath, viewModel, packFileService))
+            {
+                var containingWindow = new Window();
+                containingWindow.Title = "Texture Preview Window";
+                containingWindow.Content = new TexturePreviewView() { DataContext = viewModel };
+                containingWindow.ShowDialog();
+            }
         }
-
 
         PackFileService _packFileService;
         ResourceLibary _resourceLib;
@@ -62,17 +60,13 @@ namespace TextureEditor.ViewModels
             _scene = new SceneContainer();
             _scene.Components.Add(new ResourceLibary(_scene, packFileService));
             _scene.ForceCreate();
-            _scene.SceneInitialized += OnSceneInitialized;
+  
 
             _resourceLib = _scene.GetComponent<ResourceLibary>();
             _textureRenderer = new TextureToTextureRenderer(_scene.GraphicsDevice, new SpriteBatch(_scene.GraphicsDevice), _resourceLib);
             CreateImage();
         }
 
-        private void OnSceneInitialized(WpfGame scene)
-        {
-         
-        }
 
         void CreateImage()
         {
@@ -367,6 +361,12 @@ namespace TextureEditor.ViewModels
 
                 return bitmapimage;
             }
+        }
+
+        public void Dispose()
+        {
+            _textureRenderer.Dispose();
+            _scene.Dispose();
         }
     }
 }

@@ -19,6 +19,7 @@ namespace View3D.Rendering.Shading
     {
         bool UseAlpha { set; }
          void SetTexture(Texture2D texture, TexureType type);
+        void UseTexture(bool value, TexureType type);
     }
 
     public interface IShaderAnimation
@@ -115,6 +116,11 @@ namespace View3D.Rendering.Shading
             //Effect.Parameters["EnvMapTransform"].SetValue((Matrix.CreateRotationY(commonShaderParameters.EnvRotate)));
             
         }
+
+        public void UseTexture(bool value, TexureType type)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class PbrShader : IShader, IShaderTextures, IShaderAnimation
@@ -122,6 +128,7 @@ namespace View3D.Rendering.Shading
         public Effect Effect { get; private set; }
 
         Dictionary<TexureType, EffectParameter> _textures = new Dictionary<TexureType, EffectParameter>();
+        Dictionary<TexureType, EffectParameter> _useTextures = new Dictionary<TexureType, EffectParameter>();
         ResourceLibary _resourceLibary;
         public PbrShader(ResourceLibary resourceLibary)
         {
@@ -135,13 +142,28 @@ namespace View3D.Rendering.Shading
             _textures.Add(TexureType.Specular, Effect.Parameters["SpecularTexture"]);
             _textures.Add(TexureType.Normal, Effect.Parameters["NormalTexture"]);
             _textures.Add(TexureType.Gloss, Effect.Parameters["GlossTexture"]);
+
+
+            _useTextures.Add(TexureType.Diffuse, Effect.Parameters["UseDiffuse"]);
+            _useTextures.Add(TexureType.Specular, Effect.Parameters["UseSpecular"]);
+            _useTextures.Add(TexureType.Normal, Effect.Parameters["UseNormal"]);
+            _useTextures.Add(TexureType.Gloss, Effect.Parameters["UseGloss"]);
+
             _resourceLibary = resourceLibary;
         }
 
         public bool UseAlpha { set { Effect.Parameters["UseAlpha"].SetValue(value); } }
+
         public void SetTexture(Texture2D texture, TexureType type)
         {
-            _textures[type].SetValue(texture);
+            if (_textures.ContainsKey(type))
+                _textures[type].SetValue(texture);
+        }
+
+        public void UseTexture(bool value, TexureType type)
+        {
+            if(_useTextures.ContainsKey(type))
+                _useTextures[type].SetValue(value);
         }
 
         public void SetCommonParmeters(CommonShaderParameters commonShaderParameters, Matrix modelMatrix)

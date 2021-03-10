@@ -7,7 +7,7 @@ using System.IO;
 
 namespace View3D.Utility
 {
-    public class TextureToTextureRenderer
+    public class TextureToTextureRenderer : IDisposable
     {
         GraphicsDevice _device;
         SpriteBatch _spriteBatch;
@@ -66,6 +66,11 @@ namespace View3D.Utility
             {
                 texture.SaveAsPng(stream, texture.Width, texture.Height);
             }
+        }
+
+        public void Dispose()
+        {
+            _spriteBatch.Dispose();
         }
     }
 }

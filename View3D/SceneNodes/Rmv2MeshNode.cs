@@ -24,6 +24,7 @@ namespace View3D.SceneNodes
         Quaternion _orientation = Quaternion.Identity;
         Vector3 _position = Vector3.Zero;
         Vector3 _scale = Vector3.One;
+        ResourceLibary _resourceLib;
 
         public Vector3 Position { get { return _position; } set { _position = value; UpdateMatrix(); } }
         public Vector3 Scale { get { return _scale; } set { _scale = value; UpdateMatrix(); } }
@@ -44,6 +45,7 @@ namespace View3D.SceneNodes
         public Rmv2MeshNode(RmvSubModel rmvSubModel, ResourceLibary resourceLib, AnimationPlayer animationPlayer, IGeometry geometry = null)
         {
             MeshModel = rmvSubModel;
+            _resourceLib = resourceLib;
             Geometry = geometry;
             if (Geometry == null)
                 Geometry = new Rmv2Geometry(rmvSubModel, resourceLib.GraphicsDevice);
@@ -95,14 +97,26 @@ namespace View3D.SceneNodes
             return MathUtil.GetCenter(Geometry.BoundingBox) + Position;
         }
 
-        public void RefreshTexture(TexureType texureType)
+        public void UpdateTexture(string path, TexureType texureType)
         {
-            throw new NotImplementedException();
+            var texture = _resourceLib.LoadTexture(path);
+            (Effect as IShaderTextures).SetTexture(texture, texureType);
+
+            for (int i = 0; i < MeshModel.Textures.Count; i++)
+            {
+                if (MeshModel.Textures[i].TexureType == texureType)
+                {
+                    var tex = MeshModel.Textures[i];
+                    tex.Path = path;
+                    MeshModel.Textures[i] = tex;
+                    break;
+                }
+            }
         }
 
         public void UseTexture(TexureType texureType, bool value)
         {
-            throw new NotImplementedException();
+            (Effect as IShaderTextures).UseTexture(value, texureType);
         }
 
         public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)

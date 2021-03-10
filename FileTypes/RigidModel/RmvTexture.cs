@@ -2,6 +2,7 @@
 using Filetypes.ByteParsing;
 using System;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Filetypes.RigidModel
 {
@@ -38,6 +39,17 @@ namespace Filetypes.RigidModel
                 if (result == false)
                     throw new Exception();
                 return Util.SanatizeFixedString(value);
+            }
+            set
+            {
+                for (int i = 0; i < 256; i++)
+                    _path[i] = 0;
+
+                var byteValues = Encoding.UTF8.GetBytes(value);
+                for (int i = 0; i < byteValues.Length; i++)
+                {
+                    _path[i] = byteValues[i];
+                }
             }
         }
 

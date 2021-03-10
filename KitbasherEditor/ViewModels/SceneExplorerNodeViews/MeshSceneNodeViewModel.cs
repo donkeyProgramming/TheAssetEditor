@@ -1,6 +1,7 @@
 ﻿using Common;
 using Common.ApplicationSettings;
 using CommonControls.MathViews;
+using CommonControls.PackFileBrowser;
 using Filetypes.RigidModel;
 using FileTypes.PackFiles.Services;
 using GalaSoft.MvvmLight.CommandWpf;
@@ -156,7 +157,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             public bool UseTexture { get { return _useTexture; } set { SetAndNotify(ref _useTexture, value); UpdateUseTexture(value); } }
 
             string _path;
-            public string Path { get { return _path; } set { SetAndNotify(ref _path, value); UpdateTexture(value); } }
+            public string Path { get { return _path; } set { SetAndNotify(ref _path, value); } }
 
 
             public ICommand PreviewCommand { get; set; }
@@ -171,28 +172,37 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 _texureType = texureType;
                 Path = _meshNode.MeshModel.GetTexture(texureType)?.Path;
 
-                PreviewCommand = new RelayCommand(PreviewTexture);
+                PreviewCommand = new RelayCommand(() => TexturePreviewController.CreateVindow(Path, _packfileService));
                 BrowseCommand = new RelayCommand(BrowseTexture);
                 RemoveCommand = new RelayCommand(RemoveTexture);
             }
 
-
-            void PreviewTexture() 
+            void BrowseTexture() 
             {
-                TexturePreviewController.Create(Path, _packfileService);
-
+                using (var browser = new PackFileBrowserWindow(_packfileService))
+                {
+                    browser.ViewModel.Filter.SetExtentions(new List<string>() { ".dds", ".png", });
+                    if (browser.ShowDialog() == true && browser.SelectedFile != null)
+                    {
+                        try
+                        {
+                            Path = _packfileService.GetFullPath(browser.SelectedFile);
+                            _meshNode.UpdateTexture(Path, _texureType);
+                        }
+                        catch 
+                        {
+                            UpdateUseTexture(false);
+                        }
+                    }
+                }
             }
-            void BrowseTexture() { }
-            void RemoveTexture() { }
-
-            public void UpdateTexture(string newTexturePath)
+            void RemoveTexture() 
             {
-                //_meshNode.RefreshTexture(_texureType);
             }
 
             public void UpdateUseTexture(bool value)
             {
-                //_meshNode.UseTexture(_texureType, value);
+                _meshNode.UseTexture(_texureType, value);
             }
         }
 

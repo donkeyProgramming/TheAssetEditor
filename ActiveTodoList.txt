@@ -23,6 +23,8 @@ Feature list before V_1 done:
 		[DONE]Better shader handling
 		[DONE]Animation playback beginning
 		[DONE]Animation playback cleanup
+		Snap to secondary selected vertex
+		Move uv vertexes around?
 		UI
 			[DONE]UI linking (commands visible/clickable in toolbar)
 			[DONE]Update when different buttons are enabled
@@ -74,12 +76,12 @@ Feature list before V_1 done:
 		[DONE]Transform window
 		[DONE]	Scale / Flip
 		[DONE]	Rotate 45/90
-			
 		
-		Textures
-			Show
-			Change
-			Transparance
+		[DONE]Textures
+		[DONE]	Show
+		[DONE]	Change
+		[DONE]	Enable/disable
+		[DONE]	Transparency
 		Different shader modes 
 			Wireframe
 			Semi-Transparent
@@ -99,13 +101,16 @@ Feature list before V_1 done:
 	New editors:
 		Model preview
 		VMD editor
+		Texture editor
 		
 		
 Planned order:
-	Alpha mode
-	Textures	
+
 	Ws model
 	Change animation vertex type (down grade, make sure it works in validation)
+	Reduce mesh command
+	Snap to secondary selected vertex
+	Different shader modes
 	Set active packfile
 	Stop saving to CA packfile! 
 	Copy item from other packfile using ui

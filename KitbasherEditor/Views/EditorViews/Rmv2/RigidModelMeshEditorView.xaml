@@ -74,13 +74,13 @@
                     <Label>:</Label>
                     <StackPanel>
                         <Button Command="{Binding Animation.UseParentAttachemntPointsCommand}" Content="Take from parent" Width="130"/>
-                  
+
                         <Expander>
                             <Expander.Header>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="Count = "/>
                                     <TextBlock Text="{Binding Animation.AttachmentPoints.Count, UpdateSourceTrigger=PropertyChanged}"/>
-                               
+
                                 </StackPanel>
                             </Expander.Header>
 
@@ -94,7 +94,7 @@
                                         </GridView>
                                     </ListView.View>
                                 </ListView>
-                            
+
                             </StackPanel>
                         </Expander>
                     </StackPanel>
@@ -110,7 +110,7 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="Count = "/>
                                     <TextBlock Text="{Binding Animation.AnimatedBones.Count, UpdateSourceTrigger=PropertyChanged}"/>
-                                    
+
                                 </StackPanel>
                             </Expander.Header>
 
@@ -125,7 +125,7 @@
                                     </ListView.View>
 
                                 </ListView>
-                          
+
                             </StackPanel>
                         </Expander>
                     </StackPanel>
@@ -167,45 +167,49 @@
                 <simple:BrowsableItemView DockPanel.Dock="Top" LabelLength="100" LabelName="Diffuse"
                                  DisplayCheckBox="True" 
                                  PathTextReadOnly="true"
+                                DisplayRemoveButton="False"
                                  Preview="{Binding Graphics.Textures[Diffuse].PreviewCommand}" 
                                  Browse="{Binding Graphics.Textures[Diffuse].BrowseCommand}" 
-                                 Remove="{Binding Graphics.Textures[Diffuse].RemoveCommand}" 
                                  CheckBoxValue="{Binding Path=Graphics.Textures[Diffuse].UseTexture, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                  PathText="{Binding Path=Graphics.Textures[Diffuse].Path, UpdateSourceTrigger=PropertyChanged}" />
 
                 <simple:BrowsableItemView DockPanel.Dock="Top" LabelLength="100" LabelName="Specular"
                                  DisplayCheckBox="True" 
                                  PathTextReadOnly="true"
+                                           DisplayRemoveButton="False"
                                  Preview="{Binding Graphics.Textures[Specular].PreviewCommand}" 
                                  Browse="{Binding Graphics.Textures[Specular].BrowseCommand}" 
-                                 Remove="{Binding Graphics.Textures[Specular].RemoveCommand}"  
                                  CheckBoxValue="{Binding Path=Graphics.Textures[Specular].UseTexture, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                  PathText="{Binding Path=Graphics.Textures[Specular].Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <simple:BrowsableItemView DockPanel.Dock="Top" LabelLength="100" LabelName="Gloss"                                
                                  DisplayCheckBox="True" 
                                  PathTextReadOnly="true"
+                                           DisplayRemoveButton="False"
                                 Preview="{Binding Graphics.Textures[Gloss].PreviewCommand}" 
                                  Browse="{Binding Graphics.Textures[Gloss].BrowseCommand}" 
-                                 Remove="{Binding Graphics.Textures[Gloss].RemoveCommand}" 
+                            
                                  CheckBoxValue="{Binding Path=Graphics.Textures[Gloss].UseTexture, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                  PathText="{Binding Path=Graphics.Textures[Gloss].Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <simple:BrowsableItemView DockPanel.Dock="Top" LabelLength="100" LabelName="Normal"                                 
                                  DisplayCheckBox="True" 
                                  PathTextReadOnly="true"
+                                          
+                                           DisplayRemoveButton="False"
                                Preview="{Binding Graphics.Textures[Normal].PreviewCommand}" 
                                  Browse="{Binding Graphics.Textures[Normal].BrowseCommand}" 
-                                 Remove="{Binding Graphics.Textures[Normal].RemoveCommand}"  
+                             
                                  CheckBoxValue="{Binding Path=Graphics.Textures[Normal].UseTexture, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                  PathText="{Binding Path=Graphics.Textures[Normal].Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                
+
                 <simple:BrowsableItemView DockPanel.Dock="Top" LabelLength="100" LabelName="Mask"                                 
                                  DisplayCheckBox="True" 
                                  PathTextReadOnly="true"
+                                           DisplayRemoveButton="False"
                                  Preview="{Binding Graphics.Textures[Mask].PreviewCommand}" 
                                  Browse="{Binding Graphics.Textures[Mask].BrowseCommand}" 
-                                 Remove="{Binding Graphics.Textures[Mask].RemoveCommand}" 
+                       
                                  CheckBoxValue="{Binding Path=Graphics.Textures[Mask].UseTexture, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                  PathText="{Binding Path=Graphics.Textures[Mask].Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </DockPanel>
