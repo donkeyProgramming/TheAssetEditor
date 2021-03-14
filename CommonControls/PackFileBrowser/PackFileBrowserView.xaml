@@ -44,21 +44,50 @@
                                   CommandParameter="{Binding}"/>
                     </MenuItem>
 
+                    <MenuItem Header="Copy to Editable pack"
+                              Command="{Binding DataContext.CopyToEditablePackCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
+                              CommandParameter="{Binding}"
+                               IsEnabled="{Binding IsPackContainer, Converter={StaticResource InvBoolConverter}}"/>
+
+                    <MenuItem Header="Extract to file" IsEnabled="False"/>
+                    <Separator/>
+
+                    <MenuItem Header="Expand" 
+                              Command="{Binding DataContext.ExpandAllChildrenCommand,  UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
+                              CommandParameter="{Binding}"
+                              IsEnabled="{Binding IsPackContainer, Converter={StaticResource InvBoolConverter}}"/>
+
                     <MenuItem Header="Rename" 
                               Command="{Binding DataContext.RenameNodeCommand,  UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
                               CommandParameter="{Binding}"
                               IsEnabled="{Binding IsPackContainer, Converter={StaticResource InvBoolConverter}}"/>
 
-                    <MenuItem Header="Extract"/>
+                    <MenuItem Header="Copy full path" 
+                              Command="{Binding DataContext.CopyNodePathCommand,  UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
+                              CommandParameter="{Binding}"
+                              IsEnabled="{Binding IsPackContainer, Converter={StaticResource InvBoolConverter}}"/>
+
+                    <MenuItem Header="Set as Editable Pack"
+                              Command="{Binding DataContext.SetAsEditabelPackCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
+                              CommandParameter="{Binding}"
+                               IsEnabled="{Binding IsPackContainer}"/>
+                    <Separator/>
 
                     <MenuItem Header="Delete"
                               Command="{Binding DataContext.DeleteCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
-                              CommandParameter="{Binding}"/>
+                              CommandParameter="{Binding}"
+                              IsEnabled="{Binding IsPackContainer, Converter={StaticResource InvBoolConverter}}"/>
 
                     <MenuItem Header="Close"
                               Command="{Binding DataContext.CloseNodeCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
                               CommandParameter="{Binding}"
                               IsEnabled="{Binding IsPackContainer}"/>
+
+                    <MenuItem Header="Save"
+                              Command="{Binding DataContext.SavePackFileCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
+                              CommandParameter="{Binding}"
+                              IsEnabled="{Binding IsPackContainer}"/>
+
                 </ContextMenu>
 
             </TreeView.Resources>
@@ -69,15 +98,23 @@
 
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
-                    <!--Setter Property="behaviors:MouseDoubleClick.Command" Value="{Binding DataContext.DoubleClickCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}, Mode=OneTime}/-->
-                    <!--Setter Property="behaviors:MouseDoubleClick.CommandParameter" Value="{Binding, Mode=OneTime}" / TODO MEMORY LEAK-->
-                    <Setter Property="IsExpanded" Value="{Binding IsNodeExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                    <Setter Property="behaviors:MouseDoubleClick.Command" Value="{Binding DataContext.DoubleClickCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}, Mode=OneTime}"/>
+                    <!--Setter Property="behaviors:MouseDoubleClick.CommandParameter" Value="{Binding, Mode=OneTime}" /-->
+                        <Setter Property="IsExpanded" Value="{Binding IsNodeExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                     <Setter Property="ContextMenu" Value="{StaticResource NodeContextMenu}"/>
                     <Setter Property="Visibility" Value="Visible" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsVisible}" Value="False">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
+
+                        <DataTrigger Binding="{Binding IsMainEditabelPack}" Value="True">
+                            <Setter Property="FontWeight" Value="Bold" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsMainEditabelPack}" Value="False">
+                            <Setter Property="FontWeight" Value="Normal" />
+                        </DataTrigger>
+
                     </Style.Triggers>
                 </Style>
             </TreeView.ItemContainerStyle>

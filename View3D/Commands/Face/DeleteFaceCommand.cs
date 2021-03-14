@@ -10,7 +10,6 @@ using View3D.Rendering.Geometry;
 
 namespace View3D.Commands.Face
 {
-
     public class DeleteFaceCommand : CommandBase<DeleteFaceCommand>
     {
         SelectionManager _selectionManager;

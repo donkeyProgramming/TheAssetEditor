@@ -16,7 +16,7 @@ namespace TextEditor
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<TextEditorViewModel, TextEditorView>(".json", ".xml", ".txt");
+            factory.RegisterTool<TextEditorViewModel, TextEditorView>(".json", ".xml", ".txt", ".wsmodel", ".variantmeshdefinition");
         }
     }
 }

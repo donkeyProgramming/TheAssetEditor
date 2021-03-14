@@ -13,7 +13,7 @@ namespace FileTypes.PackFiles.Services
     {
         ILogger _logger = Logging.Create<PackFileService>();
         
-        
+
         public PackFileDataBase Database { get; private set; }
 
         public PackFileService(PackFileDataBase database)
@@ -80,11 +80,20 @@ namespace FileTypes.PackFiles.Services
             return output;
         }
 
-        public string GetFullPath(PackFile file)
+        public string GetFullPath(PackFile file, PackFileContainer container = null)
         {
-            foreach (var pf in Database.PackFiles)
+            if (container == null)
             {
-                var res = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
+                foreach (var pf in Database.PackFiles)
+                {
+                    var res = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
+                    if (string.IsNullOrWhiteSpace(res) == false)
+                        return res;
+                }
+            }
+            else
+            {
+                var res = container.FileList.FirstOrDefault(x => x.Value == file).Key;
                 if (string.IsNullOrWhiteSpace(res) == false)
                     return res;
             }
@@ -185,7 +194,7 @@ namespace FileTypes.PackFiles.Services
             {
                 var file = source.FileList[lowerPath] as PackFile;
                 var newFile = new PackFile(file.Name, file.DataSource);
-                target.FileList.Add(lowerPath, newFile);
+                target.FileList[lowerPath] = newFile;
             }
 
             Database.TriggerContainerUpdated(target);
@@ -209,6 +218,27 @@ namespace FileTypes.PackFiles.Services
             }
 
             Database.TriggerContainerUpdated(container);
+        }
+
+        public void SetEditablePack(PackFileContainer pf)
+        {
+            Database.PackSelectedForEdit = pf;
+        }
+
+        public PackFileContainer GetEditablePack()
+        {
+            return Database.PackSelectedForEdit;
+        }
+
+        public PackFileContainer GetPackFileContainer(IPackFile file)
+        {
+            foreach (var pf in Database.PackFiles)
+            {
+                var res = pf.FileList.FirstOrDefault(x => x.Value == file).Value;
+                if (res != null)
+                    return pf;
+            }
+            throw new Exception("Unknown packfile container for " + file.Name);
         }
 
         // Remove
@@ -256,10 +286,17 @@ namespace FileTypes.PackFiles.Services
         public void Save(PackFileContainer pf, BinaryWriter writer)
         {
             pf.SaveToByteArray(writer);
-            // Compute the size of all the files
-           
         }
 
+        public void Save(PackFileContainer pf, string path)
+        {
+            using (FileStream fs = File.OpenWrite(path))
+            {
+                using (BinaryWriter writer = new BinaryWriter(fs))
+                    Save(pf, writer);
+            }
+        }
+        
         public IPackFile FindFile(string path) 
         {
             var lowerPath = path.Replace('/', '\\').ToLower();

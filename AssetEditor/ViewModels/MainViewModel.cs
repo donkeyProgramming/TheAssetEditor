@@ -7,6 +7,7 @@ using CommonControls.Behaviors;
 using CommonControls.PackFileBrowser;
 using FileTypes.PackFiles.Models;
 using FileTypes.PackFiles.Services;
+using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -18,6 +19,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using TextEditor;
 using View3D;
@@ -38,16 +40,20 @@ namespace AssetEditor.ViewModels
         int _selectedIndex;
         public int SelectedEditorIndex { get => _selectedIndex; set => SetAndNotify(ref _selectedIndex, value); }
 
+        public ICommand CloseToolCommand { get; set; }
+
         public MainViewModel(MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, GameInformationService gameInformationService, ToolFactory toolFactory)
         {
             MenuBar = menuViewModel;
+
+            CloseToolCommand = new RelayCommand<IEditorViewModel>(CloseTool);
 
             FileTree = new FileTreeViewModel(packfileService);
             FileTree.FileOpen += OnFileOpen;
 
             ToolsFactory = toolFactory;
+            //ToolsFactory.RegisterTool<TextEditorViewModel, TextEditorView>(".wsmodel", ".variantmeshdefinition");
             //ToolsFactory.RegisterToolAsDefault<TextEditorViewModel, TextEditorView>();
-
 
             if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
             {
@@ -77,7 +83,8 @@ namespace AssetEditor.ViewModels
 
             //
             //variantmeshes\variantmeshdefinitions\dwf_hammerers.variantmeshdefinition"
-            var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
+            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
+            var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_loremaster_of_hoeth\hef_loremaster_of_hoeth_head_01.rigid_model_v2");
             //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc4\hef\hef_war_lion\hef_war_lion_02.rigid_model_v2");
             //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hr1\brt\brt_royal_pegasus\brt_pegasus_01.rigid_model_v2");
             OnFileOpen(packFile);
@@ -90,6 +97,8 @@ namespace AssetEditor.ViewModels
             var caPack = packfileService.Database.PackFiles[0];
             var newPackFile = packfileService.CreateNewPackFile("CustomPackFile", PackFileCAType.MOD);
             packfileService.CopyFileFromOtherPackFile(caPack, @"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2", newPackFile);
+
+            packfileService.SetEditablePack(newPackFile);
         }
 
         private void OnFileOpen(IPackFile file)
@@ -119,6 +128,21 @@ namespace AssetEditor.ViewModels
             editorViewModel.MainFile = file;
             CurrentEditorsList.Add(editorViewModel);
             SelectedEditorIndex = CurrentEditorsList.Count - 1;
+        }
+
+        void CloseTool(IEditorViewModel tool)
+        {
+            if (tool.HasUnsavedChanges())
+            {
+                if (MessageBox.Show("Unsaved changed - Are you sure?", "Close", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
+                {
+                    return;
+                }
+            }
+
+            var index = CurrentEditorsList.IndexOf(tool);
+            CurrentEditorsList.RemoveAt(index);
+            tool.Close();
         }
     }
 }

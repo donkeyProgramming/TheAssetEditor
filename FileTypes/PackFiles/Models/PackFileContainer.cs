@@ -16,6 +16,7 @@ namespace FileTypes.PackFiles.Models
 
         public PFHeader Header { get; set; }
         public bool IsCaPackFile { get; set; } = false;
+        public string SystemFilePath { get; set; }
 
         public Dictionary<string, IPackFile> FileList { get; set; } = new Dictionary<string, IPackFile>();
 
@@ -32,6 +33,7 @@ namespace FileTypes.PackFiles.Models
 
         public PackFileContainer(string packFileSystemPath, BinaryReader reader)
         {
+            SystemFilePath = packFileSystemPath;
             Name = Path.GetFileNameWithoutExtension(packFileSystemPath);
             Header = new PFHeader(reader);
 

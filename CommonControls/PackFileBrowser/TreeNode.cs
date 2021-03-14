@@ -21,6 +21,7 @@ namespace CommonControls.PackFileBrowser
     public class TreeNode : NotifyPropertyChangedImpl
     {
         public PackFileContainer FileOwner { get; set; }
+        public bool IsPackContainer { get => NodeType == NodeType.Root; }
         public IPackFile Item { get; set; }
 
         bool _isExpanded = false;
@@ -32,8 +33,14 @@ namespace CommonControls.PackFileBrowser
 
         public NodeType NodeType { get; set; }
         public TreeNode Parent { get; set; }
-
         public ObservableCollection<TreeNode> Children { get; set; } = new ObservableCollection<TreeNode>();
+
+
+        bool _unsavedChanged;
+        public bool UnsavedChanged { get => _unsavedChanged; set => SetAndNotify(ref _unsavedChanged, value); }
+
+        bool _isMainEditabelPack;
+        public bool IsMainEditabelPack { get => _isMainEditabelPack; set => SetAndNotify(ref _isMainEditabelPack, value); }
 
         bool _Visibility = true;
         public bool IsVisible { get => _Visibility; set => SetAndNotify(ref _Visibility, value); }
@@ -71,6 +78,27 @@ namespace CommonControls.PackFileBrowser
         public override string ToString()
         {
             return Name;
+        }
+
+
+        public List<TreeNode> GetAllChildFileNodes()
+        {
+            var output = new List<TreeNode>();
+
+            var nodes = new Stack<TreeNode>(new[] { this });
+            while (nodes.Any())
+            {
+                TreeNode node = nodes.Pop();
+                if(node.NodeType == NodeType.File)
+                    output.Add(node);
+
+                foreach (var n in node.Children) 
+                    nodes.Push(n);
+            }
+
+
+            return output;
+
         }
     }
 }

@@ -2,6 +2,7 @@
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor.Services;
 using MonoGame.Framework.WpfInterop;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -9,6 +10,7 @@ using View3D.Commands.Object;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
+using View3D.Services;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
@@ -23,8 +25,20 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public ICommand DuplicateObjectCommand { get; set; }
         public ICommand DeleteObjectCommand { get; set; }
         public ICommand MergeVertexCommand { get; set; }
-        public ICommand ReduceMeshCommand { get; set; }
-        
+        public ICommand CreateLodCommand { get; set; }
+        public ICommand ExpandSelectedFacesToObjectCommand { get; set; }
+
+        bool _showObjectTools = true;
+        public bool ShowObjectTools { get => _showObjectTools; set => SetAndNotify(ref _showObjectTools, value); }
+
+
+        bool _showFaceTools = false;
+        public bool ShowFaceTools { get => _showFaceTools; set => SetAndNotify(ref _showFaceTools, value); }
+
+
+        bool _showVertexTools = false;
+        public bool ShowVertexTools { get => _showVertexTools; set => SetAndNotify(ref _showVertexTools, value); }
+
 
         bool _divideSubMeshEnabled;
         public bool DivideSubMeshEnabled { get => _divideSubMeshEnabled; set => SetAndNotify(ref _divideSubMeshEnabled, value); }
@@ -41,10 +55,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         bool _mergeVertexEnabled;
         public bool MergeVertexEnabled { get => _mergeVertexEnabled; set => SetAndNotify(ref _mergeVertexEnabled, value); }
 
-        bool _reduceMeshEnabled;
-        public bool ReduceMeshEnabled { get => _reduceMeshEnabled; set => SetAndNotify(ref _reduceMeshEnabled, value); }
-
-        
+        bool _expandSelectedFacesToObjectEnabled;
+        public bool ExpandSelectedFacesToObjectEnabled { get => _expandSelectedFacesToObjectEnabled; set => SetAndNotify(ref _expandSelectedFacesToObjectEnabled, value); }
 
 
         public ToolsMenuBarViewModel(IComponentManager componentManager, ToolbarCommandFactory commandFactory)
@@ -54,8 +66,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             DuplicateObjectCommand = commandFactory.Register(new RelayCommand(DubplicateObject), Key.D, ModifierKeys.Control);
             DeleteObjectCommand = commandFactory.Register(new RelayCommand(DeleteObject), Key.Delete, ModifierKeys.None);
             MergeVertexCommand = new RelayCommand(MergeVertex);
-            ReduceMeshCommand = new RelayCommand(ReduceMesh);
-
+            CreateLodCommand = new RelayCommand(CreateLod);
+            ExpandSelectedFacesToObjectCommand = new RelayCommand(ExpandFaceSelection);
             _selectionManager = componentManager.GetComponent<SelectionManager>();
             _selectionManager.SelectionChanged += OnSelectionChanged;
 
@@ -66,11 +78,15 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         private void OnSelectionChanged(ISelectionState state)
         {
+            ShowObjectTools = state is ObjectSelectionState;
+            ShowFaceTools = state is FaceSelectionState;
+            ShowVertexTools = state is VertexSelectionState;
+
             DivideSubMeshEnabled = false;
             DuplicateEnabled = false;
             DeleteEnabled = false;
             MergeMeshEnabled = false;
-            ReduceMeshEnabled = false;
+            ExpandSelectedFacesToObjectEnabled = false;
             MergeVertexEnabled = false;
 
             if (state is ObjectSelectionState objectSelection)
@@ -79,11 +95,13 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 MergeMeshEnabled = objectSelection.SelectedObjects().Count >= 2;
                 DuplicateEnabled = objectSelection.SelectedObjects().Count > 0;
                 DeleteEnabled = objectSelection.SelectedObjects().Count > 0;
-                ReduceMeshEnabled = objectSelection.SelectedObjects().Count > 0;
             }
             else if (state is FaceSelectionState faceSelection && faceSelection.SelectedFaces.Count != 0)
             {
                 DeleteEnabled = true;
+                ExpandSelectedFacesToObjectEnabled = true;
+                //DuplicateEnabled = true;
+                //DivideSubMeshEnabled = true;
             }
             else
             {
@@ -95,11 +113,12 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         {
             if (_selectionManager.GetState() is ObjectSelectionState objectSelectionState)
                 _objectEditor.DivideIntoSubmeshes(objectSelectionState);
+            if (_selectionManager.GetState() is FaceSelectionState faceSelectionState)
+                _faceEditor.ConvertSelectionToSeperateMesh(faceSelectionState, true);
         }
 
         void MergeObjects() 
         {
-            
             if (_selectionManager.GetState() is ObjectSelectionState objectSelectionState)
             {
                 if (objectSelectionState.CurrentSelection().Count >= 2)
@@ -113,10 +132,12 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             }
         }
 
-        void DubplicateObject() 
+        void DubplicateObject()
         {
             if (_selectionManager.GetState() is ObjectSelectionState objectSelectionState)
                 _objectEditor.DuplicateObject(objectSelectionState);
+            if (_selectionManager.GetState() is FaceSelectionState faceSelectionState)
+                _faceEditor.ConvertSelectionToSeperateMesh(faceSelectionState, false);
         }
         
         void DeleteObject() 
@@ -129,9 +150,17 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         void MergeVertex()
         {
+          
+
+
         }
 
-        void ReduceMesh()
+        void ExpandFaceSelection()
+        {
+            _faceEditor.GrowSelection(_selectionManager.GetState() as FaceSelectionState);
+        }
+
+        void CreateLod()
         {
             if (_selectionManager.GetState() is ObjectSelectionState objectSelectionState && objectSelectionState.SelectionCount() != 0)
                 _objectEditor.ReduceSelection(objectSelectionState.SelectedObjects(), 0.5f);

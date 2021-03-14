@@ -11,9 +11,9 @@ using View3D.Utility;
 
 namespace KitbasherEditor.Services
 {
-    public class ModelLoader
+    public class ModelLoaderService
     {
-        ILogger _logger = Logging.Create<ModelLoader>();
+        ILogger _logger = Logging.Create<ModelLoaderService>();
 
         public Rmv2ModelNode EditableMeshNode { get; private set; }
         public ISceneNode ReferenceMeshRoot { get; private set; }
@@ -23,7 +23,7 @@ namespace KitbasherEditor.Services
         AnimationControllerViewModel _animationView;
         SceneManager _sceneManager;
 
-        public ModelLoader(PackFileService packFileService, ResourceLibary resourceLibary, AnimationControllerViewModel animationView, SceneManager sceneManager)
+        public ModelLoaderService(PackFileService packFileService, ResourceLibary resourceLibary, AnimationControllerViewModel animationView, SceneManager sceneManager)
         {
             _packFileService = packFileService;
             _resourceLibary = resourceLibary;

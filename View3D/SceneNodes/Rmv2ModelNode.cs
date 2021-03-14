@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Animation;
@@ -71,6 +72,34 @@ namespace View3D.SceneNodes
             }
         }
 
+        public void Save()
+        {
+            var lods = GetLodNodes();
+            var orderedLods = lods.OrderByDescending(x => x.LodValue);
+
+
+            RmvSubModel[][] newMeshList = new RmvSubModel[orderedLods.Count()][];
+            for (int lodIndex = 0; lodIndex < orderedLods.Count(); lodIndex++)
+            {
+                var meshes = orderedLods.ElementAt(lodIndex).GetModels();
+                newMeshList[lodIndex] = new RmvSubModel[meshes.Count];
+
+                for (int meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
+                {
+                    newMeshList[lodIndex][meshIndex] = meshes[meshIndex].CreateRmvSubModel();
+                }
+
+
+
+
+            }
+
+
+            Model.UpdateOffsets();
+            Model.SaveToByteArray(null);
+            //Model
+        }
+
         public List<Rmv2LodNode> GetLodNodes()
         {
             return Children
@@ -79,14 +108,11 @@ namespace View3D.SceneNodes
                 .ToList();
         }
 
-        public List<Rmv2MeshNode> GetModelNodes()
+
+
+        public Rmv2MeshNode GetMeshNode(int lod, int modelIndex)
         {
-            return GetLodNodes()
-                .SelectMany(x => x.Children)
-                .Where(x => x is Rmv2MeshNode)
-                .Select(x => x as Rmv2MeshNode
-                )
-                .ToList();
+            return GetLodNodes()[lod].Children[modelIndex] as Rmv2MeshNode;
         }
 
         public override ISceneNode Clone()

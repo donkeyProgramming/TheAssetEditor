@@ -32,8 +32,6 @@ namespace TextEditor
             throw new NotImplementedException();
         }
 
-
-
         void SetCurrentPackFile(IPackFile packedFile)
         {
             PackFile file = packedFile as PackFile;
@@ -45,7 +43,18 @@ namespace TextEditor
                 using (var reader = new StreamReader(stream, Encoding.ASCII))
                     Text = reader.ReadToEnd();
             }
+        }
 
+        public void Close()
+        {
+            //
+            //throw new NotImplementedException();
+        }
+
+        public bool HasUnsavedChanges()
+        {
+            return false;
+            //throw new NotImplementedException();
         }
     }
 }

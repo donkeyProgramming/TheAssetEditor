@@ -39,7 +39,8 @@ namespace KitbasherEditor.ViewModels
 
         public IPackFile MainFile { get; set; }
 
-        ModelLoader _modelLoader;
+        ModelLoaderService _modelLoader;
+        ModelSaverHelper _modelSaver;
 
         public KitbasherViewModel(PackFileService pf)
         {
@@ -80,8 +81,10 @@ namespace KitbasherEditor.ViewModels
         {
             var sceneManager = scene.GetComponent<SceneManager>();
             var resourceLib = scene.GetComponent<ResourceLibary>();
-            _modelLoader = new ModelLoader(_packFileService, resourceLib, Animation, sceneManager);
+            _modelLoader = new ModelLoaderService(_packFileService, resourceLib, Animation, sceneManager);
+            _modelSaver = new ModelSaverHelper(_packFileService, sceneManager, this, _modelLoader.EditableMeshNode);
             MenuBar.ModelLoader = _modelLoader;
+            MenuBar.General.ModelSaver = _modelSaver;
 
             SceneExplorer.EditableMeshNode = _modelLoader.EditableMeshNode;
 
@@ -91,13 +94,28 @@ namespace KitbasherEditor.ViewModels
                 DisplayName = MainFile.Name;
             }
 
-            // Add Wmd test reference
-           
+            //_modelLoader.LoadReference("variantmeshes\\variantmeshdefinitions\\skv_ratling_gun_gunner_ror.variantmeshdefinition");
+
+
         }
 
         public bool Save()
         {
-            throw new NotImplementedException();
+            return true;
+          //  throw new NotImplementedException();
+        }
+
+        public void Close()
+        {
+            Scene.Dispose();
+            Scene = null;
+           // throw new NotImplementedException();
+        }
+
+        public bool HasUnsavedChanges()
+        {
+            return false;
+           // throw new NotImplementedException();
         }
     }
 }

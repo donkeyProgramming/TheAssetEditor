@@ -9,6 +9,8 @@ namespace Common
         string DisplayName { get; set; }
         IPackFile MainFile { get; set; }
         bool Save();
+        void Close();
+        bool HasUnsavedChanges();
     }
 
 }

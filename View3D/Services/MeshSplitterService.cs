@@ -23,6 +23,59 @@ namespace View3D.Services
             return output;
         }
 
+        public List<int> GrowSelection(IGeometry geometry, List<ushort> initialSelectedIndexes)
+        {
+            List<int> newSelection = new List<int>();
+            List<ushort> activeIndexList = new List<ushort>(initialSelectedIndexes);
+            var indexBuffer = geometry.GetIndexBuffer();
+
+            bool foundSomething = true;
+            while (foundSomething)
+            {
+                foundSomething = false;
+                for (int i = 0; i < indexBuffer.Count; i += 3)
+                {
+                    var index0 = indexBuffer[i+0];
+                    var index1 = indexBuffer[i+1];
+                    var index2 = indexBuffer[i+2];
+
+                    if (IsFaceInside(indexBuffer, i, activeIndexList, geometry))
+                    {
+                        if (newSelection.Contains(i) == false)
+                        {
+                            newSelection.Add(i);
+                            foundSomething = true;
+                            activeIndexList.Add(index0);
+                            activeIndexList.Add(index1);
+                            activeIndexList.Add(index2);
+                        }
+                    }
+                }
+            }
+
+            return newSelection;
+        }
+
+        bool IsFaceInside(List<ushort> indexBuffer, int faceId, List<ushort> currentSelection, IGeometry geo)
+        {
+            var index0 = indexBuffer[faceId + 0];
+            var index1 = indexBuffer[faceId + 1];
+            var index2 = indexBuffer[faceId + 2];
+
+            if (currentSelection.Contains(index0) || (currentSelection.Contains(index1)) || (currentSelection.Contains(index2)))
+                return true;
+
+            float tolerance = 0.0001f;
+            if (ContainsVertex(currentSelection, index0, geo, tolerance)
+                || ContainsVertex(currentSelection, index1, geo, tolerance)
+                || ContainsVertex(currentSelection, index2, geo, tolerance))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public List<List<ushort>> SplitIntoSubModels(List<ushort> indexList, IGeometry geo)
         {
             if (indexList.Count == 0)
@@ -31,39 +84,24 @@ namespace View3D.Services
             List<List<ushort>> newObjects = new List<List<ushort>>();
             newObjects.Add(new List<ushort>() { indexList[0], indexList[1] , indexList[2] });
 
-
             for (ushort i = 3; i < indexList.Count; i+=3)
             {
                 bool isContainedInExistingObject = false;
                 foreach (var currentObject in newObjects)
                 {
-                    if (currentObject.Contains(indexList[i+0]) || currentObject.Contains(indexList[i+1]) || currentObject.Contains(indexList[i+2]))
-                    {
-                        isContainedInExistingObject = true;
-                        currentObject.Add(indexList[i+0]);
-                        currentObject.Add(indexList[i+1]);
-                        currentObject.Add(indexList[i + 2]);
-                        break;
-                    }
-
-                    float tolerance = 0.0001f;
-                    if (ContainsVertex(currentObject, indexList[i + 0], geo, tolerance) 
-                        || ContainsVertex(currentObject, indexList[i + 1], geo, tolerance) 
-                        || ContainsVertex(currentObject, indexList[i + 2], geo, tolerance))
+                    if (IsFaceInside(indexList, i, currentObject, geo))
                     {
                         isContainedInExistingObject = true;
                         currentObject.Add(indexList[i + 0]);
                         currentObject.Add(indexList[i + 1]);
                         currentObject.Add(indexList[i + 2]);
+                        break;
                     }
-
                 }
 
                 if(isContainedInExistingObject == false)
                     newObjects.Add(new List<ushort>() { indexList[i+0], indexList[i+1], indexList[i+2] });
             }
-
-            var totalCount0 = newObjects.SelectMany(x => x).ToList().Count;
 
             // Check if any of the submeshes are connected
             while (CombineSubmeshes(ref newObjects)) { }

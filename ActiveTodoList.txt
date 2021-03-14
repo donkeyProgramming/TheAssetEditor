@@ -24,7 +24,12 @@ Feature list before V_1 done:
 		[DONE]Animation playback beginning
 		[DONE]Animation playback cleanup
 		Snap to secondary selected vertex
+		Create lods functionality
 		Move uv vertexes around?
+		Change animation vertex type (down grade, make sure it works in validation)
+		Select vertex with mouse click
+		Delete unfo history
+		
 		UI
 			[DONE]UI linking (commands visible/clickable in toolbar)
 			[DONE]Update when different buttons are enabled
@@ -47,12 +52,12 @@ Feature list before V_1 done:
 					ModelName
 					Pivotpoint
 				
-				Graphics:
-					ShaderName
-					MaterialID
-					TextureDir
-					Textures
-					AlphaMode
+				[DONE]Graphics:
+				[DONE]	ShaderName
+				[DONE]	MaterialID
+				[DONE]	TextureDir
+				[DONE]	Textures
+				[DONE]	AlphaMode
 				
 
 			[DONE]electing in tree view should select in scene
@@ -82,6 +87,7 @@ Feature list before V_1 done:
 		[DONE]	Change
 		[DONE]	Enable/disable
 		[DONE]	Transparency
+		[DONE]	WsModel
 		Different shader modes 
 			Wireframe
 			Semi-Transparent
@@ -105,9 +111,14 @@ Feature list before V_1 done:
 		
 		
 Planned order:
-
-	Ws model
-	Change animation vertex type (down grade, make sure it works in validation)
+	Extract face 
+	Conert faces to vertexes
+	Duplicate faces to new object
+	Figure out ctrl bug => keyboard copy issue?
+	Generate lods
+	Save to file
+	Test in game
+	
 	Reduce mesh command
 	Snap to secondary selected vertex
 	Different shader modes
@@ -129,5 +140,10 @@ Known bugs:
 	[DONE]Using the translate view tool does not make an undo stack
 	Selection manager can not select over gizmo when multiselecting
 	Gizmo behaves strangly when camera look directly forward towards model
+	Selecting not use texture, then deslecting and selecing again gives wrong checkbox value
+	Remapping head to lion to h-elf creates index out of range error. Why?
+	
+	
+	
 	
 	

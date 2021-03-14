@@ -71,6 +71,29 @@ namespace View3D.SceneNodes
 
         public IShader Effect { get; set; }
         public int LodIndex { get; set; } = -1;
+
+        internal RmvSubModel CreateRmvSubModel()
+        {
+            var newSubModel = MeshModel.Clone();
+            var typedGeo = (Geometry as Rmv2Geometry);
+            newSubModel.Mesh.IndexList = typedGeo.GetIndexBuffer().ToArray();
+            newSubModel.Mesh.VertexList = new DefaultVertex[typedGeo.VertexCount()];
+
+            var vert = typedGeo.GetVertexById(0);
+            /*
+             
+                             case VertexFormat.Default:
+                    return ByteHelper.GetSize(typeof(DefaultVertex.Data));
+                case VertexFormat.Weighted:
+                    return ByteHelper.GetSize(typeof(WeightedVertex.Data));
+                case VertexFormat.Cinematic:
+                    return ByteHelper.GetSize(typeof(CinematicVertex.Data));
+             
+             */
+
+            throw new NotImplementedException();
+        }
+
         public IGeometry Geometry { get; set; }
         public bool IsSelectable { get; set; } = true;
 

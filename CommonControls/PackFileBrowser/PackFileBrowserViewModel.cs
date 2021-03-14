@@ -1,8 +1,10 @@
 ﻿using Common;
+using CommonControls.Common;
 using CommonControls.Simple;
 using FileTypes.PackFiles.Models;
 using FileTypes.PackFiles.Services;
 using GalaSoft.MvvmLight.Command;
+using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Serilog;
 using System;
@@ -25,6 +27,8 @@ namespace CommonControls.PackFileBrowser
         protected PackFileService _packFileService;
         public event FileSelectedDelegate FileOpen;
 
+        bool _packFileTreeRebuildSuspended = false;
+
         public ObservableCollection<TreeNode> Files { get; set; } = new ObservableCollection<TreeNode>();
         public PackFileFilter Filter { get; private set; }
         public ICommand DoubleClickCommand { get; set; }
@@ -42,17 +46,27 @@ namespace CommonControls.PackFileBrowser
         
         public ICommand CloseNodeCommand { get; set; }
         public ICommand DeleteCommand { get; set; }
-        
+
+        public ICommand SavePackFileCommand { get; set; }
+
+        public ICommand CopyNodePathCommand { get; set; }
+        public ICommand CopyToEditablePackCommand { get; set; }
+
+        public ICommand SetAsEditabelPackCommand { get; set; }
+        public ICommand ExpandAllChildrenCommand { get; set; }
+
         public PackFileBrowserViewModel(PackFileService packFileService)
         {
             RenameNodeCommand = new RelayCommand<TreeNode>(OnRenameNode);
-
             AddFilesCommand = new RelayCommand<TreeNode>(OnAddFilesCommand);
             AddFilesFromDirectory = new RelayCommand<TreeNode>(OnAddFilesFromDirectory);
-            
             CloseNodeCommand = new RelayCommand<TreeNode>(CloseNode);
             DeleteCommand = new RelayCommand<TreeNode>(DeleteNode);
-
+            SavePackFileCommand = new RelayCommand<TreeNode>(SavePackFile);
+            CopyNodePathCommand = new RelayCommand<TreeNode>(CopyNodePath);
+            CopyToEditablePackCommand = new RelayCommand<TreeNode>(CopyToEditablePack);
+            SetAsEditabelPackCommand = new RelayCommand<TreeNode>(SetAsEditabelPack);
+            ExpandAllChildrenCommand = new RelayCommand<TreeNode>(ExpandAllChildren);
             DoubleClickCommand = new RelayCommand<TreeNode>(OnDoubleClick);
 
             _packFileService = packFileService;
@@ -68,6 +82,12 @@ namespace CommonControls.PackFileBrowser
 
         void OnRenameNode(TreeNode treeNode)
         {
+            if (treeNode.FileOwner.IsCaPackFile)
+            {
+                MessageBox.Show("Unable to edit CA packfile");
+                return;
+            }
+
             if (treeNode.NodeType == NodeType.Directory)
             {
                 MessageBox.Show("Not possible to rename a directory at this point");
@@ -85,6 +105,12 @@ namespace CommonControls.PackFileBrowser
 
         void OnAddFilesCommand(TreeNode node)
         {
+            if (node.FileOwner.IsCaPackFile)
+            {
+                MessageBox.Show("Unable to edit CA packfile");
+                return;
+            }
+
             var dialog = new CommonOpenFileDialog();
             dialog.IsFolderPicker = false;
             dialog.Multiselect = true;
@@ -103,6 +129,12 @@ namespace CommonControls.PackFileBrowser
 
         void OnAddFilesFromDirectory(TreeNode node)
         {
+            if (node.FileOwner.IsCaPackFile)
+            {
+                MessageBox.Show("Unable to edit CA packfile");
+                return;
+            }
+
             var dialog = new CommonOpenFileDialog();
             dialog.IsFolderPicker = true;
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
@@ -113,19 +145,96 @@ namespace CommonControls.PackFileBrowser
         }
 
         void DeleteNode(TreeNode node)
-        { 
-        
+        {
+            if (node.FileOwner.IsCaPackFile)
+            {
+                MessageBox.Show("Unable to edit CA packfile");
+                return;
+            }
         }
+
 
         void CloseNode(TreeNode node)
         {
             _packFileService.UnloadPackContainer(node.FileOwner);
         }
 
+        void SavePackFile(TreeNode node)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            if (saveFileDialog.ShowDialog() == true)
+                _packFileService.Save(node.FileOwner, saveFileDialog.FileName);
+        }
+
+
+        void CopyNodePath(TreeNode node)
+        {
+            if (node.Item != null)
+            {
+                var path = _packFileService.GetFullPath(node.Item as PackFile);
+                Clipboard.SetText(path);
+            }
+        }
+
+        void CopyToEditablePack(TreeNode node)
+        {
+            if (_packFileService.GetEditablePack() == null)
+            {
+                MessageBox.Show("No editable pack selected!");
+                return;
+            }
+
+            try
+            {
+                _packFileTreeRebuildSuspended = true;
+
+                using (new WaitCursor())
+                {
+                    var files = node.GetAllChildFileNodes();
+                    foreach (var file in files)
+                        _packFileService.CopyFileFromOtherPackFile(file.FileOwner, file.GetFullPath(), _packFileService.GetEditablePack());
+                }
+            }
+            finally
+            {
+                _packFileTreeRebuildSuspended = false;
+                PackFileContainerLoaded(_packFileService.GetEditablePack());
+            }
+
+            
+        }
+
+        void SetAsEditabelPack(TreeNode node)
+        {
+            if (node.FileOwner.IsCaPackFile)
+            {
+                MessageBox.Show("Unable to edit CA packfile");
+                return;
+            }
+
+            _packFileService.SetEditablePack(node.FileOwner);
+
+            foreach (var item in Files)
+                item.IsMainEditabelPack = false;
+
+            var rootNode = node;
+            while (rootNode.Parent != null)
+                rootNode = rootNode.Parent;
+            rootNode.IsMainEditabelPack = true;
+        }
+
+        void ExpandAllChildren(TreeNode node)
+        {
+            node.IsNodeExpanded = true;
+            foreach (var child in node.Children)
+                ExpandAllChildren(child);
+        }
+
         protected virtual void OnDoubleClick(TreeNode node) 
         {
-            if (node.NodeType == NodeType.File)
-                FileOpen?.Invoke(node.Item); 
+            // using command parmeter to get node causes memory leaks, using selected node for now
+            if (SelectedItem.NodeType == NodeType.File)
+                FileOpen?.Invoke(SelectedItem.Item); 
         }
 
         private void ContainerUpdated(PackFileContainer pf)
@@ -135,11 +244,14 @@ namespace CommonControls.PackFileBrowser
 
         private void PackFileContainerLoaded(PackFileContainer container)
         {
+            if (_packFileTreeRebuildSuspended)
+                return;
             var existingNode = Files.FirstOrDefault(x => x.FileOwner == container);
             if(existingNode != null)
                 Files.Remove(existingNode);
 
             var root = new TreeNode(container.Name, NodeType.Root, container, null);
+            root.IsMainEditabelPack = _packFileService.GetEditablePack() == container;
             Dictionary<string, TreeNode> directoryMap = new Dictionary<string, TreeNode>();
            
             foreach (var item in container.FileList)

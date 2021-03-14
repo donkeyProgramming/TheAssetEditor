@@ -35,7 +35,9 @@
     <None Remove="Resources\Icons\icons8-undo-50.png" />
     <None Remove="Resources\Icons\icons8-xml-file-48.png" />
     <None Remove="Resources\Icons\Kitbasher\Camera_Focus.png" />
+    <None Remove="Resources\Icons\Kitbasher\CreateLod.png" />
     <None Remove="Resources\Icons\Kitbasher\DeleteHistory.png" />
+    <None Remove="Resources\Icons\Kitbasher\ExpandSelection.png" />
     <None Remove="Resources\Icons\Kitbasher\Gizmo_move.png" />
     <None Remove="Resources\Icons\Kitbasher\Gizmo_rotate.png" />
     <None Remove="Resources\Icons\Kitbasher\Gizmo_scale.png" />
@@ -149,8 +151,14 @@
     <Resource Include="Resources\Icons\Kitbasher\Camera_Focus.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\CreateLod.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\Icons\Kitbasher\DeleteHistory.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\ExpandSelection.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Icons\Kitbasher\Gizmo_move.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

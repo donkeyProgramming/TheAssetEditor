@@ -161,7 +161,7 @@
                                  PathTextReadOnly="true"
                                  DisplayRemoveButton="False" 
                                  DisplayPreviewButton="False" 
-                                 Browse="{Binding BrowseTextureDirCommand}" 
+                                          DisplayBrowseButton="False"
                                  PathText="{Binding Path=Graphics.TextureDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <simple:BrowsableItemView DockPanel.Dock="Top" LabelLength="100" LabelName="Diffuse"

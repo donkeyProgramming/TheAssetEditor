@@ -17,6 +17,7 @@ namespace FileTypes.PackFiles.Models
         public event PackFileContainerRemovedDelegate PackFileContainerRemoved;
 
         public List<PackFileContainer> PackFiles { get; set; } = new List<PackFileContainer>();
+        public PackFileContainer PackSelectedForEdit { get; set; }
 
         public void AddPackFile(PackFileContainer pf)
         {

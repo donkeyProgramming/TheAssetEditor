@@ -25,7 +25,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public ICommand ImportReferenceCommand_OrcTorso { get; set; }
         public ICommand ImportReferenceCommand_PaladinVMD { get; set; }
 
-        public ModelLoader ModelLoader { get; set; }
+        public ModelLoaderService ModelLoader { get; set; }
 
 
         PackFileService _packFileService;

@@ -2,6 +2,7 @@
 using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
+using System.Collections.Generic;
 
 namespace View3D.Commands
 {
@@ -48,6 +49,31 @@ namespace View3D.Commands
 
         protected abstract void ExecuteCommand();
         protected abstract void UndoCommand();
+    }
+
+    public class ComplexCommand : ICommand
+    {
+        List<ICommand> _subCommands = new List<ICommand>();
+
+        public void Execute()
+        {
+            foreach (var command in _subCommands)
+                command.Execute();
+            throw new NotImplementedException();
+        }
+
+        public void Initialize(IComponentManager componentManager)
+        {
+            foreach (var command in _subCommands)
+                command.Initialize(componentManager);
+        }
+
+        public void Undo()
+        {
+            _subCommands.Reverse();
+            foreach (var command in _subCommands)
+                command.Undo();
+        }
     }
 }
 

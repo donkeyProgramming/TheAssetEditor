@@ -118,7 +118,7 @@ namespace View3D.Services
             }
         }
 
-        void LoadRigidMesh(PackFile file, ref ISceneNode parent, AnimationPlayer player)
+        Rmv2ModelNode LoadRigidMesh(PackFile file, ref ISceneNode parent, AnimationPlayer player)
         {
             var rmvModel = new RmvRigidModel(file.DataSource.ReadData(), file.Name);
             var model = new Rmv2ModelNode(rmvModel, _device, _resourceLibary, Path.GetFileName( rmvModel.FileName), player);
@@ -127,6 +127,8 @@ namespace View3D.Services
                 parent = model;
             else
                 parent.AddObject(model);
+
+            return model;
         }
 
         void LoadWsModel(PackFile file, ref ISceneNode parent, AnimationPlayer player)
@@ -141,14 +143,75 @@ namespace View3D.Services
             string xmlString = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(xmlString);
-
-            var nodes = doc.SelectNodes(@"/model/geometry");
-            foreach (XmlNode node in nodes)
+            
+            var geometryNodes = doc.SelectNodes(@"/model/geometry");
+            if (geometryNodes.Count != 0)
             {
-                var modelFile = _packFileService.FindFile( node.InnerText) as PackFile;
+                var geometryNode = geometryNodes.Item(0);
+                var modelFile = _packFileService.FindFile(geometryNode.InnerText) as PackFile;
                 var modelAsBase = wsModelNode as ISceneNode;
-                LoadRigidMesh(modelFile, ref modelAsBase, player);
+                var loadedModelNode = LoadRigidMesh(modelFile, ref modelAsBase, player);
+
+                // Materials
+                var materialNodes = doc.SelectNodes(@"/model/materials/material");
+                foreach (XmlNode materialNode in materialNodes)
+                {
+                    var materialFile = materialNode.InnerText;
+                    var partIndex = materialNode.Attributes.GetNamedItem("part_index").InnerText;
+                    var lodIndex = materialNode.Attributes.GetNamedItem("lod_index").InnerText;
+                    var materialConfig = ParseMaterialFile(materialFile);
+
+                    var mesh = loadedModelNode.GetMeshNode(int.Parse(lodIndex), int.Parse(partIndex));
+                    bool useAlpha = materialFile.Contains("alpha_on");
+                    var alphaSettings = mesh.MeshModel.Mesh.AlphaSettings;
+                    if (useAlpha)
+                        alphaSettings.Mode = AlphaMode.Alpha_Test;
+                    else
+                        alphaSettings.Mode = AlphaMode.Opaque;
+                    mesh.MeshModel.Mesh.AlphaSettings = alphaSettings;
+
+                    foreach (var newTexture in materialConfig)
+                        mesh.UpdateTexture(newTexture.Value, newTexture.Key);
+                }
             }
+        }
+
+        Dictionary<TexureType, string> ParseMaterialFile(string path)
+        {
+            var output = new Dictionary<TexureType, string>();
+
+            var materialFile = _packFileService.FindFile(path);
+            var buffer = (materialFile as PackFile).DataSource.ReadData();
+            string xmlString = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(xmlString);
+            var textureNodes = doc.SelectNodes(@"/material/textures/texture");
+
+            foreach (XmlNode node in textureNodes)
+            {
+                var slotNode = node.SelectNodes("slot");
+                var pathNode = node.SelectNodes("source");
+
+                var textureSlotName = slotNode[0].InnerText;
+                var texturePath = pathNode[0].InnerText;
+
+                if (textureSlotName == "s_diffuse")
+                    output[TexureType.Diffuse] = texturePath;
+
+                if (textureSlotName == "s_gloss")
+                    output[TexureType.Gloss] = texturePath;
+
+                if (textureSlotName == "s_mask")
+                    output[TexureType.Mask] = texturePath;
+
+                if (textureSlotName == "s_normal")
+                    output[TexureType.Normal] = texturePath;
+
+                if (textureSlotName == "s_specular")
+                    output[TexureType.Specular] = texturePath;
+            }
+
+            return output;
         }
     }
 }

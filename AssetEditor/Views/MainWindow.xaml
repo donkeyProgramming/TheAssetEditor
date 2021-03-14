@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AssetEditor" 
         xmlns:views="clr-namespace:AssetEditor.Views" 
+        xmlns:viewmodels="clr-namespace:AssetEditor.ViewModels" 
         xmlns:test="clr-namespace:AssetEditor.Test" 
-        xmlns:packfilebrowser="clr-namespace:CommonControls.PackFileBrowser;assembly=CommonControls"
         mc:Ignorable="d"
         Title="AssetEditor" Height="1024" Width="2000">
     <Window.Resources>
@@ -46,11 +46,43 @@
                      ContentTemplateSelector="{StaticResource MySelector}"
                      test:DataTemplateParameters.ViewFactory="{Binding ToolsFactory}">
 
-            <TabControl.ItemTemplate >
+            <TabControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Grid.Column="1" 
+                                Command="{Binding DataContext.CloseToolCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}}" 
+                                CommandParameter="{Binding}">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Path Data="M0,0 L8,8 M8,0 L0,8" StrokeThickness="3" VerticalAlignment="Center" Margin="5,4,0,2">
+                                        <Path.Style>
+                                            <Style TargetType="{x:Type Path}">
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="False">
+                                                        <Setter Property="Stroke" Value="LightGray" />
+                                                    </Trigger>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Stroke" Value="Red" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Path.Style>
+                                    </Path>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </Grid>
                 </DataTemplate>
             </TabControl.ItemTemplate>
+
+
+
+
 
         </TabControl>
 

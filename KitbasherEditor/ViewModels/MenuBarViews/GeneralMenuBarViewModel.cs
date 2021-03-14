@@ -1,5 +1,6 @@
 ﻿using Common;
 using GalaSoft.MvvmLight.CommandWpf;
+using KitbasherEditor.Services;
 using MonoGame.Framework.WpfInterop;
 using System.Linq;
 using System.Windows.Input;
@@ -35,6 +36,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         FocusSelectableObjectComponent _cameraFocusComponent;
         SelectionManager _selectionManager;
         IEditableMeshResolver _editableMeshResolver;
+        public ModelSaverHelper ModelSaver { get; set; }
 
         public GeneralMenuBarViewModel(IComponentManager componentManager, ToolbarCommandFactory commandFactory)
         {
@@ -92,6 +94,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         void Save() 
         {
+            ModelSaver.Save();
         }
 
         void OpenReferenceFile() 

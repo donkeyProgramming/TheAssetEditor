@@ -281,7 +281,7 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
     if (UseGloss)
         GlossTex = GlossTexture.Sample(SampleType, input.tex);
 
-    float4 NormalTex = float4(0, 0, 0, 1);
+    float4 NormalTex = float4(0.5f, 0.5f, 0.5f, 1);
     if (UseNormal)
         NormalTex = NormalTexture.Sample(s_normal, input.tex);
 

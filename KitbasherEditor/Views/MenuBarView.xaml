@@ -3,10 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:KitbasherEditor.Views"
+             xmlns:local="clr-namespace:KitbasherEditor.Views" xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
              mc:Ignorable="d" Loaded="UserControl_Loaded" >
 
     <UserControl.Resources>
+        <valueconverters:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Collapsed" />
+
         <Style x:Key="VerticalSeparatorStyle" 
        TargetType="{x:Type Separator}"
        BasedOn="{StaticResource {x:Type Separator}}">
@@ -39,7 +41,7 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
-                <MenuItem Header="Save"  IsEnabled="False"/>
+                <MenuItem Header="Save" Command="{Binding General.SaveCommand, Mode=OneTime}"/>
                 <MenuItem Header="Save as"  IsEnabled="False"/>
                 <Separator/>
                 <MenuItem Header="Import reference" Command="{Binding ImportReferenceCommand, Mode=OneTime}"/>
@@ -113,16 +115,8 @@
                     </ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock VerticalAlignment="Center"  Margin="3,0,0,0" Text="Pivot:"/>
-                <ComboBox IsEnabled="False" SelectedIndex="{Binding Gizmo.PivotModeModeIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                    <ComboBoxItem Content="Object postions"/>
-                    <ComboBoxItem Content="Selection center"/>
-                </ComboBox>
-
-
-
-                <ToolBar>
-
+                <!-- Object selection-->
+                <ToolBar  Visibility="{Binding Tools.ShowObjectTools, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
                     <Button ToolTip="Divide selected mesh into submeshes" 
                         Command="{Binding Tools.DivideSubMeshCommand}"
                         IsEnabled="{Binding Tools.DivideSubMeshEnabled, UpdateSourceTrigger=PropertyChanged}">
@@ -140,31 +134,57 @@
                         IsEnabled="{Binding Tools.DuplicateEnabled, UpdateSourceTrigger=PropertyChanged}">
                         <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_duplicate.png"/>
                     </Button>
-
+                    
                     <Button ToolTip="Delete selected object or faces (Del)" 
                         Command="{Binding Tools.DeleteObjectCommand}"
                         IsEnabled="{Binding Tools.DeleteEnabled, UpdateSourceTrigger=PropertyChanged}">
                         <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_delete.png"/>
                     </Button>
 
-                    <Button ToolTip="Reduce mesh" 
-                        Command="{Binding Tools.ReduceMeshCommand}"
-                        IsEnabled="{Binding Tools.ReduceMeshEnabled, UpdateSourceTrigger=PropertyChanged}">
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-compress-64.png"/>
+                    <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
+
+                    <Button ToolTip="Create lods" 
+                        Command="{Binding Tools.CreateLodCommand}">
+                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/createlod.png"/>
                     </Button>
-                    
                 </ToolBar>
 
-                <Button ToolTip="Merge selected vertexes" 
+
+                <!-- Face selection-->
+                <ToolBar  Visibility="{Binding Tools.ShowFaceTools, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
+                    <Button ToolTip="Expand selection" 
+                        Command="{Binding Tools.ExpandSelectedFacesToObjectCommand}"
+                        IsEnabled="{Binding Tools.ExpandSelectedFacesToObjectEnabled, UpdateSourceTrigger=PropertyChanged}">
+                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/ExpandSelection.png"/>
+                    </Button>
+
+                    <Button ToolTip="Divide selected faces into submeshes" 
+                        Command="{Binding Tools.DivideSubMeshCommand}"
+                        IsEnabled="{Binding Tools.DivideSubMeshEnabled, UpdateSourceTrigger=PropertyChanged}">
+                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_split.png"/>
+                    </Button>
+                    <Button ToolTip="Duplicated selected faces into new object (Ctr+D)" 
+                        Command="{Binding Tools.DuplicateObjectCommand}"
+                        IsEnabled="{Binding Tools.DuplicateEnabled, UpdateSourceTrigger=PropertyChanged}">
+                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_duplicate.png"/>
+                    </Button>
+
+                    <Button ToolTip="Delete selected faces (Del)" 
+                        Command="{Binding Tools.DeleteObjectCommand}"
+                        IsEnabled="{Binding Tools.DeleteEnabled, UpdateSourceTrigger=PropertyChanged}">
+                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_delete.png"/>
+                    </Button>
+
+                </ToolBar>
+
+                <!-- Vertex selection-->
+                <ToolBar  Visibility="{Binding Tools.ShowVertexTools, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
+                    <Button ToolTip="Merge selected vertexes" 
                         Command="{Binding Tools.MergeVertexCommand}"
                         IsEnabled="{Binding Tools.MergeVertexEnabled, UpdateSourceTrigger=PropertyChanged}">
-                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_mergeVertex.png"/>
-                </Button>
-                <Button ToolTip="Snap vertex" IsEnabled="False">
-                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SnapVertex.png"/>
-                </Button>
-
-
+                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_mergeVertex.png"/>
+                    </Button>
+                </ToolBar>
 
                 <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
                 <TextBlock VerticalAlignment="Center">RenderMode:</TextBlock>
