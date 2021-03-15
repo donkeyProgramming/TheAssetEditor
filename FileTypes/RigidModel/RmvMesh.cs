@@ -191,13 +191,22 @@ namespace Filetypes.RigidModel
     {
         public int KeyValue;
         public AlphaMode Mode;
+
+        public MeshAlphaSettings Clone()
+        {
+            return new MeshAlphaSettings
+            {
+                KeyValue = KeyValue,
+                Mode = Mode,
+            };
+        }
     }
 
     public class RmvMesh
     {
         public BaseVertex[] VertexList { get; set; }
         public ushort[] IndexList;
-        public MeshAlphaSettings AlphaSettings { get; set; }
+        
 
         public static int GetVertexSize(VertexFormat vertexFormat)
         {
@@ -216,7 +225,6 @@ namespace Filetypes.RigidModel
 
         internal void SaveToByteArray(BinaryWriter writer, VertexFormat vertexFormat)
         {
-            writer.Write(ByteHelper.GetBytes(AlphaSettings));
             for (int i = 0; i < VertexList.Length; i++)
             {
                 if (vertexFormat == VertexFormat.Default)
@@ -237,7 +245,7 @@ namespace Filetypes.RigidModel
         {
             //ref Point bytesAsPoint = ref Unsafe.As<byte, Point>(ref MemoryMarshal.GetReference(bytes));
 
-            AlphaSettings = ByteHelper.ByteArrayToStructure<MeshAlphaSettings>(data, vertexStart - 8);
+           
             var vertexSize = GetVertexSize(vertexFormat);
 
             VertexList = new BaseVertex[vertexCount];
@@ -269,9 +277,9 @@ namespace Filetypes.RigidModel
                 IndexList[i] =  BitConverter.ToUInt16(data, faceStart + sizeof(ushort) * i);
         }
 
-        public RmvMesh(MeshAlphaSettings alphaSettings)
+        public RmvMesh()
         {
-            AlphaSettings = alphaSettings;
+
         }
     }
 
@@ -282,7 +290,8 @@ namespace Filetypes.RigidModel
         public RmvSubModelHeader Header { get; set; }
         public List<RmvAttachmentPoint> AttachmentPoints;
         public List<RmvTexture> Textures;
-        public RmvMesh Mesh { get; private set; }
+        public MeshAlphaSettings AlphaSettings { get; set; }
+        public RmvMesh Mesh { get; set; }
         public string ParentSkeletonName { get; set; }    // Not part of the model definition
 
         public RmvSubModel(byte[] dataArray, int offset, string skeletonName)
@@ -346,6 +355,7 @@ namespace Filetypes.RigidModel
             var vertexStart =  Header.VertexOffset + _modelStart; 
             var faceStart = Header.FaceOffset + _modelStart;
 
+            AlphaSettings = ByteHelper.ByteArrayToStructure<MeshAlphaSettings>(dataArray, (int)vertexStart - 8);
             return new RmvMesh(dataArray, Header.VertextType, (int)vertexStart, Header.VertexCount, (int)faceStart, Header.FaceCount);
         }
 
@@ -358,7 +368,8 @@ namespace Filetypes.RigidModel
                Header = Header,
                AttachmentPoints = AttachmentPoints.Select(x => x).ToList(),
                Textures = Textures.Select(x => x).ToList(),
-               Mesh = new RmvMesh(Mesh.AlphaSettings)
+               AlphaSettings = AlphaSettings.Clone(),
+               Mesh = null
            };
        }
     }

@@ -11,7 +11,7 @@ namespace Filetypes.RigidModel
     {
         public RmvModelHeader Header { get; private set; }
         public RmvLodHeader[] LodHeaders { get; private set; }
-        public RmvSubModel[][] MeshList { get; private set; }
+        public RmvSubModel[][] MeshList { get; set; }
         public string FileName { get; private set; }
 
         public RmvRigidModel(byte[] data, string fileName)
@@ -109,6 +109,8 @@ namespace Filetypes.RigidModel
 
                     for (var textureIndex = 0; textureIndex < model.Textures.Count; textureIndex++)
                         writer.Write(ByteHelper.GetBytes(model.Textures[textureIndex]));
+                    
+                    writer.Write(ByteHelper.GetBytes(model.AlphaSettings));
 
                     model.Mesh.SaveToByteArray(writer, model.Header.VertextType);
                 }

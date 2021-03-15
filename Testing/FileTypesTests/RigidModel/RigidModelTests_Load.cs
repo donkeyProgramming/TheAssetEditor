@@ -1,18 +1,21 @@
 ﻿using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
 using FileTypes.PackFiles.Services;
+using FileTypesTests.Util;
+using Microsoft.Xna.Framework;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using View3D.SceneNodes;
 
 namespace FileTypesTests.RigidModel
 {
     class RigidModelTests_Load
     {
 
-        PackFile GetMeshPackFile()
+        PackFile GetWarLionModel()
         {
             PackFileService packFileService = new PackFileService(new PackFileDataBase());
             var loadedPackFile = packFileService.Load(@"Data\variants_wp_.pack");
@@ -22,15 +25,30 @@ namespace FileTypesTests.RigidModel
             return file as PackFile;
         }
 
-        byte[] GetMeshData()
+        PackFile GetWeaponModel()
         {
-            return GetMeshPackFile().DataSource.ReadData();
+            PackFileService packFileService = new PackFileService(new PackFileDataBase());
+            var loadedPackFile = packFileService.Load(@"Data\variants_wp_.pack");
+
+            var file = packFileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_props\hef_ranger_sword_1h_03.rigid_model_v2");
+            Assert.NotNull(file);
+            return file as PackFile;
+        }
+
+        byte[] GetLionMeshData()
+        {
+            return GetWarLionModel().DataSource.ReadData();
+        }
+
+        byte[] GetWeaponMeshData()
+        {
+            return GetWeaponModel().DataSource.ReadData();
         }
 
         [Test]
         public void LoadWarLionTest()
         {
-            RmvRigidModel model = new RmvRigidModel(GetMeshData(), "UnitTestModel");
+            RmvRigidModel model = new RmvRigidModel(GetLionMeshData(), "UnitTestModel");
 
             // Header
             Assert.AreEqual("RMV2", model.Header.FileType);
@@ -63,7 +81,7 @@ namespace FileTypesTests.RigidModel
         [Test]
         public void SaveWarLion()
         {
-            var originalMeshBytes = GetMeshData();
+            var originalMeshBytes = GetLionMeshData();
             RmvRigidModel model = new RmvRigidModel(originalMeshBytes, "UnitTestModel");
             using (MemoryStream ms = new MemoryStream())
             {
@@ -82,7 +100,7 @@ namespace FileTypesTests.RigidModel
         [Test]
         public void UpdateOffsets()
         {
-            var meshData = GetMeshData();
+            var meshData = GetLionMeshData();
             RmvRigidModel model = new RmvRigidModel(meshData, "UnitTestModel");
 
             model.UpdateOffsets();
@@ -99,6 +117,43 @@ namespace FileTypesTests.RigidModel
                     Assert.AreEqual(meshData[i], bits[i]);
             }
         }
+
+        [Test]
+        public void UpdateOffs2222et2s()
+        {
+
+           
+
+            var meshData = GetWeaponMeshData();
+           
+            Rmv2ModelNode node = new Rmv2ModelNode("NodeName");
+            node.SetModel(new RmvRigidModel(meshData, "UnitTestModelFileName"), null, null, new TestGeometryGraphicsContextFactory());
+
+            // Edit the first vertex
+            var geometry = node.GetMeshNode(0, 0).Geometry;// as Rmv2Geometry;
+            geometry.UpdateVertexPosition(0, new Vector3(10, 10, 10));
+
+            // Save
+            var bytes = node.Save();
+            var reloadedMesh = new RmvRigidModel(bytes, "UnitTestModelFileName");
+
+            //model.UpdateOffsets();
+            //
+            //using (MemoryStream ms = new MemoryStream())
+            //{
+            //    using (BinaryWriter writer = new BinaryWriter(ms))
+            //        model.SaveToByteArray(writer);
+            //
+            //    var bits = ms.ToArray();
+            //    Assert.AreEqual(meshData.Length, bits.Length);
+            //
+            //    for (int i = 0; i < meshData.Length; i++)
+            //        Assert.AreEqual(meshData[i], bits[i]);
+            //}
+        }
+
+
+
 
     }
 }

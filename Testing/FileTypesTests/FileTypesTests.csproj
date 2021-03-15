@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Common.csproj" />
     <ProjectReference Include="..\..\FileTypes\FileTypes.csproj" />
+    <ProjectReference Include="..\..\View3D\View3D.csproj" />
     <ProjectReference Include="..\TestCommon\TestCommon.csproj" />
   </ItemGroup>
 

@@ -40,29 +40,39 @@ namespace Filetypes.RigidModel.Vertex
         public CinematicVertex(Data data)
         {
             _data = data;
-
-            Postition = CreatVector4HalfFloat(_data.position);
-            Uv = CreatVector2HalfFloat(_data.uv);
-            Normal = CreatVector4Byte(_data.normal);
-            BiNormal = CreatVector4Byte(_data.biNormal);
-            Tangent = CreatVector4Byte(_data.tangent);
-
-            BoneIndex = new byte[] { _data.boneIndex[0], _data.boneIndex[1], _data.boneIndex[2], _data.boneIndex[3] };
-            BoneWeight = new float[] { _data.boneWeight[0] / 255.0f, _data.boneWeight[1] / 255.0f, _data.boneWeight[2] / 255.0f, _data.boneWeight[3] / 255.0f };
+            CreateFromData(_data);
         }
 
-        public CinematicVertex()
+        public CinematicVertex(RmvVector4 position, RmvVector2 uv, RmvVector3 normal, RmvVector3 biNormal, RmvVector3 tanget, BoneInformation[] boneInformation)
         {
-            Postition = new RmvVector4(0);
+            if (boneInformation.Length != 4)
+                throw new ArgumentException();
 
-            Postition = new RmvVector4(0);
-            Uv = new RmvVector2() { X = 0, Y = 0};
-            Normal = new RmvVector4(0);
-            BiNormal = new RmvVector4(0);
-            Tangent = new RmvVector4(0);
+            _data = new Data()
+            {
+                position = CreatePositionVector4(position),
+                uv = CreatePositionVector2(uv),
+                boneIndex = boneInformation.Select(x => x.BoneIndex).ToArray(),
+                boneWeight = boneInformation.Select(x => (byte)(x.BoneWeight * 255.0f)).ToArray(),
+                normal = CreateNormalVector3(normal),
+                biNormal = CreateNormalVector3(biNormal),
+                tangent = CreateNormalVector3(tanget),
+            };
 
-            BoneIndex = new byte[] {0,0,0,0 };
-            BoneWeight = new float[] { 0,0,0,0 };
+            CreateFromData(_data);
         }
+
+        void CreateFromData(Data data)
+        {
+            Postition = CreatVector4HalfFloat(data.position);
+            Uv = CreatVector2HalfFloat(data.uv);
+            Normal = CreatVector4Byte(data.normal);
+            BiNormal = CreatVector4Byte(data.biNormal);
+            Tangent = CreatVector4Byte(data.tangent);
+
+            BoneIndex = new byte[] { data.boneIndex[0], data.boneIndex[1], data.boneIndex[2], data.boneIndex[3] };
+            BoneWeight = new float[] { data.boneWeight[0] / 255.0f, data.boneWeight[1] / 255.0f, data.boneWeight[2] / 255.0f, data.boneWeight[3] / 255.0f };
+        }
+
     }
 }

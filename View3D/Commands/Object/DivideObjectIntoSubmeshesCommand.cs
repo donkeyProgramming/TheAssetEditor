@@ -63,7 +63,8 @@ namespace View3D.Commands.Object
                     var hack = _objectToSplit as Rmv2MeshNode;
                     var originalRmvModel = hack.MeshModel;
 
-                    var meshNode = new Rmv2MeshNode(hack.MeshModel.Clone(), _resourceLib, hack.AnimationPlayer, mesh);
+                    var context = new GeometryGraphicsContext(_resourceLib.GraphicsDevice);
+                    var meshNode = new Rmv2MeshNode(hack.MeshModel.Clone(), context, _resourceLib, hack.AnimationPlayer, mesh);
                     meshNode.Name = $"{_objectToSplit.Name}_submesh_{counter++}";
                     createdMeshes.Add(meshNode);
                     _newGroupNode.AddObject(meshNode);

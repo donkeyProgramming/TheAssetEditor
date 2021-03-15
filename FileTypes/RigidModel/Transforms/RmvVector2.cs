@@ -10,5 +10,16 @@ namespace Filetypes.RigidModel.Transforms
     {
         public float X;
         public float Y;
+
+        public RmvVector2(float x, float y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        public override string ToString()
+        {
+            return $"{X}, {Y}";
+        }
     }
 }

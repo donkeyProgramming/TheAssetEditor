@@ -214,7 +214,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         GroupTypeEnum _materialType;
         public GroupTypeEnum MaterialType { get { return _materialType; } set { SetAndNotify(ref _materialType, value); } }
-        public AlphaMode AlphaModeValue { get { return _meshNode.MeshModel.Mesh.AlphaSettings.Mode; ; } set { UpdateAlphaValue(value); NotifyPropertyChanged(); } }
+        public AlphaMode AlphaModeValue { get { return _meshNode.MeshModel.AlphaSettings.Mode; ; } set { UpdateAlphaValue(value); NotifyPropertyChanged(); } }
         public IEnumerable<AlphaMode> PossibleAlphaModes { get; set; } = new List<AlphaMode>() { AlphaMode.Opaque, AlphaMode.Alpha_Test, AlphaMode.Alpha_Blend };
         public string TextureDirectory { get { return _meshNode.MeshModel.Header.TextureDirectory; } set { UpdateTextureDirectory(value); NotifyPropertyChanged(); } }
 
@@ -236,9 +236,9 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         void UpdateAlphaValue(AlphaMode value)
         {
-            var alphaSettings = _meshNode.MeshModel.Mesh.AlphaSettings;
+            var alphaSettings = _meshNode.MeshModel.AlphaSettings;
             alphaSettings.Mode = value;
-            _meshNode.MeshModel.Mesh.AlphaSettings = alphaSettings;
+            _meshNode.MeshModel.AlphaSettings = alphaSettings;
         }
 
         void UpdateTextureDirectory(string newPath)

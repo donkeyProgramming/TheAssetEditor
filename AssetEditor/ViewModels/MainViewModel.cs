@@ -48,6 +48,7 @@ namespace AssetEditor.ViewModels
 
             CloseToolCommand = new RelayCommand<IEditorViewModel>(CloseTool);
 
+           
             FileTree = new FileTreeViewModel(packfileService);
             FileTree.FileOpen += OnFileOpen;
 
@@ -84,9 +85,12 @@ namespace AssetEditor.ViewModels
             //
             //variantmeshes\variantmeshdefinitions\dwf_hammerers.variantmeshdefinition"
             //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
-            var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_loremaster_of_hoeth\hef_loremaster_of_hoeth_head_01.rigid_model_v2");
+            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_loremaster_of_hoeth\hef_loremaster_of_hoeth_head_01.rigid_model_v2");
             //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc4\hef\hef_war_lion\hef_war_lion_02.rigid_model_v2");
             //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hr1\brt\brt_royal_pegasus\brt_pegasus_01.rigid_model_v2");
+            var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_props\hef_ranger_sword_1h_03.rigid_model_v2");
+
+            
             OnFileOpen(packFile);
 
             CreateTestPackFiles(packfileService);
@@ -95,7 +99,7 @@ namespace AssetEditor.ViewModels
         void CreateTestPackFiles(PackFileService packfileService)
         {
             var caPack = packfileService.Database.PackFiles[0];
-            var newPackFile = packfileService.CreateNewPackFile("CustomPackFile", PackFileCAType.MOD);
+            var newPackFile = packfileService.CreateNewPackFileContainer("CustomPackFile", PackFileCAType.MOD);
             packfileService.CopyFileFromOtherPackFile(caPack, @"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2", newPackFile);
 
             packfileService.SetEditablePack(newPackFile);

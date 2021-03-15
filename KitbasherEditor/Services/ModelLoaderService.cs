@@ -5,6 +5,7 @@ using FileTypes.PackFiles.Services;
 using KitbasherEditor.ViewModels;
 using Serilog;
 using View3D.Components.Component;
+using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Services;
 using View3D.Utility;
@@ -32,20 +33,13 @@ namespace KitbasherEditor.Services
 
             _sceneManager.RootNode.AddObject(new SkeletonNode(resourceLibary.Content, animationView));
             EditableMeshNode = (Rmv2ModelNode)_sceneManager.RootNode.AddObject(new Rmv2ModelNode("Editable Model"));
-            for (int lodIndex = 0; lodIndex < 4; lodIndex++)
-            {
-                var lodNode = new Rmv2LodNode("Lod " + lodIndex, lodIndex);
-                lodNode.IsVisible = lodIndex == 0;
-                EditableMeshNode.AddObject(lodNode);
-            }
-
             ReferenceMeshRoot = sceneManager.RootNode.AddObject(new GroupNode("Reference meshs") { IsEditable = false });
         }
 
         public void LoadEditableModel(PackFile file)
         {
             var rmv = new RmvRigidModel(file.DataSource.ReadData(), file.Name);
-            EditableMeshNode.SetModel(rmv, _resourceLibary.GraphicsDevice, _resourceLibary, _animationView.Player);
+            EditableMeshNode.SetModel(rmv, _resourceLibary, _animationView.Player, GeometryGraphicsContextFactory.CreateInstance(_resourceLibary.GraphicsDevice));
 
             _animationView.SetActiveSkeleton(rmv.Header.SkeletonName);
         }

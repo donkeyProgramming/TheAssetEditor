@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace View3D.SceneNodes
 {
@@ -10,7 +11,26 @@ namespace View3D.SceneNodes
 
         internal List<Rmv2MeshNode> GetModels()
         {
-            throw new NotImplementedException();
+            var output = new List<Rmv2MeshNode>();
+            foreach (var child in Children)
+            {
+                if (child is Rmv2MeshNode meshNode)
+                {
+                    output.Add(meshNode);
+                }
+                else if (child is GroupNode)
+                {
+                    foreach (var groupChild in child.Children)
+                    {
+                        if (groupChild is Rmv2MeshNode meshNode2)
+                        {
+                            output.Add(meshNode2);
+                        }
+                    }
+                }
+            }
+
+            return output;
         }
     }
 

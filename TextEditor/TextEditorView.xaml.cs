@@ -33,7 +33,7 @@ namespace TextEditor
 
 			this.SetValue(TextOptions.TextFormattingModeProperty, TextFormattingMode.Display);
 
-		
+		//this.
 
 			//textEditor.TextArea.SelectionBorder = null;
 

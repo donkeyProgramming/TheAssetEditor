@@ -1,5 +1,6 @@
 ﻿using Filetypes.ByteParsing;
 using Filetypes.RigidModel.Transforms;
+using SharpDX;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,19 @@ namespace Filetypes.RigidModel.Vertex
 {
     public abstract class BaseVertex
     {
+        public class BoneInformation
+        { 
+            public byte BoneIndex { get; set; }
+            public float BoneWeight { get; set; }
+
+            public BoneInformation(byte index, float weight)
+            {
+                BoneIndex = index;
+                BoneWeight = weight;
+            }
+        }
+
+
         public RmvVector4 Postition;
         public RmvVector2 Uv;
         public RmvVector4 Normal;
@@ -60,6 +74,50 @@ namespace Filetypes.RigidModel.Vertex
         float ByteToNormal(byte b)
         {
             return (b / 255.0f * 2.0f) - 1.0f;
+        }
+
+        byte NormalToByte(float f)
+        {
+            var truncatedFloat = ((f * 255.0f) / 2.0f) + 1.0f;
+            return (byte)truncatedFloat;
+        }
+
+        protected byte[] CreatePositionVector4(RmvVector4 vector)
+        {
+            var output = new byte[8];
+            ushort[] halfs = { new Half(vector.X).RawValue, new Half(vector.Y).RawValue, new Half(vector.Z).RawValue, new Half(vector.W).RawValue };
+            for (int i = 0; i < 4; i++)
+            {
+                var bytes = BitConverter.GetBytes(halfs[i]);
+                output[(i * 2)] = bytes[0];
+                output[(i * 2) + 1] = bytes[1];
+            }
+
+            return output;
+        }
+
+        protected byte[] CreatePositionVector2(RmvVector2 vector)
+        {
+            var output = new byte[4];
+            ushort[] halfs = { new Half(vector.X).RawValue, new Half(vector.Y).RawValue };
+            for (int i = 0; i < 2; i++)
+            {
+                var bytes = BitConverter.GetBytes(halfs[i]);
+                output[(i * 2)] = bytes[0];
+                output[(i * 2) + 1] = bytes[1];
+            }
+
+            return output;
+        }
+
+        protected byte[] CreateNormalVector3(RmvVector3 vector)
+        {
+            var output = new byte[4];
+            output[0] = NormalToByte(vector.X);
+            output[1] = NormalToByte(vector.Y);
+            output[2] = NormalToByte(vector.Z);
+            output[3] = NormalToByte(1);
+            return output;
         }
     }
 }

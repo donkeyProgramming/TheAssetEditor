@@ -17,7 +17,7 @@
                     </Style.Triggers>
                 </Style>
             </ToolBar.Resources>
-            <Button >
+            <Button Command="{Binding SaveCommand, Mode=OneTime}">
                 <Image Source="Images/Save.png" Height="16"/>
             </Button>
             <Separator/>

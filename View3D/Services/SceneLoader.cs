@@ -121,7 +121,7 @@ namespace View3D.Services
         Rmv2ModelNode LoadRigidMesh(PackFile file, ref ISceneNode parent, AnimationPlayer player)
         {
             var rmvModel = new RmvRigidModel(file.DataSource.ReadData(), file.Name);
-            var model = new Rmv2ModelNode(rmvModel, _device, _resourceLibary, Path.GetFileName( rmvModel.FileName), player);
+            var model = new Rmv2ModelNode(rmvModel, _resourceLibary, Path.GetFileName( rmvModel.FileName), player, GeometryGraphicsContextFactory.CreateInstance(_device));
 
             if (parent == null)
                 parent = model;
@@ -163,12 +163,12 @@ namespace View3D.Services
 
                     var mesh = loadedModelNode.GetMeshNode(int.Parse(lodIndex), int.Parse(partIndex));
                     bool useAlpha = materialFile.Contains("alpha_on");
-                    var alphaSettings = mesh.MeshModel.Mesh.AlphaSettings;
+                    var alphaSettings = mesh.MeshModel.AlphaSettings;
                     if (useAlpha)
                         alphaSettings.Mode = AlphaMode.Alpha_Test;
                     else
                         alphaSettings.Mode = AlphaMode.Opaque;
-                    mesh.MeshModel.Mesh.AlphaSettings = alphaSettings;
+                    mesh.MeshModel.AlphaSettings = alphaSettings;
 
                     foreach (var newTexture in materialConfig)
                         mesh.UpdateTexture(newTexture.Value, newTexture.Key);

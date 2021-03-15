@@ -159,13 +159,19 @@ namespace KitbasherEditor.ViewModels
             if (!string.IsNullOrWhiteSpace(selectedSkeletonPath))
             {
                 _skeletonPackFile = _packFileService.FindFile(selectedSkeletonPath) as PackFile;
-                HeaderText = _skeletonPackFile.Name + " - No Animation";
-                var animations = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(Path.GetFileNameWithoutExtension(_skeletonPackFile.Name));
-                foreach (var anim in animations)
-                    AnimationsForCurrentSkeleton.Add(_packFileService.GetFullPath(anim));
+                if (_skeletonPackFile == null)
+                    HeaderText = "No skeleton";
+                else
+                {
+                    HeaderText = _skeletonPackFile.Name + " - No Animation";
 
-                var skeletonAnimationFile = AnimationFile.Create(_skeletonPackFile);
-                Skeleton = new GameSkeleton(skeletonAnimationFile, Player);
+                    var animations = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(Path.GetFileNameWithoutExtension(_skeletonPackFile.Name));
+                    foreach (var anim in animations)
+                        AnimationsForCurrentSkeleton.Add(_packFileService.GetFullPath(anim));
+
+                    var skeletonAnimationFile = AnimationFile.Create(_skeletonPackFile);
+                    Skeleton = new GameSkeleton(skeletonAnimationFile, Player);
+                }
 
             }
 

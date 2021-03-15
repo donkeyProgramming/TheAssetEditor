@@ -42,13 +42,13 @@ namespace View3D.SceneNodes
         { }
 
 
-        public Rmv2MeshNode(RmvSubModel rmvSubModel, ResourceLibary resourceLib, AnimationPlayer animationPlayer, IGeometry geometry = null)
+        public Rmv2MeshNode(RmvSubModel rmvSubModel, IGeometryGraphicsContext context, ResourceLibary resourceLib, AnimationPlayer animationPlayer, IGeometry geometry = null)
         {
             MeshModel = rmvSubModel;
             _resourceLib = resourceLib;
             Geometry = geometry;
             if (Geometry == null)
-                Geometry = new Rmv2Geometry(rmvSubModel, resourceLib.GraphicsDevice);
+                Geometry = new Rmv2Geometry(rmvSubModel, context);
             AnimationPlayer = animationPlayer;
 
             Name = rmvSubModel.Header.ModelName;
@@ -56,16 +56,19 @@ namespace View3D.SceneNodes
             Scale = Vector3.One;
             Orientation = Quaternion.Identity;
 
-            Effect = new PbrShader(resourceLib);
-            var diffuse = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Diffuse).Value.Path);
-            var specTexture = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Specular).Value.Path);
-            var normalTexture = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Normal).Value.Path);
-            var glossTexture = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Gloss).Value.Path);
+            if(resourceLib != null)
+            {
+                Effect = new PbrShader(resourceLib);
+                var diffuse = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Diffuse).Value.Path);
+                var specTexture = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Specular).Value.Path);
+                var normalTexture = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Normal).Value.Path);
+                var glossTexture = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Gloss).Value.Path);
             
-            (Effect as IShaderTextures).SetTexture(diffuse, TexureType.Diffuse);
-            (Effect as IShaderTextures).SetTexture(specTexture, TexureType.Specular);
-            (Effect as IShaderTextures).SetTexture(normalTexture, TexureType.Normal);
-            (Effect as IShaderTextures).SetTexture(glossTexture, TexureType.Gloss);
+                (Effect as IShaderTextures).SetTexture(diffuse, TexureType.Diffuse);
+                (Effect as IShaderTextures).SetTexture(specTexture, TexureType.Specular);
+                (Effect as IShaderTextures).SetTexture(normalTexture, TexureType.Normal);
+                (Effect as IShaderTextures).SetTexture(glossTexture, TexureType.Gloss);
+            }
         }
 
 
@@ -75,23 +78,8 @@ namespace View3D.SceneNodes
         internal RmvSubModel CreateRmvSubModel()
         {
             var newSubModel = MeshModel.Clone();
-            var typedGeo = (Geometry as Rmv2Geometry);
-            newSubModel.Mesh.IndexList = typedGeo.GetIndexBuffer().ToArray();
-            newSubModel.Mesh.VertexList = new DefaultVertex[typedGeo.VertexCount()];
-
-            var vert = typedGeo.GetVertexById(0);
-            /*
-             
-                             case VertexFormat.Default:
-                    return ByteHelper.GetSize(typeof(DefaultVertex.Data));
-                case VertexFormat.Weighted:
-                    return ByteHelper.GetSize(typeof(WeightedVertex.Data));
-                case VertexFormat.Cinematic:
-                    return ByteHelper.GetSize(typeof(CinematicVertex.Data));
-             
-             */
-
-            throw new NotImplementedException();
+            newSubModel.Mesh = (Geometry as Rmv2Geometry).CreateRmvMesh();
+            return newSubModel;
         }
 
         public IGeometry Geometry { get; set; }
@@ -165,7 +153,7 @@ namespace View3D.SceneNodes
             }
 
             if (Effect is IShaderTextures tetureEffect)
-                tetureEffect.UseAlpha = MeshModel.Mesh.AlphaSettings.Mode == AlphaMode.Alpha_Test;
+                tetureEffect.UseAlpha = MeshModel.AlphaSettings.Mode == AlphaMode.Alpha_Test;
 
             renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeoRenderItem() { Geometry = Geometry, ModelMatrix = ModelMatrix, Shader = Effect });
         }

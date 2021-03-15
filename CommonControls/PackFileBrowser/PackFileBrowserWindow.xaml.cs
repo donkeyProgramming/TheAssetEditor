@@ -33,7 +33,8 @@ namespace CommonControls.PackFileBrowser
         private void ViewModel_FileOpen(IPackFile file)
         {
             SelectedFile = file as PackFile;
-            DialogResult = true;
+            if(DialogResult != true)
+                DialogResult = true;
             Close();
         }
 

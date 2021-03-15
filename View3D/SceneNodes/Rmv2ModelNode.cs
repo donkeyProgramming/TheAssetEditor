@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using View3D.Animation;
 using View3D.Components.Rendering;
@@ -30,33 +31,26 @@ namespace View3D.SceneNodes
             // Add to render qeueue.
         }
 
-        public Rmv2ModelNode(RmvRigidModel model, GraphicsDevice device, ResourceLibary resourceLib, string name, AnimationPlayer animationPlayer)
+        public Rmv2ModelNode(RmvRigidModel model,  ResourceLibary resourceLib, string name, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory) : base(name)
         {
-            Model = model;
-            Name = name;
-
-            for (int lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
-            {
-                var lodNode = new Rmv2LodNode("Lod " + lodIndex, lodIndex);
-
-                for (int modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
-                {
-                    var node = new Rmv2MeshNode(model.MeshList[lodIndex][modelIndex], resourceLib, animationPlayer);
-                    node.LodIndex = lodIndex;
-                    lodNode.AddObject(node);
-                }
-
-                lodNode.IsVisible = lodIndex == 0;
-                AddObject(lodNode);
-            }
+            SetModel(model, resourceLib, animationPlayer, contextFactory);
         }
 
         public Rmv2ModelNode(string name)
         {
             Name = name;
+
+            for (int lodIndex = 0; lodIndex < 4; lodIndex++)
+            {
+                var lodNode = new Rmv2LodNode("Lod " + lodIndex, lodIndex)
+                {
+                    IsVisible = lodIndex == 0
+                };
+                AddObject(lodNode);
+            }
         }
 
-        public void SetModel(RmvRigidModel model, GraphicsDevice device, ResourceLibary resourceLibary, AnimationPlayer animationPlayer)
+        public void SetModel(RmvRigidModel model, ResourceLibary resourceLibary, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory)
         {
             Model = model;
             for (int lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
@@ -65,18 +59,17 @@ namespace View3D.SceneNodes
 
                 for (int modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
                 {
-                    var node = new Rmv2MeshNode(model.MeshList[lodIndex][modelIndex], resourceLibary, animationPlayer);
+                    var node = new Rmv2MeshNode(model.MeshList[lodIndex][modelIndex], contextFactory.Create(), resourceLibary, animationPlayer);
                     node.LodIndex = lodIndex;
                     lodNode.AddObject(node);
                 }
             }
         }
 
-        public void Save()
+        public byte[] Save()
         {
             var lods = GetLodNodes();
-            var orderedLods = lods.OrderByDescending(x => x.LodValue);
-
+            var orderedLods = lods.OrderBy(x => x.LodValue);
 
             RmvSubModel[][] newMeshList = new RmvSubModel[orderedLods.Count()][];
             for (int lodIndex = 0; lodIndex < orderedLods.Count(); lodIndex++)
@@ -85,19 +78,18 @@ namespace View3D.SceneNodes
                 newMeshList[lodIndex] = new RmvSubModel[meshes.Count];
 
                 for (int meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
-                {
                     newMeshList[lodIndex][meshIndex] = meshes[meshIndex].CreateRmvSubModel();
-                }
-
-
-
-
             }
 
 
+            Model.MeshList = newMeshList;
             Model.UpdateOffsets();
-            Model.SaveToByteArray(null);
-            //Model
+
+            using MemoryStream ms = new MemoryStream();
+            using BinaryWriter writer = new BinaryWriter(ms);
+
+            Model.SaveToByteArray(writer);
+            return ms.ToArray();
         }
 
         public List<Rmv2LodNode> GetLodNodes()

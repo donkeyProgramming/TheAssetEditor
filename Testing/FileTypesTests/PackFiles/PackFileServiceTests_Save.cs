@@ -37,7 +37,7 @@ namespace FileTypesTests.PackFiles
         public void CreateModPackFile()
         {
             PackFileService packFileService = new PackFileService(new PackFileDataBase());
-            var packContainer = packFileService.CreateNewPackFile("MyTestPackFile", PackFileCAType.MOD);
+            var packContainer = packFileService.CreateNewPackFileContainer("MyTestPackFile", PackFileCAType.MOD);
 
  
             var packFile = new PackFile("ExampleFile.txt", new FileSystemSource(@"Data\FolderData\SubFolder0\Subfolder_0_file0.txt"));

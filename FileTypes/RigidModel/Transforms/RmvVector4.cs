@@ -29,5 +29,10 @@ namespace Filetypes.RigidModel.Transforms
             Z = value;
             W = value;
         }
+
+        public override string ToString()
+        {
+            return $"{X}, {Y}, {Z}, {W}";
+        }
     }
 }

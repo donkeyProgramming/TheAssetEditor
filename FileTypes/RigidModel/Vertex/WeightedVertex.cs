@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Filetypes.RigidModel.Transforms;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -39,15 +40,39 @@ namespace Filetypes.RigidModel.Vertex
         public WeightedVertex(Data data)
         {
             _data = data;
+            CreateFromData(_data);
+        }
 
-            Postition = CreatVector4HalfFloat(_data.position);
-            Uv = CreatVector2HalfFloat(_data.uv);
-            Normal = CreatVector4Byte(_data.normal);
-            BiNormal = CreatVector4Byte(_data.biNormal);
-            Tangent = CreatVector4Byte(_data.tangent);
+        public WeightedVertex(RmvVector4 position, RmvVector2 uv, RmvVector3 normal, RmvVector3 biNormal, RmvVector3 tanget, BoneInformation[] boneInformation)
+        {
+            if (boneInformation.Length != 2)
+                throw new ArgumentException();
 
-            BoneIndex = new byte[] { _data.boneIndex[0], _data.boneIndex[1] };
-            BoneWeight = new float[] { _data.boneWeight[0] / 255.0f, _data.boneWeight[1] / 255.0f };
+            _data = new Data()
+            {
+                position = CreatePositionVector4(position),
+                uv = CreatePositionVector2(uv),
+                boneIndex = boneInformation.Select(x=>x.BoneIndex).ToArray(),
+                boneWeight = boneInformation.Select(x => (byte)(x.BoneWeight * 255.0f)).ToArray(),
+                normal = CreateNormalVector3(normal),
+                biNormal = CreateNormalVector3(biNormal),
+                tangent = CreateNormalVector3(tanget),
+
+            };
+
+            CreateFromData(_data);
+        }
+
+        void CreateFromData(Data data)
+        {
+            Postition = CreatVector4HalfFloat(data.position);
+            Uv = CreatVector2HalfFloat(data.uv);
+            Normal = CreatVector4Byte(data.normal);
+            BiNormal = CreatVector4Byte(data.biNormal);
+            Tangent = CreatVector4Byte(data.tangent);
+
+            BoneIndex = new byte[] { data.boneIndex[0], data.boneIndex[1] };
+            BoneWeight = new float[] { data.boneWeight[0] / 255.0f, data.boneWeight[1] / 255.0f };
         }
     }
 }

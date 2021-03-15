@@ -166,7 +166,7 @@ namespace FileTypes.PackFiles.Services
 
         // Add
         // ---------------------------
-        public PackFileContainer CreateNewPackFile(string name, PackFileCAType type)
+        public PackFileContainer CreateNewPackFileContainer(string name, PackFileCAType type)
         {
             var newPackFile = new PackFileContainer(name)
             {
@@ -178,12 +178,12 @@ namespace FileTypes.PackFiles.Services
         }
 
 
-        public void AddFileToPack(PackFileContainer container, string path, IPackFile newFile)
+        public void AddFileToPack(PackFileContainer container, string directoryPath, IPackFile newFile)
         {
-            if (!string.IsNullOrWhiteSpace(path))
-                path += "\\";
-            path += newFile.Name;
-            container.FileList[path.ToLower()] = newFile;
+            if (!string.IsNullOrWhiteSpace(directoryPath))
+                directoryPath += "\\";
+            directoryPath += newFile.Name;
+            container.FileList[directoryPath.ToLower()] = newFile;
             Database.TriggerContainerUpdated(container);
         }
 
@@ -238,7 +238,8 @@ namespace FileTypes.PackFiles.Services
                 if (res != null)
                     return pf;
             }
-            throw new Exception("Unknown packfile container for " + file.Name);
+            _logger.Here().Information($"Unknown packfile container for {file.Name}");
+            return null;
         }
 
         // Remove
@@ -266,6 +267,8 @@ namespace FileTypes.PackFiles.Services
             var key = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
             _logger.Here().Information($"Deleting file {key}");
             pf.FileList.Remove(key);
+
+            Database.TriggerContainerUpdated(pf);
         }
 
         // Modify
@@ -309,6 +312,21 @@ namespace FileTypes.PackFiles.Services
                     return packFile.FileList[lowerPath];
                 }
             }
+            _logger.Here().Warning($"File not found");
+            return null;
+        }
+
+        public IPackFile FindFile(string path, PackFileContainer container)
+        {
+            var lowerPath = path.Replace('/', '\\').ToLower();
+            _logger.Here().Information($"Searching for file {lowerPath}");
+
+            if (container.FileList.ContainsKey(lowerPath))
+            {
+                _logger.Here().Information($"File found");
+                return container.FileList[lowerPath];
+            }
+
             _logger.Here().Warning($"File not found");
             return null;
         }

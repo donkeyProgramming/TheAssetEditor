@@ -151,6 +151,9 @@ namespace CommonControls.PackFileBrowser
                 MessageBox.Show("Unable to edit CA packfile");
                 return;
             }
+
+            if(MessageBox.Show("Are you sure you want to delete the file?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                _packFileService.DeleteFile(node.FileOwner, node.Item);
         }
 
 

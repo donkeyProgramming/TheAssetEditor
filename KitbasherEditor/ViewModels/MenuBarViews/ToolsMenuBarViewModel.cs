@@ -150,9 +150,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         void MergeVertex()
         {
-          
-
-
         }
 
         void ExpandFaceSelection()
