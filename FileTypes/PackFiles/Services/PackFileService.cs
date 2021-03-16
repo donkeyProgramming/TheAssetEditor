@@ -293,13 +293,15 @@ namespace FileTypes.PackFiles.Services
 
         public void Save(PackFileContainer pf, string path)
         {
-            using (FileStream fs = File.OpenWrite(path))
+            using (MemoryStream memoryStream = new MemoryStream())
             {
-                using (BinaryWriter writer = new BinaryWriter(fs))
+                using (BinaryWriter writer = new BinaryWriter(memoryStream))
                     Save(pf, writer);
+
+                File.WriteAllBytes(path, memoryStream.ToArray());
             }
         }
-        
+
         public IPackFile FindFile(string path) 
         {
             var lowerPath = path.Replace('/', '\\').ToLower();

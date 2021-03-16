@@ -102,7 +102,9 @@ namespace AssetEditor.ViewModels
             var newPackFile = packfileService.CreateNewPackFileContainer("CustomPackFile", PackFileCAType.MOD);
             packfileService.CopyFileFromOtherPackFile(caPack, @"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2", newPackFile);
 
-            packfileService.SetEditablePack(newPackFile);
+            var loadedPackFile = packfileService.Load(@"C:\Users\ole_k\Desktop\TestPackfile\SlayerMod.pack");
+
+            packfileService.SetEditablePack(loadedPackFile);
         }
 
         private void OnFileOpen(IPackFile file)

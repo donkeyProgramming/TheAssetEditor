@@ -33,6 +33,17 @@ namespace View3D.SceneNodes
 
         public Rmv2ModelNode(RmvRigidModel model,  ResourceLibary resourceLib, string name, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory) : base(name)
         {
+            Name = name;
+
+            for (int lodIndex = 0; lodIndex < 4; lodIndex++)
+            {
+                var lodNode = new Rmv2LodNode("Lod " + lodIndex, lodIndex)
+                {
+                    IsVisible = lodIndex == 0
+                };
+                AddObject(lodNode);
+            }
+
             SetModel(model, resourceLib, animationPlayer, contextFactory);
         }
 

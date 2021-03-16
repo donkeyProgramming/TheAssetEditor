@@ -1,4 +1,5 @@
-﻿using FileTypes.PackFiles.Models;
+﻿using CommonControls.Common;
+using FileTypes.PackFiles.Models;
 using FileTypes.PackFiles.Services;
 using KitbasherEditor.ViewModels;
 using System;
@@ -27,10 +28,15 @@ namespace KitbasherEditor.Services
 
         public void Save()
         {
-            _editableMeshNode.Save();
+            var inputFile = _kitbasherViewModel.MainFile as PackFile;
+            var bytes = _editableMeshNode.Save();
+            var newPf = new PackFile(inputFile.Name, new MemorySource(bytes));
+            var path = _packFileService.GetFullPath(inputFile);
+            SaveHelper.Save(_packFileService, path, newPf);
+
             return;
 
-            var inputFile = _kitbasherViewModel.MainFile as PackFile;
+          
             var selectedEditabelPackFile = _packFileService.GetEditablePack();
             var filePackFileConainer = _packFileService.GetPackFileContainer(inputFile);
 
