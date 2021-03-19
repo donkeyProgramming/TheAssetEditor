@@ -1,15 +1,16 @@
 Feature list before V_1 done:
 	PackFile
-		Save packfile dialog - create folder
+		[DONE]Save packfile dialog;
+		Create packfile folder
 	
 	General
 		[Done]General error handling
 		[Done]Differnt filetypes for xml files
 		Files changed must show in packfile tree
 		Create new file => VMD, XML, TXT
-		Copy file to main
-		Set main Packfile (the one files are saved to)
-		Close and save tabcontrol items
+		[DONE]Copy file to main
+		[DONE]Set main Packfile (the one files are saved to)
+		[DONE]Close and save tabcontrol items
 		Recently used files
 		Right click rmv2 model files => Edit
 		Remove animation invert by fixing veiw matrix
@@ -102,7 +103,7 @@ Feature list before V_1 done:
 		[DONE]Validate
 		[DONE]Skeleton id remapper
 		[DONE]Scale gizmo with +- keys on numpad. Reset option
-		Saving model to packfile
+		[DONE]Saving model to packfile
 
 	New editors:
 		Model preview

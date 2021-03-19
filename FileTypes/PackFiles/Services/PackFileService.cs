@@ -291,8 +291,16 @@ namespace FileTypes.PackFiles.Services
             pf.SaveToByteArray(writer);
         }
 
-        public void Save(PackFileContainer pf, string path)
+        public void Save(PackFileContainer pf, string path, bool createBackup)
         {
+            if (createBackup)
+            {
+                SaveHelper.
+            }
+
+
+
+
             using (MemoryStream memoryStream = new MemoryStream())
             {
                 using (BinaryWriter writer = new BinaryWriter(memoryStream))

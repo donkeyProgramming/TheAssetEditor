@@ -138,6 +138,7 @@ namespace View3D.Rendering.Geometry
             var mesh = new Rmv2Geometry(Context);
             CopyInto(mesh);
             mesh.WeightCount = WeightCount;
+            mesh._vertedFormat = _vertedFormat;
             return mesh;
         }
 

@@ -77,7 +77,7 @@ namespace View3D.SceneNodes
             }
         }
 
-        public byte[] Save()
+        public byte[] Save(bool onlySaveVisibleNodes)
         {
             var lods = GetLodNodes();
             var orderedLods = lods.OrderBy(x => x.LodValue);
@@ -91,8 +91,7 @@ namespace View3D.SceneNodes
                 for (int meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
                     newMeshList[lodIndex][meshIndex] = meshes[meshIndex].CreateRmvSubModel();
             }
-
-
+            
             Model.MeshList = newMeshList;
             Model.UpdateOffsets();
 

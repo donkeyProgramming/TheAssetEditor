@@ -100,7 +100,8 @@ namespace KitbasherEditor.ViewModels
             if (node is Rmv2MeshNode meshNode)
             {
                 meshNode.IsSelectable = true;
-                EditableMeshNode.Children[SelectedLodLevel.Value].AddObject(meshNode);
+                EditableMeshNode.GetLodNodes()[0].AddObject(meshNode);
+                //EditableMeshNode.Children[SelectedLodLevel.Value].AddObject(meshNode);
             }
 
             if (node is Rmv2LodNode lodNode)
@@ -109,7 +110,8 @@ namespace KitbasherEditor.ViewModels
                 foreach (var lodModel in lodNode.Children)
                 {
                     (lodModel as Rmv2MeshNode).IsSelectable = true;
-                    EditableMeshNode.Children[index].AddObject(lodModel);
+                    EditableMeshNode.GetLodNodes()[0].AddObject(lodModel);
+                    //EditableMeshNode.Children[index].AddObject(lodModel);
                 }
             }
 
@@ -117,7 +119,7 @@ namespace KitbasherEditor.ViewModels
             {
                 foreach (var lodChild in modelNode.Children)
                 {
-                    if (lodChild is Rmv2LodNode lodNode0)
+                    if (lodChild  is Rmv2LodNode lodNode0)
                     {
                         var index = lodNode0.LodValue;
                         foreach (var lodModel in lodNode0.Children)
@@ -125,8 +127,9 @@ namespace KitbasherEditor.ViewModels
                             if (index > 3)
                                 continue;
                             (lodModel as Rmv2MeshNode).IsSelectable = true;
-                            EditableMeshNode.Children[index].AddObject(lodModel);
+                            EditableMeshNode.GetLodNodes()[0].AddObject(lodModel);
                         }
+                        break;
                     }
                 }
             }

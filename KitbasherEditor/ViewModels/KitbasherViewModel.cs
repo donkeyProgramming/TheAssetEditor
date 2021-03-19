@@ -90,8 +90,15 @@ namespace KitbasherEditor.ViewModels
 
             if (MainFile != null)
             {
-                _modelLoader.LoadEditableModel(MainFile as PackFile);
-                DisplayName = MainFile.Name;
+                try
+                {
+                    _modelLoader.LoadEditableModel(MainFile as PackFile);
+                    DisplayName = MainFile.Name;
+                }
+                catch (Exception e)
+                {
+                    _logger.Here().Error($"Error loading file {MainFile?.Name} - {e}");
+                }
             }
 
             //_modelLoader.LoadReference("variantmeshes\\variantmeshdefinitions\\skv_ratling_gun_gunner_ror.variantmeshdefinition");

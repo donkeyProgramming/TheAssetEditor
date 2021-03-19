@@ -119,7 +119,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         void UseParentSkeleton() { }
 
         void UseParentAttachmentPoints() { }
-
+         
         void OpenBoneRemappingTool()
         {
             RemappedAnimatedBoneConfiguration config = new RemappedAnimatedBoneConfiguration();

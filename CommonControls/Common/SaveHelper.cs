@@ -10,6 +10,8 @@ namespace CommonControls.Common
 {
     public static class SaveHelper
     {
+        public static string BackupFolderPath = "Backup";
+
         public static void Save(PackFileService packFileService, PackFile inputFile)
         {
             var selectedEditabelPackFile = packFileService.GetEditablePack();
@@ -46,6 +48,33 @@ namespace CommonControls.Common
 
             var directoryPath = Path.GetDirectoryName(filename);
             packFileService.AddFileToPack(selectedEditabelPackFile, directoryPath, packFile);
+        }
+
+        public static void CreateFileBackup(string originalFileName)
+        {
+            if (File.Exists(originalFileName))
+            {
+                var dirName = Path.GetDirectoryName(originalFileName);
+                var fileName = Path.GetFileNameWithoutExtension(originalFileName);
+                var extention = Path.GetExtension(originalFileName);
+                var uniqeFileName = IndexedFilename(fileName, extention);
+                var newFilePath = Path.Combine(dirName, BackupFolderPath, uniqeFileName);
+
+                Directory.CreateDirectory(Path.Combine(dirName, BackupFolderPath));
+                File.Copy(originalFileName, newFilePath);
+            }
+        }
+
+        static string IndexedFilename(string stub, string extension)
+        {
+            int ix = 0;
+            string filename = null;
+            do
+            {
+                ix++;
+                filename = String.Format("{0}{1}.{2}", stub, ix, extension);
+            } while (File.Exists(filename));
+            return filename;
         }
     }
 }

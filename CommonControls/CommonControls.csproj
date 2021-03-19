@@ -233,4 +233,8 @@
     <ProjectReference Include="..\FileTypes\FileTypes.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>

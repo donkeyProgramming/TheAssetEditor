@@ -40,6 +40,7 @@ namespace View3D.SceneNodes
         List<ISceneNode> _children = new List<ISceneNode>();
 
         public List<ISceneNode> Children { get { return _children; } }
+        public IEnumerable<ISceneNode> GetChildren() { return Children; }
 
         public ISceneNode _parent;
         public ISceneNode Parent { get => _parent; set => SetAndNotifyWhenChanged(ref _parent, value); }

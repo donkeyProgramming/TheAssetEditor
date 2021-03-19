@@ -78,7 +78,8 @@ namespace Filetypes.RigidModel.Vertex
 
         byte NormalToByte(float f)
         {
-            var truncatedFloat = ((f * 255.0f) / 2.0f) + 1.0f;
+           // var truncatedFloat = ((f * 255.0f) / 2.0f) + 1.0f;
+            var truncatedFloat = ((f + 1.0f) / 2.0f) * 255.0f;
             return (byte)truncatedFloat;
         }
 

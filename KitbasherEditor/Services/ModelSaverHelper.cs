@@ -1,9 +1,11 @@
 ﻿using CommonControls.Common;
+using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
 using FileTypes.PackFiles.Services;
 using KitbasherEditor.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using View3D.Components.Component;
@@ -11,6 +13,86 @@ using View3D.SceneNodes;
 
 namespace KitbasherEditor.Services
 {
+
+
+    public static class LinqRecursiveHelper
+    {
+        /// <summary>
+        /// Return item and all children recursively.
+        /// </summary>
+        /// <typeparam name="T">Type of item.</typeparam>
+        /// <param name="item">The item to be traversed.</param>
+        /// <param name="childSelector">Child property selector.</param>
+        /// <returns></returns>
+        public static IEnumerable<T> Traverse<T>(this T item, Func<T, T> childSelector)
+        {
+            var stack = new Stack<T>(new T[] { item });
+
+            while (stack.Any())
+            {
+                var next = stack.Pop();
+                if (next != null)
+                {
+                    yield return next;
+                    stack.Push(childSelector(next));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Return item and all children recursively.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="item"></param>
+        /// <param name="childSelector"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> Traverse<T>(this T item, Func<T, IEnumerable<T>> childSelector)
+        {
+            var stack = new Stack<T>(new T[] { item });
+
+            while (stack.Any())
+            {
+                var next = stack.Pop();
+                //if(next != null)
+                //{
+                yield return next;
+                foreach (var child in childSelector(next))
+                {
+                    stack.Push(child);
+                }
+                //}
+            }
+        }
+
+        /// <summary>
+        /// Return item and all children recursively.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="items"></param>
+        /// <param name="childSelector"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> Traverse<T>(this IEnumerable<T> items,
+          Func<T, IEnumerable<T>> childSelector)
+        {
+            var stack = new Stack<T>(items);
+            while (stack.Any())
+            {
+                var next = stack.Pop();
+                yield return next;
+                foreach (var child in childSelector(next))
+                    stack.Push(child);
+            }
+        }
+
+        public static IEnumerable<T> Flatten<T>(this T source, Func<T, IEnumerable<T>> selector)
+        {
+            return selector(source).SelectMany(c => Flatten(c, selector))
+                                   .Concat(new[] { source });
+        }
+    }
+
+
+
     public class ModelSaverHelper
     {
         private readonly  PackFileService _packFileService;
@@ -28,31 +110,41 @@ namespace KitbasherEditor.Services
 
         public void Save()
         {
-            var inputFile = _kitbasherViewModel.MainFile as PackFile;
-            var bytes = _editableMeshNode.Save();
-            var newPf = new PackFile(inputFile.Name, new MemorySource(bytes));
-            var path = _packFileService.GetFullPath(inputFile);
-            SaveHelper.Save(_packFileService, path, newPf);
+            try
+            {
+                var inputFile = _kitbasherViewModel.MainFile as PackFile;
+
+                var isAllVisible = true;
+                _editableMeshNode.GetLodNodes()[0].ForeachNode((node) =>
+                {
+                    if (!node.IsVisible)
+                        isAllVisible = false;
+                });
+
+                bool onlySaveVisible = false;
+                if (isAllVisible == false)
+                {
+                    if (MessageBox.Show("Only save visible nodes?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        onlySaveVisible = true;
+                }
+
+                var bytes = _editableMeshNode.Save(onlySaveVisible);
+
+                var reloadedModel = new RmvRigidModel(bytes, "reloadedFile");
+
+                var newPf = new PackFile(inputFile.Name, new MemorySource(bytes));
+                var path = _packFileService.GetFullPath(inputFile);
+                SaveHelper.Save(_packFileService, path, newPf);
+
+               
+
+            }
+            catch (Exception e)
+            { 
+            
+            }
 
             return;
-
-          
-            var selectedEditabelPackFile = _packFileService.GetEditablePack();
-            var filePackFileConainer = _packFileService.GetPackFileContainer(inputFile);
-
-            if (selectedEditabelPackFile == null)
-            {
-                MessageBox.Show("No editable pack selected!");
-                return;
-            }
-
-            if (filePackFileConainer != selectedEditabelPackFile)
-            {
-                var filePath = _packFileService.GetFullPath(inputFile, filePackFileConainer);
-                _packFileService.CopyFileFromOtherPackFile(filePackFileConainer, filePath, selectedEditabelPackFile);
-            }
-
-
             
             /*
              RmvRigidModel model = new RmvRigidModel(originalMeshBytes, "UnitTestModel");

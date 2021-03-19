@@ -84,7 +84,7 @@ namespace Filetypes.RigidModel
 
         public UknownData _uknownData;
 
-        public VertexFormat VertextType { get => (VertexFormat)_vertexType; }
+        public VertexFormat VertextType { get => (VertexFormat)_vertexType; set => _vertexType = (ushort)value; }
 
         public string ModelName
         {
