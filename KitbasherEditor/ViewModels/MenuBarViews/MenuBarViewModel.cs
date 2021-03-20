@@ -1,5 +1,5 @@
 ﻿using CommonControls.PackFileBrowser;
-using FileTypes.PackFiles.Services;
+using CommonControls.Services;
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor.Services;
 using MonoGame.Framework.WpfInterop;
@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Input;
-using View3D.Components.Component.Selection;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {

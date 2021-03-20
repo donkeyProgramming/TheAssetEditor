@@ -11,7 +11,7 @@ namespace FileTypes.PackFiles.Models
 {
     public class PackFile : NotifyPropertyChangedImpl, IPackFile
     {
-        public IDataSource DataSource { get; private set; }
+        public IDataSource DataSource { get; set; }
 
         public PackFile(string name, IDataSource dataSource)
         {

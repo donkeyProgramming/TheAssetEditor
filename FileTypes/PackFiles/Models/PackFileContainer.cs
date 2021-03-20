@@ -74,7 +74,7 @@ namespace FileTypes.PackFiles.Models
             return;
         }
 
-        internal void SaveToByteArray(BinaryWriter writer)
+        public void SaveToByteArray(BinaryWriter writer)
         {
             long fileNamesOffset = 0;
             foreach (var file in FileList)

@@ -18,6 +18,8 @@ Feature list before V_1 done:
 		[DONE]	Double click open
 		[DONE]	Ok open
 		[DONE]	File extention filter
+		Dont always rebuild treeview! Save, new file
+		Prompt if unsaved changes
 		
 	
 	Editor:
@@ -104,6 +106,7 @@ Feature list before V_1 done:
 		[DONE]Skeleton id remapper
 		[DONE]Scale gizmo with +- keys on numpad. Reset option
 		[DONE]Saving model to packfile
+		Convert face selection to vertes
 
 	New editors:
 		Model preview
@@ -143,7 +146,7 @@ Known bugs:
 	Gizmo behaves strangly when camera look directly forward towards model
 	Selecting not use texture, then deslecting and selecing again gives wrong checkbox value
 	Remapping head to lion to h-elf creates index out of range error. Why?
-	
+	Saving 2x does not work for text files
 	
 	
 	

@@ -1,8 +1,10 @@
-﻿using CommonControls.Common;
+﻿using Common;
+using CommonControls.Common;
+using CommonControls.Services;
 using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
-using FileTypes.PackFiles.Services;
 using KitbasherEditor.ViewModels;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -95,6 +97,8 @@ namespace KitbasherEditor.Services
 
     public class ModelSaverHelper
     {
+        ILogger _logger = Logging.Create<ModelSaverHelper>();
+
         private readonly  PackFileService _packFileService;
         private readonly  SceneManager _sceneManager;
         private readonly KitbasherViewModel _kitbasherViewModel;
@@ -132,38 +136,13 @@ namespace KitbasherEditor.Services
 
                 var reloadedModel = new RmvRigidModel(bytes, "reloadedFile");
 
-                var newPf = new PackFile(inputFile.Name, new MemorySource(bytes));
                 var path = _packFileService.GetFullPath(inputFile);
-                SaveHelper.Save(_packFileService, path, newPf);
-
-               
-
+                SaveHelper.Save(_packFileService, path, inputFile, bytes);
             }
             catch (Exception e)
-            { 
-            
-            }
-
-            return;
-            
-            /*
-             RmvRigidModel model = new RmvRigidModel(originalMeshBytes, "UnitTestModel");
-            using (MemoryStream ms = new MemoryStream())
             {
-                using (BinaryWriter writer = new BinaryWriter(ms))
-                    model.SaveToByteArray(writer);
-
-                var savedMeshBytes = ms.ToArray();
-                Assert.AreEqual(originalMeshBytes.Length, savedMeshBytes.Length);
-
-                for (int i = 0; i < originalMeshBytes.Length; i++)
-                    Assert.AreEqual(originalMeshBytes[i], savedMeshBytes[i]);
+                _logger.Here().Error("Error saving model - " + e.ToString());
             }
-             
-             */
-
-            // _editableMeshNode
-
         }
     }
 }

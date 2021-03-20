@@ -9,22 +9,27 @@ namespace View3D.SceneNodes
         public Rmv2LodNode(string name, int lodIndex) : base(name) { LodValue = lodIndex; }
         public int LodValue { get; set; }
 
-        internal List<Rmv2MeshNode> GetModels()
+        internal List<Rmv2MeshNode> GetModels(bool onlyVisible)
         {
             var output = new List<Rmv2MeshNode>();
             foreach (var child in Children)
             {
                 if (child is Rmv2MeshNode meshNode)
                 {
-                    output.Add(meshNode);
+                    if (!(onlyVisible && meshNode.IsVisible == false))
+                        output.Add(meshNode);
                 }
-                else if (child is GroupNode)
+                else if (child is GroupNode groupNode)
                 {
-                    foreach (var groupChild in child.Children)
+                    if ( !(onlyVisible && groupNode.IsVisible == false) )
                     {
-                        if (groupChild is Rmv2MeshNode meshNode2)
+                        foreach (var groupChild in child.Children)
                         {
-                            output.Add(meshNode2);
+                            if (groupChild is Rmv2MeshNode meshNode2)
+                            {
+                                if (!(onlyVisible && meshNode2.IsVisible == false))
+                                    output.Add(meshNode2);
+                            }
                         }
                     }
                 }

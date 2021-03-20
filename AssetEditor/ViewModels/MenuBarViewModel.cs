@@ -1,8 +1,8 @@
 ﻿using AssetEditor.Views.Settings;
 using Common;
+using CommonControls.Services;
 using CommonControls.Simple;
 using FileTypes.PackFiles.Models;
-using FileTypes.PackFiles.Services;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.WindowsAPICodePack.Dialogs;

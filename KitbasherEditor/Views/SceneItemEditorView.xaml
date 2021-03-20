@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:KitbasherEditor.Views" 
+             xmlns:generic="clr-namespace:KitbasherEditor.Views.EditorViews"
              xmlns:rmv2="clr-namespace:KitbasherEditor.Views.EditorViews.Rmv2"
              xmlns:nodeViewModels="clr-namespace:KitbasherEditor.ViewModels.SceneExplorerNodeViews"
              xmlns:nodeTypes="clr-namespace:View3D.SceneNodes;assembly=View3D" 
@@ -20,6 +21,11 @@
         <DataTemplate DataType="{ x:Type nodeViewModels:MeshSceneNodeViewModel}">
             <rmv2:RigidModelMeshEditorView/>
         </DataTemplate>
+        <DataTemplate DataType="{ x:Type nodeViewModels:SkeletonSceneNodeViewModel}">
+            <generic:SkeletonView/>
+        </DataTemplate>
+
+        
 
     </UserControl.Resources>
     <ScrollViewer>

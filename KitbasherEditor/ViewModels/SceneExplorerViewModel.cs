@@ -1,6 +1,5 @@
 ﻿using Common;
-using Common.ApplicationSettings;
-using FileTypes.PackFiles.Services;
+using CommonControls.Services;
 using GalaSoft.MvvmLight.Command;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using System;
@@ -46,14 +45,16 @@ namespace KitbasherEditor.ViewModels
 
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         PackFileService _packFileService;
+        AnimationControllerViewModel _animationControllerViewModel;
         bool _updateSelectionManagerOnNodeSelect = true;
-        public SceneExplorerViewModel(SceneContainer sceneContainer, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService packFileService)
+        public SceneExplorerViewModel(SceneContainer sceneContainer, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService packFileService, AnimationControllerViewModel animationControllerViewModel)
         {
             _selectedLodLvl = LodItem.GetAll.First();
 
             _sceneContainer = sceneContainer;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _packFileService = packFileService;
+            _animationControllerViewModel = animationControllerViewModel;
             _sceneManager = _sceneContainer.GetComponent<SceneManager>();
             _commandExecutor = sceneContainer.GetComponent<CommandExecutor>();
             _selectionManager = sceneContainer.GetComponent<SelectionManager>();
@@ -175,9 +176,11 @@ namespace KitbasherEditor.ViewModels
 
         private void OnNodeSelected(ISceneNode selectedNode)
         {
-            SelectedNodeViewModel = SceneNodeViewFactory.Create(selectedNode, _skeletonAnimationLookUpHelper, _packFileService);
             if (_updateSelectionManagerOnNodeSelect)
             {
+                _updateSelectionManagerOnNodeSelect = false;
+                SelectedNodeViewModel = SceneNodeViewFactory.Create(selectedNode, _skeletonAnimationLookUpHelper, _packFileService, _animationControllerViewModel);
+           
                 var objectState = new ObjectSelectionState();
                 if (selectedNode != null)
                 {
@@ -197,6 +200,7 @@ namespace KitbasherEditor.ViewModels
                 }
 
                 _selectionManager.SetState(objectState);
+                _updateSelectionManagerOnNodeSelect = true;
             }
         }
     }

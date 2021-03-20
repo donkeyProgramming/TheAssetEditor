@@ -1,22 +1,18 @@
 ﻿using Common;
 using Common.ApplicationSettings;
+using CommonControls.Services;
 using FileTypes.PackFiles.Models;
-using FileTypes.PackFiles.Services;
-using g3;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
-using View3D.Animation;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Components.Gizmo;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
-using View3D.Rendering.Geometry;
 using View3D.Scene;
 using View3D.Utility;
 
@@ -66,14 +62,15 @@ namespace KitbasherEditor.ViewModels
             Scene.Components.Add(new ClearScreenComponent(Scene));
             Scene.Components.Add(new RenderEngineComponent(Scene));
             Scene.Components.Add(new GridComponent(Scene));
-            Scene.Components.Add(new AnimationsContainerComponent(Scene)); 
+            Scene.Components.Add(new AnimationsContainerComponent(Scene));
 
+            Animation = new AnimationControllerViewModel(Scene, _packFileService, _skeletonAnimationLookUpHelper);
 
-            SceneExplorer = new SceneExplorerViewModel(Scene, _skeletonAnimationLookUpHelper, _packFileService);
+            SceneExplorer = new SceneExplorerViewModel(Scene, _skeletonAnimationLookUpHelper, _packFileService, Animation);
             Scene.Components.Add(SceneExplorer);
 
             MenuBar = new MenuBarViewModel(Scene, _packFileService);
-            Animation = new AnimationControllerViewModel(Scene, _packFileService, _skeletonAnimationLookUpHelper);
+            
             Scene.SceneInitialized += OnSceneInitialized;
         }
 

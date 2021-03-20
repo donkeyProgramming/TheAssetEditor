@@ -41,7 +41,9 @@
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
             <Label Width="100">Attachments</Label>
             <Label>:</Label>
-            <Expander>
+            <StackPanel>
+                <Button Command="{Binding FixAttachmentPointsCommand}" Content="Fix" Width="130"/>
+                <Expander>
                 <Expander.Header>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="Count = "/>
@@ -75,6 +77,7 @@
                 </Grid>
 
             </Expander>
+            </StackPanel>
         </StackPanel>
 
     </DockPanel>

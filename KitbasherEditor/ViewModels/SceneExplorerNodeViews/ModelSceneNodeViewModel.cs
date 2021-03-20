@@ -27,7 +27,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public List<string> SkeletonNameList { get; set; }
 
         string _skeletonName;
-        public string SkeletonName { get { return _skeletonName; } set { SetAndNotify(ref _skeletonName, value); } }
+        public string SkeletonName { get { return _skeletonName; } set { SetAndNotify(ref _skeletonName, value); UpdateSkeletonName(); } }
         public OnSeachDelegate FilterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 
 
@@ -43,19 +43,21 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         public ICommand AddAttachmentPointCommand { get; set; }
         public ICommand RemoveAttachmentPointCommand { get; set; }
+        public ICommand FixAttachmentPointsCommand { get; set; }
 
         Rmv2ModelNode _modelNode;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        
+        AnimationControllerViewModel _animationControllerViewModel;
 
-        public ModelSceneNodeViewModel(Rmv2ModelNode node, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        public ModelSceneNodeViewModel(Rmv2ModelNode node, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AnimationControllerViewModel animationControllerViewModel)
         {
             _modelNode = node;
 
              FileName = node.Model.FileName;
             SelectedVersion = "7";
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
- 
+            _animationControllerViewModel = animationControllerViewModel;
+
             SkeletonNameList = _skeletonAnimationLookUpHelper.GetAllSkeletonFileNames();
             SkeletonName = SkeletonNameList.FirstOrDefault(x => x.Contains(node.Model.Header.SkeletonName));
 
@@ -67,6 +69,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
             AddAttachmentPointCommand = new RelayCommand(AddAttachmentPoint);
             RemoveAttachmentPointCommand = new RelayCommand(RemoveAttachmentPoint);
+            FixAttachmentPointsCommand = new RelayCommand(FixAttachmentPoints);
 
             // Ensure all models have this value set
             UpdateSkeletonName();
@@ -83,6 +86,13 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         { 
         }
 
+        void FixAttachmentPoints()
+        {
+            ModelEditorService service = new ModelEditorService(_modelNode);
+            //service.SetAttachmentPoints (_animationControllerViewModel.Skeleton);
+            
+        }
+
         void UpdateSkeletonName()
         {
             string cleanName = "";
@@ -91,6 +101,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
             ModelEditorService service = new ModelEditorService(_modelNode);
             service.SetSkeletonName(cleanName);
+
+           // _animationControllerViewModel.SetActiveSkeleton(cleanName);
         }
 
         void UpdateAttachmentPoint()

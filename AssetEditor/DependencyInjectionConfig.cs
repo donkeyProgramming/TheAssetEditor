@@ -6,6 +6,7 @@ using Common;
 using Common.ApplicationSettings;
 using Common.GameInformation;
 using CommonControls.Resources;
+using CommonControls.Services;
 using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -47,7 +48,7 @@ namespace AssetEditor
             services.AddTransient<SettingsWindow>();
             services.AddTransient<SettingsViewModel>();
             services.AddTransient<MenuBarViewModel>();
-            services.AddTransient<FileTypes.PackFiles.Services.PackFileService>();
+            services.AddTransient<PackFileService>();
 
             TextEditor_DependencyInjectionContainer.Register(services);
             KitbasherEditor_DependencyInjectionContainer.Register(services);

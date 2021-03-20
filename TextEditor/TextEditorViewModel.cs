@@ -1,7 +1,7 @@
 ﻿using Common;
 using CommonControls.Common;
+using CommonControls.Services;
 using FileTypes.PackFiles.Models;
-using FileTypes.PackFiles.Services;
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
 using System.Collections.Generic;
@@ -59,10 +59,8 @@ namespace TextEditor
 
         public bool Save()
         {
-            var bytes = Encoding.ASCII.GetBytes(Text);
-            var newPf = new PackFile(MainFile.Name, new MemorySource(bytes));
             var path = _pf.GetFullPath(MainFile as PackFile);
-            SaveHelper.Save(_pf, path, newPf);
+            SaveHelper.Save(_pf, path, MainFile as PackFile, Encoding.ASCII.GetBytes(Text));
             return false;
         }
 

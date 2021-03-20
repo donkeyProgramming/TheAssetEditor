@@ -73,8 +73,6 @@
                     <Label Width="100">Attachments</Label>
                     <Label>:</Label>
                     <StackPanel>
-                        <Button Command="{Binding Animation.UseParentAttachemntPointsCommand}" Content="Take from parent" Width="130"/>
-
                         <Expander>
                             <Expander.Header>
                                 <StackPanel Orientation="Horizontal">

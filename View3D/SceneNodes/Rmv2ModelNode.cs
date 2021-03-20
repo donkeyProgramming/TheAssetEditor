@@ -85,7 +85,7 @@ namespace View3D.SceneNodes
             RmvSubModel[][] newMeshList = new RmvSubModel[orderedLods.Count()][];
             for (int lodIndex = 0; lodIndex < orderedLods.Count(); lodIndex++)
             {
-                var meshes = orderedLods.ElementAt(lodIndex).GetModels();
+                var meshes = orderedLods.ElementAt(lodIndex).GetModels(onlySaveVisibleNodes);
                 newMeshList[lodIndex] = new RmvSubModel[meshes.Count];
 
                 for (int meshIndex = 0; meshIndex < meshes.Count; meshIndex++)

@@ -1,16 +1,13 @@
 ﻿using Common;
-using Common.ApplicationSettings;
 using CommonControls.MathViews;
 using CommonControls.PackFileBrowser;
+using CommonControls.Services;
 using Filetypes.RigidModel;
-using FileTypes.PackFiles.Services;
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping;
 using KitbasherEditor.Views.EditorViews;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 using TextureEditor.ViewModels;
@@ -39,7 +36,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
     public class MeshSceneNodeViewModel_General : NotifyPropertyChangedImpl
     {
         Rmv2MeshNode _meshNode;
-
 
         public string ModelName { get { return _meshNode.MeshModel.Header.ModelName; } set { UpdateModelName(value); NotifyPropertyChanged(); } }
 

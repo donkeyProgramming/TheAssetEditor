@@ -1,5 +1,5 @@
-﻿using FileTypes.PackFiles.Models;
-using FileTypes.PackFiles.Services;
+﻿using CommonControls.Services;
+using FileTypes.PackFiles.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,7 +30,7 @@ namespace CommonControls.Common
             }
         }
 
-        public static void Save(PackFileService packFileService, string filename, PackFile packFile)
+        public static void Save(PackFileService packFileService, string filename, PackFile packFile, byte[] updatedData = null)
         {
             var selectedEditabelPackFile = packFileService.GetEditablePack();
             if (selectedEditabelPackFile == null)
@@ -45,10 +45,20 @@ namespace CommonControls.Common
                 if (MessageBox.Show("Replace existing file?", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
                     return;
             }
-
-            var directoryPath = Path.GetDirectoryName(filename);
-            packFileService.AddFileToPack(selectedEditabelPackFile, directoryPath, packFile);
+            if (existingFile == null)
+            {
+                var directoryPath = Path.GetDirectoryName(filename);
+                packFileService.AddFileToPack(selectedEditabelPackFile, directoryPath, packFile);
+            }
+            else
+            {
+                if (updatedData == null)
+                    throw new Exception("Trying to update an existing file, but no data is provided");
+                (existingFile as PackFile).DataSource = new MemorySource(updatedData);
+            }
         }
+
+
 
         public static void CreateFileBackup(string originalFileName)
         {
@@ -57,11 +67,10 @@ namespace CommonControls.Common
                 var dirName = Path.GetDirectoryName(originalFileName);
                 var fileName = Path.GetFileNameWithoutExtension(originalFileName);
                 var extention = Path.GetExtension(originalFileName);
-                var uniqeFileName = IndexedFilename(fileName, extention);
-                var newFilePath = Path.Combine(dirName, BackupFolderPath, uniqeFileName);
+                var uniqeFileName = IndexedFilename(Path.Combine(dirName, BackupFolderPath, fileName), extention);
 
                 Directory.CreateDirectory(Path.Combine(dirName, BackupFolderPath));
-                File.Copy(originalFileName, newFilePath);
+                File.Copy(originalFileName, uniqeFileName);
             }
         }
 
@@ -72,7 +81,7 @@ namespace CommonControls.Common
             do
             {
                 ix++;
-                filename = String.Format("{0}{1}.{2}", stub, ix, extension);
+                filename = String.Format("{0}{1}{2}", stub, ix, extension);
             } while (File.Exists(filename));
             return filename;
         }

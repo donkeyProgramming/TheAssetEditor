@@ -3,27 +3,18 @@ using AssetEditor.Views.Settings;
 using Common;
 using Common.ApplicationSettings;
 using Common.GameInformation;
-using CommonControls.Behaviors;
-using CommonControls.PackFileBrowser;
+using CommonControls.Services;
 using FileTypes.PackFiles.Models;
-using FileTypes.PackFiles.Services;
 using GalaSoft.MvvmLight.CommandWpf;
-using KitbasherEditor.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
-using TextEditor;
-using View3D;
-using View3D.Scene;
+
 
 namespace AssetEditor.ViewModels
 {
@@ -85,11 +76,11 @@ namespace AssetEditor.ViewModels
             //
             //variantmeshes\variantmeshdefinitions\dwf_hammerers.variantmeshdefinition"
             //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
-            var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_loremaster_of_hoeth\hef_loremaster_of_hoeth_head_01.rigid_model_v2");
+            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_loremaster_of_hoeth\hef_loremaster_of_hoeth_head_01.rigid_model_v2");
             //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc4\hef\hef_war_lion\hef_war_lion_02.rigid_model_v2");
             //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hr1\brt\brt_royal_pegasus\brt_pegasus_01.rigid_model_v2");
             //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_props\hef_ranger_sword_1h_03.rigid_model_v2");
-            //
+            var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\skvt1\skv\skv_jezzails\skv_clan_rats_legs_fr_01.rigid_model_v2"); 
             //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_eltharion\hef_eltharion_head.rigid_model_v2");
             //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu17\skv\skv_clan_rats\head\skv_clan_rats_head_04.rigid_model_v2");
 
@@ -143,9 +134,7 @@ namespace AssetEditor.ViewModels
             if (tool.HasUnsavedChanges())
             {
                 if (MessageBox.Show("Unsaved changed - Are you sure?", "Close", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
-                {
                     return;
-                }
             }
 
             var index = CurrentEditorsList.IndexOf(tool);

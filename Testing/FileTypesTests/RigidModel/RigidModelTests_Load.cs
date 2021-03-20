@@ -1,6 +1,6 @@
-﻿using Filetypes.RigidModel;
+﻿using CommonControls.Services;
+using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
-using FileTypes.PackFiles.Services;
 using FileTypesTests.Util;
 using Microsoft.Xna.Framework;
 using NUnit.Framework;
@@ -134,7 +134,7 @@ namespace FileTypesTests.RigidModel
             geometry.UpdateVertexPosition(0, new Vector3(10, 10, 10));
 
             // Save
-            var bytes = node.Save();
+            var bytes = node.Save(true);
             var reloadedMesh = new RmvRigidModel(bytes, "UnitTestModelFileName");
 
             //model.UpdateOffsets();

@@ -1,21 +1,17 @@
 ﻿using Common;
 using CommonControls.Common;
+using CommonControls.Services;
 using CommonControls.Simple;
 using FileTypes.PackFiles.Models;
-using FileTypes.PackFiles.Services;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Windows.Data;
 using System.Windows.Input;
 
 namespace CommonControls.PackFileBrowser
@@ -159,14 +155,15 @@ namespace CommonControls.PackFileBrowser
 
         void CloseNode(TreeNode node)
         {
-            _packFileService.UnloadPackContainer(node.FileOwner);
+            if(MessageBox.Show("Are you sure you want to close the packfile?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                _packFileService.UnloadPackContainer(node.FileOwner);
         }
 
         void SavePackFile(TreeNode node)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             if (saveFileDialog.ShowDialog() == true)
-                _packFileService.Save(node.FileOwner, saveFileDialog.FileName);
+                _packFileService.Save(node.FileOwner, saveFileDialog.FileName, true);
         }
 
 

@@ -1,7 +1,7 @@
 ﻿using Common;
+using CommonControls.Services;
 using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
-using FileTypes.PackFiles.Services;
 using GalaSoft.MvvmLight.CommandWpf;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
@@ -141,7 +141,7 @@ namespace KitbasherEditor.ViewModels
             string animationFolder = "animations\\skeletons\\";
             var skeletonFilePath = animationFolder + skeletonName + ".anim";
 
-            SelectedSkeleton = skeletonFilePath;;
+            SelectedSkeleton = skeletonFilePath;
             SelectedAnimation = null;
 
             // Try to set a default animation

@@ -1,12 +1,5 @@
-﻿using Common;
-using CommonControls.PackFileBrowser;
-using CommonControls.Simple;
-using FileTypes.PackFiles.Models;
-using FileTypes.PackFiles.Services;
-using GalaSoft.MvvmLight.CommandWpf;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using Serilog;
-using System.Windows.Input;
+﻿using CommonControls.PackFileBrowser;
+using CommonControls.Services;
 
 namespace AssetEditor.ViewModels
 {
