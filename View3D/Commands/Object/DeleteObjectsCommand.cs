@@ -28,6 +28,11 @@ namespace View3D.Commands.Object
             _itemsToDelete = new List<SceneNode>() { itemToDelete };
         }
 
+        public override string GetHintText()
+        {
+            return "Delete Object";
+        }
+
         public override void Initialize(IComponentManager componentManager)
         {
             _selectionManager = componentManager.GetComponent<SelectionManager>();

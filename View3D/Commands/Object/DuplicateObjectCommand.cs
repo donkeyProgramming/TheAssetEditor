@@ -24,6 +24,11 @@ namespace View3D.Commands.Object
             _objectsToCopy = new List<ISceneNode>(objectsToCopy);
         }
 
+        public override string GetHintText()
+        {
+            return "Duplicate Object";
+        }
+
         public override void Initialize(IComponentManager componentManager)
         {
             _selectionManager = componentManager.GetComponent<SelectionManager>();
@@ -47,6 +52,8 @@ namespace View3D.Commands.Object
                 if(clonedItem is ISelectable selectableNode)
                     objectState.ModifySelection(selectableNode, false);
             }
+
+            _selectionManager.SetState(objectState);
         }
 
         protected override void UndoCommand()

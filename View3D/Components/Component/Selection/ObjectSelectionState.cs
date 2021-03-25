@@ -58,6 +58,20 @@ namespace View3D.Components.Component.Selection
         {
             return _selectionList;
         }
+
+        public bool IsSelectionEqual(ObjectSelectionState state)
+        {
+            if (_selectionList.Count != state._selectionList.Count)
+                return false;
+
+            foreach (var item in _selectionList)
+            {
+                if (state._selectionList.Contains(item) == false)
+                    return false;
+            }
+
+            return true;
+        }
     }
 }
 

@@ -14,6 +14,7 @@ namespace View3D.Components.Component
     public class FaceEditor : BaseComponent
     {
         CommandExecutor _commandManager;
+        SelectionManager _selectionManager;
 
         public FaceEditor(WpfGame game) : base(game)
         {
@@ -22,7 +23,7 @@ namespace View3D.Components.Component
         public override void Initialize()
         {
             _commandManager = GetComponent<CommandExecutor>();
-
+            _selectionManager = GetComponent<SelectionManager>();
             base.Initialize();
         }
 
@@ -61,26 +62,16 @@ namespace View3D.Components.Component
             _commandManager.ExecuteCommand(selectCmd);
         }
 
-        public void ConvertSelectionToSeperateMesh(FaceSelectionState faceSelectionState, bool deleteOriginal)
+        public void DuplicatedSelectedFacesToNewMesh(FaceSelectionState faceSelectionState, bool deleteOriginal)
         {
-            var selectedFaceIndecies = new List<ushort>();
-            var indexBuffer = faceSelectionState.RenderObject.Geometry.GetIndexBuffer();
-            foreach (var face in faceSelectionState.SelectedFaces)
-            {
-                selectedFaceIndecies.Add(indexBuffer[face]);
-                selectedFaceIndecies.Add(indexBuffer[face + 1]);
-                selectedFaceIndecies.Add(indexBuffer[face + 2]);
-            }
+            var selectCmd = new DuplicateFacesCommand(faceSelectionState.RenderObject, faceSelectionState.SelectedFaces, deleteOriginal);
+            _commandManager.ExecuteCommand(selectCmd);
+        }
 
-            var duplicate = faceSelectionState.RenderObject.Geometry.Clone();
-            duplicate.RemoveUnusedVertexes(selectedFaceIndecies.ToArray());
-            faceSelectionState.RenderObject.Geometry = duplicate;
-
-            if (deleteOriginal)
-            {
-                var deleteCommand = new DeleteFaceCommand(faceSelectionState.RenderObject.Geometry, faceSelectionState.CurrentSelection());
-                deleteCommand.Execute();
-            }
+        public void ConvertSelectionToVertex(FaceSelectionState faceSelectionState)
+        {
+            var selectCmd = new ConvertFacesToVertexSelectionCommand(faceSelectionState);
+            _commandManager.ExecuteCommand(selectCmd);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Filetypes.RigidModel;
 using Filetypes.RigidModel.Transforms;
 using Filetypes.RigidModel.Vertex;
+using MeshDecimator;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -61,7 +62,7 @@ namespace View3D.Rendering.Geometry
             }
 
             RebuildVertexBuffer();
-            CreateIndexFromBuffers();
+            RebuildIndexBuffer();
         }
 
         protected Rmv2Geometry(IGeometryGraphicsContext context) : base(VertexPositionNormalTextureCustom.VertexDeclaration, context)
@@ -133,10 +134,10 @@ namespace View3D.Rendering.Geometry
             return mesh;
         }
 
-        public override IGeometry Clone()
+        public override IGeometry Clone(bool includeMesh = true)
         {
             var mesh = new Rmv2Geometry(Context);
-            CopyInto(mesh);
+            CopyInto(mesh, includeMesh);
             mesh.WeightCount = WeightCount;
             mesh._vertedFormat = _vertedFormat;
             return mesh;
@@ -244,8 +245,117 @@ namespace View3D.Rendering.Geometry
             _vertexArray = newVertexArray;
             _indexList = newIndexArray;
 
-            CreateIndexFromBuffers();
+            RebuildIndexBuffer();
             RebuildVertexBuffer();
+        }
+
+        public Rmv2Geometry CreatedReducedCopy(float factor)
+        {
+
+
+            var quality = factor;
+            // ObjMesh sourceObjMesh = new ObjMesh();
+            // sourceObjMesh.ReadFile(sourcePath);
+            var sourceVertices = _vertexArray.Select(x => new MeshDecimator.Math.Vector3d(x.Position.X, x.Position.Y, x.Position.Z)).ToArray();
+
+
+            // var sourceTexCoords3D = sourceObjMesh.TexCoords3D;
+            var sourceSubMeshIndices = _indexList.Select(x => (int)x).ToArray();
+
+            var sourceMesh = new Mesh(sourceVertices, sourceSubMeshIndices);
+            sourceMesh.Normals = _vertexArray.Select(x => new MeshDecimator.Math.Vector3(x.Normal.X, x.Normal.Y, x.Normal.Z)).ToArray();
+            sourceMesh.Tangents = _vertexArray.Select(x => new MeshDecimator.Math.Vector4(x.Tangent.X, x.Tangent.Y, x.Tangent.Z, 0)).ToArray(); // Should last 0 be 1?
+            sourceMesh.SetUVs(0, _vertexArray.Select(x => new MeshDecimator.Math.Vector2(x.TextureCoordinate.X, x.TextureCoordinate.Y)).ToArray());
+
+            if (WeightCount == 4)
+            {
+                sourceMesh.BoneWeights = _vertexArray.Select(x => new BoneWeight(
+                    (int)x.BlendIndices.X, (int)x.BlendIndices.Y, (int)x.BlendIndices.Z, (int)x.BlendIndices.W,
+                    x.BlendWeights.X, x.BlendWeights.Y, x.BlendWeights.Z, x.BlendWeights.W)).ToArray();
+            }
+            else if (WeightCount == 2)
+            {
+                sourceMesh.BoneWeights = _vertexArray.Select(x => new BoneWeight(
+                      (int)x.BlendIndices.X, (int)x.BlendIndices.Y, 0,0,
+                      x.BlendWeights.X, x.BlendWeights.Y, 0,0)).ToArray();
+            }
+
+
+
+
+
+           //if (WeightCount == VertexFormat.Cinematic)
+           //{
+           //    sourceMesh.BoneWeights = rmvSubModel.Mesh.VertexList.Select(x => new MeshDecimator.BoneWeight(
+           //        x.BoneIndex[0], x.BoneIndex[1], x.BoneIndex[2], x.BoneIndex[3],
+           //        x.BoneWeight[0], x.BoneWeight[1], x.BoneWeight[2], x.BoneWeight[3])).ToArray();
+           //}
+           //else if (rmvSubModel.Header.VertextType == VertexFormat.Weighted)
+           //{
+           //    sourceMesh.BoneWeights = rmvSubModel.Mesh.VertexList.Select(x => new MeshDecimator.BoneWeight(
+           //        x.BoneIndex[0], x.BoneIndex[1], 0, 0,
+           //        x.BoneWeight[0], x.BoneWeight[1], 0, 0)).ToArray();
+           //}
+
+            int currentTriangleCount = sourceSubMeshIndices.Length / 3;
+
+
+            int targetTriangleCount = (int)Math.Ceiling(currentTriangleCount * quality);
+  
+
+
+
+            var algorithm = MeshDecimation.CreateAlgorithm(Algorithm.Default);
+            algorithm.Verbose = true;
+            Mesh destMesh = MeshDecimation.DecimateMesh(algorithm, sourceMesh, targetTriangleCount);
+
+            var destVertices = destMesh.Vertices;
+            var destNormals = destMesh.Normals;
+            var destIndices = destMesh.GetSubMeshIndices();
+
+            VertexPositionNormalTextureCustom[] outputVerts = new VertexPositionNormalTextureCustom[destVertices.Length];
+
+            for (int i = 0; i < outputVerts.Length; i++)
+            {
+                var pos = destMesh.Vertices[i];
+                var norm = destMesh.Normals[i];
+                var tangents = destMesh.Tangents[i];
+                var uv = destMesh.UV1[i];
+                var boneWeight = destMesh.BoneWeights[i];
+
+                Vector3 normal = new Vector3(norm.x, norm.y, norm.z);
+                Vector3 tangent = new Vector3(tangents.x, tangents.y, tangents.z);
+                var binormal = Vector3.Normalize(Vector3.Cross(normal, tangent));// * sign
+
+                var vert = new VertexPositionNormalTextureCustom();
+                vert.Position = new Vector4((float)pos.x, (float)pos.y, (float)pos.z, 1);
+                vert.Normal = new Vector3(norm.x, norm.y, norm.z);
+                vert.Tangent = new Vector3(tangents.x, tangents.y, tangents.z);
+                vert.BiNormal = new Vector3(binormal.X, binormal.Y, binormal.Z);
+                vert.TextureCoordinate = new Vector2(uv.x, uv.y);
+
+                if (WeightCount == 4)
+                {
+                    vert.BlendIndices = new Vector4(boneWeight.boneIndex0, boneWeight.boneIndex1, boneWeight.boneIndex2, boneWeight.boneIndex3);
+                    vert.BlendWeights = new Vector4(boneWeight.boneWeight0, boneWeight.boneWeight1, boneWeight.boneWeight2, boneWeight.boneWeight3);
+                }
+                else if (WeightCount == 4)
+                {
+                    vert.BlendIndices = new Vector4(boneWeight.boneIndex0, boneWeight.boneIndex1, 0, 0);
+                    vert.BlendWeights = new Vector4(boneWeight.boneWeight0, boneWeight.boneWeight1, 0, 0);
+                }
+
+                outputVerts[i] = vert;
+            }
+
+            var clone = Clone(false) as Rmv2Geometry;
+            clone._indexList = destIndices[0].Select(x => (ushort)x).ToArray();
+            clone._vertexArray = outputVerts;
+
+            clone.RebuildIndexBuffer();
+            clone.RebuildVertexBuffer();
+
+            return clone;
         }
     }
 }

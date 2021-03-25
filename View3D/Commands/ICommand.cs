@@ -11,6 +11,7 @@ namespace View3D.Commands
         void Undo();
         void Execute();
         void Initialize(IComponentManager componentManager);
+        string GetHintText();
     }
 
 
@@ -49,31 +50,7 @@ namespace View3D.Commands
 
         protected abstract void ExecuteCommand();
         protected abstract void UndoCommand();
-    }
-
-    public class ComplexCommand : ICommand
-    {
-        List<ICommand> _subCommands = new List<ICommand>();
-
-        public void Execute()
-        {
-            foreach (var command in _subCommands)
-                command.Execute();
-            throw new NotImplementedException();
-        }
-
-        public void Initialize(IComponentManager componentManager)
-        {
-            foreach (var command in _subCommands)
-                command.Initialize(componentManager);
-        }
-
-        public void Undo()
-        {
-            _subCommands.Reverse();
-            foreach (var command in _subCommands)
-                command.Undo();
-        }
+        public abstract string GetHintText();
     }
 }
 

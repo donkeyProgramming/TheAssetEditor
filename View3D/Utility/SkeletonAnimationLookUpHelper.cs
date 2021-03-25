@@ -19,11 +19,17 @@ namespace View3D.Utility
 
         List<string> _skeletonFilesNames = new List<string>();
 
-        public void Initialize(PackFileService packFileService)
+        public SkeletonAnimationLookUpHelper(PackFileService packFileService)
+        {
+            _pf = packFileService;
+            Initialize();
+        }
+
+        void Initialize()
         {
             _logger.Here().Information("Finding all animations");
 
-            _pf = packFileService;
+            
             var AllAnimations = _pf.FindAllWithExtention(".anim");
 
             _logger.Here().Information("Animations found =" + AllAnimations.Count());

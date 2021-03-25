@@ -25,11 +25,15 @@ namespace View3D.Commands.Vertex
             _isRemove = isRemove;
         }
 
+        public override string GetHintText()
+        {
+            return "Select Vertex";
+        }
+
         public override void Initialize(IComponentManager componentManager)
         {
             _selectionManager = componentManager.GetComponent<SelectionManager>();
         }
-
 
         protected override void ExecuteCommand()
         {

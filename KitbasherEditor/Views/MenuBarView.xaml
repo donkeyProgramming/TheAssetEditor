@@ -152,6 +152,12 @@
 
                 <!-- Face selection-->
                 <ToolBar  Visibility="{Binding Tools.ShowFaceTools, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
+                    <Button ToolTip="Convert selection to vertex" 
+                        Command="{Binding Tools.FaceToVertexCommand}"
+                        IsEnabled="{Binding Tools.FaceToVertexEnabled, UpdateSourceTrigger=PropertyChanged}">
+                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/FaceToVertex.png"/>
+                    </Button>
+
                     <Button ToolTip="Expand selection" 
                         Command="{Binding Tools.ExpandSelectedFacesToObjectCommand}"
                         IsEnabled="{Binding Tools.ExpandSelectedFacesToObjectEnabled, UpdateSourceTrigger=PropertyChanged}">

@@ -1,138 +1,61 @@
-Feature list before V_1 done:
-	PackFile
-		[DONE]Save packfile dialog;
-		Create packfile folder
-	
-	General
-		[Done]General error handling
-		[Done]Differnt filetypes for xml files
-		Files changed must show in packfile tree
-		Create new file => VMD, XML, TXT
-		[DONE]Copy file to main
-		[DONE]Set main Packfile (the one files are saved to)
-		[DONE]Close and save tabcontrol items
-		Recently used files
-		Right click rmv2 model files => Edit
-		Remove animation invert by fixing veiw matrix
-		[DONE]Open editor from file menu
-		[DONE]	Double click open
-		[DONE]	Ok open
-		[DONE]	File extention filter
-		Dont always rebuild treeview! Save, new file
-		Prompt if unsaved changes
-		
-	
-	Editor:
-		[DONE]Better shader handling
-		[DONE]Animation playback beginning
-		[DONE]Animation playback cleanup
-		Snap to secondary selected vertex
-		Create lods functionality
-		Move uv vertexes around?
-		Change animation vertex type (down grade, make sure it works in validation)
-		Select vertex with mouse click
-		Delete unfo history
-		
-		UI
-			[DONE]UI linking (commands visible/clickable in toolbar)
-			[DONE]Update when different buttons are enabled
-			[DONE]Hotkeys
-			Show info model
-			Show info header
-			Show info rmv2
-				How to handle changing skeleton? => SkeletonName + attachmentpoints + vertex bone id
-					Button => use parent
+Feature list:
+	Kitbash editor:
+		Tools:
+			[DONE]Convert face selection to vertex
+			[DONE]Duplicate selected faces 
+			[DONE]Extract selected faces to new object
+			[DONE]Generate lods
+				Ui ratio setting values 
 				
-				Animation:
-					Different skeleton bone ids
-					AttachmentPoints
-					BoneIndexLink
-				
-				General:
-					VertexType	=> Only downgrade => Later, not important (support for one bone for all vertexes is needed)
-					Vertex count
-					Index count
-					ModelName
-					Pivotpoint
-				
-				[DONE]Graphics:
-				[DONE]	ShaderName
-				[DONE]	MaterialID
-				[DONE]	TextureDir
-				[DONE]	Textures
-				[DONE]	AlphaMode
-				
-
-			[DONE]electing in tree view should select in scene
-			[DONE]Focus camera - work on selected faces and verts
-			[DONE]Reset camera
+			[DONE]Remapping skeleton does not update the skeleton getting names from, causing crashes in some cases
+			[DONE]Change animation skeleton
+			Undo for animation mapping
 			
-		Different toolbar tools for selection mode (object, vertex, face)
-			Face => Select all faces in part, split selectin into mesh, delete
-			Object => Split, combine, duplicate, delete
-			Vertex => merge, enable snap vertex
-			remove FreezeTransformCommand
+			Handle large models with n lods
+			Validate logic before save 
+			Change animation vertex type (downgrade, make sure it works in validation)
 			
-		[DONE]Transform:
-		[DONE]	Scale
-		[DONE]	Rotate
-		[DONE]	Translate
-		[DONE]		When scaling, if ctrl is pressed, scale uniform
-				
-		[DONE]Group/Ungroup meshses in selection
 		
-		[DONE]Transform window
-		[DONE]	Scale / Flip
-		[DONE]	Rotate 45/90
-		
-		[DONE]Textures
-		[DONE]	Show
-		[DONE]	Change
-		[DONE]	Enable/disable
-		[DONE]	Transparency
-		[DONE]	WsModel
-		Different shader modes 
-			Wireframe
-			Semi-Transparent
-			No alpha
-			No texture
-			Normal
-		[DONE]Grid
-		Pivot
+		Pivot:
 			Edit
 			Display
-		[DONE]Combine meshes
-		[DONE]Validate
-		[DONE]Skeleton id remapper
-		[DONE]Scale gizmo with +- keys on numpad. Reset option
-		[DONE]Saving model to packfile
-		Convert face selection to vertes
+			
+		General:
+			Open from file
+			Remove animation invert by fixing veiw matrix
+			Delete undo history
+			Select vertex with mouse click
+			Validate tool
+			Make sure textures actually work
+			Small popup when undoing stuff
+			Skelton with good descriptive names 
+			set all not ediable to readonly ui
+			Make sure texture stuff works
+			Waiting mouse when doing command
+			Profile grow selection
+			
+		UI:			
+			Fix attachement points buttons
+			Fix skeleton buttons
 
-	New editors:
-		Model preview
-		VMD editor
-		Texture editor
-		
-		
-Planned order:
-	Extract face 
-	Conert faces to vertexes
-	Duplicate faces to new object
-	Figure out ctrl bug => keyboard copy issue?
-	Generate lods
-	Save to file
-	Test in game
+	General:
+		TreeView:
+			[DONE]Dont always rebuild treeview! Save, new file
+			save as dialog (create folder)
+			Create new file => VMD, XML, TXT
+			Right click rmv2 model files => Edit
+			duplicate file
+			
+		Other:
+			Prompt if unsaved changes
+			Recently used files
 	
-	Reduce mesh command
-	Snap to secondary selected vertex
-	Different shader modes
-	Set active packfile
-	Stop saving to CA packfile! 
-	Copy item from other packfile using ui
-	Open from packfile explore
-	Close tab control
-	Saving to packfile
 	
+	3d Preview tool:
+		Make one...
+		
+	Text editor:
+
 	
 Known bugs:
 	[DONE]Select face, then swap to vertex mode, need to call update before draw error
@@ -141,12 +64,20 @@ Known bugs:
 	[DONE]Gizmo not rendering correctly behind other meshes -> always render last?
 	[DONE]Splitting mesh sets wrong offset for gizmo before moved once
 	[DONE]Ctrl to multi deselect not working
+	[DONE]Selecting mesh does not select in sidebar
 	[DONE]Using the translate view tool does not make an undo stack
+	[DONE]selecting reference mesh causes slowdown and animation change! 
+	[DONE]Selection issues in sceneexplorer
 	Selection manager can not select over gizmo when multiselecting
 	Gizmo behaves strangly when camera look directly forward towards model
 	Selecting not use texture, then deslecting and selecing again gives wrong checkbox value
 	Remapping head to lion to h-elf creates index out of range error. Why?
 	Saving 2x does not work for text files
+	Pivot not correct after duplicate of object
+	
+	
+	
+	
 	
 	
 	

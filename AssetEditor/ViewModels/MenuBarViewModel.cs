@@ -26,6 +26,9 @@ namespace AssetEditor.ViewModels
         public ICommand CreateNewPackFileCommand { get; set; }
         public ICommand OpenPackFileCommand { get; set; }
 
+
+        public ICommand OpenKitbashEditorCommand { get; set; }
+
         public MenuBarViewModel(IServiceProvider provider, PackFileService packfileService)
         {
             _serviceProvider = provider;
@@ -33,6 +36,7 @@ namespace AssetEditor.ViewModels
             OpenSettingsWindowCommand = new RelayCommand(ShowSettingsDialog);
             OpenPackFileCommand = new RelayCommand(OpenPackFile);
             CreateNewPackFileCommand = new RelayCommand(CreatePackFile);
+            OpenKitbashEditorCommand = new RelayCommand(OpenKitbasherTool);
         }
 
         void OpenPackFile()
@@ -46,7 +50,6 @@ namespace AssetEditor.ViewModels
                     MessageBox.Show($"Unable to load packfiles {dialog.FileName}");
             }
         }
-
 
         void ShowSettingsDialog()
         {
@@ -62,6 +65,11 @@ namespace AssetEditor.ViewModels
             {
                 _packfileService.CreateNewPackFileContainer(window.TextValue, PackFileCAType.MOD);
             }
+        }
+
+        void OpenKitbasherTool()
+        { 
+        
         }
     }
 }

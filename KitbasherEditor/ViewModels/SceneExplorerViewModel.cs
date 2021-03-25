@@ -46,7 +46,6 @@ namespace KitbasherEditor.ViewModels
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         PackFileService _packFileService;
         AnimationControllerViewModel _animationControllerViewModel;
-        bool _updateSelectionManagerOnNodeSelect = true;
         public SceneExplorerViewModel(SceneContainer sceneContainer, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService packFileService, AnimationControllerViewModel animationControllerViewModel)
         {
             _selectedLodLvl = LodItem.GetAll.First();
@@ -78,21 +77,45 @@ namespace KitbasherEditor.ViewModels
                 {
                     var obj = objectSelection.SelectedObjects().First();
                     if (obj != SelectedNode)
-                    {
-                        _updateSelectionManagerOnNodeSelect = false;
                         SelectedNode = obj as SceneNode;
-                        _updateSelectionManagerOnNodeSelect = true;
-                    }
 
                     return;
                 }
             }
 
             if(SelectedNode != null)
-            {
-                _updateSelectionManagerOnNodeSelect = false;
                 SelectedNode = null;
-                _updateSelectionManagerOnNodeSelect = true;
+        }
+
+        private void OnNodeSelected(ISceneNode selectedNode)
+        {
+            SelectedNodeViewModel = SceneNodeViewFactory.Create(selectedNode, _skeletonAnimationLookUpHelper, _packFileService, _animationControllerViewModel);
+
+            if (selectedNode != null)
+            {
+                var objectState = new ObjectSelectionState();
+                if (selectedNode is GroupNode groupNode && groupNode.IsSelectable == true)
+                {
+                    foreach (var child in groupNode.Children)
+                    {
+                        if (child is ISelectable selectableNode && selectableNode.IsSelectable)
+                            objectState.ModifySelection(selectableNode, false);
+                    }
+                }
+                else
+                {
+                    if (selectedNode is ISelectable selectableNode && selectableNode.IsSelectable)
+                        objectState.ModifySelection(selectableNode, false);
+                }
+
+                // Is the state actually changed?
+                var currentSelection = _selectionManager.GetState() as ObjectSelectionState;
+                bool selectionEqual = false;
+                if (currentSelection != null)
+                    selectionEqual = currentSelection.IsSelectionEqual(objectState);
+
+                if (!selectionEqual)
+                    _selectionManager.SetState(objectState);
             }
         }
 
@@ -100,9 +123,10 @@ namespace KitbasherEditor.ViewModels
         {
             if (node is Rmv2MeshNode meshNode)
             {
-                meshNode.IsSelectable = true;
-                EditableMeshNode.GetLodNodes()[0].AddObject(meshNode);
-                //EditableMeshNode.Children[SelectedLodLevel.Value].AddObject(meshNode);
+                node.Parent.RemoveObject(node);
+                EditableMeshNode.GetLodNodes()[0].AddObject(node);
+                node.IsEditable = true;
+                return;
             }
 
             if (node is Rmv2LodNode lodNode)
@@ -112,7 +136,6 @@ namespace KitbasherEditor.ViewModels
                 {
                     (lodModel as Rmv2MeshNode).IsSelectable = true;
                     EditableMeshNode.GetLodNodes()[0].AddObject(lodModel);
-                    //EditableMeshNode.Children[index].AddObject(lodModel);
                 }
             }
 
@@ -165,7 +188,7 @@ namespace KitbasherEditor.ViewModels
             }
         }
 
-        public ISceneNode GetEditableMeshNode()
+        public ISceneNode GetActiveEditableMeshNode()
         {
             return EditableMeshNode.Children[SelectedLodLevel.Value];
         }
@@ -174,34 +197,11 @@ namespace KitbasherEditor.ViewModels
         {
         }
 
-        private void OnNodeSelected(ISceneNode selectedNode)
-        {
-            if (_updateSelectionManagerOnNodeSelect)
-            {
-                _updateSelectionManagerOnNodeSelect = false;
-                SelectedNodeViewModel = SceneNodeViewFactory.Create(selectedNode, _skeletonAnimationLookUpHelper, _packFileService, _animationControllerViewModel);
-           
-                var objectState = new ObjectSelectionState();
-                if (selectedNode != null)
-                {
-                    if (selectedNode is GroupNode groupNode && groupNode.IsSelectable == true)
-                    {
-                        foreach (var child in groupNode.Children)
-                        {
-                            if (child is ISelectable selectableNode && selectableNode.IsSelectable)
-                                objectState.ModifySelection(selectableNode, false);
-                        }
-                    }
-                    else
-                    {
-                        if (selectedNode is ISelectable selectableNode && selectableNode.IsSelectable)
-                            objectState.ModifySelection(selectableNode, false);
-                    }
-                }
 
-                _selectionManager.SetState(objectState);
-                _updateSelectionManagerOnNodeSelect = true;
-            }
+
+        public Rmv2ModelNode GeEditableMeshRootNode()
+        {
+            return EditableMeshNode;
         }
     }
 

@@ -30,6 +30,10 @@
                 <MenuItem Header="Open AssetEditor folder"/>
                 <MenuItem Header="Settings" Command="{Binding MenuBar.OpenSettingsWindowCommand}"/>
             </MenuItem>
+
+            <MenuItem Header="Tools">
+                <MenuItem Header="Kitbash Editor" Command="{Binding MenuBar.OpenKitbashEditorCommand}"/>
+            </MenuItem>
         </Menu>
     </DockPanel>
 </UserControl>

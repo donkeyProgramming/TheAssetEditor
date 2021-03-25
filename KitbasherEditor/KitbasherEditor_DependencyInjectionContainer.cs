@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using View3D.Utility;
 
 namespace KitbasherEditor
 {
@@ -14,6 +15,8 @@ namespace KitbasherEditor
         {
             serviceCollection.AddTransient<KitbasherView>();
             serviceCollection.AddTransient<KitbasherViewModel>();
+            serviceCollection.AddSingleton<SkeletonAnimationLookUpHelper>();
+            //_skeletonAnimationLookUpHelper = new (_packFileService);
         }
 
         public static void RegisterTools(IToolFactory factory)

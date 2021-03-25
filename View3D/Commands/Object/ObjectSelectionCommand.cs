@@ -34,6 +34,11 @@ namespace View3D.Commands.Object
             _isRemove = removeSelection;
         }
 
+        public override string GetHintText()
+        {
+            return "Object Selected";
+        }
+
         public override void Initialize(IComponentManager componentManager)
         {
             _selectionManager = componentManager.GetComponent<SelectionManager>();

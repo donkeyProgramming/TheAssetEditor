@@ -1,14 +1,17 @@
 ﻿using Common;
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor.Services;
+using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using View3D.Commands.Object;
+using View3D.Commands.Vertex;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
+using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Services;
 
@@ -19,6 +22,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         SelectionManager _selectionManager;
         ObjectEditor _objectEditor;
         FaceEditor _faceEditor;
+        IEditableMeshResolver _editableMeshResolver;
+        CommandExecutor _commandExecutor;
 
         public ICommand DivideSubMeshCommand { get; set; }
         public ICommand MergeObjectCommand { get; set; }
@@ -27,6 +32,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public ICommand MergeVertexCommand { get; set; }
         public ICommand CreateLodCommand { get; set; }
         public ICommand ExpandSelectedFacesToObjectCommand { get; set; }
+        public ICommand FaceToVertexCommand { get; set; }
 
         bool _showObjectTools = true;
         public bool ShowObjectTools { get => _showObjectTools; set => SetAndNotify(ref _showObjectTools, value); }
@@ -58,6 +64,11 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         bool _expandSelectedFacesToObjectEnabled;
         public bool ExpandSelectedFacesToObjectEnabled { get => _expandSelectedFacesToObjectEnabled; set => SetAndNotify(ref _expandSelectedFacesToObjectEnabled, value); }
 
+        bool _faceToVertexEnabled;
+        public bool FaceToVertexEnabled { get => _faceToVertexEnabled; set => SetAndNotify(ref _faceToVertexEnabled, value); }
+
+
+
 
         public ToolsMenuBarViewModel(IComponentManager componentManager, ToolbarCommandFactory commandFactory)
         {
@@ -68,11 +79,17 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             MergeVertexCommand = new RelayCommand(MergeVertex);
             CreateLodCommand = new RelayCommand(CreateLod);
             ExpandSelectedFacesToObjectCommand = new RelayCommand(ExpandFaceSelection);
+
+            FaceToVertexCommand = new RelayCommand(ConvertFacesToVertex);
+
             _selectionManager = componentManager.GetComponent<SelectionManager>();
             _selectionManager.SelectionChanged += OnSelectionChanged;
 
             _objectEditor = componentManager.GetComponent<ObjectEditor>();
             _faceEditor = componentManager.GetComponent<FaceEditor>();
+            _editableMeshResolver = componentManager.GetComponent<IEditableMeshResolver>();
+            _commandExecutor = componentManager.GetComponent<CommandExecutor>();
+
             OnSelectionChanged(_selectionManager.GetState());
         }
 
@@ -88,6 +105,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             MergeMeshEnabled = false;
             ExpandSelectedFacesToObjectEnabled = false;
             MergeVertexEnabled = false;
+            FaceToVertexEnabled = false;
 
             if (state is ObjectSelectionState objectSelection)
             {
@@ -100,8 +118,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             {
                 DeleteEnabled = true;
                 ExpandSelectedFacesToObjectEnabled = true;
-                //DuplicateEnabled = true;
-                //DivideSubMeshEnabled = true;
+                FaceToVertexEnabled = true;
+                DuplicateEnabled = true;
+                DivideSubMeshEnabled = true;
             }
             else
             {
@@ -114,7 +133,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             if (_selectionManager.GetState() is ObjectSelectionState objectSelectionState)
                 _objectEditor.DivideIntoSubmeshes(objectSelectionState);
             if (_selectionManager.GetState() is FaceSelectionState faceSelectionState)
-                _faceEditor.ConvertSelectionToSeperateMesh(faceSelectionState, true);
+                _faceEditor.DuplicatedSelectedFacesToNewMesh(faceSelectionState, true);
         }
 
         void MergeObjects() 
@@ -137,7 +156,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             if (_selectionManager.GetState() is ObjectSelectionState objectSelectionState)
                 _objectEditor.DuplicateObject(objectSelectionState);
             if (_selectionManager.GetState() is FaceSelectionState faceSelectionState)
-                _faceEditor.ConvertSelectionToSeperateMesh(faceSelectionState, false);
+                _faceEditor.DuplicatedSelectedFacesToNewMesh(faceSelectionState, false);
         }
         
         void DeleteObject() 
@@ -159,10 +178,53 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         void CreateLod()
         {
-            if (_selectionManager.GetState() is ObjectSelectionState objectSelectionState && objectSelectionState.SelectionCount() != 0)
-                _objectEditor.ReduceSelection(objectSelectionState.SelectedObjects(), 0.5f);
+            var rootNode = _editableMeshResolver.GeEditableMeshRootNode();
+
+            var firtLod = rootNode.Children.First();
+            var lodsToGenerate = rootNode.Children
+                .Skip(1)
+                .Take(rootNode.Children.Count - 1)
+                .ToList();
+
+            foreach (var lod in lodsToGenerate)
+            {
+                var itemsToDelete = new List<ISceneNode>();
+                foreach (var child in lod.Children)
+                    itemsToDelete.Add(child);
+
+                foreach (var child in itemsToDelete)
+                    child.Parent.RemoveObject(child);
+            }
+
+            var objectsToGenerateLodsFor = firtLod.Children
+                .Where(x => x is Rmv2MeshNode)
+                .Select(x => x as Rmv2MeshNode)
+                .ToList();
+
+            //Generate lod
+            for (int lodIndex = 0; lodIndex < lodsToGenerate.Count(); lodIndex++)
+            {
+                var lerpValue = (1.0f / (lodsToGenerate.Count() - 1)) * (lodsToGenerate.Count()  - 1 - lodIndex);
+                var ratio = MathHelper.Lerp(0.25f, 0.75f, lerpValue);
+
+                var newNodes = new List<Rmv2MeshNode>();
+                foreach (var sceneNode in objectsToGenerateLodsFor)
+                {
+                    Rmv2MeshNode res = _objectEditor.ReduceMesh(sceneNode, ratio);
+                    newNodes.Add(res);
+                }
+
+                foreach (var item in newNodes)
+                {
+                    lodsToGenerate[lodIndex].AddObject(item);
+                }
+            }
         }
 
+        void ConvertFacesToVertex()
+        {
+            _faceEditor.ConvertSelectionToVertex(_selectionManager.GetState() as FaceSelectionState);
+        }
 
     }
 }

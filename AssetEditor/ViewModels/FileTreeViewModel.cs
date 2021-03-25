@@ -7,7 +7,6 @@ namespace AssetEditor.ViewModels
    {
        public FileTreeViewModel(PackFileService packFileService) : base(packFileService)
        {
-            ContextMenuVisibility = System.Windows.Visibility.Visible;
        }
    }
 }

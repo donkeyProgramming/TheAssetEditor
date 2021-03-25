@@ -10,6 +10,21 @@ using System.Linq;
 
 namespace Filetypes.RigidModel
 {
+
+    /*
+     static inline constexpr float SNORM16_To_Float(int16_t in)
+    {
+        if (in == 32767)
+            return 1.f;
+        
+        if (in == -32768)
+            return -1.f;
+
+        float c = in;
+        return ( c / ( 32767.0f ) );
+    }
+     */
+
     public class AnimationFile
     {
         public class BoneInfo

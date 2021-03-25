@@ -10,6 +10,7 @@ using View3D.Commands.Object;
 using View3D.Components.Component.Selection;
 using View3D.Components.Input;
 using View3D.Rendering;
+using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Services;
 using View3D.Utility;
@@ -74,9 +75,25 @@ namespace View3D.Components.Component
             return true;
         }
 
-        public void ReduceSelection(List<ISelectable> selectable, float factor)
+        public void CreateLods(List<ISelectable> selectable, float factor)
         {
             throw new NotImplementedException();
+        }
+
+        public Rmv2MeshNode ReduceMesh(Rmv2MeshNode meshNode, float factor)
+        {
+
+            var originalMesh = meshNode.Geometry as Rmv2Geometry;
+  
+
+            var cpy = meshNode.CloneWithoutGeometry();
+            cpy.Geometry = originalMesh.CreatedReducedCopy(factor);
+            //cpy.Parent.AddObject(cpy);
+
+            
+
+            return cpy;
+            
         }
     }
 }

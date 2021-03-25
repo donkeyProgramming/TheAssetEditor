@@ -18,6 +18,7 @@ namespace CommonControls.PackFileBrowser
         public PackFileBrowserWindow(PackFileService packfileService)
         {
             ViewModel = new PackFileBrowserViewModel(packfileService);
+            ViewModel.ContextMenu.HasContextMenu = false;
             ViewModel.FileOpen += ViewModel_FileOpen;
             InitializeComponent();
             DataContext = this;

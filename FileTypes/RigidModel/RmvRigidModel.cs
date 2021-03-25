@@ -9,7 +9,7 @@ namespace Filetypes.RigidModel
 {
     public class RmvRigidModel
     {
-        public RmvModelHeader Header { get; private set; }
+        public RmvModelHeader Header { get; set; }
         public RmvLodHeader[] LodHeaders { get; private set; }
         public RmvSubModel[][] MeshList { get; set; }
         public string FileName { get; private set; }

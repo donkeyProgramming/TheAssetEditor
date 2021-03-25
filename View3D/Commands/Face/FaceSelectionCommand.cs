@@ -32,6 +32,10 @@ namespace View3D.Commands.Face
             _isRemove = removeSelection;
         }
 
+        public override string GetHintText()
+        {
+            return "Face selected";
+        }
         public override void Initialize(IComponentManager componentManager)
         {
             _selectionManager = componentManager.GetComponent<SelectionManager>();

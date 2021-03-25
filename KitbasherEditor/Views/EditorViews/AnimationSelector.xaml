@@ -44,7 +44,8 @@
                             IsManipulationEnabled="False"
                             LabelTotalWidth="0"   
                             ShowLabel="False"
-                            LabelText="External Skeleton"/>
+                            LabelText="External Skeleton"
+                            IsEnabled="False"/>
                     </DockPanel>
                 </Grid>
 

@@ -66,6 +66,8 @@ namespace View3D.SceneNodes
             Model = model;
             for (int lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
             {
+                if (lodIndex >= Children.Count)
+                    return;
                 var lodNode = Children[lodIndex];
 
                 for (int modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)

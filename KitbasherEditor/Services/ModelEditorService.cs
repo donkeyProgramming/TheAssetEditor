@@ -26,6 +26,10 @@ namespace KitbasherEditor.Services
         }
 
         public void SetSkeletonName(string skeletonName)
-        { }
+        {
+            var header = _model.Model.Header;
+            header.SkeletonName = skeletonName;
+            _model.Model.Header = header;
+        }
     }
 }

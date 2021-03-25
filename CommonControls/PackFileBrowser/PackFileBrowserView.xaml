@@ -8,7 +8,8 @@
              xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters"
              xmlns:nodevalueconverters="clr-namespace:CommonControls.PackFileBrowser"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             x:Name="mystuff">
     <UserControl.Resources>
         <nodevalueconverters:PackFileToImageValueConverter x:Key="ImageValueConverter"/>
         <valueconverters:InverseBooleanConverter x:Key="InvBoolConverter"/>
@@ -24,6 +25,7 @@
         <TextBox Grid.Row="0" Text="{Binding Filter.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" behaviors:TextBoxExtensions.Watermark="Search filter"/>
         
         <TreeView 
+            
             Grid.Row="1" 
             behaviors:TreeViewExtension.SelectItemOnRightClick="True"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -33,64 +35,32 @@
             VirtualizingPanel.IsVirtualizingWhenGrouping="True">
             
             <TreeView.Resources>
-                <ContextMenu x:Key="NodeContextMenu" Visibility="{Binding DataContext.ContextMenuVisibility, Mode=OneTime,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" >
-                    <MenuItem Header="Add" >
-                        <MenuItem Header="From Directory"
-                                  Command="{Binding DataContext.AddFilesFromDirectory,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
-                                  CommandParameter="{Binding}"/>
 
-                        <MenuItem Header="File(s)"
-                                  Command="{Binding DataContext.AddFilesCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
-                                  CommandParameter="{Binding}"/>
-                    </MenuItem>
 
-                    <MenuItem Header="Copy to Editable pack"
-                              Command="{Binding DataContext.CopyToEditablePackCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
-                              CommandParameter="{Binding}"
-                               IsEnabled="{Binding IsPackContainer, Converter={StaticResource InvBoolConverter}}"/>
+                <ContextMenu x:Key="NodeContextMenu" ItemsSource="{Binding DataContext.ContextMenu.Items, UpdateSourceTrigger=PropertyChanged,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" DisplayMemberPath="Name">
 
-                    <MenuItem Header="Extract to file" IsEnabled="False"/>
-                    <Separator/>
-
-                    <MenuItem Header="Expand" 
-                              Command="{Binding DataContext.ExpandAllChildrenCommand,  UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
-                              CommandParameter="{Binding}"
-                              IsEnabled="{Binding IsPackContainer, Converter={StaticResource InvBoolConverter}}"/>
-
-                    <MenuItem Header="Rename" 
-                              Command="{Binding DataContext.RenameNodeCommand,  UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
-                              CommandParameter="{Binding}"
-                              IsEnabled="{Binding IsPackContainer, Converter={StaticResource InvBoolConverter}}"/>
-
-                    <MenuItem Header="Copy full path" 
-                              Command="{Binding DataContext.CopyNodePathCommand,  UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
-                              CommandParameter="{Binding}"
-                              IsEnabled="{Binding IsPackContainer, Converter={StaticResource InvBoolConverter}}"/>
-
-                    <MenuItem Header="Set as Editable Pack"
-                              Command="{Binding DataContext.SetAsEditabelPackCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
-                              CommandParameter="{Binding}"
-                               IsEnabled="{Binding IsPackContainer}"/>
-                    <Separator/>
-
-                    <MenuItem Header="Delete"
-                              Command="{Binding DataContext.DeleteCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
-                              CommandParameter="{Binding}"
-                              IsEnabled="{Binding IsPackContainer, Converter={StaticResource InvBoolConverter}}"/>
-
-                    <MenuItem Header="Close"
-                              Command="{Binding DataContext.CloseNodeCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
-                              CommandParameter="{Binding}"
-                              IsEnabled="{Binding IsPackContainer}"/>
-
-                    <MenuItem Header="Save"
-                              Command="{Binding DataContext.SavePackFileCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" 
-                              CommandParameter="{Binding}"
-                              IsEnabled="{Binding IsPackContainer}"/>
+                    <ContextMenu.Resources>
+                        <ControlTemplate x:Key="MenuSeparatorTemplate">
+                            <Separator />
+                        </ControlTemplate>
+                    </ContextMenu.Resources>
+                    
+                    <ContextMenu.ItemContainerStyle>
+                        <Style TargetType="MenuItem">
+                            <Setter Property="Command" Value="{Binding Command}"/>
+                            <Setter Property="ItemsSource" Value="{Binding ContextMenu}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding }" Value="{x:Null}">
+                                    <Setter Property="Template" Value="{StaticResource MenuSeparatorTemplate}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContextMenu.ItemContainerStyle>
 
                 </ContextMenu>
 
             </TreeView.Resources>
+
 
             <e1:Interaction.Behaviors>
                 <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedItem, Mode=TwoWay}" />
@@ -108,10 +78,10 @@
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
 
-                        <DataTrigger Binding="{Binding IsMainEditabelPack}" Value="True">
+                        <DataTrigger Binding="{Binding IsMainEditabelPack, UpdateSourceTrigger=PropertyChanged}" Value="True">
                             <Setter Property="FontWeight" Value="Bold" />
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding IsMainEditabelPack}" Value="False">
+                        <DataTrigger Binding="{Binding IsMainEditabelPack, UpdateSourceTrigger=PropertyChanged}" Value="False">
                             <Setter Property="FontWeight" Value="Normal" />
                         </DataTrigger>
 

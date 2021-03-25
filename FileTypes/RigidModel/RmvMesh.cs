@@ -44,6 +44,21 @@ namespace Filetypes.RigidModel
                     throw new Exception();
                 return Util.SanatizeFixedString(value);
             }
+            set
+            {
+                for (int i = 0; i < 128; i++)
+                    _skeletonName[i] = 0;
+
+                var byteValues = Encoding.UTF8.GetBytes(value);
+                for (int i = 0; i < byteValues.Length; i++)
+                {
+                    _skeletonName[i] = byteValues[i];
+                }
+            }
+
+
+
+
         }
     };
 

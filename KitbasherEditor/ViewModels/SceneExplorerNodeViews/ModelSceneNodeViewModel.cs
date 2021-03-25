@@ -95,14 +95,19 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         void UpdateSkeletonName()
         {
-            string cleanName = "";
-            if (!string.IsNullOrWhiteSpace(SkeletonName))
-                cleanName = Path.GetFileNameWithoutExtension(SkeletonName);
+            if (_modelNode.IsEditable)
+            {
+                string cleanName = "";
+                if (!string.IsNullOrWhiteSpace(SkeletonName))
+                    cleanName = Path.GetFileNameWithoutExtension(SkeletonName);
 
-            ModelEditorService service = new ModelEditorService(_modelNode);
-            service.SetSkeletonName(cleanName);
 
-           // _animationControllerViewModel.SetActiveSkeleton(cleanName);
+
+                ModelEditorService service = new ModelEditorService(_modelNode);
+                service.SetSkeletonName(cleanName);
+
+                _animationControllerViewModel.SetActiveSkeleton(cleanName);
+            }
         }
 
         void UpdateAttachmentPoint()

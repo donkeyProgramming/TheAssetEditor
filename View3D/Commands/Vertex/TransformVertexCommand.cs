@@ -12,8 +12,6 @@ using View3D.SceneNodes;
 namespace View3D.Commands.Vertex
 {
 
-
-
     public class TransformVertexCommand : CommandBase<TransformVertexCommand>
     {
         List<IGeometry> _geometryList;
@@ -31,6 +29,11 @@ namespace View3D.Commands.Vertex
             _pivotPoint = pivotPoint;
             _applyToNormals = applyToNormals;
             _affectVertexes = affectVertexes;
+        }
+
+        public override string GetHintText()
+        {
+            return "Transform";
         }
 
         public override void Initialize(IComponentManager componentManager)

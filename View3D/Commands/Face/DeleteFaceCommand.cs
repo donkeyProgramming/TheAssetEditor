@@ -26,6 +26,11 @@ namespace View3D.Commands.Face
             _geo = geoObject;
         }
 
+        public override string GetHintText()
+        {
+            return "Delete Faces";
+        }
+
         public override void Initialize(IComponentManager componentManager)
         {
             _selectionManager = componentManager.GetComponent<SelectionManager>();

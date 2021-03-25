@@ -20,8 +20,6 @@ using View3D.Utility;
 
 namespace View3D.Commands.Object
 {
- 
-
     public class CombineMeshCommand : CommandBase<CombineMeshCommand>
     {
         List<ISelectable> _objectsToCombine;
@@ -35,6 +33,11 @@ namespace View3D.Commands.Object
         public CombineMeshCommand(List<ISelectable> objectsToCombine)
         {
             _objectsToCombine = new List<ISelectable>(objectsToCombine);
+        }
+
+        public override string GetHintText()
+        {
+            return "Combine Objects";
         }
 
         public override void Initialize(IComponentManager componentManager)

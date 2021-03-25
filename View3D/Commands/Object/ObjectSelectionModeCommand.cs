@@ -32,6 +32,11 @@ namespace View3D.Commands.Object
             _selectedItem = selectedItem;
         }
 
+        public override string GetHintText()
+        {
+            return "Select Object";
+        }
+
         public override void Initialize(IComponentManager componentManager)
         {
             _selectionManager = componentManager.GetComponent<SelectionManager>();

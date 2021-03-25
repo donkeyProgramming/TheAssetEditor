@@ -22,6 +22,11 @@ namespace View3D.Commands.Object
             _parent = parent;
         }
 
+        public override string GetHintText()
+        {
+            return "Group Objects";
+        }
+
         public override void Initialize(IComponentManager componentManager)
         {
             _selectionManager = componentManager.GetComponent<SelectionManager>();
@@ -74,6 +79,11 @@ namespace View3D.Commands.Object
                 _itemsToUngroup = itemsToUngroup;
                 _parent = parent;
                 _oldGroupNode = groupNode;
+            }
+
+            public override string GetHintText()
+            {
+                return "Ungroup objects";
             }
 
             public override void Initialize(IComponentManager componentManager)

@@ -27,7 +27,7 @@ namespace View3D.Rendering.Geometry
         Vector3 _meshCenter;
         public Vector3 MeshCenter { get => _meshCenter; protected set => _meshCenter = value; }
 
-        public abstract IGeometry Clone();
+        public abstract IGeometry Clone(bool includeMesh = true);
 
         protected IndexedMeshGeometry(VertexDeclaration vertexDeclaration, IGeometryGraphicsContext context)
         {
@@ -35,7 +35,7 @@ namespace View3D.Rendering.Geometry
             Context = context;
         }
 
-        protected void CreateIndexFromBuffers()
+        protected void RebuildIndexBuffer()
         {
             Context.RebuildIndexBuffer(_indexList);
         }
@@ -131,7 +131,7 @@ namespace View3D.Rendering.Geometry
             _indexList = newIndexList;
             _vertexArray = newVertexList.ToArray();
 
-            CreateIndexFromBuffers();
+            RebuildIndexBuffer();
             RebuildVertexBuffer();
         }
 
@@ -155,22 +155,25 @@ namespace View3D.Rendering.Geometry
             _meshCenter = _meshCenter / corners.Length;
         }
 
-        protected virtual void CopyInto(IndexedMeshGeometry<VertexType> mesh)
+        protected virtual void CopyInto(IndexedMeshGeometry<VertexType> mesh, bool includeMesh = true)
         {
             mesh.Pivot = Pivot;
             mesh.Context = Context.Clone();
             mesh._vertexDeclaration = _vertexDeclaration;
             mesh._boundingBox = BoundingBox;
+            mesh._meshCenter = _meshCenter;
 
-            mesh._indexList = new ushort[_indexList.Length];
-            _indexList.CopyTo(mesh._indexList, 0);
+            if (includeMesh)
+            {
+                mesh._indexList = new ushort[_indexList.Length];
+                _indexList.CopyTo(mesh._indexList, 0);
 
-            mesh._vertexArray = new VertexType[_vertexArray.Length];
-            _vertexArray.CopyTo(mesh._vertexArray, 0);
+                mesh._vertexArray = new VertexType[_vertexArray.Length];
+                _vertexArray.CopyTo(mesh._vertexArray, 0);
 
-            mesh.Context.RebuildIndexBuffer(mesh._indexList);
-            mesh.Context.RebuildVertexBuffer(mesh._vertexArray, _vertexDeclaration);
-
+                mesh.Context.RebuildIndexBuffer(mesh._indexList);
+                mesh.Context.RebuildVertexBuffer(mesh._vertexArray, _vertexDeclaration);
+            }
         }
 
         public abstract Vector3 GetVertexById(int id);

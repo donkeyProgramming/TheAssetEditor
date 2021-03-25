@@ -160,9 +160,15 @@ namespace View3D.SceneNodes
 
         public override ISceneNode Clone()
         {
+            var node = CloneWithoutGeometry();
+            node.Geometry = Geometry.Clone();
+            return node;
+        }
+
+        public Rmv2MeshNode CloneWithoutGeometry()
+        {
             var newItem = new Rmv2MeshNode()
             {
-                Geometry = Geometry.Clone(),
                 Position = Position,
                 Orientation = Orientation,
                 Scale = Scale,
@@ -170,7 +176,7 @@ namespace View3D.SceneNodes
                 SceneManager = SceneManager,
                 IsEditable = IsEditable,
                 IsVisible = IsVisible,
-                IsSelectable= IsSelectable,
+                IsSelectable = IsSelectable,
                 LodIndex = LodIndex,
                 Name = Name + " - Clone",
                 AnimationPlayer = AnimationPlayer,

@@ -4,6 +4,7 @@ using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using Filetypes.RigidModel;
 using GalaSoft.MvvmLight.CommandWpf;
+using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping;
 using KitbasherEditor.Views.EditorViews;
 using System;
@@ -138,6 +139,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             {
                 List<IndexRemapping> remapping = config.MeshBones.First().BuildRemappingList();
                 _meshNode.Geometry.UpdateAnimationIndecies(remapping);
+                _meshNode.MeshModel.ParentSkeletonName = config.ParnetModelSkeletonName;
             }
         }
     }

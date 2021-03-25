@@ -185,7 +185,12 @@ namespace CommonControls.Services
                 directoryPath += "\\";
             directoryPath += newFile.Name;
             container.FileList[directoryPath.ToLower()] = newFile;
-            Database.TriggerContainerUpdated(container);
+
+
+            Database.TriggerPackFileAdded(container, new List<PackFile>() { newFile as PackFile });
+
+
+            //Database.TriggerContainerUpdated(container);
         }
 
         public void CopyFileFromOtherPackFile(PackFileContainer source, string path, PackFileContainer target)
@@ -196,9 +201,12 @@ namespace CommonControls.Services
                 var file = source.FileList[lowerPath] as PackFile;
                 var newFile = new PackFile(file.Name, file.DataSource);
                 target.FileList[lowerPath] = newFile;
+
+
+                Database.TriggerPackFileAdded(target, new List<PackFile>() { newFile as PackFile });
             }
 
-            Database.TriggerContainerUpdated(target);
+            //Database.TriggerContainerUpdated(target);
         }
 
         public void AddFolderContent(PackFileContainer container, string path, string folderDir)
@@ -207,6 +215,8 @@ namespace CommonControls.Services
             var filePaths = originalFilePaths.Select(x => x.Replace(folderDir + "\\", "")).ToList();
             if (!string.IsNullOrWhiteSpace(path))
                 path += "\\";
+
+            var filesAdded = new List<PackFile>();
             for (int i = 0; i < filePaths.Count; i++)
             {
                 var currentPath = filePaths[i];
@@ -214,16 +224,19 @@ namespace CommonControls.Services
 
                 var source = MemorySource.FromFile(originalFilePaths[i]);
                 var file = new PackFile(filename, source);
+                filesAdded.Add(file);
 
                 container.FileList[path.ToLower() + currentPath.ToLower()] = file;
             }
 
-            Database.TriggerContainerUpdated(container);
+            Database.TriggerPackFileAdded(container, filesAdded);
+            //            Database.TriggerContainerUpdated(container);
         }
 
         public void SetEditablePack(PackFileContainer pf)
         {
             Database.PackSelectedForEdit = pf;
+            Database.TriggerContainerUpdated(pf);
         }
 
         public PackFileContainer GetEditablePack()
@@ -254,22 +267,24 @@ namespace CommonControls.Services
         {
             var folderLower = folder.ToLower();
             var itemsToDelete = pf.FileList.Where(x => x.Key.StartsWith(folderLower));
+
+
+            Database.TriggerPackFileFolderRemoved(pf, folder);
+
             foreach (var item in itemsToDelete)
             {
                 _logger.Here().Information($"Deleting file {item.Key} in directory {folder}");
                 pf.FileList.Remove(item.Key);
             }
-
-            Database.TriggerContainerUpdated(pf);
         }
 
         public void DeleteFile(PackFileContainer pf, IPackFile file)
         {
             var key = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
             _logger.Here().Information($"Deleting file {key}");
-            pf.FileList.Remove(key);
 
-            Database.TriggerContainerUpdated(pf);
+            Database.TriggerPackFileRemoved(pf, new List<PackFile>() { file as PackFile });
+            pf.FileList.Remove(key);
         }
 
         // Modify
@@ -283,7 +298,7 @@ namespace CommonControls.Services
             file.Name = newName;
             pf.FileList[dir + "\\" + file.Name] = file;
 
-            Database.TriggerContainerUpdated(pf);
+            Database.TriggerPackFilesUpdated(pf, new List<PackFile>() { file as PackFile });
         }
 
 

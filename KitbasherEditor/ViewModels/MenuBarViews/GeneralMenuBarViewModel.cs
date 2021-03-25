@@ -72,7 +72,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             var state = _selectionManager.GetStateCopy() as ObjectSelectionState;
             if (state != null && state.SelectedObjects().Count >= 2)
             {
-                var cmd = new GroupObjectsCommand(_editableMeshResolver.GetEditableMeshNode(), state.CurrentSelection());
+                var cmd = new GroupObjectsCommand(_editableMeshResolver.GetActiveEditableMeshNode(), state.CurrentSelection());
                 _commandExecutor.ExecuteCommand(cmd);
             }
         }
@@ -86,7 +86,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 var parents = state.SelectedObjects().Select(x => x.Parent).Distinct().ToList();
                 if (parents.Count == 1 && parents.First() is GroupNode groupNode && groupNode.IsUngroupable)
                 {
-                     var cmd = new UnGroupObjectsCommand(_editableMeshResolver.GetEditableMeshNode(), state.CurrentSelection(), groupNode);
+                     var cmd = new UnGroupObjectsCommand(_editableMeshResolver.GetActiveEditableMeshNode(), state.CurrentSelection(), groupNode);
                      _commandExecutor.ExecuteCommand(cmd);
                 }
             }

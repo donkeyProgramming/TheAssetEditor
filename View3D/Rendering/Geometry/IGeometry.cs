@@ -26,7 +26,7 @@ namespace View3D.Rendering.Geometry
         BoundingBox BoundingBox { get; }
         Vector3 MeshCenter { get; }
 
-        IGeometry Clone();
+        IGeometry Clone(bool includeMesh = true);
 
         void RemoveFaces(List<int> facesToDelete);
         void RemoveUnusedVertexes(ushort[] newIndexList);

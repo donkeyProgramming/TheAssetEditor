@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
+using System.Windows;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Components.Gizmo;
@@ -38,11 +39,10 @@ namespace KitbasherEditor.ViewModels
         ModelLoaderService _modelLoader;
         ModelSaverHelper _modelSaver;
 
-        public KitbasherViewModel(PackFileService pf)
+        public KitbasherViewModel(PackFileService pf, SkeletonAnimationLookUpHelper skeletonHelper)
         {
             _packFileService = pf;
-            _skeletonAnimationLookUpHelper = new SkeletonAnimationLookUpHelper();
-            _skeletonAnimationLookUpHelper.Initialize(_packFileService);
+            _skeletonAnimationLookUpHelper = skeletonHelper;
 
             Scene = new SceneContainer();
             
@@ -95,31 +95,25 @@ namespace KitbasherEditor.ViewModels
                 catch (Exception e)
                 {
                     _logger.Here().Error($"Error loading file {MainFile?.Name} - {e}");
+                    MessageBox.Show("Unable to load file");
                 }
             }
-
-            //_modelLoader.LoadReference("variantmeshes\\variantmeshdefinitions\\skv_ratling_gun_gunner_ror.variantmeshdefinition");
-
-
         }
 
         public bool Save()
         {
             return true;
-          //  throw new NotImplementedException();
         }
 
         public void Close()
         {
             Scene.Dispose();
             Scene = null;
-           // throw new NotImplementedException();
         }
 
         public bool HasUnsavedChanges()
         {
             return false;
-           // throw new NotImplementedException();
         }
     }
 }

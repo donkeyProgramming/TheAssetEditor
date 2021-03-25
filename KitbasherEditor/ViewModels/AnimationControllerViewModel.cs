@@ -140,14 +140,16 @@ namespace KitbasherEditor.ViewModels
         {
             string animationFolder = "animations\\skeletons\\";
             var skeletonFilePath = animationFolder + skeletonName + ".anim";
+            if (SelectedSkeleton != skeletonFilePath)
+            {
+                SelectedSkeleton = skeletonFilePath;
+                SelectedAnimation = null;
 
-            SelectedSkeleton = skeletonFilePath;
-            SelectedAnimation = null;
-
-            // Try to set a default animation
-            var defaultIdleAnim = AnimationsForCurrentSkeleton.FirstOrDefault(x => x.Contains("stand_idle"));
-            if (defaultIdleAnim != null)
-                AnimationChanged(defaultIdleAnim);
+                // Try to set a default animation
+                var defaultIdleAnim = AnimationsForCurrentSkeleton.FirstOrDefault(x => x.Contains("stand_idle"));
+                if (defaultIdleAnim != null)
+                    AnimationChanged(defaultIdleAnim);
+            }
         }
 
         private void SkeletonChanged(string selectedSkeletonPath)
