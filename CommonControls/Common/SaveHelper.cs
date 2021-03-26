@@ -42,7 +42,8 @@ namespace CommonControls.Common
             var existingFile = packFileService.FindFile(filename, selectedEditabelPackFile);
             if (existingFile != null)
             {
-                if (MessageBox.Show("Replace existing file?", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
+                var fullPath = packFileService.GetFullPath(existingFile as PackFile);
+                if (MessageBox.Show($"Replace existing file?\n{fullPath} \nin packfile:{selectedEditabelPackFile.Name}", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
                     return;
             }
             if (existingFile == null)
@@ -54,10 +55,9 @@ namespace CommonControls.Common
             {
                 if (updatedData == null)
                     throw new Exception("Trying to update an existing file, but no data is provided");
-                (existingFile as PackFile).DataSource = new MemorySource(updatedData);
+                packFileService.SaveFile(existingFile as PackFile, updatedData);
             }
         }
-
 
 
         public static void CreateFileBackup(string originalFileName)

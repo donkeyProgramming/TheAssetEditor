@@ -181,16 +181,15 @@ namespace CommonControls.Services
 
         public void AddFileToPack(PackFileContainer container, string directoryPath, IPackFile newFile)
         {
+            if (container.IsCaPackFile)
+                throw new Exception("Can not add files to ca pack file");
+
             if (!string.IsNullOrWhiteSpace(directoryPath))
                 directoryPath += "\\";
             directoryPath += newFile.Name;
             container.FileList[directoryPath.ToLower()] = newFile;
 
-
             Database.TriggerPackFileAdded(container, new List<PackFile>() { newFile as PackFile });
-
-
-            //Database.TriggerContainerUpdated(container);
         }
 
         public void CopyFileFromOtherPackFile(PackFileContainer source, string path, PackFileContainer target)
@@ -230,7 +229,6 @@ namespace CommonControls.Services
             }
 
             Database.TriggerPackFileAdded(container, filesAdded);
-            //            Database.TriggerContainerUpdated(container);
         }
 
         public void SetEditablePack(PackFileContainer pf)
@@ -265,9 +263,11 @@ namespace CommonControls.Services
 
         public void DeleteFolder(PackFileContainer pf, string folder)
         {
+            if (pf.IsCaPackFile)
+                throw new Exception("Can not add files to ca pack file");
+
             var folderLower = folder.ToLower();
             var itemsToDelete = pf.FileList.Where(x => x.Key.StartsWith(folderLower));
-
 
             Database.TriggerPackFileFolderRemoved(pf, folder);
 
@@ -280,6 +280,9 @@ namespace CommonControls.Services
 
         public void DeleteFile(PackFileContainer pf, IPackFile file)
         {
+            if (pf.IsCaPackFile)
+                throw new Exception("Can not add files to ca pack file");
+
             var key = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
             _logger.Here().Information($"Deleting file {key}");
 
@@ -291,6 +294,9 @@ namespace CommonControls.Services
         // ---------------------------
         public void RenameFile(PackFileContainer pf, IPackFile file, string newName)
         {
+            if (pf.IsCaPackFile)
+                throw new Exception("Can not add files to ca pack file");
+
             var key = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
             pf.FileList.Remove(key);
 
@@ -298,6 +304,16 @@ namespace CommonControls.Services
             file.Name = newName;
             pf.FileList[dir + "\\" + file.Name] = file;
 
+            Database.TriggerPackFilesUpdated(pf, new List<PackFile>() { file as PackFile });
+        }
+         
+        public void SaveFile(PackFile file, byte[] data)
+        {
+            var pf = GetPackFileContainer(file);
+
+            if (pf.IsCaPackFile)
+                throw new Exception("Can not add files to ca pack file");
+            file.DataSource = new MemorySource(data);
             Database.TriggerPackFilesUpdated(pf, new List<PackFile>() { file as PackFile });
         }
 
@@ -309,9 +325,12 @@ namespace CommonControls.Services
 
         public void Save(PackFileContainer pf, string path, bool createBackup)
         {
+            if(pf.IsCaPackFile)
+                throw new Exception("Can not save ca pack file");
             if (createBackup)
                 SaveHelper.CreateFileBackup(path);
 
+            pf.SystemFilePath = path;
             using (MemoryStream memoryStream = new MemoryStream())
             {
                 using (BinaryWriter writer = new BinaryWriter(memoryStream))

@@ -18,7 +18,7 @@ namespace CommonControls.PackFileBrowser
         public PackFileBrowserWindow(PackFileService packfileService)
         {
             ViewModel = new PackFileBrowserViewModel(packfileService);
-            ViewModel.ContextMenu.HasContextMenu = false;
+            ViewModel.ContextMenu = new OpenFileContexMenuHandler(packfileService);
             ViewModel.FileOpen += ViewModel_FileOpen;
             InitializeComponent();
             DataContext = this;
@@ -41,6 +41,7 @@ namespace CommonControls.PackFileBrowser
 
         public void Dispose()
         {
+            ViewModel.FileOpen -= ViewModel_FileOpen;
             ViewModel.Dispose();
             ViewModel = null;
             DataContext = null;

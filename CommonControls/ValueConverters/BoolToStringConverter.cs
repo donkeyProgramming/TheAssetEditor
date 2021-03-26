@@ -10,16 +10,16 @@ using System.Windows.Media;
 namespace CommonControls.ValueConverters
 {
     [ValueConversion(typeof(bool), typeof(SolidColorBrush))]
-    public class BoolToColourConverter : IValueConverter
+    public class BoolToStringConverter : IValueConverter
     {
-        public SolidColorBrush TrueValue { get; set; }
-        public SolidColorBrush FalseValue { get; set; }
-        
-        public BoolToColourConverter()
+        public string TrueValue { get; set; }
+        public string FalseValue { get; set; }
+
+        public BoolToStringConverter()
         {
             // set defaults
-            TrueValue = new SolidColorBrush(Colors.Black);
-            FalseValue = new SolidColorBrush(Colors.Red);
+            TrueValue = "";
+            FalseValue = "";
         }
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -38,4 +38,5 @@ namespace CommonControls.ValueConverters
             return null;
         }
     }
+    
 }

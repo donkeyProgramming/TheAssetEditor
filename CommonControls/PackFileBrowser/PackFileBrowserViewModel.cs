@@ -17,11 +17,13 @@ using System.Windows.Input;
 namespace CommonControls.PackFileBrowser
 {
     public delegate void FileSelectedDelegate(IPackFile file);
+    public delegate void NodeSelectedDelegate(TreeNode node);
 
     public class PackFileBrowserViewModel : NotifyPropertyChangedImpl, IDisposable
     {
         protected PackFileService _packFileService;
         public event FileSelectedDelegate FileOpen;
+        public event NodeSelectedDelegate NodeSelected;
 
         public ObservableCollection<TreeNode> Files { get; set; } = new ObservableCollection<TreeNode>();
         public PackFileFilter Filter { get; private set; }
@@ -35,12 +37,13 @@ namespace CommonControls.PackFileBrowser
             {
                 SetAndNotify(ref _selectedItem, value);
                 ContextMenu.Create(value);
+                NodeSelected?.Invoke(_selectedItem);
             }
         }
 
         public ContextMenuHandler ContextMenu { get; set; }
 
-        public PackFileBrowserViewModel(PackFileService packFileService)
+        public PackFileBrowserViewModel(PackFileService packFileService, bool ignoreCaFiles = false)
         {
             DoubleClickCommand = new RelayCommand<TreeNode>(OnDoubleClick);
 
@@ -57,9 +60,16 @@ namespace CommonControls.PackFileBrowser
             Filter = new PackFileFilter(Files);
 
             foreach (var item in _packFileService.Database.PackFiles)
-                ReloadTree(item);
+            {
+                bool loadFile = true;
+                if (ignoreCaFiles)
+                    loadFile = !item.IsCaPackFile;
 
-            ContextMenu = new ContextMenuHandler(packFileService);
+                if(loadFile)
+                    ReloadTree(item);
+            }
+
+            ContextMenu = new DefaultContextMenuHandler(packFileService);
         }
 
         private void Database_PackFileFolderRemoved(PackFileContainer container, string folder)
@@ -90,9 +100,18 @@ namespace CommonControls.PackFileBrowser
         {
             foreach (var file in files)
             {
+                var rootNode = GetPackFileCollectionRootNode(container);
+                rootNode.UnsavedChanged = true;
                 var node = GetNodeFromPackFile(container, file);
                 node.Name = file.Name;
-                node.UnsavedChanged = false;
+                node.UnsavedChanged = true;
+
+                var parent = node.Parent;
+                while (parent != rootNode)
+                {
+                    parent.UnsavedChanged = true;
+                    parent = parent.Parent;
+                }
             }
         }
 
@@ -115,6 +134,7 @@ namespace CommonControls.PackFileBrowser
         private void AddFiles(PackFileContainer container, List<PackFile> files)
         {
             var root = GetPackFileCollectionRootNode(container);
+            root.UnsavedChanged = true;
 
             foreach (var item in files)
             {
@@ -124,19 +144,28 @@ namespace CommonControls.PackFileBrowser
                 var directoryEnd = fullPath.LastIndexOf(Path.DirectorySeparatorChar);
                 var fileName = fullPath.Substring(directoryEnd + 1);
 
+                TreeNode newNode;
                 if (numSeperators == 0)
                 {
-                    root.Children.Add(new TreeNode(fileName, NodeType.File, container, root, item));
+                    newNode = new TreeNode(fileName, NodeType.File, container, root, item);
+                    root.Children.Add(newNode);
                 }
                 else
                 {
                     var directory = fullPath.Substring(0, directoryEnd);
                     var folder = GetNodeFromPath(root, container,directory);
-                    
-                    folder.Children.Add(new TreeNode(fileName, NodeType.File, container, folder, item));
+                    newNode = new TreeNode(fileName, NodeType.File, container, folder, item);
+                    folder.Children.Add(newNode);
+                }
+
+                newNode.UnsavedChanged = true;
+                var parent = newNode.Parent;
+                while (parent != root)
+                {
+                    parent.UnsavedChanged = true;
+                    parent = parent.Parent;
                 }
             }
-
         }
 
         TreeNode GetNodeFromPath(TreeNode parent, PackFileContainer container, string path, bool createIfMissing = true)

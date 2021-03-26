@@ -1,4 +1,5 @@
 ﻿using Common;
+using CommonControls.PackFileBrowser;
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor.Services;
 using MonoGame.Framework.WpfInterop;
@@ -15,6 +16,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
     public class GeneralMenuBarViewModel : NotifyPropertyChangedImpl
     {
         public ICommand SaveCommand { get; set; }
+        public ICommand SaveAsCommand { get; set; }
         public ICommand OpenRefereceFileCommand { get; set; }
         public ICommand ValidatCommand { get; set; }
         public ICommand UndoCommand { get; set; }
@@ -41,6 +43,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public GeneralMenuBarViewModel(IComponentManager componentManager, ToolbarCommandFactory commandFactory)
         {
             SaveCommand = commandFactory.Register(new RelayCommand(Save), Key.S, ModifierKeys.Control);
+            SaveAsCommand = new RelayCommand(SaveAs);
             OpenRefereceFileCommand = commandFactory.Register(new RelayCommand(OpenReferenceFile), Key.O, ModifierKeys.Control);
             ValidatCommand = new RelayCommand(Validate);
 
@@ -95,6 +98,11 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         void Save() 
         {
             ModelSaver.Save();
+        }
+
+        void SaveAs()
+        {
+            ModelSaver.SaveAs();
         }
 
         void OpenReferenceFile() 

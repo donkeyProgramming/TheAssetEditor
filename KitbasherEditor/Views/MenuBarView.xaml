@@ -42,7 +42,7 @@
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
                 <MenuItem Header="Save" Command="{Binding General.SaveCommand, Mode=OneTime}"/>
-                <MenuItem Header="Save as"  IsEnabled="False"/>
+                <MenuItem Header="Save as" Command="{Binding General.SaveAsCommand, Mode=OneTime}" />
                 <Separator/>
                 <MenuItem Header="Import reference" Command="{Binding ImportReferenceCommand, Mode=OneTime}"/>
                 <MenuItem Header="Import reference - Ork torso" Command="{Binding ImportReferenceCommand_OrcTorso, Mode=OneTime}"/>
@@ -64,11 +64,11 @@
 
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBar>
-                <Button ToolTip="Save" IsEnabled="False">
+                <Button ToolTip="Save"  Command="{Binding General.SaveCommand, Mode=OneTime}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-save-all-50.png"/>
                 </Button>
 
-                <Button ToolTip="Import file" IsEnabled="False">
+                <Button ToolTip="Import file" Command="{Binding ImportReferenceCommand, Mode=OneTime}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/open ref.png"/>
                 </Button>
 
@@ -78,7 +78,7 @@
 
                 <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
 
-                <Button ToolTip="{Binding General.UndoHintText}" Command="{Binding General.UndoCommand}" IsEnabled="{Binding General.UndoEnabled}">
+                <Button ToolTip="{Binding General.UndoHintText}" Command="{Binding General.UndoCommand, Mode=OneTime}" IsEnabled="{Binding General.UndoEnabled}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/undo.png"/>
                 </Button>
                 <Button ToolTip="Delete undo history" IsEnabled="False">

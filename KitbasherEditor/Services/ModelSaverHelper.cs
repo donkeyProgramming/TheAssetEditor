@@ -1,5 +1,6 @@
 ﻿using Common;
 using CommonControls.Common;
+using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
@@ -117,32 +118,57 @@ namespace KitbasherEditor.Services
             try
             {
                 var inputFile = _kitbasherViewModel.MainFile as PackFile;
-
-                var isAllVisible = true;
-                _editableMeshNode.GetLodNodes()[0].ForeachNode((node) =>
-                {
-                    if (!node.IsVisible)
-                        isAllVisible = false;
-                });
-
-                bool onlySaveVisible = false;
-                if (isAllVisible == false)
-                {
-                    if (MessageBox.Show("Only save visible nodes?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                        onlySaveVisible = true;
-                }
-
-                var bytes = _editableMeshNode.Save(onlySaveVisible);
-
-                var reloadedModel = new RmvRigidModel(bytes, "reloadedFile");
-
+                byte[] bytes = GetBytesToSave();
                 var path = _packFileService.GetFullPath(inputFile);
                 SaveHelper.Save(_packFileService, path, inputFile, bytes);
             }
             catch (Exception e)
             {
                 _logger.Here().Error("Error saving model - " + e.ToString());
+                MessageBox.Show("Saving failed!");
             }
+        }
+
+        public void SaveAs()
+        {
+            try
+            {
+                var inputFile = _kitbasherViewModel.MainFile as PackFile;
+                byte[] bytes = GetBytesToSave();
+
+                using (var browser = new SavePackFileWindow(_packFileService))
+                {
+                    browser.ViewModel.Filter.SetExtentions(new List<string>() { ".variantmeshdefinition", ".wsmodel", ".rigid_model_v2" });
+                    if (browser.ShowDialog() == true)
+                        SaveHelper.Save(_packFileService, browser.FilePath, inputFile, bytes);
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error("Error saving model - " + e.ToString());
+                MessageBox.Show("Saving failed!");
+            }
+        }
+
+        private byte[] GetBytesToSave()
+        {
+            var isAllVisible = true;
+            _editableMeshNode.GetLodNodes()[0].ForeachNode((node) =>
+            {
+                if (!node.IsVisible)
+                    isAllVisible = false;
+            });
+
+            bool onlySaveVisible = false;
+            if (isAllVisible == false)
+            {
+                if (MessageBox.Show("Only save visible nodes?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    onlySaveVisible = true;
+            }
+
+            var bytes = _editableMeshNode.Save(onlySaveVisible);
+            var reloadedModel = new RmvRigidModel(bytes, "reloadedFile");
+            return bytes;
         }
     }
 }

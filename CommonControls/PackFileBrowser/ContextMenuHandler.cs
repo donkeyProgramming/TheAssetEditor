@@ -16,12 +16,10 @@ using System.Windows.Input;
 
 namespace CommonControls.PackFileBrowser
 {
-    public class ContextMenuHandler : NotifyPropertyChangedImpl
+    public abstract class ContextMenuHandler : NotifyPropertyChangedImpl
     {
         ObservableCollection<PackTreeContextMenuItem> _contextMenu;
         public ObservableCollection<PackTreeContextMenuItem> Items { get => _contextMenu; set => SetAndNotify(ref _contextMenu, value); }
-
-
 
         public ICommand RenameNodeCommand { get; set; }
         public ICommand AddFilesFromDirectory { get; set; }
@@ -32,18 +30,17 @@ namespace CommonControls.PackFileBrowser
         public ICommand CopyNodePathCommand { get; set; }
         public ICommand CopyToEditablePackCommand { get; set; }
         public ICommand DuplicateCommand { get; set; }
+        public ICommand CreateFolderCommand { get; set; }
         public ICommand SetAsEditabelPackCommand { get; set; }
         public ICommand ExpandAllChildrenCommand { get; set; }
         public ICommand OpenToolCommand_Preview { get; set; }
         public ICommand OpenToolCommand_Text { get; set; }
         public ICommand OpenToolCommand_Kitbash { get; set; }
-        
+        public ICommand SavePackFileAsCommand { get; set; }
 
+        protected PackFileService _packFileService;
 
-        PackFileService _packFileService;
-
-        public bool HasContextMenu { get; set; } = true;
-        TreeNode _selectedNode;
+        protected TreeNode _selectedNode;
         public ContextMenuHandler(PackFileService pf)
         {
             _packFileService = pf;
@@ -52,9 +49,11 @@ namespace CommonControls.PackFileBrowser
             AddFilesCommand = new RelayCommand(OnAddFilesCommand);
             AddFilesFromDirectory = new RelayCommand(OnAddFilesFromDirectory);
             DuplicateCommand = new RelayCommand(DuplicateNode);
+            CreateFolderCommand = new RelayCommand(CreateFolder);
             CloseNodeCommand = new RelayCommand(CloseNode);
             DeleteCommand = new RelayCommand(DeleteNode);
             SavePackFileCommand = new RelayCommand(SavePackFile);
+            SavePackFileAsCommand = new RelayCommand(SaveAsPackFile);
             CopyNodePathCommand = new RelayCommand(CopyNodePath);
             CopyToEditablePackCommand = new RelayCommand(CopyToEditablePack);
             SetAsEditabelPackCommand = new RelayCommand(SetAsEditabelPack);
@@ -124,8 +123,30 @@ namespace CommonControls.PackFileBrowser
 
         void DuplicateNode()
         {
-            //var packFile = new PackFile(fileName, new MemorySource(File.ReadAllBytes(file)));
-            //_packFileService.AddFileToPack(_selectedNode.FileOwner, parentPath, packFile);
+            var fileName = Path.GetFileNameWithoutExtension(_selectedNode.Name);
+            var extention = Path.GetExtension(_selectedNode.Name);
+            var newName = fileName + "_copy" + extention;
+
+            var bytes = (_selectedNode.Item as PackFile).DataSource.ReadData();
+            var packFile = new PackFile(newName, new MemorySource(bytes));
+
+            var parentPath = _selectedNode.GetFullPath();
+            var path = Path.GetDirectoryName(parentPath);
+
+            _packFileService.AddFileToPack(_selectedNode.FileOwner, path, packFile);
+        }
+
+        void CreateFolder()
+        {
+            if (_selectedNode.FileOwner.IsCaPackFile)
+            {
+                MessageBox.Show("Unable to edit CA packfile");
+                return;
+            }
+
+            _selectedNode.Children.Add(new TreeNode("TestF", NodeType.Directory, _selectedNode.FileOwner, _selectedNode));
+
+
         }
 
         void DeleteNode()
@@ -153,9 +174,25 @@ namespace CommonControls.PackFileBrowser
 
         void SavePackFile()
         {
+            var systemPath = _selectedNode.FileOwner.SystemFilePath;
+            if (string.IsNullOrWhiteSpace(systemPath))
+            {
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                if (saveFileDialog.ShowDialog() == false)
+                    return;
+                systemPath = saveFileDialog.FileName;
+            }
+
+            _packFileService.Save(_selectedNode.FileOwner, systemPath, true);
+        }
+
+        void SaveAsPackFile()
+        {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            if (saveFileDialog.ShowDialog() == true)
-                _packFileService.Save(_selectedNode.FileOwner, saveFileDialog.FileName, true);
+            if (saveFileDialog.ShowDialog() == false)
+                return;
+
+            _packFileService.Save(_selectedNode.FileOwner, saveFileDialog.FileName, true);
         }
 
         void CopyNodePath()
@@ -206,98 +243,25 @@ namespace CommonControls.PackFileBrowser
                 ExpandAllRecursive(child);
         }
 
-        public void Create(TreeNode node)
-        {
-            _selectedNode = node;
-            if (node == null || HasContextMenu == false)
-            {
-                Items = new ObservableCollection<PackTreeContextMenuItem>();
-                return;
-            }
 
-            var newContextMenu = new ObservableCollection<PackTreeContextMenuItem>();
-          
-            if (node.NodeType == NodeType.Root)
-            {
-                if (node.FileOwner.IsCaPackFile)
-                {
-                    Additem(ContextItems.Close, newContextMenu);
-                }
-                else
-                {
-                    if (_packFileService.GetEditablePack() != node.FileOwner)
-                    {
-                        Additem(ContextItems.SetAsEditabelPack, newContextMenu);
-                        AddSeperator(newContextMenu);
-                    }
+        public abstract void Create(TreeNode node);
+       
 
-                    var addFolder = Additem(ContextItems.Add, newContextMenu);
-                    Additem(ContextItems.AddFiles, addFolder);
-                    Additem(ContextItems.AddDirectory, addFolder);
-                    AddSeperator(newContextMenu);
-
-                    Additem(ContextItems.Expand, newContextMenu);
-                    AddSeperator(newContextMenu);
-                    Additem(ContextItems.Save, newContextMenu);
-                    Additem(ContextItems.Close, newContextMenu);
-                }
-            }
-
-            if (node.NodeType == NodeType.Directory)
-            {
-                if (_packFileService.GetEditablePack() != node.FileOwner)
-                    Additem(ContextItems.CopyToEditablePack, newContextMenu);
-                if (!node.FileOwner.IsCaPackFile)
-                {
-                    AddSeperator(newContextMenu);
-                    Additem(ContextItems.Rename, newContextMenu);
-                    Additem(ContextItems.Delete, newContextMenu);
-                    AddSeperator(newContextMenu);
-                    
-                }
-                Additem(ContextItems.Expand, newContextMenu);
-            }
-
-            if (node.NodeType == NodeType.File)
-            {
-                if (_packFileService.GetEditablePack() != node.FileOwner)
-                    Additem(ContextItems.CopyToEditablePack, newContextMenu);
-                if (!node.FileOwner.IsCaPackFile)
-                {
-                    AddSeperator(newContextMenu);
-                    //Additem(ContextItems.Duplicate, newContextMenu);
-                    Additem(ContextItems.Rename, newContextMenu);
-                    Additem(ContextItems.Delete, newContextMenu);
-                    AddSeperator(newContextMenu);
-
-                }
-                Additem(ContextItems.CopyFullPath, newContextMenu);
-                AddSeperator(newContextMenu);
-
-                var openFolder = Additem(ContextItems.Open, newContextMenu);
-                Additem(ContextItems.OpenWithKitbasher, openFolder);
-                Additem(ContextItems.OpenWithTextEditor, openFolder);
-                Additem(ContextItems.OpenWithPreview, openFolder);
-            }
-
-            Items = newContextMenu;
-        }
-
-        PackTreeContextMenuItem Additem(ContextItems type, PackTreeContextMenuItem parent)
+        protected PackTreeContextMenuItem Additem(ContextItems type, PackTreeContextMenuItem parent)
         {
             var item = GetItem(type);
             parent.ContextMenu.Add(item);
             return item;
         }
 
-        PackTreeContextMenuItem Additem(ContextItems type, ObservableCollection<PackTreeContextMenuItem> parent)
+        protected PackTreeContextMenuItem Additem(ContextItems type, ObservableCollection<PackTreeContextMenuItem> parent)
         {
             var item = GetItem(type);
             parent.Add(item);
             return item;
         }
 
-        void AddSeperator(ObservableCollection<PackTreeContextMenuItem> parent)
+        protected void AddSeperator(ObservableCollection<PackTreeContextMenuItem> parent)
         {
             parent.Add(null);
         }
@@ -316,6 +280,8 @@ namespace CommonControls.PackFileBrowser
                     return new PackTreeContextMenuItem() { Name = "Copy to Editable pack", Command = CopyToEditablePackCommand }; ;
                 case ContextItems.Duplicate:
                     return new PackTreeContextMenuItem() { Name = "Duplicate", Command = DuplicateCommand }; ;
+                case ContextItems.CreateFolder:
+                    return new PackTreeContextMenuItem() { Name = "Create Folder", Command = CreateFolderCommand }; ;
                 case ContextItems.Expand:
                     return new PackTreeContextMenuItem() { Name = "Expand", Command = ExpandAllChildrenCommand }; ;
                 case ContextItems.CopyFullPath:
@@ -330,6 +296,8 @@ namespace CommonControls.PackFileBrowser
                     return new PackTreeContextMenuItem() { Name = "Close", Command = CloseNodeCommand }; ;
                 case ContextItems.Save:
                     return new PackTreeContextMenuItem() { Name = "Save", Command= SavePackFileCommand }; ;
+                case ContextItems.SaveAs:
+                    return new PackTreeContextMenuItem() { Name = "Save as", Command = SavePackFileAsCommand }; ;
                 case ContextItems.Open:
                     return new PackTreeContextMenuItem() { Name = "Open", }; ;
                 case ContextItems.OpenWithTextEditor:
@@ -343,15 +311,14 @@ namespace CommonControls.PackFileBrowser
             throw new Exception("Unknown ContextItems type ");
         }
 
-
-
-        enum ContextItems
+        protected enum ContextItems
         { 
             Add,
             AddFiles,
             AddDirectory,
             CopyToEditablePack,
             Duplicate,
+            CreateFolder,
 
             Expand,
             CopyFullPath,
@@ -361,6 +328,7 @@ namespace CommonControls.PackFileBrowser
             Delete,
             Close,
             Save,
+            SaveAs,
 
             Open,
             OpenWithTextEditor,
