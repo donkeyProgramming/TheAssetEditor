@@ -17,9 +17,10 @@ namespace Common.ApplicationSettings
         }
 
         public List<GamePathPair> GameDirectories { get; set; } = new List<GamePathPair>();
-        public GameTypeEnum CurrentGame { get; set; } = GameTypeEnum.Unknown;
+        public GameTypeEnum CurrentGame { get; set; } = GameTypeEnum.Warhammer2;
         public bool UseTextEditorForUnknownFiles{ get; set; } = true;
         public bool LoadCaPacksByDefault { get; set; } = true;
         public bool IsFirstTimeStartingApplication { get; set; } = true;
+        public bool IsDeveloperRun { get; set; } = false;
     }
 }

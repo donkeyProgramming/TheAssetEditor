@@ -8,7 +8,7 @@ namespace FileTypes.PackFiles.Models
 {
     public delegate void ContainerUpdatedDelegate(PackFileContainer container);
     public delegate void PackFileContainerLoadedDelegate(PackFileContainer container);
-    public delegate void PackFileContainerRemovedDelegate(PackFileContainer container);
+    public delegate bool PackFileContainerRemovedDelegate(PackFileContainer container);
 
 
     public delegate void FileUpdated(PackFileContainer container, PackFile file);
@@ -21,7 +21,7 @@ namespace FileTypes.PackFiles.Models
         public event ContainerUpdatedDelegate ContainerUpdated;
         public event PackFileContainerLoadedDelegate PackFileContainerLoaded;
         public event PackFileContainerRemovedDelegate PackFileContainerRemoved;
-
+        public event PackFileContainerRemovedDelegate BeforePackFileContainerRemoved;
 
         public event PackFileUpdatedDelegate PackFilesUpdated;
         public event PackFileUpdatedDelegate PackFilesAdded;
@@ -43,8 +43,16 @@ namespace FileTypes.PackFiles.Models
 
         public void RemovePackFile(PackFileContainer pf)
         {
-            PackFiles.Remove(pf);
-            PackFileContainerRemoved?.Invoke(pf);
+            var canUnload = BeforePackFileContainerRemoved?.Invoke(pf);
+            if (canUnload.HasValue == false || (canUnload.HasValue == true && canUnload.Value == true))
+            {
+                PackFiles.Remove(pf);
+
+                if (PackSelectedForEdit == pf)
+                    PackSelectedForEdit = null;
+
+                PackFileContainerRemoved?.Invoke(pf);
+            }
         }
 
         public void Clear()

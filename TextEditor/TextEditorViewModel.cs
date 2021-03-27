@@ -60,7 +60,9 @@ namespace TextEditor
         public bool Save()
         {
             var path = _pf.GetFullPath(MainFile as PackFile);
-            SaveHelper.Save(_pf, path, MainFile as PackFile, Encoding.ASCII.GetBytes(Text));
+            var res = SaveHelper.Save(_pf, path, MainFile as PackFile, Encoding.ASCII.GetBytes(Text));
+            if (res != null)
+                MainFile = res;
             return false;
         }
 

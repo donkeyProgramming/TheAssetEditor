@@ -30,35 +30,38 @@ namespace CommonControls.Common
             }
         }
 
-        public static void Save(PackFileService packFileService, string filename, PackFile packFile, byte[] updatedData = null)
+        public static PackFile Save(PackFileService packFileService, string filename, PackFile packFile, byte[] updatedData = null)
         {
             var selectedEditabelPackFile = packFileService.GetEditablePack();
             if (selectedEditabelPackFile == null)
             {
                 MessageBox.Show("No editable pack selected!");
-                return;
+                return null;
             }
 
             var existingFile = packFileService.FindFile(filename, selectedEditabelPackFile);
             if (existingFile != null)
             {
-                var fullPath = packFileService.GetFullPath(existingFile as PackFile);
+                var fullPath = packFileService.GetFullPath(existingFile as PackFile, selectedEditabelPackFile);
                 if (MessageBox.Show($"Replace existing file?\n{fullPath} \nin packfile:{selectedEditabelPackFile.Name}", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
-                    return;
+                    return null;
             }
             if (existingFile == null)
             {
                 var directoryPath = Path.GetDirectoryName(filename);
-                packFileService.AddFileToPack(selectedEditabelPackFile, directoryPath, packFile);
+                var justFileName = Path.GetFileName(filename); 
+                var newPackFile = new PackFile(justFileName, new MemorySource(packFile.DataSource.ReadData()));
+                packFileService.AddFileToPack(selectedEditabelPackFile, directoryPath, newPackFile);
+                return newPackFile;
             }
             else
             {
                 if (updatedData == null)
                     throw new Exception("Trying to update an existing file, but no data is provided");
                 packFileService.SaveFile(existingFile as PackFile, updatedData);
+                return packFile;
             }
         }
-
 
         public static void CreateFileBackup(string originalFileName)
         {

@@ -191,5 +191,12 @@ namespace CommonControls.PackFileBrowser
             Children.Clear();
             Parent = null;
         }
+
+        public void ForeachNode(Action<TreeNode> func)
+        {
+            func.Invoke(this);
+            foreach (var child in Children)
+                child.ForeachNode(func);
+        }
     }
 }

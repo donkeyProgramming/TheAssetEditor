@@ -49,17 +49,10 @@
                 <MenuItem Header="Import reference - Paladin vmd" Command="{Binding ImportReferenceCommand_PaladinVMD, Mode=OneTime}"/>
             </MenuItem>
 
-            <MenuItem Header="Mode" IsEnabled="False">
-                <MenuItem Header="Edit"  />
-                <MenuItem Header="Animate"/>
-            </MenuItem>
-
             <MenuItem Header="Camera" >
                 <MenuItem Header="Focus Selection" Command="{Binding General.FocusCameraCommand, Mode=OneTime}"/>
                 <MenuItem Header="Reset" Command="{Binding General.ResetCameraCommand, Mode=OneTime}"/>
             </MenuItem>
-
-
         </Menu>
 
         <ToolBarTray DockPanel.Dock="Top">

@@ -178,21 +178,31 @@ namespace CommonControls.PackFileBrowser
             if (string.IsNullOrWhiteSpace(systemPath))
             {
                 SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.FileName = _selectedNode.FileOwner.Name;
+                saveFileDialog.Filter = "PackFile | *.pack";
+                saveFileDialog.DefaultExt = "pack";
                 if (saveFileDialog.ShowDialog() == false)
                     return;
                 systemPath = saveFileDialog.FileName;
             }
 
             _packFileService.Save(_selectedNode.FileOwner, systemPath, true);
+            _selectedNode.UnsavedChanged = false;
+            _selectedNode.ForeachNode((node) => node.UnsavedChanged = false);
         }
 
         void SaveAsPackFile()
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.FileName = _selectedNode.FileOwner.Name;
+            saveFileDialog.Filter = "PackFile | *.pack";
+            saveFileDialog.DefaultExt = "pack";
             if (saveFileDialog.ShowDialog() == false)
                 return;
 
             _packFileService.Save(_selectedNode.FileOwner, saveFileDialog.FileName, true);
+            _selectedNode.UnsavedChanged = false;
+            _selectedNode.ForeachNode((node) => node.UnsavedChanged = false);
         }
 
         void CopyNodePath()

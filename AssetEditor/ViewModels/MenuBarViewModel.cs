@@ -1,5 +1,7 @@
-﻿using AssetEditor.Views.Settings;
+﻿using AssetEditor.Services;
+using AssetEditor.Views.Settings;
 using Common;
+using Common.ApplicationSettings;
 using CommonControls.Services;
 using CommonControls.Simple;
 using FileTypes.PackFiles.Models;
@@ -9,6 +11,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
@@ -21,21 +24,25 @@ namespace AssetEditor.ViewModels
 
         IServiceProvider _serviceProvider;
         PackFileService _packfileService;
+        ToolFactory _toolFactory;
 
         public ICommand OpenSettingsWindowCommand { get; set; }
         public ICommand CreateNewPackFileCommand { get; set; }
         public ICommand OpenPackFileCommand { get; set; }
-
+        public ICommand OpenAssetEditorFolderCommand { get; set; }
 
         public ICommand OpenKitbashEditorCommand { get; set; }
+        public IEditorCreator EditorCreator { get; set; }
 
-        public MenuBarViewModel(IServiceProvider provider, PackFileService packfileService)
+        public MenuBarViewModel(IServiceProvider provider, PackFileService packfileService, ToolFactory toolFactory)
         {
             _serviceProvider = provider;
             _packfileService = packfileService;
+            _toolFactory = toolFactory;
             OpenSettingsWindowCommand = new RelayCommand(ShowSettingsDialog);
             OpenPackFileCommand = new RelayCommand(OpenPackFile);
             CreateNewPackFileCommand = new RelayCommand(CreatePackFile);
+            OpenAssetEditorFolderCommand = new RelayCommand(OpenAssetEditorFolder);
             OpenKitbashEditorCommand = new RelayCommand(OpenKitbasherTool);
         }
 
@@ -46,7 +53,7 @@ namespace AssetEditor.ViewModels
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 _logger.Here().Information($"Loading pack file {dialog.FileName}");
-                 if( _packfileService.Load(dialog.FileName) == null)
+                 if( _packfileService.Load(dialog.FileName, true) == null)
                     MessageBox.Show($"Unable to load packfiles {dialog.FileName}");
             }
         }
@@ -63,13 +70,21 @@ namespace AssetEditor.ViewModels
             TextInputWindow window = new TextInputWindow("New Packfile name", "");
             if (window.ShowDialog() == true)
             {
-                _packfileService.CreateNewPackFileContainer(window.TextValue, PackFileCAType.MOD);
+                var newPackFile = _packfileService.CreateNewPackFileContainer(window.TextValue, PackFileCAType.MOD);
+                _packfileService.SetEditablePack(newPackFile);
             }
         }
 
+        void OpenAssetEditorFolder()
+        {
+            var path = DirectoryHelper.ApplicationDirectory;
+            Process.Start("explorer.exe", path);
+        }
+
         void OpenKitbasherTool()
-        { 
-        
+        {
+         //   var editorView = _toolFactory.CreateEdtior<KitbasherEditor.ViewModels.KitbasherViewModel>();
+         //   EditorCreator.CreateEmptyEditor(editorView);
         }
     }
 }

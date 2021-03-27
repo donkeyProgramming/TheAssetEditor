@@ -88,7 +88,7 @@ namespace AssetEditor.ViewModels
             {
                 Path = dialog.FileName;
                 var files = Directory.GetFiles(Path);
-                var packFiles = files.Count(x => System.IO.Path.GetExtension(x) == "pack");
+                var packFiles = files.Count(x => System.IO.Path.GetExtension(x) == ".pack");
                 var manifest = files.Count(x => x.Contains("manifest.txt"));
 
                 if (packFiles == 0 || manifest == 0)

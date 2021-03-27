@@ -291,10 +291,11 @@ namespace CommonControls.PackFileBrowser
             Files.Add(root);
         }
 
-        private void PackFileContainerRemoved(PackFileContainer container)
+        private bool PackFileContainerRemoved(PackFileContainer container)
         {
             var node = Files.FirstOrDefault(x => x.FileOwner == container);
             Files.Remove(node);
+            return true;
         }
 
         public void Dispose()

@@ -118,5 +118,11 @@ namespace AssetEditor.Services
                 return null;
             }
         }
+
+        public IEditorViewModel CreateEdtior<ViewModel>() where ViewModel : IEditorViewModel
+        {
+            var instance = (IEditorViewModel)_serviceProvider.GetService(typeof(ViewModel));
+            return instance;
+        }
     }
 }

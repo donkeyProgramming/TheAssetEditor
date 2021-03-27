@@ -82,12 +82,20 @@ namespace CommonControls.PackFileBrowser
             }
             else
             {
-                if (string.IsNullOrWhiteSpace(_selectedNode?.Name) == false)
+                if (_selectedNode.NodeType == NodeType.File)
                 {
                     var fullPath = _selectedNode.GetFullPath();
-                    //var fullPath = _packfileService.GetFullPath(_selectedNode.Item as PackFile, _selectedNode.FileOwner);
-                    //fullPath = System.IO.Path.GetDirectoryName(fullPath);
-                    path = fullPath + "\\";
+                    path = System.IO.Path.GetDirectoryName(fullPath) + "\\";
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(_selectedNode?.Name) == false)
+                    {
+                        var fullPath = _selectedNode.GetFullPath();
+                        //var fullPath = _packfileService.GetFullPath(_selectedNode.Item as PackFile, _selectedNode.FileOwner);
+                        //fullPath = System.IO.Path.GetDirectoryName(fullPath);
+                        path = fullPath + "\\";
+                    }
                 }
 
                 path += CurrentFileName;

@@ -120,7 +120,9 @@ namespace KitbasherEditor.Services
                 var inputFile = _kitbasherViewModel.MainFile as PackFile;
                 byte[] bytes = GetBytesToSave();
                 var path = _packFileService.GetFullPath(inputFile);
-                SaveHelper.Save(_packFileService, path, inputFile, bytes);
+                var res = SaveHelper.Save(_packFileService, path, inputFile, bytes);
+                if (res != null)
+                    _kitbasherViewModel.MainFile = res;
             }
             catch (Exception e)
             {
@@ -138,9 +140,17 @@ namespace KitbasherEditor.Services
 
                 using (var browser = new SavePackFileWindow(_packFileService))
                 {
-                    browser.ViewModel.Filter.SetExtentions(new List<string>() { ".variantmeshdefinition", ".wsmodel", ".rigid_model_v2" });
+                    browser.ViewModel.Filter.SetExtentions(new List<string>() {".rigid_model_v2" });
                     if (browser.ShowDialog() == true)
-                        SaveHelper.Save(_packFileService, browser.FilePath, inputFile, bytes);
+                    {
+                        var path = browser.FilePath;
+                        if (path.Contains(".rigid_model_v2") == false)
+                            path += ".rigid_model_v2";
+
+                        var res = SaveHelper.Save(_packFileService, path, inputFile, bytes);
+                        if (res != null)
+                            _kitbasherViewModel.MainFile = res;
+                    }
                 }
             }
             catch (Exception e)

@@ -14,7 +14,6 @@ namespace CommonControls.Services
     {
         ILogger _logger = Logging.Create<PackFileService>();
         
-
         public PackFileDataBase Database { get; private set; }
 
         public PackFileService(PackFileDataBase database)
@@ -22,11 +21,12 @@ namespace CommonControls.Services
             Database = database;
         }
 
-
-        public PackFileContainer Load(string packFileSystemPath) 
+        public PackFileContainer Load(string packFileSystemPath, bool setToMainPackIfFirst = false) 
         {
             try
             {
+                var noCaPacksLoaded = Database.PackFiles.Count(x => !x.IsCaPackFile);
+
                 if (!File.Exists(packFileSystemPath))
                 {
                     _logger.Here().Error($"Trying to load file {packFileSystemPath}, which can not be located");
@@ -37,7 +37,12 @@ namespace CommonControls.Services
                 {
                     using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
                     {
-                        return Load(reader, packFileSystemPath);
+                        var container = Load(reader, packFileSystemPath);
+
+                        if (noCaPacksLoaded == 0 && setToMainPackIfFirst)
+                            SetEditablePack(container);
+
+                        return container;
                     }
                 }
             }

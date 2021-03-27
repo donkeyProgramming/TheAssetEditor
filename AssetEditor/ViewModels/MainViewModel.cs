@@ -3,6 +3,7 @@ using AssetEditor.Views.Settings;
 using Common;
 using Common.ApplicationSettings;
 using Common.GameInformation;
+using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using FileTypes.PackFiles.Models;
 using GalaSoft.MvvmLight.CommandWpf;
@@ -18,11 +19,18 @@ using System.Windows.Input;
 
 namespace AssetEditor.ViewModels
 {
-    class MainViewModel : NotifyPropertyChangedImpl
+
+    public interface IEditorCreator
+    {
+        void OpenFile(IPackFile file);
+        void CreateEmptyEditor(IEditorViewModel editorView);
+    }
+
+    class MainViewModel : NotifyPropertyChangedImpl, IEditorCreator
     {
         ILogger _logger = Logging.Create<MainViewModel>();
-
-        public FileTreeViewModel FileTree { get; private set; }
+        PackFileService _packfileService;
+        public PackFileBrowserViewModel FileTree { get; private set; }
         public MenuBarViewModel MenuBar { get; set; }
 
         public ToolFactory ToolsFactory { get; set; }
@@ -35,17 +43,20 @@ namespace AssetEditor.ViewModels
 
         public MainViewModel(MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, GameInformationService gameInformationService, ToolFactory toolFactory)
         {
+            _packfileService = packfileService;
+            _packfileService.Database.BeforePackFileContainerRemoved += Database_BeforePackFileContainerRemoved;
+
             MenuBar = menuViewModel;
-
+            MenuBar.EditorCreator = this;
             CloseToolCommand = new RelayCommand<IEditorViewModel>(CloseTool);
-
            
-            FileTree = new FileTreeViewModel(packfileService);
-            FileTree.FileOpen += OnFileOpen;
+            FileTree = new PackFileBrowserViewModel(_packfileService);
+            FileTree.FileOpen += OpenFile;
 
             ToolsFactory = toolFactory;
-            //ToolsFactory.RegisterTool<TextEditorViewModel, TextEditorView>(".wsmodel", ".variantmeshdefinition");
-            //ToolsFactory.RegisterToolAsDefault<TextEditorViewModel, TextEditorView>();
+
+
+            
 
             if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
             {
@@ -62,31 +73,54 @@ namespace AssetEditor.ViewModels
                 var gamePath = settingsService.GetGamePathForCurrentGame();
                 if (gamePath != null)
                 {
-                    var loadRes = packfileService.LoadAllCaFiles(gamePath);
+                    var loadRes = _packfileService.LoadAllCaFiles(gamePath);
                     if (!loadRes)
                         MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
                 }
             }
 
 
-            //PackFileBrowserWindow b = new PackFileBrowserWindow(packfileService);
-            //b.ShowDialog();
-            //
+            if (settingsService.CurrentSettings.IsDeveloperRun && false)
+            {
+                //PackFileBrowserWindow b = new PackFileBrowserWindow(packfileService);
+                //b.ShowDialog();
+                //
 
-            //
-            //variantmeshes\variantmeshdefinitions\dwf_hammerers.variantmeshdefinition"
-            var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
-            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_loremaster_of_hoeth\hef_loremaster_of_hoeth_head_01.rigid_model_v2");
-            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc4\hef\hef_war_lion\hef_war_lion_02.rigid_model_v2");
-            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hr1\brt\brt_royal_pegasus\brt_pegasus_01.rigid_model_v2");
-            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_props\hef_ranger_sword_1h_03.rigid_model_v2");
-            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\skvt1\skv\skv_jezzails\skv_clan_rats_legs_fr_01.rigid_model_v2"); 
-            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_eltharion\hef_eltharion_head.rigid_model_v2");
-            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu17\skv\skv_clan_rats\head\skv_clan_rats_head_04.rigid_model_v2");
+                //
+                //variantmeshes\variantmeshdefinitions\dwf_hammerers.variantmeshdefinition"
+                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
+                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_loremaster_of_hoeth\hef_loremaster_of_hoeth_head_01.rigid_model_v2");
+                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc4\hef\hef_war_lion\hef_war_lion_02.rigid_model_v2");
+                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hr1\brt\brt_royal_pegasus\brt_pegasus_01.rigid_model_v2");
+                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_props\hef_ranger_sword_1h_03.rigid_model_v2");
+                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\skvt1\skv\skv_jezzails\skv_clan_rats_legs_fr_01.rigid_model_v2"); 
+                var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_eltharion\hef_eltharion_head.rigid_model_v2");
+                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu17\skv\skv_clan_rats\head\skv_clan_rats_head_04.rigid_model_v2");
 
-            OnFileOpen(packFile);
+                OpenFile(packFile);
+                CreateTestPackFiles(packfileService);
+            }
+        }
 
-            CreateTestPackFiles(packfileService);
+        private bool Database_BeforePackFileContainerRemoved(PackFileContainer container)
+        {
+            var openFiles = CurrentEditorsList
+                .Where(x=> _packfileService.GetPackFileContainer(x.MainFile) == container)
+                .ToList();
+
+            if (openFiles.Any())
+            {
+                if (MessageBox.Show("Closing pack file with open files, are you sure?", "", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                    return false;
+            }
+
+            foreach (var editor in openFiles)
+            {
+                CurrentEditorsList.Remove(editor);
+                editor.Close();
+            }
+
+            return true;
         }
 
         void CreateTestPackFiles(PackFileService packfileService)
@@ -95,12 +129,12 @@ namespace AssetEditor.ViewModels
             var newPackFile = packfileService.CreateNewPackFileContainer("CustomPackFile", PackFileCAType.MOD);
             packfileService.CopyFileFromOtherPackFile(caPack, @"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2", newPackFile);
 
-            var loadedPackFile = packfileService.Load(@"C:\Users\ole_k\Desktop\TestPackfile\SlayerMod.pack");
+            //var loadedPackFile = packfileService.Load(@"C:\Users\ole_k\Desktop\TestPackfile\SlayerMod.pack");
 
-            packfileService.SetEditablePack(loadedPackFile);
+            packfileService.SetEditablePack(newPackFile);
         }
 
-        private void OnFileOpen(IPackFile file)
+        public void OpenFile(IPackFile file)
         {
             if (file == null)
             {
@@ -140,6 +174,12 @@ namespace AssetEditor.ViewModels
             var index = CurrentEditorsList.IndexOf(tool);
             CurrentEditorsList.RemoveAt(index);
             tool.Close();
+        }
+
+        public void CreateEmptyEditor(IEditorViewModel editorView)
+        {
+            CurrentEditorsList.Add(editorView);
+            SelectedEditorIndex = CurrentEditorsList.Count - 1;
         }
     }
 }
