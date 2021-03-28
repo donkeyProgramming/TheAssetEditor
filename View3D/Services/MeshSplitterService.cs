@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,8 +12,8 @@ namespace View3D.Services
         public List<IGeometry> SplitMesh(IGeometry geometry)
         {
             List<IGeometry> output = new List<IGeometry>();
-
-            var subModels = SplitIntoSubModels(geometry.GetIndexBuffer(), geometry);
+            var vertList = geometry.GetVertexList();
+            var subModels = SplitIntoSubModels(geometry.GetIndexBuffer(), vertList);
             foreach (var subModel in subModels)
             {
                 var duplicate = geometry.Clone();
@@ -25,6 +26,9 @@ namespace View3D.Services
 
         public List<int> GrowSelection(IGeometry geometry, List<ushort> initialSelectedIndexes)
         {
+
+            var vertList = geometry.GetVertexList();
+
             List<int> newSelection = new List<int>();
             List<ushort> activeIndexList = new List<ushort>(initialSelectedIndexes);
             var indexBuffer = geometry.GetIndexBuffer();
@@ -39,9 +43,9 @@ namespace View3D.Services
                     var index1 = indexBuffer[i+1];
                     var index2 = indexBuffer[i+2];
 
-                    if (IsFaceInside(indexBuffer, i, activeIndexList, geometry))
+                    if (newSelection.Contains(i) == false)
                     {
-                        if (newSelection.Contains(i) == false)
+                        if (IsFaceInside(indexBuffer, i, activeIndexList, vertList))
                         {
                             newSelection.Add(i);
                             foundSomething = true;
@@ -56,7 +60,7 @@ namespace View3D.Services
             return newSelection;
         }
 
-        bool IsFaceInside(List<ushort> indexBuffer, int faceId, List<ushort> currentSelection, IGeometry geo)
+        bool IsFaceInside(List<ushort> indexBuffer, int faceId, List<ushort> currentSelection, List<Vector3> vertextes)
         {
             var index0 = indexBuffer[faceId + 0];
             var index1 = indexBuffer[faceId + 1];
@@ -66,9 +70,9 @@ namespace View3D.Services
                 return true;
 
             float tolerance = 0.0001f;
-            if (ContainsVertex(currentSelection, index0, geo, tolerance)
-                || ContainsVertex(currentSelection, index1, geo, tolerance)
-                || ContainsVertex(currentSelection, index2, geo, tolerance))
+            if (ContainsVertex(currentSelection, index0, vertextes, tolerance)
+                || ContainsVertex(currentSelection, index1, vertextes, tolerance)
+                || ContainsVertex(currentSelection, index2, vertextes, tolerance))
             {
                 return true;
             }
@@ -76,7 +80,7 @@ namespace View3D.Services
             return false;
         }
 
-        public List<List<ushort>> SplitIntoSubModels(List<ushort> indexList, IGeometry geo)
+        public List<List<ushort>> SplitIntoSubModels(List<ushort> indexList, List<Vector3> vertextes)
         {
             if (indexList.Count == 0)
                 return null;
@@ -89,7 +93,7 @@ namespace View3D.Services
                 bool isContainedInExistingObject = false;
                 foreach (var currentObject in newObjects)
                 {
-                    if (IsFaceInside(indexList, i, currentObject, geo))
+                    if (IsFaceInside(indexList, i, currentObject, vertextes))
                     {
                         isContainedInExistingObject = true;
                         currentObject.Add(indexList[i + 0]);
@@ -137,13 +141,13 @@ namespace View3D.Services
         
         }
 
-        bool ContainsVertex(List<ushort> mesh, ushort possibleVertexIndex, IGeometry geo, float tolerance = 0.0000001f )
+        bool ContainsVertex(List<ushort> mesh, ushort possibleVertexIndex, List<Vector3> vertextes, float tolerance = 0.0000001f )
         {
-            var possibleVertex = geo.GetVertexById(possibleVertexIndex);
-            var uniqeIndexes = mesh.Distinct();
-            foreach (var index in uniqeIndexes)
+            var possibleVertex = vertextes[possibleVertexIndex];
+            //var uniqeIndexes = mesh.Distinct().ToList();
+            foreach (var index in mesh)
             {
-                var vert = geo.GetVertexById(index);
+                var vert = vertextes[index];
                 if ( (Math.Abs(vert.X - possibleVertex.X) < tolerance)  && 
                      (Math.Abs(vert.Y - possibleVertex.Y) < tolerance) &&
                     (Math.Abs(vert.Z - possibleVertex.Z) < tolerance) )

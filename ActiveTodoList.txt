@@ -51,6 +51,7 @@ Feature list:
 			Open material files
 			Directory copy name
 			Bounding box calculations
+			Changing animation for duplicate goes boom. Undo for mapping needed
 				
 		UI:			
 			Fix attachement points buttons

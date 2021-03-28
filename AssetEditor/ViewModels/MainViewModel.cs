@@ -80,7 +80,7 @@ namespace AssetEditor.ViewModels
             }
 
 
-            if (settingsService.CurrentSettings.IsDeveloperRun && false)
+            if (settingsService.CurrentSettings.IsDeveloperRun)
             {
                 //PackFileBrowserWindow b = new PackFileBrowserWindow(packfileService);
                 //b.ShowDialog();

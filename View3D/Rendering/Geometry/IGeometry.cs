@@ -29,6 +29,7 @@ namespace View3D.Rendering.Geometry
         IGeometry Clone(bool includeMesh = true);
 
         void RemoveFaces(List<int> facesToDelete);
+        List<Vector3> GetVertexList();
         void RemoveUnusedVertexes(ushort[] newIndexList);
         void UpdateVertexPosition(int vertexId, Vector3 position);
         void RebuildVertexBuffer();

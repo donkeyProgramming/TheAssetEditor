@@ -148,6 +148,15 @@ namespace View3D.Rendering.Geometry
             return new Vector3(_vertexArray[id].Position.X, _vertexArray[id].Position.Y, _vertexArray[id].Position.Z);
         }
 
+        public override List<Vector3> GetVertexList()
+        {
+            var vertCount = VertexCount();
+            List<Vector3> output = new List<Vector3>(vertCount);
+            for (int i = 0; i < vertCount; i++)
+                output.Add(GetVertexById(i));
+            return output;
+        }
+
         public override void UpdateVertexPosition(int vertexId, Vector3 position)
         {
             _vertexArray[vertexId].Position = new Vector4(position, 1);
