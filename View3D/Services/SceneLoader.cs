@@ -35,6 +35,12 @@ namespace View3D.Services
         public void Load(string path, ISceneNode parent, AnimationPlayer player)
         {
             var file = _packFileService.FindFile(path);
+            if (file == null)
+            {
+                _logger.Here().Error($"File {path} not found");
+                return;
+            }
+
             Load(file as PackFile, parent, player);
         }
 

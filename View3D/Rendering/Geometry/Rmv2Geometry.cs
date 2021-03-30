@@ -204,6 +204,8 @@ namespace View3D.Rendering.Geometry
                 _vertexArray[i].BlendIndices.Y = GetValue((byte)_vertexArray[i].BlendIndices.Y, remapping);
                 _vertexArray[i].BlendIndices.Z = GetValue((byte)_vertexArray[i].BlendIndices.Z, remapping);
                 _vertexArray[i].BlendIndices.W = GetValue((byte)_vertexArray[i].BlendIndices.W, remapping);
+
+                //_vertexArray[i].BlendWeights.X = 1;
             }
 
             RebuildVertexBuffer();

@@ -49,8 +49,11 @@ namespace CommonControls.Common
             if (existingFile == null)
             {
                 var directoryPath = Path.GetDirectoryName(filename);
-                var justFileName = Path.GetFileName(filename); 
-                var newPackFile = new PackFile(justFileName, new MemorySource(packFile.DataSource.ReadData()));
+                var justFileName = Path.GetFileName(filename);
+                var data = updatedData;
+                if (data == null)
+                    data = packFile.DataSource.ReadData();
+                var newPackFile = new PackFile(justFileName, new MemorySource(data));
                 packFileService.AddFileToPack(selectedEditabelPackFile, directoryPath, newPackFile);
                 return newPackFile;
             }

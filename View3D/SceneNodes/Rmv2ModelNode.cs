@@ -108,7 +108,7 @@ namespace View3D.SceneNodes
         {
             return Children
                 .Where(x => x is Rmv2LodNode)
-                .Select(x => x as Rmv2LodNode)
+                .Select(x => x as Rmv2LodNode)  
                 .ToList();
         }
 
@@ -116,7 +116,14 @@ namespace View3D.SceneNodes
 
         public Rmv2MeshNode GetMeshNode(int lod, int modelIndex)
         {
-            return GetLodNodes()[lod].Children[modelIndex] as Rmv2MeshNode;
+            var lods = GetLodNodes();
+            while (lods.Count <= lod)
+            {
+                Children.Add(new Rmv2LodNode("Test", 12));
+                lods = GetLodNodes();
+            }
+
+            return lods[lod].Children[modelIndex] as Rmv2MeshNode;
         }
 
         public override ISceneNode Clone()
@@ -135,3 +142,5 @@ namespace View3D.SceneNodes
 
  
 }
+
+

@@ -82,19 +82,14 @@ namespace AssetEditor.ViewModels
 
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
-                //PackFileBrowserWindow b = new PackFileBrowserWindow(packfileService);
-                //b.ShowDialog();
-                //
-
-                //
                 //variantmeshes\variantmeshdefinitions\dwf_hammerers.variantmeshdefinition"
-                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
+                var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_loremaster_of_hoeth\hef_loremaster_of_hoeth_head_01.rigid_model_v2");
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc4\hef\hef_war_lion\hef_war_lion_02.rigid_model_v2");
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hr1\brt\brt_royal_pegasus\brt_pegasus_01.rigid_model_v2");
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_props\hef_ranger_sword_1h_03.rigid_model_v2");
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\skvt1\skv\skv_jezzails\skv_clan_rats_legs_fr_01.rigid_model_v2"); 
-                var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_eltharion\hef_eltharion_head.rigid_model_v2");
+                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_eltharion\hef_eltharion_head.rigid_model_v2");
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu17\skv\skv_clan_rats\head\skv_clan_rats_head_04.rigid_model_v2");
 
                 OpenFile(packFile);
@@ -127,7 +122,7 @@ namespace AssetEditor.ViewModels
         {
             var caPack = packfileService.Database.PackFiles[0];
             var newPackFile = packfileService.CreateNewPackFileContainer("CustomPackFile", PackFileCAType.MOD);
-            packfileService.CopyFileFromOtherPackFile(caPack, @"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2", newPackFile);
+            //packfileService.CopyFileFromOtherPackFile(caPack, @"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2", newPackFile);
 
             //var loadedPackFile = packfileService.Load(@"C:\Users\ole_k\Desktop\TestPackfile\SlayerMod.pack");
 

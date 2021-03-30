@@ -56,7 +56,7 @@ namespace FileTypes.PackFiles.Models
                 if (Header.Version == "PFH5")
                     isCompressed = reader.ReadByte();   // For warhammer 2, terrain files are compressed
 
-                string packedFileName = IOFunctions.TheadUnsafeReadZeroTerminatedAscii(reader);
+                string packedFileName = IOFunctions.TheadUnsafeReadZeroTerminatedAscii(reader).ToLower();
 
                 var packFileName = Path.GetFileName(packedFileName);
                 var fileContent = new PackFile(packFileName, new PackedFileSource(packedFileSourceParent, offset, size));
