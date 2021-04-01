@@ -67,6 +67,8 @@ namespace View3D.Rendering.Geometry
         {
             return _indexList[i];
         }
+
+
         public int GetIndexCount()
         {
             return _indexList.Length;
@@ -75,6 +77,12 @@ namespace View3D.Rendering.Geometry
         public List<ushort> GetIndexBuffer()
         {
             return _indexList.ToList();
+        }
+
+        public void SetIndexBuffer(List<ushort> buffer)
+        {
+            _indexList = buffer.ToArray();
+            RebuildIndexBuffer();
         }
 
         protected void BuildBoundingBox()
@@ -178,7 +186,7 @@ namespace View3D.Rendering.Geometry
 
         public abstract Vector3 GetVertexById(int id);
         public abstract List<Vector3> GetVertexList();
-        public abstract void UpdateVertexPosition(int vertexId, Vector3 position);
+        public abstract void TransformVertex(int vertexId, Matrix transform);
 
         public abstract List<byte> GetUniqeBlendIndices();
         public abstract void UpdateAnimationIndecies(List<IndexRemapping> remapping);

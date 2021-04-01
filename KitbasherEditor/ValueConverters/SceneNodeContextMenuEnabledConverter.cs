@@ -41,8 +41,8 @@ namespace KitbasherEditor.ValueConverters
                 {
                     if (node is Rmv2ModelNode)
                         return true;
-                    if (node is Rmv2LodNode)
-                        return true;
+                   // if (node is Rmv2LodNode)
+                   //     return true;
                     if (node is Rmv2MeshNode)
                         return true;
 

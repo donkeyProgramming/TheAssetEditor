@@ -8,6 +8,26 @@ using System.Windows.Controls;
 
 namespace CommonControls.Behaviors
 {
+
+    public static class Ex
+    {
+        public static TreeViewItem ContainerFromItemRecursive(this ItemContainerGenerator root, object item)
+        {
+            var treeViewItem = root.ContainerFromItem(item) as TreeViewItem;
+            if (treeViewItem != null)
+                return treeViewItem;
+            foreach (var subItem in root.Items)
+            {
+                treeViewItem = root.ContainerFromItem(subItem) as TreeViewItem;
+                var search = treeViewItem?.ItemContainerGenerator.ContainerFromItemRecursive(item);
+                if (search != null)
+                    return search;
+            }
+            return null;
+        }
+
+    }
+
     public class BindableSelectedItemBehavior : Behavior<TreeView>
     {
         public object SelectedItem
@@ -21,12 +41,38 @@ namespace CommonControls.Behaviors
 
         private static void OnSelectedItemChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
+          
             var item = e.NewValue as TreeViewItem;
+
+
             if (item != null)
             {
                 item.SetValue(TreeViewItem.IsSelectedProperty, true);
             }
+            else
+            {
+                var cast = sender as BindableSelectedItemBehavior;
+
+                TreeViewItem treeItem = cast.AssociatedObject
+                           .ItemContainerGenerator
+                           .ContainerFromItemRecursive(e.NewValue);
+                if (treeItem != null)
+                    treeItem.SetValue(TreeViewItem.IsSelectedProperty, true);
+                else
+                {
+                    TreeViewItem oldTreeItem = cast.AssociatedObject
+                        .ItemContainerGenerator
+                        .ContainerFromItemRecursive(e.OldValue);
+                    if (oldTreeItem != null)
+                        oldTreeItem.SetValue(TreeViewItem.IsSelectedProperty, false);
+                }
+            }
         }
+
+        
+
+
+
 
         protected override void OnAttached()
         {

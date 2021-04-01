@@ -17,8 +17,8 @@ namespace View3D.Commands.Vertex
         List<IGeometry> _geometryList;
         Vector3 _pivotPoint;
         List<int> _affectVertexes;
-        bool _applyToNormals;
         public Matrix Transform { get; set; }
+        public bool InvertWindingOrder { get; set; } = false;
 
         SelectionManager _selectionManager;
         ISelectionState _oldSelectionState;
@@ -27,7 +27,6 @@ namespace View3D.Commands.Vertex
         {
             _geometryList = geometryList;
             _pivotPoint = pivotPoint;
-            _applyToNormals = applyToNormals;
             _affectVertexes = affectVertexes;
         }
 
@@ -56,27 +55,32 @@ namespace View3D.Commands.Vertex
                 if (_affectVertexes != null)
                 {
                     for (int v = 0; v < _affectVertexes.Count; v++)
-                        TransformVertex(geo, _affectVertexes[v], _pivotPoint, inv);
+                        geo.TransformVertex(v, inv);
                 }
                 else
                 {
                     for (int v = 0; v < geo.VertexCount(); v++)
-                        TransformVertex(geo, v, _pivotPoint, inv);
+                        geo.TransformVertex(v, inv);
+
+                    if (InvertWindingOrder)
+                    {
+                        var indexes = geo.GetIndexBuffer();
+                        for (int index = 0; index < indexes.Count; index += 3)
+                        {
+                            var temp = indexes[index + 2];
+                            indexes[index + 2] = indexes[index + 0];
+                            indexes[index + 0] = temp;
+                        }
+                        geo.SetIndexBuffer(indexes);
+                    }
                 }
 
                 geo.RebuildVertexBuffer();
             }
 
+
             _selectionManager.SetState(_oldSelectionState);
         }
 
-        void TransformVertex(IGeometry geo, int vertedId, Vector3 transformOffset, Matrix undoTransform)
-        {
-            var vert = geo.GetVertexById(vertedId);
-            vert -= transformOffset;
-            vert = Vector3.Transform(vert, undoTransform);    // Rotate normal, bi normals and all that shit
-            vert += transformOffset;
-            geo.UpdateVertexPosition(vertedId, vert);
-        }
     }
 }

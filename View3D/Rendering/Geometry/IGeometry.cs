@@ -22,6 +22,7 @@ namespace View3D.Rendering.Geometry
         public int GetIndex(int i);
         public int GetIndexCount();
         public List<ushort> GetIndexBuffer();
+        public void SetIndexBuffer(List<ushort> buffer);
 
         BoundingBox BoundingBox { get; }
         Vector3 MeshCenter { get; }
@@ -31,7 +32,7 @@ namespace View3D.Rendering.Geometry
         void RemoveFaces(List<int> facesToDelete);
         List<Vector3> GetVertexList();
         void RemoveUnusedVertexes(ushort[] newIndexList);
-        void UpdateVertexPosition(int vertexId, Vector3 position);
+        void TransformVertex(int vertexId, Matrix transform);
         void RebuildVertexBuffer();
 
         List<byte> GetUniqeBlendIndices();

@@ -131,7 +131,7 @@ namespace FileTypesTests.RigidModel
 
             // Edit the first vertex
             var geometry = node.GetMeshNode(0, 0).Geometry;// as Rmv2Geometry;
-            geometry.UpdateVertexPosition(0, new Vector3(10, 10, 10));
+            geometry.TransformVertex(0, Matrix.CreateTranslation(new Vector3(10, 10, 10)));
 
             // Save
             var bytes = node.Save(true);

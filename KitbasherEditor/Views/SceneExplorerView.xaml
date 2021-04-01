@@ -25,7 +25,7 @@
 
             <HierarchicalDataTemplate x:Key="DefaultTreeNodeStyle" ItemsSource="{Binding Children, UpdateSourceTrigger=PropertyChanged}">
                 <StackPanel Orientation="Horizontal">
-                    <simple:OptionalRadioButton Focusable="False"  VerticalAlignment="Center"
+                    <simple:OptionalRadioButton Focusable="true"  VerticalAlignment="Center"
                         Style="{StaticResource OptionalRadioButtonStyle}"                     
                         IsChecked="{Binding IsVisible, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         GroupName="{Binding Path=. , Converter={StaticResource RadioButtonGroupConverter}}"/>
@@ -36,7 +36,7 @@
 
             <HierarchicalDataTemplate x:Key="ReferenceTreeNodeStyle" ItemsSource="{Binding Children, UpdateSourceTrigger=PropertyChanged}">
                 <StackPanel Orientation="Horizontal" >
-                    <simple:OptionalRadioButton Focusable="False"  VerticalAlignment="Center"
+                    <simple:OptionalRadioButton Focusable="true"  VerticalAlignment="Center"
                         Style="{StaticResource OptionalRadioButtonStyle}"                     
                         IsChecked="{Binding IsVisible, UpdateSourceTrigger=PropertyChanged , Mode=TwoWay}"
                         GroupName="{Binding Path=. , Converter={StaticResource RadioButtonGroupConverter}}"/>
@@ -77,7 +77,16 @@
                                IsEnabled="{Binding Path=., 
                                Converter={StaticResource ContextMenuEnabledConverter}, 
                                ConverterParameter={x:Static valueconverters:NodeConvertionMode.DeleteNode}}"/>
+
+                    <MenuItem Header="Ungroup - todo"/>
                 </ContextMenu>
+
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                      Color="LightBlue" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
+                      Color="LightBlue" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}"
+                      Color="Black" />
             </TreeView.Resources>
 
             <TreeView.ItemContainerStyle>

@@ -30,6 +30,7 @@ namespace View3D.Components.Gizmo
         List<int> _selectedVertexes;
 
         Matrix _totalGizomTransform = Matrix.Identity;
+        bool _invertedWindingOrder = false;
 
 
         public TransformGizmoWrapper(List<IGeometry> effectedObjects)
@@ -63,7 +64,9 @@ namespace View3D.Components.Gizmo
         {
             if (_activeCommand != null)
             {
-                _activeCommand.Transform = _totalGizomTransform;
+                var m = Matrix.CreateTranslation(-Position) * _totalGizomTransform * Matrix.CreateTranslation(Position);
+                _activeCommand.InvertWindingOrder = _invertedWindingOrder;
+                _activeCommand.Transform = m;
                 commandManager.ExecuteCommand(_activeCommand);
                 _activeCommand = null;
             }
@@ -78,18 +81,46 @@ namespace View3D.Components.Gizmo
 
         public void GizmoRotateEvent(Matrix rotation, PivotType pivot)
         {
-            ApplyTransform(rotation, pivot);// Rotate normal, bi normals and all that shit
-            //Orientation += Quaternion.CreateFromRotationMatrix((Matrix)e.Value);  -> This enables the roation gizmo to update
+            ApplyTransform(rotation, pivot);
             _totalGizomTransform *= rotation;
         }
 
         public void GizmoScaleEvent(Vector3 scale, PivotType pivot)
         {
+            var realScale = scale + Vector3.One;
             var scaleMatrix = Matrix.CreateScale(scale + Vector3.One);
             ApplyTransform(scaleMatrix, pivot);
-
+            
             Scale += scale;
+
             _totalGizomTransform *= scaleMatrix;
+
+            var negativeAxis = CountNegativeAxis(realScale);
+            if (negativeAxis % 2 != 0)
+            {
+                _invertedWindingOrder = !_invertedWindingOrder;
+
+                foreach (var geo in _effectedObjects)
+                {
+                    var indexes = geo.GetIndexBuffer();
+                    for (int i = 0; i < indexes.Count; i += 3)
+                    {
+                        var temp = indexes[i + 2];
+                        indexes[i + 2] = indexes[i + 0];
+                        indexes[i + 0] = temp;
+                    }
+                    geo.SetIndexBuffer(indexes);
+                }
+            }
+        }
+
+        int CountNegativeAxis(Vector3 vector)
+        {
+            var result = 0;
+            if (vector.X < 0) result++;
+            if (vector.Y < 0) result++;
+            if (vector.Z < 0) result++;
+            return result;
         }
 
         void ApplyTransform(Matrix transform, PivotType pivotType)
@@ -117,11 +148,8 @@ namespace View3D.Components.Gizmo
 
         void TransformVertex(Matrix transform, IGeometry geo, Vector3 objCenter, int index)
         {
-            var vert = geo.GetVertexById(index);
-            vert = vert - objCenter;
-            vert = Vector3.Transform(vert, transform); // Rotate normal, bi normals and all that shit
-            vert = vert + objCenter;
-            geo.UpdateVertexPosition(index, vert);
+            var m = Matrix.CreateTranslation(-objCenter) * transform * Matrix.CreateTranslation(objCenter);
+            geo.TransformVertex(index, m);
         }
 
         public Vector3 GetObjectCenter()

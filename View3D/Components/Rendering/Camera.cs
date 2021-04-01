@@ -245,8 +245,8 @@ namespace View3D.Components.Rendering
                 }
                 else if (deltaMouseWheel != 0)
                 {
-                    if (Math.Abs(deltaMouseWheel) > 1000)   // Weird bug, sometimes this value is very large, probably related to state clearing. Temp fix
-                        return;
+                    if (Math.Abs(deltaMouseWheel) > 250)   // Weird bug, sometimes this value is very large, probably related to state clearing. Temp fix
+                        deltaMouseWheel = 250 * Math.Sign(deltaMouseWheel);
 
                     var oldZoom = (Zoom / 10);
                     Zoom += ( deltaMouseWheel * 0.005f)  * oldZoom;

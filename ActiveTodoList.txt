@@ -75,6 +75,7 @@ Feature list:
 		
 	Text editor:
 
+Axis size
 	
 Known bugs:
 	[DONE]Select face, then swap to vertex mode, need to call update before draw error
@@ -92,4 +93,31 @@ Known bugs:
 	Selection manager can not select over gizmo when multiselecting
 	Gizmo behaves strangly when camera look directly forward towards model
 	Selecting not use texture, then deslecting and selecing again gives wrong checkbox value	
-	Saving 2x does not work for text files
+	[DONE]Saving 2x does not work for text files
+	
+* Normalize vectors on save	
+* Packfile save issue
+[DONE]Handle Normals correctly when transforming
+* Change animation vertex type 
+[DONE]Meshes not becomming editable bug
+* Improve grouping features
+* Quality of life changes for skeleton remapping tool
+	- Undo
+	- Save thingy actually working
+	- Duplicate mesh teaking stuff from, so skeleton names does not change for duplicated meshes
+* Load large models bug
+* Lod generation bug causing rigging to fail
+* Texture paths
+[DONE]Camera full zome issue
+[DONE] Treeview scroll to top
+[DONE]TreeView reflecting scene selection
+* TreeView multiselect
+* Disable hotkeys when 3d view not active
+* Disable everything in the UI that is not actually implemented
+* Fix attachment points on export
+	
+	
+	Copy rmv2 mesh on copy do duplicate does not remap 2 items on skelremapping
+	undo for skeleton remapping
+	Selection bug
+	rotate light/side light

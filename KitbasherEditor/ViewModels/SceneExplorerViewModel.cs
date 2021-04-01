@@ -125,6 +125,7 @@ namespace KitbasherEditor.ViewModels
             {
                 node.Parent.RemoveObject(node);
                 EditableMeshNode.GetLodNodes()[0].AddObject(node);
+                meshNode.IsSelectable = true;
                 node.IsEditable = true;
                 return;
             }
@@ -158,7 +159,12 @@ namespace KitbasherEditor.ViewModels
                 }
             }
             node.Parent.RemoveObject(node);
-            node.ForeachNode(x => x.IsEditable = true);
+            node.ForeachNode(x => 
+            { 
+                x.IsEditable = true; 
+                if(x is Rmv2MeshNode mesh)
+                    mesh.IsSelectable = true; 
+            }) ;
         }
 
         void DeleteNode(SceneNode node)
