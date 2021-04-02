@@ -83,7 +83,9 @@ namespace View3D.SceneNodes
         }
 
         public IGeometry Geometry { get; set; }
-        public bool IsSelectable { get; set; } = true;
+
+        bool _isSelectable = true;
+        public bool IsSelectable { get => _isSelectable; set => SetAndNotifyWhenChanged(ref _isSelectable, value); }
 
         public void Update(GameTime time)
         {

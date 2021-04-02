@@ -11,7 +11,7 @@ namespace CommonControls.PackFileBrowser
         public override void Create(TreeNode node)
         {
             _selectedNode = node;
-            Items = new ObservableCollection<PackTreeContextMenuItem>();
+            Items = new ObservableCollection<ContextMenuItem>();
             if (node == null)
                 return;
 

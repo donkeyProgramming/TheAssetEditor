@@ -30,7 +30,7 @@ namespace View3D.Components.Component
 
         public SceneManager(WpfGame game) : base(game) 
         {
-            RootNode = new GroupNode("Root") { SceneManager = this };
+            RootNode = new GroupNode("Root") { SceneManager = this, IsEditable = true, IsLockable = false };
         }
 
         public override void Initialize()
@@ -96,8 +96,12 @@ namespace View3D.Components.Component
                         output_selectedNodes.Add(selectableNode);
                 }
 
-                foreach (var child in root.Children)
-                    SelectObjectsHirarchy(child, frustrum, output_selectedNodes);
+                bool isUnselectableGroup = root is GroupNode groupNode && groupNode.IsLockable == true && groupNode.IsSelectable == false;
+                if (!isUnselectableGroup)
+                {
+                    foreach (var child in root.Children)
+                        SelectObjectsHirarchy(child, frustrum, output_selectedNodes);
+                }
             }
         }
 
@@ -116,10 +120,15 @@ namespace View3D.Components.Component
                             output_selectedNode = selectableNode;
                         }
                     }
+                
                 }
 
-                foreach (var child in root.Children)
-                    SelectObjectsHirarchy(child, ray, ref output_selectedNode, ref bestDistance);
+                bool isUnselectableGroup = root is GroupNode groupNode && groupNode.IsLockable == true && groupNode.IsSelectable == false;
+                if (!isUnselectableGroup)
+                {
+                    foreach (var child in root.Children)
+                        SelectObjectsHirarchy(child, ray, ref output_selectedNode, ref bestDistance);
+                }
             }
         }
 

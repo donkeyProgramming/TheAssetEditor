@@ -35,7 +35,7 @@ namespace View3D.Commands.Object
         protected override void ExecuteCommand()
         {
             _oldState = _selectionManager.GetStateCopy();
-            var groupNode = _parent.AddObject(new GroupNode("New Group") { IsUngroupable = true, IsSelectable = true});
+            var groupNode = _parent.AddObject(new GroupNode("New Group") { IsUngroupable = true, IsSelectable = true, IsLockable = true });
 
             foreach (var item in _itemsToGroup)
             {
@@ -101,6 +101,9 @@ namespace View3D.Commands.Object
                     _parent.AddObject(item);
                 }
 
+                if (_oldGroupNode.Children.Count == 0)
+                    _oldGroupNode.Parent.RemoveObject(_oldGroupNode);
+
                 var currentState = _selectionManager.GetState() as ObjectSelectionState;
                 currentState.Clear();
                 
@@ -115,6 +118,10 @@ namespace View3D.Commands.Object
                     item.Parent.RemoveObject(item);
                     _oldGroupNode.AddObject(item);
                 }
+
+                if (_oldGroupNode.Parent.Children.Contains(_oldGroupNode) == false)
+                    _oldGroupNode.Parent.AddObject(_oldGroupNode);
+
 
                 _selectionManager.SetState(_oldState);
             }

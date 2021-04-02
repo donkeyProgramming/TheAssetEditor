@@ -37,11 +37,10 @@ namespace KitbasherEditor.ViewModels
         CommandExecutor _commandExecutor;
         SelectionManager _selectionManager;
 
-        public ICommand MakeNodeEditableCommand { get; set; }
-        public ICommand DeleteNodeCommand { get; set; }
+        public SceneExplorerContextMenuHandler ContextMenu { get; set; }
 
-
-        public Rmv2ModelNode EditableMeshNode { get; set; }
+        Rmv2ModelNode _editableMeshNode;
+        public Rmv2ModelNode EditableMeshNode { get => _editableMeshNode; set { _editableMeshNode = value; ContextMenu.EditableMeshNode = value; } }
 
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         PackFileService _packFileService;
@@ -64,9 +63,7 @@ namespace KitbasherEditor.ViewModels
             _sceneManager.SceneObjectAdded += (a, b) => RebuildTree();
             _sceneManager.SceneObjectRemoved += (a, b) => RebuildTree();
 
-          
-            MakeNodeEditableCommand = new RelayCommand<SceneNode>(MakeNodeEditable);
-            DeleteNodeCommand = new RelayCommand<SceneNode>(DeleteNode);
+            ContextMenu = new SceneExplorerContextMenuHandler(_commandExecutor);
         }
 
         private void SelectionChanged(ISelectionState state)
@@ -117,60 +114,8 @@ namespace KitbasherEditor.ViewModels
                 if (!selectionEqual)
                     _selectionManager.SetState(objectState);
             }
-        }
 
-        void MakeNodeEditable(SceneNode node)
-        {
-            if (node is Rmv2MeshNode meshNode)
-            {
-                node.Parent.RemoveObject(node);
-                EditableMeshNode.GetLodNodes()[0].AddObject(node);
-                meshNode.IsSelectable = true;
-                node.IsEditable = true;
-                return;
-            }
-
-            if (node is Rmv2LodNode lodNode)
-            {
-                var index = lodNode.LodValue;
-                foreach (var lodModel in lodNode.Children)
-                {
-                    (lodModel as Rmv2MeshNode).IsSelectable = true;
-                    EditableMeshNode.GetLodNodes()[0].AddObject(lodModel);
-                }
-            }
-
-            if (node is Rmv2ModelNode modelNode)
-            {
-                foreach (var lodChild in modelNode.Children)
-                {
-                    if (lodChild  is Rmv2LodNode lodNode0)
-                    {
-                        var index = lodNode0.LodValue;
-                        foreach (var lodModel in lodNode0.Children)
-                        {
-                            if (index > 3)
-                                continue;
-                            (lodModel as Rmv2MeshNode).IsSelectable = true;
-                            EditableMeshNode.GetLodNodes()[0].AddObject(lodModel);
-                        }
-                        break;
-                    }
-                }
-            }
-            node.Parent.RemoveObject(node);
-            node.ForeachNode(x => 
-            { 
-                x.IsEditable = true; 
-                if(x is Rmv2MeshNode mesh)
-                    mesh.IsSelectable = true; 
-            }) ;
-        }
-
-        void DeleteNode(SceneNode node)
-        {
-            var deleteCommand = new DeleteObjectsCommand(node);
-            _commandExecutor.ExecuteCommand(deleteCommand);
+            ContextMenu.Create(selectedNode);
         }
 
         private void RebuildTree()

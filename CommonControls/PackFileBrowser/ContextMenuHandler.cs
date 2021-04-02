@@ -18,8 +18,8 @@ namespace CommonControls.PackFileBrowser
 {
     public abstract class ContextMenuHandler : NotifyPropertyChangedImpl
     {
-        ObservableCollection<PackTreeContextMenuItem> _contextMenu;
-        public ObservableCollection<PackTreeContextMenuItem> Items { get => _contextMenu; set => SetAndNotify(ref _contextMenu, value); }
+        ObservableCollection<ContextMenuItem> _contextMenu;
+        public ObservableCollection<ContextMenuItem> Items { get => _contextMenu; set => SetAndNotify(ref _contextMenu, value); }
 
         public ICommand RenameNodeCommand { get; set; }
         public ICommand AddFilesFromDirectory { get; set; }
@@ -145,8 +145,6 @@ namespace CommonControls.PackFileBrowser
             }
 
             _selectedNode.Children.Add(new TreeNode("TestF", NodeType.Directory, _selectedNode.FileOwner, _selectedNode));
-
-
         }
 
         void DeleteNode()
@@ -257,65 +255,65 @@ namespace CommonControls.PackFileBrowser
         public abstract void Create(TreeNode node);
        
 
-        protected PackTreeContextMenuItem Additem(ContextItems type, PackTreeContextMenuItem parent)
+        protected ContextMenuItem Additem(ContextItems type, ContextMenuItem parent)
         {
             var item = GetItem(type);
             parent.ContextMenu.Add(item);
             return item;
         }
 
-        protected PackTreeContextMenuItem Additem(ContextItems type, ObservableCollection<PackTreeContextMenuItem> parent)
+        protected ContextMenuItem Additem(ContextItems type, ObservableCollection<ContextMenuItem> parent)
         {
             var item = GetItem(type);
             parent.Add(item);
             return item;
         }
 
-        protected void AddSeperator(ObservableCollection<PackTreeContextMenuItem> parent)
+        protected void AddSeperator(ObservableCollection<ContextMenuItem> parent)
         {
             parent.Add(null);
         }
 
-        PackTreeContextMenuItem GetItem(ContextItems type)
+        ContextMenuItem GetItem(ContextItems type)
         {
             switch (type)
             {
                 case ContextItems.Add:
-                    return new PackTreeContextMenuItem() { Name = "Add"};
+                    return new ContextMenuItem() { Name = "Add"};
                 case ContextItems.AddFiles:
-                    return new PackTreeContextMenuItem() { Name = "Add file", Command = AddFilesCommand }; ;
+                    return new ContextMenuItem() { Name = "Add file", Command = AddFilesCommand }; ;
                 case ContextItems.AddDirectory:
-                    return new PackTreeContextMenuItem() { Name = "Add directory", Command = AddFilesFromDirectory };
+                    return new ContextMenuItem() { Name = "Add directory", Command = AddFilesFromDirectory };
                 case ContextItems.CopyToEditablePack:
-                    return new PackTreeContextMenuItem() { Name = "Copy to Editable pack", Command = CopyToEditablePackCommand }; ;
+                    return new ContextMenuItem() { Name = "Copy to Editable pack", Command = CopyToEditablePackCommand }; ;
                 case ContextItems.Duplicate:
-                    return new PackTreeContextMenuItem() { Name = "Duplicate", Command = DuplicateCommand }; ;
+                    return new ContextMenuItem() { Name = "Duplicate", Command = DuplicateCommand }; ;
                 case ContextItems.CreateFolder:
-                    return new PackTreeContextMenuItem() { Name = "Create Folder", Command = CreateFolderCommand }; ;
+                    return new ContextMenuItem() { Name = "Create Folder", Command = CreateFolderCommand }; ;
                 case ContextItems.Expand:
-                    return new PackTreeContextMenuItem() { Name = "Expand", Command = ExpandAllChildrenCommand }; ;
+                    return new ContextMenuItem() { Name = "Expand", Command = ExpandAllChildrenCommand }; ;
                 case ContextItems.CopyFullPath:
-                    return new PackTreeContextMenuItem() { Name = "Copy full path", Command = CopyNodePathCommand };
+                    return new ContextMenuItem() { Name = "Copy full path", Command = CopyNodePathCommand };
                 case ContextItems.Rename:
-                    return new PackTreeContextMenuItem() { Name = "Rename", Command = RenameNodeCommand }; ;
+                    return new ContextMenuItem() { Name = "Rename", Command = RenameNodeCommand }; ;
                 case ContextItems.SetAsEditabelPack:
-                    return new PackTreeContextMenuItem() { Name = "Set as Editable pack", Command = SetAsEditabelPackCommand }; 
+                    return new ContextMenuItem() { Name = "Set as Editable pack", Command = SetAsEditabelPackCommand }; 
                 case ContextItems.Delete:
-                    return new PackTreeContextMenuItem() { Name = "Delete", Command = DeleteCommand }; ;
+                    return new ContextMenuItem() { Name = "Delete", Command = DeleteCommand }; ;
                 case ContextItems.Close:
-                    return new PackTreeContextMenuItem() { Name = "Close", Command = CloseNodeCommand }; ;
+                    return new ContextMenuItem() { Name = "Close", Command = CloseNodeCommand }; ;
                 case ContextItems.Save:
-                    return new PackTreeContextMenuItem() { Name = "Save", Command= SavePackFileCommand }; ;
+                    return new ContextMenuItem() { Name = "Save", Command= SavePackFileCommand }; ;
                 case ContextItems.SaveAs:
-                    return new PackTreeContextMenuItem() { Name = "Save as", Command = SavePackFileAsCommand }; ;
+                    return new ContextMenuItem() { Name = "Save as", Command = SavePackFileAsCommand }; ;
                 case ContextItems.Open:
-                    return new PackTreeContextMenuItem() { Name = "Open", }; ;
+                    return new ContextMenuItem() { Name = "Open", }; ;
                 case ContextItems.OpenWithTextEditor:
-                    return new PackTreeContextMenuItem() { Name = "Text editor", Command = OpenToolCommand_Text }; ;
+                    return new ContextMenuItem() { Name = "Text editor", Command = OpenToolCommand_Text }; ;
                 case ContextItems.OpenWithKitbasher:
-                    return new PackTreeContextMenuItem() { Name = "Kitbasher", Command = OpenToolCommand_Kitbash }; ;
+                    return new ContextMenuItem() { Name = "Kitbasher", Command = OpenToolCommand_Kitbash }; ;
                 case ContextItems.OpenWithPreview:
-                    return new PackTreeContextMenuItem() { Name = "Preview tool", Command = OpenToolCommand_Preview }; ;
+                    return new ContextMenuItem() { Name = "Preview tool", Command = OpenToolCommand_Preview }; ;
             }
 
             throw new Exception("Unknown ContextItems type ");
@@ -347,10 +345,16 @@ namespace CommonControls.PackFileBrowser
         }
     }
 
-    public class PackTreeContextMenuItem
+    public class ContextMenuItem
     {
         public string Name { get; set; }
         public ICommand Command { get; set; }
-        public ObservableCollection<PackTreeContextMenuItem> ContextMenu { get; set; } = new ObservableCollection<PackTreeContextMenuItem>();
+        public ObservableCollection<ContextMenuItem> ContextMenu { get; set; } = new ObservableCollection<ContextMenuItem>();
+
+        public ContextMenuItem(string name = "", ICommand command = null)
+        {
+            Name = name;
+            Command = command;
+        }
     }
 }

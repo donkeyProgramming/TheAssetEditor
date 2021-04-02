@@ -31,9 +31,9 @@ namespace KitbasherEditor.Services
             _animationView = animationView;
             _sceneManager = sceneManager;
 
-            _sceneManager.RootNode.AddObject(new SkeletonNode(resourceLibary.Content, animationView));
+            _sceneManager.RootNode.AddObject(new SkeletonNode(resourceLibary.Content, animationView) { IsLockable = false });
             EditableMeshNode = (Rmv2ModelNode)_sceneManager.RootNode.AddObject(new Rmv2ModelNode("Editable Model"));
-            ReferenceMeshRoot = sceneManager.RootNode.AddObject(new GroupNode("Reference meshs") { IsEditable = false });
+            ReferenceMeshRoot = sceneManager.RootNode.AddObject(new GroupNode("Reference meshs") { IsEditable = false, IsLockable=false });
         }
 
         public void LoadEditableModel(PackFile file)

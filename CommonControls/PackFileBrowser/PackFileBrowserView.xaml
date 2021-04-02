@@ -38,15 +38,13 @@
             
             <TreeView.Resources>
 
-
                 <ContextMenu x:Key="NodeContextMenu" ItemsSource="{Binding DataContext.ContextMenu.Items, UpdateSourceTrigger=PropertyChanged,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" DisplayMemberPath="Name">
-
                     <ContextMenu.Resources>
                         <ControlTemplate x:Key="MenuSeparatorTemplate">
                             <Separator />
                         </ControlTemplate>
                     </ContextMenu.Resources>
-                    
+
                     <ContextMenu.ItemContainerStyle>
                         <Style TargetType="MenuItem">
                             <Setter Property="Command" Value="{Binding Command}"/>
@@ -58,7 +56,6 @@
                             </Style.Triggers>
                         </Style>
                     </ContextMenu.ItemContainerStyle>
-
                 </ContextMenu>
 
             </TreeView.Resources>

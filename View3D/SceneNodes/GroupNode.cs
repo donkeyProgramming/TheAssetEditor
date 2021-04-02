@@ -18,12 +18,15 @@ namespace View3D.SceneNodes
                 IsEditable = IsEditable,
                 IsVisible = IsVisible,
                 IsUngroupable = IsUngroupable,
+                IsLockable = IsLockable,
                 Name = Name + " - Clone",
             };
             return newItem;
         }
 
         public bool IsUngroupable { get; set; } = false;
-        public bool IsSelectable { get; set; } = false;
+        bool _isSelectable = false;
+        public bool IsSelectable { get => _isSelectable; set => SetAndNotifyWhenChanged(ref _isSelectable, value); }
+        public bool IsLockable { get; set; } = false;
     }
 }

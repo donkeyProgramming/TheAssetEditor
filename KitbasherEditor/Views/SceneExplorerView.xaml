@@ -21,6 +21,7 @@
             <valueconverters:SceneNodeToImageConverter x:Key="ImageValueConverter"/>
             <valueconverters:SceneNodeToRadioButtonGroupingConverter x:Key="RadioButtonGroupConverter"/>
             <valueconverters:SceneNodeContextMenuEnabledConverter x:Key="ContextMenuEnabledConverter"/>
+            <valueconverters:SceneNodeToLockStateConverter x:Key="LockStateConverter"/>
             <local:TreeItemDataTemplateSelector x:Key="TreeItemDataTemplateSelector"/>
 
             <HierarchicalDataTemplate x:Key="DefaultTreeNodeStyle" ItemsSource="{Binding Children, UpdateSourceTrigger=PropertyChanged}">
@@ -29,6 +30,20 @@
                         Style="{StaticResource OptionalRadioButtonStyle}"                     
                         IsChecked="{Binding IsVisible, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         GroupName="{Binding Path=. , Converter={StaticResource RadioButtonGroupConverter}}"/>
+
+
+                    <Image Width="18" Margin="2,0" Source="{Binding Source={x:Static resources:ResourceController.LockIcon}}" >
+                        <Image.Visibility>
+                            <MultiBinding Converter="{StaticResource LockStateConverter}">
+                                <Binding UpdateSourceTrigger="PropertyChanged" Path="DataContext" RelativeSource="{RelativeSource Mode=Self}"/>
+                                <Binding UpdateSourceTrigger="PropertyChanged" Path="DataContext.IsSelectable" RelativeSource="{RelativeSource Mode=Self}"/>
+                            </MultiBinding>
+                        </Image.Visibility>
+                        
+                        
+                    </Image>
+
+
                     <Image Width="18" Margin="2,0"  Grid.Column="0" Source="{Binding Path=. , Converter={StaticResource ImageValueConverter}}"/>
                     <TextBlock Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" Margin="2,0"/>
                 </StackPanel>
@@ -59,26 +74,26 @@
             <b:Interaction.Behaviors>
                 <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedNode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
             </b:Interaction.Behaviors>
-            
+
             <TreeView.Resources>
-                <ContextMenu x:Key="NodeContextMenu">
-                    <MenuItem Header="Make editable"
-                               Command="{Binding DataContext.MakeNodeEditableCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
-                               CommandParameter="{Binding}"
-                              
-                               IsEnabled="{Binding Path=., 
-                               Converter={StaticResource ContextMenuEnabledConverter}, 
-                               ConverterParameter={x:Static valueconverters:NodeConvertionMode.MakeEditable}}"/>
+                <ContextMenu x:Key="NodeContextMenu" ItemsSource="{Binding DataContext.ContextMenu.Items, UpdateSourceTrigger=PropertyChanged,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" DisplayMemberPath="Name">
+                    <ContextMenu.Resources>
+                        <ControlTemplate x:Key="MenuSeparatorTemplate">
+                            <Separator />
+                        </ControlTemplate>
+                    </ContextMenu.Resources>
 
-                    <MenuItem Header="Remove"
-                               Command="{Binding DataContext.DeleteNodeCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" 
-                               CommandParameter="{Binding}"
-                              
-                               IsEnabled="{Binding Path=., 
-                               Converter={StaticResource ContextMenuEnabledConverter}, 
-                               ConverterParameter={x:Static valueconverters:NodeConvertionMode.DeleteNode}}"/>
-
-                    <MenuItem Header="Ungroup - todo"/>
+                    <ContextMenu.ItemContainerStyle>
+                        <Style TargetType="MenuItem">
+                            <Setter Property="Command" Value="{Binding Command}"/>
+                            <Setter Property="ItemsSource" Value="{Binding ContextMenu}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding }" Value="{x:Null}">
+                                    <Setter Property="Template" Value="{StaticResource MenuSeparatorTemplate}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContextMenu.ItemContainerStyle>
                 </ContextMenu>
 
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"

@@ -77,8 +77,13 @@ namespace View3D.Rendering.Geometry
             if (_vertedFormat == VertexFormat.Default)
             {
                 mesh.VertexList = new DefaultVertex[VertexCount()];
+
                 for (int i = 0; i < mesh.VertexList.Length; i++)
                 {
+                    _vertexArray[i].Normal = Vector3.Normalize(_vertexArray[i].Normal);
+                    _vertexArray[i].BiNormal = Vector3.Normalize(_vertexArray[i].BiNormal);
+                    _vertexArray[i].Tangent = Vector3.Normalize(_vertexArray[i].Tangent);
+
                     mesh.VertexList[i] = new DefaultVertex(
                         new RmvVector4(_vertexArray[i].Position.X, _vertexArray[i].Position.Y, _vertexArray[i].Position.Z, 1),
                         new RmvVector2(_vertexArray[i].TextureCoordinate.X, _vertexArray[i].TextureCoordinate.Y),
@@ -93,6 +98,10 @@ namespace View3D.Rendering.Geometry
                 mesh.VertexList = new WeightedVertex[VertexCount()];
                 for (int i = 0; i < mesh.VertexList.Length; i++)
                 {
+                    _vertexArray[i].Normal = Vector3.Normalize(_vertexArray[i].Normal);
+                    _vertexArray[i].BiNormal = Vector3.Normalize(_vertexArray[i].BiNormal);
+                    _vertexArray[i].Tangent = Vector3.Normalize(_vertexArray[i].Tangent);
+
                     mesh.VertexList[i] = new WeightedVertex(
                         new RmvVector4(_vertexArray[i].Position.X, _vertexArray[i].Position.Y, _vertexArray[i].Position.Z, 1),
                         new RmvVector2(_vertexArray[i].TextureCoordinate.X, _vertexArray[i].TextureCoordinate.Y),
@@ -111,6 +120,10 @@ namespace View3D.Rendering.Geometry
                 mesh.VertexList = new CinematicVertex[VertexCount()];
                 for (int i = 0; i < mesh.VertexList.Length; i++)
                 {
+                    _vertexArray[i].Normal = Vector3.Normalize(_vertexArray[i].Normal);
+                    _vertexArray[i].BiNormal = Vector3.Normalize(_vertexArray[i].BiNormal);
+                    _vertexArray[i].Tangent = Vector3.Normalize(_vertexArray[i].Tangent);
+
                     mesh.VertexList[i] = new CinematicVertex(
                         new RmvVector4(_vertexArray[i].Position.X, _vertexArray[i].Position.Y, _vertexArray[i].Position.Z, 1),
                         new RmvVector2(_vertexArray[i].TextureCoordinate.X, _vertexArray[i].TextureCoordinate.Y),

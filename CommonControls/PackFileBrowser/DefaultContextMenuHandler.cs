@@ -13,11 +13,11 @@ namespace CommonControls.PackFileBrowser
             _selectedNode = node;
             if (node == null)
             {
-                Items = new ObservableCollection<PackTreeContextMenuItem>();
+                Items = new ObservableCollection<ContextMenuItem>();
                 return;
             }
 
-            var newContextMenu = new ObservableCollection<PackTreeContextMenuItem>();
+            var newContextMenu = new ObservableCollection<ContextMenuItem>();
 
             if (node.NodeType == NodeType.Root)
             {
