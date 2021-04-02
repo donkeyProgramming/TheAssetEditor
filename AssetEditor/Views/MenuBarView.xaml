@@ -12,10 +12,10 @@
             <MenuItem Header="_File">
                 <MenuItem Header="New Packfile"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
                 <MenuItem Header="Open" Command="{Binding MenuBar.OpenPackFileCommand}"/>
-                <MenuItem Header="Recent Files"/>
+                <MenuItem Header="Recent Files" IsEnabled="False"/>
                 <Separator/>
-                <MenuItem Header="Save"/>
-                <MenuItem Header="Save as"/>
+                <MenuItem Header="Save" IsEnabled="False"/>
+                <MenuItem Header="Save as" IsEnabled="False"/>
                 <Separator/>
                 <MenuItem Header="Settings"/>
                 <Separator/>

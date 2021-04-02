@@ -67,9 +67,9 @@ namespace View3D.SceneNodes
             for (int lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
             {
                 if (lodIndex >= Children.Count)
-                    return;
-                var lodNode = Children[lodIndex];
+                    AddObject(new Rmv2LodNode("Lod " + lodIndex, lodIndex));
 
+                var lodNode = Children[lodIndex];
                 for (int modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
                 {
                     var node = new Rmv2MeshNode(model.MeshList[lodIndex][modelIndex], contextFactory.Create(), resourceLibary, animationPlayer);

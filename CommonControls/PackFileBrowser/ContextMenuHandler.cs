@@ -186,7 +186,7 @@ namespace CommonControls.PackFileBrowser
                 systemPath = saveFileDialog.FileName;
             }
 
-            _packFileService.Save(_selectedNode.FileOwner, systemPath, true);
+            _packFileService.Save(_selectedNode.FileOwner, systemPath, true);            
             _selectedNode.UnsavedChanged = false;
             _selectedNode.ForeachNode((node) => node.UnsavedChanged = false);
         }

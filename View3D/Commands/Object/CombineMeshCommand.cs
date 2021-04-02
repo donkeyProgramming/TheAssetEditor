@@ -59,7 +59,7 @@ namespace View3D.Commands.Object
                 var editableGoes = _objectsToCombine.Where(x => x is IEditableGeometry).Select(x =>(IEditableGeometry)x);
                 var newModel = editableGoes.First().Geometry.Clone() as Rmv2Geometry;
                 var typedGeo = _objectsToCombine.Select(x => (Rmv2Geometry)x.Geometry);
-                newModel.Merge(typedGeo.ToList());
+                newModel.Merge(typedGeo.Skip(1).Take(typedGeo.Count() -1).ToList());
                 _combinedMesh.Geometry = newModel;
 
                 // Remove

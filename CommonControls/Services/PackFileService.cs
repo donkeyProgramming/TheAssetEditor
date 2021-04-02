@@ -341,7 +341,9 @@ namespace CommonControls.Services
                 using (BinaryWriter writer = new BinaryWriter(memoryStream))
                     Save(pf, writer);
 
+                
                 File.WriteAllBytes(path, memoryStream.ToArray());
+                pf.UpdateAllDataSourcesAfterSave();
             }
         }
 

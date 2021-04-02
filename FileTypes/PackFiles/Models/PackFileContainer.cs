@@ -112,5 +112,23 @@ namespace FileTypes.PackFiles.Models
                 writer.Write(data);
             }
         }
+
+        public void UpdateAllDataSourcesAfterSave()
+        {
+            // Load pack
+            using (var fileStram = File.OpenRead(SystemFilePath))
+            {
+                using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
+                {
+                    var pack = new PackFileContainer(SystemFilePath, reader);
+
+                    foreach (var currentFile in FileList)
+                    {
+                        var loadedFile = pack.FileList[currentFile.Key];
+                        (currentFile.Value as PackFile).DataSource = (loadedFile as PackFile).DataSource;
+                    }
+                }
+            }
+        }
     }
 }

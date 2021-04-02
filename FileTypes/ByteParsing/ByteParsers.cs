@@ -150,7 +150,7 @@ namespace Filetypes.ByteParsing
 
         protected override Half Decode(byte[] buffer, int index)
         {
-            var u = ((ushort)BitConverter.ToInt16(buffer, index));
+            var u = (BitConverter.ToUInt16(buffer, index));
             return new Half(u);
         }
     }
