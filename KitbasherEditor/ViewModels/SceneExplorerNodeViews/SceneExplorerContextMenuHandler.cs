@@ -39,7 +39,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             if (CanMakeEditable(_activeNode))
             {
                 _contextMenu.Add(new ContextMenuItem("Make Editable", new RelayCommand(MakeEditable)));
-                _contextMenu.Add(new ContextMenuItem("Make Editable - with FileName Ref", new RelayCommand(MakeEditableWithRef)));
+                //_contextMenu.Add(new ContextMenuItem("Make Editable as group", new RelayCommand(MakeEditableAsGroup)));
             }
 
             if (IsUngroupable(_activeNode))
@@ -213,7 +213,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             });
         }
 
-        void MakeEditableWithRef()
+        void MakeEditableAsGroup()
         {
 
         }

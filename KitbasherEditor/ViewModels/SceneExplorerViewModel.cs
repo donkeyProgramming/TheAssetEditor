@@ -84,8 +84,12 @@ namespace KitbasherEditor.ViewModels
                 SelectedNode = null;
         }
 
+        bool _ignoreNextEvenet = false;
         private void OnNodeSelected(ISceneNode selectedNode)
         {
+            if (_ignoreNextEvenet)
+                return;
+
             SelectedNodeViewModel = SceneNodeViewFactory.Create(selectedNode, _skeletonAnimationLookUpHelper, _packFileService, _animationControllerViewModel);
 
             if (selectedNode != null)
@@ -112,7 +116,11 @@ namespace KitbasherEditor.ViewModels
                     selectionEqual = currentSelection.IsSelectionEqual(objectState);
 
                 if (!selectionEqual)
+                {
+                    _ignoreNextEvenet = true;
                     _selectionManager.SetState(objectState);
+                    _ignoreNextEvenet = false;
+                }
             }
 
             ContextMenu.Create(selectedNode);

@@ -23,6 +23,13 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                     return new MeshSceneNodeViewModel(m, pf, skeletonAnimationLookUpHelper);
                 case SkeletonNode s:
                     return new SkeletonSceneNodeViewModel(s, pf, skeletonAnimationLookUpHelper);
+                case GroupNode n:
+                    {
+                        if (n.IsEditable && n.Parent != null)
+                            return new GroupNodeViewModel(n);
+
+                        return null;
+                    }
 
                 default:
                     return null;

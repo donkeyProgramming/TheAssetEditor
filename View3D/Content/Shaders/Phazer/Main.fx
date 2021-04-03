@@ -246,10 +246,11 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
         input.binormal *= -1;
     }
 
+    float2 texCord = float2(input.tex.x % 1, input.tex.y % 1);
     float4 SpecTex = float4(0, 0, 0, 1);
     if (UseSpecular)
     {
-        SpecTex = SpecularTexture.Sample(SampleType, input.tex);
+        SpecTex = SpecularTexture.Sample(SampleType, texCord);
         SpecTex = pow(SpecTex, 2.2);
     }
 
@@ -257,7 +258,7 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
     float4 DiffuseTex = float4(0.5f, 0.5f, 0.5f, 1);
     if (UseDiffuse)
     {
-        DiffuseTex = DiffuseTexture.Sample(SampleType, input.tex);
+        DiffuseTex = DiffuseTexture.Sample(SampleType, texCord);
         DiffuseTex = pow(DiffuseTex, 2.2);
         DiffuseTex.rgb = DiffuseTex.rgb * (1 - max(SpecTex.b, max(SpecTex.r, SpecTex.g)));
     }
@@ -265,7 +266,7 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
 
     float4 GlossTex = float4(0, 0, 0, 1);
     if (UseGloss)
-        GlossTex = GlossTexture.Sample(SampleType, input.tex);
+        GlossTex = GlossTexture.Sample(SampleType, texCord);
 
     float4 NormalTex = float4(0.5f, 0.5f, 0.5f, 1);
     if (UseNormal)

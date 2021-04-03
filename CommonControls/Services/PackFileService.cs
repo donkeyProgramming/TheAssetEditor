@@ -123,13 +123,20 @@ namespace CommonControls.Services
                 foreach (var packFilePath in allCaPackFiles)
                 {
                     var path = gameDataFolder + "\\" + packFilePath;
-                    using (var fileStram = File.OpenRead(path))
+                    if (File.Exists(path))
                     {
-                        using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
+                        using (var fileStram = File.OpenRead(path))
                         {
-                            var pack = new PackFileContainer(path, reader);
-                            packList.Add(pack);
+                            using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
+                            {
+                                var pack = new PackFileContainer(path, reader);
+                                packList.Add(pack);
+                            }
                         }
+                    }
+                    else
+                    {
+                        _logger.Here().Warning($"Ca packfile '{path}' not found, loading skipped");
                     }
                 }
 

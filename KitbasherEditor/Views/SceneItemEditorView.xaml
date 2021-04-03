@@ -24,7 +24,9 @@
         <DataTemplate DataType="{ x:Type nodeViewModels:SkeletonSceneNodeViewModel}">
             <generic:SkeletonView/>
         </DataTemplate>
-
+        <DataTemplate DataType="{ x:Type nodeViewModels:GroupNodeViewModel}">
+            <generic:GroupView/>
+        </DataTemplate>
         
 
     </UserControl.Resources>

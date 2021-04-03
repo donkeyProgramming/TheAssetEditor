@@ -20,7 +20,7 @@
                     <TextBox Text="{Binding General.ModelName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
                 </DockPanel>
 
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" IsEnabled="False">
                     <Label Width="100">Vertex Type</Label>
                     <Label>:</Label>
                     <ComboBox ItemsSource="{Binding General.PossibleVertexTypes}" SelectedItem="{Binding General.VertexType}" VerticalAlignment="Center"/>
@@ -38,7 +38,7 @@
                     <TextBlock  Text="{Binding General.IndexCount, UpdateSourceTrigger=PropertyChanged}"  VerticalAlignment="Center"/>
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" IsEnabled="False">
                     <Label Width="100">Pivot point</Label>
                     <Label>:</Label>
                     <CheckBox  HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding General.DrawPivotPoint, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />

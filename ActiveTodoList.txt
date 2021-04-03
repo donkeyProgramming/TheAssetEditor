@@ -89,46 +89,44 @@ Known bugs:
 	[DONE]selecting reference mesh causes slowdown and animation change! 
 	[DONE]Selection issues in sceneexplorer
 	[DONE]Pivot not correct after duplicate of object
-	[DONE]Remapping head to lion to h-elf creates index out of range error. Why?
+	[DONE]Remapping head to lion to h-elf creates index out of range error.  Why?
 	Selection manager can not select over gizmo when multiselecting
 	Gizmo behaves strangly when camera look directly forward towards model
 	Selecting not use texture, then deslecting and selecing again gives wrong checkbox value	
 	[DONE]Saving 2x does not work for text files
 
-
-
-* Normalize vectors on save	
-* Unsaved changes, do you want to exit?	
-[DONE]Skeleton meshes with 5 lods being unsaveable
-[DONE] Mesh and submesh produces large models	
-[DONE] Packfile save issue
-[DONE]Handle Normals correctly when transforming
+[DONE] Improve grouping features part 1
+[DONE Dont crash if missing ca file
 * Change animation vertex type 
-[DONE]Meshes not becomming editable bug
-* Improve grouping features
-	- Ungroup context items
-	- Auto ungroup on combine
-	- Rename group 
-	- Save name
-* Lock for edit
+* Lod generation bug causing rigging to fail
+* Fix attachment points on export
+* Texture paths
 * Quality of life changes for skeleton remapping tool
 	- Undo
 	- Save thingy actually working
 	- Duplicate mesh teaking stuff from, so skeleton names does not change for duplicated meshes
+* Unsaved changes, do you want to exit?	
+* Attachment points
+* Bounding box recalc
+* Generate ws model layout
+* When playing, attach items to props
+* Pivot point stuff
+[DONE] Normalize vectors on save	
+[DONE]Skeleton meshes with 5 lods being unsaveable
+[DONE] Mesh and submesh produces large models	
+[DONE] Packfile save issue
+[DONE]Handle Normals correctly when transforming
+[DONE]Meshes not becomming editable bug
+[DONE] Lock for edit
 [DONE]Load large models bug
-* Lod generation bug causing rigging to fail
-* Texture paths
 [DONE]Camera full zome issue
 [DONE] Treeview scroll to top
 [DONE]TreeView reflecting scene selection
+* Animation modelling
 * TreeView multiselect
 * Disable hotkeys when 3d view not active
 * Disable everything in the UI that is not actually implemented
-* Fix attachment points on export
-* Generate lods for items in group
-* Generate ws model layout
-	
-	Copy rmv2 mesh on copy do duplicate does not remap 2 items on skelremapping
-	undo for skeleton remapping
-	Selection bug
-	rotate light/side light
+* Improve grouping features part 2 - Auto ungroup on combine
+* Improve grouping features part 2 - Save name so multiple refs can be open
+
+
