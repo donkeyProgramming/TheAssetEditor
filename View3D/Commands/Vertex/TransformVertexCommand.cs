@@ -15,7 +15,7 @@ namespace View3D.Commands.Vertex
     public class TransformVertexCommand : CommandBase<TransformVertexCommand>
     {
         List<IGeometry> _geometryList;
-        Vector3 _pivotPoint;
+        public Vector3 PivotPoint;
         List<int> _affectVertexes;
         public Matrix Transform { get; set; }
         public bool InvertWindingOrder { get; set; } = false;
@@ -26,7 +26,7 @@ namespace View3D.Commands.Vertex
         public TransformVertexCommand(List<IGeometry> geometryList, Vector3 pivotPoint, bool applyToNormals = false, List<int> affectVertexes = null)
         {
             _geometryList = geometryList;
-            _pivotPoint = pivotPoint;
+            PivotPoint = pivotPoint;
             _affectVertexes = affectVertexes;
         }
 
@@ -48,14 +48,15 @@ namespace View3D.Commands.Vertex
 
         protected override void UndoCommand()
         {
-            var inv = Matrix.Invert(Transform);
+            var m = Matrix.CreateTranslation(-PivotPoint) * Matrix.Invert(Transform) * Matrix.CreateTranslation(PivotPoint);
+            var inv = m;
             for(int i = 0; i < _geometryList.Count; i++)
             {
                 var geo = _geometryList[i];
                 if (_affectVertexes != null)
                 {
                     for (int v = 0; v < _affectVertexes.Count; v++)
-                        geo.TransformVertex(v, inv);
+                        geo.TransformVertex(_affectVertexes[v], inv);
                 }
                 else
                 {

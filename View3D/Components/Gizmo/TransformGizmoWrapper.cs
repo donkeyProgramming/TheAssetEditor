@@ -64,9 +64,10 @@ namespace View3D.Components.Gizmo
         {
             if (_activeCommand != null)
             {
-                var m = Matrix.CreateTranslation(-Position) * _totalGizomTransform * Matrix.CreateTranslation(Position);
+                //var m = Matrix.CreateTranslation(-Position) * _totalGizomTransform * Matrix.CreateTranslation(Position);
                 _activeCommand.InvertWindingOrder = _invertedWindingOrder;
-                _activeCommand.Transform = m;
+                _activeCommand.Transform = _totalGizomTransform;
+                _activeCommand.PivotPoint = Position;
                 commandManager.ExecuteCommand(_activeCommand);
                 _activeCommand = null;
             }

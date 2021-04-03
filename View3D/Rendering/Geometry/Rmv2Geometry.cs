@@ -373,6 +373,9 @@ namespace View3D.Rendering.Geometry
                     vert.BlendWeights = new Vector4(boneWeight.boneWeight0, boneWeight.boneWeight1, 0, 0);
                 }
 
+                if ((vert.BlendWeights.X + vert.BlendWeights.Y + vert.BlendWeights.Z + vert.BlendWeights.W) == 0)
+                    vert.BlendWeights.X = 1;
+
                 outputVerts[i] = vert;
             }
 
