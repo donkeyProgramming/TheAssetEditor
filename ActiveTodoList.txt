@@ -97,6 +97,7 @@ Known bugs:
 
 [DONE] Improve grouping features part 1
 [DONE Dont crash if missing ca file
+* Lod for groups not working
 * Change animation vertex type 
 * Lod generation bug causing rigging to fail
 * Fix attachment points on export
@@ -107,6 +108,7 @@ Known bugs:
 	- Duplicate mesh teaking stuff from, so skeleton names does not change for duplicated meshes
 * Unsaved changes, do you want to exit?	
 * Attachment points
+* Reduce mesh tool
 * Bounding box recalc
 * Generate ws model layout
 * When playing, attach items to props

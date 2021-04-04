@@ -231,7 +231,10 @@ void alpha_test(in const float pixel_alpha)
 	clip(pixel_alpha - texture_alpha_ref);
 }
 
-
+float nfmod(float a, float b)
+{
+    return a - b * floor(a / b);
+}
 
 
 float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV_TARGET0
@@ -246,7 +249,7 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
         input.binormal *= -1;
     }
 
-    float2 texCord = float2(input.tex.x % 1, input.tex.y % 1);
+    float2 texCord = float2(nfmod(input.tex.x, 1), nfmod(input.tex.y,1));
     float4 SpecTex = float4(0, 0, 0, 1);
     if (UseSpecular)
     {

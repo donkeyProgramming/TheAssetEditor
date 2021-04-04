@@ -196,10 +196,18 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                     child.Parent.RemoveObject(child);
             }
 
-            var objectsToGenerateLodsFor = firtLod.Children
-                .Where(x => x is Rmv2MeshNode)
-                .Select(x => x as Rmv2MeshNode)
-                .ToList();
+
+            var objectsToGenerateLodsFor = new List<Rmv2MeshNode>();
+            firtLod.ForeachNode((node) =>
+            {
+                if (node is Rmv2MeshNode mesh)
+                    objectsToGenerateLodsFor.Add(mesh);
+            });
+
+           //var objectsToGenerateLodsFor = firtLod.Children
+           //    .Where(x => x is Rmv2MeshNode)
+           //    .Select(x => x as Rmv2MeshNode)
+           //    .ToList();
 
             //Generate lod
             for (int lodIndex = 0; lodIndex < lodsToGenerate.Count(); lodIndex++)

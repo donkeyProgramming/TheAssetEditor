@@ -123,6 +123,8 @@ namespace View3D.SceneNodes
                 lods = GetLodNodes();
             }
 
+            if (lods[lod].Children.Count <= modelIndex)
+                return null;
             return lods[lod].Children[modelIndex] as Rmv2MeshNode;
         }
 

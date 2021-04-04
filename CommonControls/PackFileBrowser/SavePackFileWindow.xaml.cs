@@ -82,6 +82,11 @@ namespace CommonControls.PackFileBrowser
             }
             else
             {
+                if(_selectedNode == null)
+                {
+                    path = "";
+                }
+                else
                 if (_selectedNode.NodeType == NodeType.File)
                 {
                     var fullPath = _selectedNode.GetFullPath();

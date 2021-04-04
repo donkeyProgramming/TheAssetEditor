@@ -166,16 +166,23 @@ namespace View3D.Services
                     var materialConfig = ParseMaterialFile(materialFile);
 
                     var mesh = loadedModelNode.GetMeshNode(int.Parse(lodIndex), int.Parse(partIndex));
-                    bool useAlpha = materialFile.Contains("alpha_on");
-                    var alphaSettings = mesh.MeshModel.AlphaSettings;
-                    if (useAlpha)
-                        alphaSettings.Mode = AlphaMode.Alpha_Test;
+                    if (mesh == null)
+                    {
+                        _logger.Here().Error($"Trying to access mesh at index {partIndex} at lod {lodIndex}, which is not found ");
+                    }
                     else
-                        alphaSettings.Mode = AlphaMode.Opaque;
-                    mesh.MeshModel.AlphaSettings = alphaSettings;
+                    {
+                        bool useAlpha = materialFile.Contains("alpha_on");
+                        var alphaSettings = mesh.MeshModel.AlphaSettings;
+                        if (useAlpha)
+                            alphaSettings.Mode = AlphaMode.Alpha_Test;
+                        else
+                            alphaSettings.Mode = AlphaMode.Opaque;
+                        mesh.MeshModel.AlphaSettings = alphaSettings;
 
-                    foreach (var newTexture in materialConfig)
-                        mesh.UpdateTexture(newTexture.Value, newTexture.Key);
+                        foreach (var newTexture in materialConfig)
+                            mesh.UpdateTexture(newTexture.Value, newTexture.Key);
+                    }
                 }
             }
         }
