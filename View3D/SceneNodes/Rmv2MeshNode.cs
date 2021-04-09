@@ -182,7 +182,7 @@ namespace View3D.SceneNodes
                 LodIndex = LodIndex,
                 Name = Name + " - Clone",
                 AnimationPlayer = AnimationPlayer,
-                MeshModel = MeshModel
+                MeshModel = MeshModel.Clone()
             };
             newItem.Effect = Effect.Clone();
             return newItem;

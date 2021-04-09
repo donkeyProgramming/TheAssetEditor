@@ -591,13 +591,11 @@ namespace View3D.Components.Gizmo
             if (!_isActive) 
                 return;
 
-            _graphics.DepthStencilState = DepthStencilState.Default;
+            _graphics.DepthStencilState = DepthStencilState.None;
             _graphics.RasterizerState = RasterizerState.CullNone;
 
             var view = _camera.ViewMatrix;
             var projection = _camera.ProjectionMatrix;
-      
-
 
             // -- Draw Lines -- //
             _lineEffect.World = _gizmoWorld;

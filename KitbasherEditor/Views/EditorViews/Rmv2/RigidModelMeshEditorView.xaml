@@ -20,7 +20,7 @@
                     <TextBox Text="{Binding General.ModelName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
                 </DockPanel>
 
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" IsEnabled="False">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                     <Label Width="100">Vertex Type</Label>
                     <Label>:</Label>
                     <ComboBox ItemsSource="{Binding General.PossibleVertexTypes}" SelectedItem="{Binding General.VertexType}" VerticalAlignment="Center"/>

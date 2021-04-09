@@ -221,8 +221,6 @@ namespace View3D.Rendering.Geometry
                 _vertexArray[i].BlendIndices.Y = GetValue((byte)_vertexArray[i].BlendIndices.Y, remapping);
                 _vertexArray[i].BlendIndices.Z = GetValue((byte)_vertexArray[i].BlendIndices.Z, remapping);
                 _vertexArray[i].BlendIndices.W = GetValue((byte)_vertexArray[i].BlendIndices.W, remapping);
-
-                //_vertexArray[i].BlendWeights.X = 1;
             }
 
             RebuildVertexBuffer();
@@ -387,6 +385,74 @@ namespace View3D.Rendering.Geometry
             clone.RebuildVertexBuffer();
 
             return clone;
+        }
+
+        public override void ChangeVertexType(VertexFormat newFormat)
+        {
+            if (!(newFormat == VertexFormat.Weighted || newFormat == VertexFormat.Default))
+                throw new Exception("Not able to change vertex format into this");
+
+            if (newFormat == VertexFormat.Weighted)
+            {
+                for (int i = 0; i < _vertexArray.Length; i++)
+                {
+                    if (_vertedFormat == VertexFormat.Default)
+                    {
+                        _vertexArray[i].BlendIndices = new Vector4(0, 0, 0, 0);
+                        _vertexArray[i].BlendWeights = new Vector4(1, 0, 0, 0);
+                    }
+
+                    if (_vertedFormat == VertexFormat.Cinematic)
+                    {
+                        // Find most active weight
+                        float highestValue = -1;
+                        int currentIndex = 0;
+
+                        if (_vertexArray[i].BlendWeights.X > highestValue)
+                        {
+                            highestValue = _vertexArray[i].BlendWeights.X;
+                            currentIndex = (int)_vertexArray[i].BlendIndices.X;
+                        }
+
+                        if (_vertexArray[i].BlendWeights.Y > highestValue)
+                        {
+                            highestValue = _vertexArray[i].BlendWeights.Y;
+                            currentIndex = (int)_vertexArray[i].BlendIndices.Y;
+                        }
+
+                        if (_vertexArray[i].BlendWeights.Z > highestValue)
+                        {
+                            highestValue = _vertexArray[i].BlendWeights.Z;
+                            currentIndex = (int)_vertexArray[i].BlendIndices.Z;
+                        }
+
+                        if (_vertexArray[i].BlendWeights.W > highestValue)
+                        {
+                            highestValue = _vertexArray[i].BlendWeights.W;
+                            currentIndex = (int)_vertexArray[i].BlendIndices.W;
+                        }
+
+                        _vertexArray[i].BlendIndices = new Vector4(currentIndex, 0, 0, 0);
+                        _vertexArray[i].BlendWeights = new Vector4(1, 0, 0, 0);
+                    }
+                }
+
+                WeightCount = 2;
+                _vertedFormat = VertexFormat.Weighted;
+            }
+            else if (newFormat == VertexFormat.Default)
+            {
+                for (int i = 0; i < _vertexArray.Length; i++)
+                {
+                    _vertexArray[i].BlendIndices = new Vector4(0, 0, 0, 0);
+                    _vertexArray[i].BlendWeights = new Vector4(0, 0, 0, 0);
+                }
+
+                WeightCount = 0;
+                _vertedFormat = VertexFormat.Default;
+            }
+
+            RebuildVertexBuffer();
         }
     }
 }

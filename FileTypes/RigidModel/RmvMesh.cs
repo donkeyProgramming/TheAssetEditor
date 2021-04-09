@@ -240,7 +240,7 @@ namespace Filetypes.RigidModel
 
         internal void SaveToByteArray(BinaryWriter writer, VertexFormat vertexFormat)
         {
-            for (int i = 0; i < VertexList.Length; i++)
+            for (int i = 0; i < VertexList.Length; i++) 
             {
                 if (vertexFormat == VertexFormat.Default)
                     writer.Write(ByteHelper.GetBytes(((DefaultVertex)VertexList[i])._data)); 
@@ -258,12 +258,9 @@ namespace Filetypes.RigidModel
 
         public RmvMesh(byte[] data, VertexFormat vertexFormat, int vertexStart, uint vertexCount, int faceStart, uint faceCount)
         {
-            //ref Point bytesAsPoint = ref Unsafe.As<byte, Point>(ref MemoryMarshal.GetReference(bytes));
-
-           
             var vertexSize = GetVertexSize(vertexFormat);
 
-            VertexList = new BaseVertex[vertexCount];
+            VertexList = new BaseVertex[vertexCount]; 
             for (int i = 0; i < vertexCount; i++)
             {
                 if (vertexFormat == VertexFormat.Default)

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Filetypes.RigidModel;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -37,6 +38,7 @@ namespace View3D.Rendering.Geometry
 
         List<byte> GetUniqeBlendIndices();
         void UpdateAnimationIndecies(List<IndexRemapping> remapping);
+        void ChangeVertexType(VertexFormat weighted);
     }
 
     public class IndexRemapping

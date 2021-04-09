@@ -10,6 +10,7 @@ using KitbasherEditor.Views.EditorViews;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using TextureEditor.ViewModels;
 using View3D.Rendering.Geometry;
@@ -40,9 +41,31 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         public string ModelName { get { return _meshNode.MeshModel.Header.ModelName; } set { UpdateModelName(value); NotifyPropertyChanged(); } }
 
-        // Vertex type
-        VertexFormat _vertexType;
-        public VertexFormat VertexType { get { return _vertexType; } set { SetAndNotify(ref _vertexType, value); } }
+        public VertexFormat VertexType { get { return _meshNode.MeshModel.Header.VertextType; } set { ChangeVertexType(value, true); } }
+
+        private void ChangeVertexType(VertexFormat newFormat, bool doMeshUpdate)
+        {
+            if (doMeshUpdate == false)
+            {
+                NotifyPropertyChanged(nameof(VertexType));
+                return;
+            }
+
+            if (!(newFormat == VertexFormat.Weighted || newFormat == VertexFormat.Default))
+            {
+                MessageBox.Show("Can only swap to weighted or default format.");
+                NotifyPropertyChanged(nameof(VertexType));
+                return;
+            }
+
+            var header = _meshNode.MeshModel.Header;
+            header.VertextType = newFormat;
+            _meshNode.MeshModel.Header = header;
+            _meshNode.Geometry.ChangeVertexType(newFormat);
+
+            NotifyPropertyChanged(nameof(VertexType));
+        }
+
         public IEnumerable<VertexFormat> PossibleVertexTypes { get; set; }
 
         public int VertexCount { get => _meshNode.Geometry.VertexCount(); }
@@ -60,8 +83,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             _meshNode = node;
 
             PossibleVertexTypes = Enum.GetValues(typeof(VertexFormat)).Cast<VertexFormat>();
-            VertexType = _meshNode.MeshModel.Header.VertextType;
-
             Pivot = new Vector3ViewModel(_meshNode.MeshModel.Header.Transform.Pivot.X, _meshNode.MeshModel.Header.Transform.Pivot.Y, _meshNode.MeshModel.Header.Transform.Pivot.Z);
         }
 

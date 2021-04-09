@@ -190,5 +190,6 @@ namespace View3D.Rendering.Geometry
 
         public abstract List<byte> GetUniqeBlendIndices();
         public abstract void UpdateAnimationIndecies(List<IndexRemapping> remapping);
+        public abstract void ChangeVertexType(VertexFormat weighted);
     }
 }

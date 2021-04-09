@@ -109,9 +109,9 @@ namespace View3D.Utility
                     else if (image as Pfim.Dxt3Dds != null)
                     {
                         var texture = new Texture2D(device, image.Width, image.Height, false, SurfaceFormat.Dxt3);
-                        texture.SetData(image.Data, 0, (int)image.Header.PitchOrLinearSize);
+                        texture.SetData(image.Data, 0, (int)image.Header.PitchOrLinearSize); 
                         return texture;
-                    }
+                    }  
                     else
                     {
                         throw new Exception("Unknow texture format: " + image.ToString() + " Path = " + fileName);

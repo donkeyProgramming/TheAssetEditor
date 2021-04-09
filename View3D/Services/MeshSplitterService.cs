@@ -77,7 +77,7 @@ namespace View3D.Services
                 {
                     var index0 = indexList[i+0];
                     var index1 = indexList[i+1];
-                    var index2 = indexList[i+2];
+                    var index2 = indexList[i+2]; 
 
                     if (newSelection.Contains(i) == false)
                     {

@@ -11,12 +11,12 @@ Feature list:
 			[DONE]Change animation skeleton
 			Undo for animation mapping
 			
-			Handle large models with n lods
+			[DONE]Handle large models with n lods
 			Validate logic before save 
 			Validate tool
-			Change animation vertex type (downgrade, make sure it works in validation)
+			[DONE]Change animation vertex type (downgrade, make sure it works in validation)
 			Combining all items in a group should remove the group
-			Rename group ui
+			[DONE]Rename group ui
 			
 		Pivot:
 			Edit
@@ -26,7 +26,7 @@ Feature list:
 			[DONE]Open from file
 			[DONE]Small popup when undoing stuff
 			set all not ediable to readonly ui
-			Lock for edit
+			[DONE]Lock for edit
 			Waiting mouse when doing command
 			Profile grow selection
 			Remove animation invert by fixing veiw matrix
@@ -34,8 +34,7 @@ Feature list:
 			Select vertex with mouse click
 			Make sure textures actually work
 			Skelton with good descriptive names 
-			Make sure texture stuff works
-			Drag and drop would be neat
+			[DONE]Make sure texture stuff works
 			Save packfile cleanup edited
 			Save packfile handle refs to open editors and memory streams?
 			All uis should spawn at the center
@@ -90,18 +89,32 @@ Known bugs:
 	[DONE]Selection issues in sceneexplorer
 	[DONE]Pivot not correct after duplicate of object
 	[DONE]Remapping head to lion to h-elf creates index out of range error.  Why?
-	Selection manager can not select over gizmo when multiselecting
-	Gizmo behaves strangly when camera look directly forward towards model
-	Selecting not use texture, then deslecting and selecing again gives wrong checkbox value	
 	[DONE]Saving 2x does not work for text files
+	[DONE] Improve grouping features part 1
+	[DONE Dont crash if missing ca file
+	[DONE] Lod for groups not working
+	[DONE] Lod generation loosing animation information
+	[DONE] Normalize vectors on save	
+	[DONE]Skeleton meshes with 5 lods being unsaveable
+	[DONE] Mesh and submesh produces large models	
+	[DONE] Packfile save issue
+	[DONE]Handle Normals correctly when transforming
+	[DONE]Meshes not becomming editable bug
+	[DONE] Lock for edit
+	[DONE]Load large models bug
+	[DONE]Camera full zome issue
+	[DONE] Treeview scroll to top
+	[DONE]TreeView reflecting scene selection
+	Selection manager can not select over gizmo when multiselecting
+	Gizmo behaves strangly when camera look d
+	irectly forward towards model
+	Selecting not use texture, then deslecting and selecing again gives wrong checkbox value	
 
-[DONE] Improve grouping features part 1
-[DONE Dont crash if missing ca file
-* Lod for groups not working
-* Change animation vertex type 
-* Lod generation bug causing rigging to fail
+* When looking for files, search ca last -> textures, meshes
+[DONE] Change animation vertex type 
+[DONE] Lod generation bug causing rigging to fail
 * Fix attachment points on export
-* Texture paths
+[DONE] Texture paths 
 * Quality of life changes for skeleton remapping tool
 	- Undo
 	- Save thingy actually working
@@ -113,22 +126,24 @@ Known bugs:
 * Generate ws model layout
 * When playing, attach items to props
 * Pivot point stuff
-[DONE] Normalize vectors on save	
-[DONE]Skeleton meshes with 5 lods being unsaveable
-[DONE] Mesh and submesh produces large models	
-[DONE] Packfile save issue
-[DONE]Handle Normals correctly when transforming
-[DONE]Meshes not becomming editable bug
-[DONE] Lock for edit
-[DONE]Load large models bug
-[DONE]Camera full zome issue
-[DONE] Treeview scroll to top
-[DONE]TreeView reflecting scene selection
 * Animation modelling
 * TreeView multiselect
 * Disable hotkeys when 3d view not active
 * Disable everything in the UI that is not actually implemented
 * Improve grouping features part 2 - Auto ungroup on combine
 * Improve grouping features part 2 - Save name so multiple refs can be open
+* Sometimes undo for vertex movement does not work
+splitting repanse removes parts
+
+* Convert vertex type -> default
 
 
+[Done] Vertex type	-> Needs more testing
+[Done] Mapping for duplicates 
+Undo mapping
+Attachmentpoints
+Reduce mesh button
+Bondingbox display
+boundingbox recalc 
+SAveAs with no packfile created
+Load gyrobomber and fix crash

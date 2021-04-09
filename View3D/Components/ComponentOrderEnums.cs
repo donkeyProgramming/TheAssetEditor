@@ -19,9 +19,9 @@ namespace View3D.Components
     {
         ClearScreenComponent,
         Default,
-        Gizmo,
+        
         RenderEngine,
-       
+        Gizmo,
         SelectionComponent,
     }
 }
