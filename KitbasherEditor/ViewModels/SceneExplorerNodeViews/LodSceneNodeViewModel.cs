@@ -7,5 +7,10 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
     {
         public LodSceneNodeViewModel(Rmv2LodNode node)
         { }
+
+        public void Dispose()
+        {
+   
+        }
     }
 }

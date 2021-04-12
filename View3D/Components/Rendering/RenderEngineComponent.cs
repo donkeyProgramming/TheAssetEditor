@@ -29,6 +29,7 @@ namespace View3D.Components.Rendering
 
     public class RenderEngineComponent : BaseComponent
     {
+
         RasterizerState _wireframeState;
         RasterizerState _selectedFaceState;
 

@@ -30,6 +30,9 @@ namespace View3D.SceneNodes
         public Vector3 Scale { get { return _scale; } set { _scale = value; UpdateMatrix(); } }
         public Quaternion Orientation { get { return _orientation; } set { _orientation = value; UpdateMatrix(); } }
 
+        public bool DisplayBoundingBox { get; set; } = false;
+        public bool DisplayPivotPoint { get; set; } = false;
+
         void UpdateMatrix()
         {
             ModelMatrix = Matrix.CreateScale(Scale) * Matrix.CreateFromQuaternion(Orientation) * Matrix.CreateTranslation(Position);
@@ -78,6 +81,7 @@ namespace View3D.SceneNodes
         internal RmvSubModel CreateRmvSubModel()
         {
             var newSubModel = MeshModel.Clone();
+
             newSubModel.Mesh = (Geometry as Rmv2Geometry).CreateRmvMesh();
             return newSubModel;
         }
@@ -158,6 +162,12 @@ namespace View3D.SceneNodes
                 tetureEffect.UseAlpha = MeshModel.AlphaSettings.Mode == AlphaMode.Alpha_Test;
 
             renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeoRenderItem() { Geometry = Geometry, ModelMatrix = ModelMatrix, Shader = Effect });
+
+            if (DisplayPivotPoint)
+            {
+                var pivotPos = new Vector3(-MeshModel.Header.Transform.Pivot.X, MeshModel.Header.Transform.Pivot.Y, MeshModel.Header.Transform.Pivot.Z);
+                renderEngine.AddRenderItem(RenderBuckedId.Normal, new LocatorRenderItem(_resourceLib.GetStaticEffect(ShaderTypes.Line), pivotPos, 1));
+            }
         }
 
         public override ISceneNode Clone()

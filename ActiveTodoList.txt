@@ -140,10 +140,11 @@ splitting repanse removes parts
 
 [Done] Vertex type	-> Needs more testing
 [Done] Mapping for duplicates 
-Undo mapping
-Attachmentpoints
+[Done] Display and edit pivot point
+[Done] Attachmentpoints
 Reduce mesh button
 Bondingbox display
 boundingbox recalc 
-SAveAs with no packfile created
+Undo mapping
+SAveAs with no packfile created - null exception
 Load gyrobomber and fix crash

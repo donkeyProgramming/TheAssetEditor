@@ -16,6 +16,15 @@ namespace CommonControls.MathViews
             X.Value = x;
             Y.Value = y;
             Z.Value = z;
+
+            X.PropertyChanged += PropertyChanged;
+            Y.PropertyChanged += PropertyChanged;
+            Z.PropertyChanged += PropertyChanged;
+        }
+
+        private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            OnValueChanged?.Invoke(this);
         }
 
         DoubleViewModel _x = new DoubleViewModel();

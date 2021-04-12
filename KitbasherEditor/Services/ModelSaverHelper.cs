@@ -176,7 +176,8 @@ namespace KitbasherEditor.Services
                     onlySaveVisible = true;
             }
 
-            var bytes = _editableMeshNode.Save(onlySaveVisible);
+            var boneNames = _kitbasherViewModel.Animation.Skeleton.BoneNames.ToList();
+            var bytes = _editableMeshNode.Save(onlySaveVisible, boneNames);
             var reloadedModel = new RmvRigidModel(bytes, "reloadedFile");
             return bytes;
         }

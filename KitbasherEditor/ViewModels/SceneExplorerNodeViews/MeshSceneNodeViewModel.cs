@@ -33,6 +33,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             Animation = new MeshSceneNodeViewModel_Animation(_meshNode, animLookUp);
             Graphics = new MeshSceneNodeViewModel_Graphics(_meshNode, pf);
         }
+
+        public void Dispose()
+        {
+
+        }
     }
 
     public class MeshSceneNodeViewModel_General : NotifyPropertyChangedImpl
@@ -72,8 +77,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public int IndexCount { get => _meshNode.Geometry.GetIndexCount(); }
 
 
-        bool _drawPivotPoint = false;
-        public bool DrawPivotPoint { get { return _drawPivotPoint; } set { SetAndNotify(ref _drawPivotPoint, value); } }
+        public bool DrawBoundingBox { get { return _meshNode.DisplayBoundingBox; } set { _meshNode.DisplayBoundingBox = value; NotifyPropertyChanged(); } }
+        public bool DrawPivotPoint { get { return _meshNode.DisplayPivotPoint; } set { _meshNode.DisplayPivotPoint = value; NotifyPropertyChanged();} }
 
         Vector3ViewModel _pivot;
         public Vector3ViewModel Pivot { get { return _pivot; } set { SetAndNotify(ref _pivot, value); } }
@@ -84,7 +89,19 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
             PossibleVertexTypes = Enum.GetValues(typeof(VertexFormat)).Cast<VertexFormat>();
             Pivot = new Vector3ViewModel(_meshNode.MeshModel.Header.Transform.Pivot.X, _meshNode.MeshModel.Header.Transform.Pivot.Y, _meshNode.MeshModel.Header.Transform.Pivot.Z);
+            Pivot.OnValueChanged += Pivot_OnValueChanged;
         }
+
+        private void Pivot_OnValueChanged(Vector3ViewModel newValue)
+        {
+            var header = _meshNode.MeshModel.Header;
+            var transform = header.Transform;
+
+            transform.Pivot = new Filetypes.RigidModel.Transforms.RmvVector3((float)newValue.X.Value, (float)newValue.Y.Value, (float)newValue.Z.Value);
+            
+            header.Transform = transform;
+            _meshNode.MeshModel.Header = header;
+        } 
 
         void UpdateModelName(string newName)
         {

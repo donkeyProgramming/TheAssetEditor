@@ -10,10 +10,11 @@ namespace Filetypes.RigidModel
     [StructLayout(LayoutKind.Sequential)]
     public struct RmvAttachmentPoint
     {
+
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
         byte[] _name;
 
-        RmvMatrix3x4 Matrix;
+        public RmvMatrix3x4 Matrix;
         int _boneIndex;
 
         public string Name
@@ -27,6 +28,8 @@ namespace Filetypes.RigidModel
             }
             set
             {
+                if (_name == null)
+                    _name = new byte[32];
                 for (int i = 0; i < 32; i++)
                     _name[i] = 0;
 

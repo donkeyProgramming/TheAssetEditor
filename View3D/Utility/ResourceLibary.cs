@@ -50,6 +50,7 @@ namespace View3D.Utility
             LoadEffect("Shaders\\Phazer\\main", ShaderTypes.Phazer);
             LoadEffect("Shaders\\Geometry\\BasicShader", ShaderTypes.BasicEffect);
             LoadEffect("Shaders\\TexturePreview", ShaderTypes.TexturePreview);
+            LoadEffect("Shaders\\LineShader", ShaderTypes.Line);
 
             PbrDiffuse = Content.Load<TextureCube>("textures\\phazer\\rustig_koppie_DiffuseHDR");
             PbrSpecular = PbrDiffuse;// resourceLibary.XnaContentManager.Load<TextureCube>("textures\\phazer\\rustig_koppie_SpecularHDR");
@@ -141,6 +142,11 @@ namespace View3D.Utility
             throw new Exception($"Shader not found: ShaderTypes::{type}");
         }
 
-
+        internal Effect GetStaticEffect(ShaderTypes type)
+        {
+            if (_shaders.ContainsKey(type))
+                return _shaders[type];
+            throw new Exception($"Shader not found: ShaderTypes::{type}");
+        }
     }
 }

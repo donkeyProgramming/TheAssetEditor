@@ -86,7 +86,7 @@ namespace TextureEditor.ViewModels
                     {
                         using (var g = Graphics.FromImage(sourceBitmap))
                         {
-                            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                            g.InterpolationMode = InterpolationMode.HighQualityBicubic; 
                             drawBoard(g, texture.Width, texture.Height);
                             var bitmap = Texture2Image(renderedTexture);
                             g.DrawImage(bitmap, 0, 0);

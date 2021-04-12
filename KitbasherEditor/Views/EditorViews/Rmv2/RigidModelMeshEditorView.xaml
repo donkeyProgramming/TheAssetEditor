@@ -38,17 +38,17 @@
                     <TextBlock  Text="{Binding General.IndexCount, UpdateSourceTrigger=PropertyChanged}"  VerticalAlignment="Center"/>
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" IsEnabled="False">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                     <Label Width="100">Pivot point</Label>
                     <Label>:</Label>
                     <CheckBox  HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding General.DrawPivotPoint, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     <mathviews:Vector3View Width="200" VerticalContentAlignment="Center" Vector3="{Binding General.Pivot, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2,0,2,0"/>
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" IsEnabled="False">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                     <Label Width="100">Render BBox</Label>
                     <Label>:</Label>
-                    <CheckBox  HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding RenderBoundngBox, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                    <CheckBox  HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding DrawBoundingBox, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                 </StackPanel>
 
             </DockPanel>
@@ -60,7 +60,7 @@
                     <Label Width="100">Skeleton Name</Label>
                     <Label>:</Label>
                     <TextBlock  Text="{Binding Animation.SkeletonName}"  VerticalAlignment="Center"/>
-                    <Button Content="Use parent skeleton" Command="{Binding Animation.UseParentSkeletonCommand}" Margin="5,0,5,0"/>
+                    <Button Content="Use parent skeleton" Command="{Binding Animation.UseParentSkeletonCommand}" Margin="5,0,5,0" IsEnabled="False"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">

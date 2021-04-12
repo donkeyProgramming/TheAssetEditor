@@ -384,6 +384,26 @@ namespace Filetypes.RigidModel
                Mesh = null
            };
        }
+
+        public void UpdateAttachmentPointList(List<string> boneNames)
+        {
+            var header = Header;
+            header.AttachmentPointCount = (uint)boneNames.Count;
+            Header = header;
+
+            AttachmentPoints.Clear();
+            for (int i = 0; i < boneNames.Count; i++)
+            {
+                var a = new RmvAttachmentPoint
+                {
+                    BoneIndex = i,
+                    Name = boneNames[i],
+                    Matrix = RmvMatrix3x4.Identity()
+                };
+                AttachmentPoints.Add(a);
+            }
+
+        }
     }
 
    

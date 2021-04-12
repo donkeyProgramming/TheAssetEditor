@@ -29,5 +29,15 @@ namespace Filetypes.RigidModel.Transforms
 
             return false;
         }
+
+        public static RmvMatrix3x4 Identity()
+        {
+            RmvMatrix3x4 newMatrix = new RmvMatrix3x4();
+
+            newMatrix.Row0 = new RmvVector4(1, 0, 0, 0);
+            newMatrix.Row1 = new RmvVector4(0, 1, 0, 0);
+            newMatrix.Row2 = new RmvVector4(0, 0, 1, 0);
+            return newMatrix;
+        }
     }
 }

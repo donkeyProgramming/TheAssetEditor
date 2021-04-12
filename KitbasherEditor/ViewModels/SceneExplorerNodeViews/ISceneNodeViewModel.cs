@@ -1,11 +1,13 @@
 ﻿using CommonControls.Services;
+using System;
 using View3D.SceneNodes;
 using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
-    public interface ISceneNodeViewModel
-    { }
+    public interface ISceneNodeViewModel : IDisposable
+    { 
+    }
 
     public static class SceneNodeViewFactory
     {

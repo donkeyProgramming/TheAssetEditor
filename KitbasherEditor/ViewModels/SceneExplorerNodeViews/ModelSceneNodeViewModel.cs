@@ -115,5 +115,10 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             ModelEditorService service = new ModelEditorService(_modelNode);
             service.SetAttachmentPoints(AttachmentPoints.ToList());
         }
+
+        public void Dispose()
+        {
+
+        }
     }
 }

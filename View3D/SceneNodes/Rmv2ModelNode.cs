@@ -79,7 +79,7 @@ namespace View3D.SceneNodes
             }
         }
 
-        public byte[] Save(bool onlySaveVisibleNodes)
+        public byte[] Save(bool onlySaveVisibleNodes, List<string> boneNames)
         {
             var lods = GetLodNodes();
             var orderedLods = lods.OrderBy(x => x.LodValue);
@@ -91,7 +91,10 @@ namespace View3D.SceneNodes
                 newMeshList[lodIndex] = new RmvSubModel[meshes.Count];
 
                 for (int meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
+                {
                     newMeshList[lodIndex][meshIndex] = meshes[meshIndex].CreateRmvSubModel();
+                    newMeshList[lodIndex][meshIndex].UpdateAttachmentPointList(boneNames);
+                }
             }
             
             Model.MeshList = newMeshList;

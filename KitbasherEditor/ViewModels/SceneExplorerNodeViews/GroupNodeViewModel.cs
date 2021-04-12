@@ -23,5 +23,9 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         {
             _node = node;
         }
+
+        public void Dispose()
+        {
+        }
     }
 }
