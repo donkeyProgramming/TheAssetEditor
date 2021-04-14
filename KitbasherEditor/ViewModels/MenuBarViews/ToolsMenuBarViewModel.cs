@@ -33,6 +33,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public ICommand CreateLodCommand { get; set; }
         public ICommand ExpandSelectedFacesToObjectCommand { get; set; }
         public ICommand FaceToVertexCommand { get; set; }
+        public ICommand GroupCommand { get; set; }
+        public ICommand ReduceMeshCommand { get; set; }
 
         bool _showObjectTools = true;
         public bool ShowObjectTools { get => _showObjectTools; set => SetAndNotify(ref _showObjectTools, value); }
@@ -67,8 +69,11 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         bool _faceToVertexEnabled;
         public bool FaceToVertexEnabled { get => _faceToVertexEnabled; set => SetAndNotify(ref _faceToVertexEnabled, value); }
 
-
-
+        bool _groupCommandEnabled;
+        public bool GroupCommandEnabled { get => _groupCommandEnabled; set => SetAndNotify(ref _groupCommandEnabled, value); }
+        
+        bool _reduceMeshCommandEnabled;
+        public bool ReduceMeshCommandEnabled { get => _reduceMeshCommandEnabled; set => SetAndNotify(ref _reduceMeshCommandEnabled, value); }
 
         public ToolsMenuBarViewModel(IComponentManager componentManager, ToolbarCommandFactory commandFactory)
         {
@@ -77,8 +82,10 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             DuplicateObjectCommand = commandFactory.Register(new RelayCommand(DubplicateObject), Key.D, ModifierKeys.Control);
             DeleteObjectCommand = commandFactory.Register(new RelayCommand(DeleteObject), Key.Delete, ModifierKeys.None);
             MergeVertexCommand = new RelayCommand(MergeVertex);
-            CreateLodCommand = new RelayCommand(CreateLod);
+            CreateLodCommand = new RelayCommand(CreateLods);
             ExpandSelectedFacesToObjectCommand = new RelayCommand(ExpandFaceSelection);
+            GroupCommand = commandFactory.Register(new RelayCommand(GroupItems), Key.G, ModifierKeys.Control);
+            ReduceMeshCommand = new RelayCommand(ReduceMesh);
 
             FaceToVertexCommand = new RelayCommand(ConvertFacesToVertex);
 
@@ -106,6 +113,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             ExpandSelectedFacesToObjectEnabled = false;
             MergeVertexEnabled = false;
             FaceToVertexEnabled = false;
+            GroupCommandEnabled = false;
+            ReduceMeshCommandEnabled = false;
 
             if (state is ObjectSelectionState objectSelection)
             {
@@ -113,6 +122,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 MergeMeshEnabled = objectSelection.SelectedObjects().Count >= 2;
                 DuplicateEnabled = objectSelection.SelectedObjects().Count > 0;
                 DeleteEnabled = objectSelection.SelectedObjects().Count > 0;
+                GroupCommandEnabled = objectSelection.SelectedObjects().Count > 0;
+                ReduceMeshCommandEnabled = objectSelection.SelectedObjects().Count > 0;
             }
             else if (state is FaceSelectionState faceSelection && faceSelection.SelectedFaces.Count != 0)
             {
@@ -175,17 +186,38 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         {
             _faceEditor.GrowSelection(_selectionManager.GetState() as FaceSelectionState);
         }
+         
+        void GroupItems()
+        {
+            _objectEditor.GroupItems(_selectionManager.GetState() as ObjectSelectionState);
+        }
 
-        void CreateLod()
+        void ReduceMesh()
+        {
+            var selectedObjects = _selectionManager.GetState() as ObjectSelectionState;
+            if (selectedObjects == null || selectedObjects.SelectionCount() == 0)
+                return;
+
+            var meshNodes = selectedObjects.SelectedObjects()
+                .Where(x => x is Rmv2MeshNode)
+                .Select(x => x as Rmv2MeshNode)
+                .ToList();
+
+            _objectEditor.ReduceMesh(meshNodes, 0.9f, true);
+        }
+
+        void CreateLods()
         {
             var rootNode = _editableMeshResolver.GeEditableMeshRootNode();
+            var lods = rootNode.GetLodNodes();
 
-            var firtLod = rootNode.Children.First();
-            var lodsToGenerate = rootNode.Children
+            var firtLod = lods.First();
+            var lodsToGenerate = lods
                 .Skip(1)
                 .Take(rootNode.Children.Count - 1)
                 .ToList();
 
+            // Delete all the lods
             foreach (var lod in lodsToGenerate)
             {
                 var itemsToDelete = new List<ISceneNode>();
@@ -196,35 +228,29 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                     child.Parent.RemoveObject(child);
             }
 
-
-            var objectsToGenerateLodsFor = new List<Rmv2MeshNode>();
-            firtLod.ForeachNode((node) =>
-            {
-                if (node is Rmv2MeshNode mesh)
-                    objectsToGenerateLodsFor.Add(mesh);
-            });
-
-           //var objectsToGenerateLodsFor = firtLod.Children
-           //    .Where(x => x is Rmv2MeshNode)
-           //    .Select(x => x as Rmv2MeshNode)
-           //    .ToList();
+            var modelGroups = firtLod.GetAllModelsGrouped(false);
 
             //Generate lod
             for (int lodIndex = 0; lodIndex < lodsToGenerate.Count(); lodIndex++)
             {
                 var lerpValue = (1.0f / (lodsToGenerate.Count() - 1)) * (lodsToGenerate.Count()  - 1 - lodIndex);
-                var ratio = MathHelper.Lerp(0.25f, 0.75f, lerpValue);
+                var deductionRatio = MathHelper.Lerp(0.25f, 0.75f, lerpValue);
 
-                var newNodes = new List<Rmv2MeshNode>();
-                foreach (var sceneNode in objectsToGenerateLodsFor)
+                foreach (var modelGroupCollection in modelGroups)
                 {
-                    Rmv2MeshNode res = _objectEditor.ReduceMesh(sceneNode, ratio);
-                    newNodes.Add(res);
-                }
+                    ISceneNode parentNode = lodsToGenerate[lodIndex];
+                    if (modelGroupCollection.Key is Rmv2LodNode == false && modelGroupCollection.Key is GroupNode groupNode)
+                    {
+                        parentNode = groupNode.Clone();
+                        lodsToGenerate[lodIndex].AddObject(parentNode);
+                    }
 
-                foreach (var item in newNodes)
-                {
-                    lodsToGenerate[lodIndex].AddObject(item);
+                    foreach (var mesh in modelGroupCollection.Value)
+                    {
+                        var clone = mesh.Clone() as Rmv2MeshNode;
+                         _objectEditor.ReduceMesh(clone, deductionRatio, false);
+                        parentNode.AddObject(clone);
+                    }
                 }
             }
         }

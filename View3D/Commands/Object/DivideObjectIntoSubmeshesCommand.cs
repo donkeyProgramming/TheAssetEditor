@@ -59,7 +59,10 @@ namespace View3D.Commands.Object
                 var splitMeshes = meshService.SplitMesh(_objectToSplit.Geometry);
                 _logger.Here().Information($"{splitMeshes.Count} meshes generated from splitting");
 
-                _newGroupNode = (GroupNode)_editableMeshResolver.GetActiveEditableMeshNode().AddObject(new GroupNode(_objectToSplit.Name + "_Collection") { IsSelectable = true, IsUngroupable = true, IsLockable=true});
+                var parent = _objectToSplit.Parent;
+                if (parent is GroupNode groupNode && groupNode.IsUngroupable)
+                    parent = parent.Parent;
+                _newGroupNode = (GroupNode)parent.AddObject(new GroupNode(_objectToSplit.Name + "_Collection") { IsSelectable = true, IsUngroupable = true, IsLockable=true});
 
                 int counter = 0;
                 List<Rmv2MeshNode> createdMeshes = new List<Rmv2MeshNode>();

@@ -42,7 +42,6 @@
             <Label Width="100">Attachments</Label>
             <Label>:</Label>
             <StackPanel>
-                <Button Command="{Binding FixAttachmentPointsCommand}" Content="Fix" Width="130"/>
                 <Expander>
                 <Expander.Header>
                     <StackPanel Orientation="Horizontal">
@@ -61,20 +60,17 @@
                         <ColumnDefinition Width=".5*"/>
                     </Grid.ColumnDefinitions>
 
-                    <ListView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"  MaxHeight="350"
+                        <ListView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"  MaxHeight="350"
                               ItemsSource="{Binding AttachmentPoints, UpdateSourceTrigger=PropertyChanged}" 
                               SelectedItem="{Binding SelectedAttachmentPoint, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" >
-                        <ListView.View> 
-                            <GridView>
-                                <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"/>
-                                <GridViewColumn Header="BoneIndex" DisplayMemberBinding="{Binding BoneIndex}"/>
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
-
-                    <Button Grid.Row="1" Grid.Column="0" Content="Add" Command="{Binding AddAttachmentPointCommand}"/>
-                    <Button Grid.Row="1" Grid.Column="1" Content="Remove" Command="{Binding RemoveAttachmentPointCommand}" IsEnabled="{Binding IsRemoveAttachmentPointButtonEnabled}"/>
-                </Grid>
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"/>
+                                    <GridViewColumn Header="BoneIndex" DisplayMemberBinding="{Binding BoneIndex}"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </Grid>
 
             </Expander>
             </StackPanel>

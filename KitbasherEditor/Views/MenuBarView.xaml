@@ -127,7 +127,13 @@
                         IsEnabled="{Binding Tools.DuplicateEnabled, UpdateSourceTrigger=PropertyChanged}">
                         <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_duplicate.png"/>
                     </Button>
-                    
+
+                    <Button ToolTip="Group/Ungroup" 
+                        Command="{Binding Tools.GroupCommand}"
+                            IsEnabled="{Binding Tools.GroupCommandEnabled, UpdateSourceTrigger=PropertyChanged}">
+                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Group.png"/>
+                    </Button>
+
                     <Button ToolTip="Delete selected object or faces (Del)" 
                         Command="{Binding Tools.DeleteObjectCommand}"
                         IsEnabled="{Binding Tools.DeleteEnabled, UpdateSourceTrigger=PropertyChanged}">
@@ -135,6 +141,12 @@
                     </Button>
 
                     <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
+
+                    <Button ToolTip="Reduce mesh 10%" 
+                        Command="{Binding Tools.ReduceMeshCommand}"
+                            IsEnabled="{Binding Tools.ReduceMeshCommandEnabled, UpdateSourceTrigger=PropertyChanged}">
+                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-compress-64.png"/>
+                    </Button>
 
                     <Button ToolTip="Create lods" 
                         Command="{Binding Tools.CreateLodCommand}">

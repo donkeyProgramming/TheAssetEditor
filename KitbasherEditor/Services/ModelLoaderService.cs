@@ -16,7 +16,7 @@ namespace KitbasherEditor.Services
     {
         ILogger _logger = Logging.Create<ModelLoaderService>();
 
-        public Rmv2ModelNode EditableMeshNode { get; private set; }
+        public MainEditableNode EditableMeshNode { get; private set; }
         public ISceneNode ReferenceMeshRoot { get; private set; }
 
         PackFileService _packFileService;
@@ -32,7 +32,7 @@ namespace KitbasherEditor.Services
             _sceneManager = sceneManager;
 
             _sceneManager.RootNode.AddObject(new SkeletonNode(resourceLibary.Content, animationView) { IsLockable = false });
-            EditableMeshNode = (Rmv2ModelNode)_sceneManager.RootNode.AddObject(new Rmv2ModelNode("Editable Model"));
+            EditableMeshNode = (MainEditableNode)_sceneManager.RootNode.AddObject(new MainEditableNode("Editable Model"));
             ReferenceMeshRoot = sceneManager.RootNode.AddObject(new GroupNode("Reference meshs") { IsEditable = false, IsLockable=false });
         }
 

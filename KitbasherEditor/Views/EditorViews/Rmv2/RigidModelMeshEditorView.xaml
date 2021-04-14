@@ -20,11 +20,7 @@
                     <TextBox Text="{Binding General.ModelName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
                 </DockPanel>
 
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                    <Label Width="100">Vertex Type</Label>
-                    <Label>:</Label>
-                    <ComboBox ItemsSource="{Binding General.PossibleVertexTypes}" SelectedItem="{Binding General.VertexType}" VerticalAlignment="Center"/>
-                </StackPanel>
+
 
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                     <Label Width="100">Vertex Count</Label>
@@ -45,7 +41,7 @@
                     <mathviews:Vector3View Width="200" VerticalContentAlignment="Center" Vector3="{Binding General.Pivot, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2,0,2,0"/>
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" IsEnabled="False">
                     <Label Width="100">Render BBox</Label>
                     <Label>:</Label>
                     <CheckBox  HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding DrawBoundingBox, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
@@ -60,7 +56,6 @@
                     <Label Width="100">Skeleton Name</Label>
                     <Label>:</Label>
                     <TextBlock  Text="{Binding Animation.SkeletonName}"  VerticalAlignment="Center"/>
-                    <Button Content="Use parent skeleton" Command="{Binding Animation.UseParentSkeletonCommand}" Margin="5,0,5,0" IsEnabled="False"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
@@ -136,9 +131,15 @@
         <GroupBox Header="Graphics" DockPanel.Dock="Top" Margin="0,5,0,0">
             <DockPanel >
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                    <Label Width="100">Vertex Type</Label>
+                    <Label>:</Label>
+                    <ComboBox ItemsSource="{Binding Graphics.PossibleVertexTypes}" SelectedItem="{Binding Graphics.VertexType}" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" IsEnabled="False">
                     <Label Width="100">Material Type</Label>
                     <Label>:</Label>
-                    <TextBlock Text="{Binding Graphics.MaterialType}" VerticalAlignment="Center"/>
+                    <ComboBox ItemsSource="{Binding Graphics.PossibleMaterialTypes}" SelectedItem="{Binding Graphics.MaterialType}" VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal"  DockPanel.Dock="Top">

@@ -8,7 +8,6 @@ namespace View3D.Components.Component
 {
     public interface IEditableMeshResolver : IGameComponent
     {
-        ISceneNode GetActiveEditableMeshNode();
-        Rmv2ModelNode GeEditableMeshRootNode();
+        MainEditableNode GeEditableMeshRootNode();
     }
 }

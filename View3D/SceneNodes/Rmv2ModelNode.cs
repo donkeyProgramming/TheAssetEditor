@@ -20,17 +20,6 @@ namespace View3D.SceneNodes
 
         public RmvRigidModel Model { get; set; }
 
-        public void Update()
-        {
-            // Updathe the shader?
-        }
-
-
-        public void Render()
-        {
-            // Add to render qeueue.
-        }
-
         public Rmv2ModelNode(RmvRigidModel model,  ResourceLibary resourceLib, string name, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory) : base(name)
         {
             Name = name;
@@ -79,39 +68,11 @@ namespace View3D.SceneNodes
             }
         }
 
-        public byte[] Save(bool onlySaveVisibleNodes, List<string> boneNames)
-        {
-            var lods = GetLodNodes();
-            var orderedLods = lods.OrderBy(x => x.LodValue);
-
-            RmvSubModel[][] newMeshList = new RmvSubModel[orderedLods.Count()][];
-            for (int lodIndex = 0; lodIndex < orderedLods.Count(); lodIndex++)
-            {
-                var meshes = orderedLods.ElementAt(lodIndex).GetModels(onlySaveVisibleNodes);
-                newMeshList[lodIndex] = new RmvSubModel[meshes.Count];
-
-                for (int meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
-                {
-                    newMeshList[lodIndex][meshIndex] = meshes[meshIndex].CreateRmvSubModel();
-                    newMeshList[lodIndex][meshIndex].UpdateAttachmentPointList(boneNames);
-                }
-            }
-            
-            Model.MeshList = newMeshList;
-            Model.UpdateOffsets();
-
-            using MemoryStream ms = new MemoryStream();
-            using BinaryWriter writer = new BinaryWriter(ms);
-
-            Model.SaveToByteArray(writer);
-            return ms.ToArray();
-        }
-
         public List<Rmv2LodNode> GetLodNodes()
         {
             return Children
                 .Where(x => x is Rmv2LodNode)
-                .Select(x => x as Rmv2LodNode)  
+                .Select(x => x as Rmv2LodNode)
                 .ToList();
         }
 

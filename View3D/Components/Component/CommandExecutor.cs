@@ -41,16 +41,18 @@ namespace View3D.Components.Component
             _spriteBatch = new SpriteBatch(GraphicsDevice);
         }
 
-        public void ExecuteCommand(ICommand command)
+        public void ExecuteCommand(ICommand command, bool isUndoable = true)
         {
             if (command == null)
                 throw new ArgumentNullException("Command is null");
-            _commands.Push(command);
+            if(isUndoable)
+                _commands.Push(command);
             command.Initialize(Game);
             command.Execute();
 
             CreateAnimation($"Command added: {command.GetHintText()}");
-            CommandStackChanged?.Invoke();
+            if(isUndoable)
+                CommandStackChanged?.Invoke();
         }
 
         void CreateAnimation(string text)

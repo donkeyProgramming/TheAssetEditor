@@ -124,18 +124,18 @@ namespace FileTypesTests.RigidModel
 
            
 
-            var meshData = GetWeaponMeshData();
-           
-            Rmv2ModelNode node = new Rmv2ModelNode("NodeName");
-            node.SetModel(new RmvRigidModel(meshData, "UnitTestModelFileName"), null, null, new TestGeometryGraphicsContextFactory());
-
-            // Edit the first vertex
-            var geometry = node.GetMeshNode(0, 0).Geometry;// as Rmv2Geometry;
-            geometry.TransformVertex(0, Matrix.CreateTranslation(new Vector3(10, 10, 10)));
-
-            // Save
-            var bytes = node.Save(true);
-            var reloadedMesh = new RmvRigidModel(bytes, "UnitTestModelFileName");
+            //var meshData = GetWeaponMeshData();
+            //
+            //Rmv2ModelNode node = new Rmv2ModelNode("NodeName");
+            //node.SetModel(new RmvRigidModel(meshData, "UnitTestModelFileName"), null, null, new TestGeometryGraphicsContextFactory());
+            //
+            //// Edit the first vertex
+            //var geometry = node.GetMeshNode(0, 0).Geometry;// as Rmv2Geometry;
+            //geometry.TransformVertex(0, Matrix.CreateTranslation(new Vector3(10, 10, 10)));
+            //
+            //// Save
+            //var bytes = node.Save(true);
+            //var reloadedMesh = new RmvRigidModel(bytes, "UnitTestModelFileName");
 
             //model.UpdateOffsets();
             //

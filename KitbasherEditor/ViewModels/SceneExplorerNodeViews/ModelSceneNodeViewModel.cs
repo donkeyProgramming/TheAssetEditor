@@ -41,10 +41,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         bool _isRemoveAttachmentPointButtonEnabled = false;
         public bool IsRemoveAttachmentPointButtonEnabled { get { return _isRemoveAttachmentPointButtonEnabled; } set { SetAndNotify(ref _isRemoveAttachmentPointButtonEnabled, value); } }
 
-        public ICommand AddAttachmentPointCommand { get; set; }
-        public ICommand RemoveAttachmentPointCommand { get; set; }
-        public ICommand FixAttachmentPointsCommand { get; set; }
-
         Rmv2ModelNode _modelNode;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         AnimationControllerViewModel _animationControllerViewModel;
@@ -67,30 +63,9 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             attachmentPoints = attachmentPoints.OrderBy(x => x.BoneIndex);
             AttachmentPoints = new ObservableCollection<RmvAttachmentPoint>(attachmentPoints);
 
-            AddAttachmentPointCommand = new RelayCommand(AddAttachmentPoint);
-            RemoveAttachmentPointCommand = new RelayCommand(RemoveAttachmentPoint);
-            FixAttachmentPointsCommand = new RelayCommand(FixAttachmentPoints);
-
             // Ensure all models have this value set
             UpdateSkeletonName();
             UpdateAttachmentPoint();
-        }
-
-        void RemoveAttachmentPoint()
-        {
-            AttachmentPoints.Remove(SelectedAttachmentPoint.Value);
-            SelectedAttachmentPoint = null;
-        }
-
-        void AddAttachmentPoint()
-        { 
-        }
-
-        void FixAttachmentPoints()
-        {
-            ModelEditorService service = new ModelEditorService(_modelNode);
-            //service.SetAttachmentPoints (_animationControllerViewModel.Skeleton);
-            
         }
 
         void UpdateSkeletonName()

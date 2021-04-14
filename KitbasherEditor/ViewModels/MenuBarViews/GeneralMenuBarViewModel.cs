@@ -25,8 +25,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public ICommand FocusCameraCommand { get; set; }
         public ICommand ResetCameraCommand { get; set; }
 
-        public ICommand GroupSelectionCommand { get; set; }
-        public ICommand UnGroupSelectionCommand { get; set; }
 
         string _undoHintText;
         public string UndoHintText { get => _undoHintText; set => SetAndNotify(ref _undoHintText, value); }
@@ -53,9 +51,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             FocusCameraCommand = commandFactory.Register(new RelayCommand(FocusCamera), Key.F, ModifierKeys.Control);
             ResetCameraCommand = new RelayCommand(ResetCamera);
 
-            GroupSelectionCommand = commandFactory.Register(new RelayCommand(Group), Key.G, ModifierKeys.Control);
-            UnGroupSelectionCommand = commandFactory.Register(new RelayCommand(UnGroup), Key.G, ModifierKeys.Shift);
-
             _commandExecutor = componentManager.GetComponent<CommandExecutor>();
             _commandExecutor.CommandStackChanged += OnUndoStackChanged;
 
@@ -70,30 +65,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             UndoEnabled = _commandExecutor.CanUndo();
         }
 
-        void Group()
-        {
-            var state = _selectionManager.GetStateCopy() as ObjectSelectionState;
-            if (state != null && state.SelectedObjects().Count >= 2)
-            {
-                var cmd = new GroupObjectsCommand(_editableMeshResolver.GetActiveEditableMeshNode(), state.CurrentSelection());
-                _commandExecutor.ExecuteCommand(cmd);
-            }
-        }
-
-        void UnGroup()
-        {
-            var state = _selectionManager.GetStateCopy() as ObjectSelectionState;
-            if (state != null && state.SelectedObjects().Count != 0)
-            {
-                // Make sure they have the same group
-                var parents = state.SelectedObjects().Select(x => x.Parent).Distinct().ToList();
-                if (parents.Count == 1 && parents.First() is GroupNode groupNode && groupNode.IsUngroupable)
-                {
-                     var cmd = new UnGroupObjectsCommand(_editableMeshResolver.GetActiveEditableMeshNode(), state.CurrentSelection(), groupNode);
-                     _commandExecutor.ExecuteCommand(cmd);
-                }
-            }
-        }
 
         void Save() 
         {

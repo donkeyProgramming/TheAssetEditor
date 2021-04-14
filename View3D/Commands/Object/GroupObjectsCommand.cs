@@ -64,67 +64,123 @@ namespace View3D.Commands.Object
 
             _selectionManager.SetState(_oldState);
         }
+    }
 
-        public class UnGroupObjectsCommand : CommandBase<UnGroupObjectsCommand>
+    public class UnGroupObjectsCommand : CommandBase<UnGroupObjectsCommand>
+    {
+        SelectionManager _selectionManager;
+        ISelectionState _oldState;
+
+        ISceneNode _parent;
+        List<ISelectable> _itemsToUngroup { get; set; } = new List<ISelectable>();
+        ISceneNode _oldGroupNode;
+
+        public UnGroupObjectsCommand(ISceneNode parent, List<ISelectable> itemsToUngroup, ISceneNode groupNode)
         {
-            SelectionManager _selectionManager;
-            ISelectionState _oldState;
+            _itemsToUngroup = itemsToUngroup;
+            _parent = parent;
+            _oldGroupNode = groupNode;
+        }
 
-            ISceneNode _parent;
-            List<ISelectable> _itemsToUngroup { get; set; } = new List<ISelectable>();
-            ISceneNode _oldGroupNode;
+        public override string GetHintText()
+        {
+            return "Ungroup objects";
+        }
 
-            public UnGroupObjectsCommand(ISceneNode parent, List<ISelectable> itemsToUngroup, ISceneNode groupNode)
+        public override void Initialize(IComponentManager componentManager)
+        {
+            _selectionManager = componentManager.GetComponent<SelectionManager>();
+        }
+
+        protected override void ExecuteCommand()
+        {
+            _oldState = _selectionManager.GetStateCopy();
+
+            foreach (var item in _itemsToUngroup)
             {
-                _itemsToUngroup = itemsToUngroup;
-                _parent = parent;
-                _oldGroupNode = groupNode;
+                item.Parent.RemoveObject(item);
+                _parent.AddObject(item);
             }
 
-            public override string GetHintText()
+            if (_oldGroupNode.Children.Count == 0)
+                _oldGroupNode.Parent.RemoveObject(_oldGroupNode);
+
+            var currentState = _selectionManager.GetState() as ObjectSelectionState;
+            currentState.Clear();
+
+            foreach (var item in _itemsToUngroup)
+                currentState.ModifySelection(item, false);
+        }
+
+        protected override void UndoCommand()
+        {
+            foreach (var item in _itemsToUngroup)
             {
-                return "Ungroup objects";
+                item.Parent.RemoveObject(item);
+                _oldGroupNode.AddObject(item);
             }
 
-            public override void Initialize(IComponentManager componentManager)
+            if (_oldGroupNode.Parent.Children.Contains(_oldGroupNode) == false)
+                _oldGroupNode.Parent.AddObject(_oldGroupNode);
+
+
+            _selectionManager.SetState(_oldState);
+        }
+    }
+
+    public class AddObjectsToExistingGroupCommand : CommandBase<GroupObjectsCommand>
+    {
+        SelectionManager _selectionManager;
+        ISelectionState _oldState;
+
+        GroupNode _group;
+        List<ISelectable> _itemsToGroup { get; set; } = new List<ISelectable>();
+
+        public AddObjectsToExistingGroupCommand(GroupNode group, List<ISelectable> itemsToGroup)
+        {
+            _itemsToGroup = itemsToGroup;
+            _group = group;
+        }
+
+        public override string GetHintText()
+        {
+            return "Add Objects to group";
+        }
+
+        public override void Initialize(IComponentManager componentManager)
+        {
+            _selectionManager = componentManager.GetComponent<SelectionManager>();
+        }
+
+        protected override void ExecuteCommand()
+        {
+            _oldState = _selectionManager.GetStateCopy();
+            var groupNode = _group;
+
+            foreach (var item in _itemsToGroup)
             {
-                _selectionManager = componentManager.GetComponent<SelectionManager>();
+                item.Parent.RemoveObject(item);
+                groupNode.AddObject(item);
             }
 
-            protected override void ExecuteCommand()
+            var currentState = _selectionManager.GetState() as ObjectSelectionState;
+            currentState.Clear();
+
+            foreach (var item in _itemsToGroup)
+                currentState.ModifySelection(item, false);
+        }
+
+        protected override void UndoCommand()
+        {
+            var rootNode = _group.Parent;
+
+            foreach (var item in _itemsToGroup)
             {
-                _oldState = _selectionManager.GetStateCopy();
-
-                foreach (var item in _itemsToUngroup)
-                {
-                    item.Parent.RemoveObject(item);
-                    _parent.AddObject(item);
-                }
-
-                if (_oldGroupNode.Children.Count == 0)
-                    _oldGroupNode.Parent.RemoveObject(_oldGroupNode);
-
-                var currentState = _selectionManager.GetState() as ObjectSelectionState;
-                currentState.Clear();
-                
-                foreach (var item in _itemsToUngroup)
-                    currentState.ModifySelection(item, false);
+                item.Parent.RemoveObject(item);
+                rootNode.AddObject(item);
             }
 
-            protected override void UndoCommand()
-            {
-                foreach (var item in _itemsToUngroup)
-                {
-                    item.Parent.RemoveObject(item);
-                    _oldGroupNode.AddObject(item);
-                }
-
-                if (_oldGroupNode.Parent.Children.Contains(_oldGroupNode) == false)
-                    _oldGroupNode.Parent.AddObject(_oldGroupNode);
-
-
-                _selectionManager.SetState(_oldState);
-            }
+            _selectionManager.SetState(_oldState);
         }
     }
 }

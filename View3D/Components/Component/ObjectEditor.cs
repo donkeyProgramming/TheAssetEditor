@@ -14,6 +14,7 @@ using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Services;
 using View3D.Utility;
+using static View3D.Commands.Object.GroupObjectsCommand;
 
 namespace View3D.Components.Component
 {
@@ -80,19 +81,59 @@ namespace View3D.Components.Component
             throw new NotImplementedException();
         }
 
-        public Rmv2MeshNode ReduceMesh(Rmv2MeshNode meshNode, float factor)
+        public void ReduceMesh(List<Rmv2MeshNode> meshNodes, float factor, bool undoable)
         {
+            var command = new ReduceMeshCommand(meshNodes, factor);
+            _commandManager.ExecuteCommand(command, undoable);
+        }
 
-            var originalMesh = meshNode.Geometry as Rmv2Geometry;
-  
+        public void ReduceMesh(Rmv2MeshNode meshNode, float factor, bool undoable)
+        {
+            var command = new ReduceMeshCommand(new List<Rmv2MeshNode>() { meshNode }, factor);
+            _commandManager.ExecuteCommand(command, undoable);
+        }
 
-            var cpy = meshNode.CloneWithoutGeometry();
-            cpy.Geometry = originalMesh.CreatedReducedCopy(factor);
-            //cpy.Parent.AddObject(cpy);
+        public void GroupItems(ObjectSelectionState selectionState)
+        {
+            if (selectionState == null)
+                return;
+            var selectedObjects = selectionState.SelectedObjects();
+            if (selectionState == null || selectedObjects.Count == 0)
+                return;
 
-            
+            // If all items in same group
+            var parents = selectedObjects.Select(x => x.Parent);
+            var numDifferentParents = parents.Distinct().Count();
+            if (numDifferentParents == 1 && parents.First() is GroupNode groupNode && groupNode.IsUngroupable)
+            {
+                var ungroupCommand = new UnGroupObjectsCommand(parents.First().Parent, selectedObjects, groupNode);
+                _commandManager.ExecuteCommand(ungroupCommand);
+                return;
+            }
 
-            return cpy;
+            // If there is a group, but not all items are members of it, add them to the group
+            if (numDifferentParents == 2)
+            {
+                var groupParent = parents
+                    .Where(x => x is GroupNode)
+                    .Select(x => x as GroupNode)
+                    .FirstOrDefault(x => x.IsUngroupable);
+
+                var itemsInGroup = groupParent.Children;
+                var itemsToAdd = selectedObjects.Where(x => itemsInGroup.Contains(x) == false).ToList();
+
+                var addItemToGroupCmd = new AddObjectsToExistingGroupCommand(groupParent, itemsToAdd);
+                _commandManager.ExecuteCommand(addItemToGroupCmd);
+                return;
+            }
+
+
+            // Default - Create a new group and add all to it
+            var parent = selectionState.SelectedObjects().First().Parent;
+            if (parent is GroupNode parentGroupNode && parentGroupNode.IsUngroupable)
+                parent = parent.Parent;
+            var cmd = new GroupObjectsCommand(parent, selectionState.CurrentSelection());
+            _commandManager.ExecuteCommand(cmd);
             
         }
     }

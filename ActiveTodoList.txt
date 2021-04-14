@@ -120,12 +120,11 @@ Known bugs:
 	- Save thingy actually working
 	- Duplicate mesh teaking stuff from, so skeleton names does not change for duplicated meshes
 * Unsaved changes, do you want to exit?	
-* Attachment points
-* Reduce mesh tool
+[DONE] Attachment points 
 * Bounding box recalc
 * Generate ws model layout
 * When playing, attach items to props
-* Pivot point stuff
+[DONE] Pivot point stuff
 * Animation modelling
 * TreeView multiselect
 * Disable hotkeys when 3d view not active
@@ -133,18 +132,28 @@ Known bugs:
 * Improve grouping features part 2 - Auto ungroup on combine
 * Improve grouping features part 2 - Save name so multiple refs can be open
 * Sometimes undo for vertex movement does not work
-splitting repanse removes parts
+* splitting repanse removes parts
 
-* Convert vertex type -> default
-
-
+[Done] Convert vertex type -> default
 [Done] Vertex type	-> Needs more testing
 [Done] Mapping for duplicates 
 [Done] Display and edit pivot point
 [Done] Attachmentpoints
-Reduce mesh button
+[Done]Reduce mesh button
+-> undo for duplicates 
+->Change group type 
+[Done]Group/ungroup buttons on tool bar, group when only one item selected
+[Done]bonewiehgth for lods for default vertex type
+[Done] SAveAs with no packfile created - null exception
+[Done] Remove attachment point fix button
+[Done] More group stuff
+-> Crashes with largeg amount of stuff 
+
 Bondingbox display
 boundingbox recalc 
 Undo mapping
-SAveAs with no packfile created - null exception
 Load gyrobomber and fix crash
+Make editable as group - import lods 
+
+                    <TextBlock Text="{Binding Graphics.MaterialType}" VerticalAlignment="Center"/>
+                    <ComboBox ItemsSource="{Binding Graphics.PossibleMaterialTypes}" SelectedItem="{Binding Graphics.MaterialType}" VerticalAlignment="Center"/>

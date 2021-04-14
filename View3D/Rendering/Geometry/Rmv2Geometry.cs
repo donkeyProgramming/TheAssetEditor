@@ -305,27 +305,14 @@ namespace View3D.Rendering.Geometry
                       (int)x.BlendIndices.X, (int)x.BlendIndices.Y, 0,0,
                       x.BlendWeights.X, x.BlendWeights.Y, 0,0)).ToArray();
             }
-
-
-
-
-
-           //if (WeightCount == VertexFormat.Cinematic)
-           //{
-           //    sourceMesh.BoneWeights = rmvSubModel.Mesh.VertexList.Select(x => new MeshDecimator.BoneWeight(
-           //        x.BoneIndex[0], x.BoneIndex[1], x.BoneIndex[2], x.BoneIndex[3],
-           //        x.BoneWeight[0], x.BoneWeight[1], x.BoneWeight[2], x.BoneWeight[3])).ToArray();
-           //}
-           //else if (rmvSubModel.Header.VertextType == VertexFormat.Weighted)
-           //{
-           //    sourceMesh.BoneWeights = rmvSubModel.Mesh.VertexList.Select(x => new MeshDecimator.BoneWeight(
-           //        x.BoneIndex[0], x.BoneIndex[1], 0, 0,
-           //        x.BoneWeight[0], x.BoneWeight[1], 0, 0)).ToArray();
-           //}
+            else if (WeightCount == 0)
+            {
+                sourceMesh.BoneWeights = _vertexArray.Select(x => new BoneWeight(
+                      0, 0, 0, 0,
+                      0, 0, 0, 0)).ToArray();
+            }
 
             int currentTriangleCount = sourceSubMeshIndices.Length / 3;
-
-
             int targetTriangleCount = (int)Math.Ceiling(currentTriangleCount * quality);
   
 
@@ -369,6 +356,11 @@ namespace View3D.Rendering.Geometry
                 {
                     vert.BlendIndices = new Vector4(boneWeight.boneIndex0, boneWeight.boneIndex1, 0, 0);
                     vert.BlendWeights = new Vector4(boneWeight.boneWeight0, boneWeight.boneWeight1, 0, 0);
+                }
+                else if (WeightCount == 0)
+                {
+                    vert.BlendIndices = new Vector4(0,0, 0, 0);
+                    vert.BlendWeights = new Vector4(0, 0, 0, 0);
                 }
 
                 if ((vert.BlendWeights.X + vert.BlendWeights.Y + vert.BlendWeights.Z + vert.BlendWeights.W) == 0)

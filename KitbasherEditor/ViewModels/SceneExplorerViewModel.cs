@@ -39,8 +39,8 @@ namespace KitbasherEditor.ViewModels
 
         public SceneExplorerContextMenuHandler ContextMenu { get; set; }
 
-        Rmv2ModelNode _editableMeshNode;
-        public Rmv2ModelNode EditableMeshNode { get => _editableMeshNode; set { _editableMeshNode = value; ContextMenu.EditableMeshNode = value; } }
+        MainEditableNode _editableMeshNode;
+        public MainEditableNode EditableMeshNode { get => _editableMeshNode; set { _editableMeshNode = value; ContextMenu.EditableMeshNode = value; } }
 
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         PackFileService _packFileService;
@@ -149,18 +149,11 @@ namespace KitbasherEditor.ViewModels
             }
         }
 
-        public ISceneNode GetActiveEditableMeshNode()
-        {
-            return EditableMeshNode.Children[SelectedLodLevel.Value];
-        }
-
         public void Initialize()
         {
         }
 
-
-
-        public Rmv2ModelNode GeEditableMeshRootNode()
+        public MainEditableNode GeEditableMeshRootNode()
         {
             return EditableMeshNode;
         }

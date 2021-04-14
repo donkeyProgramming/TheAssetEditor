@@ -81,7 +81,6 @@ namespace View3D.SceneNodes
         internal RmvSubModel CreateRmvSubModel()
         {
             var newSubModel = MeshModel.Clone();
-
             newSubModel.Mesh = (Geometry as Rmv2Geometry).CreateRmvMesh();
             return newSubModel;
         }
@@ -192,7 +191,8 @@ namespace View3D.SceneNodes
                 LodIndex = LodIndex,
                 Name = Name + " - Clone",
                 AnimationPlayer = AnimationPlayer,
-                MeshModel = MeshModel.Clone()
+                MeshModel = MeshModel.Clone(),
+                _resourceLib = _resourceLib
             };
             newItem.Effect = Effect.Clone();
             return newItem;

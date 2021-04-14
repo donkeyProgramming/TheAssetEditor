@@ -46,32 +46,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         public string ModelName { get { return _meshNode.MeshModel.Header.ModelName; } set { UpdateModelName(value); NotifyPropertyChanged(); } }
 
-        public VertexFormat VertexType { get { return _meshNode.MeshModel.Header.VertextType; } set { ChangeVertexType(value, true); } }
-
-        private void ChangeVertexType(VertexFormat newFormat, bool doMeshUpdate)
-        {
-            if (doMeshUpdate == false)
-            {
-                NotifyPropertyChanged(nameof(VertexType));
-                return;
-            }
-
-            if (!(newFormat == VertexFormat.Weighted || newFormat == VertexFormat.Default))
-            {
-                MessageBox.Show("Can only swap to weighted or default format.");
-                NotifyPropertyChanged(nameof(VertexType));
-                return;
-            }
-
-            var header = _meshNode.MeshModel.Header;
-            header.VertextType = newFormat;
-            _meshNode.MeshModel.Header = header;
-            _meshNode.Geometry.ChangeVertexType(newFormat);
-
-            NotifyPropertyChanged(nameof(VertexType));
-        }
-
-        public IEnumerable<VertexFormat> PossibleVertexTypes { get; set; }
+        
 
         public int VertexCount { get => _meshNode.Geometry.VertexCount(); }
         public int IndexCount { get => _meshNode.Geometry.GetIndexCount(); }
@@ -86,8 +61,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public MeshSceneNodeViewModel_General(Rmv2MeshNode node)
         {
             _meshNode = node;
-
-            PossibleVertexTypes = Enum.GetValues(typeof(VertexFormat)).Cast<VertexFormat>();
             Pivot = new Vector3ViewModel(_meshNode.MeshModel.Header.Transform.Pivot.X, _meshNode.MeshModel.Header.Transform.Pivot.Y, _meshNode.MeshModel.Header.Transform.Pivot.Z);
             Pivot.OnValueChanged += Pivot_OnValueChanged;
         }
@@ -119,7 +92,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         string _skeletonName;
         public string SkeletonName { get { return _skeletonName; } set { SetAndNotify(ref _skeletonName, value); } }
-        public ICommand UseParentSkeletonCommand { get; set; }
 
         int _linkDirectlyToBoneIndex;
         public int LinkDirectlyToBoneIndex { get { return _linkDirectlyToBoneIndex; } set { SetAndNotify(ref _linkDirectlyToBoneIndex, value); } }
@@ -139,7 +111,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             _animLookUp = animLookUp;
 
             SkeletonName = _meshNode.MeshModel.ParentSkeletonName;
-            UseParentSkeletonCommand = new RelayCommand(UseParentSkeleton);
             LinkDirectlyToBoneIndex = _meshNode.MeshModel.Header.LinkDirectlyToBoneIndex;
             AttachmentPoints = _meshNode.MeshModel.AttachmentPoints.OrderBy(x => x.BoneIndex).ToList();
             UseParentAttachmentPointsCommand = new RelayCommand(UseParentAttachmentPoints);
@@ -150,8 +121,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             OpenBoneRemappingToolCommand = new RelayCommand(OpenBoneRemappingTool);
         }
 
-
-        void UseParentSkeleton() { }
 
         void UseParentAttachmentPoints() { }
          
@@ -247,20 +216,57 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         string _shaderName;
         public string ShaderName { get { return _shaderName; } set { SetAndNotify(ref _shaderName, value); } }
 
-
-        GroupTypeEnum _materialType;
-        public GroupTypeEnum MaterialType { get { return _materialType; } set { SetAndNotify(ref _materialType, value); } }
+        public GroupTypeEnum MaterialType { get { return _meshNode.MeshModel.Header.MaterialId; } set { UpdateGroupType(value); NotifyPropertyChanged(); } }
         public AlphaMode AlphaModeValue { get { return _meshNode.MeshModel.AlphaSettings.Mode; ; } set { UpdateAlphaValue(value); NotifyPropertyChanged(); } }
         public IEnumerable<AlphaMode> PossibleAlphaModes { get; set; } = new List<AlphaMode>() { AlphaMode.Opaque, AlphaMode.Alpha_Test, AlphaMode.Alpha_Blend };
         public string TextureDirectory { get { return _meshNode.MeshModel.Header.TextureDirectory; } set { UpdateTextureDirectory(value); NotifyPropertyChanged(); } }
 
+        public IEnumerable<GroupTypeEnum> PossibleMaterialTypes { get; set; }
+
         public Dictionary<TexureType, TextureViewModel> Textures { get; set; }
+
+        public VertexFormat VertexType { get { return _meshNode.MeshModel.Header.VertextType; } set { ChangeVertexType(value, true); } }
+
+        private void ChangeVertexType(VertexFormat newFormat, bool doMeshUpdate)
+        {
+            if (doMeshUpdate == false)
+            {
+                NotifyPropertyChanged(nameof(VertexType));
+                return;
+            }
+
+            if (!(newFormat == VertexFormat.Weighted || newFormat == VertexFormat.Default))
+            {
+                MessageBox.Show("Can only swap to weighted or default format.");
+                NotifyPropertyChanged(nameof(VertexType));
+                return;
+            }
+
+            if (newFormat == VertexFormat.Weighted)
+                MaterialType = GroupTypeEnum.weighted;
+            else if (newFormat == VertexFormat.Default)
+                MaterialType = GroupTypeEnum.default_type;
+            else 
+                throw new Exception("Unknown vertex format, can not set grouptype");
+
+            var header = _meshNode.MeshModel.Header;
+            header.VertextType = newFormat;
+            _meshNode.MeshModel.Header = header;
+            _meshNode.Geometry.ChangeVertexType(newFormat);
+
+
+
+            NotifyPropertyChanged(nameof(VertexType));
+        }
+
+        public IEnumerable<VertexFormat> PossibleVertexTypes { get; set; }
 
         public MeshSceneNodeViewModel_Graphics(Rmv2MeshNode meshNode, PackFileService pf)
         {
             _meshNode = meshNode;
             ShaderName = _meshNode.MeshModel.Header.ShaderParams.ShaderName;
-            MaterialType = _meshNode.MeshModel.Header.MaterialId;
+            PossibleMaterialTypes = Enum.GetValues(typeof(GroupTypeEnum)).Cast<GroupTypeEnum>();
+            PossibleVertexTypes = Enum.GetValues(typeof(VertexFormat)).Cast<VertexFormat>();
 
             Textures = new Dictionary<TexureType, TextureViewModel>();
             Textures.Add(TexureType.Diffuse, new TextureViewModel(_meshNode, pf,TexureType.Diffuse));
@@ -281,6 +287,13 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         {
             var header = _meshNode.MeshModel.Header;
             TextureDirectory = newPath;
+            _meshNode.MeshModel.Header = header;
+        }
+
+        void UpdateGroupType(GroupTypeEnum value)
+        {
+            var header = _meshNode.MeshModel.Header;
+            header.MaterialId = value;
             _meshNode.MeshModel.Header = header;
         }
     }
