@@ -1,4 +1,5 @@
-﻿using AssetEditor.Services;
+﻿using AnimMetaEditor;
+using AssetEditor.Services;
 using AssetEditor.Views.Settings;
 using Common;
 using Common.ApplicationSettings;
@@ -93,21 +94,23 @@ namespace AssetEditor.ViewModels
                             CreateTestPackFiles(packfileService);
                         }
 
-           //while (true)
-           //{
-           //    GC.Collect();
-           //    GC.WaitForPendingFinalizers();
-           //
-           //    var window = ToolsFactory.CreateToolAsWindow<KitbasherEditor.ViewModels.KitbasherViewModel>(out var model);
-           //    window.ShowDialog();
-           //    window.DataContext = null;
-           //    model.Close();
-           //    model = null;
-           //    window = null;
-           //
-           //    GC.Collect();
-           //    GC.WaitForPendingFinalizers();
-           //}
+            //while (true)
+            //{
+            //    GC.Collect();
+            //    GC.WaitForPendingFinalizers();
+            //
+            //    var window = ToolsFactory.CreateToolAsWindow<KitbasherEditor.ViewModels.KitbasherViewModel>(out var model);
+            //    window.ShowDialog();
+            //    window.DataContext = null;
+            //    model.Close();
+            //    model = null;
+            //    window = null;
+            //
+            //    GC.Collect();
+            //    GC.WaitForPendingFinalizers();
+            //}
+
+            MetaFileEditorController.MakeWindwo(_packfileService);
         }
 
         private bool Database_BeforePackFileContainerRemoved(PackFileContainer container)

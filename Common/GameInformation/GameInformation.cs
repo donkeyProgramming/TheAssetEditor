@@ -10,6 +10,7 @@ namespace Common.GameInformation
         public GameTypeEnum Type { get; set; }
         public string DisplayName { get; set; }
         public string DefaultPackType { get; set; }
+        public string ShortID { get; set; }
     }
 
     public static class GameInformationFactory
@@ -21,9 +22,14 @@ namespace Common.GameInformation
 
         public static void Create()
         {
-            Warhammer = new GameInformation() { Type = GameTypeEnum.Warhammer1, DisplayName = "Warhammer", DefaultPackType = "PFH4" };
-            Warhammer2 = new GameInformation() { Type = GameTypeEnum.Warhammer2, DisplayName = "Warhammer II", DefaultPackType = "PFH5" };
+            Warhammer = new GameInformation() { Type = GameTypeEnum.Warhammer1, DisplayName = "Warhammer", DefaultPackType = "PFH4", ShortID = "warhammer"};
+            Warhammer2 = new GameInformation() { Type = GameTypeEnum.Warhammer2, DisplayName = "Warhammer II", DefaultPackType = "PFH5", ShortID = "warhammer2" };
             Games = new List<GameInformation>() { Warhammer, Warhammer2 };
+        }
+
+        public static GameInformation GetGameById(GameTypeEnum type)
+        {
+            return null;
         }
 
     }
