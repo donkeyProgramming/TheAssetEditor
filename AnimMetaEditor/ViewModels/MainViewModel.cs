@@ -10,10 +10,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using CommonControls.Services;
+using CommonControls;
+using System.Linq;
 
 namespace AnimMetaEditor.ViewModels
 {
-    class MainViewModel : NotifyPropertyChangedImpl
+    public class MainViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
         public ActiveMetaDataContentModel ActiveMentaDataContent { get; set; } = new ActiveMetaDataContentModel();
         public TableDefinitionModel ActiveTableDefinition = new TableDefinitionModel();
@@ -21,14 +23,81 @@ namespace AnimMetaEditor.ViewModels
         public MetaDataTable DataTable { get; set; }
         public TableDefinitionEditor TableDefinitionEditor { get; set; }
         public FieldExplorer FieldExplorer { get; set; }
+        public string DisplayName { get; set; } = "MetaDecoder";
+        public IPackFile MainFile { get; set; }
 
-        public MainViewModel(MetaDataFile metaDataFile, PackFileService pf, bool allTablesReadOnly)
+        PackFileService _pf;
+        public MainViewModel(SchemaManager schemaManager,/* MetaDataFile metaDataFile,*/ PackFileService pf, bool allTablesReadOnly = true)
         {
-            TableDefinitionEditor = new TableDefinitionEditor(ActiveMentaDataContent, ActiveTableDefinition);
+            _pf = pf;
+
+            TableDefinitionEditor = new TableDefinitionEditor(schemaManager, ActiveMentaDataContent, ActiveTableDefinition);
             DataTable = new MetaDataTable(ActiveTableDefinition, ActiveMentaDataContent, pf, allTablesReadOnly);
             FieldExplorer = new FieldExplorer(TableDefinitionEditor, ActiveMentaDataContent, ActiveTableDefinition);
 
-            ActiveMentaDataContent.File = metaDataFile;
+            //ActiveMentaDataContent.File = metaDataFile;
+        }
+
+        public void ConfigureAsDecoder()
+        {
+            var allMetaFiles = _pf.FindAllWithExtention(".meta");
+            allMetaFiles = allMetaFiles.Where(f => f.Name.Contains("anm.meta")).ToList();
+            List<MetaDataFile> allMetaData = new List<MetaDataFile>();
+
+
+            MetaDataFile master = new MetaDataFile()
+            {
+                FileName = "Master collection"
+            };
+
+            MetaDataFileParser parser = new MetaDataFileParser();
+            foreach (var file in allMetaFiles)
+            {
+                var res = parser.ParseFile(file, _pf);
+                allMetaData.Add(res);
+
+                foreach (var resultDataItem in res.TagItems)
+                {
+                    var masterDataItem = master.TagItems.FirstOrDefault(x => x.Name == resultDataItem.Name && x.Version == resultDataItem.Version);
+                    if (masterDataItem == null)
+                    {
+                        master.TagItems.Add(new MetaDataTagItem() { Name = resultDataItem.Name, Version = resultDataItem.Version });
+                        masterDataItem = master.TagItems.Last();
+                    }
+
+                    foreach (var tag in resultDataItem.DataItems)
+                    {
+                        masterDataItem.DataItems.Add(tag);
+                    }
+                }
+            }
+
+            var v = allMetaData.GroupBy(X => X.TagItems.Select(d => d.Name)).ToList();
+
+            foreach (var item in master.TagItems)
+            {
+                var versions = item.DataItems.Select(x => x.Version).Distinct().ToList();
+                var size = item.DataItems.Select(x => x.Size).Distinct().ToList();
+            }
+
+            master.TagItems = master.TagItems.OrderBy(x => x.DisplayName).ToList();
+
+            ActiveMentaDataContent.File = master;
+        }
+
+        public bool Save()
+        {
+            return false;
+        }
+
+        public void Close()
+        {
+            //throw new NotImplementedException();
+        }
+
+        public bool HasUnsavedChanges()
+        {
+            return false;
         }
     }
 }

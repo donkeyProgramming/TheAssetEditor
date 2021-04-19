@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AnimMetaEditor.DataType
 {
-    class MetaDataFile
+    public class MetaDataFile
     {
         public int Version { get; set; }
         public string FileName { get; set; }

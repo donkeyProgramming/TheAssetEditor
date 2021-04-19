@@ -17,7 +17,7 @@ using FileTypes.DB;
 
 namespace AnimMetaEditor.ViewModels
 {
-    class SingleFieldExplporer : NotifyPropertyChangedImpl
+    public class SingleFieldExplporer : NotifyPropertyChangedImpl
     {
         SolidColorBrush _backgroundColour = new SolidColorBrush(Colors.White);
         public SolidColorBrush BackgroundColour
@@ -64,7 +64,7 @@ namespace AnimMetaEditor.ViewModels
 
     }
 
-    class FieldExplorer : NotifyPropertyChangedImpl
+    public class FieldExplorer : NotifyPropertyChangedImpl
     {
 
         TableDefinitionModel _tableDefinition;

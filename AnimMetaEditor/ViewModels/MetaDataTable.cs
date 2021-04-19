@@ -24,7 +24,7 @@ using CommonControls.Services;
 
 namespace AnimMetaEditor.ViewModels
 {
-    class DataTableRow
+    public class DataTableRow
     {
         public List<ItemWrapper> Values { get; set; } = new List<ItemWrapper>();
 
@@ -80,7 +80,7 @@ namespace AnimMetaEditor.ViewModels
         }
     }
 
-    class ItemWrapper : NotifyPropertyChangedImpl
+    public class ItemWrapper : NotifyPropertyChangedImpl
     {
         DataTableRow _parent;
         string _value;
@@ -117,7 +117,7 @@ namespace AnimMetaEditor.ViewModels
         public string Error { get; set; }
     }
 
-    class MetaDataTable : NotifyPropertyChangedImpl
+    public class MetaDataTable : NotifyPropertyChangedImpl
     {
         public DataGrid DataGridReference;
 

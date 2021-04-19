@@ -9,7 +9,7 @@ using Common;
 
 namespace AnimMetaEditor.ViewModels.Data
 {
-    class ActiveMetaDataContentModel : NotifyPropertyChangedImpl
+    public class ActiveMetaDataContentModel : NotifyPropertyChangedImpl
     {
         public event ValueChangedDelegate<MetaDataTagItem.Data> SelectedTagItemChanged;
         public event ValueChangedDelegate<MetaDataTagItem> SelectedTagTypeChanged;

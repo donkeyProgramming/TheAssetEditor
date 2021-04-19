@@ -39,9 +39,7 @@
 			<decoderviews:FieldExplorer Grid.Row="0"/>
             <control:HexEditor Grid.Row="1"
                     Stream="{Binding FieldExplorer.ByteStream, UpdateSourceTrigger=PropertyChanged}"
-                   
-                    
-                    CustomBackgroundBlockItems="{Binding FieldExplorer.BackgroundBlocks, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+    
                     
                     AllowByteCount="False"
                     AllowCustomBackgroundBlock="True"

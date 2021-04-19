@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Common.GameInformation
@@ -29,7 +30,7 @@ namespace Common.GameInformation
 
         public static GameInformation GetGameById(GameTypeEnum type)
         {
-            return null;
+            return Games.FirstOrDefault(x => x.Type == type);
         }
 
     }

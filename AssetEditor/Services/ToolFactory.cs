@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -100,7 +101,7 @@ namespace AssetEditor.Services
 
         public IEditorViewModel GetToolViewModelFromFileName(string filename)
         {
-            var extention = Path.GetExtension(filename);
+            var extention = Regex.Match(filename, @"\..*").Value;
             if (_extentionToToolMap.ContainsKey(extention))
             {
                 var instance = (IEditorViewModel)_serviceProvider.GetService(_extentionToToolMap[extention]);
@@ -119,9 +120,9 @@ namespace AssetEditor.Services
             }
         }
 
-        public IEditorViewModel CreateEdtior<ViewModel>() where ViewModel : IEditorViewModel
+        public ViewModel CreateEditorViewModel<ViewModel>() where ViewModel : IEditorViewModel
         {
-            var instance = (IEditorViewModel)_serviceProvider.GetService(typeof(ViewModel));
+            var instance = (ViewModel)_serviceProvider.GetService(typeof(ViewModel));
             return instance;
         }
     }

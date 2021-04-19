@@ -4,6 +4,7 @@ using AssetEditor.Views.Settings;
 using Common;
 using Common.ApplicationSettings;
 using Common.GameInformation;
+using CommonControls;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using FileTypes.PackFiles.Models;
@@ -77,23 +78,26 @@ namespace AssetEditor.ViewModels
                }
            }
 
+            if (settingsService.CurrentSettings.IsDeveloperRun)
+            {
+                //variantmeshes\variantmeshdefinitions\dwf_hammerers.variantmeshdefinition"
+                var packFile = packfileService.FindFile(@"animations\battle\ape01\attacks\ap01_attack_01.anm.meta");
+                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
+                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_loremaster_of_hoeth\hef_loremaster_of_hoeth_head_01.rigid_model_v2");
+                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc4\hef\hef_war_lion\hef_war_lion_02.rigid_model_v2");
+                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hr1\brt\brt_royal_pegasus\brt_pegasus_01.rigid_model_v2");
+                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_props\hef_ranger_sword_1h_03.rigid_model_v2");
+                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\skvt1\skv\skv_jezzails\skv_clan_rats_legs_fr_01.rigid_model_v2"); 
+                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_eltharion\hef_eltharion_head.rigid_model_v2");
+                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu17\skv\skv_clan_rats\head\skv_clan_rats_head_04.rigid_model_v2");
             
-                        if (settingsService.CurrentSettings.IsDeveloperRun)
-                        {
-                            //variantmeshes\variantmeshdefinitions\dwf_hammerers.variantmeshdefinition"
-                            var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
-                            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_loremaster_of_hoeth\hef_loremaster_of_hoeth_head_01.rigid_model_v2");
-                            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc4\hef\hef_war_lion\hef_war_lion_02.rigid_model_v2");
-                            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hr1\brt\brt_royal_pegasus\brt_pegasus_01.rigid_model_v2");
-                            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_props\hef_ranger_sword_1h_03.rigid_model_v2");
-                            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\skvt1\skv\skv_jezzails\skv_clan_rats_legs_fr_01.rigid_model_v2"); 
-                            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_eltharion\hef_eltharion_head.rigid_model_v2");
-                            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu17\skv\skv_clan_rats\head\skv_clan_rats_head_04.rigid_model_v2");
+                OpenFile(packFile);
+                CreateTestPackFiles(packfileService);
+            }
+        }
 
-                            OpenFile(packFile);
-                            CreateTestPackFiles(packfileService);
-                        }
-
+        void MemoryDebugging()
+        {
             //while (true)
             //{
             //    GC.Collect();
@@ -109,8 +113,6 @@ namespace AssetEditor.ViewModels
             //    GC.Collect();
             //    GC.WaitForPendingFinalizers();
             //}
-
-            MetaFileEditorController.MakeWindwo(_packfileService);
         }
 
         private bool Database_BeforePackFileContainerRemoved(PackFileContainer container)

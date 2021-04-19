@@ -30,6 +30,7 @@ namespace AssetEditor.ViewModels
         public ICommand CreateNewPackFileCommand { get; set; }
         public ICommand OpenPackFileCommand { get; set; }
         public ICommand OpenAssetEditorFolderCommand { get; set; }
+        public ICommand OpenAnimMetaDecocderCommand { get; set; }
 
         public ICommand OpenKitbashEditorCommand { get; set; }
         public IEditorCreator EditorCreator { get; set; }
@@ -44,6 +45,7 @@ namespace AssetEditor.ViewModels
             CreateNewPackFileCommand = new RelayCommand(CreatePackFile);
             OpenAssetEditorFolderCommand = new RelayCommand(OpenAssetEditorFolder);
             OpenKitbashEditorCommand = new RelayCommand(OpenKitbasherTool);
+            OpenAnimMetaDecocderCommand = new RelayCommand(OpenAnimMetaDecocder);
         }
 
         void OpenPackFile()
@@ -85,6 +87,14 @@ namespace AssetEditor.ViewModels
         {
          //   var editorView = _toolFactory.CreateEdtior<KitbasherEditor.ViewModels.KitbasherViewModel>();
          //   EditorCreator.CreateEmptyEditor(editorView);
+        }
+
+        void OpenAnimMetaDecocder()
+        {
+            var editorView = _toolFactory.CreateEditorViewModel<AnimMetaEditor.ViewModels.MainViewModel>();
+
+            editorView.ConfigureAsDecoder();
+            EditorCreator.CreateEmptyEditor(editorView);
         }
     }
 }

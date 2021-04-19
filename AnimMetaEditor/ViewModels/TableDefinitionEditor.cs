@@ -14,7 +14,7 @@ using CommonControls;
 
 namespace AnimMetaEditor.ViewModels
 {
-    class TableDefinitionEditor : NotifyPropertyChangedImpl
+    public class TableDefinitionEditor : NotifyPropertyChangedImpl
     {
         public ICommand RemoveDefinitionCommand { get; set; }
         public ICommand RemoveAllDefinitionCommand { get; set; }
@@ -32,8 +32,10 @@ namespace AnimMetaEditor.ViewModels
         TableDefinitionModel _tableDefinitionModel;
         ActiveMetaDataContentModel _activeMetaDataContentModel;
         public SchemaManager SchemaManager { get; set; }
-        public TableDefinitionEditor(ActiveMetaDataContentModel activeMetaDataContentModel, TableDefinitionModel tableDefinitionModel)
+        public TableDefinitionEditor(SchemaManager schemaManager, ActiveMetaDataContentModel activeMetaDataContentModel, TableDefinitionModel tableDefinitionModel)
         {
+            SchemaManager = schemaManager;
+
             AddDefinitionCommand = new RelayCommand(() => AddNewDefinitionItem());
             RemoveDefinitionCommand = new RelayCommand(OnRemoveSelected);
             RemoveAllDefinitionCommand = new RelayCommand(OnRemoveAll);

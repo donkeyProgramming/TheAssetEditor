@@ -16,24 +16,15 @@ namespace CommonControls
     {
         ILogger _logger = Logging.Create<SchemaManager>();
 
-        public static string LocTableName { get { return "LocTable"; } }
-
         Dictionary<GameTypeEnum, SchemaFile> _gameTableDefinitions = new Dictionary<GameTypeEnum, SchemaFile>();
         Dictionary<GameTypeEnum, SchemaFile> _gameAnimMetaDefinitions = new Dictionary<GameTypeEnum, SchemaFile>();
 
-        public GameTypeEnum CurrentGame { get; set; }
+        public GameTypeEnum CurrentGame { get; set; } = GameTypeEnum.Warhammer2;
 
         public SchemaManager()
         {
             foreach (var game in GameInformationFactory.Games)
                 Load(game.Type);
-        }
-
-        public void Create()
-        {
-            _logger.Information("Created");
-
-
         }
 
         public void UpdateCurrentTableDefinitions(SchemaFile schemaFile)

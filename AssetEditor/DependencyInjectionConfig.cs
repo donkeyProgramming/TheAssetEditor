@@ -1,10 +1,12 @@
-﻿using AssetEditor.Services;
+﻿using AnimMetaEditor;
+using AssetEditor.Services;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
 using Common;
 using Common.ApplicationSettings;
 using Common.GameInformation;
+using CommonControls;
 using CommonControls.Resources;
 using CommonControls.Services;
 using KitbasherEditor;
@@ -49,10 +51,12 @@ namespace AssetEditor
             services.AddTransient<SettingsViewModel>();
             services.AddTransient<MenuBarViewModel>();
             services.AddTransient<PackFileService>();
+            services.AddTransient<SchemaManager>();
 
             TextEditor_DependencyInjectionContainer.Register(services);
             KitbasherEditor_DependencyInjectionContainer.Register(services);
             View3D_DependencyInjectionContainer.Register(services);
+            AnimMetaEditor_DependencyInjectionContainer.Register(services);
         }
 
         void RegisterTools(IToolFactory factory)
@@ -60,6 +64,7 @@ namespace AssetEditor
             TextEditor_DependencyInjectionContainer.RegisterTools(factory);
             KitbasherEditor_DependencyInjectionContainer.RegisterTools(factory);
             View3D_DependencyInjectionContainer.RegisterTools(factory);
+            AnimMetaEditor_DependencyInjectionContainer.RegisterTools(factory);
         }
 
         public void ShowMainWindow()

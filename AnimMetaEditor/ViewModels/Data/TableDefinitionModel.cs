@@ -10,7 +10,7 @@ using FileTypes.DB;
 
 namespace AnimMetaEditor.ViewModels.Data
 {
-    class TableDefinitionModel : NotifyPropertyChangedImpl
+    public class TableDefinitionModel : NotifyPropertyChangedImpl
     {
         public event ValueChangedDelegate<DbColumnDefinition> SelectedItemChanged;
         public event ValueChangedDelegate<DbTableDefinition> DefinitionChanged;

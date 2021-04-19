@@ -11,22 +11,23 @@ using System.Threading.Tasks;
 using FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using System.Windows;
+using CommonControls;
 
 namespace AnimMetaEditor
 {
     public class MetaFileEditorController
     {
-        public static Window MakeWindwo(PackFileService pf)
+        public static Window MakeWindwo(SchemaManager schemaManager, PackFileService pf)
         {
             Window newWindow = new Window();
-            newWindow.Content = CreateDecoder(pf);
+            newWindow.Content = CreateDecoder(schemaManager, pf);
             //newWindow.DataContext = viewModel;
             return newWindow;
         }
 
-        public static MetaDataMainView CreateDecoder(PackFileService pf)
+        public static MetaDataMainView CreateDecoder(SchemaManager schemaManager, PackFileService pf)
         {
-            var allMetaFiles = pf.FindAllWithExtention("meta");
+            var allMetaFiles = pf.FindAllWithExtention(".meta");
             allMetaFiles = allMetaFiles.Where(f => f.Name.Contains("anm.meta")).ToList();
             List<MetaDataFile> allMetaData = new List<MetaDataFile>();
 
@@ -44,7 +45,6 @@ namespace AnimMetaEditor
 
                 foreach (var resultDataItem in res.TagItems)
                 {
-
                     var masterDataItem =  master.TagItems.FirstOrDefault(x => x.Name == resultDataItem.Name && x.Version == resultDataItem.Version);
                     if (masterDataItem == null)
                     {
@@ -56,13 +56,10 @@ namespace AnimMetaEditor
                     {
                         masterDataItem.DataItems.Add(tag);
                     }
-
                 }
             }
 
             var v = allMetaData.GroupBy(X => X.TagItems.Select(d=>d.Name)).ToList();
-
-
 
             foreach (var item in master.TagItems)
             {
@@ -72,10 +69,8 @@ namespace AnimMetaEditor
 
             master.TagItems = master.TagItems.OrderBy(x => x.DisplayName).ToList();
 
-
-
             var view = new MetaDataMainView();
-            view.DataContext = new MainViewModel(master, pf, true);
+            //view.DataContext = new MainViewModel(schemaManager, master, pf, true);
             return view;
         }
 
