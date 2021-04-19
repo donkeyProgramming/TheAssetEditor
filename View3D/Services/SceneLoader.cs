@@ -69,6 +69,7 @@ namespace View3D.Services
             return parent;
         }
 
+
         void LoadVariantMesh(PackFile file, ref ISceneNode parent, AnimationPlayer player)
         {
             var variantMeshElement = new VariantMeshNode(file.Name);

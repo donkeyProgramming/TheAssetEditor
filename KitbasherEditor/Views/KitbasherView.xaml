@@ -27,7 +27,7 @@
             <RowDefinition Height="0.5*"/>
         </Grid.RowDefinitions>
 
-        <local:MenuBarView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" DataContext="{Binding MenuBar}"/>
+        <local:MenuBarView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" DataContext="{Binding MenuBar, Mode=OneTime}"/>
 
     
         
@@ -43,7 +43,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <ContentControl Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"  Content="{Binding Scene}"/>
+            <ContentControl Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"  Content="{Binding Scene, Mode=OneTime}"/>
             <editorviews:AnimationView DataContext="{Binding Animation}" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"/>
 
             <Grid Grid.Row="0" Grid.Column="1" 
@@ -102,6 +102,6 @@
             </GridSplitter.Template>
         </GridSplitter>
 
-        <local:SceneItemEditorView DataContext="{Binding SceneExplorer}" Grid.Row="4" Grid.Column="2"/>
+        <local:SceneItemEditorView DataContext="{Binding SceneExplorer,Mode=OneTime}" Grid.Row="4" Grid.Column="2"/>
     </Grid>
 </UserControl>

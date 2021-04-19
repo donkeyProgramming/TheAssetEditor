@@ -27,7 +27,7 @@ using View3D.Components.Rendering;
 
 namespace View3D.Components.Gizmo
 {
-    public class Gizmo
+    public class Gizmo : IDisposable
     {
         ILogger _logger = Logging.Create<Gizmo>();
 
@@ -727,6 +727,14 @@ namespace View3D.Components.Gizmo
         {
             GizmoDisplaySpace = GizmoDisplaySpace == TransformSpace.Local ? TransformSpace.World : TransformSpace.Local;
         }
+
+        public void Dispose()
+        {
+            _spriteBatch.Dispose();
+            _lineEffect.Dispose();
+            _meshEffect.Dispose();
+        }
+    
 
         #endregion
     }

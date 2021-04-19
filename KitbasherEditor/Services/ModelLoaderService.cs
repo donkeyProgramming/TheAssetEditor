@@ -24,15 +24,15 @@ namespace KitbasherEditor.Services
         AnimationControllerViewModel _animationView;
         SceneManager _sceneManager;
 
-        public ModelLoaderService(PackFileService packFileService, ResourceLibary resourceLibary, AnimationControllerViewModel animationView, SceneManager sceneManager)
+        public ModelLoaderService(PackFileService packFileService, ResourceLibary resourceLibary, AnimationControllerViewModel animationView, SceneManager sceneManager, IPackFile mainFile)
         {
             _packFileService = packFileService;
             _resourceLibary = resourceLibary;
             _animationView = animationView;
             _sceneManager = sceneManager;
 
-            _sceneManager.RootNode.AddObject(new SkeletonNode(resourceLibary.Content, animationView) { IsLockable = false });
-            EditableMeshNode = (MainEditableNode)_sceneManager.RootNode.AddObject(new MainEditableNode("Editable Model"));
+            var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(resourceLibary.Content, animationView) { IsLockable = false }) as SkeletonNode;
+            EditableMeshNode = (MainEditableNode)_sceneManager.RootNode.AddObject(new MainEditableNode("Editable Model", skeletonNode, mainFile));
             ReferenceMeshRoot = sceneManager.RootNode.AddObject(new GroupNode("Reference meshs") { IsEditable = false, IsLockable=false });
         }
 

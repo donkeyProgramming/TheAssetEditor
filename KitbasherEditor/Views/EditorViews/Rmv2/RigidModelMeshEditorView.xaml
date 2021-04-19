@@ -156,6 +156,12 @@
                                SelectedItem="{Binding Graphics.AlphaModeValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                 </StackPanel>
 
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
+                    <Label Width="100">Reduce lods</Label>
+                    <Label>:</Label>
+                    <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Graphics.ReduceMeshOnLodGeneration, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+
                 <simple:BrowsableItemView DockPanel.Dock="Top" LabelLength="100" LabelName="Texture Directory"
                                  PathTextReadOnly="true"
                                  DisplayRemoveButton="False" 

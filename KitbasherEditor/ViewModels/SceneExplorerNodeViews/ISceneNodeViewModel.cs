@@ -15,8 +15,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         {
             switch (node)
             {
+                case MainEditableNode mainNode:
+                    return new MainEditableNodeViewModel(mainNode, skeletonAnimationLookUpHelper, animationControllerViewModel, pf);
+
                 case Rmv2ModelNode m:
-                    return new ModelSceneNodeViewModel(m, skeletonAnimationLookUpHelper, animationControllerViewModel);
+                    return new ModelSceneNodeViewModel(m);
 
                 case Rmv2LodNode l:
                     return new LodSceneNodeViewModel(l);
@@ -32,6 +35,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
                         return null;
                     }
+
 
                 default:
                     return null;

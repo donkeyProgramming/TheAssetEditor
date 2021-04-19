@@ -55,9 +55,6 @@ namespace AssetEditor.ViewModels
 
             ToolsFactory = toolFactory;
 
-
-            
-
             if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
             {
                 var settingsWindow = serviceProvider.GetRequiredService<SettingsWindow>();
@@ -67,34 +64,50 @@ namespace AssetEditor.ViewModels
                 settingsService.CurrentSettings.IsFirstTimeStartingApplication = false;
                 settingsService.Save();
             }
+           
+           if (settingsService.CurrentSettings.LoadCaPacksByDefault)
+           {
+               var gamePath = settingsService.GetGamePathForCurrentGame();
+               if (gamePath != null)
+               {
+                   var loadRes = _packfileService.LoadAllCaFiles(gamePath);
+                   if (!loadRes)
+                       MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
+               }
+           }
 
-            if (settingsService.CurrentSettings.LoadCaPacksByDefault)
-            {
-                var gamePath = settingsService.GetGamePathForCurrentGame();
-                if (gamePath != null)
-                {
-                    var loadRes = _packfileService.LoadAllCaFiles(gamePath);
-                    if (!loadRes)
-                        MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
-                }
-            }
+            
+                        if (settingsService.CurrentSettings.IsDeveloperRun)
+                        {
+                            //variantmeshes\variantmeshdefinitions\dwf_hammerers.variantmeshdefinition"
+                            var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
+                            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_loremaster_of_hoeth\hef_loremaster_of_hoeth_head_01.rigid_model_v2");
+                            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc4\hef\hef_war_lion\hef_war_lion_02.rigid_model_v2");
+                            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hr1\brt\brt_royal_pegasus\brt_pegasus_01.rigid_model_v2");
+                            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_props\hef_ranger_sword_1h_03.rigid_model_v2");
+                            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\skvt1\skv\skv_jezzails\skv_clan_rats_legs_fr_01.rigid_model_v2"); 
+                            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_eltharion\hef_eltharion_head.rigid_model_v2");
+                            //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu17\skv\skv_clan_rats\head\skv_clan_rats_head_04.rigid_model_v2");
 
+                            OpenFile(packFile);
+                            CreateTestPackFiles(packfileService);
+                        }
 
-            if (settingsService.CurrentSettings.IsDeveloperRun)
-            {
-                //variantmeshes\variantmeshdefinitions\dwf_hammerers.variantmeshdefinition"
-                var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
-                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_loremaster_of_hoeth\hef_loremaster_of_hoeth_head_01.rigid_model_v2");
-                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc4\hef\hef_war_lion\hef_war_lion_02.rigid_model_v2");
-                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hr1\brt\brt_royal_pegasus\brt_pegasus_01.rigid_model_v2");
-                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_props\hef_ranger_sword_1h_03.rigid_model_v2");
-                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\skvt1\skv\skv_jezzails\skv_clan_rats_legs_fr_01.rigid_model_v2"); 
-                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_eltharion\hef_eltharion_head.rigid_model_v2");
-                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu17\skv\skv_clan_rats\head\skv_clan_rats_head_04.rigid_model_v2");
-
-                OpenFile(packFile);
-                CreateTestPackFiles(packfileService);
-            }
+           //while (true)
+           //{
+           //    GC.Collect();
+           //    GC.WaitForPendingFinalizers();
+           //
+           //    var window = ToolsFactory.CreateToolAsWindow<KitbasherEditor.ViewModels.KitbasherViewModel>(out var model);
+           //    window.ShowDialog();
+           //    window.DataContext = null;
+           //    model.Close();
+           //    model = null;
+           //    window = null;
+           //
+           //    GC.Collect();
+           //    GC.WaitForPendingFinalizers();
+           //}
         }
 
         private bool Database_BeforePackFileContainerRemoved(PackFileContainer container)

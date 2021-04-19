@@ -248,7 +248,11 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                     foreach (var mesh in modelGroupCollection.Value)
                     {
                         var clone = mesh.Clone() as Rmv2MeshNode;
-                         _objectEditor.ReduceMesh(clone, deductionRatio, false);
+                        
+                        var reduceValue = deductionRatio;
+                        if (clone.ReduceMeshOnLodGeneration == false)
+                            reduceValue = 1;
+                         _objectEditor.ReduceMesh(clone, reduceValue, false);
                         parentNode.AddObject(clone);
                     }
                 }

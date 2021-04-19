@@ -44,9 +44,14 @@
                 <MenuItem Header="Save" Command="{Binding General.SaveCommand, Mode=OneTime}"/>
                 <MenuItem Header="Save as" Command="{Binding General.SaveAsCommand, Mode=OneTime}" />
                 <Separator/>
+                <MenuItem Header="Generate Ws Model" Command="{Binding General.GenerateWsModelCommand, Mode=OneTime}"/>
+                <Separator/>
                 <MenuItem Header="Import reference" Command="{Binding ImportReferenceCommand, Mode=OneTime}"/>
-                <MenuItem Header="Import reference - Ork torso" Command="{Binding ImportReferenceCommand_OrcTorso, Mode=OneTime}"/>
                 <MenuItem Header="Import reference - Paladin vmd" Command="{Binding ImportReferenceCommand_PaladinVMD, Mode=OneTime}"/>
+            </MenuItem>
+
+            <MenuItem Header="_Options">
+                <MenuItem Header="Sort models by name" Command="{Binding General.SortModelsByNameCommand, Mode=OneTime}"/>
             </MenuItem>
 
             <MenuItem Header="Camera" >

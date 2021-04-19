@@ -105,55 +105,58 @@ Known bugs:
 	[DONE]Camera full zome issue
 	[DONE] Treeview scroll to top
 	[DONE]TreeView reflecting scene selection
+	[DONE] Change animation vertex type 
+	[DONE] Lod generation bug causing rigging to fail
+	[DONE] Fix attachment points on export
+	[DONE] Texture paths 
+	[DONE] Attachment points 
+	[DONE] Pivot point stuff
+	[Done] Convert vertex type -> default
+	[Done] Vertex type	-> Needs more testing 
+	[Done] Mapping for duplicates 
+	[Done] Display and edit pivot point
+	[Done] Attachmentpoints
+	[Done]Reduce mesh button
+	[Done]Group/ungroup buttons on tool bar, group when only one item selected
+	[Done]bonewiehgth for lods for default vertex type
+	[Done] SAveAs with no packfile created - null exception
+	[Done] Remove attachment point fix button
+	[Done] More group stuff
+	[Done]Change group type
+	[Done] Load gyrobomber and fix crash - No crash?
+	[Done] Generate ws model layout
+	[Done] Can not load crossbow men -> Broken variant mesh
 	Selection manager can not select over gizmo when multiselecting
 	Gizmo behaves strangly when camera look d
 	irectly forward towards model
 	Selecting not use texture, then deslecting and selecing again gives wrong checkbox value	
 
-* When looking for files, search ca last -> textures, meshes
-[DONE] Change animation vertex type 
-[DONE] Lod generation bug causing rigging to fail
-* Fix attachment points on export
-[DONE] Texture paths 
-* Quality of life changes for skeleton remapping tool
-	- Undo
-	- Save thingy actually working
-	- Duplicate mesh teaking stuff from, so skeleton names does not change for duplicated meshes
-* Unsaved changes, do you want to exit?	
-[DONE] Attachment points 
-* Bounding box recalc
-* Generate ws model layout
-* When playing, attach items to props
-[DONE] Pivot point stuff
-* Animation modelling
-* TreeView multiselect
-* Disable hotkeys when 3d view not active
-* Disable everything in the UI that is not actually implemented
-* Improve grouping features part 2 - Auto ungroup on combine
-* Improve grouping features part 2 - Save name so multiple refs can be open
-* Sometimes undo for vertex movement does not work
-* splitting repanse removes parts
 
-[Done] Convert vertex type -> default
-[Done] Vertex type	-> Needs more testing
-[Done] Mapping for duplicates 
-[Done] Display and edit pivot point
-[Done] Attachmentpoints
-[Done]Reduce mesh button
--> undo for duplicates 
-->Change group type 
-[Done]Group/ungroup buttons on tool bar, group when only one item selected
-[Done]bonewiehgth for lods for default vertex type
-[Done] SAveAs with no packfile created - null exception
-[Done] Remove attachment point fix button
-[Done] More group stuff
--> Crashes with largeg amount of stuff 
+Ensure all components is removed when exiting
+	* When looking for files, search ca last -> textures, meshes
+	* Undo for mapping
+	* Loading advance vmds
+	* Bondingbox display
+	* boundingbox recalc 
+	* Make editable as group - import lods
+	* Animation modelling
+	* TreeView multiselect
+	* Disable hotkeys when 3d view not active
+	* Disable everything in the UI that is not actually implemented
+	* Improve grouping features part 2 - Auto ungroup on combine
+	* Improve grouping features part 2 - Save name so multiple refs can be open
+	* Sometimes undo for vertex movement does not work
+	* splitting repanse removes parts 
+	* Quality of life changes for skeleton remapping tool
+		- Undo
+		- Save thingy actually working
+		- Duplicate mesh teaking stuff from, so skeleton names does not change for duplicated meshes
+	* Unsaved changes, do you want to exit?	
+	* Bounding box recalc
+	* When playing, attach items to props
+	* Saving mapping does not work when loading it back in
+	* Converte to weighted 4 vertex type
+	
 
-Bondingbox display
-boundingbox recalc 
-Undo mapping
-Load gyrobomber and fix crash
-Make editable as group - import lods 
 
-                    <TextBlock Text="{Binding Graphics.MaterialType}" VerticalAlignment="Center"/>
-                    <ComboBox ItemsSource="{Binding Graphics.PossibleMaterialTypes}" SelectedItem="{Binding Graphics.MaterialType}" VerticalAlignment="Center"/>
+Graphics.ReduceMeshOnLodGeneration

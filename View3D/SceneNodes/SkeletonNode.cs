@@ -18,9 +18,9 @@ namespace View3D.SceneNodes
         GameSkeleton Skeleton { get; set; }
     }
 
-    public class SkeletonNode : GroupNode, IDrawableItem
+    public class SkeletonNode : GroupNode, IDrawableItem, IDisposable
     {
-        IAnimationProvider _animationProvider;
+        public IAnimationProvider AnimationProvider { get; private set; }
         LineMeshRender _lineRenderer;
 
         public Vector3 NodeColour = new Vector3(.25f, 1, .25f);
@@ -33,15 +33,17 @@ namespace View3D.SceneNodes
         public SkeletonNode(ContentManager content, IAnimationProvider animationProvider, string name = "Skeleton") : base(name)
         {
             _lineRenderer = new LineMeshRender(content);
-            _animationProvider = animationProvider;
+            AnimationProvider = animationProvider;
         }
 
         public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)
         {
-            var skeleton = _animationProvider.Skeleton;
-            Name = "Skeleton ";
+            var skeleton = AnimationProvider.Skeleton;
+           
             if (skeleton != null)
-                Name = _animationProvider.Skeleton.SkeletonName;
+                Name = AnimationProvider.Skeleton.SkeletonName;
+            else
+                Name = "Skeleton ";
 
             if (IsVisible && skeleton != null/* && _animationProvider.IsActive*/)
             {
@@ -73,5 +75,10 @@ namespace View3D.SceneNodes
             }
         }
 
+        public void Dispose()
+        {
+            _lineRenderer.Dispose();
+            _lineRenderer = null;
+        }
     }
 }

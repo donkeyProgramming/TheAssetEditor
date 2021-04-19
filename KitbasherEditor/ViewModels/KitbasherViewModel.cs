@@ -25,9 +25,10 @@ namespace KitbasherEditor.ViewModels
         PackFileService _packFileService;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
-        public SceneContainer Scene { get; set; }
+        SceneContainer _scene;
+        public SceneContainer Scene { get => _scene; set => SetAndNotify(ref _scene, value); }
         public SceneExplorerViewModel SceneExplorer { get; set; }
-        public MenuBarViewModel MenuBar { get; set; } 
+        public MenuBarViewModel MenuBar { get; set; }
         public AnimationControllerViewModel Animation { get; set; }
 
 
@@ -43,9 +44,9 @@ namespace KitbasherEditor.ViewModels
         {
             _packFileService = pf;
             _skeletonAnimationLookUpHelper = skeletonHelper;
-
+            //
             Scene = new SceneContainer();
-            
+            //
             Scene.Components.Add(new FpsComponent(Scene));
             Scene.Components.Add(new KeyboardComponent(Scene));
             Scene.Components.Add(new MouseComponent(Scene));
@@ -63,12 +64,12 @@ namespace KitbasherEditor.ViewModels
             Scene.Components.Add(new RenderEngineComponent(Scene));
             Scene.Components.Add(new GridComponent(Scene));
             Scene.Components.Add(new AnimationsContainerComponent(Scene));
-
+            
             Animation = new AnimationControllerViewModel(Scene, _packFileService, _skeletonAnimationLookUpHelper);
-
+            
             SceneExplorer = new SceneExplorerViewModel(Scene, _skeletonAnimationLookUpHelper, _packFileService, Animation);
             Scene.Components.Add(SceneExplorer);
-
+            
             MenuBar = new MenuBarViewModel(Scene, _packFileService);
             
             Scene.SceneInitialized += OnSceneInitialized;
@@ -78,13 +79,13 @@ namespace KitbasherEditor.ViewModels
         {
             var sceneManager = scene.GetComponent<SceneManager>();
             var resourceLib = scene.GetComponent<ResourceLibary>();
-            _modelLoader = new ModelLoaderService(_packFileService, resourceLib, Animation, sceneManager);
+            _modelLoader = new ModelLoaderService(_packFileService, resourceLib, Animation, sceneManager, MainFile);
             _modelSaver = new ModelSaverHelper(_packFileService, sceneManager, this, _modelLoader.EditableMeshNode);
             MenuBar.ModelLoader = _modelLoader;
             MenuBar.General.ModelSaver = _modelSaver;
-
+            
             SceneExplorer.EditableMeshNode = _modelLoader.EditableMeshNode;
-
+            
             if (MainFile != null)
             {
                 try
@@ -108,7 +109,26 @@ namespace KitbasherEditor.ViewModels
         public void Close()
         {
             Scene.Dispose();
+            Scene.SceneInitialized -= OnSceneInitialized;
+            _modelSaver = null;
+            _modelLoader = null;
+            MenuBar = null;
             Scene = null;
+
+            _packFileService = null;
+            _skeletonAnimationLookUpHelper = null;
+
+            Scene = null;
+            SceneExplorer = null;
+            MenuBar = null;
+            Animation = null;
+
+
+
+            MainFile = null;
+
+            _modelLoader = null;
+            _modelSaver = null;
         }
 
         public bool HasUnsavedChanges()

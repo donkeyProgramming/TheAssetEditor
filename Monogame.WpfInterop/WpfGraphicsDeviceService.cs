@@ -8,11 +8,11 @@ namespace MonoGame.Framework.WpfInterop
     /// <summary>
     /// The <see cref="Microsoft.Xna.Framework.Content.ContentManager"/> needs a <see cref="IGraphicsDeviceService"/> to be in the <see cref="System.ComponentModel.Design.IServiceContainer"/>. This class fulfills this purpose.
     /// </summary>
-    public class WpfGraphicsDeviceService : IGraphicsDeviceService, IGraphicsDeviceManager
+    public class WpfGraphicsDeviceService : IGraphicsDeviceService, IGraphicsDeviceManager, IDisposable
     {
         internal const int MsaaSampleLimit = 32;
 
-        private readonly WpfGame _host;
+        readonly WpfGame _host;
 
         #region Constructors
 
@@ -31,11 +31,29 @@ namespace MonoGame.Framework.WpfInterop
                 throw new ArgumentException("Provided host graphics device is null.");
 
             GraphicsDevice = host.GraphicsDevice;
-            _host.GraphicsDevice.DeviceReset += (sender, args) => DeviceReset?.Invoke(this, args);
-            _host.GraphicsDevice.DeviceResetting += (sender, args) => DeviceResetting?.Invoke(this, args);
+            _host.GraphicsDevice.DeviceReset += GraphicsDevice_DeviceReset;
+            _host.GraphicsDevice.DeviceResetting += GraphicsDevice_DeviceResetting;
+            _host.GraphicsDevice.Disposing += GraphicsDevice_Disposing;
 
             host.Services.AddService(typeof(IGraphicsDeviceService), this);
             host.Services.AddService(typeof(IGraphicsDeviceManager), this);
+        }
+
+        private void GraphicsDevice_DeviceResetting(object sender, EventArgs e)
+        {
+            DeviceResetting?.Invoke(this, e);
+        }
+
+        private void GraphicsDevice_DeviceReset(object sender, EventArgs e)
+        {
+            DeviceReset?.Invoke(this, e);
+        }
+
+        private void GraphicsDevice_Disposing(object sender, EventArgs e)
+        {
+            _host.GraphicsDevice.DeviceReset -= GraphicsDevice_DeviceReset;
+            _host.GraphicsDevice.DeviceResetting -= GraphicsDevice_DeviceResetting;
+            _host.GraphicsDevice.Disposing -= GraphicsDevice_Disposing;
         }
 
         #endregion
@@ -127,6 +145,12 @@ namespace MonoGame.Framework.WpfInterop
             DeviceDisposing?.Invoke(this, EventArgs.Empty);
             // manually work around it by telling our base implementation to handle the changes
             _host.RecreateGraphicsDevice(pp);
+        }
+
+        public void Dispose()
+        {
+            //_host.GraphicsDevice.DeviceReset -= GraphicsDevice_DeviceReset;
+            //_host.GraphicsDevice.DeviceResetting -= GraphicsDevice_DeviceResetting;
         }
 
         #endregion

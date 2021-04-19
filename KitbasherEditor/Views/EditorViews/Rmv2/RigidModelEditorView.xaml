@@ -22,22 +22,6 @@
             <TextBlock Text="{Binding SelectedVersion}" VerticalAlignment="Center"/>
         </StackPanel>
 
-
-        <DockPanel DockPanel.Dock="Top">
-            <Label Width="100">Skeleton</Label>
-            <Label>:</Label>
-            <filterdialog:CollapsableFilterControl  
-                                SelectedItem="{Binding SkeletonName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                SearchItems="{Binding SkeletonNameList, UpdateSourceTrigger=PropertyChanged}"     
-                                OnSearch="{Binding FilterByFullPath, UpdateSourceTrigger=PropertyChanged}"   
-                                IsManipulationEnabled="False"
-                                LabelTotalWidth="0"   
-                                DockPanel.Dock="top"
-                                MaxHeight="400"
-                                ShowLabel="false"
-                                LabelText="Target Anim"/>
-        </DockPanel>
-
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
             <Label Width="100">Attachments</Label>
             <Label>:</Label>
@@ -61,8 +45,7 @@
                     </Grid.ColumnDefinitions>
 
                         <ListView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"  MaxHeight="350"
-                              ItemsSource="{Binding AttachmentPoints, UpdateSourceTrigger=PropertyChanged}" 
-                              SelectedItem="{Binding SelectedAttachmentPoint, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" >
+                              ItemsSource="{Binding AttachmentPoints, UpdateSourceTrigger=PropertyChanged}" >
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"/>

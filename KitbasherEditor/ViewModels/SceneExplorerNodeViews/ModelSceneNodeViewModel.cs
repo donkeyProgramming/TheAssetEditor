@@ -24,38 +24,18 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         string _selectedVersion;
         public string SelectedVersion { get { return _selectedVersion; } set { SetAndNotify(ref _selectedVersion, value); } }
 
-        public List<string> SkeletonNameList { get; set; }
-
-        string _skeletonName;
-        public string SkeletonName { get { return _skeletonName; } set { SetAndNotify(ref _skeletonName, value); UpdateSkeletonName(); } }
-        public OnSeachDelegate FilterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
-
-
 
         ObservableCollection<RmvAttachmentPoint> _attachmentPoints;
         public ObservableCollection<RmvAttachmentPoint> AttachmentPoints { get { return _attachmentPoints; } set { SetAndNotify(ref _attachmentPoints, value); } }
 
-        Nullable<RmvAttachmentPoint> _selectedAtachmentPoint;
-        public Nullable<RmvAttachmentPoint> SelectedAttachmentPoint { get { return _selectedAtachmentPoint; } set { SetAndNotify(ref _selectedAtachmentPoint, value); IsRemoveAttachmentPointButtonEnabled = _selectedAtachmentPoint != null; } }
-
-        bool _isRemoveAttachmentPointButtonEnabled = false;
-        public bool IsRemoveAttachmentPointButtonEnabled { get { return _isRemoveAttachmentPointButtonEnabled; } set { SetAndNotify(ref _isRemoveAttachmentPointButtonEnabled, value); } }
-
         Rmv2ModelNode _modelNode;
-        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        AnimationControllerViewModel _animationControllerViewModel;
 
-        public ModelSceneNodeViewModel(Rmv2ModelNode node, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AnimationControllerViewModel animationControllerViewModel)
+        public ModelSceneNodeViewModel(Rmv2ModelNode node)
         {
             _modelNode = node;
 
              FileName = node.Model.FileName;
             SelectedVersion = "7";
-            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
-            _animationControllerViewModel = animationControllerViewModel;
-
-            SkeletonNameList = _skeletonAnimationLookUpHelper.GetAllSkeletonFileNames();
-            SkeletonName = SkeletonNameList.FirstOrDefault(x => x.Contains(node.Model.Header.SkeletonName));
 
             // Find all attachmentpoints
             var attachmentPoints = node.Model.MeshList.SelectMany(x => x.SelectMany(y => y.AttachmentPoints));
@@ -64,25 +44,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             AttachmentPoints = new ObservableCollection<RmvAttachmentPoint>(attachmentPoints);
 
             // Ensure all models have this value set
-            UpdateSkeletonName();
             UpdateAttachmentPoint();
-        }
-
-        void UpdateSkeletonName()
-        {
-            if (_modelNode.IsEditable)
-            {
-                string cleanName = "";
-                if (!string.IsNullOrWhiteSpace(SkeletonName))
-                    cleanName = Path.GetFileNameWithoutExtension(SkeletonName);
-
-
-
-                ModelEditorService service = new ModelEditorService(_modelNode);
-                service.SetSkeletonName(cleanName);
-
-                _animationControllerViewModel.SetActiveSkeleton(cleanName);
-            }
         }
 
         void UpdateAttachmentPoint()

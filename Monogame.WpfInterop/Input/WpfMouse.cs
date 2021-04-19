@@ -13,11 +13,11 @@ namespace MonoGame.Framework.WpfInterop.Input
     /// Helper class that converts WPF mouse input to the XNA/MonoGame <see cref="_mouseState"/>.
     /// Required for any WPF hosted control.
     /// </summary>
-    public class WpfMouse
+    public class WpfMouse : IDisposable
     {
         #region Fields
 
-        private readonly FrameworkElement _focusElement;
+        private FrameworkElement _focusElement;
 
         private MouseState _mouseState;
         private bool _captureMouseWithin = true;
@@ -257,6 +257,21 @@ namespace MonoGame.Framework.WpfInterop.Input
 
         [DllImport("User32.dll")]
         private static extern bool SetCursorPos(int x, int y);
+
+        public void Dispose()
+        {
+            _focusElement.MouseWheel -= HandleMouse;
+            // movement
+            _focusElement.MouseMove -= HandleMouse;
+            _focusElement.MouseEnter -= HandleMouse;
+            _focusElement.MouseLeave -= HandleMouse;
+            // clicks
+            _focusElement.MouseLeftButtonDown -= HandleMouse;
+            _focusElement.MouseLeftButtonUp -= HandleMouse;
+            _focusElement.MouseRightButtonDown -= HandleMouse;
+            _focusElement.MouseRightButtonUp -= HandleMouse;
+            _focusElement = null;
+        }
 
         #endregion
     }

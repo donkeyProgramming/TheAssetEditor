@@ -20,11 +20,12 @@ namespace View3D.Scene
     public class SceneContainer : WpfGame
     {
         private bool _disposed;
+        WpfGraphicsDeviceService _diviceService;
 
         protected override void Initialize()
         {
             _disposed = false;
-            new WpfGraphicsDeviceService(this);
+            _diviceService = new WpfGraphicsDeviceService(this);
 
             base.Initialize();
         }
@@ -43,11 +44,11 @@ namespace View3D.Scene
         {
             if (_disposed)
                 return;
-
-            Components.Clear();
             _disposed = true;
 
+            _diviceService = null;
             base.Dispose(disposing);
+            Components.Clear();
         }
     }
 }

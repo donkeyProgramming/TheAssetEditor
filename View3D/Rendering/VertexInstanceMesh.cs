@@ -40,7 +40,7 @@ namespace View3D.Rendering
         }
     }
 
-    public class VertexInstanceMesh
+    public class VertexInstanceMesh : IDisposable
     {
         Effect _effect;
         VertexDeclaration _instanceVertexDeclaration;
@@ -202,6 +202,13 @@ namespace View3D.Rendering
 
             device.SetVertexBuffers(_bindings);
             device.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, 24, 0, 12, _currentInstanceCount);
+        }
+
+        public void Dispose()
+        {
+            _effect.Dispose();
+            _instanceVertexDeclaration.Dispose();
+            _instanceBuffer.Dispose();
         }
     }
 }

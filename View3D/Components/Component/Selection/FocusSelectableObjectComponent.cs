@@ -103,5 +103,10 @@ namespace View3D.Components.Component.Selection
             _archballCamera.LookAt = Vector3.Zero;
             _archballCamera.Zoom = 10;
         }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

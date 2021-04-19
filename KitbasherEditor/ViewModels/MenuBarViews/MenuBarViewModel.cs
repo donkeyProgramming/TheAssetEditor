@@ -21,7 +21,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public ToolbarCommandFactory _commandFactory = new ToolbarCommandFactory();
 
         public ICommand ImportReferenceCommand { get; set; }
-        public ICommand ImportReferenceCommand_OrcTorso { get; set; }
         public ICommand ImportReferenceCommand_PaladinVMD { get; set; }
 
         public ModelLoaderService ModelLoader { get; set; }
@@ -38,7 +37,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             Tools = new ToolsMenuBarViewModel(componentManager, _commandFactory);
 
             ImportReferenceCommand = new RelayCommand(ImportReference);
-            ImportReferenceCommand_OrcTorso = new RelayCommand(ImportReference_OrcTorso);
             ImportReferenceCommand_PaladinVMD = new RelayCommand(ImportReference_PaladinVMD);
         }
 
@@ -61,10 +59,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             GC.Collect();
             GC.WaitForPendingFinalizers();
         }
-
-        void ImportReference_OrcTorso()
-        { }
-
         void ImportReference_PaladinVMD()
         {
             ModelLoader.LoadReference(@"variantmeshes\variantmeshdefinitions\brt_paladin.variantmeshdefinition");

@@ -9,15 +9,10 @@ using View3D.Components.Rendering;
 
 namespace View3D.Rendering
 {
-    public class LineMeshRender
+    public class LineMeshRender : IDisposable
     {
         Effect _shader;
         List<VertexPosition> _originalVertecies = new List<VertexPosition>();
-
-        public LineMeshRender(Effect effect)
-        {
-            _shader = effect;
-        }
 
         public LineMeshRender(ContentManager content)
         {
@@ -125,6 +120,12 @@ namespace View3D.Rendering
                 pass.Apply();
                 device.DrawUserPrimitives(PrimitiveType.LineList, _originalVertecies.ToArray(), 0, _originalVertecies.Count() / 2);
             }
+        }
+
+        public void Dispose()
+        {
+            _shader.Dispose();
+            _shader = null;
         }
     }
 }

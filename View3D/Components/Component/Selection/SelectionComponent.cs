@@ -22,7 +22,7 @@ using View3D.Utility;
 namespace View3D.Components.Component.Selection
 {
 
-    public class SelectionComponent : BaseComponent
+    public class SelectionComponent : BaseComponent, IDisposable
     {
         ILogger _logger = Logging.Create<SelectionManager>();
 
@@ -288,6 +288,12 @@ namespace View3D.Components.Component.Selection
         int RectArea(Rectangle rect)
         {
             return rect.Width * rect.Height;
+        }
+
+        public void Dispose()
+        {
+            _spriteBatch.Dispose();
+            _textTexture.Dispose();
         }
     }
 }

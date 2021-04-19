@@ -11,7 +11,7 @@ using View3D.Rendering.RenderItems;
 
 namespace View3D.Components.Component
 {
-    public class GridComponent : BaseComponent
+    public class GridComponent : BaseComponent, IDisposable
     {
         ILogger _logger = Logging.Create<GridComponent>();
 
@@ -38,5 +38,10 @@ namespace View3D.Components.Component
             base.Draw(gameTime);
         }
 
+        public void Dispose()
+        {
+            _gridMesh.Dispose();
+            _gridMesh = null;
+        }
     }
 }

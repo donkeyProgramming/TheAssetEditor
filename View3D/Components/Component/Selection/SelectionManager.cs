@@ -19,7 +19,7 @@ using View3D.SceneNodes;
 namespace View3D.Components.Component.Selection
 {
     public delegate void SelectionChangedDelegate(ISelectionState state);
-    public class SelectionManager : BaseComponent
+    public class SelectionManager : BaseComponent, IDisposable
     {
         public event SelectionChangedDelegate SelectionChanged;
 
@@ -39,7 +39,7 @@ namespace View3D.Components.Component.Selection
         {
             CreateSelectionSate(GeometrySelectionMode.Object);
             _renderEngine = GetComponent<RenderEngineComponent>();
-
+        
 
             _lineGeometry = new LineMeshRender(Game.Content);
             VertexRenderer = new VertexInstanceMesh(GraphicsDevice, Game.Content);
@@ -137,6 +137,28 @@ namespace View3D.Components.Component.Selection
             }
 
             base.Draw(gameTime);
+        }
+
+        public void Dispose()
+        {
+            _wireframeEffect.Effect.Dispose();
+            _wireframeEffect = null;
+            _selectedFacesEffect.Effect.Dispose();
+            _selectedFacesEffect = null;
+            VertexRenderer.Dispose();
+            VertexRenderer = null;
+            _lineGeometry.Dispose();
+            _lineGeometry = null;
+
+            if (SelectionChanged != null)
+                foreach (var d in SelectionChanged.GetInvocationList())
+                    SelectionChanged -= (d as SelectionChangedDelegate);
+
+
+            _currentState?.Clear();
+            _currentState = null;
+
+
         }
     }
 }

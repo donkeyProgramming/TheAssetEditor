@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 
@@ -75,9 +76,6 @@ namespace MonoGame.Framework.WpfInterop
             get { return _content; }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException();
-
                 _content = value;
             }
         }
@@ -101,9 +99,17 @@ namespace MonoGame.Framework.WpfInterop
             Components.ComponentRemoved -= ComponentRemoved;
             Components.Clear();
 
-            UnloadContent();
 
+            Services.RemoveService(typeof(IGraphicsDeviceService));
+            Services.RemoveService(typeof(IGraphicsDeviceManager));
+
+            UnloadContent();
+            _sortedUpdateables.Clear();
+            _sortedDrawables.Clear();
+
+            Content.Unload();
             Content?.Dispose();
+            Content = null;
         }
 
         /// <summary>

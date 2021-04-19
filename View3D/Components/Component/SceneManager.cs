@@ -19,7 +19,7 @@ namespace View3D.Components.Component
     public delegate void SceneObjectRemovedDelegate(ISceneNode parent, ISceneNode toRemove);
 
 
-    public class SceneManager : BaseComponent
+    public class SceneManager : BaseComponent, IDisposable
     {
         public event SceneObjectAddedDelegate SceneObjectAdded;
         public event SceneObjectRemovedDelegate SceneObjectRemoved;
@@ -167,6 +167,28 @@ namespace View3D.Components.Component
                 foreach (var child in root.Children)
                     DrawBasicSceneHirarchy(child, parentMatrix * child.ModelMatrix);
             }
+        }
+
+        public void Dispose()
+        {
+            if (SceneObjectAdded != null)
+                foreach (var d in SceneObjectAdded.GetInvocationList())
+                    SceneObjectAdded -= (d as SceneObjectAddedDelegate);
+
+            if (SceneObjectRemoved != null)
+                foreach (var d in SceneObjectRemoved.GetInvocationList())
+                    SceneObjectRemoved -= (d as SceneObjectRemovedDelegate);
+
+            DisposeNode(RootNode);
+            RootNode = null;
+        }
+
+        void DisposeNode(ISceneNode root)
+        {
+            if (root is IDisposable disposableObject)
+                disposableObject.Dispose();
+            foreach (var child in root.Children)
+                DisposeNode(child);
         }
     }
 }

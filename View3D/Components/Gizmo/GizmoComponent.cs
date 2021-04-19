@@ -18,7 +18,7 @@ using View3D.SceneNodes;
 
 namespace View3D.Components.Gizmo
 {
-    public class GizmoComponent : BaseComponent
+    public class GizmoComponent : BaseComponent, IDisposable
     {
         MouseComponent _mouse;
         KeyboardComponent _keyboard;
@@ -166,6 +166,11 @@ namespace View3D.Components.Gizmo
         public void ModifyGizmoScale(float v)
         {
             _gizmo.ScaleModifier += v;
+        }
+
+        public void Dispose()
+        {
+            _gizmo.Dispose();
         }
     }
 }

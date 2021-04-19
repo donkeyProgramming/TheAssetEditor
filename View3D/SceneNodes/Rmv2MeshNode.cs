@@ -89,6 +89,7 @@ namespace View3D.SceneNodes
 
         bool _isSelectable = true;
         public bool IsSelectable { get => _isSelectable; set => SetAndNotifyWhenChanged(ref _isSelectable, value); }
+        public bool ReduceMeshOnLodGeneration { get; set; } = true;
 
         public void Update(GameTime time)
         {
@@ -192,7 +193,8 @@ namespace View3D.SceneNodes
                 Name = Name + " - Clone",
                 AnimationPlayer = AnimationPlayer,
                 MeshModel = MeshModel.Clone(),
-                _resourceLib = _resourceLib
+                _resourceLib = _resourceLib,
+                ReduceMeshOnLodGeneration = ReduceMeshOnLodGeneration
             };
             newItem.Effect = Effect.Clone();
             return newItem;

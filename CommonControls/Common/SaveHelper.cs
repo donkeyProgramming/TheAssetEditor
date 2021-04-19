@@ -1,4 +1,5 @@
-﻿using CommonControls.Services;
+﻿using CommonControls.PackFileBrowser;
+using CommonControls.Services;
 using FileTypes.PackFiles.Models;
 using System;
 using System.Collections.Generic;
@@ -44,7 +45,26 @@ namespace CommonControls.Common
             {
                 var fullPath = packFileService.GetFullPath(existingFile as PackFile, selectedEditabelPackFile);
                 if (MessageBox.Show($"Replace existing file?\n{fullPath} \nin packfile:{selectedEditabelPackFile.Name}", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
-                    return null;
+                {
+                    var extention = Path.GetExtension(fullPath);
+                    using (var browser = new SavePackFileWindow(packFileService))
+                    {
+                        browser.ViewModel.Filter.SetExtentions(new List<string>() { extention });
+                        if (browser.ShowDialog() == true)
+                        {
+                            var path = browser.FilePath;
+                            if (path.Contains(extention) == false)
+                                path += extention;
+
+                            filename = path;
+                            existingFile = null;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
             }
             if (existingFile == null)
             {

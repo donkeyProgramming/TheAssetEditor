@@ -1,4 +1,5 @@
-﻿using Filetypes.RigidModel;
+﻿using Common;
+using Filetypes.RigidModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,22 +11,40 @@ namespace View3D.SceneNodes
     public class MainEditableNode : Rmv2ModelNode
     {
         SkeletonNode _skeletonNode;
-        
-        public MainEditableNode(string name) : base(name)
+        public IPackFile MainPackFile { get; private set; }
+
+
+        public MainEditableNode(string name, SkeletonNode skeletonNode, IPackFile mainFile) : base(name)
         {
-            
+            _skeletonNode = skeletonNode;
+            MainPackFile = mainFile;
         }
 
-
-        public byte[] Save(bool onlySaveVisibleNodes, List<string> boneNames)
+        public bool AreAllNodesVisible()
         {
+            bool isAllVisible = true;
+            GetLodNodes()[0].ForeachNode((node) =>
+            {
+                if (!node.IsVisible)
+                    isAllVisible = false;
+            });
+            return isAllVisible;
+        }
+
+        public byte[] Save(bool onlySaveVisibleNodes)
+        {
+            List<string> boneNames = new List<string>();
+            if (_skeletonNode.AnimationProvider.Skeleton != null)
+                boneNames = _skeletonNode.AnimationProvider.Skeleton.BoneNames.ToList();
+
             var lods = GetLodNodes();
             var orderedLods = lods.OrderBy(x => x.LodValue);
 
             RmvSubModel[][] newMeshList = new RmvSubModel[orderedLods.Count()][];
             for (int lodIndex = 0; lodIndex < orderedLods.Count(); lodIndex++)
             {
-                var meshes = orderedLods.ElementAt(lodIndex).GetAllModels(onlySaveVisibleNodes);
+                var meshes = GetMeshesInLod(lodIndex, onlySaveVisibleNodes);
+
                 newMeshList[lodIndex] = new RmvSubModel[meshes.Count];
 
                 for (int meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
@@ -45,6 +64,19 @@ namespace View3D.SceneNodes
             Model.SaveToByteArray(writer);
             return ms.ToArray();
         }
+
+        public List<Rmv2MeshNode> GetMeshesInLod(int lodIndex, bool onlyVisible)
+        {
+            var lods = GetLodNodes();
+            var orderedLods = lods.OrderBy(x => x.LodValue);
+
+            var meshes = orderedLods
+               .ElementAt(lodIndex)
+               .GetAllModels(onlyVisible);
+
+            return meshes;
+        }
+
 
         // GetAllNodes
 

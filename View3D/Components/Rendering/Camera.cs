@@ -11,7 +11,7 @@ using View3D.Components.Input;
 
 namespace View3D.Components.Rendering
 {
-    public class ArcBallCamera : BaseComponent
+    public class ArcBallCamera : BaseComponent, IDisposable
     {
         ILogger _logger = Logging.Create<ArcBallCamera>();
         GraphicsDevice _graphicsDevice;
@@ -309,6 +309,11 @@ namespace View3D.Components.Rendering
             regionProjMatrix.M32 = -(regionCenterScreen.Y - (_graphicsDevice.Viewport.Height / 2f)) / ((float)source.Height / 2f);
 
             return new BoundingFrustum(ViewMatrix * regionProjMatrix);
+        }
+
+        public void Dispose()
+        {
+            _graphicsDevice = null;
         }
     }
 }

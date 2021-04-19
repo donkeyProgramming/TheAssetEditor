@@ -157,6 +157,14 @@ PixelInputType main(in VertexInputType input) // main is the default function na
 {
 	PixelInputType output;
 
+
+    float fac = 1;
+    float4x4 scale4x4 = float4x4(
+        fac, 0, 0, 0,
+        0, fac, 0, 0,
+        0, 0, fac, 0,
+        0, 0, 0, 1);
+
 	if (doAnimation && WeightCount != 0)
 	{
         float4x4 PM[4];
@@ -191,7 +199,7 @@ PixelInputType main(in VertexInputType input) // main is the default function na
 		output.binormal = input.binormal;
 	}
 
-	output.position = mul(output.position, World);
+	output.position = mul(mul(output.position, scale4x4), World);
     output.worldPosition = output.position.xyz;
 	output.position = mul(output.position, View);
 	output.position = mul(output.position, Projection);

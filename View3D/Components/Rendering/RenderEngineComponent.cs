@@ -27,7 +27,7 @@ namespace View3D.Components.Rendering
         void Draw(GraphicsDevice device, CommonShaderParameters parameters);
     }
 
-    public class RenderEngineComponent : BaseComponent
+    public class RenderEngineComponent : BaseComponent, IDisposable
     {
 
         RasterizerState _wireframeState;
@@ -116,6 +116,13 @@ namespace View3D.Components.Rendering
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+        }
+
+        public void Dispose()
+        {
+            _renderItems.Clear();
+            _wireframeState.Dispose();
+            _selectedFaceState.Dispose();
         }
     }
 }

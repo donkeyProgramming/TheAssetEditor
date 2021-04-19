@@ -16,7 +16,7 @@ using View3D.Scene;
 namespace View3D.Components.Component
 {
     public delegate void CommandStackChangedDelegate();
-    public class CommandExecutor : BaseComponent
+    public class CommandExecutor : BaseComponent, IDisposable
     {
         ILogger _logger = Logging.Create<CommandExecutor>();
         Stack<ICommand> _commands = new Stack<ICommand>();
@@ -117,7 +117,15 @@ namespace View3D.Components.Component
             }
         }
 
+        public void Dispose()
+        {
+            _spriteBatch.Dispose();
+            _spriteBatch = null;
 
+            if (CommandStackChanged != null)
+                foreach (var d in CommandStackChanged.GetInvocationList())
+                    CommandStackChanged -= (d as CommandStackChangedDelegate);
+        }
     }
 }
 

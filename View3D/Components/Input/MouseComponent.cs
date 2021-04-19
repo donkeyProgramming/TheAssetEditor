@@ -17,7 +17,7 @@ namespace View3D.Components.Input
         Right,
     }
 
-    public class MouseComponent : BaseComponent
+    public class MouseComponent : BaseComponent, IDisposable
     {
         ILogger _logger = Logging.Create<MouseComponent>();
 
@@ -139,5 +139,11 @@ namespace View3D.Components.Input
             _lastMousesState = new MouseState();
         }
 
+        public void Dispose()
+        {
+            _wpfMouse.Dispose();
+            _wpfMouse = null;
+            _mouseOwner = null;
+        }
     }
 }

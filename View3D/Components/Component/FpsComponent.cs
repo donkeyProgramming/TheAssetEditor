@@ -5,7 +5,7 @@ using MonoGame.Framework.WpfInterop;
 
 namespace View3D.Components.Component
 {
-    public class FpsComponent : BaseComponent
+    public class FpsComponent : BaseComponent, IDisposable
     {
         #region Fields
         private SpriteBatch _spriteBatch;
@@ -49,6 +49,11 @@ namespace View3D.Components.Component
             _spriteBatch.Begin();
             _spriteBatch.DrawString(_font, $"FPS: {_frames}", new Vector2(5), Color.White);
             _spriteBatch.End();
+        }
+
+        public void Dispose()
+        {
+            _spriteBatch.Dispose();
         }
 
         #endregion

@@ -136,5 +136,23 @@ namespace View3D.Components.Component
             _commandManager.ExecuteCommand(cmd);
             
         }
+
+        public void SortMeshes(ISceneNode node)
+        {
+            var children = new List<ISceneNode>(node.Children);
+            for (int i = 0; i < children.Count; i++)
+                node.RemoveObject(children[i]);
+
+            children.Sort((x, y) => x.Name.CompareTo(y.Name));
+
+            for (int i = 0; i < children.Count; i++)
+                node.AddObject(children[i]);
+
+            for (int i = 0; i < children.Count; i++)
+            {
+                if (children[i] is GroupNode)
+                    SortMeshes(children[i]);
+            }
+        }
     }
 }

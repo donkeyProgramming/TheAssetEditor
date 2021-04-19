@@ -22,7 +22,7 @@ namespace View3D.Utility
         BasicEffect
     }
 
-    public class ResourceLibary : BaseComponent
+    public class ResourceLibary : BaseComponent, IDisposable
     {
         ILogger _logger = Logging.Create<ResourceLibary>();
 
@@ -147,6 +147,32 @@ namespace View3D.Utility
             if (_shaders.ContainsKey(type))
                 return _shaders[type];
             throw new Exception($"Shader not found: ShaderTypes::{type}");
+        }
+
+        public void Dispose()
+        {
+            foreach (var item in _textureMap)
+                item.Value.Dispose();
+            _textureMap.Clear();
+
+            foreach (var item in _shaders)
+                item.Value.Dispose();
+            _shaders.Clear();
+
+
+            //Content.Dispose();
+            Content = null;
+
+            PbrDiffuse.Dispose();
+            PbrDiffuse = null;
+
+          
+            PbrSpecular.Dispose();
+            PbrSpecular = null;
+           
+
+            PbrLut.Dispose();
+            PbrLut = null;
         }
     }
 }

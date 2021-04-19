@@ -15,6 +15,9 @@
         <DataTemplate DataType="{ x:Type nodeViewModels:ModelSceneNodeViewModel}">
             <rmv2:RigidModelEditorView/>
         </DataTemplate>
+        <DataTemplate DataType="{ x:Type nodeViewModels:MainEditableNodeViewModel}">
+            <generic:MainEditableNodeView/>
+        </DataTemplate>
         <DataTemplate DataType="{ x:Type nodeViewModels:LodSceneNodeViewModel}">
             <rmv2:RigidModelLodEditorView/>
         </DataTemplate>
@@ -27,7 +30,9 @@
         <DataTemplate DataType="{ x:Type nodeViewModels:GroupNodeViewModel}">
             <generic:GroupView/>
         </DataTemplate>
+
         
+
 
     </UserControl.Resources>
     <ScrollViewer>
