@@ -31,7 +31,8 @@ namespace Filetypes.ByteParsing
         DbTypesEnum Type { get; }
         bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string error);
         bool CanDecode(byte[] buffer, int index, out int bytesRead, out string error);
-        //public abstract bool Encode();
+        
+
     }
 
     public interface SpesificByteParser<T> : IByteParser

@@ -14,6 +14,7 @@ using System.Windows.Media;
 using Common;
 using WpfHexaEditor.Core;
 using FileTypes.DB;
+using WpfHexaEditor;
 
 namespace AnimMetaEditor.ViewModels
 {

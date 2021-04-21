@@ -35,11 +35,12 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-
+            
+            <!-- Background="{Binding FieldExplorer.BackgroundBlocks, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"-->
 			<decoderviews:FieldExplorer Grid.Row="0"/>
             <control:HexEditor Grid.Row="1"
                     Stream="{Binding FieldExplorer.ByteStream, UpdateSourceTrigger=PropertyChanged}"
-    
+                   
                     
                     AllowByteCount="False"
                     AllowCustomBackgroundBlock="True"

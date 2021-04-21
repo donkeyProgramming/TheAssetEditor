@@ -81,7 +81,7 @@ namespace AssetEditor.ViewModels
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
                 //variantmeshes\variantmeshdefinitions\dwf_hammerers.variantmeshdefinition"
-                var packFile = packfileService.FindFile(@"animations\battle\ape01\attacks\ap01_attack_01.anm.meta");
+                var packFile = packfileService.FindFile(@"animations\battle\dragon02\attacks\dr2_attack_05.anm.meta");
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_loremaster_of_hoeth\hef_loremaster_of_hoeth_head_01.rigid_model_v2");
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc4\hef\hef_war_lion\hef_war_lion_02.rigid_model_v2");

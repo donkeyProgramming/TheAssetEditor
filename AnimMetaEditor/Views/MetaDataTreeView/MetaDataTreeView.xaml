@@ -29,7 +29,7 @@
         
         <ListView 
             Grid.Row="2" 
-            DisplayMemberPath="DisplayName" 
+            DisplayMemberPath="DisplayNameWithCount" 
             ItemsSource="{Binding ActiveMentaDataContent.File.TagItems, UpdateSourceTrigger=PropertyChanged}" 
             SelectedItem="{Binding ActiveMentaDataContent.SelectedTagType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 

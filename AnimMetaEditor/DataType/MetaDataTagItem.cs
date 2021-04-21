@@ -33,7 +33,10 @@ namespace AnimMetaEditor.DataType
         public int Version { get; set; }
         public List<Data> DataItems { get; set; } = new List<Data>();
 
-        public string DisplayName { get { return $"{Name}_v{Version} [{DataItems.Count}]"; } }
+        public string DisplayNameWithCount{ get { return $"{Name}_v{Version} [{DataItems.Count}]"; } }
+        public string DisplayName { get { return $"{Name}_v{Version}"; } }
+
+        public bool IsDecodedCorrectly { get; set; } = false;
 
         public override string ToString()
         {

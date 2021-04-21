@@ -30,8 +30,9 @@ namespace AnimMetaEditor.Views.MetadataTableViews
         private void StackPanel_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             var obj = sender as DataGrid;
-            var cont = obj.DataContext as MainViewModel;
-            cont.DataTable.DataGridReference = obj;
+            var cont = obj.DataContext as MainDecoderViewModel;
+            if(cont != null)
+                cont.DataTable.DataGridReference = obj;
         }
     }
 

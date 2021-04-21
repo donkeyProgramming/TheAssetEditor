@@ -1,5 +1,7 @@
 ﻿using AnimMetaEditor.ViewModels;
+using AnimMetaEditor.ViewModels.Editor;
 using AnimMetaEditor.Views;
+using AnimMetaEditor.Views.Editor;
 using Common;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -13,14 +15,16 @@ namespace AnimMetaEditor
         public static void Register(IServiceCollection serviceCollection)
         {
             serviceCollection.AddTransient<MetaDataMainView>();
-            serviceCollection.AddTransient<MainViewModel>();
-            //serviceCollection.AddSingleton<SkeletonAnimationLookUpHelper>();
-            ////_skeletonAnimationLookUpHelper = new (_packFileService);
+            serviceCollection.AddTransient<MainDecoderViewModel>();
+            
+            serviceCollection.AddTransient<MainEditorView>();
+            serviceCollection.AddTransient<MainEditorViewModel>();
         }
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<MainViewModel, MetaDataMainView>(".anm.meta");
+            factory.RegisterTool<MainEditorViewModel, MainEditorView>(".anm.meta");
+            factory.RegisterTool<MainDecoderViewModel, MetaDataMainView>();
         }
     }
 }

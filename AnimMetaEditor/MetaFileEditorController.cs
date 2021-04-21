@@ -17,14 +17,6 @@ namespace AnimMetaEditor
 {
     public class MetaFileEditorController
     {
-        public static Window MakeWindwo(SchemaManager schemaManager, PackFileService pf)
-        {
-            Window newWindow = new Window();
-            newWindow.Content = CreateDecoder(schemaManager, pf);
-            //newWindow.DataContext = viewModel;
-            return newWindow;
-        }
-
         public static MetaDataMainView CreateDecoder(SchemaManager schemaManager, PackFileService pf)
         {
             var allMetaFiles = pf.FindAllWithExtention(".meta");
