@@ -31,13 +31,15 @@ namespace Filetypes.ByteParsing
         DbTypesEnum Type { get; }
         bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string error);
         bool CanDecode(byte[] buffer, int index, out int bytesRead, out string error);
-        
+
+        byte[] Encode(string value, out string error);
 
     }
 
     public interface SpesificByteParser<T> : IByteParser
     {
         bool TryDecodeValue(byte[] buffer, int index, out T value, out int bytesRead, out string error);
+        byte[] EncodeValue(T value, out string error);
     }
 
     public abstract class NumberParser<T> : SpesificByteParser<T>
@@ -48,6 +50,8 @@ namespace Filetypes.ByteParsing
         public abstract string TypeName { get; }
 
         protected abstract T Decode(byte[] buffer, int index);
+        public abstract byte[] EncodeValue(T value, out string error);
+        public abstract byte[] Encode(string value, out string error);
 
         public bool CanDecode(byte[] buffer, int index, out int bytesRead, out string _error)
         {
@@ -90,6 +94,23 @@ namespace Filetypes.ByteParsing
         {
             return BitConverter.ToInt32(buffer, index);
         }
+
+        public override byte[] EncodeValue(int value, out string error)
+        {
+            error = null;
+            return BitConverter.GetBytes(value);
+        }
+
+        public override byte[] Encode(string value, out string error)
+        {
+            if (!int.TryParse(value, out var spesificValue))
+            {
+                error = "Unable to convert string to value";
+                return null;
+            }
+
+            return EncodeValue(spesificValue, out error);
+        }
     }
 
     public class Int64Parser : NumberParser<long>
@@ -102,6 +123,23 @@ namespace Filetypes.ByteParsing
         protected override long Decode(byte[] buffer, int index)
         {
             return BitConverter.ToInt64(buffer, index);
+        }
+
+        public override byte[] EncodeValue(long value, out string error)
+        {
+            error = null;
+            return BitConverter.GetBytes(value);
+        }
+
+        public override byte[] Encode(string value, out string error)
+        {
+            if (!long.TryParse(value, out var spesificValue))
+            {
+                error = "Unable to convert string to value";
+                return null;
+            }
+
+            return EncodeValue(spesificValue, out error);
         }
     }
 
@@ -116,6 +154,23 @@ namespace Filetypes.ByteParsing
         {
             return BitConverter.ToUInt32(buffer, index);
         }
+
+        public override byte[] EncodeValue(uint value, out string error)
+        {
+            error = null;
+            return BitConverter.GetBytes(value);
+        }
+
+        public override byte[] Encode(string value, out string error)
+        {
+            if (!uint.TryParse(value, out var spesificValue))
+            {
+                error = "Unable to convert string to value";
+                return null;
+            }
+
+            return EncodeValue(spesificValue, out error);
+        }
     }
 
     public class ByteParser : NumberParser<byte>
@@ -129,6 +184,23 @@ namespace Filetypes.ByteParsing
         {
             return buffer[index];
         }
+
+        public override byte[] EncodeValue(byte value, out string error)
+        {
+            error = null;
+            return new byte[] { value};
+        }
+
+        public override byte[] Encode(string value, out string error)
+        {
+            if (!byte.TryParse(value, out var spesificValue))
+            {
+                error = "Unable to convert string to value";
+                return null;
+            }
+
+            return EncodeValue(spesificValue, out error);
+        }
     }
 
     public class SingleParser : NumberParser<float>
@@ -140,6 +212,23 @@ namespace Filetypes.ByteParsing
         protected override float Decode(byte[] buffer, int index)
         {
             return BitConverter.ToSingle(buffer, index);
+        }
+
+        public override byte[] EncodeValue(float value, out string error)
+        {
+            error = null;
+            return BitConverter.GetBytes(value);
+        }
+
+        public override byte[] Encode(string value, out string error)
+        {
+            if (!float.TryParse(value, out var spesificValue))
+            {
+                error = "Unable to convert string to value";
+                return null;
+            }
+
+            return EncodeValue(spesificValue, out error);
         }
     }
 
@@ -154,6 +243,24 @@ namespace Filetypes.ByteParsing
             var u = (BitConverter.ToUInt16(buffer, index));
             return new Half(u);
         }
+
+        public override byte[] EncodeValue(Half value, out string error)
+        {
+            error = null;
+            return BitConverter.GetBytes(value);
+        }
+
+        public override byte[] Encode(string value, out string error)
+        {
+           
+            if (!float.TryParse(value, out var spesificValue))
+            {
+                error = "Unable to convert string to value";
+                return null;
+            }
+
+            return EncodeValue(new Half(spesificValue), out error);
+        }
     }
 
     public class ShortParser : NumberParser<short>
@@ -166,6 +273,23 @@ namespace Filetypes.ByteParsing
         {
             return BitConverter.ToInt16(buffer, index);
         }
+
+        public override byte[] EncodeValue(short value, out string error)
+        {
+            error = null;
+            return BitConverter.GetBytes(value);
+        }
+
+        public override byte[] Encode(string value, out string error)
+        {
+            if (!short.TryParse(value, out var spesificValue))
+            {
+                error = "Unable to convert string to value";
+                return null;
+            }
+
+            return EncodeValue(spesificValue, out error);
+        }
     }
 
     public class UShortParser : NumberParser<ushort>
@@ -177,6 +301,23 @@ namespace Filetypes.ByteParsing
         protected override ushort Decode(byte[] buffer, int index)
         {
             return BitConverter.ToUInt16(buffer, index);
+        }
+
+        public override byte[] EncodeValue(ushort value, out string error)
+        {
+            error = null;
+            return BitConverter.GetBytes(value);
+        }
+
+        public override byte[] Encode(string value, out string error)
+        {
+            if (!ushort.TryParse(value, out var spesificValue))
+            {
+                error = "Unable to convert string to value";
+                return null;
+            }
+
+            return EncodeValue(spesificValue, out error);
         }
     }
 
@@ -209,6 +350,23 @@ namespace Filetypes.ByteParsing
             return true;
         }
 
+        public byte[] Encode(string value, out string error)
+        {
+            if (!bool.TryParse(value, out var _res))
+            {
+                error = "Unable to convert value to bool";
+                return null;
+            }
+            error = null;
+            return Write(_res);
+        }
+
+        public byte[] EncodeValue(bool value, out string error)
+        {
+            error = null;
+            return Write(value);
+        }
+
         public bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string _error)
         {
             var result = TryDecodeValue(buffer, index, out var temp, out bytesRead, out _error);
@@ -225,7 +383,7 @@ namespace Filetypes.ByteParsing
             return canDecode;
         }
 
-        public byte[] Write(bool value)
+        byte[] Write(bool value)
         {
             if (value)
                 return new byte[1] { 1 };
@@ -362,18 +520,43 @@ namespace Filetypes.ByteParsing
 
         public byte[] WriteCaString(string value)
         {
-            if (IsOptStr)
-                throw new NotImplementedException();
-            if(StringEncoding != Encoding.UTF8)
-                throw new NotImplementedException();
-
             if (string.IsNullOrWhiteSpace(value))
-                return BitConverter.GetBytes((Int16)0);
+            {
+                if (IsOptStr)
+                    return new byte[] { 0 };
+                else
+                    return BitConverter.GetBytes((Int16)0);
+            }
+
+            
 
             var byteLength = BitConverter.GetBytes((Int16)value.Length);
             var byteStr = StringEncoding.GetBytes(value);
 
-            return byteLength.Concat(byteStr).ToArray();
+            var stringWithCountAtFront =  byteLength.Concat(byteStr).ToArray();
+
+            if (IsOptStr)
+            {
+                if (value == null || value.Length == 0)
+                    return new byte[] { 0 };
+
+                return new byte[] { 1 }.Concat(stringWithCountAtFront).ToArray();
+            }
+            else
+            {
+                return stringWithCountAtFront;
+            }
+        }
+
+        public byte[] EncodeValue(string value, out string error)
+        {
+            error = null;
+            return WriteCaString(value);
+        }
+
+        public byte[] Encode(string value, out string error)
+        {
+            return EncodeValue(value, out error);
         }
     }
 
@@ -580,11 +763,8 @@ namespace Filetypes.ByteParsing
         public bool ReadBool() => Read(ByteParsers.Bool);
         public byte ReadByte() => Read(ByteParsers.Byte);
         
-
-
         public uint PeakUint32() => Peak(ByteParsers.UInt32);
         public long PeakInt64() => Peak(ByteParsers.Int64);
-
 
         public UnknownParseResult PeakUnknown()
         {
@@ -629,7 +809,6 @@ namespace Filetypes.ByteParsing
 
             }
         }
-
 
        
         public byte[] Debug_LookForDataAfterFixedStr(int size)

@@ -119,7 +119,7 @@ namespace AnimMetaEditor.ViewModels.Editor
 
             void Validate()
             {
-                Parser.TryDecode
+                //Parser.TryDecode
             }
         }
 
