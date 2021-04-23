@@ -1,14 +1,11 @@
 ﻿using AnimMetaEditor.DataType;
 using Common;
 using CommonControls;
+using CommonControls.Common;
 using CommonControls.Services;
-using Filetypes.ByteParsing;
 using FileTypes.PackFiles.Models;
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
 using System.Windows.Input;
 
@@ -18,145 +15,59 @@ namespace AnimMetaEditor.ViewModels.Editor
     {
         PackFileService _pf;
         SchemaManager _schemaManager;
+        MetaDataFile _metaDataFile;
 
-        public string DisplayName { get => _file.Name; set => throw new NotImplementedException(); }
+        public MetaDataTagEditorViewModel Editor { get; set; }
+        public ICommand SaveCommand { get; set; }
+
+        string _displayName;
+        public string DisplayName { get => _displayName; set => SetAndNotify(ref _displayName, value); }
 
         IPackFile _file;
         public IPackFile MainFile { get => _file; set => Initialise(value); }
 
 
-
-        public TagExplorer TagExplorer { get; set; }
-        public ValueEditor ValueEditor { get; set; }
-
-        MetaDataFile _metaDataFile;
-        public MetaDataFile MetaDataFile { get => _metaDataFile; set => SetAndNotify(ref _metaDataFile, value); }
-
-
-
+        public MetaDataViewModel __metaDataFileViewModel;
+        public MetaDataViewModel MetaDataFile { get => __metaDataFileViewModel; set => SetAndNotify(ref __metaDataFileViewModel, value); }
 
         public MainEditorViewModel(PackFileService pf, SchemaManager schemaManager)
         {
             _pf = pf;
             _schemaManager = schemaManager;
+            SaveCommand = new RelayCommand(() => Save());
         }
 
         void Initialise(IPackFile file)
         {
             _file = file;
-            MetaDataFileParser parser = new MetaDataFileParser();
-            MetaDataFile = parser.ParseFile(_file as PackFile, _pf);
-            MetaDataFile.Validate(_schemaManager);
+            DisplayName = file.Name;
 
-            ValueEditor = new ValueEditor(_schemaManager);
-            TagExplorer = new TagExplorer(MetaDataFile, ValueEditor);
+            _metaDataFile = MetaDataFileParser.ParseFile(_file as PackFile, _pf);
+            _metaDataFile.Validate(_schemaManager);
 
+            MetaDataFile = new MetaDataViewModel(_metaDataFile, _schemaManager);
+            Editor = new MetaDataTagEditorViewModel(MetaDataFile);
         }
-
-
 
         public void Close()
         {
-            //throw new NotImplementedException();
         }
 
         public bool HasUnsavedChanges()
         {
             return false;
-            //throw new NotImplementedException();
         }
 
         public bool Save()
         {
-            return true;
-            //throw new NotImplementedException();
-        }
-    }
-
-    public class TagExplorer : NotifyPropertyChangedImpl
-    {
-        MetaDataFile _metaDataFile;
-        ValueEditor _valueEditor;
-
-        public MetaDataFile MetaDataFile { get => _metaDataFile; set => SetAndNotify(ref _metaDataFile, value); }
-
-        MetaDataTagItem _selectedTag;
-        public MetaDataTagItem SelectedTag { get => _selectedTag; set { SetAndNotify(ref _selectedTag, value); _valueEditor.TagSelected(_selectedTag); } }
-
-
-        public TagExplorer(MetaDataFile metaDataFile, ValueEditor valueEditor)
-        {
-            _valueEditor = valueEditor;
-
-            MetaDataFile = metaDataFile;
-        }
-    }
-
-    public class ValueEditor : NotifyPropertyChangedImpl
-    {
-        SchemaManager _schemaManager;
-
-        ObservableCollection<EditableTagItem> _fields = new ObservableCollection<EditableTagItem>();
-        public ObservableCollection<EditableTagItem> Fields { get => _fields; set => SetAndNotify(ref _fields, value); }
-
-
-        public class EditableTagItem
-        {
-            public EditableTagItem()
+            var path = _pf.GetFullPath(_file as PackFile);
+            var res = SaveHelper.Save(_pf, path, null, MetaDataFile.GetBytes());
+            if (res != null)
             {
-                ValidateCommand = new RelayCommand(Validate);
+                _file = res;
+                DisplayName = _file.Name;
             }
-
-            public string FieldName { get; set; }
-            public string Description { get; set; }
-            public string ValueType { get; set; }
-            public string ValueAsString { get; set; }
-            public string OriginalValue { get; set; }
-
-            public ICommand ValidateCommand { get; set; }
-            public ICommand ResetCommand { get; set; }
-            public IByteParser Parser { get; set; }
-
-            void Validate()
-            {
-                //Parser.TryDecode
-            }
-        }
-
-        public ValueEditor(SchemaManager schemaManager)
-        {
-            _schemaManager = schemaManager;
-        }
-
-        internal void TagSelected(MetaDataTagItem selectedTag)
-        {
-            Fields.Clear();
-            if (selectedTag != null && selectedTag.IsDecodedCorrectly)
-            {
-                var schema = _schemaManager.GetMetaDataDefinition(selectedTag.Name, selectedTag.Version);
-                var fields = schema.ColumnDefinitions;
-
-                var totalBytesRead = 0;
-                for (int i = 0; i < fields.Count; i++)
-                {
-                    FileTypes.DB.DbColumnDefinition field = fields[i];
-                    var parser = ByteParserFactory.Create(field.Type);
-                    var result = parser.TryDecode(selectedTag.DataItems[0].Bytes, selectedTag.DataItems[0].Start + totalBytesRead, out string value, out var bytesRead, out var error);
-                    totalBytesRead += bytesRead;
-
-                    EditableTagItem item = new EditableTagItem()
-                    {
-                        Description = field.Description,
-                        FieldName = $"[{i+1}] {field.Name} - { field.Type}",
-                        ValueType = field.Type.ToString(),
-                        ValueAsString = value,
-                        OriginalValue = value,
-                        Parser = parser
-                    };
-
-                    Fields.Add(item);
-                }
-            }
+            return _file != null;
         }
     }
 }

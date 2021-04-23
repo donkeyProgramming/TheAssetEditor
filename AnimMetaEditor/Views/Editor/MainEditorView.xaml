@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:AnimMetaEditor.Views.Editor"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>

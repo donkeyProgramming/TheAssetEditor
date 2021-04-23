@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace AnimMetaEditor.DataType
 {
-    class MetaDataFileParser
+    static class MetaDataFileParser
     {
-        public MetaDataFile ParseFile(PackFile file, PackFileService pf)
+        public static MetaDataFile ParseFile(PackFile file, PackFileService pf)
         {
             var fileContent = file.DataSource.ReadData();
             var contentLength = fileContent.Count();
@@ -43,12 +43,7 @@ namespace AnimMetaEditor.DataType
         }
 
 
-        public MetaDataFile ParseAllFilesAsOne()
-        {
-            return null;
-        }
-
-        MetaDataTagItem GetElement(int startIndex, byte[] data, string parentFileName, out int updatedByteIndex)
+        static MetaDataTagItem GetElement(int startIndex, byte[] data, string parentFileName, out int updatedByteIndex)
         {
             if(! ByteParsers.String.TryDecode(data, startIndex, out var tagName, out var strBytesRead, out string error))
                 throw new Exception($"Unable to detect tagname for MetaData element starting at {startIndex} - {error}");
@@ -76,7 +71,7 @@ namespace AnimMetaEditor.DataType
             return metaTagItem;
         }
 
-        bool IsAllCapsCaString(int index, byte[] data)
+        static bool IsAllCapsCaString(int index, byte[] data)
         {
             if (ByteParsers.String.TryDecode(data, index, out var tagName, out _, out _))
             {

@@ -3,12 +3,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:AnimMetaEditor.Views.Editor"
+             xmlns:local="clr-namespace:AnimMetaEditor.Views.Editor" xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <valueconverters:BoolToColourConverter x:Key="ColourConverter" TrueValue="White" FalseValue="Red"/>
+    </UserControl.Resources>
     <Grid>
-        <ListView ItemsSource="{Binding ValueEditor.Fields, UpdateSourceTrigger=PropertyChanged}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
 
+        <ListView Grid.Row="0" ItemsSource="{Binding MetaDataFile.SelectedTag.Variables, UpdateSourceTrigger=PropertyChanged}">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -32,7 +39,6 @@
                             <ColumnDefinition Width="auto"/>
                             <ColumnDefinition Width="auto"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="auto"/>
                         </Grid.ColumnDefinitions>
 
                         <Grid.RowDefinitions>
@@ -42,7 +48,7 @@
                             <RowDefinition Height="auto"/>
                         </Grid.RowDefinitions>
 
-                        
+
                         <Label Grid.Row="0" Grid.Column="0" FontWeight="bold" Content="Field Name"/>
                         <Label Grid.Row="1" Grid.Column="0" Content="Description"/>
                         <Label Grid.Row="2" Grid.Column="0" Content="Value"/>
@@ -53,16 +59,14 @@
 
                         <Label Grid.Row="0" Grid.Column="2"  FontWeight="bold"  Content="{Binding FieldName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                         <Label Grid.Row="1" Grid.Column="2" Content="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                        <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding ValueAsString, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                        <Button Grid.Row="2" Grid.Column="3" Content="Validate" Command="{Binding ValidateCommand}" Width="60" HorizontalAlignment="Right" Margin="2,0,2,0"/>
-
-                        <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" BorderThickness="1" Margin="2" BorderBrush="DarkGray"></Border>
+                        <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding ValueAsString, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                  Background="{Binding isValid, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                        <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" BorderThickness="1" Margin="2" BorderBrush="DarkGray"/>
 
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        
-        
+
     </Grid>
 </UserControl>

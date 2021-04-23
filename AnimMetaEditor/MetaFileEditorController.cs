@@ -29,10 +29,9 @@ namespace AnimMetaEditor
                 FileName ="Master collection"
             };
 
-            MetaDataFileParser parser = new MetaDataFileParser();
             foreach (var file in allMetaFiles)
             {
-                var res = parser.ParseFile(file, pf);
+                var res = MetaDataFileParser.ParseFile(file, pf);
                 allMetaData.Add(res);
 
                 foreach (var resultDataItem in res.TagItems)
@@ -68,9 +67,7 @@ namespace AnimMetaEditor
 
         public static void CreateEditor(PackFile file, PackFileService pf)
         {
-
-            MetaDataFileParser parser = new MetaDataFileParser();
-            parser.ParseFile(file, pf);
+            MetaDataFileParser.ParseFile(file, pf);
         }
     }
 }

@@ -23,7 +23,7 @@
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBar>
-                <Button ToolTip="Save"  Command="{Binding ToolBar.SaveCommand, Mode=OneTime}">
+                <Button ToolTip="Save"  Command="{Binding SaveCommand, Mode=OneTime}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-save-all-50.png"/>
                 </Button>
             </ToolBar>

@@ -53,10 +53,9 @@ namespace AnimMetaEditor.ViewModels
                     FileName = "Master collection"
                 };
 
-                MetaDataFileParser parser = new MetaDataFileParser();
                 foreach (var file in allMetaFiles)
                 {
-                    var res = parser.ParseFile(file, _pf);
+                    var res = MetaDataFileParser.ParseFile(file, _pf);
                     allMetaData.Add(res);
 
                     foreach (var resultDataItem in res.TagItems)
