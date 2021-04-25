@@ -33,6 +33,16 @@ namespace AnimMetaEditor.ViewModels.Editor
         {
             isValid = _parser.Encode(ValueAsString, out _) != null;
         }
+
+        public byte[] GetByteValue()
+        {
+            return _parser.Encode(ValueAsString, out _);
+        }
+
+        public override string ToString()
+        {
+            return $"{FieldName} - {ValueAsString} - {isValid}";
+        }
     }
 }
 

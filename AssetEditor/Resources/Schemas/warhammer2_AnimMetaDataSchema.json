@@ -1,0 +1,4580 @@
+{
+  "GameEnum": "Warhammer2",
+  "Version": 1,
+  "TableDefinitions": {
+    "ALPHA": [
+      {
+        "TableName": "ALPHA",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Time1",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Time in ms (0 = the start of the animation) when the Alpha will be the Desired Alpha value. Note that it will slowly transition to that value, so if you want the transition to be quicker, add a new ALPHA metadata tag, make it apply just before this one, and give it a \"1\" desired value.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Time2",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "=Time1, I guess",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Always 0?",
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "0, 1, or 83 so far. It's apparently not VFX Filter ID.",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Desired Alpha",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "This might be a %, 0 = invisible and 1 = visible.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "PROP": [
+      {
+        "TableName": "PROP",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Start Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "The starting time for when the prop is visible, in miliseconds. 0 = the beginning of the animation",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "End Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "The ending time for when the prop is visibile, in miliseconds. 0 = the beginning of the animation",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Always 0?",
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Bombardment Order",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "This is related to bombardment abilities, allowing props to be toggled off after using a unit's ability. The number here is the order in which the prop is toggled off. Look at the gyrobomber's stuff to see this in action.",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Prop Model",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Path to the prop's model. Probably has to be of the \"rigid\" vertex type, so no rigged models.",
+            "FilenameRelativePath": null,
+            "Type": "Optstring"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Always 0?",
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "X Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Y Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Z Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "X Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Y Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Z Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "W Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Bone ID",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "This is the ID of the bone to which the prop is attached. The bone is also the origin for positioning/rotating the prop.",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "0 or 2. Unknown.",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "0, 1, or 7. Unknown.",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          }
+        ]
+      }
+    ],
+    "RIDER_IDLE_SPEED_SCALE": [
+      {
+        "TableName": "RIDER_IDLE_SPEED_SCALE",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Could be start time.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Could be end time.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Animation Speed Scale",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Likely speeds up/slows down rider animations. I wonder if this can be used to correct that cavalry scaling bug...",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "SNIP": [
+      {
+        "TableName": "SNIP",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Start Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Removes animation frames before this time, in milliseconds.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "End Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Removes animation frames after this time, in milliseconds.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Always 0?",
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Always 0?",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          }
+        ]
+      }
+    ],
+    "RESCALE": [
+      {
+        "TableName": "RESCALE",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Start Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "in milliseconds.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "End Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "in milliseconds.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Always 0?",
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Always 0?",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Scale",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Unit will go to this scale between start and end time? Haven't test it yet, sounds funny though.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "ANIMATED_PROP": [
+      {
+        "TableName": "ANIMATED_PROP",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Always 0?",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Start Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "When the prop appears.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "End Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "When the prop disappears. Note that if Start Time = End Time the prop will appear at that time and only disappear after the animation ends.",
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "0, 1, 4, 10. Unknown",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Could also be a byte, but it appears to only be 0 or 1.",
+            "FilenameRelativePath": null,
+            "Type": "Boolean"
+          },
+          {
+            "Name": "Model",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Path to the model. Can be either a RMV2 or a wsmodel.",
+            "FilenameRelativePath": null,
+            "Type": "String"
+          },
+          {
+            "Name": "Animation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Path to the animation's .anim file.",
+            "FilenameRelativePath": null,
+            "Type": "String"
+          },
+          {
+            "Name": "X Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "In meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Y Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "In meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Z Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "In meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "X Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Y Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Z Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "W Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Bone ID",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "ID of the bone to which the prop is attached. The prop is the origin for positioning and rotation.",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "0, 1, or 2. Unknown.",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "1, 3, 4, 5, 6, or 7. Unknown.",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          }
+        ]
+      },
+      {
+        "TableName": "ANIMATED_PROP",
+        "Version": 11,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Start Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "When the prop appears.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "End Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Could also be a byte.",
+            "FilenameRelativePath": null,
+            "Type": "Boolean"
+          },
+          {
+            "Name": "Model",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "String"
+          },
+          {
+            "Name": "Animation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "String"
+          },
+          {
+            "Name": "X Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "In meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Y Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "In meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Z Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "In meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "X Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Y Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Z Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "W Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Bone ID",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "ID of the bone to which the prop is attached. The prop is the origin for positioning and rotation.",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "TIME": [
+      {
+        "TableName": "TIME",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          }
+        ]
+      }
+    ],
+    "NOT_BUILDING": [
+      {
+        "TableName": "NOT_BUILDING",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          }
+        ]
+      }
+    ],
+    "FIRE_POS": [
+      {
+        "TableName": "FIRE_POS",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Time1",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "When the projectile will fire, time in miliseconds. 0 = start of the animation.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Time2",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Time1 = Time2",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Always 0?",
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Always 0?",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "X Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Measured from the unit's animroot bone, in meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Y Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Measured from the unit's animroot bone, in meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Z Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Measured from the unit's animroot bone, in meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      },
+      {
+        "TableName": "FIRE_POS",
+        "Version": 2,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Time1",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Time2",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "X Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Y Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Z Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "FULL_BODY": [
+      {
+        "TableName": "FULL_BODY",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "FACE_POSE": [
+      {
+        "TableName": "FACE_POSE",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Time1",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "When the face pose will be applied, in miliseconds. 0 = beginning of animation.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Time2",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Time2 = Time1?",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Always 0?",
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Always 0?",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Face Pose ID",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "This should probably be an enum. (these are animation slots available in .frg, and in the order they appear there) 0=FACE_POSE_RELAX,1=FACE_POSE_RELAX_BLINK,2=FACE_POSE_ANGRY,3=FACE_POSE_ANGRY_BLINK,4=FACE_POSE_ANGRY_SCREAM,5=FACE_POSE_DEAD,6=FACE_POSE_DEAD2,7=FACE_POSE_DEATH_SCREAM,8=FACE_POSE_WORRIED,9=FACE_POSE_WORRIED_BLINK",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "It's mostly 1's but some 0.6 to 0.8, so it could be some \"intensity\" thing, no idea though.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      },
+      {
+        "TableName": "FACE_POSE",
+        "Version": 2,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Time1",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Time2",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Face Pose ID",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "EFFECT": [
+      {
+        "TableName": "EFFECT",
+        "Version": 11,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Time1",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "When the VFX will appear, in milliseconds. 0 = beginning of animation.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Time2",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Time2 = Time1?",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "This apparently signals if an optional byte should come right after or not. 0 = no byte, 1 = byte right after.",
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "VFX Filter ID",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "This is related to that one column in the \"battle entities tables\". If this is 0, then the VFX will always show, but if it's anything else, then the battle entity of the unit needs to match this ID for the VFX to show up for that unit. ",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "VFX Name ",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Name of the VFX's .xml file in the vfx folder. Leave off the file extension. Note that for this you don't need to add custom vfx to the particles db table and they still require a \"movie\"-type .pack for them to be loaded.",
+            "FilenameRelativePath": null,
+            "Type": "String"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Boolean"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Boolean"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Boolean"
+          },
+          {
+            "Name": "X Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "In meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Y Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "In meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Z Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "In meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "X Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Y Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Z Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "W Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Bone ID",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "ID of the bone to which the VFX is attached.",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "VFX Scale",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Scale of the VFX. 1 = normal, 0.5 = half, etc.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "IMPACT_POS": [
+      {
+        "TableName": "IMPACT_POS",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Time1",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Time in miliseconds.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Time2",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Time2 = Time1?",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "X Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Measured from the unit's animroot bone. In meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Y Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Measured from the unit's animroot bone. In meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Z Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Measured from the unit's animroot bone. In meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "LHAND_POSE": [
+      {
+        "TableName": "LHAND_POSE",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Time1",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Time when hand is posed. 0 = start of animation.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Time2",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Time2 = Time1?",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Left Hand Pose ID",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "This should be an enum. (these are animation slots in .frg) 0=HAND_POSE_RELAX,1=HAND_POSE_FLAT,2=HAND_POSE_CLENCH,3=HAND_POSE_GRIP,4=HAND_POSE_HALF_OPEN,5=HAND_POSE_THUMB_GRIP,6=HAND_POSE_CUSTOM_1,7=HAND_POSE_CUSTOM_2,8=HAND_POSE_CUSTOM_3,9=HAND_POSE_CUSTOM_4,10=HAND_POSE_CUSTOM_5,11=HAND_POSE_CUSTOM_6,12=HAND_POSE_CUSTOM_7,13=HAND_POSE_CUSTOM_8,14=HAND_POSE_CUSTOM_9,15=HAND_POSE_CUSTOM_10,",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "RHAND_POSE": [
+      {
+        "TableName": "RHAND_POSE",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Time1",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Time when hand is posed. 0 = start of animation.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Time2",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Time2= Time1?",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Right Hand Pose ID",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "This should be an enum. (these are animation slots in .frg) 0=HAND_POSE_RELAX,1=HAND_POSE_FLAT,2=HAND_POSE_CLENCH,3=HAND_POSE_GRIP,4=HAND_POSE_HALF_OPEN,5=HAND_POSE_THUMB_GRIP,6=HAND_POSE_CUSTOM_1,7=HAND_POSE_CUSTOM_2,8=HAND_POSE_CUSTOM_3,9=HAND_POSE_CUSTOM_4,10=HAND_POSE_CUSTOM_5,11=HAND_POSE_CUSTOM_6,12=HAND_POSE_CUSTOM_7,13=HAND_POSE_CUSTOM_8,14=HAND_POSE_CUSTOM_9,15=HAND_POSE_CUSTOM_10,",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "TRANSFORM": [
+      {
+        "TableName": "TRANSFORM",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Start Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "When the bone goes to that transformed state.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "End Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "When the bone returns to it's original state? Not sure about that, but ff start and end times are the same, it'll stay transformed until the end of the animation.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Bone ID1",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "ID of the bone which you are moving or rotating.",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Bone ID2",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Bone ID1 = BoneID2?",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "X Translation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "In meters. Local to the bone's orientation.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Y Translation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "In meters. Local to the bone's orientation.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Z Translation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "In meters. Local to the bone's orientation.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "X Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Y Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Z Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "W Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "DISABLE_PERSISTENT_ID": [
+      {
+        "TableName": "DISABLE_PERSISTENT_ID",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          }
+        ]
+      }
+    ],
+    "DISABLE_PERSISTENT": [
+      {
+        "TableName": "DISABLE_PERSISTENT",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Start Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "End Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "If start = end time, will go until the end of the animation.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "-1, 0, or 1?",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          }
+        ]
+      }
+    ],
+    "BOUNDING_VOLUME_OVERRIDE": [
+      {
+        "TableName": "BOUNDING_VOLUME_OVERRIDE",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "BLOOD": [
+      {
+        "TableName": "BLOOD",
+        "Version": 11,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Time1",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Time2",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "VFX Name",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "String"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Boolean"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Boolean"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Boolean"
+          },
+          {
+            "Name": "X Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Y Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Z Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "X Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Y Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Z Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "W Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Bone ID",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "VFX Scale",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "MAX_TARGET_SIZE": [
+      {
+        "TableName": "MAX_TARGET_SIZE",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Max Target Size",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Likely an enum related to unit size. Maybe 0=large, 1=medium, 2=small, 3=very_large, 4=very_small",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          }
+        ]
+      }
+    ],
+    "MIN_TARGET_SIZE": [
+      {
+        "TableName": "MIN_TARGET_SIZE",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Min Target Size",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Likely an enum related to unit size. Maybe 0=large, 1=medium, 2=small, 3=very_large, 4=very_small",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          }
+        ]
+      }
+    ],
+    "SPLASH_ATTACK": [
+      {
+        "TableName": "SPLASH_ATTACK",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Time1",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Time2",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "X Position 1",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Y Position 1",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Z Position 1",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "X Position 2",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Y Position 2",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Z Position 2",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Some type of angle in degress?",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Float16"
+          }
+        ]
+      }
+    ],
+    "SPLICE": [
+      {
+        "TableName": "SPLICE",
+        "Version": 12,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Start Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "End TIme",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Filter Bone ID",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "I believe this \"stops\" the spliced animation from going past this bone in the skeleton's hierarchy. So if it's a spine bone, and the spliced animation is applied to animroot, then it won't be spliced to the torso.",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Animation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "String"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Spliced Bone ID",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "The spliced animation applies to this bone and all of it's children. -1 seems to be the same as 0, ie. animroot, but there's probably something with the pose-type .anim files that makes it distinct.",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "String"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "String"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "String"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "String"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "String"
+          }
+        ]
+      }
+    ],
+    "BEARING": [
+      {
+        "TableName": "BEARING",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "DOCK_EQPT_RHAND": [
+      {
+        "TableName": "DOCK_EQPT_RHAND",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Start Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "End Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Weapon Bone ID",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "0=\"Weapon Bone 1\" in .frg but \"be_prop_0\" in a typical VMD. 1=\"Weapon Bone 2\" in .frg but \"be_prop_1\" in VMD. etc.",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "DOCK_EQPT_LWAIST": [
+      {
+        "TableName": "DOCK_EQPT_LWAIST",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Start Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "End Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Weapon Bone ID",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "0=\"Weapon Bone 1\" in .frg but \"be_prop_0\" in a typical VMD. 1=\"Weapon Bone 2\" in .frg but \"be_prop_1\" in VMD. etc.",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "DOCK_EQPT_LHAND": [
+      {
+        "TableName": "DOCK_EQPT_LHAND",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Weapon Bone ID",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "0=\"Weapon Bone 1\" in .frg but \"be_prop_0\" in a typical VMD. 1=\"Weapon Bone 2\" in .frg but \"be_prop_1\" in VMD. etc.",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "DOCK_EQPT_BACK": [
+      {
+        "TableName": "DOCK_EQPT_BACK",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Start Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "End Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Weapon Bone ID",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "0=\"Weapon Bone 1\" in .frg but \"be_prop_0\" in a typical VMD. 1=\"Weapon Bone 2\" in .frg but \"be_prop_1\" in VMD. etc.",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "DOCK_EQPT_RWAIST": [
+      {
+        "TableName": "DOCK_EQPT_RWAIST",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Start Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "End Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Weapon Bone ID",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "0=\"Weapon Bone 1\" in .frg but \"be_prop_0\" in a typical VMD. 1=\"Weapon Bone 2\" in .frg but \"be_prop_1\" in VMD. etc.",
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "WEAPON_HIP": [
+      {
+        "TableName": "WEAPON_HIP",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Start Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "End Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Weapon Bone ID",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "WEAPON_LHAND": [
+      {
+        "TableName": "WEAPON_LHAND",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Start Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "End Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Weapon Bone ID",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "WEAPON_RHAND": [
+      {
+        "TableName": "WEAPON_RHAND",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Start Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "End Time",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Short"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Weapon Bone ID",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          }
+        ]
+      }
+    ],
+    "CREW_LOCATION": [
+      {
+        "TableName": "CREW_LOCATION",
+        "Version": 10,
+        "ColumnDefinitions": [
+          {
+            "Name": "Version",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Crew Type",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "This might have to do with what animations each crew plays when the artillery fires.",
+            "FilenameRelativePath": null,
+            "Type": "String"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "X Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "I believe this is measured from the artillery piece's animroot. In meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Y Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "I believe this is measured from the artillery piece's animroot. In meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Z Position",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "I believe this is measured from the artillery piece's animroot. In meters.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "X Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Y Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Z Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "W Rotation",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": "Quarternion component.",
+            "FilenameRelativePath": null,
+            "Type": "Single"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          },
+          {
+            "Name": "Unknown Field",
+            "FieldReference": null,
+            "TableReference": null,
+            "IsKey": false,
+            "IsOptional": false,
+            "MaxLength": 0,
+            "IsFileName": false,
+            "Description": null,
+            "FilenameRelativePath": null,
+            "Type": "Integer"
+          }
+        ]
+      }
+    ]
+  }
+}

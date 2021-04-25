@@ -31,8 +31,8 @@ namespace Filetypes.ByteParsing
         DbTypesEnum Type { get; }
         bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string error);
         bool CanDecode(byte[] buffer, int index, out int bytesRead, out string error);
-
         byte[] Encode(string value, out string error);
+        string DefaultValue();
 
     }
 
@@ -80,6 +80,11 @@ namespace Filetypes.ByteParsing
             if (canDecode)
                 value = Decode(buffer, index);
             return canDecode;
+        }
+
+        public string DefaultValue()
+        {
+            return "0";
         }
     }
 
@@ -247,7 +252,7 @@ namespace Filetypes.ByteParsing
         public override byte[] EncodeValue(Half value, out string error)
         {
             error = null;
-            return BitConverter.GetBytes(value);
+            return BitConverter.GetBytes(value.RawValue);
         }
 
         public override byte[] Encode(string value, out string error)
@@ -348,6 +353,11 @@ namespace Filetypes.ByteParsing
             bytesRead = FieldSize;
             _error = null;
             return true;
+        }
+
+        public string DefaultValue()
+        {
+            return "false";
         }
 
         public byte[] Encode(string value, out string error)
@@ -557,6 +567,11 @@ namespace Filetypes.ByteParsing
         public byte[] Encode(string value, out string error)
         {
             return EncodeValue(value, out error);
+        }
+
+        public string DefaultValue()
+        {
+            return "";
         }
     }
 

@@ -7,6 +7,7 @@ using FileTypes.PackFiles.Models;
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
 using System.Text;
+using System.Windows;
 using System.Windows.Input;
 
 namespace AnimMetaEditor.ViewModels.Editor
@@ -46,7 +47,7 @@ namespace AnimMetaEditor.ViewModels.Editor
             _metaDataFile.Validate(_schemaManager);
 
             MetaDataFile = new MetaDataViewModel(_metaDataFile, _schemaManager);
-            Editor = new MetaDataTagEditorViewModel(MetaDataFile);
+            Editor = new MetaDataTagEditorViewModel(_schemaManager, MetaDataFile);
         }
 
         public void Close()
@@ -61,7 +62,15 @@ namespace AnimMetaEditor.ViewModels.Editor
         public bool Save()
         {
             var path = _pf.GetFullPath(_file as PackFile);
-            var res = SaveHelper.Save(_pf, path, null, MetaDataFile.GetBytes());
+
+            if (!MetaDataFile.IsValid(out string errorMessage))
+            {
+                MessageBox.Show($"Unable to save : {errorMessage}");
+                return false;
+            }
+
+            var bytes = MetaDataFile.GetBytes();
+            var res = SaveHelper.Save(_pf, path, null, bytes);
             if (res != null)
             {
                 _file = res;

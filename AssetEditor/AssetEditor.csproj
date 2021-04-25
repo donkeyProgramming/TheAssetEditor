@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>hnet.com-image (1).ico</ApplicationIcon>
-    <AssemblyName>AssetEditor v0.5-DecoderBeta</AssemblyName>
+    <AssemblyName>AssetEditor v0.6</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -27,6 +27,12 @@
     <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
     <ProjectReference Include="..\TextEditor\TextEditor.csproj" />
     <ProjectReference Include="..\View3D\View3D.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\Schemas\warhammer2_AnimMetaDataSchema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

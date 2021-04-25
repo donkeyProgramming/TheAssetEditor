@@ -42,6 +42,19 @@ namespace AnimMetaEditor.DataType
             return outputFile;
         }
 
+        internal static byte[] GenerateBytes(MetaDataFile output)
+        {
+            List<byte> data = new List<byte>();
+            data.AddRange(BitConverter.GetBytes((int)output.Version));
+            data.AddRange(BitConverter.GetBytes((int)output.TagItems.Count));
+            foreach (var item in output.TagItems)
+            {
+                data.AddRange(ByteParsers.String.Encode(item.Name, out _));
+                data.AddRange(item.DataItems[0].Bytes);
+            }
+
+            return data.ToArray();
+        }
 
         static MetaDataTagItem GetElement(int startIndex, byte[] data, string parentFileName, out int updatedByteIndex)
         {

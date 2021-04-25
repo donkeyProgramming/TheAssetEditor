@@ -9,6 +9,7 @@ using System.Text;
 using Common;
 using System.Linq;
 using System.IO;
+using System.Windows;
 
 namespace CommonControls
 {
@@ -103,6 +104,17 @@ namespace CommonControls
             };
         }
 
+        public List<DbTableDefinition> GetAllMetaDataDefinitions()
+        {
+            if (_gameAnimMetaDefinitions.ContainsKey(CurrentGame))
+            {
+                var allDefs = _gameAnimMetaDefinitions[CurrentGame].TableDefinitions.SelectMany(x=>x.Value).ToList();
+                return allDefs;
+            }
+
+            return null;
+        }
+
         public void UpdateMetaTableDefinition(DbTableDefinition newTableDefinition)
         {
             if (!_gameAnimMetaDefinitions.ContainsKey(CurrentGame))
@@ -144,6 +156,9 @@ namespace CommonControls
                 string path = DirectoryHelper.SchemaDirectory + "\\" + GameInformationFactory.GetGameById(CurrentGame).ShortID + "_AnimMetaDataSchema.json";
                 var content = JsonConvert.SerializeObject(_gameAnimMetaDefinitions[CurrentGame], Formatting.Indented);
                 File.WriteAllText(path, content);
+
+                MessageBox.Show("Be kind and send the updated scehema to the developers so it can be shared");
+
                 return true;
             }
             catch (Exception e)
@@ -177,12 +192,17 @@ namespace CommonControls
             if (_gameTableDefinitions.ContainsKey(game))
                 return;
             
-            string path = DirectoryHelper.SchemaDirectory + "\\" + GameInformationFactory.GetGameById(game).ShortID + "_schema.json";
+            string path = DirectoryHelper.SchemaDirectory + "\\" + GameInformationFactory.GetGameById(game).ShortID + "_schema.json";   // Try local copy first
+            if(!File.Exists(path))
+                path = "Resources\\Schemas\\" + GameInformationFactory.GetGameById(game).ShortID + "_schema.json";
+
             var content = LoadSchemaFile(path);
             if (content != null)
                 _gameTableDefinitions.Add(game, content);
             
-            path = DirectoryHelper.SchemaDirectory + "\\" + GameInformationFactory.GetGameById(game).ShortID + "_AnimMetaDataSchema.json";
+            path = DirectoryHelper.SchemaDirectory + "\\" + GameInformationFactory.GetGameById(game).ShortID + "_AnimMetaDataSchema.json"; // Try local copy first
+            if (!File.Exists(path))
+                path = "Resources\\Schemas\\" + GameInformationFactory.GetGameById(game).ShortID + "_AnimMetaDataSchema.json";
             content = LoadSchemaFile(path);
             if (content != null)
                 _gameAnimMetaDefinitions.Add(game, content);
@@ -193,6 +213,7 @@ namespace CommonControls
             if (!File.Exists(path))
                 return null;
 
+            _logger.Here().Information($"Loading schema file - {path}");
             var content = File.ReadAllText(path);
             var schema = JsonConvert.DeserializeObject<SchemaFile>(content);
             return schema;
