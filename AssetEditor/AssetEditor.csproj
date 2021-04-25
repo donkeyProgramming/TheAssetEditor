@@ -13,6 +13,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\Schemas\warhammer2_AnimMetaDataSchema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
     <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
@@ -29,10 +35,8 @@
     <ProjectReference Include="..\View3D\View3D.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Resources\Schemas\warhammer2_AnimMetaDataSchema.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<PropertyGroup>
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
 
 </Project>

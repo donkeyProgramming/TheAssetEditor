@@ -10,6 +10,8 @@ using Common;
 using System.Linq;
 using System.IO;
 using System.Windows;
+using System.Reflection;
+using System.Collections;
 
 namespace CommonControls
 {
@@ -202,11 +204,35 @@ namespace CommonControls
             
             path = DirectoryHelper.SchemaDirectory + "\\" + GameInformationFactory.GetGameById(game).ShortID + "_AnimMetaDataSchema.json"; // Try local copy first
             if (!File.Exists(path))
-                path = "Resources\\Schemas\\" + GameInformationFactory.GetGameById(game).ShortID + "_AnimMetaDataSchema.json";
-            content = LoadSchemaFile(path);
+            {
+                var allResource = GetResourceNames();
+
+                var resourceFileName = GameInformationFactory.GetGameById(game).ShortID + "_AnimMetaDataSchema.json";
+                var entry = allResource.FirstOrDefault(x => x.Key.ToString().Contains(resourceFileName, StringComparison.InvariantCultureIgnoreCase));
+                if (entry.Key != null)
+                {
+                    using var resourceReader = new StreamReader(entry.Value as Stream);
+                    var resourceContent = resourceReader.ReadToEnd();
+                    content = LoadSchemaFileFromContent(resourceContent);
+                }
+            }
+            else
+                content = LoadSchemaFile(path);
             if (content != null)
                 _gameAnimMetaDefinitions.Add(game, content);
         }
+
+        public static List<DictionaryEntry> GetResourceNames()
+        {
+            var asm = Assembly.GetEntryAssembly();
+            string resName = asm.GetName().Name + ".g.resources";
+            using (var stream = asm.GetManifestResourceStream(resName))
+            using (var reader = new System.Resources.ResourceReader(stream))
+            {
+                return reader.Cast<DictionaryEntry>().Select(entry => entry).ToList();
+            }
+        }
+
 
         SchemaFile LoadSchemaFile(string path)
         {
@@ -215,6 +241,13 @@ namespace CommonControls
 
             _logger.Here().Information($"Loading schema file - {path}");
             var content = File.ReadAllText(path);
+            var schema = JsonConvert.DeserializeObject<SchemaFile>(content);
+            return schema;
+        }
+
+        SchemaFile LoadSchemaFileFromContent(string content)
+        {
+            _logger.Here().Information($"Loading schema from content");
             var schema = JsonConvert.DeserializeObject<SchemaFile>(content);
             return schema;
         }
