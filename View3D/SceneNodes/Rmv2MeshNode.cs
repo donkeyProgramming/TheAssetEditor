@@ -202,4 +202,35 @@ namespace View3D.SceneNodes
 
 
     }
+
+
+    public class Rmv2MeshNodeHelper
+    {
+        public static List<Rmv2MeshNode> GetAllVisibleMeshes(ISceneNode node)
+        {
+            return GetAllChildren(node);
+        }
+
+
+        static List<Rmv2MeshNode> GetAllChildren(ISceneNode parent)
+        {
+            var output = new List<Rmv2MeshNode>();
+            var visibleChildren = parent.Children.Where(x => x.IsVisible);
+
+            foreach (var child in visibleChildren)
+            {
+                if (child is Rmv2MeshNode mesh)
+                {
+                    output.Add(mesh);
+                }
+                else
+                {
+                    var result = GetAllChildren(child);
+                    output.AddRange(result);
+                }
+            }
+
+            return output;
+        }
+    }
 }

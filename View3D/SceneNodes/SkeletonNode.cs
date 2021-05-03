@@ -23,8 +23,8 @@ namespace View3D.SceneNodes
         public IAnimationProvider AnimationProvider { get; private set; }
         LineMeshRender _lineRenderer;
 
-        public Vector3 NodeColour = new Vector3(.25f, 1, .25f);
-        public Vector3 SelectedNodeColour = new Vector3(1, 0, 0);
+        public Color NodeColour = Color.Black;
+        public Color SelectedNodeColour = Color.Red;
         public Vector3 LineColour = new Vector3(0, 0, 0);
 
         public int? SelectedBoneIndex { get; set; }
@@ -57,7 +57,7 @@ namespace View3D.SceneNodes
                         continue;
 
                     float scale = SkeletonScale;
-                    Vector3 drawColour = NodeColour;
+                    Color drawColour = NodeColour;
                     if (SelectedBoneIndex.HasValue && SelectedBoneIndex.Value == i)
                     {
                         drawColour = SelectedNodeColour;
@@ -67,7 +67,7 @@ namespace View3D.SceneNodes
                     var boneMatrix = skeleton.GetAnimatedWorldTranform(i);
                     var parentBoneMatrix = skeleton.GetAnimatedWorldTranform(parentIndex);
 
-                    _lineRenderer.AddCube(Matrix.CreateScale(scale) * Matrix.CreateScale(0.05f) * boneMatrix * parentWorld);
+                    _lineRenderer.AddCube(Matrix.CreateScale(scale) * Matrix.CreateScale(0.05f) * boneMatrix * parentWorld, drawColour);
                     _lineRenderer.AddLine(Vector3.Transform(boneMatrix.Translation, parentWorld), Vector3.Transform(parentBoneMatrix.Translation, parentWorld));
                 }
 

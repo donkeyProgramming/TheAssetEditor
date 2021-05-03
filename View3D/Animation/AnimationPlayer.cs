@@ -190,6 +190,8 @@ namespace View3D.Animation
 
         public void Pause() { IsPlaying = false; }
 
+        public void Play(bool value) { IsPlaying = value;  }
+
         public AnimationFrame GetCurrentFrame()
         {
             return _currentAnimFrame;

@@ -118,7 +118,7 @@ namespace CommonControls.PackFileBrowser
         protected virtual void OnDoubleClick(TreeNode node) 
         {
             // using command parmeter to get node causes memory leaks, using selected node for now
-            if (SelectedItem.NodeType == NodeType.File)
+            if (SelectedItem != null && SelectedItem.NodeType == NodeType.File)
                 FileOpen?.Invoke(SelectedItem.Item); 
         }
 

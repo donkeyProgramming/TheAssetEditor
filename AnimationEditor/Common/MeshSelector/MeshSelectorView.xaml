@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="AnimationEditor.Common.MeshSelector.MeshSelectorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AnimationEditor.Common.MeshSelector" 
+             xmlns:packfilebrowser="clr-namespace:CommonControls.PackFileBrowser;assembly=CommonControls"
+             mc:Ignorable="d" 
+            d:DesignWidth="800">
+    <Grid>
+        <Expander >
+            <Expander.Header>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalContentAlignment="Center"/>
+                    <TextBlock VerticalAlignment="Bottom">
+                        <Run FontSize="14" FontWeight="Bold" Text="Mesh : "/>
+                        <Run Text="{Binding SelectedFileName, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+                    </TextBlock>
+                </StackPanel>
+            </Expander.Header>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox Grid.Column="0" Margin="0,0,5,0" IsReadOnly="True"/>
+                <Button Grid.Column="1" Content="Browse" Command="{Binding BrowseFileCommand}"/>
+            </Grid>
+        </Expander>
+    </Grid>
+</UserControl>

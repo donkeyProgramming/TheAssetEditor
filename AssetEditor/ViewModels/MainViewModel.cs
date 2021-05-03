@@ -81,7 +81,7 @@ namespace AssetEditor.ViewModels
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
                 //variantmeshes\variantmeshdefinitions\dwf_hammerers.variantmeshdefinition"
-                var packFile = packfileService.FindFile(@"animations\battle\dragon02\attacks\dr2_attack_05.anm.meta");
+                //var packFile = packfileService.FindFile(@"animations\battle\dragon02\attacks\dr2_attack_05.anm.meta");
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_loremaster_of_hoeth\hef_loremaster_of_hoeth_head_01.rigid_model_v2");
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc4\hef\hef_war_lion\hef_war_lion_02.rigid_model_v2");
@@ -90,8 +90,24 @@ namespace AssetEditor.ViewModels
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\skvt1\skv\skv_jezzails\skv_clan_rats_legs_fr_01.rigid_model_v2"); 
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_eltharion\hef_eltharion_head.rigid_model_v2");
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu17\skv\skv_clan_rats\head\skv_clan_rats_head_04.rigid_model_v2");
-            
-                OpenFile(packFile);
+
+
+                var editorView = toolFactory.CreateEditorViewModel<AnimationEditor.PropCreator.ViewModels.MainPropCreatorViewModel>();
+                editorView.RefInput= new AnimationEditor.PropCreator.ViewModels.MainPropCreatorViewModelInput()
+                { 
+                    Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_damsel_campaign_01.variantmeshdefinition") as PackFile,
+                    Animation = packfileService.FindFile(@"animations\battle\humanoid01b\staff_and_sword\celebrate\hu1b_sfsw_celebrate_01.anim") as PackFile,
+                };
+
+                editorView.MainInput = new AnimationEditor.PropCreator.ViewModels.MainPropCreatorViewModelInput()
+                {
+                    Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_assassin.variantmeshdefinition") as PackFile,
+                    Animation = packfileService.FindFile(@"animations\battle\humanoid17\halberd\stand\hu17_hb_stand_01.anim") as PackFile,
+                };
+
+                CreateEmptyEditor(editorView);
+
+                //OpenFile(packFile);
                 CreateTestPackFiles(packfileService);
             }
         }

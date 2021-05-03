@@ -16,11 +16,13 @@ float3 Color;
 struct VertexShaderInput
 {
 	float3 Position : POSITION0;
+	float3 Colour : COLOR0;
 };
 
 struct VertexShaderOutput
 {
 	float4 Position : SV_POSITION;
+	float3 Colour : NORMAL0;
 };
 
 VertexShaderOutput MainVS(in VertexShaderInput input)
@@ -30,13 +32,13 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 	float4 worldPosition = mul(float4(input.Position, 1), World);
 	float4 viewPosition = mul(worldPosition, View);
 	output.Position = mul(viewPosition, Projection);
-
+	output.Colour = input.Colour;
 	return output;
 }
 
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
-	return float4(Color, 1);
+	return float4(input.Colour, 1);
 }
 
 technique BasicColorDrawing

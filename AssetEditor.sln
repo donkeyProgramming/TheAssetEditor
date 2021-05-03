@@ -38,7 +38,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeshDecimator", "MeshDecima
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextureEditor", "TextureEditor\TextureEditor.csproj", "{70708A4D-A71A-487A-87DE-47E526F2E142}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimMetaEditor", "AnimMetaEditor\AnimMetaEditor.csproj", "{34951708-9476-4077-B6DD-89F5BD76CE9C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimMetaEditor", "AnimMetaEditor\AnimMetaEditor.csproj", "{34951708-9476-4077-B6DD-89F5BD76CE9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimationEditor", "AnimationEditor\AnimationEditor.csproj", "{0FCB6133-32A4-4115-BD53-474C703E7B34}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -98,6 +100,10 @@ Global
 		{34951708-9476-4077-B6DD-89F5BD76CE9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34951708-9476-4077-B6DD-89F5BD76CE9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34951708-9476-4077-B6DD-89F5BD76CE9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FCB6133-32A4-4115-BD53-474C703E7B34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FCB6133-32A4-4115-BD53-474C703E7B34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FCB6133-32A4-4115-BD53-474C703E7B34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FCB6133-32A4-4115-BD53-474C703E7B34}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -111,6 +117,7 @@ Global
 		{F49D5D98-DF95-4A31-A42F-DA6D92C242DD} = {C174C249-D109-49BE-8BC5-42A0D5DEDBDA}
 		{70708A4D-A71A-487A-87DE-47E526F2E142} = {07AC615B-A8FC-4E1A-BDD5-BC11452429A0}
 		{34951708-9476-4077-B6DD-89F5BD76CE9C} = {07AC615B-A8FC-4E1A-BDD5-BC11452429A0}
+		{0FCB6133-32A4-4115-BD53-474C703E7B34} = {07AC615B-A8FC-4E1A-BDD5-BC11452429A0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AB5968F3-98ED-4AFF-98EA-0DBEDCACADF2}

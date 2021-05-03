@@ -1,4 +1,5 @@
-﻿using AssetEditor.Services;
+﻿using AnimationEditor.PropCreator.ViewModels;
+using AssetEditor.Services;
 using AssetEditor.Views.Settings;
 using Common;
 using Common.ApplicationSettings;
@@ -33,6 +34,7 @@ namespace AssetEditor.ViewModels
         public ICommand OpenAnimMetaDecocderCommand { get; set; }
 
         public ICommand OpenKitbashEditorCommand { get; set; }
+        public ICommand OpenPropCreatorCommand { get; set; }
         public IEditorCreator EditorCreator { get; set; }
 
         public MenuBarViewModel(IServiceProvider provider, PackFileService packfileService, ToolFactory toolFactory)
@@ -46,6 +48,7 @@ namespace AssetEditor.ViewModels
             OpenAssetEditorFolderCommand = new RelayCommand(OpenAssetEditorFolder);
             OpenKitbashEditorCommand = new RelayCommand(OpenKitbasherTool);
             OpenAnimMetaDecocderCommand = new RelayCommand(OpenAnimMetaDecocder);
+            OpenPropCreatorCommand = new RelayCommand(OpenPropCreatorEditor);
         }
 
         void OpenPackFile()
@@ -94,6 +97,13 @@ namespace AssetEditor.ViewModels
             var editorView = _toolFactory.CreateEditorViewModel<AnimMetaEditor.ViewModels.MainDecoderViewModel>();
 
             editorView.ConfigureAsDecoder();
+            EditorCreator.CreateEmptyEditor(editorView);
+        }
+
+
+        void OpenPropCreatorEditor()
+        {
+            var editorView = _toolFactory.CreateEditorViewModel<MainPropCreatorViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
     }

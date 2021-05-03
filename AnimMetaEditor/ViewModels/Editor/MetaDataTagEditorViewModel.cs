@@ -16,7 +16,7 @@ namespace AnimMetaEditor.ViewModels.Editor
         MetaDataViewModel _data;
         SchemaManager _schemaManager;
 
-        public ICommand MoveUpCommand { get; set; }
+        public ICommand MoveUpCommand { get; set; } 
         public ICommand MoveDownCommand { get; set; }
         public ICommand CopyCommand { get; set; }
         public ICommand PasteCommand { get; set; }

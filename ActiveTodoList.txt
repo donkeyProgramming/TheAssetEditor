@@ -159,4 +159,42 @@ Ensure all components is removed when exiting
 	
 
 
-Graphics.ReduceMeshOnLodGeneration
+Quality of life:
+	Flip mesh
+	Remove slots and slot folders
+	Hotkey names
+	Skeleton information view 
+	Snap mesh to skeleteon when mapping
+	Undo mapping 
+	Improved ws model generation (Facncy mode)
+	about box - Dont break eula
+	Save taxturepaths with slash other way
+	Null terminated string somewhere?
+	
+Animation tool:
+	Select and move bones
+	Create new bones?
+	Create skeleton
+		Cicular rotation
+		Translation
+		Rotate 
+	Attachment weapons while playing
+	Metadata?
+		Animated props
+		Transform
+		Splice 
+	Set mesh
+	
+	Goals:
+		Create pose
+			-> Blend to pose?
+		Create mount animations 
+			-> follow a node 
+		Extract part of skeleton
+		Speed up/slow down animation 
+		Convert animation between skeletons 
+		Easy to work on large datasets
+		Create weapon anims 
+
+
+

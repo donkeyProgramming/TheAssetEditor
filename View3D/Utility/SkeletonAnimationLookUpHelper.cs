@@ -29,7 +29,6 @@ namespace View3D.Utility
         {
             _logger.Here().Information("Finding all animations");
 
-            
             var AllAnimations = _pf.FindAllWithExtention(".anim");
 
             _logger.Here().Information("Animations found =" + AllAnimations.Count());

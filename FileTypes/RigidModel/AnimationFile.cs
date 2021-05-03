@@ -155,7 +155,6 @@ namespace Filetypes.RigidModel
             }
         }
 
-
         public static AnimationFile Create(PackFile file)
         {
             ILogger logger = Logging.Create<AnimationFile>();
@@ -163,7 +162,6 @@ namespace Filetypes.RigidModel
             logger.Here().Information($"Loading animation: {file} Size:{data.Length}");
             return Create(new ByteChunk(data));
         }
-
 
         static AnimationFile Create(ByteChunk chunk)
         {

@@ -1,4 +1,5 @@
-﻿using AnimMetaEditor;
+﻿using AnimationEditor;
+using AnimMetaEditor;
 using AssetEditor.Services;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
@@ -57,6 +58,7 @@ namespace AssetEditor
             KitbasherEditor_DependencyInjectionContainer.Register(services);
             View3D_DependencyInjectionContainer.Register(services);
             AnimMetaEditor_DependencyInjectionContainer.Register(services);
+            AnimationEditors_DependencyInjectionContainer.Register(services);
         }
 
         void RegisterTools(IToolFactory factory)
@@ -65,6 +67,7 @@ namespace AssetEditor
             KitbasherEditor_DependencyInjectionContainer.RegisterTools(factory);
             View3D_DependencyInjectionContainer.RegisterTools(factory);
             AnimMetaEditor_DependencyInjectionContainer.RegisterTools(factory);
+            AnimationEditors_DependencyInjectionContainer.RegisterTools(factory);
         }
 
         public void ShowMainWindow()
