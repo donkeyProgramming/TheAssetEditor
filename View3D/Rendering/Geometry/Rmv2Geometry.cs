@@ -70,7 +70,7 @@ namespace View3D.Rendering.Geometry
 
 
         public RmvMesh CreateRmvMesh()
-        { 
+        {
             RmvMesh mesh = new RmvMesh();
             mesh.IndexList = GetIndexBuffer().ToArray();
 
@@ -115,7 +115,7 @@ namespace View3D.Rendering.Geometry
                         });
                 }
             }
-            else if(_vertedFormat == VertexFormat.Cinematic)
+            else if (_vertedFormat == VertexFormat.Cinematic)
             {
                 mesh.VertexList = new CinematicVertex[VertexCount()];
                 for (int i = 0; i < mesh.VertexList.Length; i++)
@@ -209,13 +209,13 @@ namespace View3D.Rendering.Geometry
                 return output.Distinct().ToList();
             }
             else
-                throw new Exception("Unknown weight count"); 
+                throw new Exception("Unknown weight count");
 
         }
 
         public override void UpdateAnimationIndecies(List<IndexRemapping> remapping)
         {
-            for(int i = 0; i < _vertexArray.Length; i++)
+            for (int i = 0; i < _vertexArray.Length; i++)
             {
                 _vertexArray[i].BlendIndices.X = GetValue((byte)_vertexArray[i].BlendIndices.X, remapping);
                 _vertexArray[i].BlendIndices.Y = GetValue((byte)_vertexArray[i].BlendIndices.Y, remapping);
@@ -302,8 +302,8 @@ namespace View3D.Rendering.Geometry
             else if (WeightCount == 2)
             {
                 sourceMesh.BoneWeights = _vertexArray.Select(x => new BoneWeight(
-                      (int)x.BlendIndices.X, (int)x.BlendIndices.Y, 0,0,
-                      x.BlendWeights.X, x.BlendWeights.Y, 0,0)).ToArray();
+                      (int)x.BlendIndices.X, (int)x.BlendIndices.Y, 0, 0,
+                      x.BlendWeights.X, x.BlendWeights.Y, 0, 0)).ToArray();
             }
             else if (WeightCount == 0)
             {
@@ -314,7 +314,7 @@ namespace View3D.Rendering.Geometry
 
             int currentTriangleCount = sourceSubMeshIndices.Length / 3;
             int targetTriangleCount = (int)Math.Ceiling(currentTriangleCount * quality);
-  
+
 
 
 
@@ -359,7 +359,7 @@ namespace View3D.Rendering.Geometry
                 }
                 else if (WeightCount == 0)
                 {
-                    vert.BlendIndices = new Vector4(0,0, 0, 0);
+                    vert.BlendIndices = new Vector4(0, 0, 0, 0);
                     vert.BlendWeights = new Vector4(0, 0, 0, 0);
                 }
 
@@ -445,6 +445,58 @@ namespace View3D.Rendering.Geometry
             }
 
             RebuildVertexBuffer();
+        }
+
+        public bool ContainsAnimationBone(int[] boneIndexList)
+        {
+            if (_vertedFormat == VertexFormat.Default)
+                return false;
+
+            for(int i = 0; i < _vertexArray.Length; i++)
+            {
+                if (DoesVertUseBoneIndex(i, boneIndexList))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void RemoveAllVertexesNotUsedByBones(int[] boneIndexList)
+        {
+            //var faceCount = _indexList.Length / 3;
+            List<int> facesToRemove = new List<int>();
+            for (int f = 0; f < _indexList.Length; f+=3)
+            {
+                var vert0 = DoesVertUseBoneIndex(_indexList[f + 0], boneIndexList);
+                var vert1 = DoesVertUseBoneIndex(_indexList[f+ 1], boneIndexList);
+                var vert2 = DoesVertUseBoneIndex(_indexList[f + 2], boneIndexList);
+
+                if (!(vert0 && vert1 && vert2))
+                    facesToRemove.Add(f);
+            }
+
+            if (facesToRemove.Count != 0)
+            {
+         
+                    RemoveFaces(facesToRemove);
+            }
+        }
+
+        bool DoesVertUseBoneIndex(int vertIndex, int[] boneIndexList)
+        {
+            var vertex = _vertexArray[vertIndex];
+            foreach (var boneIndex in boneIndexList)
+            {
+                if (vertex.BlendIndices.X == boneIndex)
+                    return true;
+                if (vertex.BlendIndices.Y == boneIndex)
+                    return true;
+                if (vertex.BlendIndices.Z == boneIndex)
+                    return true;
+                if (vertex.BlendIndices.W == boneIndex)
+                    return true;
+            }
+            return false;
         }
     }
 }

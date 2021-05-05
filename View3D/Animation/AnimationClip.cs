@@ -20,6 +20,15 @@ namespace View3D.Animation
             {
                 return $"PosCount = {Position.Count}, RotCount = {Rotation.Count}";
             }
+
+            internal KeyFrame Clone()
+            {
+                return new KeyFrame()
+                {
+                    Position = new List<Vector3>(Position),
+                    Rotation = new List<Quaternion>(Rotation)
+                };
+            }
         }
 
 
@@ -110,6 +119,166 @@ namespace View3D.Animation
             return hasDynamicRoation == 0 && hasDynamicTranslation == 0;
         }
 
+        public AnimationClip Clone()
+        {
+            AnimationClip copy = new AnimationClip();
+            copy.UseDynamicFames = UseStaticFrame;
+            copy.UseDynamicFames = UseDynamicFames;
 
+            foreach (var item in RotationMappings)
+                copy.RotationMappings.Add(item.Clone());
+
+            foreach (var item in TranslationMappings)
+                copy.TranslationMappings.Add(item.Clone());
+
+            copy.StaticFrame = StaticFrame.Clone();
+
+            foreach (var item in DynamicFrames)
+                copy.DynamicFrames.Add(item.Clone());
+
+            return copy;
+        }
+
+
+        public void MergeStaticAndDynamicFrames()
+        {
+            List<KeyFrame> newDynamicFrames = new List<KeyFrame>();
+
+            var boneCount = RotationMappings.Count;
+            var frameCount = DynamicFrames.Count;
+
+            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            {
+                var newKeyframe = new KeyFrame();
+
+                for (int boneIndex = 0; boneIndex < boneCount; boneIndex++)
+                {
+                    var translationLookup = TranslationMappings[boneIndex];
+                    if (translationLookup.IsDynamic)
+                        newKeyframe.Position.Add(DynamicFrames[frameIndex].Position[translationLookup.Id]);
+                    else if (translationLookup.IsStatic)
+                        newKeyframe.Position.Add(StaticFrame.Position[translationLookup.Id]);
+
+                    var rotationLookup = RotationMappings[boneIndex];
+                    if (rotationLookup.IsDynamic)
+                        newKeyframe.Rotation.Add(DynamicFrames[frameIndex].Rotation[rotationLookup.Id]);
+                    else if (rotationLookup.IsStatic)
+                        newKeyframe.Rotation.Add(StaticFrame.Rotation[rotationLookup.Id]);
+                }
+
+                newDynamicFrames.Add(newKeyframe);
+            }
+
+            // Update data
+            var newRotMapping = new List<AnimationBoneMapping>();
+            var newTransMappings = new List<AnimationBoneMapping>();
+            var rotCounter = 0;
+            var transCounter = 0;
+
+            for (int i = 0; i < boneCount; i++)
+            {
+                var rotationLookup = RotationMappings[i];
+                if (rotationLookup.HasValue)
+                    newRotMapping.Add(new AnimationBoneMapping(rotCounter++));
+                else
+                    newRotMapping.Add(new AnimationBoneMapping(-1));
+
+                var translationLookup = TranslationMappings[i];
+                if (translationLookup.HasValue)
+                    newTransMappings.Add(new AnimationBoneMapping(transCounter++));
+                else
+                    newTransMappings.Add(new AnimationBoneMapping(-1));
+            }
+
+            TranslationMappings = newTransMappings;
+            RotationMappings = newRotMapping;
+            DynamicFrames = newDynamicFrames;
+            StaticFrame = new KeyFrame();
+        }
+
+        /// <summary>
+        /// This function assumes that there are only dynamic frames
+        /// </summary>
+        /// <param name="bones"></param>
+        public void LimitAnimationToSelectedBones(int[] bones)
+        {
+            bool hasStatic = (StaticFrame.Position.Count + StaticFrame.Rotation.Count) != 0;
+            if (hasStatic)
+                throw new Exception("This function does not work for animations that contains a static component");
+
+            CreateMappingTable(this, bones, out var newRotMapping, out var newTransMapping);
+            CreateDynamicFrames(bones, out var newDynamicFrames);
+
+            RotationMappings = newRotMapping;
+            TranslationMappings = newTransMapping;
+            DynamicFrames = newDynamicFrames;
+
+        }
+
+        private void CreateDynamicFrames(int[] bones, out List<KeyFrame> newDynamicFrames)
+        {
+            newDynamicFrames = new List<KeyFrame>();
+
+            var boneCount = bones.Length;
+            var frameCount = DynamicFrames.Count;
+
+            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            {
+                var newKeyframe = new KeyFrame();
+
+                for (int boneIndex = 0; boneIndex < boneCount; boneIndex++)
+                {
+
+                    // Find the org bone and look at the mapping
+                    var orgBoneIndex = bones[boneIndex];
+
+                    var translationLookup = TranslationMappings[orgBoneIndex];
+                    if (translationLookup.IsDynamic)
+                        newKeyframe.Position.Add(DynamicFrames[frameIndex].Position[translationLookup.Id]);
+                    else if (translationLookup.IsStatic)
+                        newKeyframe.Position.Add(StaticFrame.Position[translationLookup.Id]);
+
+                    var rotationLookup = RotationMappings[orgBoneIndex];
+                    if (rotationLookup.IsDynamic)
+                        newKeyframe.Rotation.Add(DynamicFrames[frameIndex].Rotation[rotationLookup.Id]);
+                    else if (rotationLookup.IsStatic)
+                        newKeyframe.Rotation.Add(StaticFrame.Rotation[rotationLookup.Id]);
+                }
+
+                newDynamicFrames.Add(newKeyframe);
+            }
+        }
+
+        private void CreateMappingTable(AnimationClip existingAnim, int[] bones, out List<AnimationBoneMapping> rotationMapping, out List<AnimationBoneMapping> translationMapping)
+        {
+            translationMapping = new List<AnimationBoneMapping>();
+            rotationMapping = new List<AnimationBoneMapping>();
+            
+            int transDynamicCounter = 0;
+            int rotDynamicCounter = 0;
+
+            for (int boneIndex = 0; boneIndex < bones.Length; boneIndex++)
+            {
+                var originalBoneIndex = bones[boneIndex];
+
+                // Translation
+                var tanslationMappingValue = existingAnim.TranslationMappings[originalBoneIndex];
+
+                if (tanslationMappingValue.IsStatic)
+                    throw new Exception();
+                else if (tanslationMappingValue.IsDynamic)
+                    translationMapping.Add(new AnimationBoneMapping(transDynamicCounter++));
+                else
+                    translationMapping.Add(new AnimationBoneMapping(-1));
+
+                var rotationMappingValue = existingAnim.RotationMappings[originalBoneIndex];
+                if (rotationMappingValue.IsStatic)
+                    throw new Exception();
+                else if (rotationMappingValue.IsDynamic)
+                    rotationMapping.Add(new AnimationBoneMapping(rotDynamicCounter++));
+                else
+                    rotationMapping.Add(new AnimationBoneMapping(-1));
+            }
+        }
     }
 }

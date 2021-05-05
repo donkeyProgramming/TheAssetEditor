@@ -42,6 +42,9 @@ namespace View3D.Rendering.Geometry
 
         public void ApplyMesh(IShader effect, GraphicsDevice device)
         {
+            if (Context.IndexBuffer == null || Context.VertexBuffer == null)
+                return;
+
             device.Indices = Context.IndexBuffer;
             device.SetVertexBuffer(Context.VertexBuffer);
             foreach (var pass in effect.Effect.CurrentTechnique.Passes)
@@ -88,12 +91,24 @@ namespace View3D.Rendering.Geometry
         protected void BuildBoundingBox()
         {
             var count = VertexCount();
+            if (count == 0)
+            {
+                _boundingBox = new BoundingBox(-Vector3.One, Vector3.One);
+                _meshCenter = Vector3.Zero;
+                return;
+            }
+
             var points = new Vector3[count];
             for (int i = 0; i < count; i++)
                 points[i] = GetVertexById(i);
             _boundingBox = BoundingBox.CreateFromPoints(points);
 
-            UpdateMeshCenter();
+            // Update mesh center
+            var corners = _boundingBox.GetCorners();
+            _meshCenter = Vector3.Zero;
+            for (int i = 0; i < corners.Length; i++)
+                _meshCenter += corners[i];
+            _meshCenter = _meshCenter / corners.Length;
         }
 
         public virtual void Dispose()
@@ -152,15 +167,6 @@ namespace View3D.Rendering.Geometry
         {
             Context.RebuildVertexBuffer(_vertexArray, _vertexDeclaration);
             BuildBoundingBox();
-        }
-
-        void UpdateMeshCenter()
-        {
-            var corners = _boundingBox.GetCorners();
-            _meshCenter = Vector3.Zero;
-            for (int i = 0; i < corners.Length; i++)
-                _meshCenter += corners[i];
-            _meshCenter = _meshCenter / corners.Length;
         }
 
         protected virtual void CopyInto(IndexedMeshGeometry<VertexType> mesh, bool includeMesh = true)

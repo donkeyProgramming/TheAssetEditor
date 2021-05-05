@@ -132,6 +132,11 @@ namespace Filetypes.RigidModel
                 }
             }
 
+            public AnimationBoneMapping Clone()
+            {
+                return new AnimationBoneMapping(_value);
+            }
+
             public bool IsStatic { get { return (_value > 9999) && HasValue; } }
             public bool IsDynamic { get { return !IsStatic && HasValue; } }
             public int Id { 

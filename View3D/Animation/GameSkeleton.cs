@@ -42,8 +42,6 @@ namespace View3D.Animation
             for (int i = 0; i < BoneCount; i++)
             {
                 float scale = 1;
-                if (i == 0)
-                    scale = -1;
 
                 Rotation[i] = new Quaternion(
                     skeletonFile.DynamicFrames[skeletonWeirdIndex].Quaternion[i].X,

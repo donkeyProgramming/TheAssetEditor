@@ -66,7 +66,7 @@ namespace AnimationEditor.PropCreator.ViewModels
 
             MainModelView = new ReferenceModelSelectionViewModel(pfs, "Data: ", skeletonHelper);
             ReferenceModelView = new ReferenceModelSelectionViewModel(pfs, "Reference: ", skeletonHelper);
-            Editor = new PropCreatorEditorViewModel(MainModelView.Data, ReferenceModelView.Data);
+            Editor = new PropCreatorEditorViewModel(pfs, MainModelView.Data, ReferenceModelView.Data);
         }
 
         private void OnSceneInitialized(WpfGame scene)
@@ -77,6 +77,7 @@ namespace AnimationEditor.PropCreator.ViewModels
 
             MainModelView.Data.Initialize(resourceLib, animComp.RegisterAnimationPlayer(new AnimationPlayer(), "PlayerMain"), sceneManager.RootNode, Color.Black);
             ReferenceModelView.Data.Initialize(resourceLib, animComp.RegisterAnimationPlayer(new AnimationPlayer(), "PlayerRef"), sceneManager.RootNode, Color.Green);
+            Editor.Data.Initialize(resourceLib, animComp.RegisterAnimationPlayer(new AnimationPlayer(), "PlayerProp"), sceneManager.RootNode, Color.Red);
 
             if (MainInput != null)
             {

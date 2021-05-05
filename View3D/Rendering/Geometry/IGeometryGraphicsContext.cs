@@ -27,18 +27,30 @@ namespace View3D.Rendering.Geometry
         public void RebuildIndexBuffer(ushort[] indexList)
         {
             if (IndexBuffer != null)
+            {
                 IndexBuffer.Dispose();
-            IndexBuffer = new IndexBuffer(Device, typeof(ushort), indexList.Length, BufferUsage.None);
-            IndexBuffer.SetData(indexList);
+                IndexBuffer = null;
+            }
+            if (indexList.Length != 0)
+            {
+                IndexBuffer = new IndexBuffer(Device, typeof(ushort), indexList.Length, BufferUsage.None);
+                IndexBuffer.SetData(indexList);
+            }
         }
 
         public virtual void RebuildVertexBuffer<VertexType>(VertexType[] vertArray, VertexDeclaration vertexDeclaration) where VertexType : struct, IVertexType
         {
             if (VertexBuffer != null)
+            {
                 VertexBuffer.Dispose();
+                VertexBuffer = null;
+            }
 
-            VertexBuffer = new VertexBuffer(Device, vertexDeclaration, vertArray.Length, BufferUsage.None);
-            VertexBuffer.SetData(vertArray);
+            if (vertArray.Length != 0)
+            {
+                VertexBuffer = new VertexBuffer(Device, vertexDeclaration, vertArray.Length, BufferUsage.None);
+                VertexBuffer.SetData(vertArray);
+            }
         }
 
 

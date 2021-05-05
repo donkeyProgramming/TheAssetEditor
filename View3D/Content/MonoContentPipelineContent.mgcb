@@ -70,3 +70,8 @@
 /processor:PassThroughProcessor
 /build:Textures/Phazer/rustig_koppie_DiffuseHDR.DDS
 
+#begin Textures/Phazer/rustig_koppie_SpecularHDR.DDS
+/importer:TextureImporter
+/processor:PassThroughProcessor
+/build:Textures/Phazer/rustig_koppie_SpecularHDR.DDS
+

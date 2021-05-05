@@ -1,5 +1,7 @@
 ﻿using AnimationEditor.Common.ReferenceModel;
 using Common;
+using CommonControls.Services;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -74,10 +76,13 @@ namespace AnimationEditor.PropCreator.ViewModels
             set { SetAndNotify(ref _snapToRefBone, value);}
         }
 
-        
+        AssetViewModel _data;
+        public AssetViewModel Data { get => _data; set => SetAndNotify(ref _data, value); }
 
-        public PropCreatorEditorViewModel(AssetViewModel mainAsset, AssetViewModel refAsset)
+
+        public PropCreatorEditorViewModel(PackFileService pfs, AssetViewModel mainAsset, AssetViewModel refAsset)
         {
+            Data = new AssetViewModel(pfs);
             MainAsset = mainAsset;
             ReferenceAsset = refAsset;
 
@@ -135,6 +140,48 @@ namespace AnimationEditor.PropCreator.ViewModels
             var selectedBoneIds = boneList.Select(x => x.BoneIndex).Distinct().OrderBy(x=>x).ToList();
 
             MainAsset.OnlyShowMeshRelatedToBones(selectedBoneIds);
+
+            try
+            {
+                var newSkel = View3D.Animation.AnimationEditor.ExtractPartOfSkeleton(MainAsset.Skeleton, "TestSkel", selectedBoneIds.ToArray());
+                var newAnim = View3D.Animation.AnimationEditor.ExtractPartOfAnimation(MainAsset.AnimationClip, selectedBoneIds.ToArray());
+
+               
+
+                var worldRotBone0 = newSkel.DynamicFrames[0].Quaternion[0];
+                for (int i = 0; i < newAnim.DynamicFrames.Count; i++)
+                    newAnim.DynamicFrames[i].Rotation[0] = new Quaternion(
+                    worldRotBone0.X,
+                    worldRotBone0.Y,
+                    worldRotBone0.Z,
+                    worldRotBone0.W);
+
+
+
+
+
+
+                Data.SetSkeleton(newSkel, newSkel.Header.SkeletonName);
+                Data.SetAnimationClip(newAnim);
+
+                Data.ResetAnimation();
+                MainAsset.ResetAnimation();
+                ReferenceAsset.ResetAnimation();
+            }
+            catch (Exception e)
+            { 
+            }
+
+            
+        }
+
+        void CreateAnimatedProp(AssetViewModel asset, List<SkeletonBoneNode> bones)
+        { 
+            // Create skeleton
+            // Create mesh
+                // Only show parts
+                // Remap bone ids
+            // Create animation
         }
 
     }
