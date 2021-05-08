@@ -3,11 +3,13 @@ using CommonControls.Services;
 using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;
+using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using View3D.Animation;
+using View3D.Components;
 using View3D.Components.Component;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
@@ -16,20 +18,24 @@ using View3D.Utility;
 
 namespace AnimationEditor.Common.ReferenceModel
 {
-    public class AssetViewModel : NotifyPropertyChangedImpl, IAnimationProvider
+    public class AssetViewModel : BaseComponent, IAnimationProvider
     {
         public event ValueChangedDelegate<GameSkeleton> SkeletonChanged;
+        public event ValueChangedDelegate<AnimationClip> AnimationChanged;
 
         ILogger _logger = Logging.Create<AssetViewModel>();
         PackFileService _pfs;
 
         ResourceLibary _resourceLibary;
         ISceneNode _parentNode;
+        Color _skeletonColor;
         SkeletonNode _skeletonSceneNode;
         List<Rmv2MeshNode> _meshNodes = new List<Rmv2MeshNode>();
-        View3D.Animation.AnimationPlayer _player;
+        public View3D.Animation.AnimationPlayer Player;
+        public SkeletonBoneAnimationResolver SnapToBoneResolver { get; set; }
+        public ISceneNode MainNode { get => _parentNode; }
 
-
+        public string Description { get; set; }
 
         public bool IsActive => true;
         public GameSkeleton Skeleton { get; set; }
@@ -53,21 +59,31 @@ namespace AnimationEditor.Common.ReferenceModel
 
 
         bool _isAnimationActive = true;
-        public bool IsAnimationActive { get => _isAnimationActive; set { SetAndNotify(ref _isAnimationActive, value); _player.Play(value); } }
+        public bool IsAnimationActive { get => _isAnimationActive; set { SetAndNotify(ref _isAnimationActive, value); Player.Play(value); } }
 
-        public AssetViewModel(PackFileService pfs)
+        public Matrix Offset { get; set; } = Matrix.Identity;
+
+        public AssetViewModel(PackFileService pfs, string description, Color skeletonColour, WpfGame game) : base( game)
         {
+            Description = description;
             _pfs = pfs;
+            _skeletonColor = skeletonColour;
         }
 
-        internal void Initialize(ResourceLibary resourceLib, View3D.Animation.AnimationPlayer animationPlayer, ISceneNode parentNode, Color skeletonColour)
+        public override void Initialize()
         {
-            _resourceLibary = resourceLib;
-            _parentNode = parentNode;
-            _player = animationPlayer;
+            var rootNode = GetComponent<SceneManager>().RootNode;
+            _resourceLibary = GetComponent<ResourceLibary>();
+            var animComp = GetComponent<AnimationsContainerComponent>();
+
+            _parentNode = rootNode.AddObject(new GroupNode(Description)) as GroupNode;
+            Player = animComp.RegisterAnimationPlayer(new View3D.Animation.AnimationPlayer(), Description);
+
+            // Create skeleton
             _skeletonSceneNode = new SkeletonNode(_resourceLibary.Content, this);
-            _skeletonSceneNode.NodeColour = skeletonColour;
-            parentNode.AddObject(_skeletonSceneNode);
+            _skeletonSceneNode.NodeColour = _skeletonColor;
+            _parentNode.AddObject(_skeletonSceneNode);
+            base.Initialize();
         }
 
         public void SetMesh(PackFile file)
@@ -76,7 +92,7 @@ namespace AnimationEditor.Common.ReferenceModel
 
             SceneLoader loader = new SceneLoader(_pfs, _resourceLibary);
             var outSkeletonName = "";
-            var result = loader.Load(file, null, _player, ref outSkeletonName);
+            var result = loader.Load(file, null, Player, ref outSkeletonName);
             if (result == null)
             {
                 _logger.Here().Error("Unable to load model");
@@ -105,6 +121,33 @@ namespace AnimationEditor.Common.ReferenceModel
             MeshName = file.Name;
         }
 
+        public void CopyMeshFromOther(AssetViewModel other)
+        {
+            foreach (var mesh in _meshNodes)
+                mesh.Parent.RemoveObject(mesh);
+            _meshNodes.Clear();
+
+            foreach (var mesh in other._meshNodes)
+                _meshNodes.Add(mesh.Clone() as Rmv2MeshNode);
+
+            foreach (var mesh in _meshNodes)
+            {
+                mesh.IsVisible = true;
+                mesh.AnimationPlayer = Player;
+                _parentNode.AddObject(mesh);
+            }
+        }
+
+        public void SetMeshPosition(Matrix transform)
+        {
+            foreach (var mesh in _meshNodes)
+            {
+                for (int i = 0; i < mesh.Geometry.VertexCount(); i++)
+                    mesh.Geometry.TransformVertex(i, transform);
+                mesh.Geometry.RebuildVertexBuffer();
+            }
+        }
+
         public void SetSkeleton(PackFile skeletonPackFile)
         {
             if (skeletonPackFile != null)
@@ -121,39 +164,30 @@ namespace AnimationEditor.Common.ReferenceModel
                 SkeletonName = "";
                 Skeleton = null;
                 AnimationClip = null;
-                _player.SetAnimation(null, Skeleton);
+                Player.SetAnimation(null, Skeleton);
                 SkeletonChanged?.Invoke(Skeleton);
             }
-
         }
 
         public void SetSkeleton(AnimationFile animFile, string skeletonName)
         {
             SkeletonName = skeletonName;
-            Skeleton = new GameSkeleton(animFile, _player);
+            Skeleton = new GameSkeleton(animFile, Player);
 
             AnimationClip = null;
-            _player.SetAnimation(null, Skeleton);
+            Player.SetAnimation(null, Skeleton);
             SkeletonChanged?.Invoke(Skeleton);
         }
 
-        internal void ResetAnimation()
-        {
-            _player.CurrentFrame = 0;
-            _player.Play();
-        }
-
-        internal void OnlyShowMeshRelatedToBones(List<int> selectedBoneIds)
+        internal void OnlyShowMeshRelatedToBones(List<int> selectedBoneIds, List<IndexRemapping> remapping, string newSkeletonName)
         {
             var boneArray = selectedBoneIds.ToArray();
             foreach (var meshNode in _meshNodes)
             {
-                //meshNode.IsVisible = false;
                 var geo = meshNode.Geometry as Rmv2Geometry;
-                //if (geo.ContainsAnimationBone(boneArray) == false)
-                //    meshNode.IsVisible = false;
-                //else
                 geo.RemoveAllVertexesNotUsedByBones(boneArray);
+                geo.UpdateAnimationIndecies(remapping);
+                meshNode.MeshModel.ParentSkeletonName = newSkeletonName;
             }
         }
 
@@ -166,29 +200,31 @@ namespace AnimationEditor.Common.ReferenceModel
         {
             if (file != null)
             {
-                AnimationName = _pfs.GetFullPath(file);
                 var animation = AnimationFile.Create(file);
-                SetAnimationClip(new AnimationClip(animation));
+                SetAnimationClip(new AnimationClip(animation), _pfs.GetFullPath(file));
             }
             else
             {
-                AnimationName = "";
-                SetAnimationClip(null);
+                SetAnimationClip(null, "");
             }
         }
 
-        public void SetAnimationClip(AnimationClip clip)
+        public void SetAnimationClip(AnimationClip clip, string animationName)
         {
             AnimationClip = clip;
-            _player.SetAnimation(AnimationClip, Skeleton);
-            if (AnimationClip != null)
-                _player.Play();
+            AnimationName = animationName;
+            Player.SetAnimation(AnimationClip, Skeleton);
+            AnimationChanged?.Invoke(clip);
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            if (SnapToBoneResolver != null)
+                _parentNode.ModelMatrix = Matrix.Multiply(Offset, SnapToBoneResolver.GetWorldTransform());
+            else
+                _parentNode.ModelMatrix = Matrix.Multiply(Offset,Matrix.Identity);
         }
     }
-
-
-
-
 
     public class AnimatedPropViewModel : NotifyPropertyChangedImpl, IAnimationProvider
     {
@@ -224,10 +260,6 @@ namespace AnimationEditor.Common.ReferenceModel
 
         bool _isSkeletonVisible = true;
         public bool IsSkeletonVisible { get => _isSkeletonVisible; set { SetAndNotify(ref _isSkeletonVisible, value); _skeletonSceneNode.IsVisible = value; } }
-
-
-        bool _isAnimationActive = true;
-        public bool IsAnimationActive { get => _isAnimationActive; set { SetAndNotify(ref _isAnimationActive, value); _player.Play(value); } }
 
         public AnimatedPropViewModel(PackFileService pfs)
         {

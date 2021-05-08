@@ -11,7 +11,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace AnimationEditor.PropCreator.Views
+namespace AnimationEditor.PropCreator
 {
     /// <summary>
     /// Interaction logic for PropCreatorEditorView.xaml

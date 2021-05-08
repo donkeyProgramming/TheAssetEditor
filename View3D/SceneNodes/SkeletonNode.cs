@@ -47,7 +47,6 @@ namespace View3D.SceneNodes
 
             if (IsVisible && skeleton != null/* && _animationProvider.IsActive*/)
             {
-                //skeleton.Update();
                 _lineRenderer.Clear();
 
                 for (int i = 0; i < skeleton.BoneCount; i++)

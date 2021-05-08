@@ -52,12 +52,12 @@ namespace AnimationEditor.Common.ReferenceModel
             }
         }
 
-        public ReferenceModelSelectionViewModel(PackFileService pf, string headerName, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        public ReferenceModelSelectionViewModel(PackFileService pf, AssetViewModel data, string headerName, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             _pfs = pf;
             HeaderName = headerName;
 
-            Data = new AssetViewModel(_pfs);
+            Data = data;
             MeshViewModel = new SelectMeshViewModel(_pfs, Data);
             AnimViewModel = new SelectSkeletonAndAnimViewModel(Data, _pfs, skeletonAnimationLookUpHelper);
             SkeletonInformation = new SkeletonPreviewViewModel(Data);

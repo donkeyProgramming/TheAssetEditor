@@ -17,6 +17,7 @@ namespace View3D.Components.Component
 
         public AnimationsContainerComponent(WpfGame game) : base(game)
         {
+            UpdateOrder= (int)ComponentUpdateOrderEnum.Animation;
         }
 
         public AnimationPlayer RegisterAnimationPlayer(AnimationPlayer player, string name)

@@ -1,4 +1,5 @@
-﻿using AnimationEditor.Common.AnimationSelector;
+﻿
+using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
 using Common;
 using CommonControls.Services;
@@ -21,15 +22,15 @@ using View3D.Utility;
 
 namespace AnimationEditor.PropCreator.ViewModels
 {
-    public class MainPropCreatorViewModelInput
+    public class AnimationToolInput
     {
         public PackFile Mesh{ get; set; }
         public PackFile Animation { get; set; }
     }
 
-    public class MainPropCreatorViewModel : NotifyPropertyChangedImpl, IEditorViewModel
+    public abstract class BaseAnimationViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
-        PackFileService _pfs;
+        protected PackFileService _pfs;
         public string DisplayName { get; set; } = "Anim.Prop Creator";
         public IPackFile MainFile { get; set; }
 
@@ -38,15 +39,18 @@ namespace AnimationEditor.PropCreator.ViewModels
 
         public ReferenceModelSelectionViewModel MainModelView { get; set; }
         public ReferenceModelSelectionViewModel ReferenceModelView { get; set; }
+        public AnimationPlayerViewModel Player { get; set; } = new AnimationPlayerViewModel();
 
 
-        public MainPropCreatorViewModelInput MainInput { get; set; }
+        public AnimationToolInput MainInput { get; set; }
 
-        public MainPropCreatorViewModelInput RefInput { get; set; }
+        public AnimationToolInput RefInput { get; set; }
 
-        public PropCreatorEditorViewModel Editor { get; set; }
 
-        public MainPropCreatorViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper)
+        PropCreatorEditorViewModel _editor;
+        public PropCreatorEditorViewModel Editor { get => _editor; set => SetAndNotify(ref _editor, value); }
+
+        public BaseAnimationViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper)
         {
             _pfs = pfs;
 
@@ -64,20 +68,17 @@ namespace AnimationEditor.PropCreator.ViewModels
 
             Scene.SceneInitialized += OnSceneInitialized;
 
-            MainModelView = new ReferenceModelSelectionViewModel(pfs, "Data: ", skeletonHelper);
-            ReferenceModelView = new ReferenceModelSelectionViewModel(pfs, "Reference: ", skeletonHelper);
-            Editor = new PropCreatorEditorViewModel(pfs, MainModelView.Data, ReferenceModelView.Data);
+            var mainAsset = Scene.AddCompnent(new AssetViewModel(_pfs, "Data", Color.Black, Scene));
+            var refAsset = Scene.AddCompnent(new AssetViewModel(_pfs, "Reference", Color.Green, Scene));
+
+            MainModelView = new ReferenceModelSelectionViewModel(pfs, mainAsset, "Data:", skeletonHelper);
+            ReferenceModelView = new ReferenceModelSelectionViewModel(pfs, refAsset, "Reference:", skeletonHelper);
         }
 
         private void OnSceneInitialized(WpfGame scene)
         {
-            var sceneManager = scene.GetComponent<SceneManager>();
-            var resourceLib = scene.GetComponent<ResourceLibary>();
-            var animComp = scene.GetComponent<AnimationsContainerComponent>();
-
-            MainModelView.Data.Initialize(resourceLib, animComp.RegisterAnimationPlayer(new AnimationPlayer(), "PlayerMain"), sceneManager.RootNode, Color.Black);
-            ReferenceModelView.Data.Initialize(resourceLib, animComp.RegisterAnimationPlayer(new AnimationPlayer(), "PlayerRef"), sceneManager.RootNode, Color.Green);
-            Editor.Data.Initialize(resourceLib, animComp.RegisterAnimationPlayer(new AnimationPlayer(), "PlayerProp"), sceneManager.RootNode, Color.Red);
+            Player.RegisterAsset(MainModelView.Data);
+            Player.RegisterAsset(ReferenceModelView.Data);
 
             if (MainInput != null)
             {
@@ -90,6 +91,12 @@ namespace AnimationEditor.PropCreator.ViewModels
                 ReferenceModelView.Data.SetMesh(RefInput.Mesh);
                 ReferenceModelView.Data.SetAnimation(RefInput.Animation);
             }
+
+            Initialize();
+        }
+
+        public virtual void Initialize()
+        { 
         }
 
         public void Close()

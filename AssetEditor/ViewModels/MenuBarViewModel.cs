@@ -103,7 +103,7 @@ namespace AssetEditor.ViewModels
 
         void OpenPropCreatorEditor()
         {
-            var editorView = _toolFactory.CreateEditorViewModel<MainPropCreatorViewModel>();
+            var editorView = _toolFactory.CreateEditorViewModel<BaseAnimationViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
     }

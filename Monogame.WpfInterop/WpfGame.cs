@@ -68,6 +68,12 @@ namespace MonoGame.Framework.WpfInterop
         /// </summary>
         public GameComponentCollection Components { get; }
 
+        public T AddCompnent<T>(T comp) where T : IGameComponent
+        {
+            Components.Add(comp);
+            return comp;
+        }
+
         /// <summary>
         /// The content manager for this game.
         /// </summary>

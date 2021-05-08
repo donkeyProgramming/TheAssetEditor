@@ -4,41 +4,81 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AnimationEditor.Common.AnimationPlayer"
-             mc:Ignorable="d" >
+              xmlns:s="http://schemas.singulink.com/xaml"
+             mc:Ignorable="d" 
+              d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Margin="0,1,0,5" x:Name="AnimationContent">
-
+        <ToggleButton Grid.Row="0" Content="Animation" Click="ToggleButton_Click" IsChecked="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="10,1,10,1"/>
+        <Grid Grid.Row="1" Margin="0,1,0,10" x:Name="AnimationContent">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width=".1*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width=".3*"/>
             </Grid.ColumnDefinitions>
 
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
+            <Grid Grid.Column="0" VerticalAlignment="Top">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
 
+                <DockPanel Grid.Row="0"  >
+                    <Label Content="Main animation:" DockPanel.Dock="Left"/>
+                    <ComboBox DisplayMemberPath="SlotName" ItemsSource="{Binding PlayerItems, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedMainAnimation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" DockPanel.Dock="Right"/>
+                </DockPanel>
+                
+                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="Frame "/>
+                    <TextBlock Text="{Binding SelectedAnimationCurrentFrame, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Text=" / "/>
+                    <TextBlock Text="{Binding SelectedAnimationFrameCount, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
 
-            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
-                <TextBlock Text="Frame "/>
-                <TextBlock Text="{Binding CurrentFrame, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBlock Text=" / "/>
-                <TextBlock Text="{Binding MaxFrames, UpdateSourceTrigger=PropertyChanged}"/>
-            </StackPanel>
+                <StackPanel Grid.Row="2" Orientation="Horizontal"  HorizontalAlignment="Center" Margin="2,2,2,2" >
+                    <Button Click="{s:MethodBinding SetAnimationFirstFrame}" FontSize="20">⏮︎</Button>
+                    <Button Click="{s:MethodBinding SetAnimationPrivFrame}" FontSize="20">⏪</Button>
+                    <ToggleButton Click="{s:MethodBinding TogleAnimationPausePlay}" FontSize="20">⏯︎</ToggleButton>
+                    <Button Click="{s:MethodBinding SetAnimationNextFrame}" FontSize="20">⏩</Button>
+                    <Button Click="{s:MethodBinding SetAnimationLastFrame}" FontSize="20">⏭</Button>
+                </StackPanel>
 
-            <StackPanel Grid.Row="1" Orientation="Horizontal"  HorizontalAlignment="Center" Margin="2,2,2,2">
-                <Button Command="{Binding FirstFrameCommand}" FontSize="20">⏮︎</Button>
-                <Button Command="{Binding PrivFrameCommand}" FontSize="20">⏪</Button>
-                <ToggleButton Command="{Binding PausePlayCommand}" FontSize="20">⏯︎</ToggleButton>
-                <Button Command="{Binding NextFrameCommand}" FontSize="20">⏩</Button>
-                <Button Command="{Binding LastFrameCommand}" FontSize="20">⏭</Button>
-            </StackPanel>
+                <CheckBox IsChecked="{Binding LoopAnimation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Grid.Row="3" Content="Loop" HorizontalAlignment="Center"/>
+            </Grid>
 
-
+            <ListView  Grid.Column="2" ItemsSource="{Binding PlayerItems, UpdateSourceTrigger=PropertyChanged}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Player" Width="auto">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label Content="{Binding SlotName, UpdateSourceTrigger=PropertyChanged}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Frames" Width="auto">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label Content="{Binding MaxFrames, UpdateSourceTrigger=PropertyChanged}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Animation" Width="auto">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label Content="{Binding AnimationName, UpdateSourceTrigger=PropertyChanged}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
         </Grid>
     </Grid>
 </UserControl>

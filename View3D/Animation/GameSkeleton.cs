@@ -32,46 +32,60 @@ namespace View3D.Animation
             SkeletonName = skeletonFile.Header.SkeletonName;
             AnimationPlayer = animationPlayer;
 
+            int skeletonWeirdIndex = 0;
             for (int i = 0; i < BoneCount; i++)
             {
                 ParentBoneId[i] = skeletonFile.Bones[i].ParentId;
                 BoneNames[i] = skeletonFile.Bones[i].Name;
-            }
-
-            int skeletonWeirdIndex = 0;
-            for (int i = 0; i < BoneCount; i++)
-            {
-                float scale = 1;
-
                 Rotation[i] = new Quaternion(
                     skeletonFile.DynamicFrames[skeletonWeirdIndex].Quaternion[i].X,
                     skeletonFile.DynamicFrames[skeletonWeirdIndex].Quaternion[i].Y,
                     skeletonFile.DynamicFrames[skeletonWeirdIndex].Quaternion[i].Z,
                     skeletonFile.DynamicFrames[skeletonWeirdIndex].Quaternion[i].W);
 
-                var translationMatrix = Matrix.CreateTranslation(
-                    skeletonFile.DynamicFrames[skeletonWeirdIndex].Transforms[i].X * scale,
-                    skeletonFile.DynamicFrames[skeletonWeirdIndex].Transforms[i].Y,
-                    skeletonFile.DynamicFrames[skeletonWeirdIndex].Transforms[i].Z);
+
 
                 Translation[i] = new Vector3(
-                    skeletonFile.DynamicFrames[skeletonWeirdIndex].Transforms[i].X * scale,
+                    skeletonFile.DynamicFrames[skeletonWeirdIndex].Transforms[i].X * 1,
                     skeletonFile.DynamicFrames[skeletonWeirdIndex].Transforms[i].Y,
                     skeletonFile.DynamicFrames[skeletonWeirdIndex].Transforms[i].Z);
+            }
 
+            RebuildSkeletonMatrix();
+        }
+
+        void RebuildSkeletonMatrix()
+        {
+            for (int i = 0; i < BoneCount; i++)
+            {
+                var translationMatrix = Matrix.CreateTranslation(Translation[i]);
                 var rotationMatrix = Matrix.CreateFromQuaternion(Rotation[i]);
                 var transform = rotationMatrix * translationMatrix;
-
                 _worldTransform[i] = transform;
             }
 
             for (int i = 0; i < BoneCount; i++)
             {
-                var parentIndex = skeletonFile.Bones[i].ParentId;
+
+
+                var parentIndex = GetParentBone(i);
                 if (parentIndex == -1)
                     continue;
                 _worldTransform[i] = _worldTransform[i] * _worldTransform[parentIndex];
             }
+        }
+
+        public void SetBoneTransform(int id, Quaternion rotation, Vector3 position)
+        {
+            Rotation[id] = rotation;
+            Translation[id] = position;
+            RebuildSkeletonMatrix();
+        }
+
+        public void SetBoneTransform(int id, Vector3 position)
+        {
+            Translation[id] = position;
+            RebuildSkeletonMatrix();
         }
 
         public void Update()

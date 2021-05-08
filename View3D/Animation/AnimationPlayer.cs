@@ -93,6 +93,7 @@ namespace View3D.Animation
         public bool ApplyStaticFrame { get; set; } = true;
         public bool ApplyDynamicFrames { get; set; } = true;
         public bool IsEnabled { get; set; } = true;
+        public bool LoopAnimation { get; set; } = true;
 
         public int CurrentFrame
         {
@@ -131,7 +132,7 @@ namespace View3D.Animation
             _skeleton = skeleton;
 
             if (_animationClips == null)
-                IsPlaying = true;
+                IsPlaying = false;
 
             _animationClips = animation;
             _timeSinceStart = TimeSpan.FromSeconds(0);
@@ -155,7 +156,10 @@ namespace View3D.Animation
                 _timeSinceStart += gameTime.ElapsedGameTime;
                 if (_timeSinceStart.TotalMilliseconds >= animationLengthMs)
                 {
-                    _timeSinceStart = TimeSpan.FromSeconds(0);
+                    if (LoopAnimation)
+                        _timeSinceStart = TimeSpan.FromSeconds(0);
+                    else
+                        IsPlaying = false;
                 }
 
                 if (ExternalAnimationRef != null)
@@ -186,9 +190,18 @@ namespace View3D.Animation
 
 
 
-        public void Play() { IsPlaying = true; }
+        public void Play() { IsPlaying = true; IsEnabled = true; }
 
         public void Pause() { IsPlaying = false; }
+        public void Stop() 
+        { 
+            IsPlaying = false;
+            _currentAnimFrame = null;
+            IsEnabled = false;
+
+            if (_skeleton != null)
+                _skeleton.Update();
+        }
 
         public void Play(bool value) { IsPlaying = value;  }
 

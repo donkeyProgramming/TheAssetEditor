@@ -11,7 +11,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-
         <DataTemplate DataType="{ x:Type nodeViewModels:ModelSceneNodeViewModel}">
             <rmv2:RigidModelEditorView/>
         </DataTemplate>
@@ -30,11 +29,8 @@
         <DataTemplate DataType="{ x:Type nodeViewModels:GroupNodeViewModel}">
             <generic:GroupView/>
         </DataTemplate>
-
-        
-
-
     </UserControl.Resources>
+    
     <ScrollViewer>
         <ContentControl Grid.Row="2" Content="{Binding Path=SelectedNodeViewModel, UpdateSourceTrigger=PropertyChanged}"  />
     </ScrollViewer>

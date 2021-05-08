@@ -31,14 +31,14 @@ namespace View3D.Animation
             {
                 var originalBoneIndex = bones[i];
 
-                if (i == 0)
-                {
-                    var worldTrans = skeleton.GetWorldTransform(originalBoneIndex);
-                    var res = worldTrans.Decompose(out Vector3 scale, out var rot, out var trans);
-                    frame.Transforms.Add(new RmvVector3(trans.X, trans.Y, trans.Z));
-                    frame.Quaternion.Add(new RmvVector4(rot.X, rot.Y, rot.Z, rot.W));
-                }
-                else
+              if (i == 0)
+              {
+                  var worldTrans = skeleton.GetWorldTransform(originalBoneIndex);
+                  var res = worldTrans.Decompose(out Vector3 scale, out var rot, out var trans);
+                  frame.Transforms.Add(new RmvVector3(trans.X, trans.Y, trans.Z));
+                  frame.Quaternion.Add(new RmvVector4(rot.X, rot.Y, rot.Z, rot.W));
+              }
+              else
                 {
                     var trans = skeleton.Translation[originalBoneIndex];
                     var rot = skeleton.Rotation[originalBoneIndex];
@@ -167,6 +167,11 @@ namespace View3D.Animation
           // }
 
             return null;
+        }
+
+        public static void ReSample( AnimationClip newAnim, int newFrameCount)
+        {
+            AnimationSampler.Sample(1, null, null, true, true);
         }
 
         private static void CreateStaticFrameTable(AnimationFile existingAnim, int[] bones, ref AnimationFile newAnim)

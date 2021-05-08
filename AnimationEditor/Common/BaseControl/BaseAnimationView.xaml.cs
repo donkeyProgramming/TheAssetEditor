@@ -11,14 +11,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace AnimationEditor.Common.MeshSelector
+namespace AnimationEditor.Common.BaseControl
 {
     /// <summary>
-    /// Interaction logic for MeshSelectorView.xaml
+    /// Interaction logic for MainPropCreatorView.xaml
     /// </summary>
-    public partial class MeshSelectorView : UserControl
+    public partial class BaseAnimationView : UserControl
     {
-        public MeshSelectorView()
+        public BaseAnimationView()
         {
             InitializeComponent();
         }

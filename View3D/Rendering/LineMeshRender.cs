@@ -117,14 +117,17 @@ namespace View3D.Rendering
 
         public void Render(GraphicsDevice device, CommonShaderParameters commonShaderParameters, Matrix ModelMatrix)
         {
-            _shader.Parameters["View"].SetValue(commonShaderParameters.View);
-            _shader.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
-            _shader.Parameters["World"].SetValue(ModelMatrix);
-
-            foreach (var pass in _shader.CurrentTechnique.Passes)
+            if (_originalVertecies.Count() != 0)
             {
-                pass.Apply();
-                device.DrawUserPrimitives(PrimitiveType.LineList, _originalVertecies.ToArray(), 0, _originalVertecies.Count() / 2);
+                _shader.Parameters["View"].SetValue(commonShaderParameters.View);
+                _shader.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
+                _shader.Parameters["World"].SetValue(ModelMatrix);
+
+                foreach (var pass in _shader.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    device.DrawUserPrimitives(PrimitiveType.LineList, _originalVertecies.ToArray(), 0, _originalVertecies.Count() / 2);
+                }
             }
         }
 

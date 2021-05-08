@@ -1,5 +1,6 @@
-﻿using AnimationEditor.PropCreator.ViewModels;
-using AnimationEditor.PropCreator.Views;
+﻿using AnimationEditor.Common.BaseControl;
+using AnimationEditor.PropCreator;
+using AnimationEditor.PropCreator.ViewModels;
 using Common;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -12,9 +13,9 @@ namespace AnimationEditor
     {
         public static void Register(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddTransient<MainPropCreatorViewModel>();
-            serviceCollection.AddTransient<MainPropCreatorView>();
-            //serviceCollection.AddTransient<MainDecoderViewModel>();
+            serviceCollection.AddTransient<PropCreatorViewModel>();
+            //serviceCollection.AddTransient<MainPropCreatorView>();
+            serviceCollection.AddTransient<BaseAnimationView>();
 
 
             //serviceCollection.AddTransient<MainEditorViewModel>();
@@ -23,7 +24,7 @@ namespace AnimationEditor
         public static void RegisterTools(IToolFactory factory)
         {
             //factory.RegisterTool<MainEditorViewModel, MainEditorView>(".anm.meta");
-            factory.RegisterTool<MainPropCreatorViewModel, MainPropCreatorView>();
+            factory.RegisterTool<PropCreatorViewModel, BaseAnimationView>();
         }
     }
 }

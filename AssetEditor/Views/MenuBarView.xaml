@@ -34,9 +34,12 @@
             <MenuItem Header="Tools">
                 <MenuItem Header="AnimMeta Decoder" Command="{Binding MenuBar.OpenAnimMetaDecocderCommand}" IsEnabled="true"/>
                 <MenuItem Header="Kitbash Editor" Command="{Binding MenuBar.OpenKitbashEditorCommand}" IsEnabled="False"/>
-                <MenuItem Header="Animation re-targeting Editor" Command="{Binding MenuBar.OpenKitbashEditorCommand}" IsEnabled="False"/>
-                <MenuItem Header="Animation attachment point Editor" Command="{Binding MenuBar.OpenKitbashEditorCommand}" IsEnabled="False"/>
+                
                 <MenuItem Header="Animated prop creator" Command="{Binding MenuBar.OpenPropCreatorCommand}"/>
+                <MenuItem Header="Campaign animation converter" Command="{Binding MenuBar.OpenPropCreatorCommand}" IsEnabled="False"/>
+                <MenuItem Header="Mount animation editor" Command="{Binding MenuBar.OpenPropCreatorCommand}" IsEnabled="False"/>
+                <MenuItem Header="Pose Creator" Command="{Binding MenuBar.OpenPropCreatorCommand}" IsEnabled="False"/>
+                <MenuItem Header="Animation re-targeting Editor" Command="{Binding MenuBar.OpenKitbashEditorCommand}" IsEnabled="False"/>
             </MenuItem>
         </Menu>
     </DockPanel>

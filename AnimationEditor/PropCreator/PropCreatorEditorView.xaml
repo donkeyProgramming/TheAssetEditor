@@ -1,0 +1,151 @@
+﻿<UserControl x:Class="AnimationEditor.PropCreator.PropCreatorEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <GroupBox Grid.Column="0" Grid.Row="0" Header="Editor">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+
+
+                <Label Grid.Column="0" Grid.Row="0" Content="Start bone"/>
+                <Label Grid.Column="1" Grid.Row="0" Content=":"/>
+                <dotNetKitControls:AutoCompleteComboBox Grid.Column="3" Grid.Row="0" 
+                    SelectedValuePath="Id"
+                    TextSearch.TextPath="BoneName"
+                    ItemsSource="{Binding StartBoneList, UpdateSourceTrigger=PropertyChanged}"
+                    SelectedItem="{Binding SelectedStartBone}"/>
+
+                <Label Grid.Column="0" Grid.Row="1" Content="Specify End bone"/>
+                <Label Grid.Column="1" Grid.Row="1" Content=":"/>
+                <CheckBox Grid.Column="2" Grid.Row="1" VerticalContentAlignment="Center" IsChecked="{Binding SpecifyChildBone, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <Label Grid.Column="0" Grid.Row="2" Content="End bone"/>
+                <Label Grid.Column="1" Grid.Row="2" Content=":"/>
+                <dotNetKitControls:AutoCompleteComboBox Grid.Column="3" Grid.Row="2" IsEnabled="{Binding SpecifyChildBone, UpdateSourceTrigger=PropertyChanged}"
+                    SelectedValuePath="Id"
+                    TextSearch.TextPath="BoneName"
+                    ItemsSource="{Binding EndBoneList}"
+                    SelectedItem="{Binding SelectedEndBone}"/>
+
+                <Label Grid.Column="0" Grid.Row="3" Content="Move to zero"/>
+                <Label Grid.Column="1" Grid.Row="3" Content=":"/>
+                <CheckBox Grid.Column="2" Grid.Row="3" VerticalContentAlignment="Center" IsEnabled="False"/>
+
+                <Label Grid.Column="0" Grid.Row="4" Content="Fit animation"/>
+                <Label Grid.Column="1" Grid.Row="4" Content=":"/>
+                <CheckBox Grid.Column="2" Grid.Row="4" VerticalContentAlignment="Center" IsChecked="{Binding FitAnimation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+                <Label Grid.Column="0" Grid.Row="5" Content="Loop animation"/>
+                <Label Grid.Column="1" Grid.Row="5" Content=":"/>
+                <TextBox Grid.Column="2" Grid.Row="5" IsEnabled="False"
+                    Text="{Binding LoopCounter.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                    MaxLength="{Binding NumbersMaxLength, ElementName=self}" >
+                    <b:Interaction.Behaviors>
+                        <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
+                    </b:Interaction.Behaviors>
+                </TextBox>
+
+                <Label Grid.Column="0" Grid.Row="6" Content="Trans offset"/>
+                <Label Grid.Column="1" Grid.Row="6" Content=":"/>
+                <mathviews:Vector3View Grid.Column="3" Grid.Row="6" VerticalContentAlignment="Center" IsEnabled="False"/>
+                
+                <Label Grid.Column="0" Grid.Row="7" Content="Rot offset"/>
+                <Label Grid.Column="1" Grid.Row="7" Content=":"/>
+                <mathviews:Vector3View Grid.Column="3" Grid.Row="7" VerticalContentAlignment="Center" IsEnabled="False"/>
+
+                <Label Grid.Column="0" Grid.Row="8" Content="Scale"/>
+                <Label Grid.Column="1" Grid.Row="8" Content=":"/>
+                <TextBox Grid.Column="2" Grid.Row="8" IsEnabled="False"
+                    Text="{Binding Scale.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                    MaxLength="{Binding NumbersMaxLength, ElementName=self}" >
+                            <b:Interaction.Behaviors>
+                                <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
+                            </b:Interaction.Behaviors>
+                </TextBox>
+
+                <Grid Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="9" Margin="30,5,30,5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0" Content="Preview" Command="{Binding PreviewCommand}"/>
+                    <Button Grid.Row="1" Content="Create Skeleton" Margin="0,5,0,0" IsEnabled="False"/>
+                    <Button Grid.Row="2" Content="Extract Animation" Margin="0,5,0,0" IsEnabled="False"/>
+                    <Button Grid.Row="3" Content="Extract Mesh" Margin="0,5,0,0" IsEnabled="False"/>
+                    <Button Grid.Row="4" Content="Create animated prop" Margin="0,5,0,0" IsEnabled="False"/>
+                </Grid>
+            </Grid>
+        </GroupBox>
+
+
+        <GroupBox Grid.Column="0" Grid.Row="1" Header="Visual Helper">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Column="0" Grid.Row="0" Content="Attach to ref bone"/>
+                <Label Grid.Column="1" Grid.Row="0" Content=":"/>
+                <Grid Grid.Column="2" Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <CheckBox VerticalContentAlignment="Center" Grid.Column="0" IsChecked="{Binding SnapToRefBone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <dotNetKitControls:AutoCompleteComboBox  Grid.Column="1"
+                        SelectedValuePath="Id"
+                        TextSearch.TextPath="BoneName"
+                        ItemsSource="{Binding ReferenceBoneList}"
+                        SelectedItem="{Binding SelectedRefBone}"/>
+                </Grid>
+            
+            </Grid>
+        </GroupBox>
+      
+    </Grid>
+</UserControl>
