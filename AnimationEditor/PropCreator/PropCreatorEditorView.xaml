@@ -40,7 +40,6 @@
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
 
-
                 <Label Grid.Column="0" Grid.Row="0" Content="Start bone"/>
                 <Label Grid.Column="1" Grid.Row="0" Content=":"/>
                 <dotNetKitControls:AutoCompleteComboBox Grid.Column="3" Grid.Row="0" 

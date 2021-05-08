@@ -47,8 +47,8 @@ namespace AnimationEditor.PropCreator.ViewModels
         public AnimationToolInput RefInput { get; set; }
 
 
-        PropCreatorEditorViewModel _editor;
-        public PropCreatorEditorViewModel Editor { get => _editor; set => SetAndNotify(ref _editor, value); }
+        object _editor;
+        public object Editor { get => _editor; set => SetAndNotify(ref _editor, value); }
 
         public BaseAnimationViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper)
         {

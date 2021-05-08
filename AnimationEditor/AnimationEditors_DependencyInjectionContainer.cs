@@ -1,4 +1,5 @@
 ﻿using AnimationEditor.Common.BaseControl;
+using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.PropCreator;
 using AnimationEditor.PropCreator.ViewModels;
 using Common;
@@ -14,17 +15,17 @@ namespace AnimationEditor
         public static void Register(IServiceCollection serviceCollection)
         {
             serviceCollection.AddTransient<PropCreatorViewModel>();
-            //serviceCollection.AddTransient<MainPropCreatorView>();
+            serviceCollection.AddTransient<MountAnimationCreatorViewModel>();
+            
             serviceCollection.AddTransient<BaseAnimationView>();
 
-
-            //serviceCollection.AddTransient<MainEditorViewModel>();
         }
 
         public static void RegisterTools(IToolFactory factory)
         {
             //factory.RegisterTool<MainEditorViewModel, MainEditorView>(".anm.meta");
             factory.RegisterTool<PropCreatorViewModel, BaseAnimationView>();
+            factory.RegisterTool<MountAnimationCreatorViewModel, BaseAnimationView>();
         }
     }
 }

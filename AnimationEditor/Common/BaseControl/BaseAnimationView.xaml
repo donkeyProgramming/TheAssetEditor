@@ -6,6 +6,7 @@
              xmlns:referencemodel="clr-namespace:AnimationEditor.Common.ReferenceModel" 
              xmlns:animationplayer="clr-namespace:AnimationEditor.Common.AnimationPlayer"
              xmlns:propcreator="clr-namespace:AnimationEditor.PropCreator"
+             xmlns:mountcreator="clr-namespace:AnimationEditor.MountAnimationCreator"
              mc:Ignorable="d" >
     <UserControl.Resources>
      
@@ -54,6 +55,10 @@
                 <ContentControl.Resources>
                     <DataTemplate DataType="{ x:Type propcreator:PropCreatorEditorViewModel}">
                         <propcreator:PropCreatorEditorView  />
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{ x:Type mountcreator:MountAnimationCreatorEditor}">
+                        <mountcreator:MountAnimationCreatorView  />
                     </DataTemplate>
                 </ContentControl.Resources>
             </ContentControl>
