@@ -91,6 +91,11 @@ namespace View3D.Components.Component.Selection
             return _currentState;
         }
 
+        public State GetState<State>() where State: class, ISelectionState
+        {
+            return _currentState as State;
+        }
+
         public ISelectionState GetStateCopy()
         {
             return _currentState.Clone();

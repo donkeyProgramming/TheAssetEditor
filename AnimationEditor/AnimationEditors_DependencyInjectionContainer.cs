@@ -18,12 +18,10 @@ namespace AnimationEditor
             serviceCollection.AddTransient<MountAnimationCreatorViewModel>();
             
             serviceCollection.AddTransient<BaseAnimationView>();
-
         }
 
         public static void RegisterTools(IToolFactory factory)
         {
-            //factory.RegisterTool<MainEditorViewModel, MainEditorView>(".anm.meta");
             factory.RegisterTool<PropCreatorViewModel, BaseAnimationView>();
             factory.RegisterTool<MountAnimationCreatorViewModel, BaseAnimationView>();
         }

@@ -22,17 +22,17 @@ namespace AnimationEditor.Common.AnimationPlayer
 
 
         int _selectedAnimationCurrentFrame = 0;
-        public int SelectedAnimationCurrentFrame { get { return _selectedAnimationCurrentFrame; } set { SetAndNotify(ref _selectedAnimationCurrentFrame, value); } }
+        public int SelectedAnimationCurrentFrame { get { return _selectedAnimationCurrentFrame; } set { SetAndNotifyWhenChanged(ref _selectedAnimationCurrentFrame, value); } }
 
         int _selectedAnimationFrameCount = 0;
-        public int SelectedAnimationFrameCount { get { return _selectedAnimationFrameCount; } set { SetAndNotify(ref _selectedAnimationFrameCount, value); } }
+        public int SelectedAnimationFrameCount { get { return _selectedAnimationFrameCount; } set { SetAndNotifyWhenChanged(ref _selectedAnimationFrameCount, value); } }
 
 
         bool _isEnabled;
         public bool IsEnabled { get { return _isEnabled; } set { SetAndNotify(ref _isEnabled, value); OnEnableChanged(IsEnabled); } }
 
         bool _loopAnimation = true;
-        public bool LoopAnimation { get { return _loopAnimation; } set { SetAndNotify(ref _loopAnimation, value); } }
+        public bool LoopAnimation { get { return _loopAnimation; } set { SetAndNotifyWhenChanged(ref _loopAnimation, value); } }
 
 
         List<AssetViewModel> _assetList = new List<AssetViewModel>();
@@ -40,7 +40,7 @@ namespace AnimationEditor.Common.AnimationPlayer
         public ObservableCollection<AssetPlayerItem> PlayerItems { get; set; } = new ObservableCollection<AssetPlayerItem>();
 
         AssetPlayerItem _selectedMainAnimation;
-        public AssetPlayerItem SelectedMainAnimation { get { return _selectedMainAnimation; } set { MainAnimationChanged(_selectedMainAnimation, value);  SetAndNotify(ref _selectedMainAnimation, value); } }
+        public AssetPlayerItem SelectedMainAnimation { get { return _selectedMainAnimation; } set { MainAnimationChanged(_selectedMainAnimation, value); SetAndNotifyWhenChanged(ref _selectedMainAnimation, value); } }
 
         
 

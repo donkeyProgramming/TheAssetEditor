@@ -18,5 +18,11 @@ namespace Common
         public void RegisterTool<ViewModel, View>()
             where ViewModel : IEditorViewModel
             where View : Control;
+
+
+        public ViewModel CreateEditorViewModel<ViewModel>() 
+            where ViewModel : IEditorViewModel;
+
+
     }
 }

@@ -31,14 +31,14 @@ namespace View3D.Animation
             {
                 var originalBoneIndex = bones[i];
 
-              if (i == 0)
-              {
-                  var worldTrans = skeleton.GetWorldTransform(originalBoneIndex);
-                  var res = worldTrans.Decompose(out Vector3 scale, out var rot, out var trans);
-                  frame.Transforms.Add(new RmvVector3(trans.X, trans.Y, trans.Z));
-                  frame.Quaternion.Add(new RmvVector4(rot.X, rot.Y, rot.Z, rot.W));
-              }
-              else
+                if (i == 0)
+                {
+                    var worldTrans = skeleton.GetWorldTransform(originalBoneIndex);
+                    var res = worldTrans.Decompose(out Vector3 scale, out var rot, out var trans);
+                    frame.Transforms.Add(new RmvVector3(trans.X, trans.Y, trans.Z));
+                    frame.Quaternion.Add(new RmvVector4(rot.X, rot.Y, rot.Z, rot.W));
+                }
+                else
                 {
                     var trans = skeleton.Translation[originalBoneIndex];
                     var rot = skeleton.Rotation[originalBoneIndex];
@@ -86,38 +86,38 @@ namespace View3D.Animation
             //
             //CreateBoneTable(skeleton, bones, ref newAnim);
 
-;
+            ;
             var cpy = existingAnim.Clone();
             cpy.MergeStaticAndDynamicFrames();
             cpy.LimitAnimationToSelectedBones(bones);
             return cpy;
 
-           //var boneCount = bones.Length;
-           //var frameCount = clip.DynamicFrames.Count;
-           //List<KeyFrame> newDynamicFrames = new List<KeyFrame>();
-           //
-           //for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
-           //{
-           //    var newKeyframe = new KeyFrame();
-           //
-           //    for (int boneIndex = 0; boneIndex < boneCount; boneIndex++)
-           //    {
-           //        var translationLookup = clip.TranslationMappings[boneIndex];
-           //        if (translationLookup.IsDynamic)
-           //            newKeyframe.Position.Add(clip.DynamicFrames[frameIndex].Position[translationLookup.Id]);
-           //        else if (translationLookup.IsStatic)
-           //            newKeyframe.Position.Add(clip.StaticFrame.Position[translationLookup.Id]);
-           //
-           //        var rotationLookup = clip.RotationMappings[boneIndex];
-           //        if (rotationLookup.IsDynamic)
-           //            newKeyframe.Rotation.Add(clip.DynamicFrames[frameIndex].Rotation[rotationLookup.Id]);
-           //        else if (rotationLookup.IsStatic)
-           //            newKeyframe.Rotation.Add(clip.StaticFrame.Rotation[rotationLookup.Id]);
-           //    }
-           //
-           //    newDynamicFrames.Add(newKeyframe);
-           //}
-           //
+            //var boneCount = bones.Length;
+            //var frameCount = clip.DynamicFrames.Count;
+            //List<KeyFrame> newDynamicFrames = new List<KeyFrame>();
+            //
+            //for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            //{
+            //    var newKeyframe = new KeyFrame();
+            //
+            //    for (int boneIndex = 0; boneIndex < boneCount; boneIndex++)
+            //    {
+            //        var translationLookup = clip.TranslationMappings[boneIndex];
+            //        if (translationLookup.IsDynamic)
+            //            newKeyframe.Position.Add(clip.DynamicFrames[frameIndex].Position[translationLookup.Id]);
+            //        else if (translationLookup.IsStatic)
+            //            newKeyframe.Position.Add(clip.StaticFrame.Position[translationLookup.Id]);
+            //
+            //        var rotationLookup = clip.RotationMappings[boneIndex];
+            //        if (rotationLookup.IsDynamic)
+            //            newKeyframe.Rotation.Add(clip.DynamicFrames[frameIndex].Rotation[rotationLookup.Id]);
+            //        else if (rotationLookup.IsStatic)
+            //            newKeyframe.Rotation.Add(clip.StaticFrame.Rotation[rotationLookup.Id]);
+            //    }
+            //
+            //    newDynamicFrames.Add(newKeyframe);
+            //}
+            //
 
 
 
@@ -129,49 +129,95 @@ namespace View3D.Animation
 
             //AnimationClip
 
-          //
-          // newAnim.DynamicFrames = new List<AnimationFile.Frame>();
-          //for (int frameIndex = 0; frameIndex < existingAnim.DynamicFrames.Count; frameIndex++)
-          // {
-          //     var frame = new AnimationFile.Frame();
-          //
-          //     for (int boneIndex = 0; boneIndex < bones.Length; boneIndex++)
-          //     {
-          //
-          //         var originalBoneIndex = bones[boneIndex];
-          //         var tanslationMappingValue = existingAnim.TranslationMappings[originalBoneIndex];
-          //         if (tanslationMappingValue.IsDynamic)
-          //         {
-          //             // Copy all?
-          //             //newAnim.StaticFrame.Transforms.Add(existingAnim.StaticFrame.Transforms[tanslationMappingValue.Id]);
-          //         }
-          //
-          //
-          //
-          //
-          //         
-          //         for (int i = 0; i < existingAnim.DynamicFrames[frameIndex].Transforms.Count; i++)
-          //             frame.Transforms.Add(existingAnim.DynamicFrames[frameIndex].Transforms[i]);
-          //
-          //         for (int i = 0; i < existingAnim.DynamicFrames[frameIndex].Quaternion.Count; i++)
-          //             frame.Quaternion.Add(existingAnim.DynamicFrames[frameIndex].Quaternion[i]);
-          //
-          //         newAnim.DynamicFrames.Add(frame);
-          //     }
-          // }
-          //
-          // // Remove by index
-          // for (int i = 0; i < newAnim.DynamicFrames.Count; i++)
-          // { 
-          // 
-          // }
+            //
+            // newAnim.DynamicFrames = new List<AnimationFile.Frame>();
+            //for (int frameIndex = 0; frameIndex < existingAnim.DynamicFrames.Count; frameIndex++)
+            // {
+            //     var frame = new AnimationFile.Frame();
+            //
+            //     for (int boneIndex = 0; boneIndex < bones.Length; boneIndex++)
+            //     {
+            //
+            //         var originalBoneIndex = bones[boneIndex];
+            //         var tanslationMappingValue = existingAnim.TranslationMappings[originalBoneIndex];
+            //         if (tanslationMappingValue.IsDynamic)
+            //         {
+            //             // Copy all?
+            //             //newAnim.StaticFrame.Transforms.Add(existingAnim.StaticFrame.Transforms[tanslationMappingValue.Id]);
+            //         }
+            //
+            //
+            //
+            //
+            //         
+            //         for (int i = 0; i < existingAnim.DynamicFrames[frameIndex].Transforms.Count; i++)
+            //             frame.Transforms.Add(existingAnim.DynamicFrames[frameIndex].Transforms[i]);
+            //
+            //         for (int i = 0; i < existingAnim.DynamicFrames[frameIndex].Quaternion.Count; i++)
+            //             frame.Quaternion.Add(existingAnim.DynamicFrames[frameIndex].Quaternion[i]);
+            //
+            //         newAnim.DynamicFrames.Add(frame);
+            //     }
+            // }
+            //
+            // // Remove by index
+            // for (int i = 0; i < newAnim.DynamicFrames.Count; i++)
+            // { 
+            // 
+            // }
 
             return null;
         }
 
-        public static void ReSample( AnimationClip newAnim, int newFrameCount)
+        public static void LoopAnimation(AnimationClip newRiderAnim, int loopCounter)
         {
-            AnimationSampler.Sample(1, null, null, true, true);
+            var origianlFrames = newRiderAnim.DynamicFrames.ToList();
+
+            for (int i = 0; i < loopCounter - 1; i++)
+            {
+                for (int frameIndex = 0; frameIndex < origianlFrames.Count; frameIndex++)
+                {
+                    var newFrame = origianlFrames[frameIndex].Clone();
+                    newRiderAnim.DynamicFrames.Add(newFrame);
+                }
+            }
+
+
+
+            //throw new NotImplementedException();
+        }
+
+        public static AnimationClip ReSample(GameSkeleton skeleton, AnimationClip newAnim, int newFrameCount)
+        {
+            var output = newAnim.Clone();
+            output.DynamicFrames.Clear();
+
+            var fraction = 1.0f / newFrameCount;
+            for (int i = 0; i < newFrameCount; i++)
+            {
+                float t = i * fraction;
+                var keyframe = AnimationSampler.Sample(t, skeleton, new List<AnimationClip> { newAnim }, true, true);
+
+                KeyFrame newKeyFrame = new KeyFrame();
+                for (int mappingIndex = 0; mappingIndex < output.RotationMappings.Count; mappingIndex++)
+                {
+                    var mapping = output.RotationMappings[mappingIndex];
+                    if (mapping.HasValue)
+                        newKeyFrame.Rotation.Add(keyframe.BoneTransforms[mappingIndex].Rotation);
+                }
+
+                for (int mappingIndex = 0; mappingIndex < output.TranslationMappings.Count; mappingIndex++)
+                {
+                    var mapping = output.TranslationMappings[mappingIndex];
+                    if (mapping.HasValue)
+                        newKeyFrame.Position.Add(keyframe.BoneTransforms[mappingIndex].Translation);
+                }
+
+
+                output.DynamicFrames.Add(newKeyFrame);
+            }
+
+            return output;
         }
 
         private static void CreateStaticFrameTable(AnimationFile existingAnim, int[] bones, ref AnimationFile newAnim)

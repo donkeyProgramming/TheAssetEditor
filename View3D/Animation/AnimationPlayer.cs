@@ -100,6 +100,9 @@ namespace View3D.Animation
             get { return (int)Math.Round(_timeSinceStart.TotalSeconds * 20); }
             set
             {
+                if (CurrentFrame == value)
+                    return;
+
                 if (_animationClips != null)
                 {
                     var frameCount = FrameCount();

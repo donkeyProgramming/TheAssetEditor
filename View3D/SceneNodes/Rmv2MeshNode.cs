@@ -211,7 +211,6 @@ namespace View3D.SceneNodes
             return GetAllChildren(node);
         }
 
-
         static List<Rmv2MeshNode> GetAllChildren(ISceneNode parent)
         {
             var output = new List<Rmv2MeshNode>();
@@ -219,7 +218,7 @@ namespace View3D.SceneNodes
 
             foreach (var child in visibleChildren)
             {
-                if (child is Rmv2MeshNode mesh)
+                if (child is Rmv2MeshNode mesh && mesh.LodIndex==0)
                 {
                     output.Add(mesh);
                 }

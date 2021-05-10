@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Text;
 using View3D.Animation;
 using View3D.Components.Component;
+using View3D.Components.Component.Selection;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
 using View3D.Rendering.Geometry;
@@ -50,7 +51,7 @@ namespace AnimationEditor.PropCreator.ViewModels
         object _editor;
         public object Editor { get => _editor; set => SetAndNotify(ref _editor, value); }
 
-        public BaseAnimationViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper)
+        public BaseAnimationViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, string headerAsset0, string headerAsset1)
         {
             _pfs = pfs;
 
@@ -65,14 +66,18 @@ namespace AnimationEditor.PropCreator.ViewModels
             Scene.Components.Add(new GridComponent(Scene));
             Scene.Components.Add(new SceneManager(Scene));
             Scene.Components.Add(new AnimationsContainerComponent(Scene));
+            Scene.AddCompnent(new SelectionManager(Scene));
+            Scene.AddCompnent(new SelectionComponent(Scene));
+            Scene.AddCompnent(new CommandExecutor(Scene));
+            
 
             Scene.SceneInitialized += OnSceneInitialized;
 
-            var mainAsset = Scene.AddCompnent(new AssetViewModel(_pfs, "Data", Color.Black, Scene));
-            var refAsset = Scene.AddCompnent(new AssetViewModel(_pfs, "Reference", Color.Green, Scene));
+            var mainAsset = Scene.AddCompnent(new AssetViewModel(_pfs, headerAsset0, Color.Black, Scene));
+            var refAsset = Scene.AddCompnent(new AssetViewModel(_pfs, headerAsset1,  Color.Green, Scene));
 
-            MainModelView = new ReferenceModelSelectionViewModel(pfs, mainAsset, "Data:", skeletonHelper);
-            ReferenceModelView = new ReferenceModelSelectionViewModel(pfs, refAsset, "Reference:", skeletonHelper);
+            MainModelView = new ReferenceModelSelectionViewModel(pfs, mainAsset, headerAsset0 + ":", skeletonHelper);
+            ReferenceModelView = new ReferenceModelSelectionViewModel(pfs, refAsset, headerAsset1 + ":", skeletonHelper);
         }
 
         private void OnSceneInitialized(WpfGame scene)

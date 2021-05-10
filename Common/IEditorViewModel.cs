@@ -13,4 +13,10 @@ namespace Common
         bool HasUnsavedChanges();
     }
 
+    public interface IEditorCreator
+    {
+        void OpenFile(IPackFile file);
+        void CreateEmptyEditor(IEditorViewModel editorView);
+    }
+
 }

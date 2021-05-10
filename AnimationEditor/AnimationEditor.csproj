@@ -17,4 +17,9 @@
     <ProjectReference Include="..\View3D\View3D.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="CampaignAnimationCreator\" />
+    <Folder Include="PoseCreator\" />
+  </ItemGroup>
+
 </Project>

@@ -3,10 +3,111 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:AnimationEditor.MountAnimationCreator"
+             xmlns:local="clr-namespace:AnimationEditor.MountAnimationCreator" 
+             xmlns:animationsettings="clr-namespace:AnimationEditor.Common.AnimationSettings" 
+             xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
+              xmlns:s="http://schemas.singulink.com/xaml"
+                         xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <Button>Dog</Button>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <GroupBox Grid.Row="0" Header="Editor:">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Column="0" Grid.Row="0" Content="Rider root bone"/>
+                <Label Grid.Column="1" Grid.Row="0" Content=":"/>
+                <dotNetKitControls:AutoCompleteComboBox Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" 
+                    SelectedValuePath="Id"
+                    TextSearch.TextPath="BoneName"
+                    ItemsSource="{Binding RiderBones, UpdateSourceTrigger=PropertyChanged}"
+                    SelectedItem="{Binding SelectedRiderBone}"/>
+
+                <Label Grid.Column="0" Grid.Row="1" Content="Mount Bone"/>
+                <Label Grid.Column="1" Grid.Row="1" Content=":"/>
+                <dotNetKitControls:AutoCompleteComboBox Grid.Column="2" Grid.Row="1" IsEnabled="False"
+                    SelectedValuePath="Id"
+                    TextSearch.TextPath="BoneName"
+                    ItemsSource="{Binding MountBones, UpdateSourceTrigger=PropertyChanged}"
+                    SelectedItem="{Binding SelectedMountBone}"/>
+
+                <Label Grid.Column="0" Grid.Row="2" Content="Mount Vertex"/>
+                <Label Grid.Column="1" Grid.Row="2" Content=":"/>
+                <Grid Grid.Row="2" Grid.Column="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition  MaxWidth="150"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Button  Grid.Column="0" Click="{s:MethodBinding SetMountVertex}" Content="Set" Margin="0,0,3,0"/>
+                    <TextBox Grid.Column="1" Text="{Binding SelectedVertexesText, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" IsReadOnly="true"/>
+                </Grid>
+
+                <Label Grid.Column="0" Grid.Row="4" Content="Mount scale"/>
+                <Label Grid.Column="1" Grid.Row="4" Content=":"/>
+                <TextBox Grid.Column="2" Grid.Row="4"  Text="{Binding MountScale.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" >
+                    <b:Interaction.Behaviors>
+                        <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
+                    </b:Interaction.Behaviors>
+                </TextBox>
+            </Grid>
+        </GroupBox>
+
+        <animationsettings:AnimationSettingsView Grid.Row="1" DataContext="{Binding AnimationSettings, Mode=OneTime}"/>
+
+        <Grid  Grid.Row="2" Margin="30,5,30,5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <Button Grid.Row="0" Content="Preview" Click="{s:MethodBinding CreateMountAnimation}" IsEnabled="{Binding CanPreview, UpdateSourceTrigger=PropertyChanged}"/>
+            <Button Grid.Row="1" Content="Save" Command="{Binding PreviewCommand}" IsEnabled="{Binding CanSave, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,0"/>
+            <Button Grid.Row="2" Content="Save As" Command="{Binding PreviewCommand}" IsEnabled="{Binding CanSave, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,0"/>
+        </Grid>
+
+        <GroupBox Grid.Row="3" Header="Visualisation help:">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+
+                <CheckBox VerticalContentAlignment="Center"/>
+                <Label Grid.Column="1" Grid.Row="0" Content="Snap camera to Bone"/>
+                <Label Grid.Column="2" Grid.Row="0" Content=":"/>
+                <dotNetKitControls:AutoCompleteComboBox Grid.Column="3" Grid.Row="0" 
+                    SelectedValuePath="Id"
+                    TextSearch.TextPath="BoneName"
+                    ItemsSource="{Binding StartBoneList, UpdateSourceTrigger=PropertyChanged}"
+                    SelectedItem="{Binding SelectedStartBone}"/>
+            </Grid>
+        </GroupBox>
+
     </Grid>
 </UserControl>

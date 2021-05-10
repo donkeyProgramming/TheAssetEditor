@@ -1,6 +1,8 @@
 ﻿using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
+using Common;
 using CommonControls.Services;
+using FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -11,7 +13,7 @@ namespace AnimationEditor.PropCreator
 {
     public class PropCreatorViewModel : BaseAnimationViewModel
     {
-        public PropCreatorViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper) : base(pfs, skeletonHelper)
+        public PropCreatorViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper) : base(pfs, skeletonHelper, "Main", "Reference")
         {
             DisplayName  = "Anim.Prop Creator";
         }
@@ -22,6 +24,26 @@ namespace AnimationEditor.PropCreator
             var editor = new PropCreatorEditorViewModel(propAsset, MainModelView.Data, ReferenceModelView.Data);
             Player.RegisterAsset(editor.Data);
             Editor = editor;
+        }
+    }
+
+    public static class PropCreatorViewModel_Debug
+    {
+        public static void CreateDamselAndSkavenEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        {
+            var editorView = toolFactory.CreateEditorViewModel<PropCreatorViewModel>();
+            editorView.MainInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_assassin.variantmeshdefinition") as PackFile,
+                Animation = packfileService.FindFile(@"animations\battle\humanoid17\halberd\stand\hu17_hb_stand_01.anim") as PackFile,
+            };
+
+            editorView.RefInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_damsel_campaign_01.variantmeshdefinition") as PackFile,
+                Animation = packfileService.FindFile(@"animations\battle\humanoid01b\staff_and_sword\celebrate\hu1b_sfsw_celebrate_01.anim") as PackFile,
+            };
+            creator.CreateEmptyEditor(editorView);
         }
     }
 }

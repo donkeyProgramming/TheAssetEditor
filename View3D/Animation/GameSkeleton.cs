@@ -131,5 +131,16 @@ namespace View3D.Animation
         {
             return ParentBoneId[boneIndex];
         }
+
+        public List<int> GetChildBones(int parentBoneIndex)
+        {
+            var output = new List<int>();
+            for (int i = 0; i < ParentBoneId.Length; i++)
+            {
+                if (ParentBoneId[i] == parentBoneIndex)
+                    output.Add(i);
+            }
+            return output;
+        }
     }
 }

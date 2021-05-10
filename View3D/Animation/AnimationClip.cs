@@ -130,8 +130,9 @@ namespace View3D.Animation
 
             foreach (var item in TranslationMappings)
                 copy.TranslationMappings.Add(item.Clone());
-
-            copy.StaticFrame = StaticFrame.Clone();
+            
+            if(StaticFrame != null)
+                copy.StaticFrame = StaticFrame.Clone();
 
             foreach (var item in DynamicFrames)
                 copy.DynamicFrames.Add(item.Clone());

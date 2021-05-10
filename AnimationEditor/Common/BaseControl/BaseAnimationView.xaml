@@ -57,7 +57,7 @@
                         <propcreator:PropCreatorEditorView  />
                     </DataTemplate>
 
-                    <DataTemplate DataType="{ x:Type mountcreator:MountAnimationCreatorEditor}">
+                    <DataTemplate DataType="{ x:Type mountcreator:Editor}">
                         <mountcreator:MountAnimationCreatorView  />
                     </DataTemplate>
                 </ContentControl.Resources>

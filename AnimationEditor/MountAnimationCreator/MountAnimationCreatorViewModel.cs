@@ -1,8 +1,14 @@
-﻿using AnimationEditor.PropCreator.ViewModels;
+﻿using AnimationEditor.Common.ReferenceModel;
+using AnimationEditor.PropCreator.ViewModels;
+using Common;
 using CommonControls.Services;
+using FileTypes.PackFiles.Models;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+
 using System.Text;
+using View3D.Components.Component.Selection;
 using View3D.Utility;
 
 namespace AnimationEditor.MountAnimationCreator
@@ -10,17 +16,40 @@ namespace AnimationEditor.MountAnimationCreator
 
     public class MountAnimationCreatorViewModel : BaseAnimationViewModel
     {
-        public MountAnimationCreatorViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper) : base(pfs, skeletonHelper)
+        public MountAnimationCreatorViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper) : base(pfs, skeletonHelper, "Rider", "Mount")
         {
-            DisplayName = "Anim.Prop Creator";
+            DisplayName = "MountAnimCreator";
         }
 
         public override void Initialize()
         {
-            //var propAsset = Scene.AddCompnent(new AssetViewModel(_pfs, "Prop", Color.Red, Scene));
-            //var editor = new PropCreatorEditorViewModel(propAsset, MainModelView.Data, ReferenceModelView.Data);
-            //Player.RegisterAsset(editor.Data);
-            Editor = new MountAnimationCreatorEditor();
+            ReferenceModelView.Data.IsSelectable = true;
+            var propAsset = Scene.AddCompnent(new AssetViewModel(_pfs, "NewAnim", Color.Red, Scene));
+            Player.RegisterAsset(propAsset);
+            Editor = new Editor(MainModelView.Data, ReferenceModelView.Data, propAsset, Scene);
+        }
+    }
+
+
+    public static class MountAnimationCreatorViewModel_Debug
+    {
+        public static void CreateDamselAndGrymgoreEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        {
+            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+
+            editorView.MainInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_damsel_campaign_01.variantmeshdefinition") as PackFile,
+                Animation = packfileService.FindFile(@"animations\battle\humanoid01b\rider\horse01\spear_and_shield\locomotion\hu1b_hr1_sps_rider1_walk_01.anim") as PackFile,
+            };
+
+            editorView.RefInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\lzd_carnosaur_grymloq.variantmeshdefinition") as PackFile,
+                Animation = packfileService.FindFile(@"animations\battle\humanoid07b\rider\raptor03b\club\locomotion\hu7b_rp3b_cl_rider1_walk_03.anim") as PackFile,
+            };
+
+            creator.CreateEmptyEditor(editorView);
         }
     }
 }

@@ -498,5 +498,11 @@ namespace View3D.Rendering.Geometry
             }
             return false;
         }
+
+
+        public VertexPositionNormalTextureCustom GetVertexExtented(int index)
+        {
+            return _vertexArray[index];
+        }
     }
 }

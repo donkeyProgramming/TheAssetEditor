@@ -24,13 +24,6 @@ using System.Windows.Input;
 
 namespace AssetEditor.ViewModels
 {
-
-    public interface IEditorCreator
-    {
-        void OpenFile(IPackFile file);
-        void CreateEmptyEditor(IEditorViewModel editorView);
-    }
-
     class MainViewModel : NotifyPropertyChangedImpl, IEditorCreator
     {
         ILogger _logger = Logging.Create<MainViewModel>();
@@ -95,20 +88,22 @@ namespace AssetEditor.ViewModels
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu17\skv\skv_clan_rats\head\skv_clan_rats_head_04.rigid_model_v2");
 
 
-                var editorView = toolFactory.CreateEditorViewModel<PropCreatorViewModel>();
-                editorView.RefInput= new AnimationToolInput()
-                { 
-                    Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_damsel_campaign_01.variantmeshdefinition") as PackFile,
-                    Animation = packfileService.FindFile(@"animations\battle\humanoid01b\staff_and_sword\celebrate\hu1b_sfsw_celebrate_01.anim") as PackFile,
-                };
+                MountAnimationCreatorViewModel_Debug.CreateDamselAndGrymgoreEditor(this, toolFactory, packfileService);
 
-                editorView.MainInput = new AnimationToolInput()
-                {
-                    Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_assassin.variantmeshdefinition") as PackFile,
-                    Animation = packfileService.FindFile(@"animations\battle\humanoid17\halberd\stand\hu17_hb_stand_01.anim") as PackFile,
-                };
-
-                CreateEmptyEditor(editorView);
+                //var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+                //editorView.RefInput= new AnimationToolInput()
+                //{ 
+                //    Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_damsel_campaign_01.variantmeshdefinition") as PackFile,
+                //    Animation = packfileService.FindFile(@"animations\battle\humanoid01b\staff_and_sword\celebrate\hu1b_sfsw_celebrate_01.anim") as PackFile,
+                //};
+                //
+                //editorView.MainInput = new AnimationToolInput()
+                //{
+                //    Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_assassin.variantmeshdefinition") as PackFile,
+                //    Animation = packfileService.FindFile(@"animations\battle\humanoid17\halberd\stand\hu17_hb_stand_01.anim") as PackFile,
+                //};
+                //
+                //CreateEmptyEditor(editorView);
 
                 //OpenFile(packFile);
                 CreateTestPackFiles(packfileService);

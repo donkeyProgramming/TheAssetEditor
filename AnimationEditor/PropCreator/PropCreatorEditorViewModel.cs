@@ -56,7 +56,7 @@ namespace AnimationEditor.PropCreator
 
 
         
-                   bool _fitAnimation = true;
+        bool _fitAnimation = true;
         public bool FitAnimation
         {
             get { return _fitAnimation; }
@@ -173,17 +173,17 @@ namespace AnimationEditor.PropCreator
                 newAnim.DynamicFrames[i].Rotation[0] = new Quaternion(worldRotBone0.X, worldRotBone0.Y, worldRotBone0.Z, worldRotBone0.W);
                 //newAnim.DynamicFrames[i].Position[0] = Vector3.Zero;
             }
-
-            if (FitAnimation)
-                View3D.Animation.AnimationEditor.ReSample(newAnim, MainAsset.AnimationClip.DynamicFrames.Count());
-
+           //
+           // if (FitAnimation)
+           //     View3D.Animation.AnimationEditor.ReSample(newAnim, newAnim, MainAsset.AnimationClip.DynamicFrames.Count());
+           //
           
 
             Data.SetSkeleton(newSkel, newSkel.Header.SkeletonName);
             var skeletonPos = Data.Skeleton.GetWorldTransform(0).Translation;
             Data.Skeleton.SetBoneTransform(0, Vector3.Zero);
 
-            Data.CopyMeshFromOther(MainAsset);
+            Data.CopyMeshFromOther(MainAsset, false);
             var remapping = CreateBoneMapping(Data.Skeleton, MainAsset.Skeleton);
             Data.OnlyShowMeshRelatedToBones(selectedBoneIds, remapping, newSkel.Header.SkeletonName);
             Data.SetAnimationClip(newAnim, "PropAnim");
@@ -250,9 +250,6 @@ namespace AnimationEditor.PropCreator
 
             return IsIndirectChildOf(parentIndex, childOff, skeleton);
         }
-
-
-
     }
 
     // Flat skeleton

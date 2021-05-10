@@ -46,7 +46,4 @@ namespace CommonControls.MathViews
             return Value.ToString();
         }
     }
-
-
-
 }
