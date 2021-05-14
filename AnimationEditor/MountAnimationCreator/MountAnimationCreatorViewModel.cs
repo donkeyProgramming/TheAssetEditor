@@ -26,10 +26,9 @@ namespace AnimationEditor.MountAnimationCreator
             ReferenceModelView.Data.IsSelectable = true;
             var propAsset = Scene.AddCompnent(new AssetViewModel(_pfs, "NewAnim", Color.Red, Scene));
             Player.RegisterAsset(propAsset);
-            Editor = new Editor(MainModelView.Data, ReferenceModelView.Data, propAsset, Scene);
+            Editor = new Editor(_pfs, MainModelView.Data, ReferenceModelView.Data, propAsset, Scene);
         }
     }
-
 
     public static class MountAnimationCreatorViewModel_Debug
     {
@@ -51,5 +50,28 @@ namespace AnimationEditor.MountAnimationCreator
 
             creator.CreateEmptyEditor(editorView);
         }
+
+
+        public static void CreateKarlAndSquigEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        {
+            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+
+            editorView.MainInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\emp_ch_karl.variantmeshdefinition") as PackFile,
+                Animation = packfileService.FindFile(@"animations\battle\humanoid01\rider\horse01\staff_and_sword\attacks\hu1_hr1_sfsw_rider1_attack_01.anim") as PackFile,
+            };
+
+            editorView.RefInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\grn_great_cave_squig.variantmeshdefinition") as PackFile,
+                Animation = packfileService.FindFile(@"animations\battle\raptor02\attacks\rp2_attack_05.anim") as PackFile,
+            };
+
+            creator.CreateEmptyEditor(editorView);
+        }
     }
 }
+
+
+

@@ -44,6 +44,7 @@ namespace AssetEditor
             services.AddSingleton<ApplicationSettingsService>();
             services.AddSingleton<ToolFactory>();
             services.AddSingleton<FileTypes.PackFiles.Models.PackFileDataBase>();
+            services.AddSingleton<SkeletonAnimationLookUpHelper>();
 
             services.AddTransient<GameInformationService>();
             services.AddTransient<MainWindow>();

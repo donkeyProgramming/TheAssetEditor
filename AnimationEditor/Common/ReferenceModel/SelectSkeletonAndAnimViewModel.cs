@@ -22,8 +22,8 @@ namespace AnimationEditor.Common.ReferenceModel
         ObservableCollection<string> _animationList = new ObservableCollection<string>();
         public ObservableCollection<string> AnimationsForCurrentSkeleton { get { return _animationList; } set { SetAndNotify(ref _animationList, value); } }
 
-        List<string> _skeletonList = new List<string>();
-        public List<string> SkeletonList { get { return _skeletonList; } set { SetAndNotify(ref _skeletonList, value); } }
+        ObservableCollection<string> _skeletonList = new ObservableCollection<string>();
+        public ObservableCollection<string> SkeletonList { get { return _skeletonAnimationLookUpHelper.SkeletonFileNames; } set { SetAndNotify(ref _skeletonList, value); } }
 
 
         string _skeletonName;
@@ -41,7 +41,7 @@ namespace AnimationEditor.Common.ReferenceModel
             _data = data;
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
-            SkeletonList = _skeletonAnimationLookUpHelper.GetAllSkeletonFileNames();
+            //SkeletonList = ;
 
             _data.PropertyChanged += _data_PropertyChanged;
         }
@@ -62,18 +62,14 @@ namespace AnimationEditor.Common.ReferenceModel
                 var skeletonPackFile = _pfs.FindFile(selectedSkeletonPath) as PackFile;
                 if (skeletonPackFile != null)
                 {
-                    AnimationsForCurrentSkeleton.Clear();
-                    var animations = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(Path.GetFileNameWithoutExtension(skeletonPackFile.Name));
-                    foreach (var anim in animations)
-                        AnimationsForCurrentSkeleton.Add(_pfs.GetFullPath(anim));
-
+                    AnimationsForCurrentSkeleton = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(Path.GetFileNameWithoutExtension(skeletonPackFile.Name));
                     _data.SetSkeleton(skeletonPackFile);
                     return;
                 }
             }
 
             _data.Skeleton = null;
-            AnimationsForCurrentSkeleton.Clear();
+            AnimationsForCurrentSkeleton = new ObservableCollection<string>();
         }
 
         private void AnimationChanged(string selectedAnimationPath)

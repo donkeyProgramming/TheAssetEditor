@@ -21,7 +21,7 @@ namespace FileTypesTests.PackFiles
         public void LoadCaPackFile()
         {
             var packFileDb = new PackFileDataBase();
-            PackFileService packFileService = new PackFileService(packFileDb);
+            PackFileService packFileService = new PackFileService(packFileDb, null);
             var result = packFileService.Load(@"Data\CaPackFile_01.pack");
 
             Assert.NotNull(result);
@@ -34,7 +34,7 @@ namespace FileTypesTests.PackFiles
         [Test]
         public void LoadAllCaPacks()
         {
-            PackFileService packFileService = new PackFileService(new PackFileDataBase());
+            PackFileService packFileService = new PackFileService(new PackFileDataBase(), null);
             var result = packFileService.LoadAllCaFiles(@"Data");
             Assert.IsTrue(result);
         }
@@ -42,7 +42,7 @@ namespace FileTypesTests.PackFiles
         [Test]
         public void UnloadPackFile()
         {
-            PackFileService packFileService = new PackFileService(new PackFileDataBase());
+            PackFileService packFileService = new PackFileService(new PackFileDataBase(), null);
             var pack0 = packFileService.Load(@"Data\CaPackFile_01.pack");
             var pack1 = packFileService.Load(@"Data\boot.pack");
 
@@ -58,7 +58,7 @@ namespace FileTypesTests.PackFiles
         [Test]
         public void LoadBootPack()
         {
-            PackFileService packFileService = new PackFileService(new PackFileDataBase());
+            PackFileService packFileService = new PackFileService(new PackFileDataBase(), null);
             var pack0 = packFileService.Load(@"Data\boot.pack");
 
 

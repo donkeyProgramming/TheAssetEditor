@@ -33,8 +33,8 @@ namespace KitbasherEditor.ViewModels
         ObservableCollection<string> _animationList = new ObservableCollection<string>();
         public ObservableCollection<string> AnimationsForCurrentSkeleton { get { return _animationList; } set { SetAndNotify(ref _animationList, value); } }
 
-        List<string> _skeletonList = new List<string>();
-        public List<string> SkeletonList { get { return _skeletonList; } set { SetAndNotify(ref _skeletonList, value); } }
+        ObservableCollection<string> _skeletonList = new ObservableCollection<string>();
+        public ObservableCollection<string> SkeletonList { get { return _skeletonList; } set { SetAndNotify(ref _skeletonList, value); } }
 
         string _selectedSkeleton;
         public string SelectedSkeleton { get { return _selectedSkeleton; } set { SetAndNotify(ref _selectedSkeleton, value); SkeletonChanged(_selectedSkeleton); } }
@@ -82,7 +82,7 @@ namespace KitbasherEditor.ViewModels
             _componentManager = componentManager;
             _packFileService = pf;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
-            SkeletonList = _skeletonAnimationLookUpHelper.GetAllSkeletonFileNames();
+            SkeletonList = _skeletonAnimationLookUpHelper.SkeletonFileNames;
 
             var animCollection = _componentManager.GetComponent<AnimationsContainerComponent>();
             Player = animCollection.RegisterAnimationPlayer(new AnimationPlayer(), "MainPlayer");
@@ -157,7 +157,7 @@ namespace KitbasherEditor.ViewModels
             HeaderText = "";
             _skeletonPackFile = null;
             Skeleton = null;
-            AnimationsForCurrentSkeleton.Clear();
+            AnimationsForCurrentSkeleton = new ObservableCollection<string>();
             if (!string.IsNullOrWhiteSpace(selectedSkeletonPath))
             {
                 _skeletonPackFile = _packFileService.FindFile(selectedSkeletonPath) as PackFile;
@@ -166,10 +166,7 @@ namespace KitbasherEditor.ViewModels
                 else
                 {
                     HeaderText = _skeletonPackFile.Name + " - No Animation";
-
-                    var animations = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(Path.GetFileNameWithoutExtension(_skeletonPackFile.Name));
-                    foreach (var anim in animations)
-                        AnimationsForCurrentSkeleton.Add(_packFileService.GetFullPath(anim));
+                    AnimationsForCurrentSkeleton = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(Path.GetFileNameWithoutExtension(_skeletonPackFile.Name));
 
                     var skeletonAnimationFile = AnimationFile.Create(_skeletonPackFile);
                     Skeleton = new GameSkeleton(skeletonAnimationFile, Player);

@@ -23,7 +23,7 @@ namespace AnimMetaEditor
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<MainEditorViewModel, MainEditorView>(".anm.meta");
+            factory.RegisterTool<MainEditorViewModel, MainEditorView>(".anm.meta", ".meta");
             factory.RegisterTool<MainDecoderViewModel, MetaDataMainView>();
         }
     }

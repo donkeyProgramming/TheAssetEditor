@@ -10,7 +10,7 @@ using System.Linq;
 
 
 namespace View3D.Utility
-{
+{/*
     public class SkeletonAnimationLookUpHelper
     {
         ILogger _logger = Logging.Create<SkeletonAnimationLookUpHelper>();
@@ -90,5 +90,5 @@ namespace View3D.Utility
             }
             return null;
         }
-    }
+    }*/
 }

@@ -13,12 +13,15 @@ namespace CommonControls.Services
     public class PackFileService
     {
         ILogger _logger = Logging.Create<PackFileService>();
-        
+
+
+        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         public PackFileDataBase Database { get; private set; }
 
-        public PackFileService(PackFileDataBase database)
+        public PackFileService(PackFileDataBase database, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             Database = database;
+            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
         }
 
         public PackFileContainer Load(string packFileSystemPath, bool setToMainPackIfFirst = false) 
@@ -45,6 +48,8 @@ namespace CommonControls.Services
                         return container;
                     }
                 }
+
+                
             }
             catch (Exception e)
             {
@@ -53,16 +58,28 @@ namespace CommonControls.Services
             }
         }
 
-        public List<PackFile> FindAllWithExtention(string extention)
+        public List<PackFile> FindAllWithExtention(string extention, PackFileContainer packFileContainer = null)
         {
             extention = extention.ToLower();
             List<PackFile> output = new List<PackFile>();
-            foreach (var pf in Database.PackFiles)
+            if (packFileContainer == null)
             {
-                foreach (var file in pf.FileList)
+                foreach (var pf in Database.PackFiles)
+                {
+                    foreach (var file in pf.FileList)
+                    {
+                        var fileExtention = Path.GetExtension(file.Key);
+                        if (fileExtention == extention)
+                            output.Add(file.Value as PackFile);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var file in packFileContainer.FileList)
                 {
                     var fileExtention = Path.GetExtension(file.Key);
-                    if(fileExtention == extention)
+                    if (fileExtention == extention)
                         output.Add(file.Value as PackFile);
                 }
             }
@@ -70,15 +87,26 @@ namespace CommonControls.Services
             return output;
         }
 
-        public List<PackFile> FindAllFilesInDirectory(string dir)
+        public List<PackFile> FindAllFilesInDirectory(string dir, PackFileContainer packFileContainer = null)
         {
             dir = dir.ToLower();
             List<PackFile> output = new List<PackFile>();
-            foreach (var pf in Database.PackFiles)
+            if (packFileContainer == null)
             {
-                foreach (var file in pf.FileList)
+                foreach (var pf in Database.PackFiles)
                 {
-                    if(file.Key.IndexOf(dir) == 0)
+                    foreach (var file in pf.FileList)
+                    {
+                        if (file.Key.IndexOf(dir) == 0)
+                            output.Add(file.Value as PackFile);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var file in packFileContainer.FileList)
+                {
+                    if (file.Key.IndexOf(dir) == 0)
                         output.Add(file.Value as PackFile);
                 }
             }
@@ -110,6 +138,7 @@ namespace CommonControls.Services
         {
             var pack = new PackFileContainer(packFileSystemPath, binaryReader);
             Database.AddPackFile(pack);
+            _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pack);
             return pack;
         }
 
@@ -131,6 +160,7 @@ namespace CommonControls.Services
                             {
                                 var pack = new PackFileContainer(path, reader);
                                 packList.Add(pack);
+                                _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pack);
                             }
                         }
                     }
@@ -154,6 +184,7 @@ namespace CommonControls.Services
                 }
 
                 Database.AddPackFile(caPackFileContainer);
+                
             }
             catch (Exception e)
             {

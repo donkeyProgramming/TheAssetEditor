@@ -19,7 +19,7 @@ namespace Common
             EnsureCreated(AnimationIndexMappingDirectory);
         }
 
-        static void EnsureCreated(string path)
+        public static void EnsureCreated(string path)
         {
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);

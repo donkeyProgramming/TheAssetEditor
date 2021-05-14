@@ -13,7 +13,7 @@ namespace FileTypesTests.PackFiles
         [Test]
         public void Basic()
         {
-            PackFileService packFileService = new PackFileService(new PackFileDataBase());
+            PackFileService packFileService = new PackFileService(new PackFileDataBase(), null);
             var loadedPackFile = packFileService.Load(@"Data\CaPackFile_01.pack");
 
             Assert.NotNull(loadedPackFile);
@@ -24,7 +24,7 @@ namespace FileTypesTests.PackFiles
         [Test]
         public void DeleteFile()
         {
-            PackFileService packFileService = new PackFileService(new PackFileDataBase());
+            PackFileService packFileService = new PackFileService(new PackFileDataBase(), null);
             var loadedPackFile = packFileService.Load(@"Data\CaPackFile_01.pack");
             var file = packFileService.FindFile(@"warmachines\tex\dwf_gyrocopter_obisidan_01_diffuse.dds");
 
@@ -37,7 +37,7 @@ namespace FileTypesTests.PackFiles
         [Test]
         public void DeleteFolder()
         {
-            PackFileService packFileService = new PackFileService(new PackFileDataBase());
+            PackFileService packFileService = new PackFileService(new PackFileDataBase(), null);
             var loadedPackFile = packFileService.Load(@"Data\CaPackFile_01.pack");
 
             packFileService.DeleteFolder(loadedPackFile, @"warmachines\tex");

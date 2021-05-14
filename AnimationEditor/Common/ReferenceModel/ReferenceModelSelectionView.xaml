@@ -35,7 +35,6 @@
                     <RowDefinition/>
                     <RowDefinition/>
                     <RowDefinition/>
-                    <RowDefinition Height="400"/>
                 </Grid.RowDefinitions>
 
                 <CheckBox Grid.Column="0"  Grid.Row="0" VerticalContentAlignment="Center" IsChecked="{Binding Data.ShowMesh, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
@@ -72,28 +71,31 @@
                                 LabelText="Target Anim"/>
 
 
-                <Label Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="6" Content="Skeleton:"/>
-                <TreeView Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="6" ItemsSource="{Binding SkeletonInformation.Bones, UpdateSourceTrigger=PropertyChanged}">
-                    <b:Interaction.Behaviors>
-                        <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SkeletonInformation.SelectedBone, Mode=TwoWay}" />
-                    </b:Interaction.Behaviors>
+                <Expander Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="3" IsExpanded="False">
+                    <Expander.Header>
+                        <TextBlock>Skeleton:</TextBlock>
+                    </Expander.Header>
+                    <TreeView ItemsSource="{Binding SkeletonInformation.Bones, UpdateSourceTrigger=PropertyChanged}" MaxHeight="400">
+                        <b:Interaction.Behaviors>
+                            <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SkeletonInformation.SelectedBone, Mode=TwoWay}" />
+                        </b:Interaction.Behaviors>
 
-                    <TreeView.ItemContainerStyle>
-                        <Style TargetType="{x:Type TreeViewItem}">
-                            <Setter Property="IsExpanded" Value="True" />
-                        </Style>
-                    </TreeView.ItemContainerStyle>
-                    <TreeView.ItemTemplate >
-                        <HierarchicalDataTemplate ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding BoneName, UpdateSourceTrigger=PropertyChanged}"/>
-                                <TextBlock Text=" - "></TextBlock>
-                                <TextBlock Text="{Binding BoneIndex, UpdateSourceTrigger=PropertyChanged}"/>
-                            </StackPanel>
-                        </HierarchicalDataTemplate>
-                    </TreeView.ItemTemplate>
-
-                </TreeView>
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="{x:Type TreeViewItem}">
+                                <Setter Property="IsExpanded" Value="True" />
+                            </Style>
+                        </TreeView.ItemContainerStyle>
+                        <TreeView.ItemTemplate >
+                            <HierarchicalDataTemplate ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding BoneName, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text=" - "></TextBlock>
+                                    <TextBlock Text="{Binding BoneIndex, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
+                </Expander>
             </Grid>
 
 

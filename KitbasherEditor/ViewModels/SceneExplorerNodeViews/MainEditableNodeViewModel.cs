@@ -5,6 +5,7 @@ using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor.Services;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -22,7 +23,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         AnimationControllerViewModel _animationControllerViewModel;
         PackFileService _pf;
 
-        public List<string> SkeletonNameList { get; set; }
+        public ObservableCollection<string> SkeletonNameList { get; set; }
 
         string _skeletonName;
         public string SkeletonName { get { return _skeletonName; } set { SetAndNotify(ref _skeletonName, value); UpdateSkeletonName(); } }
@@ -35,7 +36,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             _animationControllerViewModel = animationControllerViewModel;
             _pf = pf;
 
-            SkeletonNameList = _skeletonAnimationLookUpHelper.GetAllSkeletonFileNames();
+            SkeletonNameList = _skeletonAnimationLookUpHelper.SkeletonFileNames;
             SkeletonName = SkeletonNameList.FirstOrDefault(x => x.Contains(_mainNode.Model.Header.SkeletonName));
 
             UpdateSkeletonName();

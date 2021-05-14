@@ -14,7 +14,7 @@ namespace FileTypesTests.PackFiles
         [Test]
         public void Basic()
         {
-            PackFileService packFileService = new PackFileService(new PackFileDataBase());
+            PackFileService packFileService = new PackFileService(new PackFileDataBase(), null);
             var loadedPackFile = packFileService.Load(@"Data\CaPackFile_01.pack");
 
             Assert.NotNull(loadedPackFile);
@@ -36,7 +36,7 @@ namespace FileTypesTests.PackFiles
         [Test]
         public void CreateModPackFile()
         {
-            PackFileService packFileService = new PackFileService(new PackFileDataBase());
+            PackFileService packFileService = new PackFileService(new PackFileDataBase(), null);
             var packContainer = packFileService.CreateNewPackFileContainer("MyTestPackFile", PackFileCAType.MOD);
 
  

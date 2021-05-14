@@ -26,12 +26,12 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public MeshSceneNodeViewModel_Graphics Graphics { get; set; }
 
         Rmv2MeshNode _meshNode;
-        public MeshSceneNodeViewModel(Rmv2MeshNode node, PackFileService pf, SkeletonAnimationLookUpHelper animLookUp)
+        public MeshSceneNodeViewModel(Rmv2MeshNode node, PackFileService pfs, SkeletonAnimationLookUpHelper animLookUp)
         {
             _meshNode = node;
             General = new MeshSceneNodeViewModel_General(_meshNode);
-            Animation = new MeshSceneNodeViewModel_Animation(_meshNode, animLookUp);
-            Graphics = new MeshSceneNodeViewModel_Graphics(_meshNode, pf);
+            Animation = new MeshSceneNodeViewModel_Animation(pfs, _meshNode, animLookUp);
+            Graphics = new MeshSceneNodeViewModel_Graphics(_meshNode, pfs);
         }
 
         public void Dispose()
@@ -89,6 +89,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
     {
         Rmv2MeshNode _meshNode;
         SkeletonAnimationLookUpHelper _animLookUp;
+        PackFileService _pfs;
 
         string _skeletonName;
         public string SkeletonName { get { return _skeletonName; } set { SetAndNotify(ref _skeletonName, value); } }
@@ -105,8 +106,9 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public List<AnimatedBone> AnimatedBones { get { return _animatedBones; } set { SetAndNotify(ref _animatedBones, value); } }
         public ICommand OpenBoneRemappingToolCommand { get; set; }
 
-        public MeshSceneNodeViewModel_Animation(Rmv2MeshNode meshNode, SkeletonAnimationLookUpHelper animLookUp)
+        public MeshSceneNodeViewModel_Animation(PackFileService pfs, Rmv2MeshNode meshNode, SkeletonAnimationLookUpHelper animLookUp)
         {
+            _pfs = pfs;
             _meshNode = meshNode;
             _animLookUp = animLookUp;
 
@@ -115,7 +117,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             AttachmentPoints = _meshNode.MeshModel.AttachmentPoints.OrderBy(x => x.BoneIndex).ToList();
             UseParentAttachmentPointsCommand = new RelayCommand(UseParentAttachmentPoints);
 
-            var skeletonFile = _animLookUp.GetSkeletonFileFromName(SkeletonName);
+            var skeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, SkeletonName);
             var bones = _meshNode.Geometry.GetUniqeBlendIndices();
             AnimatedBones = bones.Select(x => new AnimatedBone() { BoneIndex = x, Name = skeletonFile.Bones[x].Name }).OrderBy(x => x.BoneIndex).ToList();
             OpenBoneRemappingToolCommand = new RelayCommand(OpenBoneRemappingTool);
@@ -128,12 +130,12 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         {
             RemappedAnimatedBoneConfiguration config = new RemappedAnimatedBoneConfiguration();
 
-            var existingSkeletonFile = _animLookUp.GetSkeletonFileFromName(SkeletonName);
+            var existingSkeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, SkeletonName);
             config.MeshSkeletonName = SkeletonName;
             config.MeshBones = AnimatedBone.CreateFromSkeleton(existingSkeletonFile, AnimatedBones.Select(x => x.BoneIndex).ToList());
 
             var modelNode = _meshNode.GetParentModel();
-            var newSkeletonFile = _animLookUp.GetSkeletonFileFromName(modelNode.Model.Header.SkeletonName);
+            var newSkeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, modelNode.Model.Header.SkeletonName);
             config.ParnetModelSkeletonName = modelNode.Model.Header.SkeletonName;
             config.ParentModelBones = AnimatedBone.CreateFromSkeleton(newSkeletonFile);
 
