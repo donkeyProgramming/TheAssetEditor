@@ -70,6 +70,25 @@ namespace AnimationEditor.MountAnimationCreator
 
             creator.CreateEmptyEditor(editorView);
         }
+
+        public static void CreateBroodHorrorEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        {
+            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+
+            editorView.MainInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_plague_priest.variantmeshdefinition") as PackFile,
+               // Animation = packfileService.FindFile(@"animations\battle\humanoid01\rider\horse01\staff_and_sword\attacks\hu1_hr1_sfsw_rider1_attack_01.anim") as PackFile,
+            };
+
+            editorView.RefInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_brood_horror.variantmeshdefinition") as PackFile,
+                Animation = packfileService.FindFile(@"animations\battle\rat01\locomotion\rt1_walk_01.anim") as PackFile,
+            };
+
+            creator.CreateEmptyEditor(editorView);
+        }
     }
 }
 

@@ -61,6 +61,8 @@ namespace AnimationEditor.Common.AnimationPlayer
             asset.Player.LoopAnimation = false;
             if (SelectedMainAnimation == null)
                 SelectedMainAnimation = PlayerItems.First();
+
+            OnEnableChanged(IsEnabled);
         }
 
         public void TogleAnimationPausePlay()

@@ -88,7 +88,7 @@ namespace AssetEditor.ViewModels
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu17\skv\skv_clan_rats\head\skv_clan_rats_head_04.rigid_model_v2");
 
 
-                MountAnimationCreatorViewModel_Debug.CreateKarlAndSquigEditor(this, toolFactory, packfileService);
+                MountAnimationCreatorViewModel_Debug.CreateBroodHorrorEditor(this, toolFactory, packfileService);
 
                 //var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
                 //editorView.RefInput= new AnimationToolInput()
@@ -132,7 +132,7 @@ namespace AssetEditor.ViewModels
         private bool Database_BeforePackFileContainerRemoved(PackFileContainer container)
         {
             var openFiles = CurrentEditorsList
-                .Where(x=> _packfileService.GetPackFileContainer(x.MainFile) == container)
+                .Where(x=> x.MainFile != null && _packfileService.GetPackFileContainer(x.MainFile) == container)
                 .ToList();
 
             if (openFiles.Any())

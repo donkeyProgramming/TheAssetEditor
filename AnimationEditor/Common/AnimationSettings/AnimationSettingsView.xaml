@@ -40,7 +40,7 @@
 
             <Label Grid.Column="0" Grid.Row="2" Content="Apply offsets:"/>
             <Label Grid.Column="1" Grid.Row="2" Content=":"/>
-            <CheckBox Grid.Column="3" Grid.Row="2" VerticalContentAlignment="Center" IsChecked="{Binding ApplyOffsets, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <CheckBox Grid.Column="3" Grid.Row="2" VerticalContentAlignment="Center" IsChecked="{Binding ApplyOffsets, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
 
             <Label Grid.Column="0" Grid.Row="3" Content="Trans offset"/>
             <Label Grid.Column="1" Grid.Row="3" Content=":"/>

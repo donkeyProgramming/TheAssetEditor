@@ -6,12 +6,18 @@ using CommonControls.Common;
 using CommonControls.MathViews;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
+using CsvHelper;
+using Filetypes.AnimationPack;
 using Filetypes.RigidModel;
+using FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Dynamic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -25,6 +31,8 @@ namespace AnimationEditor.MountAnimationCreator
 {
     public class Editor : NotifyPropertyChangedImpl
     {
+        ILogger _logger = Logging.Create<Editor>();
+
         SkeletonBoneNode _selectedRiderBone;
         public SkeletonBoneNode SelectedRiderBone
         {
@@ -67,18 +75,25 @@ namespace AnimationEditor.MountAnimationCreator
             set { SetAndNotify(ref _canSave, value); }
         }
 
+        bool _displayGeneratedRiderMesh = true;
+        public bool DisplayGeneratedRiderMesh
+        {
+            get { return _displayGeneratedRiderMesh; }
+            set { SetAndNotify(ref _displayGeneratedRiderMesh, value); UpdateRiderMeshVisability(value); }
+        }
+
+        bool _displayGeneratedRiderSkeleton = false;
+        public bool DisplayGeneratedRiderSkeleton
+        {
+            get { return _displayGeneratedRiderSkeleton; }
+            set { SetAndNotify(ref _displayGeneratedRiderSkeleton, value); UpdateRiderSkeletonVisability(value); }
+        }
+
         string _selectedVertexesText;
         public string SelectedVertexesText
         {
             get { return _selectedVertexesText; }
             set { SetAndNotify(ref _selectedVertexesText, value); }
-        }
-
-        DoubleViewModel _mountScale = new DoubleViewModel(1);
-        public DoubleViewModel MountScale
-        {
-            get { return _mountScale; }
-            set { SetAndNotify(ref _mountScale, value); }
         }
 
 
@@ -89,7 +104,7 @@ namespace AnimationEditor.MountAnimationCreator
             set { SetAndNotify(ref _useSavePrefix, value); }
         }
 
-        string _savePrefixText = "new_prefix_";
+        string _savePrefixText = "";
         public string SavePrefixText
         {
             get { return _savePrefixText; }
@@ -100,7 +115,7 @@ namespace AnimationEditor.MountAnimationCreator
         public AssetViewModel NewAnimation { get => _newAnimation; set => SetAndNotify(ref _newAnimation, value); }
 
         public AnimationSettingsViewModel AnimationSettings { get; set; } = new AnimationSettingsViewModel();
-
+        public MountLinkController MountLinkController { get; set; }
 
         AssetViewModel _mount;
         AssetViewModel _rider;
@@ -117,11 +132,22 @@ namespace AnimationEditor.MountAnimationCreator
 
             _mount.SkeletonChanged += MountSkeletonChanged;
             _rider.SkeletonChanged += RiderSkeletonChanges;
+            _rider.AnimationChanged += RiderAnimationChanged;
 
             MountSkeletonChanged(_mount.Skeleton);
             RiderSkeletonChanges(_rider.Skeleton);
 
             _selectionManager = componentManager.GetComponent<SelectionManager>();
+
+            MountLinkController = new MountLinkController(pfs, rider, mount);
+
+        }
+
+        private void RiderAnimationChanged(AnimationClip newValue)
+        {
+            UpdateCanSaveAndPreviewStates();
+            if(CanSave)
+                CreateMountAnimation();
         }
 
         SelectionManager _selectionManager;
@@ -149,7 +175,9 @@ namespace AnimationEditor.MountAnimationCreator
 
         void UpdateCanSaveAndPreviewStates()
         {
-            CanPreview = SelectedRiderBone != null && _mountVertexes.Count != 0 && _mount != null && _rider != null;
+            var mountOK = _mount != null && _mount.AnimationClip != null && _mount.Skeleton != null;
+            var riderOK = _rider != null && _rider.AnimationClip != null && _rider.Skeleton != null;
+            CanPreview = SelectedRiderBone != null && _mountVertexes.Count != 0 && mountOK  && riderOK;
             CanSave = CanPreview && NewAnimation.AnimationClip != null;
         }
 
@@ -175,57 +203,92 @@ namespace AnimationEditor.MountAnimationCreator
 
         public void CreateMountAnimation()
         {
-            var mountAnim = _mount.AnimationClip;
-            var newRiderAnim = _rider.AnimationClip.Clone();
+            _mount.SetTransform(Matrix.CreateScale((float)AnimationSettings.Scale.Value));
+
+            var newRiderAnim = GenerateMountAnimation(_mount.AnimationClip, _mount.Skeleton, _rider.AnimationClip, _rider.Skeleton, _mountVertexOwner, _mountVertexes.First(), SelectedRiderBone.BoneIndex, SelectedRiderBone.ParentBoneIndex, AnimationSettings);
+
+            // Apply
+            NewAnimation.CopyMeshFromOther(_rider, true);
+            NewAnimation.SetAnimationClip(newRiderAnim, Path.GetFileName(_rider.AnimationName));
+            UpdateCanSaveAndPreviewStates();
+        }
+
+
+        static AnimationClip GenerateMountAnimation(AnimationClip mountAnimation, GameSkeleton mountSkeleton, AnimationClip riderAnimation, GameSkeleton riderSkeleton, 
+            Rmv2MeshNode mountMesh, int mountVertexId, int riderBoneIndex, int parentBoneIndex, 
+            AnimationSettingsViewModel AnimationSettings)
+        {
+            bool fitAnimations = AnimationSettings.FitAnimation;
+            int loopCounter = (int)AnimationSettings.LoopCounter.Value;
+            float mountScale = (float)AnimationSettings.Scale.Value;
+            Vector3 translationOffset = new Vector3((float)AnimationSettings.Translation.X.Value, (float)AnimationSettings.Translation.Y.Value, (float)AnimationSettings.Translation.Z.Value);
+            Vector3 rotationOffset = new Vector3((float)AnimationSettings.Rotation.X.Value, (float)AnimationSettings.Rotation.Y.Value, (float)AnimationSettings.Rotation.Z.Value);
+
+            var newRiderAnim = riderAnimation.Clone();
             newRiderAnim.MergeStaticAndDynamicFrames();
 
-            // Loop
-            var loopCounter = AnimationSettings.LoopCounter.Value;
-            View3D.Animation.AnimationEditor.LoopAnimation(newRiderAnim, (int)loopCounter);
+            View3D.Animation.AnimationEditor.LoopAnimation(newRiderAnim, loopCounter);
 
             // Resample
-            if (AnimationSettings.FitAnimation)
-                newRiderAnim = View3D.Animation.AnimationEditor.ReSample(_rider.Skeleton, newRiderAnim, mountAnim.DynamicFrames.Count);
+            if (fitAnimations)
+                newRiderAnim = View3D.Animation.AnimationEditor.ReSample(riderSkeleton, newRiderAnim, mountAnimation.DynamicFrames.Count);
 
-            var riderBoneIndex = SelectedRiderBone.BoneIndex;
+            MeshAnimationHelper mountVertexPositionResolver = new MeshAnimationHelper(mountMesh, Matrix.CreateScale(mountScale));
 
-            MeshAnimationHelper mountVertexPositionResolver = new MeshAnimationHelper(_mountVertexOwner);
-
-            var maxFrameCount = Math.Min(_mount.AnimationClip.DynamicFrames.Count, newRiderAnim.DynamicFrames.Count);
+            var maxFrameCount = Math.Min(mountAnimation.DynamicFrames.Count, newRiderAnim.DynamicFrames.Count);
             bool keepOriginalRotation = true;
             for (int i = 0; i < maxFrameCount; i++)
             {
-                
-                var mountFrame = AnimationSampler.Sample(i, 0, _mount.Skeleton, new List<AnimationClip> { _mount.AnimationClip }, true, true);
+                var mountFrame = AnimationSampler.Sample(i, 0, mountSkeleton, new List<AnimationClip> { mountAnimation }, true, true);
+                var riderFrame = AnimationSampler.Sample(i, 0, riderSkeleton, new List<AnimationClip> { riderAnimation }, true, true);
 
-                var mountBoneWorldMatrix = mountVertexPositionResolver.GetVertexPosition(mountFrame, _mountVertexes.First());
+                var mountBoneWorldMatrix = mountVertexPositionResolver.GetVertexPosition(mountFrame, mountVertexId);
 
-                mountBoneWorldMatrix.Decompose(out var _, out var rot, out var pos);
+                mountBoneWorldMatrix.Decompose(out var _, out var mountVertexRot, out var mountVertexPos);
+                //mountFrame.BoneTransforms[0].WorldTransformDecompose(out var _, out var mountFrameRot, out var mountFramePos);
+                //mountVertexRot = Quaternion.Identity;
 
-                var rotationOffset =  Quaternion.CreateFromYawPitchRoll(MathHelper.ToRadians((float)AnimationSettings.Rotation.X.Value), MathHelper.ToRadians((float)AnimationSettings.Rotation.Y.Value), MathHelper.ToRadians((float)AnimationSettings.Rotation.Z.Value));
+
+
+                var rotationOffsetQuat = Quaternion.CreateFromYawPitchRoll(MathHelper.ToRadians(rotationOffset.X), MathHelper.ToRadians(rotationOffset.Y), MathHelper.ToRadians(rotationOffset.Z));
 
                 var mountMovement = mountFrame.BoneTransforms[0].Translation;
                 newRiderAnim.DynamicFrames[i].Position[0] = mountMovement;
                 newRiderAnim.DynamicFrames[i].Rotation[0] = Quaternion.Identity;
 
                 var origianlRotation = Quaternion.Identity;
-                if(keepOriginalRotation)
-                    origianlRotation = newRiderAnim.DynamicFrames[i].Rotation[riderBoneIndex];
+                if (keepOriginalRotation)
+                {
+                    //    origianlRotation = newRiderAnim.DynamicFrames[i].Rotation[riderBoneIndex];
 
+                    var worldM = riderFrame.GetSkeletonAnimatedWorld(riderSkeleton, riderBoneIndex);
+                    worldM.Decompose(out var _, out var riderRot, out var RiderPos);
+
+                    origianlRotation = riderRot;
+                }
+
+                //public Matrix GetAnimatedWorldTranform(int boneIndex)
+                //{
+                //    if (_frame != null)
+                //        return _frame.GetSkeletonAnimatedWorld(this, boneIndex);
+                //
+                //    return GetWorldTransform(boneIndex); ;
+                //}
+
+                //origianlRotation = Quaternion.Identity;
 
                 var orgPos = newRiderAnim.DynamicFrames[i].Position[riderBoneIndex];
                 var orgOrt = newRiderAnim.DynamicFrames[i].Rotation[riderBoneIndex];
-                newRiderAnim.DynamicFrames[i].Position[riderBoneIndex] =  pos + new Vector3((float)AnimationSettings.Translation.X.Value, (float)AnimationSettings.Translation.Y.Value, (float)AnimationSettings.Translation.Z.Value) - mountFrame.BoneTransforms[0].Translation;
-                newRiderAnim.DynamicFrames[i].Rotation[riderBoneIndex] = Quaternion.Multiply(Quaternion.Multiply(rot, origianlRotation), rotationOffset);
+                newRiderAnim.DynamicFrames[i].Position[riderBoneIndex] = mountVertexPos + translationOffset - mountFrame.BoneTransforms[0].Translation;
+                newRiderAnim.DynamicFrames[i].Rotation[riderBoneIndex] = Quaternion.Multiply(Quaternion.Multiply(mountVertexRot, origianlRotation), rotationOffsetQuat);
 
                 var diffPos = newRiderAnim.DynamicFrames[i].Position[riderBoneIndex] - orgPos;
-                var diffRot = newRiderAnim.DynamicFrames[i].Rotation[riderBoneIndex] * Quaternion.Inverse( orgOrt);
+                var diffRot = newRiderAnim.DynamicFrames[i].Rotation[riderBoneIndex] * Quaternion.Inverse(orgOrt);
 
                 // Find all the bones at the same level
-                var parentBoneIndex = SelectedRiderBone.ParentBoneIndex;
                 if (parentBoneIndex != -1)
                 {
-                    var childNodes = _rider.Skeleton.GetChildBones(parentBoneIndex);
+                    var childNodes = riderSkeleton.GetChildBones(parentBoneIndex);
 
                     for (int boneId = 0; boneId < childNodes.Count; boneId++)
                     {
@@ -238,25 +301,40 @@ namespace AnimationEditor.MountAnimationCreator
                 }
             }
 
-            // Apply
-            NewAnimation.CopyMeshFromOther(_rider, true);
-            NewAnimation.SetAnimationClip(newRiderAnim, Path.GetFileName(_rider.AnimationName));
-            UpdateCanSaveAndPreviewStates();
+            return newRiderAnim;
         }
+
+        private void UpdateRiderMeshVisability(bool value)
+        {
+            if (NewAnimation != null)
+                NewAnimation.MainNode.IsVisible = value;
+        }
+
+        private void UpdateRiderSkeletonVisability(bool value)
+        {
+            if (NewAnimation != null)
+                NewAnimation.IsSkeletonVisible = value;
+        }
+        
 
         public void SaveAnimation()
         {
-            var animFile = NewAnimation.AnimationClip.ConvertToFileFormat(NewAnimation.Skeleton);
+            SaveAnimation(_rider.AnimationName, NewAnimation.AnimationClip, NewAnimation.Skeleton);
+        }
+
+        void SaveAnimation(string riderAnimationName, AnimationClip clip, GameSkeleton skeleton)
+        {
+            var animFile = clip.ConvertToFileFormat(skeleton);
             var bytes = AnimationFile.GetBytes(animFile);
 
             string savePath = "";
             if (UseSavePrefix)
-                savePath = Path.GetDirectoryName(_rider.AnimationName) + "\\" + SavePrefixText + Path.GetFileName(_rider.AnimationName);
+                savePath = Path.GetDirectoryName(riderAnimationName) + "\\" + SavePrefixText + Path.GetFileName(riderAnimationName);
             else
             {
                 using (var browser = new SavePackFileWindow(_pfs))
                 {
-                    browser.ViewModel.Filter.SetExtentions(new List<string>() { ".rigid_model_v2" });
+                    browser.ViewModel.Filter.SetExtentions(new List<string>() { ".anim" });
                     if (browser.ShowDialog() == true)
                     {
                         savePath = browser.FilePath;
@@ -270,9 +348,47 @@ namespace AnimationEditor.MountAnimationCreator
             SaveHelper.Save(_pfs, savePath, null, bytes);
         }
 
-        public void SaveAnimationAs()
-        { 
-        
+        public void BatchProcess()
+        {
+            // Entry : For each mount item:
+            // Slot(id), status (OK, ERROR, MISSING IN RIDER), IsMountAnim, mount animation name, new rider animation name
+
+            var csvLog = new List<object>();
+            var mountSlots = MountLinkController.GetAllMountFragments();
+
+            foreach (var mountFragment in mountSlots)
+            {
+                var riderFragment = MountLinkController.GetRiderFragmentFromMount(mountFragment);
+                if (riderFragment == null)
+                {
+                    csvLog.Add(new { Status = "MISSING IN RIDER", MountSlot = mountFragment.Slot.ToString(),  MountAnimation = mountFragment.AnimationFile, RiderSlot = "", RiderAnimation = "" });
+                    continue;
+                }
+
+                try
+                {
+                    var mountAnimPackFile = _pfs.FindFile(mountFragment.AnimationFile) as PackFile;
+                    var mountAnim = new AnimationClip(AnimationFile.Create(mountAnimPackFile));
+
+                    var riderAnimPackFile = _pfs.FindFile(riderFragment.AnimationFile) as PackFile;
+                    var riderAnim = new AnimationClip(AnimationFile.Create(riderAnimPackFile));
+
+                    var newRiderAnim = GenerateMountAnimation(mountAnim, _mount.Skeleton, riderAnim, _rider.Skeleton, _mountVertexOwner, _mountVertexes.First(), SelectedRiderBone.BoneIndex, SelectedRiderBone.ParentBoneIndex, AnimationSettings);
+                    SaveAnimation(riderFragment.AnimationFile, newRiderAnim, _rider.Skeleton);
+
+                    csvLog.Add(new { Status = "OK", MountSlot = mountFragment.Slot.ToString(), MountAnimation = mountFragment.AnimationFile, RiderSlot = riderFragment.Slot.ToString(), RiderAnimation = riderFragment.AnimationFile });
+                }
+                catch
+                {
+                    csvLog.Add(new { Status = "ERROR", MountSlot = mountFragment.Slot.ToString(), MountAnimation = mountFragment.AnimationFile, RiderSlot = riderFragment.Slot.ToString(), RiderAnimation = riderFragment.AnimationFile});
+                }
+            }
+
+            var fileName = $"C:\\temp\\{Path.GetFileNameWithoutExtension(MountLinkController.SeletedRider.DisplayName)}_log.csv";
+            _logger.Here().Information("Batch export log can be found at - " + fileName);
+            using var writer = new StreamWriter(fileName);
+            using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+            csv.WriteRecords(csvLog);
         }
     }
 
@@ -280,9 +396,11 @@ namespace AnimationEditor.MountAnimationCreator
     class MeshAnimationHelper
     {
         Rmv2MeshNode _mesh;
-        public MeshAnimationHelper(Rmv2MeshNode mesh)
+        Matrix _worldTransform;
+        public MeshAnimationHelper(Rmv2MeshNode mesh, Matrix worldTransform)
         {
             _mesh = mesh;
+            _worldTransform = worldTransform;
         }
 
         public Matrix GetVertexPosition(AnimationFrame frame, int vertexId)
@@ -362,7 +480,7 @@ namespace AnimationEditor.MountAnimationCreator
                 transformSum.M43 = (m1.M43 * w1);
                 
             }
-            return transformSum;
+            return transformSum * _worldTransform;
         }
         
 

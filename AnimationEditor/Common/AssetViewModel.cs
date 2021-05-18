@@ -62,9 +62,6 @@ namespace AnimationEditor.Common.ReferenceModel
         public bool IsSkeletonVisible { get => _isSkeletonVisible; set { SetAndNotify(ref _isSkeletonVisible, value); _skeletonSceneNode.IsVisible = value; } }
 
 
-        bool _isAnimationActive = true;
-        public bool IsAnimationActive { get => _isAnimationActive; set { SetAndNotify(ref _isAnimationActive, value); Player.Play(value); } }
-
         public Matrix Offset { get; set; } = Matrix.Identity;
 
         public AssetViewModel(PackFileService pfs, string description, Color skeletonColour, WpfGame game) : base( game)

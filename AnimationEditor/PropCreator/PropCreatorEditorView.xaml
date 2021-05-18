@@ -105,9 +105,10 @@
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
                     <Button Grid.Row="0" Content="Preview" Command="{Binding PreviewCommand}"/>
-                    <Button Grid.Row="1" Content="Create Skeleton" Margin="0,5,0,0" IsEnabled="False"/>
-                    <Button Grid.Row="2" Content="Extract Animation" Margin="0,5,0,0" IsEnabled="False"/>
-                    <Button Grid.Row="3" Content="Extract Mesh" Margin="0,5,0,0" IsEnabled="False"/>
+                    <Button Grid.Row="1" Content="Save Skeleton" Margin="0,5,0,0" IsEnabled="False"/>
+                    <Button Grid.Row="2" Content="Save Animation" Margin="0,5,0,0" IsEnabled="False"/>
+                    <Button Grid.Row="3" Content="Save Mesh" Margin="0,5,0,0" IsEnabled="False"/>
+       
                     <Button Grid.Row="4" Content="Create animated prop" Margin="0,5,0,0" IsEnabled="False"/>
                 </Grid>
             </Grid>

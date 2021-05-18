@@ -48,7 +48,6 @@ namespace AnimationEditor.Common.ReferenceModel
                 SetAndNotify(ref _isVisible, value);
                 Data.ShowMesh = value;
                 Data.IsSkeletonVisible = value;
-                Data.IsAnimationActive = value;
             }
         }
 
@@ -68,11 +67,12 @@ namespace AnimationEditor.Common.ReferenceModel
         private void Data_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             SubHeaderName = "";
-            if (Data.MeshName != null)
-                SubHeaderName = Data.MeshName;
 
             if (Data.Skeleton != null)
-                SubHeaderName += " Skeleton - " + Data.Skeleton.SkeletonName;
+                SubHeaderName = Data.Skeleton.SkeletonName;
+
+            if (Data.AnimationClip != null)
+                SubHeaderName += " - " + Data.AnimationName;
         }
 
         public void BrowseMesh()

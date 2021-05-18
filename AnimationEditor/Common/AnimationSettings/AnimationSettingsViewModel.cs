@@ -22,7 +22,7 @@ namespace AnimationEditor.Common.AnimationSettings
             set { SetAndNotify(ref _loopCounter, value); }
         }
 
-        bool _applyOffsets = false;
+        bool _applyOffsets = true;
         public bool ApplyOffsets
         {
             get { return _applyOffsets; }
