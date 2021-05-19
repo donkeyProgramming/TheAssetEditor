@@ -74,11 +74,10 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         bool IsUngroupable(ISceneNode node)
         {
-            if (node is GroupNode gn)
-            {
-                if (gn.IsUngroupable)
-                    return true;
-            }
+            if (node is GroupNode gn && gn.IsUngroupable)
+                return true;
+            else if (node.Parent is GroupNode g && g.IsUngroupable)
+                return true;
  
             return false;
         }
@@ -99,10 +98,10 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             }
 
             if (node is SlotNode)
-                return false;
+                return true;
 
             if (node is SlotsNode)
-                return false;
+                return true;
 
             if (node is SkeletonNode)
                 return false;
@@ -220,8 +219,10 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         void Ungroup()
         {
-            var cmd = new UnGroupObjectsCommand(_activeNode.Parent, _activeNode.Children.Select(x=>x as ISelectable).ToList(), _activeNode);
-            CommandExecutor.ExecuteCommand(cmd);
+            if (_activeNode is GroupNode gn && gn.IsUngroupable)
+                CommandExecutor.ExecuteCommand(new UnGroupObjectsCommand(_activeNode.Parent, _activeNode.Children.Select(x => x as ISelectable).ToList(), _activeNode));
+            else if (_activeNode.Parent is GroupNode g && g.IsUngroupable)
+                CommandExecutor.ExecuteCommand(new UnGroupObjectsCommand(_activeNode.Parent.Parent, new List<ISelectable>() { _activeNode as ISelectable }, _activeNode.Parent));
         }
 
         void ToggleLock()

@@ -92,7 +92,13 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
 
         public ICommand SaveConfigurationCommand { get; set; }
         public ICommand LoadConfigurationCommand{ get; set; }
-        
+
+ 
+        public bool MoveMeshToFit
+        {
+            get { return _configuration.MoveMeshToFit; }
+            set { _configuration.MoveMeshToFit = value;  NotifyPropertyChanged(); }
+        }
 
         string _currentConfigPath = string.Empty;
         public string CurrentConfigPath
@@ -100,8 +106,6 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
             get { return _currentConfigPath; }
             set { OnConfigPathChanged(value);  SetAndNotify(ref _currentConfigPath, value);  }
         }
-
-
 
         ObservableCollection<string> _allConfigPaths;
         public ObservableCollection<string> AllConfigPaths

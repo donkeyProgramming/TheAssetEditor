@@ -29,14 +29,14 @@ namespace AnimationEditor.Common.AnimationSettings
             set { SetAndNotify(ref _applyOffsets, value); }
         }
 
-        Vector3ViewModel _translation = new Vector3ViewModel();
+        Vector3ViewModel _translation = new Vector3ViewModel(0);
         public Vector3ViewModel Translation
         {
             get { return _translation; }
             set { SetAndNotify(ref _translation, value); }
         }
 
-        Vector3ViewModel _rotation = new Vector3ViewModel();
+        Vector3ViewModel _rotation = new Vector3ViewModel(0);
         public Vector3ViewModel Rotation
         {
             get { return _rotation; }
@@ -48,6 +48,25 @@ namespace AnimationEditor.Common.AnimationSettings
         {
             get { return _scale; }
             set { SetAndNotify(ref _scale, value); }
+        }
+
+
+
+
+        bool _keepRiderRotation = true;
+        public bool KeepRiderRotation
+        {
+            get { return _keepRiderRotation; }
+            set { SetAndNotify(ref _keepRiderRotation, value); }
+        }
+
+
+
+        Vector3ViewModel _maxRiderRotation = new Vector3ViewModel(-1);
+        public Vector3ViewModel MaxRiderRotation
+        {
+            get { return _maxRiderRotation; }
+            set { SetAndNotify(ref _maxRiderRotation, value); }
         }
     }
 }

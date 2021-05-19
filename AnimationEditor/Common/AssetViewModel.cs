@@ -264,8 +264,6 @@ namespace AnimationEditor.Common.ReferenceModel
         List<Rmv2MeshNode> _meshNodes = new List<Rmv2MeshNode>();
         View3D.Animation.AnimationPlayer _player;
 
-
-
         public bool IsActive => true;
         public GameSkeleton Skeleton { get; set; }
 

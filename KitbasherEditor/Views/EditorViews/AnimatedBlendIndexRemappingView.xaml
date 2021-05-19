@@ -244,6 +244,7 @@
                         <TextBlock>"</TextBlock>
                     </StackPanel>
                 </Button>
+                <CheckBox Grid.Row="1" Grid.Column="1" Content="Move mesh to fit" IsChecked="{Binding MoveMeshToFit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center"/>
             </Grid>
         </Grid>
 

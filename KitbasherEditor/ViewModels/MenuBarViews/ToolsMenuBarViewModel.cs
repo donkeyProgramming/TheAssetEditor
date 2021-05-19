@@ -23,7 +23,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         ObjectEditor _objectEditor;
         FaceEditor _faceEditor;
         IEditableMeshResolver _editableMeshResolver;
-        CommandExecutor _commandExecutor;
+        ViewOnlySelectedComponent _viewOnlySelectedComp;
 
         public ICommand DivideSubMeshCommand { get; set; }
         public ICommand MergeObjectCommand { get; set; }
@@ -35,6 +35,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public ICommand FaceToVertexCommand { get; set; }
         public ICommand GroupCommand { get; set; }
         public ICommand ReduceMeshCommand { get; set; }
+        public ICommand ToggleShowSelectionCommand { get; set; }
+        
 
         bool _showObjectTools = true;
         public bool ShowObjectTools { get => _showObjectTools; set => SetAndNotify(ref _showObjectTools, value); }
@@ -75,6 +77,10 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         bool _reduceMeshCommandEnabled;
         public bool ReduceMeshCommandEnabled { get => _reduceMeshCommandEnabled; set => SetAndNotify(ref _reduceMeshCommandEnabled, value); }
 
+
+        bool _toggleShowSelectionEnabled = true;
+        public bool ToggleShowSelectionEnabled { get => _toggleShowSelectionEnabled; set => SetAndNotify(ref _toggleShowSelectionEnabled, value); }
+
         public ToolsMenuBarViewModel(IComponentManager componentManager, ToolbarCommandFactory commandFactory)
         {
             DivideSubMeshCommand = new RelayCommand(DivideSubMesh);
@@ -85,6 +91,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             CreateLodCommand = new RelayCommand(CreateLods);
             ExpandSelectedFacesToObjectCommand = new RelayCommand(ExpandFaceSelection);
             GroupCommand = commandFactory.Register(new RelayCommand(GroupItems), Key.G, ModifierKeys.Control);
+            ToggleShowSelectionCommand = commandFactory.Register(new RelayCommand(ToggleShowSelection), Key.Space, ModifierKeys.None);
             ReduceMeshCommand = new RelayCommand(ReduceMesh);
 
             FaceToVertexCommand = new RelayCommand(ConvertFacesToVertex);
@@ -95,7 +102,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _objectEditor = componentManager.GetComponent<ObjectEditor>();
             _faceEditor = componentManager.GetComponent<FaceEditor>();
             _editableMeshResolver = componentManager.GetComponent<IEditableMeshResolver>();
-            _commandExecutor = componentManager.GetComponent<CommandExecutor>();
+            _viewOnlySelectedComp = componentManager.GetComponent<ViewOnlySelectedComponent>();
 
             OnSelectionChanged(_selectionManager.GetState());
         }
@@ -262,6 +269,11 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         void ConvertFacesToVertex()
         {
             _faceEditor.ConvertSelectionToVertex(_selectionManager.GetState() as FaceSelectionState);
+        }
+
+        void ToggleShowSelection()
+        {
+            _viewOnlySelectedComp.Toggle();
         }
 
     }

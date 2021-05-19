@@ -76,7 +76,7 @@
 
             </Grid>
         </GroupBox>
-        <GroupBox Grid.Row="1" Header="Editor:">
+        <GroupBox Grid.Row="1" Header="Attachment:">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
@@ -144,13 +144,14 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
 
          
                 <Label Grid.Column="0" Grid.Row="0" Content="Snap camera to Bone"/>
                 <Label Grid.Column="1" Grid.Row="0" Content=":"/>
-                <CheckBox Grid.Column="2" Grid.Row="0" VerticalContentAlignment="Center"/>
-                <dotNetKitControls:AutoCompleteComboBox Grid.Column="3" Grid.Row="0" 
+                <CheckBox Grid.Column="2" Grid.Row="0" VerticalContentAlignment="Center" IsEnabled="False"/>
+                <dotNetKitControls:AutoCompleteComboBox Grid.Column="3" Grid.Row="0" IsEnabled="False" 
                     SelectedValuePath="Id"
                     TextSearch.TextPath="BoneName"
                     ItemsSource="{Binding StartBoneList, UpdateSourceTrigger=PropertyChanged}"
@@ -161,9 +162,9 @@
                 <Label Grid.Column="1" Grid.Row="1" Content=":"/>
                 <CheckBox  Grid.Column="2" Grid.Row="1"  VerticalContentAlignment="Center" IsChecked="{Binding DisplayGeneratedRiderMesh, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-                <Label Grid.Column="0" Grid.Row="1" Content="Display preview skelton"/>
-                <Label Grid.Column="1" Grid.Row="1" Content=":"/>
-                <CheckBox  Grid.Column="2" Grid.Row="1"  VerticalContentAlignment="Center" IsChecked="{Binding DisplayGeneratedRiderSkeleton, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <Label Grid.Column="0" Grid.Row="2" Content="Display preview skelton"/>
+                <Label Grid.Column="1" Grid.Row="2" Content=":"/>
+                <CheckBox  Grid.Column="2" Grid.Row="2"  VerticalContentAlignment="Center" IsChecked="{Binding DisplayGeneratedRiderSkeleton, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
             </Grid>
         </GroupBox>

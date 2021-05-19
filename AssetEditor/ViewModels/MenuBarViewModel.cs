@@ -1,4 +1,5 @@
-﻿using AnimationEditor.PropCreator.ViewModels;
+﻿using AnimationEditor.MountAnimationCreator;
+using AnimationEditor.PropCreator.ViewModels;
 using AssetEditor.Services;
 using AssetEditor.Views.Settings;
 using Common;
@@ -32,6 +33,9 @@ namespace AssetEditor.ViewModels
         public ICommand OpenPackFileCommand { get; set; }
         public ICommand OpenAssetEditorFolderCommand { get; set; }
         public ICommand OpenAnimMetaDecocderCommand { get; set; }
+         public ICommand OpenMountCreatorCommand { get; set; }
+
+        
 
         public ICommand OpenKitbashEditorCommand { get; set; }
         public ICommand OpenPropCreatorCommand { get; set; }
@@ -48,6 +52,7 @@ namespace AssetEditor.ViewModels
             OpenAssetEditorFolderCommand = new RelayCommand(OpenAssetEditorFolder);
             OpenKitbashEditorCommand = new RelayCommand(OpenKitbasherTool);
             OpenAnimMetaDecocderCommand = new RelayCommand(OpenAnimMetaDecocder);
+            OpenMountCreatorCommand = new RelayCommand(OpenMountCreator);
             OpenPropCreatorCommand = new RelayCommand(OpenPropCreatorEditor);
         }
 
@@ -104,6 +109,12 @@ namespace AssetEditor.ViewModels
         void OpenPropCreatorEditor()
         {
             var editorView = _toolFactory.CreateEditorViewModel<BaseAnimationViewModel>();
+            EditorCreator.CreateEmptyEditor(editorView);
+        }
+
+        void OpenMountCreator()
+        {
+            var editorView = _toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
     }

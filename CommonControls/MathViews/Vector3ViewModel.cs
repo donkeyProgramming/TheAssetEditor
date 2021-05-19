@@ -22,6 +22,17 @@ namespace CommonControls.MathViews
             Z.PropertyChanged += PropertyChanged;
         }
 
+        public Vector3ViewModel(double value = 0)
+        {
+            X.Value = value;
+            Y.Value = value;
+            Z.Value = value;
+
+            X.PropertyChanged += PropertyChanged;
+            Y.PropertyChanged += PropertyChanged;
+            Z.PropertyChanged += PropertyChanged;
+        }
+
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             OnValueChanged?.Invoke(this);

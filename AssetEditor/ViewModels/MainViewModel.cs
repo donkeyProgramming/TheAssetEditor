@@ -12,6 +12,7 @@ using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using FileTypes.PackFiles.Models;
 using GalaSoft.MvvmLight.CommandWpf;
+using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
@@ -88,7 +89,9 @@ namespace AssetEditor.ViewModels
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu17\skv\skv_clan_rats\head\skv_clan_rats_head_04.rigid_model_v2");
 
 
-                MountAnimationCreatorViewModel_Debug.CreateBroodHorrorEditor(this, toolFactory, packfileService);
+                //MountAnimationCreatorViewModel_Debug.CreateLionAndHu01b(this, toolFactory, packfileService);
+                KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
+
 
                 //var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
                 //editorView.RefInput= new AnimationToolInput()
@@ -104,8 +107,6 @@ namespace AssetEditor.ViewModels
                 //};
                 //
                 //CreateEmptyEditor(editorView);
-
-                //OpenFile(packFile);
                 CreateTestPackFiles(packfileService);
             }
         }

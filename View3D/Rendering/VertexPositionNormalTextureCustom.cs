@@ -43,14 +43,15 @@ namespace View3D.Rendering
             get { return VertexDeclaration; }
         }
 
-        public int GetBoneIndex(int index)
+
+        public float[] GetBoneWeights()
         {
-            return (new int[] { (int)BlendIndices.X, (int)BlendIndices.Y, (int)BlendIndices.Z, (int)BlendIndices.W })[index];
+            return new float[] { BlendWeights.X, BlendWeights.Y, BlendWeights.Z, BlendWeights.W };
         }
 
-        public float GetBoneWeight(int index)
+        public int[] GetBoneIndexs()
         {
-            return (new float[] { BlendWeights.X, BlendWeights.Y, BlendWeights.Z, BlendWeights.W })[index];
+            return new int[] { (int)BlendIndices.X, (int)BlendIndices.Y, (int)BlendIndices.Z, (int)BlendIndices.W };
         }
 
     }

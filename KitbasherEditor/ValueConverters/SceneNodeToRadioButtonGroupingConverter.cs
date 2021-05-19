@@ -26,6 +26,9 @@ namespace KitbasherEditor.ValueConverters
             if(sceneNode is SlotNode)
                 return Guid.NewGuid().ToString();
 
+            if(sceneNode is WsModelGroup)
+                return sceneNode.Parent.Id;
+
             return Guid.NewGuid().ToString();
         }
 

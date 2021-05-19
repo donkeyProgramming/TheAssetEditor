@@ -42,14 +42,9 @@ namespace AnimationEditor.Common.AnimationPlayer
         AssetPlayerItem _selectedMainAnimation;
         public AssetPlayerItem SelectedMainAnimation { get { return _selectedMainAnimation; } set { MainAnimationChanged(_selectedMainAnimation, value); SetAndNotifyWhenChanged(ref _selectedMainAnimation, value); } }
 
-        
 
         public AnimationPlayerViewModel()
         {
-            //var animCollection = _componentManager.GetComponent<AnimationsContainerComponent>();
-            //Player = animCollection.RegisterAnimationPlayer(new AnimationPlayer(), "MainPlayer");
-            //Player.OnFrameChanged += OnAnimationFrameChanged;
-
             IsEnabled = false;
         }
 

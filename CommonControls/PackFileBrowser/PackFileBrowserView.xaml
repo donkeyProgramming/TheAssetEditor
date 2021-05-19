@@ -15,7 +15,6 @@
         <valueconverters:InverseBooleanConverter x:Key="InvBoolConverter"/>
         <nodevalueconverters:SortedCollectionViewSource x:Key="SortedCollectionViewSource" Property0="NodeType" Property1="Name"/>
         <valueconverters:BoolToStringConverter x:Key="BoolToStringConverter" TrueValue="*"/>
-        
     </UserControl.Resources>
 
     <Grid>
@@ -24,10 +23,9 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <TextBox Grid.Row="0" Text="{Binding Filter.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" behaviors:TextBoxExtensions.Watermark="Search filter"/>
+        <TextBox KeyboardNavigation.TabIndex="0" KeyboardNavigation.IsTabStop="True"  Grid.Row="0" Text="{Binding Filter.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" behaviors:TextBoxExtensions.Watermark="Search filter"/>
         
         <TreeView 
-            
             Grid.Row="1" 
             behaviors:TreeViewExtension.SelectItemOnRightClick="True"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"

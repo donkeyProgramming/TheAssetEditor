@@ -92,7 +92,7 @@ namespace KitbasherEditor.ViewModels
 
             if (SelectedNodeViewModel != null)
                 SelectedNodeViewModel.Dispose();
-            SelectedNodeViewModel = SceneNodeViewFactory.Create(selectedNode, _skeletonAnimationLookUpHelper, _packFileService, _animationControllerViewModel);
+            SelectedNodeViewModel = SceneNodeViewFactory.Create(selectedNode, _skeletonAnimationLookUpHelper, _packFileService, _animationControllerViewModel, _sceneContainer.GetComponent<CommandExecutor>());
 
             if (selectedNode != null)
             {

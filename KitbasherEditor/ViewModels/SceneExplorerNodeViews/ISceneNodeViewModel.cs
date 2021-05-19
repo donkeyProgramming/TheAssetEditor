@@ -1,5 +1,6 @@
 ﻿using CommonControls.Services;
 using System;
+using View3D.Components.Component;
 using View3D.SceneNodes;
 using View3D.Utility;
 
@@ -11,7 +12,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
     public static class SceneNodeViewFactory
     {
-        public static ISceneNodeViewModel Create(ISceneNode node, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService pf, AnimationControllerViewModel animationControllerViewModel)
+        public static ISceneNodeViewModel Create(ISceneNode node, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService pf, AnimationControllerViewModel animationControllerViewModel, CommandExecutor commandExecutor)
         {
             switch (node)
             {
@@ -25,7 +26,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                     return new LodSceneNodeViewModel(l);
 
                 case Rmv2MeshNode m:
-                    return new MeshSceneNodeViewModel(m, pf, skeletonAnimationLookUpHelper);
+                    return new MeshSceneNodeViewModel(m, pf, skeletonAnimationLookUpHelper, commandExecutor);
                 case SkeletonNode s:
                     return new SkeletonSceneNodeViewModel(s, pf, skeletonAnimationLookUpHelper);
                 case GroupNode n:

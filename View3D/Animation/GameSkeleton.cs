@@ -54,7 +54,7 @@ namespace View3D.Animation
             RebuildSkeletonMatrix();
         }
 
-        void RebuildSkeletonMatrix()
+        public void RebuildSkeletonMatrix()
         {
             for (int i = 0; i < BoneCount; i++)
             {
@@ -66,8 +66,6 @@ namespace View3D.Animation
 
             for (int i = 0; i < BoneCount; i++)
             {
-
-
                 var parentIndex = GetParentBone(i);
                 if (parentIndex == -1)
                     continue;
@@ -75,17 +73,19 @@ namespace View3D.Animation
             }
         }
 
-        public void SetBoneTransform(int id, Quaternion rotation, Vector3 position)
+        public void SetBoneTransform(int id, Quaternion rotation, Vector3 position, bool rebuild = true)
         {
             Rotation[id] = rotation;
             Translation[id] = position;
-            RebuildSkeletonMatrix();
+            if(rebuild)
+                RebuildSkeletonMatrix();
         }
 
-        public void SetBoneTransform(int id, Vector3 position)
+        public void SetBoneTransform(int id, Vector3 position, bool rebuild = true)
         {
             Translation[id] = position;
-            RebuildSkeletonMatrix();
+            if (rebuild)
+                RebuildSkeletonMatrix();
         }
 
         public void Update()
@@ -141,6 +141,24 @@ namespace View3D.Animation
                     output.Add(i);
             }
             return output;
+        }
+
+        public AnimationFrame CreateAnimationFrame()
+        {
+            var currentFrame = new AnimationFrame();
+            for (int i = 0; i < BoneCount; i++)
+            {
+                currentFrame.BoneTransforms.Add(new AnimationFrame.BoneKeyFrame()
+                {
+                    Translation = Translation[i],
+                    Rotation = Rotation[i],
+                    BoneIndex = i,
+                    ParentBoneIndex = GetParentBone(i),
+                    WorldTransform = _worldTransform[i]
+                });
+            }
+
+            return currentFrame;
         }
     }
 }

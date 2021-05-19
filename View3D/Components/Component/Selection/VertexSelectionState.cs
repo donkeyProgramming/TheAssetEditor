@@ -18,11 +18,16 @@ namespace View3D.Components.Component.Selection
 
         public void ModifySelection(int newSelectionItem, bool onlyRemove)
         {
-            if (SelectedVertices.Contains(newSelectionItem))
-                SelectedVertices.Remove(newSelectionItem);
-            else if(!onlyRemove)
-                SelectedVertices.Add(newSelectionItem);
-
+            if (onlyRemove)
+            {
+                if (SelectedVertices.Contains(newSelectionItem))
+                    SelectedVertices.Remove(newSelectionItem);
+            }
+            else
+            {
+                if (!SelectedVertices.Contains(newSelectionItem))
+                    SelectedVertices.Add(newSelectionItem);
+            }
             SelectionChanged?.Invoke(this);
         }
 

@@ -88,11 +88,11 @@ namespace View3D.Animation
         AnimationFrame _currentAnimFrame;
         List<AnimationClip> _animationClips;
 
-        public bool IsPlaying { get; private set; } = false;
+        public bool IsPlaying { get; private set; } = true;
         public double SpeedMultiplication { get; set; }
         public bool ApplyStaticFrame { get; set; } = true;
         public bool ApplyDynamicFrames { get; set; } = true;
-        public bool IsEnabled { get; set; } = true;
+        public bool IsEnabled { get; set; } = false;
         public bool LoopAnimation { get; set; } = true;
 
         public int CurrentFrame
@@ -132,11 +132,16 @@ namespace View3D.Animation
 
         public void SetAnimationArray(List<AnimationClip> animation, GameSkeleton skeleton)
         {
+            if (animation != null)
+            {
+                // Make sure animation fits
+                var numBones = skeleton.BoneCount;
+                var maxAnimBones = Math.Max(animation.Select(x => x.RotationMappings.Count).Max(), animation.Select(x => x.TranslationMappings.Count).Max());
+                if (maxAnimBones > numBones)
+                    throw new Exception("This animation does not work for this skeleton!");
+            }
+
             _skeleton = skeleton;
-
-            if (_animationClips == null)
-                IsPlaying = false;
-
             _animationClips = animation;
             _timeSinceStart = TimeSpan.FromSeconds(0);
             UpdateAnimationFrame();
@@ -148,7 +153,6 @@ namespace View3D.Animation
                 return _animationClips[0].DynamicFrames.Count() * (1f / 20f) * 1000;
             return 0;
         }
-
 
         public void Update(GameTime gameTime)
         {

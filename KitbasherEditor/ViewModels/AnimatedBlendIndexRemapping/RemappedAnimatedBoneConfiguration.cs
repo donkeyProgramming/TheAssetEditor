@@ -15,7 +15,7 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
        
         public string ParnetModelSkeletonName { get; set; }
 
+        public bool MoveMeshToFit { get; set; } = false;
 
-        
     }
 }

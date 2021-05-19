@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
+using System.Windows.Input;
 
 namespace CommonControls.PackFileBrowser
 {
@@ -22,6 +23,14 @@ namespace CommonControls.PackFileBrowser
             ViewModel.FileOpen += ViewModel_FileOpen;
             InitializeComponent();
             DataContext = this;
+
+            PreviewKeyDown += HandleEsc;
+        }
+
+        private void HandleEsc(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+                Close();
         }
 
         private void ViewModel_FileOpen(IPackFile file)
@@ -41,6 +50,7 @@ namespace CommonControls.PackFileBrowser
 
         public void Dispose()
         {
+            PreviewKeyDown -= HandleEsc;
             ViewModel.FileOpen -= ViewModel_FileOpen;
             ViewModel.Dispose();
             ViewModel = null;

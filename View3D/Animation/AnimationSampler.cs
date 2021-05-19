@@ -20,17 +20,7 @@ namespace View3D.Animation
                 if (skeleton == null)
                     return null;
 
-                var currentFrame = new AnimationFrame();
-                for (int i = 0; i < skeleton.BoneCount; i++)
-                {
-                    currentFrame.BoneTransforms.Add(new AnimationFrame.BoneKeyFrame()
-                    {
-                        Translation = skeleton.Translation[i],
-                        Rotation = skeleton.Rotation[i],
-                        BoneIndex = i,
-                        ParentBoneIndex = skeleton.GetParentBone(i),
-                    });
-                }
+                var currentFrame = skeleton.CreateAnimationFrame();
 
                 if (animationClips != null)
                 {

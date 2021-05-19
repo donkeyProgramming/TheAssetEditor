@@ -13,6 +13,9 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using TextureEditor.ViewModels;
+using View3D.Animation;
+using View3D.Commands.Object;
+using View3D.Components.Component;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Utility;
@@ -26,11 +29,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public MeshSceneNodeViewModel_Graphics Graphics { get; set; }
 
         Rmv2MeshNode _meshNode;
-        public MeshSceneNodeViewModel(Rmv2MeshNode node, PackFileService pfs, SkeletonAnimationLookUpHelper animLookUp)
+        public MeshSceneNodeViewModel(Rmv2MeshNode node, PackFileService pfs, SkeletonAnimationLookUpHelper animLookUp, CommandExecutor commandExecutor)
         {
             _meshNode = node;
             General = new MeshSceneNodeViewModel_General(_meshNode);
-            Animation = new MeshSceneNodeViewModel_Animation(pfs, _meshNode, animLookUp);
+            Animation = new MeshSceneNodeViewModel_Animation(pfs, _meshNode, animLookUp, commandExecutor);
             Graphics = new MeshSceneNodeViewModel_Graphics(_meshNode, pfs);
         }
 
@@ -90,6 +93,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         Rmv2MeshNode _meshNode;
         SkeletonAnimationLookUpHelper _animLookUp;
         PackFileService _pfs;
+        CommandExecutor _commandExecutor;
 
         string _skeletonName;
         public string SkeletonName { get { return _skeletonName; } set { SetAndNotify(ref _skeletonName, value); } }
@@ -106,11 +110,12 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public List<AnimatedBone> AnimatedBones { get { return _animatedBones; } set { SetAndNotify(ref _animatedBones, value); } }
         public ICommand OpenBoneRemappingToolCommand { get; set; }
 
-        public MeshSceneNodeViewModel_Animation(PackFileService pfs, Rmv2MeshNode meshNode, SkeletonAnimationLookUpHelper animLookUp)
+        public MeshSceneNodeViewModel_Animation(PackFileService pfs, Rmv2MeshNode meshNode, SkeletonAnimationLookUpHelper animLookUp, CommandExecutor commandExecutor)
         {
             _pfs = pfs;
             _meshNode = meshNode;
             _animLookUp = animLookUp;
+            _commandExecutor = commandExecutor;
 
             SkeletonName = _meshNode.MeshModel.ParentSkeletonName;
             LinkDirectlyToBoneIndex = _meshNode.MeshModel.Header.LinkDirectlyToBoneIndex;
@@ -146,9 +151,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
             if (window.ShowDialog() == true)
             {
-                List<IndexRemapping> remapping = config.MeshBones.First().BuildRemappingList();
-                _meshNode.Geometry.UpdateAnimationIndecies(remapping);
-                _meshNode.MeshModel.ParentSkeletonName = config.ParnetModelSkeletonName;
+                var remapping = config.MeshBones.First().BuildRemappingList();
+                _commandExecutor.ExecuteCommand(new RemapBoneIndexesCommand(_meshNode, remapping, config.ParnetModelSkeletonName, config.MoveMeshToFit, new GameSkeleton(existingSkeletonFile, null), new GameSkeleton(newSkeletonFile, null)));
             }
         }
     }

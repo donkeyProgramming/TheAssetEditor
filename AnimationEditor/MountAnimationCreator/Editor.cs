@@ -26,6 +26,7 @@ using View3D.Animation;
 using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
+using View3D.Utility;
 
 namespace AnimationEditor.MountAnimationCreator
 {
@@ -169,7 +170,8 @@ namespace AnimationEditor.MountAnimationCreator
             else
                 RiderBones = SkeletonHelper.CreateFlatSkeletonList(newValue);
 
-            SelectedRiderBone = RiderBones.FirstOrDefault(x => string.Equals("root", x.BoneName, StringComparison.OrdinalIgnoreCase));
+            if(RiderBones != null)
+                SelectedRiderBone = RiderBones.FirstOrDefault(x => string.Equals("root", x.BoneName, StringComparison.OrdinalIgnoreCase));
             UpdateCanSaveAndPreviewStates();
         }
 
@@ -210,82 +212,75 @@ namespace AnimationEditor.MountAnimationCreator
             // Apply
             NewAnimation.CopyMeshFromOther(_rider, true);
             NewAnimation.SetAnimationClip(newRiderAnim, Path.GetFileName(_rider.AnimationName));
+            NewAnimation.IsSkeletonVisible = DisplayGeneratedRiderSkeleton;
             UpdateCanSaveAndPreviewStates();
         }
 
 
         static AnimationClip GenerateMountAnimation(AnimationClip mountAnimation, GameSkeleton mountSkeleton, AnimationClip riderAnimation, GameSkeleton riderSkeleton, 
             Rmv2MeshNode mountMesh, int mountVertexId, int riderBoneIndex, int parentBoneIndex, 
-            AnimationSettingsViewModel AnimationSettings)
+            AnimationSettingsViewModel animationSettings)
         {
-            bool fitAnimations = AnimationSettings.FitAnimation;
-            int loopCounter = (int)AnimationSettings.LoopCounter.Value;
-            float mountScale = (float)AnimationSettings.Scale.Value;
-            Vector3 translationOffset = new Vector3((float)AnimationSettings.Translation.X.Value, (float)AnimationSettings.Translation.Y.Value, (float)AnimationSettings.Translation.Z.Value);
-            Vector3 rotationOffset = new Vector3((float)AnimationSettings.Rotation.X.Value, (float)AnimationSettings.Rotation.Y.Value, (float)AnimationSettings.Rotation.Z.Value);
+            Vector3 translationOffset = new Vector3((float)animationSettings.Translation.X.Value, (float)animationSettings.Translation.Y.Value, (float)animationSettings.Translation.Z.Value);
+            Vector3 rotationOffset = new Vector3((float)animationSettings.Rotation.X.Value, (float)animationSettings.Rotation.Y.Value, (float)animationSettings.Rotation.Z.Value);
+            var rotationOffsetMatrix = Quaternion.CreateFromYawPitchRoll(MathHelper.ToRadians(rotationOffset.X), MathHelper.ToRadians(rotationOffset.Y), MathHelper.ToRadians(rotationOffset.Z));
 
             var newRiderAnim = riderAnimation.Clone();
             newRiderAnim.MergeStaticAndDynamicFrames();
 
-            View3D.Animation.AnimationEditor.LoopAnimation(newRiderAnim, loopCounter);
+            View3D.Animation.AnimationEditor.LoopAnimation(newRiderAnim, (int)animationSettings.LoopCounter.Value);
 
             // Resample
-            if (fitAnimations)
+            if (animationSettings.FitAnimation)
                 newRiderAnim = View3D.Animation.AnimationEditor.ReSample(riderSkeleton, newRiderAnim, mountAnimation.DynamicFrames.Count);
 
+            float mountScale = (float)animationSettings.Scale.Value;
             MeshAnimationHelper mountVertexPositionResolver = new MeshAnimationHelper(mountMesh, Matrix.CreateScale(mountScale));
 
             var maxFrameCount = Math.Min(mountAnimation.DynamicFrames.Count, newRiderAnim.DynamicFrames.Count);
-            bool keepOriginalRotation = true;
             for (int i = 0; i < maxFrameCount; i++)
             {
                 var mountFrame = AnimationSampler.Sample(i, 0, mountSkeleton, new List<AnimationClip> { mountAnimation }, true, true);
-                var riderFrame = AnimationSampler.Sample(i, 0, riderSkeleton, new List<AnimationClip> { riderAnimation }, true, true);
 
-                var mountBoneWorldMatrix = mountVertexPositionResolver.GetVertexPosition(mountFrame, mountVertexId);
-
+                var mountBoneWorldMatrix = mountVertexPositionResolver.GetVertexTransform(mountFrame, mountVertexId);
                 mountBoneWorldMatrix.Decompose(out var _, out var mountVertexRot, out var mountVertexPos);
-                //mountFrame.BoneTransforms[0].WorldTransformDecompose(out var _, out var mountFrameRot, out var mountFramePos);
-                //mountVertexRot = Quaternion.Identity;
 
-
-
-                var rotationOffsetQuat = Quaternion.CreateFromYawPitchRoll(MathHelper.ToRadians(rotationOffset.X), MathHelper.ToRadians(rotationOffset.Y), MathHelper.ToRadians(rotationOffset.Z));
-
+                // Make sure the rider moves along in the world with the same speed as the mount
                 var mountMovement = mountFrame.BoneTransforms[0].Translation;
                 newRiderAnim.DynamicFrames[i].Position[0] = mountMovement;
                 newRiderAnim.DynamicFrames[i].Rotation[0] = Quaternion.Identity;
 
+                // Keep the original rotation of the rider animation
                 var origianlRotation = Quaternion.Identity;
-                if (keepOriginalRotation)
+                if (animationSettings.KeepRiderRotation)
                 {
-                    //    origianlRotation = newRiderAnim.DynamicFrames[i].Rotation[riderBoneIndex];
+                    var riderFrame = AnimationSampler.Sample(i, 0, riderSkeleton, new List<AnimationClip> { riderAnimation }, true, true);
+                    var riderBoneWorldmatrix = riderFrame.GetSkeletonAnimatedWorld(riderSkeleton, riderBoneIndex);
+                    riderBoneWorldmatrix.Decompose(out var _, out origianlRotation, out var _);
 
-                    var worldM = riderFrame.GetSkeletonAnimatedWorld(riderSkeleton, riderBoneIndex);
-                    worldM.Decompose(out var _, out var riderRot, out var RiderPos);
+                    var axisAngles = MathUtil.ToAxisAngleDegrees(origianlRotation);
 
-                    origianlRotation = riderRot;
+                    if (animationSettings.MaxRiderRotation.X.Value != -1)
+                        origianlRotation.X = MathHelper.Clamp(axisAngles.X, (float)-animationSettings.MaxRiderRotation.X.Value, (float)animationSettings.MaxRiderRotation.X.Value);
+                    if (animationSettings.MaxRiderRotation.Y.Value != -1)
+                        origianlRotation.Y = MathHelper.Clamp(axisAngles.Y, (float)-animationSettings.MaxRiderRotation.Y.Value, (float)animationSettings.MaxRiderRotation.Y.Value);
+                    if (animationSettings.MaxRiderRotation.Z.Value != -1)
+                        origianlRotation.Z = MathHelper.Clamp(axisAngles.Z, (float)-animationSettings.MaxRiderRotation.Z.Value, (float)animationSettings.MaxRiderRotation.Z.Value);
                 }
 
-                //public Matrix GetAnimatedWorldTranform(int boneIndex)
-                //{
-                //    if (_frame != null)
-                //        return _frame.GetSkeletonAnimatedWorld(this, boneIndex);
-                //
-                //    return GetWorldTransform(boneIndex); ;
-                //}
+                var originalPosition = newRiderAnim.DynamicFrames[i].Position[riderBoneIndex];
+                var originalRotation = newRiderAnim.DynamicFrames[i].Rotation[riderBoneIndex];
 
-                //origianlRotation = Quaternion.Identity;
+                var newRiderPosition = mountVertexPos + translationOffset - mountFrame.BoneTransforms[0].Translation;
+                var newRiderRotation = Quaternion.Multiply(Quaternion.Multiply(mountVertexRot, origianlRotation), rotationOffsetMatrix);
 
-                var orgPos = newRiderAnim.DynamicFrames[i].Position[riderBoneIndex];
-                var orgOrt = newRiderAnim.DynamicFrames[i].Rotation[riderBoneIndex];
-                newRiderAnim.DynamicFrames[i].Position[riderBoneIndex] = mountVertexPos + translationOffset - mountFrame.BoneTransforms[0].Translation;
-                newRiderAnim.DynamicFrames[i].Rotation[riderBoneIndex] = Quaternion.Multiply(Quaternion.Multiply(mountVertexRot, origianlRotation), rotationOffsetQuat);
+                var riderPositionDiff= newRiderPosition - originalPosition;
+                var riderRotationDiff = newRiderRotation * Quaternion.Inverse(originalRotation);
 
-                var diffPos = newRiderAnim.DynamicFrames[i].Position[riderBoneIndex] - orgPos;
-                var diffRot = newRiderAnim.DynamicFrames[i].Rotation[riderBoneIndex] * Quaternion.Inverse(orgOrt);
+                newRiderAnim.DynamicFrames[i].Position[riderBoneIndex] = newRiderPosition;
+                newRiderAnim.DynamicFrames[i].Rotation[riderBoneIndex] = newRiderRotation;
 
-                // Find all the bones at the same level
+                // Find all the bones at the same level (normally attachmentpoints) and move them as well
                 if (parentBoneIndex != -1)
                 {
                     var childNodes = riderSkeleton.GetChildBones(parentBoneIndex);
@@ -295,8 +290,8 @@ namespace AnimationEditor.MountAnimationCreator
                         var id = childNodes[boneId];
                         if (id == riderBoneIndex)
                             continue;
-                        newRiderAnim.DynamicFrames[i].Position[id] += diffPos;
-                        newRiderAnim.DynamicFrames[i].Rotation[id] = diffRot * newRiderAnim.DynamicFrames[i].Rotation[id];
+                        newRiderAnim.DynamicFrames[i].Position[id] += riderPositionDiff;
+                        newRiderAnim.DynamicFrames[i].Rotation[id] = riderRotationDiff * newRiderAnim.DynamicFrames[i].Rotation[id];
                     }
                 }
             }
@@ -316,7 +311,6 @@ namespace AnimationEditor.MountAnimationCreator
                 NewAnimation.IsSkeletonVisible = value;
         }
         
-
         public void SaveAnimation()
         {
             SaveAnimation(_rider.AnimationName, NewAnimation.AnimationClip, NewAnimation.Skeleton);
@@ -390,99 +384,5 @@ namespace AnimationEditor.MountAnimationCreator
             using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
             csv.WriteRecords(csvLog);
         }
-    }
-
-
-    class MeshAnimationHelper
-    {
-        Rmv2MeshNode _mesh;
-        Matrix _worldTransform;
-        public MeshAnimationHelper(Rmv2MeshNode mesh, Matrix worldTransform)
-        {
-            _mesh = mesh;
-            _worldTransform = worldTransform;
-        }
-
-        public Matrix GetVertexPosition(AnimationFrame frame, int vertexId)
-        {
-            var geo = _mesh.Geometry as Rmv2Geometry;
-            var vert = geo.GetVertexExtented(vertexId);
-            var m =  GetAnimationVertex(frame, vertexId);
-            Matrix finalTransfrom = Matrix.CreateTranslation(new Vector3(vert.Position.X, vert.Position.Y, vert.Position.Z)) * m;
-            return finalTransfrom;
-        }
-
-
-        Matrix GetAnimationVertex(AnimationFrame frame, int vertexId)
-        {
-            var geo = _mesh.Geometry as Rmv2Geometry;
-            var vert = geo.GetVertexExtented(vertexId);
-
-            var transformSum = Matrix.Identity;
-            if (geo.WeightCount == 4)
-            {
-                int b0 = (int)vert.BlendIndices.X;
-                int b1 = (int)vert.BlendIndices.Y;
-                int b2 = (int)vert.BlendIndices.Z;
-                int b3 = (int)vert.BlendIndices.W;
-
-                float w1 = vert.BlendWeights.X;
-                float w2 = vert.BlendWeights.Y;
-                float w3 = vert.BlendWeights.Z;
-                float w4 = vert.BlendWeights.W;
-
-                Matrix m1 = frame.BoneTransforms[b0].WorldTransform;
-                Matrix m2 = frame.BoneTransforms[b1].WorldTransform;
-                Matrix m3 = frame.BoneTransforms[b2].WorldTransform;
-                Matrix m4 = frame.BoneTransforms[b3].WorldTransform;
-                transformSum.M11 = (m1.M11 * w1) + (m2.M11 * w2) + (m3.M11 * w3) + (m4.M11 * w4);
-                transformSum.M12 = (m1.M12 * w1) + (m2.M12 * w2) + (m3.M12 * w3) + (m4.M12 * w4);
-                transformSum.M13 = (m1.M13 * w1) + (m2.M13 * w2) + (m3.M13 * w3) + (m4.M13 * w4);
-                transformSum.M21 = (m1.M21 * w1) + (m2.M21 * w2) + (m3.M21 * w3) + (m4.M21 * w4);
-                transformSum.M22 = (m1.M22 * w1) + (m2.M22 * w2) + (m3.M22 * w3) + (m4.M22 * w4);
-                transformSum.M23 = (m1.M23 * w1) + (m2.M23 * w2) + (m3.M23 * w3) + (m4.M23 * w4);
-                transformSum.M31 = (m1.M31 * w1) + (m2.M31 * w2) + (m3.M31 * w3) + (m4.M31 * w4);
-                transformSum.M32 = (m1.M32 * w1) + (m2.M32 * w2) + (m3.M32 * w3) + (m4.M32 * w4);
-                transformSum.M33 = (m1.M33 * w1) + (m2.M33 * w2) + (m3.M33 * w3) + (m4.M33 * w4);
-                transformSum.M41 = (m1.M41 * w1) + (m2.M41 * w2) + (m3.M41 * w3) + (m4.M41 * w4);
-                transformSum.M42 = (m1.M42 * w1) + (m2.M42 * w2) + (m3.M42 * w3) + (m4.M42 * w4);
-                transformSum.M43 = (m1.M43 * w1) + (m2.M43 * w2) + (m3.M43 * w3) + (m4.M43 * w4);
-            }
-
-            if (geo.WeightCount == 2)
-            {
-                int b0 = (int)vert.BlendIndices.X;
-                int b1 = (int)vert.BlendIndices.Y;
-                int b2 = (int)vert.BlendIndices.Z;
-                int b3 = (int)vert.BlendIndices.W;
-
-                float w1 = vert.BlendWeights.X;
-                float w2 = vert.BlendWeights.Y;
-                float w3 = vert.BlendWeights.Z;
-                float w4 = vert.BlendWeights.W;
-
-                Matrix m1 = frame.BoneTransforms[b0].WorldTransform;
-                Matrix m2 = frame.BoneTransforms[b1].WorldTransform;
-                Matrix m3 = frame.BoneTransforms[b2].WorldTransform;
-                Matrix m4 = frame.BoneTransforms[b3].WorldTransform;
-
-                transformSum.M11 = (m1.M11 * w1);
-                transformSum.M12 = (m1.M12 * w1);
-                transformSum.M13 = (m1.M13 * w1);
-                transformSum.M21 = (m1.M21 * w1);
-                transformSum.M22 = (m1.M22 * w1);
-                transformSum.M23 = (m1.M23 * w1);
-                transformSum.M31 = (m1.M31 * w1);
-                transformSum.M32 = (m1.M32 * w1);
-                transformSum.M33 = (m1.M33 * w1);
-                transformSum.M41 = (m1.M41 * w1);
-                transformSum.M42 = (m1.M42 * w1);
-                transformSum.M43 = (m1.M43 * w1);
-                
-            }
-            return transformSum * _worldTransform;
-        }
-        
-
     }
 }

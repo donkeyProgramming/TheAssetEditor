@@ -89,6 +89,25 @@ namespace AnimationEditor.MountAnimationCreator
 
             creator.CreateEmptyEditor(editorView);
         }
+
+        public static void CreateLionAndHu01b(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        {
+            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+
+            editorView.MainInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_princess_campaign_01.variantmeshdefinition") as PackFile,
+                Animation = packfileService.FindFile(@"animations\battle\humanoid01b\rider\great_stag01\spear_bow\attack\hu1b_st1_spbo_great_stag_rider1_jumping_attack_01.anim") as PackFile,
+            };
+
+            editorView.RefInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_war_lion.variantmeshdefinition") as PackFile,
+                Animation = packfileService.FindFile(@"animations\battle\bigcat04\attacks\bc4_lion_jumping_attack_01.anim") as PackFile,
+            };
+
+            creator.CreateEmptyEditor(editorView);
+        }
     }
 }
 

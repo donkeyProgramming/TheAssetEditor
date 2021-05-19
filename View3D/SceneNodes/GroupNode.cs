@@ -29,4 +29,11 @@ namespace View3D.SceneNodes
         public bool IsSelectable { get => _isSelectable; set => SetAndNotifyWhenChanged(ref _isSelectable, value); }
         public bool IsLockable { get; set; } = false;
     }
+
+    public class WsModelGroup : GroupNode
+    {
+        public WsModelGroup(string name = "") : base(name)
+        {
+        }
+    }
 }

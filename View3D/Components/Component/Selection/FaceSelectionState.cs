@@ -16,11 +16,16 @@ namespace View3D.Components.Component.Selection
 
         public void ModifySelection(int newSelectionItem, bool onlyRemove)
         {
-            if (SelectedFaces.Contains(newSelectionItem))
-                SelectedFaces.Remove(newSelectionItem);
-            else if(!onlyRemove)
-                SelectedFaces.Add(newSelectionItem);
-
+            if (onlyRemove)
+            {
+                if (SelectedFaces.Contains(newSelectionItem))
+                    SelectedFaces.Remove(newSelectionItem);
+            }
+            else
+            {
+                if (!SelectedFaces.Contains(newSelectionItem))
+                    SelectedFaces.Add(newSelectionItem);
+            }
             SelectionChanged?.Invoke(this);
         }
 

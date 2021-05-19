@@ -53,6 +53,7 @@
     <None Remove="Resources\Icons\Kitbasher\SelectionMode_face.png" />
     <None Remove="Resources\Icons\Kitbasher\SelectionMode_object.png" />
     <None Remove="Resources\Icons\Kitbasher\SelectionMode_Vertex.png" />
+    <None Remove="Resources\Icons\Kitbasher\ShowSelection.png" />
     <None Remove="Resources\Icons\Kitbasher\SnapVertex.png" />
     <None Remove="Resources\Icons\Kitbasher\tool_combine.png" />
     <None Remove="Resources\Icons\Kitbasher\tool_delete.png" />
@@ -206,6 +207,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Icons\Kitbasher\SelectionMode_Vertex.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\ShowSelection.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Icons\Kitbasher\SnapVertex.png">

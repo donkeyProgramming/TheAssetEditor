@@ -187,6 +187,8 @@ Animation tool:
 	
 	Goals:
 		Create pose
+			-> new pose
+			-> modify pose using transforms
 			-> Blend to pose?
 		Create mount animations 
 			-> follow a node 
@@ -195,6 +197,52 @@ Animation tool:
 		Convert animation between skeletons 
 		Easy to work on large datasets
 		Create weapon anims 
+
+// ---------------------
+
+
+
+Fit skeleton on remapping
+Attach to vertex
+
+WsModel auto generate when possible
+Extract new mesh from selection
+
+Enter works on prompts
+Dropdown for search
+Mouse focus on search for browser
+regex for filebrowser?
+Skeletonbone highligerr
+boundingbox display and recalc
+Hotkey descriptions 
+
+Remapping vmd tool?
+Generic viewer
+
+[DONE]Key to only view selected
+[DONE]Shift to add to selection
+[DONE]Extract mesh from group context menu
+[DONE]Remove from refslot context menu
+[DONE]Wsmodel view toggle not working
+[DONE]Escape to close open file browser
+[DONE]Allow undo of mapping
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

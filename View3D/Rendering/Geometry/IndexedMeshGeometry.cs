@@ -193,6 +193,7 @@ namespace View3D.Rendering.Geometry
         public abstract Vector3 GetVertexById(int id);
         public abstract List<Vector3> GetVertexList();
         public abstract void TransformVertex(int vertexId, Matrix transform);
+        public abstract void SetTransformVertex(int vertexId, Matrix transform);
 
         public abstract List<byte> GetUniqeBlendIndices();
         public abstract void UpdateAnimationIndecies(List<IndexRemapping> remapping);

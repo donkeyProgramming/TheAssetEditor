@@ -199,7 +199,8 @@ namespace KitbasherEditor.ViewModels
                 CurrentFrame = 0;
 
                 Player.SetAnimation(animClip, Skeleton);
-                Player.Play();
+                if(Player.IsPlaying && Player.IsEnabled)
+                    Player.Play();
             }
         }
 

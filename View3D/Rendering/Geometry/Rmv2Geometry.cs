@@ -179,6 +179,11 @@ namespace View3D.Rendering.Geometry
             _vertexArray[vertexId].Tangent = Vector3.TransformNormal(_vertexArray[vertexId].Tangent, transform);
         }
 
+        public override void SetTransformVertex(int vertexId, Matrix transform)
+        {
+            _vertexArray[vertexId].Position = Vector4.Transform(new Vector4(0,0,0,1), transform);
+        }
+
         public override List<byte> GetUniqeBlendIndices()
         {
             if (WeightCount == 0)

@@ -15,12 +15,22 @@ namespace KitbasherEditor
         {
             serviceCollection.AddTransient<KitbasherView>();
             serviceCollection.AddTransient<KitbasherViewModel>();
-            
+
         }
 
         public static void RegisterTools(IToolFactory factory)
         {
             factory.RegisterTool<KitbasherViewModel, KitbasherView>(".rigid_model_v2");
+        }
+    }
+
+
+    public static class KitbashEditor_Debug
+    {
+        public static void CreateSlayerHead(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        {
+            var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
+            creator.OpenFile(packFile);
         }
     }
 }

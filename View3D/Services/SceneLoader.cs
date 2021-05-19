@@ -145,7 +145,7 @@ namespace View3D.Services
 
         void LoadWsModel(PackFile file, ref ISceneNode parent, AnimationPlayer player, ref string skeletonName)
         {
-            var wsModelNode = new GroupNode("WsModel - " + file.Name);
+            var wsModelNode = new WsModelGroup("WsModel - " + file.Name);
             if (parent == null)
                 parent = wsModelNode;
             else

@@ -17,7 +17,7 @@ namespace CommonControls.MathViews
             set { SetAndNotify(ref _w, value); OnValueChanged?.Invoke(this); }
         }
 
-        public Vector4ViewModel(double x = 0, double y = 0, double z = 0, double w = 1)
+        public Vector4ViewModel(double x = 0, double y = 0, double z = 0, double w = 1) :base(0)
         { 
             X.Value = x;
             Y.Value = y;

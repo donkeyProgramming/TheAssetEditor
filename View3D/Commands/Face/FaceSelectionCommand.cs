@@ -14,21 +14,21 @@ namespace View3D.Commands.Face
         SelectionManager _selectionManager;
 
         ISelectionState _oldState;
-        bool _isModification;
+        bool _isAdd;
         bool _isRemove;
         List<int> _selectedFaces;
 
-        public FaceSelectionCommand(List<int> selectedFaces, bool isModification = false, bool removeSelection = false)
+        public FaceSelectionCommand(List<int> selectedFaces, bool isAdd = false, bool removeSelection = false)
         {
             _selectedFaces = selectedFaces;
-            _isModification = isModification;
+            _isAdd = isAdd;
             _isRemove = removeSelection;
         }
 
-        public FaceSelectionCommand(int selectedFace, bool isModification = false, bool removeSelection = false)
+        public FaceSelectionCommand(int selectedFace, bool isAdd = false, bool removeSelection = false)
         {
             _selectedFaces = new List<int>() { selectedFace };
-            _isModification = isModification;
+            _isAdd = isAdd;
             _isRemove = removeSelection;
         }
 
@@ -45,9 +45,9 @@ namespace View3D.Commands.Face
         {
             _oldState = _selectionManager.GetStateCopy();
             var currentState = _selectionManager.GetState() as FaceSelectionState;
-            _logger.Here().Information($"Command info - Mod[{_isModification}] Item[{currentState.RenderObject.Name}] faces[{_selectedFaces.Count}]");
+            _logger.Here().Information($"Command info - Add[{_isAdd}] Item[{currentState.RenderObject.Name}] faces[{_selectedFaces.Count}]");
 
-            if (!(_isModification || _isRemove))
+            if (!(_isAdd || _isRemove))
                 currentState.Clear();
 
             foreach (var newSelectionItem in _selectedFaces)

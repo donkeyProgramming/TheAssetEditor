@@ -47,23 +47,24 @@ namespace KitbasherEditor.ViewModels
             //
             Scene = new SceneContainer();
             //
-            Scene.Components.Add(new FpsComponent(Scene));
-            Scene.Components.Add(new KeyboardComponent(Scene));
-            Scene.Components.Add(new MouseComponent(Scene));
-            Scene.Components.Add(new ResourceLibary(Scene, pf));
-            Scene.Components.Add(new ArcBallCamera(Scene, new Vector3(0), 10));
-            Scene.Components.Add(new SceneManager(Scene));
-            Scene.Components.Add(new SelectionManager(Scene));
-            Scene.Components.Add(new CommandExecutor(Scene));
-            Scene.Components.Add(new GizmoComponent(Scene));
-            Scene.Components.Add(new SelectionComponent(Scene));
-            Scene.Components.Add(new ObjectEditor(Scene));
-            Scene.Components.Add(new FaceEditor(Scene));
-            Scene.Components.Add(new FocusSelectableObjectComponent(Scene));
-            Scene.Components.Add(new ClearScreenComponent(Scene));
-            Scene.Components.Add(new RenderEngineComponent(Scene));
-            Scene.Components.Add(new GridComponent(Scene));
-            Scene.Components.Add(new AnimationsContainerComponent(Scene));
+            Scene.AddCompnent(new FpsComponent(Scene));
+            Scene.AddCompnent(new KeyboardComponent(Scene));
+            Scene.AddCompnent(new MouseComponent(Scene));
+            Scene.AddCompnent(new ResourceLibary(Scene, pf));
+            Scene.AddCompnent(new ArcBallCamera(Scene, new Vector3(0), 10));
+            Scene.AddCompnent(new SceneManager(Scene));
+            Scene.AddCompnent(new SelectionManager(Scene));
+            Scene.AddCompnent(new CommandExecutor(Scene));
+            Scene.AddCompnent(new GizmoComponent(Scene));
+            Scene.AddCompnent(new SelectionComponent(Scene));
+            Scene.AddCompnent(new ObjectEditor(Scene));
+            Scene.AddCompnent(new FaceEditor(Scene));
+            Scene.AddCompnent(new FocusSelectableObjectComponent(Scene));
+            Scene.AddCompnent(new ClearScreenComponent(Scene));
+            Scene.AddCompnent(new RenderEngineComponent(Scene));
+            Scene.AddCompnent(new GridComponent(Scene));
+            Scene.AddCompnent(new AnimationsContainerComponent(Scene));
+            Scene.AddCompnent(new ViewOnlySelectedComponent(Scene));
             
             Animation = new AnimationControllerViewModel(Scene, _packFileService, _skeletonAnimationLookUpHelper);
             

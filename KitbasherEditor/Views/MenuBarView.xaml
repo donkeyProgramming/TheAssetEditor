@@ -113,6 +113,12 @@
                     </ComboBoxItem>
                 </ComboBox>
 
+                <Button ToolTip="Toggle view selected item (Space)" 
+                        Command="{Binding Tools.ToggleShowSelectionCommand}"
+                        IsEnabled="{Binding Tools.ToggleShowSelectionEnabled, UpdateSourceTrigger=PropertyChanged}">
+                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/ShowSelection.png"/>
+                </Button>
+
                 <!-- Object selection-->
                 <ToolBar  Visibility="{Binding Tools.ShowObjectTools, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
                     <Button ToolTip="Divide selected mesh into submeshes" 

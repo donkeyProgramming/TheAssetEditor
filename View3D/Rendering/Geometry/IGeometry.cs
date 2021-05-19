@@ -34,6 +34,7 @@ namespace View3D.Rendering.Geometry
         List<Vector3> GetVertexList();
         void RemoveUnusedVertexes(ushort[] newIndexList);
         void TransformVertex(int vertexId, Matrix transform);
+        void SetTransformVertex(int vertexId, Matrix transform);
         void RebuildVertexBuffer();
 
         List<byte> GetUniqeBlendIndices();
