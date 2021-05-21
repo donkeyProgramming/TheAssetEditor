@@ -27,14 +27,14 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
 
         PackFileService _packFileService;
-        public MenuBarViewModel(IComponentManager componentManager, PackFileService packFileService)
+        public MenuBarViewModel(IComponentManager componentManager, PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper)
         {
             _packFileService = packFileService;
 
             TransformTool = new TransformToolViewModel(componentManager);
             Gizmo = new GizmoModeMenuBarViewModel(TransformTool, componentManager, _commandFactory);
             General = new GeneralMenuBarViewModel(componentManager, _commandFactory);
-            Tools = new ToolsMenuBarViewModel(componentManager, _commandFactory);
+            Tools = new ToolsMenuBarViewModel(componentManager, _commandFactory, _packFileService, skeletonHelper);
 
             ImportReferenceCommand = new RelayCommand(ImportReference);
             ImportReferenceCommand_PaladinVMD = new RelayCommand(ImportReference_PaladinVMD);

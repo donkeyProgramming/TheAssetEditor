@@ -201,23 +201,25 @@ Animation tool:
 // ---------------------
 
 
+BmiToolCommand
 
-Fit skeleton on remapping
 Attach to vertex
 
-WsModel auto generate when possible
+
 Extract new mesh from selection
 
 Enter works on prompts
 Dropdown for search
 Mouse focus on search for browser
-regex for filebrowser?
 Skeletonbone highligerr
-boundingbox display and recalc
 Hotkey descriptions 
+
 
 Remapping vmd tool?
 Generic viewer
+
+WsModel auto generate when possible
+Wsmodel make editable context menu
 
 [DONE]Key to only view selected
 [DONE]Shift to add to selection
@@ -226,6 +228,9 @@ Generic viewer
 [DONE]Wsmodel view toggle not working
 [DONE]Escape to close open file browser
 [DONE]Allow undo of mapping
+
+[Done-ish]Fatness slider
+[Done-ish]Fit skeleton on remapping
 
 
 

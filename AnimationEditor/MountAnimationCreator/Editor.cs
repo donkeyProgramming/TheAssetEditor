@@ -242,7 +242,7 @@ namespace AnimationEditor.MountAnimationCreator
             {
                 var mountFrame = AnimationSampler.Sample(i, 0, mountSkeleton, new List<AnimationClip> { mountAnimation }, true, true);
 
-                var mountBoneWorldMatrix = mountVertexPositionResolver.GetVertexTransform(mountFrame, mountVertexId);
+                var mountBoneWorldMatrix = mountVertexPositionResolver.GetVertexTransformWorld(mountFrame, mountVertexId);
                 mountBoneWorldMatrix.Decompose(out var _, out var mountVertexRot, out var mountVertexPos);
 
                 // Make sure the rider moves along in the world with the same speed as the mount

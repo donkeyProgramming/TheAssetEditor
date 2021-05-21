@@ -17,14 +17,21 @@ namespace View3D.Animation
             _worldTransform = worldTransform;
         }
 
+        public Matrix GetVertexTransformWorld(AnimationFrame frame, int vertexId)
+        {
+            var geo = _mesh.Geometry as Rmv2Geometry;
+            var vert = geo.GetVertexExtented(vertexId);
+            var m = GetVertexTransform(frame, vertexId);
+            Matrix finalTransfrom = Matrix.CreateTranslation(new Vector3(vert.Position.X, vert.Position.Y, vert.Position.Z)) * m;
+            return finalTransfrom;
+        }
+
         public Matrix GetVertexTransform(AnimationFrame frame, int vertexId)
         {
             var geo = _mesh.Geometry as Rmv2Geometry;
             var vert = geo.GetVertexExtented(vertexId);
             var m = GetAnimationVertex(frame, vertexId);
             return m;
-            Matrix finalTransfrom = Matrix.CreateTranslation(new Vector3(vert.Position.X, vert.Position.Y, vert.Position.Z)) * m;
-            return finalTransfrom;
         }
 
 

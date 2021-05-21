@@ -6,7 +6,10 @@ using Filetypes.RigidModel;
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping;
+using KitbasherEditor.ViewModels.BmiEditor;
 using KitbasherEditor.Views.EditorViews;
+using Microsoft.Xna.Framework;
+using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,11 +32,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public MeshSceneNodeViewModel_Graphics Graphics { get; set; }
 
         Rmv2MeshNode _meshNode;
-        public MeshSceneNodeViewModel(Rmv2MeshNode node, PackFileService pfs, SkeletonAnimationLookUpHelper animLookUp, CommandExecutor commandExecutor)
+        public MeshSceneNodeViewModel(Rmv2MeshNode node, PackFileService pfs, SkeletonAnimationLookUpHelper animLookUp, IComponentManager componentManager)
         {
             _meshNode = node;
             General = new MeshSceneNodeViewModel_General(_meshNode);
-            Animation = new MeshSceneNodeViewModel_Animation(pfs, _meshNode, animLookUp, commandExecutor);
+            Animation = new MeshSceneNodeViewModel_Animation(pfs, _meshNode, animLookUp, componentManager);
             Graphics = new MeshSceneNodeViewModel_Graphics(_meshNode, pfs);
         }
 
@@ -93,7 +96,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         Rmv2MeshNode _meshNode;
         SkeletonAnimationLookUpHelper _animLookUp;
         PackFileService _pfs;
-        CommandExecutor _commandExecutor;
+        IComponentManager _componentManager;
 
         string _skeletonName;
         public string SkeletonName { get { return _skeletonName; } set { SetAndNotify(ref _skeletonName, value); } }
@@ -104,23 +107,21 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         List<RmvAttachmentPoint> _attachemntPoints;
         public List<RmvAttachmentPoint> AttachmentPoints { get { return _attachemntPoints; } set { SetAndNotify(ref _attachemntPoints, value); } }
-        public ICommand UseParentAttachmentPointsCommand { get; set; }
 
         List<AnimatedBone> _animatedBones;
         public List<AnimatedBone> AnimatedBones { get { return _animatedBones; } set { SetAndNotify(ref _animatedBones, value); } }
         public ICommand OpenBoneRemappingToolCommand { get; set; }
 
-        public MeshSceneNodeViewModel_Animation(PackFileService pfs, Rmv2MeshNode meshNode, SkeletonAnimationLookUpHelper animLookUp, CommandExecutor commandExecutor)
+        public MeshSceneNodeViewModel_Animation(PackFileService pfs, Rmv2MeshNode meshNode, SkeletonAnimationLookUpHelper animLookUp, IComponentManager componentManager)
         {
             _pfs = pfs;
             _meshNode = meshNode;
             _animLookUp = animLookUp;
-            _commandExecutor = commandExecutor;
+            _componentManager = componentManager; 
 
             SkeletonName = _meshNode.MeshModel.ParentSkeletonName;
             LinkDirectlyToBoneIndex = _meshNode.MeshModel.Header.LinkDirectlyToBoneIndex;
             AttachmentPoints = _meshNode.MeshModel.AttachmentPoints.OrderBy(x => x.BoneIndex).ToList();
-            UseParentAttachmentPointsCommand = new RelayCommand(UseParentAttachmentPoints);
 
             var skeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, SkeletonName);
             var bones = _meshNode.Geometry.GetUniqeBlendIndices();
@@ -128,9 +129,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             OpenBoneRemappingToolCommand = new RelayCommand(OpenBoneRemappingTool);
         }
 
-
-        void UseParentAttachmentPoints() { }
-         
         void OpenBoneRemappingTool()
         {
             RemappedAnimatedBoneConfiguration config = new RemappedAnimatedBoneConfiguration();
@@ -152,7 +150,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             if (window.ShowDialog() == true)
             {
                 var remapping = config.MeshBones.First().BuildRemappingList();
-                _commandExecutor.ExecuteCommand(new RemapBoneIndexesCommand(_meshNode, remapping, config.ParnetModelSkeletonName, config.MoveMeshToFit, new GameSkeleton(existingSkeletonFile, null), new GameSkeleton(newSkeletonFile, null)));
+                _componentManager.GetComponent<CommandExecutor>().ExecuteCommand(new RemapBoneIndexesCommand(_meshNode, remapping, config.ParnetModelSkeletonName, config.MoveMeshToFit, new GameSkeleton(existingSkeletonFile, null), new GameSkeleton(newSkeletonFile, null)));
             }
         }
     }

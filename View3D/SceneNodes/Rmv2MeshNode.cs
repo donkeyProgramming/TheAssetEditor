@@ -45,6 +45,9 @@ namespace View3D.SceneNodes
         { }
 
 
+
+
+
         public Rmv2MeshNode(RmvSubModel rmvSubModel, IGeometryGraphicsContext context, ResourceLibary resourceLib, AnimationPlayer animationPlayer, IGeometry geometry = null)
         {
             MeshModel = rmvSubModel;
@@ -73,6 +76,9 @@ namespace View3D.SceneNodes
                 (Effect as IShaderTextures).SetTexture(glossTexture, TexureType.Gloss);
             }
         }
+
+
+
 
 
         public IShader Effect { get; set; }

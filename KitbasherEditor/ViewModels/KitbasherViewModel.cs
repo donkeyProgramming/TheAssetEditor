@@ -71,7 +71,7 @@ namespace KitbasherEditor.ViewModels
             SceneExplorer = new SceneExplorerViewModel(Scene, _skeletonAnimationLookUpHelper, _packFileService, Animation);
             Scene.Components.Add(SceneExplorer);
             
-            MenuBar = new MenuBarViewModel(Scene, _packFileService);
+            MenuBar = new MenuBarViewModel(Scene, _packFileService, skeletonHelper);
             
             Scene.SceneInitialized += OnSceneInitialized;
         }

@@ -1,12 +1,16 @@
 ﻿using Common;
+using CommonControls.Services;
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor.Services;
+using KitbasherEditor.ViewModels.BmiEditor;
+using KitbasherEditor.Views.EditorViews;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using View3D.Animation;
 using View3D.Commands.Object;
 using View3D.Commands.Vertex;
 using View3D.Components.Component;
@@ -19,11 +23,14 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 {
     public class ToolsMenuBarViewModel : NotifyPropertyChangedImpl
     {
+        IComponentManager _componentManager;
         SelectionManager _selectionManager;
         ObjectEditor _objectEditor;
         FaceEditor _faceEditor;
         IEditableMeshResolver _editableMeshResolver;
         ViewOnlySelectedComponent _viewOnlySelectedComp;
+        PackFileService _packFileService;
+        SkeletonAnimationLookUpHelper _skeletonHelper;
 
         public ICommand DivideSubMeshCommand { get; set; }
         public ICommand MergeObjectCommand { get; set; }
@@ -36,7 +43,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public ICommand GroupCommand { get; set; }
         public ICommand ReduceMeshCommand { get; set; }
         public ICommand ToggleShowSelectionCommand { get; set; }
-        
+        public ICommand BmiToolCommand { get; set; }
 
         bool _showObjectTools = true;
         public bool ShowObjectTools { get => _showObjectTools; set => SetAndNotify(ref _showObjectTools, value); }
@@ -81,8 +88,15 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         bool _toggleShowSelectionEnabled = true;
         public bool ToggleShowSelectionEnabled { get => _toggleShowSelectionEnabled; set => SetAndNotify(ref _toggleShowSelectionEnabled, value); }
 
-        public ToolsMenuBarViewModel(IComponentManager componentManager, ToolbarCommandFactory commandFactory)
+        bool _bmiToolCommandEnabled = true;
+        public bool BmiToolCommandEnabled { get => _bmiToolCommandEnabled; set => SetAndNotify(ref _bmiToolCommandEnabled, value); }
+
+        public ToolsMenuBarViewModel(IComponentManager componentManager, ToolbarCommandFactory commandFactory, PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper)
         {
+            _packFileService = packFileService;
+            _componentManager = componentManager;
+            _skeletonHelper = skeletonHelper;
+
             DivideSubMeshCommand = new RelayCommand(DivideSubMesh);
             MergeObjectCommand = commandFactory.Register(new RelayCommand(MergeObjects), Key.M, ModifierKeys.Control);
             DuplicateObjectCommand = commandFactory.Register(new RelayCommand(DubplicateObject), Key.D, ModifierKeys.Control);
@@ -93,8 +107,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             GroupCommand = commandFactory.Register(new RelayCommand(GroupItems), Key.G, ModifierKeys.Control);
             ToggleShowSelectionCommand = commandFactory.Register(new RelayCommand(ToggleShowSelection), Key.Space, ModifierKeys.None);
             ReduceMeshCommand = new RelayCommand(ReduceMesh);
-
             FaceToVertexCommand = new RelayCommand(ConvertFacesToVertex);
+            BmiToolCommand = new RelayCommand(OpenBmiTool);
+
 
             _selectionManager = componentManager.GetComponent<SelectionManager>();
             _selectionManager.SelectionChanged += OnSelectionChanged;
@@ -122,6 +137,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             FaceToVertexEnabled = false;
             GroupCommandEnabled = false;
             ReduceMeshCommandEnabled = false;
+            BmiToolCommandEnabled = false;
 
             if (state is ObjectSelectionState objectSelection)
             {
@@ -131,6 +147,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 DeleteEnabled = objectSelection.SelectedObjects().Count > 0;
                 GroupCommandEnabled = objectSelection.SelectedObjects().Count > 0;
                 ReduceMeshCommandEnabled = objectSelection.SelectedObjects().Count > 0;
+                BmiToolCommandEnabled = objectSelection.SelectedObjects().Count == 1;
             }
             else if (state is FaceSelectionState faceSelection && faceSelection.SelectedFaces.Count != 0)
             {
@@ -276,5 +293,22 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _viewOnlySelectedComp.Toggle();
         }
 
+        void OpenBmiTool()
+        {
+            var state = _selectionManager.GetState<ObjectSelectionState>();
+            var meshNode = state.GetSingleSelectedObject() as Rmv2MeshNode;
+
+            if (meshNode != null)
+            {
+                var skeletonName = meshNode.MeshModel.ParentSkeletonName;
+
+                var newSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(_packFileService, skeletonName);
+                GameSkeleton skeleton = new GameSkeleton(newSkeletonFile, null);
+
+                var window = new BmiWindow();
+                window.DataContext = new BmiViewModel(skeleton, meshNode, _componentManager);
+                window.Show();
+            }
+        }
     }
 }

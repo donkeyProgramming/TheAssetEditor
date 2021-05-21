@@ -54,5 +54,10 @@ namespace View3D.Rendering
             return new int[] { (int)BlendIndices.X, (int)BlendIndices.Y, (int)BlendIndices.Z, (int)BlendIndices.W };
         }
 
+        public Vector3 Position3()
+        {
+            return new Vector3(Position.X, Position.Y, Position.Z);
+        }
+
     }
 }

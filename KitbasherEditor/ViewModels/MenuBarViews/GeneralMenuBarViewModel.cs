@@ -27,8 +27,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public ICommand FocusCameraCommand { get; set; }
         public ICommand ResetCameraCommand { get; set; }
         public ICommand SortModelsByNameCommand { get; set; }
-        
 
+        public ICommand OpenAttachToolCommand { get; set; }
+        
         string _undoHintText;
         public string UndoHintText { get => _undoHintText; set => SetAndNotify(ref _undoHintText, value); }
 
@@ -52,6 +53,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
             UndoCommand = commandFactory.Register(new RelayCommand(() => _commandExecutor.Undo()), Key.Z, ModifierKeys.Control);
             DeleteHistoryCommand = new RelayCommand(DeleteHistory);
+            OpenAttachToolCommand = new RelayCommand(OpenAttachTool);
 
             FocusCameraCommand = commandFactory.Register(new RelayCommand(() => _cameraFocusComponent.FocusSelection()), Key.F, ModifierKeys.Control);
             ResetCameraCommand = new RelayCommand(() => _cameraFocusComponent.ResetCamera());
@@ -69,7 +71,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         private void OnUndoStackChanged()
         {
-            UndoHintText = _commandExecutor.GetUndoHint();
+            UndoHintText = _commandExecutor.GetUndoHint() + " (ctrl+Z)";
             UndoEnabled = _commandExecutor.CanUndo();
         }
 
@@ -85,5 +87,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             if (lod0 != null)
                 _objectEditor.SortMeshes(lod0);
         }
+
+
+        void OpenAttachTool()
+        { }
     }
 }

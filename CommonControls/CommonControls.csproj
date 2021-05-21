@@ -44,6 +44,7 @@
     <None Remove="Resources\Icons\Kitbasher\Gizmo_rotate.png" />
     <None Remove="Resources\Icons\Kitbasher\Gizmo_scale.png" />
     <None Remove="Resources\Icons\Kitbasher\Group.png" />
+    <None Remove="Resources\Icons\Kitbasher\icons8-bmi-48.png" />
     <None Remove="Resources\Icons\Kitbasher\icons8-compress-64.png" />
     <None Remove="Resources\Icons\Kitbasher\icons8-cursor-256.png" />
     <None Remove="Resources\Icons\Kitbasher\icons8-save-all-50.png" />
@@ -69,6 +70,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
+    <PackageReference Include="Singulink.WPF.Data.MethodBinding" Version="1.1.0" />
     <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
     <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
   </ItemGroup>
@@ -180,6 +182,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Icons\Kitbasher\Group.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\icons8-bmi-48.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Icons\Kitbasher\icons8-compress-64.png">

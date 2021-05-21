@@ -109,7 +109,7 @@ namespace View3D.Services
                 foreach (var mesh in slot.VariantMeshes)
                 {
                     if (mesh.Name != null)
-                        Load(mesh.Name.ToLower(), slotElement, player, ref skeletonName);
+                        Load(mesh.Name.ToLower(), slotElement, player, ref skeletonName); 
                 }
 
                 foreach (var meshReference in slot.VariantMeshReferences)

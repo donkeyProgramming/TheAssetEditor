@@ -12,11 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Commands\" />
-    <Folder Include="Components\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="geometry3Sharp" Version="1.0.324" />
     <PackageReference Include="morelinq" Version="3.3.2" />
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />

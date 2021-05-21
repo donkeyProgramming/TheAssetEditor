@@ -41,12 +41,12 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
-                <MenuItem Header="Save" Command="{Binding General.SaveCommand, Mode=OneTime}"/>
+                <MenuItem Header="Save (ctr+s)" Command="{Binding General.SaveCommand, Mode=OneTime}"/>
                 <MenuItem Header="Save as" Command="{Binding General.SaveAsCommand, Mode=OneTime}" />
                 <Separator/>
                 <MenuItem Header="Generate Ws Model" Command="{Binding General.GenerateWsModelCommand, Mode=OneTime}"/>
                 <Separator/>
-                <MenuItem Header="Import reference" Command="{Binding ImportReferenceCommand, Mode=OneTime}"/>
+                <MenuItem Header="Import reference (ctr+o)" Command="{Binding ImportReferenceCommand, Mode=OneTime}"/>
                 <MenuItem Header="Import reference - Paladin vmd" Command="{Binding ImportReferenceCommand_PaladinVMD, Mode=OneTime}"/>
             </MenuItem>
 
@@ -54,19 +54,23 @@
                 <MenuItem Header="Sort models by name" Command="{Binding General.SortModelsByNameCommand, Mode=OneTime}"/>
             </MenuItem>
 
+            <MenuItem Header="Tools" IsEnabled="False">
+                <MenuItem Header="Attach tool" Command="{Binding General.OpenAttachToolCommand, Mode=OneTime}"/>
+            </MenuItem>
+
             <MenuItem Header="Camera" >
-                <MenuItem Header="Focus Selection" Command="{Binding General.FocusCameraCommand, Mode=OneTime}"/>
+                <MenuItem Header="Focus Selection (ctr+f)" Command="{Binding General.FocusCameraCommand, Mode=OneTime}"/>
                 <MenuItem Header="Reset" Command="{Binding General.ResetCameraCommand, Mode=OneTime}"/>
             </MenuItem>
         </Menu>
 
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBar>
-                <Button ToolTip="Save"  Command="{Binding General.SaveCommand, Mode=OneTime}">
+                <Button ToolTip="Save (ctr+s)"  Command="{Binding General.SaveCommand, Mode=OneTime}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-save-all-50.png"/>
                 </Button>
 
-                <Button ToolTip="Import file" Command="{Binding ImportReferenceCommand, Mode=OneTime}">
+                <Button ToolTip="Import file (ctr+o)" Command="{Binding ImportReferenceCommand, Mode=OneTime}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/open ref.png"/>
                 </Button>
 
@@ -85,16 +89,16 @@
 
 
                 <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
-                <RadioButton ToolTip="Object selector" GroupName="gizmo" Command="{Binding Gizmo.CursorCommand}" IsChecked="{Binding Gizmo.CursorActive, UpdateSourceTrigger=PropertyChanged}">
+                <RadioButton ToolTip="Object selector(Q)" GroupName="gizmo" Command="{Binding Gizmo.CursorCommand}" IsChecked="{Binding Gizmo.CursorActive, UpdateSourceTrigger=PropertyChanged}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-cursor-256.png"/>
                 </RadioButton>
-                <RadioButton ToolTip="Move gizmo" GroupName="gizmo" Command="{Binding Gizmo.MoveCommand}" IsChecked="{Binding Gizmo.MoveActive, UpdateSourceTrigger=PropertyChanged}">
+                <RadioButton ToolTip="Move gizmo(W)" GroupName="gizmo" Command="{Binding Gizmo.MoveCommand}" IsChecked="{Binding Gizmo.MoveActive, UpdateSourceTrigger=PropertyChanged}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Gizmo_move.png"/>
                 </RadioButton>
-                <RadioButton ToolTip="Rotate gizmo" GroupName="gizmo" Command="{Binding Gizmo.RotateCommand}" IsChecked="{Binding Gizmo.RotateActive, UpdateSourceTrigger=PropertyChanged}">
+                <RadioButton ToolTip="Rotate gizmo(E)" GroupName="gizmo" Command="{Binding Gizmo.RotateCommand}" IsChecked="{Binding Gizmo.RotateActive, UpdateSourceTrigger=PropertyChanged}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Gizmo_rotate.png"/>
                 </RadioButton>
-                <RadioButton ToolTip="Scale gizmo" GroupName="gizmo" Command="{Binding Gizmo.ScaleCommand}" IsChecked="{Binding Gizmo.ScaleActive, UpdateSourceTrigger=PropertyChanged}">
+                <RadioButton ToolTip="Scale gizmo(R)" GroupName="gizmo" Command="{Binding Gizmo.ScaleCommand}" IsChecked="{Binding Gizmo.ScaleActive, UpdateSourceTrigger=PropertyChanged}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Gizmo_scale.png"/>
                 </RadioButton>
 
@@ -103,13 +107,13 @@
                 <TextBlock VerticalAlignment="Center" Text="Selection:"/>
                 <ComboBox SelectedIndex="{Binding Gizmo.SelectionModeIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                     <ComboBoxItem>
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_object.png"/>
+                        <Image ToolTip="Object (F1)"  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_object.png"/>
                     </ComboBoxItem>
                     <ComboBoxItem>
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_face.png"/>
+                        <Image ToolTip="Face (F2)"  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_face.png"/>
                     </ComboBoxItem>
                     <ComboBoxItem >
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_Vertex.png"/>
+                        <Image ToolTip="Vertex (F3)"  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_Vertex.png"/>
                     </ComboBoxItem>
                 </ComboBox>
 
@@ -127,7 +131,7 @@
                         <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_split.png"/>
                     </Button>
 
-                    <Button ToolTip="Merge selected meshes into one mesh" 
+                    <Button ToolTip="Merge selected meshes into one mesh (ctrl+m)" 
                         Command="{Binding Tools.MergeObjectCommand}"
                         IsEnabled="{Binding Tools.MergeMeshEnabled, UpdateSourceTrigger=PropertyChanged}">
                         <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_combine.png"/>
@@ -139,7 +143,7 @@
                         <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_duplicate.png"/>
                     </Button>
 
-                    <Button ToolTip="Group/Ungroup" 
+                    <Button ToolTip="Group/Ungroup (ctrl+g)" 
                         Command="{Binding Tools.GroupCommand}"
                             IsEnabled="{Binding Tools.GroupCommandEnabled, UpdateSourceTrigger=PropertyChanged}">
                         <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Group.png"/>
@@ -162,6 +166,12 @@
                     <Button ToolTip="Create lods" 
                         Command="{Binding Tools.CreateLodCommand}">
                         <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/createlod.png"/>
+                    </Button>
+
+                    <Button ToolTip="Open BMI tool" 
+                        Command="{Binding Tools.BmiToolCommand}"
+                            IsEnabled="{Binding Tools.BmiToolCommandEnabled, UpdateSourceTrigger=PropertyChanged}">
+                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-bmi-48.png"/>
                     </Button>
                 </ToolBar>
 

@@ -1,4 +1,5 @@
 ﻿using CommonControls.Services;
+using MonoGame.Framework.WpfInterop;
 using System;
 using View3D.Components.Component;
 using View3D.SceneNodes;
@@ -12,7 +13,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
     public static class SceneNodeViewFactory
     {
-        public static ISceneNodeViewModel Create(ISceneNode node, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService pf, AnimationControllerViewModel animationControllerViewModel, CommandExecutor commandExecutor)
+        public static ISceneNodeViewModel Create(ISceneNode node, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService pf, AnimationControllerViewModel animationControllerViewModel, IComponentManager componentManager)
         {
             switch (node)
             {
@@ -26,7 +27,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                     return new LodSceneNodeViewModel(l);
 
                 case Rmv2MeshNode m:
-                    return new MeshSceneNodeViewModel(m, pf, skeletonAnimationLookUpHelper, commandExecutor);
+                    return new MeshSceneNodeViewModel(m, pf, skeletonAnimationLookUpHelper, componentManager);
                 case SkeletonNode s:
                     return new SkeletonSceneNodeViewModel(s, pf, skeletonAnimationLookUpHelper);
                 case GroupNode n:
