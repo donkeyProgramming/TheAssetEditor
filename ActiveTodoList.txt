@@ -1,32 +1,20 @@
 Feature list:
 	Kitbash editor:
 		Tools:
-			[DONE]Convert face selection to vertex
-			[DONE]Duplicate selected faces 
-			[DONE]Extract selected faces to new object
+
 			[DONE]Generate lods
 				Ui ratio setting values 
 				
-			[DONE]Remapping skeleton does not update the skeleton getting names from, causing crashes in some cases
-			[DONE]Change animation skeleton
-			Undo for animation mapping
-			
-			[DONE]Handle large models with n lods
 			Validate logic before save 
 			Validate tool
-			[DONE]Change animation vertex type (downgrade, make sure it works in validation)
-			Combining all items in a group should remove the group
-			[DONE]Rename group ui
+			Combining all items in a group should remove the group	
 			
 		Pivot:
 			Edit
 			Display
 			
 		General:
-			[DONE]Open from file
-			[DONE]Small popup when undoing stuff
 			set all not ediable to readonly ui
-			[DONE]Lock for edit
 			Waiting mouse when doing command
 			Profile grow selection
 			Remove animation invert by fixing veiw matrix
@@ -34,33 +22,17 @@ Feature list:
 			Select vertex with mouse click
 			Make sure textures actually work
 			Skelton with good descriptive names 
-			[DONE]Make sure texture stuff works
 			Save packfile cleanup edited
 			Save packfile handle refs to open editors and memory streams?
 			All uis should spawn at the center
-			[DONE]Test with empty settings
-			[DONE]Create "developer" settings
-			
-			[DONE]Default to warhammer 2 for game
-			[DONE]How to handle assets for single publiush
-			[DONE]New packfile -> Set as main editable file
-			[DONE]Option->OPen log folder
-			[DONE]Pack file extention on save
-			Closing packfile need to close all open windoes
 			Open material files
 			Directory copy name
 			Bounding box calculations
 			Changing animation for duplicate goes boom. Undo for mapping needed
 				
-		UI:			
-			Fix attachement points buttons
-			Fix skeleton buttons
 
 	General:
 		TreeView:
-			[DONE]Dont always rebuild treeview! Save, new file
-			[DONE]save as dialog (create folder)
-			[DONE]duplicate file
 			Create new file => VMD, XML, TXT
 			Right click rmv2 model files => Edit	
 			
@@ -71,10 +43,6 @@ Feature list:
 	
 	3d Preview tool:
 		Make one...
-		
-	Text editor:
-
-Axis size
 	
 Known bugs:
 	[DONE]Select face, then swap to vertex mode, need to call update before draw error
@@ -134,7 +102,6 @@ Known bugs:
 
 Ensure all components is removed when exiting
 	* When looking for files, search ca last -> textures, meshes
-	* Undo for mapping
 	* Loading advance vmds
 	* Bondingbox display
 	* boundingbox recalc 
@@ -148,11 +115,9 @@ Ensure all components is removed when exiting
 	* Sometimes undo for vertex movement does not work
 	* splitting repanse removes parts 
 	* Quality of life changes for skeleton remapping tool
-		- Undo
 		- Save thingy actually working
 		- Duplicate mesh teaking stuff from, so skeleton names does not change for duplicated meshes
 	* Unsaved changes, do you want to exit?	
-	* Bounding box recalc
 	* When playing, attach items to props
 	* Saving mapping does not work when loading it back in
 	* Converte to weighted 4 vertex type
@@ -161,11 +126,8 @@ Ensure all components is removed when exiting
 
 Quality of life:
 	Flip mesh
-	Remove slots and slot folders
-	Hotkey names
 	Skeleton information view 
 	Snap mesh to skeleteon when mapping
-	Undo mapping 
 	Improved ws model generation (Facncy mode)
 	about box - Dont break eula
 	Save taxturepaths with slash other way
@@ -201,25 +163,26 @@ Animation tool:
 // ---------------------
 
 
-BmiToolCommand
 
 Attach to vertex
-
-
 Extract new mesh from selection
-
 Enter works on prompts
 Dropdown for search
 Mouse focus on search for browser
 Skeletonbone highligerr
-Hotkey descriptions 
-
-
 Remapping vmd tool?
 Generic viewer
 
+bone mapper:
+	Show bones?
+	Fit skeleton auto scale?
+	Always show breath first
+// ----------------------------------------------
+
 WsModel auto generate when possible
 Wsmodel make editable context menu
+
+auto merge meshes that can be merged 
 
 [DONE]Key to only view selected
 [DONE]Shift to add to selection
@@ -228,11 +191,20 @@ Wsmodel make editable context menu
 [DONE]Wsmodel view toggle not working
 [DONE]Escape to close open file browser
 [DONE]Allow undo of mapping
+[Done]Hotkey descriptions 
 
 [Done-ish]Fatness slider
 [Done-ish]Fit skeleton on remapping
+	try names with _0 at when -1
+	[Done]increase size of view
+	Confirme text with mappings with -1
+	[Done]Make auto move more visible and actiate the checkbox
+	-> Mapping from self to self warning -> error at the bottow
+	
+add a way to multiselect items on model/vmd import
+	=> rigkt click context menu import
 
-
+Fit to skeleton -> allows for -1 in mapping better 
 
 
 

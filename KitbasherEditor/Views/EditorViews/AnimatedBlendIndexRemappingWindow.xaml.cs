@@ -25,6 +25,9 @@ namespace KitbasherEditor.Views.EditorViews
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
+
+
+
             Close();
         }
 

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews"
         mc:Ignorable="d"
-        Title="AnimatedBlendIndexRemappingWindow" Height="450" Width="800">
+        Title="AnimatedBlendIndexRemappingWindow" Height="600" Width="1200">
     <DockPanel LastChildFill="True">
 
         <DockPanel DockPanel.Dock="Bottom" LastChildFill="False">

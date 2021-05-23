@@ -20,6 +20,13 @@ namespace KitbasherEditor.Views.EditorViews
         public BmiWindow()
         {
             InitializeComponent();
+            this.Deactivated += Window_Deactivated;
+        }
+
+        private void Window_Deactivated(object sender, EventArgs e)
+        {
+            Window window = (Window)sender;
+            window.Topmost = true;
         }
     }
 }
