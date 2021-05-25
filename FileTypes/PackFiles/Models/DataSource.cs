@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Filetypes.ByteParsing;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -9,6 +10,7 @@ namespace FileTypes.PackFiles.Models
     {
         long Size{get;}
         byte[] ReadData();
+        ByteChunk ReadDataAsChunk();
     }
 
     public class FileSystemSource : IDataSource
@@ -25,6 +27,11 @@ namespace FileTypes.PackFiles.Models
         public byte[] ReadData()
         {
             return File.ReadAllBytes(filepath);
+        }
+
+        public ByteChunk ReadDataAsChunk()
+        {
+            return new ByteChunk(ReadData());
         }
     }
 
@@ -46,6 +53,10 @@ namespace FileTypes.PackFiles.Models
         public static MemorySource FromFile(string path)
         {
             return new MemorySource(File.ReadAllBytes(path));
+        }
+        public ByteChunk ReadDataAsChunk()
+        {
+            return new ByteChunk(ReadData());
         }
     }
 
@@ -75,6 +86,10 @@ namespace FileTypes.PackFiles.Models
                 stream.Read(data, 0, data.Length);
             }
             return data;
+        }
+        public ByteChunk ReadDataAsChunk()
+        {
+            return new ByteChunk(ReadData());
         }
     }
 

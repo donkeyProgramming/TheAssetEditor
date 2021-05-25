@@ -121,7 +121,7 @@ namespace AnimationEditor.Common.AnimationPlayer
             SelectedAnimationCurrentFrame = currentFrame;
             if (currentFrame == SelectedMainAnimation.Asset.Player.FrameCount())
             {
-                SetAnimationFirstFrame();
+                //SetAnimationFirstFrame();
                 if (LoopAnimation)
                     TogleAnimationPausePlay();
             }

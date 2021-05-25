@@ -195,12 +195,13 @@ namespace KitbasherEditor.ViewModels
                 var animFile = AnimationFile.Create(Animation);
                 var animClip = new AnimationClip(animFile);
 
-                MaxFrames = animClip.DynamicFrames.Count;
-                CurrentFrame = 0;
 
                 Player.SetAnimation(animClip, Skeleton);
                 if(Player.IsPlaying && Player.IsEnabled)
                     Player.Play();
+
+                MaxFrames = Player.FrameCount();
+                CurrentFrame = 0;
             }
         }
 

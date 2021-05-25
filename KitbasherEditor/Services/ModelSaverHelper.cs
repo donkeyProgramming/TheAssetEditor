@@ -4,6 +4,7 @@ using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
+using FileTypes.RigidModel;
 using KitbasherEditor.ViewModels;
 using Serilog;
 using System;
@@ -113,31 +114,11 @@ namespace KitbasherEditor.Services
                 var wsModelPath = Path.ChangeExtension(modelFilePath, ".wsmodel");
 
                 var existingWsModelFile = _packFileService.FindFile(wsModelPath, _packFileService.GetEditablePack());
-                //if (existingWsModelFile != null)
-                //{
-                //    if (MessageBox.Show("Replace existing file?", "", MessageBoxButton.YesNo) == MessageBoxResult.No)
-                //    {
-                //        using (var browser = new SavePackFileWindow(_packFileService))
-                //        {
-                //            browser.ViewModel.Filter.SetExtentions(new List<string>() { ".wsmodel" });
-                //            if (browser.ShowDialog() == true)
-                //            {
-                //                var path = browser.FilePath;
-                //                if (path.Contains(".wsmodel") == false)
-                //                    path += ".wsmodel";
-                //
-                //                wsModelPath = path;
-                //                existingWsModelFile = null;
-                //            }
-                //            else
-                //            {
-                //                return;
-                //            }
-                //        }
-                //    }
-                //}
 
-                var wsModelData = GetWsModel(modelFilePath, onlySaveVisible);
+                var wsModelData = GenerateWsModel(modelFilePath, onlySaveVisible, out var wsModelGeneratedPerfectly);
+                if (wsModelGeneratedPerfectly == false)
+                    MessageBox.Show("Unable to correclty generate WS model, this file needs manual work before its can be used by the game!");
+
                 SaveHelper.Save(_packFileService, wsModelPath, existingWsModelFile as PackFile, Encoding.UTF8.GetBytes(wsModelData));
             }
             catch (Exception e)
@@ -148,9 +129,26 @@ namespace KitbasherEditor.Services
         }
 
 
-        string GetWsModel(string modelFilePath, bool onlyVisible)
+        string GenerateWsModel(string modelFilePath, bool onlyVisible, out bool wsModelGeneratedPerfectly)
         {
-            StringBuilder sb = new StringBuilder();
+            wsModelGeneratedPerfectly = true;
+
+            var materialPacks = _packFileService.FindAllWithExtentionIncludePaths(".material");
+            materialPacks = materialPacks.Where(x => x.Item2.Name.Contains(".xml.material")).ToList();
+            List<WsModelMaterial> materialList = new List<WsModelMaterial>();
+            foreach (var materialPack in materialPacks)
+            {
+                try
+                {
+                    materialList.Add(new WsModelMaterial(materialPack.Item2, materialPack.Item1));
+                }
+                catch (Exception e)
+                {
+                    _logger.Here().Error("Error loading material for wsmodel generation - " + e.ToString());
+                }
+            }
+
+            var sb = new StringBuilder();
 
             sb.Append("<model version=\"1\">\n");
             sb.Append($"\t<geometry>{modelFilePath}</geometry>\n");
@@ -162,37 +160,85 @@ namespace KitbasherEditor.Services
                 var meshes = _editableMeshNode.GetMeshesInLod(lodIndex, onlyVisible);
                 for (int meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
                 {
+                    var materialFile = CreateKnownMaterial(meshes[meshIndex], materialList);
+                    if (materialFile == null)
+                    {
+                        materialFile = UnknownMaterial(meshes[meshIndex]);
+                        wsModelGeneratedPerfectly = false;
+                    }
+
                     sb.Append($"\t\t\t<material part_index=\"{meshIndex}\" lod_index=\"{lodIndex}\">");
-
-                    var mesh = meshes[meshIndex];
-                    var textureName = "?";
-                    var texture = mesh.MeshModel.GetTexture(Filetypes.RigidModel.TexureType.Diffuse);
-                    if (texture.HasValue)
-                        textureName = texture.Value.Path;
-                    var vertextType = mesh.MeshModel.Header.VertextType;
-                    var alphaOn = mesh.MeshModel.AlphaSettings.Mode != AlphaMode.Opaque;
-
-                    var vertexName = "uknown";
-                    if (vertextType == VertexFormat.Cinematic)
-                        vertexName = "weighted4";
-                    else if (vertextType == VertexFormat.Weighted)
-                        vertexName = "weighted2";
-                    else  if (vertextType == VertexFormat.Default)
-                        vertexName = "static";
-
-                    sb.Append($" MeshName='{mesh.Name}' Texture='{textureName}' VertType='{vertexName}' Alpha='{alphaOn}'");
-
+                    sb.Append(materialFile);
                     sb.Append("</material>\n");
                 }
-
-                sb.Append("\n");
             }
 
             sb.Append("\t</materials>\n");
             sb.Append("</model>\n");
 
             return sb.ToString();
+        }
 
+        private string UnknownMaterial(Rmv2MeshNode mesh)
+        {
+            var textureName = "?";
+            var texture = mesh.MeshModel.GetTexture(TexureType.Diffuse);
+            if (texture.HasValue)
+                textureName = texture.Value.Path;
+            var vertextType = mesh.MeshModel.Header.VertextType;
+            var alphaOn = mesh.MeshModel.AlphaSettings.Mode != AlphaMode.Opaque;
+
+            var vertexName = "uknown";
+            if (vertextType == VertexFormat.Cinematic)
+                vertexName = "weighted4";
+            else if (vertextType == VertexFormat.Weighted)
+                vertexName = "weighted2";
+            else if (vertextType == VertexFormat.Default)
+                vertexName = "static";
+
+            return $" MeshName='{mesh.Name}' Texture='{textureName}' VertType='{vertexName}' Alpha='{alphaOn}'";
+        }
+
+        string  CreateKnownMaterial(Rmv2MeshNode mesh, List<WsModelMaterial> possibleMaterials)
+        {
+            foreach (var material in possibleMaterials)
+            {
+                if (mesh.MeshModel.Header.VertextType != material.VertexType)
+                    continue;
+
+                var alphaOn = mesh.MeshModel.AlphaSettings.Mode != AlphaMode.Opaque;
+                if (alphaOn && material.Alpha == false)
+                    continue;
+
+                bool texturesOk = true;
+                foreach (var modelTexture in mesh.MeshModel.Textures)
+                {
+                    if (modelTexture.Path.Contains("test_mask", StringComparison.InvariantCultureIgnoreCase))
+                        continue;
+
+                    var modelTextureType = modelTexture.TexureType;
+                    var materialHasTexture = material.Textures.TryGetValue(modelTextureType, out var materialTexurePath);
+                    if (materialHasTexture == false)
+                    {
+                        texturesOk = false;
+                        break;
+                    }
+
+                    var arePathsEqual = materialTexurePath.Contains(modelTexture.Path, StringComparison.InvariantCultureIgnoreCase);
+                    if (arePathsEqual == false)
+                    {
+                        texturesOk = false;
+                        break;
+                    }
+                }
+
+                if (texturesOk)
+                {
+                    return material.FullPath;
+                }
+            }
+
+            return null;
         }
 
 

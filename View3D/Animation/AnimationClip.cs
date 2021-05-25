@@ -34,12 +34,10 @@ namespace View3D.Animation
 
         public KeyFrame StaticFrame { get; set; } = null;
         public List<KeyFrame> DynamicFrames = new List<KeyFrame>();
+        public float PlayTimeInSec { get; set; } = -1;
 
         public List<AnimationBoneMapping> RotationMappings { get; set; } = new List<AnimationBoneMapping>();
         public List<AnimationBoneMapping> TranslationMappings { get; set; } = new List<AnimationBoneMapping>();
-
-        public bool UseStaticFrame { get; set; } = true;
-        public bool UseDynamicFames { get; set; } = true;
 
         public AnimationClip() { }
 
@@ -47,6 +45,7 @@ namespace View3D.Animation
         {
             RotationMappings = file.RotationMappings.ToList();
             TranslationMappings = file.TranslationMappings.ToList();
+            PlayTimeInSec = file.Header.AnimationTotalPlayTimeInSec;
 
             if (file.StaticFrame != null)
                 StaticFrame = CreateKeyFrame(file.StaticFrame);
@@ -122,8 +121,7 @@ namespace View3D.Animation
         public AnimationClip Clone()
         {
             AnimationClip copy = new AnimationClip();
-            copy.UseDynamicFames = UseStaticFrame;
-            copy.UseDynamicFames = UseDynamicFames;
+            copy.PlayTimeInSec = PlayTimeInSec;
 
             foreach (var item in RotationMappings)
                 copy.RotationMappings.Add(item.Clone());
@@ -229,7 +227,6 @@ namespace View3D.Animation
 
                 for (int boneIndex = 0; boneIndex < boneCount; boneIndex++)
                 {
-
                     // Find the org bone and look at the mapping
                     var orgBoneIndex = bones[boneIndex];
 

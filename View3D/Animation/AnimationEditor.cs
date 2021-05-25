@@ -192,11 +192,11 @@ namespace View3D.Animation
             var output = newAnim.Clone();
             output.DynamicFrames.Clear();
 
-            var fraction = 1.0f / newFrameCount;
+            var fraction = 1.0f / (newFrameCount - 1);
             for (int i = 0; i < newFrameCount; i++)
             {
                 float t = i * fraction;
-                var keyframe = AnimationSampler.Sample(t, skeleton, new List<AnimationClip> { newAnim }, true, true);
+                var keyframe = AnimationSampler.Sample(t, skeleton, new List<AnimationClip> { newAnim });
 
                 KeyFrame newKeyFrame = new KeyFrame();
                 for (int mappingIndex = 0; mappingIndex < output.RotationMappings.Count; mappingIndex++)
@@ -213,9 +213,11 @@ namespace View3D.Animation
                         newKeyFrame.Position.Add(keyframe.BoneTransforms[mappingIndex].Translation);
                 }
 
-
                 output.DynamicFrames.Add(newKeyFrame);
             }
+
+
+            output.PlayTimeInSec = (output.DynamicFrames.Count() - 1) / 20.0f;
 
             return output;
         }

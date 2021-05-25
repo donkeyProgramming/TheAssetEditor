@@ -2,6 +2,7 @@
 using CommonControls.Services;
 using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
+using FileTypes.RigidModel;
 using Microsoft.Xna.Framework.Graphics;
 using Serilog;
 using System;
@@ -168,10 +169,12 @@ namespace View3D.Services
                 var materialNodes = doc.SelectNodes(@"/model/materials/material");
                 foreach (XmlNode materialNode in materialNodes)
                 {
-                    var materialFile = materialNode.InnerText;
+                    var materialFilePath = materialNode.InnerText;
                     var partIndex = materialNode.Attributes.GetNamedItem("part_index").InnerText;
                     var lodIndex = materialNode.Attributes.GetNamedItem("lod_index").InnerText;
-                    var materialConfig = ParseMaterialFile(materialFile);
+
+                    var materialFile = _packFileService.FindFile(materialFilePath);
+                    var materialConfig = new WsModelMaterial(materialFile as PackFile, "");
 
                     var mesh = loadedModelNode.GetMeshNode(int.Parse(lodIndex), int.Parse(partIndex));
                     if (mesh == null)
@@ -180,7 +183,7 @@ namespace View3D.Services
                     }
                     else
                     {
-                        bool useAlpha = materialFile.Contains("alpha_on");
+                        bool useAlpha = materialConfig.Alpha;
                         var alphaSettings = mesh.MeshModel.AlphaSettings;
                         if (useAlpha)
                             alphaSettings.Mode = AlphaMode.Alpha_Test;
@@ -188,18 +191,18 @@ namespace View3D.Services
                             alphaSettings.Mode = AlphaMode.Opaque;
                         mesh.MeshModel.AlphaSettings = alphaSettings;
 
-                        foreach (var newTexture in materialConfig)
+                        foreach (var newTexture in materialConfig.Textures)
                             mesh.UpdateTexture(newTexture.Value, newTexture.Key);
                     }
                 }
             }
         }
 
-        Dictionary<TexureType, string> ParseMaterialFile(string path)
+        /*Dictionary<TexureType, string> ParseMaterialFile(string path)
         {
             var output = new Dictionary<TexureType, string>();
 
-            var materialFile = _packFileService.FindFile(path);
+            
             var buffer = (materialFile as PackFile).DataSource.ReadData();
             string xmlString = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
             XmlDocument doc = new XmlDocument();
@@ -231,6 +234,6 @@ namespace View3D.Services
             }
 
             return output;
-        }
+        }*/
     }
 }

@@ -60,8 +60,14 @@ namespace CommonControls.Services
 
         public List<PackFile> FindAllWithExtention(string extention, PackFileContainer packFileContainer = null)
         {
+            return FindAllWithExtentionIncludePaths(extention, packFileContainer).Select(x => x.Item2).ToList();
+        }
+
+
+        public List<ValueTuple<string, PackFile>> FindAllWithExtentionIncludePaths(string extention, PackFileContainer packFileContainer = null)
+        {
             extention = extention.ToLower();
-            List<PackFile> output = new List<PackFile>();
+            var output = new List<ValueTuple<string, PackFile>>();
             if (packFileContainer == null)
             {
                 foreach (var pf in Database.PackFiles)
@@ -70,7 +76,7 @@ namespace CommonControls.Services
                     {
                         var fileExtention = Path.GetExtension(file.Key);
                         if (fileExtention == extention)
-                            output.Add(file.Value as PackFile);
+                            output.Add(new ValueTuple<string, PackFile>(file.Key, file.Value as PackFile));
                     }
                 }
             }
@@ -80,7 +86,7 @@ namespace CommonControls.Services
                 {
                     var fileExtention = Path.GetExtension(file.Key);
                     if (fileExtention == extention)
-                        output.Add(file.Value as PackFile);
+                        output.Add(new ValueTuple<string, PackFile>(file.Key, file.Value as PackFile));
                 }
             }
 

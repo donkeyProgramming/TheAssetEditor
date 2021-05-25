@@ -240,21 +240,23 @@ namespace AnimationEditor.MountAnimationCreator
             var maxFrameCount = Math.Min(mountAnimation.DynamicFrames.Count, newRiderAnim.DynamicFrames.Count);
             for (int i = 0; i < maxFrameCount; i++)
             {
-                var mountFrame = AnimationSampler.Sample(i, 0, mountSkeleton, new List<AnimationClip> { mountAnimation }, true, true);
+                var mountFrame = AnimationSampler.Sample(i, 0, mountSkeleton, new List<AnimationClip> { mountAnimation });
 
                 var mountBoneWorldMatrix = mountVertexPositionResolver.GetVertexTransformWorld(mountFrame, mountVertexId);
                 mountBoneWorldMatrix.Decompose(out var _, out var mountVertexRot, out var mountVertexPos);
 
                 // Make sure the rider moves along in the world with the same speed as the mount
                 var mountMovement = mountFrame.BoneTransforms[0].Translation;
-                newRiderAnim.DynamicFrames[i].Position[0] = mountMovement;
+                newRiderAnim.DynamicFrames[i].Position[0] = mountMovement; ;// mountAnimation.DynamicFrames[i].Position[0];
                 newRiderAnim.DynamicFrames[i].Rotation[0] = Quaternion.Identity;
 
+
+               // continue;
                 // Keep the original rotation of the rider animation
                 var origianlRotation = Quaternion.Identity;
                 if (animationSettings.KeepRiderRotation)
                 {
-                    var riderFrame = AnimationSampler.Sample(i, 0, riderSkeleton, new List<AnimationClip> { riderAnimation }, true, true);
+                    var riderFrame = AnimationSampler.Sample(i, 0, riderSkeleton, new List<AnimationClip> { riderAnimation });
                     var riderBoneWorldmatrix = riderFrame.GetSkeletonAnimatedWorld(riderSkeleton, riderBoneIndex);
                     riderBoneWorldmatrix.Decompose(out var _, out origianlRotation, out var _);
 

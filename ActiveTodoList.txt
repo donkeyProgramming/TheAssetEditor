@@ -208,6 +208,23 @@ Fit to skeleton -> allows for -1 in mapping better
 
 
 
+* Press key to toggle "view only selected" (space)
+* Shift changed to add to selected, instead of being an or operation
+* Right clicking on mesh in a group gives the option of ungrouping it
+* Added remove option to Slot and Slots in the tree view for reference meshes
+* Wsmodels are now toggled correctly in the tree view
+* Re-Rigging can now be undone with ctrl+z
+* Escape key closes the open window when trying to add a new reference
+* Hot key description added to all items
+* Some other bug fixes
+
+* Bmi tool added - Edit volume on a per bone basis 
+* Mount animation tool added - Create new mount animations for pretty much anything
+* "Tutorials" created. Some help would be greatly appreciated!  https://tw-modding.com/index.php/Tutorial:AssetEditor
+
+
+
+
 
 
 

@@ -89,8 +89,8 @@ namespace AssetEditor.ViewModels
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu17\skv\skv_clan_rats\head\skv_clan_rats_head_04.rigid_model_v2");
 
 
-                MountAnimationCreatorViewModel_Debug.CreateLionAndHu01b(this, toolFactory, packfileService);
-                //KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
+                //MountAnimationCreatorViewModel_Debug.CreateLionAndHu01b(this, toolFactory, packfileService);
+                KitbashEditor_Debug.CreateLoremasterHead(this, toolFactory, packfileService);
 
 
                 //var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();

@@ -80,24 +80,37 @@ namespace AnimationEditor.MountAnimationCreator
             set { SetAndNotify(ref _canBatchProcess, value);  }
         }
 
-
-
         AssetViewModel _rider;
         AssetViewModel _mount;
         PackFileService _pfs;
 
-
         public MountLinkController(PackFileService pfs, AssetViewModel rider, AssetViewModel mount)
         {
-            var file = pfs.FindFile(@"animations\animation_tables\animation_tables.animpack");
-
             _pfs = pfs;
             _rider = rider;
             _mount = mount;
 
-            var fragments = AnimationPackLoader.GetFragmentCollections(file as PackFile);
-            AnimationSets0 = new ObservableCollection<FragmentDisplayItem>(fragments.Select(x => new FragmentDisplayItem(x)));
-            AnimationSets1 = new ObservableCollection<FragmentDisplayItem>(fragments.Select(x => new FragmentDisplayItem(x)));
+            AnimationSets0 = new ObservableCollection<FragmentDisplayItem>();
+            AnimationSets1 = new ObservableCollection<FragmentDisplayItem>();
+
+            var animPacks = pfs.FindAllWithExtention(@".animpack");
+            foreach (var animPack in animPacks)
+            {
+                var fragments = AnimationPackLoader.GetFragmentCollections(animPack as PackFile);
+                foreach (var fragment in fragments)
+                {
+                    AnimationSets0.Add(new FragmentDisplayItem(fragment));
+                    AnimationSets1.Add(new FragmentDisplayItem(fragment));
+                }
+            }
+
+            var allFragments = pfs.FindAllWithExtention(@".frg");
+            foreach (var fragmentPack in allFragments)
+            {
+                var fragment = new AnimationFragmentCollection(fragmentPack.Name, fragmentPack.DataSource.ReadDataAsChunk());
+                AnimationSets0.Add(new FragmentDisplayItem(fragment));
+                AnimationSets1.Add(new FragmentDisplayItem(fragment));
+            }
         }
 
 

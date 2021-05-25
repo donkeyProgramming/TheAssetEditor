@@ -11,9 +11,7 @@ namespace View3D.Animation
 {
     public class AnimationSampler
     {
-
-
-        public static AnimationFrame Sample(int frameIndex, float frameIterpolation, GameSkeleton skeleton, List<AnimationClip> animationClips, bool applyStaticFrame = true, bool applyDynamicFrames = true)
+        public static AnimationFrame Sample(int frameIndex, float frameIterpolation, GameSkeleton skeleton, List<AnimationClip> animationClips)
         {
             try
             {
@@ -24,27 +22,19 @@ namespace View3D.Animation
 
                 if (animationClips != null)
                 {
-                    if (applyStaticFrame)
+                    foreach (var animation in animationClips)
+                        ApplyAnimation(animation.StaticFrame, null, 0, currentFrame, animation.RotationMappings, animation.TranslationMappings, AnimationBoneMappingType.Static);
+                    
+                    if (animationClips.Any())
                     {
-                        foreach (var animation in animationClips)
+                        if (animationClips[0].DynamicFrames.Count > frameIndex)
                         {
-                            if (animation.UseStaticFrame)
-                                ApplyAnimation(animation.StaticFrame, null, 0, currentFrame, animation.RotationMappings, animation.TranslationMappings, AnimationBoneMappingType.Static);
+                            var currentFrameKeys = GetKeyFrameFromIndex(animationClips[0].DynamicFrames, frameIndex);
+                            var nextFrameKeys = GetKeyFrameFromIndex(animationClips[0].DynamicFrames, frameIndex + 1);
+                            ApplyAnimation(currentFrameKeys, nextFrameKeys, frameIterpolation, currentFrame, animationClips[0].RotationMappings, animationClips[0].TranslationMappings, AnimationBoneMappingType.Dynamic);
                         }
                     }
-
-                    if (applyDynamicFrames)
-                    {
-                        if (animationClips.Any() && animationClips[0].UseDynamicFames)
-                        {
-                            if (animationClips[0].DynamicFrames.Count > frameIndex)
-                            {
-                                var currentFrameKeys = GetKeyFrameFromIndex(animationClips[0].DynamicFrames, frameIndex);
-                                var nextFrameKeys = GetKeyFrameFromIndex(animationClips[0].DynamicFrames, frameIndex + 1);
-                                ApplyAnimation(currentFrameKeys, nextFrameKeys, (float)frameIterpolation, currentFrame, animationClips[0].RotationMappings, animationClips[0].TranslationMappings, AnimationBoneMappingType.Dynamic);
-                            }
-                        }
-                    }
+                    
                 }
 
                 for (int i = 0; i < currentFrame.BoneTransforms.Count(); i++)
@@ -56,8 +46,8 @@ namespace View3D.Animation
                     var parentindex = currentFrame.BoneTransforms[i].ParentBoneIndex;
                     if (parentindex == -1)
                     {
-                        var scale = Matrix.CreateScale(1, 1, 1);
-                        currentFrame.BoneTransforms[i].WorldTransform = (scale * currentFrame.BoneTransforms[i].WorldTransform);
+                        //var scale = Matrix.CreateScale(1, 1, 1);
+                        //currentFrame.BoneTransforms[i].WorldTransform = (scale * currentFrame.BoneTransforms[i].WorldTransform);
                         continue;
                     }
 
@@ -79,31 +69,25 @@ namespace View3D.Animation
             }
         }
 
-        public static AnimationFrame Sample(float t, GameSkeleton skeleton, List<AnimationClip> animationClips, bool applyStaticFrame, bool applyDynamicFrames)
+        public static AnimationFrame Sample(float t, GameSkeleton skeleton, List<AnimationClip> animationClips)
         {
             try
             {
-                if (skeleton == null)
-                    return null;
-
-                // Make sure it its in the 0-1 range
-                t = EnsureRange(t, 0, 1);
-
+                var clampedT = EnsureRange(t, 0, 1);
                 int frameIndex = 0;
                 float frameIterpolation = 0;
+
                 if (animationClips != null)
                 {
-                    if (applyDynamicFrames)
-                    {
-                        int maxFrames = animationClips[0].DynamicFrames.Count() - 1;
-                        float frame = maxFrames * t;
+                    int maxFrames = animationClips[0].DynamicFrames.Count() - 1;
+                    float frameWithLeftover = maxFrames * clampedT;
+                    float clampedFrame = (float)Math.Floor(frameWithLeftover);
 
-                        frameIndex = (int)(frame);
-                        frameIterpolation = frame - frameIndex;
-                    }
+                    frameIndex = (int)(clampedFrame);
+                    frameIterpolation = frameWithLeftover - clampedFrame; 
                 }
 
-                return Sample(frameIndex, frameIterpolation, skeleton, animationClips, applyStaticFrame, applyDynamicFrames);
+                return Sample(frameIndex, frameIterpolation, skeleton, animationClips);
             }
             catch (Exception e)
             {
@@ -113,9 +97,9 @@ namespace View3D.Animation
             }
         }
 
-        public static AnimationFrame Sample(int frameIndex, float frameIterpolation, GameSkeleton skeleton, AnimationClip animationClip, bool applyStaticFrame = true, bool applyDynamicFrames = true)
+        public static AnimationFrame Sample(int frameIndex, float frameIterpolation, GameSkeleton skeleton, AnimationClip animationClip)
         {
-            return Sample(frameIndex, frameIterpolation, skeleton, new List<AnimationClip>() { animationClip }, applyStaticFrame, applyDynamicFrames);
+            return Sample(frameIndex, frameIterpolation, skeleton, new List<AnimationClip>() { animationClip });
         }
 
         static float EnsureRange(float value, float min, float max)

@@ -53,7 +53,12 @@ namespace View3D.SceneNodes
                 {
                     var parentIndex = skeleton.GetParentBone(i);
                     if (parentIndex == -1)
+                    {
+                        var boneMatrix2 = skeleton.GetAnimatedWorldTranform(i);
+                        _lineRenderer.AddCube(Matrix.CreateScale(SkeletonScale) * Matrix.CreateScale(0.05f) * boneMatrix2 * parentWorld, NodeColour);
                         continue;
+                    }
+                        
 
                     float scale = SkeletonScale;
                     Color drawColour = NodeColour;

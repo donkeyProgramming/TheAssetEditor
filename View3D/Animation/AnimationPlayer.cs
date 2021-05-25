@@ -90,14 +90,18 @@ namespace View3D.Animation
 
         public bool IsPlaying { get; private set; } = true;
         public double SpeedMultiplication { get; set; }
-        public bool ApplyStaticFrame { get; set; } = true;
-        public bool ApplyDynamicFrames { get; set; } = true;
         public bool IsEnabled { get; set; } = false;
         public bool LoopAnimation { get; set; } = true;
 
         public int CurrentFrame
         {
-            get { return (int)Math.Round(_timeSinceStart.TotalSeconds * 20); }
+            get 
+            {
+                if (_animationClips == null)
+                    return 0;
+
+                return (int)Math.Round((_timeSinceStart.TotalMilliseconds / GetAnimationLengthMs()) * _animationClips[0].DynamicFrames.Count()); 
+            }
             set
             {
                 if (CurrentFrame == value)
@@ -108,10 +112,12 @@ namespace View3D.Animation
                     var frameCount = FrameCount();
                     if (frameCount > 0)
                     {
-                        int newFrame = value;
-                        _timeSinceStart = TimeSpan.FromMilliseconds(newFrame * (1f / 20f) * 1000);
+                        var framePercentage = (value / ((float)_animationClips[0].DynamicFrames.Count())) * GetAnimationLengthMs();
+                        _timeSinceStart = TimeSpan.FromMilliseconds(framePercentage);
                     }
-                    OnFrameChanged?.Invoke(CurrentFrame);
+
+                    var currentFrame = CurrentFrame;
+                    OnFrameChanged?.Invoke(currentFrame);
                 }
                 else
                 {
@@ -150,7 +156,7 @@ namespace View3D.Animation
         float GetAnimationLengthMs()
         {
             if (_animationClips != null && _animationClips.Any())
-                return _animationClips[0].DynamicFrames.Count() * (1f / 20f) * 1000;
+                return _animationClips[0].PlayTimeInSec * 1000;
             return 0;
         }
 
@@ -158,7 +164,7 @@ namespace View3D.Animation
         {
             float animationLengthMs = GetAnimationLengthMs();
 
-            if (animationLengthMs != 0 && IsPlaying)
+            if (animationLengthMs != 0 && IsPlaying && IsEnabled)
             {
                 _timeSinceStart += gameTime.ElapsedGameTime;
                 if (_timeSinceStart.TotalMilliseconds >= animationLengthMs)
@@ -190,12 +196,10 @@ namespace View3D.Animation
             float animationLengthMs = GetAnimationLengthMs();
             if (animationLengthMs != 0)
                 sampleT = (float)(_timeSinceStart.TotalMilliseconds / animationLengthMs);
-            _currentAnimFrame = AnimationSampler.Sample(sampleT, _skeleton, _animationClips, ApplyStaticFrame, ApplyDynamicFrames);
+            _currentAnimFrame = AnimationSampler.Sample(sampleT, _skeleton, _animationClips);
             if(_skeleton != null)
                 _skeleton.Update();
         }
-
-
 
         public void Play() { IsPlaying = true; IsEnabled = true; }
 
@@ -218,7 +222,7 @@ namespace View3D.Animation
         }
 
         public int FrameCount()
-        {
+         {
             if (_animationClips != null)
                 return _animationClips[0].DynamicFrames.Count();
             return 0;

@@ -84,5 +84,11 @@ namespace CommonControls.Services
             }
             return null;
         }
+
+        public class AnimationReference
+        { 
+            public string AnimationFile { get; set; }
+            public PackFileContainer Container { get; set; }
+        }
     }
 }
