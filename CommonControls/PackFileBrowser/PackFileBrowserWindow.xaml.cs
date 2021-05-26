@@ -21,6 +21,7 @@ namespace CommonControls.PackFileBrowser
             ViewModel = new PackFileBrowserViewModel(packfileService);
             ViewModel.ContextMenu = new OpenFileContexMenuHandler(packfileService);
             ViewModel.FileOpen += ViewModel_FileOpen;
+            ViewModel.Filter.AutoExapandResultsAfterLimitedCount = 50;
             InitializeComponent();
             DataContext = this;
 
@@ -42,7 +43,7 @@ namespace CommonControls.PackFileBrowser
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
-        {
+        { 
             SelectedFile = ViewModel.SelectedItem?.Item as PackFile;
             DialogResult = true;
             Close();

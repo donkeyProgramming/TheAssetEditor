@@ -1,4 +1,5 @@
 ﻿using Common;
+using CommonControls.ErrorListDialog;
 using CommonControls.Services;
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor.Services;
@@ -177,11 +178,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             {
                 if (objectSelectionState.CurrentSelection().Count >= 2)
                 {
-                    if (!_objectEditor.CombineMeshes(objectSelectionState, out var errorMessage))
-                    {
-                        var longError = string.Join("\n", errorMessage);
-                        MessageBox.Show("Errors trying to combine meshes:\n\n" + longError);
-                    }
+                    if (!_objectEditor.CombineMeshes(objectSelectionState, out var errorList))
+                        ErrorListWindow.ShowDialog("Combine Errors", errorList);
                 }                
             }
         }

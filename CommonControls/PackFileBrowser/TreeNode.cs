@@ -198,5 +198,18 @@ namespace CommonControls.PackFileBrowser
             foreach (var child in Children)
                 child.ForeachNode(func);
         }
+
+        public void ExpandIfVisible(bool includeChildren = true)
+        {
+            if (IsVisible)
+            {
+                IsNodeExpanded = true;
+                if (includeChildren)
+                {
+                    foreach (var child in Children)
+                        child.ExpandIfVisible(includeChildren);
+                }
+            }
+        }
     }
 }

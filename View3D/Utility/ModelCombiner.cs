@@ -5,14 +5,15 @@ using System.Linq;
 using System.Text;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
+using static CommonControls.ErrorListDialog.ErrorListViewModel;
 
 namespace View3D.Utility
 {
     public class ModelCombiner
     {
-        public bool CanCombine(List<Rmv2MeshNode> items, out List<string> errors)
+        public bool CanCombine(List<Rmv2MeshNode> items, out List<ErrorListDataItem> errors)
         {
-            errors = new List<string>();
+            errors = new List<ErrorListDataItem>();
             foreach (var outerLoopItem in items)
             {
                 foreach (var innerLoopItem in items)
@@ -23,37 +24,26 @@ namespace View3D.Utility
                     // Textures
                     if (!ValidateTextures(outerLoopItem.MeshModel, innerLoopItem.MeshModel, out string textureErrorMsg))
                     {
-                        errors.Add("Texture -> " + textureErrorMsg);
+                        //errors.Add("Texture -> " + textureErrorMsg);
+                        var errorItem = ErrorListDataItem.Error("Texture", textureErrorMsg);
+                        errors.Add(errorItem);
                     }
 
                     // Vertex type
                     if (outerLoopItem.MeshModel.Header.VertextType != innerLoopItem.MeshModel.Header.VertextType)
                     {
-                        errors.Add($"Vertext type -> {outerLoopItem.MeshModel.Header.ModelName} has a different vertex type then {innerLoopItem.MeshModel.Header.ModelName}");
+                        var errorItem = ErrorListDataItem.Error("VertexType", $"{outerLoopItem.MeshModel.Header.ModelName} has a different vertex type then {innerLoopItem.MeshModel.Header.ModelName}");
+                        errors.Add(errorItem);
                     }
 
                     // Alpha mode
                     if (outerLoopItem.MeshModel.AlphaSettings.Mode != innerLoopItem.MeshModel.AlphaSettings.Mode)
                     {
-                        errors.Add($"AlphaSettings Mode -> {outerLoopItem.MeshModel.Header.ModelName} has a different AlphaSettings mode then {innerLoopItem.MeshModel.Header.ModelName}");
+                        var errorItem = ErrorListDataItem.Error("AlphaSettings mode", $"{outerLoopItem.MeshModel.Header.ModelName} has a different AlphaSettings mode then {innerLoopItem.MeshModel.Header.ModelName}");
+                        errors.Add(errorItem);
                     }
-
-
-                    // Skeleton stuff
-                    //if(ValidateSkeletonInfo(outerLoopItem.Geometry, ))
                 }
-
-
-
-                //var skellyName = outerLoopItem.MeshModel.ParentSkeletonName;
-                //var indexList = outerLoopItem.Geometry.GetUniqeBlendIndices();
-
-
-                //var newSkeletonFile = _animLookUp.GetSkeletonFileFromName(modelNode.Model.Header.SkeletonName);
-                //config.ParnetModelSkeletonName = modelNode.Model.Header.SkeletonName;
-                //config.ParentModelBones = AnimatedBone.CreateFromSkeleton(newSkeletonFile);
             }
-
 
             return errors.Count == 0;
         }

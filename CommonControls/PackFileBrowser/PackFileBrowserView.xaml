@@ -23,8 +23,19 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <TextBox KeyboardNavigation.TabIndex="0" KeyboardNavigation.IsTabStop="True"  Grid.Row="0" Text="{Binding Filter.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" behaviors:TextBoxExtensions.Watermark="Search filter"/>
-        
+        <TextBox KeyboardNavigation.TabIndex="0" KeyboardNavigation.IsTabStop="True"  Grid.Row="0" Text="{Binding Filter.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" behaviors:TextBoxExtensions.Watermark="Search filter">
+            <TextBox.Resources>
+                <Style TargetType="{x:Type TextBox}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Filter.HasRegExError}" Value="true">
+                            <Setter Property="Background" Value="Red" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Resources>
+
+        </TextBox>
+
         <TreeView 
             Grid.Row="1" 
             behaviors:TreeViewExtension.SelectItemOnRightClick="True"

@@ -3,6 +3,7 @@ using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator;
 using Common;
 using CommonControls.Common;
+using CommonControls.ErrorListDialog;
 using CommonControls.MathViews;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
@@ -27,6 +28,7 @@ using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Utility;
+using static CommonControls.ErrorListDialog.ErrorListViewModel;
 
 namespace AnimationEditor.MountAnimationCreator
 {
@@ -349,10 +351,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public void BatchProcess()
         {
-            // Entry : For each mount item:
-            // Slot(id), status (OK, ERROR, MISSING IN RIDER), IsMountAnim, mount animation name, new rider animation name
-
-            var csvLog = new List<object>();
+            var inforResult = new List<ErrorListDataItem>();
             var mountSlots = MountLinkController.GetAllMountFragments();
 
             foreach (var mountFragment in mountSlots)
@@ -360,7 +359,8 @@ namespace AnimationEditor.MountAnimationCreator
                 var riderFragment = MountLinkController.GetRiderFragmentFromMount(mountFragment);
                 if (riderFragment == null)
                 {
-                    csvLog.Add(new { Status = "MISSING IN RIDER", MountSlot = mountFragment.Slot.ToString(),  MountAnimation = mountFragment.AnimationFile, RiderSlot = "", RiderAnimation = "" });
+                    var expectedRiderSlot = "RIDER_" + mountFragment.Slot.Value;
+                    inforResult.Add(ErrorListDataItem.Error(mountFragment.Slot.ToString(), "Animation (" + expectedRiderSlot + ") missing in rider fragment. Mount Anim = " + mountFragment.AnimationFile));
                     continue;
                 }
 
@@ -375,19 +375,18 @@ namespace AnimationEditor.MountAnimationCreator
                     var newRiderAnim = GenerateMountAnimation(mountAnim, _mount.Skeleton, riderAnim, _rider.Skeleton, _mountVertexOwner, _mountVertexes.First(), SelectedRiderBone.BoneIndex, SelectedRiderBone.ParentBoneIndex, AnimationSettings);
                     SaveAnimation(riderFragment.AnimationFile, newRiderAnim, _rider.Skeleton);
 
-                    csvLog.Add(new { Status = "OK", MountSlot = mountFragment.Slot.ToString(), MountAnimation = mountFragment.AnimationFile, RiderSlot = riderFragment.Slot.ToString(), RiderAnimation = riderFragment.AnimationFile });
+                    var riderInfo = $"Rider:{riderFragment.Slot.Value}, {riderFragment.AnimationFile}";
+                    var mountInfo = $"Mount:{mountFragment.Slot.Value}, {mountFragment.AnimationFile}";
+                    inforResult.Add(ErrorListDataItem.Ok(mountFragment.Slot.ToString(), $"{mountInfo} | {riderInfo}"));
                 }
                 catch
                 {
-                    csvLog.Add(new { Status = "ERROR", MountSlot = mountFragment.Slot.ToString(), MountAnimation = mountFragment.AnimationFile, RiderSlot = riderFragment.Slot.ToString(), RiderAnimation = riderFragment.AnimationFile});
+                    var riderInfo = $"RiderInfo:RIDER_{mountFragment.Slot.Value}, {riderFragment.AnimationFile}";
+                    inforResult.Add(ErrorListDataItem.Error(mountFragment.Slot.ToString(), "Error generating rider animation:" + riderInfo));
                 }
             }
 
-            var fileName = $"C:\\temp\\{Path.GetFileNameWithoutExtension(MountLinkController.SeletedRider.DisplayName)}_log.csv";
-            _logger.Here().Information("Batch export log can be found at - " + fileName);
-            using var writer = new StreamWriter(fileName);
-            using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-            csv.WriteRecords(csvLog);
+            ErrorListWindow.ShowDialog("Combine Errors", inforResult.OrderBy(x=>x.ErrorType).ToList());
         }
 
         public void CreateFragment()

@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Threading;
 
 namespace CommonControls.PackFileBrowser
@@ -25,8 +26,19 @@ namespace CommonControls.PackFileBrowser
             }
         }
 
-        List<string> _extentionFilter;
 
+        bool _hasRegExError =false;
+        public bool HasRegExError
+        {
+            get => _hasRegExError;
+            set
+            {
+                SetAndNotify(ref _hasRegExError, value);
+            }
+        }
+
+        List<string> _extentionFilter;
+        public int AutoExapandResultsAfterLimitedCount { get; set; } = -1;
 
         public PackFileFilter(ObservableCollection<TreeNode> nodes)
         {
@@ -51,10 +63,48 @@ namespace CommonControls.PackFileBrowser
             _filterTimer = null;
         }
 
+
         void Filter(string text)
         {
+            Regex expression = null;
+            try
+            {
+                expression = new Regex(text, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                HasRegExError = false;
+            }
+            catch
+            {
+                HasRegExError = true;
+                return;
+            }
+
             foreach (var item in _nodeCollection)
-                HasChildWithFilterMatch(item, text);
+                HasChildWithFilterMatch(item, expression);
+
+            if (AutoExapandResultsAfterLimitedCount != -1)
+            {
+                int visibleNodes = 0;
+                foreach (var item in _nodeCollection)
+                    visibleNodes += CountVisibleNodes(item);
+
+                if (visibleNodes <= AutoExapandResultsAfterLimitedCount)
+                {
+                    foreach (var item in _nodeCollection)
+                        item.ExpandIfVisible();
+                }
+            }
+        }
+
+        int CountVisibleNodes(TreeNode file)
+        {
+            if (file.NodeType == NodeType.File && file.IsVisible)
+                return 1;
+
+            var count = 0;
+            foreach (var child in file.Children)
+                count += CountVisibleNodes(child); 
+            
+            return count;
         }
 
         public void SetExtentions(List<string> extentions)
@@ -63,7 +113,7 @@ namespace CommonControls.PackFileBrowser
             Filter(FilterText);
         }
 
-        bool HasChildWithFilterMatch(TreeNode file, string filterText)
+        bool HasChildWithFilterMatch(TreeNode file, Regex expression)
         {
             if (file.NodeType == NodeType.File)
             {
@@ -83,7 +133,7 @@ namespace CommonControls.PackFileBrowser
 
                 if (hasValidExtention)
                 {
-                    if (string.IsNullOrWhiteSpace(filterText) || file.Name.Contains(filterText))
+                    if(expression.IsMatch(file.Name))
                     {
                         file.IsVisible = true;
                         return true;
@@ -94,7 +144,7 @@ namespace CommonControls.PackFileBrowser
             var hasChildMatch = false;
             foreach (var child in file.Children)
             {
-                if (HasChildWithFilterMatch(child, filterText))
+                if (HasChildWithFilterMatch(child, expression))
                     hasChildMatch = true; 
             }
 

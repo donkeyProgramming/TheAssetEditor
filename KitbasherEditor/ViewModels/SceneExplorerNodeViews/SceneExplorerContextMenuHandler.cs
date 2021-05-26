@@ -39,15 +39,14 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             if (CanMakeEditable(_activeNode))
             {
                 _contextMenu.Add(new ContextMenuItem("Make Editable", new RelayCommand(MakeEditable)));
-                //_contextMenu.Add(new ContextMenuItem("Make Editable as group", new RelayCommand(MakeEditableAsGroup)));
             }
 
             if (IsUngroupable(_activeNode))
                 _contextMenu.Add(new ContextMenuItem("Ungroup", new RelayCommand(Ungroup)));
 
-            if(IsLockable(_activeNode))
+            if (IsLockable(_activeNode))
                 _contextMenu.Add(new ContextMenuItem("Lock", new RelayCommand(ToggleLock)));
-            else if(IsUnlockable(_activeNode))
+            else if (IsUnlockable(_activeNode))
                 _contextMenu.Add(new ContextMenuItem("Unlock", new RelayCommand(ToggleLock)));
 
             if (IsRemovable(_activeNode))
@@ -58,7 +57,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             }
         }
 
-  
+
 
         bool CanMakeEditable(ISceneNode node)
         {
@@ -67,6 +66,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 if (node is Rmv2ModelNode)
                     return true;
                 if (node is Rmv2MeshNode)
+                    return true;
+                if (node is WsModelGroup)
                     return true;
             }
             return false;
@@ -78,7 +79,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 return true;
             else if (node.Parent is GroupNode g && g.IsUngroupable)
                 return true;
- 
+
             return false;
         }
 
@@ -111,7 +112,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         bool IsLockable(ISceneNode node)
         {
-            if (node.IsEditable == true )
+            if (node.IsEditable == true)
             {
                 if (node is ISelectable selectable)
                 {
@@ -187,22 +188,15 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
             if (node is Rmv2ModelNode modelNode)
             {
-                foreach (var lodChild in modelNode.Children)
-                {
-                    if (lodChild is Rmv2LodNode lodNode0)
-                    {
-                        var index = lodNode0.LodValue;
-                        foreach (var lodModel in lodNode0.Children)
-                        {
-                            if (index > 3)
-                                continue;
-                            (lodModel as Rmv2MeshNode).IsSelectable = true;
-                            EditableMeshNode.GetLodNodes()[0].AddObject(lodModel);
-                        }
-                        break;
-                    }
-                }
+                MakeModelNodeEditable(modelNode);
             }
+
+            if (node is WsModelGroup)
+            {
+                var child = node.Children.First();
+                MakeModelNodeEditable(child as Rmv2ModelNode);
+            }
+
             node.Parent.RemoveObject(node);
             node.ForeachNode(x =>
             {
@@ -210,6 +204,26 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 if (x is Rmv2MeshNode mesh)
                     mesh.IsSelectable = true;
             });
+        }
+
+        void MakeModelNodeEditable(Rmv2ModelNode modelNode)
+        {
+            foreach (var lodChild in modelNode.Children)
+            {
+                if (lodChild is Rmv2LodNode lodNode0)
+                {
+                    var index = lodNode0.LodValue;
+                    foreach (var lodModel in lodNode0.Children)
+                    {
+                        if (index > 3)
+                            continue;
+                        (lodModel as Rmv2MeshNode).IsSelectable = true;
+                        EditableMeshNode.GetLodNodes()[0].AddObject(lodModel);
+                    }
+                    break;
+                }
+            }
+       
         }
 
         void MakeEditableAsGroup()

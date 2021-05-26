@@ -19,7 +19,7 @@ Feature list:
 			Profile grow selection
 			Remove animation invert by fixing veiw matrix
 			Delete undo history
-			Select vertex with mouse click
+			Select vertex w ith mouse click
 			Make sure textures actually work
 			Skelton with good descriptive names 
 			Save packfile cleanup edited
@@ -233,15 +233,30 @@ Fit to skeleton -> allows for -1 in mapping better
 
 ------------------------------
 
-* Animations from multiple pack files
-* Animation packs not just name the same as default
-* Lots of minor animation bugs
-* Auto generate WS models completly
+[Done] Animations from multiple pack files
+[Done] Animation packs not just name the same as default
+[Done] Lots of minor animation bugs
+[Done] Auto generate WS models completly
+[Done] Ws model make editable 
+[Done] Error/warning window for combining meshes and fragment/anim generation 
+[Done] RegEx for file pack file browser
+[Done] Auto expand OpenFile dialog results when less then 50 hits
+[Done] View Tech skeletons
+[Done] New version check
+
+-> Remap -1 error box
+-> Move mesh fit out of remapping 
+-> 
+
 -> Create fragment/bin/animpack
 	-> View/Edit? Fuck...
 	-> Validate files found
--> New version check
--> Error/warning window for combining meshes and fragment/anim generation 
 -> Import multiple ref
--> Ws model make editable 
+-> Make loop work for animations in mount tool
+-> Make kitbash tool work from tool list 
+
+
+-> Extract selected mesh 
+-> Speed up mesh grow/split
+
 

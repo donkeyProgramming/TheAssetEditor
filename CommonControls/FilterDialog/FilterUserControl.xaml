@@ -17,7 +17,7 @@
     <DockPanel >
         <DockPanel DockPanel.Dock="Top" Margin="0,5,0,5">
             <Label  DockPanel.Dock="Left" Content="Filter:" VerticalContentAlignment="Center"/>
-            <TextBox x:Name="SearchTextBox" Height="20" behaviors:TextBoxExtensions.Watermark="SSearch filter, regEx supported"/>
+            <TextBox x:Name="SearchTextBox" Height="20" behaviors:TextBoxExtensions.Watermark="Search filter, regEx supported"/>
         </DockPanel>
 
         <ContentPresenter DockPanel.Dock="Top" Content="{Binding InnerContent, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" />

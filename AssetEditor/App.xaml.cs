@@ -1,4 +1,5 @@
-﻿using Common;
+﻿using AssetEditor.Services;
+using Common;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,8 @@ namespace AssetEditor
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            VersionChecker.CheckVersion("v0.8");
+
             Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(DispatcherUnhandledExceptionHandler);
 
             _config = new DependencyInjectionConfig();

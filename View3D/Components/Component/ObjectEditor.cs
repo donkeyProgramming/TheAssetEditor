@@ -14,6 +14,7 @@ using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Services;
 using View3D.Utility;
+using static CommonControls.ErrorListDialog.ErrorListViewModel;
 using static View3D.Commands.Object.GroupObjectsCommand;
 
 namespace View3D.Components.Component
@@ -63,7 +64,7 @@ namespace View3D.Components.Component
             }
         }
 
-        public bool CombineMeshes(ObjectSelectionState objectSelectionState, out List<string> errorMessages)
+        public bool CombineMeshes(ObjectSelectionState objectSelectionState, out List<ErrorListDataItem> errorMessages)
         {
             ModelCombiner modelValidator = new ModelCombiner();
             var objs = objectSelectionState.SelectedObjects().Where(x => x is Rmv2MeshNode).Select(x => x as Rmv2MeshNode);
