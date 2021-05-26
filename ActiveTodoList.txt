@@ -181,8 +181,15 @@ bone mapper:
 
 WsModel auto generate when possible
 Wsmodel make editable context menu
-
+Extract animated pose to mesh
 auto merge meshes that can be merged 
+Cooler metafile editor
+Skeleton editor
+Support for more game
+Anim prop editor 
+Clean up animation system
+Flip the view 
+make animations easier to work wiot
 
 [DONE]Key to only view selected
 [DONE]Shift to add to selection
@@ -208,6 +215,7 @@ Fit to skeleton -> allows for -1 in mapping better
 
 
 
+
 * Press key to toggle "view only selected" (space)
 * Shift changed to add to selected, instead of being an or operation
 * Right clicking on mesh in a group gives the option of ungrouping it
@@ -223,20 +231,17 @@ Fit to skeleton -> allows for -1 in mapping better
 * "Tutorials" created. Some help would be greatly appreciated!  https://tw-modding.com/index.php/Tutorial:AssetEditor
 
 
+------------------------------
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+* Animations from multiple pack files
+* Animation packs not just name the same as default
+* Lots of minor animation bugs
+* Auto generate WS models completly
+-> Create fragment/bin/animpack
+	-> View/Edit? Fuck...
+	-> Validate files found
+-> New version check
+-> Error/warning window for combining meshes and fragment/anim generation 
+-> Import multiple ref
+-> Ws model make editable 
 

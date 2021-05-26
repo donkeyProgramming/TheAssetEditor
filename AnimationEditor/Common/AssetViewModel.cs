@@ -15,6 +15,7 @@ using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Services;
 using View3D.Utility;
+using static CommonControls.Services.SkeletonAnimationLookUpHelper;
 
 namespace AnimationEditor.Common.ReferenceModel
 {
@@ -51,8 +52,8 @@ namespace AnimationEditor.Common.ReferenceModel
         string _skeletonName;
         public string SkeletonName { get => _skeletonName; set => SetAndNotify(ref _skeletonName, value); }
 
-        string _animationName;
-        public string AnimationName { get => _animationName; set => SetAndNotify(ref _animationName, value); }
+        AnimationReference _animationName;
+        public AnimationReference AnimationName { get => _animationName; set => SetAndNotify(ref _animationName, value); }
 
 
         bool _showMesh = true;
@@ -99,8 +100,6 @@ namespace AnimationEditor.Common.ReferenceModel
                 _logger.Here().Error("Unable to load model");
                 return;
             }
-
-        
 
             for (int i = 0; i < _meshNodes.Count; i++)
                 _meshNodes[i].Parent.RemoveObject(_meshNodes[i]);
@@ -219,24 +218,26 @@ namespace AnimationEditor.Common.ReferenceModel
             _skeletonSceneNode.SelectedBoneIndex = boneIndex;
         }
 
-        public void SetAnimation(PackFile file)
+        public void SetAnimation(AnimationReference animationReference)
         {
-            if (file != null)
+            if (animationReference != null)
             {
+                var file = _pfs.FindFile(animationReference.AnimationFile, animationReference.Container) as PackFile;
+                AnimationName = animationReference;
                 var animation = AnimationFile.Create(file);
-                SetAnimationClip(new AnimationClip(animation), _pfs.GetFullPath(file));
+                SetAnimationClip(new AnimationClip(animation), animationReference);
             }
             else
             {
-                SetAnimationClip(null, "");
+                SetAnimationClip(null, null);
             }
         }
 
-        public void SetAnimationClip(AnimationClip clip, string animationName)
+        public void SetAnimationClip(AnimationClip clip, AnimationReference animationReference)
         {
             var frame = Player.CurrentFrame;
             AnimationClip = clip;
-            AnimationName = animationName;
+            AnimationName = animationReference;
             Player.SetAnimation(AnimationClip, Skeleton);
             AnimationChanged?.Invoke(clip);
             Player.CurrentFrame = frame;

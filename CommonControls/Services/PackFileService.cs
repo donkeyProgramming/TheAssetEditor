@@ -307,6 +307,7 @@ namespace CommonControls.Services
         // ---------------------------
         public void UnloadPackContainer(PackFileContainer pf)
         {
+            _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, pf);
             Database.RemovePackFile(pf);
         }
 
@@ -370,6 +371,8 @@ namespace CommonControls.Services
         public void Save(PackFileContainer pf, BinaryWriter writer)
         {
             pf.SaveToByteArray(writer);
+            _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, pf);
+            _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pf);
         }
 
         public void Save(PackFileContainer pf, string path, bool createBackup)
@@ -384,8 +387,7 @@ namespace CommonControls.Services
             {
                 using (BinaryWriter writer = new BinaryWriter(memoryStream))
                     Save(pf, writer);
-
-                
+   
                 File.WriteAllBytes(path, memoryStream.ToArray());
                 pf.UpdateAllDataSourcesAfterSave();
             }

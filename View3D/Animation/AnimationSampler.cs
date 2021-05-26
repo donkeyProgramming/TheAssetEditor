@@ -80,6 +80,8 @@ namespace View3D.Animation
                 if (animationClips != null)
                 {
                     int maxFrames = animationClips[0].DynamicFrames.Count() - 1;
+                    if (maxFrames < 0)
+                        maxFrames = 0;
                     float frameWithLeftover = maxFrames * clampedT;
                     float clampedFrame = (float)Math.Floor(frameWithLeftover);
 

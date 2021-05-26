@@ -26,7 +26,7 @@ namespace AnimationEditor.MountAnimationCreator
             ReferenceModelView.Data.IsSelectable = true;
             var propAsset = Scene.AddCompnent(new AssetViewModel(_pfs, "NewAnim", Color.Red, Scene));
             Player.RegisterAsset(propAsset);
-            Editor = new Editor(_pfs, MainModelView.Data, ReferenceModelView.Data, propAsset, Scene);
+            Editor = new Editor(_pfs, _skeletonHelper, MainModelView.Data, ReferenceModelView.Data, propAsset, Scene);
         }
     }
 
@@ -108,6 +108,47 @@ namespace AnimationEditor.MountAnimationCreator
 
             creator.CreateEmptyEditor(editorView);
         }
+
+        public static void CreateRaptorAndHu01b(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        {
+            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+
+            editorView.MainInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_princess_campaign_01.variantmeshdefinition") as PackFile,
+                Animation = packfileService.FindFile(@"animations\battle\humanoid01b\rider\raptor03\sword_and_shield\locomotion\hu1b_elf_rp3_sws_rider1_run_02.anim") as PackFile,
+            };
+
+            editorView.RefInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\def_cold_one.variantmeshdefinition") as PackFile,
+                Animation = packfileService.FindFile(@"animations\battle\raptor03\locomotion\rp3_run_02.anim") as PackFile,
+            };
+
+            creator.CreateEmptyEditor(editorView);
+        }
+
+        public static void CreateRaptorAndHu02(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        {
+            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+
+            editorView.MainInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\grn_savage_orc_base.variantmeshdefinition") as PackFile,
+                //Animation = packfileService.FindFile(@"animations\battle\humanoid01b\rider\raptor03\sword_and_shield\locomotion\hu1b_elf_rp3_sws_rider1_run_02.anim") as PackFile,
+            };
+
+            editorView.RefInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\def_cold_one.variantmeshdefinition") as PackFile,
+                Animation = packfileService.FindFile(@"animations\battle\raptor03\locomotion\rp3_run_02.anim") as PackFile,
+            };
+
+            creator.CreateEmptyEditor(editorView);
+        }
+
+
+        
     }
 }
 

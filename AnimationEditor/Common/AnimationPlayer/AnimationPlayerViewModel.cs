@@ -122,8 +122,8 @@ namespace AnimationEditor.Common.AnimationPlayer
             if (currentFrame == SelectedMainAnimation.Asset.Player.FrameCount())
             {
                 //SetAnimationFirstFrame();
-                if (LoopAnimation)
-                    TogleAnimationPausePlay();
+                //if (LoopAnimation)
+                //    TogleAnimationPausePlay();
             }
         }
 
@@ -180,7 +180,7 @@ namespace AnimationEditor.Common.AnimationPlayer
             void UpdateInfo()
             {
                 IsActive = true;
-                AnimationName = Asset.AnimationName;
+                AnimationName = Asset.AnimationName?.AnimationFile;
                 SlotName = Asset.Description;
                 MaxFrames = Asset.Player.FrameCount();
             }

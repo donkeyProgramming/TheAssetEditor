@@ -100,7 +100,7 @@ namespace View3D.Animation
                 if (_animationClips == null)
                     return 0;
 
-                return (int)Math.Round((_timeSinceStart.TotalMilliseconds / GetAnimationLengthMs()) * _animationClips[0].DynamicFrames.Count()); 
+                return (int)Math.Round((_timeSinceStart.TotalMilliseconds / GetAnimationLengthMs()) * (_animationClips[0].DynamicFrames.Count() - 1) ) + 1; 
             }
             set
             {
@@ -110,9 +110,15 @@ namespace View3D.Animation
                 if (_animationClips != null)
                 {
                     var frameCount = FrameCount();
+
+                    if (value < 0)
+                        value = 0;
+                    else if (value > frameCount)
+                        value = frameCount;
+
                     if (frameCount > 0)
                     {
-                        var framePercentage = (value / ((float)_animationClips[0].DynamicFrames.Count())) * GetAnimationLengthMs();
+                        var framePercentage = (value / ((float)frameCount)) * GetAnimationLengthMs();
                         _timeSinceStart = TimeSpan.FromMilliseconds(framePercentage);
                     }
 
@@ -163,16 +169,20 @@ namespace View3D.Animation
         public void Update(GameTime gameTime)
         {
             float animationLengthMs = GetAnimationLengthMs();
-
             if (animationLengthMs != 0 && IsPlaying && IsEnabled)
             {
                 _timeSinceStart += gameTime.ElapsedGameTime;
                 if (_timeSinceStart.TotalMilliseconds >= animationLengthMs)
                 {
                     if (LoopAnimation)
+                    {
                         _timeSinceStart = TimeSpan.FromSeconds(0);
+                    }
                     else
+                    {
+                        _timeSinceStart = TimeSpan.FromMilliseconds(animationLengthMs);
                         IsPlaying = false;
+                    }
                 }
 
                 if (ExternalAnimationRef != null)

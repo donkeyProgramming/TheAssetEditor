@@ -186,7 +186,7 @@ namespace AnimationEditor.PropCreator
             Data.CopyMeshFromOther(MainAsset, false);
             var remapping = CreateBoneMapping(Data.Skeleton, MainAsset.Skeleton);
             Data.OnlyShowMeshRelatedToBones(selectedBoneIds, remapping, newSkel.Header.SkeletonName);
-            Data.SetAnimationClip(newAnim, "PropAnim");
+            Data.SetAnimationClip(newAnim, null);
 
             // Move skeleton to 0,0,0
             

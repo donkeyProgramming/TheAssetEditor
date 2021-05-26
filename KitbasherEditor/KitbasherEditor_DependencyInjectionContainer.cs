@@ -47,5 +47,11 @@ namespace KitbasherEditor
             var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu17\skv\skv_clan_rats\head\skv_clan_rats_head_04.rigid_model_v2");
             creator.OpenFile(packFile);
         }
+
+        public static void CreatePrincessBody(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        {
+            var packFile = packfileService.FindFile(@"variantmeshes/wh_variantmodels/hu1b/hef/hef_princess/hef_princess_body_01.rigid_model_v2");
+            creator.OpenFile(packFile);
+        }
     }
 }

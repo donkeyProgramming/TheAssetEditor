@@ -15,7 +15,7 @@ namespace CommonControls.Services
     public class SkeletonAnimationLookUpHelper 
     {
         ILogger _logger = Logging.Create<SkeletonAnimationLookUpHelper>();
-        Dictionary<string, ObservableCollection<string>> _skeletonNameToAnimationMap = new Dictionary<string, ObservableCollection<string>>();
+        Dictionary<string, ObservableCollection<AnimationReference>> _skeletonNameToAnimationMap = new Dictionary<string, ObservableCollection<AnimationReference>>();
 
         public ObservableCollection<string> SkeletonFileNames = new ObservableCollection<string>();
 
@@ -25,38 +25,48 @@ namespace CommonControls.Services
 
         public void LoadFromPackFileContainer(PackFileService pfs, PackFileContainer packFileContainer)
         {
-            _logger.Here().Information("Finding all animations");
-
-            var AllAnimations = pfs.FindAllWithExtention(".anim", packFileContainer);
-            _logger.Here().Information("Animations found =" + AllAnimations.Count());
-
-            foreach (var animation in AllAnimations)
+            var allAnimations = pfs.FindAllWithExtentionIncludePaths(".anim", packFileContainer);
+            foreach (var animation in allAnimations)
             {
                 try
                 {
-                    var animationSkeletonName = AnimationFile.GetAnimationHeader(animation).SkeletonName;
+                    var animationSkeletonName = AnimationFile.GetAnimationHeader(animation.Item2).SkeletonName;
                     if (_skeletonNameToAnimationMap.ContainsKey(animationSkeletonName) == false)
-                        _skeletonNameToAnimationMap.Add(animationSkeletonName, new ObservableCollection<string>());
+                        _skeletonNameToAnimationMap.Add(animationSkeletonName, new ObservableCollection<AnimationReference>());
 
-                    _skeletonNameToAnimationMap[animationSkeletonName].Add(pfs.GetFullPath(animation, packFileContainer));
+                    _skeletonNameToAnimationMap[animationSkeletonName].Add(new AnimationReference(pfs.GetFullPath(animation.Item2, packFileContainer), packFileContainer));
                 }
                 catch (Exception e)
                 {
-                    _logger.Here().Error("Parsing failed for " + pfs.GetFullPath(animation, packFileContainer) + "\n" + e.ToString());
+                    _logger.Here().Error("Parsing failed for " + pfs.GetFullPath(animation.Item2, packFileContainer) + "\n" + e.ToString());
                 }
             }
 
+            var allNormalSkeletons = allAnimations.Where(x => x.Item1.Contains("animations\\skeletons", StringComparison.InvariantCultureIgnoreCase));
+            foreach (var item in allNormalSkeletons)
+                SkeletonFileNames.Add(item.Item1);
 
-            _logger.Here().Information("Finding all skeletons");
+            var techSkeletons = allAnimations.Where(x => x.Item1.Contains("tech", StringComparison.InvariantCultureIgnoreCase));
+            foreach (var item in techSkeletons)
+                SkeletonFileNames.Add(item.Item1);
 
-            var allFilesInFolder = pfs.FindAllFilesInDirectory("animations\\skeletons", packFileContainer);
-            var newItems = allFilesInFolder.Where(x => Path.GetExtension(x.Name) == ".anim").Select(x => pfs.GetFullPath(x, packFileContainer)).ToList();
-            foreach (var item in newItems)
-                SkeletonFileNames.Add(item);
-
+            _logger.Here().Information("Animations found =" + allAnimations.Count());
             _logger.Here().Information("Skeletons found =" + SkeletonFileNames.Count());
+        }
 
-            _logger.Here().Information("Finding all done");
+        public void UnloadAnimationFromContainer(PackFileService pfs, PackFileContainer packFileContainer)
+        {
+            int itemsRemoved = 0;
+            var s = _skeletonNameToAnimationMap.Select(skeleton => (skeleton.Key, skeleton.Value.Where(animations => animations.Container == packFileContainer))).ToList();
+            foreach (var key in s)
+            {
+                var copy = key.Item2.Select(x => x).ToList();
+                foreach (var toRemove in copy)
+                {
+                    _skeletonNameToAnimationMap[key.Key].Remove(toRemove);
+                    itemsRemoved++;
+                }
+            }
         }
 
         public List<string> GetAllSkeletonNames()
@@ -64,10 +74,10 @@ namespace CommonControls.Services
             return SkeletonFileNames.Select(x => Path.GetFileNameWithoutExtension(x)).ToList();
         }
 
-        public ObservableCollection<string> GetAnimationsForSkeleton(string skeletonName)
+        public ObservableCollection<AnimationReference> GetAnimationsForSkeleton(string skeletonName)
         {
             if (_skeletonNameToAnimationMap.ContainsKey(skeletonName) == false)
-                _skeletonNameToAnimationMap.Add(skeletonName, new ObservableCollection<string>());
+                _skeletonNameToAnimationMap.Add(skeletonName, new ObservableCollection<AnimationReference>());
             return _skeletonNameToAnimationMap[skeletonName];
         }
 
@@ -85,10 +95,38 @@ namespace CommonControls.Services
             return null;
         }
 
+        public AnimationReference FindAnimationRefFromPackFile(PackFile animation, PackFileService pfs)
+        {
+            var fullPath = pfs.GetFullPath(animation);
+            foreach (var entry in _skeletonNameToAnimationMap.Values)
+            {
+                foreach (var s in entry)
+                {
+                    var res = String.Compare(s.AnimationFile, fullPath, StringComparison.InvariantCultureIgnoreCase);
+                    if (res == 0)
+                        return s;
+                }
+            }
+
+            return null;
+        }
+
         public class AnimationReference
-        { 
+        {
+            public AnimationReference(string animationFile, PackFileContainer container)
+            {
+                AnimationFile = animationFile;
+                Container = container;
+            }
             public string AnimationFile { get; set; }
             public PackFileContainer Container { get; set; }
+
+            public override string ToString()
+            {
+                return $"[{Container.Name}] {AnimationFile}";
+             }
         }
+
+
     }
 }

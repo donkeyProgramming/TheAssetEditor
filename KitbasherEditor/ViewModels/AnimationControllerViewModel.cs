@@ -16,6 +16,7 @@ using View3D.Components.Component;
 using View3D.SceneNodes;
 using View3D.Utility;
 using static CommonControls.FilterDialog.FilterUserControl;
+using static CommonControls.Services.SkeletonAnimationLookUpHelper;
 
 namespace KitbasherEditor.ViewModels
 {
@@ -30,8 +31,8 @@ namespace KitbasherEditor.ViewModels
         string _headerText = "No animation selected";
         public string HeaderText { get { return _headerText; } set { SetAndNotify(ref _headerText, value); } }
 
-        ObservableCollection<string> _animationList = new ObservableCollection<string>();
-        public ObservableCollection<string> AnimationsForCurrentSkeleton { get { return _animationList; } set { SetAndNotify(ref _animationList, value); } }
+        ObservableCollection<AnimationReference> _animationList = new ObservableCollection<AnimationReference>();
+        public ObservableCollection<AnimationReference> AnimationsForCurrentSkeleton { get { return _animationList; } set { SetAndNotify(ref _animationList, value); } }
 
         ObservableCollection<string> _skeletonList = new ObservableCollection<string>();
         public ObservableCollection<string> SkeletonList { get { return _skeletonList; } set { SetAndNotify(ref _skeletonList, value); } }
@@ -40,8 +41,8 @@ namespace KitbasherEditor.ViewModels
         public string SelectedSkeleton { get { return _selectedSkeleton; } set { SetAndNotify(ref _selectedSkeleton, value); SkeletonChanged(_selectedSkeleton); } }
 
 
-        string _selectedAnimation;
-        public string SelectedAnimation { get { return _selectedAnimation; } set { SetAndNotify(ref _selectedAnimation, value); AnimationChanged(_selectedAnimation); } }
+        AnimationReference _selectedAnimation;
+        public AnimationReference SelectedAnimation { get { return _selectedAnimation; } set { SetAndNotify(ref _selectedAnimation, value); AnimationChanged(_selectedAnimation); } }
 
         public OnSeachDelegate FilterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 
@@ -146,7 +147,7 @@ namespace KitbasherEditor.ViewModels
                 SelectedAnimation = null;
 
                 // Try to set a default animation
-                var defaultIdleAnim = AnimationsForCurrentSkeleton.FirstOrDefault(x => x.Contains("stand_idle"));
+                var defaultIdleAnim = AnimationsForCurrentSkeleton.FirstOrDefault(x => x.AnimationFile.Contains("stand_idle"));
                 if (defaultIdleAnim != null)
                     AnimationChanged(defaultIdleAnim);
             }
@@ -157,7 +158,7 @@ namespace KitbasherEditor.ViewModels
             HeaderText = "";
             _skeletonPackFile = null;
             Skeleton = null;
-            AnimationsForCurrentSkeleton = new ObservableCollection<string>();
+            AnimationsForCurrentSkeleton = new ObservableCollection<AnimationReference>();
             if (!string.IsNullOrWhiteSpace(selectedSkeletonPath))
             {
                 _skeletonPackFile = _packFileService.FindFile(selectedSkeletonPath) as PackFile;
@@ -177,11 +178,11 @@ namespace KitbasherEditor.ViewModels
             SelectedAnimation = null;
         }
 
-        private void AnimationChanged(string selectedAnimationPath)
+        private void AnimationChanged(AnimationReference selectedAnimation)
         {
             Animation = null;
-            if (string.IsNullOrWhiteSpace(selectedAnimationPath) == false)
-                Animation = _packFileService.FindFile(selectedAnimationPath) as PackFile;
+            if (selectedAnimation != null)
+                Animation = _packFileService.FindFile(selectedAnimation.AnimationFile, selectedAnimation.Container) as PackFile;
 
             if (Animation != null)
                 HeaderText = _skeletonPackFile.Name + " - " + Animation.Name;

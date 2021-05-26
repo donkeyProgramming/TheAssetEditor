@@ -84,9 +84,12 @@ namespace AnimationEditor.MountAnimationCreator
         AssetViewModel _mount;
         PackFileService _pfs;
 
-        public MountLinkController(PackFileService pfs, AssetViewModel rider, AssetViewModel mount)
+        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+
+        public MountLinkController(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, AssetViewModel mount)
         {
             _pfs = pfs;
+            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _rider = rider;
             _mount = mount;
 
@@ -145,8 +148,9 @@ namespace AnimationEditor.MountAnimationCreator
             var lookUp = "RIDER_" + value.Entry.Slot.Value;
             SelectedRiderTag = PossibleRiderTags.FirstOrDefault(x => x.Entry.Slot.Value == lookUp);
             
-            var file = _pfs.FindFile(value.Entry.AnimationFile);
-            _mount.SetAnimation(file as PackFile);
+            var file = _pfs.FindFile(value.Entry.AnimationFile) as PackFile;
+            var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file, _pfs);
+            _mount.SetAnimation(animationRef);
         }
 
         private void RiderTagSelected(SlotDisplayItem value)
@@ -154,8 +158,9 @@ namespace AnimationEditor.MountAnimationCreator
             if (value == null)
                 return;
 
-            var file = _pfs.FindFile(value.Entry.AnimationFile);
-            _rider.SetAnimation(file as PackFile);
+            var file = _pfs.FindFile(value.Entry.AnimationFile) as PackFile;
+            var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file, _pfs);
+            _rider.SetAnimation(animationRef);
         }
 
 

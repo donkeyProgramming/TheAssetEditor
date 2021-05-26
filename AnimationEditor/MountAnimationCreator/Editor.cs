@@ -124,7 +124,7 @@ namespace AnimationEditor.MountAnimationCreator
         Rmv2MeshNode _mountVertexOwner;
         PackFileService _pfs;
 
-        public Editor(PackFileService pfs, AssetViewModel rider, AssetViewModel mount, AssetViewModel newAnimation, IComponentManager componentManager)
+        public Editor(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, AssetViewModel mount, AssetViewModel newAnimation, IComponentManager componentManager)
         {
             _pfs = pfs;
             NewAnimation = newAnimation;
@@ -140,7 +140,7 @@ namespace AnimationEditor.MountAnimationCreator
 
             _selectionManager = componentManager.GetComponent<SelectionManager>();
 
-            MountLinkController = new MountLinkController(pfs, rider, mount);
+            MountLinkController = new MountLinkController(pfs, skeletonAnimationLookUpHelper,  rider, mount);
 
         }
 
@@ -211,7 +211,7 @@ namespace AnimationEditor.MountAnimationCreator
 
             // Apply
             NewAnimation.CopyMeshFromOther(_rider, true);
-            NewAnimation.SetAnimationClip(newRiderAnim, Path.GetFileName(_rider.AnimationName));
+            NewAnimation.SetAnimationClip(newRiderAnim, new SkeletonAnimationLookUpHelper.AnimationReference("New mount animation", null));
             NewAnimation.IsSkeletonVisible = DisplayGeneratedRiderSkeleton;
             UpdateCanSaveAndPreviewStates();
         }
@@ -233,7 +233,7 @@ namespace AnimationEditor.MountAnimationCreator
             // Resample
             if (animationSettings.FitAnimation)
                 newRiderAnim = View3D.Animation.AnimationEditor.ReSample(riderSkeleton, newRiderAnim, mountAnimation.DynamicFrames.Count);
-
+            newRiderAnim.StaticFrame = null;
             float mountScale = (float)animationSettings.Scale.Value;
             MeshAnimationHelper mountVertexPositionResolver = new MeshAnimationHelper(mountMesh, Matrix.CreateScale(mountScale));
 
@@ -247,11 +247,14 @@ namespace AnimationEditor.MountAnimationCreator
 
                 // Make sure the rider moves along in the world with the same speed as the mount
                 var mountMovement = mountFrame.BoneTransforms[0].Translation;
-                newRiderAnim.DynamicFrames[i].Position[0] = mountMovement; ;// mountAnimation.DynamicFrames[i].Position[0];
+                newRiderAnim.DynamicFrames[i].Position[0] = mountAnimation.DynamicFrames[i].Position[0];
                 newRiderAnim.DynamicFrames[i].Rotation[0] = Quaternion.Identity;
 
-
-               // continue;
+                //newRiderAnim.DynamicFrames[i].Position[riderBoneIndex] = Vector3.Zero;
+                //newRiderAnim.DynamicFrames[i].Rotation[riderBoneIndex] = Quaternion.Identity;
+                //
+                //continue;
+                // continue;
                 // Keep the original rotation of the rider animation
                 var origianlRotation = Quaternion.Identity;
                 if (animationSettings.KeepRiderRotation)
@@ -315,7 +318,7 @@ namespace AnimationEditor.MountAnimationCreator
         
         public void SaveAnimation()
         {
-            SaveAnimation(_rider.AnimationName, NewAnimation.AnimationClip, NewAnimation.Skeleton);
+            SaveAnimation(_rider.AnimationName.AnimationFile, NewAnimation.AnimationClip, NewAnimation.Skeleton);
         }
 
         void SaveAnimation(string riderAnimationName, AnimationClip clip, GameSkeleton skeleton)
@@ -386,5 +389,8 @@ namespace AnimationEditor.MountAnimationCreator
             using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
             csv.WriteRecords(csvLog);
         }
+
+        public void CreateFragment()
+        { }
     }
 }

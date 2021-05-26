@@ -32,6 +32,7 @@ namespace AnimationEditor.PropCreator.ViewModels
     public abstract class BaseAnimationViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
         protected PackFileService _pfs;
+        protected SkeletonAnimationLookUpHelper _skeletonHelper;
         public string DisplayName { get; set; } = "Anim.Prop Creator";
         public IPackFile MainFile { get; set; }
 
@@ -54,6 +55,7 @@ namespace AnimationEditor.PropCreator.ViewModels
         public BaseAnimationViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, string headerAsset0, string headerAsset1)
         {
             _pfs = pfs;
+            _skeletonHelper = skeletonHelper;
 
             Scene = new SceneContainer();
             Scene.Components.Add(new FpsComponent(Scene));
@@ -88,13 +90,15 @@ namespace AnimationEditor.PropCreator.ViewModels
             if (MainInput != null)
             {
                 MainModelView.Data.SetMesh(MainInput.Mesh);
-                MainModelView.Data.SetAnimation(MainInput.Animation);
+                if(MainInput.Animation != null)
+                    MainModelView.Data.SetAnimation(_skeletonHelper.FindAnimationRefFromPackFile(MainInput.Animation, _pfs));
             }
 
             if (RefInput != null)
             {
                 ReferenceModelView.Data.SetMesh(RefInput.Mesh);
-                ReferenceModelView.Data.SetAnimation(RefInput.Animation);
+                if(RefInput.Animation != null)
+                    ReferenceModelView.Data.SetAnimation(_skeletonHelper.FindAnimationRefFromPackFile(RefInput.Animation, _pfs));
             }
 
             Initialize();

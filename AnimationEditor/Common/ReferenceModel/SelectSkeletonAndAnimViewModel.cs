@@ -10,6 +10,7 @@ using System.Text;
 using View3D.Animation;
 using View3D.Utility;
 using static CommonControls.FilterDialog.FilterUserControl;
+using static CommonControls.Services.SkeletonAnimationLookUpHelper;
 
 namespace AnimationEditor.Common.ReferenceModel
 {
@@ -19,8 +20,8 @@ namespace AnimationEditor.Common.ReferenceModel
         AssetViewModel _data;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
-        ObservableCollection<string> _animationList = new ObservableCollection<string>();
-        public ObservableCollection<string> AnimationsForCurrentSkeleton { get { return _animationList; } set { SetAndNotify(ref _animationList, value); } }
+        ObservableCollection<AnimationReference> _animationList = new ObservableCollection<AnimationReference>();
+        public ObservableCollection<AnimationReference> AnimationsForCurrentSkeleton { get { return _animationList; } set { SetAndNotify(ref _animationList, value); } }
 
         ObservableCollection<string> _skeletonList = new ObservableCollection<string>();
         public ObservableCollection<string> SkeletonList { get { return _skeletonAnimationLookUpHelper.SkeletonFileNames; } set { SetAndNotify(ref _skeletonList, value); } }
@@ -30,8 +31,8 @@ namespace AnimationEditor.Common.ReferenceModel
         public string SkeletonName { get => _data.SkeletonName; set { SetAndNotify(ref _skeletonName, value); SkeletonChanged(value); } }
 
 
-        string _selectedAnimation;
-        public string SelectedAnimation { get => _data.AnimationName; set { SetAndNotify(ref _selectedAnimation, value); AnimationChanged(value); } }
+        AnimationReference _selectedAnimation;
+        public AnimationReference SelectedAnimation { get => _data.AnimationName; set { SetAndNotify(ref _selectedAnimation, value); AnimationChanged(value); } }
 
         public OnSeachDelegate FiterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 
@@ -69,20 +70,15 @@ namespace AnimationEditor.Common.ReferenceModel
             }
 
             _data.Skeleton = null;
-            AnimationsForCurrentSkeleton = new ObservableCollection<string>();
+            AnimationsForCurrentSkeleton = new ObservableCollection<AnimationReference>();
         }
 
-        private void AnimationChanged(string selectedAnimationPath)
+        private void AnimationChanged(AnimationReference animationReference)
         {
-            if (string.IsNullOrWhiteSpace(selectedAnimationPath) == false)
-            {
-                var animFile = _pfs.FindFile(selectedAnimationPath) as PackFile;
-                _data.SetAnimation(animFile);
-            }
+            if (animationReference != null)
+                _data.SetAnimation(animationReference);
             else
-            {
                 _data.SetAnimation(null);
-            }
         }
     }
 }

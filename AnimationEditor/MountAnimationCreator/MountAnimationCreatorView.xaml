@@ -69,10 +69,8 @@
                     ItemsSource="{Binding MountLinkController.PossibleRiderTags, UpdateSourceTrigger=PropertyChanged}"
                     SelectedItem="{Binding MountLinkController.SelectedRiderTag}"/>
 
-                <Label Grid.Column="0" Grid.Row="4" Content="Auto selected rider anim"/>
-                <Label Grid.Column="1" Grid.Row="4" Content=":"/>
                 <Button  Grid.Column="2" Grid.Row="4"  Click="{s:MethodBinding BatchProcess}" Content="Generate and save all" IsEnabled="{Binding MountLinkController.CanBatchProcess, UpdateSourceTrigger=PropertyChanged}"/>
-
+                <Button  Grid.Column="2" Grid.Row="5"  Click="{s:MethodBinding CreateFragment}" Content="Create fragment" IsEnabled="{Binding MountLinkController.CanBatchProcess, UpdateSourceTrigger=PropertyChanged}"/>
 
             </Grid>
         </GroupBox>
