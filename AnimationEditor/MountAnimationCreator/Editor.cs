@@ -107,7 +107,7 @@ namespace AnimationEditor.MountAnimationCreator
             set { SetAndNotify(ref _useSavePrefix, value); }
         }
 
-        string _savePrefixText = "";
+        string _savePrefixText = "New_";
         public string SavePrefixText
         {
             get { return _savePrefixText; }
@@ -323,6 +323,9 @@ namespace AnimationEditor.MountAnimationCreator
             SaveAnimation(_rider.AnimationName.AnimationFile, NewAnimation.AnimationClip, NewAnimation.Skeleton);
         }
 
+        public void AddAnimationToFragment()
+        { }
+
         void SaveAnimation(string riderAnimationName, AnimationClip clip, GameSkeleton skeleton)
         {
             var animFile = clip.ConvertToFileFormat(skeleton);
@@ -351,6 +354,17 @@ namespace AnimationEditor.MountAnimationCreator
 
         public void BatchProcess()
         {
+            // Bin and animpack
+            // Fragment
+            // Animations
+
+            // Rider fragment
+            // Mount Fragment
+            // New fragment
+
+            var res = BatchProcessOptionsWindow.ShowDialog("MyFragment.frg");
+            return;
+
             var inforResult = new List<ErrorListDataItem>();
             var mountSlots = MountLinkController.GetAllMountFragments();
 
@@ -389,7 +403,6 @@ namespace AnimationEditor.MountAnimationCreator
             ErrorListWindow.ShowDialog("Combine Errors", inforResult.OrderBy(x=>x.ErrorType).ToList());
         }
 
-        public void CreateFragment()
-        { }
+
     }
 }

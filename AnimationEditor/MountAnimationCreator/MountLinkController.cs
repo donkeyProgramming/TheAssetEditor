@@ -110,7 +110,7 @@ namespace AnimationEditor.MountAnimationCreator
             var allFragments = pfs.FindAllWithExtention(@".frg");
             foreach (var fragmentPack in allFragments)
             {
-                var fragment = new AnimationFragmentCollection(fragmentPack.Name, fragmentPack.DataSource.ReadDataAsChunk());
+                var fragment = new AnimationFragmentFile(fragmentPack.Name, fragmentPack.DataSource.ReadDataAsChunk());
                 AnimationSets0.Add(new FragmentDisplayItem(fragment));
                 AnimationSets1.Add(new FragmentDisplayItem(fragment));
             }
@@ -164,13 +164,13 @@ namespace AnimationEditor.MountAnimationCreator
         }
 
 
-        public List<AnimationFragmentItem> GetAllMountFragments()
+        public List<Fragment> GetAllMountFragments()
         {
             return PossibleMountTags.Select(x => x.Entry).ToList();
         }
 
 
-        public AnimationFragmentItem GetRiderFragmentFromMount(AnimationFragmentItem mountItem)
+        public Fragment GetRiderFragmentFromMount(Fragment mountItem)
         {
             var lookUp = "RIDER_" + mountItem.Slot.Value;
             return PossibleRiderTags.FirstOrDefault(x => x.Entry.Slot.Value == lookUp)?.Entry;
@@ -178,8 +178,8 @@ namespace AnimationEditor.MountAnimationCreator
 
         public class FragmentDisplayItem
         {
-            public AnimationFragmentCollection Entry { get; set; }
-            public FragmentDisplayItem(AnimationFragmentCollection entry)
+            public AnimationFragmentFile Entry { get; set; }
+            public FragmentDisplayItem(AnimationFragmentFile entry)
             {
                 Entry = entry;
             }
@@ -194,8 +194,8 @@ namespace AnimationEditor.MountAnimationCreator
 
         public class SlotDisplayItem
         {
-            public AnimationFragmentItem Entry { get; set; }
-            public SlotDisplayItem(AnimationFragmentItem entry)
+            public Fragment Entry { get; set; }
+            public SlotDisplayItem(Fragment entry)
             {
                 Entry = entry;
             }

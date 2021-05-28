@@ -1,0 +1,45 @@
+﻿<Window x:Class="AnimationEditor.MountAnimationCreator.BatchProcessOptionsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AnimationEditor.MountAnimationCreator"
+        mc:Ignorable="d"
+        Title="Batch Process Options" SizeToContent="WidthAndHeight">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" Content="AnimPack"/>
+        <Label Grid.Row="0" Grid.Column="1" Content=":"/>
+        <CheckBox Grid.Row="0" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding CreateAnimPack, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+        <TextBox Grid.Row="0" Grid.Column="3" Width="300" VerticalContentAlignment="Center" Margin="2,2,0,2" Text="{Binding AnimPackName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding CreateAnimPack, UpdateSourceTrigger=PropertyChanged}" />
+
+        <Label Grid.Row="1" Grid.Column="0" Content="AnimBin"/>
+        <Label Grid.Row="1" Grid.Column="1" Content=":"/>
+        <CheckBox Grid.Row="1" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding CreateAnimBin, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+        <TextBox Grid.Row="1" Grid.Column="3" Width="300" VerticalContentAlignment="Center" Margin="2,2,0,2" Text="{Binding AnimBinName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding CreateAnimBin, UpdateSourceTrigger=PropertyChanged}" />
+
+        <Label Grid.Row="2" Grid.Column="0" Content="Fragment"/>
+        <Label Grid.Row="2" Grid.Column="1" Content=":"/>
+        <CheckBox Grid.Row="2" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding CreateFragment, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+        <TextBox Grid.Row="2" Grid.Column="3" Width="300" VerticalContentAlignment="Center" Margin="2,2,0,2" Text="{Binding FragmentName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding CreateFragment, UpdateSourceTrigger=PropertyChanged}" />
+
+        <Label Grid.Row="3" Grid.Column="0" Content="Animations"/>
+        <Label Grid.Row="3" Grid.Column="1" Content=":"/>
+        <CheckBox Grid.Row="3" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding CreateAnimations, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+        <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Content="Create" Margin="10,2,10,2" Click="Button_Click"/>
+    </Grid>
+</Window>

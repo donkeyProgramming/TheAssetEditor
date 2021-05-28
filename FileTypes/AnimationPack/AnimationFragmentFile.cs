@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Filetypes.AnimationPack
 {
-    public class AnimationFragmentCollection
+    public class AnimationFragmentFile
     {
         public class StringArrayTable
         {
@@ -41,8 +41,8 @@ namespace Filetypes.AnimationPack
         public StringArrayTable Skeletons { get; set; } = new StringArrayTable();
         public int MinSlotId { get; set; }
         public int MaxSlotId { get; set; }
-        public List<AnimationFragmentItem> AnimationFragments { get; set; } = new List<AnimationFragmentItem>();
-        public AnimationFragmentCollection(string fileName, ByteChunk data = null)
+        public List<Fragment> AnimationFragments { get; set; } = new List<Fragment>();
+        public AnimationFragmentFile(string fileName, ByteChunk data = null)
         {
             FileName = fileName;
             if (data != null)
@@ -52,19 +52,17 @@ namespace Filetypes.AnimationPack
                 MaxSlotId = data.ReadInt32();
                 var numFragItems = data.ReadInt32();
                 for (int i = 0; i < numFragItems; i++)
-                    AnimationFragments.Add(new AnimationFragmentItem(data));
+                    AnimationFragments.Add(new Fragment(data));
             }
         }
 
 
-        AnimationFragmentItem GetFragment(AnimationSlotType slot)
+        Fragment GetFragment(AnimationSlotType slot)
         {
             return AnimationFragments.FirstOrDefault(x => x.Slot.Id == slot.Id);
         }
 
-
-
-        public void AddFragmentCollection(AnimationFragmentCollection other)
+        public void AddFragmentCollection(AnimationFragmentFile other)
         {
             int itemsAdded = 0;
             foreach (var otherFragment in other.AnimationFragments)

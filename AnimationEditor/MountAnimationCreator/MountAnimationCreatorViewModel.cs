@@ -30,7 +30,7 @@ namespace AnimationEditor.MountAnimationCreator
         }
     }
 
-    public static class MountAnimationCreatorViewModel_Debug
+    public static class MountAnimationCreator_Debug
     {
         public static void CreateDamselAndGrymgoreEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {

@@ -7,7 +7,7 @@ using System.Linq;
 namespace Filetypes.AnimationPack
 {
     [Serializable]
-    public class AnimationFragmentItem
+    public class Fragment
     {
         int _id { get; set; }
         int _slot { get; set; }
@@ -24,7 +24,7 @@ namespace Filetypes.AnimationPack
         public string Unknown3 { get; set; } = string.Empty;
         public bool Unknown4 { get; set; } = false;
 
-        public AnimationFragmentItem(ByteChunk data)
+        public Fragment(ByteChunk data)
         {
             _id = data.ReadInt32();
             _slot = data.ReadInt32();
@@ -64,7 +64,7 @@ namespace Filetypes.AnimationPack
         }
 
 
-        public AnimationFragmentItem()
+        public Fragment()
         {
         }
 

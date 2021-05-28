@@ -25,7 +25,7 @@ namespace Filetypes.AnimationPack
 
         public List<AnimationTableEntry> AnimationTableEntries { get; set; } = new List<AnimationTableEntry>();
         public List<MatchedAnimationTableEntry> MatchedAnimationTableEntries { get; set; } = new List<MatchedAnimationTableEntry>();
-        public List<AnimationFragmentCollection> AnimationFragments { get; set; } = new List<AnimationFragmentCollection>();
+        public List<AnimationFragmentFile> AnimationFragments { get; set; } = new List<AnimationFragmentFile>();
 
 
         delegate void ProcessFileDelegate(AnimationDataFile file, ByteChunk data);
@@ -38,17 +38,17 @@ namespace Filetypes.AnimationPack
         //  Animation tables
 
 
-        static public IEnumerable<AnimationFragmentCollection> GetFragmentCollections(PackFile file)
+        static public IEnumerable<AnimationFragmentFile> GetFragmentCollections(PackFile file)
         {
             var d = file.DataSource.ReadData();
             ByteChunk data = new ByteChunk(d);
             var fragmentFiles = FindAllSubFiles(data).Where(x => x.Name.Contains(".frg"));
 
-            var animationFragmentCollections = new List<AnimationFragmentCollection>();
+            var animationFragmentCollections = new List<AnimationFragmentFile>();
             foreach (var fragmentFile in fragmentFiles)
             {
                 data.Index = fragmentFile.StartOffset;
-                animationFragmentCollections.Add(new AnimationFragmentCollection(fragmentFile.Name, data));
+                animationFragmentCollections.Add(new AnimationFragmentFile(fragmentFile.Name, data));
             }
 
             return animationFragmentCollections;
@@ -127,9 +127,9 @@ namespace Filetypes.AnimationPack
             return false;
         }
 
-        static bool ParseFragment(List<string> lineList, IList< AnimationFragmentItem> fragmentList)
+        static bool ParseFragment(List<string> lineList, IList< Fragment> fragmentList)
         {
-            var fragmentItem = new AnimationFragmentItem();
+            var fragmentItem = new Fragment();
 
             fragmentItem.Slot= AnimationSlotTypeHelper.GetfromValue(lineList[0]);
             fragmentItem.AnimationFile = GetStrValue(lineList[1]);
@@ -294,7 +294,7 @@ namespace Filetypes.AnimationPack
         void ProcessFragmentFile(AnimationDataFile file, ByteChunk data)
         {
             data.Index = file.StartOffset;
-            AnimationFragments.Add(new AnimationFragmentCollection(file.Name, data));
+            AnimationFragments.Add(new AnimationFragmentFile(file.Name, data));
         }
 
         void ProcessMatchCombatFile(AnimationDataFile file, ByteChunk data)
