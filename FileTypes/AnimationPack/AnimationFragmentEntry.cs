@@ -4,10 +4,36 @@ using System.Collections;
 using System.IO;
 using System.Linq;
 
-namespace Filetypes.AnimationPack
+namespace FileTypes.AnimationPack
 {
-    [Serializable]
-    public class Fragment
+
+    public class FragmentReader
+    {
+        public AnimationFragmentEntry Read(ByteChunk data)
+        {
+            var id = data.ReadInt32();
+            var slot = data.ReadInt32();
+
+            var fragment = new AnimationFragmentEntry()
+            {
+                Slot = AnimationSlotTypeHelper.GetFromId(slot),
+                AnimationFile = data.ReadString(),
+                MetaDataFile = data.ReadString(),
+                SoundMetaDataFile = data.ReadString(),
+                Skeleton = data.ReadString(),
+                Blend = data.ReadSingle(),
+                Weight = data.ReadSingle(),
+                Unknown0 = data.ReadInt32(),
+                Unknown1 = data.ReadInt32(),
+                Unknown3 = data.ReadString(),
+                Unknown4 = data.ReadBool(),
+            };
+            return fragment;
+        }
+    }
+
+
+    public class AnimationFragmentEntry
     {
         int _id { get; set; }
         int _slot { get; set; }
@@ -18,13 +44,13 @@ namespace Filetypes.AnimationPack
         public string SoundMetaDataFile { get; set; } = string.Empty;
         public string Skeleton { get; set; } = string.Empty;
         public float Blend { get; set; } = 0;
-        public float Wight { get; set; } = 0;
+        public float Weight { get; set; } = 0;
         public int Unknown0 { get; set; } = 0;
         public int Unknown1 { get; set; } = 0;
         public string Unknown3 { get; set; } = string.Empty;
         public bool Unknown4 { get; set; } = false;
 
-        public Fragment(ByteChunk data)
+        public AnimationFragmentEntry(ByteChunk data)
         {
             _id = data.ReadInt32();
             _slot = data.ReadInt32();
@@ -36,7 +62,7 @@ namespace Filetypes.AnimationPack
             SoundMetaDataFile = data.ReadString();
             Skeleton = data.ReadString();
             Blend = data.ReadSingle();
-            Wight = data.ReadSingle();
+            Weight = data.ReadSingle();
             Unknown0 = data.ReadInt32();
             Unknown1 = data.ReadInt32();
             Unknown3 = data.ReadString();
@@ -45,7 +71,6 @@ namespace Filetypes.AnimationPack
 
         public void Write(BinaryWriter writer)
         {
-
             writer.Write(Slot.Id);
             writer.Write(Slot.Id);
 
@@ -55,7 +80,7 @@ namespace Filetypes.AnimationPack
             writer.Write(ByteParsers.String.WriteCaString(Skeleton));
 
             writer.Write(Blend);
-            writer.Write(Wight);
+            writer.Write(Weight);
 
             writer.Write(Unknown0);
             writer.Write(Unknown1);
@@ -64,7 +89,7 @@ namespace Filetypes.AnimationPack
         }
 
 
-        public Fragment()
+        public AnimationFragmentEntry()
         {
         }
 

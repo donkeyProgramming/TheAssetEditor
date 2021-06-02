@@ -8,6 +8,7 @@ using Common;
 using Common.ApplicationSettings;
 using Common.GameInformation;
 using CommonControls;
+using CommonControls.Editors.AnimationPack;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using CommonControls.Table;
@@ -45,9 +46,9 @@ namespace AssetEditor.ViewModels
         public MainViewModel(MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, GameInformationService gameInformationService, ToolFactory toolFactory)
         {
 
-            TableWindow window = new TableWindow();
-            window.DataContext = new AnimationFragmentViewModel();
-            window.ShowDialog();
+            //TableWindow window = new TableWindow();
+            //window.DataContext = new AnimationFragmentViewModel();
+            //window.ShowDialog();
 
 
             _packfileService = packfileService;
@@ -99,7 +100,7 @@ namespace AssetEditor.ViewModels
 
                 //MountAnimationCreator_Debug.CreateRaptorAndHu02(this, toolFactory, packfileService);
                 //KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
-
+                AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
                 //var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
                 //editorView.RefInput= new AnimationToolInput()
                 //{ 

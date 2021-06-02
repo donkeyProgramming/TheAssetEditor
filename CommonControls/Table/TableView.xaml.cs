@@ -36,7 +36,7 @@ namespace CommonControls.Table
                     Header = e.Column.Header,
                     HeaderTemplate = e.Column.HeaderTemplate,
                     HeaderStringFormat = e.Column.HeaderStringFormat,
-                    SortMemberPath = e.PropertyName // this is used to index into the DataRowView so it MUST be the property's name (for this implementation anyways)
+                    SortMemberPath = "Index" // this is used to index into the DataRowView so it MUST be the property's name (for this implementation anyways)
                 };
                 e.Column = c;
             }

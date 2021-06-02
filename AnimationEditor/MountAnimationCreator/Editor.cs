@@ -8,7 +8,6 @@ using CommonControls.MathViews;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using CsvHelper;
-using Filetypes.AnimationPack;
 using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;

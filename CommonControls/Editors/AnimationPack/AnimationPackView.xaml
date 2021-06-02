@@ -1,0 +1,67 @@
+﻿<UserControl x:Class="CommonControls.Editors.AnimationPack.AnimationPackView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CommonControls.Editors.AnimationPack"
+             xmlns:behaviors="clr-namespace:CommonControls.Behaviors"
+             xmlns:table="clr-namespace:CommonControls.Table"
+             xmlns:animationFragmenView="clr-namespace:CommonControls.Editors.AnimationFragment"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width=".3*"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- File Menu -->
+        <DockPanel Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0">
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_File">
+                    <MenuItem Header="Save"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
+                    <MenuItem Header="Extract selected"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
+                </MenuItem>
+            </Menu>
+        </DockPanel>
+
+        <!-- Left side - file list and filter -->
+        <Grid Grid.Row="1" Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <TextBox Grid.Row="0" 
+                     Text="{Binding AnimationPackItems.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                     behaviors:TextBoxExtensions.Watermark="Filter, Regex">
+                <TextBox.Style>
+                    <Style TargetType="{x:Type TextBox}">
+                        <Setter Property="Background" Value="White"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding AnimationPackItems.FilterValid, UpdateSourceTrigger=PropertyChanged}" Value="false">
+                                <Setter Property="Background" Value="OrangeRed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
+            <ListView Grid.Row="1" ItemsSource="{Binding AnimationPackItems.Values}" DisplayMemberPath="DisplayName" SelectedItem="{Binding AnimationPackItems.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+        </Grid>
+
+        <!-- Right side - Main view -->
+        <ContentControl Grid.Row="1" Grid.Column="2" Content="{Binding SelectedItemViewModel, UpdateSourceTrigger=PropertyChanged}">
+            <ContentControl.Resources>
+                <DataTemplate DataType="{ x:Type animationFragmenView:AnimationFragmentViewModel}">
+                    <table:TableView/>
+                </DataTemplate>
+            </ContentControl.Resources>
+        </ContentControl>
+
+    </Grid>
+</UserControl>

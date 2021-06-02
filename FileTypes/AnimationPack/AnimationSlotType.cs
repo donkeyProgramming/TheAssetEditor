@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Filetypes.AnimationPack
+namespace FileTypes.AnimationPack
 {
     [Serializable]
     public class AnimationSlotType
@@ -27,26 +27,28 @@ namespace Filetypes.AnimationPack
 
     public static class AnimationSlotTypeHelper
     {
-        static List<AnimationSlotType> _slotTypes;
+        static List<AnimationSlotType> _values
+            ;
+        public static List<AnimationSlotType> Values { get { PopulateList(); return _values; } private set => _values = value; }
 
         static public AnimationSlotType GetFromId(int id)
         {
             PopulateList();
-            return _slotTypes.FirstOrDefault(x=>x.Id == id);
+            return Values.FirstOrDefault(x=>x.Id == id);
         }
 
         static public AnimationSlotType GetfromValue(string value)
         {
             PopulateList();
             var upperStr = value.ToUpper();
-            return _slotTypes.FirstOrDefault(x => x.Value == upperStr);
+            return Values.FirstOrDefault(x => x.Value == upperStr);
         }
 
         static void PopulateList()
         {
-            if (_slotTypes != null)
+            if (_values != null)
                 return;
-            _slotTypes = new List<AnimationSlotType>()
+            _values = new List<AnimationSlotType>()
             {
                 new AnimationSlotType(0, "MISSING_ANIM"),
                 new AnimationSlotType(1, "STAND"),

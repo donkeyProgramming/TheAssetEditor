@@ -20,12 +20,13 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <GroupBox Grid.Row="0" Header="Mount link shortcut:">
+        <Expander IsExpanded="True" Grid.Row="0" Header="Mount link shortcut:">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
@@ -44,6 +45,7 @@
                     TextSearch.TextPath="DisplayName"
                     ItemsSource="{Binding MountLinkController.AnimationSets0, UpdateSourceTrigger=PropertyChanged}"
                     SelectedItem="{Binding MountLinkController.SelectedMount}"/>
+                <Button Grid.Column="3" Grid.Row="0" Width="25" Margin="2"/>
 
                 <Label Grid.Column="0" Grid.Row="1" Content="Rider"/>
                 <Label Grid.Column="1" Grid.Row="1" Content=":"/>
@@ -52,6 +54,7 @@
                     TextSearch.TextPath="DisplayName"
                     ItemsSource="{Binding MountLinkController.AnimationSets1, UpdateSourceTrigger=PropertyChanged}"
                     SelectedItem="{Binding MountLinkController.SeletedRider}"/>
+                <Button Grid.Column="3" Grid.Row="1" Width="25" Margin="2"/>
 
                 <Label Grid.Column="0" Grid.Row="2" Content="Mount animation tag"/>
                 <Label Grid.Column="1" Grid.Row="2" Content=":"/>
@@ -71,8 +74,8 @@
 
                 <Button  Grid.Column="2" Grid.Row="4"  Click="{s:MethodBinding BatchProcess}" Content="Generate" IsEnabled="{Binding MountLinkController.CanBatchProcess, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
-        </GroupBox>
-        <GroupBox Grid.Row="1" Header="Attachment:">
+        </Expander>
+        <Expander Grid.Row="1" Header="Rdier Attachment:" IsExpanded="true">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
@@ -106,11 +109,12 @@
                     <TextBox Grid.Column="1" Text="{Binding SelectedVertexesText, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" IsReadOnly="true"/>
                 </Grid>
             </Grid>
-        </GroupBox>
+        </Expander>
 
         <animationsettings:AnimationSettingsView Grid.Row="2" DataContext="{Binding AnimationSettings, Mode=OneTime}"/>
 
-        <Grid  Grid.Row="3" Margin="15,5,15,5">
+        <Expander  Header="Save:" Grid.Row="3"  IsExpanded="True">
+        <Grid Margin="15,5,15,5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
@@ -125,6 +129,7 @@
 
             <DockPanel Grid.Row="4" Margin="0,5,0,0">
                 <Button  Content="Add to fragment" Click="{s:MethodBinding AddAnimationToFragment}" IsEnabled="{Binding CanSave, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="0,0,5,0"/>
+                <Button  Width="20"  DockPanel.Dock="Right" Click="{s:MethodBinding AddAnimationToFragment}" IsEnabled="{Binding CanSave, UpdateSourceTrigger=PropertyChanged}"  Margin="2"/>
                 <dotNetKitControls:AutoCompleteComboBox 
                     SelectedValuePath="Id"
                     TextSearch.TextPath="BoneName"
@@ -151,8 +156,9 @@
                 <TextBox VerticalContentAlignment="Center" Text="{Binding SavePrefixText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             </DockPanel>
         </Grid>
+        </Expander>
 
-        <GroupBox Grid.Row="4" Header="Visualisation help:">
+        <Expander Grid.Row="4" Header="Visualisation help:" IsExpanded="True">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
@@ -187,7 +193,7 @@
                 <CheckBox  Grid.Column="2" Grid.Row="2"  VerticalContentAlignment="Center" IsChecked="{Binding DisplayGeneratedRiderSkeleton, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
             </Grid>
-        </GroupBox>
+        </Expander>
 
     </Grid>
 </UserControl>

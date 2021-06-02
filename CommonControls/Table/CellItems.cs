@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
 using System.Windows.Data;
 
@@ -157,14 +158,20 @@ namespace CommonControls.Table
 
     public class TypedComboBoxCellItem<T> : ValueCellItem<T>, ComboBoxCellItem
     {
+        ObservableCollection<T> _allPossibleValues;
         ObservableCollection<T> _possibleValues;
         public ObservableCollection<T> PossibleValues { get => _possibleValues; set => SetAndNotify(ref _possibleValues, value); }
         public bool ValidateAsEnums { get; set; } = true;
 
+
+        int _selectedIndex = -1;
+        public int SelectedIndex { get => _selectedIndex; set => SetAndNotify(ref _selectedIndex, value); }
+
         public TypedComboBoxCellItem(T selectedValue = default, ObservableCollection<T> possibleValues = null)
         {
             Data = selectedValue;
-            PossibleValues = new ObservableCollection<T>(possibleValues);
+            PossibleValues = possibleValues;
+            _allPossibleValues = possibleValues;
         }
 
         public override string ToString(IFormatProvider provider)
@@ -172,8 +179,31 @@ namespace CommonControls.Table
             return Data?.ToString();
         }
 
+        private string _SearchText;
+        public string SearchText
+        {
+            get { return _SearchText; }
+            set
+            {
+                SetAndNotify(ref _SearchText, value);
+                PossibleValues = new ObservableCollection<T> (_allPossibleValues.Where(x=>x.ToString().Contains(SearchText, StringComparison.InvariantCultureIgnoreCase)).ToList()) ;
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
         protected override void Validate()
         {
+            return;
             if (ValidateAsEnums && PossibleValues != null)
             {
                 IsValid = PossibleValues.Contains(Data);

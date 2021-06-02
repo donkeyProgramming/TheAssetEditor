@@ -1,7 +1,7 @@
 ﻿using AnimationEditor.Common.ReferenceModel;
 using Common;
 using CommonControls.Services;
-using Filetypes.AnimationPack;
+using FileTypes.AnimationPack;
 using FileTypes.PackFiles.Models;
 using System;
 using System.Collections.Generic;
@@ -99,7 +99,7 @@ namespace AnimationEditor.MountAnimationCreator
             var animPacks = pfs.FindAllWithExtention(@".animpack");
             foreach (var animPack in animPacks)
             {
-                var fragments = AnimationPackLoader.GetFragmentCollections(animPack as PackFile);
+                var fragments = AnimationPackLoader.GetFragments(animPack as PackFile);
                 foreach (var fragment in fragments)
                 {
                     AnimationSets0.Add(new FragmentDisplayItem(fragment));
@@ -110,7 +110,7 @@ namespace AnimationEditor.MountAnimationCreator
             var allFragments = pfs.FindAllWithExtention(@".frg");
             foreach (var fragmentPack in allFragments)
             {
-                var fragment = new AnimationFragmentFile(fragmentPack.Name, fragmentPack.DataSource.ReadDataAsChunk());
+                var fragment = new AnimationFragment(fragmentPack.Name, fragmentPack.DataSource.ReadDataAsChunk());
                 AnimationSets0.Add(new FragmentDisplayItem(fragment));
                 AnimationSets1.Add(new FragmentDisplayItem(fragment));
             }
@@ -124,7 +124,7 @@ namespace AnimationEditor.MountAnimationCreator
                 PossibleMountTags = new ObservableCollection<SlotDisplayItem>();
                 return;
             }
-            PossibleMountTags = new ObservableCollection<SlotDisplayItem>(value.Entry.AnimationFragments.Select(x =>new SlotDisplayItem(x)));
+            PossibleMountTags = new ObservableCollection<SlotDisplayItem>(value.Entry.Fragments.Select(x =>new SlotDisplayItem(x)));
             CanBatchProcess = SelectedMount != null && SeletedRider != null;
         }
 
@@ -135,7 +135,7 @@ namespace AnimationEditor.MountAnimationCreator
                 PossibleRiderTags = new ObservableCollection<SlotDisplayItem>();
                 return;
             }
-            PossibleRiderTags = new ObservableCollection<SlotDisplayItem>(value.Entry.AnimationFragments.Select(x => new SlotDisplayItem(x)));
+            PossibleRiderTags = new ObservableCollection<SlotDisplayItem>(value.Entry.Fragments.Select(x => new SlotDisplayItem(x)));
             CanBatchProcess = SelectedMount != null && SeletedRider != null;
         }
 
@@ -164,13 +164,13 @@ namespace AnimationEditor.MountAnimationCreator
         }
 
 
-        public List<Fragment> GetAllMountFragments()
+        public List<AnimationFragmentEntry> GetAllMountFragments()
         {
             return PossibleMountTags.Select(x => x.Entry).ToList();
         }
 
 
-        public Fragment GetRiderFragmentFromMount(Fragment mountItem)
+        public AnimationFragmentEntry GetRiderFragmentFromMount(AnimationFragmentEntry mountItem)
         {
             var lookUp = "RIDER_" + mountItem.Slot.Value;
             return PossibleRiderTags.FirstOrDefault(x => x.Entry.Slot.Value == lookUp)?.Entry;
@@ -178,8 +178,8 @@ namespace AnimationEditor.MountAnimationCreator
 
         public class FragmentDisplayItem
         {
-            public AnimationFragmentFile Entry { get; set; }
-            public FragmentDisplayItem(AnimationFragmentFile entry)
+            public AnimationFragment Entry { get; set; }
+            public FragmentDisplayItem(AnimationFragment entry)
             {
                 Entry = entry;
             }
@@ -194,8 +194,8 @@ namespace AnimationEditor.MountAnimationCreator
 
         public class SlotDisplayItem
         {
-            public Fragment Entry { get; set; }
-            public SlotDisplayItem(Fragment entry)
+            public AnimationFragmentEntry Entry { get; set; }
+            public SlotDisplayItem(AnimationFragmentEntry entry)
             {
                 Entry = entry;
             }

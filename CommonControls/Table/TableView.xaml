@@ -29,7 +29,7 @@
                     <Setter Property="Background" Value="OrangeRed" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType=DataGridCell}}" Value="true">
-                    <Setter Property="Background" Value="White" />
+                    <Setter Property="Background" Value="LightBlue" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -41,7 +41,7 @@
                     <Setter Property="Foreground" Value="OrangeRed" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType=DataGridCell}}" Value="true">
-                    <Setter Property="Background" Value="White" />
+                    <Setter Property="Foreground" Value="DarkBlue" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -69,7 +69,7 @@
             </DockPanel>
         </DataTemplate>
 
-        <DataTemplate x:Key="ComboBoxTemplate">
+        <DataTemplate x:Key="ComboBoxTemplate2">
             <DockPanel DataContext="{Binding RelativeSource={RelativeSource AncestorType=DataGridCell}, Converter={StaticResource drvc}}">
                 <dotNetKitControls:AutoCompleteComboBox
                     SelectedValuePath="."
@@ -77,9 +77,44 @@
                     ItemsSource="{Binding PossibleValues, UpdateSourceTrigger=PropertyChanged}"
                     SelectedItem="{Binding Data, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                     ToolTip="{StaticResource ErrorToolTip}" 
-                    Style="{StaticResource ComboBoxTemplateToolStyle}"/>
+                    Style="{StaticResource ComboBoxTemplateToolStyle}">
+                    <dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
+                </dotNetKitControls:AutoCompleteComboBox>
             </DockPanel>
         </DataTemplate>
+
+        <DataTemplate x:Key="ComboBoxTemplate">
+            <DockPanel DataContext="{Binding RelativeSource={RelativeSource AncestorType=DataGridCell}, Converter={StaticResource drvc}}">
+                <ComboBox Name="cmbContains" IsEditable="True" IsTextSearchEnabled="false"
+                          ItemsSource="{Binding PossibleValues}" 
+                          SelectedIndex="{Binding SelectedIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                          VirtualizingStackPanel.IsVirtualizing="True" 
+                          ToolTip="{StaticResource ErrorToolTip}" 
+                          Text="{Binding SearchText, Mode=TwoWay}" 
+                          Style="{StaticResource ComboBoxTemplateToolStyle}">
+
+
+
+                    <ComboBox.Triggers>
+                        <EventTrigger RoutedEvent="TextBoxBase.TextChanged">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="IsDropDownOpen">
+                                        <DiscreteBooleanKeyFrame Value="True" KeyTime="0:0:0"/>
+                                    </BooleanAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </ComboBox.Triggers>
+
+                </ComboBox>
+            </DockPanel>
+        </DataTemplate>
+
     </UserControl.Resources>
 
     <Grid>
@@ -88,7 +123,7 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <DataGrid Grid.Row="0"
+        <DataGrid Grid.Row="0"        
                   Name="dataGrid1"
                   ItemsSource="{Binding Data.DefaultView}" 
                   SelectedItem="{Binding Path=SelectedRow, Mode=TwoWay}"

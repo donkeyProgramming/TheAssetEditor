@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Filetypes.AnimationPack
+namespace FileTypes.AnimationPack
 {
-    public class AnimationFragmentFile
+    public class AnimationFragment
     {
         public class StringArrayTable
         {
@@ -41,8 +41,8 @@ namespace Filetypes.AnimationPack
         public StringArrayTable Skeletons { get; set; } = new StringArrayTable();
         public int MinSlotId { get; set; }
         public int MaxSlotId { get; set; }
-        public List<Fragment> AnimationFragments { get; set; } = new List<Fragment>();
-        public AnimationFragmentFile(string fileName, ByteChunk data = null)
+        public List<AnimationFragmentEntry> Fragments { get; set; } = new List<AnimationFragmentEntry>();
+        public AnimationFragment(string fileName, ByteChunk data = null)
         {
             FileName = fileName;
             if (data != null)
@@ -52,31 +52,31 @@ namespace Filetypes.AnimationPack
                 MaxSlotId = data.ReadInt32();
                 var numFragItems = data.ReadInt32();
                 for (int i = 0; i < numFragItems; i++)
-                    AnimationFragments.Add(new Fragment(data));
+                    Fragments.Add(new AnimationFragmentEntry(data));
             }
         }
 
 
-        Fragment GetFragment(AnimationSlotType slot)
+        AnimationFragmentEntry GetFragment(AnimationSlotType slot)
         {
-            return AnimationFragments.FirstOrDefault(x => x.Slot.Id == slot.Id);
+            return Fragments.FirstOrDefault(x => x.Slot.Id == slot.Id);
         }
 
-        public void AddFragmentCollection(AnimationFragmentFile other)
+        public void AddFragmentCollection(AnimationFragment other)
         {
             int itemsAdded = 0;
-            foreach (var otherFragment in other.AnimationFragments)
+            foreach (var otherFragment in other.Fragments)
             {
                 var existingFragment = GetFragment(otherFragment.Slot);
                 if (existingFragment == null)
                 {
                     var cpy = ObjectHelper.DeepClone(otherFragment);
-                    AnimationFragments.Add(cpy);
+                    Fragments.Add(cpy);
                     itemsAdded++;
                 }
             }
 
-            AnimationFragments = AnimationFragments
+            Fragments = Fragments
                 .OrderBy(x => x.Slot.Id)
                 .ToList();
 
@@ -85,13 +85,13 @@ namespace Filetypes.AnimationPack
 
         void UpdateMinAndMaxSlotIds()
         {
-            MinSlotId = AnimationFragments.Min(x => x.Slot.Id);
-            MaxSlotId = AnimationFragments.Max(x => x.Slot.Id);
+            MinSlotId = Fragments.Min(x => x.Slot.Id);
+            MaxSlotId = Fragments.Max(x => x.Slot.Id);
         }
 
         public void ChangeAnimationFileName(string prefix)
         {
-            foreach (var fragment in AnimationFragments)
+            foreach (var fragment in Fragments)
             {
                 if (!string.IsNullOrWhiteSpace(fragment.AnimationFile))
                 {
@@ -106,7 +106,7 @@ namespace Filetypes.AnimationPack
 
         public void SetSkeleton(string skeletonName)
         {
-            foreach (var fragment in AnimationFragments)
+            foreach (var fragment in Fragments)
             {
                 fragment.Skeleton = skeletonName;
             }
@@ -115,7 +115,7 @@ namespace Filetypes.AnimationPack
 
         public void ChangeSkeleton(string newSkeletonName)
         {
-            foreach (var fragment in AnimationFragments)
+            foreach (var fragment in Fragments)
             {
                 //fragment.AnimationFile.Replace(fragment.Skeleton)
                 fragment.Skeleton = newSkeletonName;
@@ -142,9 +142,9 @@ namespace Filetypes.AnimationPack
                     Skeletons.Write(writer);
                     writer.Write(MinSlotId);
                     writer.Write(MaxSlotId);
-                    writer.Write(AnimationFragments.Count);
+                    writer.Write(Fragments.Count);
 
-                    foreach(var frag in AnimationFragments)
+                    foreach(var frag in Fragments)
                         frag.Write(writer);
                         //writer.Write(Skeletons..Header.AnimationType);                       // Animtype
                     //writer.Write((uint)1);                                          // Uknown_always 1

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Filetypes.AnimationPack
+namespace FileTypes.AnimationPack
 {
     public class MatchedAnimationTableEntry
     {

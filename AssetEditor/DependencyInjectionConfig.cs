@@ -8,6 +8,8 @@ using Common;
 using Common.ApplicationSettings;
 using Common.GameInformation;
 using CommonControls;
+using CommonControls.Editors.AnimationFragment;
+using CommonControls.Editors.AnimationPack;
 using CommonControls.Resources;
 using CommonControls.Services;
 using KitbasherEditor;
@@ -60,6 +62,8 @@ namespace AssetEditor
             View3D_DependencyInjectionContainer.Register(services);
             AnimMetaEditor_DependencyInjectionContainer.Register(services);
             AnimationEditors_DependencyInjectionContainer.Register(services);
+            AnimationFragment_DependencyInjectionContainer.Register(services);
+            AnimationPack_DependencyInjectionContainer.Register(services);
         }
 
         void RegisterTools(IToolFactory factory)
@@ -69,6 +73,8 @@ namespace AssetEditor
             View3D_DependencyInjectionContainer.RegisterTools(factory);
             AnimMetaEditor_DependencyInjectionContainer.RegisterTools(factory);
             AnimationEditors_DependencyInjectionContainer.RegisterTools(factory);
+            AnimationFragment_DependencyInjectionContainer.RegisterTools(factory);
+            AnimationPack_DependencyInjectionContainer.RegisterTools(factory);
         }
 
         public void ShowMainWindow()

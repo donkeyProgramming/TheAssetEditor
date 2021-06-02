@@ -8,9 +8,10 @@
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
-             mc:Ignorable="d" d:Width="300">
-    <GroupBox Header="Animation settings:">
-        <Grid>
+             mc:Ignorable="d" d:Width="500">
+    <Expander Header="Animation settings:" IsExpanded="true">
+        <Border BorderBrush="Gray" BorderThickness="1">
+            <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
@@ -68,5 +69,7 @@
             <Label Grid.Column="1" Grid.Row="7" Content=":"/>
             <mathviews:Vector3View Grid.Column="3" Grid.Row="7" VerticalContentAlignment="Center" Vector3="{Binding MaxRiderRotation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
         </Grid>
-    </GroupBox>
+        </Border>
+    </Expander>
+   
 </UserControl>
