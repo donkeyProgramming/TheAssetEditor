@@ -3,14 +3,76 @@ using GalaSoft.MvvmLight.CommandWpf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Linq;
 using System.Text;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 
 namespace CommonControls.Table
 {
+
+    public class CellFactory
+    {
+        List<Func<object, BaseCellItem>> _createMap = new List<Func<object, BaseCellItem>>();
+        List<string> _columnNames = new List<string>();
+        Dictionary<string, ColoumTypes> _coloumTypes = new Dictionary<string, ColoumTypes>();
+        Dictionary<ColoumTypes, string> _resourceMap = new Dictionary<ColoumTypes, string>();
+
+        DataTable _table;
+
+
+        public enum ColoumTypes
+        { 
+            Default,
+            Bool,
+            SubTable,
+            ComboBox,
+            BitFlag
+        }
+
+        public CellFactory(DataTable privateTable)
+        {
+            _table = privateTable;
+            _resourceMap[ColoumTypes.Default] = "BaseTemplate";
+            _resourceMap[ColoumTypes.Bool] = "BoolTemplate";
+            _resourceMap[ColoumTypes.SubTable] = "ButtonTemplate";
+            _resourceMap[ColoumTypes.ComboBox] = "ComboBoxTemplate";
+            _resourceMap[ColoumTypes.BitFlag] = "";
+        }
+
+        internal string GetCellTemplate(string propertyName)
+        {
+            var type = _coloumTypes[propertyName];
+            return _resourceMap[type];
+        }
+
+        public void CreateColoumn(string coloumnName, ColoumTypes coloumType, Func<object, BaseCellItem> createCell)
+        {
+            _columnNames = new List<string>();
+            _createMap.Add(createCell);
+            _table.Columns.Add(coloumnName, typeof(BaseCellItem));
+            _coloumTypes[coloumnName] = coloumType;
+        }
+
+        BaseCellItem CreateColumnValue(int coloumIndex, object value)
+        {
+            return _createMap[coloumIndex](value);
+        }
+
+        public List<BaseCellItem> CreateRowInstance(params object[] values)
+        {
+            List<BaseCellItem> output = new List<BaseCellItem>();
+            for(int i = 0; i < values.Length; i++)
+                output.Add(CreateColumnValue(i, values[i]));
+
+            return output;
+        }
+    }
+
+
     public abstract class BaseCellItem : NotifyPropertyChangedImpl, IConvertible
     {
         bool _isValid = true;
@@ -239,10 +301,7 @@ namespace CommonControls.Table
 
         public override BaseCellItem Duplicate()
         {
-            var copy = new TypedComboBoxCellItem<T>();
-            copy._allPossibleValues = _allPossibleValues;
-            copy.Data = Data;
-            copy._SearchText = _SearchText;
+            var copy = new TypedComboBoxCellItem<T>(Data, _allPossibleValues);
             copy.ValidateAsEnums = ValidateAsEnums;
             CopyInto(copy);
             return copy;
@@ -261,15 +320,18 @@ namespace CommonControls.Table
 
         public ICommand ClickCommand { get; set; }
 
-        public ButtonCellItem(ExplorCellButtonPressed clickCallback)
+        TableViewModel _subTable;
+
+        public ButtonCellItem(TableViewModel subTable)
         {
             ClickCommand = new RelayCommand<DataGridCellInfo>(Click);
-            ExplorCellButtonCallback = clickCallback;
+            _subTable = subTable;
+            //ExplorCellButtonCallback = clickCallback;
         }
 
         public override BaseCellItem Duplicate()
         {
-            var copy = new ButtonCellItem(ExplorCellButtonCallback);
+            var copy = new ButtonCellItem(_subTable.Clone());
             CopyInto(copy);
             return copy;
         }
@@ -279,12 +341,17 @@ namespace CommonControls.Table
             var owner = cellInfo.Item as System.Data.DataRowView;
             var table = owner.DataView.Table;
             var index = table.Rows.IndexOf(owner.Row);
-            ExplorCellButtonCallback?.Invoke(this);
+
+            TableWindow window = new TableWindow();
+            window.DataContext = _subTable;
+            window.Show();
+
+            ExplorCellButtonCallback?.Invoke(this, index);
         }
 
         public override string ToString(IFormatProvider provider)
         {
-            return "Button";
+            return "";
         }
     }
 

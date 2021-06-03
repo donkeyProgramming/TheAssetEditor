@@ -3,12 +3,15 @@ using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator;
 using Common;
 using CommonControls.Common;
+using CommonControls.Editors.AnimationFragment;
 using CommonControls.ErrorListDialog;
 using CommonControls.MathViews;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
+using CommonControls.Table;
 using CsvHelper;
 using Filetypes.RigidModel;
+using FileTypes.AnimationPack;
 using FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
@@ -124,6 +127,7 @@ namespace AnimationEditor.MountAnimationCreator
         List<int> _mountVertexes = new List<int>();
         Rmv2MeshNode _mountVertexOwner;
         PackFileService _pfs;
+        SelectionManager _selectionManager;
 
         public Editor(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, AssetViewModel mount, AssetViewModel newAnimation, IComponentManager componentManager)
         {
@@ -152,7 +156,7 @@ namespace AnimationEditor.MountAnimationCreator
                 CreateMountAnimation();
         }
 
-        SelectionManager _selectionManager;
+      
 
         private void MountSkeletonChanged(GameSkeleton newValue)
         {
@@ -351,6 +355,25 @@ namespace AnimationEditor.MountAnimationCreator
             SaveHelper.Save(_pfs, savePath, null, bytes);
         }
 
+        public void ViewMountFragment()
+        {
+            ViewFragment(MountLinkController.SelectedMount?.Entry);
+        }
+
+        public void ViewRiderFragment()
+        {
+            ViewFragment(MountLinkController.SeletedRider?.Entry);
+        }
+
+        void ViewFragment(AnimationFragment fragment)
+        {
+            if (fragment != null)
+            {
+                var view = AnimationFragmentViewModel.CreateFromFragment(_pfs, fragment, false);
+                TableWindow.Show(view);
+            }
+        }
+
         public void BatchProcess()
         {
             // Bin and animpack
@@ -362,6 +385,50 @@ namespace AnimationEditor.MountAnimationCreator
             // New fragment
 
             var res = BatchProcessOptionsWindow.ShowDialog("MyFragment.frg");
+
+            //AnimationPackLoader
+            AnimationPackFile animPack = new AnimationPackFile();
+            animPack.AnimationBin = new AnimationBin("animation//test_table.bin");
+            var tableEntry = new AnimationBinEntry("my_entry_in_table", "Humanoid01", "dog");
+            tableEntry.FragmentReferences.Add(new AnimationBinEntry.FragmentReference() { Name = "test_fragment.frg" });
+         
+
+            animPack.AnimationBin.AnimationTableEntries.Add(tableEntry);
+
+            var fragment = new AnimationFragment("animation//test_fragment.frg");
+            fragment.Skeletons = new AnimationFragment.StringArrayTable("Humanoid01", "Humanoid01");
+            for (int i = 0; i < 10; i++)
+            {
+                AnimationFragmentEntry entry = new AnimationFragmentEntry();
+                entry.Skeleton = "Humanoid01";
+                entry.Slot = AnimationSlotTypeHelper.GetFromId(i);
+                entry.AnimationFile = "somAnim" +i.ToString() + ".anim";
+                entry.MetaDataFile = "somAnimMeta" + i.ToString() + ".anim";
+                entry.SoundMetaDataFile = "somAnimSound" + i.ToString() + ".anim";
+            }
+            animPack.Fragments.Add(fragment);
+
+
+
+            var bytes = animPack.ToByteArray();
+
+            // SaveFile(path, data, packfileContainer); // Overwirtes and all that fuzz
+            // SaveFile(PackFile, data, packfileContainer); // Overwirtes and all that fuzz
+
+
+            var outputFile = new PackFile();
+            _pfs.AddFileToPack(null, "animations//tables", outputFile);
+            _pfs.SaveFile())
+            // Save
+           // animPack.AnimationBin.AnimationTableEntries.Add()
+            // Create animPack
+            // Create bin
+            // Add
+            // Create fragment
+            //Add
+
+
+
             return;
 
             var inforResult = new List<ErrorListDataItem>();

@@ -24,6 +24,11 @@ namespace FileTypes.AnimationPack
             for (int i = 0; i < RowCount; i++)
                 AnimationTableEntries.Add(new AnimationBinEntry(data));
         }
+
+        public AnimationBin(string fileName) 
+        {
+            FileName = FileName;
+        }
     }
 
     public class AnimationBinEntry
@@ -31,7 +36,7 @@ namespace FileTypes.AnimationPack
         public class FragmentReference
         {
             public string Name { get; set; }
-            public int Unknown { get; set; }
+            public int Unknown { get; set; } = 0;
 
             public override string ToString()
             {
@@ -44,22 +49,26 @@ namespace FileTypes.AnimationPack
         public string MountName { get; set; }
 
         public List<FragmentReference> FragmentReferences { get; set; } = new List<FragmentReference>();
-        public short Unknown0 { get; set; }
-        public short Unknown1 { get; set; }
+        public short Unknown { get; set; }
 
         public AnimationBinEntry(ByteChunk data)
         {
             Name = data.ReadString();
             SkeletonName = data.ReadString();
             MountName = data.ReadString();
-
             LoadAnimationSets(data);
+        }
+
+        public AnimationBinEntry(string name, string skeletonName, string mountName = "")
+        {
+            Name = name;
+            SkeletonName = skeletonName;
+            MountName = mountName;
         }
 
         void LoadAnimationSets(ByteChunk data)
         {
             var count = data.ReadInt32();
-           // Unknown0 = data.ReadShort();
             for (int i = 0; i < count; i++)
             {
                 var animationSet = new FragmentReference()
@@ -69,7 +78,7 @@ namespace FileTypes.AnimationPack
                 };
                 FragmentReferences.Add(animationSet);
             }
-            Unknown1 = data.ReadShort();
+            Unknown = data.ReadShort();
         }
 
         public override string ToString()

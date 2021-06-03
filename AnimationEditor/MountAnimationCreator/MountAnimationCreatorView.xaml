@@ -45,7 +45,7 @@
                     TextSearch.TextPath="DisplayName"
                     ItemsSource="{Binding MountLinkController.AnimationSets0, UpdateSourceTrigger=PropertyChanged}"
                     SelectedItem="{Binding MountLinkController.SelectedMount}"/>
-                <Button Grid.Column="3" Grid.Row="0" Width="25" Margin="2"/>
+                <Button  Content="..." Grid.Column="3" Grid.Row="0" Width="25" Margin="2"  Click="{s:MethodBinding ViewMountFragment}"/>
 
                 <Label Grid.Column="0" Grid.Row="1" Content="Rider"/>
                 <Label Grid.Column="1" Grid.Row="1" Content=":"/>
@@ -54,7 +54,7 @@
                     TextSearch.TextPath="DisplayName"
                     ItemsSource="{Binding MountLinkController.AnimationSets1, UpdateSourceTrigger=PropertyChanged}"
                     SelectedItem="{Binding MountLinkController.SeletedRider}"/>
-                <Button Grid.Column="3" Grid.Row="1" Width="25" Margin="2"/>
+                <Button Content="..." Grid.Column="3" Grid.Row="1" Width="25" Margin="2"  Click="{s:MethodBinding ViewRiderFragment}"/>
 
                 <Label Grid.Column="0" Grid.Row="2" Content="Mount animation tag"/>
                 <Label Grid.Column="1" Grid.Row="2" Content=":"/>

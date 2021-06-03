@@ -11,6 +11,33 @@ using System.Text;
 namespace CommonControls.Editors.AnimationBin
 {
 
+    public class AnimationBinFragRefViewModel : TableViewModel
+    {
+        public AnimationBinFragRefViewModel(FileTypes.AnimationPack.AnimationBinEntry entry)
+        {
+            Factory.CreateColoumn("Index", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x) { IsEditable=false});
+            Factory.CreateColoumn("Fragment", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
+            Factory.CreateColoumn("Unknown", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
+
+            if (entry != null)
+            {
+                int index = 0;
+                SuspendLayout();
+                foreach (var binEntry in entry.FragmentReferences)
+                    CreateRow(index++, binEntry.Name, binEntry.Unknown);
+
+                ResumeLayout();
+            }
+        }
+
+        public override TableViewModel Clone()
+        {
+            var newTable = new AnimationBinFragRefViewModel(null);
+            newTable.Data = Data.Clone();
+            return newTable;
+        }
+    }
+
     public class AnimationBinViewModel : TableViewModel, IEditorViewModel
     {
         string _displayName;
@@ -21,13 +48,21 @@ namespace CommonControls.Editors.AnimationBin
         {
             _pf = pf;
 
-            // Create coloumns
-            CreateColum("Index", typeof(ValueCellItem<int>));
-            CreateColum("Key", typeof(ValueCellItem<string>));
-            CreateColum("Skeleton", typeof(ValueCellItem<string>));
-            CreateColum("MountSkeleton", typeof(ValueCellItem<string>));
-            CreateColum("FragRefs", typeof(ButtonCellItem));
-            CreateColum("Unknown", typeof(ValueCellItem<int>));    
+            Factory.CreateColoumn("Index", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x) { IsEditable=false});
+            Factory.CreateColoumn("Key", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
+            Factory.CreateColoumn("Skeleton", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
+            Factory.CreateColoumn("Frag", CellFactory.ColoumTypes.SubTable, (x) => new ButtonCellItem(x as TableViewModel));
+            Factory.CreateColoumn("Unknown", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
+        }
+
+        void Load(FileTypes.AnimationPack.AnimationBin binFile)
+        {
+            SuspendLayout();
+            var index = 0;
+            foreach (var binEntry in binFile.AnimationTableEntries)
+                CreateRow(index++, binEntry.Name, binEntry.SkeletonName, new AnimationBinFragRefViewModel(binEntry), binEntry.Unknown);
+
+            ResumeLayout();
         }
 
         public static AnimationBinViewModel CreateFromBin(PackFileService pfs, FileTypes.AnimationPack.AnimationBin binFile)
@@ -37,29 +72,11 @@ namespace CommonControls.Editors.AnimationBin
              return viewModel;
         }
 
-
         void Load(PackFile file)
         {
             DisplayName = file.Name;
             var binFile = new FileTypes.AnimationPack.AnimationBin(file.Name, file.DataSource.ReadDataAsChunk());
             Load(binFile);
-        }
-
-        void Load(FileTypes.AnimationPack.AnimationBin binFile)
-        {
-            SuspendLayout();
-            var index = 0;
-            foreach (var binEntry in binFile.AnimationTableEntries)
-            {
-                CreateRow(
-                   new ValueCellItem<int>(index++) { IsEditable = false },
-                   new ValueCellItem<string>(binEntry.Name),
-                   new ValueCellItem<string>(binEntry.SkeletonName),
-                   new ValueCellItem<string>(binEntry.MountName),
-                   new ButtonCellItem((cell, index) => { }),
-                   new ValueCellItem<int>(binEntry.Unknown1));
-            }
-            ResumeLayout();
         }
 
         PackFile _packFile;

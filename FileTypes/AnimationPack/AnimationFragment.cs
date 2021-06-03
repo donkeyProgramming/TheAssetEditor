@@ -15,8 +15,14 @@ namespace FileTypes.AnimationPack
         {
             public List<string> Values { get; set; } = new List<string>();
 
-            public StringArrayTable()
-            { }
+            public StringArrayTable(params string[] items)
+            {
+                if (items != null)
+                {
+                    foreach (var item in items)
+                        Values.Add(item);
+                }
+            }
 
             public StringArrayTable(ByteChunk data)
             {

@@ -87,6 +87,7 @@
                 <CheckBox DockPanel.Dock="Left" HorizontalAlignment="Center" VerticalContentAlignment="Center"
                           IsChecked="{Binding Data, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                           ToolTip="{StaticResource ErrorToolTip}"
+                          IsEnabled="{Binding IsEditable}"
                           Style="{StaticResource BackgroundColourStyle}">
                 </CheckBox>
             </DockPanel>
@@ -104,9 +105,11 @@
         <DataTemplate x:Key="ComboBoxTemplate">
             <DockPanel DataContext="{Binding RelativeSource={RelativeSource AncestorType=DataGridCell}, Converter={StaticResource drvc}}">
                 <ComboBox Name="cmbContains" IsEditable="True" IsTextSearchEnabled="false"
-                           Text="{Binding SearchText, Mode=TwoWay}" 
+                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                           ItemsSource="{Binding PossibleValues}" 
-                          ToolTip="{StaticResource ErrorToolTip}"        
+                          SelectedItem="{Binding Data, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                          ToolTip="{StaticResource ErrorToolTip}"   
+                          IsEnabled="{Binding IsEditable}"
                           Style="{StaticResource ComboBoxTemplateToolStyle}">
 
                     <ComboBox.ItemsPanel>
@@ -137,6 +140,7 @@
                   EnableRowVirtualization="True"
                   EnableColumnVirtualization="True"
                   VirtualizingPanel.ScrollUnit="Pixel"
+                  
                     VirtualizingStackPanel.VirtualizationMode="Standard"
              VirtualizingStackPanel.IsVirtualizing="True"
                   AlternationCount="2" 
@@ -145,9 +149,13 @@
 
             <DataGrid.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="MyHeader" 
+                    <MenuItem Header="Duplicate" 
                      Command="{Binding DuplicateRowCommand}"
                      CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedItem}" />
+                    <MenuItem Header="New" />
+                    
+                    <MenuItem Header="Delete"/>
+                    <MenuItem Header="Delete all but selected"/>
                 </ContextMenu>
             </DataGrid.ContextMenu>
             

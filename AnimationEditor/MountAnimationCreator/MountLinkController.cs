@@ -99,8 +99,8 @@ namespace AnimationEditor.MountAnimationCreator
             var animPacks = pfs.FindAllWithExtention(@".animpack");
             foreach (var animPack in animPacks)
             {
-                var fragments = AnimationPackLoader.GetFragments(animPack as PackFile);
-                foreach (var fragment in fragments)
+                var animPackFile = new AnimationPackFile(animPack as PackFile);
+                foreach (var fragment in animPackFile.Fragments)
                 {
                     AnimationSets0.Add(new FragmentDisplayItem(fragment));
                     AnimationSets1.Add(new FragmentDisplayItem(fragment));

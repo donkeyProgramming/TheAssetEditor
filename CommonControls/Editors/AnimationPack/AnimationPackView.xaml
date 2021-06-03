@@ -27,6 +27,9 @@
                 <MenuItem Header="_File">
                     <MenuItem Header="Save"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
                     <MenuItem Header="Extract selected"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
+                    <MenuItem Header="New bin"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
+                    <MenuItem Header="New fragment"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
+                    <MenuItem Header="Import file"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
                 </MenuItem>
             </Menu>
         </DockPanel>

@@ -40,13 +40,13 @@ namespace CommonControls.Editors.AnimationPack
 
         private void Load(PackFile packFile)
         {
+            var animPack = new AnimationPackFile(packFile);
             var data = new List<IAnimPackItem>();
-            var animationTables = AnimationPackLoader.GetAnimationBins(packFile);
-            foreach (var item in animationTables)
-                data.Add(new BinAnimPackItem() { Item = item });
+            
+            if(animPack.AnimationBin != null)
+                data.Add(new BinAnimPackItem() { Item = animPack.AnimationBin });
 
-            var fragments = AnimationPackLoader.GetFragments(packFile);
-            foreach (var item in fragments)
+            foreach (var item in animPack.Fragments)
                 data.Add(new FagmentAnimPackItem() { Item = item });
 
             AnimationPackItems = new FilterCollection<IAnimPackItem>(data, ItemSelected)

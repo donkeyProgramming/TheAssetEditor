@@ -20,21 +20,11 @@ namespace CommonControls.Table
 
         private void DataGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
         {
-            DataTemplate dt = null;
-            if (e.PropertyType == typeof(BoolCellItem))
-                dt = (DataTemplate)Resources["BoolTemplate"];
-            else if ((typeof(ComboBoxCellItem).IsAssignableFrom(e.PropertyType)))
-                dt = (DataTemplate)Resources["ComboBoxTemplate"];
-            else if ((typeof(ButtonCellItem).IsAssignableFrom(e.PropertyType)))
-                dt = (DataTemplate)Resources["ButtonTemplate"];
-            else if ((typeof(BaseCellItem).IsAssignableFrom(e.PropertyType)))
-            {
-                if(e.PropertyName.ToLower() == "index")
-                    dt = (DataTemplate)Resources["IndexTemplate"];
-                else
-                    dt = (DataTemplate)Resources["BaseTemplate"];
-            }
+            var viewModel = DataContext as TableViewModel;
+            var factory = viewModel.Factory;
 
+            var resourceName = factory.GetCellTemplate(e.PropertyName);
+            DataTemplate dt = (DataTemplate)Resources[resourceName];
             if (dt != null)
             {
                 DataGridTemplateColumn c = new DataGridTemplateColumn()

@@ -13,6 +13,15 @@ namespace CommonControls.Table
     abstract public class TableViewModel : NotifyPropertyChangedImpl
     {
 
+        public virtual TableViewModel Clone()
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+        public CellFactory Factory { get; set; }
+
         string _filterText;
         public string FilterText { get => _filterText; set => SetAndNotify(ref _filterText, value); }
 
@@ -33,12 +42,11 @@ namespace CommonControls.Table
 
         public TableViewModel()
         {
+            Factory = new CellFactory(_privateTable);
             _privateTable.CaseSensitive = false;
-            SearchCommand = new RelayCommand<string>(Filter);
 
+            SearchCommand = new RelayCommand<string>(Filter);
             DuplicateRowCommand = new RelayCommand<DataRowView>(DuplicateRow);
-            //Data = _privateTable;
-            //https://stackoverflow.com/questions/19320528/wpf-hide-row-in-datagrid-based-on-condition
         }
 
         protected void SuspendLayout()
@@ -56,19 +64,14 @@ namespace CommonControls.Table
             _privateTable.Columns.Add(name, type);
         }
 
-        public void CreateColum(string name)
-        {
-            _privateTable.Columns.Add(name);
-        }
-
         protected void CreateRow(params object[] rowItems)
         {
             if (_privateTable.Columns.Count != rowItems.Length)
                 throw new Exception("Not the same amount of coloums in data element as table");
 
-            _privateTable.Rows.Add(rowItems);
+            var newRow = Factory.CreateRowInstance(rowItems).ToArray();
+            _privateTable.Rows.Add(newRow);
         }
-
 
         void Filter(string filterText)
         {
@@ -82,7 +85,6 @@ namespace CommonControls.Table
 
             _privateTable.DefaultView.RowFilter = completeFilter;
         }
-
 
         public void DuplicateRow(DataRowView value)
         {
@@ -100,11 +102,10 @@ namespace CommonControls.Table
 
             if (_privateTable.Columns[0].ColumnName.ToLower() == "index")
             {
-                var indexColoum = newColumns[0] as ValueCellItem<int>;
+                var indexColoum = newColumns[0] as ValueCellItem<object>;
                 indexColoum.Data = _privateTable.Rows.Count;
             }
-
-            CreateRow(newColumns.ToArray());
+            _privateTable.Rows.Add(newColumns.ToArray());
         }
 
         public void InsertNewRow()

@@ -21,5 +21,12 @@ namespace CommonControls.Table
         {
             InitializeComponent();
         }
+
+        public static void Show(TableViewModel viewModel)
+        {
+            var window = new TableWindow();
+            window.DataContext = viewModel;
+            window.ShowDialog();
+        }
     }
 }

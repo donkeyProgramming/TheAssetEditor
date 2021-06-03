@@ -18,30 +18,26 @@ namespace CommonControls.Editors.AnimationFragment
         public string DisplayName { get => _displayName; set => SetAndNotify(ref _displayName, value); }
       
         PackFileService _pf;
-        public AnimationFragmentViewModel(PackFileService pf)
+        public AnimationFragmentViewModel(PackFileService pf, bool isEditable = true)
         {
             _pf = pf;
-            _possibleEnumValues = new ObservableCollection<string>();// { "1-Horse", "2-Cat", "3-dog", "4-Bird" };
+            var possibleEnumValues = new ObservableCollection<string>();// { "1-Horse", "2-Cat", "3-dog", "4-Bird" };
             foreach (var slot in AnimationSlotTypeHelper.Values)
-                _possibleEnumValues.Add(slot.Value);
+                possibleEnumValues.Add(slot.Value);
 
-            // Create coloumns
-            CreateColum("Index", typeof(ValueCellItem<int>));
-            CreateColum("Slot", typeof(TypedComboBoxCellItem<string>));
-            CreateColum("FileName", typeof(ValueCellItem<string>));
-            CreateColum("MetaFile", typeof(ValueCellItem<string>));
-            CreateColum("SoundMeta", typeof(ValueCellItem<string>));
-            //CreateColum("Weapon0", typeof(BoolCellItem));
-            //CreateColum("Weapon1", typeof(BoolCellItem));
+            Factory.CreateColoumn("Index", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x) { IsEditable = false });
+            Factory.CreateColoumn("Slot", CellFactory.ColoumTypes.ComboBox, (x) => new TypedComboBoxCellItem<string>(x as string, possibleEnumValues) { IsEditable = isEditable });
+            Factory.CreateColoumn("FileName", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x) { IsEditable = isEditable });
+            Factory.CreateColoumn("MetaFile", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x) { IsEditable = isEditable });
+            Factory.CreateColoumn("SoundMeta", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x) { IsEditable = isEditable });
         }
 
-        public static AnimationFragmentViewModel CreateFromFragment(PackFileService pfs, FileTypes.AnimationPack.AnimationFragment fragment)
+        public static AnimationFragmentViewModel CreateFromFragment(PackFileService pfs, FileTypes.AnimationPack.AnimationFragment fragment, bool isEditable = true)
         {
-            var viewModel = new AnimationFragmentViewModel(pfs);
+            var viewModel = new AnimationFragmentViewModel(pfs, isEditable);
             viewModel.Load(fragment);
             return viewModel;
         }
-
 
         void Load(PackFile file)
         {
@@ -55,14 +51,7 @@ namespace CommonControls.Editors.AnimationFragment
             SuspendLayout();
             var index = 0;
             foreach (var fragment in fragmentFile.Fragments)
-            {
-                CreateRow(
-                    new ValueCellItem<int>(index++) { IsEditable=false},
-                    new TypedComboBoxCellItem<string>(fragment.Slot.Value, _possibleEnumValues),
-                   new ValueCellItem<string>(fragment.AnimationFile, Validate),
-                   new ValueCellItem<string>(fragment.MetaDataFile, Validate),
-                   new ValueCellItem<string>(fragment.SoundMetaDataFile, Validate));
-            }
+                CreateRow(index++, fragment.Slot.Value, fragment.AnimationFile, fragment.MetaDataFile, fragment.SoundMetaDataFile);
             ResumeLayout();
         }
 
@@ -82,7 +71,7 @@ namespace CommonControls.Editors.AnimationFragment
             return true;
         }
 
-        ObservableCollection<string> _possibleEnumValues;
+        
 
         
 

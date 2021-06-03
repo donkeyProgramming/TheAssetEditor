@@ -23,8 +23,8 @@ namespace FileTypes.AnimationPack
                 Skeleton = data.ReadString(),
                 Blend = data.ReadSingle(),
                 Weight = data.ReadSingle(),
-                Unknown0 = data.ReadInt32(),
-                Unknown1 = data.ReadInt32(),
+                Unknown0 = data.ReadInt32(),//6
+                Unknown1 = data.ReadInt32(),//6
                 Unknown3 = data.ReadString(),
                 Unknown4 = data.ReadBool(),
             };
