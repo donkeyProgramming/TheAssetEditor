@@ -58,8 +58,8 @@ namespace FileTypes.AnimationPack
 
         void LoadAnimationSets(ByteChunk data)
         {
-            var count = data.ReadShort();
-            Unknown0 = data.ReadShort();
+            var count = data.ReadInt32();
+           // Unknown0 = data.ReadShort();
             for (int i = 0; i < count; i++)
             {
                 var animationSet = new FragmentReference()

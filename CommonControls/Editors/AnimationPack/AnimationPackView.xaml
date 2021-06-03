@@ -7,6 +7,7 @@
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors"
              xmlns:table="clr-namespace:CommonControls.Table"
              xmlns:animationFragmenView="clr-namespace:CommonControls.Editors.AnimationFragment"
+             xmlns:animationBinView="clr-namespace:CommonControls.Editors.AnimationBin"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -58,6 +59,10 @@
         <ContentControl Grid.Row="1" Grid.Column="2" Content="{Binding SelectedItemViewModel, UpdateSourceTrigger=PropertyChanged}">
             <ContentControl.Resources>
                 <DataTemplate DataType="{ x:Type animationFragmenView:AnimationFragmentViewModel}">
+                    <table:TableView/>
+                </DataTemplate>
+
+                <DataTemplate DataType="{ x:Type animationBinView:AnimationBinViewModel}">
                     <table:TableView/>
                 </DataTemplate>
             </ContentControl.Resources>

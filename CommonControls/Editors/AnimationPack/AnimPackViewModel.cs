@@ -1,5 +1,6 @@
 ﻿using Common;
 using CommonControls.Common;
+using CommonControls.Editors.AnimationBin;
 using CommonControls.Editors.AnimationFragment;
 using CommonControls.Services;
 using FileTypes.AnimationPack;
@@ -58,6 +59,8 @@ namespace CommonControls.Editors.AnimationPack
         {
             if (item != null && item is FagmentAnimPackItem animFragItem)
                 SelectedItemViewModel = AnimationFragmentViewModel.CreateFromFragment(_pfs, animFragItem.Item);
+            else if (item != null && item is BinAnimPackItem binItem)
+                SelectedItemViewModel = AnimationBinViewModel.CreateFromBin(_pfs, binItem.Item);
 
         }
 

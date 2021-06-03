@@ -25,8 +25,15 @@ namespace CommonControls.Table
                 dt = (DataTemplate)Resources["BoolTemplate"];
             else if ((typeof(ComboBoxCellItem).IsAssignableFrom(e.PropertyType)))
                 dt = (DataTemplate)Resources["ComboBoxTemplate"];
-            else if((typeof(BaseCellItem).IsAssignableFrom(e.PropertyType)))
-                dt = (DataTemplate)Resources["BaseTemplate"];
+            else if ((typeof(ButtonCellItem).IsAssignableFrom(e.PropertyType)))
+                dt = (DataTemplate)Resources["ButtonTemplate"];
+            else if ((typeof(BaseCellItem).IsAssignableFrom(e.PropertyType)))
+            {
+                if(e.PropertyName.ToLower() == "index")
+                    dt = (DataTemplate)Resources["IndexTemplate"];
+                else
+                    dt = (DataTemplate)Resources["BaseTemplate"];
+            }
 
             if (dt != null)
             {
@@ -36,7 +43,7 @@ namespace CommonControls.Table
                     Header = e.Column.Header,
                     HeaderTemplate = e.Column.HeaderTemplate,
                     HeaderStringFormat = e.Column.HeaderStringFormat,
-                    SortMemberPath = "Index" // this is used to index into the DataRowView so it MUST be the property's name (for this implementation anyways)
+                    SortMemberPath = e.PropertyName // this is used to index into the DataRowView so it MUST be the property's name (for this implementation anyways)
                 };
                 e.Column = c;
             }
@@ -80,7 +87,8 @@ namespace CommonControls.Table
             if (drv == null)
                 return null;
 
-            return drv.Row[cell.Column.SortMemberPath];
+            
+           return drv.Row[cell.Column.SortMemberPath];
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

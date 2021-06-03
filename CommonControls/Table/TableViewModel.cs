@@ -6,57 +6,106 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Text;
 using System.Windows.Input;
+using System.Linq;
 
 namespace CommonControls.Table
 {
-    public class TableViewModel : NotifyPropertyChangedImpl
+    abstract public class TableViewModel : NotifyPropertyChangedImpl
     {
+
         string _filterText;
         public string FilterText { get => _filterText; set => SetAndNotify(ref _filterText, value); }
 
-        public DataTable Data { get; set; } = new DataTable();
+        DataTable _privateTable = new DataTable();
+
+        DataTable _data;
+        public DataTable Data { get => _data; set => SetAndNotify(ref _data, value); }
 
 
         DataRowView _selectedRow;
         public DataRowView SelectedRow { get => _selectedRow; set => SetAndNotify(ref _selectedRow, value); }
 
         public ICommand SearchCommand { get; set; }
+        public ICommand DuplicateRowCommand { get; set; }
+        public ICommand CreateRowCommand { get; set; }
+        public ICommand DeleteRowCommand { get; set; }
 
 
         public TableViewModel()
         {
+            _privateTable.CaseSensitive = false;
             SearchCommand = new RelayCommand<string>(Filter);
+
+            DuplicateRowCommand = new RelayCommand<DataRowView>(DuplicateRow);
+            //Data = _privateTable;
             //https://stackoverflow.com/questions/19320528/wpf-hide-row-in-datagrid-based-on-condition
+        }
+
+        protected void SuspendLayout()
+        {
+            Data = null;
+        }
+
+        protected void ResumeLayout()
+        {
+            Data = _privateTable;
         }
 
         public void CreateColum(string name, Type type)
         {
-            Data.Columns.Add(name, type);
+            _privateTable.Columns.Add(name, type);
         }
 
         public void CreateColum(string name)
         {
-            Data.Columns.Add(name);
+            _privateTable.Columns.Add(name);
         }
 
         protected void CreateRow(params object[] rowItems)
         {
-            if (Data.Columns.Count != rowItems.Length)
+            if (_privateTable.Columns.Count != rowItems.Length)
                 throw new Exception("Not the same amount of coloums in data element as table");
 
-            Data.Rows.Add(rowItems);
+            _privateTable.Rows.Add(rowItems);
         }
 
 
         void Filter(string filterText)
         {
-            //DV.RowFilter = string.Format("convert(JobNumber, 'System.String') Like '%{0}%' ",
-            //textBox1.Text);
+            filterText = filterText.ToUpper();
+            var columnNames = new List<string>();
+            for (int i = 0; i < _privateTable.Columns.Count; i++)
+                columnNames.Add(_privateTable.Columns[i].ColumnName);
+
+            var filters = columnNames.Select(x => string.Format("convert({0}, 'System.String') LIKE '%{1}%'", x, filterText));
+            var completeFilter = string.Join(" OR ", filters);
+
+            _privateTable.DefaultView.RowFilter = completeFilter;
         }
 
 
-        public void DuplicateRow()
-        { }
+        public void DuplicateRow(DataRowView value)
+        {
+            DuplicateRow(value.Row);
+        }
+
+        protected virtual void DuplicateRow(DataRow row)
+        {
+            var newColumns = new List<BaseCellItem>();
+            foreach (BaseCellItem objItem in row.ItemArray)
+            {
+                var clone = objItem.Duplicate();
+                newColumns.Add(clone);
+            }
+
+            if (_privateTable.Columns[0].ColumnName.ToLower() == "index")
+            {
+                var indexColoum = newColumns[0] as ValueCellItem<int>;
+                indexColoum.Data = _privateTable.Rows.Count;
+            }
+
+            CreateRow(newColumns.ToArray());
+        }
 
         public void InsertNewRow()
         { }

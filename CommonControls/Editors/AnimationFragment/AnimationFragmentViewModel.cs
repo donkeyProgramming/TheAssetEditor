@@ -6,6 +6,7 @@ using FileTypes.PackFiles.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Text;
 
 namespace CommonControls.Editors.AnimationFragment
@@ -25,9 +26,10 @@ namespace CommonControls.Editors.AnimationFragment
                 _possibleEnumValues.Add(slot.Value);
 
             // Create coloumns
+            CreateColum("Index", typeof(ValueCellItem<int>));
             CreateColum("Slot", typeof(TypedComboBoxCellItem<string>));
             CreateColum("FileName", typeof(ValueCellItem<string>));
-            CreateColum("MetaFile", typeof(ValueCellItem<string>));    // Explorable item
+            CreateColum("MetaFile", typeof(ValueCellItem<string>));
             CreateColum("SoundMeta", typeof(ValueCellItem<string>));
             //CreateColum("Weapon0", typeof(BoolCellItem));
             //CreateColum("Weapon1", typeof(BoolCellItem));
@@ -50,13 +52,18 @@ namespace CommonControls.Editors.AnimationFragment
 
         void Load(FileTypes.AnimationPack.AnimationFragment fragmentFile)
         {
+            SuspendLayout();
+            var index = 0;
             foreach (var fragment in fragmentFile.Fragments)
             {
-                CreateRow(new TypedComboBoxCellItem<string>(fragment.Slot.Value, _possibleEnumValues),
+                CreateRow(
+                    new ValueCellItem<int>(index++) { IsEditable=false},
+                    new TypedComboBoxCellItem<string>(fragment.Slot.Value, _possibleEnumValues),
                    new ValueCellItem<string>(fragment.AnimationFile, Validate),
                    new ValueCellItem<string>(fragment.MetaDataFile, Validate),
                    new ValueCellItem<string>(fragment.SoundMetaDataFile, Validate));
             }
+            ResumeLayout();
         }
 
         PackFile _packFile;
@@ -76,6 +83,8 @@ namespace CommonControls.Editors.AnimationFragment
         }
 
         ObservableCollection<string> _possibleEnumValues;
+
+        
 
 
 

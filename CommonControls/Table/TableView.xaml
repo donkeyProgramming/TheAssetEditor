@@ -12,7 +12,7 @@
         <local:DataRowViewConverter x:Key="drvc" />
         <valueconverters:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Collapsed" />
 
-        <ContextMenu  x:Key="RowContextMenu" DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+        <ContextMenu  x:Key="RowContextMenu" DataContext="{Binding RelativeSource={RelativeSource Mode=Self}, Path=PlacementTarget.DataContext}">
             <MenuItem Header="Duplicate row" Click="{s:MethodBinding DuplicateRow}"/>
             <MenuItem Header="Delete row" Click="{s:MethodBinding DeleteRow}"/>
             <MenuItem Header="New row" Click="{s:MethodBinding InsertNewRow }"/>
@@ -24,10 +24,21 @@
 
         <Style x:Key="BackgroundColourStyle" TargetType="{x:Type Control}">
             <Setter Property="Background" Value="{Binding Path=Background, RelativeSource={RelativeSource AncestorType=DataGridCell}}"/>
+            <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsValid, UpdateSourceTrigger=PropertyChanged}" Value="false">
                     <Setter Property="Background" Value="OrangeRed" />
                 </DataTrigger>
+                <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType=DataGridCell}}" Value="true">
+                    <Setter Property="Background" Value="LightBlue" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="IndexColoumnStyle" TargetType="{x:Type Control}">
+            <Setter Property="Background" Value="{Binding Path=Background, RelativeSource={RelativeSource AncestorType=DataGridCell}}"/>
+            <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}" />
+            <Style.Triggers>
                 <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType=DataGridCell}}" Value="true">
                     <Setter Property="Background" Value="LightBlue" />
                 </DataTrigger>
@@ -48,19 +59,31 @@
 
         <DataTemplate x:Key="BaseTemplate" >
             <DockPanel DataContext="{Binding RelativeSource={RelativeSource AncestorType=DataGridCell}, Converter={StaticResource drvc}}">
-                <Button Width="25" DockPanel.Dock="Right" Visibility="{Binding ShowExploreButton, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToHiddenConverter}}"/>
                 <TextBox Text="{Binding Data, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                          AcceptsReturn="False" AcceptsTab="False"
                          DockPanel.Dock="Left"
+                         IsEnabled="{Binding IsEditable}"
                          ToolTip="{StaticResource ErrorToolTip}"
                          Style="{StaticResource BackgroundColourStyle}">
                 </TextBox>
             </DockPanel>
         </DataTemplate>
 
+        <DataTemplate x:Key="IndexTemplate" >
+            <DockPanel DataContext="{Binding RelativeSource={RelativeSource AncestorType=DataGridCell}, Converter={StaticResource drvc}}">
+                <TextBox Text="{Binding Data, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                         AcceptsReturn="False" AcceptsTab="False"
+                         DockPanel.Dock="Left"
+                         IsEnabled="{Binding IsEditable}"
+                         Style="{StaticResource IndexColoumnStyle}"
+                         HorizontalContentAlignment="Center">
+                </TextBox>
+            </DockPanel>
+        </DataTemplate>
+
+
         <DataTemplate x:Key="BoolTemplate" >
             <DockPanel DataContext="{Binding RelativeSource={RelativeSource AncestorType=DataGridCell}, Converter={StaticResource drvc}}">
-                <Button Width="25" DockPanel.Dock="Right" Visibility="{Binding ShowExploreButton, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToHiddenConverter}}"/>
                 <CheckBox DockPanel.Dock="Left" HorizontalAlignment="Center" VerticalContentAlignment="Center"
                           IsChecked="{Binding Data, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                           ToolTip="{StaticResource ErrorToolTip}"
@@ -69,47 +92,28 @@
             </DockPanel>
         </DataTemplate>
 
-        <DataTemplate x:Key="ComboBoxTemplate2">
-            <DockPanel DataContext="{Binding RelativeSource={RelativeSource AncestorType=DataGridCell}, Converter={StaticResource drvc}}">
-                <dotNetKitControls:AutoCompleteComboBox
-                    SelectedValuePath="."
-                    TextSearch.TextPath="."
-                    ItemsSource="{Binding PossibleValues, UpdateSourceTrigger=PropertyChanged}"
-                    SelectedItem="{Binding Data, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                    ToolTip="{StaticResource ErrorToolTip}" 
-                    Style="{StaticResource ComboBoxTemplateToolStyle}">
-                    <dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel />
-                        </ItemsPanelTemplate>
-                    </dotNetKitControls:AutoCompleteComboBox.ItemsPanel>
-                </dotNetKitControls:AutoCompleteComboBox>
+        <DataTemplate x:Key="ButtonTemplate" >
+            <DockPanel >
+                <Button DockPanel.Dock="Right" Content="..." 
+                        DataContext="{Binding RelativeSource={RelativeSource AncestorType=DataGridCell}, Converter={StaticResource drvc}}"
+                        Command="{Binding ClickCommand}"
+                        CommandParameter="{Binding CurrentCell, RelativeSource={RelativeSource FindAncestor, AncestorType=DataGrid}}"/>
             </DockPanel>
         </DataTemplate>
 
         <DataTemplate x:Key="ComboBoxTemplate">
             <DockPanel DataContext="{Binding RelativeSource={RelativeSource AncestorType=DataGridCell}, Converter={StaticResource drvc}}">
                 <ComboBox Name="cmbContains" IsEditable="True" IsTextSearchEnabled="false"
+                           Text="{Binding SearchText, Mode=TwoWay}" 
                           ItemsSource="{Binding PossibleValues}" 
-                          SelectedIndex="{Binding SelectedIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                          VirtualizingStackPanel.IsVirtualizing="True" 
-                          ToolTip="{StaticResource ErrorToolTip}" 
-                          Text="{Binding SearchText, Mode=TwoWay}" 
+                          ToolTip="{StaticResource ErrorToolTip}"        
                           Style="{StaticResource ComboBoxTemplateToolStyle}">
 
-
-
-                    <ComboBox.Triggers>
-                        <EventTrigger RoutedEvent="TextBoxBase.TextChanged">
-                            <BeginStoryboard>
-                                <Storyboard>
-                                    <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="IsDropDownOpen">
-                                        <DiscreteBooleanKeyFrame Value="True" KeyTime="0:0:0"/>
-                                    </BooleanAnimationUsingKeyFrames>
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                    </ComboBox.Triggers>
+                    <ComboBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </ComboBox.ItemsPanel>
 
                 </ComboBox>
             </DockPanel>
@@ -125,14 +129,31 @@
 
         <DataGrid Grid.Row="0"        
                   Name="dataGrid1"
-                  ItemsSource="{Binding Data.DefaultView}" 
-                  SelectedItem="{Binding Path=SelectedRow, Mode=TwoWay}"
-                  AutoGenerateColumns="True" CanUserAddRows="false" AlternationCount="2" 
-                  AutoGeneratingColumn="DataGrid_AutoGeneratingColumn" 
-                  local:DataGridBehavior.DisplayRowNumber="True">
+                  
+                  ItemsSource="{Binding Data.DefaultView, UpdateSourceTrigger=PropertyChanged}" 
+                  SelectedItem="{Binding Path=SelectedRow, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                  AutoGenerateColumns="True"
+                  CanUserAddRows="false" 
+                  EnableRowVirtualization="True"
+                  EnableColumnVirtualization="True"
+                  VirtualizingPanel.ScrollUnit="Pixel"
+                    VirtualizingStackPanel.VirtualizationMode="Standard"
+             VirtualizingStackPanel.IsVirtualizing="True"
+                  AlternationCount="2" 
+                  AutoGeneratingColumn="DataGrid_AutoGeneratingColumn" >
+
+
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="MyHeader" 
+                     Command="{Binding DuplicateRowCommand}"
+                     CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedItem}" />
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            
             <DataGrid.RowStyle>
                 <Style TargetType="{x:Type DataGridRow}">
-                    <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}" />
+                    
                     <Style.Triggers>
                         <Trigger Property="ItemsControl.AlternationIndex" Value="0">
                             <Setter Property="Background" Value="#EEEEEE" />
