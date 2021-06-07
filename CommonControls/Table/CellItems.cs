@@ -1,6 +1,8 @@
 ﻿using Common;
+using CommonControls.Common;
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -40,7 +42,7 @@ namespace CommonControls.Table
             _resourceMap[ColoumTypes.Bool] = "BoolTemplate";
             _resourceMap[ColoumTypes.SubTable] = "ButtonTemplate";
             _resourceMap[ColoumTypes.ComboBox] = "ComboBoxTemplate";
-            _resourceMap[ColoumTypes.BitFlag] = "";
+            _resourceMap[ColoumTypes.BitFlag] = "BitflagTemplate";
         }
 
         internal string GetCellTemplate(string propertyName)
@@ -85,7 +87,6 @@ namespace CommonControls.Table
         public string ErrorText { get => _errorText; set => SetAndNotify(ref _errorText, value); }
 
         public abstract string ToString(IFormatProvider provider);
-
 
         public abstract BaseCellItem Duplicate();
 
@@ -247,16 +248,12 @@ namespace CommonControls.Table
         }
     }
 
-    public class TypedComboBoxCellItem<T> : ValueCellItem<T>, ComboBoxCellItem
+    public class TypedComboBoxCellItem<T> : ValueCellItem<T>
     {
         ObservableCollection<T> _allPossibleValues;
         ObservableCollection<T> _possibleValues;
         public ObservableCollection<T> PossibleValues { get => _possibleValues; set => SetAndNotify(ref _possibleValues, value); }
         public bool ValidateAsEnums { get; set; } = true;
-
-
-        //int _selectedIndex = -1;
-        //public int SelectedIndex { get => _selectedIndex; set => SetAndNotify(ref _selectedIndex, value); }
 
         public TypedComboBoxCellItem(T selectedValue = default, ObservableCollection<T> possibleValues = null)
         {
@@ -265,7 +262,6 @@ namespace CommonControls.Table
             _allPossibleValues = possibleValues;
             if(Data != null)
                 _SearchText = Data.ToString();
-            //_selectedIndex = PossibleValues.IndexOf(selectedValue);
         }
 
         public override string ToString(IFormatProvider provider)
@@ -308,15 +304,10 @@ namespace CommonControls.Table
         }
     }
 
-    public interface ComboBoxCellItem
-    { }
-
-
     public class ButtonCellItem : BaseCellItem
     {
-        public delegate void ExplorCellButtonPressed(BaseCellItem cell, int rowIndex);
-        ExplorCellButtonPressed _explorCellButtonCallback;
-        public ExplorCellButtonPressed ExplorCellButtonCallback { get => _explorCellButtonCallback; set { _explorCellButtonCallback = value; } }
+        //public delegate void ExplorCellButtonPressed(BaseCellItem cell, int rowIndex);
+        //ExplorCellButtonPressed _explorCellButtonCallback;}
 
         public ICommand ClickCommand { get; set; }
 
@@ -326,7 +317,6 @@ namespace CommonControls.Table
         {
             ClickCommand = new RelayCommand<DataGridCellInfo>(Click);
             _subTable = subTable;
-            //ExplorCellButtonCallback = clickCallback;
         }
 
         public override BaseCellItem Duplicate()
@@ -338,15 +328,7 @@ namespace CommonControls.Table
 
         void Click(DataGridCellInfo cellInfo)
         {
-            var owner = cellInfo.Item as System.Data.DataRowView;
-            var table = owner.DataView.Table;
-            var index = table.Rows.IndexOf(owner.Row);
-
-            TableWindow window = new TableWindow();
-            window.DataContext = _subTable;
-            window.Show();
-
-            ExplorCellButtonCallback?.Invoke(this, index);
+            TableWindow.Show(_subTable);
         }
 
         public override string ToString(IFormatProvider provider)
@@ -355,4 +337,46 @@ namespace CommonControls.Table
         }
     }
 
+    public class BitflagCellItem : BaseCellItem
+    {
+        public int BitFlagValue { get; set; }
+        public int NumFlags { get; set; }
+        public ObservableCollection<NotifyPropValueWrapper<bool>> Flags { get; set; } = new ObservableCollection<NotifyPropValueWrapper<bool>>();
+
+        public BitflagCellItem(int value, int numFlags)
+        {
+            BitFlagValue = value;
+            NumFlags = numFlags;
+
+            var b = new BitArray(new int[] { BitFlagValue });
+            var bits = new bool[b.Count];
+            b.CopyTo(bits, 0);
+
+            for (int i = 0; i < NumFlags; i++)
+                Flags.Add(new NotifyPropValueWrapper<bool>(bits[i]));
+        }
+
+        public int GetAsInt()
+        {
+            var outputValues = Flags.Select(x => x.Value).ToList();
+            if (outputValues.Count != 32)
+                outputValues.AddRange(Enumerable.Repeat(false, 32 - outputValues.Count));
+
+            BitArray output = new BitArray(outputValues.ToArray());
+            int[] ouputArray = new int[1];
+            output.CopyTo(ouputArray, 0);
+            var v = ouputArray[0];
+            return v;
+        }
+
+        public override BaseCellItem Duplicate()
+        {
+            return new BitflagCellItem(BitFlagValue, NumFlags);
+        }
+
+        public override string ToString(IFormatProvider provider)
+        {
+            return "";
+        }
+    }
 }

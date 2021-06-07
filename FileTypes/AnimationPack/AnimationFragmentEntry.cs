@@ -7,32 +7,6 @@ using System.Linq;
 namespace FileTypes.AnimationPack
 {
 
-    public class FragmentReader
-    {
-        public AnimationFragmentEntry Read(ByteChunk data)
-        {
-            var id = data.ReadInt32();
-            var slot = data.ReadInt32();
-
-            var fragment = new AnimationFragmentEntry()
-            {
-                Slot = AnimationSlotTypeHelper.GetFromId(slot),
-                AnimationFile = data.ReadString(),
-                MetaDataFile = data.ReadString(),
-                SoundMetaDataFile = data.ReadString(),
-                Skeleton = data.ReadString(),
-                Blend = data.ReadSingle(),
-                Weight = data.ReadSingle(),
-                Unknown0 = data.ReadInt32(),//6
-                Unknown1 = data.ReadInt32(),//6
-                Unknown3 = data.ReadString(),
-                Unknown4 = data.ReadBool(),
-            };
-            return fragment;
-        }
-    }
-
-
     public class AnimationFragmentEntry
     {
         int _id { get; set; }
@@ -69,28 +43,49 @@ namespace FileTypes.AnimationPack
             Unknown4 = data.ReadBool();
         }
 
-        public void Write(BinaryWriter writer)
+        public AnimationFragmentEntry Clone()
         {
-            writer.Write(Slot.Id);
-            writer.Write(Slot.Id);
-
-            writer.Write(ByteParsers.String.WriteCaString(AnimationFile));
-            writer.Write(ByteParsers.String.WriteCaString(MetaDataFile));
-            writer.Write(ByteParsers.String.WriteCaString(SoundMetaDataFile));
-            writer.Write(ByteParsers.String.WriteCaString(Skeleton));
-
-            writer.Write(Blend);
-            writer.Write(Weight);
-
-            writer.Write(Unknown0);
-            writer.Write(Unknown1);
-            writer.Write(ByteParsers.String.WriteCaString(Unknown3));
-            //writer.Write(ByteParsers.Bool.Write(Unknown4));
+            return new AnimationFragmentEntry()
+            {
+                Slot = Slot.Clone(),
+                AnimationFile = AnimationFile,
+                MetaDataFile = MetaDataFile,
+                SoundMetaDataFile = SoundMetaDataFile,
+                Skeleton = Skeleton,
+                Blend = Blend,
+                Weight = Weight,
+                Unknown0 = Unknown0,
+                Unknown1 = Unknown1,
+                Unknown3 = Unknown3,
+                Unknown4 = Unknown4
+            };
         }
-
 
         public AnimationFragmentEntry()
         {
+        }
+
+        public byte[] ToByteArray()
+        {
+            using MemoryStream memStream = new MemoryStream();
+
+            memStream.Write(ByteParsers.Int32.EncodeValue(Slot.Id, out _));
+            memStream.Write(ByteParsers.Int32.EncodeValue(Slot.Id, out _));
+
+            memStream.Write(ByteParsers.String.WriteCaString(AnimationFile));
+            memStream.Write(ByteParsers.String.WriteCaString(MetaDataFile));
+            memStream.Write(ByteParsers.String.WriteCaString(SoundMetaDataFile));
+            memStream.Write(ByteParsers.String.WriteCaString(Skeleton));
+
+            memStream.Write(ByteParsers.Single.EncodeValue(Blend, out _));
+            memStream.Write(ByteParsers.Single.EncodeValue(Weight, out _));
+
+            memStream.Write(ByteParsers.Int32.EncodeValue(Unknown0, out _));
+            memStream.Write(ByteParsers.Int32.EncodeValue(Unknown1, out _));
+            memStream.Write(ByteParsers.String.WriteCaString(Unknown3));
+            memStream.Write(ByteParsers.Bool.EncodeValue(Unknown4, out _));
+
+            return memStream.ToArray();
         }
 
         public void SetWeaponFlag(int weaponIndex, bool value)
@@ -114,5 +109,7 @@ namespace FileTypes.AnimationPack
 
             return value;
         }
+
+
     }
 }

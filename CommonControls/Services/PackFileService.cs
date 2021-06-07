@@ -356,7 +356,7 @@ namespace CommonControls.Services
 
             Database.TriggerPackFilesUpdated(pf, new List<PackFile>() { file as PackFile });
         }
-         
+
         public void SaveFile(PackFile file, byte[] data)
         {
             var pf = GetPackFileContainer(file);

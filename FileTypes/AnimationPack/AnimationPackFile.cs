@@ -3,75 +3,13 @@ using Filetypes.ByteParsing;
 using FileTypes.PackFiles.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace FileTypes.AnimationPack
 {
-   /* public class AnimationPackLoader
-    {
-        class AnimationDataFile
-        {
-            public string Name { get; set; }
-            public int StartOffset { get; set; }
-            public int Size { get; set; }
-
-            public override string ToString()
-            {
-                return Name;
-            }
-        }
-
-        static public IEnumerable<AnimationFragment> GetFragments(PackFile file)
-        {
-            var data = file.DataSource.ReadDataAsChunk();
-            var fragmentFiles = FindAllSubFiles(data).Where(x => x.Name.Contains(".frg"));
-
-            var output = new List<AnimationFragment>();
-            foreach (var fragmentFile in fragmentFiles)
-            {
-                data.Index = fragmentFile.StartOffset;
-                output.Add(new AnimationFragment(fragmentFile.Name, data));
-            }
-
-            return output;
-        }
-
-        static public List<AnimationBin> GetAnimationBins(PackFile file)
-        {
-            var output = new List<AnimationBin>();
-            var data = file.DataSource.ReadDataAsChunk();
-            var animationBins = FindAllSubFiles(data).Where(x => x.Name.Contains("tables.bin")).ToList();
-
-            foreach (var animBin in animationBins)
-            {
-                var byteChunk = new ByteChunk(data.Buffer, animBin.StartOffset);
-                output.Add(new AnimationBin(animBin.Name, byteChunk));
-            }
-
-            return output;
-        }
-
-        static List<AnimationDataFile> FindAllSubFiles(ByteChunk data)
-        {
-            var toalFileCount = data.ReadInt32();
-            var fileList = new List<AnimationDataFile>(toalFileCount);
-            for (int i = 0; i < toalFileCount; i++)
-            {
-                var file = new AnimationDataFile()
-                {
-                    Name = data.ReadString(),
-                    Size = data.ReadInt32(),
-                    StartOffset = data.Index
-                };
-                fileList.Add(file);
-                data.Index += file.Size;
-            }
-            return fileList;
-        }
-    }
-    */
     public class AnimationPackFile
     {
         class AnimationDataFile
@@ -80,9 +18,22 @@ namespace FileTypes.AnimationPack
             public int StartOffset { get; set; }
             public int Size { get; set; }
 
-            public override string ToString()
+            public AnimationDataFile()
+            { }
+
+            public AnimationDataFile(ByteChunk data)
             {
-                return Name;
+                Name = data.ReadString();
+                Size = data.ReadInt32();
+                StartOffset = data.Index;
+            }
+
+            public byte[] ToByteArray()
+            {
+                using MemoryStream memStream = new MemoryStream();
+                memStream.Write(ByteParsers.String.WriteCaString(Name));
+                memStream.Write(ByteParsers.Int32.EncodeValue(Size, out _));
+                return memStream.ToArray();
             }
         }
 
@@ -93,6 +44,7 @@ namespace FileTypes.AnimationPack
         public AnimationPackFile(PackFile file)
         {
             var data = file.DataSource.ReadDataAsChunk();
+
             var files = FindAllSubFiles(data);
             Fragments = GetFragments(files, data);
             AnimationBin = GetAnimationBins(files, data).FirstOrDefault();
@@ -104,6 +56,7 @@ namespace FileTypes.AnimationPack
 
         public AnimationPackFile()
         { }
+
 
         List<AnimationFragment> GetFragments(List<AnimationDataFile> animationDataFiles, ByteChunk data)
         {
@@ -139,12 +92,7 @@ namespace FileTypes.AnimationPack
             var fileList = new List<AnimationDataFile>(toalFileCount);
             for (int i = 0; i < toalFileCount; i++)
             {
-                var file = new AnimationDataFile()
-                {
-                    Name = data.ReadString(),
-                    Size = data.ReadInt32(),
-                    StartOffset = data.Index
-                };
+                var file = new AnimationDataFile(data);
                 fileList.Add(file);
                 data.Index += file.Size;
             }
@@ -153,7 +101,42 @@ namespace FileTypes.AnimationPack
 
         public byte[] ToByteArray()
         {
-            return null;
+            if (HasUnknownElements)
+                throw new Exception("Can not save animation pack with unkown elements");
+
+            using MemoryStream memStream = new MemoryStream();
+
+            int totalFileCount = Fragments.Count;
+            if (AnimationBin != null)
+                totalFileCount++;
+
+            memStream.Write(ByteParsers.Int32.EncodeValue(totalFileCount, out _));
+
+            if (AnimationBin != null)
+            {
+                var animBinByteArray = AnimationBin.ToByteArray();
+                AnimationDataFile file = new AnimationDataFile()
+                {
+                    Name = AnimationBin.FileName,
+                    Size = animBinByteArray.Length
+                };
+                memStream.Write(file.ToByteArray());
+                memStream.Write(animBinByteArray);
+            }
+
+            foreach (var item in Fragments)
+            {
+                var itemByteArray = item.ToByteArray();
+                AnimationDataFile file = new AnimationDataFile()
+                {
+                    Name = item.FileName,
+                    Size = itemByteArray.Length
+                };
+                memStream.Write(file.ToByteArray());
+                memStream.Write(itemByteArray);
+            }
+
+            return memStream.ToArray();
         }
     }
 }

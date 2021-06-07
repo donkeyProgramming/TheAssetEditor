@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -39,7 +40,12 @@ namespace CommonControls.Table
                         dataGrid.LoadingRow -= loadedRowHandler;
                         return;
                     }
-                    ea.Row.Header = ea.Row.GetIndex();
+                    var veiw = dataGrid.ItemsSource as DataView;
+                    var row = ea.Row.DataContext as DataRowView;
+                    
+                    var index =veiw.Table.Rows.IndexOf(row.Row);
+                    //var t = veiw.Table.Rows.IndexOf(ea.Row.Item as DataRowView);
+                    ea.Row.Header = index;// ea.Row.GetIndex();
                 };
                 dataGrid.LoadingRow += loadedRowHandler;
 
@@ -52,7 +58,21 @@ namespace CommonControls.Table
                         return;
                     }
                     GetVisualChildCollection<DataGridRow>(dataGrid).
-                        ForEach(d => d.Header = d.GetIndex());
+                        ForEach(d => 
+                        {
+
+                            var veiw = dataGrid.ItemsSource as DataView;
+                           // var row = d.DataContext
+
+                            //var index = veiw.Table.Rows.IndexOf(row.Row);
+
+
+                            // dataGrid.
+                            //d.Header = d.GetIndex(); 
+                        });
+
+                    //var r = 
+                    //var index = r.Table.Rows.IndexOf(r);
                 };
                 dataGrid.ItemContainerGenerator.ItemsChanged += itemsChangedHandler;
             }

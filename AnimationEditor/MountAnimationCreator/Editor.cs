@@ -1,5 +1,6 @@
 ﻿using AnimationEditor.Common.AnimationSettings;
 using AnimationEditor.Common.ReferenceModel;
+using AnimationEditor.MountAnimationCreator.Services;
 using AnimationEditor.PropCreator;
 using Common;
 using CommonControls.Common;
@@ -374,58 +375,63 @@ namespace AnimationEditor.MountAnimationCreator
             }
         }
 
+
+
+
         public void BatchProcess()
         {
-            // Bin and animpack
-            // Fragment
-            // Animations
+            var mountFrag = MountLinkController.SelectedMount.Entry;
+            var riderFrag = MountLinkController.SeletedRider.Entry;
 
-            // Rider fragment
-            // Mount Fragment
-            // New fragment
 
-            var res = BatchProcessOptionsWindow.ShowDialog("MyFragment.frg");
+            var t = new BatchProcessorService(mountFrag, riderFrag);
 
-            //AnimationPackLoader
-            AnimationPackFile animPack = new AnimationPackFile();
-            animPack.AnimationBin = new AnimationBin("animation//test_table.bin");
-            var tableEntry = new AnimationBinEntry("my_entry_in_table", "Humanoid01", "dog");
-            tableEntry.FragmentReferences.Add(new AnimationBinEntry.FragmentReference() { Name = "test_fragment.frg" });
-         
 
-            animPack.AnimationBin.AnimationTableEntries.Add(tableEntry);
+            // Add all rider spesific
 
-            var fragment = new AnimationFragment("animation//test_fragment.frg");
-            fragment.Skeletons = new AnimationFragment.StringArrayTable("Humanoid01", "Humanoid01");
-            for (int i = 0; i < 10; i++)
-            {
-                AnimationFragmentEntry entry = new AnimationFragmentEntry();
-                entry.Skeleton = "Humanoid01";
-                entry.Slot = AnimationSlotTypeHelper.GetFromId(i);
-                entry.AnimationFile = "somAnim" +i.ToString() + ".anim";
-                entry.MetaDataFile = "somAnimMeta" + i.ToString() + ".anim";
-                entry.SoundMetaDataFile = "somAnimSound" + i.ToString() + ".anim";
-            }
-            animPack.Fragments.Add(fragment);
+            // Add all dock
+
+            // Add all face
+
+            // Add all hand
 
 
 
-            var bytes = animPack.ToByteArray();
+            // Ranged
 
-            // SaveFile(path, data, packfileContainer); // Overwirtes and all that fuzz
-            // SaveFile(PackFile, data, packfileContainer); // Overwirtes and all that fuzz
+            // rider
 
-
-            var outputFile = new PackFile();
-            _pfs.AddFileToPack(null, "animations//tables", outputFile);
-            _pfs.SaveFile())
-            // Save
-           // animPack.AnimationBin.AnimationTableEntries.Add()
-            // Create animPack
-            // Create bin
-            // Add
-            // Create fragment
-            //Add
+            //
+            //  foreach (int i = 0; i < 10; i++)
+            //  {
+            //      AnimationFragmentEntry entry = new AnimationFragmentEntry();
+            //      entry.Skeleton = "Humanoid01";
+            //      entry.Slot = AnimationSlotTypeHelper.GetFromId(i);
+            //      entry.AnimationFile = "somAnim" +i.ToString() + ".anim";
+            //      entry.MetaDataFile = "somAnimMeta" + i.ToString() + ".anim";
+            //      entry.SoundMetaDataFile = "somAnimSound" + i.ToString() + ".anim";
+            //      fragment.Fragments.Add(entry);
+            //  }
+            //  fragment.UpdateMinAndMaxSlotIds();
+            //  animPack.Fragments.Add(fragment);
+            //
+            //
+            //
+            //  var bytes = animPack.ToByteArray();
+            //
+            //  // SaveFile(path, data, packfileContainer); // Overwirtes and all that fuzz
+            //  // SaveFile(PackFile, data, packfileContainer); // Overwirtes and all that fuzz
+            //
+            //  var newFile = SaveHelper.Save(_pfs, "animations\\tables\\myanim.animpack", null, bytes);
+            //  //var outputFile = new PackFile();
+            //  //_pfs.AddFileToPack(null, "animations//tables", outputFile);
+            //  // Save
+            // // animPack.AnimationBin.AnimationTableEntries.Add()
+            //  // Create animPack
+            //  // Create bin
+            //  // Add
+            //  // Create fragment
+            //  //Add
 
 
 

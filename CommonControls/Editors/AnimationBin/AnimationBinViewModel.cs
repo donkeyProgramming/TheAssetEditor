@@ -15,16 +15,15 @@ namespace CommonControls.Editors.AnimationBin
     {
         public AnimationBinFragRefViewModel(FileTypes.AnimationPack.AnimationBinEntry entry)
         {
-            Factory.CreateColoumn("Index", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x) { IsEditable=false});
+            //Factory.CreateColoumn("Index", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x) { IsEditable=false});
             Factory.CreateColoumn("Fragment", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
             Factory.CreateColoumn("Unknown", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
 
             if (entry != null)
             {
-                int index = 0;
                 SuspendLayout();
                 foreach (var binEntry in entry.FragmentReferences)
-                    CreateRow(index++, binEntry.Name, binEntry.Unknown);
+                    CreateRow(binEntry.Name, binEntry.Unknown);
 
                 ResumeLayout();
             }
@@ -48,9 +47,10 @@ namespace CommonControls.Editors.AnimationBin
         {
             _pf = pf;
 
-            Factory.CreateColoumn("Index", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x) { IsEditable=false});
+            //Factory.CreateColoumn("Index", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x) { IsEditable=false});
             Factory.CreateColoumn("Key", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
             Factory.CreateColoumn("Skeleton", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
+            Factory.CreateColoumn("Mount", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
             Factory.CreateColoumn("Frag", CellFactory.ColoumTypes.SubTable, (x) => new ButtonCellItem(x as TableViewModel));
             Factory.CreateColoumn("Unknown", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
         }
@@ -58,9 +58,8 @@ namespace CommonControls.Editors.AnimationBin
         void Load(FileTypes.AnimationPack.AnimationBin binFile)
         {
             SuspendLayout();
-            var index = 0;
             foreach (var binEntry in binFile.AnimationTableEntries)
-                CreateRow(index++, binEntry.Name, binEntry.SkeletonName, new AnimationBinFragRefViewModel(binEntry), binEntry.Unknown);
+                CreateRow( binEntry.Name, binEntry.SkeletonName, binEntry.MountName, new AnimationBinFragRefViewModel(binEntry), binEntry.Unknown);
 
             ResumeLayout();
         }

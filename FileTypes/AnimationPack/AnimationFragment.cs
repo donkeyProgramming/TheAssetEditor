@@ -32,14 +32,14 @@ namespace FileTypes.AnimationPack
                     Values.Add(data.ReadString());
             }
 
-            public void Write(BinaryWriter writer)
+            public byte[] ToByteArray()
             {
-                writer.Write(Values.Count);
-                for (int i = 0; i < Values.Count; i++)
-                {
-                    var bytes = ByteParsers.String.WriteCaString(Values[i]);
-                    writer.Write(bytes);
-                }
+                using MemoryStream memStream = new MemoryStream();
+                memStream.Write(ByteParsers.Int32.EncodeValue(Values.Count, out _));
+                foreach(var item in Values)
+                    memStream.Write(ByteParsers.String.WriteCaString(item));
+
+                return memStream.ToArray();
             }
         }
 
@@ -62,6 +62,20 @@ namespace FileTypes.AnimationPack
             }
         }
 
+        public byte[] ToByteArray()
+        {
+            using MemoryStream memStream = new MemoryStream();
+            memStream.Write(Skeletons.ToByteArray());
+
+            memStream.Write(ByteParsers.Int32.EncodeValue(MinSlotId, out _));
+            memStream.Write(ByteParsers.Int32.EncodeValue(MaxSlotId, out _));
+
+            memStream.Write(ByteParsers.Int32.EncodeValue(Fragments.Count, out _));
+            foreach (var item in Fragments)
+                memStream.Write(item.ToByteArray());
+
+            return memStream.ToArray();
+        } 
 
         AnimationFragmentEntry GetFragment(AnimationSlotType slot)
         {
@@ -89,10 +103,15 @@ namespace FileTypes.AnimationPack
             UpdateMinAndMaxSlotIds();
         }
 
-        void UpdateMinAndMaxSlotIds()
+        public void UpdateMinAndMaxSlotIds()
         {
-            MinSlotId = Fragments.Min(x => x.Slot.Id);
-            MaxSlotId = Fragments.Max(x => x.Slot.Id);
+            MinSlotId = 0;
+            MaxSlotId = 0;
+            if (Fragments.Count != 0)
+            {
+                MinSlotId = Fragments.Min(x => x.Slot.Id);
+                MaxSlotId = Fragments.Max(x => x.Slot.Id);
+            }
         }
 
         public void ChangeAnimationFileName(string prefix)
@@ -115,59 +134,6 @@ namespace FileTypes.AnimationPack
             foreach (var fragment in Fragments)
             {
                 fragment.Skeleton = skeletonName;
-            }
-        }
-
-
-        public void ChangeSkeleton(string newSkeletonName)
-        {
-            foreach (var fragment in Fragments)
-            {
-                //fragment.AnimationFile.Replace(fragment.Skeleton)
-                fragment.Skeleton = newSkeletonName;
-            }
-
-            for (int i = 0; i < Skeletons.Values.Count; i++)
-                Skeletons.Values[i] = newSkeletonName;
-        }
-
-        public override string ToString()
-        {
-            return $"{FileName}";
-        }
-
-        public void Write(string path)
-        {
-            if (Skeletons.Values.Count == 1)
-                Skeletons.Values.Add(Skeletons.Values[0]);
-
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                using (BinaryWriter writer = new BinaryWriter(memoryStream))
-                {
-                    Skeletons.Write(writer);
-                    writer.Write(MinSlotId);
-                    writer.Write(MaxSlotId);
-                    writer.Write(Fragments.Count);
-
-                    foreach(var frag in Fragments)
-                        frag.Write(writer);
-                        //writer.Write(Skeletons..Header.AnimationType);                       // Animtype
-                    //writer.Write((uint)1);                                          // Uknown_always 1
-                    //writer.Write(input.Header.FrameRate);                           // Framerate
-                    //writer.Write((short)input.Header.SkeletonName.Length);          // SkeletonNAme length
-
-
-
-                    var dir = Path.GetDirectoryName(path);
-                    if (!Directory.Exists(dir))
-                        Directory.CreateDirectory(dir);
-            
-                    using (var fileStream = File.Create(path))
-                    {
-                        memoryStream.WriteTo(fileStream);
-                    }
-                }
             }
         }
     }

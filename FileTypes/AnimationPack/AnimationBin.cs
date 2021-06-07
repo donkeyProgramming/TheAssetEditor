@@ -2,6 +2,7 @@
 using FileTypes.PackFiles.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace FileTypes.AnimationPack
@@ -27,7 +28,20 @@ namespace FileTypes.AnimationPack
 
         public AnimationBin(string fileName) 
         {
-            FileName = FileName;
+            FileName = fileName;
+        }
+
+        public byte[] ToByteArray()
+        {
+            using MemoryStream memStream = new MemoryStream();
+
+            memStream.Write(ByteParsers.Int32.EncodeValue(TableVersion, out _));
+            memStream.Write(ByteParsers.Int32.EncodeValue(AnimationTableEntries.Count, out _));
+
+            foreach (var tableEntry in AnimationTableEntries)
+                memStream.Write(tableEntry.ToByteArray());
+
+            return memStream.ToArray();
         }
     }
 
@@ -38,10 +52,22 @@ namespace FileTypes.AnimationPack
             public string Name { get; set; }
             public int Unknown { get; set; } = 0;
 
-            public override string ToString()
+            public FragmentReference() { }
+
+            public FragmentReference(ByteChunk data)
             {
-                return $"{Name}, Unk = {Unknown}";
+                Name = data.ReadString();
+                Unknown = data.ReadInt32();
             }
+
+            public byte[] ToByteArray()
+            {
+                using MemoryStream memStream = new MemoryStream();
+                memStream.Write(ByteParsers.String.WriteCaString(Name));
+                memStream.Write(ByteParsers.Int32.EncodeValue(Unknown, out _));
+                return memStream.ToArray();
+            }
+
         }
 
         public string Name { get; set; }
@@ -49,14 +75,17 @@ namespace FileTypes.AnimationPack
         public string MountName { get; set; }
 
         public List<FragmentReference> FragmentReferences { get; set; } = new List<FragmentReference>();
-        public short Unknown { get; set; }
+        public short Unknown { get; set; } = 0;
 
         public AnimationBinEntry(ByteChunk data)
         {
             Name = data.ReadString();
             SkeletonName = data.ReadString();
             MountName = data.ReadString();
-            LoadAnimationSets(data);
+            var count = data.ReadInt32();
+            for (int i = 0; i < count; i++)
+                FragmentReferences.Add(new FragmentReference(data));
+            Unknown = data.ReadShort();
         }
 
         public AnimationBinEntry(string name, string skeletonName, string mountName = "")
@@ -66,28 +95,21 @@ namespace FileTypes.AnimationPack
             MountName = mountName;
         }
 
-        void LoadAnimationSets(ByteChunk data)
+        public byte[] ToByteArray()
         {
-            var count = data.ReadInt32();
-            for (int i = 0; i < count; i++)
-            {
-                var animationSet = new FragmentReference()
-                {
-                    Name = data.ReadString(),
-                    Unknown = data.ReadInt32()
-                };
-                FragmentReferences.Add(animationSet);
-            }
-            Unknown = data.ReadShort();
-        }
+            using MemoryStream memStream = new MemoryStream();
 
-        public override string ToString()
-        {
-            var str = $"{Name}, Skeleton = {SkeletonName}";
-            if (MountName.Length != 0)
-                str += $", Mount = {MountName}";
-            str += $", AnimationSets = {FragmentReferences.Count}";
-            return str;
+            memStream.Write(ByteParsers.String.WriteCaString(Name));
+            memStream.Write(ByteParsers.String.WriteCaString(SkeletonName));
+            memStream.Write(ByteParsers.String.WriteCaString(MountName));
+
+            memStream.Write(ByteParsers.Int32.EncodeValue(FragmentReferences.Count, out _));
+            foreach (var fragment in FragmentReferences)
+                memStream.Write(fragment.ToByteArray());
+
+            memStream.Write(ByteParsers.Short.EncodeValue(Unknown, out _));
+
+            return memStream.ToArray();
         }
     }
 }

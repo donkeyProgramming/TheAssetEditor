@@ -122,6 +122,24 @@
             </DockPanel>
         </DataTemplate>
 
+        <DataTemplate x:Key="BitflagTemplate">
+            <DockPanel DataContext="{Binding RelativeSource={RelativeSource AncestorType=DataGridCell}, Converter={StaticResource drvc}}">
+                <ItemsControl  ItemsSource="{Binding Flags}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding Value, Mode=TwoWay}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </DockPanel>
+        </DataTemplate>
+
     </UserControl.Resources>
 
     <Grid>
@@ -140,7 +158,7 @@
                   EnableRowVirtualization="True"
                   EnableColumnVirtualization="True"
                   VirtualizingPanel.ScrollUnit="Pixel"
-                  
+                  local:DataGridBehavior.DisplayRowNumber="True"
                     VirtualizingStackPanel.VirtualizationMode="Standard"
              VirtualizingStackPanel.IsVirtualizing="True"
                   AlternationCount="2" 

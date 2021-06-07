@@ -18,6 +18,11 @@ namespace FileTypes.AnimationPack
             Value = value.ToUpper();
         }
 
+        public AnimationSlotType Clone()
+        {
+            return new AnimationSlotType(Id, Value);
+        }
+
         public override string ToString()
         {
             return $"{Value}[{Id}]";
@@ -42,6 +47,12 @@ namespace FileTypes.AnimationPack
             PopulateList();
             var upperStr = value.ToUpper();
             return Values.FirstOrDefault(x => x.Value == upperStr);
+        }
+
+        static public AnimationSlotType GetMatchingRiderAnimation(string value)
+        {
+            var riderAnim = "RIDER_" + value;
+            return Values.FirstOrDefault(x => x.Value == riderAnim);
         }
 
         static void PopulateList()

@@ -21,15 +21,19 @@ namespace CommonControls.Editors.AnimationFragment
         public AnimationFragmentViewModel(PackFileService pf, bool isEditable = true)
         {
             _pf = pf;
-            var possibleEnumValues = new ObservableCollection<string>();// { "1-Horse", "2-Cat", "3-dog", "4-Bird" };
+            var possibleEnumValues = new ObservableCollection<string>();
             foreach (var slot in AnimationSlotTypeHelper.Values)
                 possibleEnumValues.Add(slot.Value);
 
-            Factory.CreateColoumn("Index", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x) { IsEditable = false });
+            //Factory.CreateColoumn("Index", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x) { IsEditable = false });
             Factory.CreateColoumn("Slot", CellFactory.ColoumTypes.ComboBox, (x) => new TypedComboBoxCellItem<string>(x as string, possibleEnumValues) { IsEditable = isEditable });
             Factory.CreateColoumn("FileName", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x) { IsEditable = isEditable });
             Factory.CreateColoumn("MetaFile", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x) { IsEditable = isEditable });
             Factory.CreateColoumn("SoundMeta", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x) { IsEditable = isEditable });
+            Factory.CreateColoumn("Unknown0", CellFactory.ColoumTypes.BitFlag, (x) => new BitflagCellItem((int)x, 6) { IsEditable = isEditable });
+            Factory.CreateColoumn("Weapon", CellFactory.ColoumTypes.BitFlag, (x) => new BitflagCellItem((int)x, 6) { IsEditable = isEditable });
+            Factory.CreateColoumn("Unknown1", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x) { IsEditable = isEditable });
+            Factory.CreateColoumn("Unknown2", CellFactory.ColoumTypes.Bool, (x) => new BoolCellItem((bool)x) { IsEditable = isEditable });
         }
 
         public static AnimationFragmentViewModel CreateFromFragment(PackFileService pfs, FileTypes.AnimationPack.AnimationFragment fragment, bool isEditable = true)
@@ -49,9 +53,8 @@ namespace CommonControls.Editors.AnimationFragment
         void Load(FileTypes.AnimationPack.AnimationFragment fragmentFile)
         {
             SuspendLayout();
-            var index = 0;
             foreach (var fragment in fragmentFile.Fragments)
-                CreateRow(index++, fragment.Slot.Value, fragment.AnimationFile, fragment.MetaDataFile, fragment.SoundMetaDataFile);
+                CreateRow( fragment.Slot.Value, fragment.AnimationFile, fragment.MetaDataFile, fragment.SoundMetaDataFile, fragment.Unknown0, fragment.Unknown1, fragment.Unknown3, fragment.Unknown4);
             ResumeLayout();
         }
 

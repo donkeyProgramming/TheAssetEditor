@@ -73,7 +73,7 @@ namespace AnimationEditor.MountAnimationCreator
         }
 
 
-        bool _canBatchProcess;
+        bool _canBatchProcess = true;
         public bool CanBatchProcess
         {
             get { return _canBatchProcess; }
