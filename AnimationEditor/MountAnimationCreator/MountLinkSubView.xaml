@@ -32,37 +32,46 @@
                
                 <Label Grid.Column="0" Grid.Row="0" Content="Mount" Margin="0,1,0,0"/>
                 <Label Grid.Column="1" Grid.Row="0" Content=":" Margin="0,1,0,0"/>
-                <dotNetKitControls:AutoCompleteComboBox Grid.Column="2" Grid.Row="0" Margin="0,1,0,0"
-                            SelectedValuePath="DisplayName"
-                            TextSearch.TextPath="DisplayName"
-                            ItemsSource="{Binding MountLinkController.AnimationSets0, UpdateSourceTrigger=PropertyChanged}"
-                            SelectedItem="{Binding MountLinkController.SelectedMount}"/>
+                <ComboBox Grid.Column="2" Grid.Row="0" 
+                          IsEditable="True"
+                          IsTextSearchEnabled="false"
+                          DisplayMemberPath="DisplayName"
+                          Text="{Binding MountLinkController.SelectedMount.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                          ItemsSource="{Binding MountLinkController.SelectedMount.Values}" 
+                          SelectedItem="{Binding MountLinkController.SelectedMount.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                
                 <Button  Content="..." Grid.Column="3" Grid.Row="0" Width="25" Margin="2"  Click="{s:MethodBinding ViewMountFragment}"/>
 
                 <Label Grid.Column="0" Grid.Row="1" Content="Rider"/>
                 <Label Grid.Column="1" Grid.Row="1" Content=":"/>
-                <dotNetKitControls:AutoCompleteComboBox Grid.Column="2" Grid.Row="1" 
-                    SelectedValuePath="DisplayName"
-                    TextSearch.TextPath="DisplayName"
-                    ItemsSource="{Binding MountLinkController.AnimationSets1, UpdateSourceTrigger=PropertyChanged}"
-                    SelectedItem="{Binding MountLinkController.SeletedRider}"/>
+                <ComboBox Grid.Column="2" Grid.Row="1" 
+                          IsEditable="True"
+                          IsTextSearchEnabled="false"
+                          DisplayMemberPath="DisplayName"
+                          Text="{Binding MountLinkController.SelectedRider.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                          ItemsSource="{Binding MountLinkController.SelectedRider.Values}" 
+                          SelectedItem="{Binding MountLinkController.SelectedRider.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                 <Button Content="..." Grid.Column="3" Grid.Row="1" Width="25" Margin="2"  Click="{s:MethodBinding ViewRiderFragment}"/>
 
                 <Label Grid.Column="0" Grid.Row="2" Content="Mount tag"/>
                 <Label Grid.Column="1" Grid.Row="2" Content=":"/>
-                <dotNetKitControls:AutoCompleteComboBox Grid.Column="2" Grid.Row="2" 
-                    SelectedValuePath="DisplayName"
-                    TextSearch.TextPath="DisplayName"
-                    ItemsSource="{Binding MountLinkController.PossibleMountTags, UpdateSourceTrigger=PropertyChanged}"
-                    SelectedItem="{Binding MountLinkController.SelectedMountTag}"/>
+                <ComboBox Grid.Column="2" Grid.Row="2" 
+                          IsEditable="True"
+                          IsTextSearchEnabled="false"
+                          DisplayMemberPath="DisplayName"
+                          Text="{Binding MountLinkController.SelectedMountTag.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                          ItemsSource="{Binding MountLinkController.SelectedMountTag.Values}" 
+                          SelectedItem="{Binding MountLinkController.SelectedMountTag.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
                 <Label Grid.Column="0" Grid.Row="3" Content="Rider tag"/>
                 <Label Grid.Column="1" Grid.Row="3" Content=":"/>
-                <dotNetKitControls:AutoCompleteComboBox Grid.Column="2" Grid.Row="3"
-                        SelectedValuePath="DisplayName"
-                        TextSearch.TextPath="DisplayName"
-                        ItemsSource="{Binding MountLinkController.PossibleRiderTags, UpdateSourceTrigger=PropertyChanged}"
-                        SelectedItem="{Binding MountLinkController.SelectedRiderTag}"/>
+                <ComboBox Grid.Column="2" Grid.Row="3" 
+                          IsEditable="True"
+                          IsTextSearchEnabled="false"
+                          DisplayMemberPath="DisplayName"
+                          Text="{Binding MountLinkController.SelectedRiderTag.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                          ItemsSource="{Binding MountLinkController.SelectedRiderTag.Values}" 
+                          SelectedItem="{Binding MountLinkController.SelectedRiderTag.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
  
 

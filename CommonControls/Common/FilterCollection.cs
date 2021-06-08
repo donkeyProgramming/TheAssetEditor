@@ -35,10 +35,23 @@ namespace CommonControls.Common
 
         public FilterCollection(IEnumerable<T> data, ValueChangedDelegate<T> valueChangedEvent = null)
         {
-            _possibleValues = new List<T>(data);
-            Values = new ObservableCollection<T>(_possibleValues);
+            UpdatePossibleValues(data);
             if (valueChangedEvent != null)
                 SelectedItemChanged += valueChangedEvent;
+        }
+
+        public void UpdatePossibleValues(IEnumerable<T> data)
+        {
+            if (data == null)
+            {
+                _possibleValues = new List<T>();
+                Values = new ObservableCollection<T>();
+            }
+            else
+            {
+                _possibleValues = new List<T>(data);
+                Values = new ObservableCollection<T>(_possibleValues);
+            }
         }
 
         void FilterChanged(string filterValue)

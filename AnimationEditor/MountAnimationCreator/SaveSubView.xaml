@@ -51,7 +51,7 @@
 
                 <DockPanel  Grid.Row="5" Margin="10,5,10,0">
                     <Label Content="Save prefix:"/>
-                    <TextBox VerticalContentAlignment="Center" Text="{Binding SavePrefixText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                    <TextBox VerticalContentAlignment="Center" Text="{Binding SavePrefixText.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                 </DockPanel>
 
             </StackPanel>

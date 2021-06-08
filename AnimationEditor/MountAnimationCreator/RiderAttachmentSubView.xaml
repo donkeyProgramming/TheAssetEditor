@@ -31,6 +31,14 @@
                     ItemsSource="{Binding RiderBones, UpdateSourceTrigger=PropertyChanged}"
                     SelectedItem="{Binding SelectedRiderBone}"/>
 
+            <ComboBox Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" 
+                          IsEditable="True"
+                          IsTextSearchEnabled="false"
+                          DisplayMemberPath="BoneName"
+                          Text="{Binding SelectedRiderBone.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                          ItemsSource="{Binding SelectedRiderBone.Values}" 
+                          SelectedItem="{Binding SelectedRiderBone.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
             <Label Grid.Column="0" Grid.Row="2" Content="Mount Vertex"/>
             <Label Grid.Column="1" Grid.Row="2" Content=":"/>
             <Grid Grid.Row="2" Grid.Column="2">
@@ -39,7 +47,7 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <Button  Grid.Column="0" Click="{s:MethodBinding SetMountVertex}" Content="Set" Margin="0,0,3,0"/>
-                <TextBox Grid.Column="1" Text="{Binding SelectedVertexesText, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" IsReadOnly="true"/>
+                <TextBox Grid.Column="1" Text="{Binding SelectedVertexesText.Value, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" IsReadOnly="true"/>
             </Grid>
         </Grid>
     </Expander>
