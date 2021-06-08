@@ -62,7 +62,7 @@ namespace AnimationEditor.Common.AnimationPlayer
 
         public void TogleAnimationPausePlay()
         {
-            foreach (var item in _assetList)
+             foreach (var item in _assetList)
             {
                 if(item.Player.IsPlaying)
                     item.Player.Pause();
@@ -102,6 +102,7 @@ namespace AnimationEditor.Common.AnimationPlayer
         {
             foreach (var item in _assetList)
             {
+                LoopAnimation = false;
                 item.Player.Pause();
                 item.Player.CurrentFrame = SelectedMainAnimation.Asset.Player.FrameCount();
             }
@@ -121,9 +122,11 @@ namespace AnimationEditor.Common.AnimationPlayer
             SelectedAnimationCurrentFrame = currentFrame;
             if (currentFrame == SelectedMainAnimation.Asset.Player.FrameCount())
             {
-                //SetAnimationFirstFrame();
-                //if (LoopAnimation)
-                //    TogleAnimationPausePlay();
+                if (LoopAnimation)
+                {
+                    SetAnimationFirstFrame();
+                    TogleAnimationPausePlay();
+                }
             }
         }
 

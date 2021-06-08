@@ -11,9 +11,9 @@ namespace View3D.Utility
 {
     public class ModelCombiner
     {
-        public bool CanCombine(List<Rmv2MeshNode> items, out List<ErrorListDataItem> errors)
+        public bool CanCombine(List<Rmv2MeshNode> items, out ErrorList errors)
         {
-            errors = new List<ErrorListDataItem>();
+            errors = new ErrorList();
             foreach (var outerLoopItem in items)
             {
                 foreach (var innerLoopItem in items)
@@ -25,27 +25,27 @@ namespace View3D.Utility
                     if (!ValidateTextures(outerLoopItem.MeshModel, innerLoopItem.MeshModel, out string textureErrorMsg))
                     {
                         //errors.Add("Texture -> " + textureErrorMsg);
-                        var errorItem = ErrorListDataItem.Error("Texture", textureErrorMsg);
-                        errors.Add(errorItem);
+                        errors.Error("Texture", textureErrorMsg);
+                     
                     }
 
                     // Vertex type
                     if (outerLoopItem.MeshModel.Header.VertextType != innerLoopItem.MeshModel.Header.VertextType)
                     {
-                        var errorItem = ErrorListDataItem.Error("VertexType", $"{outerLoopItem.MeshModel.Header.ModelName} has a different vertex type then {innerLoopItem.MeshModel.Header.ModelName}");
-                        errors.Add(errorItem);
+                        errors.Error("VertexType", $"{outerLoopItem.MeshModel.Header.ModelName} has a different vertex type then {innerLoopItem.MeshModel.Header.ModelName}");
+              
                     }
 
                     // Alpha mode
                     if (outerLoopItem.MeshModel.AlphaSettings.Mode != innerLoopItem.MeshModel.AlphaSettings.Mode)
                     {
-                        var errorItem = ErrorListDataItem.Error("AlphaSettings mode", $"{outerLoopItem.MeshModel.Header.ModelName} has a different AlphaSettings mode then {innerLoopItem.MeshModel.Header.ModelName}");
-                        errors.Add(errorItem);
+                        errors.Error("AlphaSettings mode", $"{outerLoopItem.MeshModel.Header.ModelName} has a different AlphaSettings mode then {innerLoopItem.MeshModel.Header.ModelName}");
+       
                     }
                 }
             }
 
-            return errors.Count == 0;
+            return errors.Errors.Count == 0;
         }
 
         private bool ValidateTextures(RmvSubModel item0, RmvSubModel item1, out string textureErrorMsg)

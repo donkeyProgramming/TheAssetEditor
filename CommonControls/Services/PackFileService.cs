@@ -393,7 +393,7 @@ namespace CommonControls.Services
             }
         }
 
-        public IPackFile FindFile(string path) 
+        public PackFile FindFile(string path) 
         {
             var lowerPath = path.Replace('/', '\\').ToLower();
             _logger.Here().Information($"Searching for file {lowerPath}");
@@ -402,7 +402,7 @@ namespace CommonControls.Services
                 if (packFile.FileList.ContainsKey(lowerPath))
                 {
                     _logger.Here().Information($"File found");
-                    return packFile.FileList[lowerPath];
+                    return packFile.FileList[lowerPath] as PackFile;
                 }
             }
             _logger.Here().Warning($"File not found");

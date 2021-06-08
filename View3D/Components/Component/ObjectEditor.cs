@@ -64,7 +64,7 @@ namespace View3D.Components.Component
             }
         }
 
-        public bool CombineMeshes(ObjectSelectionState objectSelectionState, out List<ErrorListDataItem> errorMessages)
+        public bool CombineMeshes(ObjectSelectionState objectSelectionState, out ErrorList errorMessages)
         {
             ModelCombiner modelValidator = new ModelCombiner();
             var objs = objectSelectionState.SelectedObjects().Where(x => x is Rmv2MeshNode).Select(x => x as Rmv2MeshNode);

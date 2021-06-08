@@ -33,6 +33,7 @@ namespace CommonControls.Common
 
         public static PackFile Save(PackFileService packFileService, string filename, PackFile packFile, byte[] updatedData = null)
         {
+            filename = filename.ToLower();
             var selectedEditabelPackFile = packFileService.GetEditablePack();
             if (selectedEditabelPackFile == null)
             {

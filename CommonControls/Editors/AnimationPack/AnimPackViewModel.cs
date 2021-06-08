@@ -26,9 +26,6 @@ namespace CommonControls.Editors.AnimationPack
 
         public FilterCollection<IAnimPackItem> AnimationPackItems { get; set; }
 
-
-
-
         IEditorViewModel _selectedItemViewModel;
         public IEditorViewModel SelectedItemViewModel { get => _selectedItemViewModel; set => SetAndNotify(ref _selectedItemViewModel, value); }
 
@@ -53,6 +50,8 @@ namespace CommonControls.Editors.AnimationPack
             {
                 SearchFilter = (value,rx) => { return rx.Match(value.DisplayName).Success; }
             };
+
+            DisplayName = _packFile.Name;
         }
 
         void ItemSelected(IAnimPackItem item)

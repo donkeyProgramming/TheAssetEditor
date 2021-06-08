@@ -6,6 +6,7 @@ using FileTypes.PackFiles.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -93,10 +94,15 @@ namespace AnimationEditor.MountAnimationCreator
             _rider = rider;
             _mount = mount;
 
+            ReloadFragments();
+        }
+
+        public void ReloadFragments()
+        {
             AnimationSets0 = new ObservableCollection<FragmentDisplayItem>();
             AnimationSets1 = new ObservableCollection<FragmentDisplayItem>();
 
-            var animPacks = pfs.FindAllWithExtention(@".animpack");
+            var animPacks = _pfs.FindAllWithExtention(@".animpack");
             foreach (var animPack in animPacks)
             {
                 var animPackFile = new AnimationPackFile(animPack as PackFile);
@@ -107,7 +113,7 @@ namespace AnimationEditor.MountAnimationCreator
                 }
             }
 
-            var allFragments = pfs.FindAllWithExtention(@".frg");
+            var allFragments = _pfs.FindAllWithExtention(@".frg");
             foreach (var fragmentPack in allFragments)
             {
                 var fragment = new AnimationFragment(fragmentPack.Name, fragmentPack.DataSource.ReadDataAsChunk());
@@ -116,7 +122,6 @@ namespace AnimationEditor.MountAnimationCreator
             }
         }
 
-
         void MuntSelected(FragmentDisplayItem value)
         {
             if (value == null)
@@ -124,6 +129,11 @@ namespace AnimationEditor.MountAnimationCreator
                 PossibleMountTags = new ObservableCollection<SlotDisplayItem>();
                 return;
             }
+            var skeletonName = value.Entry.Skeletons.Values.FirstOrDefault();
+            var existingSkeletonName = Path.GetFileNameWithoutExtension(_mount.SkeletonName);
+            if (skeletonName != existingSkeletonName)
+                throw new Exception("This fragment does not fit the current skeleton");
+
             PossibleMountTags = new ObservableCollection<SlotDisplayItem>(value.Entry.Fragments.Select(x =>new SlotDisplayItem(x)));
             CanBatchProcess = SelectedMount != null && SeletedRider != null;
         }
@@ -135,6 +145,12 @@ namespace AnimationEditor.MountAnimationCreator
                 PossibleRiderTags = new ObservableCollection<SlotDisplayItem>();
                 return;
             }
+
+            var skeletonName = value.Entry.Skeletons.Values.FirstOrDefault();
+            var existingSkeletonName = Path.GetFileNameWithoutExtension(_rider.SkeletonName);
+            if (skeletonName != existingSkeletonName)
+                throw new Exception("This fragment does not fit the current skeleton");
+
             PossibleRiderTags = new ObservableCollection<SlotDisplayItem>(value.Entry.Fragments.Select(x => new SlotDisplayItem(x)));
             CanBatchProcess = SelectedMount != null && SeletedRider != null;
         }
@@ -145,12 +161,12 @@ namespace AnimationEditor.MountAnimationCreator
             if (value == null)
                 return;
 
-            var lookUp = "RIDER_" + value.Entry.Slot.Value;
-            SelectedRiderTag = PossibleRiderTags.FirstOrDefault(x => x.Entry.Slot.Value == lookUp);
-            
             var file = _pfs.FindFile(value.Entry.AnimationFile) as PackFile;
             var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file, _pfs);
             _mount.SetAnimation(animationRef);
+
+            var lookUp = "RIDER_" + value.Entry.Slot.Value;
+            SelectedRiderTag = PossibleRiderTags.FirstOrDefault(x => x.Entry.Slot.Value == lookUp);
         }
 
         private void RiderTagSelected(SlotDisplayItem value)

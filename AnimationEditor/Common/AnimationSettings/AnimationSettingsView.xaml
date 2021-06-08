@@ -10,66 +10,62 @@
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
              mc:Ignorable="d" d:Width="500">
     <Expander Header="Animation settings:" IsExpanded="true">
-        <Border BorderBrush="Gray" BorderThickness="1">
+        <Border BorderBrush="Gray" BorderThickness="0">
             <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-            </Grid.RowDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
 
-            <Label Grid.Column="0" Grid.Row="0" Content="Fit animation"/>
-            <Label Grid.Column="1" Grid.Row="0" Content=":"/>
-            <CheckBox Grid.Column="2" Grid.Row="0" VerticalContentAlignment="Center" IsChecked="{Binding FitAnimation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <Label Grid.Column="0" Grid.Row="0" Content="Fit animation"/>
+                <Label Grid.Column="1" Grid.Row="0" Content=":"/>
+                <CheckBox Grid.Column="2" Grid.Row="0" VerticalContentAlignment="Center" IsChecked="{Binding FitAnimation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-            <Label Grid.Column="0" Grid.Row="1" Content="Loop Counter"/>
-            <Label Grid.Column="1" Grid.Row="1" Content=":"/>
-            <TextBox Grid.Column="2" Grid.Row="1" VerticalContentAlignment="Center" Text="{Binding LoopCounter.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" >
-                <b:Interaction.Behaviors>
-                    <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
-                </b:Interaction.Behaviors>
-            </TextBox>
+                <Label Grid.Column="0" Grid.Row="1" Content="Loop Counter"/>
+                <Label Grid.Column="1" Grid.Row="1" Content=":"/>
+                <TextBox Grid.Column="2" Grid.Row="1" VerticalContentAlignment="Center" Text="{Binding LoopCounter.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" >
+                    <b:Interaction.Behaviors>
+                        <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
+                    </b:Interaction.Behaviors>
+                </TextBox>
 
-            <Label Grid.Column="0" Grid.Row="2" Content="Apply offsets:"/>
-            <Label Grid.Column="1" Grid.Row="2" Content=":"/>
-            <CheckBox Grid.Column="3" Grid.Row="2" VerticalContentAlignment="Center" IsChecked="{Binding ApplyOffsets, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                <Label Grid.Column="0" Grid.Row="2" Content="Apply offsets:"/>
+                <Label Grid.Column="1" Grid.Row="2" Content=":"/>
+                <CheckBox Grid.Column="3" Grid.Row="2" VerticalContentAlignment="Center" IsChecked="{Binding ApplyOffsets, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
 
-            <Label Grid.Column="0" Grid.Row="3" Content="Trans offset"/>
-            <Label Grid.Column="1" Grid.Row="3" Content=":"/>
-            <mathviews:Vector3View Grid.Column="3" Grid.Row="3" VerticalContentAlignment="Center" Vector3="{Binding Translation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <Label Grid.Column="0" Grid.Row="3" Content="Trans offset"/>
+                <Label Grid.Column="1" Grid.Row="3" Content=":"/>
+                <mathviews:Vector3View Grid.Column="3" Grid.Row="3" VerticalContentAlignment="Center" Vector3="{Binding Translation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-            <Label Grid.Column="0" Grid.Row="4" Content="Rot offset"/>
-            <Label Grid.Column="1" Grid.Row="4" Content=":"/>
-            <mathviews:Vector3View Grid.Column="3" Grid.Row="4" VerticalContentAlignment="Center" Vector3="{Binding Rotation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <Label Grid.Column="0" Grid.Row="4" Content="Rot offset"/>
+                <Label Grid.Column="1" Grid.Row="4" Content=":"/>
+                <mathviews:Vector3View Grid.Column="3" Grid.Row="4" VerticalContentAlignment="Center" Vector3="{Binding Rotation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-            <Label Grid.Column="0" Grid.Row="5" Content="Scale"/>
-            <Label Grid.Column="1" Grid.Row="5" Content=":"/>
-            <TextBox Grid.Column="2" Grid.Row="5"  Text="{Binding Scale.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" >
-                <b:Interaction.Behaviors>
-                    <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
-                </b:Interaction.Behaviors>
-            </TextBox>
+                <Label Grid.Column="0" Grid.Row="5" Content="Scale"/>
+                <Label Grid.Column="1" Grid.Row="5" Content=":"/>
+                <TextBox Grid.Column="2" Grid.Row="5"  Text="{Binding Scale.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" >
+                    <b:Interaction.Behaviors>
+                        <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
+                    </b:Interaction.Behaviors>
+                </TextBox>
 
-            <Label Grid.Column="0" Grid.Row="6" Content="Keep rider rot"/>
-            <Label Grid.Column="1" Grid.Row="6" Content=":"/>
-            <CheckBox Grid.Column="3" Grid.Row="6" VerticalContentAlignment="Center" IsChecked="{Binding KeepRiderRotation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-
-            <Label Grid.Column="0" Grid.Row="7" Content="Max rider rot"/>
-            <Label Grid.Column="1" Grid.Row="7" Content=":"/>
-            <mathviews:Vector3View Grid.Column="3" Grid.Row="7" VerticalContentAlignment="Center" Vector3="{Binding MaxRiderRotation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-        </Grid>
+                <Label Grid.Column="0" Grid.Row="6" Content="Keep rider rot"/>
+                <Label Grid.Column="1" Grid.Row="6" Content=":"/>
+                <CheckBox Grid.Column="3" Grid.Row="6" VerticalContentAlignment="Center" IsChecked="{Binding KeepRiderRotation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
         </Border>
     </Expander>
-   
+
 </UserControl>

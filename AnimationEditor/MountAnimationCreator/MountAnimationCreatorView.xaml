@@ -6,8 +6,8 @@
              xmlns:local="clr-namespace:AnimationEditor.MountAnimationCreator" 
              xmlns:animationsettings="clr-namespace:AnimationEditor.Common.AnimationSettings" 
              xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
-              xmlns:s="http://schemas.singulink.com/xaml"
-                         xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:s="http://schemas.singulink.com/xaml"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="800">
@@ -20,180 +20,10 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <Expander IsExpanded="True" Grid.Row="0" Header="Mount link shortcut:">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="auto"/>
-                </Grid.ColumnDefinitions>
-
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
-
-                <Label Grid.Column="0" Grid.Row="0" Content="Mount"/>
-                <Label Grid.Column="1" Grid.Row="0" Content=":"/>
-                <dotNetKitControls:AutoCompleteComboBox Grid.Column="2" Grid.Row="0"
-                    SelectedValuePath="DisplayName"
-                    TextSearch.TextPath="DisplayName"
-                    ItemsSource="{Binding MountLinkController.AnimationSets0, UpdateSourceTrigger=PropertyChanged}"
-                    SelectedItem="{Binding MountLinkController.SelectedMount}"/>
-                <Button  Content="..." Grid.Column="3" Grid.Row="0" Width="25" Margin="2"  Click="{s:MethodBinding ViewMountFragment}"/>
-
-                <Label Grid.Column="0" Grid.Row="1" Content="Rider"/>
-                <Label Grid.Column="1" Grid.Row="1" Content=":"/>
-                <dotNetKitControls:AutoCompleteComboBox Grid.Column="2" Grid.Row="1" 
-                    SelectedValuePath="DisplayName"
-                    TextSearch.TextPath="DisplayName"
-                    ItemsSource="{Binding MountLinkController.AnimationSets1, UpdateSourceTrigger=PropertyChanged}"
-                    SelectedItem="{Binding MountLinkController.SeletedRider}"/>
-                <Button Content="..." Grid.Column="3" Grid.Row="1" Width="25" Margin="2"  Click="{s:MethodBinding ViewRiderFragment}"/>
-
-                <Label Grid.Column="0" Grid.Row="2" Content="Mount animation tag"/>
-                <Label Grid.Column="1" Grid.Row="2" Content=":"/>
-                <dotNetKitControls:AutoCompleteComboBox Grid.Column="2" Grid.Row="2" 
-                    SelectedValuePath="DisplayName"
-                    TextSearch.TextPath="DisplayName"
-                    ItemsSource="{Binding MountLinkController.PossibleMountTags, UpdateSourceTrigger=PropertyChanged}"
-                    SelectedItem="{Binding MountLinkController.SelectedMountTag}"/>
-
-                <Label Grid.Column="0" Grid.Row="3" Content="Rider animation tag"/>
-                <Label Grid.Column="1" Grid.Row="3" Content=":"/>
-                <dotNetKitControls:AutoCompleteComboBox Grid.Column="2" Grid.Row="3"
-             SelectedValuePath="DisplayName"
-                    TextSearch.TextPath="DisplayName"
-                    ItemsSource="{Binding MountLinkController.PossibleRiderTags, UpdateSourceTrigger=PropertyChanged}"
-                    SelectedItem="{Binding MountLinkController.SelectedRiderTag}"/>
-
-                <Button  Grid.Column="2" Grid.Row="4"  Click="{s:MethodBinding BatchProcess}" Content="Generate" IsEnabled="{Binding MountLinkController.CanBatchProcess, UpdateSourceTrigger=PropertyChanged}"/>
-            </Grid>
-        </Expander>
-        <Expander Grid.Row="1" Header="Rdier Attachment:" IsExpanded="true">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
-
-                <Label Grid.Column="0" Grid.Row="0" Content="Rider root bone"/>
-                <Label Grid.Column="1" Grid.Row="0" Content=":"/>
-                <dotNetKitControls:AutoCompleteComboBox Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" 
-                    SelectedValuePath="Id"
-                    TextSearch.TextPath="BoneName"
-                    ItemsSource="{Binding RiderBones, UpdateSourceTrigger=PropertyChanged}"
-                    SelectedItem="{Binding SelectedRiderBone}"/>
-
-                <Label Grid.Column="0" Grid.Row="2" Content="Mount Vertex"/>
-                <Label Grid.Column="1" Grid.Row="2" Content=":"/>
-                <Grid Grid.Row="2" Grid.Column="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition  MaxWidth="150"/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <Button  Grid.Column="0" Click="{s:MethodBinding SetMountVertex}" Content="Set" Margin="0,0,3,0"/>
-                    <TextBox Grid.Column="1" Text="{Binding SelectedVertexesText, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" IsReadOnly="true"/>
-                </Grid>
-            </Grid>
-        </Expander>
-
-        <animationsettings:AnimationSettingsView Grid.Row="2" DataContext="{Binding AnimationSettings, Mode=OneTime}"/>
-
-        <Expander  Header="Save:" Grid.Row="3"  IsExpanded="True">
-        <Grid Margin="15,5,15,5">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-            </Grid.RowDefinitions>
-
-            <Button Grid.Row="2" Content="Preview" Click="{s:MethodBinding CreateMountAnimation}" IsEnabled="{Binding CanPreview, UpdateSourceTrigger=PropertyChanged}"/>
-            <Button Grid.Row="3" Content="Save anim file" Click="{s:MethodBinding SaveAnimation}" IsEnabled="{Binding CanSave, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,0"/>
-           
-
-            <DockPanel Grid.Row="4" Margin="0,5,0,0">
-                <Button  Content="Add to fragment" Click="{s:MethodBinding AddAnimationToFragment}" IsEnabled="{Binding CanSave, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="0,0,5,0"/>
-                <Button  Width="20"  DockPanel.Dock="Right" Click="{s:MethodBinding AddAnimationToFragment}" IsEnabled="{Binding CanSave, UpdateSourceTrigger=PropertyChanged}"  Margin="2"/>
-                <dotNetKitControls:AutoCompleteComboBox 
-                    SelectedValuePath="Id"
-                    TextSearch.TextPath="BoneName"
-                    ItemsSource="{Binding RiderBones, UpdateSourceTrigger=PropertyChanged}"
-                    SelectedItem="{Binding SelectedRiderBone}"/>
-
-            </DockPanel>
-
-            <DockPanel Grid.Row="1" Margin="0,5,0,0">
-                <Label Content="Current fragment:"/>
-                <dotNetKitControls:AutoCompleteComboBox 
-                    SelectedValuePath="Id"
-                    TextSearch.TextPath="BoneName"
-                    ItemsSource="{Binding RiderBones, UpdateSourceTrigger=PropertyChanged}"
-                    SelectedItem="{Binding SelectedRiderBone}"/>
-                
-            </DockPanel>
-
-
-
-            <DockPanel Grid.Row="0" Margin="0,5,0,0">
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding UseSavePrefix, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                <Label Content="Use save prefix:"/>
-                <TextBox VerticalContentAlignment="Center" Text="{Binding SavePrefixText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            </DockPanel>
-        </Grid>
-        </Expander>
-
-        <Expander Grid.Row="4" Header="Visualisation help:" IsExpanded="True">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
-
-         
-                <Label Grid.Column="0" Grid.Row="0" Content="Snap camera to Bone"/>
-                <Label Grid.Column="1" Grid.Row="0" Content=":"/>
-                <CheckBox Grid.Column="2" Grid.Row="0" VerticalContentAlignment="Center" IsEnabled="False"/>
-                <dotNetKitControls:AutoCompleteComboBox Grid.Column="3" Grid.Row="0" IsEnabled="False" 
-                    SelectedValuePath="Id"
-                    TextSearch.TextPath="BoneName"
-                    ItemsSource="{Binding StartBoneList, UpdateSourceTrigger=PropertyChanged}"
-                    SelectedItem="{Binding SelectedStartBone}"/>
-
-                
-                <Label Grid.Column="0" Grid.Row="1" Content="Display preview mesh"/>
-                <Label Grid.Column="1" Grid.Row="1" Content=":"/>
-                <CheckBox  Grid.Column="2" Grid.Row="1"  VerticalContentAlignment="Center" IsChecked="{Binding DisplayGeneratedRiderMesh, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-
-                <Label Grid.Column="0" Grid.Row="2" Content="Display preview skelton"/>
-                <Label Grid.Column="1" Grid.Row="2" Content=":"/>
-                <CheckBox  Grid.Column="2" Grid.Row="2"  VerticalContentAlignment="Center" IsChecked="{Binding DisplayGeneratedRiderSkeleton, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-
-            </Grid>
-        </Expander>
-
+        <local:RiderAttachmentSubView Grid.Row="0" />
+        <animationsettings:AnimationSettingsView Grid.Row="1" DataContext="{Binding AnimationSettings, Mode=OneTime}"/>
+        <local:MountLinkSubView Grid.Row="2" />
+        <local:SaveSubView Grid.Row="3"/>
+        <local:VisualisationHelperSubView  Grid.Row="4" />
     </Grid>
 </UserControl>

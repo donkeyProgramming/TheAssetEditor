@@ -108,6 +108,12 @@ namespace CommonControls.Services
                 }
             }
 
+            var f = pfs.FindFile(fullPath);
+            if (f != null)
+            {
+                var pf = pfs.GetPackFileContainer(animation);
+                return new AnimationReference(fullPath, pf);  
+            }
             return null;
         }
 

@@ -1,148 +1,136 @@
-﻿using FileTypes.AnimationPack;
+﻿using CommonControls.Common;
+using CommonControls.ErrorListDialog;
+using CommonControls.Services;
+using Filetypes.RigidModel;
+using FileTypes.AnimationPack;
+using FileTypes.PackFiles.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using View3D.Animation;
 
 namespace AnimationEditor.MountAnimationCreator.Services
 {
     class BatchProcessorService
     {
+        PackFileService _pfs;
+        MountAnimationGeneratorService _animationGenerator;
+        BatchProcessOptions _batchProcessOptions;
         AnimationFragment _mountFragment;
         AnimationFragment _riderFragment;
 
+       
+        AnimationPackFile _outAnimPack;
         AnimationFragment _riderOutputFragment;
-        AnimationPackFile _outputAnimPack;
+        List<AnimationFile> _animationFiles = new List<AnimationFile>();
 
+        string _animationPrefix = "new_";
+        string _animPackName = "test_tables.animpack";
+        string _animBinName = "test_tables.bin";
+        string _fragmentName = "hu1_test_hr1_hammer";
 
-        public BatchProcessorService(AnimationFragment mountFragment, AnimationFragment riderFragment)
+        public BatchProcessorService(PackFileService pfs, MountAnimationGeneratorService animationGenerator, BatchProcessOptions batchProcessOptions)
         {
+            _pfs = pfs;
+            _animationGenerator = animationGenerator;
+            _batchProcessOptions = batchProcessOptions;
+        }
+
+        public void Process(AnimationFragment mountFragment, AnimationFragment riderFragment)
+        {
+            var resultInfo = new ErrorListViewModel.ErrorList();
             _mountFragment = mountFragment;
             _riderFragment = riderFragment;
 
-            var animPackName = "test_tables.bin";
-            var animBinName = "hu1_test_hr1_hammer";
-            var fragmentName = "test_fragment.frg";
+            CreateFiles(_batchProcessOptions);
+            CreateFragmentAndAnimations(resultInfo);
+            SaveFiles();
 
+            ErrorListWindow.ShowDialog("Mount creation result", resultInfo);
+        }
 
-            // Create a map matching rider and mount slots
-            var animationMap = new Dictionary<string, string>();
-            foreach (var item in _mountFragment.Fragments)
-            {
-                if (!animationMap.ContainsKey(item.Slot.Value))
-                    animationMap.Add(item.Slot.Value, null);
-            }
+        void CreateFragmentAndAnimations(ErrorListViewModel.ErrorList resultInfo)
+        {
+            CopyAnimations("MISSING_ANIM", resultInfo);
 
-            // Find all the matching animations in the rider
-            foreach (var riderItem in _riderFragment.Fragments)
-            {
-                var riderItemName = riderItem.Slot.Value;
-
-                // Rider animations
-                if (riderItemName.Contains("rider_", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    var slotWithoutRiderPrefix = riderItemName.Remove(0, "rider_".Length);
-                    if (animationMap.ContainsKey(slotWithoutRiderPrefix))
-                    {
-                        animationMap[slotWithoutRiderPrefix] = riderItemName;
-                    }
-                }
-
-                // Porthole animations
-                if (riderItemName.Contains("porthole_", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    if (animationMap.ContainsKey(riderItemName))
-                        animationMap[riderItemName] = riderItemName;
-                }
-
-                if (riderItemName.Contains("missing_anim", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    if (animationMap.ContainsKey(riderItemName))
-                        animationMap[riderItemName] = riderItemName;
-                }
-            }
-
-            //AnimationPackLoader
-            AnimationPackFile animPack = new AnimationPackFile();
-            animPack.AnimationBin = new AnimationBin("animations//animation_tables//" + animPackName);
-            var tableEntry = new AnimationBinEntry(animBinName, _riderFragment.Skeletons.Values.First(), _mountFragment.Skeletons.Values.First());
-            tableEntry.FragmentReferences.Add(new AnimationBinEntry.FragmentReference() { Name = fragmentName });
-
-
-            animPack.AnimationBin.AnimationTableEntries.Add(tableEntry);
-
-            _riderOutputFragment = new AnimationFragment("animations//animation_tables//" + fragmentName);
-            _riderOutputFragment.Skeletons = new AnimationFragment.StringArrayTable(_riderFragment.Skeletons.Values.First(), _riderFragment.Skeletons.Values.First());
-            _debugMap = new Dictionary<string, string>();
-            //     // Build the output animation file 
-            CreateAnimation("MISSING_ANIM");
-            
             foreach (var animationSlot in GetMetaDataSlots())
-                CreateAnimation(animationSlot);
+                CopyAnimations(animationSlot, resultInfo);
 
             foreach (var animationSlot in GetPoseAndDockAnimationsSlots())
-                CreateAnimation(animationSlot);
+                CopyAnimations(animationSlot, resultInfo);
 
             foreach (var animationSlot in GetPortholeSlots())
-                CreateAnimation(animationSlot, animationSlot);
+                CreateAnimation(animationSlot, animationSlot, resultInfo);
 
-            foreach (var animationSlot in GetRiderMountAnimations())
-                CreateAnimation(animationSlot.Item1, animationSlot.Item2);
-            
+            foreach (var animationSlot in GetMatchedAnimations())
+                CreateAnimation(animationSlot.Item1, animationSlot.Item2, resultInfo);
 
-            //foreach (var animationSlot in GetRiderAnimationsWithoutCasting())
-            //    CreateAnimation(animationSlot, animationSlot);
+            // Casting, ranged
         }
 
-        Dictionary<string, string> _debugMap = new Dictionary<string, string>();
 
-        void CreateAnimation( string riderSlot, string mountSlot)
+
+        void CreateAnimation( string riderSlot, string mountSlot, ErrorListViewModel.ErrorList resultInfo)
         {
-            if (!_debugMap.ContainsKey(riderSlot))
+            // Does the rider have this?
+            var riderHasAnimation = _riderFragment.Fragments.FirstOrDefault(x => x.Slot.Value == riderSlot) != null;
+            if (riderHasAnimation)
             {
-                // Does the rider have this?
-                var riderHasAnimation = _riderFragment.Fragments.FirstOrDefault(x => x.Slot.Value == riderSlot) != null;
-                if (riderHasAnimation)
+                // Create a copy of the animation fragment entry
+                var riderFragment = _riderFragment.Fragments.First(x => x.Slot.Value == riderSlot);
+                var newRiderFragment = riderFragment.Clone();
+                var newAnimationName = GenerateNewAnimationName(newRiderFragment.AnimationFile, _animationPrefix);
+                newRiderFragment.AnimationFile = newAnimationName;
+                _riderOutputFragment.Fragments.Add(newRiderFragment);
+
+                var mountFragment = _mountFragment.Fragments.First(x => x.Slot.Value == mountSlot);
+
+                // Generate new animation
+                var riderAnim = LoadAnimation(riderFragment.AnimationFile);
+                var mountAnim = LoadAnimation(mountFragment.AnimationFile);
+                var newAnimation = _animationGenerator.GenerateMountAnimation(mountAnim, riderAnim);
+
+                // Save the new animation
+                var animFile = newAnimation.ConvertToFileFormat(_animationGenerator.GetRiderSkeleton());
+                var bytes = AnimationFile.GetBytes(animFile);
+                SaveHelper.Save(_pfs, newAnimationName, null, bytes);
+
+                resultInfo.Ok(mountSlot, "Matching animation found in rider ("+ riderSlot + "). New animation created");
+            }
+            else
+            {
+                // Add an empty fragment entry
+                _riderOutputFragment.Fragments.Add(new AnimationFragmentEntry()
                 {
-                    _debugMap[riderSlot] = "From mount - " + mountSlot;
+                    Slot = AnimationSlotTypeHelper.GetfromValue(riderSlot),
+                    Skeleton = _riderFragment.Skeletons.Values.First()
+                });
 
-
-                    var fragmentEntry = _riderFragment.Fragments.First(x => x.Slot.Value == riderSlot);
-                    _riderOutputFragment.Fragments.Add(fragmentEntry.Clone());
-
-
-
-                }
-                else
-                {
-
-
-
-                    _debugMap[riderSlot] = "From mount - " + mountSlot + " MISSING! <--";
-                }
+                resultInfo.Error(mountSlot, "Expected slot missing in  rider (" + riderSlot + "), this need to be resolved!");
             }
         }
 
-        void CreateAnimation(string riderSlot)
+        void CopyAnimations(string riderSlot, ErrorListViewModel.ErrorList resultInfo)
         {
-            if (!_debugMap.ContainsKey(riderSlot))
-            {
-                _debugMap[riderSlot] = "from self - " + riderSlot;
+            var fragmentEntry = _riderFragment.Fragments.First(x => x.Slot.Value == riderSlot);
+            _riderOutputFragment.Fragments.Add(fragmentEntry.Clone());
 
-                var fragmentEntry = _riderFragment.Fragments.First(x => x.Slot.Value == riderSlot);
-                _riderOutputFragment.Fragments.Add(fragmentEntry.Clone());
-            }
+            resultInfo.Ok(riderSlot, "Animation copied from rider");
         }
 
         List<string> GetPoseAndDockAnimationsSlots()
         {
             var poses = _riderFragment.Fragments
               .Where(x => x.Slot.Value.StartsWith("HAND_POSE_", StringComparison.CurrentCultureIgnoreCase) || x.Slot.Value.StartsWith("FACE_POSE", StringComparison.CurrentCultureIgnoreCase))
-              .Select(x => x.Slot.Value);
+              .Select(x => x.Slot.Value)
+              .Distinct();
 
             var docks = _riderFragment.Fragments
               .Where(x => x.Slot.Value.StartsWith("DOCK_", StringComparison.CurrentCultureIgnoreCase))
-              .Select(x => x.Slot.Value);
+              .Select(x => x.Slot.Value)
+              .Distinct();
 
             return poses.Concat(docks).ToList();
         }
@@ -152,6 +140,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
             return _riderFragment.Fragments
                    .Where(x => x.Slot.Value.StartsWith("PERSISTENT_METADATA_", StringComparison.CurrentCultureIgnoreCase))
                    .Select(x => x.Slot.Value)
+                   .Distinct()
                    .ToList();
         }
 
@@ -160,15 +149,52 @@ namespace AnimationEditor.MountAnimationCreator.Services
             return _riderFragment.Fragments
                   .Where(x => x.Slot.Value.StartsWith("PORTHOLE_", StringComparison.CurrentCultureIgnoreCase))
                   .Select(x => x.Slot.Value)
+                  .Distinct()
                   .ToList();
         }
 
-        List<(string, string)> GetRiderMountAnimations()
+        // Animations where rider and mount needs the same amount of frames
+        List<(string, string)> GetMatchedAnimations()   
         {
             return _mountFragment.Fragments
                 .Where(x => AnimationSlotTypeHelper.GetMatchingRiderAnimation(x.Slot.Value) != null)
                 .Select(x => (AnimationSlotTypeHelper.GetMatchingRiderAnimation(x.Slot.Value).Value, x.Slot.Value))
+                .Distinct()
                 .ToList();
+        }
+
+        void CreateFiles(BatchProcessOptions batchProcessOptions)
+        {
+            //AnimationPackLoader
+            _outAnimPack = new AnimationPackFile();
+            _outAnimPack.AnimationBin = new AnimationBin("animations/animation_tables/" + _animBinName);
+            var tableEntry = new AnimationBinEntry(_fragmentName, _riderFragment.Skeletons.Values.First(), _mountFragment.Skeletons.Values.First());
+            tableEntry.FragmentReferences.Add(new AnimationBinEntry.FragmentReference() { Name = _fragmentName });
+
+            _outAnimPack.AnimationBin.AnimationTableEntries.Add(tableEntry);
+
+            _riderOutputFragment = new AnimationFragment("animations/animation_tables/" + _fragmentName + ".frg");
+            _riderOutputFragment.Skeletons = new AnimationFragment.StringArrayTable(_riderFragment.Skeletons.Values.First(), _riderFragment.Skeletons.Values.First());
+
+            _outAnimPack.Fragments.Add(_riderOutputFragment);
+        }
+
+        void SaveFiles()
+        {
+            var bytes = _outAnimPack.ToByteArray();
+            SaveHelper.Save(_pfs, "animations\\animation_tables\\" + _animPackName, null, bytes);
+        }
+
+        AnimationClip LoadAnimation(string path)
+        {
+            var file = _pfs.FindFile(path);
+            var animation = AnimationFile.Create(file);
+            return new AnimationClip(animation);
+        }
+
+        string GenerateNewAnimationName(string fullPath, string prefix)
+        {
+            return Path.GetDirectoryName(fullPath) + "\\" + prefix + Path.GetFileName(fullPath);
         }
     }
 }

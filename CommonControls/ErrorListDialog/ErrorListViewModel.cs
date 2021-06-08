@@ -16,19 +16,31 @@ namespace CommonControls.ErrorListDialog
             public string Description { get; set; }
             public bool IsError { get; set; } = false;
 
-            public static ErrorListDataItem Error(string itemName, string description)
+        }
+
+        public class ErrorList
+        {
+            public List<ErrorListDataItem> Errors { get; set; } = new List<ErrorListDataItem>();
+
+            public ErrorListDataItem Error(string itemName, string description)
             {
-                return new ErrorListDataItem() { ErrorType = "Error", ItemName = itemName, Description = description, IsError=true };
+                var item = new ErrorListDataItem() { ErrorType = "Error", ItemName = itemName, Description = description, IsError = true };
+                Errors.Add(item);
+                return item;
             }
 
-            public static ErrorListDataItem Warning(string itemName, string description)
+            public ErrorListDataItem Warning(string itemName, string description)
             {
-                return new ErrorListDataItem() { ErrorType = "Warning", ItemName = itemName, Description = description, IsError = true };
+                var item = new ErrorListDataItem() { ErrorType = "Warning", ItemName = itemName, Description = description, IsError = true };
+                Errors.Add(item);
+                return item;
             }
 
-            public static ErrorListDataItem Ok(string itemName, string description)
+            public ErrorListDataItem Ok(string itemName, string description)
             {
-                return new ErrorListDataItem() { ErrorType = "Ok", ItemName = itemName, Description = description };
+                var item =  new ErrorListDataItem() { ErrorType = "Ok", ItemName = itemName, Description = description };
+                Errors.Add(item);
+                return item;
             }
         }
 

@@ -59,14 +59,5 @@ namespace AnimationEditor.Common.AnimationSettings
             get { return _keepRiderRotation; }
             set { SetAndNotify(ref _keepRiderRotation, value); }
         }
-
-
-
-        Vector3ViewModel _maxRiderRotation = new Vector3ViewModel(-1);
-        public Vector3ViewModel MaxRiderRotation
-        {
-            get { return _maxRiderRotation; }
-            set { SetAndNotify(ref _maxRiderRotation, value); }
-        }
     }
 }

@@ -23,9 +23,9 @@ namespace AnimationEditor.MountAnimationCreator
             InitializeComponent();
         }
 
-        public static BatchProcessOptions ShowDialog(string fragmentName)
+        public static BatchProcessOptions ShowDialog(string fragmentName, string savePrefix)
         {
-            var options = new BatchProcessOptions() { FragmentName = fragmentName };
+            var options = new BatchProcessOptions() { FragmentName = fragmentName,SavePrefix = savePrefix };
             var window = new BatchProcessOptionsWindow();
             window.DataContext = options;
             if(window.ShowDialog() == true)
@@ -90,5 +90,7 @@ namespace AnimationEditor.MountAnimationCreator
             get => _createAnimations;
             set => SetAndNotify(ref _createAnimations, value);
         }
+
+        public string SavePrefix { get; set; }
     }
 }

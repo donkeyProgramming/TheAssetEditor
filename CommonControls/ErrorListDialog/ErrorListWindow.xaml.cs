@@ -22,13 +22,13 @@ namespace CommonControls.ErrorListDialog
             Close();
         }
 
-        public static void ShowDialog(string titel, List<ErrorListDataItem> errorItems)
+        public static void ShowDialog(string titel, ErrorList errorItems)
         {
             var window = new ErrorListWindow();
             window.DataContext = new ErrorListViewModel()
             {
-                WindowTitle = titel + " (" + errorItems.Count(x=>x.IsError) + ")",
-                ErrorItems = errorItems
+                WindowTitle = titel + " (" + errorItems.Errors.Count(x=>x.IsError) + ")",
+                ErrorItems = errorItems.Errors
             };
             window.ShowDialog();
         }
