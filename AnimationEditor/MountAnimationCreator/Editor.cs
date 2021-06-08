@@ -62,7 +62,7 @@ namespace AnimationEditor.MountAnimationCreator
             DisplayGeneratedMesh = new NotifyAtr<bool>(true, (value) => { if (_newAnimation.MainNode != null) _newAnimation.MainNode.IsVisible = value; });
 
             SelectedRiderBone = new FilterCollection<SkeletonBoneNode>(null, (x) => UpdateCanSaveAndPreviewStates());
-            MountLinkController = new MountLinkController(pfs, skeletonAnimationLookUpHelper, rider, mount);
+            MountLinkController = new MountLinkController(pfs, skeletonAnimationLookUpHelper, rider, mount, UpdateCanSaveAndPreviewStates);
 
             _mount.SkeletonChanged += MountSkeletonChanged;
             _rider.SkeletonChanged += RiderSkeletonChanges;

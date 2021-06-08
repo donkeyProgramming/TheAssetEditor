@@ -26,13 +26,15 @@ namespace AnimationEditor.MountAnimationCreator
         AssetViewModel _mount;
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        Action _validateAction;
 
-        public MountLinkController(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, AssetViewModel mount)
+        public MountLinkController(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, AssetViewModel mount, Action validate)
         {
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _rider = rider;
             _mount = mount;
+            _validateAction = validate;
 
             SelectedMountTag = new FilterCollection<SlotDisplayItem>(null, MountTagSeleted);
             SelectedRiderTag = new FilterCollection<SlotDisplayItem>(null, RiderTagSelected);
@@ -87,6 +89,7 @@ namespace AnimationEditor.MountAnimationCreator
             if (value == null)
             {
                 collection.UpdatePossibleValues(null);
+                _validateAction();
                 return;
             }
             var newSkeletonName = value.Entry.Skeletons.Values.FirstOrDefault();
@@ -98,29 +101,33 @@ namespace AnimationEditor.MountAnimationCreator
             }
 
             collection.UpdatePossibleValues(value.Entry.Fragments.Select(x =>new SlotDisplayItem(x)));
+            _validateAction();
         }
 
         private void MountTagSeleted(SlotDisplayItem value)
         {
-            if (value == null)
-                return;
+            if (value != null)
+            {
 
-            var file = _pfs.FindFile(value.Entry.AnimationFile);
-            var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file, _pfs);
-            _mount.SetAnimation(animationRef);
+                var file = _pfs.FindFile(value.Entry.AnimationFile);
+                var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file, _pfs);
+                _mount.SetAnimation(animationRef);
 
-            var lookUp = "RIDER_" + value.Entry.Slot.Value;
-            SelectedRiderTag.SelectedItem = SelectedRiderTag.Values.FirstOrDefault(x => x.Entry.Slot.Value == lookUp);
+                var lookUp = "RIDER_" + value.Entry.Slot.Value;
+                SelectedRiderTag.SelectedItem = SelectedRiderTag.Values.FirstOrDefault(x => x.Entry.Slot.Value == lookUp);
+            }
+            _validateAction();
         }
 
         private void RiderTagSelected(SlotDisplayItem value)
         {
-            if (value == null)
-                return;
-
-            var file = _pfs.FindFile(value.Entry.AnimationFile);
-            var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file, _pfs);
-            _rider.SetAnimation(animationRef);
+            if (value != null)
+            {
+                var file = _pfs.FindFile(value.Entry.AnimationFile);
+                var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file, _pfs);
+                _rider.SetAnimation(animationRef);
+            }
+            _validateAction();
         }
 
 
