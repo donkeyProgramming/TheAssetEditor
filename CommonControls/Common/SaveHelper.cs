@@ -31,7 +31,7 @@ namespace CommonControls.Common
             }
         }
 
-        public static PackFile Save(PackFileService packFileService, string filename, PackFile packFile, byte[] updatedData = null)
+        public static PackFile Save(PackFileService packFileService, string filename, PackFile packFile, byte[] updatedData = null, bool promptSaveOverride = true)
         {
             filename = filename.ToLower();
             var selectedEditabelPackFile = packFileService.GetEditablePack();
@@ -42,7 +42,7 @@ namespace CommonControls.Common
             }
 
             var existingFile = packFileService.FindFile(filename, selectedEditabelPackFile);
-            if (existingFile != null)
+            if (existingFile != null && promptSaveOverride)
             {
                 var fullPath = packFileService.GetFullPath(existingFile as PackFile, selectedEditabelPackFile);
                 if (MessageBox.Show($"Replace existing file?\n{fullPath} \nin packfile:{selectedEditabelPackFile.Name}", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
@@ -83,7 +83,7 @@ namespace CommonControls.Common
                 if (updatedData == null)
                     throw new Exception("Trying to update an existing file, but no data is provided");
                 packFileService.SaveFile(existingFile as PackFile, updatedData);
-                return packFile;
+                return existingFile as PackFile;
             }
         }
 

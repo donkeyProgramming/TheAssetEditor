@@ -20,11 +20,9 @@ namespace AnimationEditor.MountAnimationCreator.Services
         BatchProcessOptions _batchProcessOptions;
         AnimationFragment _mountFragment;
         AnimationFragment _riderFragment;
-
        
         AnimationPackFile _outAnimPack;
         AnimationFragment _riderOutputFragment;
-        List<AnimationFile> _animationFiles = new List<AnimationFile>();
 
         string _animationPrefix = "new_";
         string _animPackName = "test_tables.animpack";
@@ -33,6 +31,10 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
         public BatchProcessorService(PackFileService pfs, MountAnimationGeneratorService animationGenerator, BatchProcessOptions batchProcessOptions)
         {
+            _animPackName = batchProcessOptions.AnimPackName;
+            _animBinName = batchProcessOptions.AnimBinName;
+            _fragmentName = batchProcessOptions.FragmentName;
+
             _pfs = pfs;
             _animationGenerator = animationGenerator;
             _batchProcessOptions = batchProcessOptions;
@@ -44,11 +46,11 @@ namespace AnimationEditor.MountAnimationCreator.Services
             _mountFragment = mountFragment;
             _riderFragment = riderFragment;
 
-            CreateFiles(_batchProcessOptions);
+            CreateFiles();
             CreateFragmentAndAnimations(resultInfo);
             SaveFiles();
 
-            ErrorListWindow.ShowDialog("Mount creation result", resultInfo);
+            ErrorListWindow.ShowDialog("Mount creation result", resultInfo, false);
         }
 
         void CreateFragmentAndAnimations(ErrorListViewModel.ErrorList resultInfo)
@@ -69,8 +71,6 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
             // Casting, ranged
         }
-
-
 
         void CreateAnimation( string riderSlot, string mountSlot, ErrorListViewModel.ErrorList resultInfo)
         {
@@ -163,10 +163,10 @@ namespace AnimationEditor.MountAnimationCreator.Services
                 .ToList();
         }
 
-        void CreateFiles(BatchProcessOptions batchProcessOptions)
+        void CreateFiles()
         {
             //AnimationPackLoader
-            _outAnimPack = new AnimationPackFile();
+            _outAnimPack = new AnimationPackFile(_animBinName);
             _outAnimPack.AnimationBin = new AnimationBin("animations/animation_tables/" + _animBinName);
             var tableEntry = new AnimationBinEntry(_fragmentName, _riderFragment.Skeletons.Values.First(), _mountFragment.Skeletons.Values.First());
             tableEntry.FragmentReferences.Add(new AnimationBinEntry.FragmentReference() { Name = _fragmentName });

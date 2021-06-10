@@ -117,6 +117,9 @@ namespace CommonControls.Services
             return null;
         }
 
+
+        // Delete this pice of shit
+        asdasd
         public class AnimationReference
         {
             public AnimationReference(string animationFile, PackFileContainer container)

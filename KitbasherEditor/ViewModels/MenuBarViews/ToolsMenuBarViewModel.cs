@@ -111,7 +111,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             FaceToVertexCommand = new RelayCommand(ConvertFacesToVertex);
             BmiToolCommand = new RelayCommand(OpenBmiTool);
 
-
             _selectionManager = componentManager.GetComponent<SelectionManager>();
             _selectionManager.SelectionChanged += OnSelectionChanged;
 
@@ -179,7 +178,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 if (objectSelectionState.CurrentSelection().Count >= 2)
                 {
                     if (!_objectEditor.CombineMeshes(objectSelectionState, out var errorList))
-                        ErrorListWindow.ShowDialog("Combine Errors", errorList);
+                        ErrorListWindow.ShowDialog("Combine Errors", errorList, false);
                 }                
             }
         }

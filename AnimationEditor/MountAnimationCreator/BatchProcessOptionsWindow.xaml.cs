@@ -42,7 +42,7 @@ namespace AnimationEditor.MountAnimationCreator
 
     public class BatchProcessOptions : NotifyPropertyChangedImpl
     {
-        bool _createAnimPack = false;
+        bool _createAnimPack = true;
         public bool CreateAnimPack
         {
             get => _createAnimPack;
@@ -56,7 +56,7 @@ namespace AnimationEditor.MountAnimationCreator
             set => SetAndNotify(ref _animPackName, value);
         }
 
-        bool _createAnimBin = false;  
+        bool _createAnimBin = true;  
         public bool CreateAnimBin
         {
             get => _createAnimBin;
@@ -70,7 +70,7 @@ namespace AnimationEditor.MountAnimationCreator
             set => SetAndNotify(ref _animBinName, value);
         }
 
-        bool _createFragment = false;
+        bool _createFragment = true;
         public bool CreateFragment
         {
             get => _createFragment;

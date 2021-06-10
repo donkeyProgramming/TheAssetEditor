@@ -26,8 +26,8 @@ namespace CommonControls.Editors.AnimationPack
 
         public FilterCollection<IAnimPackItem> AnimationPackItems { get; set; }
 
-        IEditorViewModel _selectedItemViewModel;
-        public IEditorViewModel SelectedItemViewModel { get => _selectedItemViewModel; set => SetAndNotify(ref _selectedItemViewModel, value); }
+        object _selectedItemViewModel;
+        public object SelectedItemViewModel { get => _selectedItemViewModel; set => SetAndNotify(ref _selectedItemViewModel, value); }
 
 
         public AnimPackViewModel(PackFileService pfs)

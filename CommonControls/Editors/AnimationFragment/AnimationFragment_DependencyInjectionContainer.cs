@@ -12,13 +12,13 @@ namespace CommonControls.Editors.AnimationFragment
     {
         public static void Register(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddTransient<TableView>();
-            serviceCollection.AddTransient<AnimationFragmentViewModel>();
+            //serviceCollection.AddTransient<TableView>();
+            //serviceCollection.AddTransient<AnimationFragmentViewModel>();
         }
-
+    
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<AnimationFragmentViewModel, TableView>(".frg");
+            //factory.RegisterTool<AnimationFragmentViewModel, TableView>(".frg");
         }
     }
-}
+}   

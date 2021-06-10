@@ -12,19 +12,12 @@
         <local:DataRowViewConverter x:Key="drvc" />
         <valueconverters:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Collapsed" />
 
-        <ContextMenu  x:Key="RowContextMenu" DataContext="{Binding RelativeSource={RelativeSource Mode=Self}, Path=PlacementTarget.DataContext}">
-            <MenuItem Header="Duplicate row" Click="{s:MethodBinding DuplicateRow}"/>
-            <MenuItem Header="Delete row" Click="{s:MethodBinding DeleteRow}"/>
-            <MenuItem Header="New row" Click="{s:MethodBinding InsertNewRow }"/>
-        </ContextMenu>
-
         <ToolTip x:Key="ErrorToolTip">
             <TextBlock Text="{Binding ErrorText, UpdateSourceTrigger=PropertyChanged}"/>
         </ToolTip>
 
         <Style x:Key="BackgroundColourStyle" TargetType="{x:Type Control}">
             <Setter Property="Background" Value="{Binding Path=Background, RelativeSource={RelativeSource AncestorType=DataGridCell}}"/>
-            <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsValid, UpdateSourceTrigger=PropertyChanged}" Value="false">
                     <Setter Property="Background" Value="OrangeRed" />
@@ -37,7 +30,6 @@
 
         <Style x:Key="IndexColoumnStyle" TargetType="{x:Type Control}">
             <Setter Property="Background" Value="{Binding Path=Background, RelativeSource={RelativeSource AncestorType=DataGridCell}}"/>
-            <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType=DataGridCell}}" Value="true">
                     <Setter Property="Background" Value="LightBlue" />
@@ -140,17 +132,33 @@
             </DockPanel>
         </DataTemplate>
 
+        <Style x:Key="ImageStyle" TargetType="Image">
+            <Setter Property="Height" Value="32"/>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.25"></Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <DataGrid Grid.Row="0"        
+        <ToolBarTray Grid.Row="0"  >
+            <ToolBar>
+                <Button ToolTip="Save "  Command="{Binding SaveCommand, Mode=OneTime}" IsEnabled="{Binding SaveEnabled.Value, UpdateSourceTrigger=PropertyChanged}">
+                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-save-all-50.png"/>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+
+        <DataGrid Grid.Row="1"        
                   Name="dataGrid1"
-                  
                   ItemsSource="{Binding Data.DefaultView, UpdateSourceTrigger=PropertyChanged}" 
                   SelectedItem="{Binding Path=SelectedRow, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                   AutoGenerateColumns="True"
@@ -159,27 +167,27 @@
                   EnableColumnVirtualization="True"
                   VirtualizingPanel.ScrollUnit="Pixel"
                   local:DataGridBehavior.DisplayRowNumber="True"
-                    VirtualizingStackPanel.VirtualizationMode="Standard"
-             VirtualizingStackPanel.IsVirtualizing="True"
+                  VirtualizingStackPanel.VirtualizationMode="Standard"
+                  VirtualizingStackPanel.IsVirtualizing="True"
                   AlternationCount="2" 
                   AutoGeneratingColumn="DataGrid_AutoGeneratingColumn" >
-
 
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Duplicate" 
-                     Command="{Binding DuplicateRowCommand}"
-                     CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedItem}" />
-                    <MenuItem Header="New" />
-                    
-                    <MenuItem Header="Delete"/>
-                    <MenuItem Header="Delete all but selected"/>
+                         Command="{Binding DuplicateRowCommand}"
+                         CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedItem}" />
+                    <MenuItem Header="New" 
+                         Command="{Binding NewRowCommand}"/>
+                    <MenuItem Header="Delete"
+                         Command="{Binding DeleteRowCommand}"
+                         CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedItem}" />
+                    <MenuItem Header="Delete all but selected" IsEnabled="False"/>
                 </ContextMenu>
             </DataGrid.ContextMenu>
             
             <DataGrid.RowStyle>
                 <Style TargetType="{x:Type DataGridRow}">
-                    
                     <Style.Triggers>
                         <Trigger Property="ItemsControl.AlternationIndex" Value="0">
                             <Setter Property="Background" Value="#EEEEEE" />
@@ -189,7 +197,7 @@
             </DataGrid.RowStyle>
         </DataGrid>
 
-        <DockPanel Grid.Row="1">
+        <DockPanel Grid.Row="2">
             <Button Content="Filter" Width="100" DockPanel.Dock="Right"  Command="{Binding SearchCommand}" CommandParameter="{Binding FilterText}" />
             <TextBox Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" AcceptsReturn="False" >
                 <TextBox.InputBindings>

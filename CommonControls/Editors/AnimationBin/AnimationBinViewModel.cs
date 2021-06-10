@@ -15,7 +15,6 @@ namespace CommonControls.Editors.AnimationBin
     {
         public AnimationBinFragRefViewModel(FileTypes.AnimationPack.AnimationBinEntry entry)
         {
-            //Factory.CreateColoumn("Index", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x) { IsEditable=false});
             Factory.CreateColoumn("Fragment", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
             Factory.CreateColoumn("Unknown", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
 
@@ -47,7 +46,6 @@ namespace CommonControls.Editors.AnimationBin
         {
             _pf = pf;
 
-            //Factory.CreateColoumn("Index", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x) { IsEditable=false});
             Factory.CreateColoumn("Key", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
             Factory.CreateColoumn("Skeleton", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
             Factory.CreateColoumn("Mount", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));

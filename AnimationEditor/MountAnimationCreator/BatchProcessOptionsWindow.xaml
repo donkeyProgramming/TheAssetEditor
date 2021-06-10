@@ -23,22 +23,22 @@
 
         <Label Grid.Row="0" Grid.Column="0" Content="AnimPack"/>
         <Label Grid.Row="0" Grid.Column="1" Content=":"/>
-        <CheckBox Grid.Row="0" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding CreateAnimPack, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+        <CheckBox Grid.Row="0" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding CreateAnimPack, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="False"/>
         <TextBox Grid.Row="0" Grid.Column="3" Width="300" VerticalContentAlignment="Center" Margin="2,2,0,2" Text="{Binding AnimPackName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding CreateAnimPack, UpdateSourceTrigger=PropertyChanged}" />
 
         <Label Grid.Row="1" Grid.Column="0" Content="AnimBin"/>
         <Label Grid.Row="1" Grid.Column="1" Content=":"/>
-        <CheckBox Grid.Row="1" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding CreateAnimBin, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+        <CheckBox Grid.Row="1" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding CreateAnimBin, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="False"/>
         <TextBox Grid.Row="1" Grid.Column="3" Width="300" VerticalContentAlignment="Center" Margin="2,2,0,2" Text="{Binding AnimBinName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding CreateAnimBin, UpdateSourceTrigger=PropertyChanged}" />
 
         <Label Grid.Row="2" Grid.Column="0" Content="Fragment"/>
         <Label Grid.Row="2" Grid.Column="1" Content=":"/>
-        <CheckBox Grid.Row="2" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding CreateFragment, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+        <CheckBox Grid.Row="2" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding CreateFragment, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="False"/>
         <TextBox Grid.Row="2" Grid.Column="3" Width="300" VerticalContentAlignment="Center" Margin="2,2,0,2" Text="{Binding FragmentName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding CreateFragment, UpdateSourceTrigger=PropertyChanged}" />
 
         <Label Grid.Row="3" Grid.Column="0" Content="Animations"/>
         <Label Grid.Row="3" Grid.Column="1" Content=":"/>
-        <CheckBox Grid.Row="3" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding CreateAnimations, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+        <CheckBox Grid.Row="3" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding CreateAnimations, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="False"/>
 
         <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Content="Create" Margin="10,2,10,2" Click="Button_Click"/>
     </Grid>

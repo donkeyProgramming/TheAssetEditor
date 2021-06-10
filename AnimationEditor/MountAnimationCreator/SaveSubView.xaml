@@ -12,10 +12,8 @@
     <Expander IsExpanded="True" Header="Save and preview:">
         <Border BorderBrush="Gray" BorderThickness="0">
             <StackPanel>
-  
-
                 <DockPanel Grid.Row="0" Margin="10,5,10,0">
-                    <Button Content="Update Preview"/>
+                    <Button Content="Update Preview" Click="{s:MethodBinding CreateMountAnimation}" IsEnabled="{Binding CanPreview.Value, UpdateSourceTrigger=PropertyChanged}"/>
                 </DockPanel>
 
                 <DockPanel Grid.Row="1" Margin="10,5,10,0">
@@ -23,30 +21,44 @@
                 </DockPanel>
 
                 <DockPanel Grid.Row="2" Margin="10,5,10,0">
-  
                     <Label DockPanel.Dock="Left" Content="Selected fragment:" HorizontalContentAlignment="Center"/>
-                    <Button DockPanel.Dock="Right" Content=".." Width="25" Margin="2" />
-                    <dotNetKitControls:AutoCompleteComboBox  DockPanel.Dock="Left" 
-                            SelectedValuePath="DisplayName"
-                            TextSearch.TextPath="DisplayName"
-                            ItemsSource="{Binding MountLinkController.AnimationSets0, UpdateSourceTrigger=PropertyChanged}"
-                            SelectedItem="{Binding MountLinkController.SelectedMount}"/>
+                    <Button DockPanel.Dock="Right" Content=".." Width="25" Margin="2" Click="{s:MethodBinding ViewOutputFragment}" />
+                    <ComboBox DockPanel.Dock="Left" 
+                          IsEditable="True"
+                          IsTextSearchEnabled="false"
+                          DisplayMemberPath="FileName"
+                          Text="{Binding ActiveOutputFragment.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                          ItemsSource="{Binding ActiveOutputFragment.Values}" 
+                          SelectedItem="{Binding ActiveOutputFragment.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                 </DockPanel>
 
                 <DockPanel Grid.Row="3" Margin="10,5,10,0">
                     <Label DockPanel.Dock="Left" Content="Selected slot:         " HorizontalContentAlignment="Center"/>
-                    <Button DockPanel.Dock="Right" Content="Add to fragment" Margin="3,0,0,0"/>
-                    <dotNetKitControls:AutoCompleteComboBox
-                        DockPanel.Dock="Left"
-                        SelectedValuePath="DisplayName"
-                        TextSearch.TextPath="DisplayName"
-                        ItemsSource="{Binding MountLinkController.AnimationSets0, UpdateSourceTrigger=PropertyChanged}"
-                        SelectedItem="{Binding MountLinkController.SelectedMount}"/>
+                    <Button DockPanel.Dock="Right" Content="Add to fragment" Margin="3,0,0,0" Click="{s:MethodBinding AddAnimationToFragment}" IsEnabled="{Binding CanAddToFragment.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                    <ComboBox DockPanel.Dock="Left" 
+                          IsEditable="True"
+                          IsTextSearchEnabled="false"
+                          DisplayMemberPath="Entry.Value.Slot.Value"
+                          Text="{Binding ActiveFragmentSlot.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                          ItemsSource="{Binding ActiveFragmentSlot.Values}" 
+                          SelectedItem="{Binding ActiveFragmentSlot.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        
+                        <ComboBox.ItemContainerStyle>
+                            <Style TargetType="{x:Type ComboBoxItem}">
+
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Path=IsValid.Value}" Value="false">
+                                        <Setter Property="Foreground" Value="Red" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ComboBox.ItemContainerStyle>
+
+                    </ComboBox>
                 </DockPanel>
 
-
                 <DockPanel  Grid.Row="4" Margin="10,5,10,0">
-                    <Button  Click="{s:MethodBinding BatchProcess}" Content="Batch process based on selected Mount/Rider fragment" IsEnabled="{Binding MountLinkController.CanBatchProcess, UpdateSourceTrigger=PropertyChanged}" Margin="0,1,0,1"/>
+                    <Button  Click="{s:MethodBinding BatchProcess}" Content="Batch process based on selected Mount/Rider fragment" IsEnabled="{Binding CanBatchProcess.Value, UpdateSourceTrigger=PropertyChanged}" Margin="0,1,0,1"/>
                 </DockPanel>
 
                 <DockPanel  Grid.Row="5" Margin="10,5,10,0">

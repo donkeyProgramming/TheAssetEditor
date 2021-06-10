@@ -40,13 +40,15 @@ namespace FileTypes.AnimationPack
         public List<AnimationFragment> Fragments { get; set; } = new List<AnimationFragment>();
         public AnimationBin AnimationBin { get; set; }
         public bool HasUnknownElements { get; set; } = false;
+        public string FileName { get; set; }
 
-        public AnimationPackFile(PackFile file)
+        public AnimationPackFile(PackFile file, string onlyForThisSkeleton = null)
         {
             var data = file.DataSource.ReadDataAsChunk();
+            FileName = file.Name;
 
             var files = FindAllSubFiles(data);
-            Fragments = GetFragments(files, data);
+            Fragments = GetFragments(files, data, onlyForThisSkeleton);
             AnimationBin = GetAnimationBins(files, data).FirstOrDefault();
             var loadedFileCount = Fragments.Count;
             if (AnimationBin != null)
@@ -54,19 +56,31 @@ namespace FileTypes.AnimationPack
             HasUnknownElements = loadedFileCount != files.Count();
         }
 
-        public AnimationPackFile()
-        { }
+        public AnimationPackFile(string fileName)
+        {
+            FileName = fileName;
+        }
 
 
-        List<AnimationFragment> GetFragments(List<AnimationDataFile> animationDataFiles, ByteChunk data)
+        List<AnimationFragment> GetFragments(List<AnimationDataFile> animationDataFiles, ByteChunk data, string onlyForThisSkeleton = null)
         {
             var fragmentFiles = animationDataFiles.Where(x => x.Name.Contains(".frg"));
 
-            var output = new List<AnimationFragment>();
+            var output = new List<AnimationFragment>(fragmentFiles.Count());
             foreach (var fragmentFile in fragmentFiles)
             {
                 data.Index = fragmentFile.StartOffset;
-                output.Add(new AnimationFragment(fragmentFile.Name, data));
+                var fragment = new AnimationFragment(fragmentFile.Name, data);
+                fragment.ParentAnimationPack = this;
+                if (onlyForThisSkeleton != null)
+                {
+                    if(onlyForThisSkeleton == fragment.Skeletons.Values.FirstOrDefault())
+                        output.Add(fragment);
+                }
+                else
+                {
+                    output.Add(fragment);
+                }
             }
 
             return output;

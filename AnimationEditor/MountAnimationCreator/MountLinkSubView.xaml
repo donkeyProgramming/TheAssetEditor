@@ -35,7 +35,7 @@
                 <ComboBox Grid.Column="2" Grid.Row="0" 
                           IsEditable="True"
                           IsTextSearchEnabled="false"
-                          DisplayMemberPath="DisplayName"
+                          DisplayMemberPath="FileName"
                           Text="{Binding MountLinkController.SelectedMount.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                           ItemsSource="{Binding MountLinkController.SelectedMount.Values}" 
                           SelectedItem="{Binding MountLinkController.SelectedMount.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
@@ -47,7 +47,7 @@
                 <ComboBox Grid.Column="2" Grid.Row="1" 
                           IsEditable="True"
                           IsTextSearchEnabled="false"
-                          DisplayMemberPath="DisplayName"
+                          DisplayMemberPath="FileName"
                           Text="{Binding MountLinkController.SelectedRider.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                           ItemsSource="{Binding MountLinkController.SelectedRider.Values}" 
                           SelectedItem="{Binding MountLinkController.SelectedRider.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
@@ -58,7 +58,7 @@
                 <ComboBox Grid.Column="2" Grid.Row="2" 
                           IsEditable="True"
                           IsTextSearchEnabled="false"
-                          DisplayMemberPath="DisplayName"
+                          DisplayMemberPath="Slot.Value"
                           Text="{Binding MountLinkController.SelectedMountTag.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                           ItemsSource="{Binding MountLinkController.SelectedMountTag.Values}" 
                           SelectedItem="{Binding MountLinkController.SelectedMountTag.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
@@ -68,7 +68,7 @@
                 <ComboBox Grid.Column="2" Grid.Row="3" 
                           IsEditable="True"
                           IsTextSearchEnabled="false"
-                          DisplayMemberPath="DisplayName"
+                          DisplayMemberPath="Slot.Value"
                           Text="{Binding MountLinkController.SelectedRiderTag.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                           ItemsSource="{Binding MountLinkController.SelectedRiderTag.Values}" 
                           SelectedItem="{Binding MountLinkController.SelectedRiderTag.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>

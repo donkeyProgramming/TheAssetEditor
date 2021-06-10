@@ -11,6 +11,8 @@ namespace FileTypes.AnimationPack
 {
     public class AnimationFragment
     {
+        public AnimationPackFile ParentAnimationPack { get; set; }
+
         public class StringArrayTable
         {
             public List<string> Values { get; set; } = new List<string>();

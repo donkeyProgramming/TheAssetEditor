@@ -4,6 +4,7 @@ using CommonControls.Common;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using Filetypes.RigidModel;
+using FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -112,7 +113,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
             return _riderSkeleton;
         }
 
-        static public void SaveAnimation(PackFileService pfs, string riderAnimationName, string savePrefix, AnimationClip clip, GameSkeleton skeleton)
+        static public PackFile SaveAnimation(PackFileService pfs, string riderAnimationName, string savePrefix, AnimationClip clip, GameSkeleton skeleton)
         {
             var animFile = clip.ConvertToFileFormat(skeleton);
             var bytes = AnimationFile.GetBytes(animFile);
@@ -135,7 +136,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
             //            return;
             //    }
             //}
-            SaveHelper.Save(pfs, savePath, null, bytes);
+            return SaveHelper.Save(pfs, savePath, null, bytes);
         }
 
     }

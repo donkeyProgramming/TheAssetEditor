@@ -22,7 +22,7 @@ namespace CommonControls.ErrorListDialog
             Close();
         }
 
-        public static void ShowDialog(string titel, ErrorList errorItems)
+        public static void ShowDialog(string titel, ErrorList errorItems, bool modal = true)
         {
             var window = new ErrorListWindow();
             window.DataContext = new ErrorListViewModel()
@@ -30,7 +30,10 @@ namespace CommonControls.ErrorListDialog
                 WindowTitle = titel + " (" + errorItems.Errors.Count(x=>x.IsError) + ")",
                 ErrorItems = errorItems.Errors
             };
-            window.ShowDialog();
+            if (modal)
+                window.ShowDialog();
+            else
+                window.Show();
         }
     }
 }

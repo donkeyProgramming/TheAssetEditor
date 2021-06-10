@@ -49,8 +49,11 @@ namespace CommonControls.Common
             }
             else
             {
+                fix this so it works. Index maybe?
+                var selectedItem = SelectedItem;
                 _possibleValues = new List<T>(data);
                 Values = new ObservableCollection<T>(_possibleValues);
+                SelectedItem = selectedItem;
             }
         }
 

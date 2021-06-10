@@ -28,16 +28,21 @@ namespace AnimationEditor.MountAnimationCreator
 
         public FilterCollection<SkeletonBoneNode> SelectedRiderBone { get; set; }
 
-        public NotifyAtr<bool> CanPreview { get; set; } = new NotifyAtr<bool>(false);
-        public NotifyAtr<bool> CanSave { get; set; } = new NotifyAtr<bool>(false);
-        public NotifyAtr<bool> CanPatchProcess { get; set; } = new NotifyAtr<bool>(false);
+        public NotifyAttr<bool> CanPreview { get; set; } = new NotifyAttr<bool>(false);
+        public NotifyAttr<bool> CanSave { get; set; } = new NotifyAttr<bool>(false);
+        public NotifyAttr<bool> CanBatchProcess { get; set; } = new NotifyAttr<bool>(false);
+        public NotifyAttr<bool> CanAddToFragment { get; set; } = new NotifyAttr<bool>(false);
+        
 
-        public NotifyAtr<bool> DisplayGeneratedSkeleton { get; set; }
-        public NotifyAtr<bool> DisplayGeneratedMesh { get; set; }
+        public NotifyAttr<bool> DisplayGeneratedSkeleton { get; set; }
+        public NotifyAttr<bool> DisplayGeneratedMesh { get; set; }
 
-        public NotifyAtr<string> SelectedVertexesText { get; set; } = new NotifyAtr<string>("");
-        public NotifyAtr<string> SavePrefixText { get; set; } = new NotifyAtr<string>("new_");
+        public NotifyAttr<string> SelectedVertexesText { get; set; } = new NotifyAttr<string>("");
+        public NotifyAttr<string> SavePrefixText { get; set; } = new NotifyAttr<string>("new_");
 
+
+        public FilterCollection<AnimationFragment> ActiveOutputFragment { get; set; }
+        public FilterCollection<ActiveFragmentSlotItem> ActiveFragmentSlot { get; set; }
 
         public AnimationSettingsViewModel AnimationSettings { get; set; } = new AnimationSettingsViewModel();
         public MountLinkController MountLinkController { get; set; }
@@ -58,11 +63,17 @@ namespace AnimationEditor.MountAnimationCreator
             _rider = rider;
             _selectionManager = componentManager.GetComponent<SelectionManager>();
 
-            DisplayGeneratedSkeleton = new NotifyAtr<bool>(true, (value) => _newAnimation.IsSkeletonVisible = value);
-            DisplayGeneratedMesh = new NotifyAtr<bool>(true, (value) => { if (_newAnimation.MainNode != null) _newAnimation.MainNode.IsVisible = value; });
+            DisplayGeneratedSkeleton = new NotifyAttr<bool>(true, (value) => _newAnimation.IsSkeletonVisible = value);
+            DisplayGeneratedMesh = new NotifyAttr<bool>(true, (value) => { if (_newAnimation.MainNode != null) _newAnimation.MainNode.IsVisible = value; });
 
             SelectedRiderBone = new FilterCollection<SkeletonBoneNode>(null, (x) => UpdateCanSaveAndPreviewStates());
             MountLinkController = new MountLinkController(pfs, skeletonAnimationLookUpHelper, rider, mount, UpdateCanSaveAndPreviewStates);
+
+            ActiveOutputFragment = new FilterCollection<AnimationFragment>(null, OutputFragmentSelected);
+            ActiveOutputFragment.SearchFilter = (value, rx) => { return rx.Match(value.FileName).Success; };
+
+            ActiveFragmentSlot = new FilterCollection<ActiveFragmentSlotItem>(null, (x)=> UpdateCanSaveAndPreviewStates());
+            ActiveFragmentSlot.SearchFilter = (value, rx) => { return rx.Match(value.Entry.Value.Slot.Value).Success; };
 
             _mount.SkeletonChanged += MountSkeletonChanged;
             _rider.SkeletonChanged += RiderSkeletonChanges;
@@ -87,21 +98,38 @@ namespace AnimationEditor.MountAnimationCreator
         private void RiderSkeletonChanges(GameSkeleton newValue)
         {
             if (newValue == null)
+            {
+                ActiveOutputFragment.UpdatePossibleValues(null);
                 SelectedRiderBone.UpdatePossibleValues(null);
+            }
             else
+            {
+                ActiveOutputFragment.UpdatePossibleValues(MountLinkController.LoadFragmentsForSkeleton(newValue.SkeletonName, true));
                 SelectedRiderBone.UpdatePossibleValues(SkeletonHelper.CreateFlatSkeletonList(newValue));
+            }
 
             SelectedRiderBone.SelectedItem = SelectedRiderBone.Values.FirstOrDefault(x => string.Equals("root", x.BoneName, StringComparison.OrdinalIgnoreCase));
             UpdateCanSaveAndPreviewStates();
         }
 
+        void OutputFragmentSelected(AnimationFragment fragment)
+        {
+            if (fragment == null)
+                ActiveFragmentSlot.UpdatePossibleValues(null);
+            else
+                ActiveFragmentSlot.UpdatePossibleValues(fragment.Fragments.Select(x=> new ActiveFragmentSlotItem(x)));
+            UpdateCanSaveAndPreviewStates();
+        }
+
         void UpdateCanSaveAndPreviewStates()
         {
+            var mountConnectionOk = SelectedRiderBone != null && _mountVertexes.Count != 0;
             var mountOK = _mount != null && _mount.AnimationClip != null && _mount.Skeleton != null;
             var riderOK = _rider != null && _rider.AnimationClip != null && _rider.Skeleton != null;
-            CanPreview.Value = SelectedRiderBone != null && _mountVertexes.Count != 0 && mountOK  && riderOK;
+            CanPreview.Value = mountConnectionOk && _mountVertexes.Count != 0 && mountOK  && riderOK;
             CanSave.Value = CanPreview.Value && _newAnimation.AnimationClip != null;
-            CanPatchProcess.Value = false;
+            CanBatchProcess.Value = MountLinkController?.SelectedMount?.SelectedItem != null && MountLinkController?.SelectedRider?.SelectedItem != null && mountConnectionOk;
+            CanAddToFragment.Value = ActiveOutputFragment?.SelectedItem != null && ActiveFragmentSlot?.SelectedItem != null;// && CanPreview.Value;
         }
 
         public void SetMountVertex()
@@ -146,31 +174,58 @@ namespace AnimationEditor.MountAnimationCreator
         }
 
         public void AddAnimationToFragment()
-        { }
+        {
+            // Find stuff in active slot.
+            var selectedAnimationSlot = MountLinkController.SelectedRiderTag.SelectedItem;
+            var fileResult = MountAnimationGeneratorService.SaveAnimation(_pfs, _rider.AnimationName.AnimationFile, SavePrefixText.Value, _newAnimation.AnimationClip, _newAnimation.Skeleton);
+            if (fileResult == null)
+                return;
+
+
+            var newAnimSlot = selectedAnimationSlot.Clone();
+            newAnimSlot.AnimationFile = _pfs.GetFullPath(fileResult);
+            newAnimSlot.Slot = ActiveFragmentSlot.SelectedItem.Entry.Value.Slot.Clone();
+
+            var toRemove = ActiveOutputFragment.SelectedItem.Fragments.FirstOrDefault(x => x.Slot.Id == ActiveFragmentSlot.SelectedItem.Entry.Value.Slot.Id);
+            ActiveOutputFragment.SelectedItem.Fragments.Remove(toRemove);
+
+            ActiveOutputFragment.SelectedItem.Fragments.Add(newAnimSlot);
+
+           var bytes = ActiveOutputFragment.SelectedItem.ParentAnimationPack.ToByteArray();
+            SaveHelper.Save(_pfs, "animations\\animation_tables\\" + ActiveOutputFragment.SelectedItem.ParentAnimationPack.FileName, null, bytes, false);
+
+            // Update status for the slot thing 
+            ActiveFragmentSlot.UpdatePossibleValues(ActiveOutputFragment.SelectedItem.Fragments.Select(x => new ActiveFragmentSlotItem(x)));
+        }
 
         public void ViewMountFragment()
         {
-            ViewFragment(MountLinkController.SelectedMount.SelectedItem?.Entry);
+            ViewFragment(MountLinkController.SelectedMount.SelectedItem);
         }
 
         public void ViewRiderFragment()
         {
-            ViewFragment(MountLinkController.SelectedRider.SelectedItem?.Entry);
+            ViewFragment(MountLinkController.SelectedRider.SelectedItem);
         }
 
-        void ViewFragment(AnimationFragment fragment)
+        public void ViewOutputFragment()
+        {
+            ViewFragment(ActiveOutputFragment.SelectedItem, true);
+        }
+
+        void ViewFragment(AnimationFragment fragment, bool canEdit = false)
         {
             if (fragment != null)
             {
-                var view = AnimationFragmentViewModel.CreateFromFragment(_pfs, fragment, false);
+                var view = AnimationFragmentViewModel.CreateFromFragment(_pfs, fragment, canEdit);
                 TableWindow.Show(view);
             }
         }
 
         public void BatchProcess()
         {
-            var mountFrag = MountLinkController.SelectedMount.SelectedItem.Entry;
-            var riderFrag = MountLinkController.SelectedRider.SelectedItem.Entry;
+            var mountFrag = MountLinkController.SelectedMount.SelectedItem;
+            var riderFrag = MountLinkController.SelectedRider.SelectedItem;
             
             var batchSettings = BatchProcessOptionsWindow.ShowDialog("new_" + Path.GetFileNameWithoutExtension(riderFrag.FileName), SavePrefixText.Value);
             if (batchSettings != null)
@@ -178,6 +233,20 @@ namespace AnimationEditor.MountAnimationCreator
                 var service = new BatchProcessorService(_pfs, CreateAnimationGenerator(), batchSettings);
                 service.Process(mountFrag, riderFrag);
                 MountLinkController.ReloadFragments();
+
+                ActiveOutputFragment.UpdatePossibleValues(MountLinkController.LoadFragmentsForSkeleton(_rider.Skeleton.SkeletonName, true));
+            }
+        }
+
+        public class ActiveFragmentSlotItem
+        {
+            public NotifyAttr<bool> IsValid { get; set; } = new NotifyAttr<bool>(false);
+            public NotifyAttr<AnimationFragmentEntry> Entry { get; set; } = new NotifyAttr<AnimationFragmentEntry>(null);
+
+            public ActiveFragmentSlotItem(AnimationFragmentEntry entry)
+            {
+                Entry.Value = entry;
+                IsValid.Value = !string.IsNullOrWhiteSpace(entry.AnimationFile);
             }
         }
     }

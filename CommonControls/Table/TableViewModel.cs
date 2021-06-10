@@ -7,6 +7,7 @@ using System.Data;
 using System.Text;
 using System.Windows.Input;
 using System.Linq;
+using CommonControls.Common;
 
 namespace CommonControls.Table
 {
@@ -36,8 +37,11 @@ namespace CommonControls.Table
 
         public ICommand SearchCommand { get; set; }
         public ICommand DuplicateRowCommand { get; set; }
-        public ICommand CreateRowCommand { get; set; }
+        public ICommand NewRowCommand { get; set; }
         public ICommand DeleteRowCommand { get; set; }
+        public ICommand SaveCommand { get; set; }
+
+        public NotifyAttr<bool> SaveEnabled { get; set; } = new NotifyAttr<bool>(false);
 
 
         public TableViewModel()
@@ -47,6 +51,9 @@ namespace CommonControls.Table
 
             SearchCommand = new RelayCommand<string>(Filter);
             DuplicateRowCommand = new RelayCommand<DataRowView>(DuplicateRow);
+            NewRowCommand = new RelayCommand(NewRow);
+            DeleteRowCommand = new RelayCommand<DataRowView>(DeleteRow);
+            SaveCommand = new RelayCommand(SaveTable);
         }
 
         protected void SuspendLayout()
@@ -54,9 +61,10 @@ namespace CommonControls.Table
             Data = null;
         }
 
-        protected void ResumeLayout()
+        protected void ResumeLayout(bool commitChanged = true)
         {
             Data = _privateTable;
+            Data.AcceptChanges();
         }
 
         public void CreateColum(string name, Type type)
@@ -91,6 +99,22 @@ namespace CommonControls.Table
             DuplicateRow(value.Row);
         }
 
+        public void DeleteRow(DataRowView value)
+        {
+            _privateTable.Rows.Remove(value.Row);
+        }
+
+        public void NewRow()
+        {
+            var values = Factory.CreateEmptyRowInstance();
+            _privateTable.Rows.Add(values.ToArray());
+        }
+
+        public virtual void SaveTable()
+        {
+            
+        }
+
         protected virtual void DuplicateRow(DataRow row)
         {
             var newColumns = new List<BaseCellItem>();
@@ -98,12 +122,6 @@ namespace CommonControls.Table
             {
                 var clone = objItem.Duplicate();
                 newColumns.Add(clone);
-            }
-
-            if (_privateTable.Columns[0].ColumnName.ToLower() == "index")
-            {
-                var indexColoum = newColumns[0] as ValueCellItem<object>;
-                indexColoum.Data = _privateTable.Rows.Count;
             }
             _privateTable.Rows.Add(newColumns.ToArray());
         }

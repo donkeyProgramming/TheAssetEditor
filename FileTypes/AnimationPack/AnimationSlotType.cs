@@ -39,7 +39,7 @@ namespace FileTypes.AnimationPack
         static public AnimationSlotType GetFromId(int id)
         {
             PopulateList();
-            return Values.FirstOrDefault(x=>x.Id == id);
+            return Values[id];
         }
 
         static public AnimationSlotType GetfromValue(string value)

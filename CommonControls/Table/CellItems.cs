@@ -22,6 +22,7 @@ namespace CommonControls.Table
         List<string> _columnNames = new List<string>();
         Dictionary<string, ColoumTypes> _coloumTypes = new Dictionary<string, ColoumTypes>();
         Dictionary<ColoumTypes, string> _resourceMap = new Dictionary<ColoumTypes, string>();
+        Dictionary<ColoumTypes, object> _defaultValueMap = new Dictionary<ColoumTypes, object>();
 
         DataTable _table;
 
@@ -35,6 +36,8 @@ namespace CommonControls.Table
             BitFlag
         }
 
+
+
         public CellFactory(DataTable privateTable)
         {
             _table = privateTable;
@@ -43,6 +46,12 @@ namespace CommonControls.Table
             _resourceMap[ColoumTypes.SubTable] = "ButtonTemplate";
             _resourceMap[ColoumTypes.ComboBox] = "ComboBoxTemplate";
             _resourceMap[ColoumTypes.BitFlag] = "BitflagTemplate";
+
+            _defaultValueMap[ColoumTypes.Default] = "";
+            _defaultValueMap[ColoumTypes.Bool] = false;
+            _defaultValueMap[ColoumTypes.SubTable] = null;
+            _defaultValueMap[ColoumTypes.ComboBox] = null;
+            _defaultValueMap[ColoumTypes.BitFlag] = 0;
         }
 
         internal string GetCellTemplate(string propertyName)
@@ -53,7 +62,6 @@ namespace CommonControls.Table
 
         public void CreateColoumn(string coloumnName, ColoumTypes coloumType, Func<object, BaseCellItem> createCell)
         {
-            _columnNames = new List<string>();
             _createMap.Add(createCell);
             _table.Columns.Add(coloumnName, typeof(BaseCellItem));
             _coloumTypes[coloumnName] = coloumType;
@@ -69,6 +77,20 @@ namespace CommonControls.Table
             List<BaseCellItem> output = new List<BaseCellItem>();
             for(int i = 0; i < values.Length; i++)
                 output.Add(CreateColumnValue(i, values[i]));
+
+            return output;
+        }
+
+        public List<BaseCellItem> CreateEmptyRowInstance()
+        {
+            List<BaseCellItem> output = new List<BaseCellItem>();
+            for(int i = 0; i < _coloumTypes.Count; i++)
+            {
+                var columnType = _coloumTypes.ElementAt(i);
+                var defaultValue = _defaultValueMap[columnType.Value];
+                var newCell = _createMap[i](defaultValue);
+                output.Add(newCell);
+            }
 
             return output;
         }
