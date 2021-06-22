@@ -26,7 +26,6 @@ namespace AssetEditor
     {
         public IServiceProvider ServiceProvider { get; private set; }
         
-
         public DependencyInjectionConfig()
         {
             Logging.Configure(Serilog.Events.LogEventLevel.Information);

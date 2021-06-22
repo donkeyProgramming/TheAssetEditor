@@ -168,7 +168,7 @@ namespace Filetypes.RigidModel
             return Create(new ByteChunk(data));
         }
 
-        static AnimationFile Create(ByteChunk chunk)
+        public static  AnimationFile Create(ByteChunk chunk)
         {
             if (chunk.BytesLeft == 0)
                 throw new Exception("Trying to load animation with no data, chunk size = 0");

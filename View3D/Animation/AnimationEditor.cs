@@ -187,7 +187,7 @@ namespace View3D.Animation
             //throw new NotImplementedException();
         }
 
-        public static AnimationClip ReSample(GameSkeleton skeleton, AnimationClip newAnim, int newFrameCount)
+        public static AnimationClip ReSample(GameSkeleton skeleton, AnimationClip newAnim, int newFrameCount, float playTime)
         {
             var output = newAnim.Clone();
             output.DynamicFrames.Clear();
@@ -214,10 +214,9 @@ namespace View3D.Animation
                 }
 
                 output.DynamicFrames.Add(newKeyFrame);
-            }
+            } 
 
-
-            output.PlayTimeInSec = (output.DynamicFrames.Count() - 1) / 20.0f;
+            output.PlayTimeInSec = playTime;// (output.DynamicFrames.Count() - 1) / 20.0f;
 
             return output;
         }

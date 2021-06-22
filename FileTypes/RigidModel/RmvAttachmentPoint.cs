@@ -34,7 +34,8 @@ namespace Filetypes.RigidModel
                     _name[i] = 0;
 
                 var byteValues = Encoding.UTF8.GetBytes(value);
-                for (int i = 0; i < byteValues.Length; i++)
+                var maxLenth = Math.Clamp(byteValues.Length, 0, 32);
+                for (int i = 0; i < maxLenth; i++)
                 {
                     _name[i] = byteValues[i];
                 }

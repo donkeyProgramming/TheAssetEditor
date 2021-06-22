@@ -58,20 +58,40 @@
                 <ComboBox Grid.Column="2" Grid.Row="2" 
                           IsEditable="True"
                           IsTextSearchEnabled="false"
-                          DisplayMemberPath="Slot.Value"
+                          DisplayMemberPath="Entry.Value.Slot.Value"
                           Text="{Binding MountLinkController.SelectedMountTag.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                           ItemsSource="{Binding MountLinkController.SelectedMountTag.Values}" 
-                          SelectedItem="{Binding MountLinkController.SelectedMountTag.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                          SelectedItem="{Binding MountLinkController.SelectedMountTag.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                    <ComboBox.ItemContainerStyle>
+                        <Style TargetType="{x:Type ComboBoxItem}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=IsValid.Value}" Value="false">
+                                    <Setter Property="Foreground" Value="Red" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ComboBox.ItemContainerStyle>
+                </ComboBox>
 
                 <Label Grid.Column="0" Grid.Row="3" Content="Rider tag"/>
                 <Label Grid.Column="1" Grid.Row="3" Content=":"/>
                 <ComboBox Grid.Column="2" Grid.Row="3" 
                           IsEditable="True"
                           IsTextSearchEnabled="false"
-                          DisplayMemberPath="Slot.Value"
+                          DisplayMemberPath="Entry.Value.Slot.Value"
                           Text="{Binding MountLinkController.SelectedRiderTag.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                           ItemsSource="{Binding MountLinkController.SelectedRiderTag.Values}" 
-                          SelectedItem="{Binding MountLinkController.SelectedRiderTag.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                          SelectedItem="{Binding MountLinkController.SelectedRiderTag.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                    <ComboBox.ItemContainerStyle>
+                        <Style TargetType="{x:Type ComboBoxItem}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=IsValid.Value}" Value="false">
+                                    <Setter Property="Foreground" Value="Red" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ComboBox.ItemContainerStyle>
+                </ComboBox>
 
  
 

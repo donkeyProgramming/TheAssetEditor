@@ -38,14 +38,12 @@ namespace AnimationEditor.MountAnimationCreator
 
             editorView.MainInput = new AnimationToolInput()
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_damsel_campaign_01.variantmeshdefinition") as PackFile,
-                Animation = packfileService.FindFile(@"animations\battle\humanoid01b\rider\horse01\spear_and_shield\locomotion\hu1b_hr1_sps_rider1_walk_01.anim") as PackFile,
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_damsel_campaign_01.variantmeshdefinition")
             };
 
             editorView.RefInput = new AnimationToolInput()
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\lzd_carnosaur_grymloq.variantmeshdefinition") as PackFile,
-                Animation = packfileService.FindFile(@"animations\battle\humanoid07b\rider\raptor03b\club\locomotion\hu7b_rp3b_cl_rider1_walk_03.anim") as PackFile,
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\lzd_carnosaur_grymloq.variantmeshdefinition")
             };
 
             creator.CreateEmptyEditor(editorView);
@@ -58,14 +56,12 @@ namespace AnimationEditor.MountAnimationCreator
 
             editorView.MainInput = new AnimationToolInput()
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\emp_ch_karl.variantmeshdefinition") as PackFile,
-                Animation = packfileService.FindFile(@"animations\battle\humanoid01\rider\horse01\staff_and_sword\attacks\hu1_hr1_sfsw_rider1_attack_01.anim") as PackFile,
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\emp_ch_karl.variantmeshdefinition")
             };
 
             editorView.RefInput = new AnimationToolInput()
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\grn_great_cave_squig.variantmeshdefinition") as PackFile,
-                Animation = packfileService.FindFile(@"animations\battle\raptor02\attacks\rp2_attack_05.anim") as PackFile,
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\grn_great_cave_squig.variantmeshdefinition")
             };
 
             creator.CreateEmptyEditor(editorView);
@@ -77,14 +73,12 @@ namespace AnimationEditor.MountAnimationCreator
 
             editorView.MainInput = new AnimationToolInput()
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_plague_priest.variantmeshdefinition") as PackFile,
-               // Animation = packfileService.FindFile(@"animations\battle\humanoid01\rider\horse01\staff_and_sword\attacks\hu1_hr1_sfsw_rider1_attack_01.anim") as PackFile,
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_plague_priest.variantmeshdefinition")
             };
 
             editorView.RefInput = new AnimationToolInput()
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_brood_horror.variantmeshdefinition") as PackFile,
-                Animation = packfileService.FindFile(@"animations\battle\rat01\locomotion\rt1_walk_01.anim") as PackFile,
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_brood_horror.variantmeshdefinition")
             };
 
             creator.CreateEmptyEditor(editorView);
@@ -96,14 +90,29 @@ namespace AnimationEditor.MountAnimationCreator
 
             editorView.MainInput = new AnimationToolInput()
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_princess_campaign_01.variantmeshdefinition") as PackFile,
-                Animation = packfileService.FindFile(@"animations\battle\humanoid01b\rider\great_stag01\spear_bow\attack\hu1b_st1_spbo_great_stag_rider1_jumping_attack_01.anim") as PackFile,
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_princess_campaign_01.variantmeshdefinition")
             };
 
             editorView.RefInput = new AnimationToolInput()
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_war_lion.variantmeshdefinition") as PackFile,
-                Animation = packfileService.FindFile(@"animations\battle\bigcat04\attacks\bc4_lion_jumping_attack_01.anim") as PackFile,
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_war_lion.variantmeshdefinition")
+            };
+
+            creator.CreateEmptyEditor(editorView);
+        }
+
+        public static void CreateLionAndHu01c(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        {
+            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+
+            editorView.MainInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\chs_marauder_horsemen.variantmeshdefinition")
+            };
+
+            editorView.RefInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_war_lion.variantmeshdefinition")
             };
 
             creator.CreateEmptyEditor(editorView);
@@ -115,14 +124,29 @@ namespace AnimationEditor.MountAnimationCreator
 
             editorView.MainInput = new AnimationToolInput()
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_princess_campaign_01.variantmeshdefinition") as PackFile,
-                Animation = packfileService.FindFile(@"animations\battle\humanoid01b\rider\raptor03\sword_and_shield\locomotion\hu1b_elf_rp3_sws_rider1_run_02.anim") as PackFile,
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_princess_campaign_01.variantmeshdefinition")
             };
 
             editorView.RefInput = new AnimationToolInput()
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\def_cold_one.variantmeshdefinition") as PackFile,
-                Animation = packfileService.FindFile(@"animations\battle\raptor03\locomotion\rp3_run_02.anim") as PackFile,
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\def_cold_one.variantmeshdefinition")
+            };
+
+            creator.CreateEmptyEditor(editorView);
+        }
+
+        public static void CreateRaptorAndHu01d(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        {
+            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+
+            editorView.MainInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_archer_armoured.variantmeshdefinition"),
+            };
+
+            editorView.RefInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\def_cold_one.variantmeshdefinition"),
             };
 
             creator.CreateEmptyEditor(editorView);
@@ -135,13 +159,11 @@ namespace AnimationEditor.MountAnimationCreator
             editorView.MainInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\grn_savage_orc_base.variantmeshdefinition") as PackFile,
-                //Animation = packfileService.FindFile(@"animations\battle\humanoid01b\rider\raptor03\sword_and_shield\locomotion\hu1b_elf_rp3_sws_rider1_run_02.anim") as PackFile,
             };
 
             editorView.RefInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\def_cold_one.variantmeshdefinition") as PackFile,
-                Animation = packfileService.FindFile(@"animations\battle\raptor03\locomotion\rp3_run_02.anim") as PackFile,
             };
 
             creator.CreateEmptyEditor(editorView);

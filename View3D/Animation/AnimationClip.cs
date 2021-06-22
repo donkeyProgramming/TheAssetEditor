@@ -21,7 +21,7 @@ namespace View3D.Animation
                 return $"PosCount = {Position.Count}, RotCount = {Rotation.Count}";
             }
 
-            internal KeyFrame Clone()
+            public KeyFrame Clone()
             {
                 return new KeyFrame()
                 {

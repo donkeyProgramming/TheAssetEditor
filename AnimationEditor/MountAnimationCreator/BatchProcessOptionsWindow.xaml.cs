@@ -49,7 +49,7 @@ namespace AnimationEditor.MountAnimationCreator
             set => SetAndNotify(ref _createAnimPack, value);
         }
 
-        string _animPackName = "new_anim_table.animpack";
+        string _animPackName = "new_anim_tables.animpack";
         public string AnimPackName
         {
             get => _animPackName;

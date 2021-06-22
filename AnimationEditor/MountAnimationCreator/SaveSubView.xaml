@@ -16,10 +16,6 @@
                     <Button Content="Update Preview" Click="{s:MethodBinding CreateMountAnimation}" IsEnabled="{Binding CanPreview.Value, UpdateSourceTrigger=PropertyChanged}"/>
                 </DockPanel>
 
-                <DockPanel Grid.Row="1" Margin="10,5,10,0">
-                    <Button Content="Save animation"/>
-                </DockPanel>
-
                 <DockPanel Grid.Row="2" Margin="10,5,10,0">
                     <Label DockPanel.Dock="Left" Content="Selected fragment:" HorizontalContentAlignment="Center"/>
                     <Button DockPanel.Dock="Right" Content=".." Width="25" Margin="2" Click="{s:MethodBinding ViewOutputFragment}" />
@@ -35,6 +31,7 @@
                 <DockPanel Grid.Row="3" Margin="10,5,10,0">
                     <Label DockPanel.Dock="Left" Content="Selected slot:         " HorizontalContentAlignment="Center"/>
                     <Button DockPanel.Dock="Right" Content="Add to fragment" Margin="3,0,0,0" Click="{s:MethodBinding AddAnimationToFragment}" IsEnabled="{Binding CanAddToFragment.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                    
                     <ComboBox DockPanel.Dock="Left" 
                           IsEditable="True"
                           IsTextSearchEnabled="false"
@@ -42,10 +39,9 @@
                           Text="{Binding ActiveFragmentSlot.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                           ItemsSource="{Binding ActiveFragmentSlot.Values}" 
                           SelectedItem="{Binding ActiveFragmentSlot.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                        
+                         
                         <ComboBox.ItemContainerStyle>
                             <Style TargetType="{x:Type ComboBoxItem}">
-
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding Path=IsValid.Value}" Value="false">
                                         <Setter Property="Foreground" Value="Red" />
@@ -62,8 +58,12 @@
                 </DockPanel>
 
                 <DockPanel  Grid.Row="5" Margin="10,5,10,0">
-                    <Label Content="Save prefix:"/>
+                    <Label DockPanel.Dock="Left" Content="Save prefix:"/>
+
+                    <CheckBox  DockPanel.Dock="Right" VerticalContentAlignment="Center" IsChecked="{Binding EnsureUniqeFileName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                    <Label  DockPanel.Dock="Right"  Content="Ensure unique:"/>
                     <TextBox VerticalContentAlignment="Center" Text="{Binding SavePrefixText.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                    
                 </DockPanel>
 
             </StackPanel>

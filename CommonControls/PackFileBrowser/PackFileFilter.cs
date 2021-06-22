@@ -115,6 +115,12 @@ namespace CommonControls.PackFileBrowser
 
         bool HasChildWithFilterMatch(TreeNode file, Regex expression)
         {
+            if (file.NodeType == NodeType.Root && file.Children.Count == 0)
+            {
+                file.IsVisible = true;
+                return true;
+            }
+
             if (file.NodeType == NodeType.File)
             {
                 bool hasValidExtention = true;

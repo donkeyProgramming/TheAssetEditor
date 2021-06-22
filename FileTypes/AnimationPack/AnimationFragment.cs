@@ -66,6 +66,17 @@ namespace FileTypes.AnimationPack
 
         public byte[] ToByteArray()
         {
+            // Ensure it ok
+            UpdateMinAndMaxSlotIds();
+            Fragments = Fragments.OrderBy(x => x.Slot.Id).ToList();
+            foreach (var fragment in Fragments)
+            {
+                fragment.AnimationFile = fragment.AnimationFile.Replace("\\", "/");
+                fragment.MetaDataFile = fragment.MetaDataFile.Replace("\\", "/");
+                fragment.SoundMetaDataFile = fragment.SoundMetaDataFile.Replace("\\", "/");
+            }
+
+            // Save
             using MemoryStream memStream = new MemoryStream();
             memStream.Write(Skeletons.ToByteArray());
 

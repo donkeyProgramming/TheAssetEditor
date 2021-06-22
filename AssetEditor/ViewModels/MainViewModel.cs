@@ -45,12 +45,6 @@ namespace AssetEditor.ViewModels
 
         public MainViewModel(MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, GameInformationService gameInformationService, ToolFactory toolFactory)
         {
-
-            //TableWindow window = new TableWindow();
-            //window.DataContext = new AnimationFragmentViewModel();
-            //window.ShowDialog();
-
-
             _packfileService = packfileService;
             _packfileService.Database.BeforePackFileContainerRemoved += Database_BeforePackFileContainerRemoved;
 
@@ -97,8 +91,7 @@ namespace AssetEditor.ViewModels
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_eltharion\hef_eltharion_head.rigid_model_v2");
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu17\skv\skv_clan_rats\head\skv_clan_rats_head_04.rigid_model_v2");
 
-
-                MountAnimationCreator_Debug.CreateRaptorAndHu02(this, toolFactory, packfileService);
+                MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
                 //KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 

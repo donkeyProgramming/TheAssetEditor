@@ -12,7 +12,6 @@ using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -29,7 +28,6 @@ namespace AnimationEditor.MountAnimationCreator
         public FilterCollection<SkeletonBoneNode> SelectedRiderBone { get; set; }
 
         public NotifyAttr<bool> CanPreview { get; set; } = new NotifyAttr<bool>(false);
-        public NotifyAttr<bool> CanSave { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> CanBatchProcess { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> CanAddToFragment { get; set; } = new NotifyAttr<bool>(false);
         
@@ -39,10 +37,10 @@ namespace AnimationEditor.MountAnimationCreator
 
         public NotifyAttr<string> SelectedVertexesText { get; set; } = new NotifyAttr<string>("");
         public NotifyAttr<string> SavePrefixText { get; set; } = new NotifyAttr<string>("new_");
-
-
+        public NotifyAttr<bool> EnsureUniqeFileName { get; set; } = new NotifyAttr<bool>(true);
+        
         public FilterCollection<AnimationFragment> ActiveOutputFragment { get; set; }
-        public FilterCollection<ActiveFragmentSlotItem> ActiveFragmentSlot { get; set; }
+        public FilterCollection<FragmentStatusSlotItem> ActiveFragmentSlot { get; set; }
 
         public AnimationSettingsViewModel AnimationSettings { get; set; } = new AnimationSettingsViewModel();
         public MountLinkController MountLinkController { get; set; }
@@ -72,7 +70,7 @@ namespace AnimationEditor.MountAnimationCreator
             ActiveOutputFragment = new FilterCollection<AnimationFragment>(null, OutputFragmentSelected);
             ActiveOutputFragment.SearchFilter = (value, rx) => { return rx.Match(value.FileName).Success; };
 
-            ActiveFragmentSlot = new FilterCollection<ActiveFragmentSlotItem>(null, (x)=> UpdateCanSaveAndPreviewStates());
+            ActiveFragmentSlot = new FilterCollection<FragmentStatusSlotItem>(null, (x)=> UpdateCanSaveAndPreviewStates());
             ActiveFragmentSlot.SearchFilter = (value, rx) => { return rx.Match(value.Entry.Value.Slot.Value).Success; };
 
             _mount.SkeletonChanged += MountSkeletonChanged;
@@ -86,13 +84,16 @@ namespace AnimationEditor.MountAnimationCreator
         private void RiderAnimationChanged(AnimationClip newValue)
         {
             UpdateCanSaveAndPreviewStates();
-            if(CanSave.Value)
+            if (CanPreview.Value)
                 CreateMountAnimation();
+            else
+                _newAnimation?.SetAnimation(null);
         }
 
         private void MountSkeletonChanged(GameSkeleton newValue)
         {
             UpdateCanSaveAndPreviewStates();
+            MountLinkController.ReloadFragments(false, true);
         }
 
         private void RiderSkeletonChanges(GameSkeleton newValue)
@@ -108,7 +109,8 @@ namespace AnimationEditor.MountAnimationCreator
                 SelectedRiderBone.UpdatePossibleValues(SkeletonHelper.CreateFlatSkeletonList(newValue));
             }
 
-            SelectedRiderBone.SelectedItem = SelectedRiderBone.Values.FirstOrDefault(x => string.Equals("root", x.BoneName, StringComparison.OrdinalIgnoreCase));
+            SelectedRiderBone.SelectedItem = SelectedRiderBone.PossibleValues.FirstOrDefault(x => string.Equals("root", x.BoneName, StringComparison.OrdinalIgnoreCase));
+            MountLinkController.ReloadFragments(true, false);
             UpdateCanSaveAndPreviewStates();
         }
 
@@ -117,7 +119,7 @@ namespace AnimationEditor.MountAnimationCreator
             if (fragment == null)
                 ActiveFragmentSlot.UpdatePossibleValues(null);
             else
-                ActiveFragmentSlot.UpdatePossibleValues(fragment.Fragments.Select(x=> new ActiveFragmentSlotItem(x)));
+                ActiveFragmentSlot.UpdatePossibleValues(fragment.Fragments.Select(x=> new FragmentStatusSlotItem(x)));
             UpdateCanSaveAndPreviewStates();
         }
 
@@ -127,7 +129,6 @@ namespace AnimationEditor.MountAnimationCreator
             var mountOK = _mount != null && _mount.AnimationClip != null && _mount.Skeleton != null;
             var riderOK = _rider != null && _rider.AnimationClip != null && _rider.Skeleton != null;
             CanPreview.Value = mountConnectionOk && _mountVertexes.Count != 0 && mountOK  && riderOK;
-            CanSave.Value = CanPreview.Value && _newAnimation.AnimationClip != null;
             CanBatchProcess.Value = MountLinkController?.SelectedMount?.SelectedItem != null && MountLinkController?.SelectedRider?.SelectedItem != null && mountConnectionOk;
             CanAddToFragment.Value = ActiveOutputFragment?.SelectedItem != null && ActiveFragmentSlot?.SelectedItem != null;// && CanPreview.Value;
         }
@@ -158,7 +159,7 @@ namespace AnimationEditor.MountAnimationCreator
 
             // Apply
             _newAnimation.CopyMeshFromOther(_rider, true);
-            _newAnimation.SetAnimationClip(newRiderAnim, new SkeletonAnimationLookUpHelper.AnimationReference("New mount animation", null));
+            _newAnimation.SetAnimationClip(newRiderAnim, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
             _newAnimation.IsSkeletonVisible = DisplayGeneratedSkeleton.Value;
             UpdateCanSaveAndPreviewStates();
         }
@@ -167,22 +168,23 @@ namespace AnimationEditor.MountAnimationCreator
         {
             return new MountAnimationGeneratorService(AnimationSettings, _mountVertexOwner, _mountVertexes.First(), SelectedRiderBone.SelectedItem.BoneIndex, _rider, _mount);
         }
-        
-        public void SaveAnimation()
-        {
-            MountAnimationGeneratorService.SaveAnimation(_pfs, _rider.AnimationName.AnimationFile, SavePrefixText.Value, _newAnimation.AnimationClip, _newAnimation.Skeleton);
-        }
 
         public void AddAnimationToFragment()
         {
             // Find stuff in active slot.
             var selectedAnimationSlot = MountLinkController.SelectedRiderTag.SelectedItem;
-            var fileResult = MountAnimationGeneratorService.SaveAnimation(_pfs, _rider.AnimationName.AnimationFile, SavePrefixText.Value, _newAnimation.AnimationClip, _newAnimation.Skeleton);
+
+            AnimationClip newRiderClip = null;
+            if (MountAnimationGeneratorService.IsCopyOnlyAnimation(selectedAnimationSlot.Entry.Value.Slot.Value))
+                newRiderClip = _rider.AnimationClip;
+            else
+                newRiderClip = CreateAnimationGenerator().GenerateMountAnimation(_mount.AnimationClip, _rider.AnimationClip);
+
+            var fileResult = MountAnimationGeneratorService.SaveAnimation(_pfs, _rider.AnimationName.AnimationFile, SavePrefixText.Value, EnsureUniqeFileName.Value, newRiderClip, _newAnimation.Skeleton);
             if (fileResult == null)
                 return;
 
-
-            var newAnimSlot = selectedAnimationSlot.Clone();
+            var newAnimSlot = selectedAnimationSlot.Entry.Value.Clone();
             newAnimSlot.AnimationFile = _pfs.GetFullPath(fileResult);
             newAnimSlot.Slot = ActiveFragmentSlot.SelectedItem.Entry.Value.Slot.Clone();
 
@@ -191,11 +193,13 @@ namespace AnimationEditor.MountAnimationCreator
 
             ActiveOutputFragment.SelectedItem.Fragments.Add(newAnimSlot);
 
-           var bytes = ActiveOutputFragment.SelectedItem.ParentAnimationPack.ToByteArray();
+            var bytes = ActiveOutputFragment.SelectedItem.ParentAnimationPack.ToByteArray();
             SaveHelper.Save(_pfs, "animations\\animation_tables\\" + ActiveOutputFragment.SelectedItem.ParentAnimationPack.FileName, null, bytes, false);
 
             // Update status for the slot thing 
-            ActiveFragmentSlot.UpdatePossibleValues(ActiveOutputFragment.SelectedItem.Fragments.Select(x => new ActiveFragmentSlotItem(x)));
+            var possibleValues = ActiveOutputFragment.SelectedItem.Fragments.Select(x => new FragmentStatusSlotItem(x));
+            ActiveFragmentSlot.UpdatePossibleValues(possibleValues);
+            MountLinkController.ReloadFragments(true, false);
         }
 
         public void ViewMountFragment()
@@ -222,32 +226,39 @@ namespace AnimationEditor.MountAnimationCreator
             }
         }
 
-        public void BatchProcess()
+        public void RefreshView()
+        {
+            MountLinkController.ReloadFragments();
+            ActiveOutputFragment.UpdatePossibleValues(MountLinkController.LoadFragmentsForSkeleton(_rider.SkeletonName, true));
+        }
+
+        public void BatchProcess() 
         {
             var mountFrag = MountLinkController.SelectedMount.SelectedItem;
             var riderFrag = MountLinkController.SelectedRider.SelectedItem;
-            
-            var batchSettings = BatchProcessOptionsWindow.ShowDialog("new_" + Path.GetFileNameWithoutExtension(riderFrag.FileName), SavePrefixText.Value);
+
+            var newFileName = "new_" + Path.GetFileNameWithoutExtension(riderFrag.FileName);
+            var batchSettings = BatchProcessOptionsWindow.ShowDialog(newFileName, SavePrefixText.Value);
             if (batchSettings != null)
             {
                 var service = new BatchProcessorService(_pfs, CreateAnimationGenerator(), batchSettings);
                 service.Process(mountFrag, riderFrag);
-                MountLinkController.ReloadFragments();
+                MountLinkController.ReloadFragments(true, false);
 
                 ActiveOutputFragment.UpdatePossibleValues(MountLinkController.LoadFragmentsForSkeleton(_rider.Skeleton.SkeletonName, true));
             }
         }
+    }
 
-        public class ActiveFragmentSlotItem
+    public class FragmentStatusSlotItem
+    {
+        public NotifyAttr<bool> IsValid { get; set; } = new NotifyAttr<bool>(false);
+        public NotifyAttr<AnimationFragmentEntry> Entry { get; set; } = new NotifyAttr<AnimationFragmentEntry>(null);
+
+        public FragmentStatusSlotItem(AnimationFragmentEntry entry)
         {
-            public NotifyAttr<bool> IsValid { get; set; } = new NotifyAttr<bool>(false);
-            public NotifyAttr<AnimationFragmentEntry> Entry { get; set; } = new NotifyAttr<AnimationFragmentEntry>(null);
-
-            public ActiveFragmentSlotItem(AnimationFragmentEntry entry)
-            {
-                Entry.Value = entry;
-                IsValid.Value = !string.IsNullOrWhiteSpace(entry.AnimationFile);
-            }
+            Entry.Value = entry;
+            IsValid.Value = !string.IsNullOrWhiteSpace(entry.AnimationFile);
         }
     }
 }

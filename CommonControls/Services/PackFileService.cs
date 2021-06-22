@@ -238,6 +238,9 @@ namespace CommonControls.Services
             directoryPath += newFile.Name;
             container.FileList[directoryPath.ToLower()] = newFile;
 
+            _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, container);
+            _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, container);
+
             Database.TriggerPackFileAdded(container, new List<PackFile>() { newFile as PackFile });
         }
 
@@ -276,6 +279,9 @@ namespace CommonControls.Services
 
                 container.FileList[path.ToLower() + currentPath.ToLower()] = file;
             }
+
+            _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, container);
+            _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, container);
 
             Database.TriggerPackFileAdded(container, filesAdded);
         }
@@ -396,12 +402,10 @@ namespace CommonControls.Services
         public PackFile FindFile(string path) 
         {
             var lowerPath = path.Replace('/', '\\').ToLower();
-            _logger.Here().Information($"Searching for file {lowerPath}");
             foreach (var packFile in Database.PackFiles)
             {
                 if (packFile.FileList.ContainsKey(lowerPath))
                 {
-                    _logger.Here().Information($"File found");
                     return packFile.FileList[lowerPath] as PackFile;
                 }
             }

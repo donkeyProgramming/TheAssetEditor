@@ -9,7 +9,7 @@ namespace CommonControls.Common
 {
     public class FilterCollection<T> : NotifyPropertyChangedImpl
     {
-        List<T> _possibleValues;
+        public List<T> PossibleValues { get; set; }
 
         ObservableCollection<T> _values;
         public ObservableCollection<T> Values { get => _values; set => SetAndNotify(ref _values, value); }
@@ -44,15 +44,15 @@ namespace CommonControls.Common
         {
             if (data == null)
             {
-                _possibleValues = new List<T>();
+                PossibleValues = new List<T>();
                 Values = new ObservableCollection<T>();
             }
             else
             {
-                fix this so it works. Index maybe?
+                // TODO fix this so it works. Index maybe?
                 var selectedItem = SelectedItem;
-                _possibleValues = new List<T>(data);
-                Values = new ObservableCollection<T>(_possibleValues);
+                PossibleValues = new List<T>(data);
+                Values = new ObservableCollection<T>(PossibleValues);
                 SelectedItem = selectedItem;
             }
         }
@@ -63,8 +63,8 @@ namespace CommonControls.Common
             {
                 var rx = new Regex(filterValue, RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-                var newValues = new List<T>(_possibleValues.Count);
-                foreach (var item in _possibleValues)
+                var newValues = new List<T>(PossibleValues.Count);
+                foreach (var item in PossibleValues)
                 {
                     bool addItem = false;
                     if (SearchFilter != null)

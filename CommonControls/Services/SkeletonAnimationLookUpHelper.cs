@@ -119,7 +119,7 @@ namespace CommonControls.Services
 
 
         // Delete this pice of shit
-        asdasd
+        
         public class AnimationReference
         {
             public AnimationReference(string animationFile, PackFileContainer container)

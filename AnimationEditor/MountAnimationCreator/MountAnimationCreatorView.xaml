@@ -5,14 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AnimationEditor.MountAnimationCreator" 
              xmlns:animationsettings="clr-namespace:AnimationEditor.Common.AnimationSettings" 
-             xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
              xmlns:s="http://schemas.singulink.com/xaml"
-             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
@@ -25,5 +23,6 @@
         <local:MountLinkSubView Grid.Row="2" />
         <local:SaveSubView Grid.Row="3"/>
         <local:VisualisationHelperSubView  Grid.Row="4" />
+        <Button Content="Refresh Tool" Click="{s:MethodBinding RefreshView}" Grid.Row="5" Margin="10,0,10,0"/>
     </Grid>
 </UserControl>

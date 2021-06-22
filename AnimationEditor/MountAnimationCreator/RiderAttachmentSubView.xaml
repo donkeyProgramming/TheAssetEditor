@@ -5,10 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AnimationEditor.MountAnimationCreator"
               xmlns:s="http://schemas.singulink.com/xaml"
-             xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
+
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Expander Grid.Row="0" Header="Rdier Attachment:" IsExpanded="true">
+    <Expander Grid.Row="0" Header="Rider Attachment:" IsExpanded="true">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
@@ -17,7 +17,6 @@
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
@@ -33,16 +32,50 @@
                           ItemsSource="{Binding SelectedRiderBone.Values}" 
                           SelectedItem="{Binding SelectedRiderBone.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
+            <Label Grid.Column="0" Grid.Row="1" Content="Static Legs Animation"/>
+            <Label Grid.Column="1" Grid.Row="1" Content=":"/>
+            <Grid Grid.Row="1" Grid.Column="2" IsEnabled="False">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="0.75*"/>
+                    <ColumnDefinition Width="0.25*"/>
+                </Grid.ColumnDefinitions>
+
+                <CheckBox Grid.Column="0" VerticalContentAlignment="Center" IsChecked="{Binding UseStaticLegAnimation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+                <ComboBox Grid.Column="1" 
+                          Margin="3,0,3,0"
+                          IsEditable="True"
+                          IsTextSearchEnabled="false"
+                          DisplayMemberPath="BoneName"
+                          Text="{Binding SelectedLegAnimation.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                          ItemsSource="{Binding SelectedLegAnimation.Values}" 
+                          SelectedItem="{Binding SelectedLegAnimation.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+
+                <ComboBox Grid.Column="2" 
+                          IsEditable="True"
+                          IsTextSearchEnabled="false"
+                          DisplayMemberPath="BoneName"
+                          Text="{Binding SelectedLegBone.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                          ItemsSource="{Binding SelectedLegBone.Values}" 
+                          SelectedItem="{Binding SelectedLegBone.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            </Grid>
+
+
             <Label Grid.Column="0" Grid.Row="2" Content="Mount Vertex"/>
             <Label Grid.Column="1" Grid.Row="2" Content=":"/>
             <Grid Grid.Row="2" Grid.Column="2">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition  MaxWidth="150"/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition Width="0.75*"/>
+                    <ColumnDefinition Width="0.25*"/>
                 </Grid.ColumnDefinitions>
-                <Button  Grid.Column="0" Click="{s:MethodBinding SetMountVertex}" Content="Set" Margin="0,0,3,0"/>
-                <TextBox Grid.Column="1" Text="{Binding SelectedVertexesText.Value, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" IsReadOnly="true"/>
+                <TextBox Grid.Column="0" Text="{Binding SelectedVertexesText.Value, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" IsReadOnly="true" />
+                <Button  Grid.Column="1" Click="{s:MethodBinding SetMountVertex}" Content="Set" Margin="3,0,0,0"/>
             </Grid>
+
+
+
         </Grid>
     </Expander>
 </UserControl>

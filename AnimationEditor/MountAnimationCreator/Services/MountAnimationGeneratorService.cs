@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using View3D.Animation;
 using View3D.SceneNodes;
@@ -19,7 +20,6 @@ namespace AnimationEditor.MountAnimationCreator.Services
     class MountAnimationGeneratorService
     {
         AnimationSettingsViewModel _animationSettings;
-        Rmv2MeshNode _mountMesh;
         int _mountVertexId;
         int _riderBoneIndex;
         GameSkeleton _riderSkeleton;
@@ -53,7 +53,8 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
             // Resample
             if (_animationSettings.FitAnimation)
-                newRiderAnim = View3D.Animation.AnimationEditor.ReSample(_riderSkeleton, newRiderAnim, mountAnimation.DynamicFrames.Count);
+                newRiderAnim = View3D.Animation.AnimationEditor.ReSample(_riderSkeleton, newRiderAnim, mountAnimation.DynamicFrames.Count, mountAnimation.PlayTimeInSec);
+
             newRiderAnim.StaticFrame = null;
 
             var maxFrameCount = Math.Min(mountAnimation.DynamicFrames.Count, newRiderAnim.DynamicFrames.Count);
@@ -113,31 +114,64 @@ namespace AnimationEditor.MountAnimationCreator.Services
             return _riderSkeleton;
         }
 
-        static public PackFile SaveAnimation(PackFileService pfs, string riderAnimationName, string savePrefix, AnimationClip clip, GameSkeleton skeleton)
+        static public PackFile SaveAnimation(PackFileService pfs, string riderAnimationName, string savePrefix, bool ensureUniqeName, AnimationClip clip, GameSkeleton skeleton)
         {
             var animFile = clip.ConvertToFileFormat(skeleton);
             var bytes = AnimationFile.GetBytes(animFile);
 
             string savePath = "";
             if (string.IsNullOrWhiteSpace(savePrefix) == false)
-                savePath = Path.GetDirectoryName(riderAnimationName) + "\\" + savePrefix + Path.GetFileName(riderAnimationName);
-            //else
-            //{
-            //    using (var browser = new SavePackFileWindow(pfs))
-            //    {
-            //        browser.ViewModel.Filter.SetExtentions(new List<string>() { ".anim" });
-            //        if (browser.ShowDialog() == true)
-            //        {
-            //            savePath = browser.FilePath;
-            //            if (savePath.Contains(".anim", StringComparison.InvariantCultureIgnoreCase) == false)
-            //                savePath += ".anim";
-            //        }
-            //        else
-            //            return;
-            //    }
-            //}
+            {
+                if(ensureUniqeName)
+                    savePath = GenerateNewAnimationName(pfs, riderAnimationName, savePrefix);
+                else
+                    savePath = Path.GetDirectoryName(riderAnimationName) + "\\" + savePrefix + Path.GetFileName(riderAnimationName);
+            }
+                
             return SaveHelper.Save(pfs, savePath, null, bytes);
         }
 
+        static string GenerateNewAnimationName(PackFileService pfs, string fullPath, string prefix, int numberId = 0)
+        {
+            string numberPostFix = "";
+            if (numberId != 0)
+                numberPostFix = "_" + numberId;
+
+            var potentialName = Path.GetDirectoryName(fullPath) + "\\" + prefix + numberPostFix + Path.GetFileName(fullPath);
+            var fileRef = pfs.FindFile(potentialName);
+            if (fileRef == null)
+                return potentialName;
+            else
+                return GenerateNewAnimationName(pfs, fullPath, prefix, numberId + 1);
+        }
+
+        static public bool IsCopyOnlyAnimation(string riderSlot)
+        {
+            string[] startWidth = new string[] {
+                "HAND_POSE_",
+                "DOCK_",
+                "PERSISTENT_METADATA_",
+                "PORTHOLE_",
+                "RIDER_CAST_SPELL_", "RIDER_MOVING_ATTACK_", "RIDER_CELEBRATE_", "RIDER_FIRE_"};
+
+            string[] equals = new string[] {
+                "STAND",
+                "MISSING_ANIM" ,
+                "RIDER_SHOOT_READY",
+                "RIDER_COMBAT_READY",
+                "RIDER_RELOAD",
+                "RIDER_STAND_TO_RIDER_COMBAT_READY",
+                "RIDER_COMBAT_READY_TO_RIDER_STAND",
+                "RIDER_SHOOT_READY_TO_RIDER_STAND",
+                "RIDER_STAND_TO_RIDER_SHOOT_READY",
+                "RIDER_SHOOT_READY_TO_RIDER_RELOAD",
+                "RIDER_RELOAD_TO_RIDER_SHOOT_READY",
+            };
+
+            var startWithRes = startWidth.Any(x => riderSlot.StartsWith(x, StringComparison.CurrentCultureIgnoreCase));
+            var eauqlRes = equals.Any(x => riderSlot.Equals(x, StringComparison.CurrentCultureIgnoreCase));
+
+            return startWithRes || eauqlRes;
+        }
     }
 }
