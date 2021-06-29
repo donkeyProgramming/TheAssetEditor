@@ -15,6 +15,7 @@ namespace KitbasherEditor
         {
             serviceCollection.AddTransient<KitbasherView>();
             serviceCollection.AddTransient<KitbasherViewModel>();
+            serviceCollection.AddTransient<IKitBashEditor, KitbasherViewModel>();
 
         }
 

@@ -53,6 +53,7 @@ namespace AssetEditor.ViewModels
             CloseToolCommand = new RelayCommand<IEditorViewModel>(CloseTool);
            
             FileTree = new PackFileBrowserViewModel(_packfileService);
+            FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, toolFactory, this);
             FileTree.FileOpen += OpenFile;
 
             ToolsFactory = toolFactory;
@@ -91,8 +92,8 @@ namespace AssetEditor.ViewModels
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_eltharion\hef_eltharion_head.rigid_model_v2");
                 //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu17\skv\skv_clan_rats\head\skv_clan_rats_head_04.rigid_model_v2");
 
-                MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
-                //KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
+                //MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
+                KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);

@@ -5,7 +5,7 @@ namespace CommonControls.PackFileBrowser
 {
     public class OpenFileContexMenuHandler : ContextMenuHandler
     {
-        public OpenFileContexMenuHandler(PackFileService service) : base(service)
+        public OpenFileContexMenuHandler(PackFileService service) : base(service, null, null)
         { }
 
         public override void Create(TreeNode node)

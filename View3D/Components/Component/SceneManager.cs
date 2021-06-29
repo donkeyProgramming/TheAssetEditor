@@ -85,7 +85,6 @@ namespace View3D.Components.Component
             return output;
         }
 
-
         void SelectObjectsHirarchy(ISceneNode root, BoundingFrustum frustrum, List<ISelectable> output_selectedNodes)
         {
             if (root.IsVisible)
@@ -131,7 +130,6 @@ namespace View3D.Components.Component
                 }
             }
         }
-
 
         public override void Update(GameTime gameTime)
         {

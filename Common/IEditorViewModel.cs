@@ -13,6 +13,12 @@ namespace Common
         bool HasUnsavedChanges();
     }
 
+    public interface IKitBashEditor : IEditorViewModel
+    {
+        IPackFile ReferenceModel { get; set; }
+    }
+
+
     public interface IEditorCreator
     {
         void OpenFile(IPackFile file);

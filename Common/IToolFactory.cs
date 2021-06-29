@@ -22,7 +22,5 @@ namespace Common
 
         public ViewModel CreateEditorViewModel<ViewModel>() 
             where ViewModel : IEditorViewModel;
-
-
     }
 }

@@ -17,69 +17,6 @@ using System.Windows.Input;
 
 namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
 {
-
-    public delegate void BoneSelectedDelegate(AnimatedBone bone);
-    public class SkeletonBoneCollection : NotifyPropertyChangedImpl
-    {
-        ObservableCollection<AnimatedBone> _bones;
-        public event BoneSelectedDelegate BoneSelected;
-        public ObservableCollection<AnimatedBone> Bones
-        {
-            get { return _bones; }
-            set { SetAndNotify(ref _bones, value); VisibleBones = Bones; UpdateFilter(); SelectedBone = _bones.FirstOrDefault(); }
-        }
-
-        ObservableCollection<AnimatedBone> _visibleBones;
-        public ObservableCollection<AnimatedBone> VisibleBones
-        {
-            get { return _visibleBones; }
-            set { SetAndNotify(ref _visibleBones, value); }
-        }
-
-        AnimatedBone _selectedBone;
-        public AnimatedBone SelectedBone
-        {
-            get { return _selectedBone; }
-            set
-            {
-                //if (_selectedBone == value)
-                //    return;
-                SetAndNotify(ref _selectedBone, value);
-                BoneSelected?.Invoke(_selectedBone);
-            }
-        }
-
-        string _filterText = string.Empty;
-        public string FilterText
-        {
-            get { return _filterText; }
-            set
-            {
-                SetAndNotify(ref _filterText, value);
-                UpdateFilter();
-            }
-        }
-
-        string _skeletonName = string.Empty;
-        public string SkeletonName
-        {
-            get { return _skeletonName; }
-            set{SetAndNotify(ref _skeletonName, value);}
-        }
-
-        bool _onlyShowUsedBones = true;
-        public bool OnlyShowUsedBones
-        {
-            get { return _onlyShowUsedBones; }
-            set { SetAndNotify(ref _onlyShowUsedBones, value); UpdateFilter(); }
-        }
-
-        void UpdateFilter()
-        {
-            VisibleBones = FilterHelper.FilterBoneList(FilterText, OnlyShowUsedBones, Bones);
-        }
-    }
-
     public class AnimatedBlendIndexRemappingViewModel : NotifyPropertyChangedImpl
     {
         public SkeletonBoneCollection MeshBones { get; set; }
@@ -89,11 +26,9 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
         public ICommand AutoMapSelfAndChildrenByNameCommand { get; set; }
         public ICommand AutoMapSelfAndChildrenByHierarchyCommand { get; set; }
 
-
         public ICommand SaveConfigurationCommand { get; set; }
         public ICommand LoadConfigurationCommand{ get; set; }
 
- 
         public bool MoveMeshToFit
         {
             get { return _configuration.MoveMeshToFit; }
@@ -107,12 +42,7 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
             set { OnConfigPathChanged(value);  SetAndNotify(ref _currentConfigPath, value);  }
         }
 
-        ObservableCollection<string> _allConfigPaths;
-        public ObservableCollection<string> AllConfigPaths
-        {
-            get { return _allConfigPaths; }
-            set { SetAndNotify(ref _allConfigPaths, value); }
-        }
+        public ObservableCollection<string> AllConfigPaths { get; set; }
 
         RemappedAnimatedBoneConfiguration _configuration;
         ILogger _logger = Logging.Create<AnimatedBlendIndexRemappingViewModel>();
@@ -121,7 +51,7 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
         {
             MeshBones = new SkeletonBoneCollection();
             ParnetModelBones = new SkeletonBoneCollection();
-            ParnetModelBones.BoneSelected += OnParentMeshSelected;
+            ParnetModelBones.BoneSelected += OnParentBoneSelected;
 
             CreateFromConfiguration(configuration);
             FindApplicableSettingsFiles();
@@ -146,6 +76,7 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
                 }
 
                 BoneMappingHelper.AutomapDirectBoneLinksBasedOnNames(MeshBones.SelectedBone, ParnetModelBones.Bones);
+                ReProcessFucker();
             });
             
             AutoMapSelfAndChildrenByHierarchyCommand = new RelayCommand(() =>
@@ -168,7 +99,6 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
             LoadConfigurationCommand = new RelayCommand(Load);
         }
 
-
         void CreateFromConfiguration(RemappedAnimatedBoneConfiguration config)
         {
             MeshBones.Bones = config.MeshBones;
@@ -178,13 +108,14 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
             ParnetModelBones.SkeletonName = config.ParnetModelSkeletonName;
 
             _configuration = config;
-
         }
 
-        private void OnParentMeshSelected(AnimatedBone bone)
+        private void OnParentBoneSelected(AnimatedBone bone)
         {
             MeshBones.SelectedBone.MappedBoneIndex = bone.BoneIndex;
             MeshBones.SelectedBone.MappedBoneName = bone.Name;
+
+            OnMappingCreated(MeshBones.SelectedBone.BoneIndex, MeshBones.SelectedBone.MappedBoneIndex);
         }
 
         void Save()
@@ -260,8 +191,12 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
             var obj = JsonConvert.DeserializeObject<RemappedAnimatedBoneConfiguration>(content);
             CreateFromConfiguration(obj);
         }
-    }
 
+        public virtual void OnMappingCreated(int originalBoneIndex, int newBoneIndex)
+        { }
+
+        public virtual void ReProcessFucker() { }
+    }
 
     class FilterHelper
     {
@@ -279,11 +214,7 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
                 bool isVisible = IsBoneVisibleInFilter(item, onlySHowUsedBones, filterText, true);
                 item.IsVisible = isVisible;
                 if (isVisible)
-                {
-                    //var newItem = item.Copy(false);
-                    //output.Add(newItem);
                     FilterBoneListRecursive(filterText, onlySHowUsedBones, item.Children, item.Children);
-                }
             }
         }
 
@@ -300,8 +231,6 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
                 if (contains)
                     return contains;
             }
-
-            
 
             if (checkChildren)
             {

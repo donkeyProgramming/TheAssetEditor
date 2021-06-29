@@ -167,6 +167,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         void MakeEditable()
         {
             var node = _activeNode;
+            
             if (node is Rmv2MeshNode meshNode)
             {
                 node.Parent.RemoveObject(node);

@@ -18,6 +18,15 @@ namespace View3D.SceneNodes
         GameSkeleton Skeleton { get; set; }
     }
 
+    public class SimpleSkeletonProvider : IAnimationProvider
+    {
+        public SimpleSkeletonProvider(GameSkeleton skeleton) { Skeleton = skeleton; }
+        public bool IsActive => true;
+
+        public GameSkeleton Skeleton { get; set; }
+    }
+
+
     public class SkeletonNode : GroupNode, IDrawableItem, IDisposable
     {
         public IAnimationProvider AnimationProvider { get; private set; }

@@ -4,6 +4,7 @@ using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using View3D.Animation;
 
@@ -26,12 +27,20 @@ namespace View3D.Components.Component
             return player;
         }
 
+        public void Remove(AnimationPlayer player)
+        {
+            var item = _playerMap.Where(x=>x.Value == player);
+            if (item != null)
+                _playerMap.Remove(item.First().Key);
+        }
+
         public override void Update(GameTime gameTime)
         {
             foreach (var item in _playerMap)
                 item.Value.Update(gameTime);
             base.Update(gameTime);
         }
+
 
     }
 }

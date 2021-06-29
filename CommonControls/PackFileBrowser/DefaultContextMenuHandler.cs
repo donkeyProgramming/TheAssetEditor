@@ -1,11 +1,12 @@
-﻿using CommonControls.Services;
+﻿using Common;
+using CommonControls.Services;
 using System.Collections.ObjectModel;
 
 namespace CommonControls.PackFileBrowser
 {
     public class DefaultContextMenuHandler : ContextMenuHandler
     {
-        public DefaultContextMenuHandler(PackFileService service) : base(service)
+        public DefaultContextMenuHandler(PackFileService service, IToolFactory toolFactory, IEditorCreator editorCreator) : base(service, toolFactory, editorCreator)
         { }
 
         public override void Create(TreeNode node)

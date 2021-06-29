@@ -77,7 +77,6 @@ namespace View3D.SceneNodes
         }
 
 
-
         public Rmv2MeshNode GetMeshNode(int lod, int modelIndex)
         {
             var lods = GetLodNodes();

@@ -131,16 +131,23 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         void OpenBoneRemappingTool()
         {
+            var targetSkeletonName = _meshNode.MeshModel.ParentSkeletonName;
+
+            var existingSkeletonMeshNode = _meshNode.GetParentModel();
+            var existingSkeltonName = existingSkeletonMeshNode.Model.Header.SkeletonName;
+
             RemappedAnimatedBoneConfiguration config = new RemappedAnimatedBoneConfiguration();
 
-            var existingSkeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, SkeletonName);
-            config.MeshSkeletonName = SkeletonName;
+            var existingSkeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, targetSkeletonName);
+            config.MeshSkeletonName = targetSkeletonName;
             config.MeshBones = AnimatedBone.CreateFromSkeleton(existingSkeletonFile, AnimatedBones.Select(x => x.BoneIndex).ToList());
+            
 
-            var modelNode = _meshNode.GetParentModel();
-            var newSkeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, modelNode.Model.Header.SkeletonName);
-            config.ParnetModelSkeletonName = modelNode.Model.Header.SkeletonName;
+            var newSkeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, existingSkeltonName);
+            config.ParnetModelSkeletonName = existingSkeltonName;
             config.ParentModelBones = AnimatedBone.CreateFromSkeleton(newSkeletonFile);
+
+
 
             AnimatedBlendIndexRemappingWindow window = new AnimatedBlendIndexRemappingWindow()
             {

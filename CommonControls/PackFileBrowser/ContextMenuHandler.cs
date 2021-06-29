@@ -41,9 +41,14 @@ namespace CommonControls.PackFileBrowser
         protected PackFileService _packFileService;
 
         protected TreeNode _selectedNode;
-        public ContextMenuHandler(PackFileService pf)
+        protected IToolFactory _toolFactory;
+        protected IEditorCreator _editorCreator;
+
+        public ContextMenuHandler(PackFileService pf, IToolFactory toolFactory, IEditorCreator editorCreator)
         {
             _packFileService = pf;
+            _toolFactory = toolFactory;
+            _editorCreator = editorCreator;
 
             RenameNodeCommand = new RelayCommand(OnRenameNode);
             AddFilesCommand = new RelayCommand(OnAddFilesCommand);
@@ -58,6 +63,8 @@ namespace CommonControls.PackFileBrowser
             CopyToEditablePackCommand = new RelayCommand(CopyToEditablePack);
             SetAsEditabelPackCommand = new RelayCommand(SetAsEditabelPack);
             ExpandAllChildrenCommand = new RelayCommand(ExpandAllChildren);
+
+            OpenToolCommand_Kitbash = new RelayCommand(OpenKitbasherTool);
         }
 
         void OnRenameNode()
@@ -251,6 +258,20 @@ namespace CommonControls.PackFileBrowser
                 ExpandAllRecursive(child);
         }
 
+        void OpenKitbasherTool()
+        {
+            return;
+            if (_selectedNode != null)
+            {
+                var name = _selectedNode.Item.Name.ToLower();
+                if (name.EndsWith(".variantmeshdefinition") || name.EndsWith(".rigid_model_v2"))
+                {
+                    var editorView = _toolFactory.CreateEditorViewModel<IKitBashEditor>();
+                    editorView.ReferenceModel = _selectedNode.Item;
+                    _editorCreator.CreateEmptyEditor(editorView);
+                }
+            }
+        }
 
         public abstract void Create(TreeNode node);
        

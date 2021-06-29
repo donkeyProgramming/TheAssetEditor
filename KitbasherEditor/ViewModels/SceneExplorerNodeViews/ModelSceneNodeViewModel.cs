@@ -42,15 +42,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             attachmentPoints = attachmentPoints.DistinctBy(x => x.BoneIndex);
             attachmentPoints = attachmentPoints.OrderBy(x => x.BoneIndex);
             AttachmentPoints = new ObservableCollection<RmvAttachmentPoint>(attachmentPoints);
-
-            // Ensure all models have this value set
-            UpdateAttachmentPoint();
-        }
-
-        void UpdateAttachmentPoint()
-        {
-            ModelEditorService service = new ModelEditorService(_modelNode);
-            service.SetAttachmentPoints(AttachmentPoints.ToList());
         }
 
         public void Dispose()

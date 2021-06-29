@@ -152,10 +152,11 @@ namespace View3D.Animation
                 {
                     Translation = Translation[i],
                     Rotation = Rotation[i],
+                    Scale = Vector3.One,
                     BoneIndex = i,
                     ParentBoneIndex = GetParentBone(i),
                     WorldTransform = _worldTransform[i]
-                });
+                }); ;
             }
 
             return currentFrame;

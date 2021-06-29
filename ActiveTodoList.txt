@@ -260,3 +260,44 @@ Fit to skeleton -> allows for -1 in mapping better
 -> Speed up mesh grow/split
 
 
+
+
+
+v10
+	Vertex type:
+		Can not change vertex type to cinematic
+		Change vertex type does not remove skeleton
+
+	Pivot point:
+		Show pivotpoint crash
+		"Copy pivot to all" feature
+		Round values for pivot points
+
+	Mesh Fit tool:
+		Extract to own tool
+		Realtime
+		View the skeletons
+		Toogle meshes
+		Scale
+
+	Split mesh/grow selection
+		Speed up
+
+	Refactor:
+		Start cleaning up the direct use of rmv2 data
+
+v11
+	Mount tool:
+		Add static leg pos
+
+	Tech skeleton Editor:
+		Create
+		Add bone support to the gizmo
+
+v12
+	Campagne anim editor
+		Create
+
+	Pose Creator
+		Create
+

@@ -32,6 +32,12 @@ namespace View3D.Animation
                             var currentFrameKeys = GetKeyFrameFromIndex(animationClips[0].DynamicFrames, frameIndex);
                             var nextFrameKeys = GetKeyFrameFromIndex(animationClips[0].DynamicFrames, frameIndex + 1);
                             ApplyAnimation(currentFrameKeys, nextFrameKeys, frameIterpolation, currentFrame, animationClips[0].RotationMappings, animationClips[0].TranslationMappings, AnimationBoneMappingType.Dynamic);
+
+                            // Apply skeleton scale
+                           for (int i = 0; i < currentFrame.BoneTransforms.Count(); i++)
+                           {
+                               currentFrame.BoneTransforms[i].Scale = animationClips[0].DynamicFrames[0].Scale[i];
+                           }
                         }
                     }
                     
@@ -41,12 +47,15 @@ namespace View3D.Animation
                 {
                     Quaternion rotation = currentFrame.BoneTransforms[i].Rotation;
                     Vector3 translation = currentFrame.BoneTransforms[i].Translation;
-                    currentFrame.BoneTransforms[i].WorldTransform = Matrix.CreateFromQuaternion(rotation) * Matrix.CreateTranslation(translation);
+                    currentFrame.BoneTransforms[i].WorldTransform =
+                        Matrix.CreateScale(currentFrame.BoneTransforms[i].Scale) * 
+                        Matrix.CreateFromQuaternion(rotation) *
+                        Matrix.CreateTranslation(translation);
 
                     var parentindex = currentFrame.BoneTransforms[i].ParentBoneIndex;
                     if (parentindex == -1)
                     {
-                        //var scale = Matrix.CreateScale(1, 1, 1);
+                        //var scale = Matrix.CreateScale(0.1f);
                         //currentFrame.BoneTransforms[i].WorldTransform = (scale * currentFrame.BoneTransforms[i].WorldTransform);
                         continue;
                     }

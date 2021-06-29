@@ -173,6 +173,12 @@
                             IsEnabled="{Binding Tools.BmiToolCommandEnabled, UpdateSourceTrigger=PropertyChanged}">
                         <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-bmi-48.png"/>
                     </Button>
+
+                    <Button ToolTip="Open Skeleton Reshaper tool" 
+                        Command="{Binding Tools.SkeletonReshaperCommand}"
+                            IsEnabled="{Binding Tools.SkeletonReshaperCommandEnabled, UpdateSourceTrigger=PropertyChanged}">
+                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-body-48.png"/>
+                    </Button>
                 </ToolBar>
 
 

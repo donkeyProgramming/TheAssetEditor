@@ -21,6 +21,8 @@ namespace View3D.SceneNodes
     {
         public RmvSubModel MeshModel { get; set; }
 
+        // Remove mesh model!
+
         Quaternion _orientation = Quaternion.Identity;
         Vector3 _position = Vector3.Zero;
         Vector3 _scale = Vector3.One;
@@ -43,10 +45,6 @@ namespace View3D.SceneNodes
 
         private Rmv2MeshNode()
         { }
-
-
-
-
 
         public Rmv2MeshNode(RmvSubModel rmvSubModel, IGeometryGraphicsContext context, ResourceLibary resourceLib, AnimationPlayer animationPlayer, IGeometry geometry = null)
         {

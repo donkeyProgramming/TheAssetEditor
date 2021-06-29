@@ -10,13 +10,12 @@ namespace View3D.SceneNodes
 {
     public class MainEditableNode : Rmv2ModelNode
     {
-        SkeletonNode _skeletonNode;
+        public SkeletonNode Skeleton { get; private set; }
         public IPackFile MainPackFile { get; private set; }
-
 
         public MainEditableNode(string name, SkeletonNode skeletonNode, IPackFile mainFile) : base(name)
         {
-            _skeletonNode = skeletonNode;
+            Skeleton = skeletonNode;
             MainPackFile = mainFile;
         }
 
@@ -34,8 +33,8 @@ namespace View3D.SceneNodes
         public byte[] Save(bool onlySaveVisibleNodes)
         {
             List<string> boneNames = new List<string>();
-            if (_skeletonNode.AnimationProvider.Skeleton != null)
-                boneNames = _skeletonNode.AnimationProvider.Skeleton.BoneNames.ToList();
+            if (Skeleton.AnimationProvider.Skeleton != null)
+                boneNames = Skeleton.AnimationProvider.Skeleton.BoneNames.ToList();
 
             var lods = GetLodNodes();
             var orderedLods = lods.OrderBy(x => x.LodValue);

@@ -28,7 +28,6 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
         public int MappedBoneIndex { get { return _mappedBoneIndex; } set { SetAndNotify(ref _mappedBoneIndex, value); } }
 
 
-
         bool isVisible = true;
         [JsonIgnore]
         public bool IsVisible { get { return isVisible; } set { SetAndNotify(ref isVisible, value); } }

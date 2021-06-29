@@ -45,6 +45,7 @@
     <None Remove="Resources\Icons\Kitbasher\Gizmo_scale.png" />
     <None Remove="Resources\Icons\Kitbasher\Group.png" />
     <None Remove="Resources\Icons\Kitbasher\icons8-bmi-48.png" />
+    <None Remove="Resources\Icons\Kitbasher\icons8-body-48.png" />
     <None Remove="Resources\Icons\Kitbasher\icons8-compress-64.png" />
     <None Remove="Resources\Icons\Kitbasher\icons8-cursor-256.png" />
     <None Remove="Resources\Icons\Kitbasher\icons8-save-all-50.png" />
@@ -187,6 +188,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Icons\Kitbasher\icons8-bmi-48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\icons8-body-48.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Icons\Kitbasher\icons8-compress-64.png">

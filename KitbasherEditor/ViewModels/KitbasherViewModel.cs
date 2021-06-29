@@ -19,7 +19,7 @@ using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels
 {
-    public class KitbasherViewModel : NotifyPropertyChangedImpl, IEditorViewModel
+    public class KitbasherViewModel : NotifyPropertyChangedImpl, IKitBashEditor
     {
         ILogger _logger = Logging.Create<KitbasherViewModel>();
         PackFileService _packFileService;
@@ -36,6 +36,7 @@ namespace KitbasherEditor.ViewModels
         public string DisplayName { get => _displayName; set => SetAndNotify(ref _displayName, value); }
 
         public IPackFile MainFile { get; set; }
+        public IPackFile ReferenceModel { get; set; }
 
         ModelLoaderService _modelLoader;
         ModelSaverHelper _modelSaver;
@@ -100,6 +101,20 @@ namespace KitbasherEditor.ViewModels
                     MessageBox.Show("Unable to load file");
                 }
             }
+
+            if (ReferenceModel != null)
+            {
+                try
+                {
+                    _modelLoader.LoadReference(ReferenceModel as PackFile);
+                    DisplayName = ReferenceModel.Name;
+                }
+                catch (Exception e)
+                {
+                    _logger.Here().Error($"Error loading file {ReferenceModel?.Name} - {e}");
+                    MessageBox.Show("Unable to load file");
+                }
+            }
         }
 
         public bool Save()
@@ -115,19 +130,13 @@ namespace KitbasherEditor.ViewModels
             _modelLoader = null;
             MenuBar = null;
             Scene = null;
-
             _packFileService = null;
             _skeletonAnimationLookUpHelper = null;
-
             Scene = null;
             SceneExplorer = null;
             MenuBar = null;
             Animation = null;
-
-
-
             MainFile = null;
-
             _modelLoader = null;
             _modelSaver = null;
         }

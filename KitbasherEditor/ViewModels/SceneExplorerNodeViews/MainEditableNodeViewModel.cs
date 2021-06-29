@@ -37,9 +37,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             _pf = pf;
 
             SkeletonNameList = _skeletonAnimationLookUpHelper.SkeletonFileNames;
-            SkeletonName = SkeletonNameList.FirstOrDefault(x => x.Contains(_mainNode.Model.Header.SkeletonName));
-
-            UpdateSkeletonName();
+            if (_mainNode.Model != null)
+            {
+                SkeletonName = SkeletonNameList.FirstOrDefault(x => x.Contains(_mainNode.Model.Header.SkeletonName));
+                UpdateSkeletonName();
+            }
         }
 
         void UpdateSkeletonName()
@@ -48,15 +50,14 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             if (!string.IsNullOrWhiteSpace(SkeletonName))
                 cleanName = Path.GetFileNameWithoutExtension(SkeletonName);
 
-            ModelEditorService service = new ModelEditorService(_mainNode);
-            service.SetSkeletonName(cleanName);
+            if (_mainNode.Model != null)
+            {
+                var service = new ModelEditorService(_mainNode);
+                service.SetSkeletonName(cleanName);
+            }
 
             _animationControllerViewModel.SetActiveSkeleton(cleanName);   
         }
-
-       
-
-
 
         public void Dispose()
         {

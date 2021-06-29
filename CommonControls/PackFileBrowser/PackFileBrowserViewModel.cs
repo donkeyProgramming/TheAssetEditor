@@ -36,7 +36,7 @@ namespace CommonControls.PackFileBrowser
             set
             {
                 SetAndNotify(ref _selectedItem, value);
-                ContextMenu.Create(value);
+                ContextMenu?.Create(value);
                 NodeSelected?.Invoke(_selectedItem);
             }
         }
@@ -68,8 +68,6 @@ namespace CommonControls.PackFileBrowser
                 if(loadFile)
                     ReloadTree(item);
             }
-
-            ContextMenu = new DefaultContextMenuHandler(packFileService);
         }
 
         private void Database_PackFileFolderRemoved(PackFileContainer container, string folder)

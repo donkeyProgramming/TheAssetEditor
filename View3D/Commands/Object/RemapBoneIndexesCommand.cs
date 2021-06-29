@@ -12,14 +12,6 @@ using View3D.Utility;
 
 namespace View3D.Commands.Object
 {
-    class TempSkelProv : IAnimationProvider
-    {
-        public bool IsActive => true;
-
-        public GameSkeleton Skeleton { get; set; }
-    }
-
-
     public class RemapBoneIndexesCommand : CommandBase<RemapBoneIndexesCommand>
     {
         List<IndexRemapping> _mapping;

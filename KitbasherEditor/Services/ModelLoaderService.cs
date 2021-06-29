@@ -58,7 +58,7 @@ namespace KitbasherEditor.Services
             LoadReference(refereneceMesh as PackFile);
         }
 
-        public void LoadReference(PackFile file)
+        public void LoadReference(PackFile file, bool updateSkeleton = false)
         {
             _logger.Here().Information($"Loading reference model - {_packFileService.GetFullPath(file)}");
 
@@ -78,6 +78,8 @@ namespace KitbasherEditor.Services
                     selectable.IsSelectable = false;
             });
             ReferenceMeshRoot.AddObject(result);
+
+            //_animationView.SetActiveSkeleton(result.f.Header.SkeletonName);
         }
     }
 }

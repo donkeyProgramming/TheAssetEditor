@@ -1,9 +1,12 @@
 ﻿using Common;
 using CommonControls.ErrorListDialog;
 using CommonControls.Services;
+using Filetypes.RigidModel;
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor.Services;
+using KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping;
 using KitbasherEditor.ViewModels.BmiEditor;
+using KitbasherEditor.ViewModels.MeshFitter;
 using KitbasherEditor.Views.EditorViews;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
@@ -19,6 +22,7 @@ using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Services;
+using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
@@ -45,6 +49,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public ICommand ReduceMeshCommand { get; set; }
         public ICommand ToggleShowSelectionCommand { get; set; }
         public ICommand BmiToolCommand { get; set; }
+        public ICommand SkeletonReshaperCommand { get; set; }
 
         bool _showObjectTools = true;
         public bool ShowObjectTools { get => _showObjectTools; set => SetAndNotify(ref _showObjectTools, value); }
@@ -92,6 +97,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         bool _bmiToolCommandEnabled = true;
         public bool BmiToolCommandEnabled { get => _bmiToolCommandEnabled; set => SetAndNotify(ref _bmiToolCommandEnabled, value); }
 
+        bool _skeletonReshaperCommandEnabled = true;
+        public bool SkeletonReshaperCommandEnabled { get => _skeletonReshaperCommandEnabled; set => SetAndNotify(ref _skeletonReshaperCommandEnabled, value); }
+
         public ToolsMenuBarViewModel(IComponentManager componentManager, ToolbarCommandFactory commandFactory, PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper)
         {
             _packFileService = packFileService;
@@ -110,6 +118,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             ReduceMeshCommand = new RelayCommand(ReduceMesh);
             FaceToVertexCommand = new RelayCommand(ConvertFacesToVertex);
             BmiToolCommand = new RelayCommand(OpenBmiTool);
+            SkeletonReshaperCommand = new RelayCommand(OpenSkeletonReshaperTool);
 
             _selectionManager = componentManager.GetComponent<SelectionManager>();
             _selectionManager.SelectionChanged += OnSelectionChanged;
@@ -138,6 +147,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             GroupCommandEnabled = false;
             ReduceMeshCommandEnabled = false;
             BmiToolCommandEnabled = false;
+            SkeletonReshaperCommandEnabled = false;
 
             if (state is ObjectSelectionState objectSelection)
             {
@@ -148,6 +158,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 GroupCommandEnabled = objectSelection.SelectedObjects().Count > 0;
                 ReduceMeshCommandEnabled = objectSelection.SelectedObjects().Count > 0;
                 BmiToolCommandEnabled = objectSelection.SelectedObjects().Count == 1;
+                SkeletonReshaperCommandEnabled = objectSelection.SelectedObjects().Count > 0;
             }
             else if (state is FaceSelectionState faceSelection && faceSelection.SelectedFaces.Count != 0)
             {
@@ -306,6 +317,12 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 window.DataContext = new BmiViewModel(skeleton, meshNode, _componentManager);
                 window.Show();
             }
+        }
+
+        void OpenSkeletonReshaperTool()
+        {
+            var state = _selectionManager.GetState<ObjectSelectionState>();
+            MeshFitterViewModel.ShowView(state.CurrentSelection(), _componentManager, _skeletonHelper, _packFileService);
         }
     }
 }

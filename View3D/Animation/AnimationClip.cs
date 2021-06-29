@@ -15,6 +15,7 @@ namespace View3D.Animation
         {
             public List<Vector3> Position { get; set; } = new List<Vector3>();
             public List<Quaternion> Rotation { get; set; } = new List<Quaternion>();
+            public List<Vector3> Scale { get; set; } = new List<Vector3>();
 
             public override string ToString()
             {
@@ -26,7 +27,8 @@ namespace View3D.Animation
                 return new KeyFrame()
                 {
                     Position = new List<Vector3>(Position),
-                    Rotation = new List<Quaternion>(Rotation)
+                    Rotation = new List<Quaternion>(Rotation),
+                     Scale = new List<Vector3>(Scale)
                 };
             }
         }
@@ -63,14 +65,21 @@ namespace View3D.Animation
             foreach (var rotation in frame.Quaternion)
                 output.Rotation.Add(new Quaternion(rotation.X, rotation.Y, rotation.Z, rotation.W));
 
+            foreach (var rotation in frame.Quaternion)
+                output.Scale.Add(Vector3.One);
+
             return output;
         }
 
         public AnimationFile ConvertToFileFormat(GameSkeleton skeleton)
         {
             AnimationFile output = new AnimationFile();
+
+            //float frameRate = 
+            var fRate = (DynamicFrames.Count() - 1) / PlayTimeInSec;
+            output.Header.FrameRate = (float)Math.Floor(fRate);
             output.Header.AnimationType = 7;
-            output.Header.AnimationTotalPlayTimeInSec = (DynamicFrames.Count() - 1) / output.Header.FrameRate;
+            output.Header.AnimationTotalPlayTimeInSec = PlayTimeInSec;
             output.Header.SkeletonName = skeleton.SkeletonName;
 
             output.Bones = new BoneInfo[skeleton.BoneCount];

@@ -36,6 +36,7 @@ namespace View3D.Animation
             public int ParentBoneIndex { get; set; }
             public Quaternion Rotation { get; set; }
             public Vector3 Translation { get; set; }
+            public Vector3 Scale { get; set; }
             public Matrix WorldTransform { get; set; }
         }
 
