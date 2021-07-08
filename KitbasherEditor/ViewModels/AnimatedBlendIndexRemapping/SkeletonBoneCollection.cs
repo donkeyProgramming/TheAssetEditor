@@ -60,10 +60,22 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
             get { return _onlyShowUsedBones; }
             set { SetAndNotify(ref _onlyShowUsedBones, value); UpdateFilter(); }
         }
-
+         
         void UpdateFilter()
         {
             VisibleBones = FilterHelper.FilterBoneList(FilterText, OnlyShowUsedBones, Bones);
+        }
+
+        public AnimatedBone GetFromBoneId(int i)
+        {
+            foreach (var bone in Bones)
+            {
+                var res = bone.GetFromBoneId(i);
+                if (res != null)
+                    return res;
+            }
+
+            return null;
         }
     }
 }

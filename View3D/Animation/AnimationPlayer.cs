@@ -131,7 +131,7 @@ namespace View3D.Animation
                     OnFrameChanged?.Invoke(0);
                 }
 
-                UpdateAnimationFrame();
+                Refresh();
             }
         }
 
@@ -157,7 +157,7 @@ namespace View3D.Animation
             _skeleton = skeleton;
             _animationClips = animation;
             _timeSinceStart = TimeSpan.FromSeconds(0);
-            UpdateAnimationFrame();
+            Refresh();
         }
 
         float GetAnimationLengthMs()
@@ -192,10 +192,10 @@ namespace View3D.Animation
                 OnFrameChanged?.Invoke(CurrentFrame);
             }
 
-            UpdateAnimationFrame();
+            Refresh();
         }
 
-        void UpdateAnimationFrame()
+        public void Refresh()
         {
             if (IsEnabled == false)
             {

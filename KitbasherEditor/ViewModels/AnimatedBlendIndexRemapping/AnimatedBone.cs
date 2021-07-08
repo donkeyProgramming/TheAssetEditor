@@ -1,5 +1,6 @@
 ﻿using Common;
 using Filetypes.RigidModel;
+using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,11 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
         public int MappedBoneIndex { get { return _mappedBoneIndex; } set { SetAndNotify(ref _mappedBoneIndex, value); } }
 
 
+        // Meta data
+        public Vector3 BonePosOffset { get; set; } = new Vector3(0);
+        public Vector3 BoneRotOffset { get; set; } = new Vector3(0);
+        public float BoneScaleOffset { get; set; } = 1;
+
         bool isVisible = true;
         [JsonIgnore]
         public bool IsVisible { get { return isVisible; } set { SetAndNotify(ref isVisible, value); } }
@@ -39,6 +45,21 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
 
             foreach (var child in Children)
                 child.ClearMapping();
+        }
+
+        public AnimatedBone GetFromBoneId(int i)
+        {
+            if (BoneIndex == i)
+                return this;
+
+            foreach (var child in Children)
+            {
+                var res = child.GetFromBoneId(i);
+                if (res != null)
+                    return res;
+            }
+
+            return null;
         }
 
         public List<IndexRemapping> BuildRemappingList()

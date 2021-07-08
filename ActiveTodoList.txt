@@ -301,3 +301,13 @@ v12
 	Pose Creator
 		Create
 
+
+
+
+Bugs:
+	Crash when displaying pivot
+	Improve pivot stuff
+	Error with unsucsessfull mapping => can not select mesh
+	Added confirm when using mapping with bad values
+	Generating lods for models with more than 4 lods
+	Boundingbox recalc

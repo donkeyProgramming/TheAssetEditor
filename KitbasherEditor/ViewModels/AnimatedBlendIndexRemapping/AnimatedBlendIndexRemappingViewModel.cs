@@ -22,13 +22,6 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
         public SkeletonBoneCollection MeshBones { get; set; }
         public SkeletonBoneCollection ParnetModelBones { get; set; }
 
-        public ICommand ClearBindingSelfAndChildrenCommand { get; set; }
-        public ICommand AutoMapSelfAndChildrenByNameCommand { get; set; }
-        public ICommand AutoMapSelfAndChildrenByHierarchyCommand { get; set; }
-
-        public ICommand SaveConfigurationCommand { get; set; }
-        public ICommand LoadConfigurationCommand{ get; set; }
-
         public bool MoveMeshToFit
         {
             get { return _configuration.MoveMeshToFit; }
@@ -55,49 +48,46 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
 
             CreateFromConfiguration(configuration);
             FindApplicableSettingsFiles();
-
-            ClearBindingSelfAndChildrenCommand = new RelayCommand(() =>
-            {
-                if (MeshBones.SelectedBone == null)
-                {
-                    MessageBox.Show("No bone selected - Please select a bone first");
-                    return;
-                }
-
-                MeshBones.SelectedBone.ClearMapping();
-            });
-
-            AutoMapSelfAndChildrenByNameCommand = new RelayCommand(() =>
-            {
-                if (MeshBones.SelectedBone == null)
-                {
-                    MessageBox.Show("No bone selected - Please select a bone first");
-                    return;
-                }
-
-                BoneMappingHelper.AutomapDirectBoneLinksBasedOnNames(MeshBones.SelectedBone, ParnetModelBones.Bones);
-                ReProcessFucker();
-            });
-            
-            AutoMapSelfAndChildrenByHierarchyCommand = new RelayCommand(() =>
-            {
-                if (MeshBones.SelectedBone == null)
-                {
-                    MessageBox.Show("No mesh bone selected - Please select a bone first");
-                    return;
-                }
-                if (MeshBones.SelectedBone == null)
-                {
-                    MessageBox.Show("No parent model bone selected - Please select a bone first");
-                    return;
-                }
-
-                BoneMappingHelper.AutomapDirectBoneLinksBasedOnHierarchy(MeshBones.SelectedBone, ParnetModelBones.SelectedBone);
-            });
-
-            SaveConfigurationCommand = new RelayCommand(Save);
-            LoadConfigurationCommand = new RelayCommand(Load);
         }
+
+        public virtual void ClearBindingSelfAndChildren()
+        {
+            if (MeshBones.SelectedBone == null)
+            {
+                MessageBox.Show("No bone selected - Please select a bone first");
+                return;
+            }
+
+            MeshBones.SelectedBone.ClearMapping();
+        }
+
+        public virtual void AutoMapSelfAndChildrenByName()
+        {
+            if (MeshBones.SelectedBone == null)
+            {
+                MessageBox.Show("No bone selected - Please select a bone first");
+                return;
+            }
+
+            BoneMappingHelper.AutomapDirectBoneLinksBasedOnNames(MeshBones.SelectedBone, ParnetModelBones.Bones);
+        }
+
+        public virtual void AutoMapSelfAndChildrenByHierarchy()
+        {
+            if (MeshBones.SelectedBone == null)
+            {
+                MessageBox.Show("No mesh bone selected - Please select a bone first");
+                return;
+            }
+            if (MeshBones.SelectedBone == null)
+            {
+                MessageBox.Show("No parent model bone selected - Please select a bone first");
+                return;
+            }
+
+            BoneMappingHelper.AutomapDirectBoneLinksBasedOnHierarchy(MeshBones.SelectedBone, ParnetModelBones.SelectedBone);
+        }
+
 
         void CreateFromConfiguration(RemappedAnimatedBoneConfiguration config)
         {
@@ -118,7 +108,7 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
             OnMappingCreated(MeshBones.SelectedBone.BoneIndex, MeshBones.SelectedBone.MappedBoneIndex);
         }
 
-        void Save()
+        public void Save()
         {
             var dataStr = JsonConvert.SerializeObject(_configuration, Formatting.Indented);
 
@@ -137,7 +127,7 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
             }
         }
 
-        void Load()
+        public void Load()
         {
             OpenFileDialog dialog = new OpenFileDialog();
             dialog.InitialDirectory = DirectoryHelper.AnimationIndexMappingDirectory;
@@ -194,8 +184,6 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
 
         public virtual void OnMappingCreated(int originalBoneIndex, int newBoneIndex)
         { }
-
-        public virtual void ReProcessFucker() { }
     }
 
     class FilterHelper

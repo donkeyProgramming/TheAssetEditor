@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews.MeshFitter" xmlns:editorviews="clr-namespace:KitbasherEditor.Views.EditorViews" xmlns:b="http://schemas.microsoft.com/xaml/behaviors" xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
+             xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews.MeshFitter" xmlns:editorviews="clr-namespace:KitbasherEditor.Views.EditorViews" xmlns:b="http://schemas.microsoft.com/xaml/behaviors" xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls" xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     
@@ -15,19 +15,26 @@
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition Height="5"/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="5"/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Row="0" Background="Gray" BorderThickness="2"/>
+            <Border Grid.Row="0" Grid.ColumnSpan="3" Background="Gray" BorderThickness="2"/>
             
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="Scale"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Root scale"/>
             <TextBlock Grid.Row="1" Grid.Column="1" Text=":"/>
-            <TextBox Grid.Row="1" Grid.Column="2"  Text="{Binding ScaleFactor.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center">
+            <TextBox Grid.Row="1" Grid.Column="2"  Width="116" Text="{Binding ScaleFactor.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="2" >
                 <b:Interaction.Behaviors>
                     <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
                 </b:Interaction.Behaviors>
@@ -37,15 +44,35 @@
             <TextBlock Grid.Row="2" Grid.Column="1" Text=":"/>
             <CheckBox Grid.Row="2" Grid.Column="2" IsChecked="{Binding OnlyMOveSelectedBone.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="Display offset"/>
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Relative Scale:"/>
             <TextBlock Grid.Row="3" Grid.Column="1" Text=":"/>
-            <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding DisplayOffset.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center">
+            <CheckBox Grid.Row="3" Grid.Column="2" IsChecked="{Binding RelativeScale.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Display offset"/>
+            <TextBlock Grid.Row="4" Grid.Column="1" Text=":"/>
+            <mathviews:Vector3View Grid.Row="4" Grid.Column="2" Width="350" VerticalContentAlignment="Center" Vector3="{Binding General.Pivot, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2" HorizontalAlignment="Left"/>
+
+            <Border Grid.Row="5" Grid.ColumnSpan="3" Background="Gray" BorderThickness="2"/>
+            
+            <TextBlock Grid.Row="6" Grid.Column="0" Text="Pos offset"/>
+            <TextBlock Grid.Row="6" Grid.Column="1" Text=":"/>
+            <mathviews:Vector3View Grid.Row="6" Grid.Column="2" Width="350" VerticalContentAlignment="Center" Vector3="{Binding BonePositionOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2" HorizontalAlignment="Left" IsEnabled="{Binding IsBoneSelected.Value, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <TextBlock Grid.Row="7" Grid.Column="0" Text="Rot offset"/>
+            <TextBlock Grid.Row="7" Grid.Column="1" Text=":"/>
+            <mathviews:Vector3View Grid.Row="7" Grid.Column="2" Width="350" VerticalContentAlignment="Center" Vector3="{Binding BoneRotationOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2" HorizontalAlignment="Left" IsEnabled="{Binding IsBoneSelected.Value, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <TextBlock Grid.Row="8" Grid.Column="0" Text="Scale"/>
+            <TextBlock Grid.Row="8" Grid.Column="1" Text=":"/>
+            <TextBox Grid.Row="8" Grid.Column="2"  Width="116" Text="{Binding BoneScaleFactor.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="2" IsEnabled="{Binding IsBoneSelected.Value, UpdateSourceTrigger=PropertyChanged}">
                 <b:Interaction.Behaviors>
                     <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
                 </b:Interaction.Behaviors>
             </TextBox>
+
+            <Button Grid.Row="9" Grid.Column="2" Content="Reset offsets" Margin="2" IsEnabled="{Binding IsBoneSelected.Value, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
-  
+
         <editorviews:AnimatedBlendIndexRemappingView/>
     </DockPanel>
 </UserControl>

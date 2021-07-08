@@ -89,7 +89,11 @@ namespace CommonControls.Services
                 {
                     var file = pfs.FindFile(name);
                     if (file != null)
-                        return AnimationFile.Create(file as PackFile);
+                    {
+                        // Make sure its not a tech skeleton
+                        if(pfs.GetFullPath(file).Contains("tech") == false)
+                            return AnimationFile.Create(file as PackFile);
+                    }
                 }
             }
             return null;

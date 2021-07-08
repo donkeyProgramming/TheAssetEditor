@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews"
-      
+            xmlns:s="http://schemas.singulink.com/xaml"
              xmlns:editorviews="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
              xmlns:ei1="http://schemas.microsoft.com/xaml/behaviors" 
              xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
@@ -83,7 +83,7 @@
                             <Trigger Property="IsExpanded" Value="false">
                                 <Setter Property="Visibility" TargetName="ItemsHost" Value="Collapsed"/>
                             </Trigger>
-                     
+
                             <Trigger Property="HasItems" Value="false">
                                 <Setter Property="Visibility" TargetName="Expander" Value="Hidden"/>
                             </Trigger>
@@ -109,9 +109,6 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-
-
-
         </Style>
 
     </UserControl.Resources>
@@ -124,11 +121,20 @@
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Column="0" >
+        <DockPanel Grid.Row="0" Grid.Column="0" Margin="0,3,0,3">
+            <TextBlock Text="Config:" VerticalAlignment="Center" />
+            <Button Click="{s:MethodBinding Load}" DockPanel.Dock="Right" Width="50">Load</Button>
+            <Button Click="{s:MethodBinding Save}" DockPanel.Dock="Right" Width="50">Save</Button>
+            <ComboBox ItemsSource="{Binding AllConfigPaths, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedItem="{Binding CurrentConfigPath, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                      DockPanel.Dock="Right" Margin="5,0,2,0"/>
+        </DockPanel>
+
+        <Grid Grid.Column="0" Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
@@ -223,21 +229,21 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 
-                <Button Grid.Row="0" Grid.Column="0"  Command="{Binding AutoMapSelfAndChildrenByNameCommand}" CommandParameter="{Binding SelectedOriginalBone}">
+                <Button Grid.Row="0" Grid.Column="0"  Click="{s:MethodBinding AutoMapSelfAndChildrenByName}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock>Auto map "</TextBlock>
                         <TextBlock Text="{Binding MeshBones.SelectedBone.Name, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock>" based on name</TextBlock>
                     </StackPanel>
                 </Button>
-                <Button Grid.Row="0" Grid.Column="1" Command="{Binding AutoMapSelfAndChildrenByHierarchyCommand}" CommandParameter="{Binding SelectedOriginalBone}">
+                <Button Grid.Row="0" Grid.Column="1" Click="{s:MethodBinding AutoMapSelfAndChildrenByHierarchy}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock>Auto map "</TextBlock>
                         <TextBlock Text="{Binding MeshBones.SelectedBone.Name, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock>" based on hierarchy</TextBlock>
                     </StackPanel>
                 </Button>
-                <Button Grid.Row="1" Grid.Column="0" Command="{Binding ClearBindingSelfAndChildrenCommand}">
+                <Button Grid.Row="1" Grid.Column="0" Click="{s:MethodBinding ClearBindingSelfAndChildren}" >
                     <StackPanel Orientation="Horizontal">
                         <TextBlock>Clear mapping for "</TextBlock>
                         <TextBlock Text="{Binding MeshBones.SelectedBone.Name, UpdateSourceTrigger=PropertyChanged}"/>
@@ -248,7 +254,7 @@
             </Grid>
         </Grid>
 
-        <Grid Grid.Column="2">
+        <Grid Grid.Column="2" Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
@@ -289,16 +295,6 @@
                 </TreeView.ItemTemplate>
             </TreeView>
         </Grid>
-
-
-        <DockPanel Grid.Row="1" Grid.Column="0" Margin="0,3,0,3">
-            <TextBlock Text="Config:" VerticalAlignment="Center" />
-            <Button Command="{Binding LoadConfigurationCommand}" DockPanel.Dock="Right" Width="50">Load</Button>
-            <Button Command="{Binding SaveConfigurationCommand}" DockPanel.Dock="Right" Width="50">Save</Button>
-            <ComboBox ItemsSource="{Binding AllConfigPaths, UpdateSourceTrigger=PropertyChanged}"
-                      SelectedItem="{Binding CurrentConfigPath, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                      DockPanel.Dock="Right" Margin="5,0,2,0"/>
-        </DockPanel>
 
     </Grid>
 </UserControl>
