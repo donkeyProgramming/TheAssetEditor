@@ -311,3 +311,5 @@ Bugs:
 	Added confirm when using mapping with bad values
 	Generating lods for models with more than 4 lods
 	Boundingbox recalc
+	Validation of VMD files
+	Bug with mapping skeletons -> incorrect total weight?

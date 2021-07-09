@@ -20,8 +20,8 @@ namespace KitbasherEditor.ViewModels.MeshFitter
 {
     public class MeshFitterViewModel : AnimatedBlendIndexRemappingViewModel
     {
-        GameSkeleton _dwarfSkeleton; 
-        GameSkeleton _humanoid01Skeleton;
+        GameSkeleton _targetSkeleton; 
+        GameSkeleton _fromSkeleton;
 
         IComponentManager _componentManager;
         AnimationClip _animationClip;
@@ -41,7 +41,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
         public MeshFitterViewModel(RemappedAnimatedBoneConfiguration configuration, List<Rmv2MeshNode> meshNodes, GameSkeleton targetSkeleton, AnimationFile currentSkeletonFile, IComponentManager componentManager) : base(configuration)
         {
             _meshNodes = meshNodes;
-            _dwarfSkeleton = targetSkeleton;
+            _targetSkeleton = targetSkeleton;
             _componentManager = componentManager;
             ScaleFactor.PropertyChanged += (_0, _1) => ReProcessFucker();
             BoneScaleFactor.PropertyChanged+=(_0, _1) => BoneScaleUpdate((float)BoneScaleFactor.Value, MeshBones.SelectedBone);
@@ -52,27 +52,27 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             MeshBones.BoneSelected += (_) => OnBoneSelected();
 
             _animationPlayer = _componentManager.GetComponent<AnimationsContainerComponent>().RegisterAnimationPlayer(new AnimationPlayer(), "Temp animation rerig");
-            _humanoid01Skeleton = new GameSkeleton(currentSkeletonFile, _animationPlayer);
+            _fromSkeleton = new GameSkeleton(currentSkeletonFile, _animationPlayer);
             
             // Build empty animation
             _animationClip = new AnimationClip();
             _animationClip.DynamicFrames.Add(new AnimationClip.KeyFrame());
 
-            for (int i = 0; i < _humanoid01Skeleton.BoneCount; i++)
+            for (int i = 0; i < _fromSkeleton.BoneCount; i++)
             {
-                _animationClip.DynamicFrames[0].Rotation.Add(_humanoid01Skeleton.Rotation[i]);
-                _animationClip.DynamicFrames[0].Position.Add(_humanoid01Skeleton.Translation[i]);
+                _animationClip.DynamicFrames[0].Rotation.Add(_fromSkeleton.Rotation[i]);
+                _animationClip.DynamicFrames[0].Position.Add(_fromSkeleton.Translation[i]);
                 _animationClip.DynamicFrames[0].Scale.Add(Vector3.One);
 
                 _animationClip.RotationMappings.Add(new AnimationFile.AnimationBoneMapping(i));
                 _animationClip.TranslationMappings.Add(new AnimationFile.AnimationBoneMapping(i));
             }
 
-            _animationPlayer.SetAnimation(_animationClip, _humanoid01Skeleton);
+            _animationPlayer.SetAnimation(_animationClip, _fromSkeleton);
             _animationPlayer.Play();
 
             var resourceLib = _componentManager.GetComponent<ResourceLibary>();
-            _currentSkeletonNode = new SkeletonNode(resourceLib.Content, new SimpleSkeletonProvider(_humanoid01Skeleton));
+            _currentSkeletonNode = new SkeletonNode(resourceLib.Content, new SimpleSkeletonProvider(_fromSkeleton));
             _componentManager.GetComponent<SceneManager>().RootNode.AddObject(_currentSkeletonNode);
 
             _oldAnimationPlayer = _meshNodes.First().AnimationPlayer;
@@ -134,96 +134,125 @@ namespace KitbasherEditor.ViewModels.MeshFitter
 
         void ReProcessFucker()
         {
-            // From humanoid to dwarf
-
+            // Rebuild the mapping index as its easy to work with
             var mapping = MeshBones.Bones.First().BuildRemappingList();
 
-            // Reset it all
-            for (int i = 0; i < _humanoid01Skeleton.BoneCount; i++)
+            // Reset the animation back to bind pose
+            for (int i = 0; i < _fromSkeleton.BoneCount; i++)
             {
-                _animationClip.DynamicFrames[0].Rotation[i] = _humanoid01Skeleton.Rotation[i];
-                _animationClip.DynamicFrames[0].Position[i] = _humanoid01Skeleton.Translation[i];
+                _animationClip.DynamicFrames[0].Rotation[i] = _fromSkeleton.Rotation[i];
+                _animationClip.DynamicFrames[0].Position[i] = _fromSkeleton.Translation[i];
                 _animationClip.DynamicFrames[0].Scale[i] = Vector3.One;
             }
 
-            // Set scale
+            // Set the base scale for the mesh and apply the animation
             float baseScale = (float)ScaleFactor.Value;
-            
             _animationClip.DynamicFrames[0].Scale[0] = new Vector3(baseScale);
             _animationPlayer.Refresh();
+
             if (baseScale == 0)
                 return;
-            for (int i = 0; i < _humanoid01Skeleton.BoneCount; i++)
+
+            for (int i = 0; i < _fromSkeleton.BoneCount; i++)
             {
                 var mappedIndex = mapping.FirstOrDefault(x => x.OriginalValue == i);
-                var boneAttribute = MeshBones.GetFromBoneId(i);
+                var boneObject = MeshBones.GetFromBoneId(i);
+
+                float boneScale = 1;
+                var bonePosition = Vector3.Zero;// _fromSkeleton.get
+                var boneRotation = Quaternion.Identity;// _animationClip.DynamicFrames[0].Rotation[i];
+
+                var fromBoneIndex = i;
+
                 if (mappedIndex != null)
                 {
-                    var dwarfBoneIndex = mappedIndex.NewValue; ;
-                    var humanoid01BoneIndex = mappedIndex.OriginalValue;
-
-                    var desiredParentWorldTransform = _dwarfSkeleton.GetWorldTransform(dwarfBoneIndex);
-
-                    desiredParentWorldTransform =
-                            (Matrix.CreateRotationX(boneAttribute.BoneRotOffset.X) * Matrix.CreateRotationY(boneAttribute.BoneRotOffset.Y) * Matrix.CreateRotationZ(boneAttribute.BoneRotOffset.Z)) *
-                        desiredParentWorldTransform * 
+                    var targetBoneIndex = mappedIndex.NewValue;
                     
-                        Matrix.CreateTranslation(boneAttribute.BonePosOffset);
 
+                    // Get the world position where we want to move the bone to
+                    var targetBoneWorldTransform = _targetSkeleton.GetAnimatedWorldTranform(targetBoneIndex);
 
-                    var dwarfParentBone = _dwarfSkeleton.GetParentBone(dwarfBoneIndex) ;
-                    if (dwarfParentBone == -1)
-                        continue;
+                    // Apply the offset values
+                    var desiredParentWorldTransform = MathUtil.CreateRotation(boneObject.BoneRotOffset) * 
+                        targetBoneWorldTransform *
+                        Matrix.CreateTranslation(boneObject.BonePosOffset);
 
+                    // Compute scaling
+                    float scale = boneObject.BoneScaleOffset;
+                    if (scale <= 0)
+                        scale = 0.00001f;   // To stop the calculations from exploding with NAN values
+                     
+                    var fromParentBoneIndex = _fromSkeleton.GetParentBone(fromBoneIndex);
+                    var targetParentBoneIndex = _targetSkeleton.GetParentBone(targetBoneIndex);
 
-                    var dwarfParentWorldPos = _dwarfSkeleton.GetWorldTransform(dwarfParentBone);
-                    var dwarfBoneLength = Vector3.Distance(desiredParentWorldTransform.Translation, dwarfParentWorldPos.Translation);
-
-
-                    float scale = 1;
-                    scale = scale * boneAttribute.BoneScaleOffset;
-                    var parentBoneIndex = _humanoid01Skeleton.GetParentBone(humanoid01BoneIndex);
-                    if (parentBoneIndex == -1)
-                        continue;
-
-                    var parentWorld = _humanoid01Skeleton.GetAnimatedWorldTranform(parentBoneIndex);
-                    var matrix = desiredParentWorldTransform * Matrix.Invert(parentWorld);
-                    matrix.Decompose(out var _, out var newRotation, out var newPosition);
-
-
-                    var humanodB0 = _humanoid01Skeleton.GetWorldTransform(humanoid01BoneIndex);
-                    if (humanoid01BoneIndex != -1 && parentBoneIndex != -1)
+                    if (fromParentBoneIndex != -1 && targetParentBoneIndex != -1)
                     {
-                        var humanodB1 = _humanoid01Skeleton.GetWorldTransform(parentBoneIndex);
-                        var humanodBoneLength = Vector3.Distance(humanodB0.Translation, humanodB1.Translation);
+                        var toBone0 = _targetSkeleton.GetWorldTransform(targetBoneIndex);
+                        var toBone1 = _targetSkeleton.GetWorldTransform(targetParentBoneIndex);
+                        var targetBoneLength = Vector3.Distance(toBone0.Translation, toBone1.Translation);
 
-                        if(RelativeScale.Value)
-                            scale = (dwarfBoneLength / humanodBoneLength) *(baseScale * boneAttribute.BoneScaleOffset);
+                        var fromBone0 = _fromSkeleton.GetWorldTransform(fromBoneIndex);
+                        var fromBone1 = _fromSkeleton.GetWorldTransform(fromParentBoneIndex);
+                        var humanodBoneLength = Vector3.Distance(fromBone0.Translation, fromBone1.Translation);
 
-                        if (float.IsNaN(scale))
-                            scale = baseScale;
-
-                    }
-                   
-                    _animationClip.DynamicFrames[0].Rotation[humanoid01BoneIndex] = newRotation;
-                    _animationClip.DynamicFrames[0].Position[humanoid01BoneIndex] = newPosition;
-                    _animationClip.DynamicFrames[0].Scale[humanoid01BoneIndex] *= new Vector3(scale);
-
-                    var childBones = _humanoid01Skeleton.GetChildBones(humanoid01BoneIndex);
-                    foreach (var childBoneIndex in childBones)
-                    {
-                        float invScale = 1 / scale;
-                        _animationClip.DynamicFrames[0].Scale[childBoneIndex] *= new Vector3(invScale);
+                        if (RelativeScale.Value)
+                            scale *= (targetBoneLength / humanodBoneLength);
                     }
 
-                    _animationPlayer.Refresh();
+                    if (scale <= 0)
+                        scale = 0.00001f;   // To stop the calculations from exploding with NAN values
+
+                    var parentWorld = Matrix.Identity;
+                    if (fromParentBoneIndex != -1)
+                        parentWorld = _fromSkeleton.GetAnimatedWorldTranform(fromParentBoneIndex);
+                    var finalWorldPositon = desiredParentWorldTransform * Matrix.Invert(parentWorld);
+                    finalWorldPositon.Decompose(out var _, out boneRotation, out bonePosition);
+                    boneScale = scale;
                 }
+                else
+                {
+                    // Get the world position where we want to move the bone to
+                    var targetBoneWorldTransform = _fromSkeleton.GetAnimatedWorldTranform(i);
+
+                    // Apply the offset values
+                    var desiredParentWorldTransform = MathUtil.CreateRotation(boneObject.BoneRotOffset) *
+                        targetBoneWorldTransform *
+                        Matrix.CreateTranslation(boneObject.BonePosOffset);
+
+                    // Compute scaling
+                    float scale = boneObject.BoneScaleOffset;
+                    if (scale <= 0)
+                        scale = 0.00001f;   // To stop the calculations from exploding with NAN values
+
+                    var fromParentBoneIndex = _fromSkeleton.GetParentBone(i);
+
+                    var parentWorld = Matrix.Identity;
+                    if (fromParentBoneIndex != -1)
+                        parentWorld = _fromSkeleton.GetAnimatedWorldTranform(fromParentBoneIndex);
+                    var finalWorldPositon = desiredParentWorldTransform * Matrix.Invert(parentWorld);
+                    finalWorldPositon.Decompose(out var _, out boneRotation, out bonePosition);
+                    boneScale = scale;
+                }
+
+                _animationClip.DynamicFrames[0].Rotation[i] = boneRotation;
+                _animationClip.DynamicFrames[0].Position[i] = bonePosition;
+                _animationClip.DynamicFrames[0].Scale[i] *= new Vector3(boneScale);
+
+                // Apply the inv scale to all children to avoid the mesh growing out of control
+                var childBones = _fromSkeleton.GetChildBones(i);
+                foreach (var childBoneIndex in childBones)
+                {
+                    float invScale = 1 / boneScale;
+                    _animationClip.DynamicFrames[0].Scale[childBoneIndex] *= new Vector3(invScale);
+                }
+
+                _animationPlayer.Refresh();
             }
         }
 
         public override void OnMappingCreated(int humanoid01BoneIndex, int dwarfBoneIndex)
         {
-            if (_dwarfSkeleton == null)
+            if (_targetSkeleton == null)
                 return;
 
             ReProcessFucker();

@@ -114,5 +114,21 @@ namespace View3D.Utility
             axis = new Vector3(q.X, q.Y, q.Z) * ooScale;
         }
 
+        public static Matrix CreateRotation(float x_degrees, float y_degrees, float z_degrees)
+        {
+            var x = MathHelper.ToRadians(x_degrees);
+            var y = MathHelper.ToRadians(y_degrees);
+            var z = MathHelper.ToRadians(z_degrees);
+            return Matrix.CreateRotationX(x) * Matrix.CreateRotationY(y) * Matrix.CreateRotationZ(z);
+        }
+
+        public static Matrix CreateRotation(Vector3 angles_degrees)
+        {
+            var x = MathHelper.ToRadians(angles_degrees.X);
+            var y = MathHelper.ToRadians(angles_degrees.Y);
+            var z = MathHelper.ToRadians(angles_degrees.Z);
+            return Matrix.CreateRotationX(x) * Matrix.CreateRotationY(y) * Matrix.CreateRotationZ(z);
+        }
+
     }
 }
