@@ -93,7 +93,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
                 var parentBoneIndex = _riderSkeleton.GetParentBone(_riderBoneIndex);
                 if (parentBoneIndex != -1)
                 {
-                    var childNodes = _riderSkeleton.GetChildBones(parentBoneIndex);
+                    var childNodes = _riderSkeleton.GetDirectChildBones(parentBoneIndex);
 
                     for (int boneId = 0; boneId < childNodes.Count; boneId++)
                     {

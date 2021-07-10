@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using View3D.Animation;
+using View3D.Commands.Object;
 using View3D.Components.Component;
 using View3D.SceneNodes;
 using View3D.Utility;
@@ -20,6 +21,8 @@ namespace KitbasherEditor.ViewModels.MeshFitter
 {
     public class MeshFitterViewModel : AnimatedBlendIndexRemappingViewModel
     {
+        Window _window;
+
         GameSkeleton _targetSkeleton; 
         GameSkeleton _fromSkeleton;
 
@@ -33,21 +36,26 @@ namespace KitbasherEditor.ViewModels.MeshFitter
         public NotifyAttr<bool> RelativeScale { get; set; } = new NotifyAttr<bool>(false);
         public DoubleViewModel ScaleFactor { get; set; } = new DoubleViewModel(1);
 
+        public Vector3ViewModel SkeletonDisplayOffset { get; set; } = new Vector3ViewModel(0);
+
         public NotifyAttr<bool> IsBoneSelected { get; set; } = new NotifyAttr<bool>(false);
         public DoubleViewModel BoneScaleFactor { get; set; } = new DoubleViewModel(1);
         public Vector3ViewModel BonePositionOffset { get; set; } = new Vector3ViewModel(0);
         public Vector3ViewModel BoneRotationOffset { get; set; } = new Vector3ViewModel(0);
 
-        public MeshFitterViewModel(RemappedAnimatedBoneConfiguration configuration, List<Rmv2MeshNode> meshNodes, GameSkeleton targetSkeleton, AnimationFile currentSkeletonFile, IComponentManager componentManager) : base(configuration)
+        public MeshFitterViewModel(Window ownerWindow, RemappedAnimatedBoneConfiguration configuration, List<Rmv2MeshNode> meshNodes, GameSkeleton targetSkeleton, AnimationFile currentSkeletonFile, IComponentManager componentManager) : base(configuration)
         {
+            _window = ownerWindow;
+
             _meshNodes = meshNodes;
             _targetSkeleton = targetSkeleton;
             _componentManager = componentManager;
-            ScaleFactor.PropertyChanged += (_0, _1) => ReProcessFucker();
+            ScaleFactor.PropertyChanged += (_0, _1) => ApplyMeshFittingTransforms();
             BoneScaleFactor.PropertyChanged+=(_0, _1) => BoneScaleUpdate((float)BoneScaleFactor.Value, MeshBones.SelectedBone);
             BonePositionOffset.OnValueChanged += (viewModel) => BonePositionUpdated(viewModel, MeshBones.SelectedBone);
             BoneRotationOffset.OnValueChanged += (viewModel) => BoneRotationUpdated(viewModel, MeshBones.SelectedBone);
-            RelativeScale.PropertyChanged += (_0, _1) => ReProcessFucker();
+            SkeletonDisplayOffset.OnValueChanged += (viewModel) => SkeletonDisplayOffsetUpdated(viewModel);
+            RelativeScale.PropertyChanged += (_0, _1) => ApplyMeshFittingTransforms();
 
             MeshBones.BoneSelected += (_) => OnBoneSelected();
 
@@ -73,6 +81,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
 
             var resourceLib = _componentManager.GetComponent<ResourceLibary>();
             _currentSkeletonNode = new SkeletonNode(resourceLib.Content, new SimpleSkeletonProvider(_fromSkeleton));
+            _currentSkeletonNode.SelectedNodeColour = Color.White;
             _componentManager.GetComponent<SceneManager>().RootNode.AddObject(_currentSkeletonNode);
 
             _oldAnimationPlayer = _meshNodes.First().AnimationPlayer;
@@ -80,21 +89,26 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 mesh.AnimationPlayer = _animationPlayer;
         }
 
+        private void SkeletonDisplayOffsetUpdated(Vector3ViewModel viewModel)
+        {
+            _currentSkeletonNode.ModelMatrix = Matrix.CreateTranslation((float)viewModel.X.Value, (float)viewModel.Y.Value, (float)viewModel.Z.Value);
+        }
+
         public override void AutoMapSelfAndChildrenByName()
         {
             base.AutoMapSelfAndChildrenByName();
-            ReProcessFucker();
+            ApplyMeshFittingTransforms();
         }
 
         public override void AutoMapSelfAndChildrenByHierarchy()
         {
             base.AutoMapSelfAndChildrenByHierarchy();
-            ReProcessFucker();
+            ApplyMeshFittingTransforms();
         }
         public override void ClearBindingSelfAndChildren()
         {
             base.ClearBindingSelfAndChildren();
-            ReProcessFucker();
+            ApplyMeshFittingTransforms();
         }
 
         void OnBoneSelected()
@@ -105,34 +119,40 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 BoneScaleFactor.Value = MeshBones.SelectedBone.BoneScaleOffset;
                 BoneRotationOffset.Set(MeshBones.SelectedBone.BoneRotOffset.X, MeshBones.SelectedBone.BoneRotOffset.Y, MeshBones.SelectedBone.BoneRotOffset.Z);
                 BonePositionOffset.Set(MeshBones.SelectedBone.BonePosOffset.X, MeshBones.SelectedBone.BonePosOffset.Y, MeshBones.SelectedBone.BonePosOffset.Z);
+
+                _currentSkeletonNode.SelectedBoneIndex = MeshBones.SelectedBone.BoneIndex;
+                _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().Skeleton.SelectedBoneIndex = MeshBones.SelectedBone.MappedBoneIndex;
             }
             else
             {
                 BoneScaleFactor.Value = 1;
                 BoneRotationOffset.Set(0);
                 BonePositionOffset.Set(0);
+
+                _currentSkeletonNode.SelectedBoneIndex = null;
+                _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().Skeleton.SelectedBoneIndex = null;
             }
         }
 
         void BoneScaleUpdate(float newValue, AnimatedBone bone)
         {
             bone.BoneScaleOffset = newValue;
-            ReProcessFucker();
+            ApplyMeshFittingTransforms();
         }
 
         void BoneRotationUpdated(Vector3ViewModel newValue, AnimatedBone bone)
         {
             bone.BoneRotOffset = new Vector3((float)newValue.X.Value, (float)newValue.Y.Value, (float)newValue.Z.Value);
-            ReProcessFucker();
+            ApplyMeshFittingTransforms();
         }
 
         void BonePositionUpdated(Vector3ViewModel newValue, AnimatedBone bone)
         {
             bone.BonePosOffset = new Vector3((float)newValue.X.Value, (float)newValue.Y.Value, (float)newValue.Z.Value);
-            ReProcessFucker();
+            ApplyMeshFittingTransforms();
         }
 
-        void ReProcessFucker()
+        void ApplyMeshFittingTransforms()
         {
             // Rebuild the mapping index as its easy to work with
             var mapping = MeshBones.Bones.First().BuildRemappingList();
@@ -156,33 +176,34 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             for (int i = 0; i < _fromSkeleton.BoneCount; i++)
             {
                 var mappedIndex = mapping.FirstOrDefault(x => x.OriginalValue == i);
-                var boneObject = MeshBones.GetFromBoneId(i);
-
-                float boneScale = 1;
-                var bonePosition = Vector3.Zero;// _fromSkeleton.get
-                var boneRotation = Quaternion.Identity;// _animationClip.DynamicFrames[0].Rotation[i];
+                var boneValuesObject = MeshBones.GetFromBoneId(i);
 
                 var fromBoneIndex = i;
+                var fromParentBoneIndex = _fromSkeleton.GetParentBone(fromBoneIndex);
+                Matrix desiredBonePosWorld = Matrix.Identity;
 
+                // Get the world position where we want to move the bone to
                 if (mappedIndex != null)
                 {
                     var targetBoneIndex = mappedIndex.NewValue;
-                    
+                    desiredBonePosWorld = _targetSkeleton.GetAnimatedWorldTranform(targetBoneIndex);
+                }
+                else
+                {
+                    desiredBonePosWorld = _fromSkeleton.GetAnimatedWorldTranform(i);
+                }
 
-                    // Get the world position where we want to move the bone to
-                    var targetBoneWorldTransform = _targetSkeleton.GetAnimatedWorldTranform(targetBoneIndex);
+                // Apply the offset values to the bone in worldspace
+                var desiredBonePosWorldWithOffsets = MathUtil.CreateRotation(boneValuesObject.BoneRotOffset) *
+                    desiredBonePosWorld *
+                    Matrix.CreateTranslation(boneValuesObject.BonePosOffset);
 
-                    // Apply the offset values
-                    var desiredParentWorldTransform = MathUtil.CreateRotation(boneObject.BoneRotOffset) * 
-                        targetBoneWorldTransform *
-                        Matrix.CreateTranslation(boneObject.BonePosOffset);
-
-                    // Compute scaling
-                    float scale = boneObject.BoneScaleOffset;
-                    if (scale <= 0)
-                        scale = 0.00001f;   // To stop the calculations from exploding with NAN values
-                     
-                    var fromParentBoneIndex = _fromSkeleton.GetParentBone(fromBoneIndex);
+                // Apply relative scale if applicable 
+                float relativeScale = 1;
+                var computeRelativeScale = RelativeScale.Value && mappedIndex != null;
+                if (computeRelativeScale)
+                {
+                    var targetBoneIndex = mappedIndex.NewValue;
                     var targetParentBoneIndex = _targetSkeleton.GetParentBone(targetBoneIndex);
 
                     if (fromParentBoneIndex != -1 && targetParentBoneIndex != -1)
@@ -193,56 +214,35 @@ namespace KitbasherEditor.ViewModels.MeshFitter
 
                         var fromBone0 = _fromSkeleton.GetWorldTransform(fromBoneIndex);
                         var fromBone1 = _fromSkeleton.GetWorldTransform(fromParentBoneIndex);
-                        var humanodBoneLength = Vector3.Distance(fromBone0.Translation, fromBone1.Translation);
+                        var fromBoneLength = Vector3.Distance(fromBone0.Translation, fromBone1.Translation);
 
-                        if (RelativeScale.Value)
-                            scale *= (targetBoneLength / humanodBoneLength);
+                        relativeScale = fromBoneLength / targetBoneLength;
                     }
-
-                    if (scale <= 0)
-                        scale = 0.00001f;   // To stop the calculations from exploding with NAN values
-
-                    var parentWorld = Matrix.Identity;
-                    if (fromParentBoneIndex != -1)
-                        parentWorld = _fromSkeleton.GetAnimatedWorldTranform(fromParentBoneIndex);
-                    var finalWorldPositon = desiredParentWorldTransform * Matrix.Invert(parentWorld);
-                    finalWorldPositon.Decompose(out var _, out boneRotation, out bonePosition);
-                    boneScale = scale;
-                }
-                else
-                {
-                    // Get the world position where we want to move the bone to
-                    var targetBoneWorldTransform = _fromSkeleton.GetAnimatedWorldTranform(i);
-
-                    // Apply the offset values
-                    var desiredParentWorldTransform = MathUtil.CreateRotation(boneObject.BoneRotOffset) *
-                        targetBoneWorldTransform *
-                        Matrix.CreateTranslation(boneObject.BonePosOffset);
-
-                    // Compute scaling
-                    float scale = boneObject.BoneScaleOffset;
-                    if (scale <= 0)
-                        scale = 0.00001f;   // To stop the calculations from exploding with NAN values
-
-                    var fromParentBoneIndex = _fromSkeleton.GetParentBone(i);
-
-                    var parentWorld = Matrix.Identity;
-                    if (fromParentBoneIndex != -1)
-                        parentWorld = _fromSkeleton.GetAnimatedWorldTranform(fromParentBoneIndex);
-                    var finalWorldPositon = desiredParentWorldTransform * Matrix.Invert(parentWorld);
-                    finalWorldPositon.Decompose(out var _, out boneRotation, out bonePosition);
-                    boneScale = scale;
                 }
 
+                // Compute scaling
+                float scale = boneValuesObject.BoneScaleOffset * relativeScale;
+
+                // To stop the calculations from exploding with NAN values
+                if (scale <= 0 || float.IsNaN(scale))
+                    scale = 0.00001f;   
+
+                var parentWorld = Matrix.Identity;
+                if (fromParentBoneIndex != -1)
+                    parentWorld = _fromSkeleton.GetAnimatedWorldTranform(fromParentBoneIndex);
+                var bonePositionLocalSpace = desiredBonePosWorldWithOffsets * Matrix.Invert(parentWorld);
+                bonePositionLocalSpace.Decompose(out var _,  out var boneRotation,  out var bonePosition);
+
+                // Apply the values to the animation
                 _animationClip.DynamicFrames[0].Rotation[i] = boneRotation;
                 _animationClip.DynamicFrames[0].Position[i] = bonePosition;
-                _animationClip.DynamicFrames[0].Scale[i] *= new Vector3(boneScale);
+                _animationClip.DynamicFrames[0].Scale[i] *= new Vector3(scale);
 
                 // Apply the inv scale to all children to avoid the mesh growing out of control
-                var childBones = _fromSkeleton.GetChildBones(i);
+                var childBones = _fromSkeleton.GetDirectChildBones(i);
                 foreach (var childBoneIndex in childBones)
                 {
-                    float invScale = 1 / boneScale;
+                    float invScale = 1 / scale;
                     _animationClip.DynamicFrames[0].Scale[childBoneIndex] *= new Vector3(invScale);
                 }
 
@@ -255,21 +255,56 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             if (_targetSkeleton == null)
                 return;
 
-            ReProcessFucker();
+            ApplyMeshFittingTransforms();
+        }
+
+        public void ResetOffsetTransforms()
+        {
+            if (MeshBones.SelectedBone != null)
+            {
+                MeshBones.SelectedBone.BonePosOffset = Vector3.Zero;
+                MeshBones.SelectedBone.BoneRotOffset = Vector3.Zero;
+                MeshBones.SelectedBone.BoneScaleOffset = 1;
+                OnBoneSelected();
+            }
+        
+        }
+
+        public void CopyScaleToChildren()
+        {
+            if (MeshBones.SelectedBone != null)
+            {
+                var id = MeshBones.SelectedBone.BoneIndex;
+                var childBones = _fromSkeleton.GetAllChildBones(id);
+                foreach (var boneId in childBones)
+                {
+                    var bone = MeshBones.GetFromBoneId(boneId);
+                    bone.BoneScaleOffset = MeshBones.SelectedBone.BoneScaleOffset;
+                }
+
+                ApplyMeshFittingTransforms();
+            }
         }
 
 
-        public void Close()
+        public void CleanUp()
         {
             // Restore animation player
             _componentManager.GetComponent<AnimationsContainerComponent>().Remove(_animationPlayer);
             foreach (var mesh in _meshNodes)
                 mesh.AnimationPlayer = _oldAnimationPlayer;
 
-            // Apply changes to mesh
-
             // Remove the skeleton node
+            _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().Skeleton.SelectedBoneIndex = null; 
             _componentManager.GetComponent<SceneManager>().RootNode.RemoveObject(_currentSkeletonNode);
+        }
+
+        public void SaveAndClose()
+        {
+            var frame = AnimationSampler.Sample(0, _fromSkeleton, new List<AnimationClip>() { _animationClip });
+            var cmd = new CreateAnimatedMeshPoseCommand(_meshNodes, _fromSkeleton, frame);
+            _componentManager.GetComponent<CommandExecutor>().ExecuteCommand(cmd);   
+            _window.Close();
         }
 
         public static void ShowView(List<ISelectable> meshesToFit, IComponentManager componentManager, SkeletonAnimationLookUpHelper skeletonHelper, PackFileService pfs)
@@ -311,8 +346,10 @@ namespace KitbasherEditor.ViewModels.MeshFitter
 
 
             var containingWindow = new Window();
-            containingWindow.Title = "Texture Preview Window";
-            containingWindow.DataContext = new MeshFitterViewModel(config, meshNodes, targetSkeleton.AnimationProvider.Skeleton, currentSkeletonFile, componentManager);
+            containingWindow.Title = "MeshFitter";
+            containingWindow.Width = 1200;
+            containingWindow.Height = 1100;
+            containingWindow.DataContext = new MeshFitterViewModel(containingWindow, config, meshNodes, targetSkeleton.AnimationProvider.Skeleton, currentSkeletonFile, componentManager);
             containingWindow.Content = new MeshFitterView();
             containingWindow.Closed += ContainingWindow_Closed;
             containingWindow.Show();
@@ -322,7 +359,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
         {
             var window = sender as Window;
             var dataContex = window.DataContext as MeshFitterViewModel;
-            dataContex.Close();
+            dataContex.CleanUp();
         }
     }
 }

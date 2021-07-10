@@ -35,7 +35,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public MeshSceneNodeViewModel(Rmv2MeshNode node, PackFileService pfs, SkeletonAnimationLookUpHelper animLookUp, IComponentManager componentManager)
         {
             _meshNode = node;
-            General = new MeshSceneNodeViewModel_General(_meshNode);
+            General = new MeshSceneNodeViewModel_General(_meshNode, componentManager);
             Animation = new MeshSceneNodeViewModel_Animation(pfs, _meshNode, animLookUp, componentManager);
             Graphics = new MeshSceneNodeViewModel_Graphics(_meshNode, pfs);
         }
@@ -49,10 +49,9 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
     public class MeshSceneNodeViewModel_General : NotifyPropertyChangedImpl
     {
         Rmv2MeshNode _meshNode;
+        IComponentManager _componentManager;
 
         public string ModelName { get { return _meshNode.MeshModel.Header.ModelName; } set { UpdateModelName(value); NotifyPropertyChanged(); } }
-
-        
 
         public int VertexCount { get => _meshNode.Geometry.VertexCount(); }
         public int IndexCount { get => _meshNode.Geometry.GetIndexCount(); }
@@ -64,22 +63,23 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         Vector3ViewModel _pivot;
         public Vector3ViewModel Pivot { get { return _pivot; } set { SetAndNotify(ref _pivot, value); } }
 
-        public MeshSceneNodeViewModel_General(Rmv2MeshNode node)
+        public ICommand CopyPivotToAllMeshesCommand { get; set; }
+        public ICommand RecomputeBoundingBoxCommand { get; set; }
+
+        public MeshSceneNodeViewModel_General(Rmv2MeshNode node, IComponentManager componentManager)
         {
             _meshNode = node;
+            _componentManager = componentManager;
             Pivot = new Vector3ViewModel(_meshNode.MeshModel.Header.Transform.Pivot.X, _meshNode.MeshModel.Header.Transform.Pivot.Y, _meshNode.MeshModel.Header.Transform.Pivot.Z);
             Pivot.OnValueChanged += Pivot_OnValueChanged;
+            CopyPivotToAllMeshesCommand = new RelayCommand(CopyPivotToAllMeshes);
+            RecomputeBoundingBoxCommand = new RelayCommand(RecomputeBoundingBox);
         }
 
         private void Pivot_OnValueChanged(Vector3ViewModel newValue)
         {
-            var header = _meshNode.MeshModel.Header;
-            var transform = header.Transform;
-
-            transform.Pivot = new Filetypes.RigidModel.Transforms.RmvVector3((float)newValue.X.Value, (float)newValue.Y.Value, (float)newValue.Z.Value);
-            
-            header.Transform = transform;
-            _meshNode.MeshModel.Header = header;
+            _meshNode.UpdatePivotPoint(new Vector3((float)newValue.X.Value, (float)newValue.Y.Value, (float)newValue.Z.Value));
+           
         } 
 
         void UpdateModelName(string newName)
@@ -88,6 +88,21 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             header.ModelName = newName;
             _meshNode.MeshModel.Header = header;
             _meshNode.Name = newName;
+        }
+
+        void CopyPivotToAllMeshes()
+        {
+            var newPiv = new Vector3((float)Pivot.X.Value, (float)Pivot.Y.Value, (float)Pivot.Z.Value);
+
+            var root = _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode();
+            var allMeshes = root.GetMeshesInLod(0, false);
+            foreach (var mesh in allMeshes)
+                mesh.UpdatePivotPoint(newPiv);
+        }
+
+        void RecomputeBoundingBox()
+        {
+            _meshNode.RecomputeBoundingBox();
         }
     }
 
@@ -103,7 +118,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         int _linkDirectlyToBoneIndex;
         public int LinkDirectlyToBoneIndex { get { return _linkDirectlyToBoneIndex; } set { SetAndNotify(ref _linkDirectlyToBoneIndex, value); } }
-
 
         List<RmvAttachmentPoint> _attachemntPoints;
         public List<RmvAttachmentPoint> AttachmentPoints { get { return _attachemntPoints; } set { SetAndNotify(ref _attachemntPoints, value); } }
@@ -125,7 +139,22 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
             var skeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, SkeletonName);
             var bones = _meshNode.Geometry.GetUniqeBlendIndices();
-            AnimatedBones = bones.Select(x => new AnimatedBone() { BoneIndex = x, Name = skeletonFile.Bones[x].Name }).OrderBy(x => x.BoneIndex).ToList();
+
+            // Make sure the bones are valid, mapping can cause issues! 
+            if (bones.Count != 0)
+            {
+                var activeBonesMin = bones.Min(x => x);
+                var activeBonesMax = bones.Max(x => x);
+                var skeletonBonesMax = skeletonFile.Bones.Max(x => x.Id);
+
+                bool hasValidBoneMapping = activeBonesMin >= 0 && skeletonBonesMax >= activeBonesMax;
+                if (!hasValidBoneMapping)
+                    MessageBox.Show("Mesh an invalid bones, this might cause issues. Its a result of an invalid re-rigging");
+
+                if (skeletonFile != null && hasValidBoneMapping)
+                    AnimatedBones = bones.Select(x => new AnimatedBone() { BoneIndex = x, Name = skeletonFile.Bones[x].Name }).OrderBy(x => x.BoneIndex).ToList();
+            }
+
             OpenBoneRemappingToolCommand = new RelayCommand(OpenBoneRemappingTool);
         }
 
@@ -147,7 +176,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             config.ParnetModelSkeletonName = existingSkeltonName;
             config.ParentModelBones = AnimatedBone.CreateFromSkeleton(newSkeletonFile);
 
-
+            if (targetSkeletonName == existingSkeltonName)
+                MessageBox.Show("Trying to map to and from the same skeleton. This does not really make any sense in most cases.", "Error", MessageBoxButton.OK);
 
             AnimatedBlendIndexRemappingWindow window = new AnimatedBlendIndexRemappingWindow()
             {
@@ -157,7 +187,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             if (window.ShowDialog() == true)
             {
                 var remapping = config.MeshBones.First().BuildRemappingList();
-                _componentManager.GetComponent<CommandExecutor>().ExecuteCommand(new RemapBoneIndexesCommand(_meshNode, remapping, config.ParnetModelSkeletonName, config.MoveMeshToFit, new GameSkeleton(existingSkeletonFile, null), new GameSkeleton(newSkeletonFile, null)));
+                _componentManager.GetComponent<CommandExecutor>().ExecuteCommand(new RemapBoneIndexesCommand(_meshNode, remapping, config.ParnetModelSkeletonName, new GameSkeleton(existingSkeletonFile, null), new GameSkeleton(newSkeletonFile, null)));
             }
         }
     }
@@ -246,7 +276,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 return;
             }
 
-            if (!(newFormat == VertexFormat.Weighted || newFormat == VertexFormat.Default))
+            if (!(newFormat == VertexFormat.Weighted || newFormat == VertexFormat.Default || newFormat == VertexFormat.Cinematic))
             {
                 MessageBox.Show("Can only swap to weighted or default format.");
                 NotifyPropertyChanged(nameof(VertexType));
@@ -257,15 +287,15 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 MaterialType = GroupTypeEnum.weighted;
             else if (newFormat == VertexFormat.Default)
                 MaterialType = GroupTypeEnum.default_type;
-            else 
+            else if (newFormat == VertexFormat.Cinematic)
+                MaterialType = GroupTypeEnum.weighted;
+            else
                 throw new Exception("Unknown vertex format, can not set grouptype");
 
             var header = _meshNode.MeshModel.Header;
             header.VertextType = newFormat;
             _meshNode.MeshModel.Header = header;
             _meshNode.Geometry.ChangeVertexType(newFormat);
-
-
 
             NotifyPropertyChanged(nameof(VertexType));
         }

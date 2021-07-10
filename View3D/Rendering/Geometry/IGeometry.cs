@@ -44,13 +44,15 @@ namespace View3D.Rendering.Geometry
 
     public class IndexRemapping
     {
-        public IndexRemapping(byte originalValue, byte newValue)
+        public IndexRemapping(byte originalValue, byte newValue, bool isUsedByCurrentModel = false)
         {
             OriginalValue = originalValue;
             NewValue = newValue;
+            IsUsedByModel = isUsedByCurrentModel;
         }
 
         public byte OriginalValue { get; set; }
         public byte NewValue { get; set; }
+        public bool IsUsedByModel { get; set; } = false;
     }
 }

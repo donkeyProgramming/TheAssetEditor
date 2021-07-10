@@ -60,18 +60,26 @@ namespace View3D.SceneNodes
             Scale = Vector3.One;
             Orientation = Quaternion.Identity;
 
-            if(resourceLib != null)
+            if (resourceLib != null)
             {
                 Effect = new PbrShader(resourceLib);
-                var diffuse = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Diffuse).Value.Path);
-                var specTexture = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Specular).Value.Path);
-                var normalTexture = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Normal).Value.Path);
-                var glossTexture = resourceLib.LoadTexture(rmvSubModel.GetTexture(TexureType.Gloss).Value.Path);
-            
+                Texture2D diffuse = LoadTexture(TexureType.Diffuse);
+                Texture2D specTexture = LoadTexture(TexureType.Specular);
+                Texture2D normalTexture = LoadTexture(TexureType.Normal);
+                Texture2D glossTexture = LoadTexture(TexureType.Gloss);
+
                 (Effect as IShaderTextures).SetTexture(diffuse, TexureType.Diffuse);
                 (Effect as IShaderTextures).SetTexture(specTexture, TexureType.Specular);
                 (Effect as IShaderTextures).SetTexture(normalTexture, TexureType.Normal);
                 (Effect as IShaderTextures).SetTexture(glossTexture, TexureType.Gloss);
+            }
+
+            Texture2D LoadTexture(TexureType type)
+            {
+                var texture = rmvSubModel.GetTexture(type);
+                if (texture == null)
+                    return null;
+                return resourceLib.LoadTexture(texture.Value.Path);
             }
         }
 
@@ -118,6 +126,7 @@ namespace View3D.SceneNodes
             return MathUtil.GetCenter(Geometry.BoundingBox) + Position;
         }
 
+
         public void UpdateTexture(string path, TexureType texureType)
         {
             var texture = _resourceLib.LoadTexture(path);
@@ -150,7 +159,7 @@ namespace View3D.SceneNodes
 
                 if (AnimationPlayer != null)
                 {
-                    var frame = AnimationPlayer.GetCurrentFrame();
+                    var frame = AnimationPlayer.GetCurrentAnimationFrame();
                     if (frame != null)
                     {
                         for (int i = 0; i < frame.BoneTransforms.Count(); i++)
@@ -171,6 +180,13 @@ namespace View3D.SceneNodes
             {
                 var pivotPos = new Vector3(-MeshModel.Header.Transform.Pivot.X, MeshModel.Header.Transform.Pivot.Y, MeshModel.Header.Transform.Pivot.Z);
                 renderEngine.AddRenderItem(RenderBuckedId.Normal, new LocatorRenderItem(_resourceLib.GetStaticEffect(ShaderTypes.Line), pivotPos, 1));
+            }
+
+            if (DisplayBoundingBox)
+            {
+                var bb = new BoundingBox(new Vector3(MeshModel.Header.BoundingBox.MinimumX, MeshModel.Header.BoundingBox.MinimumY, MeshModel.Header.BoundingBox.MinimumZ),
+                    new Vector3(MeshModel.Header.BoundingBox.MaximumX, MeshModel.Header.BoundingBox.MaximumY, MeshModel.Header.BoundingBox.MaximumZ));
+                renderEngine.AddRenderItem(RenderBuckedId.Normal, new BoundingBoxRenderItem(_resourceLib.GetStaticEffect(ShaderTypes.Line), bb));
             }
         }
 
@@ -204,7 +220,35 @@ namespace View3D.SceneNodes
             return newItem;
         }
 
+        public void UpdatePivotPoint(Vector3 newPiv)
+        {
+            var header = MeshModel.Header;
+            var transform = header.Transform;
 
+            transform.Pivot = new Filetypes.RigidModel.Transforms.RmvVector3((float)newPiv.X, (float)newPiv.Y, (float)newPiv.Z);
+
+            header.Transform = transform;
+            MeshModel.Header = header;
+        }
+
+        public void RecomputeBoundingBox()
+        {
+            var header = MeshModel.Header;
+            var bb = header.BoundingBox;
+
+            var newBB = BoundingBox.CreateFromPoints(Geometry.GetVertexList());
+
+            bb.MinimumX = newBB.Min.X;
+            bb.MinimumY = newBB.Min.Y;
+            bb.MinimumZ = newBB.Min.Z;
+
+            bb.MaximumX = newBB.Max.X;
+            bb.MaximumY = newBB.Max.Y;
+            bb.MaximumZ = newBB.Max.Z;
+
+            header.BoundingBox = bb;
+            MeshModel.Header = header;
+        }
     }
 
 

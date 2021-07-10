@@ -100,6 +100,12 @@ namespace KitbasherEditor.Services
                 if (IsRepalcement(bone.Name, name, "leg_left_2 ", "foot_left"))
                     return bone;
 
+                if (IsRepalcement(bone.Name, name, "lowerarm_left_roll ", "lowerarm_roll_left"))
+                    return bone;
+
+                if (IsRepalcement(bone.Name, name, "upperarm_left_roll ", "upperarm_roll_left"))
+                    return bone;
+
                 var result = FindBoneBasedOnNameCommonReplacements(name, bone.Children);
                 if (result != null)
                     return result;

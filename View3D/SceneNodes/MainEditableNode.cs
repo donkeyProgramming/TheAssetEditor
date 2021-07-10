@@ -48,6 +48,7 @@ namespace View3D.SceneNodes
 
                 for (int meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
                 {
+                    meshes[meshIndex].RecomputeBoundingBox();
                     newMeshList[lodIndex][meshIndex] = meshes[meshIndex].CreateRmvSubModel();
                     newMeshList[lodIndex][meshIndex].UpdateAttachmentPointList(boneNames);
                 }

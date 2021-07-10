@@ -130,5 +130,19 @@ namespace View3D.Utility
             return Matrix.CreateRotationX(x) * Matrix.CreateRotationY(y) * Matrix.CreateRotationZ(z);
         }
 
+        public static Vector3 SanitiseScaleVector(Vector3 v)
+        {
+            if (v.X <= 0 || float.IsNaN(v.X))
+                v.X = 0.00001f;
+
+            if (v.Y <= 0 || float.IsNaN(v.Y))
+                v.Y = 0.00001f;
+
+            if (v.Z <= 0 || float.IsNaN(v.Z))
+                v.Z = 0.00001f;
+
+            return v;
+        }
+
     }
 }

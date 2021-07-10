@@ -50,13 +50,13 @@ namespace View3D.Animation
             PlayTimeInSec = file.Header.AnimationTotalPlayTimeInSec;
 
             if (file.StaticFrame != null)
-                StaticFrame = CreateKeyFrame(file.StaticFrame);
+                StaticFrame = CreateKeyFrame(file.StaticFrame, file.Bones.Length);
 
             foreach (var frame in file.DynamicFrames)
-                DynamicFrames.Add(CreateKeyFrame(frame));
+                DynamicFrames.Add(CreateKeyFrame(frame, file.Bones.Length));
         }
 
-        KeyFrame CreateKeyFrame(AnimationFile.Frame frame)
+        KeyFrame CreateKeyFrame(Frame frame, int totalBoneCount)
         {
             var output = new KeyFrame();
             foreach (var translation in frame.Transforms)
@@ -65,8 +65,7 @@ namespace View3D.Animation
             foreach (var rotation in frame.Quaternion)
                 output.Rotation.Add(new Quaternion(rotation.X, rotation.Y, rotation.Z, rotation.W));
 
-            foreach (var rotation in frame.Quaternion)
-                output.Scale.Add(Vector3.One);
+            output.Scale = Enumerable.Repeat(Vector3.One, totalBoneCount).ToList();
 
             return output;
         }

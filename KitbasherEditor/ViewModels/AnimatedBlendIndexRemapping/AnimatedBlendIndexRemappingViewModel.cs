@@ -22,12 +22,6 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
         public SkeletonBoneCollection MeshBones { get; set; }
         public SkeletonBoneCollection ParnetModelBones { get; set; }
 
-        public bool MoveMeshToFit
-        {
-            get { return _configuration.MoveMeshToFit; }
-            set { _configuration.MoveMeshToFit = value;  NotifyPropertyChanged(); }
-        }
-
         string _currentConfigPath = string.Empty;
         public string CurrentConfigPath
         {
@@ -184,6 +178,20 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
 
         public virtual void OnMappingCreated(int originalBoneIndex, int newBoneIndex)
         { }
+
+        public virtual bool Validate(out string errorText)
+        {
+            var usedBonesCount = MeshBones.GetUsedBonesCount();
+            var mapping = MeshBones.Bones.First().BuildRemappingList();
+            var numMappings = mapping.Count(x => x.IsUsedByModel);
+            if (usedBonesCount != numMappings)
+            {
+                errorText = "Not all bones mapped. This will not work as you expect and will case problems later!\nOnly do this if your REALLY know what you are doing";
+                return false;
+            }
+            errorText = "";
+            return true;
+        }
     }
 
     class FilterHelper

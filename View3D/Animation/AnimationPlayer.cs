@@ -227,7 +227,7 @@ namespace View3D.Animation
 
         public void Play(bool value) { IsPlaying = value;  }
 
-        public AnimationFrame GetCurrentFrame()
+        public AnimationFrame GetCurrentAnimationFrame()
         {
             return _currentAnimFrame;
         }

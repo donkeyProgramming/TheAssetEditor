@@ -179,6 +179,12 @@
                             IsEnabled="{Binding Tools.SkeletonReshaperCommandEnabled, UpdateSourceTrigger=PropertyChanged}">
                         <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-body-48.png"/>
                     </Button>
+
+                    <Button ToolTip="Convert selected meshes to static meshes with the current animation frame" 
+                        Command="{Binding Tools.CreateStaticMeshesCommand}"
+                            IsEnabled="{Binding Tools.CreateStaticMeshesCommandEnabled, UpdateSourceTrigger=PropertyChanged}">
+                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-fruity-ice-pop-64.png"/>
+                    </Button>
                 </ToolBar>
 
 

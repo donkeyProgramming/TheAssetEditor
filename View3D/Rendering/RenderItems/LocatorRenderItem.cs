@@ -28,15 +28,16 @@ namespace View3D.Rendering.RenderItems
 
         public void Render(GraphicsDevice device, CommonShaderParameters commonShaderParameters, Matrix ModelMatrix)
         {
-            VertexPosition[] _originalVertecies = new VertexPosition[6];
+            var _originalVertecies = new VertexPositionColor[6];
+            Color colour = Color.Red;
 
             var halfLength = _size / 2;
-            _originalVertecies[0] = new VertexPosition(_pos + new Vector3(-halfLength, 0, 0));
-            _originalVertecies[1] = new VertexPosition(_pos + new Vector3(halfLength, 0, 0));
-            _originalVertecies[2] = new VertexPosition(_pos + new Vector3(0, -halfLength, 0));
-            _originalVertecies[3] = new VertexPosition(_pos + new Vector3(0, halfLength, 0));
-            _originalVertecies[4] = new VertexPosition(_pos + new Vector3(0, 0, -halfLength));
-            _originalVertecies[5] = new VertexPosition(_pos + new Vector3(0, 0, halfLength));
+            _originalVertecies[0] = new VertexPositionColor(_pos + new Vector3(-halfLength, 0, 0), colour);
+            _originalVertecies[1] = new VertexPositionColor(_pos + new Vector3(halfLength, 0, 0), colour);
+            _originalVertecies[2] = new VertexPositionColor(_pos + new Vector3(0, -halfLength, 0), colour);
+            _originalVertecies[3] = new VertexPositionColor(_pos + new Vector3(0, halfLength, 0), colour);
+            _originalVertecies[4] = new VertexPositionColor(_pos + new Vector3(0, 0, -halfLength), colour);
+            _originalVertecies[5] = new VertexPositionColor(_pos + new Vector3(0, 0, halfLength), colour);
 
             _shader.Parameters["View"].SetValue(commonShaderParameters.View);
             _shader.Parameters["Projection"].SetValue(commonShaderParameters.Projection);

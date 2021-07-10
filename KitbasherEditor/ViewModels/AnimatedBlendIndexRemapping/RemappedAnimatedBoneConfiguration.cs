@@ -14,8 +14,5 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
         public ObservableCollection<AnimatedBone> ParentModelBones { get; set; }
        
         public string ParnetModelSkeletonName { get; set; }
-
-        public bool MoveMeshToFit { get; set; } = false;
-
     }
 }

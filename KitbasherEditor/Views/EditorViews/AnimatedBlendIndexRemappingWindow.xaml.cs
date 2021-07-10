@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
@@ -24,10 +25,16 @@ namespace KitbasherEditor.Views.EditorViews
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
+            var viewModel = DataContext as AnimatedBlendIndexRemappingViewModel;
+            var res = viewModel.Validate(out string errorText);
+            if (res == false)
+            {
+                var messageBoxResult = MessageBox.Show("Are you sure you want to do this?\n\n" + errorText + "\n\nContinue?", "Error", MessageBoxButton.OKCancel);
+                if (messageBoxResult == MessageBoxResult.Cancel)
+                    return;
+            }
+
             DialogResult = true;
-
-
-
             Close();
         }
 

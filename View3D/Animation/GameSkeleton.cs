@@ -92,7 +92,7 @@ namespace View3D.Animation
         {
             if (AnimationPlayer != null)
             {
-                var frame = AnimationPlayer.GetCurrentFrame();
+                var frame = AnimationPlayer.GetCurrentAnimationFrame();
                 SetAnimationFrame(frame);
             }
         }
@@ -132,13 +132,28 @@ namespace View3D.Animation
             return ParentBoneId[boneIndex];
         }
 
-        public List<int> GetChildBones(int parentBoneIndex)
+        public List<int> GetDirectChildBones(int parentBoneIndex)
         {
             var output = new List<int>();
             for (int i = 0; i < ParentBoneId.Length; i++)
             {
                 if (ParentBoneId[i] == parentBoneIndex)
                     output.Add(i);
+            }
+            return output;
+        }
+
+        public List<int> GetAllChildBones(int parentBoneIndex)
+        {
+            var output = new List<int>();
+            for (int i = 0; i < ParentBoneId.Length; i++)
+            {
+                if (ParentBoneId[i] == parentBoneIndex)
+                {
+                    output.Add(i);
+                    var res = GetAllChildBones(i);
+                    output.AddRange(res);
+                }
             }
             return output;
         }

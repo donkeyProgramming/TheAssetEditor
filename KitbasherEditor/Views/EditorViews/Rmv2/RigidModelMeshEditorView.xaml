@@ -7,6 +7,7 @@
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls" 
              xmlns:simple="clr-namespace:CommonControls.Simple;assembly=CommonControls"
               xmlns:enumValue="clr-namespace:Filetypes.RigidModel;assembly=FileTypes"
+             xmlns:s="http://schemas.singulink.com/xaml"
              mc:Ignorable="d" 
               d:DesignWidth="800" >
     <DockPanel LastChildFill="False">
@@ -19,8 +20,6 @@
                     <Label DockPanel.Dock="Left">:</Label>
                     <TextBox Text="{Binding General.ModelName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
                 </DockPanel>
-
-
 
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                     <Label Width="100">Vertex Count</Label>
@@ -39,12 +38,14 @@
                     <Label>:</Label>
                     <CheckBox  HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding General.DrawPivotPoint, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     <mathviews:Vector3View Width="200" VerticalContentAlignment="Center" Vector3="{Binding General.Pivot, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2,0,2,0"/>
+                    <Button Content="Copy to all meshes" Margin="3" Command="{Binding General.CopyPivotToAllMeshesCommand}"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
                     <Label Width="100">Render BBox</Label>
                     <Label>:</Label>
-                    <CheckBox  HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding DrawBoundingBox, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="False"/>
+                    <CheckBox  HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding General.DrawBoundingBox, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    <Button Content="ReCompute" Margin="3" Command="{Binding General.RecomputeBoundingBoxCommand}"/>
                 </StackPanel>
 
             </DockPanel>

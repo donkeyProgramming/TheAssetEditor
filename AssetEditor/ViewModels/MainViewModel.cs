@@ -12,6 +12,7 @@ using CommonControls.Editors.AnimationPack;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using CommonControls.Table;
+using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor;

@@ -77,5 +77,25 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
 
             return null;
         }
+
+        public int GetUsedBonesCount()
+        {
+            var count = 0;
+            foreach (var bone in Bones)
+                count += ContyBones(bone);
+
+            return count;
+        }
+
+        int ContyBones(AnimatedBone b)
+        {
+            var value = 0;
+            foreach (var child in b.Children)
+                value += ContyBones(child);
+
+            if (b.IsUsedByCurrentModel)
+                value = value + 1;
+            return value;
+        }
     }
 }

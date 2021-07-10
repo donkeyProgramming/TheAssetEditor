@@ -202,18 +202,11 @@ make animations easier to work wiot
 
 [Done-ish]Fatness slider
 [Done-ish]Fit skeleton on remapping
-	try names with _0 at when -1
 	[Done]increase size of view
-	Confirme text with mappings with -1
 	[Done]Make auto move more visible and actiate the checkbox
-	-> Mapping from self to self warning -> error at the bottow
 	
 add a way to multiselect items on model/vmd import
 	=> rigkt click context menu import
-
-Fit to skeleton -> allows for -1 in mapping better 
-
-
 
 
 * Press key to toggle "view only selected" (space)
@@ -265,26 +258,21 @@ Fit to skeleton -> allows for -1 in mapping better
 
 v10
 	Vertex type:
-		Can not change vertex type to cinematic
-		Change vertex type does not remove skeleton
+		[Done]Can not change vertex type to cinematic
 
 	Pivot point:
-		Show pivotpoint crash
-		"Copy pivot to all" feature
+		[Done]AShow pivotpoint crash
+		[Done]A"Copy pivot to all" feature
 		Round values for pivot points
 
 	Mesh Fit tool:
-		Extract to own tool
-		Realtime
-		View the skeletons
-		Toogle meshes
-		Scale
+		[Done]AExtract to own tool
+		[Done]ARealtime
+		[Done]AView the skeletons
+		[Done]AToogle meshes
+		[Done]AScale
 
-	Split mesh/grow selection
-		Speed up
 
-	Refactor:
-		Start cleaning up the direct use of rmv2 data
 
 v11
 	Mount tool:
@@ -293,6 +281,12 @@ v11
 	Tech skeleton Editor:
 		Create
 		Add bone support to the gizmo
+
+	Split mesh/grow selection
+		Speed up
+
+	Refactor:
+		Start cleaning up the direct use of rmv2 data
 
 v12
 	Campagne anim editor
@@ -305,11 +299,26 @@ v12
 
 
 Bugs:
-	Crash when displaying pivot
-	Improve pivot stuff
-	Error with unsucsessfull mapping => can not select mesh
-	Added confirm when using mapping with bad values
-	Generating lods for models with more than 4 lods
-	Boundingbox recalc
+	[Done]Texture issues when loading rome2 models
+	[Done]Crash when displaying pivot
+	[Done]Improve pivot stuff
+	[Done]Error with unsucsessfull mapping => can not select mesh
+	[Done]Added confirm when using mapping with bad values
+	[Done]Error message when mapping to and from same skeleton
+	impovements to bone mapping
+	[Done]ABoundingbox recalc
+	
+	[Done]Bug with mapping skeletons -> incorrect total weight?
+	
+	
+	[Done]Convert mesh om OK
+	[Done]Move selected bone disable
+	[Done]Move mest to fit disbale
+	[Done]Header
+	[Done]Copy scale to children button
+	[Done]Reset offsets button
+	[Done]Fix animation scale issues
+
 	Validation of VMD files
-	Bug with mapping skeletons -> incorrect total weight?
+	Generating lods for models with more than 4 lods
+	Extract animation frame to static mesh pose so models in a pose can be used for stuff

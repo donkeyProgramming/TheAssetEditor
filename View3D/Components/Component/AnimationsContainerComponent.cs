@@ -34,6 +34,14 @@ namespace View3D.Components.Component
                 _playerMap.Remove(item.First().Key);
         }
 
+        public AnimationPlayer Get(string name)
+        {
+            var hasKey = _playerMap.ContainsKey(name);
+            if (!hasKey)
+                return null;
+            return _playerMap[name];
+        }
+
         public override void Update(GameTime gameTime)
         {
             foreach (var item in _playerMap)

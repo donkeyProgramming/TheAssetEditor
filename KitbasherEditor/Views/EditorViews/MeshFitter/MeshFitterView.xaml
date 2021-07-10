@@ -3,7 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews.MeshFitter" xmlns:editorviews="clr-namespace:KitbasherEditor.Views.EditorViews" xmlns:b="http://schemas.microsoft.com/xaml/behaviors" xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls" xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls"
+             xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews.MeshFitter"
+             xmlns:editorviews="clr-namespace:KitbasherEditor.Views.EditorViews" 
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls" 
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls"
+             xmlns:s="http://schemas.singulink.com/xaml"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     
@@ -11,12 +16,13 @@
 
         <Grid DockPanel.Dock="Bottom">
             <Grid.RowDefinitions>
-                <RowDefinition Height="5"/>
+                <RowDefinition Height="6"/>
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition Height="5"/>
+                <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
@@ -27,10 +33,10 @@
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Row="0" Grid.ColumnSpan="3" Background="Gray" BorderThickness="2"/>
+            <Border Grid.Row="0" Grid.ColumnSpan="4" Background="Gray" BorderThickness="2" />
             
             <TextBlock Grid.Row="1" Grid.Column="0" Text="Root scale"/>
             <TextBlock Grid.Row="1" Grid.Column="1" Text=":"/>
@@ -42,7 +48,7 @@
 
             <TextBlock Grid.Row="2" Grid.Column="0" Text="Only move selected bone "/>
             <TextBlock Grid.Row="2" Grid.Column="1" Text=":"/>
-            <CheckBox Grid.Row="2" Grid.Column="2" IsChecked="{Binding OnlyMOveSelectedBone.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <CheckBox Grid.Row="2" Grid.Column="2" IsChecked="{Binding OnlyMOveSelectedBone.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="False"/>
 
             <TextBlock Grid.Row="3" Grid.Column="0" Text="Relative Scale:"/>
             <TextBlock Grid.Row="3" Grid.Column="1" Text=":"/>
@@ -50,7 +56,7 @@
 
             <TextBlock Grid.Row="4" Grid.Column="0" Text="Display offset"/>
             <TextBlock Grid.Row="4" Grid.Column="1" Text=":"/>
-            <mathviews:Vector3View Grid.Row="4" Grid.Column="2" Width="350" VerticalContentAlignment="Center" Vector3="{Binding General.Pivot, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2" HorizontalAlignment="Left"/>
+            <mathviews:Vector3View Grid.Row="4" Grid.Column="2" Width="350" VerticalContentAlignment="Center" Vector3="{Binding SkeletonDisplayOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2" HorizontalAlignment="Left"/>
 
             <Border Grid.Row="5" Grid.ColumnSpan="3" Background="Gray" BorderThickness="2"/>
             
@@ -69,8 +75,10 @@
                     <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
                 </b:Interaction.Behaviors>
             </TextBox>
+            <Button Grid.Row="8" Grid.Column="3" HorizontalAlignment="Left" Content="Copy to children"  Click="{s:MethodBinding CopyScaleToChildren}"/>
 
-            <Button Grid.Row="9" Grid.Column="2" Content="Reset offsets" Margin="2" IsEnabled="{Binding IsBoneSelected.Value, UpdateSourceTrigger=PropertyChanged}" />
+            <Button Grid.Row="9" Grid.Column="2" Content="Reset offsets" Margin="2" Click="{s:MethodBinding ResetOffsetTransforms}"/>
+            <Button Grid.Row="10" Grid.Column="3" HorizontalAlignment="Right" Content="Save" FontSize="20" Margin="5" Click="{s:MethodBinding SaveAndClose}" />
         </Grid>
 
         <editorviews:AnimatedBlendIndexRemappingView/>

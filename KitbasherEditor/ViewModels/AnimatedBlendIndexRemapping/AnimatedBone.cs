@@ -73,7 +73,7 @@ namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
         {
             if (bone.MappedBoneIndex != -1)
             {
-                var mapping = new IndexRemapping((byte)bone.BoneIndex, (byte)bone.MappedBoneIndex);
+                var mapping = new IndexRemapping((byte)bone.BoneIndex, (byte)bone.MappedBoneIndex, bone.IsUsedByCurrentModel);
                 output.Add(mapping);
             }
 
