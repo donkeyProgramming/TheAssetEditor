@@ -120,16 +120,16 @@ namespace View3D.Rendering.Geometry
         {
             var newIndexList = new ushort[_indexList.Length - (facesToDelete.Count * 3)];
             var writeIndex = 0;
-            for (int i = 0; i < _indexList.Length; )
+            for (int i = 0; i < _indexList.Length;)
             {
                 if (facesToDelete.Contains(i) == false)
                     newIndexList[writeIndex++] = (_indexList[i++]);
                 else
-                    i+= 3;
+                    i += 3;
             }
 
             RemoveUnusedVertexes(newIndexList);
-           
+
         }
 
         public virtual void RemoveUnusedVertexes(ushort[] newIndexList)
@@ -156,6 +156,38 @@ namespace View3D.Rendering.Geometry
 
             RebuildIndexBuffer();
             RebuildVertexBuffer();
+        }
+
+        public IGeometry CloneSubMesh(ushort[] newIndexList)
+        {
+            var mesh = this.Clone(false) as IndexedMeshGeometry<VertexType>;
+
+
+            var uniqeIndexes = newIndexList.Distinct().ToList();
+            uniqeIndexes.Sort();
+
+            var newVertexList = new List<VertexType>();
+            Dictionary<ushort, ushort> remappingTable = new Dictionary<ushort, ushort>();
+            for (ushort i = 0; i < _vertexArray.Length; i++)
+            {
+                if (uniqeIndexes.Contains(i))
+                {
+                    remappingTable[i] = (ushort)remappingTable.Count();
+                    newVertexList.Add(_vertexArray[i]);
+                }
+            }
+
+            for (int i = 0; i < newIndexList.Length; i++)
+                newIndexList[i] = remappingTable[newIndexList[i]];
+
+            mesh._indexList = newIndexList;
+            mesh._vertexArray = newVertexList.ToArray();
+
+            mesh.RebuildIndexBuffer();
+            mesh.RebuildVertexBuffer();
+
+            return mesh;
+
         }
 
         public virtual int VertexCount()

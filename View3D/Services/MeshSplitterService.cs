@@ -16,218 +16,229 @@ namespace View3D.Services
             var subModels = SplitIntoSubModels(geometry.GetIndexBuffer(), vertList);
             foreach (var subModel in subModels)
             {
-                var duplicate = geometry.Clone();
-                duplicate.RemoveUnusedVertexes(subModel.ToArray());
+                var duplicate = geometry.CloneSubMesh(subModel.ToArray());
                 output.Add(duplicate);
             }
 
             return output;
         }
 
-        public List<List<ushort>> SplitIntoSubModels(List<ushort> indexList, List<Vector3> vertextes)
+        List<List<ushort>> SplitIntoSubModels(List<ushort> indexList, List<Vector3> vertextes)
         {
-            if (indexList.Count == 0)
-                return null;
+           var selectedSubMeshes = ConverteToSubFaceObject(indexList, vertextes);
 
-            List<List<ushort>> newObjects = new List<List<ushort>>();
-            newObjects.Add(new List<ushort>(indexList.Count) { indexList[0], indexList[1], indexList[2] });
-
-            for (int i = 3; i < indexList.Count; i += 3)
-            {
-                bool isContainedInExistingObject = false;
-                foreach (var currentObject in newObjects)
+            var output = new List<List<ushort>>();
+           foreach (var item in selectedSubMeshes)
+           {
+                var faces = item.GetFaces();
+                var meshIndexes = new List<ushort>(faces.Count);
+                foreach (var face in faces)
                 {
-                    if (IsFaceInside(indexList, i, currentObject, vertextes))
-                    {
-                        isContainedInExistingObject = true;
-                        currentObject.Add(indexList[i + 0]);
-                        currentObject.Add(indexList[i + 1]);
-                        currentObject.Add(indexList[i + 2]);
-                        break;
-                    }
+                    meshIndexes.Add(indexList[face + 0]);
+                    meshIndexes.Add(indexList[face + 1]);
+                    meshIndexes.Add(indexList[face + 2]);
                 }
 
-                if (isContainedInExistingObject == false)
-                    newObjects.Add(new List<ushort>(indexList.Count) { indexList[i + 0], indexList[i + 1], indexList[i + 2] });
-            }
+                output.Add(meshIndexes);
 
-
-            // Check if any of the submeshes are connected
-            var objectList = newObjects.Select(x => new TempMesh(x, vertextes)).ToList();
-            while (CombineSubmeshes(ref objectList, vertextes)) { }
-            objectList = objectList.OrderByDescending(x => x.Size()).ToList();
-            CombineMeshesBasedOnVertex(ref objectList, vertextes);
-
-            return objectList.Select(x => x.IndexList).ToList();
+           }
+           return output;
         }
+
 
         public List<int> GrowSelection(IGeometry geometry, List<ushort> initialSelectedIndexes)
         {
             var vertextes = geometry.GetVertexList();
             var indexList = geometry.GetIndexBuffer();
+            var selectedSubMeshes = ConverteToSubFaceObject(indexList, vertextes);
 
-            List<int> newSelection = new List<int>();
-            List<ushort> activeIndexList = new List<ushort>(initialSelectedIndexes);
-           
-            bool foundSomething = true;
-            while (foundSomething)
+            var outputFaceList = new List<int>();
+            foreach (var item in selectedSubMeshes)
             {
-                foundSomething = false;
-                for (int i = 0; i < indexList.Count; i += 3)
-                {
-                    var index0 = indexList[i+0];
-                    var index1 = indexList[i+1];
-                    var index2 = indexList[i+2]; 
+                if (item.ContainsAtLeastOneIndex(initialSelectedIndexes))
+                    outputFaceList.AddRange(item.GetFaces());
+            }
 
-                    if (newSelection.Contains(i) == false)
+            return outputFaceList.Distinct().ToList();
+        }
+
+
+       
+
+        List<SubFaceObject> ConverteToSubFaceObject(List<ushort> indexList, List<Vector3> vertextes)
+        {
+            var subMeshList = new List<SubFaceObject>();
+
+            for (int i = 3; i < indexList.Count; i += 3)
+            {
+                bool isContainedInExistingObject = false;
+                foreach (var currentObject in subMeshList)
+                {
+                    if (currentObject.IsConnectedToFace(i))
                     {
-                        if (IsFaceInside(indexList, i, activeIndexList, vertextes))
-                        {
-                            newSelection.Add(i);
-                            foundSomething = true;
-                            activeIndexList.Add(index0);
-                            activeIndexList.Add(index1);
-                            activeIndexList.Add(index2);
-                        }
-                    }
+                        currentObject.AddFace(i);
+                        isContainedInExistingObject = true;
+                    };
+                }
+
+                if (isContainedInExistingObject == false)
+                {
+                    var newItem = new SubFaceObject(indexList, vertextes);
+                    newItem.AddFace(i);
+                    subMeshList.Add(newItem);
                 }
             }
 
-            return newSelection;
+            foreach (var mesh in subMeshList)
+                mesh.ComputeBoundingBox();
+            return MergeSubMeshes(subMeshList);
         }
 
-        bool IsFaceInside(List<ushort> indexBuffer, int faceId, List<ushort> currentSelection, List<Vector3> vertextes)
+        List<SubFaceObject> MergeSubMeshes(List<SubFaceObject> list)
         {
-            var index0 = indexBuffer[faceId + 0];
-            var index1 = indexBuffer[faceId + 1];
-            var index2 = indexBuffer[faceId + 2];
-
-            if (currentSelection.Contains(index0) || (currentSelection.Contains(index1)) || (currentSelection.Contains(index2)))
-                return true;
-
-            float tolerance = 0.0001f * 0.0001f;
-            if (ContainsVertex(currentSelection, index0, index1, index2, vertextes, tolerance))
-                return true;
-
-            return false;
-        }
-
-        bool CombineSubmeshes(ref List<TempMesh> meshs, List<Vector3> vertextes)
-        {
-            foreach (var outerMesh in meshs)
+            for (int i = 0; i < list.Count; i++)
             {
-                var outerMeshDistinctDistinct = outerMesh.IndexList.Distinct();
-                var outerMeshDistinctLookup = outerMeshDistinctDistinct.ToLookup(x=>x);
-                foreach (var innerMesh in meshs)
+                for (int j = 0; j < list.Count; j++)
                 {
-                    if (innerMesh == outerMesh)
+                    if (i == j)
                         continue;
 
-                    for (int i = 0; i < innerMesh.IndexList.Count(); i++)
+                    var meshA = list[i];
+                    var meshB = list[j];
+
+                    if (meshA.Overlaps(meshB))
+                        meshA.Merge(meshB);
+                }
+            }
+
+            return list.Where(x => x.GetFaceCount() != 0).ToList();
+        }
+
+
+
+        class SubFaceObject
+        {
+            //List<int> FaceIndexes;
+            //List<int> VertexIndexes; // FaceIndexes * 3
+            //BoundingBox BB;
+            //List<Vector3> Points;
+
+            List<ushort> _meshTotalIndexList;
+            List<Vector3> _meshVertexList;
+
+            List<ushort> _subMeshDistinctIndexList;
+            List<int> _faceList = new List<int>();
+            BoundingBox _bb;
+
+            public SubFaceObject(List<ushort> meshTotalIndexList, List<Vector3> meshVertexList)
+            {
+                _meshTotalIndexList = meshTotalIndexList;
+                _meshVertexList = meshVertexList;
+                _subMeshDistinctIndexList = new List<ushort>(meshTotalIndexList.Count() / 10);
+            }
+
+            public bool IsConnectedToFace(int faceIndex)
+            {
+                var index = faceIndex;
+
+                if (_subMeshDistinctIndexList.Contains(_meshTotalIndexList[index + 0]))
+                    return true;
+                if (_subMeshDistinctIndexList.Contains(_meshTotalIndexList[index + 1]))
+                    return true;
+                if (_subMeshDistinctIndexList.Contains(_meshTotalIndexList[index + 2]))
+                    return true;
+
+                return false;
+            }
+
+            public void AddFace(int faceIndex)
+            {
+                _faceList.Add(faceIndex);
+
+                var index = faceIndex;
+                if (!_subMeshDistinctIndexList.Contains(_meshTotalIndexList[index + 0]))
+                    _subMeshDistinctIndexList.Add(_meshTotalIndexList[index + 0]);
+                if (!_subMeshDistinctIndexList.Contains(_meshTotalIndexList[index + 1]))
+                    _subMeshDistinctIndexList.Add(_meshTotalIndexList[index + 1]);
+                if (!_subMeshDistinctIndexList.Contains(_meshTotalIndexList[index + 2]))
+                    _subMeshDistinctIndexList.Add(_meshTotalIndexList[index + 2]);
+            }
+
+            public bool ContainsAtLeastOneIndex(List<ushort> indexList)
+            {
+                foreach (var index in indexList)
+                {
+                    if (_subMeshDistinctIndexList.Contains(index))
+                        return true;
+                }
+                return false;
+            }
+
+            public List<int> GetFaces()
+            {
+                return _faceList.Distinct().ToList();
+            }
+
+            public int GetFaceCount()
+            {
+                return _faceList.Count();
+            }
+
+
+            public void ComputeBoundingBox()
+            {
+                var vertList = new Vector3[_subMeshDistinctIndexList.Count()];
+                for (int i = 0; i < _subMeshDistinctIndexList.Count; i++)
+                    vertList[i] = _meshVertexList[_subMeshDistinctIndexList[i]];
+                _bb = BoundingBox.CreateFromPoints(vertList);
+            }
+
+            public bool Overlaps(SubFaceObject other)
+            {
+                if (_bb.Intersects(other._bb))
+                {
+                    var selfIndexes = _subMeshDistinctIndexList;
+                    var otherIndexes = other._subMeshDistinctIndexList;
+
+                    foreach (var otherVertIndex in otherIndexes)
                     {
-                        if(outerMeshDistinctLookup.Contains(innerMesh.IndexList[i]))
-                        {
-                            outerMesh.IndexList.AddRange(innerMesh.IndexList);
-                            meshs.Remove(innerMesh);
-                            outerMesh.CreateBoundingBox(vertextes);
+
+                        float tolerance = 0.0001f * 0.0001f;
+                        if (ContainsVertex(selfIndexes, otherVertIndex, _meshVertexList, tolerance))
                             return true;
-                        }
                     }
                 }
+
+                return false;
             }
-            return false;
-        
-        }
 
-        void CombineMeshesBasedOnVertex(ref List<TempMesh> meshs, List<Vector3> vertextes)
-        {
-            for(int outerMeshIndex = 0; outerMeshIndex < meshs.Count; outerMeshIndex++)
+            public void Merge(SubFaceObject other)
             {
-                var outerMesh = meshs[outerMeshIndex];
+                _faceList.AddRange(other._faceList);
+                _faceList = _faceList.Distinct().ToList();
 
-                var outerMeshDistinctDistinct = outerMesh.IndexList.Distinct();
-                for(int innerMeshIndex = 0; innerMeshIndex < meshs.Count; innerMeshIndex++)
+                _subMeshDistinctIndexList.AddRange(other._subMeshDistinctIndexList);
+                _subMeshDistinctIndexList = _subMeshDistinctIndexList.Distinct().ToList();
+
+                ComputeBoundingBox();
+
+                other._faceList.Clear();
+                other._subMeshDistinctIndexList.Clear();
+                other._bb.Max = new Vector3(99999, 99999, 99999);
+                other._bb.Min = new Vector3(-99999, -99999, -99999);
+            }
+
+            bool ContainsVertex(IEnumerable<ushort> mesh, ushort possibleVertexIndex0, List<Vector3> vertextes, float tolerance = 0.0000001f)
+            {
+                foreach (var index in mesh)
                 {
-                    var innerMesh = meshs[innerMeshIndex];
-                    if (outerMeshIndex == innerMeshIndex)
-                        continue;
-                    if (innerMesh.Box.Intersects(outerMesh.Box))
-                    {
-                        var innerMeshDistinct = innerMesh.IndexList.Distinct();
-                        foreach (var innerIndex in innerMeshDistinct)
-                        {
-                            if (ContainsVertex(outerMeshDistinctDistinct, innerIndex, vertextes, 0.0001f * 0.0001f))
-                            {
-                                outerMesh.IndexList.AddRange(innerMesh.IndexList);
-                                meshs.Remove(innerMesh);
-                                outerMesh.CreateBoundingBox(vertextes);
-                                innerMeshIndex--;
-                                break;
-                            }
-                        }
-                    }
+                    var vert = vertextes[index];
+                    var length0 = (vert - vertextes[possibleVertexIndex0]).LengthSquared();
+                    if (length0 < tolerance)
+                        return true;
                 }
+                return false;
             }
         }
-
-        bool ContainsVertex(List<ushort> mesh, ushort possibleVertexIndex0, ushort possibleVertexIndex1, ushort possibleVertexIndex2, List<Vector3> vertextes, float tolerance = 0.0000001f )
-        {
-            foreach (var index in mesh)
-            {
-                var vert = vertextes[index];
-
-                var length0 = (vert - vertextes[possibleVertexIndex0]).LengthSquared();
-                if (length0 < tolerance)
-                    return true;
-
-                var length1 = (vert - vertextes[possibleVertexIndex1]).LengthSquared();
-                if (length1 < tolerance)
-                    return true;
-
-                var length2 = (vert - vertextes[possibleVertexIndex2]).LengthSquared();
-                if (length2 < tolerance)
-                    return true;
-            }
-            return false;
-        }
-
-        bool ContainsVertex(IEnumerable<ushort> mesh, ushort possibleVertexIndex0, List<Vector3> vertextes, float tolerance = 0.0000001f)
-        {
-            foreach (var index in mesh)
-            {
-                var vert = vertextes[index];
-                var length0 = (vert - vertextes[possibleVertexIndex0]).LengthSquared();
-                if (length0 < tolerance)
-                    return true;
-            }
-            return false;
-        }
-
-            class TempMesh
-        {
-            public BoundingBox Box;
-            public List<ushort> IndexList;
-
-            public TempMesh(List<ushort> mesh, List<Vector3> vertextes)
-            {
-                IndexList = mesh;
-                CreateBoundingBox(vertextes);
-            }
-
-            public void CreateBoundingBox(List<Vector3> vertextes)
-            {
-                var objectVertList = new Vector3[IndexList.Count];
-                for (int i = 0; i < IndexList.Count; i++)
-                    objectVertList[i] = vertextes[IndexList[i]];
-                Box = BoundingBox.CreateFromPoints(objectVertList);
-            }
-
-            public float Size()
-            {
-                var size = Box.Max - Box.Min;
-                return size.X * size.X + size.Y * size.Y + size.Z * size.Z;
-            }
-        }
-
     }
 }

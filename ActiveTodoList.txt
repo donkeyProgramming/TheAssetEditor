@@ -173,10 +173,6 @@ Skeletonbone highligerr
 Remapping vmd tool?
 Generic viewer
 
-bone mapper:
-	Show bones?
-	Fit skeleton auto scale?
-	Always show breath first
 // ----------------------------------------------
 
 WsModel auto generate when possible
@@ -275,6 +271,8 @@ v10
 
 
 v11
+	Make remapping realtime 
+
 	Mount tool:
 		Add static leg pos
 
@@ -321,4 +319,9 @@ Bugs:
 
 	Validation of VMD files
 	Generating lods for models with more than 4 lods
-	Extract animation frame to static mesh pose so models in a pose can be used for stuff
+	[Done]Extract animation frame to static mesh pose so models in a pose can be used for stuff
+
+
+	// Animation table stuff
+		- Edit
+		- Create copy from bin

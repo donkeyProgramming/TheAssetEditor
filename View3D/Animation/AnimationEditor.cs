@@ -213,6 +213,9 @@ namespace View3D.Animation
                         newKeyFrame.Position.Add(keyframe.BoneTransforms[mappingIndex].Translation);
                 }
 
+                for (int b = 0; b < skeleton.BoneCount; b++)
+                    newKeyFrame.Scale.Add(Vector3.One);
+
                 output.DynamicFrames.Add(newKeyFrame);
             } 
 

@@ -66,6 +66,7 @@ namespace View3D.Commands.Object
 
                 int counter = 0;
                 List<Rmv2MeshNode> createdMeshes = new List<Rmv2MeshNode>();
+
                 foreach (var mesh in splitMeshes)
                 {
                     var hack = _objectToSplit as Rmv2MeshNode;

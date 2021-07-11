@@ -202,7 +202,7 @@ namespace View3D.Animation
                 _currentAnimFrame = null;
                 return;
             }
-
+            //Fix this so if crash no break
             float sampleT = 0;
             float animationLengthMs = GetAnimationLengthMs();
             if (animationLengthMs != 0)

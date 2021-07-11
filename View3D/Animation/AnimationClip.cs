@@ -171,6 +171,8 @@ namespace View3D.Animation
                         newKeyframe.Rotation.Add(DynamicFrames[frameIndex].Rotation[rotationLookup.Id]);
                     else if (rotationLookup.IsStatic)
                         newKeyframe.Rotation.Add(StaticFrame.Rotation[rotationLookup.Id]);
+
+                    newKeyframe.Scale.Add(Vector3.One);
                 }
 
                 newDynamicFrames.Add(newKeyframe);

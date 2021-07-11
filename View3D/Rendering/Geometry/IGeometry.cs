@@ -29,6 +29,7 @@ namespace View3D.Rendering.Geometry
         Vector3 MeshCenter { get; }
 
         IGeometry Clone(bool includeMesh = true);
+        IGeometry CloneSubMesh(ushort[] newIndexList);
 
         void RemoveFaces(List<int> facesToDelete);
         List<Vector3> GetVertexList();
