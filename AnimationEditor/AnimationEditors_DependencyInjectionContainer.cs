@@ -1,4 +1,5 @@
-﻿using AnimationEditor.Common.BaseControl;
+﻿using AnimationEditor.CampaignAnimationCreator;
+using AnimationEditor.Common.BaseControl;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.PropCreator;
 using AnimationEditor.PropCreator.ViewModels;
@@ -16,7 +17,8 @@ namespace AnimationEditor
         {
             serviceCollection.AddTransient<PropCreatorViewModel>();
             serviceCollection.AddTransient<MountAnimationCreatorViewModel>();
-            
+            serviceCollection.AddTransient<CampaignAnimationCreatorViewModel>();
+
             serviceCollection.AddTransient<BaseAnimationView>();
         }
 
@@ -24,6 +26,7 @@ namespace AnimationEditor
         {
             factory.RegisterTool<PropCreatorViewModel, BaseAnimationView>();
             factory.RegisterTool<MountAnimationCreatorViewModel, BaseAnimationView>();
+            factory.RegisterTool<CampaignAnimationCreatorViewModel, BaseAnimationView>();
         }
     }
 }

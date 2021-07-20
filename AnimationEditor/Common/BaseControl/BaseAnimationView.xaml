@@ -6,10 +6,11 @@
              xmlns:referencemodel="clr-namespace:AnimationEditor.Common.ReferenceModel" 
              xmlns:animationplayer="clr-namespace:AnimationEditor.Common.AnimationPlayer"
              xmlns:propcreator="clr-namespace:AnimationEditor.PropCreator"
-             xmlns:mountcreator="clr-namespace:AnimationEditor.MountAnimationCreator"
+             xmlns:mountcreator="clr-namespace:AnimationEditor.MountAnimationCreator" 
+             xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls" xmlns:campaignanimationcreator="clr-namespace:AnimationEditor.CampaignAnimationCreator"
              mc:Ignorable="d" >
     <UserControl.Resources>
-     
+        <valueconverters:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Collapsed" />
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -47,8 +48,8 @@
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <referencemodel:ReferenceModelSelectionView Grid.Row="0" DataContext="{Binding MainModelView, Mode=OneTime}"/>
-            <referencemodel:ReferenceModelSelectionView Grid.Row="1" DataContext="{Binding ReferenceModelView, Mode=OneTime}"/>
+            <referencemodel:ReferenceModelSelectionView Grid.Row="0" DataContext="{Binding MainModelView, Mode=OneTime}"  Visibility="{Binding MainModelView.IsControlVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}"/>
+            <referencemodel:ReferenceModelSelectionView Grid.Row="1" DataContext="{Binding ReferenceModelView, Mode=OneTime}" Visibility="{Binding ReferenceModelView.IsControlVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}"/>
             <Rectangle Grid.Row="2" Fill="LightGray" Height="3" Margin="2,2,2,2"/>
             
             <ContentControl Grid.Row="3" Content="{Binding Editor, UpdateSourceTrigger=PropertyChanged}" >
@@ -59,6 +60,10 @@
 
                     <DataTemplate DataType="{ x:Type mountcreator:Editor}">
                         <mountcreator:MountAnimationCreatorView  />
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{ x:Type campaignanimationcreator:Editor}">
+                        <campaignanimationcreator:EditorView  />
                     </DataTemplate>
                 </ContentControl.Resources>
             </ContentControl>

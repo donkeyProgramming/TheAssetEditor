@@ -1,5 +1,6 @@
 ﻿
 using Common;
+using CommonControls.Common;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using Filetypes.RigidModel;
@@ -50,6 +51,8 @@ namespace AnimationEditor.Common.ReferenceModel
                 Data.IsSkeletonVisible = value;
             }
         }
+
+        public NotifyAttr<bool> IsControlVisible { get; set; } = new NotifyAttr<bool>(true);
 
         public ReferenceModelSelectionViewModel(PackFileService pf, AssetViewModel data, string headerName, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {

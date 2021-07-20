@@ -106,12 +106,13 @@ Bugs:
 
 
 Animations:
-	Load all 3k anims
-	Ensure faulty animations not break the program for ever
+	-->Load all 3k anims
+	-->Ensure faulty animations not break the program for ever
+	-->Update animation slots
+	-->Animation player issues
 	Create duplicate of animation bin
 	Save bin/frg
-	Update animation slots
-	Animation player issues
+
 	
 
 Kitbashing:
@@ -123,12 +124,14 @@ Kitbashing:
 	[Can not reproduce]Ogre bug when merging -> https://discord.com/channels/373745291289034763/795235087352201226/865233241328975912 => I noticed this too, if the paths have different capitalisation or the / 's are the opposite way on two ogre parts using the same texture they will not combine.
 	Default to vmd when browsing  in kitbasher -> Type filter
 	Improve remapping to handle n meshes and be realtime
-	ReTarget mesh to closest vertex 
 	Mesh fitter - Karl franze on humanoid01c
 	[Done]Improve remapping to from same skeleton message
 	Group devided meshes when large
 	[Done]Drag and drop
 	Cancel save as error -> Save with name bug to root folder
+	
+	-->ReTarget mesh to closest vertex 
+	-->CampagneAnimation creator
 
 General:
 	No packfile selected error - improve
@@ -149,6 +152,7 @@ Rendering:
 	Tint for selected faces
 	[Done]Control light direction and intensity
 	[Done]Load three kingodm shit
+	--> Change background colour 
 
 
 Animation retargeting:
@@ -159,3 +163,30 @@ Animation retargeting:
 	https://forums.ogre3d.org/viewtopic.php?t=81043
 	https://gamedev.stackexchange.com/questions/27058/how-to-programatically-retarget-animations-from-one-skeleton-to-another
 	https://dl.acm.org/doi/pdf/10.5555/1555880.1555907
+	
+	
+	
+	
+Changelog:
+	Load more texture formats (including bc5 and bc7)
+	Use mipmaps when rendering
+	Better lighting (thanks to phazer)
+	Light controls. PageUp/Down to rotete. Shift + PageUp/Down to controll brightness
+	Correctly load and display ThreeKingdom models
+	
+	Selection related actions greatly improved performance
+	Growing selection/splitting into submesh when ALT key is pressed does not auto merge overlapping vertexes (for removing Ogre hats...)
+	Drag and drop rmv2, vmd and wsmodels from treeview onto kitbasher to load
+	
+	Added help link in UI which takes you to the Wiki
+	Added possoblity to easily load ThreeKingdoms, Troy and Rome Remastered files (lots of nice animations...)
+	
+	Fixed crashes in MountEditor tool
+	
+	
+	
+	
+	
+	
+	
+	

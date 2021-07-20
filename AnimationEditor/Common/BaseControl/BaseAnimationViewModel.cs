@@ -71,6 +71,7 @@ namespace AnimationEditor.PropCreator.ViewModels
             Scene.AddCompnent(new SelectionManager(Scene));
             Scene.AddCompnent(new SelectionComponent(Scene));
             Scene.AddCompnent(new CommandExecutor(Scene));
+            Scene.AddCompnent(new LightControllerComponent(Scene));
             
 
             Scene.SceneInitialized += OnSceneInitialized;

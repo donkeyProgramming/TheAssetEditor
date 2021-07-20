@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="CampaignAnimationCreator\" />
     <Folder Include="PoseCreator\" />
   </ItemGroup>
 

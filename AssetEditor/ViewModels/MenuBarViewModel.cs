@@ -1,4 +1,5 @@
-﻿using AnimationEditor.MountAnimationCreator;
+﻿using AnimationEditor.CampaignAnimationCreator;
+using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.PropCreator.ViewModels;
 using AssetEditor.Services;
 using AssetEditor.Views.Settings;
@@ -47,6 +48,7 @@ namespace AssetEditor.ViewModels
 
         public ICommand OpenHelpCommand { get; set; }
         public ICommand OpenKitbashEditorCommand { get; set; }
+        public ICommand OpenCampaignAnimCreatorCommand { get; set; }
         public ICommand OpenPropCreatorCommand { get; set; }
         public IEditorCreator EditorCreator { get; set; }
 
@@ -63,6 +65,7 @@ namespace AssetEditor.ViewModels
             OpenAnimMetaDecocderCommand = new RelayCommand(OpenAnimMetaDecocder);
             OpenMountCreatorCommand = new RelayCommand(OpenMountCreator);
             OpenPropCreatorCommand = new RelayCommand(OpenPropCreatorEditor);
+            OpenCampaignAnimCreatorCommand = new RelayCommand(OpenCampaignAnimCreatorEditor);
 
             OpenRome2RePacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Rome_2_Remastered));
             OpenThreeKingdomsPacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.ThreeKingdoms));
@@ -147,6 +150,12 @@ namespace AssetEditor.ViewModels
         void OpenMountCreator()
         {
             var editorView = _toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            EditorCreator.CreateEmptyEditor(editorView);
+        }
+
+        void OpenCampaignAnimCreatorEditor()
+        {
+            var editorView = _toolFactory.CreateEditorViewModel<CampaignAnimationCreatorViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
     }
