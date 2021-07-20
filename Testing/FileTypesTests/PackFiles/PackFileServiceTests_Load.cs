@@ -35,7 +35,7 @@ namespace FileTypesTests.PackFiles
         public void LoadAllCaPacks()
         {
             PackFileService packFileService = new PackFileService(new PackFileDataBase(), null);
-            var result = packFileService.LoadAllCaFiles(@"Data");
+            var result = packFileService.LoadAllCaFiles(@"Data", "test");
             Assert.IsTrue(result);
         }
 

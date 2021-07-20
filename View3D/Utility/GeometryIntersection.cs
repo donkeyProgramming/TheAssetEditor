@@ -70,17 +70,24 @@ namespace View3D.Utility
         {
             faces = new List<int>();
 
-            for (int i = 0; i < geometry.GetIndexCount(); i += 3)
-            {
-                var index0 = geometry.GetIndex(i + 0);
-                var index1 = geometry.GetIndex(i + 1);
-                var index2 = geometry.GetIndex(i + 2);
+            var indexList = geometry.GetIndexBuffer();
+            var vertList = geometry.GetVertexList();
 
-                if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertexById(index0), matrix)) != ContainmentType.Disjoint)
+            var transformedVertList = new Vector3[vertList.Count];
+            for (int i = 0; i < vertList.Count; i++)
+                transformedVertList[i] = Vector3.Transform(vertList[i], matrix);
+
+            for (int i = 0; i < indexList.Count; i += 3)
+            {
+                var index0 = indexList[i + 0];
+                var index1 = indexList[i + 1];
+                var index2 = indexList[i + 2];
+
+                if (boundingFrustum.Contains(transformedVertList[index0]) != ContainmentType.Disjoint)
                     faces.Add(i);
-                else if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertexById(index1), matrix)) != ContainmentType.Disjoint)
+                else if (boundingFrustum.Contains(transformedVertList[index1]) != ContainmentType.Disjoint)
                     faces.Add(i);
-                else if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertexById(index2), matrix)) != ContainmentType.Disjoint)
+                else if (boundingFrustum.Contains(transformedVertList[index2]) != ContainmentType.Disjoint)
                     faces.Add(i);
             }
 

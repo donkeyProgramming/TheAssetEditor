@@ -4,6 +4,8 @@ using AssetEditor.Services;
 using AssetEditor.Views.Settings;
 using Common;
 using Common.ApplicationSettings;
+using Common.GameInformation;
+using CommonControls.Common;
 using CommonControls.Services;
 using CommonControls.Simple;
 using FileTypes.PackFiles.Models;
@@ -14,6 +16,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
@@ -33,10 +36,16 @@ namespace AssetEditor.ViewModels
         public ICommand OpenPackFileCommand { get; set; }
         public ICommand OpenAssetEditorFolderCommand { get; set; }
         public ICommand OpenAnimMetaDecocderCommand { get; set; }
-         public ICommand OpenMountCreatorCommand { get; set; }
+        public ICommand OpenMountCreatorCommand { get; set; }
 
-        
 
+        public ICommand OpenRome2RePacksCommand { get; set; }
+        public ICommand OpenThreeKingdomsPacksCommand { get; set; }
+        public ICommand OpenWarhammer2PacksCommand { get; set; }
+        public ICommand OpenTroyPacksCommand { get; set; }
+
+
+        public ICommand OpenHelpCommand { get; set; }
         public ICommand OpenKitbashEditorCommand { get; set; }
         public ICommand OpenPropCreatorCommand { get; set; }
         public IEditorCreator EditorCreator { get; set; }
@@ -54,6 +63,13 @@ namespace AssetEditor.ViewModels
             OpenAnimMetaDecocderCommand = new RelayCommand(OpenAnimMetaDecocder);
             OpenMountCreatorCommand = new RelayCommand(OpenMountCreator);
             OpenPropCreatorCommand = new RelayCommand(OpenPropCreatorEditor);
+
+            OpenRome2RePacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Rome_2_Remastered));
+            OpenThreeKingdomsPacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.ThreeKingdoms));
+            OpenWarhammer2PacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Warhammer2));
+            OpenTroyPacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Troy));
+
+            OpenHelpCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://tw-modding.com/index.php/Tutorial:AssetEditor") { CreateNoWindow = true }));  
         }
 
         void OpenPackFile()
@@ -65,6 +81,22 @@ namespace AssetEditor.ViewModels
                 _logger.Here().Information($"Loading pack file {dialog.FileName}");
                  if( _packfileService.Load(dialog.FileName, true) == null)
                     MessageBox.Show($"Unable to load packfiles {dialog.FileName}");
+            }
+        }
+
+        void OpenGamePacks(GameTypeEnum game)
+        {
+            var settingsService = _serviceProvider.GetService<ApplicationSettingsService>();
+            var settings = settingsService.CurrentSettings;
+            var gamePath = settings.GameDirectories.FirstOrDefault(x => x.Game == game);
+            if (gamePath == null || string.IsNullOrWhiteSpace(gamePath.Path))
+            {
+                MessageBox.Show("No path provided for game");
+                return;
+            }
+            using (new WaitCursor())
+            {
+                _packfileService.LoadAllCaFiles(gamePath.Path, GameInformationFactory.GetGameById(game).DisplayName);
             }
         }
 

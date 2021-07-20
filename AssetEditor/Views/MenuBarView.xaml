@@ -17,7 +17,12 @@
                 <MenuItem Header="Save" IsEnabled="False"/>
                 <MenuItem Header="Save as" IsEnabled="False"/>
                 <Separator/>
-                <MenuItem Header="Settings"/>
+                <MenuItem Header="Load all game packfiles">
+                    <MenuItem Header="Rome2 Remastered" Command="{Binding MenuBar.OpenRome2RePacksCommand}"/>
+                    <MenuItem Header="Three Kingdoms" Command="{Binding MenuBar.OpenThreeKingdomsPacksCommand}"/>
+                    <MenuItem Header="Warhammer 2" Command="{Binding MenuBar.OpenWarhammer2PacksCommand}"/>
+                    <MenuItem Header="Troy" Command="{Binding MenuBar.OpenTroyPacksCommand}"/>
+                </MenuItem>
                 <Separator/>
                 <MenuItem Header="_Exit" />
             </MenuItem>
@@ -40,6 +45,11 @@
                 <MenuItem Header="Pose Creator" Command="{Binding MenuBar.OpenPropCreatorCommand}" IsEnabled="False"/>
                 <MenuItem Header="Animation re-targeting Editor" Command="{Binding MenuBar.OpenKitbashEditorCommand}" IsEnabled="False"/>
                 <MenuItem Header="AnimMeta Decoder" Command="{Binding MenuBar.OpenAnimMetaDecocderCommand}" IsEnabled="true"/>
+            </MenuItem>
+
+            <MenuItem Header="Help">
+                <MenuItem Header="Help" Command="{Binding MenuBar.OpenHelpCommand}" IsEnabled="true"/>
+                <MenuItem Header="About"/>
             </MenuItem>
         </Menu>
     </DockPanel>

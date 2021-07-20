@@ -57,6 +57,9 @@
     <None Update="ContentOutput\Textures\Phazer\Brdf_rgba32f_raw.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="ContentOutput\Textures\Phazer\rad_sqwantani_bgra8.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="ContentOutput\Textures\Phazer\rustig_koppie_DiffuseHDR.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

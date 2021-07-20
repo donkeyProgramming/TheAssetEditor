@@ -1,5 +1,7 @@
 ﻿using Common;
 using Common.ApplicationSettings;
+using CommonControls.Common;
+using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using FileTypes.PackFiles.Models;
 using KitbasherEditor.Services;
@@ -8,6 +10,7 @@ using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
+using System.IO;
 using System.Windows;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
@@ -19,7 +22,7 @@ using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels
 {
-    public class KitbasherViewModel : NotifyPropertyChangedImpl, IKitBashEditor
+    public class KitbasherViewModel : NotifyPropertyChangedImpl, IKitBashEditor, IDropTarget
     {
         ILogger _logger = Logging.Create<KitbasherViewModel>();
         PackFileService _packFileService;
@@ -66,6 +69,7 @@ namespace KitbasherEditor.ViewModels
             Scene.AddCompnent(new GridComponent(Scene));
             Scene.AddCompnent(new AnimationsContainerComponent(Scene));
             Scene.AddCompnent(new ViewOnlySelectedComponent(Scene));
+            Scene.AddCompnent(new LightControllerComponent(Scene));
             
             Animation = new AnimationControllerViewModel(Scene, _packFileService, _skeletonAnimationLookUpHelper);
             
@@ -144,6 +148,23 @@ namespace KitbasherEditor.ViewModels
         public bool HasUnsavedChanges()
         {
             return false;
+        }
+
+        public bool AllowDrop(TreeNode node)
+        {
+            if (node != null && node.NodeType == NodeType.File)
+            {
+                var extention = Path.GetExtension(node.Name).ToLower();
+                if (extention == ".rigid_model_v2" || extention == ".wsmodel" || extention == ".variantmeshdefinition")
+                    return true;
+            }
+            return false;
+        }
+
+        public bool Drop(TreeNode node)
+        {
+            _modelLoader.LoadReference(node.Item as PackFile);
+            return true;
         }
     }
 }

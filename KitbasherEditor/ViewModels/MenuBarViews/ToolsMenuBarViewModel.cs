@@ -9,6 +9,7 @@ using KitbasherEditor.ViewModels.BmiEditor;
 using KitbasherEditor.ViewModels.MeshFitter;
 using KitbasherEditor.Views.EditorViews;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,7 @@ using View3D.Commands.Object;
 using View3D.Commands.Vertex;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
+using View3D.Components.Input;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Services;
@@ -36,6 +38,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         ViewOnlySelectedComponent _viewOnlySelectedComp;
         PackFileService _packFileService;
         SkeletonAnimationLookUpHelper _skeletonHelper;
+        WindowKeyboard _keyboard;
 
         public ICommand DivideSubMeshCommand { get; set; }
         public ICommand MergeObjectCommand { get; set; }
@@ -104,11 +107,12 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         bool _createStaticMeshesCommandEnabled = false;
         public bool CreateStaticMeshesCommandEnabled { get => _createStaticMeshesCommandEnabled; set => SetAndNotify(ref _createStaticMeshesCommandEnabled, value); }
 
-        public ToolsMenuBarViewModel(IComponentManager componentManager, ToolbarCommandFactory commandFactory, PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper)
+        public ToolsMenuBarViewModel(IComponentManager componentManager, ToolbarCommandFactory commandFactory, PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper, WindowKeyboard keyboard)
         {
             _packFileService = packFileService;
             _componentManager = componentManager;
             _skeletonHelper = skeletonHelper;
+            _keyboard = keyboard;
 
             DivideSubMeshCommand = new RelayCommand(DivideSubMesh);
             MergeObjectCommand = commandFactory.Register(new RelayCommand(MergeObjects), Key.M, ModifierKeys.Control);
@@ -184,7 +188,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         void DivideSubMesh() 
         {
             if (_selectionManager.GetState() is ObjectSelectionState objectSelectionState)
-                _objectEditor.DivideIntoSubmeshes(objectSelectionState);
+                _objectEditor.DivideIntoSubmeshes(objectSelectionState, !_keyboard.IsKeyDown(Key.LeftAlt));
             if (_selectionManager.GetState() is FaceSelectionState faceSelectionState)
                 _faceEditor.DuplicatedSelectedFacesToNewMesh(faceSelectionState, true);
         }
@@ -223,7 +227,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         void ExpandFaceSelection()
         {
-            _faceEditor.GrowSelection(_selectionManager.GetState() as FaceSelectionState);
+            _faceEditor.GrowSelection(_selectionManager.GetState() as FaceSelectionState, !_keyboard.IsKeyDown(Key.LeftAlt));
         }
          
         void GroupItems()

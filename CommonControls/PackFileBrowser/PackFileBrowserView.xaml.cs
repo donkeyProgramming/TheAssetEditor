@@ -31,6 +31,47 @@ namespace CommonControls.PackFileBrowser
             set { SetValue(CustomContextMenuProperty, value); }
         }
 
+
+        private void TreeView_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                TreeViewItem item = (TreeViewItem)sender;
+
+                item.Focusable = true;
+                item.Focus();
+                item.Focusable = false;
+
+                _lastMouseDown = e.GetPosition(tvParameters);
+            }
+        }
+        Point _lastMouseDown;
+        TreeNode draggedItem;
+
+        private void treeView_MouseMove(object sender, MouseEventArgs e)
+        {
+            try
+            {
+                if (e.LeftButton == MouseButtonState.Pressed)
+                {
+                    Point currentPosition = e.GetPosition(tvParameters);
+
+                    if ((Math.Abs(currentPosition.X - _lastMouseDown.X) > 10.0) ||
+                        (Math.Abs(currentPosition.Y - _lastMouseDown.Y) > 10.0))
+                    {
+                        draggedItem = tvParameters.SelectedItem as TreeNode;
+                        if (draggedItem != null)
+                        {
+                            DragDropEffects finalDropEffect = DragDrop.DoDragDrop(tvParameters, tvParameters.SelectedValue, DragDropEffects.Move);
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
         public static readonly DependencyProperty CustomContextMenuProperty = DependencyProperty.Register("CustomContextMenu", typeof(ContextMenu), typeof(PackFileBrowserView), new UIPropertyMetadata(null));
     }
 

@@ -55,11 +55,11 @@ namespace View3D.Components.Component
             }
         }
 
-        public void DivideIntoSubmeshes(ObjectSelectionState objectSelectionState)
+        public void DivideIntoSubmeshes(ObjectSelectionState objectSelectionState, bool combineOverlappingVertexes)
         {
             if (objectSelectionState.GetSingleSelectedObject() is IEditableGeometry drawableNode)
             {
-                var command = new DivideObjectIntoSubmeshesCommand(drawableNode);
+                var command = new DivideObjectIntoSubmeshesCommand(drawableNode, combineOverlappingVertexes);
                 _commandManager.ExecuteCommand(command);
             }
         }

@@ -177,7 +177,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             config.ParentModelBones = AnimatedBone.CreateFromSkeleton(newSkeletonFile);
 
             if (targetSkeletonName == existingSkeltonName)
-                MessageBox.Show("Trying to map to and from the same skeleton. This does not really make any sense in most cases.", "Error", MessageBoxButton.OK);
+                MessageBox.Show("Trying to map to and from the same skeleton. This does not really make any sense if you are trying to make the mesh fit an other skeleton.", "Error", MessageBoxButton.OK);
 
             AnimatedBlendIndexRemappingWindow window = new AnimatedBlendIndexRemappingWindow()
             {

@@ -169,11 +169,11 @@ namespace Filetypes.RigidModel
 
             ModelSize = +nonMeshSize +
                 (uint)
-                ((RmvMesh.GetVertexSize(VertextType) * VertexCount) +
+                ((RmvMesh.GetVertexSize(VertextType, 7) * VertexCount) +
                 (sizeof(ushort) * FaceCount));
 
             VertexOffset = nonMeshSize;
-            FaceOffset = nonMeshSize + (uint)(RmvMesh.GetVertexSize(VertextType) * VertexCount);
+            FaceOffset = nonMeshSize + (uint)(RmvMesh.GetVertexSize(VertextType, 7) * VertexCount);
 
             BoundingBox.Recompute(mesh);
         }
@@ -239,17 +239,19 @@ namespace Filetypes.RigidModel
         public BaseVertex[] VertexList { get; set; }
         public ushort[] IndexList;
         
-
-        public static int GetVertexSize(VertexFormat vertexFormat)
+        public static int GetVertexSize(VertexFormat vertexFormat, uint modelVersion)
         {
+            var extraSize = 0;
+            if (modelVersion == 8)
+                extraSize = 4;
             switch (vertexFormat)
             {
                 case VertexFormat.Default:
                     return ByteHelper.GetSize(typeof(DefaultVertex.Data));
                 case VertexFormat.Weighted:
-                    return ByteHelper.GetSize(typeof(WeightedVertex.Data));
+                    return ByteHelper.GetSize(typeof(WeightedVertex.Data)) + extraSize;
                 case VertexFormat.Cinematic:
-                    return ByteHelper.GetSize(typeof(CinematicVertex.Data));
+                    return ByteHelper.GetSize(typeof(CinematicVertex.Data)) + extraSize;
             }
 
             throw new Exception($"Unkown vertex format - {vertexFormat}");
@@ -273,9 +275,9 @@ namespace Filetypes.RigidModel
                 writer.Write(IndexList[i]);
         }
 
-        public RmvMesh(byte[] data, VertexFormat vertexFormat, int vertexStart, uint vertexCount, int faceStart, uint faceCount)
+        public RmvMesh(byte[] data, uint modelVersion, VertexFormat vertexFormat, int vertexStart, uint vertexCount, int faceStart, uint faceCount)
         {
-            var vertexSize = GetVertexSize(vertexFormat);
+            var vertexSize = GetVertexSize(vertexFormat, modelVersion);
 
             VertexList = new BaseVertex[vertexCount]; 
             for (int i = 0; i < vertexCount; i++)
@@ -323,14 +325,14 @@ namespace Filetypes.RigidModel
         public RmvMesh Mesh { get; set; }
         public string ParentSkeletonName { get; set; }    // Not part of the model definition
 
-        public RmvSubModel(byte[] dataArray, int offset, string skeletonName)
+        public RmvSubModel(byte[] dataArray, int offset, uint modelVersion, string skeletonName)
         {
             _modelStart = offset;
             ParentSkeletonName = skeletonName;
             Header = LoadHeader(dataArray);
             AttachmentPoints = LoadAttachmentPoints(dataArray);
             Textures = LoadTextures(dataArray);
-            Mesh = LoadMesh(dataArray);
+            Mesh = LoadMesh(dataArray, modelVersion);
         }
 
         public RmvSubModel()
@@ -379,13 +381,13 @@ namespace Filetypes.RigidModel
             return null;
         }
 
-        RmvMesh LoadMesh(byte[] dataArray)
+        RmvMesh LoadMesh(byte[] dataArray, uint modelVersion)
         {
             var vertexStart =  Header.VertexOffset + _modelStart; 
             var faceStart = Header.FaceOffset + _modelStart;
 
             AlphaSettings = ByteHelper.ByteArrayToStructure<MeshAlphaSettings>(dataArray, (int)vertexStart - 8);
-            return new RmvMesh(dataArray, Header.VertextType, (int)vertexStart, Header.VertexCount, (int)faceStart, Header.FaceCount);
+            return new RmvMesh(dataArray, modelVersion, Header.VertextType, (int)vertexStart, Header.VertexCount, (int)faceStart, Header.FaceCount);
         }
 
        public RmvSubModel Clone()

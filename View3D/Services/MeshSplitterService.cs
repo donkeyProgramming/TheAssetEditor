@@ -9,11 +9,11 @@ namespace View3D.Services
 {
     public class MeshSplitterService
     {
-        public List<IGeometry> SplitMesh(IGeometry geometry)
+        public List<IGeometry> SplitMesh(IGeometry geometry, bool combineOverlappingVertexes)
         {
             List<IGeometry> output = new List<IGeometry>();
             var vertList = geometry.GetVertexList();
-            var subModels = SplitIntoSubModels(geometry.GetIndexBuffer(), vertList);
+            var subModels = SplitIntoSubModels(geometry.GetIndexBuffer(), vertList, combineOverlappingVertexes);
             foreach (var subModel in subModels)
             {
                 var duplicate = geometry.CloneSubMesh(subModel.ToArray());
@@ -23,9 +23,9 @@ namespace View3D.Services
             return output;
         }
 
-        List<List<ushort>> SplitIntoSubModels(List<ushort> indexList, List<Vector3> vertextes)
+        List<List<ushort>> SplitIntoSubModels(List<ushort> indexList, List<Vector3> vertextes, bool combineOverlappingVertexes)
         {
-           var selectedSubMeshes = ConverteToSubFaceObject(indexList, vertextes);
+           var selectedSubMeshes = ConverteToSubFaceObject(indexList, vertextes, combineOverlappingVertexes);
 
             var output = new List<List<ushort>>();
            foreach (var item in selectedSubMeshes)
@@ -45,12 +45,11 @@ namespace View3D.Services
            return output;
         }
 
-
-        public List<int> GrowSelection(IGeometry geometry, List<ushort> initialSelectedIndexes)
+        public List<int> GrowFaceSelection(IGeometry geometry, List<ushort> initialSelectedIndexes, bool combineOverlappingVertexes)
         {
             var vertextes = geometry.GetVertexList();
             var indexList = geometry.GetIndexBuffer();
-            var selectedSubMeshes = ConverteToSubFaceObject(indexList, vertextes);
+            var selectedSubMeshes = ConverteToSubFaceObject(indexList, vertextes, combineOverlappingVertexes);
 
             var outputFaceList = new List<int>();
             foreach (var item in selectedSubMeshes)
@@ -63,9 +62,7 @@ namespace View3D.Services
         }
 
 
-       
-
-        List<SubFaceObject> ConverteToSubFaceObject(List<ushort> indexList, List<Vector3> vertextes)
+        List<SubFaceObject> ConverteToSubFaceObject(List<ushort> indexList, List<Vector3> vertextes, bool combineOverlappingVertexes)
         {
             var subMeshList = new List<SubFaceObject>();
 
@@ -91,6 +88,10 @@ namespace View3D.Services
 
             foreach (var mesh in subMeshList)
                 mesh.ComputeBoundingBox();
+
+            if (combineOverlappingVertexes == false)
+                return subMeshList;
+
             return MergeSubMeshes(subMeshList);
         }
 

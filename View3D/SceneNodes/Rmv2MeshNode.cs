@@ -64,6 +64,8 @@ namespace View3D.SceneNodes
             {
                 Effect = new PbrShader(resourceLib);
                 Texture2D diffuse = LoadTexture(TexureType.Diffuse);
+                if(diffuse == null)
+                    diffuse = LoadTexture(TexureType.Diffuse_alternative);
                 Texture2D specTexture = LoadTexture(TexureType.Specular);
                 Texture2D normalTexture = LoadTexture(TexureType.Normal);
                 Texture2D glossTexture = LoadTexture(TexureType.Gloss);
@@ -82,10 +84,6 @@ namespace View3D.SceneNodes
                 return resourceLib.LoadTexture(texture.Value.Path);
             }
         }
-
-
-
-
 
         public IShader Effect { get; set; }
         public int LodIndex { get; set; } = -1;
@@ -173,7 +171,6 @@ namespace View3D.SceneNodes
 
             if (Effect is IShaderTextures tetureEffect)
                 tetureEffect.UseAlpha = MeshModel.AlphaSettings.Mode == AlphaMode.Alpha_Test;
-
             renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeoRenderItem() { Geometry = Geometry, ModelMatrix =  ModelMatrix, Shader = Effect });
 
             if (DisplayPivotPoint)

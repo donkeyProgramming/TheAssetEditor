@@ -148,7 +148,7 @@ namespace CommonControls.Services
             return pack;
         }
 
-        public bool LoadAllCaFiles(string gameDataFolder)
+        public bool LoadAllCaFiles(string gameDataFolder, string gameName)
         {
             try
             {
@@ -176,7 +176,7 @@ namespace CommonControls.Services
                     }
                 }
 
-                PackFileContainer caPackFileContainer = new PackFileContainer("All CA packs");
+                PackFileContainer caPackFileContainer = new PackFileContainer("All CA packs - " + gameName);
                 caPackFileContainer.IsCaPackFile = true;
                 var packFilesOrderedByGroup = packList
                     .GroupBy(x => x.Header.LoadOrder)

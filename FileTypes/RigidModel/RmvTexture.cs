@@ -10,6 +10,7 @@ namespace Filetypes.RigidModel
     public enum TexureType
     {
         Diffuse = 0,
+        Diffuse_alternative = 27,
         Normal = 1,
         Mask = 3,
         Ambient_occlusion = 5,

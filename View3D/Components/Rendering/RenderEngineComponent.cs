@@ -29,7 +29,6 @@ namespace View3D.Components.Rendering
 
     public class RenderEngineComponent : BaseComponent, IDisposable
     {
-
         RasterizerState _wireframeState;
         RasterizerState _selectedFaceState;
 
@@ -37,8 +36,10 @@ namespace View3D.Components.Rendering
 
         Dictionary<RenderBuckedId, List<IRenderItem>> _renderItems = new Dictionary<RenderBuckedId, List<IRenderItem>>();
 
-        public RenderMode RenderMode { get; set; } = RenderMode.Cinematic;
+        public float LightRotationDegrees { get; set; } = 180;
+        public float LightIntensityMult { get; set; } = 6;
 
+        public RenderMode RenderMode { get; set; } = RenderMode.Cinematic;
 
         public RenderEngineComponent(WpfGame game) : base(game)
         {
@@ -65,7 +66,6 @@ namespace View3D.Components.Rendering
 
             _camera = GetComponent<ArcBallCamera>();
 
-
             base.Initialize();
         }
 
@@ -86,8 +86,6 @@ namespace View3D.Components.Rendering
 
         public override void Draw(GameTime gameTime)
         {
-            //GraphicsDevice.Clear(Color.CornflowerBlue);
-
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
@@ -97,7 +95,8 @@ namespace View3D.Components.Rendering
                 View = _camera.ViewMatrix,
                 CameraPosition = _camera.Position,
                 CameraLookAt = _camera.LookAt,
-                EnvRotate = 0
+                LightRotationRadians = MathHelper.ToRadians(LightRotationDegrees),
+                LightIntensityMult = LightIntensityMult
             };
 
             foreach (var item in _renderItems[RenderBuckedId.Normal])

@@ -22,7 +22,8 @@ namespace View3D.Commands.Object
     class DivideObjectIntoSubmeshesCommand : CommandBase<DivideObjectIntoSubmeshesCommand>
     {
         IEditableGeometry _objectToSplit;
-       
+        bool _combineOverlappingVertexes;
+
         GroupNode _newGroupNode;
 
         IEditableMeshResolver _editableMeshResolver;
@@ -31,9 +32,10 @@ namespace View3D.Commands.Object
         ISelectionState _originalSelectionState;
         ResourceLibary _resourceLib;
 
-        public DivideObjectIntoSubmeshesCommand(IEditableGeometry objectToSplit)
+        public DivideObjectIntoSubmeshesCommand(IEditableGeometry objectToSplit, bool combineOverlappingVertexes)
         {
             _objectToSplit = objectToSplit;
+            _combineOverlappingVertexes = combineOverlappingVertexes;
         }
 
         public override string GetHintText()
@@ -56,7 +58,7 @@ namespace View3D.Commands.Object
             using (new WaitCursor())
             {
                 var meshService = new MeshSplitterService();
-                var splitMeshes = meshService.SplitMesh(_objectToSplit.Geometry);
+                var splitMeshes = meshService.SplitMesh(_objectToSplit.Geometry, _combineOverlappingVertexes);
                 _logger.Here().Information($"{splitMeshes.Count} meshes generated from splitting");
 
                 var parent = _objectToSplit.Parent;

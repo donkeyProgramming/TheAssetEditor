@@ -1,134 +1,16 @@
-Feature list:
-	Kitbash editor:
-		Tools:
 
-			[DONE]Generate lods
-				Ui ratio setting values 
-				
-			Validate logic before save 
-			Validate tool
-			Combining all items in a group should remove the group	
-			
-		Pivot:
-			Edit
-			Display
-			
-		General:
-			set all not ediable to readonly ui
-			Waiting mouse when doing command
-			Profile grow selection
-			Remove animation invert by fixing veiw matrix
-			Delete undo history
-			Select vertex w ith mouse click
-			Make sure textures actually work
-			Skelton with good descriptive names 
-			Save packfile cleanup edited
-			Save packfile handle refs to open editors and memory streams?
-			All uis should spawn at the center
-			Open material files
-			Directory copy name
-			Bounding box calculations
-			Changing animation for duplicate goes boom. Undo for mapping needed
-				
-
-	General:
-		TreeView:
-			Create new file => VMD, XML, TXT
-			Right click rmv2 model files => Edit	
-			
-		Other:
-			Prompt if unsaved changes
-			Recently used files
-	
-	
-	3d Preview tool:
-		Make one...
-	
-Known bugs:
-	[DONE]Select face, then swap to vertex mode, need to call update before draw error
-	[DONE]Bug with selection in rotation mode, can not select when an axis is active
-	[DONE]selecting mesh while transforming the gizmo causes undo to be correct
-	[DONE]Gizmo not rendering correctly behind other meshes -> always render last?
-	[DONE]Splitting mesh sets wrong offset for gizmo before moved once
-	[DONE]Ctrl to multi deselect not working
-	[DONE]Selecting mesh does not select in sidebar
-	[DONE]Using the translate view tool does not make an undo stack
-	[DONE]selecting reference mesh causes slowdown and animation change! 
-	[DONE]Selection issues in sceneexplorer
-	[DONE]Pivot not correct after duplicate of object
-	[DONE]Remapping head to lion to h-elf creates index out of range error.  Why?
-	[DONE]Saving 2x does not work for text files
-	[DONE] Improve grouping features part 1
-	[DONE Dont crash if missing ca file
-	[DONE] Lod for groups not working
-	[DONE] Lod generation loosing animation information
-	[DONE] Normalize vectors on save	
-	[DONE]Skeleton meshes with 5 lods being unsaveable
-	[DONE] Mesh and submesh produces large models	
-	[DONE] Packfile save issue
-	[DONE]Handle Normals correctly when transforming
-	[DONE]Meshes not becomming editable bug
-	[DONE] Lock for edit
-	[DONE]Load large models bug
-	[DONE]Camera full zome issue
-	[DONE] Treeview scroll to top
-	[DONE]TreeView reflecting scene selection
-	[DONE] Change animation vertex type 
-	[DONE] Lod generation bug causing rigging to fail
-	[DONE] Fix attachment points on export
-	[DONE] Texture paths 
-	[DONE] Attachment points 
-	[DONE] Pivot point stuff
-	[Done] Convert vertex type -> default
-	[Done] Vertex type	-> Needs more testing 
-	[Done] Mapping for duplicates 
-	[Done] Display and edit pivot point
-	[Done] Attachmentpoints
-	[Done]Reduce mesh button
-	[Done]Group/ungroup buttons on tool bar, group when only one item selected
-	[Done]bonewiehgth for lods for default vertex type
-	[Done] SAveAs with no packfile created - null exception
-	[Done] Remove attachment point fix button
-	[Done] More group stuff
-	[Done]Change group type
-	[Done] Load gyrobomber and fix crash - No crash?
-	[Done] Generate ws model layout
-	[Done] Can not load crossbow men -> Broken variant mesh
 	Selection manager can not select over gizmo when multiselecting
 	Gizmo behaves strangly when camera look d
 	irectly forward towards model
 	Selecting not use texture, then deslecting and selecing again gives wrong checkbox value	
 
 
-Ensure all components is removed when exiting
-	* When looking for files, search ca last -> textures, meshes
-	* Loading advance vmds
-	* Bondingbox display
-	* boundingbox recalc 
-	* Make editable as group - import lods
-	* Animation modelling
-	* TreeView multiselect
-	* Disable hotkeys when 3d view not active
-	* Disable everything in the UI that is not actually implemented
-	* Improve grouping features part 2 - Auto ungroup on combine
-	* Improve grouping features part 2 - Save name so multiple refs can be open
-	* Sometimes undo for vertex movement does not work
-	* splitting repanse removes parts 
-	* Quality of life changes for skeleton remapping tool
-		- Save thingy actually working
-		- Duplicate mesh teaking stuff from, so skeleton names does not change for duplicated meshes
-	* Unsaved changes, do you want to exit?	
-	* When playing, attach items to props
-	* Saving mapping does not work when loading it back in
-	* Converte to weighted 4 vertex type
+
 	
 
 
 Quality of life:
-	Flip mesh
 	Skeleton information view 
-	Snap mesh to skeleteon when mapping
-	Improved ws model generation (Facncy mode)
 	about box - Dont break eula
 	Save taxturepaths with slash other way
 	Null terminated string somewhere?
@@ -160,93 +42,7 @@ Animation tool:
 		Easy to work on large datasets
 		Create weapon anims 
 
-// ---------------------
 
-
-
-Attach to vertex
-Extract new mesh from selection
-Enter works on prompts
-Dropdown for search
-Mouse focus on search for browser
-Skeletonbone highligerr
-Remapping vmd tool?
-Generic viewer
-
-// ----------------------------------------------
-
-WsModel auto generate when possible
-Wsmodel make editable context menu
-Extract animated pose to mesh
-auto merge meshes that can be merged 
-Cooler metafile editor
-Skeleton editor
-Support for more game
-Anim prop editor 
-Clean up animation system
-Flip the view 
-make animations easier to work wiot
-
-[DONE]Key to only view selected
-[DONE]Shift to add to selection
-[DONE]Extract mesh from group context menu
-[DONE]Remove from refslot context menu
-[DONE]Wsmodel view toggle not working
-[DONE]Escape to close open file browser
-[DONE]Allow undo of mapping
-[Done]Hotkey descriptions 
-
-[Done-ish]Fatness slider
-[Done-ish]Fit skeleton on remapping
-	[Done]increase size of view
-	[Done]Make auto move more visible and actiate the checkbox
-	
-add a way to multiselect items on model/vmd import
-	=> rigkt click context menu import
-
-
-* Press key to toggle "view only selected" (space)
-* Shift changed to add to selected, instead of being an or operation
-* Right clicking on mesh in a group gives the option of ungrouping it
-* Added remove option to Slot and Slots in the tree view for reference meshes
-* Wsmodels are now toggled correctly in the tree view
-* Re-Rigging can now be undone with ctrl+z
-* Escape key closes the open window when trying to add a new reference
-* Hot key description added to all items
-* Some other bug fixes
-
-* Bmi tool added - Edit volume on a per bone basis 
-* Mount animation tool added - Create new mount animations for pretty much anything
-* "Tutorials" created. Some help would be greatly appreciated!  https://tw-modding.com/index.php/Tutorial:AssetEditor
-
-
-------------------------------
-
-[Done] Animations from multiple pack files
-[Done] Animation packs not just name the same as default
-[Done] Lots of minor animation bugs
-[Done] Auto generate WS models completly
-[Done] Ws model make editable 
-[Done] Error/warning window for combining meshes and fragment/anim generation 
-[Done] RegEx for file pack file browser
-[Done] Auto expand OpenFile dialog results when less then 50 hits
-[Done] View Tech skeletons
-[Done] New version check
-
--> Remap -1 error box
--> Move mesh fit out of remapping 
--> 
-
--> Create fragment/bin/animpack
-	-> View/Edit? Fuck...
-	-> Validate files found
--> Import multiple ref
--> Make loop work for animations in mount tool
--> Make kitbash tool work from tool list 
-
-
--> Extract selected mesh 
--> Speed up mesh grow/split
 
 
 
@@ -297,31 +93,69 @@ v12
 
 
 Bugs:
-	[Done]Texture issues when loading rome2 models
-	[Done]Crash when displaying pivot
-	[Done]Improve pivot stuff
-	[Done]Error with unsucsessfull mapping => can not select mesh
-	[Done]Added confirm when using mapping with bad values
-	[Done]Error message when mapping to and from same skeleton
-	impovements to bone mapping
-	[Done]ABoundingbox recalc
-	
-	[Done]Bug with mapping skeletons -> incorrect total weight?
-	
-	
-	[Done]Convert mesh om OK
-	[Done]Move selected bone disable
-	[Done]Move mest to fit disbale
-	[Done]Header
-	[Done]Copy scale to children button
-	[Done]Reset offsets button
-	[Done]Fix animation scale issues
-
 	Validation of VMD files
 	Generating lods for models with more than 4 lods
-	[Done]Extract animation frame to static mesh pose so models in a pose can be used for stuff
 
 
-	// Animation table stuff
-		- Edit
-		- Create copy from bin
+
+
+
+
+	
+
+
+
+Animations:
+	Load all 3k anims
+	Ensure faulty animations not break the program for ever
+	Create duplicate of animation bin
+	Save bin/frg
+	Update animation slots
+	Animation player issues
+	
+
+Kitbashing:
+	Selection:
+		[DONE]Selection speedup
+		[DONE]Dont auto merge "submeshes" when alt is pressed
+		Select based on texture?
+	Edit with fallof when moving vertexes?
+	[Can not reproduce]Ogre bug when merging -> https://discord.com/channels/373745291289034763/795235087352201226/865233241328975912 => I noticed this too, if the paths have different capitalisation or the / 's are the opposite way on two ogre parts using the same texture they will not combine.
+	Default to vmd when browsing  in kitbasher -> Type filter
+	Improve remapping to handle n meshes and be realtime
+	ReTarget mesh to closest vertex 
+	Mesh fitter - Karl franze on humanoid01c
+	[Done]Improve remapping to from same skeleton message
+	Group devided meshes when large
+	[Done]Drag and drop
+	Cancel save as error -> Save with name bug to root folder
+
+General:
+	No packfile selected error - improve
+	Enter trigger search in browse dialog
+	!Multiple schemas for animation slots
+	[Done]Load other games
+		[Done]Add 3 kingdoms
+		[Done]Add troy 
+		[Done]Add rome remastered
+	Save packfile memory error?
+	[Done]Help link
+	
+
+Rendering:
+	[Done]Mipmaps
+	[Done]Load all texture formats
+	[Done]try out new image from phazer
+	Tint for selected faces
+	[Done]Control light direction and intensity
+	[Done]Load three kingodm shit
+
+
+Animation retargeting:
+	Use pose
+	https://www.youtube.com/watch?v=xy9aLbZLdeA
+	https://www.youtube.com/watch?v=GIY46ckPgco
+	https://github.com/get-rad/unrealLLsample_31
+	https://forums.ogre3d.org/viewtopic.php?t=81043
+	https://gamedev.stackexchange.com/questions/27058/how-to-programatically-retarget-animations-from-one-skeleton-to-another
+	https://dl.acm.org/doi/pdf/10.5555/1555880.1555907

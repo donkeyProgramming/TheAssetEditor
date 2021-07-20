@@ -125,7 +125,7 @@
 
                 <!-- Object selection-->
                 <ToolBar  Visibility="{Binding Tools.ShowObjectTools, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
-                    <Button ToolTip="Divide selected mesh into submeshes" 
+                    <Button ToolTip="Divide selected mesh into submeshes\nHold ALT to not auto combine connected meshes" 
                         Command="{Binding Tools.DivideSubMeshCommand}"
                         IsEnabled="{Binding Tools.DivideSubMeshEnabled, UpdateSourceTrigger=PropertyChanged}">
                         <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_split.png"/>
@@ -196,7 +196,7 @@
                         <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/FaceToVertex.png"/>
                     </Button>
 
-                    <Button ToolTip="Expand selection" 
+                    <Button ToolTip="Expand selection based on selected faces.\nHold ALT to not auto combine connected meshes" 
                         Command="{Binding Tools.ExpandSelectedFacesToObjectCommand}"
                         IsEnabled="{Binding Tools.ExpandSelectedFacesToObjectEnabled, UpdateSourceTrigger=PropertyChanged}">
                         <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/ExpandSelection.png"/>
@@ -229,13 +229,6 @@
                         <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_mergeVertex.png"/>
                     </Button>
                 </ToolBar>
-
-                <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
-                <TextBlock VerticalAlignment="Center">RenderMode:</TextBlock>
-                <ComboBox>
-                    <ComboBoxItem Content="Default" IsSelected="True"/>
-                </ComboBox>
-
 
 
             </ToolBar>

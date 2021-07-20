@@ -35,7 +35,7 @@ namespace Filetypes.RigidModel
                 for (int meshIndex = 0; meshIndex < lodMeshCount; meshIndex++)
                 {
                     var offset = LodHeaders[lodIndex].FirstMeshOffset + sizeOffset;
-                    MeshList[lodIndex][meshIndex] = new RmvSubModel(data, (int)offset, Header.SkeletonName);
+                    MeshList[lodIndex][meshIndex] = new RmvSubModel(data, (int)offset, Header.Version, Header.SkeletonName);
                     sizeOffset += (int)MeshList[lodIndex][meshIndex].Header.ModelSize;
                 }
             }
@@ -52,7 +52,7 @@ namespace Filetypes.RigidModel
         {
             if (Header.Version == 6)
                 return ByteHelper.GetSize(typeof(Rmv2LodHeader_V6));
-            else if(Header.Version == 7)
+            else if(Header.Version == 7 || Header.Version == 8)
                 return ByteHelper.GetSize(typeof(Rmv2LodHeader_V7));
             
             throw new Exception("Unknown rmv2 version - " + Header.Version);
@@ -138,7 +138,7 @@ namespace Filetypes.RigidModel
             {
                 var lodHeader = LodHeaders[lodIndex];
                 lodHeader.MeshCount = (uint)MeshList[lodIndex].Length;
-                lodHeader.TotalLodVertexSize = (uint)MeshList[lodIndex].Sum(x=>x.Header.VertexCount * RmvMesh.GetVertexSize(x.Header.VertextType));
+                lodHeader.TotalLodVertexSize = (uint)MeshList[lodIndex].Sum(x=>x.Header.VertexCount * RmvMesh.GetVertexSize(x.Header.VertextType, Header.Version));
                 lodHeader.TotalLodIndexSize = (uint)MeshList[lodIndex].Sum(x => x.Header.FaceCount * sizeof(ushort));
                 lodHeader.FirstMeshOffset = headerOffset + modelOffset;
                 LodHeaders[lodIndex] = lodHeader;

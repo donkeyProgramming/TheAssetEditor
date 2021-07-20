@@ -13,21 +13,27 @@ namespace View3D.Components.Component.Selection
         public ISelectable RenderObject { get; set; }
         public List<int> SelectedFaces { get; set; } = new List<int>();
 
-
-        public void ModifySelection(int newSelectionItem, bool onlyRemove)
+        public void ModifySelection(IEnumerable<int> newSelectionItems, bool onlyRemove)
         {
             if (onlyRemove)
             {
-                if (SelectedFaces.Contains(newSelectionItem))
-                    SelectedFaces.Remove(newSelectionItem);
+                foreach (var newSelectionItem in newSelectionItems)
+                {
+                    if (SelectedFaces.Contains(newSelectionItem))
+                        SelectedFaces.Remove(newSelectionItem);
+                }
             }
             else
             {
-                if (!SelectedFaces.Contains(newSelectionItem))
-                    SelectedFaces.Add(newSelectionItem);
+                foreach (var newSelectionItem in newSelectionItems)
+                {
+                    if (!SelectedFaces.Contains(newSelectionItem))
+                        SelectedFaces.Add(newSelectionItem);
+                }
             }
             SelectionChanged?.Invoke(this);
         }
+
 
         public List<int> CurrentSelection()
         {

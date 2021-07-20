@@ -39,6 +39,15 @@ namespace Filetypes.RigidModel.Vertex
             ByteParsers.Float16.TryDecodeValue(data, 4, out var z, out _, out _);
             ByteParsers.Float16.TryDecodeValue(data, 6, out var w, out _, out _);
 
+            if (w > 0.0f)
+            {
+                x *= w;
+                y *= w;
+                z *= w;
+                w = 0;
+            }
+            
+
             return new RmvVector4()
             {
                 X = x,
@@ -51,13 +60,23 @@ namespace Filetypes.RigidModel.Vertex
 
         protected RmvVector4 CreatVector4Byte(byte[] data)
         {
-            return new RmvVector4()
+            var v =  new RmvVector4()
             {
                 X = ByteToNormal(data[0]),
                 Y = ByteToNormal(data[1]),
                 Z = ByteToNormal(data[2]),
                 W = ByteToNormal(data[3])
             };
+
+            if (v.W > 0.0f)
+            {
+                v.X *= v.W;
+                v.Y *= v.W;
+                v.Z *= v.W;
+                v.W = 0;
+            }
+
+            return v;
         }
 
         protected RmvVector2 CreatVector2HalfFloat(byte[] data)

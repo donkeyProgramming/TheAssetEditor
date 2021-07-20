@@ -36,7 +36,8 @@
 
         </TextBox>
 
-        <TreeView 
+        <TreeView  x:Name="tvParameters"
+            AllowDrop="True"
             Grid.Row="1" 
             behaviors:TreeViewExtension.SelectItemOnRightClick="True"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -76,9 +77,11 @@
 
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="Focusable" Value="False"/>
+                    <EventSetter Event="TreeViewItem.MouseMove" Handler="treeView_MouseMove"/>
+                    <EventSetter Event="TreeViewItem.PreviewMouseLeftButtonDown" Handler="TreeView_MouseDown"/>
                     <Setter Property="behaviors:MouseDoubleClick.Command" Value="{Binding DataContext.DoubleClickCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}, Mode=OneTime}"/>
-                    <!--Setter Property="behaviors:MouseDoubleClick.CommandParameter" Value="{Binding, Mode=OneTime}" /-->
-                        <Setter Property="IsExpanded" Value="{Binding IsNodeExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                    <Setter Property="IsExpanded" Value="{Binding IsNodeExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                     <Setter Property="ContextMenu" Value="{StaticResource NodeContextMenu}"/>
                     <Setter Property="Visibility" Value="Visible" />
                     <Style.Triggers>

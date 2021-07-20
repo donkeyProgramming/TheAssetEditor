@@ -14,6 +14,8 @@ float4x4 Projection;
 
 
 float4x4  EnvMapTransform;
+float LightMult = 1;
+
 
 
 bool debug = true;
@@ -27,6 +29,8 @@ bool scale_by_one_over_pi = false;
 float light0_roughnessFactor = 1;
 float light0_radiannce = 1;
 float light0_ambientFactor = 1;
+
+float3 TintColour = float3(1,1,1);
 
 
 // Textures
@@ -118,7 +122,7 @@ struct PixelInputType
 
 float get_cube_env_scale_factor()
 {
-	return 1.0f;
+	return LightMult;
 }
 
 float adjust_linear_smoothness(in const float linear_smoothness)
@@ -352,8 +356,8 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
 
     const float gamma_value = 2.2;
 
-    float3 hdrColor = color.rgb * exposure * 0.9;
-    float3 mapped = Uncharted2ToneMapping(hdrColor);
+    float3 hdrColor = color.rgb * exposure * 1.9;
+    float3 mapped = Uncharted2ToneMapping(hdrColor) * TintColour;
     mapped = pow(mapped, 1.0 / gamma_value);
     color = float4(mapped, 1);
 

@@ -50,8 +50,7 @@ namespace View3D.Commands.Face
             if (!(_isAdd || _isRemove))
                 currentState.Clear();
 
-            foreach (var newSelectionItem in _selectedFaces)
-                currentState.ModifySelection(newSelectionItem, _isRemove);
+            currentState.ModifySelection(_selectedFaces, _isRemove);
 
             currentState.EnsureSorted();
         }

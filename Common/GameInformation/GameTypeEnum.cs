@@ -11,6 +11,7 @@ namespace Common.GameInformation
         Attila,
         Empire,
         Napoleon,
+        Rome_2_Remastered,
         Rome_2,
         Shogun_2,
         ThreeKingdoms,

@@ -44,7 +44,7 @@ namespace View3D.Components.Component
             }
         }
 
-        public void GrowSelection(FaceSelectionState faceSelectionState)
+        public void GrowSelection(FaceSelectionState faceSelectionState, bool combineOverlappingVertexes)
         {
             var selectedFaceIndecies = new List<ushort>();
             var indexBuffer = faceSelectionState.RenderObject.Geometry.GetIndexBuffer();
@@ -56,7 +56,7 @@ namespace View3D.Components.Component
             }
 
             var meshService = new MeshSplitterService();
-            var newSelection = meshService.GrowSelection(faceSelectionState.RenderObject.Geometry, selectedFaceIndecies);
+            var newSelection = meshService.GrowFaceSelection(faceSelectionState.RenderObject.Geometry, selectedFaceIndecies, combineOverlappingVertexes);
 
             var selectCmd = new FaceSelectionCommand(newSelection);
             _commandManager.ExecuteCommand(selectCmd);

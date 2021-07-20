@@ -90,6 +90,7 @@ namespace View3D.Rendering.Shading
         }
 
         public bool UseAlpha { set { Effect.Parameters["UseAlpha"].SetValue(value); } }
+        public Vector3 TintColour { set { Effect.Parameters["TintColour"].SetValue(value); } }
 
         public void SetTexture(Texture2D texture, TexureType type)
         {
@@ -107,7 +108,8 @@ namespace View3D.Rendering.Shading
         {
             Effect.Parameters["View"].SetValue(commonShaderParameters.View);
             Effect.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
-            Effect.Parameters["EnvMapTransform"].SetValue((Matrix.CreateRotationY(commonShaderParameters.EnvRotate)));
+            Effect.Parameters["EnvMapTransform"].SetValue((Matrix.CreateRotationY(commonShaderParameters.LightRotationRadians)));
+            Effect.Parameters["LightMult"].SetValue(commonShaderParameters.LightIntensityMult);
             Effect.Parameters["World"].SetValue(modelMatrix);
         }
 

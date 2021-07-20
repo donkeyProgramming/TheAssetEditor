@@ -4,12 +4,17 @@ using FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.WpfInterop;
+using Pfim;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Media.Imaging;
 using View3D.Components;
+using System.Windows.Media;
+
 
 namespace View3D.Utility
 {
@@ -34,7 +39,7 @@ namespace View3D.Utility
 
         public TextureCube PbrDiffuse { get; private set; }
         public TextureCube PbrSpecular { get; private set; }
-        public Texture2D PbrLut{ get; private set; }
+        public Texture2D PbrLut { get; private set; }
 
 
         public ResourceLibary(WpfGame game, PackFileService pf) : base(game)
@@ -53,7 +58,7 @@ namespace View3D.Utility
             LoadEffect("Shaders\\LineShader", ShaderTypes.Line);
 
             PbrDiffuse = Content.Load<TextureCube>("textures\\phazer\\rustig_koppie_DiffuseHDR");
-            PbrSpecular = PbrDiffuse;// resourceLibary.XnaContentManager.Load<TextureCube>("textures\\phazer\\rustig_koppie_SpecularHDR");
+            PbrSpecular = Content.Load<TextureCube>("textures\\phazer\\rad_sqwantani_bgra8");
             //PbrSpecular = Content.Load<TextureCube>("textures\\phazer\\rustig_koppie_SpecularHDR");
             PbrLut = Content.Load<Texture2D>("textures\\phazer\\Brdf_rgba32f_raw");
         }
@@ -80,52 +85,40 @@ namespace View3D.Utility
 
         Texture2D LoadTextureAsTexture2d(string fileName, GraphicsDevice device)
         {
-
-            try
+            var file = _pf.FindFile(fileName);
+            if (file == null)
             {
-                //r content = File.ReadAllBytes(@"C:\Users\ole_k\Desktop\New folder\rad_rustig.dds");
-                var file = _pf.FindFile(fileName) as PackFile;
-                if (file == null)
+                _logger.Here().Error($"Unable to find texture: {fileName}");
+                return null;
+            }
+
+            var content = file.DataSource.ReadData();
+            using (MemoryStream stream = new MemoryStream(content))
+            {
+                var image = Pfim.Pfim.FromStream(stream);
+
+                if (image.Format != ImageFormat.Rgba32)
                 {
-                    _logger.Here().Error($"Unable to find texture: {fileName}");
+                    _logger.Here().Error($"Error loading texture ({fileName} - Unkown textur format {image.Format})");
                     return null;
                 }
 
-                var content = file.DataSource.ReadData();
-                using (MemoryStream stream = new MemoryStream(content))
-                {
-                    var image = Pfim.Dds.Create(stream, new Pfim.PfimConfig(32768, Pfim.TargetFormat.Native, false));
-                    if (image as Pfim.Dxt1Dds != null)
-                    {
-                        var texture = new Texture2D(device, image.Width, image.Height, false, SurfaceFormat.Dxt1);
+                var texture = new Texture2D(device, image.Width, image.Height, true, SurfaceFormat.Bgra32);
+                texture.SetData(0, null, image.Data, 0, image.DataLen);
 
-                        texture.SetData(image.Data, 0, (int)image.Header.PitchOrLinearSize);
-                        return texture;
-                    }
-                    else if (image as Pfim.Dxt5Dds != null)
-                    {
-                        var texture = new Texture2D(device, image.Width, image.Height, false, SurfaceFormat.Dxt5);
-                        texture.SetData(image.Data, 0, (int)image.Header.PitchOrLinearSize);
-                        return texture;
-                    }
-                    else if (image as Pfim.Dxt3Dds != null)
-                    {
-                        var texture = new Texture2D(device, image.Width, image.Height, false, SurfaceFormat.Dxt3);
-                        texture.SetData(image.Data, 0, (int)image.Header.PitchOrLinearSize); 
-                        return texture;
-                    }  
-                    else
-                    {
-                        throw new Exception("Unknow texture format: " + image.ToString() + " Path = " + fileName);
-                    }
+                // Load mipmaps
+                for (int i = 0; i < image.MipMaps.Length; i++)
+                {
+                    var mipmap = image.MipMaps[i];
+                    if (mipmap.Width > 4)
+                        texture.SetData(i + 1, null, image.Data, mipmap.DataOffset, mipmap.DataLen);
+
                 }
+
+                return texture;
             }
-            catch (Exception e)
-            {
-                _logger.Here().Error($"Error loading texture ({fileName}): {e}");
-            }
-            return null;
         }
+
 
         public Effect LoadEffect(string fileName, ShaderTypes type)
         {
@@ -167,10 +160,10 @@ namespace View3D.Utility
             PbrDiffuse.Dispose();
             PbrDiffuse = null;
 
-          
+
             PbrSpecular.Dispose();
             PbrSpecular = null;
-           
+
 
             PbrLut.Dispose();
             PbrLut = null;
