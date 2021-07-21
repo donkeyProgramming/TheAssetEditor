@@ -19,7 +19,7 @@ namespace CommonControls.PackFileBrowser
 
     public partial class SavePackFileWindow : Window, IDisposable, INotifyPropertyChanged
     {
-        PackFile SelectedFile { get; set; }
+        public PackFile SelectedFile { get; set; }
         public PackFileBrowserViewModel ViewModel { get; set; }
 
         TreeNode _selectedNode;

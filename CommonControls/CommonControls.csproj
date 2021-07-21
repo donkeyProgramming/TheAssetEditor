@@ -53,6 +53,7 @@
     <None Remove="Resources\Icons\Kitbasher\icons8-undo-50.png" />
     <None Remove="Resources\Icons\Kitbasher\Open ref.png" />
     <None Remove="Resources\Icons\Kitbasher\Open.png" />
+    <None Remove="Resources\Icons\Kitbasher\pin.png" />
     <None Remove="Resources\Icons\Kitbasher\SelectionMode_face.png" />
     <None Remove="Resources\Icons\Kitbasher\SelectionMode_object.png" />
     <None Remove="Resources\Icons\Kitbasher\SelectionMode_Vertex.png" />
@@ -213,6 +214,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Icons\Kitbasher\Open.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Kitbasher\pin.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Icons\Kitbasher\SelectionMode_face.png">

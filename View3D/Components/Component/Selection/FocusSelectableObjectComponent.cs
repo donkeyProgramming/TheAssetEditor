@@ -47,11 +47,29 @@ namespace View3D.Components.Component.Selection
             {
                 if (objectState.SelectedObjects().Count == 0)
                     return;
-                Vector3 finalPos = Vector3.Zero;
-                foreach (var item in objectState.SelectedObjects())
-                    finalPos += Vector3.Transform(MathUtil.GetCenter(item.Geometry.BoundingBox), _sceneManager.GetWorldPosition(item));
 
-                _archballCamera.LookAt = finalPos / objectState.SelectedObjects().Count();
+                if (objectState.SelectionCount() == 1)
+                {
+                    var obj = objectState.SelectedObjects()[0].Geometry.BoundingBox;
+
+                    var bbCorners = obj.GetCorners();
+                    var bbCenter = new Vector3(bbCorners.Average(x => x.X), bbCorners.Average(x => x.Y), bbCorners.Average(x => x.Z));
+
+                    double fov = MathHelper.ToRadians(45);
+                    double boundSphereRadius = bbCorners.Select(x => Vector3.Distance(x, bbCenter)).Max();
+                    double camDistance = ((boundSphereRadius * 2.0) / Math.Tan(fov / 2.0)) / 2;
+
+                    _archballCamera.LookAt = bbCenter;
+                    _archballCamera.Zoom = (float)camDistance;
+                }
+                else
+                {
+                    Vector3 finalPos = Vector3.Zero;
+                    foreach (var item in objectState.SelectedObjects())
+                        finalPos += Vector3.Transform(MathUtil.GetCenter(item.Geometry.BoundingBox), _sceneManager.GetWorldPosition(item));
+
+                    _archballCamera.LookAt = finalPos / objectState.SelectedObjects().Count();
+                }
             }
             else if (selectionState is VertexSelectionState vertexSelection)
             {

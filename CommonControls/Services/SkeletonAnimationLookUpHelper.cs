@@ -136,7 +136,7 @@ namespace CommonControls.Services
 
             public override string ToString()
             {
-                return $"[{Container.Name}] {AnimationFile}";
+                return $"[{Container?.Name}] {AnimationFile}";
              }
         }
 

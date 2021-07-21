@@ -36,11 +36,14 @@ namespace View3D.Rendering.Geometry
         void RemoveUnusedVertexes(ushort[] newIndexList);
         void TransformVertex(int vertexId, Matrix transform);
         void SetTransformVertex(int vertexId, Matrix transform);
+        void SetVertexWeights(int index, Vector4 newWeights);
+        void SetVertexBlendIndex(int index, Vector4 blendIndex);
         void RebuildVertexBuffer();
 
         List<byte> GetUniqeBlendIndices();
         void UpdateAnimationIndecies(List<IndexRemapping> remapping);
         void ChangeVertexType(VertexFormat weighted);
+        
     }
 
     public class IndexRemapping

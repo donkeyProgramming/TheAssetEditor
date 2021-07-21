@@ -1,5 +1,6 @@
 ﻿using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
+using Common;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
 using System;
@@ -25,24 +26,19 @@ namespace AnimationEditor.CampaignAnimationCreator
         }
     }
 
-    public static class MountAnimationCreator_Debug
+    public static class CampaignAnimationCreator_Debug
     {
-       // public static void CreateDamselAndGrymgoreEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
-       // {
-       //     var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
-       //
-       //     editorView.MainInput = new AnimationToolInput()
-       //     {
-       //         Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_damsel_campaign_01.variantmeshdefinition")
-       //     };
-       //
-       //     editorView.RefInput = new AnimationToolInput()
-       //     {
-       //         Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\lzd_carnosaur_grymloq.variantmeshdefinition")
-       //     };
-       //
-       //     creator.CreateEmptyEditor(editorView);
-       // }
+        public static void CreateDamselEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        {
+            var editorView = toolFactory.CreateEditorViewModel<CampaignAnimationCreatorViewModel>();
+            editorView.MainInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_damsel_campaign_01.variantmeshdefinition"),
+                Animation = packfileService.FindFile(@"animations\battle\humanoid01b\staff_and_sword\arch_mage\locomotion\hu1b_stsw_mage_combat_walk_01.anim")
+            };
+       
+            creator.CreateEmptyEditor(editorView);
+        }
        
     }
 }

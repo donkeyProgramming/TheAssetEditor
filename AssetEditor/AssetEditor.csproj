@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>hnet.com-image (1).ico</ApplicationIcon>
-    <AssemblyName>AssetEditor v0.10</AssemblyName>
+    <AssemblyName>AssetEditor v0.11</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -1,4 +1,5 @@
-﻿using AnimationEditor.MountAnimationCreator;
+﻿using AnimationEditor.CampaignAnimationCreator;
+using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.PropCreator;
 using AnimationEditor.PropCreator.ViewModels;
 using AnimMetaEditor;
@@ -83,19 +84,9 @@ namespace AssetEditor.ViewModels
 
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
-                //variantmeshes\variantmeshdefinitions\dwf_hammerers.variantmeshdefinition"
-                //var packFile = packfileService.FindFile(@"animations\battle\dragon02\attacks\dr2_attack_05.anm.meta");
-                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2");
-                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_loremaster_of_hoeth\hef_loremaster_of_hoeth_head_01.rigid_model_v2");
-                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc4\hef\hef_war_lion\hef_war_lion_02.rigid_model_v2");
-                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hr1\brt\brt_royal_pegasus\brt_pegasus_01.rigid_model_v2");
-                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_props\hef_ranger_sword_1h_03.rigid_model_v2");
-                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\skvt1\skv\skv_jezzails\skv_clan_rats_legs_fr_01.rigid_model_v2"); 
-                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_eltharion\hef_eltharion_head.rigid_model_v2");
-                //var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu17\skv\skv_clan_rats\head\skv_clan_rats_head_04.rigid_model_v2");
-
+                //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                // MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
-                KitbashEditor_Debug.CreateSkavenSlaveHead(this, toolFactory, packfileService);
+                KitbashEditor_Debug.CreatePrincessBody(this, toolFactory, packfileService);
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);

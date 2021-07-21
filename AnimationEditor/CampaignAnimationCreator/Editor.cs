@@ -7,7 +7,10 @@ using CommonControls.Common;
 using CommonControls.Editors.AnimationFragment;
 using CommonControls.Services;
 using CommonControls.Table;
+using Filetypes.RigidModel;
 using FileTypes.AnimationPack;
+using FileTypes.PackFiles.Models;
+using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
@@ -25,24 +28,32 @@ namespace AnimationEditor.CampaignAnimationCreator
     {
         public FilterCollection<SkeletonBoneNode> ModelBoneList { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
 
-        AssetViewModel _rider;
+        AssetViewModel _selectedUnit;
         PackFileService _pfs;
+        AnimationClip _selectedAnimationClip;
+       
 
         public Editor(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, IComponentManager componentManager)
         {
             _pfs = pfs;
-            _rider = rider;
-            _rider.SkeletonChanged += SkeletonChanged;
-            _rider.AnimationChanged += AnimationChanged;
+            _selectedUnit = rider;
+            _selectedUnit.SkeletonChanged += SkeletonChanged;
+            _selectedUnit.AnimationChanged += AnimationChanged;
 
-            SkeletonChanged(_rider.Skeleton);
+            SkeletonChanged(_selectedUnit.Skeleton);
+            AnimationChanged(_selectedUnit.AnimationClip);
         }
-
-
 
         public void SaveAnimation()
         {
-            if (_rider.AnimationClip == null)
+            var animFile = _selectedUnit.AnimationClip.ConvertToFileFormat(_selectedUnit.Skeleton);
+            var bytes = AnimationFile.GetBytes(animFile);
+            SaveHelper.SaveAs(_pfs, bytes, ".anim");
+        }
+
+        public void Convert()
+        {
+            if (_selectedAnimationClip == null)
             {
                 MessageBox.Show("No animation selected");
                 return;
@@ -54,52 +65,37 @@ namespace AnimationEditor.CampaignAnimationCreator
                 return;
             }
 
+            var newAnimation = _selectedAnimationClip.Clone();
+            newAnimation.MergeStaticAndDynamicFrames();
 
-            // Convert to simple anim
-            // Foreach frame
-            //      Foreach bone
-            //          Copy translation - root trans
-            //          Copy rotation - root rot
-            //          Clear root trans
-            //          Clear root rot
+            for (int frameIndex = 0; frameIndex < newAnimation.DynamicFrames.Count; frameIndex++)
+            {
+                var frame = newAnimation.DynamicFrames[frameIndex];
+                frame.Position[ModelBoneList.SelectedItem.BoneIndex] = Vector3.Zero;
+                frame.Rotation[ModelBoneList.SelectedItem.BoneIndex] = Quaternion.Identity;
+            }
 
-            /*
-              Vector3 translationOffset = new Vector3((float)_animationSettings.Translation.X.Value, (float)_animationSettings.Translation.Y.Value, (float)_animationSettings.Translation.Z.Value);
-            Vector3 rotationOffset = new Vector3((float)_animationSettings.Rotation.X.Value, (float)_animationSettings.Rotation.Y.Value, (float)_animationSettings.Rotation.Z.Value);
-            var rotationOffsetMatrix = Quaternion.CreateFromYawPitchRoll(MathHelper.ToRadians(rotationOffset.X), MathHelper.ToRadians(rotationOffset.Y), MathHelper.ToRadians(rotationOffset.Z));
-
-            var newRiderAnim = riderAnimation.Clone();
-            newRiderAnim.MergeStaticAndDynamicFrames();
-
-            View3D.Animation.AnimationEditor.LoopAnimation(newRiderAnim, (int)_animationSettings.LoopCounter.Value);
-
-            // Resample
-            if (_animationSettings.FitAnimation)
-                newRiderAnim = View3D.Animation.AnimationEditor.ReSample(_riderSkeleton, newRiderAnim, mountAnimation.DynamicFrames.Count, mountAnimation.PlayTimeInSec);
-             */
-
-            //SaveHelper.Save(_pfs, null);
-        }
-
-        public void Convert()
-        { 
-            
-        
+            _selectedUnit.AnimationChanged -= AnimationChanged;
+            _selectedUnit.SetAnimationClip(newAnimation, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
+            _selectedUnit.AnimationChanged += AnimationChanged;
         }
 
         private void AnimationChanged(AnimationClip newValue)
         {
-            //throw new NotImplementedException();
+            _selectedAnimationClip = newValue;
         }
 
         private void SkeletonChanged(GameSkeleton newValue)
         {
             if (newValue == null)
+            {
                 ModelBoneList.UpdatePossibleValues(null);
+            }
             else
+            {
                 ModelBoneList.UpdatePossibleValues(SkeletonHelper.CreateFlatSkeletonList(newValue));
+                ModelBoneList.SelectedItem = ModelBoneList.PossibleValues.FirstOrDefault(x => x.BoneName.ToLower() == "animroot");
+            }
         }
     }
-
-    
 }

@@ -54,6 +54,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public ICommand BmiToolCommand { get; set; }
         public ICommand SkeletonReshaperCommand { get; set; }
         public ICommand CreateStaticMeshesCommand { get; set; }
+        public ICommand PinMeshToMeshCommand { get; set; }
+
 
         bool _showObjectTools = true;
         public bool ShowObjectTools { get => _showObjectTools; set => SetAndNotify(ref _showObjectTools, value); }
@@ -107,6 +109,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         bool _createStaticMeshesCommandEnabled = false;
         public bool CreateStaticMeshesCommandEnabled { get => _createStaticMeshesCommandEnabled; set => SetAndNotify(ref _createStaticMeshesCommandEnabled, value); }
 
+        bool _pinMeshToMeshEnabled = false;
+        public bool PinMeshToMeshEnabled { get => _pinMeshToMeshEnabled; set => SetAndNotify(ref _pinMeshToMeshEnabled, value); }
+
         public ToolsMenuBarViewModel(IComponentManager componentManager, ToolbarCommandFactory commandFactory, PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper, WindowKeyboard keyboard)
         {
             _packFileService = packFileService;
@@ -128,6 +133,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             BmiToolCommand = new RelayCommand(OpenBmiTool);
             SkeletonReshaperCommand = new RelayCommand(OpenSkeletonReshaperTool);
             CreateStaticMeshesCommand = new RelayCommand(CreateStaticMeshes);
+            PinMeshToMeshCommand = new RelayCommand(PinMeshToMesh);
 
             _selectionManager = componentManager.GetComponent<SelectionManager>();
             _selectionManager.SelectionChanged += OnSelectionChanged;
@@ -158,6 +164,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             BmiToolCommandEnabled = false;
             SkeletonReshaperCommandEnabled = false;
             CreateStaticMeshesCommandEnabled = false;
+            PinMeshToMeshEnabled = false;
 
             if (state is ObjectSelectionState objectSelection)
             {
@@ -170,6 +177,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 BmiToolCommandEnabled = objectSelection.SelectedObjects().Count == 1;
                 SkeletonReshaperCommandEnabled = objectSelection.SelectedObjects().Count > 0;
                 CreateStaticMeshesCommandEnabled = objectSelection.SelectedObjects().Count > 0;
+                PinMeshToMeshEnabled = objectSelection.SelectedObjects().Count == 2;
             }
             else if (state is FaceSelectionState faceSelection && faceSelection.SelectedFaces.Count != 0)
             {
@@ -365,15 +373,24 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             }
 
             var cmd = new CreateAnimatedMeshPoseCommand(meshes, mainPlayer._skeleton, frame);
-
-            cmd.Initialize(_componentManager);
-            cmd.Execute();
+            var commandExecutor = _componentManager.GetComponent<CommandExecutor>();
+            commandExecutor.ExecuteCommand(cmd, false);
 
             foreach (var mesh in meshes)
-            {
                 mesh.Geometry.ChangeVertexType(VertexFormat.Default);
-            }
+        }
 
+        void PinMeshToMesh()
+        {
+            //var animationPlayers = _componentManager.GetComponent<AnimationsContainerComponent>();
+            //var mainPlayer = animationPlayers.Get("MainPlayer");
+
+            var state = _selectionManager.GetState<ObjectSelectionState>();
+            var selectedObjects = state.SelectedObjects();
+
+            var cmd = new PinMeshToMeshCommand(selectedObjects[0] as Rmv2MeshNode, selectedObjects[1] as Rmv2MeshNode, null);
+            var commandExecutor = _componentManager.GetComponent<CommandExecutor>();
+            commandExecutor.ExecuteCommand(cmd);
         }
     }
 }

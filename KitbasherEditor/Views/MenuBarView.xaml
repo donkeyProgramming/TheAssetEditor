@@ -185,6 +185,12 @@
                             IsEnabled="{Binding Tools.CreateStaticMeshesCommandEnabled, UpdateSourceTrigger=PropertyChanged}">
                         <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-fruity-ice-pop-64.png"/>
                     </Button>
+
+                    <Button ToolTip="Pin mesh to an other mesh. \nSelect two meshes. The second mesh will be pinned to the first" 
+                        Command="{Binding Tools.PinMeshToMeshCommand}"
+                            IsEnabled="{Binding Tools.PinMeshToMeshEnabled, UpdateSourceTrigger=PropertyChanged}">
+                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/pin.png"/>
+                    </Button>
                 </ToolBar>
 
 

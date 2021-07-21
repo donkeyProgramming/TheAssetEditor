@@ -14,7 +14,7 @@ namespace FileTypesTests.RigidModel
 {
     class RigidModelTests_Load
     {
-
+        /*
         PackFile GetWarLionModel()
         {
             PackFileService packFileService = new PackFileService(new PackFileDataBase());
@@ -116,7 +116,7 @@ namespace FileTypesTests.RigidModel
                 for (int i = 0; i < meshData.Length; i++)
                     Assert.AreEqual(meshData[i], bits[i]);
             }
-        }
+        }*/
 
         [Test]
         public void UpdateOffs2222et2s()

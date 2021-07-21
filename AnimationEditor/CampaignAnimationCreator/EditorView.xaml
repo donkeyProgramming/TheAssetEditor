@@ -29,7 +29,7 @@
                           Text="{Binding ModelBoneList.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                           ItemsSource="{Binding ModelBoneList.Values}" 
                           SelectedItem="{Binding ModelBoneList.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-        <Button Grid.Row="1" Grid.ColumnSpan="3"  Content="Save" Margin="5" Click="{s:MethodBinding SaveAnimation}" />
-        <Button Grid.Row="2" Grid.ColumnSpan="3"  Content="Convert" Margin="5" Click="{s:MethodBinding Convert}" />
+        <Button Grid.Row="1" Grid.ColumnSpan="3"  Content="Convert" Margin="5" Click="{s:MethodBinding Convert}" />
+        <Button Grid.Row="2" Grid.ColumnSpan="3"  Content="Save" Margin="5" Click="{s:MethodBinding SaveAnimation}" />
     </Grid>
 </UserControl>

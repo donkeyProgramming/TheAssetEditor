@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace FileTypesTests.PackFiles
-{
+{/*
     class PackFileServiceTests_Add
     {
         [Test]
@@ -78,5 +78,5 @@ namespace FileTypesTests.PackFiles
             var file = packFileService.FindFile(@"warmachines\materials\subFolder1\Subfolder_1_file1.txt");
             Assert.NotNull(file);
         }
-    }
+    }*/
 }

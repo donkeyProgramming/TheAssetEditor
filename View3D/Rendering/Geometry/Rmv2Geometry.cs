@@ -184,6 +184,28 @@ namespace View3D.Rendering.Geometry
             _vertexArray[vertexId].Position = Vector4.Transform(new Vector4(0,0,0,1), transform);
         }
 
+        public override void SetVertexWeights(int index, Vector4 newWeights)
+        {
+            if (_vertedFormat == VertexFormat.Weighted)
+            {
+                newWeights.X = newWeights.X + newWeights.Z;
+                newWeights.Y = newWeights.Y + newWeights.W;
+            }
+
+            _vertexArray[index].BlendWeights = newWeights;
+        }
+
+        public override void SetVertexBlendIndex(int index, Vector4 blendIndex)
+        {
+            if (_vertedFormat == VertexFormat.Weighted)
+            {
+                blendIndex.Z = 0;
+                blendIndex.W = 0;
+            }
+
+            _vertexArray[index].BlendIndices = blendIndex;
+        }
+
         public override List<byte> GetUniqeBlendIndices()
         {
             if (WeightCount == 0)

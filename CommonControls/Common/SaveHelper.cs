@@ -87,6 +87,41 @@ namespace CommonControls.Common
             }
         }
 
+        public static PackFile SaveAs(PackFileService packFileService, byte[] data, string extention)
+        {
+            using (var browser = new SavePackFileWindow(packFileService))
+            {
+                browser.ViewModel.Filter.SetExtentions(new List<string>() { extention });
+                if (browser.ShowDialog() == true)
+                {
+                    var path = browser.FilePath;
+                    if (path.Contains(extention) == false)
+                        path += extention;
+
+                    var existingFile = browser.SelectedFile;
+                    if (existingFile != null)
+                    {
+                        var fullPath = packFileService.GetFullPath(existingFile);
+                        var selectedEditabelPackFile = packFileService.GetPackFileContainer(existingFile);
+                        if (MessageBox.Show($"Replace existing file?\n{fullPath} \nin packfile:{selectedEditabelPackFile.Name}", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
+                            return null;
+
+                        packFileService.SaveFile(existingFile, data);
+                    }
+                    else
+                    {
+                        var selectedEditabelPackFile = packFileService.GetEditablePack();
+                        var directoryPath = Path.GetDirectoryName(path);
+                        var justFileName = Path.GetFileName(path);
+                        var newPackFile = new PackFile(justFileName, new MemorySource(data));
+                        packFileService.AddFileToPack(selectedEditabelPackFile, directoryPath, newPackFile);
+                        return newPackFile;
+                    }
+                }
+                return null;
+            }
+        }
+
         public static void CreateFileBackup(string originalFileName)
         {
             if (File.Exists(originalFileName))
