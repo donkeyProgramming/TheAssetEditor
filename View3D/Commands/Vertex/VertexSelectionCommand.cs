@@ -44,8 +44,6 @@ namespace View3D.Commands.Vertex
             if (!(_isAdd || _isRemove))
                 currentState.Clear();
 
-            _selectedVertices.Clear();
-            _selectedVertices.Add(409);
             foreach (var newSelectionItem in _selectedVertices)
                 currentState.ModifySelection(newSelectionItem, _isRemove);
 
