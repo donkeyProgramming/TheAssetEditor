@@ -8,6 +8,7 @@ using System.Text;
 using View3D.Components.Component.Selection;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
+using MoreLinq;
 
 namespace View3D.Commands.Face
 {
@@ -47,12 +48,8 @@ namespace View3D.Commands.Face
             }
 
             var distinctValues = selectedFaceIndecies.Distinct();
-            var vertexState = new VertexSelectionState()
-            {
-                RenderObject = renderObject,
-                SelectedVertices = distinctValues.ToList()
-            };
-
+            var vertexState = new VertexSelectionState(renderObject, 0);
+            vertexState.ModifySelection(distinctValues, false);
             _selectionManager.SetState(vertexState);
         }
 

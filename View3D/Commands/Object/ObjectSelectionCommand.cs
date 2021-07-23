@@ -49,7 +49,7 @@ namespace View3D.Commands.Object
             _oldState = _selectionManager.GetStateCopy();
             var currentState = _selectionManager.GetState() as ObjectSelectionState;
             if (currentState == null)
-                currentState = _selectionManager.CreateSelectionSate(GeometrySelectionMode.Object) as ObjectSelectionState;
+                currentState = _selectionManager.CreateSelectionSate(GeometrySelectionMode.Object, null) as ObjectSelectionState;
             _logger.Here().Information($"Command info - Remove[{_isRemove}] Mod[{_isModification}] Items[{string.Join(',', _items.Select(x => x.Name))}]");
 
             if (!(_isModification || _isRemove))

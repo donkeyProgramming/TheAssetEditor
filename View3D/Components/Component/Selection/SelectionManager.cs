@@ -6,6 +6,7 @@ using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using View3D.Components.Gizmo;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
@@ -29,6 +30,7 @@ namespace View3D.Components.Component.Selection
 
         LineMeshRender _lineGeometry;
         VertexInstanceMesh VertexRenderer;
+        float _vertexSelectionFallof = 0;
 
         public SelectionManager(WpfGame game ) : base(game) {}
 
@@ -37,7 +39,7 @@ namespace View3D.Components.Component.Selection
         BasicShader _selectedFacesEffect;
         public override void Initialize()
         {
-            CreateSelectionSate(GeometrySelectionMode.Object);
+            CreateSelectionSate(GeometrySelectionMode.Object, null);
             _renderEngine = GetComponent<RenderEngineComponent>();
         
 
@@ -55,7 +57,7 @@ namespace View3D.Components.Component.Selection
             base.Initialize();
         }
 
-        public ISelectionState CreateSelectionSate(GeometrySelectionMode mode)
+        public ISelectionState CreateSelectionSate(GeometrySelectionMode mode, ISelectable selectedObj)
         {
             if (_currentState != null)
             {
@@ -74,7 +76,7 @@ namespace View3D.Components.Component.Selection
                     break;
 
                 case GeometrySelectionMode.Vertex:
-                    _currentState = new VertexSelectionState();
+                    _currentState = new VertexSelectionState(selectedObj, _vertexSelectionFallof);
                     break;
 
                 default:
@@ -137,7 +139,7 @@ namespace View3D.Components.Component.Selection
             if (selectionState is VertexSelectionState selectionVertexState && selectionVertexState.RenderObject != null)
             {
                 var vertexObject = selectionVertexState.RenderObject as Rmv2MeshNode;
-                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new VertexRenderItem() { Node = vertexObject, World = vertexObject.ModelMatrix, SelectedVertices = selectionVertexState.SelectedVertices, VertexRenderer = VertexRenderer });
+                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new VertexRenderItem() { Node = vertexObject, World = vertexObject.ModelMatrix, SelectedVertices = selectionVertexState, VertexRenderer = VertexRenderer });
                 _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeoRenderItem() { ModelMatrix = vertexObject.ModelMatrix, Geometry = vertexObject.Geometry, Shader = _wireframeEffect });
             }
 
@@ -162,8 +164,14 @@ namespace View3D.Components.Component.Selection
 
             _currentState?.Clear();
             _currentState = null;
+        }
 
-
+        public void UpdateVertexSelectionFallof(float newValue)
+        {
+            _vertexSelectionFallof = Math.Clamp(newValue, 0, float.MaxValue);
+            var vertexSelectionState = GetState<VertexSelectionState>();
+            if (vertexSelectionState != null)
+                vertexSelectionState.UpdateWeights(_vertexSelectionFallof);
         }
     }
 }

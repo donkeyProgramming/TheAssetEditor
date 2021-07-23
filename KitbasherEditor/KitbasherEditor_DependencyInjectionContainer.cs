@@ -54,5 +54,11 @@ namespace KitbasherEditor
             var packFile = packfileService.FindFile(@"variantmeshes/wh_variantmodels/hu1b/hef/hef_princess/hef_princess_body_01.rigid_model_v2");
             creator.OpenFile(packFile);
         }
+
+        public static void CreateOgre(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        {
+            var packFile = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu13\ogr\ogr_maneater\ogr_maneater_body_01.rigid_model_v2");
+            creator.OpenFile(packFile);
+        }
     }
 }

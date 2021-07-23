@@ -69,8 +69,6 @@ namespace View3D.Components.Rendering
             base.Initialize();
         }
 
-
-
         public void AddRenderItem(RenderBuckedId id, IRenderItem item)
         {
             _renderItems[id].Add(item);

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using View3D.Components.Component;
+using View3D.Components.Component.Selection;
 using View3D.Components.Rendering;
 using View3D.SceneNodes;
 
@@ -15,7 +16,7 @@ namespace View3D.Rendering.RenderItems
 
         public Rmv2MeshNode Node { get; set; }
         public Matrix World { get; set; }
-        public List<int> SelectedVertices { get; set; }
+        public VertexSelectionState SelectedVertices { get; set; }
 
         public void Draw(GraphicsDevice device, CommonShaderParameters parameters)
         {

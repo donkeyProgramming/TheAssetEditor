@@ -1,5 +1,7 @@
 ﻿using Common;
+using CommonControls.Common;
 using CommonControls.ErrorListDialog;
+using CommonControls.MathViews;
 using CommonControls.Services;
 using Filetypes.RigidModel;
 using GalaSoft.MvvmLight.CommandWpf;
@@ -12,6 +14,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -55,6 +58,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public ICommand SkeletonReshaperCommand { get; set; }
         public ICommand CreateStaticMeshesCommand { get; set; }
         public ICommand PinMeshToMeshCommand { get; set; }
+
+        public NotifyAttr<DoubleViewModel> VertexMovementFalloff { get; set; }
 
 
         bool _showObjectTools = true;
@@ -135,6 +140,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             CreateStaticMeshesCommand = new RelayCommand(CreateStaticMeshes);
             PinMeshToMeshCommand = new RelayCommand(PinMeshToMesh);
 
+            VertexMovementFalloff = new NotifyAttr<DoubleViewModel>(new DoubleViewModel());
+            VertexMovementFalloff.Value.PropertyChanged += VertexMovementFalloffChanged;
             _selectionManager = componentManager.GetComponent<SelectionManager>();
             _selectionManager.SelectionChanged += OnSelectionChanged;
 
@@ -145,6 +152,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
             OnSelectionChanged(_selectionManager.GetState());
         }
+
+        private void Value(double d)
+        { }
 
         private void OnSelectionChanged(ISelectionState state)
         {
@@ -375,22 +385,22 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             var cmd = new CreateAnimatedMeshPoseCommand(meshes, mainPlayer._skeleton, frame);
             var commandExecutor = _componentManager.GetComponent<CommandExecutor>();
             commandExecutor.ExecuteCommand(cmd, false);
-
-            foreach (var mesh in meshes)
-                mesh.Geometry.ChangeVertexType(VertexFormat.Default);
         }
 
         void PinMeshToMesh()
         {
-            //var animationPlayers = _componentManager.GetComponent<AnimationsContainerComponent>();
-            //var mainPlayer = animationPlayers.Get("MainPlayer");
-
             var state = _selectionManager.GetState<ObjectSelectionState>();
             var selectedObjects = state.SelectedObjects();
 
-            var cmd = new PinMeshToMeshCommand(selectedObjects[0] as Rmv2MeshNode, selectedObjects[1] as Rmv2MeshNode, null);
+            var cmd = new PinMeshToMeshCommand(selectedObjects[0] as Rmv2MeshNode, selectedObjects[1] as Rmv2MeshNode);
             var commandExecutor = _componentManager.GetComponent<CommandExecutor>();
             commandExecutor.ExecuteCommand(cmd);
+        }
+
+
+        private void VertexMovementFalloffChanged(object sender, PropertyChangedEventArgs e)
+        {
+            _selectionManager.UpdateVertexSelectionFallof((float)VertexMovementFalloff.Value.Value);
         }
     }
 }

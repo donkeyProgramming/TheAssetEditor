@@ -45,7 +45,7 @@ namespace View3D.Commands.Object
         protected override void ExecuteCommand()
         {
             _oldState = _selectionManager.GetStateCopy();
-            var newSelectionState = _selectionManager.CreateSelectionSate(_newMode);
+            var newSelectionState = _selectionManager.CreateSelectionSate(_newMode, _selectedItem);
 
             if (newSelectionState.Mode == GeometrySelectionMode.Object && _selectedItem != null)
                 (newSelectionState as ObjectSelectionState).ModifySelection(_selectedItem, false);

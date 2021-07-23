@@ -48,9 +48,10 @@
                 <MenuItem Header="AnimMeta Decoder" Command="{Binding MenuBar.OpenAnimMetaDecocderCommand}" IsEnabled="true"/>
             </MenuItem>
 
-            <MenuItem Header="Help">
-                <MenuItem Header="Help" Command="{Binding MenuBar.OpenHelpCommand}" IsEnabled="true"/>
-                <MenuItem Header="About"/>
+            <MenuItem Header="About">
+                <MenuItem Header="Manual" Command="{Binding MenuBar.OpenHelpCommand}" IsEnabled="true"/>
+                <MenuItem Header="About" IsEnabled="False"/>
+                <MenuItem Header="Suport me on Patreon" Command="{Binding MenuBar.OpenPatreonCommand}" IsEnabled="true"/>
             </MenuItem>
         </Menu>
     </DockPanel>

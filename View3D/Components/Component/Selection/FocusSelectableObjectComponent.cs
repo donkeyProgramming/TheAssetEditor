@@ -39,37 +39,34 @@ namespace View3D.Components.Component.Selection
             Focus(_selectionManager.GetState());
         }
 
+        public void FocusObjects(List<ISelectable> items)
+        {
+            if (items.Count == 0)
+                return;
+
+            // Create a suber bb
+            BoundingBox bb = items[0].Geometry.BoundingBox;
+            for (int i = 1; i < items.Count; i++)
+                bb = BoundingBox.CreateMerged(bb, items[i].Geometry.BoundingBox);
+
+            var bbCorners = bb.GetCorners();
+            var bbCenter = new Vector3(bbCorners.Average(x => x.X), bbCorners.Average(x => x.Y), bbCorners.Average(x => x.Z));
+
+            double fov = MathHelper.ToRadians(45);
+            double boundSphereRadius = bbCorners.Select(x => Vector3.Distance(x, bbCenter)).Max();
+            double camDistance = ((boundSphereRadius * 2.0) / Math.Tan(fov / 2.0)) / 2;
+
+            _archballCamera.LookAt = bbCenter;
+            _archballCamera.Zoom = (float)camDistance;
+        }
+
         void Focus(ISelectionState selectionState)
         {
             _logger.Here().Information("Focusing on selection");
 
             if (selectionState is ObjectSelectionState objectState)
             {
-                if (objectState.SelectedObjects().Count == 0)
-                    return;
-
-                if (objectState.SelectionCount() == 1)
-                {
-                    var obj = objectState.SelectedObjects()[0].Geometry.BoundingBox;
-
-                    var bbCorners = obj.GetCorners();
-                    var bbCenter = new Vector3(bbCorners.Average(x => x.X), bbCorners.Average(x => x.Y), bbCorners.Average(x => x.Z));
-
-                    double fov = MathHelper.ToRadians(45);
-                    double boundSphereRadius = bbCorners.Select(x => Vector3.Distance(x, bbCenter)).Max();
-                    double camDistance = ((boundSphereRadius * 2.0) / Math.Tan(fov / 2.0)) / 2;
-
-                    _archballCamera.LookAt = bbCenter;
-                    _archballCamera.Zoom = (float)camDistance;
-                }
-                else
-                {
-                    Vector3 finalPos = Vector3.Zero;
-                    foreach (var item in objectState.SelectedObjects())
-                        finalPos += Vector3.Transform(MathUtil.GetCenter(item.Geometry.BoundingBox), _sceneManager.GetWorldPosition(item));
-
-                    _archballCamera.LookAt = finalPos / objectState.SelectedObjects().Count();
-                }
+                FocusObjects(objectState.SelectedObjects());
             }
             else if (selectionState is VertexSelectionState vertexSelection)
             {

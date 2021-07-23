@@ -74,7 +74,7 @@ namespace View3D.Rendering.Geometry
             RmvMesh mesh = new RmvMesh();
             mesh.IndexList = GetIndexBuffer().ToArray();
 
-            if (_vertedFormat == VertexFormat.Default)
+            if (_vertedFormat == VertexFormat.Static)
             {
                 mesh.VertexList = new DefaultVertex[VertexCount()];
 
@@ -418,14 +418,14 @@ namespace View3D.Rendering.Geometry
 
         public override void ChangeVertexType(VertexFormat newFormat)
         {
-            if (!(newFormat == VertexFormat.Weighted || newFormat == VertexFormat.Default || newFormat == VertexFormat.Cinematic))
+            if (!(newFormat == VertexFormat.Weighted || newFormat == VertexFormat.Static || newFormat == VertexFormat.Cinematic))
                 throw new Exception("Not able to change vertex format into this");
 
             if (newFormat == VertexFormat.Weighted)
             {
                 for (int i = 0; i < _vertexArray.Length; i++)
                 {
-                    if (_vertedFormat == VertexFormat.Default)
+                    if (_vertedFormat == VertexFormat.Static)
                     {
                         _vertexArray[i].BlendIndices = new Vector4(0, 0, 0, 0);
                         _vertexArray[i].BlendWeights = new Vector4(1, 0, 0, 0);
@@ -473,7 +473,7 @@ namespace View3D.Rendering.Geometry
             {
                 for (int i = 0; i < _vertexArray.Length; i++)
                 {
-                    if (_vertedFormat == VertexFormat.Default)
+                    if (_vertedFormat == VertexFormat.Static)
                     {
                         _vertexArray[i].BlendIndices = new Vector4(0, 0, 0, 0);
                         _vertexArray[i].BlendWeights = new Vector4(1, 0, 0, 0);
@@ -517,7 +517,7 @@ namespace View3D.Rendering.Geometry
                 WeightCount = 4;
                 _vertedFormat = VertexFormat.Cinematic;
             }
-            else if (newFormat == VertexFormat.Default)
+            else if (newFormat == VertexFormat.Static)
             {
                 for (int i = 0; i < _vertexArray.Length; i++)
                 {
@@ -526,7 +526,7 @@ namespace View3D.Rendering.Geometry
                 }
 
                 WeightCount = 0;
-                _vertedFormat = VertexFormat.Default;
+                _vertedFormat = VertexFormat.Static;
             }
 
             RebuildVertexBuffer();
@@ -534,7 +534,7 @@ namespace View3D.Rendering.Geometry
 
         public bool ContainsAnimationBone(int[] boneIndexList)
         {
-            if (_vertedFormat == VertexFormat.Default)
+            if (_vertedFormat == VertexFormat.Static)
                 return false;
 
             for(int i = 0; i < _vertexArray.Length; i++)

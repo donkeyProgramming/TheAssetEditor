@@ -70,7 +70,7 @@ namespace View3D.Components.Gizmo
         private void GizmoTransformStart()
         {
             _mouse.MouseOwner = this;
-            _activeTransformation.Start(_gizmo.ActiveMode);
+            _activeTransformation.Start(_commandManager);
         }
 
         private void GizmoTransformEnd()

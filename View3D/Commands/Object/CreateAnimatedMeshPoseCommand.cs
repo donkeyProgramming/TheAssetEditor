@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Filetypes.RigidModel;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -43,6 +44,11 @@ namespace View3D.Commands.Object
                     var vert = meshHelper.GetVertexTransform(_frame, i);
                     node.Geometry.TransformVertex(i, vert);
                 }
+
+                var header = node.MeshModel.Header;
+                header.VertextType = VertexFormat.Static;
+                node.MeshModel.Header = header;
+                node.Geometry.ChangeVertexType(VertexFormat.Static);
 
                 node.Geometry.RebuildVertexBuffer();
             }

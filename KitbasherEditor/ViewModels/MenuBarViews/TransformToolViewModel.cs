@@ -90,7 +90,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
             if (_activeMode == TransformMode.Rotate)
             {
-                transform.Start(GizmoMode.Rotate);
+                transform.Start(_commandExecutor);
                 transform.GizmoRotateEvent(
                     Matrix.CreateRotationX(MathHelper.ToRadians((float)_vector3.X.Value)) *
                     Matrix.CreateRotationY(MathHelper.ToRadians((float)_vector3.Y.Value)) *
@@ -98,12 +98,12 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             }
             else if (_activeMode == TransformMode.Translate)
             {
-                transform.Start(GizmoMode.Translate);
+                transform.Start(_commandExecutor);
                 transform.GizmoTranslateEvent(new Vector3((float)_vector3.X.Value, (float)_vector3.Y.Value, (float)_vector3.Z.Value), PivotType.ObjectCenter);
             }
             else if (_activeMode == TransformMode.Scale)
             {
-                transform.Start(GizmoMode.NonUniformScale);
+                transform.Start(_commandExecutor);
                 transform.GizmoScaleEvent(new Vector3((float)_vector3.X.Value-1, (float)_vector3.Y.Value - 1, (float)_vector3.Z.Value - 1), PivotType.ObjectCenter);    // -1 due to weirdness inside the function
             }
 

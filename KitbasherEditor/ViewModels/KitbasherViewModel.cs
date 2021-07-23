@@ -11,6 +11,7 @@ using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
@@ -18,6 +19,7 @@ using View3D.Components.Gizmo;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
 using View3D.Scene;
+using View3D.SceneNodes;
 using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels
@@ -97,7 +99,12 @@ namespace KitbasherEditor.ViewModels
                 try
                 {
                     _modelLoader.LoadEditableModel(MainFile as PackFile);
-                    DisplayName = MainFile.Name;
+                    var nodes = _modelLoader.EditableMeshNode.GetMeshNodes(0)
+                        .Select(x => x as ISelectable)
+                        .Where(x => x != null)
+                        .ToList();
+                    Scene.GetComponent<FocusSelectableObjectComponent>().FocusObjects(nodes);
+                   DisplayName = MainFile.Name;
                 }
                 catch (Exception e)
                 {

@@ -276,7 +276,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 return;
             }
 
-            if (!(newFormat == VertexFormat.Weighted || newFormat == VertexFormat.Default || newFormat == VertexFormat.Cinematic))
+            if (!(newFormat == VertexFormat.Weighted || newFormat == VertexFormat.Static || newFormat == VertexFormat.Cinematic))
             {
                 MessageBox.Show("Can only swap to weighted or default format.");
                 NotifyPropertyChanged(nameof(VertexType));
@@ -285,7 +285,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
             if (newFormat == VertexFormat.Weighted)
                 MaterialType = GroupTypeEnum.weighted;
-            else if (newFormat == VertexFormat.Default)
+            else if (newFormat == VertexFormat.Static)
                 MaterialType = GroupTypeEnum.default_type;
             else if (newFormat == VertexFormat.Cinematic)
                 MaterialType = GroupTypeEnum.weighted;

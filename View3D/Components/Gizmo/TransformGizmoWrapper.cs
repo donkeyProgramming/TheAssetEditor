@@ -4,6 +4,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using View3D.Commands.Vertex;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
@@ -27,44 +28,56 @@ namespace View3D.Components.Gizmo
         TransformVertexCommand _activeCommand;
 
         List<IGeometry> _effectedObjects;
-        List<int> _selectedVertexes;
+        ISelectionState _selectionState;
 
         Matrix _totalGizomTransform = Matrix.Identity;
         bool _invertedWindingOrder = false;
 
-
-        public TransformGizmoWrapper(List<IGeometry> effectedObjects)
+        public TransformGizmoWrapper(List<IGeometry> effectedObjects, ISelectionState vertexSelectionState)
         {
-            _effectedObjects = effectedObjects;
+           
+            _selectionState = vertexSelectionState;
 
-            foreach (var item in _effectedObjects)
-                Position += item.MeshCenter;
+            if (_selectionState as ObjectSelectionState != null)
+            {
+                _effectedObjects = effectedObjects;
 
-            Position = (Position / _effectedObjects.Count);
+                foreach (var item in _effectedObjects)
+                    Position += item.MeshCenter;
+
+                Position = (Position / _effectedObjects.Count);
+            }
+            if (_selectionState is VertexSelectionState vertSelectionState)
+            {
+                _effectedObjects = effectedObjects;
+
+                for (int i = 0; i < vertSelectionState.SelectedVertices.Count; i++)
+                    Position += _effectedObjects[0].GetVertexById(vertSelectionState.SelectedVertices[i]);
+
+                Position = (Position / vertSelectionState.SelectedVertices.Count);
+            }
         }
 
-        public TransformGizmoWrapper(IGeometry vertexGeometry, List<int> selectedVertexes)
+        public void Start(CommandExecutor commandManager)
         {
-            _effectedObjects = new List<IGeometry>() { vertexGeometry };
-            _selectedVertexes = selectedVertexes;
+            if (_activeCommand != null)
+            {
+                    MessageBox.Show("Transform debug check - Please inform the creator of the tool that you got this message. Would also love it if you tried undoing your last command to see if that works..\n E-001");
+                _activeCommand.InvertWindingOrder = _invertedWindingOrder;
+                _activeCommand.Transform = _totalGizomTransform;
+                _activeCommand.PivotPoint = Position;
+                commandManager.ExecuteCommand(_activeCommand);
+                _activeCommand = null;
+            }
 
-            for (int i = 0; i < _selectedVertexes.Count; i++)
-                Position += vertexGeometry.GetVertexById(_selectedVertexes[i]);
-
-            Position = (Position / _selectedVertexes.Count);
-        }
-
-        public void Start(GizmoMode mode)
-        {
             _totalGizomTransform = Matrix.Identity;
-            _activeCommand = new TransformVertexCommand(_effectedObjects, Position, mode == GizmoMode.Rotate, _selectedVertexes);
+            _activeCommand = new TransformVertexCommand(_effectedObjects, Position);
         }
 
         public void Stop(CommandExecutor commandManager)
         {
             if (_activeCommand != null)
             {
-                //var m = Matrix.CreateTranslation(-Position) * _totalGizomTransform * Matrix.CreateTranslation(Position);
                 _activeCommand.InvertWindingOrder = _invertedWindingOrder;
                 _activeCommand.Transform = _totalGizomTransform;
                 _activeCommand.PivotPoint = Position;
@@ -126,23 +139,37 @@ namespace View3D.Components.Gizmo
 
         void ApplyTransform(Matrix transform, PivotType pivotType)
         {
+            transform.Decompose(out var scale, out var rot, out var trans);
+
             foreach (var geo in _effectedObjects)
             {
                 var objCenter = Vector3.Zero;
                 if (pivotType == PivotType.ObjectCenter)
                     objCenter = Position;
 
-                if (_selectedVertexes == null)
+                if (_selectionState is ObjectSelectionState objectSelectionState)
                 {
                     for (int i = 0; i < geo.VertexCount(); i++)
                         TransformVertex(transform, geo, objCenter, i);
                 }
-                else
+                else if(_selectionState is VertexSelectionState vertSelectionState)
                 {
-                    for (int i = 0; i < _selectedVertexes.Count; i++)
-                        TransformVertex(transform, geo, objCenter, _selectedVertexes[i]);
+                    for (int i = 0; i < vertSelectionState.VertexWeights.Count; i++)
+                    {
+                        if (vertSelectionState.VertexWeights[i] != 0)
+                        {
+                            var weight = vertSelectionState.VertexWeights[i];
+                            var vertexScale = Vector3.Lerp(Vector3.One, scale, weight);
+                            var vertRot = Quaternion.Slerp(Quaternion.Identity, rot, weight);
+                            var vertTrnas = trans * weight;
+
+                            var weightedTransform = Matrix.CreateScale(vertexScale) * Matrix.CreateFromQuaternion(vertRot) * Matrix.CreateTranslation(vertTrnas);
+
+                            TransformVertex(weightedTransform, geo, objCenter, i);
+                        }
+                    }
                 }
-               
+
                 geo.RebuildVertexBuffer();
             }
         }
@@ -164,12 +191,12 @@ namespace View3D.Components.Gizmo
             {
                 var transformables = objectSelectionState.CurrentSelection().Where(x => x is ITransformable).Select(x => x.Geometry);
                 if (transformables.Any())
-                    return new TransformGizmoWrapper(transformables.ToList());
+                    return new TransformGizmoWrapper(transformables.ToList(), state);
             }
             else if (state is VertexSelectionState vertexSelectionState)
             {
                 if (vertexSelectionState.SelectedVertices.Count != 0)
-                    return new  TransformGizmoWrapper(vertexSelectionState.RenderObject.Geometry, vertexSelectionState.SelectedVertices);
+                    return new  TransformGizmoWrapper(new List<IGeometry>(){vertexSelectionState.RenderObject.Geometry}, vertexSelectionState);
             }
             return null;
         }

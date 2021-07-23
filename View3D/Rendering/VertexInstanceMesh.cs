@@ -3,8 +3,10 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
 
 namespace View3D.Rendering
@@ -65,7 +67,7 @@ namespace View3D.Rendering
         int _currentInstanceCount;
 
         Vector3 _selectedColur = new Vector3(1, 0, 0);
-        Vector3 _deselectedColur = new Vector3(0, 1, 0);
+        Vector3 _deselectedColur = new Vector3(1, 1, 1);
 
         public VertexInstanceMesh(GraphicsDevice device, ContentManager content)
         {
@@ -146,7 +148,7 @@ namespace View3D.Rendering
             _indexBuffer.SetData(indices);
         }
 
-        public void Update(IGeometry geo, Matrix modelMatrix, Quaternion objectRotation, Vector3 cameraPos, List<int> selectedVertexes)
+        public void Update(IGeometry geo, Matrix modelMatrix, Quaternion objectRotation, Vector3 cameraPos, VertexSelectionState selectedVertexes)
         {
             _currentInstanceCount = geo.VertexCount();
             for (int i = 0; i < _currentInstanceCount; i++)
@@ -161,11 +163,8 @@ namespace View3D.Rendering
                 _instanceTransform[i].World1 = new Vector3(world[1, 0], world[1, 1], world[1, 2]);
                 _instanceTransform[i].World2 = new Vector3(world[2, 0], world[2, 1], world[2, 2]);
                 _instanceTransform[i].World3 = new Vector3(world[3, 0], world[3, 1], world[3, 2]);
-
-                if (selectedVertexes.Contains(i))
-                    _instanceTransform[i].Colour = _selectedColur;
-                else
-                    _instanceTransform[i].Colour = _deselectedColur;
+                _instanceTransform[i].Colour = Vector3.Lerp(_deselectedColur, _selectedColur, selectedVertexes.VertexWeights[i]);
+            
             }
             _instanceBuffer.SetData(_instanceTransform, 0, _currentInstanceCount, SetDataOptions.None);
         }

@@ -2,6 +2,7 @@
 using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
@@ -16,18 +17,16 @@ namespace View3D.Commands.Vertex
     {
         List<IGeometry> _geometryList;
         public Vector3 PivotPoint;
-        List<int> _affectVertexes;
         public Matrix Transform { get; set; }
         public bool InvertWindingOrder { get; set; } = false;
 
         SelectionManager _selectionManager;
         ISelectionState _oldSelectionState;
 
-        public TransformVertexCommand(List<IGeometry> geometryList, Vector3 pivotPoint, bool applyToNormals = false, List<int> affectVertexes = null)
+        public TransformVertexCommand(List<IGeometry> geometryList, Vector3 pivotPoint)
         {
             _geometryList = geometryList;
             PivotPoint = pivotPoint;
-            _affectVertexes = affectVertexes;
         }
 
         public override string GetHintText()
@@ -48,20 +47,35 @@ namespace View3D.Commands.Vertex
 
         protected override void UndoCommand()
         {
-            var m = Matrix.CreateTranslation(-PivotPoint) * Matrix.Invert(Transform) * Matrix.CreateTranslation(PivotPoint);
-            var inv = m;
-            for(int i = 0; i < _geometryList.Count; i++)
+            Transform.Decompose(out var scale, out var rot, out var trans);
+
+            for (int meshIndex = 0; meshIndex < _geometryList.Count; meshIndex++)
             {
-                var geo = _geometryList[i];
-                if (_affectVertexes != null)
+                var geo = _geometryList[meshIndex];
+                if (_oldSelectionState.Mode == GeometrySelectionMode.Vertex)
                 {
-                    for (int v = 0; v < _affectVertexes.Count; v++)
-                        geo.TransformVertex(_affectVertexes[v], inv);
+                    var vState = _oldSelectionState as VertexSelectionState;
+                    for (int vertIndex = 0; vertIndex < vState.VertexWeights.Count; vertIndex++)
+                    {
+                        if (vState.VertexWeights[vertIndex] != 0)
+                        {
+                            var weight = vState.VertexWeights[vertIndex];
+                            var vertexScale = Vector3.Lerp(Vector3.One, scale, weight);
+                            var vertRot = Quaternion.Slerp(Quaternion.Identity, rot, weight);
+                            var vertTrnas = trans * weight;
+
+                            var weightedUndoTransform = Matrix.CreateScale(vertexScale) * Matrix.CreateFromQuaternion(vertRot) * Matrix.CreateTranslation(vertTrnas);
+                            var finalMatrix = Matrix.CreateTranslation(-PivotPoint) * Matrix.Invert(weightedUndoTransform) * Matrix.CreateTranslation(PivotPoint);
+
+                            geo.TransformVertex(vertIndex, finalMatrix);
+                        }
+                    }
                 }
                 else
                 {
+                    var undoMatrix = Matrix.CreateTranslation(-PivotPoint) * Matrix.Invert(Transform) * Matrix.CreateTranslation(PivotPoint);
                     for (int v = 0; v < geo.VertexCount(); v++)
-                        geo.TransformVertex(v, inv);
+                        geo.TransformVertex(v, undoMatrix);
 
                     if (InvertWindingOrder)
                     {
@@ -78,7 +92,6 @@ namespace View3D.Commands.Vertex
 
                 geo.RebuildVertexBuffer();
             }
-
 
             _selectionManager.SetState(_oldSelectionState);
         }

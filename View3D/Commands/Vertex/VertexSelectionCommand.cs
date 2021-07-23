@@ -2,6 +2,7 @@
 using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System.Collections.Generic;
+using System.Linq;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Rendering;
@@ -44,8 +45,7 @@ namespace View3D.Commands.Vertex
             if (!(_isAdd || _isRemove))
                 currentState.Clear();
 
-            foreach (var newSelectionItem in _selectedVertices)
-                currentState.ModifySelection(newSelectionItem, _isRemove);
+            currentState.ModifySelection(_selectedVertices, _isRemove);
 
             currentState.EnsureSorted();
         }

@@ -20,13 +20,11 @@ namespace View3D.Commands.Object
 
         Rmv2MeshNode _sourceMesh; 
         Rmv2MeshNode _objectToPin;
-        GameSkeleton _skeleton;
 
-        public PinMeshToMeshCommand(Rmv2MeshNode sourceMesh, Rmv2MeshNode objectToPin, GameSkeleton skeleton)
+        public PinMeshToMeshCommand(Rmv2MeshNode sourceMesh, Rmv2MeshNode objectToPin)
         {
             _sourceMesh = sourceMesh;
             _objectToPin = objectToPin;
-            _skeleton = skeleton;
         }
 
         public override string GetHintText()
@@ -52,8 +50,6 @@ namespace View3D.Commands.Object
             // Use the center of the bb box to find the closest vert
             var bbCorners = _objectToPin.Geometry.BoundingBox.GetCorners();
             var bbCenter = new Vector3(bbCorners.Average(x => x.X), bbCorners.Average(x => x.Y), bbCorners.Average(x => x.Z));
-            //Vector3.Transform(bbCenter, _objectToPin.ModelMatrix)
-
 
             // Get closest vert
             var sourceGeo = _sourceMesh.Geometry as Rmv2Geometry;

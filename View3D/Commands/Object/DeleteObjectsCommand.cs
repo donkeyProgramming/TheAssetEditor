@@ -46,7 +46,7 @@ namespace View3D.Commands.Object
             foreach (var item in _itemsToDelete)
                 item.Parent.RemoveObject(item);
 
-            _selectionManager.CreateSelectionSate(GeometrySelectionMode.Object);
+            _selectionManager.CreateSelectionSate(GeometrySelectionMode.Object, null);
         }
 
         protected override void UndoCommand()

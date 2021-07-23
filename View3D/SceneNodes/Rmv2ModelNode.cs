@@ -91,6 +91,13 @@ namespace View3D.SceneNodes
             return lods[lod].Children[modelIndex] as Rmv2MeshNode;
         }
 
+        public List<Rmv2MeshNode> GetMeshNodes(int lod)
+        {
+            var lods = GetLodNodes();
+       
+            return lods[lod].Children.Select(x=> x as Rmv2MeshNode).ToList();
+        }
+
         public override ISceneNode Clone()
         {
             var newItem = new Rmv2ModelNode(Name + " - Clone")

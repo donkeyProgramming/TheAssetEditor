@@ -246,7 +246,7 @@ namespace Filetypes.RigidModel
                 extraSize = 4;
             switch (vertexFormat)
             {
-                case VertexFormat.Default:
+                case VertexFormat.Static:
                     return ByteHelper.GetSize(typeof(DefaultVertex.Data));
                 case VertexFormat.Weighted:
                     return ByteHelper.GetSize(typeof(WeightedVertex.Data)) + extraSize;
@@ -261,7 +261,7 @@ namespace Filetypes.RigidModel
         {
             for (int i = 0; i < VertexList.Length; i++) 
             {
-                if (vertexFormat == VertexFormat.Default)
+                if (vertexFormat == VertexFormat.Static)
                     writer.Write(ByteHelper.GetBytes(((DefaultVertex)VertexList[i])._data)); 
                 else if (vertexFormat == VertexFormat.Cinematic)
                     writer.Write(ByteHelper.GetBytes(((CinematicVertex)VertexList[i])._data));
@@ -282,7 +282,7 @@ namespace Filetypes.RigidModel
             VertexList = new BaseVertex[vertexCount]; 
             for (int i = 0; i < vertexCount; i++)
             {
-                if (vertexFormat == VertexFormat.Default)
+                if (vertexFormat == VertexFormat.Static)
                 {
                     var vertexData = ByteHelper.ByteArrayToStructure<DefaultVertex.Data>(data, vertexStart + i * vertexSize);
                     VertexList[i] = new DefaultVertex(vertexData);

@@ -40,7 +40,7 @@ namespace View3D.Commands.Object
 
             _oldState = _selectionManager.GetStateCopy();
 
-            var state = _selectionManager.CreateSelectionSate(GeometrySelectionMode.Object);
+            var state = _selectionManager.CreateSelectionSate(GeometrySelectionMode.Object, null);
             var objectState = state as ObjectSelectionState;
 
             foreach (var item in _objectsToCopy)

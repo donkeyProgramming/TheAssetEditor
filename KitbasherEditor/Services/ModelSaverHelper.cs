@@ -193,7 +193,7 @@ namespace KitbasherEditor.Services
                 vertexName = "weighted4";
             else if (vertextType == VertexFormat.Weighted)
                 vertexName = "weighted2";
-            else if (vertextType == VertexFormat.Default)
+            else if (vertextType == VertexFormat.Static)
                 vertexName = "static";
 
             return $" MeshName='{mesh.Name}' Texture='{textureName}' VertType='{vertexName}' Alpha='{alphaOn}'";

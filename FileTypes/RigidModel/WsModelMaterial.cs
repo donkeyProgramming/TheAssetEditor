@@ -38,7 +38,7 @@ namespace FileTypes.RigidModel
                 else if (Name.Contains("weighted2", StringComparison.InvariantCultureIgnoreCase))
                     VertexType = VertexFormat.Weighted;
                 else
-                    VertexType = VertexFormat.Default;
+                    VertexType = VertexFormat.Static;
             }
 
             var textureNodes = doc.SelectNodes(@"/material/textures/texture");

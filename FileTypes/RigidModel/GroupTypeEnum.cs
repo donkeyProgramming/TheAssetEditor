@@ -65,7 +65,7 @@ namespace Filetypes.RigidModel
 	public enum VertexFormat : UInt32
 	{
 		Unknown = 99,
-		Default = 0,
+		Static = 0,
 		Weighted = 3,
 		Cinematic = 4
 	};

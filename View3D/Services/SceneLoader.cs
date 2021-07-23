@@ -85,9 +85,7 @@ namespace View3D.Services
             else
                 parent.AddObject(variantMeshElement);
 
-
             var slotsElement = variantMeshElement.AddObject( new SlotsNode("Slots"));
-
             var vmdContent = Encoding.UTF8.GetString(file.DataSource.ReadData());
 
             VariantMeshFile meshFile;

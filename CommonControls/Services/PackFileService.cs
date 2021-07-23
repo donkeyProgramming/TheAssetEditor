@@ -204,14 +204,26 @@ namespace CommonControls.Services
         List<string> GetPackFilesFromManifest(string gameDataFolder)
         {
             var output = new List<string>();
-            var lines = File.ReadAllLines(gameDataFolder + "\\manifest.txt");
-            foreach (var line in lines)
+            var manifestFile = gameDataFolder + "\\manifest.txt";
+            if (File.Exists(manifestFile))
             {
-                var items = line.Split('\t');
-                if (items[0].Contains(".pack"))
-                    output.Add(items[0].Trim());
+                var lines = File.ReadAllLines(manifestFile);
+                foreach (var line in lines)
+                {
+                    var items = line.Split('\t');
+                    if (items[0].Contains(".pack"))
+                        output.Add(items[0].Trim());
+                }
+                return output;
             }
-            return output;
+            else
+            {
+                var files = Directory.GetFiles(gameDataFolder)
+                    .Where(x => Path.GetExtension(x) == ".pack")
+                    .Select(x=>Path.GetFileName(x))
+                    .ToList();
+                return files;
+            }
         }
 
         // Add

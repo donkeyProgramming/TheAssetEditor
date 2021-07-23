@@ -47,6 +47,8 @@ namespace AssetEditor.ViewModels
 
 
         public ICommand OpenHelpCommand { get; set; }
+        public ICommand OpenPatreonCommand { get; set; }
+        
         public ICommand OpenKitbashEditorCommand { get; set; }
         public ICommand OpenCampaignAnimCreatorCommand { get; set; }
         public ICommand OpenPropCreatorCommand { get; set; }
@@ -72,7 +74,8 @@ namespace AssetEditor.ViewModels
             OpenWarhammer2PacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Warhammer2));
             OpenTroyPacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Troy));
 
-            OpenHelpCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://tw-modding.com/index.php/Tutorial:AssetEditor") { CreateNoWindow = true }));  
+            OpenHelpCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://tw-modding.com/index.php/Tutorial:AssetEditor") { CreateNoWindow = true }));
+            OpenPatreonCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://www.patreon.com/TheAssetEditor") { CreateNoWindow = true }));
         }
 
         void OpenPackFile()

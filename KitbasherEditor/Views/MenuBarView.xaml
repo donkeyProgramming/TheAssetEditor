@@ -3,7 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:KitbasherEditor.Views" xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
+             xmlns:local="clr-namespace:KitbasherEditor.Views" 
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
+             xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
              mc:Ignorable="d" Loaded="UserControl_Loaded" >
 
     <UserControl.Resources>
@@ -64,8 +67,8 @@
             </MenuItem>
         </Menu>
 
-        <ToolBarTray DockPanel.Dock="Top">
-            <ToolBar>
+        <ToolBarTray DockPanel.Dock="Top" Height="50" VerticalAlignment="Center">
+            <ToolBar VerticalContentAlignment="Center">
                 <Button ToolTip="Save (ctr+s)"  Command="{Binding General.SaveCommand, Mode=OneTime}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-save-all-50.png"/>
                 </Button>
@@ -74,16 +77,16 @@
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/open ref.png"/>
                 </Button>
 
-                <Button ToolTip="Validate object" IsEnabled="False">
+                <Button ToolTip="Validate object" IsEnabled="False" Visibility="Collapsed">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Validate.png"/>
                 </Button>
 
-                <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
+
 
                 <Button ToolTip="{Binding General.UndoHintText}" Command="{Binding General.UndoCommand, Mode=OneTime}" IsEnabled="{Binding General.UndoEnabled}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/undo.png"/>
                 </Button>
-                <Button ToolTip="Delete undo history" IsEnabled="False">
+                <Button ToolTip="Delete undo history" IsEnabled="False" Visibility="Collapsed">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/DeleteHistory.png"/>
                 </Button>
 
@@ -231,9 +234,17 @@
                 <ToolBar  Visibility="{Binding Tools.ShowVertexTools, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
                     <Button ToolTip="Merge selected vertexes" 
                         Command="{Binding Tools.MergeVertexCommand}"
-                        IsEnabled="{Binding Tools.MergeVertexEnabled, UpdateSourceTrigger=PropertyChanged}">
+                        IsEnabled="{Binding Tools.MergeVertexEnabled, UpdateSourceTrigger=PropertyChanged}"
+                            Visibility="Collapsed">
                         <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_mergeVertex.png"/>
                     </Button>
+
+                    <Label Content="Fall-of:" VerticalContentAlignment="Center"/>
+                    <TextBox MaxWidth="50" MinWidth="50" Text="{Binding Tools.VertexMovementFalloff.Value.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" ToolTip="Fall of distance for selected vertexes">
+                        <b:Interaction.Behaviors>
+                            <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
+                        </b:Interaction.Behaviors>
+                    </TextBox>
                 </ToolBar>
 
 
