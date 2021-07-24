@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows;
 
 namespace View3D.Animation
 {
@@ -197,19 +198,27 @@ namespace View3D.Animation
 
         public void Refresh()
         {
-            if (IsEnabled == false)
+            try
             {
-                _currentAnimFrame = null;
-                return;
+                if (IsEnabled == false)
+                {
+                    _currentAnimFrame = null;
+                    return;
+                }
+                //Fix this so if crash no break
+                float sampleT = 0;
+                float animationLengthMs = GetAnimationLengthMs();
+                if (animationLengthMs != 0)
+                    sampleT = (float)(_timeSinceStart.TotalMilliseconds / animationLengthMs);
+                _currentAnimFrame = AnimationSampler.Sample(sampleT, _skeleton, _animationClips);
+                if (_skeleton != null)
+                    _skeleton.Update();
             }
-            //Fix this so if crash no break
-            float sampleT = 0;
-            float animationLengthMs = GetAnimationLengthMs();
-            if (animationLengthMs != 0)
-                sampleT = (float)(_timeSinceStart.TotalMilliseconds / animationLengthMs);
-            _currentAnimFrame = AnimationSampler.Sample(sampleT, _skeleton, _animationClips);
-            if(_skeleton != null)
-                _skeleton.Update();
+            catch
+            {
+                MessageBox.Show("Error playing animation");
+                SetAnimation(null, _skeleton);
+            }
         }
 
         public void Play() { IsPlaying = true; IsEnabled = true; }

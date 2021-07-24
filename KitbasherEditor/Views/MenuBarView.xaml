@@ -183,6 +183,12 @@
                         <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-body-48.png"/>
                     </Button>
 
+                    <Button ToolTip="Open Regigging Tool" 
+                        Command="{Binding Tools.ReRiggingToolCommand}"
+                            IsEnabled="{Binding Tools.ReRiggingToolCommandEnabled, UpdateSourceTrigger=PropertyChanged}">
+                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/icons8-animated-skeleton-50.png"/>
+                    </Button>
+
                     <Button ToolTip="Convert selected meshes to static meshes with the current animation frame" 
                         Command="{Binding Tools.CreateStaticMeshesCommand}"
                             IsEnabled="{Binding Tools.CreateStaticMeshesCommandEnabled, UpdateSourceTrigger=PropertyChanged}">

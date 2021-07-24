@@ -98,7 +98,6 @@
                     <Label Width="100">Animation Bones</Label>
                     <Label>:</Label>
                     <StackPanel>
-                        <Button Command="{Binding Animation.OpenBoneRemappingToolCommand}" Content="Open Remapping tool" Width="130"/>
                         <Expander>
                             <Expander.Header>
                                 <StackPanel Orientation="Horizontal">

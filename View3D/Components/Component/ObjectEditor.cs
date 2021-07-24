@@ -16,6 +16,7 @@ using View3D.Services;
 using View3D.Utility;
 using static CommonControls.ErrorListDialog.ErrorListViewModel;
 using static View3D.Commands.Object.GroupObjectsCommand;
+using MessageBox = System.Windows.MessageBox;
 
 namespace View3D.Components.Component
 {
@@ -75,11 +76,6 @@ namespace View3D.Components.Component
             _commandManager.ExecuteCommand(command);
             
             return true;
-        }
-
-        public void CreateLods(List<ISelectable> selectable, float factor)
-        {
-            throw new NotImplementedException();
         }
 
         public void ReduceMesh(List<Rmv2MeshNode> meshNodes, float factor, bool undoable)
@@ -155,5 +151,7 @@ namespace View3D.Components.Component
                     SortMeshes(children[i]);
             }
         }
+
+      
     }
 }

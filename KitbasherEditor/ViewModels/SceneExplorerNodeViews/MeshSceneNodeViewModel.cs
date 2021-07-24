@@ -124,7 +124,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         List<AnimatedBone> _animatedBones;
         public List<AnimatedBone> AnimatedBones { get { return _animatedBones; } set { SetAndNotify(ref _animatedBones, value); } }
-        public ICommand OpenBoneRemappingToolCommand { get; set; }
 
         public MeshSceneNodeViewModel_Animation(PackFileService pfs, Rmv2MeshNode meshNode, SkeletonAnimationLookUpHelper animLookUp, IComponentManager componentManager)
         {
@@ -154,42 +153,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 if (skeletonFile != null && hasValidBoneMapping)
                     AnimatedBones = bones.Select(x => new AnimatedBone() { BoneIndex = x, Name = skeletonFile.Bones[x].Name }).OrderBy(x => x.BoneIndex).ToList();
             }
-
-            OpenBoneRemappingToolCommand = new RelayCommand(OpenBoneRemappingTool);
         }
 
-        void OpenBoneRemappingTool()
-        {
-            var targetSkeletonName = _meshNode.MeshModel.ParentSkeletonName;
-
-            var existingSkeletonMeshNode = _meshNode.GetParentModel();
-            var existingSkeltonName = existingSkeletonMeshNode.Model.Header.SkeletonName;
-
-            RemappedAnimatedBoneConfiguration config = new RemappedAnimatedBoneConfiguration();
-
-            var existingSkeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, targetSkeletonName);
-            config.MeshSkeletonName = targetSkeletonName;
-            config.MeshBones = AnimatedBone.CreateFromSkeleton(existingSkeletonFile, AnimatedBones.Select(x => x.BoneIndex).ToList());
-            
-
-            var newSkeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, existingSkeltonName);
-            config.ParnetModelSkeletonName = existingSkeltonName;
-            config.ParentModelBones = AnimatedBone.CreateFromSkeleton(newSkeletonFile);
-
-            if (targetSkeletonName == existingSkeltonName)
-                MessageBox.Show("Trying to map to and from the same skeleton. This does not really make any sense if you are trying to make the mesh fit an other skeleton.", "Error", MessageBoxButton.OK);
-
-            AnimatedBlendIndexRemappingWindow window = new AnimatedBlendIndexRemappingWindow()
-            {
-                DataContext = new AnimatedBlendIndexRemappingViewModel(config)
-            };
-
-            if (window.ShowDialog() == true)
-            {
-                var remapping = config.MeshBones.First().BuildRemappingList();
-                _componentManager.GetComponent<CommandExecutor>().ExecuteCommand(new RemapBoneIndexesCommand(_meshNode, remapping, config.ParnetModelSkeletonName, new GameSkeleton(existingSkeletonFile, null), new GameSkeleton(newSkeletonFile, null)));
-            }
-        }
     }
 
     public class MeshSceneNodeViewModel_Graphics : NotifyPropertyChangedImpl

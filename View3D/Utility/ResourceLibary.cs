@@ -59,7 +59,6 @@ namespace View3D.Utility
 
             PbrDiffuse = Content.Load<TextureCube>("textures\\phazer\\rustig_koppie_DiffuseHDR");
             PbrSpecular = Content.Load<TextureCube>("textures\\phazer\\rad_sqwantani_bgra8");
-            //PbrSpecular = Content.Load<TextureCube>("textures\\phazer\\rustig_koppie_SpecularHDR");
             PbrLut = Content.Load<Texture2D>("textures\\phazer\\Brdf_rgba32f_raw");
         }
 

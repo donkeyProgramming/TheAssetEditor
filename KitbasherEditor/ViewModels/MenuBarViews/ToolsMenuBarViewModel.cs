@@ -28,6 +28,7 @@ using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Services;
 using View3D.Utility;
+using MessageBox = System.Windows.MessageBox;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
@@ -58,6 +59,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public ICommand SkeletonReshaperCommand { get; set; }
         public ICommand CreateStaticMeshesCommand { get; set; }
         public ICommand PinMeshToMeshCommand { get; set; }
+        public ICommand ReRiggingToolCommand { get; set; }
 
         public NotifyAttr<DoubleViewModel> VertexMovementFalloff { get; set; }
 
@@ -117,6 +119,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         bool _pinMeshToMeshEnabled = false;
         public bool PinMeshToMeshEnabled { get => _pinMeshToMeshEnabled; set => SetAndNotify(ref _pinMeshToMeshEnabled, value); }
 
+        bool _reRiggingToolCommandEnabled = false;
+        public bool ReRiggingToolCommandEnabled { get => _reRiggingToolCommandEnabled; set => SetAndNotify(ref _reRiggingToolCommandEnabled, value); }
+
         public ToolsMenuBarViewModel(IComponentManager componentManager, ToolbarCommandFactory commandFactory, PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper, WindowKeyboard keyboard)
         {
             _packFileService = packFileService;
@@ -139,6 +144,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             SkeletonReshaperCommand = new RelayCommand(OpenSkeletonReshaperTool);
             CreateStaticMeshesCommand = new RelayCommand(CreateStaticMeshes);
             PinMeshToMeshCommand = new RelayCommand(PinMeshToMesh);
+            ReRiggingToolCommand = new RelayCommand(OpenReRiggingTool);
 
             VertexMovementFalloff = new NotifyAttr<DoubleViewModel>(new DoubleViewModel());
             VertexMovementFalloff.Value.PropertyChanged += VertexMovementFalloffChanged;
@@ -175,6 +181,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             SkeletonReshaperCommandEnabled = false;
             CreateStaticMeshesCommandEnabled = false;
             PinMeshToMeshEnabled = false;
+            ReRiggingToolCommandEnabled = false;
 
             if (state is ObjectSelectionState objectSelection)
             {
@@ -188,6 +195,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 SkeletonReshaperCommandEnabled = objectSelection.SelectedObjects().Count > 0;
                 CreateStaticMeshesCommandEnabled = objectSelection.SelectedObjects().Count > 0;
                 PinMeshToMeshEnabled = objectSelection.SelectedObjects().Count == 2;
+                ReRiggingToolCommandEnabled = objectSelection.SelectedObjects().Count != 0;
             }
             else if (state is FaceSelectionState faceSelection && faceSelection.SelectedFaces.Count != 0)
             {
@@ -362,7 +370,10 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
             var frame = mainPlayer.GetCurrentAnimationFrame();
             if (frame == null)
+            {
+                MessageBox.Show("An animation must be playing for this tool to work");
                 return;
+            }
 
             var state = _selectionManager.GetState<ObjectSelectionState>();
             var selectedObjects = state.SelectedObjects();
@@ -382,7 +393,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 }
             }
 
-            var cmd = new CreateAnimatedMeshPoseCommand(meshes, mainPlayer._skeleton, frame);
+            var cmd = new CreateAnimatedMeshPoseCommand(meshes, mainPlayer._skeleton, frame, true);
             var commandExecutor = _componentManager.GetComponent<CommandExecutor>();
             commandExecutor.ExecuteCommand(cmd, false);
         }
@@ -397,10 +408,92 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             commandExecutor.ExecuteCommand(cmd);
         }
 
-
         private void VertexMovementFalloffChanged(object sender, PropertyChangedEventArgs e)
         {
             _selectionManager.UpdateVertexSelectionFallof((float)VertexMovementFalloff.Value.Value);
+        }
+
+        private void OpenReRiggingTool()
+        {
+            var root = _editableMeshResolver.GeEditableMeshRootNode();
+            var skeletonName = root.Skeleton.Name;
+            Remap(_selectionManager.GetState<ObjectSelectionState>(), skeletonName);
+        }
+
+        void Remap(ObjectSelectionState state, string targetSkeletonName)
+        {
+            var existingSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(_packFileService, targetSkeletonName);
+            if (existingSkeletonFile == null)
+                throw new System.Exception("TargetSkeleton not found -" + targetSkeletonName);
+
+            var selectedMeshses = state.SelectedObjects<Rmv2MeshNode>();
+            if (selectedMeshses.Count(x => x.MeshModel.Header.VertextType == VertexFormat.Static) != 0)
+            {
+                MessageBox.Show($"A static mesh is selected, which can not be remapped");
+                return;
+            }
+
+            var selectedMeshSkeletons = selectedMeshses
+                .Select(x => x.MeshModel.ParentSkeletonName)
+                .Distinct();
+
+            if (selectedMeshSkeletons.Count() != 1)
+            {
+                MessageBox.Show($"{selectedMeshSkeletons.Count()} skeleton types selected, the tool only works when a single skeleton types is selected");
+                return;
+            }
+
+            var selectedMeshSkeleton = selectedMeshSkeletons.First();
+            var newSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(_packFileService, selectedMeshSkeleton);
+
+            // Ensure all the bones have valid stuff
+            var allUsedBoneIndexes = new List<byte>();
+            foreach (var mesh in selectedMeshses)
+            {
+                var boneIndexes = mesh.Geometry.GetUniqeBlendIndices();
+                var activeBonesMin = boneIndexes.Min(x => x);
+                var activeBonesMax = boneIndexes.Max(x => x);
+
+                var skeletonBonesMax = newSkeletonFile.Bones.Max(x => x.Id);
+                bool hasValidBoneMapping = activeBonesMin >= 0 && skeletonBonesMax >= activeBonesMax;
+                if (!hasValidBoneMapping)
+                {
+                    MessageBox.Show($"Mesh {mesh.Name} has an invalid bones, this might cause issues. Its a result of an invalid re-rigging most of the time");
+                    return;
+                }
+                allUsedBoneIndexes.AddRange(boneIndexes);
+            }
+
+            var animatedBoneIndexes = allUsedBoneIndexes
+                .Distinct()
+                .Select(x => new AnimatedBone() { BoneIndex = x, Name = newSkeletonFile.Bones[x].Name })
+                .OrderBy(x => x.BoneIndex).
+                ToList();
+
+            var config = new RemappedAnimatedBoneConfiguration();
+            
+
+            config.MeshSkeletonName = selectedMeshSkeleton;
+            config.MeshBones = AnimatedBone.CreateFromSkeleton(newSkeletonFile, animatedBoneIndexes.Select(x => x.BoneIndex).ToList());
+
+            
+            config.ParnetModelSkeletonName = targetSkeletonName;
+            config.ParentModelBones = AnimatedBone.CreateFromSkeleton(existingSkeletonFile);
+
+            if (targetSkeletonName == selectedMeshSkeleton)
+                MessageBox.Show("Trying to map to and from the same skeleton. This does not really make any sense if you are trying to make the mesh fit an other skeleton.", "Error", MessageBoxButton.OK);
+
+            AnimatedBlendIndexRemappingWindow window = new AnimatedBlendIndexRemappingWindow()
+            {
+                DataContext = new AnimatedBlendIndexRemappingViewModel(config)
+            };
+
+            if (window.ShowDialog() == true)
+            {
+                var remapping = config.MeshBones.First().BuildRemappingList();
+                _componentManager.GetComponent<CommandExecutor>().ExecuteCommand(new RemapBoneIndexesCommand(selectedMeshses, remapping, config.ParnetModelSkeletonName));
+            }
+
         }
     }
 }

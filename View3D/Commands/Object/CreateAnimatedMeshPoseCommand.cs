@@ -16,12 +16,14 @@ namespace View3D.Commands.Object
         List<Rmv2MeshNode> _meshNodes;
         GameSkeleton _skeleton; 
         AnimationFrame _frame;
+        bool _convertToStaticFrame;
 
-        public CreateAnimatedMeshPoseCommand(List<Rmv2MeshNode> meshNodes, GameSkeleton skeleton, AnimationFrame frame)
+        public CreateAnimatedMeshPoseCommand(List<Rmv2MeshNode> meshNodes, GameSkeleton skeleton, AnimationFrame frame, bool convertToStaticFrame = false)
         {
             _meshNodes = new List<Rmv2MeshNode>(meshNodes);
             _skeleton = skeleton;
             _frame = frame;
+            _convertToStaticFrame = convertToStaticFrame;
         }
 
         public override string GetHintText()
@@ -45,10 +47,13 @@ namespace View3D.Commands.Object
                     node.Geometry.TransformVertex(i, vert);
                 }
 
-                var header = node.MeshModel.Header;
-                header.VertextType = VertexFormat.Static;
-                node.MeshModel.Header = header;
-                node.Geometry.ChangeVertexType(VertexFormat.Static);
+                if (_convertToStaticFrame)
+                {
+                    var header = node.MeshModel.Header;
+                    header.VertextType = VertexFormat.Static;
+                    node.MeshModel.Header = header;
+                    node.Geometry.ChangeVertexType(VertexFormat.Static);
+                }
 
                 node.Geometry.RebuildVertexBuffer();
             }

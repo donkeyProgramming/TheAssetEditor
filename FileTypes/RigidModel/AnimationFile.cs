@@ -5,6 +5,7 @@ using FileTypes.PackFiles.Models;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -25,6 +26,7 @@ namespace Filetypes.RigidModel
     }
      */
 
+    [DebuggerDisplay("AnimationFile - {Header.SkeletonName}[{DynamicFrames.Count}]")]
     public class AnimationFile
     {
         public class BoneInfo
@@ -224,8 +226,13 @@ namespace Filetypes.RigidModel
                     output.DynamicFrames.Add(frame);
                 }
             }
+
             // ----------------------
-            
+
+            if (output.Header.AnimationType != 7)
+                output.Header.AnimationTotalPlayTimeInSec = output.DynamicFrames.Count() / output.Header.FrameRate;
+
+
             return output;
         }
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using View3D.Rendering;
 using View3D.SceneNodes;
 
@@ -57,6 +58,14 @@ namespace View3D.Components.Component.Selection
         public List<ISelectable> SelectedObjects()
         {
             return _selectionList;
+        }
+
+        public List<T> SelectedObjects<T>() where T : class
+        {
+            return _selectionList
+               .Where(x => x is T)
+               .Select(x => x as T)
+               .ToList();
         }
 
         public bool IsSelectionEqual(ObjectSelectionState state)

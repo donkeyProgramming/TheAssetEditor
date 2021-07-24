@@ -17,20 +17,18 @@ namespace View3D.Commands.Object
         List<IndexRemapping> _mapping;
         string _newSkeletonName;
 
-        Rmv2MeshNode _meshOwner;
-        IGeometry _originalGeometry;
+        List<Rmv2MeshNode> _meshNodeList;
+        List<IGeometry> _originalGeometry;
         string _originalSkeletonName;
 
-        GameSkeleton _targetSkeleton;
-        GameSkeleton _currentSkeleton;
 
-        public RemapBoneIndexesCommand(Rmv2MeshNode meshOwner, List<IndexRemapping> mapping, string newSkeletonName, GameSkeleton currentSkeleton, GameSkeleton targetSkeleton)
+        public RemapBoneIndexesCommand(List<Rmv2MeshNode> meshNodeList, List<IndexRemapping> mapping, string newSkeletonName)
         {
-            _meshOwner = meshOwner;
+            _meshNodeList = meshNodeList;
             _mapping = mapping;
+
             _newSkeletonName = newSkeletonName;
-            _currentSkeleton = currentSkeleton;
-            _targetSkeleton = targetSkeleton;
+            _originalSkeletonName = _meshNodeList.First().MeshModel.ParentSkeletonName;
         }
 
 
@@ -41,16 +39,22 @@ namespace View3D.Commands.Object
 
         protected override void ExecuteCommand()
         {
-            _originalGeometry = _meshOwner.Geometry.Clone();
-            _originalSkeletonName = _meshOwner.MeshModel.ParentSkeletonName;
-            _meshOwner.Geometry.UpdateAnimationIndecies(_mapping);
-            _meshOwner.MeshModel.ParentSkeletonName = _newSkeletonName;
+            _originalGeometry = _meshNodeList.Select(x => x.Geometry.Clone()).ToList();
+
+            foreach (var node in _meshNodeList)
+            {
+                node.Geometry.UpdateAnimationIndecies(_mapping);
+                node.MeshModel.ParentSkeletonName = _newSkeletonName;
+            }
         }
 
         protected override void UndoCommand()
         {
-            _meshOwner.Geometry = _originalGeometry;
-            _meshOwner.MeshModel.ParentSkeletonName = _originalSkeletonName;
+            for (int i = 0; i < _meshNodeList.Count; i++)
+            {
+                _meshNodeList[i].Geometry = _originalGeometry[i];
+                _meshNodeList[i].MeshModel.ParentSkeletonName = _originalSkeletonName;
+            }
         }
     }
 }

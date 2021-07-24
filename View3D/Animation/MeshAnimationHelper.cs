@@ -75,31 +75,30 @@ namespace View3D.Animation
             {
                 int b0 = (int)vert.BlendIndices.X;
                 int b1 = (int)vert.BlendIndices.Y;
-                int b2 = (int)vert.BlendIndices.Z;
-                int b3 = (int)vert.BlendIndices.W;
+
 
                 float w1 = vert.BlendWeights.X;
                 float w2 = vert.BlendWeights.Y;
-                float w3 = vert.BlendWeights.Z;
-                float w4 = vert.BlendWeights.W;
+
+                if (w2 == 0)
+                    w2 = 1 - w1;
+
 
                 Matrix m1 = frame.BoneTransforms[b0].WorldTransform;
                 Matrix m2 = frame.BoneTransforms[b1].WorldTransform;
-                Matrix m3 = frame.BoneTransforms[b2].WorldTransform;
-                Matrix m4 = frame.BoneTransforms[b3].WorldTransform;
 
-                transformSum.M11 = (m1.M11 * w1);
-                transformSum.M12 = (m1.M12 * w1);
-                transformSum.M13 = (m1.M13 * w1);
-                transformSum.M21 = (m1.M21 * w1);
-                transformSum.M22 = (m1.M22 * w1);
-                transformSum.M23 = (m1.M23 * w1);
-                transformSum.M31 = (m1.M31 * w1);
-                transformSum.M32 = (m1.M32 * w1);
-                transformSum.M33 = (m1.M33 * w1);
-                transformSum.M41 = (m1.M41 * w1);
-                transformSum.M42 = (m1.M42 * w1);
-                transformSum.M43 = (m1.M43 * w1);
+                transformSum.M11 = (m1.M11 * w1) + (m2.M11 * w2);
+                transformSum.M12 = (m1.M12 * w1) + (m2.M12 * w2);
+                transformSum.M13 = (m1.M13 * w1) + (m2.M13 * w2);
+                transformSum.M21 = (m1.M21 * w1) + (m2.M21 * w2);
+                transformSum.M22 = (m1.M22 * w1) + (m2.M22 * w2);
+                transformSum.M23 = (m1.M23 * w1) + (m2.M23 * w2);
+                transformSum.M31 = (m1.M31 * w1) + (m2.M31 * w2);
+                transformSum.M32 = (m1.M32 * w1) + (m2.M32 * w2);
+                transformSum.M33 = (m1.M33 * w1) + (m2.M33 * w2);
+                transformSum.M41 = (m1.M41 * w1) + (m2.M41 * w2);
+                transformSum.M42 = (m1.M42 * w1) + (m2.M42 * w2);
+                transformSum.M43 = (m1.M43 * w1) + (m2.M43 * w2);
 
             }
             return transformSum * _worldTransform;
