@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="AnimationTransferTool\" />
     <Folder Include="PoseCreator\" />
   </ItemGroup>
 

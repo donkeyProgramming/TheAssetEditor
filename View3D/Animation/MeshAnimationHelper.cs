@@ -28,12 +28,8 @@ namespace View3D.Animation
 
         public Matrix GetVertexTransform(AnimationFrame frame, int vertexId)
         {
-            var geo = _mesh.Geometry as Rmv2Geometry;
-            var vert = geo.GetVertexExtented(vertexId);
-            var m = GetAnimationVertex(frame, vertexId);
-            return m;
+            return GetAnimationVertex(frame, vertexId);
         }
-
 
         Matrix GetAnimationVertex(AnimationFrame frame, int vertexId)
         {
@@ -76,13 +72,11 @@ namespace View3D.Animation
                 int b0 = (int)vert.BlendIndices.X;
                 int b1 = (int)vert.BlendIndices.Y;
 
-
                 float w1 = vert.BlendWeights.X;
                 float w2 = vert.BlendWeights.Y;
 
                 if (w2 == 0)
                     w2 = 1 - w1;
-
 
                 Matrix m1 = frame.BoneTransforms[b0].WorldTransform;
                 Matrix m2 = frame.BoneTransforms[b1].WorldTransform;
@@ -99,7 +93,6 @@ namespace View3D.Animation
                 transformSum.M41 = (m1.M41 * w1) + (m2.M41 * w2);
                 transformSum.M42 = (m1.M42 * w1) + (m2.M42 * w2);
                 transformSum.M43 = (m1.M43 * w1) + (m2.M43 * w2);
-
             }
             return transformSum * _worldTransform;
         }

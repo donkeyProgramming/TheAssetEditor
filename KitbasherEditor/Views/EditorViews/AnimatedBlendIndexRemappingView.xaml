@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews"
-            xmlns:s="http://schemas.singulink.com/xaml"
+             xmlns:s="http://schemas.singulink.com/xaml"
              xmlns:editorviews="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
              xmlns:ei1="http://schemas.microsoft.com/xaml/behaviors" 
              xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
