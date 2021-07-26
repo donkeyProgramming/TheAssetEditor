@@ -1,10 +1,9 @@
-﻿using KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace KitbasherEditor.Services
+namespace CommonControls.Editors.BoneMapping
 {
     public static class BoneMappingHelper
     {
@@ -52,7 +51,7 @@ namespace KitbasherEditor.Services
             return null;
         }
 
-        public static AnimatedBone FindBoneBasedOnNameCommonReplacements(string name, IEnumerable<AnimatedBone> boneList)
+        static AnimatedBone FindBoneBasedOnNameCommonReplacements(string name, IEnumerable<AnimatedBone> boneList)
         {
             foreach (var bone in boneList)
             {
@@ -130,10 +129,7 @@ namespace KitbasherEditor.Services
             if (boneNameA == replacementB && boneNameB == replacementA)
                 return true;
 
-
-
             return false;
-
         }
     }
 }

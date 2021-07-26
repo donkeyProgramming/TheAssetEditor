@@ -1,8 +1,5 @@
-﻿using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
-using System;
-using System.Text;
-
-namespace KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping
+﻿
+namespace CommonControls.Editors.BoneMapping
 {
     //public class RemappedAnimatedBone
     //{

@@ -31,7 +31,6 @@ namespace AnimationEditor.CampaignAnimationCreator
         AssetViewModel _selectedUnit;
         PackFileService _pfs;
         AnimationClip _selectedAnimationClip;
-       
 
         public Editor(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, IComponentManager componentManager)
         {

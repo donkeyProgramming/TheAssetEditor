@@ -266,10 +266,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\FileTypes\FileTypes.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Editors\MatchSkeletonView\" />
+    <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
   </ItemGroup>
 
 </Project>
