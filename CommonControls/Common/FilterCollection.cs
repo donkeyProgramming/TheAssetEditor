@@ -29,8 +29,10 @@ namespace CommonControls.Common
 
 
         public delegate bool FilterDelegate(T value, Regex regex);
+        public delegate void FilterExtendedDelegate(FilterCollection<T> sender, Regex regex);
 
         public FilterDelegate SearchFilter { get; set; }
+        public FilterExtendedDelegate SearchFilterExtended { get; set; }
 
 
         public FilterCollection(IEnumerable<T> data, ValueChangedDelegate<T> valueChangedEvent = null)
@@ -57,27 +59,44 @@ namespace CommonControls.Common
             }
         }
 
+        public void RefreshFilter()
+        {
+            FilterChanged(_filter);
+        }
+
         void FilterChanged(string filterValue)
         {
             try
             {
+                if (filterValue == null)
+                    filterValue = "";
                 var rx = new Regex(filterValue, RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-                var newValues = new List<T>(PossibleValues.Count);
-                foreach (var item in PossibleValues)
+                if (SearchFilterExtended != null)
                 {
-                    bool addItem = false;
-                    if (SearchFilter != null)
-                        addItem = SearchFilter(item, rx);
-                    else
-                        addItem = rx.Match(item.ToString()).Success;
-
-                    if (addItem)
-                        newValues.Add(item);
-
+                     SearchFilterExtended.Invoke(this, rx);
+                    //Values = new ObservableCollection<T>(returnVals);
                 }
+                else
+                {
+                    var newValues = new List<T>(PossibleValues.Count);
+                    foreach (var item in PossibleValues)
+                    {
+                        bool addItem = false;
+                        if (SearchFilter != null)
+                            addItem = SearchFilter(item, rx);
+                        else
+                            addItem = rx.Match(item.ToString()).Success;
+
+                        if (addItem)
+                            newValues.Add(item);
+
+                    }
+
+                    Values = new ObservableCollection<T>(newValues);
+                }
+
                 FilterValid = true;
-                Values = new ObservableCollection<T>(newValues);
             }
             catch
             {

@@ -86,7 +86,7 @@ namespace AssetEditor.ViewModels
             {
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
               // MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
-                KitbashEditor_Debug.CreatePrincessBody(this, toolFactory, packfileService);
+                KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);

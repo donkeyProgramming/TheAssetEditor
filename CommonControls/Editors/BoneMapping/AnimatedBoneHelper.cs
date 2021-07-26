@@ -1,6 +1,7 @@
 ﻿using Filetypes.RigidModel;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 
 namespace CommonControls.Editors.BoneMapping
 {
@@ -63,5 +64,58 @@ namespace CommonControls.Editors.BoneMapping
 
             return null;
         }
+
+
+
+        public static int GetUsedBonesCount(AnimatedBone b)
+        {
+            var value = 0;
+            foreach (var child in b.Children)
+                value += GetUsedBonesCount(child);
+
+            if (b.IsUsedByCurrentModel.Value)
+                value = value + 1;
+            return value;
+        }
+
+        public static void FilterBoneList(Regex regex, bool onlySHowUsedBones, IEnumerable<AnimatedBone> completeList)
+        {
+            foreach (var item in completeList)
+            {
+                bool isVisible = IsBoneVisibleInFilter(item, onlySHowUsedBones, regex, true);
+                item.IsVisible.Value = isVisible;
+                if (isVisible)
+                    FilterBoneList(regex, onlySHowUsedBones, item.Children);
+            }
+        }
+
+        static bool IsBoneVisibleInFilter(AnimatedBone bone, bool onlySHowUsedBones, Regex regex, bool checkChildren)
+        {
+            var contains = regex.Match(bone.Name.Value.ToLower()).Success;
+
+            if (onlySHowUsedBones)
+            {
+                if (contains && bone.IsUsedByCurrentModel.Value)
+                    return contains;
+            }
+            else
+            {
+                if (contains)
+                    return contains;
+            }
+
+            if (checkChildren)
+            {
+                foreach (var child in bone.Children)
+                {
+                    var res = IsBoneVisibleInFilter(child, onlySHowUsedBones, regex, checkChildren);
+                    if (res == true)
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
     }
 }

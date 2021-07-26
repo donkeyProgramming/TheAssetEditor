@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CommonControls.Editors.BoneMapping
+﻿namespace CommonControls.Editors.BoneMapping
 {
     public class IndexRemapping
     {

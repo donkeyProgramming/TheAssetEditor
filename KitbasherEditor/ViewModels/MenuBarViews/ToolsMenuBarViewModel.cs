@@ -461,7 +461,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             var animatedBoneIndexes = allUsedBoneIndexes
                 .Distinct()
                 .Select(x => new AnimatedBone(x, newSkeletonFile.Bones[x].Name))
-                .OrderBy(x => x.BoneIndex).
+                .OrderBy(x => x.BoneIndex.Value).
                 ToList();
 
             var config = new RemappedAnimatedBoneConfiguration();
@@ -470,7 +470,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             config.MeshSkeletonName = selectedMeshSkeleton;
             config.MeshBones = AnimatedBoneHelper.CreateFromSkeleton(newSkeletonFile, animatedBoneIndexes.Select(x => x.BoneIndex.Value).ToList());
 
-            
             config.ParnetModelSkeletonName = targetSkeletonName;
             config.ParentModelBones = AnimatedBoneHelper.CreateFromSkeleton(existingSkeletonFile);
 

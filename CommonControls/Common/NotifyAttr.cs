@@ -6,7 +6,7 @@ using System.Text;
 
 namespace CommonControls.Common
 {
-    [DebuggerDisplay("NotifyAttr - {Value}")]
+    [DebuggerDisplay("NotifyAttr [{Value}]")]
     public class NotifyAttr<T> : NotifyPropertyChangedImpl
     {
         ValueChangedDelegate<T> _onValueChanged;
@@ -20,8 +20,8 @@ namespace CommonControls.Common
 
         public NotifyAttr(T value, ValueChangedDelegate<T> onValueChanged)
         {
-            _onValueChanged = onValueChanged;
             Value = value;
+            _onValueChanged = onValueChanged;
         }
     }
 }

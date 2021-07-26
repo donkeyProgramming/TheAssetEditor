@@ -51,13 +51,13 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             _targetSkeleton = targetSkeleton;
             _componentManager = componentManager;
             ScaleFactor.PropertyChanged += (_0, _1) => ApplyMeshFittingTransforms();
-            BoneScaleFactor.PropertyChanged+=(_0, _1) => BoneScaleUpdate((float)BoneScaleFactor.Value, MeshBones.SelectedBone);
-            BonePositionOffset.OnValueChanged += (viewModel) => BonePositionUpdated(viewModel, MeshBones.SelectedBone);
-            BoneRotationOffset.OnValueChanged += (viewModel) => BoneRotationUpdated(viewModel, MeshBones.SelectedBone);
+            BoneScaleFactor.PropertyChanged+=(_0, _1) => BoneScaleUpdate((float)BoneScaleFactor.Value, MeshBones.SelectedItem);
+            BonePositionOffset.OnValueChanged += (viewModel) => BonePositionUpdated(viewModel, MeshBones.SelectedItem);
+            BoneRotationOffset.OnValueChanged += (viewModel) => BoneRotationUpdated(viewModel, MeshBones.SelectedItem);
             SkeletonDisplayOffset.OnValueChanged += (viewModel) => SkeletonDisplayOffsetUpdated(viewModel);
             RelativeScale.PropertyChanged += (_0, _1) => ApplyMeshFittingTransforms();
 
-            MeshBones.BoneSelected += (_) => OnBoneSelected();
+            MeshBones.SelectedItemChanged += (_) => OnBoneSelected();
 
             _animationPlayer = _componentManager.GetComponent<AnimationsContainerComponent>().RegisterAnimationPlayer(new AnimationPlayer(), "Temp animation rerig");
             _fromSkeleton = new GameSkeleton(currentSkeletonFile, _animationPlayer);
@@ -113,15 +113,15 @@ namespace KitbasherEditor.ViewModels.MeshFitter
 
         void OnBoneSelected()
         {
-            IsBoneSelected.Value = MeshBones.SelectedBone != null;
-            if (MeshBones.SelectedBone != null)
+            IsBoneSelected.Value = MeshBones.SelectedItem != null;
+            if (MeshBones.SelectedItem != null)
             {
-                BoneScaleFactor.Value = MeshBones.SelectedBone.BoneScaleOffset;
-                BoneRotationOffset.Set(MeshBones.SelectedBone.BoneRotOffset.X, MeshBones.SelectedBone.BoneRotOffset.Y, MeshBones.SelectedBone.BoneRotOffset.Z);
-                BonePositionOffset.Set(MeshBones.SelectedBone.BonePosOffset.X, MeshBones.SelectedBone.BonePosOffset.Y, MeshBones.SelectedBone.BonePosOffset.Z);
+                BoneScaleFactor.Value = MeshBones.SelectedItem.BoneScaleOffset;
+                BoneRotationOffset.Set(MeshBones.SelectedItem.BoneRotOffset.X, MeshBones.SelectedItem.BoneRotOffset.Y, MeshBones.SelectedItem.BoneRotOffset.Z);
+                BonePositionOffset.Set(MeshBones.SelectedItem.BonePosOffset.X, MeshBones.SelectedItem.BonePosOffset.Y, MeshBones.SelectedItem.BonePosOffset.Z);
 
-                _currentSkeletonNode.SelectedBoneIndex = MeshBones.SelectedBone.BoneIndex.Value;
-                _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().Skeleton.SelectedBoneIndex = MeshBones.SelectedBone.MappedBoneIndex.Value;
+                _currentSkeletonNode.SelectedBoneIndex = MeshBones.SelectedItem.BoneIndex.Value;
+                _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().Skeleton.SelectedBoneIndex = MeshBones.SelectedItem.MappedBoneIndex.Value;
             }
             else
             {
@@ -136,18 +136,24 @@ namespace KitbasherEditor.ViewModels.MeshFitter
 
         void BoneScaleUpdate(float newValue, AnimatedBone bone)
         {
+            if (bone == null)
+                return;
             bone.BoneScaleOffset = newValue;
             ApplyMeshFittingTransforms();
         }
 
         void BoneRotationUpdated(Vector3ViewModel newValue, AnimatedBone bone)
         {
+            if (bone == null)
+                return;
             bone.BoneRotOffset = new Vector3((float)newValue.X.Value, (float)newValue.Y.Value, (float)newValue.Z.Value);
             ApplyMeshFittingTransforms();
         }
 
         void BonePositionUpdated(Vector3ViewModel newValue, AnimatedBone bone)
         {
+            if (bone == null)
+                return;
             bone.BonePosOffset = new Vector3((float)newValue.X.Value, (float)newValue.Y.Value, (float)newValue.Z.Value);
             ApplyMeshFittingTransforms();
         }
@@ -155,7 +161,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
         void ApplyMeshFittingTransforms()
         {
             // Rebuild the mapping index as its easy to work with
-            var mapping = AnimatedBoneHelper.BuildRemappingList(MeshBones.Bones.First());
+            var mapping = AnimatedBoneHelper.BuildRemappingList(MeshBones.PossibleValues.First());
 
             // Reset the animation back to bind pose
             for (int i = 0; i < _fromSkeleton.BoneCount; i++)
@@ -176,7 +182,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             for (int i = 0; i < _fromSkeleton.BoneCount; i++)
             {
                 var mappedIndex = mapping.FirstOrDefault(x => x.OriginalValue == i);
-                var boneValuesObject = MeshBones.GetFromBoneId(i);
+                var boneValuesObject = MeshBones.PossibleValues.First().GetFromBoneId(i);
 
                 var fromBoneIndex = i;
                 var fromParentBoneIndex = _fromSkeleton.GetParentBone(fromBoneIndex);
@@ -260,11 +266,11 @@ namespace KitbasherEditor.ViewModels.MeshFitter
 
         public void ResetOffsetTransforms()
         {
-            if (MeshBones.SelectedBone != null)
+            if (MeshBones.SelectedItem != null)
             {
-                MeshBones.SelectedBone.BonePosOffset = Vector3.Zero;
-                MeshBones.SelectedBone.BoneRotOffset = Vector3.Zero;
-                MeshBones.SelectedBone.BoneScaleOffset = 1;
+                MeshBones.SelectedItem.BonePosOffset = Vector3.Zero;
+                MeshBones.SelectedItem.BoneRotOffset = Vector3.Zero;
+                MeshBones.SelectedItem.BoneScaleOffset = 1;
                 OnBoneSelected();
             }
         
@@ -272,14 +278,14 @@ namespace KitbasherEditor.ViewModels.MeshFitter
 
         public void CopyScaleToChildren()
         {
-            if (MeshBones.SelectedBone != null)
+            if (MeshBones.SelectedItem != null)
             {
-                var id = MeshBones.SelectedBone.BoneIndex.Value;
+                var id = MeshBones.SelectedItem.BoneIndex.Value;
                 var childBones = _fromSkeleton.GetAllChildBones(id);
                 foreach (var boneId in childBones)
                 {
-                    var bone = MeshBones.GetFromBoneId(boneId);
-                    bone.BoneScaleOffset = MeshBones.SelectedBone.BoneScaleOffset;
+                    var bone = MeshBones.PossibleValues.First().GetFromBoneId(boneId);
+                    bone.BoneScaleOffset = MeshBones.SelectedItem.BoneScaleOffset;
                 }
 
                 ApplyMeshFittingTransforms();

@@ -126,7 +126,7 @@
             <Button Click="{s:MethodBinding Load}" DockPanel.Dock="Right" Width="50">Load</Button>
             <Button Click="{s:MethodBinding Save}" DockPanel.Dock="Right" Width="50">Save</Button>
             <ComboBox ItemsSource="{Binding AllConfigPaths, UpdateSourceTrigger=PropertyChanged}"
-                      SelectedItem="{Binding CurrentConfigPath, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                      SelectedItem="{Binding CurrentConfigPath.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                       DockPanel.Dock="Right" Margin="5,0,2,0"/>
         </DockPanel>
 
@@ -146,27 +146,27 @@
 
             <StackPanel  Grid.Row="0" Orientation="Horizontal">
                 <TextBlock  Text="Current model bones - " FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
-                <TextBlock  Text="{Binding MeshBones.SkeletonName, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
+                <TextBlock  Text="{Binding MeshSkeletonName.Value, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
             </StackPanel>
 
 
-            <TextBox Grid.Row="1" BorderBrush="Black" Text="{Binding MeshBones.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <TextBox Grid.Row="1" BorderBrush="Black" Text="{Binding MeshBones.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             <Button Grid.Row="1" Grid.Column ="1"  Content="Clear" IsEnabled="False" />
 
 
             <CheckBox Grid.Row="2" VerticalContentAlignment="Center"
                       Content="Only show used bones"
-                      IsChecked="{Binding MeshBones.OnlyShowUsedBones, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                      IsChecked="{Binding OnlyShowUsedBones.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
             <TreeView 
                 Grid.Row="3"
                 Grid.ColumnSpan="2"
                 HorizontalContentAlignment="Stretch" 
-                ItemsSource="{Binding MeshBones.VisibleBones}" 
+                ItemsSource="{Binding MeshBones.Values}" 
                 ItemContainerStyle="{StaticResource BoneTreeViewStyle}">
 
                 <b:Interaction.Behaviors>
-                    <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding MeshBones.SelectedBone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding MeshBones.SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </b:Interaction.Behaviors>
 
                 <TreeView.ItemTemplate>
@@ -228,21 +228,21 @@
                 <Button Grid.Row="0" Grid.Column="0"  Click="{s:MethodBinding AutoMapSelfAndChildrenByName}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock>Auto map "</TextBlock>
-                        <TextBlock Text="{Binding MeshBones.SelectedBone.Name.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding MeshBones.SelectedItem.Name.Value, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock>" based on name</TextBlock>
                     </StackPanel>
                 </Button>
                 <Button Grid.Row="0" Grid.Column="1" Click="{s:MethodBinding AutoMapSelfAndChildrenByHierarchy}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock>Auto map "</TextBlock>
-                        <TextBlock Text="{Binding MeshBones.SelectedBone.Name.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding MeshBones.SelectedItem.Name.Value, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock>" based on hierarchy</TextBlock>
                     </StackPanel>
                 </Button>
                 <Button Grid.Row="1" Grid.Column="0" Click="{s:MethodBinding ClearBindingSelfAndChildren}" >
                     <StackPanel Orientation="Horizontal">
                         <TextBlock>Clear mapping for "</TextBlock>
-                        <TextBlock Text="{Binding MeshBones.SelectedBone.Name.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding MeshBones.SelectedItem.Name.Value, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock>"</TextBlock>
                     </StackPanel>
                 </Button>
@@ -264,21 +264,20 @@
 
             <StackPanel  Grid.Row="0" Orientation="Horizontal">
                 <TextBlock  Text="Parnet Model bones - " FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
-                <TextBlock  Text="{Binding ParnetModelBones.SkeletonName, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
+                <TextBlock  Text="{Binding ParentSkeletonName.Value, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
             </StackPanel>
 
-            <TextBox Grid.Row="1" BorderBrush="Black" Text="{Binding ParnetModelBones.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <TextBox Grid.Row="1" BorderBrush="Black" Text="{Binding ParentModelBones.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             <Button Grid.Row="1" Grid.Column ="1"  Content="Clear" IsEnabled="False"/>
             <TreeView 
                 Grid.Row="2"
                 Grid.ColumnSpan="2"
                 HorizontalContentAlignment="Stretch" 
-                ItemsSource="{Binding ParnetModelBones.VisibleBones}" 
+                ItemsSource="{Binding ParentModelBones.Values}" 
                 ItemContainerStyle="{StaticResource BoneTreeViewStyle}">
 
-
                 <b:Interaction.Behaviors>
-                    <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding ParnetModelBones.SelectedBone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding ParentModelBones.SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </b:Interaction.Behaviors>
 
                 <TreeView.ItemTemplate >

@@ -1,4 +1,5 @@
 ﻿using Common;
+using CommonControls.Common;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Serilog;
@@ -8,91 +9,112 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 
 namespace CommonControls.Editors.BoneMapping
 {
     public class BoneMappingViewModel : NotifyPropertyChangedImpl
     {
-        public SkeletonBoneCollection MeshBones { get; set; }
-        public SkeletonBoneCollection ParnetModelBones { get; set; }
+        ILogger _logger = Logging.Create<BoneMappingViewModel>();
+        RemappedAnimatedBoneConfiguration _configuration;
 
-        string _currentConfigPath = string.Empty;
-        public string CurrentConfigPath
-        {
-            get { return _currentConfigPath; }
-            set { OnConfigPathChanged(value);  SetAndNotify(ref _currentConfigPath, value);  }
-        }
+        public FilterCollection<AnimatedBone> MeshBones { get; set; }
+        public FilterCollection<AnimatedBone> ParentModelBones { get; set; }
+
+        public NotifyAttr<string> CurrentConfigPath { get; set; } 
 
         public ObservableCollection<string> AllConfigPaths { get; set; }
 
-        RemappedAnimatedBoneConfiguration _configuration;
-        ILogger _logger = Logging.Create<BoneMappingViewModel>();
+        public NotifyAttr<bool> OnlyShowUsedBones { get; set; }
+        public NotifyAttr<string> MeshSkeletonName { get; set; }
+        public NotifyAttr<string> ParentSkeletonName { get; set; }
+
 
         public BoneMappingViewModel(RemappedAnimatedBoneConfiguration configuration)
         {
-            MeshBones = new SkeletonBoneCollection();
-            ParnetModelBones = new SkeletonBoneCollection();
-            ParnetModelBones.BoneSelected += OnParentBoneSelected;
+            MeshBones = new FilterCollection<AnimatedBone>(null);
+            ParentModelBones = new FilterCollection<AnimatedBone>(null, OnParentBoneSelected);
+            OnlyShowUsedBones = new NotifyAttr<bool>(true, (x) => MeshBones.RefreshFilter());
+            CurrentConfigPath = new NotifyAttr<string>(string.Empty, OnConfigPathChanged);
 
             CreateFromConfiguration(configuration);
             FindApplicableSettingsFiles();
+
+            MeshBones.SelectedItem = MeshBones.Values.FirstOrDefault();
+            MeshBones.SearchFilterExtended += FilterMeshBones;
+            MeshBones.RefreshFilter();
+
+            ParentModelBones.SearchFilterExtended += FilterParentBones;
+        }
+
+        void FilterMeshBones(FilterCollection<AnimatedBone> value, Regex regex)
+        {
+            AnimatedBoneHelper.FilterBoneList(regex, OnlyShowUsedBones.Value, value.PossibleValues);
+        }
+
+        void FilterParentBones(FilterCollection<AnimatedBone> value, Regex regex)
+        {
+            AnimatedBoneHelper.FilterBoneList(regex, OnlyShowUsedBones.Value, value.PossibleValues);
         }
 
         public virtual void ClearBindingSelfAndChildren()
         {
-            if (MeshBones.SelectedBone == null)
+            if (MeshBones.SelectedItem == null)
             {
                 MessageBox.Show("No bone selected - Please select a bone first");
                 return;
             }
 
-            MeshBones.SelectedBone.ClearMapping();
+            MeshBones.SelectedItem.ClearMapping();
         }
 
         public virtual void AutoMapSelfAndChildrenByName()
         {
-            if (MeshBones.SelectedBone == null)
+            if (MeshBones.SelectedItem == null)
             {
                 MessageBox.Show("No bone selected - Please select a bone first");
                 return;
             }
 
-            BoneMappingHelper.AutomapDirectBoneLinksBasedOnNames(MeshBones.SelectedBone, ParnetModelBones.Bones);
+            BoneMappingHelper.AutomapDirectBoneLinksBasedOnNames(MeshBones.SelectedItem, ParentModelBones.PossibleValues);
         }
 
         public virtual void AutoMapSelfAndChildrenByHierarchy()
         {
-            if (MeshBones.SelectedBone == null)
+            if (MeshBones.SelectedItem == null)
             {
                 MessageBox.Show("No mesh bone selected - Please select a bone first");
                 return;
             }
-            if (MeshBones.SelectedBone == null)
+            if (ParentModelBones.SelectedItem == null)
             {
                 MessageBox.Show("No parent model bone selected - Please select a bone first");
                 return;
             }
 
-            BoneMappingHelper.AutomapDirectBoneLinksBasedOnHierarchy(MeshBones.SelectedBone, ParnetModelBones.SelectedBone);
+            BoneMappingHelper.AutomapDirectBoneLinksBasedOnHierarchy(MeshBones.SelectedItem, ParentModelBones.SelectedItem);
         }
+
         void CreateFromConfiguration(RemappedAnimatedBoneConfiguration config)
         {
-            MeshBones.Bones = config.MeshBones;
-            MeshBones.SkeletonName = config.MeshSkeletonName;
+            MeshBones.UpdatePossibleValues(config.MeshBones);
+            MeshSkeletonName = new NotifyAttr<string>(config.MeshSkeletonName);
 
-            ParnetModelBones.Bones = config.ParentModelBones;
-            ParnetModelBones.SkeletonName = config.ParnetModelSkeletonName;
+            ParentModelBones.UpdatePossibleValues(config.ParentModelBones);
+            ParentSkeletonName = new NotifyAttr<string>(config.MeshSkeletonName);
 
             _configuration = config;
         }
 
         private void OnParentBoneSelected(AnimatedBone bone)
         {
-            MeshBones.SelectedBone.MappedBoneIndex.Value = bone.BoneIndex.Value;
-            MeshBones.SelectedBone.MappedBoneName.Value = bone.Name.Value;
+            if (bone == null)
+                return;
+            MeshBones.SelectedItem.MappedBoneIndex.Value = bone.BoneIndex.Value;
+            MeshBones.SelectedItem.MappedBoneName.Value = bone.Name.Value;
 
-            OnMappingCreated(MeshBones.SelectedBone.BoneIndex.Value, MeshBones.SelectedBone.MappedBoneIndex.Value);
+            OnMappingCreated(MeshBones.SelectedItem.BoneIndex.Value, MeshBones.SelectedItem.MappedBoneIndex.Value);
         }
 
         public void Save()
@@ -110,7 +132,7 @@ namespace CommonControls.Editors.BoneMapping
                 if (AllConfigPaths.Contains(saveFileDialog.FileName) == false)
                     AllConfigPaths.Add(saveFileDialog.FileName);
 
-                CurrentConfigPath = saveFileDialog.FileName;
+                CurrentConfigPath.Value = saveFileDialog.FileName;
             }
         }
 
@@ -161,7 +183,7 @@ namespace CommonControls.Editors.BoneMapping
 
         void OnConfigPathChanged(string filename)
         {
-            if (filename == _currentConfigPath)
+            if (filename == CurrentConfigPath.Value)
                 return;
 
             var content = File.ReadAllText(filename);
@@ -174,8 +196,8 @@ namespace CommonControls.Editors.BoneMapping
 
         public virtual bool Validate(out string errorText)
         {
-            var usedBonesCount = MeshBones.GetUsedBonesCount();
-            var mapping = AnimatedBoneHelper.BuildRemappingList(MeshBones.Bones.First());
+            var usedBonesCount = AnimatedBoneHelper.GetUsedBonesCount(MeshBones.PossibleValues.First());
+            var mapping = AnimatedBoneHelper.BuildRemappingList(MeshBones.PossibleValues.First());
             var numMappings = mapping.Count(x => x.IsUsedByModel);
             if (usedBonesCount != numMappings)
             {
@@ -187,51 +209,4 @@ namespace CommonControls.Editors.BoneMapping
         }
     }
 
-    class FilterHelper
-    {
-        public static ObservableCollection<AnimatedBone> FilterBoneList(string filterText, bool onlySHowUsedBones, ObservableCollection<AnimatedBone> completeList)
-        {
-            var output = new ObservableCollection<AnimatedBone>();
-            FilterBoneListRecursive(filterText, onlySHowUsedBones, completeList, output);
-            return completeList;
-        }
-
-        static void FilterBoneListRecursive(string filterText, bool onlySHowUsedBones, ObservableCollection<AnimatedBone> completeList, ObservableCollection<AnimatedBone> output)
-        {
-            foreach (var item in completeList)
-            {
-                bool isVisible = IsBoneVisibleInFilter(item, onlySHowUsedBones, filterText, true);
-                item.IsVisible.Value = isVisible;
-                if (isVisible)
-                    FilterBoneListRecursive(filterText, onlySHowUsedBones, item.Children, item.Children);
-            }
-        }
-
-        static bool IsBoneVisibleInFilter(AnimatedBone bone, bool onlySHowUsedBones, string filterText, bool checkChildren)
-        {
-            var contains = bone.Name.Value.IndexOf(filterText, StringComparison.OrdinalIgnoreCase) != -1;
-            if (onlySHowUsedBones)
-            {
-                if (contains && bone.IsUsedByCurrentModel.Value)
-                    return contains;
-            }
-            else
-            {
-                if (contains)
-                    return contains;
-            }
-
-            if (checkChildren)
-            {
-                foreach (var child in bone.Children)
-                {
-                    var res = IsBoneVisibleInFilter(child, onlySHowUsedBones, filterText, checkChildren);
-                    if (res == true)
-                        return true;
-                }
-            }
-
-            return false;
-        }
-    }
 }
