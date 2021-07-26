@@ -1,13 +1,10 @@
 ﻿using Common;
+using CommonControls.Editors.BoneMapping;
 using CommonControls.MathViews;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using Filetypes.RigidModel;
 using GalaSoft.MvvmLight.CommandWpf;
-using KitbasherEditor.Services;
-using KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping;
-using KitbasherEditor.ViewModels.BmiEditor;
-using KitbasherEditor.Views.EditorViews;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using System;
@@ -16,12 +13,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using TextureEditor.ViewModels;
-using View3D.Animation;
-using View3D.Commands.Object;
 using View3D.Components.Component;
-using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
-using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
@@ -151,7 +144,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                     MessageBox.Show("Mesh an invalid bones, this might cause issues. Its a result of an invalid re-rigging");
 
                 if (skeletonFile != null && hasValidBoneMapping)
-                    AnimatedBones = bones.Select(x => new AnimatedBone() { BoneIndex = x, Name = skeletonFile.Bones[x].Name }).OrderBy(x => x.BoneIndex).ToList();
+                {
+                    AnimatedBones = bones.Select(x => new AnimatedBone(x, skeletonFile.Bones[x].Name))
+                        .OrderBy(x => x.BoneIndex.Value)
+                        .ToList();
+                }
             }
         }
 

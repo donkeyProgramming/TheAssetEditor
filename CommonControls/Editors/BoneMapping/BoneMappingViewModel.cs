@@ -76,8 +76,6 @@ namespace CommonControls.Editors.BoneMapping
 
             BoneMappingHelper.AutomapDirectBoneLinksBasedOnHierarchy(MeshBones.SelectedBone, ParnetModelBones.SelectedBone);
         }
-
-
         void CreateFromConfiguration(RemappedAnimatedBoneConfiguration config)
         {
             MeshBones.Bones = config.MeshBones;
@@ -91,10 +89,10 @@ namespace CommonControls.Editors.BoneMapping
 
         private void OnParentBoneSelected(AnimatedBone bone)
         {
-            MeshBones.SelectedBone.MappedBoneIndex = bone.BoneIndex;
-            MeshBones.SelectedBone.MappedBoneName = bone.Name;
+            MeshBones.SelectedBone.MappedBoneIndex.Value = bone.BoneIndex.Value;
+            MeshBones.SelectedBone.MappedBoneName.Value = bone.Name.Value;
 
-            OnMappingCreated(MeshBones.SelectedBone.BoneIndex, MeshBones.SelectedBone.MappedBoneIndex);
+            OnMappingCreated(MeshBones.SelectedBone.BoneIndex.Value, MeshBones.SelectedBone.MappedBoneIndex.Value);
         }
 
         public void Save()
@@ -203,7 +201,7 @@ namespace CommonControls.Editors.BoneMapping
             foreach (var item in completeList)
             {
                 bool isVisible = IsBoneVisibleInFilter(item, onlySHowUsedBones, filterText, true);
-                item.IsVisible = isVisible;
+                item.IsVisible.Value = isVisible;
                 if (isVisible)
                     FilterBoneListRecursive(filterText, onlySHowUsedBones, item.Children, item.Children);
             }
@@ -211,10 +209,10 @@ namespace CommonControls.Editors.BoneMapping
 
         static bool IsBoneVisibleInFilter(AnimatedBone bone, bool onlySHowUsedBones, string filterText, bool checkChildren)
         {
-            var contains = bone.Name.IndexOf(filterText, StringComparison.OrdinalIgnoreCase) != -1;
+            var contains = bone.Name.Value.IndexOf(filterText, StringComparison.OrdinalIgnoreCase) != -1;
             if (onlySHowUsedBones)
             {
-                if (contains && bone.IsUsedByCurrentModel)
+                if (contains && bone.IsUsedByCurrentModel.Value)
                     return contains;
             }
             else

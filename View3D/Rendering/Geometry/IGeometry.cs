@@ -1,4 +1,5 @@
-﻿using Filetypes.RigidModel;
+﻿using CommonControls.Editors.BoneMapping;
+using Filetypes.RigidModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -44,19 +45,5 @@ namespace View3D.Rendering.Geometry
         void UpdateAnimationIndecies(List<IndexRemapping> remapping);
         void ChangeVertexType(VertexFormat weighted);
         
-    }
-
-    public class IndexRemapping
-    {
-        public IndexRemapping(byte originalValue, byte newValue, bool isUsedByCurrentModel = false)
-        {
-            OriginalValue = originalValue;
-            NewValue = newValue;
-            IsUsedByModel = isUsedByCurrentModel;
-        }
-
-        public byte OriginalValue { get; set; }
-        public byte NewValue { get; set; }
-        public bool IsUsedByModel { get; set; } = false;
     }
 }

@@ -9,14 +9,14 @@ namespace CommonControls.Editors.BoneMapping
     {
         public static void AutomapDirectBoneLinksBasedOnNames(AnimatedBone boneToGetMapping, IEnumerable<AnimatedBone> externalBonesList)
         {
-            var otherBone = FindBoneBasedOnName(boneToGetMapping.Name, externalBonesList);
+            var otherBone = FindBoneBasedOnName(boneToGetMapping.Name.Value, externalBonesList);
             if (otherBone == null)
-                otherBone = FindBoneBasedOnNameCommonReplacements(boneToGetMapping.Name, externalBonesList);
+                otherBone = FindBoneBasedOnNameCommonReplacements(boneToGetMapping.Name.Value, externalBonesList);
 
             if (otherBone != null)
             {
-                boneToGetMapping.MappedBoneIndex = otherBone.BoneIndex;
-                boneToGetMapping.MappedBoneName = otherBone.Name;
+                boneToGetMapping.MappedBoneIndex.Value = otherBone.BoneIndex.Value;
+                boneToGetMapping.MappedBoneName.Value = otherBone.Name.Value;
             }
 
             foreach (var bone in boneToGetMapping.Children)
@@ -25,8 +25,8 @@ namespace CommonControls.Editors.BoneMapping
 
         public static void AutomapDirectBoneLinksBasedOnHierarchy(AnimatedBone boneToGetMapping, AnimatedBone otherBoneToStartFrom)
         {
-            boneToGetMapping.MappedBoneIndex = otherBoneToStartFrom.BoneIndex;
-            boneToGetMapping.MappedBoneName = otherBoneToStartFrom.Name;
+            boneToGetMapping.MappedBoneIndex.Value = otherBoneToStartFrom.BoneIndex.Value;
+            boneToGetMapping.MappedBoneName.Value = otherBoneToStartFrom.Name.Value;
 
             for (int i = 0; i < boneToGetMapping.Children.Count(); i++)
             {
@@ -40,7 +40,7 @@ namespace CommonControls.Editors.BoneMapping
         {
             foreach (var bone in boneList)
             {
-                if (bone.Name == name)
+                if (bone.Name.Value == name)
                     return bone;
 
                 var result = FindBoneBasedOnName(name, bone.Children);
@@ -56,7 +56,7 @@ namespace CommonControls.Editors.BoneMapping
             foreach (var bone in boneList)
             {
                 // Try adding _0
-                if (name + "_0" == bone.Name)
+                if (name + "_0" == bone.Name.Value)
                     return bone;
                 if (name == bone.Name + "_0")
                     return bone;
@@ -64,44 +64,44 @@ namespace CommonControls.Editors.BoneMapping
                 // Try removing _0
                 if (name.Contains("_0"))
                 {
-                    if (name.Replace("_0", "") == bone.Name)
+                    if (name.Replace("_0", "") == bone.Name.Value)
                         return bone;
                 }
 
-                if (bone.Name.Contains("_0"))
+                if (bone.Name.Value.Contains("_0"))
                 {
-                    if (name == bone.Name.Replace("_0", ""))
+                    if (name == bone.Name.Value.Replace("_0", ""))
                         return bone;
                 }
 
-                if (IsRepalcement(bone.Name, name, "arm_left_0", "upperarm_left"))
+                if (IsRepalcement(bone.Name.Value, name, "arm_left_0", "upperarm_left"))
                     return bone;
 
-                if (IsRepalcement(bone.Name, name, "arm_left_1", "lowerarm_left"))
+                if (IsRepalcement(bone.Name.Value, name, "arm_left_1", "lowerarm_left"))
                     return bone;
 
-                if (IsRepalcement(bone.Name, name, "arm_left_2", "hand_left"))
+                if (IsRepalcement(bone.Name.Value, name, "arm_left_2", "hand_left"))
                     return bone;
 
-                if (IsRepalcement(bone.Name, name, "arm_left_0_roll_0", "upperarm_roll_left_0"))
+                if (IsRepalcement(bone.Name.Value, name, "arm_left_0_roll_0", "upperarm_roll_left_0"))
                     return bone;
 
-                if (IsRepalcement(bone.Name, name, "arm_left_1_roll_0", "lowerarm_roll_left_0"))
+                if (IsRepalcement(bone.Name.Value, name, "arm_left_1_roll_0", "lowerarm_roll_left_0"))
                     return bone;
 
-                if (IsRepalcement(bone.Name, name, "leg_left_0", "upperleg_left"))
+                if (IsRepalcement(bone.Name.Value, name, "leg_left_0", "upperleg_left"))
                     return bone;
 
-                if (IsRepalcement(bone.Name, name, "leg_left_1", "lowerleg_left"))
+                if (IsRepalcement(bone.Name.Value, name, "leg_left_1", "lowerleg_left"))
                     return bone;
 
-                if (IsRepalcement(bone.Name, name, "leg_left_2 ", "foot_left"))
+                if (IsRepalcement(bone.Name.Value, name, "leg_left_2 ", "foot_left"))
                     return bone;
 
-                if (IsRepalcement(bone.Name, name, "lowerarm_left_roll ", "lowerarm_roll_left"))
+                if (IsRepalcement(bone.Name.Value, name, "lowerarm_left_roll ", "lowerarm_roll_left"))
                     return bone;
 
-                if (IsRepalcement(bone.Name, name, "upperarm_left_roll ", "upperarm_roll_left"))
+                if (IsRepalcement(bone.Name.Value, name, "upperarm_left_roll ", "upperarm_roll_left"))
                     return bone;
 
                 var result = FindBoneBasedOnNameCommonReplacements(name, bone.Children);

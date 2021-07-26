@@ -1,5 +1,6 @@
 ﻿using AnimationEditor.Common.ReferenceModel;
 using Common;
+using CommonControls.Editors.BoneMapping;
 using CommonControls.Services;
 using Filetypes.RigidModel;
 using GalaSoft.MvvmLight.CommandWpf;
@@ -202,7 +203,7 @@ namespace AnimationEditor.PropCreator
             for (int i = 0; i < newSkeleton.BoneCount; i++)
             {
                 var oldIndex = originalSkeleton.GetBoneIndexByName(newSkeleton.BoneNames[i]);
-                output.Add(new IndexRemapping((byte)oldIndex, (byte)i));
+                output.Add(new IndexRemapping(oldIndex, i));
             }
 
             return output;

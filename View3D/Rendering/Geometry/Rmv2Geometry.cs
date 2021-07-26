@@ -1,4 +1,5 @@
-﻿using Filetypes.RigidModel;
+﻿using CommonControls.Editors.BoneMapping;
+using Filetypes.RigidModel;
 using Filetypes.RigidModel.Transforms;
 using Filetypes.RigidModel.Vertex;
 using MeshDecimator;
@@ -270,7 +271,7 @@ namespace View3D.Rendering.Geometry
         {
             var remappingItem = remappingList.FirstOrDefault(x => x.OriginalValue == currentValue);
             if (remappingItem != null)
-                return remappingItem.NewValue;
+                return (byte)remappingItem.NewValue;
             return currentValue;
         }
 

@@ -1,17 +1,16 @@
 ﻿using Common;
 using CommonControls.Common;
+using CommonControls.Editors.BoneMapping;
+using CommonControls.Editors.BoneMapping.View;
 using CommonControls.ErrorListDialog;
 using CommonControls.MathViews;
 using CommonControls.Services;
 using Filetypes.RigidModel;
 using GalaSoft.MvvmLight.CommandWpf;
-using KitbasherEditor.Services;
-using KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping;
 using KitbasherEditor.ViewModels.BmiEditor;
 using KitbasherEditor.ViewModels.MeshFitter;
 using KitbasherEditor.Views.EditorViews;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,14 +19,9 @@ using System.Windows;
 using System.Windows.Input;
 using View3D.Animation;
 using View3D.Commands.Object;
-using View3D.Commands.Vertex;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
-using View3D.Components.Input;
-using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
-using View3D.Services;
-using View3D.Utility;
 using MessageBox = System.Windows.MessageBox;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
@@ -466,7 +460,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
             var animatedBoneIndexes = allUsedBoneIndexes
                 .Distinct()
-                .Select(x => new AnimatedBone() { BoneIndex = x, Name = newSkeletonFile.Bones[x].Name })
+                .Select(x => new AnimatedBone(x, newSkeletonFile.Bones[x].Name))
                 .OrderBy(x => x.BoneIndex).
                 ToList();
 
@@ -474,23 +468,23 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             
 
             config.MeshSkeletonName = selectedMeshSkeleton;
-            config.MeshBones = AnimatedBone.CreateFromSkeleton(newSkeletonFile, animatedBoneIndexes.Select(x => x.BoneIndex).ToList());
+            config.MeshBones = AnimatedBoneHelper.CreateFromSkeleton(newSkeletonFile, animatedBoneIndexes.Select(x => x.BoneIndex.Value).ToList());
 
             
             config.ParnetModelSkeletonName = targetSkeletonName;
-            config.ParentModelBones = AnimatedBone.CreateFromSkeleton(existingSkeletonFile);
+            config.ParentModelBones = AnimatedBoneHelper.CreateFromSkeleton(existingSkeletonFile);
 
             if (targetSkeletonName == selectedMeshSkeleton)
                 MessageBox.Show("Trying to map to and from the same skeleton. This does not really make any sense if you are trying to make the mesh fit an other skeleton.", "Error", MessageBoxButton.OK);
 
-            AnimatedBlendIndexRemappingWindow window = new AnimatedBlendIndexRemappingWindow()
+            var window = new BoneMappingWindow()
             {
-                DataContext = new AnimatedBlendIndexRemappingViewModel(config)
+                DataContext = new BoneMappingViewModel(config)
             };
 
             if (window.ShowDialog() == true)
             {
-                var remapping = config.MeshBones.First().BuildRemappingList();
+                var remapping = AnimatedBoneHelper.BuildRemappingList(config.MeshBones.First());
                 _componentManager.GetComponent<CommandExecutor>().ExecuteCommand(new RemapBoneIndexesCommand(selectedMeshses, remapping, config.ParnetModelSkeletonName));
             }
 

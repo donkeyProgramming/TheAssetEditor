@@ -4,14 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews.MeshFitter"
-             xmlns:editorviews="clr-namespace:KitbasherEditor.Views.EditorViews" 
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls" 
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls"
-             xmlns:s="http://schemas.singulink.com/xaml"
+             xmlns:s="http://schemas.singulink.com/xaml" 
+             xmlns:boneMapping="clr-namespace:CommonControls.Editors.BoneMapping.View;assembly=CommonControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    
     <DockPanel LastChildFill="True">
 
         <Grid DockPanel.Dock="Bottom">
@@ -81,6 +80,6 @@
             <Button Grid.Row="10" Grid.Column="3" HorizontalAlignment="Right" Content="Save" FontSize="20" Margin="5" Click="{s:MethodBinding SaveAndClose}" />
         </Grid>
 
-        <editorviews:AnimatedBlendIndexRemappingView/>
+        <boneMapping:BoneMappingView/>
     </DockPanel>
 </UserControl>

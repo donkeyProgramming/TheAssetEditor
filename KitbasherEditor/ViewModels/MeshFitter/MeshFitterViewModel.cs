@@ -1,8 +1,8 @@
 ﻿using CommonControls.Common;
+using CommonControls.Editors.BoneMapping;
 using CommonControls.MathViews;
 using CommonControls.Services;
 using Filetypes.RigidModel;
-using KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping;
 using KitbasherEditor.Views.EditorViews.MeshFitter;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
@@ -19,7 +19,7 @@ using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels.MeshFitter
 {
-    public class MeshFitterViewModel : AnimatedBlendIndexRemappingViewModel
+    public class MeshFitterViewModel : BoneMappingViewModel
     {
         Window _window;
 
@@ -120,8 +120,8 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 BoneRotationOffset.Set(MeshBones.SelectedBone.BoneRotOffset.X, MeshBones.SelectedBone.BoneRotOffset.Y, MeshBones.SelectedBone.BoneRotOffset.Z);
                 BonePositionOffset.Set(MeshBones.SelectedBone.BonePosOffset.X, MeshBones.SelectedBone.BonePosOffset.Y, MeshBones.SelectedBone.BonePosOffset.Z);
 
-                _currentSkeletonNode.SelectedBoneIndex = MeshBones.SelectedBone.BoneIndex;
-                _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().Skeleton.SelectedBoneIndex = MeshBones.SelectedBone.MappedBoneIndex;
+                _currentSkeletonNode.SelectedBoneIndex = MeshBones.SelectedBone.BoneIndex.Value;
+                _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().Skeleton.SelectedBoneIndex = MeshBones.SelectedBone.MappedBoneIndex.Value;
             }
             else
             {
@@ -155,7 +155,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
         void ApplyMeshFittingTransforms()
         {
             // Rebuild the mapping index as its easy to work with
-            var mapping = MeshBones.Bones.First().BuildRemappingList();
+            var mapping = AnimatedBoneHelper.BuildRemappingList(MeshBones.Bones.First());
 
             // Reset the animation back to bind pose
             for (int i = 0; i < _fromSkeleton.BoneCount; i++)
@@ -274,7 +274,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
         {
             if (MeshBones.SelectedBone != null)
             {
-                var id = MeshBones.SelectedBone.BoneIndex;
+                var id = MeshBones.SelectedBone.BoneIndex.Value;
                 var childBones = _fromSkeleton.GetAllChildBones(id);
                 foreach (var boneId in childBones)
                 {
@@ -323,7 +323,11 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 .Distinct();
 
             if (allSkeltonNames.Count() != 1)
-                throw new Exception("Unexpected number of skeletons. This tool only works for one skeleton");
+            {
+                var commaList = string.Join(",", allSkeltonNames);
+                MessageBox.Show($"Unexpected number of skeletons - {commaList}. This tool only works for one skeleton");
+                return;
+            }
 
             var currentSkeletonName = allSkeltonNames.First();
             var currentSkeletonFile = skeletonHelper.GetSkeletonFileFromName(pfs, currentSkeletonName);
@@ -339,10 +343,10 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             
             RemappedAnimatedBoneConfiguration config = new RemappedAnimatedBoneConfiguration();
             config.ParnetModelSkeletonName= targetSkeleton.Name;
-            config.ParentModelBones= AnimatedBone.CreateFromSkeleton(targetSkeletonFile);
+            config.ParentModelBones= AnimatedBoneHelper.CreateFromSkeleton(targetSkeletonFile);
 
             config.MeshSkeletonName = currentSkeletonName;
-            config.MeshBones = AnimatedBone.CreateFromSkeleton(currentSkeletonFile, usedBoneIndexes);
+            config.MeshBones = AnimatedBoneHelper.CreateFromSkeleton(currentSkeletonFile, usedBoneIndexes);
 
 
             var containingWindow = new Window();

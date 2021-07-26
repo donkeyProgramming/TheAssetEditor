@@ -7,6 +7,9 @@ using System.Text;
 
 namespace CommonControls.Editors.BoneMapping
 {
+
+    // TODO replace with FilterCollection
+
     public delegate void BoneSelectedDelegate(AnimatedBone bone);
     public class SkeletonBoneCollection : NotifyPropertyChangedImpl
     {
@@ -93,7 +96,7 @@ namespace CommonControls.Editors.BoneMapping
             foreach (var child in b.Children)
                 value += CountBones(child);
 
-            if (b.IsUsedByCurrentModel)
+            if (b.IsUsedByCurrentModel.Value)
                 value = value + 1;
             return value;
         }

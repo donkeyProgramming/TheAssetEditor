@@ -1,5 +1,4 @@
-﻿using KitbasherEditor.ViewModels.AnimatedBlendIndexRemapping;
-using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
+﻿using CommonControls.Editors.BoneMapping;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -27,7 +26,7 @@ namespace KitbasherEditor.ValueConverters
             if (!(value is AnimatedBone))
                 return FalseValue;
 
-            if ((value as AnimatedBone).IsUsedByCurrentModel)
+            if ((value as AnimatedBone).IsUsedByCurrentModel.Value)
                 return TrueValue;
             return FalseValue;
         }

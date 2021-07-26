@@ -112,8 +112,8 @@
 
                                     <ListView.View>
                                         <GridView>
-                                            <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"/>
-                                            <GridViewColumn Header="BoneIndex" DisplayMemberBinding="{Binding BoneIndex}"/>
+                                            <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name.Value}"/>
+                                            <GridViewColumn Header="BoneIndex" DisplayMemberBinding="{Binding BoneIndex.Value}"/>
                                         </GridView>
                                     </ListView.View>
 

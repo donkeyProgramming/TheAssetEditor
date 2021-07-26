@@ -1,14 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
+﻿using CommonControls.Editors.BoneMapping;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using View3D.Animation;
-using View3D.Components.Component;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
-using View3D.Utility;
 
 namespace View3D.Commands.Object
 {
@@ -21,7 +17,6 @@ namespace View3D.Commands.Object
         List<IGeometry> _originalGeometry;
         string _originalSkeletonName;
 
-
         public RemapBoneIndexesCommand(List<Rmv2MeshNode> meshNodeList, List<IndexRemapping> mapping, string newSkeletonName)
         {
             _meshNodeList = meshNodeList;
@@ -30,7 +25,6 @@ namespace View3D.Commands.Object
             _newSkeletonName = newSkeletonName;
             _originalSkeletonName = _meshNodeList.First().MeshModel.ParentSkeletonName;
         }
-
 
         public override string GetHintText()
         {

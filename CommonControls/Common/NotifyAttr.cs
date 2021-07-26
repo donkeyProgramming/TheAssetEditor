@@ -1,10 +1,12 @@
 ﻿using Common;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace CommonControls.Common
 {
+    [DebuggerDisplay("NotifyAttr - {Value}")]
     public class NotifyAttr<T> : NotifyPropertyChangedImpl
     {
         ValueChangedDelegate<T> _onValueChanged;

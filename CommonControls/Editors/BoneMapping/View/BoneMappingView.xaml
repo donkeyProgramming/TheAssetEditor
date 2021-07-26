@@ -83,7 +83,7 @@
                             <Trigger Property="HasItems" Value="false">
                                 <Setter Property="Visibility" TargetName="Expander" Value="Hidden"/>
                             </Trigger>
-                            <DataTrigger Binding="{Binding IsVisible}" Value="False">
+                            <DataTrigger Binding="{Binding IsVisible.Value}" Value="False">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
                             <Trigger Property="IsSelected" Value="true">
@@ -180,36 +180,36 @@
 
                             <StackPanel Grid.Column="0" Orientation="Horizontal">
                                 <TextBlock  
-                                            Text="{Binding Name}"
-                                            Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                                            Text="{Binding Name.Value}"
+                                            Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
                                 <TextBlock  
                                         Text="["
-                                        Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
 
                                 <TextBlock  
-                                        Text="{Binding BoneIndex}"
-                                        Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                                        Text="{Binding BoneIndex.Value}"
+                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
 
                                 <TextBlock  
                                         Text="]"
-                                        Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Orientation="Horizontal">
                                 <TextBlock  
-                                            Text="{Binding MappedBoneName}"
-                                            Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                                            Text="{Binding MappedBoneName.Value}"
+                                            Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
                                 <TextBlock  
                                         Text="["
-                                        Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
 
                                 <TextBlock  
-                                        Text="{Binding MappedBoneIndex}"
-                                        Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                                        Text="{Binding MappedBoneIndex.Value}"
+                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
 
                                 <TextBlock  
                                         Text="]"
-                                        Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
                             </StackPanel>
                         </Grid>
                     </HierarchicalDataTemplate>
@@ -228,21 +228,21 @@
                 <Button Grid.Row="0" Grid.Column="0"  Click="{s:MethodBinding AutoMapSelfAndChildrenByName}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock>Auto map "</TextBlock>
-                        <TextBlock Text="{Binding MeshBones.SelectedBone.Name, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding MeshBones.SelectedBone.Name.Value, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock>" based on name</TextBlock>
                     </StackPanel>
                 </Button>
                 <Button Grid.Row="0" Grid.Column="1" Click="{s:MethodBinding AutoMapSelfAndChildrenByHierarchy}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock>Auto map "</TextBlock>
-                        <TextBlock Text="{Binding MeshBones.SelectedBone.Name, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding MeshBones.SelectedBone.Name.Value, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock>" based on hierarchy</TextBlock>
                     </StackPanel>
                 </Button>
                 <Button Grid.Row="1" Grid.Column="0" Click="{s:MethodBinding ClearBindingSelfAndChildren}" >
                     <StackPanel Orientation="Horizontal">
                         <TextBlock>Clear mapping for "</TextBlock>
-                        <TextBlock Text="{Binding MeshBones.SelectedBone.Name, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding MeshBones.SelectedBone.Name.Value, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock>"</TextBlock>
                     </StackPanel>
                 </Button>
@@ -284,7 +284,7 @@
                 <TreeView.ItemTemplate >
                     <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock  Text="{Binding Name}"/>
+                            <TextBlock  Text="{Binding Name.Value}"/>
                         </StackPanel>
 
                     </HierarchicalDataTemplate>
