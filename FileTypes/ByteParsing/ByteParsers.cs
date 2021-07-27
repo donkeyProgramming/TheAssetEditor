@@ -22,6 +22,7 @@ namespace Filetypes.ByteParsing
         Single,
         Float16,
         Boolean,
+        StringLookup,
         List,
     }
 

@@ -14,6 +14,7 @@ using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using CommonControls.Table;
 using Filetypes.RigidModel;
+using FileTypes.AnimationPack;
 using FileTypes.PackFiles.Models;
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor;
@@ -69,8 +70,25 @@ namespace AssetEditor.ViewModels
                 settingsService.CurrentSettings.IsFirstTimeStartingApplication = false;
                 settingsService.Save();
             }
-           
-           if (settingsService.CurrentSettings.LoadCaPacksByDefault)
+
+
+            // ----------
+            var gName = GameInformationFactory.GetGameById(GameTypeEnum.Warhammer2).DisplayName;
+            var gPath = settingsService.GetGamePathForGame(GameTypeEnum.Warhammer2);
+            var gRes = _packfileService.LoadAllCaFiles(gPath, gName);
+
+           // var allFiles = _packfileService.FindAllFilesInDirectory(@"animations/database/campaign/bin");
+            var allFiles = _packfileService.FindAllFilesInDirectory(@"animations/campaign/database/bin");
+
+            AnimationCampaignBinHelper.BatchProcess(allFiles);
+       
+            //-----------
+
+
+
+
+
+            if (settingsService.CurrentSettings.LoadCaPacksByDefault)
            {
                var gamePath = settingsService.GetGamePathForCurrentGame();
                if (gamePath != null)

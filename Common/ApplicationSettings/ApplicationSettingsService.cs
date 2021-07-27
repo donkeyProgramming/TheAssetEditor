@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Common.GameInformation;
+using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -38,8 +39,13 @@ namespace Common.ApplicationSettings
         public string GetGamePathForCurrentGame()
         {
             var game = CurrentSettings.CurrentGame;
-            if (game == GameInformation.GameTypeEnum.Unknown)
+            if (game == GameTypeEnum.Unknown)
                 return null;
+            return GetGamePathForGame(game);
+        }
+
+        public string GetGamePathForGame(GameTypeEnum game)
+        {
             var gameDirInfo = CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game);
             return gameDirInfo?.Path;
         }

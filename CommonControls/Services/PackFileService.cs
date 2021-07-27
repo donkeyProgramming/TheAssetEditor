@@ -95,7 +95,7 @@ namespace CommonControls.Services
 
         public List<PackFile> FindAllFilesInDirectory(string dir, PackFileContainer packFileContainer = null)
         {
-            dir = dir.ToLower();
+            dir = dir.Replace('/', '\\').ToLower();
             List<PackFile> output = new List<PackFile>();
             if (packFileContainer == null)
             {
