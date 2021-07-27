@@ -61,6 +61,8 @@ namespace AssetEditor.ViewModels
 
             ToolsFactory = toolFactory;
 
+            // DebugCampaignBins(settingsService);
+
             if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
             {
                 var settingsWindow = serviceProvider.GetRequiredService<SettingsWindow>();
@@ -70,23 +72,6 @@ namespace AssetEditor.ViewModels
                 settingsService.CurrentSettings.IsFirstTimeStartingApplication = false;
                 settingsService.Save();
             }
-
-
-            // ----------
-            var gName = GameInformationFactory.GetGameById(GameTypeEnum.Warhammer2).DisplayName;
-            var gPath = settingsService.GetGamePathForGame(GameTypeEnum.Warhammer2);
-            var gRes = _packfileService.LoadAllCaFiles(gPath, gName);
-
-           // var allFiles = _packfileService.FindAllFilesInDirectory(@"animations/database/campaign/bin");
-            var allFiles = _packfileService.FindAllFilesInDirectory(@"animations/campaign/database/bin");
-
-            AnimationCampaignBinHelper.BatchProcess(allFiles);
-       
-            //-----------
-
-
-
-
 
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
            {
@@ -129,6 +114,19 @@ namespace AssetEditor.ViewModels
             //    GC.Collect();
             //    GC.WaitForPendingFinalizers();
             //}
+        }
+
+
+        void DebugCampaignBins(ApplicationSettingsService settingsService)
+        {
+            var gName = GameInformationFactory.GetGameById(GameTypeEnum.Warhammer2).DisplayName;
+            var gPath = settingsService.GetGamePathForGame(GameTypeEnum.Warhammer2);
+            var gRes = _packfileService.LoadAllCaFiles(gPath, gName);
+
+            // var allFiles = _packfileService.FindAllFilesInDirectory(@"animations/database/campaign/bin");
+            var allFiles = _packfileService.FindAllFilesInDirectory(@"animations/campaign/database/bin");
+
+            AnimationCampaignBinHelper.BatchProcess(allFiles);
         }
 
         private bool Database_BeforePackFileContainerRemoved(PackFileContainer container)
