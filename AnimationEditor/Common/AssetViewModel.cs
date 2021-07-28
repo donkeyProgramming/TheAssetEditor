@@ -119,6 +119,10 @@ namespace AnimationEditor.Common.ReferenceModel
             SetSkeleton(skeletonFile as PackFile);
             MeshName = file.Name;
 
+
+            ShowMesh = ShowMesh;
+            IsSkeletonVisible = IsSkeletonVisible;
+
             MeshChanged?.Invoke(this);
         }
 
@@ -151,6 +155,9 @@ namespace AnimationEditor.Common.ReferenceModel
 
             var skeletonFile = _pfs.FindFile(other.SkeletonName);
             SetSkeleton(skeletonFile as PackFile);
+
+            ShowMesh = ShowMesh;
+            IsSkeletonVisible = IsSkeletonVisible;
 
             MeshChanged?.Invoke(this);
         }

@@ -22,7 +22,7 @@ namespace AnimationEditor.AnimationTransferTool
         public override void Initialize()
         {
             ReferenceModelView.Data.IsSelectable = false;
-            var propAsset = Scene.AddCompnent(new AssetViewModel(_pfs, "Generated", Color.Red, Scene));
+            var propAsset = Scene.AddCompnent(new AssetViewModel(_pfs, "Generated", Color.Black, Scene));
             Player.RegisterAsset(propAsset);
             Editor = new Editor(_pfs, _skeletonHelper, MainModelView.Data, ReferenceModelView.Data, propAsset, Scene);
         }
@@ -47,8 +47,11 @@ namespace AnimationEditor.AnimationTransferTool
 
             editorView.RefInput = new AnimationToolInput()
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\3k_dlc05_unit_metal_camp_crushers.variantmeshdefinition"),
-                Animation = packfileService.FindFile(@"animations\battle\character\male01\infantry\inf_1h095bow\special_ability\special_ability_arrow_storm_01\inf_1h095bow_arrow_storm_01.anim")
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\emp_archer_ror.variantmeshdefinition"),
+                Animation = packfileService.FindFile(@"animations\battle\humanoid01\sword_and_pistol\missile_attacks\hu1_swp_missile_attack_aim_to_shootready_01.anim")
+
+                //Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\3k_dlc05_unit_metal_camp_crushers.variantmeshdefinition"),
+                //Animation = packfileService.FindFile(@"animations\battle\character\male01\infantry\inf_1h095bow\special_ability\special_ability_arrow_storm_01\inf_1h095bow_arrow_storm_01.anim")
             };
 
             creator.CreateEmptyEditor(editorView);

@@ -93,7 +93,7 @@ namespace Filetypes.RigidModel
             if (header.AnimationType == 7)
                 header.AnimationTotalPlayTimeInSec = chunk.ReadSingle(); // Play time
 
-            bool isSupportedAnimationFile = header.AnimationType == 5 || header.AnimationType == 6 || header.AnimationType == 7;// || header.AnimationType == 4;
+            bool isSupportedAnimationFile = header.AnimationType == 5 || header.AnimationType == 6 || header.AnimationType == 7 || header.AnimationType == 4;
             if (!isSupportedAnimationFile)
                 throw new Exception($"Unsuported animation format: {header.AnimationType}");
 

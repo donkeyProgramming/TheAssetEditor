@@ -80,9 +80,9 @@ namespace AssetEditor.ViewModels
                 if (gamePath != null)
                 {
 
-                    var gName = GameInformationFactory.GetGameById(GameTypeEnum.ThreeKingdoms).DisplayName;
-                    var gPath = settingsService.GetGamePathForGame(GameTypeEnum.ThreeKingdoms);
-                    var gRes = _packfileService.LoadAllCaFiles(gPath, gName);
+                    //var gName = GameInformationFactory.GetGameById(GameTypeEnum.ThreeKingdoms).DisplayName;
+                    //var gPath = settingsService.GetGamePathForGame(GameTypeEnum.ThreeKingdoms);
+                    //var gRes = _packfileService.LoadAllCaFiles(gPath, gName);
 
 
                     var gameName = GameInformationFactory.GetGameById(settingsService.CurrentSettings.CurrentGame).DisplayName;
@@ -91,14 +91,14 @@ namespace AssetEditor.ViewModels
                         MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
                 }
             }
-
+          
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
-              // MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
+                // MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
                 //KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
-
                 AnimationTransferTool_Debug.CreateDamselEditor(this, toolFactory, packfileService);
+
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);

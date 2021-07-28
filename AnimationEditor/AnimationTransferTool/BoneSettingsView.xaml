@@ -5,10 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AnimationEditor.AnimationTransferTool"
              xmlns:s="http://schemas.singulink.com/xaml"
-             xmlns:filterdialog="clr-namespace:CommonControls.FilterDialog;assembly=CommonControls" 
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-              xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls" xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls"
+              xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls" 
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -18,9 +18,9 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="35"/>
         </Grid.RowDefinitions>
-        
+
         <TreeView Grid.Row="0" ItemsSource="{Binding Bones, UpdateSourceTrigger=PropertyChanged}" MaxHeight="400">
             <b:Interaction.Behaviors>
                 <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedBone, Mode=TwoWay}" />
@@ -42,7 +42,6 @@
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>
-
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -84,21 +83,16 @@
             <Label      Grid.Row="3" Grid.Column="1" Content=":"/>
             <mathviews:Vector3View Grid.Row="3" Grid.Column="3" VerticalContentAlignment="Center" Vector3="{Binding SelectedBone.RotationOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-            <Label      Grid.Row="4" Grid.Column="0" Content="Bone Trans offset"/>
+            <Label      Grid.Row="4" Grid.Column="0" Content="Is Local Offset"/>
             <Label      Grid.Row="4" Grid.Column="1" Content=":"/>
-            <mathviews:Vector3View Grid.Row="4" Grid.Column="3" VerticalContentAlignment="Center" Vector3="{Binding SelectedBone.SingleBoneTranslationOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <CheckBox   Grid.Row="4" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding SelectedBone.IsLocalOffset.Value}"/>
 
-            <Label      Grid.Row="5" Grid.Column="0" Content="Bone Rot offset"/>
+            <Label      Grid.Row="5" Grid.Column="0" Content="Is Relative to"/>
             <Label      Grid.Row="5" Grid.Column="1" Content=":"/>
-            <mathviews:Vector3View Grid.Row="5" Grid.Column="3" VerticalContentAlignment="Center" Vector3="{Binding SelectedBone.SingleBoneRotationOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-
-            <Label      Grid.Row="6" Grid.Column="0" Content="Is Relative to"/>
-            <Label      Grid.Row="6" Grid.Column="1" Content=":"/>
-            <ComboBox Grid.Row="6" Grid.Column="2" ItemsSource="{Binding FlatBoneList}" SelectedItem="{Binding SelectedBone.BoneIsRelativeTo, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-
+            <ComboBox Grid.Row="5" Grid.Column="2" ItemsSource="{Binding FlatBoneList}" SelectedItem="{Binding SelectedBone.SelectedRelativeBone, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" DisplayMemberPath="BoneName.Value"/>
         </Grid>
 
-        <Button Grid.Row="2" Content="Apply" Click="{s:MethodBinding Process}"/>
+        <Button Grid.Row="2" Content="Apply Changes" Click="{s:MethodBinding UpdateAnimation}" Margin="5"/>
 
     </Grid>
 </UserControl>
