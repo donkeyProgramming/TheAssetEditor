@@ -24,6 +24,7 @@ namespace AnimationEditor.Common.ReferenceModel
     {
         public event ValueChangedDelegate<GameSkeleton> SkeletonChanged;
         public event ValueChangedDelegate<AnimationClip> AnimationChanged;
+        public event ValueChangedDelegate<AssetViewModel> MeshChanged;
 
         ILogger _logger = Logging.Create<AssetViewModel>();
         PackFileService _pfs;
@@ -117,6 +118,8 @@ namespace AnimationEditor.Common.ReferenceModel
             var skeletonFile = _pfs.FindFile(fullSkeletonName);
             SetSkeleton(skeletonFile as PackFile);
             MeshName = file.Name;
+
+            MeshChanged?.Invoke(this);
         }
 
         void SetSelectableState()
@@ -148,6 +151,8 @@ namespace AnimationEditor.Common.ReferenceModel
 
             var skeletonFile = _pfs.FindFile(other.SkeletonName);
             SetSkeleton(skeletonFile as PackFile);
+
+            MeshChanged?.Invoke(this);
         }
 
         public void SetMeshPosition(Matrix transform)
@@ -253,7 +258,7 @@ namespace AnimationEditor.Common.ReferenceModel
         }
     }
 
-    public class AnimatedPropViewModel : NotifyPropertyChangedImpl, IAnimationProvider
+   /* public class AnimatedPropViewModel : NotifyPropertyChangedImpl, IAnimationProvider
     {
         public event ValueChangedDelegate<GameSkeleton> SkeletonChanged;
 
@@ -392,5 +397,5 @@ namespace AnimationEditor.Common.ReferenceModel
                 _player.SetAnimation(null, Skeleton);
             }
         }
-    }
+    }*/
 }

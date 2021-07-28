@@ -1,4 +1,5 @@
-﻿using AnimationEditor.CampaignAnimationCreator;
+﻿using AnimationEditor.AnimationTransferTool;
+using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.PropCreator;
 using AnimationEditor.PropCreator.ViewModels;
@@ -74,22 +75,30 @@ namespace AssetEditor.ViewModels
             }
 
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
-           {
-               var gamePath = settingsService.GetGamePathForCurrentGame();
-               if (gamePath != null)
-               {
-                   var gameName = GameInformationFactory.GetGameById(settingsService.CurrentSettings.CurrentGame).DisplayName;
-                   var loadRes = _packfileService.LoadAllCaFiles(gamePath, gameName);
-                   if (!loadRes)
-                       MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
-               }
-           }
+            {
+                var gamePath = settingsService.GetGamePathForCurrentGame();
+                if (gamePath != null)
+                {
+
+                    var gName = GameInformationFactory.GetGameById(GameTypeEnum.ThreeKingdoms).DisplayName;
+                    var gPath = settingsService.GetGamePathForGame(GameTypeEnum.ThreeKingdoms);
+                    var gRes = _packfileService.LoadAllCaFiles(gPath, gName);
+
+
+                    var gameName = GameInformationFactory.GetGameById(settingsService.CurrentSettings.CurrentGame).DisplayName;
+                    var loadRes = _packfileService.LoadAllCaFiles(gamePath, gameName);
+                    if (!loadRes)
+                        MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
+                }
+            }
 
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
               // MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
-                KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
+                //KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
+
+                AnimationTransferTool_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);

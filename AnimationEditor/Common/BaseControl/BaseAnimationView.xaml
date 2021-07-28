@@ -7,7 +7,9 @@
              xmlns:animationplayer="clr-namespace:AnimationEditor.Common.AnimationPlayer"
              xmlns:propcreator="clr-namespace:AnimationEditor.PropCreator"
              xmlns:mountcreator="clr-namespace:AnimationEditor.MountAnimationCreator" 
-             xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls" xmlns:campaignanimationcreator="clr-namespace:AnimationEditor.CampaignAnimationCreator"
+             xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
+             xmlns:campaignanimationcreator="clr-namespace:AnimationEditor.CampaignAnimationCreator"
+             xmlns:animationtransfertool="clr-namespace:AnimationEditor.AnimationTransferTool"
              mc:Ignorable="d" >
     <UserControl.Resources>
         <valueconverters:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Collapsed" />
@@ -64,6 +66,10 @@
 
                     <DataTemplate DataType="{ x:Type campaignanimationcreator:Editor}">
                         <campaignanimationcreator:EditorView  />
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{ x:Type animationtransfertool:Editor}">
+                        <animationtransfertool:EditorView  />
                     </DataTemplate>
                 </ContentControl.Resources>
             </ContentControl>

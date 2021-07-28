@@ -171,7 +171,7 @@ namespace View3D.SceneNodes
 
             if (Effect is IShaderTextures tetureEffect)
                 tetureEffect.UseAlpha = MeshModel.AlphaSettings.Mode == AlphaMode.Alpha_Test;
-            renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeoRenderItem() { Geometry = Geometry, ModelMatrix =  ModelMatrix, Shader = Effect });
+            renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeoRenderItem() { Geometry = Geometry, ModelMatrix = parentWorld* ModelMatrix, Shader = Effect });
 
             if (DisplayPivotPoint)
             {

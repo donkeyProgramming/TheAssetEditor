@@ -102,7 +102,7 @@ namespace CommonControls.Editors.BoneMapping
             MeshSkeletonName = new NotifyAttr<string>(config.MeshSkeletonName);
 
             ParentModelBones.UpdatePossibleValues(config.ParentModelBones);
-            ParentSkeletonName = new NotifyAttr<string>(config.MeshSkeletonName);
+            ParentSkeletonName = new NotifyAttr<string>(config.ParnetModelSkeletonName);
 
             _configuration = config;
         }

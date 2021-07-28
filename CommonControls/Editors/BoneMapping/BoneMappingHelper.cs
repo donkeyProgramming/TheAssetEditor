@@ -96,13 +96,34 @@ namespace CommonControls.Editors.BoneMapping
                 if (IsRepalcement(bone.Name.Value, name, "leg_left_1", "lowerleg_left"))
                     return bone;
 
-                if (IsRepalcement(bone.Name.Value, name, "leg_left_2 ", "foot_left"))
+                if (IsRepalcement(bone.Name.Value, name, "leg_left_2", "foot_left"))
                     return bone;
 
-                if (IsRepalcement(bone.Name.Value, name, "lowerarm_left_roll ", "lowerarm_roll_left"))
+                if (IsRepalcement(bone.Name.Value, name, "lowerarm_left_roll", "lowerarm_roll_left"))
                     return bone;
 
-                if (IsRepalcement(bone.Name.Value, name, "upperarm_left_roll ", "upperarm_roll_left"))
+                if (IsRepalcement(bone.Name.Value, name, "upperarm_left_roll", "upperarm_roll_left"))
+                    return bone;
+
+                if (IsRepalcement(bone.Name.Value, name, "shoulder_pad_left", "shoulderpad_left_0"))
+                    return bone;
+
+                if (IsRepalcement(bone.Name.Value, name, "be_prop_0", "weapon_1"))
+                    return bone;
+
+                if (IsRepalcement(bone.Name.Value, name, "be_prop_1", "weapon_2"))
+                    return bone;
+
+                if (IsRepalcement(bone.Name.Value, name, "be_prop_2", "weapon_3"))
+                    return bone;
+
+                if (IsRepalcement(bone.Name.Value, name, "be_prop_3", "weapon_4"))
+                    return bone;
+
+                if (IsRepalcement(bone.Name.Value, name, "be_prop_4", "weapon_5"))
+                    return bone;
+
+                if (IsRepalcement(bone.Name.Value, name, "be_prop_5", "weapon_6"))
                     return bone;
 
                 var result = FindBoneBasedOnNameCommonReplacements(name, bone.Children);

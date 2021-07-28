@@ -22,6 +22,12 @@ namespace CommonControls.Editors.BoneMapping.View
             InitializeComponent();
         }
 
+        public BoneMappingWindow(BoneMappingViewModel dataContext)
+        {
+            DataContext = dataContext;
+            InitializeComponent();
+        }
+
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
             var viewModel = DataContext as BoneMappingViewModel;
