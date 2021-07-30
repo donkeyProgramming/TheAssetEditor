@@ -89,7 +89,11 @@
 
             <Label      Grid.Row="5" Grid.Column="0" Content="Is Relative to"/>
             <Label      Grid.Row="5" Grid.Column="1" Content=":"/>
-            <ComboBox Grid.Row="5" Grid.Column="2" ItemsSource="{Binding FlatBoneList}" SelectedItem="{Binding SelectedBone.SelectedRelativeBone, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" DisplayMemberPath="BoneName.Value"/>
+            <DockPanel Grid.Row="5" Grid.Column="2" >
+                <Button DockPanel.Dock="Right" Content="Clear" Width="60" Click="{s:MethodBinding ClearRelativeBone}"/>
+                <ComboBox ItemsSource="{Binding FlatBoneList}" SelectedItem="{Binding SelectedBone.SelectedRelativeBone, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" DisplayMemberPath="BoneName.Value"/>
+            </DockPanel>
+            
         </Grid>
 
         <Button Grid.Row="2" Content="Apply Changes" Click="{s:MethodBinding UpdateAnimation}" Margin="5"/>

@@ -15,8 +15,6 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using View3D.Animation;
-using View3D.SceneNodes;
-using View3D.Utility;
 
 namespace AnimationEditor.AnimationTransferTool
 {
@@ -26,17 +24,18 @@ namespace AnimationEditor.AnimationTransferTool
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         AssetViewModel _copyTo;
         AssetViewModel _copyFrom;
-        AssetViewModel _generated;
+        public AssetViewModel Generated { get; set; }
         List<IndexRemapping> _remappingInformaton;
 
         public ObservableCollection<SkeletonBoneNode> Bones { get; set; } = new ObservableCollection<SkeletonBoneNode>();
         public ObservableCollection<SkeletonBoneNode> FlatBoneList { get; set; } = new ObservableCollection<SkeletonBoneNode>();
-        
+        public AnimationSettings AnimationSettings { get; set; } = new AnimationSettings();
+
         SkeletonBoneNode _selectedBone;
         public SkeletonBoneNode SelectedBone
         {
             get { return _selectedBone; }
-            set { SetAndNotify(ref _selectedBone, value); OnBoneSelected(value); }
+            set { SetAndNotify(ref _selectedBone, value); HightlightSelectedBones(value); }
         }
 
         public Editor(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel copyToAsset, AssetViewModel copyFromAsset, AssetViewModel generated, IComponentManager componentManager)
@@ -45,28 +44,32 @@ namespace AnimationEditor.AnimationTransferTool
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _copyTo = copyToAsset;
             _copyFrom = copyFromAsset;
-            _generated = generated;
+            Generated = generated;
 
-            _copyTo.SkeletonChanged += Target_SkeletonChanged;
-            _copyFrom.SkeletonChanged += _source_SkeletonChanged;
-            _copyTo.MeshChanged += MeshChanged;
+            _copyFrom.SkeletonChanged += CopyFromSkeletonChanged;
+            _copyTo.MeshChanged += CopyToMeshChanged;
 
-            _copyTo.Offset = Matrix.CreateTranslation(new Vector3(0, 0, -1));
-            _copyFrom.Offset = Matrix.CreateTranslation(new Vector3(0, 0, 1));
+            _copyTo.Offset = Matrix.CreateTranslation(new Vector3(0, 0, -2));
+            _copyFrom.Offset = Matrix.CreateTranslation(new Vector3(0, 0, 2));
 
-            MeshChanged(_copyTo);
+            AnimationSettings.OffsetGenerated.OnValueChanged += (vector) => generated.Offset = Matrix.CreateTranslation(new Vector3((float)vector.X.Value, (float)vector.Y.Value, (float)vector.Z.Value));
+            AnimationSettings.OffsetTarget.OnValueChanged += (vector) => _copyTo.Offset = Matrix.CreateTranslation(new Vector3((float)vector.X.Value, (float)vector.Y.Value, (float)vector.Z.Value));
+            AnimationSettings.OffsetSource.OnValueChanged += (vector) => _copyFrom.Offset = Matrix.CreateTranslation(new Vector3((float)vector.X.Value, (float)vector.Y.Value, (float)vector.Z.Value));
+
+            if(_copyTo.Skeleton != null)
+                CopyToMeshChanged(_copyTo);
         }
 
-        void OnBoneSelected(SkeletonBoneNode bone)
+        void HightlightSelectedBones(SkeletonBoneNode bone)
         {
             if (bone == null)
             {
-                _generated.SelectedBoneIndex(-1);
+                Generated.SelectedBoneIndex(-1);
                 _copyFrom.SelectedBoneIndex(-1);
             }
             else
             {
-                _generated.SelectedBoneIndex(bone.BoneIndex.Value);
+                Generated.SelectedBoneIndex(bone.BoneIndex.Value);
                 if (_remappingInformaton != null)
                 { 
                     var mapping = _remappingInformaton.FirstOrDefault(x => x.OriginalValue == bone.BoneIndex.Value);
@@ -76,21 +79,18 @@ namespace AnimationEditor.AnimationTransferTool
             }
         }
 
-        private void MeshChanged(AssetViewModel newValue)
+        private void CopyToMeshChanged(AssetViewModel newValue)
         {
-            _generated.CopyMeshFromOther(newValue, true);
+            Generated.CopyMeshFromOther(newValue, true);
             CreateBoneOverview(newValue.Skeleton);
-            OnBoneSelected(null);
+            HightlightSelectedBones(null);
         }
 
-        private void _source_SkeletonChanged(View3D.Animation.GameSkeleton newValue)
+        private void CopyFromSkeletonChanged(GameSkeleton newValue)
         {
-            //throw new NotImplementedException();
-        }
-
-        private void Target_SkeletonChanged(View3D.Animation.GameSkeleton newValue)
-        {
-            //throw new NotImplementedException();
+            _remappingInformaton = null;
+            CreateBoneOverview(_copyTo.Skeleton);
+            HightlightSelectedBones(null);
         }
 
         public void OpenMappingWindow()
@@ -104,9 +104,6 @@ namespace AnimationEditor.AnimationTransferTool
 
             config.ParnetModelSkeletonName = _copyFrom.SkeletonName;
             config.ParentModelBones = AnimatedBoneHelper.CreateFromSkeleton(sourceSkeleton);
-
-            if (config.MeshSkeletonName == config.ParnetModelSkeletonName)
-                MessageBox.Show("The two models share skeleton, no need for mapping?", "Error", MessageBoxButton.OK);
 
             var window = new BoneMappingWindow(new BoneMappingViewModel(config));
             if (window.ShowDialog() == true)
@@ -127,28 +124,54 @@ namespace AnimationEditor.AnimationTransferTool
             }
         }
 
+        public void ClearRelativeSelectedBone()
+        {
+            if(SelectedBone != null)
+                SelectedBone.SelectedRelativeBone = null;
+        }
+
         public void UpdateAnimation()
         {
             if (_remappingInformaton == null)
             {
-                MessageBox.Show("No config?", "Error", MessageBoxButton.OK);
+                MessageBox.Show("No mapping created?", "Error", MessageBoxButton.OK);
                 return;
             }
 
-            // Skeleton null, animatiom null
-            // Relative bone list clear
+            if (_copyTo.Skeleton == null || _copyFrom.Skeleton == null)
+            {
+                MessageBox.Show("Missing a skeleton?", "Error", MessageBoxButton.OK);
+                return;
+            }
 
-            var service = new AnimationRemapperService(_remappingInformaton, Bones);
-            AnimationClip clip = service.ReMapAnimation(_copyFrom.Skeleton, _copyTo.Skeleton, _copyFrom.AnimationClip);
-            _generated.SetAnimationClip(clip, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
+            if (_copyFrom.AnimationClip == null)
+            {
+                MessageBox.Show("No animation to copy selected", "Error", MessageBoxButton.OK);
+                return;
+            }
+
+            var service = new AnimationRemapperService(AnimationSettings, _remappingInformaton, Bones);
+            var clip = service.ReMapAnimation(_copyFrom.Skeleton, _copyTo.Skeleton, _copyFrom.AnimationClip);
+            Generated.SetAnimationClip(clip, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
         }
 
+        public void SaveAnimation()
+        {
+            if (Generated.AnimationClip == null || Generated.Skeleton == null || _copyFrom.Skeleton == null)
+            {
+                MessageBox.Show("No animation generated", "Error", MessageBoxButton.OK);
+                return;
+            }
 
+            var orgName = _copyFrom.AnimationName.AnimationFile;
+            var orgSkeleton = _copyFrom.Skeleton.SkeletonName;
+            var newSkeleton = Generated.Skeleton.SkeletonName;
+            var newName = orgName.Replace(orgSkeleton, newSkeleton);
 
+            var animFile = Generated.AnimationClip.ConvertToFileFormat(Generated.Skeleton);
+            SaveHelper.Save(_pfs, newName, null, AnimationFile.GetBytes(animFile));
+        }
 
-
-
-            //---void 
         void CreateBoneOverview(GameSkeleton skeleton)
         {
             SelectedBone = null;
@@ -210,5 +233,7 @@ namespace AnimationEditor.AnimationTransferTool
         }
 
         public ObservableCollection<SkeletonBoneNode> Children { get; set; } = new ObservableCollection<SkeletonBoneNode>();
+
+       
     }
 }

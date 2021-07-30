@@ -1,4 +1,5 @@
-﻿using AnimationEditor.CampaignAnimationCreator;
+﻿using AnimationEditor.AnimationTransferTool;
+using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.PropCreator.ViewModels;
 using AssetEditor.Services;
@@ -52,6 +53,7 @@ namespace AssetEditor.ViewModels
         public ICommand OpenKitbashEditorCommand { get; set; }
         public ICommand OpenCampaignAnimCreatorCommand { get; set; }
         public ICommand OpenPropCreatorCommand { get; set; }
+        public ICommand OpenAnimationTransferToolCommand { get; set; }
         public IEditorCreator EditorCreator { get; set; }
 
         public MenuBarViewModel(IServiceProvider provider, PackFileService packfileService, ToolFactory toolFactory)
@@ -68,6 +70,7 @@ namespace AssetEditor.ViewModels
             OpenMountCreatorCommand = new RelayCommand(OpenMountCreator);
             OpenPropCreatorCommand = new RelayCommand(OpenPropCreatorEditor);
             OpenCampaignAnimCreatorCommand = new RelayCommand(OpenCampaignAnimCreatorEditor);
+            OpenAnimationTransferToolCommand = new RelayCommand(OpenAnimationTransferTool);
 
             OpenRome2RePacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Rome_2_Remastered));
             OpenThreeKingdomsPacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.ThreeKingdoms));
@@ -159,6 +162,12 @@ namespace AssetEditor.ViewModels
         void OpenCampaignAnimCreatorEditor()
         {
             var editorView = _toolFactory.CreateEditorViewModel<CampaignAnimationCreatorViewModel>();
+            EditorCreator.CreateEmptyEditor(editorView);
+        }
+
+        void OpenAnimationTransferTool()
+        {
+            var editorView = _toolFactory.CreateEditorViewModel<AnimationTransferToolViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
     }

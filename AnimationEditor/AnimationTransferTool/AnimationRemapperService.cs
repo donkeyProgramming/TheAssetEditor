@@ -13,30 +13,42 @@ namespace AnimationEditor.AnimationTransferTool
     public class AnimationRemapperService
     {
         List<IndexRemapping> _remappingInformaton;
-        public IEnumerable<SkeletonBoneNode> _bones;
+        IEnumerable<SkeletonBoneNode> _bones;
+        AnimationSettings _settings;
 
-        public AnimationRemapperService(List<IndexRemapping> mapping, IEnumerable<SkeletonBoneNode> bones)
+        public AnimationRemapperService(AnimationSettings settings, List<IndexRemapping> mapping, IEnumerable<SkeletonBoneNode> bones)
         {
+            _settings = settings;
             _remappingInformaton = mapping;
             _bones = bones;
         }
 
         public AnimationClip ReMapAnimation(GameSkeleton copyFromSkeleton, GameSkeleton copyToSkeleton, AnimationClip animationToCopy)
         {
-            var newAnimation = CreateNewAnimation(copyToSkeleton, animationToCopy);
+            var newFrameCount = (int)(_settings.SpeedMult.Value * animationToCopy.DynamicFrames.Count);
+            var newPlayTime = (float)_settings.SpeedMult.Value * animationToCopy.PlayTimeInSec;
+            var resampledAnimationToCopy = View3D.Animation.AnimationEditor.ReSample(copyFromSkeleton, animationToCopy, newFrameCount, newPlayTime);
 
-            MapAnimationWorld(copyFromSkeleton, copyToSkeleton, animationToCopy, newAnimation);
-            ApplyRelativeScale(copyFromSkeleton, copyToSkeleton, newAnimation);
-            SnapBonesToWorld(copyFromSkeleton, copyToSkeleton, newAnimation, animationToCopy);
+            var newAnimation = CreateNewAnimation(copyToSkeleton, resampledAnimationToCopy);
+
+            MapAnimationWorld(copyFromSkeleton, copyToSkeleton, resampledAnimationToCopy, newAnimation);
+            if(_settings.ApplyRelativeScale.Value)
+                ApplyRelativeScale(copyFromSkeleton, copyToSkeleton, newAnimation);
+            SnapBonesToWorld(copyFromSkeleton, copyToSkeleton, newAnimation, resampledAnimationToCopy);
+
+            if (_settings.FreezeUnmapped.Value)
+                FrezeUnmappedBone(copyToSkeleton, newAnimation);
+
             ApplyOffsets(copyToSkeleton, newAnimation);
-            FixAttachmentPoints(copyFromSkeleton, copyToSkeleton, newAnimation, animationToCopy);
+            FixAttachmentPoints(copyFromSkeleton, copyToSkeleton, newAnimation, resampledAnimationToCopy);
+         
+
             return newAnimation;
         }
 
         public void MapAnimationWorld(GameSkeleton copyFromSkeleton, GameSkeleton copyToSkeleton, AnimationClip animationToCopy, AnimationClip newAnimation)
         {
             var frameCount = animationToCopy.DynamicFrames.Count;
-
             for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
                 for (int i = 0; i < copyToSkeleton.BoneCount; i++)
@@ -254,6 +266,23 @@ namespace AnimationEditor.AnimationTransferTool
                     //animationToFix.DynamicFrames[frameIndex].Rotation[i] = boneRotation;
                     animationToFix.DynamicFrames[frameIndex].Position[i] = bonePosition;
 
+                }
+            }
+        }
+
+        void FrezeUnmappedBone(GameSkeleton copyToSkeleton, AnimationClip animation)
+        {
+            var frameCount = animation.DynamicFrames.Count;
+            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            {
+                for (int i = 0; i < copyToSkeleton.BoneCount; i++)
+                {
+                    var mappedIndex = _remappingInformaton.FirstOrDefault(x => x.OriginalValue == i);
+                    if (mappedIndex != null)
+                        continue;
+
+                    animation.DynamicFrames[frameIndex].Rotation[i] = Quaternion.Identity;
+                    animation.DynamicFrames[frameIndex].Position[i] = Vector3.Zero;
                 }
             }
         }

@@ -15,34 +15,9 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
+
         <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="180"/>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="auto"/>
-            </Grid.ColumnDefinitions>
-
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-            </Grid.RowDefinitions>
-
-            <Label Grid.Row="0" Grid.Column="0"  Content="Offset New:"/>
-            <mathviews:Vector3View Grid.Row="0" Grid.Column="1" Margin="2"/>
-            <Label Grid.Row="0" Grid.Column="2"  Content="Mesh:"/>
-            <CheckBox Grid.Row="0" Grid.Column="3" VerticalContentAlignment="Center"/>
-            <Label Grid.Row="0" Grid.Column="4"  Content="Skeleton:"/>
-            <CheckBox Grid.Row="0" Grid.Column="5" VerticalContentAlignment="Center"/>
-
-            <Label Grid.Row="1" Grid.Column="0"  Content="Offset Target:"/>
-            <mathviews:Vector3View Grid.Row="1" Grid.Column="1" Margin="2"/>
-
-            <Label Grid.Row="2" Grid.Column="0"  Content="Offset Source:"/>
-            <mathviews:Vector3View Grid.Row="2" Grid.Column="1" Margin="2"/>
+            <local:AnimationSettingsView/>
         </Grid>
 
         <Grid Grid.Row="1">
@@ -52,7 +27,7 @@
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" Content="Open bone mapping window" Click="{s:MethodBinding OpenMappingWindow}" Margin="2"/>
-            <Button Grid.Column="1" Content="Save Animation" Margin="2"/>
+            <Button Grid.Column="1" Content="Save Animation" Click="{s:MethodBinding SaveAnimation}" Margin="2"/>
             <Button Grid.Column="2" Content="Batch Process" IsEnabled="False" Margin="2"/>
         </Grid>
 
