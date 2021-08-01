@@ -65,7 +65,7 @@
             </DockPanel>
 
             <DockPanel >
-                <Label Content="Speed multiplier" Width ="{StaticResource labelWidth}"/>
+                <Label Content="Length multiplier" Width ="{StaticResource labelWidth}"/>
                 <Label Content=":"/>
                 <TextBox Text="{Binding AnimationSettings.SpeedMult.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
                     <b:Interaction.Behaviors>

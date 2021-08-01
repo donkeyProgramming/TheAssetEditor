@@ -171,6 +171,18 @@ namespace AnimationEditor.AnimationTransferTool
             var animFile = Generated.AnimationClip.ConvertToFileFormat(Generated.Skeleton);
             SaveHelper.Save(_pfs, newName, null, AnimationFile.GetBytes(animFile));
         }
+        public void ClearAllSettings()
+        {
+            if(MessageBox.Show("Are you sure?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                CreateBoneOverview(_copyTo.Skeleton);
+        }
+
+
+        public void UseTargetAsSource()
+        {
+            if (MessageBox.Show("Are you sure?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                _copyFrom.CopyMeshFromOther(_copyTo, true);
+        }
 
         void CreateBoneOverview(GameSkeleton skeleton)
         {
@@ -224,7 +236,8 @@ namespace AnimationEditor.AnimationTransferTool
         public Vector3ViewModel TranslationOffset { get; set; } = new Vector3ViewModel(0);
 
         public NotifyAttr<bool> ForceSnapToWorld { get; set; } = new NotifyAttr<bool>(false);
-        
+        public NotifyAttr<bool> FreezeTranslation { get; set; } = new NotifyAttr<bool>(false);
+
         public SkeletonBoneNode _selectedRelativeBone;
         public SkeletonBoneNode SelectedRelativeBone
         {

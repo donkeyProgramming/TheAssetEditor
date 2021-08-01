@@ -205,6 +205,61 @@ namespace View3D.Animation
             StaticFrame = new KeyFrame();
         }
 
+
+        public void RemoveOptimizations(GameSkeleton skeleton)
+        {
+            List<KeyFrame> newDynamicFrames = new List<KeyFrame>();
+
+            var boneCount = RotationMappings.Count;
+            var frameCount = DynamicFrames.Count;
+
+            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            {
+                var newKeyframe = new KeyFrame();
+
+                for (int boneIndex = 0; boneIndex < boneCount; boneIndex++)
+                {
+                    var translationLookup = TranslationMappings[boneIndex];
+                    if (translationLookup.IsDynamic)
+                        newKeyframe.Position.Add(DynamicFrames[frameIndex].Position[translationLookup.Id]);
+                    else if (translationLookup.IsStatic)
+                        newKeyframe.Position.Add(StaticFrame.Position[translationLookup.Id]);
+                    else 
+                        newKeyframe.Position.Add(skeleton.Translation[boneIndex]);
+
+                    var rotationLookup = RotationMappings[boneIndex];
+                    if (rotationLookup.IsDynamic)
+                        newKeyframe.Rotation.Add(DynamicFrames[frameIndex].Rotation[rotationLookup.Id]);
+                    else if (rotationLookup.IsStatic)
+                        newKeyframe.Rotation.Add(StaticFrame.Rotation[rotationLookup.Id]);
+                    else
+                        newKeyframe.Rotation.Add(skeleton.Rotation[boneIndex]);
+
+                    newKeyframe.Scale.Add(Vector3.One);
+                }
+
+                newDynamicFrames.Add(newKeyframe);
+            }
+
+            // Update data
+            var newRotMapping = new List<AnimationBoneMapping>();
+            var newTransMappings = new List<AnimationBoneMapping>();
+   
+
+            for (int i = 0; i < boneCount; i++)
+            {
+                newRotMapping.Add(new AnimationBoneMapping(i));
+                newTransMappings.Add(new AnimationBoneMapping(i));
+            }
+
+            TranslationMappings = newTransMappings;
+            RotationMappings = newRotMapping;
+            DynamicFrames = newDynamicFrames;
+            StaticFrame = new KeyFrame();
+        }
+
+
+
         /// <summary>
         /// This function assumes that there are only dynamic frames
         /// </summary>

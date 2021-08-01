@@ -1,4 +1,7 @@
 
+[![name](https://user-images.githubusercontent.com/54080240/126827425-c6c49064-0cb7-459d-b6c2-47544f4013cd.png)](https://www.patreon.com/TheAssetEditor)
+
+
 	Selection manager can not select over gizmo when multiselecting
 	Gizmo behaves strangly when camera look d
 	irectly forward towards model
@@ -166,27 +169,63 @@ Animation retargeting:
 	
 	
 	
+
+* Load more texture formats (including bc5 and bc7)
+* Use mipmaps when rendering
+* Better lighting-ish (thanks to phazer)
+* Light controls. PageUp/Down to rotete. Shift + PageUp/Down to controll brightness
+* Correctly load and display ThreeKingdom models
+  
+* Mesh selection and editing actions have greatly improved performance.
+* Growing selection/splitting into submesh when ALT key is pressed does not auto merge overlapping vertexes (for removing Ogre hats...)
+* Drag and drop rmv2, vmd and wsmodels from treeview onto kitbasher to load
+* Focus(ctrl + f) now also zooms to fit the model. 
+* Pin mesh to mesh tool. For attaching items that are controlled by multiple bones, such as belt buckles, spikes and what ever.
+  
+* Added help link in UI which takes you to the Wiki
+* Added possoblity to easily load ThreeKingdoms, Troy and Rome Remastered files (lots of nice animations...)
+  
+* Campage animation creator added
+  
+* Fixed crashes in MountEditor
 	
-Changelog:
-	Load more texture formats (including bc5 and bc7)
-	Use mipmaps when rendering
-	Better lighting (thanks to phazer)
-	Light controls. PageUp/Down to rotete. Shift + PageUp/Down to controll brightness
-	Correctly load and display ThreeKingdom models
+
 	
-	Selection related actions greatly improved performance
-	Growing selection/splitting into submesh when ALT key is pressed does not auto merge overlapping vertexes (for removing Ogre hats...)
-	Drag and drop rmv2, vmd and wsmodels from treeview onto kitbasher to load
+
+Lots of rome stuff	
+Savign static meshes
+Convert selection to verts
+Fix the size for tool bar
+ogre anims -> Anims in general
+Lod for larges 5 models 
 	
-	Added help link in UI which takes you to the Wiki
-	Added possoblity to easily load ThreeKingdoms, Troy and Rome Remastered files (lots of nice animations...)
+
+New features:
+	Vertex movement now has weighted selection
 	
-	Fixed crashes in MountEditor tool
-	
-	
-	
-	
-	
+Fixed bugs:
+	Unable select vertexes in KitBash tool
+	Unable to select vertex for mount in MountEditor
+	Save static Mesh
 	
 	
+	Unable to load : variantmeshes\_variantmodels\mount\horse\horse_body.rigid_model_v2
 	
+	
+	
+	
+	
+	
+	window manager to open stuff in the same place as alst time
+	
+	
+Fixed crash in remapper tool
+Moved remapper to work for multiple meshes
+fixed error in handling weighted meshes in mesh fitter 
+Even more animation fixes
+
+-> Anim converter tool
+
+so far decoding is: probably version (2 or 3), str table ofs, 1, 0, 1, item count, items, string count, str1, str2, ..., strN
+if item count == 0, then that's full decoding
+tem data is presumably a bunch of arrays of things, it starts with   countA, inta1, inta2,..., intaN, countB, intb1, intb2, ..., intbN, etc.

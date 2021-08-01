@@ -27,21 +27,27 @@ namespace AnimationEditor.AnimationTransferTool
         {
             var newFrameCount = (int)(_settings.SpeedMult.Value * animationToCopy.DynamicFrames.Count);
             var newPlayTime = (float)_settings.SpeedMult.Value * animationToCopy.PlayTimeInSec;
+
+            animationToCopy.RemoveOptimizations(copyFromSkeleton);
             var resampledAnimationToCopy = View3D.Animation.AnimationEditor.ReSample(copyFromSkeleton, animationToCopy, newFrameCount, newPlayTime);
 
             var newAnimation = CreateNewAnimation(copyToSkeleton, resampledAnimationToCopy);
 
-            MapAnimationWorld(copyFromSkeleton, copyToSkeleton, resampledAnimationToCopy, newAnimation);
-            if(_settings.ApplyRelativeScale.Value)
+            if (copyFromSkeleton.SkeletonName != copyToSkeleton.SkeletonName)
+                MapAnimationWorld(copyFromSkeleton, copyToSkeleton, resampledAnimationToCopy, newAnimation);
+
+            if (_settings.ApplyRelativeScale.Value)
                 ApplyRelativeScale(copyFromSkeleton, copyToSkeleton, newAnimation);
+
             SnapBonesToWorld(copyFromSkeleton, copyToSkeleton, newAnimation, resampledAnimationToCopy);
 
             if (_settings.FreezeUnmapped.Value)
                 FrezeUnmappedBone(copyToSkeleton, newAnimation);
 
+            FrezeTaggedBones(copyToSkeleton, newAnimation);
             ApplyOffsets(copyToSkeleton, newAnimation);
             FixAttachmentPoints(copyFromSkeleton, copyToSkeleton, newAnimation, resampledAnimationToCopy);
-         
+            ScaleAnimation(newAnimation, copyToSkeleton);
 
             return newAnimation;
         }
@@ -270,6 +276,19 @@ namespace AnimationEditor.AnimationTransferTool
             }
         }
 
+        void ScaleAnimation(AnimationClip animation, GameSkeleton skeleton)
+        {
+            var frameCount = animation.DynamicFrames.Count;
+            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            {
+                for (int i = 0; i < skeleton.BoneCount; i++)
+                {
+                    animation.DynamicFrames[frameIndex].Position[i] = animation.DynamicFrames[frameIndex].Position[i] * (float)_settings.Scale.Value;
+                }
+            }
+
+        }
+
         void FrezeUnmappedBone(GameSkeleton copyToSkeleton, AnimationClip animation)
         {
             var frameCount = animation.DynamicFrames.Count;
@@ -283,6 +302,21 @@ namespace AnimationEditor.AnimationTransferTool
 
                     animation.DynamicFrames[frameIndex].Rotation[i] = Quaternion.Identity;
                     animation.DynamicFrames[frameIndex].Position[i] = Vector3.Zero;
+                }
+            }
+        }
+
+
+        void FrezeTaggedBones(GameSkeleton copyToSkeleton, AnimationClip animation)
+        {
+            var frameCount = animation.DynamicFrames.Count;
+            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            {
+                for (int i = 0; i < copyToSkeleton.BoneCount; i++)
+                {
+                    var boneSettings = BoneHelper.GetBoneFromId(_bones, i);
+                    if (boneSettings.FreezeTranslation.Value)
+                        animation.DynamicFrames[frameIndex].Position[i] = Vector3.Zero;
                 }
             }
         }

@@ -83,9 +83,9 @@
             <Label      Grid.Row="3" Grid.Column="1" Content=":"/>
             <mathviews:Vector3View Grid.Row="3" Grid.Column="3" VerticalContentAlignment="Center" Vector3="{Binding SelectedBone.RotationOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-            <Label      Grid.Row="4" Grid.Column="0" Content="Is Local Offset"/>
+            <Label      Grid.Row="4" Grid.Column="0" Content="Freeze translation"/>
             <Label      Grid.Row="4" Grid.Column="1" Content=":"/>
-            <CheckBox   Grid.Row="4" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding SelectedBone.IsLocalOffset.Value}"/>
+            <CheckBox   Grid.Row="4" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding SelectedBone.FreezeTranslation.Value}"/>
 
             <Label      Grid.Row="5" Grid.Column="0" Content="Is Relative to"/>
             <Label      Grid.Row="5" Grid.Column="1" Content=":"/>
@@ -96,7 +96,6 @@
             
         </Grid>
 
-        <Button Grid.Row="2" Content="Apply Changes" Click="{s:MethodBinding UpdateAnimation}" Margin="5"/>
 
     </Grid>
 </UserControl>
