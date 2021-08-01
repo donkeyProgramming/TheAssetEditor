@@ -95,6 +95,12 @@ namespace AnimationEditor.AnimationTransferTool
 
         public void OpenMappingWindow()
         {
+            if (_copyTo.Skeleton == null || _copyFrom.Skeleton == null)
+            {
+                MessageBox.Show("Source or target skeleton not selected", "Error");
+                return;
+            }
+
             var targetSkeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, _copyTo.SkeletonName);
             var sourceSkeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, _copyFrom.SkeletonName);
 
@@ -246,7 +252,5 @@ namespace AnimationEditor.AnimationTransferTool
         }
 
         public ObservableCollection<SkeletonBoneNode> Children { get; set; } = new ObservableCollection<SkeletonBoneNode>();
-
-       
     }
 }

@@ -30,11 +30,12 @@ namespace AnimationEditor.AnimationTransferTool
 
             animationToCopy.RemoveOptimizations(copyFromSkeleton);
             var resampledAnimationToCopy = View3D.Animation.AnimationEditor.ReSample(copyFromSkeleton, animationToCopy, newFrameCount, newPlayTime);
-
             var newAnimation = CreateNewAnimation(copyToSkeleton, resampledAnimationToCopy);
 
             if (copyFromSkeleton.SkeletonName != copyToSkeleton.SkeletonName)
                 MapAnimationWorld(copyFromSkeleton, copyToSkeleton, resampledAnimationToCopy, newAnimation);
+            else
+                newAnimation = resampledAnimationToCopy;
 
             if (_settings.ApplyRelativeScale.Value)
                 ApplyRelativeScale(copyFromSkeleton, copyToSkeleton, newAnimation);
