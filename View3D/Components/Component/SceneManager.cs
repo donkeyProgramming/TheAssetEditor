@@ -163,7 +163,7 @@ namespace View3D.Components.Component
                     drawableNode.Render(_renderEngine, parentMatrix);
 
                 foreach (var child in root.Children)
-                    DrawBasicSceneHirarchy(child, parentMatrix * child.ModelMatrix);
+                    DrawBasicSceneHirarchy(child, parentMatrix);
             }
         }
 

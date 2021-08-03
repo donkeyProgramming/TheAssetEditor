@@ -6,6 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Icons\Copy.png" />
+    <None Remove="Resources\Icons\Cut.png" />
+    <None Remove="Resources\Icons\Delete.png" />
     <None Remove="Resources\Icons\icons8-3d-object-48.png" />
     <None Remove="Resources\Icons\icons8-add-folder-50.png" />
     <None Remove="Resources\Icons\icons8-animated-skeleton-40.png" />
@@ -68,6 +71,12 @@
     <None Remove="Resources\Icons\Kitbasher\tool_split.png" />
     <None Remove="Resources\Icons\Kitbasher\Undo.png" />
     <None Remove="Resources\Icons\Kitbasher\Validate.png" />
+    <None Remove="Resources\Icons\Open.png" />
+    <None Remove="Resources\Icons\Paste.png" />
+    <None Remove="Resources\Icons\Redo.png" />
+    <None Remove="Resources\Icons\Save.png" />
+    <None Remove="Resources\Icons\Undo.png" />
+    <None Remove="Resources\Icons\WordWrap.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -78,9 +87,13 @@
     <PackageReference Include="Singulink.WPF.Data.MethodBinding" Version="1.1.0" />
     <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
     <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
+	  <PackageReference Include="AvalonEdit" Version="6.1.2.30" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\Icons\Copy.png" />
+    <Resource Include="Resources\Icons\Cut.png" />
+    <Resource Include="Resources\Icons\Delete.png" />
     <Resource Include="Resources\Icons\icons8-3d-object-48.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
@@ -261,6 +274,12 @@
     <Resource Include="Resources\Icons\Kitbasher\Validate.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Resources\Icons\Open.png" />
+    <Resource Include="Resources\Icons\Paste.png" />
+    <Resource Include="Resources\Icons\Redo.png" />
+    <Resource Include="Resources\Icons\Save.png" />
+    <Resource Include="Resources\Icons\Undo.png" />
+    <Resource Include="Resources\Icons\WordWrap.png" />
   </ItemGroup>
 
   <ItemGroup>

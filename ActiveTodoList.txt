@@ -2,230 +2,95 @@
 [![name](https://user-images.githubusercontent.com/54080240/126827425-c6c49064-0cb7-459d-b6c2-47544f4013cd.png)](https://www.patreon.com/TheAssetEditor)
 
 
-	Selection manager can not select over gizmo when multiselecting
-	Gizmo behaves strangly when camera look d
-	irectly forward towards model
-	Selecting not use texture, then deslecting and selecing again gives wrong checkbox value	
-
-
-
-	
-
-
-Quality of life:
-	Skeleton information view 
-	about box - Dont break eula
-	Save taxturepaths with slash other way
-	Null terminated string somewhere?
-	
-Animation tool:
-	Select and move bones
-	Create new bones?
-	Create skeleton
-		Cicular rotation
-		Translation
-		Rotate 
-	Attachment weapons while playing
-	Metadata?
-		Animated props
-		Transform
-		Splice 
-	Set mesh
-	
-	Goals:
-		Create pose
-			-> new pose
-			-> modify pose using transforms
-			-> Blend to pose?
-		Create mount animations 
-			-> follow a node 
-		Extract part of skeleton
-		Speed up/slow down animation 
-		Convert animation between skeletons 
-		Easy to work on large datasets
-		Create weapon anims 
-
-
-
-
-
-
-
-v10
-	Vertex type:
-		[Done]Can not change vertex type to cinematic
-
-	Pivot point:
-		[Done]AShow pivotpoint crash
-		[Done]A"Copy pivot to all" feature
-		Round values for pivot points
-
-	Mesh Fit tool:
-		[Done]AExtract to own tool
-		[Done]ARealtime
-		[Done]AView the skeletons
-		[Done]AToogle meshes
-		[Done]AScale
-
-
-
-v11
-	Make remapping realtime 
-
-	Mount tool:
-		Add static leg pos
-
-	Tech skeleton Editor:
-		Create
-		Add bone support to the gizmo
-
-	Split mesh/grow selection
-		Speed up
-
-	Refactor:
-		Start cleaning up the direct use of rmv2 data
-
-v12
-	Campagne anim editor
-		Create
-
-	Pose Creator
-		Create
-
-
-
-
-Bugs:
-	Validation of VMD files
-	Generating lods for models with more than 4 lods
-
-
-
-
-
-
-	
-
-
-
-Animations:
-	-->Load all 3k anims
-	-->Ensure faulty animations not break the program for ever
-	-->Update animation slots
-	-->Animation player issues
-	Create duplicate of animation bin
-	Save bin/frg
-
-	
-
-Kitbashing:
-	Selection:
-		[DONE]Selection speedup
-		[DONE]Dont auto merge "submeshes" when alt is pressed
-		Select based on texture?
-	Edit with fallof when moving vertexes?
-	[Can not reproduce]Ogre bug when merging -> https://discord.com/channels/373745291289034763/795235087352201226/865233241328975912 => I noticed this too, if the paths have different capitalisation or the / 's are the opposite way on two ogre parts using the same texture they will not combine.
-	Default to vmd when browsing  in kitbasher -> Type filter
-	Improve remapping to handle n meshes and be realtime
-	Mesh fitter - Karl franze on humanoid01c
-	[Done]Improve remapping to from same skeleton message
-	Group devided meshes when large
-	[Done]Drag and drop
-	Cancel save as error -> Save with name bug to root folder
-	
-	-->ReTarget mesh to closest vertex 
-	-->CampagneAnimation creator
-
-General:
-	No packfile selected error - improve
-	Enter trigger search in browse dialog
-	!Multiple schemas for animation slots
-	[Done]Load other games
-		[Done]Add 3 kingdoms
-		[Done]Add troy 
-		[Done]Add rome remastered
-	Save packfile memory error?
-	[Done]Help link
-	
 
 Rendering:
-	[Done]Mipmaps
-	[Done]Load all texture formats
-	[Done]try out new image from phazer
-	Tint for selected faces
-	[Done]Control light direction and intensity
-	[Done]Load three kingodm shit
-	--> Change background colour 
+	Improve
+	Debug (normals, weights)
+	Settings
+	Flip right left 
+	Change background colour 
+	Performance 
+
+General:
+	Validator (matrial, vmd, vsmodel)
+	Validators animation
+	Better vmd loader
+	Make rome work better
+	Enter trigger search in browse dialog
+	Create duplicate of animation bin
+	Skeleton offsets move through gizmo
+	Reset camera/focus selection in all editors 
+	Render settigns in all editors 
+	
+Kitbash:
+	Auto rig (pin per vertex)
+	Rerig on remap
+	Tree view auto select
+	Redo command
+	Lod for larges 5 models 
+	Default to vmd when browsing  in kitbasher -> Type filter
+	Improve remapping to handle n meshes and be realtime
+	Skeleton information view 
+	Attach weapons 
+	Split face tool
+	Mesh verifications (Show normals, ensure weights)
+	Flip faces tool/Invert normals
+		Better tint fom selected faces 
+	
+Misc:
+	Compagin anims missing from anim search
+	Memory leaks
+	Imprive saving so it does not crahs
+	Improve saving - invalid folders 
+	about box - Dont break eula
+
+Animation transfer tool:
+	Clear on bone
+	Default to generate anim set 
+	Set animation length
+	Allow for merging of animation
+	Scale bone length - usefull for root anims 
+	
+Super view:
+	View on mount 
+	View matched 
+	View riders using attachment system
+	Props
+	Meta:
+		Animated props
+		Effects
+		Props
+		Transforms
+		Splice
+		Impact pos
+		Fire pos 
+			
+UV editor 
+	Select based on UV island 
+	
+Animation bin/frg editor		
+Campagin bin editor
+AnimBin editor (3k, troy)
+Attachment point editor
+Pose creator tool
+Animated prop tool, not needed?
+Skeleton splicer tool?
+Texture optimizer tool - Island combiner 
 
 
-Animation retargeting:
-	Use pose
-	https://www.youtube.com/watch?v=xy9aLbZLdeA
-	https://www.youtube.com/watch?v=GIY46ckPgco
-	https://github.com/get-rad/unrealLLsample_31
-	https://forums.ogre3d.org/viewtopic.php?t=81043
-	https://gamedev.stackexchange.com/questions/27058/how-to-programatically-retarget-animations-from-one-skeleton-to-another
-	https://dl.acm.org/doi/pdf/10.5555/1555880.1555907
-	
-	
-	
+Campagin map shit?
+Sound
 
-* Load more texture formats (including bc5 and bc7)
-* Use mipmaps when rendering
-* Better lighting-ish (thanks to phazer)
-* Light controls. PageUp/Down to rotete. Shift + PageUp/Down to controll brightness
-* Correctly load and display ThreeKingdom models
-  
-* Mesh selection and editing actions have greatly improved performance.
-* Growing selection/splitting into submesh when ALT key is pressed does not auto merge overlapping vertexes (for removing Ogre hats...)
-* Drag and drop rmv2, vmd and wsmodels from treeview onto kitbasher to load
-* Focus(ctrl + f) now also zooms to fit the model. 
-* Pin mesh to mesh tool. For attaching items that are controlled by multiple bones, such as belt buckles, spikes and what ever.
-  
-* Added help link in UI which takes you to the Wiki
-* Added possoblity to easily load ThreeKingdoms, Troy and Rome Remastered files (lots of nice animations...)
-  
-* Campage animation creator added
-  
-* Fixed crashes in MountEditor
-	
 
-	
+---------
 
-Lots of rome stuff	
-Savign static meshes
-Convert selection to verts
-Fix the size for tool bar
-ogre anims -> Anims in general
-Lod for larges 5 models 
-	
+v14
+	Generic text -> binary editor 
 
-New features:
-	Vertex movement now has weighted selection
-	
-Fixed bugs:
-	Unable select vertexes in KitBash tool
-	Unable to select vertex for mount in MountEditor
-	Save static Mesh
-	
-	
-	Unable to load : variantmeshes\_variantmodels\mount\horse\horse_body.rigid_model_v2
-	
-	
-	
-	
-	
-	
-	window manager to open stuff in the same place as alst time
-	
-	
-Fixed crash in remapper tool
-Moved remapper to work for multiple meshes
-fixed error in handling weighted meshes in mesh fitter 
-Even more animation fixes
+	AnimBin
+	TreeView multi select
+	Compagin anims missing from anim search
+	Flip left/Right view in rendering
+	AnimTransfer - clear single button
 
--> Anim converter tool
 
-so far decoding is: probably version (2 or 3), str table ofs, 1, 0, 1, item count, items, string count, str1, str2, ..., strN
-if item count == 0, then that's full decoding
-tem data is presumably a bunch of arrays of things, it starts with   countA, inta1, inta2,..., intaN, countB, intb1, intb2, ..., intbN, etc.

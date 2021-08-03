@@ -16,12 +16,11 @@ namespace KitbasherEditor
             serviceCollection.AddTransient<KitbasherView>();
             serviceCollection.AddTransient<KitbasherViewModel>();
             serviceCollection.AddTransient<IKitBashEditor, KitbasherViewModel>();
-
         }
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<KitbasherViewModel, KitbasherView>(".rigid_model_v2");
+            factory.RegisterTool<KitbasherViewModel, KitbasherView>(new ExtentionToTool(".rigid_model_v2"));
         }
     }
 

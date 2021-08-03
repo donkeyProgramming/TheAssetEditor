@@ -117,7 +117,7 @@ namespace CommonControls.PackFileBrowser
         {
             // using command parmeter to get node causes memory leaks, using selected node for now
             if (SelectedItem != null && SelectedItem.NodeType == NodeType.File)
-                FileOpen?.Invoke(SelectedItem.Item); 
+                FileOpen?.Invoke(SelectedItem.Item as PackFile); 
         }
 
         private void ContainerUpdated(PackFileContainer pf)

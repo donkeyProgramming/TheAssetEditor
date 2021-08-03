@@ -34,7 +34,6 @@
     <ProjectReference Include="..\FileTypes\FileTypes.csproj" />
     <ProjectReference Include="..\KitbasherEditor\KitbasherEditor.csproj" />
     <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
-    <ProjectReference Include="..\TextEditor\TextEditor.csproj" />
     <ProjectReference Include="..\View3D\View3D.csproj" />
   </ItemGroup>
 

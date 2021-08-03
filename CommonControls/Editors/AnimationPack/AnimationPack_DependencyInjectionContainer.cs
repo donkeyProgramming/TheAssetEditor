@@ -17,7 +17,7 @@ namespace CommonControls.Editors.AnimationPack
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<AnimPackViewModel, AnimationPackView>(".animpack");
+            factory.RegisterTool<AnimPackViewModel, AnimationPackView>(new ExtentionToTool(".animpack"));
         }
     }
 

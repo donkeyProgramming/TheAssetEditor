@@ -85,6 +85,9 @@ namespace FileTypes.DB
             ValueType = valueType;
         }
 
+        public SimpleSchemaField()
+        { }
+
         public string Name { get; set; }
         public string Value { get; set; }
         public DbTypesEnum ValueType { get; set; }

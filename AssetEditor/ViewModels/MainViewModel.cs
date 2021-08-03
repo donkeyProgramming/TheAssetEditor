@@ -62,7 +62,7 @@ namespace AssetEditor.ViewModels
 
             ToolsFactory = toolFactory;
 
-            // DebugCampaignBins(settingsService);
+           
 
             if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
             {
@@ -79,12 +79,6 @@ namespace AssetEditor.ViewModels
                 var gamePath = settingsService.GetGamePathForCurrentGame();
                 if (gamePath != null)
                 {
-
-                    //var gName = GameInformationFactory.GetGameById(GameTypeEnum.ThreeKingdoms).DisplayName;
-                    //var gPath = settingsService.GetGamePathForGame(GameTypeEnum.ThreeKingdoms);
-                    //var gRes = _packfileService.LoadAllCaFiles(gPath, gName);
-
-
                     var gameName = GameInformationFactory.GetGameById(settingsService.CurrentSettings.CurrentGame).DisplayName;
                     var loadRes = _packfileService.LoadAllCaFiles(gamePath, gameName);
                     if (!loadRes)
@@ -97,11 +91,15 @@ namespace AssetEditor.ViewModels
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 // MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
                 //KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
-                AnimationTransferTool_Debug.CreateDamselEditor(this, toolFactory, packfileService);
+                //AnimationTransferTool_Debug.CreateDamselEditor(this, toolFactory, packfileService);
+
+                var f = packfileService.FindFile(@"animations\campaign\database\bin\cam_hero_hu1d_def_spear_and_shield.bin");
+                OpenFile(f);
 
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);
+                //DebugCampaignBins(settingsService);
                 CreateTestPackFiles(packfileService);
             }
         }
@@ -161,12 +159,7 @@ namespace AssetEditor.ViewModels
 
         void CreateTestPackFiles(PackFileService packfileService)
         {
-            var caPack = packfileService.Database.PackFiles[0];
             var newPackFile = packfileService.CreateNewPackFileContainer("CustomPackFile", PackFileCAType.MOD);
-            //packfileService.CopyFileFromOtherPackFile(caPack, @"variantmeshes\wh_variantmodels\hu3\dwf\dwf_slayers\head\dwf_slayers_head_01.rigid_model_v2", newPackFile);
-
-            //var loadedPackFile = packfileService.Load(@"C:\Users\ole_k\Desktop\TestPackfile\SlayerMod.pack");
-
             packfileService.SetEditablePack(newPackFile);
         }
 
@@ -186,7 +179,8 @@ namespace AssetEditor.ViewModels
                 return;
             }
 
-            var editorViewModel = ToolsFactory.GetToolViewModelFromFileName(file.Name);
+            var fullFileName = _packfileService.GetFullPath(file as PackFile);
+            var editorViewModel = ToolsFactory.GetToolViewModelFromFileName(fullFileName);
             if (editorViewModel == null)
             {
                 _logger.Here().Warning($"Trying to open file {file.Name}, but there are no valid tools for it.");
