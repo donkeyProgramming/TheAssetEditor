@@ -19,6 +19,11 @@ namespace FileTypes.AnimationPack
         public int Version { get; set; }
         public List<StatusItem> Status { get; set; } = new List<StatusItem>();
 
+        public interface ICampaignAnimationBinEntry
+        {
+            byte[] ToBytes(ref List<string> stringTable);
+        }
+
         public class StatusItem
         {
             public string Name { get; set; }
@@ -38,7 +43,7 @@ namespace FileTypes.AnimationPack
             public List<LocomotionEntry> Locomotion { get; set; }
         }
 
-        public class AnimationEntry
+        public class AnimationEntry : ICampaignAnimationBinEntry
         {
             public string Animation { get; set; }
             public string AnimationMeta { get; set; }
@@ -58,9 +63,21 @@ namespace FileTypes.AnimationPack
                 output.Weight = byteChunk.ReadSingle();
                 return output;
             }
+
+            public byte[] ToBytes(ref List<string> stringTable)
+            {
+                ChuckWriter chuck = new ChuckWriter();
+                chuck.WriteStringTableIndex(Animation, ref stringTable);
+                chuck.WriteStringTableIndex(AnimationMeta, ref stringTable);
+                chuck.WriteStringTableIndex(SoundMeta, ref stringTable);
+                chuck.WriteStringTableIndex(Type, ref stringTable);
+                chuck.Write(BlendTime, ByteParsers.Single);
+                chuck.Write(Weight, ByteParsers.Single);
+                return chuck.GetBytes();
+            }
         }
 
-        public class PersistentMeta
+        public class PersistentMeta 
         {
             public string Animation { get; set; }
             public string AnimationMeta { get; set; }
@@ -128,7 +145,7 @@ namespace FileTypes.AnimationPack
             }
         }
 
-        public  class PortholeEntry
+        public  class PortholeEntry : ICampaignAnimationBinEntry
         {
             public string Value0 { get; set; }
             public string Value1 { get; set; }
@@ -146,9 +163,20 @@ namespace FileTypes.AnimationPack
                 output.Value4 = byteChunk.ReadSingle();
                 return output;
             }
+
+            public byte[] ToBytes(ref List<string> stringTable)
+            {
+                ChuckWriter chuck = new ChuckWriter();
+                chuck.WriteStringTableIndex(Value0, ref stringTable);
+                chuck.WriteStringTableIndex(Value1, ref stringTable);
+                chuck.WriteStringTableIndex(Value2, ref stringTable);
+                chuck.WriteStringTableIndex(Value3, ref stringTable);
+                chuck.Write(Value4, ByteParsers.Single);
+                return chuck.GetBytes();
+            }
         }
 
-        public class ActionEntry
+        public class ActionEntry : ICampaignAnimationBinEntry
         {
             public string Animation { get; set; }
             public string AnimationMeta { get; set; }
@@ -174,9 +202,23 @@ namespace FileTypes.AnimationPack
                 output.Unknown = byteChunk.ReadBool();
                 return output;
             }
+
+            public byte[] ToBytes(ref List<string> stringTable)
+            {
+                ChuckWriter chuck = new ChuckWriter();
+                chuck.WriteStringTableIndex(Animation, ref stringTable);
+                chuck.WriteStringTableIndex(AnimationMeta, ref stringTable);
+                chuck.WriteStringTableIndex(SoundMeta, ref stringTable);
+                chuck.WriteStringTableIndex(Type, ref stringTable);
+                chuck.Write(BlendTime, ByteParsers.Single);
+                chuck.WriteStringTableIndex(ActionType, ref stringTable);
+                chuck.Write(ActionId, ByteParsers.Int32);
+                chuck.Write(Unknown, ByteParsers.Bool);
+                return chuck.GetBytes();
+            }
         }
 
-        public class LocomotionEntry
+        public class LocomotionEntry : ICampaignAnimationBinEntry
         {
             public string Animation { get; set; }
             public string AnimationMeta { get; set; }
@@ -200,17 +242,23 @@ namespace FileTypes.AnimationPack
                 output.DistanceMinTravled = byteChunk.ReadSingle();
                 return output;
             }
-        }
 
-        public class MissingType
-        {
-            public static MissingType FromChunck(ByteChunk byteChunk, string[] stringTable)
+            public byte[] ToBytes(ref List<string> stringTable)
             {
-                throw new Exception("Unkown datatype");
+                ChuckWriter chuck = new ChuckWriter();
+                chuck.WriteStringTableIndex(Animation, ref stringTable);
+                chuck.WriteStringTableIndex(AnimationMeta, ref stringTable);
+                chuck.WriteStringTableIndex(SoundMeta, ref stringTable);
+                chuck.WriteStringTableIndex(Type, ref stringTable);
+                chuck.Write(Weight, ByteParsers.Single);
+                chuck.Write(ModelScale, ByteParsers.Single);
+                chuck.Write(DistanceTraveled, ByteParsers.Single);
+                chuck.Write(DistanceMinTravled, ByteParsers.Single);
+                return chuck.GetBytes();
             }
         }
 
-        public class UnknownEntry
+        public class UnknownEntry : ICampaignAnimationBinEntry
         {
             public string Animation { get; set; }
             public string AnimationMeta { get; set; }
@@ -232,6 +280,32 @@ namespace FileTypes.AnimationPack
                 output.Value = byteChunk.ReadInt32();
                 return output;
             }
+
+            public byte[] ToBytes(ref List<string> stringTable)
+            {
+                ChuckWriter chuck = new ChuckWriter();
+                chuck.WriteStringTableIndex(Animation, ref stringTable);
+                chuck.WriteStringTableIndex(AnimationMeta, ref stringTable);
+                chuck.WriteStringTableIndex(SoundMeta, ref stringTable);
+                chuck.WriteStringTableIndex(Type, ref stringTable);
+                chuck.Write(BlendTime, ByteParsers.Single);
+                chuck.Write(Weight, ByteParsers.Single);
+                chuck.Write(Value, ByteParsers.Single);
+                return chuck.GetBytes();
+            }
+        }
+
+        public class MissingType : ICampaignAnimationBinEntry
+        {
+            public static MissingType FromChunck(ByteChunk byteChunk, string[] stringTable)
+            {
+                throw new Exception("Unkown datatype");
+            }
+
+            public byte[] ToBytes(ref List<string> stringTable)
+            {
+                throw new Exception("Unkown datatype");
+            }
         }
     }
 
@@ -241,7 +315,7 @@ namespace FileTypes.AnimationPack
     {
         delegate T CreateEntryDelegate<T>(ByteChunk chung, string[] table);
 
-        public static CampaignAnimationBin LoadStuff(ByteChunk data)
+        public static CampaignAnimationBin Load(ByteChunk data)
         {
             var outputFile = new CampaignAnimationBin();
             outputFile.Version = data.ReadInt32();
@@ -254,11 +328,11 @@ namespace FileTypes.AnimationPack
 
             var stringTable = ReadStrTable(strTableChunk);
 
-            var offset0 = data.ReadInt32(); // 1
-            var offset1 = data.ReadInt32(); // 0
-            var offset2 = data.ReadInt32(); // 1
+            var skeletonStrIndex = data.ReadInt32();    // 1
+            var selfRefStringIndex = data.ReadInt32();  // 0
+            var offset2 = data.ReadInt32();             // 1
 
-            if (offset0 != 1 || offset1 != 0 || offset2 != 1)
+            if (skeletonStrIndex != 1 || selfRefStringIndex != 0 || offset2 != 1)
                 throw new Exception("Invalid static values");
 
             outputFile.Reference = stringTable[0];
@@ -275,7 +349,45 @@ namespace FileTypes.AnimationPack
                 throw new Exception("Data left");
 
 
+
+            var saveTheBadBOyBytes = Write(outputFile, "cam_hero_hu1d_def_spear_and_shield");
+
+            //var t = Load(new ByteChunk(saveTheBadBOyBytes));
+
+
+
             return outputFile;
+        }
+
+        public static byte[] Write(CampaignAnimationBin bin, string fileName)
+        {
+            var dataWriter = new ChuckWriter();
+            var stringTable = new List<string>();
+
+            dataWriter.Write(1, ByteParsers.Int32);
+            dataWriter.Write(0, ByteParsers.Int32);
+            dataWriter.Write(1, ByteParsers.Int32);
+
+            stringTable.Add(fileName);
+            stringTable.Add(bin.SkeletonName);
+
+            // Statuses
+            dataWriter.Write(bin.Status.Count, ByteParsers.Int32);
+            foreach (var status in bin.Status)
+                WriteStatus(status, dataWriter, ref stringTable);
+
+            var dataBytes = dataWriter.GetBytes();
+            var finalWriter = new ChuckWriter();
+            finalWriter.Write(bin.Version, ByteParsers.Int32);
+            finalWriter.Write(dataBytes.Length+8, ByteParsers.Int32);
+            finalWriter.AddBytes(dataBytes);
+
+
+            finalWriter.Write(stringTable.Count, ByteParsers.Int32);
+            foreach (var str in stringTable)
+                finalWriter.Write(str, ByteParsers.String);
+
+            return finalWriter.GetBytes();
         }
 
         static CampaignAnimationBin.StatusItem LoadStatus(ByteChunk data, string[] strTable)
@@ -323,7 +435,6 @@ namespace FileTypes.AnimationPack
             return currentStatus;
         }
 
-
         static List<T> LoadSlots<T>(ByteChunk data, string[] stringTable, CreateEntryDelegate<T> createEntryDelegate, string peakExitCondition = null, int numItems = -1)
         {
             if(numItems == -1)
@@ -352,6 +463,43 @@ namespace FileTypes.AnimationPack
             return output;
         }
 
+
+        static void WriteStatus(CampaignAnimationBin.StatusItem statusItem, ChuckWriter writer, ref List<string> stringTable)
+        {
+            if (statusItem.Name == "global" && (statusItem.PersitantMetaData != null || statusItem.Docks != null || statusItem.Poses != null))
+            {
+                throw new Exception("Unable to save items with global entry");
+            }
+
+            writer.WriteStringTableIndex(statusItem.Name, ref stringTable);
+
+            WriteSlot(statusItem.Idle, writer, ref stringTable);
+            WriteSlot(statusItem.Porthole, writer, ref stringTable);
+            WriteSlot(statusItem.Selection, writer, ref stringTable);
+            WriteSlot(statusItem.Unk0, writer, ref stringTable);
+            WriteSlot(statusItem.Action, writer, ref stringTable);
+            WriteSlot(statusItem.Unk1, writer, ref stringTable);
+            WriteSlot(statusItem.Unkown, writer, ref stringTable);
+            WriteSlot(statusItem.Unk3, writer, ref stringTable);
+            WriteSlot(statusItem.Locomotion, writer, ref stringTable);
+        }
+
+        static void WriteSlot<T>(IEnumerable<T> entries, ChuckWriter writer, ref List<string> stringTable) where T : CampaignAnimationBin.ICampaignAnimationBinEntry
+        {
+            if (entries == null)
+            {
+                writer.Write(0, ByteParsers.Int32);
+                return;
+            }
+
+            writer.Write(entries.Count(), ByteParsers.Int32);
+            foreach (var entry in entries)
+            {
+                var bytes = entry.ToBytes(ref stringTable);
+                writer.AddBytes(bytes);
+            }
+        }
+
         static string[] ReadStrTable(ByteChunk data)
         {
             var stringTable = new List<string>();
@@ -374,7 +522,7 @@ namespace FileTypes.AnimationPack
                 try
                 {
                     var chunkf = f.DataSource.ReadDataAsChunk();
-                    var bin = CampaignAnimationBinLoader.LoadStuff(chunkf);
+                    var bin = CampaignAnimationBinLoader.Load(chunkf);
                     output.Add(bin);
                 }
                 catch (Exception e)

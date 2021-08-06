@@ -21,6 +21,7 @@ General:
 	Skeleton offsets move through gizmo
 	Reset camera/focus selection in all editors 
 	Render settigns in all editors 
+	Loading pack file with error - show message 
 	
 Kitbash:
 	Auto rig (pin per vertex)
@@ -35,7 +36,9 @@ Kitbash:
 	Split face tool
 	Mesh verifications (Show normals, ensure weights)
 	Flip faces tool/Invert normals
-		Better tint fom selected faces 
+	 Better tint fom selected faces 
+	 emp_demigryph_knight_helmet_01 has this, just keep dividing his collar and it does this constantly (removes face)
+	 animated pose to statick is not working
 	
 Misc:
 	Compagin anims missing from anim search
@@ -50,6 +53,8 @@ Animation transfer tool:
 	Set animation length
 	Allow for merging of animation
 	Scale bone length - usefull for root anims 
+	Copy setting to children (force snap, freeze)
+	Clear all settings
 	
 Super view:
 	View on mount 
@@ -92,5 +97,14 @@ v14
 	Compagin anims missing from anim search
 	Flip left/Right view in rendering
 	AnimTransfer - clear single button
+		Apply mapping to all children
+	Added materials and shit as upported formats 
+	Scale on mount tool broken?
+
+	Animation transfer tool: - Scale bone length - usefull for root anims 
+	Animation transfer tool: - Copy setting to children (force snap, freeze)
 
 
+Scale places - Mount tool 
+
+Does not load => variantmeshes\variantmeshdefinitions\troy_heavy_swordsmen.variantmeshdefinition

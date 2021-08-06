@@ -165,7 +165,7 @@ namespace AnimationEditor.AnimationTransferTool
         {
             if (Generated.AnimationClip == null || Generated.Skeleton == null || _copyFrom.Skeleton == null)
             {
-                MessageBox.Show("No animation generated", "Error", MessageBoxButton.OK);
+                MessageBox.Show("Can not save, as no animation has been generated. Press the Apply button first", "Error", MessageBoxButton.OK);
                 return;
             }
 

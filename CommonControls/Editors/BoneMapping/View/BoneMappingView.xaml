@@ -243,7 +243,7 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock>Clear mapping for "</TextBlock>
                         <TextBlock Text="{Binding MeshBones.SelectedItem.Name.Value, UpdateSourceTrigger=PropertyChanged}"/>
-                        <TextBlock>"</TextBlock>
+                        <TextBlock>" and children</TextBlock>
                     </StackPanel>
                 </Button>
 
