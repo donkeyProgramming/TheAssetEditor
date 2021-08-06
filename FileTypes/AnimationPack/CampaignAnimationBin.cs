@@ -28,10 +28,9 @@ namespace FileTypes.AnimationPack
         {
             public string Name { get; set; }
 
-            public PersistentMeta PersitantMetaData { get; set; }
+            public List<PersistentMeta> PersitantMetaData { get; set; }
             public List<PersistentMeta_Pose> Poses { get; set; }
             public List<PersistentMeta_Dock> Docks { get; set; }
-
             public List<AnimationEntry> Idle { get; set; }
             public List<PortholeEntry> Porthole { get; set; }
             public List<AnimationEntry> Selection { get; set; }
@@ -55,10 +54,10 @@ namespace FileTypes.AnimationPack
             public static AnimationEntry FromChunck(ByteChunk byteChunk, string[] stringTable)
             {
                 var output = new AnimationEntry();
-                output.Animation = stringTable[byteChunk.ReadInt32()];
-                output.AnimationMeta = stringTable[byteChunk.ReadInt32()];
-                output.SoundMeta = stringTable[byteChunk.ReadInt32()];
-                output.Type = stringTable[byteChunk.ReadInt32()];
+                output.Animation = byteChunk.ReadStringTableIndex(stringTable);
+                output.AnimationMeta = byteChunk.ReadStringTableIndex(stringTable);
+                output.SoundMeta = byteChunk.ReadStringTableIndex(stringTable);
+                output.Type = byteChunk.ReadStringTableIndex(stringTable);
                 output.BlendTime = byteChunk.ReadSingle();
                 output.Weight = byteChunk.ReadSingle();
                 return output;
@@ -89,12 +88,12 @@ namespace FileTypes.AnimationPack
             public static TransitionEntry FromChunck(ByteChunk byteChunk, string[] stringTable)
             {
                 var output = new TransitionEntry();
-                output.Animation = stringTable[byteChunk.ReadInt32()];
-                output.AnimationMeta = stringTable[byteChunk.ReadInt32()];
-                output.SoundMeta = stringTable[byteChunk.ReadInt32()];
-                output.Type = stringTable[byteChunk.ReadInt32()];
+                output.Animation = byteChunk.ReadStringTableIndex(stringTable);
+                output.AnimationMeta = byteChunk.ReadStringTableIndex(stringTable);
+                output.SoundMeta = byteChunk.ReadStringTableIndex(stringTable);
+                output.Type = byteChunk.ReadStringTableIndex(stringTable);
                 output.BlendTime = byteChunk.ReadSingle();
-                output.TransitionTo = stringTable[byteChunk.ReadInt32()];
+                output.TransitionTo = byteChunk.ReadStringTableIndex(stringTable);
                 return output;
             }
 
@@ -118,19 +117,15 @@ namespace FileTypes.AnimationPack
             public string SoundMeta { get; set; }
             public string Type { get; set; }
             public float BlendTime { get; set; }
-            //public int NumPoses { get; set; }
-            //public int NumDocks { get; set; }
 
             public static PersistentMeta FromChunck(ByteChunk byteChunk, string[] stringTable)
             {
                 var output = new PersistentMeta();
-                output.Animation = stringTable[byteChunk.ReadInt32()];
-                output.AnimationMeta = stringTable[byteChunk.ReadInt32()];
-                output.SoundMeta = stringTable[byteChunk.ReadInt32()];
-                output.Type = stringTable[byteChunk.ReadInt32()];
+                output.Animation = byteChunk.ReadStringTableIndex(stringTable);
+                output.AnimationMeta = byteChunk.ReadStringTableIndex(stringTable);
+                output.SoundMeta = byteChunk.ReadStringTableIndex(stringTable);
+                output.Type = byteChunk.ReadStringTableIndex(stringTable);
                 output.BlendTime = byteChunk.ReadSingle();
-                //output.NumPoses = byteChunk.ReadInt32();
-                //output.NumDocks = byteChunk.ReadInt32();
                 return output;
             }
         }
@@ -147,9 +142,9 @@ namespace FileTypes.AnimationPack
             public static PersistentMeta_Pose FromChunck(ByteChunk byteChunk, string[] stringTable)
             {
                 var output = new PersistentMeta_Pose();
-                output.Animation = stringTable[byteChunk.ReadInt32()];
-                output.AnimationMeta = stringTable[byteChunk.ReadInt32()];
-                output.SoundMeta = stringTable[byteChunk.ReadInt32()];
+                output.Animation = byteChunk.ReadStringTableIndex(stringTable);
+                output.AnimationMeta = byteChunk.ReadStringTableIndex(stringTable);
+                output.SoundMeta = byteChunk.ReadStringTableIndex(stringTable);
                 output.Weight = byteChunk.ReadSingle();
                 output.BlendTime = byteChunk.ReadSingle();
                 output.PoseId = byteChunk.ReadInt32();
@@ -169,12 +164,12 @@ namespace FileTypes.AnimationPack
             public static PersistentMeta_Dock FromChunck(ByteChunk byteChunk, string[] stringTable)
             {
                 var output = new PersistentMeta_Dock();
-                output.Animation = stringTable[byteChunk.ReadInt32()];
-                output.AnimationMeta = stringTable[byteChunk.ReadInt32()];
-                output.SoundMeta = stringTable[byteChunk.ReadInt32()];
+                output.Animation = byteChunk.ReadStringTableIndex(stringTable);
+                output.AnimationMeta = byteChunk.ReadStringTableIndex(stringTable);
+                output.SoundMeta = byteChunk.ReadStringTableIndex(stringTable);
                 output.Weight = byteChunk.ReadSingle();
                 output.BlendTime = byteChunk.ReadSingle();
-                output.Dock = stringTable[byteChunk.ReadInt32()];
+                output.Dock = byteChunk.ReadStringTableIndex(stringTable);
                 return output;
             }
         }
@@ -227,14 +222,14 @@ namespace FileTypes.AnimationPack
             public static ActionEntry FromChunck(ByteChunk byteChunk, string[] stringTable)
             {
                 var output = new ActionEntry();
-                output.Animation = stringTable[byteChunk.ReadInt32()];
-                output.AnimationMeta = stringTable[byteChunk.ReadInt32()];
-                output.SoundMeta = stringTable[byteChunk.ReadInt32()];
+                output.Animation = byteChunk.ReadStringTableIndex(stringTable);
+                output.AnimationMeta = byteChunk.ReadStringTableIndex(stringTable);
+                output.SoundMeta = byteChunk.ReadStringTableIndex(stringTable);
 
-                output.Type = stringTable[byteChunk.ReadInt32()];
+                output.Type = byteChunk.ReadStringTableIndex(stringTable);
                 output.BlendTime = byteChunk.ReadSingle();
 
-                output.ActionType = stringTable[byteChunk.ReadInt32()];
+                output.ActionType = byteChunk.ReadStringTableIndex(stringTable);
                 output.ActionId = byteChunk.ReadInt32();
                 output.Unknown = byteChunk.ReadBool();
                 return output;
@@ -269,10 +264,10 @@ namespace FileTypes.AnimationPack
             public static LocomotionEntry FromChunck(ByteChunk byteChunk, string[] stringTable)
             {
                 var output = new LocomotionEntry();
-                output.Animation = stringTable[byteChunk.ReadInt32()];
-                output.AnimationMeta = stringTable[byteChunk.ReadInt32()];
-                output.SoundMeta = stringTable[byteChunk.ReadInt32()];
-                output.Type = stringTable[byteChunk.ReadInt32()];
+                output.Animation = byteChunk.ReadStringTableIndex(stringTable);
+                output.AnimationMeta = byteChunk.ReadStringTableIndex(stringTable);
+                output.SoundMeta = byteChunk.ReadStringTableIndex(stringTable);
+                output.Type = byteChunk.ReadStringTableIndex(stringTable);
                 output.Weight = byteChunk.ReadSingle();
                 output.ModelScale = byteChunk.ReadSingle();
                 output.DistanceTraveled = byteChunk.ReadSingle();
@@ -308,10 +303,10 @@ namespace FileTypes.AnimationPack
             public static UnknownEntry FromChunck(ByteChunk byteChunk, string[] stringTable)
             {
                 var output = new UnknownEntry();
-                output.Animation = stringTable[byteChunk.ReadInt32()];
-                output.AnimationMeta = stringTable[byteChunk.ReadInt32()];
-                output.SoundMeta = stringTable[byteChunk.ReadInt32()];
-                output.Type = stringTable[byteChunk.ReadInt32()];
+                output.Animation = byteChunk.ReadStringTableIndex(stringTable);
+                output.AnimationMeta = byteChunk.ReadStringTableIndex(stringTable);
+                output.SoundMeta = byteChunk.ReadStringTableIndex(stringTable);
+                output.Type = byteChunk.ReadStringTableIndex(stringTable);
                 output.BlendTime = byteChunk.ReadSingle();
                 output.Weight = byteChunk.ReadSingle();
                 output.Value = byteChunk.ReadInt32();
@@ -365,12 +360,9 @@ namespace FileTypes.AnimationPack
 
             var stringTable = ReadStrTable(strTableChunk);
 
-            var skeletonStrIndex = data.ReadInt32();    // 1
-            var selfRefStringIndex = data.ReadInt32();  // 0
-            var offset2 = data.ReadInt32();             // 1
-
-            if (skeletonStrIndex != 1 || selfRefStringIndex != 0 || offset2 != 1)
-                throw new Exception("Invalid static values");
+            var skeletonStrIndex = data.ReadInt32();                // 1
+            var selfRefStringIndex = data.ReadInt32();              // 0
+            var someValueAlwaysOne = data.ReadInt32();              // 1
 
             outputFile.Reference = stringTable[0];
             outputFile.SkeletonName = stringTable[1];
@@ -384,14 +376,6 @@ namespace FileTypes.AnimationPack
 
             if (strTableOffset != data.Index)
                 throw new Exception("Data left");
-
-
-
-            //var saveTheBadBOyBytes = Write(outputFile, "cam_hero_hu1d_def_spear_and_shield");
-
-            //var t = Load(new ByteChunk(saveTheBadBOyBytes));
-
-
 
             return outputFile;
         }
@@ -429,103 +413,69 @@ namespace FileTypes.AnimationPack
 
         static CampaignAnimationBin.StatusItem LoadStatus(ByteChunk data, string[] strTable)
         {
-            var statusNameIndex = data.ReadInt32();
-            var statusName = strTable[statusNameIndex];
-
+            var statusName = data.ReadStringTableIndex(strTable);
             var currentStatus = new CampaignAnimationBin.StatusItem() { Name = statusName };
 
             if (statusName == "global") // Special case
             {
-                currentStatus.PersitantMetaData = LoadSlots(data, strTable, CampaignAnimationBin.PersistentMeta.FromChunck)?.FirstOrDefault();
-
-
-                var poseCount = data.ReadInt32();
-                if (poseCount != 0)
-                    poseCount = poseCount;
-
-                //int poseCount, dockCount = 0;
-                //if (currentStatus.PersitantMetaData != null)
-                //{
-                //    poseCount = currentStatus.PersitantMetaData.NumPoses;
-                //    dockCount = currentStatus.PersitantMetaData.NumDocks;
-                //}
-                //else
-                //{
-                //    poseCount = data.ReadInt32();
-                //}
-
-                currentStatus.Poses = LoadSlots(data, strTable, CampaignAnimationBin.PersistentMeta_Pose.FromChunck, null, poseCount);
-
-                //if (currentStatus.PersitantMetaData == null)
-                var dockCount = data.ReadInt32();
-                if (dockCount != 0)
-                    dockCount = dockCount;
-
-                currentStatus.Docks = LoadSlots(data, strTable, CampaignAnimationBin.PersistentMeta_Dock.FromChunck, null, dockCount);
+                currentStatus.PersitantMetaData = LoadSlots(data, strTable, CampaignAnimationBin.PersistentMeta.FromChunck);
+                currentStatus.Poses = LoadSlots(data, strTable, CampaignAnimationBin.PersistentMeta_Pose.FromChunck);
+                currentStatus.Docks = LoadSlots(data, strTable, CampaignAnimationBin.PersistentMeta_Dock.FromChunck);
             }
             else
             {
                 currentStatus.Idle = LoadSlots(data, strTable, CampaignAnimationBin.AnimationEntry.FromChunck);
-                currentStatus.Porthole = LoadSlots(data, strTable, CampaignAnimationBin.PortholeEntry.FromChunck);     // What is this?
+                currentStatus.Porthole = LoadSlots(data, strTable, CampaignAnimationBin.PortholeEntry.FromChunck);  
                 currentStatus.Selection = LoadSlots(data, strTable, CampaignAnimationBin.AnimationEntry.FromChunck);
                 currentStatus.Transitions = LoadSlots(data, strTable, CampaignAnimationBin.TransitionEntry.FromChunck);                        
                 currentStatus.Action = LoadSlots(data, strTable, CampaignAnimationBin.ActionEntry.FromChunck);
-                currentStatus.Unk1 = LoadSlots(data, strTable, CampaignAnimationBin.MissingType.FromChunck); // Always zero
+                currentStatus.Unk1 = LoadSlots(data, strTable, CampaignAnimationBin.MissingType.FromChunck);    // Always zero
                 currentStatus.Unkown = LoadSlots(data, strTable, CampaignAnimationBin.UnknownEntry.FromChunck); // What is this?
-                currentStatus.Unk3 = LoadSlots(data, strTable, CampaignAnimationBin.MissingType.FromChunck);
+                currentStatus.Unk3 = LoadSlots(data, strTable, CampaignAnimationBin.MissingType.FromChunck);    // Always zero
                 currentStatus.Locomotion = LoadSlots(data, strTable, CampaignAnimationBin.LocomotionEntry.FromChunck);
             }
 
             return currentStatus;
         }
 
-        static List<T> LoadSlots<T>(ByteChunk data, string[] stringTable, CreateEntryDelegate<T> createEntryDelegate, string peakExitCondition = null, int numItems = -1)
+        static List<T> LoadSlots<T>(ByteChunk data, string[] stringTable, CreateEntryDelegate<T> createEntryDelegate)
         {
-            if (numItems == -1)
-                numItems = data.ReadInt32();
+            var numItems = data.ReadInt32();
             var output = new List<T>();
             for (int i = 0; i < numItems; i++)
             {
-                // peak
-                if (peakExitCondition != null)
-                {
-                    var peakId = data.PeakUint32();
-                    if (peakId >= 0 && peakId < stringTable.Length)
-                    {
-                        var peakStr = stringTable[peakId];
-                        if (peakStr.Contains(peakExitCondition))
-                            return output;
-                    }
-                }
-
                 var newItem = createEntryDelegate(data, stringTable);
                 output.Add(newItem);
             }
+
             if (output.Count == 0)
                 return null;
 
             return output;
         }
 
-
         static void WriteStatus(CampaignAnimationBin.StatusItem statusItem, ChuckWriter writer, ref List<string> stringTable)
         {
-            if (statusItem.Name == "global" && (statusItem.PersitantMetaData != null || statusItem.Docks != null || statusItem.Poses != null))
-            {
-                throw new Exception("Unable to save items with global entry");
-            }
-
             writer.WriteStringTableIndex(statusItem.Name, ref stringTable);
 
-            WriteSlot(statusItem.Idle, writer, ref stringTable);
-            WriteSlot(statusItem.Porthole, writer, ref stringTable);
-            WriteSlot(statusItem.Selection, writer, ref stringTable);
-            WriteSlot(statusItem.Transitions, writer, ref stringTable);
-            WriteSlot(statusItem.Action, writer, ref stringTable);
-            WriteSlot(statusItem.Unk1, writer, ref stringTable);
-            WriteSlot(statusItem.Unkown, writer, ref stringTable);
-            WriteSlot(statusItem.Unk3, writer, ref stringTable);
-            WriteSlot(statusItem.Locomotion, writer, ref stringTable);
+            if (statusItem.Name == "global")
+            {
+
+                //Figure out what UnknownEntry is 
+                throw new Exception("Unable to save items with global entry");
+            }
+            else
+            {
+                WriteSlot(statusItem.Idle, writer, ref stringTable);
+                WriteSlot(statusItem.Porthole, writer, ref stringTable);
+                WriteSlot(statusItem.Selection, writer, ref stringTable);
+                WriteSlot(statusItem.Transitions, writer, ref stringTable);
+                WriteSlot(statusItem.Action, writer, ref stringTable);
+                WriteSlot(statusItem.Unk1, writer, ref stringTable);
+                WriteSlot(statusItem.Unkown, writer, ref stringTable);
+                WriteSlot(statusItem.Unk3, writer, ref stringTable);
+                WriteSlot(statusItem.Locomotion, writer, ref stringTable);
+            }
         }
 
         static void WriteSlot<T>(IEnumerable<T> entries, ChuckWriter writer, ref List<string> stringTable) where T : CampaignAnimationBin.ICampaignAnimationBinEntry
@@ -565,10 +515,6 @@ namespace FileTypes.AnimationPack
             {
                 try
                 {
-                    if (f.Name.Contains("cam_hu1_empire_staff_and_sword"))
-                    { 
-                    
-                    }
                     var chunkf = f.DataSource.ReadDataAsChunk();
                     var bin = CampaignAnimationBinLoader.Load(chunkf);
                     output.Add(bin);
@@ -590,97 +536,6 @@ namespace FileTypes.AnimationPack
             var eTotal = x0.Count + x1.Count + x2.Count + x3.Count + x4.Count + x5.Count;     // 53 
             return;
         }
-
-        /*public static SimpleSchema CreateSchema()
-        {
-            var output = new SimpleSchema();
-
-           //var persistMeta = SimpleSchemaObject.Create("CampaginBin_PersistentMeta", 3)
-           //                .AddItem("Animation", DbTypesEnum.StringLookup)
-           //                .AddItem("AnimationMeta", DbTypesEnum.StringLookup)
-           //                .AddItem("AnimationSound", DbTypesEnum.StringLookup)
-           //                .AddItem("TypeStr", DbTypesEnum.StringLookup)
-           //                .AddItem("BlendTime", DbTypesEnum.Single)
-           //                .AddItem("NumPoses", DbTypesEnum.Integer)
-           //                 .AddItem("NumDocks", DbTypesEnum.Integer);
-           //
-           //var persistMeta_pose = SimpleSchemaObject.Create("CampaginBin_PersistentMeta_Pose", 3)
-           //              .AddItem("Animation", DbTypesEnum.StringLookup)
-           //              .AddItem("AnimationMeta", DbTypesEnum.StringLookup)
-           //              .AddItem("AnimationSound", DbTypesEnum.StringLookup)
-           //              .AddItem("Weight", DbTypesEnum.Single)
-           //              .AddItem("BlendTime", DbTypesEnum.Single)
-           //              .AddItem("PoseId", DbTypesEnum.Integer);
-           //
-
-            var persistMeta_dock = SimpleSchemaObject.Create("CampaginBin_PersistentMeta_Dock", 3)
-                          .AddItem("Animation", DbTypesEnum.StringLookup)
-                          .AddItem("AnimationMeta", DbTypesEnum.StringLookup)
-                          .AddItem("AnimationSound", DbTypesEnum.StringLookup)
-                          .AddItem("Weight", DbTypesEnum.Single)
-                          .AddItem("BlendTime", DbTypesEnum.Single)
-                          .AddItem("Dock", DbTypesEnum.StringLookup);
-            
-
-            //var animation = SimpleSchemaObject.Create("CampaginBin_Animation", 3)
-            //                .AddItem("Animation", DbTypesEnum.StringLookup)
-            //                .AddItem("AnimationMeta", DbTypesEnum.StringLookup)
-            //                .AddItem("AnimationSound", DbTypesEnum.StringLookup)
-            //                .AddItem("TypeStr", DbTypesEnum.StringLookup)
-            //                .AddItem("Weight", DbTypesEnum.Single)
-            //                .AddItem("BlendTime", DbTypesEnum.Single);
-
-            var locomotion = SimpleSchemaObject.Create("CampaginBin_Locomotion", 3)
-                           .AddItem("Animation", DbTypesEnum.StringLookup)
-                           .AddItem("AnimationMeta", DbTypesEnum.StringLookup)
-                           .AddItem("AnimationSound", DbTypesEnum.StringLookup)
-                           .AddItem("TypeStr", DbTypesEnum.StringLookup)
-                           .AddItem("Weight", DbTypesEnum.Single)
-                           .AddItem("ModelScale", DbTypesEnum.Single)
-                           .AddItem("DistanceTraveled", DbTypesEnum.Single)
-                           .AddItem("DistanceMinTraveled", DbTypesEnum.Single);
-
-            var action = SimpleSchemaObject.Create("CampaginBin_Action", 3)
-                           .AddItem("Animation", DbTypesEnum.StringLookup)
-                           .AddItem("AnimationMeta", DbTypesEnum.StringLookup)
-                           .AddItem("AnimationSound", DbTypesEnum.StringLookup)
-                           .AddItem("TypeStr", DbTypesEnum.StringLookup)
-                           .AddItem("BlendTime", DbTypesEnum.Single)
-                           .AddItem("Action", DbTypesEnum.StringLookup)
-                           .AddItem("ActionId", DbTypesEnum.Integer)
-                           .AddItem("UnkownBool", DbTypesEnum.Boolean);
-
-            var porthole = SimpleSchemaObject.Create("CampaginBin_Porthole", 3)
-                                      .AddItem("Animation", DbTypesEnum.StringLookup)
-                                      .AddItem("Animation", DbTypesEnum.StringLookup)
-                                      .AddItem("Animation", DbTypesEnum.StringLookup)
-                                      .AddItem("Animation", DbTypesEnum.StringLookup)
-                                      .AddItem("Animation", DbTypesEnum.Single);
-
-
-            var unknown = SimpleSchemaObject.Create("CampaginBin_Unknown", 3)
-                            .AddItem("Animation", DbTypesEnum.StringLookup)
-                            .AddItem("AnimationMeta", DbTypesEnum.StringLookup)
-                            .AddItem("AnimationSound", DbTypesEnum.StringLookup)
-                            .AddItem("TypeStr", DbTypesEnum.StringLookup)
-                            .AddItem("Weight", DbTypesEnum.Single)
-                            .AddItem("BlendTime", DbTypesEnum.Integer)
-                            .AddItem("Skeleton", DbTypesEnum.StringLookup);
-
-
-            var unknown2 = SimpleSchemaObject.Create("CampaginBin_Unknown2", 3)
-                            .AddItem("Animation", DbTypesEnum.StringLookup)
-                            .AddItem("AnimationMeta", DbTypesEnum.StringLookup)
-                            .AddItem("AnimationSound", DbTypesEnum.StringLookup)
-                            .AddItem("TypeStr", DbTypesEnum.StringLookup)
-                            .AddItem("Weight", DbTypesEnum.Single)
-                            .AddItem("BlendTime", DbTypesEnum.Integer)
-                            .AddItem("Skeleton", DbTypesEnum.StringLookup);
-
-
-            output.ObjectDefinitions.AddRange(new SimpleSchemaObject[] { persistMeta, animation, locomotion, action, persistMeta_pose, persistMeta_dock, porthole, unknown, unknown2 });
-            return output;
-        }*/
     }
 
 

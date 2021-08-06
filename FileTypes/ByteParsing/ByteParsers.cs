@@ -778,9 +778,12 @@ namespace Filetypes.ByteParsing
         public ushort ReadUShort() => Read(ByteParsers.UShort);
         public bool ReadBool() => Read(ByteParsers.Bool);
         public byte ReadByte() => Read(ByteParsers.Byte);
-        
+        public string ReadStringTableIndex(IEnumerable<string> stringTable) => stringTable.ElementAt(ReadInt32());
+
+
         public uint PeakUint32() => Peak(ByteParsers.UInt32);
         public long PeakInt64() => Peak(ByteParsers.Int64);
+
 
         public UnknownParseResult PeakUnknown()
         {
