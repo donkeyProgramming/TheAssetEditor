@@ -62,7 +62,8 @@ namespace AssetEditor.ViewModels
 
             ToolsFactory = toolFactory;
 
-           
+            //DebugCampaignBins(settingsService);
+
 
             if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
             {
@@ -88,6 +89,7 @@ namespace AssetEditor.ViewModels
           
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
+               
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 // MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
                 //KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
@@ -99,7 +101,7 @@ namespace AssetEditor.ViewModels
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);
-                //DebugCampaignBins(settingsService);
+              
                 CreateTestPackFiles(packfileService);
             }
         }
@@ -126,11 +128,12 @@ namespace AssetEditor.ViewModels
 
         void DebugCampaignBins(ApplicationSettingsService settingsService)
         {
-            var gName = GameInformationFactory.GetGameById(GameTypeEnum.Warhammer2).DisplayName;
-            var gPath = settingsService.GetGamePathForGame(GameTypeEnum.Warhammer2);
+            var game = GameTypeEnum.Warhammer2;
+            var gName = GameInformationFactory.GetGameById(game).DisplayName;
+            var gPath = settingsService.GetGamePathForGame(game);
             var gRes = _packfileService.LoadAllCaFiles(gPath, gName);
 
-            // var allFiles = _packfileService.FindAllFilesInDirectory(@"animations/database/campaign/bin");
+            //var allFiles = _packfileService.FindAllFilesInDirectory(@"animations/database/campaign/bin");
             var allFiles = _packfileService.FindAllFilesInDirectory(@"animations/campaign/database/bin");
 
             AnimationCampaignBinHelper.BatchProcess(allFiles);
