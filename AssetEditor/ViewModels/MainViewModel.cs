@@ -62,7 +62,7 @@ namespace AssetEditor.ViewModels
 
             ToolsFactory = toolFactory;
 
-            //DebugCampaignBins(settingsService);
+            DebugCampaignBins(settingsService);
 
 
             if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)

@@ -110,7 +110,7 @@ namespace FileTypes.AnimationPack
             }
         }
 
-        public class PersistentMeta
+        public class PersistentMeta : ICampaignAnimationBinEntry
         {
             public string Animation { get; set; }
             public string AnimationMeta { get; set; }
@@ -128,9 +128,20 @@ namespace FileTypes.AnimationPack
                 output.BlendTime = byteChunk.ReadSingle();
                 return output;
             }
+
+            public byte[] ToBytes(ref List<string> stringTable)
+            {
+                ChuckWriter chuck = new ChuckWriter();
+                chuck.WriteStringTableIndex(Animation, ref stringTable);
+                chuck.WriteStringTableIndex(AnimationMeta, ref stringTable);
+                chuck.WriteStringTableIndex(SoundMeta, ref stringTable);
+                chuck.WriteStringTableIndex(Type, ref stringTable);
+                chuck.Write(BlendTime, ByteParsers.Single);
+                return chuck.GetBytes();
+            }
         }
 
-        public class PersistentMeta_Pose
+        public class PersistentMeta_Pose : ICampaignAnimationBinEntry
         {
             public string Animation { get; set; }
             public string AnimationMeta { get; set; }
@@ -150,9 +161,22 @@ namespace FileTypes.AnimationPack
                 output.PoseId = byteChunk.ReadInt32();
                 return output;
             }
+
+
+            public byte[] ToBytes(ref List<string> stringTable)
+            {
+                ChuckWriter chuck = new ChuckWriter();
+                chuck.WriteStringTableIndex(Animation, ref stringTable);
+                chuck.WriteStringTableIndex(AnimationMeta, ref stringTable);
+                chuck.WriteStringTableIndex(SoundMeta, ref stringTable);
+                chuck.Write(Weight, ByteParsers.Single);
+                chuck.Write(BlendTime, ByteParsers.Single);
+                chuck.Write(PoseId, ByteParsers.Int32);
+                return chuck.GetBytes();
+            }
         }
 
-        public class PersistentMeta_Dock
+        public class PersistentMeta_Dock : ICampaignAnimationBinEntry
         {
             public string Animation { get; set; }
             public string AnimationMeta { get; set; }
@@ -171,6 +195,19 @@ namespace FileTypes.AnimationPack
                 output.BlendTime = byteChunk.ReadSingle();
                 output.Dock = byteChunk.ReadStringTableIndex(stringTable);
                 return output;
+            }
+
+
+            public byte[] ToBytes(ref List<string> stringTable)
+            {
+                ChuckWriter chuck = new ChuckWriter();
+                chuck.WriteStringTableIndex(Animation, ref stringTable);
+                chuck.WriteStringTableIndex(AnimationMeta, ref stringTable);
+                chuck.WriteStringTableIndex(SoundMeta, ref stringTable);
+                chuck.Write(Weight, ByteParsers.Single);
+                chuck.Write(BlendTime, ByteParsers.Single);
+                chuck.WriteStringTableIndex(Dock, ref stringTable);
+                return chuck.GetBytes();
             }
         }
 
@@ -403,7 +440,6 @@ namespace FileTypes.AnimationPack
             finalWriter.Write(dataBytes.Length + 8, ByteParsers.Int32);
             finalWriter.AddBytes(dataBytes);
 
-
             finalWriter.Write(stringTable.Count, ByteParsers.Int32);
             foreach (var str in stringTable)
                 finalWriter.Write(str, ByteParsers.String);
@@ -460,9 +496,9 @@ namespace FileTypes.AnimationPack
 
             if (statusItem.Name == "global")
             {
-
-                //Figure out what UnknownEntry is 
-                throw new Exception("Unable to save items with global entry");
+                WriteSlot(statusItem.PersitantMetaData, writer, ref stringTable);
+                WriteSlot(statusItem.Poses, writer, ref stringTable);
+                WriteSlot(statusItem.Docks, writer, ref stringTable);
             }
             else
             {
