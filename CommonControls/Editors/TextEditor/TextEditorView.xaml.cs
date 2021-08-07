@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,11 +18,19 @@ using ICSharpCode.AvalonEdit.Search;
 
 namespace CommonControls.Editors.TextEditor
 {
+	public interface ITextEditor
+	{
+		void ClearUndoStack();
+		void SetSyntaxHighlighting(string type);
+		void ShowLineNumbers(bool value);
+		void HightLightText(int lineNumber, int offset, int length);
+	}
+
     /// <summary>
     /// Interaction logic for TextEditorView.xaml
     /// </summary>
-    public partial class TextEditorView : UserControl
-    {
+    public partial class TextEditorView : UserControl, ITextEditor
+	{
         FoldingManager _foldingManager;
         object _foldingStrategy;
 
@@ -29,14 +38,46 @@ namespace CommonControls.Editors.TextEditor
         {
             InitializeComponent();
 
+			DataContextChanged += TextEditorView_DataContextChanged;
+
 			SetValue(TextOptions.TextFormattingModeProperty, TextFormattingMode.Display);
-
 			SearchPanel.Install(textEditor);
-
+			
 			DispatcherTimer foldingUpdateTimer = new DispatcherTimer();
 			foldingUpdateTimer.Interval = TimeSpan.FromSeconds(2);
 			foldingUpdateTimer.Tick += delegate { UpdateFoldings(); };
 			foldingUpdateTimer.Start();
+		}
+
+		public void ClearUndoStack()
+		{
+			textEditor.Document.UndoStack.ClearAll();
+		}
+
+		public void SetSyntaxHighlighting(string type)
+		{
+			var xmlHightlight = HighlightingManager.Instance.HighlightingDefinitions.FirstOrDefault(x => x.Name == type);
+			highlightingComboBox.SelectedValue = xmlHightlight;
+		}
+
+		public void ShowLineNumbers(bool value)
+		{
+			textEditor.ShowLineNumbers = value;
+		}
+
+		public void HightLightText(int lineNumber, int offset, int length)
+		{
+			var line = textEditor.Document.GetLineByNumber(lineNumber);
+			textEditor.Select(line.Offset + offset, length);
+			textEditor.ScrollTo(lineNumber, 0);
+		}
+
+		private void TextEditorView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+			if (DataContext is ITextEditorViewModel typedViewModel)
+			{
+				typedViewModel.SetEditor(this);
+			}
 		}
 
 		void HighlightingComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -94,5 +135,6 @@ namespace CommonControls.Editors.TextEditor
 				((XmlFoldingStrategy)_foldingStrategy).UpdateFoldings(_foldingManager, textEditor.Document);
 			}
 		}
-	}
+
+    }
 }

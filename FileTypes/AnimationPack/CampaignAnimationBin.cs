@@ -545,29 +545,46 @@ namespace FileTypes.AnimationPack
         public static void BatchProcess(List<PackFile> fileList)
         {
             int counter = 0;
-            var failed = new List<string>();
+            var loadErrors = new List<string>();
+            var writeErrors = new List<string>();
+            var reLoadErrors = new List<string>();
             var output = new List<CampaignAnimationBin>();
             foreach (var f in fileList)
             {
+
+                // Load
+                // -----------------
+                var chunkf = f.DataSource.ReadDataAsChunk();
+                CampaignAnimationBin loadedBin = null;
+
                 try
                 {
-                    var chunkf = f.DataSource.ReadDataAsChunk();
-                    var bin = CampaignAnimationBinLoader.Load(chunkf);
-                    output.Add(bin);
+                    loadedBin = CampaignAnimationBinLoader.Load(chunkf);
+                    output.Add(loadedBin);
                 }
                 catch (Exception e)
                 {
-                    failed.Add(f.Name + " " + e.Message);
+                    loadErrors.Add(f.Name + " " + e.Message);
                 }
+
+
+                // Write
+                // -----------------
+
+
+                // Reload
+                // -----------------
+
+
                 counter++;
             }
 
-            var x0 = failed.Where(x => x.Contains("missing schema")).ToList();      // 52
-            var x1 = failed.Where(x => x.Contains("Index was outside")).ToList();
-            var x2 = failed.Where(x => x.Contains("Metadata error")).ToList();
-            var x3 = failed.Where(x => x.Contains("Sequence contains no elements")).ToList();
-            var x4 = failed.Where(x => x.Contains("Version error")).ToList();   // 1
-            var x5 = failed.Where(x => x.Contains("Unkown datatype")).ToList();   // 1
+            var x0 = loadErrors.Where(x => x.Contains("missing schema")).ToList();      // 52
+            var x1 = loadErrors.Where(x => x.Contains("Index was outside")).ToList();
+            var x2 = loadErrors.Where(x => x.Contains("Metadata error")).ToList();
+            var x3 = loadErrors.Where(x => x.Contains("Sequence contains no elements")).ToList();
+            var x4 = loadErrors.Where(x => x.Contains("Version error")).ToList();   // 1
+            var x5 = loadErrors.Where(x => x.Contains("Unkown datatype")).ToList();   // 1
 
             var eTotal = x0.Count + x1.Count + x2.Count + x3.Count + x4.Count + x5.Count;     // 53 
             return;

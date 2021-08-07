@@ -892,7 +892,8 @@ namespace Filetypes.ByteParsing
 
         public void WriteStringTableIndex(string str, ref List<string> stringTable)
         {
-            
+            if (string.IsNullOrEmpty(str))
+                str = "";
             str = str.ToLower().Trim();
             int writeIndex = stringTable.IndexOf(str);
             if (writeIndex == -1)

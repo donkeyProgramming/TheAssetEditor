@@ -5,49 +5,22 @@ using FileTypes.PackFiles.Models;
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using System.Windows;
 using System.Windows.Input;
 
 namespace CommonControls.Editors.TextEditor
 {
-
-    public interface ITextConverter
+    public interface ITextEditorViewModel : IEditorViewModel
     {
-        string GetText(byte[] bytes);
-        byte[] ToBytes(string text);
-        bool Validate(string text, out string errorText);
-    
+        void SetEditor(ITextEditor theEditor);
     }
 
-    public class DefaultTextConverter : ITextConverter
-    {
-        public string GetText(byte[] bytes)
-        {
-            using (MemoryStream stream = new MemoryStream(bytes, 0, bytes.Length))
-            {
-                using (var reader = new StreamReader(stream, Encoding.ASCII))
-                    return reader.ReadToEnd();
-            }
-        }
-
-        public byte[] ToBytes(string text)
-        {
-            return Encoding.ASCII.GetBytes(text);
-        }
-
-        public bool Validate(string text, out string errorText)
-        {
-            errorText = string.Empty;
-            return true;
-        }
-    }
-
-    public class TextEditorViewModel<TextConverter> : NotifyPropertyChangedImpl, IEditorViewModel
+    public class TextEditorViewModel<TextConverter> : NotifyPropertyChangedImpl, ITextEditorViewModel
         where TextConverter : ITextConverter
     {
         public ICommand SaveCommand { get; set; }
+
+
 
 
         string _displayName;
@@ -59,6 +32,7 @@ namespace CommonControls.Editors.TextEditor
         IPackFile _packFile;
         PackFileService _pf;
 
+        ITextEditor _textEditor;
         TextConverter _converter;
 
         public TextEditorViewModel(PackFileService pf, TextConverter converter)
@@ -66,6 +40,14 @@ namespace CommonControls.Editors.TextEditor
             _converter = converter;
             _pf = pf;
             SaveCommand = new RelayCommand(() => Save());
+        }
+
+        public void SetEditor(ITextEditor theEditor)
+        {
+            _textEditor = theEditor;
+            _textEditor.ClearUndoStack();
+            _textEditor.ShowLineNumbers(_converter.ShouldShowLineNumbers());
+            _textEditor.SetSyntaxHighlighting(_converter.GetSyntaxType());
         }
 
         public IPackFile MainFile
@@ -91,14 +73,14 @@ namespace CommonControls.Editors.TextEditor
         {
             var path = _pf.GetFullPath(MainFile as PackFile);
 
-            if (_converter.Validate(Text, out string errorText) == false)
+            var bytes = _converter.ToBytes(Text, path, out var error);
+            if (bytes == null || error != null)
             {
-                MessageBox.Show("Unable to save text:\n" + errorText);
+                MessageBox.Show(error.Text, "Error");
+                _textEditor.HightLightText(error.ErrorLineNumber, error.ErrorPosition, error.ErrorLength);
                 return false;
             }
 
-
-            var bytes = _converter.ToBytes(Text);
             var res = SaveHelper.Save(_pf, path, MainFile as PackFile, bytes);
             if (res != null)
                 MainFile = res;
