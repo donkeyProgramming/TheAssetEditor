@@ -1,8 +1,9 @@
-﻿namespace CommonControls.Editors.TextEditor
+﻿using CommonControls.Services;
+
+namespace CommonControls.Editors.TextEditor
 {
     public interface ITextConverter
     {
-
         public class SaveError
         {
             public string Text { get; set; }
@@ -12,10 +13,10 @@
         }
 
         string GetText(byte[] bytes);
-        byte[] ToBytes(string text, string fileName, out SaveError error);
 
         bool ShouldShowLineNumbers();
         string GetSyntaxType();
-
+        bool CanSaveOnError();
+        byte[] ToBytes(string text, string filePath, PackFileService pfs, out SaveError error);
     }
 }

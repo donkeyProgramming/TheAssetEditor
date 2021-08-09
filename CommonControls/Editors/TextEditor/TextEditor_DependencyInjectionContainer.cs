@@ -17,7 +17,7 @@ namespace CommonControls.Editors.TextEditor
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<TextEditorViewModel<DefaultTextConverter>, TextEditorView>(new ExtentionToTool(".json", ".xml", ".txt", ".wsmodel", ".variantmeshdefinition"));
+            factory.RegisterTool<TextEditorViewModel<DefaultTextConverter>, TextEditorView>(new ExtentionToTool(".json", ".xml", ".txt", ".wsmodel"));
         }
     }
 }

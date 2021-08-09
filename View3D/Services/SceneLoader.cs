@@ -1,4 +1,5 @@
 ﻿using Common;
+using CommonControls.Editors.VariantMeshDefinition;
 using CommonControls.Services;
 using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
@@ -42,7 +43,7 @@ namespace View3D.Services
                 return;
             }
 
-            Load(file as PackFile, parent, player, ref skeletonName);
+            Load(file, parent, player, ref skeletonName);
         }
 
         public ISceneNode Load(PackFile file, ISceneNode parent, AnimationPlayer player, ref string skeletonName)
@@ -52,7 +53,6 @@ namespace View3D.Services
 
             _logger.Here().Information($"Attempting to load file {file.Name}");
 
-            //string _refSkeletonName = null;
             switch (file.Extention)
             {
                 case ".variantmeshdefinition":
@@ -69,10 +69,7 @@ namespace View3D.Services
                 default:
                     throw new Exception("Unknown mesh extention");
             }
-            //if (!string.IsNullOrWhiteSpace(_refSkeletonName))
-            //    skeletonName = _refSkeletonName;
-            //else
-            //    skeletonName = skeletonName;
+
             return parent;
         }
 
@@ -85,46 +82,48 @@ namespace View3D.Services
             else
                 parent.AddObject(variantMeshElement);
 
-            var slotsElement = variantMeshElement.AddObject( new SlotsNode("Slots"));
-            var vmdContent = Encoding.UTF8.GetString(file.DataSource.ReadData());
-
-            VariantMeshFile meshFile;
             try
             {
-                meshFile = VariantMeshDefinition.Create(vmdContent);
+                var vmdContent = Encoding.UTF8.GetString(file.DataSource.ReadData());
+                var meshFile = VariantMeshToXmlConverter.LoadFromString(vmdContent);
+                LoadVariantMesh(meshFile, variantMeshElement, player, ref skeletonName);
             }
             catch (Exception e)
             {
                 _logger.Here().Error("Failed to load file : " + file.Name);
-                _logger.Here().Error("File content : " + vmdContent);
                 _logger.Here().Error("Error : " + e.ToString());
                 throw e;
             }
-           
+        }
 
-            foreach (var slot in meshFile.VARIANT_MESH.SLOT)
+        void LoadVariantMesh(VariantMesh mesh, ISceneNode root, AnimationPlayer player, ref string skeletonName)
+        {
+            if (mesh.ChildSlots.Count != 0)
+                root = root.AddObject(new SlotsNode("Slots"));
+
+            // Load model
+            if (string.IsNullOrWhiteSpace(mesh.ModelReference) != true)
+                 Load(mesh.ModelReference.ToLower(), root, player, ref skeletonName); 
+
+            foreach (var slot in mesh.ChildSlots)
             {
-                var slotElement = slotsElement.AddObject(new SlotNode(slot.Name));
+                var slotNode = root.AddObject(new SlotNode(slot.Name));
 
-                foreach (var mesh in slot.VariantMeshes)
+                foreach (var childMesh in slot.ChildMeshes)
+                    LoadVariantMesh(childMesh, slotNode, player, ref skeletonName);
+
+                foreach (var meshReference in slot.ChildReferences)
+                    Load(meshReference.Reference.ToLower(), slotNode, player, ref skeletonName);
+
+                for (int i = 0; i < slotNode.Children.Count(); i++)
                 {
-
-                    if (mesh.Name != null)
-                        Load(mesh.Name.ToLower(), slotElement, player, ref skeletonName); 
-                }
-
-                foreach (var meshReference in slot.VariantMeshReferences)
-                    Load(meshReference.definition.ToLower(), slotElement, player, ref skeletonName);
-
-                for (int i = 0; i < slotElement.Children.Count(); i++)
-                {
-                    slotElement.Children[i].IsVisible = i == 0;
-                    slotElement.Children[i].IsExpanded = false;
-
-                    if (slotElement.Name.Contains("stump_"))
+                    slotNode.Children[i].IsVisible = i == 0;
+                    slotNode.Children[i].IsExpanded = false;
+            
+                    if (slotNode.Name.Contains("stump_"))
                     {
-                        slotElement.IsVisible = false;
-                        slotElement.IsExpanded = false;
+                        slotNode.IsVisible = false;
+                        slotNode.IsExpanded = false;
                     }
                 }
             }

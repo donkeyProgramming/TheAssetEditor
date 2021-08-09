@@ -20,9 +20,6 @@ namespace CommonControls.Editors.TextEditor
     {
         public ICommand SaveCommand { get; set; }
 
-
-
-
         string _displayName;
         public string DisplayName { get => _displayName; set => SetAndNotify(ref _displayName, value); }
 
@@ -73,7 +70,7 @@ namespace CommonControls.Editors.TextEditor
         {
             var path = _pf.GetFullPath(MainFile as PackFile);
 
-            var bytes = _converter.ToBytes(Text, path, out var error);
+            var bytes = _converter.ToBytes(Text, path, _pf, out var error);
             if (bytes == null || error != null)
             {
                 MessageBox.Show(error.Text, "Error");

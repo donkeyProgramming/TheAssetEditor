@@ -52,7 +52,10 @@ namespace KitbasherEditor.Views
         private static void OnSelectionCollectionAssigned(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var tb = d as MultiSelectTreeView;
-            tb.Subscribe();
+            if (e.NewValue == null)
+                tb.UnSubscribe(e.OldValue as ObservableCollection<ISceneNode>);
+            else
+                tb.Subscribe(e.NewValue as ObservableCollection<ISceneNode>);
         }
 
         public MultiSelectTreeView()
@@ -119,9 +122,14 @@ namespace KitbasherEditor.Views
             }
         }
 
-        public void Subscribe()
+        public void Subscribe(ObservableCollection<ISceneNode> collection)
         {
-            SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
+            collection.CollectionChanged += SelectedObjects_CollectionChanged;
+        }
+
+        public void UnSubscribe(ObservableCollection<ISceneNode> collection)
+        {
+            collection.CollectionChanged -= SelectedObjects_CollectionChanged;
         }
 
         private void SelectedObjects_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

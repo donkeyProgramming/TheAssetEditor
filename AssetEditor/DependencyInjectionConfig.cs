@@ -12,6 +12,7 @@ using CommonControls.Editors.AnimationFragment;
 using CommonControls.Editors.AnimationPack;
 using CommonControls.Editors.CampaignAnimBin;
 using CommonControls.Editors.TextEditor;
+using CommonControls.Editors.VariantMeshDefinition;
 using CommonControls.Resources;
 using CommonControls.Services;
 using KitbasherEditor;
@@ -63,6 +64,7 @@ namespace AssetEditor
             AnimationFragment_DependencyInjectionContainer.Register(services);
             AnimationPack_DependencyInjectionContainer.Register(services);
             CampaignAnimBin_DependencyInjectionContainer.Register(services);
+            VariantMeshDefinition_DependencyInjectionContainer.Register(services);
         }
 
         void RegisterTools(IToolFactory factory)
@@ -75,6 +77,7 @@ namespace AssetEditor
             AnimationFragment_DependencyInjectionContainer.RegisterTools(factory);
             AnimationPack_DependencyInjectionContainer.RegisterTools(factory);
             CampaignAnimBin_DependencyInjectionContainer.RegisterTools(factory);
+            VariantMeshDefinition_DependencyInjectionContainer.RegisterTools(factory);
         }
 
         public void ShowMainWindow()

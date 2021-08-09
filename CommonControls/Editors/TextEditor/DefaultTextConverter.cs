@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using CommonControls.Services;
+using System.IO;
 using System.Text;
 
 namespace CommonControls.Editors.TextEditor
@@ -16,8 +17,9 @@ namespace CommonControls.Editors.TextEditor
 
         public bool ShouldShowLineNumbers() => true;
         public string GetSyntaxType() => "XML";
+        public bool CanSaveOnError() => true;
 
-        public byte[] ToBytes(string text, string fileName, out ITextConverter.SaveError error)
+        public byte[] ToBytes(string text, string fileName, PackFileService pfs, out ITextConverter.SaveError error)
         {
             error = null;
             return Encoding.ASCII.GetBytes(text);

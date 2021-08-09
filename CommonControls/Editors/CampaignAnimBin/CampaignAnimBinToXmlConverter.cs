@@ -1,5 +1,6 @@
 ﻿using CommonControls.Common;
 using CommonControls.Editors.TextEditor;
+using CommonControls.Services;
 using Filetypes.ByteParsing;
 using FileTypes.AnimationPack;
 using System;
@@ -35,7 +36,7 @@ namespace CommonControls.Editors.CampaignAnimBin
             }
         }
 
-        public byte[] ToBytes(string text, string filePath, out ITextConverter.SaveError error)
+        public byte[] ToBytes(string text, string filePath, PackFileService pfs, out ITextConverter.SaveError error)
         {
             try
             {
@@ -97,6 +98,6 @@ namespace CommonControls.Editors.CampaignAnimBin
 
         public bool ShouldShowLineNumbers() => true;
         public string GetSyntaxType() => "XML";
-
+        public bool CanSaveOnError() => false;
     }
 }
