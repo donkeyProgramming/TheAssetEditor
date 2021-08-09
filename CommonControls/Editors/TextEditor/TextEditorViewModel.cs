@@ -73,9 +73,18 @@ namespace CommonControls.Editors.TextEditor
             var bytes = _converter.ToBytes(Text, path, _pf, out var error);
             if (bytes == null || error != null)
             {
-                MessageBox.Show(error.Text, "Error");
                 _textEditor.HightLightText(error.ErrorLineNumber, error.ErrorPosition, error.ErrorLength);
-                return false;
+
+                if (_converter.CanSaveOnError())
+                {
+                    if (MessageBox.Show(error.Text + "\n\nThis means that the file might not work!\nSave anyway?", "Error", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                        return false;
+                }
+                else
+                {
+                    MessageBox.Show(error.Text, "Error");
+                    return false;
+                }
             }
 
             var res = SaveHelper.Save(_pf, path, MainFile as PackFile, bytes);
