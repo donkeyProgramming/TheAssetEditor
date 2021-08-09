@@ -1,6 +1,9 @@
-﻿using KitbasherEditor.ViewModels;
+﻿using CommonControls.Behaviors;
+using KitbasherEditor.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,6 +19,160 @@ using View3D.SceneNodes;
 
 namespace KitbasherEditor.Views
 {
+
+    public static class ItemContainerGeneratorHelper
+    {
+        public static TreeViewItem ContainerFromItemRecursive(this ItemContainerGenerator root, object item)
+        {
+            var treeViewItem = root.ContainerFromItem(item) as TreeViewItem;
+            if (treeViewItem != null)
+                return treeViewItem;
+            foreach (var subItem in root.Items)
+            {
+                treeViewItem = root.ContainerFromItem(subItem) as TreeViewItem;
+                var search = treeViewItem?.ItemContainerGenerator.ContainerFromItemRecursive(item);
+                if (search != null)
+                    return search;
+            }
+            return null;
+        }
+    }
+
+    public class MultiSelectTreeView : TreeView
+    {
+        public ObservableCollection<ISceneNode> SelectedObjects
+        {
+            get { return (ObservableCollection<ISceneNode>)GetValue(SelectedObjectsProperty); }
+            set { SetValue(SelectedObjectsProperty, value); }
+        }
+
+        public static readonly DependencyProperty SelectedObjectsProperty =
+            DependencyProperty.Register("SelectedObjects", typeof(ObservableCollection<ISceneNode>), typeof(MultiSelectTreeView), new FrameworkPropertyMetadata(OnSelectionCollectionAssigned));
+
+        private static void OnSelectionCollectionAssigned(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var tb = d as MultiSelectTreeView;
+            tb.Subscribe();
+        }
+
+        public MultiSelectTreeView()
+        {
+            SelectedItemChanged += MyTreeView_SelectedItemChanged;
+            Focusable = true;
+        }
+
+        void Deselect(TreeViewItem treeViewItem, ISceneNode node)
+        {
+            if (treeViewItem != null)
+            {
+                treeViewItem.Background = Brushes.White;
+                treeViewItem.Foreground = Brushes.Black;
+            }
+            SelectedObjects.Remove(node);
+        }
+
+        void ChangeSelectedState(TreeViewItem treeViewItem, ISceneNode node)
+        {
+            if (!SelectedObjects.Contains(node))
+            {
+                treeViewItem.Background = Brushes.LightBlue;
+                treeViewItem.Foreground = Brushes.Black;
+                SelectedObjects.Add(node);
+            }
+            else
+            {
+                Deselect(treeViewItem, node);
+            }
+        }
+
+        void MyTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+
+
+            try
+            {
+                SelectedObjects.CollectionChanged -= SelectedObjects_CollectionChanged;
+                var snode = SelectedItem as ISceneNode;
+                var treeViewItem = ItemContainerGenerator.ContainerFromItemRecursive(SelectedItem);
+                if (treeViewItem == null)
+                    return;
+
+                treeViewItem.IsSelected = false;
+                treeViewItem.Focus();
+
+                if (!IsShiftPressed)
+                {
+                    var itemsToDelete = SelectedObjects.Select(x => x).ToList();
+                    foreach (var item in itemsToDelete)
+                    {
+                        var itts = ItemContainerGenerator.ContainerFromItemRecursive(item);
+     
+                            Deselect(itts, item);
+                    }
+                }
+
+                ChangeSelectedState(treeViewItem, snode);
+            }
+            finally
+            {
+                SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
+            }
+        }
+
+        public void Subscribe()
+        {
+            SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
+        }
+
+        private void SelectedObjects_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            try
+            {
+                SelectedObjects.CollectionChanged -= SelectedObjects_CollectionChanged;
+                SelectedItemChanged -= MyTreeView_SelectedItemChanged;
+
+                if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+                {
+                    foreach (var item in e.NewItems)
+                    {
+                        var treeViewItem = ItemContainerGenerator.ContainerFromItemRecursive(item);
+                        if (treeViewItem != null)
+                        {
+                            treeViewItem.Background = Brushes.LightBlue;
+                            treeViewItem.Foreground = Brushes.Black;
+                            treeViewItem.IsSelected = false;
+                            treeViewItem.Focus();
+                        }
+                    }
+                }
+                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+                {
+                    foreach (var item in e.OldItems)
+                    {
+                        var treeViewItem = ItemContainerGenerator.ContainerFromItemRecursive(item);
+                        if (treeViewItem != null)
+                        {
+                            treeViewItem.Background = Brushes.White;
+                            treeViewItem.Foreground = Brushes.Black;
+                            treeViewItem.IsSelected = false;
+                        }
+                    }
+                }
+                else
+                {
+                    throw new Exception("Unknown event in MultiSelectTreeView::SelectedObjects_CollectionChanged " + e.Action);
+                }
+            }
+            finally
+            {
+                SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
+                SelectedItemChanged += MyTreeView_SelectedItemChanged;
+            }
+        }
+
+        bool IsShiftPressed { get =>  Keyboard.IsKeyDown(Key.LeftShift);}
+    }
+
     /// <summary>
     /// Interaction logic for SceneExplorerView.xaml
     /// </summary>
@@ -33,6 +190,8 @@ namespace KitbasherEditor.Views
                 item.IsExpanded = !item.IsExpanded;
             e.Handled = true;
         }
+
+
     }
 
     public class TreeItemDataTemplateSelector : DataTemplateSelector

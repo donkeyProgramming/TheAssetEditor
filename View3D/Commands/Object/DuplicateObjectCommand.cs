@@ -50,7 +50,7 @@ namespace View3D.Commands.Object
                 _clonedObjects.Add(clonedItem);
                 item.Parent.AddObject(clonedItem);
                 if(clonedItem is ISelectable selectableNode)
-                    objectState.ModifySelection(selectableNode, false);
+                    objectState.ModifySelectionSingleObject(selectableNode, false);
             }
 
             _selectionManager.SetState(objectState);

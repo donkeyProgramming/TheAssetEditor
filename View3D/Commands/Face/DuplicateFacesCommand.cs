@@ -65,7 +65,7 @@ namespace View3D.Commands.Face
 
             // Object state
             var objectState = new ObjectSelectionState();
-            objectState.ModifySelection(_newObject, false);
+            objectState.ModifySelectionSingleObject(_newObject, false);
             _selectionManager.SetState(objectState);
        }
    

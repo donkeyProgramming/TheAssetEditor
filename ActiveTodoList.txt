@@ -92,16 +92,21 @@ Sound
 ---------
 
 v14
-	Generic text -> binary editor 
-
-	AnimBin
-	TreeView multi select
-	Compagin anims missing from anim search
+	[X]Generic text -> binary editor 
+	[X]AnimBin
+	[X]TreeView multi select
+	[X - not really a thing] Compagin anims missing from anim search
 	Flip left/Right view in rendering
-	AnimTransfer - clear single button
-		Apply mapping to all children
+	Remapping 
+		- Open last setting (auto save to file?)
+		- Apply mapping to all children
+		- clear single button
+	
 	Added materials and shit as upported formats 
-	Scale on mount tool broken?
+	
+	
+	Bugs:
+		[X]Scale on mount tool broken?
 
 	Animation transfer tool: - Scale bone length - usefull for root anims 
 	Animation transfer tool: - Copy setting to children (force snap, freeze)

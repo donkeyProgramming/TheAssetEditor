@@ -19,8 +19,6 @@ namespace AnimationEditor.CampaignAnimationCreator
         public override void Initialize()
         {
             ReferenceModelView.Data.IsSelectable = true;
-            //var propAsset = Scene.AddCompnent(new AssetViewModel(_pfs, "NewAnim", Color.Red, Scene));
-            //Player.RegisterAsset(propAsset);
             ReferenceModelView.IsControlVisible.Value = false;
             Editor = new Editor(_pfs, _skeletonHelper, MainModelView.Data, Scene);
         }

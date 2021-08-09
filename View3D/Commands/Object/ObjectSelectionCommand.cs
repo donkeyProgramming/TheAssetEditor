@@ -55,8 +55,7 @@ namespace View3D.Commands.Object
             if (!(_isModification || _isRemove))
                 currentState.Clear();
 
-            foreach (var newSelectionItem in _items)
-                currentState.ModifySelection(newSelectionItem, _isRemove);
+            currentState.ModifySelection(_items, _isRemove);
         }
 
         protected override void UndoCommand()

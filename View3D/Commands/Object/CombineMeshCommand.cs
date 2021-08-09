@@ -69,7 +69,7 @@ namespace View3D.Commands.Object
                 // Select
                 var currentState = _selectionManager.GetState() as ObjectSelectionState;
                 currentState.Clear();
-                currentState.ModifySelection(_combinedMesh as ISelectable, false);
+                currentState.ModifySelectionSingleObject(_combinedMesh as ISelectable, false);
             }
         }
 

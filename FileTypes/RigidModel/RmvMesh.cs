@@ -62,22 +62,6 @@ namespace Filetypes.RigidModel
         }
     };
 
-    /*
-     struct GroupPreHeader
-{
-    ERigidMaterial RigidMaterialId = ERigidMaterial::eMAT_ERROR_NOT_SET;
-    uint32_t dwGroupSize = 0;    
-
-    uint32_t uiTextureAndAttchmentBlockSize = 0; 
-    uint32_t dwVertextCount = 0;        
-
-    uint32_t dwVertexData_TextAndAttach_BlockSize = 0; 
-    uint32_t dwIndexCount = 0;
-
-    DirectX::XMFLOAT3 vMinBB;
-    DirectX::XMFLOAT3 vMaxBB;
-};
-     */
 
     [StructLayout(LayoutKind.Sequential)]
     [Serializable]

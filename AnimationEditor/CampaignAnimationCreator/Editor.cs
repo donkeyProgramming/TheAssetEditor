@@ -1,26 +1,14 @@
-﻿using AnimationEditor.Common.AnimationSettings;
-using AnimationEditor.Common.ReferenceModel;
-using AnimationEditor.MountAnimationCreator.Services;
+﻿using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator;
 using Common;
 using CommonControls.Common;
-using CommonControls.Editors.AnimationFragment;
 using CommonControls.Services;
-using CommonControls.Table;
 using Filetypes.RigidModel;
-using FileTypes.AnimationPack;
-using FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
-using Serilog;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using View3D.Animation;
-using View3D.Components.Component.Selection;
-using View3D.SceneNodes;
 
 namespace AnimationEditor.CampaignAnimationCreator
 {

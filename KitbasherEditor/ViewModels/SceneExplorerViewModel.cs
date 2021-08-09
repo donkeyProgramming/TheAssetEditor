@@ -23,8 +23,12 @@ namespace KitbasherEditor.ViewModels
         public ObservableCollection<ISceneNode> SceneGraphRootNodes { get { return _sceneGraphRootNodes; } set { SetAndNotify(ref _sceneGraphRootNodes, value); } }
 
 
-        ISceneNode _selectedNode;
-        public ISceneNode SelectedNode { get { return _selectedNode; } set { SetAndNotify(ref _selectedNode, value); OnNodeSelected(_selectedNode); } }
+
+        ObservableCollection<ISceneNode> _SelectedObjects = new ObservableCollection<ISceneNode>();
+        public ObservableCollection<ISceneNode> SelectedObjects { get { return _SelectedObjects; } set { SetAndNotify(ref _SelectedObjects, value); } }
+
+       //ISceneNode _selectedNode;
+       //public ISceneNode SelectedNode { get { return _selectedNode; } set { SetAndNotify(ref _selectedNode, value); OnNodeSelected(_selectedNode); } }
 
         ISceneNodeViewModel _selectedNodeViewModel;
         public ISceneNodeViewModel SelectedNodeViewModel { get { return _selectedNodeViewModel; } set { SetAndNotify(ref _selectedNodeViewModel, value); } }
@@ -64,75 +68,105 @@ namespace KitbasherEditor.ViewModels
             _sceneManager.SceneObjectRemoved += (a, b) => RebuildTree();
 
             ContextMenu = new SceneExplorerContextMenuHandler(_commandExecutor);
+
+            SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
         }
 
-        private void SelectionChanged(ISelectionState state)
+        private void SelectedObjects_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if (state is ObjectSelectionState objectSelection)
+            try
             {
-                if (objectSelection.SelectedObjects().Count == 1)
-                {
-                    var obj = objectSelection.SelectedObjects().First();
-                    if (obj != SelectedNode)
-                        SelectedNode = obj as SceneNode;
+                SelectedObjects.CollectionChanged -= SelectedObjects_CollectionChanged;
+                _selectionManager.SelectionChanged -= SelectionChanged;
 
-                    return;
-                }
-            }
-
-            if(SelectedNode != null)
-                SelectedNode = null;
-        }
-
-        bool _ignoreNextEvenet = false;
-        private void OnNodeSelected(ISceneNode selectedNode)
-        {
-            if (_ignoreNextEvenet)
-                return;
-
-            if (SelectedNodeViewModel != null)
-                SelectedNodeViewModel.Dispose();
-            SelectedNodeViewModel = SceneNodeViewFactory.Create(selectedNode, _skeletonAnimationLookUpHelper, _packFileService, _animationControllerViewModel, _sceneContainer);
-
-            if (selectedNode != null)
-            {
                 var objectState = new ObjectSelectionState();
-                if (selectedNode is GroupNode groupNode && groupNode.IsSelectable == true)
+                foreach (var item in SelectedObjects)
                 {
-                    foreach (var child in groupNode.Children)
+                    if (item is GroupNode groupNode && groupNode.IsSelectable == true)
                     {
-                        if (child is ISelectable selectableNode && selectableNode.IsSelectable)
-                            objectState.ModifySelection(selectableNode, false);
+                        var itemsToSelect = groupNode.Children.Where(x => x as ISelectable != null)
+                            .Select(x => x as ISelectable)
+                            .Where(x => x.IsSelectable != false)
+                            .ToList();
+
+                        objectState.ModifySelection(itemsToSelect, false);
+                    }
+                    else
+                    {
+                        if (item is ISelectable selectableNode && selectableNode.IsSelectable)
+                            objectState.ModifySelectionSingleObject(selectableNode, false);
                     }
                 }
-                else
-                {
-                    if (selectedNode is ISelectable selectableNode && selectableNode.IsSelectable)
-                        objectState.ModifySelection(selectableNode, false);
-                }
 
-                // Is the state actually changed?
                 var currentSelection = _selectionManager.GetState() as ObjectSelectionState;
                 bool selectionEqual = false;
                 if (currentSelection != null)
                     selectionEqual = currentSelection.IsSelectionEqual(objectState);
 
                 if (!selectionEqual)
-                {
-                    _ignoreNextEvenet = true;
                     _selectionManager.SetState(objectState);
-                    _ignoreNextEvenet = false;
+
+            }
+            finally
+            {
+                SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
+                _selectionManager.SelectionChanged += SelectionChanged;
+            }
+            
+            UpdateViewModelAndContextMenyBasedOnSelection();
+        }
+
+        void UpdateViewModelAndContextMenyBasedOnSelection()
+        {
+            if (SelectedNodeViewModel != null)
+                SelectedNodeViewModel.Dispose();
+
+            if (SelectedObjects.Count == 1)
+            {
+                SelectedNodeViewModel = SceneNodeViewFactory.Create(SelectedObjects.First(), _skeletonAnimationLookUpHelper, _packFileService, _animationControllerViewModel, _sceneContainer);
+                ContextMenu.Create(SelectedObjects.First());
+            }
+            else
+            {
+                SelectedNodeViewModel = null;
+                ContextMenu.Create(null);
+            }
+        }
+
+        private void SelectionChanged(ISelectionState state)
+        {
+            try
+            {
+                SelectedObjects.CollectionChanged -= SelectedObjects_CollectionChanged;
+
+                if (state is ObjectSelectionState objectSelection)
+                {
+                    if (SelectedObjects.Count != 0)
+                    {
+                        while (SelectedObjects.Count > 0)
+                            SelectedObjects.RemoveAt(SelectedObjects.Count - 1);
+                    }
+                    var objects = objectSelection.SelectedObjects();
+                    foreach (var obj in objects)
+                        SelectedObjects.Add(obj);
                 }
             }
+            finally
+            {
+                SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
+            }
 
-            ContextMenu.Create(selectedNode);
+            UpdateViewModelAndContextMenyBasedOnSelection();
         }
 
         private void RebuildTree()
         {
-            var collection = new ObservableCollection<ISceneNode>(); ;
-            collection.Add(_sceneManager.RootNode);
-            SceneGraphRootNodes = collection;
+            //var collection = new ObservableCollection<ISceneNode>(); ;
+            //collection.Add(_sceneManager.RootNode);
+
+            SceneGraphRootNodes.Clear();
+            SceneGraphRootNodes.Add(_sceneManager.RootNode);
+            //SceneGraphRootNodes = collection;
             UpdateLod(SelectedLodLevel.Value);
         }
 
@@ -159,8 +193,6 @@ namespace KitbasherEditor.ViewModels
         }
     }
 
-
-    
     public class LodItem
     { 
         public string Name { get; set; }

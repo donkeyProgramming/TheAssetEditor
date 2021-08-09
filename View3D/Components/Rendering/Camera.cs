@@ -204,7 +204,7 @@ namespace View3D.Components.Rendering
             if (!mouse.IsMouseOwner(this))
                 return;
 
-            var deltaMouseX = mouse.DeltaPosition().X;
+            var deltaMouseX = -mouse.DeltaPosition().X;
             var deltaMouseY = mouse.DeltaPosition().Y;
             var deltaMouseWheel = mouse.DeletaScrollWheel();
 
@@ -258,11 +258,17 @@ namespace View3D.Components.Rendering
 
         Matrix RefreshProjection()
         {
+
+            //return Matrix.CreateOrthographic(_graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height, 0.01f, 150);
+
+
+    
+
             return Matrix.CreatePerspectiveFieldOfView(
                 MathHelper.ToRadians(45), // 45 degree angle
                 (float)_graphicsDevice.Viewport.Width /
                 (float)_graphicsDevice.Viewport.Height,
-                .01f, 150);
+                .01f, 150) * Matrix.CreateScale(-1, 1,1);
         }
 
         public Ray CreateCameraRay(Vector2 mouseLocation)

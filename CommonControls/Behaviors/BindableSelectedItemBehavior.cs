@@ -1,9 +1,11 @@
 ﻿using Microsoft.Xaml.Behaviors;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 //using System.Windows.Interactivity;
 
 namespace CommonControls.Behaviors
@@ -41,9 +43,7 @@ namespace CommonControls.Behaviors
 
         private static void OnSelectedItemChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-          
             var item = e.NewValue as TreeViewItem;
-
 
             if (item != null)
             {
@@ -68,11 +68,6 @@ namespace CommonControls.Behaviors
                 }
             }
         }
-
-        
-
-
-
 
         protected override void OnAttached()
         {

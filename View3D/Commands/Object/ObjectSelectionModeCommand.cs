@@ -48,7 +48,7 @@ namespace View3D.Commands.Object
             var newSelectionState = _selectionManager.CreateSelectionSate(_newMode, _selectedItem);
 
             if (newSelectionState.Mode == GeometrySelectionMode.Object && _selectedItem != null)
-                (newSelectionState as ObjectSelectionState).ModifySelection(_selectedItem, false);
+                (newSelectionState as ObjectSelectionState).ModifySelectionSingleObject(_selectedItem, false);
             else if (newSelectionState.Mode == GeometrySelectionMode.Face)
                 (newSelectionState as FaceSelectionState).RenderObject = _selectedItem;
             else if(newSelectionState.Mode == GeometrySelectionMode.Vertex)

@@ -12,7 +12,7 @@ namespace View3D.Components.Component.Selection
 
         List<ISelectable> _selectionList { get; set; } = new List<ISelectable>();
 
-        public void ModifySelection(ISelectable newSelectionItem, bool onlyRemove)
+        public void ModifySelectionSingleObject(ISelectable newSelectionItem, bool onlyRemove)
         {
             if (_selectionList.Contains(newSelectionItem))
                 _selectionList.Remove(newSelectionItem);
@@ -21,6 +21,29 @@ namespace View3D.Components.Component.Selection
 
             SelectionChanged?.Invoke(this);
         }
+
+        public void ModifySelection(IEnumerable<ISelectable> newSelectionItems, bool onlyRemove)
+        {
+            if (onlyRemove)
+            {
+                foreach (var newSelectionItem in newSelectionItems)
+                {
+                    if (_selectionList.Contains(newSelectionItem))
+                        _selectionList.Remove(newSelectionItem);
+                }
+            }
+            else
+            {
+                foreach (var newSelectionItem in newSelectionItems)
+                {
+                    if (!_selectionList.Contains(newSelectionItem))
+                        _selectionList.Add(newSelectionItem);
+                }
+            }
+
+            SelectionChanged?.Invoke(this);
+        }
+
 
         public List<ISelectable> CurrentSelection() 
         { 

@@ -84,8 +84,7 @@ namespace View3D.Commands.Object
                 _objectToSplit.Parent.RemoveObject(_objectToSplit as SceneNode);
 
                 var newState = (ObjectSelectionState)_selectionManager.CreateSelectionSate(GeometrySelectionMode.Object, null);
-                foreach (var node in createdMeshes)
-                    newState.ModifySelection(node, false);
+                newState.ModifySelection(createdMeshes, false);
             }
         }
 

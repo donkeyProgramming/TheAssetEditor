@@ -39,10 +39,7 @@
                                 <Binding UpdateSourceTrigger="PropertyChanged" Path="DataContext.IsSelectable" RelativeSource="{RelativeSource Mode=Self}"/>
                             </MultiBinding>
                         </Image.Visibility>
-                        
-                        
                     </Image>
-
 
                     <Image Width="18" Margin="2,0"  Grid.Column="0" Source="{Binding Path=. , Converter={StaticResource ImageValueConverter}}"/>
                     <TextBlock Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" Margin="2,0"/>
@@ -65,17 +62,14 @@
     </UserControl.Resources>
 
     <DockPanel>
-        <TreeView 
+        <local:MultiSelectTreeView x:Name="TheTreeView"
            behaviors:TreeViewExtension.SelectItemOnRightClick="True"
            TreeViewItem.PreviewMouseDoubleClick="TreeViewItem_PreviewMouseDoubleClick"
            ItemsSource="{Binding Path=SceneGraphRootNodes, UpdateSourceTrigger=PropertyChanged}"
-           ItemTemplateSelector="{StaticResource TreeItemDataTemplateSelector}">
-            
-            <b:Interaction.Behaviors>
-                <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedNode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-            </b:Interaction.Behaviors>
+           ItemTemplateSelector="{StaticResource TreeItemDataTemplateSelector}"
+            SelectedObjects="{Binding SelectedObjects, UpdateSourceTrigger=PropertyChanged}">
 
-            <TreeView.Resources>
+            <local:MultiSelectTreeView.Resources>
                 <ContextMenu x:Key="NodeContextMenu" ItemsSource="{Binding DataContext.ContextMenu.Items, UpdateSourceTrigger=PropertyChanged,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" DisplayMemberPath="Name">
                     <ContextMenu.Resources>
                         <ControlTemplate x:Key="MenuSeparatorTemplate">
@@ -102,17 +96,17 @@
                       Color="LightBlue" />
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}"
                       Color="Black" />
-            </TreeView.Resources>
+            </local:MultiSelectTreeView.Resources>
 
-            <TreeView.ItemContainerStyle>
+            <local:MultiSelectTreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" />
                     <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
                     <Setter Property="ContextMenu" Value="{StaticResource NodeContextMenu}"/>
                 </Style>
-            </TreeView.ItemContainerStyle>
+            </local:MultiSelectTreeView.ItemContainerStyle>
 
 
-        </TreeView>
+        </local:MultiSelectTreeView>
     </DockPanel>
 </UserControl>

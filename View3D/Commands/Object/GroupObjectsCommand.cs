@@ -46,8 +46,8 @@ namespace View3D.Commands.Object
             var currentState = _selectionManager.GetState() as ObjectSelectionState;
             currentState.Clear();
 
-            foreach (var item in _itemsToGroup)
-                currentState.ModifySelection(item, false);
+            var itemsToSelect = groupNode.Children.Where(x => (x as ISelectable)?.IsSelectable == true).Select(x=>x as ISelectable).ToList();
+            currentState.ModifySelection(itemsToSelect, false);
         }
 
         protected override void UndoCommand()
@@ -107,9 +107,7 @@ namespace View3D.Commands.Object
 
             var currentState = _selectionManager.GetState() as ObjectSelectionState;
             currentState.Clear();
-
-            foreach (var item in _itemsToUngroup)
-                currentState.ModifySelection(item, false);
+            currentState.ModifySelection(_itemsToUngroup, false);
         }
 
         protected override void UndoCommand()
@@ -165,9 +163,7 @@ namespace View3D.Commands.Object
 
             var currentState = _selectionManager.GetState() as ObjectSelectionState;
             currentState.Clear();
-
-            foreach (var item in _itemsToGroup)
-                currentState.ModifySelection(item, false);
+            currentState.ModifySelection(_itemsToGroup, false);
         }
 
         protected override void UndoCommand()
