@@ -66,7 +66,7 @@ namespace View3D.Services
         {
             var subMeshList = new List<SubFaceObject>();
 
-            for (int i = 3; i < indexList.Count; i += 3)
+            for (int i = 0; i < indexList.Count; i += 3)
             {
                 bool isContainedInExistingObject = false;
                 foreach (var currentObject in subMeshList)

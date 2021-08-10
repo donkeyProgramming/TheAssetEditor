@@ -57,8 +57,8 @@ namespace View3D.Utility
             LoadEffect("Shaders\\TexturePreview", ShaderTypes.TexturePreview);
             LoadEffect("Shaders\\LineShader", ShaderTypes.Line);
 
-            PbrDiffuse = Content.Load<TextureCube>("textures\\phazer\\rustig_koppie_DiffuseHDR");
-            PbrSpecular = Content.Load<TextureCube>("textures\\phazer\\rad_sqwantani_bgra8");
+            PbrDiffuse = Content.Load<TextureCube>("textures\\phazer\\DIFFUSE_irr_qwantani_rgba32f");
+            PbrSpecular = Content.Load<TextureCube>("textures\\phazer\\SkyOnly_SpecularHDR");   // Skyonly
             PbrLut = Content.Load<Texture2D>("textures\\phazer\\Brdf_rgba32f_raw");
         }
 

@@ -65,32 +65,13 @@
 /processor:PassThroughProcessor
 /build:Textures/Phazer/Brdf_rgba32f_raw.DDS
 
-#begin Textures/Phazer/rad_sqwantani_bgra8.dds
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Textures/Phazer/rad_sqwantani_bgra8.dds
-
-#begin Textures/Phazer/rustig_koppie_DiffuseHDR.DDS
+#begin Textures/Phazer/DIFFUSE_irr_qwantani_rgba32f.dds
 /importer:TextureImporter
 /processor:PassThroughProcessor
-/build:Textures/Phazer/rustig_koppie_DiffuseHDR.DDS
+/build:Textures/Phazer/DIFFUSE_irr_qwantani_rgba32f.dds
 
-#begin Textures/Phazer/rustig_koppie_DiffuseHDR.DDS
+#begin Textures/Phazer/SkyOnly_SpecularHDR.dds
 /importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Textures/Phazer/rustig_koppie_DiffuseHDR.DDS
+/processor:PassThroughProcessor
+/build:Textures/Phazer/SkyOnly_SpecularHDR.dds
 

@@ -36,7 +36,7 @@ namespace View3D.Components.Rendering
 
         Dictionary<RenderBuckedId, List<IRenderItem>> _renderItems = new Dictionary<RenderBuckedId, List<IRenderItem>>();
 
-        public float LightRotationDegrees { get; set; } = 180;
+        public float LightRotationDegrees { get; set; } = 20;
         public float LightIntensityMult { get; set; } = 6;
 
         public RenderMode RenderMode { get; set; } = RenderMode.Cinematic;

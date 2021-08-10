@@ -58,10 +58,10 @@
     <None Update="ContentOutput\Textures\Phazer\Brdf_rgba32f_raw.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="ContentOutput\Textures\Phazer\rad_sqwantani_bgra8.xnb">
+    <None Update="ContentOutput\Textures\Phazer\DIFFUSE_irr_qwantani_rgba32f.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="ContentOutput\Textures\Phazer\rustig_koppie_DiffuseHDR.xnb">
+    <None Update="ContentOutput\Textures\Phazer\SkyOnly_SpecularHDR.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Content\Fonts\DefaultFont.spritefont">
@@ -118,6 +118,10 @@
     <None Update="Content\Textures\Phazer\rustig_koppie_DiffuseHDR.DDS">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ContentOutput\Textures\Phazer\" />
   </ItemGroup>
 
 </Project>

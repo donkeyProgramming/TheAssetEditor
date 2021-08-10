@@ -71,9 +71,9 @@ namespace View3D.Rendering.Shading
         {
             Effect = resourceLibary.GetEffect(ShaderTypes.Phazer);
 
-            Effect.Parameters["tex_cube_diffuse"].SetValue(resourceLibary.PbrDiffuse);
-            Effect.Parameters["tex_cube_specular"].SetValue(resourceLibary.PbrSpecular);
-            Effect.Parameters["specularBRDF_LUT"].SetValue(resourceLibary.PbrLut);
+            Effect.Parameters["tex_cube_diffuse"]?.SetValue(resourceLibary.PbrDiffuse);
+            Effect.Parameters["tex_cube_specular"]?.SetValue(resourceLibary.PbrSpecular);
+            Effect.Parameters["specularBRDF_LUT"]?.SetValue(resourceLibary.PbrLut);
 
             _textures.Add(TexureType.Diffuse, Effect.Parameters["DiffuseTexture"]);
             _textures.Add(TexureType.Specular, Effect.Parameters["SpecularTexture"]);
@@ -95,7 +95,7 @@ namespace View3D.Rendering.Shading
         public void SetTexture(Texture2D texture, TexureType type)
         {
             if (_textures.ContainsKey(type))
-                _textures[type].SetValue(texture);
+                _textures[type]?.SetValue(texture);
         }
 
         public void UseTexture(bool value, TexureType type)
@@ -111,6 +111,10 @@ namespace View3D.Rendering.Shading
             Effect.Parameters["EnvMapTransform"].SetValue((Matrix.CreateRotationY(commonShaderParameters.LightRotationRadians)));
             Effect.Parameters["LightMult"].SetValue(commonShaderParameters.LightIntensityMult);
             Effect.Parameters["World"].SetValue(modelMatrix);
+            Effect.Parameters["CameraPos"].SetValue(commonShaderParameters.CameraPosition);
+
+
+            
         }
 
         public bool UseAnimation { set { Effect.Parameters["doAnimation"].SetValue(value); } }

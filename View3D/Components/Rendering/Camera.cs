@@ -268,7 +268,7 @@ namespace View3D.Components.Rendering
                 MathHelper.ToRadians(45), // 45 degree angle
                 (float)_graphicsDevice.Viewport.Width /
                 (float)_graphicsDevice.Viewport.Height,
-                .01f, 150) * Matrix.CreateScale(-1, 1,1);
+                .01f, 250) * Matrix.CreateScale(-1, 1,1);
         }
 
         public Ray CreateCameraRay(Vector2 mouseLocation)

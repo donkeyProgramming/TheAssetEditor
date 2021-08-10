@@ -107,7 +107,7 @@ namespace View3D.Services
 
             foreach (var slot in mesh.ChildSlots)
             {
-                var slotNode = root.AddObject(new SlotNode(slot.Name));
+                var slotNode = root.AddObject(new SlotNode(slot.Name + " " + slot.AttachmentPoint, slot.AttachmentPoint));
 
                 foreach (var childMesh in slot.ChildMeshes)
                     LoadVariantMesh(childMesh, slotNode, player, ref skeletonName);

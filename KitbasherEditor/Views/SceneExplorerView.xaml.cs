@@ -90,7 +90,8 @@ namespace KitbasherEditor.Views
 
         void MyTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-
+            if (SelectedObjects == null)
+                return;
 
             try
             {
@@ -134,6 +135,9 @@ namespace KitbasherEditor.Views
 
         private void SelectedObjects_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            if (SelectedObjects == null)
+                return;
+
             try
             {
                 SelectedObjects.CollectionChanged -= SelectedObjects_CollectionChanged;
