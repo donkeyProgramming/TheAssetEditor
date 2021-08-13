@@ -31,6 +31,8 @@ namespace View3D.SceneNodes
         public Vector3 Position { get { return _position; } set { _position = value; UpdateMatrix(); } }
         public Vector3 Scale { get { return _scale; } set { _scale = value; UpdateMatrix(); } }
         public Quaternion Orientation { get { return _orientation; } set { _orientation = value; UpdateMatrix(); } }
+        public string AttachmentPointName { get; set; } = "";
+        public SkeletonBoneAnimationResolver AttachmentBoneResolver { get; set; } = null;
 
         public bool DisplayBoundingBox { get; set; } = false;
         public bool DisplayPivotPoint { get; set; } = false;
@@ -165,19 +167,23 @@ namespace View3D.SceneNodes
                     }
                 }
 
-                animationEffect.SetAnimationParameters(data, 4);
+                animationEffect.SetAnimationParameters(data, (Geometry as Rmv2Geometry).WeightCount);
                 animationEffect.UseAnimation = AnimationPlayer.IsEnabled;
             }
 
+
+            if(AttachmentBoneResolver != null)
+                parentWorld = parentWorld * AttachmentBoneResolver.GetWorldTransform();
+
             if (Effect is IShaderTextures tetureEffect)
                 tetureEffect.UseAlpha = MeshModel.AlphaSettings.Mode == AlphaMode.Alpha_Test;
-            renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeoRenderItem() { Geometry = Geometry, ModelMatrix = parentWorld* ModelMatrix, Shader = Effect });
+
+            var pivotPos = new Vector3(MeshModel.Header.Transform.Pivot.X, MeshModel.Header.Transform.Pivot.Y, MeshModel.Header.Transform.Pivot.Z);
+            var modelWithOffset = ModelMatrix * Matrix.CreateTranslation(pivotPos);
+            renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeoRenderItem() { Geometry = Geometry, ModelMatrix = modelWithOffset * parentWorld, Shader = Effect });
 
             if (DisplayPivotPoint)
-            {
-                var pivotPos = new Vector3(-MeshModel.Header.Transform.Pivot.X, MeshModel.Header.Transform.Pivot.Y, MeshModel.Header.Transform.Pivot.Z);
                 renderEngine.AddRenderItem(RenderBuckedId.Normal, new LocatorRenderItem(_resourceLib.GetStaticEffect(ShaderTypes.Line), pivotPos, 1));
-            }
 
             if (DisplayBoundingBox)
             {

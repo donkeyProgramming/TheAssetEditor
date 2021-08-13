@@ -62,6 +62,28 @@ namespace KitbasherEditor.Views
         {
             SelectedItemChanged += MyTreeView_SelectedItemChanged;
             Focusable = true;
+            PreviewMouseDoubleClick += MultiSelectTreeView_PreviewMouseDoubleClick;   
+        }
+
+        private void MultiSelectTreeView_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            TreeViewItem treeViewItem = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+            if (treeViewItem != null)
+            {
+                var node = treeViewItem.DataContext as SceneNode;
+                if (node != null)
+                    node.IsExpanded = !node.IsExpanded;
+            }
+
+            e.Handled = true;
+        }
+
+        public static TreeViewItem VisualUpwardSearch(DependencyObject source)
+        {
+            while (source != null && !(source is TreeViewItem))
+                source = VisualTreeHelper.GetParent(source);
+
+            return source as TreeViewItem;
         }
 
         void Deselect(TreeViewItem treeViewItem, ISceneNode node)

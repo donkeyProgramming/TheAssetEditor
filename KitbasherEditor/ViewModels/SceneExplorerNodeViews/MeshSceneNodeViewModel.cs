@@ -1,4 +1,5 @@
 ﻿using Common;
+using CommonControls.Common;
 using CommonControls.Editors.BoneMapping;
 using CommonControls.MathViews;
 using CommonControls.PackFileBrowser;
@@ -13,8 +14,10 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using TextureEditor.ViewModels;
+using View3D.Animation;
 using View3D.Components.Component;
 using View3D.SceneNodes;
+using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
@@ -43,6 +46,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
     {
         Rmv2MeshNode _meshNode;
         IComponentManager _componentManager;
+
 
         public string ModelName { get { return _meshNode.MeshModel.Header.ModelName; } set { UpdateModelName(value); NotifyPropertyChanged(); } }
 
@@ -118,6 +122,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         List<AnimatedBone> _animatedBones;
         public List<AnimatedBone> AnimatedBones { get { return _animatedBones; } set { SetAndNotify(ref _animatedBones, value); } }
 
+        public FilterCollection<AnimatedBone> ModelBoneList { get; set; } = new FilterCollection<AnimatedBone>(null); 
+
         public MeshSceneNodeViewModel_Animation(PackFileService pfs, Rmv2MeshNode meshNode, SkeletonAnimationLookUpHelper animLookUp, IComponentManager componentManager)
         {
             _pfs = pfs;
@@ -143,15 +149,46 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 if (!hasValidBoneMapping)
                     MessageBox.Show("Mesh an invalid bones, this might cause issues. Its a result of an invalid re-rigging");
 
+                var boneList = AnimatedBoneHelper.CreateFlatSkeletonList(skeletonFile);
+
                 if (skeletonFile != null && hasValidBoneMapping)
                 {
-                    AnimatedBones = bones.Select(x => new AnimatedBone(x, skeletonFile.Bones[x].Name))
+                    AnimatedBones = boneList
                         .OrderBy(x => x.BoneIndex.Value)
                         .ToList();
                 }
+
             }
+
+            var existingSkeletonMeshNode = _meshNode.GetParentModel();
+            var existingSkeltonName = existingSkeletonMeshNode.Model.Header.SkeletonName;
+            var existingSkeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, existingSkeltonName);
+
+            var possiblePropBoneList = AnimatedBoneHelper.CreateFlatSkeletonList(existingSkeletonFile);
+            ModelBoneList.UpdatePossibleValues(possiblePropBoneList, new AnimatedBone(-1, "none"));
+            ModelBoneList.SelectedItemChanged += ModelBoneList_SelectedItemChanged;
+            ModelBoneList.SearchFilter = (value, rx) => { return rx.Match(value.Name.Value).Success; };
+            ModelBoneList.SelectedItem = ModelBoneList.PossibleValues.FirstOrDefault(x => x.Name.Value == _meshNode.AttachmentPointName);
+         
         }
 
+        private void ModelBoneList_SelectedItemChanged(AnimatedBone newValue)
+        {
+            MainEditableNode mainNode = _meshNode.GetParentModel() as MainEditableNode;
+            if (mainNode == null)
+                return;
+
+            if (newValue != null && newValue.BoneIndex.Value != -1)
+            {
+                _meshNode.AttachmentPointName = newValue.Name.Value;
+                _meshNode.AttachmentBoneResolver = new SkeletonBoneAnimationResolver(mainNode.Skeleton.AnimationProvider, newValue.BoneIndex.Value);
+            }
+            else
+            {
+                _meshNode.AttachmentPointName = null;
+                _meshNode.AttachmentBoneResolver = null;
+            }
+        }
     }
 
     public class MeshSceneNodeViewModel_Graphics : NotifyPropertyChangedImpl

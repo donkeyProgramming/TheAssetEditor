@@ -124,6 +124,18 @@
                     </StackPanel>
                 </StackPanel>
 
+
+                <DockPanel DockPanel.Dock="Top" >
+                    <Label Width="100">Attach to:</Label>
+                    <Label>:</Label>
+                    <ComboBox Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" 
+                          IsEditable="True"
+                          IsTextSearchEnabled="false"
+                          DisplayMemberPath="Name.Value"
+                          Text="{Binding Animation.ModelBoneList.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                          ItemsSource="{Binding Animation.ModelBoneList.Values}" 
+                          SelectedItem="{Binding Animation.ModelBoneList.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                </DockPanel>
             </DockPanel>
         </GroupBox>
 

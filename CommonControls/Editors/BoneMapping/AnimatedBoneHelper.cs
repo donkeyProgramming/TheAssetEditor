@@ -47,6 +47,17 @@ namespace CommonControls.Editors.BoneMapping
             return output;
         }
 
+        public static ObservableCollection<AnimatedBone> CreateFlatSkeletonList(AnimationFile file)
+        {
+            var output = new ObservableCollection<AnimatedBone>();
+            foreach(var boneInfo in file.Bones)
+            {
+                var newNode = new AnimatedBone(boneInfo.Id, boneInfo.Name);
+                output.Add(newNode);
+            }
+            return output;
+        }
+
         static AnimatedBone FindBoneInList(int parentId, IEnumerable<AnimatedBone> boneList)
         {
             foreach (var bone in boneList)

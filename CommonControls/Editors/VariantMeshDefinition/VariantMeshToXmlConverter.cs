@@ -55,7 +55,7 @@ namespace CommonControls.Editors.VariantMeshDefinition
             if (string.IsNullOrWhiteSpace(mesh.ModelReference) == false)
             {
                 if (pfs.FindFile(mesh.ModelReference) == null)
-                    return new ITextConverter.SaveError() { Text = $"Unabel to find file {mesh.ModelReference}", ErrorLineNumber = 1, ErrorPosition = 0, ErrorLength = 0 };
+                    return new ITextConverter.SaveError() { Text = $"Unabel to find file '{mesh.ModelReference}'", ErrorLineNumber = 1, ErrorPosition = 0, ErrorLength = 0 };
             }
 
             foreach (var slot in mesh.ChildSlots)
@@ -95,57 +95,8 @@ namespace CommonControls.Editors.VariantMeshDefinition
             return typedObject;
         }
 
-
-
         public bool ShouldShowLineNumbers() => true;
         public string GetSyntaxType() => "XML";
         public bool CanSaveOnError() => true;
     }
-
-  
 }
-/*
-         public static VariantMesh Create(string fileContent)
-        {
-            ITextConverter.SaveError tempError = null; ;
-            var xmlEventHandler = new XmlDeserializationEvents();
-            xmlEventHandler.OnUnknownElement = (x, e) => tempError = new ITextConverter.SaveError()
-            {
-                Text = "Unsuported xml element : " + e.Element.LocalName + $" at line {e.LineNumber} and position {e.LinePosition}",
-                ErrorLineNumber = e.LineNumber,
-                ErrorPosition = e.LinePosition - e.Element.LocalName.Length,
-                ErrorLength = e.Element.LocalName.Length
-            };
-
-            xmlEventHandler.OnUnknownAttribute = (x, e) => tempError = new ITextConverter.SaveError()
-            {
-                Text = "Unsuported xml attribute : " + e.Attr.LocalName + $" at line {e.LineNumber} and position {e.LinePosition}",
-                ErrorLineNumber = e.LineNumber,
-                ErrorPosition = e.LinePosition - e.Attr.LocalName.Length,
-                ErrorLength = e.Attr.LocalName.Length
-            };
-
-            xmlEventHandler.OnUnknownNode = (x, e) => tempError = new ITextConverter.SaveError()
-            {
-                Text = "Unsuported xml node : " + e.LocalName + $" at line {e.LineNumber} and position {e.LinePosition}",
-                ErrorLineNumber = e.LineNumber,
-                ErrorPosition = e.LinePosition - e.LocalName.Length,
-                ErrorLength = e.LocalName.Length
-            }; 
-
-
-            XmlRootAttribute xRoot = new XmlRootAttribute("VARIANT_MESH");
-
-            var xmlserializer = new XmlSerializer(typeof(VariantMesh), xRoot);
-            using var stringReader = new StringReader(fileContent);
-            var reader = XmlReader.Create(stringReader);
-
-          
-            var obj = xmlserializer.Deserialize(reader, xmlEventHandler);
-            var typedObject = obj as VariantMesh;
-
-
-            return typedObject;
-
-        }
- */

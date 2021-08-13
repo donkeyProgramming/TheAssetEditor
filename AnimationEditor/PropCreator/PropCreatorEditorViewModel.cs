@@ -212,7 +212,9 @@ namespace AnimationEditor.PropCreator
         private void UpdateBoneSnap()
         {
             if (SelectedRefBone != null && SnapToRefBone == true)
-                Data.SnapToBoneResolver = new View3D.Utility.SkeletonBoneAnimationResolver(ReferenceAsset.Skeleton, SelectedRefBone.BoneIndex);
+            {
+                Data.SnapToBoneResolver = new View3D.Utility.SkeletonBoneAnimationResolver(new SimpleSkeletonProvider(ReferenceAsset.Skeleton), SelectedRefBone.BoneIndex);
+            }
             else
                 Data.SnapToBoneResolver = null;
         }

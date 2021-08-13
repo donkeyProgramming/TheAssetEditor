@@ -92,7 +92,7 @@ namespace AssetEditor.ViewModels
                
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 // MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
-                KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
+                KitbashEditor_Debug.CreatePaladin(this, toolFactory, packfileService);
                 //AnimationTransferTool_Debug.CreateDamselEditor(this, toolFactory, packfileService);
 
                 //var f = packfileService.FindFile(@"animations\campaign\database\bin\cam_hero_hu1d_def_spear_and_shield.bin");

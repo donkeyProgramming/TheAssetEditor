@@ -3,15 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using View3D.Animation;
+using View3D.SceneNodes;
 
 namespace View3D.Utility
 {
     public class SkeletonBoneAnimationResolver
     {
-        GameSkeleton _gameSkeleton;
+        IAnimationProvider _gameSkeleton;
         int _boneIndex;
 
-        public SkeletonBoneAnimationResolver(GameSkeleton gameSkeleton, int boneIndex)
+        public SkeletonBoneAnimationResolver(IAnimationProvider gameSkeleton, int boneIndex)
         {
             _gameSkeleton = gameSkeleton;
             _boneIndex = boneIndex;
@@ -19,8 +20,7 @@ namespace View3D.Utility
 
         public Matrix GetWorldTransform()
         {
-            return _gameSkeleton.GetAnimatedWorldTranform(_boneIndex);
+            return _gameSkeleton.Skeleton.GetAnimatedWorldTranform(_boneIndex);
         }
-
     }
 }

@@ -92,40 +92,30 @@ Sound
 ---------
 
 v14
-	[X]Better variantmeshdefinition handling => Show errors 
-	[X]Validate variantmeshdefinition
-	[X]Generic text -> binary editor 
-	[X]AnimBin
-	[X]TreeView multi select
-	[X - not really a thing] Compagin anims missing from anim search
-	[X]Flip left/Right view in rendering
-	[X]Scale on mount tool broken?
-	[x]Mesh split removes random faces
+	[X] Better variantmeshdefinition handling => Show errors 
+	[X] Validate variantmeshdefinition
+	[X] Generic text -> binary editor 
+	[X] AnimBin
+	[X] TreeView multi select
+	[X - can not reproduce] Compagin anims missing from anim search
+	[X] Flip left/Right view in rendering
+	[X] Scale on mount tool broken?
+	[x] Mesh split removes random faces
+	[x] ANimated mesh => static prop bugs
+	[x] Issue when pressing save in the mesh fitter tool, mesh no longer deforms slightly
+	
+	
+	Double clikcing mesh tree not expanding
 	
 	Remapping 
 		- Open last setting (auto save to file?)
 		- Apply mapping to all children
 		- Clear single button
-	
-	Added materials and shit as supported text formats 
-	Mesh without polygons error while generating bb
-	 
-	Invert mesh normals 
-	Weights issues 
-	lod large 5 models file?
-	Different pivs, warning? 
+		
 	Look into some shading shit	
 		Toggle backface
 		Show normals  + validation
 		Weights?
-
-	Search opening folders - Hourglass
-	filetypes for browse dialog
-	Animation transfer tool: - Scale bone length - usefull for root anims 
-	Animation transfer tool: - Copy setting to children (force snap, freeze)
-	
-	handle pivs when rendering?
-	
 	
 	Validation:
 		Different pivs
@@ -133,6 +123,32 @@ v14
 		Empty mesh 
 		Vertex weights 
 		Normals 
+		
+	Props during playback
+		offsets 
+	
+	Added materials and shit as supported text formats 
+	Mesh without polygons error while generating bb
+	ANimated mesh => static prop not working 
+	 
+	Invert mesh normals 
+	Weights issues 
+	lod large 5 models file?
+
+	Thrones of britania loading 
+
+	Show skeleton
+	Search opening folders - Hourglass
+	filetypes for browse dialog
+	Animation transfer tool: - Scale bone length - usefull for root anims 
+	Animation transfer tool: - Copy setting to children (force snap, freeze)
+	
+	handle pivs when rendering?
+	Yellow tool save, small shrink, why?
+	
+	split hair into group
+
+----
 
 
 Scale places - Mount tool 

@@ -75,11 +75,21 @@ namespace KitbasherEditor.Services
             { 
                 node.IsEditable = false;
                 if (node is ISelectable selectable)
+                {
                     selectable.IsSelectable = false;
-            });
-            ReferenceMeshRoot.AddObject(result);
+                }
 
-            //_animationView.SetActiveSkeleton(result.f.Header.SkeletonName);
+                if (node is Rmv2MeshNode mesh && string.IsNullOrWhiteSpace(mesh.AttachmentPointName) == false)
+                {
+                    if (EditableMeshNode.Skeleton.AnimationProvider?.Skeleton != null)
+                    {
+                        int boneIndex = EditableMeshNode.Skeleton.AnimationProvider.Skeleton.GetBoneIndexByName(mesh.AttachmentPointName);
+                        mesh.AttachmentBoneResolver = new SkeletonBoneAnimationResolver(EditableMeshNode.Skeleton.AnimationProvider, boneIndex);
+                    }
+                }
+            });
+
+            ReferenceMeshRoot.AddObject(result);
         }
     }
 }

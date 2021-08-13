@@ -7,8 +7,10 @@ using System.Text.RegularExpressions;
 
 namespace CommonControls.Common
 {
-    public class FilterCollection<T> : NotifyPropertyChangedImpl
+    public class FilterCollection<T> : NotifyPropertyChangedImpl where T:class
     {
+        public event ValueChangedDelegate<T> SelectedItemChanged;
+
         public List<T> PossibleValues { get; set; }
 
         ObservableCollection<T> _values;
@@ -16,8 +18,6 @@ namespace CommonControls.Common
 
         T _selectedItem;
         public T SelectedItem { get => _selectedItem; set => SetAndNotify<T>(ref _selectedItem, value, SelectedItemChanged); }
-        public event ValueChangedDelegate<T> SelectedItemChanged;
-
 
         // Filter stuff
         string _filter;
@@ -42,7 +42,7 @@ namespace CommonControls.Common
                 SelectedItemChanged += valueChangedEvent;
         }
 
-        public void UpdatePossibleValues(IEnumerable<T> data)
+        public void UpdatePossibleValues(IEnumerable<T> data, T emptyItem = null)
         {
             if (data == null)
             {
@@ -54,6 +54,9 @@ namespace CommonControls.Common
                 // TODO fix this so it works. Index maybe?
                 var selectedItem = SelectedItem;
                 PossibleValues = new List<T>(data);
+                if (emptyItem != null)
+                    PossibleValues.Insert(0, emptyItem);
+
                 Values = new ObservableCollection<T>(PossibleValues);
                 SelectedItem = selectedItem;
             }
