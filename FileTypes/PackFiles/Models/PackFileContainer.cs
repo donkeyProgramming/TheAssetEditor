@@ -1,4 +1,5 @@
 ﻿using Common;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,6 +13,8 @@ namespace FileTypes.PackFiles.Models
 
     public class PackFileContainer
     {
+        ILogger _logger = Logging.Create<PackFileContainer>();
+
         public string Name { get; set; }
 
         public PFHeader Header { get; set; }
@@ -77,7 +80,8 @@ namespace FileTypes.PackFiles.Models
         public void SaveToByteArray(BinaryWriter writer)
         {
             long fileNamesOffset = 0;
-            foreach (var file in FileList)
+            var sortedFiles = FileList.OrderBy(x => x.Key);
+            foreach (var file in sortedFiles)
             {
                 if (Header.Version == "PFH5")
                     fileNamesOffset += 1;
@@ -89,26 +93,38 @@ namespace FileTypes.PackFiles.Models
             Header.Save(FileList.Count(), (int)fileNamesOffset, writer);
 
             // Save all the files
-            var sortedFiles = FileList.OrderBy(x => x.Key);
             foreach (var file in sortedFiles)
             {
-                writer.Write((int)(file.Value as PackFile).DataSource.Size);
+                var fileSize = (int)(file.Value as PackFile).DataSource.Size;
+                writer.Write(fileSize);
+
                 if (Header.HasAdditionalInfo)
                     writer.Write((int)0);   // timestamp
 
                 if (Header.Version == "PFH5")
                     writer.Write((byte)0);  // Compression
 
+                // Filename
                 foreach (byte c in file.Key)
                     writer.Write(c);
+
+                // Zero terminator
                 writer.Write((byte)0);
             }
 
+            PackedFileSourceParent packedFileSourceParent = new PackedFileSourceParent()
+            {
+                FilePath = SystemFilePath,
+            };
 
             // Write the files
             foreach (var file in sortedFiles)
             {
                 var data = (file.Value as PackFile).DataSource.ReadData();
+                var offset = writer.BaseStream.Position;
+                var dataLength = data.Length;
+                (file.Value as PackFile).DataSource = new PackedFileSource(packedFileSourceParent, offset, dataLength);
+
                 writer.Write(data);
             }
         }

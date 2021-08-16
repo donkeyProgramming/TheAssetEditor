@@ -34,9 +34,8 @@ namespace CommonControls.Editors.VariantMeshDefinition
                 // Validate
                 var obj = LoadFromString(text);;
                 error = ValidateFilePaths(obj, pfs);
-                if(error == null)
-                    return Encoding.UTF8.GetBytes(text);
-                return null;
+               
+                return Encoding.UTF8.GetBytes(text);
             }
             catch (Exception e)
             {
@@ -46,7 +45,7 @@ namespace CommonControls.Editors.VariantMeshDefinition
                 else
                     error = new ITextConverter.SaveError() { Text = e.Message };
 
-                return null;
+                return Encoding.UTF8.GetBytes(text);
             }
         }
 

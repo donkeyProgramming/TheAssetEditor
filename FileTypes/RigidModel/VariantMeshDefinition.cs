@@ -51,6 +51,9 @@ namespace Filetypes.RigidModel
             [XmlAttribute("attach_point")]
             public string AttachmentPoint { get; set; }
 
+            [XmlAttribute("probability")]
+            public string Probability { get; set; }
+
             [XmlAttribute("name")]
             public string Name { get; set; }
 

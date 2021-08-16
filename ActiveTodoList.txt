@@ -41,11 +41,10 @@ Kitbash:
 		Vertex weights 
 	Mesh without polygons error while generating bb (unsure when and why)
 	Distribute leftover weights using ratio instead of average 
-		
+	Total vertex and index count 
+	
 Misc:
-	Compagin anims missing from anim search
 	Memory leaks
-	Imprive saving so it does not crahs - auto of memory
 	Send errors to server?
 	Improve saving - invalid folders ((nothing)/nothing)filename.ext)
 	about box - Dont break eula
@@ -60,11 +59,14 @@ Animation transfer tool:
 	Scale bone length - usefull for root anims 
 	Copy setting to children (force snap, freeze)
 	Clear all settings
+	Auto select generated animation
+	Scale model using matrix, allow save of that scaled mesh 
 	
 Mount tool:
 	Make it eaiser to use
 	One click make animpack by combining rider and mount frg. 
 	"Add capabilites" function (fire while moving, casting++)
+	Auto select generated animation
 	
 Super view:
 	View on mount 
@@ -99,6 +101,10 @@ Sound?
 3d texture painter?!
 
 ---------Next version
+
+v15
+	variantmeshes/variantmeshdefinitions/emp_wizard_light.variantmeshdefinition probability tag
+	Save anyway for xml veriantmesh not working
 
 v14
 	[X] Better variantmeshdefinition handling => Show errors 
