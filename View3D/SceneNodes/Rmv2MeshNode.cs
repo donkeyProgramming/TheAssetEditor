@@ -168,12 +168,7 @@ namespace View3D.SceneNodes
                     if (frame != null)
                     {
                         for (int i = 0; i < frame.BoneTransforms.Count(); i++)
-                        {
-                            //var d = frame.BoneTransforms[i].WorldTransform;
-                            //d.M44 = 1;
-                            //frame.BoneTransforms[i].WorldTransform = d;
                             data[i] = frame.BoneTransforms[i].WorldTransform;
-                        }
                     }
                 }
 
@@ -183,7 +178,7 @@ namespace View3D.SceneNodes
 
 
             if(AttachmentBoneResolver != null)
-                parentWorld = parentWorld * AttachmentBoneResolver.GetWorldTransform();
+                parentWorld = parentWorld * AttachmentBoneResolver.GetWorldTransformIfAnimating();
 
             if (Effect is IShaderTextures tetureEffect)
                 tetureEffect.UseAlpha = MeshModel.AlphaSettings.Mode == AlphaMode.Alpha_Test;

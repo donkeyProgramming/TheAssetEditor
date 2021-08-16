@@ -19,7 +19,7 @@ namespace View3D.Animation
         public int BoneCount { get; set; }
         public string SkeletonName { get; set; }
 
-        AnimationPlayer AnimationPlayer { get; set; }
+        public AnimationPlayer AnimationPlayer { get; private set; }
 
         public GameSkeleton(AnimationFile skeletonFile, AnimationPlayer animationPlayer)
         {

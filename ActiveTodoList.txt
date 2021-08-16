@@ -120,8 +120,10 @@ v14
 	[x] bone mapping view -> Copy settings to all childre. Clear self 
 	[x]lod large 5 models file?
 	[x] 	Click select vertexes! 
+	[x] Chaos dragon => clicking editbale model changes skeleton to tech skeleton
 	
 	Erro when combining meshes with more then uint16 parts
+	
 	Wireframe mode
 	Orthigraphic projection
 	
@@ -129,7 +131,7 @@ v14
 	
 	Improve frg editor! 
 	
-	Chaos dragon => clicking editbale model changes skeleton to tech skeleton
+	
 
 	[Can not reproduce? ]Weight bug => hu6 skeleton and the mesh was the head from the coatl (well i cut it off by deleting the rest of the body), the head of the lord of change and a piece of equipment from the lord of change
 	
@@ -150,3 +152,34 @@ variantmeshes\wh_variantmodels\hu6\bst\bst_bestigors\torso\bst_bestigor_torso_01
 
 
 Scale places - Mount tool 
+
+
+
+
+General:
+- Generic editor system for binary=>text=>binary 
+- Validation of VariantMeshDefinition files on save, with error handling (missing files, incorrect xml) 
+- Campagin Bin editor 
+- Models are no longer mirrored compared to in game
+- Huge improvment to the rendering thanks to Phazer
+- Should no longer get out of memory error while saving large files
+- Program is now 64bit
+
+Kitbash:
+- Multi select meshes
+- Splitting meshes into subpart removed random faces
+- Convert animated mesh at a pose into static mesh not working
+- Fixed some issues with how animation data was calculated. This caused a small (some times huge) error when using the meshfitter or static mesh creator
+- Some animation weight issues fixed
+- Props are attached during playback
+- Pivotpoint is taken into account during playback
+- New mapping options in Bone mapping window (clear self, copy self to children)
+- Possible to click on vertexes, not just drag selection
+- Lod for meshes with 5 lods should work now
+- Bug which caused skeleton to change if there was a tech skeleton available 
+
+Mount tool:
+- Fixed scale bug 
+
+	
+

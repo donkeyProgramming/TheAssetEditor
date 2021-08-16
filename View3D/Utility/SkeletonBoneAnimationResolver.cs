@@ -9,18 +9,25 @@ namespace View3D.Utility
 {
     public class SkeletonBoneAnimationResolver
     {
-        IAnimationProvider _gameSkeleton;
+        IAnimationProvider _animationProvider;
         int _boneIndex;
 
         public SkeletonBoneAnimationResolver(IAnimationProvider gameSkeleton, int boneIndex)
         {
-            _gameSkeleton = gameSkeleton;
+            _animationProvider = gameSkeleton;
             _boneIndex = boneIndex;
         }
 
         public Matrix GetWorldTransform()
         {
-            return _gameSkeleton.Skeleton.GetAnimatedWorldTranform(_boneIndex);
+            return _animationProvider.Skeleton.GetAnimatedWorldTranform(_boneIndex);
+        }
+
+        public Matrix GetWorldTransformIfAnimating()
+        {
+            if(_animationProvider.Skeleton.AnimationPlayer.IsEnabled && _animationProvider.Skeleton.AnimationPlayer.IsPlaying)
+                return _animationProvider.Skeleton.GetAnimatedWorldTranform(_boneIndex);
+            return Matrix.Identity;
         }
     }
 }
