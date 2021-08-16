@@ -80,7 +80,7 @@ namespace FileTypes.PackFiles.Models
         public byte[] ReadData()
         {
             byte[] data = new byte[Size];
-            using (Stream stream = File.OpenRead(_parent.FilePath))
+            using (Stream stream = File.Open(_parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 stream.Seek(Offset, SeekOrigin.Begin);
                 stream.Read(data, 0, data.Length);

@@ -20,7 +20,7 @@ namespace View3D.Rendering.RenderItems
 
         public void Draw(GraphicsDevice device, CommonShaderParameters parameters)
         {
-            VertexRenderer.Update(Node.Geometry, Node.ModelMatrix, Node.Orientation, parameters.CameraPosition, SelectedVertices);
+            VertexRenderer.Update(Node.Geometry, Node.RenderMatrix, Node.Orientation, parameters.CameraPosition, SelectedVertices);
             VertexRenderer.Draw(parameters.View, parameters.Projection, device, new Vector3(0, 1, 0));
         }
     }

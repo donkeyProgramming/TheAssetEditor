@@ -116,7 +116,7 @@ namespace View3D.Components.Component.Selection
             var currentState = _selectionManager.GetState();
             if (currentState.Mode == GeometrySelectionMode.Face && currentState is FaceSelectionState faceState)
             {
-                if (GeometryIntersection.IntersectFaces(unprojectedSelectionRect, faceState.RenderObject.Geometry, faceState.RenderObject.ModelMatrix, out var faces))
+                if (GeometryIntersection.IntersectFaces(unprojectedSelectionRect, faceState.RenderObject.Geometry, faceState.RenderObject.RenderMatrix, out var faces))
                 {
                     var faceSelectionCommand = new FaceSelectionCommand(faces, isSelectionModification, removeSelection);
                     _commandManager.ExecuteCommand(faceSelectionCommand);
@@ -125,7 +125,7 @@ namespace View3D.Components.Component.Selection
             }
             else if (currentState.Mode == GeometrySelectionMode.Vertex && currentState is VertexSelectionState vertexState)
             {
-                if (GeometryIntersection.IntersectVertices(unprojectedSelectionRect, vertexState.RenderObject.Geometry, vertexState.RenderObject.ModelMatrix, out var vertices))
+                if (GeometryIntersection.IntersectVertices(unprojectedSelectionRect, vertexState.RenderObject.Geometry, vertexState.RenderObject.RenderMatrix, out var vertices))
                 {
                     var vertexSelectionCommand = new VertexSelectionCommand(vertices, isSelectionModification, removeSelection);
                     _commandManager.ExecuteCommand(vertexSelectionCommand);
@@ -154,18 +154,23 @@ namespace View3D.Components.Component.Selection
         {
             var ray = _camera.CreateCameraRay(mousePosition);
             var currentState = _selectionManager.GetState();
-            if (currentState.Mode == GeometrySelectionMode.Face)
-            {
-                if (currentState.Mode == GeometrySelectionMode.Face)
+            if (currentState is FaceSelectionState faceState)
+            {  
+                if (GeometryIntersection.IntersectFace(ray, faceState.RenderObject.Geometry, faceState.RenderObject.RenderMatrix, out var selectedFace) != null)
                 {
-                    var faceState = currentState as FaceSelectionState;
-                    
-                    if (GeometryIntersection.IntersectFace(ray, faceState.RenderObject.Geometry, faceState.RenderObject.ModelMatrix, out var selectedFace) != null)
-                    {
-                        FaceSelectionCommand faceSelectionCommand = new FaceSelectionCommand(selectedFace.Value, isSelectionModification, removeSelection);
-                        _commandManager.ExecuteCommand(faceSelectionCommand);
-                        return;
-                    }
+                    FaceSelectionCommand faceSelectionCommand = new FaceSelectionCommand(selectedFace.Value, isSelectionModification, removeSelection);
+                    _commandManager.ExecuteCommand(faceSelectionCommand);
+                    return;
+                }
+            }
+
+            if (currentState is VertexSelectionState vertexState)
+            {
+                if (GeometryIntersection.IntersectVertex(ray, vertexState.RenderObject.Geometry, _camera.Position, vertexState.RenderObject.RenderMatrix, out var selecteVert) != null)
+                {
+                    var selectCommand = new VertexSelectionCommand(new List<int>() { selecteVert }, isSelectionModification, removeSelection);
+                    _commandManager.ExecuteCommand(selectCommand);
+                    return;
                 }
             }
 

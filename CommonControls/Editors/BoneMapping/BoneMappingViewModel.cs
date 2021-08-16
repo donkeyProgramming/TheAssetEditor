@@ -96,6 +96,28 @@ namespace CommonControls.Editors.BoneMapping
             BoneMappingHelper.AutomapDirectBoneLinksBasedOnHierarchy(MeshBones.SelectedItem, ParentModelBones.SelectedItem);
         }
 
+        public virtual void ClearBindingSelf()
+        {
+            if (MeshBones.SelectedItem == null)
+            {
+                MessageBox.Show("No mesh bone selected - Please select a bone first");
+                return;
+            }
+
+            MeshBones.SelectedItem.ClearMapping(false);
+        }
+
+        public virtual void CopyMappingToAllChildren()
+        {
+            if (MeshBones.SelectedItem == null)
+            {
+                MessageBox.Show("No mesh bone selected - Please select a bone first");
+                return;
+            }
+
+            MeshBones.SelectedItem.ApplySelfToChildren();
+        }
+
         void CreateFromConfiguration(RemappedAnimatedBoneConfiguration config)
         {
             MeshBones.UpdatePossibleValues(config.MeshBones);

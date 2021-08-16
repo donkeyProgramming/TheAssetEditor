@@ -1,6 +1,4 @@
 ﻿using Filetypes.RigidModel;
-using Filetypes.RigidModel.Vertex;
-using MeshDecimator;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -9,7 +7,6 @@ using System.Linq;
 using View3D.Animation;
 using View3D.Components.Gizmo;
 using View3D.Components.Rendering;
-using View3D.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.Rendering.RenderItems;
 using View3D.Rendering.Shading;
@@ -36,6 +33,14 @@ namespace View3D.SceneNodes
 
         public bool DisplayBoundingBox { get; set; } = false;
         public bool DisplayPivotPoint { get; set; } = false;
+
+        public override Matrix ModelMatrix { get => base.ModelMatrix; set => UpdateModelMatrix(value); }
+
+        private void UpdateModelMatrix(Matrix value)
+        {
+            base.ModelMatrix = value;
+            RenderMatrix = value;
+        }
 
         void UpdateMatrix()
         {
@@ -163,7 +168,12 @@ namespace View3D.SceneNodes
                     if (frame != null)
                     {
                         for (int i = 0; i < frame.BoneTransforms.Count(); i++)
+                        {
+                            //var d = frame.BoneTransforms[i].WorldTransform;
+                            //d.M44 = 1;
+                            //frame.BoneTransforms[i].WorldTransform = d;
                             data[i] = frame.BoneTransforms[i].WorldTransform;
+                        }
                     }
                 }
 
@@ -180,6 +190,8 @@ namespace View3D.SceneNodes
 
             var pivotPos = new Vector3(MeshModel.Header.Transform.Pivot.X, MeshModel.Header.Transform.Pivot.Y, MeshModel.Header.Transform.Pivot.Z);
             var modelWithOffset = ModelMatrix * Matrix.CreateTranslation(pivotPos);
+            RenderMatrix = modelWithOffset;
+
             renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeoRenderItem() { Geometry = Geometry, ModelMatrix = modelWithOffset * parentWorld, Shader = Effect });
 
             if (DisplayPivotPoint)

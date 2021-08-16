@@ -191,9 +191,12 @@ namespace CommonControls.PackFileBrowser
                 systemPath = saveFileDialog.FileName;
             }
 
-            _packFileService.Save(_selectedNode.FileOwner, systemPath, true);            
-            _selectedNode.UnsavedChanged = false;
-            _selectedNode.ForeachNode((node) => node.UnsavedChanged = false);
+            using (new WaitCursor())
+            {
+                _packFileService.Save(_selectedNode.FileOwner, systemPath, true);
+                _selectedNode.UnsavedChanged = false;
+                _selectedNode.ForeachNode((node) => node.UnsavedChanged = false);
+            }
         }
 
         void SaveAsPackFile()
@@ -205,9 +208,12 @@ namespace CommonControls.PackFileBrowser
             if (saveFileDialog.ShowDialog() == false)
                 return;
 
-            _packFileService.Save(_selectedNode.FileOwner, saveFileDialog.FileName, true);
-            _selectedNode.UnsavedChanged = false;
-            _selectedNode.ForeachNode((node) => node.UnsavedChanged = false);
+            using (new WaitCursor())
+            {
+                _packFileService.Save(_selectedNode.FileOwner, saveFileDialog.FileName, true);
+                _selectedNode.UnsavedChanged = false;
+                _selectedNode.ForeachNode((node) => node.UnsavedChanged = false);
+            }
         }
 
         void CopyNodePath()

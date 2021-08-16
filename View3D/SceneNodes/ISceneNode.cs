@@ -13,6 +13,7 @@ namespace View3D.SceneNodes
         bool IsExpanded { get; set; }
         bool IsVisible { get; set; }
         Matrix ModelMatrix { get; set; }
+        Matrix RenderMatrix { get; }
         string Name { get; set; }
         ISceneNode Parent { get; set; }
         SceneManager SceneManager { get; set; }

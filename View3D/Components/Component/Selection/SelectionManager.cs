@@ -125,22 +125,25 @@ namespace View3D.Components.Component.Selection
             {
                 foreach (var item in objectSelectionState.CurrentSelection())
                 {
-                    _lineGeometry.AddBoundingBox(item.Geometry.BoundingBox);
-                    _renderEngine.AddRenderItem(RenderBuckedId.Selection, new LineRenderItem() { World = item.ModelMatrix, LineMesh = _lineGeometry });
+                    if (item is Rmv2MeshNode mesh)
+                    {
+                        _lineGeometry.AddBoundingBox(item.Geometry.BoundingBox);
+                        _renderEngine.AddRenderItem(RenderBuckedId.Selection, new LineRenderItem() { World = mesh.RenderMatrix, LineMesh = _lineGeometry });
+                    }
                 }
             }
 
             if (selectionState is FaceSelectionState selectionFaceState && selectionFaceState.RenderObject is Rmv2MeshNode meshNode)
             {
-                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new GeoRenderItem() { ModelMatrix = meshNode.ModelMatrix, Geometry = meshNode.Geometry, Shader = _selectedFacesEffect, Faces = selectionFaceState.SelectedFaces });
-                _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeoRenderItem() { ModelMatrix = meshNode.ModelMatrix, Geometry = meshNode.Geometry, Shader = _wireframeEffect});
+                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new GeoRenderItem() { ModelMatrix = meshNode.RenderMatrix, Geometry = meshNode.Geometry, Shader = _selectedFacesEffect, Faces = selectionFaceState.SelectedFaces });
+                _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeoRenderItem() { ModelMatrix = meshNode.RenderMatrix, Geometry = meshNode.Geometry, Shader = _wireframeEffect});
             }
 
             if (selectionState is VertexSelectionState selectionVertexState && selectionVertexState.RenderObject != null)
             {
                 var vertexObject = selectionVertexState.RenderObject as Rmv2MeshNode;
-                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new VertexRenderItem() { Node = vertexObject, World = vertexObject.ModelMatrix, SelectedVertices = selectionVertexState, VertexRenderer = VertexRenderer });
-                _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeoRenderItem() { ModelMatrix = vertexObject.ModelMatrix, Geometry = vertexObject.Geometry, Shader = _wireframeEffect });
+                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new VertexRenderItem() { Node = vertexObject, World = vertexObject.RenderMatrix, SelectedVertices = selectionVertexState, VertexRenderer = VertexRenderer });
+                _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeoRenderItem() { ModelMatrix = vertexObject.RenderMatrix, Geometry = vertexObject.Geometry, Shader = _wireframeEffect });
             }
 
             base.Draw(gameTime);

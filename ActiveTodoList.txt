@@ -1,15 +1,12 @@
-
 [![name](https://user-images.githubusercontent.com/54080240/126827425-c6c49064-0cb7-459d-b6c2-47544f4013cd.png)](https://www.patreon.com/TheAssetEditor)
 
-
-
 Rendering:
-	Improve
 	Debug (normals, weights)
 	Settings
 	Flip right left 
 	Change background colour 
 	Performance 
+	Preview materials?
 
 General:
 	Validator (matrial, vmd, vsmodel)
@@ -24,33 +21,39 @@ General:
 	Loading pack file with error - show message 
 	
 Kitbash:
-	Auto rig (pin per vertex)
-	Rerig on remap
-	Tree view auto select
-	Redo command
-	Lod for larges 5 models 
-	Default to vmd when browsing  in kitbasher -> Type filter
-	Improve remapping to handle n meshes and be realtime
+	Improve remapping to handle n meshes and be realtime, preview animation?
 	Skeleton information view 
-	Attach weapons 
+	Auto rig (pin per vertex)
+	Auto rig (closest bones)
+	Redo command
+	Otho projections 
+	Default to vmd when browsing in kitbasher -> Type filter
 	Split face tool
 	Mesh verifications (Show normals, ensure weights)
 	Flip faces tool/Invert normals
-	 Better tint fom selected faces 
-	 emp_demigryph_knight_helmet_01 has this, just keep dividing his collar and it does this constantly (removes face)
-	 animated pose to statick is not working
-	 Unable to play 3k anim : [data] animations\battle\character\male01\infantry\inf_1h095dun\attacks\inf_1h095dun_basic_attack_mid_05.anim
-	sfo_asset_editor_thing texture bug 
-	
+	Better tint fom selected faces 
+	Unable to play 3k anim : [data] animations\battle\character\male01\infantry\inf_1h095dun\attacks\inf_1h095dun_basic_attack_mid_05.anim
+	split hair into group
+	Validation:
+		Different pivs
+		Could be combined
+		Empty mesh 
+		Vertex weights 
+	Mesh without polygons error while generating bb (unsure when and why)
+	Distribute leftover weights using ratio instead of average 
+		
 Misc:
 	Compagin anims missing from anim search
 	Memory leaks
-	Imprive saving so it does not crahs
-	Improve saving - invalid folders 
+	Imprive saving so it does not crahs - auto of memory
+	Send errors to server?
+	Improve saving - invalid folders ((nothing)/nothing)filename.ext)
 	about box - Dont break eula
+	Thrones of britania loading 
+	Added materials and shit as supported text formats 
 
 Animation transfer tool:
-	Clear on bone
+	Clear one bone
 	Default to generate anim set 
 	Set animation length
 	Allow for merging of animation
@@ -58,12 +61,18 @@ Animation transfer tool:
 	Copy setting to children (force snap, freeze)
 	Clear all settings
 	
+Mount tool:
+	Make it eaiser to use
+	One click make animpack by combining rider and mount frg. 
+	"Add capabilites" function (fire while moving, casting++)
+	
 Super view:
 	View on mount 
 	View matched 
 	View riders using attachment system
 	Props
 	Meta:
+		Finish metafile decoding 
 		Animated props
 		Effects
 		Props
@@ -74,22 +83,22 @@ Super view:
 			
 UV editor 
 	Select based on UV island 
+	Automagically recreate optimized textures -> Texture optimizer tool - Island combiner 
 	
 Animation bin/frg editor		
 Campagin bin editor
 AnimBin editor (3k, troy)
 Attachment point editor
-Pose creator tool
+Pose creator tool (inv kinematic?)
 Animated prop tool, not needed?
 Skeleton splicer tool?
-Texture optimizer tool - Island combiner 
 
 
 Campagin map shit?
-Sound
+Sound?
+3d texture painter?!
 
-
----------
+---------Next version
 
 v14
 	[X] Better variantmeshdefinition handling => Show errors 
@@ -103,54 +112,41 @@ v14
 	[x] Mesh split removes random faces
 	[x] ANimated mesh => static prop bugs
 	[x] Issue when pressing save in the mesh fitter tool, mesh no longer deforms slightly
+	[x] some weight issues fixded
+	[x] props during playback
+	[x] take pivot into account duing playback
+	[X] out of memory excption while saving pack files
+	[x] move program to 64bit to enable more memory abuse 
+	[x] bone mapping view -> Copy settings to all childre. Clear self 
+	[x]lod large 5 models file?
+	[x] 	Click select vertexes! 
 	
+	Erro when combining meshes with more then uint16 parts
+	Wireframe mode
+	Orthigraphic projection
 	
-	Double clikcing mesh tree not expanding
+
+	
+	Improve frg editor! 
+	
+	Chaos dragon => clicking editbale model changes skeleton to tech skeleton
+
+	[Can not reproduce? ]Weight bug => hu6 skeleton and the mesh was the head from the coatl (well i cut it off by deleting the rest of the body), the head of the lord of change and a piece of equipment from the lord of change
 	
 	Remapping 
 		- Open last setting (auto save to file?)
-		- Apply mapping to all children
-		- Clear single button
-		
-	Look into some shading shit	
-		Toggle backface
-		Show normals  + validation
-		Weights?
-	
-	Validation:
-		Different pivs
-		Could be combined
-		Empty mesh 
-		Vertex weights 
-		Normals 
-		
-	Props during playback
-		offsets 
-	
-	Added materials and shit as supported text formats 
-	Mesh without polygons error while generating bb
-	ANimated mesh => static prop not working 
-	 
-	Invert mesh normals 
-	Weights issues 
-	lod large 5 models file?
 
-	Thrones of britania loading 
-
-	Show skeleton
+	Show skeleton in kitbash editor (show weight of selected bone vertexes)
 	Search opening folders - Hourglass
 	filetypes for browse dialog
+	
 	Animation transfer tool: - Scale bone length - usefull for root anims 
 	Animation transfer tool: - Copy setting to children (force snap, freeze)
 	
-	handle pivs when rendering?
-	Yellow tool save, small shrink, why?
-	
-	split hair into group
+	vertexes not correct, check empire greatsword weapon (pvito issue for vertex, and bb)
 
+variantmeshes\wh_variantmodels\hu6\bst\bst_bestigors\torso\bst_bestigor_torso_01.rigid_model_v2
 ----
 
 
 Scale places - Mount tool 
-
-Does not load => variantmeshes\variantmeshdefinitions\troy_heavy_swordsmen.variantmeshdefinition

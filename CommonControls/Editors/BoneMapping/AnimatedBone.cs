@@ -29,13 +29,27 @@ namespace CommonControls.Editors.BoneMapping
             Name.Value = name;
         }
 
-        public void ClearMapping()
+        public void ClearMapping(bool includeChildren = true)
         {
             MappedBoneName.Value = "";
             MappedBoneIndex.Value = -1;
 
+            if (includeChildren)
+            {
+                foreach (var child in Children)
+                    child.ClearMapping(includeChildren);
+            }
+        }
+
+
+        public void ApplySelfToChildren()
+        {
             foreach (var child in Children)
-                child.ClearMapping();
+            {
+                child.MappedBoneName.Value = MappedBoneName.Value;
+                child.MappedBoneIndex.Value = MappedBoneIndex.Value;
+                child.ApplySelfToChildren();
+            }
         }
 
         public AnimatedBone GetFromBoneId(int i)

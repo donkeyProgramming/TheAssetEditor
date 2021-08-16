@@ -16,6 +16,40 @@ namespace View3D.Utility
             return res;
         }
 
+        public static float? IntersectVertex(Ray ray, IGeometry geometry, Vector3 cameraPos, Matrix matrix, out int selectedVertex)
+        {
+            Matrix inverseTransform = Matrix.Invert(matrix);
+            ray.Position = Vector3.Transform(ray.Position, inverseTransform);
+            ray.Direction = Vector3.TransformNormal(ray.Direction, inverseTransform);
+            cameraPos = Vector3.Transform(cameraPos, inverseTransform);
+
+            var vertexList = geometry.GetVertexList();
+            float bestDistance = float.MaxValue;
+            selectedVertex = -1;
+            for (int i = 0; i < vertexList.Count; i++)
+            {
+                var distance = (cameraPos - vertexList[i]).Length();
+                var distanceScale = 0.0025f * distance * 1.5f;
+
+                var bb = new BoundingBox(new Vector3(distanceScale * -0.5f) + vertexList[i], new Vector3(distanceScale * 0.5f) + vertexList[i]);
+                var res = bb.Intersects(ray); ;
+                if (res != null)
+                {
+                    var dist = res.Value;
+                    if (dist < bestDistance)
+                    {
+                        selectedVertex = i;
+                        bestDistance = dist;
+                    }
+                }
+            }
+
+            if (selectedVertex == -1)
+                return null;
+
+            return bestDistance;
+        }
+
         public static float? IntersectFace(Ray ray, IGeometry geometry, Matrix matrix, out int? face)
         {
             face = null;

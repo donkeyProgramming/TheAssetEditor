@@ -401,14 +401,13 @@ namespace CommonControls.Services
                 SaveHelper.CreateFileBackup(path);
 
             pf.SystemFilePath = path;
-            using (MemoryStream memoryStream = new MemoryStream())
+            using (var memoryStream = new FileStream(path, FileMode.OpenOrCreate))
             {
-                using (BinaryWriter writer = new BinaryWriter(memoryStream))
+                using (var writer = new BinaryWriter(memoryStream))
                     Save(pf, writer);
-   
-                File.WriteAllBytes(path, memoryStream.ToArray());
-                pf.UpdateAllDataSourcesAfterSave();
             }
+
+            pf.UpdateAllDataSourcesAfterSave();
         }
 
         public PackFile FindFile(string path) 

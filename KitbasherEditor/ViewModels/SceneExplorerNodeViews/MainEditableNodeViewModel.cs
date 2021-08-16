@@ -39,7 +39,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             SkeletonNameList = _skeletonAnimationLookUpHelper.SkeletonFileNames;
             if (_mainNode.Model != null)
             {
-                SkeletonName = SkeletonNameList.FirstOrDefault(x => x.Contains(_mainNode.Model.Header.SkeletonName));
+                SkeletonName = SkeletonNameList.FirstOrDefault(x => Path.GetFileNameWithoutExtension(x).ToLower() == _mainNode.Model.Header.SkeletonName.ToLower());
                 UpdateSkeletonName();
             }
         }

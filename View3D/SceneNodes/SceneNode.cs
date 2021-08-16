@@ -57,8 +57,8 @@ namespace View3D.SceneNodes
         bool _isExpanded = true;
         public bool IsExpanded { get => _isExpanded; set => SetAndNotify(ref _isExpanded, value); }
 
-        public Matrix ModelMatrix { get; set; } = Matrix.Identity;
-
+        virtual public Matrix ModelMatrix { get; set; } = Matrix.Identity;
+        virtual public Matrix RenderMatrix { get; protected set; } = Matrix.Identity;
 
         public ISceneNode AddObject(ISceneNode item)
         {

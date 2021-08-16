@@ -285,6 +285,8 @@ PixelInputType main(in VertexInputType input) // main is the default function na
 		output.binormal = input.binormal;
 	}
 
+	//output.position = float4(output.position.xyz, 1);
+
 	output.position = mul(mul(output.position, scale4x4), World);
 	output.worldPosition = output.position.xyz;
 	output.position = mul(output.position, View);

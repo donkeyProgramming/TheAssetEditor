@@ -55,10 +55,6 @@ namespace Filetypes.RigidModel
                     _skeletonName[i] = byteValues[i];
                 }
             }
-
-
-
-
         }
     };
 

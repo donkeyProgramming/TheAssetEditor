@@ -175,6 +175,12 @@ namespace View3D.Rendering.Geometry
         {
             _vertexArray[vertexId].Position = Vector4.Transform(_vertexArray[vertexId].Position, transform);
 
+
+            _vertexArray[vertexId].Position.X = _vertexArray[vertexId].Position.X / _vertexArray[vertexId].Position.W;
+            _vertexArray[vertexId].Position.Y = _vertexArray[vertexId].Position.Y / _vertexArray[vertexId].Position.W;
+            _vertexArray[vertexId].Position.Z = _vertexArray[vertexId].Position.Z / _vertexArray[vertexId].Position.W;
+            _vertexArray[vertexId].Position.W = 1;
+
             _vertexArray[vertexId].Normal = Vector3.TransformNormal(_vertexArray[vertexId].Normal, transform);
             _vertexArray[vertexId].BiNormal = Vector3.TransformNormal(_vertexArray[vertexId].BiNormal, transform);
             _vertexArray[vertexId].Tangent = Vector3.TransformNormal(_vertexArray[vertexId].Tangent, transform);
