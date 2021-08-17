@@ -288,4 +288,8 @@
     <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Editors\AnimMeta\" />
+  </ItemGroup>
+
 </Project>

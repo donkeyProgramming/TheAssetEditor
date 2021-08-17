@@ -1,20 +1,14 @@
 ﻿using Common;
-using Filetypes;
-using Filetypes.ByteParsing;
-using GalaSoft.MvvmLight.Command;
-using AnimMetaEditor.DataType;
 using AnimMetaEditor.ViewModels.Data;
-using AnimMetaEditor.Views.MetadataTableViews;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Windows.Input;
 using CommonControls.Services;
-using CommonControls;
 using System.Linq;
 using CommonControls.Common;
 using System.Text;
 using System.IO;
+using FileTypes.DB;
+using FileTypes.MetaData;
 
 namespace AnimMetaEditor.ViewModels
 {
@@ -63,7 +57,9 @@ namespace AnimMetaEditor.ViewModels
                 {
                     try
                     {
-                        var res = MetaDataFileParser.ParseFile(file, _pf);
+                        var fileName = _pf.GetFullPath(file);
+                        var fileContent = file.DataSource.ReadData();
+                        var res = MetaDataFileParser.ParseFile(fileContent, fileName);
                         allMetaData.Add(res);
 
                         foreach (var resultDataItem in res.TagItems)

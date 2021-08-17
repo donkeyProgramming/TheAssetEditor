@@ -1,26 +1,20 @@
-﻿using Common;
-using CommonControls.Services;
-using Filetypes.ByteParsing;
-using FileTypes.PackFiles.Models;
+﻿using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace AnimMetaEditor.DataType
+namespace FileTypes.MetaData
 {
-    static class MetaDataFileParser
+    public static class MetaDataFileParser
     {
-        public static MetaDataFile ParseFile(PackFile file, PackFileService pf)
+        public static MetaDataFile ParseFile(byte[] fileContent, string fullFileName)
         {
-            var fileContent = file.DataSource.ReadData();
             var contentLength = fileContent.Count();
-
 
             MetaDataFile outputFile = new MetaDataFile()
             {
-                FileName = pf.GetFullPath(file),
+                FileName = fullFileName,
                 Version = BitConverter.ToInt32(fileContent, 0)
             };
 
@@ -42,7 +36,19 @@ namespace AnimMetaEditor.DataType
             return outputFile;
         }
 
-        internal static byte[] GenerateBytes(MetaDataFile output)
+        public static MetaDataFile SafeParseFile(byte[] fileContent, string fullFileName)
+        {
+            try
+            {
+                return ParseFile(fileContent, fullFileName);
+            }
+            catch 
+            {
+                return null;
+            }
+        }
+
+        public static byte[] GenerateBytes(MetaDataFile output)
         {
             List<byte> data = new List<byte>();
             data.AddRange(BitConverter.GetBytes((int)output.Version));
@@ -58,7 +64,7 @@ namespace AnimMetaEditor.DataType
 
         static MetaDataTagItem GetElement(int startIndex, byte[] data, string parentFileName, out int updatedByteIndex)
         {
-            if(! ByteParsers.String.TryDecode(data, startIndex, out var tagName, out var strBytesRead, out string error))
+            if (!ByteParsers.String.TryDecode(data, startIndex, out var tagName, out var strBytesRead, out string error))
                 throw new Exception($"Unable to detect tagname for MetaData element starting at {startIndex} - {error}");
 
             int currentIndex = startIndex + strBytesRead;
@@ -98,6 +104,6 @@ namespace AnimMetaEditor.DataType
 
             return false;
         }
-        
+
     }
 }

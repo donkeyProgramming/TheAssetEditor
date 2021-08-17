@@ -11,14 +11,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace AnimationEditor.Common.FragmentExplorer
+namespace AnimationEditor.SuperView
 {
     /// <summary>
-    /// Interaction logic for FragmentExplorerWindow.xaml
+    /// Interaction logic for EditorView.xaml
     /// </summary>
-    public partial class FragmentExplorerWindow : UserControl
+    public partial class EditorView : UserControl
     {
-        public FragmentExplorerWindow()
+        public EditorView()
         {
             InitializeComponent();
         }

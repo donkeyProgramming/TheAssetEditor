@@ -4,6 +4,7 @@ using AnimationEditor.Common.BaseControl;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.PropCreator;
 using AnimationEditor.PropCreator.ViewModels;
+using AnimationEditor.SuperView;
 using Common;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -20,6 +21,7 @@ namespace AnimationEditor
             serviceCollection.AddTransient<MountAnimationCreatorViewModel>();
             serviceCollection.AddTransient<CampaignAnimationCreatorViewModel>();
             serviceCollection.AddTransient<AnimationTransferToolViewModel>();
+            serviceCollection.AddTransient<SuperViewViewModel>();
 
             serviceCollection.AddTransient<BaseAnimationView>();
         }
@@ -30,6 +32,7 @@ namespace AnimationEditor
             factory.RegisterTool<MountAnimationCreatorViewModel, BaseAnimationView>();
             factory.RegisterTool<CampaignAnimationCreatorViewModel, BaseAnimationView>();
             factory.RegisterTool<AnimationTransferToolViewModel, BaseAnimationView>();
+            factory.RegisterTool<SuperViewViewModel, BaseAnimationView>();
         }
     }
 }

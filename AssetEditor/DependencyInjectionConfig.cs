@@ -15,6 +15,7 @@ using CommonControls.Editors.TextEditor;
 using CommonControls.Editors.VariantMeshDefinition;
 using CommonControls.Resources;
 using CommonControls.Services;
+using FileTypes.DB;
 using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
 using System;

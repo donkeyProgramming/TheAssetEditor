@@ -1,17 +1,12 @@
 ﻿using Common;
 using Filetypes.ByteParsing;
 using GalaSoft.MvvmLight.CommandWpf;
-using AnimMetaEditor.DataType;
 using AnimMetaEditor.ViewModels.Data;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -21,6 +16,7 @@ using System.Windows.Media;
 using FileTypes.DB;
 using FileTypes.PackFiles.Models;
 using CommonControls.Services;
+using FileTypes.MetaData;
 
 namespace AnimMetaEditor.ViewModels
 {

@@ -37,8 +37,8 @@ namespace AnimationEditor.MountAnimationCreator
 
             SelectedMountTag = new FilterCollection<FragmentStatusSlotItem>(null, MountTagSeleted);
             SelectedRiderTag = new FilterCollection<FragmentStatusSlotItem>(null, RiderTagSelected);
-            SelectedMount = new FilterCollection<AnimationFragment>(null, (value) => MuntSelected(value, SelectedMountTag, _mount.SkeletonName));
-            SelectedRider = new FilterCollection<AnimationFragment>(null, (value) => MuntSelected(value, SelectedRiderTag, _rider.SkeletonName));
+            SelectedMount = new FilterCollection<AnimationFragment>(null, (value) => MuntSelected(value, SelectedMountTag, _mount.SkeletonName.Value));
+            SelectedRider = new FilterCollection<AnimationFragment>(null, (value) => MuntSelected(value, SelectedRiderTag, _rider.SkeletonName.Value));
 
             SelectedMountTag.SearchFilter = (value, rx) => { return rx.Match(value.Entry.Value.Slot.Value).Success; };
             SelectedRiderTag.SearchFilter = (value, rx) => { return rx.Match(value.Entry.Value.Slot.Value).Success; };
@@ -52,7 +52,7 @@ namespace AnimationEditor.MountAnimationCreator
         {
             if (mount)
             {
-                var mountSkeletonName = Path.GetFileNameWithoutExtension(_mount.SkeletonName);
+                var mountSkeletonName = Path.GetFileNameWithoutExtension(_mount.SkeletonName.Value);
                 var allPossibleMount = LoadFragmentsForSkeleton(mountSkeletonName);
                 SelectedMount.UpdatePossibleValues(allPossibleMount);
             }
@@ -61,7 +61,7 @@ namespace AnimationEditor.MountAnimationCreator
             {
                 var selectedSlotId = SelectedRiderTag.SelectedItem?.Entry.Value.Slot.Id;
                 var selectedRider = SelectedRider.SelectedItem?.FileName;
-                var riderSkeletonName = Path.GetFileNameWithoutExtension(_rider.SkeletonName);
+                var riderSkeletonName = Path.GetFileNameWithoutExtension(_rider.SkeletonName.Value);
                 var allPossibleRider = LoadFragmentsForSkeleton(riderSkeletonName);
                 SelectedRider.UpdatePossibleValues(allPossibleRider);
                 if (selectedRider != null)

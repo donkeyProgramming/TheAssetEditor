@@ -15,7 +15,7 @@ namespace View3D.SceneNodes
     public interface IAnimationProvider
     { 
         bool IsActive { get; }
-        GameSkeleton Skeleton { get; set; }
+        GameSkeleton Skeleton { get;  }
     }
 
     public class SimpleSkeletonProvider : IAnimationProvider
@@ -23,7 +23,7 @@ namespace View3D.SceneNodes
         public SimpleSkeletonProvider(GameSkeleton skeleton) { Skeleton = skeleton; }
         public bool IsActive => true;
 
-        public GameSkeleton Skeleton { get; set; }
+        public GameSkeleton Skeleton { get; private set; }
     }
 
 

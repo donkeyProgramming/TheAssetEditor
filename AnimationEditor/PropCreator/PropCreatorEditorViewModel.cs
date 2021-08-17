@@ -165,35 +165,20 @@ namespace AnimationEditor.PropCreator
             var newSkel = View3D.Animation.AnimationEditor.ExtractPartOfSkeleton(MainAsset.Skeleton, "TestSkel", selectedBoneIds.ToArray());
             var newAnim = View3D.Animation.AnimationEditor.ExtractPartOfAnimation(MainAsset.AnimationClip, selectedBoneIds.ToArray());
 
-
-
             // Make root node world from skeleton
             var worldRotBone0 = newSkel.DynamicFrames[0].Quaternion[0];
             for (int i = 0; i < newAnim.DynamicFrames.Count; i++)
-            {
                 newAnim.DynamicFrames[i].Rotation[0] = new Quaternion(worldRotBone0.X, worldRotBone0.Y, worldRotBone0.Z, worldRotBone0.W);
-                //newAnim.DynamicFrames[i].Position[0] = Vector3.Zero;
-            }
-           //
-           // if (FitAnimation)
-           //     View3D.Animation.AnimationEditor.ReSample(newAnim, newAnim, MainAsset.AnimationClip.DynamicFrames.Count());
-           //
-          
 
             Data.SetSkeleton(newSkel, newSkel.Header.SkeletonName);
             var skeletonPos = Data.Skeleton.GetWorldTransform(0).Translation;
             Data.Skeleton.SetBoneTransform(0, Vector3.Zero);
 
-            Data.CopyMeshFromOther(MainAsset, false);
+            Data.CopyMeshFromOther(MainAsset);
             var remapping = CreateBoneMapping(Data.Skeleton, MainAsset.Skeleton);
             Data.OnlyShowMeshRelatedToBones(selectedBoneIds, remapping, newSkel.Header.SkeletonName);
             Data.SetAnimationClip(newAnim, null);
 
-            // Move skeleton to 0,0,0
-            
-
-            // Move mesh to 0,0,0
-            
             Data.SetMeshPosition(Matrix.CreateTranslation(-skeletonPos));
         }
 

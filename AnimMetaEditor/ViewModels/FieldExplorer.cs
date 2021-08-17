@@ -1,20 +1,16 @@
 ﻿using Filetypes.ByteParsing;
 using GalaSoft.MvvmLight.CommandWpf;
-using AnimMetaEditor.DataType;
 using AnimMetaEditor.ViewModels.Data;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
 using Common;
 using WpfHexaEditor.Core;
 using FileTypes.DB;
-using WpfHexaEditor;
+using FileTypes.MetaData;
 
 namespace AnimMetaEditor.ViewModels
 {

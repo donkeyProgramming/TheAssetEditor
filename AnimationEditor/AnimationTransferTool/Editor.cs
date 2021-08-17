@@ -81,7 +81,7 @@ namespace AnimationEditor.AnimationTransferTool
 
         private void CopyToMeshChanged(AssetViewModel newValue)
         {
-            Generated.CopyMeshFromOther(newValue, true);
+            Generated.CopyMeshFromOther(newValue);
             CreateBoneOverview(newValue.Skeleton);
             HightlightSelectedBones(null);
         }
@@ -101,14 +101,14 @@ namespace AnimationEditor.AnimationTransferTool
                 return;
             }
 
-            var targetSkeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, _copyTo.SkeletonName);
-            var sourceSkeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, _copyFrom.SkeletonName);
+            var targetSkeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, _copyTo.SkeletonName.Value);
+            var sourceSkeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, _copyFrom.SkeletonName.Value);
 
             var config = new RemappedAnimatedBoneConfiguration();
-            config.MeshSkeletonName = _copyTo.SkeletonName;
+            config.MeshSkeletonName = _copyTo.SkeletonName.Value;
             config.MeshBones = AnimatedBoneHelper.CreateFromSkeleton(targetSkeleton);
 
-            config.ParnetModelSkeletonName = _copyFrom.SkeletonName;
+            config.ParnetModelSkeletonName = _copyFrom.SkeletonName.Value;
             config.ParentModelBones = AnimatedBoneHelper.CreateFromSkeleton(sourceSkeleton);
 
             var window = new BoneMappingWindow(new BoneMappingViewModel(config));
@@ -169,7 +169,7 @@ namespace AnimationEditor.AnimationTransferTool
                 return;
             }
 
-            var orgName = _copyFrom.AnimationName.AnimationFile;
+            var orgName = _copyFrom.AnimationName.Value.AnimationFile;
             var orgSkeleton = _copyFrom.Skeleton.SkeletonName;
             var newSkeleton = Generated.Skeleton.SkeletonName;
             var newName = orgName.Replace(orgSkeleton, newSkeleton);
@@ -187,7 +187,7 @@ namespace AnimationEditor.AnimationTransferTool
         public void UseTargetAsSource()
         {
             if (MessageBox.Show("Are you sure?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                _copyFrom.CopyMeshFromOther(_copyTo, true);
+                _copyFrom.CopyMeshFromOther(_copyTo);
         }
 
         void CreateBoneOverview(GameSkeleton skeleton)

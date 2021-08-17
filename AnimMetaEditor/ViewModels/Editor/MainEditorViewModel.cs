@@ -1,8 +1,8 @@
-﻿using AnimMetaEditor.DataType;
-using Common;
-using CommonControls;
+﻿using Common;
 using CommonControls.Common;
 using CommonControls.Services;
+using FileTypes.DB;
+using FileTypes.MetaData;
 using FileTypes.PackFiles.Models;
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
@@ -43,7 +43,10 @@ namespace AnimMetaEditor.ViewModels.Editor
             _file = file;
             DisplayName = file.Name;
 
-            _metaDataFile = MetaDataFileParser.ParseFile(_file as PackFile, _pf);
+
+            var fileName = _pf.GetFullPath(_file as PackFile);
+            var fileContent = (_file as PackFile).DataSource.ReadData();
+            _metaDataFile = MetaDataFileParser.ParseFile(fileContent, fileName);
             _metaDataFile.Validate(_schemaManager);
 
             MetaDataFile = new MetaDataViewModel(_metaDataFile, _schemaManager);

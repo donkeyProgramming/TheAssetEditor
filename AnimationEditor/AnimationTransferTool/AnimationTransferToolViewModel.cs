@@ -13,7 +13,7 @@ namespace AnimationEditor.AnimationTransferTool
     {
         public AnimationTransferToolViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper) : base(pfs, skeletonHelper, "Target", "Source")
         {
-            DisplayName = "Campaign Animation Creator";
+            DisplayName = "Animation transfer tool";
             Pfs = pfs;
         }
 

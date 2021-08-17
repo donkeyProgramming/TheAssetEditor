@@ -1,7 +1,6 @@
-﻿using SharpDX;
+﻿using Filetypes.RigidModel.Transforms;
+using SharpDX;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -24,6 +23,8 @@ namespace Filetypes.ByteParsing
         Boolean,
         StringLookup,
         List,
+        Vector3,
+        Vector4
     }
 
     public interface IByteParser
@@ -235,6 +236,96 @@ namespace Filetypes.ByteParsing
             }
 
             return EncodeValue(spesificValue, out error);
+        }
+    }
+
+
+    public class Vector3Parser : SpesificByteParser<RmvVector3>
+    {
+        public string TypeName => "Vector3";
+
+        public DbTypesEnum Type => DbTypesEnum.Vector3;
+
+        public bool CanDecode(byte[] buffer, int index, out int bytesRead, out string error)
+        {
+            return TryDecodeValue(buffer, index, out var _, out bytesRead, out error);
+        }
+
+        public string DefaultValue()
+        {
+            return "{0,0,0}";
+        }
+
+        public byte[] Encode(string value, out string error)
+        {
+            throw new NotImplementedException();
+        }
+
+        public byte[] EncodeValue(RmvVector3 value, out string error)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string error)
+        {
+            var result =  TryDecodeValue(buffer, index, out var typedValue, out bytesRead, out error);
+            value = $"{typedValue.X},{typedValue.Y},{typedValue.Z}";
+            return result;
+        }
+
+        public bool TryDecodeValue(byte[] buffer, int index, out RmvVector3 value, out int bytesRead, out string error)
+        {
+            var x = ByteParsers.Single.TryDecodeValue(buffer, index+0, out var xValue, out bytesRead, out error);
+            var y = ByteParsers.Single.TryDecodeValue(buffer, index+4, out var yValue, out bytesRead, out error);
+            var z = ByteParsers.Single.TryDecodeValue(buffer, index+8, out var zValue, out bytesRead, out error);
+            bytesRead = 12;
+            value = new RmvVector3(xValue, yValue, zValue);
+            return x && y && z;
+        }
+    }
+
+    public class Vector4Parser : SpesificByteParser<RmvVector4>
+    {
+        public string TypeName => "Vector4";
+
+        public DbTypesEnum Type => DbTypesEnum.Vector4;
+
+        public bool CanDecode(byte[] buffer, int index, out int bytesRead, out string error)
+        {
+            return TryDecodeValue(buffer, index, out var _, out bytesRead, out error);
+        }
+
+        public string DefaultValue()
+        {
+            return "{0,0,0,1}";
+        }
+
+        public byte[] Encode(string value, out string error)
+        {
+            throw new NotImplementedException();
+        }
+
+        public byte[] EncodeValue(RmvVector4 value, out string error)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string error)
+        {
+            var result = TryDecodeValue(buffer, index, out var typedValue, out bytesRead, out error);
+            value = $"{typedValue.X},{typedValue.Y},{typedValue.Z},{typedValue.W}";
+            return result;
+        }
+
+        public bool TryDecodeValue(byte[] buffer, int index, out RmvVector4 value, out int bytesRead, out string error)
+        {
+            var x = ByteParsers.Single.TryDecodeValue(buffer, index + 0, out var xValue, out bytesRead, out error);
+            var y = ByteParsers.Single.TryDecodeValue(buffer, index + 4, out var yValue, out bytesRead, out error);
+            var z = ByteParsers.Single.TryDecodeValue(buffer, index + 8, out var zValue, out bytesRead, out error);
+            var w = ByteParsers.Single.TryDecodeValue(buffer, index + 12, out var wValue, out bytesRead, out error);
+            bytesRead = 16;
+            value = new RmvVector4(xValue, yValue, zValue, wValue);
+            return x && y && z && w;
         }
     }
 
@@ -604,9 +695,12 @@ namespace Filetypes.ByteParsing
     {
         public static ByteParser Byte { get; set; } = new ByteParser();
         public static IntParser Int32 { get; set; } = new IntParser();
+
         public static Int64Parser Int64 { get; set; } = new Int64Parser();
         public static UIntParser UInt32 { get; set; } = new UIntParser();
         public static SingleParser Single { get; set; } = new SingleParser();
+        public static Vector3Parser Vector3 { get; set; } = new Vector3Parser();
+        public static Vector4Parser Vector4 { get; set; } = new Vector4Parser();
         public static Float16Parser Float16 { get; set; } = new Float16Parser();
         public static ShortParser Short { get; set; } = new ShortParser();
         public static UShortParser UShort { get; set; } = new UShortParser();
@@ -617,301 +711,5 @@ namespace Filetypes.ByteParsing
         public static StringAsciiParser StringAscii { get; set; } = new StringAsciiParser();
 
         public static IByteParser[] GetAllParsers() {  return new IByteParser[]{ Byte , Int32 , Int64 , UInt32 ,Single, Float16, Short, UShort, Bool, OptString, String, OptStringAscii, StringAscii}; }
-    }
-
-    public static class ByteParserFactory
-    {
-        public static IByteParser Create(DbTypesEnum typeEnum)
-        {
-            switch (typeEnum)
-            {
-                case DbTypesEnum.String:
-                    return ByteParsers.String;
-
-                case DbTypesEnum.String_ascii:
-                    return ByteParsers.StringAscii;
-
-                case DbTypesEnum.Optstring:
-                    return ByteParsers.OptString;
-
-                case DbTypesEnum.Optstring_ascii:
-                    return ByteParsers.OptStringAscii;
-
-                case DbTypesEnum.Integer:
-                    return ByteParsers.Int32;
-
-                case DbTypesEnum.Int64:
-                    return ByteParsers.Int64;
-
-                case DbTypesEnum.Short:
-                    return ByteParsers.Short;
-
-                case DbTypesEnum.UShort:
-                    return ByteParsers.UShort;
-
-                case DbTypesEnum.Single:
-                    return ByteParsers.Single;
-
-                case DbTypesEnum.Float16:
-                    return ByteParsers.Float16;
-
-                case DbTypesEnum.Boolean:
-                    return ByteParsers.Bool;
-
-                case DbTypesEnum.uint32:
-                    return ByteParsers.UInt32;
-
-                case DbTypesEnum.Byte:
-                    return ByteParsers.Byte;
-
-                case DbTypesEnum.List:
-                    throw new NotImplementedException();
-            }
-            throw new NotImplementedException();
-        }
-        // From string?
-        // FromEnum
-        // From Ca type
-        // ??
-    }
-
-    public class ByteChunk
-    {
-        byte[] _buffer;
-        int _currentIndex;
-        public ByteChunk(byte[] buffer, int index = 0)
-        {
-            _buffer = buffer;
-            _currentIndex = index;
-        }
-
-        public void Reset()
-        {
-            Index = 0;
-        }
-
-        public static ByteChunk FromFile(string fileName)
-        {
-            var bytes = File.ReadAllBytes(fileName);
-            return new ByteChunk(bytes);
-        }
-
-        public int BytesLeft => _buffer.Length - _currentIndex;
-        public int Index { get { return _currentIndex; } set { _currentIndex = value;} }
-
-        public byte[] Buffer { get { return _buffer; } }
-
-        T Read<T>(SpesificByteParser<T> parser)
-        {
-            if (!parser.TryDecodeValue(_buffer, _currentIndex, out T value, out int bytesRead, out string error))
-                throw new Exception("Unable to parse :" + error);
-
-            _currentIndex += bytesRead;
-            return value;
-        }
-
-        string ReadFixedLengthString(StringParser parser, int length)
-        {
-            if (!parser.TryDecodeFixedLength(_buffer, _currentIndex, length, out var value, out int bytesRead))
-                throw new Exception("Unable to parse");
-
-            _currentIndex += bytesRead;
-            return value;
-        }
-
-        string ReadZeroTerminatedString(StringParser parser)
-        {
-            if (!parser.TryDecodeZeroTerminatedString(_buffer, _currentIndex, out var value, out int bytesRead))
-                throw new Exception("Unable to parse");
-
-            _currentIndex += bytesRead;
-            return value;
-            
-        }
-
-        T Peak<T>(SpesificByteParser<T> parser)
-        {
-            if (!parser.TryDecodeValue(_buffer, _currentIndex, out T value, out int bytesRead, out string error))
-                throw new Exception("Unable to parse :" + error);
-
-            return value;
-        }
-
-        public byte[] ReadBytesUntil(int index)
-        {
-            var length = index - _currentIndex;
-            byte[] destination = new byte[length];
-            Array.Copy(_buffer, index, destination, 0, length);
-            _currentIndex += length;
-            return destination;
-        }
-
-        public byte[] ReadBytes(int count)
-        {
-            byte[] destination = new byte[count];
-            Array.Copy(_buffer, _currentIndex, destination, 0, count);
-            _currentIndex += count;
-            return destination;
-        }
-
-        public void Advance(int byteCount)
-        {
-            _currentIndex += byteCount;
-        }
-
-        public void Read(IByteParser parser, out string value, out string error)
-        {
-            if (!parser.TryDecode(_buffer, _currentIndex, out  value, out int bytesRead, out error))
-                throw new Exception("Unable to parse :" + error);
-
-            _currentIndex += bytesRead;
-        }
-
-        public string ReadStringAscii() => Read(ByteParsers.StringAscii);
-        public string ReadString() => Read(ByteParsers.String);
-        public int ReadInt32() => Read(ByteParsers.Int32);
-        public uint ReadUInt32() => Read(ByteParsers.UInt32);
-        public long ReadInt64() => Read(ByteParsers.Int64);
-        public float ReadSingle() => Read(ByteParsers.Single);
-        public Half ReadFloat16() => Read(ByteParsers.Float16);
-        public short ReadShort() => Read(ByteParsers.Short);
-        public ushort ReadUShort() => Read(ByteParsers.UShort);
-        public bool ReadBool() => Read(ByteParsers.Bool);
-        public byte ReadByte() => Read(ByteParsers.Byte);
-        public string ReadStringTableIndex(IEnumerable<string> stringTable) => stringTable.ElementAt(ReadInt32());
-
-
-        public uint PeakUint32() => Peak(ByteParsers.UInt32);
-        public long PeakInt64() => Peak(ByteParsers.Int64);
-
-
-        public UnknownParseResult PeakUnknown()
-        {
-            var parsers = ByteParsers.GetAllParsers();
-            var output = new List<string>();
-            foreach (var parser in parsers)
-            {
-             
-                    var result = parser.TryDecode(_buffer, _currentIndex, out string value, out int bytesRead, out string error);
-                    if (!result)
-                        output.Add($"{parser.TypeName} - Failed:{error}");
-                    else
-                        output.Add($"{parser.TypeName} - {value}");
-
-            }
-
-            return new UnknownParseResult() { Data = output.ToArray()};
-        }
-
-
-        public ByteChunk CreateSub(int size)
-        {
-            var data = ReadBytes(size);
-            return new ByteChunk(data);
-        }
-        public string ReadFixedLength(int length) => ReadFixedLengthString(ByteParsers.String, length);
-        public string ReadZeroTerminatedStr() => ReadZeroTerminatedString(ByteParsers.String);
-
-
-        public class UnknownParseResult
-        {
-            public string[] Data { get; set; }
-            public override string ToString()
-            {
-                var strOuput = "";
-                if (Data != null)
-                {
-                    foreach (var s in Data)
-                        strOuput += s + "\n";
-                }
-                return strOuput;
-
-            }
-        }
-
-       
-        public byte[] Debug_LookForDataAfterFixedStr(int size)
-        {
-            var dataCpy = new ByteChunk(ReadBytes(size));
-            Index -= size;
-
-            var str = dataCpy.ReadFixedLength(size);
-            var strClean = Util.SanatizeFixedString(str);
-
-            dataCpy.Reset();
-            dataCpy.Index = strClean.Length;
-            var bytesAfterClean = dataCpy.ReadBytes(dataCpy.BytesLeft);
-            var nonZeroBytes = bytesAfterClean.Count(x => x != 0);
-            if (nonZeroBytes != 0)
-            {
-                return bytesAfterClean;
-            }
-
-            return null;
-        }
-
-
-        public string Debug_LookForStrAfterFixedStr(int size)
-        {
-            var dataCpy = new ByteChunk(ReadBytes(size));
-            Index -= size;
-
-            var str = dataCpy.ReadFixedLength(size);
-            var strClean = Util.SanatizeFixedString(str);
-
-            dataCpy.Reset();
-            dataCpy.Index = strClean.Length;
-            var bytesAfterClean = dataCpy.ReadBytes(dataCpy.BytesLeft);
-            var nonZeroBytes = bytesAfterClean.Count(x => x != 0);
-            if (nonZeroBytes != 0)
-            {
-                dataCpy.Index = strClean.Length;
-                var strAfterClean = dataCpy.ReadFixedLength(dataCpy.BytesLeft);
-                return strAfterClean;
-            }
-
-            return null;
-        }
-
-
-        public override string ToString()
-        {
-            return $"ByteParser[Size = {_buffer?.Length}, index = {_currentIndex}]";
-        }
-    }
-
-    public class ChuckWriter
-    {
-        List<byte> _bytes = new List<byte>();
-
-        public void Write<T>(T value, SpesificByteParser<T> parser)
-        {
-            var bytes = parser.EncodeValue(value, out _);
-            _bytes.AddRange(bytes);
-        }
-
-        public void WriteStringTableIndex(string str, ref List<string> stringTable)
-        {
-            if (string.IsNullOrEmpty(str))
-                str = "";
-            str = str.ToLower().Trim();
-            int writeIndex = stringTable.IndexOf(str);
-            if (writeIndex == -1)
-            {
-                stringTable.Add(str);
-                writeIndex = stringTable.Count - 1;
-            }
-            Write(writeIndex, ByteParsers.Int32);
-        }
-
-        public void AddBytes(byte[] bytes)
-        {
-            _bytes.AddRange(bytes);
-        }
-
-        public byte[] GetBytes()
-        {
-            return _bytes.ToArray();
-        }
     }
 }

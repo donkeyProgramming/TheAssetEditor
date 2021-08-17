@@ -28,6 +28,14 @@ namespace View3D.SceneNodes
         bool _isSelectable = false;
         public bool IsSelectable { get => _isSelectable; set => SetAndNotifyWhenChanged(ref _isSelectable, value); }
         public bool IsLockable { get; set; } = false;
+
+        public override Matrix ModelMatrix { get => base.ModelMatrix; set => UpdateModelMatrix(value); }
+
+        private void UpdateModelMatrix(Matrix value)
+        {
+            base.ModelMatrix = value;
+            RenderMatrix = value;
+        }
     }
 
     public class WsModelGroup : GroupNode

@@ -401,19 +401,6 @@ namespace CommonControls.Services
                 SaveHelper.CreateFileBackup(path);
 
             pf.SystemFilePath = path;
-
-            //using (MemoryStream memoryStream = new MemoryStream())
-            //{
-            //    using (BinaryWriter writer = new BinaryWriter(memoryStream))
-            //        Save(pf, writer);
-            //
-            //    File.WriteAllBytes(path, memoryStream.ToArray());
-            //}
-
-            //pf.UpdateAllDataSourcesAfterSave();
-
-            // VS-------------------------------------
-
             using (var memoryStream = new FileStream(path+"_temp", FileMode.OpenOrCreate))
             {
                 using (var writer = new BinaryWriter(memoryStream))
@@ -422,8 +409,6 @@ namespace CommonControls.Services
 
             File.Delete(path);
             File.Move(path + "_temp", path);
-            
-            //pf.UpdateAllDataSourcesAfterSave();
         }
 
         public PackFile FindFile(string path) 

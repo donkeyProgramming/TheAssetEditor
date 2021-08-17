@@ -183,7 +183,7 @@ namespace AnimationEditor.Common.AnimationPlayer
             void UpdateInfo()
             {
                 IsActive = true;
-                AnimationName = Asset.AnimationName?.AnimationFile;
+                AnimationName = Asset.AnimationName.Value?.AnimationFile;
                 SlotName = Asset.Description;
                 MaxFrames = Asset.Player.FrameCount();
             }

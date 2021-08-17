@@ -1,7 +1,6 @@
-﻿using AnimMetaEditor.DataType;
-using Common;
-using CommonControls;
-using System;
+﻿using Common;
+using FileTypes.DB;
+using FileTypes.MetaData;
 using System.Collections.ObjectModel;
 
 namespace AnimMetaEditor.ViewModels.Editor

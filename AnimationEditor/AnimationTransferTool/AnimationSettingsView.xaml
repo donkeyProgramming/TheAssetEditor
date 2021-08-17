@@ -25,8 +25,8 @@
                 <Label Content="Visability New" Width ="{StaticResource labelWidth}"  />
                 <Label Content=":"/>
 
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Generated.ShowMesh, UpdateSourceTrigger=PropertyChanged}" Content="Mesh" Margin="0,0,50,0"/>
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Generated.IsSkeletonVisible, UpdateSourceTrigger=PropertyChanged}" Content="Skeleton"/>
+                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Generated.ShowMesh.Value, UpdateSourceTrigger=PropertyChanged}" Content="Mesh" Margin="0,0,50,0"/>
+                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Generated.ShowSkeleton.Value, UpdateSourceTrigger=PropertyChanged}" Content="Skeleton"/>
             </DockPanel>
 
 

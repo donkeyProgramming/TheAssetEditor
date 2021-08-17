@@ -61,7 +61,7 @@ namespace AnimationEditor.MountAnimationCreator
             _rider = rider;
             _selectionManager = componentManager.GetComponent<SelectionManager>();
 
-            DisplayGeneratedSkeleton = new NotifyAttr<bool>(true, (value) => _newAnimation.IsSkeletonVisible = value);
+            DisplayGeneratedSkeleton = new NotifyAttr<bool>(true, (value) => _newAnimation.ShowSkeleton.Value = value);
             DisplayGeneratedMesh = new NotifyAttr<bool>(true, (value) => { if (_newAnimation.MainNode != null) _newAnimation.MainNode.IsVisible = value; });
 
             SelectedRiderBone = new FilterCollection<SkeletonBoneNode>(null, (x) => UpdateCanSaveAndPreviewStates());
@@ -158,9 +158,9 @@ namespace AnimationEditor.MountAnimationCreator
             var newRiderAnim = CreateAnimationGenerator().GenerateMountAnimation(_mount.AnimationClip, _rider.AnimationClip);
 
             // Apply
-            _newAnimation.CopyMeshFromOther(_rider, true);
+            _newAnimation.CopyMeshFromOther(_rider);
             _newAnimation.SetAnimationClip(newRiderAnim, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
-            _newAnimation.IsSkeletonVisible = DisplayGeneratedSkeleton.Value;
+            _newAnimation.ShowSkeleton.Value = DisplayGeneratedSkeleton.Value;
             UpdateCanSaveAndPreviewStates();
         }
 
@@ -180,7 +180,7 @@ namespace AnimationEditor.MountAnimationCreator
             else
                 newRiderClip = CreateAnimationGenerator().GenerateMountAnimation(_mount.AnimationClip, _rider.AnimationClip);
 
-            var fileResult = MountAnimationGeneratorService.SaveAnimation(_pfs, _rider.AnimationName.AnimationFile, SavePrefixText.Value, EnsureUniqeFileName.Value, newRiderClip, _newAnimation.Skeleton);
+            var fileResult = MountAnimationGeneratorService.SaveAnimation(_pfs, _rider.AnimationName.Value.AnimationFile, SavePrefixText.Value, EnsureUniqeFileName.Value, newRiderClip, _newAnimation.Skeleton);
             if (fileResult == null)
                 return;
 
@@ -229,7 +229,7 @@ namespace AnimationEditor.MountAnimationCreator
         public void RefreshView()
         {
             MountLinkController.ReloadFragments();
-            ActiveOutputFragment.UpdatePossibleValues(MountLinkController.LoadFragmentsForSkeleton(_rider.SkeletonName, true));
+            ActiveOutputFragment.UpdatePossibleValues(MountLinkController.LoadFragmentsForSkeleton(_rider.SkeletonName.Value, true));
         }
 
         public void BatchProcess() 

@@ -1,7 +1,5 @@
-﻿using Filetypes;
-using Filetypes.ByteParsing;
+﻿using Filetypes.ByteParsing;
 using GalaSoft.MvvmLight.CommandWpf;
-using AnimMetaEditor.DataType;
 using AnimMetaEditor.ViewModels.Data;
 using System;
 using System.Collections.ObjectModel;
@@ -10,7 +8,7 @@ using System.Windows;
 using System.Windows.Input;
 using Common;
 using FileTypes.DB;
-using CommonControls;
+using FileTypes.MetaData;
 
 namespace AnimMetaEditor.ViewModels
 {

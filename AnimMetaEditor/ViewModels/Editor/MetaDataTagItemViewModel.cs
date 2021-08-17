@@ -1,8 +1,7 @@
-﻿using AnimMetaEditor.DataType;
-using Common;
-using CommonControls;
+﻿using Common;
 using Filetypes.ByteParsing;
 using FileTypes.DB;
+using FileTypes.MetaData;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

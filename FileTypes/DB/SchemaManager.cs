@@ -1,5 +1,4 @@
 ﻿using Common.GameInformation;
-using FileTypes.DB;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -13,7 +12,7 @@ using System.Windows;
 using System.Reflection;
 using System.Collections;
 
-namespace CommonControls
+namespace FileTypes.DB
 {
     public class SchemaManager
     {

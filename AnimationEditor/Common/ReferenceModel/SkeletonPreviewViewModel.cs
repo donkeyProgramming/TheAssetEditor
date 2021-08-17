@@ -10,7 +10,7 @@ namespace AnimationEditor.Common.ReferenceModel
 {
     public class SkeletonPreviewViewModel : NotifyPropertyChangedImpl
     {
-        AssetViewModel _data;
+        AssetViewModel _asset;
 
         int _boneCount = 0;
         public int BoneCount
@@ -25,13 +25,13 @@ namespace AnimationEditor.Common.ReferenceModel
         public SkeletonBoneNode SelectedBone
         {
             get { return _selectedBone; }
-            set { SetAndNotify(ref _selectedBone, value); _data.SelectedBoneIndex(SelectedBone?.BoneIndex); }
+            set { SetAndNotify(ref _selectedBone, value); _asset.SelectedBoneIndex(SelectedBone?.BoneIndex); }
         }
 
         public SkeletonPreviewViewModel(AssetViewModel assetViewModel)
         {
-            _data = assetViewModel;
-            _data.SkeletonChanged += CreateBoneOverview;
+            _asset = assetViewModel;
+            _asset.SkeletonChanged += CreateBoneOverview;
         }
 
         void CreateBoneOverview(GameSkeleton skeleton)

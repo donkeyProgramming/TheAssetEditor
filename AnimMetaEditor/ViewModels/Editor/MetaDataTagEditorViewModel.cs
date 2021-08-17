@@ -1,10 +1,6 @@
-﻿using AnimMetaEditor.DataType;
-using AnimMetaEditor.Views.Editor;
-using CommonControls;
+﻿using AnimMetaEditor.Views.Editor;
 using FileTypes.DB;
 using GalaSoft.MvvmLight.CommandWpf;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;

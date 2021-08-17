@@ -159,11 +159,12 @@ namespace View3D.Components.Component
         {
             if (root.IsVisible)
             {
-                if (root is IDrawableItem drawableNode)
-                    drawableNode.Render(_renderEngine, parentMatrix);
-
                 foreach (var child in root.Children)
-                    DrawBasicSceneHirarchy(child, parentMatrix);
+                {
+                    if (child is IDrawableItem drawableNode && child.IsVisible)
+                        drawableNode.Render(_renderEngine, parentMatrix);
+                    DrawBasicSceneHirarchy(child, parentMatrix * child.ModelMatrix);
+                }
             }
         }
 

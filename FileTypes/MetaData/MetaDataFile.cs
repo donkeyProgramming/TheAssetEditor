@@ -1,11 +1,9 @@
-﻿using CommonControls;
+﻿using FileTypes.DB;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace AnimMetaEditor.DataType
+namespace FileTypes.MetaData
 {
     public class MetaDataFile
     {
@@ -19,7 +17,7 @@ namespace AnimMetaEditor.DataType
         }
 
 
-        public void Validate(SchemaManager schemaManager )
+        public void Validate(SchemaManager schemaManager)
         {
             foreach (var metaItem in TagItems)
             {

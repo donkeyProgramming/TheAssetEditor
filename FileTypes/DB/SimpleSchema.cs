@@ -7,7 +7,7 @@ using System.Text;
 
 namespace FileTypes.DB
 {
-    public class SimpleSchema
+   /* public class SimpleSchema
     {
         public List<SimpleSchemaObject> ObjectDefinitions { get; set; } = new List<SimpleSchemaObject>();
 
@@ -91,5 +91,5 @@ namespace FileTypes.DB
         public string Name { get; set; }
         public string Value { get; set; }
         public DbTypesEnum ValueType { get; set; }
-    }
+    }*/
 }

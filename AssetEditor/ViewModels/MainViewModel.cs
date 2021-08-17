@@ -3,6 +3,7 @@ using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.PropCreator;
 using AnimationEditor.PropCreator.ViewModels;
+using AnimationEditor.SuperView;
 using AnimMetaEditor;
 using AssetEditor.Services;
 using AssetEditor.Views.Settings;
@@ -89,19 +90,25 @@ namespace AssetEditor.ViewModels
           
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
-               
+
+                //SuperViewViewModel_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
-                // MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
-                KitbashEditor_Debug.CreatePaladin(this, toolFactory, packfileService);
+                //MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
+                //KitbashEditor_Debug.CreatePaladin(this, toolFactory, packfileService);
                 //AnimationTransferTool_Debug.CreateDamselEditor(this, toolFactory, packfileService);
 
                 //var f = packfileService.FindFile(@"animations\campaign\database\bin\cam_hero_hu1d_def_spear_and_shield.bin");
                 //OpenFile(f);
 
+
+
+                var f = packfileService.FindFile(@"animations\battle\persistent\hu1b_alarielle_staff_and_sword_persistent_metadata_alive_0.anm.meta");
+                OpenFile(f);
+
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);
-              
+
                 CreateTestPackFiles(packfileService);
             }
         }
