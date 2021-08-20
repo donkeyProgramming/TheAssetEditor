@@ -1,5 +1,6 @@
 ﻿using Common;
 using CommonControls.Services;
+using FileTypes.DB;
 using FileTypes.MetaData;
 using FileTypes.PackFiles.Models;
 using System;
@@ -22,10 +23,10 @@ namespace AnimationEditor.Common.ReferenceModel
 
 
         PackFile _selectedMetaFiles;
-        public PackFile SelectedMetaFile { get => _selectedMetaFiles; set { SetAndNotify(ref _selectedMetaFiles, value); _data.SetMetaFile(LoadMetaDataFile(value)); } }
+        public PackFile SelectedMetaFile { get => _selectedMetaFiles; set { SetAndNotify(ref _selectedMetaFiles, value); _data.SetMetaFile(_selectedMetaFiles, _selectedPersistMeta); } }
 
         PackFile _selectedPersistMeta;
-        public PackFile SelectedPersistMetaFile { get => _selectedPersistMeta; set { SetAndNotify(ref _selectedPersistMeta, value); _data.SetPersistantMetaFile(LoadMetaDataFile(value)); } } 
+        public PackFile SelectedPersistMetaFile { get => _selectedPersistMeta; set { SetAndNotify(ref _selectedPersistMeta, value); _data.SetMetaFile(_selectedMetaFiles, _selectedPersistMeta); } } 
 
 
         public OnSeachDelegate FiterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
@@ -51,15 +52,6 @@ namespace AnimationEditor.Common.ReferenceModel
         }  
 
 
-        MetaDataFile LoadMetaDataFile(PackFile value)
-        {
-            if (value == null)
-                return null;
-
-            var fileName = _pfs.GetFullPath(value);
-            var fileContent = value.DataSource.ReadData();
-            var metaDataFile = MetaDataFileParser.ParseFile(fileContent, fileName);
-            return metaDataFile;
-        }
+      
     }
 }

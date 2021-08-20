@@ -60,7 +60,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
             var maxFrameCount = Math.Min(mountAnimation.DynamicFrames.Count, newRiderAnim.DynamicFrames.Count);
             for (int i = 0; i < maxFrameCount; i++)
             {
-                var mountFrame = AnimationSampler.Sample(i, 0, _mountSkeleton, new List<AnimationClip> { mountAnimation });
+                var mountFrame = AnimationSampler.Sample(i, 0, _mountSkeleton,  mountAnimation );
                 var mountBoneWorldMatrix = _mountVertexPositionResolver.GetVertexTransformWorld(mountFrame, _mountVertexId);
                 mountBoneWorldMatrix.Decompose(out var _, out var mountVertexRot, out var mountVertexPos);
 
@@ -72,7 +72,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
                 var origianlRotation = Quaternion.Identity;
                 if (_animationSettings.KeepRiderRotation)
                 {
-                    var riderFrame = AnimationSampler.Sample(i, 0, _riderSkeleton, new List<AnimationClip> { newRiderAnim });
+                    var riderFrame = AnimationSampler.Sample(i, 0, _riderSkeleton, newRiderAnim );
                     var riderBoneWorldmatrix = riderFrame.GetSkeletonAnimatedWorld(_riderSkeleton, _riderBoneIndex);
                     riderBoneWorldmatrix.Decompose(out var _, out origianlRotation, out var _);
                 }

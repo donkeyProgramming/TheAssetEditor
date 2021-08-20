@@ -57,7 +57,7 @@ namespace TextureEditor.ViewModels
             _packFileService = packFileService;
 
             _scene = new SceneContainer();
-            _scene.Components.Add(new ResourceLibary(_scene, packFileService));
+            _scene.Components.Add(new ResourceLibary(_scene, packFileService ));
             _scene.ForceCreate();
   
 

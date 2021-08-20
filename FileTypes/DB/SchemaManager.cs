@@ -11,10 +11,11 @@ using System.IO;
 using System.Windows;
 using System.Reflection;
 using System.Collections;
+using Microsoft.Xna.Framework;
 
 namespace FileTypes.DB
 {
-    public class SchemaManager
+    public class SchemaManager : IGameComponent
     {
         ILogger _logger = Logging.Create<SchemaManager>();
 
@@ -249,6 +250,10 @@ namespace FileTypes.DB
             _logger.Here().Information($"Loading schema from content");
             var schema = JsonConvert.DeserializeObject<SchemaFile>(content);
             return schema;
+        }
+
+        public void Initialize()
+        {
         }
     }
 

@@ -307,7 +307,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
 
         public void SaveAndClose()
         {
-            var frame = AnimationSampler.Sample(0, _fromSkeleton, new List<AnimationClip>() { _animationClip });
+            var frame = AnimationSampler.Sample(0, _fromSkeleton, _animationClip);
             var cmd = new CreateAnimatedMeshPoseCommand(_meshNodes, _fromSkeleton, frame);
             _componentManager.GetComponent<CommandExecutor>().ExecuteCommand(cmd);   
             _window.Close();

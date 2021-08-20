@@ -3,6 +3,9 @@ using SharpDX;
 using System;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework;
+using Vector4 = Microsoft.Xna.Framework.Vector4;
+using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace Filetypes.ByteParsing
 {
@@ -240,7 +243,7 @@ namespace Filetypes.ByteParsing
     }
 
 
-    public class Vector3Parser : SpesificByteParser<RmvVector3>
+    public class Vector3Parser : SpesificByteParser<Vector3>
     {
         public string TypeName => "Vector3";
 
@@ -261,7 +264,7 @@ namespace Filetypes.ByteParsing
             throw new NotImplementedException();
         }
 
-        public byte[] EncodeValue(RmvVector3 value, out string error)
+        public byte[] EncodeValue(Vector3 value, out string error)
         {
             throw new NotImplementedException();
         }
@@ -273,18 +276,18 @@ namespace Filetypes.ByteParsing
             return result;
         }
 
-        public bool TryDecodeValue(byte[] buffer, int index, out RmvVector3 value, out int bytesRead, out string error)
+        public bool TryDecodeValue(byte[] buffer, int index, out Vector3 value, out int bytesRead, out string error)
         {
             var x = ByteParsers.Single.TryDecodeValue(buffer, index+0, out var xValue, out bytesRead, out error);
             var y = ByteParsers.Single.TryDecodeValue(buffer, index+4, out var yValue, out bytesRead, out error);
             var z = ByteParsers.Single.TryDecodeValue(buffer, index+8, out var zValue, out bytesRead, out error);
             bytesRead = 12;
-            value = new RmvVector3(xValue, yValue, zValue);
+            value = new Vector3(xValue, yValue, zValue);
             return x && y && z;
         }
     }
 
-    public class Vector4Parser : SpesificByteParser<RmvVector4>
+    public class Vector4Parser : SpesificByteParser<Vector4>
     {
         public string TypeName => "Vector4";
 
@@ -305,7 +308,7 @@ namespace Filetypes.ByteParsing
             throw new NotImplementedException();
         }
 
-        public byte[] EncodeValue(RmvVector4 value, out string error)
+        public byte[] EncodeValue(Vector4 value, out string error)
         {
             throw new NotImplementedException();
         }
@@ -317,14 +320,14 @@ namespace Filetypes.ByteParsing
             return result;
         }
 
-        public bool TryDecodeValue(byte[] buffer, int index, out RmvVector4 value, out int bytesRead, out string error)
+        public bool TryDecodeValue(byte[] buffer, int index, out Vector4 value, out int bytesRead, out string error)
         {
             var x = ByteParsers.Single.TryDecodeValue(buffer, index + 0, out var xValue, out bytesRead, out error);
             var y = ByteParsers.Single.TryDecodeValue(buffer, index + 4, out var yValue, out bytesRead, out error);
             var z = ByteParsers.Single.TryDecodeValue(buffer, index + 8, out var zValue, out bytesRead, out error);
             var w = ByteParsers.Single.TryDecodeValue(buffer, index + 12, out var wValue, out bytesRead, out error);
             bytesRead = 16;
-            value = new RmvVector4(xValue, yValue, zValue, wValue);
+            value = new Vector4(xValue, yValue, zValue, wValue);
             return x && y && z && w;
         }
     }

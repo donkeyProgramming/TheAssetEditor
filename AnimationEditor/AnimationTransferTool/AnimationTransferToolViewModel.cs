@@ -2,6 +2,7 @@
 using AnimationEditor.PropCreator.ViewModels;
 using Common;
 using CommonControls.Services;
+using FileTypes.DB;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace AnimationEditor.AnimationTransferTool
 {
     public class AnimationTransferToolViewModel : BaseAnimationViewModel
     {
-        public AnimationTransferToolViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper) : base(pfs, skeletonHelper, "Target", "Source")
+        public AnimationTransferToolViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, SchemaManager schemaManager) : base(pfs, skeletonHelper, schemaManager,"Target", "Source")
         {
             DisplayName = "Animation transfer tool";
             Pfs = pfs;

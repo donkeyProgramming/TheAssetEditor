@@ -14,7 +14,7 @@ using System.Text;
 using System.Windows.Media.Imaging;
 using View3D.Components;
 using System.Windows.Media;
-
+using FileTypes.DB;
 
 namespace View3D.Utility
 {
@@ -34,7 +34,7 @@ namespace View3D.Utility
         Dictionary<string, Texture2D> _textureMap = new Dictionary<string, Texture2D>();
         Dictionary<ShaderTypes, Effect> _shaders = new Dictionary<ShaderTypes, Effect>();
 
-        PackFileService _pf;
+        public PackFileService Pfs { get; private set; }
         public ContentManager Content { get; set; }
 
         public TextureCube PbrDiffuse { get; private set; }
@@ -44,7 +44,7 @@ namespace View3D.Utility
 
         public ResourceLibary(WpfGame game, PackFileService pf) : base(game)
         {
-            _pf = pf;
+            Pfs = pf;
         }
 
         public override void Initialize()
@@ -84,37 +84,44 @@ namespace View3D.Utility
 
         Texture2D LoadTextureAsTexture2d(string fileName, GraphicsDevice device)
         {
-            var file = _pf.FindFile(fileName);
+            var file = Pfs.FindFile(fileName);
             if (file == null)
             {
                 _logger.Here().Error($"Unable to find texture: {fileName}");
                 return null;
             }
-
-            var content = file.DataSource.ReadData();
-            using (MemoryStream stream = new MemoryStream(content))
+            try
             {
-                var image = Pfim.Pfim.FromStream(stream);
-
-                if (image.Format != ImageFormat.Rgba32)
+                var content = file.DataSource.ReadData();
+                using (MemoryStream stream = new MemoryStream(content))
                 {
-                    _logger.Here().Error($"Error loading texture ({fileName} - Unkown textur format {image.Format})");
-                    return null;
+                    var image = Pfim.Pfim.FromStream(stream);
+
+                    if (image.Format != ImageFormat.Rgba32)
+                    {
+                        _logger.Here().Error($"Error loading texture ({fileName} - Unkown textur format {image.Format})");
+                        return null;
+                    }
+
+                    var texture = new Texture2D(device, image.Width, image.Height, true, SurfaceFormat.Bgra32);
+                    texture.SetData(0, null, image.Data, 0, image.DataLen);
+
+                    // Load mipmaps
+                    for (int i = 0; i < image.MipMaps.Length; i++)
+                    {
+                        var mipmap = image.MipMaps[i];
+                        if (mipmap.Width > 4)
+                            texture.SetData(i + 1, null, image.Data, mipmap.DataOffset, mipmap.DataLen);
+
+                    }
+
+                    return texture;
                 }
-
-                var texture = new Texture2D(device, image.Width, image.Height, true, SurfaceFormat.Bgra32);
-                texture.SetData(0, null, image.Data, 0, image.DataLen);
-
-                // Load mipmaps
-                for (int i = 0; i < image.MipMaps.Length; i++)
-                {
-                    var mipmap = image.MipMaps[i];
-                    if (mipmap.Width > 4)
-                        texture.SetData(i + 1, null, image.Data, mipmap.DataOffset, mipmap.DataLen);
-
-                }
-
-                return texture;
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error($"Error loading texture {fileName} - {e.Message})");
+                return null;
             }
         }
 

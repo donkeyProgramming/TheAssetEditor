@@ -1,6 +1,7 @@
 ﻿using FileTypes.DB;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace FileTypes.MetaData
@@ -8,57 +9,17 @@ namespace FileTypes.MetaData
     public class MetaDataFile
     {
         public int Version { get; set; }
-        public string FileName { get; set; }
-        public List<MetaDataTagItem> TagItems { get; set; } = new List<MetaDataTagItem>();
+        public List<IMetaEntry> Items { get; set; } = new List<IMetaEntry>();
 
-        public override string ToString()
+        public List<MetaEntry> GetItemsOfType(string type)
         {
-            return $"{FileName} - {TagItems.Count}";
-        }
+            return Items
+                .Where(x => x.DecodedCorrectly && x is MetaEntry)
+                .Where(x => x.Name.Contains(type, StringComparison.InvariantCultureIgnoreCase))
+                .Select(x => x as MetaEntry)
+                .ToList(); ;
 
 
-        public void Validate(SchemaManager schemaManager)
-        {
-            foreach (var metaItem in TagItems)
-            {
-                var schema = schemaManager.GetMetaDataDefinition(metaItem.Name, metaItem.Version);
-                if (schema == null)
-                {
-                    metaItem.IsDecodedCorrectly = false;
-                    continue;
-                }
-
-                var fields = schema.ColumnDefinitions;
-                var totalBytesRead = 0;
-                var expectedBytes = metaItem.DataItems[0].Size;
-                var parsingFailed = false;
-                for (int i = 0; i < fields.Count; i++)
-                {
-                    var parser = Filetypes.ByteParsing.ByteParserFactory.Create(fields[i].Type);
-                    var result = parser.TryDecode(metaItem.DataItems[0].Bytes, metaItem.DataItems[0].Start + totalBytesRead, out string value, out var bytesRead, out var error);
-                    totalBytesRead += bytesRead;
-
-                    if (result == false)
-                    {
-                        parsingFailed = true;
-                        break;
-                    }
-                }
-
-                if (parsingFailed)
-                {
-                    metaItem.IsDecodedCorrectly = false;
-                    continue;
-                }
-
-                if (totalBytesRead != expectedBytes)
-                {
-                    metaItem.IsDecodedCorrectly = false;
-                    continue;
-                }
-
-                metaItem.IsDecodedCorrectly = true;
-            }
         }
     }
 }

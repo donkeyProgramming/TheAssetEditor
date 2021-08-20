@@ -27,14 +27,14 @@ namespace View3D.Services
         GraphicsDevice _device;
         ResourceLibary _resourceLibary;
 
-        public SceneLoader(PackFileService packFileService, ResourceLibary resourceLibary)
+        public SceneLoader(ResourceLibary resourceLibary)
         {
-            _packFileService = packFileService;
+            _packFileService = resourceLibary.Pfs;
             _device = resourceLibary.GraphicsDevice;
             _resourceLibary = resourceLibary;
         }
 
-        public void Load(string path, ISceneNode parent, AnimationPlayer player, ref string skeletonName, string attachmentPointName)
+        public void Load(string path, SceneNode parent, AnimationPlayer player, ref string skeletonName, string attachmentPointName)
         {
             var file = _packFileService.FindFile(path);
             if (file == null)
@@ -46,7 +46,7 @@ namespace View3D.Services
             Load(file, parent, player, ref skeletonName, attachmentPointName);
         }
 
-        public ISceneNode Load(PackFile file, ISceneNode parent, AnimationPlayer player, ref string skeletonName, string attachmentPointName = null)
+        public SceneNode Load(PackFile file, SceneNode parent, AnimationPlayer player, ref string skeletonName, string attachmentPointName = null)
         {
             if (file == null)
                 throw new Exception("File is null in SceneLoader::Load");
@@ -74,7 +74,7 @@ namespace View3D.Services
         }
 
 
-        void LoadVariantMesh(PackFile file, ref ISceneNode parent, AnimationPlayer player, ref string skeletonName, string attachmentPointName)
+        void LoadVariantMesh(PackFile file, ref SceneNode parent, AnimationPlayer player, ref string skeletonName, string attachmentPointName)
         {
             var variantMeshElement = new VariantMeshNode(file.Name);
             if (parent == null)
@@ -96,7 +96,7 @@ namespace View3D.Services
             }
         }
 
-        void LoadVariantMesh(VariantMesh mesh, ISceneNode root, AnimationPlayer player, ref string skeletonName, string attachmentPointName)
+        void LoadVariantMesh(VariantMesh mesh, SceneNode root, AnimationPlayer player, ref string skeletonName, string attachmentPointName)
         {
             if (mesh.ChildSlots.Count != 0)
                 root = root.AddObject(new SlotsNode("Slots"));
@@ -129,7 +129,7 @@ namespace View3D.Services
             }
         }
 
-        Rmv2ModelNode LoadRigidMesh(PackFile file, ref ISceneNode parent, AnimationPlayer player, ref string skeletonName, string attachmentPointName)
+        Rmv2ModelNode LoadRigidMesh(PackFile file, ref SceneNode parent, AnimationPlayer player, ref string skeletonName, string attachmentPointName)
         {
             var rmvModel = new RmvRigidModel(file.DataSource.ReadData(), file.Name);
             var model = new Rmv2ModelNode(rmvModel, _resourceLibary, Path.GetFileName( rmvModel.FileName), player, GeometryGraphicsContextFactory.CreateInstance(_device));
@@ -147,7 +147,7 @@ namespace View3D.Services
             return model;
         }
 
-        void LoadWsModel(PackFile file, ref ISceneNode parent, AnimationPlayer player, ref string skeletonName, string attachmentPointName)
+        void LoadWsModel(PackFile file, ref SceneNode parent, AnimationPlayer player, ref string skeletonName, string attachmentPointName)
         {
             var wsModelNode = new WsModelGroup("WsModel - " + file.Name);
             if (parent == null)
@@ -165,7 +165,7 @@ namespace View3D.Services
             {
                 var geometryNode = geometryNodes.Item(0);
                 var modelFile = _packFileService.FindFile(geometryNode.InnerText) as PackFile;
-                var modelAsBase = wsModelNode as ISceneNode;
+                var modelAsBase = wsModelNode as SceneNode;
                 var loadedModelNode = LoadRigidMesh(modelFile, ref modelAsBase, player, ref skeletonName, attachmentPointName);
 
                 // Materials

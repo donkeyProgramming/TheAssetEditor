@@ -2,6 +2,7 @@
 using AnimationEditor.PropCreator.ViewModels;
 using Common;
 using CommonControls.Services;
+using FileTypes.DB;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace AnimationEditor.CampaignAnimationCreator
 {
     public class CampaignAnimationCreatorViewModel : BaseAnimationViewModel
     {
-        public CampaignAnimationCreatorViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper) : base(pfs, skeletonHelper, "Model", "Not_in_use")
+        public CampaignAnimationCreatorViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, SchemaManager schemaManager) : base(pfs, skeletonHelper, schemaManager, "Model", "Not_in_use")
         {
             DisplayName = "Campaign Animation Creator";
         }

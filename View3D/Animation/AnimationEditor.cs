@@ -196,7 +196,7 @@ namespace View3D.Animation
             for (int i = 0; i < newFrameCount; i++)
             {
                 float t = i * fraction;
-                var keyframe = AnimationSampler.Sample(t, skeleton, new List<AnimationClip> { newAnim });
+                var keyframe = AnimationSampler.Sample(t, skeleton, newAnim);
 
                 KeyFrame newKeyFrame = new KeyFrame();
                 for (int mappingIndex = 0; mappingIndex < output.RotationMappings.Count; mappingIndex++)

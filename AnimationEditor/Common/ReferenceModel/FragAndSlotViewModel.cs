@@ -122,8 +122,7 @@ namespace AnimationEditor.Common.ReferenceModel
             if(value == null)
             {
                 _asset.SetAnimation(null);
-                _asset.SetMetaFile(null);
-                _asset.SetPersistantMetaFile(null);
+                _asset.SetMetaFile(null, null);
             }
             else
             {

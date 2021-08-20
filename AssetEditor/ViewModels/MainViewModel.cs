@@ -1,30 +1,17 @@
-﻿using AnimationEditor.AnimationTransferTool;
-using AnimationEditor.CampaignAnimationCreator;
-using AnimationEditor.MountAnimationCreator;
-using AnimationEditor.PropCreator;
-using AnimationEditor.PropCreator.ViewModels;
-using AnimationEditor.SuperView;
-using AnimMetaEditor;
-using AssetEditor.Services;
+﻿using AnimationEditor.SuperView;
 using AssetEditor.Views.Settings;
 using Common;
 using Common.ApplicationSettings;
 using Common.GameInformation;
-using CommonControls;
-using CommonControls.Editors.AnimationPack;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
-using CommonControls.Table;
-using Filetypes.RigidModel;
 using FileTypes.AnimationPack;
 using FileTypes.PackFiles.Models;
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
-using Octokit;
 using Serilog;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -91,7 +78,7 @@ namespace AssetEditor.ViewModels
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
 
-                //SuperViewViewModel_Debug.CreateDamselEditor(this, toolFactory, packfileService);
+                SuperViewViewModel_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 //MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
                 //KitbashEditor_Debug.CreatePaladin(this, toolFactory, packfileService);
@@ -102,10 +89,12 @@ namespace AssetEditor.ViewModels
 
 
 
-                var f = packfileService.FindFile(@"animations\battle\persistent\hu1b_alarielle_staff_and_sword_persistent_metadata_alive_0.anm.meta");
-                OpenFile(f);
+                //var f = packfileService.FindFile(@"animations\battle\persistent\hu1b_alarielle_staff_and_sword_persistent_metadata_alive_0.anm.meta");
+                //OpenFile(f);
 
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
+
+                //KitbashEditor_Debug.CreatePaladin(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);
 

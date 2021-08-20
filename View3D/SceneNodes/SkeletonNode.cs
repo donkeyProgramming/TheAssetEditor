@@ -12,13 +12,13 @@ using View3D.Rendering.RenderItems;
 
 namespace View3D.SceneNodes
 {
-    public interface IAnimationProvider
+    public interface ISkeletonProvider
     { 
         bool IsActive { get; }
         GameSkeleton Skeleton { get;  }
     }
 
-    public class SimpleSkeletonProvider : IAnimationProvider
+    public class SimpleSkeletonProvider : ISkeletonProvider
     {
         public SimpleSkeletonProvider(GameSkeleton skeleton) { Skeleton = skeleton; }
         public bool IsActive => true;
@@ -29,7 +29,7 @@ namespace View3D.SceneNodes
 
     public class SkeletonNode : GroupNode, IDrawableItem, IDisposable
     {
-        public IAnimationProvider AnimationProvider { get; private set; }
+        public ISkeletonProvider AnimationProvider { get; private set; }
         LineMeshRender _lineRenderer;
 
         public Color NodeColour = Color.Black;
@@ -39,7 +39,7 @@ namespace View3D.SceneNodes
         public int? SelectedBoneIndex { get; set; }
         public float SkeletonScale { get; set; } = 1;
 
-        public SkeletonNode(ContentManager content, IAnimationProvider animationProvider, string name = "Skeleton") : base(name)
+        public SkeletonNode(ContentManager content, ISkeletonProvider animationProvider, string name = "Skeleton") : base(name)
         {
             _lineRenderer = new LineMeshRender(content);
             AnimationProvider = animationProvider;

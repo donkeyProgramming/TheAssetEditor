@@ -871,7 +871,7 @@
             "Type": "Vector4"
           },
           {
-            "Name": "Bone ID",
+            "Name": "BoneID",
             "FieldReference": null,
             "TableReference": null,
             "IsKey": false,
@@ -3503,7 +3503,7 @@
             "Type": "Integer"
           },
           {
-            "Name": "Start Time",
+            "Name": "StartTime",
             "FieldReference": null,
             "TableReference": null,
             "IsKey": false,
@@ -3515,7 +3515,7 @@
             "Type": "Single"
           },
           {
-            "Name": "End Time",
+            "Name": "EndTime",
             "FieldReference": null,
             "TableReference": null,
             "IsKey": false,
@@ -3551,7 +3551,7 @@
             "Type": "Integer"
           },
           {
-            "Name": "Weapon Bone ID",
+            "Name": "PropBoneId",
             "FieldReference": null,
             "TableReference": null,
             "IsKey": false,
@@ -3607,7 +3607,7 @@
             "Type": "Integer"
           },
           {
-            "Name": "Start Time",
+            "Name": "StartTime",
             "FieldReference": null,
             "TableReference": null,
             "IsKey": false,
@@ -3619,7 +3619,7 @@
             "Type": "Single"
           },
           {
-            "Name": "End Time",
+            "Name": "EndTime",
             "FieldReference": null,
             "TableReference": null,
             "IsKey": false,
@@ -3655,7 +3655,7 @@
             "Type": "Integer"
           },
           {
-            "Name": "Weapon Bone ID",
+            "Name": "PropBoneId",
             "FieldReference": null,
             "TableReference": null,
             "IsKey": false,
@@ -3759,7 +3759,7 @@
             "Type": "Integer"
           },
           {
-            "Name": "Weapon Bone ID",
+            "Name": "PropBoneId",
             "FieldReference": null,
             "TableReference": null,
             "IsKey": false,
@@ -3815,7 +3815,7 @@
             "Type": "Integer"
           },
           {
-            "Name": "Start Time",
+            "Name": "StartTime",
             "FieldReference": null,
             "TableReference": null,
             "IsKey": false,
@@ -3827,7 +3827,7 @@
             "Type": "Single"
           },
           {
-            "Name": "End Time",
+            "Name": "EndTime",
             "FieldReference": null,
             "TableReference": null,
             "IsKey": false,
@@ -3863,7 +3863,7 @@
             "Type": "Integer"
           },
           {
-            "Name": "Weapon Bone ID",
+            "Name": "PropBoneId",
             "FieldReference": null,
             "TableReference": null,
             "IsKey": false,
@@ -3919,7 +3919,7 @@
             "Type": "Integer"
           },
           {
-            "Name": "Start Time",
+            "Name": "StartTime",
             "FieldReference": null,
             "TableReference": null,
             "IsKey": false,
@@ -3931,7 +3931,7 @@
             "Type": "Single"
           },
           {
-            "Name": "End Time",
+            "Name": "EndTime",
             "FieldReference": null,
             "TableReference": null,
             "IsKey": false,
@@ -3967,7 +3967,7 @@
             "Type": "Integer"
           },
           {
-            "Name": "Weapon Bone ID",
+            "Name": "PropBoneId",
             "FieldReference": null,
             "TableReference": null,
             "IsKey": false,

@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using View3D.Animation.AnimationChange;
+using View3D.SceneNodes;
 using static Filetypes.RigidModel.AnimationFile;
 
 namespace View3D.Animation
@@ -28,7 +30,7 @@ namespace View3D.Animation
                 {
                     Position = new List<Vector3>(Position),
                     Rotation = new List<Quaternion>(Rotation),
-                     Scale = new List<Vector3>(Scale)
+                    Scale = new List<Vector3>(Scale)
                 };
             }
         }
@@ -56,6 +58,7 @@ namespace View3D.Animation
                 DynamicFrames.Add(CreateKeyFrame(frame, file.Bones.Length));
         }
 
+       
         KeyFrame CreateKeyFrame(Frame frame, int totalBoneCount)
         {
             var output = new KeyFrame();
@@ -117,13 +120,6 @@ namespace View3D.Animation
                 frame.Quaternion.Add(new RmvVector4(rot.X, rot.Y, rot.Z, rot.W));
 
             return frame;
-        }
-
-        public bool IsPoseClip()
-        {
-            var hasDynamicRoation = RotationMappings.Count(x => x.IsDynamic);
-            var hasDynamicTranslation = TranslationMappings.Count(x => x.IsDynamic);
-            return hasDynamicRoation == 0 && hasDynamicTranslation == 0;
         }
 
         public AnimationClip Clone()

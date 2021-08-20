@@ -2,6 +2,7 @@
 using AnimationEditor.PropCreator.ViewModels;
 using Common;
 using CommonControls.Services;
+using FileTypes.DB;
 using FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;
 using System;
@@ -13,7 +14,7 @@ namespace AnimationEditor.PropCreator
 {
     public class PropCreatorViewModel : BaseAnimationViewModel
     {
-        public PropCreatorViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper) : base(pfs, skeletonHelper, "Main", "Reference")
+        public PropCreatorViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, SchemaManager schemaManager) : base(pfs, skeletonHelper, schemaManager, "Main", "Reference")
         {
             DisplayName  = "Anim.Prop Creator";
         }
@@ -21,8 +22,8 @@ namespace AnimationEditor.PropCreator
         public override void Initialize()
         {
             var propAsset = Scene.AddCompnent(new AssetViewModel(_pfs, "Prop", Color.Red, Scene));
+            Player.RegisterAsset(propAsset);
             var editor = new PropCreatorEditorViewModel(propAsset, MainModelView.Data, ReferenceModelView.Data);
-            Player.RegisterAsset(editor.Data);
             Editor = editor;
         }
     }

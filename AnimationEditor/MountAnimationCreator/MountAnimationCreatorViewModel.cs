@@ -2,6 +2,7 @@
 using AnimationEditor.PropCreator.ViewModels;
 using Common;
 using CommonControls.Services;
+using FileTypes.DB;
 using FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;
 using System;
@@ -16,7 +17,7 @@ namespace AnimationEditor.MountAnimationCreator
 
     public class MountAnimationCreatorViewModel : BaseAnimationViewModel
     {
-        public MountAnimationCreatorViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper) : base(pfs, skeletonHelper, "Rider", "Mount")
+        public MountAnimationCreatorViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, SchemaManager schemaManager) : base(pfs, skeletonHelper, schemaManager, "Rider", "Mount")
         {
             DisplayName = "MountAnimCreator";
         }

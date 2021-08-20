@@ -21,7 +21,7 @@ using static CommonControls.Services.SkeletonAnimationLookUpHelper;
 namespace KitbasherEditor.ViewModels
 {
 
-    public class AnimationControllerViewModel : NotifyPropertyChangedImpl, IAnimationProvider
+    public class AnimationControllerViewModel : NotifyPropertyChangedImpl, ISkeletonProvider
     {
         ILogger _logger = Logging.Create<AnimationControllerViewModel>();
         IComponentManager _componentManager;

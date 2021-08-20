@@ -159,8 +159,10 @@ variantmeshes\wh_variantmodels\hu6\bst\bst_bestigors\torso\bst_bestigor_torso_01
 
 Scale places - Mount tool 
 
-
-
+---------
+Validation of variant mesh, exception, not error box on xml node exception
+I think pretty much all vmds should have those two entries, no? meta n entries
+vmp_master_necromancer_torso_02.rigid_model_v2 is the body I am working on texture crach
 
 - Animated prop
 - Splice
@@ -169,6 +171,10 @@ Scale places - Mount tool
 - Prop
 
 - Firepos
+animations\battle\persistent\hu1b_alarielle_staff_and_sword_persistent_metadata_alive_0.anm.meta
+
+variantmeshes\variantmeshdefinitions\hef_alarielle.variantmeshdefinition
+animations/animation_tables/hu1b_alarielle_staff_and_sword.frg
 
 	
-
+variantmeshes\variantmeshdefinitions\skv_throt.variantmeshdefinition

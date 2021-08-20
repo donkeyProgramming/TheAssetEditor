@@ -1,15 +1,13 @@
 ﻿using AnimationEditor;
-using AnimMetaEditor;
-using AssetEditor.Services;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
 using Common;
 using Common.ApplicationSettings;
 using Common.GameInformation;
-using CommonControls;
 using CommonControls.Editors.AnimationFragment;
 using CommonControls.Editors.AnimationPack;
+using CommonControls.Editors.AnimMeta;
 using CommonControls.Editors.CampaignAnimBin;
 using CommonControls.Editors.TextEditor;
 using CommonControls.Editors.VariantMeshDefinition;

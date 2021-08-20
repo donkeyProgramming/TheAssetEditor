@@ -5,13 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using View3D.Animation.AnimationChange;
+using View3D.SceneNodes;
 using static Filetypes.RigidModel.AnimationFile;
 
 namespace View3D.Animation
 {
     public class AnimationSampler
     {
-        public static AnimationFrame Sample(int frameIndex, float frameIterpolation, GameSkeleton skeleton, List<AnimationClip> animationClips)
+        public static AnimationFrame Sample(int frameIndex, float frameIterpolation, GameSkeleton skeleton, AnimationClip animationClip, List<AnimationChangeRule> animationChangeRules = null)
         {
             try
             {
@@ -20,25 +22,26 @@ namespace View3D.Animation
 
                 var currentFrame = skeleton.CreateAnimationFrame();
 
-                if (animationClips != null)
+                if (animationClip != null)
                 {
-                    foreach (var animation in animationClips)
-                        ApplyAnimation(animation.StaticFrame, null, 0, currentFrame, animation.RotationMappings, animation.TranslationMappings, AnimationBoneMappingType.Static);
+                    ApplyAnimation(animationClip.StaticFrame, null, 0, currentFrame, animationClip.RotationMappings, animationClip.TranslationMappings, AnimationBoneMappingType.Static);
                     
-                    if (animationClips.Any())
+                    if (animationClip.DynamicFrames.Count > frameIndex)
                     {
-                        if (animationClips[0].DynamicFrames.Count > frameIndex)
-                        {
-                            var currentFrameKeys = GetKeyFrameFromIndex(animationClips[0].DynamicFrames, frameIndex);
-                            var nextFrameKeys = GetKeyFrameFromIndex(animationClips[0].DynamicFrames, frameIndex + 1);
-                            ApplyAnimation(currentFrameKeys, nextFrameKeys, frameIterpolation, currentFrame, animationClips[0].RotationMappings, animationClips[0].TranslationMappings, AnimationBoneMappingType.Dynamic);
+                        var currentFrameKeys = GetKeyFrameFromIndex(animationClip.DynamicFrames, frameIndex);
+                        var nextFrameKeys = GetKeyFrameFromIndex(animationClip.DynamicFrames, frameIndex + 1);
+                        ApplyAnimation(currentFrameKeys, nextFrameKeys, frameIterpolation, currentFrame, animationClip.RotationMappings, animationClip.TranslationMappings, AnimationBoneMappingType.Dynamic);
 
-                            // Apply skeleton scale
-                           for (int i = 0; i < currentFrame.BoneTransforms.Count(); i++)
-                               currentFrame.BoneTransforms[i].Scale = animationClips[0].DynamicFrames[0].Scale[i];
-                        }
+                        // Apply skeleton scale
+                        for (int i = 0; i < currentFrame.BoneTransforms.Count(); i++)
+                            currentFrame.BoneTransforms[i].Scale = animationClip.DynamicFrames[0].Scale[i];
                     }
-                    
+                }
+
+                if (animationChangeRules != null)
+                {
+                    foreach (var rule in animationChangeRules)
+                        rule.ApplyBeforeWorldTransform(currentFrame);
                 }
 
                 for (int i = 0; i < currentFrame.BoneTransforms.Count(); i++)
@@ -52,13 +55,15 @@ namespace View3D.Animation
 
                     var parentindex = currentFrame.BoneTransforms[i].ParentBoneIndex;
                     if (parentindex == -1)
-                    {
-                        //var scale = Matrix.CreateScale(0.1f);
-                        //currentFrame.BoneTransforms[i].WorldTransform = (scale * currentFrame.BoneTransforms[i].WorldTransform);
                         continue;
-                    }
 
                     currentFrame.BoneTransforms[i].WorldTransform = currentFrame.BoneTransforms[i].WorldTransform * currentFrame.BoneTransforms[parentindex].WorldTransform;
+                }
+
+                if (animationChangeRules != null)
+                {
+                    foreach (var rule in animationChangeRules)
+                        rule.ApplyAfterWorldTransform(currentFrame);
                 }
 
                 for (int i = 0; i < skeleton.BoneCount; i++)
@@ -66,6 +71,7 @@ namespace View3D.Animation
                     var inv = Matrix.Invert(skeleton.GetWorldTransform(i));
                     currentFrame.BoneTransforms[i].WorldTransform = Matrix.Multiply(inv, currentFrame.BoneTransforms[i].WorldTransform);
                 }
+
                 return currentFrame;
             }
             catch (Exception e)
@@ -76,7 +82,7 @@ namespace View3D.Animation
             }
         }
 
-        public static AnimationFrame Sample(float t, GameSkeleton skeleton, List<AnimationClip> animationClips)
+        public static AnimationFrame Sample(float t, GameSkeleton skeleton, AnimationClip animationClip, List<AnimationChangeRule> animationChangeRules = null)
         {
             try
             {
@@ -84,9 +90,9 @@ namespace View3D.Animation
                 int frameIndex = 0;
                 float frameIterpolation = 0;
 
-                if (animationClips != null)
+                if (animationClip != null)
                 {
-                    int maxFrames = animationClips[0].DynamicFrames.Count() - 1;
+                    int maxFrames = animationClip.DynamicFrames.Count() - 1;
                     if (maxFrames < 0)
                         maxFrames = 0;
                     float frameWithLeftover = maxFrames * clampedT;
@@ -96,7 +102,7 @@ namespace View3D.Animation
                     frameIterpolation = frameWithLeftover - clampedFrame; 
                 }
 
-                return Sample(frameIndex, frameIterpolation, skeleton, animationClips);
+                return Sample(frameIndex, frameIterpolation, skeleton, animationClip, animationChangeRules);
             }
             catch (Exception e)
             {
@@ -106,10 +112,6 @@ namespace View3D.Animation
             }
         }
 
-        public static AnimationFrame Sample(int frameIndex, float frameIterpolation, GameSkeleton skeleton, AnimationClip animationClip)
-        {
-            return Sample(frameIndex, frameIterpolation, skeleton, new List<AnimationClip>() { animationClip });
-        }
 
         static float EnsureRange(float value, float min, float max)
         {

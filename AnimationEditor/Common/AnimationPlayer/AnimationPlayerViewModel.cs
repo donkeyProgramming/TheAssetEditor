@@ -64,10 +64,24 @@ namespace AnimationEditor.Common.AnimationPlayer
         {
              foreach (var item in _assetList)
             {
-                if(item.Player.IsPlaying)
+                if (item.Player.IsPlaying)
+                {
                     item.Player.Pause();
+                    foreach (var attachedItem in item.MetaDataItems)
+                    {
+                        if (attachedItem.Player != null)
+                            attachedItem.Player.Pause(); 
+                    }
+                }
                 else
+                {
                     item.Player.Play();
+                    foreach (var attachedItem in item.MetaDataItems)
+                    {
+                       if (attachedItem.Player != null)
+                           attachedItem.Player.Play();
+                    }
+                }
             }
         }
 
@@ -143,6 +157,12 @@ namespace AnimationEditor.Common.AnimationPlayer
                 {
                     item.Player.CurrentFrame = 0;
                     item.Player.Play();
+
+                    foreach (var attachedItem in item.MetaDataItems)
+                    {
+                        if (attachedItem.Player != null)
+                            attachedItem.Player.Play();
+                    }
                 }
             }
             else

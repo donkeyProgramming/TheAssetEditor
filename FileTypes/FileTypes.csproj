@@ -11,6 +11,7 @@
   <ItemGroup>
     <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
+	<PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.0.1641" />
   </ItemGroup>
 
   <ItemGroup>

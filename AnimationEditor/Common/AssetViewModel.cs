@@ -1,17 +1,22 @@
-﻿using Common;
+﻿using AnimationEditor.Common.AnimationPlayer;
+using Common;
 using CommonControls.Common;
 using CommonControls.Editors.BoneMapping;
 using CommonControls.Services;
 using Filetypes.RigidModel;
+using FileTypes.DB;
 using FileTypes.MetaData;
+using FileTypes.MetaData.Instances;
 using FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using View3D.Animation;
+using View3D.Animation.MetaData;
 using View3D.Components;
 using View3D.Components.Component;
 using View3D.Rendering.Geometry;
@@ -22,16 +27,18 @@ using static CommonControls.Services.SkeletonAnimationLookUpHelper;
 
 namespace AnimationEditor.Common.ReferenceModel
 {
-    public class AssetViewModel : BaseComponent, IAnimationProvider
+    public class AssetViewModel : BaseComponent, ISkeletonProvider
     {
         public event ValueChangedDelegate<GameSkeleton> SkeletonChanged;
         public event ValueChangedDelegate<AnimationClip> AnimationChanged;
         public event ValueChangedDelegate<AssetViewModel> MeshChanged;
+        public event ValueChangedDelegate<AssetViewModel> MetaDataChanged;
+
 
         ILogger _logger = Logging.Create<AssetViewModel>();
         PackFileService _pfs;
         ResourceLibary _resourceLibary;
-        ISceneNode _parentNode;
+        SceneNode _parentNode;
         Color _skeletonColor;
         SkeletonNode _skeletonSceneNode;
         List<Rmv2MeshNode> _meshNodes = new List<Rmv2MeshNode>();
@@ -40,16 +47,17 @@ namespace AnimationEditor.Common.ReferenceModel
         public bool IsSelectable { get => _isSelectable; set { _isSelectable = value; SetSelectableState(); } } 
 
         public View3D.Animation.AnimationPlayer Player;
-        public SkeletonBoneAnimationResolver SnapToBoneResolver { get; set; }
-        public ISceneNode MainNode { get => _parentNode; }
+        public List<IMetaDataInstance> MetaDataItems { get; set; } = new List<IMetaDataInstance>();
+
+        public SceneNode MainNode { get => _parentNode; }
 
         public string Description { get; set; }
 
         public bool IsActive => true;
         public GameSkeleton Skeleton { get; private set; }
         public AnimationClip AnimationClip { get; private set; }
-        public MetaDataFile MetaData { get; private set; }
-        public MetaDataFile PersistMetaData { get; private set; }
+        public PackFile MetaData { get; private set; }
+        public PackFile PersistMetaData { get; private set; }
         public Matrix Offset { get; set; } = Matrix.Identity;
 
 
@@ -86,6 +94,9 @@ namespace AnimationEditor.Common.ReferenceModel
             _skeletonSceneNode = new SkeletonNode(_resourceLibary.Content, this);
             _skeletonSceneNode.NodeColour = _skeletonColor;
             _parentNode.AddObject(_skeletonSceneNode);
+
+ 
+
             base.Initialize();
         }
 
@@ -93,7 +104,7 @@ namespace AnimationEditor.Common.ReferenceModel
         {
             _logger.Here().Information($"Loading reference model - {_pfs.GetFullPath(file)}");
 
-            SceneLoader loader = new SceneLoader(_pfs, _resourceLibary);
+            SceneLoader loader = new SceneLoader(_resourceLibary);
             var outSkeletonName = "";
             var result = loader.Load(file, null, Player, ref outSkeletonName);
             if (result == null)
@@ -198,13 +209,8 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public void SetSkeleton(AnimationFile animFile, string skeletonName)
         {
-            SetSkeleton(new GameSkeleton(animFile, Player), skeletonName);
-        }
-
-        public void SetSkeleton(GameSkeleton gameSkeleton, string skeletonName)
-        {
             SkeletonName.Value = skeletonName;
-            Skeleton = gameSkeleton;
+            Skeleton = new GameSkeleton(animFile, Player);
 
             AnimationClip = null;
             Player.SetAnimation(null, Skeleton);
@@ -255,22 +261,23 @@ namespace AnimationEditor.Common.ReferenceModel
             Player.CurrentFrame = frame;
         }
 
-        public void SetMetaFile(MetaDataFile metaFile)
+        public void SetMetaFile(PackFile metaFile, PackFile persistantFile)
         {
             MetaData = metaFile;
+            PersistMetaData = persistantFile;
+
+            MetaDataChanged?.Invoke(this);
         }
 
-        public void SetPersistantMetaFile(MetaDataFile persistantFile)
-        {
-            PersistMetaData = persistantFile;
-        }
+
 
         public override void Update(GameTime gameTime)
         {
-            if (SnapToBoneResolver != null)
-                _parentNode.ModelMatrix = Matrix.Multiply(Offset, SnapToBoneResolver.GetWorldTransform());
-            else
-                _parentNode.ModelMatrix = Matrix.Multiply(Offset,Matrix.Identity);
+            _parentNode.ModelMatrix = Matrix.Multiply(Offset,Matrix.Identity);
+
+            var p = Player.CurrentFrame;
+            foreach (var item in MetaDataItems)
+                item.Update(p);
         }
 
         

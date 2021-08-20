@@ -4,6 +4,8 @@ using AnimationEditor.Common.ReferenceModel;
 using Common;
 using CommonControls.Services;
 using Filetypes.RigidModel;
+using FileTypes.AnimationPack;
+using FileTypes.DB;
 using FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
@@ -27,13 +29,21 @@ namespace AnimationEditor.PropCreator.ViewModels
     {
         public PackFile Mesh{ get; set; }
         public PackFile Animation { get; set; }
+        public string FragmentName { get; set; }
+        public AnimationSlotType AnimationSlot { get; set; }
+
+        //AnimationSlotTypeHelper
+        // Fragment
+        // Slot
     }
 
     public abstract class BaseAnimationViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
+        bool _createDefaultAssets;
         protected PackFileService _pfs;
         protected SkeletonAnimationLookUpHelper _skeletonHelper;
-        public string DisplayName { get; set; } = "Anim.Prop Creator";
+        protected SchemaManager _schemaManager;
+        public string DisplayName { get; set; } = "Creator";
         public IPackFile MainFile { get; set; }
 
         SceneContainer _scene;
@@ -52,16 +62,20 @@ namespace AnimationEditor.PropCreator.ViewModels
         object _editor;
         public object Editor { get => _editor; set => SetAndNotify(ref _editor, value); }
 
-        public BaseAnimationViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, string headerAsset0, string headerAsset1)
+        public BaseAnimationViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, SchemaManager schemaManager, string headerAsset0, string headerAsset1, bool createDefaultAssets = true)
         {
             _pfs = pfs;
             _skeletonHelper = skeletonHelper;
+            _schemaManager = schemaManager;
+            _createDefaultAssets = createDefaultAssets;
 
             Scene = new SceneContainer();
             Scene.Components.Add(new FpsComponent(Scene));
             Scene.Components.Add(new KeyboardComponent(Scene));
             Scene.Components.Add(new MouseComponent(Scene));
             Scene.Components.Add(new ResourceLibary(Scene, pfs));
+            Scene.Components.Add(skeletonHelper);
+            Scene.Components.Add(schemaManager);
             Scene.Components.Add(new ArcBallCamera(Scene, new Vector3(0), 10));
             Scene.Components.Add(new ClearScreenComponent(Scene));
             Scene.Components.Add(new RenderEngineComponent(Scene));
@@ -79,27 +93,30 @@ namespace AnimationEditor.PropCreator.ViewModels
             var mainAsset = Scene.AddCompnent(new AssetViewModel(_pfs, headerAsset0, Color.Black, Scene));
             var refAsset = Scene.AddCompnent(new AssetViewModel(_pfs, headerAsset1,  Color.Green, Scene));
 
-            MainModelView = new ReferenceModelSelectionViewModel(pfs, mainAsset, headerAsset0 + ":", skeletonHelper);
-            ReferenceModelView = new ReferenceModelSelectionViewModel(pfs, refAsset, headerAsset1 + ":", skeletonHelper);
+            MainModelView = new ReferenceModelSelectionViewModel(pfs, mainAsset, headerAsset0 + ":", Scene, skeletonHelper, schemaManager);
+            ReferenceModelView = new ReferenceModelSelectionViewModel(pfs, refAsset, headerAsset1 + ":", Scene, skeletonHelper, schemaManager);
         }
 
         private void OnSceneInitialized(WpfGame scene)
         {
-            Player.RegisterAsset(MainModelView.Data);
-            Player.RegisterAsset(ReferenceModelView.Data);
-
-            if (MainInput != null)
+            if (_createDefaultAssets)
             {
-                MainModelView.Data.SetMesh(MainInput.Mesh);
-                if(MainInput.Animation != null)
-                    MainModelView.Data.SetAnimation(_skeletonHelper.FindAnimationRefFromPackFile(MainInput.Animation, _pfs));
-            }
+                Player.RegisterAsset(MainModelView.Data);
+                Player.RegisterAsset(ReferenceModelView.Data);
 
-            if (RefInput != null)
-            {
-                ReferenceModelView.Data.SetMesh(RefInput.Mesh);
-                if(RefInput.Animation != null)
-                    ReferenceModelView.Data.SetAnimation(_skeletonHelper.FindAnimationRefFromPackFile(RefInput.Animation, _pfs));
+                if (MainInput != null)
+                {
+                    MainModelView.Data.SetMesh(MainInput.Mesh);
+                    if (MainInput.Animation != null)
+                        MainModelView.Data.SetAnimation(_skeletonHelper.FindAnimationRefFromPackFile(MainInput.Animation, _pfs));
+                }
+
+                if (RefInput != null)
+                {
+                    ReferenceModelView.Data.SetMesh(RefInput.Mesh);
+                    if (RefInput.Animation != null)
+                        ReferenceModelView.Data.SetAnimation(_skeletonHelper.FindAnimationRefFromPackFile(RefInput.Animation, _pfs));
+                }
             }
 
             Initialize();

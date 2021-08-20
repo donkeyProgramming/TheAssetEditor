@@ -289,7 +289,33 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Editors\AnimMeta\" />
+    <Compile Update="Editors\AnimMeta\View\MetaEntriesListView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Editors\AnimMeta\View\EditorValueEditor.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Editors\AnimMeta\View\MainEditorView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Editors\AnimMeta\View\NewTagWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Editors\AnimMeta\View\MetaEntriesListView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Editors\AnimMeta\View\EditorValueEditor.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Editors\AnimMeta\View\MainEditorView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Editors\AnimMeta\View\NewTagWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 
 </Project>

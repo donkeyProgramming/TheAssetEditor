@@ -3,6 +3,7 @@ using Common.ApplicationSettings;
 using CommonControls.Common;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
+using FileTypes.DB;
 using FileTypes.PackFiles.Models;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
@@ -46,7 +47,7 @@ namespace KitbasherEditor.ViewModels
         ModelLoaderService _modelLoader;
         ModelSaverHelper _modelSaver;
 
-        public KitbasherViewModel(PackFileService pf, SkeletonAnimationLookUpHelper skeletonHelper)
+        public KitbasherViewModel(PackFileService pf, SkeletonAnimationLookUpHelper skeletonHelper )
         {
             _packFileService = pf;
             _skeletonAnimationLookUpHelper = skeletonHelper;

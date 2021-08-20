@@ -9,7 +9,5 @@ namespace FileTypes.DB
         public string TableName { get; set; }
         public int Version { get; set; }
         public List<DbColumnDefinition> ColumnDefinitions { get; set; } = new List<DbColumnDefinition>();
-
-        public string DisplayName { get => TableName + "_v" + Version; }
     }
 }

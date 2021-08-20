@@ -62,7 +62,7 @@ namespace KitbasherEditor.Services
         {
             _logger.Here().Information($"Loading reference model - {_packFileService.GetFullPath(file)}");
 
-            SceneLoader loader = new SceneLoader(_packFileService, _resourceLibary);
+            SceneLoader loader = new SceneLoader(_resourceLibary);
             var outSkeletonName = "";
             var result = loader.Load(file, null, _animationView.Player, ref outSkeletonName);
             if (result == null)

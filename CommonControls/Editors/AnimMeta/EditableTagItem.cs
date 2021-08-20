@@ -4,18 +4,18 @@ using GalaSoft.MvvmLight.CommandWpf;
 using System.Windows;
 using System.Windows.Input;
 
-namespace AnimMetaEditor.ViewModels.Editor
+namespace CommonControls.Editors.AnimMeta
 {
     public class EditableTagItem : NotifyPropertyChangedImpl
     {
-        byte[] _originalValue;
+        byte[] _originalByteValue;
         IByteParser _parser { get; set; }
 
         public EditableTagItem(IByteParser parser, byte[] value)
         {
-            _originalValue = value;
+            _originalByteValue = value;
             _parser = parser;
-            isValid = _parser.TryDecode(_originalValue, 0, out _valueAsString, out _, out _);
+            IsValid = _parser.TryDecode(_originalByteValue, 0, out _valueAsString, out _, out _);
         }
 
         string _valueAsString;
@@ -24,24 +24,18 @@ namespace AnimMetaEditor.ViewModels.Editor
         public string FieldName { get; set; }
         public string Description { get; set; }
         public string ValueType { get; set; }
-        public ICommand ResetCommand { get; set; }
 
         bool _isValueValid;
-        public bool isValid { get => _isValueValid; set { SetAndNotify(ref _isValueValid, value); } }
+        public bool IsValid { get => _isValueValid; set { SetAndNotify(ref _isValueValid, value); } }
 
         void Validate()
         {
-            isValid = _parser.Encode(ValueAsString, out _) != null;
+            IsValid = _parser.Encode(ValueAsString, out _) != null;
         }
 
         public byte[] GetByteValue()
         {
             return _parser.Encode(ValueAsString, out _);
-        }
-
-        public override string ToString()
-        {
-            return $"{FieldName} - {ValueAsString} - {isValid}";
         }
     }
 }

@@ -98,6 +98,14 @@ namespace Filetypes.ByteParsing
             _currentIndex += bytesRead;
         }
 
+        public void Read<T>(SpesificByteParser<T> parser, out T value, out string error)
+        {
+            if (!parser.TryDecodeValue(_buffer, _currentIndex, out value, out int bytesRead, out error))
+                throw new Exception("Unable to parse :" + error);
+
+            _currentIndex += bytesRead;
+        }
+
         public string ReadStringAscii() => Read(ByteParsers.StringAscii);
         public string ReadString() => Read(ByteParsers.String);
         public int ReadInt32() => Read(ByteParsers.Int32);

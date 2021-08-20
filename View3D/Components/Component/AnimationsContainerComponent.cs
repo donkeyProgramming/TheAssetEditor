@@ -44,6 +44,10 @@ namespace View3D.Components.Component
 
         public override void Update(GameTime gameTime)
         {
+            var itemsToRemove = _playerMap.Where(x => x.Value.MarkedForRemoval).ToList();
+            foreach (var item in itemsToRemove)
+                _playerMap.Remove(item.Key);
+
             foreach (var item in _playerMap)
                 item.Value.Update(gameTime);
             base.Update(gameTime);

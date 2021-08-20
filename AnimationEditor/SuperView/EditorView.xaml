@@ -3,16 +3,21 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:AnimationEditor.SuperView"
+             xmlns:local="clr-namespace:AnimationEditor.SuperView" xmlns:referencemodel="clr-namespace:AnimationEditor.Common.ReferenceModel"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel>
-        <ListView ItemsSource="{Binding MyItems, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Stretch">
-            <ListView.ItemTemplate>
+    <Grid>
+        <ListView ItemsSource="{Binding Items, UpdateSourceTrigger=PropertyChanged}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate >
                 <DataTemplate>
-                    <local:ModelView/>
+                    <referencemodel:ReferenceModelSelectionView />
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-    </StackPanel>
+    </Grid>
 </UserControl>

@@ -75,14 +75,14 @@ namespace AnimationEditor.PropCreator
         public SkeletonBoneNode SelectedRefBone
         {
             get { return _selectedRefBone; }
-            set { SetAndNotify(ref _selectedRefBone, value); UpdateBoneSnap(); }
+            set { SetAndNotify(ref _selectedRefBone, value); }
         }
 
         bool _snapToRefBone = true;
         public bool SnapToRefBone
         {
             get { return _snapToRefBone; }
-            set { SetAndNotify(ref _snapToRefBone, value); UpdateBoneSnap(); }
+            set { SetAndNotify(ref _snapToRefBone, value);  }
         }
 
         bool _specifyChildBone = false;
@@ -192,16 +192,6 @@ namespace AnimationEditor.PropCreator
             }
 
             return output;
-        }
-
-        private void UpdateBoneSnap()
-        {
-            if (SelectedRefBone != null && SnapToRefBone == true)
-            {
-                Data.SnapToBoneResolver = new View3D.Utility.SkeletonBoneAnimationResolver(new SimpleSkeletonProvider(ReferenceAsset.Skeleton), SelectedRefBone.BoneIndex);
-            }
-            else
-                Data.SnapToBoneResolver = null;
         }
 
     }

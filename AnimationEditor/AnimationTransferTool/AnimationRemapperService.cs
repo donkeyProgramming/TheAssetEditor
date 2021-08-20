@@ -60,8 +60,8 @@ namespace AnimationEditor.AnimationTransferTool
             {
                 for (int i = 0; i < copyToSkeleton.BoneCount; i++)
                 {
-                    var currentCopyToFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton, new List<AnimationClip>() { newAnimation });
-                    var copyFromFrame = AnimationSampler.Sample(frameIndex, 0, copyFromSkeleton, new List<AnimationClip>() { animationToCopy });
+                    var currentCopyToFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton,  newAnimation);
+                    var copyFromFrame = AnimationSampler.Sample(frameIndex, 0, copyFromSkeleton, animationToCopy );
 
                     var desiredBonePosWorld = currentCopyToFrame.GetSkeletonAnimatedWorld(copyToSkeleton, i);
 
@@ -139,11 +139,11 @@ namespace AnimationEditor.AnimationTransferTool
             var frameCount = animationToScale.DynamicFrames.Count;
             for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
-                var copyFromFrame = AnimationSampler.Sample(frameIndex, 0, copyFromSkeleton, new List<AnimationClip>() { animationToCopy });
+                var copyFromFrame = AnimationSampler.Sample(frameIndex, 0, copyFromSkeleton,  animationToCopy );
 
                 for (int i = 0; i < copyToSkeleton.BoneCount; i++)
                 {
-                    var currentFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton, new List<AnimationClip>() { animationToScale });
+                    var currentFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton,  animationToScale );
 
                     var boneSettings = BoneHelper.GetBoneFromId(_bones, i);
                     if (boneSettings.ForceSnapToWorld.Value == false)
@@ -179,7 +179,7 @@ namespace AnimationEditor.AnimationTransferTool
             {
                 for (int i = 0; i < copyToSkeleton.BoneCount; i++)
                 {
-                    var currentFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton, new List<AnimationClip>() { animationToScale });
+                    var currentFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton, animationToScale );
 
                     var fromParentBoneIndex = copyToSkeleton.GetParentBone(i);
                     if (fromParentBoneIndex == -1)
@@ -223,8 +223,8 @@ namespace AnimationEditor.AnimationTransferTool
 
                     var targetBoneIndex = mappedIndex.NewValue;
 
-                    var currentCopyToFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton, new List<AnimationClip>() { animationToFix });
-                    var copyFromFrame = AnimationSampler.Sample(frameIndex, 0, copyFromSkeleton, new List<AnimationClip>() { animationToCopy });
+                    var currentCopyToFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton,animationToFix );
+                    var copyFromFrame = AnimationSampler.Sample(frameIndex, 0, copyFromSkeleton,  animationToCopy );
 
 
                     // self attach - The attachment point to move | copyToSkeleton -> boneIndex i

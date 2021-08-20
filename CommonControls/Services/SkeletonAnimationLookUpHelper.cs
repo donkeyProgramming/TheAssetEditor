@@ -2,6 +2,7 @@
 using CommonControls.Services;
 using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
+using Microsoft.Xna.Framework;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ using System.Linq;
 namespace CommonControls.Services
 {
 
-    public class SkeletonAnimationLookUpHelper 
+    public class SkeletonAnimationLookUpHelper : IGameComponent
     {
         ILogger _logger = Logging.Create<SkeletonAnimationLookUpHelper>();
         Dictionary<string, ObservableCollection<AnimationReference>> _skeletonNameToAnimationMap = new Dictionary<string, ObservableCollection<AnimationReference>>();
@@ -121,9 +122,13 @@ namespace CommonControls.Services
             return null;
         }
 
+        public void Initialize()
+        {
+        }
+
 
         // Delete this pice of shit
-        
+
         public class AnimationReference
         {
             public AnimationReference(string animationFile, PackFileContainer container)

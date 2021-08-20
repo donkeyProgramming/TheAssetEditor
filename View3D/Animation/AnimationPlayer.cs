@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using View3D.Animation.AnimationChange;
 
 namespace View3D.Animation
 {
@@ -88,28 +89,31 @@ namespace View3D.Animation
         public GameSkeleton _skeleton;
         TimeSpan _timeSinceStart;
         AnimationFrame _currentAnimFrame;
-        List<AnimationClip> _animationClips;
+        AnimationClip _animationClip;
 
         public bool IsPlaying { get; private set; } = true;
         public double SpeedMultiplication { get; set; }
         public bool IsEnabled { get; set; } = false;
         public bool LoopAnimation { get; set; } = true;
+        public bool MarkedForRemoval { get; set; } = false;
+
+        public List<AnimationChangeRule> AnimationRules { get; set; } = new List<AnimationChangeRule>();
 
         public int CurrentFrame
         {
             get 
             {
-                if (_animationClips == null)
+                if (_animationClip == null)
                     return 0;
 
-                return (int)Math.Round((_timeSinceStart.TotalMilliseconds / GetAnimationLengthMs()) * (_animationClips[0].DynamicFrames.Count() - 1) ) + 1; 
+                return (int)Math.Round((_timeSinceStart.TotalMilliseconds / GetAnimationLengthMs()) * (_animationClip.DynamicFrames.Count() - 1) ) + 1; 
             }
             set
             {
                 if (CurrentFrame == value)
                     return;
 
-                if (_animationClips != null)
+                if (_animationClip != null)
                 {
                     var frameCount = FrameCount();
 
@@ -141,30 +145,30 @@ namespace View3D.Animation
             if (animation == null)
                 SetAnimationArray(null, skeleton);
             else
-                SetAnimationArray(new List<AnimationClip>() { animation }, skeleton);
+                SetAnimationArray(animation , skeleton);
         }
 
-        public void SetAnimationArray(List<AnimationClip> animation, GameSkeleton skeleton)
+        public void SetAnimationArray(AnimationClip animation, GameSkeleton skeleton)
         {
             if (animation != null)
             {
                 // Make sure animation fits
                 var numBones = skeleton.BoneCount;
-                var maxAnimBones = Math.Max(animation.Select(x => x.RotationMappings.Count).Max(), animation.Select(x => x.TranslationMappings.Count).Max());
+                var maxAnimBones = Math.Max(animation.RotationMappings.Count, animation.TranslationMappings.Count);
                 if (maxAnimBones > numBones)
                     throw new Exception("This animation does not work for this skeleton!");
             }
 
             _skeleton = skeleton;
-            _animationClips = animation;
+            _animationClip = animation;
             _timeSinceStart = TimeSpan.FromSeconds(0);
             Refresh();
         }
 
         float GetAnimationLengthMs()
         {
-            if (_animationClips != null && _animationClips.Any())
-                return _animationClips[0].PlayTimeInSec * 1000;
+            if (_animationClip != null)
+                return _animationClip.PlayTimeInSec * 1000;
             return 0;
         }
 
@@ -210,7 +214,7 @@ namespace View3D.Animation
                 float animationLengthMs = GetAnimationLengthMs();
                 if (animationLengthMs != 0)
                     sampleT = (float)(_timeSinceStart.TotalMilliseconds / animationLengthMs);
-                _currentAnimFrame = AnimationSampler.Sample(sampleT, _skeleton, _animationClips);
+                _currentAnimFrame = AnimationSampler.Sample(sampleT, _skeleton, _animationClip, AnimationRules);
                 if (_skeleton != null)
                     _skeleton.Update();
             }
@@ -243,8 +247,8 @@ namespace View3D.Animation
 
         public int FrameCount()
          {
-            if (_animationClips != null)
-                return _animationClips[0].DynamicFrames.Count();
+            if (_animationClip != null)
+                return _animationClip.DynamicFrames.Count();
             return 0;
         }
 

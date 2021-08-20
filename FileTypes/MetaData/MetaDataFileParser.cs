@@ -1,4 +1,7 @@
 ﻿using Filetypes.ByteParsing;
+using FileTypes.DB;
+using FileTypes.MetaData.Instances;
+using FileTypes.PackFiles.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,61 +11,87 @@ namespace FileTypes.MetaData
 {
     public static class MetaDataFileParser
     {
-        public static MetaDataFile ParseFile(byte[] fileContent, string fullFileName)
+
+
+        public static MetaDataFile Open(PackFile pfs, SchemaManager schemaManager)
+        {
+            if (pfs == null)
+                return null;
+            var content = pfs.DataSource.ReadData();
+            return ParseFile(content, schemaManager);
+        }
+
+
+        public static MetaDataFile ParseFile(byte[] fileContent, SchemaManager schemaManager)
         {
             var contentLength = fileContent.Count();
 
             MetaDataFile outputFile = new MetaDataFile()
             {
-                FileName = fullFileName,
                 Version = BitConverter.ToInt32(fileContent, 0)
             };
 
             if (outputFile.Version != 2)
-                throw new Exception($"Unknown version - {outputFile.Version} for {outputFile.FileName}");
+                throw new Exception($"Unknown version - {outputFile.Version}");
 
             if (contentLength > 8)
-            {
-                MetaDataTagItem currentElement = null;
+            {           
                 int numElements = BitConverter.ToInt32(fileContent, 4);
-                int currentIndex = 0 + 8; // First 4 bytes is the number of elements, next 2 is unknown
-                while (currentIndex != contentLength && (currentElement = GetElement(currentIndex, fileContent, outputFile.FileName, out currentIndex)) != null)
-                    outputFile.TagItems.Add(currentElement);
+                var items = ExploratoryGetEntries(fileContent);
 
-                if (numElements != outputFile.TagItems.Count)
-                    throw new Exception($"Not the expected amount elements. Expected {numElements}, got {outputFile.TagItems.Count}");
+                if (numElements != items.Count)
+                    throw new Exception($"Not the expected amount elements. Expected {numElements}, got {items.Count}");
+
+                // Convert to sensible stuff
+                foreach (var item in items)
+                {
+                    var schema = schemaManager.GetMetaDataDefinition(item.Name, item.Version);
+                    if (schema.ColumnDefinitions.Count != 0)
+                    {
+                        var knownItem = new MetaEntry(item.Name, item.Version, item.GetData(), schema);
+                        if(knownItem.Validate())
+                            outputFile.Items.Add(knownItem);
+                        else
+                            outputFile.Items.Add(item);
+                    }
+                    else
+                    {
+                        outputFile.Items.Add(item);
+                    }
+                }
             }
 
             return outputFile;
         }
 
-        public static MetaDataFile SafeParseFile(byte[] fileContent, string fullFileName)
+        static List<UnknownMetaEntry> ExploratoryGetEntries(byte[] fileContent)
         {
-            try
-            {
-                return ParseFile(fileContent, fullFileName);
-            }
-            catch 
-            {
-                return null;
-            }
+            int byteLength = fileContent.Length;
+            var output = new List<UnknownMetaEntry>();
+            UnknownMetaEntry currentElement = null;
+            int currentIndex = 0 + 8; // version and num elements
+
+            while (currentIndex != byteLength && (currentElement = GetElement(currentIndex, fileContent, out currentIndex)) != null)
+                output.Add(currentElement);
+
+            return output;
         }
 
-        public static byte[] GenerateBytes(MetaDataFile output)
+        public static byte[] GenerateBytes(int version, IEnumerable<MetaDataTagItem> items)
         {
             List<byte> data = new List<byte>();
-            data.AddRange(BitConverter.GetBytes((int)output.Version));
-            data.AddRange(BitConverter.GetBytes((int)output.TagItems.Count));
-            foreach (var item in output.TagItems)
+            data.AddRange(BitConverter.GetBytes(version));
+            data.AddRange(BitConverter.GetBytes(items.Count()));
+            foreach (var item in items)
             {
                 data.AddRange(ByteParsers.String.Encode(item.Name, out _));
-                data.AddRange(item.DataItems[0].Bytes);
+                data.AddRange(item.DataItem.Bytes);
             }
 
             return data.ToArray();
         }
 
-        static MetaDataTagItem GetElement(int startIndex, byte[] data, string parentFileName, out int updatedByteIndex)
+        static UnknownMetaEntry GetElement(int startIndex, byte[] data, out int updatedByteIndex)
         {
             if (!ByteParsers.String.TryDecode(data, startIndex, out var tagName, out var strBytesRead, out string error))
                 throw new Exception($"Unable to detect tagname for MetaData element starting at {startIndex} - {error}");
@@ -75,18 +104,18 @@ namespace FileTypes.MetaData
                     break;
             }
 
-            var metaTagItem = new MetaDataTagItem()
-            {
-                Name = tagName,
-            };
-
-            var start = startIndex + strBytesRead;
             updatedByteIndex = currentIndex;
 
-            var dataItem = new MetaDataTagItem.Data(parentFileName, data, startIndex + strBytesRead, currentIndex - start);
+            var start = startIndex + strBytesRead;
+            var size = currentIndex - start;
 
-            metaTagItem.DataItems.Add(dataItem);
-            metaTagItem.Version = dataItem.Version;
+            var version = BitConverter.ToInt32(data, startIndex + strBytesRead);
+           
+            byte[] destination = new byte[size];
+            Array.Copy(data, start, destination, 0, size);
+
+            var metaTagItem = new UnknownMetaEntry(tagName, version, destination);
+
             return metaTagItem;
         }
 

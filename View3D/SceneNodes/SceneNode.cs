@@ -60,17 +60,6 @@ namespace View3D.SceneNodes
         virtual public Matrix ModelMatrix { get; set; } = Matrix.Identity;
         virtual public Matrix RenderMatrix { get; protected set; } = Matrix.Identity;
 
-        public ISceneNode AddObject(ISceneNode item)
-        {
-            item.SceneManager = SceneManager;
-            item.ForeachNode((node) => node.SceneManager = SceneManager);
-
-            item.Parent = this;
-            _children.Add(item);
-            SceneManager?.TriggerAddObjectEvent(this, item);
-            return item;
-        }
-
         public ISceneNode RemoveObject(ISceneNode item)
         {
             _children.Remove(item);
@@ -90,6 +79,17 @@ namespace View3D.SceneNodes
             func.Invoke(this);
             foreach (var child in _children)
                 child.ForeachNode(func);
+        }
+
+        public T AddObject<T>(T item) where T : ISceneNode
+        {
+            item.SceneManager = SceneManager;
+            item.ForeachNode((node) => node.SceneManager = SceneManager);
+
+            item.Parent = this;
+            _children.Add(item);
+            SceneManager?.TriggerAddObjectEvent(this, item);
+            return item;
         }
     }
 }

@@ -18,7 +18,7 @@ namespace View3D.SceneNodes
         ISceneNode Parent { get; set; }
         SceneManager SceneManager { get; set; }
 
-        ISceneNode AddObject(ISceneNode item);
+        T AddObject<T>(T item) where T : ISceneNode;
         ISceneNode Clone();
         void ForeachNode(Action<ISceneNode> func);
         ISceneNode RemoveObject(ISceneNode item);
