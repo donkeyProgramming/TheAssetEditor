@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace View3D.Utility
+namespace CommonControls.Common
 {
     public class MathUtil
     {

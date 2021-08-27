@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AnimationEditor\AnimationEditor.csproj" />
+    <ProjectReference Include="..\AnimMetaEditor\AnimMetaEditor.csproj" />
     <ProjectReference Include="..\CommonControls\CommonControls.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\FileTypes\FileTypes.csproj" />

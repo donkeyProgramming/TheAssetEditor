@@ -57,21 +57,24 @@ namespace Common
 
     public interface IToolFactory
     {
-        public void RegisterTool<ViewModel, View>(IPackFileToToolSelector toolSelector)
+        void RegisterTool<ViewModel, View>(IPackFileToToolSelector toolSelector)
                where ViewModel : IEditorViewModel
                where View : Control;
 
-        public void RegisterToolAsDefault<ViewModel, View>()
+        void RegisterToolAsDefault<ViewModel, View>()
            where ViewModel : IEditorViewModel
            where View : Control;
 
-        public void RegisterTool<ViewModel, View>()
+        void RegisterTool<ViewModel, View>()
             where ViewModel : IEditorViewModel
             where View : Control;
 
 
-        public ViewModel CreateEditorViewModel<ViewModel>() 
+        ViewModel CreateEditorViewModel<ViewModel>() 
             where ViewModel : IEditorViewModel;
+
+        Window CreateToolAsWindow(IEditorViewModel viewModel);
+        IEditorViewModel GetToolViewModelFromFileName(string filename);
     }
 
     public class ToolFactory : IToolFactory

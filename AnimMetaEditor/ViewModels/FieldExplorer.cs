@@ -129,7 +129,7 @@ namespace AnimMetaEditor.ViewModels
             Update(_activeMetaDataContent.SelectedTagItem, _tableDefinition);
         }
 
-        private void OnSelectedTagItemChanged(MetaDataTagItem.Data newValue)
+        private void OnSelectedTagItemChanged(MetaDataTagItem.TagData newValue)
         {
             Update(newValue, _tableDefinition);
         }
@@ -150,7 +150,7 @@ namespace AnimMetaEditor.ViewModels
             _tableDefEditor.AddNewDefinitionItem(explporer.EnumValue);
         }
 
-        public void Update(MetaDataTagItem.Data data, TableDefinitionModel tableDef)
+        public void Update(MetaDataTagItem.TagData data, TableDefinitionModel tableDef)
         {
             if (data == null)
             {

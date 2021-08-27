@@ -38,19 +38,14 @@ namespace AnimationEditor.Common.ReferenceModel
             _pfs = pfs;
 
             // One skeleton change and anim chaange, clear
-
-            var files = pfs.FindAllWithExtention(".meta").Where(x=>x.Name.Contains("anm.meta"));
-            MetaFiles = new ObservableCollection<PackFile>(files);
+            Refresh();
         }
 
-        private void SkeletonChanged(string selectedSkeletonPath)
+        public void Refresh()
         {
-        }   
-
-        private void AnimationChanged(AnimationReference animationReference)
-        {
-        }  
-
+            var files = _pfs.FindAllWithExtention(".meta").Where(x => x.Name.Contains("anm.meta"));
+            MetaFiles = new ObservableCollection<PackFile>(files);
+        }
 
       
     }

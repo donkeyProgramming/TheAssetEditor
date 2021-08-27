@@ -22,7 +22,7 @@ namespace FileTypes.MetaData
         }
 
 
-        public static MetaDataFile ParseFile(byte[] fileContent, SchemaManager schemaManager)
+        public static MetaDataFile ParseFile(byte[] fileContent, SchemaManager schemaManager, bool doValidation = true)
         {
             var contentLength = fileContent.Count();
 
@@ -49,10 +49,17 @@ namespace FileTypes.MetaData
                     if (schema.ColumnDefinitions.Count != 0)
                     {
                         var knownItem = new MetaEntry(item.Name, item.Version, item.GetData(), schema);
-                        if(knownItem.Validate())
-                            outputFile.Items.Add(knownItem);
+                        if (doValidation)
+                        {
+                            if (knownItem.Validate())
+                                outputFile.Items.Add(knownItem);
+                            else
+                                outputFile.Items.Add(item);
+                        }
                         else
-                            outputFile.Items.Add(item);
+                        {
+                            outputFile.Items.Add(knownItem);
+                        }
                     }
                     else
                     {
@@ -127,12 +134,13 @@ namespace FileTypes.MetaData
                     return false;
                 if (tagName.Length < 4)
                     return false;
-                var allCaps = tagName.All(c => char.IsUpper(c) || c == '_');
+                var allCaps = tagName.All(c => char.IsUpper(c) || c == '_' || c == ' ');
                 return allCaps;
             }
-
+            
             return false;
         }
+
 
     }
 }

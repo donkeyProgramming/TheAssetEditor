@@ -202,7 +202,7 @@ namespace FileTypes.DB
             if (content != null)
                 _gameTableDefinitions.Add(game, content);
             
-            path = DirectoryHelper.SchemaDirectory + "\\" + GameInformationFactory.GetGameById(game).ShortID + "_AnimMetaDataSchema.json"; // Try local copy first
+            path = DirectoryHelper.SchemaDirectory + "\\" + GameInformationFactory.GetGameById(game).ShortID + "_AnimMetaDataSchema.json"; 
             if (!File.Exists(path))
             {
                 var allResource = GetResourceNames();

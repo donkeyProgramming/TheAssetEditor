@@ -34,7 +34,7 @@ namespace View3D.Components.Component
 
         public override void Draw(GameTime gameTime)
         {
-            _renderComponent.AddRenderItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = _gridMesh, World = Matrix.Identity });
+            _renderComponent.AddRenderItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = _gridMesh, ModelMatrix = Matrix.Identity });
             base.Draw(gameTime);
         }
 

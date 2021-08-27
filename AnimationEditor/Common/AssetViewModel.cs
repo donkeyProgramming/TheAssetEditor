@@ -67,6 +67,8 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public NotifyAttr<AnimationReference> AnimationName { get; set; } = new NotifyAttr<AnimationReference>(null);
 
+
+
         public NotifyAttr<bool> ShowMesh { get; set; }
         public NotifyAttr<bool> ShowSkeleton { get; set; }
 
@@ -130,6 +132,18 @@ namespace AnimationEditor.Common.ReferenceModel
             MeshName.Value = file.Name;
             ShowMesh.Value = ShowMesh.Value;
             ShowSkeleton.Value = ShowSkeleton.Value;
+
+            result.ForeachNode((node) =>
+            {
+                if (node is Rmv2MeshNode mesh && string.IsNullOrWhiteSpace(mesh.AttachmentPointName) == false)
+                {
+                    if (Skeleton != null)
+                    {
+                        int boneIndex = Skeleton.GetBoneIndexByName(mesh.AttachmentPointName);
+                        mesh.AttachmentBoneResolver = new SkeletonBoneAnimationResolver(this, boneIndex);
+                    }
+                }
+            });
 
             MeshChanged?.Invoke(this);
         }
@@ -265,11 +279,13 @@ namespace AnimationEditor.Common.ReferenceModel
         {
             MetaData = metaFile;
             PersistMetaData = persistantFile;
-
             MetaDataChanged?.Invoke(this);
         }
 
-
+        public void ReApplyMeta()
+        {
+            MetaDataChanged?.Invoke(this);
+        }
 
         public override void Update(GameTime gameTime)
         {

@@ -45,12 +45,31 @@ namespace FileTypes.MetaData
         
         public DbTableDefinition Schema { get; set; }
         
-        public MetaEntry(string name, int version, byte[] data, DbTableDefinition parser)
+        public MetaEntry(string name, int version, byte[] data, DbTableDefinition schema)
         {
             Name = name;
             Version = version;
             _data = data;
-            Schema = parser;
+            Schema = schema;
+        }
+
+        public MetaEntry(DbTableDefinition schema)
+        {
+            Schema = schema;
+            Name = schema.TableName;
+            Version = schema.Version;
+
+            var bytes = new List<byte>();
+            foreach (var field in Schema.ColumnDefinitions)
+            {
+                var parser = ByteParserFactory.Create(field.Type);
+                var defaultValue = parser.DefaultValue();
+                var fieldBytes = parser.Encode(defaultValue, out var _);
+                bytes.AddRange(fieldBytes);
+            }
+
+            _data = bytes.ToArray();
+            
         }
 
         public byte[] GetData() => _data;

@@ -1,4 +1,5 @@
 ﻿using Common;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,11 +67,23 @@ namespace CommonControls.MathViews
             Z.Value = z;
         }
 
+        public void Set(Vector3 monoVector)
+        {
+            X.Value = monoVector.X;
+            Y.Value = monoVector.Y;
+            Z.Value = monoVector.Z;
+        }
+
         public void Set(float value)
         {
             X.Value = value;
             Y.Value = value;
             Z.Value = value;
+        }
+
+        public Vector3 GetAsVector3()
+        {
+            return new Vector3((float)X.Value, (float)Y.Value, (float)Z.Value);
         }
 
         public override string ToString()

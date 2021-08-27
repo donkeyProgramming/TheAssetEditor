@@ -1,19 +1,19 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace FileTypes.MetaData.Instances
 {
-    public class DockEquipment
+    public class ImpactPosition
     {
-        public static DockEquipment Create(MetaEntry metaData)
+        public static ImpactPosition Create(MetaEntry metaData)
         {
-            var ouput = new DockEquipment()
+            var ouput = new ImpactPosition()
             {
                 StartTime = metaData.Get<float>("StartTime"),
                 EndTime = metaData.Get<float>("EndTime"),
-
-                PropBoneId = metaData.Get<int>("PropBoneId"),
+                Position = metaData.Get<Vector3>("Position"),
             };
 
             return ouput;
@@ -22,6 +22,6 @@ namespace FileTypes.MetaData.Instances
 
         public float StartTime { get; set; }
         public float EndTime { get; set; }
-        public int PropBoneId{ get; set; }
+        public Vector3 Position { get; set; }
     }
 }

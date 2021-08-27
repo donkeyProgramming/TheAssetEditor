@@ -71,7 +71,7 @@ namespace Filetypes.ByteParsing
             return true;
         }
 
-        public bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string _error)
+        public virtual bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string _error)
         {
             var result = TryDecodeValue(buffer, index, out T temp, out bytesRead, out _error);
             value = temp.ToString();
@@ -224,6 +224,13 @@ namespace Filetypes.ByteParsing
             return BitConverter.ToSingle(buffer, index);
         }
 
+        public override bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string _error)
+        {
+            var result = TryDecodeValue(buffer, index, out float temp, out bytesRead, out _error);
+            value = temp.ToString("0.00000000");
+            return result;
+        }
+
         public override byte[] EncodeValue(float value, out string error)
         {
             error = null;
@@ -256,17 +263,56 @@ namespace Filetypes.ByteParsing
 
         public string DefaultValue()
         {
-            return "{0,0,0}";
+            return "0,0,0";
         }
 
         public byte[] Encode(string value, out string error)
         {
-            throw new NotImplementedException();
+            var split = value.Split(",");
+            if (split.Length != 3)
+            {
+                error = "Value must contain 3 numbers seperated by ','";
+                return null;
+            }
+
+            var x = ByteParsers.Single.Encode(split[0], out error);
+            if (x == null)
+                return null;
+
+            var y = ByteParsers.Single.Encode(split[1], out error);
+            if (y == null)
+                return null;
+
+            var z = ByteParsers.Single.Encode(split[2], out error);
+            if (z == null)
+                return null;
+
+            var combined = new byte[12];
+            Array.Copy(x, 0, combined, 0, 4);
+            Array.Copy(y, 0, combined, 4, 4);
+            Array.Copy(z, 0, combined, 8, 4);
+            return combined;
         }
 
         public byte[] EncodeValue(Vector3 value, out string error)
         {
-            throw new NotImplementedException();
+            var x = ByteParsers.Single.EncodeValue(value.X, out error);
+            if (x == null)
+                return null;
+
+            var y = ByteParsers.Single.EncodeValue(value.Y, out error);
+            if (y == null)
+                return null;
+
+            var z = ByteParsers.Single.EncodeValue(value.Z, out error);
+            if (z == null)
+                return null;
+
+            var combined = new byte[12];
+            Array.Copy(x, 0, combined, 0, 4);
+            Array.Copy(y, 0, combined, 4, 4);
+            Array.Copy(z, 0, combined, 8, 4);
+            return combined;
         }
 
         public bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string error)
@@ -300,17 +346,66 @@ namespace Filetypes.ByteParsing
 
         public string DefaultValue()
         {
-            return "{0,0,0,1}";
+            return "0,0,0,1";
         }
 
         public byte[] Encode(string value, out string error)
         {
-            throw new NotImplementedException();
+            var split = value.Split(",");
+            if (split.Length != 4)
+            {
+                error = "Value must contain 4 numbers seperated by ','";
+                return null;
+            }
+
+            var x = ByteParsers.Single.Encode(split[0], out error);
+            if (x == null)
+                return null;
+
+            var y = ByteParsers.Single.Encode(split[1], out error);
+            if (y == null)
+                return null;
+
+            var z = ByteParsers.Single.Encode(split[2], out error);
+            if (z == null)
+                return null;
+
+            var w = ByteParsers.Single.Encode(split[3], out error);
+            if (w == null)
+                return null;
+
+            var combined = new byte[16];
+            Array.Copy(x, 0, combined, 0, 4);
+            Array.Copy(y, 0, combined, 4, 4);
+            Array.Copy(z, 0, combined, 8, 4);
+            Array.Copy(w, 0, combined, 12, 4);
+            return combined;
         }
 
         public byte[] EncodeValue(Vector4 value, out string error)
         {
-            throw new NotImplementedException();
+            var x = ByteParsers.Single.EncodeValue(value.X, out error);
+            if (x == null)
+                return null;
+
+            var y = ByteParsers.Single.EncodeValue(value.Y, out error);
+            if (y == null)
+                return null;
+
+            var z = ByteParsers.Single.EncodeValue(value.Z, out error);
+            if (z == null)
+                return null;
+
+            var w = ByteParsers.Single.EncodeValue(value.W, out error);
+            if (w == null)
+                return null;
+
+            var combined = new byte[16];
+            Array.Copy(x, 0, combined, 0, 4);
+            Array.Copy(y, 0, combined, 4, 4);
+            Array.Copy(z, 0, combined, 8, 4);
+            Array.Copy(w, 0, combined, 12, 4);
+            return combined;
         }
 
         public bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string error)

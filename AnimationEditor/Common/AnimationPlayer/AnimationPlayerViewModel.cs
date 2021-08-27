@@ -62,64 +62,39 @@ namespace AnimationEditor.Common.AnimationPlayer
 
         public void TogleAnimationPausePlay()
         {
-             foreach (var item in _assetList)
+            foreach (var item in _assetList)
             {
                 if (item.Player.IsPlaying)
-                {
-                    item.Player.Pause();
-                    foreach (var attachedItem in item.MetaDataItems)
-                    {
-                        if (attachedItem.Player != null)
-                            attachedItem.Player.Pause(); 
-                    }
-                }
+                    Pause(item);
                 else
-                {
-                    item.Player.Play();
-                    foreach (var attachedItem in item.MetaDataItems)
-                    {
-                       if (attachedItem.Player != null)
-                           attachedItem.Player.Play();
-                    }
-                }
+                    Play(item);  
             }
         }
 
         public void SetAnimationNextFrame()
         {
             foreach (var item in _assetList)
-            {
-                item.Player.Pause();
-                item.Player.CurrentFrame++;
-            }
+                NextFrame(item);
         }
 
         public void SetAnimationPrivFrame()
         {
             foreach (var item in _assetList)
-            {
-                item.Player.Pause();
-                item.Player.CurrentFrame--;
-            }
+                PrivFrame(item);
         }
 
         public void SetAnimationFirstFrame()
         {
             foreach (var item in _assetList)
-            {
-                item.Player.Pause();
-                item.Player.CurrentFrame = 0;
-            }
+                SetFrame(item, 0);
         }
 
         public void SetAnimationLastFrame()
         {
+            LoopAnimation = false;
             foreach (var item in _assetList)
-            {
-                LoopAnimation = false;
-                item.Player.Pause();
-                item.Player.CurrentFrame = SelectedMainAnimation.Asset.Player.FrameCount();
-            }
+                SetFrame(item, SelectedMainAnimation.Asset.Player.FrameCount());
+          
         }
 
         private void MainAnimationChanged(AssetPlayerItem oldAnimation, AssetPlayerItem mainAnimation)
@@ -154,21 +129,95 @@ namespace AnimationEditor.Common.AnimationPlayer
                     SelectedAnimationFrameCount = 0;
 
                 foreach (var item in _assetList)
-                {
-                    item.Player.CurrentFrame = 0;
-                    item.Player.Play();
-
-                    foreach (var attachedItem in item.MetaDataItems)
-                    {
-                        if (attachedItem.Player != null)
-                            attachedItem.Player.Play();
-                    }
-                }
+                    Play(item);
             }
             else
             {
                 foreach (var item in _assetList)
-                    item.Player.Stop();
+                    Stop(item);
+            }
+        }
+
+
+        void Play(AssetViewModel item)
+        {
+            item.Player.CurrentFrame = 0;
+            item.Player.Play();
+
+            foreach (var attachedItem in item.MetaDataItems)
+            {
+                if (attachedItem.Player != null)
+                {
+                    attachedItem.Player.CurrentFrame = 0;
+                    attachedItem.Player.Play();
+                }
+            }
+        }
+
+        void Pause(AssetViewModel item)
+        {
+            item.Player.Pause();
+            foreach (var attachedItem in item.MetaDataItems)
+            {
+                if (attachedItem.Player != null)
+                    attachedItem.Player.Pause();
+            }
+        }
+
+        void Stop(AssetViewModel item)
+        {
+            item.Player.Stop();
+
+            foreach (var attachedItem in item.MetaDataItems)
+            {
+                if (attachedItem.Player != null)
+                    attachedItem.Player.Stop();
+            }
+        }
+
+        void SetFrame(AssetViewModel item, int frame)
+        {
+            item.Player.Pause();
+            item.Player.CurrentFrame = frame;
+
+            foreach (var attachedItem in item.MetaDataItems)
+            {
+                if (attachedItem.Player != null)
+                {
+                    attachedItem.Player.Pause();
+                    attachedItem.Player.CurrentFrame = frame;
+                }
+            }
+        }
+
+        void NextFrame(AssetViewModel item)
+        {
+            item.Player.Pause();
+            item.Player.CurrentFrame++;
+
+            foreach (var attachedItem in item.MetaDataItems)
+            {
+                if (attachedItem.Player != null)
+                {
+                    attachedItem.Player.Pause();
+                    attachedItem.Player.CurrentFrame = item.Player.CurrentFrame;
+                }
+            }
+        }
+
+        void PrivFrame(AssetViewModel item)
+        {
+
+            item.Player.Pause();
+            item.Player.CurrentFrame--;
+
+            foreach (var attachedItem in item.MetaDataItems)
+            {
+                if (attachedItem.Player != null)
+                {
+                    attachedItem.Player.Pause();
+                    attachedItem.Player.CurrentFrame = item.Player.CurrentFrame;
+                }
             }
         }
 

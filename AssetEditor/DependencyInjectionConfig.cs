@@ -64,6 +64,7 @@ namespace AssetEditor
             AnimationPack_DependencyInjectionContainer.Register(services);
             CampaignAnimBin_DependencyInjectionContainer.Register(services);
             VariantMeshDefinition_DependencyInjectionContainer.Register(services);
+            //AnimMetaDecoder_DependencyInjectionContainer.Register(services);
         }
 
         void RegisterTools(IToolFactory factory)
@@ -77,6 +78,7 @@ namespace AssetEditor
             AnimationPack_DependencyInjectionContainer.RegisterTools(factory);
             CampaignAnimBin_DependencyInjectionContainer.RegisterTools(factory);
             VariantMeshDefinition_DependencyInjectionContainer.RegisterTools(factory);
+           // AnimMetaDecoder_DependencyInjectionContainer.RegisterTools(factory);
         }
 
         public void ShowMainWindow()

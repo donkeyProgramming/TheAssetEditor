@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignWidth="300"
              x:Name="self">
-    <Grid>
+    <Grid >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
@@ -18,9 +18,8 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <Border x:Name="b" Grid.Row="0" Grid.Column="0" />
-        <Border x:Name="b2" Grid.Row="0" Grid.Column="0" Margin="3,0,3,0"/>
-        <TextBox 
+        <Border x:Name="b" Grid.Row="0" Grid.Column="0" Margin="2,0,2,0" />
+        <TextBox
             Width="{Binding ActualWidth, ElementName=b}" 
             Grid.Row="0" Grid.Column="0" 
             Text="{Binding Vector3.X.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ElementName=self}"
@@ -31,9 +30,9 @@
         </TextBox>
 
         <TextBox 
-            Width="{Binding ActualWidth, ElementName=b2}" 
+            Width="{Binding ActualWidth, ElementName=b}" 
             Grid.Row="0" Grid.Column="1"
-            Margin="3,0,3,0"
+            Margin="1,0,1,0"
             Text="{Binding Vector3.Y.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ElementName=self}" 
             MaxLength="{Binding NumbersMaxLength, ElementName=self}" >
             <b:Interaction.Behaviors>

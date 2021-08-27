@@ -140,11 +140,10 @@ namespace AssetEditor.ViewModels
 
         void OpenAnimMetaDecocder()
         {
-            throw new NotImplementedException();
-            //var editorView = _toolFactory.CreateEditorViewModel<AnimMetaEditor.ViewModels.MainDecoderViewModel>();
+            var editorView = _toolFactory.CreateEditorViewModel<AnimMetaEditor.ViewModels.MainDecoderViewModel>();
             //
-            //editorView.ConfigureAsDecoder();
-            //EditorCreator.CreateEmptyEditor(editorView);
+             editorView.ConfigureAsDecoder();
+            EditorCreator.CreateEmptyEditor(editorView);
         }
 
 

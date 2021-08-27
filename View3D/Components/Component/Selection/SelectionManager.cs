@@ -128,7 +128,7 @@ namespace View3D.Components.Component.Selection
                     if (item is Rmv2MeshNode mesh)
                     {
                         _lineGeometry.AddBoundingBox(item.Geometry.BoundingBox);
-                        _renderEngine.AddRenderItem(RenderBuckedId.Selection, new LineRenderItem() { World = mesh.RenderMatrix, LineMesh = _lineGeometry });
+                        _renderEngine.AddRenderItem(RenderBuckedId.Selection, new LineRenderItem() { ModelMatrix = mesh.RenderMatrix, LineMesh = _lineGeometry });
                     }
                 }
             }
@@ -142,7 +142,7 @@ namespace View3D.Components.Component.Selection
             if (selectionState is VertexSelectionState selectionVertexState && selectionVertexState.RenderObject != null)
             {
                 var vertexObject = selectionVertexState.RenderObject as Rmv2MeshNode;
-                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new VertexRenderItem() { Node = vertexObject, World = vertexObject.RenderMatrix, SelectedVertices = selectionVertexState, VertexRenderer = VertexRenderer });
+                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new VertexRenderItem() { Node = vertexObject, ModelMatrix = vertexObject.RenderMatrix, SelectedVertices = selectionVertexState, VertexRenderer = VertexRenderer });
                 _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeoRenderItem() { ModelMatrix = vertexObject.RenderMatrix, Geometry = vertexObject.Geometry, Shader = _wireframeEffect });
             }
 

@@ -8,21 +8,8 @@ namespace View3D.Animation.AnimationChange
     public abstract class AnimationChangeRule
     {
         public virtual void ApplyBeforeWorldTransform(AnimationFrame frame) { }
-        public virtual void ApplyAfterWorldTransform(AnimationFrame frame) { }
+        public virtual void ApplyRule(AnimationFrame frame, int boneId, float v) { }
+
+        public virtual void ApplyRuleAfter(AnimationFrame frame, float time) { }
     }
-
-    //class Splice : IAnimationChangeRule
-    //{ 
-    //    
-    //}
-
-    //public class Transform : AnimationChangeRule
-    //{
-    //
-    //    public void ApplyBeforeWorldTransform(AnimationFrame frame)
-    //    {
-    //        frame.BoneTransforms[0].Rotation += Quaternion.Identity;
-    //        frame.BoneTransforms[0].Translation += Vector3.Zero;
-    //    }
-    //}
 }

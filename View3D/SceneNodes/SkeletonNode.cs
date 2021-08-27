@@ -84,7 +84,7 @@ namespace View3D.SceneNodes
                     _lineRenderer.AddLine(Vector3.Transform(boneMatrix.Translation, parentWorld), Vector3.Transform(parentBoneMatrix.Translation, parentWorld));
                 }
 
-                renderEngine.AddRenderItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = _lineRenderer, World = Matrix.Identity });
+                renderEngine.AddRenderItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = _lineRenderer, ModelMatrix = Matrix.Identity });
             }
         }
 

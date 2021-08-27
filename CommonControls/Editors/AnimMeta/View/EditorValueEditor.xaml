@@ -4,10 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters"
+             xmlns:tags="clr-namespace:CommonControls.Editors.AnimMeta"
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews"
+             xmlns:System="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <valueconverters:BoolToColourConverter x:Key="ColourConverter" TrueValue="White" FalseValue="Red"/>
+        <System:Double x:Key="labelWidth">80</System:Double>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -30,39 +34,60 @@
                 </Style>
             </ListView.ItemContainerStyle>
 
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto"/>
-                            <ColumnDefinition Width="auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+            <ListView.Resources>
+                <DataTemplate DataType="{ x:Type tags:OrientationEditableTagItem}">
+                    <DockPanel LastChildFill="true">
+                        <DockPanel DockPanel.Dock="Top">
+                            <Label FontWeight="bold" Content="Field Name"  Width ="{StaticResource labelWidth}"/>
+                            <Label FontWeight="bold"  Content=":"/>
+                            <Label FontWeight="bold"  Content="{Binding FieldName, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DockPanel>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="auto"/>
-                        </Grid.RowDefinitions>
+                        <DockPanel DockPanel.Dock="Top">
+                            <Label Content="Description"  Width ="{StaticResource labelWidth}"/>
+                            <Label Content=":"/>
+                            <Viewbox StretchDirection="DownOnly" Stretch="Fill" HorizontalAlignment="Left">
+                                <TextBlock TextWrapping="Wrap" VerticalAlignment="Stretch" HorizontalAlignment="Left" Width="700" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Viewbox>
+                        </DockPanel>
 
-                        <Label Grid.Row="0" Grid.Column="0" FontWeight="bold" Content="Field Name"/>
-                        <Label Grid.Row="1" Grid.Column="0" Content="Description"/>
-                        <Label Grid.Row="2" Grid.Column="0" Content="Value"/>
+                        <DockPanel DockPanel.Dock="Top">
+                            <Label Content="Value"  Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
+                            <Label Content=":"  DockPanel.Dock="Left"/>
+                            <mathviews:Vector3View VerticalContentAlignment="Center" Vector3="{Binding Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Background="{Binding IsValid, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ColourConverter}}" MinWidth="300" MaxWidth="300" HorizontalAlignment="Left"/>
+                        </DockPanel>
 
-                        <Label Grid.Row="0" Grid.Column="1" FontWeight="bold"  Content=":"/>
-                        <Label Grid.Row="1" Grid.Column="1" Content=":"/>
-                        <Label Grid.Row="2" Grid.Column="1" Content=":"/>
-
-                        <Label Grid.Row="0" Grid.Column="2"  FontWeight="bold"  Content="{Binding FieldName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                        <Label Grid.Row="1" Grid.Column="2" Content="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                        <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding ValueAsString, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                  Background="{Binding IsValid, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
-                        <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" BorderThickness="1" Margin="2" BorderBrush="DarkGray"/>
-
-                    </Grid>
+                        <Border BorderThickness="1" Margin="2" BorderBrush="DarkGray"/>
+                    </DockPanel>
                 </DataTemplate>
-            </ListView.ItemTemplate>
+
+                <DataTemplate DataType="{ x:Type tags:EditableTagItem}">
+                    <DockPanel LastChildFill="true">
+                        <DockPanel DockPanel.Dock="Top">
+                            <Label FontWeight="bold" Content="Field Name"  Width ="{StaticResource labelWidth}"/>
+                            <Label FontWeight="bold"  Content=":"/>
+                            <Label FontWeight="bold"  Content="{Binding FieldName, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DockPanel>
+
+                        <DockPanel DockPanel.Dock="Top">
+                            <Label Content="Description"  Width ="{StaticResource labelWidth}"/>
+                            <Label Content=":"/>
+                            <Viewbox StretchDirection="DownOnly" Stretch="Fill" HorizontalAlignment="Left">
+                                <TextBlock TextWrapping="Wrap" VerticalAlignment="Stretch" HorizontalAlignment="Left" Width="700" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Viewbox> 
+                        </DockPanel>
+
+                        <DockPanel DockPanel.Dock="Top">
+                            <Label Content="Value"  Width ="{StaticResource labelWidth}"/>
+                            <Label Content=":"/>
+                            <TextBox Text="{Binding ValueAsString, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Background="{Binding IsValid, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                        </DockPanel>
+
+                        <Border BorderThickness="1" Margin="2" BorderBrush="DarkGray"/>
+                    </DockPanel>
+                </DataTemplate>
+            </ListView.Resources>
+
         </ListView>
 
     </Grid>

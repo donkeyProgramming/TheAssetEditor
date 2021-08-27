@@ -142,10 +142,7 @@ namespace View3D.Animation
 
         public void SetAnimation(AnimationClip animation, GameSkeleton skeleton)
         {
-            if (animation == null)
-                SetAnimationArray(null, skeleton);
-            else
-                SetAnimationArray(animation , skeleton);
+            SetAnimationArray(animation , skeleton);
         }
 
         public void SetAnimationArray(AnimationClip animation, GameSkeleton skeleton)
@@ -159,6 +156,7 @@ namespace View3D.Animation
                     throw new Exception("This animation does not work for this skeleton!");
             }
 
+            AnimationRules.Clear();
             _skeleton = skeleton;
             _animationClip = animation;
             _timeSinceStart = TimeSpan.FromSeconds(0);

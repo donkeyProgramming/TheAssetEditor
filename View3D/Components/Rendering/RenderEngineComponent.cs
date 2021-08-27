@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using View3D.Rendering;
+using View3D.Utility;
 
 namespace View3D.Components.Rendering
 {
@@ -14,6 +15,7 @@ namespace View3D.Components.Rendering
         Wireframe,
         Selection,
         Line,
+        Text
     }
 
     public enum RenderMode
@@ -24,6 +26,7 @@ namespace View3D.Components.Rendering
 
     public interface IRenderItem
     {
+        Matrix ModelMatrix { get; set; }
         void Draw(GraphicsDevice device, CommonShaderParameters parameters);
     }
 
@@ -35,6 +38,7 @@ namespace View3D.Components.Rendering
         ArcBallCamera _camera;
 
         Dictionary<RenderBuckedId, List<IRenderItem>> _renderItems = new Dictionary<RenderBuckedId, List<IRenderItem>>();
+        ResourceLibary _resourceLib;
 
         public float LightRotationDegrees { get; set; } = 20;
         public float LightIntensityMult { get; set; } = 6;
@@ -65,6 +69,7 @@ namespace View3D.Components.Rendering
             _wireframeState.DepthClipEnable = true;
 
             _camera = GetComponent<ArcBallCamera>();
+            _resourceLib = GetComponent<ResourceLibary>();
 
             base.Initialize();
         }
@@ -84,9 +89,6 @@ namespace View3D.Components.Rendering
 
         public override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
-
             CommonShaderParameters commonShaderParameters = new CommonShaderParameters()
             {
                 Projection = _camera.ProjectionMatrix,
@@ -96,6 +98,14 @@ namespace View3D.Components.Rendering
                 LightRotationRadians = MathHelper.ToRadians(LightRotationDegrees),
                 LightIntensityMult = LightIntensityMult
             };
+
+            _resourceLib.CommonSpriteBatch.Begin();
+            foreach (var item in _renderItems[RenderBuckedId.Text])
+                item.Draw(GraphicsDevice, commonShaderParameters);
+            _resourceLib.CommonSpriteBatch.End();
+
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
             foreach (var item in _renderItems[RenderBuckedId.Normal])
                 item.Draw(GraphicsDevice, commonShaderParameters);
@@ -110,6 +120,8 @@ namespace View3D.Components.Rendering
 
             foreach (var item in _renderItems[RenderBuckedId.Line])
                 item.Draw(GraphicsDevice, commonShaderParameters);
+
+
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;

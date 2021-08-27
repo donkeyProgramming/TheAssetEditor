@@ -13,10 +13,11 @@ namespace View3D.Animation
 {
     public class AnimationSampler
     {
-        public static AnimationFrame Sample(int frameIndex, float frameIterpolation, GameSkeleton skeleton, AnimationClip animationClip, List<AnimationChangeRule> animationChangeRules = null)
+        public static AnimationFrame Sample(int frameIndex, float frameIterpolation, GameSkeleton skeleton, AnimationClip animationClip, List<AnimationChangeRule> animationChangeRules = null, Nullable<float> time = null)
         {
             try
             {
+
                 if (skeleton == null)
                     return null;
 
@@ -37,21 +38,22 @@ namespace View3D.Animation
                             currentFrame.BoneTransforms[i].Scale = animationClip.DynamicFrames[0].Scale[i];
                     }
                 }
-
-                if (animationChangeRules != null)
-                {
-                    foreach (var rule in animationChangeRules)
-                        rule.ApplyBeforeWorldTransform(currentFrame);
-                }
-
+          
                 for (int i = 0; i < currentFrame.BoneTransforms.Count(); i++)
                 {
                     Quaternion rotation = currentFrame.BoneTransforms[i].Rotation;
                     Vector3 translation = currentFrame.BoneTransforms[i].Translation;
+
                     currentFrame.BoneTransforms[i].WorldTransform =
                         Matrix.CreateScale(currentFrame.BoneTransforms[i].Scale) * 
                         Matrix.CreateFromQuaternion(rotation) *
                         Matrix.CreateTranslation(translation);
+               
+                    if (animationChangeRules != null)
+                    {
+                        foreach (var rule in animationChangeRules)
+                            rule.ApplyRule(currentFrame, i, time.Value * animationClip.PlayTimeInSec);
+                    }
 
                     var parentindex = currentFrame.BoneTransforms[i].ParentBoneIndex;
                     if (parentindex == -1)
@@ -63,8 +65,12 @@ namespace View3D.Animation
                 if (animationChangeRules != null)
                 {
                     foreach (var rule in animationChangeRules)
-                        rule.ApplyAfterWorldTransform(currentFrame);
+                        rule.ApplyRuleAfter(currentFrame, time.Value * animationClip.PlayTimeInSec);
+
+                    //foreach (var rule in animationChangeRules)
+                    //    rule.ApplyRule(currentFrame, 0);
                 }
+
 
                 for (int i = 0; i < skeleton.BoneCount; i++)
                 {
@@ -102,7 +108,7 @@ namespace View3D.Animation
                     frameIterpolation = frameWithLeftover - clampedFrame; 
                 }
 
-                return Sample(frameIndex, frameIterpolation, skeleton, animationClip, animationChangeRules);
+                return Sample(frameIndex, frameIterpolation, skeleton, animationClip, animationChangeRules, t);
             }
             catch (Exception e)
             {

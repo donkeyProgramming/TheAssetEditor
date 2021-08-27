@@ -15,7 +15,7 @@ namespace View3D.Rendering.RenderItems
         public VertexInstanceMesh VertexRenderer { get; set; }
 
         public Rmv2MeshNode Node { get; set; }
-        public Matrix World { get; set; }
+        public Matrix ModelMatrix { get; set; } = Matrix.Identity;
         public VertexSelectionState SelectedVertices { get; set; }
 
         public void Draw(GraphicsDevice device, CommonShaderParameters parameters)

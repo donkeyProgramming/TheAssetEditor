@@ -200,43 +200,5 @@ namespace View3D.Services
                 }
             }
         }
-
-        /*Dictionary<TexureType, string> ParseMaterialFile(string path)
-        {
-            var output = new Dictionary<TexureType, string>();
-
-            
-            var buffer = (materialFile as PackFile).DataSource.ReadData();
-            string xmlString = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(xmlString);
-            var textureNodes = doc.SelectNodes(@"/material/textures/texture");
-
-            foreach (XmlNode node in textureNodes)
-            {
-                var slotNode = node.SelectNodes("slot");
-                var pathNode = node.SelectNodes("source");
-
-                var textureSlotName = slotNode[0].InnerText;
-                var texturePath = pathNode[0].InnerText;
-
-                if (textureSlotName == "s_diffuse")
-                    output[TexureType.Diffuse] = texturePath;
-
-                if (textureSlotName == "s_gloss")
-                    output[TexureType.Gloss] = texturePath;
-
-                if (textureSlotName == "s_mask")
-                    output[TexureType.Mask] = texturePath;
-
-                if (textureSlotName == "s_normal")
-                    output[TexureType.Normal] = texturePath;
-
-                if (textureSlotName == "s_specular")
-                    output[TexureType.Specular] = texturePath;
-            }
-
-            return output;
-        }*/
     }
 }

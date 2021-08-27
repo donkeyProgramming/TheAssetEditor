@@ -1,5 +1,4 @@
 ﻿using AnimMetaEditor.ViewModels;
-using AnimMetaEditor.ViewModels.Editor;
 using AnimMetaEditor.Views;
 using AnimMetaEditor.Views.Editor;
 using Common;
@@ -10,7 +9,7 @@ using System.Text;
 
 namespace AnimMetaEditor
 {
-    public class AnimMetaEditor_DependencyInjectionContainer
+    public class AnimMetaDecoder_DependencyInjectionContainer
     {
         public static void Register(IServiceCollection serviceCollection)
         {
@@ -18,12 +17,12 @@ namespace AnimMetaEditor
             serviceCollection.AddTransient<MainDecoderViewModel>();
             
             serviceCollection.AddTransient<MainEditorView>();
-            serviceCollection.AddTransient<MainEditorViewModel>();
+            //serviceCollection.AddTransient<MainEditorViewModel>();
         }
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<MainEditorViewModel, MainEditorView>(new ExtentionToTool(".anm.meta", ".meta"));
+            //factory.RegisterTool<MainEditorViewModel, MainEditorView>(new ExtentionToTool(".anm.meta", ".meta"));
             factory.RegisterTool<MainDecoderViewModel, MetaDataMainView>();
         }
     }

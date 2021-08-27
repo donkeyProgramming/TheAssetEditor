@@ -36,6 +36,8 @@ namespace View3D.Utility
 
         public PackFileService Pfs { get; private set; }
         public ContentManager Content { get; set; }
+        public SpriteBatch CommonSpriteBatch{ get; private set; }
+        public SpriteFont DefaultFont { get; private set; }
 
         public TextureCube PbrDiffuse { get; private set; }
         public TextureCube PbrSpecular { get; private set; }
@@ -45,6 +47,7 @@ namespace View3D.Utility
         public ResourceLibary(WpfGame game, PackFileService pf) : base(game)
         {
             Pfs = pf;
+           
         }
 
         public override void Initialize()
@@ -56,6 +59,9 @@ namespace View3D.Utility
             LoadEffect("Shaders\\Geometry\\BasicShader", ShaderTypes.BasicEffect);
             LoadEffect("Shaders\\TexturePreview", ShaderTypes.TexturePreview);
             LoadEffect("Shaders\\LineShader", ShaderTypes.Line);
+
+            DefaultFont = Game.Content.Load<SpriteFont>("Fonts//DefaultFont");
+            CommonSpriteBatch = new SpriteBatch(Game.GraphicsDevice);
 
             PbrDiffuse = Content.Load<TextureCube>("textures\\phazer\\DIFFUSE_irr_qwantani_rgba32f");
             PbrSpecular = Content.Load<TextureCube>("textures\\phazer\\SkyOnly_SpecularHDR");   // Skyonly
@@ -173,6 +179,9 @@ namespace View3D.Utility
 
             PbrLut.Dispose();
             PbrLut = null;
+
+            CommonSpriteBatch.Dispose();
+            CommonSpriteBatch = null;
         }
     }
 }

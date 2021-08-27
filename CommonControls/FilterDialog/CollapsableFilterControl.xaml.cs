@@ -49,8 +49,11 @@ namespace CommonControls.FilterDialog
 
         void ClearSelection()
         {
-            FilterBox.SelectedItem = null;
-            HandleOnItemSelected();
+            if (MessageBox.Show("Are you sure?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                FilterBox.SelectedItem = null;
+                HandleOnItemSelected();
+            }
         }
 
         void ToggleSearchFiled()

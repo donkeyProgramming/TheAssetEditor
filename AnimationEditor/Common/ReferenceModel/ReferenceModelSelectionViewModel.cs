@@ -37,6 +37,7 @@ namespace AnimationEditor.Common.ReferenceModel
         PackFileService _pfs;
         IComponentManager _componentManager;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        IToolFactory _toolFactory;
 
         // Header
         string _headerName;
@@ -71,8 +72,9 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public NotifyAttr<bool> IsControlVisible { get; set; } = new NotifyAttr<bool>(true);
 
-        public ReferenceModelSelectionViewModel(PackFileService pf, AssetViewModel data, string headerName, IComponentManager componentManager, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, SchemaManager schemaManager)
+        public ReferenceModelSelectionViewModel(IToolFactory toolFactory, PackFileService pf, AssetViewModel data, string headerName, IComponentManager componentManager, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, SchemaManager schemaManager)
         {
+            _toolFactory = toolFactory;
             _pfs = pf;
             HeaderName = headerName;
             _componentManager = componentManager;
@@ -90,6 +92,11 @@ namespace AnimationEditor.Common.ReferenceModel
             Data.AnimationChanged += Data_AnimationChanged;
             Data.SkeletonChanged += Data_SkeletonChanged;
             Data.MetaDataChanged += MetaDataChanged;
+        }
+
+        private void Database_ContainerUpdated(PackFileContainer container)
+        {
+          //  throw new NotImplementedException();
         }
 
         private void Data_SkeletonChanged(GameSkeleton newValue)
@@ -127,8 +134,27 @@ namespace AnimationEditor.Common.ReferenceModel
             }
         }
 
-        public void ViewMetaData() { }
-        public void ViewPersistMetaData() { }
+        public void ViewSelectedMeta() 
+        {
+            var fullFileName = _pfs.GetFullPath(_data.MetaData);
+            var viewModel = _toolFactory.GetToolViewModelFromFileName(fullFileName);
+            viewModel.MainFile = _data.MetaData;
+            var window = _toolFactory.CreateToolAsWindow(viewModel);
+            window.Show();
+        }
+
+        public void ViewSelectedPersistMeta()
+        {
+            var fullFileName = _pfs.GetFullPath(_data.PersistMetaData);
+            var viewModel = _toolFactory.GetToolViewModelFromFileName(fullFileName);
+            viewModel.MainFile = _data.PersistMetaData;
+            var window = _toolFactory.CreateToolAsWindow(viewModel);
+            window.Width = 800;
+            window.Height = 450;
+            window.Title = "Persistent meta file - " + fullFileName;
+
+            window.Show();
+        }
 
 
         void MetaDataChanged(AssetViewModel model)
@@ -147,79 +173,11 @@ namespace AnimationEditor.Common.ReferenceModel
             var fatory = new MetaDataFactory(model.MainNode , _componentManager, model, model.Player, FragAndSlotSelection.FragmentList.SelectedItem);
             model.MetaDataItems = fatory.Create(persist, meta);
 
-            /*
-            if (model.MetaData != null)
-            {
-                var f = MetaDataFileParser.Open(model.MetaData, _schemaManager);
-                var props = f.GetItemsOfType("animated_prop");
-                foreach(var prop in props)
-                {
-                    var animatedPropMeta = AnimatedProp.Create(prop);
-                    var mesh = _pfs.FindFile(animatedPropMeta.MeshName);
+        }
 
-                    var PropPlayer = _componentManager.GetComponent<AnimationsContainerComponent>().RegisterAnimationPlayer(new View3D.Animation.AnimationPlayer(), "propPlayer"+Guid.NewGuid());
-
-                    SceneLoader loader = new SceneLoader(_componentManager.GetComponent<ResourceLibary>());
-
-
-                    string skelName = "";
-                    var result = loader.Load(mesh, new GroupNode("The dogNode"), PropPlayer, ref skelName);
-
-
-                    var ske = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, skelName);
-                    GameSkeleton s = new GameSkeleton(ske, PropPlayer);
-
-                    var anim = _pfs.FindFile(animatedPropMeta.AnimationName);
-                    AnimationFile animFile = AnimationFile.Create(anim);
-                    var clip = new AnimationClip(animFile);
-
-                    var rule = new CopyRootTransform(model, animatedPropMeta.BoneId,  animatedPropMeta.Position, animatedPropMeta.Orientation);
-                    clip.AnimationRules.Add(rule);
-
-                    //for (int i = 0; i < clip.DynamicFrames.Count; i++)
-                    //{
-                    //
-                    //    var headPos = model.AnimationClip.GetPosition(model.Skeleton, i, 22);
-                    //    clip.SetPosition(i, 0, headPos);
-                    //}
-
-                    //clip.CopyRootMovementFrom(model.AnimationClip 22);
-
-
-                    PropPlayer.SetAnimation(clip, s);
-
-                    model.MainNode.AddObject(result);
-
-                    var skeletonSceneNode = new SkeletonNode(_componentManager.GetComponent<ResourceLibary>().Content, new SimpleSkeletonProvider(s));
-                    skeletonSceneNode.NodeColour = Color.Yellow;
-
-                    result.AddObject(skeletonSceneNode);
-
-                    var test = new AnimatedPropInstance(result as SceneNode, PropPlayer, model, animatedPropMeta.BoneId, animatedPropMeta.Position, animFile);
-
-                    model.AttachedItems.Add(test);
-                }
-
-                // Add stuff
-
-                // Meta files in
-
-                // Persistant first
-                // Things to create in scene
-                //  - Animated prop
-                //  - Effect
-                //  - Prop
-                //  - Impact pos
-                //  - firepos
-                // Update the animation
-                //  - Transform
-                //  - Splice
-                //  - 
-
-
-            }
-
-            */
+        public void Refresh()
+        {
+            MetaFileInformation.Refresh();
         }
     }
 

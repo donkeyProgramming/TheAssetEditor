@@ -1,6 +1,7 @@
 ﻿using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
+using Common;
 using CommonControls.Services;
 using FileTypes.DB;
 using Microsoft.Xna.Framework;
@@ -20,14 +21,13 @@ namespace AnimationEditor.SuperView
         SkeletonAnimationLookUpHelper _skeletonHelper;
         AnimationPlayerViewModel _player;
         SchemaManager _schemaManager;
+        IToolFactory _toolFactory;
 
-        public ObservableCollection<object> Items { get; set; } = new ObservableCollection<object>();
+        public ObservableCollection<ReferenceModelSelectionViewModel> Items { get; set; } = new ObservableCollection<ReferenceModelSelectionViewModel>();
 
-        public Editor(SceneContainer scene, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, AnimationPlayerViewModel player, SchemaManager schemaManager)
+        public Editor(IToolFactory toolFactory, SceneContainer scene, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, AnimationPlayerViewModel player, SchemaManager schemaManager)
         {
-            Items.Add(null);
-            Items.Add(null);
-
+            _toolFactory = toolFactory;
             _scene = scene;
             _pfs = pfs;
             _skeletonHelper = skeletonHelper;
@@ -39,7 +39,7 @@ namespace AnimationEditor.SuperView
         {
             var asset = _scene.AddCompnent(new AssetViewModel(_pfs, "Item 0", Color.Black, _scene));
             _player.RegisterAsset(asset);
-            var viewModel = new ReferenceModelSelectionViewModel(_pfs, asset, "Item 0:", _scene, _skeletonHelper, _schemaManager);
+            var viewModel = new ReferenceModelSelectionViewModel(_toolFactory, _pfs, asset, "Item 0:", _scene, _skeletonHelper, _schemaManager);
 
             viewModel.Data.SetMesh(input.Mesh);
             if (input.Animation != null)
@@ -55,13 +55,17 @@ namespace AnimationEditor.SuperView
                 }
             }
 
-      
-
             Items.Add(viewModel);
         }
 
-        void ReApply()
-        { }
+        public void Refresh()
+        {
+            foreach (var item in Items)
+                item.Refresh();
+
+            foreach (var item in Items)
+                item.Data.ReApplyMeta();
+        }
 
     }
 }

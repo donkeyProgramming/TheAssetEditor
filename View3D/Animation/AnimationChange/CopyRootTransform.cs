@@ -18,12 +18,15 @@ namespace View3D.Animation.AnimationChange
             _offsetRot = offsetRot;
         }
 
-        public override void ApplyBeforeWorldTransform(AnimationFrame frame)
+        public override void ApplyRule(AnimationFrame frame, int boneId, float v)       
         {
+          
+            if (boneId != 0)
+                return;
+
             var transform = _skeletonProvider.Skeleton.GetAnimatedWorldTranform(_boneId);
-            transform.Decompose(out var scale, out var rot, out var trans);
-            frame.BoneTransforms[0].Rotation =  rot * _offsetRot;// *  rot * _offsetRot; ;
-            frame.BoneTransforms[0].Translation = trans;// + new Vector3(_offsetPos.Z, _offsetPos.X, _offsetPos.Y);
+            Matrix m = Matrix.CreateFromQuaternion(_offsetRot) * Matrix.CreateTranslation(_offsetPos) * transform;
+            frame.BoneTransforms[0].WorldTransform = m;
         }
     }
 }

@@ -20,9 +20,11 @@ namespace View3D.Rendering.RenderItems
             _bb = bb;
         }
 
+        public Matrix ModelMatrix { get; set; } = Matrix.Identity;
+
         public void Draw(GraphicsDevice device, CommonShaderParameters parameters)
         {
-            Render(device, parameters, Matrix.Identity);
+            Render(device, parameters, ModelMatrix);
         }
 
         public void Render(GraphicsDevice device, CommonShaderParameters commonShaderParameters, Matrix ModelMatrix)

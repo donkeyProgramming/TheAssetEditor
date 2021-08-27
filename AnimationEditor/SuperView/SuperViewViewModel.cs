@@ -13,7 +13,7 @@ namespace AnimationEditor.SuperView
 
     public class SuperViewViewModel : BaseAnimationViewModel
     {
-        public SuperViewViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, SchemaManager schemaManager) : base(pfs, skeletonHelper, schemaManager, "not_in_use1", "not_in_use2", false)
+        public SuperViewViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, SchemaManager schemaManager) : base(toolFactory, pfs, skeletonHelper, schemaManager, "not_in_use1", "not_in_use2", false)
         {
             DisplayName = "Super view";
             Pfs = pfs;
@@ -27,32 +27,10 @@ namespace AnimationEditor.SuperView
             ReferenceModelView.IsControlVisible.Value = false;
             ReferenceModelView.Data.IsSelectable = false;
 
-            var typedEditor = new Editor(Scene, _pfs, _skeletonHelper, Player, _schemaManager);
+            var typedEditor = new Editor(_toolFactory ,Scene, _pfs, _skeletonHelper, Player, _schemaManager);
             Editor = typedEditor;
 
             typedEditor.Create(MainInput);
-
-            //var propAsset = Scene.AddCompnent(new AssetViewModel(_pfs, "Generated", Color.Black, Scene));
-            //Player.RegisterAsset(propAsset);
-            //Editor = new Editor(_pfs, _skeletonHelper, MainModelView.Data, ReferenceModelView.Data, propAsset, Scene);
-
-            /*
-             
-             if (MainInput != null)
-                {
-                    MainModelView.Data.SetMesh(MainInput.Mesh);
-                    if (MainInput.Animation != null)
-                        MainModelView.Data.SetAnimation(_skeletonHelper.FindAnimationRefFromPackFile(MainInput.Animation, _pfs));
-                }
-
-                if (RefInput != null)
-                {
-                    ReferenceModelView.Data.SetMesh(RefInput.Mesh);
-                    if (RefInput.Animation != null)
-                        ReferenceModelView.Data.SetAnimation(_skeletonHelper.FindAnimationRefFromPackFile(RefInput.Animation, _pfs));
-                }
-             */
-
         }
     }
 
@@ -67,11 +45,24 @@ namespace AnimationEditor.SuperView
                 FragmentName = @"animations/animation_tables/hu1b_alarielle_staff_and_sword.frg",
                 AnimationSlot = AnimationSlotTypeHelper.GetfromValue("STAND")
             };
+           // editorView.MainInput = new AnimationToolInput()
+           // {
+           //     Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_throt.variantmeshdefinition"),
+           //     FragmentName = @"animations/animation_tables/hu17_dlc16_throt.frg",
+           //     AnimationSlot = AnimationSlotTypeHelper.GetfromValue("ATTACK_5")
+           // };
+
+         //editorView.MainInput = new AnimationToolInput()
+         //{
+         //    Mesh = packfileService.FindFile(@"warmachines\engines\emp_steam_tank\emp_steam_tank01.rigid_model_v2"),
+         //    FragmentName = @"animations/animation_tables/wm_steam_tank01.frg",
+         //    AnimationSlot = AnimationSlotTypeHelper.GetfromValue("STAND")
+         //};
             editorView.MainInput = new AnimationToolInput()
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_throt.variantmeshdefinition"),
-                FragmentName = @"animations/animation_tables/hu17_dlc16_throt.frg",
-                AnimationSlot = AnimationSlotTypeHelper.GetfromValue("STAND_IDLE_1")
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\emp_state_troops_crossbowmen_ror.variantmeshdefinition"),
+                FragmentName = @"animations/animation_tables/hu1_empire_sword_crossbow.frg",
+                AnimationSlot = AnimationSlotTypeHelper.GetfromValue("FIRE_HIGH")
             };
 
             creator.CreateEmptyEditor(editorView);

@@ -1,4 +1,5 @@
 ﻿using AnimationEditor.SuperView;
+using AssetEditor.Services;
 using AssetEditor.Views.Settings;
 using Common;
 using Common.ApplicationSettings;
@@ -6,6 +7,7 @@ using Common.GameInformation;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using FileTypes.AnimationPack;
+using FileTypes.DB;
 using FileTypes.PackFiles.Models;
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor;
@@ -35,7 +37,7 @@ namespace AssetEditor.ViewModels
 
         public ICommand CloseToolCommand { get; set; }
 
-        public MainViewModel(MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, GameInformationService gameInformationService, ToolFactory toolFactory)
+        public MainViewModel(MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, GameInformationService gameInformationService, ToolFactory toolFactory, SchemaManager schemaManager)
         {
             _packfileService = packfileService;
             _packfileService.Database.BeforePackFileContainerRemoved += Database_BeforePackFileContainerRemoved;
@@ -65,6 +67,7 @@ namespace AssetEditor.ViewModels
 
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
             {
+                //settingsService.CurrentSettings.CurrentGame = GameTypeEnum.ThreeKingdoms;
                 var gamePath = settingsService.GetGamePathForCurrentGame();
                 if (gamePath != null)
                 {
@@ -72,11 +75,17 @@ namespace AssetEditor.ViewModels
                     var loadRes = _packfileService.LoadAllCaFiles(gamePath, gameName);
                     if (!loadRes)
                         MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
+                    
+                    //new AnimMetaBatchProcessor().BatchProcess(_packfileService, schemaManager, gameName);
                 }
             }
           
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
+                _packfileService.Load(@"C:\Users\ole_k\AssetEditor\MyStuff\ratcar.pack", true);
+
+                //AnimMetaBatchProcessor processor = new AnimMetaBatchProcessor();
+                //processor.BatchProcess(_packfileService, schemaManager, "Warhammer");
 
                 SuperViewViewModel_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
@@ -89,7 +98,7 @@ namespace AssetEditor.ViewModels
 
 
 
-                //var f = packfileService.FindFile(@"animations\battle\persistent\hu1b_alarielle_staff_and_sword_persistent_metadata_alive_0.anm.meta");
+                //var f = packfileService.FindFile(@"animations\battle\persistent\hr1_warhorse_persistent_metadata_alive_0.anm.meta");
                 //OpenFile(f);
 
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
@@ -98,7 +107,7 @@ namespace AssetEditor.ViewModels
 
                 //CreateEmptyEditor(editorView);
 
-                CreateTestPackFiles(packfileService);
+               // CreateTestPackFiles(packfileService);
             }
         }
 

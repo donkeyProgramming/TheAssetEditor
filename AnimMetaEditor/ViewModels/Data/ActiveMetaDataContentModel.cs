@@ -24,7 +24,7 @@ namespace AnimMetaEditor.ViewModels.Data
                     _selectedItem = _tagTypeItem.DataItems.FirstOrDefault();
                 else
                     _selectedItem = null;
-
+               
                 SelectedTagTypeChanged?.Invoke(_tagTypeItem);
                 SelectedTagItemChanged?.Invoke(_selectedItem);
             } 

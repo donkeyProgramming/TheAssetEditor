@@ -163,18 +163,67 @@ Scale places - Mount tool
 Validation of variant mesh, exception, not error box on xml node exception
 I think pretty much all vmds should have those two entries, no? meta n entries
 vmp_master_necromancer_torso_02.rigid_model_v2 is the body I am working on texture crach
+Create link fom program to modding den
+imposter stuff variantmeshes\variantmeshdefinitions\chs_wyrd_spawn_left_side.variantmeshdefinition xml
+Create material file when missing  for generate ws model
+Update wiki with info on campagin tutorial 
+@h3ro  found the origin of the error I had before, if you put the same name in the three fields "animpack", "animbin" and "fragment" (even if you maintain the suffixes) the error appears
+Fix names in campagin bin xml
+Remap head of goblin to rat, eayes and ears gets fucked 
+campagin bin validation - path and skeleton
+Fix attachmentpoints for weapons inside wmds
+Debugger view - table for vertex info 
+Save rmv2 files 
+Set output format 
 
-- Animated prop
+- Animated prop [X]
+- Effect  		[X]
+- Splash
+- Impact pos	[X]
+- Hand pos
+- Transform		
+- Prop
 - Splice
 - Crew location
-- Effect 
-- Prop
+- FirePos [X]
+- Target Pos [X]
+- Impact speed
+- Facepos
+- SoundTrigger
 
-- Firepos
-animations\battle\persistent\hu1b_alarielle_staff_and_sword_persistent_metadata_alive_0.anm.meta
 
-variantmeshes\variantmeshdefinitions\hef_alarielle.variantmeshdefinition
-animations/animation_tables/hu1b_alarielle_staff_and_sword.frg
+
+[x] Fix timing issue and out of sync
+[X] Fix error when chaning model info
+HandPos
+Facepos
+[X]Targetpos and firepos
+[X]Dock waist
+[X]Weapon hand left/right
+Both persist and normal 
+Firgure out why meta not showing in UI 
+Copy paste using json?
+Time to frame converter 
+start/end time
+
+//hu17_cr_attack_09_skrolk.anm.meta
 
 	
 variantmeshes\variantmeshdefinitions\skv_throt.variantmeshdefinition
+
+
+ Wood mage - 3 attacks
+	Wine from hands - Big tree guy
+	Roots from ground 
+	Lifting bulders from the grond 
+	
+	Lightning
+	Bats
+	Lifint small stones, spinn them then throw 
+	
+	Medusa hair, 
+	Serpent01
+	
+	Screaming skulls on pike?! 
+	FLail like weapons
+	

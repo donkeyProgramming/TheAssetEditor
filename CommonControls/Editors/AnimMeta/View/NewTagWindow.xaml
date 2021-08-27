@@ -18,8 +18,16 @@
         <ListView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
             ItemsSource="{Binding Items, UpdateSourceTrigger=PropertyChanged}" 
             SelectedItem="{Binding SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-            DisplayMemberPath="DisplayName"
             MouseDoubleClick="ListView_MouseDoubleClick">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding TableName}"/>
+                        <TextBlock Text="_"/>
+                        <TextBlock Text="{Binding Version}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
         </ListView>
 
         <Button Grid.Row="1" Grid.Column="1" Content="OK" Width="100" Click="OnOkClick"/>

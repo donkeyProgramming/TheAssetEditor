@@ -14,7 +14,7 @@ namespace AnimationEditor.PropCreator
 {
     public class PropCreatorViewModel : BaseAnimationViewModel
     {
-        public PropCreatorViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, SchemaManager schemaManager) : base(pfs, skeletonHelper, schemaManager, "Main", "Reference")
+        public PropCreatorViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, SchemaManager schemaManager) : base(toolFactory, pfs, skeletonHelper, schemaManager, "Main", "Reference")
         {
             DisplayName  = "Anim.Prop Creator";
         }

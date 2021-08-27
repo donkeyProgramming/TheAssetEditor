@@ -13,7 +13,6 @@ namespace CommonControls.Editors.AnimMeta
     public class MetaDataTagItemViewModel : NotifyPropertyChangedImpl
     {
         IMetaEntry _originalItem;
-        SchemaManager _schemaManager;
 
         public ObservableCollection<EditableTagItem> Variables { get; set; } = new ObservableCollection<EditableTagItem>();
 
@@ -21,9 +20,8 @@ namespace CommonControls.Editors.AnimMeta
         public NotifyAttr<bool> IsDecodedCorrectly { get; set; } = new NotifyAttr<bool>(false);
 
 
-        public MetaDataTagItemViewModel(IMetaEntry item, SchemaManager schemaManager)
+        public MetaDataTagItemViewModel(IMetaEntry item)
         {
-            _schemaManager = schemaManager;
             _originalItem = item;
 
             DisplayName.Value = $"{item.Name}_v{item.Version}";
@@ -32,7 +30,6 @@ namespace CommonControls.Editors.AnimMeta
             if (IsDecodedCorrectly.Value)
                  Variables = CreateVariableList(item as MetaEntry);
         }
-
 
         ObservableCollection<EditableTagItem> CreateVariableList(MetaEntry entry)
         {
@@ -50,15 +47,26 @@ namespace CommonControls.Editors.AnimMeta
                 var byteValue = new byte[fieldByteLength];
                 Array.Copy(data, totalBytesRead, byteValue, 0, fieldByteLength);
 
-                EditableTagItem item = new EditableTagItem(parser, byteValue)
+                if (field.Name.Contains("orientation", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    Description = field.Description,
-                    FieldName = $"[{counter + 1}] {field.Name} - { field.Type}",
-                    ValueType = field.Type.ToString(),
-                };
-
-                // Special for vector3 and 4
-                output.Add(item);
+                    OrientationEditableTagItem item = new OrientationEditableTagItem(ByteParsers.Vector4, byteValue)
+                    {
+                        Description = field.Description,
+                        FieldName = $"[{counter + 1}] {field.Name} - { field.Type}",
+                        ValueType = field.Type.ToString(),
+                    };
+                    output.Add(item);
+                }
+                else
+                {
+                    EditableTagItem item = new EditableTagItem(parser, byteValue)
+                    {
+                        Description = field.Description,
+                        FieldName = $"[{counter + 1}] {field.Name} - { field.Type}",
+                        ValueType = field.Type.ToString(),
+                    };
+                    output.Add(item);
+                }
                 totalBytesRead += fieldByteLength;
                 counter++;
             }
@@ -66,8 +74,19 @@ namespace CommonControls.Editors.AnimMeta
             return output;
         }
 
+        public string HasError()
+        {
+            foreach (var variable in Variables)
+            {
+                if (!variable.IsValid)
+                    return $"Variable '{variable.FieldName}' in {DisplayName} has an error";
+            }
 
-        /*internal MetaDataTagItem GetAsData()
+            return null;
+        }
+
+
+        internal MetaDataTagItem GetAsData()
         {
             var newItem = new MetaDataTagItem()
             {
@@ -80,9 +99,8 @@ namespace CommonControls.Editors.AnimMeta
                 if (_originalItem == null)
                     throw new Exception("_originalItem is null and IsDecodedCorrectly is false");
 
-                var tmp = new byte[_originalItem.DataItem.Size];
-                Array.Copy(_originalItem.DataItem.Bytes, _originalItem.DataItem.Start, tmp, 0, _originalItem.DataItem.Size);
-                var copy = new MetaDataTagItem.TagData(tmp, 0, tmp.Length);
+                var data = _originalItem.GetData();
+                var copy = new MetaDataTagItem.TagData(data, 0, data.Length);
                 newItem.DataItem = copy;
                 return newItem;
             }
@@ -104,7 +122,7 @@ namespace CommonControls.Editors.AnimMeta
             var instance = new MetaDataTagItem.TagData(byteArray, 0, totalCount);
             newItem.DataItem = instance;
             return newItem;
-        }*/
+        }
     }
 }
 

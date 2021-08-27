@@ -46,6 +46,7 @@ namespace AnimationEditor.PropCreator.ViewModels
         public string DisplayName { get; set; } = "Creator";
         public IPackFile MainFile { get; set; }
 
+        protected IToolFactory _toolFactory;
         SceneContainer _scene;
         public SceneContainer Scene { get => _scene; set => SetAndNotify(ref _scene, value); }
 
@@ -62,8 +63,9 @@ namespace AnimationEditor.PropCreator.ViewModels
         object _editor;
         public object Editor { get => _editor; set => SetAndNotify(ref _editor, value); }
 
-        public BaseAnimationViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, SchemaManager schemaManager, string headerAsset0, string headerAsset1, bool createDefaultAssets = true)
+        public BaseAnimationViewModel(IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, SchemaManager schemaManager, string headerAsset0, string headerAsset1, bool createDefaultAssets = true)
         {
+            _toolFactory = toolFactory;
             _pfs = pfs;
             _skeletonHelper = skeletonHelper;
             _schemaManager = schemaManager;
@@ -93,8 +95,8 @@ namespace AnimationEditor.PropCreator.ViewModels
             var mainAsset = Scene.AddCompnent(new AssetViewModel(_pfs, headerAsset0, Color.Black, Scene));
             var refAsset = Scene.AddCompnent(new AssetViewModel(_pfs, headerAsset1,  Color.Green, Scene));
 
-            MainModelView = new ReferenceModelSelectionViewModel(pfs, mainAsset, headerAsset0 + ":", Scene, skeletonHelper, schemaManager);
-            ReferenceModelView = new ReferenceModelSelectionViewModel(pfs, refAsset, headerAsset1 + ":", Scene, skeletonHelper, schemaManager);
+            MainModelView = new ReferenceModelSelectionViewModel(_toolFactory, pfs, mainAsset, headerAsset0 + ":", Scene, skeletonHelper, schemaManager);
+            ReferenceModelView = new ReferenceModelSelectionViewModel(_toolFactory, pfs, refAsset, headerAsset1 + ":", Scene, skeletonHelper, schemaManager);
         }
 
         private void OnSceneInitialized(WpfGame scene)

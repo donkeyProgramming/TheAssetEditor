@@ -1,4 +1,5 @@
-﻿using CommonControls.Editors.BoneMapping;
+﻿using CommonControls.Common;
+using CommonControls.Editors.BoneMapping;
 using Filetypes.RigidModel;
 using Microsoft.Xna.Framework;
 using System;

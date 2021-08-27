@@ -53,15 +53,18 @@ namespace AnimationEditor.Common.ReferenceModel
         {
             Unsubscribe();
 
+            FragmentList.SelectedItem = null;
+            FragmentSlotList.SelectedItem = null;
+
             if (newValue == null)
             {
                 FragmentList.UpdatePossibleValues(new List<AnimationFragment>());
                 FragmentSlotList.UpdatePossibleValues(new List<AnimationFragmentEntry>());
                 return;
             }
-            var mountSkeletonName = Path.GetFileNameWithoutExtension(_asset.SkeletonName.Value);
-            var allPossibleMount = LoadFragmentsForSkeleton(mountSkeletonName);
-            FragmentList.UpdatePossibleValues(allPossibleMount);
+            var skeletonName = Path.GetFileNameWithoutExtension(_asset.SkeletonName.Value);
+            var allPossibleFragments = LoadFragmentsForSkeleton(skeletonName);
+            FragmentList.UpdatePossibleValues(allPossibleFragments);
 
             Subscribe();
         }

@@ -1,5 +1,6 @@
 ﻿using Common;
 using CommonControls.Common;
+using CommonControls.Editors.AnimMeta.View;
 using CommonControls.Services;
 using FileTypes.DB;
 using FileTypes.MetaData;
@@ -49,11 +50,10 @@ namespace CommonControls.Editors.AnimMeta
             _metaDataFile = MetaDataFileParser.ParseFile(fileContent, _schemaManager);
 
             foreach (var item in _metaDataFile.Items)
-                Tags.Add(new MetaDataTagItemViewModel(item, _schemaManager));
+                Tags.Add(new MetaDataTagItemViewModel(item));
         }
 
-        // Move up and down
-        void MoveUp()
+        public void MoveUp()
         {
             var itemToMove = SelectedTag;
             if (itemToMove == null)
@@ -69,7 +69,7 @@ namespace CommonControls.Editors.AnimMeta
             SelectedTag = itemToMove;
         }
 
-        void MoveDown()
+        public void MoveDown()
         {
             var itemToMove = SelectedTag;
             if (itemToMove == null)
@@ -85,7 +85,7 @@ namespace CommonControls.Editors.AnimMeta
             SelectedTag = itemToMove;
         }
 
-        void Delete()
+        public void Delete()
         {
             var item = SelectedTag;
             if (item == null)
@@ -95,28 +95,28 @@ namespace CommonControls.Editors.AnimMeta
             SelectedTag = Tags.FirstOrDefault();
         }
 
-        void New()
+        public void New()
         {
-            throw new System.Exception();
-            //var dialog = new NewTagWindow();
-            //
-            //var allDefs = _schemaManager.GetAllMetaDataDefinitions();
-            //allDefs = allDefs.OrderBy(x => x.DisplayName).ToList();
-            //
-            //NewTagWindowViewModel model = new NewTagWindowViewModel();
-            //model.Items = new ObservableCollection<DbTableDefinition>(allDefs);
-            //dialog.DataContext = model;
-            //
-            //var res = dialog.ShowDialog();
-            //if (res.HasValue && res.Value == true)
-            //{
-            //    var newItem = new MetaDataTagItemViewModel(model.SelectedItem, _schemaManager);
-            //    _data.Tags.Add(newItem);
-            //}
-            //
-            //dialog.DataContext = null;
+
+            var dialog = new NewTagWindow();
+            
+            var allDefs = _schemaManager.GetAllMetaDataDefinitions();
+            allDefs = allDefs.OrderBy(x => x.TableName + "_" + x.Version).ToList();
+            
+            NewTagWindowViewModel model = new NewTagWindowViewModel();
+            model.Items = new ObservableCollection<DbTableDefinition>(allDefs);
+            dialog.DataContext = model;
+            
+            var res = dialog.ShowDialog();
+            if (res.HasValue && res.Value == true)
+            {
+                var newEntry = new MetaEntry(model.SelectedItem);
+                var newTagView = new MetaDataTagItemViewModel(newEntry);
+                Tags.Add(newTagView);
+            }
+            
+            dialog.DataContext = null;
         }
-        //-----
 
 
         public void Close()
@@ -125,27 +125,28 @@ namespace CommonControls.Editors.AnimMeta
 
         public bool HasUnsavedChanges() => false;
 
-
         public bool Save()
         {
-            return false;
-            //var path = _pf.GetFullPath(_file as PackFile);
-            //var currentErrorMessage = MetaDataEntryView.GetErrorMessage();
-            //
-            //if (string.IsNullOrWhiteSpace(currentErrorMessage) == false)
-            //{
-            //    MessageBox.Show($"Unable to save : {currentErrorMessage}");
-            //    return false;
-            //}
-            //
-            //var bytes =  MetaDataFileParser.GenerateBytes(_metaDataFile.Version, MetaDataEntryView.Tags.Select(x=>x.GetAsData()));
-            //var res = SaveHelper.Save(_pf, path, null, bytes);
-            //if (res != null)
-            //{
-            //    _file = res;
-            //    DisplayName = _file.Name;
-            //}
-            //return _file != null;
+            var path = _pf.GetFullPath(_file);
+
+            foreach (var tag in Tags)
+            {
+                var currentErrorMessage = tag.HasError();
+                if (string.IsNullOrWhiteSpace(currentErrorMessage) == false)
+                {
+                    MessageBox.Show($"Unable to save : {currentErrorMessage}");
+                    return false;
+                }
+            }
+
+            var bytes =  MetaDataFileParser.GenerateBytes(_metaDataFile.Version, Tags.Select(x=>x.GetAsData()));
+            var res = SaveHelper.Save(_pf, path, null, bytes);
+            if (res != null)
+            {
+                _file = res;
+                DisplayName = _file.Name;
+            }
+            return _file != null;
         }
     }
 }

@@ -414,11 +414,11 @@ namespace CommonControls.Services
         public PackFile FindFile(string path) 
         {
             var lowerPath = path.Replace('/', '\\').ToLower();
-            foreach (var packFile in Database.PackFiles)
+            for (var i = Database.PackFiles.Count - 1; i >= 0; i--)
             {
-                if (packFile.FileList.ContainsKey(lowerPath))
+                if (Database.PackFiles[i].FileList.ContainsKey(lowerPath))
                 {
-                    return packFile.FileList[lowerPath] as PackFile;
+                    return Database.PackFiles[i].FileList[lowerPath] as PackFile;
                 }
             }
             _logger.Here().Warning($"File not found");

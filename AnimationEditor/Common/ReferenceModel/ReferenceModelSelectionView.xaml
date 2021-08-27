@@ -119,7 +119,7 @@
                     <CheckBox Visibility="Hidden" />
                     <Label DockPanel.Dock="Left" Content="Meta persist" Width ="{StaticResource labelWidth}" />
                     <Label DockPanel.Dock="Left" Content=":"/>
-                    <Button DockPanel.Dock="Right" Width="30" Margin="10,3,0,0" Content="..." Click="{s:MethodBinding RemoveMesh}"  VerticalAlignment="Top" />
+                    <Button DockPanel.Dock="Right" Width="30" Margin="10,3,0,0" Content="..." Click="{s:MethodBinding ViewSelectedPersistMeta}"  VerticalAlignment="Top" />
 
                     <filterdialog:CollapsableFilterControl VerticalContentAlignment="Center" DockPanel.Dock="Right"
                                     SelectedItem="{Binding MetaFileInformation.SelectedPersistMetaFile, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
@@ -136,7 +136,7 @@
                     <CheckBox Visibility="Hidden" />
                     <Label DockPanel.Dock="Left" Content="Meta" Width ="{StaticResource labelWidth}" />
                     <Label DockPanel.Dock="Left" Content=":"/>
-                    <Button DockPanel.Dock="Right" Width="30" Margin="10,3,0,0" Content="..." Click="{s:MethodBinding RemoveMesh}" VerticalAlignment="Top"/>
+                    <Button DockPanel.Dock="Right" Width="30" Margin="10,3,0,0" Content="..." Click="{s:MethodBinding ViewSelectedMeta}" VerticalAlignment="Top"/>
 
                     <filterdialog:CollapsableFilterControl VerticalContentAlignment="Center" DockPanel.Dock="Right"
                                     SelectedItem="{Binding MetaFileInformation.SelectedMetaFile, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
