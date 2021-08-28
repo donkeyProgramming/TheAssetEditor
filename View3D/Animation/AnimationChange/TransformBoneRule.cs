@@ -11,10 +11,14 @@ namespace View3D.Animation.AnimationChange
             _metadata = metadata;
         }
 
-        public override void ApplyBeforeWorldTransform(AnimationFrame frame)
+        public override void TransformBone(AnimationFrame frame, int boneId, float v)
         {
-            frame.BoneTransforms[_metadata.TargetNode].Translation += _metadata.Position;
-            frame.BoneTransforms[_metadata.TargetNode].Rotation = frame.BoneTransforms[_metadata.TargetNode].Rotation *  new Quaternion(_metadata.Orientation);
+            if (boneId != _metadata.TargetNode)
+                return;
+
+            var quat = new Quaternion(_metadata.Orientation);
+            Matrix m = Matrix.CreateFromQuaternion(quat) * Matrix.CreateTranslation(_metadata.Position) * frame.BoneTransforms[_metadata.TargetNode].WorldTransform;
+            frame.BoneTransforms[_metadata.TargetNode].WorldTransform = m;
         }
     }
 }

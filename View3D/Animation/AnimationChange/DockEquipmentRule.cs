@@ -50,11 +50,8 @@ namespace View3D.Animation.AnimationChange
             _offset = offsetFrame.GetSkeletonAnimatedWorldDiff(_skeletonProvider.Skeleton, _equipmentSlotToDock, _dockTargetkBoneId);
         }
 
-        public override void ApplyRuleAfter(AnimationFrame frame, float time)
+        public override void ApplyWorldTransform(AnimationFrame frame, float time)
         {
-          
-            // This is applied, then we never snap to it, so boom! error
-
             if (time >= _startTime)
             {
                 var offsetFrame = AnimationSampler.Sample(0, _skeletonProvider.Skeleton, _dockAnimation);

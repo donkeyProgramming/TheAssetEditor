@@ -52,7 +52,7 @@ namespace View3D.Animation
                     if (animationChangeRules != null)
                     {
                         foreach (var rule in animationChangeRules)
-                            rule.ApplyRule(currentFrame, i, time.Value * animationClip.PlayTimeInSec);
+                            rule.TransformBone(currentFrame, i, time.Value * animationClip.PlayTimeInSec);
                     }
 
                     var parentindex = currentFrame.BoneTransforms[i].ParentBoneIndex;
@@ -65,10 +65,7 @@ namespace View3D.Animation
                 if (animationChangeRules != null)
                 {
                     foreach (var rule in animationChangeRules)
-                        rule.ApplyRuleAfter(currentFrame, time.Value * animationClip.PlayTimeInSec);
-
-                    //foreach (var rule in animationChangeRules)
-                    //    rule.ApplyRule(currentFrame, 0);
+                        rule.ApplyWorldTransform(currentFrame, time.Value * animationClip.PlayTimeInSec);
                 }
 
 

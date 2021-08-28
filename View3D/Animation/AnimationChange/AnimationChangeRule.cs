@@ -7,9 +7,8 @@ namespace View3D.Animation.AnimationChange
 {
     public abstract class AnimationChangeRule
     {
-        public virtual void ApplyBeforeWorldTransform(AnimationFrame frame) { }
-        public virtual void ApplyRule(AnimationFrame frame, int boneId, float v) { }
+        public virtual void TransformBone(AnimationFrame frame, int boneId, float v) { }
 
-        public virtual void ApplyRuleAfter(AnimationFrame frame, float time) { }
+        public virtual void ApplyWorldTransform(AnimationFrame frame, float time) { }
     }
 }

@@ -175,6 +175,8 @@ Fix attachmentpoints for weapons inside wmds
 Debugger view - table for vertex info 
 Save rmv2 files 
 Set output format 
+Duplicate fragment to new 
+Show in explorer
 
 - Animated prop [X]
 - Effect  		[X]

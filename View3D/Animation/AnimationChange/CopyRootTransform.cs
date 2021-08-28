@@ -18,9 +18,8 @@ namespace View3D.Animation.AnimationChange
             _offsetRot = offsetRot;
         }
 
-        public override void ApplyRule(AnimationFrame frame, int boneId, float v)       
+        public override void TransformBone(AnimationFrame frame, int boneId, float v)       
         {
-          
             if (boneId != 0)
                 return;
 
