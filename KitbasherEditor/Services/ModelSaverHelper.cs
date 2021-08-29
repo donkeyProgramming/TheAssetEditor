@@ -101,6 +101,12 @@ namespace KitbasherEditor.Services
         {
             try
             {
+                if (_packFileService.GetEditablePack() == null)
+                {
+                    MessageBox.Show("No editable pack selected", "error");
+                    return;
+                }
+
                 var isAllVisible = _editableMeshNode.AreAllNodesVisible();
                 bool onlySaveVisible = false;
                 if (isAllVisible == false)

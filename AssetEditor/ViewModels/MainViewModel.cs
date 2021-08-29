@@ -82,12 +82,12 @@ namespace AssetEditor.ViewModels
           
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
-                _packfileService.Load(@"C:\Users\ole_k\AssetEditor\MyStuff\ratcar.pack", true);
+                //_packfileService.Load(@"C:\Users\ole_k\AssetEditor\MyStuff\ratcar.pack", true);
 
                 //AnimMetaBatchProcessor processor = new AnimMetaBatchProcessor();
                 //processor.BatchProcess(_packfileService, schemaManager, "Warhammer");
 
-                SuperViewViewModel_Debug.CreateDamselEditor(this, toolFactory, packfileService);
+                //SuperViewViewModel_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 //MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
                 //KitbashEditor_Debug.CreatePaladin(this, toolFactory, packfileService);
@@ -98,8 +98,8 @@ namespace AssetEditor.ViewModels
 
 
 
-                //var f = packfileService.FindFile(@"animations\battle\persistent\hr1_warhorse_persistent_metadata_alive_0.anm.meta");
-                //OpenFile(f);
+                var f = packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack");
+                OpenFile(f);
 
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 

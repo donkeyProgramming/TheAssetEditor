@@ -17,12 +17,12 @@ namespace FileTypes.AnimationPack
         public string MetaDataFile { get; set; } = string.Empty;
         public string SoundMetaDataFile { get; set; } = string.Empty;
         public string Skeleton { get; set; } = string.Empty;
-        public float Blend { get; set; } = 0;
-        public float Weight { get; set; } = 0;
+        public float BlendInTime { get; set; } = 0;
+        public float SelectionWeight { get; set; } = 0;
         public int Unknown0 { get; set; } = 0;
         public int Unknown1 { get; set; } = 0;
-        public string Unknown3 { get; set; } = string.Empty;
-        public bool Unknown4 { get; set; } = false;
+        public string Comment { get; set; } = string.Empty;
+        public bool Ignore { get; set; } = false;
 
         public AnimationFragmentEntry(ByteChunk data)
         {
@@ -35,12 +35,12 @@ namespace FileTypes.AnimationPack
             MetaDataFile = data.ReadString();
             SoundMetaDataFile = data.ReadString();
             Skeleton = data.ReadString();
-            Blend = data.ReadSingle();
-            Weight = data.ReadSingle();
+            BlendInTime = data.ReadSingle();
+            SelectionWeight = data.ReadSingle();
             Unknown0 = data.ReadInt32();
             Unknown1 = data.ReadInt32();
-            Unknown3 = data.ReadString();
-            Unknown4 = data.ReadBool();
+            Comment = data.ReadString();
+            Ignore = data.ReadBool();
         }
 
         public AnimationFragmentEntry Clone()
@@ -52,12 +52,12 @@ namespace FileTypes.AnimationPack
                 MetaDataFile = MetaDataFile,
                 SoundMetaDataFile = SoundMetaDataFile,
                 Skeleton = Skeleton,
-                Blend = Blend,
-                Weight = Weight,
+                BlendInTime = BlendInTime,
+                SelectionWeight = SelectionWeight,
                 Unknown0 = Unknown0,
                 Unknown1 = Unknown1,
-                Unknown3 = Unknown3,
-                Unknown4 = Unknown4
+                Comment = Comment,
+                Ignore = Ignore
             };
         }
 
@@ -77,13 +77,13 @@ namespace FileTypes.AnimationPack
             memStream.Write(ByteParsers.String.WriteCaString(SoundMetaDataFile));
             memStream.Write(ByteParsers.String.WriteCaString(Skeleton));
 
-            memStream.Write(ByteParsers.Single.EncodeValue(Blend, out _));
-            memStream.Write(ByteParsers.Single.EncodeValue(Weight, out _));
+            memStream.Write(ByteParsers.Single.EncodeValue(BlendInTime, out _));
+            memStream.Write(ByteParsers.Single.EncodeValue(SelectionWeight, out _));
 
             memStream.Write(ByteParsers.Int32.EncodeValue(Unknown0, out _));
             memStream.Write(ByteParsers.Int32.EncodeValue(Unknown1, out _));
-            memStream.Write(ByteParsers.String.WriteCaString(Unknown3));
-            memStream.Write(ByteParsers.Bool.EncodeValue(Unknown4, out _));
+            memStream.Write(ByteParsers.String.WriteCaString(Comment));
+            memStream.Write(ByteParsers.Bool.EncodeValue(Ignore, out _));
 
             return memStream.ToArray();
         }

@@ -154,6 +154,26 @@
                 <Button ToolTip="Save "  Command="{Binding SaveCommand, Mode=OneTime}" IsEnabled="{Binding SaveEnabled.Value, UpdateSourceTrigger=PropertyChanged}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-save-all-50.png"/>
                 </Button>
+
+                <Separator/>
+                
+                <Button ToolTip="New entry"  Command="{Binding NewEntryCommand, Mode=OneTime}" IsEnabled="{Binding NewEnabled.Value, UpdateSourceTrigger=PropertyChanged}">
+                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/icons8-new-copy-50.png"/>
+                </Button>
+
+                <Button ToolTip="Delete"  Command="{Binding DeleteCommand, Mode=OneTime}" IsEnabled="{Binding ValidateEnabled.Value, UpdateSourceTrigger=PropertyChanged}">
+                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/icons8-trash-can-50.png"/>
+                </Button>
+                
+                <Separator/>
+                
+                <Button ToolTip="Validate"  Command="{Binding ValidateCommand, Mode=OneTime}" IsEnabled="{Binding ValidateEnabled.Value, UpdateSourceTrigger=PropertyChanged}">
+                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Validate.png"/>
+                </Button>
+
+                <Button ToolTip="Export"  Command="{Binding ExportCommand, Mode=OneTime}" IsEnabled="{Binding ExportEnabled.Value, UpdateSourceTrigger=PropertyChanged}">
+                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/icons8-move-right-48.png"/>
+                </Button>
             </ToolBar>
         </ToolBarTray>
 

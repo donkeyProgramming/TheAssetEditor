@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows;
 
 namespace CommonControls.Services
 {
@@ -23,6 +24,7 @@ namespace CommonControls.Services
             Database = database;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
         }
+
 
         public PackFileContainer Load(string packFileSystemPath, bool setToMainPackIfFirst = false) 
         {
@@ -307,6 +309,16 @@ namespace CommonControls.Services
         public PackFileContainer GetEditablePack()
         {
             return Database.PackSelectedForEdit;
+        }
+
+        public bool HasEditablePackFile()
+        {
+            if (GetEditablePack() == null)
+            {
+                MessageBox.Show("Unable to complate operation, Editable packfile not set.", "Error");
+                return false;
+            }
+            return true;
         }
 
         public PackFileContainer GetPackFileContainer(IPackFile file)

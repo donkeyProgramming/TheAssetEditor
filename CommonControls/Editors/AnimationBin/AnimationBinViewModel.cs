@@ -10,41 +10,17 @@ using System.Text;
 
 namespace CommonControls.Editors.AnimationBin
 {
-
-    public class AnimationBinFragRefViewModel : TableViewModel
-    {
-        public AnimationBinFragRefViewModel(FileTypes.AnimationPack.AnimationBinEntry entry)
-        {
-            Factory.CreateColoumn("Fragment", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
-            Factory.CreateColoumn("Unknown", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
-
-            if (entry != null)
-            {
-                SuspendLayout();
-                foreach (var binEntry in entry.FragmentReferences)
-                    CreateRow(binEntry.Name, binEntry.Unknown);
-
-                ResumeLayout();
-            }
-        }
-
-        public override TableViewModel Clone()
-        {
-            var newTable = new AnimationBinFragRefViewModel(null);
-            newTable.Data = Data.Clone();
-            return newTable;
-        }
-    }
-
     public class AnimationBinViewModel : TableViewModel, IEditorViewModel
     {
         string _displayName;
         public string DisplayName { get => _displayName; set => SetAndNotify(ref _displayName, value); }
 
-        PackFileService _pf;
+        PackFileService _pfs;
         public AnimationBinViewModel(PackFileService pf)
         {
-            _pf = pf;
+            _pfs = pf;
+
+            ExportEnabled.Value = true;
 
             Factory.CreateColoumn("Key", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
             Factory.CreateColoumn("Skeleton", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
@@ -86,12 +62,58 @@ namespace CommonControls.Editors.AnimationBin
 
         public void Close()
         {
-            //throw new NotImplementedException();
         }
 
         public bool HasUnsavedChanges()
         {
             return false;
+        }
+
+        public override void Export()
+        {
+            if (_pfs.HasEditablePackFile() == false)
+                return;
+
+            if (SelectedRow == null || SelectedRow.Row.ItemArray.Length == 0)
+                return;
+            var dialog = new ExportBinWindow();
+            if (dialog.ShowDialog() == true)
+            { 
+            
+            }
+
+            // Validation rules
+            // All fragments found
+            // All files valid paths
+            // valid skeleton
+            // anim files use same skeleton
+        }
+
+
+    }
+
+    public class AnimationBinFragRefViewModel : TableViewModel
+    {
+        public AnimationBinFragRefViewModel(FileTypes.AnimationPack.AnimationBinEntry entry)
+        {
+            Factory.CreateColoumn("Fragment", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
+            Factory.CreateColoumn("Unknown", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x));
+
+            if (entry != null)
+            {
+                SuspendLayout();
+                foreach (var binEntry in entry.FragmentReferences)
+                    CreateRow(binEntry.Name, binEntry.Unknown);
+
+                ResumeLayout();
+            }
+        }
+
+        public override TableViewModel Clone()
+        {
+            var newTable = new AnimationBinFragRefViewModel(null);
+            newTable.Data = Data.Clone();
+            return newTable;
         }
     }
 }

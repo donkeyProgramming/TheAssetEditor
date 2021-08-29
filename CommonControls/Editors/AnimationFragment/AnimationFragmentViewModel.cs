@@ -29,8 +29,8 @@ namespace CommonControls.Editors.AnimationFragment
             Factory.CreateColoumn("SoundMeta", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x) { IsEditable = isEditable });
             Factory.CreateColoumn("Unknown0", CellFactory.ColoumTypes.BitFlag, (x) => new BitflagCellItem((int)x, 6) { IsEditable = isEditable });
             Factory.CreateColoumn("Weapon", CellFactory.ColoumTypes.BitFlag, (x) => new BitflagCellItem((int)x, 6) { IsEditable = isEditable });
-            Factory.CreateColoumn("Unknown1", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<object>(x) { IsEditable = isEditable });
-            Factory.CreateColoumn("Unknown2", CellFactory.ColoumTypes.Bool, (x) => new BoolCellItem((bool)x) { IsEditable = isEditable });
+            Factory.CreateColoumn("Weight", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<float>((float)x) { IsEditable = isEditable });
+            Factory.CreateColoumn("BlendInTime", CellFactory.ColoumTypes.Default, (x) => new ValueCellItem<float>((float)x) { IsEditable = isEditable });
         }
 
         public static AnimationFragmentViewModel CreateFromFragment(PackFileService pfs, FileTypes.AnimationPack.AnimationFragment fragment, bool isEditable = true)
@@ -43,8 +43,20 @@ namespace CommonControls.Editors.AnimationFragment
         void Load(FileTypes.AnimationPack.AnimationFragment fragmentFile)
         {
             SuspendLayout();
+
             foreach (var fragment in fragmentFile.Fragments)
-                CreateRow( fragment.Slot.Value, fragment.AnimationFile, fragment.MetaDataFile, fragment.SoundMetaDataFile, fragment.Unknown0, fragment.Unknown1, fragment.Unknown3, fragment.Unknown4);
+            {
+                CreateRow(
+                    fragment.Slot.Value, 
+                    fragment.AnimationFile,
+                    fragment.MetaDataFile,
+                    fragment.SoundMetaDataFile,
+                    fragment.Unknown0,
+                    fragment.Unknown1, 
+                    fragment.SelectionWeight,
+                    fragment.BlendInTime
+                    );
+            }
 
             ResumeLayout();
         }

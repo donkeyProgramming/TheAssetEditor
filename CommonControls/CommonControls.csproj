@@ -17,6 +17,7 @@
     <None Remove="Resources\Icons\icons8-clear-symbol-48.png" />
     <None Remove="Resources\Icons\icons8-collectibles-48.png" />
     <None Remove="Resources\Icons\icons8-database-48.png" />
+    <None Remove="Resources\Icons\icons8-delete-48.png" />
     <None Remove="Resources\Icons\icons8-documents-folder-50.png" />
     <None Remove="Resources\Icons\icons8-file-48.png" />
     <None Remove="Resources\Icons\icons8-file-explorer-50.png" />
@@ -29,11 +30,14 @@
     <None Remove="Resources\Icons\icons8-man-50.png" />
     <None Remove="Resources\Icons\icons8-mesh-50.png" />
     <None Remove="Resources\Icons\icons8-mesh-50_2.png" />
+    <None Remove="Resources\Icons\icons8-move-right-48.png" />
+    <None Remove="Resources\Icons\icons8-new-copy-50.png" />
     <None Remove="Resources\Icons\icons8-orthogonal-view-50.png" />
     <None Remove="Resources\Icons\icons8-question-mark-48.png" />
     <None Remove="Resources\Icons\icons8-save-all-50.png" />
     <None Remove="Resources\Icons\icons8-sugar-cube-100.png" />
     <None Remove="Resources\Icons\icons8-sugar-cube-64.png" />
+    <None Remove="Resources\Icons\icons8-trash-can-50.png" />
     <None Remove="Resources\Icons\icons8-txt-48.png" />
     <None Remove="Resources\Icons\icons8-undo-50.png" />
     <None Remove="Resources\Icons\icons8-xml-file-48.png" />
@@ -91,9 +95,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\Icons\Copy.png" />
-    <Resource Include="Resources\Icons\Cut.png" />
-    <Resource Include="Resources\Icons\Delete.png" />
+    <Resource Include="Resources\Icons\Copy.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Cut.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Delete.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\Icons\icons8-3d-object-48.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
@@ -116,6 +126,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Icons\icons8-database-48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-delete-48.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Icons\icons8-documents-folder-50.png">
@@ -154,6 +167,12 @@
     <Resource Include="Resources\Icons\icons8-mesh-50_2.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Resources\Icons\icons8-move-right-48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-new-copy-50.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\Icons\icons8-orthogonal-view-50.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
@@ -164,6 +183,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Icons\icons8-sugar-cube-64.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-trash-can-50.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Icons\icons8-txt-48.png">
@@ -274,12 +296,24 @@
     <Resource Include="Resources\Icons\Kitbasher\Validate.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\Icons\Open.png" />
-    <Resource Include="Resources\Icons\Paste.png" />
-    <Resource Include="Resources\Icons\Redo.png" />
-    <Resource Include="Resources\Icons\Save.png" />
-    <Resource Include="Resources\Icons\Undo.png" />
-    <Resource Include="Resources\Icons\WordWrap.png" />
+    <Resource Include="Resources\Icons\Open.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Paste.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Redo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Save.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\Undo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\WordWrap.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>

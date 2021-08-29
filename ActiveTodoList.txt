@@ -177,6 +177,14 @@ Save rmv2 files
 Set output format 
 Duplicate fragment to new 
 Show in explorer
+Make empire spearmen work, shild not attached 
+
+
+        public float BlendInTime { get; set; } = 0;
+        public float SelectionWeight { get; set; } = 0;
+		Attile matched combat 
+		3k bin 
+
 
 - Animated prop [X]
 - Effect  		[X]

@@ -13,13 +13,10 @@ namespace CommonControls.Table
 {
     abstract public class TableViewModel : NotifyPropertyChangedImpl
     {
-
         public virtual TableViewModel Clone()
         {
             throw new NotImplementedException();
         }
-
-
 
         public CellFactory Factory { get; set; }
 
@@ -41,8 +38,14 @@ namespace CommonControls.Table
         public ICommand DeleteRowCommand { get; set; }
         public ICommand SaveCommand { get; set; }
 
-        public NotifyAttr<bool> SaveEnabled { get; set; } = new NotifyAttr<bool>(false);
 
+
+        public ICommand ExportCommand { get; set; }
+        public ICommand ValidateCommand { get; set; }
+
+        public NotifyAttr<bool> SaveEnabled { get; set; } = new NotifyAttr<bool>(false);
+        public NotifyAttr<bool> ExportEnabled { get; set; } = new NotifyAttr<bool>(false);
+        public NotifyAttr<bool> ValidateEnabled { get; set; } = new NotifyAttr<bool>(false);
 
         public TableViewModel()
         {
@@ -54,6 +57,8 @@ namespace CommonControls.Table
             NewRowCommand = new RelayCommand(NewRow);
             DeleteRowCommand = new RelayCommand<DataRowView>(DeleteRow);
             SaveCommand = new RelayCommand(SaveTable);
+            ExportCommand = new RelayCommand(Export);
+            //ValidateCommand = new RelayCommand(Validate);
         }
 
         protected void SuspendLayout()
@@ -110,10 +115,9 @@ namespace CommonControls.Table
             _privateTable.Rows.Add(values.ToArray());
         }
 
-        public virtual void SaveTable()
-        {
-            
-        }
+        public virtual void SaveTable() { }
+
+        public virtual void Export() { }
 
         protected virtual void DuplicateRow(DataRow row)
         {
