@@ -50,6 +50,8 @@ namespace Filetypes.ByteParsing
             return value;
         }
 
+
+
         string ReadZeroTerminatedString(StringParser parser)
         {
             if (!parser.TryDecodeZeroTerminatedString(_buffer, _currentIndex, out var value, out int bytesRead))
@@ -122,7 +124,7 @@ namespace Filetypes.ByteParsing
 
         public uint PeakUint32() => Peak(ByteParsers.UInt32);
         public long PeakInt64() => Peak(ByteParsers.Int64);
-
+        public byte PeakByte() => Peak(ByteParsers.Byte);
 
         public UnknownParseResult PeakUnknown()
         {
