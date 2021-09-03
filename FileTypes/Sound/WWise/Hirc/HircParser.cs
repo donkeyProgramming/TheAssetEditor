@@ -45,6 +45,9 @@ namespace FileTypes.Sound.WWise.Hirc
                     case HircType.Action:
                         soundDb.Hircs.Add(CAkAction.Create(chunk));
                         break;
+                    case HircType.SwitchContainer:
+                        soundDb.Hircs.Add(CAkSwitchCntr.Create(chunk));
+                        break;
                     default:
                         soundDb.Hircs.Add(CAkUnknown.Create(chunk));
                         break;

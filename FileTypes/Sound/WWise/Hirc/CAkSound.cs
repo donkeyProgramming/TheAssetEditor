@@ -43,8 +43,8 @@ namespace FileTypes.Sound.WWise.Hirc
                 StreamType = (SourceType)chunk.ReadByte()
             };
 
-            if (output.StreamType != SourceType.Straming)
-                throw new Exception();
+            //if (output.StreamType != SourceType.Straming)
+            //    throw new Exception();
 
             output.akMediaInformation = AkMediaInformation.Create(chunk);
 

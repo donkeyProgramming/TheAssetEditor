@@ -1,0 +1,25 @@
+Section 0 - [21]
+[000000] "Play_dlc07_camp_advice_brt_blessing_lady_001_1", 0
+[000001] "Play_dlc07_camp_advice_brt_blessing_lady_002_1", 0
+[000002] "Play_dlc07_camp_advice_brt_blessing_lady_003_1", 0
+[000003] "Play_dlc07_camp_advice_brt_blessing_lady_004_1", 0
+[000004] "Play_dlc07_camp_advice_brt_chivalry_001_1", 0
+[000005] "Play_dlc07_camp_advice_brt_chivalry_002_1", 0
+[000006] "Play_dlc07_camp_advice_brt_chivalry_003_1", 0
+[000007] "Play_dlc07_camp_advice_brt_chivalry_004_1", 0
+[000008] "Play_dlc07_camp_advice_brt_chivalry_005_1", 0
+[000009] "Play_dlc07_camp_advice_brt_chivalry_006_1", 0
+[000010] "Play_dlc07_camp_advice_brt_chivalry_007_1", 0
+[000011] "Play_dlc07_camp_advice_brt_chivalry_008_1", 0
+[000012] "Play_dlc07_camp_advice_brt_chivalry_009_1", 0
+[000013] "Play_dlc07_camp_advice_brt_errantry_war_003_1", 0
+[000014] "Play_dlc07_camp_advice_brt_green_knight_001_1", 0
+[000015] "Play_dlc07_camp_advice_brt_green_knight_002_1", 0
+[000016] "Play_dlc07_camp_advice_brt_green_knight_003_1", 0
+[000017] "Play_dlc07_camp_advice_brt_green_knight_004_1", 0
+[000018] "Play_dlc07_camp_advice_brt_peasant_economy_001_1", 0
+[000019] "Play_dlc07_camp_advice_brt_peasant_economy_002_1", 0
+[000020] "Play_dlc07_camp_advice_brt_peasant_economy_003_1", 0
+Section 1 - [0]
+Section 2 - [0]
+Section 3 - [0]

@@ -122,10 +122,11 @@ namespace AssetEditor.ViewModels
                     var datFile = DatParser.Parse(datPackFile); ;
                     masterFile.Merge(datFile);
                 }
-                //masterFile.DumpToFile(@"C:\temp\SoundTesting\masterDatDump.txt");
+                masterFile.DumpToFile(@"C:\temp\SoundTesting\masterDatDump.txt");
                 //
-                //
-                var bnkFile = packfileService.FindFile(@"audio/wwise/battle_advice__core.bnk");
+                ////
+                //var bnkFile = packfileService.FindFile(@"audio/wwise/battle_advice__core.bnk");
+                var bnkFile = packfileService.FindFile(@"audio/wwise/battle_individual_melee__warhammer2.bnk");
                 Bnkparser.Parse(bnkFile, masterFile.CreateFileNameList());
 
                 //var datFile = packfileService.FindFile(@"audio/wwise/event_data__core.dat");

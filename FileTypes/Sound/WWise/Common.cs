@@ -30,4 +30,14 @@ namespace FileTypes.Sound.WWise
         PrefetchStreaming = 0x01,
         Straming = 0x02,
     }
+
+    public enum AkPropBundleType : byte
+    {
+        Volume = 0x00,
+        Pitch = 0x02,
+        MakeUpGain = 0x06,
+        StatePropNum_Priority = 0x07,
+        PriorityDistanceOffset = 0x08,
+        CenterPCT = 0x0E,
+    }
 }

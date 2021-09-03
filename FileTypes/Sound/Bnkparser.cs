@@ -34,7 +34,8 @@ namespace FileTypes.Sound
             var events = soundDb.Hircs.Where(x => x.Type == HircType.Event).Cast<CAkEvent>().ToList();
             var actions = soundDb.Hircs.Where(x => x.Type == HircType.Action).Cast<CAkAction>().Where(x => x.ActionType == ActionType.Play);
             var sounds = soundDb.Hircs.Where(x => x.Type == HircType.Sound).Cast<CAkSound>();
-
+            var switches = soundDb.Hircs.Where(x => x.Type == HircType.SwitchContainer).Cast<CAkSwitchCntr>();
+            
             var valueMap = new Dictionary<string, List<uint>>();
             foreach (var currentEvent in events)
             {
