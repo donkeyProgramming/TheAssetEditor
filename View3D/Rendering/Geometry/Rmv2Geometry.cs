@@ -184,6 +184,10 @@ namespace View3D.Rendering.Geometry
             _vertexArray[vertexId].Normal = Vector3.TransformNormal(_vertexArray[vertexId].Normal, transform);
             _vertexArray[vertexId].BiNormal = Vector3.TransformNormal(_vertexArray[vertexId].BiNormal, transform);
             _vertexArray[vertexId].Tangent = Vector3.TransformNormal(_vertexArray[vertexId].Tangent, transform);
+
+            _vertexArray[vertexId].Normal.Normalize();
+            _vertexArray[vertexId].BiNormal.Normalize();
+            _vertexArray[vertexId].Tangent.Normalize();
         }
 
         public override void SetTransformVertex(int vertexId, Matrix transform)
@@ -256,18 +260,26 @@ namespace View3D.Rendering.Geometry
                 _vertexArray[i].BlendIndices.Z = GetMappedBlendIndex((byte)_vertexArray[i].BlendIndices.Z, remapping);
                 _vertexArray[i].BlendIndices.W = GetMappedBlendIndex((byte)_vertexArray[i].BlendIndices.W, remapping);
 
-                var totalBlendWeight = _vertexArray[i].BlendWeights.X + _vertexArray[i].BlendWeights.Y + _vertexArray[i].BlendWeights.Z + _vertexArray[i].BlendWeights.W;
-                if ( (1 - totalBlendWeight) >= float.Epsilon)
+                if (_vertedFormat == VertexFormat.Weighted)
                 {
-                    var diff = 1 - totalBlendWeight;
-                    float diffPart = diff / WeightCount;
-
-                    _vertexArray[i].BlendWeights.X += diffPart;
-                    _vertexArray[i].BlendWeights.Y += diffPart;
-                    _vertexArray[i].BlendWeights.Z += diffPart;
-                    _vertexArray[i].BlendWeights.W += diffPart;
+                    _vertexArray[i].BlendWeights.Z = 0;
+                    _vertexArray[i].BlendWeights.W = 0;
                 }
-                var totalBlendWeight2 = _vertexArray[i].BlendWeights.X + _vertexArray[i].BlendWeights.Y + _vertexArray[i].BlendWeights.Z + _vertexArray[i].BlendWeights.W;
+
+                _vertexArray[i].BlendWeights.Normalize();
+
+                //var totalBlendWeight = _vertexArray[i].BlendWeights.X + _vertexArray[i].BlendWeights.Y + _vertexArray[i].BlendWeights.Z + _vertexArray[i].BlendWeights.W;
+                //if ( (1 - totalBlendWeight) >= float.Epsilon)
+                //{
+                //    var diff = 1 - totalBlendWeight;
+                //    float diffPart = diff / WeightCount;
+                //
+                //    _vertexArray[i].BlendWeights.X += diffPart;
+                //    _vertexArray[i].BlendWeights.Y += diffPart;
+                //    _vertexArray[i].BlendWeights.Z += diffPart;
+                //    _vertexArray[i].BlendWeights.W += diffPart;
+                //}
+                //var totalBlendWeight2 = _vertexArray[i].BlendWeights.X + _vertexArray[i].BlendWeights.Y + _vertexArray[i].BlendWeights.Z + _vertexArray[i].BlendWeights.W;
             }
 
             RebuildVertexBuffer();
@@ -280,6 +292,8 @@ namespace View3D.Rendering.Geometry
                 return (byte)remappingItem.NewValue;
             return currentValue;
         }
+
+
 
         public void Merge(List<Rmv2Geometry> others)
         {

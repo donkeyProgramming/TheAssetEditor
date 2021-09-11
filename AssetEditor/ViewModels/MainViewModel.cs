@@ -4,6 +4,7 @@ using AssetEditor.Views.Settings;
 using Common;
 using Common.ApplicationSettings;
 using Common.GameInformation;
+using CommonControls.Editors.VariantMeshDefinition;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using FileTypes.AnimationPack;
@@ -15,6 +16,7 @@ using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -53,9 +55,6 @@ namespace AssetEditor.ViewModels
 
             ToolsFactory = toolFactory;
 
-            //DebugCampaignBins(settingsService);
-
-
             if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
             {
                 var settingsWindow = serviceProvider.GetRequiredService<SettingsWindow>();
@@ -68,7 +67,7 @@ namespace AssetEditor.ViewModels
 
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
             {
-                //settingsService.CurrentSettings.CurrentGame = GameTypeEnum.ThreeKingdoms;
+                //settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Troy;
                 var gamePath = settingsService.GetGamePathForCurrentGame();
                 if (gamePath != null)
                 {
@@ -91,8 +90,8 @@ namespace AssetEditor.ViewModels
                 //SuperViewViewModel_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 //MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
-                //KitbashEditor_Debug.CreatePaladin(this, toolFactory, packfileService);
-                //AnimationTransferTool_Debug.CreateDamselEditor(this, toolFactory, packfileService);
+                KitbashEditor_Debug.CreatePaladin(this, toolFactory, packfileService);
+                //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateDamselEditor(this, toolFactory, packfileService);
 
                 //var f = packfileService.FindFile(@"animations\campaign\database\bin\cam_hero_hu1d_def_spear_and_shield.bin");
                 //OpenFile(f);
@@ -115,26 +114,26 @@ namespace AssetEditor.ViewModels
                 //
                 //
                 //// Create a super dat
-                var masterFile = new SoundDatFile();
-                var datPackFiles = packfileService.FindAllWithExtention(".dat");
-                foreach (var datPackFile in datPackFiles)
-                { 
-                    var datFile = DatParser.Parse(datPackFile); ;
-                    masterFile.Merge(datFile);
-                }
-                masterFile.DumpToFile(@"C:\temp\SoundTesting\masterDatDump.txt");
+                //var masterFile = new SoundDatFile();
+                //var datPackFiles = packfileService.FindAllWithExtention(".dat");
+                //foreach (var datPackFile in datPackFiles)
+                //{ 
+                //    var datFile = DatParser.Parse(datPackFile); ;
+                //    masterFile.Merge(datFile);
+                //}
+                //masterFile.DumpToFile(@"C:\temp\SoundTesting\masterDatDump.txt");
                 //
                 ////
                 //var bnkFile = packfileService.FindFile(@"audio/wwise/battle_advice__core.bnk");
-                var bnkFile = packfileService.FindFile(@"audio/wwise/battle_individual_melee__warhammer2.bnk");
-                Bnkparser.Parse(bnkFile, masterFile.CreateFileNameList());
+                // var bnkFile = packfileService.FindFile(@"audio/wwise/battle_individual_melee__warhammer2.bnk");
+                // Bnkparser.Parse(bnkFile, masterFile.CreateFileNameList());
 
                 //var datFile = packfileService.FindFile(@"audio/wwise/event_data__core.dat");
                 //DatParser.Parse(datFile);
                 //
 
-                var f = packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack");
-                OpenFile(f);
+                //var f = packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack");
+                //OpenFile(f);
 
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 
@@ -142,7 +141,7 @@ namespace AssetEditor.ViewModels
 
                 //CreateEmptyEditor(editorView);
 
-               // CreateTestPackFiles(packfileService);
+                // CreateTestPackFiles(packfileService);
             }
         }
 

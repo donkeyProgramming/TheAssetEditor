@@ -266,6 +266,7 @@ namespace Filetypes.RigidModel
                 {
                     var vertexData = ByteHelper.ByteArrayToStructure<DefaultVertex.Data>(data, vertexStart + i * vertexSize);
                     VertexList[i] = new DefaultVertex(vertexData);
+
                 }
                 else if (vertexFormat == VertexFormat.Cinematic)
                 {

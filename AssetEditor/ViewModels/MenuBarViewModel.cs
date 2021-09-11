@@ -2,6 +2,7 @@
 using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.PropCreator.ViewModels;
+using AnimationEditor.SuperView;
 using AssetEditor.Services;
 using AssetEditor.Views.Settings;
 using Common;
@@ -49,11 +50,13 @@ namespace AssetEditor.ViewModels
 
         public ICommand OpenHelpCommand { get; set; }
         public ICommand OpenPatreonCommand { get; set; }
-        
+        public ICommand OpenDiscordCommand { get; set; }
+
         public ICommand OpenKitbashEditorCommand { get; set; }
         public ICommand OpenCampaignAnimCreatorCommand { get; set; }
         public ICommand OpenPropCreatorCommand { get; set; }
         public ICommand OpenAnimationTransferToolCommand { get; set; }
+        public ICommand OpenSuperViewToolCommand { get; set; }
         public IEditorCreator EditorCreator { get; set; }
 
         public MenuBarViewModel(IServiceProvider provider, PackFileService packfileService, ToolFactory toolFactory)
@@ -71,6 +74,7 @@ namespace AssetEditor.ViewModels
             OpenPropCreatorCommand = new RelayCommand(OpenPropCreatorEditor);
             OpenCampaignAnimCreatorCommand = new RelayCommand(OpenCampaignAnimCreatorEditor);
             OpenAnimationTransferToolCommand = new RelayCommand(OpenAnimationTransferTool);
+            OpenSuperViewToolCommand = new RelayCommand(OpenSuperViewTool);
 
             OpenRome2RePacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Rome_2_Remastered));
             OpenThreeKingdomsPacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.ThreeKingdoms));
@@ -79,6 +83,7 @@ namespace AssetEditor.ViewModels
 
             OpenHelpCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://tw-modding.com/index.php/Tutorial:AssetEditor") { CreateNoWindow = true }));
             OpenPatreonCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://www.patreon.com/TheAssetEditor") { CreateNoWindow = true }));
+            OpenDiscordCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://discord.gg/6Djf2sCczC") { CreateNoWindow = true }));
         }
 
         void OpenPackFile()
@@ -170,5 +175,11 @@ namespace AssetEditor.ViewModels
             var editorView = _toolFactory.CreateEditorViewModel<AnimationTransferToolViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
+
+        void OpenSuperViewTool()
+        {
+            var editorView = _toolFactory.CreateEditorViewModel<SuperViewViewModel>();
+            EditorCreator.CreateEmptyEditor(editorView);
+        }     
     }
 }

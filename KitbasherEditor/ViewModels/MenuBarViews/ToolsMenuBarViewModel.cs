@@ -10,6 +10,7 @@ using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor.ViewModels.BmiEditor;
 using KitbasherEditor.ViewModels.MeshFitter;
 using KitbasherEditor.Views.EditorViews;
+using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using System.Collections.Generic;
@@ -56,7 +57,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public ICommand ReRiggingToolCommand { get; set; }
 
         public NotifyAttr<DoubleViewModel> VertexMovementFalloff { get; set; }
-
+        public ICommand ShowVertexDebugInfoCommand { get; set; }
 
         bool _showObjectTools = true;
         public bool ShowObjectTools { get => _showObjectTools; set => SetAndNotify(ref _showObjectTools, value); }
@@ -93,7 +94,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         bool _groupCommandEnabled;
         public bool GroupCommandEnabled { get => _groupCommandEnabled; set => SetAndNotify(ref _groupCommandEnabled, value); }
-        
+
         bool _reduceMeshCommandEnabled;
         public bool ReduceMeshCommandEnabled { get => _reduceMeshCommandEnabled; set => SetAndNotify(ref _reduceMeshCommandEnabled, value); }
 
@@ -115,6 +116,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         bool _reRiggingToolCommandEnabled = false;
         public bool ReRiggingToolCommandEnabled { get => _reRiggingToolCommandEnabled; set => SetAndNotify(ref _reRiggingToolCommandEnabled, value); }
+
+        bool _showVertexDebugInfoEnabled = false;
+        public bool ShowVertexDebugInfoEnabled { get => _showVertexDebugInfoEnabled; set => SetAndNotify(ref _showVertexDebugInfoEnabled, value); }
 
         public ToolsMenuBarViewModel(IComponentManager componentManager, ToolbarCommandFactory commandFactory, PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper, WindowKeyboard keyboard)
         {
@@ -139,6 +143,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             CreateStaticMeshesCommand = new RelayCommand(CreateStaticMeshes);
             PinMeshToMeshCommand = new RelayCommand(PinMeshToMesh);
             ReRiggingToolCommand = new RelayCommand(OpenReRiggingTool);
+            ShowVertexDebugInfoCommand = new RelayCommand(ShowVertexDebugInfo);
 
             VertexMovementFalloff = new NotifyAttr<DoubleViewModel>(new DoubleViewModel());
             VertexMovementFalloff.Value.PropertyChanged += VertexMovementFalloffChanged;
@@ -152,9 +157,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
             OnSelectionChanged(_selectionManager.GetState());
         }
-
-        private void Value(double d)
-        { }
 
         private void OnSelectionChanged(ISelectionState state)
         {
@@ -176,6 +178,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             CreateStaticMeshesCommandEnabled = false;
             PinMeshToMeshEnabled = false;
             ReRiggingToolCommandEnabled = false;
+            ShowVertexDebugInfoEnabled = false;
 
             if (state is ObjectSelectionState objectSelection)
             {
@@ -199,13 +202,13 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 DuplicateEnabled = true;
                 DivideSubMeshEnabled = true;
             }
-            else
+            else if (state is VertexSelectionState vertexState )
             {
-                // Vertex state
+                ShowVertexDebugInfoEnabled = vertexState.SelectedVertices.Count != 0;
             }
         }
 
-        void DivideSubMesh() 
+        void DivideSubMesh()
         {
             if (_selectionManager.GetState() is ObjectSelectionState objectSelectionState)
                 _objectEditor.DivideIntoSubmeshes(objectSelectionState, !_keyboard.IsKeyDown(Key.LeftAlt));
@@ -213,7 +216,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 _faceEditor.DuplicatedSelectedFacesToNewMesh(faceSelectionState, true);
         }
 
-        void MergeObjects() 
+        void MergeObjects()
         {
             if (_selectionManager.GetState() is ObjectSelectionState objectSelectionState)
             {
@@ -221,7 +224,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 {
                     if (!_objectEditor.CombineMeshes(objectSelectionState, out var errorList))
                         ErrorListWindow.ShowDialog("Combine Errors", errorList, false);
-                }                
+                }
             }
         }
 
@@ -232,8 +235,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             if (_selectionManager.GetState() is FaceSelectionState faceSelectionState)
                 _faceEditor.DuplicatedSelectedFacesToNewMesh(faceSelectionState, false);
         }
-        
-        void DeleteObject() 
+
+        void DeleteObject()
         {
             if (_selectionManager.GetState() is ObjectSelectionState objectSelectionState)
                 _objectEditor.DeleteObject(objectSelectionState);
@@ -249,7 +252,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         {
             _faceEditor.GrowSelection(_selectionManager.GetState() as FaceSelectionState, !_keyboard.IsKeyDown(Key.LeftAlt));
         }
-         
+
         void GroupItems()
         {
             _objectEditor.GroupItems(_selectionManager.GetState() as ObjectSelectionState);
@@ -296,7 +299,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             //Generate lod
             for (int lodIndex = 0; lodIndex < lodsToGenerate.Count(); lodIndex++)
             {
-                var lerpValue = (1.0f / (lodsToGenerate.Count() - 1)) * (lodsToGenerate.Count()  - 1 - lodIndex);
+                var lerpValue = (1.0f / (lodsToGenerate.Count() - 1)) * (lodsToGenerate.Count() - 1 - lodIndex);
                 var deductionRatio = MathHelper.Lerp(0.25f, 0.75f, lerpValue);
 
                 foreach (var modelGroupCollection in modelGroups)
@@ -311,11 +314,11 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                     foreach (var mesh in modelGroupCollection.Value)
                     {
                         var clone = mesh.Clone() as Rmv2MeshNode;
-                        
+
                         var reduceValue = deductionRatio;
                         if (clone.ReduceMeshOnLodGeneration == false)
                             reduceValue = 1;
-                         _objectEditor.ReduceMesh(clone, reduceValue, false);
+                        _objectEditor.ReduceMesh(clone, reduceValue, false);
                         parentNode.AddObject(clone);
                     }
                 }
@@ -378,8 +381,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             var lod0 = root.GetLodNodes()[0];
             lod0.AddObject(groupNodeContainer);
             foreach (var obj in selectedObjects)
-            { 
-                if(obj is Rmv2MeshNode meshNode)
+            {
+                if (obj is Rmv2MeshNode meshNode)
                 {
                     var cpy = meshNode.Clone() as Rmv2MeshNode;
                     groupNodeContainer.AddObject(cpy);
@@ -465,7 +468,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 ToList();
 
             var config = new RemappedAnimatedBoneConfiguration();
-            
+
 
             config.MeshSkeletonName = selectedMeshSkeleton;
             config.MeshBones = AnimatedBoneHelper.CreateFromSkeleton(newSkeletonFile, animatedBoneIndexes.Select(x => x.BoneIndex.Value).ToList());
@@ -487,6 +490,11 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 _componentManager.GetComponent<CommandExecutor>().ExecuteCommand(new RemapBoneIndexesCommand(selectedMeshses, remapping, config.ParnetModelSkeletonName));
             }
 
+        }
+
+        void ShowVertexDebugInfo()
+        {
+            VertexDebuggerViewModel.Create(_componentManager);
         }
     }
 }

@@ -41,6 +41,7 @@ namespace Filetypes.RigidModel.Vertex
         {
             _data = data;
             CreateFromData(_data);
+           // Fix();
         }
 
         public DefaultVertex(RmvVector4 position, RmvVector2 uv, RmvVector3 normal, RmvVector3 biNormal, RmvVector3 tanget)
@@ -69,6 +70,22 @@ namespace Filetypes.RigidModel.Vertex
 
             BoneIndex = null;
             BoneWeight = null;
+        }
+
+        public void Fix()
+        {
+            var cpyX = Tangent.X;
+            Tangent.X = Tangent.Z;
+            Tangent.Z = cpyX;
+
+
+            cpyX = Normal.X;
+            Normal.X = Normal.Z;
+            Normal.Z = cpyX;
+
+            cpyX = BiNormal.X;
+            BiNormal.X = BiNormal.Z;
+            BiNormal.Z = cpyX;
         }
     }
 }

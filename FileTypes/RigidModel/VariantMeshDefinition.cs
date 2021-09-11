@@ -13,6 +13,19 @@ namespace Filetypes.RigidModel
             [XmlAttribute("model")]
             public string ModelReference { get; set; }
 
+            [XmlAttribute("imposter_model")]
+            public string ImposterModel { get; set; }
+
+            [XmlAttribute("decal_diffuse")]
+            public string DecalDiffuse { get; set; }
+            [XmlAttribute("decal_normal")]
+            public string DecalNormal { get; set; }
+            
+
+            [XmlAttribute("use_different_attach_point_parts")]
+            public string use_different_attach_point_parts { get; set; }
+            
+
             [XmlElement("SLOT")]
             public List<SLOT> ChildSlots { get; set; }
 
@@ -56,6 +69,10 @@ namespace Filetypes.RigidModel
 
             [XmlAttribute("name")]
             public string Name { get; set; }
+
+
+            [XmlAttribute("use_different_attach_point_parts")]
+            public string use_different_attach_point_parts { get; set; }
 
 
             [XmlElement("VARIANT_MESH")]

@@ -30,6 +30,9 @@ namespace AnimationEditor.SuperView
             var typedEditor = new Editor(_toolFactory ,Scene, _pfs, _skeletonHelper, Player, _schemaManager);
             Editor = typedEditor;
 
+            if (MainInput == null)
+                MainInput = new AnimationToolInput();
+
             typedEditor.Create(MainInput);
         }
     }
@@ -52,12 +55,12 @@ namespace AnimationEditor.SuperView
                 AnimationSlot = AnimationSlotTypeHelper.GetfromValue("ATTACK_5")
             };
 
-         editorView.MainInput = new AnimationToolInput()
-         {
-             Mesh = packfileService.FindFile(@"warmachines\engines\emp_steam_tank\emp_steam_tank01.rigid_model_v2"),
-             FragmentName = @"animations/animation_tables/wm_steam_tank01.frg",
-             AnimationSlot = AnimationSlotTypeHelper.GetfromValue("STAND")
-         };
+        //editorView.MainInput = new AnimationToolInput()
+        //{
+        //    Mesh = packfileService.FindFile(@"warmachines\engines\emp_steam_tank\emp_steam_tank01.rigid_model_v2"),
+        //    FragmentName = @"animations/animation_tables/wm_steam_tank01.frg",
+        //    AnimationSlot = AnimationSlotTypeHelper.GetfromValue("STAND")
+        //};
            //editorView.MainInput = new AnimationToolInput()
            //{
            //    Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\emp_state_troops_crossbowmen_ror.variantmeshdefinition"),

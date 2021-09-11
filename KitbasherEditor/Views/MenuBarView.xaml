@@ -251,6 +251,12 @@
                             <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
                         </b:Interaction.Behaviors>
                     </TextBox>
+
+                    <Button ToolTip="Show debug info" 
+                        Command="{Binding Tools.ShowVertexDebugInfoCommand}"
+                        IsEnabled="{Binding Tools.ShowVertexDebugInfoEnabled, UpdateSourceTrigger=PropertyChanged}">
+                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/icons8-question-mark-48.png"/>
+                    </Button>
                 </ToolBar>
 
 

@@ -8,11 +8,13 @@
              xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:filterdialog="clr-namespace:CommonControls.FilterDialog;assembly=CommonControls" 
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
-             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors" 
+             xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
              mc:Ignorable="d" 
  d:DesignWidth="800">
     <UserControl.Resources>
         <System:Double x:Key="labelWidth">100</System:Double>
+        <valueconverters:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Collapsed" />
     </UserControl.Resources>
     <GroupBox>
         <Expander >
@@ -115,7 +117,7 @@
                                     ShowLabel="false"/>
                 </DockPanel>
 
-                <DockPanel>
+                <DockPanel Visibility="{Binding AllowMetaData.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
                     <CheckBox Visibility="Hidden" />
                     <Label DockPanel.Dock="Left" Content="Meta persist" Width ="{StaticResource labelWidth}" />
                     <Label DockPanel.Dock="Left" Content=":"/>
@@ -132,7 +134,7 @@
                 </DockPanel>
 
 
-                <DockPanel>
+                <DockPanel Visibility="{Binding AllowMetaData.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
                     <CheckBox Visibility="Hidden" />
                     <Label DockPanel.Dock="Left" Content="Meta" Width ="{StaticResource labelWidth}" />
                     <Label DockPanel.Dock="Left" Content=":"/>

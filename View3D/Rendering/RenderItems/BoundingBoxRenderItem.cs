@@ -45,7 +45,6 @@ namespace View3D.Rendering.RenderItems
             _originalVertecies[6] = new VertexPositionColor(corners[3], colour);
             _originalVertecies[7] = new VertexPositionColor(corners[0], colour);
 
-
             var offset = 4;
             _originalVertecies[8] = new VertexPositionColor(corners[0 + offset], colour);
             _originalVertecies[9] = new VertexPositionColor(corners[1 + offset], colour);
@@ -58,8 +57,7 @@ namespace View3D.Rendering.RenderItems
 
             _originalVertecies[14] = new VertexPositionColor(corners[3 + offset], colour);
             _originalVertecies[15] = new VertexPositionColor(corners[0 + offset], colour);
-
-            
+    
             _originalVertecies[16] = new VertexPositionColor(corners[0], colour);
             _originalVertecies[17] = new VertexPositionColor(corners[0 + offset], colour);
 
@@ -71,7 +69,6 @@ namespace View3D.Rendering.RenderItems
 
             _originalVertecies[22] = new VertexPositionColor(corners[3], colour);
             _originalVertecies[23] = new VertexPositionColor(corners[3 + offset], colour);
-
 
             _shader.Parameters["View"].SetValue(commonShaderParameters.View);
             _shader.Parameters["Projection"].SetValue(commonShaderParameters.Projection);

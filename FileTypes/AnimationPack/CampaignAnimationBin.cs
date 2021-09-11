@@ -45,9 +45,9 @@ namespace FileTypes.AnimationPack
         public class AnimationEntry : ICampaignAnimationBinEntry
         {
             public string Animation { get; set; }
-            public string AnimationMeta { get; set; }
-            public string SoundMeta { get; set; }
             public string Type { get; set; }
+            public string MetaFile { get; set; }
+            public string SoundMeta { get; set; }
             public float BlendTime { get; set; }
             public float Weight { get; set; }
 
@@ -55,9 +55,9 @@ namespace FileTypes.AnimationPack
             {
                 var output = new AnimationEntry();
                 output.Animation = byteChunk.ReadStringTableIndex(stringTable);
-                output.AnimationMeta = byteChunk.ReadStringTableIndex(stringTable);
-                output.SoundMeta = byteChunk.ReadStringTableIndex(stringTable);
                 output.Type = byteChunk.ReadStringTableIndex(stringTable);
+                output.MetaFile = byteChunk.ReadStringTableIndex(stringTable);
+                output.SoundMeta = byteChunk.ReadStringTableIndex(stringTable);
                 output.BlendTime = byteChunk.ReadSingle();
                 output.Weight = byteChunk.ReadSingle();
                 return output;
@@ -67,9 +67,9 @@ namespace FileTypes.AnimationPack
             {
                 ChuckWriter chuck = new ChuckWriter();
                 chuck.WriteStringTableIndex(Animation, ref stringTable);
-                chuck.WriteStringTableIndex(AnimationMeta, ref stringTable);
-                chuck.WriteStringTableIndex(SoundMeta, ref stringTable);
                 chuck.WriteStringTableIndex(Type, ref stringTable);
+                chuck.WriteStringTableIndex(MetaFile, ref stringTable);
+                chuck.WriteStringTableIndex(SoundMeta, ref stringTable);
                 chuck.Write(BlendTime, ByteParsers.Single);
                 chuck.Write(Weight, ByteParsers.Single);
                 return chuck.GetBytes();
@@ -248,9 +248,9 @@ namespace FileTypes.AnimationPack
         public class ActionEntry : ICampaignAnimationBinEntry
         {
             public string Animation { get; set; }
-            public string AnimationMeta { get; set; }
-            public string SoundMeta { get; set; }
             public string Type { get; set; }
+            public string Meta { get; set; }
+            public string SoundMeta { get; set; }
             public float BlendTime { get; set; }
             public string ActionType { get; set; }
             public int ActionId { get; set; }
@@ -260,10 +260,10 @@ namespace FileTypes.AnimationPack
             {
                 var output = new ActionEntry();
                 output.Animation = byteChunk.ReadStringTableIndex(stringTable);
-                output.AnimationMeta = byteChunk.ReadStringTableIndex(stringTable);
-                output.SoundMeta = byteChunk.ReadStringTableIndex(stringTable);
-
                 output.Type = byteChunk.ReadStringTableIndex(stringTable);
+                output.Meta = byteChunk.ReadStringTableIndex(stringTable);
+
+                output.SoundMeta = byteChunk.ReadStringTableIndex(stringTable);
                 output.BlendTime = byteChunk.ReadSingle();
 
                 output.ActionType = byteChunk.ReadStringTableIndex(stringTable);
@@ -276,9 +276,9 @@ namespace FileTypes.AnimationPack
             {
                 ChuckWriter chuck = new ChuckWriter();
                 chuck.WriteStringTableIndex(Animation, ref stringTable);
-                chuck.WriteStringTableIndex(AnimationMeta, ref stringTable);
-                chuck.WriteStringTableIndex(SoundMeta, ref stringTable);
                 chuck.WriteStringTableIndex(Type, ref stringTable);
+                chuck.WriteStringTableIndex(Meta, ref stringTable);
+                chuck.WriteStringTableIndex(SoundMeta, ref stringTable);
                 chuck.Write(BlendTime, ByteParsers.Single);
                 chuck.WriteStringTableIndex(ActionType, ref stringTable);
                 chuck.Write(ActionId, ByteParsers.Int32);

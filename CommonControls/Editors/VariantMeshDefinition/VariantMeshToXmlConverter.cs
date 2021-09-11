@@ -1,6 +1,8 @@
 ﻿using CommonControls.Common;
 using CommonControls.Editors.TextEditor;
 using CommonControls.Services;
+using Filetypes.ByteParsing;
+using FileTypes.PackFiles.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,7 +34,7 @@ namespace CommonControls.Editors.VariantMeshDefinition
             try
             {
                 // Validate
-                var obj = LoadFromString(text);;
+                var obj = Load(text);;
                 error = ValidateFilePaths(obj, pfs);
                
                 return Encoding.UTF8.GetBytes(text);
@@ -80,18 +82,29 @@ namespace CommonControls.Editors.VariantMeshDefinition
         }
 
 
-        public static VariantMesh LoadFromString(string fileContent)
+        public static VariantMesh Load(string fileContent, bool strict = false)
         {
             XmlRootAttribute xRoot = new XmlRootAttribute("VARIANT_MESH");
 
             var xmlserializer = new XmlSerializer(typeof(VariantMesh), xRoot);
             using var stringReader = new StringReader(fileContent);
             var reader = XmlReader.Create(stringReader);
+            
+            object result = null;
+            if (strict)
+                result = xmlserializer.Deserialize(reader, new UnkownXmlDataThrower().EventHandler);
+            else
+                result = xmlserializer.Deserialize(reader);
 
-            var obj = xmlserializer.Deserialize(reader, new UnkownXmlDataThrower().EventHandler);
-            var typedObject = obj as VariantMesh;
+            var typedObject = result as VariantMesh;
             typedObject.FixStrings();
             return typedObject;
+        }
+
+        public static VariantMesh Load(PackFile pf, bool strict = false)
+        {
+            var vmdContent = Encoding.UTF8.GetString(pf.DataSource.ReadData());
+            return Load(vmdContent, strict);
         }
 
         public bool ShouldShowLineNumbers() => true;

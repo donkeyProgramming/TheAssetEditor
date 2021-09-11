@@ -84,8 +84,7 @@ namespace View3D.Services
 
             try
             {
-                var vmdContent = Encoding.UTF8.GetString(file.DataSource.ReadData());
-                var meshFile = VariantMeshToXmlConverter.LoadFromString(vmdContent);
+                var meshFile = VariantMeshToXmlConverter.Load(file);
                 LoadVariantMesh(meshFile, variantMeshElement, player, ref skeletonName, attachmentPointName);
             }
             catch (Exception e)

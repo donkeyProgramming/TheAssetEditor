@@ -148,7 +148,7 @@ namespace View3D.Utility
             throw new Exception($"Shader not found: ShaderTypes::{type}");
         }
 
-        internal Effect GetStaticEffect(ShaderTypes type)
+        public Effect GetStaticEffect(ShaderTypes type)
         {
             if (_shaders.ContainsKey(type))
                 return _shaders[type];

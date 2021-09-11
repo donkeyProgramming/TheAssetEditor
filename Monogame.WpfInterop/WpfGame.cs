@@ -13,6 +13,7 @@ namespace MonoGame.Framework.WpfInterop
     {
         public T GetComponent<T>() where T : IGameComponent;
         public void AddComponent<T>(T comp) where T : IGameComponent;
+        public void RemoveComponent<T>(T comp) where T : IGameComponent;
     }
 
 
@@ -238,13 +239,19 @@ namespace MonoGame.Framework.WpfInterop
                     return (T)comp;
             }
 
-            return default(T);
+            return default;
         }
 
         public void AddComponent<T>(T comp) where T : IGameComponent
         {
             Components.Add(comp);
         }
+
+        public void RemoveComponent<T>(T comp) where T : IGameComponent
+        {
+            Components.Remove(comp);
+        }
+
 
         private void SortDrawables()
         {
@@ -265,6 +272,7 @@ namespace MonoGame.Framework.WpfInterop
         {
             _sortedUpdateables.Sort((a, b) => a.UpdateOrder.CompareTo(b.UpdateOrder));
         }
+
 
 
 

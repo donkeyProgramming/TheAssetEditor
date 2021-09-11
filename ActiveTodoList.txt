@@ -1,12 +1,5 @@
 [![name](https://user-images.githubusercontent.com/54080240/126827425-c6c49064-0cb7-459d-b6c2-47544f4013cd.png)](https://www.patreon.com/TheAssetEditor)
 
-Rendering:
-	Debug (normals, weights)
-	Settings
-	Flip right left 
-	Change background colour 
-	Performance 
-	Preview materials?
 
 General:
 	Validator (matrial, vmd, vsmodel)
@@ -19,29 +12,10 @@ General:
 	Reset camera/focus selection in all editors 
 	Render settigns in all editors 
 	Loading pack file with error - show message 
-	
-Kitbash:
-	Improve remapping to handle n meshes and be realtime, preview animation?
-	Skeleton information view 
-	Auto rig (pin per vertex)
-	Auto rig (closest bones)
-	Redo command
-	Otho projections 
 	Default to vmd when browsing in kitbasher -> Type filter
-	Split face tool
-	Mesh verifications (Show normals, ensure weights)
-	Flip faces tool/Invert normals
-	Better tint fom selected faces 
 	Unable to play 3k anim : [data] animations\battle\character\male01\infantry\inf_1h095dun\attacks\inf_1h095dun_basic_attack_mid_05.anim
-	split hair into group
-	Validation:
-		Different pivs
-		Could be combined
-		Empty mesh 
-		Vertex weights 
-	Mesh without polygons error while generating bb (unsure when and why)
-	Distribute leftover weights using ratio instead of average 
-	Total vertex and index count 
+	
+	
 	
 Misc:
 	Memory leaks
@@ -62,11 +36,7 @@ Animation transfer tool:
 	Auto select generated animation
 	Scale model using matrix, allow save of that scaled mesh 
 	
-Mount tool:
-	Make it eaiser to use
-	One click make animpack by combining rider and mount frg. 
-	"Add capabilites" function (fire while moving, casting++)
-	Auto select generated animation
+
 	
 Super view:
 	View on mount 
@@ -106,45 +76,9 @@ v15
 	variantmeshes/variantmeshdefinitions/emp_wizard_light.variantmeshdefinition probability tag
 	Save anyway for xml veriantmesh not working
 
-v14
-	[X] Better variantmeshdefinition handling => Show errors 
-	[X] Validate variantmeshdefinition
-	[X] Generic text -> binary editor 
-	[X] AnimBin
-	[X] TreeView multi select
-	[X - can not reproduce] Compagin anims missing from anim search
-	[X] Flip left/Right view in rendering
-	[X] Scale on mount tool broken?
-	[x] Mesh split removes random faces
-	[x] ANimated mesh => static prop bugs
-	[x] Issue when pressing save in the mesh fitter tool, mesh no longer deforms slightly
-	[x] some weight issues fixded
-	[x] props during playback
-	[x] take pivot into account duing playback
-	[X] out of memory excption while saving pack files
-	[x] move program to 64bit to enable more memory abuse 
-	[x] bone mapping view -> Copy settings to all childre. Clear self 
-	[x]lod large 5 models file?
-	[x] 	Click select vertexes! 
-	[x] Chaos dragon => clicking editbale model changes skeleton to tech skeleton
-	
-	Erro when combining meshes with more then uint16 parts
-	
-	Wireframe mode
-	Orthigraphic projection
-	
-
-	
 	Improve frg editor! 
 	
-	
 
-	[Can not reproduce? ]Weight bug => hu6 skeleton and the mesh was the head from the coatl (well i cut it off by deleting the rest of the body), the head of the lord of change and a piece of equipment from the lord of change
-	
-	Remapping 
-		- Open last setting (auto save to file?)
-
-	Show skeleton in kitbash editor (show weight of selected bone vertexes)
 	Search opening folders - Hourglass
 	filetypes for browse dialog
 	
@@ -184,6 +118,19 @@ Make empire spearmen work, shild not attached
         public float SelectionWeight { get; set; } = 0;
 		Attile matched combat 
 		3k bin 
+
+
+Export N items to new animPack?
+TableName -> defauilt to animation_tables
+animPackName -> 
+
+OK | Close 
+ 
+
+
+
+
+
 
 
 - Animated prop [X]

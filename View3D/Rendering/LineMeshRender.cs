@@ -133,7 +133,7 @@ namespace View3D.Rendering
 
         public void Dispose()
         {
-            _shader.Dispose();
+            //_shader.Dispose();
             _shader = null;
         }
     }

@@ -40,8 +40,10 @@ namespace AnimationEditor.SuperView
             var asset = _scene.AddCompnent(new AssetViewModel(_pfs, "Item 0", Color.Black, _scene));
             _player.RegisterAsset(asset);
             var viewModel = new ReferenceModelSelectionViewModel(_toolFactory, _pfs, asset, "Item 0:", _scene, _skeletonHelper, _schemaManager);
+            viewModel.AllowMetaData.Value = true;
 
-            viewModel.Data.SetMesh(input.Mesh);
+            if(input.Mesh != null)
+                viewModel.Data.SetMesh(input.Mesh);
             if (input.Animation != null)
                 viewModel.Data.SetAnimation(_skeletonHelper.FindAnimationRefFromPackFile(input.Animation, _pfs));
 

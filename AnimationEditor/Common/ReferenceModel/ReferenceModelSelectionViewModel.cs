@@ -55,6 +55,7 @@ namespace AnimationEditor.Common.ReferenceModel
         public SelectMetaViewModel MetaFileInformation { get; set; }
         public SelectFragAndSlotViewModel FragAndSlotSelection { get; set; }
 
+       
 
 
         // Visability
@@ -71,7 +72,7 @@ namespace AnimationEditor.Common.ReferenceModel
         }
 
         public NotifyAttr<bool> IsControlVisible { get; set; } = new NotifyAttr<bool>(true);
-
+        public NotifyAttr<bool> AllowMetaData { get; set; } = new NotifyAttr<bool>(false);
         public ReferenceModelSelectionViewModel(IToolFactory toolFactory, PackFileService pf, AssetViewModel data, string headerName, IComponentManager componentManager, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, SchemaManager schemaManager)
         {
             _toolFactory = toolFactory;
@@ -159,6 +160,9 @@ namespace AnimationEditor.Common.ReferenceModel
 
         void MetaDataChanged(AssetViewModel model)
         {
+            if (AllowMetaData.Value == false)
+                return;
+
             foreach (var item in model.MetaDataItems)
                 item.CleanUp();
             model.MetaDataItems.Clear();
