@@ -15,6 +15,7 @@ namespace FileTypes.Sound.WWise
         Sound = 0x02,
         Action = 0x03,
         Event = 0x04,
+        SequenceContainer = 0x05,
         SwitchContainer = 0x06,
         ActorMixer = 0x07
     }
@@ -39,5 +40,11 @@ namespace FileTypes.Sound.WWise
         StatePropNum_Priority = 0x07,
         PriorityDistanceOffset = 0x08,
         CenterPCT = 0x0E,
+    }
+
+    public enum AkGroupType : byte
+    {
+        Switch = 0x00,
+        State = 0x01,
     }
 }

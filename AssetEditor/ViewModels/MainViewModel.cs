@@ -90,47 +90,15 @@ namespace AssetEditor.ViewModels
                 //SuperViewViewModel_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 //MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
-                KitbashEditor_Debug.CreatePaladin(this, toolFactory, packfileService);
+                KitbashEditor_Debug.CreateLoremasterHead(this, toolFactory, packfileService);
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateDamselEditor(this, toolFactory, packfileService);
 
                 //var f = packfileService.FindFile(@"animations\campaign\database\bin\cam_hero_hu1d_def_spear_and_shield.bin");
                 //OpenFile(f);
 
 
-                // Battle_Group_Foley_Collision_Metal_Stop
-                // 1902570353
-                //var stringToHash = "Battle_Group_Foley_Collision_Metal_Stop";
-                //var lower = stringToHash.ToLower();
-                //var bytes = System.Text.Encoding.UTF8.GetBytes(lower);
-                //
-                //uint hashValue = 2166136261;
-                //for (int byteIndex = 0; byteIndex < bytes.Length; byteIndex++)
-                //{
-                //    var nameByte = bytes[byteIndex];
-                //    hashValue = hashValue * 16777619; //#FNV prime
-                //    hashValue = hashValue ^ nameByte; //#FNV xor
-                //    hashValue = hashValue & 0xFFFFFFFF; //#python clamp
-                //}
-                //
-                //
-                //// Create a super dat
-                //var masterFile = new SoundDatFile();
-                //var datPackFiles = packfileService.FindAllWithExtention(".dat");
-                //foreach (var datPackFile in datPackFiles)
-                //{ 
-                //    var datFile = DatParser.Parse(datPackFile); ;
-                //    masterFile.Merge(datFile);
-                //}
-                //masterFile.DumpToFile(@"C:\temp\SoundTesting\masterDatDump.txt");
-                //
-                ////
-                //var bnkFile = packfileService.FindFile(@"audio/wwise/battle_advice__core.bnk");
-                // var bnkFile = packfileService.FindFile(@"audio/wwise/battle_individual_melee__warhammer2.bnk");
-                // Bnkparser.Parse(bnkFile, masterFile.CreateFileNameList());
-
-                //var datFile = packfileService.FindFile(@"audio/wwise/event_data__core.dat");
-                //DatParser.Parse(datFile);
-                //
+                //var soundEditor = new CommonControls.Editors.Sound.SoundEditor(packfileService);
+                //soundEditor.ParseAll();
 
                 //var f = packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack");
                 //OpenFile(f);

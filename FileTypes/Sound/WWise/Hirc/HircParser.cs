@@ -48,6 +48,9 @@ namespace FileTypes.Sound.WWise.Hirc
                     case HircType.SwitchContainer:
                         soundDb.Hircs.Add(CAkSwitchCntr.Create(chunk));
                         break;
+                    case HircType.SequenceContainer:
+                        soundDb.Hircs.Add(CAkRanSeqCnt.Create(chunk));
+                        break;
                     default:
                         soundDb.Hircs.Add(CAkUnknown.Create(chunk));
                         break;

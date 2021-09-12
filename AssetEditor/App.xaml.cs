@@ -21,7 +21,7 @@ namespace AssetEditor
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            VersionChecker.CheckVersion("v0.16");
+            VersionChecker.CheckVersion("v0.17");
 
             Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(DispatcherUnhandledExceptionHandler);
 

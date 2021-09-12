@@ -266,20 +266,16 @@ namespace View3D.Rendering.Geometry
                     _vertexArray[i].BlendWeights.W = 0;
                 }
 
-                _vertexArray[i].BlendWeights.Normalize();
-
-                //var totalBlendWeight = _vertexArray[i].BlendWeights.X + _vertexArray[i].BlendWeights.Y + _vertexArray[i].BlendWeights.Z + _vertexArray[i].BlendWeights.W;
-                //if ( (1 - totalBlendWeight) >= float.Epsilon)
-                //{
-                //    var diff = 1 - totalBlendWeight;
-                //    float diffPart = diff / WeightCount;
-                //
-                //    _vertexArray[i].BlendWeights.X += diffPart;
-                //    _vertexArray[i].BlendWeights.Y += diffPart;
-                //    _vertexArray[i].BlendWeights.Z += diffPart;
-                //    _vertexArray[i].BlendWeights.W += diffPart;
-                //}
-                //var totalBlendWeight2 = _vertexArray[i].BlendWeights.X + _vertexArray[i].BlendWeights.Y + _vertexArray[i].BlendWeights.Z + _vertexArray[i].BlendWeights.W;
+                var totalBlendWeight = _vertexArray[i].BlendWeights.X + _vertexArray[i].BlendWeights.Y + _vertexArray[i].BlendWeights.Z + _vertexArray[i].BlendWeights.W;
+                if ( (1 - totalBlendWeight) >= float.Epsilon || (1 - totalBlendWeight) <= float.Epsilon )
+                {
+                    var factor = 1 / totalBlendWeight;
+                    _vertexArray[i].BlendWeights.X *= factor;
+                    _vertexArray[i].BlendWeights.Y *= factor;
+                    _vertexArray[i].BlendWeights.Z *= factor;
+                    _vertexArray[i].BlendWeights.W *= factor;
+                }
+                var totalBlendWeight2 = _vertexArray[i].BlendWeights.X + _vertexArray[i].BlendWeights.Y + _vertexArray[i].BlendWeights.Z + _vertexArray[i].BlendWeights.W;
             }
 
             RebuildVertexBuffer();
