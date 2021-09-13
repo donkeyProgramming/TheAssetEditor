@@ -90,15 +90,15 @@ namespace AssetEditor.ViewModels
                 //SuperViewViewModel_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 //MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
-                KitbashEditor_Debug.CreateLoremasterHead(this, toolFactory, packfileService);
+                //KitbashEditor_Debug.CreateLoremasterHead(this, toolFactory, packfileService);
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateDamselEditor(this, toolFactory, packfileService);
 
                 //var f = packfileService.FindFile(@"animations\campaign\database\bin\cam_hero_hu1d_def_spear_and_shield.bin");
                 //OpenFile(f);
 
 
-                //var soundEditor = new CommonControls.Editors.Sound.SoundEditor(packfileService);
-                //soundEditor.ParseAll();
+                var soundEditor = new CommonControls.Editors.Sound.SoundEditor(packfileService);
+                soundEditor.ParseAll();
 
                 //var f = packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack");
                 //OpenFile(f);

@@ -10,8 +10,8 @@ namespace FileTypes.Sound.WWise.Hirc
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public AkGroupType eGroupType { get; set; }
-        public uint GroudId { get; set; }   // Enum group name
-        public uint DefaultSwitchValue { get; set; }    // Default value name
+        public uint ulGroupID { get; set; }   // Enum group name
+        public uint ulDefaultSwitch { get; set; }    // Default value name
         public byte bIsContinuousValidation { get; set; }
         public Children Children { get; set; }
         public List<CAkSwitchPackage> SwitchList { get; set; } = new List<CAkSwitchPackage>();
@@ -26,8 +26,8 @@ namespace FileTypes.Sound.WWise.Hirc
             switchCntr.LoadCommon(chunk);
             switchCntr.NodeBaseParams = NodeBaseParams.Create(chunk);
             switchCntr.eGroupType = (AkGroupType)chunk.ReadByte();
-            switchCntr.GroudId = chunk.ReadUInt32();
-            switchCntr.DefaultSwitchValue = chunk.ReadUInt32();
+            switchCntr.ulGroupID = chunk.ReadUInt32();
+            switchCntr.ulDefaultSwitch = chunk.ReadUInt32();
             switchCntr.bIsContinuousValidation = chunk.ReadByte();
             switchCntr.Children = Children.Create(chunk);
 
@@ -212,11 +212,42 @@ namespace FileTypes.Sound.WWise.Hirc
     public class NodeInitialFxParams
     {
         public byte bIsOverrideParentFX { get; set; }
-        public byte uNumFx { get; set; }
+
+        public byte bitsFXBypass { get; set; }
+        public List<FXChunk> FxList { get; set; } = new List<FXChunk>();
 
         public static NodeInitialFxParams Create(ByteChunk chunk)
         {
-            return new NodeInitialFxParams() { bIsOverrideParentFX = chunk.ReadByte(), uNumFx = chunk.ReadByte() };
+            var instance = new NodeInitialFxParams();
+            instance.bIsOverrideParentFX = chunk.ReadByte();
+            var uNumFx = chunk.ReadByte();
+
+            if (uNumFx != 0)
+            {
+                instance.bitsFXBypass = chunk.ReadByte();
+                for (int i = 0; i < uNumFx; i++)
+                    instance.FxList.Add(FXChunk.Create(chunk));
+            }
+
+            return instance;
+        }
+    }
+
+    public class FXChunk
+    {
+        public byte uFXIndex { get; set; }
+        public uint fxID { get; set; }
+        public byte bIsShareSet { get; set; }
+        public byte bIsRendered { get; set; }
+
+        public static FXChunk Create(ByteChunk chunk)
+        {
+            var instance = new FXChunk();
+            instance.uFXIndex = chunk.ReadByte();
+            instance.fxID = chunk.ReadUInt32();
+            instance.bIsShareSet = chunk.ReadByte();
+            instance.bIsRendered = chunk.ReadByte();
+            return instance;
         }
     }
 
@@ -259,12 +290,14 @@ namespace FileTypes.Sound.WWise.Hirc
                     for (int i = 0; i < numPlayListItems; i++)
                         instance.PlayListItems.Add(AkPathListItemOffset.Create(chunk));
 
-                    for (int i = 0; i < 4; i++)
+                    //var numParams = 4;
+                    //if (instance.ePathMode == 0x05)   //StepRandomPickNewPath
+                    //    numParams = 1;
+                    for (int i = 0; i < numPlayListItems; i++)
                         instance.Params.Add(Ak3DAutomationParams.Create(chunk));
                 }
             }
 
-            
 
             return instance;
         }

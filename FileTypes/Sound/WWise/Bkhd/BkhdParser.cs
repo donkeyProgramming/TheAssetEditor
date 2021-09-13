@@ -7,10 +7,12 @@ namespace FileTypes.Sound.WWise.Bkhd
 {
     public class BkhdParser : IParser
     {
-        public void Parse(ByteChunk chunk, SoundDataBase soundDb)
+        public void Parse(string fileName, ByteChunk chunk, SoundDataBase soundDb)
         {
             var bkdh = new BkhdHeader()
             {
+                OwnerFileName = fileName,
+
                 Size = chunk.ReadUInt32(),
                 dwBankGeneratorVersion = chunk.ReadUInt32(),
                 dwSoundBankID = chunk.ReadUInt32(),
@@ -25,6 +27,9 @@ namespace FileTypes.Sound.WWise.Bkhd
 
     public class BkhdHeader
     {
+
+        public string OwnerFileName { get; set; }
+
         public uint Size { get; set; }
         public uint dwBankGeneratorVersion { get; set; }
         public uint dwSoundBankID { get; set; }     // Name of the file

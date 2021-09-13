@@ -1,15 +1,20 @@
 ﻿using Filetypes.ByteParsing;
 using System;
+using System.Linq;
 using System.Text;
 
 namespace FileTypes.Sound.WWise.Hirc
 {
     public abstract class HricItem
     {
+        public string DisplayName { get; set; }
+        public string OwnerFile { get; set; }
+        public int IndexInFile { get; set; }
+
         public HircType Type { get; set; }
         public uint Size { get; set; }
         public uint Id { get; set; }
-        public string DisplayName { get; set; }
+
 
         protected void LoadCommon(ByteChunk chunk)
         {
@@ -26,7 +31,7 @@ namespace FileTypes.Sound.WWise.Hirc
 
     public class HircParser : IParser
     {
-        public void Parse(ByteChunk chunk, SoundDataBase soundDb)
+        public void Parse(string fileName, ByteChunk chunk, SoundDataBase soundDb)
         {
             var chunkSize = chunk.ReadUInt32();
             var numItems = chunk.ReadUInt32();
@@ -51,10 +56,16 @@ namespace FileTypes.Sound.WWise.Hirc
                     case HircType.SequenceContainer:
                         soundDb.Hircs.Add(CAkRanSeqCnt.Create(chunk));
                         break;
+                    case HircType.LayerContainer:
+                        soundDb.Hircs.Add(CAkLayerCntr.Create(chunk));
+                        break;
                     default:
                         soundDb.Hircs.Add(CAkUnknown.Create(chunk));
                         break;
                 }
+
+                soundDb.Hircs.Last().IndexInFile = i;
+                soundDb.Hircs.Last().OwnerFile = fileName;
             }
         }
     }

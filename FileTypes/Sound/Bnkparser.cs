@@ -26,7 +26,7 @@ namespace FileTypes.Sound
             while (chunk.BytesLeft != 0)
             {
                 var cc4 = Encoding.UTF8.GetString(chunk.ReadBytes(4));
-                parsers[cc4].Parse(chunk, soundDb);
+                parsers[cc4].Parse(file.Name, chunk, soundDb);
             }
 
             return soundDb;
