@@ -49,8 +49,8 @@ namespace AnimationEditor.AnimationTransferTool
             FrezeTaggedBones(copyToSkeleton, newAnimation);
             ApplyOffsets(copyToSkeleton, newAnimation);
             FixAttachmentPoints(copyFromSkeleton, copyToSkeleton, newAnimation, resampledAnimationToCopy);
-            ScaleAnimation(newAnimation, copyToSkeleton);
-
+            ScaleAnimation(newAnimation, copyToSkeleton); 
+            
             return newAnimation;
         }
 
@@ -273,7 +273,6 @@ namespace AnimationEditor.AnimationTransferTool
 
                     //animationToFix.DynamicFrames[frameIndex].Rotation[i] = boneRotation;
                     animationToFix.DynamicFrames[frameIndex].Position[i] = bonePosition;
-
                 }
             }
         }
@@ -283,12 +282,8 @@ namespace AnimationEditor.AnimationTransferTool
             var frameCount = animation.DynamicFrames.Count;
             for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
-                for (int i = 0; i < skeleton.BoneCount; i++)
-                {
-                    animation.DynamicFrames[frameIndex].Position[i] = animation.DynamicFrames[frameIndex].Position[i] * (float)_settings.Scale.Value;
-                }
+                 animation.DynamicFrames[frameIndex].Scale[0] = new Vector3((float) _settings.Scale.Value);
             }
-
         }
 
         void FrezeUnmappedBone(GameSkeleton copyToSkeleton, AnimationClip animation)

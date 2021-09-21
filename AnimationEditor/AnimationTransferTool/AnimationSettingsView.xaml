@@ -7,7 +7,9 @@
              xmlns:local="clr-namespace:AnimationEditor.AnimationTransferTool"
              mc:Ignorable="d" 
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls" xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls"
+             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls" 
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls"
+              xmlns:s="http://schemas.singulink.com/xaml"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <System:Double x:Key="labelWidth">140</System:Double>
@@ -43,13 +45,20 @@
             </DockPanel>
 
             <DockPanel>
-                <Label Content="Scale" Width ="{StaticResource labelWidth}"  />
-                <Label Content=":"/>
+                <Label Content="Scale" Width ="{StaticResource labelWidth}"  DockPanel.Dock="Left"/>
+                <Label Content=":" DockPanel.Dock="Left"/>
+                <Button Content="Export Mesh at scale" Click="{s:MethodBinding ExportScaledMesh}" DockPanel.Dock="Right"/>
+
                 <TextBox Text="{Binding AnimationSettings.Scale.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
+                    <TextBox.ToolTip>
+                        <ToolTip Content="Scaling the skeleton will make the mesh look dragged unless the mesh is also exported"/>
+                    </TextBox.ToolTip>
+
                     <b:Interaction.Behaviors>
                         <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
                     </b:Interaction.Behaviors>
                 </TextBox>
+               
             </DockPanel>
 
             <DockPanel >

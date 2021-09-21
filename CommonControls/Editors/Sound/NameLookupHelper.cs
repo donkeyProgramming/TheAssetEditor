@@ -16,7 +16,7 @@ namespace CommonControls.Editors.Sound
             }
         }
 
-        uint Hash(string value)
+        public static uint Hash(string value)
         {
             var lower = value.ToLower();
             var bytes = Encoding.UTF8.GetBytes(lower);

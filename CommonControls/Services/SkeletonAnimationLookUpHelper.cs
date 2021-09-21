@@ -88,8 +88,10 @@ namespace CommonControls.Services
             {
                 if (name.Contains(skeletonName))
                 {
+                    var fullName = Path.GetFileNameWithoutExtension(name);
+
                     var file = pfs.FindFile(name);
-                    if (file != null)
+                    if (file != null && fullName == skeletonName)
                     {
                         // Make sure its not a tech skeleton
                         if(pfs.GetFullPath(file).Contains("tech") == false)

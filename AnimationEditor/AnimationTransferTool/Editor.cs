@@ -175,8 +175,10 @@ namespace AnimationEditor.AnimationTransferTool
             var newName = orgName.Replace(orgSkeleton, newSkeleton);
 
             var animFile = Generated.AnimationClip.ConvertToFileFormat(Generated.Skeleton);
+
             SaveHelper.Save(_pfs, newName, null, AnimationFile.GetBytes(animFile));
         }
+
         public void ClearAllSettings()
         {
             if(MessageBox.Show("Are you sure?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
@@ -220,6 +222,13 @@ namespace AnimationEditor.AnimationTransferTool
 
                 FlatBoneList.Add(newBone);
             }
+        }
+
+        public void ExportScaledMesh()
+        {
+            //MainEditableNode
+            var node = Generated.MainNode;
+            //node.GetChildren()
         }
     }
 

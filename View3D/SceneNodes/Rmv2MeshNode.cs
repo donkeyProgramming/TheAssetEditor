@@ -184,7 +184,7 @@ namespace View3D.SceneNodes
             if (Effect is IShaderTextures tetureEffect)
                 tetureEffect.UseAlpha = MeshModel.AlphaSettings.Mode == AlphaMode.Alpha_Test;
 
-            var pivotPos = new Vector3(MeshModel.Header.Transform.Pivot.X, MeshModel.Header.Transform.Pivot.Y, MeshModel.Header.Transform.Pivot.Z);
+            var pivotPos = GetPivot();
             var modelWithOffset = ModelMatrix * Matrix.CreateTranslation(pivotPos);
             RenderMatrix = modelWithOffset;
 
@@ -242,6 +242,11 @@ namespace View3D.SceneNodes
             MeshModel.Header = header;
         }
 
+        public Vector3 GetPivot()
+        { 
+            return new Vector3(MeshModel.Header.Transform.Pivot.X, MeshModel.Header.Transform.Pivot.Y, MeshModel.Header.Transform.Pivot.Z); ;
+        }
+
         public void RecomputeBoundingBox()
         {
             var header = MeshModel.Header;
@@ -263,32 +268,5 @@ namespace View3D.SceneNodes
     }
 
 
-    public class Rmv2MeshNodeHelper
-    {
-        public static List<Rmv2MeshNode> GetAllVisibleMeshes(ISceneNode node)
-        {
-            return GetAllChildren(node);
-        }
 
-        static List<Rmv2MeshNode> GetAllChildren(ISceneNode parent)
-        {
-            var output = new List<Rmv2MeshNode>();
-            var visibleChildren = parent.Children.Where(x => x.IsVisible);
-
-            foreach (var child in visibleChildren)
-            {
-                if (child is Rmv2MeshNode mesh && mesh.LodIndex==0)
-                {
-                    output.Add(mesh);
-                }
-                else
-                {
-                    var result = GetAllChildren(child);
-                    output.AddRange(result);
-                }
-            }
-
-            return output;
-        }
-    }
 }

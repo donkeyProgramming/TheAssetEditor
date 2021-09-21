@@ -12,14 +12,30 @@ namespace FileTypes.Sound.WWise
 
     public enum HircType : byte
     {
+        State = 0x01,
         Sound = 0x02,
         Action = 0x03,
         Event = 0x04,
         SequenceContainer = 0x05,
         SwitchContainer = 0x06,
         ActorMixer = 0x07,
+        Audio_Bus = 0x08,
         LayerContainer = 0x09,
-        DialogEvent =  0x0f
+        //
+        Music_Segment = 0x0a,
+        Music_Track = 0x0b,
+        Music_Switch = 0x0c,
+        Music_Random_Sequence = 0x0d,
+        //
+        Attenuation = 0x0e,
+        Dialogue_Event = 0x0f,
+        FxShareSet = 0x10,
+        FxCustom = 0x11,
+        AuxiliaryBus = 0x12,
+        LFO = 0x13,
+        Envelope = 0x14,
+        AudioDevice = 0x15,
+        TimeMod = 0x16,
     }
 
     public enum ActionType : ushort

@@ -397,14 +397,6 @@ namespace CommonControls.Services
             Database.TriggerPackFilesUpdated(pf, new List<PackFile>() { file as PackFile });
         }
 
-
-        public void Save(PackFileContainer pf, BinaryWriter writer)
-        {
-            pf.SaveToByteArray(writer);
-            _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, pf);
-            _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pf);
-        }
-
         public void Save(PackFileContainer pf, string path, bool createBackup)
         {
             if(pf.IsCaPackFile)
@@ -412,15 +404,19 @@ namespace CommonControls.Services
             if (createBackup)
                 SaveHelper.CreateFileBackup(path);
 
+            _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, pf);
+
             pf.SystemFilePath = path;
             using (var memoryStream = new FileStream(path+"_temp", FileMode.OpenOrCreate))
             {
                 using (var writer = new BinaryWriter(memoryStream))
-                    Save(pf, writer);
+                    pf.SaveToByteArray(writer);
             }
 
             File.Delete(path);
             File.Move(path + "_temp", path);
+
+            _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pf);
         }
 
         public PackFile FindFile(string path) 

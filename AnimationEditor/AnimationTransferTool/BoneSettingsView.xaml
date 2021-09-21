@@ -63,7 +63,7 @@
             <Label Grid.Row="0" Grid.ColumnSpan="3">
                 <Label.Content>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Selected Bone: " FontSize="16" VerticalAlignment="Center"/>
+                        <TextBlock Text="Settings for selected Bone: " FontSize="16" VerticalAlignment="Center"/>
                         <TextBlock Text="{Binding SelectedBone.BoneName.Value, UpdateSourceTrigger=PropertyChanged}"  VerticalAlignment="Center"/>
                         <TextBlock Text=" => " VerticalAlignment="Center"/>
                         <TextBlock Text="..." VerticalAlignment="Center"/>

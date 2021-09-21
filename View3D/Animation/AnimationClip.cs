@@ -113,8 +113,13 @@ namespace View3D.Animation
         Frame CreateFrameFromKeyFrame(KeyFrame keyFrame)
         {
             var frame = new Frame();
-            foreach (var trans in keyFrame.Position)
+            float scale = 1;
+            for(int i = 0; i < keyFrame.Position.Count; i++)
+            {
+                scale *= keyFrame.Scale[i].X;
+                var trans = keyFrame.Position[i] * scale;
                 frame.Transforms.Add(new RmvVector3(trans.X, trans.Y, trans.Z));
+            }
 
             foreach (var rot in keyFrame.Rotation)
                 frame.Quaternion.Add(new RmvVector4(rot.X, rot.Y, rot.Z, rot.W));

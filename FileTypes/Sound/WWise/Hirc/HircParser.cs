@@ -59,6 +59,21 @@ namespace FileTypes.Sound.WWise.Hirc
                     case HircType.LayerContainer:
                         soundDb.Hircs.Add(CAkLayerCntr.Create(chunk));
                         break;
+                    case HircType.Dialogue_Event:
+
+                        var start = chunk.Index;
+                        try
+                        {
+                            var item = CAkDialogueEvent.Create(chunk);
+                            soundDb.Hircs.Add(item);
+                        }
+                        catch
+                        {
+                            chunk.Index = start;
+                            soundDb.Hircs.Add(CAkUnknown.Create(chunk));
+                        }
+                     
+                        break;
                     default:
                         soundDb.Hircs.Add(CAkUnknown.Create(chunk));
                         break;

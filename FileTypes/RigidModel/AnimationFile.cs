@@ -304,7 +304,10 @@ namespace Filetypes.RigidModel
                         writer.Write((int)3);   // Frame count, why 3 when empty?
                     }
 
-                    return memoryStream.ToArray();
+                    var bytes = memoryStream.ToArray();
+                    var tempResult = AnimationFile.Create(new Filetypes.ByteParsing.ByteChunk(bytes));  // Throws excetion and stop the save if the animation is corrupt for some reason
+
+                    return bytes;
                 }
             }
         }

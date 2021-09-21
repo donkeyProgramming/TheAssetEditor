@@ -127,7 +127,7 @@ namespace KitbasherEditor.Views.EditorViews.VertexDebugger
                     _lineRenderer.AddLine(pos, pos + vertexInfo.Tangent * scale, Color.Red);
                 }
 
-                renderEngine.AddRenderItem(RenderBuckedId.Normal, new LineRenderItem() { LineMesh = _lineRenderer });
+                renderEngine.AddRenderItem(RenderBuckedId.Normal, new LineRenderItem() { LineMesh = _lineRenderer, ModelMatrix = mesh.ModelMatrix * Matrix.CreateTranslation(mesh.GetPivot()) });
             }
         }
 
