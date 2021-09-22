@@ -163,9 +163,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             var existingSkeletonMeshNode = _meshNode.GetParentModel();
             var existingSkeltonName = existingSkeletonMeshNode.Model.Header.SkeletonName;
             var existingSkeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, existingSkeltonName);
-
-            var possiblePropBoneList = AnimatedBoneHelper.CreateFlatSkeletonList(existingSkeletonFile);
-            ModelBoneList.UpdatePossibleValues(possiblePropBoneList, new AnimatedBone(-1, "none"));
+            if(existingSkeletonFile != null)
+                ModelBoneList.UpdatePossibleValues(AnimatedBoneHelper.CreateFlatSkeletonList(existingSkeletonFile), new AnimatedBone(-1, "none"));
             ModelBoneList.SelectedItemChanged += ModelBoneList_SelectedItemChanged;
             ModelBoneList.SearchFilter = (value, rx) => { return rx.Match(value.Name.Value).Success; };
             ModelBoneList.SelectedItem = ModelBoneList.PossibleValues.FirstOrDefault(x => x.Name.Value == _meshNode.AttachmentPointName);

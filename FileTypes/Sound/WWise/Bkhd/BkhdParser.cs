@@ -21,6 +21,10 @@ namespace FileTypes.Sound.WWise.Bkhd
                 dwProjectID = chunk.ReadUInt32(),
                 padding = chunk.ReadUInt32(),
             };
+
+            if (bkdh.dwBankGeneratorVersion == 2147483770)
+                bkdh.dwBankGeneratorVersion = 122;
+
             soundDb.Header = bkdh;
         }
     }

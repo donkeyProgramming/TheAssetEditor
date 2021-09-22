@@ -98,7 +98,7 @@ namespace AssetEditor.ViewModels
 
 
                 var soundEditor = new CommonControls.Editors.Sound.SoundEditor(packfileService);
-                soundEditor.ParseAll();
+                soundEditor.CreateSoundMap();
 
                 //var f = packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack");
                 //OpenFile(f);

@@ -17,19 +17,24 @@ using System.Timers;
 using System.IO;
 using System.Text;
 using FileTypes.PackFiles.Models;
+using FileTypes.Sound.WWise.Hirc.V122;
 
 namespace CommonControls.Editors.Sound
 {
-    public class SoundEditor
+    public partial class SoundEditor
     {
         ILogger _logger = Logging.Create<SoundEditor>();
 
         private readonly PackFileService _pfs;
-
+        List<string> _filesToSkip = new List<string>();
 
         public SoundEditor(PackFileService pfs)
         {
             _pfs = pfs;
+
+            _filesToSkip.Add("media");
+            _filesToSkip.Add("init.bnk");
+            _filesToSkip.Add("animation_blood_data.bnk");
         }
 
         List<PackFile> GetAttilaFiles()
@@ -51,6 +56,8 @@ namespace CommonControls.Editors.Sound
             var files = _pfs.FindAllWithExtention(".bnk");
             return files;
         }
+
+      
 
         NameLookupHelper GetNameHelper(List<PackFile> files)
         {
@@ -74,397 +81,157 @@ namespace CommonControls.Editors.Sound
             return nameHelper;
         }
 
-        public void ParseAll()
+        List<PackFile> RemoveUnwantedFiles(List<PackFile> files, VisualEventOutputNode parent, Stopwatch timer)
         {
-            var masterDb = new SoundDataBase();
-            var parsedFiles = new List<string>();
-            var skippedFiles = new List<string>();
-            var failedFiles = new List<string>();
+            _logger.Here().Information($"Removing unwanted files [{timer.Elapsed.TotalSeconds}s]");
 
-            var files = GetAttilaFiles();
+            var itemsToRemove = new List<PackFile>();
+            foreach (var file in files)
+            {
+                foreach (var removeName in _filesToSkip)
+                {
+                    if (file.Name.Contains(removeName))
+                    {
+                        itemsToRemove.Add(file);
+                        break;
+                    }
+                }
+            }
+
+            if (itemsToRemove.Count != 0)
+            {
+                var root = parent.AddChild($"RemovedFiles: {itemsToRemove.Count}");
+                foreach (var item in itemsToRemove)
+                {
+                    root.AddChild(item.Name);
+                    files.Remove(item);
+                }
+            }
+
+            _logger.Here().Information($"{itemsToRemove.Count} files removed [{timer.Elapsed.TotalSeconds}s]");
+
+            return files;
+        }
+
+        List<PackFile> OnlyParseOneFile_debug(List<PackFile> files, string filter)
+        {
+            var itemsToRemove = new List<PackFile>();
+            foreach (var file in files)
+            {
+                if (file.Name.Contains(filter, StringComparison.OrdinalIgnoreCase) == false)
+                    itemsToRemove.Add(file);
+            }
+
+            if (itemsToRemove.Count != 0)
+            {
+                foreach (var item in itemsToRemove)
+                    files.Remove(item);
+            }
+            return files;
+        }
+
+       ExtenededSoundDataBase BuildMasterDb(List<PackFile> files, VisualEventOutputNode parent, Stopwatch timer)
+        {
+            _logger.Here().Information($"Generating Master DB [{timer.Elapsed.TotalSeconds}s]");
+
+            var fileRoot = parent.AddChild("File information:");
+            var masterDb = new ExtenededSoundDataBase();
+            
+            var currentFile = 0;
+            foreach (var file in files)
+            {
+                var localDb = Bnkparser.Parse(file);
+                var eventCount = localDb.Hircs.Count(x => x.Type == HircType.Event);
+                var dialogEventCount = localDb.Hircs.Count(x => x.Type == HircType.Dialogue_Event);
+
+                var fileOutputStr = $"{file.Name} NumEvents:{eventCount} NumDialogEvents: {dialogEventCount}";  // Some kind of failed items/unsupporeted item log as well
+                fileRoot.AddChild(fileOutputStr);
+
+                masterDb.AddHircItems(localDb.Hircs);
+
+                _logger.Here().Information($"{currentFile}/{files.Count} {fileOutputStr}");
+                currentFile++;
+            }
+
+            _logger.Here().Information($"Generating Master DB Done [{timer.Elapsed.TotalSeconds}s]");
+
+            return masterDb;
+        }
+
+        void ParsBnkFiles(ExtenededSoundDataBase masterDb, NameLookupHelper nameHelper, List<PackFile> files, VisualEventOutputNode parent, Stopwatch timer)
+        {
+            for(int fileIndex = 0; fileIndex < files.Count; fileIndex++)
+            {
+                var soundDb = Bnkparser.Parse(files[fileIndex]);
+
+                var events = soundDb.Hircs
+                    .Where(x => x.Type == HircType.Event || x.Type == HircType.Dialogue_Event)
+                    .Where(x=> x.HasError == false);
+
+                var fileNodeOutputStr = $"{files[fileIndex].Name} Total EventCount:{events}";
+                _logger.Here().Information($"{fileIndex}/{files.Count} {fileNodeOutputStr}");
+
+                var fileOutput = parent.AddChild(fileNodeOutputStr);
+                var fileOutputError = fileOutput.AddChild("Errors while parsing :");
+                bool procesedCorrectly = true;
+
+                var itemsProcessed = 0;
+                foreach (var currentEvent in events)
+                {
+                    var visualEvent = new EventHierarchy(currentEvent, masterDb, nameHelper, fileOutput, fileOutputError, files[fileIndex].Name);
+
+                    if (itemsProcessed % 100 == 0 && itemsProcessed != 0)
+                        _logger.Here().Information($"\t{itemsProcessed}/{events} events processsed [{timer.Elapsed.TotalSeconds}s]");
+                    
+                    itemsProcessed++;
+                    procesedCorrectly = visualEvent.ProcesedCorrectly && procesedCorrectly;
+                }
+
+              
+                if (procesedCorrectly == true)
+                    fileOutput.Children.Remove(fileOutputError);
+
+                if (events.Any())
+                    _logger.Here().Information($"\t{itemsProcessed}/{events} events processsed [{timer.Elapsed.TotalSeconds}s]");
+            }
+        }
+
+
+        public void AddStats(VisualEventOutputNode statsNode, ExtenededSoundDataBase masterDb, int numFiles)
+        {
+            var unknowTypeInfo = masterDb.UnknownObjectTypes.Distinct().Select(x => x + $"[{masterDb.UnknownObjectTypes.Count(unkObj => unkObj == x)}]");
+            var numWemFiles = _pfs.FindAllWithExtention(".wem");
+
+            statsNode.AddChild($"Num bnk Files = {numFiles}");
+            statsNode.AddChild($"Num wem Files = {numWemFiles.Count}");
+            statsNode.AddChild($"References wem Files = {masterDb.ReferensedSounds.Distinct().Count()}");
+            statsNode.AddChild($"Unknown hirc types = {string.Join(",", unknowTypeInfo)}");
+             
+        }
+
+        public void CreateSoundMap()
+        {
+            var files = GetPackFileFiles();
+            //var files = GetAttilaFiles();
             var nameHelper = GetNameHelper(files);
 
-            var numWemFiles = _pfs.FindAllWithExtention(".wem");
-            List<uint> referensedSounds = new List<uint>();
-            List<string> unknownObjectTypes = new List<string>();
-
-            var currentFile = 0;
             var timer = new Stopwatch();
             timer.Start();
 
             VisualEventOutputNode rootOutput = new VisualEventOutputNode($"Root :");
             var statsNode = rootOutput.AddChild("Stats");
+            //files = OnlyParseOneFile_debug(files, "battle_advice__core.bnk");
+            //files = OnlyParseOneFile_debug(files, "battle_advice.bnk"); // Attila
 
-            foreach (var file in files)
-            {
-                if (file.Name.Contains("media") || file.Name.Contains("init.bnk") || file.Name.Contains("animation_blood_data.bnk"))
-                {
-                    skippedFiles.Add(file.Name);
-                    continue; 
-                }
-
-
-                if (file.Name.Contains("battle_advice.bnk") == false)
-                    continue;
-                
-
-                //if (file.Name.Contains("battle_individual_artillery__core") == false)
-                //    continue;
-
-                //if (file.Name.Contains("battle_vo_conversational__core") == false)
-                //   continue;
-                //if (file.Name.Contains("battle_vo_orders__core") == false)
-                //    continue;
-
-
-
-                var soundDb = Bnkparser.Parse(file);
-                var db = new ExtenededSoundDataBase(soundDb, nameHelper, referensedSounds, unknownObjectTypes);
-
-                var events = soundDb.Hircs.Where(x => x.Type == HircType.Event).Cast<CAkEvent>().ToList();
-                var dialogEvents = soundDb.Hircs.Where(x => x.Type == HircType.Dialogue_Event && x as CAkDialogueEvent != null).Cast<CAkDialogueEvent>().ToList();
-                var itemsProcessed = 0;
-
-                _logger.Here().Information($"{currentFile}/{files.Count} {file.Name} NumEvents:{events.Count} NumDialogEvents: {dialogEvents.Count}");
-
-                var fileOutput = rootOutput.AddChild($"File: {file.Name} NumEvents: {events.Count} NumDialogEvents: {dialogEvents.Count}");
-
-                foreach (var currentEvent in events)
-                {
-                    var name = nameHelper.GetName(currentEvent.Id); ;
-                    var visualEvent = new VisualEvent(currentEvent, db, fileOutput, file.Name);
-
-                    if (itemsProcessed % 100 == 0 && itemsProcessed != 0)
-                        _logger.Here().Information($"\t{itemsProcessed}/{events.Count} events processsed [{timer.Elapsed.TotalSeconds}s]");
-                    itemsProcessed++;
-                }
-
-                var dialogItemsProcessed = 0;
-                foreach (var currentEvent in dialogEvents)
-                {
-                    var name = nameHelper.GetName(currentEvent.Id); ;
-                    var visualEvent = new VisualEvent(currentEvent, db, fileOutput, file.Name);
-
-                    if (dialogItemsProcessed % 100 == 0 && dialogItemsProcessed != 0)
-                        _logger.Here().Information($"\t{dialogItemsProcessed}/{events.Count} dialogEvents processsed [{timer.Elapsed.TotalSeconds}s]");
-                    dialogItemsProcessed++;
-                }
-
-
-                if (events.Count != 0)
-                    _logger.Here().Information($"\t{itemsProcessed}/{events.Count} events processsed [{timer.Elapsed.TotalSeconds}s]");
-
-                if (dialogEvents.Count != 0)
-                    _logger.Here().Information($"\t{dialogItemsProcessed}/{dialogEvents.Count} dialogEvents processsed [{timer.Elapsed.TotalSeconds}s]");
-
-                currentFile++;
-            }
-
-
-            var x = unknownObjectTypes.Distinct().Select(x => x + $"[{unknownObjectTypes.Count(unkObj => unkObj == x)}]");
-
-            statsNode.AddChild($"Num bnk Files = {files.Count}");
-            statsNode.AddChild($"Num wem Files = {numWemFiles.Count}");
-            statsNode.AddChild($"References wem Files = {referensedSounds.Distinct().Count()}");
-            statsNode.AddChild($"Unknown hirc types = {string.Join(",", x)}");
+            files = RemoveUnwantedFiles(files, rootOutput, timer);
+            var masterDb = BuildMasterDb(files, rootOutput, timer);
+            ParsBnkFiles(masterDb, nameHelper, files, rootOutput, timer);
+            AddStats(statsNode, masterDb, files.Count);
 
             VisualEventSerializer serializer = new VisualEventSerializer();
             var output = serializer.Start(rootOutput);
 
-
-
-            //var str = rootOutput.GetDisplayStr();
             File.WriteAllText(@"C:\temp\SoundTesting\Warhammer2RippedEvents.txt", output);
-
-
-            //var eventNameIds = events.Select(x => $"{x.Id}\t\t{x.DisplayName}");
-            //var eventNameIdsDisplayStr = string.Join(", \n", eventNameIds);
-            //
-            //
-            //var connectionStrings = valueMap.Select(x => $"{x.Key} => {x.Value.FirstOrDefault()}").ToList();
-            //var displayStr = string.Join(", \n", connectionStrings);
-
-
-            // how does CAkActorMixer fit into this?
-        }
-
-        public class ExtenededSoundDataBase
-        {
-            public NameLookupHelper NameHelper { get; private set; }
-            public SoundDataBase MasterDb { get; private set; }
-
-            public List<CAkEvent> Events { get; private set; }
-            public List<CAkAction> Actions { get; private set; }
-            public List<CAkSound> Sounds { get; private set; }
-            public List<CAkSwitchCntr> Switches { get; private set; }
-            public List<CAkRanSeqCnt> RandomContainers { get; private set; }
-
-            public List<uint> ReferensedSounds { get; set; }
-            public List<string> UnknownObjectTypes { get; set; }
-
-
-            public ExtenededSoundDataBase(SoundDataBase masterDb, NameLookupHelper nameHelper, List<uint> referensedSounds, List<string> unknownObjectType)
-            {
-                NameHelper = nameHelper;
-                MasterDb = masterDb;
-
-                Events = masterDb.Hircs.Where(x => x.Type == HircType.Event).Cast<CAkEvent>().ToList();
-                Actions = masterDb.Hircs.Where(x => x.Type == HircType.Action).Cast<CAkAction>().Where(x => x.ActionType == ActionType.Play).ToList();
-                Sounds = masterDb.Hircs.Where(x => x.Type == HircType.Sound).Cast<CAkSound>().ToList(); 
-                Switches = masterDb.Hircs.Where(x => x.Type == HircType.SwitchContainer).Cast<CAkSwitchCntr>().ToList(); 
-                RandomContainers = masterDb.Hircs.Where(x => x.Type == HircType.SequenceContainer).Cast<CAkRanSeqCnt>().ToList();
-                ReferensedSounds = referensedSounds;
-                UnknownObjectTypes = unknownObjectType;
-            }
-
-            public List<HricItem> GetHircObject(uint id, string bnkFile)
-            {
-                var res = MasterDb.Hircs.Where(x => x.Id == id && x.OwnerFile == bnkFile).ToList();
-                //if (res.Count == 0)
-                //    throw new Exception();
-                return res;
-            }
-
-            public List<HricItem> GetHircObjects(List<uint> ids, string bnkFile)
-            {
-                var res = MasterDb.Hircs.Where(x => ids.Contains(x.Id) && x.OwnerFile == bnkFile).ToList();
-                //if (res.Count == 0)
-                //    throw new Exception();
-                return res;
-            }
-        }
-
-        public class VisualEventOutputNode
-        {
-            public string Data { get; set; } = "";
-            public List<VisualEventOutputNode> Children { get; set; } = new List<VisualEventOutputNode>();
-
-            public VisualEventOutputNode(string data)
-            {
-                Data = data;
-            }
-
-            public VisualEventOutputNode AddChild(string data)
-            {
-                var child = new VisualEventOutputNode(data);
-                Children.Add(child);
-                return child;
-            }
-        }
-
-        public class VisualEventSerializer
-        {
-            StringBuilder _builder;
-            public string Start(VisualEventOutputNode root)
-            {
-                _builder = new StringBuilder();
-                HandleNode(root, 0);
-                return GetStr();
-            }
-
-            void HandleNode(VisualEventOutputNode node, int indentation)
-            {
-                var indentStr = string.Concat(Enumerable.Repeat('\t', indentation));
-                _builder.AppendLine(indentStr + node.Data);
-
-                foreach (var item in node.Children)
-                {
-                    HandleNode(item, indentation + 1);
-                }
-            }
-
-            string GetStr()
-            {
-                return _builder.ToString();
-            }
-
-        }
-
-
-        public class VisualEvent
-        {
-            string _ownerFileName;
-            ExtenededSoundDataBase _db;
-            string _name;
-             
-            public VisualEventOutputNode Output { get; set; }
-            public bool ProcesedCorrectly { get; set; } = true;
-            public VisualEvent(CAkEvent startEvent, ExtenededSoundDataBase db, VisualEventOutputNode rootOutput, string ownerFileName)
-            {
-                _ownerFileName = ownerFileName;
-                _db = db;
-                _name = _db.NameHelper.GetName(startEvent.Id);
-
-                ProcessChild(startEvent, rootOutput);
-            }
-
-            public VisualEvent(CAkDialogueEvent startEvent, ExtenededSoundDataBase db, VisualEventOutputNode rootOutput, string ownerFileName)
-            {
-                _ownerFileName = ownerFileName;
-                _db = db;
-                _name = _db.NameHelper.GetName(startEvent.Id);
-
-                ProcessChild(startEvent, rootOutput);
-            }
-
-
-            void ProcessChild(CAkEvent caEvent, VisualEventOutputNode currentNode)
-            {
-                var name  = _db.NameHelper.GetName(caEvent.Id);
-                var eventNode = currentNode.AddChild($"-> Event:{name}[{caEvent.Id}]");
-                if (Output == null)
-                    Output = eventNode;
-
-                var actionIdsForEvent = caEvent.Actions.Select(x => x.ActionId).ToList();
-
-                var children = _db.GetHircObjects(actionIdsForEvent, caEvent.OwnerFile);
-                foreach (var child in children)
-                    ProcessGenericChild(child, eventNode);
-            }
-
-
-            void ProcessGenericChild(HricItem item, VisualEventOutputNode currentNode)
-            {
-                if (item is CAkAction action)
-                    ProcessChild(action, currentNode);
-                else if (item is CAkEvent caEvent)
-                    ProcessChild(caEvent, currentNode);
-                else if (item is CAkSound sound)
-                    ProcessChild(sound, currentNode);
-                else if (item is CAkSwitchCntr switchContainer)
-                    ProcessChild(switchContainer, currentNode);
-                else if (item is CAkRanSeqCnt randomContainer)
-                    ProcessChild(randomContainer, currentNode);
-                else if (item is CAkLayerCntr layeredControl)
-                    ProcessChild(layeredControl, currentNode);
-                else if (item is CAkDialogueEvent dialogEvent)
-                    ProcessChild(dialogEvent, currentNode);
-                else
-                    ProcessUnknownChild(item, currentNode);
-            }
-
-            void ProcessChild(CAkAction item, VisualEventOutputNode currentNode)
-            {
-                var node = currentNode.AddChild($"CAkAction ActionType:[{item.ActionType}] \tId:[{item.Id}]");
-
-                var actionRefs = _db.GetHircObject(item.SoundId, _ownerFileName);
-                foreach (var actionRef in actionRefs)
-                    ProcessGenericChild(actionRef, node);
-            }
-
-            void ProcessChild(CAkSound item, VisualEventOutputNode currentNode)
-            {
-                currentNode.AddChild($"CAkSound {item.BankSourceData.akMediaInformation.SourceId}.wem \tId:[{item.Id}] \tParentId:[{item.NodeBaseParams.DirectParentID}]");
-                _db.ReferensedSounds.Add(item.BankSourceData.akMediaInformation.SourceId);
-            }
-
-            void ProcessChild(CAkSwitchCntr item, VisualEventOutputNode currentNode)
-            {
-                var node = currentNode.AddChild($"CAkSwitchCntr EnumGroup:[{_db.NameHelper.GetName(item.ulGroupID)}] \tDefault:[{_db.NameHelper.GetName(item.ulDefaultSwitch)}] \tId:[{item.Id}] \tParentId:[{item.NodeBaseParams.DirectParentID}]" );
-                foreach (var switchCase in item.SwitchList)
-               {
-                    var switchCaseNode = node.AddChild($"SwitchValue [{_db.NameHelper.GetName(switchCase.SwitchId)}]");
-                    foreach (var child in switchCase.NodeIdList)
-                    {
-                        var childRef = _db.GetHircObject(child, _ownerFileName);
-                        Debug.Assert(childRef.Count() <= 1);
-
-                        if (childRef.FirstOrDefault() != null)
-                            ProcessGenericChild(childRef.FirstOrDefault(), switchCaseNode);
-                    }
-               }
-            }
-
-            void ProcessChild(CAkLayerCntr item, VisualEventOutputNode currentNode)
-            {
-                var node = currentNode.AddChild($"CAkLayerCntr \tId:[{item.Id}] \tParentId:[{item.NodeBaseParams.DirectParentID}]");
-                foreach (var layer in item.LayerList)
-                {
-                    var switchCaseNode = node.AddChild($"LayerChildItem Id:[{layer.ulLayerID}] \trtpcID:[{_db.NameHelper.GetName(layer.rtpcID)}]");
-                    foreach (var child in layer.CAssociatedChildDataList)
-                    {
-                        var childRef = _db.GetHircObject(child.ulAssociatedChildID, _ownerFileName);
-                        Debug.Assert(childRef.Count() <= 1);
-
-                        if (childRef.FirstOrDefault() != null)
-                            ProcessGenericChild(childRef.FirstOrDefault(), switchCaseNode);
-                    }
-                }
-            }
-
-            void ProcessChild(CAkRanSeqCnt item, VisualEventOutputNode currentNode)
-            {
-                var node = currentNode.AddChild($"CAkRanSeqCnt \tId:[{item.Id}] \tParentId:[{item.NodeBaseParams.DirectParentID}]");
-
-                foreach (var playListItem in item.AkPlaylist)
-                {
-                    var playListRefs = _db.GetHircObject(playListItem.PlayId, _ownerFileName);
-                    Debug.Assert(playListRefs.Count() <= 1);
-
-                    if(playListRefs.FirstOrDefault() != null)
-                        ProcessGenericChild(playListRefs.FirstOrDefault(), node);
-                }
-            }
-
-            void ProcessChild(CAkDialogueEvent item, VisualEventOutputNode currentNode)
-            {
-                var name = _db.NameHelper.GetName(item.Id);
-                var node = currentNode.AddChild($"-> DialogEvent:{name} \tId:[{item.Id}]");
-
-                // arguments id and name
-
-                foreach(var child in item.AkDecisionTree.Root.Children)
-                    ProcessAkDecisionTreeNode(child, node);
-            }
-
-
-            void ProcessAkDecisionTreeNode(AkDecisionTree.Node node, VisualEventOutputNode currentOutputNode)
-            {
-                var name = _db.NameHelper.GetName(node.key);
-                var outputNode = currentOutputNode.AddChild($"DialogNode {name} Id:[{node.key}]");
-
-                foreach (var childNode in node.Children)
-                    ProcessAkDecisionTreeNode(childNode, outputNode);
-
-                foreach (var childNode in node.SoundNodes)
-                {
-                    var childNodeName = _db.NameHelper.GetName(childNode.key);
-                    var soundChildNode = outputNode.AddChild($"Sound_Node {childNodeName}  Id:[{childNode.key}] AudioNodeId:[{childNode.audioNodeId}]");
-                    
-                    var nodes = _db.GetHircObject(childNode.audioNodeId, _ownerFileName);
-                    if (nodes.FirstOrDefault() != null)
-                        ProcessGenericChild(nodes.FirstOrDefault(), soundChildNode);
-                }
-            }
-
-            void ProcessUnknownChild(HricItem item, VisualEventOutputNode currentNode)
-            {
-                currentNode.AddChild($"Unknown HricItem Type:[{item.Type}] \tId:[{item.Id}] ");
-                ProcesedCorrectly = false;
-                _db.UnknownObjectTypes.Add(item.Type.ToString());
-            }
-        }
-
-        public class SoundEvent
-        { 
-            
-        }
-
-        public class SoundAction
-        { 
-        }
-
-        public class Sound
-        { 
-        }
-
-        public class SoundSwitch
-        {
-        }
-
-        public class SoundContainer
-        { 
-        
         }
     }
 }

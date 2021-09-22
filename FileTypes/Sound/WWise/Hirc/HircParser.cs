@@ -1,32 +1,64 @@
 ﻿using Filetypes.ByteParsing;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace FileTypes.Sound.WWise.Hirc
 {
-    public abstract class HricItem
+    public class HircFactory
     {
-        public string DisplayName { get; set; }
-        public string OwnerFile { get; set; }
-        public int IndexInFile { get; set; }
-
-        public HircType Type { get; set; }
-        public uint Size { get; set; }
-        public uint Id { get; set; }
-
-
-        protected void LoadCommon(ByteChunk chunk)
+        Dictionary<HircType, Func<HircItem>> _itemList = new Dictionary<HircType, Func<HircItem>>();
+        public void RegisterHirc(HircType type, Func<HircItem> creator)
         {
-            Type = (HircType)chunk.ReadByte();
-            Size = chunk.ReadUInt32();
-            Id = chunk.ReadUInt32();
+            _itemList[type] = creator;
         }
 
-        protected void SkipToEnd(ByteChunk chunk, int startIndex)
+        public HircItem CreateInstance(HircType type)
         {
-            chunk.Index = (int)(startIndex + Size);
+            if(_itemList.ContainsKey(type))
+                return _itemList[type]();
+            return new CAkUnknown();
         }
+
+        public static HircFactory CreateFactory(uint version)
+        {
+            switch (version)
+            {
+                case 112: return CreateFactory_v112();
+                case 122: return CreateFactory_v122();
+            }
+
+            throw new Exception("Unkown Version");
+        }
+
+        public static HircFactory CreateFactory_v112()
+        {
+            var instance = new HircFactory();
+            instance.RegisterHirc(HircType.Sound, () => new V122.CAkSound());
+            instance.RegisterHirc(HircType.Event, () => new V122.CAkEvent_v122());
+            instance.RegisterHirc(HircType.Action, () => new V122.CAkAction());
+            instance.RegisterHirc(HircType.SwitchContainer, () => new V122.CAkSwitchCntr());
+            instance.RegisterHirc(HircType.SequenceContainer, () => new V122.CAkRanSeqCnt());
+            instance.RegisterHirc(HircType.LayerContainer, () => new V122.CAkLayerCntr());
+            instance.RegisterHirc(HircType.Dialogue_Event, () => new V122.CAkDialogueEvent());
+            return instance;
+        }
+
+        public static HircFactory CreateFactory_v122()
+        {
+            var instance = new HircFactory();
+            instance.RegisterHirc(HircType.Sound, () => new V122.CAkSound());
+            instance.RegisterHirc(HircType.Event, () => new V122.CAkEvent_v122());
+            instance.RegisterHirc(HircType.Action, () => new V122.CAkAction());
+            instance.RegisterHirc(HircType.SwitchContainer, () => new V122.CAkSwitchCntr());
+            instance.RegisterHirc(HircType.SequenceContainer, () => new V122.CAkRanSeqCnt());
+            instance.RegisterHirc(HircType.LayerContainer, () => new V122.CAkLayerCntr());
+            instance.RegisterHirc(HircType.Dialogue_Event, () => new V122.CAkDialogueEvent());
+            return instance;
+        }
+
+
     }
 
     public class HircParser : IParser
@@ -35,48 +67,29 @@ namespace FileTypes.Sound.WWise.Hirc
         {
             var chunkSize = chunk.ReadUInt32();
             var numItems = chunk.ReadUInt32();
+            var failedItems = new List<uint>();
 
-            for (int i = 0; i < numItems; i++)
+            var factory = HircFactory.CreateFactory(soundDb.Header.dwBankGeneratorVersion);
+
+            for (uint i = 0; i < numItems; i++)
             {
                 var hircType = (HircType)chunk.PeakByte();
-                switch (hircType)
-                {
-                    case HircType.Sound:
-                        soundDb.Hircs.Add(CAkSound.Create(chunk));
-                        break;
-                    case HircType.Event:
-                        soundDb.Hircs.Add(CAkEvent.Create(chunk));
-                        break;
-                    case HircType.Action:
-                        soundDb.Hircs.Add(CAkAction.Create(chunk));
-                        break;
-                    case HircType.SwitchContainer:
-                        soundDb.Hircs.Add(CAkSwitchCntr.Create(chunk));
-                        break;
-                    case HircType.SequenceContainer:
-                        soundDb.Hircs.Add(CAkRanSeqCnt.Create(chunk));
-                        break;
-                    case HircType.LayerContainer:
-                        soundDb.Hircs.Add(CAkLayerCntr.Create(chunk));
-                        break;
-                    case HircType.Dialogue_Event:
 
-                        var start = chunk.Index;
-                        try
-                        {
-                            var item = CAkDialogueEvent.Create(chunk);
-                            soundDb.Hircs.Add(item);
-                        }
-                        catch
-                        {
-                            chunk.Index = start;
-                            soundDb.Hircs.Add(CAkUnknown.Create(chunk));
-                        }
-                     
-                        break;
-                    default:
-                        soundDb.Hircs.Add(CAkUnknown.Create(chunk));
-                        break;
+                var start = chunk.Index;
+                try
+                {
+                    var hircItem = factory.CreateInstance(hircType);
+                    hircItem.Parse(chunk);
+                    soundDb.Hircs.Add(hircItem);
+                }
+                catch (Exception e)
+                {
+                    failedItems.Add(i);
+                    chunk.Index = start;
+
+                    var unkInstance = new CAkUnknown() { ErrorMsg = e.Message};
+                    unkInstance.Parse(chunk);
+                    soundDb.Hircs.Add(unkInstance);
                 }
 
                 soundDb.Hircs.Last().IndexInFile = i;

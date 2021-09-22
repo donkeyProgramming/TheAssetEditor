@@ -73,9 +73,6 @@ Sound?
 ---------Next version
 
 v15
-	variantmeshes/variantmeshdefinitions/emp_wizard_light.variantmeshdefinition probability tag
-	Save anyway for xml veriantmesh not working
-
 	Improve frg editor! 
 	
 
@@ -87,22 +84,18 @@ v15
 	
 	vertexes not correct, check empire greatsword weapon (pvito issue for vertex, and bb)
 
-variantmeshes\wh_variantmodels\hu6\bst\bst_bestigors\torso\bst_bestigor_torso_01.rigid_model_v2
 ----
 
 
 Scale places - Mount tool 
 
 ---------
-Validation of variant mesh, exception, not error box on xml node exception
-I think pretty much all vmds should have those two entries, no? meta n entries
-vmp_master_necromancer_torso_02.rigid_model_v2 is the body I am working on texture crach
-Create link fom program to modding den
-imposter stuff variantmeshes\variantmeshdefinitions\chs_wyrd_spawn_left_side.variantmeshdefinition xml
+
+
 Create material file when missing  for generate ws model
-Update wiki with info on campagin tutorial 
+
 @h3ro  found the origin of the error I had before, if you put the same name in the three fields "animpack", "animbin" and "fragment" (even if you maintain the suffixes) the error appears
-Fix names in campagin bin xml
+
 Remap head of goblin to rat, eayes and ears gets fucked 
 campagin bin validation - path and skeleton
 Fix attachmentpoints for weapons inside wmds
@@ -114,20 +107,26 @@ Show in explorer
 Make empire spearmen work, shild not attached 
 
 
-        public float BlendInTime { get; set; } = 0;
-        public float SelectionWeight { get; set; } = 0;
-		Attile matched combat 
-		3k bin 
+
 
 
 Export N items to new animPack?
 TableName -> defauilt to animation_tables
 animPackName -> 
 
-OK | Close 
+
  
 
 
+Fix names in campagin bin xml (some at least)
+Vmd validation issues 
+Update wiki with info on campagin tutorial 
+Discord link
+SUper view v1 
+Texture loading crash
+Fixed some bone wieghting issues 
+Debugger view
+Static mesh props 
 
 
 

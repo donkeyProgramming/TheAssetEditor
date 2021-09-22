@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FileTypes.Sound.WWise.Hirc
+namespace FileTypes.Sound.WWise.Hirc.V122
 {
-    public class CAkDialogueEvent : HricItem
+    public class CAkDialogueEvent : HircItem
     {
 
         public byte uProbability;
@@ -15,22 +15,14 @@ namespace FileTypes.Sound.WWise.Hirc
         public byte uMode;
         public AkDecisionTree AkDecisionTree;
 
-        public static CAkDialogueEvent Create(ByteChunk chunk)
+        protected override void Create(ByteChunk chunk)
         {
-            // Start
-            var objectStartIndex = chunk.Index;
-
-            var dialog = new CAkDialogueEvent();
-            dialog.LoadCommon(chunk);
-            dialog.uProbability = chunk.ReadByte();
-            dialog.uTreeDepth = chunk.ReadUInt32();
-            dialog.ArgumentList = new ArgumentList(chunk, dialog.uTreeDepth);
-            dialog.uTreeDataSize = chunk.ReadUInt32();
-            dialog.uMode = chunk.ReadByte();
-            dialog.AkDecisionTree = new AkDecisionTree(chunk, dialog.uTreeDepth);
-
-            dialog.SkipToEnd(chunk, objectStartIndex + 5);
-            return dialog;
+            uProbability = chunk.ReadByte();
+            uTreeDepth = chunk.ReadUInt32();
+            ArgumentList = new ArgumentList(chunk, uTreeDepth);
+            uTreeDataSize = chunk.ReadUInt32();
+            uMode = chunk.ReadByte();
+            AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth);
         }
     }
 

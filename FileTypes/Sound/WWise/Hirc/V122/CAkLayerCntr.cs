@@ -3,33 +3,25 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FileTypes.Sound.WWise.Hirc
+namespace FileTypes.Sound.WWise.Hirc.V122
 {
-    public class CAkLayerCntr : HricItem
+    public class CAkLayerCntr : HircItem
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public Children Children { get; set; }
         public List<CAkLayer> LayerList { get; set; } = new List<CAkLayer>();
         public byte bIsContinuousValidation { get; set; }
 
-        public static CAkLayerCntr Create(ByteChunk chunk)
+        protected override void Create(ByteChunk chunk)
         {
-            // Start
-            var objectStartIndex = chunk.Index;
-
-            var switchCntr = new CAkLayerCntr();
-            switchCntr.LoadCommon(chunk);
-            switchCntr.NodeBaseParams = NodeBaseParams.Create(chunk);
-            switchCntr.Children = Children.Create(chunk);
+            NodeBaseParams = NodeBaseParams.Create(chunk);
+            Children = Children.Create(chunk);
 
             var layerCount = chunk.ReadUInt32();
             for (int i = 0; i < layerCount; i++)
-                switchCntr.LayerList.Add(CAkLayer.Create(chunk));
+                LayerList.Add(CAkLayer.Create(chunk));
 
-            switchCntr.bIsContinuousValidation = chunk.ReadByte();
-
-            switchCntr.SkipToEnd(chunk, objectStartIndex + 5);
-            return switchCntr;
+            bIsContinuousValidation = chunk.ReadByte();
         }
     }
 

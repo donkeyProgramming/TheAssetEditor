@@ -7,6 +7,6 @@ namespace FileTypes.Sound.WWise
     public class SoundDataBase
     {
         public BkhdHeader Header { get; set; }
-        public List<HricItem> Hircs { get; set; } = new List<HricItem>();
+        public List<HircItem> Hircs { get; set; } = new List<HircItem>();
     }
 }

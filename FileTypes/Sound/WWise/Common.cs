@@ -1,4 +1,7 @@
-﻿using Filetypes.ByteParsing;
+﻿using Common;
+using Filetypes.ByteParsing;
+using Newtonsoft.Json;
+using Serilog;
 using System;
 using System.Text;
 
@@ -8,6 +11,47 @@ namespace FileTypes.Sound.WWise
     interface IParser
     {
         void Parse(string fileName, ByteChunk chunk, SoundDataBase soundDb);
+    }
+
+    public abstract class HircItem
+    {
+        ILogger _logger = Logging.Create<HircItem>();
+
+        public string DisplayName { get; set; }
+        public string OwnerFile { get; set; }
+        public uint IndexInFile { get; set; }
+        public bool HasError { get; set; } = true;
+
+        public HircType Type { get; set; }
+        public uint Size { get; set; }
+        public uint Id { get; set; }
+
+        public void Parse(ByteChunk chunk)
+        {
+            try
+            {
+                var objectStartIndex = chunk.Index;
+
+                Type = (HircType)chunk.ReadByte();
+                Size = chunk.ReadUInt32();
+                Id = chunk.ReadUInt32();
+
+                Create(chunk);
+
+                chunk.Index = (int)(objectStartIndex + 5 + Size);
+                HasError = false;
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error("Failed to parse object - " + e.Message);
+                var jsonStr = JsonConvert.SerializeObject(this, Formatting.Indented);
+                _logger.Here().Error("\n" + jsonStr);
+                throw;
+            }
+        }
+
+        protected abstract void Create(ByteChunk chunk);
+
     }
 
     public enum HircType : byte

@@ -1,27 +1,18 @@
 ﻿using Filetypes.ByteParsing;
 using System;
 
-namespace FileTypes.Sound.WWise.Hirc
+namespace FileTypes.Sound.WWise.Hirc.V122
 {
-    public class CAkSound : HricItem
+    public class CAkSound : HircItem
     {
 
         public AkBankSourceData BankSourceData { get; set; }
         public NodeBaseParams NodeBaseParams { get; set; }
 
-        public static CAkSound Create(ByteChunk chunk)
+        protected override void Create(ByteChunk chunk)
         {
-            // Start
-            var objectStartIndex = chunk.Index;
-
-            var sound = new CAkSound();
-            sound.LoadCommon(chunk);
-            sound.BankSourceData = AkBankSourceData.Create(chunk);
-            sound.NodeBaseParams = NodeBaseParams.Create(chunk);
-
-            sound.SkipToEnd(chunk, objectStartIndex + 5);
-            return sound;
-
+            BankSourceData = AkBankSourceData.Create(chunk);
+            NodeBaseParams = NodeBaseParams.Create(chunk);
         }
     }
 

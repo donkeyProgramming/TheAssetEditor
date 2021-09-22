@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FileTypes.Sound.WWise.Hirc
+namespace FileTypes.Sound.WWise.Hirc.V122
 {
 
-    public class CAkSwitchCntr : HricItem
+    public class CAkSwitchCntr : HircItem
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public AkGroupType eGroupType { get; set; }
@@ -17,30 +17,23 @@ namespace FileTypes.Sound.WWise.Hirc
         public List<CAkSwitchPackage> SwitchList { get; set; } = new List<CAkSwitchPackage>();
         public List<AkSwitchNodeParams> Parameters { get; set; } = new List<AkSwitchNodeParams>();
 
-        public static CAkSwitchCntr Create(ByteChunk chunk)
+        protected override void Create(ByteChunk chunk)
         {
-            // Start
-            var objectStartIndex = chunk.Index;
-
-            var switchCntr = new CAkSwitchCntr();
-            switchCntr.LoadCommon(chunk);
-            switchCntr.NodeBaseParams = NodeBaseParams.Create(chunk);
-            switchCntr.eGroupType = (AkGroupType)chunk.ReadByte();
-            switchCntr.ulGroupID = chunk.ReadUInt32();
-            switchCntr.ulDefaultSwitch = chunk.ReadUInt32();
-            switchCntr.bIsContinuousValidation = chunk.ReadByte();
-            switchCntr.Children = Children.Create(chunk);
+            NodeBaseParams = NodeBaseParams.Create(chunk);
+            eGroupType = (AkGroupType)chunk.ReadByte();
+            ulGroupID = chunk.ReadUInt32();
+            ulDefaultSwitch = chunk.ReadUInt32();
+            bIsContinuousValidation = chunk.ReadByte();
+            Children = Children.Create(chunk);
 
             var switchListCount = chunk.ReadUInt32();
             for (int i = 0; i < switchListCount; i++)
-                switchCntr.SwitchList.Add(CAkSwitchPackage.Create(chunk));
+                SwitchList.Add(CAkSwitchPackage.Create(chunk));
 
             var paramCount = chunk.ReadUInt32();
             for (int i = 0; i < paramCount; i++)
-                switchCntr.Parameters.Add(AkSwitchNodeParams.Create(chunk));
+                Parameters.Add(AkSwitchNodeParams.Create(chunk));
 
-            switchCntr.SkipToEnd(chunk, objectStartIndex + 5);
-            return switchCntr;
         }
     }
 

@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FileTypes.Sound.WWise.Hirc
+namespace FileTypes.Sound.WWise.Hirc.V122
 {
 
-    public class CAkRanSeqCnt : HricItem
+    public class CAkRanSeqCnt : HircItem
     {
         public NodeBaseParams NodeBaseParams { get; set; }
  
@@ -25,40 +25,31 @@ namespace FileTypes.Sound.WWise.Hirc
         public Children Children { get; set; }
         public List<AkPlaylistItem> AkPlaylist { get; set; } = new List<AkPlaylistItem>();
 
-        // Playlist
-
-        public static CAkRanSeqCnt Create(ByteChunk chunk)
+        protected override void Create(ByteChunk chunk)
         {
-            // Start
-            var objectStartIndex = chunk.Index;
+            NodeBaseParams = NodeBaseParams.Create(chunk);
 
-            var ranSeqCnt = new CAkRanSeqCnt();
-            ranSeqCnt.LoadCommon(chunk);
-            ranSeqCnt.NodeBaseParams = NodeBaseParams.Create(chunk);
+            LoopCount = chunk.ReadUShort();
+            sLoopModMin = chunk.ReadUShort();
+            sLoopModMax = chunk.ReadUShort();
 
-            ranSeqCnt.LoopCount = chunk.ReadUShort();
-            ranSeqCnt.sLoopModMin = chunk.ReadUShort();
-            ranSeqCnt.sLoopModMax = chunk.ReadUShort();
+            fTransitionTime = chunk.ReadSingle();
+            fTransitionTimeModMin = chunk.ReadSingle();
+            fTransitionTimeModMax = chunk.ReadSingle();
 
-            ranSeqCnt.fTransitionTime = chunk.ReadSingle();
-            ranSeqCnt.fTransitionTimeModMin = chunk.ReadSingle();
-            ranSeqCnt.fTransitionTimeModMax = chunk.ReadSingle();
+            wAvoidRepeatCount = chunk.ReadUShort();
 
-            ranSeqCnt.wAvoidRepeatCount = chunk.ReadUShort();
+            eTransitionMode = chunk.ReadByte();
+            eRandomMode = chunk.ReadByte();
+            eMode = chunk.ReadByte();
+            byBitVector = chunk.ReadByte();
 
-            ranSeqCnt.eTransitionMode = chunk.ReadByte();
-            ranSeqCnt.eRandomMode = chunk.ReadByte();
-            ranSeqCnt.eMode = chunk.ReadByte();
-            ranSeqCnt.byBitVector = chunk.ReadByte();
-
-            ranSeqCnt.Children = Children.Create(chunk);
+            Children = Children.Create(chunk);
 
             var playListItemCount = chunk.ReadUShort();
             for (int i = 0; i < playListItemCount; i++)
-                ranSeqCnt.AkPlaylist.Add(AkPlaylistItem.Create(chunk));
+                AkPlaylist.Add(AkPlaylistItem.Create(chunk));
 
-            ranSeqCnt.SkipToEnd(chunk, objectStartIndex + 5);
-            return ranSeqCnt;
         }
     }
 
