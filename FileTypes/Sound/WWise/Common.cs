@@ -45,7 +45,7 @@ namespace FileTypes.Sound.WWise
             {
                 _logger.Here().Error("Failed to parse object - " + e.Message);
                 var jsonStr = JsonConvert.SerializeObject(this, Formatting.Indented);
-                _logger.Here().Error("\n" + jsonStr);
+                _logger.Here().Error("\n" + "\n" + Type + jsonStr);
                 throw;
             }
         }

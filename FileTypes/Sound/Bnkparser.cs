@@ -3,6 +3,7 @@ using FileTypes.PackFiles.Models;
 using FileTypes.Sound.WWise;
 using FileTypes.Sound.WWise.Bkhd;
 using FileTypes.Sound.WWise.Hirc;
+using FileTypes.Sound.WWise.Stid;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,10 +23,13 @@ namespace FileTypes.Sound
             var parsers = new Dictionary<string, IParser>();
             parsers["BKHD"] = new BkhdParser();
             parsers["HIRC"] = new HircParser();
+            parsers["STID"] = new StidParser();
 
             while (chunk.BytesLeft != 0)
             {
                 var cc4 = Encoding.UTF8.GetString(chunk.ReadBytes(4));
+                if(cc4 == "\0\0\0\0")
+                    cc4 = Encoding.UTF8.GetString(chunk.ReadBytes(4));
                 parsers[cc4].Parse(file.Name, chunk, soundDb);
             }
 

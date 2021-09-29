@@ -2,7 +2,7 @@
 
 namespace FileTypes.Sound.WWise.Hirc.V122
 {
-    public class CAkAction : HircItem
+    public class CAkAction_V122 : CAkAction
     {
         public ActionType ActionType { get; set; }
         public uint SoundId { get; set; }
@@ -12,5 +12,8 @@ namespace FileTypes.Sound.WWise.Hirc.V122
             ActionType = (ActionType) chunk.ReadUShort();
             SoundId = chunk.ReadUInt32();
         }
+
+        public override ActionType GetActionType() => ActionType;
+        public override uint GetSoundId() => SoundId;
     }
 }

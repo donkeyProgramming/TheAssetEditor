@@ -3,17 +3,19 @@ using System;
 
 namespace FileTypes.Sound.WWise.Hirc.V122
 {
-    public class CAkSound : HircItem
+    public class CAkSound_V122 : CAkSound
     {
-
-        public AkBankSourceData BankSourceData { get; set; }
+        public AkBankSourceData AkBankSourceData { get; set; }
         public NodeBaseParams NodeBaseParams { get; set; }
 
         protected override void Create(ByteChunk chunk)
         {
-            BankSourceData = AkBankSourceData.Create(chunk);
+            AkBankSourceData = AkBankSourceData.Create(chunk);
             NodeBaseParams = NodeBaseParams.Create(chunk);
         }
+
+        public override uint GetParentId() => AkBankSourceData.akMediaInformation.SourceId;
+        public override uint GetSourceId() => NodeBaseParams.DirectParentID;
     }
 
     public class AkBankSourceData

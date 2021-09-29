@@ -16,7 +16,7 @@ namespace FileTypes.PackFiles.Models
         ILogger _logger = Logging.Create<PackFileContainer>();
 
         public string Name { get; set; }
-
+        public uint OriginalSize { get; set; }
         public PFHeader Header { get; set; }
         public bool IsCaPackFile { get; set; } = false;
         public string SystemFilePath { get; set; }

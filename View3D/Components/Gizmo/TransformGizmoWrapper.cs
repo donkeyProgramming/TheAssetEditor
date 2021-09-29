@@ -62,7 +62,7 @@ namespace View3D.Components.Gizmo
         {
             if (_activeCommand != null)
             {
-                    MessageBox.Show("Transform debug check - Please inform the creator of the tool that you got this message. Would also love it if you tried undoing your last command to see if that works..\n E-001");
+                 //   MessageBox.Show("Transform debug check - Please inform the creator of the tool that you got this message. Would also love it if you tried undoing your last command to see if that works..\n E-001");
                 _activeCommand.InvertWindingOrder = _invertedWindingOrder;
                 _activeCommand.Transform = _totalGizomTransform;
                 _activeCommand.PivotPoint = Position;

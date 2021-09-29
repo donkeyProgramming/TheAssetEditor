@@ -3,6 +3,7 @@ using CommonControls.Common;
 using Filetypes.ByteParsing;
 using FileTypes.DB;
 using FileTypes.MetaData;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,6 +13,7 @@ namespace CommonControls.Editors.AnimMeta
 {
     public class MetaDataTagItemViewModel : NotifyPropertyChangedImpl
     {
+        ILogger _logger = Logging.Create<MetaDataTagItemViewModel>();
         IMetaEntry _originalItem;
 
         public ObservableCollection<EditableTagItem> Variables { get; set; } = new ObservableCollection<EditableTagItem>();
@@ -49,7 +51,17 @@ namespace CommonControls.Editors.AnimMeta
 
                 if (field.Name.Contains("orientation", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    OrientationEditableTagItem item = new OrientationEditableTagItem(ByteParsers.Vector4, byteValue)
+                    var item = new OrientationEditableTagItem(ByteParsers.Vector4, byteValue)
+                    {
+                        Description = field.Description,
+                        FieldName = $"[{counter + 1}] {field.Name} - { field.Type}",
+                        ValueType = field.Type.ToString(),
+                    };
+                    output.Add(item);
+                }
+                else if (field.Type == DbTypesEnum.Vector3)
+                {
+                    var item = new Vector3EditableTagItem(ByteParsers.Vector3, byteValue)
                     {
                         Description = field.Description,
                         FieldName = $"[{counter + 1}] {field.Name} - { field.Type}",
@@ -88,6 +100,7 @@ namespace CommonControls.Editors.AnimMeta
 
         internal MetaDataTagItem GetAsData()
         {
+            _logger.Here().Information("Start " + DisplayName.Value);
             var newItem = new MetaDataTagItem()
             {
                 Name = _originalItem.Name,
@@ -96,19 +109,32 @@ namespace CommonControls.Editors.AnimMeta
 
             if (!IsDecodedCorrectly.Value)
             {
+                _logger.Here().Information("Creating from original data");
                 if (_originalItem == null)
+                {
+                    _logger.Here().Error("Data missing!");
                     throw new Exception("_originalItem is null and IsDecodedCorrectly is false");
+                }
 
+                _logger.Here().Information("Getting data");
                 var data = _originalItem.GetData();
+                _logger.Here().Information("Creating tag. Length=" + data.Length);
                 var copy = new MetaDataTagItem.TagData(data, 0, data.Length);
                 newItem.DataItem = copy;
                 return newItem;
             }
 
+            _logger.Here().Information("Getting variables");
             var byteList = new List<byte[]>();
             foreach (var variable in Variables)
-                byteList.Add(variable.GetByteValue());
+            {
+                _logger.Here().Information(variable.FieldName + " " + variable.ValueAsString);
+                var bytes = variable.GetByteValue();
+                _logger.Here().Information(variable.FieldName + " " + variable.ValueAsString + " {" + bytes.Length + "}");
+                byteList.Add(bytes);
+            }
 
+            _logger.Here().Information("Creating byte array");
             var totalCount = byteList.Sum(x => x.Length);
             var byteArray = new byte[totalCount];
 
@@ -119,8 +145,11 @@ namespace CommonControls.Editors.AnimMeta
                 currentByte += byteItem.Length;
             }
 
+            _logger.Here().Information("Creating tag. Length=" + totalCount);
             var instance = new MetaDataTagItem.TagData(byteArray, 0, totalCount);
             newItem.DataItem = instance;
+
+            _logger.Here().Information("Done");
             return newItem;
         }
     }

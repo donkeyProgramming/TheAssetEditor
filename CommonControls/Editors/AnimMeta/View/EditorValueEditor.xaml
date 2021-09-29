@@ -61,6 +61,32 @@
                     </DockPanel>
                 </DataTemplate>
 
+                <DataTemplate DataType="{ x:Type tags:Vector3EditableTagItem}">
+                    <DockPanel LastChildFill="true">
+                        <DockPanel DockPanel.Dock="Top">
+                            <Label FontWeight="bold" Content="Field Name"  Width ="{StaticResource labelWidth}"/>
+                            <Label FontWeight="bold"  Content=":"/>
+                            <Label FontWeight="bold"  Content="{Binding FieldName, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DockPanel>
+
+                        <DockPanel DockPanel.Dock="Top">
+                            <Label Content="Description"  Width ="{StaticResource labelWidth}"/>
+                            <Label Content=":"/>
+                            <Viewbox StretchDirection="DownOnly" Stretch="Fill" HorizontalAlignment="Left">
+                                <TextBlock TextWrapping="Wrap" VerticalAlignment="Stretch" HorizontalAlignment="Left" Width="700" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Viewbox>
+                        </DockPanel>
+
+                        <DockPanel DockPanel.Dock="Top">
+                            <Label Content="Value"  Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
+                            <Label Content=":"  DockPanel.Dock="Left"/>
+                            <mathviews:Vector3View VerticalContentAlignment="Center" Vector3="{Binding Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Background="{Binding IsValid, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ColourConverter}}" MinWidth="300" MaxWidth="300" HorizontalAlignment="Left"/>
+                        </DockPanel>
+
+                        <Border BorderThickness="1" Margin="2" BorderBrush="DarkGray"/>
+                    </DockPanel>
+                </DataTemplate>
+
                 <DataTemplate DataType="{ x:Type tags:EditableTagItem}">
                     <DockPanel LastChildFill="true">
                         <DockPanel DockPanel.Dock="Top">

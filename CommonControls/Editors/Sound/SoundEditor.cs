@@ -57,17 +57,20 @@ namespace CommonControls.Editors.Sound
             return files;
         }
 
-      
-
         NameLookupHelper GetNameHelper(List<PackFile> files)
         {
             var masterDat = new SoundDatFile();
             var datPackFiles = _pfs.FindAllWithExtention(".dat");
+
             foreach (var datPackFile in datPackFiles)
             {
-                var datFile = DatParser.Parse(datPackFile); ;
+                var datFile = DatParser.Parse(datPackFile, false);
                 masterDat.Merge(datFile);
             }
+            
+            var attillaFile = new PackFile(Path.GetFileName(@"Event_data.dat"), new FileSystemSource(@"C:\temp\SoundTesting\Attila\event_data.dat"));
+            var attilaDatFile = DatParser.Parse(attillaFile, true);
+            masterDat.Merge(attilaDatFile);
 
             var fileNameDump0 = files.Select(x => x.Name);
             var fileNameDump1 = files.Select(x => Path.GetFileNameWithoutExtension(x.Name));
@@ -140,16 +143,25 @@ namespace CommonControls.Editors.Sound
             var currentFile = 0;
             foreach (var file in files)
             {
-                var localDb = Bnkparser.Parse(file);
-                var eventCount = localDb.Hircs.Count(x => x.Type == HircType.Event);
-                var dialogEventCount = localDb.Hircs.Count(x => x.Type == HircType.Dialogue_Event);
+                try
+                {
+                    var localDb = Bnkparser.Parse(file);
+                    var eventCount = localDb.Hircs.Count(x => x.Type == HircType.Event);
+                    var dialogEventCount = localDb.Hircs.Count(x => x.Type == HircType.Dialogue_Event);
 
-                var fileOutputStr = $"{file.Name} NumEvents:{eventCount} NumDialogEvents: {dialogEventCount}";  // Some kind of failed items/unsupporeted item log as well
-                fileRoot.AddChild(fileOutputStr);
+                    var fileOutputStr = $"{file.Name} NumEvents:{eventCount} NumDialogEvents: {dialogEventCount}";  // Some kind of failed items/unsupporeted item log as well
+                    fileRoot.AddChild(fileOutputStr);
 
-                masterDb.AddHircItems(localDb.Hircs);
+                    masterDb.AddHircItems(localDb.Hircs);
 
-                _logger.Here().Information($"{currentFile}/{files.Count} {fileOutputStr}");
+                    _logger.Here().Information($"{currentFile}/{files.Count} {fileOutputStr}");
+                }
+                catch (Exception e)
+                {
+                    _logger.Here().Information($"{currentFile}/{files.Count} {file.Name} Error:{e.Message}");
+                    fileRoot.AddChild($"{file.Name} Error:{e.Message}");
+                }
+
                 currentFile++;
             }
 
@@ -162,37 +174,41 @@ namespace CommonControls.Editors.Sound
         {
             for(int fileIndex = 0; fileIndex < files.Count; fileIndex++)
             {
-                var soundDb = Bnkparser.Parse(files[fileIndex]);
-
-                var events = soundDb.Hircs
-                    .Where(x => x.Type == HircType.Event || x.Type == HircType.Dialogue_Event)
-                    .Where(x=> x.HasError == false);
-
-                var fileNodeOutputStr = $"{files[fileIndex].Name} Total EventCount:{events}";
-                _logger.Here().Information($"{fileIndex}/{files.Count} {fileNodeOutputStr}");
-
-                var fileOutput = parent.AddChild(fileNodeOutputStr);
-                var fileOutputError = fileOutput.AddChild("Errors while parsing :");
-                bool procesedCorrectly = true;
-
-                var itemsProcessed = 0;
-                foreach (var currentEvent in events)
+                try
                 {
-                    var visualEvent = new EventHierarchy(currentEvent, masterDb, nameHelper, fileOutput, fileOutputError, files[fileIndex].Name);
+                    var soundDb = Bnkparser.Parse(files[fileIndex]);
 
-                    if (itemsProcessed % 100 == 0 && itemsProcessed != 0)
+                    var events = soundDb.Hircs
+                        .Where(x => x.Type == HircType.Event || x.Type == HircType.Dialogue_Event)
+                        .Where(x => x.HasError == false);
+
+                    var fileNodeOutputStr = $"{files[fileIndex].Name} Total EventCount:{events.Count()}";
+                    _logger.Here().Information($"{fileIndex}/{files.Count} {fileNodeOutputStr}");
+
+                    var fileOutput = parent.AddChild(fileNodeOutputStr);
+                    var fileOutputError = fileOutput.AddChild("Errors while parsing :");
+                    bool procesedCorrectly = true;
+
+                    var itemsProcessed = 0;
+                    foreach (var currentEvent in events)
+                    {
+                        var visualEvent = new EventHierarchy(currentEvent, masterDb, nameHelper, fileOutput, fileOutputError, files[fileIndex].Name);
+
+                        if (itemsProcessed % 100 == 0 && itemsProcessed != 0)
+                            _logger.Here().Information($"\t{itemsProcessed}/{events} events processsed [{timer.Elapsed.TotalSeconds}s]");
+
+                        itemsProcessed++;
+                        procesedCorrectly = visualEvent.ProcesedCorrectly && procesedCorrectly;
+                    }
+
+                    if (procesedCorrectly == true)
+                        fileOutput.Children.Remove(fileOutputError);
+
+                    if (events.Any())
                         _logger.Here().Information($"\t{itemsProcessed}/{events} events processsed [{timer.Elapsed.TotalSeconds}s]");
-                    
-                    itemsProcessed++;
-                    procesedCorrectly = visualEvent.ProcesedCorrectly && procesedCorrectly;
                 }
-
-              
-                if (procesedCorrectly == true)
-                    fileOutput.Children.Remove(fileOutputError);
-
-                if (events.Any())
-                    _logger.Here().Information($"\t{itemsProcessed}/{events} events processsed [{timer.Elapsed.TotalSeconds}s]");
+                catch
+                { }
             }
         }
 
@@ -206,11 +222,11 @@ namespace CommonControls.Editors.Sound
             statsNode.AddChild($"Num wem Files = {numWemFiles.Count}");
             statsNode.AddChild($"References wem Files = {masterDb.ReferensedSounds.Distinct().Count()}");
             statsNode.AddChild($"Unknown hirc types = {string.Join(",", unknowTypeInfo)}");
-             
         }
 
         public void CreateSoundMap()
         {
+            return;
             var files = GetPackFileFiles();
             //var files = GetAttilaFiles();
             var nameHelper = GetNameHelper(files);
@@ -222,6 +238,8 @@ namespace CommonControls.Editors.Sound
             var statsNode = rootOutput.AddChild("Stats");
             //files = OnlyParseOneFile_debug(files, "battle_advice__core.bnk");
             //files = OnlyParseOneFile_debug(files, "battle_advice.bnk"); // Attila
+            //files = OnlyParseOneFile_debug(files, "battle_animation.bnk"); // Attila
+            
 
             files = RemoveUnwantedFiles(files, rootOutput, timer);
             var masterDb = BuildMasterDb(files, rootOutput, timer);

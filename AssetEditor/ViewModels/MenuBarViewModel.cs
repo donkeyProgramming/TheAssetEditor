@@ -57,6 +57,7 @@ namespace AssetEditor.ViewModels
         public ICommand OpenPropCreatorCommand { get; set; }
         public ICommand OpenAnimationTransferToolCommand { get; set; }
         public ICommand OpenSuperViewToolCommand { get; set; }
+        public ICommand OpenTechSkeletonEditorCommand { get; set; }
         public IEditorCreator EditorCreator { get; set; }
 
         public MenuBarViewModel(IServiceProvider provider, PackFileService packfileService, ToolFactory toolFactory)
@@ -75,6 +76,7 @@ namespace AssetEditor.ViewModels
             OpenCampaignAnimCreatorCommand = new RelayCommand(OpenCampaignAnimCreatorEditor);
             OpenAnimationTransferToolCommand = new RelayCommand(OpenAnimationTransferTool);
             OpenSuperViewToolCommand = new RelayCommand(OpenSuperViewTool);
+            OpenTechSkeletonEditorCommand = new RelayCommand(OpenTechSkeletonEditor);
 
             OpenRome2RePacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Rome_2_Remastered));
             OpenThreeKingdomsPacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.ThreeKingdoms));
@@ -181,5 +183,11 @@ namespace AssetEditor.ViewModels
             var editorView = _toolFactory.CreateEditorViewModel<SuperViewViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }     
+
+        void OpenTechSkeletonEditor()
+        {
+            var editorView = _toolFactory.CreateEditorViewModel<SuperViewViewModel>();
+            EditorCreator.CreateEmptyEditor(editorView);
+        }
     }
 }

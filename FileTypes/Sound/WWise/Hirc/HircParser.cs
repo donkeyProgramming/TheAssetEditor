@@ -32,29 +32,30 @@ namespace FileTypes.Sound.WWise.Hirc
             throw new Exception("Unkown Version");
         }
 
-        public static HircFactory CreateFactory_v112()
+        public static HircFactory CreateFactory_v122()
         {
             var instance = new HircFactory();
-            instance.RegisterHirc(HircType.Sound, () => new V122.CAkSound());
+            instance.RegisterHirc(HircType.Sound, () => new V122.CAkSound_V122());
             instance.RegisterHirc(HircType.Event, () => new V122.CAkEvent_v122());
-            instance.RegisterHirc(HircType.Action, () => new V122.CAkAction());
+            instance.RegisterHirc(HircType.Action, () => new V122.CAkAction_V122());
             instance.RegisterHirc(HircType.SwitchContainer, () => new V122.CAkSwitchCntr());
-            instance.RegisterHirc(HircType.SequenceContainer, () => new V122.CAkRanSeqCnt());
+            instance.RegisterHirc(HircType.SequenceContainer, () => new V122.CAkRanSeqCnt_V122());
             instance.RegisterHirc(HircType.LayerContainer, () => new V122.CAkLayerCntr());
             instance.RegisterHirc(HircType.Dialogue_Event, () => new V122.CAkDialogueEvent());
             return instance;
         }
 
-        public static HircFactory CreateFactory_v122()
+        public static HircFactory CreateFactory_v112()
         {
             var instance = new HircFactory();
-            instance.RegisterHirc(HircType.Sound, () => new V122.CAkSound());
-            instance.RegisterHirc(HircType.Event, () => new V122.CAkEvent_v122());
-            instance.RegisterHirc(HircType.Action, () => new V122.CAkAction());
-            instance.RegisterHirc(HircType.SwitchContainer, () => new V122.CAkSwitchCntr());
-            instance.RegisterHirc(HircType.SequenceContainer, () => new V122.CAkRanSeqCnt());
-            instance.RegisterHirc(HircType.LayerContainer, () => new V122.CAkLayerCntr());
-            instance.RegisterHirc(HircType.Dialogue_Event, () => new V122.CAkDialogueEvent());
+            instance.RegisterHirc(HircType.Sound, () => new V112.CAkSound_V112());
+            instance.RegisterHirc(HircType.Event, () => new V112.CAkEvent_v112());
+            instance.RegisterHirc(HircType.Action, () => new V112.CAkAction_v112());
+            instance.RegisterHirc(HircType.SwitchContainer, () => new V112.CAkSwitchCntr_V112());
+            instance.RegisterHirc(HircType.SequenceContainer, () => new V112.CAkRanSeqCnt_V112());
+
+            //instance.RegisterHirc(HircType.LayerContainer, () => new V122.CAkLayerCntr());
+            //instance.RegisterHirc(HircType.Dialogue_Event, () => new V122.CAkDialogueEvent());
             return instance;
         }
 
@@ -79,6 +80,8 @@ namespace FileTypes.Sound.WWise.Hirc
                 try
                 {
                     var hircItem = factory.CreateInstance(hircType);
+                    hircItem.IndexInFile = i;
+                    hircItem.OwnerFile = fileName;
                     hircItem.Parse(chunk);
                     soundDb.Hircs.Add(hircItem);
                 }
@@ -87,13 +90,12 @@ namespace FileTypes.Sound.WWise.Hirc
                     failedItems.Add(i);
                     chunk.Index = start;
 
-                    var unkInstance = new CAkUnknown() { ErrorMsg = e.Message};
+                    var unkInstance = new CAkUnknown() { ErrorMsg = e.Message, IndexInFile = i, OwnerFile = fileName};
                     unkInstance.Parse(chunk);
                     soundDb.Hircs.Add(unkInstance);
                 }
 
-                soundDb.Hircs.Last().IndexInFile = i;
-                soundDb.Hircs.Last().OwnerFile = fileName;
+
             }
         }
     }

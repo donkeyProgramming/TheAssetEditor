@@ -8,7 +8,7 @@ using System.Text;
 
 namespace AnimationEditor.SuperView
 {
-    class ModelViewModel : NotifyPropertyChangedImpl
+    /*class ModelViewModel : NotifyPropertyChangedImpl
     {
         PackFileService _pfs;
 
@@ -71,5 +71,5 @@ namespace AnimationEditor.SuperView
             MeshViewModel.BrowseMesh();
         }
     
-    }
+    }*/
 }

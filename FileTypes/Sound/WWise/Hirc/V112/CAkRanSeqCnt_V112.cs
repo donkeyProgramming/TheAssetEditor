@@ -1,12 +1,13 @@
 ﻿using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
-namespace FileTypes.Sound.WWise.Hirc.V122
+namespace FileTypes.Sound.WWise.Hirc.V112
 {
 
-    public class CAkRanSeqCnt : HircItem
+    public class CAkRanSeqCnt_V112 : CAkRanSeqCnt
     {
         public NodeBaseParams NodeBaseParams { get; set; }
  
@@ -51,6 +52,9 @@ namespace FileTypes.Sound.WWise.Hirc.V122
                 AkPlaylist.Add(AkPlaylistItem.Create(chunk));
 
         }
+
+        public override uint GetParentId() => NodeBaseParams.DirectParentID;
+        public override List<uint> GetChildren() => AkPlaylist.Select(x=>x.PlayId).ToList();
     }
 
 

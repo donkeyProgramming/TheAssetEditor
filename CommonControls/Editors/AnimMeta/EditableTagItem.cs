@@ -4,6 +4,7 @@ using CommonControls.MathViews;
 using Filetypes.ByteParsing;
 using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Xna.Framework;
+using Serilog;
 using System.Windows;
 using System.Windows.Input;
 
@@ -11,6 +12,8 @@ namespace CommonControls.Editors.AnimMeta
 {
     public class EditableTagItem : NotifyPropertyChangedImpl
     {
+        ILogger _logger = Logging.Create<EditableTagItem>();
+
         byte[] _originalByteValue;
         IByteParser _parser { get; set; }
 
@@ -38,13 +41,17 @@ namespace CommonControls.Editors.AnimMeta
 
         public virtual byte[] GetByteValue()
         {
-            return _parser.Encode(ValueAsString, out _);
+            _logger.Here().Information($"GetByteValue=>{FieldName} {_parser} {ValueAsString}");
+            var value = _parser.Encode(ValueAsString, out var error);
+            _logger.Here().Information($"GetByteValue Complete=>{value?.Length} {error}");
+            return value;
         }
     }
 
 
     public class OrientationEditableTagItem : EditableTagItem
     {
+        ILogger _logger = Logging.Create<OrientationEditableTagItem>();
         public Vector3ViewModel Value { get; set; } = new Vector3ViewModel(0);
 
         Vector4Parser _parser;
@@ -66,17 +73,48 @@ namespace CommonControls.Editors.AnimMeta
 
         public override byte[] GetByteValue()
         {
+            _logger.Here().Information($"GetByteValue Orientation=>{FieldName} {_parser} {ValueAsString} {Value}");
+
             var vector3 = Value.GetAsVector3();
-
-
             var value = MathUtil.FromAxisAngleDegrees(vector3);
             value.Normalize();
-
-
-            var test = MathUtil.ToAxisAngleDegrees(value);
-
+            _logger.Here().Information($"GetByteValue Orientation=>Vector computed");
 
             var bytes = _parser.EncodeValue(value.ToVector4(), out var err);
+       
+            _logger.Here().Information($"GetByteValue Complete=>{bytes?.Length} {err}");
+
+            return bytes;
+        }
+    }
+
+    public class Vector3EditableTagItem : EditableTagItem
+    {
+        ILogger _logger = Logging.Create<OrientationEditableTagItem>();
+        public Vector3ViewModel Value { get; set; } = new Vector3ViewModel(0);
+
+        Vector3Parser _parser;
+
+        public Vector3EditableTagItem(Vector3Parser parser, byte[] value) : base(parser, value)
+        {
+            _parser = parser;
+
+            if (parser.TryDecodeValue(value, 0, out var vector3, out var _, out var err))
+                Value.Set(vector3);
+            else
+                IsValid = false;
+        }
+
+        public override byte[] GetByteValue()
+        {
+            _logger.Here().Information($"GetByteValue Vector3=>{FieldName} {_parser} {ValueAsString} {Value}");
+
+            var vector3 = Value.GetAsVector3();
+            _logger.Here().Information($"GetByteValue Vector3=>Vector computed");
+
+            var bytes = _parser.EncodeValue(vector3, out var err);
+            _logger.Here().Information($"GetByteValue Complete=>{bytes?.Length} {err}");
+
             return bytes;
         }
     }

@@ -12,8 +12,8 @@ namespace FileTypes.Sound.WWise.Bkhd
             var bkdh = new BkhdHeader()
             {
                 OwnerFileName = fileName,
-
                 Size = chunk.ReadUInt32(),
+
                 dwBankGeneratorVersion = chunk.ReadUInt32(),
                 dwSoundBankID = chunk.ReadUInt32(),
                 dwLanguageID = chunk.ReadUInt32(),

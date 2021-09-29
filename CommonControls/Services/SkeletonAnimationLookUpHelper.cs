@@ -72,6 +72,7 @@ namespace CommonControls.Services
 
         public List<string> GetAllSkeletonNames()
         {
+
             return SkeletonFileNames.Select(x => Path.GetFileNameWithoutExtension(x)).ToList();
         }
 
@@ -89,9 +90,10 @@ namespace CommonControls.Services
                 if (name.Contains(skeletonName))
                 {
                     var fullName = Path.GetFileNameWithoutExtension(name);
+                    var lookUpFullName = Path.GetFileNameWithoutExtension(skeletonName); 
 
                     var file = pfs.FindFile(name);
-                    if (file != null && fullName == skeletonName)
+                    if (file != null && fullName == lookUpFullName)
                     {
                         // Make sure its not a tech skeleton
                         if(pfs.GetFullPath(file).Contains("tech") == false)

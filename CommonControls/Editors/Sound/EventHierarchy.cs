@@ -80,16 +80,16 @@ namespace CommonControls.Editors.Sound
 
         void ProcessChild(CAkAction item, VisualEventOutputNode currentNode)
         {
-            var node = currentNode.AddChild($"CAkAction ActionType:[{item.ActionType}] \tId:[{item.Id}] ownerFile:[{item.OwnerFile}|{item.IndexInFile}]");
+            var node = currentNode.AddChild($"CAkAction ActionType:[{item.GetActionType()}] \tId:[{item.Id}] ownerFile:[{item.OwnerFile}|{item.IndexInFile}]");
 
-            var actionRefs = _db.GetHircObject(item.SoundId, _ownerFileName, _errorNode);
+            var actionRefs = _db.GetHircObject(item.GetSoundId(), _ownerFileName, _errorNode);
             ProcessChildrenOfNode(actionRefs, node);
         }
 
         void ProcessChild(CAkSound item, VisualEventOutputNode currentNode)
         {
-            currentNode.AddChild($"CAkSound {item.BankSourceData.akMediaInformation.SourceId}.wem \tId:[{item.Id}] \tParentId:[{item.NodeBaseParams.DirectParentID}] ownerFile:[{item.OwnerFile}|{item.IndexInFile}]");
-            _db.ReferensedSounds.Add(item.BankSourceData.akMediaInformation.SourceId);
+            currentNode.AddChild($"CAkSound {item.GetSourceId()}.wem \tId:[{item.Id}] \tParentId:[{item.GetParentId()}] ownerFile:[{item.OwnerFile}|{item.IndexInFile}]");
+            _db.ReferensedSounds.Add(item.GetSourceId());
         }
 
         void ProcessChild(CAkSwitchCntr item, VisualEventOutputNode currentNode)
@@ -121,11 +121,11 @@ namespace CommonControls.Editors.Sound
 
         void ProcessChild(CAkRanSeqCnt item, VisualEventOutputNode currentNode)
         {
-            var node = currentNode.AddChild($"CAkRanSeqCnt \tId:[{item.Id}] \tParentId:[{item.NodeBaseParams.DirectParentID}] ownerFile:[{item.OwnerFile}|{item.IndexInFile}]" );
-
-            foreach (var playListItem in item.AkPlaylist)
+            var node = currentNode.AddChild($"CAkRanSeqCnt \tId:[{item.Id}] \tParentId:[{item.GetParentId()}] ownerFile:[{item.OwnerFile}|{item.IndexInFile}]" );
+            var children = item.GetChildren();
+            foreach (var child in children)
             {
-                var playListRefs = _db.GetHircObject(playListItem.PlayId, _ownerFileName, _errorNode);
+                var playListRefs = _db.GetHircObject(child, _ownerFileName, _errorNode);
                 ProcessChildrenOfNode(playListRefs, node);
             }
         }

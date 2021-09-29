@@ -6,7 +6,9 @@ using FileTypes.DB;
 using FileTypes.MetaData;
 using FileTypes.PackFiles.Models;
 using GalaSoft.MvvmLight.CommandWpf;
+using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
@@ -17,6 +19,8 @@ namespace CommonControls.Editors.AnimMeta
 {
     public class EditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
+        ILogger _logger = Logging.Create<EditorViewModel>();
+
         PackFileService _pf;
         SchemaManager _schemaManager;
         MetaDataFile _metaDataFile;
@@ -139,13 +143,26 @@ namespace CommonControls.Editors.AnimMeta
                 }
             }
 
-            var bytes =  MetaDataFileParser.GenerateBytes(_metaDataFile.Version, Tags.Select(x=>x.GetAsData()));
+            _logger.Here().Information("Creating metadata file. TagCount=" + Tags.Count + " " + path);
+            var tagDataItems = new List<MetaDataTagItem>();
+
+            foreach (var tag in Tags)
+            {
+                _logger.Here().Information("Prosessing tag " + tag?.DisplayName?.Value);
+                tagDataItems.Add(tag.GetAsData());
+            }
+
+            _logger.Here().Information("Generating bytes");
+            var bytes =  MetaDataFileParser.GenerateBytes(_metaDataFile.Version, tagDataItems);
+            _logger.Here().Information("Saving");
             var res = SaveHelper.Save(_pf, path, null, bytes);
             if (res != null)
             {
                 _file = res;
                 DisplayName = _file.Name;
             }
+
+            _logger.Here().Information("Creating metadata file complete");
             return _file != null;
         }
     }
