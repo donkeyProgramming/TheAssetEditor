@@ -1,0 +1,74 @@
+﻿<UserControl x:Class="AnimationEditor.TechSkeletonEditor.EditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AnimationEditor.TechSkeletonEditor"
+             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors" 
+             xmlns:s="http://schemas.singulink.com/xaml"
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel>
+        <Button Content="Load Skeleton" Click="{s:MethodBinding LoadSkeleton}"/>
+
+        <Grid Margin="0,5,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <CheckBox  Grid.Column="0" IsChecked="{Binding ShowSkeleton, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/>
+            <TextBlock  Grid.Column="1" Text="{Binding SkeletonName.Value, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
+        
+        </Grid>
+
+
+        <TreeView ItemsSource="{Binding Bones, UpdateSourceTrigger=PropertyChanged}" MaxHeight="400">
+            <b:Interaction.Behaviors>
+                <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedBone, Mode=TwoWay}" />
+            </b:Interaction.Behaviors>
+
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsExpanded" Value="True" />
+                </Style>
+            </TreeView.ItemContainerStyle>
+            <TreeView.ItemTemplate >
+                <HierarchicalDataTemplate ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding BoneName, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text=" - "></TextBlock>
+                        <TextBlock Text="{Binding BoneIndex, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+
+        <TextBlock Text="{Binding SelectedNodeName.Value, UpdateSourceTrigger=PropertyChanged}"/>
+        
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+        
+            <Label      Grid.Row="0" Grid.Column="0" Content="Translation"/>
+            <Label      Grid.Row="0" Grid.Column="1" Content=":"/>
+            <mathviews:Vector3View Grid.Row="0" Grid.Column="3" VerticalContentAlignment="Center" Vector3="{Binding SelectedBoneTranslationOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+            <Label      Grid.Row="1" Grid.Column="0" Content="Rotation"/>
+            <Label      Grid.Row="1" Grid.Column="1" Content=":"/>
+            <mathviews:Vector3View Grid.Row="1" Grid.Column="3" VerticalContentAlignment="Center" Vector3="{Binding SelectedBoneRotationOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+        </Grid>
+
+        <Button Content="Save" Click="{s:MethodBinding Save}"/>
+    </StackPanel>
+</UserControl>

@@ -44,46 +44,9 @@ namespace AnimationEditor.Common.ReferenceModel
                 return;
 
             BoneCount = skeleton.BoneCount;
-            for (int i = 0; i < skeleton.BoneCount; i++)
-            {
-                var parentBoneId = skeleton.GetParentBone(i);
-                if (parentBoneId == -1)
-                {
-                    Bones.Add(CreateNode(i, parentBoneId, skeleton.BoneNames[i]));
-                }
-                else
-                {
-                    var treeParent = GetParent(Bones, parentBoneId);
-
-                    if (treeParent != null)
-                        treeParent.Children.Add(CreateNode(i, parentBoneId, skeleton.BoneNames[i]));
-                }
-            }
-        }
-
-        SkeletonBoneNode CreateNode(int boneId, int parentBoneId, string boneName)
-        {
-            SkeletonBoneNode item = new SkeletonBoneNode
-            {
-                BoneIndex = boneId,
-                BoneName = boneName,
-                ParentBoneIndex = parentBoneId
-            };
-            return item;
-        }
-
-        SkeletonBoneNode GetParent(ObservableCollection<SkeletonBoneNode> root, int parentBoneId)
-        {
-            foreach (SkeletonBoneNode item in root)
-            {
-                if (item.BoneIndex == parentBoneId)
-                    return item;
-
-                var result = GetParent(item.Children, parentBoneId);
-                if (result != null)
-                    return result;
-            }
-            return null;
+            var newBones = SkeletonBoneNodeHelper.CreateBoneOverview(skeleton);
+            foreach (var bone in newBones)
+                Bones.Add(bone);
         }
     }
 
@@ -117,5 +80,56 @@ namespace AnimationEditor.Common.ReferenceModel
         }
 
         public ObservableCollection<SkeletonBoneNode> Children { get; set; } = new ObservableCollection<SkeletonBoneNode>();
+    }
+
+    public class SkeletonBoneNodeHelper
+    {
+        public static List<SkeletonBoneNode> CreateBoneOverview(GameSkeleton skeleton)
+        {
+            var output = new List<SkeletonBoneNode>();
+
+            for (int i = 0; i < skeleton.BoneCount; i++)
+            {
+                var parentBoneId = skeleton.GetParentBone(i);
+                if (parentBoneId == -1)
+                {
+                    output.Add(CreateNode(i, parentBoneId, skeleton.BoneNames[i]));
+                }
+                else
+                {
+                    var treeParent = GetParent(output, parentBoneId);
+
+                    if (treeParent != null)
+                        treeParent.Children.Add(CreateNode(i, parentBoneId, skeleton.BoneNames[i]));
+                }
+            }
+
+            return output;
+        }
+
+        static SkeletonBoneNode CreateNode(int boneId, int parentBoneId, string boneName)
+        {
+            SkeletonBoneNode item = new SkeletonBoneNode
+            {
+                BoneIndex = boneId,
+                BoneName = boneName,
+                ParentBoneIndex = parentBoneId
+            };
+            return item;
+        }
+
+        static SkeletonBoneNode GetParent(IEnumerable<SkeletonBoneNode> root, int parentBoneId)
+        {
+            foreach (SkeletonBoneNode item in root)
+            {
+                if (item.BoneIndex == parentBoneId)
+                    return item;
+
+                var result = GetParent(item.Children, parentBoneId);
+                if (result != null)
+                    return result;
+            }
+            return null;
+        }
     }
 }

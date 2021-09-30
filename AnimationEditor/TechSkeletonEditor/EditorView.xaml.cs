@@ -11,14 +11,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace AnimationEditor.SuperView
+namespace AnimationEditor.TechSkeletonEditor
 {
     /// <summary>
-    /// Interaction logic for ModelView.xaml
+    /// Interaction logic for EditorView.xaml
     /// </summary>
-    public partial class ModelView : UserControl
+    public partial class EditorView : UserControl
     {
-        public ModelView()
+        public EditorView()
         {
             InitializeComponent();
         }

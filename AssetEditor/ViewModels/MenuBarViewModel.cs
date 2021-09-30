@@ -3,6 +3,7 @@ using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SuperView;
+using AnimationEditor.TechSkeletonEditor;
 using AssetEditor.Services;
 using AssetEditor.Views.Settings;
 using Common;
@@ -186,7 +187,7 @@ namespace AssetEditor.ViewModels
 
         void OpenTechSkeletonEditor()
         {
-            var editorView = _toolFactory.CreateEditorViewModel<SuperViewViewModel>();
+            var editorView = _toolFactory.CreateEditorViewModel<TechSkeletonEditorViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
     }

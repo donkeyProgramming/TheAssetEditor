@@ -9,8 +9,6 @@ using System.Text;
 
 namespace AnimationEditor.SuperView
 {
-
-
     public class SuperViewViewModel : BaseAnimationViewModel
     {
         public SuperViewViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, SchemaManager schemaManager) : base(toolFactory, pfs, skeletonHelper, schemaManager, "not_in_use1", "not_in_use2", false)

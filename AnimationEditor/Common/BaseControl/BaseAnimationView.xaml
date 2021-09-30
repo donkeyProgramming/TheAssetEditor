@@ -10,7 +10,8 @@
              xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
              xmlns:campaignanimationcreator="clr-namespace:AnimationEditor.CampaignAnimationCreator"
              xmlns:animationtransfertool="clr-namespace:AnimationEditor.AnimationTransferTool"
-              xmlns:superview="clr-namespace:AnimationEditor.SuperView"
+             xmlns:superview="clr-namespace:AnimationEditor.SuperView"
+             xmlns:techskeletoneditor="clr-namespace:AnimationEditor.TechSkeletonEditor"
              mc:Ignorable="d" >
     <UserControl.Resources>
         <valueconverters:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Collapsed" />
@@ -73,9 +74,15 @@
                         <animationtransfertool:EditorView  />
                     </DataTemplate>
 
+                    <DataTemplate DataType="{ x:Type techskeletoneditor:Editor}">
+                        <techskeletoneditor:EditorView  />
+                    </DataTemplate>
+
                     <DataTemplate DataType="{ x:Type superview:Editor}">
                         <superview:EditorView  />
                     </DataTemplate>
+ 
+
                 </ContentControl.Resources>
             </ContentControl>
         </Grid>

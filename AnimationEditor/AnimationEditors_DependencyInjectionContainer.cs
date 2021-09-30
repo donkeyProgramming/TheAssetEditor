@@ -5,6 +5,7 @@ using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.PropCreator;
 using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SuperView;
+using AnimationEditor.TechSkeletonEditor;
 using Common;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -22,6 +23,7 @@ namespace AnimationEditor
             serviceCollection.AddTransient<CampaignAnimationCreatorViewModel>();
             serviceCollection.AddTransient<AnimationTransferToolViewModel>();
             serviceCollection.AddTransient<SuperViewViewModel>();
+            serviceCollection.AddTransient<TechSkeletonEditorViewModel>();
 
             serviceCollection.AddTransient<BaseAnimationView>();
         }
@@ -33,6 +35,7 @@ namespace AnimationEditor
             factory.RegisterTool<CampaignAnimationCreatorViewModel, BaseAnimationView>();
             factory.RegisterTool<AnimationTransferToolViewModel, BaseAnimationView>();
             factory.RegisterTool<SuperViewViewModel, BaseAnimationView>();
+            factory.RegisterTool<TechSkeletonEditorViewModel, BaseAnimationView>();
         }
     }
 }
