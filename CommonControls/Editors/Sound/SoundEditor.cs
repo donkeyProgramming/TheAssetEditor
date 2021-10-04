@@ -37,6 +37,33 @@ namespace CommonControls.Editors.Sound
             _filesToSkip.Add("animation_blood_data.bnk");
         }
 
+        public void CreateSoundMap()
+        {
+            var files = GetPackFileFiles();
+            //var files = GetAttilaFiles();
+            var nameHelper = GetNameHelper(files);
+
+            var timer = new Stopwatch();
+            timer.Start();
+
+            VisualEventOutputNode rootOutput = new VisualEventOutputNode($"Root :");
+            var statsNode = rootOutput.AddChild("Stats");
+            //files = OnlyParseOneFile_debug(files, "battle_vo_orders__core.bnk");
+            //files = OnlyParseOneFile_debug(files, "battle_advice.bnk"); // Attila
+            //files = OnlyParseOneFile_debug(files, "battle_animation.bnk"); // Attila
+
+
+            files = RemoveUnwantedFiles(files, rootOutput, timer);
+            var masterDb = BuildMasterDb(files, rootOutput, timer);
+            ParsBnkFiles(masterDb, nameHelper, files, rootOutput, timer);
+            AddStats(statsNode, masterDb, files.Count);
+
+            VisualEventSerializer serializer = new VisualEventSerializer();
+            var output = serializer.Start(rootOutput);
+
+            File.WriteAllText(@"C:\temp\SoundTesting\Warhammer2RippedEvents.txt", output);
+        }
+
         List<PackFile> GetAttilaFiles()
         {
             var fileInFolder = Directory.GetFiles(@"C:\temp\SoundTesting\Attila");
@@ -149,7 +176,7 @@ namespace CommonControls.Editors.Sound
                     var eventCount = localDb.Hircs.Count(x => x.Type == HircType.Event);
                     var dialogEventCount = localDb.Hircs.Count(x => x.Type == HircType.Dialogue_Event);
 
-                    var fileOutputStr = $"{file.Name} NumEvents:{eventCount} NumDialogEvents: {dialogEventCount}";  // Some kind of failed items/unsupporeted item log as well
+                    var fileOutputStr = $"{file.Name} Events:{eventCount} DialogEvents: {dialogEventCount}";  // Some kind of failed items/unsupporeted item log as well
                     fileRoot.AddChild(fileOutputStr);
 
                     masterDb.AddHircItems(localDb.Hircs);
@@ -222,34 +249,6 @@ namespace CommonControls.Editors.Sound
             statsNode.AddChild($"Num wem Files = {numWemFiles.Count}");
             statsNode.AddChild($"References wem Files = {masterDb.ReferensedSounds.Distinct().Count()}");
             statsNode.AddChild($"Unknown hirc types = {string.Join(",", unknowTypeInfo)}");
-        }
-
-        public void CreateSoundMap()
-        {
-            return;
-            var files = GetPackFileFiles();
-            //var files = GetAttilaFiles();
-            var nameHelper = GetNameHelper(files);
-
-            var timer = new Stopwatch();
-            timer.Start();
-
-            VisualEventOutputNode rootOutput = new VisualEventOutputNode($"Root :");
-            var statsNode = rootOutput.AddChild("Stats");
-            //files = OnlyParseOneFile_debug(files, "battle_advice__core.bnk");
-            //files = OnlyParseOneFile_debug(files, "battle_advice.bnk"); // Attila
-            //files = OnlyParseOneFile_debug(files, "battle_animation.bnk"); // Attila
-            
-
-            files = RemoveUnwantedFiles(files, rootOutput, timer);
-            var masterDb = BuildMasterDb(files, rootOutput, timer);
-            ParsBnkFiles(masterDb, nameHelper, files, rootOutput, timer);
-            AddStats(statsNode, masterDb, files.Count);
-
-            VisualEventSerializer serializer = new VisualEventSerializer();
-            var output = serializer.Start(rootOutput);
-
-            File.WriteAllText(@"C:\temp\SoundTesting\Warhammer2RippedEvents.txt", output);
         }
     }
 }

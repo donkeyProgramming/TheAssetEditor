@@ -152,6 +152,10 @@ namespace CommonControls.Editors.Sound
 
         void ProcessUnknownChild(HircItem item, VisualEventOutputNode currentNode)
         {
+            if (item.Type == HircType.Dialogue_Event)
+            { 
+            }
+
             var errorStr = $"Reference to unknown HricItem Type:[{item.Type}] \tId:[{item.Id}] ownerFile:[{item.OwnerFile}|{item.IndexInFile}]";
             currentNode.AddChild(errorStr);
             _errorNode.AddChild(errorStr);

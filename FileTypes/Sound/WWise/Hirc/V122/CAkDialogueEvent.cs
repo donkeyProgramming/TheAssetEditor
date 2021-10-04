@@ -60,23 +60,17 @@ namespace FileTypes.Sound.WWise.Hirc.V122
                     Children.Add(node);
                 }
 
-               
+                foreach (var child in Children)
                 {
-                    foreach (var child in Children)
+                    if (currentTreeDepth != maxTreeDepth)
+                        child.Parse(chunk, child.children_uCount, currentTreeDepth + 1, maxTreeDepth);
+                    else
                     {
-                        if (currentTreeDepth != maxTreeDepth)
-                            child.Parse(chunk, child.children_uCount, currentTreeDepth + 1, maxTreeDepth);
-                        else
-                        {
-                            for(uint i = 0; i< child.children_uCount;i++)
-                                child.SoundNodes.Add(new SoundNode(chunk));
-                        }
-                           
+                        for(uint i = 0; i< child.children_uCount;i++)
+                            child.SoundNodes.Add(new SoundNode(chunk));
                     }
-                }
-               
- 
-
+                           
+                }            
             }
         }
 

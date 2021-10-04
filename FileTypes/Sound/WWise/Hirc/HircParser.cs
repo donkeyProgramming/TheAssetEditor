@@ -54,8 +54,8 @@ namespace FileTypes.Sound.WWise.Hirc
             instance.RegisterHirc(HircType.SwitchContainer, () => new V112.CAkSwitchCntr_V112());
             instance.RegisterHirc(HircType.SequenceContainer, () => new V112.CAkRanSeqCnt_V112());
 
-            //instance.RegisterHirc(HircType.LayerContainer, () => new V122.CAkLayerCntr());
-            //instance.RegisterHirc(HircType.Dialogue_Event, () => new V122.CAkDialogueEvent());
+            //instance.RegisterHirc(HircType.LayerContainer, () => new V112.CAkLayerCntr());
+            //instance.RegisterHirc(HircType.Dialogue_Event, () => new V112.CAkDialogueEvent());
             return instance;
         }
 
@@ -75,6 +75,10 @@ namespace FileTypes.Sound.WWise.Hirc
             for (uint i = 0; i < numItems; i++)
             {
                 var hircType = (HircType)chunk.PeakByte();
+
+                if (i == 1475)
+                { 
+                }
 
                 var start = chunk.Index;
                 try
