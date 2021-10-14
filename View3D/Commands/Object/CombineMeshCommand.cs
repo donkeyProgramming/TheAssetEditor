@@ -51,7 +51,7 @@ namespace View3D.Commands.Object
 
             using (new WaitCursor())
             {
-                _combinedMesh = _objectsToCombine.First().Clone() as IEditableGeometry;
+                _combinedMesh = SceneNodeHelper.CloneNode(_objectsToCombine.First()) as IEditableGeometry;
                 _combinedMesh.Name = _objectsToCombine.First().Name + "_Combined";
                 _combinedMesh.Parent.AddObject(_combinedMesh);
 

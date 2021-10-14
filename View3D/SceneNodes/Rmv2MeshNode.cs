@@ -19,8 +19,6 @@ namespace View3D.SceneNodes
     {
         public RmvSubModel MeshModel { get; set; }
 
-        // Remove mesh model!
-
         Quaternion _orientation = Quaternion.Identity;
         Vector3 _position = Vector3.Zero;
         Vector3 _scale = Vector3.One;
@@ -201,35 +199,26 @@ namespace View3D.SceneNodes
             }
         }
 
-        public override ISceneNode Clone()
+
+        public override ISceneNode CreateCopyInstance() => new Rmv2MeshNode();
+
+        public override void CopyInto(ISceneNode target)
         {
-            var node = CloneWithoutGeometry();
-            node.Geometry = Geometry.Clone();
-            return node;
+            var typedTarget = target as Rmv2MeshNode;
+            typedTarget.Position = Position;
+            typedTarget.Orientation = Orientation;
+            typedTarget.Scale = Scale;
+            typedTarget.LodIndex = LodIndex;
+            typedTarget.ReduceMeshOnLodGeneration = ReduceMeshOnLodGeneration;
+
+            typedTarget.AnimationPlayer = AnimationPlayer;
+            typedTarget.MeshModel = MeshModel.Clone();
+            typedTarget._resourceLib = _resourceLib;
+            typedTarget.Effect = Effect.Clone();
+            typedTarget.Geometry = Geometry.Clone();
+            base.CopyInto(target);
         }
 
-        public Rmv2MeshNode CloneWithoutGeometry()
-        {
-            var newItem = new Rmv2MeshNode()
-            {
-                Position = Position,
-                Orientation = Orientation,
-                Scale = Scale,
-                Parent = Parent,
-                SceneManager = SceneManager,
-                IsEditable = IsEditable,
-                IsVisible = IsVisible,
-                IsSelectable = IsSelectable,
-                LodIndex = LodIndex,
-                Name = Name + " - Clone",
-                AnimationPlayer = AnimationPlayer,
-                MeshModel = MeshModel.Clone(),
-                _resourceLib = _resourceLib,
-                ReduceMeshOnLodGeneration = ReduceMeshOnLodGeneration
-            };
-            newItem.Effect = Effect.Clone();
-            return newItem;
-        }
 
         public void UpdatePivotPoint(Vector3 newPiv)
         {

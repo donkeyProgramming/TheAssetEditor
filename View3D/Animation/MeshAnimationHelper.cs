@@ -28,11 +28,6 @@ namespace View3D.Animation
 
         public Matrix GetVertexTransform(AnimationFrame frame, int vertexId)
         {
-            return GetAnimationVertex(frame, vertexId);
-        }
-
-        Matrix GetAnimationVertex(AnimationFrame frame, int vertexId)
-        {
             var geo = _mesh.Geometry as Rmv2Geometry;
             var vert = geo.GetVertexExtented(vertexId);
 
@@ -46,7 +41,8 @@ namespace View3D.Animation
                 transformSum += simpleMatrix * blendWeight[i];
             }
 
-            return transformSum * _worldTransform;
+            var result = transformSum * _worldTransform;
+            return result;
         }
     }
 }

@@ -32,6 +32,8 @@ namespace KitbasherEditor.Views.EditorViews.VertexDebugger
             public Vector3 Tangent { get; set; }
             public float TangentLength { get; set; }
 
+            public Vector4 Position { get; set; }
+
         }
 
         public ObservableCollection<VertexInstance> VertexList { get; set; } = new ObservableCollection<VertexInstance>();
@@ -95,6 +97,8 @@ namespace KitbasherEditor.Views.EditorViews.VertexDebugger
 
                         Tangent = vertexInfo.Tangent,
                         TangentLength = vertexInfo.Tangent.Length(),
+
+                        Position = vertexInfo.Position
                     });
                 }
             }

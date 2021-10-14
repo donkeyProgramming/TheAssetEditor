@@ -12,7 +12,7 @@
               xmlns:s="http://schemas.singulink.com/xaml"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <System:Double x:Key="labelWidth">140</System:Double>
+        <System:Double x:Key="labelWidth">160</System:Double>
     </UserControl.Resources>
     <Expander IsExpanded="True" Header="Settings:">
         <StackPanel>
@@ -62,19 +62,26 @@
             </DockPanel>
 
             <DockPanel >
+                <Label Content="Use scaled skeleton name" Width ="{StaticResource labelWidth}"/>
+                <Label Content=":"/>
+                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.UseScaledSkeletonName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <TextBox Text="{Binding AnimationSettings.ScaledSkeletonName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
+            </DockPanel>
+
+            <DockPanel >
                 <Label Content="Apply Relative scale" Width ="{StaticResource labelWidth}"/>
                 <Label Content=":"/>
                 <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.ApplyRelativeScale.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             </DockPanel>
 
             <DockPanel >
-                <Label Content="Freeze unmapped bones" Width ="{StaticResource labelWidth}"/>
+                <Label Content="Zero unmapped bones" Width ="{StaticResource labelWidth}"/>
                 <Label Content=":"/>
                 <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.FreezeUnmapped.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             </DockPanel>
 
             <DockPanel >
-                <Label Content="Length multiplier" Width ="{StaticResource labelWidth}"/>
+                <Label Content="Animation length multiplier" Width ="{StaticResource labelWidth}"/>
                 <Label Content=":"/>
                 <TextBox Text="{Binding AnimationSettings.SpeedMult.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
                     <b:Interaction.Behaviors>

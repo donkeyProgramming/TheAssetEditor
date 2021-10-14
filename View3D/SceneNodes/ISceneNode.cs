@@ -19,8 +19,13 @@ namespace View3D.SceneNodes
         SceneManager SceneManager { get; set; }
 
         T AddObject<T>(T item) where T : ISceneNode;
-        ISceneNode Clone();
-        void ForeachNode(Action<ISceneNode> func);
+
+        void ForeachNodeRecursive(Action<ISceneNode> func);
         ISceneNode RemoveObject(ISceneNode item);
+
+
+        ISceneNode CreateCopyInstance();
+        void CopyInto(ISceneNode target);
     }
+
 }

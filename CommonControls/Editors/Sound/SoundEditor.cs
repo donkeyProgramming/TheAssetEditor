@@ -39,6 +39,7 @@ namespace CommonControls.Editors.Sound
 
         public void CreateSoundMap()
         {
+            return;
             var files = GetPackFileFiles();
             //var files = GetAttilaFiles();
             var nameHelper = GetNameHelper(files);
@@ -62,6 +63,7 @@ namespace CommonControls.Editors.Sound
             var output = serializer.Start(rootOutput);
 
             File.WriteAllText(@"C:\temp\SoundTesting\Warhammer2RippedEvents.txt", output);
+            CreateHircList(masterDb, @"C:\temp\SoundTesting\HircList.txt", nameHelper);
         }
 
         List<PackFile> GetAttilaFiles()
@@ -209,7 +211,8 @@ namespace CommonControls.Editors.Sound
                         .Where(x => x.Type == HircType.Event || x.Type == HircType.Dialogue_Event)
                         .Where(x => x.HasError == false);
 
-                    var fileNodeOutputStr = $"{files[fileIndex].Name} Total EventCount:{events.Count()}";
+                    var eventsCount = events.Count();
+                    var fileNodeOutputStr = $"{files[fileIndex].Name} Total EventCount:{eventsCount}";
                     _logger.Here().Information($"{fileIndex}/{files.Count} {fileNodeOutputStr}");
 
                     var fileOutput = parent.AddChild(fileNodeOutputStr);
@@ -222,7 +225,7 @@ namespace CommonControls.Editors.Sound
                         var visualEvent = new EventHierarchy(currentEvent, masterDb, nameHelper, fileOutput, fileOutputError, files[fileIndex].Name);
 
                         if (itemsProcessed % 100 == 0 && itemsProcessed != 0)
-                            _logger.Here().Information($"\t{itemsProcessed}/{events} events processsed [{timer.Elapsed.TotalSeconds}s]");
+                            _logger.Here().Information($"\t{itemsProcessed}/{eventsCount} events processsed [{timer.Elapsed.TotalSeconds}s]");
 
                         itemsProcessed++;
                         procesedCorrectly = visualEvent.ProcesedCorrectly && procesedCorrectly;
@@ -232,13 +235,44 @@ namespace CommonControls.Editors.Sound
                         fileOutput.Children.Remove(fileOutputError);
 
                     if (events.Any())
-                        _logger.Here().Information($"\t{itemsProcessed}/{events} events processsed [{timer.Elapsed.TotalSeconds}s]");
+                        _logger.Here().Information($"\t{itemsProcessed}/{eventsCount} events processsed [{timer.Elapsed.TotalSeconds}s]");
                 }
                 catch
                 { }
             }
         }
 
+        public void CreateHircList(ExtenededSoundDataBase db, string outputName, NameLookupHelper nameLookupHelper)
+        {
+            StringBuilder output = new StringBuilder();
+
+            var totalItems = db.HircList.SelectMany(x => x.Value.Select(y => y.Id)).ToList();
+            var totalUniqueItems = totalItems.Distinct();
+
+            output.AppendLine($"Item count: {totalItems.Count}");
+            output.AppendLine($"Distinct count: {totalUniqueItems.Count()}");
+
+            output.AppendLine("\n-----------------------------\n");
+
+           foreach(var itemCollection in db.HircList)
+            {
+                var displayName = nameLookupHelper.GetName(itemCollection.Key);
+                var numChildren = itemCollection.Value.Count();
+                if (numChildren == 1)
+                {
+                    var instance = itemCollection.Value.First();
+                    output.AppendLine($"Id:{itemCollection.Key} [{displayName}] - {instance.Type} {instance.OwnerFile} {instance.IndexInFile} ");
+                }
+                else 
+                {
+                    output.AppendLine($"Id:{itemCollection.Key} [{displayName}] Multiple instances {itemCollection.Value.Count}");
+                    foreach(var instance in itemCollection.Value)
+                        output.AppendLine($"\t {instance.Type} {instance.OwnerFile} {instance.IndexInFile} ");
+                }
+            }
+
+            File.WriteAllText(outputName, output.ToString());
+        }
 
         public void AddStats(VisualEventOutputNode statsNode, ExtenededSoundDataBase masterDb, int numFiles)
         {

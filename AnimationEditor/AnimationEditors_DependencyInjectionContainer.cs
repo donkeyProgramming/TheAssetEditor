@@ -18,7 +18,6 @@ namespace AnimationEditor
     {
         public static void Register(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddTransient<PropCreatorViewModel>();
             serviceCollection.AddTransient<MountAnimationCreatorViewModel>();
             serviceCollection.AddTransient<CampaignAnimationCreatorViewModel>();
             serviceCollection.AddTransient<AnimationTransferToolViewModel>();
@@ -30,7 +29,6 @@ namespace AnimationEditor
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<PropCreatorViewModel, BaseAnimationView>();
             factory.RegisterTool<MountAnimationCreatorViewModel, BaseAnimationView>();
             factory.RegisterTool<CampaignAnimationCreatorViewModel, BaseAnimationView>();
             factory.RegisterTool<AnimationTransferToolViewModel, BaseAnimationView>();

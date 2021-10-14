@@ -80,7 +80,7 @@ namespace AnimationEditor.CampaignAnimationCreator
             }
             else
             {
-                ModelBoneList.UpdatePossibleValues(SkeletonHelper.CreateFlatSkeletonList(newValue));
+                ModelBoneList.UpdatePossibleValues(SkeletonBoneNodeHelper.CreateFlatSkeletonList(newValue));
                 ModelBoneList.SelectedItem = ModelBoneList.PossibleValues.FirstOrDefault(x => x.BoneName.ToLower() == "animroot");
             }
         }

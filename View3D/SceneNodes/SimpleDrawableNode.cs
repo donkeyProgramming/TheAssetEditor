@@ -6,7 +6,7 @@ using View3D.Components.Rendering;
 
 namespace View3D.SceneNodes
 {
-    public class SimpleDrawableNode : SceneNode, IDrawableItem
+    public class SimpleDrawableNode : GroupNode, IDrawableItem
     {
         Dictionary<RenderBuckedId, List<IRenderItem>> _renderList = new Dictionary<RenderBuckedId, List<IRenderItem>>();
 
@@ -14,8 +14,6 @@ namespace View3D.SceneNodes
         {
             Name = name;
         }
-
-        public override ISceneNode Clone() => throw new NotImplementedException();
 
         public void AddItem(RenderBuckedId renderBuckedId, IRenderItem item)
         {
@@ -36,7 +34,10 @@ namespace View3D.SceneNodes
                     renderEngine.AddRenderItem(bucket.Key, item);
                 }
             }
-           
         }
+
+        protected SimpleDrawableNode() { }
+
+        public override ISceneNode CreateCopyInstance() => new SimpleDrawableNode();
     }
 }

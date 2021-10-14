@@ -5,6 +5,7 @@ using AssetEditor.Views.Settings;
 using Common;
 using Common.ApplicationSettings;
 using Common.GameInformation;
+using CommonControls.Editors.AnimationFilePreviewEditor;
 using CommonControls.Editors.AnimationFragment;
 using CommonControls.Editors.AnimationPack;
 using CommonControls.Editors.AnimMeta;
@@ -64,6 +65,7 @@ namespace AssetEditor
             AnimationPack_DependencyInjectionContainer.Register(services);
             CampaignAnimBin_DependencyInjectionContainer.Register(services);
             VariantMeshDefinition_DependencyInjectionContainer.Register(services);
+            AnimationFilePreviewEditor_DependencyInjectionContainer.Register(services);
             //AnimMetaDecoder_DependencyInjectionContainer.Register(services);
         }
 
@@ -78,7 +80,8 @@ namespace AssetEditor
             AnimationPack_DependencyInjectionContainer.RegisterTools(factory);
             CampaignAnimBin_DependencyInjectionContainer.RegisterTools(factory);
             VariantMeshDefinition_DependencyInjectionContainer.RegisterTools(factory);
-           // AnimMetaDecoder_DependencyInjectionContainer.RegisterTools(factory);
+            AnimationFilePreviewEditor_DependencyInjectionContainer.RegisterTools(factory);
+            // AnimMetaDecoder_DependencyInjectionContainer.RegisterTools(factory);
         }
 
         public void ShowMainWindow()

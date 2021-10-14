@@ -339,7 +339,9 @@ namespace AnimationEditor.AnimationTransferTool
             {
                 newAnimation.RotationMappings.Add(new AnimationFile.AnimationBoneMapping(i));
                 newAnimation.TranslationMappings.Add(new AnimationFile.AnimationBoneMapping(i));
-                newAnimation.DynamicFrames[0].Scale[0] = Vector3.One;
+
+                if(newAnimation.DynamicFrames.Count != 0)
+                    newAnimation.DynamicFrames[0].Scale[0] = Vector3.One;
             }
             return newAnimation;
         }

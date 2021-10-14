@@ -42,7 +42,7 @@ namespace View3D.Commands.Face
            _oldState = _selectionManager.GetStateCopy();
 
             // Clone the object
-            _newObject = _inputNode.Clone() as ISelectable;
+            _newObject = SceneNodeHelper.CloneNode(_inputNode);
 
             // Add to the scene
             if (!_deleteOriginal)

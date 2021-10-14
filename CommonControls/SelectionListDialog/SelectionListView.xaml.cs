@@ -11,14 +11,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace KitbasherEditor.Views.EditorViews.Rmv2
+namespace CommonControls.SelectionListDialog
 {
     /// <summary>
-    /// Interaction logic for RigidModelEditorView.xaml
+    /// Interaction logic for SelectionListView.xaml
     /// </summary>
-    public partial class RigidModelEditorView : UserControl
+    public partial class SelectionListView : UserControl
     {
-        public RigidModelEditorView()
+        public SelectionListView()
         {
             InitializeComponent();
         }

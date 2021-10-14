@@ -80,7 +80,6 @@ namespace View3D.Rendering.Shading
             _textures.Add(TexureType.Normal, Effect.Parameters["NormalTexture"]);
             _textures.Add(TexureType.Gloss, Effect.Parameters["GlossTexture"]);
 
-
             _useTextures.Add(TexureType.Diffuse, Effect.Parameters["UseDiffuse"]);
             _useTextures.Add(TexureType.Specular, Effect.Parameters["UseSpecular"]);
             _useTextures.Add(TexureType.Normal, Effect.Parameters["UseNormal"]);
@@ -112,9 +111,6 @@ namespace View3D.Rendering.Shading
             Effect.Parameters["LightMult"].SetValue(commonShaderParameters.LightIntensityMult);
             Effect.Parameters["World"].SetValue(modelMatrix);
             Effect.Parameters["CameraPos"].SetValue(commonShaderParameters.CameraPosition);
-
-
-            
         }
 
         public bool UseAnimation { set { Effect.Parameters["doAnimation"].SetValue(value); } }

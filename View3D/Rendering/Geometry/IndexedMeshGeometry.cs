@@ -161,8 +161,7 @@ namespace View3D.Rendering.Geometry
 
         public IGeometry CloneSubMesh(ushort[] newIndexList)
         {
-            var mesh = this.Clone(false) as IndexedMeshGeometry<VertexType>;
-
+            var mesh = Clone(false) as IndexedMeshGeometry<VertexType>;
 
             var uniqeIndexes = newIndexList.Distinct().ToList();
             uniqeIndexes.Sort();

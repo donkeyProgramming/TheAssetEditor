@@ -35,7 +35,7 @@ namespace View3D.Animation
 
                         // Apply skeleton scale
                         for (int i = 0; i < currentFrame.BoneTransforms.Count(); i++)
-                            currentFrame.BoneTransforms[i].Scale = animationClip.DynamicFrames[0].Scale[i];
+                            currentFrame.BoneTransforms[i].Scale = animationClip.DynamicFrames[frameIndex].Scale[i];
                     }
                 }
           

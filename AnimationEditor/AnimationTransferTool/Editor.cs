@@ -3,29 +3,41 @@ using Common;
 using CommonControls.Common;
 using CommonControls.Editors.BoneMapping;
 using CommonControls.Editors.BoneMapping.View;
-using CommonControls.MathViews;
+using CommonControls.SelectionListDialog;
 using CommonControls.Services;
 using Filetypes.RigidModel;
+using FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
 using View3D.Animation;
+using View3D.Commands;
+using View3D.Commands.Object;
+using View3D.Components.Component;
+using View3D.SceneNodes;
+using View3D.Services;
 
 namespace AnimationEditor.AnimationTransferTool
 {
     public class Editor : NotifyPropertyChangedImpl
     {
+        ILogger _logger = Logging.Create<Editor>();
+
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        IComponentManager _componentManager;
         AssetViewModel _copyTo;
         AssetViewModel _copyFrom;
         public AssetViewModel Generated { get; set; }
         List<IndexRemapping> _remappingInformaton;
+        RemappedAnimatedBoneConfiguration _config;
 
         public ObservableCollection<SkeletonBoneNode> Bones { get; set; } = new ObservableCollection<SkeletonBoneNode>();
         public ObservableCollection<SkeletonBoneNode> FlatBoneList { get; set; } = new ObservableCollection<SkeletonBoneNode>();
@@ -42,6 +54,8 @@ namespace AnimationEditor.AnimationTransferTool
         {
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
+            _componentManager = componentManager;
+
             _copyTo = copyToAsset;
             _copyFrom = copyFromAsset;
             Generated = generated;
@@ -84,6 +98,10 @@ namespace AnimationEditor.AnimationTransferTool
             Generated.CopyMeshFromOther(newValue);
             CreateBoneOverview(newValue.Skeleton);
             HightlightSelectedBones(null);
+
+            _config = null;
+            AnimationSettings.UseScaledSkeletonName.Value = false;
+            AnimationSettings.ScaledSkeletonName.Value = "";
         }
 
         private void CopyFromSkeletonChanged(GameSkeleton newValue)
@@ -91,6 +109,10 @@ namespace AnimationEditor.AnimationTransferTool
             _remappingInformaton = null;
             CreateBoneOverview(_copyTo.Skeleton);
             HightlightSelectedBones(null);
+
+            _config = null;
+            AnimationSettings.UseScaledSkeletonName.Value = false;
+            AnimationSettings.ScaledSkeletonName.Value = "";
         }
 
         public void OpenMappingWindow()
@@ -104,17 +126,20 @@ namespace AnimationEditor.AnimationTransferTool
             var targetSkeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, _copyTo.SkeletonName.Value);
             var sourceSkeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, _copyFrom.SkeletonName.Value);
 
-            var config = new RemappedAnimatedBoneConfiguration();
-            config.MeshSkeletonName = _copyTo.SkeletonName.Value;
-            config.MeshBones = AnimatedBoneHelper.CreateFromSkeleton(targetSkeleton);
+            if (_config == null)
+            {
+                _config = new RemappedAnimatedBoneConfiguration();
+                _config.MeshSkeletonName = _copyTo.SkeletonName.Value;
+                _config.MeshBones = AnimatedBoneHelper.CreateFromSkeleton(targetSkeleton);
+                
+                _config.ParnetModelSkeletonName = _copyFrom.SkeletonName.Value;
+                _config.ParentModelBones = AnimatedBoneHelper.CreateFromSkeleton(sourceSkeleton);
+            }
 
-            config.ParnetModelSkeletonName = _copyFrom.SkeletonName.Value;
-            config.ParentModelBones = AnimatedBoneHelper.CreateFromSkeleton(sourceSkeleton);
-
-            var window = new BoneMappingWindow(new BoneMappingViewModel(config));
+            var window = new BoneMappingWindow(new BoneMappingViewModel(_config));
             if (window.ShowDialog() == true)
             {
-                _remappingInformaton = AnimatedBoneHelper.BuildRemappingList(config.MeshBones.First());
+                _remappingInformaton = AnimatedBoneHelper.BuildRemappingList(_config.MeshBones.First());
                 UpdateAnimation();
                 UpdateBonesAfterMapping(Bones);
             }
@@ -138,27 +163,83 @@ namespace AnimationEditor.AnimationTransferTool
 
         public void UpdateAnimation()
         {
+            if (CanUpdateAnimation(true))
+            {
+                var newAnimationClip = UpdateAnimation(_copyFrom.AnimationClip);
+                Generated.SetAnimationClip(newAnimationClip, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
+            }
+        }
+
+        bool CanUpdateAnimation(bool requireAnimation)
+        {
             if (_remappingInformaton == null)
             {
                 MessageBox.Show("No mapping created?", "Error", MessageBoxButton.OK);
-                return;
+                return false;
             }
 
             if (_copyTo.Skeleton == null || _copyFrom.Skeleton == null)
             {
                 MessageBox.Show("Missing a skeleton?", "Error", MessageBoxButton.OK);
-                return;
+                return false;
             }
 
-            if (_copyFrom.AnimationClip == null)
+            if (_copyFrom.AnimationClip == null && requireAnimation)
             {
                 MessageBox.Show("No animation to copy selected", "Error", MessageBoxButton.OK);
-                return;
+                return false;
             }
 
+            return true;
+        }
+
+        AnimationClip UpdateAnimation(AnimationClip clip)
+        {
             var service = new AnimationRemapperService(AnimationSettings, _remappingInformaton, Bones);
-            var clip = service.ReMapAnimation(_copyFrom.Skeleton, _copyTo.Skeleton, _copyFrom.AnimationClip);
-            Generated.SetAnimationClip(clip, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
+            var newClip = service.ReMapAnimation(_copyFrom.Skeleton, _copyTo.Skeleton, clip);
+            return newClip;
+        }
+
+        public void OpenBatchProcessDialog()
+        {
+            if (!CanUpdateAnimation(false))
+                return;
+
+            // Find all animations for skeleton
+            var copyFromAnims = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(_copyFrom.Skeleton.SkeletonName);
+
+            var items = copyFromAnims.Select(x => new SelectionListViewModel<SkeletonAnimationLookUpHelper.AnimationReference>.Item()
+            {
+                IsChecked = new NotifyAttr<bool>(!x.AnimationFile.Contains("tech", StringComparison.InvariantCultureIgnoreCase)),
+                DisplayName = x.AnimationFile,
+                ItemValue = x
+            }).ToList();
+
+            var window = SelectionListWindow.ShowDialog("Select animations:", items);
+            if (window.Result)
+            {
+                using (var waitCursor = new WaitCursor())
+                {
+                    var index = 1;
+                    var numItemsToProcess = items.Count(x => x.IsChecked.Value);
+                    foreach (var item in items)
+                    {
+                        if (item.IsChecked.Value)
+                        {
+                            var file = _pfs.FindFile(item.ItemValue.AnimationFile, item.ItemValue.Container) as PackFile;
+                            var animFile = AnimationFile.Create(file.DataSource.ReadDataAsChunk());
+                            var clip = new AnimationClip(animFile);
+
+                            _logger.Here().Information($"Processing animation {index} / {numItemsToProcess} - {item.DisplayName}");
+
+                            var updatedClip = UpdateAnimation(clip);
+                            SaveAnimation(updatedClip, item.ItemValue.AnimationFile, false);
+                            index++;
+                        }
+                       
+                    }
+                }
+            }
         }
 
         public void SaveAnimation()
@@ -169,14 +250,24 @@ namespace AnimationEditor.AnimationTransferTool
                 return;
             }
 
-            var orgName = _copyFrom.AnimationName.Value.AnimationFile;
+            SaveAnimation(Generated.AnimationClip, Generated.AnimationName.Value.AnimationFile);
+        }
+
+        void SaveAnimation(AnimationClip clip, string animationName, bool prompOnOverride = true)
+        {
+            var originalPath = animationName;
             var orgSkeleton = _copyFrom.Skeleton.SkeletonName;
-            var newSkeleton = Generated.Skeleton.SkeletonName;
-            var newName = orgName.Replace(orgSkeleton, newSkeleton);
+            var newSkeleton = _copyTo.Skeleton.SkeletonName;
+            var newPath = originalPath.Replace(orgSkeleton, newSkeleton);
 
-            var animFile = Generated.AnimationClip.ConvertToFileFormat(Generated.Skeleton);
+            var animFile = clip.ConvertToFileFormat(_copyTo.Skeleton);
+            if (AnimationSettings.UseScaledSkeletonName.Value)
+                animFile.Header.SkeletonName = AnimationSettings.ScaledSkeletonName.Value;
 
-            SaveHelper.Save(_pfs, newName, null, AnimationFile.GetBytes(animFile));
+            var currentFileName = Path.GetFileName(newPath);
+            newPath = newPath.Replace(currentFileName, "cust_" + currentFileName);
+
+            SaveHelper.Save(_pfs, newPath, null, AnimationFile.GetBytes(animFile), prompOnOverride);
         }
 
         public void ClearAllSettings()
@@ -189,7 +280,11 @@ namespace AnimationEditor.AnimationTransferTool
         public void UseTargetAsSource()
         {
             if (MessageBox.Show("Are you sure?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                AnimationSettings.UseScaledSkeletonName.Value = false;
+                AnimationSettings.ScaledSkeletonName.Value = "";
                 _copyFrom.CopyMeshFromOther(_copyTo);
+            }
         }
 
         void CreateBoneOverview(GameSkeleton skeleton)
@@ -226,40 +321,86 @@ namespace AnimationEditor.AnimationTransferTool
 
         public void ExportScaledMesh()
         {
-            //MainEditableNode
-            var node = Generated.MainNode;
-            //node.GetChildren()
+            var commandExecutor = _componentManager.GetComponent<CommandExecutor>();
+
+            var modelNodes = SceneNodeHelper.GetChildrenOfType<Rmv2ModelNode>(Generated.MainNode, (x) => x.IsVisible)
+                .Where(x => x.IsVisible)
+                .ToList();
+
+            if(modelNodes.Count == 0)
+            {
+                MessageBox.Show("Can not save, as there is no mesh", "Error", MessageBoxButton.OK);
+                return;
+            }
+
+            AnimationSettings.UseScaledSkeletonName.Value = true;
+            var scaleStr = "s" + AnimationSettings.Scale.Value.ToString().Replace(".", "").Replace(",", "");
+            var newSkeletonName = Generated.Skeleton.SkeletonName + "_" + scaleStr;
+            var originalSkeletonName = modelNodes.First().Model.Header.SkeletonName;
+            AnimationSettings.ScaledSkeletonName.Value = newSkeletonName;
+
+            // Create scaled animation
+            var scaleAnimClip = new AnimationClip();
+            scaleAnimClip.DynamicFrames.Add(new AnimationClip.KeyFrame());
+            scaleAnimClip.DynamicFrames.Add(new AnimationClip.KeyFrame());
+            scaleAnimClip.PlayTimeInSec = 2.0f / 20.0f;
+            for (int i = 0; i < Generated.Skeleton.BoneCount; i++)
+            {
+                scaleAnimClip.DynamicFrames[0].Position.Add(Generated.Skeleton.Translation[i]);
+                scaleAnimClip.DynamicFrames[0].Rotation.Add(Generated.Skeleton.Rotation[i]);
+                scaleAnimClip.DynamicFrames[0].Scale.Add(Vector3.One);
+
+                scaleAnimClip.DynamicFrames[1].Position.Add(Generated.Skeleton.Translation[i]);
+                scaleAnimClip.DynamicFrames[1].Rotation.Add(Generated.Skeleton.Rotation[i]);
+                scaleAnimClip.DynamicFrames[1].Scale.Add(Vector3.One);
+
+                scaleAnimClip.RotationMappings.Add(new AnimationFile.AnimationBoneMapping(i));
+                scaleAnimClip.TranslationMappings.Add(new AnimationFile.AnimationBoneMapping(i));
+            }
+
+            scaleAnimClip.DynamicFrames[0].Scale[0] = new Vector3((float)AnimationSettings.Scale.Value);
+            scaleAnimClip.DynamicFrames[1].Scale[0] = new Vector3((float)AnimationSettings.Scale.Value);
+
+            // Create a skeleton from the scaled animation
+            var skeletonAnimFile = scaleAnimClip.ConvertToFileFormat(Generated.Skeleton);
+            skeletonAnimFile.Header.SkeletonName = newSkeletonName;
+
+            var skeletonBytes = AnimationFile.GetBytes(skeletonAnimFile);
+            SaveHelper.Save(_pfs, @"animations\skeletons\" + newSkeletonName + ".anim", null, skeletonBytes);
+
+            var animationFrame = AnimationSampler.Sample(0, 0, Generated.Skeleton, scaleAnimClip);
+
+            int numCommandsToUndo = 0;
+            foreach (var model in modelNodes)
+            {
+                var header = model.Model.Header;
+                header.SkeletonName = newSkeletonName;
+                model.Model.Header = header;
+
+                var meshList = SceneNodeHelper.GetChildrenOfType<Rmv2MeshNode>(model);
+                var cmd = new CreateAnimatedMeshPoseCommand(meshList, animationFrame, false);
+                commandExecutor.ExecuteCommand(cmd, true);
+  
+                numCommandsToUndo++;
+            }
+
+            var meshName = Path.GetFileNameWithoutExtension(_copyTo.MeshName.Value);
+            var newMeshName = meshName + "_" + scaleStr + ".rigid_model_v2";
+            var bytes = MeshSaverService.Save(true, modelNodes, Generated.Skeleton);
+            SaveHelper.Save(_pfs, newMeshName, null, bytes);
+
+            // Undo the mesh transform
+            for(int i = 0; i < numCommandsToUndo; i++)
+                commandExecutor.Undo(); 
+
+            // Reset the skeleton
+            foreach (var model in modelNodes)
+            {
+                var header = model.Model.Header;
+                header.SkeletonName = originalSkeletonName;
+                model.Model.Header = header;
+            }
         }
-    }
-
-    public class SkeletonBoneNode : NotifyPropertyChangedImpl
-    {
-        public NotifyAttr<int> BoneIndex { get; set; } = new NotifyAttr<int>(0);
-        public NotifyAttr<int> ParnetBoneIndex { get; set; } = new NotifyAttr<int>(-1);
-        public NotifyAttr<string> BoneName { get; set; } = new NotifyAttr<string>("");
-        public NotifyAttr<bool> HasMapping { get; set; } = new NotifyAttr<bool>(false);
-
-        public SkeletonBoneNode(string boneName, int boneIndex, int parentBoneIndex)
-        {
-            BoneName.Value = boneName;
-            BoneIndex.Value = boneIndex;
-            ParnetBoneIndex.Value = parentBoneIndex;
-        }
-
-        public NotifyAttr<bool> IsLocalOffset { get; set; } = new NotifyAttr<bool>(false);
-        public Vector3ViewModel RotationOffset { get; set; } = new Vector3ViewModel(0);
-        public Vector3ViewModel TranslationOffset { get; set; } = new Vector3ViewModel(0);
-
-        public NotifyAttr<bool> ForceSnapToWorld { get; set; } = new NotifyAttr<bool>(false);
-        public NotifyAttr<bool> FreezeTranslation { get; set; } = new NotifyAttr<bool>(false);
-
-        public SkeletonBoneNode _selectedRelativeBone;
-        public SkeletonBoneNode SelectedRelativeBone
-        {
-            get { return _selectedRelativeBone; }
-            set { SetAndNotify(ref _selectedRelativeBone, value); }
-        }
-
-        public ObservableCollection<SkeletonBoneNode> Children { get; set; } = new ObservableCollection<SkeletonBoneNode>();
     }
 }
+

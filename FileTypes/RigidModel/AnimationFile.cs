@@ -58,8 +58,6 @@ namespace Filetypes.RigidModel
         
         public Frame StaticFrame { get; set; } = null;
         public List<Frame> DynamicFrames = new List<Frame>();
-
-
         public AnimationHeader Header { get; set; } = new AnimationHeader();
 
         public static AnimationHeader GetAnimationHeader(PackFile file)

@@ -43,8 +43,6 @@ namespace View3D.Animation
                     skeletonFile.DynamicFrames[skeletonWeirdIndex].Quaternion[i].Z,
                     skeletonFile.DynamicFrames[skeletonWeirdIndex].Quaternion[i].W);
 
-
-
                 Translation[i] = new Vector3(
                     skeletonFile.DynamicFrames[skeletonWeirdIndex].Transforms[i].X * 1,
                     skeletonFile.DynamicFrames[skeletonWeirdIndex].Transforms[i].Y,
@@ -126,8 +124,6 @@ namespace View3D.Animation
 
             return GetWorldTransform(boneIndex); ;
         }
-
-
         public Matrix GetAnimatedTranform(int boneIndex)
         {
             if (_frame != null)

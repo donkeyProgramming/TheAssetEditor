@@ -131,6 +131,7 @@ namespace View3D.Rendering.Geometry
                         new RmvVector3(_vertexArray[i].Normal.X, _vertexArray[i].Normal.Y, _vertexArray[i].Normal.Z),
                         new RmvVector3(_vertexArray[i].BiNormal.X, _vertexArray[i].BiNormal.Y, _vertexArray[i].BiNormal.Z),
                         new RmvVector3(_vertexArray[i].Tangent.X, _vertexArray[i].Tangent.Y, _vertexArray[i].Tangent.Z),
+                        
                         new BaseVertex.BoneInformation[4]
                         {
                             new BaseVertex.BoneInformation( (byte)_vertexArray[i].BlendIndices.X, _vertexArray[i].BlendWeights.X),

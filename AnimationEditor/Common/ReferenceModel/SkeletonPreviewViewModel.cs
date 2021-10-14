@@ -107,6 +107,36 @@ namespace AnimationEditor.Common.ReferenceModel
             return output;
         }
 
+        public static ObservableCollection<SkeletonBoneNode> CreateFlatSkeletonList(GameSkeleton skeleton, int startBone = -1)
+        {
+            var output = new ObservableCollection<SkeletonBoneNode>();
+            for (int i = 0; i < skeleton.BoneCount; i++)
+            {
+                if (startBone == -1 || IsIndirectChildOf(i, startBone, skeleton))
+                {
+                    var bone = new SkeletonBoneNode()
+                    {
+                        BoneIndex = i,
+                        BoneName = skeleton.BoneNames[i]
+                    };
+                    output.Add(bone);
+                }
+            }
+            return output;
+        }
+
+        public static bool IsIndirectChildOf(int boneIndex, int childOff, GameSkeleton skeleton)
+        {
+            var parentIndex = skeleton.GetParentBone(boneIndex);
+            if (parentIndex == -1)
+                return false;
+
+            if (parentIndex == childOff)
+                return true;
+
+            return IsIndirectChildOf(parentIndex, childOff, skeleton);
+        }
+
         static SkeletonBoneNode CreateNode(int boneId, int parentBoneId, string boneName)
         {
             SkeletonBoneNode item = new SkeletonBoneNode

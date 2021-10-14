@@ -1,6 +1,7 @@
 ﻿using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace FileTypes.Sound.WWise.Hirc.V122
@@ -22,13 +23,14 @@ namespace FileTypes.Sound.WWise.Hirc.V122
             ArgumentList = new ArgumentList(chunk, uTreeDepth);
             uTreeDataSize = chunk.ReadUInt32();
             uMode = chunk.ReadByte();
-            AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth);
+            AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth , Size);
         }
     }
 
 
     public class AkDecisionTree
     {
+        [DebuggerDisplay("Node Key:[{key}] Children:[{Children.Count}] Sounds:[{SoundNodes.Count}]")]
         public class Node
         {
             public uint key;
@@ -44,26 +46,52 @@ namespace FileTypes.Sound.WWise.Hirc.V122
             {
             }
 
-            public void Parse(ByteChunk chunk, uint parentCount, uint currentTreeDepth, uint maxTreeDepth)
+            public void Parse(ByteChunk chunk, uint parentCount, uint currentTreeDepth, uint maxTreeDepth, uint size)
             {
+
+                // Load all my children
+
+
+
+                // For each of my children, load my children
+
+
                 for (uint i = 0; i < parentCount; i++)
                 {
-                    var node = new Node()
-                    {
-                        key = chunk.ReadUInt32(),
-                        children_uIdx = chunk.ReadUShort(),
-                        children_uCount = chunk.ReadUShort(),
-                        uWeight = chunk.ReadUShort(),
-                        uProbability = chunk.ReadUShort(),
-                    };
+                    var peak = chunk.PeakUint32();
+                    var uidx = (peak >> 0) & 0xFFFF;
+                    var ucnt = (peak >> 16) & 0xFFFF;
+                    var count_max = size;// chunk.BytesLeft;
 
-                    Children.Add(node);
+                    //if (uidx > count_max || ucnt > count_max)
+                    //{
+                    //    SoundNodes.Add(new SoundNode(chunk));
+                    //}
+                    //else
+                    {
+                        var node = new Node()
+                        {
+                            key = chunk.ReadUInt32(),
+                            children_uIdx = chunk.ReadUShort(),
+                            children_uCount = chunk.ReadUShort(),
+                            uWeight = chunk.ReadUShort(),
+                            uProbability = chunk.ReadUShort(),
+                        };
+
+                        Children.Add(node);
+
+                        if (node.children_uCount == 15346)
+                        { }
+                    }
+
+
+              
                 }
 
                 foreach (var child in Children)
                 {
                     if (currentTreeDepth != maxTreeDepth)
-                        child.Parse(chunk, child.children_uCount, currentTreeDepth + 1, maxTreeDepth);
+                        child.Parse(chunk, child.children_uCount, currentTreeDepth + 1, maxTreeDepth, size);
                     else
                     {
                         for(uint i = 0; i< child.children_uCount;i++)
@@ -92,11 +120,11 @@ namespace FileTypes.Sound.WWise.Hirc.V122
 
         public Node Root { get; set; }
 
-        public AkDecisionTree(ByteChunk chunk, uint maxTreeDepth)
+        public AkDecisionTree(ByteChunk chunk, uint maxTreeDepth, uint size)
         {
 
             Root = new Node();
-            Root.Parse(chunk, 1, 1, maxTreeDepth);
+            Root.Parse(chunk, 1, 1, maxTreeDepth, size);
         }
     }
 

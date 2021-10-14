@@ -26,21 +26,18 @@ namespace View3D.Utility
                     {
                         //errors.Add("Texture -> " + textureErrorMsg);
                         errors.Error("Texture", textureErrorMsg);
-                     
                     }
 
                     // Vertex type
                     if (outerLoopItem.MeshModel.Header.VertextType != innerLoopItem.MeshModel.Header.VertextType)
                     {
                         errors.Error("VertexType", $"{outerLoopItem.MeshModel.Header.ModelName} has a different vertex type then {innerLoopItem.MeshModel.Header.ModelName}");
-              
                     }
 
                     // Alpha mode
                     if (outerLoopItem.MeshModel.AlphaSettings.Mode != innerLoopItem.MeshModel.AlphaSettings.Mode)
                     {
                         errors.Error("AlphaSettings mode", $"{outerLoopItem.MeshModel.Header.ModelName} has a different AlphaSettings mode then {innerLoopItem.MeshModel.Header.ModelName}");
-       
                     }
                 }
             }

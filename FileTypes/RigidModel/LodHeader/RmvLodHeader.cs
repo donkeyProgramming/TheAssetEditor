@@ -26,7 +26,11 @@ namespace Filetypes.RigidModel.LodHeader
         uint TotalLodVertexSize { get; set; }
         uint TotalLodIndexSize { get; set; }
         uint FirstMeshOffset { get; set; }
-        byte QualityLvl { get; set; }
+        byte QualityLvl { get; }
         float LodCameraDistance { get; set; }
+
+        int GetHeaderSize();
+
+        public RmvLodHeader Clone();
     }
 }

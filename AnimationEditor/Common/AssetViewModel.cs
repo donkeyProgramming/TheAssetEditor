@@ -41,7 +41,7 @@ namespace AnimationEditor.Common.ReferenceModel
         SceneNode _parentNode;
         Color _skeletonColor;
         SkeletonNode _skeletonSceneNode;
-        List<Rmv2MeshNode> _meshNodes = new List<Rmv2MeshNode>();
+        ISceneNode _modelNode;
 
         bool _isSelectable = false;
         public bool IsSelectable { get => _isSelectable; set { _isSelectable = value; SetSelectableState(); } } 
@@ -79,7 +79,7 @@ namespace AnimationEditor.Common.ReferenceModel
             _pfs = pfs;
             _skeletonColor = skeletonColour;
 
-            ShowMesh = new NotifyAttr<bool>(true, (x) => _meshNodes.ForEach((x) => x.IsVisible = ShowMesh.Value));
+            ShowMesh = new NotifyAttr<bool>(true, (x) => SetMeshVisability(x));
             ShowSkeleton = new NotifyAttr<bool>(true, (x) => _skeletonSceneNode.IsVisible = ShowSkeleton.Value);
         }
 
@@ -97,9 +97,14 @@ namespace AnimationEditor.Common.ReferenceModel
             _skeletonSceneNode.NodeColour = _skeletonColor;
             _parentNode.AddObject(_skeletonSceneNode);
 
- 
-
             base.Initialize();
+        }
+
+        void SetMeshVisability(bool value)
+        {
+            if (_modelNode == null)
+                return;
+            _modelNode.IsVisible = value;
         }
 
         public void SetMesh(PackFile file)
@@ -115,16 +120,11 @@ namespace AnimationEditor.Common.ReferenceModel
                 return;
             }
 
-            for (int i = 0; i < _meshNodes.Count; i++)
-                _meshNodes[i].Parent.RemoveObject(_meshNodes[i]);
+            if(_modelNode != null)
+                _parentNode.RemoveObject(_modelNode);
+            _modelNode = result;
+            _parentNode.AddObject(result);
 
-            _meshNodes.Clear();
-            _meshNodes = Rmv2MeshNodeHelper.GetAllVisibleMeshes(result);
-
-            SetSelectableState();
-
-            for (int i = 0; i < _meshNodes.Count; i++)
-                _parentNode.AddObject(_meshNodes[i]);
 
             var fullSkeletonName = $"animations\\skeletons\\{outSkeletonName}.anim";
             var skeletonFile = _pfs.FindFile(fullSkeletonName);
@@ -133,7 +133,7 @@ namespace AnimationEditor.Common.ReferenceModel
             ShowMesh.Value = ShowMesh.Value;
             ShowSkeleton.Value = ShowSkeleton.Value;
 
-            result.ForeachNode((node) =>
+            result.ForeachNodeRecursive((node) =>
             {
                 if (node is Rmv2MeshNode mesh && string.IsNullOrWhiteSpace(mesh.AttachmentPointName) == false)
                 {
@@ -150,49 +150,39 @@ namespace AnimationEditor.Common.ReferenceModel
 
         void SetSelectableState()
         {
-            foreach (var node in _meshNodes)
+
+            _modelNode.ForeachNodeRecursive((node) =>
             {
                 node.IsEditable = false;
                 if (node is ISelectable selectable)
                     selectable.IsSelectable = IsSelectable;
-            }
+            });
         }
 
         public void CopyMeshFromOther(AssetViewModel other)
         {
-            foreach (var mesh in _meshNodes)
-                mesh.Parent.RemoveObject(mesh);
-            _meshNodes.Clear();
+            if (_modelNode != null)
+                _parentNode.RemoveObject(_modelNode);
 
-            foreach (var mesh in other._meshNodes)
-                _meshNodes.Add(mesh.Clone() as Rmv2MeshNode);
+            if (other._modelNode == null)
+                return;
 
-            foreach (var mesh in _meshNodes)
-            {
-                mesh.IsVisible = true;
-                mesh.IsSelectable = IsSelectable;
+            _modelNode = SceneNodeHelper.DeepCopy(other._modelNode);
+
+            var cloneMeshes = SceneNodeHelper.GetChildrenOfType<Rmv2MeshNode>(_modelNode);
+            foreach (var mesh in cloneMeshes)
                 mesh.AnimationPlayer = Player;
-                _parentNode.AddObject(mesh);
-            }
 
+            _parentNode.AddObject(_modelNode);
             var skeletonFile = _pfs.FindFile(other.SkeletonName.Value);
             SetSkeleton(skeletonFile);
-
+            
             ShowMesh.Value = ShowMesh.Value;
             ShowSkeleton.Value = ShowSkeleton.Value;
-
+            
             MeshChanged?.Invoke(this);
         }
 
-        public void SetMeshPosition(Matrix transform)
-        {
-            foreach (var mesh in _meshNodes)
-            {
-                for (int i = 0; i < mesh.Geometry.VertexCount(); i++)
-                    mesh.Geometry.TransformVertex(i, transform);
-                mesh.Geometry.RebuildVertexBuffer();
-            }
-        }
 
         public void SetSkeleton(PackFile skeletonPackFile)
         {
@@ -217,8 +207,8 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public void SetTransform(Matrix matrix)
         {
-            foreach (var node in _meshNodes)
-                node.ModelMatrix = matrix;
+            if(_modelNode != null)
+                _modelNode.ModelMatrix = matrix;
         }
 
         public void SetSkeleton(AnimationFile animFile, string skeletonName)
@@ -231,17 +221,6 @@ namespace AnimationEditor.Common.ReferenceModel
             SkeletonChanged?.Invoke(Skeleton);
         }
 
-        internal void OnlyShowMeshRelatedToBones(List<int> selectedBoneIds, List<IndexRemapping> remapping, string newSkeletonName)
-        {
-            var boneArray = selectedBoneIds.ToArray();
-            foreach (var meshNode in _meshNodes)
-            {
-                var geo = meshNode.Geometry as Rmv2Geometry;
-                geo.RemoveAllVertexesNotUsedByBones(boneArray);
-                geo.UpdateAnimationIndecies(remapping);
-                meshNode.MeshModel.ParentSkeletonName = newSkeletonName;
-            }
-        }
 
         internal void SelectedBoneIndex(int? boneIndex)
         {

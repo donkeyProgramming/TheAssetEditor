@@ -99,7 +99,7 @@ namespace KitbasherEditor.ViewModels
             {
                 try
                 {
-                    _modelLoader.LoadEditableModel(MainFile as PackFile);
+                    _modelLoader.LoadMainEditableModel(MainFile as PackFile);
                     var nodes = _modelLoader.EditableMeshNode.GetMeshNodes(0)
                         .Select(x => x as ISelectable)
                         .Where(x => x != null)

@@ -14,7 +14,15 @@ namespace Filetypes.RigidModel
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct RmvModelHeader
-    { 
+    {
+        public RmvModelHeader(uint version, string skeletonName, uint lodCount)
+        {
+            _fileType = ByteParsers.String.Encode("RMV2", out _);
+            Version = version;
+            LodCount = lodCount;
+            _skeletonName = ByteParsers.String.Encode(skeletonName, out _);
+        }
+
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         byte[] _fileType;
 
@@ -23,6 +31,8 @@ namespace Filetypes.RigidModel
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
         byte[] _skeletonName;
+
+        public RmvVersionEnum GetVersion() => (RmvVersionEnum)Version;
 
         public string FileType
         {
@@ -55,6 +65,17 @@ namespace Filetypes.RigidModel
                     _skeletonName[i] = byteValues[i];
                 }
             }
+        }
+
+        public RmvModelHeader Clone()
+        {
+            return new RmvModelHeader()
+            {
+                _fileType = _fileType,
+                Version = Version,
+                LodCount = LodCount,
+                _skeletonName = _skeletonName,
+            };
         }
     };
 

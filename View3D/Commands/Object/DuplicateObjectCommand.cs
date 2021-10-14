@@ -45,7 +45,7 @@ namespace View3D.Commands.Object
 
             foreach (var item in _objectsToCopy)
             {
-                var clonedItem = item.Clone();
+                var clonedItem = SceneNodeHelper.CloneNode(item);
                 clonedItem.Id = Guid.NewGuid().ToString();
                 _clonedObjects.Add(clonedItem);
                 item.Parent.AddObject(clonedItem);

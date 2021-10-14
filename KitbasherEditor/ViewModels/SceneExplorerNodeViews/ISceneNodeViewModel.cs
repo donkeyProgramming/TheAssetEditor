@@ -23,9 +23,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 case Rmv2ModelNode m:
                     return new ModelSceneNodeViewModel(m);
 
-                case Rmv2LodNode l:
-                    return new LodSceneNodeViewModel(l);
-
                 case Rmv2MeshNode m:
                     return new MeshSceneNodeViewModel(m, pf, skeletonAnimationLookUpHelper, componentManager);
                 case SkeletonNode s:

@@ -199,7 +199,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             }
 
             node.Parent.RemoveObject(node);
-            node.ForeachNode(x =>
+            node.ForeachNodeRecursive(x =>
             {
                 x.IsEditable = true;
                 if (x is Rmv2MeshNode mesh)

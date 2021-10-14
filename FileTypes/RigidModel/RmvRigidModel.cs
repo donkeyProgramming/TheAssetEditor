@@ -7,23 +7,30 @@ using System.Linq;
 
 namespace Filetypes.RigidModel
 {
+    public enum RmvVersionEnum
+    { 
+        RMV2_V6 = 6,
+        RMV2_V7 = 7,
+        RMV2_V8 = 8,
+    }
+
     public class RmvRigidModel
     {
         public RmvModelHeader Header { get; set; }
-        public RmvLodHeader[] LodHeaders { get; private set; }
+        public RmvLodHeader[] LodHeaders { get; set; }
         public RmvSubModel[][] MeshList { get; set; }
         public string FileName { get; private set; }
 
-        public RmvRigidModel(byte[] data, string fileName)
+        public RmvRigidModel(byte[] modelByteData, string fileName)
         { 
             ILogger logger = Logging.Create<RmvRigidModel>();
             logger.Here().Information($"Loading Rmv2RigidModel: {fileName}");
-            if (data.Length == 0)
+            if (modelByteData.Length == 0)
                 throw new Exception("Trying to load Rmv2RigidModel with no data, data size = 0");
 
             FileName = fileName;
-            Header = LoadModelHeader(data);
-            LodHeaders = LoadLodHeaders(data);
+            Header = LoadModelHeader(modelByteData);
+            LodHeaders = LoadLodHeaders(modelByteData);
 
             MeshList = new RmvSubModel[Header.LodCount][];
             for (int lodIndex = 0; lodIndex < Header.LodCount; lodIndex++)
@@ -34,14 +41,17 @@ namespace Filetypes.RigidModel
                 var sizeOffset = 0;
                 for (int meshIndex = 0; meshIndex < lodMeshCount; meshIndex++)
                 {
-                    var offset = LodHeaders[lodIndex].FirstMeshOffset + sizeOffset;
-                    MeshList[lodIndex][meshIndex] = new RmvSubModel(data, (int)offset, Header.Version, Header.SkeletonName);
+                    int offset = (int)LodHeaders[lodIndex].FirstMeshOffset + sizeOffset;
+                    MeshList[lodIndex][meshIndex] = new RmvSubModel(modelByteData, offset, Header.Version, Header.SkeletonName);
+                    
                     sizeOffset += (int)MeshList[lodIndex][meshIndex].Header.ModelSize;
                 }
             }
 
             logger.Here().Information("Loading done");
         }
+
+        public RmvRigidModel() { }
 
         RmvModelHeader LoadModelHeader(byte[] data)
         {
@@ -68,7 +78,7 @@ namespace Filetypes.RigidModel
             {
                 RmvLodHeader header;
                 if (Header.Version == 6)
-                    header = ByteHelper.ByteArrayToStructure<Rmv2LodHeader_V6>(data, offset + lodHeaderSize*i);
+                    header = ByteHelper.ByteArrayToStructure<Rmv2LodHeader_V6>(data, offset + lodHeaderSize * i);
                 else
                     header = ByteHelper.ByteArrayToStructure<Rmv2LodHeader_V7>(data, offset + lodHeaderSize * i);
 
@@ -82,7 +92,7 @@ namespace Filetypes.RigidModel
         {
             writer.Write(ByteHelper.GetBytes(Header));
 
-            if (Header.Version == 7)
+            if (Header.Version == 7 || Header.Version == 8)
             {
                 for (int i = 0; i < LodHeaders.Length; i++)
                     writer.Write(ByteHelper.GetBytes((Rmv2LodHeader_V7)LodHeaders[i]));
@@ -113,8 +123,6 @@ namespace Filetypes.RigidModel
                     writer.Write(ByteHelper.GetBytes(model.AlphaSettings));
 
                     var header = model.Header;
-                    //header.VertextType = VertexFormat.Default;
-                    //model.Header = header;
                     model.Mesh.SaveToByteArray(writer, model.Header.VertextType);
                 }
             }
@@ -144,7 +152,6 @@ namespace Filetypes.RigidModel
                 LodHeaders[lodIndex] = lodHeader;
 
                 modelOffset += (uint)MeshList[lodIndex].Sum(x => x.Header.ModelSize);
-                
             }
         }
     }

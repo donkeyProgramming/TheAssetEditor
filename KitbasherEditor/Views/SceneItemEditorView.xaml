@@ -11,14 +11,8 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <DataTemplate DataType="{ x:Type nodeViewModels:ModelSceneNodeViewModel}">
-            <rmv2:RigidModelEditorView/>
-        </DataTemplate>
         <DataTemplate DataType="{ x:Type nodeViewModels:MainEditableNodeViewModel}">
             <generic:MainEditableNodeView/>
-        </DataTemplate>
-        <DataTemplate DataType="{ x:Type nodeViewModels:LodSceneNodeViewModel}">
-            <rmv2:RigidModelLodEditorView/>
         </DataTemplate>
         <DataTemplate DataType="{ x:Type nodeViewModels:MeshSceneNodeViewModel}">
             <rmv2:RigidModelMeshEditorView/>

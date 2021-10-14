@@ -10,18 +10,14 @@ namespace View3D.SceneNodes
             Name = name;
         }
 
-        public override ISceneNode Clone()
+        public override ISceneNode CreateCopyInstance() => new GroupNode();
+
+        public override void CopyInto(ISceneNode target)
         {
-            var newItem = new GroupNode()
-            {
-                SceneManager = SceneManager,
-                IsEditable = IsEditable,
-                IsVisible = IsVisible,
-                IsUngroupable = IsUngroupable,
-                IsLockable = IsLockable,
-                Name = Name + " - Clone",
-            };
-            return newItem;
+            var typedTarget = target as GroupNode;
+            typedTarget.IsUngroupable = IsUngroupable;
+            typedTarget.IsLockable = IsLockable;
+            base.CopyInto(target);
         }
 
         public bool IsUngroupable { get; set; } = false;
@@ -36,6 +32,8 @@ namespace View3D.SceneNodes
             base.ModelMatrix = value;
             RenderMatrix = value;
         }
+
+
     }
 
     public class WsModelGroup : GroupNode

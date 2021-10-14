@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Filetypes.RigidModel.Vertex
 {
+
+
+
     public class CinematicVertex : BaseVertex
     {
         public struct Data //32

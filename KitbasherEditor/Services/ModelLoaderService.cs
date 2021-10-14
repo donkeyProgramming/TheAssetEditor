@@ -32,14 +32,15 @@ namespace KitbasherEditor.Services
             _sceneManager = sceneManager;
 
             var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(resourceLibary.Content, animationView) { IsLockable = false }) as SkeletonNode;
-            EditableMeshNode = (MainEditableNode)_sceneManager.RootNode.AddObject(new MainEditableNode("Editable Model", skeletonNode, mainFile));
+            EditableMeshNode = _sceneManager.RootNode.AddObject(new MainEditableNode("Editable Model", skeletonNode, mainFile));
             ReferenceMeshRoot = sceneManager.RootNode.AddObject(new GroupNode("Reference meshs") { IsEditable = false, IsLockable=false });
         }
 
-        public void LoadEditableModel(PackFile file)
+        public void LoadMainEditableModel(PackFile file)
         {
             var rmv = new RmvRigidModel(file.DataSource.ReadData(), file.Name);
             EditableMeshNode.SetModel(rmv, _resourceLibary, _animationView.Player, GeometryGraphicsContextFactory.CreateInstance(_resourceLibary.GraphicsDevice));
+            EditableMeshNode.SelectedOutputFormat = rmv.Header.GetVersion();
 
             _animationView.SetActiveSkeleton(rmv.Header.SkeletonName);
         }
@@ -55,7 +56,7 @@ namespace KitbasherEditor.Services
                 return;
             }
 
-            LoadReference(refereneceMesh as PackFile);
+            LoadReference(refereneceMesh);
         }
 
         public void LoadReference(PackFile file, bool updateSkeleton = false)
@@ -71,7 +72,7 @@ namespace KitbasherEditor.Services
                 return;
             }
 
-            result.ForeachNode((node) => 
+            result.ForeachNodeRecursive((node) => 
             { 
                 node.IsEditable = false;
                 if (node is ISelectable selectable)

@@ -77,7 +77,17 @@ namespace View3D.SceneNodes
 
             return output;
         }
-        
+
+        protected Rmv2LodNode() { }
+
+        public override ISceneNode CreateCopyInstance() => new Rmv2LodNode();
+
+        public override void CopyInto(ISceneNode target)
+        {
+            var typedTarget = target as Rmv2LodNode;
+            typedTarget.LodValue = LodValue;
+            base.CopyInto(target);
+        }
     }
 
  

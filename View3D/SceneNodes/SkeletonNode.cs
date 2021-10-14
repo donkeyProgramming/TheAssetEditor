@@ -88,6 +88,22 @@ namespace View3D.SceneNodes
             }
         }
 
+
+        protected SkeletonNode() { }
+
+        public override ISceneNode CreateCopyInstance() => new SkeletonNode();
+
+        public override void CopyInto(ISceneNode target)
+        {
+            var typedTarget = target as SkeletonNode;
+            typedTarget.NodeColour = NodeColour;
+            typedTarget.SelectedNodeColour = SelectedNodeColour;
+            typedTarget.LineColour = LineColour;
+            typedTarget.SelectedBoneIndex = SelectedBoneIndex;
+            typedTarget.SkeletonScale = SkeletonScale;
+            base.CopyInto(target);
+        }
+
         public void Dispose()
         {
             _lineRenderer.Dispose();

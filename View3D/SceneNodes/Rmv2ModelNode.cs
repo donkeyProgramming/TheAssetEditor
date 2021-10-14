@@ -1,14 +1,7 @@
 ﻿using Filetypes.RigidModel;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using View3D.Animation;
-using View3D.Components.Rendering;
-using View3D.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.Utility;
 
@@ -16,15 +9,13 @@ namespace View3D.SceneNodes
 {
     public class Rmv2ModelNode : GroupNode
     {
-        // AnimationData
-
         public RmvRigidModel Model { get; set; }
 
         public Rmv2ModelNode(RmvRigidModel model,  ResourceLibary resourceLib, string name, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory) : base(name)
         {
             Name = name;
 
-            for (int lodIndex = 0; lodIndex < 4; lodIndex++)
+            for (int lodIndex = 0; lodIndex < model.LodHeaders.Count(); lodIndex++)
             {
                 var lodNode = new Rmv2LodNode("Lod " + lodIndex, lodIndex)
                 {
@@ -94,21 +85,31 @@ namespace View3D.SceneNodes
         public List<Rmv2MeshNode> GetMeshNodes(int lod)
         {
             var lods = GetLodNodes();
-       
             return lods[lod].Children.Select(x=> x as Rmv2MeshNode).ToList();
         }
 
-        public override ISceneNode Clone()
+        public List<Rmv2MeshNode> GetMeshesInLod(int lodIndex, bool onlyVisible)
         {
-            var newItem = new Rmv2ModelNode(Name + " - Clone")
-            {
-                SceneManager = SceneManager,
-                IsEditable = IsEditable,
-                IsVisible = IsVisible,
-                Name = Name + " - Clone",
-                Model = Model,
-            };
-            return newItem;
+            var lods = GetLodNodes();
+            var orderedLods = lods.OrderBy(x => x.LodValue);
+
+            var meshes = orderedLods
+               .ElementAt(lodIndex)
+               .GetAllModels(onlyVisible);
+
+            return meshes;
+        }
+
+
+        protected Rmv2ModelNode() { }
+
+        public override ISceneNode CreateCopyInstance() => new Rmv2ModelNode();
+
+        public override void CopyInto(ISceneNode tartet)
+        {
+            var typedTarget = tartet as Rmv2ModelNode;
+            typedTarget.Model = Model;
+            base.CopyInto(tartet);
         }
     }
 

@@ -1,10 +1,15 @@
 ﻿using Common;
 using Filetypes.RigidModel;
+using Filetypes.RigidModel.LodHeader;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using View3D.Animation;
+using View3D.Services;
 
 namespace View3D.SceneNodes
 {
@@ -12,6 +17,7 @@ namespace View3D.SceneNodes
     {
         public SkeletonNode Skeleton { get; private set; }
         public IPackFile MainPackFile { get; private set; }
+        public RmvVersionEnum SelectedOutputFormat { get; set; }
 
         public MainEditableNode(string name, SkeletonNode skeletonNode, IPackFile mainFile) : base(name)
         {
@@ -22,7 +28,7 @@ namespace View3D.SceneNodes
         public bool AreAllNodesVisible()
         {
             bool isAllVisible = true;
-            GetLodNodes()[0].ForeachNode((node) =>
+            GetLodNodes()[0].ForeachNodeRecursive((node) =>
             {
                 if (!node.IsVisible)
                     isAllVisible = false;
@@ -38,19 +44,20 @@ namespace View3D.SceneNodes
 
             var lods = GetLodNodes();
             var orderedLods = lods.OrderBy(x => x.LodValue);
+            var lodCount = lods.Count;
 
             RmvSubModel[][] newMeshList = new RmvSubModel[orderedLods.Count()][];
-            for (int lodIndex = 0; lodIndex < orderedLods.Count(); lodIndex++)
+            for (int currentLodIndex = 0; currentLodIndex < lodCount; currentLodIndex++)
             {
-                var meshes = GetMeshesInLod(lodIndex, onlySaveVisibleNodes);
+                List<Rmv2MeshNode> meshes = GetMeshesInLod(currentLodIndex, onlySaveVisibleNodes);
 
-                newMeshList[lodIndex] = new RmvSubModel[meshes.Count];
+                newMeshList[currentLodIndex] = new RmvSubModel[meshes.Count];
 
                 for (int meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
                 {
                     meshes[meshIndex].RecomputeBoundingBox();
-                    newMeshList[lodIndex][meshIndex] = meshes[meshIndex].CreateRmvSubModel();
-                    newMeshList[lodIndex][meshIndex].UpdateAttachmentPointList(boneNames);
+                    newMeshList[currentLodIndex][meshIndex] = meshes[meshIndex].CreateRmvSubModel();
+                    newMeshList[currentLodIndex][meshIndex].UpdateAttachmentPointList(boneNames);
                 }
             }
 
@@ -62,20 +69,27 @@ namespace View3D.SceneNodes
 
 
             Model.SaveToByteArray(writer);
-            return ms.ToArray();
+            var data = ms.ToArray();
+
+
+
+            var test = MeshSaverService.Save(onlySaveVisibleNodes, this, Skeleton.AnimationProvider.Skeleton);
+            var test2 = MeshSaverService.Save(onlySaveVisibleNodes, new List< Rmv2ModelNode >(){ this}, Skeleton.AnimationProvider.Skeleton);
+            for (int i = 0; i < test2.Length; i++)
+            {
+                if (data[i] != test2[i])
+                { 
+                }
+            
+            }
+
+            return data;
+
         }
 
-        public List<Rmv2MeshNode> GetMeshesInLod(int lodIndex, bool onlyVisible)
-        {
-            var lods = GetLodNodes();
-            var orderedLods = lods.OrderBy(x => x.LodValue);
 
-            var meshes = orderedLods
-               .ElementAt(lodIndex)
-               .GetAllModels(onlyVisible);
 
-            return meshes;
-        }
+
 
 
         // GetAllNodes

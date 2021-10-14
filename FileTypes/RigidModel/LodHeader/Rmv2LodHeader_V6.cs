@@ -19,8 +19,21 @@ namespace Filetypes.RigidModel.LodHeader
         public uint TotalLodIndexSize { get => _totalLodIndexSize; set => _totalLodIndexSize = value; }
         public uint FirstMeshOffset { get => _firstMeshOffset; set => _firstMeshOffset = value; }
 
-        public byte QualityLvl { get => 0; set => throw new Exception(); }
+        public byte QualityLvl { get => 0; }
         public float LodCameraDistance { get => _lodCameraDistance; set => _lodCameraDistance = value; }
-    }
 
+        public int GetHeaderSize() => ByteHelper.GetSize(typeof(Rmv2LodHeader_V6));
+
+        public RmvLodHeader Clone()
+        {
+            return new Rmv2LodHeader_V6()
+            {
+                _meshCount = MeshCount,
+                _totalLodVertexSize = _totalLodVertexSize,
+                _totalLodIndexSize = _totalLodIndexSize,
+                _firstMeshOffset = _firstMeshOffset,
+                _lodCameraDistance = _lodCameraDistance,
+            };
+        }
+    }
 }

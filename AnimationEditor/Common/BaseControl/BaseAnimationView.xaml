@@ -58,10 +58,6 @@
             
             <ContentControl Grid.Row="3" Content="{Binding Editor, UpdateSourceTrigger=PropertyChanged}" >
                 <ContentControl.Resources>
-                    <DataTemplate DataType="{ x:Type propcreator:PropCreatorEditorViewModel}">
-                        <propcreator:PropCreatorEditorView  />
-                    </DataTemplate>
-
                     <DataTemplate DataType="{ x:Type mountcreator:Editor}">
                         <mountcreator:MountAnimationCreatorView  />
                     </DataTemplate>

@@ -3,8 +3,10 @@ using Filetypes.RigidModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.WpfInterop;
+using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using View3D.Components.Gizmo;
 using View3D.Components.Rendering;
 using View3D.Rendering;
@@ -24,6 +26,7 @@ namespace View3D.Components.Component
         public event SceneObjectAddedDelegate SceneObjectAdded;
         public event SceneObjectRemovedDelegate SceneObjectRemoved;
 
+        ILogger _logger = Logging.Create<SceneManager>();
         public ISceneNode RootNode { get; private set; }
 
         RenderEngineComponent _renderEngine;
@@ -167,6 +170,23 @@ namespace View3D.Components.Component
                 }
             }
         }
+
+        public void DumpToConsole()
+        {
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine("SceneManager content:");
+            DumpToConsole(RootNode, 0, stringBuilder);
+            _logger.Here().Information(stringBuilder.ToString());
+        }
+
+        void DumpToConsole(ISceneNode node, int indentationLevel, StringBuilder output)
+        {
+            var indent = new string('\t', indentationLevel);
+            output.AppendLine($"{indent}[{node.GetType().Name}]{node.Name} isVisible:{node.IsVisible} isEditable:{node.IsEditable} id:{node.Id}");
+            foreach (var child in node.Children)
+                DumpToConsole(child, indentationLevel + 1, output);
+        }
+
 
         public void Dispose()
         {

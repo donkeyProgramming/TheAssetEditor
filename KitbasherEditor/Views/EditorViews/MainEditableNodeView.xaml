@@ -24,5 +24,11 @@
                                 ShowLabel="false"
                                 LabelText="Target Anim"/>
         </DockPanel>
+
+        <DockPanel DockPanel.Dock="Top">
+            <Label Width="100">Output format</Label>
+            <Label>:</Label>
+            <ComboBox ItemsSource="{Binding PossibleOutputFormats}" SelectedItem="{Binding SelectedOutputFormat}" VerticalAlignment="Center"/>
+        </DockPanel>
     </DockPanel>
 </UserControl>

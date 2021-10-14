@@ -29,7 +29,7 @@
 
             <Button Grid.Column="0" Content="Open bone mapping window" Click="{s:MethodBinding OpenMappingWindow}" Margin="2"/>
             <Button Grid.Column="1" Content="Save Animation" Click="{s:MethodBinding SaveAnimation}" Margin="2"/>
-            <Button Grid.Column="2" Content="Batch Process" IsEnabled="False" Margin="2"/>
+            <Button Grid.Column="2" Content="Batch Process"  Click="{s:MethodBinding OpenBatchProcessDialog}" Margin="2"/>
            
         </Grid>
 

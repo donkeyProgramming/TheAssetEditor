@@ -14,21 +14,19 @@ namespace View3D.Commands.Object
         List<IGeometry> _originalGeometries;
 
         List<Rmv2MeshNode> _meshNodes;
-        GameSkeleton _skeleton; 
         AnimationFrame _frame;
         bool _convertToStaticFrame;
 
-        public CreateAnimatedMeshPoseCommand(List<Rmv2MeshNode> meshNodes, GameSkeleton skeleton, AnimationFrame frame, bool convertToStaticFrame = false)
+        public CreateAnimatedMeshPoseCommand(List<Rmv2MeshNode> meshNodes, AnimationFrame frame, bool convertToStaticFrame = false)
         {
             _meshNodes = new List<Rmv2MeshNode>(meshNodes);
-            _skeleton = skeleton;
             _frame = frame;
             _convertToStaticFrame = convertToStaticFrame;
         }
 
         public override string GetHintText()
         {
-            return "Remap skeleton";
+            return "Created static mesh from animation"; 
         }
 
         protected override void ExecuteCommand()

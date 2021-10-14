@@ -1,4 +1,5 @@
 ﻿using Common;
+using CommonControls.MathViews;
 using CommonControls.Services;
 using System;
 using System.Collections.Generic;
@@ -15,10 +16,14 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         SkeletonNode _meshNode;
         public SkeletonSceneNodeViewModel(SkeletonNode node, PackFileService pf, SkeletonAnimationLookUpHelper animLookUp)
         {
-          
             _meshNode = node;
-            //_asset = assetViewModel;
             CreateBoneOverview(_meshNode.AnimationProvider.Skeleton);
+            BoneScale.PropertyChanged += BoneScale_PropertyChanged;
+        }
+
+        private void BoneScale_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            _meshNode.SkeletonScale = (float)BoneScale.Value;
         }
 
         int _boneCount = 0;
@@ -41,11 +46,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                     _meshNode.SelectedBoneIndex = null;
                 else
                     _meshNode.SelectedBoneIndex = _selectedBone.BoneIndex;
-
-                /* _skeletonSceneNode.SelectedBoneIndex = boneIndex; */
-                                                                        }
+              }
         }
 
+
+        public DoubleViewModel BoneScale { get; set; } = new DoubleViewModel(1);
 
 
         void CreateBoneOverview(GameSkeleton skeleton)
@@ -102,6 +107,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         public void Dispose()
         {
+            BoneScale.PropertyChanged -= BoneScale_PropertyChanged;
         }
 
 

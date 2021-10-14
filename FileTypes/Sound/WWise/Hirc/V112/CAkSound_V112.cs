@@ -15,8 +15,8 @@ namespace FileTypes.Sound.WWise.Hirc.V112
             NodeBaseParams = NodeBaseParams.Create(chunk);
         }
 
-        public override uint GetParentId() => AkBankSourceData.akMediaInformation.SourceId;
-        public override uint GetSourceId() => NodeBaseParams.DirectParentID;
+        public override uint GetParentId() => NodeBaseParams.DirectParentID;
+        public override uint GetSourceId() => AkBankSourceData.akMediaInformation.SourceId;
 
     }
 

@@ -10,6 +10,7 @@ using CommonControls.Services;
 using FileTypes.AnimationPack;
 using FileTypes.DB;
 using FileTypes.PackFiles.Models;
+using FileTypes.RigidModel;
 using FileTypes.Sound;
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor;
@@ -82,6 +83,10 @@ namespace AssetEditor.ViewModels
           
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
+
+                var invMatrixPackFile = _packfileService.FindFile(@"animations\skeletons\advisorcrow01.bone_inv_trans_mats");
+                var t = AnimInvMatrixFile.Create(invMatrixPackFile.DataSource.ReadDataAsChunk());
+
                 //_packfileService.Load(@"C:\Users\ole_k\AssetEditor\MyStuff\ratcar.pack", true);
 
                 //AnimMetaBatchProcessor processor = new AnimMetaBatchProcessor();
@@ -91,7 +96,7 @@ namespace AssetEditor.ViewModels
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 //MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
                 //KitbashEditor_Debug.CreateLoremasterHead(this, toolFactory, packfileService);
-                //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateDamselEditor(this, toolFactory, packfileService);
+                AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateGreatEagle(this, toolFactory, packfileService);
 
                 //var f = packfileService.FindFile(@"animations\campaign\database\bin\cam_hero_hu1d_def_spear_and_shield.bin");
                 //OpenFile(f);
@@ -109,7 +114,7 @@ namespace AssetEditor.ViewModels
 
                 //CreateEmptyEditor(editorView);
 
-                // CreateTestPackFiles(packfileService);
+                 CreateTestPackFiles(packfileService);
             }
         }
 

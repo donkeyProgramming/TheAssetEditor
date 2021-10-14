@@ -169,6 +169,9 @@ namespace CommonControls.Editors.Sound
             if (children.Count > 1)
                 currentOutputNode.Data += " DuplicateChildRef " + children.Count + "{" +  string.Join(", ", children.Select(x=>x.OwnerFile + " " + x.Id)) + "}";
 
+            if (children.Count == 0)
+                currentOutputNode.Data += " No children found!";
+
             foreach (var child in children)
                 ProcessGenericChild(child, currentOutputNode);
         }

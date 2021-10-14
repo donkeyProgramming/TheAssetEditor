@@ -23,6 +23,7 @@ using View3D.Commands.Object;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
+using View3D.Services;
 using MessageBox = System.Windows.MessageBox;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
@@ -299,21 +300,20 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             //Generate lod
             for (int lodIndex = 0; lodIndex < lodsToGenerate.Count(); lodIndex++)
             {
-                var lerpValue = (1.0f / (lodsToGenerate.Count() - 1)) * (lodsToGenerate.Count() - 1 - lodIndex);
-                var deductionRatio = MathHelper.Lerp(0.25f, 0.75f, lerpValue);
+                var deductionRatio = MeshSaverService.GetDefaultLodReductionValue(lodsToGenerate.Count(), lodIndex);
 
                 foreach (var modelGroupCollection in modelGroups)
                 {
                     ISceneNode parentNode = lodsToGenerate[lodIndex];
                     if (modelGroupCollection.Key is Rmv2LodNode == false && modelGroupCollection.Key is GroupNode groupNode)
                     {
-                        parentNode = groupNode.Clone();
+                        parentNode = SceneNodeHelper.CloneNode(groupNode);
                         lodsToGenerate[lodIndex].AddObject(parentNode);
                     }
 
                     foreach (var mesh in modelGroupCollection.Value)
                     {
-                        var clone = mesh.Clone() as Rmv2MeshNode;
+                        var clone = SceneNodeHelper.CloneNode(mesh);
 
                         var reduceValue = deductionRatio;
                         if (clone.ReduceMeshOnLodGeneration == false)
@@ -384,13 +384,13 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             {
                 if (obj is Rmv2MeshNode meshNode)
                 {
-                    var cpy = meshNode.Clone() as Rmv2MeshNode;
+                    var cpy = SceneNodeHelper.CloneNode(meshNode);
                     groupNodeContainer.AddObject(cpy);
                     meshes.Add(cpy);
                 }
             }
 
-            var cmd = new CreateAnimatedMeshPoseCommand(meshes, mainPlayer._skeleton, frame, true);
+            var cmd = new CreateAnimatedMeshPoseCommand(meshes, frame, true);
             var commandExecutor = _componentManager.GetComponent<CommandExecutor>();
             commandExecutor.ExecuteCommand(cmd, false);
         }

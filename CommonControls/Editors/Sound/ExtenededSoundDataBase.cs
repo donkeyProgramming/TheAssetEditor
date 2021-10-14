@@ -10,6 +10,8 @@ namespace CommonControls.Editors.Sound
         public List<uint> IdsNotFound { get; set; } = new List<uint>();
         Dictionary<uint, List<HircItem>> _hircList { get; set; } = new Dictionary<uint, List<HircItem>>();
 
+        public Dictionary<uint, List<HircItem>> HircList { get => _hircList; }
+
         public ExtenededSoundDataBase()
         {
         }

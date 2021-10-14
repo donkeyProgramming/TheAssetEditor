@@ -13,7 +13,6 @@ namespace CommonControls.Editors.TextEditor
         }
 
         string GetText(byte[] bytes);
-
         bool ShouldShowLineNumbers();
         string GetSyntaxType();
         bool CanSaveOnError();

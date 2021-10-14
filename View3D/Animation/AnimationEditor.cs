@@ -78,95 +78,10 @@ namespace View3D.Animation
 
         public static AnimationClip ExtractPartOfAnimation(AnimationClip existingAnim, int[] bones)
         {
-            //var newAnim = new AnimationFile();
-            //newAnim.Header.SkeletonName = skeletonName;
-            //newAnim.Header.AnimationTotalPlayTimeInSec = existingAnim.Header.AnimationTotalPlayTimeInSec;
-            //newAnim.Bones = new AnimationFile.BoneInfo[bones.Length];
-            //newAnim.StaticFrame = new AnimationFile.Frame();
-            //
-            //CreateBoneTable(skeleton, bones, ref newAnim);
-
-            ;
             var cpy = existingAnim.Clone();
             cpy.MergeStaticAndDynamicFrames();
             cpy.LimitAnimationToSelectedBones(bones);
             return cpy;
-
-            //var boneCount = bones.Length;
-            //var frameCount = clip.DynamicFrames.Count;
-            //List<KeyFrame> newDynamicFrames = new List<KeyFrame>();
-            //
-            //for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
-            //{
-            //    var newKeyframe = new KeyFrame();
-            //
-            //    for (int boneIndex = 0; boneIndex < boneCount; boneIndex++)
-            //    {
-            //        var translationLookup = clip.TranslationMappings[boneIndex];
-            //        if (translationLookup.IsDynamic)
-            //            newKeyframe.Position.Add(clip.DynamicFrames[frameIndex].Position[translationLookup.Id]);
-            //        else if (translationLookup.IsStatic)
-            //            newKeyframe.Position.Add(clip.StaticFrame.Position[translationLookup.Id]);
-            //
-            //        var rotationLookup = clip.RotationMappings[boneIndex];
-            //        if (rotationLookup.IsDynamic)
-            //            newKeyframe.Rotation.Add(clip.DynamicFrames[frameIndex].Rotation[rotationLookup.Id]);
-            //        else if (rotationLookup.IsStatic)
-            //            newKeyframe.Rotation.Add(clip.StaticFrame.Rotation[rotationLookup.Id]);
-            //    }
-            //
-            //    newDynamicFrames.Add(newKeyframe);
-            //}
-            //
-
-
-
-            //----------------
-
-            //CreateMappingTable(existingAnim, bones, ref newAnim);
-            //CreateStaticFrameTable(existingAnim, bones, ref newAnim);
-
-
-            //AnimationClip
-
-            //
-            // newAnim.DynamicFrames = new List<AnimationFile.Frame>();
-            //for (int frameIndex = 0; frameIndex < existingAnim.DynamicFrames.Count; frameIndex++)
-            // {
-            //     var frame = new AnimationFile.Frame();
-            //
-            //     for (int boneIndex = 0; boneIndex < bones.Length; boneIndex++)
-            //     {
-            //
-            //         var originalBoneIndex = bones[boneIndex];
-            //         var tanslationMappingValue = existingAnim.TranslationMappings[originalBoneIndex];
-            //         if (tanslationMappingValue.IsDynamic)
-            //         {
-            //             // Copy all?
-            //             //newAnim.StaticFrame.Transforms.Add(existingAnim.StaticFrame.Transforms[tanslationMappingValue.Id]);
-            //         }
-            //
-            //
-            //
-            //
-            //         
-            //         for (int i = 0; i < existingAnim.DynamicFrames[frameIndex].Transforms.Count; i++)
-            //             frame.Transforms.Add(existingAnim.DynamicFrames[frameIndex].Transforms[i]);
-            //
-            //         for (int i = 0; i < existingAnim.DynamicFrames[frameIndex].Quaternion.Count; i++)
-            //             frame.Quaternion.Add(existingAnim.DynamicFrames[frameIndex].Quaternion[i]);
-            //
-            //         newAnim.DynamicFrames.Add(frame);
-            //     }
-            // }
-            //
-            // // Remove by index
-            // for (int i = 0; i < newAnim.DynamicFrames.Count; i++)
-            // { 
-            // 
-            // }
-
-            return null;
         }
 
         public static void LoopAnimation(AnimationClip newRiderAnim, int loopCounter)
@@ -181,10 +96,6 @@ namespace View3D.Animation
                     newRiderAnim.DynamicFrames.Add(newFrame);
                 }
             }
-
-
-
-            //throw new NotImplementedException();
         }
 
         public static AnimationClip ReSample(GameSkeleton skeleton, AnimationClip newAnim, int newFrameCount, float playTime)

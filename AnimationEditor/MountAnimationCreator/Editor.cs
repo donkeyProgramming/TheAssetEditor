@@ -106,7 +106,7 @@ namespace AnimationEditor.MountAnimationCreator
             else
             {
                 ActiveOutputFragment.UpdatePossibleValues(MountLinkController.LoadFragmentsForSkeleton(newValue.SkeletonName, true));
-                SelectedRiderBone.UpdatePossibleValues(SkeletonHelper.CreateFlatSkeletonList(newValue));
+                SelectedRiderBone.UpdatePossibleValues(SkeletonBoneNodeHelper.CreateFlatSkeletonList(newValue));
             }
 
             SelectedRiderBone.SelectedItem = SelectedRiderBone.PossibleValues.FirstOrDefault(x => string.Equals("root", x.BoneName, StringComparison.OrdinalIgnoreCase));
