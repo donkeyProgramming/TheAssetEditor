@@ -20,6 +20,7 @@ namespace AnimationEditor.AnimationTransferTool
         }
 
         public NotifyAttr<bool> IsLocalOffset { get; set; } = new NotifyAttr<bool>(false);
+        public DoubleViewModel BoneLengthMult { get; set; } = new DoubleViewModel(1);
         public Vector3ViewModel RotationOffset { get; set; } = new Vector3ViewModel(0);
         public Vector3ViewModel TranslationOffset { get; set; } = new Vector3ViewModel(0);
 

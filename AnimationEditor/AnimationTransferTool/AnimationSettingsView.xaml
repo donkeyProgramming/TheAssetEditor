@@ -17,14 +17,9 @@
     <Expander IsExpanded="True" Header="Settings:">
         <StackPanel>
 
-            <DockPanel>
-                <Label Content="Offset New" Width ="{StaticResource labelWidth}"  />
-                <Label Content=":"/>
-                <mathviews:Vector3View Vector3="{Binding AnimationSettings.OffsetGenerated, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2"/>
-            </DockPanel>
 
             <DockPanel>
-                <Label Content="Visability New" Width ="{StaticResource labelWidth}"  />
+                <Label Content="Visability - Generated" Width ="{StaticResource labelWidth}"  />
                 <Label Content=":"/>
 
                 <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Generated.ShowMesh.Value, UpdateSourceTrigger=PropertyChanged}" Content="Mesh" Margin="0,0,50,0"/>
@@ -33,13 +28,20 @@
 
 
             <DockPanel>
-                <Label Content="Offset Target" Width ="{StaticResource labelWidth}"  />
+                <Label Content="Display offset - Generated" Width ="{StaticResource labelWidth}"  />
+                <Label Content=":"/>
+                <mathviews:Vector3View Vector3="{Binding AnimationSettings.OffsetGenerated, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2"/>
+            </DockPanel>
+
+
+            <DockPanel>
+                <Label Content="Display offset -  Target" Width ="{StaticResource labelWidth}"  />
                 <Label Content=":"/>
                 <mathviews:Vector3View Vector3="{Binding AnimationSettings.OffsetTarget, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2"/>
             </DockPanel>
 
             <DockPanel>
-                <Label Content="Offset Source" Width ="{StaticResource labelWidth}"  />
+                <Label Content="Display offset -  Source" Width ="{StaticResource labelWidth}"  />
                 <Label Content=":"/>
                 <mathviews:Vector3View  Vector3="{Binding AnimationSettings.OffsetSource, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2"/>
             </DockPanel>
@@ -47,7 +49,8 @@
             <DockPanel>
                 <Label Content="Scale" Width ="{StaticResource labelWidth}"  DockPanel.Dock="Left"/>
                 <Label Content=":" DockPanel.Dock="Left"/>
-                <Button Content="Export Mesh at scale" Click="{s:MethodBinding ExportScaledMesh}" DockPanel.Dock="Right"/>
+                <Button Content="Export Mapped Mesh at scale" Click="{s:MethodBinding ExportScaledMesh}" DockPanel.Dock="Right" IsEnabled="False"/>
+                <Button Content="Export Mesh at scale" Click="{s:MethodBinding ExportScaledMesh}" DockPanel.Dock="Right" Margin="2,0,2,0"/>
 
                 <TextBox Text="{Binding AnimationSettings.Scale.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
                     <TextBox.ToolTip>
@@ -81,7 +84,7 @@
             </DockPanel>
 
             <DockPanel >
-                <Label Content="Animation length multiplier" Width ="{StaticResource labelWidth}"/>
+                <Label Content="Animation speed multiplier" Width ="{StaticResource labelWidth}"/>
                 <Label Content=":"/>
                 <TextBox Text="{Binding AnimationSettings.SpeedMult.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
                     <b:Interaction.Behaviors>

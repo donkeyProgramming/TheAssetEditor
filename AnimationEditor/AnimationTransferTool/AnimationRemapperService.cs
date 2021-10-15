@@ -277,12 +277,24 @@ namespace AnimationEditor.AnimationTransferTool
             }
         }
 
-        void ScaleAnimation(AnimationClip animation, GameSkeleton skeleton)
+        void ScaleAnimation(AnimationClip animation, GameSkeleton copyToSkeleton)
         {
             var frameCount = animation.DynamicFrames.Count;
             for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
                  animation.DynamicFrames[frameIndex].Scale[0] = new Vector3((float) _settings.Scale.Value);
+            }
+
+            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            {
+                for (int boneIndex = 0; boneIndex < copyToSkeleton.BoneCount; boneIndex++)
+                {
+                    var boneSettings = BoneHelper.GetBoneFromId(_bones, boneIndex);
+                    if (boneSettings == null)
+                        continue;
+
+                    animation.DynamicFrames[frameIndex].Position[boneIndex] = animation.DynamicFrames[frameIndex].Position[boneIndex] * (float)boneSettings.BoneLengthMult.Value;
+                }
             }
         }
 

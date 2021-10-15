@@ -8,11 +8,12 @@
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
               xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls" 
-             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls"
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls" xmlns:System="clr-namespace:System;assembly=System.Runtime"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <valueconverters:BoolToColourConverter x:Key="ColourConverter" TrueValue="Black" FalseValue="Red"/>
+        <System:Double x:Key="labelWidth">160</System:Double>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -44,56 +45,67 @@
         </TreeView>
 
         <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
+            <StackPanel>
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-            </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" Grid.ColumnSpan="3">
-                <Label.Content>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Settings for selected Bone: " FontSize="16" VerticalAlignment="Center"/>
-                        <TextBlock Text="&quot;"  VerticalAlignment="Center" FontSize="16" FontWeight="Bold"/>
-                        <TextBlock Text="{Binding SelectedBone.BoneName.Value, UpdateSourceTrigger=PropertyChanged}"  VerticalAlignment="Center" FontSize="16" FontWeight="Bold"/>
-                        <TextBlock Text="&quot;"  VerticalAlignment="Center" FontSize="16" FontWeight="Bold"/>
-                    </StackPanel>
-                </Label.Content>
-            </Label>
+                <DockPanel>
+                    <Label>
+                        <Label.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Settings for selected Bone: " FontSize="16" VerticalAlignment="Center"/>
+                                <TextBlock Text="&quot;"  VerticalAlignment="Center" FontSize="16" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding SelectedBone.BoneName.Value, UpdateSourceTrigger=PropertyChanged}"  VerticalAlignment="Center" FontSize="16" FontWeight="Bold"/>
+                                <TextBlock Text="&quot;"  VerticalAlignment="Center" FontSize="16" FontWeight="Bold"/>
+                            </StackPanel>
+                        </Label.Content>
+                    </Label>
+                </DockPanel>
 
-            <Label      Grid.Row="1" Grid.Column="0" Content="ForceSnapToWorld"/>
-            <Label      Grid.Row="1" Grid.Column="1" Content=":"/>
-            <CheckBox   Grid.Row="1" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding SelectedBone.ForceSnapToWorld.Value}"/>
+                <DockPanel>
+                    <Label      Width ="{StaticResource labelWidth}" Content="Translation offset"/>
+                    <Label      Content=":"/>
+                    <mathviews:Vector3View  VerticalContentAlignment="Center" Vector3="{Binding SelectedBone.TranslationOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                </DockPanel>
 
-            <Label      Grid.Row="2" Grid.Column="0" Content="Trans offset"/>
-            <Label      Grid.Row="2" Grid.Column="1" Content=":"/>
-            <mathviews:Vector3View Grid.Row="2" Grid.Column="3" VerticalContentAlignment="Center" Vector3="{Binding SelectedBone.TranslationOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <DockPanel>
+                    <Label     Width ="{StaticResource labelWidth}" Content="Rotation offset"/>
+                    <Label      Content=":"/>
+                    <mathviews:Vector3View  VerticalContentAlignment="Center" Vector3="{Binding SelectedBone.RotationOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                </DockPanel>
 
-            <Label      Grid.Row="3" Grid.Column="0" Content="Rot offset"/>
-            <Label      Grid.Row="3" Grid.Column="1" Content=":"/>
-            <mathviews:Vector3View Grid.Row="3" Grid.Column="3" VerticalContentAlignment="Center" Vector3="{Binding SelectedBone.RotationOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <DockPanel >
+                    <Label Content="Bone length Mult" Width ="{StaticResource labelWidth}"/>
+                    <Label Content=":"/>
+                    <TextBox Text="{Binding SelectedBone.BoneLengthMult.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
+                        <b:Interaction.Behaviors>
+                            <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
+                        </b:Interaction.Behaviors>
+                    </TextBox>
+                </DockPanel>
 
-            <Label      Grid.Row="4" Grid.Column="0" Content="Freeze translation"/>
-            <Label      Grid.Row="4" Grid.Column="1" Content=":"/>
-            <CheckBox   Grid.Row="4" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding SelectedBone.FreezeTranslation.Value}"/>
+                <DockPanel>
+                    <Label     Width ="{StaticResource labelWidth}" Content="Freeze transform"/>
+                    <Label       Content=":"/>
+                    <CheckBox   VerticalContentAlignment="Center" IsChecked="{Binding SelectedBone.FreezeTranslation.Value}"/>
+                </DockPanel>
 
-            <Label      Grid.Row="5" Grid.Column="0" Content="Is Relative to"/>
-            <Label      Grid.Row="5" Grid.Column="1" Content=":"/>
-            <DockPanel Grid.Row="5" Grid.Column="2" >
-                <Button DockPanel.Dock="Right" Content="Clear" Width="60" Click="{s:MethodBinding ClearRelativeBone}"/>
-                <ComboBox ItemsSource="{Binding FlatBoneList}" SelectedItem="{Binding SelectedBone.SelectedRelativeBone, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" DisplayMemberPath="BoneName.Value"/>
-            </DockPanel>
-            
+                <DockPanel>
+                    <Label      Width ="{StaticResource labelWidth}" Content="Force snap in worldspace"/>
+                    <Label       Content=":"/>
+                    <CheckBox    VerticalContentAlignment="Center" IsChecked="{Binding SelectedBone.ForceSnapToWorld.Value}"/>
+                </DockPanel>
+
+                <DockPanel>
+                    <Label     Width ="{StaticResource labelWidth}"   Content="Is Relative to"/>
+                    <Label       Content=":"/>
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Content="Clear" Width="60" Click="{s:MethodBinding ClearRelativeBone}"/>
+                        <ComboBox ItemsSource="{Binding FlatBoneList}" SelectedItem="{Binding SelectedBone.SelectedRelativeBone, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" DisplayMemberPath="BoneName.Value"/>
+                    </DockPanel>
+                </DockPanel>
+
+
+            </StackPanel>
         </Grid>
 
 

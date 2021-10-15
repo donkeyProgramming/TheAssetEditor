@@ -197,6 +197,8 @@ namespace AnimationEditor.Common.ReferenceModel
             }
             else
             {
+                if (Skeleton == null)
+                    return;
                 SkeletonName.Value = "";
                 Skeleton = null;
                 AnimationClip = null;
