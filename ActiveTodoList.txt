@@ -16,7 +16,7 @@ General:
 	Unable to play 3k anim : [data] animations\battle\character\male01\infantry\inf_1h095dun\attacks\inf_1h095dun_basic_attack_mid_05.anim
 	
 	
-	
+	 
 Misc:
 	Memory leaks
 	Send errors to server?
