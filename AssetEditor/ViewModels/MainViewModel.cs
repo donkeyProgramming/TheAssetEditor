@@ -7,6 +7,7 @@ using Common.GameInformation;
 using CommonControls.Editors.VariantMeshDefinition;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
+using Filetypes.RigidModel;
 using FileTypes.AnimationPack;
 using FileTypes.DB;
 using FileTypes.PackFiles.Models;
@@ -22,7 +23,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-
+using View3D.Animation;
 
 namespace AssetEditor.ViewModels
 {
@@ -84,8 +85,24 @@ namespace AssetEditor.ViewModels
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
 
-                var invMatrixPackFile = _packfileService.FindFile(@"animations\skeletons\advisorcrow01.bone_inv_trans_mats");
-                var t = AnimInvMatrixFile.Create(invMatrixPackFile.DataSource.ReadDataAsChunk());
+                //var invMatrixPackFile = _packfileService.FindFile(@"animations\skeletons\advisorcrow01.bone_inv_trans_mats");
+                //
+                //var skeletonFile = _packfileService.FindFile(@"animations\skeletons\humanoid01.anim");
+                //var skeletonAnim = AnimationFile.Create(skeletonFile);
+                //var gameSkeleton = new GameSkeleton(skeletonAnim, null);
+                //var invTest = gameSkeleton.CreateInvMatrixFile();
+                //
+                //var bytes = invTest.GetBytes();
+                //var reloadedInv = AnimInvMatrixFile.Create(new Filetypes.ByteParsing.ByteChunk(bytes));
+                //
+                //var originalInvFile = _packfileService.FindFile(@"animations\skeletons\humanoid01.bone_inv_trans_mats");
+                //var originalInv = AnimInvMatrixFile.Create(originalInvFile.DataSource.ReadDataAsChunk());
+                //
+                //var reloadedInstance = new CommonControls.Editors.AnimationFilePreviewEditor.InvMatrixToTextConverter();
+                //var orgText = "Org\n" + reloadedInstance.GetText(originalInvFile.DataSource.ReadData());
+                //var reloadedText = "Reloaded\n" + reloadedInstance.GetText(bytes);
+                //
+                //var t = AnimInvMatrixFile.Create(invMatrixPackFile.DataSource.ReadDataAsChunk());
 
                 //_packfileService.Load(@"C:\Users\ole_k\AssetEditor\MyStuff\ratcar.pack", true);
 

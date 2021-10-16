@@ -242,9 +242,15 @@ Kitbasher tool:
 		[BUG]weapons not attached anymore
 		
 Skeleton creator tool:
-		
-General:
+	Invert
+	Insert/delete
+	Transform 
+
+Animation pack editor
+	Save error - unknown type from transfer tool
 	Duplicated animpack entry to new bin
+	
+General:
 	[BUG]rename file, create folder, to lower letters 
 	[BUG]variantmeshes\wh_variantmodels\ra1b\skv\skv_rat\skv_rat_01.rigid_model_v2 crashes, skeleton not found
 	Track size of pack files to detect changes outside of the progrm 
@@ -261,7 +267,8 @@ General:
 variantmeshes\variantmeshdefinitions\bst_chaos_spawn.variantmeshdefinition
 
 
-
+animations\skeletons\humanoid01.anim
+animations\skeletons\humanoid01.bone_inv_trans_mats
 
 
 

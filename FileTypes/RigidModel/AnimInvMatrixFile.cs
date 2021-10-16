@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace FileTypes.RigidModel
@@ -27,26 +28,78 @@ namespace FileTypes.RigidModel
 				output.MatrixList[i] = Matrix.Identity;
 								 
 				output.MatrixList[i].M11 = chunk.ReadSingle();
-				output.MatrixList[i].M31 = chunk.ReadSingle();
 				output.MatrixList[i].M21 = chunk.ReadSingle();
+				output.MatrixList[i].M31 = chunk.ReadSingle();
 								  
-				output.MatrixList[i].M13 = chunk.ReadSingle();
-				output.MatrixList[i].M33 = chunk.ReadSingle();
-				output.MatrixList[i].M23 = chunk.ReadSingle();
+				output.MatrixList[i].M12 = chunk.ReadSingle();
+				output.MatrixList[i].M22 = chunk.ReadSingle();
+				output.MatrixList[i].M32 = chunk.ReadSingle();
 								 
 				output.MatrixList[i].M13 = chunk.ReadSingle();
-				output.MatrixList[i].M33 = chunk.ReadSingle();
 				output.MatrixList[i].M23 = chunk.ReadSingle();
+				output.MatrixList[i].M33 = chunk.ReadSingle();
 								 
 				output.MatrixList[i].M14 = chunk.ReadSingle();
-				output.MatrixList[i].M34 = chunk.ReadSingle();
 				output.MatrixList[i].M24 = chunk.ReadSingle();
+				output.MatrixList[i].M34 = chunk.ReadSingle();
 			}
 
 			var bytesLeft = chunk.BytesLeft;
 			if (bytesLeft != 0)
 				throw new Exception("Data left in AnimInvMatrix:" + bytesLeft);
 			return output;
+		}
+
+		/*
+		 * 
+		 * matrix = matrix.Inverse();
+		matrix = matrix.Transpose();
+
+		// run though the inverse bind pose matrix
+		for (size_t n = 0; n < 4; n++)
+		{
+			for (size_t m = 0; m < 3; m++)
+			{
+				float a = matrix[m][n];
+				//float a = 0.1; // TODO: DEBUGGIN CODE, makes incorrect matrices on purpose
+				inv_file.write((char*)&a, 4);
+			}
+		}		
+		 */
+
+		public byte[] GetBytes()
+		{
+			using (MemoryStream memoryStream = new MemoryStream())
+			{
+				using (BinaryWriter writer = new BinaryWriter(memoryStream))
+				{
+					writer.Write(Version);
+					writer.Write(MatrixList.Length);
+
+					for (int i = 0; i < MatrixList.Length; i++)
+					{
+						writer.Write(MatrixList[i].M11);
+						writer.Write(MatrixList[i].M21);
+						writer.Write(MatrixList[i].M31);
+
+						writer.Write(MatrixList[i].M12);
+						writer.Write(MatrixList[i].M22);
+						writer.Write(MatrixList[i].M32);
+
+						writer.Write(MatrixList[i].M13);
+						writer.Write(MatrixList[i].M23);
+						writer.Write(MatrixList[i].M33);
+
+						writer.Write(MatrixList[i].M14);
+						writer.Write(MatrixList[i].M24);
+						writer.Write(MatrixList[i].M34);
+					}
+
+					var bytes = memoryStream.ToArray();
+					var temp = Create(new ByteChunk(bytes));
+					return bytes;
+				}
+			}
 		}
 	}
 

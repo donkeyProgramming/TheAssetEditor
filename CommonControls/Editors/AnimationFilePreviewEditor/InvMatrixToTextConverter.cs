@@ -11,7 +11,7 @@ using System.Windows;
 
 namespace CommonControls.Editors.AnimationFilePreviewEditor
 {
-    class InvMatrixToTextConverter : ITextConverter
+    public class InvMatrixToTextConverter : ITextConverter
     {
         public string GetText(byte[] bytes)
         {
@@ -51,7 +51,6 @@ namespace CommonControls.Editors.AnimationFilePreviewEditor
 
         public byte[] ToBytes(string text, string filePath, PackFileService pfs, out ITextConverter.SaveError error)
         {
-
             error = new ITextConverter.SaveError() { Text = "This file type can not be saved" };
             return null;
         }

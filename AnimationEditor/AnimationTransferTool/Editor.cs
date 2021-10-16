@@ -7,6 +7,7 @@ using CommonControls.SelectionListDialog;
 using CommonControls.Services;
 using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
+using FileTypes.RigidModel;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
@@ -367,6 +368,12 @@ namespace AnimationEditor.AnimationTransferTool
 
             var skeletonBytes = AnimationFile.GetBytes(skeletonAnimFile);
             SaveHelper.Save(_pfs, @"animations\skeletons\" + newSkeletonName + ".anim", null, skeletonBytes);
+
+            //Save inv matrix file
+            var newSkeleton = new GameSkeleton(skeletonAnimFile, null);
+            var invMatrixFile = newSkeleton.CreateInvMatrixFile();
+            var invMatrixBytes = invMatrixFile.GetBytes();
+            SaveHelper.Save(_pfs, @"animations\skeletons\" + newSkeletonName + ".bone_inv_trans_mats", null, invMatrixBytes);
 
             var animationFrame = AnimationSampler.Sample(0, 0, Generated.Skeleton, scaleAnimClip);
 
