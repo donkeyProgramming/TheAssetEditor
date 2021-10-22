@@ -240,8 +240,7 @@ Kitbasher tool:
 	[BUG]3k model selection not working? Wft is going on => banner
 	[BUG]Changing textuers not saving
 	[BUG]weapons not attached anymore
-	Redo pin tool => Select vertex and mesh | UI
-	Create 
+	Redo pin tool => Select vertex and mesh | UI 
 	Fix manipulars 
 		
 		
@@ -251,26 +250,27 @@ Skeleton creator tool:
 	Transform 
 
 Animation pack editor
-	Better thingsy  for finding bin
-	Generate bin name better int mount tool
-	Duplicated animpack entry to new bin
-	New pack
-	New match
-	New frg
-	display matching combat file
+	[DONE]Generate bin name better int mount tool
+	[DONE]New pack
+	[DONE]New frg
 	[DONE]Error handling frg
 	[DONE]clean up error handler for campagin bin editor 
-	Are you sure when swappng between files
-	Save
-	3k items 
-	throw new Exception("TODO")
+	[DONE]Are you sure when swappng between files
+	[DONE]Save
+	[DONE]throw new Exception("TODO")
+	[DONE]Validation of paths 
 	Expand slot types on ctrl
+	3k items 
+	New match
+	display matching combat file
+	Better logic  for finding bin
 	
 General:
 	[BUG]rename file, create folder, to lower letters 
 	[BUG]variantmeshes\wh_variantmodels\ra1b\skv\skv_rat\skv_rat_01.rigid_model_v2 crashes, skeleton not found
 	Track size of pack files to detect changes outside of the progrm 
 	Corruption logic detection 
+	Make tutorials on youtube
 
 
 

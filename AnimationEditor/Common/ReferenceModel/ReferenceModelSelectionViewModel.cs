@@ -126,12 +126,7 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public void ViewFragment()
         {
-            throw new Exception("TODO");
-            //if (FragAndSlotSelection.FragmentList.SelectedItem != null)
-            //{
-            //    var view = AnimationFragmentViewModel.CreateFromFragment(_pfs, FragAndSlotSelection.FragmentList.SelectedItem, false);
-            //    TableWindow.Show(view);
-            //}
+            FragAndSlotSelection.PreviewSelectedSlot();
         }
 
         public void ViewSelectedMeta() 

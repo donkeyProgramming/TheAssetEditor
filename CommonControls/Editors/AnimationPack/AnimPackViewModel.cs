@@ -22,6 +22,7 @@ namespace CommonControls.Editors.AnimationPack
     {
 
         PackFileService _pfs;
+        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
         string _displayName;
         public string DisplayName { get => _displayName; set => SetAndNotify(ref _displayName, value); }
@@ -38,16 +39,17 @@ namespace CommonControls.Editors.AnimationPack
         AnimationPackFile _animPack;
 
         public ICommand CreateNewFragmentCommand { get; set; }
-        public ICommand CreateMatchedBinCommand { get; set; }
+        public ICommand SaveCommand { get; set; }
         public ICommand DeleteSelectedCommand { get; set; }
 
-        public AnimPackViewModel(PackFileService pfs)
+        public AnimPackViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             _pfs = pfs;
+            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
 
             CreateNewFragmentCommand = new RelayCommand(CreateFragment);
-            //CreateMatchedBinCommand = new RelayCommand(CreateFragment);
             DeleteSelectedCommand = new RelayCommand(DeleteSelected);
+            SaveCommand = new RelayCommand(() => Save());
         }
 
         void CreateFragment()
@@ -98,7 +100,13 @@ namespace CommonControls.Editors.AnimationPack
 
         private void Load(PackFile packFile)
         {
-            _animPack = new AnimationPackFile(packFile);
+            var pack = new AnimationPackFile(packFile);
+            Load(pack);
+        }
+
+        public void Load(AnimationPackFile animPack)
+        {
+            _animPack = animPack;
             var itemNames = new List<string>();
 
             if (_animPack.AnimationBin != null)
@@ -107,12 +115,17 @@ namespace CommonControls.Editors.AnimationPack
             foreach (var item in _animPack.Fragments)
                 itemNames.Add(item.FileName);
 
-            AnimationPackItems = new FilterCollection<string>(itemNames, ItemSelected)
+            AnimationPackItems = new FilterCollection<string>(itemNames, ItemSelected, BeforeItemSelected)
             {
                 SearchFilter = (value, rx) => { return rx.Match(value).Success; }
             };
 
-            DisplayName = _packFile.Name;
+            DisplayName = animPack.FileName;
+        }
+
+        public void SetSelectedFile(string path)
+        {
+            AnimationPackItems.SelectedItem = AnimationPackItems.PossibleValues.FirstOrDefault(x => x == path);
         }
 
         ITextConverter GetConverterForType(AnimationPackFile.AnimationPackFileType type)
@@ -122,19 +135,25 @@ namespace CommonControls.Editors.AnimationPack
                 case AnimationPackFile.AnimationPackFileType.Bin:
                     return new AnimationBinToXmlConverter();
                 case AnimationPackFile.AnimationPackFileType.Fragment:
-                    return new AnimationFragmentToXmlConverter();
+                    return new AnimationFragmentToXmlConverter(_skeletonAnimationLookUpHelper);
             }
 
             return new DefaultTextConverter();
         }
 
-        void ItemSelected(string item)
+        bool BeforeItemSelected(string item)
         {
             if (SelectedItemViewModel != null && SelectedItemViewModel.HasUnsavedChanges())
-            { 
-                // Are you sure?
+            {
+                if (MessageBox.Show("Editor has unsaved changes that will be lost.\nContinue?", "", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                    return false;
             }
 
+            return true;
+        }
+
+        void ItemSelected(string item)
+        {
             if (string.IsNullOrWhiteSpace(item) == false)
             {
                 var bytes = _animPack.GetFile(item, out var animPackFileType);
@@ -143,11 +162,11 @@ namespace CommonControls.Editors.AnimationPack
                 ICommand saveCommand = null;
                 if (animPackFileType == AnimationPackFile.AnimationPackFileType.Bin)
                 {
-                    saveCommand = new RelayCommand(() => SaveBin());
+                    saveCommand = new RelayCommand(() => SaveData());
                 }
                 else if (animPackFileType == AnimationPackFile.AnimationPackFileType.Fragment)
                 {
-                    saveCommand = new RelayCommand(() => SaveBin());
+                    saveCommand = new RelayCommand(() => SaveData());
                 }
 
                 SelectedItemViewModel = new SimpleTextEditorViewModel();
@@ -159,22 +178,30 @@ namespace CommonControls.Editors.AnimationPack
             }
         }
 
-        bool SaveBin()
+        bool SaveData()
         {
+            if (MainFile == null)
+            {
+                MessageBox.Show("Can not save in this mode - Open the file normally");
+                return false;
+            }
+
             var fileName = AnimationPackItems.SelectedItem;
             _animPack.GetFile(fileName, out var animPackFileType);
 
             ITextConverter converter = GetConverterForType(animPackFileType);
-            var bytes = converter.ToBytes(SelectedItemViewModel.Text, fileName, null, out var error);
+            var bytes = converter.ToBytes(SelectedItemViewModel.Text, fileName, _pfs, out var error);
 
            if (bytes == null || error != null)
            {
                SelectedItemViewModel.TextEditor.HightLightText(error.ErrorLineNumber, error.ErrorPosition, error.ErrorLength);
                MessageBox.Show(error.Text, "Error");
-                return false;
+               return false;
            }
            
            _animPack.UpdateFileFromBytes(fileName, bytes);
+            SelectedItemViewModel.ResetChangeLog();
+
             return true;
         }
 
@@ -189,9 +216,43 @@ namespace CommonControls.Editors.AnimationPack
 
         public bool Save()
         {
+            if (MainFile == null)
+            {
+                MessageBox.Show("Can not save in this mode - Open the file normally");
+                return false;
+            }
+
+            if (SelectedItemViewModel != null && SelectedItemViewModel.HasUnsavedChanges())
+            {
+                if (MessageBox.Show("Editor has unsaved changes.\nSave anyway?", "", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                    return false;
+            }
+
             var savePath = _pfs.GetFullPath(MainFile as PackFile);
             SaveHelper.Save(_pfs, savePath, null, _animPack.ToByteArray());
             return true;
+        }
+
+
+        public static void ShowPreviewWinodow(AnimationPackFile animationPack, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, string selectedFileName )
+        {
+            var animPack = animationPack;
+            var controller = new AnimPackViewModel(pfs, skeletonAnimationLookUpHelper);
+            controller.Load(animPack);
+
+            var containingWindow = new Window();
+            containingWindow.Title = "Animation pack - " + animationPack.FileName;
+
+            containingWindow.DataContext = controller;
+            containingWindow.Content = new CommonControls.Editors.AnimationPack.AnimationPackView();
+
+            containingWindow.Width = 1200;
+            containingWindow.Height = 1100;
+
+
+            containingWindow.Loaded += (sender, e) => controller.SetSelectedFile(selectedFileName);
+
+            containingWindow.ShowDialog();
         }
     }
 }

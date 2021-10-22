@@ -38,10 +38,20 @@ namespace AnimationEditor.Common.ReferenceModel
                 SearchFilter = (value, rx) => { return rx.Match(value.Slot.Value).Success; }
             };
 
-
             OnSkeletonChange(_asset.Skeleton);
             Subscribe();
         }
+
+
+        public void PreviewSelectedSlot()
+        {
+            if (FragmentList.SelectedItem != null && FragmentList.SelectedItem != null)
+            {
+                var animPack = FragmentList.SelectedItem.ParentAnimationPack;
+                CommonControls.Editors.AnimationPack.AnimPackViewModel.ShowPreviewWinodow(animPack, _pfs, _skeletonAnimationLookUpHelper, FragmentList.SelectedItem.FileName);
+            }
+        }
+
 
         void Subscribe()
         {

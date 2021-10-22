@@ -10,6 +10,7 @@ namespace CommonControls.Common
     public class FilterCollection<T> : NotifyPropertyChangedImpl where T:class
     {
         public event ValueChangedDelegate<T> SelectedItemChanged;
+        public event BeforeValueChangedDelegate<T> BeforeSelectedItemChanged;
 
         public List<T> PossibleValues { get; set; }
 
@@ -17,7 +18,20 @@ namespace CommonControls.Common
         public ObservableCollection<T> Values { get => _values; set => SetAndNotify(ref _values, value); }
 
         T _selectedItem;
-        public T SelectedItem { get => _selectedItem; set => SetAndNotify<T>(ref _selectedItem, value, SelectedItemChanged); }
+        public T SelectedItem
+        {
+            get => _selectedItem;
+            set
+            {
+                if (BeforeSelectedItemChanged != null)
+                {
+                    var res = BeforeSelectedItemChanged.Invoke(value);
+                    if (res == false)
+                        return;
+                }
+                SetAndNotify(ref _selectedItem, value, SelectedItemChanged);
+            }
+        }
 
         // Filter stuff
         string _filter;
@@ -35,11 +49,14 @@ namespace CommonControls.Common
         public FilterExtendedDelegate SearchFilterExtended { get; set; }
 
 
-        public FilterCollection(IEnumerable<T> data, ValueChangedDelegate<T> valueChangedEvent = null)
+        public FilterCollection(IEnumerable<T> data, ValueChangedDelegate<T> valueChangedEvent = null, BeforeValueChangedDelegate<T> beforeValueChangeEvent = null)
         {
             UpdatePossibleValues(data);
             if (valueChangedEvent != null)
                 SelectedItemChanged += valueChangedEvent;
+
+            if (beforeValueChangeEvent != null)
+                BeforeSelectedItemChanged += beforeValueChangeEvent;
         }
 
         public void UpdatePossibleValues(IEnumerable<T> data, T emptyItem = null)

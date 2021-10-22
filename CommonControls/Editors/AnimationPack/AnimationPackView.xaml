@@ -22,11 +22,8 @@
         <DockPanel Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0">
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
-                    <MenuItem Header="Save"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
-                    <MenuItem Header="Extract selected"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
-                    <MenuItem Header="New bin"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
+                    <MenuItem Header="Save"  Command="{Binding SaveCommand}"/>
                     <MenuItem Header="New fragment"  Command="{Binding CreateNewFragmentCommand}"/>
-                    <MenuItem Header="Import file"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
                 </MenuItem>
             </Menu>
         </DockPanel>

@@ -51,6 +51,7 @@ namespace AnimationEditor.MountAnimationCreator
         Rmv2MeshNode _mountVertexOwner;
         PackFileService _pfs;
         SelectionManager _selectionManager;
+        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
         public Editor(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, AssetViewModel mount, AssetViewModel newAnimation, IComponentManager componentManager)
         {
@@ -58,6 +59,7 @@ namespace AnimationEditor.MountAnimationCreator
             _newAnimation = newAnimation;
             _mount = mount;
             _rider = rider;
+            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _selectionManager = componentManager.GetComponent<SelectionManager>();
 
             DisplayGeneratedSkeleton = new NotifyAttr<bool>(true, (value) => _newAnimation.ShowSkeleton.Value = value);
@@ -220,9 +222,8 @@ namespace AnimationEditor.MountAnimationCreator
         {
             if (fragment != null)
             {
-                throw new Exception("TODO");
-                //var view = AnimationFragmentViewModel.CreateFromFragment(_pfs, fragment, canEdit);
-                //TableWindow.Show(view);
+                var animPack = fragment.ParentAnimationPack;
+                CommonControls.Editors.AnimationPack.AnimPackViewModel.ShowPreviewWinodow(animPack, _pfs, _skeletonAnimationLookUpHelper, fragment.FileName);
             }
         }
 

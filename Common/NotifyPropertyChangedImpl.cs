@@ -14,6 +14,7 @@ namespace Common
         public event PropertyChangedEventHandler PropertyChanged;
         public delegate void ValueChangedDelegate();
         public delegate void ValueChangedDelegate<T>(T newValue);
+        public delegate bool BeforeValueChangedDelegate<T>(T newValue);
         public delegate void ValueAndSenderChangedDelegate<T>(object sender, T newValue);
 
         protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")

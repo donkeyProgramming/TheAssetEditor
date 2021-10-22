@@ -49,26 +49,13 @@ namespace AnimationEditor.MountAnimationCreator
             set => SetAndNotify(ref _createAnimPack, value);
         }
 
-        string _animPackName = "new_anim_tables.animpack";
+        string _animPackName = "my_anim_pack";
         public string AnimPackName
         {
             get => _animPackName;
             set => SetAndNotify(ref _animPackName, value);
         }
 
-        bool _createAnimBin = true;  
-        public bool CreateAnimBin
-        {
-            get => _createAnimBin;
-            set => SetAndNotify(ref _createAnimBin, value);
-        }
-
-        string _animBinName = "new_anim_tables.bin";
-        public string AnimBinName
-        {
-            get => _animBinName;
-            set => SetAndNotify(ref _animBinName, value);
-        }
 
         bool _createFragment = true;
         public bool CreateFragment

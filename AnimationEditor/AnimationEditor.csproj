@@ -16,8 +16,4 @@
     <ProjectReference Include="..\View3D\View3D.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="PoseCreator\" />
-  </ItemGroup>
-
 </Project>

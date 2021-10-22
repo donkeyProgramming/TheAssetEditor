@@ -31,9 +31,9 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
         public BatchProcessorService(PackFileService pfs, MountAnimationGeneratorService animationGenerator, BatchProcessOptions batchProcessOptions)
         {
-            _animPackName = batchProcessOptions.AnimPackName;
-            _animBinName = batchProcessOptions.AnimBinName;
-            _fragmentName = batchProcessOptions.FragmentName;
+            _animPackName = SaveHelper.EnsureEnding(batchProcessOptions.AnimPackName, ".animpack");
+            _animBinName = SaveHelper.EnsureEnding(batchProcessOptions.AnimPackName, "_tables.bin");
+            _fragmentName = SaveHelper.EnsureEnding(batchProcessOptions.FragmentName, ".frg");
 
             _pfs = pfs;
             _animationGenerator = animationGenerator;

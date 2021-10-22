@@ -1,5 +1,6 @@
 ﻿using CommonControls.Common;
 using CommonControls.Editors.TextEditor;
+using CommonControls.ErrorListDialog;
 using CommonControls.Services;
 using FileTypes.AnimationPack;
 using System;
@@ -10,11 +11,19 @@ using System.Linq;
 using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
+using static CommonControls.ErrorListDialog.ErrorListViewModel;
 
 namespace CommonControls.Editors.AnimationPack
 {
     public class AnimationFragmentToXmlConverter : ITextConverter
     {
+        private SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+
+        public AnimationFragmentToXmlConverter(SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        {
+            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
+        }
+
         public string GetText(byte[] bytes)
         {
             try
@@ -45,8 +54,6 @@ namespace CommonControls.Editors.AnimationPack
             }
         }
 
-
-
         public byte[] ToBytes(string text, string filePath, PackFileService pfs, out ITextConverter.SaveError error)
         {
             var xmlserializer = new XmlSerializer(typeof(Animation));
@@ -64,7 +71,7 @@ namespace CommonControls.Editors.AnimationPack
                     return null;
                 }
 
-                error = Validate(obj, text);
+                error = Validate(obj, text, pfs);
                 if (error != null)
                     return null;
 
@@ -86,7 +93,7 @@ namespace CommonControls.Editors.AnimationPack
            
         }
 
-        ITextConverter.SaveError Validate(Animation xmlAnimation, string text)
+        ITextConverter.SaveError Validate(Animation xmlAnimation, string text, PackFileService pfs)
         {
             if (string.IsNullOrWhiteSpace(xmlAnimation.Skeleton))
                 return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Missing skeleton item on root" };
@@ -132,6 +139,28 @@ namespace CommonControls.Editors.AnimationPack
                 if (ValidateBoolArray(item.WeaponBone) == false)
                     return GenerateError(text, lastIndex, "WeaponBone bool array contains invalid values. Should contain 6 true/false values");
             }
+
+            var errorList = new ErrorList();
+            if(_skeletonAnimationLookUpHelper.GetSkeletonFileFromName(pfs, xmlAnimation.Skeleton) == null)
+                errorList.Warning("Root", $"Skeleton {xmlAnimation.Skeleton} is not found");
+
+            foreach (var item in xmlAnimation.AnimationFragmentEntry)
+            {
+                if (string.IsNullOrWhiteSpace(item.File.Value))
+                    errorList.Warning(item.Slot, "Item does not have an animation");
+
+                if(pfs.FindFile(item.File.Value) == null)
+                    errorList.Warning(item.Slot, $"Animation {item.File.Value} is not found");
+
+                if (item.Meta.Value != "" && pfs.FindFile(item.Meta.Value) == null)
+                    errorList.Warning(item.Slot, $"Meta {item.Meta.Value} is not found");
+
+                if (item.Sound.Value != "" && pfs.FindFile(item.Sound.Value) == null)
+                    errorList.Warning(item.Slot, $"Sound {item.Sound.Value} is not found");
+            }
+
+            if(errorList.Errors.Count != 0)
+                ErrorListWindow.ShowDialog("Errors", errorList, false);
 
             return null;
         }
