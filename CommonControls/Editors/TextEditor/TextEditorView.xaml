@@ -19,7 +19,7 @@
                     </Style.Triggers>
                 </Style>
             </ToolBar.Resources>
-            <Button Command="{Binding SaveCommand, Mode=OneTime}">
+            <Button Command="{Binding SaveCommand, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <Image Source="../../Resources/Icons/Save.png" Height="16"/>
             </Button>
             <Separator/>

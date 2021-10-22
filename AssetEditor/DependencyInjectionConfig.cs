@@ -6,7 +6,6 @@ using Common;
 using Common.ApplicationSettings;
 using Common.GameInformation;
 using CommonControls.Editors.AnimationFilePreviewEditor;
-using CommonControls.Editors.AnimationFragment;
 using CommonControls.Editors.AnimationPack;
 using CommonControls.Editors.AnimMeta;
 using CommonControls.Editors.CampaignAnimBin;
@@ -61,7 +60,6 @@ namespace AssetEditor
             View3D_DependencyInjectionContainer.Register(services);
             AnimMetaEditor_DependencyInjectionContainer.Register(services);
             AnimationEditors_DependencyInjectionContainer.Register(services);
-            AnimationFragment_DependencyInjectionContainer.Register(services);
             AnimationPack_DependencyInjectionContainer.Register(services);
             CampaignAnimBin_DependencyInjectionContainer.Register(services);
             VariantMeshDefinition_DependencyInjectionContainer.Register(services);
@@ -76,7 +74,6 @@ namespace AssetEditor
             View3D_DependencyInjectionContainer.RegisterTools(factory);
             AnimMetaEditor_DependencyInjectionContainer.RegisterTools(factory);
             AnimationEditors_DependencyInjectionContainer.RegisterTools(factory);
-            AnimationFragment_DependencyInjectionContainer.RegisterTools(factory);
             AnimationPack_DependencyInjectionContainer.RegisterTools(factory);
             CampaignAnimBin_DependencyInjectionContainer.RegisterTools(factory);
             VariantMeshDefinition_DependencyInjectionContainer.RegisterTools(factory);

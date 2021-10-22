@@ -35,6 +35,7 @@ Animation transfer tool:
 	Clear all settings
 	Auto select generated animation
 	Scale model using matrix, allow save of that scaled mesh 
+	Save skeleton with mapped values
 	
 
 	
@@ -200,10 +201,9 @@ Transer tools:
 	[DONE]Keep mapping settings for when you reopen 
 	[DONE]better mesh name
 	[DONE]rename skeleton name in path
-	Export scaled mesh 
+	[DONE]Export scaled mesh 
 		[DONE]Scale mesh
-		Save inv matrix 	 animations\skeletons\advisorcrow01.bone_inv_trans_mats	
-		Save skeleton with mapped values
+		[DONE]Save inv matrix 	 
 	[Done]Ensure collaps skeleton works 	
 	[DONE]Add bonelength mult to bone settings
 	[BUG]if root bone is missing, dumb aniamtion => bow to centigor
@@ -230,16 +230,20 @@ Superview:
 	Gloab transform 
 	Crash when inserting effect in soma cases 
 	Basic splice
-	Use timer
+	Use timer values in meta 
 	Refactor animmeta factory and connected stuff
 	
 Kitbasher tool:
-		[BUG]Adding skeleton to ocelods staff does not work 
-		Select output format
-		[BUG]Setting texture or alpha data does not work from the ui
-		[BUG]3k model selection not working? Wft is going on => banner
-		[BUG]Changing textuers not saving
-		[BUG]weapons not attached anymore
+	[BUG]Adding skeleton to ocelods staff does not work 
+	Select output format
+	[BUG]Setting texture or alpha data does not work from the ui
+	[BUG]3k model selection not working? Wft is going on => banner
+	[BUG]Changing textuers not saving
+	[BUG]weapons not attached anymore
+	Redo pin tool => Select vertex and mesh | UI
+	Create 
+	Fix manipulars 
+		
 		
 Skeleton creator tool:
 	Invert
@@ -247,8 +251,20 @@ Skeleton creator tool:
 	Transform 
 
 Animation pack editor
-	Save error - unknown type from transfer tool
+	Better thingsy  for finding bin
+	Generate bin name better int mount tool
 	Duplicated animpack entry to new bin
+	New pack
+	New match
+	New frg
+	display matching combat file
+	[DONE]Error handling frg
+	[DONE]clean up error handler for campagin bin editor 
+	Are you sure when swappng between files
+	Save
+	3k items 
+	throw new Exception("TODO")
+	Expand slot types on ctrl
 	
 General:
 	[BUG]rename file, create folder, to lower letters 

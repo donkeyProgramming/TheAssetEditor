@@ -12,6 +12,7 @@ using Common.GameInformation;
 using CommonControls.Common;
 using CommonControls.Services;
 using CommonControls.Simple;
+using FileTypes.AnimationPack;
 using FileTypes.PackFiles.Models;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Extensions.DependencyInjection;
@@ -61,6 +62,8 @@ namespace AssetEditor.ViewModels
         public ICommand OpenTechSkeletonEditorCommand { get; set; }
         public IEditorCreator EditorCreator { get; set; }
 
+        public ICommand CreateAnimPackCommand { get; set; }
+
         public MenuBarViewModel(IServiceProvider provider, PackFileService packfileService, ToolFactory toolFactory)
         {
             _serviceProvider = provider;
@@ -69,6 +72,7 @@ namespace AssetEditor.ViewModels
             OpenSettingsWindowCommand = new RelayCommand(ShowSettingsDialog);
             OpenPackFileCommand = new RelayCommand(OpenPackFile);
             CreateNewPackFileCommand = new RelayCommand(CreatePackFile);
+            CreateAnimPackCommand = new RelayCommand(CreateAnimPack);
             OpenAssetEditorFolderCommand = new RelayCommand(OpenAssetEditorFolder);
             OpenKitbashEditorCommand = new RelayCommand(OpenKitbasherTool);
             OpenAnimMetaDecocderCommand = new RelayCommand(OpenAnimMetaDecocder);
@@ -78,6 +82,8 @@ namespace AssetEditor.ViewModels
             OpenAnimationTransferToolCommand = new RelayCommand(OpenAnimationTransferTool);
             OpenSuperViewToolCommand = new RelayCommand(OpenSuperViewTool);
             OpenTechSkeletonEditorCommand = new RelayCommand(OpenTechSkeletonEditor);
+
+
 
             OpenRome2RePacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Rome_2_Remastered));
             OpenThreeKingdomsPacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.ThreeKingdoms));
@@ -131,6 +137,41 @@ namespace AssetEditor.ViewModels
             {
                 var newPackFile = _packfileService.CreateNewPackFileContainer(window.TextValue, PackFileCAType.MOD);
                 _packfileService.SetEditablePack(newPackFile);
+            }
+        }
+
+
+        void CreateAnimPack()
+        {
+            TextInputWindow window = new TextInputWindow("New AnimPack name", "");
+            if (window.ShowDialog() == true)
+            {
+                // Is extention correct
+                var fileName = SaveHelper.EnsureEnding(window.TextValue, ".animpack");
+                var filePath = @"animations/animation_tables/" + fileName;
+                var binPath = @"animations/animation_tables/" + SaveHelper.EnsureEnding(fileName, "_tables.bin");
+                if (!SaveHelper.IsFilenameUnique(_packfileService, filePath))
+                {
+                    MessageBox.Show("Filename is not unique");
+                    return;
+                }
+
+                // Create dummy data
+                var animPack = new FileTypes.AnimationPack.AnimationPackFile(filePath);
+                animPack.AnimationBin = new FileTypes.AnimationPack.AnimationBin(binPath);
+                animPack.AnimationBin.AnimationTableEntries.Add(
+                    new AnimationBinEntry("ExampleDbRef", "ExampleSkeleton")
+                    {
+                        Unknown = 1,
+                        FragmentReferences = new List<AnimationBinEntry.FragmentReference>()
+                        {
+                            new AnimationBinEntry.FragmentReference() { Name = "FragNameRef0"},
+                            new AnimationBinEntry.FragmentReference() { Name = "FragNameRef1"}
+                        }
+                    });
+
+                // Save
+                SaveHelper.Save(_packfileService, filePath, null, animPack.ToByteArray());
             }
         }
 

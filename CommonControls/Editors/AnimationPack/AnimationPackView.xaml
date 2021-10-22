@@ -3,11 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:CommonControls.Editors.AnimationPack"
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors"
-             xmlns:table="clr-namespace:CommonControls.Table"
-             xmlns:animationFragmenView="clr-namespace:CommonControls.Editors.AnimationFragment"
-             xmlns:animationBinView="clr-namespace:CommonControls.Editors.AnimationBin"
+             xmlns:texteditor="clr-namespace:CommonControls.Editors.TextEditor"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -28,7 +25,7 @@
                     <MenuItem Header="Save"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
                     <MenuItem Header="Extract selected"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
                     <MenuItem Header="New bin"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
-                    <MenuItem Header="New fragment"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
+                    <MenuItem Header="New fragment"  Command="{Binding CreateNewFragmentCommand}"/>
                     <MenuItem Header="Import file"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
                 </MenuItem>
             </Menu>
@@ -55,21 +52,14 @@
                     </Style>
                 </TextBox.Style>
             </TextBox>
-            <ListView Grid.Row="1" ItemsSource="{Binding AnimationPackItems.Values}" DisplayMemberPath="DisplayName" SelectedItem="{Binding AnimationPackItems.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <ListView Grid.Row="1" ItemsSource="{Binding AnimationPackItems.Values}" SelectedItem="{Binding AnimationPackItems.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
         </Grid>
 
         <!-- Right side - Main view -->
-        <ContentControl Grid.Row="1" Grid.Column="2" Content="{Binding SelectedItemViewModel, UpdateSourceTrigger=PropertyChanged}">
-            <ContentControl.Resources>
-                <DataTemplate DataType="{ x:Type animationFragmenView:AnimationFragmentViewModel}">
-                    <table:TableView/>
-                </DataTemplate>
 
-                <DataTemplate DataType="{ x:Type animationBinView:AnimationBinViewModel}">
-                    <table:TableView/>
-                </DataTemplate>
-            </ContentControl.Resources>
-        </ContentControl>
+        <texteditor:TextEditorView Grid.Row="1" Grid.Column="2" DataContext="{Binding SelectedItemViewModel, UpdateSourceTrigger=PropertyChanged}"/>
+            
+   
 
     </Grid>
 </UserControl>

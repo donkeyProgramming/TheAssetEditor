@@ -12,6 +12,15 @@ namespace FileTypes.AnimationPack
 {
     public class AnimationPackFile
     {
+
+        public enum AnimationPackFileType
+        { 
+            Bin,
+            Fragment,
+            MatchedCombat,
+            Unknown
+        }
+
         class AnimationDataFile
         {
             public string Name { get; set; }
@@ -50,6 +59,8 @@ namespace FileTypes.AnimationPack
             var files = FindAllSubFiles(data);
             Fragments = GetFragments(files, data, onlyForThisSkeleton);
             AnimationBin = GetAnimationBins(files, data).FirstOrDefault();
+
+            //animations/matched_combat/attila_generated.bin
             var loadedFileCount = Fragments.Count;
             if (AnimationBin != null)
                 loadedFileCount++;
@@ -86,10 +97,75 @@ namespace FileTypes.AnimationPack
             return output;
         }
 
+        public byte[] GetFile(string path, out AnimationPackFileType type)
+        {
+            type = GetFileType(path);
+
+            if (AnimationBin != null && AnimationBin.FileName == path)
+            {
+                return AnimationBin.ToByteArray();
+            }
+
+            foreach (var item in Fragments)
+            {
+                if (item.FileName == path)
+                {
+                    return item.ToByteArray();
+                }
+            }
+
+
+            throw new Exception("File not found");
+        }
+
+        public AnimationPackFileType GetFileType(string path)
+        {
+            if (AnimationBin != null && AnimationBin.FileName == path)
+            {
+                return AnimationPackFileType.Bin;
+            }
+
+            foreach (var item in Fragments)
+            {
+                if (item.FileName == path)
+                {
+                    return AnimationPackFileType.Fragment;
+                }
+            }
+
+            throw new Exception("File not found");
+        }
+
+        public void UpdateFileFromBytes(string path, byte[] bytes)
+        {
+            if (path.Contains("tables.bin", StringComparison.InvariantCultureIgnoreCase))
+            {
+                AnimationBin = new AnimationBin(path, new ByteChunk(bytes));
+                return;
+            }
+
+            if (path.Contains(".frg", StringComparison.InvariantCultureIgnoreCase))
+            {
+                for (int i = 0; i < Fragments.Count; i++)
+                {
+                    if (Fragments[i].FileName == path)
+                    {
+                        Fragments[i] = new AnimationFragment(path, new ByteChunk(bytes));
+                        return;
+                    }
+                }
+            }
+
+            throw new Exception("Unable to update file - " + path); 
+        }
+
         List<AnimationBin> GetAnimationBins(List<AnimationDataFile> animationDataFile, ByteChunk data)
         {
             var output = new List<AnimationBin>();
             var animationBins = animationDataFile.Where(x => x.Name.Contains("tables.bin")).ToList();
+
+            if (animationBins.Count > 2)
+                throw new Exception("This pack contains multiple tables.bin files, not supported");
 
             foreach (var animBin in animationBins)
             {

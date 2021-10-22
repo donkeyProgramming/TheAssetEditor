@@ -52,6 +52,9 @@ namespace CommonControls.Editors.TextEditor
                {
                    var caretOffset = editor.CaretOffset;
                    editor.Document.Text = dependencyPropertyChangedEventArgs.NewValue.ToString();
+
+                    if (caretOffset >= editor.Text.Length)
+                        caretOffset = 0;
                    editor.CaretOffset = caretOffset;
                }
             }

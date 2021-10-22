@@ -87,6 +87,28 @@ namespace CommonControls.Common
             }
         }
 
+        public static bool IsFilenameUnique(PackFileService pfs, string path)
+        {
+            if (pfs.HasEditablePackFile() == false)
+                throw new Exception("Can not check if filename is unique if no out packfile is selected");
+
+            var file = pfs.FindFile(path, pfs.GetEditablePack());
+            return file == null;
+        }
+
+        public static string EnsureEnding(string text, string ending)
+        {
+            text = text.ToLower();
+            bool hasCorrectEnding = text.EndsWith(ending);
+            if (!hasCorrectEnding)
+            {
+                text = Path.GetFileNameWithoutExtension(text);
+                text = text + ending;
+            }
+
+            return text;
+        }
+
         public static PackFile SaveAs(PackFileService packFileService, byte[] data, string extention)
         {
             using (var browser = new SavePackFileWindow(packFileService))

@@ -1,8 +1,6 @@
 ﻿
 using Common;
 using CommonControls.Common;
-using CommonControls.Editors.AnimationFragment;
-using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using CommonControls.Table;
 using Filetypes.RigidModel;
@@ -128,11 +126,12 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public void ViewFragment()
         {
-            if (FragAndSlotSelection.FragmentList.SelectedItem != null)
-            {
-                var view = AnimationFragmentViewModel.CreateFromFragment(_pfs, FragAndSlotSelection.FragmentList.SelectedItem, false);
-                TableWindow.Show(view);
-            }
+            throw new Exception("TODO");
+            //if (FragAndSlotSelection.FragmentList.SelectedItem != null)
+            //{
+            //    var view = AnimationFragmentViewModel.CreateFromFragment(_pfs, FragAndSlotSelection.FragmentList.SelectedItem, false);
+            //    TableWindow.Show(view);
+            //}
         }
 
         public void ViewSelectedMeta() 

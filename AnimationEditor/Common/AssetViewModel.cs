@@ -150,7 +150,8 @@ namespace AnimationEditor.Common.ReferenceModel
 
         void SetSelectableState()
         {
-
+            if (_modelNode == null)
+                return;
             _modelNode.ForeachNodeRecursive((node) =>
             {
                 node.IsEditable = false;

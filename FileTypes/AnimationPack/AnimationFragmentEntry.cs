@@ -43,6 +43,9 @@ namespace FileTypes.AnimationPack
             Ignore = data.ReadBool();
         }
 
+        public AnimationFragmentEntry()
+        { }
+
         public AnimationFragmentEntry Clone()
         {
             return new AnimationFragmentEntry()
@@ -61,9 +64,6 @@ namespace FileTypes.AnimationPack
             };
         }
 
-        public AnimationFragmentEntry()
-        {
-        }
 
         public byte[] ToByteArray()
         {
@@ -72,10 +72,10 @@ namespace FileTypes.AnimationPack
             memStream.Write(ByteParsers.Int32.EncodeValue(Slot.Id, out _));
             memStream.Write(ByteParsers.Int32.EncodeValue(Slot.Id, out _));
 
-            memStream.Write(ByteParsers.String.WriteCaString(AnimationFile));
-            memStream.Write(ByteParsers.String.WriteCaString(MetaDataFile));
-            memStream.Write(ByteParsers.String.WriteCaString(SoundMetaDataFile));
-            memStream.Write(ByteParsers.String.WriteCaString(Skeleton));
+            memStream.Write(ByteParsers.String.WriteCaString(AnimationFile.ToLower()));
+            memStream.Write(ByteParsers.String.WriteCaString(MetaDataFile.ToLower()));
+            memStream.Write(ByteParsers.String.WriteCaString(SoundMetaDataFile.ToLower()));
+            memStream.Write(ByteParsers.String.WriteCaString(Skeleton.ToLower()));
 
             memStream.Write(ByteParsers.Single.EncodeValue(BlendInTime, out _));
             memStream.Write(ByteParsers.Single.EncodeValue(SelectionWeight, out _));
@@ -88,13 +88,22 @@ namespace FileTypes.AnimationPack
             return memStream.ToArray();
         }
 
-        public void SetWeaponFlag(int weaponIndex, bool value)
+        public void SetUnknown0Flag(int index, bool value)
         {
             BitArray b = new BitArray(new int[] { Unknown0 });
-            b[weaponIndex] = value;
+            b[index] = value;
             int[] array = new int[1];
             b.CopyTo(array, 0);
             Unknown0 = array[0];
+        }
+
+        public void SetUnknown1Flag(int index, bool value)
+        {
+            BitArray b = new BitArray(new int[] { Unknown1 });
+            b[index] = value;
+            int[] array = new int[1];
+            b.CopyTo(array, 0);
+            Unknown1 = array[0];
         }
 
         int getIntFromBitArray(BitArray bitArray)

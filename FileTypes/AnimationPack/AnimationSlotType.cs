@@ -9,14 +9,17 @@ namespace FileTypes.AnimationPack
     [Serializable]
     public class AnimationSlotType
     {
-        public int Id { get; private set; }
-        public string Value { get; private set; }
+        public int Id { get; set; }
+        public string Value { get; set; }
 
         public AnimationSlotType(int id, string value)
         {
             Id = id;
             Value = value.ToUpper();
         }
+
+        public AnimationSlotType()
+        { }
 
         public AnimationSlotType Clone()
         {
@@ -32,8 +35,7 @@ namespace FileTypes.AnimationPack
 
     public static class AnimationSlotTypeHelper
     {
-        static List<AnimationSlotType> _values
-            ;
+        static List<AnimationSlotType> _values;
         public static List<AnimationSlotType> Values { get { PopulateList(); return _values; } private set => _values = value; }
 
         static public AnimationSlotType GetFromId(int id)

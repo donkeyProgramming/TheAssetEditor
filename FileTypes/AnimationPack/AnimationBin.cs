@@ -10,7 +10,6 @@ namespace FileTypes.AnimationPack
     public class AnimationBin
     {
         public int TableVersion { get; set; } = 2;
-        public int RowCount { get; set; } = 0;
         public string FileName { get; set; }
 
         public List<AnimationBinEntry> AnimationTableEntries { get; set; } = new List<AnimationBinEntry>();
@@ -20,9 +19,9 @@ namespace FileTypes.AnimationPack
         {
             FileName = filename;
             TableVersion = data.ReadInt32();
-            RowCount = data.ReadInt32();
-            AnimationTableEntries = new List<AnimationBinEntry>(RowCount);
-            for (int i = 0; i < RowCount; i++)
+            var rowCount = data.ReadInt32();
+            AnimationTableEntries = new List<AnimationBinEntry>(rowCount);
+            for (int i = 0; i < rowCount; i++)
                 AnimationTableEntries.Add(new AnimationBinEntry(data));
         }
 
@@ -63,7 +62,7 @@ namespace FileTypes.AnimationPack
             public byte[] ToByteArray()
             {
                 using MemoryStream memStream = new MemoryStream();
-                memStream.Write(ByteParsers.String.WriteCaString(Name));
+                memStream.Write(ByteParsers.String.WriteCaString(Name.ToLower()));
                 memStream.Write(ByteParsers.Int32.EncodeValue(Unknown, out _));
                 return memStream.ToArray();
             }
@@ -99,9 +98,9 @@ namespace FileTypes.AnimationPack
         {
             using MemoryStream memStream = new MemoryStream();
 
-            memStream.Write(ByteParsers.String.WriteCaString(Name));
-            memStream.Write(ByteParsers.String.WriteCaString(SkeletonName));
-            memStream.Write(ByteParsers.String.WriteCaString(MountName));
+            memStream.Write(ByteParsers.String.WriteCaString(Name.ToLower()));
+            memStream.Write(ByteParsers.String.WriteCaString(SkeletonName.ToLower()));
+            memStream.Write(ByteParsers.String.WriteCaString(MountName.ToLower()));
 
             memStream.Write(ByteParsers.Int32.EncodeValue(FragmentReferences.Count, out _));
             foreach (var fragment in FragmentReferences)

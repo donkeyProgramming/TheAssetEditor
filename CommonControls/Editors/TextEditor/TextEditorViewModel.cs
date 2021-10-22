@@ -10,12 +10,12 @@ using System.Windows.Input;
 
 namespace CommonControls.Editors.TextEditor
 {
-    public interface ITextEditorViewModel : IEditorViewModel
+    public interface ITextEditorViewModel
     {
         void SetEditor(ITextEditor theEditor);
     }
 
-    public class TextEditorViewModel<TextConverter> : NotifyPropertyChangedImpl, ITextEditorViewModel
+    public class TextEditorViewModel<TextConverter> : NotifyPropertyChangedImpl, ITextEditorViewModel, IEditorViewModel
         where TextConverter : ITextConverter
     {
         public ICommand SaveCommand { get; set; }
@@ -100,6 +100,51 @@ namespace CommonControls.Editors.TextEditor
         public bool HasUnsavedChanges()
         {
             return false;
+        }
+    }
+
+
+    public class SimpleTextEditorViewModel : NotifyPropertyChangedImpl, ITextEditorViewModel
+    {
+        ICommand _saveCommand;
+        public ICommand SaveCommand { get => _saveCommand; set => SetAndNotify(ref _saveCommand, value); }
+
+        string _text;
+        public string Text 
+        { 
+            get => _text; 
+            set 
+            { 
+                SetAndNotify(ref _text, value);
+                _textChanged = true;
+            }
+        }
+
+        bool _textChanged = false;
+        public ITextEditor TextEditor { get; private set; }
+
+        public SimpleTextEditorViewModel()
+        {
+            SaveCommand = new RelayCommand(() => Save());
+        }
+
+        public bool Save() { return true; }
+
+        public void SetEditor(ITextEditor theEditor)
+        {
+            TextEditor = theEditor;
+            TextEditor.ClearUndoStack();
+        }   
+
+        public bool HasUnsavedChanges()
+        {
+            return _textChanged;
+        }
+
+        public void ResetChangeLog()
+        {
+            _textChanged = false;
+               TextEditor.ClearUndoStack();
         }
     }
 }

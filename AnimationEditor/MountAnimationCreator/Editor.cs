@@ -4,7 +4,6 @@ using AnimationEditor.MountAnimationCreator.Services;
 using AnimationEditor.PropCreator;
 using Common;
 using CommonControls.Common;
-using CommonControls.Editors.AnimationFragment;
 using CommonControls.Services;
 using CommonControls.Table;
 using FileTypes.AnimationPack;
@@ -221,8 +220,9 @@ namespace AnimationEditor.MountAnimationCreator
         {
             if (fragment != null)
             {
-                var view = AnimationFragmentViewModel.CreateFromFragment(_pfs, fragment, canEdit);
-                TableWindow.Show(view);
+                throw new Exception("TODO");
+                //var view = AnimationFragmentViewModel.CreateFromFragment(_pfs, fragment, canEdit);
+                //TableWindow.Show(view);
             }
         }
 

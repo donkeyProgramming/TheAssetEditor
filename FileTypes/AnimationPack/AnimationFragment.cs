@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace FileTypes.AnimationPack
 {
@@ -26,6 +28,8 @@ namespace FileTypes.AnimationPack
                 }
             }
 
+            public StringArrayTable() { }
+
             public StringArrayTable(ByteChunk data)
             {
                 var count = data.ReadInt32();
@@ -39,7 +43,7 @@ namespace FileTypes.AnimationPack
                 using MemoryStream memStream = new MemoryStream();
                 memStream.Write(ByteParsers.Int32.EncodeValue(Values.Count, out _));
                 foreach(var item in Values)
-                    memStream.Write(ByteParsers.String.WriteCaString(item));
+                    memStream.Write(ByteParsers.String.WriteCaString(item.ToLower()));
 
                 return memStream.ToArray();
             }
@@ -64,6 +68,8 @@ namespace FileTypes.AnimationPack
             }
         }
 
+        public AnimationFragment() { }
+
         public byte[] ToByteArray()
         {
             // Ensure it ok
@@ -71,9 +77,9 @@ namespace FileTypes.AnimationPack
             Fragments = Fragments.OrderBy(x => x.Slot.Id).ToList();
             foreach (var fragment in Fragments)
             {
-                fragment.AnimationFile = fragment.AnimationFile.Replace("\\", "/");
-                fragment.MetaDataFile = fragment.MetaDataFile.Replace("\\", "/");
-                fragment.SoundMetaDataFile = fragment.SoundMetaDataFile.Replace("\\", "/");
+                fragment.AnimationFile = fragment.AnimationFile.Replace("\\", "/").ToLower();
+                fragment.MetaDataFile = fragment.MetaDataFile.Replace("\\", "/").ToLower();
+                fragment.SoundMetaDataFile = fragment.SoundMetaDataFile.Replace("\\", "/").ToLower();
             }
 
             // Save
@@ -142,7 +148,7 @@ namespace FileTypes.AnimationPack
             }
         }
 
-        public void SetSkeleton(string skeletonName)
+        public void SetSkeletonForAllFragments(string skeletonName)
         {
             foreach (var fragment in Fragments)
             {

@@ -40,44 +40,20 @@ namespace CommonControls.Editors.CampaignAnimBin
         {
             try
             {
-                ITextConverter.SaveError tempError = null;
                 var xmlserializer = new XmlSerializer(typeof(CampaignAnimationBin));
                 using var stringReader = new StringReader(text);
                 var reader = XmlReader.Create(stringReader);
-                
-                var xmlEventHandler = new XmlDeserializationEvents();
-                xmlEventHandler.OnUnknownElement = (x,e) => tempError = new ITextConverter.SaveError() 
-                { 
-                    Text = "Unsuported xml element : " + e.Element.LocalName + $" at line {e.LineNumber} and position {e.LinePosition}", 
-                    ErrorLineNumber = e.LineNumber,
-                    ErrorPosition = e.LinePosition - e.Element.LocalName.Length,
-                    ErrorLength = e.Element.LocalName.Length
-                };
 
-                xmlEventHandler.OnUnknownAttribute = (x, e) => tempError = new ITextConverter.SaveError()
-                {
-                    Text = "Unsuported xml attribute : " + e.Attr.LocalName + $" at line {e.LineNumber} and position {e.LinePosition}",
-                    ErrorLineNumber = e.LineNumber,
-                    ErrorPosition = e.LinePosition - e.Attr.LocalName.Length,
-                    ErrorLength = e.Attr.LocalName.Length
-                };
+                var errorHandler = new XmlSerializationErrorHandler();
 
-                xmlEventHandler.OnUnknownNode = (x, e) => tempError = new ITextConverter.SaveError()
-                {
-                    Text = "Unsuported xml node : " + e.LocalName + $" at line {e.LineNumber} and position {e.LinePosition}",
-                    ErrorLineNumber = e.LineNumber,
-                    ErrorPosition = e.LinePosition - e.LocalName.Length,
-                    ErrorLength = e.LocalName.Length
-                }; ;
-
-                var obj = xmlserializer.Deserialize(reader, xmlEventHandler);
+                var obj = xmlserializer.Deserialize(reader, errorHandler.EventHandler);
                 var typedObject = obj as CampaignAnimationBin;
                 var fileName = Path.GetFileNameWithoutExtension(filePath);
 
                 var bytes = CampaignAnimationBinLoader.Write(typedObject, fileName);
-                if (tempError != null)
+                if (errorHandler.Error != null)
                 {
-                    error = tempError;
+                    error = errorHandler.Error;
                     return null;
                 }
                 error = null;
