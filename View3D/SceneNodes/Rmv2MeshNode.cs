@@ -11,6 +11,7 @@ using View3D.Components.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.Rendering.RenderItems;
 using View3D.Rendering.Shading;
+using View3D.Services;
 using View3D.Utility;
 
 namespace View3D.SceneNodes
@@ -58,7 +59,7 @@ namespace View3D.SceneNodes
             _resourceLib = resourceLib;
             Geometry = geometry;
             if (Geometry == null)
-                Geometry = new Rmv2Geometry(rmvSubModel, context);
+                Geometry = MeshBuilderService.BuildMeshFromRmvModel(rmvSubModel, context);
             AnimationPlayer = animationPlayer;
 
             Name = rmvSubModel.Header.ModelName;
@@ -97,7 +98,7 @@ namespace View3D.SceneNodes
         internal RmvSubModel CreateRmvSubModel()
         {
             var newSubModel = MeshModel.Clone();
-            newSubModel.Mesh = (Geometry as Rmv2Geometry).CreateRmvMesh();
+            newSubModel.Mesh =  MeshBuilderService.CreateRmvFileMesh(Geometry as Rmv2Geometry);
             return newSubModel;
         }
 

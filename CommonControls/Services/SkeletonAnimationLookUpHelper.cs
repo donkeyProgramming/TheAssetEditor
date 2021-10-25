@@ -13,7 +13,7 @@ using System.Linq;
 namespace CommonControls.Services
 {
 
-    public class SkeletonAnimationLookUpHelper : IGameComponent
+    public class SkeletonAnimationLookUpHelper : IGameComponent, IAnimationFileDiscovered
     {
         ILogger _logger = Logging.Create<SkeletonAnimationLookUpHelper>();
         Dictionary<string, ObservableCollection<AnimationReference>> _skeletonNameToAnimationMap = new Dictionary<string, ObservableCollection<AnimationReference>>();
@@ -28,32 +28,31 @@ namespace CommonControls.Services
         {
             var allAnimations = pfs.FindAllWithExtentionIncludePaths(".anim", packFileContainer);
             foreach (var animation in allAnimations)
-            {
-                try
-                {
-                    var animationSkeletonName = AnimationFile.GetAnimationHeader(animation.Item2).SkeletonName;
-                    if (_skeletonNameToAnimationMap.ContainsKey(animationSkeletonName) == false)
-                        _skeletonNameToAnimationMap.Add(animationSkeletonName, new ObservableCollection<AnimationReference>());
+                FileDiscovered(animation.Item2, packFileContainer, pfs.GetFullPath(animation.Item2, packFileContainer));
+        }
 
-                    _skeletonNameToAnimationMap[animationSkeletonName].Add(new AnimationReference(pfs.GetFullPath(animation.Item2, packFileContainer), packFileContainer));
-                }
-                catch (Exception e)
-                {
-                    _logger.Here().Error("Parsing failed for " + pfs.GetFullPath(animation.Item2, packFileContainer) + "\n" + e.ToString());
-                }
+        public void FileDiscovered(PackFile file, PackFileContainer container, string fullPath)
+        {
+            try
+            {
+                var animationSkeletonName = AnimationFile.GetAnimationHeader(file).SkeletonName;
+                if (_skeletonNameToAnimationMap.ContainsKey(animationSkeletonName) == false)
+                    _skeletonNameToAnimationMap.Add(animationSkeletonName, new ObservableCollection<AnimationReference>());
+
+                _skeletonNameToAnimationMap[animationSkeletonName].Add(new AnimationReference(fullPath, container));
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error("Parsing failed for " + fullPath + "\n" + e.ToString());
             }
 
-            var allNormalSkeletons = allAnimations.Where(x => x.Item1.Contains("animations\\skeletons", StringComparison.InvariantCultureIgnoreCase));
-            foreach (var item in allNormalSkeletons)
-                SkeletonFileNames.Add(item.Item1);
+            if (fullPath.Contains("animations\\skeletons", StringComparison.InvariantCultureIgnoreCase))
+                SkeletonFileNames.Add(fullPath);
 
-            var techSkeletons = allAnimations.Where(x => x.Item1.Contains("tech", StringComparison.InvariantCultureIgnoreCase));
-            foreach (var item in techSkeletons)
-                SkeletonFileNames.Add(item.Item1);
-
-            _logger.Here().Information("Animations found =" + allAnimations.Count());
-            _logger.Here().Information("Skeletons found =" + SkeletonFileNames.Count());
+            else if (fullPath.Contains("tech", StringComparison.InvariantCultureIgnoreCase))
+                SkeletonFileNames.Add(fullPath);
         }
+
 
         public void UnloadAnimationFromContainer(PackFileService pfs, PackFileContainer packFileContainer)
         {
@@ -129,6 +128,8 @@ namespace CommonControls.Services
         public void Initialize()
         {
         }
+
+        
 
 
         // Delete this pice of shit

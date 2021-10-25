@@ -35,7 +35,7 @@ namespace View3D.Rendering
             Tangent = tangent;
             BiNormal = biNormal;
             BlendWeights = Vector4.One;
-            BlendIndices = Vector4.Zero; //; new short[4] { 0, 0, 0, 0 };
+            BlendIndices = Vector4.Zero;
         }
 
         VertexDeclaration IVertexType.VertexDeclaration

@@ -44,7 +44,7 @@ namespace Filetypes.RigidModel
 
         public class AnimationHeader
         {
-            public uint AnimationType { get; set; } 
+            public uint AnimationType { get; set; }             
             public uint Unknown0_alwaysOne { get; set; } = 1;
             public float FrameRate { get; set; } = 20;
             public string SkeletonName { get; set; }
@@ -62,7 +62,7 @@ namespace Filetypes.RigidModel
 
         public static AnimationHeader GetAnimationHeader(PackFile file)
         {
-            var data = file.DataSource.ReadData();
+            var data = file.DataSource.ReadData(100);
             try
             {
                 return GetAnimationHeader(new ByteChunk(data));

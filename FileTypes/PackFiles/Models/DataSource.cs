@@ -10,6 +10,7 @@ namespace FileTypes.PackFiles.Models
     {
         long Size{get;}
         byte[] ReadData();
+        byte[] ReadData(int size);
         ByteChunk ReadDataAsChunk();
     }
 
@@ -27,6 +28,16 @@ namespace FileTypes.PackFiles.Models
         public byte[] ReadData()
         {
             return File.ReadAllBytes(filepath);
+        }
+
+        public byte[] ReadData(int size)
+        {
+            using (BinaryReader reader = new BinaryReader(new FileStream(filepath, FileMode.Open)))
+            {
+                byte[] output = new byte[size];
+                reader.Read(output, 0, size);
+                return output;
+            }
         }
 
         public ByteChunk ReadDataAsChunk()
@@ -48,6 +59,14 @@ namespace FileTypes.PackFiles.Models
         public byte[] ReadData()
         {
             return data;
+        }
+
+        public byte[] ReadData(int size)
+        {
+            byte[] output = new byte[size];
+            Array.Copy(data, 0, output, 0, size);
+            return output;
+
         }
 
         public static MemorySource FromFile(string path)
@@ -87,6 +106,19 @@ namespace FileTypes.PackFiles.Models
             }
             return data;
         }
+
+        public byte[] ReadData(int size)
+        {
+            byte[] data = new byte[size];
+            using (Stream stream = File.Open(_parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                stream.Seek(Offset, SeekOrigin.Begin);
+                stream.Read(data, 0, size);
+            }
+            return data;
+        }
+
+
         public ByteChunk ReadDataAsChunk()
         {
             return new ByteChunk(ReadData());

@@ -144,9 +144,9 @@ namespace CommonControls.Services
 
         public PackFileContainer Load(BinaryReader binaryReader, string packFileSystemPath)
         {
-            var pack = new PackFileContainer(packFileSystemPath, binaryReader);
+            var pack = new PackFileContainer(packFileSystemPath, binaryReader, _skeletonAnimationLookUpHelper);
             Database.AddPackFile(pack);
-            _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pack);
+            //_skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pack);
             return pack;
         }
 
@@ -166,9 +166,9 @@ namespace CommonControls.Services
                         {
                             using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
                             {
-                                var pack = new PackFileContainer(path, reader);
+                                var pack = new PackFileContainer(path, reader, _skeletonAnimationLookUpHelper);
                                 packList.Add(pack);
-                                _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pack);
+                                //_skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pack);
                             }
                         }
                     }
@@ -267,11 +267,8 @@ namespace CommonControls.Services
                 var newFile = new PackFile(file.Name, file.DataSource);
                 target.FileList[lowerPath] = newFile;
 
-
                 Database.TriggerPackFileAdded(target, new List<PackFile>() { newFile as PackFile });
             }
-
-            //Database.TriggerContainerUpdated(target);
         }
 
         public void AddFolderContent(PackFileContainer container, string path, string folderDir)

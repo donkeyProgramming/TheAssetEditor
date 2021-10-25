@@ -234,16 +234,18 @@ Superview:
 	Refactor animmeta factory and connected stuff
 	
 Kitbasher tool:
-	[BUG]Adding skeleton to ocelods staff does not work 
 	Select output format
+	[BUG]Adding skeleton to ocelods staff does not work 
 	[BUG]Setting texture or alpha data does not work from the ui
 	[BUG]3k model selection not working? Wft is going on => banner
 	[BUG]Changing textuers not saving
 	[BUG]weapons not attached anymore
+	Fill hole
 	Redo pin tool => Select vertex and mesh | UI 
 	Fix manipulars 
-		
-		
+	Cleanup lots of code for "tools"
+	Clean up geometry class
+			
 Skeleton creator tool:
 	Invert
 	Insert/delete

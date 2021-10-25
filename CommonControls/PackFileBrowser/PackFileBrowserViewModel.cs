@@ -237,53 +237,53 @@ namespace CommonControls.PackFileBrowser
 
             var root = new TreeNode(container.Name, NodeType.Root, container, null);
             root.IsMainEditabelPack = _packFileService.GetEditablePack() == container;
-            Dictionary<string, TreeNode> directoryMap = new Dictionary<string, TreeNode>();
+            var directoryMap = new Dictionary<string, TreeNode>();
            
             foreach (var item in container.FileList)
             {
                 var fullPath = item.Key;
-                var numSeperators = fullPath.Count(x=> x == Path.DirectorySeparatorChar);
+                var pathParts = fullPath.Split(Path.DirectorySeparatorChar);
 
-                var directoryEnd = fullPath.LastIndexOf(Path.DirectorySeparatorChar);
-                var fileName = fullPath.Substring(directoryEnd + 1);
-
-                if (numSeperators == 0)
+                if (pathParts.Length == 1)
                 {
-                    root.Children.Add(new TreeNode(fileName, NodeType.File, container, root, item.Value));
+                    root.Children.Add(new TreeNode(pathParts[0], NodeType.File, container, root, item.Value));
                 }
                 else
                 {
+                    var directoryEnd = fullPath.LastIndexOf(Path.DirectorySeparatorChar);
                     var directory = fullPath.Substring(0, directoryEnd);
-                    var res = directoryMap.TryGetValue(directory, out var node);
-                    if (!res)
+                    var numSeperators = pathParts.Length - 1;
+
+                    var directoryLookupResult = directoryMap.ContainsKey(directory);
+                    if (!directoryLookupResult)
                     {
-                        var currentIndex = 0;
-                        var lastIndex = 0;
+                        var currentIndexComputed = 0;
 
                         TreeNode lastNode = root;
                         for (int i = 0; i < numSeperators; i++)
                         {
-                            currentIndex = fullPath.IndexOf(Path.DirectorySeparatorChar, currentIndex);
-                            var subStr = fullPath.Substring(0, currentIndex);
-                            if (directoryMap.ContainsKey(subStr) == false)
+                            currentIndexComputed += pathParts[i].Length + 1;
+                            var subDirString = fullPath.Substring(0, currentIndexComputed - 1);
+
+                            if (directoryMap.TryGetValue(subDirString, out var lookUpNode) == false)
                             {
-                                var nodeName = subStr;
-                                if(lastIndex != 0)
-                                    nodeName = fullPath.Substring(lastIndex+1 , currentIndex - lastIndex-1);
-                                var currentNode = new TreeNode(nodeName, NodeType.Directory, container, lastNode);
+                                var folderNodeName = pathParts[i];
+                                var currentNode = new TreeNode(folderNodeName, NodeType.Directory, container, lastNode);
                                 lastNode.Children.Add(currentNode);
-                                directoryMap.Add(subStr, currentNode);
                                 lastNode = currentNode;
+
+                                directoryMap.Add(subDirString, currentNode);
                             }
                             else
                             {
-                                lastNode = directoryMap[subStr];
+                                lastNode = lookUpNode;
                             }
-                            lastIndex = currentIndex;
-                            currentIndex++;
                         }
                     }
-                    directoryMap[directory].Children.Add(new TreeNode(fileName, NodeType.File, container, directoryMap[directory], item.Value));
+
+                    var fileName = pathParts.Last();
+                    var treeNode = new TreeNode(fileName, NodeType.File, container, directoryMap[directory], item.Value);
+                    directoryMap[directory].Children.Add(treeNode);
                 }
             }
             Files.Add(root);

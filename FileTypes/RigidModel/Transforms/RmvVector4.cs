@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,6 +34,21 @@ namespace Filetypes.RigidModel.Transforms
         public override string ToString()
         {
             return $"{X}, {Y}, {Z}, {W}";
+        }
+
+        public Vector4 ToVector4()
+        {
+            return new Vector4(X, Y, Z, W);
+        }
+
+        public Vector4 ToVector4(float w)
+        {
+            return new Vector4(X, Y, Z, w);
+        }
+
+        public Vector3 ToVector3()
+        {
+            return new Vector3(X, Y, Z);
         }
     }
 }

@@ -10,6 +10,12 @@ using System.Text;
 
 namespace FileTypes.PackFiles.Models
 {
+    public interface IAnimationFileDiscovered
+    {
+        void FileDiscovered(PackFile file, PackFileContainer container, string fullPath);
+
+    }
+
 
     public class PackFileContainer
     {
@@ -34,7 +40,7 @@ namespace FileTypes.PackFiles.Models
             return $"{Name} - {Header?.LoadOrder}";
         }
 
-        public PackFileContainer(string packFileSystemPath, BinaryReader reader)
+        public PackFileContainer(string packFileSystemPath, BinaryReader reader, IAnimationFileDiscovered animationFileDiscovered)
         {
             SystemFilePath = packFileSystemPath;
             Name = Path.GetFileNameWithoutExtension(packFileSystemPath);
@@ -59,12 +65,15 @@ namespace FileTypes.PackFiles.Models
                 if (Header.Version == "PFH5")
                     isCompressed = reader.ReadByte();   // For warhammer 2, terrain files are compressed
 
-                string packedFileName = IOFunctions.TheadUnsafeReadZeroTerminatedAscii(reader).ToLower();
+                string fullPackedFileName = IOFunctions.TheadUnsafeReadZeroTerminatedAscii(reader).ToLower();
 
-                var packFileName = Path.GetFileName(packedFileName);
+                var packFileName = Path.GetFileName(fullPackedFileName);
                 var fileContent = new PackFile(packFileName, new PackedFileSource(packedFileSourceParent, offset, size));
 
-                FileList.Add(packedFileName, fileContent);
+                if (animationFileDiscovered != null && packFileName.EndsWith(".anim"))
+                    animationFileDiscovered.FileDiscovered(fileContent, this, fullPackedFileName);
+
+                FileList.Add(fullPackedFileName, fileContent);
                 offset += size;
             }
         }
@@ -131,10 +140,12 @@ namespace FileTypes.PackFiles.Models
 
         public void UpdateAllDataSourcesAfterSave()
         {
+            throw new Exception();
+
             // Load pack
             using var fileStram = File.OpenRead(SystemFilePath);
             using var reader = new BinaryReader(fileStram, Encoding.ASCII);
-            var pack = new PackFileContainer(SystemFilePath, reader);
+            var pack = new PackFileContainer(SystemFilePath, reader, null);
 
             foreach (var currentFile in FileList)
             {

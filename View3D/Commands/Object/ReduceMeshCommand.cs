@@ -7,6 +7,7 @@ using System.Text;
 using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
+using View3D.Services;
 
 namespace View3D.Commands.Object
 {
@@ -42,7 +43,7 @@ namespace View3D.Commands.Object
             foreach (var meshNode in _meshList)
             {
                 var originalMesh = meshNode.Geometry as Rmv2Geometry;
-                var reducedMesh = originalMesh.CreatedReducedCopy(_factor);
+                var reducedMesh = MeshOptimizerService.CreatedReducedCopy(originalMesh, _factor);
                 meshNode.Geometry = reducedMesh;
                 _originalGeometry.Add(originalMesh);
             }

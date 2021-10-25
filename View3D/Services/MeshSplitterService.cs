@@ -119,11 +119,6 @@ namespace View3D.Services
 
         class SubFaceObject
         {
-            //List<int> FaceIndexes;
-            //List<int> VertexIndexes; // FaceIndexes * 3
-            //BoundingBox BB;
-            //List<Vector3> Points;
-
             List<ushort> _meshTotalIndexList;
             List<Vector3> _meshVertexList;
 
@@ -184,7 +179,6 @@ namespace View3D.Services
             {
                 return _faceList.Count();
             }
-
 
             public void ComputeBoundingBox()
             {

@@ -71,8 +71,8 @@ namespace Filetypes.RigidModel.Vertex
             BiNormal = CreatVector4Byte(data.biNormal);
             Tangent = CreatVector4Byte(data.tangent);
 
-            BoneIndex = new byte[] { data.boneIndex[0], data.boneIndex[1] };
-            BoneWeight = new float[] { data.boneWeight[0] / 255.0f, data.boneWeight[1] / 255.0f };
+            BoneIndex = new byte[] { data.boneIndex[0], data.boneIndex[1]};
+            BoneWeight = new float[] { data.boneWeight[0] / 255.0f, data.boneWeight[1] / 255.0f};
         }
     }
 }

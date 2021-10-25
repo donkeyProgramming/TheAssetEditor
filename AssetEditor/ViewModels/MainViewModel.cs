@@ -122,12 +122,12 @@ namespace AssetEditor.ViewModels
                 //var soundEditor = new CommonControls.Editors.Sound.SoundEditor(packfileService);
                 //soundEditor.CreateSoundMap();
 
-                var f = packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack");
-                OpenFile(f);
+                //var f = packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack");
+                //OpenFile(f);
 
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 
-                //KitbashEditor_Debug.CreatePaladin(this, toolFactory, packfileService);
+                KitbashEditor_Debug.CreatePaladin(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);
 
