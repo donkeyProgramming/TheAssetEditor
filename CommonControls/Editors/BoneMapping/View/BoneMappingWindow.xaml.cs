@@ -17,15 +17,21 @@ namespace CommonControls.Editors.BoneMapping.View
     /// </summary>
     public partial class BoneMappingWindow : Window
     {
+        public event EventHandler ApplySettings;
+        public bool Result { get; private set; } = false;
+
         public BoneMappingWindow()
         {
             InitializeComponent();
         }
 
-        public BoneMappingWindow(BoneMappingViewModel dataContext)
+        public BoneMappingWindow(BoneMappingViewModel dataContext, bool showApplyButton)
         {
             DataContext = dataContext;
             InitializeComponent();
+            if (showApplyButton == false)
+                ApplyButtonHandle.Visibility = Visibility.Collapsed;
+
         }
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
@@ -39,14 +45,19 @@ namespace CommonControls.Editors.BoneMapping.View
                     return;
             }
 
-            DialogResult = true;
+            Result = true;
             Close();
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = false;
+            Result = false;
             Close();
+        }
+
+        private void  ApplyButton_Click(object sender, RoutedEventArgs e)
+        {
+            ApplySettings?.Invoke(this, e);
         }
     }
 }

@@ -18,10 +18,12 @@ namespace View3D.Components.Rendering
         MouseComponent _mouse;
         KeyboardComponent _keyboard;
 
-        public ArcBallCamera(WpfGame game, Vector3 lookAt, float currentZoom) : base(game)
+        public ArcBallCamera(WpfGame game, float yaw = 0.8f, float pitch = -0.32f, float currentZoom = 10) : base(game)
         {
             Zoom = currentZoom;
-            _lookAt = lookAt;
+            Yaw = yaw;
+            Pitch = pitch;
+            //_lookAt = lookAt;
 
             UpdateOrder = (int)ComponentUpdateOrderEnum.Camera;
         }

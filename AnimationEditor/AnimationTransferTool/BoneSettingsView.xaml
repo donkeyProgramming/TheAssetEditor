@@ -13,7 +13,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <valueconverters:BoolToColourConverter x:Key="ColourConverter" TrueValue="Black" FalseValue="Red"/>
-        <System:Double x:Key="labelWidth">160</System:Double>
+        <System:Double x:Key="labelWidth">110</System:Double>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -84,15 +84,20 @@
                 </DockPanel>
 
                 <DockPanel>
-                    <Label     Width ="{StaticResource labelWidth}" Content="Freeze transform"/>
-                    <Label       Content=":"/>
-                    <CheckBox   VerticalContentAlignment="Center" IsChecked="{Binding SelectedBone.FreezeTranslation.Value}"/>
+                    <Label Width ="{StaticResource labelWidth}"/>
+                    <Label Content=":" Visibility="Hidden"/>
+                    <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding SelectedBone.FreezeTranslation.Value}" Content="Freeze position" Margin="0,0,5,0" ToolTip="Set the bone position to 0,0,0"/>
+                    <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding SelectedBone.FreezeRotation.Value}" Content="Freeze Rotation" Margin="0,0,5,0" ToolTip="Set the bone rotation to 0,0,0"/>
+                    <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding SelectedBone.ForceSnapToWorld.Value}" Content="Snap worldspace" ToolTip="Sets the bone transform to the same as the target, no magic attempted"/>
                 </DockPanel>
 
                 <DockPanel>
-                    <Label      Width ="{StaticResource labelWidth}" Content="Force snap in worldspace"/>
-                    <Label       Content=":"/>
-                    <CheckBox    VerticalContentAlignment="Center" IsChecked="{Binding SelectedBone.ForceSnapToWorld.Value}"/>
+                    <Label Width ="{StaticResource labelWidth}"/>
+                    <Label Content=":" Visibility="Hidden"/>
+
+                    <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding SelectedBone.ApplyTranslation.Value}" Content="Apply translation" Margin="0,0,5,0"/>
+                    <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding SelectedBone.ApplyRotation.Value}" Content="Apply Rotation"/>
+
                 </DockPanel>
 
                 <DockPanel>

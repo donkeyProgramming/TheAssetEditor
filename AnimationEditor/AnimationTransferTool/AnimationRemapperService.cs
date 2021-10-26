@@ -73,6 +73,8 @@ namespace AnimationEditor.AnimationTransferTool
                         desiredBonePosWorld = copyFromFrame.GetSkeletonAnimatedWorld(copyFromSkeleton, targetBoneIndex) * Matrix.CreateScale(1);
                     }
 
+                    var boneSettings = BoneHelper.GetBoneFromId(_bones, i);
+
                     var fromParentBoneIndex = copyToSkeleton.GetParentBone(i);
                     if (fromParentBoneIndex != -1)
                     {
@@ -81,15 +83,19 @@ namespace AnimationEditor.AnimationTransferTool
                         var bonePositionLocalSpace = desiredBonePosWorld * Matrix.Invert(parentWorld);
                         bonePositionLocalSpace.Decompose(out var _, out var boneRotation, out var bonePosition);
 
-                        newAnimation.DynamicFrames[frameIndex].Rotation[i] = boneRotation;
-                        newAnimation.DynamicFrames[frameIndex].Position[i] = bonePosition;
+                        if(boneSettings.ApplyRotation.Value == true)
+                            newAnimation.DynamicFrames[frameIndex].Rotation[i] = boneRotation;
+                        if (boneSettings.ApplyTranslation.Value == true)
+                            newAnimation.DynamicFrames[frameIndex].Position[i] = bonePosition;
                     }
                     else
                     {
                         desiredBonePosWorld.Decompose(out var _, out var boneRotation, out var bonePosition);
 
-                        newAnimation.DynamicFrames[frameIndex].Rotation[i] = boneRotation;
-                        newAnimation.DynamicFrames[frameIndex].Position[i] = bonePosition;
+                        if (boneSettings.ApplyRotation.Value == true)
+                            newAnimation.DynamicFrames[frameIndex].Rotation[i] = boneRotation;
+                        if (boneSettings.ApplyTranslation.Value == true)
+                            newAnimation.DynamicFrames[frameIndex].Position[i] = bonePosition;
                     }
                 }
             }
@@ -326,6 +332,9 @@ namespace AnimationEditor.AnimationTransferTool
                     var boneSettings = BoneHelper.GetBoneFromId(_bones, i);
                     if (boneSettings.FreezeTranslation.Value)
                         animation.DynamicFrames[frameIndex].Position[i] = Vector3.Zero;
+
+                    if (boneSettings.FreezeRotation.Value)
+                        animation.DynamicFrames[frameIndex].Rotation[i] = Quaternion.Identity;
                 }
             }
         }

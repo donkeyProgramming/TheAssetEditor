@@ -11,6 +11,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace CommonControls.Editors.BoneMapping
 {
@@ -33,7 +35,7 @@ namespace CommonControls.Editors.BoneMapping
 
         public BoneMappingViewModel(RemappedAnimatedBoneConfiguration configuration)
         {
-            MeshBones = new FilterCollection<AnimatedBone>(null);
+            MeshBones = new FilterCollection<AnimatedBone>(null, OnBoneSelected);
             ParentModelBones = new FilterCollection<AnimatedBone>(null, OnParentBoneSelected);
             OnlyShowUsedBones = new NotifyAttr<bool>(true, (x) => MeshBones.RefreshFilter());
             CurrentConfigPath = new NotifyAttr<string>(string.Empty, OnConfigPathChanged);
@@ -120,41 +122,75 @@ namespace CommonControls.Editors.BoneMapping
 
         void CreateFromConfiguration(RemappedAnimatedBoneConfiguration config)
         {
+            var boneSelector = _configuration?.SkeletonBoneHighlighter;
+            _configuration = config;
+            if (_configuration.SkeletonBoneHighlighter == null)
+                _configuration.SkeletonBoneHighlighter = boneSelector;
+
             MeshBones.UpdatePossibleValues(config.MeshBones);
             MeshSkeletonName = new NotifyAttr<string>(config.MeshSkeletonName);
 
             ParentModelBones.UpdatePossibleValues(config.ParentModelBones);
             ParentSkeletonName = new NotifyAttr<string>(config.ParnetModelSkeletonName);
-
-            _configuration = config;
         }
 
         private void OnParentBoneSelected(AnimatedBone bone)
         {
             if (bone == null)
                 return;
+
             MeshBones.SelectedItem.MappedBoneIndex.Value = bone.BoneIndex.Value;
             MeshBones.SelectedItem.MappedBoneName.Value = bone.Name.Value;
 
             OnMappingCreated(MeshBones.SelectedItem.BoneIndex.Value, MeshBones.SelectedItem.MappedBoneIndex.Value);
+
+            if (_configuration.SkeletonBoneHighlighter != null)
+            {
+                _configuration.SkeletonBoneHighlighter.SelectTargetSkeletonBone(bone.BoneIndex.Value);
+            }
+
         }
+
+        private void OnBoneSelected(AnimatedBone bone)
+        {
+            if (_configuration.SkeletonBoneHighlighter != null)
+            {
+                if (bone == null)
+                    _configuration.SkeletonBoneHighlighter.SelectSourceSkeletonBone(-1);
+                else
+                {
+                    _configuration.SkeletonBoneHighlighter.SelectSourceSkeletonBone(bone.BoneIndex.Value);
+                    if(bone.MappedBoneIndex.Value != -1)
+                        _configuration.SkeletonBoneHighlighter.SelectTargetSkeletonBone(bone.MappedBoneIndex.Value);
+                }
+            }
+        }
+
+        
 
         public void Save()
         {
-            var dataStr = JsonConvert.SerializeObject(_configuration, Formatting.Indented);
-
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.OverwritePrompt = true;
-            saveFileDialog.InitialDirectory = DirectoryHelper.AnimationIndexMappingDirectory;
-            saveFileDialog.DefaultExt = "json";
-            saveFileDialog.Filter = "Mapping files(*.json)|*.json;";
-            if (saveFileDialog.ShowDialog() == true)
+            var xmlserializer = new XmlSerializer(_configuration.GetType());
+            var stringWriter = new StringWriter();
+            using (var writer = XmlWriter.Create(stringWriter, settings: new XmlWriterSettings() { Indent = true }))
             {
-                File.WriteAllText(saveFileDialog.FileName, dataStr);
-                if (AllConfigPaths.Contains(saveFileDialog.FileName) == false)
-                    AllConfigPaths.Add(saveFileDialog.FileName);
+                xmlserializer.Serialize(writer, _configuration);
+                var dataStr = stringWriter.ToString();
 
-                CurrentConfigPath.Value = saveFileDialog.FileName;
+
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.OverwritePrompt = true;
+                saveFileDialog.InitialDirectory = DirectoryHelper.AnimationIndexMappingDirectory;
+                saveFileDialog.DefaultExt = "xml";
+                saveFileDialog.Filter = "Mapping files(*.xml)|*.xml;";
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    File.WriteAllText(saveFileDialog.FileName, dataStr);
+                    if (AllConfigPaths.Contains(saveFileDialog.FileName) == false)
+                        AllConfigPaths.Add(saveFileDialog.FileName);
+
+                    CurrentConfigPath.Value = saveFileDialog.FileName;
+                }
             }
         }
 
@@ -167,7 +203,10 @@ namespace CommonControls.Editors.BoneMapping
                 try
                 {
                     var content = File.ReadAllText(dialog.FileName);
-                    var obj = JsonConvert.DeserializeObject<RemappedAnimatedBoneConfiguration>(content);
+                    var xmlserializer = new XmlSerializer(_configuration.GetType());
+                    using var stringReader = new StringReader(content);
+                    var reader = XmlReader.Create(stringReader);
+                    var obj = xmlserializer.Deserialize(reader) as RemappedAnimatedBoneConfiguration;
 
                     if (obj.MeshSkeletonName == _configuration.MeshSkeletonName && obj.ParnetModelSkeletonName == _configuration.ParnetModelSkeletonName)
                         CreateFromConfiguration(obj);

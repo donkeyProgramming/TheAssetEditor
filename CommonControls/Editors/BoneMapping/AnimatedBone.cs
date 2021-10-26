@@ -23,7 +23,11 @@ namespace CommonControls.Editors.BoneMapping
         public Vector3 BoneRotOffset { get; set; } = new Vector3(0);
         public float BoneScaleOffset { get; set; } = 1;
 
-        public AnimatedBone(int index, string name)
+
+        public AnimatedBone()
+        { }
+
+        public AnimatedBone(int index = 0, string name = "")
         {
             BoneIndex.Value = index;
             Name.Value = name;

@@ -92,6 +92,23 @@ namespace AnimationEditor.AnimationTransferTool
             creator.CreateEmptyEditor(editorView);
         }
 
-        
+        public static void CreateBowCentigor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        {
+            var editorView = toolFactory.CreateEditorViewModel<AnimationTransferToolViewModel>();
+            editorView.MainInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\bst_centigors_base.variantmeshdefinition")
+            };
+
+            editorView.RefInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_princess.variantmeshdefinition"),
+                Animation = packfileService.FindFile(@"animations\battle\humanoid01b\subset\elves\bow\missile_actions\hu1b_bow_aim_01.anim")
+            };
+
+            creator.CreateEmptyEditor(editorView);
+        }
+
+
     }
 }

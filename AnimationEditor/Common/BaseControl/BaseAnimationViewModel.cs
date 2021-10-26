@@ -78,7 +78,7 @@ namespace AnimationEditor.PropCreator.ViewModels
             Scene.Components.Add(new ResourceLibary(Scene, pfs));
             Scene.Components.Add(skeletonHelper);
             Scene.Components.Add(schemaManager);
-            Scene.Components.Add(new ArcBallCamera(Scene, new Vector3(0), 10));
+            Scene.Components.Add(new ArcBallCamera(Scene));
             Scene.Components.Add(new ClearScreenComponent(Scene));
             Scene.Components.Add(new RenderEngineComponent(Scene));
             Scene.Components.Add(new GridComponent(Scene));

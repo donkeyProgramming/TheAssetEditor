@@ -12,7 +12,7 @@
               xmlns:s="http://schemas.singulink.com/xaml"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <System:Double x:Key="labelWidth">160</System:Double>
+        <System:Double x:Key="labelWidth">140</System:Double>
     </UserControl.Resources>
     <Expander IsExpanded="True" Header="Settings:">
         <StackPanel>
@@ -26,31 +26,17 @@
                 <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Generated.ShowSkeleton.Value, UpdateSourceTrigger=PropertyChanged}" Content="Skeleton"/>
             </DockPanel>
 
-
             <DockPanel>
-                <Label Content="Display offset - Generated" Width ="{StaticResource labelWidth}"  />
+                <Label Content="Display offset" Width ="{StaticResource labelWidth}"  />
                 <Label Content=":"/>
-                <mathviews:Vector3View Vector3="{Binding AnimationSettings.OffsetGenerated, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2"/>
-            </DockPanel>
-
-
-            <DockPanel>
-                <Label Content="Display offset -  Target" Width ="{StaticResource labelWidth}"  />
-                <Label Content=":"/>
-                <mathviews:Vector3View Vector3="{Binding AnimationSettings.OffsetTarget, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2"/>
-            </DockPanel>
-
-            <DockPanel>
-                <Label Content="Display offset -  Source" Width ="{StaticResource labelWidth}"  />
-                <Label Content=":"/>
-                <mathviews:Vector3View  Vector3="{Binding AnimationSettings.OffsetSource, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2"/>
+                <mathviews:Vector3View Vector3="{Binding AnimationSettings.DisplayOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2"/>
             </DockPanel>
 
             <DockPanel>
                 <Label Content="Scale" Width ="{StaticResource labelWidth}"  DockPanel.Dock="Left"/>
                 <Label Content=":" DockPanel.Dock="Left"/>
-                <Button Content="Export Mapped Mesh at scale" Click="{s:MethodBinding ExportScaledMesh}" DockPanel.Dock="Right" IsEnabled="False"/>
-                <Button Content="Export Mesh at scale" Click="{s:MethodBinding ExportScaledMesh}" DockPanel.Dock="Right" Margin="2,0,2,0"/>
+                <Button Content="Export Mapped skeleton" Click="{s:MethodBinding ExportMappedSkeleton}" DockPanel.Dock="Right"/>
+                <Button Content="Export Mesh/skeleton at scale" Click="{s:MethodBinding ExportScaledMesh}" DockPanel.Dock="Right" Margin="2,0,2,0"/>
 
                 <TextBox Text="{Binding AnimationSettings.Scale.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
                     <TextBox.ToolTip>
@@ -65,26 +51,21 @@
             </DockPanel>
 
             <DockPanel >
-                <Label Content="Use scaled skeleton name" Width ="{StaticResource labelWidth}"/>
+                <Label Content="Use generated skeleton" Width ="{StaticResource labelWidth}"/>
                 <Label Content=":"/>
                 <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.UseScaledSkeletonName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                 <TextBox Text="{Binding AnimationSettings.ScaledSkeletonName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
             </DockPanel>
 
             <DockPanel >
-                <Label Content="Apply Relative scale" Width ="{StaticResource labelWidth}"/>
-                <Label Content=":"/>
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.ApplyRelativeScale.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <Label Width ="{StaticResource labelWidth}"/>
+                <Label Content=":" Visibility="Hidden"/>
+                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.ApplyRelativeScale.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Content="Apply Relative scale" ToolTip="Scale bone length based on relative difference" Margin="0,0,5,0"/>
+                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.FreezeUnmapped.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Content="Zero unmapped bones" ToolTip="Set the transform of all unmapped bones to 0"/>
             </DockPanel>
 
             <DockPanel >
-                <Label Content="Zero unmapped bones" Width ="{StaticResource labelWidth}"/>
-                <Label Content=":"/>
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.FreezeUnmapped.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            </DockPanel>
-
-            <DockPanel >
-                <Label Content="Animation speed multiplier" Width ="{StaticResource labelWidth}"/>
+                <Label Content="Animation speed mult" Width ="{StaticResource labelWidth}"/>
                 <Label Content=":"/>
                 <TextBox Text="{Binding AnimationSettings.SpeedMult.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
                     <b:Interaction.Behaviors>

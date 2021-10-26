@@ -18,6 +18,11 @@ namespace CommonControls.Common
             Value = value;
         }
 
+        public NotifyAttr()
+        {
+            Value = default;
+        }
+
         public NotifyAttr(T value, ValueChangedDelegate<T> onValueChanged)
         {
             Value = value;

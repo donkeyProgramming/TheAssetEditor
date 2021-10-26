@@ -2,12 +2,9 @@
 
 
 General:
-	Validator (matrial, vmd, vsmodel)
 	Validators animation
-	Better vmd loader
 	Make rome work better
 	Enter trigger search in browse dialog
-	Create duplicate of animation bin
 	Skeleton offsets move through gizmo
 	Reset camera/focus selection in all editors 
 	Render settigns in all editors 
@@ -15,8 +12,6 @@ General:
 	Default to vmd when browsing in kitbasher -> Type filter
 	Unable to play 3k anim : [data] animations\battle\character\male01\infantry\inf_1h095dun\attacks\inf_1h095dun_basic_attack_mid_05.anim
 	
-	
-	 
 Misc:
 	Memory leaks
 	Send errors to server?
@@ -24,20 +19,6 @@ Misc:
 	about box - Dont break eula
 	Thrones of britania loading 
 	Added materials and shit as supported text formats 
-
-Animation transfer tool:
-	Clear one bone
-	Default to generate anim set 
-	Set animation length
-	Allow for merging of animation
-	Scale bone length - usefull for root anims 
-	Copy setting to children (force snap, freeze)
-	Clear all settings
-	Auto select generated animation
-	Scale model using matrix, allow save of that scaled mesh 
-	Save skeleton with mapped values
-	
-
 	
 Super view:
 	View on mount 
@@ -63,8 +44,7 @@ UV editor
 	Select based on UV island 
 	Automagically recreate optimized textures -> Texture optimizer tool - Island combiner 
 	
-Animation bin/frg editor		
-Campagin bin editor
+	
 AnimBin editor (3k, troy)
 Attachment point editor
 Pose creator tool (inv kinematic?)
@@ -204,10 +184,16 @@ Transer tools:
 	[DONE]Export scaled mesh 
 		[DONE]Scale mesh
 		[DONE]Save inv matrix 	 
-	[Done]Ensure collaps skeleton works 	
+	[DONE]Ensure collaps skeleton works 	
 	[DONE]Add bonelength mult to bone settings
-	[BUG]if root bone is missing, dumb aniamtion => bow to centigor
+	[DONE]Save settings
+	[DONE]if root bone is missing, dumb aniamtion => bow to centigor (local transform on bone) (only transfrom, only rot)
+	[BUG] automap 3k man => humanod01, skirt out of control, should be world space for unmapped bones 
+	Export mapped mesh
 	[BUG]Framerate differences => 3k issue [data] animations\cinematic\library\anim\male01\cao_cao_e3\lubu\outro\special\lubu_outro_special.anim
+	Enable camera reset 
+	Enable focus on selected bone
+	Use part of target anim for unmapped bones (option for whole skeleton)
 	
 	
 Meta editor:
@@ -245,6 +231,9 @@ Kitbasher tool:
 	Fix manipulars 
 	Cleanup lots of code for "tools"
 	Clean up geometry class
+	Toggle backface rendering
+	Mirror inverted tool
+	
 			
 Skeleton creator tool:
 	Invert
@@ -263,9 +252,9 @@ Animation pack editor
 	[DONE]Validation of paths 
 	Expand slot types on ctrl
 	3k items 
-	New match
 	display matching combat file
 	Better logic  for finding bin
+	Add capability dropdown (range, firewhile moving, riders+++) 
 	
 General:
 	[BUG]rename file, create folder, to lower letters 
@@ -274,24 +263,6 @@ General:
 	Corruption logic detection 
 	Make tutorials on youtube
 
-
-
-
-
-
-
-
-
-variantmeshes\variantmeshdefinitions\bst_chaos_spawn.variantmeshdefinition
-
-
-animations\skeletons\humanoid01.anim
-animations\skeletons\humanoid01.bone_inv_trans_mats
-
-
-
-
-GUI => CommandFactory => Command => Editors?
 
 
 

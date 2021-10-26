@@ -62,7 +62,7 @@ namespace View3D.Services
             mesh.IndexList = geometry.GetIndexBuffer().ToArray();
 
             // Ensure normalized
-            for (int i = 0; i < mesh.VertexList.Length; i++)
+            for (int i = 0; i < geometry.VertexArray.Length; i++)
             {
                 geometry.VertexArray[i].Normal = Vector3.Normalize(geometry.VertexArray[i].Normal);
                 geometry.VertexArray[i].BiNormal = Vector3.Normalize(geometry.VertexArray[i].BiNormal);

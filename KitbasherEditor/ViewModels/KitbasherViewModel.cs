@@ -58,7 +58,7 @@ namespace KitbasherEditor.ViewModels
             Scene.AddCompnent(new KeyboardComponent(Scene));
             Scene.AddCompnent(new MouseComponent(Scene));
             Scene.AddCompnent(new ResourceLibary(Scene, pf));
-            Scene.AddCompnent(new ArcBallCamera(Scene, new Vector3(0), 10));
+            Scene.AddCompnent(new ArcBallCamera(Scene));
             Scene.AddCompnent(new SceneManager(Scene));
             Scene.AddCompnent(new SelectionManager(Scene));
             Scene.AddCompnent(new CommandExecutor(Scene));
