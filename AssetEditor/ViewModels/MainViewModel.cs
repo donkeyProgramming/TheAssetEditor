@@ -114,7 +114,7 @@ namespace AssetEditor.ViewModels
                 //MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
                 //KitbashEditor_Debug.CreateLoremasterHead(this, toolFactory, packfileService);
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateBowCentigor(this, toolFactory, packfileService);
-                AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateGreatEagle(this, toolFactory, packfileService);
+                //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateGreatEagle(this, toolFactory, packfileService);
                 //var f = packfileService.FindFile(@"animations\campaign\database\bin\cam_hero_hu1d_def_spear_and_shield.bin");
                 //OpenFile(f);
 
@@ -127,7 +127,7 @@ namespace AssetEditor.ViewModels
 
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 
-                //KitbashEditor_Debug.CreatePaladin(this, toolFactory, packfileService);
+                KitbashEditor_Debug.CreatePrincessBody(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);
 

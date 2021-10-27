@@ -244,6 +244,7 @@ Animation pack editor
 	[DONE]Generate bin name better int mount tool
 	[DONE]New pack
 	[DONE]New frg
+	
 	[DONE]Error handling frg
 	[DONE]clean up error handler for campagin bin editor 
 	[DONE]Are you sure when swappng between files
@@ -265,10 +266,21 @@ General:
 
 
 
+// Meshes to rig:
+--
+--
+--
+
+Rig method - Point | Weighted
+
+Target 
+	Faces
+	Vertex
 
 
 
 
+https://answers.unity.com/questions/424974/nearest-point-on-mesh.html
 
 
 
