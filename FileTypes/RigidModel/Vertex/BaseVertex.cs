@@ -46,7 +46,6 @@ namespace Filetypes.RigidModel.Vertex
                 z *= w;
                 w = 0;
             }
-            
 
             return new RmvVector4()
             {

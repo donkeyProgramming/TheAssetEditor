@@ -263,7 +263,7 @@ namespace Filetypes.ByteParsing
 
         public string DefaultValue()
         {
-            return "0,0,0";
+            return "0|0|0";
         }
 
         public byte[] Encode(string value, out string error)
@@ -271,7 +271,7 @@ namespace Filetypes.ByteParsing
             var split = value.Split("|");
             if (split.Length != 3)
             {
-                error = "Value must contain 3 numbers seperated by ','";
+                error = "Value must contain 3 numbers seperated by '|'";
                 return null;
             }
 
@@ -346,15 +346,15 @@ namespace Filetypes.ByteParsing
 
         public string DefaultValue()
         {
-            return "0,0,0,1";
+            return "0|0|0|1";
         }
 
         public byte[] Encode(string value, out string error)
         {
-            var split = value.Split(",");
+            var split = value.Split("|");
             if (split.Length != 4)
             {
-                error = "Value must contain 4 numbers seperated by ','";
+                error = "Value must contain 4 numbers seperated by '|'";
                 return null;
             }
 

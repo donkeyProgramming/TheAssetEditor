@@ -64,7 +64,12 @@ namespace FileTypes.MetaData
             {
                 var parser = ByteParserFactory.Create(field.Type);
                 var defaultValue = parser.DefaultValue();
-                var fieldBytes = parser.Encode(defaultValue, out var _);
+                if (field.Name.ToLower() == "version")
+                    defaultValue = schema.Version.ToString();
+
+                var fieldBytes = parser.Encode(defaultValue, out var error);
+                if (fieldBytes == null)
+                    throw new Exception("Failed to create meta tag with default values : " + error);
                 bytes.AddRange(fieldBytes);
             }
 

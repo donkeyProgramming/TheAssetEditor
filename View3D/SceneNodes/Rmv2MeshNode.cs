@@ -53,7 +53,7 @@ namespace View3D.SceneNodes
         private Rmv2MeshNode()
         { }
 
-        public Rmv2MeshNode(RmvSubModel rmvSubModel, IGeometryGraphicsContext context, ResourceLibary resourceLib, AnimationPlayer animationPlayer, IGeometry geometry = null)
+        public Rmv2MeshNode(RmvSubModel rmvSubModel, IGraphicsCardGeometry context, ResourceLibary resourceLib, AnimationPlayer animationPlayer, IGeometry geometry = null)
         {
             MeshModel = rmvSubModel;
             _resourceLib = resourceLib;
@@ -98,7 +98,8 @@ namespace View3D.SceneNodes
         internal RmvSubModel CreateRmvSubModel()
         {
             var newSubModel = MeshModel.Clone();
-            newSubModel.Mesh =  MeshBuilderService.CreateRmvFileMesh(Geometry as Rmv2Geometry);
+            newSubModel.SetAlphaMode(Geometry.Alpha);
+            newSubModel.Mesh = MeshBuilderService.CreateRmvFileMesh(Geometry as Rendering.Geometry.Geometry);
             return newSubModel;
         }
 
@@ -172,7 +173,7 @@ namespace View3D.SceneNodes
                     }
                 }
 
-                animationEffect.SetAnimationParameters(data, (Geometry as Rmv2Geometry).WeightCount);
+                animationEffect.SetAnimationParameters(data, (Geometry as Rendering.Geometry.Geometry).WeightCount);
                 animationEffect.UseAnimation = AnimationPlayer.IsEnabled;
             }
 
@@ -181,7 +182,7 @@ namespace View3D.SceneNodes
                 parentWorld = parentWorld * AttachmentBoneResolver.GetWorldTransformIfAnimating();
 
             if (Effect is IShaderTextures tetureEffect)
-                tetureEffect.UseAlpha = MeshModel.AlphaSettings.Mode == AlphaMode.Alpha_Test;
+                tetureEffect.UseAlpha = Geometry.Alpha == AlphaMode.Alpha_Test;
 
             var pivotPos = GetPivot();
             var modelWithOffset = ModelMatrix * Matrix.CreateTranslation(pivotPos);

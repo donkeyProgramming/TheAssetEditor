@@ -12,27 +12,30 @@ using View3D.Rendering.Shading;
 
 namespace View3D.Rendering.Geometry
 {
-    public class Rmv2Geometry : IGeometry
+    public class Geometry : IGeometry
     {
-        protected IGeometryGraphicsContext Context;
-        public VertexPositionNormalTextureCustom[] VertexArray; // Vector3 for pos!
+        protected IGraphicsCardGeometry Context;
+        public VertexPositionNormalTextureCustom[] VertexArray; // Vector3 for pos at some point
         public ushort[] IndexArray;
 
         public Vector3 Pivot { get; set; }
-        public BoundingBox BoundingBox { get; set; }
-        public Vector3 MeshCenter { get; set; }
+        public BoundingBox BoundingBox { get; private set; }
+        public Vector3 MeshCenter { get; private set; }
 
-        public int WeightCount { get; set; } = 0;
+        public int WeightCount { get; private set; } = 0;
         public VertexFormat VertexFormat { get; private set; }
 
-        public Rmv2Geometry(IGeometryGraphicsContext context)
+
+        public AlphaMode Alpha { get; set; }
+
+        public Geometry(IGraphicsCardGeometry context)
         {
             Context = context;
         }
 
         public IGeometry Clone(bool includeMesh = true)
         {
-            var mesh = new Rmv2Geometry(Context);
+            var mesh = new Geometry(Context);
 
             mesh.Pivot = Pivot;
             mesh.Context = Context.Clone();
@@ -56,12 +59,12 @@ namespace View3D.Rendering.Geometry
             return mesh;
         }
 
-        public Vector3 GetVertexById(int id)//
+        public Vector3 GetVertexById(int id)
         {
             return new Vector3(VertexArray[id].Position.X, VertexArray[id].Position.Y, VertexArray[id].Position.Z);
         }
 
-        public List<Vector3> GetVertexList()//
+        public List<Vector3> GetVertexList()
         {
             var vertCount = VertexCount();
             List<Vector3> output = new List<Vector3>(vertCount);
@@ -182,7 +185,7 @@ namespace View3D.Rendering.Geometry
             return currentValue;
         }
 
-        public void Merge(List<Rmv2Geometry> others)//
+        public void Merge(List<Geometry> others)//
         {
             var newVertexBufferSize = others.Sum(x => x.VertexCount()) + VertexCount();
             var newVertexArray = new VertexPositionNormalTextureCustom[newVertexBufferSize];
@@ -465,7 +468,7 @@ namespace View3D.Rendering.Geometry
 
         public IGeometry CloneSubMesh(ushort[] newIndexList)
         {
-            var mesh = Clone(false) as Rmv2Geometry;
+            var mesh = Clone(false) as Geometry;
 
             var uniqeIndexes = newIndexList.Distinct().ToList();
             uniqeIndexes.Sort();

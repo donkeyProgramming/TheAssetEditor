@@ -73,15 +73,15 @@ namespace View3D.SceneNodes
 
 
 
-            var test = MeshSaverService.Save(onlySaveVisibleNodes, this, Skeleton.AnimationProvider.Skeleton);
-            var test2 = MeshSaverService.Save(onlySaveVisibleNodes, new List< Rmv2ModelNode >(){ this}, Skeleton.AnimationProvider.Skeleton);
-            for (int i = 0; i < test2.Length; i++)
-            {
-                if (data[i] != test2[i])
-                { 
-                }
-            
-            }
+            //var test = MeshSaverService.Save(onlySaveVisibleNodes, this, Skeleton.AnimationProvider.Skeleton);
+            //var test2 = MeshSaverService.Save(onlySaveVisibleNodes, new List< Rmv2ModelNode >(){ this}, Skeleton.AnimationProvider.Skeleton);
+            //for (int i = 0; i < test2.Length; i++)
+            //{
+            //    if (data[i] != test2[i])
+            //    { 
+            //    }
+            //
+            //}
 
             return data;
 

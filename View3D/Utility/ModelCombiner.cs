@@ -35,7 +35,7 @@ namespace View3D.Utility
                     }
 
                     // Alpha mode
-                    if (outerLoopItem.MeshModel.AlphaSettings.Mode != innerLoopItem.MeshModel.AlphaSettings.Mode)
+                    if (outerLoopItem.Geometry.Alpha != innerLoopItem.Geometry.Alpha)
                     {
                         errors.Error("AlphaSettings mode", $"{outerLoopItem.MeshModel.Header.ModelName} has a different AlphaSettings mode then {innerLoopItem.MeshModel.Header.ModelName}");
                     }

@@ -15,6 +15,7 @@ namespace View3D.Rendering.Geometry
 
     public interface IGeometry : IDisposable
     {
+        public AlphaMode Alpha { get; set; }
         public void ApplyMesh(IShader effect, GraphicsDevice device);
         public void ApplyMeshPart(IShader effect, GraphicsDevice device, List<int> faceSelection);
 

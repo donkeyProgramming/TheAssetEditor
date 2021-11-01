@@ -8,20 +8,20 @@ namespace FileTypesTests.Util
 {
     class TestGeometryGraphicsContextFactory : IGeometryGraphicsContextFactory
     {
-        public IGeometryGraphicsContext Create()
+        public IGraphicsCardGeometry Create()
         {
             return new TestGeometryGraphicsContext(); ;
         }
     }
 
 
-    class TestGeometryGraphicsContext : IGeometryGraphicsContext
+    class TestGeometryGraphicsContext : IGraphicsCardGeometry
     {
         public IndexBuffer IndexBuffer => throw new NotImplementedException();
 
         public VertexBuffer VertexBuffer => throw new NotImplementedException();
 
-        public IGeometryGraphicsContext Clone()
+        public IGraphicsCardGeometry Clone()
         {
             return new TestGeometryGraphicsContext();
         }

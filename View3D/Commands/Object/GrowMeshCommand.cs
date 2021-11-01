@@ -40,7 +40,7 @@ namespace View3D.Commands.Object
         {
             _backup = _node.Geometry.Clone();
 
-            var mesh = _node.Geometry as Rmv2Geometry;
+            var mesh = _node.Geometry as Geometry;
             var vertexCount = mesh.VertexCount();
 
             Vector3[] normals = new Vector3[vertexCount];

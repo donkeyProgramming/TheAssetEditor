@@ -84,12 +84,13 @@ namespace Filetypes.RigidModel
     [Serializable]
     public struct RmvSubModelHeader
     {
-        public GroupTypeEnum MaterialId;
-        public uint ModelSize;
+        public GroupTypeEnum ShaderFlag;
+        public ushort RenderFlag;
+        public uint MeshSectionSize;
         public uint VertexOffset;
         public uint VertexCount;
-        public uint FaceOffset;
-        public uint FaceCount;
+        public uint IndexOffset;
+        public uint IndexCount;
 
         public RvmBoundingBox BoundingBox;
         public RmvShaderParams ShaderParams;
@@ -103,19 +104,25 @@ namespace Filetypes.RigidModel
         public byte[] _textureDir;
         
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
-        public byte[] ZeroPadding0;
+        public byte[] Filters;  // Always zero?
 
-        public byte _unknown0;
-        public byte _unknown1;
+        public byte PaddingByte0;
+        public byte PaddingByte1;
 
         public RmvTransform Transform;
 
-        public int LinkDirectlyToBoneIndex;
-        public int Flag_alwaysNegativeOne;
+        public int MatrixIndex;         // Used when meshes should be attached to a bone, eg for buildings being destroyed 
+        public int ParentMatrixIndex;   // Always -1 it seems
         public uint AttachmentPointCount;
         public uint TextureCount;
+        public uint StringParamCount;
+        public uint FloatParamCount;
+        public uint IntParamCount;
+        public uint Vec4ParamCount;
 
-        public UknownData _uknownData;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 124)]
+        public byte[] PaddingArray;
+
 
         public VertexFormat VertextType { get => (VertexFormat)_vertexType; set => _vertexType = (ushort)value; }
 
@@ -156,29 +163,39 @@ namespace Filetypes.RigidModel
             }
         }
 
-        internal void UpdateHeader(RmvMesh mesh, List<RmvTexture> textures, List<RmvAttachmentPoint> attachmentPoints)
+        internal void UpdateHeader(RmvMesh mesh, RmvSubModel refSubMmodel, uint modelVersion)
         {
+            var stringParamSize = 0;
+            foreach (var str in refSubMmodel.StringParams)
+            {
+                var res = ByteParsers.String.Encode(str, out _);
+                stringParamSize += res.Length;
+            }
+
+            var headerDataSize = (uint)(ByteHelper.GetSize<RmvSubModelHeader>() +
+                (ByteHelper.GetSize<RmvAttachmentPoint>() * refSubMmodel.AttachmentPoints.Count) +
+                (ByteHelper.GetSize<RmvTexture>() * refSubMmodel.Textures.Count) +
+                (stringParamSize) +
+                (4 * 2 * refSubMmodel.FloatParams.Count) + 
+                (4 * 2 * refSubMmodel.IntParams.Count) + 
+                (4 * 4 * 2 * refSubMmodel.Vec4Params.Count));
+
+            AttachmentPointCount = (uint)refSubMmodel.AttachmentPoints.Count;
+            TextureCount = (uint)refSubMmodel.Textures.Count;
+            StringParamCount = (uint)refSubMmodel.StringParams.Count;
+            FloatParamCount = (uint)refSubMmodel.FloatParams.Count;
+            IntParamCount = (uint)refSubMmodel.IntParams.Count;
+            Vec4ParamCount = (uint)refSubMmodel.Vec4Params.Count;
+
             VertexCount = (uint)mesh.VertexList.Length;
-            FaceCount = (uint)mesh.IndexList.Length;
-            AttachmentPointCount = (uint)attachmentPoints.Count;
-            TextureCount = (uint)textures.Count;
+            IndexCount = (uint)mesh.IndexList.Length;
+            VertexOffset = headerDataSize;
+            IndexOffset = headerDataSize + (uint)(RmvMesh.GetVertexSize(VertextType, modelVersion) * VertexCount);
 
-            var nonMeshSize = (uint)(ByteHelper.GetSize<RmvSubModelHeader>() +
-                (ByteHelper.GetSize<RmvAttachmentPoint>() * AttachmentPointCount) +
-                (ByteHelper.GetSize<RmvTexture>() * TextureCount) +
-                ByteHelper.GetSize<MeshAlphaSettings>());
-
-            ModelSize = +nonMeshSize +
-                (uint)
-                ((RmvMesh.GetVertexSize(VertextType, 7) * VertexCount) +
-                (sizeof(ushort) * FaceCount));
-
-            VertexOffset = nonMeshSize;
-            FaceOffset = nonMeshSize + (uint)(RmvMesh.GetVertexSize(VertextType, 7) * VertexCount);
+            MeshSectionSize = headerDataSize + (uint)(RmvMesh.GetVertexSize(VertextType, modelVersion) * VertexCount) + (sizeof(ushort) * IndexCount);
 
             BoundingBox.Recompute(mesh);
         }
-
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -207,33 +224,6 @@ namespace Filetypes.RigidModel
         }
     }
 
-    [Serializable]
-    public struct UknownData
-    {
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
-        byte[] zeroPadding0;
-
-        byte alwaysOne;
-
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 131)]
-        byte[] zeroPadding1;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct MeshAlphaSettings
-    {
-        public int KeyValue;
-        public AlphaMode Mode;
-
-        public MeshAlphaSettings Clone()
-        {
-            return new MeshAlphaSettings
-            {
-                KeyValue = KeyValue,
-                Mode = Mode,
-            };
-        }
-    }
 
     public class RmvMesh
     {
@@ -323,57 +313,146 @@ namespace Filetypes.RigidModel
         public RmvSubModelHeader Header { get; set; }
         public List<RmvAttachmentPoint> AttachmentPoints;
         public List<RmvTexture> Textures;
-        public MeshAlphaSettings AlphaSettings { get; set; }
+        public List<string> StringParams;
+        public List<float> FloatParams;
+        public List<int> IntParams;
+        public List<RmvVector4> Vec4Params;
+
         public RmvMesh Mesh { get; set; }
         public string ParentSkeletonName { get; set; }    // Not part of the model definition
+
 
         public RmvSubModel(byte[] dataArray, int offset, uint modelVersion, string skeletonName)
         {
             _modelStart = offset;
+
+            var dataOffset = offset;
             ParentSkeletonName = skeletonName;
-            Header = LoadHeader(dataArray);
-            AttachmentPoints = LoadAttachmentPoints(dataArray);
-            Textures = LoadTextures(dataArray);
-            Mesh = LoadMesh(dataArray, modelVersion);
+
+            Header = LoadHeader(dataArray, ref dataOffset);
+            AttachmentPoints = LoadAttachmentPoints(dataArray, ref dataOffset);
+            Textures = LoadTextures(dataArray, ref dataOffset);
+            StringParams = LoadStringParams(dataArray, ref dataOffset);
+            FloatParams = LoadFloatParams(dataArray, ref dataOffset);
+            IntParams = LoadIntParams(dataArray, ref dataOffset);
+            Vec4Params = LoadVec4Params(dataArray, ref dataOffset);
+            Mesh = LoadMesh(dataArray, modelVersion, ref dataOffset);
         }
 
         public RmvSubModel()
         { }
 
-        RmvSubModelHeader LoadHeader(byte[] dataArray)
+        RmvSubModelHeader LoadHeader(byte[] dataArray, ref int dataOffset)
         {
+            dataOffset = dataOffset + ByteHelper.GetSize<RmvSubModelHeader>();
             return ByteHelper.ByteArrayToStructure<RmvSubModelHeader>(dataArray, _modelStart);
         }
 
-        List<RmvAttachmentPoint> LoadAttachmentPoints(byte[] dataArray)
+        List<RmvAttachmentPoint> LoadAttachmentPoints(byte[] dataArray, ref int dataOffset)
         {
-            var attachmentPointStart = _modelStart + ByteHelper.GetSize<RmvSubModelHeader>();
-            var attachmentPointSize = ByteHelper.GetSize<RmvAttachmentPoint>();
-
             var attachmentPoints = new List<RmvAttachmentPoint>();
             for (int i = 0; i < Header.AttachmentPointCount; i++)
             {
-                var attachmentPoint = ByteHelper.ByteArrayToStructure<RmvAttachmentPoint>(dataArray, attachmentPointStart + attachmentPointSize * i);
+                var attachmentPoint = ByteHelper.ByteArrayToStructure<RmvAttachmentPoint>(dataArray, dataOffset);
+                dataOffset += ByteHelper.GetSize<RmvAttachmentPoint>();
                 attachmentPoints.Add(attachmentPoint);
             }
 
             return attachmentPoints;
         }
 
-        List<RmvTexture> LoadTextures(byte[] dataArray)
+        List<RmvTexture> LoadTextures(byte[] dataArray, ref int dataOffset)
         {
-            var attachmentsPointOffset = ByteHelper.GetSize<RmvAttachmentPoint>() * Header.AttachmentPointCount;
-            var textureStart = _modelStart + ByteHelper.GetSize<RmvSubModelHeader>() + attachmentsPointOffset;
-            var textureSize = ByteHelper.GetSize<RmvTexture>();
-
             var textures = new List<RmvTexture>();
             for (int i = 0; i < Header.TextureCount; i++)
             {
-                var texture = ByteHelper.ByteArrayToStructure<RmvTexture>(dataArray, (int)textureStart + textureSize * i);
+                var texture = ByteHelper.ByteArrayToStructure<RmvTexture>(dataArray, dataOffset);
+                dataOffset += ByteHelper.GetSize<RmvTexture>();
                 textures.Add(texture);
             }
 
             return textures;
+        }
+
+        List<string> LoadStringParams(byte[] dataArray, ref int dataOffset)
+        {
+            var output = new List<string>();
+            for (int i = 0; i < Header.StringParamCount; i++)
+            {
+                var index = ByteParsers.UInt32.TryDecode(dataArray, dataOffset, out _, out _, out _);
+                var result = ByteParsers.String.TryDecode(dataArray, dataOffset + 4, out var value, out var byteLength, out var error);
+                if (!result)
+                {
+                    throw new Exception("Error reading string parameter - " + error);
+                }
+                dataOffset += byteLength + 4;
+                output.Add(value);
+            }
+            return output;
+        }
+
+
+        List<float> LoadFloatParams(byte[] dataArray, ref int dataOffset)
+        {
+            var output = new List<float>();
+            for (int i = 0; i < Header.FloatParamCount; i++)
+            {
+                var index = ByteParsers.UInt32.TryDecode(dataArray, dataOffset, out _, out _, out _);
+                var result = ByteParsers.Single.TryDecodeValue(dataArray, dataOffset+4, out var value, out var byteLength, out var error);
+                if (!result)
+                {
+                    throw new Exception("Error reading float parameter - " + error);
+                }
+                dataOffset += byteLength + 4;
+                output.Add(value);
+            }
+            return output;
+        }
+
+        List<int> LoadIntParams(byte[] dataArray, ref int dataOffset)
+        {
+            var output = new List<int>();
+            for (int i = 0; i < Header.IntParamCount; i++)
+            {
+                var index = ByteParsers.UInt32.TryDecode(dataArray, dataOffset, out _, out _, out _);
+                var result = ByteParsers.Int32.TryDecodeValue(dataArray, dataOffset+4, out var value, out var byteLength, out var error);
+                if (!result)
+                {
+                    throw new Exception("Error reading int parameter - " + error);
+                }
+                dataOffset += byteLength + 4 ;
+                output.Add(value);
+            }
+            return output;
+        }
+
+        List<RmvVector4> LoadVec4Params(byte[] dataArray, ref int dataOffset)
+        {
+            var output = new List<RmvVector4>();
+            for (int i = 0; i < Header.Vec4ParamCount; i++)
+            {
+                var index = ByteParsers.UInt32.TryDecode(dataArray, dataOffset, out _, out _, out _);
+
+                var result = ByteParsers.Single.TryDecodeValue(dataArray, dataOffset+4, out var x, out var byteLength, out var error);
+                if (!result)
+                    throw new Exception("Error reading RmvVector4 parameter - " + error);
+
+                result = ByteParsers.Single.TryDecodeValue(dataArray, dataOffset+8, out var y, out byteLength, out error);
+                if (!result)
+                    throw new Exception("Error reading RmvVector4 parameter - " + error);
+
+                result = ByteParsers.Single.TryDecodeValue(dataArray, dataOffset+12, out var z, out byteLength, out error);
+                if (!result)
+                    throw new Exception("Error reading RmvVector4 parameter - " + error);
+
+                result = ByteParsers.Single.TryDecodeValue(dataArray, dataOffset+16, out var w, out byteLength, out error);
+                if (!result)
+                    throw new Exception("Error reading RmvVector4 parameter - " + error);
+
+                dataOffset += (4 * 4) + 4;
+                output.Add(new RmvVector4(x,y,z,w));
+            }
+            return output;
         }
 
         public RmvTexture? GetTexture(TexureType texureType)
@@ -383,13 +462,22 @@ namespace Filetypes.RigidModel
             return null;
         }
 
-        RmvMesh LoadMesh(byte[] dataArray, uint modelVersion)
+        public AlphaMode GetAlphaMode()
+        {
+            return (AlphaMode)IntParams.First();
+        }
+
+        public void SetAlphaMode(AlphaMode mode)
+        {
+            IntParams[0] = (int)mode;
+        }
+
+        RmvMesh LoadMesh(byte[] dataArray, uint modelVersion, ref int dataOffset)
         {
             var vertexStart =  Header.VertexOffset + _modelStart; 
-            var faceStart = Header.FaceOffset + _modelStart;
+            var faceStart = Header.IndexOffset + _modelStart;
 
-            AlphaSettings = ByteHelper.ByteArrayToStructure<MeshAlphaSettings>(dataArray, (int)vertexStart - 8);
-            return new RmvMesh(dataArray, modelVersion, Header.VertextType, (int)vertexStart, Header.VertexCount, (int)faceStart, Header.FaceCount);
+            return new RmvMesh(dataArray, modelVersion, Header.VertextType, (int)vertexStart, Header.VertexCount, (int)faceStart, Header.IndexCount);
         }
 
        public RmvSubModel Clone()
@@ -401,7 +489,10 @@ namespace Filetypes.RigidModel
                Header = Header,
                AttachmentPoints = AttachmentPoints.Select(x => x).ToList(),
                Textures = Textures.Select(x => x).ToList(),
-               AlphaSettings = AlphaSettings.Clone(),
+               StringParams = StringParams.Select(x => x).ToList(),
+               FloatParams = FloatParams.Select(x => x).ToList(),
+               IntParams = IntParams.Select(x => x).ToList(),
+               Vec4Params = Vec4Params.Select(x => x).ToList(),
                Mesh = null
            };
        }
@@ -423,9 +514,7 @@ namespace Filetypes.RigidModel
                 };
                 AttachmentPoints.Add(a);
             }
-
         }
     }
 
-   
 }

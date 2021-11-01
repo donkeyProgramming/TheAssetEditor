@@ -1,6 +1,7 @@
 ﻿using Filetypes.ByteParsing;
 using Filetypes.RigidModel.Transforms;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -8,6 +9,7 @@ using System.Text;
 namespace Filetypes.RigidModel
 {
     [StructLayout(LayoutKind.Sequential)]
+    [DebuggerDisplay("RmvAttachmentPoint = {Name}")]
     public struct RmvAttachmentPoint
     {
 

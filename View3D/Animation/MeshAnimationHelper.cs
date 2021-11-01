@@ -19,7 +19,7 @@ namespace View3D.Animation
 
         public Matrix GetVertexTransformWorld(AnimationFrame frame, int vertexId)
         {
-            var geo = _mesh.Geometry as Rmv2Geometry;
+            var geo = _mesh.Geometry as Geometry;
             var vert = geo.GetVertexExtented(vertexId);
             var m = GetVertexTransform(frame, vertexId);
             Matrix finalTransfrom = Matrix.CreateTranslation(new Vector3(vert.Position.X, vert.Position.Y, vert.Position.Z)) * m;
@@ -28,7 +28,7 @@ namespace View3D.Animation
 
         public Matrix GetVertexTransform(AnimationFrame frame, int vertexId)
         {
-            var geo = _mesh.Geometry as Rmv2Geometry;
+            var geo = _mesh.Geometry as Geometry;
             var vert = geo.GetVertexExtented(vertexId);
 
             var blendIndex = new int[4] { (int)vert.BlendIndices.X, (int)vert.BlendIndices.Y, (int)vert.BlendIndices.Z, (int)vert.BlendIndices.W };

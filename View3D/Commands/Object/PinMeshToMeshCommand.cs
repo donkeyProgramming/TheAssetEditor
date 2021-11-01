@@ -52,7 +52,7 @@ namespace View3D.Commands.Object
             var bbCenter = new Vector3(bbCorners.Average(x => x.X), bbCorners.Average(x => x.Y), bbCorners.Average(x => x.Z));
 
             // Get closest vert
-            var sourceGeo = _sourceMesh.Geometry as Rmv2Geometry;
+            var sourceGeo = _sourceMesh.Geometry as Geometry;
             int closestSourceVert = -1;
             float closestDistSqrt = float.MaxValue;
             for (int i = 0; i < sourceGeo.VertexCount(); i++)

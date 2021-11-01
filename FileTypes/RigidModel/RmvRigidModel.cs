@@ -44,7 +44,7 @@ namespace Filetypes.RigidModel
                     int offset = (int)LodHeaders[lodIndex].FirstMeshOffset + sizeOffset;
                     MeshList[lodIndex][meshIndex] = new RmvSubModel(modelByteData, offset, Header.Version, Header.SkeletonName);
                     
-                    sizeOffset += (int)MeshList[lodIndex][meshIndex].Header.ModelSize;
+                    sizeOffset += (int)MeshList[lodIndex][meshIndex].Header.MeshSectionSize;
                 }
             }
 
@@ -119,10 +119,34 @@ namespace Filetypes.RigidModel
 
                     for (var textureIndex = 0; textureIndex < model.Textures.Count; textureIndex++)
                         writer.Write(ByteHelper.GetBytes(model.Textures[textureIndex]));
-                    
-                    writer.Write(ByteHelper.GetBytes(model.AlphaSettings));
 
-                    var header = model.Header;
+                    for (var stringIndex = 0; stringIndex < model.StringParams.Count; stringIndex++)
+                    {
+                        writer.Write(ByteParsing.ByteParsers.Int32.EncodeValue(stringIndex, out _));
+                        writer.Write(ByteParsing.ByteParsers.String.Encode(model.StringParams[stringIndex], out _));
+                    }
+
+                    for (var floatIndex = 0; floatIndex < model.FloatParams.Count; floatIndex++)
+                    {
+                        writer.Write(ByteParsing.ByteParsers.Int32.EncodeValue(floatIndex, out _));
+                        writer.Write(ByteParsing.ByteParsers.Single.EncodeValue(model.FloatParams[floatIndex], out _));
+                    }
+
+                    for (var intIndex = 0; intIndex < model.IntParams.Count; intIndex++)
+                    {
+                        writer.Write(ByteParsing.ByteParsers.Int32.EncodeValue(intIndex, out _));
+                        writer.Write(ByteParsing.ByteParsers.Int32.EncodeValue(model.IntParams[intIndex], out _));
+                    }
+
+                    for (var vec4Index = 0; vec4Index < model.Vec4Params.Count; vec4Index++)
+                    {
+                        writer.Write(ByteParsing.ByteParsers.Int32.EncodeValue(vec4Index, out _));
+                        writer.Write(ByteParsing.ByteParsers.Single.EncodeValue(model.Vec4Params[vec4Index].X, out _));
+                        writer.Write(ByteParsing.ByteParsers.Single.EncodeValue(model.Vec4Params[vec4Index].Y, out _));
+                        writer.Write(ByteParsing.ByteParsers.Single.EncodeValue(model.Vec4Params[vec4Index].Z, out _));
+                        writer.Write(ByteParsing.ByteParsers.Single.EncodeValue(model.Vec4Params[vec4Index].W, out _));
+                    }
+
                     model.Mesh.SaveToByteArray(writer, model.Header.VertextType);
                 }
             }
@@ -136,10 +160,11 @@ namespace Filetypes.RigidModel
                 for (var modelIndex = 0; modelIndex < MeshList[lodIndex].Length; modelIndex++)
                 {
                     var header = MeshList[lodIndex][modelIndex].Header;
-                    header.UpdateHeader(MeshList[lodIndex][modelIndex].Mesh, MeshList[lodIndex][modelIndex].Textures, MeshList[lodIndex][modelIndex].AttachmentPoints);
+                    header.UpdateHeader(MeshList[lodIndex][modelIndex].Mesh, MeshList[lodIndex][modelIndex], 7);
                     MeshList[lodIndex][modelIndex].Header = header;
                 }
             }
+
             var headerOffset = (uint)(ByteHelper.GetSize<RmvModelHeader>() + GetLodHeaderSize() * Header.LodCount);
             uint modelOffset = 0;
             for (int lodIndex = 0; lodIndex < Header.LodCount; lodIndex++)
@@ -147,11 +172,11 @@ namespace Filetypes.RigidModel
                 var lodHeader = LodHeaders[lodIndex];
                 lodHeader.MeshCount = (uint)MeshList[lodIndex].Length;
                 lodHeader.TotalLodVertexSize = (uint)MeshList[lodIndex].Sum(x=>x.Header.VertexCount * RmvMesh.GetVertexSize(x.Header.VertextType, Header.Version));
-                lodHeader.TotalLodIndexSize = (uint)MeshList[lodIndex].Sum(x => x.Header.FaceCount * sizeof(ushort));
+                lodHeader.TotalLodIndexSize = (uint)MeshList[lodIndex].Sum(x => x.Header.IndexCount * sizeof(ushort));
                 lodHeader.FirstMeshOffset = headerOffset + modelOffset;
                 LodHeaders[lodIndex] = lodHeader;
 
-                modelOffset += (uint)MeshList[lodIndex].Sum(x => x.Header.ModelSize);
+                modelOffset += (uint)MeshList[lodIndex].Sum(x => x.Header.MeshSectionSize);
             }
         }
     }

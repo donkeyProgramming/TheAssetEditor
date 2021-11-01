@@ -192,7 +192,7 @@ namespace KitbasherEditor.Services
             if (texture.HasValue)
                 textureName = texture.Value.Path;
             var vertextType = mesh.MeshModel.Header.VertextType;
-            var alphaOn = mesh.MeshModel.AlphaSettings.Mode != AlphaMode.Opaque;
+            var alphaOn = mesh.Geometry.Alpha != AlphaMode.Opaque;
 
             var vertexName = "uknown";
             if (vertextType == VertexFormat.Cinematic)
@@ -212,7 +212,7 @@ namespace KitbasherEditor.Services
                 if (mesh.MeshModel.Header.VertextType != material.VertexType)
                     continue;
 
-                var alphaOn = mesh.MeshModel.AlphaSettings.Mode != AlphaMode.Opaque;
+                var alphaOn = mesh.Geometry.Alpha != AlphaMode.Opaque;
                 if (alphaOn && material.Alpha == false)
                     continue;
 

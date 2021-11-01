@@ -94,6 +94,7 @@ namespace View3D.SceneNodes
         {
             var typedTarget = target as SceneNode;
 
+            target.Parent = Parent;
             typedTarget.SceneManager = SceneManager;
             typedTarget.IsEditable = IsEditable;
             typedTarget.IsVisible = IsVisible;

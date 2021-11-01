@@ -132,7 +132,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             _componentManager = componentManager; 
 
             SkeletonName = _meshNode.MeshModel.ParentSkeletonName;
-            LinkDirectlyToBoneIndex = _meshNode.MeshModel.Header.LinkDirectlyToBoneIndex;
+            LinkDirectlyToBoneIndex = _meshNode.MeshModel.Header.MatrixIndex;
             AttachmentPoints = _meshNode.MeshModel.AttachmentPoints.OrderBy(x => x.BoneIndex).ToList();
 
             var skeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, SkeletonName);
@@ -255,8 +255,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         string _shaderName;
         public string ShaderName { get { return _shaderName; } set { SetAndNotify(ref _shaderName, value); } }
 
-        public GroupTypeEnum MaterialType { get { return _meshNode.MeshModel.Header.MaterialId; } set { UpdateGroupType(value); NotifyPropertyChanged(); } }
-        public AlphaMode AlphaModeValue { get { return _meshNode.MeshModel.AlphaSettings.Mode; ; } set { UpdateAlphaValue(value); NotifyPropertyChanged(); } }
+        public GroupTypeEnum MaterialType { get { return _meshNode.MeshModel.Header.ShaderFlag; } set { UpdateGroupType(value); NotifyPropertyChanged(); } }
+        public AlphaMode AlphaModeValue { get { return _meshNode.Geometry.Alpha; } set { _meshNode.Geometry.Alpha = value; NotifyPropertyChanged(); } }
         public IEnumerable<AlphaMode> PossibleAlphaModes { get; set; } = new List<AlphaMode>() { AlphaMode.Opaque, AlphaMode.Alpha_Test, AlphaMode.Alpha_Blend };
         public string TextureDirectory { get { return _meshNode.MeshModel.Header.TextureDirectory; } set { UpdateTextureDirectory(value); NotifyPropertyChanged(); } }
         public bool ReduceMeshOnLodGeneration { get { return _meshNode.ReduceMeshOnLodGeneration; } set { _meshNode.ReduceMeshOnLodGeneration = value; NotifyPropertyChanged(); } }
@@ -315,13 +315,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             Textures.Add(TexureType.Gloss, new TextureViewModel(_meshNode, pf, TexureType.Gloss));
         }
 
-        void UpdateAlphaValue(AlphaMode value)
-        {
-            var alphaSettings = _meshNode.MeshModel.AlphaSettings;
-            alphaSettings.Mode = value;
-            _meshNode.MeshModel.AlphaSettings = alphaSettings;
-        }
-
         void UpdateTextureDirectory(string newPath)
         {
             var header = _meshNode.MeshModel.Header;
@@ -332,7 +325,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         void UpdateGroupType(GroupTypeEnum value)
         {
             var header = _meshNode.MeshModel.Header;
-            header.MaterialId = value;
+            header.ShaderFlag = value;
             _meshNode.MeshModel.Header = header;
         }
     }

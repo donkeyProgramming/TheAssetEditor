@@ -2,7 +2,7 @@
 
 namespace Filetypes.RigidModel
 {
-    public enum GroupTypeEnum
+    public enum GroupTypeEnum : ushort
     {
 		bow_wave = 22,
 		non_renderable = 26,

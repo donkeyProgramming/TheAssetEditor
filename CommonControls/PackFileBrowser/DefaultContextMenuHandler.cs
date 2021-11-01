@@ -53,6 +53,10 @@ namespace CommonControls.PackFileBrowser
                     Additem(ContextItems.CopyToEditablePack, newContextMenu);
                 if (!node.FileOwner.IsCaPackFile)
                 {
+                    var addFolder = Additem(ContextItems.Add, newContextMenu);
+                    Additem(ContextItems.AddFiles, addFolder);
+                    Additem(ContextItems.AddDirectory, addFolder);
+
                     AddSeperator(newContextMenu);
                     Additem(ContextItems.Rename, newContextMenu);
                     Additem(ContextItems.Delete, newContextMenu);

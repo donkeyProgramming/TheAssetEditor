@@ -2,24 +2,26 @@
 
 namespace View3D.Rendering.Geometry
 {
-    public interface IGeometryGraphicsContext
+    public interface IGraphicsCardGeometry
     {
         IndexBuffer IndexBuffer { get; }
         VertexBuffer VertexBuffer { get; }
 
-        IGeometryGraphicsContext Clone();
+
         void RebuildIndexBuffer(ushort[] indexList);
+        void RebuildVertexBuffer(VertexPositionNormalTextureCustom[] vertArray, VertexDeclaration vertexDeclaration);
+
+        IGraphicsCardGeometry Clone();
         void Dispose();
-        void RebuildVertexBuffer<VertexType>(VertexType[] vertArray, VertexDeclaration vertexDeclaration) where VertexType : struct, IVertexType;
     }
 
-    public class GeometryGraphicsContext : IGeometryGraphicsContext
+    public class GraphicsCardGeometry : IGraphicsCardGeometry
     {
         GraphicsDevice Device;
         public VertexBuffer VertexBuffer { get; private set; }
         public IndexBuffer IndexBuffer { get; private set; }
 
-        public GeometryGraphicsContext(GraphicsDevice device)
+        public GraphicsCardGeometry(GraphicsDevice device)
         {
             Device = device;
         }
@@ -31,6 +33,7 @@ namespace View3D.Rendering.Geometry
                 IndexBuffer.Dispose();
                 IndexBuffer = null;
             }
+
             if (indexList.Length != 0)
             {
                 IndexBuffer = new IndexBuffer(Device, typeof(ushort), indexList.Length, BufferUsage.None);
@@ -38,7 +41,7 @@ namespace View3D.Rendering.Geometry
             }
         }
 
-        public virtual void RebuildVertexBuffer<VertexType>(VertexType[] vertArray, VertexDeclaration vertexDeclaration) where VertexType : struct, IVertexType
+        public virtual void RebuildVertexBuffer(VertexPositionNormalTextureCustom[] vertArray, VertexDeclaration vertexDeclaration)
         {
             if (VertexBuffer != null)
             {
@@ -54,9 +57,9 @@ namespace View3D.Rendering.Geometry
         }
 
 
-        public IGeometryGraphicsContext Clone()
+        public IGraphicsCardGeometry Clone()
         {
-            return new GeometryGraphicsContext(Device);
+            return new GraphicsCardGeometry(Device);
         }
 
         public void Dispose()
@@ -70,7 +73,7 @@ namespace View3D.Rendering.Geometry
 
     public interface IGeometryGraphicsContextFactory
     {
-        IGeometryGraphicsContext Create();
+        IGraphicsCardGeometry Create();
     }
     public class GeometryGraphicsContextFactory : IGeometryGraphicsContextFactory
     {
@@ -85,9 +88,9 @@ namespace View3D.Rendering.Geometry
             return new GeometryGraphicsContextFactory(device);
         }
 
-        public IGeometryGraphicsContext Create()
+        public IGraphicsCardGeometry Create()
         {
-            return new GeometryGraphicsContext(Device);
+            return new GraphicsCardGeometry(Device);
         }
     }
 }

@@ -80,7 +80,7 @@ namespace KitbasherEditor.Views.EditorViews.VertexDebugger
                 var vertexList = selection.SelectedVertices;
                 foreach (var vertexIndex in vertexList)
                 {
-                    var vertexInfo = (mesh.Geometry as Rmv2Geometry).GetVertexExtented(vertexIndex);
+                    var vertexInfo = (mesh.Geometry as Geometry).GetVertexExtented(vertexIndex);
 
                     VertexList.Add(new VertexInstance()
                     { 
@@ -123,7 +123,7 @@ namespace KitbasherEditor.Views.EditorViews.VertexDebugger
                 var vertexList = selection.SelectedVertices;
                 foreach (var vertexIndex in vertexList)
                 {
-                    var vertexInfo = (mesh.Geometry as Rmv2Geometry).GetVertexExtented(vertexIndex);
+                    var vertexInfo = (mesh.Geometry as Geometry).GetVertexExtented(vertexIndex);
                     var scale = (float)DebugScale.Value;
                     var pos = vertexInfo.Position3();
                     _lineRenderer.AddLine(pos, pos + vertexInfo.Normal * scale, Color.Blue);

@@ -12,9 +12,10 @@ namespace View3D.Services
 {
     public class MeshBuilderService
     {
-        public static Rmv2Geometry BuildMeshFromRmvModel(RmvSubModel modelPart, IGeometryGraphicsContext context)
+        public static Geometry BuildMeshFromRmvModel(RmvSubModel modelPart, IGraphicsCardGeometry context)
         {
-            var output = new Rmv2Geometry(context);
+            var output = new Geometry(context);
+            output.Alpha = modelPart.GetAlphaMode();
 
             output.Pivot = new Vector3(modelPart.Header.Transform.Pivot.X, modelPart.Header.Transform.Pivot.Y, modelPart.Header.Transform.Pivot.Z);
             output.VertexArray = new VertexPositionNormalTextureCustom[modelPart.Mesh.VertexList.Length];
@@ -56,11 +57,11 @@ namespace View3D.Services
             return output;
         }
 
-        public static RmvMesh CreateRmvFileMesh(Rmv2Geometry geometry)
+        public static RmvMesh CreateRmvFileMesh(Geometry geometry)
         {
             RmvMesh mesh = new RmvMesh();
             mesh.IndexList = geometry.GetIndexBuffer().ToArray();
-
+        
             // Ensure normalized
             for (int i = 0; i < geometry.VertexArray.Length; i++)
             {
