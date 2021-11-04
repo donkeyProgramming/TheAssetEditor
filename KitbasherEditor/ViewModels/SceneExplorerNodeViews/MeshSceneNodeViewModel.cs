@@ -33,7 +33,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             _meshNode = node;
             General = new MeshSceneNodeViewModel_General(_meshNode, componentManager);
             Animation = new MeshSceneNodeViewModel_Animation(pfs, _meshNode, animLookUp, componentManager);
-            Graphics = new MeshSceneNodeViewModel_Graphics(_meshNode, pfs);
+            Graphics = new MeshSceneNodeViewModel_Graphics(_meshNode, pfs, componentManager);
         }
 
         public void Dispose()
@@ -251,6 +251,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         }
 
         Rmv2MeshNode _meshNode;
+        IComponentManager _componentManager;
 
         string _shaderName;
         public string ShaderName { get { return _shaderName; } set { SetAndNotify(ref _shaderName, value); } }
@@ -290,14 +291,17 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             else
                 throw new Exception("Unknown vertex format, can not set grouptype");
 
-            _meshNode.Geometry.ChangeVertexType(newFormat);
+            var mainNode = _componentManager.GetComponent<IEditableMeshResolver>();
+            var skeletonName = mainNode.GeEditableMeshRootNode()?.Skeleton.Name;
+            _meshNode.Geometry.ChangeVertexType(newFormat, skeletonName);
             NotifyPropertyChanged(nameof(VertexType));
         }
 
         public IEnumerable<VertexFormat> PossibleVertexTypes { get; set; }
 
-        public MeshSceneNodeViewModel_Graphics(Rmv2MeshNode meshNode, PackFileService pf)
+        public MeshSceneNodeViewModel_Graphics(Rmv2MeshNode meshNode, PackFileService pf, IComponentManager componentManager)
         {
+            _componentManager = componentManager;
             _meshNode = meshNode;
             ShaderName = _meshNode.RmvModel_depricated.Header.ShaderParams.ShaderName;
             PossibleMaterialTypes = Enum.GetValues(typeof(GroupTypeEnum)).Cast<GroupTypeEnum>();

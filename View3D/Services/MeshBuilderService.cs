@@ -20,7 +20,7 @@ namespace View3D.Services
             output.Pivot = new Vector3(modelPart.Header.Transform.Pivot.X, modelPart.Header.Transform.Pivot.Y, modelPart.Header.Transform.Pivot.Z);
             output.VertexArray = new VertexPositionNormalTextureCustom[modelPart.Mesh.VertexList.Length];
             output.IndexArray = (ushort[])modelPart.Mesh.IndexList.Clone();
-            output.ChangeVertexType(modelPart.Header.VertextType);
+            output.ChangeVertexType(modelPart.Header.VertextType, skeletonName);
 
             for (int i = 0; i < modelPart.Mesh.VertexList.Length; i++)
             {

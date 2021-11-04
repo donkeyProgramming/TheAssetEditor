@@ -103,17 +103,34 @@ namespace FileTypes.AnimationPack
 
             if (AnimationBin != null && AnimationBin.FileName == path)
             {
-                return AnimationBin.ToByteArray();
+                return GetAnimBin(path).ToByteArray();
             }
 
+            return GetAnimFragment(path).ToByteArray();
+
+
+            throw new Exception("File not found");
+        }
+
+        public AnimationFragment GetAnimFragment(string path)
+        {
             foreach (var item in Fragments)
             {
                 if (item.FileName == path)
                 {
-                    return item.ToByteArray();
+                    return item;
                 }
             }
 
+            throw new Exception("File not found");
+        }
+
+        public AnimationBin GetAnimBin(string path)
+        {
+            if (AnimationBin != null && AnimationBin.FileName == path)
+            {
+                return AnimationBin;
+            }
 
             throw new Exception("File not found");
         }

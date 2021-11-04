@@ -24,6 +24,7 @@
                 <MenuItem Header="_File">
                     <MenuItem Header="Save"  Command="{Binding SaveCommand}"/>
                     <MenuItem Header="New fragment"  Command="{Binding CreateNewFragmentCommand}"/>
+                    <MenuItem Header="View Selected As Table"  Command="{Binding ViewAsTableCommand}"/>
                 </MenuItem>
             </Menu>
         </DockPanel>
@@ -53,10 +54,7 @@
         </Grid>
 
         <!-- Right side - Main view -->
-
         <texteditor:TextEditorView Grid.Row="1" Grid.Column="2" DataContext="{Binding SelectedItemViewModel, UpdateSourceTrigger=PropertyChanged}"/>
-            
-   
 
     </Grid>
 </UserControl>

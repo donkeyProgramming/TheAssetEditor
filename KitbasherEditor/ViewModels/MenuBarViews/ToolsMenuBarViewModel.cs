@@ -424,7 +424,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 throw new System.Exception("TargetSkeleton not found -" + targetSkeletonName);
 
             var selectedMeshses = state.SelectedObjects<Rmv2MeshNode>();
-            if (selectedMeshses.Count(x => x.RmvModel_depricated.Header.VertextType == VertexFormat.Static) != 0)
+            if (selectedMeshses.Count(x => x.Geometry.VertexFormat == VertexFormat.Static) != 0)
             {
                 MessageBox.Show($"A static mesh is selected, which can not be remapped");
                 return;

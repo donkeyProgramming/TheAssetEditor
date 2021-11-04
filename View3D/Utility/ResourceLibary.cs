@@ -115,9 +115,13 @@ namespace View3D.Utility
                     // Load mipmaps
                     for (int i = 0; i < image.MipMaps.Length; i++)
                     {
-                        var mipmap = image.MipMaps[i];
-                        if (mipmap.Width > 4)
-                            texture.SetData(i + 1, null, image.Data, mipmap.DataOffset, mipmap.DataLen);
+                        try
+                        {
+                            var mipmap = image.MipMaps[i];
+                            if (mipmap.Width > 4)
+                                texture.SetData(i + 1, null, image.Data, mipmap.DataOffset, mipmap.DataLen);
+                        }
+                        catch { }
 
                     }
 

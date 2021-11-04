@@ -1,8 +1,5 @@
 ﻿using CommonControls.Editors.BoneMapping;
 using Filetypes.RigidModel;
-using Filetypes.RigidModel.Transforms;
-using Filetypes.RigidModel.Vertex;
-using MeshDecimator;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -69,7 +66,7 @@ namespace View3D.Rendering.Geometry
 
         public List<Vector3> GetVertexList()
         {
-            var vertCount = VertexCount();
+            var vertCount = VertexArray.Length;
             List<Vector3> output = new List<Vector3>(vertCount);
             for (int i = 0; i < vertCount; i++)
                 output.Add(GetVertexById(i));
@@ -228,9 +225,7 @@ namespace View3D.Rendering.Geometry
             RebuildVertexBuffer();
         }
 
-   
-
-        public void ChangeVertexType(VertexFormat newFormat)//
+        public void ChangeVertexType(VertexFormat newFormat, string newSkeletonName)
         {
             if (!(newFormat == VertexFormat.Weighted || newFormat == VertexFormat.Static || newFormat == VertexFormat.Cinematic))
                 throw new Exception("Not able to change vertex format into this");
@@ -282,6 +277,7 @@ namespace View3D.Rendering.Geometry
 
                 WeightCount = 2;
                 VertexFormat = VertexFormat.Weighted;
+                ParentSkeletonName = newSkeletonName;
             }
             else if (newFormat == VertexFormat.Cinematic)
             {
@@ -330,6 +326,7 @@ namespace View3D.Rendering.Geometry
 
                 WeightCount = 4;
                 VertexFormat = VertexFormat.Cinematic;
+                ParentSkeletonName = newSkeletonName;
             }
             else if (newFormat == VertexFormat.Static)
             {
@@ -341,6 +338,7 @@ namespace View3D.Rendering.Geometry
 
                 WeightCount = 0;
                 VertexFormat = VertexFormat.Static;
+                ParentSkeletonName = "";
             }
 
             RebuildVertexBuffer();
@@ -350,7 +348,6 @@ namespace View3D.Rendering.Geometry
         {
             return VertexArray[index];
         }
-
 
         public void ApplyMesh(IShader effect, GraphicsDevice device)
         {

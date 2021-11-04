@@ -531,7 +531,7 @@ namespace Filetypes.RigidModel
             bb.MaximumZ = newBB.Max.Z;
 
             header.BoundingBox = bb;
-           
+            Header = header;
         }
     }
 

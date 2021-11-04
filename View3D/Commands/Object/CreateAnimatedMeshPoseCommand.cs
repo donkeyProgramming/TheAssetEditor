@@ -50,7 +50,7 @@ namespace View3D.Commands.Object
                     var header = node.RmvModel_depricated.Header;
                     header.VertextType = VertexFormat.Static;
                     node.RmvModel_depricated.Header = header;
-                    node.Geometry.ChangeVertexType(VertexFormat.Static);
+                    node.Geometry.ChangeVertexType(VertexFormat.Static, "");
                 }
 
                 node.Geometry.RebuildVertexBuffer();

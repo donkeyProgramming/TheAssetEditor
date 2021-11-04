@@ -62,9 +62,12 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             if (SelectedOutputFormat == RmvVersionEnum.RMV2_V6)
             {
                 PossibleOutputFormats.Add(RmvVersionEnum.RMV2_V6);
+                PossibleOutputFormats.Add(RmvVersionEnum.RMV2_V7);
+                PossibleOutputFormats.Add(RmvVersionEnum.RMV2_V8);
             }
             else if (SelectedOutputFormat == RmvVersionEnum.RMV2_V7 || SelectedOutputFormat == RmvVersionEnum.RMV2_V8)
             {
+                PossibleOutputFormats.Add(RmvVersionEnum.RMV2_V6);
                 PossibleOutputFormats.Add(RmvVersionEnum.RMV2_V7);
                 PossibleOutputFormats.Add(RmvVersionEnum.RMV2_V8);
             }

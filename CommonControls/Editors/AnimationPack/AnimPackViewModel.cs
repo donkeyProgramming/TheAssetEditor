@@ -41,6 +41,10 @@ namespace CommonControls.Editors.AnimationPack
         public ICommand CreateNewFragmentCommand { get; set; }
         public ICommand SaveCommand { get; set; }
         public ICommand DeleteSelectedCommand { get; set; }
+        public ICommand ViewAsTableCommand { get; set; }
+        
+
+        public ObservableCollection<AnimationFragmentEntry> AnimStuff { get; set; } = new ObservableCollection<AnimationFragmentEntry>();
 
         public AnimPackViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
@@ -50,6 +54,7 @@ namespace CommonControls.Editors.AnimationPack
             CreateNewFragmentCommand = new RelayCommand(CreateFragment);
             DeleteSelectedCommand = new RelayCommand(DeleteSelected);
             SaveCommand = new RelayCommand(() => Save());
+            ViewAsTableCommand = new RelayCommand(() => ViewSelectedAsTable());
         }
 
         void CreateFragment()
@@ -167,6 +172,7 @@ namespace CommonControls.Editors.AnimationPack
                 else if (animPackFileType == AnimationPackFile.AnimationPackFileType.Fragment)
                 {
                     saveCommand = new RelayCommand(() => SaveData());
+
                 }
 
                 SelectedItemViewModel = new SimpleTextEditorViewModel();
@@ -233,6 +239,45 @@ namespace CommonControls.Editors.AnimationPack
             return true;
         }
 
+        public bool ViewSelectedAsTable()
+        {
+            var selectedItem = AnimationPackItems.SelectedItem;
+            if (selectedItem == null)
+                return false;
+
+            if (_animPack.GetFileType(selectedItem) == AnimationPackFile.AnimationPackFileType.Bin)
+            {
+                var data = new ObservableCollection<AnimationBinEntry>();
+
+                var bin = _animPack.GetAnimBin(selectedItem);
+                foreach (var item in bin.AnimationTableEntries)
+                    data.Add(item);
+
+                AnimTablePreviewWindow window = new AnimTablePreviewWindow()
+                {
+                    DataContext = data
+                };
+
+                window.ShowDialog();
+            }
+            else
+            {
+                var data = new ObservableCollection<AnimationFragmentEntry>();
+
+                var frag = _animPack.GetAnimFragment(selectedItem);
+                foreach (var item in frag.Fragments)
+                    data.Add(item);
+
+                AnimTablePreviewWindow window = new AnimTablePreviewWindow()
+                {
+                    DataContext = data
+                };
+
+                window.ShowDialog();
+            }
+
+            return true;
+        }
 
         public static void ShowPreviewWinodow(AnimationPackFile animationPack, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, string selectedFileName )
         {
