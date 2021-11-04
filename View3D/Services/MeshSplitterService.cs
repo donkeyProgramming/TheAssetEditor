@@ -9,9 +9,9 @@ namespace View3D.Services
 {
     public class MeshSplitterService
     {
-        public List<IGeometry> SplitMesh(IGeometry geometry, bool combineOverlappingVertexes)
+        public List<MeshObject> SplitMesh(MeshObject geometry, bool combineOverlappingVertexes)
         {
-            List<IGeometry> output = new List<IGeometry>();
+            var output = new List<MeshObject>();
             var vertList = geometry.GetVertexList();
             var subModels = SplitIntoSubModels(geometry.GetIndexBuffer(), vertList, combineOverlappingVertexes);
             foreach (var subModel in subModels)
@@ -45,7 +45,7 @@ namespace View3D.Services
            return output;
         }
 
-        public List<int> GrowFaceSelection(IGeometry geometry, List<ushort> initialSelectedIndexes, bool combineOverlappingVertexes)
+        public List<int> GrowFaceSelection(MeshObject geometry, List<ushort> initialSelectedIndexes, bool combineOverlappingVertexes)
         {
             var vertextes = geometry.GetVertexList();
             var indexList = geometry.GetIndexBuffer();

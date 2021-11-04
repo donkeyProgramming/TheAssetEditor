@@ -188,10 +188,10 @@ namespace KitbasherEditor.Services
         private string UnknownMaterial(Rmv2MeshNode mesh)
         {
             var textureName = "?";
-            var texture = mesh.MeshModel.GetTexture(TexureType.Diffuse);
+            var texture = mesh.RmvModel_depricated.GetTexture(TexureType.Diffuse);
             if (texture.HasValue)
                 textureName = texture.Value.Path;
-            var vertextType = mesh.MeshModel.Header.VertextType;
+            var vertextType = mesh.RmvModel_depricated.Header.VertextType;
             var alphaOn = mesh.Geometry.Alpha != AlphaMode.Opaque;
 
             var vertexName = "uknown";
@@ -209,7 +209,7 @@ namespace KitbasherEditor.Services
         {
             foreach (var material in possibleMaterials)
             {
-                if (mesh.MeshModel.Header.VertextType != material.VertexType)
+                if (mesh.RmvModel_depricated.Header.VertextType != material.VertexType)
                     continue;
 
                 var alphaOn = mesh.Geometry.Alpha != AlphaMode.Opaque;
@@ -217,7 +217,7 @@ namespace KitbasherEditor.Services
                     continue;
 
                 bool texturesOk = true;
-                foreach (var modelTexture in mesh.MeshModel.Textures)
+                foreach (var modelTexture in mesh.RmvModel_depricated.Textures)
                 {
                     if (modelTexture.Path.Contains("test_mask", StringComparison.InvariantCultureIgnoreCase))
                         continue;

@@ -12,7 +12,7 @@ using View3D.Rendering.Shading;
 
 namespace View3D.Rendering.Geometry
 {
-    public class Geometry : IGeometry
+    public class MeshObject 
     {
         protected IGraphicsCardGeometry Context;
         public VertexPositionNormalTextureCustom[] VertexArray; // Vector3 for pos at some point
@@ -24,23 +24,28 @@ namespace View3D.Rendering.Geometry
 
         public int WeightCount { get; private set; } = 0;
         public VertexFormat VertexFormat { get; private set; }
-
-
         public AlphaMode Alpha { get; set; }
+        public string ParentSkeletonName { get; set; }
 
-        public Geometry(IGraphicsCardGeometry context)
+
+        public MeshObject(IGraphicsCardGeometry context, string skeletonName)
         {
+            ParentSkeletonName = skeletonName;
             Context = context;
         }
 
-        public IGeometry Clone(bool includeMesh = true)
+        public MeshObject Clone(bool includeMesh = true)
         {
-            var mesh = new Geometry(Context);
+            var mesh = new MeshObject(Context, ParentSkeletonName);
 
             mesh.Pivot = Pivot;
             mesh.Context = Context.Clone();
             mesh.BoundingBox = BoundingBox;
             mesh.MeshCenter = MeshCenter;
+            mesh.Alpha = Alpha;
+            mesh.ParentSkeletonName = ParentSkeletonName;
+            mesh.WeightCount = WeightCount;
+            mesh.VertexFormat = VertexFormat;
 
             if (includeMesh)
             {
@@ -54,8 +59,6 @@ namespace View3D.Rendering.Geometry
                 mesh.Context.RebuildVertexBuffer(mesh.VertexArray, VertexPositionNormalTextureCustom.VertexDeclaration);
             }
 
-            mesh.WeightCount = WeightCount;
-            mesh.VertexFormat = VertexFormat;
             return mesh;
         }
 
@@ -185,7 +188,7 @@ namespace View3D.Rendering.Geometry
             return currentValue;
         }
 
-        public void Merge(List<Geometry> others)//
+        public void Merge(List<MeshObject> others)//
         {
             var newVertexBufferSize = others.Sum(x => x.VertexCount()) + VertexCount();
             var newVertexArray = new VertexPositionNormalTextureCustom[newVertexBufferSize];
@@ -466,9 +469,9 @@ namespace View3D.Rendering.Geometry
             RebuildVertexBuffer();
         }
 
-        public IGeometry CloneSubMesh(ushort[] newIndexList)
+        public MeshObject CloneSubMesh(ushort[] newIndexList)
         {
-            var mesh = Clone(false) as Geometry;
+            var mesh = Clone(false) as MeshObject;
 
             var uniqeIndexes = newIndexList.Distinct().ToList();
             uniqeIndexes.Sort();

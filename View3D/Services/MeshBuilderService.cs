@@ -12,9 +12,9 @@ namespace View3D.Services
 {
     public class MeshBuilderService
     {
-        public static Geometry BuildMeshFromRmvModel(RmvSubModel modelPart, IGraphicsCardGeometry context)
+        public static MeshObject BuildMeshFromRmvModel(RmvSubModel modelPart, string skeletonName, IGraphicsCardGeometry context)
         {
-            var output = new Geometry(context);
+            var output = new MeshObject(context, skeletonName);
             output.Alpha = modelPart.GetAlphaMode();
 
             output.Pivot = new Vector3(modelPart.Header.Transform.Pivot.X, modelPart.Header.Transform.Pivot.Y, modelPart.Header.Transform.Pivot.Z);
@@ -57,7 +57,17 @@ namespace View3D.Services
             return output;
         }
 
-        public static RmvMesh CreateRmvFileMesh(Geometry geometry)
+
+
+        public static RmvSubModel CreateRmvSubModel(RmvSubModel baseModel, MeshObject geometry)
+        {
+            var newSubModel = baseModel.Clone();
+            newSubModel.SetAlphaMode(geometry.Alpha);
+            newSubModel.Mesh = CreateRmvFileMesh(geometry);
+            return newSubModel;
+        }
+
+        public static RmvMesh CreateRmvFileMesh(MeshObject geometry)
         {
             RmvMesh mesh = new RmvMesh();
             mesh.IndexList = geometry.GetIndexBuffer().ToArray();

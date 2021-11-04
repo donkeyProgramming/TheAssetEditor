@@ -52,7 +52,7 @@ namespace View3D.SceneNodes
                 var lodNode = Children[lodIndex];
                 for (int modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
                 {
-                    var node = new Rmv2MeshNode(model.MeshList[lodIndex][modelIndex], contextFactory.Create(), resourceLibary, animationPlayer);
+                    var node = new Rmv2MeshNode(model.MeshList[lodIndex][modelIndex], model.Header.SkeletonName, contextFactory.Create(), resourceLibary, animationPlayer);
                     node.LodIndex = lodIndex;
                     lodNode.AddObject(node);
                 }

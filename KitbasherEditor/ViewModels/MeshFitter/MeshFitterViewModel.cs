@@ -325,7 +325,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 .ToList();
 
             var allSkeltonNames = meshNodes
-                .Select(x => x.MeshModel.ParentSkeletonName)
+                .Select(x => x.Geometry.ParentSkeletonName)
                 .Distinct();
 
             if (allSkeltonNames.Count() != 1)

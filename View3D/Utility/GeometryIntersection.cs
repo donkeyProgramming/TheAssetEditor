@@ -10,13 +10,13 @@ namespace View3D.Utility
 {
     public static class GeometryIntersection
     {
-        public static float? IntersectObject(Ray ray, IGeometry geometry, Matrix matrix)
+        public static float? IntersectObject(Ray ray, MeshObject geometry, Matrix matrix)
         {
             var res = IntersectFace(ray, geometry, matrix, out var _);
             return res;
         }
 
-        public static float? IntersectVertex(Ray ray, IGeometry geometry, Vector3 cameraPos, Matrix matrix, out int selectedVertex)
+        public static float? IntersectVertex(Ray ray, MeshObject geometry, Vector3 cameraPos, Matrix matrix, out int selectedVertex)
         {
             Matrix inverseTransform = Matrix.Invert(matrix);
             ray.Position = Vector3.Transform(ray.Position, inverseTransform);
@@ -50,7 +50,7 @@ namespace View3D.Utility
             return bestDistance;
         }
 
-        public static float? IntersectFace(Ray ray, IGeometry geometry, Matrix matrix, out int? face)
+        public static float? IntersectFace(Ray ray, MeshObject geometry, Matrix matrix, out int? face)
         {
             face = null;
 
@@ -89,7 +89,7 @@ namespace View3D.Utility
             return bestDistance;
         }
 
-        public static bool IntersectObject(BoundingFrustum boundingFrustum, IGeometry geometry, Matrix matrix)
+        public static bool IntersectObject(BoundingFrustum boundingFrustum, MeshObject geometry, Matrix matrix)
         {
             for (int i = 0; i < geometry.VertexCount(); i++)
             {
@@ -100,7 +100,7 @@ namespace View3D.Utility
             return false;
         }
 
-        public static bool IntersectFaces(BoundingFrustum boundingFrustum, IGeometry geometry, Matrix matrix, out List<int> faces)
+        public static bool IntersectFaces(BoundingFrustum boundingFrustum, MeshObject geometry, Matrix matrix, out List<int> faces)
         {
             faces = new List<int>();
 
@@ -130,7 +130,7 @@ namespace View3D.Utility
             return faces != null;
         }
 
-        public static bool IntersectVertices(BoundingFrustum boundingFrustum, IGeometry geometry, Matrix matrix, out List<int> vertices)
+        public static bool IntersectVertices(BoundingFrustum boundingFrustum, MeshObject geometry, Matrix matrix, out List<int> vertices)
         {
             vertices = new List<int>();
 

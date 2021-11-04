@@ -15,12 +15,12 @@ namespace View3D.Commands.Face
         SelectionManager _selectionManager;
 
         ISelectionState _oldState;
-        IGeometry _oldGeometry;
+        MeshObject _oldGeometry;
 
         List<int> _facesToDelete;
-        IGeometry _geo;
+        MeshObject _geo;
 
-        public DeleteFaceCommand(IGeometry geoObject, List<int> facesToDelete)
+        public DeleteFaceCommand(MeshObject geoObject, List<int> facesToDelete)
         {
             _facesToDelete = facesToDelete;
             _geo = geoObject;

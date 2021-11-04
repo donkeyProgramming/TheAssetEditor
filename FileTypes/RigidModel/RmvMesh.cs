@@ -189,12 +189,10 @@ namespace Filetypes.RigidModel
 
             VertexCount = (uint)mesh.VertexList.Length;
             IndexCount = (uint)mesh.IndexList.Length;
+
             VertexOffset = headerDataSize;
-            IndexOffset = headerDataSize + (uint)(RmvMesh.GetVertexSize(VertextType, modelVersion) * VertexCount);
-
-            MeshSectionSize = headerDataSize + (uint)(RmvMesh.GetVertexSize(VertextType, modelVersion) * VertexCount) + (sizeof(ushort) * IndexCount);
-
-            BoundingBox.Recompute(mesh);
+            IndexOffset = VertexOffset + (uint)(RmvMesh.GetVertexSize(VertextType, modelVersion) * VertexCount);
+            MeshSectionSize = IndexOffset + (sizeof(ushort) * IndexCount);
         }
     }
 
@@ -319,15 +317,13 @@ namespace Filetypes.RigidModel
         public List<RmvVector4> Vec4Params;
 
         public RmvMesh Mesh { get; set; }
-        public string ParentSkeletonName { get; set; }    // Not part of the model definition
 
 
-        public RmvSubModel(byte[] dataArray, int offset, uint modelVersion, string skeletonName)
+        public RmvSubModel(byte[] dataArray, int offset, uint modelVersion)
         {
             _modelStart = offset;
 
             var dataOffset = offset;
-            ParentSkeletonName = skeletonName;
 
             Header = LoadHeader(dataArray, ref dataOffset);
             AttachmentPoints = LoadAttachmentPoints(dataArray, ref dataOffset);
@@ -485,7 +481,6 @@ namespace Filetypes.RigidModel
            return new RmvSubModel()
            {
                _modelStart = _modelStart,
-               ParentSkeletonName = ParentSkeletonName,
                Header = Header,
                AttachmentPoints = AttachmentPoints.Select(x => x).ToList(),
                Textures = Textures.Select(x => x).ToList(),

@@ -2,8 +2,6 @@
 using Filetypes.RigidModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using View3D.Animation;
 using View3D.Components.Gizmo;
@@ -18,7 +16,7 @@ namespace View3D.SceneNodes
 {
     public class Rmv2MeshNode : SceneNode, ITransformable, IEditableGeometry, ISelectable, IUpdateable, IDrawableItem
     {
-        public RmvSubModel MeshModel { get; set; }
+        public RmvSubModel RmvModel_depricated { get; set; }
 
         Quaternion _orientation = Quaternion.Identity;
         Vector3 _position = Vector3.Zero;
@@ -53,13 +51,13 @@ namespace View3D.SceneNodes
         private Rmv2MeshNode()
         { }
 
-        public Rmv2MeshNode(RmvSubModel rmvSubModel, IGraphicsCardGeometry context, ResourceLibary resourceLib, AnimationPlayer animationPlayer, IGeometry geometry = null)
+        public Rmv2MeshNode(RmvSubModel rmvSubModel, string skeletonName, IGraphicsCardGeometry context, ResourceLibary resourceLib, AnimationPlayer animationPlayer, MeshObject geometry = null)
         {
-            MeshModel = rmvSubModel;
+            RmvModel_depricated = rmvSubModel;
             _resourceLib = resourceLib;
             Geometry = geometry;
             if (Geometry == null)
-                Geometry = MeshBuilderService.BuildMeshFromRmvModel(rmvSubModel, context);
+                Geometry = MeshBuilderService.BuildMeshFromRmvModel(rmvSubModel, skeletonName, context);
             AnimationPlayer = animationPlayer;
 
             Name = rmvSubModel.Header.ModelName;
@@ -97,13 +95,10 @@ namespace View3D.SceneNodes
 
         internal RmvSubModel CreateRmvSubModel()
         {
-            var newSubModel = MeshModel.Clone();
-            newSubModel.SetAlphaMode(Geometry.Alpha);
-            newSubModel.Mesh = MeshBuilderService.CreateRmvFileMesh(Geometry as Rendering.Geometry.Geometry);
-            return newSubModel;
+            return MeshBuilderService.CreateRmvSubModel(this.RmvModel_depricated, this.Geometry);
         }
 
-        public IGeometry Geometry { get; set; }
+        public MeshObject Geometry { get; set; }
 
         bool _isSelectable = true;
         public bool IsSelectable { get => _isSelectable; set => SetAndNotifyWhenChanged(ref _isSelectable, value); }
@@ -138,13 +133,13 @@ namespace View3D.SceneNodes
             var texture = _resourceLib.LoadTexture(path);
             (Effect as IShaderTextures).SetTexture(texture, texureType);
 
-            for (int i = 0; i < MeshModel.Textures.Count; i++)
+            for (int i = 0; i < RmvModel_depricated.Textures.Count; i++)
             {
-                if (MeshModel.Textures[i].TexureType == texureType)
+                if (RmvModel_depricated.Textures[i].TexureType == texureType)
                 {
-                    var tex = MeshModel.Textures[i];
+                    var tex = RmvModel_depricated.Textures[i];
                     tex.Path = path;
-                    MeshModel.Textures[i] = tex;
+                    RmvModel_depricated.Textures[i] = tex;
                     break;
                 }
             }
@@ -173,7 +168,7 @@ namespace View3D.SceneNodes
                     }
                 }
 
-                animationEffect.SetAnimationParameters(data, (Geometry as Rendering.Geometry.Geometry).WeightCount);
+                animationEffect.SetAnimationParameters(data, (Geometry as Rendering.Geometry.MeshObject).WeightCount);
                 animationEffect.UseAnimation = AnimationPlayer.IsEnabled;
             }
 
@@ -195,8 +190,8 @@ namespace View3D.SceneNodes
 
             if (DisplayBoundingBox)
             {
-                var bb = new BoundingBox(new Vector3(MeshModel.Header.BoundingBox.MinimumX, MeshModel.Header.BoundingBox.MinimumY, MeshModel.Header.BoundingBox.MinimumZ),
-                    new Vector3(MeshModel.Header.BoundingBox.MaximumX, MeshModel.Header.BoundingBox.MaximumY, MeshModel.Header.BoundingBox.MaximumZ));
+                var bb = new BoundingBox(new Vector3(RmvModel_depricated.Header.BoundingBox.MinimumX, RmvModel_depricated.Header.BoundingBox.MinimumY, RmvModel_depricated.Header.BoundingBox.MinimumZ),
+                    new Vector3(RmvModel_depricated.Header.BoundingBox.MaximumX, RmvModel_depricated.Header.BoundingBox.MaximumY, RmvModel_depricated.Header.BoundingBox.MaximumZ));
                 renderEngine.AddRenderItem(RenderBuckedId.Normal, new BoundingBoxRenderItem(_resourceLib.GetStaticEffect(ShaderTypes.Line), bb));
             }
         }
@@ -214,7 +209,7 @@ namespace View3D.SceneNodes
             typedTarget.ReduceMeshOnLodGeneration = ReduceMeshOnLodGeneration;
 
             typedTarget.AnimationPlayer = AnimationPlayer;
-            typedTarget.MeshModel = MeshModel.Clone();
+            typedTarget.RmvModel_depricated = RmvModel_depricated.Clone();
             typedTarget._resourceLib = _resourceLib;
             typedTarget.Effect = Effect.Clone();
             typedTarget.Geometry = Geometry.Clone();
@@ -224,23 +219,23 @@ namespace View3D.SceneNodes
 
         public void UpdatePivotPoint(Vector3 newPiv)
         {
-            var header = MeshModel.Header;
+            var header = RmvModel_depricated.Header;
             var transform = header.Transform;
 
             transform.Pivot = new Filetypes.RigidModel.Transforms.RmvVector3((float)newPiv.X, (float)newPiv.Y, (float)newPiv.Z);
 
             header.Transform = transform;
-            MeshModel.Header = header;
+            RmvModel_depricated.Header = header;
         }
 
         public Vector3 GetPivot()
         { 
-            return new Vector3(MeshModel.Header.Transform.Pivot.X, MeshModel.Header.Transform.Pivot.Y, MeshModel.Header.Transform.Pivot.Z); ;
+            return new Vector3(RmvModel_depricated.Header.Transform.Pivot.X, RmvModel_depricated.Header.Transform.Pivot.Y, RmvModel_depricated.Header.Transform.Pivot.Z); ;
         }
 
         public void RecomputeBoundingBox()
         {
-            var header = MeshModel.Header;
+            var header = RmvModel_depricated.Header;
             var bb = header.BoundingBox;
 
             var newBB = BoundingBox.CreateFromPoints(Geometry.GetVertexList());
@@ -254,7 +249,7 @@ namespace View3D.SceneNodes
             bb.MaximumZ = newBB.Max.Z;
 
             header.BoundingBox = bb;
-            MeshModel.Header = header;
+            RmvModel_depricated.Header = header;
         }
     }
 

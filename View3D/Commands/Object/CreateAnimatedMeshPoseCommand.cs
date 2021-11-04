@@ -11,7 +11,7 @@ namespace View3D.Commands.Object
 {
     public class CreateAnimatedMeshPoseCommand : CommandBase<CreateAnimatedMeshPoseCommand>
     {
-        List<IGeometry> _originalGeometries;
+        List<MeshObject> _originalGeometries;
 
         List<Rmv2MeshNode> _meshNodes;
         AnimationFrame _frame;
@@ -31,7 +31,7 @@ namespace View3D.Commands.Object
 
         protected override void ExecuteCommand()
         {
-            _originalGeometries = new List<IGeometry>();
+            _originalGeometries = new List<MeshObject>();
             foreach (var node in _meshNodes)
                 _originalGeometries.Add(node.Geometry.Clone());
 
@@ -47,9 +47,9 @@ namespace View3D.Commands.Object
 
                 if (_convertToStaticFrame)
                 {
-                    var header = node.MeshModel.Header;
+                    var header = node.RmvModel_depricated.Header;
                     header.VertextType = VertexFormat.Static;
-                    node.MeshModel.Header = header;
+                    node.RmvModel_depricated.Header = header;
                     node.Geometry.ChangeVertexType(VertexFormat.Static);
                 }
 

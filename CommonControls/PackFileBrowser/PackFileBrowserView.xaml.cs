@@ -72,6 +72,16 @@ namespace CommonControls.PackFileBrowser
             }
         }
 
+        private void TreeViewItem_PreviewMouseRightButtonDown(object sender, MouseEventArgs e)
+        {
+            TreeViewItem item = sender as TreeViewItem;
+            if (item != null)
+            {
+                item.Focus();
+                e.Handled = true;
+            }
+        }
+
         public static readonly DependencyProperty CustomContextMenuProperty = DependencyProperty.Register("CustomContextMenu", typeof(ContextMenu), typeof(PackFileBrowserView), new UIPropertyMetadata(null));
     }
 

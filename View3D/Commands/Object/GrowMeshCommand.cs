@@ -16,7 +16,7 @@ namespace View3D.Commands.Object
         List<int> _bonesAffectedScale;
         GameSkeleton _gameSkeleton;
 
-        IGeometry _backup;
+        MeshObject _backup;
 
         public GrowMeshCommand(GameSkeleton skeleton, Rmv2MeshNode node, float factor, List<int> bonesAffectedScale)
         {
@@ -40,7 +40,7 @@ namespace View3D.Commands.Object
         {
             _backup = _node.Geometry.Clone();
 
-            var mesh = _node.Geometry as Geometry;
+            var mesh = _node.Geometry as MeshObject;
             var vertexCount = mesh.VertexCount();
 
             Vector3[] normals = new Vector3[vertexCount];

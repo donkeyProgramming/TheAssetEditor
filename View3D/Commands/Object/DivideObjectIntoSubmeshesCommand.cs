@@ -64,7 +64,7 @@ namespace View3D.Commands.Object
                 var parent = _objectToSplit.Parent;
                 if (parent is GroupNode groupNode && groupNode.IsUngroupable)
                     parent = parent.Parent;
-                _newGroupNode = (GroupNode)parent.AddObject(new GroupNode(_objectToSplit.Name + "_Collection") { IsSelectable = true, IsUngroupable = true, IsLockable=true});
+                _newGroupNode = parent.AddObject(new GroupNode(_objectToSplit.Name + "_Collection") { IsSelectable = true, IsUngroupable = true, IsLockable=true});
 
                 int counter = 0;
                 List<Rmv2MeshNode> createdMeshes = new List<Rmv2MeshNode>();
@@ -72,11 +72,13 @@ namespace View3D.Commands.Object
                 foreach (var mesh in splitMeshes)
                 {
                     var hack = _objectToSplit as Rmv2MeshNode;
-                    var originalRmvModel = hack.MeshModel;
+                    var originalRmvModel = hack.RmvModel_depricated;
 
                     var context = new GraphicsCardGeometry(_resourceLib.GraphicsDevice);
-                    var meshNode = new Rmv2MeshNode(hack.MeshModel.Clone(), context, _resourceLib, hack.AnimationPlayer, mesh);
+                    var meshNode = new Rmv2MeshNode(hack.RmvModel_depricated.Clone(), _objectToSplit.Geometry.ParentSkeletonName,  context, _resourceLib, hack.AnimationPlayer, mesh);
                     meshNode.Name = $"{_objectToSplit.Name}_submesh_{counter++}";
+
+
                     createdMeshes.Add(meshNode);
                     _newGroupNode.AddObject(meshNode);
                 }

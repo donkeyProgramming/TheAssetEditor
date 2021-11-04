@@ -13,7 +13,7 @@ namespace View3D.SceneNodes
 {
     public interface IEditableGeometry : ISceneNode
     {
-        IGeometry Geometry { get; set; }
+        MeshObject Geometry { get; set; }
     }
 
     public interface IDrawableItem : ISceneNode
@@ -23,7 +23,7 @@ namespace View3D.SceneNodes
 
     public interface ISelectable : ISceneNode
     {
-        IGeometry Geometry { get; set; }
+        MeshObject Geometry { get; set; }
         bool IsSelectable { get; set; }
     }
 

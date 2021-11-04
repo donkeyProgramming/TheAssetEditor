@@ -13,7 +13,7 @@ namespace View3D.Rendering.RenderItems
 {
     public class GeoRenderItem : IRenderItem
     {
-        public IGeometry Geometry { get; set; }
+        public Geometry.MeshObject Geometry { get; set; }
         public IShader Shader { get; set; }
         public Matrix ModelMatrix { get; set; }
 

@@ -1,29 +1,22 @@
-﻿using AnimationEditor.SuperView;
-using AssetEditor.Services;
-using AssetEditor.Views.Settings;
+﻿using AssetEditor.Views.Settings;
 using Common;
 using Common.ApplicationSettings;
 using Common.GameInformation;
-using CommonControls.Editors.VariantMeshDefinition;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
-using Filetypes.RigidModel;
 using FileTypes.AnimationPack;
 using FileTypes.DB;
 using FileTypes.PackFiles.Models;
-using FileTypes.RigidModel;
-using FileTypes.Sound;
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using View3D.Animation;
 
 namespace AssetEditor.ViewModels
 {
@@ -50,7 +43,8 @@ namespace AssetEditor.ViewModels
             MenuBar = menuViewModel;
             MenuBar.EditorCreator = this;
             CloseToolCommand = new RelayCommand<IEditorViewModel>(CloseTool);
-           
+
+
             FileTree = new PackFileBrowserViewModel(_packfileService);
             FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, toolFactory, this);
             FileTree.FileOpen += OpenFile;
@@ -133,6 +127,16 @@ namespace AssetEditor.ViewModels
 
                 CreateTestPackFiles(packfileService);
             }
+        }
+
+        private void Compiler_ErrorDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void Compiler_OutputDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            //throw new NotImplementedException();
         }
 
         void MemoryDebugging()
@@ -244,4 +248,5 @@ namespace AssetEditor.ViewModels
             SelectedEditorIndex = CurrentEditorsList.Count - 1;
         }
     }
+
 }

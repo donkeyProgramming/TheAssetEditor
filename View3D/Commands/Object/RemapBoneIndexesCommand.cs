@@ -14,7 +14,7 @@ namespace View3D.Commands.Object
         string _newSkeletonName;
 
         List<Rmv2MeshNode> _meshNodeList;
-        List<IGeometry> _originalGeometry;
+        List<MeshObject> _originalGeometry;
         string _originalSkeletonName;
 
         public RemapBoneIndexesCommand(List<Rmv2MeshNode> meshNodeList, List<IndexRemapping> mapping, string newSkeletonName)
@@ -23,7 +23,7 @@ namespace View3D.Commands.Object
             _mapping = mapping;
 
             _newSkeletonName = newSkeletonName;
-            _originalSkeletonName = _meshNodeList.First().MeshModel.ParentSkeletonName;
+            _originalSkeletonName = _meshNodeList.First().Geometry.ParentSkeletonName;
         }
 
         public override string GetHintText()
@@ -38,7 +38,7 @@ namespace View3D.Commands.Object
             foreach (var node in _meshNodeList)
             {
                 node.Geometry.UpdateAnimationIndecies(_mapping);
-                node.MeshModel.ParentSkeletonName = _newSkeletonName;
+                node.Geometry.ParentSkeletonName = _newSkeletonName;
             }
         }
 
@@ -47,7 +47,7 @@ namespace View3D.Commands.Object
             for (int i = 0; i < _meshNodeList.Count; i++)
             {
                 _meshNodeList[i].Geometry = _originalGeometry[i];
-                _meshNodeList[i].MeshModel.ParentSkeletonName = _originalSkeletonName;
+                _meshNodeList[i].Geometry.ParentSkeletonName = _originalSkeletonName;
             }
         }
     }

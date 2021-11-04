@@ -17,15 +17,5 @@ namespace Filetypes.RigidModel.Transforms
         public float MaximumX;
         public float MaximumY;
         public float MaximumZ;
-
-        internal void Recompute(RmvMesh mesh)
-        {
-            //throw new NotImplementedException();
-        }
-
-        //public override string ToString()
-        //{
-        //    return $"x(min:{MinimumX} max:{MaximumX}) y(min:{MinimumY} max:{MaximumY}) z(min:{MinimumZ} max:{MaximumZ})";
-        //}
     }
 }

@@ -15,7 +15,7 @@ namespace View3D.Commands.Object
     public class ReduceMeshCommand : CommandBase<ObjectSelectionModeCommand>
     {
         private readonly List<Rmv2MeshNode> _meshList;
-        List<Geometry> _originalGeometry = new List<Geometry>();
+        List<MeshObject> _originalGeometry = new List<MeshObject>();
         private readonly float _factor;
         SelectionManager _selectionManager;
         ISelectionState _oldState;
@@ -42,7 +42,7 @@ namespace View3D.Commands.Object
 
             foreach (var meshNode in _meshList)
             {
-                var originalMesh = meshNode.Geometry as Geometry;
+                var originalMesh = meshNode.Geometry as MeshObject;
                 var reducedMesh = MeshOptimizerService.CreatedReducedCopy(originalMesh, _factor);
                 meshNode.Geometry = reducedMesh;
                 _originalGeometry.Add(originalMesh);

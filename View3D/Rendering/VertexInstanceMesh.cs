@@ -148,7 +148,7 @@ namespace View3D.Rendering
             _indexBuffer.SetData(indices);
         }
 
-        public void Update(IGeometry geo, Matrix modelMatrix, Quaternion objectRotation, Vector3 cameraPos, VertexSelectionState selectedVertexes)
+        public void Update(MeshObject geo, Matrix modelMatrix, Quaternion objectRotation, Vector3 cameraPos, VertexSelectionState selectedVertexes)
         {
             _currentInstanceCount = geo.VertexCount();
             for (int i = 0; i < _currentInstanceCount; i++)

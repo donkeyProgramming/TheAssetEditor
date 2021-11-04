@@ -187,9 +187,9 @@ namespace View3D.Services
                     {
                         bool useAlpha = materialConfig.Alpha;
                         if (useAlpha)
-                            mesh.MeshModel.SetAlphaMode(AlphaMode.Alpha_Test);
+                            mesh.RmvModel_depricated.SetAlphaMode(AlphaMode.Alpha_Test);
                         else
-                            mesh.MeshModel.SetAlphaMode(AlphaMode.Opaque);
+                            mesh.RmvModel_depricated.SetAlphaMode(AlphaMode.Opaque);
 
                         foreach (var newTexture in materialConfig.Textures)
                             mesh.UpdateTexture(newTexture.Value, newTexture.Key);

@@ -342,7 +342,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
             if (meshNode != null)
             {
-                var skeletonName = meshNode.MeshModel.ParentSkeletonName;
+                var skeletonName = meshNode.Geometry.ParentSkeletonName;
 
                 var newSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(_packFileService, skeletonName);
                 GameSkeleton skeleton = new GameSkeleton(newSkeletonFile, null);
@@ -424,14 +424,14 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 throw new System.Exception("TargetSkeleton not found -" + targetSkeletonName);
 
             var selectedMeshses = state.SelectedObjects<Rmv2MeshNode>();
-            if (selectedMeshses.Count(x => x.MeshModel.Header.VertextType == VertexFormat.Static) != 0)
+            if (selectedMeshses.Count(x => x.RmvModel_depricated.Header.VertextType == VertexFormat.Static) != 0)
             {
                 MessageBox.Show($"A static mesh is selected, which can not be remapped");
                 return;
             }
 
             var selectedMeshSkeletons = selectedMeshses
-                .Select(x => x.MeshModel.ParentSkeletonName)
+                .Select(x => x.Geometry.ParentSkeletonName)
                 .Distinct();
 
             if (selectedMeshSkeletons.Count() != 1)
@@ -479,17 +479,14 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             if (targetSkeletonName == selectedMeshSkeleton)
                 MessageBox.Show("Trying to map to and from the same skeleton. This does not really make any sense if you are trying to make the mesh fit an other skeleton.", "Error", MessageBoxButton.OK);
 
-            var window = new BoneMappingWindow()
-            {
-                DataContext = new BoneMappingViewModel(config)
-            };
+            var window = new BoneMappingWindow(new BoneMappingViewModel(config), false);
+            window.ShowDialog();
 
-            if (window.ShowDialog() == true)
+            if (window.Result == true)
             {
                 var remapping = AnimatedBoneHelper.BuildRemappingList(config.MeshBones.First());
                 _componentManager.GetComponent<CommandExecutor>().ExecuteCommand(new RemapBoneIndexesCommand(selectedMeshses, remapping, config.ParnetModelSkeletonName));
             }
-
         }
 
         void ShowVertexDebugInfo()

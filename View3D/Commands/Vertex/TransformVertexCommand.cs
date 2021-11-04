@@ -15,7 +15,7 @@ namespace View3D.Commands.Vertex
 
     public class TransformVertexCommand : CommandBase<TransformVertexCommand>
     {
-        List<IGeometry> _geometryList;
+        List<MeshObject> _geometryList;
         public Vector3 PivotPoint;
         public Matrix Transform { get; set; }
         public bool InvertWindingOrder { get; set; } = false;
@@ -23,7 +23,7 @@ namespace View3D.Commands.Vertex
         SelectionManager _selectionManager;
         ISelectionState _oldSelectionState;
 
-        public TransformVertexCommand(List<IGeometry> geometryList, Vector3 pivotPoint)
+        public TransformVertexCommand(List<MeshObject> geometryList, Vector3 pivotPoint)
         {
             _geometryList = geometryList;
             PivotPoint = pivotPoint;

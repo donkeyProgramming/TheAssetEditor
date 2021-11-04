@@ -4,11 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AssetEditor.Views"
-             xmlns:pf="clr-namespace:CommonControls.PackFileBrowser;assembly=CommonControls" xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
+             xmlns:pf="clr-namespace:CommonControls.PackFileBrowser;assembly=CommonControls" 
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-
-
 
     <pf:PackFileBrowserView/>
 </UserControl>

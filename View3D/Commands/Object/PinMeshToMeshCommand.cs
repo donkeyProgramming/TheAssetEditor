@@ -13,7 +13,7 @@ namespace View3D.Commands.Object
 {
     public class PinMeshToMeshCommand : CommandBase<CreateAnimatedMeshPoseCommand>
     {
-        IGeometry _originalGeo;
+        MeshObject _originalGeo;
         string _originalSkeletonName;
         ISelectionState _oldState;
         SelectionManager _selectionManager;
@@ -41,18 +41,18 @@ namespace View3D.Commands.Object
         protected override void ExecuteCommand()
         {
             _originalGeo = _objectToPin.Geometry.Clone();
-            _originalSkeletonName = _objectToPin.MeshModel.ParentSkeletonName;
+            _originalSkeletonName = _objectToPin.Geometry.ParentSkeletonName;
             _oldState = _selectionManager.GetStateCopy();
 
             // Update the skeleton
-            _objectToPin.MeshModel.ParentSkeletonName = _sourceMesh.MeshModel.ParentSkeletonName;
+            _objectToPin.Geometry.ParentSkeletonName = _sourceMesh.Geometry.ParentSkeletonName;
 
             // Use the center of the bb box to find the closest vert
             var bbCorners = _objectToPin.Geometry.BoundingBox.GetCorners();
             var bbCenter = new Vector3(bbCorners.Average(x => x.X), bbCorners.Average(x => x.Y), bbCorners.Average(x => x.Z));
 
             // Get closest vert
-            var sourceGeo = _sourceMesh.Geometry as Geometry;
+            var sourceGeo = _sourceMesh.Geometry as MeshObject;
             int closestSourceVert = -1;
             float closestDistSqrt = float.MaxValue;
             for (int i = 0; i < sourceGeo.VertexCount(); i++)
@@ -80,7 +80,7 @@ namespace View3D.Commands.Object
         protected override void UndoCommand()
         {
             _objectToPin.Geometry = _originalGeo;
-            _objectToPin.MeshModel.ParentSkeletonName = _originalSkeletonName;
+            _objectToPin.Geometry.ParentSkeletonName = _originalSkeletonName;
             _selectionManager.SetState(_oldState);
         }
     }

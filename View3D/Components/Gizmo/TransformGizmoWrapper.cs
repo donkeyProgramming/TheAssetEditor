@@ -27,13 +27,13 @@ namespace View3D.Components.Gizmo
 
         TransformVertexCommand _activeCommand;
 
-        List<IGeometry> _effectedObjects;
+        List<MeshObject> _effectedObjects;
         ISelectionState _selectionState;
 
         Matrix _totalGizomTransform = Matrix.Identity;
         bool _invertedWindingOrder = false;
 
-        public TransformGizmoWrapper(List<IGeometry> effectedObjects, ISelectionState vertexSelectionState)
+        public TransformGizmoWrapper(List<MeshObject> effectedObjects, ISelectionState vertexSelectionState)
         {
            
             _selectionState = vertexSelectionState;
@@ -174,7 +174,7 @@ namespace View3D.Components.Gizmo
             }
         }
 
-        void TransformVertex(Matrix transform, IGeometry geo, Vector3 objCenter, int index)
+        void TransformVertex(Matrix transform, MeshObject geo, Vector3 objCenter, int index)
         {
             var m = Matrix.CreateTranslation(-objCenter) * transform * Matrix.CreateTranslation(objCenter);
             geo.TransformVertex(index, m);
@@ -196,7 +196,7 @@ namespace View3D.Components.Gizmo
             else if (state is VertexSelectionState vertexSelectionState)
             {
                 if (vertexSelectionState.SelectedVertices.Count != 0)
-                    return new  TransformGizmoWrapper(new List<IGeometry>(){vertexSelectionState.RenderObject.Geometry}, vertexSelectionState);
+                    return new  TransformGizmoWrapper(new List<MeshObject>(){vertexSelectionState.RenderObject.Geometry}, vertexSelectionState);
             }
             return null;
         }

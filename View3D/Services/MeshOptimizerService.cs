@@ -11,7 +11,7 @@ namespace View3D.Services
 {
     public class MeshOptimizerService
     {
-        public static Geometry CreatedReducedCopy(Geometry original, float factor)
+        public static MeshObject CreatedReducedCopy(MeshObject original, float factor)
         {
             var quality = factor;
             var sourceVertices = original.VertexArray.Select(x => new MeshDecimator.Math.Vector3d(x.Position.X, x.Position.Y, x.Position.Z)).ToArray();
@@ -95,7 +95,7 @@ namespace View3D.Services
                 outputVerts[i] = vert;
             }
 
-            var clone = original.Clone(false) as Geometry;
+            var clone = original.Clone(false) as MeshObject;
             clone.IndexArray = destIndices[0].Select(x => (ushort)x).ToArray();
             clone.VertexArray = outputVerts;
 

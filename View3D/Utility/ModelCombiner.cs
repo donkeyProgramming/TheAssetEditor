@@ -22,22 +22,22 @@ namespace View3D.Utility
                         continue;
 
                     // Textures
-                    if (!ValidateTextures(outerLoopItem.MeshModel, innerLoopItem.MeshModel, out string textureErrorMsg))
+                    if (!ValidateTextures(outerLoopItem.RmvModel_depricated, innerLoopItem.RmvModel_depricated, out string textureErrorMsg))
                     {
                         //errors.Add("Texture -> " + textureErrorMsg);
                         errors.Error("Texture", textureErrorMsg);
                     }
 
                     // Vertex type
-                    if (outerLoopItem.MeshModel.Header.VertextType != innerLoopItem.MeshModel.Header.VertextType)
+                    if (outerLoopItem.RmvModel_depricated.Header.VertextType != innerLoopItem.RmvModel_depricated.Header.VertextType)
                     {
-                        errors.Error("VertexType", $"{outerLoopItem.MeshModel.Header.ModelName} has a different vertex type then {innerLoopItem.MeshModel.Header.ModelName}");
+                        errors.Error("VertexType", $"{outerLoopItem.RmvModel_depricated.Header.ModelName} has a different vertex type then {innerLoopItem.RmvModel_depricated.Header.ModelName}");
                     }
 
                     // Alpha mode
                     if (outerLoopItem.Geometry.Alpha != innerLoopItem.Geometry.Alpha)
                     {
-                        errors.Error("AlphaSettings mode", $"{outerLoopItem.MeshModel.Header.ModelName} has a different AlphaSettings mode then {innerLoopItem.MeshModel.Header.ModelName}");
+                        errors.Error("AlphaSettings mode", $"{outerLoopItem.RmvModel_depricated.Header.ModelName} has a different AlphaSettings mode then {innerLoopItem.RmvModel_depricated.Header.ModelName}");
                     }
                 }
             }

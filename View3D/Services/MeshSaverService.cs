@@ -30,7 +30,7 @@ namespace View3D.Services
             return deductionRatio;
         }
 
-        public static byte[] Save(bool onlySaveVisibleNodes, Rmv2ModelNode modelNode, GameSkeleton skeleton)
+        /*public static byte[] Save(bool onlySaveVisibleNodes, Rmv2ModelNode modelNode, GameSkeleton skeleton)
         {
             RmvRigidModel outputModel = new RmvRigidModel()
             {
@@ -68,13 +68,20 @@ namespace View3D.Services
 
             outputModel.SaveToByteArray(writer);
             return ms.ToArray();
-        }
+        }*/
 
 
 
 
         public static byte[] Save(bool onlySaveVisibleNodes, List<Rmv2ModelNode> modelNodes, GameSkeleton skeleton)
         {
+
+            // Create new header
+            // Copy load headers
+            // Create new model headers 
+            // Create mesh data
+
+
             RmvRigidModel outputModel = new RmvRigidModel()
             {
                 Header = modelNodes.First().Model.Header.Clone(),
