@@ -272,6 +272,8 @@ Open file with external tool in tree view
 Fix mesh and 3k viewing 
 Start game in debugging mode 
 [DONE]Rerigging window broken in kitbasher 
+Bonding box not updating correctly
+To and from static mesh not working great 
 
 ----
 

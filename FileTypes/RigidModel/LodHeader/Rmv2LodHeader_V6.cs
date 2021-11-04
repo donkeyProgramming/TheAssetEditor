@@ -35,5 +35,19 @@ namespace Filetypes.RigidModel.LodHeader
                 _lodCameraDistance = _lodCameraDistance,
             };
         }
+
+        public static Rmv2LodHeader_V6 CreateFromBase(RmvLodHeader header)
+        {
+            return new Rmv2LodHeader_V6()
+            {
+                _meshCount = header.MeshCount,
+                _totalLodVertexSize = header.TotalLodVertexSize,
+                _totalLodIndexSize = header.TotalLodIndexSize,
+                _firstMeshOffset = header.FirstMeshOffset,
+                _lodCameraDistance = header.LodCameraDistance,
+            };
+        }
     }
+
+
 }

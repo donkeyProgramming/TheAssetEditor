@@ -93,9 +93,9 @@ namespace View3D.SceneNodes
         public IShader Effect { get; set; }
         public int LodIndex { get; set; } = -1;
 
-        internal RmvSubModel CreateRmvSubModel()
+        internal RmvSubModel CreateRmvSubModel(RmvVersionEnum version)
         {
-            return MeshBuilderService.CreateRmvSubModel(this.RmvModel_depricated, this.Geometry);
+            return MeshBuilderService.CreateRmvSubModel(RmvModel_depricated, Geometry, version);
         }
 
         public MeshObject Geometry { get; set; }
@@ -235,21 +235,7 @@ namespace View3D.SceneNodes
 
         public void RecomputeBoundingBox()
         {
-            var header = RmvModel_depricated.Header;
-            var bb = header.BoundingBox;
-
-            var newBB = BoundingBox.CreateFromPoints(Geometry.GetVertexList());
-
-            bb.MinimumX = newBB.Min.X;
-            bb.MinimumY = newBB.Min.Y;
-            bb.MinimumZ = newBB.Min.Z;
-
-            bb.MaximumX = newBB.Max.X;
-            bb.MaximumY = newBB.Max.Y;
-            bb.MaximumZ = newBB.Max.Z;
-
-            header.BoundingBox = bb;
-            RmvModel_depricated.Header = header;
+            RmvModel_depricated.UpdateBoundingBox(BoundingBox.CreateFromPoints(Geometry.GetVertexList()));
         }
     }
 

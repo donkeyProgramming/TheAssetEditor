@@ -130,8 +130,8 @@ namespace View3D.Services
 
         Rmv2ModelNode LoadRigidMesh(PackFile file, ref SceneNode parent, AnimationPlayer player, ref string skeletonName, string attachmentPointName)
         {
-            var rmvModel = new RmvRigidModel(file.DataSource.ReadData(), file.Name);
-            var model = new Rmv2ModelNode(rmvModel, _resourceLibary, Path.GetFileName( rmvModel.FileName), player, GeometryGraphicsContextFactory.CreateInstance(_device));
+            var rmvModel = new RmvRigidModel(file.DataSource.ReadData());
+            var model = new Rmv2ModelNode(rmvModel, _resourceLibary, Path.GetFileName(file.Name), player, GeometryGraphicsContextFactory.CreateInstance(_device));
 
             foreach (var mesh in model.GetMeshNodes(0))
                 mesh.AttachmentPointName = attachmentPointName;

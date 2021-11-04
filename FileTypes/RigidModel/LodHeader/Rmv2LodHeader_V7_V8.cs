@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Filetypes.RigidModel.LodHeader
 {
-    public struct Rmv2LodHeader_V7 : RmvLodHeader
+    public struct Rmv2LodHeader_V7_V8 : RmvLodHeader
     {
         uint _meshCount;
         uint _totalLodVertexSize;
@@ -27,11 +27,11 @@ namespace Filetypes.RigidModel.LodHeader
         public byte QualityLvl { get => _qualityLvl; set => _qualityLvl = value; }
         public float LodCameraDistance { get => _lodCameraDistance; set => _lodCameraDistance = value; }
 
-        public int GetHeaderSize() => ByteHelper.GetSize(typeof(Rmv2LodHeader_V7));
+        public int GetHeaderSize() => ByteHelper.GetSize(typeof(Rmv2LodHeader_V7_V8));
 
         public RmvLodHeader Clone()
         {
-            return new Rmv2LodHeader_V7()
+            return new Rmv2LodHeader_V7_V8()
             {
                 _meshCount = MeshCount,
                 _totalLodVertexSize = _totalLodVertexSize,
@@ -45,6 +45,34 @@ namespace Filetypes.RigidModel.LodHeader
                 _padding1 = _padding1,
                 _padding2 = _padding2,
             };
+        }
+
+        public static Rmv2LodHeader_V7_V8 CreateFromBase(RmvLodHeader header, uint lodLevel)
+        {
+            var output = new Rmv2LodHeader_V7_V8()
+            {
+                _meshCount = header.MeshCount,
+                _totalLodVertexSize = header.TotalLodVertexSize,
+                _totalLodIndexSize = header.TotalLodIndexSize,
+                _firstMeshOffset = header.FirstMeshOffset,
+                _lodCameraDistance = header.LodCameraDistance,
+
+                _lodLevel = lodLevel,
+                _qualityLvl = 0,
+                _padding0 = 125,
+                _padding1 = 136,
+                _padding2 = 174
+            };
+
+            if(header is Rmv2LodHeader_V7_V8 typedHeader)
+            {
+                output._lodLevel = typedHeader._qualityLvl;
+                output._padding0 = typedHeader._padding0;
+                output._padding1 = typedHeader._padding1;
+                output._padding2 = typedHeader._padding2;
+            }
+
+            return output;
         }
     }
 }

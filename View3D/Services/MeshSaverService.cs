@@ -72,16 +72,92 @@ namespace View3D.Services
 
 
 
+        static RmvLodHeader[] CreateLodHeaders(RmvLodHeader baseData, RmvVersionEnum version, uint numLods)
+        {
+            var output = new RmvLodHeader[numLods];
+            for (uint i = 0; i < numLods; i++)
+            {
+                switch (version)
+                {
+                    case RmvVersionEnum.RMV2_V6:
+                        output[i] = Rmv2LodHeader_V6.CreateFromBase(baseData);
+                        break;
+                    case RmvVersionEnum.RMV2_V7:
+                    case RmvVersionEnum.RMV2_V8:
+                        output[i] = Rmv2LodHeader_V7_V8.CreateFromBase(baseData, i);
+                        break;
+
+                    default:
+                        throw new NotImplementedException("Version not supported");
+                }
+            }
+
+            return output;
+        }
+
+        public static byte[] SaveV2(bool onlySaveVisibleNodes, List<Rmv2ModelNode> modelNodes, GameSkeleton skeleton, RmvVersionEnum version )
+        {
+            uint lodCount = (uint)modelNodes.First().Model.LodHeaders.Length;
+
+            RmvRigidModel header = new RmvRigidModel()
+            {
+                Header = new RmvModelHeader()
+                {
+                    _fileType = Encoding.ASCII.GetBytes("RMV2"),
+                    SkeletonName = skeleton.SkeletonName,
+                    Version = version,
+                    LodCount = lodCount
+                },
+
+                LodHeaders = CreateLodHeaders(modelNodes.First().Model.LodHeaders.First(), version, lodCount)
+            };
+
+            // We add all the bone names to the mesh, as its just simpler then trying to figure out which bones are actually needed for attachments
+            var boneNames = skeleton?.BoneNames.ToList();
+
+            // Create all the meshes
+            List<RmvSubModel>[] newMeshList = new List<RmvSubModel>[lodCount];
+            for (int i = 0; i < lodCount; i++)
+                newMeshList[i] = new List<RmvSubModel>();
+
+            foreach (var modelNode in modelNodes)
+            {
+                for (int currentLodIndex = 0; currentLodIndex < lodCount; currentLodIndex++)
+                {
+                    List<Rmv2MeshNode> meshes = modelNode.GetMeshesInLod(currentLodIndex, onlySaveVisibleNodes);
+
+                    for (int meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
+                    {
+                        var newMesh = meshes[meshIndex].CreateRmvSubModel(version);
+                        newMesh.UpdateAttachmentPointList(boneNames);
+                        newMesh.UpdateBoundingBox(BoundingBox.CreateFromPoints(meshes[meshIndex].Geometry.GetVertexList()));
+
+                        newMeshList[currentLodIndex].Add(newMesh);
+                    }
+                }
+            }
+
+            // Convert the list to an array
+            RmvSubModel[][] newMeshListArray = new RmvSubModel[lodCount][];
+            for (int i = 0; i < lodCount; i++)
+                newMeshListArray[i] = newMeshList[i].ToArray();
+
+            // Update data in the header and recalc offset
+            header.MeshList = newMeshListArray;
+            header.UpdateOffsets(version);
+
+            // Output the data
+            using MemoryStream ms = new MemoryStream();
+            using var writer = new BinaryWriter(ms);
+            header.SaveToByteArray(writer);
+
+            return ms.ToArray(); ;
+        }
+
+
 
         public static byte[] Save(bool onlySaveVisibleNodes, List<Rmv2ModelNode> modelNodes, GameSkeleton skeleton)
         {
-
-            // Create new header
-            // Copy load headers
-            // Create new model headers 
-            // Create mesh data
-
-
             RmvRigidModel outputModel = new RmvRigidModel()
             {
                 Header = modelNodes.First().Model.Header.Clone(),
@@ -102,16 +178,14 @@ namespace View3D.Services
             {
                 for (int currentLodIndex = 0; currentLodIndex < lodCount; currentLodIndex++)
                 {
-                    List<Rmv2MeshNode> meshes = modelNode.GetMeshesInLod(currentLodIndex, onlySaveVisibleNodes);
+                    var meshNodes = modelNode.GetMeshesInLod(currentLodIndex, onlySaveVisibleNodes);
 
-                    for (int meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
+                    for (int meshIndex = 0; meshIndex < meshNodes.Count; meshIndex++)
                     {
-                        meshes[meshIndex].RecomputeBoundingBox();
+                        var newMesh  = meshNodes[meshIndex].CreateRmvSubModel(RmvVersionEnum.RMV2_V7);
 
-                        var newMesh  = meshes[meshIndex].CreateRmvSubModel();
                         newMesh.UpdateAttachmentPointList(boneNames);
-
-                        newMeshList[currentLodIndex].Add(newMesh);
+                        newMesh.UpdateBoundingBox(BoundingBox.CreateFromPoints(meshNodes[meshIndex].Geometry.GetVertexList()));
                     }
                 }
             }
@@ -121,12 +195,15 @@ namespace View3D.Services
                 newMeshListArray[i] = newMeshList[i].ToArray();
 
             outputModel.MeshList = newMeshListArray;
-            outputModel.UpdateOffsets();
+            outputModel.UpdateOffsets(RmvVersionEnum.RMV2_V7);
 
             using MemoryStream ms = new MemoryStream();
             using var writer = new BinaryWriter(ms);
 
             outputModel.SaveToByteArray(writer);
+
+
+
             return ms.ToArray();
         }
 

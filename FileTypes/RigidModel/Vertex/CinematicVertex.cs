@@ -1,6 +1,7 @@
 ﻿using Filetypes.RigidModel.Transforms;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -35,18 +36,26 @@ namespace Filetypes.RigidModel.Vertex
 
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
             public byte[] tangent;      // 4 x 1
-
         }
 
         public Data _data;
+        public ColourData? _colourData;
 
-        public CinematicVertex(Data data)
+        public CinematicVertex(Data data, ColourData? colourData = null)
         {
             _data = data;
+            _colourData = colourData;
             CreateFromData(_data);
         }
 
-        public CinematicVertex(RmvVector4 position, RmvVector2 uv, RmvVector3 normal, RmvVector3 biNormal, RmvVector3 tanget, BoneInformation[] boneInformation)
+        public override void Write(BinaryWriter writer)
+        {
+            writer.Write(ByteHelper.GetBytes(_data));
+            if(_colourData != null)
+                writer.Write(ByteHelper.GetBytes(_colourData.Value));
+        }
+
+        public CinematicVertex(RmvVector4 position, RmvVector2 uv, RmvVector3 normal, RmvVector3 biNormal, RmvVector3 tanget, BoneInformation[] boneInformation, ColourData? colourData = null)
         {
             if (boneInformation.Length != 4)
                 throw new ArgumentException();
@@ -61,6 +70,8 @@ namespace Filetypes.RigidModel.Vertex
                 biNormal = CreateNormalVector3(biNormal),
                 tangent = CreateNormalVector3(tanget),
             };
+
+            _colourData = colourData;
 
             CreateFromData(_data);
         }

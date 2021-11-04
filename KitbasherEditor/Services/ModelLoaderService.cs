@@ -38,9 +38,9 @@ namespace KitbasherEditor.Services
 
         public void LoadMainEditableModel(PackFile file)
         {
-            var rmv = new RmvRigidModel(file.DataSource.ReadData(), file.Name);
+            var rmv = new RmvRigidModel(file.DataSource.ReadData());
             EditableMeshNode.SetModel(rmv, _resourceLibary, _animationView.Player, GeometryGraphicsContextFactory.CreateInstance(_resourceLibary.GraphicsDevice));
-            EditableMeshNode.SelectedOutputFormat = rmv.Header.GetVersion();
+            EditableMeshNode.SelectedOutputFormat = rmv.Header.Version;
 
             _animationView.SetActiveSkeleton(rmv.Header.SkeletonName);
         }

@@ -59,19 +59,19 @@ namespace View3D.Services
 
 
 
-        public static RmvSubModel CreateRmvSubModel(RmvSubModel baseModel, MeshObject geometry)
+        public static RmvSubModel CreateRmvSubModel(RmvSubModel baseModel, MeshObject geometry, RmvVersionEnum version)
         {
             var newSubModel = baseModel.Clone();
             newSubModel.SetAlphaMode(geometry.Alpha);
-            newSubModel.Mesh = CreateRmvFileMesh(geometry);
+            newSubModel.Mesh = CreateRmvFileMesh(geometry, version);
             return newSubModel;
         }
 
-        public static RmvMesh CreateRmvFileMesh(MeshObject geometry)
+        public static RmvMesh CreateRmvFileMesh(MeshObject geometry, RmvVersionEnum version)
         {
             RmvMesh mesh = new RmvMesh();
             mesh.IndexList = geometry.GetIndexBuffer().ToArray();
-        
+
             // Ensure normalized
             for (int i = 0; i < geometry.VertexArray.Length; i++)
             {
@@ -80,63 +80,71 @@ namespace View3D.Services
                 geometry.VertexArray[i].Tangent = Vector3.Normalize(geometry.VertexArray[i].Tangent);
             }
 
-            if (geometry.VertexFormat == VertexFormat.Static)
+            switch (geometry.VertexFormat)
             {
-                mesh.VertexList = new DefaultVertex[geometry.VertexCount()];
+                case VertexFormat.Static:
+                    mesh.VertexList = new StaticVertex[geometry.VertexCount()];
+                    break;
 
-                for (int i = 0; i < mesh.VertexList.Length; i++)
-                {
-                    mesh.VertexList[i] = new DefaultVertex(
-                        new RmvVector4(geometry.VertexArray[i].Position.X, geometry.VertexArray[i].Position.Y, geometry.VertexArray[i].Position.Z, 1),
-                        new RmvVector2(geometry.VertexArray[i].TextureCoordinate.X, geometry.VertexArray[i].TextureCoordinate.Y),
-                        new RmvVector3(geometry.VertexArray[i].Normal.X, geometry.VertexArray[i].Normal.Y, geometry.VertexArray[i].Normal.Z),
-                        new RmvVector3(geometry.VertexArray[i].BiNormal.X, geometry.VertexArray[i].BiNormal.Y, geometry.VertexArray[i].BiNormal.Z),
-                        new RmvVector3(geometry.VertexArray[i].Tangent.X, geometry.VertexArray[i].Tangent.Y, geometry.VertexArray[i].Tangent.Z)
-                      );
-                }
+                case VertexFormat.Weighted:
+                    mesh.VertexList = new WeightedVertex[geometry.VertexCount()];
+                    break;
+
+                case VertexFormat.Cinematic:
+                    mesh.VertexList = new CinematicVertex[geometry.VertexCount()];
+                    break;
+
+                default:
+                    throw new NotImplementedException();
             }
-            else if (geometry.VertexFormat == VertexFormat.Weighted)
+
+            
+            for (int i = 0; i < mesh.VertexList.Length; i++)
             {
-                mesh.VertexList = new WeightedVertex[geometry.VertexCount()];
-                for (int i = 0; i < mesh.VertexList.Length; i++)
+                var pos = new RmvVector4(geometry.VertexArray[i].Position.X, geometry.VertexArray[i].Position.Y, geometry.VertexArray[i].Position.Z, 1);
+                var uv = new RmvVector2(geometry.VertexArray[i].TextureCoordinate.X, geometry.VertexArray[i].TextureCoordinate.Y);
+                var normal = new RmvVector3(geometry.VertexArray[i].Normal.X, geometry.VertexArray[i].Normal.Y, geometry.VertexArray[i].Normal.Z);
+                var biNormal = new RmvVector3(geometry.VertexArray[i].BiNormal.X, geometry.VertexArray[i].BiNormal.Y, geometry.VertexArray[i].BiNormal.Z);
+                var tanget = new RmvVector3(geometry.VertexArray[i].Tangent.X, geometry.VertexArray[i].Tangent.Y, geometry.VertexArray[i].Tangent.Z);
+
+                BaseVertex.ColourData? colourData = null;
+                if (version == RmvVersionEnum.RMV2_V8)
                 {
-                    mesh.VertexList[i] = new WeightedVertex(
-                        new RmvVector4(geometry.VertexArray[i].Position.X, geometry.VertexArray[i].Position.Y, geometry.VertexArray[i].Position.Z, 1),
-                        new RmvVector2(geometry.VertexArray[i].TextureCoordinate.X, geometry.VertexArray[i].TextureCoordinate.Y),
-                        new RmvVector3(geometry.VertexArray[i].Normal.X, geometry.VertexArray[i].Normal.Y, geometry.VertexArray[i].Normal.Z),
-                        new RmvVector3(geometry.VertexArray[i].BiNormal.X, geometry.VertexArray[i].BiNormal.Y, geometry.VertexArray[i].BiNormal.Z),
-                        new RmvVector3(geometry.VertexArray[i].Tangent.X, geometry.VertexArray[i].Tangent.Y, geometry.VertexArray[i].Tangent.Z),
-                        new BaseVertex.BoneInformation[2]
+                    colourData = new BaseVertex.ColourData()
+                    {
+                        Colour = new byte[4] { 0, 0, 0, 255 }
+                    };
+                }
+
+                switch (geometry.VertexFormat)
+                {
+                    case VertexFormat.Static:
+                        mesh.VertexList[i] = new StaticVertex(pos, uv, normal, biNormal, tanget);
+                        break;
+
+                    case VertexFormat.Weighted:             
+                        var boneBlendInfo2 =  new BaseVertex.BoneInformation[2]
                         {
                             new BaseVertex.BoneInformation( (byte)geometry.VertexArray[i].BlendIndices.X, geometry.VertexArray[i].BlendWeights.X),
                             new BaseVertex.BoneInformation( (byte)geometry.VertexArray[i].BlendIndices.Y, geometry.VertexArray[i].BlendWeights.Y),
-                        });
-                }
-            }
-            else if (geometry.VertexFormat == VertexFormat.Cinematic)
-            {
-                mesh.VertexList = new CinematicVertex[geometry.VertexCount()];
-                for (int i = 0; i < mesh.VertexList.Length; i++)
-                {
-                    mesh.VertexList[i] = new CinematicVertex(
-                        new RmvVector4(geometry.VertexArray[i].Position.X, geometry.VertexArray[i].Position.Y, geometry.VertexArray[i].Position.Z, 1),
-                        new RmvVector2(geometry.VertexArray[i].TextureCoordinate.X, geometry.VertexArray[i].TextureCoordinate.Y),
-                        new RmvVector3(geometry.VertexArray[i].Normal.X, geometry.VertexArray[i].Normal.Y, geometry.VertexArray[i].Normal.Z),
-                        new RmvVector3(geometry.VertexArray[i].BiNormal.X, geometry.VertexArray[i].BiNormal.Y, geometry.VertexArray[i].BiNormal.Z),
-                        new RmvVector3(geometry.VertexArray[i].Tangent.X, geometry.VertexArray[i].Tangent.Y, geometry.VertexArray[i].Tangent.Z),
+                        };
 
-                        new BaseVertex.BoneInformation[4]
+                        mesh.VertexList[i] = new WeightedVertex(pos, uv, normal, biNormal, tanget, boneBlendInfo2, colourData);
+                        break;
+
+                    case VertexFormat.Cinematic:
+                        var boneBlendInfo4 = new BaseVertex.BoneInformation[4]
                         {
                             new BaseVertex.BoneInformation( (byte)geometry.VertexArray[i].BlendIndices.X, geometry.VertexArray[i].BlendWeights.X),
                             new BaseVertex.BoneInformation( (byte)geometry.VertexArray[i].BlendIndices.Y, geometry.VertexArray[i].BlendWeights.Y),
                             new BaseVertex.BoneInformation( (byte)geometry.VertexArray[i].BlendIndices.Z, geometry.VertexArray[i].BlendWeights.Z),
                             new BaseVertex.BoneInformation( (byte)geometry.VertexArray[i].BlendIndices.W, geometry.VertexArray[i].BlendWeights.W)
-                        });
+                        };
+
+                        mesh.VertexList[i] = new CinematicVertex(pos, uv, normal, biNormal, tanget, boneBlendInfo4, colourData);
+                        break;
                 }
-            }
-            else
-            {
-                throw new Exception("Unknown vertex format");
+
             }
 
             return mesh;

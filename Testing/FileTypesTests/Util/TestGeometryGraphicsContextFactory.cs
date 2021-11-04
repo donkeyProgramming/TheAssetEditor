@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using View3D.Rendering;
 using View3D.Rendering.Geometry;
 
 namespace FileTypesTests.Util
@@ -38,6 +39,11 @@ namespace FileTypesTests.Util
         public void RebuildVertexBuffer<VertexType>(VertexType[] vertArray, VertexDeclaration vertexDeclaration) where VertexType : struct, IVertexType
         {
            
+        }
+
+        public void RebuildVertexBuffer(VertexPositionNormalTextureCustom[] vertArray, VertexDeclaration vertexDeclaration)
+        {
+            throw new NotImplementedException();
         }
     }
 }

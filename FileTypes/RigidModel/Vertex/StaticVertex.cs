@@ -2,6 +2,7 @@
 using SharpDX;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Filetypes.RigidModel.Vertex
 {
-    public class DefaultVertex : BaseVertex
+    public class StaticVertex : BaseVertex
     {
         public struct Data //32
         {
@@ -37,14 +38,19 @@ namespace Filetypes.RigidModel.Vertex
 
         public Data _data;
 
-        public DefaultVertex(Data data)
+        public StaticVertex(Data data)
         {
             _data = data;
             CreateFromData(_data);
            // Fix();
         }
 
-        public DefaultVertex(RmvVector4 position, RmvVector2 uv, RmvVector3 normal, RmvVector3 biNormal, RmvVector3 tanget)
+        public override void Write(BinaryWriter writer)
+        {
+            writer.Write(ByteHelper.GetBytes(_data));
+        }
+
+        public StaticVertex(RmvVector4 position, RmvVector2 uv, RmvVector3 normal, RmvVector3 biNormal, RmvVector3 tanget)
         {
             _data = new Data()
             {

@@ -1,6 +1,7 @@
 ﻿using Filetypes.RigidModel.Transforms;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -34,16 +35,26 @@ namespace Filetypes.RigidModel.Vertex
             public byte[] tangent;      // 4 x 1
         }
 
-
         public Data _data;
+        public ColourData? _colourData;
 
-        public WeightedVertex(Data data)
+        public WeightedVertex(Data data, ColourData? colourData)
         {
             _data = data;
+            _colourData = colourData;
+
             CreateFromData(_data);
         }
 
-        public WeightedVertex(RmvVector4 position, RmvVector2 uv, RmvVector3 normal, RmvVector3 biNormal, RmvVector3 tanget, BoneInformation[] boneInformation)
+        public override void Write(BinaryWriter writer)
+        {
+            writer.Write(ByteHelper.GetBytes(_data));
+
+            if (_colourData != null)
+                writer.Write(ByteHelper.GetBytes(_colourData.Value));
+        }
+
+        public WeightedVertex(RmvVector4 position, RmvVector2 uv, RmvVector3 normal, RmvVector3 biNormal, RmvVector3 tanget, BoneInformation[] boneInformation, ColourData? colourData)
         {
             if (boneInformation.Length != 2)
                 throw new ArgumentException();
@@ -57,8 +68,9 @@ namespace Filetypes.RigidModel.Vertex
                 normal = CreateNormalVector3(normal),
                 biNormal = CreateNormalVector3(biNormal),
                 tangent = CreateNormalVector3(tanget),
-
             };
+
+            _colourData = colourData;
 
             CreateFromData(_data);
         }

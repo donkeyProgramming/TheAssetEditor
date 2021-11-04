@@ -3,7 +3,9 @@ using Filetypes.RigidModel.Transforms;
 using SharpDX;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,6 +25,12 @@ namespace Filetypes.RigidModel.Vertex
             }
         }
 
+        public struct ColourData
+        {
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public byte[] Colour;      // 4 x 1
+        }
+
 
         public RmvVector4 Postition;
         public RmvVector2 Uv;
@@ -31,6 +39,8 @@ namespace Filetypes.RigidModel.Vertex
         public RmvVector4 Tangent;
         public byte[] BoneIndex;
         public float[] BoneWeight;
+
+        public abstract void Write(BinaryWriter writer);
 
         protected RmvVector4 CreatVector4HalfFloat(byte[] data)
         {

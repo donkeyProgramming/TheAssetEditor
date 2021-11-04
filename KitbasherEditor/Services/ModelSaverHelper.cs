@@ -15,6 +15,7 @@ using System.Text;
 using System.Windows;
 using View3D.Components.Component;
 using View3D.SceneNodes;
+using View3D.Services;
 
 namespace KitbasherEditor.Services
 {
@@ -92,8 +93,8 @@ namespace KitbasherEditor.Services
                     onlySaveVisible = true;
             }
 
-            var bytes = _editableMeshNode.Save(onlySaveVisible);
-            var reloadedModel = new RmvRigidModel(bytes, "reloadedFile");
+            var bytes = MeshSaverService.SaveV2(onlySaveVisible, new List<Rmv2ModelNode>() { _editableMeshNode }, _editableMeshNode.Skeleton.AnimationProvider.Skeleton, _editableMeshNode.SelectedOutputFormat);
+            var reloadedModel = new RmvRigidModel(bytes);
             return bytes;
         }
 
