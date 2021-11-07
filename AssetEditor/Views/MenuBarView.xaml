@@ -21,6 +21,7 @@
                 <MenuItem Header="Save as" IsEnabled="False"/>
                 <Separator/>
                 <MenuItem Header="Load all game packfiles">
+                    <MenuItem Header="Atilla" Command="{Binding MenuBar.OpenAttilaPacksCommand}"/>
                     <MenuItem Header="Rome2 Remastered" Command="{Binding MenuBar.OpenRome2RePacksCommand}"/>
                     <MenuItem Header="Three Kingdoms" Command="{Binding MenuBar.OpenThreeKingdomsPacksCommand}"/>
                     <MenuItem Header="Warhammer 2" Command="{Binding MenuBar.OpenWarhammer2PacksCommand}"/>

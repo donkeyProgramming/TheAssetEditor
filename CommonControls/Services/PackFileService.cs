@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace CommonControls.Services
@@ -95,6 +96,73 @@ namespace CommonControls.Services
             return output;
         }
 
+        public List<string> DeepSearch(string searchStr, bool caseSensetive)
+        {
+
+            _logger.Here().Information($"Searching for : '{searchStr}'");
+
+            var filesWithResult = new List<KeyValuePair<string,string>>();
+            var files = Database.PackFiles.SelectMany(x => x.FileList.Select(x=>((x.Value as PackFile).DataSource as PackedFileSource).Parent.FilePath)).Distinct().ToList();
+
+            var indexLock = new object();
+            int currentPackFileIndex = 0;
+
+            Parallel.For(0, files.Count,
+              index => 
+              {
+                  int currentIndex = 0;
+              
+                  lock (indexLock)
+                  {
+                      currentIndex = currentPackFileIndex;
+                      currentPackFileIndex++;
+                  }
+
+                  var packFilePath = files[currentIndex];
+                  if (packFilePath.Contains("audio", StringComparison.InvariantCultureIgnoreCase))
+                  {
+                      _logger.Here().Information($"Skipping audio file {currentIndex}/{files.Count}");
+                  }
+                  else
+                  {
+                      using (var fileStram = File.OpenRead(packFilePath))
+                      {
+                          using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
+                          {
+                              var pfc = new PackFileContainer(packFilePath, reader, _skeletonAnimationLookUpHelper);
+
+                              _logger.Here().Information($"Seraching through packfile {currentIndex}/{files.Count} -  {packFilePath} {pfc.FileList.Count} files");
+
+                              foreach (var packFile in pfc.FileList.Values)
+                              {
+                                  var pf = packFile as PackFile;
+                                  var ds = pf.DataSource as PackedFileSource;
+                                  var bytes = ds.ReadDataForFastSearch(fileStram);
+                                  var str = Encoding.ASCII.GetString(bytes);
+
+                                  if (str.Contains(searchStr, StringComparison.InvariantCultureIgnoreCase))
+                                  {
+                                      var fillPathFile = pfc.FileList.FirstOrDefault(x => x.Value == packFile).Key;
+                                      _logger.Here().Information($"Found result '{fillPathFile}' in '{packFilePath}'");
+
+                                      lock (filesWithResult)
+                                      {
+                                          filesWithResult.Add(new KeyValuePair<string, string>(fillPathFile, packFilePath));
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  }
+              });
+
+            _logger.Here().Information($"[{filesWithResult.Count}] Result for '{searchStr}'_________________:");
+            foreach (var item in filesWithResult)
+                _logger.Here().Information($"\t\t'{item.Key}' in '{item.Value}'");
+
+            return filesWithResult.Select(x=>x.Value).ToList();
+        }
+
         public List<PackFile> FindAllFilesInDirectory(string dir, PackFileContainer packFileContainer = null)
         {
             dir = dir.Replace('/', '\\').ToLower();
@@ -146,7 +214,6 @@ namespace CommonControls.Services
         {
             var pack = new PackFileContainer(packFileSystemPath, binaryReader, _skeletonAnimationLookUpHelper);
             Database.AddPackFile(pack);
-            //_skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pack);
             return pack;
         }
 
@@ -168,7 +235,6 @@ namespace CommonControls.Services
                             {
                                 var pack = new PackFileContainer(path, reader, _skeletonAnimationLookUpHelper);
                                 packList.Add(pack);
-                                //_skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pack);
                             }
                         }
                     }

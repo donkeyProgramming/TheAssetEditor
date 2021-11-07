@@ -21,6 +21,7 @@ namespace Common.GameInformation
         public static GameInformation Troy { get; private set; }
         public static GameInformation ThreeKingdoms { get; private set; }
         public static GameInformation Rome2Remastered { get; private set; }
+        public static GameInformation Attilla { get; private set; }
         public static List<GameInformation> Games { get; private set; }
 
         public static void Create()
@@ -30,7 +31,8 @@ namespace Common.GameInformation
             Troy = new GameInformation() { Type = GameTypeEnum.Troy, DisplayName = "Troy", DefaultPackType = "PFH5", ShortID = "troy" };
             ThreeKingdoms = new GameInformation() { Type = GameTypeEnum.ThreeKingdoms, DisplayName = "Three Kingdoms", DefaultPackType = "PFH5", ShortID = "ThreeKingdoms" };
             Rome2Remastered = new GameInformation() { Type = GameTypeEnum.Rome_2_Remastered, DisplayName = "Rome II - Re", DefaultPackType = "PFH5", ShortID = "Rome2Remastered" };
-            Games = new List<GameInformation>() { Warhammer, Warhammer2, Troy, ThreeKingdoms, Rome2Remastered };
+            Attilla = new GameInformation() { Type = GameTypeEnum.Attila, DisplayName = "Attila", DefaultPackType = "PFH5", ShortID = "Attila" };
+            Games = new List<GameInformation>() { Warhammer, Warhammer2, Troy, ThreeKingdoms, Rome2Remastered, Attilla };
         }
 
         public static GameInformation GetGameById(GameTypeEnum type)

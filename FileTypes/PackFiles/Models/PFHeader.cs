@@ -53,6 +53,7 @@ namespace FileTypes.PackFiles.Models
 
         public PFHeader(BinaryReader reader)
         {
+            var fileNameBuffer = new byte[1024];
             Version = new string(reader.ReadChars(4));
             ByteMask = reader.ReadInt32();
             
@@ -83,7 +84,7 @@ namespace FileTypes.PackFiles.Models
             }
 
             for (int i = 0; i < ReferenceFileCount; i++)
-                _dependantFiles.Add(IOFunctions.TheadUnsafeReadZeroTerminatedAscii(reader));
+                _dependantFiles.Add(IOFunctions.TheadUnsafeReadZeroTerminatedAscii(reader, fileNameBuffer));
 
             HasAdditionalInfo = (ByteMask & HAS_INDEX_WITH_TIMESTAMPS) != 0;
             DataStart = headerOffset + _buffer.Length +  pack_file_index_size + packed_file_index_size;

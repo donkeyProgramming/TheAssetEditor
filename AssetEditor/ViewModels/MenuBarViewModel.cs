@@ -48,7 +48,7 @@ namespace AssetEditor.ViewModels
         public ICommand OpenThreeKingdomsPacksCommand { get; set; }
         public ICommand OpenWarhammer2PacksCommand { get; set; }
         public ICommand OpenTroyPacksCommand { get; set; }
-
+        public ICommand OpenAttilaPacksCommand { get; set; }
 
         public ICommand OpenHelpCommand { get; set; }
         public ICommand OpenPatreonCommand { get; set; }
@@ -83,8 +83,7 @@ namespace AssetEditor.ViewModels
             OpenSuperViewToolCommand = new RelayCommand(OpenSuperViewTool);
             OpenTechSkeletonEditorCommand = new RelayCommand(OpenTechSkeletonEditor);
 
-
-
+            OpenAttilaPacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Attila));
             OpenRome2RePacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Rome_2_Remastered));
             OpenThreeKingdomsPacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.ThreeKingdoms));
             OpenWarhammer2PacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Warhammer2));

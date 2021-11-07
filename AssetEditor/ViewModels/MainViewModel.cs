@@ -6,6 +6,7 @@ using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using FileTypes.AnimationPack;
 using FileTypes.DB;
+using FileTypes.FastBin;
 using FileTypes.PackFiles.Models;
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor;
@@ -71,13 +72,14 @@ namespace AssetEditor.ViewModels
                     var loadRes = _packfileService.LoadAllCaFiles(gamePath, gameName);
                     if (!loadRes)
                         MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
-                    
-                    //new AnimMetaBatchProcessor().BatchProcess(_packfileService, schemaManager, gameName);
                 }
             }
           
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
+                //_packfileService.Load(@"C:\Users\ole_k\AssetEditor\MyStuff\TroyBmdFile.pack");
+                //new FastBinParser().ParseFile(_packfileService.FindFile(@"sky_troy_generic_01.bmd.bmd"));
+                //new FastBinParser().ParseFile(_packfileService.FindFile(@"troy_siege_model_01.bmd"));
 
                 //var invMatrixPackFile = _packfileService.FindFile(@"animations\skeletons\advisorcrow01.bone_inv_trans_mats");
                 //
@@ -116,8 +118,14 @@ namespace AssetEditor.ViewModels
                 //var soundEditor = new CommonControls.Editors.Sound.SoundEditor(packfileService);
                 //soundEditor.CreateSoundMap();
 
-                var f = packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack");
-                OpenFile(f);
+                //packfileService.DeepSearch("sea_mesh_9", false);
+                //packfileService.DeepSearch("31x11_dragonback_skew_mirror_01", false);
+
+                //OpenFile(packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack"));
+
+
+                //OpenFile(packfileService.FindFile(@"terrain\tiles\campaign\dwarf_custom\86x57_karaz_a_karak\custom_mesh.rigid_model_v2"));
+
 
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 

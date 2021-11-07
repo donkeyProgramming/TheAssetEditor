@@ -6,6 +6,14 @@ using System.Text;
 
 namespace FileTypes.PackFiles.Models
 {
+
+
+    public enum PackFileDataSourceType
+    { 
+        FileSystem,
+        PackFile,
+        Memory
+    }
     public interface IDataSource
     {
         long Size{get;}
@@ -90,6 +98,8 @@ namespace FileTypes.PackFiles.Models
         }
 
         PackedFileSourceParent _parent;
+
+        public PackedFileSourceParent Parent { get => _parent; }
         public PackedFileSource(PackedFileSourceParent parent, long offset, long length)
         {
             Offset = offset;
@@ -115,6 +125,14 @@ namespace FileTypes.PackFiles.Models
                 stream.Seek(Offset, SeekOrigin.Begin);
                 stream.Read(data, 0, size);
             }
+            return data;
+        }
+
+        public byte[] ReadDataForFastSearch(Stream knownStream)
+        {
+            byte[] data = new byte[Size];
+            knownStream.Seek(Offset, SeekOrigin.Begin);
+            knownStream.Read(data, 0, (int)Size);
             return data;
         }
 

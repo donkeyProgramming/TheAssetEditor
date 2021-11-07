@@ -42,6 +42,7 @@ namespace FileTypes.PackFiles.Models
 
         public PackFileContainer(string packFileSystemPath, BinaryReader reader, IAnimationFileDiscovered animationFileDiscovered)
         {
+            var fileNameBuffer = new byte[1024];
             SystemFilePath = packFileSystemPath;
             Name = Path.GetFileNameWithoutExtension(packFileSystemPath);
             Header = new PFHeader(reader);
@@ -65,7 +66,7 @@ namespace FileTypes.PackFiles.Models
                 if (Header.Version == "PFH5")
                     isCompressed = reader.ReadByte();   // For warhammer 2, terrain files are compressed
 
-                string fullPackedFileName = IOFunctions.TheadUnsafeReadZeroTerminatedAscii(reader).ToLower();
+                string fullPackedFileName = IOFunctions.TheadUnsafeReadZeroTerminatedAscii(reader, fileNameBuffer).ToLower();
 
                 var packFileName = Path.GetFileName(fullPackedFileName);
                 var fileContent = new PackFile(packFileName, new PackedFileSource(packedFileSourceParent, offset, size));
