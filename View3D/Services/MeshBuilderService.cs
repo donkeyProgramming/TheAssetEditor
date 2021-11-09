@@ -53,7 +53,7 @@ namespace View3D.Services
 
             output.RebuildVertexBuffer();
             output.RebuildIndexBuffer();
-
+            output.BuildBoundingBox();
             return output;
         }
 

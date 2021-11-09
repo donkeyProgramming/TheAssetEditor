@@ -218,12 +218,14 @@ namespace KitbasherEditor.Services
                     continue;
 
                 bool texturesOk = true;
-                foreach (var modelTexture in mesh.RmvModel_depricated.Textures)
+                foreach (var modelTexture in mesh.Geometry.GetTextures())
                 {
-                    if (modelTexture.Path.Contains("test_mask", StringComparison.InvariantCultureIgnoreCase))
+                    var path = modelTexture.Value;
+                    var modelTextureType = modelTexture.Key;
+
+                    if (path.Contains("test_mask", StringComparison.InvariantCultureIgnoreCase))
                         continue;
 
-                    var modelTextureType = modelTexture.TexureType;
                     var materialHasTexture = material.Textures.TryGetValue(modelTextureType, out var materialTexurePath);
                     if (materialHasTexture == false)
                     {
@@ -231,7 +233,7 @@ namespace KitbasherEditor.Services
                         break;
                     }
 
-                    var arePathsEqual = materialTexurePath.Contains(modelTexture.Path, StringComparison.InvariantCultureIgnoreCase);
+                    var arePathsEqual = materialTexurePath.Contains(path, StringComparison.InvariantCultureIgnoreCase);
                     if (arePathsEqual == false)
                     {
                         texturesOk = false;

@@ -2,6 +2,7 @@
 using Common;
 using Common.ApplicationSettings;
 using Common.GameInformation;
+using CommonControls.Common;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using FileTypes.AnimationPack;
@@ -77,6 +78,9 @@ namespace AssetEditor.ViewModels
           
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
+
+                DecoderHelper instance = DecoderHelper.CreateTestInstance(_packfileService);
+
                 //_packfileService.Load(@"C:\Users\ole_k\AssetEditor\MyStuff\TroyBmdFile.pack");
                 //new FastBinParser().ParseFile(_packfileService.FindFile(@"sky_troy_generic_01.bmd.bmd"));
                 //new FastBinParser().ParseFile(_packfileService.FindFile(@"troy_siege_model_01.bmd"));
@@ -129,7 +133,7 @@ namespace AssetEditor.ViewModels
 
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 
-                //KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
+                KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);
 

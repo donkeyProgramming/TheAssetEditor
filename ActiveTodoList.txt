@@ -295,12 +295,31 @@ Target
 https://answers.unity.com/questions/424974/nearest-point-on-mesh.html
 
 
+--
+Textures not saving 
+Check ws model generation 
+Test mesh combiner 
+Test boundingbox
+Test pivot 
+--
 
 
 
 
 
+terrain\tiles\campaign\cliff_custom\6x4_inner_right_t1_r3\custom_mesh.rigid_model_v2
+
+terrain\tiles\campaign\dwarf_custom\86x57_karaz_a_karak\custom_mesh.rigid_model_v2
 
 
+vert count = 1370
+vert start = 588
+face start = 49908
+size diff = 79320
+
+total vert size = 49320
+
+index size = 2
+vert size = 36
 
 

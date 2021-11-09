@@ -34,6 +34,14 @@ namespace View3D.SceneNodes
 
         public override Matrix ModelMatrix { get => base.ModelMatrix; set => UpdateModelMatrix(value); }
 
+        public PbrShader Effect { get; private set; }
+        public int LodIndex { get; set; } = -1;
+        public MeshObject Geometry { get; set; }
+
+        bool _isSelectable = true;
+        public bool IsSelectable { get => _isSelectable; set => SetAndNotifyWhenChanged(ref _isSelectable, value); }
+        public bool ReduceMeshOnLodGeneration { get; set; } = true;
+
         private void UpdateModelMatrix(Matrix value)
         {
             base.ModelMatrix = value;
@@ -69,45 +77,38 @@ namespace View3D.SceneNodes
             {
                 Effect = new PbrShader(resourceLib);
                 Texture2D diffuse = LoadTexture(TexureType.Diffuse);
-                if(diffuse == null)
+                if (diffuse == null)
                     diffuse = LoadTexture(TexureType.Diffuse_alternative);
                 Texture2D specTexture = LoadTexture(TexureType.Specular);
                 Texture2D normalTexture = LoadTexture(TexureType.Normal);
                 Texture2D glossTexture = LoadTexture(TexureType.Gloss);
 
-                (Effect as IShaderTextures).SetTexture(diffuse, TexureType.Diffuse);
-                (Effect as IShaderTextures).SetTexture(specTexture, TexureType.Specular);
-                (Effect as IShaderTextures).SetTexture(normalTexture, TexureType.Normal);
-                (Effect as IShaderTextures).SetTexture(glossTexture, TexureType.Gloss);
-            }
-
-            Texture2D LoadTexture(TexureType type)
-            {
-                var texture = rmvSubModel.GetTexture(type);
-                if (texture == null)
-                    return null;
-                return resourceLib.LoadTexture(texture.Value.Path);
+                Effect.SetTexture(diffuse, TexureType.Diffuse);
+                Effect.SetTexture(specTexture, TexureType.Specular);
+                Effect.SetTexture(normalTexture, TexureType.Normal);
+                Effect.SetTexture(glossTexture, TexureType.Gloss);
             }
         }
 
-        public IShader Effect { get; set; }
-        public int LodIndex { get; set; } = -1;
+        Texture2D LoadTexture(TexureType type)
+        {
+            var texture = RmvModel_depricated.GetTexture(type);
+            if (texture == null)
+                return null;
+
+            Geometry.UpdateTexture(type, texture.Value.Path);
+            return _resourceLib.LoadTexture(texture.Value.Path);
+        }
+
+
+
 
         internal RmvSubModel CreateRmvSubModel(RmvVersionEnum version)
         {
             return MeshBuilderService.CreateRmvSubModel(RmvModel_depricated, Geometry, version);
         }
 
-        public MeshObject Geometry { get; set; }
-
-        bool _isSelectable = true;
-        public bool IsSelectable { get => _isSelectable; set => SetAndNotifyWhenChanged(ref _isSelectable, value); }
-        public bool ReduceMeshOnLodGeneration { get; set; } = true;
-
-        public void Update(GameTime time)
-        {
-
-        }
+        public void Update(GameTime time) { }
 
         public Rmv2ModelNode GetParentModel()
         {
@@ -127,75 +128,53 @@ namespace View3D.SceneNodes
             return MathUtil.GetCenter(Geometry.BoundingBox) + Position;
         }
 
-
         public void UpdateTexture(string path, TexureType texureType)
         {
             var texture = _resourceLib.LoadTexture(path);
-            (Effect as IShaderTextures).SetTexture(texture, texureType);
-
-            for (int i = 0; i < RmvModel_depricated.Textures.Count; i++)
-            {
-                if (RmvModel_depricated.Textures[i].TexureType == texureType)
-                {
-                    var tex = RmvModel_depricated.Textures[i];
-                    tex.Path = path;
-                    RmvModel_depricated.Textures[i] = tex;
-                    break;
-                }
-            }
+            Effect.SetTexture(texture, texureType);
+            Geometry.UpdateTexture(texureType, path);
         }
 
         public void UseTexture(TexureType texureType, bool value)
         {
-            (Effect as IShaderTextures).UseTexture(value, texureType);
+            Effect.UseTexture(value, texureType);
         }
 
         public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)
-        {
-            if (Effect is IShaderAnimation animationEffect)
+        {         
+            Matrix[] data = new Matrix[256];
+            for (int i = 0; i < 256; i++)
+                data[i] = Matrix.Identity;
+
+            if (AnimationPlayer != null)
             {
-                Matrix[] data = new Matrix[256];
-                for (int i = 0; i < 256; i++)
-                    data[i] = Matrix.Identity;
-
-                if (AnimationPlayer != null)
+                var frame = AnimationPlayer.GetCurrentAnimationFrame();
+                if (frame != null)
                 {
-                    var frame = AnimationPlayer.GetCurrentAnimationFrame();
-                    if (frame != null)
-                    {
-                        for (int i = 0; i < frame.BoneTransforms.Count(); i++)
-                            data[i] = frame.BoneTransforms[i].WorldTransform;
-                    }
+                    for (int i = 0; i < frame.BoneTransforms.Count(); i++)
+                        data[i] = frame.BoneTransforms[i].WorldTransform;
                 }
-
-                animationEffect.SetAnimationParameters(data, (Geometry as Rendering.Geometry.MeshObject).WeightCount);
-                animationEffect.UseAnimation = AnimationPlayer.IsEnabled;
             }
 
-
+            Effect.SetAnimationParameters(data, Geometry.WeightCount);
+            Effect.UseAnimation = AnimationPlayer.IsEnabled;
+            
             if(AttachmentBoneResolver != null)
                 parentWorld = parentWorld * AttachmentBoneResolver.GetWorldTransformIfAnimating();
 
-            if (Effect is IShaderTextures tetureEffect)
-                tetureEffect.UseAlpha = Geometry.Alpha == AlphaMode.Alpha_Test;
+            Effect.UseAlpha = Geometry.Alpha == AlphaMode.Alpha_Test;
 
-            var pivotPos = GetPivot();
-            var modelWithOffset = ModelMatrix * Matrix.CreateTranslation(pivotPos);
+            var modelWithOffset = ModelMatrix * Matrix.CreateTranslation(Geometry.Pivot);
             RenderMatrix = modelWithOffset;
 
             renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeoRenderItem() { Geometry = Geometry, ModelMatrix = modelWithOffset * parentWorld, Shader = Effect });
 
             if (DisplayPivotPoint)
-                renderEngine.AddRenderItem(RenderBuckedId.Normal, new LocatorRenderItem(_resourceLib.GetStaticEffect(ShaderTypes.Line), pivotPos, 1));
+                renderEngine.AddRenderItem(RenderBuckedId.Normal, new LocatorRenderItem(_resourceLib.GetStaticEffect(ShaderTypes.Line), Geometry.Pivot, 1));
 
             if (DisplayBoundingBox)
-            {
-                var bb = new BoundingBox(new Vector3(RmvModel_depricated.Header.BoundingBox.MinimumX, RmvModel_depricated.Header.BoundingBox.MinimumY, RmvModel_depricated.Header.BoundingBox.MinimumZ),
-                    new Vector3(RmvModel_depricated.Header.BoundingBox.MaximumX, RmvModel_depricated.Header.BoundingBox.MaximumY, RmvModel_depricated.Header.BoundingBox.MaximumZ));
-                renderEngine.AddRenderItem(RenderBuckedId.Normal, new BoundingBoxRenderItem(_resourceLib.GetStaticEffect(ShaderTypes.Line), bb));
-            }
+                renderEngine.AddRenderItem(RenderBuckedId.Normal, new BoundingBoxRenderItem(_resourceLib.GetStaticEffect(ShaderTypes.Line), Geometry.BoundingBox));
         }
-
 
         public override ISceneNode CreateCopyInstance() => new Rmv2MeshNode();
 
@@ -211,31 +190,19 @@ namespace View3D.SceneNodes
             typedTarget.AnimationPlayer = AnimationPlayer;
             typedTarget.RmvModel_depricated = RmvModel_depricated.Clone();
             typedTarget._resourceLib = _resourceLib;
-            typedTarget.Effect = Effect.Clone();
+            typedTarget.Effect = Effect.Clone() as PbrShader;
             typedTarget.Geometry = Geometry.Clone();
             base.CopyInto(target);
         }
 
-
         public void UpdatePivotPoint(Vector3 newPiv)
         {
-            var header = RmvModel_depricated.Header;
-            var transform = header.Transform;
-
-            transform.Pivot = new Filetypes.RigidModel.Transforms.RmvVector3((float)newPiv.X, (float)newPiv.Y, (float)newPiv.Z);
-
-            header.Transform = transform;
-            RmvModel_depricated.Header = header;
-        }
-
-        public Vector3 GetPivot()
-        { 
-            return new Vector3(RmvModel_depricated.Header.Transform.Pivot.X, RmvModel_depricated.Header.Transform.Pivot.Y, RmvModel_depricated.Header.Transform.Pivot.Z); ;
+            Geometry.Pivot = newPiv;
         }
 
         public void RecomputeBoundingBox()
         {
-            RmvModel_depricated.UpdateBoundingBox(BoundingBox.CreateFromPoints(Geometry.GetVertexList()));
+            Geometry.BuildBoundingBox();
         }
     }
 

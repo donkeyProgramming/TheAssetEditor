@@ -38,7 +38,6 @@ namespace Filetypes.ByteParsing
         bool CanDecode(byte[] buffer, int index, out int bytesRead, out string error);
         byte[] Encode(string value, out string error);
         string DefaultValue();
-
     }
 
     public interface SpesificByteParser<T> : IByteParser
@@ -58,7 +57,7 @@ namespace Filetypes.ByteParsing
         public abstract byte[] EncodeValue(T value, out string error);
         public abstract byte[] Encode(string value, out string error);
 
-        public bool CanDecode(byte[] buffer, int index, out int bytesRead, out string _error)
+        public virtual bool CanDecode(byte[] buffer, int index, out int bytesRead, out string _error)
         {
             if (buffer.Length - index < FieldSize)
             {
@@ -74,11 +73,11 @@ namespace Filetypes.ByteParsing
         public virtual bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string _error)
         {
             var result = TryDecodeValue(buffer, index, out T temp, out bytesRead, out _error);
-            value = temp.ToString();
+            value = temp?.ToString();
             return result;
         }
 
-        public bool TryDecodeValue(byte[] buffer, int index, out T value, out int bytesRead, out string _error)
+        public virtual bool TryDecodeValue(byte[] buffer, int index, out T value, out int bytesRead, out string _error)
         {
             value = default;
             bool canDecode = CanDecode(buffer, index, out bytesRead, out _error);
@@ -456,6 +455,22 @@ namespace Filetypes.ByteParsing
 
             return EncodeValue(new Half(spesificValue), out error);
         }
+
+        public override bool TryDecodeValue(byte[] buffer, int index, out Half value, out int bytesRead, out string _error)
+        {
+            var res = base.TryDecodeValue(buffer, index, out value, out bytesRead, out _error);
+            if (res)
+            {
+                if (float.IsNaN(value))
+                {
+                    bytesRead = 0;
+                    _error = "Value is NAN";
+                    return false;
+                }
+            }
+
+            return res;
+        }
     }
 
     public class ShortParser : NumberParser<short>
@@ -765,6 +780,73 @@ namespace Filetypes.ByteParsing
         }
     }
 
+    public class FixedStringParser : NumberParser<string>
+    {
+        public override string TypeName { get { return "FixedString[" + FieldSize + "]"; } }
+        public override DbTypesEnum Type => DbTypesEnum.Byte;
+
+        protected override int FieldSize => _stringLength;
+
+        int _stringLength;
+
+        public FixedStringParser(int length)
+        {
+            _stringLength = length;
+        }
+
+        protected override string Decode(byte[] buffer, int index)
+        {
+            return Encoding.ASCII.GetString(buffer, index, FieldSize);
+        }
+
+        public override byte[] EncodeValue(string value, out string error)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override byte[] Encode(string value, out string error)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool CanDecode(byte[] buffer, int index, out int bytesRead, out string _error)
+        {
+            if (buffer.Length - index < FieldSize)
+            {
+                bytesRead = 0;
+                _error = "Not enough space in stream";
+                return false;
+            }
+
+            for (int i = 0; i < FieldSize; i++)
+            {
+                var b = buffer[index + i];
+                //var t = Encoding.ASCII.GetString(buffer, index + i, 1)[0];
+                bool isAscii = b < 128;
+                if (!isAscii)
+                {
+                    bytesRead = 0;
+                    _error = "Contains invalid ANCII chars : " + b;
+                    return false;
+                }
+            }
+
+            var value = Decode(buffer, index);
+            var hasInvalidChars =  FilePathHasInvalidChars(value);
+            if (hasInvalidChars)
+                _error = "Contains invalid chars for path : " + value;
+
+            bytesRead = FieldSize;
+            _error = null;
+            return true;
+        }
+
+        bool FilePathHasInvalidChars(string path)
+        {
+            return !string.IsNullOrEmpty(path) && path.IndexOfAny(System.IO.Path.GetInvalidPathChars()) >= 0;
+        }
+    }
+
     public class StringAsciiParser : StringParser
     {
         public override string TypeName { get { return "StringAscii"; } }
@@ -808,6 +890,6 @@ namespace Filetypes.ByteParsing
         public static OptionalStringAsciiParser OptStringAscii { get; set; } = new OptionalStringAsciiParser();
         public static StringAsciiParser StringAscii { get; set; } = new StringAsciiParser();
 
-        public static IByteParser[] GetAllParsers() {  return new IByteParser[]{ Byte , Int32 , Int64 , UInt32 ,Single, Float16, Short, UShort, Bool, OptString, String, OptStringAscii, StringAscii}; }
+        public static IByteParser[] GetAllParsers() {  return new IByteParser[]{ Byte , Int32 , Int64 , UInt32, Single, Float16, Short, UShort, Bool, OptString, String, OptStringAscii, StringAscii}; }
     }
 }

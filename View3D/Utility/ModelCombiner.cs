@@ -21,46 +21,43 @@ namespace View3D.Utility
                     if (outerLoopItem == innerLoopItem)
                         continue;
 
+                    var model0Name = outerLoopItem.Name;
+                    var model1Name = innerLoopItem.Name;
+
                     // Textures
-                    if (!ValidateTextures(outerLoopItem.RmvModel_depricated, innerLoopItem.RmvModel_depricated, out string textureErrorMsg))
-                    {
-                        //errors.Add("Texture -> " + textureErrorMsg);
+                    if (!ValidateTextures(outerLoopItem.Geometry, model0Name, innerLoopItem.Geometry, model1Name, out string textureErrorMsg))
                         errors.Error("Texture", textureErrorMsg);
-                    }
 
                     // Vertex type
-                    if (outerLoopItem.RmvModel_depricated.Header.VertextType != innerLoopItem.RmvModel_depricated.Header.VertextType)
-                    {
-                        errors.Error("VertexType", $"{outerLoopItem.RmvModel_depricated.Header.ModelName} has a different vertex type then {innerLoopItem.RmvModel_depricated.Header.ModelName}");
-                    }
+                    if (outerLoopItem.Geometry.VertexFormat != innerLoopItem.Geometry.VertexFormat)
+                        errors.Error("VertexType", $"{model0Name} has a different vertex type then {model1Name}");
 
                     // Alpha mode
                     if (outerLoopItem.Geometry.Alpha != innerLoopItem.Geometry.Alpha)
-                    {
-                        errors.Error("AlphaSettings mode", $"{outerLoopItem.RmvModel_depricated.Header.ModelName} has a different AlphaSettings mode then {innerLoopItem.RmvModel_depricated.Header.ModelName}");
-                    }
+                        errors.Error("AlphaSettings mode", $"{model0Name} has a different AlphaSettings mode then {model1Name}");
                 }
             }
 
             return errors.Errors.Count == 0;
         }
 
-        private bool ValidateTextures(RmvSubModel item0, RmvSubModel item1, out string textureErrorMsg)
+        private bool ValidateTextures(MeshObject item0, string item0Name, MeshObject item1, string item1Name, out string textureErrorMsg)
         {
-            if (item0.Textures.Count != item1.Textures.Count)
+            var textureList0 = item0.GetTextures();
+            var textureList1 = item1.GetTextures();
+            if (textureList0.Count != textureList1.Count())
             {
-                textureErrorMsg = $"{item0.Header.ModelName} has a different number of textures then {item1.Header.ModelName}";
+                textureErrorMsg = $"{item0Name} has a different number of textures then {item1Name}";
                 return false;
             }
 
-            foreach (var texture in item0.Textures)
+            foreach (var item in textureList0)
             {
-                var res = item1.Textures.Count(x => x.Path == texture.Path);
-                if (res != 1)
-                {
-                    textureErrorMsg = $"{item1.Header.ModelName} does not contain texture {texture.Path}";
-                    return false;
-                }
+                if (textureList1.ContainsKey(item.Key) && textureList1[item.Key] == textureList0[item.Key])
+                    continue;
+
+                textureErrorMsg = $"{item1Name} does not contain texture {item.Key}";
+                return false;
             }
 
             textureErrorMsg = null;

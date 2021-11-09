@@ -66,35 +66,6 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                    <Label Width="100">Attachments</Label>
-                    <Label>:</Label>
-                    <StackPanel>
-                        <Expander>
-                            <Expander.Header>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Count = "/>
-                                    <TextBlock Text="{Binding Animation.AttachmentPoints.Count, UpdateSourceTrigger=PropertyChanged}"/>
-
-                                </StackPanel>
-                            </Expander.Header>
-
-                            <StackPanel>
-                                <ListView ItemsSource="{Binding Animation.AttachmentPoints}" MaxHeight="350" >
-
-                                    <ListView.View>
-                                        <GridView>
-                                            <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"/>
-                                            <GridViewColumn Header="BoneIndex" DisplayMemberBinding="{Binding BoneIndex}"/>
-                                        </GridView>
-                                    </ListView.View>
-                                </ListView>
-
-                            </StackPanel>
-                        </Expander>
-                    </StackPanel>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                     <Label Width="100">Animation Bones</Label>
                     <Label>:</Label>
                     <StackPanel>

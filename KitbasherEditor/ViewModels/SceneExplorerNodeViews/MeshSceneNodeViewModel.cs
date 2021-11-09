@@ -67,7 +67,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         {
             _meshNode = node;
             _componentManager = componentManager;
-            Pivot = new Vector3ViewModel(_meshNode.RmvModel_depricated.Header.Transform.Pivot.X, _meshNode.RmvModel_depricated.Header.Transform.Pivot.Y, _meshNode.RmvModel_depricated.Header.Transform.Pivot.Z);
+            Pivot = new Vector3ViewModel(_meshNode.Geometry.Pivot);
             Pivot.OnValueChanged += Pivot_OnValueChanged;
             CopyPivotToAllMeshesCommand = new RelayCommand(CopyPivotToAllMeshes);
             RecomputeBoundingBoxCommand = new RelayCommand(RecomputeBoundingBox);
@@ -81,9 +81,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         void UpdateModelName(string newName)
         {
-            var header = _meshNode.RmvModel_depricated.Header;
-            header.ModelName = newName;
-            _meshNode.RmvModel_depricated.Header = header;
             _meshNode.Name = newName;
         }
 
@@ -116,8 +113,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         int _linkDirectlyToBoneIndex;
         public int LinkDirectlyToBoneIndex { get { return _linkDirectlyToBoneIndex; } set { SetAndNotify(ref _linkDirectlyToBoneIndex, value); } }
 
-        List<RmvAttachmentPoint> _attachemntPoints;
-        public List<RmvAttachmentPoint> AttachmentPoints { get { return _attachemntPoints; } set { SetAndNotify(ref _attachemntPoints, value); } }
 
         List<AnimatedBone> _animatedBones;
         public List<AnimatedBone> AnimatedBones { get { return _animatedBones; } set { SetAndNotify(ref _animatedBones, value); } }
@@ -133,7 +128,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
             SkeletonName = _meshNode.Geometry.ParentSkeletonName;
             LinkDirectlyToBoneIndex = _meshNode.RmvModel_depricated.Header.MatrixIndex;
-            AttachmentPoints = _meshNode.RmvModel_depricated.AttachmentPoints.OrderBy(x => x.BoneIndex).ToList();
 
             var skeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, SkeletonName);
             var bones = _meshNode.Geometry.GetUniqeBlendIndices();

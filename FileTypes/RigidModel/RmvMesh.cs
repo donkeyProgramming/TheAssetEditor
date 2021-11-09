@@ -200,7 +200,6 @@ namespace Filetypes.RigidModel
     [Serializable]
     public struct RmvShaderParams
     {
-
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 12)]
         byte[] _shaderName;
 

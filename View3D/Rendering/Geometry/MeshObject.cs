@@ -25,6 +25,9 @@ namespace View3D.Rendering.Geometry
         public string ParentSkeletonName { get; set; }
 
 
+        Dictionary<TexureType, string> _textures { get; set; } = new Dictionary<TexureType, string>();
+
+
         public MeshObject(IGraphicsCardGeometry context, string skeletonName)
         {
             ParentSkeletonName = skeletonName;
@@ -44,6 +47,9 @@ namespace View3D.Rendering.Geometry
             mesh.WeightCount = WeightCount;
             mesh.VertexFormat = VertexFormat;
 
+            foreach (var item in _textures)
+                mesh._textures.Add(item.Key, item.Value);
+
             if (includeMesh)
             {
                 mesh.IndexArray = new ushort[IndexArray.Length];
@@ -57,6 +63,23 @@ namespace View3D.Rendering.Geometry
             }
 
             return mesh;
+        }
+
+        public void UpdateTexture(TexureType type, string texturePath)
+        {
+            _textures[type] = texturePath;
+        }
+
+        public string GetTexturePath(TexureType type)
+        {
+            if (_textures.ContainsKey(type))
+                return _textures[type];
+            return null;
+        }
+
+        public Dictionary<TexureType, string> GetTextures()
+        {
+            return _textures;
         }
 
         public Vector3 GetVertexById(int id)
@@ -397,7 +420,7 @@ namespace View3D.Rendering.Geometry
             RebuildIndexBuffer();
         }
 
-        void BuildBoundingBox()
+        public void BuildBoundingBox()
         {
             var count = VertexCount();
             if (count == 0)
