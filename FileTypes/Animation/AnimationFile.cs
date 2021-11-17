@@ -9,7 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-namespace Filetypes.RigidModel
+namespace Filetypes.Animation
 {
 
     /*

@@ -1,5 +1,6 @@
 ﻿using Common;
 using CommonControls.Services;
+using Filetypes.Animation;
 using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;

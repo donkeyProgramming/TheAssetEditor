@@ -28,6 +28,13 @@ namespace Filetypes.RigidModel.Transforms
             Z = z;
         }
 
+        public RmvVector3(Vector3 vector)
+        {
+            X = vector.X;
+            Y = vector.Y;
+            Z = vector.Z;
+        }
+
         public override string ToString()
         {
             return $"{X}, {Y}, {Z}";

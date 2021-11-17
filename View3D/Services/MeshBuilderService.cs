@@ -4,6 +4,7 @@ using Filetypes.RigidModel.Vertex;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
@@ -12,24 +13,21 @@ namespace View3D.Services
 {
     public class MeshBuilderService
     {
-        public static MeshObject BuildMeshFromRmvModel(RmvSubModel modelPart, string skeletonName, IGraphicsCardGeometry context)
+        public static MeshObject BuildMeshFromRmvModel(RmvModel modelPart, string skeletonName, IGraphicsCardGeometry context)
         {
             var output = new MeshObject(context, skeletonName);
-            output.Alpha = modelPart.GetAlphaMode();
-
-            output.Pivot = new Vector3(modelPart.Header.Transform.Pivot.X, modelPart.Header.Transform.Pivot.Y, modelPart.Header.Transform.Pivot.Z);
             output.VertexArray = new VertexPositionNormalTextureCustom[modelPart.Mesh.VertexList.Length];
             output.IndexArray = (ushort[])modelPart.Mesh.IndexList.Clone();
-            output.ChangeVertexType(modelPart.Header.VertextType, skeletonName);
+            output.ChangeVertexType(modelPart.Material.VertexType, skeletonName);
 
             for (int i = 0; i < modelPart.Mesh.VertexList.Length; i++)
             {
                 var vertex = modelPart.Mesh.VertexList[i];
-                output.VertexArray[i].Position = vertex.Postition.ToVector4(1);
-                output.VertexArray[i].Normal = vertex.Normal.ToVector3();
-                output.VertexArray[i].BiNormal = vertex.BiNormal.ToVector3();
-                output.VertexArray[i].Tangent = vertex.Tangent.ToVector3();
-                output.VertexArray[i].TextureCoordinate = vertex.Uv.ToVector2();
+                output.VertexArray[i].Position = vertex.Position;
+                output.VertexArray[i].Normal = vertex.Normal;
+                output.VertexArray[i].BiNormal = vertex.BiNormal;
+                output.VertexArray[i].Tangent = vertex.Tangent;
+                output.VertexArray[i].TextureCoordinate = vertex.Uv;
 
                 if (output.VertexFormat == VertexFormat.Static)
                 {
@@ -43,7 +41,6 @@ namespace View3D.Services
                 }
                 else if (output.VertexFormat == VertexFormat.Cinematic)
                 {
-
                     output.VertexArray[i].BlendIndices = new Vector4(vertex.BoneIndex[0], vertex.BoneIndex[1], vertex.BoneIndex[2], vertex.BoneIndex[3]);
                     output.VertexArray[i].BlendWeights = new Vector4(vertex.BoneWeight[0], vertex.BoneWeight[1], vertex.BoneWeight[2], vertex.BoneWeight[3]);
                 }
@@ -57,21 +54,16 @@ namespace View3D.Services
             return output;
         }
 
-
-
-        public static RmvSubModel CreateRmvSubModel(RmvSubModel baseModel, MeshObject geometry, RmvVersionEnum version)
+        public static RmvModel CreateRmvSubModel(RmvModel baseModel, MeshObject geometry, RmvVersionEnum version)
         {
             var newSubModel = baseModel.Clone();
-            newSubModel.SetAlphaMode(geometry.Alpha);
-            newSubModel.Mesh = CreateRmvFileMesh(geometry, version);
+            newSubModel.Mesh = CreateRmvFileMesh(geometry);
             return newSubModel;
         }
 
-        public static RmvMesh CreateRmvFileMesh(MeshObject geometry, RmvVersionEnum version)
-        {
-            RmvMesh mesh = new RmvMesh();
-            mesh.IndexList = geometry.GetIndexBuffer().ToArray();
 
+        public static RmvMesh CreateRmvFileMesh(MeshObject geometry)
+        {
             // Ensure normalized
             for (int i = 0; i < geometry.VertexArray.Length; i++)
             {
@@ -80,72 +72,23 @@ namespace View3D.Services
                 geometry.VertexArray[i].Tangent = Vector3.Normalize(geometry.VertexArray[i].Tangent);
             }
 
-            switch (geometry.VertexFormat)
-            {
-                case VertexFormat.Static:
-                    mesh.VertexList = new StaticVertex[geometry.VertexCount()];
-                    break;
-
-                case VertexFormat.Weighted:
-                    mesh.VertexList = new WeightedVertex[geometry.VertexCount()];
-                    break;
-
-                case VertexFormat.Cinematic:
-                    mesh.VertexList = new CinematicVertex[geometry.VertexCount()];
-                    break;
-
-                default:
-                    throw new NotImplementedException();
-            }
-
-            
-            for (int i = 0; i < mesh.VertexList.Length; i++)
-            {
-                var pos = new RmvVector4(geometry.VertexArray[i].Position.X, geometry.VertexArray[i].Position.Y, geometry.VertexArray[i].Position.Z, 1);
-                var uv = new RmvVector2(geometry.VertexArray[i].TextureCoordinate.X, geometry.VertexArray[i].TextureCoordinate.Y);
-                var normal = new RmvVector3(geometry.VertexArray[i].Normal.X, geometry.VertexArray[i].Normal.Y, geometry.VertexArray[i].Normal.Z);
-                var biNormal = new RmvVector3(geometry.VertexArray[i].BiNormal.X, geometry.VertexArray[i].BiNormal.Y, geometry.VertexArray[i].BiNormal.Z);
-                var tanget = new RmvVector3(geometry.VertexArray[i].Tangent.X, geometry.VertexArray[i].Tangent.Y, geometry.VertexArray[i].Tangent.Z);
-
-                BaseVertex.ColourData? colourData = null;
-                if (version == RmvVersionEnum.RMV2_V8)
+            RmvMesh mesh = new RmvMesh();
+            mesh.IndexList = geometry.GetIndexBuffer().ToArray();
+            mesh.VertexList = geometry.VertexArray.
+                Select(x => new CommonVertex()
                 {
-                    colourData = new BaseVertex.ColourData()
-                    {
-                        Colour = new byte[4] { 0, 0, 0, 255 }
-                    };
-                }
+                    Position = x.Position,
+                    Normal = x.Normal,
+                    BiNormal = x.BiNormal,
+                    Tangent = x.Tangent,
 
-                switch (geometry.VertexFormat)
-                {
-                    case VertexFormat.Static:
-                        mesh.VertexList[i] = new StaticVertex(pos, uv, normal, biNormal, tanget);
-                        break;
+                    Colour = new Vector4(0,0,0,1),
+                    Uv = x.TextureCoordinate,
 
-                    case VertexFormat.Weighted:             
-                        var boneBlendInfo2 =  new BaseVertex.BoneInformation[2]
-                        {
-                            new BaseVertex.BoneInformation( (byte)geometry.VertexArray[i].BlendIndices.X, geometry.VertexArray[i].BlendWeights.X),
-                            new BaseVertex.BoneInformation( (byte)geometry.VertexArray[i].BlendIndices.Y, geometry.VertexArray[i].BlendWeights.Y),
-                        };
-
-                        mesh.VertexList[i] = new WeightedVertex(pos, uv, normal, biNormal, tanget, boneBlendInfo2, colourData);
-                        break;
-
-                    case VertexFormat.Cinematic:
-                        var boneBlendInfo4 = new BaseVertex.BoneInformation[4]
-                        {
-                            new BaseVertex.BoneInformation( (byte)geometry.VertexArray[i].BlendIndices.X, geometry.VertexArray[i].BlendWeights.X),
-                            new BaseVertex.BoneInformation( (byte)geometry.VertexArray[i].BlendIndices.Y, geometry.VertexArray[i].BlendWeights.Y),
-                            new BaseVertex.BoneInformation( (byte)geometry.VertexArray[i].BlendIndices.Z, geometry.VertexArray[i].BlendWeights.Z),
-                            new BaseVertex.BoneInformation( (byte)geometry.VertexArray[i].BlendIndices.W, geometry.VertexArray[i].BlendWeights.W)
-                        };
-
-                        mesh.VertexList[i] = new CinematicVertex(pos, uv, normal, biNormal, tanget, boneBlendInfo4, colourData);
-                        break;
-                }
-
-            }
+                    BoneIndex = x.GetBoneIndexs().Take(geometry.WeightCount).Select(x=>(byte)x).ToArray(),
+                    BoneWeight = x.GetBoneWeights().Take(geometry.WeightCount).ToArray(),
+                    WeightCount = geometry.WeightCount
+                }).ToArray();
 
             return mesh;
         }

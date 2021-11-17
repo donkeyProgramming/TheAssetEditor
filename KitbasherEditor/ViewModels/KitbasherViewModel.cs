@@ -45,7 +45,7 @@ namespace KitbasherEditor.ViewModels
         public IPackFile ReferenceModel { get; set; }
 
         ModelLoaderService _modelLoader;
-        ModelSaverHelper _modelSaver;
+        ModelSaveHelper _modelSaver;
 
         public KitbasherViewModel(PackFileService pf, SkeletonAnimationLookUpHelper skeletonHelper )
         {
@@ -89,7 +89,7 @@ namespace KitbasherEditor.ViewModels
             var sceneManager = scene.GetComponent<SceneManager>();
             var resourceLib = scene.GetComponent<ResourceLibary>();
             _modelLoader = new ModelLoaderService(_packFileService, resourceLib, Animation, sceneManager, MainFile);
-            _modelSaver = new ModelSaverHelper(_packFileService, sceneManager, this, _modelLoader.EditableMeshNode);
+            _modelSaver = new ModelSaveHelper(_packFileService, sceneManager, this, _modelLoader.EditableMeshNode);
             MenuBar.ModelLoader = _modelLoader;
             MenuBar.General.ModelSaver = _modelSaver;
             

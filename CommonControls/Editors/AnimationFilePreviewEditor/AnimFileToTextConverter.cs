@@ -1,5 +1,6 @@
 ﻿using CommonControls.Editors.TextEditor;
 using CommonControls.Services;
+using Filetypes.Animation;
 using Filetypes.ByteParsing;
 using Filetypes.RigidModel;
 using Newtonsoft.Json;

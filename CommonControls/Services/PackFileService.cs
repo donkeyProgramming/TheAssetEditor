@@ -143,7 +143,7 @@ namespace CommonControls.Services
                                   if (str.Contains(searchStr, StringComparison.InvariantCultureIgnoreCase))
                                   {
                                       var fillPathFile = pfc.FileList.FirstOrDefault(x => x.Value == packFile).Key;
-                                      _logger.Here().Information($"Found result '{fillPathFile}' in '{packFilePath}'");
+                                      _logger.Here().Information($"Found result in '{fillPathFile}' in '{packFilePath}'");
 
                                       lock (filesWithResult)
                                       {

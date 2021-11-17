@@ -151,7 +151,7 @@ namespace View3D.Rendering
         public void Update(MeshObject geo, Matrix modelMatrix, Quaternion objectRotation, Vector3 cameraPos, VertexSelectionState selectedVertexes)
         {
             _currentInstanceCount = geo.VertexCount();
-            for (int i = 0; i < _currentInstanceCount; i++)
+            for (int i = 0; i < _currentInstanceCount && i < _maxInstanceCount; i++)
             {
                 var vertPos = Vector3.Transform(geo.GetVertexById(i), modelMatrix);
                 var distance = (cameraPos - vertPos).Length();
@@ -166,7 +166,7 @@ namespace View3D.Rendering
                 _instanceTransform[i].Colour = Vector3.Lerp(_deselectedColur, _selectedColur, selectedVertexes.VertexWeights[i]);
             
             }
-            _instanceBuffer.SetData(_instanceTransform, 0, _currentInstanceCount, SetDataOptions.None);
+            _instanceBuffer.SetData(_instanceTransform, 0, Math.Min(_currentInstanceCount, _maxInstanceCount), SetDataOptions.None);
         }
 
         private void GenerateInstanceInformation(int count)

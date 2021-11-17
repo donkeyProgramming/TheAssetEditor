@@ -1,13 +1,11 @@
-﻿using Filetypes.RigidModel;
+﻿using Filetypes.Animation;
 using Filetypes.RigidModel.Transforms;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using View3D.Animation.AnimationChange;
-using View3D.SceneNodes;
-using static Filetypes.RigidModel.AnimationFile;
+using static Filetypes.Animation.AnimationFile;
+
 
 namespace View3D.Animation
 {

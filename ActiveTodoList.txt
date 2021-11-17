@@ -297,20 +297,24 @@ https://answers.unity.com/questions/424974/nearest-point-on-mesh.html
 
 --
 Textures not saving 
-Check ws model generation 
 Test mesh combiner 
-Test boundingbox
-Test pivot 
+Test name on write 
+Duplicate mesh (generate lod without reduce) changes normlas slightly -> Easy to see on slayer head beard 
+Remove active lod selection 
 --
 
 
 
-
+kfcs
+kfp
 
 terrain\tiles\campaign\cliff_custom\6x4_inner_right_t1_r3\custom_mesh.rigid_model_v2
 
 terrain\tiles\campaign\dwarf_custom\86x57_karaz_a_karak\custom_mesh.rigid_model_v2
 
+
+terrain\campaigns\warhammer_map_1_1_wood_elves\global_meshes\land_mesh_21.rigid_model_v2
+offset = 336
 
 vert count = 1370
 vert start = 588
@@ -321,5 +325,20 @@ total vert size = 49320
 
 index size = 2
 vert size = 36
+
+
+
+Global meshes:
+	Default map?
+	
+	
+Texture_arrays:
+		Climat => textures
+		
+Stuff places on top of the map using tile_list.bin?
+
+
+252
+	
 
 

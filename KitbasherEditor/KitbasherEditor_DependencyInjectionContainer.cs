@@ -20,7 +20,7 @@ namespace KitbasherEditor
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<KitbasherViewModel, KitbasherView>(new ExtentionToTool(".rigid_model_v2"));
+            factory.RegisterTool<KitbasherViewModel, KitbasherView>(new ExtentionToTool(".rigid_model_v2", ".wsmodel.rigid_model_v2"));
         }
     }
 

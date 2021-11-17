@@ -1,18 +1,12 @@
 ﻿using Common;
 using CommonControls.Services;
 using Filetypes.RigidModel;
-using FileTypes.PackFiles.Models;
-using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor.Services;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Windows.Input;
 using View3D.SceneNodes;
-using View3D.Utility;
 using static CommonControls.FilterDialog.FilterUserControl;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews

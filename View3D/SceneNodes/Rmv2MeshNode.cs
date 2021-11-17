@@ -1,5 +1,6 @@
 ﻿using CommonControls.Common;
 using Filetypes.RigidModel;
+using FileTypes.RigidModel.MaterialHeaders;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
@@ -16,7 +17,11 @@ namespace View3D.SceneNodes
 {
     public class Rmv2MeshNode : SceneNode, ITransformable, IEditableGeometry, ISelectable, IUpdateable, IDrawableItem
     {
-        public RmvSubModel RmvModel_depricated { get; set; }
+        public RmvModel RmvModel_depricated { get; set; }
+        public IMaterial Material { get; set; }
+        public MeshObject Geometry { get; set; }
+
+        public RmvCommonHeader CommonHeader{ get; set; }
 
         Quaternion _orientation = Quaternion.Identity;
         Vector3 _position = Vector3.Zero;
@@ -36,7 +41,7 @@ namespace View3D.SceneNodes
 
         public PbrShader Effect { get; private set; }
         public int LodIndex { get; set; } = -1;
-        public MeshObject Geometry { get; set; }
+        
 
         bool _isSelectable = true;
         public bool IsSelectable { get => _isSelectable; set => SetAndNotifyWhenChanged(ref _isSelectable, value); }
@@ -59,8 +64,11 @@ namespace View3D.SceneNodes
         private Rmv2MeshNode()
         { }
 
-        public Rmv2MeshNode(RmvSubModel rmvSubModel, string skeletonName, IGraphicsCardGeometry context, ResourceLibary resourceLib, AnimationPlayer animationPlayer, MeshObject geometry = null)
+        public Rmv2MeshNode(RmvModel rmvSubModel, string skeletonName, IGraphicsCardGeometry context, ResourceLibary resourceLib, AnimationPlayer animationPlayer, MeshObject geometry = null)
         {
+            Material = rmvSubModel.Material.Clone();
+            CommonHeader = rmvSubModel.CommonHeader;
+
             RmvModel_depricated = rmvSubModel;
             _resourceLib = resourceLib;
             Geometry = geometry;
@@ -68,7 +76,7 @@ namespace View3D.SceneNodes
                 Geometry = MeshBuilderService.BuildMeshFromRmvModel(rmvSubModel, skeletonName, context);
             AnimationPlayer = animationPlayer;
 
-            Name = rmvSubModel.Header.ModelName;
+            Name = rmvSubModel.Material.ModelName;
             Position = Vector3.Zero;
             Scale = Vector3.One;
             Orientation = Quaternion.Identity;
@@ -92,7 +100,7 @@ namespace View3D.SceneNodes
 
         Texture2D LoadTexture(TexureType type)
         {
-            var texture = RmvModel_depricated.GetTexture(type);
+            var texture = Material.GetTexture(type);
             if (texture == null)
                 return null;
 
@@ -103,7 +111,7 @@ namespace View3D.SceneNodes
 
 
 
-        internal RmvSubModel CreateRmvSubModel(RmvVersionEnum version)
+        internal RmvModel CreateRmvSubModel(RmvVersionEnum version)
         {
             return MeshBuilderService.CreateRmvSubModel(RmvModel_depricated, Geometry, version);
         }
@@ -162,15 +170,15 @@ namespace View3D.SceneNodes
             if(AttachmentBoneResolver != null)
                 parentWorld = parentWorld * AttachmentBoneResolver.GetWorldTransformIfAnimating();
 
-            Effect.UseAlpha = Geometry.Alpha == AlphaMode.Alpha_Test;
+            Effect.UseAlpha = Material.AlphaMode == AlphaMode.Alpha_Test;
 
-            var modelWithOffset = ModelMatrix * Matrix.CreateTranslation(Geometry.Pivot);
+            var modelWithOffset = ModelMatrix * Matrix.CreateTranslation(Material.PivotPoint);
             RenderMatrix = modelWithOffset;
 
             renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeoRenderItem() { Geometry = Geometry, ModelMatrix = modelWithOffset * parentWorld, Shader = Effect });
 
             if (DisplayPivotPoint)
-                renderEngine.AddRenderItem(RenderBuckedId.Normal, new LocatorRenderItem(_resourceLib.GetStaticEffect(ShaderTypes.Line), Geometry.Pivot, 1));
+                renderEngine.AddRenderItem(RenderBuckedId.Normal, new LocatorRenderItem(_resourceLib.GetStaticEffect(ShaderTypes.Line), Material.PivotPoint, 1));
 
             if (DisplayBoundingBox)
                 renderEngine.AddRenderItem(RenderBuckedId.Normal, new BoundingBoxRenderItem(_resourceLib.GetStaticEffect(ShaderTypes.Line), Geometry.BoundingBox));
@@ -181,6 +189,8 @@ namespace View3D.SceneNodes
         public override void CopyInto(ISceneNode target)
         {
             var typedTarget = target as Rmv2MeshNode;
+            typedTarget.Material = Material.Clone();
+            typedTarget.CommonHeader = CommonHeader;
             typedTarget.Position = Position;
             typedTarget.Orientation = Orientation;
             typedTarget.Scale = Scale;
@@ -197,7 +207,7 @@ namespace View3D.SceneNodes
 
         public void UpdatePivotPoint(Vector3 newPiv)
         {
-            Geometry.Pivot = newPiv;
+            Material.PivotPoint = newPiv;
         }
 
         public void RecomputeBoundingBox()

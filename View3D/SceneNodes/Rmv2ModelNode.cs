@@ -9,9 +9,9 @@ namespace View3D.SceneNodes
 {
     public class Rmv2ModelNode : GroupNode
     {
-        public RmvRigidModel Model { get; set; }
+        public RmvFile Model { get; set; }
 
-        public Rmv2ModelNode(RmvRigidModel model,  ResourceLibary resourceLib, string name, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory) : base(name)
+        public Rmv2ModelNode(RmvFile model,  ResourceLibary resourceLib, string name, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory) : base(name)
         {
             Name = name;
 
@@ -41,7 +41,7 @@ namespace View3D.SceneNodes
             }
         }
 
-        public void SetModel(RmvRigidModel model, ResourceLibary resourceLibary, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory)
+        public void SetModel(RmvFile model, ResourceLibary resourceLibary, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory)
         {
             Model = model;
             for (int lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
@@ -52,7 +52,7 @@ namespace View3D.SceneNodes
                 var lodNode = Children[lodIndex];
                 for (int modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
                 {
-                    var node = new Rmv2MeshNode(model.MeshList[lodIndex][modelIndex], model.Header.SkeletonName, contextFactory.Create(), resourceLibary, animationPlayer);
+                    var node = new Rmv2MeshNode(model.ModelList[lodIndex][modelIndex], model.Header.SkeletonName, contextFactory.Create(), resourceLibary, animationPlayer);
                     node.LodIndex = lodIndex;
                     lodNode.AddObject(node);
                 }

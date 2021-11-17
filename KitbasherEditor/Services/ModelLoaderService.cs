@@ -2,6 +2,7 @@
 using CommonControls.Services;
 using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
+using FileTypes.RigidModel;
 using KitbasherEditor.ViewModels;
 using Serilog;
 using View3D.Components.Component;
@@ -38,7 +39,10 @@ namespace KitbasherEditor.Services
 
         public void LoadMainEditableModel(PackFile file)
         {
-            var rmv = new RmvRigidModel(file.DataSource.ReadData());
+            var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
+
+            //var rmv = new RmvFile();
+            //rmv.Load(file.DataSource.ReadData());
             EditableMeshNode.SetModel(rmv, _resourceLibary, _animationView.Player, GeometryGraphicsContextFactory.CreateInstance(_resourceLibary.GraphicsDevice));
             EditableMeshNode.SelectedOutputFormat = rmv.Header.Version;
 

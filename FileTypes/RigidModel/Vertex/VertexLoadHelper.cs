@@ -2,47 +2,12 @@
 using Filetypes.RigidModel.Transforms;
 using SharpDX;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Filetypes.RigidModel.Vertex
 {
-    public abstract class BaseVertex
+    public static class VertexLoadHelper
     {
-        public class BoneInformation
-        { 
-            public byte BoneIndex { get; set; }
-            public float BoneWeight { get; set; }
-
-            public BoneInformation(byte index, float weight)
-            {
-                BoneIndex = index;
-                BoneWeight = weight;
-            }
-        }
-
-        public struct ColourData
-        {
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-            public byte[] Colour;      // 4 x 1
-        }
-
-
-        public RmvVector4 Postition;
-        public RmvVector2 Uv;
-        public RmvVector4 Normal;
-        public RmvVector4 BiNormal;
-        public RmvVector4 Tangent;
-        public byte[] BoneIndex;
-        public float[] BoneWeight;
-
-        public abstract void Write(BinaryWriter writer);
-
-        protected RmvVector4 CreatVector4HalfFloat(byte[] data)
+        static public RmvVector4 CreatVector4HalfFloat(byte[] data)
         {
             ByteParsers.Float16.TryDecodeValue(data, 0, out var x, out _, out _);
             ByteParsers.Float16.TryDecodeValue(data, 2, out var y, out _, out _);
@@ -66,10 +31,34 @@ namespace Filetypes.RigidModel.Vertex
             };
         }
 
-
-        protected RmvVector4 CreatVector4Byte(byte[] data)
+        static public RmvVector4 CreatVector4Float(byte[] data)
         {
-            var v =  new RmvVector4()
+            ByteParsers.Single.TryDecodeValue(data, 0, out var x, out _, out _);
+            ByteParsers.Single.TryDecodeValue(data, 4, out var y, out _, out _);
+            ByteParsers.Single.TryDecodeValue(data, 8, out var z, out _, out _);
+            ByteParsers.Single.TryDecodeValue(data, 12, out var w, out _, out _);
+
+            if (w > 0.0f)
+            {
+                x *= w;
+                y *= w;
+                z *= w;
+                w = 0;
+            }
+
+            return new RmvVector4()
+            {
+                X = x,
+                Y = y,
+                Z = z,
+                W = w
+            };
+        }
+
+
+        static public RmvVector4 CreatVector4Byte(byte[] data)
+        {
+            var v = new RmvVector4()
             {
                 X = ByteToNormal(data[0]),
                 Y = ByteToNormal(data[1]),
@@ -88,7 +77,7 @@ namespace Filetypes.RigidModel.Vertex
             return v;
         }
 
-        protected RmvVector2 CreatVector2HalfFloat(byte[] data)
+        static public RmvVector2 CreatVector2HalfFloat(byte[] data)
         {
             ByteParsers.Float16.TryDecodeValue(data, 0, out var x, out _, out _);
             ByteParsers.Float16.TryDecodeValue(data, 2, out var y, out _, out _);
@@ -99,19 +88,19 @@ namespace Filetypes.RigidModel.Vertex
             };
         }
 
-        float ByteToNormal(byte b)
+        static public float ByteToNormal(byte b)
         {
             return (b / 255.0f * 2.0f) - 1.0f;
         }
 
-        byte NormalToByte(float f)
+        static public byte NormalToByte(float f)
         {
-           // var truncatedFloat = ((f * 255.0f) / 2.0f) + 1.0f;
+            // var truncatedFloat = ((f * 255.0f) / 2.0f) + 1.0f;
             var truncatedFloat = ((f + 1.0f) / 2.0f) * 255.0f;
             return (byte)truncatedFloat;
         }
 
-        protected byte[] CreatePositionVector4(RmvVector4 vector)
+        static public byte[] CreatePositionVector4(Microsoft.Xna.Framework.Vector4 vector)
         {
             var output = new byte[8];
             ushort[] halfs = { new Half(vector.X).RawValue, new Half(vector.Y).RawValue, new Half(vector.Z).RawValue, new Half(vector.W).RawValue };
@@ -125,7 +114,7 @@ namespace Filetypes.RigidModel.Vertex
             return output;
         }
 
-        protected byte[] CreatePositionVector2(RmvVector2 vector)
+        static public byte[] CreatePositionVector2(Microsoft.Xna.Framework.Vector2 vector)
         {
             var output = new byte[4];
             ushort[] halfs = { new Half(vector.X).RawValue, new Half(vector.Y).RawValue };
@@ -139,7 +128,7 @@ namespace Filetypes.RigidModel.Vertex
             return output;
         }
 
-        protected byte[] CreateNormalVector3(RmvVector3 vector)
+        static public byte[] CreateNormalVector3(Microsoft.Xna.Framework.Vector3 vector)
         {
             var output = new byte[4];
             output[0] = NormalToByte(vector.X);

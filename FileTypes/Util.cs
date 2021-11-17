@@ -21,7 +21,7 @@ namespace Filetypes
     }
 
 
-    class ByteHelper
+    public class ByteHelper
     {
         public static T ByteArrayToStructure<T>(byte[] bytes, int offset) where T : struct
         {
@@ -61,6 +61,15 @@ namespace Filetypes
 
                 return t;
             }
+        }
+
+        static public byte[] CreateFixLengthString(string str, int maxLength)
+        {
+            byte[] output = new byte[maxLength];
+            var byteValues = Encoding.UTF8.GetBytes(str);
+            for (int i = 0; i < byteValues.Length && i < maxLength; i++)
+                output[i] = byteValues[i];
+            return output;
         }
 
         public static int GetSize(Type type)

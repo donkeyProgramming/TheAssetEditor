@@ -1,6 +1,7 @@
 ﻿using CommonControls.Common;
 using CommonControls.ErrorListDialog;
 using CommonControls.Services;
+using Filetypes.Animation;
 using Filetypes.RigidModel;
 using FileTypes.AnimationPack;
 using FileTypes.PackFiles.Models;

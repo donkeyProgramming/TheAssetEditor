@@ -31,6 +31,14 @@ namespace Filetypes.RigidModel.LodHeader
 
         int GetHeaderSize();
 
+
         public RmvLodHeader Clone();
+    }
+
+    public interface ILodHeaderCreator
+    {
+        uint HeaderSize { get; }
+        RmvLodHeader Create(byte[] buffer, int offset);
+        byte[] Save(RmvLodHeader rmvLodHeader);
     }
 }

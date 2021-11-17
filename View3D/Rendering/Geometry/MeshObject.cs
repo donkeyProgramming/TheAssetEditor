@@ -15,18 +15,14 @@ namespace View3D.Rendering.Geometry
         public VertexPositionNormalTextureCustom[] VertexArray; // Vector3 for pos at some point
         public ushort[] IndexArray;
 
-        public Vector3 Pivot { get; set; }
         public BoundingBox BoundingBox { get; private set; }
         public Vector3 MeshCenter { get; private set; }
 
         public int WeightCount { get; private set; } = 0;
         public VertexFormat VertexFormat { get; private set; }
-        public AlphaMode Alpha { get; set; }
         public string ParentSkeletonName { get; set; }
 
-
         Dictionary<TexureType, string> _textures { get; set; } = new Dictionary<TexureType, string>();
-
 
         public MeshObject(IGraphicsCardGeometry context, string skeletonName)
         {
@@ -38,11 +34,9 @@ namespace View3D.Rendering.Geometry
         {
             var mesh = new MeshObject(Context, ParentSkeletonName);
 
-            mesh.Pivot = Pivot;
             mesh.Context = Context.Clone();
             mesh.BoundingBox = BoundingBox;
             mesh.MeshCenter = MeshCenter;
-            mesh.Alpha = Alpha;
             mesh.ParentSkeletonName = ParentSkeletonName;
             mesh.WeightCount = WeightCount;
             mesh.VertexFormat = VertexFormat;
@@ -250,6 +244,7 @@ namespace View3D.Rendering.Geometry
 
         public void ChangeVertexType(VertexFormat newFormat, string newSkeletonName)
         {
+            return;
             if (!(newFormat == VertexFormat.Weighted || newFormat == VertexFormat.Static || newFormat == VertexFormat.Cinematic))
                 throw new Exception("Not able to change vertex format into this");
 

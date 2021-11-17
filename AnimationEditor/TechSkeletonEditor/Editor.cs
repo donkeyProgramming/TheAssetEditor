@@ -4,6 +4,7 @@ using Common;
 using CommonControls.Common;
 using CommonControls.MathViews;
 using CommonControls.Services;
+using Filetypes.Animation;
 using Filetypes.RigidModel;
 using FileTypes.DB;
 using System;

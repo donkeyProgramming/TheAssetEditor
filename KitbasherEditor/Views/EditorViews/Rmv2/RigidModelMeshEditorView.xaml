@@ -45,7 +45,6 @@
                     <Label Width="100">Render BBox</Label>
                     <Label>:</Label>
                     <CheckBox  HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding General.DrawBoundingBox, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                    <Button Content="ReCompute" Margin="3" Command="{Binding General.RecomputeBoundingBoxCommand}"/>
                 </StackPanel>
 
             </DockPanel>

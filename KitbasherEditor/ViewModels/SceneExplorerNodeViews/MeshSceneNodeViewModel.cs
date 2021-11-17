@@ -5,12 +5,14 @@ using CommonControls.MathViews;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using Filetypes.RigidModel;
+using FileTypes.RigidModel.MaterialHeaders;
 using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using TextureEditor.ViewModels;
@@ -47,8 +49,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         Rmv2MeshNode _meshNode;
         IComponentManager _componentManager;
 
-
-        public string ModelName { get { return _meshNode.RmvModel_depricated.Header.ModelName; } set { UpdateModelName(value); NotifyPropertyChanged(); } }
+        public string ModelName { get { return _meshNode.Material.ModelName; } set { _meshNode.Material.ModelName = value; NotifyPropertyChanged(); } }
 
         public int VertexCount { get => _meshNode.Geometry.VertexCount(); }
         public int IndexCount { get => _meshNode.Geometry.GetIndexCount(); }
@@ -61,16 +62,15 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public Vector3ViewModel Pivot { get { return _pivot; } set { SetAndNotify(ref _pivot, value); } }
 
         public ICommand CopyPivotToAllMeshesCommand { get; set; }
-        public ICommand RecomputeBoundingBoxCommand { get; set; }
 
         public MeshSceneNodeViewModel_General(Rmv2MeshNode node, IComponentManager componentManager)
         {
             _meshNode = node;
+            _meshNode.Name = _meshNode.Material.ModelName;
             _componentManager = componentManager;
-            Pivot = new Vector3ViewModel(_meshNode.Geometry.Pivot);
+            Pivot = new Vector3ViewModel(_meshNode.Material.PivotPoint);
             Pivot.OnValueChanged += Pivot_OnValueChanged;
             CopyPivotToAllMeshesCommand = new RelayCommand(CopyPivotToAllMeshes);
-            RecomputeBoundingBoxCommand = new RelayCommand(RecomputeBoundingBox);
         }
 
         private void Pivot_OnValueChanged(Vector3ViewModel newValue)
@@ -78,11 +78,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             _meshNode.UpdatePivotPoint(new Vector3((float)newValue.X.Value, (float)newValue.Y.Value, (float)newValue.Z.Value));
            
         } 
-
-        void UpdateModelName(string newName)
-        {
-            _meshNode.Name = newName;
-        }
 
         void CopyPivotToAllMeshes()
         {
@@ -92,11 +87,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             var allMeshes = root.GetMeshesInLod(0, false);
             foreach (var mesh in allMeshes)
                 mesh.UpdatePivotPoint(newPiv);
-        }
-
-        void RecomputeBoundingBox()
-        {
-            _meshNode.RecomputeBoundingBox();
         }
     }
 
@@ -127,7 +117,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             _componentManager = componentManager; 
 
             SkeletonName = _meshNode.Geometry.ParentSkeletonName;
-            LinkDirectlyToBoneIndex = _meshNode.RmvModel_depricated.Header.MatrixIndex;
+            
+            //LinkDirectlyToBoneIndex = (_meshNode.Material as WeightedMaterial).MatrixIndex;
 
             var skeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, SkeletonName);
             var bones = _meshNode.Geometry.GetUniqeBlendIndices();
@@ -208,7 +199,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 _packfileService = packfileService;
                 _meshNode = meshNode;
                 _texureType = texureType;
-                Path = _meshNode.RmvModel_depricated.GetTexture(texureType)?.Path;
+                Path = _meshNode.Material.GetTexture(texureType)?.Path;
 
                 PreviewCommand = new RelayCommand(() => TexturePreviewController.CreateVindow(Path, _packfileService));
                 BrowseCommand = new RelayCommand(BrowseTexture);
@@ -250,12 +241,12 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         string _shaderName;
         public string ShaderName { get { return _shaderName; } set { SetAndNotify(ref _shaderName, value); } }
 
-        public GroupTypeEnum MaterialType { get { return _meshNode.RmvModel_depricated.Header.ShaderFlag; } set { UpdateGroupType(value); NotifyPropertyChanged(); } }
-        public AlphaMode AlphaModeValue { get { return _meshNode.Geometry.Alpha; } set { _meshNode.Geometry.Alpha = value; NotifyPropertyChanged(); } }
+        public ModelMaterialEnum MaterialType { get { return _meshNode.RmvModel_depricated.CommonHeader.ModelTypeFlag; } set { UpdateGroupType(value); NotifyPropertyChanged(); } }
+        public AlphaMode AlphaModeValue { get { return _meshNode.Material.AlphaMode; } set { _meshNode.Material.AlphaMode = value; NotifyPropertyChanged(); } }
         public IEnumerable<AlphaMode> PossibleAlphaModes { get; set; } = new List<AlphaMode>() { AlphaMode.Opaque, AlphaMode.Alpha_Test, AlphaMode.Alpha_Blend };
-        public string TextureDirectory { get { return _meshNode.RmvModel_depricated.Header.TextureDirectory; } set { UpdateTextureDirectory(value); NotifyPropertyChanged(); } }
+        public string TextureDirectory { get { return (_meshNode.Material as WeightedMaterial).TextureDirectory; } set { (_meshNode.Material as WeightedMaterial).TextureDirectory = value; NotifyPropertyChanged(); } }
         public bool ReduceMeshOnLodGeneration { get { return _meshNode.ReduceMeshOnLodGeneration; } set { _meshNode.ReduceMeshOnLodGeneration = value; NotifyPropertyChanged(); } }
-        public IEnumerable<GroupTypeEnum> PossibleMaterialTypes { get; set; }
+        public IEnumerable<ModelMaterialEnum> PossibleMaterialTypes { get; set; }
 
         public Dictionary<TexureType, TextureViewModel> Textures { get; set; }
 
@@ -277,11 +268,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             }
 
             if (newFormat == VertexFormat.Weighted)
-                MaterialType = GroupTypeEnum.weighted;
+                MaterialType = ModelMaterialEnum.weighted;
             else if (newFormat == VertexFormat.Static)
-                MaterialType = GroupTypeEnum.default_type;
+                MaterialType = ModelMaterialEnum.default_type;
             else if (newFormat == VertexFormat.Cinematic)
-                MaterialType = GroupTypeEnum.weighted;
+                MaterialType = ModelMaterialEnum.weighted;
             else
                 throw new Exception("Unknown vertex format, can not set grouptype");
 
@@ -297,9 +288,9 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         {
             _componentManager = componentManager;
             _meshNode = meshNode;
-            ShaderName = _meshNode.RmvModel_depricated.Header.ShaderParams.ShaderName;
-            PossibleMaterialTypes = Enum.GetValues(typeof(GroupTypeEnum)).Cast<GroupTypeEnum>();
-            PossibleVertexTypes = Enum.GetValues(typeof(VertexFormat)).Cast<VertexFormat>();
+            ShaderName = _meshNode.RmvModel_depricated.CommonHeader.ShaderParams.ShaderName;
+            PossibleMaterialTypes = Enum.GetValues(typeof(ModelMaterialEnum)).Cast<ModelMaterialEnum>();
+            PossibleVertexTypes = new VertexFormat[] { VertexFormat.Static, VertexFormat.Weighted, VertexFormat.Cinematic };
 
             Textures = new Dictionary<TexureType, TextureViewModel>();
             Textures.Add(TexureType.Diffuse, new TextureViewModel(_meshNode, pf,TexureType.Diffuse));
@@ -309,18 +300,12 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             Textures.Add(TexureType.Gloss, new TextureViewModel(_meshNode, pf, TexureType.Gloss));
         }
 
-        void UpdateTextureDirectory(string newPath)
+        void UpdateGroupType(ModelMaterialEnum value)
         {
-            var header = _meshNode.RmvModel_depricated.Header;
-            TextureDirectory = newPath;
-            _meshNode.RmvModel_depricated.Header = header;
-        }
-
-        void UpdateGroupType(GroupTypeEnum value)
-        {
-            var header = _meshNode.RmvModel_depricated.Header;
-            header.ShaderFlag = value;
-            _meshNode.RmvModel_depricated.Header = header;
+            throw new NotImplementedException("TODO");
+            //var header = _meshNode.RmvModel_depricated.Header;
+            //header.ModelTypeFlag = value;
+            //_meshNode.RmvModel_depricated.Header = header;
         }
     }
 }

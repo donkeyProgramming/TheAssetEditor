@@ -10,9 +10,9 @@ namespace Filetypes.RigidModel.Transforms
     public struct RmvTransform
     {
         public RmvVector3 Pivot;
-        RmvMatrix3x4 Matrix0;
-        RmvMatrix3x4 Matrix1;
-        RmvMatrix3x4 Matrix2;
+        public RmvMatrix3x4 Matrix0;
+        public RmvMatrix3x4 Matrix1;
+        public RmvMatrix3x4 Matrix2;
 
         public bool IsIdentityPivot()
         {

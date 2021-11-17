@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace FileTypes.RigidModel
+namespace FileTypes.Animation
 {
 	public class AnimInvMatrixFile
 	{

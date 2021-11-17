@@ -3,6 +3,7 @@ using AnimationEditor.Common.ReferenceModel;
 using CommonControls.Common;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
+using Filetypes.Animation;
 using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;

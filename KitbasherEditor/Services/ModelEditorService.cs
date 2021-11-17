@@ -1,10 +1,4 @@
-﻿using Common;
-using Filetypes.RigidModel;
-using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using View3D.SceneNodes;
+﻿using View3D.SceneNodes;
 
 namespace KitbasherEditor.Services
 {

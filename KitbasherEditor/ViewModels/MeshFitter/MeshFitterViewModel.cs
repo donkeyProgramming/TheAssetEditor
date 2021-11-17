@@ -2,6 +2,7 @@
 using CommonControls.Editors.BoneMapping;
 using CommonControls.MathViews;
 using CommonControls.Services;
+using Filetypes.Animation;
 using Filetypes.RigidModel;
 using KitbasherEditor.Views.EditorViews.MeshFitter;
 using Microsoft.Xna.Framework;

@@ -14,6 +14,12 @@ namespace Filetypes.ByteParsing
                 case DbTypesEnum.String_ascii:
                     return ByteParsers.StringAscii;
 
+                case DbTypesEnum.FixedString:
+                    return new FixedStringParser(1);
+
+                case DbTypesEnum.FixedStringAcii:
+                    return new FixedAciiStringParser(1);
+
                 case DbTypesEnum.Optstring:
                     return ByteParsers.OptString;
 

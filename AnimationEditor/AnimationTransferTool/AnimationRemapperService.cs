@@ -1,5 +1,6 @@
 ﻿using CommonControls.Common;
 using CommonControls.Editors.BoneMapping;
+using Filetypes.Animation;
 using Filetypes.RigidModel;
 using Microsoft.Xna.Framework;
 using System;

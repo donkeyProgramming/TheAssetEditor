@@ -14,6 +14,8 @@ namespace Filetypes.ByteParsing
         Byte,
         String,
         String_ascii,
+        FixedString,
+        FixedStringAcii,
         Optstring,
         Optstring_ascii,
         Int64,
@@ -210,6 +212,13 @@ namespace Filetypes.ByteParsing
 
             return EncodeValue(spesificValue, out error);
         }
+
+        public byte[] ReadArray(byte[] buffer, int index, int count)
+        {
+            byte[] destination = new byte[count];
+            Array.Copy(buffer, index, destination, 0, count);
+            return destination;
+        }
     }
 
     public class SingleParser : NumberParser<float>
@@ -227,6 +236,7 @@ namespace Filetypes.ByteParsing
         {
             var result = TryDecodeValue(buffer, index, out float temp, out bytesRead, out _error);
             value = temp.ToString("0.00000000");
+            //value = temp.ToString();
             return result;
         }
 
@@ -780,16 +790,16 @@ namespace Filetypes.ByteParsing
         }
     }
 
-    public class FixedStringParser : NumberParser<string>
+    public class FixedAciiStringParser : NumberParser<string>
     {
-        public override string TypeName { get { return "FixedString[" + FieldSize + "]"; } }
-        public override DbTypesEnum Type => DbTypesEnum.Byte;
+        public override string TypeName { get { return "FixedAsciiString[" + FieldSize + "]"; } }
+        public override DbTypesEnum Type => DbTypesEnum.FixedStringAcii;
 
         protected override int FieldSize => _stringLength;
 
         int _stringLength;
 
-        public FixedStringParser(int length)
+        public FixedAciiStringParser(int length)
         {
             _stringLength = length;
         }
@@ -847,6 +857,36 @@ namespace Filetypes.ByteParsing
         }
     }
 
+    public class FixedStringParser : NumberParser<string>
+    {
+        public override string TypeName { get { return "FixedString[" + FieldSize/2 + "]"; } }
+        public override DbTypesEnum Type => DbTypesEnum.FixedString;
+
+        protected override int FieldSize => _stringLength * 2;
+
+        int _stringLength;
+
+        public FixedStringParser(int length)
+        {
+            _stringLength = length;
+        }
+
+        protected override string Decode(byte[] buffer, int index)
+        {
+            return Encoding.Unicode.GetString(buffer, index, FieldSize);
+        }
+
+        public override byte[] EncodeValue(string value, out string error)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override byte[] Encode(string value, out string error)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class StringAsciiParser : StringParser
     {
         public override string TypeName { get { return "StringAscii"; } }
@@ -890,6 +930,6 @@ namespace Filetypes.ByteParsing
         public static OptionalStringAsciiParser OptStringAscii { get; set; } = new OptionalStringAsciiParser();
         public static StringAsciiParser StringAscii { get; set; } = new StringAsciiParser();
 
-        public static IByteParser[] GetAllParsers() {  return new IByteParser[]{ Byte , Int32 , Int64 , UInt32, Single, Float16, Short, UShort, Bool, OptString, String, OptStringAscii, StringAscii}; }
+        public static IByteParser[] GetAllParsers() {  return new IByteParser[]{ Byte , Int32 , Int64 , UInt32, Single, Float16, Short, UShort, Bool, OptString, String, OptStringAscii, StringAscii, new FixedAciiStringParser(1), new FixedStringParser(1) }; }
     }
 }

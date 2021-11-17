@@ -41,7 +41,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         SelectionManager _selectionManager;
         IEditableMeshResolver _editableMeshResolver;
         ObjectEditor _objectEditor;
-        public ModelSaverHelper ModelSaver { get; set; }
+        public ModelSaveHelper ModelSaver { get; set; }
 
         public GeneralMenuBarViewModel(IComponentManager componentManager, ToolbarCommandFactory commandFactory)
         {

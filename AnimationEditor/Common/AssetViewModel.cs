@@ -3,6 +3,7 @@ using Common;
 using CommonControls.Common;
 using CommonControls.Editors.BoneMapping;
 using CommonControls.Services;
+using Filetypes.Animation;
 using Filetypes.RigidModel;
 using FileTypes.DB;
 using FileTypes.MetaData;

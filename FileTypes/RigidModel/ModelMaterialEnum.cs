@@ -2,7 +2,7 @@
 
 namespace Filetypes.RigidModel
 {
-    public enum GroupTypeEnum : ushort
+    public enum ModelMaterialEnum : ushort
     {
 		bow_wave = 22,
 		non_renderable = 26,
@@ -52,7 +52,8 @@ namespace Filetypes.RigidModel
 		projected_decal_v4 = 97,
 		global_terrain = 98,
 		decal_overlay = 99,
-		alpha_blend = 100
+		alpha_blend = 100,
+		TerrainTiles = 101
 	};
 
 	public enum AlphaMode : Int32
@@ -67,7 +68,13 @@ namespace Filetypes.RigidModel
 		Unknown = 99,
 		Static = 0,
 		Weighted = 3,
-		Cinematic = 4
+		Cinematic = 4,
+
+		Position16_bit,
+
+		// Not part of CA code
+		Weighted_withTint = 10003,
+		Cinematic_withTint = 10004,
 	};
 
 	/*

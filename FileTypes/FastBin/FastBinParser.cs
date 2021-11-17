@@ -5,6 +5,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using static Filetypes.ByteParsing.ByteChunk;
 
 namespace FileTypes.FastBin
 {
@@ -130,21 +131,110 @@ namespace FileTypes.FastBin
         {
             GetVerionAndCount("PARSE_PROP_LIST", chunk, out var version, out var count);
 
+            var byteOffsetStart = chunk.Index;
+
+            chunk.Index = byteOffsetStart;
             if (version == 2)
             {
-                var keyIndex = chunk.ReadUShort(); // Could this be the key index?
+                //var keyIndex = chunk.ReadUShort(); // Could this be the key index?
 
-                if (keyIndex != 0)
-                    throw new NotImplementedException("Check what this is");
+                // if (keyIndex != 0)
+                //     throw new NotImplementedException("Check what this is");
 
-                var keyStr = chunk.ReadString();
+                var propFileRef = new string[count];
+                for(int i = 0; i < count; i++ )
+                    propFileRef[i] = chunk.ReadString();
+
                 var numChildren = chunk.ReadUInt32();
+
+;
+
+
 
                 for (int popChildIndex = 0; popChildIndex < numChildren; popChildIndex++)
                 {
-                    var propVersion = chunk.ReadUInt32();
-                    if (propVersion != 15)
+                    var start = chunk.Index;
+                    // 103 bytes for each item from the looks of things - v15
+                    // 102 bytes for each item from the looks of things - v14
+                    var propVersion = chunk.ReadUShort();
+                    if ( !(propVersion == 15 || propVersion == 14))
                         throw new NotImplementedException("Check what this is");
+
+                    var keyIndex = chunk.ReadInt32();
+
+
+                    var matrix = new float[12];
+                    for (int i = 0; i < 12; i++)
+                        matrix[i] = chunk.ReadSingle();
+
+                    var ind = chunk.Index;
+
+                    // 8 bit flags..
+                    //var dataTest0 = new List<UnknownParseResult>();
+                    //var unkDataSize0 = 7;
+                    //for (int i = 0; i < unkDataSize0; i++)
+                    //{
+                    //    dataTest0.Add(chunk.PeakUnknown());
+                    //    chunk.ReadByte();
+                    //}
+
+                    var decal = chunk.ReadBool();
+                    var logic_decal = chunk.ReadBool();
+                    var is_fauna = chunk.ReadBool();
+                    var snow_inside = chunk.ReadBool();
+                    var snow_outside = chunk.ReadBool();
+                    var destruction_inside = chunk.ReadBool();
+                    var destruction_outside = chunk.ReadBool();
+                    var animated = chunk.ReadBool();
+
+                    //chunk.ReadByte();
+
+                    var decal_parallax_scale = chunk.ReadSingle(); 
+                    var decal_tiling = chunk.ReadSingle();
+
+
+
+                    //var decal_override_gbuffer_normal = chunk.ReadBool();
+                    //var visible_in_shroud = chunk.ReadBool();
+                    //var decal_apply_to_terrain = chunk.ReadBool();
+                    //var decal_apply_to_gbuffer_objects = chunk.ReadBool();
+                    //var decal_render_above_snow = chunk.ReadBool();
+
+                    var x0 = chunk.PeakUnknown();
+                    var b0 = chunk.ReadByte();
+      
+                   
+
+                    //var unk = chunk.ReadUShort();  // Related to animated
+                    //if (animated != 0)
+                    //    throw new NotImplementedException("Check what this is");
+
+                    var flags_serialise_version = chunk.ReadUShort();
+                    
+                    
+                    // 5 bit flags
+                    var dataTest1 = new List<UnknownParseResult>();
+                    var unkDataSize1 = 11;
+                    for (int i = 0; i < unkDataSize1; i++)
+                    {
+                        dataTest1.Add(chunk.PeakUnknown());
+                        chunk.ReadByte();
+                    }
+
+ 
+                    var height_mode = chunk.ReadString();   // 254
+                    var pdlc_mask = chunk.ReadInt32();
+                    var cast_shadows = chunk.ReadBool();
+                    var no_culling = chunk.ReadBool();
+
+                    if (propVersion == 15)
+                    {
+                        var terrain_bent = chunk.ReadBool();
+                    }
+
+                    var dataRead = chunk.Index - start;
+
+                    //var ukn = chunk.ReadBytes(3);
                 }
                 //170 start of item
                 //254 start of bhm_parent

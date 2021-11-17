@@ -19,16 +19,16 @@ using View3D.Services;
 
 namespace KitbasherEditor.Services
 {
-    public class ModelSaverHelper
+    public class ModelSaveHelper
     {
-        ILogger _logger = Logging.Create<ModelSaverHelper>();
+        ILogger _logger = Logging.Create<ModelSaveHelper>();
 
         private readonly  PackFileService _packFileService;
         private readonly  SceneManager _sceneManager;
         private readonly KitbasherViewModel _kitbasherViewModel;
         private readonly MainEditableNode _editableMeshNode;
 
-        public ModelSaverHelper(PackFileService packFileService, SceneManager sceneManager, KitbasherViewModel kitbasherViewModel, MainEditableNode editableMeshNode)
+        public ModelSaveHelper(PackFileService packFileService, SceneManager sceneManager, KitbasherViewModel kitbasherViewModel, MainEditableNode editableMeshNode)
         {
            _packFileService = packFileService;
            _sceneManager = sceneManager;
@@ -93,9 +93,8 @@ namespace KitbasherEditor.Services
                     onlySaveVisible = true;
             }
 
-            var bytes = MeshSaverService.SaveV2(onlySaveVisible, new List<Rmv2ModelNode>() { _editableMeshNode }, _editableMeshNode.Skeleton.AnimationProvider.Skeleton, _editableMeshNode.SelectedOutputFormat);
-            var reloadedModel = new RmvRigidModel(bytes);
-            return bytes;
+            var bytes0 = MeshSaverService.SaveV3(onlySaveVisible, new List<Rmv2ModelNode>() { _editableMeshNode }, _editableMeshNode.Skeleton.AnimationProvider.Skeleton, _editableMeshNode.SelectedOutputFormat, ModelMaterialEnum.default_type);
+            return bytes0;
         }
 
         public void GenerateWsModel()
@@ -142,12 +141,12 @@ namespace KitbasherEditor.Services
 
             var materialPacks = _packFileService.FindAllWithExtentionIncludePaths(".material");
             materialPacks = materialPacks.Where(x => x.Item2.Name.Contains(".xml.material")).ToList();
-            List<WsModelMaterial> materialList = new List<WsModelMaterial>();
+            List<WsModelFile> materialList = new List<WsModelFile>();
             foreach (var materialPack in materialPacks)
             {
                 try
                 {
-                    materialList.Add(new WsModelMaterial(materialPack.Item2, materialPack.Item1));
+                    materialList.Add(new WsModelFile(materialPack.Item2, materialPack.Item1));
                 }
                 catch (Exception e)
                 {
@@ -189,11 +188,11 @@ namespace KitbasherEditor.Services
         private string UnknownMaterial(Rmv2MeshNode mesh)
         {
             var textureName = "?";
-            var texture = mesh.RmvModel_depricated.GetTexture(TexureType.Diffuse);
+            var texture = mesh.Material.GetTexture(TexureType.Diffuse);
             if (texture.HasValue)
                 textureName = texture.Value.Path;
-            var vertextType = mesh.RmvModel_depricated.Header.VertextType;
-            var alphaOn = mesh.Geometry.Alpha != AlphaMode.Opaque;
+            var vertextType = mesh.Material.VertexType;
+            var alphaOn = mesh.Material.AlphaMode != AlphaMode.Opaque;
 
             var vertexName = "uknown";
             if (vertextType == VertexFormat.Cinematic)
@@ -206,14 +205,14 @@ namespace KitbasherEditor.Services
             return $" MeshName='{mesh.Name}' Texture='{textureName}' VertType='{vertexName}' Alpha='{alphaOn}'";
         }
 
-        string  CreateKnownMaterial(Rmv2MeshNode mesh, List<WsModelMaterial> possibleMaterials)
+        string  CreateKnownMaterial(Rmv2MeshNode mesh, List<WsModelFile> possibleMaterials)
         {
             foreach (var material in possibleMaterials)
             {
-                if (mesh.RmvModel_depricated.Header.VertextType != material.VertexType)
+                if (mesh.RmvModel_depricated.Material.VertexType != material.VertexType)
                     continue;
 
-                var alphaOn = mesh.Geometry.Alpha != AlphaMode.Opaque;
+                var alphaOn = mesh.Material.AlphaMode != AlphaMode.Opaque;
                 if (alphaOn && material.Alpha == false)
                     continue;
 

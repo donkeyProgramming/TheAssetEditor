@@ -2,6 +2,7 @@
 using CommonControls.Services;
 using Filetypes.ByteParsing;
 using Filetypes.RigidModel;
+using FileTypes.Animation;
 using FileTypes.RigidModel;
 using Newtonsoft.Json;
 using System;

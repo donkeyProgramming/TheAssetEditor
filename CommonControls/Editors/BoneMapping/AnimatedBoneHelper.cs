@@ -1,4 +1,5 @@
-﻿using Filetypes.RigidModel;
+﻿using Filetypes.Animation;
+using Filetypes.RigidModel;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;

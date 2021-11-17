@@ -3,6 +3,7 @@ using AnimationEditor.PropCreator;
 using Common;
 using CommonControls.Common;
 using CommonControls.Services;
+using Filetypes.Animation;
 using Filetypes.RigidModel;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;

@@ -123,7 +123,7 @@ namespace KitbasherEditor.Views.EditorViews.VertexDebugger
                 var vertexList = selection.SelectedVertices;
                 foreach (var vertexIndex in vertexList)
                 {
-                    var vertexInfo = (mesh.Geometry as MeshObject).GetVertexExtented(vertexIndex);
+                    var vertexInfo = mesh.Geometry.GetVertexExtented(vertexIndex);
                     var scale = (float)DebugScale.Value;
                     var pos = vertexInfo.Position3();
                     _lineRenderer.AddLine(pos, pos + vertexInfo.Normal * scale, Color.Blue);
@@ -131,7 +131,7 @@ namespace KitbasherEditor.Views.EditorViews.VertexDebugger
                     _lineRenderer.AddLine(pos, pos + vertexInfo.Tangent * scale, Color.Red);
                 }
 
-                renderEngine.AddRenderItem(RenderBuckedId.Normal, new LineRenderItem() { LineMesh = _lineRenderer, ModelMatrix = mesh.ModelMatrix * Matrix.CreateTranslation(mesh.Geometry.Pivot) });
+                renderEngine.AddRenderItem(RenderBuckedId.Normal, new LineRenderItem() { LineMesh = _lineRenderer, ModelMatrix = mesh.ModelMatrix * Matrix.CreateTranslation(mesh.Material.PivotPoint) });
             }
         }
 

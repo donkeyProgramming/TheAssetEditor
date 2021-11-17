@@ -8,7 +8,7 @@ using System.Xml;
 
 namespace FileTypes.RigidModel
 {
-    public class WsModelMaterial
+    public class WsModelFile
     {
         public bool Alpha { get; set; } = false;
         public Dictionary<TexureType, string> Textures { get; set; } = new Dictionary<TexureType, string>();
@@ -16,7 +16,7 @@ namespace FileTypes.RigidModel
         public string Name { get; set; }
         public string FullPath { get; set; }
 
-        public WsModelMaterial(PackFile pf, string fullPath)
+        public WsModelFile(PackFile pf, string fullPath)
         {
             FullPath = fullPath;
 

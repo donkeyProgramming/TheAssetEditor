@@ -130,7 +130,7 @@ namespace View3D.Services
 
         Rmv2ModelNode LoadRigidMesh(PackFile file, ref SceneNode parent, AnimationPlayer player, ref string skeletonName, string attachmentPointName)
         {
-            var rmvModel = new RmvRigidModel(file.DataSource.ReadData());
+            var rmvModel = ModelFactory.Create().Load(file.DataSource.ReadData());
             var model = new Rmv2ModelNode(rmvModel, _resourceLibary, Path.GetFileName(file.Name), player, GeometryGraphicsContextFactory.CreateInstance(_device));
 
             foreach (var mesh in model.GetMeshNodes(0))
@@ -176,7 +176,7 @@ namespace View3D.Services
                     var lodIndex = materialNode.Attributes.GetNamedItem("lod_index").InnerText;
 
                     var materialFile = _packFileService.FindFile(materialFilePath);
-                    var materialConfig = new WsModelMaterial(materialFile as PackFile, "");
+                    var materialConfig = new WsModelFile(materialFile as PackFile, "");
 
                     var mesh = loadedModelNode.GetMeshNode(int.Parse(lodIndex), int.Parse(partIndex));
                     if (mesh == null)
@@ -187,9 +187,9 @@ namespace View3D.Services
                     {
                         bool useAlpha = materialConfig.Alpha;
                         if (useAlpha)
-                            mesh.RmvModel_depricated.SetAlphaMode(AlphaMode.Alpha_Test);
+                            mesh.Material.AlphaMode = (AlphaMode.Alpha_Test);
                         else
-                            mesh.RmvModel_depricated.SetAlphaMode(AlphaMode.Opaque);
+                            mesh.Material.AlphaMode = (AlphaMode.Opaque);
 
                         foreach (var newTexture in materialConfig.Textures)
                             mesh.UpdateTexture(newTexture.Value, newTexture.Key);

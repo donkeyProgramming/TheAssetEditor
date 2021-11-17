@@ -6,6 +6,22 @@ using System.Threading.Tasks;
 
 namespace Filetypes.RigidModel.LodHeader
 {
+    public class Rmv2LodHeader_V7_V8_Creator : ILodHeaderCreator
+    {
+        public uint HeaderSize => (uint)ByteHelper.GetSize(typeof(Rmv2LodHeader_V7_V8));
+
+        public RmvLodHeader Create(byte[] buffer, int offset)
+        {
+            var header = ByteHelper.ByteArrayToStructure<Rmv2LodHeader_V7_V8>(buffer, offset);
+            return header;
+        }
+
+        public byte[] Save(RmvLodHeader rmvLodHeader)
+        {
+            return ByteHelper.GetBytes<Rmv2LodHeader_V7_V8>((Rmv2LodHeader_V7_V8)rmvLodHeader);
+        }
+    }
+
     public struct Rmv2LodHeader_V7_V8 : RmvLodHeader
     {
         uint _meshCount;

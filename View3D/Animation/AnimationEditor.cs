@@ -1,4 +1,5 @@
-﻿using Filetypes.RigidModel;
+﻿using Filetypes.Animation;
+using Filetypes.RigidModel;
 using Filetypes.RigidModel.Transforms;
 using Microsoft.Xna.Framework;
 using System;

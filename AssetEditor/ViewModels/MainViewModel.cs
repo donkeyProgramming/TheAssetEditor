@@ -3,6 +3,7 @@ using Common;
 using Common.ApplicationSettings;
 using Common.GameInformation;
 using CommonControls.Common;
+using CommonControls.FormatResearch;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using FileTypes.AnimationPack;
@@ -78,12 +79,16 @@ namespace AssetEditor.ViewModels
           
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
+                //OpenFile(packfileService.FindFile(@"terrain\campaigns\wh2_main_great_vortex_map_1\global_meshes\land_mesh_20.rigid_model_v2"));
+                //TerrainRmv2Decoder.Crate101Type(_packfileService);
+                //OpenFile(packfileService.FindFile(@"terrain\tiles\campaign\dwarf_custom\86x57_karaz_a_karak\custom_mesh.rigid_model_v2"));
 
-                DecoderHelper instance = DecoderHelper.CreateTestInstance(_packfileService);
-
-                //_packfileService.Load(@"C:\Users\ole_k\AssetEditor\MyStuff\TroyBmdFile.pack");
+                _packfileService.Load(@"C:\Users\ole_k\AssetEditor\MyStuff\TroyBmdFile.pack");
                 //new FastBinParser().ParseFile(_packfileService.FindFile(@"sky_troy_generic_01.bmd.bmd"));
                 //new FastBinParser().ParseFile(_packfileService.FindFile(@"troy_siege_model_01.bmd"));
+                new FastBinParser().ParseFile(_packfileService.FindFile(@"prefabs\campaign\empire_mountain_fort.bmd"));
+
+                //
 
                 //var invMatrixPackFile = _packfileService.FindFile(@"animations\skeletons\advisorcrow01.bone_inv_trans_mats");
                 //
@@ -116,24 +121,21 @@ namespace AssetEditor.ViewModels
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateBowCentigor(this, toolFactory, packfileService);
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateGreatEagle(this, toolFactory, packfileService);
                 //var f = packfileService.FindFile(@"animations\campaign\database\bin\cam_hero_hu1d_def_spear_and_shield.bin");
-                //OpenFile(f);
+                //
 
 
                 //var soundEditor = new CommonControls.Editors.Sound.SoundEditor(packfileService);
                 //soundEditor.CreateSoundMap();
 
-                //packfileService.DeepSearch("sea_mesh_9", false);
+                //packfileService.DeepSearch("wh2_main_vor_deadwood_the_frozen_city", false);
                 //packfileService.DeepSearch("31x11_dragonback_skew_mirror_01", false);
 
                 //OpenFile(packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack"));
 
 
-                //OpenFile(packfileService.FindFile(@"terrain\tiles\campaign\dwarf_custom\86x57_karaz_a_karak\custom_mesh.rigid_model_v2"));
-
-
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 
-                KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
+                //KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);
 

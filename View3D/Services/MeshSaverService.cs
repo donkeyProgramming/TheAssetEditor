@@ -1,5 +1,8 @@
 ﻿using Filetypes.RigidModel;
 using Filetypes.RigidModel.LodHeader;
+using Filetypes.RigidModel.Transforms;
+using FileTypes.RigidModel;
+using FileTypes.RigidModel.MaterialHeaders;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -30,48 +33,6 @@ namespace View3D.Services
             return deductionRatio;
         }
 
-        /*public static byte[] Save(bool onlySaveVisibleNodes, Rmv2ModelNode modelNode, GameSkeleton skeleton)
-        {
-            RmvRigidModel outputModel = new RmvRigidModel()
-            {
-                Header = modelNode.Model.Header.Clone(),
-                LodHeaders = modelNode.Model.LodHeaders.Select(x => x.Clone()).ToArray()
-            };
-
-            List<string> boneNames = new List<string>();
-            if (skeleton != null)
-                boneNames = skeleton.BoneNames.ToList();
-
-            var lods = modelNode.GetLodNodes();
-            var lodCount = lods.Count;
-
-            RmvSubModel[][] newMeshList = new RmvSubModel[lodCount][];
-            for (int currentLodIndex = 0; currentLodIndex < lodCount; currentLodIndex++)
-            {
-                List<Rmv2MeshNode> meshes = modelNode.GetMeshesInLod(currentLodIndex, onlySaveVisibleNodes);
-
-                newMeshList[currentLodIndex] = new RmvSubModel[meshes.Count];
-
-                for (int meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
-                {
-                    meshes[meshIndex].RecomputeBoundingBox();
-                    newMeshList[currentLodIndex][meshIndex] = meshes[meshIndex].CreateRmvSubModel();
-                    newMeshList[currentLodIndex][meshIndex].UpdateAttachmentPointList(boneNames);
-                }
-            }
-
-            outputModel.MeshList = newMeshList;
-            outputModel.UpdateOffsets();
-
-            using MemoryStream ms = new MemoryStream();
-            using var writer = new BinaryWriter(ms);
-
-            outputModel.SaveToByteArray(writer);
-            return ms.ToArray();
-        }*/
-
-
-
         static RmvLodHeader[] CreateLodHeaders(RmvLodHeader baseData, RmvVersionEnum version, uint numLods)
         {
             var output = new RmvLodHeader[numLods];
@@ -95,13 +56,13 @@ namespace View3D.Services
             return output;
         }
 
-        public static byte[] SaveV2(bool onlySaveVisibleNodes, List<Rmv2ModelNode> modelNodes, GameSkeleton skeleton, RmvVersionEnum version )
+        public static byte[] SaveV3(bool onlySaveVisibleNodes, List<Rmv2ModelNode> modelNodes, GameSkeleton skeleton, RmvVersionEnum version, ModelMaterialEnum modelMaterial)
         {
             uint lodCount = (uint)modelNodes.First().Model.LodHeaders.Length;
 
-            RmvRigidModel header = new RmvRigidModel()
+            RmvFile outputFile = new RmvFile()
             {
-                Header = new RmvModelHeader()
+                Header = new RmvFileHeader()
                 {
                     _fileType = Encoding.ASCII.GetBytes("RMV2"),
                     SkeletonName = skeleton.SkeletonName,
@@ -112,13 +73,10 @@ namespace View3D.Services
                 LodHeaders = CreateLodHeaders(modelNodes.First().Model.LodHeaders.First(), version, lodCount)
             };
 
-            // We add all the bone names to the mesh, as its just simpler then trying to figure out which bones are actually needed for attachments
-            var boneNames = skeleton?.BoneNames.ToList();
-
             // Create all the meshes
-            List<RmvSubModel>[] newMeshList = new List<RmvSubModel>[lodCount];
+            List<RmvModel>[] newMeshList = new List<RmvModel>[lodCount];
             for (int i = 0; i < lodCount; i++)
-                newMeshList[i] = new List<RmvSubModel>();
+                newMeshList[i] = new List<RmvModel>();
 
             foreach (var modelNode in modelNodes)
             {
@@ -128,84 +86,62 @@ namespace View3D.Services
 
                     for (int meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
                     {
-                        var newMesh = meshes[meshIndex].CreateRmvSubModel(version);
-                        newMesh.UpdateAttachmentPointList(boneNames);
-                        newMesh.UpdateBoundingBox(BoundingBox.CreateFromPoints(meshes[meshIndex].Geometry.GetVertexList()));
+                        var newModel = new RmvModel()
+                        {
+                            CommonHeader = meshes[meshIndex].CommonHeader,
+                            Material = meshes[meshIndex].Material,
+                            Mesh = MeshBuilderService.CreateRmvFileMesh(meshes[meshIndex].Geometry)
+                        };
 
-                        newMeshList[currentLodIndex].Add(newMesh);
+                        // Computer bounding box in Commonheader
+                        var commonHeader = newModel.CommonHeader;
+                        commonHeader.BoundingBox.UpdateBoundingBox(BoundingBox.CreateFromPoints(newModel.Mesh.VertexList.Select(x=> new Vector3(x.Position.X, x.Position.Y, x.Position.Z) )));
+                        newModel.CommonHeader = commonHeader;
+
+                        if (newModel.Material is WeightedMaterial weighterMaterial)
+                        {
+                            // Vertex
+                            if (version == RmvVersionEnum.RMV2_V8)
+                            {
+                                if (meshes[meshIndex].Geometry.VertexFormat == VertexFormat.Cinematic)
+                                    weighterMaterial.BinaryVertexFormat = VertexFormat.Cinematic_withTint;
+                                else if(meshes[meshIndex].Geometry.VertexFormat == VertexFormat.Weighted)
+                                    weighterMaterial.BinaryVertexFormat = VertexFormat.Weighted_withTint;
+                                else
+                                    weighterMaterial.BinaryVertexFormat = meshes[meshIndex].Geometry.VertexFormat;
+                            }
+                            else
+                            {
+                                weighterMaterial.BinaryVertexFormat = meshes[meshIndex].Geometry.VertexFormat;
+                            }
+
+                            weighterMaterial.AttachmentPointParams.Clear();
+                            if (skeleton != null)
+                                weighterMaterial.UpdateAttachmentPointList(skeleton.BoneNames.ToList());
+                        }
+                        else
+                        {
+                            throw new NotImplementedException("Trying to save unsupported material");
+                        }
+
+                        newMeshList[currentLodIndex].Add(newModel);
                     }
                 }
             }
-
+            
             // Convert the list to an array
-            RmvSubModel[][] newMeshListArray = new RmvSubModel[lodCount][];
+            var newMeshListArray = new RmvModel[lodCount][];
             for (int i = 0; i < lodCount; i++)
                 newMeshListArray[i] = newMeshList[i].ToArray();
 
             // Update data in the header and recalc offset
-            header.MeshList = newMeshListArray;
-            header.UpdateOffsets(version);
+            outputFile.ModelList = newMeshListArray;
+            outputFile.UpdateOffsets();
 
             // Output the data
-            using MemoryStream ms = new MemoryStream();
-            using var writer = new BinaryWriter(ms);
-            header.SaveToByteArray(writer);
+            var outputBytes = ModelFactory.Create().Save(outputFile);
 
-            return ms.ToArray(); ;
+            return outputBytes;
         }
-
-
-
-        public static byte[] Save(bool onlySaveVisibleNodes, List<Rmv2ModelNode> modelNodes, GameSkeleton skeleton)
-        {
-            RmvRigidModel outputModel = new RmvRigidModel()
-            {
-                Header = modelNodes.First().Model.Header.Clone(),
-                LodHeaders = modelNodes.First().Model.LodHeaders.Select(x => x.Clone()).ToArray()
-            };
-
-            List<string> boneNames = new List<string>();
-            if (skeleton != null)
-                boneNames = skeleton.BoneNames.ToList();
-
-            var lodCount = outputModel.LodHeaders.Count();
-
-            List<RmvSubModel>[] newMeshList = new List<RmvSubModel>[lodCount];
-            for(int i = 0; i < lodCount; i++)
-                newMeshList[i] = new List<RmvSubModel>();
-
-            foreach (var modelNode in modelNodes)
-            {
-                for (int currentLodIndex = 0; currentLodIndex < lodCount; currentLodIndex++)
-                {
-                    var meshNodes = modelNode.GetMeshesInLod(currentLodIndex, onlySaveVisibleNodes);
-
-                    for (int meshIndex = 0; meshIndex < meshNodes.Count; meshIndex++)
-                    {
-                        var newMesh  = meshNodes[meshIndex].CreateRmvSubModel(RmvVersionEnum.RMV2_V7);
-
-                        newMesh.UpdateAttachmentPointList(boneNames);
-                        newMesh.UpdateBoundingBox(BoundingBox.CreateFromPoints(meshNodes[meshIndex].Geometry.GetVertexList()));
-                    }
-                }
-            }
-
-            RmvSubModel[][] newMeshListArray = new RmvSubModel[lodCount][];
-            for (int i = 0; i < lodCount; i++)
-                newMeshListArray[i] = newMeshList[i].ToArray();
-
-            outputModel.MeshList = newMeshListArray;
-            outputModel.UpdateOffsets(RmvVersionEnum.RMV2_V7);
-
-            using MemoryStream ms = new MemoryStream();
-            using var writer = new BinaryWriter(ms);
-
-            outputModel.SaveToByteArray(writer);
-
-
-
-            return ms.ToArray();
-        }
-
     }
 }

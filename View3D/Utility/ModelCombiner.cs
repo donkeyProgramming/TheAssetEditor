@@ -33,7 +33,7 @@ namespace View3D.Utility
                         errors.Error("VertexType", $"{model0Name} has a different vertex type then {model1Name}");
 
                     // Alpha mode
-                    if (outerLoopItem.Geometry.Alpha != innerLoopItem.Geometry.Alpha)
+                    if (outerLoopItem.Material.AlphaMode != innerLoopItem.Material.AlphaMode)
                         errors.Error("AlphaSettings mode", $"{model0Name} has a different AlphaSettings mode then {model1Name}");
                 }
             }
