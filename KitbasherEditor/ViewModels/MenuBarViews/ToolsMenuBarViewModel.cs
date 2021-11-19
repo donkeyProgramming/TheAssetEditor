@@ -209,7 +209,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             }
         }
 
-        void DivideSubMesh()
+        public void DivideSubMesh()
         {
             if (_selectionManager.GetState() is ObjectSelectionState objectSelectionState)
                 _objectEditor.DivideIntoSubmeshes(objectSelectionState, !_keyboard.IsKeyDown(Key.LeftAlt));
@@ -217,7 +217,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 _faceEditor.DuplicatedSelectedFacesToNewMesh(faceSelectionState, true);
         }
 
-        void MergeObjects()
+        public void MergeObjects()
         {
             if (_selectionManager.GetState() is ObjectSelectionState objectSelectionState)
             {
@@ -229,7 +229,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             }
         }
 
-        void DubplicateObject()
+        public void DubplicateObject()
         {
             if (_selectionManager.GetState() is ObjectSelectionState objectSelectionState)
                 _objectEditor.DuplicateObject(objectSelectionState);
@@ -237,7 +237,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 _faceEditor.DuplicatedSelectedFacesToNewMesh(faceSelectionState, false);
         }
 
-        void DeleteObject()
+        public void DeleteObject()
         {
             if (_selectionManager.GetState() is ObjectSelectionState objectSelectionState)
                 _objectEditor.DeleteObject(objectSelectionState);
@@ -245,21 +245,21 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 _faceEditor.DeleteFaces(faceSelection);
         }
 
-        void MergeVertex()
+        public void MergeVertex()
         {
         }
 
-        void ExpandFaceSelection()
+        public void ExpandFaceSelection()
         {
             _faceEditor.GrowSelection(_selectionManager.GetState() as FaceSelectionState, !_keyboard.IsKeyDown(Key.LeftAlt));
         }
 
-        void GroupItems()
+        public void GroupItems()
         {
             _objectEditor.GroupItems(_selectionManager.GetState() as ObjectSelectionState);
         }
 
-        void ReduceMesh()
+        public void ReduceMesh()
         {
             var selectedObjects = _selectionManager.GetState() as ObjectSelectionState;
             if (selectedObjects == null || selectedObjects.SelectionCount() == 0)
@@ -273,7 +273,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _objectEditor.ReduceMesh(meshNodes, 0.9f, true);
         }
 
-        void CreateLods()
+        public void CreateLods()
         {
             var rootNode = _editableMeshResolver.GeEditableMeshRootNode();
             var lods = rootNode.GetLodNodes();
@@ -325,17 +325,17 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             }
         }
 
-        void ConvertFacesToVertex()
+        public void ConvertFacesToVertex()
         {
             _faceEditor.ConvertSelectionToVertex(_selectionManager.GetState() as FaceSelectionState);
         }
 
-        void ToggleShowSelection()
+        public void ToggleShowSelection()
         {
             _viewOnlySelectedComp.Toggle();
         }
 
-        void OpenBmiTool()
+        public void OpenBmiTool()
         {
             var state = _selectionManager.GetState<ObjectSelectionState>();
             var meshNode = state.GetSingleSelectedObject() as Rmv2MeshNode;
@@ -353,13 +353,13 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             }
         }
 
-        void OpenSkeletonReshaperTool()
+        public void OpenSkeletonReshaperTool()
         {
             var state = _selectionManager.GetState<ObjectSelectionState>();
             MeshFitterViewModel.ShowView(state.CurrentSelection(), _componentManager, _skeletonHelper, _packFileService);
         }
 
-        void CreateStaticMeshes()
+        public void CreateStaticMeshes()
         {
             // Get the frame
             var animationPlayers = _componentManager.GetComponent<AnimationsContainerComponent>();
@@ -395,7 +395,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             commandExecutor.ExecuteCommand(cmd, false);
         }
 
-        void PinMeshToMesh()
+        public void PinMeshToMesh()
         {
             var state = _selectionManager.GetState<ObjectSelectionState>();
             var selectedObjects = state.SelectedObjects();
@@ -405,26 +405,26 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             commandExecutor.ExecuteCommand(cmd);
         }
 
-        private void VertexMovementFalloffChanged(object sender, PropertyChangedEventArgs e)
+        public void VertexMovementFalloffChanged(object sender, PropertyChangedEventArgs e)
         {
             _selectionManager.UpdateVertexSelectionFallof((float)VertexMovementFalloff.Value.Value);
         }
 
-        private void OpenReRiggingTool()
+        public void OpenReRiggingTool()
         {
             var root = _editableMeshResolver.GeEditableMeshRootNode();
             var skeletonName = root.Skeleton.Name;
             Remap(_selectionManager.GetState<ObjectSelectionState>(), skeletonName);
         }
 
-        void Remap(ObjectSelectionState state, string targetSkeletonName)
+        public void Remap(ObjectSelectionState state, string targetSkeletonName)
         {
             var existingSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(_packFileService, targetSkeletonName);
             if (existingSkeletonFile == null)
                 throw new System.Exception("TargetSkeleton not found -" + targetSkeletonName);
 
             var selectedMeshses = state.SelectedObjects<Rmv2MeshNode>();
-            if (selectedMeshses.Count(x => x.Geometry.VertexFormat == VertexFormat.Static) != 0)
+            if (selectedMeshses.Count(x => x.Geometry.VertexFormat == UiVertexFormat.Static) != 0)
             {
                 MessageBox.Show($"A static mesh is selected, which can not be remapped");
                 return;
@@ -489,7 +489,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             }
         }
 
-        void ShowVertexDebugInfo()
+        public void ShowVertexDebugInfo()
         {
             VertexDebuggerViewModel.Create(_componentManager);
         }

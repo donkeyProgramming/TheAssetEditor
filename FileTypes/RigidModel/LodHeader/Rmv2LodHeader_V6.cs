@@ -17,18 +17,30 @@ namespace Filetypes.RigidModel.LodHeader
             return header;
         }
 
+        public RmvLodHeader CreateFromBase(RmvLodHeader source, uint lodLevel)
+        {
+            return new Rmv2LodHeader_V6()
+            {
+                _meshCount = source.MeshCount,
+                _totalLodVertexSize = source.TotalLodVertexSize,
+                _totalLodIndexSize = source.TotalLodIndexSize,
+                _firstMeshOffset = source.FirstMeshOffset,
+                _lodCameraDistance = source.LodCameraDistance,
+            };
+        }
+
         public byte[] Save(RmvLodHeader rmvLodHeader)
         {
-            return ByteHelper.GetBytes<Rmv2LodHeader_V6>((Rmv2LodHeader_V6)rmvLodHeader);
+            return ByteHelper.GetBytes((Rmv2LodHeader_V6)rmvLodHeader);
         }
     }
     public struct Rmv2LodHeader_V6 : RmvLodHeader
     {
-        uint _meshCount;
-        uint _totalLodVertexSize;
-        uint _totalLodIndexSize;
-        uint _firstMeshOffset;
-        float _lodCameraDistance;
+        public uint _meshCount;
+        public uint _totalLodVertexSize;
+        public uint _totalLodIndexSize;
+        public uint _firstMeshOffset;
+        public float _lodCameraDistance;
 
         public uint MeshCount { get => _meshCount; set => _meshCount = value; }
         public uint TotalLodVertexSize { get => _totalLodVertexSize; set => _totalLodVertexSize = value; }
@@ -52,7 +64,7 @@ namespace Filetypes.RigidModel.LodHeader
             };
         }
 
-        public static Rmv2LodHeader_V6 CreateFromBase(RmvLodHeader header)
+        public static Rmv2LodHeader_V6 CreateFromBase(RmvLodHeader header, uint lodLevel)
         {
             return new Rmv2LodHeader_V6()
             {

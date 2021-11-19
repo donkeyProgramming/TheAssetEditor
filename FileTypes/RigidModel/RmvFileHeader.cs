@@ -20,17 +20,6 @@ namespace Filetypes.RigidModel
 
         public static int HeaderSize { get => ByteHelper.GetSize(typeof(RmvFileHeader)); }
 
-        public string FileType
-        {
-            get
-            {
-                var result = ByteParsers.String.TryDecodeFixedLength(_fileType, 0, 4, out string value, out _);
-                if (result == false)
-                    throw new Exception();
-                return Util.SanatizeFixedString(value);
-            }
-        }
-
         public string SkeletonName
         {
             get
@@ -58,17 +47,6 @@ namespace Filetypes.RigidModel
             {
                 _skeletonName[i] = byteValues[i];
             }
-        }
-
-        public RmvFileHeader Clone()
-        {
-            return new RmvFileHeader()
-            {
-                _fileType = _fileType,
-                Version = Version,
-                LodCount = LodCount,
-                _skeletonName = _skeletonName,
-            };
         }
     };
 

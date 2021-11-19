@@ -177,7 +177,16 @@ namespace CommonControls.FormatResearch
                         .Where(x => x != null);
                     var min = decimals.Min();
                     var max = decimals.Max();
-                    range = (decimal)(max - min);
+                    if (double.IsNaN(min.Value) || double.IsNaN(max.Value))
+                    {
+                        range = decimal.MaxValue;
+                    }
+                    else
+                    {
+                        range = (decimal)(max - min);
+                    }
+                  
+                    
                 }
 
                 var allValuesGrouped = allItemsOfType
@@ -337,7 +346,7 @@ namespace CommonControls.FormatResearch
                 Console.WriteLine($"\t{item.Type}: {item.FailedItems}[Failed] / {item.TotalItems}[Total] = {(1.0f - item.FailPercentage) * 100}[%OK] {rangeStr}");
                 Console.WriteLine($"\t--------------------------------------------------------------");
 
-                if (item.FailPercentage < 0.10f)
+               // if (item.FailPercentage < 0.10f)
                 {
                     var longestItem = item.PossibleValues
                           .OrderByDescending(x => x.Length)

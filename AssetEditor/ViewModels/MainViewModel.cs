@@ -2,13 +2,10 @@
 using Common;
 using Common.ApplicationSettings;
 using Common.GameInformation;
-using CommonControls.Common;
-using CommonControls.FormatResearch;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using FileTypes.AnimationPack;
 using FileTypes.DB;
-using FileTypes.FastBin;
 using FileTypes.PackFiles.Models;
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor;
@@ -80,13 +77,13 @@ namespace AssetEditor.ViewModels
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
                 //OpenFile(packfileService.FindFile(@"terrain\campaigns\wh2_main_great_vortex_map_1\global_meshes\land_mesh_20.rigid_model_v2"));
-                //TerrainRmv2Decoder.Crate101Type(_packfileService);
+                //CommonControls.FormatResearch.TerrainRmv2Decoder.CreateTerrainCustom(_packfileService);
                 //OpenFile(packfileService.FindFile(@"terrain\tiles\campaign\dwarf_custom\86x57_karaz_a_karak\custom_mesh.rigid_model_v2"));
 
-                _packfileService.Load(@"C:\Users\ole_k\AssetEditor\MyStuff\TroyBmdFile.pack");
+                //_packfileService.Load(@"C:\Users\ole_k\AssetEditor\MyStuff\TroyBmdFile.pack");
                 //new FastBinParser().ParseFile(_packfileService.FindFile(@"sky_troy_generic_01.bmd.bmd"));
                 //new FastBinParser().ParseFile(_packfileService.FindFile(@"troy_siege_model_01.bmd"));
-                new FastBinParser().ParseFile(_packfileService.FindFile(@"prefabs\campaign\empire_mountain_fort.bmd"));
+                //new FastBinParser().ParseFile(_packfileService.FindFile(@"prefabs\campaign\empire_mountain_fort.bmd"));
 
                 //
 
@@ -135,7 +132,7 @@ namespace AssetEditor.ViewModels
 
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 
-                //KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
+                KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);
 

@@ -14,6 +14,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         }
 
         List<CommandMapping> _mappings = new List<CommandMapping>();
+        List<MenuAction> _actions = new List<MenuAction>();
 
         public ICommand Register(ICommand command, Key key, ModifierKeys modifierKeys)
         {
@@ -28,14 +29,23 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         }
 
 
+        public void Register(MenuAction action)
+        {
+            _actions.Add(action);
+        }
+
+
         public bool TriggerCommand(Key key, ModifierKeys modifierKeys)
         {
             bool isHandled = false;
-            foreach (var item in _mappings)
+            foreach (var item in _actions)
             {
-                if (item.Key == key && item.ModifierKeys == modifierKeys)
+                if (item.Hotkey == null)
+                    continue;
+
+                if (item.Hotkey.Key == key && item.Hotkey.ModifierKeys == modifierKeys)
                 {
-                    item.Command.Execute(null);
+                    item.TriggerAction();
                     isHandled = true;
                 }
             }

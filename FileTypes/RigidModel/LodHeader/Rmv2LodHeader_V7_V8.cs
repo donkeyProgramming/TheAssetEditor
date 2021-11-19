@@ -16,19 +16,47 @@ namespace Filetypes.RigidModel.LodHeader
             return header;
         }
 
+        public RmvLodHeader CreateFromBase(RmvLodHeader source, uint lodLevel)
+        {
+            var output = new Rmv2LodHeader_V7_V8()
+            {
+                _meshCount = source.MeshCount,
+                _totalLodVertexSize = source.TotalLodVertexSize,
+                _totalLodIndexSize = source.TotalLodIndexSize,
+                _firstMeshOffset = source.FirstMeshOffset,
+                _lodCameraDistance = source.LodCameraDistance,
+
+                _lodLevel = lodLevel,
+                _qualityLvl = 0,
+                _padding0 = 125,
+                _padding1 = 136,
+                _padding2 = 174
+            };
+
+            if (source is Rmv2LodHeader_V7_V8 typedHeader)
+            {
+                output._lodLevel = typedHeader._qualityLvl;
+                output._padding0 = typedHeader._padding0;
+                output._padding1 = typedHeader._padding1;
+                output._padding2 = typedHeader._padding2;
+            }
+
+            return output;
+        }
+
         public byte[] Save(RmvLodHeader rmvLodHeader)
         {
-            return ByteHelper.GetBytes<Rmv2LodHeader_V7_V8>((Rmv2LodHeader_V7_V8)rmvLodHeader);
+            return ByteHelper.GetBytes((Rmv2LodHeader_V7_V8)rmvLodHeader);
         }
     }
 
     public struct Rmv2LodHeader_V7_V8 : RmvLodHeader
     {
-        uint _meshCount;
-        uint _totalLodVertexSize;
-        uint _totalLodIndexSize;
-        uint _firstMeshOffset;
-        float _lodCameraDistance;
+        public uint _meshCount;
+        public uint _totalLodVertexSize;
+        public uint _totalLodIndexSize;
+        public uint _firstMeshOffset;
+        public float _lodCameraDistance;
         public uint _lodLevel;
         public byte _qualityLvl;
         public byte _padding0;
@@ -61,34 +89,6 @@ namespace Filetypes.RigidModel.LodHeader
                 _padding1 = _padding1,
                 _padding2 = _padding2,
             };
-        }
-
-        public static Rmv2LodHeader_V7_V8 CreateFromBase(RmvLodHeader header, uint lodLevel)
-        {
-            var output = new Rmv2LodHeader_V7_V8()
-            {
-                _meshCount = header.MeshCount,
-                _totalLodVertexSize = header.TotalLodVertexSize,
-                _totalLodIndexSize = header.TotalLodIndexSize,
-                _firstMeshOffset = header.FirstMeshOffset,
-                _lodCameraDistance = header.LodCameraDistance,
-
-                _lodLevel = lodLevel,
-                _qualityLvl = 0,
-                _padding0 = 125,
-                _padding1 = 136,
-                _padding2 = 174
-            };
-
-            if(header is Rmv2LodHeader_V7_V8 typedHeader)
-            {
-                output._lodLevel = typedHeader._qualityLvl;
-                output._padding0 = typedHeader._padding0;
-                output._padding1 = typedHeader._padding1;
-                output._padding2 = typedHeader._padding2;
-            }
-
-            return output;
         }
     }
 }

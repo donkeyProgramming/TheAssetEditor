@@ -129,19 +129,37 @@ namespace Filetypes.ByteParsing
         public UnknownParseResult PeakUnknown()
         {
             var parsers = ByteParsers.GetAllParsers();
-            var output = new List<string>();
+            var output = new List<UnknownParseResult.Item>();
             foreach (var parser in parsers)
             {
-             
-                    var result = parser.TryDecode(_buffer, _currentIndex, out string value, out int bytesRead, out string error);
-                    if (!result)
-                        output.Add($"{parser.TypeName} - Failed:{error}");
-                    else
-                        output.Add($"{parser.TypeName} - {value}");
+                var result = parser.TryDecode(_buffer, _currentIndex, out string value, out int bytesRead, out string error);
+                var item = new UnknownParseResult.Item()
+                { 
+                    Result = result,
+                    ErrorMessage = error,
+                    Value = value,
+                    Type = parser.Type,
+                };
 
+                output.Add(item);
             }
 
             return new UnknownParseResult() { Data = output.ToArray()};
+        }
+
+        public UnknownParseResult[] PeakUnknown(int numBytes)
+        {
+            var index = _currentIndex;
+
+            var output = new UnknownParseResult[numBytes];
+            for (int i = 0; i < numBytes; i++)
+            {
+                output[i] = PeakUnknown();
+                ReadByte();
+            }
+
+            _currentIndex = index;
+            return output;
         }
 
 
@@ -156,17 +174,31 @@ namespace Filetypes.ByteParsing
 
         public class UnknownParseResult
         {
-            public string[] Data { get; set; }
+            public Item[] Data { get; set; }
             public override string ToString()
             {
-                var strOuput = "";
-                if (Data != null)
-                {
-                    foreach (var s in Data)
-                        strOuput += s + "\n";
-                }
-                return strOuput;
+                return string.Join(" \n", Data.Select(x=>x.DisplayStr()));
+            }
 
+            public class Item
+            { 
+                public bool Result { get; set; }
+                public string Value { get; set; } = "";
+                public string ErrorMessage { get; set; } = "";
+                public DbTypesEnum Type { get; set; }
+
+                public string DisplayStr()
+                {
+                    if(!Result)
+                        return $"{Type} - Failed:{ErrorMessage}";
+                    else
+                        return $"{Type} - {Value}";
+                }
+
+                public override string ToString()
+                {
+                    return DisplayStr();
+                }
             }
         }
 

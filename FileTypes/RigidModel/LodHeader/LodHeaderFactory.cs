@@ -2,6 +2,7 @@
 using Filetypes.RigidModel.LodHeader;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace FileTypes.RigidModel.LodHeader
@@ -36,9 +37,14 @@ namespace FileTypes.RigidModel.LodHeader
             return _lodHeaderCreators[version].HeaderSize;
         }
 
-        internal byte[] Save(RmvVersionEnum version, RmvLodHeader rmvLodHeader)
+        public byte[] Save(RmvVersionEnum version, RmvLodHeader rmvLodHeader)
         {
             return _lodHeaderCreators[version].Save(rmvLodHeader);
+        }
+
+        public RmvLodHeader CreateFromBase(RmvVersionEnum version, RmvLodHeader source, uint lodLevel)
+        {
+            return _lodHeaderCreators[version].CreateFromBase(source, lodLevel);
         }
     }
 }

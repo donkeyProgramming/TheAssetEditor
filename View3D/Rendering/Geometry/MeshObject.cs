@@ -19,7 +19,7 @@ namespace View3D.Rendering.Geometry
         public Vector3 MeshCenter { get; private set; }
 
         public int WeightCount { get; private set; } = 0;
-        public VertexFormat VertexFormat { get; private set; }
+        public UiVertexFormat VertexFormat { get; private set; } = UiVertexFormat.Unknown;
         public string ParentSkeletonName { get; set; }
 
         Dictionary<TexureType, string> _textures { get; set; } = new Dictionary<TexureType, string>();
@@ -110,7 +110,7 @@ namespace View3D.Rendering.Geometry
 
         public void SetVertexWeights(int index, Vector4 newWeights)
         {
-            if (VertexFormat == VertexFormat.Weighted)
+            if (VertexFormat == UiVertexFormat.Weighted)
             {
                 newWeights.X = newWeights.X + newWeights.Z;
                 newWeights.Y = newWeights.Y + newWeights.W;
@@ -121,7 +121,7 @@ namespace View3D.Rendering.Geometry
 
         public void SetVertexBlendIndex(int index, Vector4 blendIndex)
         {
-            if (VertexFormat == VertexFormat.Weighted)
+            if (VertexFormat == UiVertexFormat.Weighted)
             {
                 blendIndex.Z = 0;
                 blendIndex.W = 0;
@@ -173,7 +173,7 @@ namespace View3D.Rendering.Geometry
                 VertexArray[i].BlendIndices.Z = GetMappedBlendIndex((byte)VertexArray[i].BlendIndices.Z, remapping);
                 VertexArray[i].BlendIndices.W = GetMappedBlendIndex((byte)VertexArray[i].BlendIndices.W, remapping);
 
-                if (VertexFormat == VertexFormat.Weighted)
+                if (VertexFormat == UiVertexFormat.Weighted)
                 {
                     VertexArray[i].BlendWeights.Z = 0;
                     VertexArray[i].BlendWeights.W = 0;
@@ -242,124 +242,55 @@ namespace View3D.Rendering.Geometry
             RebuildVertexBuffer();
         }
 
-        public void ChangeVertexType(VertexFormat newFormat, string newSkeletonName)
+        public void ChangeVertexType(UiVertexFormat newFormat, string newSkeletonName, bool updateMesh = true)
         {
-            return;
-            if (!(newFormat == VertexFormat.Weighted || newFormat == VertexFormat.Static || newFormat == VertexFormat.Cinematic))
+            if (!(newFormat == UiVertexFormat.Weighted || newFormat == UiVertexFormat.Static || newFormat == UiVertexFormat.Cinematic))
                 throw new Exception("Not able to change vertex format into this");
 
-            if (newFormat == VertexFormat.Weighted)
+            if (updateMesh)
             {
                 for (int i = 0; i < VertexArray.Length; i++)
                 {
-                    if (VertexFormat == VertexFormat.Static)
+                    if (newFormat != UiVertexFormat.Static)
+                    {
+                        var vertInfo = new (float index, float weight)[4];
+                        vertInfo[0] = (VertexArray[i].BlendIndices.X, VertexArray[i].BlendWeights.X);
+                        vertInfo[1] = (VertexArray[i].BlendIndices.Y, VertexArray[i].BlendWeights.Y);
+                        vertInfo[2] = (VertexArray[i].BlendIndices.Z, VertexArray[i].BlendWeights.Z);
+                        vertInfo[3] = (VertexArray[i].BlendIndices.W, VertexArray[i].BlendWeights.W);
+
+                        var sortedVertInfo = vertInfo.OrderByDescending(x => x.weight);
+
+                        VertexArray[i].BlendIndices = new Vector4(sortedVertInfo.First().index, 0, 0, 0);
+                        VertexArray[i].BlendWeights = new Vector4(1, 0, 0, 0);
+                    }
+                    else
                     {
                         VertexArray[i].BlendIndices = new Vector4(0, 0, 0, 0);
                         VertexArray[i].BlendWeights = new Vector4(1, 0, 0, 0);
                     }
-
-                    if (VertexFormat == VertexFormat.Cinematic)
-                    {
-                        // Find most active weight
-                        float highestValue = -1;
-                        int currentIndex = 0;
-
-                        if (VertexArray[i].BlendWeights.X > highestValue)
-                        {
-                            highestValue = VertexArray[i].BlendWeights.X;
-                            currentIndex = (int)VertexArray[i].BlendIndices.X;
-                        }
-
-                        if (VertexArray[i].BlendWeights.Y > highestValue)
-                        {
-                            highestValue = VertexArray[i].BlendWeights.Y;
-                            currentIndex = (int)VertexArray[i].BlendIndices.Y;
-                        }
-
-                        if (VertexArray[i].BlendWeights.Z > highestValue)
-                        {
-                            highestValue = VertexArray[i].BlendWeights.Z;
-                            currentIndex = (int)VertexArray[i].BlendIndices.Z;
-                        }
-
-                        if (VertexArray[i].BlendWeights.W > highestValue)
-                        {
-                            highestValue = VertexArray[i].BlendWeights.W;
-                            currentIndex = (int)VertexArray[i].BlendIndices.W;
-                        }
-
-                        VertexArray[i].BlendIndices = new Vector4(currentIndex, 0, 0, 0);
-                        VertexArray[i].BlendWeights = new Vector4(1, 0, 0, 0);
-                    }
                 }
 
-                WeightCount = 2;
-                VertexFormat = VertexFormat.Weighted;
-                ParentSkeletonName = newSkeletonName;
+                RebuildVertexBuffer();
             }
-            else if (newFormat == VertexFormat.Cinematic)
+
+            switch (newFormat)
             {
-                for (int i = 0; i < VertexArray.Length; i++)
-                {
-                    if (VertexFormat == VertexFormat.Static)
-                    {
-                        VertexArray[i].BlendIndices = new Vector4(0, 0, 0, 0);
-                        VertexArray[i].BlendWeights = new Vector4(1, 0, 0, 0);
-                    }
-
-                    if (VertexFormat == VertexFormat.Weighted)
-                    {
-                        // Find most active weight
-                        float highestValue = -1;
-                        int currentIndex = 0;
-
-                        if (VertexArray[i].BlendWeights.X > highestValue)
-                        {
-                            highestValue = VertexArray[i].BlendWeights.X;
-                            currentIndex = (int)VertexArray[i].BlendIndices.X;
-                        }
-
-                        if (VertexArray[i].BlendWeights.Y > highestValue)
-                        {
-                            highestValue = VertexArray[i].BlendWeights.Y;
-                            currentIndex = (int)VertexArray[i].BlendIndices.Y;
-                        }
-
-                        if (VertexArray[i].BlendWeights.Z > highestValue)
-                        {
-                            highestValue = VertexArray[i].BlendWeights.Z;
-                            currentIndex = (int)VertexArray[i].BlendIndices.Z;
-                        }
-
-                        if (VertexArray[i].BlendWeights.W > highestValue)
-                        {
-                            highestValue = VertexArray[i].BlendWeights.W;
-                            currentIndex = (int)VertexArray[i].BlendIndices.W;
-                        }
-
-                        VertexArray[i].BlendIndices = new Vector4(currentIndex, 0, 0, 0);
-                        VertexArray[i].BlendWeights = new Vector4(1, 0, 0, 0);
-                    }
-                }
-
-                WeightCount = 4;
-                VertexFormat = VertexFormat.Cinematic;
-                ParentSkeletonName = newSkeletonName;
-            }
-            else if (newFormat == VertexFormat.Static)
-            {
-                for (int i = 0; i < VertexArray.Length; i++)
-                {
-                    VertexArray[i].BlendIndices = new Vector4(0, 0, 0, 0);
-                    VertexArray[i].BlendWeights = new Vector4(0, 0, 0, 0);
-                }
-
-                WeightCount = 0;
-                VertexFormat = VertexFormat.Static;
-                ParentSkeletonName = "";
+                case UiVertexFormat.Static:
+                    WeightCount = 0;
+                    ParentSkeletonName = "";
+                    break;
+                case UiVertexFormat.Weighted:
+                    WeightCount = 2;
+                    ParentSkeletonName = newSkeletonName;
+                    break;
+                case UiVertexFormat.Cinematic:
+                    WeightCount = 4;
+                    ParentSkeletonName = newSkeletonName;
+                    break;
             }
 
-            RebuildVertexBuffer();
+            VertexFormat = newFormat;     
         }
 
         public VertexPositionNormalTextureCustom GetVertexExtented(int index)//

@@ -126,9 +126,9 @@ namespace KitbasherEditor.Views.EditorViews.VertexDebugger
                     var vertexInfo = mesh.Geometry.GetVertexExtented(vertexIndex);
                     var scale = (float)DebugScale.Value;
                     var pos = vertexInfo.Position3();
-                    _lineRenderer.AddLine(pos, pos + vertexInfo.Normal * scale, Color.Blue);
+                    _lineRenderer.AddLine(pos, pos + vertexInfo.Normal * scale, Color.Red);
                     _lineRenderer.AddLine(pos, pos + vertexInfo.BiNormal * scale, Color.Green);
-                    _lineRenderer.AddLine(pos, pos + vertexInfo.Tangent * scale, Color.Red);
+                    _lineRenderer.AddLine(pos, pos + vertexInfo.Tangent * scale, Color.Blue);
                 }
 
                 renderEngine.AddRenderItem(RenderBuckedId.Normal, new LineRenderItem() { LineMesh = _lineRenderer, ModelMatrix = mesh.ModelMatrix * Matrix.CreateTranslation(mesh.Material.PivotPoint) });

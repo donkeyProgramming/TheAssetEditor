@@ -1,8 +1,6 @@
-﻿using Filetypes.RigidModel.Vertex;
-using Filetypes.RigidModel.Vertex.Formats;
+﻿using Filetypes.RigidModel.Vertex.Formats;
 using FileTypes.RigidModel.Vertex.Formats;
 using Microsoft.Xna.Framework;
-using System;
 using System.Collections.Generic;
 
 namespace Filetypes.RigidModel.Vertex
@@ -13,6 +11,7 @@ namespace Filetypes.RigidModel.Vertex
         CommonVertex Create(byte[] buffer, int offset, int vertexSize);
         byte[] ToBytes(CommonVertex vertex);
         uint VertexSize { get; }
+        bool ForceComputeNormals { get; }
     }
 
     public class CommonVertex
@@ -38,6 +37,7 @@ namespace Filetypes.RigidModel.Vertex
         {
             _vertexCreators[VertexFormat.Static] = new StaticVertexCreator();
             _vertexCreators[VertexFormat.Position16_bit] = new Position16_bitVertexCreator();
+            _vertexCreators[VertexFormat.CustomTerrain] = new CustomTerrainVertexreator();
 
             _vertexCreators[VertexFormat.Weighted] = new WeightedVertexCreator();
             _vertexCreators[VertexFormat.Weighted_withTint] = new WeightedVertexCreator() { AddTintColour = true };
@@ -66,6 +66,27 @@ namespace Filetypes.RigidModel.Vertex
         public byte[] Save(VertexFormat vertexType, CommonVertex vertex)
         {
             return _vertexCreators[vertexType].ToBytes(vertex);
+        }
+
+        public void ReComputeNormals(VertexFormat binaryVertexFormat, ref CommonVertex[] vertexList, ref ushort[] indexList)
+        {
+            if (!_vertexCreators[binaryVertexFormat].ForceComputeNormals)
+                return;
+
+            for (int i = 0; i < indexList.Length; i += 3)
+            {
+                var index0 = indexList[i+0];
+                var index1 = indexList[i+1];
+                var index2 = indexList[i+2];
+
+                var u = vertexList[index0].GetPosistionAsVec3() - vertexList[index1].GetPosistionAsVec3();
+                var v = vertexList[index0].GetPosistionAsVec3() - vertexList[index2].GetPosistionAsVec3();
+                var normal = Vector3.Normalize(Vector3.Cross(u, v)) * -1;
+
+                vertexList[index0].Normal = normal;
+                vertexList[index1].Normal = normal;
+                vertexList[index2].Normal = normal;
+            }
         }
     }
 }

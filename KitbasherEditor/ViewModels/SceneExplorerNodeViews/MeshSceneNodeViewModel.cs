@@ -34,8 +34,18 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         {
             _meshNode = node;
             General = new MeshSceneNodeViewModel_General(_meshNode, componentManager);
-            Animation = new MeshSceneNodeViewModel_Animation(pfs, _meshNode, animLookUp, componentManager);
-            Graphics = new MeshSceneNodeViewModel_Graphics(_meshNode, pfs, componentManager);
+
+            if (node.Material is WeightedMaterial)
+            {
+
+                Animation = new MeshSceneNodeViewModel_Animation(pfs, _meshNode, animLookUp, componentManager);
+                Graphics = new MeshSceneNodeViewModel_Graphics(_meshNode, pfs, componentManager);
+            }
+            else
+            {
+                Animation = null;
+                Graphics = null;
+            }
         }
 
         public void Dispose()
@@ -250,39 +260,17 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         public Dictionary<TexureType, TextureViewModel> Textures { get; set; }
 
-        public VertexFormat VertexType { get { return _meshNode.Geometry.VertexFormat; } set { ChangeVertexType(value, true); } }
+        public UiVertexFormat VertexType { get { return _meshNode.Geometry.VertexFormat; } set { ChangeVertexType(value); } }
 
-        private void ChangeVertexType(VertexFormat newFormat, bool doMeshUpdate)
+        void ChangeVertexType(UiVertexFormat newFormat)
         {
-            if (doMeshUpdate == false)
-            {
-                NotifyPropertyChanged(nameof(VertexType));
-                return;
-            }
-
-            if (!(newFormat == VertexFormat.Weighted || newFormat == VertexFormat.Static || newFormat == VertexFormat.Cinematic))
-            {
-                MessageBox.Show("Can only swap to weighted or default format.");
-                NotifyPropertyChanged(nameof(VertexType));
-                return;
-            }
-
-            if (newFormat == VertexFormat.Weighted)
-                MaterialType = ModelMaterialEnum.weighted;
-            else if (newFormat == VertexFormat.Static)
-                MaterialType = ModelMaterialEnum.default_type;
-            else if (newFormat == VertexFormat.Cinematic)
-                MaterialType = ModelMaterialEnum.weighted;
-            else
-                throw new Exception("Unknown vertex format, can not set grouptype");
-
             var mainNode = _componentManager.GetComponent<IEditableMeshResolver>();
             var skeletonName = mainNode.GeEditableMeshRootNode()?.Skeleton.Name;
             _meshNode.Geometry.ChangeVertexType(newFormat, skeletonName);
             NotifyPropertyChanged(nameof(VertexType));
         }
 
-        public IEnumerable<VertexFormat> PossibleVertexTypes { get; set; }
+        public IEnumerable<UiVertexFormat> PossibleVertexTypes { get; set; }
 
         public MeshSceneNodeViewModel_Graphics(Rmv2MeshNode meshNode, PackFileService pf, IComponentManager componentManager)
         {
@@ -290,7 +278,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             _meshNode = meshNode;
             ShaderName = _meshNode.RmvModel_depricated.CommonHeader.ShaderParams.ShaderName;
             PossibleMaterialTypes = Enum.GetValues(typeof(ModelMaterialEnum)).Cast<ModelMaterialEnum>();
-            PossibleVertexTypes = new VertexFormat[] { VertexFormat.Static, VertexFormat.Weighted, VertexFormat.Cinematic };
+            PossibleVertexTypes = new UiVertexFormat[] { UiVertexFormat.Static, UiVertexFormat.Weighted, UiVertexFormat.Cinematic };
 
             Textures = new Dictionary<TexureType, TextureViewModel>();
             Textures.Add(TexureType.Diffuse, new TextureViewModel(_meshNode, pf,TexureType.Diffuse));

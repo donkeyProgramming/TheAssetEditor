@@ -93,7 +93,7 @@ namespace KitbasherEditor.Services
                     onlySaveVisible = true;
             }
 
-            var bytes0 = MeshSaverService.SaveV3(onlySaveVisible, new List<Rmv2ModelNode>() { _editableMeshNode }, _editableMeshNode.Skeleton.AnimationProvider.Skeleton, _editableMeshNode.SelectedOutputFormat, ModelMaterialEnum.default_type);
+            var bytes0 = MeshSaverService.Save(onlySaveVisible, new List<Rmv2ModelNode>() { _editableMeshNode }, _editableMeshNode.Skeleton.AnimationProvider.Skeleton, _editableMeshNode.SelectedOutputFormat, ModelMaterialEnum.default_type);
             return bytes0;
         }
 
@@ -169,7 +169,7 @@ namespace KitbasherEditor.Services
                     var materialFile = CreateKnownMaterial(meshes[meshIndex], materialList);
                     if (materialFile == null)
                     {
-                        materialFile = UnknownMaterial(meshes[meshIndex]);
+                        materialFile = CreateUnknownMaterial(meshes[meshIndex]);
                         wsModelGeneratedPerfectly = false;
                     }
 
@@ -185,7 +185,7 @@ namespace KitbasherEditor.Services
             return sb.ToString();
         }
 
-        private string UnknownMaterial(Rmv2MeshNode mesh)
+        private string CreateUnknownMaterial(Rmv2MeshNode mesh)
         {
             var textureName = "?";
             var texture = mesh.Material.GetTexture(TexureType.Diffuse);
@@ -195,11 +195,11 @@ namespace KitbasherEditor.Services
             var alphaOn = mesh.Material.AlphaMode != AlphaMode.Opaque;
 
             var vertexName = "uknown";
-            if (vertextType == VertexFormat.Cinematic)
+            if (vertextType == UiVertexFormat.Cinematic)
                 vertexName = "weighted4";
-            else if (vertextType == VertexFormat.Weighted)
+            else if (vertextType == UiVertexFormat.Weighted)
                 vertexName = "weighted2";
-            else if (vertextType == VertexFormat.Static)
+            else if (vertextType == UiVertexFormat.Static)
                 vertexName = "static";
 
             return $" MeshName='{mesh.Name}' Texture='{textureName}' VertType='{vertexName}' Alpha='{alphaOn}'";

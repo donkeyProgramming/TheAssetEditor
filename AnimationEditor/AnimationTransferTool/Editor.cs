@@ -473,7 +473,7 @@ namespace AnimationEditor.AnimationTransferTool
 
             var meshName = Path.GetFileNameWithoutExtension(_copyTo.MeshName.Value);
             var newMeshName = meshName + "_" + scaleStr + ".rigid_model_v2";
-            var bytes = MeshSaverService.SaveV3(true, modelNodes, Generated.Skeleton, RmvVersionEnum.RMV2_V7, ModelMaterialEnum.default_type);
+            var bytes = MeshSaverService.Save(true, modelNodes, Generated.Skeleton, RmvVersionEnum.RMV2_V7, ModelMaterialEnum.default_type);
             SaveHelper.Save(_pfs, newMeshName, null, bytes);
 
             // Undo the mesh transform
@@ -539,7 +539,7 @@ namespace AnimationEditor.AnimationTransferTool
 
             var meshName = Path.GetFileNameWithoutExtension(_copyTo.MeshName.Value);
             var newMeshName = meshName + "_" + savePostFix + ".rigid_model_v2";
-            var bytes = MeshSaverService.SaveV3(true, modelNodes, Generated.Skeleton, RmvVersionEnum.RMV2_V7, ModelMaterialEnum.default_type);
+            var bytes = MeshSaverService.Save(true, modelNodes, Generated.Skeleton, RmvVersionEnum.RMV2_V7, ModelMaterialEnum.default_type);
             SaveHelper.Save(_pfs, newMeshName, null, bytes);
 
             // Undo the mesh transform

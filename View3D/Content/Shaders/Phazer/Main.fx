@@ -369,108 +369,114 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
 
 	//return float4(GlossTex.rrr, 1);
 
-float4 NormalTex = float4(0.5f, 0.5f, 0.5f, 1);
-if (UseNormal)
-	NormalTex = NormalTexture.Sample(s_normal, input.tex);
+	float4 NormalTex = float4(0.5f, 0.5f, 0.5f, 1);
+	if (UseNormal)
+		NormalTex = NormalTexture.Sample(s_normal, input.tex);
 
-float smoothness = (GlossTex.r);
-// smoothness = pow(smoothness, 2);
-float roughness = saturate((1 - smoothness));
-//roughness = ((1 - smoothness));
+	float smoothness = (GlossTex.r);
+	// smoothness = pow(smoothness, 2);
+	float roughness = saturate((1 - smoothness));
+	//roughness = ((1 - smoothness));
 
-// return float4(roughness, roughness, roughness, 1);
+	// return float4(roughness, roughness, roughness, 1);
 
- //float smoothness = substance_smoothness_get_our_smoothness(GlossTex.r);
- //float roughness = saturate((1 - smoothness));
- //return float4(roughness, roughness, roughness,1);
- // Deccode the TW nortex_cube_specular with orthogonal projection
-float3 Np;
+	 //float smoothness = substance_smoothness_get_our_smoothness(GlossTex.r);
+	 //float roughness = saturate((1 - smoothness));
+	 //return float4(roughness, roughness, roughness,1);
+	 // Deccode the TW nortex_cube_specular with orthogonal projection
+	float3 Np;
 
-Np.x = NormalTex.r * NormalTex.a;
-Np.y = NormalTex.g;
-Np = (Np * 2.0f) - 1.0f;
-Np.z = sqrt(1 - Np.x * Np.x - Np.y * Np.y);
-float3 _N = Np.yzx; // Works
+	Np.x = NormalTex.r * NormalTex.a;
+	Np.y = NormalTex.g;
+	Np = (Np * 2.0f) - 1.0f;
+	Np.z = sqrt(1 - Np.x * Np.x - Np.y * Np.y);
+	float3 _N = Np.yzx; // Works
 
-	//float3x3 basis = float3x3(normalize(input.tangent), normalize(input.normal), normalize(input.binormal));
-	//float3 bumpNormal = normalize(mul(normalize(_N), basis));
+		//float3x3 basis = float3x3(normalize(input.tangent), normalize(input.normal), normalize(input.binormal));
+		//float3 bumpNormal = normalize(mul(normalize(_N), basis));
 
-float3x3 basis = float3x3(normalize(input.tangent), normalize(input.binormal), normalize(input.normal));
-float3 bumpNormal = normalize(mul(normalize(Np), basis));
+	float3x3 basis = float3x3(normalize(input.tangent), normalize(input.binormal), normalize(input.normal));
+	float3 bumpNormal = normalize(mul(normalize(Np), basis));
 
-bumpNormal = getBlueNormal(input); // TODO: PHAZER: test code
+	bumpNormal = getBlueNormal(input); // TODO: PHAZER: test code
+
+	if (UseNormal == false)
+	{
+		bumpNormal = _input.normal;
+		//return float4(1, 0, 0, 1);
+	}
 
 	// ************************************************************************
 	//bumpNormal = input.normal; // TODO: PHAZER: uncomment this line to DISABLE normal mapping
 
 	// ************************************************************************
-float3 N = normalize(bumpNormal);
+	float3 N = normalize(bumpNormal);
 
-//float3 Lo = float3(0,0,1);
-float3 Lo = normalize(input.viewDirection);
+	//float3 Lo = float3(0,0,1);
+	float3 Lo = normalize(input.viewDirection);
 
-// Angle between surface normal and outgoing light direction.
-float cosLo = max(0.0, dot(N, Lo));
+	// Angle between surface normal and outgoing light direction.
+	float cosLo = max(0.0, dot(N, Lo));
 
-// Specular reflection vector.
-// float3 Lr = 2.0 * cosLo * N- Lo;  // written out reflect formula
-float3 Lr = reflect(N, Lo); // HLSL intrisic reflection function
+	// Specular reflection vector.
+	// float3 Lr = 2.0 * cosLo * N- Lo;  // written out reflect formula
+	float3 Lr = reflect(N, Lo); // HLSL intrisic reflection function
 
-	// specular
-float3 F0 = SpecTex.rgb;
+		// specular
+	float3 F0 = SpecTex.rgb;
 
-// TODO: PHAZER:
-// rotate only normal with ENV map matrix, when they are use the to sample the ENV maps
-// so the transfors does not disturb the PBR math
-// --
-float3 bumpNormal_Rot = mul(bumpNormal, (float3x3) EnvMapTransform);
-bumpNormal_Rot = normalize(bumpNormal_Rot);
-float3 irradiance = tex_cube_diffuse.Sample(SampleType, bumpNormal_Rot).rgb;
-//return float4(irradiance, 1);
+	// TODO: PHAZER:
+	// rotate only normal with ENV map matrix, when they are use the to sample the ENV maps
+	// so the transfors does not disturb the PBR math
+	// --
+	float3 bumpNormal_Rot = mul(bumpNormal, (float3x3) EnvMapTransform);
+	bumpNormal_Rot = normalize(bumpNormal_Rot);
+	float3 irradiance = tex_cube_diffuse.Sample(SampleType, bumpNormal_Rot).rgb;
+	//return float4(irradiance, 1);
 
-   //// TODO: PHAZER: normal mapping test code
-//float3 mapped_test = Uncharted2ToneMapping(irradiance);
-//float3 color_test = pow(mapped_test, 1.0 / 1.0);
-//return float4(irradiance, 1);
-   //// ----------------
+	   //// TODO: PHAZER: normal mapping test code
+	//float3 mapped_test = Uncharted2ToneMapping(irradiance);
+	//float3 color_test = pow(mapped_test, 1.0 / 1.0);
+	//return float4(irradiance, 1);
+	   //// ----------------
 
-float3 F = fresnelSchlickRoughness(cosLo, F0, roughness);
+	float3 F = fresnelSchlickRoughness(cosLo, F0, roughness);
 
-float3 kS = F;
-float3 kD = 1.0 - kS;
+	float3 kS = F;
+	float3 kD = 1.0 - kS;
 
-float3 diffuseIBL = kD * DiffuseTex.rgb * irradiance;
+	float3 diffuseIBL = kD * DiffuseTex.rgb * irradiance;
 
-// PHAZER:
-// rotate only normal with ENV map matrix, when they are use the to sample the ENV maps
-// so the transfors does not disturb the PBR math
-// --
-// rotate refletion map by rotating the reflect vector
-float3 Lr_Rot = mul(Lr, (float3x3) EnvMapTransform);
-float3 specularIrradiance = sample_environment_specular(roughness, normalize(Lr));
+	// PHAZER:
+	// rotate only normal with ENV map matrix, when they are use the to sample the ENV maps
+	// so the transfors does not disturb the PBR math
+	// --
+	// rotate refletion map by rotating the reflect vector
+	float3 Lr_Rot = mul(Lr, (float3x3) EnvMapTransform);
+	float3 specularIrradiance = sample_environment_specular(roughness, normalize(Lr));
 
-float2 brdf = specularBRDF_LUT.Sample(spBRDF_Sampler, float2(cosLo, (1.0 - roughness))).xy;
-float3 specularIBL = (brdf.x * F0 + brdf.y) * specularIrradiance;
+	float2 brdf = specularBRDF_LUT.Sample(spBRDF_Sampler, float2(cosLo, (1.0 - roughness))).xy;
+	float3 specularIBL = (brdf.x * F0 + brdf.y) * specularIrradiance;
 
-float3 ambientLighting = (specularIBL + diffuseIBL); // * light[0].ambientFactor;
+	float3 ambientLighting = (specularIBL + diffuseIBL); // * light[0].ambientFactor;
 
-float4 color = float4(ambientLighting, 1.0);
+	float4 color = float4(ambientLighting, 1.0);
 
-if (UseAlpha == 1)
-{
-	alpha_test(DiffuseTex.a);
-}
+	if (UseAlpha == 1)
+	{
+		alpha_test(DiffuseTex.a);
+	}
 
-const float gamma_value = 1;
+	const float gamma_value = 1;
 
-float3 hdrColor = color.rgb * exposure * 2.2;
+	float3 hdrColor = color.rgb * exposure * 2.2;
 
-// PHAZER: I think tint has to be multiplied on BEFORE tonemapping
-float3 mapped = Uncharted2ToneMapping(hdrColor) * TintColour;
-mapped = pow(mapped, 1.0 / gamma_value);
-color = float4(mapped, 1);
+	// PHAZER: I think tint has to be multiplied on BEFORE tonemapping
+	float3 mapped = Uncharted2ToneMapping(hdrColor) * TintColour;
+	mapped = pow(mapped, 1.0 / gamma_value);
+	color = float4(mapped, 1);
 
-return color;
+	return color;
 
 }
 float4 SimplePixel(in PixelInputType _input /*, bool bIsFrontFace : SV_IsFrontFace*/) : SV_TARGET0

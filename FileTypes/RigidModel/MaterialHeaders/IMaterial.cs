@@ -7,7 +7,8 @@ namespace FileTypes.RigidModel.MaterialHeaders
 {
     public interface IMaterial
     {
-        VertexFormat VertexType { get; set; }
+        public ModelMaterialEnum MaterialId { get; set; }
+        UiVertexFormat VertexType { get; set; }
         VertexFormat BinaryVertexFormat { get; set; }
         Vector3 PivotPoint { get; set; }
         AlphaMode AlphaMode { get; set; }
@@ -16,6 +17,8 @@ namespace FileTypes.RigidModel.MaterialHeaders
         IMaterial Clone();
         uint ComputeSize();
         RmvTexture? GetTexture(TexureType texureType);
+
+        void UpdateBeforeSave(UiVertexFormat uiVertexFormat, RmvVersionEnum outputVersion, string[] boneNames);
     }
 
     public interface IMaterialCreator
@@ -35,6 +38,7 @@ namespace FileTypes.RigidModel.MaterialHeaders
             _materialCreators[ModelMaterialEnum.weighted] = new WeighterMaterialCreator();
             _materialCreators[ModelMaterialEnum.default_type] = new WeighterMaterialCreator();
             _materialCreators[ModelMaterialEnum.TerrainTiles] = new TerrainTileMaterialCreator();
+            _materialCreators[ModelMaterialEnum.custom_terrain] = new CustomTerrainMaterialCreator();
         }
 
         public IMaterial LoadMaterial(byte[] data, int offset, RmvVersionEnum rmvType, ModelMaterialEnum modelTypeEnum)

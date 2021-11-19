@@ -2,6 +2,7 @@
 using Filetypes;
 using Filetypes.ByteParsing;
 using Filetypes.RigidModel;
+using Filetypes.RigidModel.Vertex;
 using FileTypes.PackFiles.Models;
 using FileTypes.RigidModel;
 using FileTypes.RigidModel.LodHeader;
@@ -68,57 +69,6 @@ namespace CommonControls.FormatResearch
             var instance = new DecoderHelper();
             instance.Create(GetFilesTiles(_pfs), GetDecoders(), LoadHeader_DefaultType, ComputeStats);
             return instance;
-        }
-
-        static public DecoderHelper Crate101Type(PackFileService pfs)
-        {
-            _pfs = pfs;
-            var instance = new DecoderHelper();
-            instance.Create(GetFilesMap(_pfs), GetDecoders(), LoadHeader_101Type, ComputeStats);
-            return instance;
-        }
-
-        static DataItem LoadHeader_101Type(PackFile file)
-        {
-            try
-            {
-                var chunk = file.DataSource.ReadDataAsChunk();
-                var buffer = chunk.Buffer;
-
-                var model = ModelFactory.Create().LoadOnlyHeaders(buffer);
-                var offset = model.LodHeaders.First().FirstMeshOffset;
-                var commonHeader = ByteHelper.ByteArrayToStructure<RmvCommonHeader>(buffer, (int)offset);
-
-                if (commonHeader.ModelTypeFlag != ModelMaterialEnum.TerrainTiles)
-                    return null;    // Skip
-
-                chunk.Index = (int)offset + ByteHelper.GetSize<RmvCommonHeader>();
-
-                var terrainBaseStr = chunk.ReadFixedLength(64);
-                //
-                var width = chunk.ReadUInt32();
-                var hight = chunk.ReadUInt32();
-                //
-                var unk = chunk.ReadUInt32();
-                var unk0 = chunk.ReadUInt32();
-                var unk1 = chunk.ReadUInt32();
-                var unk2 = chunk.ReadUInt32();
-
-                uint headerSize = commonHeader.VertexOffset;
-                var path = _pfs.GetFullPath(file);
-                var vertSize = (commonHeader.IndexOffset - commonHeader.VertexOffset) / commonHeader.VertexCount;
-                return new DataItem(chunk, path, new RMV2AdditionalInfo() { RenderFlag = commonHeader.RenderFlag, ModelTypeFlag = commonHeader.ModelTypeFlag, HeaderSize = (int)commonHeader.VertexOffset, VertexSize = (int)vertSize })
-                {
-                    DataMaxSize = headerSize,
-                    DataRead = (uint)(chunk.Index - offset)
-                };
-            }
-            catch
-            {
-                // Failed to get this far
-                var path = _pfs.GetFullPath(file);
-                return new DataItem(null, path);
-            }
         }
 
         static DataItem LoadHeader_DefaultType(PackFile file)
@@ -236,34 +186,55 @@ namespace CommonControls.FormatResearch
             try
             {
                 var chunk = file.DataSource.ReadDataAsChunk();
+                var buffer = chunk.Buffer;
 
-                var model = new RmvFile();
-                //model.LoadHeaders(chunk.Buffer);
+                var model = ModelFactory.Create().LoadOnlyHeaders(buffer);
+                if (model.LodHeaders.Length == 0)
+                    return null;
 
                 var offset = model.LodHeaders.First().FirstMeshOffset;
-                chunk.Index = (int)offset;
+                var commonHeader = ByteHelper.ByteArrayToStructure<RmvCommonHeader>(buffer, (int)offset);
 
-                // Read the beginning of the model header
-                var modelTypeFlag = (ModelMaterialEnum)chunk.ReadUShort();
-                if(modelTypeFlag != ModelMaterialEnum.custom_terrain)
-                   return null;
+                if (commonHeader.ModelTypeFlag != ModelMaterialEnum.custom_terrain)
+                    return null;    // Skip
 
-                var renderFlag = chunk.ReadUShort();
-                var MeshSectionSize = chunk.ReadUInt32();
-                var VertexOffset = chunk.ReadUInt32();
-                var VertexCount = chunk.ReadUInt32();
-                var IndexOffset = chunk.ReadUInt32();
-                var IndexCount = chunk.ReadUInt32();
-
-                var boundingBox = chunk.ReadBytes(24);
-                var shaderParams = chunk.ReadBytes(32);
+                chunk.Index = (int)offset + ByteHelper.GetSize<RmvCommonHeader>();
 
                 var texturePath = chunk.ReadFixedLength(256);
 
-                uint headerSize = VertexOffset;
+                //chunk.ReadSingle();
+                //chunk.ReadSingle();
+                //chunk.ReadSingle();
+                //chunk.ReadSingle();
+
+                var v0 = chunk.ReadSingle();
+                var v1 = chunk.ReadSingle();
+                var v2 = chunk.ReadSingle();
+                var v3 = chunk.ReadSingle();
+
+
+                //var g0 = chunk.ReadFloat16();
+                //var g1 = chunk.ReadFloat16();
+                //var g2 = chunk.ReadFloat16();
+                //var g3 = chunk.ReadFloat16();
+
+                var d0 = VertexLoadHelper.ByteToNormal( chunk.ReadByte() );
+                var d1 = VertexLoadHelper.ByteToNormal( chunk.ReadByte() );
+                var d2 = VertexLoadHelper.ByteToNormal( chunk.ReadByte() );
+
+                var d3 = VertexLoadHelper.ByteToNormal( chunk.ReadByte() );
+                var d4 = VertexLoadHelper.ByteToNormal( chunk.ReadByte() );
+                var d5 = VertexLoadHelper.ByteToNormal( chunk.ReadByte() );
+
+                var t = chunk.PeakUnknown(36 - (4*4));
+
+                var f16 = t.SelectMany(x => x.Data.Where(y => y.Type == DbTypesEnum.Float16)).ToArray();
+                var f32 = t.SelectMany(x => x.Data.Where(y => y.Type == DbTypesEnum.Single)).ToArray();
+
+                uint headerSize = commonHeader.VertexOffset;
                 var path = _pfs.GetFullPath(file);
-                var vertSize = (IndexOffset - VertexOffset) / VertexCount;
-                return new DataItem(chunk, path, new RMV2AdditionalInfo() { RenderFlag = renderFlag, ModelTypeFlag = modelTypeFlag, HeaderSize = (int)VertexOffset, VertexSize = (int)vertSize })
+                var vertSize = (commonHeader.IndexOffset - commonHeader.VertexOffset) / commonHeader.VertexCount;
+                return new DataItem(chunk, path, new RMV2AdditionalInfo() { RenderFlag = commonHeader.RenderFlag, ModelTypeFlag = commonHeader.ModelTypeFlag, HeaderSize = (int)commonHeader.VertexOffset, VertexSize = (int)vertSize })
                 {
                     DataMaxSize = headerSize,
                     DataRead = (uint)(chunk.Index - offset)

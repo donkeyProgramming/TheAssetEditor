@@ -46,7 +46,7 @@ namespace View3D.Commands.Object
                 }
 
                 if (_convertToStaticFrame)
-                    node.Geometry.ChangeVertexType(VertexFormat.Static, "");
+                    node.Geometry.ChangeVertexType(UiVertexFormat.Static, "");
 
                 node.Geometry.RebuildVertexBuffer();
             }

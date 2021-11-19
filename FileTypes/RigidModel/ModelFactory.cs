@@ -1,14 +1,10 @@
-﻿using Common;
-using Filetypes;
+﻿using Filetypes;
 using Filetypes.RigidModel;
 using Filetypes.RigidModel.LodHeader;
 using Filetypes.RigidModel.Vertex;
 using FileTypes.RigidModel.LodHeader;
 using FileTypes.RigidModel.MaterialHeaders;
-using Microsoft.Xna.Framework;
-using Serilog;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -16,8 +12,6 @@ namespace FileTypes.RigidModel
 {
     public class ModelFactory
     {
-        ILogger _logger = Logging.Create<ModelFactory>();
-
         public static ModelFactory Create() => new ModelFactory();
 
         public RmvFile Load(byte[] bytes)
@@ -64,6 +58,11 @@ namespace FileTypes.RigidModel
             var commonHeader = ByteHelper.ByteArrayToStructure<RmvCommonHeader>(data, modelStartOffset);
             var materialOffset = modelStartOffset + ByteHelper.GetSize<RmvCommonHeader>();
             var material = MaterialFactory.Create().LoadMaterial(data, materialOffset, rmvVersionEnum, commonHeader.ModelTypeFlag);
+            var materialSize = material.ComputeSize();
+            
+            if (materialOffset + materialSize != commonHeader.VertexOffset + modelStartOffset)
+                throw new Exception("Part of material header not read");
+
             var mesh = LoadMesh(data, commonHeader, material.BinaryVertexFormat, modelStartOffset);
 
             return new RmvModel()
@@ -74,25 +73,32 @@ namespace FileTypes.RigidModel
             };
         }
 
-        RmvMesh LoadMesh(byte[] dataArray, RmvCommonHeader CommonHeader, VertexFormat vertexFormat, int modelStartOffset)
+        RmvMesh LoadMesh(byte[] dataArray, RmvCommonHeader CommonHeader, VertexFormat binaryVertexFormat, int modelStartOffset)
         {
+            var vertexFactory = VertexFactory.Create();
+
             var vertexStart = CommonHeader.VertexOffset + modelStartOffset;
-            var vertexSize = (CommonHeader.IndexOffset - CommonHeader.VertexOffset) / CommonHeader.VertexCount;
+            var expectedVertexSize = (CommonHeader.IndexOffset - CommonHeader.VertexOffset) / CommonHeader.VertexCount;
+            var vertexSize = vertexFactory.GetVertexSize(binaryVertexFormat);
+            if (expectedVertexSize != vertexSize)
+                throw new Exception("Vertex size does not match");
 
-            var VertexList = VertexFactory.Create().CreateVertexFromBytes(vertexFormat, dataArray, (int)CommonHeader.VertexCount, (int)vertexStart, (int)vertexSize);
-
-            var bb = BoundingBox.CreateFromPoints(VertexList.Select(X => X.GetPosistionAsVec3()));
+            var VertexList = vertexFactory.CreateVertexFromBytes(binaryVertexFormat, dataArray, (int)CommonHeader.VertexCount, (int)vertexStart, (int)expectedVertexSize);
 
             var faceStart = CommonHeader.IndexOffset + modelStartOffset;
             var IndexList = new ushort[CommonHeader.IndexCount];
             for (int i = 0; i < CommonHeader.IndexCount; i++)
                 IndexList[i] = BitConverter.ToUInt16(dataArray, (int)faceStart + sizeof(ushort) * i);
 
-            return new RmvMesh()
+            var mesh = new RmvMesh()
             {
                 VertexList = VertexList,
                 IndexList = IndexList
             };
+
+            vertexFactory.ReComputeNormals(binaryVertexFormat, ref VertexList, ref IndexList);
+
+            return mesh;
         }
 
         public byte[] Save(RmvFile file)
@@ -104,7 +110,7 @@ namespace FileTypes.RigidModel
                 throw new Exception("Unexpected number of Lods");
 
             writer.Write(ByteHelper.GetBytes(file.Header));
-            for(int lodIndex =0; lodIndex < file.LodHeaders.Length; lodIndex++)
+            for(int lodIndex = 0; lodIndex < file.LodHeaders.Length; lodIndex++)
             {
                 ValidateLodHeader(file, lodIndex);
                 writer.Write(LodHeaderFactory.Create().Save(file.Header.Version, file.LodHeaders[lodIndex]));

@@ -71,10 +71,19 @@ namespace Filetypes.RigidModel
 		Cinematic = 4,
 
 		Position16_bit,
+		CustomTerrain,
 
 		// Not part of CA code
 		Weighted_withTint = 10003,
 		Cinematic_withTint = 10004,
+	};
+
+	public enum UiVertexFormat : UInt32
+	{
+		Unknown = 99,
+		Static = 0,
+		Weighted = 3,
+		Cinematic = 4,
 	};
 
 	/*

@@ -14,7 +14,7 @@ namespace FileTypes.RigidModel.MaterialHeaders
 {
     public class WeightedMaterial : IMaterial
     {
-        public VertexFormat VertexType { get; set; } = VertexFormat.Unknown;
+        public UiVertexFormat VertexType { get; set; } = UiVertexFormat.Unknown;
         public VertexFormat BinaryVertexFormat { get; set; } = VertexFormat.Unknown;
         public Vector3 PivotPoint { get; set; }
         public AlphaMode AlphaMode { get; set; }
@@ -34,6 +34,8 @@ namespace FileTypes.RigidModel.MaterialHeaders
         public List<int> IntParams { get; set; }
         public List<RmvVector4> Vec4Params { get; set; }
 
+        public ModelMaterialEnum MaterialId { get; set; } = ModelMaterialEnum.weighted;
+
         public IMaterial Clone()
         {
             return new WeightedMaterial()
@@ -42,6 +44,7 @@ namespace FileTypes.RigidModel.MaterialHeaders
                 BinaryVertexFormat = BinaryVertexFormat,
                 MatrixIndex = MatrixIndex,
                 ParentMatrixIndex = ParentMatrixIndex,
+                MaterialId = MaterialId,
 
                 ModelName = ModelName,
                 AlphaMode = AlphaMode,
@@ -59,10 +62,10 @@ namespace FileTypes.RigidModel.MaterialHeaders
             };
         }
 
-        public void UpdateAttachmentPointList(List<string> boneNames)
+        void UpdateAttachmentPointList(string[] boneNames)
         {
             AttachmentPointParams.Clear();
-            for (int i = 0; i < boneNames.Count; i++)
+            for (int i = 0; i < boneNames.Length; i++)
             {
                 var a = new RmvAttachmentPoint
                 {
@@ -100,13 +103,43 @@ namespace FileTypes.RigidModel.MaterialHeaders
                 return TexturesParams.FirstOrDefault(x => x.TexureType == texureType);
             return null;
         }
+
+        public void UpdateBeforeSave(UiVertexFormat uiVertexFormat, RmvVersionEnum outputVersion, string[] boneNames)
+        {
+            if (outputVersion == RmvVersionEnum.RMV2_V8)
+            {
+                if (uiVertexFormat == UiVertexFormat.Cinematic)
+                    BinaryVertexFormat = VertexFormat.Cinematic_withTint;
+                else if (uiVertexFormat == UiVertexFormat.Weighted)
+                    BinaryVertexFormat = VertexFormat.Weighted_withTint;
+                else
+                    BinaryVertexFormat = VertexFormat.Static;
+            }
+            else
+            {
+                if (uiVertexFormat == UiVertexFormat.Cinematic)
+                    BinaryVertexFormat = VertexFormat.Cinematic;
+                else if (uiVertexFormat == UiVertexFormat.Weighted)
+                    BinaryVertexFormat = VertexFormat.Weighted;
+                else
+                    BinaryVertexFormat = VertexFormat.Static;
+            }
+
+            if(BinaryVertexFormat == VertexFormat.Static)
+                MaterialId = ModelMaterialEnum.default_type;
+            else
+                MaterialId = ModelMaterialEnum.weighted;
+
+            UpdateAttachmentPointList(boneNames);
+        }   
     }
 
     public class WeighterMaterialCreator : IMaterialCreator
     {
         public IMaterial Create(RmvVersionEnum rmvType, byte[] dataArray, int dataOffset)
         {
-            var Header = LoadHeader(dataArray, ref dataOffset);
+            var Header = ByteHelper.ByteArrayToStructure<WeightedMaterialStruct>(dataArray, dataOffset);
+            dataOffset += ByteHelper.GetSize<WeightedMaterialStruct>();
             var material = new WeightedMaterial()
             {
                 AttachmentPointParams = LoadAttachmentPoints(Header.AttachmentPointCount, dataArray, ref dataOffset),
@@ -116,7 +149,7 @@ namespace FileTypes.RigidModel.MaterialHeaders
                 IntParams = LoadIntParams(Header.IntParamCount, dataArray, ref dataOffset),
                 Vec4Params = LoadVec4Params(Header.Vec4ParamCount, dataArray, ref dataOffset),
 
-                VertexType = (VertexFormat)Header._vertexType,
+                VertexType = (UiVertexFormat)Header._vertexType,
                 BinaryVertexFormat = (VertexFormat)Header._vertexType,
                 ModelName = Util.SanatizeFixedString(Encoding.ASCII.GetString(Header._modelName)),
                 Filters = Util.SanatizeFixedString(Encoding.ASCII.GetString(Header.Filters)),
@@ -135,12 +168,14 @@ namespace FileTypes.RigidModel.MaterialHeaders
             // Version 8 fix for different vertex format with same id! 
             if (rmvType == RmvVersionEnum.RMV2_V8)
             {
-                if (material.VertexType == VertexFormat.Weighted)
+                if (material.BinaryVertexFormat == VertexFormat.Weighted)
                     material.BinaryVertexFormat = VertexFormat.Weighted_withTint;
-                else if (material.VertexType == VertexFormat.Cinematic)
+                else if (material.BinaryVertexFormat == VertexFormat.Cinematic)
                     material.BinaryVertexFormat = VertexFormat.Cinematic_withTint;
+                else if (material.BinaryVertexFormat == VertexFormat.Static)
+                    material.BinaryVertexFormat = VertexFormat.Static;
                 else
-                    material.BinaryVertexFormat = material.VertexType;
+                    throw new Exception("Unknown vertex format for material");
             }
 
             return material;
@@ -220,11 +255,6 @@ namespace FileTypes.RigidModel.MaterialHeaders
                 throw new Exception("Difference in actual and expected byte size for weighted material");
 
             return bytes;
-        }
-
-        WeightedMaterialStruct LoadHeader(byte[] dataArray, ref int dataOffset)
-        {
-            return ByteHelper.ByteArrayToStructure<WeightedMaterialStruct>(dataArray, dataOffset);
         }
 
         List<RmvAttachmentPoint> LoadAttachmentPoints(uint AttachmentPointCount, byte[] dataArray, ref int dataOffset)

@@ -14,6 +14,7 @@ namespace Filetypes.RigidModel.Vertex.Formats
     {
         public VertexFormat Type => VertexFormat.Static;
         public uint VertexSize => (uint)ByteHelper.GetSize<Data>();
+        public bool ForceComputeNormals => false;
 
         public CommonVertex Create(byte[] buffer, int offset, int vertexSize)
         {
@@ -21,7 +22,7 @@ namespace Filetypes.RigidModel.Vertex.Formats
 
             var vertex = new CommonVertex()
             {
-                Position = VertexLoadHelper.CreatVector4HalfFloat(vertexData.position).ToVector4(),
+                Position = VertexLoadHelper.CreatVector4HalfFloat(vertexData.position).ToVector4(1),
                 Normal = VertexLoadHelper.CreatVector4Byte(vertexData.normal).ToVector3(),
                 BiNormal = VertexLoadHelper.CreatVector4Byte(vertexData.biNormal).ToVector3(),
                 Tangent = VertexLoadHelper.CreatVector4Byte(vertexData.tangent).ToVector3(),

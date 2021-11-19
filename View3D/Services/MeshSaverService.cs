@@ -2,6 +2,7 @@
 using Filetypes.RigidModel.LodHeader;
 using Filetypes.RigidModel.Transforms;
 using FileTypes.RigidModel;
+using FileTypes.RigidModel.LodHeader;
 using FileTypes.RigidModel.MaterialHeaders;
 using Microsoft.Xna.Framework;
 using System;
@@ -35,28 +36,14 @@ namespace View3D.Services
 
         static RmvLodHeader[] CreateLodHeaders(RmvLodHeader baseData, RmvVersionEnum version, uint numLods)
         {
+            var factory = LodHeaderFactory.Create();
             var output = new RmvLodHeader[numLods];
             for (uint i = 0; i < numLods; i++)
-            {
-                switch (version)
-                {
-                    case RmvVersionEnum.RMV2_V6:
-                        output[i] = Rmv2LodHeader_V6.CreateFromBase(baseData);
-                        break;
-                    case RmvVersionEnum.RMV2_V7:
-                    case RmvVersionEnum.RMV2_V8:
-                        output[i] = Rmv2LodHeader_V7_V8.CreateFromBase(baseData, i);
-                        break;
-
-                    default:
-                        throw new NotImplementedException("Version not supported");
-                }
-            }
-
+                output[i] = factory.CreateFromBase(version, baseData, i);
             return output;
         }
 
-        public static byte[] SaveV3(bool onlySaveVisibleNodes, List<Rmv2ModelNode> modelNodes, GameSkeleton skeleton, RmvVersionEnum version, ModelMaterialEnum modelMaterial)
+        public static byte[] Save(bool onlySaveVisibleNodes, List<Rmv2ModelNode> modelNodes, GameSkeleton skeleton, RmvVersionEnum version, ModelMaterialEnum modelMaterial)
         {
             uint lodCount = (uint)modelNodes.First().Model.LodHeaders.Length;
 
@@ -93,36 +80,17 @@ namespace View3D.Services
                             Mesh = MeshBuilderService.CreateRmvFileMesh(meshes[meshIndex].Geometry)
                         };
 
-                        // Computer bounding box in Commonheader
+                        var boneNames = new string[0];
+                        if (skeleton != null)
+                            boneNames = skeleton.BoneNames.ToArray();
+
+                        newModel.Material.UpdateBeforeSave(meshes[meshIndex].Geometry.VertexFormat, version, boneNames);
+
+                        // Update the common header
                         var commonHeader = newModel.CommonHeader;
-                        commonHeader.BoundingBox.UpdateBoundingBox(BoundingBox.CreateFromPoints(newModel.Mesh.VertexList.Select(x=> new Vector3(x.Position.X, x.Position.Y, x.Position.Z) )));
+                        commonHeader.BoundingBox.UpdateBoundingBox(BoundingBox.CreateFromPoints(newModel.Mesh.VertexList.Select(x => x.GetPosistionAsVec3())));
+                        commonHeader.ModelTypeFlag = newModel.Material.MaterialId;
                         newModel.CommonHeader = commonHeader;
-
-                        if (newModel.Material is WeightedMaterial weighterMaterial)
-                        {
-                            // Vertex
-                            if (version == RmvVersionEnum.RMV2_V8)
-                            {
-                                if (meshes[meshIndex].Geometry.VertexFormat == VertexFormat.Cinematic)
-                                    weighterMaterial.BinaryVertexFormat = VertexFormat.Cinematic_withTint;
-                                else if(meshes[meshIndex].Geometry.VertexFormat == VertexFormat.Weighted)
-                                    weighterMaterial.BinaryVertexFormat = VertexFormat.Weighted_withTint;
-                                else
-                                    weighterMaterial.BinaryVertexFormat = meshes[meshIndex].Geometry.VertexFormat;
-                            }
-                            else
-                            {
-                                weighterMaterial.BinaryVertexFormat = meshes[meshIndex].Geometry.VertexFormat;
-                            }
-
-                            weighterMaterial.AttachmentPointParams.Clear();
-                            if (skeleton != null)
-                                weighterMaterial.UpdateAttachmentPointList(skeleton.BoneNames.ToList());
-                        }
-                        else
-                        {
-                            throw new NotImplementedException("Trying to save unsupported material");
-                        }
 
                         newMeshList[currentLodIndex].Add(newModel);
                     }

@@ -16,9 +16,10 @@ namespace View3D.Services
         public static MeshObject BuildMeshFromRmvModel(RmvModel modelPart, string skeletonName, IGraphicsCardGeometry context)
         {
             var output = new MeshObject(context, skeletonName);
+            output.ChangeVertexType(modelPart.Material.VertexType, skeletonName, false);
             output.VertexArray = new VertexPositionNormalTextureCustom[modelPart.Mesh.VertexList.Length];
             output.IndexArray = (ushort[])modelPart.Mesh.IndexList.Clone();
-            output.ChangeVertexType(modelPart.Material.VertexType, skeletonName);
+            
 
             for (int i = 0; i < modelPart.Mesh.VertexList.Length; i++)
             {
@@ -29,17 +30,17 @@ namespace View3D.Services
                 output.VertexArray[i].Tangent = vertex.Tangent;
                 output.VertexArray[i].TextureCoordinate = vertex.Uv;
 
-                if (output.VertexFormat == VertexFormat.Static)
+                if (output.VertexFormat == UiVertexFormat.Static)
                 {
                     output.VertexArray[i].BlendIndices = Vector4.Zero;
                     output.VertexArray[i].BlendWeights = Vector4.Zero;
                 }
-                else if (output.VertexFormat == VertexFormat.Weighted)
+                else if (output.VertexFormat == UiVertexFormat.Weighted)
                 {
                     output.VertexArray[i].BlendIndices = new Vector4(vertex.BoneIndex[0], vertex.BoneIndex[1], 0, 0);
                     output.VertexArray[i].BlendWeights = new Vector4(vertex.BoneWeight[0], vertex.BoneWeight[1], 0, 0);
                 }
-                else if (output.VertexFormat == VertexFormat.Cinematic)
+                else if (output.VertexFormat == UiVertexFormat.Cinematic)
                 {
                     output.VertexArray[i].BlendIndices = new Vector4(vertex.BoneIndex[0], vertex.BoneIndex[1], vertex.BoneIndex[2], vertex.BoneIndex[3]);
                     output.VertexArray[i].BlendWeights = new Vector4(vertex.BoneWeight[0], vertex.BoneWeight[1], vertex.BoneWeight[2], vertex.BoneWeight[3]);

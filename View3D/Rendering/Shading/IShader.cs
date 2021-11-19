@@ -95,6 +95,8 @@ namespace View3D.Rendering.Shading
         {
             if (_textures.ContainsKey(type))
                 _textures[type]?.SetValue(texture);
+
+            UseTexture(texture != null, type);
         }
 
         public void UseTexture(bool value, TexureType type)

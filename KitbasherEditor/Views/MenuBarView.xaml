@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:KitbasherEditor.Views" 
+             xmlns:viewmodel="clr-namespace:KitbasherEditor.ViewModels.MenuBarViews"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
              xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
@@ -13,8 +14,8 @@
         <valueconverters:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Collapsed" />
 
         <Style x:Key="VerticalSeparatorStyle" 
-       TargetType="{x:Type Separator}"
-       BasedOn="{StaticResource {x:Type Separator}}">
+            TargetType="{x:Type Separator}"
+            BasedOn="{StaticResource {x:Type Separator}}">
             <Setter Property="Margin" Value="6,0,6,0"/>
             <Setter Property="LayoutTransform">
                 <Setter.Value>
@@ -37,6 +38,36 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <DataTemplate x:Key="defaultButtonTemplate">
+            <Button ToolTip="{Binding Action.ToolTipAttribute.Value}" BorderThickness="0" Background="AliceBlue" Margin="1" 
+                    IsEnabled="{Binding Action.IsActionEnabled.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                    Command="{Binding Path=Action.Command}" 
+                    ToolTipService.ShowOnDisabled="True">
+                <Image Style="{StaticResource ImageStyle}" Source="{Binding Image}"/>
+            </Button>
+        </DataTemplate>
+
+        <DataTemplate x:Key="radioButtonTemplate">
+            <RadioButton    ToolTip="{Binding  Action.ToolTipAttribute.Value}"  BorderThickness="0" Background="AliceBlue" Margin="1" 
+                            IsChecked="{Binding IsChecked.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                            Command="{Binding Path=Action.Command}"
+                            GroupName="{Binding GroupName}" 
+                            Style="{StaticResource {x:Type ToggleButton}}"
+                            IsEnabled="{Binding Action.IsActionEnabled.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                            ToolTipService.ShowOnDisabled="True" >
+                <Image Style="{StaticResource ImageStyle}" Source="{Binding Image}"/>
+            </RadioButton>
+        </DataTemplate>
+
+        <DataTemplate x:Key="seperatorButtonTemplate">
+            <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
+        </DataTemplate>
+
+        <viewmodel:ButtonDataTemplateSelector x:Key="buttonStyleSelector"
+            DefaultButtonTemplate="{StaticResource defaultButtonTemplate}" 
+            RadioButtonTemplate="{StaticResource radioButtonTemplate}"
+            SeperatorTemplate="{StaticResource seperatorButtonTemplate}"/>
 
     </UserControl.Resources>
 
@@ -66,6 +97,34 @@
                 <MenuItem Header="Reset" Command="{Binding General.ResetCameraCommand, Mode=OneTime}"/>
             </MenuItem>
         </Menu>
+
+        <Menu ItemsSource="{Binding CustomMenu}">
+            <Menu.Resources>
+                <Style TargetType="{x:Type MenuItem}">
+                    <Setter Property="Header" Value="{Binding Name}" />
+                    <Setter Property="Command" Value="{Binding Action.Command}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSeparator}" Value="True">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type MenuItem}">
+                                        <Separator />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+
+                <HierarchicalDataTemplate DataType="{x:Type viewmodel:MenuDesc}" ItemsSource="{Binding CustomMenu}" />
+            </Menu.Resources>
+        </Menu>
+
+        <ToolBarTray DockPanel.Dock="Top" Height="50" VerticalAlignment="Center">
+            <ToolBar ItemsSource="{Binding Path=CustomButtons}" ItemTemplateSelector="{StaticResource buttonStyleSelector}"  />
+        </ToolBarTray>
+
+
 
         <ToolBarTray DockPanel.Dock="Top" Height="50" VerticalAlignment="Center">
             <ToolBar VerticalContentAlignment="Center">
@@ -125,6 +184,11 @@
                         IsEnabled="{Binding Tools.ToggleShowSelectionEnabled, UpdateSourceTrigger=PropertyChanged}">
                     <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/ShowSelection.png"/>
                 </Button>
+
+
+
+
+
 
                 <!-- Object selection-->
                 <ToolBar  Visibility="{Binding Tools.ShowObjectTools, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">

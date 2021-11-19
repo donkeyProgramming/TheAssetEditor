@@ -39,6 +39,8 @@ namespace Filetypes.RigidModel.LodHeader
     {
         uint HeaderSize { get; }
         RmvLodHeader Create(byte[] buffer, int offset);
+        RmvLodHeader CreateFromBase(RmvLodHeader source, uint lodLevel);
         byte[] Save(RmvLodHeader rmvLodHeader);
+
     }
 }

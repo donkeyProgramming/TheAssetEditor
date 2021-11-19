@@ -12,7 +12,7 @@ namespace FileTypes.RigidModel
     {
         public bool Alpha { get; set; } = false;
         public Dictionary<TexureType, string> Textures { get; set; } = new Dictionary<TexureType, string>();
-        public VertexFormat VertexType { get; set; } = VertexFormat.Unknown;
+        public UiVertexFormat VertexType { get; set; } = UiVertexFormat.Unknown;
         public string Name { get; set; }
         public string FullPath { get; set; }
 
@@ -34,11 +34,11 @@ namespace FileTypes.RigidModel
                     Alpha = true;
 
                 if (Name.Contains("weighted4", StringComparison.InvariantCultureIgnoreCase))
-                    VertexType = VertexFormat.Cinematic;
+                    VertexType = UiVertexFormat.Cinematic;
                 else if (Name.Contains("weighted2", StringComparison.InvariantCultureIgnoreCase))
-                    VertexType = VertexFormat.Weighted;
+                    VertexType = UiVertexFormat.Weighted;
                 else
-                    VertexType = VertexFormat.Static;
+                    VertexType = UiVertexFormat.Static;
             }
 
             var textureNodes = doc.SelectNodes(@"/material/textures/texture");

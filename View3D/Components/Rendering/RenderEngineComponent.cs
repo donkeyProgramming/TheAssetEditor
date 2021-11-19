@@ -56,16 +56,18 @@ namespace View3D.Components.Rendering
 
         public override void Initialize()
         {
+            //float depthBias = -0.000008f;
+            float depthBias = -0.08f;
             _wireframeState = new RasterizerState();
             _wireframeState.FillMode = FillMode.WireFrame;
             _wireframeState.CullMode = CullMode.None;
-            _wireframeState.DepthBias = -0.000008f;
+            _wireframeState.DepthBias = depthBias;
             _wireframeState.DepthClipEnable = true;
 
             _selectedFaceState = new RasterizerState();
             _selectedFaceState.FillMode = FillMode.Solid;
             _selectedFaceState.CullMode = CullMode.None;
-            _selectedFaceState.DepthBias = -0.000008f;
+            _selectedFaceState.DepthBias = depthBias;
             _wireframeState.DepthClipEnable = true;
 
             _camera = GetComponent<ArcBallCamera>();

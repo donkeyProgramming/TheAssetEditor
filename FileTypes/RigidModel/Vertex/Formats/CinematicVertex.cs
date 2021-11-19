@@ -11,6 +11,8 @@ namespace Filetypes.RigidModel.Vertex.Formats
         public bool AddTintColour { get; set; }
         public uint VertexSize => (uint)ByteHelper.GetSize<Data>() + TintColourSize();
 
+        public bool ForceComputeNormals => false;
+
         public CommonVertex Create(byte[] buffer, int offset, int vertexSize)
         {
             var vertexData = ByteHelper.ByteArrayToStructure<Data>(buffer, offset);

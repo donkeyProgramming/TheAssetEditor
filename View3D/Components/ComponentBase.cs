@@ -17,6 +17,7 @@ namespace View3D.Components
         private bool _visible = true;
         private int _drawOrder = (int)ComponentDrawOrderEnum.Default;
         private bool _initialized;
+        public bool Isinitialized { get => _initialized; }
         private bool _enabled = true;
         private int _updateOrder = (int)ComponentUpdateOrderEnum.Default;
 
