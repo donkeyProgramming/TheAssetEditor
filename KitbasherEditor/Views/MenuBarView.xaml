@@ -5,11 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:KitbasherEditor.Views" 
              xmlns:viewmodel="clr-namespace:KitbasherEditor.ViewModels.MenuBarViews"
-             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
+             xmlns:menusystem="clr-namespace:CommonControls.Common.MenuSystem;assembly=CommonControls"
              xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
              mc:Ignorable="d" Loaded="UserControl_Loaded" >
-
     <UserControl.Resources>
         <valueconverters:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Collapsed" />
 
@@ -70,40 +68,14 @@
             DefaultButtonTemplate="{StaticResource defaultButtonTemplate}" 
             RadioButtonTemplate="{StaticResource radioButtonTemplate}"
             SeperatorTemplate="{StaticResource seperatorButtonTemplate}"/>
-
     </UserControl.Resources>
 
 
     <DockPanel>
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File">
-                <MenuItem Header="Save (ctr+s)" Command="{Binding General.SaveCommand, Mode=OneTime}"/>
-                <MenuItem Header="Save as" Command="{Binding General.SaveAsCommand, Mode=OneTime}" />
-                <Separator/>
-                <MenuItem Header="Generate Ws Model" Command="{Binding General.GenerateWsModelCommand, Mode=OneTime}"/>
-                <Separator/>
-                <MenuItem Header="Import reference (ctr+o)" Command="{Binding ImportReferenceCommand, Mode=OneTime}"/>
-                <MenuItem Header="Import reference - Paladin vmd" Command="{Binding ImportReferenceCommand_PaladinVMD, Mode=OneTime}"/>
-            </MenuItem>
-
-            <MenuItem Header="_Options">
-                <MenuItem Header="Sort models by name" Command="{Binding General.SortModelsByNameCommand, Mode=OneTime}"/>
-            </MenuItem>
-
-            <MenuItem Header="Tools" IsEnabled="False">
-                <MenuItem Header="Attach tool" Command="{Binding General.OpenAttachToolCommand, Mode=OneTime}"/>
-            </MenuItem>
-
-            <MenuItem Header="Camera" >
-                <MenuItem Header="Focus Selection (ctr+f)" Command="{Binding General.FocusCameraCommand, Mode=OneTime}"/>
-                <MenuItem Header="Reset" Command="{Binding General.ResetCameraCommand, Mode=OneTime}"/>
-            </MenuItem>
-        </Menu>
-
-        <Menu ItemsSource="{Binding CustomMenu}">
+        <Menu ItemsSource="{Binding MenuItems}"  DockPanel.Dock="Top">
             <Menu.Resources>
                 <Style TargetType="{x:Type MenuItem}">
-                    <Setter Property="Header" Value="{Binding Name}" />
+                    <Setter Property="Header" Value="{Binding NameAttribute.Value}" />
                     <Setter Property="Command" Value="{Binding Action.Command}" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsSeparator}" Value="True">
@@ -118,215 +90,12 @@
                     </Style.Triggers>
                 </Style>
 
-                <HierarchicalDataTemplate DataType="{x:Type viewmodel:MenuDesc}" ItemsSource="{Binding CustomMenu}" />
+                <HierarchicalDataTemplate DataType="{x:Type menusystem:ToolbarItem}" ItemsSource="{Binding Children}" />
             </Menu.Resources>
         </Menu>
 
-        <ToolBarTray DockPanel.Dock="Top" Height="50" VerticalAlignment="Center">
+        <ToolBarTray DockPanel.Dock="Top" VerticalAlignment="Center">
             <ToolBar ItemsSource="{Binding Path=CustomButtons}" ItemTemplateSelector="{StaticResource buttonStyleSelector}"  />
-        </ToolBarTray>
-
-
-
-        <ToolBarTray DockPanel.Dock="Top" Height="50" VerticalAlignment="Center">
-            <ToolBar VerticalContentAlignment="Center">
-                <Button ToolTip="Save (ctr+s)"  Command="{Binding General.SaveCommand, Mode=OneTime}">
-                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-save-all-50.png"/>
-                </Button>
-
-                <Button ToolTip="Import file (ctr+o)" Command="{Binding ImportReferenceCommand, Mode=OneTime}">
-                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/open ref.png"/>
-                </Button>
-
-                <Button ToolTip="Validate object" IsEnabled="False" Visibility="Collapsed">
-                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Validate.png"/>
-                </Button>
-
-
-
-                <Button ToolTip="{Binding General.UndoHintText}" Command="{Binding General.UndoCommand, Mode=OneTime}" IsEnabled="{Binding General.UndoEnabled}">
-                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/undo.png"/>
-                </Button>
-                <Button ToolTip="Delete undo history" IsEnabled="False" Visibility="Collapsed">
-                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/DeleteHistory.png"/>
-                </Button>
-
-
-                <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
-                <RadioButton ToolTip="Object selector(Q)" GroupName="gizmo" Command="{Binding Gizmo.CursorCommand}" IsChecked="{Binding Gizmo.CursorActive, UpdateSourceTrigger=PropertyChanged}">
-                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-cursor-256.png"/>
-                </RadioButton>
-                <RadioButton ToolTip="Move gizmo(W)" GroupName="gizmo" Command="{Binding Gizmo.MoveCommand}" IsChecked="{Binding Gizmo.MoveActive, UpdateSourceTrigger=PropertyChanged}">
-                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Gizmo_move.png"/>
-                </RadioButton>
-                <RadioButton ToolTip="Rotate gizmo(E)" GroupName="gizmo" Command="{Binding Gizmo.RotateCommand}" IsChecked="{Binding Gizmo.RotateActive, UpdateSourceTrigger=PropertyChanged}">
-                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Gizmo_rotate.png"/>
-                </RadioButton>
-                <RadioButton ToolTip="Scale gizmo(R)" GroupName="gizmo" Command="{Binding Gizmo.ScaleCommand}" IsChecked="{Binding Gizmo.ScaleActive, UpdateSourceTrigger=PropertyChanged}">
-                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Gizmo_scale.png"/>
-                </RadioButton>
-
-                <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
-
-                <TextBlock VerticalAlignment="Center" Text="Selection:"/>
-                <ComboBox SelectedIndex="{Binding Gizmo.SelectionModeIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                    <ComboBoxItem>
-                        <Image ToolTip="Object (F1)"  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_object.png"/>
-                    </ComboBoxItem>
-                    <ComboBoxItem>
-                        <Image ToolTip="Face (F2)"  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_face.png"/>
-                    </ComboBoxItem>
-                    <ComboBoxItem >
-                        <Image ToolTip="Vertex (F3)"  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/SelectionMode_Vertex.png"/>
-                    </ComboBoxItem>
-                </ComboBox>
-
-                <Button ToolTip="Toggle view selected item (Space)" 
-                        Command="{Binding Tools.ToggleShowSelectionCommand}"
-                        IsEnabled="{Binding Tools.ToggleShowSelectionEnabled, UpdateSourceTrigger=PropertyChanged}">
-                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/ShowSelection.png"/>
-                </Button>
-
-
-
-
-
-
-                <!-- Object selection-->
-                <ToolBar  Visibility="{Binding Tools.ShowObjectTools, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
-                    <Button ToolTip="Divide selected mesh into submeshes\nHold ALT to not auto combine connected meshes" 
-                        Command="{Binding Tools.DivideSubMeshCommand}"
-                        IsEnabled="{Binding Tools.DivideSubMeshEnabled, UpdateSourceTrigger=PropertyChanged}">
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_split.png"/>
-                    </Button>
-
-                    <Button ToolTip="Merge selected meshes into one mesh (ctrl+m)" 
-                        Command="{Binding Tools.MergeObjectCommand}"
-                        IsEnabled="{Binding Tools.MergeMeshEnabled, UpdateSourceTrigger=PropertyChanged}">
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_combine.png"/>
-                    </Button>
-
-                    <Button ToolTip="Duplicated selected (Ctr+D)" 
-                        Command="{Binding Tools.DuplicateObjectCommand}"
-                        IsEnabled="{Binding Tools.DuplicateEnabled, UpdateSourceTrigger=PropertyChanged}">
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_duplicate.png"/>
-                    </Button>
-
-                    <Button ToolTip="Group/Ungroup (ctrl+g)" 
-                        Command="{Binding Tools.GroupCommand}"
-                            IsEnabled="{Binding Tools.GroupCommandEnabled, UpdateSourceTrigger=PropertyChanged}">
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/Group.png"/>
-                    </Button>
-
-                    <Button ToolTip="Delete selected object or faces (Del)" 
-                        Command="{Binding Tools.DeleteObjectCommand}"
-                        IsEnabled="{Binding Tools.DeleteEnabled, UpdateSourceTrigger=PropertyChanged}">
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_delete.png"/>
-                    </Button>
-
-                    <Separator Style="{DynamicResource VerticalSeparatorStyle}" />
-
-                    <Button ToolTip="Reduce mesh 10%" 
-                        Command="{Binding Tools.ReduceMeshCommand}"
-                            IsEnabled="{Binding Tools.ReduceMeshCommandEnabled, UpdateSourceTrigger=PropertyChanged}">
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-compress-64.png"/>
-                    </Button>
-
-                    <Button ToolTip="Create lods" 
-                        Command="{Binding Tools.CreateLodCommand}">
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/createlod.png"/>
-                    </Button>
-
-                    <Button ToolTip="Open BMI tool" 
-                        Command="{Binding Tools.BmiToolCommand}"
-                            IsEnabled="{Binding Tools.BmiToolCommandEnabled, UpdateSourceTrigger=PropertyChanged}">
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-bmi-48.png"/>
-                    </Button>
-
-                    <Button ToolTip="Open Skeleton Reshaper tool" 
-                        Command="{Binding Tools.SkeletonReshaperCommand}"
-                            IsEnabled="{Binding Tools.SkeletonReshaperCommandEnabled, UpdateSourceTrigger=PropertyChanged}">
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-body-48.png"/>
-                    </Button>
-
-                    <Button ToolTip="Open Re-Rigging Tool" 
-                        Command="{Binding Tools.ReRiggingToolCommand}"
-                            IsEnabled="{Binding Tools.ReRiggingToolCommandEnabled, UpdateSourceTrigger=PropertyChanged}">
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/icons8-animated-skeleton-50.png"/>
-                    </Button>
-
-                    <Button ToolTip="Convert selected meshes to static meshes with the current animation frame" 
-                        Command="{Binding Tools.CreateStaticMeshesCommand}"
-                            IsEnabled="{Binding Tools.CreateStaticMeshesCommandEnabled, UpdateSourceTrigger=PropertyChanged}">
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-fruity-ice-pop-64.png"/>
-                    </Button>
-
-                    <Button ToolTip="Pin mesh to an other mesh. \nSelect two meshes. The second mesh will be pinned to the first" 
-                        Command="{Binding Tools.PinMeshToMeshCommand}"
-                            IsEnabled="{Binding Tools.PinMeshToMeshEnabled, UpdateSourceTrigger=PropertyChanged}">
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/pin.png"/>
-                    </Button>
-                </ToolBar>
-
-
-                <!-- Face selection-->
-                <ToolBar  Visibility="{Binding Tools.ShowFaceTools, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
-                    <Button ToolTip="Convert selection to vertex" 
-                        Command="{Binding Tools.FaceToVertexCommand}"
-                        IsEnabled="{Binding Tools.FaceToVertexEnabled, UpdateSourceTrigger=PropertyChanged}">
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/FaceToVertex.png"/>
-                    </Button>
-
-                    <Button ToolTip="Expand selection based on selected faces.\nHold ALT to not auto combine connected meshes" 
-                        Command="{Binding Tools.ExpandSelectedFacesToObjectCommand}"
-                        IsEnabled="{Binding Tools.ExpandSelectedFacesToObjectEnabled, UpdateSourceTrigger=PropertyChanged}">
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/ExpandSelection.png"/>
-                    </Button>
-
-                    <Button ToolTip="Divide selected faces into submeshes" 
-                        Command="{Binding Tools.DivideSubMeshCommand}"
-                        IsEnabled="{Binding Tools.DivideSubMeshEnabled, UpdateSourceTrigger=PropertyChanged}">
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_split.png"/>
-                    </Button>
-                    <Button ToolTip="Duplicated selected faces into new object (Ctr+D)" 
-                        Command="{Binding Tools.DuplicateObjectCommand}"
-                        IsEnabled="{Binding Tools.DuplicateEnabled, UpdateSourceTrigger=PropertyChanged}">
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_duplicate.png"/>
-                    </Button>
-
-                    <Button ToolTip="Delete selected faces (Del)" 
-                        Command="{Binding Tools.DeleteObjectCommand}"
-                        IsEnabled="{Binding Tools.DeleteEnabled, UpdateSourceTrigger=PropertyChanged}">
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_delete.png"/>
-                    </Button>
-
-                </ToolBar>
-
-                <!-- Vertex selection-->
-                <ToolBar  Visibility="{Binding Tools.ShowVertexTools, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
-                    <Button ToolTip="Merge selected vertexes" 
-                        Command="{Binding Tools.MergeVertexCommand}"
-                        IsEnabled="{Binding Tools.MergeVertexEnabled, UpdateSourceTrigger=PropertyChanged}"
-                            Visibility="Collapsed">
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_mergeVertex.png"/>
-                    </Button>
-
-                    <Label Content="Fall-of:" VerticalContentAlignment="Center"/>
-                    <TextBox MaxWidth="50" MinWidth="50" Text="{Binding Tools.VertexMovementFalloff.Value.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" ToolTip="Fall of distance for selected vertexes">
-                        <b:Interaction.Behaviors>
-                            <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
-                        </b:Interaction.Behaviors>
-                    </TextBox>
-
-                    <Button ToolTip="Show debug info" 
-                        Command="{Binding Tools.ShowVertexDebugInfoCommand}"
-                        IsEnabled="{Binding Tools.ShowVertexDebugInfoEnabled, UpdateSourceTrigger=PropertyChanged}">
-                        <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/icons8-question-mark-48.png"/>
-                    </Button>
-                </ToolBar>
-
-
-            </ToolBar>
         </ToolBarTray>
 
     </DockPanel>

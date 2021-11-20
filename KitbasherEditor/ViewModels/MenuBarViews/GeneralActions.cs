@@ -14,7 +14,7 @@ using static View3D.Commands.Object.GroupObjectsCommand;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
-    public class GeneralMenuBarViewModel : NotifyPropertyChangedImpl
+    public class GeneralActions : NotifyPropertyChangedImpl
     { 
         CommandExecutor _commandExecutor;
         FocusSelectableObjectComponent _cameraFocusComponent;
@@ -22,11 +22,10 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         ObjectEditor _objectEditor;
         public ModelSaveHelper ModelSaver { get; set; }
 
-        public GeneralMenuBarViewModel(IComponentManager componentManager)
+        public GeneralActions(IComponentManager componentManager)
         {
             _commandExecutor = componentManager.GetComponent<CommandExecutor>();
             _cameraFocusComponent = componentManager.GetComponent<FocusSelectableObjectComponent>();
-
             _editableMeshResolver = componentManager.GetComponent<IEditableMeshResolver>();
             _objectEditor = componentManager.GetComponent<ObjectEditor>();
         }

@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Windows.Input;
 
-namespace KitbasherEditor.ViewModels.MenuBarViews
+namespace CommonControls.Common.MenuSystem
 {
     public interface IKeyboardHandler
     {
@@ -9,7 +11,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         void OnKeyDown(Key key, Key systemKey, ModifierKeys modifiers);
     }
 
-    public class WindowKeyboard 
+    public class WindowKeyboard
     {
         Dictionary<Key, bool> _isKeyDown = new Dictionary<Key, bool>();
         public bool IsKeyDown(Key key)

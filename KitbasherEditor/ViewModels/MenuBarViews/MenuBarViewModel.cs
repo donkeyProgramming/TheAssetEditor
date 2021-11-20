@@ -1,4 +1,5 @@
 ﻿using CommonControls.Common;
+using CommonControls.Common.MenuSystem;
 using CommonControls.PackFileBrowser;
 using CommonControls.Resources;
 using CommonControls.Services;
@@ -10,8 +11,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using View3D.Components.Component;
@@ -19,156 +18,6 @@ using View3D.Components.Component.Selection;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
-
-    public class MenuItem
-    {
-        public string Name { get; set; }
-        public ICommand Command { get; set; }
-        public ObservableCollection<MenuItem> MenuItems { get; set; } = new ObservableCollection<MenuItem>();
-        public string ToolTip { get; set; }
-        public string ImagePath { get; set; } = @"pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/tool_split.png";
-
-        public MenuItem(string name = "", ICommand command = null)
-        {
-            Name = name;
-            Command = command;
-        }
-    }
-
-    public enum ActionEnabledRule
-    { 
-        Always,
-        OneObjectSelected,
-        AtleastOneObjectSelected,
-        TwoObjectesSelected,
-        TwoOrMoreObjectsSelected,
-        FaceSelected,
-        VertexSelected,
-        AnythingSelected,
-        ObjectOrVertexSelected,
-        ObjectOrFaceSelected,
-        Custom
-    }
-
-    public enum ButtonVisabilityRule
-    {
-        Always,
-        ObjectMode,
-        FaceMode,
-        VertexMode,
-    }
-
-    public class MenuAction
-    {
-        public Hotkey Hotkey { get; set; }
-        public ICommand Command { get; set; }
-        public NotifyAttr<string> ToolTipAttribute { get; set; } = new NotifyAttr<string>();
-        public ActionEnabledRule EnableRule { get; set; }
-        public NotifyAttr<bool> IsActionEnabled { get; set; } = new NotifyAttr<bool>(true);
-
-        public void TriggerAction()
-        {
-            if (ActionTriggeredCallback != null)
-                ActionTriggeredCallback();
-
-            _func();
-        }
-
-        public Action ActionTriggeredCallback { get; set; }
-        Action _func { get; set; }
-
-        public MenuAction(Action function)
-        {
-            _func = function;
-            Command = new RelayCommand(TriggerAction);
-        }
-
-        public string ToolTip
-        {
-            set 
-            {
-                ToolTipAttribute.Value = value + ToopTipText();
-            }
-        }
-
-        string ToopTipText()
-        {
-            return "";
-        }
-    }
-
-    public class Hotkey
-    {
-        public ModifierKeys ModifierKeys { get; set; }
-        public Key Key { get; set; }
-
-        public Hotkey(Key key, ModifierKeys modifierKeys)
-        {
-            Key = key;
-            ModifierKeys = modifierKeys;
-        }
-    }
-
-    public class MenuDesc
-    {
-        public string Name { get; set; }
-        public ObservableCollection<MenuDesc> CustomMenu { get; set; } = new ObservableCollection<MenuDesc>();
-
-        public MenuAction Action { get; set; }
-        public bool IsSeparator { get; set; } = false;
-    }
-
-
-    public class ButtonDesc
-    {
-        public NotifyAttr<bool> IsVisible { get; set; } = new NotifyAttr<bool>(true);
-        public BitmapImage Image { get; set; }
-        public MenuAction Action { get; set; }
-        public ButtonVisabilityRule ShowRule { get; set; } = ButtonVisabilityRule.Always;
-        public bool IsSeperator { get; set; } = false;
-
-        public ButtonDesc(MenuAction action)
-        {
-            Action = action;
-        }
-    }
-
-    public class RadioButtonDesc : ButtonDesc
-    {
-        public string GroupName { get; set; } = Guid.NewGuid().ToString();
-        public NotifyAttr<bool> IsChecked { get; set; } = new NotifyAttr<bool>(false);
-
-        public RadioButtonDesc(MenuAction action, bool isChecked = false) : base(action)
-        {
-            IsChecked.Value = isChecked;
-            action.ActionTriggeredCallback = OnActionTriggered;
-        }
-
-        void OnActionTriggered() => IsChecked.Value = true;
-    }
-
-    public class ButtonDataTemplateSelector : DataTemplateSelector
-    {
-        public DataTemplate DefaultButtonTemplate { get; set; }
-        public DataTemplate RadioButtonTemplate { get; set; }
-        public DataTemplate SeperatorTemplate { get; set; }
-
-        public override DataTemplate SelectTemplate(object item, DependencyObject container)
-        {
-            var button = (ButtonDesc)item;
-            if (button.IsSeperator)
-                return SeperatorTemplate;
-            switch (button)
-            {
-                case RadioButtonDesc _:
-                    return RadioButtonTemplate;
-                default: 
-                    return DefaultButtonTemplate;
-            }
-        }
-    }
-
-
     public enum MenuActionType
     { 
         Save,
@@ -211,68 +60,70 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         GrowFaceSelection,
         ConvertFaceToVertexSelection,
-
-
     }
 
     public class MenuBarViewModel : IKeyboardHandler
     {
-        public ObservableCollection<MenuItem> MenuItems { get; set; }
-
-        public ObservableCollection<MenuDesc> CustomMenu { get; set; } = new ObservableCollection<MenuDesc>();
-        public ObservableCollection<ButtonDesc> CustomButtons { get; set; } = new ObservableCollection<ButtonDesc>();
-
-
-        public GizmoModeMenuBarViewModel Gizmo { get; set; }
-        public GeneralMenuBarViewModel General { get; set; }
-        public ToolsMenuBarViewModel Tools { get; set; }
-        public TransformToolViewModel TransformTool { get; set; }
-
-        public ToolbarCommandFactory _commandFactory = new ToolbarCommandFactory();
-
+        public ObservableCollection<ToolbarItem> MenuItems { get; set; } = new ObservableCollection<ToolbarItem>();
+        public ObservableCollection<MenuBarButton> CustomButtons { get; set; } = new ObservableCollection<MenuBarButton>();
 
         public ModelLoaderService ModelLoader { get; set; }
+        public GizmoActions Gizmo { get; set; }
+        public GeneralActions General { get; set; }
+        public ToolActions Tools { get; set; }
+        public TransformToolViewModel TransformTool { get; set; }
 
+        ActionHotkeyHandler _commandFactory = new ActionHotkeyHandler();
+        VisibilityHandler _ruleFactory;
         WindowKeyboard _keyboard = new WindowKeyboard();
         PackFileService _packFileService;
-
         SelectionManager _selectionManager;
-
+        CommandExecutor _commandExecutor;
 
         Dictionary<MenuActionType, MenuAction> _actionList = new Dictionary<MenuActionType, MenuAction>();
-        Dictionary<ActionEnabledRule, Func<bool>> _actionEnabledRules = new Dictionary<ActionEnabledRule, Func<bool>>();
-        Dictionary<ButtonVisabilityRule, Func<bool>> _buttonVisabilityRules = new Dictionary<ButtonVisabilityRule, Func<bool>>();
+
         public MenuBarViewModel(IComponentManager componentManager, PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper)
         {
             _packFileService = packFileService;
-
+            _ruleFactory = new VisibilityHandler(componentManager);
             TransformTool = new TransformToolViewModel(componentManager);
-            Gizmo = new GizmoModeMenuBarViewModel(TransformTool, componentManager);
-            General = new GeneralMenuBarViewModel(componentManager);
-            Tools = new ToolsMenuBarViewModel(componentManager, _commandFactory, _packFileService, skeletonHelper, _keyboard);
+            Gizmo = new GizmoActions(TransformTool, componentManager);
+            General = new GeneralActions(componentManager);
+            Tools = new ToolActions(componentManager, _packFileService, skeletonHelper, _keyboard);
 
-            // -----------------------------------
-            // Actions
-            // -----------------------------------
-            _actionList[MenuActionType.Save] = new MenuAction(General.Save ) { EnableRule = ActionEnabledRule.Always, ToolTip = "Save" };
+            CreateActions();
+            CreateButtons();
+            CreateMenu();
+            ProcessHotkeys();
+
+            _selectionManager = componentManager.GetComponent<SelectionManager>();
+            _selectionManager.SelectionChanged += OnSelectionChanged;
+
+            _commandExecutor = componentManager.GetComponent<CommandExecutor>();
+            _commandExecutor.CommandStackChanged += OnUndoStackChanged;
+        }
+
+        void CreateActions()
+        {
+            _actionList[MenuActionType.Save] = new MenuAction(General.Save) { EnableRule = ActionEnabledRule.Always, ToolTip = "Save" };
             _actionList[MenuActionType.SaveAs] = new MenuAction(General.SaveAs) { EnableRule = ActionEnabledRule.Always, ToolTip = "Save as" };
-            _actionList[MenuActionType.GenerateWsModel] = new MenuAction(General.GenerateWsModel ) { EnableRule = ActionEnabledRule.Always, ToolTip = "Generate ws model" };
+            _actionList[MenuActionType.GenerateWsModel] = new MenuAction(General.GenerateWsModel) { EnableRule = ActionEnabledRule.Always, ToolTip = "Generate ws model" };
             _actionList[MenuActionType.OpenImportReference] = new MenuAction(ImportReference) { EnableRule = ActionEnabledRule.Always, ToolTip = "Import Reference model" };
             _actionList[MenuActionType.ImportReferencePaladin] = new MenuAction(ImportReference_PaladinVMD) { EnableRule = ActionEnabledRule.Always, ToolTip = "Import paladin Reference model" };
-            _actionList[MenuActionType.Undo] = new MenuAction(General.Undo) { EnableRule = ActionEnabledRule.Custom, ToolTip = "Undo Last item", Hotkey = new Hotkey(Key.Z, ModifierKeys.Control)};
+            _actionList[MenuActionType.Undo] = new MenuAction(General.Undo) { EnableRule = ActionEnabledRule.Custom, ToolTip = "Undo Last item", Hotkey = new Hotkey(Key.Z, ModifierKeys.Control) };
             _actionList[MenuActionType.SortModelsByName] = new MenuAction(General.SortMeshes) { EnableRule = ActionEnabledRule.Always, ToolTip = "Sort models by name" };
-            
+
 
             _actionList[MenuActionType.Gizmo_ScaleUp] = new MenuAction(Gizmo.ScaleGizmoUp) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Add, ModifierKeys.None) };
             _actionList[MenuActionType.Gizmo_ScaleDown] = new MenuAction(Gizmo.ScaleGizmoDown) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Subtract, ModifierKeys.None) };
             _actionList[MenuActionType.Gizmo_Arrow] = new MenuAction(Gizmo.Cursor) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Q, ModifierKeys.None) };
             _actionList[MenuActionType.Gizmo_Move] = new MenuAction(Gizmo.Move) { EnableRule = ActionEnabledRule.Always, ToolTip = "Move Gizmo", Hotkey = new Hotkey(Key.W, ModifierKeys.None) };
-            _actionList[MenuActionType.Gizmo_Rotate] = new MenuAction( Gizmo.Rotate) { EnableRule = ActionEnabledRule.Always, ToolTip = "Rotate Gizmo", Hotkey = new Hotkey(Key.E, ModifierKeys.None) };
-            _actionList[MenuActionType.Gizmo_Scale] = new MenuAction( Gizmo.Scale) { EnableRule = ActionEnabledRule.Always, ToolTip = "Scale Gizmo", Hotkey = new Hotkey(Key.R, ModifierKeys.None) };
+            _actionList[MenuActionType.Gizmo_Rotate] = new MenuAction(Gizmo.Rotate) { EnableRule = ActionEnabledRule.Always, ToolTip = "Rotate Gizmo", Hotkey = new Hotkey(Key.E, ModifierKeys.None) };
+            _actionList[MenuActionType.Gizmo_Scale] = new MenuAction(Gizmo.Scale) { EnableRule = ActionEnabledRule.Always, ToolTip = "Scale Gizmo", Hotkey = new Hotkey(Key.R, ModifierKeys.None) };
 
-            _actionList[MenuActionType.SelectObject] = new MenuAction(() => { Gizmo.UpdateSelectionMode(GeometrySelectionMode.Object); } ) {EnableRule = ActionEnabledRule.Always, ToolTip = "Object Mode", Hotkey = new Hotkey(Key.F1, ModifierKeys.None) };
+            _actionList[MenuActionType.SelectObject] = new MenuAction(() => { Gizmo.UpdateSelectionMode(GeometrySelectionMode.Object); }) { EnableRule = ActionEnabledRule.Always, ToolTip = "Object Mode", Hotkey = new Hotkey(Key.F1, ModifierKeys.None) };
             _actionList[MenuActionType.SelectFace] = new MenuAction(() => { Gizmo.UpdateSelectionMode(GeometrySelectionMode.Face); }) { EnableRule = ActionEnabledRule.Always, ToolTip = "Face Mode", Hotkey = new Hotkey(Key.F2, ModifierKeys.None) };
-            _actionList[MenuActionType.SelectVertex] = new MenuAction(() => { Gizmo.UpdateSelectionMode(GeometrySelectionMode.Vertex); }) {EnableRule = ActionEnabledRule.Always, ToolTip = "Vertex Mode", Hotkey = new Hotkey(Key.F3, ModifierKeys.None) };
+            _actionList[MenuActionType.SelectVertex] = new MenuAction(() => { Gizmo.UpdateSelectionMode(GeometrySelectionMode.Vertex); }) { EnableRule = ActionEnabledRule.Always, ToolTip = "Vertex Mode", Hotkey = new Hotkey(Key.F3, ModifierKeys.None) };
 
             _actionList[MenuActionType.ViewOnlySelected] = new MenuAction(Tools.ToggleShowSelection) { EnableRule = ActionEnabledRule.Always, ToolTip = "View only selected", Hotkey = new Hotkey(Key.Space, ModifierKeys.None) };
             _actionList[MenuActionType.ResetCamera] = new MenuAction(General.ResetCamera) { EnableRule = ActionEnabledRule.Always, ToolTip = "Reset camera", Hotkey = new Hotkey(Key.F4, ModifierKeys.None) };
@@ -295,157 +146,115 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _actionList[MenuActionType.GrowFaceSelection] = new MenuAction(Tools.ExpandFaceSelection) { EnableRule = ActionEnabledRule.FaceSelected, ToolTip = "Grow selection" };
             _actionList[MenuActionType.ConvertFaceToVertexSelection] = new MenuAction(Tools.ConvertFacesToVertex) { EnableRule = ActionEnabledRule.FaceSelected, ToolTip = "Convert selected faces to vertexes" };
             _actionList[MenuActionType.OpenVertexDebuggerTool] = new MenuAction(Tools.ShowVertexDebugInfo) { EnableRule = ActionEnabledRule.ObjectOrVertexSelected, ToolTip = "Open vertex debugger" };
-
-
-            // -----------------------------------
-            // Menu items
-            // -----------------------------------
-            CustomMenu.Add(new MenuDesc() { Name = "File" });
-            CustomMenu.Add(new MenuDesc() { Name = "Debug" });
-            CustomMenu.Add(new MenuDesc() { Name = "Tools" });
-            CustomMenu.Add(new MenuDesc() { Name = "Rendering" });
-
-            CustomMenu[0].CustomMenu.Add(new MenuDesc() { Name = "Save", Action = _actionList[MenuActionType.Save] });
-            CustomMenu[0].CustomMenu.Add(new MenuDesc() { Name = "Save As", Action = _actionList[MenuActionType.SaveAs] });
-            CustomMenu[0].CustomMenu.Add(new MenuDesc() { IsSeparator = true }); 
-            CustomMenu[0].CustomMenu.Add(new MenuDesc() { Name = "Import Reference model", Action = _actionList[MenuActionType.OpenImportReference] });
-
-            CustomMenu[1].CustomMenu.Add(new MenuDesc() { Name = "Import Paladin", Action = _actionList[MenuActionType.ImportReferencePaladin] });
-
-            CustomMenu[2].CustomMenu.Add(new MenuDesc() { Name = "Sort models by name", Action = _actionList[MenuActionType.SortModelsByName] });
-            CustomMenu[2].CustomMenu.Add(new MenuDesc() { Name = "Generat Ws Model", Action = _actionList[MenuActionType.GenerateWsModel] });
-
-            CustomMenu[3].CustomMenu.Add(new MenuDesc() { Name = "Focus camera", Action = _actionList[MenuActionType.FocusSelection] });
-            CustomMenu[3].CustomMenu.Add(new MenuDesc() { Name = "Reset camera", Action = _actionList[MenuActionType.ResetCamera] });
-
-            // -----------------------------------
-            // Button items
-            // -----------------------------------
-
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.Save]) { Image = ResourceController.SaveFileIcon});
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.OpenImportReference]) { Image = ResourceController.OpenReferenceMeshIcon});
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.Undo]) { Image = ResourceController.UndoIcon });
-
-            CustomButtons.Add(new ButtonDesc(null) { IsSeperator = true });
-
-            CustomButtons.Add(new RadioButtonDesc(_actionList[MenuActionType.Gizmo_Arrow], true) { GroupName = "Gizmo", Image = ResourceController.Gizmo_CursorIcon });
-            CustomButtons.Add(new RadioButtonDesc(_actionList[MenuActionType.Gizmo_Move]) { GroupName = "Gizmo", Image = ResourceController.Gizmo_MoveIcon });
-            CustomButtons.Add(new RadioButtonDesc(_actionList[MenuActionType.Gizmo_Rotate]) { GroupName = "Gizmo", Image = ResourceController.Gizmo_ScaleIcon });
-            CustomButtons.Add(new RadioButtonDesc(_actionList[MenuActionType.Gizmo_Scale]) { GroupName = "Gizmo", Image = ResourceController.Gizmo_RotateIcon });
-
-            CustomButtons.Add(new ButtonDesc(null) { IsSeperator = true });
-
-            CustomButtons.Add(new RadioButtonDesc(_actionList[MenuActionType.SelectObject], true) { GroupName = "SelectionMode", Image = ResourceController.Selection_Object_Icon  });
-            CustomButtons.Add(new RadioButtonDesc(_actionList[MenuActionType.SelectFace]) { GroupName = "SelectionMode", Image = ResourceController.Selection_Face_Icon });
-            CustomButtons.Add(new RadioButtonDesc(_actionList[MenuActionType.SelectVertex]) { GroupName = "SelectionMode", Image = ResourceController.Selection_Vertex_Icon  });
-
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.ViewOnlySelected]) { Image = ResourceController.ViewSelectedIcon});
-
-            CustomButtons.Add(new ButtonDesc(null) { IsSeperator = true });
-
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.DevideToSubmesh]) { ShowRule = ButtonVisabilityRule.ObjectMode,  Image = ResourceController.DivideIntoSubMeshIcon });
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.MergeSelectedMeshes]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.MergeMeshIcon });
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.DuplicateSelected]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.DuplicateIcon });
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.DeleteSelected]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.DeleteIcon });
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.ConvertSelectedMeshIntoStaticAtCurrentAnimFrame]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.FreezeAnimationIcon });
-
-            CustomButtons.Add(new ButtonDesc(null) { IsSeperator = true });
-
-
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.ReduceMesh10x]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.ReduceMeshIcon });
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.CreateLod]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.CreateLodIcon });
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.OpenBmiTool]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.BmiToolIcon });
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.OpenSkeletonResharper]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.SkeletonReshaperIcon });
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.OpenReRiggingTool]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.ReRiggingIcon });
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.OpenPinTool]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.PinIcon });
-
-
-            // Face tools
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.ConvertFaceToVertexSelection]) { ShowRule = ButtonVisabilityRule.FaceMode, Image = ResourceController.FaceToVertexIcon });
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.GrowFaceSelection]) { ShowRule = ButtonVisabilityRule.FaceMode, Image = ResourceController.GrowSelectionIcon });
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.DevideToSubmesh]) { ShowRule = ButtonVisabilityRule.FaceMode, Image = ResourceController.DivideIntoSubMeshIcon });
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.DuplicateSelected]) { ShowRule = ButtonVisabilityRule.FaceMode, Image = ResourceController.DuplicateIcon });
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.DeleteSelected]) { ShowRule = ButtonVisabilityRule.FaceMode, Image = ResourceController.DeleteIcon });
-
-
-            // Vertex tools
-            CustomButtons.Add(new ButtonDesc(_actionList[MenuActionType.OpenVertexDebuggerTool]) { ShowRule = ButtonVisabilityRule.VertexMode, Image = ResourceController.VertexDebuggerIcon });
-            
-            RegisterHotkeys();
-
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-            _selectionManager.SelectionChanged += OnSelectionChanged;
-
-            _commandExecutor = componentManager.GetComponent<CommandExecutor>();
-            _commandExecutor.CommandStackChanged += OnUndoStackChanged;
-
-
-            _buttonVisabilityRules[ButtonVisabilityRule.Always] = AllwaysTrueRule;
-            _buttonVisabilityRules[ButtonVisabilityRule.ObjectMode] = IsObjectMode;
-            _buttonVisabilityRules[ButtonVisabilityRule.FaceMode] = IsFaceMode;
-            _buttonVisabilityRules[ButtonVisabilityRule.VertexMode] = IsVertexMode;
-
-            _actionEnabledRules[ActionEnabledRule.Always] = AllwaysTrueRule;
-            _actionEnabledRules[ActionEnabledRule.OneObjectSelected] = OneObjectSelectedRule;
-            _actionEnabledRules[ActionEnabledRule.AtleastOneObjectSelected] = AtleastOneObjectSelectedRule;
-            _actionEnabledRules[ActionEnabledRule.TwoOrMoreObjectsSelected] = TwoOrMoreObjectsSelectedRule;
-            _actionEnabledRules[ActionEnabledRule.TwoObjectesSelected] = TwoObjectSelectedRule;
-
-            _actionEnabledRules[ActionEnabledRule.FaceSelected] = FaceSelectedRule;
-            _actionEnabledRules[ActionEnabledRule.VertexSelected] = VertexSelectedRule;
-            _actionEnabledRules[ActionEnabledRule.AnythingSelected] = AnythingSelectedRule;
-            _actionEnabledRules[ActionEnabledRule.ObjectOrVertexSelected] = ObjectOrVertexSelectedRule;
-            _actionEnabledRules[ActionEnabledRule.ObjectOrFaceSelected] = ObjectOrFaceSelectedReule;
-           
-            
         }
 
-
-
-
-
-        bool IsObjectMode() => _selectionManager.GetState().Mode == GeometrySelectionMode.Object;
-        bool IsFaceMode() => _selectionManager.GetState().Mode == GeometrySelectionMode.Face;
-        bool IsVertexMode() => _selectionManager.GetState().Mode == GeometrySelectionMode.Vertex;
-        bool AllwaysTrueRule() => true;
-
-        bool OneObjectSelectedRule() => IsObjectMode() && _selectionManager.GetState().SelectionCount() == 1;
-        bool TwoObjectSelectedRule() => IsObjectMode() && _selectionManager.GetState().SelectionCount() == 1;
-        bool AtleastOneObjectSelectedRule() => IsObjectMode() && _selectionManager.GetState().SelectionCount() >= 1;
-        bool TwoOrMoreObjectsSelectedRule() => IsObjectMode() && _selectionManager.GetState().SelectionCount() >= 2;
-        bool AnythingSelectedRule() => _selectionManager.GetState().SelectionCount() >= 1;
-        bool ObjectOrFaceSelectedReule() => (IsObjectMode() || IsFaceMode()) && _selectionManager.GetState().SelectionCount() >= 1;
-        bool ObjectOrVertexSelectedRule() => (IsObjectMode() || IsVertexMode()) && _selectionManager.GetState().SelectionCount() >= 1;
-
-        bool FaceSelectedRule() =>  IsFaceMode() && _selectionManager.GetState().SelectionCount() >= 1;
-        bool VertexSelectedRule() => IsVertexMode() && _selectionManager.GetState().SelectionCount() >= 1;
-
-
-        CommandExecutor _commandExecutor;
-        private void OnUndoStackChanged()
+        void CreateMenu()
         {
-            _actionList[MenuActionType.Undo].ToolTip = _commandExecutor.GetUndoHint();
-            _actionList[MenuActionType.Undo].IsActionEnabled.Value = _commandExecutor.CanUndo();
+            MenuItems.Add(new ToolbarItem() { Name = "File" });
+            MenuItems.Add(new ToolbarItem() { Name = "Debug" });
+            MenuItems.Add(new ToolbarItem() { Name = "Tools" });
+            MenuItems.Add(new ToolbarItem() { Name = "Rendering" });
+
+            MenuItems[0].Children.Add(new ToolbarItem() { Name = "Save", Action = _actionList[MenuActionType.Save] });
+            MenuItems[0].Children.Add(new ToolbarItem() { Name = "Save As", Action = _actionList[MenuActionType.SaveAs] });
+            MenuItems[0].Children.Add(new ToolbarItem() { IsSeparator = true });
+            MenuItems[0].Children.Add(new ToolbarItem() { Name = "Import Reference model", Action = _actionList[MenuActionType.OpenImportReference] });
+
+            MenuItems[1].Children.Add(new ToolbarItem() { Name = "Import Paladin", Action = _actionList[MenuActionType.ImportReferencePaladin] });
+
+            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Sort models by name", Action = _actionList[MenuActionType.SortModelsByName] });
+            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Generat Ws Model", Action = _actionList[MenuActionType.GenerateWsModel] });
+
+            MenuItems[3].Children.Add(new ToolbarItem() { Name = "Focus camera", Action = _actionList[MenuActionType.FocusSelection] });
+            MenuItems[3].Children.Add(new ToolbarItem() { Name = "Reset camera", Action = _actionList[MenuActionType.ResetCamera] });
         }
 
-        // Create Object tools
-        // Create face tools
-        // Create vertex tools
 
-        void RegisterHotkeys()
+        void CreateButtons()
+        {
+            CreateGeneralButtons();
+            CreateSelectionButtons();
+            CreateObjectButtons();
+            CreateFaceButtons();
+            CreateVertexButtons();
+        }
+
+        void CreateGeneralButtons()
+        {
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.Save]) { Image = ResourceController.SaveFileIcon });
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.OpenImportReference]) { Image = ResourceController.OpenReferenceMeshIcon });
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.Undo]) { Image = ResourceController.UndoIcon });
+
+            CustomButtons.Add(new MenuBarButton(null) { IsSeperator = true });
+        }
+
+        void CreateSelectionButtons()
+        {
+            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Arrow], "Gizmo", true) { Image = ResourceController.Gizmo_CursorIcon });
+            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Move],"Gizmo") { Image = ResourceController.Gizmo_MoveIcon });
+            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Rotate], "Gizmo") { Image = ResourceController.Gizmo_ScaleIcon });
+            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Scale],"Gizmo") {  Image = ResourceController.Gizmo_RotateIcon });
+
+            CustomButtons.Add(new MenuBarButton(null) { IsSeperator = true });
+
+            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.SelectObject], "SelectionMode", true) { Image = ResourceController.Selection_Object_Icon });
+            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.SelectFace], "SelectionMode") {  Image = ResourceController.Selection_Face_Icon });
+            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.SelectVertex], "SelectionMode") { Image = ResourceController.Selection_Vertex_Icon });
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.ViewOnlySelected]) { Image = ResourceController.ViewSelectedIcon });
+
+            CustomButtons.Add(new MenuBarButton(null) { IsSeperator = true });
+        }
+
+        void CreateObjectButtons()
+        {
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.DevideToSubmesh]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.DivideIntoSubMeshIcon });
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.MergeSelectedMeshes]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.MergeMeshIcon });
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.DuplicateSelected]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.DuplicateIcon });
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.DeleteSelected]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.DeleteIcon });
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.ConvertSelectedMeshIntoStaticAtCurrentAnimFrame]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.FreezeAnimationIcon });
+
+            CustomButtons.Add(new MenuBarButton(null) { IsSeperator = true });
+
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.ReduceMesh10x]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.ReduceMeshIcon });
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.CreateLod]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.CreateLodIcon });
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.OpenBmiTool]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.BmiToolIcon });
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.OpenSkeletonResharper]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.SkeletonReshaperIcon });
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.OpenReRiggingTool]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.ReRiggingIcon });
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.OpenPinTool]) { ShowRule = ButtonVisabilityRule.ObjectMode, Image = ResourceController.PinIcon });
+        }
+
+        void CreateFaceButtons()
+        {
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.ConvertFaceToVertexSelection]) { ShowRule = ButtonVisabilityRule.FaceMode, Image = ResourceController.FaceToVertexIcon });
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.GrowFaceSelection]) { ShowRule = ButtonVisabilityRule.FaceMode, Image = ResourceController.GrowSelectionIcon });
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.DevideToSubmesh]) { ShowRule = ButtonVisabilityRule.FaceMode, Image = ResourceController.DivideIntoSubMeshIcon });
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.DuplicateSelected]) { ShowRule = ButtonVisabilityRule.FaceMode, Image = ResourceController.DuplicateIcon });
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.DeleteSelected]) { ShowRule = ButtonVisabilityRule.FaceMode, Image = ResourceController.DeleteIcon });
+        }
+
+        void CreateVertexButtons()
+        {
+            CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.OpenVertexDebuggerTool]) { ShowRule = ButtonVisabilityRule.VertexMode, Image = ResourceController.VertexDebuggerIcon });
+        }
+
+        void ProcessHotkeys()
         {
             var actionList = _actionList
                 .Where(x => x.Value.Hotkey != null)
                 .Select(x => x.Value);
 
             foreach (var item in actionList)
+            {
+                item.UpdateToolTip();
                 _commandFactory.Register(item);
+            }
         }
 
-
-
-
-        // Update undo action tool tip and state
+        private void OnUndoStackChanged()
+        {
+            _actionList[MenuActionType.Undo].ToolTip = _commandExecutor.GetUndoHint();
+            _actionList[MenuActionType.Undo].IsActionEnabled.Value = _commandExecutor.CanUndo();
+        }
 
         private void OnSelectionChanged(ISelectionState state)
         {
@@ -460,20 +269,12 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
             // Validate if tool button is visible
             foreach (var button in CustomButtons)
-            {
-                var rule = button.ShowRule;
-                button.IsVisible.Value = _buttonVisabilityRules[rule].Invoke();
-            }
+                _ruleFactory.Validate(button);
 
 
             // Validate if menu action is enabled
             foreach (var action in _actionList.Values)
-            {
-                var rule = action.EnableRule;
-                if (rule == ActionEnabledRule.Custom)
-                    continue;
-                action.IsActionEnabled.Value = _actionEnabledRules[rule].Invoke();
-            }
+                _ruleFactory.Validate(action);
         }
 
 
@@ -500,15 +301,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                     ModelLoader.LoadReference(browser.SelectedFile);
                 }
             }
-
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-        }
-        void ImportReference_PaladinVMD()
-        {
-            ModelLoader.LoadReference(@"variantmeshes\variantmeshdefinitions\brt_paladin.variantmeshdefinition");
         }
 
-
+        void ImportReference_PaladinVMD() => ModelLoader.LoadReference(@"variantmeshes\variantmeshdefinitions\brt_paladin.variantmeshdefinition");
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Common;
 using CommonControls.Common;
+using CommonControls.Common.MenuSystem;
 using CommonControls.Editors.BoneMapping;
 using CommonControls.Editors.BoneMapping.View;
 using CommonControls.ErrorListDialog;
@@ -28,7 +29,7 @@ using MessageBox = System.Windows.MessageBox;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
-    public class ToolsMenuBarViewModel : NotifyPropertyChangedImpl
+    public class ToolActions : NotifyPropertyChangedImpl
     {
         IComponentManager _componentManager;
         SelectionManager _selectionManager;
@@ -40,173 +41,18 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         SkeletonAnimationLookUpHelper _skeletonHelper;
         WindowKeyboard _keyboard;
 
-        public ICommand DivideSubMeshCommand { get; set; }
-        public ICommand MergeObjectCommand { get; set; }
-        public ICommand DuplicateObjectCommand { get; set; }
-        public ICommand DeleteObjectCommand { get; set; }
-        public ICommand MergeVertexCommand { get; set; }
-        public ICommand CreateLodCommand { get; set; }
-        public ICommand ExpandSelectedFacesToObjectCommand { get; set; }
-        public ICommand FaceToVertexCommand { get; set; }
-        public ICommand GroupCommand { get; set; }
-        public ICommand ReduceMeshCommand { get; set; }
-        public ICommand ToggleShowSelectionCommand { get; set; }
-        public ICommand BmiToolCommand { get; set; }
-        public ICommand SkeletonReshaperCommand { get; set; }
-        public ICommand CreateStaticMeshesCommand { get; set; }
-        public ICommand PinMeshToMeshCommand { get; set; }
-        public ICommand ReRiggingToolCommand { get; set; }
-
-        public NotifyAttr<DoubleViewModel> VertexMovementFalloff { get; set; }
-        public ICommand ShowVertexDebugInfoCommand { get; set; }
-
-        bool _showObjectTools = true;
-        public bool ShowObjectTools { get => _showObjectTools; set => SetAndNotify(ref _showObjectTools, value); }
-
-
-        bool _showFaceTools = false;
-        public bool ShowFaceTools { get => _showFaceTools; set => SetAndNotify(ref _showFaceTools, value); }
-
-
-        bool _showVertexTools = false;
-        public bool ShowVertexTools { get => _showVertexTools; set => SetAndNotify(ref _showVertexTools, value); }
-
-
-        bool _divideSubMeshEnabled;
-        public bool DivideSubMeshEnabled { get => _divideSubMeshEnabled; set => SetAndNotify(ref _divideSubMeshEnabled, value); }
-
-        bool _mergeMeshEnabled;
-        public bool MergeMeshEnabled { get => _mergeMeshEnabled; set => SetAndNotify(ref _mergeMeshEnabled, value); }
-
-        bool _duplicateEnabled;
-        public bool DuplicateEnabled { get => _duplicateEnabled; set => SetAndNotify(ref _duplicateEnabled, value); }
-
-        bool _deleteEnabled;
-        public bool DeleteEnabled { get => _deleteEnabled; set => SetAndNotify(ref _deleteEnabled, value); }
-
-        bool _mergeVertexEnabled;
-        public bool MergeVertexEnabled { get => _mergeVertexEnabled; set => SetAndNotify(ref _mergeVertexEnabled, value); }
-
-        bool _expandSelectedFacesToObjectEnabled;
-        public bool ExpandSelectedFacesToObjectEnabled { get => _expandSelectedFacesToObjectEnabled; set => SetAndNotify(ref _expandSelectedFacesToObjectEnabled, value); }
-
-        bool _faceToVertexEnabled;
-        public bool FaceToVertexEnabled { get => _faceToVertexEnabled; set => SetAndNotify(ref _faceToVertexEnabled, value); }
-
-        bool _groupCommandEnabled;
-        public bool GroupCommandEnabled { get => _groupCommandEnabled; set => SetAndNotify(ref _groupCommandEnabled, value); }
-
-        bool _reduceMeshCommandEnabled;
-        public bool ReduceMeshCommandEnabled { get => _reduceMeshCommandEnabled; set => SetAndNotify(ref _reduceMeshCommandEnabled, value); }
-
-
-        bool _toggleShowSelectionEnabled = true;
-        public bool ToggleShowSelectionEnabled { get => _toggleShowSelectionEnabled; set => SetAndNotify(ref _toggleShowSelectionEnabled, value); }
-
-        bool _bmiToolCommandEnabled = true;
-        public bool BmiToolCommandEnabled { get => _bmiToolCommandEnabled; set => SetAndNotify(ref _bmiToolCommandEnabled, value); }
-
-        bool _skeletonReshaperCommandEnabled = true;
-        public bool SkeletonReshaperCommandEnabled { get => _skeletonReshaperCommandEnabled; set => SetAndNotify(ref _skeletonReshaperCommandEnabled, value); }
-
-        bool _createStaticMeshesCommandEnabled = false;
-        public bool CreateStaticMeshesCommandEnabled { get => _createStaticMeshesCommandEnabled; set => SetAndNotify(ref _createStaticMeshesCommandEnabled, value); }
-
-        bool _pinMeshToMeshEnabled = false;
-        public bool PinMeshToMeshEnabled { get => _pinMeshToMeshEnabled; set => SetAndNotify(ref _pinMeshToMeshEnabled, value); }
-
-        bool _reRiggingToolCommandEnabled = false;
-        public bool ReRiggingToolCommandEnabled { get => _reRiggingToolCommandEnabled; set => SetAndNotify(ref _reRiggingToolCommandEnabled, value); }
-
-        bool _showVertexDebugInfoEnabled = false;
-        public bool ShowVertexDebugInfoEnabled { get => _showVertexDebugInfoEnabled; set => SetAndNotify(ref _showVertexDebugInfoEnabled, value); }
-
-        public ToolsMenuBarViewModel(IComponentManager componentManager, ToolbarCommandFactory commandFactory, PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper, WindowKeyboard keyboard)
+        public ToolActions(IComponentManager componentManager, PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper, WindowKeyboard keyboard)
         {
             _packFileService = packFileService;
             _componentManager = componentManager;
             _skeletonHelper = skeletonHelper;
             _keyboard = keyboard;
 
-            DivideSubMeshCommand = new RelayCommand(DivideSubMesh);
-            MergeObjectCommand = commandFactory.Register(new RelayCommand(MergeObjects), Key.M, ModifierKeys.Control);
-            DuplicateObjectCommand = commandFactory.Register(new RelayCommand(DubplicateObject), Key.D, ModifierKeys.Control);
-            DeleteObjectCommand = commandFactory.Register(new RelayCommand(DeleteObject), Key.Delete, ModifierKeys.None);
-            MergeVertexCommand = new RelayCommand(MergeVertex);
-            CreateLodCommand = new RelayCommand(CreateLods);
-            ExpandSelectedFacesToObjectCommand = new RelayCommand(ExpandFaceSelection);
-            GroupCommand = commandFactory.Register(new RelayCommand(GroupItems), Key.G, ModifierKeys.Control);
-            ToggleShowSelectionCommand = commandFactory.Register(new RelayCommand(ToggleShowSelection), Key.Space, ModifierKeys.None);
-            ReduceMeshCommand = new RelayCommand(ReduceMesh);
-            FaceToVertexCommand = new RelayCommand(ConvertFacesToVertex);
-            BmiToolCommand = new RelayCommand(OpenBmiTool);
-            SkeletonReshaperCommand = new RelayCommand(OpenSkeletonReshaperTool);
-            CreateStaticMeshesCommand = new RelayCommand(CreateStaticMeshes);
-            PinMeshToMeshCommand = new RelayCommand(PinMeshToMesh);
-            ReRiggingToolCommand = new RelayCommand(OpenReRiggingTool);
-            ShowVertexDebugInfoCommand = new RelayCommand(ShowVertexDebugInfo);
-
-            VertexMovementFalloff = new NotifyAttr<DoubleViewModel>(new DoubleViewModel());
-            VertexMovementFalloff.Value.PropertyChanged += VertexMovementFalloffChanged;
             _selectionManager = componentManager.GetComponent<SelectionManager>();
-            _selectionManager.SelectionChanged += OnSelectionChanged;
-
             _objectEditor = componentManager.GetComponent<ObjectEditor>();
             _faceEditor = componentManager.GetComponent<FaceEditor>();
             _editableMeshResolver = componentManager.GetComponent<IEditableMeshResolver>();
             _viewOnlySelectedComp = componentManager.GetComponent<ViewOnlySelectedComponent>();
-
-            OnSelectionChanged(_selectionManager.GetState());
-        }
-
-        private void OnSelectionChanged(ISelectionState state)
-        {
-            ShowObjectTools = state is ObjectSelectionState;
-            ShowFaceTools = state is FaceSelectionState;
-            ShowVertexTools = state is VertexSelectionState;
-
-            DivideSubMeshEnabled = false;
-            DuplicateEnabled = false;
-            DeleteEnabled = false;
-            MergeMeshEnabled = false;
-            ExpandSelectedFacesToObjectEnabled = false;
-            MergeVertexEnabled = false;
-            FaceToVertexEnabled = false;
-            GroupCommandEnabled = false;
-            ReduceMeshCommandEnabled = false;
-            BmiToolCommandEnabled = false;
-            SkeletonReshaperCommandEnabled = false;
-            CreateStaticMeshesCommandEnabled = false;
-            PinMeshToMeshEnabled = false;
-            ReRiggingToolCommandEnabled = false;
-            ShowVertexDebugInfoEnabled = false;
-
-            if (state is ObjectSelectionState objectSelection)
-            {
-                DivideSubMeshEnabled = objectSelection.SelectedObjects().Count == 1;
-                MergeMeshEnabled = objectSelection.SelectedObjects().Count >= 2;
-                DuplicateEnabled = objectSelection.SelectedObjects().Count > 0;
-                DeleteEnabled = objectSelection.SelectedObjects().Count > 0;
-                GroupCommandEnabled = objectSelection.SelectedObjects().Count > 0;
-                ReduceMeshCommandEnabled = objectSelection.SelectedObjects().Count > 0;
-                BmiToolCommandEnabled = objectSelection.SelectedObjects().Count == 1;
-                SkeletonReshaperCommandEnabled = objectSelection.SelectedObjects().Count > 0;
-                CreateStaticMeshesCommandEnabled = objectSelection.SelectedObjects().Count > 0;
-                PinMeshToMeshEnabled = objectSelection.SelectedObjects().Count == 2;
-                ReRiggingToolCommandEnabled = objectSelection.SelectedObjects().Count != 0;
-            }
-            else if (state is FaceSelectionState faceSelection && faceSelection.SelectedFaces.Count != 0)
-            {
-                DeleteEnabled = true;
-                ExpandSelectedFacesToObjectEnabled = true;
-                FaceToVertexEnabled = true;
-                DuplicateEnabled = true;
-                DivideSubMeshEnabled = true;
-            }
-            else if (state is VertexSelectionState vertexState )
-            {
-                ShowVertexDebugInfoEnabled = vertexState.SelectedVertices.Count != 0;
-            }
         }
 
         public void DivideSubMesh()
@@ -405,10 +251,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             commandExecutor.ExecuteCommand(cmd);
         }
 
-        public void VertexMovementFalloffChanged(object sender, PropertyChangedEventArgs e)
-        {
-            _selectionManager.UpdateVertexSelectionFallof((float)VertexMovementFalloff.Value.Value);
-        }
 
         public void OpenReRiggingTool()
         {

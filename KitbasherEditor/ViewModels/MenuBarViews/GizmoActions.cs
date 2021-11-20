@@ -8,13 +8,13 @@ using View3D.Components.Gizmo;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
-    public class GizmoModeMenuBarViewModel : NotifyPropertyChangedImpl
+    public class GizmoActions : NotifyPropertyChangedImpl
     {
         GizmoComponent _gizmoComponent;
         SelectionComponent _selectionComponent;
         TransformToolViewModel _transformToolViewModel;
 
-        public GizmoModeMenuBarViewModel(TransformToolViewModel transformToolViewModel, IComponentManager componentManager)
+        public GizmoActions(TransformToolViewModel transformToolViewModel, IComponentManager componentManager)
         {
             _transformToolViewModel = transformToolViewModel;
             _gizmoComponent = componentManager.GetComponent<GizmoComponent>();
@@ -64,14 +64,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _gizmoComponent.SetGizmoMode(GizmoMode.NonUniformScale);
         }
 
-        public void ScaleGizmoDown()
-        {
-            _gizmoComponent.ModifyGizmoScale(-0.5f);
-        }
+        public void ScaleGizmoDown() => _gizmoComponent.ModifyGizmoScale(-0.5f);
 
-        public void ScaleGizmoUp()
-        {
-            _gizmoComponent.ModifyGizmoScale(0.5f);
-        }
+        public void ScaleGizmoUp() => _gizmoComponent.ModifyGizmoScale(0.5f);
+       
     }
 }
