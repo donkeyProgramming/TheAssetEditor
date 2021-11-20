@@ -1,8 +1,10 @@
 ﻿using Common;
+using CommonControls.Common;
 using CommonControls.MathViews;
 using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 using View3D.Commands.Vertex;
@@ -43,6 +45,11 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         Vector3ViewModel _vector3 = new Vector3ViewModel(0);
         public Vector3ViewModel Vector3 { get { return _vector3; } set { SetAndNotify(ref _vector3, value); } }
 
+        public NotifyAttr<DoubleViewModel> VertexMovementFalloff { get; set; }
+
+        public NotifyAttr<bool> ShowVertexFalloff { get; set; } = new NotifyAttr<bool>(false);
+
+
         public TransformToolViewModel(IComponentManager componentManager)
         {
             ApplyCommand = new RelayCommand(ApplyTransform);
@@ -50,10 +57,19 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _commandExecutor = componentManager.GetComponent<CommandExecutor>();
 
             _selectionManager.SelectionChanged += SelectionChanged;
+
+            VertexMovementFalloff = new NotifyAttr<DoubleViewModel>(new DoubleViewModel());
+            VertexMovementFalloff.Value.PropertyChanged += VertexMovementFalloffChanged;
+        }
+
+        public void VertexMovementFalloffChanged(object sender, PropertyChangedEventArgs e)
+        {
+            _selectionManager.UpdateVertexSelectionFallof((float)VertexMovementFalloff.Value.Value);
         }
 
         private void SelectionChanged(ISelectionState state)
         {
+            ShowVertexFalloff.Value = false;
             if (state.Mode == GeometrySelectionMode.Face)
             {
                 ButtonEnabled = false;
@@ -62,8 +78,11 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             {
                 if (state is ObjectSelectionState objectSelectionState)
                     ButtonEnabled = objectSelectionState.SelectionCount() != 0;
-                else if(state is VertexSelectionState vertexSelectionState)
+                else if (state is VertexSelectionState vertexSelectionState)
+                {
                     ButtonEnabled = vertexSelectionState.SelectionCount() != 0;
+                    ShowVertexFalloff.Value = true;
+                }
             }
         }
 

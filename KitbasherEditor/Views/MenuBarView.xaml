@@ -43,7 +43,8 @@
             <Button ToolTip="{Binding Action.ToolTipAttribute.Value}" BorderThickness="0" Background="AliceBlue" Margin="1" 
                     IsEnabled="{Binding Action.IsActionEnabled.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                     Command="{Binding Path=Action.Command}" 
-                    ToolTipService.ShowOnDisabled="True">
+                    ToolTipService.ShowOnDisabled="True"
+                    Visibility="{Binding IsVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
                 <Image Style="{StaticResource ImageStyle}" Source="{Binding Image}"/>
             </Button>
         </DataTemplate>
@@ -55,7 +56,8 @@
                             GroupName="{Binding GroupName}" 
                             Style="{StaticResource {x:Type ToggleButton}}"
                             IsEnabled="{Binding Action.IsActionEnabled.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                            ToolTipService.ShowOnDisabled="True" >
+                            ToolTipService.ShowOnDisabled="True"
+                            Visibility="{Binding IsVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
                 <Image Style="{StaticResource ImageStyle}" Source="{Binding Image}"/>
             </RadioButton>
         </DataTemplate>

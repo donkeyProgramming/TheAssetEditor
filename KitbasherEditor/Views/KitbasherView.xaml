@@ -4,7 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:KitbasherEditor.Views"
-             xmlns:viewmodels="clr-namespace:KitbasherEditor.ViewModels" xmlns:editorviews="clr-namespace:KitbasherEditor.Views.EditorViews" xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls" xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
+             xmlns:viewmodels="clr-namespace:KitbasherEditor.ViewModels" 
+             xmlns:editorviews="clr-namespace:KitbasherEditor.Views.EditorViews" 
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls"
+             xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
+            xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              AllowDrop="True">
@@ -58,12 +63,29 @@
                   Visibility="{Binding MenuBar.TransformTool.IsVisible, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToHiddenConverter}}">
                 <DockPanel HorizontalAlignment="Right" VerticalAlignment="Top">
                     <Border BorderThickness="2" BorderBrush="DarkGray" Background="LightGray">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding MenuBar.TransformTool.Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                            <mathviews:Vector3View Width="200" Vector3="{Binding MenuBar.TransformTool.Vector3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                            <Button Content="Apply"
-                                    Command="{Binding MenuBar.TransformTool.ApplyCommand}"
-                                    IsEnabled="{Binding MenuBar.TransformTool.ButtonEnabled, UpdateSourceTrigger=PropertyChanged}"/> 
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding MenuBar.TransformTool.Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                <mathviews:Vector3View Width="200" Vector3="{Binding MenuBar.TransformTool.Vector3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                <Button Content="Apply"
+                                        Command="{Binding MenuBar.TransformTool.ApplyCommand}"
+                                        IsEnabled="{Binding MenuBar.TransformTool.ButtonEnabled, UpdateSourceTrigger=PropertyChanged}"/> 
+                            </StackPanel>
+
+                            <DockPanel Margin="2" Visibility="{Binding MenuBar.TransformTool.ShowVertexFalloff.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToHiddenConverter}}">
+                                <TextBlock Text="Vertex Fall-of:" DockPanel.Dock="Left" Margin="0,0,4,0"/>
+                                <TextBox  DockPanel.Dock="Right"
+                                         Text="{Binding MenuBar.TransformTool.VertexMovementFalloff.Value.TextValue, 
+                                         UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" 
+                                         ToolTip="Fall of distance for selected vertexes">
+                                    <b:Interaction.Behaviors>
+                                        <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
+                                    </b:Interaction.Behaviors>
+                                </TextBox>
+                            </DockPanel>
+
+
+
                         </StackPanel>
                     </Border>
                 </DockPanel>
