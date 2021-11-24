@@ -33,9 +33,6 @@ namespace KitbasherEditor.ViewModels
         ISceneNodeViewModel _selectedNodeViewModel;
         public ISceneNodeViewModel SelectedNodeViewModel { get { return _selectedNodeViewModel; } set { SetAndNotify(ref _selectedNodeViewModel, value); } }
 
-        LodItem _selectedLodLvl;
-        public LodItem SelectedLodLevel { get { return _selectedLodLvl; } set { SetAndNotify(ref _selectedLodLvl, value); UpdateLod(_selectedLodLvl.Value); } }
-
         SceneContainer _sceneContainer;
         SceneManager _sceneManager;
         CommandExecutor _commandExecutor;
@@ -51,8 +48,6 @@ namespace KitbasherEditor.ViewModels
         AnimationControllerViewModel _animationControllerViewModel;
         public SceneExplorerViewModel(SceneContainer sceneContainer, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService packFileService, AnimationControllerViewModel animationControllerViewModel)
         {
-            _selectedLodLvl = LodItem.GetAll.First();
-
             _sceneContainer = sceneContainer;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _packFileService = packFileService;
@@ -167,7 +162,7 @@ namespace KitbasherEditor.ViewModels
             SceneGraphRootNodes.Clear();
             SceneGraphRootNodes.Add(_sceneManager.RootNode);
             //SceneGraphRootNodes = collection;
-            UpdateLod(SelectedLodLevel.Value);
+            UpdateLod(0);
         }
 
         void UpdateLod(int newLodLevel)
@@ -190,32 +185,6 @@ namespace KitbasherEditor.ViewModels
         public MainEditableNode GeEditableMeshRootNode()
         {
             return EditableMeshNode;
-        }
-    }
-
-    public class LodItem
-    { 
-        public string Name { get; set; }
-        public int Value { get; set; }
-
-
-        static List<LodItem> _items;
-        public static List<LodItem> GetAll
-        {
-            get
-            {
-                if (_items == null)
-                {
-                    _items = new List<LodItem>()
-                    {
-                        new LodItem(){ Name = "Lod 0 - Highest", Value = 0},
-                        new LodItem(){ Name = "Lod 1", Value = 1},
-                        new LodItem(){ Name = "Lod 2", Value = 2},
-                        new LodItem(){ Name = "Lod 3 - Lowest", Value = 3},
-                    };
-                }
-                return _items;
-            }
         }
     }
 }

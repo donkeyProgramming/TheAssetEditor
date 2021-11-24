@@ -57,7 +57,7 @@
             </Grid.ColumnDefinitions>
 
             <ContentControl Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"  Content="{Binding Scene, Mode=OneTime}"/>
-            <editorviews:AnimationView DataContext="{Binding Animation}" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"/>
+            <editorviews:AnimationPlayerView DataContext="{Binding Animation}" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"/>
 
             <Grid Grid.Row="0" Grid.Column="1" 
                   Visibility="{Binding MenuBar.TransformTool.IsVisible, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToHiddenConverter}}">
@@ -105,21 +105,8 @@
             </GridSplitter.Template>
         </GridSplitter>
 
-        <Grid Grid.Row="1"  Grid.Column="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <TextBlock Grid.Column="0" Text="Active Lod:" Margin="0,0,5,0"/>
-            <ComboBox Grid.Column="1" 
-                      ItemsSource="{Binding Source={x:Static viewmodels:LodItem.GetAll}}" DisplayMemberPath="Name"    
-                      SelectedItem="{Binding SceneExplorer.SelectedLodLevel, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-        </Grid>
-      
-        
+        <TextBlock  Grid.Row="1"  Grid.Column="2" Text="Scene:" Margin="0,0,5,0"/>
         <local:SceneExplorerView DataContext="{Binding SceneExplorer}"  Grid.Row="2" Grid.Column="2"/>
-
 
         <GridSplitter Grid.Row="3"  Grid.Column="2" HorizontalAlignment="Stretch">
             <GridSplitter.Template>

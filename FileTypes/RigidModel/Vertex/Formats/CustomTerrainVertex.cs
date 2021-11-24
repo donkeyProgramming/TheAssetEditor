@@ -50,6 +50,7 @@ namespace FileTypes.RigidModel.Vertex.Formats
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
             public byte[] position;     // 4 x 4
 
+            // No idea what all this really iss 
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
             public byte[] normal;       // 4 x 1
 

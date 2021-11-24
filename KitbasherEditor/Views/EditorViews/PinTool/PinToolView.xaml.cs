@@ -11,14 +11,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace KitbasherEditor.Views.EditorViews
+namespace KitbasherEditor.Views.EditorViews.PinTool
 {
     /// <summary>
-    /// Interaction logic for PintToolView.xaml
+    /// Interaction logic for PinToolView.xaml
     /// </summary>
-    public partial class PintToolView : UserControl
+    public partial class PinToolView : UserControl
     {
-        public PintToolView()
+        public PinToolView()
         {
             InitializeComponent();
         }

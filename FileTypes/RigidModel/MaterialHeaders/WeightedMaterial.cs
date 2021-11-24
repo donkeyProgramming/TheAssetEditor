@@ -109,20 +109,38 @@ namespace FileTypes.RigidModel.MaterialHeaders
             if (outputVersion == RmvVersionEnum.RMV2_V8)
             {
                 if (uiVertexFormat == UiVertexFormat.Cinematic)
+                {
+                    VertexType = UiVertexFormat.Cinematic;
                     BinaryVertexFormat = VertexFormat.Cinematic_withTint;
+                }
                 else if (uiVertexFormat == UiVertexFormat.Weighted)
+                {
+                    VertexType = UiVertexFormat.Weighted;
                     BinaryVertexFormat = VertexFormat.Weighted_withTint;
+                }
                 else
+                {
+                    VertexType = UiVertexFormat.Static;
                     BinaryVertexFormat = VertexFormat.Static;
+                }
             }
             else
             {
                 if (uiVertexFormat == UiVertexFormat.Cinematic)
+                {
+                    VertexType = UiVertexFormat.Cinematic;
                     BinaryVertexFormat = VertexFormat.Cinematic;
+                }
                 else if (uiVertexFormat == UiVertexFormat.Weighted)
+                {
+                    VertexType = UiVertexFormat.Weighted;
                     BinaryVertexFormat = VertexFormat.Weighted;
+                }
                 else
+                {
+                    VertexType = UiVertexFormat.Static;
                     BinaryVertexFormat = VertexFormat.Static;
+                }
             }
 
             if(BinaryVertexFormat == VertexFormat.Static)

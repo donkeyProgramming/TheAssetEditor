@@ -264,7 +264,7 @@ namespace CommonControls.Editors.AnimationPack
                 for (int i = 0; i < 6; i++)
                     entry.SetUnknown0Flag(i, bool.Parse(unknown0Flags[i]));
 
-                var unknown1Flags = item.Unknown.Split(",");
+                var unknown1Flags = item.WeaponBone.Split(",");
                 for (int i = 0; i < 6; i++)
                     entry.SetUnknown1Flag(i, bool.Parse(unknown1Flags[i]));
 

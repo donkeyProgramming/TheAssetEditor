@@ -17,9 +17,9 @@ namespace KitbasherEditor.Views.EditorViews
     /// <summary>
     /// Interaction logic for AnimationView.xaml
     /// </summary>
-    public partial class AnimationView : UserControl
+    public partial class AnimationPlayerView : UserControl
     {
-        public AnimationView()
+        public AnimationPlayerView()
         {
             InitializeComponent();
             AnimationContent.Visibility = Visibility.Collapsed;

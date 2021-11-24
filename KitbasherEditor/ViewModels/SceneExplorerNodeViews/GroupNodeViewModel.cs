@@ -12,13 +12,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         public string GroupName { get => _node.Name; set { _node.Name = value; NotifyPropertyChanged(); } }
 
-
-        bool _saveAsFileEnabled;
-        public bool SaveAsFileEnabled { get => _saveAsFileEnabled; set => SetAndNotify(ref _saveAsFileEnabled, value); }
-
-        string _saveAsFilePath;
-        public string SaveAsFilePath { get => _saveAsFilePath; set => SetAndNotify(ref _saveAsFilePath, value); }
-
         public GroupNodeViewModel(GroupNode node)
         {
             _node = node;

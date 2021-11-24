@@ -1,17 +1,11 @@
 ﻿using Common;
-using Filetypes.RigidModel;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using View3D.Components.Gizmo;
 using View3D.Components.Rendering;
-using View3D.Rendering;
-using View3D.Rendering.Geometry;
-using View3D.Rendering.RenderItems;
 using View3D.SceneNodes;
 using View3D.Utility;
 
@@ -19,7 +13,6 @@ namespace View3D.Components.Component
 {
     public delegate void SceneObjectAddedDelegate(ISceneNode parent, ISceneNode added);
     public delegate void SceneObjectRemovedDelegate(ISceneNode parent, ISceneNode toRemove);
-
 
     public class SceneManager : BaseComponent, IDisposable
     {

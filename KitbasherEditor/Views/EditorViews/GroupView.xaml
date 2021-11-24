@@ -8,23 +8,11 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel LastChildFill="False">
         <Label Content="Group Information:" FontSize="20" FontWeight="Bold" DockPanel.Dock="Top"/>
-       
+
         <DockPanel DockPanel.Dock="Top">
             <Label Width="100" DockPanel.Dock="Left">Group name</Label>
             <Label DockPanel.Dock="Left">:</Label>
             <TextBox Text="{Binding GroupName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
-        </DockPanel>
-
-        <DockPanel DockPanel.Dock="Top" IsEnabled="False">
-            <Label Width="100" DockPanel.Dock="Left">Save as file</Label>
-            <Label DockPanel.Dock="Left">:</Label>
-            <CheckBox IsChecked="{Binding SaveAsFileEnabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
-        </DockPanel>
-
-        <DockPanel DockPanel.Dock="Top" IsEnabled="False">
-            <Label Width="100" DockPanel.Dock="Left">Save as file Path</Label>
-            <Label DockPanel.Dock="Left">:</Label>
-            <TextBox Text="{Binding SaveAsFilePath, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
         </DockPanel>
     </DockPanel>
 </UserControl>

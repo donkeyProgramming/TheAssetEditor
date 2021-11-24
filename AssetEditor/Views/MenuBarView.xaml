@@ -17,9 +17,6 @@
                 </MenuItem>
                 <MenuItem Header="Recent Files" IsEnabled="False"/>
                 <Separator/>
-                <MenuItem Header="Save" IsEnabled="False"/>
-                <MenuItem Header="Save as" IsEnabled="False"/>
-                <Separator/>
                 <MenuItem Header="Load all game packfiles">
                     <MenuItem Header="Atilla" Command="{Binding MenuBar.OpenAttilaPacksCommand}"/>
                     <MenuItem Header="Rome2 Remastered" Command="{Binding MenuBar.OpenRome2RePacksCommand}"/>

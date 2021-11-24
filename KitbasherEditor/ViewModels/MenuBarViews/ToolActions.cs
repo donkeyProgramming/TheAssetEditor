@@ -10,6 +10,7 @@ using Filetypes.RigidModel;
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor.ViewModels.BmiEditor;
 using KitbasherEditor.ViewModels.MeshFitter;
+using KitbasherEditor.ViewModels.PinTool;
 using KitbasherEditor.Views.EditorViews;
 using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using Microsoft.Xna.Framework;
@@ -89,10 +90,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 _objectEditor.DeleteObject(objectSelectionState);
             else if (_selectionManager.GetState() is FaceSelectionState faceSelection)
                 _faceEditor.DeleteFaces(faceSelection);
-        }
-
-        public void MergeVertex()
-        {
         }
 
         public void ExpandFaceSelection()
@@ -241,16 +238,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             commandExecutor.ExecuteCommand(cmd, false);
         }
 
-        public void PinMeshToMesh()
-        {
-            var state = _selectionManager.GetState<ObjectSelectionState>();
-            var selectedObjects = state.SelectedObjects();
-
-            var cmd = new PinMeshToMeshCommand(selectedObjects[0] as Rmv2MeshNode, selectedObjects[1] as Rmv2MeshNode);
-            var commandExecutor = _componentManager.GetComponent<CommandExecutor>();
-            commandExecutor.ExecuteCommand(cmd);
-        }
-
+        public void PinMeshToMesh() => PinToolViewModel.ShowWindow(_componentManager);
 
         public void OpenReRiggingTool()
         {

@@ -15,7 +15,8 @@ namespace View3D.Components.Rendering
         Wireframe,
         Selection,
         Line,
-        Text
+        Text,
+        ConstantDebugLine,
     }
 
     public enum RenderMode
@@ -56,8 +57,8 @@ namespace View3D.Components.Rendering
 
         public override void Initialize()
         {
-            //float depthBias = -0.000008f;
-            float depthBias = -0.08f;
+            float depthBias = -0.000008f;
+            //float depthBias = -0.08f;
             _wireframeState = new RasterizerState();
             _wireframeState.FillMode = FillMode.WireFrame;
             _wireframeState.CullMode = CullMode.None;
@@ -83,10 +84,20 @@ namespace View3D.Components.Rendering
 
         public override void Update(GameTime gameTime)
         {
-            foreach (RenderBuckedId value in Enum.GetValues(typeof(RenderBuckedId)))
+
+            foreach (var value in _renderItems.Keys)
+            {
+                if (value == RenderBuckedId.ConstantDebugLine)
+                    continue;
                 _renderItems[value].Clear();
+            }
 
             base.Update(gameTime);
+        }
+
+        public void ClearDebugBuffer()
+        {
+            _renderItems[RenderBuckedId.ConstantDebugLine].Clear();
         }
 
         public override void Draw(GameTime gameTime)
@@ -123,7 +134,8 @@ namespace View3D.Components.Rendering
             foreach (var item in _renderItems[RenderBuckedId.Line])
                 item.Draw(GraphicsDevice, commonShaderParameters);
 
-
+            foreach (var item in _renderItems[RenderBuckedId.ConstantDebugLine])
+                item.Draw(GraphicsDevice, commonShaderParameters);
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;

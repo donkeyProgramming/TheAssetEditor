@@ -25,6 +25,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         GenerateWsModel,
         OpenImportReference,
         ImportReferencePaladin,
+        ImportReferenceSlayer,
+        ImportReferenceGoblin,
         SortModelsByName,
 
         Undo,
@@ -109,11 +111,13 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _actionList[MenuActionType.SaveAs] = new MenuAction(General.SaveAs) { EnableRule = ActionEnabledRule.Always, ToolTip = "Save as" };
             _actionList[MenuActionType.GenerateWsModel] = new MenuAction(General.GenerateWsModel) { EnableRule = ActionEnabledRule.Always, ToolTip = "Generate ws model" };
             _actionList[MenuActionType.OpenImportReference] = new MenuAction(ImportReference) { EnableRule = ActionEnabledRule.Always, ToolTip = "Import Reference model" };
-            _actionList[MenuActionType.ImportReferencePaladin] = new MenuAction(ImportReference_PaladinVMD) { EnableRule = ActionEnabledRule.Always, ToolTip = "Import paladin Reference model" };
+            _actionList[MenuActionType.ImportReferencePaladin] = new MenuAction(ImportReference_PaladinVMD) { EnableRule = ActionEnabledRule.Always, ToolTip = "Import Paladin Reference model" };
+            _actionList[MenuActionType.ImportReferenceSlayer] = new MenuAction(ImportReference_Slayer) { EnableRule = ActionEnabledRule.Always, ToolTip = "Import Slayer Reference model" };
+            _actionList[MenuActionType.ImportReferenceGoblin] = new MenuAction(ImportReference_Goblin) { EnableRule = ActionEnabledRule.Always, ToolTip = "Import Goblin Reference model" };
             _actionList[MenuActionType.Undo] = new MenuAction(General.Undo) { EnableRule = ActionEnabledRule.Custom, ToolTip = "Undo Last item", Hotkey = new Hotkey(Key.Z, ModifierKeys.Control) };
             _actionList[MenuActionType.SortModelsByName] = new MenuAction(General.SortMeshes) { EnableRule = ActionEnabledRule.Always, ToolTip = "Sort models by name" };
 
-
+            
             _actionList[MenuActionType.Gizmo_ScaleUp] = new MenuAction(Gizmo.ScaleGizmoUp) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Add, ModifierKeys.None) };
             _actionList[MenuActionType.Gizmo_ScaleDown] = new MenuAction(Gizmo.ScaleGizmoDown) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Subtract, ModifierKeys.None) };
             _actionList[MenuActionType.Gizmo_Arrow] = new MenuAction(Gizmo.Cursor) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Q, ModifierKeys.None) };
@@ -127,7 +131,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
             _actionList[MenuActionType.ViewOnlySelected] = new MenuAction(Tools.ToggleShowSelection) { EnableRule = ActionEnabledRule.Always, ToolTip = "View only selected", Hotkey = new Hotkey(Key.Space, ModifierKeys.None) };
             _actionList[MenuActionType.ResetCamera] = new MenuAction(General.ResetCamera) { EnableRule = ActionEnabledRule.Always, ToolTip = "Reset camera", Hotkey = new Hotkey(Key.F4, ModifierKeys.None) };
-            _actionList[MenuActionType.FocusSelection] = new MenuAction(General.FocusSelection) { EnableRule = ActionEnabledRule.Always, ToolTip = "Focus camera on selected", Hotkey = new Hotkey(Key.R, ModifierKeys.Control) };
+            _actionList[MenuActionType.FocusSelection] = new MenuAction(General.FocusSelection) { EnableRule = ActionEnabledRule.Always, ToolTip = "Focus camera on selected", Hotkey = new Hotkey(Key.F, ModifierKeys.Control) };
 
             _actionList[MenuActionType.DevideToSubmesh] = new MenuAction(Tools.DivideSubMesh) { EnableRule = ActionEnabledRule.OneObjectSelected, ToolTip = "Split mesh into logical parts" };
             //_actionList[MenuActionType.DevideToSubmesh_withoutCombining] = new MenuAction(Tools.DivideSubMesh) { EnableRule = ActionEnabledRule.Always, ToolTip = "Split mesh into logical parts without combining" };
@@ -136,12 +140,13 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _actionList[MenuActionType.DeleteSelected] = new MenuAction(Tools.DeleteObject) { EnableRule = ActionEnabledRule.ObjectOrFaceSelected, ToolTip = "Delete selected", Hotkey = new Hotkey(Key.Delete, ModifierKeys.None) };
             _actionList[MenuActionType.ConvertSelectedMeshIntoStaticAtCurrentAnimFrame] = new MenuAction(Tools.CreateStaticMeshes) { EnableRule = ActionEnabledRule.AtleastOneObjectSelected, ToolTip = "Convert the selected mesh at at the given animation frame into a static mesh" };
 
+            // Group items missing -> Only menu 
             _actionList[MenuActionType.ReduceMesh10x] = new MenuAction(Tools.ReduceMesh) { EnableRule = ActionEnabledRule.AtleastOneObjectSelected, ToolTip = "Reduce the mesh polygon count by 10%" };
             _actionList[MenuActionType.CreateLod] = new MenuAction(Tools.CreateLods) { EnableRule = ActionEnabledRule.Always, ToolTip = "Auto generate lods for models" };
             _actionList[MenuActionType.OpenBmiTool] = new MenuAction(Tools.OpenBmiTool) { EnableRule = ActionEnabledRule.OneObjectSelected, ToolTip = "Open the Bmi tool" };
             _actionList[MenuActionType.OpenSkeletonResharper] = new MenuAction(Tools.OpenSkeletonReshaperTool) { EnableRule = ActionEnabledRule.AtleastOneObjectSelected, ToolTip = "Open the skeleton modeling tool" };
             _actionList[MenuActionType.OpenReRiggingTool] = new MenuAction(Tools.OpenReRiggingTool) { EnableRule = ActionEnabledRule.AtleastOneObjectSelected, ToolTip = "Open the re-rigging tool" };
-            _actionList[MenuActionType.OpenPinTool] = new MenuAction(Tools.PinMeshToMesh) { EnableRule = ActionEnabledRule.TwoObjectesSelected, ToolTip = "Open the pin tool" };
+            _actionList[MenuActionType.OpenPinTool] = new MenuAction(Tools.PinMeshToMesh) { EnableRule = ActionEnabledRule.Always, ToolTip = "Open the pin tool" };
 
             _actionList[MenuActionType.GrowFaceSelection] = new MenuAction(Tools.ExpandFaceSelection) { EnableRule = ActionEnabledRule.FaceSelected, ToolTip = "Grow selection" };
             _actionList[MenuActionType.ConvertFaceToVertexSelection] = new MenuAction(Tools.ConvertFacesToVertex) { EnableRule = ActionEnabledRule.FaceSelected, ToolTip = "Convert selected faces to vertexes" };
@@ -161,6 +166,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             MenuItems[0].Children.Add(new ToolbarItem() { Name = "Import Reference model", Action = _actionList[MenuActionType.OpenImportReference] });
 
             MenuItems[1].Children.Add(new ToolbarItem() { Name = "Import Paladin", Action = _actionList[MenuActionType.ImportReferencePaladin] });
+            MenuItems[1].Children.Add(new ToolbarItem() { Name = "Import Slayer", Action = _actionList[MenuActionType.ImportReferenceSlayer] });
+            MenuItems[1].Children.Add(new ToolbarItem() { Name = "Import Goblin", Action = _actionList[MenuActionType.ImportReferenceGoblin] });
 
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "Sort models by name", Action = _actionList[MenuActionType.SortModelsByName] });
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "Generat Ws Model", Action = _actionList[MenuActionType.GenerateWsModel] });
@@ -168,7 +175,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             MenuItems[3].Children.Add(new ToolbarItem() { Name = "Focus camera", Action = _actionList[MenuActionType.FocusSelection] });
             MenuItems[3].Children.Add(new ToolbarItem() { Name = "Reset camera", Action = _actionList[MenuActionType.ResetCamera] });
         }
-
 
         void CreateButtons()
         {
@@ -304,5 +310,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         }
 
         void ImportReference_PaladinVMD() => ModelLoader.LoadReference(@"variantmeshes\variantmeshdefinitions\brt_paladin.variantmeshdefinition");
+        void ImportReference_Slayer() => ModelLoader.LoadReference(@"variantmeshes\variantmeshdefinitions\dwf_giant_slayers.variantmeshdefinition");
+        void ImportReference_Goblin() => ModelLoader.LoadReference(@"variantmeshes\variantmeshdefinitions\grn_forest_goblins_base.variantmeshdefinition");
     }
 }
