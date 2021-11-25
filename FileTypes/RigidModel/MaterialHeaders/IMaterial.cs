@@ -17,6 +17,7 @@ namespace FileTypes.RigidModel.MaterialHeaders
         IMaterial Clone();
         uint ComputeSize();
         RmvTexture? GetTexture(TexureType texureType);
+        void SetTexture(TexureType texureType, string path);
 
         void UpdateBeforeSave(UiVertexFormat uiVertexFormat, RmvVersionEnum outputVersion, string[] boneNames);
     }

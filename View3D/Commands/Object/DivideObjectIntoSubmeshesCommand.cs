@@ -78,7 +78,6 @@ namespace View3D.Commands.Object
                     var meshNode = new Rmv2MeshNode(hack.RmvModel_depricated.Clone(), _objectToSplit.Geometry.ParentSkeletonName,  context, _resourceLib, hack.AnimationPlayer, mesh);
                     meshNode.Name = $"{_objectToSplit.Name}_submesh_{counter++}";
 
-
                     createdMeshes.Add(meshNode);
                     _newGroupNode.AddObject(meshNode);
                 }

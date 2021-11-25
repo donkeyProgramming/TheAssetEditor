@@ -228,5 +228,6 @@ namespace AssetEditor.ViewModels
             var editorView = _toolFactory.CreateEditorViewModel<TechSkeletonEditorViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
+
     }
 }

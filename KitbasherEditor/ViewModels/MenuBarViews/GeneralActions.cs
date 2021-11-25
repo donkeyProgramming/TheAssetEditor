@@ -9,6 +9,7 @@ using System.Windows.Input;
 using View3D.Commands.Object;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
+using View3D.Components.Rendering;
 using View3D.SceneNodes;
 using static View3D.Commands.Object.GroupObjectsCommand;
 
@@ -20,6 +21,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         FocusSelectableObjectComponent _cameraFocusComponent;
         IEditableMeshResolver _editableMeshResolver;
         ObjectEditor _objectEditor;
+        RenderEngineComponent _renderEngineComponent;
+
         public ModelSaveHelper ModelSaver { get; set; }
 
         public GeneralActions(IComponentManager componentManager)
@@ -28,6 +31,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _cameraFocusComponent = componentManager.GetComponent<FocusSelectableObjectComponent>();
             _editableMeshResolver = componentManager.GetComponent<IEditableMeshResolver>();
             _objectEditor = componentManager.GetComponent<ObjectEditor>();
+            _renderEngineComponent = componentManager.GetComponent<RenderEngineComponent>();
         }
 
         public void SortMeshes()
@@ -42,6 +46,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public void GenerateWsModel() => ModelSaver.GenerateWsModel();
         public void Undo() => _commandExecutor.Undo();
         public void FocusSelection() => _cameraFocusComponent.FocusSelection();
-        public void ResetCamera() => _cameraFocusComponent.ResetCamera();        
+        public void ResetCamera() => _cameraFocusComponent.ResetCamera();
+
+        public void ToggleBackFaceRendering() => _renderEngineComponent.ToggelBackFaceRendering();
+        public void ToggleLargeSceneRendering() => _renderEngineComponent.ToggleLargeSceneRendering();
     }
 }

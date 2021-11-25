@@ -1,9 +1,11 @@
-﻿using Filetypes;
+﻿using Common;
+using Filetypes;
 using Filetypes.RigidModel;
 using Filetypes.RigidModel.LodHeader;
 using Filetypes.RigidModel.Vertex;
 using FileTypes.RigidModel.LodHeader;
 using FileTypes.RigidModel.MaterialHeaders;
+using Serilog;
 using System;
 using System.IO;
 using System.Linq;
@@ -12,6 +14,7 @@ namespace FileTypes.RigidModel
 {
     public class ModelFactory
     {
+        ILogger _logger = Logging.Create<ModelFactory>();
         public static ModelFactory Create() => new ModelFactory();
 
         public RmvFile Load(byte[] bytes)
@@ -103,12 +106,15 @@ namespace FileTypes.RigidModel
 
         public byte[] Save(RmvFile file)
         {
+            _logger.Here().Information("Converting RmvFile to bytes");
+
             using MemoryStream ms = new MemoryStream();
             using var writer = new BinaryWriter(ms);
 
             if (file.LodHeaders.Length != file.Header.LodCount)
                 throw new Exception("Unexpected number of Lods");
 
+            _logger.Here().Information("Creating headers");
             writer.Write(ByteHelper.GetBytes(file.Header));
             for(int lodIndex = 0; lodIndex < file.LodHeaders.Length; lodIndex++)
             {
@@ -116,6 +122,7 @@ namespace FileTypes.RigidModel
                 writer.Write(LodHeaderFactory.Create().Save(file.Header.Version, file.LodHeaders[lodIndex]));
             }
 
+            _logger.Here().Information("Creating meshes");
             for (int lodIndex = 0; lodIndex < file.LodHeaders.Length; lodIndex++)
             {
                 var models = file.ModelList[lodIndex];
@@ -137,10 +144,13 @@ namespace FileTypes.RigidModel
             }
 
             var bytes = ms.ToArray();
+
+            _logger.Here().Information("Attempting to reload model");
             var reloadedModel = Load(bytes);
             if (reloadedModel == null)
                 throw new Exception("Failed to save model - Could not load the result");
 
+            _logger.Here().Information("Converting RmvFile to bytes - Done");
             return bytes;
         }
 

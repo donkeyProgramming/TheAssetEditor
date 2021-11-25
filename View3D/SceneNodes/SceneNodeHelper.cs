@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace View3D.SceneNodes
@@ -45,6 +46,67 @@ namespace View3D.SceneNodes
                 clone.Children.Add(childClone);
             }
             return clone;
+        }
+
+        public static void MakeNodeEditable(Rmv2ModelNode mainNode, ISceneNode node)
+        {
+            if (node is Rmv2MeshNode meshNode)
+            {
+                node.Parent.RemoveObject(node);
+                mainNode.GetLodNodes()[0].AddObject(node);
+                meshNode.IsSelectable = true;
+                node.IsEditable = true;
+                return;
+            }
+
+            if (node is Rmv2LodNode lodNode)
+            {
+                var index = lodNode.LodValue;
+                foreach (var lodModel in lodNode.Children)
+                {
+                    (lodModel as Rmv2MeshNode).IsSelectable = true;
+                    mainNode.GetLodNodes()[0].AddObject(lodModel);
+                }
+            }
+
+            if (node is Rmv2ModelNode modelNode)
+            {
+                MakeModelNodeEditable(mainNode, modelNode);
+            }
+
+            if (node is WsModelGroup)
+            {
+                var child = node.Children.First();
+                MakeModelNodeEditable(mainNode, child as Rmv2ModelNode);
+            }
+
+            node.Parent.RemoveObject(node);
+            node.ForeachNodeRecursive(x =>
+            {
+                x.IsEditable = true;
+                if (x is Rmv2MeshNode mesh)
+                    mesh.IsSelectable = true;
+            });
+        }
+
+        static void MakeModelNodeEditable(Rmv2ModelNode mainNode, Rmv2ModelNode modelNode)
+        {
+            foreach (var lodChild in modelNode.Children)
+            {
+                if (lodChild is Rmv2LodNode lodNode0)
+                {
+                    var index = lodNode0.LodValue;
+                    foreach (var lodModel in lodNode0.Children)
+                    {
+                        if (index > 3)
+                            continue;
+                        (lodModel as Rmv2MeshNode).IsSelectable = true;
+                        mainNode.GetLodNodes()[0].AddObject(lodModel);
+                    }
+                    break;
+                }
+            }
+
         }
     }
 }

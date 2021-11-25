@@ -57,6 +57,10 @@ namespace FileTypes.RigidModel.MaterialHeaders
             return null;
         }
 
+        public void SetTexture(TexureType texureType, string path)
+        {
+        }
+
         public void UpdateBeforeSave(UiVertexFormat uiVertexFormat, RmvVersionEnum outputVersion, string[] boneNames)
         {
             throw new NotImplementedException();

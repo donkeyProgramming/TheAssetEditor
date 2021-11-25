@@ -49,6 +49,10 @@ namespace FileTypes.RigidModel.MaterialHeaders
         {
             throw new NotImplementedException();
         }
+
+        public void SetTexture(TexureType texureType, string path)
+        {
+        }
     }
 
     public class CustomTerrainMaterialCreator : IMaterialCreator

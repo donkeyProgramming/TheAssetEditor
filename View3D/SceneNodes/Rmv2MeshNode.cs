@@ -3,6 +3,8 @@ using Filetypes.RigidModel;
 using FileTypes.RigidModel.MaterialHeaders;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using View3D.Animation;
 using View3D.Components.Gizmo;
@@ -104,16 +106,7 @@ namespace View3D.SceneNodes
             if (texture == null)
                 return null;
 
-            Geometry.UpdateTexture(type, texture.Value.Path);
             return _resourceLib.LoadTexture(texture.Value.Path);
-        }
-
-
-
-
-        internal RmvModel CreateRmvSubModel(RmvVersionEnum version)
-        {
-            return MeshBuilderService.CreateRmvSubModel(RmvModel_depricated, Geometry, version);
         }
 
         public void Update(GameTime time) { }
@@ -138,9 +131,10 @@ namespace View3D.SceneNodes
 
         public void UpdateTexture(string path, TexureType texureType)
         {
-            var texture = _resourceLib.LoadTexture(path);
+            Material.SetTexture(texureType, path);
+
+            var texture = LoadTexture(texureType);
             Effect.SetTexture(texture, texureType);
-            Geometry.UpdateTexture(texureType, path);
         }
 
         public void UseTexture(TexureType texureType, bool value)
@@ -213,6 +207,24 @@ namespace View3D.SceneNodes
         public void RecomputeBoundingBox()
         {
             Geometry.BuildBoundingBox();
+        }
+
+        public Dictionary<TexureType, string> GetTextures()
+        {
+            var enumCollection = Enum.GetValues(typeof(TexureType));
+            Dictionary<TexureType, string> output = new Dictionary<TexureType, string>();
+
+            foreach (var enumValue in enumCollection)
+            {
+                var texture = Material.GetTexture((TexureType)enumValue);
+                if (texture != null && texture.HasValue)
+                {
+                    if (string.IsNullOrWhiteSpace(texture.Value.Path) == false)
+                        output[(TexureType)enumValue] = texture.Value.Path;
+                }
+            }
+
+            return output;
         }
     }
 

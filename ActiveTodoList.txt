@@ -221,19 +221,18 @@ Superview:
 	Refactor animmeta factory and connected stuff
 	
 Kitbasher tool:
-	[DONE]Select output format
-	[DONE]Adding skeleton to ocelods staff does not work 
 	[BUG]Setting texture or alpha data does not work from the ui
 	[BUG]3k model selection not working? Wft is going on => banner
 	[BUG]Changing textuers not saving
 	[BUG]weapons not attached anymore
 	Fill hole
-	Redo pin tool => Select vertex and mesh | UI 
 	Fix manipulars 
 	Cleanup lots of code for "tools"
 	Clean up geometry class
 	Toggle backface rendering
 	Mirror inverted tool
+	Revert normals 
+	Textures not updating on change 
 	
 			
 Skeleton creator tool:
@@ -343,3 +342,5 @@ Stuff places on top of the map using tile_list.bin?
 	
 
 
+Take pivot into account when selection
+DDS viwer 

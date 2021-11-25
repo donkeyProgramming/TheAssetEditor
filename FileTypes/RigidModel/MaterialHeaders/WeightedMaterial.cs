@@ -104,6 +104,26 @@ namespace FileTypes.RigidModel.MaterialHeaders
             return null;
         }
 
+        public void SetTexture(TexureType texureType, string path)
+        {
+            for (int i = 0; i < TexturesParams.Count; i++)
+            {
+                if (TexturesParams[i].TexureType == texureType)
+                {
+                    var item = TexturesParams[i];
+                    item.Path = path;
+                    TexturesParams[i] = item;
+                    return;
+                }
+            }
+
+            RmvTexture newTexture = new RmvTexture();
+            newTexture.TexureType = texureType;
+            newTexture.Path = path;
+
+            TexturesParams.Add(newTexture);
+        }
+
         public void UpdateBeforeSave(UiVertexFormat uiVertexFormat, RmvVersionEnum outputVersion, string[] boneNames)
         {
             if (outputVersion == RmvVersionEnum.RMV2_V8)

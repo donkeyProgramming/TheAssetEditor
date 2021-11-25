@@ -217,7 +217,7 @@ namespace KitbasherEditor.Services
                     continue;
 
                 bool texturesOk = true;
-                foreach (var modelTexture in mesh.Geometry.GetTextures())
+                foreach (var modelTexture in mesh.GetTextures())
                 {
                     var path = modelTexture.Value;
                     var modelTextureType = modelTexture.Key;

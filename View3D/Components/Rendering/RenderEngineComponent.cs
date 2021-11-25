@@ -19,11 +19,6 @@ namespace View3D.Components.Rendering
         ConstantDebugLine,
     }
 
-    public enum RenderMode
-    { 
-        Cinematic,
-        Simple
-    }
 
     public interface IRenderItem
     {
@@ -33,18 +28,23 @@ namespace View3D.Components.Rendering
 
     public class RenderEngineComponent : BaseComponent, IDisposable
     {
-        RasterizerState _wireframeState;
-        RasterizerState _selectedFaceState;
+        enum RasterizerStateEnum
+        {
+            Default,
+            Wireframe,
+            SelectedFaces,
+        }
 
+        Dictionary<RasterizerStateEnum, RasterizerState> _rasterStates = new Dictionary<RasterizerStateEnum, RasterizerState>();
         ArcBallCamera _camera;
-
         Dictionary<RenderBuckedId, List<IRenderItem>> _renderItems = new Dictionary<RenderBuckedId, List<IRenderItem>>();
         ResourceLibary _resourceLib;
 
+        bool _cullingEnabled = false;
+        bool _bigSceneDepthBiasMode = false;
+
         public float LightRotationDegrees { get; set; } = 20;
         public float LightIntensityMult { get; set; } = 6;
-
-        public RenderMode RenderMode { get; set; } = RenderMode.Cinematic;
 
         public RenderEngineComponent(WpfGame game) : base(game)
         {
@@ -57,24 +57,59 @@ namespace View3D.Components.Rendering
 
         public override void Initialize()
         {
-            float depthBias = -0.000008f;
-            //float depthBias = -0.08f;
-            _wireframeState = new RasterizerState();
-            _wireframeState.FillMode = FillMode.WireFrame;
-            _wireframeState.CullMode = CullMode.None;
-            _wireframeState.DepthBias = depthBias;
-            _wireframeState.DepthClipEnable = true;
-
-            _selectedFaceState = new RasterizerState();
-            _selectedFaceState.FillMode = FillMode.Solid;
-            _selectedFaceState.CullMode = CullMode.None;
-            _selectedFaceState.DepthBias = depthBias;
-            _wireframeState.DepthClipEnable = true;
+            RebuildRasterStates(_cullingEnabled, _bigSceneDepthBiasMode);
 
             _camera = GetComponent<ArcBallCamera>();
             _resourceLib = GetComponent<ResourceLibary>();
 
             base.Initialize();
+        }
+
+        void RebuildRasterStates(bool cullingEnabled, bool bigSceneDepthBias)
+        {
+            foreach (var item in _rasterStates.Values)
+                item.Dispose();
+            _rasterStates.Clear();
+
+            var cullMode = cullingEnabled ? CullMode.CullCounterClockwiseFace : CullMode.None;
+            float bias = bigSceneDepthBias ? 0 : 0;
+
+            _rasterStates[RasterizerStateEnum.Default] = new RasterizerState();
+            _rasterStates[RasterizerStateEnum.Default].FillMode = FillMode.Solid;
+            _rasterStates[RasterizerStateEnum.Default].CullMode = cullMode;
+            _rasterStates[RasterizerStateEnum.Default].DepthBias = bias;
+            _rasterStates[RasterizerStateEnum.Default].DepthClipEnable = true;
+            _rasterStates[RasterizerStateEnum.Default].MultiSampleAntiAlias = true;
+
+            float depthOffsetBias = 0.0005f;
+            _rasterStates[RasterizerStateEnum.Wireframe] = new RasterizerState();
+            _rasterStates[RasterizerStateEnum.Wireframe].FillMode = FillMode.WireFrame;
+            _rasterStates[RasterizerStateEnum.Wireframe].CullMode = cullMode;
+            _rasterStates[RasterizerStateEnum.Wireframe].DepthBias = bias - depthOffsetBias; ;
+            _rasterStates[RasterizerStateEnum.Wireframe].DepthClipEnable = true;
+            _rasterStates[RasterizerStateEnum.Wireframe].MultiSampleAntiAlias = true;
+
+            _rasterStates[RasterizerStateEnum.SelectedFaces] = new RasterizerState();
+            _rasterStates[RasterizerStateEnum.SelectedFaces].FillMode = FillMode.Solid;
+            _rasterStates[RasterizerStateEnum.SelectedFaces].CullMode = CullMode.None;
+            _rasterStates[RasterizerStateEnum.SelectedFaces].DepthBias = bias - depthOffsetBias;
+            _rasterStates[RasterizerStateEnum.SelectedFaces].DepthClipEnable = true;
+            _rasterStates[RasterizerStateEnum.SelectedFaces].MultiSampleAntiAlias = true;
+
+            _cullingEnabled = cullingEnabled;
+            _bigSceneDepthBiasMode = bigSceneDepthBias;
+        }
+
+        public void ToggleLargeSceneRendering()
+        {
+            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+            RebuildRasterStates(_cullingEnabled, !_bigSceneDepthBiasMode);
+        }
+
+        public void ToggelBackFaceRendering()
+        {
+            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+            RebuildRasterStates(!_cullingEnabled, _bigSceneDepthBiasMode);
         }
 
         public void AddRenderItem(RenderBuckedId id, IRenderItem item)
@@ -118,16 +153,16 @@ namespace View3D.Components.Rendering
             _resourceLib.CommonSpriteBatch.End();
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+            GraphicsDevice.RasterizerState = _rasterStates[RasterizerStateEnum.Default];
 
             foreach (var item in _renderItems[RenderBuckedId.Normal])
                 item.Draw(GraphicsDevice, commonShaderParameters);
 
-            GraphicsDevice.RasterizerState = _wireframeState;
+            GraphicsDevice.RasterizerState = _rasterStates[RasterizerStateEnum.Wireframe];
             foreach (var item in _renderItems[RenderBuckedId.Wireframe])
                 item.Draw(GraphicsDevice, commonShaderParameters);
 
-            GraphicsDevice.RasterizerState = _selectedFaceState;
+            GraphicsDevice.RasterizerState = _rasterStates[RasterizerStateEnum.SelectedFaces];
             foreach (var item in _renderItems[RenderBuckedId.Selection])
                 item.Draw(GraphicsDevice, commonShaderParameters);
 
@@ -144,8 +179,9 @@ namespace View3D.Components.Rendering
         public void Dispose()
         {
             _renderItems.Clear();
-            _wireframeState.Dispose();
-            _selectedFaceState.Dispose();
+            foreach (var item in _rasterStates.Values)
+                item.Dispose();
+            _rasterStates.Clear();
         }
     }
 }

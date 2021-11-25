@@ -149,6 +149,16 @@ namespace KitbasherEditor.ViewModels.PinTool
                 return;
             }
 
+            foreach (var mesh in AffectedMeshCollection)
+            {
+                if (SourceMeshCollection.Count(x => x == mesh) != 0)
+                {
+                    MessageBox.Show("Source mesh is also in the list of target meshes", "Error");
+                    return;
+                }
+            }
+
+
             var cmd = new SkinWrapRiggingCommand(AffectedMeshCollection, SourceMeshCollection);
             var commandExecutor = _componentManager.GetComponent<CommandExecutor>();
             commandExecutor.ExecuteCommand(cmd);

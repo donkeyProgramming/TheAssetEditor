@@ -27,6 +27,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         ImportReferencePaladin,
         ImportReferenceSlayer,
         ImportReferenceGoblin,
+        ImportMapForDebug,
         SortModelsByName,
 
         Undo,
@@ -44,6 +45,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         ViewOnlySelected,
         FocusSelection,
         ResetCamera,
+        ToogleBackFaceRendering,
+        ToggleLargeSceneRendering,
 
         DevideToSubmesh,
         DevideToSubmesh_withoutCombining,
@@ -75,6 +78,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public ToolActions Tools { get; set; }
         public TransformToolViewModel TransformTool { get; set; }
 
+        IComponentManager _componentManager;
         ActionHotkeyHandler _commandFactory = new ActionHotkeyHandler();
         VisibilityHandler _ruleFactory;
         WindowKeyboard _keyboard = new WindowKeyboard();
@@ -86,6 +90,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         public MenuBarViewModel(IComponentManager componentManager, PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper)
         {
+            _componentManager = componentManager;
             _packFileService = packFileService;
             _ruleFactory = new VisibilityHandler(componentManager);
             TransformTool = new TransformToolViewModel(componentManager);
@@ -114,10 +119,10 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _actionList[MenuActionType.ImportReferencePaladin] = new MenuAction(ImportReference_PaladinVMD) { EnableRule = ActionEnabledRule.Always, ToolTip = "Import Paladin Reference model" };
             _actionList[MenuActionType.ImportReferenceSlayer] = new MenuAction(ImportReference_Slayer) { EnableRule = ActionEnabledRule.Always, ToolTip = "Import Slayer Reference model" };
             _actionList[MenuActionType.ImportReferenceGoblin] = new MenuAction(ImportReference_Goblin) { EnableRule = ActionEnabledRule.Always, ToolTip = "Import Goblin Reference model" };
+            _actionList[MenuActionType.ImportMapForDebug] = new MenuAction(ImportDebugMap) { EnableRule = ActionEnabledRule.Always, ToolTip = "Import map for debug" };
             _actionList[MenuActionType.Undo] = new MenuAction(General.Undo) { EnableRule = ActionEnabledRule.Custom, ToolTip = "Undo Last item", Hotkey = new Hotkey(Key.Z, ModifierKeys.Control) };
             _actionList[MenuActionType.SortModelsByName] = new MenuAction(General.SortMeshes) { EnableRule = ActionEnabledRule.Always, ToolTip = "Sort models by name" };
 
-            
             _actionList[MenuActionType.Gizmo_ScaleUp] = new MenuAction(Gizmo.ScaleGizmoUp) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Add, ModifierKeys.None) };
             _actionList[MenuActionType.Gizmo_ScaleDown] = new MenuAction(Gizmo.ScaleGizmoDown) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Subtract, ModifierKeys.None) };
             _actionList[MenuActionType.Gizmo_Arrow] = new MenuAction(Gizmo.Cursor) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Q, ModifierKeys.None) };
@@ -132,6 +137,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _actionList[MenuActionType.ViewOnlySelected] = new MenuAction(Tools.ToggleShowSelection) { EnableRule = ActionEnabledRule.Always, ToolTip = "View only selected", Hotkey = new Hotkey(Key.Space, ModifierKeys.None) };
             _actionList[MenuActionType.ResetCamera] = new MenuAction(General.ResetCamera) { EnableRule = ActionEnabledRule.Always, ToolTip = "Reset camera", Hotkey = new Hotkey(Key.F4, ModifierKeys.None) };
             _actionList[MenuActionType.FocusSelection] = new MenuAction(General.FocusSelection) { EnableRule = ActionEnabledRule.Always, ToolTip = "Focus camera on selected", Hotkey = new Hotkey(Key.F, ModifierKeys.Control) };
+            _actionList[MenuActionType.ToogleBackFaceRendering] = new MenuAction(General.ToggleBackFaceRendering) { EnableRule = ActionEnabledRule.Always, ToolTip = "Toggle backface rendering" };
+            _actionList[MenuActionType.ToggleLargeSceneRendering] = new MenuAction(General.ToggleLargeSceneRendering) { EnableRule = ActionEnabledRule.Always, ToolTip = "Toogle rendering of large scenes" };
 
             _actionList[MenuActionType.DevideToSubmesh] = new MenuAction(Tools.DivideSubMesh) { EnableRule = ActionEnabledRule.OneObjectSelected, ToolTip = "Split mesh into logical parts" };
             //_actionList[MenuActionType.DevideToSubmesh_withoutCombining] = new MenuAction(Tools.DivideSubMesh) { EnableRule = ActionEnabledRule.Always, ToolTip = "Split mesh into logical parts without combining" };
@@ -168,12 +175,17 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             MenuItems[1].Children.Add(new ToolbarItem() { Name = "Import Paladin", Action = _actionList[MenuActionType.ImportReferencePaladin] });
             MenuItems[1].Children.Add(new ToolbarItem() { Name = "Import Slayer", Action = _actionList[MenuActionType.ImportReferenceSlayer] });
             MenuItems[1].Children.Add(new ToolbarItem() { Name = "Import Goblin", Action = _actionList[MenuActionType.ImportReferenceGoblin] });
+            MenuItems[1].Children.Add(new ToolbarItem() { Name = "Import map", Action = _actionList[MenuActionType.ImportMapForDebug] });
+            
 
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "Sort models by name", Action = _actionList[MenuActionType.SortModelsByName] });
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "Generat Ws Model", Action = _actionList[MenuActionType.GenerateWsModel] });
 
             MenuItems[3].Children.Add(new ToolbarItem() { Name = "Focus camera", Action = _actionList[MenuActionType.FocusSelection] });
             MenuItems[3].Children.Add(new ToolbarItem() { Name = "Reset camera", Action = _actionList[MenuActionType.ResetCamera] });
+            MenuItems[3].Children.Add(new ToolbarItem() { IsSeparator = true });
+            MenuItems[3].Children.Add(new ToolbarItem() { Name = "Toggle backface rendering", Action = _actionList[MenuActionType.ToogleBackFaceRendering] });
+            MenuItems[3].Children.Add(new ToolbarItem() { Name = "Toggle Big scene rendering", Action = _actionList[MenuActionType.ToggleLargeSceneRendering] });
         }
 
         void CreateButtons()
@@ -198,8 +210,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         {
             CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Arrow], "Gizmo", true) { Image = ResourceController.Gizmo_CursorIcon });
             CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Move],"Gizmo") { Image = ResourceController.Gizmo_MoveIcon });
-            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Rotate], "Gizmo") { Image = ResourceController.Gizmo_ScaleIcon });
-            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Scale],"Gizmo") {  Image = ResourceController.Gizmo_RotateIcon });
+            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Rotate], "Gizmo") { Image = ResourceController.Gizmo_RotateIcon});
+            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Scale],"Gizmo") {  Image = ResourceController.Gizmo_ScaleIcon });
 
             CustomButtons.Add(new MenuBarButton(null) { IsSeperator = true });
 
@@ -277,7 +289,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             foreach (var button in CustomButtons)
                 _ruleFactory.Validate(button);
 
-
             // Validate if menu action is enabled
             foreach (var action in _actionList.Values)
                 _ruleFactory.Validate(action);
@@ -312,5 +323,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         void ImportReference_PaladinVMD() => ModelLoader.LoadReference(@"variantmeshes\variantmeshdefinitions\brt_paladin.variantmeshdefinition");
         void ImportReference_Slayer() => ModelLoader.LoadReference(@"variantmeshes\variantmeshdefinitions\dwf_giant_slayers.variantmeshdefinition");
         void ImportReference_Goblin() => ModelLoader.LoadReference(@"variantmeshes\variantmeshdefinitions\grn_forest_goblins_base.variantmeshdefinition");
+        void ImportDebugMap() => MapLoaderService.Load(_packFileService, _componentManager, ModelLoader);
     }
 }

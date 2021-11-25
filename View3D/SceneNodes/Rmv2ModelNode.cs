@@ -57,7 +57,7 @@ namespace View3D.SceneNodes
                     lodNode.AddObject(node);
                 }
             }
-        }
+        } 
 
         public List<Rmv2LodNode> GetLodNodes()
         {

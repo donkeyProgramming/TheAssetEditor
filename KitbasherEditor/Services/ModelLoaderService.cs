@@ -5,6 +5,8 @@ using FileTypes.PackFiles.Models;
 using FileTypes.RigidModel;
 using KitbasherEditor.ViewModels;
 using Serilog;
+using System.Collections.Generic;
+using System.Linq;
 using View3D.Components.Component;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
@@ -34,18 +36,14 @@ namespace KitbasherEditor.Services
 
             var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(resourceLibary.Content, animationView) { IsLockable = false }) as SkeletonNode;
             EditableMeshNode = _sceneManager.RootNode.AddObject(new MainEditableNode("Editable Model", skeletonNode, mainFile));
-            ReferenceMeshRoot = sceneManager.RootNode.AddObject(new GroupNode("Reference meshs") { IsEditable = false, IsLockable=false });
+            ReferenceMeshRoot = sceneManager.RootNode.AddObject(new GroupNode("Reference meshs") { IsEditable = false, IsLockable = false });
         }
 
         public void LoadMainEditableModel(PackFile file)
         {
             var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
-
-            //var rmv = new RmvFile();
-            //rmv.Load(file.DataSource.ReadData());
             EditableMeshNode.SetModel(rmv, _resourceLibary, _animationView.Player, GeometryGraphicsContextFactory.CreateInstance(_resourceLibary.GraphicsDevice));
             EditableMeshNode.SelectedOutputFormat = rmv.Header.Version;
-
             _animationView.SetActiveSkeleton(rmv.Header.SkeletonName);
         }
 
@@ -63,21 +61,45 @@ namespace KitbasherEditor.Services
             LoadReference(refereneceMesh);
         }
 
-        public void LoadReference(PackFile file, bool updateSkeleton = false)
+        public void LoadModelIntoMainScene(PackFile file)
         {
             _logger.Here().Information($"Loading reference model - {_packFileService.GetFullPath(file)}");
+            var result = LoadModel(file);
 
+            var lodNodes = new List<Rmv2LodNode>();
+            result.ForeachNodeRecursive((node) =>
+            {
+                if (node is Rmv2LodNode lodNode && lodNode.LodValue == 0)
+                    lodNodes.Add(lodNode);
+            });
+
+            foreach (var node in lodNodes)
+                SceneNodeHelper.MakeNodeEditable(EditableMeshNode, node);
+        }
+
+
+
+        public void LoadReference(PackFile file)
+        {
+            _logger.Here().Information($"Loading reference model - {_packFileService.GetFullPath(file)}");
+            var result = LoadModel(file);
+            ReferenceMeshRoot.AddObject(result);
+        }
+
+
+        SceneNode LoadModel(PackFile file)
+        {
             SceneLoader loader = new SceneLoader(_resourceLibary);
             var outSkeletonName = "";
             var result = loader.Load(file, null, _animationView.Player, ref outSkeletonName);
             if (result == null)
             {
                 _logger.Here().Error("Unable to load model");
-                return;
+                return null;
             }
 
-            result.ForeachNodeRecursive((node) => 
-            { 
+            result.ForeachNodeRecursive((node) =>
+            {
                 node.IsEditable = false;
                 if (node is ISelectable selectable)
                 {
@@ -94,7 +116,8 @@ namespace KitbasherEditor.Services
                 }
             });
 
-            ReferenceMeshRoot.AddObject(result);
+            return result;
         }
     }
+        
 }

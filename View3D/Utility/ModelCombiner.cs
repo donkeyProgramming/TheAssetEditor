@@ -25,7 +25,7 @@ namespace View3D.Utility
                     var model1Name = innerLoopItem.Name;
 
                     // Textures
-                    if (!ValidateTextures(outerLoopItem.Geometry, model0Name, innerLoopItem.Geometry, model1Name, out string textureErrorMsg))
+                    if (!ValidateTextures(outerLoopItem, model0Name, innerLoopItem, model1Name, out string textureErrorMsg))
                         errors.Error("Texture", textureErrorMsg);
 
                     // Vertex type
@@ -41,7 +41,7 @@ namespace View3D.Utility
             return errors.Errors.Count == 0;
         }
 
-        private bool ValidateTextures(MeshObject item0, string item0Name, MeshObject item1, string item1Name, out string textureErrorMsg)
+        private bool ValidateTextures(Rmv2MeshNode item0, string item0Name, Rmv2MeshNode item1, string item1Name, out string textureErrorMsg)
         {
             var textureList0 = item0.GetTextures();
             var textureList1 = item1.GetTextures();
@@ -64,6 +64,10 @@ namespace View3D.Utility
             return true;
         }
 
-  
+
+
+
+
+
     }
 }
