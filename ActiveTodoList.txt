@@ -14,6 +14,7 @@ Major ideas:
 	UI tool
 	BMD/CSC editor 
 	Map tools?
+	Search window 
 
 
 General:
