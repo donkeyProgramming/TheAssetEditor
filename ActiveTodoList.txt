@@ -2,6 +2,20 @@
 ImageMagick
 https://github.com/dlemstra/Magick.NET
 
+
+
+
+Major ideas:
+	Texture kitbashing
+	Sync textures (updates in PS reflected in Ass)
+	SkeletonEditor
+	Sound tree view + new sounds editor 
+	Script tool - keep files outside of the packfile, allow for dynamic reload
+	UI tool
+	BMD/CSC editor 
+	Map tools?
+
+
 General:
 	Validators animation
 	Make rome work better
