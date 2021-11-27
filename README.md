@@ -1,5 +1,11 @@
 [![name](https://user-images.githubusercontent.com/54080240/126827425-c6c49064-0cb7-459d-b6c2-47544f4013cd.png)](https://www.patreon.com/TheAssetEditor)
 
+Modding tool for total war games
+Features:
+- Super easy to use 3d editor which supports saving and loading to all game formats (rmv2)
+- Animation editor that easily allows for moving animation between skeletons or making mount animations where there is none. 
+- Lots of other cool stuff, check it out! 
+
 Planned major features:
 - Mesh verifications (Show normals, ensure weights)
 - Animation transfer tool
