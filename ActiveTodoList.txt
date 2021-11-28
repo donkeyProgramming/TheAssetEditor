@@ -16,6 +16,12 @@ Major ideas:
 	Map tools?
 	Search window 
 
+Bugs:
+	corruption detector
+	File changed outside of ass
+	lod issue
+	weapons in hands
+
 
 General:
 	Validators animation

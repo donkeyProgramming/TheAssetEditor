@@ -1,0 +1,38 @@
+﻿<UserControl x:Class="CommonControls.Editors.AnimationBatchExporter.AnimationBatchExportView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CommonControls.Editors.AnimationBatchExporter"
+               xmlns:s="http://schemas.singulink.com/xaml"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height='200'/>
+            <RowDefinition Height='auto'/>
+            <RowDefinition Height='auto'/>
+        </Grid.RowDefinitions>
+
+        <GroupBox Grid.Row="0" Header="Packfiles to convert:">
+            <ListView  ItemsSource="{Binding PackfileList, UpdateSourceTrigger=PropertyChanged}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding Process.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center"/>
+                            <Label Content="{Binding Name.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </GroupBox>
+
+        <DockPanel Grid.Row="1" LastChildFill="True" Margin="0,5,0,0">
+            <Label Content="Output format:"/>
+            <ComboBox ItemsSource="{Binding PossibleOutputFormats, UpdateSourceTrigger=PropertyChanged}" 
+                      SelectedItem="{Binding SelectedOutputFormat.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+        </DockPanel>
+
+        <Button Grid.Row="2" Content="Apply" Margin="5,5,5,0" Click="{s:MethodBinding Process}"/>
+    </Grid>
+</UserControl>

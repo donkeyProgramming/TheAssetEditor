@@ -21,7 +21,7 @@ namespace CommonControls.Editors.AnimationFilePreviewEditor
                 var output = new StringBuilder();
                 
                 output.AppendLine($"Header:");
-                output.AppendLine($"\t AnimationType:{animFile.Header.AnimationType}");
+                output.AppendLine($"\t AnimationFormat:{animFile.Header.AnimationFormat}");
                 output.AppendLine($"\t Unknown0_alwaysOne:{animFile.Header.Unknown0_alwaysOne}");
                 output.AppendLine($"\t FrameRate:{animFile.Header.FrameRate}");
                 output.AppendLine($"\t SkeletonName:{animFile.Header.SkeletonName}");
@@ -64,7 +64,6 @@ namespace CommonControls.Editors.AnimationFilePreviewEditor
                 return "";
             }
         }
-
 
         void PrintFrame(StringBuilder output, int indentation, AnimationFile.Frame frame)
         {

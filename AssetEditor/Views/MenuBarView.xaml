@@ -43,7 +43,9 @@
                 <MenuItem Header="Animation Transfer Tool" Command="{Binding MenuBar.OpenAnimationTransferToolCommand}" />
                 <MenuItem Header="Super view" Command="{Binding MenuBar.OpenSuperViewToolCommand}" />
                 <MenuItem Header="Tech skeleton Editor" Command="{Binding MenuBar.OpenTechSkeletonEditorCommand}" />
+                <MenuItem Header="Animation batch converter" Command="{Binding MenuBar.OpenAnimationBatchExporterCommand}" />
                 
+
                 <MenuItem Header="AnimMeta Decoder" Command="{Binding MenuBar.OpenAnimMetaDecocderCommand}" IsEnabled="False"/>
                 <MenuItem Header="Kitbash Editor" Command="{Binding MenuBar.OpenKitbashEditorCommand}" IsEnabled="False"/>
                 <MenuItem Header="Animated prop creator" Command="{Binding MenuBar.OpenPropCreatorCommand}" IsEnabled="False"/>

@@ -38,49 +38,4 @@ namespace FileTypes.PackFiles.Models
         public string Extention { get => Path.GetExtension(Name); }
     }
 
-
-
-
-
-    /*public class PackFileDirectory : NotifyPropertyChangedImpl, IPackFile
-    {
-        public PackFileDirectory(string name) 
-        {
-            Name = name;
-        }
-
-        public override string ToString()
-        {
-            return $"Dir : {Name} - Files: {InternalFileList.Count}";
-        }
-
-        string _name;
-        public string Name
-        {
-            get => _name;
-            set => SetAndNotify(ref _name, value);
-        }
-
-
-        public void Sort()
-        {
-            InternalFileList = new Dictionary<string, IPackFile>(InternalFileList.OrderBy(x => x.Value.PackFileType()).ThenBy(x => x.Value.Name));
-            foreach (var item in InternalFileList)
-                item.Value.Sort();
-        }
-
-        public PackFileType PackFileType() { return Common.PackFileType.Directory; }
-        public IPackFile FindChild(string itemName)
-        {
-            InternalFileList.TryGetValue(itemName, out var value);
-            return value;
-        }
-
-    
-        Dictionary<string, IPackFile> InternalFileList { get; set; } = new Dictionary<string, IPackFile>();
-
-        IEnumerable<IPackFile> IPackFile.Children => InternalFileList.Values;
-
-        IPackFile IPackFile.Parent { get; set; }
-    }*/
 }

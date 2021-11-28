@@ -324,6 +324,29 @@ namespace CommonControls.Services
             Database.TriggerPackFileAdded(container, new List<PackFile>() { newFile as PackFile });
         }
 
+        public void AddFilesToPack(PackFileContainer container, List<string> directoryPaths, List<PackFile> newFiles)
+        {
+            if (container.IsCaPackFile)
+                throw new Exception("Can not add files to ca pack file");
+
+            if (directoryPaths.Count != newFiles.Count)
+                throw new Exception("Different number of directories and files");
+
+            for(int i = 0; i < directoryPaths.Count; i++)
+            {
+                var path = directoryPaths[i];
+                if (!string.IsNullOrWhiteSpace(path))
+                    path += "\\";
+                path += newFiles[i].Name;
+                container.FileList[path.ToLower()] = newFiles[i];
+
+            }
+            _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, container);
+            _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, container);
+
+            Database.TriggerPackFileAdded(container, newFiles);
+        }
+
         public void CopyFileFromOtherPackFile(PackFileContainer source, string path, PackFileContainer target)
         {
             var lowerPath = path.ToLower();
@@ -394,6 +417,11 @@ namespace CommonControls.Services
             }
             _logger.Here().Information($"Unknown packfile container for {file.Name}");
             return null;
+        }
+
+        public List<PackFileContainer> GetAllPackfileContainers()
+        {
+            return Database.PackFiles.ToList();
         }
 
         // Remove

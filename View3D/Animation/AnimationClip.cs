@@ -78,7 +78,7 @@ namespace View3D.Animation
             //float frameRate = 
             var fRate = (DynamicFrames.Count() - 1) / PlayTimeInSec;
             output.Header.FrameRate = (float)Math.Floor(fRate);
-            output.Header.AnimationType = 7;
+            output.Header.AnimationFormat = 7;
             output.Header.AnimationTotalPlayTimeInSec = PlayTimeInSec;
             output.Header.SkeletonName = skeleton.SkeletonName;
 

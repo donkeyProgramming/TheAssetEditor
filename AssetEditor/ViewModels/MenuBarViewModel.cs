@@ -10,6 +10,7 @@ using Common;
 using Common.ApplicationSettings;
 using Common.GameInformation;
 using CommonControls.Common;
+using CommonControls.Editors.AnimationBatchExporter;
 using CommonControls.Services;
 using CommonControls.Simple;
 using FileTypes.AnimationPack;
@@ -42,6 +43,7 @@ namespace AssetEditor.ViewModels
         public ICommand OpenAssetEditorFolderCommand { get; set; }
         public ICommand OpenAnimMetaDecocderCommand { get; set; }
         public ICommand OpenMountCreatorCommand { get; set; }
+        public ICommand OpenAnimationBatchExporterCommand { get; set; }
 
 
         public ICommand OpenRome2RePacksCommand { get; set; }
@@ -82,6 +84,7 @@ namespace AssetEditor.ViewModels
             OpenAnimationTransferToolCommand = new RelayCommand(OpenAnimationTransferTool);
             OpenSuperViewToolCommand = new RelayCommand(OpenSuperViewTool);
             OpenTechSkeletonEditorCommand = new RelayCommand(OpenTechSkeletonEditor);
+            OpenAnimationBatchExporterCommand = new RelayCommand(OpenAnimationBatchExporter);
 
             OpenAttilaPacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Attila));
             OpenRome2RePacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Rome_2_Remastered));
@@ -228,6 +231,8 @@ namespace AssetEditor.ViewModels
             var editorView = _toolFactory.CreateEditorViewModel<TechSkeletonEditorViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
+
+        void OpenAnimationBatchExporter() => AnimationBatchExportViewModel.ShowWindow(_packfileService);
 
     }
 }

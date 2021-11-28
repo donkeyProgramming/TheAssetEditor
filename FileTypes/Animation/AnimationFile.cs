@@ -44,7 +44,7 @@ namespace Filetypes.Animation
 
         public class AnimationHeader
         {
-            public uint AnimationType { get; set; }             
+            public uint AnimationFormat { get; set; }             
             public uint Unknown0_alwaysOne { get; set; } = 1;
             public float FrameRate { get; set; } = 20;
             public string SkeletonName { get; set; }
@@ -81,19 +81,19 @@ namespace Filetypes.Animation
                 throw new Exception("Trying to load animation header with no data, chunk size = 0");
 
             var header = new AnimationHeader();
-            header.AnimationType = chunk.ReadUInt32();
+            header.AnimationFormat = chunk.ReadUInt32();
             header.Unknown0_alwaysOne = chunk.ReadUInt32();        // Always 1?
             header.FrameRate = chunk.ReadSingle();
             var nameLength = chunk.ReadShort();
             header.SkeletonName = chunk.ReadFixedLength(nameLength);
             header.Unknown1_alwaysZero = chunk.ReadUInt32();        // Always 0? padding?
 
-            if (header.AnimationType == 7)
+            if (header.AnimationFormat == 7)
                 header.AnimationTotalPlayTimeInSec = chunk.ReadSingle(); // Play time
 
-            bool isSupportedAnimationFile = header.AnimationType == 5 || header.AnimationType == 6 || header.AnimationType == 7 || header.AnimationType == 4;
+            bool isSupportedAnimationFile = header.AnimationFormat == 5 || header.AnimationFormat == 6 || header.AnimationFormat == 7 || header.AnimationFormat == 4;
             if (!isSupportedAnimationFile)
-                throw new Exception($"Unsuported animation format: {header.AnimationType}");
+                throw new Exception($"Unsuported animation format: {header.AnimationFormat}");
 
             return header;
         }
@@ -203,7 +203,7 @@ namespace Filetypes.Animation
             }
 
             // A single static frame - Can be inverse, a pose or empty. Not sure? Hand animations are stored here
-            if (output.Header.AnimationType == 7)
+            if (output.Header.AnimationFormat == 7)
             {
                 var staticPosCount = chunk.ReadUInt32();
                 var staticRotCount = chunk.ReadUInt32();
@@ -227,7 +227,7 @@ namespace Filetypes.Animation
 
             // ----------------------
 
-            if (output.Header.AnimationType != 7)
+            if (output.Header.AnimationFormat != 7)
                 output.Header.AnimationTotalPlayTimeInSec = output.DynamicFrames.Count() / output.Header.FrameRate;
 
 
@@ -241,15 +241,15 @@ namespace Filetypes.Animation
                 using (BinaryWriter writer = new BinaryWriter(memoryStream))
                 {
                     // Header
-                    writer.Write(input.Header.AnimationType);                       // Animtype
-                    writer.Write((uint)1);                                          // Uknown_always 1
+                    writer.Write(input.Header.AnimationFormat);                     // Animtype
+                    writer.Write(input.Header.Unknown0_alwaysOne);                  // Uknown_always 1
                     writer.Write(input.Header.FrameRate);                           // Framerate
                     writer.Write((short)input.Header.SkeletonName.Length);          // SkeletonNAme length
                     for (int i = 0; i < input.Header.SkeletonName.Length; i++)      // SkeletonNAme
                         writer.Write(input.Header.SkeletonName[i]);
-                    writer.Write((uint)0);                                          // Uknown_always 0
+                    writer.Write(input.Header.Unknown1_alwaysZero);                  // Uknown_always 0
 
-                    if (input.Header.AnimationType == 7)
+                    if (input.Header.AnimationFormat == 7)
                         writer.Write(input.Header.AnimationTotalPlayTimeInSec);
 
                     //Body - Bones
@@ -271,7 +271,7 @@ namespace Filetypes.Animation
                         writer.Write(input.RotationMappings[i].FileWriteValue);
 
                     // Static frame
-                    if (input.Header.AnimationType == 7)
+                    if (input.Header.AnimationFormat == 7)
                     {
                         if (input.StaticFrame != null)
                         {
