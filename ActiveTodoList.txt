@@ -21,6 +21,8 @@ Bugs:
 	File changed outside of ass
 	lod issue
 	weapons in hands
+	throw new NotImplementedException("TODO"); => saving 3k models 
+	Lod header 5 => variantmeshes\_variantmodels\elephant\bodyparts\e3_elephant\default_elephant.rigid_model_v2
 
 
 General:

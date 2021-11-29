@@ -137,5 +137,16 @@ namespace Filetypes.RigidModel.Vertex
             output[3] = NormalToByte(1);
             return output;
         }
+
+
+        static public byte[] Create4BytesFromVector4(Microsoft.Xna.Framework.Vector4 vector)
+        {
+            var output = new byte[4];
+            output[0] = NormalToByte(vector.X);
+            output[1] = NormalToByte(vector.Y);
+            output[2] = NormalToByte(vector.Z);
+            output[3] = NormalToByte(vector.W);
+            return output;
+        }
     }
 }

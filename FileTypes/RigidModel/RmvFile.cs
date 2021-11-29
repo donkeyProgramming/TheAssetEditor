@@ -12,7 +12,8 @@ using System.Linq;
 namespace Filetypes.RigidModel
 {
     public enum RmvVersionEnum : uint
-    { 
+    {
+        RMV2_V5 = 5,
         RMV2_V6 = 6,
         RMV2_V7 = 7,
         RMV2_V8 = 8,

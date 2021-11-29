@@ -15,6 +15,7 @@ namespace FileTypes.RigidModel.LodHeader
 
         public LodHeaderFactory()
         {
+            //_lodHeaderCreators[RmvVersionEnum.RMV2_V5] = new Rmv2LodHeader_V6_Creator();
             _lodHeaderCreators[RmvVersionEnum.RMV2_V6] = new Rmv2LodHeader_V6_Creator();
             _lodHeaderCreators[RmvVersionEnum.RMV2_V7] = new Rmv2LodHeader_V7_V8_Creator();
             _lodHeaderCreators[RmvVersionEnum.RMV2_V8] = new Rmv2LodHeader_V7_V8_Creator();

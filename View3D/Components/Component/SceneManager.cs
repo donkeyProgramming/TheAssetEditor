@@ -87,7 +87,11 @@ namespace View3D.Components.Component
             {
                 if (root is ISelectable selectableNode && selectableNode.IsSelectable)
                 {
-                    if (GeometryIntersection.IntersectObject(frustrum, selectableNode.Geometry, selectableNode.ModelMatrix))
+                    Vector3 pivotPoint = Vector3.Zero;
+                    if (selectableNode is Rmv2MeshNode meshNode)
+                        pivotPoint = meshNode.Material.PivotPoint;
+
+                    if (GeometryIntersection.IntersectObject(frustrum, selectableNode.Geometry, selectableNode.ModelMatrix * Matrix.CreateTranslation(pivotPoint)))
                         output_selectedNodes.Add(selectableNode);
                 }
 
@@ -106,7 +110,11 @@ namespace View3D.Components.Component
             {
                 if (root is ISelectable selectableNode && selectableNode.IsSelectable)
                 {
-                    var distance = GeometryIntersection.IntersectObject(ray, selectableNode.Geometry, selectableNode.ModelMatrix);
+                    Vector3 pivotPoint = Vector3.Zero;
+                    if (selectableNode is Rmv2MeshNode meshNode)
+                        pivotPoint = meshNode.Material.PivotPoint;
+
+                    var distance = GeometryIntersection.IntersectObject(ray, selectableNode.Geometry, selectableNode.ModelMatrix * Matrix.CreateTranslation(pivotPoint));
                     if (distance != null)
                     {
                         if (distance < bestDistance)

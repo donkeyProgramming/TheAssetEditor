@@ -38,12 +38,13 @@ namespace View3D.Services
             return deductionRatio;
         }
 
-        static RmvLodHeader[] CreateLodHeaders(RmvLodHeader baseData, RmvVersionEnum version, uint numLods)
+        static RmvLodHeader[] CreateLodHeaders(RmvLodHeader[] baseHeaders, RmvVersionEnum version)
         {
+            var numLods = baseHeaders.Count();
             var factory = LodHeaderFactory.Create();
             var output = new RmvLodHeader[numLods];
-            for (uint i = 0; i < numLods; i++)
-                output[i] = factory.CreateFromBase(version, baseData, i);
+            for(int i = 0; i < numLods; i++)
+                output[i] = factory.CreateFromBase(version, baseHeaders[i], (uint)i);
             return output;
         }
 
@@ -65,7 +66,7 @@ namespace View3D.Services
                     LodCount = lodCount
                 },
 
-                LodHeaders = CreateLodHeaders(modelNodes.First().Model.LodHeaders.First(), version, lodCount)
+                LodHeaders = CreateLodHeaders(modelNodes.First().Model.LodHeaders, version)
             };
 
             // Create all the meshes
