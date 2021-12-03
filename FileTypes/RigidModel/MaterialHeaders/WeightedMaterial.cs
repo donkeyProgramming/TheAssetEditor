@@ -104,6 +104,11 @@ namespace FileTypes.RigidModel.MaterialHeaders
             return null;
         }
 
+        public List<RmvTexture> GetAllTextures()
+        {
+            return TexturesParams;
+        }
+
         public void SetTexture(TexureType texureType, string path)
         {
             for (int i = 0; i < TexturesParams.Count; i++)
@@ -174,7 +179,7 @@ namespace FileTypes.RigidModel.MaterialHeaders
 
     public class WeighterMaterialCreator : IMaterialCreator
     {
-        public IMaterial Create(RmvVersionEnum rmvType, byte[] dataArray, int dataOffset)
+        public IMaterial Create(ModelMaterialEnum materialId, RmvVersionEnum rmvType, byte[] dataArray, int dataOffset)
         {
             var Header = ByteHelper.ByteArrayToStructure<WeightedMaterialStruct>(dataArray, dataOffset);
             dataOffset += ByteHelper.GetSize<WeightedMaterialStruct>();
@@ -187,6 +192,7 @@ namespace FileTypes.RigidModel.MaterialHeaders
                 IntParams = LoadIntParams(Header.IntParamCount, dataArray, ref dataOffset),
                 Vec4Params = LoadVec4Params(Header.Vec4ParamCount, dataArray, ref dataOffset),
 
+                MaterialId = materialId,
                 VertexType = (UiVertexFormat)Header._vertexType,
                 BinaryVertexFormat = (VertexFormat)Header._vertexType,
                 ModelName = Util.SanatizeFixedString(Encoding.ASCII.GetString(Header._modelName)),

@@ -20,7 +20,7 @@ namespace FileTypes.RigidModel.MaterialHeaders
         public string ModelName { get; set; } = "TerrainTile";
 
         public string TexturePath { get; set; }
-
+        public string TextureDirectory { get => ""; set { } }
 
         public IMaterial Clone()
         {
@@ -44,6 +44,7 @@ namespace FileTypes.RigidModel.MaterialHeaders
         {
             return null;
         }
+ 
 
         public void UpdateBeforeSave(UiVertexFormat uiVertexFormat, RmvVersionEnum outputVersion, string[] boneNames)
         {
@@ -53,15 +54,21 @@ namespace FileTypes.RigidModel.MaterialHeaders
         public void SetTexture(TexureType texureType, string path)
         {
         }
+
+        public List<RmvTexture> GetAllTextures()
+        {
+            return new List<RmvTexture>();
+        }
     }
 
     public class CustomTerrainMaterialCreator : IMaterialCreator
     {
-        public IMaterial Create(RmvVersionEnum rmvType, byte[] buffer, int offset)
+        public IMaterial Create(ModelMaterialEnum materialId, RmvVersionEnum rmvType, byte[] buffer, int offset)
         {
             var header = ByteHelper.ByteArrayToStructure<CustomTerrainStruct>(buffer, offset);
             return new CustomTerrainMaterial()
             {
+                MaterialId = materialId,
                 TexturePath = Util.SanatizeFixedString(Encoding.ASCII.GetString(header.TexturePath)),
             };
         }

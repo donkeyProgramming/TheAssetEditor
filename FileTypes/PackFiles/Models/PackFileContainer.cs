@@ -90,7 +90,7 @@ namespace FileTypes.PackFiles.Models
         public void SaveToByteArray(BinaryWriter writer)
         {
             long fileNamesOffset = 0;
-            var sortedFiles = FileList.OrderBy(x => x.Key);
+            var sortedFiles = FileList.OrderBy(x => x.Key, StringComparer.Ordinal).ToList();
             foreach (var file in sortedFiles)
             {
                 if (Header.Version == "PFH5")
@@ -136,22 +136,6 @@ namespace FileTypes.PackFiles.Models
                 (file.Value as PackFile).DataSource = new PackedFileSource(packedFileSourceParent, offset, dataLength);
 
                 writer.Write(data);
-            }
-        }
-
-        public void UpdateAllDataSourcesAfterSave()
-        {
-            throw new Exception();
-
-            // Load pack
-            using var fileStram = File.OpenRead(SystemFilePath);
-            using var reader = new BinaryReader(fileStram, Encoding.ASCII);
-            var pack = new PackFileContainer(SystemFilePath, reader, null);
-
-            foreach (var currentFile in FileList)
-            {
-                var loadedFile = pack.FileList[currentFile.Key];
-                (currentFile.Value as PackFile).DataSource = (loadedFile as PackFile).DataSource;
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using CommonControls.Services;
+using KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2;
 using MonoGame.Framework.WpfInterop;
 using System;
 using View3D.Components.Component;
@@ -20,7 +21,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 case MainEditableNode mainNode:
                     return new MainEditableNodeViewModel(mainNode, skeletonAnimationLookUpHelper, animationControllerViewModel, pf);
                 case Rmv2MeshNode m:
-                    return new MeshSceneNodeViewModel(m, pf, skeletonAnimationLookUpHelper, componentManager);
+                    return new MeshEditorViewModel(m, pf, skeletonAnimationLookUpHelper, componentManager);
                 case SkeletonNode s:
                     return new SkeletonSceneNodeViewModel(s, pf, skeletonAnimationLookUpHelper);
                 case GroupNode n:

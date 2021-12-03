@@ -7,6 +7,7 @@
              xmlns:generic="clr-namespace:KitbasherEditor.Views.EditorViews"
              xmlns:rmv2="clr-namespace:KitbasherEditor.Views.EditorViews.Rmv2"
              xmlns:nodeViewModels="clr-namespace:KitbasherEditor.ViewModels.SceneExplorerNodeViews"
+             xmlns:nodeViewModelsrmv2="clr-namespace:KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2"
              xmlns:nodeTypes="clr-namespace:View3D.SceneNodes;assembly=View3D" 
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -14,8 +15,8 @@
         <DataTemplate DataType="{ x:Type nodeViewModels:MainEditableNodeViewModel}">
             <generic:MainEditableNodeView/>
         </DataTemplate>
-        <DataTemplate DataType="{ x:Type nodeViewModels:MeshSceneNodeViewModel}">
-            <rmv2:RigidModelMeshEditorView/>
+        <DataTemplate DataType="{ x:Type nodeViewModelsrmv2:MeshEditorViewModel}">
+            <rmv2:MeshEditorView/>
         </DataTemplate>
         <DataTemplate DataType="{ x:Type nodeViewModels:SkeletonSceneNodeViewModel}">
             <generic:SkeletonView/>

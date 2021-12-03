@@ -35,6 +35,17 @@ namespace Filetypes.RigidModel
             }
         }
 
+        public string FileType
+        {
+            get
+            {
+                var result = ByteParsers.String.TryDecodeFixedLength(_fileType, 0, 4, out string value, out _);
+                if (result == false)
+                    throw new Exception();
+                return Util.SanatizeFixedString(value);
+            }
+        }
+
         void SetSkeletonName(string skeletonName)
         {
             _skeletonName = new byte[128];

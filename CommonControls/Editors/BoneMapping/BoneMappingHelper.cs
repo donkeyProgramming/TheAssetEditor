@@ -12,7 +12,7 @@ namespace CommonControls.Editors.BoneMapping
         {
             var otherBone = FindBoneBasedOnName(boneToGetMapping.Name.Value, externalBonesList);
             if (otherBone == null)
-                otherBone = FindBoneBasedOnNameCommonReplacements(boneToGetMapping.Name.Value, externalBonesList);
+                otherBone = RecursiveFindBoneBasedOnNameCommonReplacements(boneToGetMapping.Name.Value, externalBonesList);
 
             if (otherBone != null)
             {
@@ -52,7 +52,7 @@ namespace CommonControls.Editors.BoneMapping
             return null;
         }
 
-        static AnimatedBone FindBoneBasedOnNameCommonReplacements(string name, IEnumerable<AnimatedBone> boneList)
+        static AnimatedBone RecursiveFindBoneBasedOnNameCommonReplacements(string name, IEnumerable<AnimatedBone> boneList)
         {
             foreach (var bone in boneList)
             {
@@ -75,58 +75,63 @@ namespace CommonControls.Editors.BoneMapping
                         return bone;
                 }
 
-                if (IsRepalcement(bone.Name.Value, name, "arm_left_0", "upperarm_left"))
-                    return bone;
+                var rules = new string[][]
+                {
+                    new string[] { "root", "bn_hips" },
+                    new string[] { "spine_0", "bn_spine" },
 
-                if (IsRepalcement(bone.Name.Value, name, "arm_left_1", "lowerarm_left"))
-                    return bone;
+                    new string[] { "hand_left", "bn_lefthand" },
+                    new string[] { "finger_index_left_0", "bn_lefthandindex1" },
+                    new string[] { "finger_index_left_1", "bn_lefthandindex2" },
+                    new string[] { "finger_index_left_2", "bn_lefthandindex3" },
 
-                if (IsRepalcement(bone.Name.Value, name, "arm_left_2", "hand_left"))
-                    return bone;
+                    new string[] { "finger_ring_left_0", "bn_lefthandring1" },
+                    new string[] { "finger_ring_left_1", "bn_lefthandring2" },
+                    new string[] { "finger_ring_left_2", "bn_lefthandring3" },
 
-                if (IsRepalcement(bone.Name.Value, name, "arm_left_0_roll_0", "upperarm_roll_left_0"))
-                    return bone;
+                    new string[] { "thumb_left_0", "bn_lefthandthumb1" },
+                    new string[] { "thumb_left_1", "bn_lefthandthumb2" },
+                    new string[] { "thumb_left_2", "bn_lefthandthumb3" },
 
-                if (IsRepalcement(bone.Name.Value, name, "arm_left_1_roll_0", "lowerarm_roll_left_0"))
-                    return bone;
+                    new string[] { "arm_left_0", "upperarm_left", "bn_leftarm" },
+                    new string[] { "arm_left_1", "lowerarm_left", "bn_leftforearm" },
+                    new string[] { "arm_left_2", "hand_left" },
+                    new string[] { "arm_left_0_roll_0", "upperarm_roll_left_0", "bn_leftarmroll" },
+                    new string[] { "arm_left_1_roll_0", "lowerarm_roll_left_0", "bn_leftforearmroll" },
+                    new string[] { "lowerarm_left_roll", "lowerarm_roll_left", "bn_leftforearmroll" },
+                    new string[] { "upperarm_left_roll", "upperarm_roll_left", "bn_leftarmroll" },
+                    new string[] { "shoulder_pad_left", "shoulderpad_left_0" },
+                    new string[] { "clav_left", "bn_leftshoulder" },
 
-                if (IsRepalcement(bone.Name.Value, name, "leg_left_0", "upperleg_left"))
-                    return bone;
+                    new string[] { "leg_left_0", "upperleg_left", "bn_leftupleg" },
+                    new string[] { "leg_left_1", "lowerleg_left", "bn_leftleg" },
+                    new string[] { "leg_left_2", "foot_left", "bn_leftfoot" },
+                    new string[] { "toe_left_0", "bn_lefttoebase" },
 
-                if (IsRepalcement(bone.Name.Value, name, "leg_left_1", "lowerleg_left"))
-                    return bone;
+                    new string[] { "neck_0", "bn_neck" },
+                    new string[] { "eye_left", "bn_lefteye" },
+                    new string[] { "eyebrow", "bn_eyebrows" },
 
-                if (IsRepalcement(bone.Name.Value, name, "leg_left_2", "foot_left"))
-                    return bone;
+                    new string[] { "be_prop_0", "weapon_1" },
+                    new string[] { "be_prop_1", "weapon_2" },
+                    new string[] { "be_prop_2", "weapon_3" },
+                    new string[] { "be_prop_3", "weapon_4" },
+                    new string[] { "be_prop_4", "weapon_5" },
+                    new string[] { "be_prop_5", "weapon_6" },
 
-                if (IsRepalcement(bone.Name.Value, name, "lowerarm_left_roll", "lowerarm_roll_left"))
-                    return bone;
+                    // Reme 2 game skeleton fix:
+                    new string[] { "finger_index_left_2", "bn_lefthandindex2" },
+                    new string[] { "finger_ring_left_2", "bn_lefthandring2" },
+                    new string[] { "thumb_left_2", "bn_lefthandthumb2" },
+                };
 
-                if (IsRepalcement(bone.Name.Value, name, "upperarm_left_roll", "upperarm_roll_left"))
-                    return bone;
+                foreach (var rule in rules)
+                {
+                    if (IsBoneNamesMatch(bone.Name.Value, name, rule))
+                        return bone;
+                }  
 
-                if (IsRepalcement(bone.Name.Value, name, "shoulder_pad_left", "shoulderpad_left_0"))
-                    return bone;
-
-                if (IsRepalcement(bone.Name.Value, name, "be_prop_0", "weapon_1"))
-                    return bone;
-
-                if (IsRepalcement(bone.Name.Value, name, "be_prop_1", "weapon_2"))
-                    return bone;
-
-                if (IsRepalcement(bone.Name.Value, name, "be_prop_2", "weapon_3"))
-                    return bone;
-
-                if (IsRepalcement(bone.Name.Value, name, "be_prop_3", "weapon_4"))
-                    return bone;
-
-                if (IsRepalcement(bone.Name.Value, name, "be_prop_4", "weapon_5"))
-                    return bone;
-
-                if (IsRepalcement(bone.Name.Value, name, "be_prop_5", "weapon_6"))
-                    return bone;
-
-                var result = FindBoneBasedOnNameCommonReplacements(name, bone.Children);
+                var result = RecursiveFindBoneBasedOnNameCommonReplacements(name, bone.Children);
                 if (result != null)
                     return result;
             }
@@ -136,6 +141,7 @@ namespace CommonControls.Editors.BoneMapping
 
         static bool IsRepalcement(string boneNameA, string boneNameB, string replacementA, string replacementB)
         {
+
             if (boneNameA == replacementA && boneNameB == replacementB)
                 return true;
 
@@ -152,6 +158,39 @@ namespace CommonControls.Editors.BoneMapping
                 return true;
 
             return false;
+        }
+
+
+
+        static bool IsBoneNamesMatch(string boneNameA, string boneNameB, string[] alternativeNames)
+        {
+            // Clean up for easier comparing 
+            boneNameA = CleanUpBoneName(boneNameA);
+            boneNameB = CleanUpBoneName(boneNameB);
+            for (int i = 0; i < alternativeNames.Length; i++)
+                alternativeNames[i] = CleanUpBoneName(alternativeNames[i]);
+
+            if (boneNameA == boneNameB)
+                return true;
+
+            if (alternativeNames.Contains(boneNameA) && alternativeNames.Contains(boneNameB))
+                return true;
+
+            // Swap left for right
+            for(int i = 0; i < alternativeNames.Length; i++)
+                alternativeNames[i] = alternativeNames[i].Replace("left", "right");
+
+            if (alternativeNames.Contains(boneNameA) && alternativeNames.Contains(boneNameB))
+                return true;
+
+            return false;
+        }
+
+        static string CleanUpBoneName(string boneName)
+        {
+            return boneName
+                   .Replace("bn_", "")
+                   .Replace("_", "");
         }
     }
 }

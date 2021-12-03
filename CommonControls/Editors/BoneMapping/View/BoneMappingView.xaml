@@ -251,7 +251,7 @@
 
 
             <StackPanel  Grid.Row="0" Orientation="Horizontal">
-                <TextBlock  Text="Parnet Model bones - " FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
+                <TextBlock  Text="Target Model Bones - " FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
                 <TextBlock  Text="{Binding ParentSkeletonName.Value, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
             </StackPanel>
 

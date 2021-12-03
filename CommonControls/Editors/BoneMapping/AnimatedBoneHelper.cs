@@ -77,8 +77,6 @@ namespace CommonControls.Editors.BoneMapping
             return null;
         }
 
-
-
         public static int GetUsedBonesCount(AnimatedBone b)
         {
             var value = 0;

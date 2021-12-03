@@ -36,6 +36,14 @@ namespace CommonControls.Services
         {
             try
             {
+                var brokenAnims = new string[] { "rigidmodels\\buildings\\roman_aqueduct_straight\\roman_aqueduct_straight_piece01_destruct01_anim.anim" };
+
+                if (brokenAnims.Contains(fullPath))
+                {
+                    _logger.Here().Warning("Skipping loading of known broken file - " + fullPath);
+                    return;
+                }
+
                 var animationSkeletonName = AnimationFile.GetAnimationHeader(file).SkeletonName;
                 if (_skeletonNameToAnimationMap.ContainsKey(animationSkeletonName) == false)
                     _skeletonNameToAnimationMap.Add(animationSkeletonName, new ObservableCollection<AnimationReference>());

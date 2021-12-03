@@ -32,6 +32,7 @@ namespace CommonControls.Editors.BoneMapping.View
             if (showApplyButton == false)
                 ApplyButtonHandle.Visibility = Visibility.Collapsed;
 
+            Title = $"Bone Mapping - Mapping from '{dataContext.MeshSkeletonName.Value}' to '{dataContext.ParentSkeletonName.Value}'";
         }
 
         private void OkButton_Click(object sender, RoutedEventArgs e)

@@ -110,7 +110,7 @@ namespace KitbasherEditor.ViewModels
                 catch (Exception e)
                 {
                     _logger.Here().Error($"Error loading file {MainFile?.Name} - {e}");
-                    MessageBox.Show("Unable to load file");
+                    MessageBox.Show($"Unable to load file\n+{e.Message}");
                 }
             }
 
@@ -124,7 +124,7 @@ namespace KitbasherEditor.ViewModels
                 catch (Exception e)
                 {
                     _logger.Here().Error($"Error loading file {ReferenceModel?.Name} - {e}");
-                    MessageBox.Show("Unable to load file");
+                    MessageBox.Show($"Unable to load file\n+{e.Message}");
                 }
             }
         }

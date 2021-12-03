@@ -30,6 +30,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         ImportMapForDebug,
         SortModelsByName,
 
+        Group,
         Undo,
         Gizmo_ScaleUp,
         Gizmo_ScaleDown,
@@ -123,6 +124,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _actionList[MenuActionType.Undo] = new MenuAction(General.Undo) { EnableRule = ActionEnabledRule.Custom, ToolTip = "Undo Last item", Hotkey = new Hotkey(Key.Z, ModifierKeys.Control) };
             _actionList[MenuActionType.SortModelsByName] = new MenuAction(General.SortMeshes) { EnableRule = ActionEnabledRule.Always, ToolTip = "Sort models by name" };
 
+            _actionList[MenuActionType.Group] = new MenuAction(Tools.GroupItems) { EnableRule = ActionEnabledRule.AtleastOneObjectSelected, ToolTip = "(Un)Group", Hotkey = new Hotkey(Key.G, ModifierKeys.Control) };
             _actionList[MenuActionType.Gizmo_ScaleUp] = new MenuAction(Gizmo.ScaleGizmoUp) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Add, ModifierKeys.None) };
             _actionList[MenuActionType.Gizmo_ScaleDown] = new MenuAction(Gizmo.ScaleGizmoDown) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Subtract, ModifierKeys.None) };
             _actionList[MenuActionType.Gizmo_Arrow] = new MenuAction(Gizmo.Cursor) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Q, ModifierKeys.None) };
@@ -176,8 +178,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             MenuItems[1].Children.Add(new ToolbarItem() { Name = "Import Slayer", Action = _actionList[MenuActionType.ImportReferenceSlayer] });
             MenuItems[1].Children.Add(new ToolbarItem() { Name = "Import Goblin", Action = _actionList[MenuActionType.ImportReferenceGoblin] });
             MenuItems[1].Children.Add(new ToolbarItem() { Name = "Import map", Action = _actionList[MenuActionType.ImportMapForDebug] });
-            
 
+            MenuItems[2].Children.Add(new ToolbarItem() { Name = "(Un)Group selection", Action = _actionList[MenuActionType.Group] });
+            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Reduce mesh by 10%", Action = _actionList[MenuActionType.ReduceMesh10x] });
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "Sort models by name", Action = _actionList[MenuActionType.SortModelsByName] });
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "Generat Ws Model", Action = _actionList[MenuActionType.GenerateWsModel] });
 

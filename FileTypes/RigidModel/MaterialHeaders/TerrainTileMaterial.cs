@@ -18,6 +18,7 @@ namespace FileTypes.RigidModel.MaterialHeaders
         public string TerrainBaseStr { get; set; }
         public ModelMaterialEnum MaterialId { get; set; } = ModelMaterialEnum.TerrainTiles;
         UiVertexFormat IMaterial.VertexType { get; set; } = UiVertexFormat.Static;
+        public string TextureDirectory { get => ""; set { } }
 
         uint Unknown0 { get; set; }
         uint Unknown1 { get; set; }
@@ -57,6 +58,10 @@ namespace FileTypes.RigidModel.MaterialHeaders
             return null;
         }
 
+        public List<RmvTexture> GetAllTextures()
+        {
+            return new List<RmvTexture>();
+        }
         public void SetTexture(TexureType texureType, string path)
         {
         }
@@ -69,11 +74,12 @@ namespace FileTypes.RigidModel.MaterialHeaders
 
     public class TerrainTileMaterialCreator : IMaterialCreator
     {
-        public IMaterial Create(RmvVersionEnum rmvType, byte[] buffer, int offset)
+        public IMaterial Create(ModelMaterialEnum materialId, RmvVersionEnum rmvType, byte[] buffer, int offset)
         {
             var header = ByteHelper.ByteArrayToStructure<TerrainTileStruct>(buffer, offset);
             return new TerrainTileMaterial()
             {
+                MaterialId = materialId,
                 BinaryVertexFormat = VertexFormat.Position16_bit,
             };
         }

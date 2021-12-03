@@ -14,11 +14,11 @@ using System.Windows.Shapes;
 namespace KitbasherEditor.Views.EditorViews.Rmv2
 {
     /// <summary>
-    /// Interaction logic for RigidModelMeshEditorView.xaml
+    /// Interaction logic for WeightedMaterialView.xaml
     /// </summary>
-    public partial class RigidModelMeshEditorView : UserControl
+    public partial class WeightedMaterialView : UserControl
     {
-        public RigidModelMeshEditorView()
+        public WeightedMaterialView()
         {
             InitializeComponent();
         }

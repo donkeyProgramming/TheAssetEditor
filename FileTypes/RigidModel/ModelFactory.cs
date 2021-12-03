@@ -60,12 +60,10 @@ namespace FileTypes.RigidModel
         {
             var commonHeader = ByteHelper.ByteArrayToStructure<RmvCommonHeader>(data, modelStartOffset);
             var materialOffset = modelStartOffset + ByteHelper.GetSize<RmvCommonHeader>();
-            var material = MaterialFactory.Create().LoadMaterial(data, materialOffset, rmvVersionEnum, commonHeader.ModelTypeFlag);
-            var materialSize = material.ComputeSize();
-            
-            if (materialOffset + materialSize != commonHeader.VertexOffset + modelStartOffset)
-                throw new Exception("Part of material header not read");
+            var meshStart = commonHeader.VertexOffset + modelStartOffset;
+            var expectedMaterialSize = meshStart - materialOffset;
 
+            var material = MaterialFactory.Create().LoadMaterial(data, materialOffset, rmvVersionEnum, commonHeader.ModelTypeFlag, expectedMaterialSize);
             var mesh = LoadMesh(data, commonHeader, material.BinaryVertexFormat, modelStartOffset);
 
             return new RmvModel()
@@ -76,30 +74,30 @@ namespace FileTypes.RigidModel
             };
         }
 
-        RmvMesh LoadMesh(byte[] dataArray, RmvCommonHeader CommonHeader, VertexFormat binaryVertexFormat, int modelStartOffset)
+        RmvMesh LoadMesh(byte[] dataArray, RmvCommonHeader commonHeader, VertexFormat binaryVertexFormat, int modelStartOffset)
         {
             var vertexFactory = VertexFactory.Create();
 
-            var vertexStart = CommonHeader.VertexOffset + modelStartOffset;
-            var expectedVertexSize = (CommonHeader.IndexOffset - CommonHeader.VertexOffset) / CommonHeader.VertexCount;
+            var vertexStart = commonHeader.VertexOffset + modelStartOffset;
+            var expectedVertexSize = (commonHeader.IndexOffset - commonHeader.VertexOffset) / commonHeader.VertexCount;
             var vertexSize = vertexFactory.GetVertexSize(binaryVertexFormat);
             if (expectedVertexSize != vertexSize)
                 throw new Exception("Vertex size does not match");
 
-            var VertexList = vertexFactory.CreateVertexFromBytes(binaryVertexFormat, dataArray, (int)CommonHeader.VertexCount, (int)vertexStart, (int)expectedVertexSize);
+            var vertexList = vertexFactory.CreateVertexFromBytes(binaryVertexFormat, dataArray, (int)commonHeader.VertexCount, (int)vertexStart, (int)expectedVertexSize);
 
-            var faceStart = CommonHeader.IndexOffset + modelStartOffset;
-            var IndexList = new ushort[CommonHeader.IndexCount];
-            for (int i = 0; i < CommonHeader.IndexCount; i++)
+            var faceStart = commonHeader.IndexOffset + modelStartOffset;
+            var IndexList = new ushort[commonHeader.IndexCount];
+            for (int i = 0; i < commonHeader.IndexCount; i++)
                 IndexList[i] = BitConverter.ToUInt16(dataArray, (int)faceStart + sizeof(ushort) * i);
 
             var mesh = new RmvMesh()
             {
-                VertexList = VertexList,
+                VertexList = vertexList,
                 IndexList = IndexList
             };
 
-            vertexFactory.ReComputeNormals(binaryVertexFormat, ref VertexList, ref IndexList);
+            vertexFactory.ReComputeNormals(binaryVertexFormat, ref vertexList, ref IndexList);
 
             return mesh;
         }

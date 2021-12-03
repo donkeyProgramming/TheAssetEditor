@@ -512,7 +512,7 @@ namespace CommonControls.Services
 
         public PackFile FindFile(string path) 
         {
-            var lowerPath = path.Replace('/', '\\').ToLower();
+            var lowerPath = path.Replace('/', '\\').ToLower().Trim();
             for (var i = Database.PackFiles.Count - 1; i >= 0; i--)
             {
                 if (Database.PackFiles[i].FileList.ContainsKey(lowerPath))
