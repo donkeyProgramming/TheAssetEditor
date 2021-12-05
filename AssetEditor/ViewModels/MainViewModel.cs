@@ -63,7 +63,7 @@ namespace AssetEditor.ViewModels
 
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
             {
-                settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Rome_2_Remastered;
+                //settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Rome_2_Remastered;
                 var gamePath = settingsService.GetGamePathForCurrentGame();
                 if (gamePath != null)
                 {
@@ -128,11 +128,11 @@ namespace AssetEditor.ViewModels
                 //packfileService.DeepSearch("31x11_dragonback_skew_mirror_01", false);
 
                 //OpenFile(packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack"));
-                OpenFile(packfileService.FindFile(@"variantmeshes\_variantmodels\man\skin\cleopatra_mark_antony_trailer\mark_antony_lod1.rigid_model_v2"));
+                //OpenFile(packfileService.FindFile(@"variantmeshes\_variantmodels\man\skin\cleopatra_mark_antony_trailer\mark_antony_lod1.rigid_model_v2"));
 
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 
-                //KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
+                KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);
 

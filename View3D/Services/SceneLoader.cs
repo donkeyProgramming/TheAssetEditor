@@ -27,23 +27,11 @@ namespace View3D.Services
         GraphicsDevice _device;
         ResourceLibary _resourceLibary;
 
-        public SceneLoader(ResourceLibary resourceLibary)
+        public SceneLoader(ResourceLibary resourceLibary, PackFileService pfs)
         {
-            _packFileService = resourceLibary.Pfs;
+            _packFileService = pfs;
             _device = resourceLibary.GraphicsDevice;
             _resourceLibary = resourceLibary;
-        }
-
-        public void Load(string path, SceneNode parent, AnimationPlayer player, ref string skeletonName, string attachmentPointName)
-        {
-            var file = _packFileService.FindFile(path);
-            if (file == null)
-            {
-                _logger.Here().Error($"File {path} not found");
-                return;
-            }
-
-            Load(file, parent, player, ref skeletonName, attachmentPointName);
         }
 
         public SceneNode Load(PackFile file, SceneNode parent, AnimationPlayer player, ref string skeletonName, string attachmentPointName = null)
@@ -71,6 +59,18 @@ namespace View3D.Services
             }
 
             return parent;
+        }
+
+        void Load(string path, SceneNode parent, AnimationPlayer player, ref string skeletonName, string attachmentPointName)
+        {
+            var file = _packFileService.FindFile(path);
+            if (file == null)
+            {
+                _logger.Here().Error($"File {path} not found");
+                return;
+            }
+
+            Load(file, parent, player, ref skeletonName, attachmentPointName);
         }
 
 

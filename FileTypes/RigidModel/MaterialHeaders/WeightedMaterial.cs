@@ -129,7 +129,7 @@ namespace FileTypes.RigidModel.MaterialHeaders
             TexturesParams.Add(newTexture);
         }
 
-        public void UpdateBeforeSave(UiVertexFormat uiVertexFormat, RmvVersionEnum outputVersion, string[] boneNames)
+        public void UpdateEnumsBeforeSaving(UiVertexFormat uiVertexFormat, RmvVersionEnum outputVersion)
         {
             if (outputVersion == RmvVersionEnum.RMV2_V8)
             {
@@ -168,13 +168,19 @@ namespace FileTypes.RigidModel.MaterialHeaders
                 }
             }
 
+            // Overwrite the material type for static meshes
             if(BinaryVertexFormat == VertexFormat.Static)
                 MaterialId = ModelMaterialEnum.default_type;
             else
                 MaterialId = ModelMaterialEnum.weighted;
 
+     
+        }
+
+        public void EnrichDataBeforeSaving(string[] boneNames, BoundingBox boundingBox)
+        {
             UpdateAttachmentPointList(boneNames);
-        }   
+        }
     }
 
     public class WeighterMaterialCreator : IMaterialCreator

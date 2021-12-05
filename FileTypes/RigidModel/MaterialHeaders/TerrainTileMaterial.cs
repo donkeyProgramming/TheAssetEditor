@@ -66,7 +66,12 @@ namespace FileTypes.RigidModel.MaterialHeaders
         {
         }
 
-        public void UpdateBeforeSave(UiVertexFormat uiVertexFormat, RmvVersionEnum outputVersion, string[] boneNames)
+        public void UpdateEnumsBeforeSaving(UiVertexFormat uiVertexFormat, RmvVersionEnum outputVersion)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void EnrichDataBeforeSaving(string[] boneNames, BoundingBox boundingBox)
         {
             throw new NotImplementedException();
         }

@@ -108,5 +108,24 @@ namespace View3D.SceneNodes
             }
 
         }
+
+        public static List<string> GetSkeletonNames(ISceneNode result)
+        {
+            var output = new List<string>();
+
+            var nodeQueue = new Queue<ISceneNode>();
+            nodeQueue.Enqueue(result);
+            while (nodeQueue.Count != 0)
+            {
+                var item = nodeQueue.Dequeue();
+                foreach (var child in item.Children)  
+                    nodeQueue.Enqueue(child);
+
+                if (item is Rmv2ModelNode modelNode)
+                    output.Add(modelNode.Model.Header.SkeletonName);
+            }
+
+            return output;
+        }
     }
 }

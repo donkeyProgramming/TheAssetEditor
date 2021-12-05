@@ -19,22 +19,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         public NotifyAttr<string> BinaryVertexFormat { get; set; } = new NotifyAttr<string>();
         public NotifyAttr<string> TransformInfo { get; set; } = new NotifyAttr<string>();
 
-        public NotifyAttr<int> NumStringParameters { get; set; } = new NotifyAttr<int>();
         public ObservableCollection<string> StringParameters { get; set; }
-
-        public NotifyAttr<int> NumFloatParameters { get; set; } = new NotifyAttr<int>();
         public ObservableCollection<float> FloatParameters { get; set; }
-
-        public NotifyAttr<int> NumIntParameters { get; set; } = new NotifyAttr<int>();
         public ObservableCollection<int> IntParameters { get; set; }
-
-        public NotifyAttr<int> NumTextureParameters { get; set; } = new NotifyAttr<int>();
         public ObservableCollection<string> TextureParameters { get; set; }
-
-        public NotifyAttr<int> NumAttachmentPointParameters { get; set; } = new NotifyAttr<int>();
         public ObservableCollection<string> AttachmentPointParameters { get; set; }
-
-        public NotifyAttr<int> NumVectorParameters { get; set; } = new NotifyAttr<int>();
         public ObservableCollection<string> VectorParameters { get; set; }
 
         public WeightedMaterialViewModel(Rmv2MeshNode node)
@@ -50,22 +39,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             TransformInfo.Value = $"Piv Identity = {typedMaterial.OriginalTransform.IsIdentityPivot()} Matrix Identity = {typedMaterial.OriginalTransform.IsIdentityMatrices()}";
 
             StringParameters = new ObservableCollection<string>(typedMaterial.StringParams);
-            NumStringParameters.Value = StringParameters.Count;
-
             FloatParameters = new ObservableCollection<float>(typedMaterial.FloatParams);
-            NumFloatParameters.Value = FloatParameters.Count;
-
             IntParameters = new ObservableCollection<int>(typedMaterial.IntParams);
-            NumIntParameters.Value = IntParameters.Count;
-
             TextureParameters = new ObservableCollection<string>(typedMaterial.TexturesParams.Select(x=>x.TexureType + " - " + x.Path));
-            NumTextureParameters.Value = TextureParameters.Count;
-
             AttachmentPointParameters = new ObservableCollection<string>(typedMaterial.AttachmentPointParams.Select(x => x.BoneIndex+ " - " + x.Name + " Ident:" + x.Matrix.IsIdentity()));
-            NumAttachmentPointParameters.Value = AttachmentPointParameters.Count;
-
             VectorParameters = new ObservableCollection<string>(typedMaterial.Vec4Params.Select(x => $"[{x.X}] [{x.Y}] [{x.Z}] [{x.W}]"));
-            NumVectorParameters.Value = TextureParameters.Count;
         }
 
     }

@@ -35,7 +35,7 @@ namespace Filetypes.RigidModel.LodHeader
 
             if (source is Rmv2LodHeader_V7_V8 typedHeader)
             {
-                output._lodLevel = typedHeader._qualityLvl;
+                output._qualityLvl = typedHeader._qualityLvl;
                 output._padding0 = typedHeader._padding0;
                 output._padding1 = typedHeader._padding1;
                 output._padding2 = typedHeader._padding2;

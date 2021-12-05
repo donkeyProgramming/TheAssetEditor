@@ -13,7 +13,6 @@ namespace FileTypes.PackFiles.Models
     public interface IAnimationFileDiscovered
     {
         void FileDiscovered(PackFile file, PackFileContainer container, string fullPath);
-
     }
 
 

@@ -48,7 +48,7 @@ namespace View3D.Services
             return output;
         }
 
-        public static byte[] Save(bool onlySaveVisibleNodes, List<Rmv2ModelNode> modelNodes, GameSkeleton skeleton, RmvVersionEnum version, ModelMaterialEnum modelMaterial)
+        public static byte[] Save(bool onlySaveVisibleNodes, List<Rmv2ModelNode> modelNodes, GameSkeleton skeleton, RmvVersionEnum version, bool enrichModel = true)
         {
             var logger = GetLogger();
             logger.Here().Information($"Starting to save model. Nodes = {modelNodes.Count}, Skeleton = {skeleton}, Version = {version}");
@@ -96,13 +96,10 @@ namespace View3D.Services
                         if (skeleton != null)
                             boneNames = skeleton.BoneNames.ToArray();
 
-                        newModel.Material.UpdateBeforeSave(meshes[meshIndex].Geometry.VertexFormat, version, boneNames);
-
-                        // Update the common header
-                        var commonHeader = newModel.CommonHeader;
-                        commonHeader.BoundingBox.UpdateBoundingBox(BoundingBox.CreateFromPoints(newModel.Mesh.VertexList.Select(x => x.GetPosistionAsVec3())));
-                        commonHeader.ModelTypeFlag = newModel.Material.MaterialId;
-                        newModel.CommonHeader = commonHeader;
+                        newModel.Material.UpdateEnumsBeforeSaving(meshes[meshIndex].Geometry.VertexFormat, version);
+                        
+                        if(enrichModel)
+                            newModel.Material.EnrichDataBeforeSaving(boneNames, BoundingBox.CreateFromPoints(newModel.Mesh.VertexList.Select(x => x.GetPosistionAsVec3())));
 
                         logger.Here().Information($"Model. Lod: {currentLodIndex}, Model: {meshIndex} created.");
                         newMeshList[currentLodIndex].Add(newModel);

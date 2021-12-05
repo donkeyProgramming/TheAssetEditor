@@ -34,6 +34,7 @@ namespace Filetypes.RigidModel.LodHeader
             return ByteHelper.GetBytes((Rmv2LodHeader_V6)rmvLodHeader);
         }
     }
+
     public struct Rmv2LodHeader_V6 : RmvLodHeader
     {
         public uint _meshCount;

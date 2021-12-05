@@ -112,7 +112,7 @@ namespace AnimationEditor.Common.ReferenceModel
         {
             _logger.Here().Information($"Loading reference model - {_pfs.GetFullPath(file)}");
 
-            SceneLoader loader = new SceneLoader(_resourceLibary);
+            SceneLoader loader = new SceneLoader(_resourceLibary, _pfs);
             var outSkeletonName = "";
             var result = loader.Load(file, null, Player, ref outSkeletonName);
             if (result == null)
@@ -121,7 +121,7 @@ namespace AnimationEditor.Common.ReferenceModel
                 return;
             }
 
-            if(_modelNode != null)
+            if (_modelNode != null)
                 _parentNode.RemoveObject(_modelNode);
             _modelNode = result;
             _parentNode.AddObject(result);

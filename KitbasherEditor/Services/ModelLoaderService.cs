@@ -89,7 +89,7 @@ namespace KitbasherEditor.Services
 
         SceneNode LoadModel(PackFile file)
         {
-            SceneLoader loader = new SceneLoader(_resourceLibary);
+            SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService);
             var outSkeletonName = "";
             var result = loader.Load(file, null, _animationView.Player, ref outSkeletonName);
             if (result == null)
@@ -97,6 +97,9 @@ namespace KitbasherEditor.Services
                 _logger.Here().Error("Unable to load model");
                 return null;
             }
+
+
+            outSkeletonName = SceneNodeHelper.GetSkeletonNames(result).FirstOrDefault();
 
             result.ForeachNodeRecursive((node) =>
             {

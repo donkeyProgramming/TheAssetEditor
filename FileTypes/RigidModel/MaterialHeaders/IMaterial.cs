@@ -22,7 +22,8 @@ namespace FileTypes.RigidModel.MaterialHeaders
         RmvTexture? GetTexture(TexureType texureType);
         void SetTexture(TexureType texureType, string path);
 
-        void UpdateBeforeSave(UiVertexFormat uiVertexFormat, RmvVersionEnum outputVersion, string[] boneNames);
+        void UpdateEnumsBeforeSaving(UiVertexFormat uiVertexFormat, RmvVersionEnum outputVersion);
+        void EnrichDataBeforeSaving(string[] boneNames, BoundingBox boundingBox);
     }
 
     public interface IMaterialCreator

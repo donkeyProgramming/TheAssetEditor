@@ -38,7 +38,7 @@ namespace View3D.SceneNodes
 
         public byte[] Save(bool onlySaveVisibleNodes)
         {
-            var test2 = MeshSaverService.Save(onlySaveVisibleNodes, new List< Rmv2ModelNode >(){ this}, Skeleton.AnimationProvider.Skeleton, SelectedOutputFormat, ModelMaterialEnum.default_type);
+            var test2 = MeshSaverService.Save(onlySaveVisibleNodes, new List< Rmv2ModelNode >(){ this}, Skeleton.AnimationProvider.Skeleton, SelectedOutputFormat, true);
             return test2;
 
         }
