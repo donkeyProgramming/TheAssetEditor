@@ -1,4 +1,5 @@
 ﻿using Common;
+using CommonControls.Common;
 using CommonControls.Services;
 using KitbasherEditor.ViewModels;
 using KitbasherEditor.Views;
@@ -15,7 +16,7 @@ namespace KitbasherEditor
         {
             serviceCollection.AddTransient<KitbasherView>();
             serviceCollection.AddTransient<KitbasherViewModel>();
-            serviceCollection.AddTransient<IKitBashEditor, KitbasherViewModel>();
+            serviceCollection.AddTransient<IEditorViewModel, KitbasherViewModel>();
         }
 
         public static void RegisterTools(IToolFactory factory)

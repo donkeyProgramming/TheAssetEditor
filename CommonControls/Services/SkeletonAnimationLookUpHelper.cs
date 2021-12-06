@@ -25,6 +25,10 @@ namespace CommonControls.Services
         {
         }
 
+        public void Initialize()
+        {
+        }
+
         public void LoadFromPackFileContainer(PackFileService pfs, PackFileContainer packFileContainer)
         {
             var allAnimations = pfs.FindAllWithExtentionIncludePaths(".anim", packFileContainer);
@@ -80,7 +84,6 @@ namespace CommonControls.Services
 
         public List<string> GetAllSkeletonNames()
         {
-
             return SkeletonFileNames.Select(x => Path.GetFileNameWithoutExtension(x)).ToList();
         }
 
@@ -134,9 +137,7 @@ namespace CommonControls.Services
             return null;
         }
 
-        public void Initialize()
-        {
-        }
+
 
         
 

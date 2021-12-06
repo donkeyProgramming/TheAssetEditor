@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using View3D.Animation.AnimationChange;
 using View3D.Components.Component;
+using View3D.Rendering.Geometry;
 using View3D.Rendering.RenderItems;
 using View3D.SceneNodes;
 using View3D.Services;
@@ -160,11 +161,11 @@ namespace View3D.Animation.MetaData
             var propPlayer = _componentManager.GetComponent<AnimationsContainerComponent>().RegisterAnimationPlayer(new AnimationPlayer(), propName + Guid.NewGuid());
 
             // Configure the mesh
-            string skeletonName = "";
-            SceneLoader loader = new SceneLoader(resourceLib);
-            var result = loader.Load(meshPath, new GroupNode(propName), propPlayer, ref skeletonName);
+            SceneLoader loader = new SceneLoader(resourceLib, pfs, GeometryGraphicsContextFactory.CreateInstance(resourceLib.GraphicsDevice));
+            var loadedNode = loader.Load(meshPath, new GroupNode(propName), propPlayer);
 
             // Configure animation
+            var skeletonName = SceneNodeHelper.GetSkeletonName(loadedNode);
             var skeletonFile = skeletonHelper.GetSkeletonFileFromName(pfs, skeletonName);
             var skeleton = new GameSkeleton(skeletonFile, propPlayer);
             var animFile = AnimationFile.Create(animationPath);
@@ -178,14 +179,14 @@ namespace View3D.Animation.MetaData
             propPlayer.AnimationRules.Add(rule);
 
             // Add to scene
-            _root.AddObject(result);
+            _root.AddObject(loadedNode);
 
             var skeletonSceneNode = new SkeletonNode(resourceLib.Content, new SimpleSkeletonProvider(skeleton));
             skeletonSceneNode.NodeColour = Color.Yellow;
 
-            result.AddObject(skeletonSceneNode);
+            loadedNode.AddObject(skeletonSceneNode);
 
-            return new AnimatedPropInstance(result, propPlayer);
+            return new AnimatedPropInstance(loadedNode, propPlayer);
         }
 
         IMetaDataInstance CreateImpactPos(ImpactPosition impactMetaData)

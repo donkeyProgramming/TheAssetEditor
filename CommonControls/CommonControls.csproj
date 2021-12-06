@@ -355,6 +355,7 @@
 
   <ItemGroup>
     <Folder Include="Editors\FastBin\" />
+    <Folder Include="FileTypes\" />
   </ItemGroup>
 
 </Project>

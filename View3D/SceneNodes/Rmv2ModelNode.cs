@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using View3D.Animation;
 using View3D.Rendering.Geometry;
+using View3D.Services;
 using View3D.Utility;
 
 namespace View3D.SceneNodes
@@ -11,27 +12,11 @@ namespace View3D.SceneNodes
     {
         public RmvFile Model { get; set; }
 
-        public Rmv2ModelNode(RmvFile model,  ResourceLibary resourceLib, string name, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory) : base(name)
+        public Rmv2ModelNode(string name, int lodCount = 4)
         {
             Name = name;
 
-            for (int lodIndex = 0; lodIndex < model.LodHeaders.Count(); lodIndex++)
-            {
-                var lodNode = new Rmv2LodNode("Lod " + lodIndex, lodIndex)
-                {
-                    IsVisible = lodIndex == 0
-                };
-                AddObject(lodNode);
-            }
-
-            SetModel(model, resourceLib, animationPlayer, contextFactory);
-        }
-
-        public Rmv2ModelNode(string name)
-        {
-            Name = name;
-
-            for (int lodIndex = 0; lodIndex < 4; lodIndex++)
+            for (int lodIndex = 0; lodIndex < lodCount; lodIndex++)
             {
                 var lodNode = new Rmv2LodNode("Lod " + lodIndex, lodIndex)
                 {
@@ -41,7 +26,7 @@ namespace View3D.SceneNodes
             }
         }
 
-        public void SetModel(RmvFile model, ResourceLibary resourceLibary, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory)
+        public void CreateModelNodesFromFile(RmvFile model, ResourceLibary resourceLibary, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory)
         {
             Model = model;
             for (int lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
@@ -52,7 +37,11 @@ namespace View3D.SceneNodes
                 var lodNode = Children[lodIndex];
                 for (int modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
                 {
-                    var node = new Rmv2MeshNode(model.ModelList[lodIndex][modelIndex], model.Header.SkeletonName, contextFactory.Create(), resourceLibary, animationPlayer);
+                    var geometry = MeshBuilderService.BuildMeshFromRmvModel(model.ModelList[lodIndex][modelIndex], model.Header.SkeletonName, contextFactory.Create());
+                    var node = new Rmv2MeshNode(model.ModelList[lodIndex][modelIndex], animationPlayer, geometry);
+                    node.Initialize(resourceLibary);
+                    
+
                     node.LodIndex = lodIndex;
                     lodNode.AddObject(node);
                 }

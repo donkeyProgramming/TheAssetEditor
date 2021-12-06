@@ -11,6 +11,7 @@ using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor.ViewModels.BmiEditor;
 using KitbasherEditor.ViewModels.MeshFitter;
 using KitbasherEditor.ViewModels.PinTool;
+using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views.EditorViews;
 using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using Microsoft.Xna.Framework;
@@ -42,11 +43,11 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         SkeletonAnimationLookUpHelper _skeletonHelper;
         WindowKeyboard _keyboard;
 
-        public ToolActions(IComponentManager componentManager, PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper, WindowKeyboard keyboard)
+        public ToolActions(IComponentManager componentManager, PackFileService packFileService, WindowKeyboard keyboard)
         {
             _packFileService = packFileService;
             _componentManager = componentManager;
-            _skeletonHelper = skeletonHelper;
+            _skeletonHelper = _componentManager.GetComponent<SkeletonAnimationLookUpHelper>();
             _keyboard = keyboard;
 
             _selectionManager = componentManager.GetComponent<SelectionManager>();
@@ -143,7 +144,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             //Generate lod
             for (int lodIndex = 0; lodIndex < lodsToGenerate.Count(); lodIndex++)
             {
-                var deductionRatio = MeshSaverService.GetDefaultLodReductionValue(lodsToGenerate.Count(), lodIndex);
+                var deductionRatio = SceneSaverService.GetDefaultLodReductionValue(lodsToGenerate.Count(), lodIndex);
 
                 foreach (var modelGroupCollection in modelGroups)
                 {

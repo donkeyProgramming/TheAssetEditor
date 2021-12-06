@@ -10,8 +10,6 @@ using System.Text;
 namespace Common.ApplicationSettings
 {
    
-    
-
     public class ApplicationSettingsService
     {
         public delegate void SettingsChangedDelegate(ApplicationSettings settings);

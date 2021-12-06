@@ -1,60 +1,51 @@
 ﻿using Common;
 using CommonControls.Services;
-using GalaSoft.MvvmLight.Command;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
-using System;
-using System.Collections.Generic;
+using MonoGame.Framework.WpfInterop;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Windows.Input;
-using View3D.Commands.Object;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
-using View3D.Scene;
 using View3D.SceneNodes;
-using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels
 {
     public class SceneExplorerViewModel : NotifyPropertyChangedImpl, IEditableMeshResolver
     {
+        IComponentManager _componentManager;
+        SceneManager _sceneManager;
+        CommandExecutor _commandExecutor;
+        SelectionManager _selectionManager;
+        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        PackFileService _packFileService;
+        AnimationControllerViewModel _animationControllerViewModel;
+
         public ObservableCollection<ISceneNode> _sceneGraphRootNodes = new ObservableCollection<ISceneNode>();
         public ObservableCollection<ISceneNode> SceneGraphRootNodes { get { return _sceneGraphRootNodes; } set { SetAndNotify(ref _sceneGraphRootNodes, value); } }
-
-
 
         ObservableCollection<ISceneNode> _SelectedObjects = new ObservableCollection<ISceneNode>();
         public ObservableCollection<ISceneNode> SelectedObjects { get { return _SelectedObjects; } set { SetAndNotify(ref _SelectedObjects, value); } }
 
-       //ISceneNode _selectedNode;
-       //public ISceneNode SelectedNode { get { return _selectedNode; } set { SetAndNotify(ref _selectedNode, value); OnNodeSelected(_selectedNode); } }
-
         ISceneNodeViewModel _selectedNodeViewModel;
         public ISceneNodeViewModel SelectedNodeViewModel { get { return _selectedNodeViewModel; } set { SetAndNotify(ref _selectedNodeViewModel, value); } }
-
-        SceneContainer _sceneContainer;
-        SceneManager _sceneManager;
-        CommandExecutor _commandExecutor;
-        SelectionManager _selectionManager;
 
         public SceneExplorerContextMenuHandler ContextMenu { get; set; }
 
         MainEditableNode _editableMeshNode;
         public MainEditableNode EditableMeshNode { get => _editableMeshNode; set { _editableMeshNode = value; ContextMenu.EditableMeshNode = value; } }
 
-        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        PackFileService _packFileService;
-        AnimationControllerViewModel _animationControllerViewModel;
-        public SceneExplorerViewModel(SceneContainer sceneContainer, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService packFileService, AnimationControllerViewModel animationControllerViewModel)
+
+        public SceneExplorerViewModel(IComponentManager componentManager, PackFileService packFileService, AnimationControllerViewModel animationControllerViewModel)
         {
-            _sceneContainer = sceneContainer;
-            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
-            _packFileService = packFileService;
+            _componentManager = componentManager;
             _animationControllerViewModel = animationControllerViewModel;
-            _sceneManager = _sceneContainer.GetComponent<SceneManager>();
-            _commandExecutor = sceneContainer.GetComponent<CommandExecutor>();
-            _selectionManager = sceneContainer.GetComponent<SelectionManager>();
+
+            _packFileService = packFileService;
+
+            _skeletonAnimationLookUpHelper = _componentManager.GetComponent<SkeletonAnimationLookUpHelper>();
+            _sceneManager = _componentManager.GetComponent<SceneManager>();
+            _commandExecutor = componentManager.GetComponent<CommandExecutor>();
+            _selectionManager = componentManager.GetComponent<SelectionManager>();
             _selectionManager.SelectionChanged += SelectionChanged;
 
             SceneGraphRootNodes.Add(_sceneManager.RootNode);
@@ -118,7 +109,7 @@ namespace KitbasherEditor.ViewModels
 
             if (SelectedObjects.Count == 1)
             {
-                SelectedNodeViewModel = SceneNodeViewFactory.Create(SelectedObjects.First(), _skeletonAnimationLookUpHelper, _packFileService, _animationControllerViewModel, _sceneContainer);
+                SelectedNodeViewModel = SceneNodeViewFactory.Create(SelectedObjects.First(), _skeletonAnimationLookUpHelper, _packFileService, _animationControllerViewModel, _componentManager);
                 ContextMenu.Create(SelectedObjects.First());
             }
             else

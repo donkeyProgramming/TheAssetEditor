@@ -5,7 +5,7 @@ using CommonControls.Services;
 using Filetypes.RigidModel;
 using FileTypes.PackFiles.Models;
 using FileTypes.RigidModel;
-using KitbasherEditor.ViewModels;
+
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -16,23 +16,25 @@ using System.Windows;
 using View3D.Components.Component;
 using View3D.SceneNodes;
 using View3D.Services;
+using Filetypes.RigidModel.LodHeader;
+using FileTypes.RigidModel.LodHeader;
+using Microsoft.Xna.Framework;
+using View3D.Animation;
 
-namespace KitbasherEditor.Services
+namespace View3D.Services
 {
-    public class ModelSaveHelper
+    public class SceneSaverService
     {
-        ILogger _logger = Logging.Create<ModelSaveHelper>();
+        ILogger _logger = Logging.Create<SceneSaverService>();
 
-        private readonly  PackFileService _packFileService;
-        private readonly  SceneManager _sceneManager;
-        private readonly KitbasherViewModel _kitbasherViewModel;
+        private readonly PackFileService _packFileService;
+        private readonly IEditorViewModel _editorViewModel;
         private readonly MainEditableNode _editableMeshNode;
 
-        public ModelSaveHelper(PackFileService packFileService, SceneManager sceneManager, KitbasherViewModel kitbasherViewModel, MainEditableNode editableMeshNode)
+        public SceneSaverService(PackFileService packFileService, IEditorViewModel editorViewModel, MainEditableNode editableMeshNode)
         {
-           _packFileService = packFileService;
-           _sceneManager = sceneManager;
-           _kitbasherViewModel = kitbasherViewModel;
+            _packFileService = packFileService;
+            _editorViewModel = editorViewModel;
             _editableMeshNode = editableMeshNode;
         }
 
@@ -40,12 +42,12 @@ namespace KitbasherEditor.Services
         {
             try
             {
-                var inputFile = _kitbasherViewModel.MainFile as PackFile;
+                var inputFile = _editorViewModel.MainFile as PackFile;
                 byte[] bytes = GetBytesToSave();
                 var path = _packFileService.GetFullPath(inputFile);
                 var res = SaveHelper.Save(_packFileService, path, inputFile, bytes);
                 if (res != null)
-                    _kitbasherViewModel.MainFile = res;
+                    _editorViewModel.MainFile = res;
             }
             catch (Exception e)
             {
@@ -58,12 +60,12 @@ namespace KitbasherEditor.Services
         {
             try
             {
-                var inputFile = _kitbasherViewModel.MainFile as PackFile;
+                var inputFile = _editorViewModel.MainFile as PackFile;
                 byte[] bytes = GetBytesToSave();
 
                 using (var browser = new SavePackFileWindow(_packFileService))
                 {
-                    browser.ViewModel.Filter.SetExtentions(new List<string>() {".rigid_model_v2" });
+                    browser.ViewModel.Filter.SetExtentions(new List<string>() { ".rigid_model_v2" });
                     if (browser.ShowDialog() == true)
                     {
                         var path = browser.FilePath;
@@ -72,7 +74,7 @@ namespace KitbasherEditor.Services
 
                         var res = SaveHelper.Save(_packFileService, path, inputFile, bytes);
                         if (res != null)
-                            _kitbasherViewModel.MainFile = res;
+                            _editorViewModel.MainFile = res;
                     }
                 }
             }
@@ -85,7 +87,7 @@ namespace KitbasherEditor.Services
 
         private byte[] GetBytesToSave()
         {
-            var isAllVisible = _editableMeshNode.AreAllNodesVisible();
+            var isAllVisible = SceneNodeHelper.AreAllNodesVisible(_editableMeshNode);
             bool onlySaveVisible = false;
             if (isAllVisible == false)
             {
@@ -93,8 +95,112 @@ namespace KitbasherEditor.Services
                     onlySaveVisible = true;
             }
 
-            var bytes0 = MeshSaverService.Save(onlySaveVisible, new List<Rmv2ModelNode>() { _editableMeshNode }, _editableMeshNode.Skeleton.AnimationProvider.Skeleton, _editableMeshNode.SelectedOutputFormat, ModelMaterialEnum.default_type);
-            return bytes0;
+            var bytes = Save(onlySaveVisible, new List<Rmv2ModelNode>() { _editableMeshNode }, _editableMeshNode.Skeleton.AnimationProvider.Skeleton, _editableMeshNode.SelectedOutputFormat);
+            return bytes;
+        }
+
+        public static List<float> GetDefaultLodReductionValues(int numLods)
+        {
+            var output = new List<float>();
+
+            for (int lodIndex = 0; numLods < lodIndex; lodIndex++)
+                output.Add(GetDefaultLodReductionValue(numLods, lodIndex));
+
+            return output;
+        }
+
+        public static float GetDefaultLodReductionValue(int numLods, int currentLodIndex)
+        {
+            var lerpValue = (1.0f / (numLods - 1)) * (numLods - 1 - currentLodIndex);
+            var deductionRatio = MathHelper.Lerp(0.25f, 0.75f, lerpValue);
+            return deductionRatio;
+        }
+
+        static RmvLodHeader[] CreateLodHeaders(RmvLodHeader[] baseHeaders, RmvVersionEnum version)
+        {
+            var numLods = baseHeaders.Count();
+            var factory = LodHeaderFactory.Create();
+            var output = new RmvLodHeader[numLods];
+            for (int i = 0; i < numLods; i++)
+                output[i] = factory.CreateFromBase(version, baseHeaders[i], (uint)i);
+            return output;
+        }
+
+        public static byte[] Save(bool onlySaveVisibleNodes, List<Rmv2ModelNode> modelNodes, GameSkeleton skeleton, RmvVersionEnum version, bool enrichModel = true)
+        {
+            var logger = Logging.Create<SceneSaverService>();
+            logger.Here().Information($"Starting to save model. Nodes = {modelNodes.Count}, Skeleton = {skeleton}, Version = {version}");
+
+            uint lodCount = (uint)modelNodes.First().Model.LodHeaders.Length;
+
+            logger.Here().Information($"Creating header");
+            RmvFile outputFile = new RmvFile()
+            {
+                Header = new RmvFileHeader()
+                {
+                    _fileType = Encoding.ASCII.GetBytes("RMV2"),
+                    SkeletonName = skeleton == null ? "" : skeleton.SkeletonName,
+                    Version = version,
+                    LodCount = lodCount
+                },
+
+                LodHeaders = CreateLodHeaders(modelNodes.First().Model.LodHeaders, version)
+            };
+
+            // Create all the meshes
+            logger.Here().Information($"Creating meshes");
+            List<RmvModel>[] newMeshList = new List<RmvModel>[lodCount];
+            for (int i = 0; i < lodCount; i++)
+                newMeshList[i] = new List<RmvModel>();
+
+            foreach (var modelNode in modelNodes)
+            {
+                for (int currentLodIndex = 0; currentLodIndex < lodCount; currentLodIndex++)
+                {
+                    List<Rmv2MeshNode> meshes = modelNode.GetMeshesInLod(currentLodIndex, onlySaveVisibleNodes);
+
+                    for (int meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
+                    {
+                        logger.Here().Information($"Creating model. Lod: {currentLodIndex}, Model: {meshIndex}");
+
+                        var newModel = new RmvModel()
+                        {
+                            CommonHeader = meshes[meshIndex].CommonHeader,
+                            Material = meshes[meshIndex].Material,
+                            Mesh = MeshBuilderService.CreateRmvMeshFromGeometry(meshes[meshIndex].Geometry)
+                        };
+
+                        var boneNames = new string[0];
+                        if (skeleton != null)
+                            boneNames = skeleton.BoneNames.ToArray();
+
+                        newModel.Material.UpdateEnumsBeforeSaving(meshes[meshIndex].Geometry.VertexFormat, version);
+
+                        if (enrichModel)
+                            newModel.Material.EnrichDataBeforeSaving(boneNames, BoundingBox.CreateFromPoints(newModel.Mesh.VertexList.Select(x => x.GetPosistionAsVec3())));
+
+                        logger.Here().Information($"Model. Lod: {currentLodIndex}, Model: {meshIndex} created.");
+                        newMeshList[currentLodIndex].Add(newModel);
+                    }
+                }
+            }
+
+            // Convert the list to an array
+            var newMeshListArray = new RmvModel[lodCount][];
+            for (int i = 0; i < lodCount; i++)
+                newMeshListArray[i] = newMeshList[i].ToArray();
+
+            // Update data in the header and recalc offset
+            logger.Here().Information($"Update offsets");
+            outputFile.ModelList = newMeshListArray;
+            outputFile.UpdateOffsets();
+
+            // Output the data
+            logger.Here().Information($"Generating bytes.");
+            var outputBytes = ModelFactory.Create().Save(outputFile);
+
+            logger.Here().Information($"Model saved correctly");
+            return outputBytes;
         }
 
         public void GenerateWsModel()
@@ -107,7 +213,7 @@ namespace KitbasherEditor.Services
                     return;
                 }
 
-                var isAllVisible = _editableMeshNode.AreAllNodesVisible();
+                var isAllVisible = SceneNodeHelper.AreAllNodesVisible(_editableMeshNode);
                 bool onlySaveVisible = false;
                 if (isAllVisible == false)
                 {
@@ -115,7 +221,7 @@ namespace KitbasherEditor.Services
                         onlySaveVisible = true;
                 }
 
-                var modelFile = _kitbasherViewModel.MainFile as PackFile;
+                var modelFile = _editorViewModel.MainFile as PackFile;
                 var modelFilePath = _packFileService.GetFullPath(modelFile);
                 var wsModelPath = Path.ChangeExtension(modelFilePath, ".wsmodel");
 
@@ -205,7 +311,7 @@ namespace KitbasherEditor.Services
             return $" MeshName='{mesh.Name}' Texture='{textureName}' VertType='{vertexName}' Alpha='{alphaOn}'";
         }
 
-        string  CreateKnownMaterial(Rmv2MeshNode mesh, List<WsModelFile> possibleMaterials)
+        string CreateKnownMaterial(Rmv2MeshNode mesh, List<WsModelFile> possibleMaterials)
         {
             foreach (var material in possibleMaterials)
             {

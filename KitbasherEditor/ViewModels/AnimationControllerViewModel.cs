@@ -79,11 +79,11 @@ namespace KitbasherEditor.ViewModels
 
         public GameSkeleton Skeleton { get; set; }
 
-        public AnimationControllerViewModel(IComponentManager componentManager, PackFileService pf, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        public AnimationControllerViewModel(IComponentManager componentManager, PackFileService pf)
         {
             _componentManager = componentManager;
             _packFileService = pf;
-            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
+            _skeletonAnimationLookUpHelper = _componentManager.GetComponent<SkeletonAnimationLookUpHelper>();
             SkeletonList = _skeletonAnimationLookUpHelper.SkeletonFileNames;
 
             var animCollection = _componentManager.GetComponent<AnimationsContainerComponent>();

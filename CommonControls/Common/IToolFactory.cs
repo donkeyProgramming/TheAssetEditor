@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Common;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Common
+namespace CommonControls.Common
 {
     public interface IPackFileToToolSelector
     {
@@ -50,7 +51,7 @@ namespace Common
         {
             var extention = Regex.Match(fullPath, @"\..*").Value;
             if (_extention == extention && fullPath.Contains(_requiredPathSubString))
-                 return true;
+                return true;
             return false;
         }
     }
@@ -70,7 +71,7 @@ namespace Common
             where View : Control;
 
 
-        ViewModel CreateEditorViewModel<ViewModel>() 
+        ViewModel CreateEditorViewModel<ViewModel>()
             where ViewModel : IEditorViewModel;
 
         Window CreateToolAsWindow(IEditorViewModel viewModel);

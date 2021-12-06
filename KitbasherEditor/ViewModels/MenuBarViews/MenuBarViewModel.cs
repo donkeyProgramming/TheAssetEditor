@@ -73,7 +73,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public ObservableCollection<ToolbarItem> MenuItems { get; set; } = new ObservableCollection<ToolbarItem>();
         public ObservableCollection<MenuBarButton> CustomButtons { get; set; } = new ObservableCollection<MenuBarButton>();
 
-        public ModelLoaderService ModelLoader { get; set; }
+        public KitbashSceneCreator ModelLoader { get; set; }
         public GizmoActions Gizmo { get; set; }
         public GeneralActions General { get; set; }
         public ToolActions Tools { get; set; }
@@ -89,15 +89,17 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         Dictionary<MenuActionType, MenuAction> _actionList = new Dictionary<MenuActionType, MenuAction>();
 
-        public MenuBarViewModel(IComponentManager componentManager, PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper)
+        public MenuBarViewModel(IComponentManager componentManager, PackFileService packFileService)
         {
             _componentManager = componentManager;
             _packFileService = packFileService;
+
+
             _ruleFactory = new VisibilityHandler(componentManager);
             TransformTool = new TransformToolViewModel(componentManager);
             Gizmo = new GizmoActions(TransformTool, componentManager);
             General = new GeneralActions(componentManager);
-            Tools = new ToolActions(componentManager, _packFileService, skeletonHelper, _keyboard);
+            Tools = new ToolActions(componentManager, _packFileService, _keyboard);
 
             CreateActions();
             CreateButtons();

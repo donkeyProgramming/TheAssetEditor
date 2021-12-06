@@ -7,6 +7,7 @@ using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SuperView;
 using AnimationEditor.TechSkeletonEditor;
 using Common;
+using CommonControls.Common;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;

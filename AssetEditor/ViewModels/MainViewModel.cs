@@ -2,6 +2,7 @@
 using Common;
 using Common.ApplicationSettings;
 using Common.GameInformation;
+using CommonControls.Common;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using FileTypes.AnimationPack;

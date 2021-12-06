@@ -74,8 +74,18 @@ namespace View3D.Commands.Object
                     var hack = _objectToSplit as Rmv2MeshNode;
                     var originalRmvModel = hack.RmvModel_depricated;
 
-                    var context = new GraphicsCardGeometry(_resourceLib.GraphicsDevice);
-                    var meshNode = new Rmv2MeshNode(hack.RmvModel_depricated.Clone(), _objectToSplit.Geometry.ParentSkeletonName,  context, _resourceLib, hack.AnimationPlayer, mesh);
+                    //var context = new GraphicsCardGeometry(_resourceLib.GraphicsDevice);
+                    //var meshNode = new Rmv2MeshNode(hack.RmvModel_depricated.Clone(), _objectToSplit.Geometry.ParentSkeletonName,  context, _resourceLib, hack.AnimationPlayer, mesh);
+                    //var mesh = MeshBuilderService.BuildMeshFromRmvModel(hack.RmvModel_depricated.Clone(), _objectToSplit.Geometry.ParentSkeletonName, context);
+
+                    var meshNode = new Rmv2MeshNode(hack.RmvModel_depricated.Clone(), hack.AnimationPlayer, mesh);
+                    meshNode.Initialize(_resourceLib);
+
+                    
+
+
+
+
                     meshNode.Name = $"{_objectToSplit.Name}_submesh_{counter++}";
 
                     createdMeshes.Add(meshNode);

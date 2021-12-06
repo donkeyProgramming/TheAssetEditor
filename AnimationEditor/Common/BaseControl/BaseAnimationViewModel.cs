@@ -2,6 +2,7 @@
 using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
 using Common;
+using CommonControls.Common;
 using CommonControls.Services;
 using Filetypes.RigidModel;
 using FileTypes.AnimationPack;

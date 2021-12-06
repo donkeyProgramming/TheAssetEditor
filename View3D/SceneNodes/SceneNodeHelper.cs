@@ -109,7 +109,7 @@ namespace View3D.SceneNodes
 
         }
 
-        public static List<string> GetSkeletonNames(ISceneNode result)
+        public static string GetSkeletonName(ISceneNode result)
         {
             var output = new List<string>();
 
@@ -125,7 +125,20 @@ namespace View3D.SceneNodes
                     output.Add(modelNode.Model.Header.SkeletonName);
             }
 
-            return output;
+            if (output.Count == 0)
+                return "";
+            return output.First();
+        }
+
+        public static bool AreAllNodesVisible(Rmv2ModelNode searchStart)
+        {
+            bool isAllVisible = true;
+            searchStart.GetLodNodes()[0].ForeachNodeRecursive((node) =>
+            {
+                if (!node.IsVisible)
+                    isAllVisible = false;
+            });
+            return isAllVisible;
         }
     }
 }

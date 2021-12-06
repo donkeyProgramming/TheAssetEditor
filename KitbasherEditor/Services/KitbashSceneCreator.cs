@@ -15,9 +15,9 @@ using View3D.Utility;
 
 namespace KitbasherEditor.Services
 {
-    public class ModelLoaderService
+    public class KitbashSceneCreator
     {
-        ILogger _logger = Logging.Create<ModelLoaderService>();
+        ILogger _logger = Logging.Create<KitbashSceneCreator>();
 
         public MainEditableNode EditableMeshNode { get; private set; }
         public ISceneNode ReferenceMeshRoot { get; private set; }
@@ -27,14 +27,14 @@ namespace KitbasherEditor.Services
         AnimationControllerViewModel _animationView;
         SceneManager _sceneManager;
 
-        public ModelLoaderService(PackFileService packFileService, ResourceLibary resourceLibary, AnimationControllerViewModel animationView, SceneManager sceneManager, IPackFile mainFile)
+        public KitbashSceneCreator(PackFileService packFileService, ResourceLibary resourceLibary, AnimationControllerViewModel animationView, SceneManager sceneManager, IPackFile mainFile)
         {
             _packFileService = packFileService;
             _resourceLibary = resourceLibary;
             _animationView = animationView;
             _sceneManager = sceneManager;
 
-            var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(resourceLibary.Content, animationView) { IsLockable = false }) as SkeletonNode;
+            var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(resourceLibary.Content, animationView) { IsLockable = false });
             EditableMeshNode = _sceneManager.RootNode.AddObject(new MainEditableNode("Editable Model", skeletonNode, mainFile));
             ReferenceMeshRoot = sceneManager.RootNode.AddObject(new GroupNode("Reference meshs") { IsEditable = false, IsLockable = false });
         }
@@ -42,8 +42,10 @@ namespace KitbasherEditor.Services
         public void LoadMainEditableModel(PackFile file)
         {
             var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
-            EditableMeshNode.SetModel(rmv, _resourceLibary, _animationView.Player, GeometryGraphicsContextFactory.CreateInstance(_resourceLibary.GraphicsDevice));
+
+            EditableMeshNode.CreateModelNodesFromFile(rmv, _resourceLibary, _animationView.Player, GeometryGraphicsContextFactory.CreateInstance(_resourceLibary.GraphicsDevice));
             EditableMeshNode.SelectedOutputFormat = rmv.Header.Version;
+
             _animationView.SetActiveSkeleton(rmv.Header.SkeletonName);
         }
 
@@ -89,19 +91,16 @@ namespace KitbasherEditor.Services
 
         SceneNode LoadModel(PackFile file)
         {
-            SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService);
-            var outSkeletonName = "";
-            var result = loader.Load(file, null, _animationView.Player, ref outSkeletonName);
-            if (result == null)
+            SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, GeometryGraphicsContextFactory.CreateInstance(_resourceLibary.GraphicsDevice));
+            var loadedNode = loader.Load(file, null, _animationView.Player);
+
+            if (loadedNode == null)
             {
                 _logger.Here().Error("Unable to load model");
                 return null;
             }
 
-
-            outSkeletonName = SceneNodeHelper.GetSkeletonNames(result).FirstOrDefault();
-
-            result.ForeachNodeRecursive((node) =>
+            loadedNode.ForeachNodeRecursive((node) =>
             {
                 node.IsEditable = false;
                 if (node is ISelectable selectable)
@@ -119,7 +118,7 @@ namespace KitbasherEditor.Services
                 }
             });
 
-            return result;
+            return loadedNode;
         }
     }
         

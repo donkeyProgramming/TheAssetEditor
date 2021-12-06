@@ -64,7 +64,7 @@ namespace CommonControls.PackFileBrowser
             SetAsEditabelPackCommand = new RelayCommand(SetAsEditabelPack);
             ExpandAllChildrenCommand = new RelayCommand(ExpandAllChildren);
 
-            OpenToolCommand_Kitbash = new RelayCommand(OpenKitbasherTool);
+            //OpenToolCommand_Kitbash = new RelayCommand(OpenKitbasherTool);
         }
 
         void OnRenameNode()
@@ -262,21 +262,6 @@ namespace CommonControls.PackFileBrowser
             node.IsNodeExpanded = true;
             foreach (var child in node.Children)
                 ExpandAllRecursive(child);
-        }
-
-        void OpenKitbasherTool()
-        {
-            return;
-            if (_selectedNode != null)
-            {
-                var name = _selectedNode.Item.Name.ToLower();
-                if (name.EndsWith(".variantmeshdefinition") || name.EndsWith(".rigid_model_v2"))
-                {
-                    var editorView = _toolFactory.CreateEditorViewModel<IKitBashEditor>();
-                    editorView.ReferenceModel = _selectedNode.Item;
-                    _editorCreator.CreateEmptyEditor(editorView);
-                }
-            }
         }
 
         public abstract void Create(TreeNode node);

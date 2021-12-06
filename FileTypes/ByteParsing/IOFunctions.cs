@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Common
+namespace FileTypes.ByteParsing
 {
     public class IOFunctions
     {
-       // static public byte[] staticBuffer = new byte[1024];
+        // static public byte[] staticBuffer = new byte[1024];
         public static string TheadUnsafeReadZeroTerminatedAscii(BinaryReader reader, byte[] preAllocatedBuffer)
         {
             var index = 0;

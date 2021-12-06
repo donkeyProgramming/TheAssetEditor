@@ -24,17 +24,22 @@ namespace View3D.Services
     {
         ILogger _logger = Logging.Create<SceneLoader>();
         PackFileService _packFileService;
-        GraphicsDevice _device;
         ResourceLibary _resourceLibary;
+        IGeometryGraphicsContextFactory _geometryContextFactory;
 
-        public SceneLoader(ResourceLibary resourceLibary, PackFileService pfs)
+        public SceneLoader(ResourceLibary resourceLibary, PackFileService pfs, IGeometryGraphicsContextFactory geometryContextFactory)
         {
             _packFileService = pfs;
-            _device = resourceLibary.GraphicsDevice;
             _resourceLibary = resourceLibary;
+            _geometryContextFactory = geometryContextFactory;
         }
 
-        public SceneNode Load(PackFile file, SceneNode parent, AnimationPlayer player, ref string skeletonName, string attachmentPointName = null)
+        public SceneNode Load(PackFile file, SceneNode parent, AnimationPlayer player)
+        {
+            return Load(file, parent, player, null);
+        }
+
+        SceneNode Load(PackFile file, SceneNode parent, AnimationPlayer player, string attachmentPointName)
         {
             if (file == null)
                 throw new Exception("File is null in SceneLoader::Load");
@@ -44,15 +49,15 @@ namespace View3D.Services
             switch (file.Extention)
             {
                 case ".variantmeshdefinition":
-                    LoadVariantMesh(file, ref parent, player, ref skeletonName, attachmentPointName);
+                    LoadVariantMesh(file, ref parent, player, attachmentPointName);
                     break;
 
                 case ".rigid_model_v2":
-                    LoadRigidMesh(file, ref parent, player, ref skeletonName, attachmentPointName);
+                    LoadRigidMesh(file, ref parent, player, attachmentPointName);
                     break;
 
                 case ".wsmodel":
-                    LoadWsModel(file, ref parent, player, ref skeletonName, attachmentPointName);
+                    LoadWsModel(file, ref parent, player, attachmentPointName);
                     break;
                 default:
                     throw new Exception("Unknown mesh extention");
@@ -61,7 +66,7 @@ namespace View3D.Services
             return parent;
         }
 
-        void Load(string path, SceneNode parent, AnimationPlayer player, ref string skeletonName, string attachmentPointName)
+        void Load(string path, SceneNode parent, AnimationPlayer player, string attachmentPointName)
         {
             var file = _packFileService.FindFile(path);
             if (file == null)
@@ -70,11 +75,11 @@ namespace View3D.Services
                 return;
             }
 
-            Load(file, parent, player, ref skeletonName, attachmentPointName);
+            Load(file, parent, player , attachmentPointName);
         }
 
 
-        void LoadVariantMesh(PackFile file, ref SceneNode parent, AnimationPlayer player, ref string skeletonName, string attachmentPointName)
+        void LoadVariantMesh(PackFile file, ref SceneNode parent, AnimationPlayer player , string attachmentPointName)
         {
             var variantMeshElement = new VariantMeshNode(file.Name);
             if (parent == null)
@@ -85,7 +90,7 @@ namespace View3D.Services
             try
             {
                 var meshFile = VariantMeshToXmlConverter.Load(file);
-                LoadVariantMesh(meshFile, variantMeshElement, player, ref skeletonName, attachmentPointName);
+                LoadVariantMesh(meshFile, variantMeshElement, player, attachmentPointName);
             }
             catch (Exception e)
             {
@@ -95,24 +100,24 @@ namespace View3D.Services
             }
         }
 
-        void LoadVariantMesh(VariantMesh mesh, SceneNode root, AnimationPlayer player, ref string skeletonName, string attachmentPointName)
+        void LoadVariantMesh(VariantMesh mesh, SceneNode root, AnimationPlayer player, string attachmentPointName)
         {
             if (mesh.ChildSlots.Count != 0)
                 root = root.AddObject(new SlotsNode("Slots"));
 
             // Load model
             if (string.IsNullOrWhiteSpace(mesh.ModelReference) != true)
-                 Load(mesh.ModelReference.ToLower(), root, player, ref skeletonName, attachmentPointName); 
+                 Load(mesh.ModelReference.ToLower(), root, player, attachmentPointName); 
 
             foreach (var slot in mesh.ChildSlots)
             {
                 var slotNode = root.AddObject(new SlotNode(slot.Name + " " + slot.AttachmentPoint, slot.AttachmentPoint));
 
                 foreach (var childMesh in slot.ChildMeshes)
-                    LoadVariantMesh(childMesh, slotNode, player, ref skeletonName, attachmentPointName);
+                    LoadVariantMesh(childMesh, slotNode, player, attachmentPointName);
 
                 foreach (var meshReference in slot.ChildReferences)
-                    Load(meshReference.Reference.ToLower(), slotNode, player, ref skeletonName, slot.AttachmentPoint);
+                    Load(meshReference.Reference.ToLower(), slotNode, player, slot.AttachmentPoint);
 
                 for (int i = 0; i < slotNode.Children.Count(); i++)
                 {
@@ -128,25 +133,25 @@ namespace View3D.Services
             }
         }
 
-        Rmv2ModelNode LoadRigidMesh(PackFile file, ref SceneNode parent, AnimationPlayer player, ref string skeletonName, string attachmentPointName)
+        Rmv2ModelNode LoadRigidMesh(PackFile file, ref SceneNode parent, AnimationPlayer player, string attachmentPointName)
         {
             var rmvModel = ModelFactory.Create().Load(file.DataSource.ReadData());
-            var model = new Rmv2ModelNode(rmvModel, _resourceLibary, Path.GetFileName(file.Name), player, GeometryGraphicsContextFactory.CreateInstance(_device));
 
-            foreach (var mesh in model.GetMeshNodes(0))
+            var modelNode = new Rmv2ModelNode(Path.GetFileName(file.Name));
+            modelNode.CreateModelNodesFromFile(rmvModel, _resourceLibary, player, _geometryContextFactory);
+
+            foreach (var mesh in modelNode.GetMeshNodes(0))
                 mesh.AttachmentPointName = attachmentPointName;
 
             if (parent == null)
-                parent = model;
+                parent = modelNode;
             else
-                parent.AddObject(model);
-            if(!string.IsNullOrWhiteSpace(rmvModel.Header.SkeletonName))
-                skeletonName = rmvModel.Header.SkeletonName;
+                parent.AddObject(modelNode);
 
-            return model;
+            return modelNode;
         }
 
-        void LoadWsModel(PackFile file, ref SceneNode parent, AnimationPlayer player, ref string skeletonName, string attachmentPointName)
+        void LoadWsModel(PackFile file, ref SceneNode parent, AnimationPlayer player, string attachmentPointName)
         {
             var wsModelNode = new WsModelGroup("WsModel - " + file.Name);
             if (parent == null)
@@ -163,9 +168,9 @@ namespace View3D.Services
             if (geometryNodes.Count != 0)
             {
                 var geometryNode = geometryNodes.Item(0);
-                var modelFile = _packFileService.FindFile(geometryNode.InnerText) as PackFile;
+                var modelFile = _packFileService.FindFile(geometryNode.InnerText);
                 var modelAsBase = wsModelNode as SceneNode;
-                var loadedModelNode = LoadRigidMesh(modelFile, ref modelAsBase, player, ref skeletonName, attachmentPointName);
+                var loadedModelNode = LoadRigidMesh(modelFile, ref modelAsBase, player , attachmentPointName);
 
                 // Materials
                 var materialNodes = doc.SelectNodes(@"/model/materials/material");
@@ -187,9 +192,9 @@ namespace View3D.Services
                     {
                         bool useAlpha = materialConfig.Alpha;
                         if (useAlpha)
-                            mesh.Material.AlphaMode = (AlphaMode.Alpha_Test);
+                            mesh.Material.AlphaMode = AlphaMode.Alpha_Test;
                         else
-                            mesh.Material.AlphaMode = (AlphaMode.Opaque);
+                            mesh.Material.AlphaMode = AlphaMode.Opaque;
 
                         foreach (var newTexture in materialConfig.Textures)
                             mesh.UpdateTexture(newTexture.Value, newTexture.Key);

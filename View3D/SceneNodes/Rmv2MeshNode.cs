@@ -66,26 +66,26 @@ namespace View3D.SceneNodes
         private Rmv2MeshNode()
         { }
 
-        public Rmv2MeshNode(RmvModel rmvSubModel, string skeletonName, IGraphicsCardGeometry context, ResourceLibary resourceLib, AnimationPlayer animationPlayer, MeshObject geometry = null)
+        public Rmv2MeshNode(RmvModel rmvSubModel, AnimationPlayer animationPlayer, MeshObject geometry)
         {
             Material = rmvSubModel.Material.Clone();
             CommonHeader = rmvSubModel.CommonHeader;
-
             RmvModel_depricated = rmvSubModel;
-            _resourceLib = resourceLib;
-            Geometry = geometry;
-            if (Geometry == null)
-                Geometry = MeshBuilderService.BuildMeshFromRmvModel(rmvSubModel, skeletonName, context);
-            AnimationPlayer = animationPlayer;
-
             Name = rmvSubModel.Material.ModelName;
+            AnimationPlayer = animationPlayer;
+            Geometry = geometry;
+
             Position = Vector3.Zero;
             Scale = Vector3.One;
             Orientation = Quaternion.Identity;
+        }
 
-            if (resourceLib != null)
+        public void Initialize(ResourceLibary resourceLib)
+        {
+            _resourceLib = resourceLib;
+            if (_resourceLib != null)
             {
-                Effect = new PbrShader(resourceLib);
+                Effect = new PbrShader(_resourceLib);
                 Texture2D diffuse = LoadTexture(TexureType.Diffuse);
                 if (diffuse == null)
                     diffuse = LoadTexture(TexureType.Diffuse_alternative);

@@ -1,4 +1,5 @@
 ﻿using CommonControls.MathViews;
+using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.WpfInterop;
@@ -14,7 +15,7 @@ using View3D.Rendering.RenderItems;
 using View3D.SceneNodes;
 using View3D.Utility;
 
-namespace KitbasherEditor.Views.EditorViews.VertexDebugger
+namespace KitbasherEditor.ViewModels.VertexDebugger
 {
     class VertexDebuggerViewModel : BaseComponent, IDisposable
     {
@@ -83,7 +84,7 @@ namespace KitbasherEditor.Views.EditorViews.VertexDebugger
                     var vertexInfo = (mesh.Geometry as MeshObject).GetVertexExtented(vertexIndex);
 
                     VertexList.Add(new VertexInstance()
-                    { 
+                    {
                         Id = vertexIndex,
                         AnimWeights = vertexInfo.BlendWeights,
                         AnimIndecies = vertexInfo.BlendIndices,
@@ -113,7 +114,7 @@ namespace KitbasherEditor.Views.EditorViews.VertexDebugger
             if (selectionMgr.GetState() is VertexSelectionState selection)
             {
                 var mesh = selection.GetSingleSelectedObject() as Rmv2MeshNode;
-              
+
                 if (SelectedVertex != null)
                 {
                     var bb = BoundingBox.CreateFromSphere(new BoundingSphere(mesh.Geometry.GetVertexById(SelectedVertex.Id), 0.05f));
@@ -149,7 +150,7 @@ namespace KitbasherEditor.Views.EditorViews.VertexDebugger
             containingWindow.DataContext = viewModel;
             containingWindow.Content = new VertexDebuggerView();
             containingWindow.Closed += (x, y) => { componentManager.RemoveComponent(viewModel); viewModel.Dispose(); };
-            containingWindow.Show();         
+            containingWindow.Show();
         }
 
         public void Dispose()

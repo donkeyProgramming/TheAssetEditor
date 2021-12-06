@@ -25,23 +25,5 @@ namespace View3D.SceneNodes
             MainPackFile = mainFile;
         }
 
-        public bool AreAllNodesVisible()
-        {
-            bool isAllVisible = true;
-            GetLodNodes()[0].ForeachNodeRecursive((node) =>
-            {
-                if (!node.IsVisible)
-                    isAllVisible = false;
-            });
-            return isAllVisible;
-        }
-
-        public byte[] Save(bool onlySaveVisibleNodes)
-        {
-            var test2 = MeshSaverService.Save(onlySaveVisibleNodes, new List< Rmv2ModelNode >(){ this}, Skeleton.AnimationProvider.Skeleton, SelectedOutputFormat, true);
-            return test2;
-
-        }
-
     }
 }

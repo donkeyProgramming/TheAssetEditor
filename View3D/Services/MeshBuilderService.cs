@@ -55,15 +55,7 @@ namespace View3D.Services
             return output;
         }
 
-        public static RmvModel CreateRmvSubModel(RmvModel baseModel, MeshObject geometry, RmvVersionEnum version)
-        {
-            var newSubModel = baseModel.Clone();
-            newSubModel.Mesh = CreateRmvFileMesh(geometry);
-            return newSubModel;
-        }
-
-
-        public static RmvMesh CreateRmvFileMesh(MeshObject geometry)
+        public static RmvMesh CreateRmvMeshFromGeometry(MeshObject geometry)
         {
             // Ensure normalized
             for (int i = 0; i < geometry.VertexArray.Length; i++)

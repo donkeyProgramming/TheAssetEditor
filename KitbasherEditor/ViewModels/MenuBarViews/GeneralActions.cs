@@ -11,6 +11,7 @@ using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Components.Rendering;
 using View3D.SceneNodes;
+using View3D.Services;
 using static View3D.Commands.Object.GroupObjectsCommand;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
@@ -23,7 +24,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         ObjectEditor _objectEditor;
         RenderEngineComponent _renderEngineComponent;
 
-        public ModelSaveHelper ModelSaver { get; set; }
+        public SceneSaverService ModelSaver { get; set; }
 
         public GeneralActions(IComponentManager componentManager)
         {

@@ -78,12 +78,16 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 cleanName = Path.GetFileNameWithoutExtension(SkeletonName);
 
             if (_mainNode.Model != null)
-            {
-                var service = new ModelEditorService(_mainNode);
-                service.SetSkeletonName(cleanName);
-            }
+                SetSkeletonName(_mainNode, cleanName);
 
             _animationControllerViewModel.SetActiveSkeleton(cleanName);   
+        }
+
+        void SetSkeletonName(MainEditableNode node, string skeletonName)
+        {
+            var header = node.Model.Header;
+            header.SkeletonName = skeletonName;
+            node.Model.Header = header;
         }
 
         public void Dispose()

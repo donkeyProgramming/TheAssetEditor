@@ -1,4 +1,5 @@
 ﻿using Common;
+using FileTypes.ByteParsing;
 using System;
 using System.Collections.Generic;
 using System.IO;
