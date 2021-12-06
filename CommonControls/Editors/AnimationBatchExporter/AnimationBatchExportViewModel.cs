@@ -1,19 +1,17 @@
-﻿using Common;
+﻿using CommonControls.BaseDialogs;
+using CommonControls.BaseDialogs.ErrorListDialog;
 using CommonControls.Common;
-using CommonControls.ErrorListDialog;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using CommonControls.Simple;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows;
-using static CommonControls.ErrorListDialog.ErrorListViewModel;
+using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 
 namespace CommonControls.Editors.AnimationBatchExporter
 {

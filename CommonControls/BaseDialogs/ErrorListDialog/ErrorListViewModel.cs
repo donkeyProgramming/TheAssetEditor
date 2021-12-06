@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CommonControls.ErrorListDialog
+namespace CommonControls.BaseDialogs.ErrorListDialog
 {
     public class ErrorListViewModel
     {
@@ -10,7 +10,7 @@ namespace CommonControls.ErrorListDialog
         public string WindowTitle { get; set; } = "Error";
 
         public class ErrorListDataItem
-        { 
+        {
             public string ErrorType { get; set; }
             public string ItemName { get; set; }
             public string Description { get; set; }
@@ -38,7 +38,7 @@ namespace CommonControls.ErrorListDialog
 
             public ErrorListDataItem Ok(string itemName, string description)
             {
-                var item =  new ErrorListDataItem() { ErrorType = "Ok", ItemName = itemName, Description = description };
+                var item = new ErrorListDataItem() { ErrorType = "Ok", ItemName = itemName, Description = description };
                 Errors.Add(item);
                 return item;
             }
@@ -61,10 +61,10 @@ namespace CommonControls.ErrorListDialog
 
                 try
                 {
-                    var mountAnimPackFile = _pfs.FindFile(mountFragment.AnimationFile) as PackFile;
+                    var mountAnimPackFile = _pfs.FindFile(mountFragment.AnimationFile) ;
                     var mountAnim = new AnimationClip(AnimationFile.Create(mountAnimPackFile));
 
-                    var riderAnimPackFile = _pfs.FindFile(riderFragment.AnimationFile) as PackFile;
+                    var riderAnimPackFile = _pfs.FindFile(riderFragment.AnimationFile) ;
                     var riderAnim = new AnimationClip(AnimationFile.Create(riderAnimPackFile));
 
                     var newRiderAnim = GenerateMountAnimation(mountAnim, _mount.Skeleton, riderAnim, _rider.Skeleton, _mountVertexOwner, _mountVertexes.First(), SelectedRiderBone.BoneIndex, SelectedRiderBone.ParentBoneIndex, AnimationSettings);

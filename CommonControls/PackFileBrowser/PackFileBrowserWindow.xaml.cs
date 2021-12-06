@@ -1,4 +1,5 @@
 ﻿using Common;
+using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using System;
@@ -34,9 +35,9 @@ namespace CommonControls.PackFileBrowser
                 Close();
         }
 
-        private void ViewModel_FileOpen(IPackFile file)
+        private void ViewModel_FileOpen(PackFile file)
         {
-            SelectedFile = file as PackFile;
+            SelectedFile = file;
             if(DialogResult != true)
                 DialogResult = true;
             Close();
@@ -44,7 +45,7 @@ namespace CommonControls.PackFileBrowser
 
         private void Button_Click(object sender, RoutedEventArgs e)
         { 
-            SelectedFile = ViewModel.SelectedItem?.Item as PackFile;
+            SelectedFile = ViewModel.SelectedItem?.Item;
             DialogResult = true;
             Close();
         }

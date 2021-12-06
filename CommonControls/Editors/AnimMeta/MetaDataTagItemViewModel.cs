@@ -1,5 +1,4 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.FileTypes.MetaData;
 using Filetypes.ByteParsing;
 using Serilog;

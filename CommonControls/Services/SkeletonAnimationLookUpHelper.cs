@@ -1,4 +1,4 @@
-﻿using Common;
+﻿using CommonControls.Common;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;
@@ -106,7 +106,7 @@ namespace CommonControls.Services
                     {
                         // Make sure its not a tech skeleton
                         if(pfs.GetFullPath(file).Contains("tech") == false)
-                            return AnimationFile.Create(file as PackFile);
+                            return AnimationFile.Create(file );
                     }
                 }
             }

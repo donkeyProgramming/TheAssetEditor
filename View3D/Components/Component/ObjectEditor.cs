@@ -1,22 +1,13 @@
-﻿using Common;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
+﻿using CommonControls.Common;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Commands.Object;
 using View3D.Components.Component.Selection;
-using View3D.Components.Input;
-using View3D.Rendering;
-using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
-using View3D.Services;
 using View3D.Utility;
-using static CommonControls.ErrorListDialog.ErrorListViewModel;
-using static View3D.Commands.Object.GroupObjectsCommand;
-using MessageBox = System.Windows.MessageBox;
+using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 
 namespace View3D.Components.Component
 {

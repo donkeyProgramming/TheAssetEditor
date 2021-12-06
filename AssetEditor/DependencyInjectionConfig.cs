@@ -2,8 +2,6 @@
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
-using Common;
-using Common.ApplicationSettings;
 using Common.GameInformation;
 using CommonControls.Common;
 using CommonControls.Editors.AnimationFilePreviewEditor;
@@ -16,6 +14,7 @@ using CommonControls.FileTypes.DB;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Resources;
 using CommonControls.Services;
+using CommonControls.Services.GameInformation;
 using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
 using System;

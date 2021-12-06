@@ -1,5 +1,4 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
@@ -39,7 +38,7 @@ namespace KitbasherEditor.ViewModels
         string _displayName = "3d viewer";
         public string DisplayName { get => _displayName; set => SetAndNotify(ref _displayName, value); }
 
-        public IPackFile MainFile { get; set; }
+        public PackFile MainFile { get; set; }
 
         KitbashSceneCreator _modelLoader;
 
@@ -92,7 +91,7 @@ namespace KitbasherEditor.ViewModels
             {
                 try
                 {
-                    _modelLoader.LoadMainEditableModel(MainFile as PackFile);
+                    _modelLoader.LoadMainEditableModel(MainFile );
                     var nodes = _modelLoader.EditableMeshNode.GetMeshNodes(0)
                         .Select(x => x as ISelectable)
                         .Where(x => x != null)
@@ -148,7 +147,7 @@ namespace KitbasherEditor.ViewModels
 
         public bool Drop(TreeNode node)
         {
-            _modelLoader.LoadReference(node.Item as PackFile);
+            _modelLoader.LoadReference(node.Item );
             return true;
         }
     }

@@ -1,4 +1,4 @@
-﻿using Common;
+﻿using CommonControls.Common;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
@@ -158,7 +158,7 @@ namespace KitbasherEditor.ViewModels
             AnimationsForCurrentSkeleton = new ObservableCollection<AnimationReference>();
             if (!string.IsNullOrWhiteSpace(selectedSkeletonPath))
             {
-                _skeletonPackFile = _packFileService.FindFile(selectedSkeletonPath) as PackFile;
+                _skeletonPackFile = _packFileService.FindFile(selectedSkeletonPath) ;
                 if (_skeletonPackFile == null)
                     HeaderText = "No skeleton";
                 else
@@ -179,7 +179,7 @@ namespace KitbasherEditor.ViewModels
         {
             Animation = null;
             if (selectedAnimation != null)
-                Animation = _packFileService.FindFile(selectedAnimation.AnimationFile, selectedAnimation.Container) as PackFile;
+                Animation = _packFileService.FindFile(selectedAnimation.AnimationFile, selectedAnimation.Container) ;
 
             if (Animation != null)
                 HeaderText = _skeletonPackFile.Name + " - " + Animation.Name;

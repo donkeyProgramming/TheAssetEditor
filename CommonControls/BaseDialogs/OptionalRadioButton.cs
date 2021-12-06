@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace CommonControls.Simple
+namespace CommonControls.BaseDialogs
 {
     public class OptionalRadioButton : RadioButton
     {
@@ -11,7 +11,7 @@ namespace CommonControls.Simple
                 "IsOptional",
                 typeof(bool),
                 typeof(OptionalRadioButton),
-                new PropertyMetadata((bool)true,
+                new PropertyMetadata(true,
                     (obj, args) =>
                     {
                         ((OptionalRadioButton)obj).OnIsOptionalChanged(args);
@@ -35,10 +35,10 @@ namespace CommonControls.Simple
 
         protected override void OnClick()
         {
-            bool? wasChecked = this.IsChecked;
+            bool? wasChecked = IsChecked;
             base.OnClick();
-            if (this.IsOptional && wasChecked == true)
-                this.IsChecked = false;
+            if (IsOptional && wasChecked == true)
+                IsChecked = false;
         }
     }
 }

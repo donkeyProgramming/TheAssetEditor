@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 
-namespace Common
+namespace CommonControls.Common
 {
     public static class LoggerExtensions
     {

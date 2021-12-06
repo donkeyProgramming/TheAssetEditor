@@ -1,4 +1,5 @@
 ﻿using Common;
+using CommonControls.Common;
 using CommonControls.MathViews;
 using MonoGame.Framework.WpfInterop;
 using System;

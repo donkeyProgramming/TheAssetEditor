@@ -1,4 +1,6 @@
 ﻿using Common.GameInformation;
+using CommonControls.Common;
+using CommonControls.Services.GameInformation;
 using Newtonsoft.Json;
 using Serilog;
 using System;
@@ -7,9 +9,25 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Common.ApplicationSettings
+namespace CommonControls.Services
 {
-   
+
+    public class ApplicationSettings
+    {
+        public class GamePathPair
+        {
+            public GameTypeEnum Game { get; set; }
+            public string Path { get; set; }
+        }
+
+        public List<GamePathPair> GameDirectories { get; set; } = new List<GamePathPair>();
+        public GameTypeEnum CurrentGame { get; set; } = GameTypeEnum.Warhammer2;
+        public bool UseTextEditorForUnknownFiles { get; set; } = true;
+        public bool LoadCaPacksByDefault { get; set; } = true;
+        public bool IsFirstTimeStartingApplication { get; set; } = true;
+        public bool IsDeveloperRun { get; set; } = false;
+    }
+
     public class ApplicationSettingsService
     {
         public delegate void SettingsChangedDelegate(ApplicationSettings settings);

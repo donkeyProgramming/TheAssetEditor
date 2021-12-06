@@ -160,12 +160,12 @@ namespace AnimationEditor.MountAnimationCreator
 
             editorView.MainInput = new AnimationToolInput()
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\grn_savage_orc_base.variantmeshdefinition") as PackFile,
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\grn_savage_orc_base.variantmeshdefinition") ,
             };
 
             editorView.RefInput = new AnimationToolInput()
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\def_cold_one.variantmeshdefinition") as PackFile,
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\def_cold_one.variantmeshdefinition") ,
             };
 
             creator.CreateEmptyEditor(editorView);

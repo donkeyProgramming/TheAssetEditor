@@ -1,4 +1,4 @@
-﻿using Common;
+﻿using CommonControls.Common;
 using CommonControls.FileTypes;
 using CommonControls.FileTypes.RigidModel.LodHeader;
 using CommonControls.FileTypes.RigidModel.MaterialHeaders;

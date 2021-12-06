@@ -1,6 +1,4 @@
 ﻿using AssetEditor.Views.Settings;
-using Common;
-using Common.ApplicationSettings;
 using Common.GameInformation;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
@@ -8,6 +6,7 @@ using CommonControls.FileTypes.DB;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
+using CommonControls.Services.GameInformation;
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
@@ -211,7 +210,7 @@ namespace AssetEditor.ViewModels
             packfileService.SetEditablePack(newPackFile);
         }
 
-        public void OpenFile(IPackFile file)
+        public void OpenFile(PackFile file)
         {
             if (file == null)
             {
@@ -227,7 +226,7 @@ namespace AssetEditor.ViewModels
                 return;
             }
 
-            var fullFileName = _packfileService.GetFullPath(file as PackFile);
+            var fullFileName = _packfileService.GetFullPath(file );
             var editorViewModel = ToolsFactory.GetToolViewModelFromFileName(fullFileName);
             if (editorViewModel == null)
             {

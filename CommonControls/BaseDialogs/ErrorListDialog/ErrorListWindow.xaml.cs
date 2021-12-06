@@ -3,9 +3,9 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
-using static CommonControls.ErrorListDialog.ErrorListViewModel;
+using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 
-namespace CommonControls.ErrorListDialog
+namespace CommonControls.BaseDialogs.ErrorListDialog
 {
     /// <summary>
     /// Interaction logic for ErrorListWindow.xaml

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Common.GameInformation
+namespace CommonControls.Services.GameInformation
 {
     public enum GameTypeEnum
     {

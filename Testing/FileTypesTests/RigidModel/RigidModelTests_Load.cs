@@ -12,7 +12,7 @@ namespace FileTypesTests.RigidModel
 
             var file = packFileService.FindFile(@"variantmeshes\wh_variantmodels\bc4\hef\hef_war_lion\hef_war_lion_02.rigid_model_v2");
             Assert.NotNull(file);
-            return file as PackFile;
+            return file ;
         }
 
         PackFile GetWeaponModel()
@@ -22,7 +22,7 @@ namespace FileTypesTests.RigidModel
 
             var file = packFileService.FindFile(@"variantmeshes\wh_variantmodels\hu1d\hef\hef_props\hef_ranger_sword_1h_03.rigid_model_v2");
             Assert.NotNull(file);
-            return file as PackFile;
+            return file ;
         }
 
         byte[] GetLionMeshData()

@@ -1,6 +1,6 @@
-﻿using Common;
-using Common.ApplicationSettings;
-using Common.GameInformation;
+﻿using CommonControls.Common;
+using CommonControls.Services;
+using CommonControls.Services.GameInformation;
 using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Collections.ObjectModel;

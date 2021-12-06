@@ -1,4 +1,4 @@
-﻿using Common;
+﻿using CommonControls.Common;
 using CommonControls.Services;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;

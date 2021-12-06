@@ -1,13 +1,14 @@
-﻿using System;
+﻿using CommonControls.FileTypes.PackFiles.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Common
+namespace CommonControls.Common
 {
     public interface IEditorViewModel
     {
         string DisplayName { get; set; }
-        IPackFile MainFile { get; set; }
+        PackFile MainFile { get; set; }
         bool Save();
         void Close();
         bool HasUnsavedChanges();
@@ -15,7 +16,7 @@ namespace Common
 
     public interface IEditorCreator
     {
-        void OpenFile(IPackFile file);
+        void OpenFile(PackFile file);
         void CreateEmptyEditor(IEditorViewModel editorView);
     }
 

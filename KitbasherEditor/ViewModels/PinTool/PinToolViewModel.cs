@@ -1,5 +1,5 @@
-﻿using CommonControls.Common;
-using CommonControls.Simple;
+﻿using CommonControls.BaseDialogs;
+using CommonControls.Common;
 using KitbasherEditor.Views.EditorViews.PinTool;
 using MonoGame.Framework.WpfInterop;
 using System.Collections.Generic;

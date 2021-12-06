@@ -1,5 +1,5 @@
-﻿using CommonControls.Common;
-using CommonControls.ErrorListDialog;
+﻿using CommonControls.BaseDialogs.ErrorListDialog;
+using CommonControls.Common;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;

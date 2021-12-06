@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace Common
+namespace CommonControls.Common
 {
     public class NotifyPropertyChangedImpl : INotifyPropertyChanged
     {
@@ -22,7 +22,7 @@ namespace Common
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        protected virtual void NotifyPropertyChanged<T>(T value, ValueChangedDelegate<T> valueChangedDelegate, [CallerMemberName] String propertyName = "")
+        protected virtual void NotifyPropertyChanged<T>(T value, ValueChangedDelegate<T> valueChangedDelegate, [CallerMemberName] string propertyName = "")
         {
             NotifyPropertyChanged(propertyName);
             if (DisableCallbacks == false)
@@ -30,7 +30,7 @@ namespace Common
         }
 
 
-        protected virtual void SetAndNotify<T>(ref T variable, T newValue, ValueChangedDelegate<T> valueChangedDelegate = null, [CallerMemberName] String propertyName = "")
+        protected virtual void SetAndNotify<T>(ref T variable, T newValue, ValueChangedDelegate<T> valueChangedDelegate = null, [CallerMemberName] string propertyName = "")
         {
             variable = newValue;
             NotifyPropertyChanged(propertyName);
@@ -38,7 +38,7 @@ namespace Common
                 valueChangedDelegate?.Invoke(newValue);
         }
 
-        protected virtual void SetAndNotifyWhenChanged<T>(ref T variable, T newValue, ValueChangedDelegate<T> valueChangedDelegate = null, [CallerMemberName] String propertyName = "")
+        protected virtual void SetAndNotifyWhenChanged<T>(ref T variable, T newValue, ValueChangedDelegate<T> valueChangedDelegate = null, [CallerMemberName] string propertyName = "")
         {
             if (EqualityComparer<T>.Default.Equals(variable, newValue))
                 return;
@@ -48,14 +48,14 @@ namespace Common
                 valueChangedDelegate?.Invoke(newValue);
         }
 
-        protected virtual void SetAndNotifyWithSender<T>(T value, ValueAndSenderChangedDelegate<T> valueChangedDelegate, [CallerMemberName] String propertyName = "")
+        protected virtual void SetAndNotifyWithSender<T>(T value, ValueAndSenderChangedDelegate<T> valueChangedDelegate, [CallerMemberName] string propertyName = "")
         {
             NotifyPropertyChanged(propertyName);
             if (DisableCallbacks == false)
                 valueChangedDelegate?.Invoke(this, value);
         }
 
-        protected virtual void SetAndNotifyWithSender<T>(ref T variable, T newValue, ValueAndSenderChangedDelegate<T> valueChangedDelegate = null, [CallerMemberName] String propertyName = "")
+        protected virtual void SetAndNotifyWithSender<T>(ref T variable, T newValue, ValueAndSenderChangedDelegate<T> valueChangedDelegate = null, [CallerMemberName] string propertyName = "")
         {
             variable = newValue;
             NotifyPropertyChanged(propertyName);

@@ -1,4 +1,5 @@
 ﻿using Common;
+using CommonControls.Common;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,7 +10,7 @@ using System.Text;
 
 namespace CommonControls.FileTypes.PackFiles.Models
 {
-    public class PackFile : NotifyPropertyChangedImpl, IPackFile
+    public class PackFile : NotifyPropertyChangedImpl
     {
         public IDataSource DataSource { get; set; }
 

@@ -5,13 +5,14 @@ using System.Collections.Generic;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json;
 using System.Text;
-using Common;
 using System.Linq;
 using System.IO;
 using System.Windows;
 using System.Reflection;
 using System.Collections;
 using Microsoft.Xna.Framework;
+using CommonControls.Common;
+using CommonControls.Services.GameInformation;
 
 namespace CommonControls.FileTypes.DB
 {

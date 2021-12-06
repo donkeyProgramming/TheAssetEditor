@@ -1,4 +1,4 @@
-﻿using Common;
+﻿using CommonControls.Common;
 using FileTypes.ByteParsing;
 using Serilog;
 using System;
@@ -27,7 +27,7 @@ namespace CommonControls.FileTypes.PackFiles.Models
         public bool IsCaPackFile { get; set; } = false;
         public string SystemFilePath { get; set; }
 
-        public Dictionary<string, IPackFile> FileList { get; set; } = new Dictionary<string, IPackFile>();
+        public Dictionary<string, PackFile> FileList { get; set; } = new Dictionary<string, PackFile>();
 
 
         public PackFileContainer(string name)
@@ -47,7 +47,7 @@ namespace CommonControls.FileTypes.PackFiles.Models
             Name = Path.GetFileNameWithoutExtension(packFileSystemPath);
             Header = new PFHeader(reader);
 
-            FileList = new Dictionary<string, IPackFile>(Header.FileCount);
+            FileList = new Dictionary<string, PackFile>(Header.FileCount);
 
             PackedFileSourceParent packedFileSourceParent = new PackedFileSourceParent()
             {
@@ -105,7 +105,7 @@ namespace CommonControls.FileTypes.PackFiles.Models
             // Save all the files
             foreach (var file in sortedFiles)
             {
-                var fileSize = (int)(file.Value as PackFile).DataSource.Size;
+                var fileSize = (int)(file.Value ).DataSource.Size;
                 writer.Write(fileSize);
 
                 if (Header.HasAdditionalInfo)
@@ -130,10 +130,10 @@ namespace CommonControls.FileTypes.PackFiles.Models
             // Write the files
             foreach (var file in sortedFiles)
             {
-                var data = (file.Value as PackFile).DataSource.ReadData();
+                var data = (file.Value ).DataSource.ReadData();
                 var offset = writer.BaseStream.Position;
                 var dataLength = data.Length;
-                (file.Value as PackFile).DataSource = new PackedFileSource(packedFileSourceParent, offset, dataLength);
+                (file.Value ).DataSource = new PackedFileSource(packedFileSourceParent, offset, dataLength);
 
                 writer.Write(data);
             }

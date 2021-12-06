@@ -363,7 +363,7 @@ namespace CommonControls.Table
     {
         public int BitFlagValue { get; set; }
         public int NumFlags { get; set; }
-        public ObservableCollection<NotifyPropValueWrapper<bool>> Flags { get; set; } = new ObservableCollection<NotifyPropValueWrapper<bool>>();
+        public ObservableCollection<NotifyAttr<bool>> Flags { get; set; } = new ObservableCollection<NotifyAttr<bool>>();
 
         public BitflagCellItem(int value, int numFlags)
         {
@@ -375,7 +375,7 @@ namespace CommonControls.Table
             b.CopyTo(bits, 0);
 
             for (int i = 0; i < NumFlags; i++)
-                Flags.Add(new NotifyPropValueWrapper<bool>(bits[i]));
+                Flags.Add(new NotifyAttr<bool>(bits[i]));
         }
 
         public int GetAsInt()

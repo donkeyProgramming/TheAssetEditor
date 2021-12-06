@@ -10,7 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace CommonControls.Simple
+namespace CommonControls.BaseDialogs
 {
     /// <summary>
     /// Interaction logic for ControllerHostWindow.xaml

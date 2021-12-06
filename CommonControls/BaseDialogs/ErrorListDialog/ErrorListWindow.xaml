@@ -1,9 +1,8 @@
-﻿<Window x:Class="CommonControls.ErrorListDialog.ErrorListWindow"
+﻿<Window x:Class="CommonControls.BaseDialogs.ErrorListDialog.ErrorListWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:CommonControls.ErrorListDialog"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:errorlistdialog="clr-namespace:CommonControls.BaseDialogs.ErrorListDialog"
         mc:Ignorable="d"
         Title="{Binding WindowTitle}" Height="450" Width="800">
     <Grid>
@@ -12,7 +11,7 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         
-        <local:ErrorListView />
+        <errorlistdialog:ErrorListView />
         <Button Grid.Row="1" Content="Close" Margin="2,2,2,2" Click="Button_Click"/>
     </Grid>
 </Window>

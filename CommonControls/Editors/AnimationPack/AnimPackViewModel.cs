@@ -1,19 +1,14 @@
-﻿using Common;
+﻿using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using CommonControls.Editors.TextEditor;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using CommonControls.Simple;
 using FileTypes.AnimationPack;
 using GalaSoft.MvvmLight.CommandWpf;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
 
@@ -29,7 +24,7 @@ namespace CommonControls.Editors.AnimationPack
         public string DisplayName { get => _displayName; set => SetAndNotify(ref _displayName, value); }
 
         PackFile _packFile;
-        public IPackFile MainFile { get => _packFile; set { _packFile = value as PackFile; Load(_packFile); } }
+        public PackFile MainFile { get => _packFile; set { _packFile = value; Load(_packFile); } }
 
 
         public FilterCollection<string> AnimationPackItems { get; set; }
@@ -235,7 +230,7 @@ namespace CommonControls.Editors.AnimationPack
                     return false;
             }
 
-            var savePath = _pfs.GetFullPath(MainFile as PackFile);
+            var savePath = _pfs.GetFullPath(MainFile );
             SaveHelper.Save(_pfs, savePath, null, _animPack.ToByteArray());
             return true;
         }

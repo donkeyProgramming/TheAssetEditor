@@ -139,7 +139,7 @@ namespace TextureEditor.ViewModels
             if (file == null)
                 return null;
 
-            var content = (file as PackFile).DataSource.ReadData();
+            var content = (file ).DataSource.ReadData();
             using (MemoryStream stream = new MemoryStream(content))
             {
                 var image = Pfim.Dds.Create(stream, new Pfim.PfimConfig(32768, Pfim.TargetFormat.Native, true));

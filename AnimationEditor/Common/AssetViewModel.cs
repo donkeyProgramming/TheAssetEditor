@@ -1,5 +1,4 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
@@ -226,7 +225,7 @@ namespace AnimationEditor.Common.ReferenceModel
         {
             if (animationReference != null)
             {
-                var file = _pfs.FindFile(animationReference.AnimationFile, animationReference.Container) as PackFile;
+                var file = _pfs.FindFile(animationReference.AnimationFile, animationReference.Container) ;
                 AnimationName.Value = animationReference;
                 var animation = AnimationFile.Create(file);
                 SetAnimationClip(new AnimationClip(animation), animationReference);

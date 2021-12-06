@@ -1,5 +1,5 @@
 ﻿using AnimationEditor.Common.ReferenceModel;
-using Common;
+using CommonControls.Common;
 using CommonControls.Services;
 using GalaSoft.MvvmLight.CommandWpf;
 using MonoGame.Framework.WpfInterop;

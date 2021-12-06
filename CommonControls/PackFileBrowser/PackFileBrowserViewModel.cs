@@ -1,22 +1,17 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using CommonControls.Simple;
 using GalaSoft.MvvmLight.Command;
-using Microsoft.Win32;
-using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Windows;
 using System.Windows.Input;
 
 namespace CommonControls.PackFileBrowser
 {
-    public delegate void FileSelectedDelegate(IPackFile file);
+    public delegate void FileSelectedDelegate(PackFile file);
     public delegate void NodeSelectedDelegate(TreeNode node);
 
     public class PackFileBrowserViewModel : NotifyPropertyChangedImpl, IDisposable
@@ -117,7 +112,7 @@ namespace CommonControls.PackFileBrowser
         {
             // using command parmeter to get node causes memory leaks, using selected node for now
             if (SelectedItem != null && SelectedItem.NodeType == NodeType.File)
-                FileOpen?.Invoke(SelectedItem.Item as PackFile); 
+                FileOpen?.Invoke(SelectedItem.Item ); 
         }
 
         private void ContainerUpdated(PackFileContainer pf)

@@ -59,7 +59,7 @@ namespace FileTypesTests.PackFiles
 
 
             var file = packFileService.FindFile(@"fx\cardcaps.txt");
-            PackFile concretFile = file as PackFile;
+            PackFile concretFile = file ;
             var s = Encoding.UTF8.GetString(concretFile.DataSource.ReadData());
 
 

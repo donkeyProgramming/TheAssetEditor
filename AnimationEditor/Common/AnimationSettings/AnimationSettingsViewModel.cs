@@ -1,4 +1,5 @@
 ﻿using Common;
+using CommonControls.Common;
 using CommonControls.MathViews;
 using System;
 using System.Collections.Generic;

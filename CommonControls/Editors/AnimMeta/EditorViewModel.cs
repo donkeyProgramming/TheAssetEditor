@@ -1,5 +1,4 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.Editors.AnimMeta.View;
 using CommonControls.FileTypes.DB;
 using CommonControls.FileTypes.MetaData;
@@ -30,7 +29,7 @@ namespace CommonControls.Editors.AnimMeta
         public string DisplayName { get => _displayName; set => SetAndNotify(ref _displayName, value); }
 
         PackFile _file;
-        public IPackFile MainFile { get => _file; set => Initialise(value); }
+        public PackFile MainFile { get => _file; set => Initialise(value); }
 
 
         public ObservableCollection<MetaDataTagItemViewModel> Tags { get; set; } = new ObservableCollection<MetaDataTagItemViewModel>();  
@@ -45,9 +44,9 @@ namespace CommonControls.Editors.AnimMeta
             _schemaManager = schemaManager;
         }
 
-        void Initialise(IPackFile file)
+        void Initialise(PackFile file)
         {
-            _file = file as PackFile;
+            _file = file;
             DisplayName = file.Name;
 
             var fileContent = _file.DataSource.ReadData();

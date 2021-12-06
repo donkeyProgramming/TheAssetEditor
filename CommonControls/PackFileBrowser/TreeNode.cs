@@ -1,4 +1,5 @@
 ﻿using Common;
+using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace CommonControls.PackFileBrowser
     public class TreeNode : NotifyPropertyChangedImpl
     {
         public PackFileContainer FileOwner { get; set; }
-        public IPackFile Item { get; set; }
+        public PackFile Item { get; set; }
 
         bool _isExpanded = false;
         public bool IsNodeExpanded
@@ -49,7 +50,7 @@ namespace CommonControls.PackFileBrowser
 
         string _name = "";
         public string Name { get => _name; set => SetAndNotify(ref _name, value); }
-        public TreeNode(string name, NodeType type, PackFileContainer ower, TreeNode parent, IPackFile packFile = null)
+        public TreeNode(string name, NodeType type, PackFileContainer ower, TreeNode parent, PackFile packFile = null)
         {
             Name = name;
             NodeType = type;

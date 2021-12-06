@@ -1,4 +1,4 @@
-﻿using Common;
+﻿using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
@@ -25,7 +25,7 @@ namespace KitbasherEditor.Services
         AnimationControllerViewModel _animationView;
         SceneManager _sceneManager;
 
-        public KitbashSceneCreator(PackFileService packFileService, ResourceLibary resourceLibary, AnimationControllerViewModel animationView, SceneManager sceneManager, IPackFile mainFile)
+        public KitbashSceneCreator(PackFileService packFileService, ResourceLibary resourceLibary, AnimationControllerViewModel animationView, SceneManager sceneManager, PackFile mainFile)
         {
             _packFileService = packFileService;
             _resourceLibary = resourceLibary;

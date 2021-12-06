@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using View3D.SceneNodes;
-using static CommonControls.ErrorListDialog.ErrorListViewModel;
+using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 
 namespace View3D.Utility
 {

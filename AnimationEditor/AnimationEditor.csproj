@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CommonControls\CommonControls.csproj" />
-    <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\View3D\View3D.csproj" />
   </ItemGroup>
 

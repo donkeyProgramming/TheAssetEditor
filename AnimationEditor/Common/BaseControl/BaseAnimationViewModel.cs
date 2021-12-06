@@ -37,7 +37,7 @@ namespace AnimationEditor.PropCreator.ViewModels
         protected SkeletonAnimationLookUpHelper _skeletonHelper;
         protected SchemaManager _schemaManager;
         public string DisplayName { get; set; } = "Creator";
-        public IPackFile MainFile { get; set; }
+        public PackFile MainFile { get; set; }
 
         protected IToolFactory _toolFactory;
         SceneContainer _scene;

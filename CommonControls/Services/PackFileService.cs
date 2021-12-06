@@ -1,5 +1,4 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using Serilog;
 using System;
@@ -79,7 +78,7 @@ namespace CommonControls.Services
                     {
                         var fileExtention = Path.GetExtension(file.Key);
                         if (fileExtention == extention)
-                            output.Add(new ValueTuple<string, PackFile>(file.Key, file.Value as PackFile));
+                            output.Add(new ValueTuple<string, PackFile>(file.Key, file.Value ));
                     }
                 }
             }
@@ -89,7 +88,7 @@ namespace CommonControls.Services
                 {
                     var fileExtention = Path.GetExtension(file.Key);
                     if (fileExtention == extention)
-                        output.Add(new ValueTuple<string, PackFile>(file.Key, file.Value as PackFile));
+                        output.Add(new ValueTuple<string, PackFile>(file.Key, file.Value ));
                 }
             }
 
@@ -102,7 +101,7 @@ namespace CommonControls.Services
             _logger.Here().Information($"Searching for : '{searchStr}'");
 
             var filesWithResult = new List<KeyValuePair<string,string>>();
-            var files = Database.PackFiles.SelectMany(x => x.FileList.Select(x=>((x.Value as PackFile).DataSource as PackedFileSource).Parent.FilePath)).Distinct().ToList();
+            var files = Database.PackFiles.SelectMany(x => x.FileList.Select(x=>((x.Value ).DataSource as PackedFileSource).Parent.FilePath)).Distinct().ToList();
 
             var indexLock = new object();
             int currentPackFileIndex = 0;
@@ -135,7 +134,7 @@ namespace CommonControls.Services
 
                               foreach (var packFile in pfc.FileList.Values)
                               {
-                                  var pf = packFile as PackFile;
+                                  var pf = packFile ;
                                   var ds = pf.DataSource as PackedFileSource;
                                   var bytes = ds.ReadDataForFastSearch(fileStram);
                                   var str = Encoding.ASCII.GetString(bytes);
@@ -174,7 +173,7 @@ namespace CommonControls.Services
                     foreach (var file in pf.FileList)
                     {
                         if (file.Key.IndexOf(dir) == 0)
-                            output.Add(file.Value as PackFile);
+                            output.Add(file.Value );
                     }
                 }
             }
@@ -183,7 +182,7 @@ namespace CommonControls.Services
                 foreach (var file in packFileContainer.FileList)
                 {
                     if (file.Key.IndexOf(dir) == 0)
-                        output.Add(file.Value as PackFile);
+                        output.Add(file.Value );
                 }
             }
 
@@ -308,7 +307,7 @@ namespace CommonControls.Services
         }
 
 
-        public void AddFileToPack(PackFileContainer container, string directoryPath, IPackFile newFile)
+        public void AddFileToPack(PackFileContainer container, string directoryPath, PackFile newFile)
         {
             if (container.IsCaPackFile)
                 throw new Exception("Can not add files to ca pack file");
@@ -321,7 +320,7 @@ namespace CommonControls.Services
             _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, container);
             _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, container);
 
-            Database.TriggerPackFileAdded(container, new List<PackFile>() { newFile as PackFile });
+            Database.TriggerPackFileAdded(container, new List<PackFile>() { newFile  });
         }
 
         public void AddFilesToPack(PackFileContainer container, List<string> directoryPaths, List<PackFile> newFiles)
@@ -352,11 +351,11 @@ namespace CommonControls.Services
             var lowerPath = path.ToLower();
             if (source.FileList.ContainsKey(lowerPath))
             {
-                var file = source.FileList[lowerPath] as PackFile;
+                var file = source.FileList[lowerPath] ;
                 var newFile = new PackFile(file.Name, file.DataSource);
                 target.FileList[lowerPath] = newFile;
 
-                Database.TriggerPackFileAdded(target, new List<PackFile>() { newFile as PackFile });
+                Database.TriggerPackFileAdded(target, new List<PackFile>() { newFile  });
             }
         }
 
@@ -407,7 +406,7 @@ namespace CommonControls.Services
             return true;
         }
 
-        public PackFileContainer GetPackFileContainer(IPackFile file)
+        public PackFileContainer GetPackFileContainer(PackFile file)
         {
             foreach (var pf in Database.PackFiles)
             {
@@ -449,7 +448,7 @@ namespace CommonControls.Services
             }
         }
 
-        public void DeleteFile(PackFileContainer pf, IPackFile file)
+        public void DeleteFile(PackFileContainer pf, PackFile file)
         {
             if (pf.IsCaPackFile)
                 throw new Exception("Can not add files to ca pack file");
@@ -457,13 +456,13 @@ namespace CommonControls.Services
             var key = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
             _logger.Here().Information($"Deleting file {key}");
 
-            Database.TriggerPackFileRemoved(pf, new List<PackFile>() { file as PackFile });
+            Database.TriggerPackFileRemoved(pf, new List<PackFile>() { file  });
             pf.FileList.Remove(key);
         }
 
         // Modify
         // ---------------------------
-        public void RenameFile(PackFileContainer pf, IPackFile file, string newName)
+        public void RenameFile(PackFileContainer pf, PackFile file, string newName)
         {
             if (pf.IsCaPackFile)
                 throw new Exception("Can not add files to ca pack file");
@@ -475,7 +474,7 @@ namespace CommonControls.Services
             file.Name = newName;
             pf.FileList[dir + "\\" + file.Name] = file;
 
-            Database.TriggerPackFilesUpdated(pf, new List<PackFile>() { file as PackFile });
+            Database.TriggerPackFilesUpdated(pf, new List<PackFile>() { file });
         }
 
         public void SaveFile(PackFile file, byte[] data)
@@ -485,7 +484,7 @@ namespace CommonControls.Services
             if (pf.IsCaPackFile)
                 throw new Exception("Can not add files to ca pack file");
             file.DataSource = new MemorySource(data);
-            Database.TriggerPackFilesUpdated(pf, new List<PackFile>() { file as PackFile });
+            Database.TriggerPackFilesUpdated(pf, new List<PackFile>() { file });
         }
 
         public void Save(PackFileContainer pf, string path, bool createBackup)
@@ -517,7 +516,7 @@ namespace CommonControls.Services
             {
                 if (Database.PackFiles[i].FileList.ContainsKey(lowerPath))
                 {
-                    return Database.PackFiles[i].FileList[lowerPath] as PackFile;
+                    return Database.PackFiles[i].FileList[lowerPath] ;
                 }
             }
             _logger.Here().Warning($"File not found");
@@ -532,7 +531,7 @@ namespace CommonControls.Services
             if (container.FileList.ContainsKey(lowerPath))
             {
                 _logger.Here().Information($"File found");
-                return container.FileList[lowerPath] as PackFile;
+                return container.FileList[lowerPath] ;
             }
 
             _logger.Here().Warning($"File not found");

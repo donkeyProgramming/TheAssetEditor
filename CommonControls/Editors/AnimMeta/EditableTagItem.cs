@@ -1,5 +1,4 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.MathViews;
 using Filetypes.ByteParsing;
 using GalaSoft.MvvmLight.CommandWpf;

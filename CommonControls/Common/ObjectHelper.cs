@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
-namespace Common
+namespace CommonControls.Common
 {
     public class ObjectHelper
     {

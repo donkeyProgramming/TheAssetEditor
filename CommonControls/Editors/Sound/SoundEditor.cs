@@ -8,7 +8,6 @@ using Newtonsoft.Json.Serialization;
 using System.Reflection;
 using Newtonsoft.Json;
 using System.Collections;
-using Common;
 using Serilog;
 using System.Timers;
 using System.IO;
@@ -16,6 +15,7 @@ using System.Text;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.Sound;
 using CommonControls.FileTypes.Sound.WWise;
+using CommonControls.Common;
 
 namespace CommonControls.Editors.Sound
 {

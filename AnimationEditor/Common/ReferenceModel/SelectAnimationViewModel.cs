@@ -1,8 +1,5 @@
-﻿using Common;
-using CommonControls.FileTypes.PackFiles.Models;
+﻿using CommonControls.Common;
 using CommonControls.Services;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using static CommonControls.FilterDialog.FilterUserControl;
@@ -48,7 +45,7 @@ namespace AnimationEditor.Common.ReferenceModel
         {
             if (!string.IsNullOrWhiteSpace(selectedSkeletonPath))
             {
-                var skeletonPackFile = _pfs.FindFile(selectedSkeletonPath) as PackFile;
+                var skeletonPackFile = _pfs.FindFile(selectedSkeletonPath) ;
                 if (skeletonPackFile != null)
                 {
                     AnimationsForCurrentSkeleton = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(Path.GetFileNameWithoutExtension(skeletonPackFile.Name));

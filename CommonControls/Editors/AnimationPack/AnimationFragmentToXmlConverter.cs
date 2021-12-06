@@ -1,6 +1,6 @@
-﻿using CommonControls.Common;
+﻿using CommonControls.BaseDialogs.ErrorListDialog;
+using CommonControls.Common;
 using CommonControls.Editors.TextEditor;
-using CommonControls.ErrorListDialog;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
 using FileTypes.AnimationPack;
@@ -12,7 +12,7 @@ using System.Linq;
 using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
-using static CommonControls.ErrorListDialog.ErrorListViewModel;
+using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 
 namespace CommonControls.Editors.AnimationPack
 {

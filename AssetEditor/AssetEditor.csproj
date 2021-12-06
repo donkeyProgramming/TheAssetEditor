@@ -30,7 +30,6 @@
   <ItemGroup>
     <ProjectReference Include="..\AnimationEditor\AnimationEditor.csproj" />
     <ProjectReference Include="..\CommonControls\CommonControls.csproj" />
-    <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\KitbasherEditor\KitbasherEditor.csproj" />
     <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
     <ProjectReference Include="..\View3D\View3D.csproj" />

@@ -1,4 +1,5 @@
 ﻿using Common;
+using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using System;
@@ -52,12 +53,12 @@ namespace CommonControls.PackFileBrowser
             else
                 CurrentFileName = _selectedNode.Item.Name;
 
-            SelectedFile = _selectedNode.Item as PackFile;
+            SelectedFile = _selectedNode.Item;
         }
 
-        private void ViewModel_FileOpen(IPackFile file)
+        private void ViewModel_FileOpen(PackFile file)
         {
-            SelectedFile = file as PackFile;
+            SelectedFile = file;
             Button_Click(null, null);
         }
 
@@ -97,7 +98,7 @@ namespace CommonControls.PackFileBrowser
                     if (string.IsNullOrWhiteSpace(_selectedNode?.Name) == false)
                     {
                         var fullPath = _selectedNode.GetFullPath();
-                        //var fullPath = _packfileService.GetFullPath(_selectedNode.Item as PackFile, _selectedNode.FileOwner);
+                        //var fullPath = _packfileService.GetFullPath(_selectedNode.Item , _selectedNode.FileOwner);
                         //fullPath = System.IO.Path.GetDirectoryName(fullPath);
                         path = fullPath + "\\";
                     }

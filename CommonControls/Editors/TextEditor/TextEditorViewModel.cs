@@ -26,7 +26,7 @@ namespace CommonControls.Editors.TextEditor
         string _text;
         public string Text { get => _text; set => SetAndNotify(ref _text, value); }
 
-        IPackFile _packFile;
+        PackFile _packFile;
         PackFileService _pf;
 
         ITextEditor _textEditor;
@@ -47,7 +47,7 @@ namespace CommonControls.Editors.TextEditor
             _textEditor.SetSyntaxHighlighting(_converter.GetSyntaxType());
         }
 
-        public IPackFile MainFile
+        public PackFile MainFile
         {
             get => _packFile;
             set
@@ -57,9 +57,9 @@ namespace CommonControls.Editors.TextEditor
             }
         }
 
-        void SetCurrentPackFile(IPackFile packedFile)
+        void SetCurrentPackFile(PackFile packedFile)
         {
-            PackFile file = packedFile as PackFile;
+            PackFile file = packedFile ;
             DisplayName = file.Name;
 
             byte[] data = file.DataSource.ReadData();
@@ -68,7 +68,7 @@ namespace CommonControls.Editors.TextEditor
 
         public bool Save()
         {
-            var path = _pf.GetFullPath(MainFile as PackFile);
+            var path = _pf.GetFullPath(MainFile );
 
             var bytes = _converter.ToBytes(Text, path, _pf, out var error);
             if (bytes == null || error != null)
@@ -87,7 +87,7 @@ namespace CommonControls.Editors.TextEditor
                 }
             }
 
-            var res = SaveHelper.Save(_pf, path, MainFile as PackFile, bytes);
+            var res = SaveHelper.Save(_pf, path, MainFile , bytes);
             if (res != null)
                 MainFile = res;
             return false;

@@ -1,5 +1,4 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 
@@ -41,7 +40,7 @@ namespace View3D.Services
         {
             try
             {
-                var inputFile = _editorViewModel.MainFile as PackFile;
+                var inputFile = _editorViewModel.MainFile ;
                 byte[] bytes = GetBytesToSave();
                 var path = _packFileService.GetFullPath(inputFile);
                 var res = SaveHelper.Save(_packFileService, path, inputFile, bytes);
@@ -59,7 +58,7 @@ namespace View3D.Services
         {
             try
             {
-                var inputFile = _editorViewModel.MainFile as PackFile;
+                var inputFile = _editorViewModel.MainFile ;
                 byte[] bytes = GetBytesToSave();
 
                 using (var browser = new SavePackFileWindow(_packFileService))
@@ -220,7 +219,7 @@ namespace View3D.Services
                         onlySaveVisible = true;
                 }
 
-                var modelFile = _editorViewModel.MainFile as PackFile;
+                var modelFile = _editorViewModel.MainFile ;
                 var modelFilePath = _packFileService.GetFullPath(modelFile);
                 var wsModelPath = Path.ChangeExtension(modelFilePath, ".wsmodel");
 
@@ -230,7 +229,7 @@ namespace View3D.Services
                 if (wsModelGeneratedPerfectly == false)
                     MessageBox.Show("Unable to correclty generate WS model, this file needs manual work before its can be used by the game!");
 
-                SaveHelper.Save(_packFileService, wsModelPath, existingWsModelFile as PackFile, Encoding.UTF8.GetBytes(wsModelData));
+                SaveHelper.Save(_packFileService, wsModelPath, existingWsModelFile , Encoding.UTF8.GetBytes(wsModelData));
             }
             catch (Exception e)
             {

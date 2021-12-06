@@ -1,16 +1,13 @@
-﻿using Common;
+﻿using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using CommonControls.Simple;
 using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Text;
 using System.Windows;
 using System.Windows.Input;
 
@@ -81,7 +78,7 @@ namespace CommonControls.PackFileBrowser
             }
             else if (_selectedNode.NodeType == NodeType.File)
             {
-                TextInputWindow window = new TextInputWindow("Rename file", _selectedNode.Item.Name);
+                var window = new TextInputWindow("Rename file", _selectedNode.Item.Name);
                 if (window.ShowDialog() == true)
                     _packFileService.RenameFile(_selectedNode.FileOwner, _selectedNode.Item, window.TextValue);
             }
@@ -134,7 +131,7 @@ namespace CommonControls.PackFileBrowser
             var extention = Path.GetExtension(_selectedNode.Name);
             var newName = fileName + "_copy" + extention;
 
-            var bytes = (_selectedNode.Item as PackFile).DataSource.ReadData();
+            var bytes = (_selectedNode.Item ).DataSource.ReadData();
             var packFile = new PackFile(newName, new MemorySource(bytes));
 
             var parentPath = _selectedNode.GetFullPath();
@@ -220,7 +217,7 @@ namespace CommonControls.PackFileBrowser
         {
             if (_selectedNode.Item != null)
             {
-                var path = _packFileService.GetFullPath(_selectedNode.Item as PackFile);
+                var path = _packFileService.GetFullPath(_selectedNode.Item );
                 Clipboard.SetText(path);
             }
         }
