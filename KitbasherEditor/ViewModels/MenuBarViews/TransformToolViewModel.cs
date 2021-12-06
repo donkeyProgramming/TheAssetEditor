@@ -1,17 +1,13 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.MathViews;
 using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using System.ComponentModel;
-using System.Linq;
 using System.Windows.Input;
-using View3D.Commands.Vertex;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Components.Gizmo;
-using View3D.Rendering.Geometry;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {

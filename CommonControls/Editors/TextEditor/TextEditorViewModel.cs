@@ -1,10 +1,7 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using GalaSoft.MvvmLight.CommandWpf;
-using System;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 

@@ -1,10 +1,6 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.Editors.AnimMeta.View;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CommonControls.Editors.AnimMeta
 {

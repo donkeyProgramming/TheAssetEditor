@@ -1,11 +1,6 @@
-﻿using Common;
-using MonoGame.Framework.WpfInterop;
-using Serilog;
-using System;
+﻿using MonoGame.Framework.WpfInterop;
 using System.Collections.Generic;
-using System.Text;
 using View3D.Components.Component.Selection;
-using View3D.Rendering;
 using View3D.Rendering.Geometry;
 
 namespace View3D.Commands.Face

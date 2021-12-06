@@ -1,5 +1,4 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.MathViews;
 using System.Collections.ObjectModel;
 

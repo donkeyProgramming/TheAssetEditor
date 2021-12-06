@@ -1,11 +1,7 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.FileTypes.RigidModel.MaterialHeaders;
 using CommonControls.Services;
-using GalaSoft.MvvmLight.CommandWpf;
 using MonoGame.Framework.WpfInterop;
-using System.Text;
-using System.Windows.Input;
 using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2

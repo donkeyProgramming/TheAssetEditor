@@ -1,8 +1,5 @@
-﻿using Common;
-using CommonControls.Common;
-using System;
+﻿using CommonControls.Common;
 using System.Collections.Generic;
-using System.Text;
 using System.Windows.Media;
 
 namespace TextureEditor.ViewModels

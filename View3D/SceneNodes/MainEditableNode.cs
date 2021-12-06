@@ -1,5 +1,4 @@
-﻿using Common;
-using CommonControls.FileTypes.PackFiles.Models;
+﻿using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 
 namespace View3D.SceneNodes

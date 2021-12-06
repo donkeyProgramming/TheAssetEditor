@@ -1,5 +1,4 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using Microsoft.Xna.Framework;
 using System.Collections.ObjectModel;
 using System.Diagnostics;

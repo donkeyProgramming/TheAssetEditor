@@ -1,8 +1,4 @@
-﻿using Common;
-using CommonControls.Common;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using CommonControls.Common;
 using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews

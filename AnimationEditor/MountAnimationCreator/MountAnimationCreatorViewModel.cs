@@ -1,17 +1,9 @@
 ﻿using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
-using Common;
 using CommonControls.Common;
 using CommonControls.FileTypes.DB;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-
-using System.Text;
-using View3D.Components.Component.Selection;
-using View3D.Utility;
 
 namespace AnimationEditor.MountAnimationCreator
 {

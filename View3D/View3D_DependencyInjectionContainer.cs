@@ -1,10 +1,5 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using View3D.Scene;
 
 namespace View3D
 {

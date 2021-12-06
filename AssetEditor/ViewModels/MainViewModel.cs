@@ -1,12 +1,10 @@
 ﻿using AssetEditor.Views.Settings;
-using Common.GameInformation;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.DB;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
-using CommonControls.Services.GameInformation;
 using GalaSoft.MvvmLight.CommandWpf;
 using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,7 +33,7 @@ namespace AssetEditor.ViewModels
 
         public ICommand CloseToolCommand { get; set; }
 
-        public MainViewModel(MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, GameInformationService gameInformationService, ToolFactory toolFactory, SchemaManager schemaManager)
+        public MainViewModel(MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, ToolFactory toolFactory, SchemaManager schemaManager)
         {
             _packfileService = packfileService;
             _packfileService.Database.BeforePackFileContainerRemoved += Database_BeforePackFileContainerRemoved;

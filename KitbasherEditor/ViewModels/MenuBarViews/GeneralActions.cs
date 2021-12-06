@@ -1,19 +1,10 @@
-﻿using Common;
-using CommonControls.Common;
-using CommonControls.PackFileBrowser;
-using GalaSoft.MvvmLight.CommandWpf;
-using KitbasherEditor.Services;
+﻿using CommonControls.Common;
 using MonoGame.Framework.WpfInterop;
-using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
-using View3D.Commands.Object;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Components.Rendering;
-using View3D.SceneNodes;
 using View3D.Services;
-using static View3D.Commands.Object.GroupObjectsCommand;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {

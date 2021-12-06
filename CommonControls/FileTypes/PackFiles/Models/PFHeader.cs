@@ -1,9 +1,6 @@
-﻿using Common;
-using FileTypes.ByteParsing;
-using System;
+﻿using FileTypes.ByteParsing;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace CommonControls.FileTypes.PackFiles.Models
 {

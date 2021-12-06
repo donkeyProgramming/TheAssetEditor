@@ -1,11 +1,8 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace AnimationEditor.Common.ReferenceModel
 {

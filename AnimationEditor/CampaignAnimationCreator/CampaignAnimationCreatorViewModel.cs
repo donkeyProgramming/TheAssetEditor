@@ -1,13 +1,7 @@
-﻿using AnimationEditor.Common.ReferenceModel;
-using AnimationEditor.PropCreator.ViewModels;
-using Common;
+﻿using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.Common;
 using CommonControls.FileTypes.DB;
 using CommonControls.Services;
-using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AnimationEditor.CampaignAnimationCreator
 {

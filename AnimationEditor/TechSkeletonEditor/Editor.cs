@@ -1,5 +1,4 @@
 ﻿using AnimationEditor.Common.ReferenceModel;
-using Common;
 using CommonControls.Common;
 using CommonControls.FileTypes.Animation;
 using CommonControls.MathViews;

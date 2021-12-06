@@ -1,10 +1,6 @@
-﻿using AnimationEditor.Common.ReferenceModel;
-using Common;
-using CommonControls.Common;
-using System;
+﻿using CommonControls.Common;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
 using View3D.Animation;
 
 namespace AnimationEditor.Common.ReferenceModel

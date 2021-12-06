@@ -1,10 +1,8 @@
-﻿using Common.GameInformation;
-using Serilog;
+﻿using Serilog;
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json;
-using System.Text;
 using System.Linq;
 using System.IO;
 using System.Windows;
@@ -12,7 +10,7 @@ using System.Reflection;
 using System.Collections;
 using Microsoft.Xna.Framework;
 using CommonControls.Common;
-using CommonControls.Services.GameInformation;
+using CommonControls.Services;
 
 namespace CommonControls.FileTypes.DB
 {

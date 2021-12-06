@@ -1,13 +1,9 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using View3D.Components.Component;
 using View3D.Components.Rendering;
-using View3D.Rendering;
 using View3D.Rendering.Geometry;
 
 namespace View3D.SceneNodes

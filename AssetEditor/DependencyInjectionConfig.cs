@@ -2,7 +2,6 @@
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
-using Common.GameInformation;
 using CommonControls.Common;
 using CommonControls.Editors.AnimationFilePreviewEditor;
 using CommonControls.Editors.AnimationPack;
@@ -14,7 +13,6 @@ using CommonControls.FileTypes.DB;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Resources;
 using CommonControls.Services;
-using CommonControls.Services.GameInformation;
 using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -47,7 +45,6 @@ namespace AssetEditor
             services.AddSingleton<PackFileDataBase>();
             services.AddSingleton<SkeletonAnimationLookUpHelper>();
 
-            services.AddTransient<GameInformationService>();
             services.AddTransient<MainWindow>();
             services.AddTransient<MainViewModel>();
             services.AddTransient<SettingsWindow>();

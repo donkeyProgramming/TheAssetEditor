@@ -1,13 +1,5 @@
-﻿using Common;
-using MonoGame.Framework.WpfInterop;
-using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using View3D.Components.Component;
+﻿using MonoGame.Framework.WpfInterop;
 using View3D.Components.Component.Selection;
-using View3D.Rendering;
 using View3D.SceneNodes;
 
 namespace View3D.Commands.Object

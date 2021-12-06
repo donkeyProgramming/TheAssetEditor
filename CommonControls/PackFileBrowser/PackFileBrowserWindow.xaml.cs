@@ -1,10 +1,6 @@
-﻿using Common;
-using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
+﻿using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows;
 using System.Windows.Input;
 

@@ -1,14 +1,9 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.MathViews;
 using CommonControls.Services;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
 using View3D.Animation;
 using View3D.SceneNodes;
-using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {

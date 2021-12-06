@@ -1,18 +1,12 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.PackFileBrowser;
 using GalaSoft.MvvmLight.CommandWpf;
-using KitbasherEditor.Services;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Windows.Input;
 using View3D.Commands.Object;
 using View3D.Components.Component;
 using View3D.SceneNodes;
-using static View3D.Commands.Object.GroupObjectsCommand;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {

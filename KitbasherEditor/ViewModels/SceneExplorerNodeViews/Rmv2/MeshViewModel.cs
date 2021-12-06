@@ -1,5 +1,4 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.RigidModel.MaterialHeaders;
 using CommonControls.MathViews;
@@ -8,7 +7,6 @@ using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Input;
 using View3D.Components.Component;
 using View3D.SceneNodes;

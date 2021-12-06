@@ -1,12 +1,9 @@
-﻿using Common;
-using CommonControls.FileTypes.PackFiles.Models;
+﻿using CommonControls.FileTypes.PackFiles.Models;
 using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CommonControls.FileTypes.AnimationPack
 {

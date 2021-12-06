@@ -1,6 +1,4 @@
-﻿using Common;
-using CommonControls.FileTypes;
-using Filetypes.ByteParsing;
+﻿using Filetypes.ByteParsing;
 using System;
 using System.Runtime.InteropServices;
 using System.Text;

@@ -1,9 +1,6 @@
-﻿using Common;
-using CommonControls.Common;
-using GalaSoft.MvvmLight.CommandWpf;
+﻿using CommonControls.Common;
 using MonoGame.Framework.WpfInterop;
 using System;
-using System.Windows.Input;
 using View3D.Components.Component.Selection;
 using View3D.Components.Gizmo;
 

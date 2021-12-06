@@ -1,5 +1,4 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.FileTypes.DB;
 using CommonControls.FileTypes.MetaData;
 using CommonControls.Services;
@@ -14,9 +13,6 @@ namespace AssetEditor.Services
 {
     class AnimMetaBatchProcessor
     {
-
-
-
         class Entry
         {
             //public string FileName { get; set; }

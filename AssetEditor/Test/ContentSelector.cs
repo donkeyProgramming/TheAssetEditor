@@ -1,16 +1,12 @@
-﻿using AssetEditor.Services;
-using AssetEditor.ViewModels;
-using Common;
-using CommonControls.Common;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using CommonControls.Common;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace AssetEditor.Test
 {
+    RYDD MEG!
+
     public class DeviceTypeSelector : DataTemplateSelector
     {
         public DataTemplate DefaultTemplate { get; set; }

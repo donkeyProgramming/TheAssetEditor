@@ -1,12 +1,10 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.MathViews;
 using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using View3D.Animation;
 using View3D.Commands.Object;
 using View3D.Components.Component;

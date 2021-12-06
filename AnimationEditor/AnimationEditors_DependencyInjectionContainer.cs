@@ -2,16 +2,10 @@
 using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.Common.BaseControl;
 using AnimationEditor.MountAnimationCreator;
-using AnimationEditor.PropCreator;
-using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SuperView;
 using AnimationEditor.TechSkeletonEditor;
-using Common;
 using CommonControls.Common;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AnimationEditor
 {

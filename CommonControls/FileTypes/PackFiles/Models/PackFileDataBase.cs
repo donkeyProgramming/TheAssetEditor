@@ -1,9 +1,5 @@
-﻿using Common;
-using CommonControls.Common;
-using System;
+﻿using CommonControls.Common;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
 
 namespace CommonControls.FileTypes.PackFiles.Models
 {
