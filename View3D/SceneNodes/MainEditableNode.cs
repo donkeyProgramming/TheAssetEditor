@@ -1,15 +1,5 @@
 ﻿using Common;
-using Filetypes.RigidModel;
-using Filetypes.RigidModel.LodHeader;
-using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Text;
-using View3D.Animation;
-using View3D.Services;
+using CommonControls.FileTypes.RigidModel;
 
 namespace View3D.SceneNodes
 {

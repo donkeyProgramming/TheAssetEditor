@@ -1,9 +1,7 @@
 ﻿using CommonControls.Editors.TextEditor;
+using CommonControls.FileTypes.Animation;
 using CommonControls.Services;
 using Filetypes.ByteParsing;
-using Filetypes.RigidModel;
-using FileTypes.Animation;
-using FileTypes.RigidModel;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

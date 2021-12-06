@@ -1,8 +1,8 @@
 ﻿using CommonControls.Common;
 using CommonControls.Editors.TextEditor;
+using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
 using Filetypes.ByteParsing;
-using FileTypes.AnimationPack;
 using System;
 using System.Collections.Generic;
 using System.IO;

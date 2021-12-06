@@ -1,13 +1,10 @@
 ﻿using Common;
-using Common.ApplicationSettings;
 using CommonControls.Common;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
-using FileTypes.DB;
-using FileTypes.PackFiles.Models;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
-using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;

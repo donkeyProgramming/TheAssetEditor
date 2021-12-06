@@ -1,10 +1,6 @@
-﻿using CommonControls.Services;
-using FileTypes.PackFiles.Models;
+﻿using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.Services;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace FileTypesTests.PackFiles

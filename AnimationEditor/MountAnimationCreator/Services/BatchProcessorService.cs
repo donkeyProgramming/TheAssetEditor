@@ -1,15 +1,12 @@
 ﻿using CommonControls.Common;
 using CommonControls.ErrorListDialog;
+using CommonControls.FileTypes.Animation;
+using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
-using Filetypes.Animation;
-using Filetypes.RigidModel;
 using FileTypes.AnimationPack;
-using FileTypes.PackFiles.Models;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using View3D.Animation;
 
 namespace AnimationEditor.MountAnimationCreator.Services

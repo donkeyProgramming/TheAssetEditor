@@ -1,30 +1,13 @@
-﻿
-using Common;
+﻿using Common;
 using CommonControls.Common;
+using CommonControls.FileTypes.DB;
+using CommonControls.FileTypes.MetaData;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using CommonControls.Table;
-using Filetypes.RigidModel;
-using FileTypes.DB;
-using FileTypes.MetaData;
-using FileTypes.MetaData.Instances;
-using FileTypes.PackFiles.Models;
-using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Text;
 using View3D.Animation;
-using View3D.Animation.AnimationChange;
 using View3D.Animation.MetaData;
-using View3D.Components.Component;
-using View3D.SceneNodes;
-using View3D.Services;
-using View3D.Utility;
-using static CommonControls.FilterDialog.FilterUserControl;
 
 namespace AnimationEditor.Common.ReferenceModel
 {

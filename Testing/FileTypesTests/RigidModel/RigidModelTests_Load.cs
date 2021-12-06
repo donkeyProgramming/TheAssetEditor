@@ -1,14 +1,4 @@
-﻿using CommonControls.Services;
-using Filetypes.RigidModel;
-using FileTypes.PackFiles.Models;
-using FileTypesTests.Util;
-using Microsoft.Xna.Framework;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using View3D.SceneNodes;
+﻿using NUnit.Framework;
 
 namespace FileTypesTests.RigidModel
 {

@@ -1,13 +1,10 @@
 ﻿using Common;
+using CommonControls.FileTypes.Animation;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using Filetypes.Animation;
-using Filetypes.RigidModel;
-using FileTypes.PackFiles.Models;
 using GalaSoft.MvvmLight.CommandWpf;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -15,7 +12,6 @@ using System.Windows.Input;
 using View3D.Animation;
 using View3D.Components.Component;
 using View3D.SceneNodes;
-using View3D.Utility;
 using static CommonControls.FilterDialog.FilterUserControl;
 using static CommonControls.Services.SkeletonAnimationLookUpHelper;
 

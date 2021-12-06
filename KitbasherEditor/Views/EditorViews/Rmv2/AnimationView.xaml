@@ -6,7 +6,6 @@
              xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews.Rmv2"
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls" 
              xmlns:simple="clr-namespace:CommonControls.Simple;assembly=CommonControls"
-             xmlns:enumValue="clr-namespace:Filetypes.RigidModel;assembly=FileTypes"
              xmlns:s="http://schemas.singulink.com/xaml"
               xmlns:System="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 

@@ -1,10 +1,10 @@
 ﻿using Common;
 using CommonControls.Common;
 using CommonControls.ErrorListDialog;
+using CommonControls.FileTypes.Animation;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using CommonControls.Simple;
-using Filetypes.Animation;
-using FileTypes.PackFiles.Models;
 using Serilog;
 using System;
 using System.Collections.Generic;

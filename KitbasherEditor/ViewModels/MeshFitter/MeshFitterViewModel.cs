@@ -1,16 +1,14 @@
 ﻿using CommonControls.Common;
 using CommonControls.Editors.BoneMapping;
+using CommonControls.FileTypes.Animation;
 using CommonControls.MathViews;
 using CommonControls.Services;
-using Filetypes.Animation;
-using Filetypes.RigidModel;
 using KitbasherEditor.Views.EditorViews.MeshFitter;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using View3D.Animation;
 using View3D.Commands.Object;

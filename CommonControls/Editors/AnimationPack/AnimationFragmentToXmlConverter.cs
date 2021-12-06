@@ -1,6 +1,7 @@
 ﻿using CommonControls.Common;
 using CommonControls.Editors.TextEditor;
 using CommonControls.ErrorListDialog;
+using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
 using FileTypes.AnimationPack;
 using System;

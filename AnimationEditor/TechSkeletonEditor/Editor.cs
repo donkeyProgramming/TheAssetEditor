@@ -1,19 +1,13 @@
-﻿using AnimationEditor.Common.AnimationPlayer;
-using AnimationEditor.Common.ReferenceModel;
+﻿using AnimationEditor.Common.ReferenceModel;
 using Common;
 using CommonControls.Common;
+using CommonControls.FileTypes.Animation;
 using CommonControls.MathViews;
 using CommonControls.Services;
-using Filetypes.Animation;
-using Filetypes.RigidModel;
-using FileTypes.DB;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
 using System.Windows;
 using View3D.Animation;
-using View3D.Scene;
 
 namespace AnimationEditor.TechSkeletonEditor
 {

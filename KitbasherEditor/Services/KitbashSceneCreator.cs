@@ -1,12 +1,10 @@
 ﻿using Common;
+using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
-using Filetypes.RigidModel;
-using FileTypes.PackFiles.Models;
-using FileTypes.RigidModel;
 using KitbasherEditor.ViewModels;
 using Serilog;
 using System.Collections.Generic;
-using System.Linq;
 using View3D.Components.Component;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;

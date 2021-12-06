@@ -1,8 +1,8 @@
 ﻿using CommonControls.Common;
 using CommonControls.Editors.TextEditor;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using Filetypes.ByteParsing;
-using FileTypes.PackFiles.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
-using static Filetypes.RigidModel.VariantMeshDefinition;
+using static CommonControls.FileTypes.RigidModel.VariantMeshDefinition;
 
 namespace CommonControls.Editors.VariantMeshDefinition
 {

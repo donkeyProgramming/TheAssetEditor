@@ -11,10 +11,10 @@ using Common.ApplicationSettings;
 using Common.GameInformation;
 using CommonControls.Common;
 using CommonControls.Editors.AnimationBatchExporter;
+using CommonControls.FileTypes.AnimationPack;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using CommonControls.Simple;
-using FileTypes.AnimationPack;
-using FileTypes.PackFiles.Models;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -159,8 +159,8 @@ namespace AssetEditor.ViewModels
                 }
 
                 // Create dummy data
-                var animPack = new FileTypes.AnimationPack.AnimationPackFile(filePath);
-                animPack.AnimationBin = new FileTypes.AnimationPack.AnimationBin(binPath);
+                var animPack = new AnimationPackFile(filePath);
+                animPack.AnimationBin = new AnimationBin(binPath);
                 animPack.AnimationBin.AnimationTableEntries.Add(
                     new AnimationBinEntry("ExampleDbRef", "ExampleSkeleton")
                     {

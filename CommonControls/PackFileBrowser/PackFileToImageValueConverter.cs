@@ -1,8 +1,5 @@
 ﻿using CommonControls.Resources;
-using FileTypes.PackFiles.Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 

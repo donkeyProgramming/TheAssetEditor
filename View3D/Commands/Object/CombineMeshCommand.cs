@@ -1,22 +1,10 @@
-﻿using Common;
-using CommonControls.Common;
-using Filetypes.RigidModel;
-using Microsoft.Xna.Framework;
+﻿using CommonControls.Common;
 using MonoGame.Framework.WpfInterop;
-using Serilog;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using View3D.Components;
-using View3D.Components.Component;
 using View3D.Components.Component.Selection;
-using View3D.Rendering;
 using View3D.Rendering.Geometry;
-using View3D.Rendering.Shading;
 using View3D.SceneNodes;
-using View3D.Services;
-using View3D.Utility;
 
 namespace View3D.Commands.Object
 {

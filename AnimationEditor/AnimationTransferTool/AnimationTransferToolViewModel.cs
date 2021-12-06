@@ -2,8 +2,8 @@
 using AnimationEditor.PropCreator.ViewModels;
 using Common;
 using CommonControls.Common;
+using CommonControls.FileTypes.DB;
 using CommonControls.Services;
-using FileTypes.DB;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;

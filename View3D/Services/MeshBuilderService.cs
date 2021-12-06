@@ -1,6 +1,5 @@
-﻿using Filetypes.RigidModel;
-using Filetypes.RigidModel.Transforms;
-using Filetypes.RigidModel.Vertex;
+﻿using CommonControls.FileTypes.RigidModel;
+using CommonControls.FileTypes.RigidModel.Vertex;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;

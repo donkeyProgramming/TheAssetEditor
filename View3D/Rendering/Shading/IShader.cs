@@ -1,4 +1,4 @@
-﻿using Filetypes.RigidModel;
+﻿using CommonControls.FileTypes.RigidModel.Types;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;

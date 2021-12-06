@@ -1,8 +1,7 @@
 ﻿using Common;
 using CommonControls.Common;
+using CommonControls.FileTypes.MetaData;
 using Filetypes.ByteParsing;
-using FileTypes.DB;
-using FileTypes.MetaData;
 using Serilog;
 using System;
 using System.Collections.Generic;

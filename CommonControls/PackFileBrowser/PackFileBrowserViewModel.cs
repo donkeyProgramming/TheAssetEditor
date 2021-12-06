@@ -1,8 +1,8 @@
 ﻿using Common;
 using CommonControls.Common;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using CommonControls.Simple;
-using FileTypes.PackFiles.Models;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;

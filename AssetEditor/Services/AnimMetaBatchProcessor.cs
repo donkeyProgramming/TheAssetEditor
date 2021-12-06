@@ -1,8 +1,8 @@
 ﻿using Common;
+using CommonControls.FileTypes.DB;
+using CommonControls.FileTypes.MetaData;
 using CommonControls.Services;
 using Filetypes.ByteParsing;
-using FileTypes.DB;
-using FileTypes.MetaData;
 using System;
 using System.Collections.Generic;
 using System.IO;

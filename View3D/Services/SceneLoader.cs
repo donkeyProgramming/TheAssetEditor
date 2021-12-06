@@ -1,13 +1,10 @@
 ﻿using Common;
 using CommonControls.Editors.VariantMeshDefinition;
+using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
-using Filetypes.RigidModel;
-using FileTypes.PackFiles.Models;
-using FileTypes.RigidModel;
-using Microsoft.Xna.Framework.Graphics;
 using Serilog;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,7 +13,7 @@ using View3D.Animation;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Utility;
-using static Filetypes.RigidModel.VariantMeshDefinition;
+using static CommonControls.FileTypes.RigidModel.VariantMeshDefinition;
 
 namespace View3D.Services
 {
@@ -181,7 +178,7 @@ namespace View3D.Services
                     var lodIndex = materialNode.Attributes.GetNamedItem("lod_index").InnerText;
 
                     var materialFile = _packFileService.FindFile(materialFilePath);
-                    var materialConfig = new WsModelFile(materialFile as PackFile, "");
+                    var materialConfig = new WsModelFile(materialFile, "");
 
                     var mesh = loadedModelNode.GetMeshNode(int.Parse(lodIndex), int.Parse(partIndex));
                     if (mesh == null)

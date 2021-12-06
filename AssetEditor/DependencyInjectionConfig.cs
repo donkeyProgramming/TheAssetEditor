@@ -12,9 +12,10 @@ using CommonControls.Editors.AnimMeta;
 using CommonControls.Editors.CampaignAnimBin;
 using CommonControls.Editors.TextEditor;
 using CommonControls.Editors.VariantMeshDefinition;
+using CommonControls.FileTypes.DB;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Resources;
 using CommonControls.Services;
-using FileTypes.DB;
 using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -44,7 +45,7 @@ namespace AssetEditor
         {
             services.AddSingleton<ApplicationSettingsService>();
             services.AddSingleton<ToolFactory>();
-            services.AddSingleton<FileTypes.PackFiles.Models.PackFileDataBase>();
+            services.AddSingleton<PackFileDataBase>();
             services.AddSingleton<SkeletonAnimationLookUpHelper>();
 
             services.AddTransient<GameInformationService>();

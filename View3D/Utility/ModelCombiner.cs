@@ -1,9 +1,5 @@
-﻿using Filetypes.RigidModel;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using static CommonControls.ErrorListDialog.ErrorListViewModel;
 

@@ -1,14 +1,10 @@
 ﻿using CommonControls.Common;
 using CommonControls.Editors.BoneMapping;
-using Filetypes.Animation;
-using Filetypes.RigidModel;
+using CommonControls.FileTypes.Animation;
 using Microsoft.Xna.Framework;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using View3D.Animation;
-using View3D.Utility;
 
 namespace AnimationEditor.AnimationTransferTool
 {

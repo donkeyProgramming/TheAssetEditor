@@ -1,4 +1,4 @@
-﻿using Filetypes.RigidModel;
+﻿using CommonControls.FileTypes.RigidModel;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Animation;

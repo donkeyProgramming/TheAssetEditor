@@ -1,7 +1,7 @@
 ﻿using Common;
+using CommonControls.FileTypes.RigidModel;
+using CommonControls.FileTypes.RigidModel.MaterialHeaders;
 using CommonControls.MathViews;
-using Filetypes.RigidModel;
-using FileTypes.RigidModel.MaterialHeaders;
 using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;

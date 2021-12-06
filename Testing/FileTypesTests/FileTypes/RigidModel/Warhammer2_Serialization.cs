@@ -1,11 +1,7 @@
-﻿using CommonControls.Services;
-using Filetypes.RigidModel;
-using FileTypes.PackFiles.Models;
-using FileTypes.RigidModel;
+﻿using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.FileTypes.RigidModel;
+using CommonControls.Services;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Services;

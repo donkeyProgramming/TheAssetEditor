@@ -1,6 +1,6 @@
 ﻿using Common;
+using CommonControls.FileTypes.RigidModel.MaterialHeaders;
 using CommonControls.Services;
-using FileTypes.RigidModel.MaterialHeaders;
 using GalaSoft.MvvmLight.CommandWpf;
 using MonoGame.Framework.WpfInterop;
 using System.Text;
@@ -13,14 +13,14 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
     {
         public MeshViewModel Mesh { get; set; }
         public AnimationViewModel Animation { get; set; }
-        public MaterialGeneralView MaterialGeneral { get; set; }
+        public MaterialGeneralViewModel MaterialGeneral { get; set; }
         public WeightedMaterialViewModel Material { get; set; }
 
         public MeshEditorViewModel(Rmv2MeshNode node, PackFileService pfs, SkeletonAnimationLookUpHelper animLookUp, IComponentManager componentManager)
         {
             Mesh = new MeshViewModel(node, componentManager);
             Animation = new AnimationViewModel(node, pfs, animLookUp);
-            MaterialGeneral = new MaterialGeneralView(node, pfs, componentManager);
+            MaterialGeneral = new MaterialGeneralViewModel(node, pfs, componentManager);
 
             if (node.Material is WeightedMaterial)
                 Material = new WeightedMaterialViewModel(node);

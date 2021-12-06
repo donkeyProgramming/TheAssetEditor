@@ -19,8 +19,7 @@ namespace CommonControls.Simple
     {
         public ControllerHostWindow()
         {
-            InitializeComponent();
-            
+            InitializeComponent(); 
         }
 
         public ControllerHostWindow(bool alwaysTopMost)
@@ -33,7 +32,6 @@ namespace CommonControls.Simple
         {
             Window window = (Window)sender;
             window.Topmost = true;
-
         }
     }
 }

@@ -1,11 +1,9 @@
-﻿using CommonControls.Services;
-using Filetypes;
+﻿using CommonControls.FileTypes;
+using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.FileTypes.RigidModel;
+using CommonControls.FileTypes.RigidModel.Vertex;
+using CommonControls.Services;
 using Filetypes.ByteParsing;
-using Filetypes.RigidModel;
-using Filetypes.RigidModel.Vertex;
-using FileTypes.PackFiles.Models;
-using FileTypes.RigidModel;
-using FileTypes.RigidModel.LodHeader;
 using System;
 using System.Collections.Generic;
 using System.IO;

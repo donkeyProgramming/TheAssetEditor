@@ -1,12 +1,4 @@
-﻿using CommonControls.Services;
-using FileTypes.PackFiles.Models;
-using FileTypesTests.Util;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FileTypesTests.PackFiles
+﻿namespace FileTypesTests.PackFiles
 {/*
     class PackFileServiceTests_Add
     {

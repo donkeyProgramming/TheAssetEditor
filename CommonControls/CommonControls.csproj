@@ -90,9 +90,9 @@
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
     <PackageReference Include="Singulink.WPF.Data.MethodBinding" Version="1.1.0" />
     <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
-    <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
 	  <PackageReference Include="AvalonEdit" Version="6.1.2.30" />
 	  <PackageReference Include="morelinq" Version="3.3.2" />
+	  <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -319,7 +319,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
-    <ProjectReference Include="..\FileTypes\FileTypes.csproj" />
     <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
   </ItemGroup>
 

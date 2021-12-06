@@ -1,9 +1,9 @@
-﻿using FileTypes.Sound.WWise;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using FileTypes.Sound.WWise.Hirc.V122;
 using System.Text;
-using FileTypes.Sound.WWise.Hirc;
+using CommonControls.FileTypes.Sound.WWise;
+using CommonControls.FileTypes.Sound.WWise.Hirc;
+using CommonControls.FileTypes.Sound.WWise.Hirc.V122;
 
 namespace CommonControls.Editors.Sound
 {

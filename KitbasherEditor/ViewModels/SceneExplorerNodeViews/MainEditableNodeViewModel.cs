@@ -1,6 +1,6 @@
 ﻿using Common;
+using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
-using Filetypes.RigidModel;
 using KitbasherEditor.Services;
 using System;
 using System.Collections.ObjectModel;

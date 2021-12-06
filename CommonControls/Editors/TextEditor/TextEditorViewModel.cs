@@ -1,7 +1,7 @@
 ﻿using Common;
 using CommonControls.Common;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using FileTypes.PackFiles.Models;
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
 using System.Collections.Generic;

@@ -3,12 +3,10 @@ using Common;
 using CommonControls.Common;
 using CommonControls.Editors.BoneMapping;
 using CommonControls.Editors.BoneMapping.View;
+using CommonControls.FileTypes.Animation;
+using CommonControls.FileTypes.RigidModel;
 using CommonControls.SelectionListDialog;
 using CommonControls.Services;
-using Filetypes.Animation;
-using Filetypes.RigidModel;
-using FileTypes.PackFiles.Models;
-using FileTypes.RigidModel;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
@@ -17,10 +15,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using View3D.Animation;
-using View3D.Commands;
 using View3D.Commands.Object;
 using View3D.Components.Component;
 using View3D.SceneNodes;
@@ -440,53 +436,6 @@ namespace AnimationEditor.AnimationTransferTool
             // Create a skeleton from the scaled animation
 
             SaveMeshWithNewSkeleton(scaleAnimClip, scaleStr);
-            return;
-
-
-            var skeletonAnimFile = scaleAnimClip.ConvertToFileFormat(Generated.Skeleton);
-            skeletonAnimFile.Header.SkeletonName = newSkeletonName;
-
-            var skeletonBytes = AnimationFile.GetBytes(skeletonAnimFile);
-            SaveHelper.Save(_pfs, @"animations\skeletons\" + newSkeletonName + ".anim", null, skeletonBytes);
-
-            //Save inv matrix file
-            var newSkeleton = new GameSkeleton(skeletonAnimFile, null);
-            var invMatrixFile = newSkeleton.CreateInvMatrixFile();
-            var invMatrixBytes = invMatrixFile.GetBytes();
-            SaveHelper.Save(_pfs, @"animations\skeletons\" + newSkeletonName + ".bone_inv_trans_mats", null, invMatrixBytes);
-
-            var animationFrame = AnimationSampler.Sample(0, 0, Generated.Skeleton, scaleAnimClip);
-
-            int numCommandsToUndo = 0;
-            foreach (var model in modelNodes)
-            {
-                var header = model.Model.Header;
-                header.SkeletonName = newSkeletonName;
-                model.Model.Header = header;
-
-                var meshList = SceneNodeHelper.GetChildrenOfType<Rmv2MeshNode>(model);
-                var cmd = new CreateAnimatedMeshPoseCommand(meshList, animationFrame, false);
-                commandExecutor.ExecuteCommand(cmd, true);
-
-                numCommandsToUndo++;
-            }
-
-            var meshName = Path.GetFileNameWithoutExtension(_copyTo.MeshName.Value);
-            var newMeshName = meshName + "_" + scaleStr + ".rigid_model_v2";
-            var bytes = SceneSaverService.Save(true, modelNodes, Generated.Skeleton, RmvVersionEnum.RMV2_V7);
-            SaveHelper.Save(_pfs, newMeshName, null, bytes);
-
-            // Undo the mesh transform
-            for (int i = 0; i < numCommandsToUndo; i++)
-                commandExecutor.Undo();
-
-            // Reset the skeleton
-            foreach (var model in modelNodes)
-            {
-                var header = model.Model.Header;
-                header.SkeletonName = originalSkeletonName;
-                model.Model.Header = header;
-            }
         }
 
         void SaveMeshWithNewSkeleton(AnimationClip newSkeletonClip, string savePostFix)

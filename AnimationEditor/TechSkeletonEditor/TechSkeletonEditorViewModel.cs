@@ -1,8 +1,8 @@
 ﻿using AnimationEditor.PropCreator.ViewModels;
 using Common;
 using CommonControls.Common;
+using CommonControls.FileTypes.DB;
 using CommonControls.Services;
-using FileTypes.DB;
 using System;
 using System.Collections.Generic;
 using System.Text;

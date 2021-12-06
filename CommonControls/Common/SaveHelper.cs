@@ -1,6 +1,6 @@
-﻿using CommonControls.PackFileBrowser;
+﻿using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.PackFileBrowser;
 using CommonControls.Services;
-using FileTypes.PackFiles.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;

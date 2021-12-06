@@ -1,11 +1,8 @@
-﻿using Filetypes.Animation;
-using Filetypes.RigidModel;
-using Filetypes.RigidModel.Transforms;
+﻿using CommonControls.FileTypes.Animation;
+using CommonControls.FileTypes.RigidModel.Transforms;
 using Microsoft.Xna.Framework;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using static View3D.Animation.AnimationClip;
 
 namespace View3D.Animation

@@ -1,10 +1,8 @@
-﻿using CommonControls.Services;
-using Filetypes.Animation;
-using Filetypes.RigidModel;
-using FileTypes.AnimationPack;
-using FileTypes.DB;
-using FileTypes.MetaData;
-using FileTypes.MetaData.Instances;
+﻿using CommonControls.FileTypes.Animation;
+using CommonControls.FileTypes.AnimationPack;
+using CommonControls.FileTypes.MetaData;
+using CommonControls.FileTypes.MetaData.Instances;
+using CommonControls.Services;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using System;

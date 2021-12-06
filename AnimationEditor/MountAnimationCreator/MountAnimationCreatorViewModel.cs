@@ -2,9 +2,9 @@
 using AnimationEditor.PropCreator.ViewModels;
 using Common;
 using CommonControls.Common;
+using CommonControls.FileTypes.DB;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using FileTypes.DB;
-using FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;

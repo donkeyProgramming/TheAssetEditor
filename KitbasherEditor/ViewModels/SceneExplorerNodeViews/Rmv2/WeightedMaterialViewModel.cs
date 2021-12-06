@@ -1,6 +1,6 @@
 ﻿using Common;
 using CommonControls.Common;
-using FileTypes.RigidModel.MaterialHeaders;
+using CommonControls.FileTypes.RigidModel.MaterialHeaders;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using System;

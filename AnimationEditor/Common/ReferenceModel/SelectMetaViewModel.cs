@@ -1,15 +1,9 @@
 ﻿using Common;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using FileTypes.DB;
-using FileTypes.MetaData;
-using FileTypes.PackFiles.Models;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using static CommonControls.FilterDialog.FilterUserControl;
-using static CommonControls.Services.SkeletonAnimationLookUpHelper;
 
 namespace AnimationEditor.Common.ReferenceModel
 {

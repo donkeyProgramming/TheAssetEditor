@@ -1,10 +1,11 @@
 ﻿using Common;
 using CommonControls.Common;
 using CommonControls.Editors.TextEditor;
+using CommonControls.FileTypes.AnimationPack;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using CommonControls.Simple;
 using FileTypes.AnimationPack;
-using FileTypes.PackFiles.Models;
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
 using System.Collections.Generic;

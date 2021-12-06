@@ -1,10 +1,10 @@
 ﻿using Common;
 using CommonControls.Common;
 using CommonControls.Editors.AnimMeta.View;
+using CommonControls.FileTypes.DB;
+using CommonControls.FileTypes.MetaData;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using FileTypes.DB;
-using FileTypes.MetaData;
-using FileTypes.PackFiles.Models;
 using GalaSoft.MvvmLight.CommandWpf;
 using Serilog;
 using System;

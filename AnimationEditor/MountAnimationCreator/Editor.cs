@@ -4,6 +4,7 @@ using AnimationEditor.MountAnimationCreator.Services;
 using AnimationEditor.PropCreator;
 using Common;
 using CommonControls.Common;
+using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
 using CommonControls.Table;
 using FileTypes.AnimationPack;

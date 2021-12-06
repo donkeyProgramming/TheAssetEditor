@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using View3D.Animation.AnimationChange;
 using View3D.SceneNodes;
-using static Filetypes.Animation.AnimationFile;
+using static CommonControls.FileTypes.Animation.AnimationFile;
 
 namespace View3D.Animation
 {

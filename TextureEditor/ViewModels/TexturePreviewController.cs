@@ -1,18 +1,14 @@
-﻿using Common;
+﻿using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.FileTypes.RigidModel.Types;
 using CommonControls.Services;
-using Filetypes.RigidModel;
-using FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework.Graphics;
 using Pfim;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -198,38 +194,7 @@ namespace TextureEditor.ViewModels
             {
 
             }
-            return;
-            /*Texture2D t = _resourceLibary.LoadTexture(path, null);
-             Microsoft.Xna.Framework.Color[] colorArray = new Microsoft.Xna.Framework.Color[t.Width * t.Height];
-             try
-             {
-                 t.GetData(0, new Microsoft.Xna.Framework.Rectangle(0,0, t.Width, t.Height), colorArray, 0, t.Width * t.Height);
-             }
-             catch (Exception e)
-             { }*/
-
-            return;
-            /* TexturePreviewView view = new TexturePreviewView();
-             var dataContext = new TexturePreviewViewModel()
-             {
-                 Format = "DDS0",
-                 Name = "MyTestImage.png",
-                 Height = 512,
-                 Width = 1024
-             };
-             view.DataContext = dataContext;
-             var w = new Window();
-             w.Title = "Texture Preview Window";
-
-             var bitmap = new Bitmap(dataContext.Width, dataContext.Height);
-             using (Graphics gfx = Graphics.FromImage(bitmap))
-             using (SolidBrush brush = new SolidBrush(System.Drawing.Color.FromArgb(255, 0, 0)))
-             {
-                 gfx.FillRectangle(brush, 0, 0, dataContext.Width, dataContext.Height);
-             }
-             dataContext.Image = BitmapToImageSource(bitmap);
-             w.Content = view;
-             w.ShowDialog();*/
+           
         }
 
         private static ImageSource WpfImage(IImage image)

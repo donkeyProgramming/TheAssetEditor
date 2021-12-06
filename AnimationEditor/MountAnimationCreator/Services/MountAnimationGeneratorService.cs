@@ -1,20 +1,15 @@
 ﻿using AnimationEditor.Common.AnimationSettings;
 using AnimationEditor.Common.ReferenceModel;
 using CommonControls.Common;
-using CommonControls.PackFileBrowser;
+using CommonControls.FileTypes.Animation;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using Filetypes.Animation;
-using Filetypes.RigidModel;
-using FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using View3D.Animation;
 using View3D.SceneNodes;
-using View3D.Utility;
 
 namespace AnimationEditor.MountAnimationCreator.Services
 {

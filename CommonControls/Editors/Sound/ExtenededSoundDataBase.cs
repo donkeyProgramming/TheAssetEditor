@@ -1,4 +1,4 @@
-﻿using FileTypes.Sound.WWise;
+﻿using CommonControls.FileTypes.Sound.WWise;
 using System.Collections.Generic;
 
 namespace CommonControls.Editors.Sound

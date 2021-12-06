@@ -1,7 +1,4 @@
 ﻿using CommonControls.Services;
-using FileTypes.Sound;
-using FileTypes.Sound.WWise;
-using FileTypes.Sound.WWise.Hirc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,8 +13,9 @@ using Serilog;
 using System.Timers;
 using System.IO;
 using System.Text;
-using FileTypes.PackFiles.Models;
-using FileTypes.Sound.WWise.Hirc.V122;
+using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.FileTypes.Sound;
+using CommonControls.FileTypes.Sound.WWise;
 
 namespace CommonControls.Editors.Sound
 {
