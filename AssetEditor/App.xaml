@@ -1,9 +1,22 @@
 ﻿<Application x:Class="AssetEditor.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:AssetEditor" >
-    
-    <Application.Resources>
+             xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
+>
 
+    <Application.Resources >
+        <ResourceDictionary>
+
+            <!--Value converters-->
+            <valueconverters:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Collapsed" />
+            <valueconverters:BoolToColourConverter x:Key="ColourConverter_black_red" TrueValue="Black" FalseValue="Red"/>
+            <valueconverters:BoolToColourConverter x:Key="BoolToColour_white_red" TrueValue="White" FalseValue="Red"/>
+            <valueconverters:BoolToColourConverter x:Key="BoolToColour_black_gray" TrueValue="Black" FalseValue="Gray"/>
+            <valueconverters:BoolToStringConverter x:Key="BoolToStringConverter" TrueValue="*"/>
+
+            <!--Common view items-->
+
+
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

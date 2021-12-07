@@ -3,17 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews"
              mc:Ignorable="d" 
-                 xmlns:s="http://schemas.singulink.com/xaml"
+             xmlns:s="http://schemas.singulink.com/xaml"
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-               xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
-        <valueconverters:BoolToColourConverter x:Key="ColourConverter" TrueValue="Black" FalseValue="Gray"/>
-        <valueconverters:BoolToVisibilityConverter x:Key="BoolToVisConverter" TrueValue="Visible" FalseValue="Collapsed"/>
         <PathGeometry x:Key="TreeArrow" Figures="M0,0 L0,6 L6,0 z"/>
 
         <Style x:Key="ExpandCollapseToggleStyle" TargetType="{x:Type ToggleButton}">
@@ -132,8 +128,8 @@
             <TreeView.ItemTemplate >
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}">
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox IsChecked="{Binding IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
-                        <TextBlock Text="{Binding BoneName, UpdateSourceTrigger=PropertyChanged}"  Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                        <CheckBox IsChecked="{Binding IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_black_gray}}"/>
+                        <TextBlock Text="{Binding BoneName, UpdateSourceTrigger=PropertyChanged}"  Foreground="{Binding IsUsedByCurrentModel, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_black_gray}}"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>

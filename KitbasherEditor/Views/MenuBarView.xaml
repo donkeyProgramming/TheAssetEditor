@@ -3,13 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:KitbasherEditor.Views" 
              xmlns:viewmodel="clr-namespace:KitbasherEditor.ViewModels.MenuBarViews"
              xmlns:menusystem="clr-namespace:CommonControls.Common.MenuSystem;assembly=CommonControls"
-             xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
              mc:Ignorable="d" Loaded="UserControl_Loaded" >
     <UserControl.Resources>
-        <valueconverters:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Collapsed" />
 
         <Style x:Key="VerticalSeparatorStyle" 
             TargetType="{x:Type Separator}"

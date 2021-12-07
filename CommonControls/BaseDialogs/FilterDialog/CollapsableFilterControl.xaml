@@ -4,13 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:filterdialog1="clr-namespace:CommonControls.FilterDialog" 
-             xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              x:Name="self">
-    <UserControl.Resources>
-        <valueconverters:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Collapsed" />
-    </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>

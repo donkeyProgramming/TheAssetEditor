@@ -29,7 +29,6 @@ namespace CommonControls.Common
                 valueChangedDelegate?.Invoke(value);
         }
 
-
         protected virtual void SetAndNotify<T>(ref T variable, T newValue, ValueChangedDelegate<T> valueChangedDelegate = null, [CallerMemberName] string propertyName = "")
         {
             variable = newValue;

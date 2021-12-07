@@ -5,14 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AssetEditor" 
         xmlns:views="clr-namespace:AssetEditor.Views" 
-        xmlns:viewmodels="clr-namespace:AssetEditor.ViewModels" 
-        xmlns:test="clr-namespace:AssetEditor.Test" 
+        xmlns:viewFacotry="clr-namespace:AssetEditor.DataTemplates" 
         mc:Ignorable="d"
         Title="AssetEditor" Height="1024" Width="2000">
     <Window.Resources>
-        <test:DeviceTypeSelector x:Key="MySelector" />
-
+        <viewFacotry:EditorTemplateSelector x:Key="EditorSelector" />
     </Window.Resources>
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.2*"/>
@@ -43,8 +42,8 @@
         <TabControl  Grid.Row="1" Grid.Column="2"  
                      ItemsSource="{Binding CurrentEditorsList, UpdateSourceTrigger=PropertyChanged}"
                      SelectedIndex = "{Binding SelectedEditorIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                     ContentTemplateSelector="{StaticResource MySelector}"
-                     test:DataTemplateParameters.ViewFactory="{Binding ToolsFactory}">
+                     ContentTemplateSelector="{StaticResource EditorSelector}"
+                     viewFacotry:ToolFactoryParameter.ViewFactory="{Binding ToolsFactory}">
 
             <TabControl.ItemTemplate>
                 <DataTemplate>
@@ -79,11 +78,6 @@
                     </Grid>
                 </DataTemplate>
             </TabControl.ItemTemplate>
-
-
-
-
-
         </TabControl>
 
 
@@ -106,11 +100,11 @@
             </StatusBarItem>
             <Separator Grid.Column="1" />
             <StatusBarItem Grid.Column="2">
-                <TextBlock Text="c:\path\of\current\file.txt" />
+                <TextBlock Text="c:\path\of\current\file.txt"  Visibility="Collapsed"/>
             </StatusBarItem>
             <Separator Grid.Column="3" />
             <StatusBarItem Grid.Column="4">
-                <ProgressBar Value="50" Width="90" Height="16" />
+                <ProgressBar Value="50" Width="90" Height="16" Visibility="Collapsed"/>
             </StatusBarItem>
         </StatusBar>
   

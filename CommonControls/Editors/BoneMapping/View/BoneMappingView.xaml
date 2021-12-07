@@ -5,12 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:s="http://schemas.singulink.com/xaml"
-             xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters" xmlns:behaviors="clr-namespace:CommonControls.Behaviors"
+             xmlns:behaviors="clr-namespace:CommonControls.Behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <valueconverters:BoolToColourConverter x:Key="ColourConverter" TrueValue="Black" FalseValue="Gray"/>
-        <valueconverters:BoolToVisibilityConverter x:Key="BoolToVisConverter" TrueValue="Visible" FalseValue="Collapsed"/>
         <PathGeometry x:Key="TreeArrow" Figures="M0,0 L0,6 L6,0 z"/>
 
         <Style x:Key="ExpandCollapseToggleStyle" TargetType="{x:Type ToggleButton}">
@@ -181,35 +179,35 @@
                             <StackPanel Grid.Column="0" Orientation="Horizontal">
                                 <TextBlock  
                                             Text="{Binding Name.Value}"
-                                            Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                                            Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_black_gray}}"/>
                                 <TextBlock  
                                         Text="["
-                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_black_gray}}"/>
 
                                 <TextBlock  
                                         Text="{Binding BoneIndex.Value}"
-                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_black_gray}}"/>
 
                                 <TextBlock  
                                         Text="]"
-                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_black_gray}}"/>
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Orientation="Horizontal">
                                 <TextBlock  
                                             Text="{Binding MappedBoneName.Value}"
-                                            Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                                            Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_black_gray}}"/>
                                 <TextBlock  
                                         Text="["
-                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_black_gray}}"/>
 
                                 <TextBlock  
                                         Text="{Binding MappedBoneIndex.Value}"
-                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_black_gray}}"/>
 
                                 <TextBlock  
                                         Text="]"
-                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_black_gray}}"/>
                             </StackPanel>
                         </Grid>
                     </HierarchicalDataTemplate>

@@ -15,11 +15,9 @@ namespace AssetEditor.Services
     {
         class Entry
         {
-            //public string FileName { get; set; }
             public List<string> Data { get; set; } = new List<string>();
             public List<string> Errors { get; set; } = new List<string>();
         }
-
 
         string GetAsCommaSeperatedList(string filename, MetaEntry entry)
         {

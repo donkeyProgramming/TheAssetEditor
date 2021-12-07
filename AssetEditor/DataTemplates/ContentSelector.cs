@@ -3,18 +3,15 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace AssetEditor.Test
+namespace AssetEditor.DataTemplates
 {
-    RYDD MEG!
 
-    public class DeviceTypeSelector : DataTemplateSelector
+    public class EditorTemplateSelector : DataTemplateSelector
     {
-        public DataTemplate DefaultTemplate { get; set; }
-
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             var parent = FindParent<TabControl>(container);
-            var toolFactory = (ToolFactory)parent.GetValue(DataTemplateParameters.ViewFactoryProperty);
+            var toolFactory = (ToolFactory)parent.GetValue(ToolFactoryParameter.ViewFactoryProperty);
             var viewType = toolFactory.GetViewTypeFromViewModel(item.GetType());
 
             FrameworkElementFactory factory = new FrameworkElementFactory(viewType);
@@ -41,8 +38,10 @@ namespace AssetEditor.Test
         }
     }
 
-    public class DataTemplateParameters : DependencyObject
+    public class ToolFactoryParameter : DependencyObject
     {
+        public static readonly DependencyProperty ViewFactoryProperty = DependencyProperty.RegisterAttached("ViewFactory", typeof(ToolFactory), typeof(ToolFactoryParameter));
+
         public static ToolFactory GetViewFactory(DependencyObject obj)
         {
             return (ToolFactory)obj.GetValue(ViewFactoryProperty);
@@ -52,7 +51,5 @@ namespace AssetEditor.Test
         {
             obj.SetValue(ViewFactoryProperty, value);
         }
-
-        public static readonly DependencyProperty ViewFactoryProperty = DependencyProperty.RegisterAttached("ViewFactory", typeof(ToolFactory), typeof(DataTemplateParameters));
     }
 }

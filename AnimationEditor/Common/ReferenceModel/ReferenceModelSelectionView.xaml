@@ -9,12 +9,10 @@
              xmlns:filterdialog="clr-namespace:CommonControls.FilterDialog;assembly=CommonControls" 
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors" 
-             xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
-             mc:Ignorable="d" 
- d:DesignWidth="800">
+             mc:Ignorable="d" d:DesignWidth="800">
+    
     <UserControl.Resources>
         <System:Double x:Key="labelWidth">100</System:Double>
-        <valueconverters:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Collapsed" />
     </UserControl.Resources>
     <GroupBox>
         <Expander >

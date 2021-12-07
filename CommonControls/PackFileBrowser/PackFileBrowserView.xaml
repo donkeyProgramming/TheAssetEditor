@@ -12,9 +12,7 @@
              x:Name="mystuff">
     <UserControl.Resources>
         <nodevalueconverters:PackFileToImageValueConverter x:Key="ImageValueConverter"/>
-        <valueconverters:InverseBooleanConverter x:Key="InvBoolConverter"/>
         <nodevalueconverters:SortedCollectionViewSource x:Key="SortedCollectionViewSource" Property0="NodeType" Property1="Name"/>
-        <valueconverters:BoolToStringConverter x:Key="BoolToStringConverter" TrueValue="*"/>
     </UserControl.Resources>
 
     <Grid>

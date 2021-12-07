@@ -4,22 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:KitbasherEditor.Views"
-             xmlns:viewmodels="clr-namespace:KitbasherEditor.ViewModels" 
              xmlns:editorviews="clr-namespace:KitbasherEditor.Views.EditorViews" 
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls"
-             xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls"
-            xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              AllowDrop="True">
-    
-    <UserControl.Resources>
-        <valueconverters:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Collapsed" />
-    </UserControl.Resources>
+
     <Grid>
-
-
         <Grid.Style>
             <Style TargetType="{x:Type Grid}">
                 <EventSetter Event="TreeViewItem.Drop" Handler="treeView_Drop"/>

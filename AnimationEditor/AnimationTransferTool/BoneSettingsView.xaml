@@ -7,12 +7,10 @@
              xmlns:s="http://schemas.singulink.com/xaml"
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-              xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls" 
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls" xmlns:System="clr-namespace:System;assembly=System.Runtime"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <valueconverters:BoolToColourConverter x:Key="ColourConverter" TrueValue="Black" FalseValue="Red"/>
         <System:Double x:Key="labelWidth">110</System:Double>
     </UserControl.Resources>
     <Grid>
@@ -35,10 +33,10 @@
             <TreeView.ItemTemplate >
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding BoneName.Value, UpdateSourceTrigger=PropertyChanged}"   Foreground="{Binding HasMapping.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
-                        <TextBlock Text=" [" Foreground="{Binding HasMapping.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
-                        <TextBlock Text="{Binding BoneIndex.Value, UpdateSourceTrigger=PropertyChanged}" Foreground="{Binding HasMapping.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
-                        <TextBlock Text="]" Foreground="{Binding HasMapping.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter}}"/>
+                        <TextBlock Text="{Binding BoneName.Value, UpdateSourceTrigger=PropertyChanged}"   Foreground="{Binding HasMapping.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter_black_red}}"/>
+                        <TextBlock Text=" [" Foreground="{Binding HasMapping.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter_black_red}}"/>
+                        <TextBlock Text="{Binding BoneIndex.Value, UpdateSourceTrigger=PropertyChanged}" Foreground="{Binding HasMapping.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter_black_red}}"/>
+                        <TextBlock Text="]" Foreground="{Binding HasMapping.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource ColourConverter_black_red}}"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
