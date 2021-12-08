@@ -5,7 +5,7 @@ using CommonControls.FileTypes.DB;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
-using GalaSoft.MvvmLight.CommandWpf;
+using CommunityToolkit.Mvvm.Input;
 using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;

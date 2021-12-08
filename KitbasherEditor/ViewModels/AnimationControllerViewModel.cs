@@ -2,7 +2,7 @@
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using GalaSoft.MvvmLight.CommandWpf;
+using CommunityToolkit.Mvvm.Input;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System.Collections.ObjectModel;

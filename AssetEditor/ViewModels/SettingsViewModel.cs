@@ -1,6 +1,6 @@
 ﻿using CommonControls.Common;
 using CommonControls.Services;
-using GalaSoft.MvvmLight.CommandWpf;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Collections.ObjectModel;
 using System.IO;

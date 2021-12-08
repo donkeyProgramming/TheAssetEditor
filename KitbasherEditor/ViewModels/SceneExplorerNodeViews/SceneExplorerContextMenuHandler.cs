@@ -1,6 +1,6 @@
 ﻿using CommonControls.Common;
 using CommonControls.PackFileBrowser;
-using GalaSoft.MvvmLight.CommandWpf;
+using CommunityToolkit.Mvvm.Input;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;

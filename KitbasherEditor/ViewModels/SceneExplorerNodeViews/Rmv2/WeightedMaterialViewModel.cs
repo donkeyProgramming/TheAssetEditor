@@ -1,6 +1,6 @@
 ﻿using CommonControls.Common;
 using CommonControls.FileTypes.RigidModel.MaterialHeaders;
-using GalaSoft.MvvmLight.CommandWpf;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;

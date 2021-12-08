@@ -3,7 +3,7 @@ using CommonControls.Common.MenuSystem;
 using CommonControls.PackFileBrowser;
 using CommonControls.Resources;
 using CommonControls.Services;
-using GalaSoft.MvvmLight.CommandWpf;
+using CommunityToolkit.Mvvm.Input;
 using KitbasherEditor.Services;
 using MonoGame.Framework.WpfInterop;
 using System;

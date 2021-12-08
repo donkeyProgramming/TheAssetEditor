@@ -1,6 +1,6 @@
 ﻿using CommonControls.Common;
 using CommonControls.MathViews;
-using GalaSoft.MvvmLight.CommandWpf;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using System.ComponentModel;
