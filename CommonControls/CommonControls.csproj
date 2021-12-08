@@ -88,6 +88,7 @@
 	  <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
+	  <PackageReference Include="CommunityToolkit.Mvvm" Version="7.0.3" />
     <PackageReference Include="Singulink.WPF.Data.MethodBinding" Version="1.1.0" />
     <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
 	  <PackageReference Include="AvalonEdit" Version="6.1.2.30" />
@@ -359,7 +360,6 @@
 
   <ItemGroup>
     <Folder Include="Editors\FastBin\" />
-    <Folder Include="FileTypes\" />
   </ItemGroup>
 
 </Project>

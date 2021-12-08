@@ -1,5 +1,4 @@
-﻿using MonoGame.Framework.WpfInterop;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
 
@@ -7,10 +6,8 @@ namespace View3D.Commands.Face
 {
     public class DeleteFaceCommand : CommandBase<DeleteFaceCommand>
     {
-        SelectionManager _selectionManager;
-
-        ISelectionState _oldState;
-        MeshObject _oldGeometry;
+        FaceSelectionState _originalSelectionState;
+        MeshObject _originalGeometry;
 
         List<int> _facesToDelete;
         MeshObject _geo;
@@ -21,32 +18,23 @@ namespace View3D.Commands.Face
             _geo = geoObject;
         }
 
-        public override string GetHintText()
-        {
-            return "Delete Faces";
-        }
-
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-        }
+        public override string GetHintText() => "Delete Faces";
 
         protected override void ExecuteCommand()
         {
-            _oldState = _selectionManager.GetStateCopy();
+            // Create undo state
+            _originalSelectionState = _componentManager.GetComponent<SelectionManager>().GetStateCopy<FaceSelectionState>();
+            _originalGeometry = _geo.Clone();
 
-            _oldGeometry = _geo.Clone();
+            // Execute
             _geo.RemoveFaces(_facesToDelete);
-
-            var faceSelectionState = _selectionManager.GetState() as FaceSelectionState;
-            faceSelectionState.Clear();
+            _componentManager.GetComponent<SelectionManager>().GetState<FaceSelectionState>().Clear();
         }
 
         protected override void UndoCommand()
         {
-            _selectionManager.SetState(_oldState);
-            var faceSelectionState = _selectionManager.GetState() as FaceSelectionState;
-            faceSelectionState.RenderObject.Geometry = _oldGeometry;
+            _originalSelectionState.RenderObject.Geometry = _originalGeometry;
+            _componentManager.GetComponent<SelectionManager>().SetState(_originalSelectionState);
         }
     }
 }

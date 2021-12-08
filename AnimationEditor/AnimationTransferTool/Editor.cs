@@ -232,8 +232,6 @@ namespace AnimationEditor.AnimationTransferTool
             return true;
         }
 
-
-
         public void OpenBatchProcessDialog()
         {
             if (!CanUpdateAnimation(false))

@@ -3,6 +3,7 @@ using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using View3D.Components.Component.Selection;
 
 namespace View3D.Commands
 {
@@ -17,6 +18,7 @@ namespace View3D.Commands
 
     public abstract class CommandBase<T> : ICommand
     {
+        protected IComponentManager _componentManager;
         protected ILogger _logger = Logging.Create<T>();
 
         public void Undo()
@@ -32,7 +34,10 @@ namespace View3D.Commands
             }
         }
 
-        public virtual void Initialize(IComponentManager componentManager) { }
+        public virtual void Initialize(IComponentManager componentManager) 
+        {
+            _componentManager = componentManager;
+        }
 
         public void Execute()
         {
@@ -51,6 +56,7 @@ namespace View3D.Commands
         protected abstract void ExecuteCommand();
         protected abstract void UndoCommand();
         public abstract string GetHintText();
+
     }
 }
 

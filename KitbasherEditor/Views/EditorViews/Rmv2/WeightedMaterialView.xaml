@@ -24,17 +24,19 @@
                 <TextBlock  Text="{Binding Material.Filters.Value}"  VerticalAlignment="Center"/>
             </StackPanel>
 
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <DockPanel DockPanel.Dock="Top">
                 <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="MatrixIndex"/>
                 <Label>:</Label>
+                <Button Content="Set to default" Command="{Binding Material.SetDefaultMatrixIndexCommand}" Margin="2" DockPanel.Dock="Right"/>
                 <TextBlock  Text="{Binding Material.MatrixIndex.Value}"  VerticalAlignment="Center"/>
-            </StackPanel>
+            </DockPanel>
 
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <DockPanel DockPanel.Dock="Top">
                 <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="ParentMatrixIndex"/>
                 <Label>:</Label>
+                <Button Content="Set to default" Command="{Binding Material.SetDefaultParentMatrixIndexCommand}" Margin="2" DockPanel.Dock="Right"/>
                 <TextBlock  Text="{Binding Material.ParentMatrixIndex.Value}"  VerticalAlignment="Center"/>
-            </StackPanel>
+            </DockPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                 <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="BinaryVertexFormat"/>
@@ -137,6 +139,24 @@
                         </Expander.Header>
 
                         <ListView ItemsSource="{Binding Material.AttachmentPointParameters}" MaxHeight="650" />
+
+                    </Expander>
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Vec4 params"/>
+                <Label>:</Label>
+                <StackPanel>
+                    <Expander>
+                        <Expander.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Count = "/>
+                                <TextBlock Text="{Binding Material.VectorParameters.Count, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                        </Expander.Header>
+
+                        <ListView ItemsSource="{Binding Material.VectorParameters}" MaxHeight="650" />
 
                     </Expander>
                 </StackPanel>

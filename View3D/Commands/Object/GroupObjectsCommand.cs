@@ -43,7 +43,7 @@ namespace View3D.Commands.Object
                 groupNode.AddObject(item);
             }
 
-            var currentState = _selectionManager.GetState() as ObjectSelectionState;
+            var currentState = _selectionManager.GetState< ObjectSelectionState>();
             currentState.Clear();
 
             var itemsToSelect = groupNode.Children.Where(x => (x as ISelectable)?.IsSelectable == true).Select(x=>x as ISelectable).ToList();
@@ -105,7 +105,7 @@ namespace View3D.Commands.Object
             if (_oldGroupNode.Children.Count == 0)
                 _oldGroupNode.Parent.RemoveObject(_oldGroupNode);
 
-            var currentState = _selectionManager.GetState() as ObjectSelectionState;
+            var currentState = _selectionManager.GetState< ObjectSelectionState>();
             currentState.Clear();
             currentState.ModifySelection(_itemsToUngroup, false);
         }
@@ -126,57 +126,49 @@ namespace View3D.Commands.Object
         }
     }
 
-    public class AddObjectsToExistingGroupCommand : CommandBase<GroupObjectsCommand>
+    public class AddObjectsToGroupCommand : CommandBase<AddObjectsToGroupCommand>
     {
-        SelectionManager _selectionManager;
-        ISelectionState _oldState;
+        ISelectionState _originalSelectionState;
 
-        GroupNode _group;
-        List<ISelectable> _itemsToGroup { get; set; } = new List<ISelectable>();
+        GroupNode _groupToAddItemsTo;
+        List<ISelectable> _itemsToAdd { get; set; } = new List<ISelectable>();
 
-        public AddObjectsToExistingGroupCommand(GroupNode group, List<ISelectable> itemsToGroup)
+        public AddObjectsToGroupCommand(GroupNode groupToAddItemsTo, List<ISelectable> itemsToAdd)
         {
-            _itemsToGroup = itemsToGroup;
-            _group = group;
+            _itemsToAdd = itemsToAdd;
+            _groupToAddItemsTo = groupToAddItemsTo;
         }
 
-        public override string GetHintText()
-        {
-            return "Add Objects to group";
-        }
-
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-        }
-
+        public override string GetHintText() => "Add Objects to group";
+        
         protected override void ExecuteCommand()
         {
-            _oldState = _selectionManager.GetStateCopy();
-            var groupNode = _group;
-
-            foreach (var item in _itemsToGroup)
+            // Create undo state
+            _originalSelectionState = _componentManager.GetComponent<SelectionManager>().GetStateCopy();
+          
+            // Add itsms to group
+            foreach (var item in _itemsToAdd)
             {
                 item.Parent.RemoveObject(item);
-                groupNode.AddObject(item);
+                _groupToAddItemsTo.AddObject(item);
             }
 
-            var currentState = _selectionManager.GetState() as ObjectSelectionState;
+            // Select the grouped items
+            var currentState = _componentManager.GetComponent<SelectionManager>().GetState<ObjectSelectionState>();
             currentState.Clear();
-            currentState.ModifySelection(_itemsToGroup, false);
+            currentState.ModifySelection(_itemsToAdd, false);
         }
 
         protected override void UndoCommand()
         {
-            var rootNode = _group.Parent;
-
-            foreach (var item in _itemsToGroup)
+            var rootNode = _groupToAddItemsTo.Parent;
+            foreach (var item in _itemsToAdd)
             {
                 item.Parent.RemoveObject(item);
                 rootNode.AddObject(item);
             }
 
-            _selectionManager.SetState(_oldState);
+            _componentManager.GetComponent<SelectionManager>().SetState(_originalSelectionState);
         }
     }
 }

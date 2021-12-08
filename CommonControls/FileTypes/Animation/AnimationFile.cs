@@ -44,11 +44,12 @@ namespace CommonControls.FileTypes.Animation
 
         public class AnimationHeader
         {
-            public uint AnimationFormat { get; set; }
+            public uint Version { get; set; }
             public uint Unknown0_alwaysOne { get; set; } = 1;
             public float FrameRate { get; set; } = 20;
             public string SkeletonName { get; set; }
-            public uint Unknown1_alwaysZero { get; set; } = 0;
+            public uint FlagCount { get; set; } = 0;
+            public List<string> FlagVariables { get; set; } = new List<string>();
             public float AnimationTotalPlayTimeInSec { get; set; }
         }
 
@@ -81,19 +82,24 @@ namespace CommonControls.FileTypes.Animation
                 throw new Exception("Trying to load animation header with no data, chunk size = 0");
 
             var header = new AnimationHeader();
-            header.AnimationFormat = chunk.ReadUInt32();
-            header.Unknown0_alwaysOne = chunk.ReadUInt32();        // Always 1?
+            header.Version = chunk.ReadUInt32();
+            header.Unknown0_alwaysOne = chunk.ReadUInt32();        // Some type of type?
             header.FrameRate = chunk.ReadSingle();
-            var nameLength = chunk.ReadShort();
-            header.SkeletonName = chunk.ReadFixedLength(nameLength);
-            header.Unknown1_alwaysZero = chunk.ReadUInt32();        // Always 0? padding?
+            header.SkeletonName = chunk.ReadString();
+            header.FlagCount = chunk.ReadUInt32();
 
-            if (header.AnimationFormat == 7)
+            if (header.Version > 6)
+            {
+                for (int i = 0; i < header.FlagCount; i++)
+                    header.FlagVariables.Add(chunk.ReadString());
+            }
+
+            if (header.Version == 7)
                 header.AnimationTotalPlayTimeInSec = chunk.ReadSingle(); // Play time
 
-            bool isSupportedAnimationFile = header.AnimationFormat == 5 || header.AnimationFormat == 6 || header.AnimationFormat == 7 || header.AnimationFormat == 4;
+            bool isSupportedAnimationFile = header.Version == 5 || header.Version == 6 || header.Version == 7 || header.Version == 4;
             if (!isSupportedAnimationFile)
-                throw new Exception($"Unsuported animation format: {header.AnimationFormat}");
+                throw new Exception($"Unsuported animation format: {header.Version}");
 
             return header;
         }
@@ -204,7 +210,7 @@ namespace CommonControls.FileTypes.Animation
             }
 
             // A single static frame - Can be inverse, a pose or empty. Not sure? Hand animations are stored here
-            if (output.Header.AnimationFormat == 7)
+            if (output.Header.Version == 7)
             {
                 var staticPosCount = chunk.ReadUInt32();
                 var staticRotCount = chunk.ReadUInt32();
@@ -228,9 +234,8 @@ namespace CommonControls.FileTypes.Animation
 
             // ----------------------
 
-            if (output.Header.AnimationFormat != 7)
+            if (output.Header.Version != 7)
                 output.Header.AnimationTotalPlayTimeInSec = output.DynamicFrames.Count() / output.Header.FrameRate;
-
 
             return output;
         }
@@ -242,15 +247,15 @@ namespace CommonControls.FileTypes.Animation
                 using (BinaryWriter writer = new BinaryWriter(memoryStream))
                 {
                     // Header
-                    writer.Write(input.Header.AnimationFormat);                     // Animtype
+                    writer.Write(input.Header.Version);                     // Animtype
                     writer.Write(input.Header.Unknown0_alwaysOne);                  // Uknown_always 1
                     writer.Write(input.Header.FrameRate);                           // Framerate
                     writer.Write((short)input.Header.SkeletonName.Length);          // SkeletonNAme length
                     for (int i = 0; i < input.Header.SkeletonName.Length; i++)      // SkeletonNAme
                         writer.Write(input.Header.SkeletonName[i]);
-                    writer.Write(input.Header.Unknown1_alwaysZero);                  // Uknown_always 0
+                    writer.Write(input.Header.FlagCount);                  // Uknown_always 0
 
-                    if (input.Header.AnimationFormat == 7)
+                    if (input.Header.Version == 7)
                         writer.Write(input.Header.AnimationTotalPlayTimeInSec);
 
                     //Body - Bones
@@ -272,7 +277,7 @@ namespace CommonControls.FileTypes.Animation
                         writer.Write(input.RotationMappings[i].FileWriteValue);
 
                     // Static frame
-                    if (input.Header.AnimationFormat == 7)
+                    if (input.Header.Version == 7)
                     {
                         if (input.StaticFrame != null)
                         {

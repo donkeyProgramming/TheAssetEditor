@@ -25,9 +25,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             bool _useTexture = true;
             public bool UseTexture { get { return _useTexture; } set { SetAndNotify(ref _useTexture, value); UpdatePreviewTexture(value); } }
             public string TextureTypeStr { get; set; }
-
             public NotifyAttr<string> Path { get; set; } = new NotifyAttr<string>("");
-
             public NotifyAttr<bool> IsVisible { get; set; } = new NotifyAttr<bool>(true);
 
             public TextureViewModel(Rmv2MeshNode meshNode, PackFileService packfileService, TexureType texureType)
@@ -38,7 +36,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 Path.Value = _meshNode.Material.GetTexture(texureType)?.Path;
                 TextureTypeStr = _texureType.ToString();
             }
-
 
             public void Preview() => TexturePreviewController.CreateVindow(Path.Value, _packfileService);
 
@@ -71,7 +68,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             void UpdateTexturePath(string newPath)
             {
                 Path.Value = newPath;
-
                 _meshNode.UpdateTexture(Path.Value, _texureType);
             }
 

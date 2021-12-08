@@ -12,6 +12,7 @@
     <UserControl.Resources>
         <System:Double x:Key="labelWidth">120</System:Double>
     </UserControl.Resources>
+    
     <GroupBox DockPanel.Dock="Top" >
         <GroupBox.Header>
             <TextBlock Text="Mesh" FontWeight="Bold" />
@@ -41,13 +42,14 @@
                 <CheckBox  HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Mesh.DrawBoundingBox, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
             </StackPanel>
 
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <DockPanel DockPanel.Dock="Top">
                 <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Pivot"/>
                 <Label>:</Label>
                 <CheckBox  HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Mesh.DrawPivotPoint, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                <mathviews:Vector3View Width="200" VerticalContentAlignment="Center" Vector3="{Binding Mesh.Pivot, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2,0,2,0"/>
-                <Button Content="Copy to all meshes" Margin="3" Command="{Binding Mesh.CopyPivotToAllMeshesCommand}"/>
-            </StackPanel>
+            
+                <Button Content="Copy to all meshes" Margin="3" Command="{Binding Mesh.CopyPivotToAllMeshesCommand}" DockPanel.Dock="Right"/>
+                <mathviews:Vector3View VerticalContentAlignment="Center" Vector3="{Binding Mesh.Pivot, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2,0,2,0"/>
+            </DockPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
                 <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Shader"/>

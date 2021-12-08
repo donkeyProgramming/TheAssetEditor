@@ -24,13 +24,15 @@ namespace KitbasherEditor.Services
         ResourceLibary _resourceLibary;
         AnimationControllerViewModel _animationView;
         SceneManager _sceneManager;
+        IGeometryGraphicsContextFactory _geometryFactory;
 
-        public KitbashSceneCreator(PackFileService packFileService, ResourceLibary resourceLibary, AnimationControllerViewModel animationView, SceneManager sceneManager, PackFile mainFile)
+        public KitbashSceneCreator(PackFileService packFileService, ResourceLibary resourceLibary, AnimationControllerViewModel animationView, SceneManager sceneManager, PackFile mainFile, IGeometryGraphicsContextFactory geometryFactory)
         {
             _packFileService = packFileService;
             _resourceLibary = resourceLibary;
             _animationView = animationView;
             _sceneManager = sceneManager;
+            _geometryFactory = geometryFactory;
 
             var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(resourceLibary.Content, animationView) { IsLockable = false });
             EditableMeshNode = _sceneManager.RootNode.AddObject(new MainEditableNode("Editable Model", skeletonNode, mainFile));
@@ -41,7 +43,7 @@ namespace KitbasherEditor.Services
         {
             var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
 
-            EditableMeshNode.CreateModelNodesFromFile(rmv, _resourceLibary, _animationView.Player, GeometryGraphicsContextFactory.CreateInstance(_resourceLibary.GraphicsDevice));
+            EditableMeshNode.CreateModelNodesFromFile(rmv, _resourceLibary, _animationView.Player, _geometryFactory);
             EditableMeshNode.SelectedOutputFormat = rmv.Header.Version;
 
             _animationView.SetActiveSkeleton(rmv.Header.SkeletonName);
@@ -77,8 +79,6 @@ namespace KitbasherEditor.Services
                 SceneNodeHelper.MakeNodeEditable(EditableMeshNode, node);
         }
 
-
-
         public void LoadReference(PackFile file)
         {
             _logger.Here().Information($"Loading reference model - {_packFileService.GetFullPath(file)}");
@@ -86,10 +86,9 @@ namespace KitbasherEditor.Services
             ReferenceMeshRoot.AddObject(result);
         }
 
-
         SceneNode LoadModel(PackFile file)
         {
-            SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, GeometryGraphicsContextFactory.CreateInstance(_resourceLibary.GraphicsDevice));
+            SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, _geometryFactory);
             var loadedNode = loader.Load(file, null, _animationView.Player);
 
             if (loadedNode == null)

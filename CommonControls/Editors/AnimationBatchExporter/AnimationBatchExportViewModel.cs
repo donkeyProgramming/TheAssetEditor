@@ -93,7 +93,7 @@ namespace CommonControls.Editors.AnimationBatchExporter
                 try
                 {
                     var animationFile = AnimationFile.Create(file);
-                    animationFile.Header.AnimationFormat = outputAnimationFormat;
+                    animationFile.Header.Version = outputAnimationFormat;
 
                     var bytes = AnimationFile.GetBytes(animationFile);
                     var newPackFile = new PackFile(file.Name, new MemorySource(bytes));

@@ -1,4 +1,5 @@
-﻿using CommonControls.FileTypes;
+﻿using CommonControls.Common;
+using CommonControls.FileTypes;
 using CommonControls.FileTypes.RigidModel.Transforms;
 using CommonControls.FileTypes.RigidModel.Types;
 using Filetypes.ByteParsing;
@@ -53,8 +54,8 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                 Filters = Filters,
                 OriginalTransform = OriginalTransform,
 
-                AttachmentPointParams = AttachmentPointParams.Select(x => x).ToList(),
-                TexturesParams = TexturesParams.Select(x => x).ToList(),
+                AttachmentPointParams = AttachmentPointParams.Select(x => ObjectHelper.DeepClone(x)).ToList(),
+                TexturesParams = TexturesParams.Select(x => ObjectHelper.DeepClone(x)).ToList(),
                 StringParams = StringParams.Select(x => x).ToList(),
                 FloatParams = FloatParams.Select(x => x).ToList(),
                 IntParams = IntParams.Select(x => x).ToList(),
@@ -90,9 +91,10 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                 ByteHelper.GetSize<RmvAttachmentPoint>() * AttachmentPointParams.Count +
                 ByteHelper.GetSize<RmvTexture>() * TexturesParams.Count +
                 stringParamSize +
-                4 * 2 * FloatParams.Count +
-                4 * 2 * IntParams.Count +
-                4 * 4 * 2 * Vec4Params.Count);
+                // Variable + index
+                (4 * FloatParams.Count) + (4 * FloatParams.Count) +
+                (4 * IntParams.Count) + (4  * IntParams.Count) +
+                (4 * 4 * Vec4Params.Count) + (Vec4Params.Count * 4));
 
             return headerDataSize;
         }
@@ -111,22 +113,39 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 
         public void SetTexture(TexureType texureType, string path)
         {
-            for (int i = 0; i < TexturesParams.Count; i++)
+            if (string.IsNullOrWhiteSpace(path))
             {
-                if (TexturesParams[i].TexureType == texureType)
+                // Delete texture
+                for (int i = 0; i < TexturesParams.Count; i++)
                 {
-                    var item = TexturesParams[i];
-                    item.Path = path;
-                    TexturesParams[i] = item;
-                    return;
+                    if (TexturesParams[i].TexureType == texureType)
+                    {
+                        TexturesParams.RemoveAt(i);
+                        return;
+                    }
                 }
             }
+            else
+            {
+                // Update texture
+                for (int i = 0; i < TexturesParams.Count; i++)
+                {
+                    if (TexturesParams[i].TexureType == texureType)
+                    {
+                        var item = TexturesParams[i];
+                        item.Path = path;
+                        TexturesParams[i] = item;
+                        return;
+                    }
+                }
 
-            RmvTexture newTexture = new RmvTexture();
-            newTexture.TexureType = texureType;
-            newTexture.Path = path;
+                // Add if missing
+                RmvTexture newTexture = new RmvTexture();
+                newTexture.TexureType = texureType;
+                newTexture.Path = path;
 
-            TexturesParams.Add(newTexture);
+                TexturesParams.Add(newTexture);
+            }
         }
 
         public void UpdateEnumsBeforeSaving(UiVertexFormat uiVertexFormat, RmvVersionEnum outputVersion)
@@ -251,8 +270,8 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                     Matrix1 = typedMaterial.OriginalTransform.Matrix1,
                     Matrix2 = typedMaterial.OriginalTransform.Matrix2
                 },
-                MatrixIndex = 1,
-                ParentMatrixIndex = 1,
+                MatrixIndex = typedMaterial.MatrixIndex,
+                ParentMatrixIndex = typedMaterial.ParentMatrixIndex,
                 AttachmentPointCount = (uint)typedMaterial.AttachmentPointParams.Count(),
                 FloatParamCount = (uint)typedMaterial.FloatParams.Count(),
                 IntParamCount = (uint)typedMaterial.IntParams.Count(),

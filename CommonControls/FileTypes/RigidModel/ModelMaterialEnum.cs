@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CommonControls.FileTypes.RigidModel
 {
@@ -55,6 +57,18 @@ namespace CommonControls.FileTypes.RigidModel
         alpha_blend = 100,
         TerrainTiles = 101
     };
+
+    public static class ModelMaterialEnumHelper
+    {
+        public static List<ModelMaterialEnum> GetAllWeightedMaterials()
+        {
+            var enumValues = Enum.GetValues(typeof(ModelMaterialEnum)).Cast<ModelMaterialEnum>();
+            var weightedMaterials = enumValues.Where(x => x.ToString().Contains("weighted", StringComparison.InvariantCultureIgnoreCase)).ToList();
+            weightedMaterials.Add(ModelMaterialEnum.default_type);
+            weightedMaterials.Add(ModelMaterialEnum.decal_dirtmap);
+            return weightedMaterials;
+        }
+    }
 
     public enum AlphaMode : int
     {

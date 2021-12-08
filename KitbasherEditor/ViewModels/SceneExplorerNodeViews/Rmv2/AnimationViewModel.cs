@@ -26,8 +26,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             var skeletonFile = animLookUp.GetSkeletonFileFromName(pfs, SkeletonName.Value);
             var bones = _meshNode.Geometry.GetUniqeBlendIndices();
 
+            if (skeletonFile == null)
+                SkeletonName.Value = SkeletonName.Value + "[MISSING from packs]";
+
             // Make sure the bones are valid, mapping can cause issues! 
-            if (bones.Count != 0)
+            if (bones.Count != 0 && skeletonFile != null)
             {
                 var activeBonesMin = bones.Min(x => x);
                 var activeBonesMax = bones.Max(x => x);

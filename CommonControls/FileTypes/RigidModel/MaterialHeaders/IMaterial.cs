@@ -1,8 +1,6 @@
 ﻿using CommonControls.FileTypes.RigidModel.Types;
 using Microsoft.Xna.Framework;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 {
@@ -30,45 +28,5 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
     {
         IMaterial Create(ModelMaterialEnum materialId, RmvVersionEnum rmvType, byte[] dataArray, int dataOffset);
         byte[] Save(IMaterial material);
-    }
-
-    public class MaterialFactory
-    {
-        Dictionary<ModelMaterialEnum, IMaterialCreator> _materialCreators = new Dictionary<ModelMaterialEnum, IMaterialCreator>();
-
-        public static MaterialFactory Create() => new MaterialFactory();
-
-        public MaterialFactory()
-        {
-            _materialCreators[ModelMaterialEnum.weighted_skin_dirtmap] = new WeighterMaterialCreator();
-            _materialCreators[ModelMaterialEnum.weighted_skin] = new WeighterMaterialCreator();
-            _materialCreators[ModelMaterialEnum.weighted] = new WeighterMaterialCreator();
-            _materialCreators[ModelMaterialEnum.default_type] = new WeighterMaterialCreator();
-            _materialCreators[ModelMaterialEnum.TerrainTiles] = new TerrainTileMaterialCreator();
-            _materialCreators[ModelMaterialEnum.custom_terrain] = new CustomTerrainMaterialCreator();
-        }
-
-        public IMaterial LoadMaterial(byte[] data, int offset, RmvVersionEnum rmvType, ModelMaterialEnum modelTypeEnum, long expectedMaterialSize)
-        {
-            if (_materialCreators.ContainsKey(modelTypeEnum))
-            {
-                var material = _materialCreators[modelTypeEnum].Create(modelTypeEnum, rmvType, data, offset);
-                var materialSize = material.ComputeSize();
-
-                if (materialSize != expectedMaterialSize)
-                    throw new Exception($"Part of material {modelTypeEnum} header not read");
-
-                return material;
-            }
-
-            throw new Exception($"Uknown material - {modelTypeEnum} Material Size = {expectedMaterialSize}");
-        }
-
-        public byte[] Save(ModelMaterialEnum modelTypeEnum, IMaterial material)
-        {
-            return _materialCreators[modelTypeEnum].Save(material);
-        }
-
-        public List<ModelMaterialEnum> GetSupportedMaterials() => _materialCreators.Keys.Select(x => x).ToList();
     }
 }

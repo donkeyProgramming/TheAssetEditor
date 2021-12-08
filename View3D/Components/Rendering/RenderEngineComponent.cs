@@ -81,7 +81,7 @@ namespace View3D.Components.Rendering
             _rasterStates[RasterizerStateEnum.Default].DepthClipEnable = true;
             _rasterStates[RasterizerStateEnum.Default].MultiSampleAntiAlias = true;
 
-            float depthOffsetBias = 0.0005f;
+            float depthOffsetBias = 0.00005f;
             _rasterStates[RasterizerStateEnum.Wireframe] = new RasterizerState();
             _rasterStates[RasterizerStateEnum.Wireframe].FillMode = FillMode.WireFrame;
             _rasterStates[RasterizerStateEnum.Wireframe].CullMode = cullMode;

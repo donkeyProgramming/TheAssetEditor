@@ -3,15 +3,22 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews" xmlns:filterdialog="clr-namespace:CommonControls.FilterDialog;assembly=CommonControls"
+             xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews"
+             xmlns:filterdialog="clr-namespace:CommonControls.FilterDialog;assembly=CommonControls" 
+             xmlns:System="clr-namespace:System;assembly=System.Runtime"
+             xmlns:s="http://schemas.singulink.com/xaml"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <System:Double x:Key="labelWidth">135</System:Double>
+    </UserControl.Resources>
+
     <DockPanel  LastChildFill="False">
         <DockPanel DockPanel.Dock="Top">
             <TextBlock  FontSize="20" FontWeight="Bold" >Main Node:</TextBlock>
         </DockPanel>
         <DockPanel DockPanel.Dock="Top">
-            <Label Width="100">Skeleton</Label>
+            <Label Width ="{StaticResource labelWidth}" Content="Skeleton"/>
             <Label>:</Label>
             <filterdialog:CollapsableFilterControl  VerticalContentAlignment="Center"
                                 SelectedItem="{Binding SkeletonName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
@@ -26,9 +33,17 @@
         </DockPanel>
 
         <DockPanel DockPanel.Dock="Top">
-            <Label Width="100">Output format</Label>
+            <Label Width ="{StaticResource labelWidth}" Content="Output format"/>
             <Label>:</Label>
             <ComboBox ItemsSource="{Binding PossibleOutputFormats}" SelectedItem="{Binding SelectedOutputFormat}" VerticalAlignment="Center"/>
         </DockPanel>
+        <DockPanel DockPanel.Dock="Top">
+            <Label Width ="{StaticResource labelWidth}" Content="Copy textures to pack" />
+            <Label>:</Label>
+            <Button Content="Copy Textures" Click="{s:MethodBinding CopyTexturesToOutputPack}" Margin="2"/>
+            <Label Content="Output format:"/>
+            <ComboBox SelectedItem="Unchanged" VerticalAlignment="Center"/>
+        </DockPanel>
+
     </DockPanel>
 </UserControl>

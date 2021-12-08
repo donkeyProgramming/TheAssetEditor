@@ -22,12 +22,11 @@ Bugs:
 
 	Lod header 5 => variantmeshes\_variantmodels\elephant\bodyparts\e3_elephant\default_elephant.rigid_model_v2 
 		offset = 140
-	Better suport for textures older games and 3k
-	Meshes in rome 2 => 3c_eurlian_body_cine => variantmeshes\_variantmodels\man\skin\cleopatra_mark_antony_trailer\mark_antony_lod1.rigid_model_v2
-		: Uknown material - weighted_skin Material Size = 2328
+	
+	C:\Program Files (x86)\Notepad++\notepad++.exe
+	C:\Program Files\HxD\HxD.exe
 	
 	Remove bmiWindow
-	Move vertexdebuggerViewModel.cs
 	Troy	
 		variantmeshes\variantmeshdefinitions\troy_achilles_charioteer_spear.variantmeshdefinition
 	
@@ -52,11 +51,13 @@ Bugs:
 	// Troy textures missing, 3k textures missing 
 
 
-		
+	can not load -> variantmeshes\_variantmodels\man\armour\lorica_segmentata_a.rigid_model_v2
+
 	
-	
-	
-	
+	Material 
+		- use texture toggle alpha
+		- Convert UI actions to pure actions 
+
 
 variantmeshes\_variantmodels\man\skin\afr_cine_full_base_skinmafrican5_shape32.rigid_model_v2
 General:

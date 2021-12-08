@@ -23,13 +23,13 @@ namespace CommonControls.FileTypes.RigidModel.Types
         Diffuse_damage = 17
     }
 
+    [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public struct RmvTexture
     {
         public TexureType TexureType;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
         byte[] _path;
-
 
         public string Path
         {
@@ -52,6 +52,5 @@ namespace CommonControls.FileTypes.RigidModel.Types
                 }
             }
         }
-
     }
 }

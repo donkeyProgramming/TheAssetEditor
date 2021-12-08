@@ -8,47 +8,37 @@ namespace View3D.Commands.Face
     public class ConvertFacesToVertexSelectionCommand : CommandBase<DeleteFaceCommand>
     {
         SelectionManager _selectionManager;
+        FaceSelectionState _originalSelectionState;
 
-        FaceSelectionState _selectionState;
-
-        public ConvertFacesToVertexSelectionCommand(FaceSelectionState selectionState)
+        public ConvertFacesToVertexSelectionCommand(FaceSelectionState currentSelectionState)
         {
-            _selectionState = selectionState;
+            _originalSelectionState = currentSelectionState;
         }
 
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-        }
-
-        public override string GetHintText()
-        {
-            return "Convert Faces To Vertex";
-        }
+        public override string GetHintText() => "Convert Faces To Vertex";
 
         protected override void ExecuteCommand()
         {
-            var renderObject = _selectionState.RenderObject;
+            var renderObject = _originalSelectionState.RenderObject;
             var geometry = renderObject.Geometry;
 
             var selectedFaceIndecies = new List<int>();
             var indexBuffer = geometry.GetIndexBuffer();
-            foreach (var face in _selectionState.SelectedFaces)
+            foreach (var face in _originalSelectionState.SelectedFaces)
             {
                 selectedFaceIndecies.Add(indexBuffer[face]);
                 selectedFaceIndecies.Add(indexBuffer[face + 1]);
                 selectedFaceIndecies.Add(indexBuffer[face + 2]);
             }
 
-            var distinctValues = selectedFaceIndecies.Distinct();
             var vertexState = new VertexSelectionState(renderObject, 0);
-            vertexState.ModifySelection(distinctValues, false);
-            _selectionManager.SetState(vertexState);
+            vertexState.ModifySelection(selectedFaceIndecies.Distinct(), false);
+            _componentManager.GetComponent<SelectionManager>().SetState(vertexState);
         }
 
         protected override void UndoCommand()
         {
-            _selectionManager.SetState(_selectionState);
+            _componentManager.GetComponent<SelectionManager>().SetState(_originalSelectionState);
         }
     }
 }

@@ -25,6 +25,7 @@ namespace CommonControls.PackFileBrowser
                 if (node.FileOwner.IsCaPackFile)
                 {
                     Additem(ContextItems.Close, newContextMenu);
+                    Additem(ContextItems.Expand, newContextMenu);
                 }
                 else
                 {
@@ -64,6 +65,7 @@ namespace CommonControls.PackFileBrowser
 
                 }
                 Additem(ContextItems.Expand, newContextMenu);
+                Additem(ContextItems.Export, newContextMenu);
             }
 
             if (node.NodeType == NodeType.File)
@@ -80,12 +82,12 @@ namespace CommonControls.PackFileBrowser
 
                 }
                 Additem(ContextItems.CopyFullPath, newContextMenu);
+                Additem(ContextItems.Export, newContextMenu);
                 AddSeperator(newContextMenu);
 
                 var openFolder = Additem(ContextItems.Open, newContextMenu);
-                Additem(ContextItems.OpenWithKitbasher, openFolder);
-                Additem(ContextItems.OpenWithTextEditor, openFolder);
-                Additem(ContextItems.OpenWithPreview, openFolder);
+                Additem(ContextItems.OpenWithHxD, openFolder);
+                Additem(ContextItems.OpenWithNodePadPluss, openFolder);
             }
 
             Items = newContextMenu;

@@ -1,9 +1,11 @@
 ﻿using CommonControls.Common;
 using MonoGame.Framework.WpfInterop;
+using System.Collections.Generic;
 using System.Linq;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Components.Rendering;
+using View3D.SceneNodes;
 using View3D.Services;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
@@ -32,6 +34,29 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             var lod0 = _editableMeshResolver.GeEditableMeshRootNode().GetLodNodes().FirstOrDefault();
             if (lod0 != null)
                 _objectEditor.SortMeshes(lod0);
+        }
+
+        public void DeleteLods()
+        {
+            var rootNode = _editableMeshResolver.GeEditableMeshRootNode();
+            var lods = rootNode.GetLodNodes();
+
+            var firtLod = lods.First();
+            var lodsToGenerate = lods
+                .Skip(1)
+                .Take(rootNode.Children.Count - 1)
+                .ToList();
+
+            // Delete all the lods
+            foreach (var lod in lodsToGenerate)
+            {
+                var itemsToDelete = new List<ISceneNode>();
+                foreach (var child in lod.Children)
+                    itemsToDelete.Add(child);
+
+                foreach (var child in itemsToDelete)
+                    child.Parent.RemoveObject(child);
+            }
         }
 
         public void Save() => ModelSaver.Save();

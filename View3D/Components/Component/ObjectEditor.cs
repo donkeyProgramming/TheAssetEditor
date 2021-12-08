@@ -110,7 +110,7 @@ namespace View3D.Components.Component
                 var itemsInGroup = groupParent.Children;
                 var itemsToAdd = selectedObjects.Where(x => itemsInGroup.Contains(x) == false).ToList();
 
-                var addItemToGroupCmd = new AddObjectsToExistingGroupCommand(groupParent, itemsToAdd);
+                var addItemToGroupCmd = new AddObjectsToGroupCommand(groupParent, itemsToAdd);
                 _commandManager.ExecuteCommand(addItemToGroupCmd);
                 return;
             }

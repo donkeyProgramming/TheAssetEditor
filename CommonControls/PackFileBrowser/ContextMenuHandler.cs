@@ -7,7 +7,9 @@ using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
@@ -25,14 +27,14 @@ namespace CommonControls.PackFileBrowser
         public ICommand DeleteCommand { get; set; }
         public ICommand SavePackFileCommand { get; set; }
         public ICommand CopyNodePathCommand { get; set; }
+        public ICommand ExportCommand { get; set; }
         public ICommand CopyToEditablePackCommand { get; set; }
         public ICommand DuplicateCommand { get; set; }
         public ICommand CreateFolderCommand { get; set; }
         public ICommand SetAsEditabelPackCommand { get; set; }
         public ICommand ExpandAllChildrenCommand { get; set; }
-        public ICommand OpenToolCommand_Preview { get; set; }
-        public ICommand OpenToolCommand_Text { get; set; }
-        public ICommand OpenToolCommand_Kitbash { get; set; }
+        public ICommand OpenPack_FileNotpadPluss_Command { get; set; }
+        public ICommand OpenPackFile_HxD_Command { get; set; }
         public ICommand SavePackFileAsCommand { get; set; }
 
         protected PackFileService _packFileService;
@@ -60,8 +62,9 @@ namespace CommonControls.PackFileBrowser
             CopyToEditablePackCommand = new RelayCommand(CopyToEditablePack);
             SetAsEditabelPackCommand = new RelayCommand(SetAsEditabelPack);
             ExpandAllChildrenCommand = new RelayCommand(ExpandAllChildren);
-
-            //OpenToolCommand_Kitbash = new RelayCommand(OpenKitbasherTool);
+            ExportCommand = new RelayCommand(ExportToFolder);
+            OpenPack_FileNotpadPluss_Command = new RelayCommand(() => OpenPackFileUsing(@"C:\Program Files (x86)\Notepad++\notepad++.exe", _selectedNode.Item));
+            OpenPackFile_HxD_Command = new RelayCommand(() => OpenPackFileUsing(@"C:\Program Files\HxD\HxD.exe", _selectedNode.Item));
         }
 
         void OnRenameNode()
@@ -254,6 +257,70 @@ namespace CommonControls.PackFileBrowser
             ExpandAllRecursive(_selectedNode);
         }
 
+        void ExportToFolder()
+        {
+            var dialog = new CommonOpenFileDialog();
+            dialog.IsFolderPicker = true;
+            dialog.Multiselect = false;
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                var nodeStartDir =  Path.GetDirectoryName(_selectedNode.GetFullPath());
+                int fileCounter = 0;
+                SaveSelfAndChildren(_selectedNode, dialog.FileNames.First(), nodeStartDir, ref fileCounter);
+                MessageBox.Show($"{fileCounter} files exported!");
+            }
+        }
+
+        void SaveSelfAndChildren(TreeNode node, string outputDirectory, string rootPath, ref int fileCounter)
+        {
+            if (node.NodeType == NodeType.Directory)
+            {
+                foreach (var item in node.Children)
+                    SaveSelfAndChildren(item, outputDirectory, rootPath, ref fileCounter);
+            }
+            else
+            {
+                var nodeOriginalPath = node.GetFullPath();
+
+                var nodePathWithoutRoot = nodeOriginalPath;
+                if (rootPath.Length != 0)
+                    nodePathWithoutRoot = nodeOriginalPath.Replace(rootPath, "");
+
+                if (nodePathWithoutRoot.StartsWith("\\") == false)
+                    nodePathWithoutRoot = "\\" + nodePathWithoutRoot;
+
+                var fileOutputPath = outputDirectory + nodePathWithoutRoot;
+
+                var fileOutputDir = Path.GetDirectoryName(fileOutputPath);
+                DirectoryHelper.EnsureCreated(fileOutputDir);
+
+                var packFile = node.Item;
+                var bytes = packFile.DataSource.ReadData();
+    
+                File.WriteAllBytes(fileOutputPath, bytes);
+
+                fileCounter++;
+            }
+        }
+
+        void OpenPackFileUsing(string applicationPath, PackFile packFile)
+        {
+            if (File.Exists(applicationPath) == false)
+            {
+                MessageBox.Show($"Application {applicationPath} does not exist");
+                return;
+            }
+
+            var tempFolder = Path.GetTempPath();
+            var fileName = string.Format(@"{0}_", DateTime.Now.Ticks) +  packFile.Name;
+
+            var path = tempFolder + "\\" + fileName;
+            var bytes = packFile.DataSource.ReadData();
+            File.WriteAllBytes(path, bytes);
+
+            Process.Start(applicationPath, $"\"{path}\"");
+        }
+
         void ExpandAllRecursive(TreeNode node)
         {
             node.IsNodeExpanded = true;
@@ -303,6 +370,8 @@ namespace CommonControls.PackFileBrowser
                     return new ContextMenuItem() { Name = "Expand", Command = ExpandAllChildrenCommand }; ;
                 case ContextItems.CopyFullPath:
                     return new ContextMenuItem() { Name = "Copy full path", Command = CopyNodePathCommand };
+                case ContextItems.Export:
+                    return new ContextMenuItem() { Name = "Export to disk", Command = ExportCommand };
                 case ContextItems.Rename:
                     return new ContextMenuItem() { Name = "Rename", Command = RenameNodeCommand }; ;
                 case ContextItems.SetAsEditabelPack:
@@ -317,15 +386,13 @@ namespace CommonControls.PackFileBrowser
                     return new ContextMenuItem() { Name = "Save as", Command = SavePackFileAsCommand }; ;
                 case ContextItems.Open:
                     return new ContextMenuItem() { Name = "Open", }; ;
-                case ContextItems.OpenWithTextEditor:
-                    return new ContextMenuItem() { Name = "Text editor", Command = OpenToolCommand_Text }; ;
-                case ContextItems.OpenWithKitbasher:
-                    return new ContextMenuItem() { Name = "Kitbasher", Command = OpenToolCommand_Kitbash }; ;
-                case ContextItems.OpenWithPreview:
-                    return new ContextMenuItem() { Name = "Preview tool", Command = OpenToolCommand_Preview }; ;
+                case ContextItems.OpenWithHxD:
+                    return new ContextMenuItem() { Name = "HxD", Command = OpenPackFile_HxD_Command }; ;
+                case ContextItems.OpenWithNodePadPluss:
+                    return new ContextMenuItem() { Name = "Notepad++", Command = OpenPack_FileNotpadPluss_Command }; ;
             }
 
-            throw new Exception("Unknown ContextItems type ");
+            throw new Exception($"Unknown ContextItemType  {type} ");
         }
 
         protected enum ContextItems
@@ -339,6 +406,7 @@ namespace CommonControls.PackFileBrowser
 
             Expand,
             CopyFullPath,
+            Export,
             Rename,
             SetAsEditabelPack,
 
@@ -348,9 +416,8 @@ namespace CommonControls.PackFileBrowser
             SaveAs,
 
             Open,
-            OpenWithTextEditor,
-            OpenWithKitbasher,
-            OpenWithPreview,
+            OpenWithHxD,
+            OpenWithNodePadPluss,
         }
     }
 

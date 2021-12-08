@@ -9,6 +9,7 @@ using System.Text;
 
 namespace CommonControls.FileTypes.RigidModel.Types
 {
+    [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     [DebuggerDisplay("RmvAttachmentPoint = {Name}")]
     public struct RmvAttachmentPoint
@@ -46,5 +47,7 @@ namespace CommonControls.FileTypes.RigidModel.Types
         }
 
         public int BoneIndex { get { return _boneIndex; } set { _boneIndex = value; } }
+
+       
     }
 }

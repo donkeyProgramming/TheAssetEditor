@@ -20,11 +20,14 @@ namespace CommonControls.Editors.AnimationFilePreviewEditor
                 var output = new StringBuilder();
                 
                 output.AppendLine($"Header:");
-                output.AppendLine($"\t AnimationFormat:{animFile.Header.AnimationFormat}");
+                output.AppendLine($"\t Version:{animFile.Header.Version}");
                 output.AppendLine($"\t Unknown0_alwaysOne:{animFile.Header.Unknown0_alwaysOne}");
                 output.AppendLine($"\t FrameRate:{animFile.Header.FrameRate}");
                 output.AppendLine($"\t SkeletonName:{animFile.Header.SkeletonName}");
-                output.AppendLine($"\t Unknown1_alwaysZero:{animFile.Header.Unknown1_alwaysZero}");
+                output.AppendLine($"\t FlagCount:{animFile.Header.FlagCount}");
+                for(int i = 0; i < animFile.Header.FlagVariables.Count; i++)
+                    output.AppendLine($"\t\t FlagValue[{i}]:{animFile.Header.FlagVariables[i]}");
+
                 output.AppendLine($"\t AnimationTotalPlayTimeInSec:{animFile.Header.AnimationTotalPlayTimeInSec}");
 
                 output.AppendLine("");

@@ -28,6 +28,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         ImportReferenceSlayer,
         ImportReferenceGoblin,
         ImportMapForDebug,
+        DeleteLods,
+        ClearConsole,
         SortModelsByName,
 
         Group,
@@ -123,6 +125,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _actionList[MenuActionType.ImportReferenceSlayer] = new MenuAction(ImportReference_Slayer) { EnableRule = ActionEnabledRule.Always, ToolTip = "Import Slayer Reference model" };
             _actionList[MenuActionType.ImportReferenceGoblin] = new MenuAction(ImportReference_Goblin) { EnableRule = ActionEnabledRule.Always, ToolTip = "Import Goblin Reference model" };
             _actionList[MenuActionType.ImportMapForDebug] = new MenuAction(ImportDebugMap) { EnableRule = ActionEnabledRule.Always, ToolTip = "Import map for debug" };
+            _actionList[MenuActionType.DeleteLods] = new MenuAction(General.DeleteLods) { EnableRule = ActionEnabledRule.Always, ToolTip = "Delete all but first lod" };
+            _actionList[MenuActionType.ClearConsole] = new MenuAction(ClearConsole) { EnableRule = ActionEnabledRule.Always, ToolTip = "Clear the debug console window" };
             _actionList[MenuActionType.Undo] = new MenuAction(General.Undo) { EnableRule = ActionEnabledRule.Custom, ToolTip = "Undo Last item", Hotkey = new Hotkey(Key.Z, ModifierKeys.Control) };
             _actionList[MenuActionType.SortModelsByName] = new MenuAction(General.SortMeshes) { EnableRule = ActionEnabledRule.Always, ToolTip = "Sort models by name" };
 
@@ -180,6 +184,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             MenuItems[1].Children.Add(new ToolbarItem() { Name = "Import Slayer", Action = _actionList[MenuActionType.ImportReferenceSlayer] });
             MenuItems[1].Children.Add(new ToolbarItem() { Name = "Import Goblin", Action = _actionList[MenuActionType.ImportReferenceGoblin] });
             MenuItems[1].Children.Add(new ToolbarItem() { Name = "Import map", Action = _actionList[MenuActionType.ImportMapForDebug] });
+            MenuItems[1].Children.Add(new ToolbarItem() { Name = "Delete lods", Action = _actionList[MenuActionType.DeleteLods] });
+            MenuItems[1].Children.Add(new ToolbarItem() { Name = "Clear console", Action = _actionList[MenuActionType.ClearConsole] });
 
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "(Un)Group selection", Action = _actionList[MenuActionType.Group] });
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "Reduce mesh by 10%", Action = _actionList[MenuActionType.ReduceMesh10x] });
@@ -329,5 +335,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         void ImportReference_Slayer() => ModelLoader.LoadReference(@"variantmeshes\variantmeshdefinitions\dwf_giant_slayers.variantmeshdefinition");
         void ImportReference_Goblin() => ModelLoader.LoadReference(@"variantmeshes\variantmeshdefinitions\grn_forest_goblins_base.variantmeshdefinition");
         void ImportDebugMap() => MapLoaderService.Load(_packFileService, _componentManager, ModelLoader);
+
+        void ClearConsole() => Console.Clear();
     }
 }

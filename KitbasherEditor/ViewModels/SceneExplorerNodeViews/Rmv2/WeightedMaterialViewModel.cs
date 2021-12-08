@@ -1,14 +1,18 @@
 ﻿using CommonControls.Common;
 using CommonControls.FileTypes.RigidModel.MaterialHeaders;
+using GalaSoft.MvvmLight.CommandWpf;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Input;
 using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 {
     public class WeightedMaterialViewModel : NotifyPropertyChangedImpl
     {
+        WeightedMaterial _weightedMaterial;
+
         public NotifyAttr<string> Filters { get; set; } = new NotifyAttr<string>();
         public NotifyAttr<int> MatrixIndex { get; set; } = new NotifyAttr<int>();
         public NotifyAttr<int> ParentMatrixIndex { get; set; } = new NotifyAttr<int>();
@@ -22,24 +26,44 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         public ObservableCollection<string> AttachmentPointParameters { get; set; }
         public ObservableCollection<string> VectorParameters { get; set; }
 
+        public ICommand SetDefaultParentMatrixIndexCommand { get; set; }
+        public ICommand SetDefaultMatrixIndexCommand { get; set; }
+
+
+
         public WeightedMaterialViewModel(Rmv2MeshNode node)
         {
-            var typedMaterial = node.Material as WeightedMaterial;
-            if (typedMaterial == null)
+            _weightedMaterial = node.Material as WeightedMaterial;
+            if (_weightedMaterial == null)
                 throw new Exception($"Material is not WeightedMaterial - {node.Material.GetType()}");
 
-            Filters.Value = typedMaterial.Filters;
-            MatrixIndex.Value = typedMaterial.MatrixIndex;
-            ParentMatrixIndex.Value = typedMaterial.ParentMatrixIndex;
-            BinaryVertexFormat.Value = typedMaterial.BinaryVertexFormat.ToString();
-            TransformInfo.Value = $"Piv Identity = {typedMaterial.OriginalTransform.IsIdentityPivot()} Matrix Identity = {typedMaterial.OriginalTransform.IsIdentityMatrices()}";
+            Filters.Value = _weightedMaterial.Filters;
+            MatrixIndex.Value = _weightedMaterial.MatrixIndex;
+            ParentMatrixIndex.Value = _weightedMaterial.ParentMatrixIndex;
+            BinaryVertexFormat.Value = _weightedMaterial.BinaryVertexFormat.ToString();
+            TransformInfo.Value = $"Piv Identity = {_weightedMaterial.OriginalTransform.IsIdentityPivot()} Matrix Identity = {_weightedMaterial.OriginalTransform.IsIdentityMatrices()}";
 
-            StringParameters = new ObservableCollection<string>(typedMaterial.StringParams);
-            FloatParameters = new ObservableCollection<float>(typedMaterial.FloatParams);
-            IntParameters = new ObservableCollection<int>(typedMaterial.IntParams);
-            TextureParameters = new ObservableCollection<string>(typedMaterial.TexturesParams.Select(x=>x.TexureType + " - " + x.Path));
-            AttachmentPointParameters = new ObservableCollection<string>(typedMaterial.AttachmentPointParams.Select(x => x.BoneIndex+ " - " + x.Name + " Ident:" + x.Matrix.IsIdentity()));
-            VectorParameters = new ObservableCollection<string>(typedMaterial.Vec4Params.Select(x => $"[{x.X}] [{x.Y}] [{x.Z}] [{x.W}]"));
+            StringParameters = new ObservableCollection<string>(_weightedMaterial.StringParams);
+            FloatParameters = new ObservableCollection<float>(_weightedMaterial.FloatParams);
+            IntParameters = new ObservableCollection<int>(_weightedMaterial.IntParams);
+            TextureParameters = new ObservableCollection<string>(_weightedMaterial.TexturesParams.Select(x=>x.TexureType + " - " + x.Path));
+            AttachmentPointParameters = new ObservableCollection<string>(_weightedMaterial.AttachmentPointParams.Select(x => x.BoneIndex+ " - " + x.Name + " Ident:" + x.Matrix.IsIdentity()));
+            VectorParameters = new ObservableCollection<string>(_weightedMaterial.Vec4Params.Select(x => $"[{x.X}] [{x.Y}] [{x.Z}] [{x.W}]"));
+
+            SetDefaultParentMatrixIndexCommand = new RelayCommand(SetDefaultParentMatrix);
+            SetDefaultMatrixIndexCommand = new RelayCommand(SetDefaultMatrix);
+        }
+
+        void SetDefaultMatrix()
+        {
+            _weightedMaterial.MatrixIndex = -1;
+            MatrixIndex.Value = _weightedMaterial.MatrixIndex;
+        }
+
+        void SetDefaultParentMatrix()
+        {
+            _weightedMaterial.ParentMatrixIndex = -1;
+            ParentMatrixIndex.Value = _weightedMaterial.MatrixIndex;
         }
 
     }

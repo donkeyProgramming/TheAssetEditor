@@ -89,10 +89,19 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             node.Model.Header = header;
         }
 
+        public void CopyTexturesToOutputPack()
+        {
+            var meshes = _mainNode.GetMeshesInLod(0, false);
+
+
+        }
+
         public void Dispose()
         {
             _skeletonAnimationLookUpHelper = null;
             _mainNode = null;
         }
+
+     
     }
 }

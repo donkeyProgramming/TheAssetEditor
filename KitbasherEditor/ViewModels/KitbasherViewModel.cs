@@ -15,6 +15,7 @@ using View3D.Components.Component.Selection;
 using View3D.Components.Gizmo;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
+using View3D.Rendering.Geometry;
 using View3D.Scene;
 using View3D.SceneNodes;
 using View3D.Services;
@@ -42,7 +43,7 @@ namespace KitbasherEditor.ViewModels
 
         KitbashSceneCreator _modelLoader;
 
-        public KitbasherViewModel(PackFileService pf, SkeletonAnimationLookUpHelper skeletonHelper )
+        public KitbasherViewModel(PackFileService pf, SkeletonAnimationLookUpHelper skeletonHelper)
         {
             _packFileService = pf;
             _skeletonAnimationLookUpHelper = skeletonHelper;
@@ -81,7 +82,7 @@ namespace KitbasherEditor.ViewModels
         {
             var sceneManager = scene.GetComponent<SceneManager>();
             var resourceLib = scene.GetComponent<ResourceLibary>();
-            _modelLoader = new KitbashSceneCreator(_packFileService, resourceLib, Animation, sceneManager, MainFile);
+            _modelLoader = new KitbashSceneCreator(_packFileService, resourceLib, Animation, sceneManager, MainFile, GeometryGraphicsContextFactory.CreateInstance(Scene.GraphicsDevice));
             MenuBar.ModelLoader = _modelLoader;
             MenuBar.General.ModelSaver = new SceneSaverService(_packFileService, this, _modelLoader.EditableMeshNode);
             
