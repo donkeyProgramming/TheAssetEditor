@@ -37,7 +37,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 TextureTypeStr = _texureType.ToString();
             }
 
-            public void Preview() => TexturePreviewController.CreateVindow(Path.Value, _packfileService);
+            public void Preview() => TexturePreviewController.CreateWindow(Path.Value, _packfileService);
 
             public void Browse()
             {

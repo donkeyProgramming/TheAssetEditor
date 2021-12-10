@@ -21,6 +21,8 @@ namespace CommonControls.FileTypes.RigidModel.LodHeader
 
         public RmvLodHeader[] LoadLodHeaders(byte[] data, int offset, RmvVersionEnum version, uint lodCount, out uint bytesRead)
         {
+            if (_lodHeaderCreators.ContainsKey(version) == false)
+                throw new Exception($"Unknown Lod header - {version}");
             var lodLoader = _lodHeaderCreators[version];
 
             var lodHeaders = new RmvLodHeader[lodCount];

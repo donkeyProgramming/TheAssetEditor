@@ -270,7 +270,7 @@ namespace CommonControls.PackFileBrowser
                 MessageBox.Show($"{fileCounter} files exported!");
             }
         }
-
+        
         void SaveSelfAndChildren(TreeNode node, string outputDirectory, string rootPath, ref int fileCounter)
         {
             if (node.NodeType == NodeType.Directory)
@@ -281,24 +281,24 @@ namespace CommonControls.PackFileBrowser
             else
             {
                 var nodeOriginalPath = node.GetFullPath();
-
+        
                 var nodePathWithoutRoot = nodeOriginalPath;
                 if (rootPath.Length != 0)
                     nodePathWithoutRoot = nodeOriginalPath.Replace(rootPath, "");
-
+        
                 if (nodePathWithoutRoot.StartsWith("\\") == false)
                     nodePathWithoutRoot = "\\" + nodePathWithoutRoot;
-
+        
                 var fileOutputPath = outputDirectory + nodePathWithoutRoot;
-
+        
                 var fileOutputDir = Path.GetDirectoryName(fileOutputPath);
                 DirectoryHelper.EnsureCreated(fileOutputDir);
-
+        
                 var packFile = node.Item;
                 var bytes = packFile.DataSource.ReadData();
-    
+        
                 File.WriteAllBytes(fileOutputPath, bytes);
-
+        
                 fileCounter++;
             }
         }

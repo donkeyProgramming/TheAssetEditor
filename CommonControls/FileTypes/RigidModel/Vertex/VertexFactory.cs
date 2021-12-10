@@ -62,6 +62,11 @@ namespace CommonControls.FileTypes.RigidModel.Vertex
             return _vertexCreators[format].VertexSize;
         }
 
+        public bool IsKnownVertex(VertexFormat format)
+        {
+            return _vertexCreators.ContainsKey(format);
+        }
+
         public byte[] Save(VertexFormat vertexType, CommonVertex vertex)
         {
             return _vertexCreators[vertexType].ToBytes(vertex);

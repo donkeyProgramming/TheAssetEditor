@@ -13,9 +13,14 @@ namespace AssetEditor.Services
         {
             try
             {
+
+                System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
+                string version = fvi.FileVersion;
+
                 GitHubClient client = new GitHubClient(new ProductHeaderValue("AssetEditor_instance"));
                 IReadOnlyList<Release> releases = client.Repository.Release.GetAll("olekristianhomelien", "TheAssetEditor").Result;
-
+            
                 var latest = releases.FirstOrDefault();
                 if (!latest.TagName.Contains(expectedTagName, StringComparison.InvariantCultureIgnoreCase))
                 {

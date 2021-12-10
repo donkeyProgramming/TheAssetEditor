@@ -2,8 +2,9 @@
 ImageMagick
 https://github.com/dlemstra/Magick.NET
 
-
 The TW statics have the normal/tangent/bitangt stored z,y,x
+
+Texture preview tool! 
 
 Major ideas:
 	Texture kitbashing
@@ -17,24 +18,24 @@ Major ideas:
 	Search window 
 
 Bugs:
-	corruption detector
-	File changed outside of ass
+	corruption detector - 	File changed outside of ass
 
-	Lod header 5 => variantmeshes\_variantmodels\elephant\bodyparts\e3_elephant\default_elephant.rigid_model_v2 
+
+	Lod header 5 => Rome 2 | variantmeshes\_variantmodels\elephant\bodyparts\e3_elephant\default_elephant.rigid_model_v2 
 		offset = 140
 	
 	C:\Program Files (x86)\Notepad++\notepad++.exe
 	C:\Program Files\HxD\HxD.exe
 	
+	Fix 120e-12 for text values 
+	SkeletonName for static meshes in ui (missing from..)
+	Editable mesh - Copy all textues to pack - output format 
 	Remove bmiWindow
+	As AS_ prefix to mesh files 
+	
 	Troy	
 		variantmeshes\variantmeshdefinitions\troy_achilles_charioteer_spear.variantmeshdefinition
 	
-	// Check values for Unknown1_alwaysZero and Unknown0_alwaysOne in skeleton header 
-	// Group hotkey not working
-	// Reduce tool missing
-	// Curruption detector + File saved outide of ass 
-	// 
 	// Only one refmesh selectable at once 
 	
 

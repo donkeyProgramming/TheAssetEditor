@@ -14,11 +14,17 @@ namespace CommonControls.FileTypes.RigidModel
     public class ModelFactory
     {
         ILogger _logger = Logging.Create<ModelFactory>();
-        public static ModelFactory Create() => new ModelFactory();
+        public static ModelFactory Create(bool logLoadedFile = true) => new ModelFactory();
+
+        bool _logLoadedFile;
+        public ModelFactory(bool logLoadedFile = false)
+        {
+            _logLoadedFile = logLoadedFile;
+        }
 
         public RmvFile Load(byte[] bytes)
         {
-            _logger.Here().Information($"Loading RmvFile model. Bytes:{bytes.Length}");
+            _logger.Here().Information($"Loading RmvFile. Bytes:{bytes.Length}");
             var file = LoadOnlyHeaders(bytes);
 
             var modelList = new RmvModel[file.Header.LodCount][];
@@ -26,7 +32,8 @@ namespace CommonControls.FileTypes.RigidModel
                 modelList[i] = LoadMeshInLod(bytes, file.LodHeaders[i], file.Header.Version);
 
             file.ModelList = modelList;
-            DumpToLog(file, bytes.Length);
+            if(_logLoadedFile)
+                DumpToLog(file, bytes.Length);
 
             return file;
         }
@@ -82,9 +89,12 @@ namespace CommonControls.FileTypes.RigidModel
 
             var vertexStart = commonHeader.VertexOffset + modelStartOffset;
             var expectedVertexSize = (commonHeader.IndexOffset - commonHeader.VertexOffset) / commonHeader.VertexCount;
+            if(vertexFactory.IsKnownVertex(binaryVertexFormat) == false)
+                throw new Exception($"Unknown vertex for {commonHeader.ModelTypeFlag} - {binaryVertexFormat}. Size:{expectedVertexSize}");
+
             var vertexSize = vertexFactory.GetVertexSize(binaryVertexFormat);
             if (expectedVertexSize != vertexSize)
-                throw new Exception("Vertex size does not match");
+                throw new Exception($"Vertex size does not match for {commonHeader.ModelTypeFlag} - {binaryVertexFormat}. Expected: {expectedVertexSize} Actual: {vertexSize}");
 
             var vertexList = vertexFactory.CreateVertexFromBytes(binaryVertexFormat, dataArray, (int)commonHeader.VertexCount, (int)vertexStart, (int)expectedVertexSize);
 

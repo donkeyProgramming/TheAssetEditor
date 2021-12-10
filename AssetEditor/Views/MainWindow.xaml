@@ -48,14 +48,24 @@
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <Grid>
+                     
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
+                        
+                        <Grid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Close" IsEnabled="False"/>
+                                <MenuItem Header="Close others" IsEnabled="False"/>
+                            </ContextMenu>
+                        </Grid.ContextMenu>
+                        
                         <TextBlock Grid.Column="0" Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}"/>
                         <Button Grid.Column="1" 
                                 Command="{Binding DataContext.CloseToolCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}}" 
-                                CommandParameter="{Binding}">
+                                CommandParameter="{Binding}"
+                                HorizontalContentAlignment="Right">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
                                     <Path Data="M0,0 L8,8 M8,0 L0,8" StrokeThickness="3" VerticalAlignment="Center" Margin="5,4,0,2">

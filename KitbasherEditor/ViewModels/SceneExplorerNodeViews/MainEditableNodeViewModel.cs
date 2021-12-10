@@ -1,6 +1,7 @@
 ﻿using CommonControls.Common;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
+using MoreLinq;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -15,7 +16,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         MainEditableNode _mainNode;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         AnimationControllerViewModel _animationControllerViewModel;
-        PackFileService _pf;
+        PackFileService _pfs;
 
         public ObservableCollection<string> SkeletonNameList { get; set; }
 
@@ -30,12 +31,12 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public RmvVersionEnum SelectedOutputFormat { get => _selectedOutputFormat; set { SetAndNotify(ref _selectedOutputFormat, value); _mainNode.SelectedOutputFormat = value; } }
 
 
-        public MainEditableNodeViewModel(MainEditableNode mainNode, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AnimationControllerViewModel animationControllerViewModel, PackFileService pf)
+        public MainEditableNodeViewModel(MainEditableNode mainNode, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AnimationControllerViewModel animationControllerViewModel, PackFileService pfs)
         {
             _mainNode = mainNode;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _animationControllerViewModel = animationControllerViewModel;
-            _pf = pf;
+            _pfs = pfs;
 
             SkeletonNameList = _skeletonAnimationLookUpHelper.SkeletonFileNames;
             if (_mainNode.Model != null)
@@ -92,8 +93,19 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public void CopyTexturesToOutputPack()
         {
             var meshes = _mainNode.GetMeshesInLod(0, false);
+            var materials = meshes.Select(x => x.Material);
+            var allTextures = materials.SelectMany(x => x.GetAllTextures());
+            var distinctTextures = allTextures.DistinctBy(x => x.Path);
 
-
+            foreach (var tex in distinctTextures)
+            {
+                var file = _pfs.FindFile(tex.Path);    
+                if (file  != null)
+                {
+                    var sourcePackContainer = _pfs.GetPackFileContainer(file);
+                    _pfs.CopyFileFromOtherPackFile(sourcePackContainer, tex.Path, _pfs.GetEditablePack());
+                }
+            }
         }
 
         public void Dispose()
@@ -101,7 +113,5 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             _skeletonAnimationLookUpHelper = null;
             _mainNode = null;
         }
-
-     
     }
 }

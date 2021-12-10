@@ -348,7 +348,7 @@ namespace CommonControls.Services
 
         public void CopyFileFromOtherPackFile(PackFileContainer source, string path, PackFileContainer target)
         {
-            var lowerPath = path.ToLower();
+            var lowerPath = path.Replace('/', '\\').ToLower().Trim();
             if (source.FileList.ContainsKey(lowerPath))
             {
                 var file = source.FileList[lowerPath] ;

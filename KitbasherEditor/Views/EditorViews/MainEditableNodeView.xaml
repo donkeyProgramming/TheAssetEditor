@@ -40,9 +40,9 @@
         <DockPanel DockPanel.Dock="Top">
             <Label Width ="{StaticResource labelWidth}" Content="Copy textures to pack" />
             <Label>:</Label>
-            <Button Content="Copy Textures" Click="{s:MethodBinding CopyTexturesToOutputPack}" Margin="2"/>
-            <Label Content="Output format:"/>
-            <ComboBox SelectedItem="Unchanged" VerticalAlignment="Center"/>
+            <Button Content="Copy" Click="{s:MethodBinding CopyTexturesToOutputPack}" Margin="0,2,2,2" Width="50"/>
+            <Label Content="Convertion:"/>
+            <ComboBox SelectedValue="None" VerticalAlignment="Center"/>
         </DockPanel>
 
     </DockPanel>

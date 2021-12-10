@@ -13,20 +13,21 @@ namespace CommonControls.Common
             MessageBox.Show(errorStr, "Error");
         }
 
-        public static string GetErrorString(Exception e)
+        public static string GetErrorString(Exception e, string seperator = "\n")
         {
             var ss = new StringBuilder();
-            ss.Append(e.Message + "\n");
+            ss.Append(e.Message + seperator);
 
             var innerE = e.InnerException;
             while (innerE != null)
             {
-                ss.Append(innerE.Message + "\n");
+                ss.Append(innerE.Message + seperator);
                 innerE = innerE.InnerException;
             }
 
             return ss.ToString();
         }
+
 
         public static Exception GetInnerMostException(Exception e)
         {

@@ -26,29 +26,34 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 
         public IMaterial LoadMaterial(byte[] data, int offset, RmvVersionEnum rmvType, ModelMaterialEnum modelTypeEnum, long expectedMaterialSize)
         {
-            if (_materialCreators.ContainsKey(modelTypeEnum))
+            try
             {
-                var material = _materialCreators[modelTypeEnum].Create(modelTypeEnum, rmvType, data, offset);
-                var actualMaterialSize = material.ComputeSize();
+                if (_materialCreators.ContainsKey(modelTypeEnum))
+                {
+                    var material = _materialCreators[modelTypeEnum].Create(modelTypeEnum, rmvType, data, offset);
+                    var actualMaterialSize = material.ComputeSize();
 
-                if (actualMaterialSize != expectedMaterialSize)
-                    throw new Exception($"Part of material {modelTypeEnum} header not read");
+                    if (actualMaterialSize != expectedMaterialSize)
+                        throw new Exception($"Part of material {modelTypeEnum} header not read");
 
-                return material;
+                    return material;
+                }
+                else
+                {
+                    _logger.Here().Error($"Could not load {modelTypeEnum} material, atttempting to load using default");
+                    var material = _materialCreators[ModelMaterialEnum.default_type].Create(modelTypeEnum, rmvType, data, offset);
+                    var actualMaterialSize = material.ComputeSize();
+
+                    if (actualMaterialSize != expectedMaterialSize)
+                        throw new Exception($"Uknown material - {modelTypeEnum} header not read. Expected Size = {expectedMaterialSize} Actual Size = {actualMaterialSize}");
+
+                    return material;
+                }
             }
-            else
+            catch (Exception e)
             {
-                _logger.Here().Error("Could not load {modelTypeEnum} material, atttempting to load using default");
-                var material = _materialCreators[ModelMaterialEnum.default_type].Create(modelTypeEnum, rmvType, data, offset);
-                var actualMaterialSize = material.ComputeSize();
-
-                if (actualMaterialSize != expectedMaterialSize)
-                    throw new Exception($"Uknown material - {modelTypeEnum} header not read. Expected Size = {expectedMaterialSize} Actual Size = {actualMaterialSize}");
-
-                return material;
+                throw new Exception($"Error loading material - {modelTypeEnum} Material Size = {expectedMaterialSize}", e);
             }
-
-            throw new Exception($"Uknown material - {modelTypeEnum} Material Size = {expectedMaterialSize}");
         }
 
         public byte[] Save(ModelMaterialEnum modelTypeEnum, IMaterial material)

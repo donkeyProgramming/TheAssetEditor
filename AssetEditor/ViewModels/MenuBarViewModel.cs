@@ -21,6 +21,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
+using AssetEditor.Report;
 
 namespace AssetEditor.ViewModels
 {
@@ -31,6 +32,7 @@ namespace AssetEditor.ViewModels
         IServiceProvider _serviceProvider;
         PackFileService _packfileService;
         ToolFactory _toolFactory;
+        ApplicationSettingsService _settingsService;
 
         public ICommand OpenSettingsWindowCommand { get; set; }
         public ICommand CreateNewPackFileCommand { get; set; }
@@ -58,14 +60,16 @@ namespace AssetEditor.ViewModels
         public ICommand OpenSuperViewToolCommand { get; set; }
         public ICommand OpenTechSkeletonEditorCommand { get; set; }
         public IEditorCreator EditorCreator { get; set; }
+        public ICommand GenerateRmv2ReportCommand { get; set; }
 
         public ICommand CreateAnimPackCommand { get; set; }
 
-        public MenuBarViewModel(IServiceProvider provider, PackFileService packfileService, ToolFactory toolFactory)
+        public MenuBarViewModel(IServiceProvider provider, PackFileService packfileService, ToolFactory toolFactory, ApplicationSettingsService settingsService)
         {
             _serviceProvider = provider;
             _packfileService = packfileService;
             _toolFactory = toolFactory;
+            _settingsService = settingsService;
             OpenSettingsWindowCommand = new RelayCommand(ShowSettingsDialog);
             OpenPackFileCommand = new RelayCommand(OpenPackFile);
             CreateNewPackFileCommand = new RelayCommand(CreatePackFile);
@@ -80,6 +84,8 @@ namespace AssetEditor.ViewModels
             OpenSuperViewToolCommand = new RelayCommand(OpenSuperViewTool);
             OpenTechSkeletonEditorCommand = new RelayCommand(OpenTechSkeletonEditor);
             OpenAnimationBatchExporterCommand = new RelayCommand(OpenAnimationBatchExporter);
+            
+            GenerateRmv2ReportCommand = new RelayCommand(GenerateRmv2Report);
 
             OpenAttilaPacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Attila));
             OpenRome2RePacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Rome_2_Remastered));
@@ -228,6 +234,13 @@ namespace AssetEditor.ViewModels
         }
 
         void OpenAnimationBatchExporter() => AnimationBatchExportViewModel.ShowWindow(_packfileService);
+
+        void GenerateRmv2Report()
+        {
+            var gameName = GameInformationFactory.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
+            var reportGenerator = new Rmv2ReportGenerator(_packfileService);
+            reportGenerator.Create(gameName);
+        }
 
     }
 }

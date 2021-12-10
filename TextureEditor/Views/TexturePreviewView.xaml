@@ -3,44 +3,52 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:TextureEditor.Views"
+             xmlns:local="clr-namespace:TextureEditor.Views" xmlns:System="clr-namespace:System;assembly=System.Runtime"
+              xmlns:s="http://schemas.singulink.com/xaml"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <System:Double x:Key="labelWidth">120</System:Double>
+        <System:Double x:Key="LayerImageSize">120</System:Double>
+    </UserControl.Resources>
+
     <DockPanel >
-        <Button DockPanel.Dock="Bottom" HorizontalAlignment="Right" Width="120">Close</Button>
+     
         <DockPanel DockPanel.Dock="Right">
             <GroupBox>
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <Label Width="60">Format</Label>
+                        <Label Width="{StaticResource labelWidth}">Format</Label>
                         <Label>:</Label>
-                        <Label  HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding Path=Format, UpdateSourceTrigger=PropertyChanged}"></Label>
+                        <Label  HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding Path=Format.Value, UpdateSourceTrigger=PropertyChanged}"></Label>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <Label Width="60">Width</Label>
+                        <Label Width="{StaticResource labelWidth}">Width</Label>
                         <Label>:</Label>
-                        <Label  HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding Path=Width, UpdateSourceTrigger=PropertyChanged}"></Label>
+                        <Label  HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding Path=Width.Value, UpdateSourceTrigger=PropertyChanged}"></Label>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <Label Width="60">Height</Label>
+                        <Label Width="{StaticResource labelWidth}">Height</Label>
                         <Label>:</Label>
-                        <Label  HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding Path=Height, UpdateSourceTrigger=PropertyChanged}"></Label>
+                        <Label  HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding Path=Height.Value, UpdateSourceTrigger=PropertyChanged}"></Label>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <Label Width="60">MipMaps</Label>
+                        <Label Width="{StaticResource labelWidth}">Num MipMaps</Label>
                         <Label>:</Label>
                         <Label  HorizontalAlignment="Center" VerticalAlignment="Center">0</Label>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                    <Button Content="Image Details" DockPanel.Dock="Top" HorizontalAlignment="Stretch" Click="{s:MethodBinding ShowTextureDetailsInfo}"/>
+               
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0,10,0,0">
                         <StackPanel>
                             <Label HorizontalContentAlignment="Center" Width="40" >RGBA</Label>
                             <CheckBox  IsChecked="{Binding FormatRgbaCheckbox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <Image Source="{Binding Path=PreviewImage[0], UpdateSourceTrigger=PropertyChanged}" Width="60" Height="60" HorizontalAlignment="Right"></Image>
+                        <Image Source="{Binding Path=PreviewImage[0], UpdateSourceTrigger=PropertyChanged}" Width="{StaticResource LayerImageSize}" Height="{StaticResource LayerImageSize}" HorizontalAlignment="Right"></Image>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
@@ -48,7 +56,7 @@
                             <Label HorizontalContentAlignment="Center" Width="40">R</Label>
                             <CheckBox  IsChecked="{Binding FormatRCheckbox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </StackPanel>
-                        <Image Source="{Binding Path=PreviewImage[1], UpdateSourceTrigger=PropertyChanged}" Width="60" Height="60" HorizontalAlignment="Right"></Image>
+                        <Image Source="{Binding Path=PreviewImage[1], UpdateSourceTrigger=PropertyChanged}" Width="{StaticResource LayerImageSize}" Height="{StaticResource LayerImageSize}" HorizontalAlignment="Right"></Image>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
@@ -56,7 +64,7 @@
                             <Label HorizontalContentAlignment="Center" Width="40">G</Label>
                             <CheckBox IsChecked="{Binding FormatGCheckbox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </StackPanel>
-                        <Image Source="{Binding Path=PreviewImage[2], UpdateSourceTrigger=PropertyChanged}" Width="60" Height="60" HorizontalAlignment="Right"></Image>
+                        <Image Source="{Binding Path=PreviewImage[2], UpdateSourceTrigger=PropertyChanged}" Width="{StaticResource LayerImageSize}" Height="{StaticResource LayerImageSize}" HorizontalAlignment="Right"></Image>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
@@ -64,7 +72,7 @@
                             <Label HorizontalContentAlignment="Center" Width="40">B</Label>
                             <CheckBox IsChecked="{Binding FormatBCheckbox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <Image Source="{Binding Path=PreviewImage[3], UpdateSourceTrigger=PropertyChanged}" Width="60" Height="60" HorizontalAlignment="Right"></Image>
+                        <Image Source="{Binding Path=PreviewImage[3], UpdateSourceTrigger=PropertyChanged}" Width="{StaticResource LayerImageSize}" Height="{StaticResource LayerImageSize}" HorizontalAlignment="Right"></Image>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
@@ -72,7 +80,7 @@
                             <Label HorizontalContentAlignment="Center" Width="40" >A</Label>
                             <CheckBox IsChecked="{Binding FormatACheckbox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <Image Source="{Binding Path=PreviewImage[4], UpdateSourceTrigger=PropertyChanged}" Width="60" Height="60" HorizontalAlignment="Right"></Image>
+                        <Image Source="{Binding Path=PreviewImage[4], UpdateSourceTrigger=PropertyChanged}" Width="{StaticResource LayerImageSize}" Height="{StaticResource LayerImageSize}" HorizontalAlignment="Right"></Image>
                     </StackPanel>
 
 
@@ -80,11 +88,12 @@
             </GroupBox>
         </DockPanel>
 
-        <StackPanel DockPanel.Dock="Top">
-            <Label  HorizontalAlignment="Left" VerticalAlignment="Center" Content="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}"></Label>
-        </StackPanel>
+        <DockPanel DockPanel.Dock="Bottom" >
+            <Label DockPanel.Dock="Left" Content="Image Path:" FontWeight="Bold"/>
+            <Label DockPanel.Dock="Left" HorizontalAlignment="Left" VerticalAlignment="Center" Content="{Binding Path=ImagePath.Value, UpdateSourceTrigger=PropertyChanged}"/>
+        </DockPanel>
 
-        <Image  Source="{Binding Path=Image, UpdateSourceTrigger=PropertyChanged}"></Image>
+        <Image  Source="{Binding Path=ActiveImage.Value, UpdateSourceTrigger=PropertyChanged}"/>
 
     </DockPanel>
 </UserControl>

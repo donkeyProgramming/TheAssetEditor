@@ -22,10 +22,12 @@ namespace CommonControls.BaseDialogs
             InitializeComponent(); 
         }
 
-        public ControllerHostWindow(bool alwaysTopMost)
+        public ControllerHostWindow(bool alwaysTopMost = false, ResizeMode resizeMode = ResizeMode.NoResize)
         {
             if(alwaysTopMost)
                 Deactivated += Window_Deactivated;
+
+            ResizeMode = resizeMode;
         }
 
         private void Window_Deactivated(object sender, EventArgs e)

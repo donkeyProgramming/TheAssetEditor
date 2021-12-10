@@ -21,7 +21,7 @@ namespace View3D.Utility
         BasicEffect
     }
 
-    public class ResourceLibary : BaseComponent, IDisposable
+    public partial class ResourceLibary : BaseComponent, IDisposable
     {
         ILogger _logger = Logging.Create<ResourceLibary>();
 
@@ -68,10 +68,16 @@ namespace View3D.Utility
             if (_textureMap.ContainsKey(fileName))
                 return _textureMap[fileName];
 
-            var texture = LoadTextureAsTexture2d(fileName, Game.GraphicsDevice);
+            var texture = LoadTextureAsTexture2d(fileName, Game.GraphicsDevice, new ImageInformation());
             if (texture != null)
                 _textureMap[fileName] = texture;
             return texture;
+        }
+
+        public Texture2D ForceLoadImage(string fileName, out ImageInformation imageInfo)
+        {
+            imageInfo = new ImageInformation();
+            return LoadTextureAsTexture2d(fileName, Game.GraphicsDevice, imageInfo);
         }
 
         public void SaveTexture(Texture2D texture, string path)
@@ -82,7 +88,7 @@ namespace View3D.Utility
             }
         }
 
-        Texture2D LoadTextureAsTexture2d(string fileName, GraphicsDevice device)
+        Texture2D LoadTextureAsTexture2d(string fileName, GraphicsDevice device, ImageInformation out_imageInfo)
         {
             var file = Pfs.FindFile(fileName);
             if (file == null)
@@ -95,7 +101,8 @@ namespace View3D.Utility
                 var content = file.DataSource.ReadData();
                 using (MemoryStream stream = new MemoryStream(content))
                 {
-                    var image = Pfim.Pfim.FromStream(stream);
+                    using var image = Pfim.Pfim.FromStream(stream);
+                    out_imageInfo.SetFromImage(image);
 
                     if (image.Format != ImageFormat.Rgba32)
                     {
@@ -115,8 +122,10 @@ namespace View3D.Utility
                             if (mipmap.Width > 4)
                                 texture.SetData(i + 1, null, image.Data, mipmap.DataOffset, mipmap.DataLen);
                         }
-                        catch { }
-
+                        catch 
+                        {
+                            _logger.Here().Warning($"Error loading Mipmap [{i}]");
+                        }
                     }
 
                     return texture;
@@ -128,7 +137,6 @@ namespace View3D.Utility
                 return null;
             }
         }
-
 
         public Effect LoadEffect(string fileName, ShaderTypes type)
         {

@@ -1,4 +1,5 @@
-﻿using AssetEditor.Views.Settings;
+﻿using AssetEditor.Report;
+using AssetEditor.Views.Settings;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.DB;
@@ -15,6 +16,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using TextureEditor.ViewModels;
 
 namespace AssetEditor.ViewModels
 {
@@ -74,6 +76,12 @@ namespace AssetEditor.ViewModels
           
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
+
+               
+
+                //var r = new Rmv2Information(_packfileService);
+                //r.Create(GameInformationFactory.GetGameById(settingsService.CurrentSettings.CurrentGame).DisplayName);
+
                 //OpenFile(packfileService.FindFile(@"terrain\campaigns\wh2_main_great_vortex_map_1\global_meshes\land_mesh_20.rigid_model_v2"));
                 //CommonControls.FormatResearch.TerrainRmv2Decoder.CreateTerrainCustom(_packfileService);
                 //OpenFile(packfileService.FindFile(@"terrain\tiles\campaign\dwarf_custom\86x57_karaz_a_karak\custom_mesh.rigid_model_v2"));
@@ -135,6 +143,7 @@ namespace AssetEditor.ViewModels
                 //CreateEmptyEditor(editorView);
 
                 CreateTestPackFiles(packfileService);
+                //TexturePreviewController.CreateFromFilePath(@"C:\Users\ole_k\Desktop\TroyOrc.dds", _packfileService);
             }
         }
 

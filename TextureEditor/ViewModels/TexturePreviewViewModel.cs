@@ -1,18 +1,39 @@
-﻿using CommonControls.Common;
+﻿using CommonControls.BaseDialogs;
+using CommonControls.Common;
 using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Media;
+using TextureEditor.Views;
+using static View3D.Utility.ResourceLibary;
 
 namespace TextureEditor.ViewModels
 {
     public class TexturePreviewViewModel : NotifyPropertyChangedImpl
     {
-        ImageSource _image;
-        public ImageSource Image
+        ImageInformation _information;
+        public NotifyAttr<ImageSource> ActiveImage { get; set; } = new NotifyAttr<ImageSource>();
+        public NotifyAttr<ImageSource> CheckBoardImage { get; set; } = new NotifyAttr<ImageSource>();
+
+        public NotifyAttr<string> ImagePath { get; set; } = new NotifyAttr<string>();
+        public NotifyAttr<string> Format { get; set; } = new NotifyAttr<string>();
+        public NotifyAttr<int> Width { get; set; } = new NotifyAttr<int>();
+        public NotifyAttr<int> Height { get; set; } = new NotifyAttr<int>();
+
+        public bool FormatRgbaCheckbox { get => _formatCheckbox[0]; set => UpdateFormat(0, value); }
+        public bool FormatRCheckbox { get => _formatCheckbox[1]; set => UpdateFormat(1, value); }
+        public bool FormatGCheckbox { get => _formatCheckbox[2]; set => UpdateFormat(2, value); }
+        public bool FormatBCheckbox { get => _formatCheckbox[3]; set => UpdateFormat(3, value); }
+        public bool FormatACheckbox { get => _formatCheckbox[4]; set => UpdateFormat(4, value); }
+
+
+        List<bool> _formatCheckbox = new List<bool>() { false, false, false, false, false };
+        ImageSource[] _previewImage = new ImageSource[5];
+        public ImageSource[] PreviewImage
         {
-            get { return _image; }
+            get { return _previewImage; }
             set
             {
-                _image = value;
+                _previewImage = value;
                 NotifyPropertyChanged();
             }
         }
@@ -28,110 +49,27 @@ namespace TextureEditor.ViewModels
             NotifyPropertyChanged("FormatGCheckbox");
             NotifyPropertyChanged("FormatBCheckbox");
             NotifyPropertyChanged("FormatACheckbox");
-            Image = PreviewImage[index];
+            ActiveImage.Value = PreviewImage[index];
         }
 
-        List<bool> _formatCheckbox = new List<bool>() { false, false, false, false, false };
-
-        public bool FormatRgbaCheckbox
+        public void SetImageInformation(ImageInformation imageInformation)
         {
-            get { return _formatCheckbox[0]; }
-            set
-            {
-                UpdateFormat(0, value);
-            }
+            _information = imageInformation;
+            Width.Value = _information.Width;
+            Height.Value = _information.Height;
+            Format.Value = _information.Format.ToString();
+
         }
 
-        public bool FormatRCheckbox
+        public void ShowTextureDetailsInfo()
         {
-            get { return _formatCheckbox[1]; }
-            set
-            {
-                UpdateFormat(1, value);
-            }
+            var containingWindow = new ControllerHostWindow(false, ResizeMode.CanResize);
+            containingWindow.Title = "Texture Details";
+            containingWindow.Width = 550;
+            containingWindow.Height = 600;
+            containingWindow.Content = new TextureInformationView() { DataContext = _information.GetAsText()};
+            containingWindow.ShowDialog();
         }
 
-        public bool FormatGCheckbox
-        {
-            get { return _formatCheckbox[2]; }
-            set
-            {
-                UpdateFormat(2, value);
-            }
-        }
-
-        public bool FormatBCheckbox
-        {
-            get { return _formatCheckbox[3]; }
-            set
-            {
-                UpdateFormat(3, value);
-            }
-        }
-
-        public bool FormatACheckbox
-        {
-            get { return _formatCheckbox[4]; }
-            set
-            {
-                UpdateFormat(4, value);
-            }
-        }
-
-        ImageSource[] _previewImage = new ImageSource[5];
-        public ImageSource[] PreviewImage
-        {
-            get { return _previewImage; }
-            set
-            {
-                _previewImage = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-
-        string _imageName;
-        public string Name
-        {
-            get { return _imageName; }
-            set
-            {
-                _imageName = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        string _imageFormat;
-        public string Format
-        {
-            get { return _imageFormat; }
-            set
-            {
-                _imageFormat = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        int _width;
-        public int Width
-        {
-            get { return _width; }
-            set
-            {
-                _width = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        int _height;
-        public int Height
-        {
-            get { return _height; }
-            set
-            {
-                _height = value;
-                NotifyPropertyChanged();
-            }
-        }
     }
 }

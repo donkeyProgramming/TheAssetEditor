@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>hnet.com-image (1).ico</ApplicationIcon>
-    <AssemblyName>AssetEditor v0.20</AssemblyName>
+    <AssemblyName>AssetEditor v0.21</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -35,6 +35,16 @@
 
 	<PropertyGroup>
 		<DebugType>embedded</DebugType>
+		<SignAssembly>true</SignAssembly>
+		<Authors>Ole Kristian Homelien</Authors>
+		<Company>Private</Company>
+		<Product>AssetEditor</Product>
+		<PackageProjectUrl>https://github.com/olekristianhomelien/TheAssetEditor</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/olekristianhomelien/TheAssetEditor</RepositoryUrl>
+		<RepositoryType>GIT</RepositoryType>
+		<AssemblyVersion>1.21.0.0</AssemblyVersion>
+		<FileVersion>1.21.0.0</FileVersion>
+		<AssemblyOriginatorKeyFile>AssetEditorSigningKey.pfx</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 
 </Project>
