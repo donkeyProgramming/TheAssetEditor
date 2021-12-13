@@ -1,13 +1,16 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using View3D.Components;
 using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
+using View3D.Utility;
 
 namespace View3D.Rendering
 {
@@ -69,14 +72,16 @@ namespace View3D.Rendering
         Vector3 _selectedColur = new Vector3(1, 0, 0);
         Vector3 _deselectedColur = new Vector3(1, 1, 1);
 
-        public VertexInstanceMesh(GraphicsDevice device, ContentManager content)
+        public VertexInstanceMesh(IComponentManager comonentManager)
         {
-            Initialize(device, content);
+            var graphics = comonentManager.GetComponent<DeviceResolverComponent>();
+            var resourceLib = comonentManager.GetComponent<ResourceLibary>();
+            Initialize(graphics.Device, resourceLib);
         }
 
-        void Initialize(GraphicsDevice device, ContentManager content)
+        void Initialize(GraphicsDevice device, ResourceLibary resourceLib)
         {
-            _effect = content.Load<Effect>("Shaders//InstancingShader");
+            _effect = resourceLib.LoadEffect("Shaders//InstancingShader", ShaderTypes.GeometryInstance);
 
             _instanceVertexDeclaration = InstanceDataOrientation.VertexDeclaration;
             GenerateGeometry(device);

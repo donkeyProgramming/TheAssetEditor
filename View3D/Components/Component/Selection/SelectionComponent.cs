@@ -7,15 +7,11 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Commands;
 using View3D.Commands.Face;
 using View3D.Commands.Object;
 using View3D.Commands.Vertex;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
-using View3D.Rendering;
-using View3D.Rendering.Geometry;
-using View3D.Scene;
 using View3D.SceneNodes;
 using View3D.Utility;
 
@@ -40,22 +36,23 @@ namespace View3D.Components.Component.Selection
         Vector2 _startDrag;
         Vector2 _currentMousePos;
 
-        public SelectionComponent(WpfGame game) : base(game) { }
+        public SelectionComponent(IComponentManager componentManager) : base(componentManager) { }
 
         public override void Initialize()
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.SelectionComponent;
             DrawOrder = (int)ComponentDrawOrderEnum.SelectionComponent;
 
-            _mouseComponent = GetComponent<MouseComponent>();
-            _keyboardComponent = GetComponent<KeyboardComponent>();
-            _camera = GetComponent<ArcBallCamera>();
-            _sceneManger = GetComponent<SceneManager>();
-            _selectionManager = GetComponent<SelectionManager>();
-            _commandManager = GetComponent<CommandExecutor>();
+            _mouseComponent = ComponentManager.GetComponent<MouseComponent>();
+            _keyboardComponent = ComponentManager.GetComponent<KeyboardComponent>();
+            _camera = ComponentManager.GetComponent<ArcBallCamera>();
+            _sceneManger = ComponentManager.GetComponent<SceneManager>();
+            _selectionManager = ComponentManager.GetComponent<SelectionManager>();
+            _commandManager = ComponentManager.GetComponent<CommandExecutor>();
+            var graphicsResolver = ComponentManager.GetComponent<DeviceResolverComponent>();
 
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
-            _textTexture = new Texture2D(GraphicsDevice, 1, 1);
+            _spriteBatch = new SpriteBatch(graphicsResolver.Device);
+            _textTexture = new Texture2D(graphicsResolver.Device, 1, 1);
             _textTexture.SetData(new Color[1 * 1] { Color.White });
 
             base.Initialize();
@@ -96,7 +93,6 @@ namespace View3D.Components.Component.Selection
 
                 _isMouseDown = false;
             }
-
 
             if (!_isMouseDown)
             {
@@ -218,7 +214,6 @@ namespace View3D.Components.Component.Selection
             }
             return false;
         }
-
 
         public bool SetVertexSelectionMode()
         {

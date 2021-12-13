@@ -59,33 +59,31 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public NotifyAttr<AnimationReference> AnimationName { get; set; } = new NotifyAttr<AnimationReference>(null);
 
-
-
         public NotifyAttr<bool> ShowMesh { get; set; }
         public NotifyAttr<bool> ShowSkeleton { get; set; }
 
 
-        public AssetViewModel(PackFileService pfs, string description, Color skeletonColour, W game) : base( game)
+        public AssetViewModel(PackFileService pfs, string description, Color skeletonColour, IComponentManager componentManager)  : base(componentManager)
         {
             Description = description;
             _pfs = pfs;
             _skeletonColor = skeletonColour;
-            _componentManager = gam
+            _componentManager = componentManager;
             ShowMesh = new NotifyAttr<bool>(true, (x) => SetMeshVisability(x));
             ShowSkeleton = new NotifyAttr<bool>(true, (x) => _skeletonSceneNode.IsVisible = ShowSkeleton.Value);
         }
 
         public override void Initialize()
         {
-            var rootNode = GetComponent<SceneManager>().RootNode;
-            _resourceLibary = GetComponent<ResourceLibary>();
-            var animComp = GetComponent<AnimationsContainerComponent>();
+            var rootNode = _componentManager.GetComponent<SceneManager>().RootNode;
+            _resourceLibary = _componentManager.GetComponent<ResourceLibary>();
+            var animComp = _componentManager.GetComponent<AnimationsContainerComponent>();
 
             _parentNode = rootNode.AddObject(new GroupNode(Description)) as GroupNode;
             Player = animComp.RegisterAnimationPlayer(new View3D.Animation.AnimationPlayer(), Description);
 
             // Create skeleton
-            _skeletonSceneNode = new SkeletonNode(_resourceLibary.Content, this);
+            _skeletonSceneNode = new SkeletonNode(_componentManager, this);
             _skeletonSceneNode.NodeColour = _skeletonColor;
             _parentNode.AddObject(_skeletonSceneNode);
 
@@ -103,7 +101,8 @@ namespace AnimationEditor.Common.ReferenceModel
         {
             _logger.Here().Information($"Loading reference model - {_pfs.GetFullPath(file)}");
 
-            SceneLoader loader = new SceneLoader(_resourceLibary, _pfs, GeometryGraphicsContextFactory.CreateInstance(_resourceLibary.GraphicsDevice));
+            var graphics = _componentManager.GetComponent<DeviceResolverComponent>();
+            SceneLoader loader = new SceneLoader(_resourceLibary, _pfs, GeometryGraphicsContextFactory.CreateInstance(graphics.Device));
             var outSkeletonName = "";
             var loadeNode = loader.Load(file, null, Player);
             if (loadeNode == null)

@@ -3,6 +3,7 @@ using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
 using KitbasherEditor.ViewModels;
+using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System.Collections.Generic;
 using View3D.Components.Component;
@@ -26,17 +27,17 @@ namespace KitbasherEditor.Services
         SceneManager _sceneManager;
         IGeometryGraphicsContextFactory _geometryFactory;
 
-        public KitbashSceneCreator(PackFileService packFileService, ResourceLibary resourceLibary, AnimationControllerViewModel animationView, SceneManager sceneManager, PackFile mainFile, IGeometryGraphicsContextFactory geometryFactory)
+        public KitbashSceneCreator(IComponentManager componentManager, PackFileService packFileService, AnimationControllerViewModel animationView, PackFile mainFile, IGeometryGraphicsContextFactory geometryFactory)
         {
             _packFileService = packFileService;
-            _resourceLibary = resourceLibary;
+            _resourceLibary = componentManager.GetComponent<ResourceLibary>();
             _animationView = animationView;
-            _sceneManager = sceneManager;
+            _sceneManager = componentManager.GetComponent<SceneManager>();
             _geometryFactory = geometryFactory;
 
-            var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(resourceLibary.Content, animationView) { IsLockable = false });
+            var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(componentManager, animationView) { IsLockable = false });
             EditableMeshNode = _sceneManager.RootNode.AddObject(new MainEditableNode("Editable Model", skeletonNode, mainFile));
-            ReferenceMeshRoot = sceneManager.RootNode.AddObject(new GroupNode("Reference meshs") { IsEditable = false, IsLockable = false });
+            ReferenceMeshRoot = _sceneManager.RootNode.AddObject(new GroupNode("Reference meshs") { IsEditable = false, IsLockable = false });
         }
 
         public void LoadMainEditableModel(PackFile file)

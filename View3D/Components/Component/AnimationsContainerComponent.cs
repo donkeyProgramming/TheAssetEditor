@@ -16,7 +16,7 @@ namespace View3D.Components.Component
 
         Dictionary<string, AnimationPlayer> _playerMap = new Dictionary<string, AnimationPlayer>();
 
-        public AnimationsContainerComponent(WpfGame game) : base(game)
+        public AnimationsContainerComponent(IComponentManager componentManager) : base(componentManager)
         {
             UpdateOrder= (int)ComponentUpdateOrderEnum.Animation;
         }

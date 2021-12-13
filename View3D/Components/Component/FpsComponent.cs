@@ -2,34 +2,29 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.WpfInterop;
+using View3D.Utility;
 
 namespace View3D.Components.Component
 {
     public class FpsComponent : BaseComponent, IDisposable
     {
-        #region Fields
         private SpriteBatch _spriteBatch;
         private SpriteFont _font;
         private int _frames;
         private int _liveFrames;
         private TimeSpan _timeElapsed;
-        #endregion
 
-        #region Constructors
-
-        public FpsComponent(WpfGame game) : base(game)
+        public FpsComponent(IComponentManager componentManager) : base(componentManager)
         {
         }
 
-        #endregion
-
-        #region Methods
-
         protected override void LoadContent()
         {
-            _font = Game.Content.Load<SpriteFont>("Fonts//DefaultFont");
+            var resourceLib = ComponentManager.GetComponent<ResourceLibary>();
+            var graphics = ComponentManager.GetComponent<DeviceResolverComponent>();
+            _font = resourceLib.DefaultFont;
 
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            _spriteBatch = new SpriteBatch(graphics.Device);
         }
 
         public override void Update(GameTime gameTime)
@@ -55,7 +50,5 @@ namespace View3D.Components.Component
         {
             _spriteBatch.Dispose();
         }
-
-        #endregion
     }
 }

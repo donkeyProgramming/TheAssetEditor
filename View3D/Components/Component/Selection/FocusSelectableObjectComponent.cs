@@ -22,13 +22,13 @@ namespace View3D.Components.Component.Selection
         ArcBallCamera _archballCamera;
         SceneManager _sceneManager;
 
-        public FocusSelectableObjectComponent(WpfGame game) : base(game) { }
+        public FocusSelectableObjectComponent(IComponentManager componentManager) : base(componentManager) { }
 
         public override void Initialize()
         {
-            _selectionManager = GetComponent<SelectionManager>();
-            _archballCamera = GetComponent<ArcBallCamera>();
-            _sceneManager = GetComponent<SceneManager>();
+            _selectionManager = ComponentManager.GetComponent<SelectionManager>();
+            _archballCamera = ComponentManager.GetComponent<ArcBallCamera>();
+            _sceneManager = ComponentManager.GetComponent<SceneManager>();
 
             base.Initialize();
         }

@@ -39,6 +39,7 @@ namespace View3D.Components.Rendering
         ArcBallCamera _camera;
         Dictionary<RenderBuckedId, List<IRenderItem>> _renderItems = new Dictionary<RenderBuckedId, List<IRenderItem>>();
         ResourceLibary _resourceLib;
+        DeviceResolverComponent _deviceResolver;
 
         bool _cullingEnabled = false;
         bool _bigSceneDepthBiasMode = false;
@@ -46,7 +47,7 @@ namespace View3D.Components.Rendering
         public float LightRotationDegrees { get; set; } = 20;
         public float LightIntensityMult { get; set; } = 6;
 
-        public RenderEngineComponent(WpfGame game) : base(game)
+        public RenderEngineComponent(IComponentManager componentManager) : base(componentManager)
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.RenderEngine;
             DrawOrder = (int)ComponentDrawOrderEnum.RenderEngine;
@@ -59,8 +60,9 @@ namespace View3D.Components.Rendering
         {
             RebuildRasterStates(_cullingEnabled, _bigSceneDepthBiasMode);
 
-            _camera = GetComponent<ArcBallCamera>();
-            _resourceLib = GetComponent<ResourceLibary>();
+            _camera = ComponentManager.GetComponent<ArcBallCamera>();
+            _resourceLib = ComponentManager.GetComponent<ResourceLibary>();
+            _deviceResolver = ComponentManager.GetComponent<DeviceResolverComponent>();
 
             base.Initialize();
         }
@@ -102,13 +104,13 @@ namespace View3D.Components.Rendering
 
         public void ToggleLargeSceneRendering()
         {
-            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+            _deviceResolver.Device.RasterizerState = RasterizerState.CullNone;
             RebuildRasterStates(_cullingEnabled, !_bigSceneDepthBiasMode);
         }
 
         public void ToggelBackFaceRendering()
         {
-            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+            _deviceResolver.Device.RasterizerState = RasterizerState.CullNone;
             RebuildRasterStates(!_cullingEnabled, _bigSceneDepthBiasMode);
         }
 
@@ -149,31 +151,31 @@ namespace View3D.Components.Rendering
 
             _resourceLib.CommonSpriteBatch.Begin();
             foreach (var item in _renderItems[RenderBuckedId.Text])
-                item.Draw(GraphicsDevice, commonShaderParameters);
+                item.Draw(_deviceResolver.Device, commonShaderParameters);
             _resourceLib.CommonSpriteBatch.End();
 
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            GraphicsDevice.RasterizerState = _rasterStates[RasterizerStateEnum.Default];
+            _deviceResolver.Device.DepthStencilState = DepthStencilState.Default;
+            _deviceResolver.Device.RasterizerState = _rasterStates[RasterizerStateEnum.Default];
 
             foreach (var item in _renderItems[RenderBuckedId.Normal])
-                item.Draw(GraphicsDevice, commonShaderParameters);
+                item.Draw(_deviceResolver.Device, commonShaderParameters);
 
-            GraphicsDevice.RasterizerState = _rasterStates[RasterizerStateEnum.Wireframe];
+            _deviceResolver.Device.RasterizerState = _rasterStates[RasterizerStateEnum.Wireframe];
             foreach (var item in _renderItems[RenderBuckedId.Wireframe])
-                item.Draw(GraphicsDevice, commonShaderParameters);
+                item.Draw(_deviceResolver.Device, commonShaderParameters);
 
-            GraphicsDevice.RasterizerState = _rasterStates[RasterizerStateEnum.SelectedFaces];
+            _deviceResolver.Device.RasterizerState = _rasterStates[RasterizerStateEnum.SelectedFaces];
             foreach (var item in _renderItems[RenderBuckedId.Selection])
-                item.Draw(GraphicsDevice, commonShaderParameters);
+                item.Draw(_deviceResolver.Device, commonShaderParameters);
 
             foreach (var item in _renderItems[RenderBuckedId.Line])
-                item.Draw(GraphicsDevice, commonShaderParameters);
+                item.Draw(_deviceResolver.Device, commonShaderParameters);
 
             foreach (var item in _renderItems[RenderBuckedId.ConstantDebugLine])
-                item.Draw(GraphicsDevice, commonShaderParameters);
+                item.Draw(_deviceResolver.Device, commonShaderParameters);
 
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+            _deviceResolver.Device.DepthStencilState = DepthStencilState.Default;
+            _deviceResolver.Device.RasterizerState = RasterizerState.CullNone;
         }
 
         public void Dispose()

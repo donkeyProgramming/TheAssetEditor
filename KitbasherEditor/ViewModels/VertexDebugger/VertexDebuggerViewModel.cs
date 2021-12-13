@@ -55,14 +55,24 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
         LineMeshRender _lineRenderer;
         Effect _lineShader;
 
-        public VertexDebuggerViewModel(WpfGame game) : base(game)
+        public VertexDebuggerViewModel(IComponentManager componentManager) : base(componentManager)
         {
-            _lineShader = GetComponent<ResourceLibary>().GetStaticEffect(ShaderTypes.Line);
-            _lineRenderer = new LineMeshRender(game.Content);
-            var selectionMgr = GetComponent<SelectionManager>();
+
+        }
+
+        public override void Initialize()
+        {
+            var resourceLib = ComponentManager.GetComponent<ResourceLibary>();
+            _lineShader = resourceLib.GetStaticEffect(ShaderTypes.Line);
+            _lineRenderer = new LineMeshRender(resourceLib);
+
+            var selectionMgr = ComponentManager.GetComponent<SelectionManager>();
             selectionMgr.SelectionChanged += SelectionMgr_SelectionChanged;
             Refresh();
+
+            base.Initialize();
         }
+
 
         private void SelectionMgr_SelectionChanged(ISelectionState state)
         {
@@ -73,7 +83,7 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
         {
             VertexList.Clear();
             SelectedVertex = null;
-            var selectionMgr = GetComponent<SelectionManager>();
+            var selectionMgr = ComponentManager.GetComponent<SelectionManager>();
 
             if (selectionMgr.GetState() is VertexSelectionState selection)
             {
@@ -107,12 +117,12 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
 
         public override void Draw(GameTime gameTime)
         {
-            var selectionMgr = GetComponent<SelectionManager>();
-            var renderEngine = GetComponent<RenderEngineComponent>();
-
             _lineRenderer.Clear();
-            if (selectionMgr.GetState() is VertexSelectionState selection)
+
+            var selection = ComponentManager.GetComponent<SelectionManager>().GetState<VertexSelectionState>();
+            if (selection != null)
             {
+                var renderEngine = ComponentManager.GetComponent<RenderEngineComponent>();
                 var mesh = selection.GetSingleSelectedObject() as Rmv2MeshNode;
 
                 if (SelectedVertex != null)
@@ -140,7 +150,7 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
         {
             var renderComp = componentManager.GetComponent<RenderEngineComponent>();
 
-            var viewModel = new VertexDebuggerViewModel(renderComp.Game);
+            var viewModel = new VertexDebuggerViewModel(componentManager);
             componentManager.AddComponent(viewModel);
 
             var containingWindow = new Window();
@@ -155,7 +165,7 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
 
         public void Dispose()
         {
-            var selectionMgr = GetComponent<SelectionManager>();
+            var selectionMgr = ComponentManager.GetComponent<SelectionManager>();
             selectionMgr.SelectionChanged -= SelectionMgr_SelectionChanged;
             _lineRenderer.Dispose();
         }

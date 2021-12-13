@@ -17,13 +17,13 @@ namespace View3D.Components.Component
 
         CommandExecutor _commandManager;
 
-        public ObjectEditor(WpfGame game) : base(game)
+        public ObjectEditor(IComponentManager componentManager) : base(componentManager)
         {
         }
 
         public override void Initialize()
         {
-            _commandManager = GetComponent<CommandExecutor>();
+            _commandManager = ComponentManager.GetComponent<CommandExecutor>();
             base.Initialize();
         }
 

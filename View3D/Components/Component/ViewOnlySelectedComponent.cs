@@ -14,14 +14,14 @@ namespace View3D.Components.Component
 
         Dictionary<ISceneNode, bool> _visMap;       
 
-        public ViewOnlySelectedComponent(WpfGame game) : base(game)
+        public ViewOnlySelectedComponent(IComponentManager componentManager) : base(componentManager)
         {
         }
 
         public override void Initialize()
         {
-            _sceneManager = Game.GetComponent<SceneManager>();
-            _selectionManager = Game.GetComponent<SelectionManager>();
+            _sceneManager = ComponentManager.GetComponent<SceneManager>();
+            _selectionManager = ComponentManager.GetComponent<SelectionManager>();
         }
 
         public void Toggle()

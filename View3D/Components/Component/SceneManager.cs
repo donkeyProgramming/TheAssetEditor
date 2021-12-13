@@ -24,14 +24,14 @@ namespace View3D.Components.Component
 
         RenderEngineComponent _renderEngine;
 
-        public SceneManager(WpfGame game) : base(game) 
+        public SceneManager(IComponentManager componentManager) : base(componentManager) 
         {
             RootNode = new GroupNode("Root") { SceneManager = this, IsEditable = true, IsLockable = false };
         }
 
         public override void Initialize()
         {
-            _renderEngine = GetComponent<RenderEngineComponent>();
+            _renderEngine = ComponentManager.GetComponent<RenderEngineComponent>();
             base.Initialize();
         }
 

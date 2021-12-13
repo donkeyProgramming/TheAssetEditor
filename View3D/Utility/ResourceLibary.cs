@@ -18,7 +18,8 @@ namespace View3D.Utility
         Mesh,
         TexturePreview,
         Phazer,
-        BasicEffect
+        BasicEffect,
+        GeometryInstance,
     }
 
     public partial class ResourceLibary : BaseComponent, IDisposable
@@ -37,16 +38,21 @@ namespace View3D.Utility
         public TextureCube PbrSpecular { get; private set; }
         public Texture2D PbrLut { get; private set; }
 
-
+        WpfGame _game;
         public ResourceLibary(WpfGame game, PackFileService pf) : base(game)
         {
             Pfs = pf;
-           
+            _game = game;
+        }
+
+        public SpriteFont LoadFont(string path)
+        {
+            return Content.Load<SpriteFont>(path);
         }
 
         public override void Initialize()
         {
-            Content = Game.Content;
+            Content = _game.Content;
 
             // Load default shaders
             LoadEffect("Shaders\\Phazer\\main", ShaderTypes.Phazer);
@@ -54,8 +60,8 @@ namespace View3D.Utility
             LoadEffect("Shaders\\TexturePreview", ShaderTypes.TexturePreview);
             LoadEffect("Shaders\\LineShader", ShaderTypes.Line);
 
-            DefaultFont = Game.Content.Load<SpriteFont>("Fonts//DefaultFont");
-            CommonSpriteBatch = new SpriteBatch(Game.GraphicsDevice);
+            DefaultFont = LoadFont("Fonts//DefaultFont");
+            CommonSpriteBatch = new SpriteBatch(_game.GraphicsDevice);
 
             PbrDiffuse = Content.Load<TextureCube>("textures\\phazer\\DIFFUSE_irr_qwantani_rgba32f");
             PbrSpecular = Content.Load<TextureCube>("textures\\phazer\\SkyOnly_SpecularHDR");   // Skyonly
@@ -68,7 +74,7 @@ namespace View3D.Utility
             if (_textureMap.ContainsKey(fileName))
                 return _textureMap[fileName];
 
-            var texture = LoadTextureAsTexture2d(fileName, Game.GraphicsDevice, new ImageInformation());
+            var texture = LoadTextureAsTexture2d(fileName, _game.GraphicsDevice, new ImageInformation());
             if (texture != null)
                 _textureMap[fileName] = texture;
             return texture;
@@ -77,7 +83,7 @@ namespace View3D.Utility
         public Texture2D ForceLoadImage(string fileName, out ImageInformation imageInfo)
         {
             imageInfo = new ImageInformation();
-            return LoadTextureAsTexture2d(fileName, Game.GraphicsDevice, imageInfo);
+            return LoadTextureAsTexture2d(fileName, _game.GraphicsDevice, imageInfo);
         }
 
         public void SaveTexture(Texture2D texture, string path)

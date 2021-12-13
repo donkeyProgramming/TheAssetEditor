@@ -8,6 +8,7 @@ using System.Text;
 using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.Rendering.RenderItems;
+using View3D.Utility;
 
 namespace View3D.Components.Component
 {
@@ -18,15 +19,15 @@ namespace View3D.Components.Component
         RenderEngineComponent _renderComponent;
         LineMeshRender _gridMesh;
 
-        public GridComponent(WpfGame game) : base(game)
+        public GridComponent(IComponentManager componentManager) : base(componentManager)
         {
         }
 
         public override void Initialize()
         {
-            _renderComponent = GetComponent<RenderEngineComponent>();
-
-            _gridMesh = new LineMeshRender(Game.Content);
+            _renderComponent = ComponentManager.GetComponent<RenderEngineComponent>();
+            var resourceLib = ComponentManager.GetComponent<ResourceLibary>();
+            _gridMesh = new LineMeshRender(resourceLib);
             _gridMesh.CreateGrid();
 
             base.Initialize();

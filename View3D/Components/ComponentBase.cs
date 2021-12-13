@@ -10,30 +10,15 @@ namespace View3D.Components
     public class BaseComponent : NotifyPropertyChangedImpl, IDrawable, IGameComponent, IUpdateable
     {
         #region Fields
-
-        private readonly Game _game;
         private bool _visible = true;
         private int _drawOrder = (int)ComponentDrawOrderEnum.Default;
         private bool _initialized;
         public bool Isinitialized { get => _initialized; }
         private bool _enabled = true;
         private int _updateOrder = (int)ComponentUpdateOrderEnum.Default;
-
-        public Game Game { get { return _game; } }
-
-        #endregion
-
-        #region Constructors
-
-        public BaseComponent(Game game)
-        {
-            _game = game;
-        }
-
         #endregion
 
         #region Events
-
         public event EventHandler<EventArgs> DrawOrderChanged;
 
         public event EventHandler<EventArgs> VisibleChanged;
@@ -41,13 +26,15 @@ namespace View3D.Components
         public event EventHandler<EventArgs> EnabledChanged;
 
         public event EventHandler<EventArgs> UpdateOrderChanged;
-
         #endregion
 
+        protected IComponentManager ComponentManager { get; private set; }
+        public BaseComponent(IComponentManager componentManager)
+        {
+            ComponentManager = componentManager;
+        }
+
         #region Properties
-
-        public GraphicsDevice GraphicsDevice => _game.GraphicsDevice;
-
         public int DrawOrder
         {
             get { return _drawOrder; }
@@ -120,15 +107,6 @@ namespace View3D.Components
         protected virtual void LoadContent() { }
 
         public virtual void Update(GameTime gameTime) { }
-
-
-        protected T GetComponent<T>() where T : IGameComponent
-        {
-            var comp = _game.GetComponent<T>();
-            if (comp == null)
-                throw new Exception($"Unable to resolve componenet - {typeof(T)}");
-            return comp;
-        }
 
         #endregion
     }

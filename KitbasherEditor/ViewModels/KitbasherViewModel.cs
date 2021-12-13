@@ -10,6 +10,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using View3D.Components;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Components.Gizmo;
@@ -49,10 +50,11 @@ namespace KitbasherEditor.ViewModels
             _skeletonAnimationLookUpHelper = skeletonHelper;
 
             Scene = new SceneContainer();
+            Scene.AddComponent(new DeviceResolverComponent(Scene));
+            Scene.AddComponent(new ResourceLibary(Scene, pf));
             Scene.AddComponent(new FpsComponent(Scene));
             Scene.AddComponent(new KeyboardComponent(Scene));
             Scene.AddComponent(new MouseComponent(Scene));
-            Scene.AddComponent(new ResourceLibary(Scene, pf));
             Scene.AddComponent(new ArcBallCamera(Scene));
             Scene.AddComponent(new SceneManager(Scene));
             Scene.AddComponent(new SelectionManager(Scene));
@@ -80,9 +82,7 @@ namespace KitbasherEditor.ViewModels
 
         private void OnSceneInitialized(WpfGame scene)
         {
-            var sceneManager = scene.GetComponent<SceneManager>();
-            var resourceLib = scene.GetComponent<ResourceLibary>();
-            _modelLoader = new KitbashSceneCreator(_packFileService, resourceLib, Animation, sceneManager, MainFile, GeometryGraphicsContextFactory.CreateInstance(Scene.GraphicsDevice));
+            _modelLoader = new KitbashSceneCreator(scene, _packFileService, Animation, MainFile, GeometryGraphicsContextFactory.CreateInstance(Scene.GraphicsDevice));
             MenuBar.ModelLoader = _modelLoader;
             MenuBar.General.ModelSaver = new SceneSaverService(_packFileService, this, _modelLoader.EditableMeshNode);
             

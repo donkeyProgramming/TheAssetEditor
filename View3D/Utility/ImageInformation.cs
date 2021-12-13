@@ -1,4 +1,6 @@
-﻿using Pfim;
+﻿using Microsoft.Xna.Framework.Graphics;
+using Pfim;
+using System;
 using System.Text;
 
 namespace View3D.Utility
@@ -110,5 +112,7 @@ namespace View3D.Utility
                 return sb.ToString();
             }
         }
+
+
     }
 }

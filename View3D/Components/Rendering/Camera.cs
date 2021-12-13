@@ -18,7 +18,7 @@ namespace View3D.Components.Rendering
         MouseComponent _mouse;
         KeyboardComponent _keyboard;
 
-        public ArcBallCamera(WpfGame game, float yaw = 0.8f, float pitch = -0.32f, float currentZoom = 10) : base(game)
+        public ArcBallCamera(IComponentManager componentManager, float yaw = 0.8f, float pitch = -0.32f, float currentZoom = 10) : base(componentManager)
         {
             Zoom = currentZoom;
             Yaw = yaw;
@@ -30,9 +30,10 @@ namespace View3D.Components.Rendering
 
         public override void Initialize()
         {
-            _graphicsDevice = Game.GraphicsDevice;
-            _mouse = GetComponent<MouseComponent>();
-            _keyboard = GetComponent<KeyboardComponent>();
+            var graphics = ComponentManager.GetComponent<DeviceResolverComponent>();
+            _graphicsDevice = graphics.Device;
+            _mouse = ComponentManager.GetComponent<MouseComponent>();
+            _keyboard = ComponentManager.GetComponent<KeyboardComponent>();
             base.Initialize();
         }
 

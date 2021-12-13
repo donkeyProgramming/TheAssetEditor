@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,6 +10,7 @@ using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.Rendering.RenderItems;
+using View3D.Utility;
 
 namespace View3D.SceneNodes
 {
@@ -39,9 +41,9 @@ namespace View3D.SceneNodes
         public int? SelectedBoneIndex { get; set; }
         public float SkeletonScale { get; set; } = 1;
 
-        public SkeletonNode(ContentManager content, ISkeletonProvider animationProvider, string name = "Skeleton") : base(name)
+        public SkeletonNode(IComponentManager componentManager, ISkeletonProvider animationProvider, string name = "Skeleton") : base(name)
         {
-            _lineRenderer = new LineMeshRender(content);
+            _lineRenderer = new LineMeshRender(componentManager.GetComponent<ResourceLibary>());
             AnimationProvider = animationProvider;
         }
 

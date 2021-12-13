@@ -16,14 +16,14 @@ namespace View3D.Components.Component
         CommandExecutor _commandManager;
         SelectionManager _selectionManager;
 
-        public FaceEditor(WpfGame game) : base(game)
+        public FaceEditor(IComponentManager componentManager) : base(componentManager)
         {
         }
 
         public override void Initialize()
         {
-            _commandManager = GetComponent<CommandExecutor>();
-            _selectionManager = GetComponent<SelectionManager>();
+            _commandManager = ComponentManager.GetComponent<CommandExecutor>();
+            _selectionManager = ComponentManager.GetComponent<SelectionManager>();
             base.Initialize();
         }
 

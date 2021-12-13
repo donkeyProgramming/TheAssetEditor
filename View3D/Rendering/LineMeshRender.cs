@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using View3D.Components.Rendering;
+using View3D.Utility;
 
 namespace View3D.Rendering
 {
@@ -14,9 +15,9 @@ namespace View3D.Rendering
         Effect _shader;
         List<VertexPositionColor> _originalVertecies = new List<VertexPositionColor>();
 
-        public LineMeshRender(ContentManager content)
+        public LineMeshRender(ResourceLibary resourceLibary)
         {
-            _shader = content.Load<Effect>("Shaders\\LineShader");
+            _shader = resourceLibary.GetStaticEffect(ShaderTypes.Line);
         }
 
         public void Clear()

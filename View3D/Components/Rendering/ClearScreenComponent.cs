@@ -8,14 +8,21 @@ namespace View3D.Components.Rendering
 {
     public class ClearScreenComponent : BaseComponent
     {
-        public ClearScreenComponent(WpfGame game) : base(game)
+        DeviceResolverComponent _deviceResolver;
+        public ClearScreenComponent(IComponentManager component) : base(component)
         {
             DrawOrder = (int)ComponentDrawOrderEnum.ClearScreenComponent;
         }
 
+        public override void Initialize()
+        {
+            _deviceResolver = ComponentManager.GetComponent<DeviceResolverComponent>();
+            base.Initialize();
+        }
+
         public override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            _deviceResolver.Device.Clear(Color.CornflowerBlue);
         }
     }
 }

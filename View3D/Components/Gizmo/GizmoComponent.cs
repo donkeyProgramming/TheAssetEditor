@@ -30,7 +30,7 @@ namespace View3D.Components.Gizmo
         TransformGizmoWrapper _activeTransformation;
         bool _isCtrlPressed = false;
 
-        public GizmoComponent(WpfGame game) : base(game)
+        public GizmoComponent(IComponentManager componentManager) : base(componentManager)
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.Gizmo;
             DrawOrder = (int)ComponentDrawOrderEnum.Gizmo;
@@ -38,17 +38,17 @@ namespace View3D.Components.Gizmo
        
         public override void Initialize()
         {
-            _commandManager = GetComponent<CommandExecutor>();
-            _selectionManager = GetComponent<SelectionManager>();
-            _keyboard = GetComponent<KeyboardComponent>();
-            _mouse = GetComponent<MouseComponent>();
-            var camera = GetComponent<ArcBallCamera>();
-            var resourceLibary = GetComponent<ResourceLibary>();
+            _commandManager = ComponentManager.GetComponent<CommandExecutor>();
+            _selectionManager = ComponentManager.GetComponent<SelectionManager>();
+            _keyboard = ComponentManager.GetComponent<KeyboardComponent>();
+            _mouse = ComponentManager.GetComponent<MouseComponent>();
+            var camera = ComponentManager.GetComponent<ArcBallCamera>();
+            var resourceLibary = ComponentManager.GetComponent<ResourceLibary>();
+            var graphics = ComponentManager.GetComponent<DeviceResolverComponent>();
 
             _selectionManager.SelectionChanged += OnSelectionChanged;
 
-            var font = resourceLibary.Content.Load<SpriteFont>("Fonts\\DefaultFont");
-            _gizmo = new Gizmo(camera, _mouse, GraphicsDevice, new SpriteBatch(GraphicsDevice), font);
+            _gizmo = new Gizmo(camera, _mouse, graphics.Device, new SpriteBatch(graphics.Device), resourceLibary.DefaultFont);
             _gizmo.ActivePivot = PivotType.ObjectCenter;
             _gizmo.TranslateEvent += GizmoTranslateEvent;
             _gizmo.RotateEvent += GizmoRotateEvent;

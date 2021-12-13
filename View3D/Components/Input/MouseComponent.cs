@@ -49,6 +49,13 @@ namespace View3D.Components.Input
             } 
         }
 
+        public MouseComponent(WpfGame game) : base(game)
+        {
+            _wpfMouse = new WpfMouse(game);
+            _wpfMouse.CaptureMouseWithin = true;
+            UpdateOrder = (int)ComponentUpdateOrderEnum.Input;
+        }
+
         public bool IsMouseOwner(IGameComponent component)
         {
             if (MouseOwner == null || MouseOwner == component)
@@ -56,12 +63,7 @@ namespace View3D.Components.Input
             return false;
         }
 
-        public MouseComponent(WpfGame game) : base(game)
-        {
-           _wpfMouse = new WpfMouse(game);
-           _wpfMouse.CaptureMouseWithin = true;
-            UpdateOrder = (int)ComponentUpdateOrderEnum.Input;
-        }  
+
 
         public override void Update(GameTime t)
         {

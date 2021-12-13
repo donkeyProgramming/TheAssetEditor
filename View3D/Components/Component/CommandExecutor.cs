@@ -1,44 +1,35 @@
 ﻿using CommonControls.Common;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Timers;
 using View3D.Commands;
-using View3D.Components;
-using View3D.Components.Input;
-using View3D.Scene;
+using View3D.Utility;
 
 namespace View3D.Components.Component
 {
     public delegate void CommandStackChangedDelegate();
     public class CommandExecutor : BaseComponent, IDisposable
     {
+        public event CommandStackChangedDelegate CommandStackChanged;
+
         ILogger _logger = Logging.Create<CommandExecutor>();
         Stack<ICommand> _commands = new Stack<ICommand>();
 
-
-        public event CommandStackChangedDelegate CommandStackChanged;
-
         SpriteBatch _spriteBatch;
-        SpriteFont _font;
         string _animationText;
         GameTime _animationStart;
         bool _startAnimation;
 
-        public CommandExecutor(WpfGame game) : base(game)
-        {
-
-        }
+        public CommandExecutor(IComponentManager componentManager) : base(componentManager)
+        { }
 
         public override void Initialize()
         {
-            _font = Game.Content.Load<SpriteFont>("Fonts//DefaultFont");
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            var graphicsResolver = ComponentManager.GetComponent<DeviceResolverComponent>();
+            _spriteBatch = new SpriteBatch(graphicsResolver.Device);
         }
 
         public void ExecuteCommand(ICommand command, bool isUndoable = true)
@@ -47,7 +38,7 @@ namespace View3D.Components.Component
                 throw new ArgumentNullException("Command is null");
             if(isUndoable)
                 _commands.Push(command);
-            command.Initialize(Game);
+            command.Initialize(ComponentManager);
             command.Execute();
 
             CreateAnimation($"Command added: {command.GetHintText()}");
@@ -74,6 +65,8 @@ namespace View3D.Components.Component
         {
             if (_animationStart != null)
             {
+                var resourceLib = ComponentManager.GetComponent<ResourceLibary>();
+
                 var timeDiff = (gameTime.TotalGameTime - _animationStart.TotalGameTime).TotalMilliseconds;
                 float lerpValue = (float)timeDiff / 2000.0f;
                 var alphaValue = MathHelper.Lerp(1, 0, lerpValue);
@@ -81,7 +74,7 @@ namespace View3D.Components.Component
                     _animationStart = null;
 
                 _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-                _spriteBatch.DrawString(_font, _animationText, new Vector2(5,20), new Color(0, 0, 0, alphaValue));
+                _spriteBatch.DrawString(resourceLib.DefaultFont, _animationText, new Vector2(5,20), new Color(0, 0, 0, alphaValue));
                 _spriteBatch.End();
             }
 

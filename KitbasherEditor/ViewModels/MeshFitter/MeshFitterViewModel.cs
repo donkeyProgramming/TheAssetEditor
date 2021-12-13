@@ -79,7 +79,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             _animationPlayer.Play();
 
             var resourceLib = _componentManager.GetComponent<ResourceLibary>();
-            _currentSkeletonNode = new SkeletonNode(resourceLib.Content, new SimpleSkeletonProvider(_fromSkeleton));
+            _currentSkeletonNode = new SkeletonNode(_componentManager, new SimpleSkeletonProvider(_fromSkeleton));
             _currentSkeletonNode.SelectedNodeColour = Color.White;
             _componentManager.GetComponent<SceneManager>().RootNode.AddObject(_currentSkeletonNode);
 

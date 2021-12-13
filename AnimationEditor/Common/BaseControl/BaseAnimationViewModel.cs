@@ -8,6 +8,7 @@ using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
+using View3D.Components;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Components.Input;
@@ -64,10 +65,11 @@ namespace AnimationEditor.PropCreator.ViewModels
             _createDefaultAssets = createDefaultAssets;
 
             Scene = new SceneContainer();
+            Scene.AddComponent(new DeviceResolverComponent(Scene));
+            Scene.AddComponent(new ResourceLibary(Scene, pfs));
             Scene.AddComponent(new FpsComponent(Scene));
             Scene.AddComponent(new KeyboardComponent(Scene));
             Scene.AddComponent(new MouseComponent(Scene));
-            Scene.AddComponent(new ResourceLibary(Scene, pfs));
             Scene.AddComponent(skeletonHelper);
             Scene.AddComponent(schemaManager);
             Scene.AddComponent(new ArcBallCamera(Scene));
@@ -80,7 +82,6 @@ namespace AnimationEditor.PropCreator.ViewModels
             Scene.AddComponent(new SelectionComponent(Scene));
             Scene.AddComponent(new CommandExecutor(Scene));
             Scene.AddComponent(new LightControllerComponent(Scene));
-            
 
             Scene.SceneInitialized += OnSceneInitialized;
 

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
+using View3D.Utility;
 
 namespace View3D.Components.Component
 {
@@ -20,18 +21,20 @@ namespace View3D.Components.Component
         KeyboardComponent _keyboard;
         RenderEngineComponent _renderEngine;
 
-        public LightControllerComponent(WpfGame game) : base(game)
+        public LightControllerComponent(IComponentManager componentManager) : base(componentManager)
         {
 
         }
 
         public override void Initialize()
         {
-            _font = Game.Content.Load<SpriteFont>("Fonts//DefaultFont");
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            var resourceLib = ComponentManager.GetComponent<ResourceLibary>();
+            var graphics = ComponentManager.GetComponent<DeviceResolverComponent>();
+            _keyboard = ComponentManager.GetComponent<KeyboardComponent>();
+            _renderEngine = ComponentManager.GetComponent<RenderEngineComponent>();
 
-            _keyboard = GetComponent<KeyboardComponent>();
-            _renderEngine = GetComponent<RenderEngineComponent>();
+            _font = resourceLib.DefaultFont;
+            _spriteBatch = new SpriteBatch(graphics.Device);
         }
 
 

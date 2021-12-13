@@ -1,4 +1,5 @@
-﻿using CommonControls.BaseDialogs.ErrorListDialog;
+﻿using CommonControls.BaseDialogs;
+using CommonControls.BaseDialogs.ErrorListDialog;
 using CommonControls.Common;
 using CommonControls.Common.MenuSystem;
 using CommonControls.Editors.BoneMapping;
@@ -185,8 +186,13 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 var newSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(_packFileService, skeletonName);
                 GameSkeleton skeleton = new GameSkeleton(newSkeletonFile, null);
 
-                var window = new BmiWindow();
-                window.DataContext = new BmiViewModel(skeleton, meshNode, _componentManager);
+                var window = new ControllerHostWindow(true)
+                {
+                    DataContext = new BmiViewModel(skeleton, meshNode, _componentManager),
+                    Title = "Pin tool",
+                    Content = new BmiView(),
+                };
+
                 window.Show();
             }
         }

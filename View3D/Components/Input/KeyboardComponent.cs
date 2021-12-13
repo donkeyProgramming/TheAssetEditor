@@ -22,7 +22,7 @@ namespace View3D.Components.Input
 
         public KeyboardComponent(WpfGame game) : base(game)
         {
-            _wpfKeyboard = new WpfKeyboard(Game);
+            _wpfKeyboard = new WpfKeyboard(game);
             UpdateOrder = (int)ComponentUpdateOrderEnum.Input;
         }
 
@@ -34,8 +34,6 @@ namespace View3D.Components.Input
 
         public override void Update(GameTime t)
         {
-            
-
             var keyboardState = _wpfKeyboard.GetState();
 
             _lastKeyboardState = _currentKeyboardState;

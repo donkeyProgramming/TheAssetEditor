@@ -16,6 +16,7 @@ using View3D.Rendering.RenderItems;
 using View3D.Rendering.Shading;
 using View3D.Scene;
 using View3D.SceneNodes;
+using View3D.Utility;
 
 namespace View3D.Components.Component.Selection
 {
@@ -27,29 +28,30 @@ namespace View3D.Components.Component.Selection
         ILogger _logger = Logging.Create<SelectionManager>();
         ISelectionState _currentState;
         RenderEngineComponent _renderEngine;
+        BasicShader _wireframeEffect;
+        BasicShader _selectedFacesEffect;
 
         LineMeshRender _lineGeometry;
         VertexInstanceMesh VertexRenderer;
         float _vertexSelectionFallof = 0;
 
-        public SelectionManager(WpfGame game ) : base(game) {}
+        public SelectionManager(IComponentManager componentManager ) : base(componentManager) {}
 
 
-        BasicShader _wireframeEffect;
-        BasicShader _selectedFacesEffect;
         public override void Initialize()
         {
             CreateSelectionSate(GeometrySelectionMode.Object, null);
-            _renderEngine = GetComponent<RenderEngineComponent>();
-        
+            _renderEngine = ComponentManager.GetComponent<RenderEngineComponent>();
+            var resourceLibary = ComponentManager.GetComponent<ResourceLibary>();
+            var deviceResolver = ComponentManager.GetComponent<DeviceResolverComponent>();
 
-            _lineGeometry = new LineMeshRender(Game.Content);
-            VertexRenderer = new VertexInstanceMesh(GraphicsDevice, Game.Content);
+            _lineGeometry = new LineMeshRender(resourceLibary);
+            VertexRenderer = new VertexInstanceMesh(ComponentManager);
 
-            _wireframeEffect = new BasicShader(GraphicsDevice);
+            _wireframeEffect = new BasicShader(deviceResolver.Device);
             _wireframeEffect.DiffuseColor = Vector3.Zero;
 
-            _selectedFacesEffect = new BasicShader(GraphicsDevice);
+            _selectedFacesEffect = new BasicShader(deviceResolver.Device);
             _selectedFacesEffect.DiffuseColor = new Vector3(1, 0, 0);
             _selectedFacesEffect.SpecularColor = new Vector3(1, 0, 0);
             _selectedFacesEffect.EnableDefaultLighting();

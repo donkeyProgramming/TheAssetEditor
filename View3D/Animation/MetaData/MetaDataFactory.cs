@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using View3D.Animation.AnimationChange;
+using View3D.Components;
 using View3D.Components.Component;
 using View3D.Rendering.Geometry;
 using View3D.Rendering.RenderItems;
@@ -151,6 +152,7 @@ namespace View3D.Animation.MetaData
 
             var resourceLib = _componentManager.GetComponent<ResourceLibary>();
             var skeletonHelper = _componentManager.GetComponent<SkeletonAnimationLookUpHelper>();
+            var graphics = _componentManager.GetComponent<DeviceResolverComponent>();
             var pfs = resourceLib.Pfs;
 
             var meshPath = pfs.FindFile(animatedPropMeta.MeshName);
@@ -159,7 +161,7 @@ namespace View3D.Animation.MetaData
             var propPlayer = _componentManager.GetComponent<AnimationsContainerComponent>().RegisterAnimationPlayer(new AnimationPlayer(), propName + Guid.NewGuid());
 
             // Configure the mesh
-            SceneLoader loader = new SceneLoader(resourceLib, pfs, GeometryGraphicsContextFactory.CreateInstance(resourceLib.GraphicsDevice));
+            SceneLoader loader = new SceneLoader(resourceLib, pfs, GeometryGraphicsContextFactory.CreateInstance(graphics.Device));
             var loadedNode = loader.Load(meshPath, new GroupNode(propName), propPlayer);
 
             // Configure animation
@@ -179,7 +181,7 @@ namespace View3D.Animation.MetaData
             // Add to scene
             _root.AddObject(loadedNode);
 
-            var skeletonSceneNode = new SkeletonNode(resourceLib.Content, new SimpleSkeletonProvider(skeleton));
+            var skeletonSceneNode = new SkeletonNode(_componentManager, new SimpleSkeletonProvider(skeleton));
             skeletonSceneNode.NodeColour = Color.Yellow;
 
             loadedNode.AddObject(skeletonSceneNode);
