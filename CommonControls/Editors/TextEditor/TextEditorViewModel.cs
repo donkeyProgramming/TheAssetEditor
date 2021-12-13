@@ -17,8 +17,7 @@ namespace CommonControls.Editors.TextEditor
     {
         public ICommand SaveCommand { get; set; }
 
-        string _displayName;
-        public string DisplayName { get => _displayName; set => SetAndNotify(ref _displayName, value); }
+        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>();
 
         string _text;
         public string Text { get => _text; set => SetAndNotify(ref _text, value); }
@@ -57,7 +56,7 @@ namespace CommonControls.Editors.TextEditor
         void SetCurrentPackFile(PackFile packedFile)
         {
             PackFile file = packedFile ;
-            DisplayName = file.Name;
+            DisplayName.Value = file.Name;
 
             byte[] data = file.DataSource.ReadData();
             Text = _converter.GetText(data);

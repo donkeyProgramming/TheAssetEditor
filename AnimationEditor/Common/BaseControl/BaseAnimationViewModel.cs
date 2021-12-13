@@ -36,7 +36,7 @@ namespace AnimationEditor.PropCreator.ViewModels
         protected PackFileService _pfs;
         protected SkeletonAnimationLookUpHelper _skeletonHelper;
         protected SchemaManager _schemaManager;
-        public string DisplayName { get; set; } = "Creator";
+        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Creator");
         public PackFile MainFile { get; set; }
 
         protected IToolFactory _toolFactory;

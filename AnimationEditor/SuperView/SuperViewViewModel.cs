@@ -10,7 +10,7 @@ namespace AnimationEditor.SuperView
     {
         public SuperViewViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, SchemaManager schemaManager) : base(toolFactory, pfs, skeletonHelper, schemaManager, "not_in_use1", "not_in_use2", false)
         {
-            DisplayName = "Super view";
+            DisplayName.Value = "Super view";
             Pfs = pfs;
         }
 

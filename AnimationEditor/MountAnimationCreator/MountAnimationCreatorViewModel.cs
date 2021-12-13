@@ -12,7 +12,7 @@ namespace AnimationEditor.MountAnimationCreator
     {
         public MountAnimationCreatorViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, SchemaManager schemaManager) : base(toolFactory, pfs, skeletonHelper, schemaManager, "Rider", "Mount")
         {
-            DisplayName = "MountAnimCreator";
+            DisplayName.Value = "MountAnimCreator";
         }
 
         public override void Initialize()

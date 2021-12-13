@@ -1,5 +1,6 @@
 ﻿using CommonControls.Common;
 using CommonControls.Editors.TextEditor;
+using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.Services;
 using System;
 using System.Collections.Generic;
@@ -10,15 +11,15 @@ using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace CommonControls.Editors.AnimationPack
+namespace CommonControls.Editors.AnimationPack.Converters
 {
-    public class AnimationBinToXmlConverter : ITextConverter
+    public class AnimationDbFileToXmlConverter : ITextConverter
     {
         public string GetText(byte[] bytes)
         {
             try
             {
-                var binFile = new FileTypes.AnimationPack.AnimationBin("", new Filetypes.ByteParsing.ByteChunk(bytes));
+                var binFile = new AnimationDbFile("", bytes);
                 var xmlBin = ConvertBinFileToXmlBin(binFile);
 
                 var xmlserializer = new XmlSerializer(typeof(Bin));
@@ -78,7 +79,7 @@ namespace CommonControls.Editors.AnimationPack
             
         }
 
-        Bin ConvertBinFileToXmlBin(FileTypes.AnimationPack.AnimationBin binFile)
+        Bin ConvertBinFileToXmlBin(AnimationDbFile binFile)
         {
             var outputBin = new Bin();
             outputBin.BinEntry = new List<BinEntry>();
@@ -99,12 +100,12 @@ namespace CommonControls.Editors.AnimationPack
             return outputBin;
         }
 
-        FileTypes.AnimationPack.AnimationBin ConvertXmlBinToBinFile(Bin bin, string fileName)
+        AnimationDbFile ConvertXmlBinToBinFile(Bin bin, string fileName)
         {
-            var output = new FileTypes.AnimationPack.AnimationBin(fileName);
+            var output = new AnimationDbFile(fileName);
             foreach (var item in bin.BinEntry)
             {
-                var entry = new FileTypes.AnimationPack.AnimationBinEntry(item.Name, item.Skeleton.Value, item.MountSkeleton.Value)
+                var entry = new AnimationBinEntry(item.Name, item.Skeleton.Value, item.MountSkeleton.Value)
                 {
                     Unknown = item.Unknown.Value
                 };
@@ -114,7 +115,7 @@ namespace CommonControls.Editors.AnimationPack
                 {
                     var str = refInstance.Trim();
                     if (string.IsNullOrEmpty(str) == false)
-                        entry.FragmentReferences.Add(new FileTypes.AnimationPack.AnimationBinEntry.FragmentReference() { Name = str, Unknown = 0 });
+                        entry.FragmentReferences.Add(new AnimationBinEntry.FragmentReference() { Name = str, Unknown = 0 });
                 }
 
                 output.AnimationTableEntries.Add(entry);

@@ -1,6 +1,7 @@
 ﻿using AnimationEditor.Common.ReferenceModel;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
+using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.Services;
 using System;
 using System.Collections.Generic;
@@ -12,8 +13,8 @@ namespace AnimationEditor.MountAnimationCreator
 {
     public class MountLinkController : NotifyPropertyChangedImpl
     {
-        public FilterCollection<AnimationFragment> SelectedMount { get; set; }
-        public FilterCollection<AnimationFragment> SelectedRider { get; set; }
+        public FilterCollection<AnimationSetFile> SelectedMount { get; set; }
+        public FilterCollection<AnimationSetFile> SelectedRider { get; set; }
 
         public FilterCollection<FragmentStatusSlotItem> SelectedMountTag { get; set; }
         public FilterCollection<FragmentStatusSlotItem> SelectedRiderTag { get; set; }
@@ -34,8 +35,8 @@ namespace AnimationEditor.MountAnimationCreator
 
             SelectedMountTag = new FilterCollection<FragmentStatusSlotItem>(null, MountTagSeleted);
             SelectedRiderTag = new FilterCollection<FragmentStatusSlotItem>(null, RiderTagSelected);
-            SelectedMount = new FilterCollection<AnimationFragment>(null, (value) => MuntSelected(value, SelectedMountTag, _mount.SkeletonName.Value));
-            SelectedRider = new FilterCollection<AnimationFragment>(null, (value) => MuntSelected(value, SelectedRiderTag, _rider.SkeletonName.Value));
+            SelectedMount = new FilterCollection<AnimationSetFile>(null, (value) => MuntSelected(value, SelectedMountTag, _mount.SkeletonName.Value));
+            SelectedRider = new FilterCollection<AnimationSetFile>(null, (value) => MuntSelected(value, SelectedRiderTag, _rider.SkeletonName.Value));
 
             SelectedMountTag.SearchFilter = (value, rx) => { return rx.Match(value.Entry.Value.Slot.Value).Success; };
             SelectedRiderTag.SearchFilter = (value, rx) => { return rx.Match(value.Entry.Value.Slot.Value).Success; };
@@ -69,9 +70,9 @@ namespace AnimationEditor.MountAnimationCreator
             }
         }
 
-        public List<AnimationFragment> LoadFragmentsForSkeleton(string skeletonName, bool onlyPacksThatCanBeSaved = false)
+        public List<AnimationSetFile> LoadFragmentsForSkeleton(string skeletonName, bool onlyPacksThatCanBeSaved = false)
         {
-            var outputFragments = new List<AnimationFragment>();
+            var outputFragments = new List<AnimationSetFile>();
             var animPacks = _pfs.FindAllWithExtention(@".animpack");
             foreach (var animPack in animPacks)
             {
@@ -81,16 +82,15 @@ namespace AnimationEditor.MountAnimationCreator
                         continue;
                 }
 
-                var animPackFile = new AnimationPackFile(animPack, skeletonName);
-                foreach (var fragment in animPackFile.Fragments)
-                {
+                var animPackFile = AnimationPackSerializer.Load(animPack);
+                var fragments = animPackFile.GetAnimationSets(skeletonName);
+                foreach (var fragment in fragments)
                     outputFragments.Add(fragment);
-                }
             }
             return outputFragments;
         }
 
-        void MuntSelected(AnimationFragment value, FilterCollection<FragmentStatusSlotItem> collection, string skeletonName)
+        void MuntSelected(AnimationSetFile value, FilterCollection<FragmentStatusSlotItem> collection, string skeletonName)
         {
             if (value == null)
             {

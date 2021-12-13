@@ -1,5 +1,6 @@
 ﻿using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.AnimationPack;
+using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.FileTypes.MetaData;
 using CommonControls.FileTypes.MetaData.Instances;
 using CommonControls.Services;
@@ -26,9 +27,9 @@ namespace View3D.Animation.MetaData
         IComponentManager _componentManager;
         ISkeletonProvider _rootSkeleton;
         AnimationPlayer _rootPlayer;
-        AnimationFragment _fragment;
+        AnimationSetFile _fragment;
 
-        public MetaDataFactory(SceneNode root, IComponentManager componentManager, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, AnimationFragment fragment)
+        public MetaDataFactory(SceneNode root, IComponentManager componentManager, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, AnimationSetFile fragment)
         {
             _root = root;
             _componentManager = componentManager;

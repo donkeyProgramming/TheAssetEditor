@@ -3,14 +3,23 @@ ImageMagick
 https://github.com/dlemstra/Magick.NET
 
 The TW statics have the normal/tangent/bitangt stored z,y,x
-variantmeshes\variantmeshdefinitions\troy_myth_corybantes.variantmeshdefinition
-Giants Head Variations
-ajax
-Giant Armour 1
-Dardanian Defenders Armour 1
-Mycenaean 
 
+
+Improve animation editor:
+	Remove AnimTablePreviewWindow
+	Support 3k
+	Suppoert Rome 2/Attila 
+	Select game
+	Suppert warhammer matched combat 
+	Show all files, even unsupported 
+	Animation report => check that flag, set default if always the same 
+
+Search window for binary data
+Improve texture preview tool -> Global handle, open file
+General -> Close all but this tab 
 Texture preview tool! 
+Propper version handling 
+Superview bugs 
 
 CSC => some stuff in 3k
 
@@ -19,7 +28,6 @@ Major ideas:
 	Sync textures (updates in PS reflected in Ass)
 	SkeletonEditor
 	Sound tree view + new sounds editor 
-	Script tool - keep files outside of the packfile, allow for dynamic reload
 	UI tool
 	BMD/CSC editor 
 	Map tools?
@@ -309,20 +317,9 @@ Skeleton creator tool:
 	Transform 
 
 Animation pack editor
-	[DONE]Generate bin name better int mount tool
-	[DONE]New pack
-	[DONE]New frg
-
-	[DONE]Error handling frg
-	[DONE]clean up error handler for campagin bin editor 
-	[DONE]Are you sure when swappng between files
-	[DONE]Save
-	[DONE]throw new Exception("TODO")
-	[DONE]Validation of paths 
 	Expand slot types on ctrl
 	3k items 
 	display matching combat file
-	Better logic  for finding bin
 	Add capability dropdown (range, firewhile moving, riders+++) 
 	
 General:

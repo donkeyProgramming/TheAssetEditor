@@ -82,9 +82,16 @@ namespace Filetypes.ByteParsing
 
         public byte[] ReadBytes(int count)
         {
-            byte[] destination = new byte[count];
-            Array.Copy(_buffer, _currentIndex, destination, 0, count);
+            var bytes = GetBytesFromBuffer(_currentIndex, count);
             _currentIndex += count;
+            return bytes;
+        }
+
+        public byte[] GetBytesFromBuffer(int start, int count)
+        {
+            byte[] destination = new byte[count];
+            Array.Copy(_buffer, start, destination, 0, count);
+            
             return destination;
         }
 

@@ -2,8 +2,9 @@
 using CommonControls.Common;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.AnimationPack;
+using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
+using CommonControls.FileTypes.DB;
 using CommonControls.Services;
-using FileTypes.AnimationPack;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,11 +17,11 @@ namespace AnimationEditor.MountAnimationCreator.Services
         PackFileService _pfs;
         MountAnimationGeneratorService _animationGenerator;
         BatchProcessOptions _batchProcessOptions;
-        AnimationFragment _mountFragment;
-        AnimationFragment _riderFragment;
+        AnimationSetFile _mountFragment;
+        AnimationSetFile _riderFragment;
        
         AnimationPackFile _outAnimPack;
-        AnimationFragment _riderOutputFragment;
+        AnimationSetFile _riderOutputFragment;
 
         string _animationPrefix = "new_";
         string _animPackName = "test_tables.animpack";
@@ -38,13 +39,13 @@ namespace AnimationEditor.MountAnimationCreator.Services
             _batchProcessOptions = batchProcessOptions;
         }
 
-        public void Process(AnimationFragment mountFragment, AnimationFragment riderFragment)
+        public void Process(AnimationSetFile mountFragment, AnimationSetFile riderFragment)
         {
             var resultInfo = new ErrorListViewModel.ErrorList();
             _mountFragment = mountFragment;
             _riderFragment = riderFragment;
 
-            CreateFiles();
+            CreateAnimPackFile();
             CreateFragmentAndAnimations(resultInfo);
             SaveFiles();
 
@@ -132,25 +133,25 @@ namespace AnimationEditor.MountAnimationCreator.Services
         }
 
 
-        void CreateFiles()
+        void CreateAnimPackFile()
         {
-            //AnimationPackLoader
-            _outAnimPack = new AnimationPackFile(_animBinName);
-            _outAnimPack.AnimationBin = new AnimationBin("animations/animation_tables/" + _animBinName);
+            _outAnimPack = new AnimationPackFile();
+
+            var animDb = new AnimationDbFile("animations/animation_tables/" + _animBinName);
             var tableEntry = new AnimationBinEntry(_fragmentName, _riderFragment.Skeletons.Values.First(), "Bin entry using skeleton - " + _mountFragment.Skeletons.Values.First() + " goes here");
             tableEntry.FragmentReferences.Add(new AnimationBinEntry.FragmentReference() { Name = _fragmentName });
-
-            _outAnimPack.AnimationBin.AnimationTableEntries.Add(tableEntry);
-
-            _riderOutputFragment = new AnimationFragment("animations/animation_tables/" + _fragmentName + ".frg");
-            _riderOutputFragment.Skeletons = new AnimationFragment.StringArrayTable(_riderFragment.Skeletons.Values.First(), _riderFragment.Skeletons.Values.First());
-
-            _outAnimPack.Fragments.Add(_riderOutputFragment);
+            animDb.AnimationTableEntries.Add(tableEntry);
+            
+            _riderOutputFragment = new AnimationSetFile("animations/animation_tables/" + _fragmentName + ".frg", null);
+            _riderOutputFragment.Skeletons = new StringArrayTable(_riderFragment.Skeletons.Values.First(), _riderFragment.Skeletons.Values.First());
+            
+            _outAnimPack.AddFile(_riderOutputFragment);
+            _outAnimPack.AddFile(animDb);
         }
 
         void SaveFiles()
         {
-            var bytes = _outAnimPack.ToByteArray();
+            var bytes = AnimationPackSerializer.ConvertToBytes(_outAnimPack);
             SaveHelper.Save(_pfs, "animations\\animation_tables\\" + _animPackName, null, bytes);
         }
 

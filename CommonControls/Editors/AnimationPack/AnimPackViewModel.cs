@@ -1,147 +1,117 @@
-﻿using CommonControls.BaseDialogs;
-using CommonControls.Common;
+﻿using CommonControls.Common;
+using CommonControls.Editors.AnimationPack.Converters;
 using CommonControls.Editors.TextEditor;
 using CommonControls.FileTypes.AnimationPack;
+using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using FileTypes.AnimationPack;
 using CommunityToolkit.Mvvm.Input;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
-using System.Windows.Input;
 
 namespace CommonControls.Editors.AnimationPack
 {
     public class AnimPackViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
-
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        AnimationPackFile _animPack;
+        ITextConverter _activeConverter;
 
-        string _displayName;
-        public string DisplayName { get => _displayName; set => SetAndNotify(ref _displayName, value); }
+        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("");
 
         PackFile _packFile;
-        public PackFile MainFile { get => _packFile; set { _packFile = value; Load(_packFile); } }
-
+        public PackFile MainFile { get => _packFile; set { _packFile = value; Load(AnimationPackSerializer.Load(_packFile)); } }
 
         public FilterCollection<string> AnimationPackItems { get; set; }
 
         SimpleTextEditorViewModel _selectedItemViewModel;
         public SimpleTextEditorViewModel SelectedItemViewModel { get => _selectedItemViewModel; set => SetAndNotify(ref _selectedItemViewModel, value); }
 
-        AnimationPackFile _animPack;
-
-        public ICommand CreateNewFragmentCommand { get; set; }
-        public ICommand SaveCommand { get; set; }
-        public ICommand DeleteSelectedCommand { get; set; }
-        public ICommand ViewAsTableCommand { get; set; }
-        
-
-        public ObservableCollection<AnimationFragmentEntry> AnimStuff { get; set; } = new ObservableCollection<AnimationFragmentEntry>();
 
         public AnimPackViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
-
-            CreateNewFragmentCommand = new RelayCommand(CreateFragment);
-            DeleteSelectedCommand = new RelayCommand(DeleteSelected);
-            SaveCommand = new RelayCommand(() => Save());
-            ViewAsTableCommand = new RelayCommand(() => ViewSelectedAsTable());
-        }
-
-        void CreateFragment()
-        {
-            var window = new TextInputWindow("Fragment name", "");
-            if (window.ShowDialog() == true)
-            {
-                var filename = SaveHelper.EnsureEnding(window.TextValue, ".frg");
-                var filePath = @"animations/animation_tables/" + filename;
-
-                if (!SaveHelper.IsFilenameUnique(_pfs, filePath))
-                {
-                    MessageBox.Show("Filename is not unique");
-                    return;
-                }
-
-                var fragment = new AnimationFragment(filePath);
-
-                fragment.Skeletons = new AnimationFragment.StringArrayTable("ExampleSkeleton", "ExampleSkeleton");
-                fragment.Fragments.Add(new AnimationFragmentEntry()
-                {
-                    AnimationFile = @"animations/battle/ExampleSkeleton/exampleanim.anim",
-                    MetaDataFile = @"animations/battle/ExampleSkeleton/exampleanim.anm.meta",
-                    Skeleton = @"ExampleSkeleton",
-                    Slot = AnimationSlotTypeHelper.GetfromValue("MISSING_ANIM"),
-                    SoundMetaDataFile = @"animations/battle/ExampleSkeleton/exampleanim.snd.meta"
-                });
-
-                fragment.Fragments.Add(new AnimationFragmentEntry()
-                {
-                    AnimationFile = @"animations/battle/ExampleSkeleton/exampleanim2.anim",
-                    MetaDataFile = @"animations/battle/ExampleSkeleton/exampleanim2.anm.meta",
-                    Skeleton = @"ExampleSkeleton",
-                    Slot = AnimationSlotTypeHelper.GetfromValue("STAND"),
-                    SoundMetaDataFile = @"animations/battle/ExampleSkeleton/exampleanim2.snd.meta"
-                });
-
-                fragment.UpdateMinAndMaxSlotIds();
-                _animPack.Fragments.Add(fragment);
-
-                AnimationPackItems.PossibleValues.Add(filePath);
-                AnimationPackItems.UpdatePossibleValues(AnimationPackItems.PossibleValues);
-            }
-        }
-
-        void DeleteSelected()
-        { }
-
-        private void Load(PackFile packFile)
-        {
-            var pack = new AnimationPackFile(packFile);
-            Load(pack);
         }
 
         public void Load(AnimationPackFile animPack)
         {
             _animPack = animPack;
-            var itemNames = new List<string>();
-
-            if (_animPack.AnimationBin != null)
-                itemNames.Add(_animPack.AnimationBin.FileName);
-
-            foreach (var item in _animPack.Fragments)
-                itemNames.Add(item.FileName);
+            var itemNames = animPack.Files.Select(X => X.FileName).ToList();
 
             AnimationPackItems = new FilterCollection<string>(itemNames, ItemSelected, BeforeItemSelected)
             {
                 SearchFilter = (value, rx) => { return rx.Match(value).Success; }
             };
 
-            DisplayName = animPack.FileName;
+            DisplayName.Value = animPack.FileName;
         }
+
+        public void CreateEmptyAnimSetFile()
+        {
+            //var window = new TextInputWindow("Fragment name", "");
+            //if (window.ShowDialog() == true)
+            //{
+            //    var filename = SaveHelper.EnsureEnding(window.TextValue, ".frg");
+            //    var filePath = @"animations/animation_tables/" + filename;
+            //
+            //    if (!SaveHelper.IsFilenameUnique(_pfs, filePath))
+            //    {
+            //        MessageBox.Show("Filename is not unique");
+            //        return;
+            //    }
+            //
+            //    var fragment = new AnimationFragment(filePath);
+            //
+            //    fragment.Skeletons = new AnimationFragment.StringArrayTable("ExampleSkeleton", "ExampleSkeleton");
+            //    fragment.Fragments.Add(new AnimationFragmentEntry()
+            //    {
+            //        AnimationFile = @"animations/battle/ExampleSkeleton/exampleanim.anim",
+            //        MetaDataFile = @"animations/battle/ExampleSkeleton/exampleanim.anm.meta",
+            //        Skeleton = @"ExampleSkeleton",
+            //        Slot = AnimationSlotTypeHelper.GetfromValue("MISSING_ANIM"),
+            //        SoundMetaDataFile = @"animations/battle/ExampleSkeleton/exampleanim.snd.meta"
+            //    });
+            //
+            //    fragment.Fragments.Add(new AnimationFragmentEntry()
+            //    {
+            //        AnimationFile = @"animations/battle/ExampleSkeleton/exampleanim2.anim",
+            //        MetaDataFile = @"animations/battle/ExampleSkeleton/exampleanim2.anm.meta",
+            //        Skeleton = @"ExampleSkeleton",
+            //        Slot = AnimationSlotTypeHelper.GetfromValue("STAND"),
+            //        SoundMetaDataFile = @"animations/battle/ExampleSkeleton/exampleanim2.snd.meta"
+            //    });
+            //
+            //    //fragment.UpdateMinAndMaxSlotIds();
+            //    _animPack.Fragments.Add(fragment);
+            //
+            //    AnimationPackItems.PossibleValues.Add(filePath);
+            //    AnimationPackItems.UpdatePossibleValues(AnimationPackItems.PossibleValues);
+            //}
+        }
+
+
+
 
         public void SetSelectedFile(string path)
         {
             AnimationPackItems.SelectedItem = AnimationPackItems.PossibleValues.FirstOrDefault(x => x == path);
         }
 
-        ITextConverter GetConverterForType(AnimationPackFile.AnimationPackFileType type)
-        { 
-            switch(type)
-            {
-                case AnimationPackFile.AnimationPackFileType.Bin:
-                    return new AnimationBinToXmlConverter();
-                case AnimationPackFile.AnimationPackFileType.Fragment:
-                    return new AnimationFragmentToXmlConverter(_skeletonAnimationLookUpHelper);
-            }
-
-            return new DefaultTextConverter();
-        }
-
+        //ITextConverter GetConverterForType(AnimationPackFile.AnimationPackFileType type)
+        //{
+        //    switch (type)
+        //    {
+        //        case AnimationPackFile.AnimationPackFileType.Bin:
+        //            return new AnimationBinToXmlConverter();
+        //        case AnimationPackFile.AnimationPackFileType.Fragment:
+        //            return new AnimationFragmentToXmlConverter(_skeletonAnimationLookUpHelper);
+        //    }
+        //
+        //    return new DefaultTextConverter();
+        //}
+        //
         bool BeforeItemSelected(string item)
         {
             if (SelectedItemViewModel != null && SelectedItemViewModel.HasUnsavedChanges())
@@ -153,34 +123,30 @@ namespace CommonControls.Editors.AnimationPack
             return true;
         }
 
+   
         void ItemSelected(string item)
         {
             if (string.IsNullOrWhiteSpace(item) == false)
             {
-                var bytes = _animPack.GetFile(item, out var animPackFileType);
+                var seletedFile = _animPack.Files.FirstOrDefault(x => x.FileName == item);
+                if (seletedFile == null)
+                    return;
 
-                ITextConverter converter = GetConverterForType(animPackFileType);
-                ICommand saveCommand = null;
-                if (animPackFileType == AnimationPackFile.AnimationPackFileType.Bin)
-                {
-                    saveCommand = new RelayCommand(() => SaveData());
-                }
-                else if (animPackFileType == AnimationPackFile.AnimationPackFileType.Fragment)
-                {
-                    saveCommand = new RelayCommand(() => SaveData());
-
-                }
+                if (seletedFile is AnimationSetFile typedFragment)
+                    _activeConverter = new AnimationSetFileToXmlConverter(_skeletonAnimationLookUpHelper);
+                else if (seletedFile is AnimationDbFile typedBin)
+                    _activeConverter = new AnimationDbFileToXmlConverter();
 
                 SelectedItemViewModel = new SimpleTextEditorViewModel();
-                SelectedItemViewModel.SaveCommand = saveCommand;
+                SelectedItemViewModel.SaveCommand = new RelayCommand(() => SaveActiveFile());
                 SelectedItemViewModel.TextEditor.ShowLineNumbers(true);
-                SelectedItemViewModel.TextEditor.SetSyntaxHighlighting(converter.GetSyntaxType());
-                SelectedItemViewModel.Text = converter.GetText(bytes);
+                SelectedItemViewModel.TextEditor.SetSyntaxHighlighting(_activeConverter.GetSyntaxType());
+                SelectedItemViewModel.Text = _activeConverter.GetText(seletedFile.ToByteArray());
                 SelectedItemViewModel.ResetChangeLog();
             }
         }
-
-        bool SaveData()
+      
+        public bool SaveActiveFile()
         {
             if (MainFile == null)
             {
@@ -189,19 +155,18 @@ namespace CommonControls.Editors.AnimationPack
             }
 
             var fileName = AnimationPackItems.SelectedItem;
-            _animPack.GetFile(fileName, out var animPackFileType);
+            var bytes = _activeConverter.ToBytes(SelectedItemViewModel.Text, fileName, _pfs, out var error);
 
-            ITextConverter converter = GetConverterForType(animPackFileType);
-            var bytes = converter.ToBytes(SelectedItemViewModel.Text, fileName, _pfs, out var error);
+            if (bytes == null || error != null)
+            {
+                SelectedItemViewModel.TextEditor.HightLightText(error.ErrorLineNumber, error.ErrorPosition, error.ErrorLength);
+                MessageBox.Show(error.Text, "Error");
+                return false;
+            }
 
-           if (bytes == null || error != null)
-           {
-               SelectedItemViewModel.TextEditor.HightLightText(error.ErrorLineNumber, error.ErrorPosition, error.ErrorLength);
-               MessageBox.Show(error.Text, "Error");
-               return false;
-           }
-           
-           _animPack.UpdateFileFromBytes(fileName, bytes);
+            var seletedFile = _animPack.Files.FirstOrDefault(x => x.FileName == fileName);
+            seletedFile.CreateFromBytes(bytes);
+
             SelectedItemViewModel.ResetChangeLog();
 
             return true;
@@ -218,82 +183,81 @@ namespace CommonControls.Editors.AnimationPack
 
         public bool Save()
         {
-            if (MainFile == null)
-            {
-                MessageBox.Show("Can not save in this mode - Open the file normally");
-                return false;
-            }
-
-            if (SelectedItemViewModel != null && SelectedItemViewModel.HasUnsavedChanges())
-            {
-                if (MessageBox.Show("Editor has unsaved changes.\nSave anyway?", "", MessageBoxButton.YesNo) == MessageBoxResult.No)
-                    return false;
-            }
-
-            var savePath = _pfs.GetFullPath(MainFile );
-            SaveHelper.Save(_pfs, savePath, null, _animPack.ToByteArray());
+           if (MainFile == null)
+           {
+               MessageBox.Show("Can not save in this mode - Open the file normally");
+               return false;
+           }
+           
+           if (SelectedItemViewModel != null && SelectedItemViewModel.HasUnsavedChanges())
+           {
+               if (MessageBox.Show("Editor has unsaved changes.\nSave anyway?", "", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                   return false;
+           }
+           
+           var savePath = _pfs.GetFullPath(MainFile );
+           SaveHelper.Save(_pfs, savePath, null, AnimationPackSerializer.ConvertToBytes(_animPack));
             return true;
         }
 
         public bool ViewSelectedAsTable()
         {
-            var selectedItem = AnimationPackItems.SelectedItem;
-            if (selectedItem == null)
-                return false;
-
-            if (_animPack.GetFileType(selectedItem) == AnimationPackFile.AnimationPackFileType.Bin)
-            {
-                var data = new ObservableCollection<AnimationBinEntry>();
-
-                var bin = _animPack.GetAnimBin(selectedItem);
-                foreach (var item in bin.AnimationTableEntries)
-                    data.Add(item);
-
-                AnimTablePreviewWindow window = new AnimTablePreviewWindow()
-                {
-                    DataContext = data
-                };
-
-                window.ShowDialog();
-            }
-            else
-            {
-                var data = new ObservableCollection<AnimationFragmentEntry>();
-
-                var frag = _animPack.GetAnimFragment(selectedItem);
-                foreach (var item in frag.Fragments)
-                    data.Add(item);
-
-                AnimTablePreviewWindow window = new AnimTablePreviewWindow()
-                {
-                    DataContext = data
-                };
-
-                window.ShowDialog();
-            }
-
+            //var selectedItem = AnimationPackItems.SelectedItem;
+            //if (selectedItem == null)
+            //    return false;
+            //
+            //if (_animPack.GetFileType(selectedItem) == AnimationPackFile.AnimationPackFileType.Bin)
+            //{
+            //    var data = new ObservableCollection<AnimationBinEntry>();
+            //
+            //    var bin = _animPack.GetAnimBin(selectedItem);
+            //    foreach (var item in bin.AnimationTableEntries)
+            //        data.Add(item);
+            //
+            //    AnimTablePreviewWindow window = new AnimTablePreviewWindow()
+            //    {
+            //        DataContext = data
+            //    };
+            //
+            //    window.ShowDialog();
+            //}
+            //else
+            //{
+            //    var data = new ObservableCollection<AnimationFragmentEntry>();
+            //
+            //    var frag = _animPack.GetAnimFragment(selectedItem);
+            //    foreach (var item in frag.Fragments)
+            //        data.Add(item);
+            //
+            //    AnimTablePreviewWindow window = new AnimTablePreviewWindow()
+            //    {
+            //        DataContext = data
+            //    };
+            //
+            //    window.ShowDialog();
+            //}
+            
             return true;
         }
 
-        public static void ShowPreviewWinodow(AnimationPackFile animationPack, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, string selectedFileName )
+        public static void ShowPreviewWinodow(AnimationPackFile animationPackFile, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, string selectedFileName)
         {
-            var animPack = animationPack;
-            var controller = new AnimPackViewModel(pfs, skeletonAnimationLookUpHelper);
-            controller.Load(animPack);
-
-            var containingWindow = new Window();
-            containingWindow.Title = "Animation pack - " + animationPack.FileName;
-
-            containingWindow.DataContext = controller;
-            containingWindow.Content = new CommonControls.Editors.AnimationPack.AnimationPackView();
-
-            containingWindow.Width = 1200;
-            containingWindow.Height = 1100;
-
-
-            containingWindow.Loaded += (sender, e) => controller.SetSelectedFile(selectedFileName);
-
-            containingWindow.ShowDialog();
+            //var controller = new AnimPackViewModel(pfs, skeletonAnimationLookUpHelper);
+            //controller.Load(animationPack);
+            //
+            //var containingWindow = new Window();
+            //containingWindow.Title = "Animation pack - " + animationPack.FileName;
+            //
+            //containingWindow.DataContext = controller;
+            //containingWindow.Content = new CommonControls.Editors.AnimationPack.AnimationPackView();
+            //
+            //containingWindow.Width = 1200;
+            //containingWindow.Height = 1100;
+            //
+            //
+            //containingWindow.Loaded += (sender, e) => controller.SetSelectedFile(selectedFileName);
+            //
+            //containingWindow.ShowDialog();
         }
     }
 }

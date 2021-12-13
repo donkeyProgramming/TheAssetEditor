@@ -10,7 +10,7 @@
         <DataGrid ItemsSource="{Binding}"  AutoGenerateColumns="True" ScrollViewer.CanContentScroll="True" 
             ScrollViewer.VerticalScrollBarVisibility="Auto"
             ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                  IsReadOnly="true">
+            IsReadOnly="true">
 
         </DataGrid>
     </Grid>

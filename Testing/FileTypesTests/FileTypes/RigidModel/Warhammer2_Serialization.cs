@@ -95,12 +95,12 @@ namespace FileTypesTests.FileTypes.RigidModel
 
             // ModelFactory
 
-
-            SceneLoader loader = new SceneLoader(_resourceLibary, _pfs, GeometryGraphicsContextFactory.CreateInstance(_resourceLibary.GraphicsDevice));
-            var loadedNode = loader.Load(_pfs.FindFile(_dwarfHeadPath), null, null);
-
-            var modelNodes = SceneNodeHelper.GetChildrenOfType<Rmv2ModelNode>(loadedNode);
-
+          //
+          //SceneLoader loader = new SceneLoader(_resourceLibary, _pfs, GeometryGraphicsContextFactory.CreateInstance(_resourceLibary.GraphicsDevice));
+          //var loadedNode = loader.Load(_pfs.FindFile(_dwarfHeadPath), null, null);
+          //
+          //var modelNodes = SceneNodeHelper.GetChildrenOfType<Rmv2ModelNode>(loadedNode);
+          //
 
             //MeshSaverService.Save(true, modelNodes, null, RmvVersionEnum.RMV2_V7, true);
         }

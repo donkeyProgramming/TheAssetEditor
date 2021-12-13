@@ -61,7 +61,7 @@
                             </ContextMenu>
                         </Grid.ContextMenu>
                         
-                        <TextBlock Grid.Column="0" Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Grid.Column="0" Text="{Binding DisplayName.Value, UpdateSourceTrigger=PropertyChanged}"/>
                         <Button Grid.Column="1" 
                                 Command="{Binding DataContext.CloseToolCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}}" 
                                 CommandParameter="{Binding}"

@@ -1,7 +1,7 @@
 ﻿using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
+using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.Services;
-using FileTypes.AnimationPack;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,7 +13,7 @@ namespace AnimationEditor.Common.ReferenceModel
     {
         AssetViewModel _asset;
 
-        public FilterCollection<AnimationFragment> FragmentList { get; set; }
+        public FilterCollection<AnimationSetFile> FragmentList { get; set; }
 
         public FilterCollection<AnimationFragmentEntry> FragmentSlotList { get; set; }
 
@@ -29,7 +29,7 @@ namespace AnimationEditor.Common.ReferenceModel
             _asset = asset;
             _metaViewModel = metaViewModel;
 
-            FragmentList = new FilterCollection<AnimationFragment>(null, (value) => FragmentSelected(value, FragmentSlotList, _asset.SkeletonName.Value))
+            FragmentList = new FilterCollection<AnimationSetFile>(null, (value) => FragmentSelected(value, FragmentSlotList, _asset.SkeletonName.Value))
             {
                 SearchFilter = (value, rx) => { return rx.Match(value.FileName).Success; }
             };
@@ -47,7 +47,7 @@ namespace AnimationEditor.Common.ReferenceModel
         {
             if (FragmentList.SelectedItem != null && FragmentList.SelectedItem != null)
             {
-                var animPack = FragmentList.SelectedItem.ParentAnimationPack;
+                var animPack = FragmentList.SelectedItem.Parent;
                 CommonControls.Editors.AnimationPack.AnimPackViewModel.ShowPreviewWinodow(animPack, _pfs, _skeletonAnimationLookUpHelper, FragmentList.SelectedItem.FileName);
             }
         }
@@ -68,7 +68,7 @@ namespace AnimationEditor.Common.ReferenceModel
 
             if (newValue == null)
             {
-                FragmentList.UpdatePossibleValues(new List<AnimationFragment>());
+                FragmentList.UpdatePossibleValues(new List<AnimationSetFile>());
                 FragmentSlotList.UpdatePossibleValues(new List<AnimationFragmentEntry>());
                 return;
             }
@@ -90,9 +90,9 @@ namespace AnimationEditor.Common.ReferenceModel
             _asset.SkeletonChanged += OnSkeletonChange;
         }
 
-        public List<AnimationFragment> LoadFragmentsForSkeleton(string skeletonName, bool onlyPacksThatCanBeSaved = false)
+        public List<AnimationSetFile> LoadFragmentsForSkeleton(string skeletonName, bool onlyPacksThatCanBeSaved = false)
         {
-            var outputFragments = new List<AnimationFragment>();
+            var outputFragments = new List<AnimationSetFile>();
             var animPacks = _pfs.FindAllWithExtention(@".animpack");
             foreach (var animPack in animPacks)
             {
@@ -102,16 +102,15 @@ namespace AnimationEditor.Common.ReferenceModel
                         continue;
                 }
 
-                var animPackFile = new AnimationPackFile(animPack, skeletonName);
-                foreach (var fragment in animPackFile.Fragments)
-                {
+                var animPackFile = AnimationPackSerializer.Load(animPack);
+                var fragments = animPackFile.GetAnimationSets(skeletonName);
+                foreach (var fragment in fragments)
                     outputFragments.Add(fragment);
-                }
             }
             return outputFragments;
         }
 
-        void FragmentSelected(AnimationFragment value, FilterCollection<AnimationFragmentEntry> collection, string skeletonName)
+        void FragmentSelected(AnimationSetFile value, FilterCollection<AnimationFragmentEntry> collection, string skeletonName)
         {
             if (value == null)
             {

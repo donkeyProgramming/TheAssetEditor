@@ -25,8 +25,7 @@ namespace CommonControls.Editors.AnimMeta
         MetaDataFile _metaDataFile;
 
 
-        string _displayName;
-        public string DisplayName { get => _displayName; set => SetAndNotify(ref _displayName, value); }
+        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>();
 
         PackFile _file;
         public PackFile MainFile { get => _file; set => Initialise(value); }
@@ -47,7 +46,7 @@ namespace CommonControls.Editors.AnimMeta
         void Initialise(PackFile file)
         {
             _file = file;
-            DisplayName = file.Name;
+            DisplayName.Value = file.Name;
 
             var fileContent = _file.DataSource.ReadData();
             _metaDataFile = MetaDataFileParser.ParseFile(fileContent, _schemaManager);
@@ -158,7 +157,7 @@ namespace CommonControls.Editors.AnimMeta
             if (res != null)
             {
                 _file = res;
-                DisplayName = _file.Name;
+                DisplayName.Value = _file.Name;
             }
 
             _logger.Here().Information("Creating metadata file complete");

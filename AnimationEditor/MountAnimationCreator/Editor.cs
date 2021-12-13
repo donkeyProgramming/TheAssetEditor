@@ -1,12 +1,9 @@
 ﻿using AnimationEditor.Common.AnimationSettings;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.MountAnimationCreator.Services;
-using AnimationEditor.PropCreator;
 using CommonControls.Common;
-using CommonControls.FileTypes.AnimationPack;
+using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.Services;
-using CommonControls.Table;
-using FileTypes.AnimationPack;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
@@ -38,7 +35,7 @@ namespace AnimationEditor.MountAnimationCreator
         public NotifyAttr<string> SavePrefixText { get; set; } = new NotifyAttr<string>("new_");
         public NotifyAttr<bool> EnsureUniqeFileName { get; set; } = new NotifyAttr<bool>(true);
         
-        public FilterCollection<AnimationFragment> ActiveOutputFragment { get; set; }
+        public FilterCollection<AnimationSetFile> ActiveOutputFragment { get; set; }
         public FilterCollection<FragmentStatusSlotItem> ActiveFragmentSlot { get; set; }
 
         public AnimationSettingsViewModel AnimationSettings { get; set; } = new AnimationSettingsViewModel();
@@ -68,7 +65,7 @@ namespace AnimationEditor.MountAnimationCreator
             SelectedRiderBone = new FilterCollection<SkeletonBoneNode>(null, (x) => UpdateCanSaveAndPreviewStates());
             MountLinkController = new MountLinkController(pfs, skeletonAnimationLookUpHelper, rider, mount, UpdateCanSaveAndPreviewStates);
 
-            ActiveOutputFragment = new FilterCollection<AnimationFragment>(null, OutputFragmentSelected);
+            ActiveOutputFragment = new FilterCollection<AnimationSetFile>(null, OutputFragmentSelected);
             ActiveOutputFragment.SearchFilter = (value, rx) => { return rx.Match(value.FileName).Success; };
 
             ActiveFragmentSlot = new FilterCollection<FragmentStatusSlotItem>(null, (x)=> UpdateCanSaveAndPreviewStates());
@@ -115,7 +112,7 @@ namespace AnimationEditor.MountAnimationCreator
             UpdateCanSaveAndPreviewStates();
         }
 
-        void OutputFragmentSelected(AnimationFragment fragment)
+        void OutputFragmentSelected(AnimationSetFile fragment)
         {
             if (fragment == null)
                 ActiveFragmentSlot.UpdatePossibleValues(null);
@@ -194,8 +191,9 @@ namespace AnimationEditor.MountAnimationCreator
 
             ActiveOutputFragment.SelectedItem.Fragments.Add(newAnimSlot);
 
-            var bytes = ActiveOutputFragment.SelectedItem.ParentAnimationPack.ToByteArray();
-            SaveHelper.Save(_pfs, "animations\\animation_tables\\" + ActiveOutputFragment.SelectedItem.ParentAnimationPack.FileName, null, bytes, false);
+            throw new Exception("TODo");
+            //var bytes = ActiveOutputFragment.SelectedItem.ParentAnimationPack.ToByteArray();
+            //SaveHelper.Save(_pfs, "animations\\animation_tables\\" + ActiveOutputFragment.SelectedItem.ParentAnimationPack.FileName, null, bytes, false);
 
             // Update status for the slot thing 
             var possibleValues = ActiveOutputFragment.SelectedItem.Fragments.Select(x => new FragmentStatusSlotItem(x));
@@ -218,11 +216,11 @@ namespace AnimationEditor.MountAnimationCreator
             ViewFragment(ActiveOutputFragment.SelectedItem, true);
         }
 
-        void ViewFragment(AnimationFragment fragment, bool canEdit = false)
+        void ViewFragment(AnimationSetFile fragment, bool canEdit = false)
         {
             if (fragment != null)
             {
-                var animPack = fragment.ParentAnimationPack;
+                var animPack = fragment.Parent;
                 CommonControls.Editors.AnimationPack.AnimPackViewModel.ShowPreviewWinodow(animPack, _pfs, _skeletonAnimationLookUpHelper, fragment.FileName);
             }
         }

@@ -29,7 +29,7 @@ namespace CommonControls.BaseDialogs
         }
         private void OnIsOptionalChanged(DependencyPropertyChangedEventArgs args)
         {
-            // TODO: Add event handler if needed
+            // Add event handler if needed
         }
         #endregion
 

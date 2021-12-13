@@ -9,7 +9,7 @@ namespace AnimationEditor.TechSkeletonEditor
     {
         public TechSkeletonEditorViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, SchemaManager schemaManager) : base(toolFactory, pfs, skeletonHelper, schemaManager, "not_in_use1", "not_in_use2", false)
         {
-            DisplayName = "TechSkeleton Editor";
+            DisplayName.Value = "TechSkeleton Editor";
             Pfs = pfs;
         }
 

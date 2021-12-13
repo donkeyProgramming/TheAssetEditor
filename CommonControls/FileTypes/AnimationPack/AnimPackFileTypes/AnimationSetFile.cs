@@ -1,12 +1,78 @@
-﻿using CommonControls.FileTypes.AnimationPack;
+﻿using CommonControls.Common;
+using CommonControls.FileTypes.DB;
 using Filetypes.ByteParsing;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace FileTypes.AnimationPack
+namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
 {
+    public class AnimationSetFile : IAnimationPackFile
+    {
+        public string FileName { get; set; }
+        public StringArrayTable Skeletons { get; set; } = new StringArrayTable();
+        public int MinSlotId { get; set; }
+        public int MaxSlotId { get; set; }
+        public List<AnimationFragmentEntry> Fragments { get; set; } = new List<AnimationFragmentEntry>();
+        public AnimationPackFile Parent { get; set; }
+
+        public AnimationSetFile() { }
+        public AnimationSetFile(string fileName, byte[] bytes)
+        {
+            FileName = fileName;
+            if(bytes != null)
+                CreateFromBytes(bytes);
+        }
+
+        public byte[] ToByteArray()
+        {
+            MinSlotId = 0;
+            MaxSlotId = 0;
+            if (Fragments.Count != 0)
+            {
+                MinSlotId = Fragments.Min(x => x.Slot.Id);
+                MaxSlotId = Fragments.Max(x => x.Slot.Id);
+            }
+
+            Fragments = Fragments.OrderBy(x => x.Slot.Id).ToList();
+            foreach (var fragment in Fragments)
+            {
+                fragment.AnimationFile = fragment.AnimationFile.Replace("\\", "/").ToLower();
+                fragment.MetaDataFile = fragment.MetaDataFile.Replace("\\", "/").ToLower();
+                fragment.SoundMetaDataFile = fragment.SoundMetaDataFile.Replace("\\", "/").ToLower();
+            }
+
+            // Save
+            using MemoryStream memStream = new MemoryStream();
+            memStream.Write(Skeletons.ToByteArray());
+
+            memStream.Write(ByteParsers.Int32.EncodeValue(MinSlotId, out _));
+            memStream.Write(ByteParsers.Int32.EncodeValue(MaxSlotId, out _));
+
+            memStream.Write(ByteParsers.Int32.EncodeValue(Fragments.Count, out _));
+            foreach (var fragment in Fragments)
+                memStream.Write(fragment.ToByteArray());
+
+            return memStream.ToArray();
+        }
+
+        public void CreateFromBytes(byte[] bytes)
+        {
+            var data = new ByteChunk(bytes);
+           
+            Skeletons = new StringArrayTable(data);
+            MinSlotId = data.ReadInt32();
+            MaxSlotId = data.ReadInt32();
+            var numFragItems = data.ReadInt32();
+
+            Fragments.Clear();
+            for (int i = 0; i < numFragItems; i++)
+                Fragments.Add(new AnimationFragmentEntry(data));
+            
+        }
+    }
 
     public class AnimationFragmentEntry
     {

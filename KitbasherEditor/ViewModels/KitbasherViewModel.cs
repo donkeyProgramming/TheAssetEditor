@@ -37,8 +37,7 @@ namespace KitbasherEditor.ViewModels
         public AnimationControllerViewModel Animation { get; set; }
 
 
-        string _displayName = "3d viewer";
-        public string DisplayName { get => _displayName; set => SetAndNotify(ref _displayName, value); }
+        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("3D Viewer");
 
         public PackFile MainFile { get; set; }
 
@@ -98,7 +97,7 @@ namespace KitbasherEditor.ViewModels
                         .Where(x => x != null)
                         .ToList();
                     Scene.GetComponent<FocusSelectableObjectComponent>().FocusObjects(nodes);
-                   DisplayName = MainFile.Name;
+                   DisplayName.Value = MainFile.Name;
                 }
                 catch (Exception e)
                 {

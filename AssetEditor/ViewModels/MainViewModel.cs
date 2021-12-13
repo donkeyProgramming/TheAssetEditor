@@ -77,7 +77,7 @@ namespace AssetEditor.ViewModels
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
 
-               
+
 
                 //var r = new Rmv2Information(_packfileService);
                 //r.Create(GameInformationFactory.GetGameById(settingsService.CurrentSettings.CurrentGame).DisplayName);
@@ -133,12 +133,16 @@ namespace AssetEditor.ViewModels
                 //packfileService.DeepSearch("wh2_main_vor_deadwood_the_frozen_city", false);
                 //packfileService.DeepSearch("31x11_dragonback_skew_mirror_01", false);
 
-                //OpenFile(packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack"));
+
+                //AnimationPackLoader.Load(packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack"));
+
+
+                OpenFile(packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack"));
                 //OpenFile(packfileService.FindFile(@"variantmeshes\_variantmodels\man\skin\cleopatra_mark_antony_trailer\mark_antony_lod1.rigid_model_v2"));
 
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 
-                KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
+               // KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);
 

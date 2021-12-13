@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors"
              xmlns:texteditor="clr-namespace:CommonControls.Editors.TextEditor"
+             xmlns:s="http://schemas.singulink.com/xaml"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -22,9 +23,9 @@
         <DockPanel Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0">
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
-                    <MenuItem Header="Save"  Command="{Binding SaveCommand}"/>
-                    <MenuItem Header="New fragment"  Command="{Binding CreateNewFragmentCommand}"/>
-                    <MenuItem Header="View Selected As Table"  Command="{Binding ViewAsTableCommand}"/>
+                    <MenuItem Header="Save" Click="{s:MethodBinding Save}"/>
+                    <MenuItem Header="New AnimationSet"  Click="{s:MethodBinding CreateEmptyAnimSetFile}" />
+                    <MenuItem Header="View Selected As Table" Click="{s:MethodBinding ViewSelectedAsTable}"/>
                 </MenuItem>
             </Menu>
         </DockPanel>

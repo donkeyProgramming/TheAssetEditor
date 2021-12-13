@@ -22,6 +22,7 @@ using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using AssetEditor.Report;
+using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 
 namespace AssetEditor.ViewModels
 {
@@ -73,7 +74,7 @@ namespace AssetEditor.ViewModels
             OpenSettingsWindowCommand = new RelayCommand(ShowSettingsDialog);
             OpenPackFileCommand = new RelayCommand(OpenPackFile);
             CreateNewPackFileCommand = new RelayCommand(CreatePackFile);
-            CreateAnimPackCommand = new RelayCommand(CreateAnimPack);
+            CreateAnimPackCommand = new RelayCommand(CreateAnimationDb);
             OpenAssetEditorFolderCommand = new RelayCommand(OpenAssetEditorFolder);
             OpenKitbashEditorCommand = new RelayCommand(OpenKitbasherTool);
             OpenAnimMetaDecocderCommand = new RelayCommand(OpenAnimMetaDecocder);
@@ -144,7 +145,7 @@ namespace AssetEditor.ViewModels
         }
 
 
-        void CreateAnimPack()
+        void CreateAnimationDb()
         {
             TextInputWindow window = new TextInputWindow("New AnimPack name", "");
             if (window.ShowDialog() == true)
@@ -160,9 +161,10 @@ namespace AssetEditor.ViewModels
                 }
 
                 // Create dummy data
-                var animPack = new AnimationPackFile(filePath);
-                animPack.AnimationBin = new AnimationBin(binPath);
-                animPack.AnimationBin.AnimationTableEntries.Add(
+                var animPack = new AnimationPackFile();
+                var animDb = new AnimationDbFile(binPath);
+             
+                animDb.AnimationTableEntries.Add(
                     new AnimationBinEntry("ExampleDbRef", "ExampleSkeleton")
                     {
                         Unknown = 1,
@@ -173,8 +175,10 @@ namespace AssetEditor.ViewModels
                         }
                     });
 
+                animPack.AddFile(animDb);
+
                 // Save
-                SaveHelper.Save(_packfileService, filePath, null, animPack.ToByteArray());
+                SaveHelper.Save(_packfileService, filePath, null, AnimationPackSerializer.ConvertToBytes(animPack));
             }
         }
 

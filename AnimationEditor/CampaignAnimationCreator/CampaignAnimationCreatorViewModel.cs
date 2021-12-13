@@ -9,7 +9,7 @@ namespace AnimationEditor.CampaignAnimationCreator
     {
         public CampaignAnimationCreatorViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, SchemaManager schemaManager) : base(toolFactory, pfs, skeletonHelper, schemaManager, "Model", "Not_in_use")
         {
-            DisplayName = "Campaign Animation Creator";
+            DisplayName.Value = "Campaign Animation Creator";
         }
 
         public override void Initialize()

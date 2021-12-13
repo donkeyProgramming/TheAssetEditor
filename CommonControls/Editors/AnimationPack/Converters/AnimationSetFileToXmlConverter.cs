@@ -2,8 +2,9 @@
 using CommonControls.Common;
 using CommonControls.Editors.TextEditor;
 using CommonControls.FileTypes.AnimationPack;
+using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
+using CommonControls.FileTypes.DB;
 using CommonControls.Services;
-using FileTypes.AnimationPack;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,13 +15,13 @@ using System.Xml;
 using System.Xml.Serialization;
 using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 
-namespace CommonControls.Editors.AnimationPack
+namespace CommonControls.Editors.AnimationPack.Converters
 {
-    public class AnimationFragmentToXmlConverter : ITextConverter
+    public class AnimationSetFileToXmlConverter : ITextConverter
     {
         private SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
-        public AnimationFragmentToXmlConverter(SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        public AnimationSetFileToXmlConverter(SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
         }
@@ -29,7 +30,7 @@ namespace CommonControls.Editors.AnimationPack
         {
             try
             {
-                var frgFile = new FileTypes.AnimationPack.AnimationFragment("", new Filetypes.ByteParsing.ByteChunk(bytes));
+                var frgFile = new AnimationSetFile("", bytes);
                 var xmlFrg = ConvertAnimationFragmentFileToXmlFragment(frgFile);
 
                 var xmlserializer = new XmlSerializer(typeof(Animation));
@@ -198,7 +199,7 @@ namespace CommonControls.Editors.AnimationPack
         }
 
 
-        Animation ConvertAnimationFragmentFileToXmlFragment(FileTypes.AnimationPack.AnimationFragment fragmentFile)
+        Animation ConvertAnimationFragmentFileToXmlFragment(AnimationSetFile fragmentFile)
         {
             var outputBin = new Animation();
             outputBin.AnimationFragmentEntry = new List<AnimationEntry>();
@@ -241,10 +242,10 @@ namespace CommonControls.Editors.AnimationPack
             return outputBin;
         }
 
-        FileTypes.AnimationPack.AnimationFragment ConvertXmlAnimationToAnimationFragmentFile(Animation animation, string fileName)
+        AnimationSetFile ConvertXmlAnimationToAnimationFragmentFile(Animation animation, string fileName)
         {
-            var output = new FileTypes.AnimationPack.AnimationFragment(fileName);
-            output.Skeletons = new FileTypes.AnimationPack.AnimationFragment.StringArrayTable(animation.Skeleton, animation.Skeleton);
+            var output = new AnimationSetFile(fileName, null);
+            output.Skeletons = new StringArrayTable(animation.Skeleton, animation.Skeleton);
 
             foreach (var item in animation.AnimationFragmentEntry)
             {
@@ -272,7 +273,7 @@ namespace CommonControls.Editors.AnimationPack
                 output.Fragments.Add(entry);
             }
 
-            output.UpdateMinAndMaxSlotIds();
+            //output.UpdateMinAndMaxSlotIds();
             return output;
         }
 

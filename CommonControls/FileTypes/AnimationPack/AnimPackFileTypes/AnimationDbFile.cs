@@ -2,27 +2,23 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace CommonControls.FileTypes.AnimationPack
+namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
 {
-    public class AnimationBin
+    public class AnimationDbFile : IAnimationPackFile
     {
         public int TableVersion { get; set; } = 2;
         public string FileName { get; set; }
+        public AnimationPackFile Parent { get; set; }
 
         public List<AnimationBinEntry> AnimationTableEntries { get; set; } = new List<AnimationBinEntry>();
-
-
-        public AnimationBin(string filename, ByteChunk data)
+    
+        public AnimationDbFile(string filename, byte[] data)
         {
             FileName = filename;
-            TableVersion = data.ReadInt32();
-            var rowCount = data.ReadInt32();
-            AnimationTableEntries = new List<AnimationBinEntry>(rowCount);
-            for (int i = 0; i < rowCount; i++)
-                AnimationTableEntries.Add(new AnimationBinEntry(data));
+            CreateFromBytes(data);
         }
 
-        public AnimationBin(string fileName)
+        public AnimationDbFile(string fileName)
         {
             FileName = fileName;
         }
@@ -38,6 +34,17 @@ namespace CommonControls.FileTypes.AnimationPack
                 memStream.Write(tableEntry.ToByteArray());
 
             return memStream.ToArray();
+        }
+
+        public void CreateFromBytes(byte[] bytes)
+        {
+            var data = new ByteChunk(bytes);
+
+            TableVersion = data.ReadInt32();
+            var rowCount = data.ReadInt32();
+            AnimationTableEntries = new List<AnimationBinEntry>(rowCount);
+            for (int i = 0; i < rowCount; i++)
+                AnimationTableEntries.Add(new AnimationBinEntry(data));
         }
     }
 
