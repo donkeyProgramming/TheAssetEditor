@@ -49,29 +49,29 @@ namespace KitbasherEditor.ViewModels
             _skeletonAnimationLookUpHelper = skeletonHelper;
 
             Scene = new SceneContainer();
-            Scene.AddCompnent(new FpsComponent(Scene));
-            Scene.AddCompnent(new KeyboardComponent(Scene));
-            Scene.AddCompnent(new MouseComponent(Scene));
-            Scene.AddCompnent(new ResourceLibary(Scene, pf));
-            Scene.AddCompnent(new ArcBallCamera(Scene));
-            Scene.AddCompnent(new SceneManager(Scene));
-            Scene.AddCompnent(new SelectionManager(Scene));
-            Scene.AddCompnent(new CommandExecutor(Scene));
-            Scene.AddCompnent(new GizmoComponent(Scene));
-            Scene.AddCompnent(new SelectionComponent(Scene));
-            Scene.AddCompnent(new ObjectEditor(Scene));
-            Scene.AddCompnent(new FaceEditor(Scene));
-            Scene.AddCompnent(new FocusSelectableObjectComponent(Scene));
-            Scene.AddCompnent(new ClearScreenComponent(Scene));
-            Scene.AddCompnent(new RenderEngineComponent(Scene));
-            Scene.AddCompnent(new GridComponent(Scene));
-            Scene.AddCompnent(new AnimationsContainerComponent(Scene));
-            Scene.AddCompnent(new ViewOnlySelectedComponent(Scene));
-            Scene.AddCompnent(new LightControllerComponent(Scene));
-            Scene.AddCompnent(_skeletonAnimationLookUpHelper);
+            Scene.AddComponent(new FpsComponent(Scene));
+            Scene.AddComponent(new KeyboardComponent(Scene));
+            Scene.AddComponent(new MouseComponent(Scene));
+            Scene.AddComponent(new ResourceLibary(Scene, pf));
+            Scene.AddComponent(new ArcBallCamera(Scene));
+            Scene.AddComponent(new SceneManager(Scene));
+            Scene.AddComponent(new SelectionManager(Scene));
+            Scene.AddComponent(new CommandExecutor(Scene));
+            Scene.AddComponent(new GizmoComponent(Scene));
+            Scene.AddComponent(new SelectionComponent(Scene));
+            Scene.AddComponent(new ObjectEditor(Scene));
+            Scene.AddComponent(new FaceEditor(Scene));
+            Scene.AddComponent(new FocusSelectableObjectComponent(Scene));
+            Scene.AddComponent(new ClearScreenComponent(Scene));
+            Scene.AddComponent(new RenderEngineComponent(Scene));
+            Scene.AddComponent(new GridComponent(Scene));
+            Scene.AddComponent(new AnimationsContainerComponent(Scene));
+            Scene.AddComponent(new ViewOnlySelectedComponent(Scene));
+            Scene.AddComponent(new LightControllerComponent(Scene));
+            Scene.AddComponent(_skeletonAnimationLookUpHelper);
 
             Animation = new AnimationControllerViewModel(Scene, _packFileService);
-            SceneExplorer = Scene.AddCompnent(new SceneExplorerViewModel(Scene, _packFileService, Animation));
+            SceneExplorer = Scene.AddComponent(new SceneExplorerViewModel(Scene, _packFileService, Animation));
             
             MenuBar = new MenuBarViewModel(Scene, _packFileService);
             

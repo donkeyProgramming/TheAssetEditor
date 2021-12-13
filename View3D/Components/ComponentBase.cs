@@ -11,7 +11,7 @@ namespace View3D.Components
     {
         #region Fields
 
-        private readonly WpfGame _game;
+        private readonly Game _game;
         private bool _visible = true;
         private int _drawOrder = (int)ComponentDrawOrderEnum.Default;
         private bool _initialized;
@@ -19,13 +19,13 @@ namespace View3D.Components
         private bool _enabled = true;
         private int _updateOrder = (int)ComponentUpdateOrderEnum.Default;
 
-        public WpfGame Game { get { return _game; } }
+        public Game Game { get { return _game; } }
 
         #endregion
 
         #region Constructors
 
-        public BaseComponent(WpfGame game)
+        public BaseComponent(Game game)
         {
             _game = game;
         }

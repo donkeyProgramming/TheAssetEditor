@@ -9,7 +9,6 @@ namespace CommonControls.FileTypes.AnimationPack
 {
     public class AnimationPackFile
     {
-
         public enum AnimationPackFileType
         {
             Bin,

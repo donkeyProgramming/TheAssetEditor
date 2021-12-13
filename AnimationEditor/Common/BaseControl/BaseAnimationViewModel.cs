@@ -64,28 +64,28 @@ namespace AnimationEditor.PropCreator.ViewModels
             _createDefaultAssets = createDefaultAssets;
 
             Scene = new SceneContainer();
-            Scene.Components.Add(new FpsComponent(Scene));
-            Scene.Components.Add(new KeyboardComponent(Scene));
-            Scene.Components.Add(new MouseComponent(Scene));
-            Scene.Components.Add(new ResourceLibary(Scene, pfs));
-            Scene.Components.Add(skeletonHelper);
-            Scene.Components.Add(schemaManager);
-            Scene.Components.Add(new ArcBallCamera(Scene));
-            Scene.Components.Add(new ClearScreenComponent(Scene));
-            Scene.Components.Add(new RenderEngineComponent(Scene));
-            Scene.Components.Add(new GridComponent(Scene));
-            Scene.Components.Add(new SceneManager(Scene));
-            Scene.Components.Add(new AnimationsContainerComponent(Scene));
-            Scene.AddCompnent(new SelectionManager(Scene));
-            Scene.AddCompnent(new SelectionComponent(Scene));
-            Scene.AddCompnent(new CommandExecutor(Scene));
-            Scene.AddCompnent(new LightControllerComponent(Scene));
+            Scene.AddComponent(new FpsComponent(Scene));
+            Scene.AddComponent(new KeyboardComponent(Scene));
+            Scene.AddComponent(new MouseComponent(Scene));
+            Scene.AddComponent(new ResourceLibary(Scene, pfs));
+            Scene.AddComponent(skeletonHelper);
+            Scene.AddComponent(schemaManager);
+            Scene.AddComponent(new ArcBallCamera(Scene));
+            Scene.AddComponent(new ClearScreenComponent(Scene));
+            Scene.AddComponent(new RenderEngineComponent(Scene));
+            Scene.AddComponent(new GridComponent(Scene));
+            Scene.AddComponent(new SceneManager(Scene));
+            Scene.AddComponent(new AnimationsContainerComponent(Scene));
+            Scene.AddComponent(new SelectionManager(Scene));
+            Scene.AddComponent(new SelectionComponent(Scene));
+            Scene.AddComponent(new CommandExecutor(Scene));
+            Scene.AddComponent(new LightControllerComponent(Scene));
             
 
             Scene.SceneInitialized += OnSceneInitialized;
 
-            var mainAsset = Scene.AddCompnent(new AssetViewModel(_pfs, headerAsset0, Color.Black, Scene));
-            var refAsset = Scene.AddCompnent(new AssetViewModel(_pfs, headerAsset1,  Color.Green, Scene));
+            var mainAsset = Scene.AddComponent(new AssetViewModel(_pfs, headerAsset0, Color.Black, Scene));
+            var refAsset = Scene.AddComponent(new AssetViewModel(_pfs, headerAsset1,  Color.Green, Scene));
 
             MainModelView = new ReferenceModelSelectionViewModel(_toolFactory, pfs, mainAsset, headerAsset0 + ":", Scene, skeletonHelper, schemaManager);
             ReferenceModelView = new ReferenceModelSelectionViewModel(_toolFactory, pfs, refAsset, headerAsset1 + ":", Scene, skeletonHelper, schemaManager);

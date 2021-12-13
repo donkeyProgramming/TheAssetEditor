@@ -33,6 +33,7 @@ namespace AnimationEditor.Common.ReferenceModel
         Color _skeletonColor;
         SkeletonNode _skeletonSceneNode;
         ISceneNode _modelNode;
+        IComponentManager _componentManager;
 
         bool _isSelectable = false;
         public bool IsSelectable { get => _isSelectable; set { _isSelectable = value; SetSelectableState(); } } 
@@ -64,12 +65,12 @@ namespace AnimationEditor.Common.ReferenceModel
         public NotifyAttr<bool> ShowSkeleton { get; set; }
 
 
-        public AssetViewModel(PackFileService pfs, string description, Color skeletonColour, WpfGame game) : base( game)
+        public AssetViewModel(PackFileService pfs, string description, Color skeletonColour, W game) : base( game)
         {
             Description = description;
             _pfs = pfs;
             _skeletonColor = skeletonColour;
-
+            _componentManager = gam
             ShowMesh = new NotifyAttr<bool>(true, (x) => SetMeshVisability(x));
             ShowSkeleton = new NotifyAttr<bool>(true, (x) => _skeletonSceneNode.IsVisible = ShowSkeleton.Value);
         }

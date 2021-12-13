@@ -20,7 +20,7 @@ namespace AnimationEditor.AnimationTransferTool
         public override void Initialize()
         {
             ReferenceModelView.Data.IsSelectable = false;
-            var propAsset = Scene.AddCompnent(new AssetViewModel(_pfs, "Generated", Color.Black, Scene));
+            var propAsset = Scene.AddComponent(new AssetViewModel(_pfs, "Generated", Color.Black, Scene));
             Player.RegisterAsset(propAsset);
             Editor = new Editor(_pfs, _skeletonHelper, MainModelView.Data, ReferenceModelView.Data, propAsset, Scene);
         }

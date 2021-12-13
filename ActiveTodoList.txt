@@ -3,8 +3,16 @@ ImageMagick
 https://github.com/dlemstra/Magick.NET
 
 The TW statics have the normal/tangent/bitangt stored z,y,x
+variantmeshes\variantmeshdefinitions\troy_myth_corybantes.variantmeshdefinition
+Giants Head Variations
+ajax
+Giant Armour 1
+Dardanian Defenders Armour 1
+Mycenaean 
 
 Texture preview tool! 
+
+CSC => some stuff in 3k
 
 Major ideas:
 	Texture kitbashing
