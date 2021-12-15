@@ -24,8 +24,10 @@
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
                     <MenuItem Header="Save" Click="{s:MethodBinding Save}"/>
-                    <MenuItem Header="New AnimationSet"  Click="{s:MethodBinding CreateEmptyAnimSetFile}" />
-                    <MenuItem Header="View Selected As Table" Click="{s:MethodBinding ViewSelectedAsTable}"/>
+                    <Separator/>
+                    <MenuItem Header="New AnimationSet (warhammer)"  Click="{s:MethodBinding CreateEmptyWarhammerAnimSetFile}" />
+                    <MenuItem Header="New AnimationSet (3k)"  Click="{s:MethodBinding CreateEmpty3kAnimSetFile}" />
+                    <MenuItem Header="View Selected As Table" Click="{s:MethodBinding ViewSelectedAsTable}" Visibility="Collapsed"/>
                 </MenuItem>
             </Menu>
         </DockPanel>
@@ -51,7 +53,36 @@
                     </Style>
                 </TextBox.Style>
             </TextBox>
-            <ListView Grid.Row="1" ItemsSource="{Binding AnimationPackItems.Values}" SelectedItem="{Binding AnimationPackItems.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <ListView Grid.Row="1" ItemsSource="{Binding AnimationPackItems.Values}" SelectedItem="{Binding AnimationPackItems.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListViewItem}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsUnknownFile, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                <Setter Property="Foreground" Value="Red"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsUnknownFile, UpdateSourceTrigger=PropertyChanged}" Value="False">
+                                <Setter Property="Foreground" Value="Black"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.ItemContainerStyle>
+
+
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding IsChanged.Value, Converter={StaticResource BoolToChangedPrefixStr}, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Margin="4,0,0,0" Grid.Column="1" Text="{Binding FileName, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                
+                
+            </ListView>
         </Grid>
 
         <!-- Right side - Main view -->

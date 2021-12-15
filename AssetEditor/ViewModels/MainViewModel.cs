@@ -44,7 +44,6 @@ namespace AssetEditor.ViewModels
             MenuBar.EditorCreator = this;
             CloseToolCommand = new RelayCommand<IEditorViewModel>(CloseTool);
 
-
             FileTree = new PackFileBrowserViewModel(_packfileService);
             FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, toolFactory, this);
             FileTree.FileOpen += OpenFile;
@@ -63,7 +62,7 @@ namespace AssetEditor.ViewModels
 
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
             {
-                //settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Rome_2_Remastered;
+                //settingsService.CurrentSettings.CurrentGame = GameTypeEnum.ThreeKingdoms;
                 var gamePath = settingsService.GetGamePathForCurrentGame();
                 if (gamePath != null)
                 {
@@ -117,7 +116,7 @@ namespace AssetEditor.ViewModels
                 //AnimMetaBatchProcessor processor = new AnimMetaBatchProcessor();
                 //processor.BatchProcess(_packfileService, schemaManager, "Warhammer");
 
-                //SuperViewViewModel_Debug.CreateDamselEditor(this, toolFactory, packfileService);
+                //AnimationEditor.SuperView.SuperViewViewModel_Debug.CreateThrot(this, toolFactory, packfileService);
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 //MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
                 //KitbashEditor_Debug.CreateLoremasterHead(this, toolFactory, packfileService);
@@ -137,12 +136,17 @@ namespace AssetEditor.ViewModels
                 //AnimationPackLoader.Load(packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack"));
 
 
-                OpenFile(packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack"));
+                //var f = packfileService.FindFile(@"animations/matched_combat/attila_generated.bin");
+                //new CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.MatachedAnimFile("sdasda", f.DataSource.ReadData());
+                //
+               // OpenFile(packfileService.FindFile(@"animations\database\battle\bin\animation_tables.animpack"));
+               // OpenFile(packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack"));
+
                 //OpenFile(packfileService.FindFile(@"variantmeshes\_variantmodels\man\skin\cleopatra_mark_antony_trailer\mark_antony_lod1.rigid_model_v2"));
 
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 
-               // KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
+                KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);
 

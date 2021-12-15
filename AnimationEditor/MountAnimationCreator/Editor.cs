@@ -2,6 +2,7 @@
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.MountAnimationCreator.Services;
 using CommonControls.Common;
+using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.Services;
 using MonoGame.Framework.WpfInterop;
@@ -191,9 +192,8 @@ namespace AnimationEditor.MountAnimationCreator
 
             ActiveOutputFragment.SelectedItem.Fragments.Add(newAnimSlot);
 
-            throw new Exception("TODo");
-            //var bytes = ActiveOutputFragment.SelectedItem.ParentAnimationPack.ToByteArray();
-            //SaveHelper.Save(_pfs, "animations\\animation_tables\\" + ActiveOutputFragment.SelectedItem.ParentAnimationPack.FileName, null, bytes, false);
+            var bytes = AnimationPackSerializer.ConvertToBytes(ActiveOutputFragment.SelectedItem.Parent);
+            SaveHelper.Save(_pfs, "animations\\animation_tables\\" + ActiveOutputFragment.SelectedItem.Parent.FileName, null, bytes, false);
 
             // Update status for the slot thing 
             var possibleValues = ActiveOutputFragment.SelectedItem.Fragments.Select(x => new FragmentStatusSlotItem(x));
@@ -252,9 +252,9 @@ namespace AnimationEditor.MountAnimationCreator
     public class FragmentStatusSlotItem
     {
         public NotifyAttr<bool> IsValid { get; set; } = new NotifyAttr<bool>(false);
-        public NotifyAttr<AnimationFragmentEntry> Entry { get; set; } = new NotifyAttr<AnimationFragmentEntry>(null);
+        public NotifyAttr<AnimationSetEntry> Entry { get; set; } = new NotifyAttr<AnimationSetEntry>(null);
 
-        public FragmentStatusSlotItem(AnimationFragmentEntry entry)
+        public FragmentStatusSlotItem(AnimationSetEntry entry)
         {
             Entry.Value = entry;
             IsValid.Value = !string.IsNullOrWhiteSpace(entry.AnimationFile);

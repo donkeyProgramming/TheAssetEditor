@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Editors\FastBin\**" />
+    <EmbeddedResource Remove="Editors\FastBin\**" />
+    <None Remove="Editors\FastBin\**" />
+    <Page Remove="Editors\FastBin\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Resources\Icons\Copy.png" />
     <None Remove="Resources\Icons\Cut.png" />
     <None Remove="Resources\Icons\Delete.png" />
@@ -358,10 +365,6 @@
     <Page Update="Editors\AnimMeta\View\NewTagWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Editors\FastBin\" />
   </ItemGroup>
 
 </Project>

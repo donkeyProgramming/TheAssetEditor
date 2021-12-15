@@ -11,7 +11,7 @@
             <valueconverters:BoolToColourConverter x:Key="ColourConverter_black_red" TrueValue="Black" FalseValue="Red"/>
             <valueconverters:BoolToColourConverter x:Key="BoolToColour_white_red" TrueValue="White" FalseValue="Red"/>
             <valueconverters:BoolToColourConverter x:Key="BoolToColour_black_gray" TrueValue="Black" FalseValue="Gray"/>
-            <valueconverters:BoolToStringConverter x:Key="BoolToStringConverter" TrueValue="*"/>
+            <valueconverters:BoolToStringConverter x:Key="BoolToChangedPrefixStr" TrueValue="*"/>
 
             <!--Common view items-->
 

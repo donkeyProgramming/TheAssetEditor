@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors" 
              xmlns:e1="http://schemas.microsoft.com/xaml/behaviors" 
-             xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters"
              xmlns:nodevalueconverters="clr-namespace:CommonControls.PackFileBrowser"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
@@ -112,7 +111,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Image Width="12" Grid.Column="0" Source="{Binding Path=., Converter={StaticResource ImageValueConverter}, Mode=OneTime}"/>
-                        <TextBlock Grid.Column="1" Text="{Binding UnsavedChanged, Converter={StaticResource BoolToStringConverter}, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding UnsavedChanged, Converter={StaticResource BoolToChangedPrefixStr}, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Margin="4,0,0,0" Grid.Column="2" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
                 </HierarchicalDataTemplate>

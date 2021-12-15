@@ -103,9 +103,9 @@ namespace AnimationEditor.Common.ReferenceModel
 
             var graphics = _componentManager.GetComponent<DeviceResolverComponent>();
             SceneLoader loader = new SceneLoader(_resourceLibary, _pfs, GeometryGraphicsContextFactory.CreateInstance(graphics.Device));
-            var outSkeletonName = "";
-            var loadeNode = loader.Load(file, null, Player);
-            if (loadeNode == null)
+
+            var loadedNode = loader.Load(file, null, Player);
+            if (loadedNode == null)
             {
                 _logger.Here().Error("Unable to load model");
                 return;
@@ -113,18 +113,18 @@ namespace AnimationEditor.Common.ReferenceModel
 
             if (_modelNode != null)
                 _parentNode.RemoveObject(_modelNode);
-            _modelNode = loadeNode;
-            _parentNode.AddObject(loadeNode);
+            _modelNode = loadedNode;
+            _parentNode.AddObject(loadedNode);
 
-
-            var fullSkeletonName = $"animations\\skeletons\\{outSkeletonName}.anim";
+            var skeletonName = SceneNodeHelper.GetSkeletonName(loadedNode);
+            var fullSkeletonName = $"animations\\skeletons\\{skeletonName}.anim";
             var skeletonFile = _pfs.FindFile(fullSkeletonName);
             SetSkeleton(skeletonFile);
             MeshName.Value = file.Name;
             ShowMesh.Value = ShowMesh.Value;
             ShowSkeleton.Value = ShowSkeleton.Value;
 
-            loadeNode.ForeachNodeRecursive((node) =>
+            loadedNode.ForeachNodeRecursive((node) =>
             {
                 if (node is Rmv2MeshNode mesh && string.IsNullOrWhiteSpace(mesh.AttachmentPointName) == false)
                 {

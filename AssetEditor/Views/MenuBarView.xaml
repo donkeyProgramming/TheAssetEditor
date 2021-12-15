@@ -13,7 +13,9 @@
                 <MenuItem Header="Open" Command="{Binding MenuBar.OpenPackFileCommand}"/>
                 <MenuItem Header="Create">
                     <MenuItem Header="New Packfile"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
-                    <MenuItem Header="New AnimPack"  Command="{Binding MenuBar.CreateAnimPackCommand}"/>
+                    <Separator/>
+                    <MenuItem Header="New AnimPack (Warhammer)"  Command="{Binding MenuBar.CreateAnimPackWarhammerCommand}"/>
+                    <MenuItem Header="New AnimPack (3k)"  Command="{Binding MenuBar.CreateAnimPack3kCommand}"/>
                 </MenuItem>
                 <MenuItem Header="Recent Files" IsEnabled="False"/>
                 <Separator/>

@@ -125,9 +125,10 @@ namespace View3D.SceneNodes
                     output.Add(modelNode.Model.Header.SkeletonName);
             }
 
+            var potentialSkeletons = output.Where(x => string.IsNullOrWhiteSpace(x) == false);
             if (output.Count == 0)
                 return "";
-            return output.First();
+            return potentialSkeletons.First();
         }
 
         public static bool AreAllNodesVisible(Rmv2ModelNode searchStart)

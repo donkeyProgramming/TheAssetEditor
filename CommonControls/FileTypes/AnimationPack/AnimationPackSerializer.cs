@@ -1,5 +1,6 @@
 ﻿using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.Services;
 using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
@@ -33,81 +34,72 @@ namespace CommonControls.FileTypes.AnimationPack
         }
     }
 
-    public class AnimationPackFile
-    {
-        public string FileName { get; set; }
-        List<IAnimationPackFile> _files { get; set; } = new List<IAnimationPackFile>();
-
-        public IEnumerable<IAnimationPackFile> Files { get => _files; }
-
-        public void AddFile(IAnimationPackFile file)
-        {
-            file.Parent = this;
-            _files.Add(file);
-        }
-
-        public List<AnimationSetFile> GetAnimationSets(string skeletonName = null)
-        {
-            var sets = _files.Where(x => x is AnimationSetFile).Cast<AnimationSetFile>();
-            if(skeletonName != null)
-                sets = sets.Where(x => x.Skeletons.Values.Contains(skeletonName));
-
-            return sets.ToList();
-        }
-    }
+    
 
     public static class AnimationPackSerializer
     {
-        public static AnimationPackFile Load(PackFile fp)
+        static IAnimFileSerializer DeterminePossibleSerializers(string fullPath)
+        {
+            // 3k
+            if (fullPath.Contains("animations/database/", StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (fullPath.Contains("matched", StringComparison.InvariantCultureIgnoreCase))
+                    return new UnknownAnimFileSerializer();
+                else if (fullPath.Contains("trigger_database", StringComparison.InvariantCultureIgnoreCase))
+                    return new UnknownAnimFileSerializer();
+                else
+                    return new AnimationSetSerializer_3K();
+            }
+            else
+            {
+                if (fullPath.Contains(".frg", StringComparison.InvariantCultureIgnoreCase))
+                    return new AnimationSetFileSerializer();
+                else if (fullPath.Contains("matched_combat", StringComparison.InvariantCultureIgnoreCase))
+                    return new MatchedAnimFileSerializer();
+                else if (fullPath.Contains(".bin", StringComparison.InvariantCultureIgnoreCase))
+                    return new AnimationDbFileSerializer();
+            }
+
+            return null;
+
+            //throw new Exception();
+        }
+
+        public static AnimationPackFile Load(PackFile pf, PackFileService pfs)
         {
             var output = new AnimationPackFile();
+            output.FileName = pfs.GetFullPath(pf);
 
-            var fileLoaders = new Dictionary<string, List<IAnimFileSerializer>>();
-            fileLoaders.Add(".frg", new List<IAnimFileSerializer>() { new AnimationSetSerializer()/*, new AnimationSetSerializer_3K()*/});
-            fileLoaders.Add(".bin", new List<IAnimFileSerializer>() { new AnimDbSerializer() });//, new AnimMatchSerializer(), new AnimMatchSerializer_3k(), new AnimTriggerDb_3k() });
-
-            var dataChunk = fp.DataSource.ReadDataAsChunk();
+            var dataChunk = pf.DataSource.ReadDataAsChunk();
             var files = FindAllSubFiles(dataChunk);
 
             foreach (var file in files)
             {
-                var extention = Path.GetExtension(file.Name);
-
                 bool isLoaded = false;
-                if (fileLoaders.ContainsKey(extention))
+                var fileLoader = DeterminePossibleSerializers(file.Name);
+                if (fileLoader != null)
                 {
-                    foreach (var fileLoader in fileLoaders[extention])
+                    var loadedFile = LoadFile(fileLoader, file, dataChunk);
+                    if (loadedFile != null)
                     {
-                        var loadedFile = LoadFile(fileLoader, file, dataChunk);
-                        if (loadedFile != null)
-                        {
-                            output.AddFile(loadedFile);
-                            isLoaded = true;
-                            continue;
-                        }
+                        output.AddFile(loadedFile);
+                        isLoaded = true;
                     }
                 }
 
-                //if (isLoaded == false)
-                //{
-                //    var unkownLoader = new UnknownAnimFileSerializer();
-                //    var loadedFile = LoadFile(unkownLoader, file, dataChunk);
-                //    output.Files.Add(loadedFile);
-                //}
+               if (isLoaded == false)
+               {
+                   var unkownLoader = new UnknownAnimFileSerializer();
+                   var unkownFile = LoadFile(unkownLoader, file, dataChunk);
+                   output.AddFile(unkownFile);
+               }
             }
-
-
-            // Set parent pack to all files
-            // Assert all files belong to same version of the game 
 
             return output;
         }
 
         public static byte[] ConvertToBytes(AnimationPackFile animPack)
         {
-            //if (HasUnknownElements)
-            //    throw new Exception("Can not save animation pack with unkown elements");
-
             using MemoryStream memStream = new MemoryStream();
 
             int totalFileCount = animPack.Files.Count();
@@ -159,37 +151,32 @@ namespace CommonControls.FileTypes.AnimationPack
         public IAnimationPackFile Load(AnimationInfoDataFile animFileInfo, ByteChunk data);
     }
 
-    public class AnimationSetSerializer : IAnimFileSerializer
-    {
-        public IAnimationPackFile Load(AnimationInfoDataFile animFileInfo, ByteChunk data)
-        {
-            var buffer = data.GetBytesFromBuffer(animFileInfo.StartOffset, animFileInfo.Size);
-            return new AnimationSetFile(animFileInfo.Name, buffer);
-        }
-    }
-
-    public class AnimDbSerializer : IAnimFileSerializer
-    {
-        public IAnimationPackFile Load(AnimationInfoDataFile animFileInfo, ByteChunk data)
-        {
-            var buffer = data.GetBytesFromBuffer(animFileInfo.StartOffset, animFileInfo.Size);
-            return new AnimationDbFile(animFileInfo.Name, buffer);
-        }
-    }
-
     public class UnknownAnimFileSerializer : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile animFileInfo, ByteChunk data)
-        {
-            throw new System.NotImplementedException();
-        }
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new UnknownAnimFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+    }
+
+    public class AnimationSetFileSerializer : IAnimFileSerializer
+    {
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimationSetFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+    }
+
+    public class AnimationDbFileSerializer : IAnimFileSerializer
+    {
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimationDbFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+    }
+
+    public class MatchedAnimFileSerializer : IAnimFileSerializer
+    {
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new MatchedAnimFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
     }
 
 
+    public class AnimationSetSerializer_3K : IAnimFileSerializer
+    {
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimationSet3kFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+    }
 
-    //public class AnimationSetSerializer_3K : IAnimFileSerializer
-    //{ }
-    //
 
     //
     //

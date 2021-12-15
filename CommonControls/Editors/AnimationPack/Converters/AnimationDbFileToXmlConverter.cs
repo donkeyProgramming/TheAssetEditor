@@ -1,90 +1,27 @@
-﻿using CommonControls.Common;
-using CommonControls.Editors.TextEditor;
+﻿using CommonControls.Editors.TextEditor;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.Services;
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
 
 namespace CommonControls.Editors.AnimationPack.Converters
 {
-    public class AnimationDbFileToXmlConverter : ITextConverter
+    public class AnimationDbFileToXmlConverter : BaseAnimConverter<AnimationDbFileToXmlConverter.Bin, AnimationDbFile>  
     {
-        public string GetText(byte[] bytes)
+        protected override string CleanUpXml(string xmlText)
         {
-            try
-            {
-                var binFile = new AnimationDbFile("", bytes);
-                var xmlBin = ConvertBinFileToXmlBin(binFile);
-
-                var xmlserializer = new XmlSerializer(typeof(Bin));
-                var stringWriter = new StringWriter();
-                XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-                ns.Add("", "");
-                using (var writer = XmlWriter.Create(stringWriter, new XmlWriterSettings() { Indent = true, OmitXmlDeclaration=true }))
-                {
-                    xmlserializer.Serialize(writer, xmlBin, ns);
-                    var str = stringWriter.ToString();
-                    str = str.Replace("</BinEntry>", "</BinEntry>\n");
-                    str = str.Replace("<Bin>", "<Bin>\n");
-                    return str;
-                }
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("Unable to open file\n" + e.Message);
-                return "";
-            }
+            xmlText = xmlText.Replace("</BinEntry>", "</BinEntry>\n");
+            xmlText = xmlText.Replace("<Bin>", "<Bin>\n");
+            return xmlText;
         }
 
-        public byte[] ToBytes(string text, string filePath, PackFileService pfs, out ITextConverter.SaveError error)
+        protected override  Bin ConvertBytesToXmlClass(byte[] bytes)
         {
-            var xmlserializer = new XmlSerializer(typeof(Bin));
-            using var sr = new StringReader(text);
-            using var reader = XmlReader.Create(sr);
-
-            try
-            {
-                var errorHandler = new XmlSerializationErrorHandler();
-                var obj = xmlserializer.Deserialize(reader, errorHandler.EventHandler) as Bin;
-
-                if (errorHandler.Error != null)
-                {
-                    error = errorHandler.Error;
-                    return null;
-                }
-
-                var binFile = ConvertXmlBinToBinFile(obj, filePath);
-
-                error = null;
-                return binFile.ToByteArray();
-            }
-            catch (Exception e)
-            {
-                var inner = ExceptionHelper.GetInnerMostException(e);
-                if (inner is XmlException xmlException)
-                    error = new ITextConverter.SaveError() { Text = xmlException.Message, ErrorLineNumber = xmlException.LineNumber, ErrorPosition = xmlException.LinePosition, ErrorLength = 0 };
-                else if (inner != null)
-                    error = new ITextConverter.SaveError() { Text = e.Message + " - " + inner.Message, ErrorLineNumber = 1 }; 
-                else
-                    error = new ITextConverter.SaveError() { Text = e.Message };
-               
-                return null;
-            }
-            
-        }
-
-        Bin ConvertBinFileToXmlBin(AnimationDbFile binFile)
-        {
+            AnimationDbFile binFile = new AnimationDbFile("", bytes);
             var outputBin = new Bin();
             outputBin.BinEntry = new List<BinEntry>();
-
-            // Version
 
             foreach (var item in binFile.AnimationTableEntries)
             {
@@ -100,7 +37,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
             return outputBin;
         }
 
-        AnimationDbFile ConvertXmlBinToBinFile(Bin bin, string fileName)
+        protected override byte[] ConvertToAnimClassBytes(Bin bin, string fileName)
         {
             var output = new AnimationDbFile(fileName);
             foreach (var item in bin.BinEntry)
@@ -120,13 +57,14 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
                 output.AnimationTableEntries.Add(entry);
             }
-            return output;
+            return output.ToByteArray();
         }
 
-        public bool ShouldShowLineNumbers() => true;
-        public string GetSyntaxType() => "XML";
-        public bool CanSaveOnError() => false;
 
+        protected override ITextConverter.SaveError Validate(Bin type, string s, PackFileService pfs)
+        {
+            return null;
+        }
 
         [XmlRoot(ElementName = "Skeleton")]
         public class Skeleton

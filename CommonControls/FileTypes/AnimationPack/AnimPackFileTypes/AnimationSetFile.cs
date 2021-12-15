@@ -12,11 +12,15 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
     public class AnimationSetFile : IAnimationPackFile
     {
         public string FileName { get; set; }
+        public AnimationPackFile Parent { get; set; }
+        public bool IsUnknownFile { get; set; } = false;
+        public NotifyAttr<bool> IsChanged { get; set; } = new NotifyAttr<bool>(false);
+
         public StringArrayTable Skeletons { get; set; } = new StringArrayTable();
         public int MinSlotId { get; set; }
         public int MaxSlotId { get; set; }
-        public List<AnimationFragmentEntry> Fragments { get; set; } = new List<AnimationFragmentEntry>();
-        public AnimationPackFile Parent { get; set; }
+        public List<AnimationSetEntry> Fragments { get; set; } = new List<AnimationSetEntry>();
+
 
         public AnimationSetFile() { }
         public AnimationSetFile(string fileName, byte[] bytes)
@@ -24,6 +28,20 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
             FileName = fileName;
             if(bytes != null)
                 CreateFromBytes(bytes);
+        }
+
+        public void CreateFromBytes(byte[] bytes)
+        {
+            var data = new ByteChunk(bytes);
+
+            Skeletons = new StringArrayTable(data);
+            MinSlotId = data.ReadInt32();
+            MaxSlotId = data.ReadInt32();
+            var numFragItems = data.ReadInt32();
+
+            Fragments.Clear();
+            for (int i = 0; i < numFragItems; i++)
+                Fragments.Add(new AnimationSetEntry(data));
         }
 
         public byte[] ToByteArray()
@@ -58,23 +76,10 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
             return memStream.ToArray();
         }
 
-        public void CreateFromBytes(byte[] bytes)
-        {
-            var data = new ByteChunk(bytes);
-           
-            Skeletons = new StringArrayTable(data);
-            MinSlotId = data.ReadInt32();
-            MaxSlotId = data.ReadInt32();
-            var numFragItems = data.ReadInt32();
 
-            Fragments.Clear();
-            for (int i = 0; i < numFragItems; i++)
-                Fragments.Add(new AnimationFragmentEntry(data));
-            
-        }
     }
 
-    public class AnimationFragmentEntry
+    public class AnimationSetEntry
     {
         int _id { get; set; }
         int _slot { get; set; }
@@ -87,11 +92,11 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
         public float BlendInTime { get; set; } = 0;
         public float SelectionWeight { get; set; } = 0;
         public int Unknown0 { get; set; } = 0;
-        public int Unknown1 { get; set; } = 0;
+        public int WeaponBone { get; set; } = 0;
         public string Comment { get; set; } = string.Empty;
         public bool Ignore { get; set; } = false;
 
-        public AnimationFragmentEntry(ByteChunk data)
+        public AnimationSetEntry(ByteChunk data)
         {
             _id = data.ReadInt32();
             _slot = data.ReadInt32();
@@ -105,17 +110,17 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
             BlendInTime = data.ReadSingle();
             SelectionWeight = data.ReadSingle();
             Unknown0 = data.ReadInt32();
-            Unknown1 = data.ReadInt32();
+            WeaponBone = data.ReadInt32();
             Comment = data.ReadString();
             Ignore = data.ReadBool();
         }
 
-        public AnimationFragmentEntry()
+        public AnimationSetEntry()
         { }
 
-        public AnimationFragmentEntry Clone()
+        public AnimationSetEntry Clone()
         {
-            return new AnimationFragmentEntry()
+            return new AnimationSetEntry()
             {
                 Slot = Slot.Clone(),
                 AnimationFile = AnimationFile,
@@ -125,7 +130,7 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
                 BlendInTime = BlendInTime,
                 SelectionWeight = SelectionWeight,
                 Unknown0 = Unknown0,
-                Unknown1 = Unknown1,
+                WeaponBone = WeaponBone,
                 Comment = Comment,
                 Ignore = Ignore
             };
@@ -148,29 +153,20 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
             memStream.Write(ByteParsers.Single.EncodeValue(SelectionWeight, out _));
 
             memStream.Write(ByteParsers.Int32.EncodeValue(Unknown0, out _));
-            memStream.Write(ByteParsers.Int32.EncodeValue(Unknown1, out _));
+            memStream.Write(ByteParsers.Int32.EncodeValue(WeaponBone, out _));
             memStream.Write(ByteParsers.String.WriteCaString(Comment));
             memStream.Write(ByteParsers.Bool.EncodeValue(Ignore, out _));
 
             return memStream.ToArray();
         }
 
-        public void SetUnknown0Flag(int index, bool value)
+        public void SetWeaponBoneFlags(int index, bool value)
         {
-            BitArray b = new BitArray(new int[] { Unknown0 });
+            BitArray b = new BitArray(new int[] { WeaponBone });
             b[index] = value;
             int[] array = new int[1];
             b.CopyTo(array, 0);
-            Unknown0 = array[0];
-        }
-
-        public void SetUnknown1Flag(int index, bool value)
-        {
-            BitArray b = new BitArray(new int[] { Unknown1 });
-            b[index] = value;
-            int[] array = new int[1];
-            b.CopyTo(array, 0);
-            Unknown1 = array[0];
+            WeaponBone = array[0];
         }
 
         int getIntFromBitArray(BitArray bitArray)

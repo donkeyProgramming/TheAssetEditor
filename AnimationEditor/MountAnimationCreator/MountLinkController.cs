@@ -82,7 +82,7 @@ namespace AnimationEditor.MountAnimationCreator
                         continue;
                 }
 
-                var animPackFile = AnimationPackSerializer.Load(animPack);
+                var animPackFile = AnimationPackSerializer.Load(animPack, _pfs);
                 var fragments = animPackFile.GetAnimationSets(skeletonName);
                 foreach (var fragment in fragments)
                     outputFragments.Add(fragment);

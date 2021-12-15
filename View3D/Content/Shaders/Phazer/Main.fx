@@ -398,7 +398,7 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
 	float3x3 basis = float3x3(normalize(input.tangent), normalize(input.binormal), normalize(input.normal));
 	float3 bumpNormal = normalize(mul(normalize(Np), basis));
 
-	bumpNormal = getBlueNormal(input); // TODO: PHAZER: test code
+	bumpNormal = getBlueNormal(input); 
 
 	if (UseNormal == false)
 	{
@@ -407,7 +407,7 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
 	}
 
 	// ************************************************************************
-	//bumpNormal = input.normal; // TODO: PHAZER: uncomment this line to DISABLE normal mapping
+	//bumpNormal = input.normal;
 
 	// ************************************************************************
 	float3 N = normalize(bumpNormal);
@@ -425,7 +425,6 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
 		// specular
 	float3 F0 = SpecTex.rgb;
 
-	// TODO: PHAZER:
 	// rotate only normal with ENV map matrix, when they are use the to sample the ENV maps
 	// so the transfors does not disturb the PBR math
 	// --
@@ -433,8 +432,6 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
 	bumpNormal_Rot = normalize(bumpNormal_Rot);
 	float3 irradiance = tex_cube_diffuse.Sample(SampleType, bumpNormal_Rot).rgb;
 	//return float4(irradiance, 1);
-
-	   //// TODO: PHAZER: normal mapping test code
 	//float3 mapped_test = Uncharted2ToneMapping(irradiance);
 	//float3 color_test = pow(mapped_test, 1.0 / 1.0);
 	//return float4(irradiance, 1);

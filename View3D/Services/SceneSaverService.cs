@@ -1,7 +1,6 @@
 ﻿using CommonControls.Common;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
-
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -9,12 +8,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
-using View3D.Components.Component;
 using View3D.SceneNodes;
-using View3D.Services;
 using Microsoft.Xna.Framework;
 using View3D.Animation;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel.LodHeader;
 using CommonControls.FileTypes.RigidModel.Types;
 using CommonControls.FileTypes.RigidModel;

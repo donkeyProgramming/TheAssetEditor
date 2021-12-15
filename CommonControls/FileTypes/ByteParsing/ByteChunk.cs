@@ -1,4 +1,5 @@
-﻿using CommonControls.FileTypes;
+﻿using CommonControls.Common;
+using CommonControls.FileTypes;
 using SharpDX;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,15 @@ namespace Filetypes.ByteParsing
         public void Reset()
         {
             Index = 0;
+        }
+
+
+        public void SaveToFile(string path)
+        {
+            var folder = Path.GetDirectoryName(path);
+            DirectoryHelper.EnsureCreated(folder);
+
+            File.WriteAllBytes(path, _buffer);
         }
 
         public static ByteChunk FromFile(string fileName)

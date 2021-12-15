@@ -39,4 +39,16 @@ namespace CommonControls.FileTypes.DB
             return memStream.ToArray();
         }
     }
+
+    public class IntArrayTable
+    {
+        public List<int> Data { get; set; }
+        public IntArrayTable(ByteChunk data)
+        {
+            var count = data.ReadInt32();
+            Data = new List<int>(count);
+            for (int i = 0; i < count; i++)
+                Data.Add(data.ReadInt32());
+        }
+    }
 }

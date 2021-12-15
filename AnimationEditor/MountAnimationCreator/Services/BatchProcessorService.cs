@@ -95,7 +95,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
             else
             {
                 // Add an empty fragment entry
-                _riderOutputFragment.Fragments.Add(new AnimationFragmentEntry()
+                _riderOutputFragment.Fragments.Add(new AnimationSetEntry()
                 {
                     Slot = AnimationSlotTypeHelper.GetfromValue(riderSlot),
                     Skeleton = _riderFragment.Skeletons.Values.First()

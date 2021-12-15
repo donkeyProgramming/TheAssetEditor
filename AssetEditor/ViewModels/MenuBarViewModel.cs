@@ -63,7 +63,8 @@ namespace AssetEditor.ViewModels
         public IEditorCreator EditorCreator { get; set; }
         public ICommand GenerateRmv2ReportCommand { get; set; }
 
-        public ICommand CreateAnimPackCommand { get; set; }
+        public ICommand CreateAnimPackWarhammerCommand { get; set; }
+        public ICommand CreateAnimPack3kCommand { get; set; }
 
         public MenuBarViewModel(IServiceProvider provider, PackFileService packfileService, ToolFactory toolFactory, ApplicationSettingsService settingsService)
         {
@@ -74,7 +75,8 @@ namespace AssetEditor.ViewModels
             OpenSettingsWindowCommand = new RelayCommand(ShowSettingsDialog);
             OpenPackFileCommand = new RelayCommand(OpenPackFile);
             CreateNewPackFileCommand = new RelayCommand(CreatePackFile);
-            CreateAnimPackCommand = new RelayCommand(CreateAnimationDb);
+            CreateAnimPackWarhammerCommand = new RelayCommand(CreateAnimationDbWarhammer);
+            CreateAnimPack3kCommand = new RelayCommand(CreateAnimationDb3k);
             OpenAssetEditorFolderCommand = new RelayCommand(OpenAssetEditorFolder);
             OpenKitbashEditorCommand = new RelayCommand(OpenKitbasherTool);
             OpenAnimMetaDecocderCommand = new RelayCommand(OpenAnimMetaDecocder);
@@ -145,7 +147,7 @@ namespace AssetEditor.ViewModels
         }
 
 
-        void CreateAnimationDb()
+        void CreateAnimationDb(bool includeWarhamemrBin)
         {
             TextInputWindow window = new TextInputWindow("New AnimPack name", "");
             if (window.ShowDialog() == true)
@@ -153,7 +155,7 @@ namespace AssetEditor.ViewModels
                 // Is extention correct
                 var fileName = SaveHelper.EnsureEnding(window.TextValue, ".animpack");
                 var filePath = @"animations/animation_tables/" + fileName;
-                var binPath = @"animations/animation_tables/" + SaveHelper.EnsureEnding(fileName, "_tables.bin");
+               
                 if (!SaveHelper.IsFilenameUnique(_packfileService, filePath))
                 {
                     MessageBox.Show("Filename is not unique");
@@ -162,25 +164,61 @@ namespace AssetEditor.ViewModels
 
                 // Create dummy data
                 var animPack = new AnimationPackFile();
-                var animDb = new AnimationDbFile(binPath);
-             
-                animDb.AnimationTableEntries.Add(
-                    new AnimationBinEntry("ExampleDbRef", "ExampleSkeleton")
-                    {
-                        Unknown = 1,
-                        FragmentReferences = new List<AnimationBinEntry.FragmentReference>()
-                        {
-                            new AnimationBinEntry.FragmentReference() { Name = "FragNameRef0"},
-                            new AnimationBinEntry.FragmentReference() { Name = "FragNameRef1"}
-                        }
-                    });
 
+                var binPath = @"animations/animation_tables/" + SaveHelper.EnsureEnding(fileName, "_tables.bin");
+                var animDb = AnimationPackFile.CreateExampleWarhammerBin(binPath);
                 animPack.AddFile(animDb);
 
                 // Save
                 SaveHelper.Save(_packfileService, filePath, null, AnimationPackSerializer.ConvertToBytes(animPack));
             }
         }
+
+        void CreateAnimationDbWarhammer()
+        {
+            TextInputWindow window = new TextInputWindow("New AnimPack name", "");
+            if (window.ShowDialog() == true)
+            {
+                var fileName = SaveHelper.EnsureEnding(window.TextValue, ".animpack");
+                var filePath = @"animations/animation_tables/" + fileName;
+
+                if (!SaveHelper.IsFilenameUnique(_packfileService, filePath))
+                {
+                    MessageBox.Show("Filename is not unique");
+                    return;
+                }
+
+                // Create dummy data
+                var animPack = new AnimationPackFile();
+                var binPath = @"animations/animation_tables/" + SaveHelper.EnsureEnding(fileName, "_tables.bin");
+                var animDb = AnimationPackFile.CreateExampleWarhammerBin(binPath);
+                animPack.AddFile(animDb);
+
+                SaveHelper.Save(_packfileService, filePath, null, AnimationPackSerializer.ConvertToBytes(animPack));
+            }
+        }
+
+        void CreateAnimationDb3k()
+        {
+            TextInputWindow window = new TextInputWindow("New AnimPack name", "");
+            if (window.ShowDialog() == true)
+            {
+                var fileName = SaveHelper.EnsureEnding(window.TextValue, ".animpack");
+                var filePath = @"animations/database/battle/bin/" + fileName;
+                //animations\database\battle\bin\animation_tables.animpack
+                if (!SaveHelper.IsFilenameUnique(_packfileService, filePath))
+                {
+                    MessageBox.Show("Filename is not unique");
+                    return;
+                }
+
+                // Create dummy data
+                var animPack = new AnimationPackFile();
+                SaveHelper.Save(_packfileService, filePath, null, AnimationPackSerializer.ConvertToBytes(animPack));
+            }
+        }
+
+
 
         void OpenAssetEditorFolder()
         {

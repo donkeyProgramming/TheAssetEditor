@@ -15,7 +15,7 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public FilterCollection<AnimationSetFile> FragmentList { get; set; }
 
-        public FilterCollection<AnimationFragmentEntry> FragmentSlotList { get; set; }
+        public FilterCollection<AnimationSetEntry> FragmentSlotList { get; set; }
 
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
@@ -33,7 +33,7 @@ namespace AnimationEditor.Common.ReferenceModel
             {
                 SearchFilter = (value, rx) => { return rx.Match(value.FileName).Success; }
             };
-            FragmentSlotList = new FilterCollection<AnimationFragmentEntry>(null, FragmentSlotSelected)
+            FragmentSlotList = new FilterCollection<AnimationSetEntry>(null, FragmentSlotSelected)
             {
                 SearchFilter = (value, rx) => { return rx.Match(value.Slot.Value).Success; }
             };
@@ -52,7 +52,6 @@ namespace AnimationEditor.Common.ReferenceModel
             }
         }
 
-
         void Subscribe()
         {
             _asset.AnimationChanged += OnAnimationChange;
@@ -69,7 +68,7 @@ namespace AnimationEditor.Common.ReferenceModel
             if (newValue == null)
             {
                 FragmentList.UpdatePossibleValues(new List<AnimationSetFile>());
-                FragmentSlotList.UpdatePossibleValues(new List<AnimationFragmentEntry>());
+                FragmentSlotList.UpdatePossibleValues(new List<AnimationSetEntry>());
                 return;
             }
             var skeletonName = Path.GetFileNameWithoutExtension(_asset.SkeletonName.Value);
@@ -102,7 +101,7 @@ namespace AnimationEditor.Common.ReferenceModel
                         continue;
                 }
 
-                var animPackFile = AnimationPackSerializer.Load(animPack);
+                var animPackFile = AnimationPackSerializer.Load(animPack, _pfs);
                 var fragments = animPackFile.GetAnimationSets(skeletonName);
                 foreach (var fragment in fragments)
                     outputFragments.Add(fragment);
@@ -110,7 +109,7 @@ namespace AnimationEditor.Common.ReferenceModel
             return outputFragments;
         }
 
-        void FragmentSelected(AnimationSetFile value, FilterCollection<AnimationFragmentEntry> collection, string skeletonName)
+        void FragmentSelected(AnimationSetFile value, FilterCollection<AnimationSetEntry> collection, string skeletonName)
         {
             if (value == null)
             {
@@ -129,7 +128,7 @@ namespace AnimationEditor.Common.ReferenceModel
             collection.UpdatePossibleValues(value.Fragments);
         }
 
-        private void FragmentSlotSelected(AnimationFragmentEntry value)
+        private void FragmentSlotSelected(AnimationSetEntry value)
         {
             if(value == null)
             {

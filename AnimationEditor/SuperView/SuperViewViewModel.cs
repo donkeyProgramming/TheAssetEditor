@@ -43,13 +43,6 @@ namespace AnimationEditor.SuperView
                 FragmentName = @"animations/animation_tables/hu1b_alarielle_staff_and_sword.frg",
                 AnimationSlot = AnimationSlotTypeHelper.GetfromValue("STAND")
             };
-            editorView.MainInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_throt.variantmeshdefinition"),
-                FragmentName = @"animations/animation_tables/hu17_dlc16_throt.frg",
-                AnimationSlot = AnimationSlotTypeHelper.GetfromValue("ATTACK_5")
-            };
-
         //editorView.MainInput = new AnimationToolInput()
         //{
         //    Mesh = packfileService.FindFile(@"warmachines\engines\emp_steam_tank\emp_steam_tank01.rigid_model_v2"),
@@ -62,6 +55,19 @@ namespace AnimationEditor.SuperView
            //    FragmentName = @"animations/animation_tables/hu1_empire_sword_crossbow.frg",
            //    AnimationSlot = AnimationSlotTypeHelper.GetfromValue("FIRE_HIGH")
            //};
+
+            creator.CreateEmptyEditor(editorView);
+        }
+
+        public static void CreateThrot(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        {
+            var editorView = toolFactory.CreateEditorViewModel<SuperViewViewModel>();
+            editorView.MainInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_throt.variantmeshdefinition"),
+                FragmentName = @"animations/animation_tables/hu17_dlc16_throt.frg",
+                AnimationSlot = AnimationSlotTypeHelper.GetfromValue("ATTACK_5")
+            };
 
             creator.CreateEmptyEditor(editorView);
         }

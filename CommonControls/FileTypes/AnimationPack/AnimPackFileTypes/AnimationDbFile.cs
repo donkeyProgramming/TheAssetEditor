@@ -1,4 +1,5 @@
-﻿using Filetypes.ByteParsing;
+﻿using CommonControls.Common;
+using Filetypes.ByteParsing;
 using System.Collections.Generic;
 using System.IO;
 
@@ -6,21 +7,19 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
 {
     public class AnimationDbFile : IAnimationPackFile
     {
-        public int TableVersion { get; set; } = 2;
         public string FileName { get; set; }
         public AnimationPackFile Parent { get; set; }
+        public bool IsUnknownFile { get; set; } = false;
+        public NotifyAttr<bool> IsChanged { get; set; } = new NotifyAttr<bool>(false);
 
+        public int TableVersion { get; set; } = 2;
         public List<AnimationBinEntry> AnimationTableEntries { get; set; } = new List<AnimationBinEntry>();
-    
-        public AnimationDbFile(string filename, byte[] data)
-        {
-            FileName = filename;
-            CreateFromBytes(data);
-        }
 
-        public AnimationDbFile(string fileName)
+        public AnimationDbFile(string fileName, byte[] data = null)
         {
             FileName = fileName;
+            if(data != null)
+                CreateFromBytes(data);
         }
 
         public byte[] ToByteArray()
@@ -42,7 +41,7 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
 
             TableVersion = data.ReadInt32();
             var rowCount = data.ReadInt32();
-            AnimationTableEntries = new List<AnimationBinEntry>(rowCount);
+            AnimationTableEntries = new List<AnimationBinEntry>();
             for (int i = 0; i < rowCount; i++)
                 AnimationTableEntries.Add(new AnimationBinEntry(data));
         }
