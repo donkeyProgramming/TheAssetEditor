@@ -189,7 +189,7 @@ namespace View3D.Services
                     {
                         bool useAlpha = materialConfig.Alpha;
                         if (useAlpha)
-                            mesh.Material.AlphaMode = AlphaMode.Alpha_Test;
+                            mesh.Material.AlphaMode = AlphaMode.Transparent;
                         else
                             mesh.Material.AlphaMode = AlphaMode.Opaque;
 

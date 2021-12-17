@@ -19,6 +19,8 @@ namespace CommonControls.FileTypes.RigidModel
 
         public RvmBoundingBox BoundingBox;
         public RmvShaderParams ShaderParams;
+
+
     }
 
 }

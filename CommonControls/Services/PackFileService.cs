@@ -494,6 +494,15 @@ namespace CommonControls.Services
             if (createBackup)
                 SaveHelper.CreateFileBackup(path);
 
+            // Check if file has changed in size
+            if (pf.OriginalLoadByteSize != -1)
+            {
+                var fileInfo = new FileInfo(path);
+                var byteSize = fileInfo.Length;
+                if (byteSize != pf.OriginalLoadByteSize)
+                    throw new Exception("File has been changed outside of AssetEditor. Can not save the file as it will cause corruptions");
+            }
+
             _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, pf);
 
             pf.SystemFilePath = path;
@@ -506,8 +515,11 @@ namespace CommonControls.Services
             File.Delete(path);
             File.Move(path + "_temp", path);
 
+
+            pf.OriginalLoadByteSize = new FileInfo(path).Length;
             _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pf);
         }
+
 
         public PackFile FindFile(string path) 
         {

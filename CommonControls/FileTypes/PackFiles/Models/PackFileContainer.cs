@@ -26,6 +26,7 @@ namespace CommonControls.FileTypes.PackFiles.Models
         public PFHeader Header { get; set; }
         public bool IsCaPackFile { get; set; } = false;
         public string SystemFilePath { get; set; }
+        public long OriginalLoadByteSize { get; set; } = -1;
 
         public Dictionary<string, PackFile> FileList { get; set; } = new Dictionary<string, PackFile>();
 
@@ -77,6 +78,8 @@ namespace CommonControls.FileTypes.PackFiles.Models
                 FileList.Add(fullPackedFileName, fileContent);
                 offset += size;
             }
+
+            OriginalLoadByteSize = new FileInfo(packFileSystemPath).Length;
         }
 
 

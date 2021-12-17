@@ -5,6 +5,7 @@ using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using Serilog;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -17,6 +18,8 @@ namespace CommonControls.PackFileBrowser
 {
     public abstract class ContextMenuHandler : NotifyPropertyChangedImpl
     {
+        ILogger _logger = Logging.Create<ContextMenuHandler>();
+
         ObservableCollection<ContextMenuItem> _contextMenu;
         public ObservableCollection<ContextMenuItem> Items { get => _contextMenu; set => SetAndNotify(ref _contextMenu, value); }
 
@@ -134,7 +137,7 @@ namespace CommonControls.PackFileBrowser
             var extention = Path.GetExtension(_selectedNode.Name);
             var newName = fileName + "_copy" + extention;
 
-            var bytes = (_selectedNode.Item ).DataSource.ReadData();
+            var bytes = (_selectedNode.Item).DataSource.ReadData();
             var packFile = new PackFile(newName, new MemorySource(bytes));
 
             var parentPath = _selectedNode.GetFullPath();
@@ -164,7 +167,7 @@ namespace CommonControls.PackFileBrowser
 
             if (MessageBox.Show("Are you sure you want to delete the file?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
-                if(_selectedNode.NodeType == NodeType.File)
+                if (_selectedNode.NodeType == NodeType.File)
                     _packFileService.DeleteFile(_selectedNode.FileOwner, _selectedNode.Item);
                 else if (_selectedNode.NodeType == NodeType.Directory)
                     _packFileService.DeleteFolder(_selectedNode.FileOwner, _selectedNode.GetFullPath());
@@ -193,11 +196,20 @@ namespace CommonControls.PackFileBrowser
 
             using (new WaitCursor())
             {
-                _packFileService.Save(_selectedNode.FileOwner, systemPath, true);
-                _selectedNode.UnsavedChanged = false;
-                _selectedNode.ForeachNode((node) => node.UnsavedChanged = false);
+                try
+                {
+                    _packFileService.Save(_selectedNode.FileOwner, systemPath, true);
+                    _selectedNode.UnsavedChanged = false;
+                    _selectedNode.ForeachNode((node) => node.UnsavedChanged = false);
+                }
+                catch (Exception e)
+                {
+                    _logger.Here().Error(e, "Exception while saving");
+                    MessageBox.Show("Error saving:\n\n" + e.Message, "Error");
+                }
             }
         }
+
 
         void SaveAsPackFile()
         {

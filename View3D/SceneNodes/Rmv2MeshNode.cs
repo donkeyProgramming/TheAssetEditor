@@ -165,7 +165,7 @@ namespace View3D.SceneNodes
             if(AttachmentBoneResolver != null)
                 parentWorld = parentWorld * AttachmentBoneResolver.GetWorldTransformIfAnimating();
 
-            Effect.UseAlpha = Material.AlphaMode == AlphaMode.Alpha_Test;
+            Effect.UseAlpha = Material.AlphaMode == AlphaMode.Transparent;
 
             var modelWithOffset = ModelMatrix * Matrix.CreateTranslation(Material.PivotPoint);
             RenderMatrix = modelWithOffset;

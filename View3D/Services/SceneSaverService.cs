@@ -166,7 +166,7 @@ namespace View3D.Services
 
                         var boneNames = new string[0];
                         if (skeleton != null)
-                            boneNames = skeleton.BoneNames.ToArray();
+                            boneNames = skeleton.BoneNames.Select(x => x.Replace("bn_", "")).ToArray();
 
                         newModel.Material.UpdateEnumsBeforeSaving(meshes[meshIndex].Geometry.VertexFormat, version);
 

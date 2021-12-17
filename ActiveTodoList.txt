@@ -422,3 +422,17 @@ DDS viwer
 	glossmap.r = smoothness which is a proper PBR parameter that affects both the IBL and the the glossy BRDF (analytical light) 
 	The most obvious thing would be to just copy the smoothnes param, but i am not sure how that will look.
 	Also, you need to gamma correct the Rome2/Atilla/Tob specular and diffuse textures in to SRGB space, as Troy expects textures to be in SRGB color space
+	
+	
+	
+	
+Bugs:
+	[DONE]Error detector for packfile saved outside of Ass
+	[DONE]prophetess keeps disabling the alpha -> Change to true and false?
+	[DONE]Static mesh material type 
+	
+	Fix naming for old bones ->
+	Animation transfer tool => missing a frame when scaling bones 
+	Take pivot into account when selection (vertex)	
+	Show duplicate file error 
+	

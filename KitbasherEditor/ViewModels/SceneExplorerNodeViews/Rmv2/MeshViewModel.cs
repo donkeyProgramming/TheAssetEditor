@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Input;
 using View3D.Components.Component;
 using View3D.SceneNodes;
@@ -66,7 +67,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 
         private void UpdateGroupType(ModelMaterialEnum value)
         {
-            throw new NotImplementedException("");
+            MessageBox.Show("Changing material type is currently not supported - Default/weighted swaps happen by default when saving");
         }
     }
 }

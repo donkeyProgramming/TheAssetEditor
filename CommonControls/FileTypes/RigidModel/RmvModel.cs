@@ -20,6 +20,13 @@ namespace CommonControls.FileTypes.RigidModel
                 Mesh = null
             };
         }
+
+        public void UpdateModelTypeFlag(ModelMaterialEnum newValue)
+        {
+            var header = CommonHeader;
+            header.ModelTypeFlag = newValue;
+            CommonHeader = header;
+        }
     }
 
 }

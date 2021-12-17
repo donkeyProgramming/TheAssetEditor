@@ -81,7 +81,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         IComponentManager _componentManager;
 
         public AlphaMode AlphaModeValue { get { return _meshNode.Material.AlphaMode; } set { _meshNode.Material.AlphaMode = value; NotifyPropertyChanged(); } }
-        public IEnumerable<AlphaMode> PossibleAlphaModes { get; set; } = new List<AlphaMode>() { AlphaMode.Opaque, AlphaMode.Alpha_Test, AlphaMode.Alpha_Blend };
+        public IEnumerable<AlphaMode> PossibleAlphaModes { get; set; } = new List<AlphaMode>() { AlphaMode.Opaque, AlphaMode.Transparent };
 
         public string TextureDirectory { get { return _meshNode.Material.TextureDirectory; } set { _meshNode.Material.TextureDirectory = value; NotifyPropertyChanged(); } }
         public ObservableCollection<TextureViewModel> TextureList { get; set; } = new ObservableCollection<TextureViewModel>();

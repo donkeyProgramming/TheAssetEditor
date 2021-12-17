@@ -73,8 +73,7 @@ namespace CommonControls.FileTypes.RigidModel
     public enum AlphaMode : int
     {
         Opaque = 0,
-        Alpha_Test = 1,
-        Alpha_Blend = -1
+        Transparent = 1,
     };
 
     public enum VertexFormat : uint

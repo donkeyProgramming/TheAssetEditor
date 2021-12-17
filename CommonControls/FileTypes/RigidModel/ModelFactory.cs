@@ -191,6 +191,7 @@ namespace CommonControls.FileTypes.RigidModel
             if (model.CommonHeader.VertexCount != model.Mesh.VertexList.Length)
                 throw new Exception("Unexpected IndexCount");
 
+            model.UpdateModelTypeFlag(model.Material.MaterialId); 
             modelWriter.Write(ByteHelper.GetBytes(model.CommonHeader));
             modelWriter.Write(MaterialFactory.Create().Save(model.CommonHeader.ModelTypeFlag, model.Material));
 

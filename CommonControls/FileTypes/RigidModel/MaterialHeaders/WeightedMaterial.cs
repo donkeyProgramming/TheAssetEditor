@@ -303,9 +303,15 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                 writer.Write(ByteParsers.Single.EncodeValue(typedMaterial.FloatParams[floatIndex], out _));
             }
 
+            // Update alpha value in param list
+            if(typedMaterial.IntParams.Count != 0)
+                typedMaterial.IntParams[0] = (int)material.AlphaMode;
+
             for (var intIndex = 0; intIndex < typedMaterial.IntParams.Count; intIndex++)
             {
                 writer.Write(ByteParsers.Int32.EncodeValue(intIndex, out _));
+                typedMaterial.IntParams[0] = (int)material.AlphaMode;
+
                 writer.Write(ByteParsers.Int32.EncodeValue(typedMaterial.IntParams[intIndex], out _));
             }
 
