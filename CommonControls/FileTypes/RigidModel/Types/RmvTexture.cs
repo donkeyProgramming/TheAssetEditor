@@ -42,6 +42,7 @@ namespace CommonControls.FileTypes.RigidModel.Types
             }
             set
             {
+                _path = new byte[256];
                 for (int i = 0; i < 256; i++)
                     _path[i] = 0;
 

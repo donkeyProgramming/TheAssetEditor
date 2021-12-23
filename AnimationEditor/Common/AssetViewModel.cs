@@ -221,6 +221,12 @@ namespace AnimationEditor.Common.ReferenceModel
             _skeletonSceneNode.SelectedBoneIndex = boneIndex;
         }
 
+        internal void SelectedBoneScale(float scaleMult)
+        {
+            _skeletonSceneNode.SelectedBoneScaleMult = scaleMult;
+        }
+
+
         public void SetAnimation(AnimationReference animationReference)
         {
             if (animationReference != null)

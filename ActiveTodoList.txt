@@ -430,9 +430,25 @@ Bugs:
 	[DONE]Error detector for packfile saved outside of Ass
 	[DONE]prophetess keeps disabling the alpha -> Change to true and false?
 	[DONE]Static mesh material type 
-	
-	Fix naming for old bones ->
+	[DONE]Remove bn_ prefix from attachment points
 	Animation transfer tool => missing a frame when scaling bones 
 	Take pivot into account when selection (vertex)	
 	Show duplicate file error 
+	
+	
+Cool assetEditor projects:
+	https://steamcommunity.com/sharedfiles/filedetails/?id=2581828460
+	https://steamcommunity.com/sharedfiles/filedetails/?id=2613764634&searchtext=h3ro
+	https://steamcommunity.com/sharedfiles/filedetails/?id=2565433755&searchtext=h3ro
+	https://steamcommunity.com/sharedfiles/filedetails/?id=2553304127&searchtext=h3ro
+	https://steamcommunity.com/sharedfiles/filedetails/?id=2565578923
+	https://steamcommunity.com/sharedfiles/filedetails/?id=2359173409&searchtext=h3ro
+	https://steamcommunity.com/sharedfiles/filedetails/?id=2613006061&searchtext=h3ro
+	https://steamcommunity.com/sharedfiles/filedetails/?id=2560027487
+	https://steamcommunity.com/sharedfiles/filedetails/?id=1723762666&searchtext=
+	https://steamcommunity.com/sharedfiles/filedetails/?id=1167252881&searchtext=
+	https://steamcommunity.com/sharedfiles/filedetails/?id=1194588998&searchtext=
+	https://steamcommunity.com/sharedfiles/filedetails/?id=1158737832&searchtext=
+	https://steamcommunity.com/sharedfiles/filedetails/?id=1181220751&searchtext=
+
 	

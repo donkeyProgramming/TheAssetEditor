@@ -18,16 +18,19 @@ namespace AnimationEditor.TechSkeletonEditor
         public override void Initialize()
         {
             MainModelView.IsControlVisible.Value = false;
-            //ReferenceModelView.IsControlVisible.Value = false;
+            ReferenceModelView.IsControlVisible.Value = false;
             ReferenceModelView.Data.IsSelectable = false;
 
-            var typedEditor = new Editor(_pfs, MainModelView.Data);
+            var typedEditor = new Editor(_pfs, MainModelView.Data, Scene);
             Editor = typedEditor;
 
             if (MainInput == null)
                 MainInput = new AnimationToolInput();
 
-            typedEditor.Create(@"warmachines\chariot\grn_wolf_chariot\tech\grn_wolf_chariot_01.anim");
+            //typedEditor.Create(@"warmachines\chariot\grn_wolf_chariot\tech\grn_wolf_chariot_01.anim");
+            typedEditor.CreateEditor(@"variantmeshes\wh_variantmodels\hq3\nor\nor_war_mammoth\tech\nor_war_mammoth_howdah_01.anim");
+
+            
         }
 
         public static class TechSkeleton_Debug

@@ -214,5 +214,69 @@ namespace CommonControls.Common
             return u * a + v * b + w * c;
         }
 
+        public static Vector3 QuaternionToEuler(Quaternion q1)
+        {
+            double heading = 0;
+            double attitude = 0;
+            double bank = 0;
+
+            double test = q1.X * q1.Y + q1.Z * q1.W;
+            if (test > 0.499)
+            { // singularity at north pole
+                heading = 2 * Math.Atan2(q1.X, q1.W);
+                attitude = Math.PI / 2;
+                bank = 0;
+                return new Vector3((float)heading, (float)attitude, (float)bank);
+            }
+            if (test < -0.499)
+            { // singularity at south pole
+                heading = -2 * Math.Atan2(q1.X, q1.W);
+                attitude = -Math.PI / 2;
+                bank = 0;
+                return new Vector3((float)heading, (float)attitude, (float)bank);
+            }
+            double sqx = q1.X * q1.X;
+            double sqy = q1.Y * q1.Y;
+            double sqz = q1.Z * q1.Z;
+            heading = Math.Atan2(2 * q1.Y * q1.W - 2 * q1.X * q1.Z, 1 - 2 * sqy - 2 * sqz);
+            attitude = Math.Asin(2 * test);
+            bank = Math.Atan2(2 * q1.X * q1.W - 2 * q1.Y * q1.Z, 1 - 2 * sqx - 2 * sqz);
+            return new Vector3((float)heading, (float)attitude, (float)bank);
+        }
+
+        public static Vector3 QuaternionToEulerDegree(Quaternion quaternions)
+        {
+            var euler = QuaternionToEuler(quaternions);
+            var degrees = new Vector3(MathHelper.ToDegrees(euler.X), MathHelper.ToDegrees(euler.Y), MathHelper.ToDegrees(euler.Z));
+            return degrees;
+        }
+
+        public static Quaternion EulerToQuaternions(double heading, double attitude, double bank)
+        {
+            // Assuming the angles are in radians.
+            double c1 = Math.Cos(heading);
+            double s1 = Math.Sin(heading);
+            double c2 = Math.Cos(attitude);
+            double s2 = Math.Sin(attitude);
+            double c3 = Math.Cos(bank);
+            double s3 = Math.Sin(bank);
+            double w = Math.Sqrt(1.0 + c1 * c2 + c1 * c3 - s1 * s2 * s3 + c2 * c3) / 2.0;
+            double w4 = (4.0 * w);
+            double x = (c2 * s3 + c1 * s3 + s1 * s2 * c3) / w4;
+            double y = (s1 * c2 + s1 * c3 + c1 * s2 * s3) / w4;
+            double z = (-s1 * s3 + c1 * s2 * c3 + s2) / w4;
+
+            return new Quaternion((float)x, (float)y, (float)z, (float)w);
+        }
+
+        public static Quaternion EulerDegreesToQuaternion(Vector3 eulerDegrees)
+        {
+            var x = MathHelper.ToRadians(eulerDegrees.X);
+            var y = MathHelper.ToRadians(eulerDegrees.Y);
+            var z = MathHelper.ToRadians(eulerDegrees.Z);
+            return EulerToQuaternions(x, y, z);
+        }
+
+
     }
 }

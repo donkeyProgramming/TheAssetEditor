@@ -42,7 +42,8 @@ namespace CommonControls.MathViews
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            OnValueChanged?.Invoke(this);
+            if(DisableCallbacks == false)
+                OnValueChanged?.Invoke(this);
         }
 
         DoubleViewModel _x = new DoubleViewModel();
@@ -73,11 +74,11 @@ namespace CommonControls.MathViews
             Z.Value = z;
         }
 
-        public void Set(Vector3 monoVector)
+        public void Set(Vector3 value)
         {
-            X.Value = monoVector.X;
-            Y.Value = monoVector.Y;
-            Z.Value = monoVector.Z;
+            X.Value = value.X;
+            Y.Value = value.Y;
+            Z.Value = value.Z;
         }
 
         public void Set(float value)
@@ -85,6 +86,11 @@ namespace CommonControls.MathViews
             X.Value = value;
             Y.Value = value;
             Z.Value = value;
+        }
+
+        public void Clear()
+        {
+            Set(0, 0, 0);
         }
 
         public Vector3 GetAsVector3()

@@ -40,6 +40,7 @@ namespace View3D.SceneNodes
 
         public int? SelectedBoneIndex { get; set; }
         public float SkeletonScale { get; set; } = 1;
+        public float SelectedBoneScaleMult { get; set; } = 1.5f;
 
         public SkeletonNode(IComponentManager componentManager, ISkeletonProvider animationProvider, string name = "Skeleton") : base(name)
         {
@@ -76,7 +77,7 @@ namespace View3D.SceneNodes
                     if (SelectedBoneIndex.HasValue && SelectedBoneIndex.Value == i)
                     {
                         drawColour = SelectedNodeColour;
-                        scale *= 1.5f;
+                        scale *= SelectedBoneScaleMult;
                     }
 
                     var boneMatrix = skeleton.GetAnimatedWorldTranform(i);

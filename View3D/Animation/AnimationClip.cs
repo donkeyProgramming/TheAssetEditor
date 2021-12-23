@@ -19,7 +19,7 @@ namespace View3D.Animation
 
             public override string ToString()
             {
-                return $"PosCount = {Position.Count}, RotCount = {Rotation.Count}";
+                return $"PosCount = {Position.Count}, RotCount = {Rotation.Count}, ScaleCount = {Scale.Count}";
             }
 
             public KeyFrame Clone()
@@ -341,6 +341,34 @@ namespace View3D.Animation
                 else
                     rotationMapping.Add(new AnimationBoneMapping(-1));
             }
+        }
+
+        public static AnimationClip CreateSkeletonAnimation(GameSkeleton skeleton)
+        {
+            var clip = new AnimationClip()
+            {
+                PlayTimeInSec = 0.1f,
+            };
+
+            var frame = new KeyFrame();
+            for (int i = 0; i < skeleton.BoneCount; i++)
+            {
+                frame.Position.Add(skeleton.Translation[i]);
+                frame.Rotation.Add(skeleton.Rotation[i]);
+                frame.Scale.Add(Vector3.One);
+            }
+
+            // Skeletons have two identical frames, dont know why
+            clip.DynamicFrames.Add(frame.Clone());
+            clip.DynamicFrames.Add(frame.Clone());
+
+            for (int i = 0; i < skeleton.BoneCount; i++)
+            {
+                clip.RotationMappings.Add(new AnimationBoneMapping(i));
+                clip.TranslationMappings.Add(new AnimationBoneMapping(i));
+            }
+
+            return clip;
         }
     }
 }
