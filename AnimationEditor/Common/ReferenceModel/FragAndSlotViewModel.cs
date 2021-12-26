@@ -11,6 +11,7 @@ namespace AnimationEditor.Common.ReferenceModel
 {
     public class SelectFragAndSlotViewModel : NotifyPropertyChangedImpl
     {
+        string _currentSkeletonName = "";
         AssetViewModel _asset;
 
         public FilterCollection<AnimationSetFile> FragmentList { get; set; }
@@ -69,8 +70,15 @@ namespace AnimationEditor.Common.ReferenceModel
             {
                 FragmentList.UpdatePossibleValues(new List<AnimationSetFile>());
                 FragmentSlotList.UpdatePossibleValues(new List<AnimationSetEntry>());
+                _currentSkeletonName = "";
                 return;
             }
+
+            // Same skeleton again, should fix this propper.
+            if (_currentSkeletonName == _asset.SkeletonName.Value)
+                return;
+
+            _currentSkeletonName = _asset.SkeletonName.Value;
             var skeletonName = Path.GetFileNameWithoutExtension(_asset.SkeletonName.Value);
             var allPossibleFragments = LoadFragmentsForSkeleton(skeletonName);
             FragmentList.UpdatePossibleValues(allPossibleFragments);

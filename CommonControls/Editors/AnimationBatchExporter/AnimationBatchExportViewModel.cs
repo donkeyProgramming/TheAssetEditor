@@ -24,9 +24,12 @@ namespace CommonControls.Editors.AnimationBatchExporter
         public ObservableCollection<uint> PossibleOutputFormats { get; set; } = new ObservableCollection<uint>();
         public NotifyAttr<uint> SelectedOutputFormat { get; set; } = new NotifyAttr<uint>(7);
 
-        public AnimationBatchExportViewModel(PackFileService pfs)
+        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+
+        public AnimationBatchExportViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             _pfs = pfs;
+            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
 
             var containers = _pfs.GetAllPackfileContainers();
             foreach (var item in containers)
@@ -94,6 +97,8 @@ namespace CommonControls.Editors.AnimationBatchExporter
                 {
                     var animationFile = AnimationFile.Create(file);
                     animationFile.Header.Version = outputAnimationFormat;
+                    var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, animationFile.Header.SkeletonName);
+                    animationFile.RemoveOptimizations(skeleton);
 
                     var bytes = AnimationFile.GetBytes(animationFile);
                     var newPackFile = new PackFile(file.Name, new MemorySource(bytes));
@@ -113,11 +118,11 @@ namespace CommonControls.Editors.AnimationBatchExporter
             return output;
         }
 
-        public static void ShowWindow(PackFileService pfs)
+        public static void ShowWindow(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             var window = new ControllerHostWindow(true)
             {
-                DataContext = new AnimationBatchExportViewModel(pfs),
+                DataContext = new AnimationBatchExportViewModel(pfs, skeletonAnimationLookUpHelper),
                 Title = "Animation batch converter",
                 Content = new AnimationBatchExportView(),
                 Width = 400,

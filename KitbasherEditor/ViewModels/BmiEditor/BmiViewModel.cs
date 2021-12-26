@@ -76,7 +76,7 @@ namespace KitbasherEditor.ViewModels.BmiEditor
 
             for (int i = 0; i < skeleton.BoneCount; i++)
             {
-                var parentBoneId = skeleton.GetParentBone(i);
+                var parentBoneId = skeleton.GetParentBoneIndex(i);
                 if (parentBoneId == -1)
                 {
                     Bones.Add(CreateNode(i, parentBoneId, skeleton.BoneNames[i], boneIndexsUsed));

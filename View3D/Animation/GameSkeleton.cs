@@ -62,7 +62,7 @@ namespace View3D.Animation
 
             for (int i = 0; i < BoneCount; i++)
             {
-                var parentIndex = GetParentBone(i);
+                var parentIndex = GetParentBoneIndex(i);
                 if (parentIndex == -1)
                     continue;
                 _worldTransform[i] = _worldTransform[i] * _worldTransform[parentIndex];
@@ -116,7 +116,7 @@ namespace View3D.Animation
             return GetWorldTransform(boneIndex); ;
         }
 
-        public int GetParentBone(int boneIndex)
+        public int GetParentBoneIndex(int boneIndex)
         {
             return _parentBoneIds[boneIndex];
         }
@@ -158,7 +158,7 @@ namespace View3D.Animation
                     Rotation = Rotation[i],
                     Scale = Vector3.One,
                     BoneIndex = i,
-                    ParentBoneIndex = GetParentBone(i),
+                    ParentBoneIndex = GetParentBoneIndex(i),
                     WorldTransform = _worldTransform[i]
                 }); ;
             }

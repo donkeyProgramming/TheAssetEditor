@@ -89,7 +89,7 @@ namespace View3D.Animation
                 {
                     Id = i,
                     Name = skeleton.BoneNames[i],
-                    ParentId = skeleton.GetParentBone(i)
+                    ParentId = skeleton.GetParentBoneIndex(i)
                 };
             }
 
@@ -244,7 +244,6 @@ namespace View3D.Animation
             var newRotMapping = new List<AnimationBoneMapping>();
             var newTransMappings = new List<AnimationBoneMapping>();
    
-
             for (int i = 0; i < boneCount; i++)
             {
                 newRotMapping.Add(new AnimationBoneMapping(i));

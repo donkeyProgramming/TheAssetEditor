@@ -34,6 +34,7 @@ namespace AssetEditor.ViewModels
         PackFileService _packfileService;
         ToolFactory _toolFactory;
         ApplicationSettingsService _settingsService;
+        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
         public ICommand OpenSettingsWindowCommand { get; set; }
         public ICommand CreateNewPackFileCommand { get; set; }
@@ -66,12 +67,14 @@ namespace AssetEditor.ViewModels
         public ICommand CreateAnimPackWarhammerCommand { get; set; }
         public ICommand CreateAnimPack3kCommand { get; set; }
 
-        public MenuBarViewModel(IServiceProvider provider, PackFileService packfileService, ToolFactory toolFactory, ApplicationSettingsService settingsService)
+        public MenuBarViewModel(IServiceProvider provider, PackFileService packfileService, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ToolFactory toolFactory, ApplicationSettingsService settingsService)
         {
             _serviceProvider = provider;
             _packfileService = packfileService;
             _toolFactory = toolFactory;
             _settingsService = settingsService;
+            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
+
             OpenSettingsWindowCommand = new RelayCommand(ShowSettingsDialog);
             OpenPackFileCommand = new RelayCommand(OpenPackFile);
             CreateNewPackFileCommand = new RelayCommand(CreatePackFile);
@@ -275,7 +278,7 @@ namespace AssetEditor.ViewModels
             EditorCreator.CreateEmptyEditor(editorView);
         }
 
-        void OpenAnimationBatchExporter() => AnimationBatchExportViewModel.ShowWindow(_packfileService);
+        void OpenAnimationBatchExporter() => AnimationBatchExportViewModel.ShowWindow(_packfileService, _skeletonAnimationLookUpHelper);
 
         void GenerateRmv2Report()
         {

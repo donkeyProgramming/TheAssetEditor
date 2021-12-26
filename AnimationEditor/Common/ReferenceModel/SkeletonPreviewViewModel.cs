@@ -87,7 +87,7 @@ namespace AnimationEditor.Common.ReferenceModel
 
             for (int i = 0; i < skeleton.BoneCount; i++)
             {
-                var parentBoneId = skeleton.GetParentBone(i);
+                var parentBoneId = skeleton.GetParentBoneIndex(i);
                 if (parentBoneId == -1)
                 {
                     output.Add(CreateNode(i, parentBoneId, skeleton.BoneNames[i]));
@@ -124,7 +124,7 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public static bool IsIndirectChildOf(int boneIndex, int childOff, GameSkeleton skeleton)
         {
-            var parentIndex = skeleton.GetParentBone(boneIndex);
+            var parentIndex = skeleton.GetParentBoneIndex(boneIndex);
             if (parentIndex == -1)
                 return false;
 

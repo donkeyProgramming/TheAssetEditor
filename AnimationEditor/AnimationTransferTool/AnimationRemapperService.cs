@@ -72,7 +72,7 @@ namespace AnimationEditor.AnimationTransferTool
 
                     var boneSettings = BoneHelper.GetBoneFromId(_bones, i);
 
-                    var fromParentBoneIndex = copyToSkeleton.GetParentBone(i);
+                    var fromParentBoneIndex = copyToSkeleton.GetParentBoneIndex(i);
                     if (fromParentBoneIndex != -1)
                     {
                         var parentWorld = currentCopyToFrame.GetSkeletonAnimatedWorld(copyToSkeleton, fromParentBoneIndex);
@@ -111,8 +111,8 @@ namespace AnimationEditor.AnimationTransferTool
                     if (mappedIndex != null)
                     {
                         var targetBoneIndex = mappedIndex.NewValue;
-                        var copyFromParentIndex = copyFromSkeleton.GetParentBone(targetBoneIndex);
-                        var copyToParentIndex = copyToSkeleton.GetParentBone(i);
+                        var copyFromParentIndex = copyFromSkeleton.GetParentBoneIndex(targetBoneIndex);
+                        var copyToParentIndex = copyToSkeleton.GetParentBoneIndex(i);
 
                         if (copyToParentIndex != -1 && copyFromParentIndex != -1)
                         {
@@ -157,7 +157,7 @@ namespace AnimationEditor.AnimationTransferTool
                     if (mappedIndex == null)
                         continue;
 
-                    var fromParentBoneIndex = copyToSkeleton.GetParentBone(i);
+                    var fromParentBoneIndex = copyToSkeleton.GetParentBoneIndex(i);
                     if (fromParentBoneIndex == -1)
                         continue;
 
@@ -185,7 +185,7 @@ namespace AnimationEditor.AnimationTransferTool
                 {
                     var currentFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton, animationToScale );
 
-                    var fromParentBoneIndex = copyToSkeleton.GetParentBone(i);
+                    var fromParentBoneIndex = copyToSkeleton.GetParentBoneIndex(i);
                     if (fromParentBoneIndex == -1)
                         continue;
 
@@ -267,7 +267,7 @@ namespace AnimationEditor.AnimationTransferTool
                     //   desiredBonePosWorld = copyFromFrame.GetSkeletonAnimatedWorld(copyFromSkeleton, targetBoneIndex) * Matrix.CreateScale(1);
 
 
-                    var fromParentBoneIndex = copyToSkeleton.GetParentBone(i);
+                    var fromParentBoneIndex = copyToSkeleton.GetParentBoneIndex(i);
 
                     var parentWorld = currentCopyToFrame.GetSkeletonAnimatedWorld(copyToSkeleton, fromParentBoneIndex);
 

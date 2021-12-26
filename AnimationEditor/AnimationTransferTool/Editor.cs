@@ -332,7 +332,7 @@ namespace AnimationEditor.AnimationTransferTool
             for (int i = 0; i < skeleton.BoneCount; i++)
             {
                 SkeletonBoneNode newBone = null;
-                var parentBoneId = skeleton.GetParentBone(i);
+                var parentBoneId = skeleton.GetParentBoneIndex(i);
                 if (parentBoneId == -1)
                 {
                     newBone = new SkeletonBoneNode(skeleton.BoneNames[i], i, -1);

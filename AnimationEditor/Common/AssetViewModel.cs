@@ -103,7 +103,6 @@ namespace AnimationEditor.Common.ReferenceModel
 
             var graphics = _componentManager.GetComponent<DeviceResolverComponent>();
             SceneLoader loader = new SceneLoader(_resourceLibary, _pfs, GeometryGraphicsContextFactory.CreateInstance(graphics.Device));
-
             var loadedNode = loader.Load(file, null, Player);
             if (loadedNode == null)
             {

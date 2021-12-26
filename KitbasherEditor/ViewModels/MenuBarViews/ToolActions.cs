@@ -186,10 +186,10 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 var newSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(_packFileService, skeletonName);
                 GameSkeleton skeleton = new GameSkeleton(newSkeletonFile, null);
 
-                var window = new ControllerHostWindow(true)
+                var window = new ControllerHostWindow(true, ResizeMode.CanResize)
                 {
                     DataContext = new BmiViewModel(skeleton, meshNode, _componentManager),
-                    Title = "Pin tool",
+                    Title = "Bmi Tool",
                     Content = new BmiView(),
                 };
 

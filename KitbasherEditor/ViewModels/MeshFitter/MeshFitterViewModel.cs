@@ -184,7 +184,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 var boneValuesObject = MeshBones.PossibleValues.First().GetFromBoneId(i);
 
                 var fromBoneIndex = i;
-                var fromParentBoneIndex = _fromSkeleton.GetParentBone(fromBoneIndex);
+                var fromParentBoneIndex = _fromSkeleton.GetParentBoneIndex(fromBoneIndex);
                 Matrix desiredBonePosWorld = Matrix.Identity;
 
                 // Get the world position where we want to move the bone to
@@ -209,7 +209,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 if (computeRelativeScale)
                 {
                     var targetBoneIndex = mappedIndex.NewValue;
-                    var targetParentBoneIndex = _targetSkeleton.GetParentBone(targetBoneIndex);
+                    var targetParentBoneIndex = _targetSkeleton.GetParentBoneIndex(targetBoneIndex);
 
                     if (fromParentBoneIndex != -1 && targetParentBoneIndex != -1)
                     {

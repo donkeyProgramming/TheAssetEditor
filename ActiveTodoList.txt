@@ -436,6 +436,21 @@ Bugs:
 	Show duplicate file error 
 	
 	
+Fixed 0.25
+	[Done]Skeleton editor
+	[Done]change texture path for missing textures 
+	[Done]BMI tool window can now be resized again
+	[Done]lots of editors open faster 
+	
+	Tech skeleton slider 
+	Meta editor improvements 
+	Mount editor for older games
+	Alpha yes no
+	AnimTransfer => To and from self => auto map 
+	
+	
+	
+	
 Cool assetEditor projects:
 	https://steamcommunity.com/sharedfiles/filedetails/?id=2581828460
 	https://steamcommunity.com/sharedfiles/filedetails/?id=2613764634&searchtext=h3ro
@@ -450,5 +465,7 @@ Cool assetEditor projects:
 	https://steamcommunity.com/sharedfiles/filedetails/?id=1194588998&searchtext=
 	https://steamcommunity.com/sharedfiles/filedetails/?id=1158737832&searchtext=
 	https://steamcommunity.com/sharedfiles/filedetails/?id=1181220751&searchtext=
+	black karl franze mod 
+	Rat damsel 
 
 	

@@ -55,8 +55,6 @@ namespace CommonControls.FileTypes.Animation
 
         public BoneInfo[] Bones;
 
-        // Version 7 spesific 
-
         public Frame StaticFrame { get; set; } = null;
         public List<Frame> DynamicFrames = new List<Frame>();
         public AnimationHeader Header { get; set; } = new AnimationHeader();
@@ -86,16 +84,15 @@ namespace CommonControls.FileTypes.Animation
             header.Unknown0_alwaysOne = chunk.ReadUInt32();        // Some type of type?
             header.FrameRate = chunk.ReadSingle();
             header.SkeletonName = chunk.ReadString();
-            header.FlagCount = chunk.ReadUInt32();
 
             if (header.Version > 6)
             {
+                header.FlagCount = chunk.ReadUInt32();
                 for (int i = 0; i < header.FlagCount; i++)
                     header.FlagVariables.Add(chunk.ReadString());
             }
-
-            if (header.Version == 7)
-                header.AnimationTotalPlayTimeInSec = chunk.ReadSingle(); // Play time
+            
+            header.AnimationTotalPlayTimeInSec = chunk.ReadSingle();
 
             bool isSupportedAnimationFile = header.Version == 5 || header.Version == 6 || header.Version == 7 || header.Version == 4;
             if (!isSupportedAnimationFile)
@@ -234,8 +231,12 @@ namespace CommonControls.FileTypes.Animation
 
             // ----------------------
 
-            if (output.Header.Version != 7)
-                output.Header.AnimationTotalPlayTimeInSec = output.DynamicFrames.Count() / output.Header.FrameRate;
+            //if (output.Header.Version != 7)
+            //    output.Header.AnimationTotalPlayTimeInSec = output.DynamicFrames.Count() / output.Header.FrameRate;
+            //
+
+            if (chunk.BytesLeft != 0)
+                throw new Exception($"{chunk.BytesLeft} bytes left in animation");
 
             return output;
         }
@@ -247,16 +248,16 @@ namespace CommonControls.FileTypes.Animation
                 using (BinaryWriter writer = new BinaryWriter(memoryStream))
                 {
                     // Header
-                    writer.Write(input.Header.Version);                     // Animtype
-                    writer.Write(input.Header.Unknown0_alwaysOne);                  // Uknown_always 1
-                    writer.Write(input.Header.FrameRate);                           // Framerate
-                    writer.Write((short)input.Header.SkeletonName.Length);          // SkeletonNAme length
-                    for (int i = 0; i < input.Header.SkeletonName.Length; i++)      // SkeletonNAme
+                    writer.Write(input.Header.Version);                           
+                    writer.Write(input.Header.Unknown0_alwaysOne);                  
+                    writer.Write(input.Header.FrameRate);                           
+                    writer.Write((short)input.Header.SkeletonName.Length);          
+                    for (int i = 0; i < input.Header.SkeletonName.Length; i++)      
                         writer.Write(input.Header.SkeletonName[i]);
-                    writer.Write(input.Header.FlagCount);                  // Uknown_always 0
+                    writer.Write(input.Header.AnimationTotalPlayTimeInSec);
 
-                    if (input.Header.Version == 7)
-                        writer.Write(input.Header.AnimationTotalPlayTimeInSec);
+                    if (input.Header.Version == 7 || input.Header.Version == 6)
+                        writer.Write(input.Header.FlagCount);
 
                     //Body - Bones
                     writer.Write((uint)input.Bones.Length);
@@ -353,6 +354,56 @@ namespace CommonControls.FileTypes.Animation
                 frame.Quaternion.Add(quaternion);
             }
             return frame;
+        }
+
+        public void RemoveOptimizations(AnimationFile skeleton)
+        {
+            var newDynamicFrames = new List<Frame>();
+
+            var boneCount = RotationMappings.Count;
+            var frameCount = DynamicFrames.Count;
+
+            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            {
+                var newKeyframe = new Frame();
+
+                for (int boneIndex = 0; boneIndex < boneCount; boneIndex++)
+                {
+                    var translationLookup = TranslationMappings[boneIndex];
+                    
+                    if (translationLookup.IsDynamic)
+                        newKeyframe.Transforms.Add(DynamicFrames[frameIndex].Transforms[translationLookup.Id]);
+                    else if (translationLookup.IsStatic)
+                        newKeyframe.Transforms.Add(StaticFrame.Transforms[translationLookup.Id]);
+                    else
+                        newKeyframe.Transforms.Add(skeleton.DynamicFrames[0].Transforms[boneIndex]);
+
+                    var rotationLookup = RotationMappings[boneIndex];
+                    if (rotationLookup.IsDynamic)
+                        newKeyframe.Quaternion.Add(DynamicFrames[frameIndex].Quaternion[rotationLookup.Id]);
+                    else if (rotationLookup.IsStatic)
+                        newKeyframe.Quaternion.Add(StaticFrame.Quaternion[rotationLookup.Id]);
+                    else
+                        newKeyframe.Quaternion.Add(skeleton.DynamicFrames[0].Quaternion[boneIndex]);
+                }
+
+                newDynamicFrames.Add(newKeyframe);
+            }
+
+            // Update data
+            var newRotMapping = new List<AnimationBoneMapping>();
+            var newTransMappings = new List<AnimationBoneMapping>();
+
+            for (int i = 0; i < boneCount; i++)
+            {
+                newRotMapping.Add(new AnimationBoneMapping(i));
+                newTransMappings.Add(new AnimationBoneMapping(i));
+            }
+
+            TranslationMappings = newTransMappings;
+            RotationMappings = newRotMapping;
+            DynamicFrames = newDynamicFrames;
+            StaticFrame = null;
         }
 
     }

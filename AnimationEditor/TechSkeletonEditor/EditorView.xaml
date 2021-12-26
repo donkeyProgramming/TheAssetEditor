@@ -9,21 +9,38 @@
              xmlns:s="http://schemas.singulink.com/xaml"
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="800" d:DesignWidth="800">
     <StackPanel>
-        <Button Margin="5" Content="Load Skeleton" Click="{s:MethodBinding LoadSkeleton}"/>
+        <Label  Content="Skeleton Editor:" FontSize="18" FontWeight="Bold"/>
 
-        <Grid Margin="5">
+        <Grid Margin="5,0,5,5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="20" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="50" />
             </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
 
-            <CheckBox  Grid.Column="0" IsChecked="{Binding ShowSkeleton, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/>
-            <TextBlock  Grid.Column="1" Text="{Binding SkeletonName.Value, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
+            <CheckBox  Grid.Row="0" Grid.Column="0" IsChecked="{Binding ShowSkeleton, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/>
+            <Label     Grid.Row="0" Grid.Column="1" Content="Skeleton"/>
+            <Label     Grid.Row="0" Grid.Column="2" Content=":"/>
+            <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding SkeletonName.Value, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
+            <Button    Grid.Row="0" Grid.Column="4" Content="Load" Click="{s:MethodBinding LoadSkeletonAction}" Margin="1"/>
+
+            <CheckBox  Grid.Row="1" Grid.Column="0" IsChecked="{Binding ShowRefMesh, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/>
+            <Label     Grid.Row="1" Grid.Column="1" Content="Ref Mesh"/>
+            <Label     Grid.Row="1" Grid.Column="2" Content=":"/>
+            <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding RefMeshName.Value, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
+            <Button    Grid.Row="1" Grid.Column="4" Content="Load" Click="{s:MethodBinding LoadRefMeshAction}" Margin="1"/>
+
         </Grid>
 
-        <TreeView ItemsSource="{Binding Bones, UpdateSourceTrigger=PropertyChanged}" MaxHeight="400" Margin="5,5,5,1">
+        <TreeView ItemsSource="{Binding Bones, UpdateSourceTrigger=PropertyChanged}" MaxHeight="400" Height="400" Margin="5,5,5,1">
             <b:Interaction.Behaviors>
                 <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedBone, Mode=TwoWay}" />
             </b:Interaction.Behaviors>
@@ -46,12 +63,14 @@
         
         <Grid Margin="5,0,5,5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0.5*"/>
-                <ColumnDefinition Width="0.5*"/>
+                <ColumnDefinition Width="0.33*"/>
+                <ColumnDefinition Width="0.33*"/>
+                <ColumnDefinition Width="0.33*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="Create Child Bone"  Click="{s:MethodBinding CreateBone}"/>
-            <Button Grid.Column="1" Content="Delete Bone"  Click="{s:MethodBinding DeleteBone}" IsEnabled="False"/>
+            <Button Grid.Column="0" Content="Create Child Bone"  Click="{s:MethodBinding CreateBoneAction}" Margin="0,0,2,0"/>
+            <Button Grid.Column="1" Content="Duplicate Bone"  Click="{s:MethodBinding DuplicateBoneAction}"  Margin="2,0,2,0"/>
+            <Button Grid.Column="2" Content="Delete Bone"  Click="{s:MethodBinding DeleteBoneAction}" IsEnabled="False"  Margin="2,0,0,0"/>
         </Grid>
 
         <GroupBox Margin="5" Header="Settings:">
@@ -63,17 +82,18 @@
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
 
-                <Label      Grid.Row="0" Grid.Column="0" Content="World transforms"/>
+                <Label      Grid.Row="0" Grid.Column="0" Content="Source Skeleton"/>
                 <Label      Grid.Row="0" Grid.Column="1" Content=":"/>
-                <CheckBox   Grid.Row="0" Grid.Column="2" IsChecked="{Binding ShowBonesAsWorldTransform.Value, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/>
+                <TextBox    Grid.Row="0" Grid.Column="2" Text="{Binding SourceSkeletonName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2"/>
 
-                <Label      Grid.Row="1" Grid.Column="0" Content="Bone Scale"/>
+                <Label      Grid.Row="1" Grid.Column="0" Content="Selected Bone Scale"/>
                 <Label      Grid.Row="1" Grid.Column="1" Content=":"/>
                 <TextBox    Grid.Row="1" Grid.Column="2" Text="{Binding BoneScale.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
                     <b:Interaction.Behaviors>
@@ -83,7 +103,15 @@
 
                 <Label      Grid.Row="2" Grid.Column="0" Content="Foucs"/>
                 <Label      Grid.Row="2" Grid.Column="1" Content=":"/>
-                <Button     Grid.Row="2" Grid.Column="2" Content="Focus selected bone" VerticalContentAlignment="Center"  Click="{s:MethodBinding FocusSelectedBone}" Margin="2"/>
+                <Button     Grid.Row="2" Grid.Column="2" Content="Focus selected bone" VerticalContentAlignment="Center"  Click="{s:MethodBinding FocusSelectedBoneAction}" Margin="2"/>
+
+                <Label      Grid.Row="3" Grid.Column="0" Content="World transforms"/>
+                <Label      Grid.Row="3" Grid.Column="1" Content=":"/>
+                <CheckBox   Grid.Row="3" Grid.Column="2" IsChecked="{Binding ShowBonesAsWorldTransform.Value, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/>
+
+                <Label      Grid.Row="4" Grid.Column="0" Content="Is Tech skeleton"/>
+                <Label      Grid.Row="4" Grid.Column="1" Content=":"/>
+                <CheckBox   Grid.Row="4" Grid.Column="2" IsChecked="{Binding IsTechSkeleton, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/>
             </Grid>
         </GroupBox>
 
@@ -104,7 +132,7 @@
 
                 <Label Grid.Row="0"   Grid.Column="0" Content="Name"/>
                 <Label  Grid.Row="0"  Grid.Column="1" Content=":"/>
-                <TextBox Grid.Row="0"  Grid.Column="2" Text="{Binding SelectedBone.BoneName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2"/>
+                <TextBox Grid.Row="0"  Grid.Column="2" Text="{Binding SelectedBoneName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2"/>
 
                 <Label      Grid.Row="1" Grid.Column="0" Content="Translation"/>
                 <Label      Grid.Row="1" Grid.Column="1" Content=":"/>
@@ -116,6 +144,6 @@
             </Grid>
         </GroupBox>
 
-        <Button Margin="5" Content="Save" Click="{s:MethodBinding SaveSkeleton}"/>
+        <Button Margin="5" Content="Save" Click="{s:MethodBinding SaveSkeletonAction}"/>
     </StackPanel>
 </UserControl>

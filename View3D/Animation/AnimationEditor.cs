@@ -57,7 +57,7 @@ namespace View3D.Animation
             for (int i = 0; i < bones.Length; i++)
             {
                 var originalBoneIndex = bones[i];
-                animFile.Bones[i] = new AnimationFile.BoneInfo() { Id = i, Name = skeleton.BoneNames[originalBoneIndex], ParentId = skeleton.GetParentBone(originalBoneIndex) };
+                animFile.Bones[i] = new AnimationFile.BoneInfo() { Id = i, Name = skeleton.BoneNames[originalBoneIndex], ParentId = skeleton.GetParentBoneIndex(originalBoneIndex) };
             }
 
             for (int i = 0; i < bones.Length; i++)

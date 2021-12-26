@@ -90,7 +90,7 @@ namespace CommonControls.FileTypes.RigidModel
             var vertexStart = commonHeader.VertexOffset + modelStartOffset;
             var expectedVertexSize = (commonHeader.IndexOffset - commonHeader.VertexOffset) / commonHeader.VertexCount;
             if(vertexFactory.IsKnownVertex(binaryVertexFormat) == false)
-                throw new Exception($"Unknown vertex for {commonHeader.ModelTypeFlag} - {binaryVertexFormat}. Size:{expectedVertexSize}");
+                throw new Exception($"Unknown vertex format for {commonHeader.ModelTypeFlag} - {binaryVertexFormat}. Size:{expectedVertexSize}");
 
             var vertexSize = vertexFactory.GetVertexSize(binaryVertexFormat);
             if (expectedVertexSize != vertexSize)

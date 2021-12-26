@@ -63,7 +63,7 @@ namespace View3D.SceneNodes
 
                 for (int i = 0; i < skeleton.BoneCount; i++)
                 {
-                    var parentIndex = skeleton.GetParentBone(i);
+                    var parentIndex = skeleton.GetParentBoneIndex(i);
                     if (parentIndex == -1)
                     {
                         var boneMatrix2 = skeleton.GetAnimatedWorldTranform(i);

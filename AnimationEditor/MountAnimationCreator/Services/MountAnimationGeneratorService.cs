@@ -86,7 +86,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
                 newRiderAnim.DynamicFrames[i].Rotation[_riderBoneIndex] = newRiderRotation;
 
                 // Find all the bones at the same level (normally attachmentpoints) and move them as well
-                var parentBoneIndex = _riderSkeleton.GetParentBone(_riderBoneIndex);
+                var parentBoneIndex = _riderSkeleton.GetParentBoneIndex(_riderBoneIndex);
                 if (parentBoneIndex != -1)
                 {
                     var childNodes = _riderSkeleton.GetDirectChildBones(parentBoneIndex);
