@@ -300,7 +300,7 @@ namespace AnimationEditor.AnimationTransferTool
             newPath = newPath.Replace(currentFileName, "cust_" + currentFileName);
             newPath = SaveHelper.EnsureEnding(newPath, ".anim");
 
-            SaveHelper.Save(_pfs, newPath, null, AnimationFile.GetBytes(animFile), prompOnOverride);
+            SaveHelper.Save(_pfs, newPath, null, AnimationFile.ConvertToBytes(animFile), prompOnOverride);
         }
 
         public void ClearAllSettings()
@@ -365,7 +365,7 @@ namespace AnimationEditor.AnimationTransferTool
             AnimationSettings.ScaledSkeletonName.Value = newSkeletonName + ".anim";
 
 
-            var skeletonBytes = AnimationFile.GetBytes(mappedSkeletonFile);
+            var skeletonBytes = AnimationFile.ConvertToBytes(mappedSkeletonFile);
             SaveHelper.Save(_pfs, @"animations\skeletons\" + newSkeletonName + ".anim", null, skeletonBytes);
 
 
@@ -457,7 +457,7 @@ namespace AnimationEditor.AnimationTransferTool
             AnimationSettings.UseScaledSkeletonName.Value = true;
             AnimationSettings.ScaledSkeletonName.Value = newSkeletonName;
 
-            var skeletonBytes = AnimationFile.GetBytes(skeletonAnimFile);
+            var skeletonBytes = AnimationFile.ConvertToBytes(skeletonAnimFile);
             SaveHelper.Save(_pfs, @"animations\skeletons\" + newSkeletonName + ".anim", null, skeletonBytes);
 
             //Save inv matrix file

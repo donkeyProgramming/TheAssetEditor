@@ -87,7 +87,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
                 // Save the new animation           
                 var animFile = newAnimation.ConvertToFileFormat(_animationGenerator.GetRiderSkeleton());
-                var bytes = AnimationFile.GetBytes(animFile);
+                var bytes = AnimationFile.ConvertToBytes(animFile);
                 SaveHelper.Save(_pfs, newAnimationName, null, bytes);
 
                 resultInfo.Ok(mountSlot, "Matching animation found in rider ("+ riderSlot + "). New animation created");

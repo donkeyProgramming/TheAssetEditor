@@ -3,9 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:AnimationEditor.MountAnimationCreator"
-              xmlns:s="http://schemas.singulink.com/xaml"
-
+             xmlns:s="http://schemas.singulink.com/xaml"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Expander Grid.Row="0" Header="Rider Attachment:" IsExpanded="true">
@@ -32,9 +30,9 @@
                           ItemsSource="{Binding SelectedRiderBone.Values}" 
                           SelectedItem="{Binding SelectedRiderBone.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-            <Label Grid.Column="0" Grid.Row="1" Content="Static Legs Animation"/>
-            <Label Grid.Column="1" Grid.Row="1" Content=":"/>
-            <Grid Grid.Row="1" Grid.Column="2" IsEnabled="False">
+            <Label Grid.Column="0" Grid.Row="1" Content="Static Legs Animation" Visibility="Collapsed"/>
+            <Label Grid.Column="1" Grid.Row="1" Content=":" Visibility="Collapsed"/>
+            <Grid Grid.Row="1" Grid.Column="2" Visibility="Collapsed">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="0.75*"/>

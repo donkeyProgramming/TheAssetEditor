@@ -229,19 +229,13 @@ namespace CommonControls.FileTypes.Animation
                 }
             }
 
-            // ----------------------
-
-            //if (output.Header.Version != 7)
-            //    output.Header.AnimationTotalPlayTimeInSec = output.DynamicFrames.Count() / output.Header.FrameRate;
-            //
-
             if (chunk.BytesLeft != 0)
                 throw new Exception($"{chunk.BytesLeft} bytes left in animation");
 
             return output;
         }
 
-        public static byte[] GetBytes(AnimationFile input)
+        public static byte[] ConvertToBytes(AnimationFile input)
         {
             using (MemoryStream memoryStream = new MemoryStream())
             {
@@ -254,10 +248,15 @@ namespace CommonControls.FileTypes.Animation
                     writer.Write((short)input.Header.SkeletonName.Length);          
                     for (int i = 0; i < input.Header.SkeletonName.Length; i++)      
                         writer.Write(input.Header.SkeletonName[i]);
-                    writer.Write(input.Header.AnimationTotalPlayTimeInSec);
 
                     if (input.Header.Version == 7 || input.Header.Version == 6)
+                    {
                         writer.Write(input.Header.FlagCount);
+                        foreach (var flag in input.Header.FlagVariables)
+                            writer.Write(ByteParsers.String.WriteCaString(flag));
+                    }
+
+                    writer.Write(input.Header.AnimationTotalPlayTimeInSec);
 
                     //Body - Bones
                     writer.Write((uint)input.Bones.Length);

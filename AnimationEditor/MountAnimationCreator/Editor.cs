@@ -61,7 +61,7 @@ namespace AnimationEditor.MountAnimationCreator
             _selectionManager = componentManager.GetComponent<SelectionManager>();
 
             DisplayGeneratedSkeleton = new NotifyAttr<bool>(true, (value) => _newAnimation.ShowSkeleton.Value = value);
-            DisplayGeneratedMesh = new NotifyAttr<bool>(true, (value) => { if (_newAnimation.MainNode != null) _newAnimation.MainNode.IsVisible = value; });
+            DisplayGeneratedMesh = new NotifyAttr<bool>(true, (value) => { if (_newAnimation.MainNode != null) _newAnimation.ShowMesh.Value = value; });
 
             SelectedRiderBone = new FilterCollection<SkeletonBoneNode>(null, (x) => UpdateCanSaveAndPreviewStates());
             MountLinkController = new MountLinkController(pfs, skeletonAnimationLookUpHelper, rider, mount, UpdateCanSaveAndPreviewStates);
@@ -108,7 +108,16 @@ namespace AnimationEditor.MountAnimationCreator
                 SelectedRiderBone.UpdatePossibleValues(SkeletonBoneNodeHelper.CreateFlatSkeletonList(newValue));
             }
 
+            // Try setting using root bone
             SelectedRiderBone.SelectedItem = SelectedRiderBone.PossibleValues.FirstOrDefault(x => string.Equals("root", x.BoneName, StringComparison.OrdinalIgnoreCase));
+            AnimationSettings.IsRootNodeAnimation = SelectedRiderBone.SelectedItem != null;
+
+            if (AnimationSettings.IsRootNodeAnimation == false)
+            {
+                // Try setting using hip bone
+                SelectedRiderBone.SelectedItem = SelectedRiderBone.PossibleValues.FirstOrDefault(x => string.Equals("root", x.BoneName, StringComparison.OrdinalIgnoreCase));
+            }
+
             MountLinkController.ReloadFragments(true, false);
             UpdateCanSaveAndPreviewStates();
         }
@@ -154,12 +163,19 @@ namespace AnimationEditor.MountAnimationCreator
 
         public void CreateMountAnimation()
         {
+            if (SelectedRiderBone.SelectedItem == null)
+            {
+                MessageBox.Show("No 'Rider root bone' selected");
+                return;
+            }
+
             var newRiderAnim = CreateAnimationGenerator().GenerateMountAnimation(_mount.AnimationClip, _rider.AnimationClip);
 
             // Apply
             _newAnimation.CopyMeshFromOther(_rider);
             _newAnimation.SetAnimationClip(newRiderAnim, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
             _newAnimation.ShowSkeleton.Value = DisplayGeneratedSkeleton.Value;
+            _newAnimation.ShowMesh.Value = DisplayGeneratedMesh.Value;
             UpdateCanSaveAndPreviewStates();
         }
 

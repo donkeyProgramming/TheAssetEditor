@@ -118,7 +118,14 @@ namespace AssetEditor.ViewModels
 
                 //AnimationEditor.SuperView.SuperViewViewModel_Debug.CreateThrot(this, toolFactory, packfileService);
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
-                //MountAnimationCreator_Debug.CreateRaptorAndHu01d(this, toolFactory, packfileService);
+
+
+                var gameName = GameInformationFactory.GetGameById(GameTypeEnum.Rome_2_Remastered).DisplayName;
+                var romePath = settingsService.GetGamePathForGame(GameTypeEnum.Rome_2_Remastered);
+                var loadRes = _packfileService.LoadAllCaFiles(romePath, gameName);
+
+                //AnimationEditor.MountAnimationCreator.MountAnimationCreator_Debug.CreateRome2WolfRider(this, toolFactory, packfileService);
+                AnimationEditor.MountAnimationCreator.MountAnimationCreator_Debug.CreateLionAndHu01c(this, toolFactory, packfileService);
                 //KitbashEditor_Debug.CreateLoremasterHead(this, toolFactory, packfileService);
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateBowCentigor(this, toolFactory, packfileService);
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateGreatEagle(this, toolFactory, packfileService);
@@ -139,8 +146,8 @@ namespace AssetEditor.ViewModels
                 //var f = packfileService.FindFile(@"animations/matched_combat/attila_generated.bin");
                 //new CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.MatachedAnimFile("sdasda", f.DataSource.ReadData());
                 //
-               // OpenFile(packfileService.FindFile(@"animations\database\battle\bin\animation_tables.animpack"));
-               // OpenFile(packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack"));
+                // OpenFile(packfileService.FindFile(@"animations\database\battle\bin\animation_tables.animpack"));
+                // OpenFile(packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack"));
 
                 //OpenFile(packfileService.FindFile(@"variantmeshes\_variantmodels\man\skin\cleopatra_mark_antony_trailer\mark_antony_lod1.rigid_model_v2"));
 

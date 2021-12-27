@@ -37,12 +37,13 @@
             </GridSplitter.Template>
         </GridSplitter>
 
-        <Grid Grid.Row="1" Grid.Column="2" Grid.RowSpan="2">
+
+            <Grid Grid.Row="1" Grid.Column="2" Grid.RowSpan="2" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
@@ -51,33 +52,36 @@
             <referencemodel:ReferenceModelSelectionView Grid.Row="1" DataContext="{Binding ReferenceModelView, Mode=OneTime}" Visibility="{Binding IsControlVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}"/>
             <Rectangle Grid.Row="2" Fill="LightGray" Height="3" Margin="2,2,2,2"/>
 
-            <ScrollViewer Grid.Row="3">
-                <ContentControl Content="{Binding Editor, UpdateSourceTrigger=PropertyChanged}" >
-                    <ContentControl.Resources>
-                        <DataTemplate DataType="{ x:Type mountcreator:Editor}">
-                            <mountcreator:MountAnimationCreatorView  />
-                        </DataTemplate>
+            <ScrollViewer  Grid.Row="3" VerticalScrollBarVisibility="Auto">
+                <DockPanel  DockPanel.Dock="Top">
+                    <ContentControl Content="{Binding Editor, UpdateSourceTrigger=PropertyChanged}" >
+                        <ContentControl.Resources>
+                            <DataTemplate DataType="{ x:Type mountcreator:Editor}">
+                                <mountcreator:MountAnimationCreatorView  />
+                            </DataTemplate>
 
-                        <DataTemplate DataType="{ x:Type campaignanimationcreator:Editor}">
-                            <campaignanimationcreator:EditorView  />
-                        </DataTemplate>
+                            <DataTemplate DataType="{ x:Type campaignanimationcreator:Editor}">
+                                <campaignanimationcreator:EditorView  />
+                            </DataTemplate>
 
-                        <DataTemplate DataType="{ x:Type animationtransfertool:Editor}">
-                            <animationtransfertool:EditorView  />
-                        </DataTemplate>
+                            <DataTemplate DataType="{ x:Type animationtransfertool:Editor}">
+                                <animationtransfertool:EditorView  />
+                            </DataTemplate>
 
-                        <DataTemplate DataType="{ x:Type techskeletoneditor:Editor}">
-                            <techskeletoneditor:EditorView  />
-                        </DataTemplate>
+                            <DataTemplate DataType="{ x:Type techskeletoneditor:Editor}">
+                                <techskeletoneditor:EditorView  />
+                            </DataTemplate>
 
-                        <DataTemplate DataType="{ x:Type superview:Editor}">
-                            <superview:EditorView  />
-                        </DataTemplate>
+                            <DataTemplate DataType="{ x:Type superview:Editor}">
+                                <superview:EditorView  />
+                            </DataTemplate>
 
-                    </ContentControl.Resources>
-                </ContentControl>
+                        </ContentControl.Resources>
+                    </ContentControl>
+                </DockPanel>
             </ScrollViewer>
         </Grid>
+ 
 
         <animationplayer:AnimationPlayerView Grid.Row="2" Grid.Column="0" DataContext="{Binding Player, Mode=OneTime}"/>
     </Grid>

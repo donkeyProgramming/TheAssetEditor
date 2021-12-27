@@ -19,13 +19,6 @@ namespace AnimationEditor.Common.AnimationSettings
             set { SetAndNotify(ref _loopCounter, value); }
         }
 
-        bool _applyOffsets = true;
-        public bool ApplyOffsets
-        {
-            get { return _applyOffsets; }
-            set { SetAndNotify(ref _applyOffsets, value); }
-        }
-
         Vector3ViewModel _translation = new Vector3ViewModel(0);
         public Vector3ViewModel Translation
         {
@@ -47,14 +40,18 @@ namespace AnimationEditor.Common.AnimationSettings
             set { SetAndNotify(ref _scale, value); }
         }
 
-
-
-
         bool _keepRiderRotation = true;
         public bool KeepRiderRotation
         {
             get { return _keepRiderRotation; }
             set { SetAndNotify(ref _keepRiderRotation, value); }
+        }
+
+        bool _isRootNodeAnimation = false;
+        public bool IsRootNodeAnimation
+        {
+            get { return _isRootNodeAnimation; }
+            set { SetAndNotify(ref _isRootNodeAnimation, value); }
         }
     }
 }

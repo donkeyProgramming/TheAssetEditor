@@ -170,10 +170,10 @@ namespace AnimationEditor.Common.ReferenceModel
             
             ShowMesh.Value = ShowMesh.Value;
             ShowSkeleton.Value = ShowSkeleton.Value;
-            
+            SetMeshVisability(ShowMesh.Value);
+
             MeshChanged?.Invoke(this);
         }
-
 
         public void SetSkeleton(PackFile skeletonPackFile)
         {

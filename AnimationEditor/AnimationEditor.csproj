@@ -15,4 +15,9 @@
     <ProjectReference Include="..\View3D\View3D.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="MountAnimationCreator\ViewModels\" />
+    <Folder Include="MountAnimationCreator\Views\" />
+  </ItemGroup>
+
 </Project>

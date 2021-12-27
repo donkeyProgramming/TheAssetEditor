@@ -41,10 +41,6 @@
                     </b:Interaction.Behaviors>
                 </TextBox>
 
-                <Label Grid.Column="0" Grid.Row="2" Content="Apply offsets:"/>
-                <Label Grid.Column="1" Grid.Row="2" Content=":"/>
-                <CheckBox Grid.Column="3" Grid.Row="2" VerticalContentAlignment="Center" IsChecked="{Binding ApplyOffsets, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
-
                 <Label Grid.Column="0" Grid.Row="3" Content="Trans offset"/>
                 <Label Grid.Column="1" Grid.Row="3" Content=":"/>
                 <mathviews:Vector3View Grid.Column="3" Grid.Row="3" VerticalContentAlignment="Center" Vector3="{Binding Translation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
@@ -64,6 +60,10 @@
                 <Label Grid.Column="0" Grid.Row="6" Content="Keep rider rot"/>
                 <Label Grid.Column="1" Grid.Row="6" Content=":"/>
                 <CheckBox Grid.Column="3" Grid.Row="6" VerticalContentAlignment="Center" IsChecked="{Binding KeepRiderRotation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+               
+                <Label Grid.Column="0"      Grid.Row="7" Content="Is RootNode anim"/>
+                <Label Grid.Column="1"      Grid.Row="7" Content=":"/>
+                <CheckBox Grid.Column="3"   Grid.Row="7" VerticalContentAlignment="Center" IsChecked="{Binding IsRootNodeAnimation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
         </Border>
     </Expander>

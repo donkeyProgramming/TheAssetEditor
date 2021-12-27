@@ -32,7 +32,7 @@ namespace AnimationEditor.CampaignAnimationCreator
         public void SaveAnimation()
         {
             var animFile = _selectedUnit.AnimationClip.ConvertToFileFormat(_selectedUnit.Skeleton);
-            var bytes = AnimationFile.GetBytes(animFile);
+            var bytes = AnimationFile.ConvertToBytes(animFile);
             SaveHelper.SaveAs(_pfs, bytes, ".anim");
         }
 

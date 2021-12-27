@@ -100,7 +100,7 @@ namespace CommonControls.Editors.AnimationBatchExporter
                     var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, animationFile.Header.SkeletonName);
                     animationFile.RemoveOptimizations(skeleton);
 
-                    var bytes = AnimationFile.GetBytes(animationFile);
+                    var bytes = AnimationFile.ConvertToBytes(animationFile);
                     var newPackFile = new PackFile(file.Name, new MemorySource(bytes));
 
                     var path = _pfs.GetFullPath(file);

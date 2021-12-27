@@ -86,20 +86,20 @@ namespace AnimationEditor.MountAnimationCreator.Services
                 newRiderAnim.DynamicFrames[i].Rotation[_riderBoneIndex] = newRiderRotation;
 
                 // Find all the bones at the same level (normally attachmentpoints) and move them as well
-                var parentBoneIndex = _riderSkeleton.GetParentBoneIndex(_riderBoneIndex);
-                if (parentBoneIndex != -1)
-                {
-                    var childNodes = _riderSkeleton.GetDirectChildBones(parentBoneIndex);
-
-                    for (int boneId = 0; boneId < childNodes.Count; boneId++)
-                    {
-                        var id = childNodes[boneId];
-                        if (id == _riderBoneIndex)
-                            continue;
-                        newRiderAnim.DynamicFrames[i].Position[id] += riderPositionDiff;
-                        newRiderAnim.DynamicFrames[i].Rotation[id] = riderRotationDiff * newRiderAnim.DynamicFrames[i].Rotation[id];
-                    }
-                }
+                //var parentBoneIndex = _riderSkeleton.GetParentBoneIndex(_riderBoneIndex);
+                //if (parentBoneIndex != -1)
+                //{
+                //    var childNodes = _riderSkeleton.GetDirectChildBones(parentBoneIndex);
+                //
+                //    for (int boneId = 0; boneId < childNodes.Count; boneId++)
+                //    {
+                //        var id = childNodes[boneId];
+                //        if (id == _riderBoneIndex)
+                //            continue;
+                //        newRiderAnim.DynamicFrames[i].Position[id] += riderPositionDiff;
+                //        newRiderAnim.DynamicFrames[i].Rotation[id] = riderRotationDiff * newRiderAnim.DynamicFrames[i].Rotation[id];
+                //    }
+                //}
             }
 
             return newRiderAnim;
@@ -113,7 +113,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
         static public PackFile SaveAnimation(PackFileService pfs, string riderAnimationName, string savePrefix, bool ensureUniqeName, AnimationClip clip, GameSkeleton skeleton)
         {
             var animFile = clip.ConvertToFileFormat(skeleton);
-            var bytes = AnimationFile.GetBytes(animFile);
+            var bytes = AnimationFile.ConvertToBytes(animFile);
 
             string savePath = "";
             if (string.IsNullOrWhiteSpace(savePrefix) == false)
