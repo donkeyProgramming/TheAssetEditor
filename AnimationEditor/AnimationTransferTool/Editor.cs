@@ -61,13 +61,14 @@ namespace AnimationEditor.AnimationTransferTool
             _copyFrom.SkeletonChanged += CopyFromSkeletonChanged;
             _copyTo.MeshChanged += CopyToMeshChanged;
 
-            _copyTo.Offset = Matrix.CreateTranslation(new Vector3(0, 0, -2));
-            _copyFrom.Offset = Matrix.CreateTranslation(new Vector3(0, 0, 2));
-
             AnimationSettings.DisplayOffset.OnValueChanged += DisplayOffset_OnValueChanged;
+            DisplayOffset_OnValueChanged(new CommonControls.MathViews.Vector3ViewModel(0,0,2));
 
             if (_copyTo.Skeleton != null)
                 CopyToMeshChanged(_copyTo);
+
+            if (_copyFrom.Skeleton != null)
+                CopyFromSkeletonChanged(_copyFrom.Skeleton);
         }
 
         private void DisplayOffset_OnValueChanged(CommonControls.MathViews.Vector3ViewModel newValue)
@@ -111,6 +112,10 @@ namespace AnimationEditor.AnimationTransferTool
             _remappingInformaton = null;
             CreateBoneOverview(_copyTo.Skeleton);
             HightlightSelectedBones(null);
+
+            var standAnim = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(newValue.SkeletonName).FirstOrDefault(x => x.AnimationFile.Contains("stand"));
+            if(standAnim != null)
+                _copyFrom.SetAnimation(standAnim);
 
             _config = null;
             AnimationSettings.UseScaledSkeletonName.Value = false;
@@ -242,7 +247,7 @@ namespace AnimationEditor.AnimationTransferTool
 
             var items = copyFromAnims.Select(x => new SelectionListViewModel<SkeletonAnimationLookUpHelper.AnimationReference>.Item()
             {
-                IsChecked = new NotifyAttr<bool>(!x.AnimationFile.Contains("tech", StringComparison.InvariantCultureIgnoreCase)),
+                IsChecked = new NotifyAttr<bool>(! (x.AnimationFile.Contains("tech", StringComparison.InvariantCultureIgnoreCase) || x.AnimationFile.Contains("skeletons", StringComparison.InvariantCultureIgnoreCase))),
                 DisplayName = x.AnimationFile,
                 ItemValue = x
             }).ToList();
@@ -297,8 +302,11 @@ namespace AnimationEditor.AnimationTransferTool
                 animFile.Header.SkeletonName = AnimationSettings.ScaledSkeletonName.Value;
 
             var currentFileName = Path.GetFileName(newPath);
-            newPath = newPath.Replace(currentFileName, "cust_" + currentFileName);
+            newPath = newPath.Replace(currentFileName, AnimationSettings.SavePrefix.Value + currentFileName);
             newPath = SaveHelper.EnsureEnding(newPath, ".anim");
+
+            if (AnimationSettings.UseScaledSkeletonName.Value)
+                animFile.Header.SkeletonName = AnimationSettings.ScaledSkeletonName.Value;
 
             SaveHelper.Save(_pfs, newPath, null, AnimationFile.ConvertToBytes(animFile), prompOnOverride);
         }
@@ -352,41 +360,31 @@ namespace AnimationEditor.AnimationTransferTool
             }
         }
 
-        public void ExportMappedSkeleton()
-        {
-            var skeletonFile = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, _copyFrom.Skeleton.SkeletonName);
-            var clip = new AnimationClip(skeletonFile);
-
-            var mappedSkeleton = UpdateAnimation(clip);
-            var mappedSkeletonFile = mappedSkeleton.ConvertToFileFormat(Generated.Skeleton);
-
-            var newSkeletonName = Generated.Skeleton.SkeletonName + "_generated";
-            AnimationSettings.UseScaledSkeletonName.Value = true;
-            AnimationSettings.ScaledSkeletonName.Value = newSkeletonName + ".anim";
-
-
-            var skeletonBytes = AnimationFile.ConvertToBytes(mappedSkeletonFile);
-            SaveHelper.Save(_pfs, @"animations\skeletons\" + newSkeletonName + ".anim", null, skeletonBytes);
-
-
-            //Save inv matrix file
-            var newSkeleton = new GameSkeleton(mappedSkeletonFile, null);
-            var invMatrixFile = newSkeleton.CreateInvMatrixFile();
-            var invMatrixBytes = invMatrixFile.GetBytes();
-            SaveHelper.Save(_pfs, @"animations\skeletons\" + newSkeletonName + ".bone_inv_trans_mats", null, invMatrixBytes);
-
-            // Assign skeleton
-            //Generated.SetSkeleton(mappedSkeletonFile, newSkeletonName);
-            //_copyTo.SetSkeleton(mappedSkeletonFile, newSkeletonName);
-
-
-            SaveMeshWithNewSkeleton(mappedSkeleton, "changed");
-
-            // Apply to generated
-            // Apply to _copyTo
-            // Save inv file
-            // Save mesh with skeleton
-        }
+        //public void ExportMappedSkeleton()
+        //{
+        //    var skeletonFile = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, _copyFrom.Skeleton.SkeletonName);
+        //    var clip = new AnimationClip(skeletonFile);
+        //
+        //    var mappedSkeleton = UpdateAnimation(clip);
+        //    var mappedSkeletonFile = mappedSkeleton.ConvertToFileFormat(Generated.Skeleton);
+        //
+        //    var newSkeletonName = Generated.Skeleton.SkeletonName + "_generated";
+        //    AnimationSettings.UseScaledSkeletonName.Value = true;
+        //    AnimationSettings.ScaledSkeletonName.Value = newSkeletonName + ".anim";
+        //
+        //
+        //    var skeletonBytes = AnimationFile.ConvertToBytes(mappedSkeletonFile);
+        //    SaveHelper.Save(_pfs, @"animations\skeletons\" + newSkeletonName + ".anim", null, skeletonBytes);
+        //
+        //
+        //    //Save inv matrix file
+        //    var newSkeleton = new GameSkeleton(mappedSkeletonFile, null);
+        //    var invMatrixFile = newSkeleton.CreateInvMatrixFile();
+        //    var invMatrixBytes = invMatrixFile.GetBytes();
+        //    SaveHelper.Save(_pfs, @"animations\skeletons\" + newSkeletonName + ".bone_inv_trans_mats", null, invMatrixBytes);
+        //
+        //    SaveMeshWithNewSkeleton(mappedSkeleton, "changed");
+        //}
 
         public void ExportScaledMesh()
         {
@@ -485,7 +483,7 @@ namespace AnimationEditor.AnimationTransferTool
 
             var meshName = Path.GetFileNameWithoutExtension(_copyTo.MeshName.Value);
             var newMeshName = meshName + "_" + savePostFix + ".rigid_model_v2";
-            var bytes = SceneSaverService.Save(true, modelNodes, Generated.Skeleton, RmvVersionEnum.RMV2_V7);
+            var bytes = SceneSaverService.Save(true, modelNodes, newSkeleton, RmvVersionEnum.RMV2_V7);
 
             SaveHelper.Save(_pfs, newMeshName, null, bytes);
 

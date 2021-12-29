@@ -10,8 +10,6 @@ namespace CommonControls.FileTypes.MetaData
 {
     public static class MetaDataFileParser
     {
-
-
         public static MetaDataFile Open(PackFile pfs, SchemaManager schemaManager)
         {
             if (pfs == null)
@@ -19,7 +17,6 @@ namespace CommonControls.FileTypes.MetaData
             var content = pfs.DataSource.ReadData();
             return ParseFile(content, schemaManager);
         }
-
 
         public static MetaDataFile ParseFile(byte[] fileContent, SchemaManager schemaManager, bool doValidation = true)
         {
@@ -69,6 +66,40 @@ namespace CommonControls.FileTypes.MetaData
 
             return outputFile;
         }
+
+        public static MetaDataFile ParseFileV2(byte[] fileContent, bool doValidation = true)
+        {
+            var contentLength = fileContent.Count();
+
+            MetaDataFile outputFile = new MetaDataFile()
+            {
+                Version = BitConverter.ToInt32(fileContent, 0)
+            };
+
+            if (outputFile.Version != 2)
+                throw new Exception($"Unknown version - {outputFile.Version}");
+
+            if (contentLength > 8)
+            {
+                int numElements = BitConverter.ToInt32(fileContent, 4);
+                var items = ExploratoryGetEntries(fileContent);
+
+                if (numElements != items.Count)
+                    throw new Exception($"Not the expected amount elements. Expected {numElements}, got {items.Count}");
+
+                // Convert to sensible stuff
+                foreach (var item in items)
+                {
+                   
+                        outputFile.Items.Add(item);
+                    
+                }
+            }
+
+            return outputFile;
+        }
+
+
 
         static List<UnknownMetaEntry> ExploratoryGetEntries(byte[] fileContent)
         {

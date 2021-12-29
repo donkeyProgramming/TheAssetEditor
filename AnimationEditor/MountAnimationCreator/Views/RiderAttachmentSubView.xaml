@@ -6,8 +6,9 @@
              xmlns:s="http://schemas.singulink.com/xaml"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    
     <Expander Grid.Row="0" Header="Rider Attachment:" IsExpanded="true">
-        <Grid>
+        <Grid  Margin="10,5,10,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>

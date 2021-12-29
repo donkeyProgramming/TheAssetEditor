@@ -63,15 +63,6 @@ namespace View3D.SceneNodes
 
                 for (int i = 0; i < skeleton.BoneCount; i++)
                 {
-                    var parentIndex = skeleton.GetParentBoneIndex(i);
-                    if (parentIndex == -1)
-                    {
-                        var boneMatrix2 = skeleton.GetAnimatedWorldTranform(i);
-                        _lineRenderer.AddCube(Matrix.CreateScale(SkeletonScale) * Matrix.CreateScale(0.05f) * boneMatrix2 * parentWorld, NodeColour);
-                        continue;
-                    }
-                        
-
                     float scale = SkeletonScale;
                     Color drawColour = NodeColour;
                     if (SelectedBoneIndex.HasValue && SelectedBoneIndex.Value == i)
@@ -81,10 +72,14 @@ namespace View3D.SceneNodes
                     }
 
                     var boneMatrix = skeleton.GetAnimatedWorldTranform(i);
-                    var parentBoneMatrix = skeleton.GetAnimatedWorldTranform(parentIndex);
-
                     _lineRenderer.AddCube(Matrix.CreateScale(scale) * Matrix.CreateScale(0.05f) * boneMatrix * parentWorld, drawColour);
-                    _lineRenderer.AddLine(Vector3.Transform(boneMatrix.Translation, parentWorld), Vector3.Transform(parentBoneMatrix.Translation, parentWorld));
+                    
+                    var parentIndex = skeleton.GetParentBoneIndex(i);
+                    if (parentIndex != -1)
+                    {
+                        var parentBoneMatrix = skeleton.GetAnimatedWorldTranform(parentIndex);
+                        _lineRenderer.AddLine(Vector3.Transform(boneMatrix.Translation, parentWorld), Vector3.Transform(parentBoneMatrix.Translation, parentWorld));
+                    }
                 }
 
                 renderEngine.AddRenderItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = _lineRenderer, ModelMatrix = Matrix.Identity });

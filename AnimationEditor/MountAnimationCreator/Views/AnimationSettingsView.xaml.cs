@@ -11,14 +11,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace AnimationEditor.TechSkeletonEditor
+namespace AnimationEditor.MountAnimationCreator.Views
 {
     /// <summary>
-    /// Interaction logic for EditorView.xaml
+    /// Interaction logic for AnimationSettingsView.xaml
     /// </summary>
-    public partial class EditorView : UserControl
+    public partial class AnimationSettingsView : UserControl
     {
-        public EditorView()
+        public AnimationSettingsView()
         {
             InitializeComponent();
         }

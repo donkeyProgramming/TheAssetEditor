@@ -9,7 +9,7 @@
              xmlns:campaignanimationcreator="clr-namespace:AnimationEditor.CampaignAnimationCreator"
              xmlns:animationtransfertool="clr-namespace:AnimationEditor.AnimationTransferTool"
              xmlns:superview="clr-namespace:AnimationEditor.SuperView"
-             xmlns:techskeletoneditor="clr-namespace:AnimationEditor.TechSkeletonEditor"
+             xmlns:skeletoneditor="clr-namespace:AnimationEditor.SkeletonEditor"
              mc:Ignorable="d" >
     <Grid>
         <Grid.ColumnDefinitions>
@@ -57,7 +57,7 @@
                     <ContentControl Content="{Binding Editor, UpdateSourceTrigger=PropertyChanged}" >
                         <ContentControl.Resources>
                             <DataTemplate DataType="{ x:Type mountcreator:Editor}">
-                                <mountcreator:MountAnimationCreatorView  />
+                                <mountcreator:EditorView  />
                             </DataTemplate>
 
                             <DataTemplate DataType="{ x:Type campaignanimationcreator:Editor}">
@@ -68,8 +68,8 @@
                                 <animationtransfertool:EditorView  />
                             </DataTemplate>
 
-                            <DataTemplate DataType="{ x:Type techskeletoneditor:Editor}">
-                                <techskeletoneditor:EditorView  />
+                            <DataTemplate DataType="{ x:Type skeletoneditor:Editor}">
+                                <skeletoneditor:EditorView  />
                             </DataTemplate>
 
                             <DataTemplate DataType="{ x:Type superview:Editor}">

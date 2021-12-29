@@ -16,9 +16,9 @@ namespace AnimationEditor.MountAnimationCreator
     /// <summary>
     /// Interaction logic for MountAnimationCreatorView.xaml
     /// </summary>
-    public partial class MountAnimationCreatorView : UserControl
+    public partial class EditorView : UserControl
     {
-        public MountAnimationCreatorView()
+        public EditorView()
         {
             InitializeComponent();
         }

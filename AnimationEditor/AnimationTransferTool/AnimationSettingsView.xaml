@@ -22,20 +22,17 @@
                 <Label Content="Visability - Generated" Width ="{StaticResource labelWidth}"  />
                 <Label Content=":"/>
 
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Generated.ShowMesh.Value, UpdateSourceTrigger=PropertyChanged}" Content="Mesh" Margin="0,0,50,0"/>
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Generated.ShowSkeleton.Value, UpdateSourceTrigger=PropertyChanged}" Content="Skeleton"/>
-            </DockPanel>
+                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Generated.ShowMesh.Value, UpdateSourceTrigger=PropertyChanged}" Content="Mesh | "/>
+                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Generated.ShowSkeleton.Value, UpdateSourceTrigger=PropertyChanged}" Content="Skeleton | "/>
 
-            <DockPanel>
-                <Label Content="Display offset" Width ="{StaticResource labelWidth}"  />
-                <Label Content=":"/>
+                <Label Content="Offset:"  />
                 <mathviews:Vector3View Vector3="{Binding AnimationSettings.DisplayOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2"/>
             </DockPanel>
+
 
             <DockPanel>
                 <Label Content="Scale" Width ="{StaticResource labelWidth}"  DockPanel.Dock="Left"/>
                 <Label Content=":" DockPanel.Dock="Left"/>
-                <Button Content="Export Mapped skeleton" Click="{s:MethodBinding ExportMappedSkeleton}" DockPanel.Dock="Right"/>
                 <Button Content="Export Mesh/skeleton at scale" Click="{s:MethodBinding ExportScaledMesh}" DockPanel.Dock="Right" Margin="2,0,2,0"/>
 
                 <TextBox Text="{Binding AnimationSettings.Scale.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
@@ -58,8 +55,8 @@
             </DockPanel>
 
             <DockPanel >
-                <Label Width ="{StaticResource labelWidth}"/>
-                <Label Content=":" Visibility="Hidden"/>
+                <Label Content="Config" Width ="{StaticResource labelWidth}"/>
+                <Label Content=":"/>
                 <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.ApplyRelativeScale.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Content="Apply Relative scale" ToolTip="Scale bone length based on relative difference" Margin="0,0,5,0"/>
                 <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.FreezeUnmapped.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Content="Zero unmapped bones" ToolTip="Set the transform of all unmapped bones to 0"/>
             </DockPanel>
@@ -74,6 +71,11 @@
                 </TextBox>
             </DockPanel>
 
+            <DockPanel >
+                <Label Content="Save Prefix" Width ="{StaticResource labelWidth}"/>
+                <Label Content=":"/>
+                <TextBox Text="{Binding AnimationSettings.SavePrefix.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
+            </DockPanel>
 
         </StackPanel>
     </Expander>

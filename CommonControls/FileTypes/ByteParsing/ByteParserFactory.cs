@@ -1,68 +1,63 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
 
 namespace Filetypes.ByteParsing
 {
     public static class ByteParserFactory
     {
+        static Dictionary<Type, IByteParser> _typeToParserMap;
+        static Dictionary<DbTypesEnum, IByteParser> _enumToParserMap;
+
+        static void CreateTypeMap()
+        {
+            if (_typeToParserMap != null)
+                return;
+
+            var items = new List<(DbTypesEnum DbEnum, Type type, IByteParser parser)>();
+            items.Add((DbTypesEnum.String, typeof(string), ByteParsers.String));
+            items.Add((DbTypesEnum.String_ascii, null, ByteParsers.StringAscii));
+            items.Add((DbTypesEnum.FixedString, null, new FixedStringParser(1)));
+            items.Add((DbTypesEnum.FixedStringAcii, null, new FixedAciiStringParser(1)));
+            items.Add((DbTypesEnum.Optstring, null, ByteParsers.OptString));
+            items.Add((DbTypesEnum.Optstring_ascii, null, ByteParsers.OptStringAscii));
+
+            items.Add((DbTypesEnum.Short, typeof(short), ByteParsers.Short));
+            items.Add((DbTypesEnum.UShort, typeof(ushort), ByteParsers.UShort));
+            items.Add((DbTypesEnum.Integer, typeof(int), ByteParsers.Int32));
+            items.Add((DbTypesEnum.uint32, typeof(uint), ByteParsers.UInt32));
+            items.Add((DbTypesEnum.Int64, typeof(long), ByteParsers.Int64));
+
+            items.Add((DbTypesEnum.Single, typeof(float), ByteParsers.Single));
+            items.Add((DbTypesEnum.Float16, null, ByteParsers.Float16));
+
+            items.Add((DbTypesEnum.Vector3, typeof(Vector3), ByteParsers.Vector3));
+            items.Add((DbTypesEnum.Vector4, typeof(Vector4), ByteParsers.Vector4));
+
+            items.Add((DbTypesEnum.Boolean, typeof(bool), ByteParsers.Bool));
+            items.Add((DbTypesEnum.Byte, typeof(byte), ByteParsers.Byte));
+
+            _typeToParserMap = new Dictionary<Type, IByteParser>();
+            _enumToParserMap = new Dictionary<DbTypesEnum, IByteParser>();
+
+            foreach (var item in items)
+            {
+                _enumToParserMap.Add(item.DbEnum, item.parser);
+                if (item.type != null)
+                    _typeToParserMap.Add(item.type, item.parser);
+            }
+        }
+
         public static IByteParser Create(DbTypesEnum typeEnum)
         {
-            switch (typeEnum)
-            {
-                case DbTypesEnum.String:
-                    return ByteParsers.String;
+            CreateTypeMap();
+            return _enumToParserMap[typeEnum];
+        }
 
-                case DbTypesEnum.String_ascii:
-                    return ByteParsers.StringAscii;
-
-                case DbTypesEnum.FixedString:
-                    return new FixedStringParser(1);
-
-                case DbTypesEnum.FixedStringAcii:
-                    return new FixedAciiStringParser(1);
-
-                case DbTypesEnum.Optstring:
-                    return ByteParsers.OptString;
-
-                case DbTypesEnum.Optstring_ascii:
-                    return ByteParsers.OptStringAscii;
-
-                case DbTypesEnum.Integer:
-                    return ByteParsers.Int32;
-
-                case DbTypesEnum.Int64:
-                    return ByteParsers.Int64;
-
-                case DbTypesEnum.Short:
-                    return ByteParsers.Short;
-
-                case DbTypesEnum.UShort:
-                    return ByteParsers.UShort;
-
-                case DbTypesEnum.Single:
-                    return ByteParsers.Single;
-
-                case DbTypesEnum.Vector3:
-                    return ByteParsers.Vector3;
-
-                case DbTypesEnum.Vector4:
-                    return ByteParsers.Vector4;
-
-                case DbTypesEnum.Float16:
-                    return ByteParsers.Float16;
-
-                case DbTypesEnum.Boolean:
-                    return ByteParsers.Bool;
-
-                case DbTypesEnum.uint32:
-                    return ByteParsers.UInt32;
-
-                case DbTypesEnum.Byte:
-                    return ByteParsers.Byte;
-
-                case DbTypesEnum.List:
-                    throw new NotImplementedException();
-            }
-            throw new NotImplementedException();
+        public static IByteParser Create(Type type)
+        {
+            CreateTypeMap();
+            return _typeToParserMap[type];
         }
     }
 }

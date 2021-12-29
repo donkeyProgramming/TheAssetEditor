@@ -5,7 +5,7 @@ namespace CommonControls.MathViews
 {
     public class DoubleViewModel : NotifyPropertyChangedImpl
     {
-
+        virtual public event ValueChangedDelegate<double> OnValueChanged;
         string _formatString = "{0:0.######}";
 
         public DoubleViewModel(double startValue = 0)
@@ -13,8 +13,6 @@ namespace CommonControls.MathViews
             Value = startValue;
         }
 
-
-        
         public void SetMaxDecimalNumbers(int maxDecimals)
         {
             throw new NotImplementedException();
@@ -27,6 +25,7 @@ namespace CommonControls.MathViews
             set
             {
                 SetAndNotify(ref _textvalue, value);
+                OnValueChanged?.Invoke(Value);
             }
         }
 
@@ -45,6 +44,7 @@ namespace CommonControls.MathViews
                 var truncValue = string.Format(_formatString, value);
                 TextValue = truncValue.ToString();
                 _value = value;
+                OnValueChanged?.Invoke(value);
             }
         }
 

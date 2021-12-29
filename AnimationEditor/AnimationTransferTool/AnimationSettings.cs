@@ -13,5 +13,6 @@ namespace AnimationEditor.AnimationTransferTool
         public DoubleViewModel SpeedMult { get; set; } = new DoubleViewModel(1);
         public NotifyAttr<bool> FreezeUnmapped { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> ApplyRelativeScale { get; set; } = new NotifyAttr<bool>(true);
+        public NotifyAttr<string> SavePrefix { get; set; } = new NotifyAttr<string>("cust_");
     }
 }

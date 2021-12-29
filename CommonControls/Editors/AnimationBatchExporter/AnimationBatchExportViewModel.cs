@@ -96,9 +96,7 @@ namespace CommonControls.Editors.AnimationBatchExporter
                 try
                 {
                     var animationFile = AnimationFile.Create(file);
-                    animationFile.Header.Version = outputAnimationFormat;
-                    var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, animationFile.Header.SkeletonName);
-                    animationFile.RemoveOptimizations(skeleton);
+                    animationFile.ConvertToVersion(outputAnimationFormat, _skeletonAnimationLookUpHelper, _pfs);
 
                     var bytes = AnimationFile.ConvertToBytes(animationFile);
                     var newPackFile = new PackFile(file.Name, new MemorySource(bytes));

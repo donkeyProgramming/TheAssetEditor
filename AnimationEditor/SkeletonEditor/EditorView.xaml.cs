@@ -11,14 +11,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace AnimationEditor.MountAnimationCreator
+namespace AnimationEditor.SkeletonEditor
 {
     /// <summary>
-    /// Interaction logic for SaveSubView.xaml
+    /// Interaction logic for EditorView.xaml
     /// </summary>
-    public partial class SaveSubView : UserControl
+    public partial class EditorView : UserControl
     {
-        public SaveSubView()
+        public EditorView()
         {
             InitializeComponent();
         }

@@ -1,6 +1,7 @@
 ﻿using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel.Transforms;
+using CommonControls.Services;
 using Filetypes.ByteParsing;
 using Serilog;
 using System;
@@ -403,6 +404,13 @@ namespace CommonControls.FileTypes.Animation
             RotationMappings = newRotMapping;
             DynamicFrames = newDynamicFrames;
             StaticFrame = null;
+        }
+
+        public void ConvertToVersion(uint newAnimFormat, SkeletonAnimationLookUpHelper lookUpHelper, PackFileService pfs)
+        {
+            Header.Version = newAnimFormat;
+            var skeleton = lookUpHelper.GetSkeletonFileFromName(pfs, Header.SkeletonName);
+            RemoveOptimizations(skeleton);
         }
 
     }

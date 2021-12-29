@@ -2,8 +2,8 @@
 using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.Common.BaseControl;
 using AnimationEditor.MountAnimationCreator;
+using AnimationEditor.SkeletonEditor;
 using AnimationEditor.SuperView;
-using AnimationEditor.TechSkeletonEditor;
 using CommonControls.Common;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,7 +17,7 @@ namespace AnimationEditor
             serviceCollection.AddTransient<CampaignAnimationCreatorViewModel>();
             serviceCollection.AddTransient<AnimationTransferToolViewModel>();
             serviceCollection.AddTransient<SuperViewViewModel>();
-            serviceCollection.AddTransient<TechSkeletonEditorViewModel>();
+            serviceCollection.AddTransient<SkeletonEditorViewModel>();
 
             serviceCollection.AddTransient<BaseAnimationView>();
         }
@@ -28,7 +28,7 @@ namespace AnimationEditor
             factory.RegisterTool<CampaignAnimationCreatorViewModel, BaseAnimationView>();
             factory.RegisterTool<AnimationTransferToolViewModel, BaseAnimationView>();
             factory.RegisterTool<SuperViewViewModel, BaseAnimationView>();
-            factory.RegisterTool<TechSkeletonEditorViewModel, BaseAnimationView>();
+            factory.RegisterTool<SkeletonEditorViewModel, BaseAnimationView>();
         }
     }
 }

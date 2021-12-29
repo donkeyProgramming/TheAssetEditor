@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Expander Grid.Row="4" Header="Visualisation help:" IsExpanded="True">
-        <Border BorderBrush="Gray" BorderThickness="0">
+        <Border BorderBrush="Gray" BorderThickness="0" Margin="10,5,10,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>

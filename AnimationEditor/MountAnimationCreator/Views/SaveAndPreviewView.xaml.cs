@@ -11,14 +11,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace AnimationEditor.Common.AnimationSettings
+namespace AnimationEditor.MountAnimationCreator.Views
 {
     /// <summary>
-    /// Interaction logic for AnimationSettingsView.xaml
+    /// Interaction logic for SaveSubView.xaml
     /// </summary>
-    public partial class AnimationSettingsView : UserControl
+    public partial class SaveAndPreviewView : UserControl
     {
-        public AnimationSettingsView()
+        public SaveAndPreviewView()
         {
             InitializeComponent();
         }

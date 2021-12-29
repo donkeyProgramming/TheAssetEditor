@@ -15,11 +15,13 @@ namespace AnimationEditor.MountAnimationCreator.Services
     class BatchProcessorService
     {
         PackFileService _pfs;
+        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         MountAnimationGeneratorService _animationGenerator;
         BatchProcessOptions _batchProcessOptions;
         AnimationSetFile _mountFragment;
         AnimationSetFile _riderFragment;
-       
+
+        uint _animationOutputFormat;
         AnimationPackFile _outAnimPack;
         AnimationSetFile _riderOutputFragment;
 
@@ -28,15 +30,20 @@ namespace AnimationEditor.MountAnimationCreator.Services
         string _animBinName = "test_tables.bin";
         string _fragmentName = "hu1_test_hr1_hammer";
 
-        public BatchProcessorService(PackFileService pfs, MountAnimationGeneratorService animationGenerator, BatchProcessOptions batchProcessOptions)
+        public BatchProcessorService(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, MountAnimationGeneratorService animationGenerator, BatchProcessOptions batchProcessOptions, uint animationOutputFormat)
         {
-            _animPackName = SaveHelper.EnsureEnding(batchProcessOptions.AnimPackName, ".animpack");
-            _animBinName = SaveHelper.EnsureEnding(batchProcessOptions.AnimPackName, "_tables.bin");
-            _fragmentName = SaveHelper.EnsureEnding(batchProcessOptions.FragmentName, ".frg");
-
             _pfs = pfs;
+            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _animationGenerator = animationGenerator;
             _batchProcessOptions = batchProcessOptions;
+            _animationOutputFormat = animationOutputFormat;
+
+            if (_batchProcessOptions != null)
+            {
+                _animPackName = SaveHelper.EnsureEnding(batchProcessOptions.AnimPackName, ".animpack");
+                _animBinName = SaveHelper.EnsureEnding(batchProcessOptions.AnimPackName, "_tables.bin");
+                _fragmentName = SaveHelper.EnsureEnding(batchProcessOptions.FragmentName, ".frg");
+            }
         }
 
         public void Process(AnimationSetFile mountFragment, AnimationSetFile riderFragment)
@@ -72,8 +79,6 @@ namespace AnimationEditor.MountAnimationCreator.Services
                 // Create a copy of the animation fragment entry
                 var riderFragment = _riderFragment.Fragments.First(x => x.Slot.Value == riderSlot);
                 var newRiderFragment = riderFragment.Clone();
-                var newAnimationName = GenerateNewAnimationName(newRiderFragment.AnimationFile, _animationPrefix);
-                newRiderFragment.AnimationFile = newAnimationName;
                 _riderOutputFragment.Fragments.Add(newRiderFragment);
 
                 var mountFragment = _mountFragment.Fragments.First(x => x.Slot.Value == mountSlot);
@@ -81,14 +86,9 @@ namespace AnimationEditor.MountAnimationCreator.Services
                 // Generate new animation
                 var riderAnim = LoadAnimation(riderFragment.AnimationFile);
                 var mountAnim = LoadAnimation(mountFragment.AnimationFile);
-    
-                
-                var newAnimation = _animationGenerator.GenerateMountAnimation(mountAnim, riderAnim);
+                var savedAnimName = SaveSingleAnim(mountAnim, riderAnim, newRiderFragment.AnimationFile);
 
-                // Save the new animation           
-                var animFile = newAnimation.ConvertToFileFormat(_animationGenerator.GetRiderSkeleton());
-                var bytes = AnimationFile.ConvertToBytes(animFile);
-                SaveHelper.Save(_pfs, newAnimationName, null, bytes);
+                newRiderFragment.AnimationFile = savedAnimName;
 
                 resultInfo.Ok(mountSlot, "Matching animation found in rider ("+ riderSlot + "). New animation created");
             }
@@ -103,6 +103,24 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
                 resultInfo.Error(mountSlot, "Expected slot missing in  rider (" + riderSlot + "), this need to be resolved!");
             }
+        }
+
+        public string SaveSingleAnim(AnimationClip mountAnim, AnimationClip riderAnim, string originalAnimationName)
+        {
+            var newAnimationName = GenerateNewAnimationName(originalAnimationName, _animationPrefix);
+
+            var newAnimation = _animationGenerator.GenerateMountAnimation(mountAnim, riderAnim);
+
+            // Save the new animation           
+            var animFile = newAnimation.ConvertToFileFormat(_animationGenerator.GetRiderSkeleton());
+
+            if (_animationOutputFormat != 7)
+                animFile.ConvertToVersion(_animationOutputFormat, _skeletonAnimationLookUpHelper, _pfs);
+
+            var bytes = AnimationFile.ConvertToBytes(animFile);
+            SaveHelper.Save(_pfs, newAnimationName, null, bytes);
+
+            return newAnimationName;
         }
 
         void CopyAnimations(string riderSlot, ErrorListViewModel.ErrorList resultInfo)

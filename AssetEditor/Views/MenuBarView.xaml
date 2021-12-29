@@ -48,7 +48,7 @@
                 <MenuItem Header="Campaign animation converter" Command="{Binding MenuBar.OpenCampaignAnimCreatorCommand}"/>
                 <MenuItem Header="Animation Transfer Tool" Command="{Binding MenuBar.OpenAnimationTransferToolCommand}" />
                 <MenuItem Header="Super view" Command="{Binding MenuBar.OpenSuperViewToolCommand}" />
-                <MenuItem Header="Tech skeleton Editor" Command="{Binding MenuBar.OpenTechSkeletonEditorCommand}" />
+                <MenuItem Header="Skeleton Editor" Command="{Binding MenuBar.OpenTechSkeletonEditorCommand}" />
                 <MenuItem Header="Animation batch converter" Command="{Binding MenuBar.OpenAnimationBatchExporterCommand}" />
                 
 

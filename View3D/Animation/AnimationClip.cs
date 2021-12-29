@@ -75,9 +75,11 @@ namespace View3D.Animation
         {
             AnimationFile output = new AnimationFile();
 
-            //float frameRate = 
             var fRate = (DynamicFrames.Count() - 1) / PlayTimeInSec;
             output.Header.FrameRate = (float)Math.Floor(fRate);
+            if (output.Header.FrameRate <= 0)
+                output.Header.FrameRate = 20;
+
             output.Header.Version = 7;
             output.Header.AnimationTotalPlayTimeInSec = PlayTimeInSec;
             output.Header.SkeletonName = skeleton.SkeletonName;

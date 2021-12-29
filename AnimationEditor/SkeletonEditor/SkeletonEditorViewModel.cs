@@ -3,13 +3,13 @@ using CommonControls.Common;
 using CommonControls.FileTypes.DB;
 using CommonControls.Services;
 
-namespace AnimationEditor.TechSkeletonEditor
+namespace AnimationEditor.SkeletonEditor
 {
-    public class TechSkeletonEditorViewModel : BaseAnimationViewModel
+    public class SkeletonEditorViewModel : BaseAnimationViewModel
     {
-        public TechSkeletonEditorViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, SchemaManager schemaManager) : base(toolFactory, pfs, skeletonHelper, schemaManager, "not_in_use1", "not_in_use2", false)
+        public SkeletonEditorViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, SchemaManager schemaManager) : base(toolFactory, pfs, skeletonHelper, schemaManager, "not_in_use1", "not_in_use2", false)
         {
-            DisplayName.Value = "TechSkeleton Editor";
+            DisplayName.Value = "Skeleton Editor";
             Pfs = pfs;
         }
 
@@ -28,9 +28,7 @@ namespace AnimationEditor.TechSkeletonEditor
                 MainInput = new AnimationToolInput();
 
             //typedEditor.Create(@"warmachines\chariot\grn_wolf_chariot\tech\grn_wolf_chariot_01.anim");
-            typedEditor.CreateEditor(@"variantmeshes\wh_variantmodels\hq3\nor\nor_war_mammoth\tech\nor_war_mammoth_howdah_01.anim");
-
-            
+            //typedEditor.CreateEditor(@"variantmeshes\wh_variantmodels\hq3\nor\nor_war_mammoth\tech\nor_war_mammoth_howdah_01.anim");
         }
 
         public static class TechSkeleton_Debug

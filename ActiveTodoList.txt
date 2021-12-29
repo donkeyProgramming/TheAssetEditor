@@ -441,12 +441,27 @@ Fixed 0.25
 	[Done]change texture path for missing textures 
 	[Done]BMI tool window can now be resized again
 	[Done]lots of editors open faster 
+	[Done]Tool scroolbar for people with small screens 
+	[Done]Bug converting anims to v5
+	[Done]Mount editor now works for mounging Rome and attila skeltons on v7 animations for older games
+	[Done]Minor animation saving errors 
 	
-	Tech skeleton slider 
+	Export mesh and skeleton at scale => Bug + update skeleton name 
+	assign skeleton while batching 
+	When saving anims, if framerat is negative, set 20
+	
+	batch export "not working on current folder" => prefix? 
+	Privous frame 
+	Animation speed mult
+	Show time in animation player alongside frame
+	Alpha yes|no
+	Edit texture dir 
+	Save decal models => dont override material type if there is no need => move to tool instead of save 
+	Some warning about converting troy => rome about textures?
 	Meta editor improvements 
-	Mount editor for older games
-	Alpha yes no
-	AnimTransfer => To and from self => auto map 
+	AnimTransfer => To and from self => auto map
+	
+	
 	
 	
 	

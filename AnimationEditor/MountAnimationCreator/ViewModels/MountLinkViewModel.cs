@@ -9,9 +9,9 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 
-namespace AnimationEditor.MountAnimationCreator
+namespace AnimationEditor.MountAnimationCreator.ViewModels
 {
-    public class MountLinkController : NotifyPropertyChangedImpl
+    public class MountLinkViewModel : NotifyPropertyChangedImpl
     {
         public FilterCollection<AnimationSetFile> SelectedMount { get; set; }
         public FilterCollection<AnimationSetFile> SelectedRider { get; set; }
@@ -25,7 +25,7 @@ namespace AnimationEditor.MountAnimationCreator
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         Action _validateAction;
 
-        public MountLinkController(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, AssetViewModel mount, Action validate)
+        public MountLinkViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, AssetViewModel mount, Action validate)
         {
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;

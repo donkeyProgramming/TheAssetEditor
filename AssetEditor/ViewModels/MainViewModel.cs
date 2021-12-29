@@ -62,7 +62,7 @@ namespace AssetEditor.ViewModels
 
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
             {
-                //settingsService.CurrentSettings.CurrentGame = GameTypeEnum.ThreeKingdoms;
+                //settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Troy;
                 var gamePath = settingsService.GetGamePathForCurrentGame();
                 if (gamePath != null)
                 {
@@ -81,6 +81,10 @@ namespace AssetEditor.ViewModels
                 //var r = new Rmv2Information(_packfileService);
                 //r.Create(GameInformationFactory.GetGameById(settingsService.CurrentSettings.CurrentGame).DisplayName);
 
+
+                //var s = new AnimMetaDataReportGenerator(_packfileService);
+                //s.Create(GameInformationFactory.GetGameById(settingsService.CurrentSettings.CurrentGame).DisplayName);
+                //
                 //OpenFile(packfileService.FindFile(@"terrain\campaigns\wh2_main_great_vortex_map_1\global_meshes\land_mesh_20.rigid_model_v2"));
                 //CommonControls.FormatResearch.TerrainRmv2Decoder.CreateTerrainCustom(_packfileService);
                 //OpenFile(packfileService.FindFile(@"terrain\tiles\campaign\dwarf_custom\86x57_karaz_a_karak\custom_mesh.rigid_model_v2"));
@@ -116,16 +120,16 @@ namespace AssetEditor.ViewModels
                 //AnimMetaBatchProcessor processor = new AnimMetaBatchProcessor();
                 //processor.BatchProcess(_packfileService, schemaManager, "Warhammer");
 
-                //AnimationEditor.SuperView.SuperViewViewModel_Debug.CreateThrot(this, toolFactory, packfileService);
+                AnimationEditor.SuperView.SuperViewViewModel_Debug.CreateThrot(this, toolFactory, packfileService);
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
 
 
-                var gameName = GameInformationFactory.GetGameById(GameTypeEnum.Rome_2_Remastered).DisplayName;
-                var romePath = settingsService.GetGamePathForGame(GameTypeEnum.Rome_2_Remastered);
-                var loadRes = _packfileService.LoadAllCaFiles(romePath, gameName);
-
+                //var gameName = GameInformationFactory.GetGameById(GameTypeEnum.Rome_2_Remastered).DisplayName;
+                //var romePath = settingsService.GetGamePathForGame(GameTypeEnum.Rome_2_Remastered);
+                //var loadRes = _packfileService.LoadAllCaFiles(romePath, gameName);
+                ////
                 //AnimationEditor.MountAnimationCreator.MountAnimationCreator_Debug.CreateRome2WolfRider(this, toolFactory, packfileService);
-                AnimationEditor.MountAnimationCreator.MountAnimationCreator_Debug.CreateLionAndHu01c(this, toolFactory, packfileService);
+                //AnimationEditor.MountAnimationCreator.MountAnimationCreator_Debug.CreateLionAndHu01c(this, toolFactory, packfileService);
                 //KitbashEditor_Debug.CreateLoremasterHead(this, toolFactory, packfileService);
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateBowCentigor(this, toolFactory, packfileService);
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateGreatEagle(this, toolFactory, packfileService);
@@ -156,6 +160,7 @@ namespace AssetEditor.ViewModels
                 //KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);
+
 
                 CreateTestPackFiles(packfileService);
                 //TexturePreviewController.CreateFromFilePath(@"C:\Users\ole_k\Desktop\TroyOrc.dds", _packfileService);

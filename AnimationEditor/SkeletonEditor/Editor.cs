@@ -14,7 +14,7 @@ using System.Windows;
 using View3D.Animation;
 using View3D.Components.Rendering;
 
-namespace AnimationEditor.TechSkeletonEditor
+namespace AnimationEditor.SkeletonEditor
 {
     public class Editor : NotifyPropertyChangedImpl
     {

@@ -3,7 +3,6 @@ using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SuperView;
-using AnimationEditor.TechSkeletonEditor;
 using AssetEditor.Views.Settings;
 using CommonControls.BaseDialogs;
 using CommonControls.Common;
@@ -21,8 +20,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
+using AnimationEditor.SkeletonEditor;
 using AssetEditor.Report;
-using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 
 namespace AssetEditor.ViewModels
 {
@@ -274,7 +273,7 @@ namespace AssetEditor.ViewModels
 
         void OpenTechSkeletonEditor()
         {
-            var editorView = _toolFactory.CreateEditorViewModel<TechSkeletonEditorViewModel>();
+            var editorView = _toolFactory.CreateEditorViewModel<SkeletonEditorViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
 

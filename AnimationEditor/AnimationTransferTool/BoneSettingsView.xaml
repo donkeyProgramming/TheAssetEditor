@@ -107,7 +107,7 @@
                     </DockPanel>
                 </DockPanel>
 
-
+                <Button Grid.Row="4"  Content="Clear selected bone settings" Click="{s:MethodBinding ClearAllSettings}" Margin="2" />
             </StackPanel>
         </Grid>
 

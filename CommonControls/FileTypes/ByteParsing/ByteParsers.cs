@@ -38,6 +38,7 @@ namespace Filetypes.ByteParsing
         bool CanDecode(byte[] buffer, int index, out int bytesRead, out string error);
         byte[] Encode(string value, out string error);
         string DefaultValue();
+        object GetValueAsObject(byte[] buffer, int index, out int bytesRead);
     }
 
     public interface SpesificByteParser<T> : IByteParser
@@ -70,20 +71,30 @@ namespace Filetypes.ByteParsing
             return true;
         }
 
-        public virtual bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string _error)
+        public virtual bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string error)
         {
-            var result = TryDecodeValue(buffer, index, out T temp, out bytesRead, out _error);
+            var result = TryDecodeValue(buffer, index, out T temp, out bytesRead, out error);
             value = temp?.ToString();
             return result;
         }
 
-        public virtual bool TryDecodeValue(byte[] buffer, int index, out T value, out int bytesRead, out string _error)
+        public virtual bool TryDecodeValue(byte[] buffer, int index, out T value, out int bytesRead, out string error)
         {
             value = default;
-            bool canDecode = CanDecode(buffer, index, out bytesRead, out _error);
+            bool canDecode = CanDecode(buffer, index, out bytesRead, out error);
             if (canDecode)
                 value = Decode(buffer, index);
             return canDecode;
+        }
+
+        public object GetValueAsObject(byte[] buffer, int index, out int bytesRead)
+        {
+            bool canDecode = CanDecode(buffer, index, out bytesRead, out var error);
+            if (canDecode == false)
+                throw new Exception(error);
+
+            var value = Decode(buffer, index) as object;
+            return value;
         }
 
         public string DefaultValue()
@@ -338,6 +349,15 @@ namespace Filetypes.ByteParsing
             value = new Vector3(xValue, yValue, zValue);
             return x && y && z;
         }
+
+        public object GetValueAsObject(byte[] buffer, int index, out int bytesRead)
+        {
+            bool canDecode = TryDecodeValue(buffer, index, out var value, out bytesRead, out var error);
+            if (canDecode == false)
+                throw new Exception(error);
+
+            return value;
+        }
     }
 
     public class Vector4Parser : SpesificByteParser<Vector4>
@@ -431,6 +451,15 @@ namespace Filetypes.ByteParsing
             bytesRead = 16;
             value = new Vector4(xValue, yValue, zValue, wValue);
             return x && y && z && w;
+        }
+
+        public object GetValueAsObject(byte[] buffer, int index, out int bytesRead)
+        {
+            bool canDecode = TryDecodeValue(buffer, index, out var value, out bytesRead, out var error);
+            if (canDecode == false)
+                throw new Exception(error);
+
+            return value;
         }
     }
 
@@ -613,6 +642,15 @@ namespace Filetypes.ByteParsing
             else
                 return new byte[1] { 0 };
         }
+
+        public object GetValueAsObject(byte[] buffer, int index, out int bytesRead)
+        {
+            bool canDecode = TryDecodeValue(buffer, index, out var value, out bytesRead, out var error);
+            if (canDecode == false)
+                throw new Exception(error);
+
+            return value;
+        }
     }
 
     public class StringParser : SpesificByteParser<string>
@@ -785,6 +823,15 @@ namespace Filetypes.ByteParsing
         public string DefaultValue()
         {
             return "";
+        }
+
+        public object GetValueAsObject(byte[] buffer, int index, out int bytesRead)
+        {
+            bool canDecode = TryDecodeValue(buffer, index, out var value, out bytesRead, out var error);
+            if (canDecode == false)
+                throw new Exception(error);
+
+            return value;
         }
     }
 

@@ -9,7 +9,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Expander IsExpanded="True" Grid.Row="2" Header="Mount link shortcut:">
-        <Border BorderBrush="Gray" BorderThickness="0">
+        <Border BorderBrush="Gray" BorderThickness="0" Margin="10,5,10,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
@@ -40,7 +40,7 @@
                           ItemsSource="{Binding MountLinkController.SelectedMount.Values}" 
                           SelectedItem="{Binding MountLinkController.SelectedMount.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                 
-                <Button  Content="..." Grid.Column="3" Grid.Row="0" Width="25" Margin="2"  Click="{s:MethodBinding ViewMountFragment}"/>
+                <Button  Content="..." Grid.Column="3" Grid.Row="0" Width="25" Margin="2"  Click="{s:MethodBinding ViewMountFragmentAction}"/>
 
                 <Label Grid.Column="0" Grid.Row="1" Content="Rider"/>
                 <Label Grid.Column="1" Grid.Row="1" Content=":"/>
@@ -51,7 +51,7 @@
                           Text="{Binding MountLinkController.SelectedRider.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                           ItemsSource="{Binding MountLinkController.SelectedRider.Values}" 
                           SelectedItem="{Binding MountLinkController.SelectedRider.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                <Button Content="..." Grid.Column="3" Grid.Row="1" Width="25" Margin="2"  Click="{s:MethodBinding ViewRiderFragment}"/>
+                <Button Content="..." Grid.Column="3" Grid.Row="1" Width="25" Margin="2"  Click="{s:MethodBinding ViewRiderFragmentAction}"/>
 
                 <Label Grid.Column="0" Grid.Row="2" Content="Mount tag"/>
                 <Label Grid.Column="1" Grid.Row="2" Content=":"/>
