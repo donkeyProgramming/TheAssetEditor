@@ -445,21 +445,23 @@ Fixed 0.25
 	[Done]Bug converting anims to v5
 	[Done]Mount editor now works for mounging Rome and attila skeltons on v7 animations for older games
 	[Done]Minor animation saving errors 
+	[Done]Export mesh and skeleton at scale => Bug + update skeleton name 
+	[Done]assign skeleton while batching 
+	[Done]When saving anims, if framerat is negative, set 20
 	
-	Export mesh and skeleton at scale => Bug + update skeleton name 
-	assign skeleton while batching 
-	When saving anims, if framerat is negative, set 20
-	
+	Add the seach tool => projectiles\wh_lzd_terradon_rock_02.rigid_model_v2
 	batch export "not working on current folder" => prefix? 
 	Privous frame 
 	Animation speed mult
 	Show time in animation player alongside frame
 	Alpha yes|no
 	Edit texture dir 
+	deleting texture brings it back on save/load
 	Save decal models => dont override material type if there is no need => move to tool instead of save 
 	Some warning about converting troy => rome about textures?
 	Meta editor improvements 
 	AnimTransfer => To and from self => auto map
+	
 	
 	
 	

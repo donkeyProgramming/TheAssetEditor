@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
-    [MetaEntry("PROP", 10)]
+    [MetaData("PROP", 10)]
     public class Prop_v10 : MetaEntryBase
     {
         [MetaDataTag(5, "Path to model. Probably has to be of the \"rigid\" vertex type, so no animated models")]

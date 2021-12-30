@@ -942,6 +942,8 @@
         ]
       }
     ],
+
+
     "NOT_BUILDING": [
       {
         "TableName": "NOT_BUILDING",
@@ -1156,6 +1158,8 @@
         ]
       }
     ],
+
+
     "FULL_BODY": [
       {
         "TableName": "FULL_BODY",
@@ -1974,6 +1978,10 @@
         ]
       }
     ],
+
+
+
+
     "DISABLE_PERSISTENT_ID": [
       {
         "TableName": "DISABLE_PERSISTENT_ID",
@@ -2462,6 +2470,8 @@
         ]
       }
     ],
+
+
     "MAX_TARGET_SIZE": [
       {
         "TableName": "MAX_TARGET_SIZE",
@@ -2815,7 +2825,7 @@
             "IsOptional": false,
             "MaxLength": 0,
             "IsFileName": false,
-            "Description":  "Min = 0, Max = 100",
+            "Description": "Min = 0, Max = 100",
             "FilenameRelativePath": null,
             "Type": "Single"
           },
@@ -2831,10 +2841,10 @@
             "FilenameRelativePath": null,
             "Type": "String"
           }
-	
+
         ]
       },
-	   {
+      {
         "TableName": "SPLASH_ATTACK",
         "Version": 11,
         "ColumnDefinitions": [
@@ -2978,7 +2988,7 @@
             "IsOptional": false,
             "MaxLength": 0,
             "IsFileName": false,
-            "Description":  "Min = 0, Max = 100",
+            "Description": "Min = 0, Max = 100",
             "FilenameRelativePath": null,
             "Type": "Single"
           },
@@ -2994,7 +3004,7 @@
             "FilenameRelativePath": null,
             "Type": "String"
           },
-		   {
+          {
             "Name": "Strength at end",
             "FieldReference": null,
             "TableReference": null,
@@ -3002,14 +3012,16 @@
             "IsOptional": false,
             "MaxLength": 0,
             "IsFileName": false,
-            "Description":  "Min = 0, Max = 1",
+            "Description": "Min = 0, Max = 1",
             "FilenameRelativePath": null,
             "Type": "Single"
           }
-	
+
         ]
       }
     ],
+
+
     "SPLICE": [
       {
         "TableName": "SPLICE",
@@ -3281,7 +3293,7 @@
           }
         ]
       },
-	  {
+      {
         "TableName": "SPLICE",
         "Version": 11,
         "ColumnDefinitions": [
@@ -3528,6 +3540,8 @@
         ]
       }
     ],
+
+
     "BEARING": [
       {
         "TableName": "BEARING",
@@ -3608,6 +3622,8 @@
         ]
       }
     ],
+
+
     "DOCK_EQPT_RHAND": [
       {
         "TableName": "DOCK_EQPT_RHAND",
@@ -4128,6 +4144,8 @@
         ]
       }
     ],
+
+
     "WEAPON_HIP": [
       {
         "TableName": "WEAPON_HIP",

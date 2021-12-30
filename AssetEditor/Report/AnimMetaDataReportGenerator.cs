@@ -14,6 +14,16 @@ namespace AssetEditor.Report
 {
     class AnimMetaDataReportGenerator
     {
+        class FileReport
+        { 
+            //public string MetaType { get; set; }
+            public int FailedFiles { get; set; }
+            public int CompletedFiles { get; set; }
+            public List<string> Rows { get; set; } = new List<string>();
+        }
+
+
+
         PackFileService _pfs;
         public AnimMetaDataReportGenerator(PackFileService pfs)
         {
@@ -22,33 +32,64 @@ namespace AssetEditor.Report
 
         public void Create(string gameDirectory, string outputDir = @"c:\temp\AssReports\Meta\")
         {
+            var output = new Dictionary<string, FileReport>();
+            
             var fileList = _pfs.FindAllWithExtentionIncludePaths(".meta");
+
+
 
             var metaTable = new List<(string Path, MetaDataFile File)>();
             for (int i = 0; i < fileList.Count; i++)
             {
+                var fileName = fileList[i].FileName;
+                var packFile = fileList[i].Pack;
                 try
                 {
-                    var meteData = MetaDataFileParser.ParseFileV2(fileList[i].Item2.DataSource.ReadData());
+                    var metaData = MetaDataFileParser.ParseFileV2(packFile.DataSource.ReadData());
+                    metaTable.Add( (fileName, metaData) );
 
-                    if (fileList[i].Item1.Contains("aim", StringComparison.InvariantCultureIgnoreCase))
-                    { 
-                    
-                    }
 
-                    var props = meteData.GetUnkItemsOfType("animated_prop", false);
+                    var props = metaData.GetUnkItemsOfType("animated_prop", false);
                     if (props.Count() != 0)
-                    { 
-                        var res = MetaEntrySerializer.DeSerialize(props.First());
+                    {
+                        //var res = MetaEntrySerializer.DeSerialize(props.First());
+                   
+
+                        foreach (var metaItem in props)
+                        {
+                            try
+                            {
+                                var d = MetaEntrySerializer.DeSerializeToStrings(metaItem);
+                               
+
+                                //using var stream = new MemoryStream() ;
+                              
+
+
+                            }
+                            catch
+                            { 
+
+                            }
+
+                            // Is OK? => Error
+                            // Convert to CSV
+                            // Add to output for given type
+                        }
                     }
 
-                    metaTable.Add( (fileList[i].Item1, meteData) );
+
+
+                    // Decode
                 }
                 catch
                 {
                     metaTable.Add((fileList[i].Item1, null));
                 }
             }
+
+
+
 
             // Create overview
             var overViewList = metaTable
@@ -58,7 +99,7 @@ namespace AssetEditor.Report
                 {
                     MetaTagName = x.First().Name + "_" + x.First().Version,
                     Count = x.Count(),
-                    DecodedCorrectly = x.Count(x=>x.DecodedCorrectly == false) == 0
+                    DecodedCorrectly = x.Count(x=>x.DecodedCorrectly == false) == 0,
                 })
                 .OrderByDescending(x=>x.MetaTagName)
                 .ToList();

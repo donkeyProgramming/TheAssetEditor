@@ -66,7 +66,7 @@ namespace CommonControls.Services
         }
 
 
-        public List<ValueTuple<string, PackFile>> FindAllWithExtentionIncludePaths(string extention, PackFileContainer packFileContainer = null)
+        public List<(string FileName, PackFile Pack)> FindAllWithExtentionIncludePaths(string extention, PackFileContainer packFileContainer = null)
         {
             extention = extention.ToLower();
             var output = new List<ValueTuple<string, PackFile>>();

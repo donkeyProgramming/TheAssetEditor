@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
-    [MetaEntry("ANIMATED_PROP", 10)]
+    [MetaData("ANIMATED_PROP", 10)]
     public class AnimatedProp_v10 : MetaEntryBase
     {
         [MetaDataTag(5)]
@@ -20,7 +20,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         [MetaDataTag(8)]
         public Vector3 Position { get; set; }
 
-        [MetaDataTag(9)]
+        [MetaDataTag(9, "", MetaDataTagAttribute.DisplayType.EulerVector)]
         public Vector4 Orientation { get; set; }
 
         [MetaDataTag(10)]
@@ -33,7 +33,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public int OverrideProp { get; set; }
     }
 
-    [MetaEntry("ANIMATED_PROP", 11)]
+    [MetaData("ANIMATED_PROP", 11)]
     public class AnimatedProp_v11 : AnimatedProp_v10
     {
         [MetaDataTag(13)]
