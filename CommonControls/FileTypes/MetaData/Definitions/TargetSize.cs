@@ -8,14 +8,14 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 
     public class TargetSize : MetaEntryBase
     {
-        [MetaDataTag(5)]
+        [MetaDataTag(5, "Likely an enum related to unit size. Maybe 0=large, 1=medium, 2=small, 3=very_large, 4=very_small")]
         public int MaxTargetSize { get; set; }
 
         [MetaDataTag(6)]
         public int Unk0 { get; set; }
 
         [MetaDataTag(7)]
-        public bool Unk1 { get; set; }
+        public int Unk1 { get; set; }
     }
 
     [MetaData("MAX_TARGET_SIZE", 10)]

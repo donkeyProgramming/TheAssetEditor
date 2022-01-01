@@ -4,11 +4,10 @@ using System.Text;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
-
-    [MetaData("IMPACT_SPEED", 10)]
-    public class ImpactSpeed_v10 : MetaEntryBase
+    [MetaData("ALLOWED_DELTA_SCALE", 10)]
+    public class AllowDeltaScale_v10 : MetaEntryBase
     {
         [MetaDataTag(5)]
-        public float Speed { get; set; }
+        public float Value { get; set; }
     }
 }

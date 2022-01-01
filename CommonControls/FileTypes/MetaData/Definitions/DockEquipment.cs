@@ -9,9 +9,12 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     {
         [MetaDataTag(5, "0=\"Weapon Bone 1\" in .frg but \"be_prop_0\" in a typical VMD. 1=\"Weapon Bone 2\" in .frg but \"be_prop_1\" in VMD. etc.")]
         public int PropBoneId { get; set; }
+        
+        [MetaDataTag(6) ]
+        public float BlendInTime { get; set; }
 
-        public float Unk0 { get; set; }
-        public float Unk1 { get; set; }
+        [MetaDataTag(7)]
+        public float BlendOutTime { get; set; }
     }
 
     [MetaData("DOCK_EQPT_RHAND", 10)]
@@ -51,6 +54,11 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 
     [MetaData("WEAPON_LHAND", 10)]
     public class WeaponLHand_v10 : DockEquipment
+    {
+    }
+
+    [MetaData("WEAPON_ON", 10)]
+    public class WeaponOn_v10 : DockEquipment
     {
     }
 }

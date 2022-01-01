@@ -4,8 +4,8 @@ using System.Text;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
-    [MetaData("SNIP", 10)]
-    public class Snip : MetaEntryBase
+    [MetaData("DISABLE_MODEL", 10)]
+    public class DisableModel : MetaEntryBase
     {
     }
 }

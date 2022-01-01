@@ -4,8 +4,10 @@ using System.Text;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
-    [MetaData("SNIP", 10)]
-    public class Snip : MetaEntryBase
+    [MetaData("DISTANCE", 10)]
+    public class Distance_v10 : MetaEntryBase
     {
+        [MetaDataTag(5)]
+        public float Value { get; set; }
     }
 }

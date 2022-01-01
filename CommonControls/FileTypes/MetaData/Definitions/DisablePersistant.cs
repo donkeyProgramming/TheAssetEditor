@@ -8,4 +8,9 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     public class DisablePersistant_v10 : MetaEntryBase
     {
     }
+
+    [MetaData("DISABLE_PERSISTENT_VFX", 10)]
+    public class DisablePersistantVfx_v10 : MetaEntryBase
+    {
+    }
 }

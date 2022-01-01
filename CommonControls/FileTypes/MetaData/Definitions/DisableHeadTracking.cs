@@ -4,8 +4,8 @@ using System.Text;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
-    [MetaData("SNIP", 10)]
-    public class Snip : MetaEntryBase
+    [MetaData("DISABLE_HEAD_TRACKING", 10)]
+    public class DisableHeadTracking_v10 : MetaEntryBase
     {
     }
 }

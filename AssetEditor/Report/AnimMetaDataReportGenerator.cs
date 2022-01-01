@@ -1,6 +1,8 @@
-﻿using CommonControls.FileTypes.MetaData;
+﻿using CommonControls.Common;
+using CommonControls.FileTypes.MetaData;
 using CommonControls.Services;
 using CsvHelper;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -14,14 +16,15 @@ namespace AssetEditor.Report
 {
     class AnimMetaDataReportGenerator
     {
-        class FileReport
-        { 
-            //public string MetaType { get; set; }
-            public int FailedFiles { get; set; }
-            public int CompletedFiles { get; set; }
-            public List<string> Rows { get; set; } = new List<string>();
-        }
+        ILogger _logger = Logging.Create<AnimMetaDataReportGenerator>();
 
+        class FileReport
+        {
+            //public string MetaType { get; set; }
+            public List<string> FailedFiles { get; set; } = new List<string>();
+            public List<string> CompletedFiles { get; set; } = new List<string>();
+            public List<string> Headers { get; set; } = new List<string>() { "FileName", "Error"};
+        }
 
 
         PackFileService _pfs;
@@ -32,11 +35,19 @@ namespace AssetEditor.Report
 
         public void Create(string gameDirectory, string outputDir = @"c:\temp\AssReports\Meta\")
         {
+            // Create folders
+            var gameOutputDir = outputDir + $"\\{gameDirectory}\\";
+            var gameOutputDirFailed = outputDir + $"\\{gameDirectory}\\Failed\\";
+            if (Directory.Exists(gameOutputDir))
+                Directory.Delete(gameOutputDir, true);
+            DirectoryHelper.EnsureCreated(gameOutputDir);
+            DirectoryHelper.EnsureCreated(gameOutputDirFailed);
+
             var output = new Dictionary<string, FileReport>();
             
             var fileList = _pfs.FindAllWithExtentionIncludePaths(".meta");
-
-
+            //fileList = fileList.Where(x => x.FileName.Contains("snd.meta") == false).ToList();
+            var failedFiles = new List<string>();
 
             var metaTable = new List<(string Path, MetaDataFile File)>();
             for (int i = 0; i < fileList.Count; i++)
@@ -45,120 +56,97 @@ namespace AssetEditor.Report
                 var packFile = fileList[i].Pack;
                 try
                 {
-                    var metaData = MetaDataFileParser.ParseFileV2(packFile.DataSource.ReadData());
+                    var data = packFile.DataSource.ReadData();
+                    if (data.Length == 0)
+                        continue;
+                    var metaData = MetaDataFileParser.ParseFileV2(data);
                     metaTable.Add( (fileName, metaData) );
 
-
-                    var props = metaData.GetUnkItemsOfType("animated_prop", false);
-                    if (props.Count() != 0)
+                    var completedTags = 0;
+                    foreach (var item in metaData.Items)
                     {
-                        //var res = MetaEntrySerializer.DeSerialize(props.First());
-                   
+                        var tagName = item.Name + "_v" + item.Version;
+                        tagName = tagName.ToLower();
 
-                        foreach (var metaItem in props)
+                        if (output.ContainsKey(tagName) == false)
+                            output[tagName] = new FileReport();
+
+                        try
                         {
-                            try
+                            var variables = MetaEntrySerializer.DeSerializeToStrings(item);
+
+                            if (output[tagName].CompletedFiles.Count == 0)
                             {
-                                var d = MetaEntrySerializer.DeSerializeToStrings(metaItem);
-                               
-
-                                //using var stream = new MemoryStream() ;
-                              
-
-
-                            }
-                            catch
-                            { 
-
+                                foreach (var variable in variables)
+                                    output[tagName].Headers.Add(variable.Header);
                             }
 
-                            // Is OK? => Error
-                            // Convert to CSV
-                            // Add to output for given type
+                            var variableValues = variables.Select(x => x.Value).ToList();
+                            variableValues.Insert(0, fileName);
+                            variableValues.Insert(1, "");
+
+                            output[tagName].CompletedFiles.Add(string.Join("|", variableValues));
+                            completedTags++;
+                        }
+                        catch(Exception e)
+                        {
+                            var variableValues = new List<string>() { fileName, e.Message };
+                            output[tagName].FailedFiles.Add(string.Join("|", variableValues));
                         }
                     }
 
-
-
-                    // Decode
+                    _logger.Here().Information($"File processed {i}/{fileList.Count} - {completedTags}/{metaData.Items.Count} tags loaded correctly");
                 }
                 catch
                 {
-                    metaTable.Add((fileList[i].Item1, null));
+                    _logger.Here().Information($"File processed {i}/{fileList.Count} - Parsing failed completly");
+                    failedFiles.Add(fileName);
                 }
             }
 
-
-
-
-            // Create overview
-            var overViewList = metaTable
-                .SelectMany(x=>x.File.Items)
-                .GroupBy(x => x.Name + "_" + x.Version)
-                .Select(x => new 
+            // Write the data 
+            foreach (var item in output)
+            {
+                if (item.Value.CompletedFiles.Count != 0)
                 {
-                    MetaTagName = x.First().Name + "_" + x.First().Version,
-                    Count = x.Count(),
-                    DecodedCorrectly = x.Count(x=>x.DecodedCorrectly == false) == 0,
-                })
-                .OrderByDescending(x=>x.MetaTagName)
+                    var content = new StringWriter();
+                    content.WriteLine("sep=|");
+                    content.WriteLine(string.Join("|", item.Value.Headers));
+                    foreach (var competed in item.Value.CompletedFiles)
+                        content.WriteLine(competed);
+
+                    var fileName = gameOutputDir + item.Key + $"_{item.Value.CompletedFiles.Count}.csv";
+                    File.WriteAllText(fileName, content.ToString());
+                }
+
+                if (item.Value.FailedFiles.Count != 0)
+                {
+                    var content = new StringWriter();
+                    content.WriteLine("sep=|");
+                    foreach (var failed in item.Value.FailedFiles)
+                        content.WriteLine(failed);
+
+                    var fileName = gameOutputDirFailed + item.Key + $"_{item.Value.FailedFiles.Count}.csv";
+                    File.WriteAllText(fileName, content.ToString());
+                }
+            }
+
+            var orderedOutputList = output
+                .GroupBy(x => x.Value.CompletedFiles.Count / (x.Value.FailedFiles.Count + x.Value.CompletedFiles.Count))
                 .ToList();
 
-
-
-            //var prop  =overViewList.Where(x => x.MetaTagName == "ANIMATED_PROP_11").FirstOrDefault();
-
-          
-
-            var outputTagList = new Dictionary<string, List<dynamic>>();
-            foreach (var metaFile in metaTable)
+            foreach (var item in output)
             {
-                foreach (var metaTag in metaFile.File.Items)
-                {
-                    var tagName = metaTag.Name + "_" + metaTag.Version;
+                var content = new StringWriter();
+                content.WriteLine("sep=|");
 
-                    if (outputTagList.ContainsKey(tagName) == false)
-                        outputTagList[tagName] = new List<dynamic>();
+                var str = $"{item.Key}| {item.Value.CompletedFiles.Count}/{item.Value.CompletedFiles.Count + item.Value.FailedFiles.Count}";
+                _logger.Here().Information(str);
+                content.WriteLine(str);
 
-                    dynamic rowItem = new ExpandoObject();
-                    rowItem.Path = metaFile.Path;
-                    rowItem.DecodedCorrectly = metaTag.DecodedCorrectly;
-
-                    outputTagList[tagName].Add(rowItem);
-                }
+                var fileName = gameOutputDir + "Summary.csv";
+                File.WriteAllText(fileName, content.ToString());
             }
-
-
-
-            // Overview game:
-            //      Tag, count, OK
-
-            // Where
-            //      N files Tag_version_game_count_hasError
-            //      FileName | Values
-
-
-
-
-            //var failedMeshRecords = new List<dynamic>();
-            //var versionInfoRecords = new List<dynamic>();
-            //var weightedMaterialRecords = new List<dynamic>();
-            //
-            //try
-            //{
-            //    var fullOutputDir = outputDir + gameDirectory + "\\";
-            //
-            //    CommonControls.Common.DirectoryHelper.EnsureCreated(outputDir);
-            //    Write(failedMeshRecords, outputDir + "LoadResult.csv");
-            //    Write(versionInfoRecords, outputDir + "VersionAndMaterialInfo.csv");
-            //    Write(weightedMaterialRecords, outputDir + "WeightedMaterialInfo.csv");
-            //
-            //    MessageBox.Show($"Done - Created at {outputDir}");
-            //}
-            //catch
-            //{
-            //    MessageBox.Show("Unable to write reports to file!");
-            //}
         }
 
         void Write(List<dynamic> dataRecords, string filePath)
