@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CommonControls.FileTypes.Sound.WWise.Hirc.V122
 {
-    public class CAkDialogueEvent : HircItem
+    public class CAkDialogueEvent_v122 : HircItem
     {
 
         public byte uProbability;
@@ -103,7 +103,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V122
             }
         }
 
-        public class SoundNode
+        public class SoundNode 
         {
             public uint key;
             public uint audioNodeId;

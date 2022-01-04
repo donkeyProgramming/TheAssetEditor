@@ -6,7 +6,7 @@ using System.Text;
 
 namespace CommonControls.FileTypes.Sound.WWise.Hirc.V122
 {
-    public class CAkLayerCntr : HircItem
+    public class CAkLayerCntr_v122 : HircItem
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public Children Children { get; set; }

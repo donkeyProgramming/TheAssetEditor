@@ -19,7 +19,6 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
 
         public override uint GetParentId() => NodeBaseParams.DirectParentID;
         public override uint GetSourceId() => AkBankSourceData.akMediaInformation.SourceId;
-
     }
 
     public class AkBankSourceData

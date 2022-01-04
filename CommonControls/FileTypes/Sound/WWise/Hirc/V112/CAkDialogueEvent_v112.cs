@@ -2,11 +2,12 @@
 using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
 {
-    public class CAkDialogueEvent : HircItem
+    public class CAkDialogueEvent_v112 : CAkDialogueEvent
     {
 
         public byte uProbability;
@@ -15,6 +16,8 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
         public uint uTreeDataSize;
         public byte uMode;
         public AkDecisionTree AkDecisionTree;
+
+        public override List<Node> Nodes => AkDecisionTree.Root.ChildNodes;
 
         protected override void Create(ByteChunk chunk)
         {
@@ -25,12 +28,15 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
             uMode = chunk.ReadByte();
             AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth);
         }
+
+
+
     }
 
 
     public class AkDecisionTree
     {
-        public class Node
+        public class Node : CAkDialogueEvent.Node
         {
             public uint key;
             public ushort children_uIdx;
@@ -38,8 +44,8 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
             public ushort uWeight;
             public ushort uProbability;
 
-            public List<Node> Children { get; set; } = new List<Node>();
-            public List<SoundNode> SoundNodes { get; set; } = new List<SoundNode>();
+            public List<Node> _childNodes { get; } = new List<Node>();
+            public List<SoundNode> _soundNodes { get; set; } = new List<SoundNode>();
 
             public Node()
             {
@@ -58,30 +64,29 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
                         uProbability = chunk.ReadUShort(),
                     };
 
-                    Children.Add(node);
+                    _childNodes.Add(node);
                 }
 
-
+                foreach (var child in _childNodes)
                 {
-                    foreach (var child in Children)
+                    if (currentTreeDepth != maxTreeDepth)
+                        child.Parse(chunk, child.children_uCount, currentTreeDepth + 1, maxTreeDepth);
+                    else
                     {
-                        if (currentTreeDepth != maxTreeDepth)
-                            child.Parse(chunk, child.children_uCount, currentTreeDepth + 1, maxTreeDepth);
-                        else
-                        {
-                            for (uint i = 0; i < child.children_uCount; i++)
-                                child.SoundNodes.Add(new SoundNode(chunk));
-                        }
-
+                        for (uint i = 0; i < child.children_uCount; i++)
+                            child._soundNodes.Add(new SoundNode(chunk));
                     }
+
                 }
-
-
-
             }
+
+            public override uint Key => key;
+
+            public override List<CAkDialogueEvent.Node> ChildNodes => new List<CAkDialogueEvent.Node>(_childNodes);
+            public override List<CAkDialogueEvent.SoundNode> SoundNodes => new List<CAkDialogueEvent.SoundNode>(_soundNodes);
         }
 
-        public class SoundNode
+        public class SoundNode : CAkDialogueEvent.SoundNode
         {
             public uint key;
             public uint audioNodeId;
@@ -95,6 +100,10 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
                 uWeight = chunk.ReadUShort();
                 uProbability = chunk.ReadUShort();
             }
+
+            public override uint Key => key;
+
+            public override uint AudioNodeId => audioNodeId;
         }
 
         public Node Root { get; set; }

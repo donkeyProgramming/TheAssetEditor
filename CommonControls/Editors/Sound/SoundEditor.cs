@@ -37,10 +37,14 @@ namespace CommonControls.Editors.Sound
 
         public void CreateSoundMap()
         {
-            return;
-            var files = GetPackFileFiles();
-            //var files = GetAttilaFiles();
-            var nameHelper = GetNameHelper(files);
+            bool hardCodedAttilaMode = true;
+            List<PackFile> files;
+            if(hardCodedAttilaMode)
+                files = GetAttilaFiles();
+            else
+                files = GetPackFileFiles();
+
+            var nameHelper = GetNameHelper(files, @"C:\temp\SoundTesting\AttilaEvents.txt", hardCodedAttilaMode);
 
             var timer = new Stopwatch();
             timer.Start();
@@ -60,8 +64,8 @@ namespace CommonControls.Editors.Sound
             VisualEventSerializer serializer = new VisualEventSerializer();
             var output = serializer.Start(rootOutput);
 
-            File.WriteAllText(@"C:\temp\SoundTesting\Warhammer2RippedEvents.txt", output);
-            CreateHircList(masterDb, @"C:\temp\SoundTesting\HircList.txt", nameHelper);
+            File.WriteAllText(@"C:\temp\SoundTesting\AttilaSoundTree.txt", output);
+            CreateHircList(masterDb, @"C:\temp\SoundTesting\AttilaHircList.txt", nameHelper);
         }
 
         List<PackFile> GetAttilaFiles()
@@ -84,10 +88,14 @@ namespace CommonControls.Editors.Sound
             return files;
         }
 
-        NameLookupHelper GetNameHelper(List<PackFile> files)
+        NameLookupHelper GetNameHelper(List<PackFile> files, string savePath, bool onlyAttilaHardCoded = false)
         {
             var masterDat = new SoundDatFile();
+            
             var datPackFiles = _pfs.FindAllWithExtention(".dat");
+
+            if (onlyAttilaHardCoded)
+                datPackFiles.Clear();
 
             foreach (var datPackFile in datPackFiles)
             {
@@ -99,6 +107,8 @@ namespace CommonControls.Editors.Sound
             var attilaDatFile = DatParser.Parse(attillaFile, true);
             masterDat.Merge(attilaDatFile);
 
+          
+
             var fileNameDump0 = files.Select(x => x.Name);
             var fileNameDump1 = files.Select(x => Path.GetFileNameWithoutExtension(x.Name));
             var fileNameDump3 = fileNameDump0.Union(fileNameDump1);
@@ -108,6 +118,8 @@ namespace CommonControls.Editors.Sound
                 masterDat.Event3.Add(new SoundDatFile.EventType3() { EventName = item });
 
             var nameHelper = new NameLookupHelper(masterDat.CreateFileNameList());
+
+            masterDat.SaveTextVersion(savePath, nameHelper);
             return nameHelper;
         }
 
@@ -247,9 +259,27 @@ namespace CommonControls.Editors.Sound
             var totalItems = db.HircList.SelectMany(x => x.Value.Select(y => y.Id)).ToList();
             var totalUniqueItems = totalItems.Distinct();
 
-            output.AppendLine($"Item count: {totalItems.Count}");
-            output.AppendLine($"Distinct count: {totalUniqueItems.Count()}");
+            var flatList = db.HircList.SelectMany(x => x.Value).ToList();
+            var grouped = flatList.GroupBy(x => x.Type).ToList();
+            var overviewData = grouped.Select(x => new
+            {
+                Name = x.Key,
+                TotalCount = x.Count(),
+                UnknownCount = x.Count(y => y is FileTypes.Sound.WWise.Hirc.CAkUnknown),
+                ErrorCount = x.Count(y => y.HasError)
+            }).ToList();
 
+            var failCount = flatList.Count(x => x.HasError);
+            var unknownCount = flatList.Count(x => x is FileTypes.Sound.WWise.Hirc.CAkUnknown);
+
+            output.AppendLine($"Hitc Item count: {totalItems.Count}");
+            output.AppendLine($"Distinct Hitc count: {totalUniqueItems.Count()}");
+            output.AppendLine($"Failed count: {failCount}");
+            output.AppendLine($"Unknown count: {unknownCount}");
+
+            output.AppendLine("\n-----------------------------\n");
+            foreach (var item in overviewData)
+                output.AppendLine($"{item.Name} - Errors: {item.ErrorCount} Unkowns: {item.UnknownCount}");
             output.AppendLine("\n-----------------------------\n");
 
            foreach(var itemCollection in db.HircList)

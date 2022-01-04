@@ -7,7 +7,7 @@ using System.Text;
 namespace CommonControls.FileTypes.Sound.WWise.Hirc.V122
 {
 
-    public class CAkSwitchCntr : HircItem
+    public class CAkSwitchCntr_v122 : HircItem
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public AkGroupType eGroupType { get; set; }

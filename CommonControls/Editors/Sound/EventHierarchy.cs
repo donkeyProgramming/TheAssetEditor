@@ -4,10 +4,10 @@ using System.Text;
 using CommonControls.FileTypes.Sound.WWise;
 using CommonControls.FileTypes.Sound.WWise.Hirc;
 using CommonControls.FileTypes.Sound.WWise.Hirc.V122;
+using MoreLinq;
 
 namespace CommonControls.Editors.Sound
 {
-
     public class EventHierarchy
     {
         string _ownerFileName;
@@ -66,7 +66,6 @@ namespace CommonControls.Editors.Sound
             }
         }
 
-
         void ProcessChild(CAkDialogueEvent item, VisualEventOutputNode currentNode)
         {
             var name = _nameHelper.GetName(item.Id);
@@ -74,14 +73,13 @@ namespace CommonControls.Editors.Sound
 
             // arguments id and name
 
-            foreach (var child in item.AkDecisionTree.Root.Children)
+            foreach (var child in item.Nodes)
                 ProcessAkDecisionTreeNode(child, node);
         }
 
         void ProcessChild(CAkAction item, VisualEventOutputNode currentNode)
         {
             var node = currentNode.AddChild($"CAkAction ActionType:[{item.GetActionType()}] \tId:[{item.Id}] ownerFile:[{item.OwnerFile}|{item.IndexInFile}]");
-
             var actionRefs = _db.GetHircObject(item.GetSoundId(), _ownerFileName, _errorNode);
             ProcessChildrenOfNode(actionRefs, node);
         }
@@ -94,26 +92,27 @@ namespace CommonControls.Editors.Sound
 
         void ProcessChild(CAkSwitchCntr item, VisualEventOutputNode currentNode)
         {
-            var node = currentNode.AddChild($"CAkSwitchCntr EnumGroup:[{_nameHelper.GetName(item.ulGroupID)}] \tDefault:[{_nameHelper.GetName(item.ulDefaultSwitch)}] \tId:[{item.Id}] \tParentId:[{item.NodeBaseParams.DirectParentID}] ownerFile:[{item.OwnerFile}|{item.IndexInFile}]" );
-            foreach (var switchCase in item.SwitchList)
+            var node = currentNode.AddChild($"CAkSwitchCntr EnumGroup:[{_nameHelper.GetName(item.GroupId)}] \tDefault:[{_nameHelper.GetName(item.DefaultSwitch)}] \tId:[{item.Id}] \tParentId:[{item.ParentId}] ownerFile:[{item.OwnerFile}|{item.IndexInFile}]" );
+            foreach (var switchCase in item.Items)
             {
                 var switchCaseNode = node.AddChild($"SwitchValue [{_nameHelper.GetName(switchCase.SwitchId)}]");
-                foreach (var child in switchCase.NodeIdList)
+                foreach (var child in switchCase.ChildNodeIds)
                 {
                     var childRefs = _db.GetHircObject(child, _ownerFileName, _errorNode);
                     ProcessChildrenOfNode(childRefs, switchCaseNode);
                 }
             }
         }
+
         void ProcessChild(CAkLayerCntr item, VisualEventOutputNode currentNode)
         {
-            var node = currentNode.AddChild($"CAkLayerCntr \tId:[{item.Id}] \tParentId:[{item.NodeBaseParams.DirectParentID}] ownerFile:[{item.OwnerFile}|{item.IndexInFile}]");
-            foreach (var layer in item.LayerList)
+            var node = currentNode.AddChild($"CAkLayerCntr \tId:[{item.Id}] \tParentId:[{item.ParentId}] ownerFile:[{item.OwnerFile}|{item.IndexInFile}]");
+            foreach (var layer in item.Layers)
             {
-                var switchCaseNode = node.AddChild($"LayerChildItem Id:[{layer.ulLayerID}] \trtpcID:[{_nameHelper.GetName(layer.rtpcID)}]");
-                foreach (var child in layer.CAssociatedChildDataList)
+                var switchCaseNode = node.AddChild($"LayerChildItem Id:[{layer.LayerId}] \trtpcID:[{_nameHelper.GetName(layer.RtpcID)}]");
+                foreach (var child in layer.AssociatedChildDataListIds)
                 {
-                    var childRefs = _db.GetHircObject(child.ulAssociatedChildID, _ownerFileName, _errorNode);
+                    var childRefs = _db.GetHircObject(child, _ownerFileName, _errorNode);
                     ProcessChildrenOfNode(childRefs, switchCaseNode);
                 }
             }
@@ -132,20 +131,20 @@ namespace CommonControls.Editors.Sound
 
 
 
-        void ProcessAkDecisionTreeNode(AkDecisionTree.Node node, VisualEventOutputNode currentOutputNode)
+        void ProcessAkDecisionTreeNode(CAkDialogueEvent.Node node, VisualEventOutputNode currentOutputNode)
         {
-            var name = _nameHelper.GetName(node.key);
-            var outputNode = currentOutputNode.AddChild($"DialogNode {name} Id:[{node.key}]");
+            var name = _nameHelper.GetName(node.Key);
+            var outputNode = currentOutputNode.AddChild($"DialogNode {name} Id:[{node.Key}]");
 
-            foreach (var childNode in node.Children)
+            foreach (var childNode in node.ChildNodes)
                 ProcessAkDecisionTreeNode(childNode, outputNode);
 
             foreach (var childNode in node.SoundNodes)
             {
-                var childNodeName = _nameHelper.GetName(childNode.key);
-                var soundChildNode = outputNode.AddChild($"Sound_Node {childNodeName}  Id:[{childNode.key}] AudioNodeId:[{childNode.audioNodeId}]");
+                var childNodeName = _nameHelper.GetName(childNode.Key);
+                var soundChildNode = outputNode.AddChild($"Sound_Node {childNodeName}  Id:[{childNode.Key}] AudioNodeId:[{childNode.AudioNodeId}]");
                     
-                var nextItems = _db.GetHircObject(childNode.audioNodeId, _ownerFileName, _errorNode);
+                var nextItems = _db.GetHircObject(childNode.AudioNodeId, _ownerFileName, _errorNode);
                 ProcessChildrenOfNode(nextItems, soundChildNode);
             }
         }
@@ -172,7 +171,8 @@ namespace CommonControls.Editors.Sound
             if (children.Count == 0)
                 currentOutputNode.Data += " No children found!";
 
-            foreach (var child in children)
+            var distinctChildren = children.DistinctBy(x=>x.Id).ToList();
+            foreach (var child in distinctChildren)
                 ProcessGenericChild(child, currentOutputNode);
         }
     }

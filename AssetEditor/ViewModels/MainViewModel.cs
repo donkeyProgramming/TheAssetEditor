@@ -62,7 +62,7 @@ namespace AssetEditor.ViewModels
 
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
             {
-                settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Attila;
+                settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Warhammer2;
                 var gamePath = settingsService.GetGamePathForCurrentGame();
                 if (gamePath != null)
                 {
@@ -81,9 +81,11 @@ namespace AssetEditor.ViewModels
                 //var r = new Rmv2Information(_packfileService);
                 //r.Create(GameInformationFactory.GetGameById(settingsService.CurrentSettings.CurrentGame).DisplayName);
 
+                //var soundEditor = new CommonControls.Editors.Sound.SoundEditor(packfileService);
+                //soundEditor.CreateSoundMap();
 
-                var s = new AnimMetaDataReportGenerator(_packfileService);
-                s.Create(GameInformationFactory.GetGameById(settingsService.CurrentSettings.CurrentGame).DisplayName);
+                //var s = new AnimMetaDataReportGenerator(_packfileService);
+                //s.Create(GameInformationFactory.GetGameById(settingsService.CurrentSettings.CurrentGame).DisplayName);
                 //
                 //OpenFile(packfileService.FindFile(@"terrain\campaigns\wh2_main_great_vortex_map_1\global_meshes\land_mesh_20.rigid_model_v2"));
                 //CommonControls.FormatResearch.TerrainRmv2Decoder.CreateTerrainCustom(_packfileService);
@@ -120,7 +122,7 @@ namespace AssetEditor.ViewModels
                 //AnimMetaBatchProcessor processor = new AnimMetaBatchProcessor();
                 //processor.BatchProcess(_packfileService, schemaManager, "Warhammer");
 
-                AnimationEditor.SuperView.SuperViewViewModel_Debug.CreateThrot(this, toolFactory, packfileService);
+                //AnimationEditor.SuperView.SuperViewViewModel_Debug.CreateThrot(this, toolFactory, packfileService);
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
 
 
@@ -137,8 +139,6 @@ namespace AssetEditor.ViewModels
                 //
 
 
-                //var soundEditor = new CommonControls.Editors.Sound.SoundEditor(packfileService);
-                //soundEditor.CreateSoundMap();
 
                 //packfileService.DeepSearch("wh2_main_vor_deadwood_the_frozen_city", false);
                 //packfileService.DeepSearch("31x11_dragonback_skew_mirror_01", false);

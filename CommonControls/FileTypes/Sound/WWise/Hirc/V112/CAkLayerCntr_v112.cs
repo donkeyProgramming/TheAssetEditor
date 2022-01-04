@@ -2,16 +2,22 @@
 using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
 {
-    public class CAkLayerCntr : HircItem
+
+
+
+    public class CAkLayerCntr_v112 : CAkLayerCntr
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public Children Children { get; set; }
         public List<CAkLayer> LayerList { get; set; } = new List<CAkLayer>();
         public byte bIsContinuousValidation { get; set; }
+
+
 
         protected override void Create(ByteChunk chunk)
         {
@@ -24,6 +30,15 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
 
             bIsContinuousValidation = chunk.ReadByte();
         }
+
+        public override uint ParentId => NodeBaseParams.DirectParentID;
+
+        public override List<Layer> Layers => LayerList.Select(x=> new Layer() 
+        { 
+            LayerId = x.ulLayerID, 
+            RtpcID = x.rtpcID, 
+            AssociatedChildDataListIds = x.CAssociatedChildDataList.Select(y=>y.ulAssociatedChildID).ToList()
+        }).ToList();
     }
 
     public class CAkLayer
@@ -53,7 +68,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
     {
 
         public uint ulAssociatedChildID { get; set; }
-        public byte unknown_custom0 { get; set; }
+        public uint ulCurveSize { get; set; }
         public byte unknown_custom1 { get; set; }
         public List<AkRTPCGraphPoint> AkRTPCGraphPointList { get; set; } = new List<AkRTPCGraphPoint>();
 
@@ -61,10 +76,8 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
         {
             var instance = new CAssociatedChildData();
             instance.ulAssociatedChildID = chunk.ReadUInt32();
-            instance.unknown_custom0 = chunk.ReadByte();
-            instance.unknown_custom1 = chunk.ReadByte();
-            var pointCount = chunk.ReadUInt32();
-            for (int i = 0; i < pointCount; i++)
+            instance.ulCurveSize = chunk.ReadUInt32();
+            for (int i = 0; i < instance.ulCurveSize; i++)
                 instance.AkRTPCGraphPointList.Add(AkRTPCGraphPoint.Create(chunk));
             return instance;
         }

@@ -2,12 +2,13 @@
 using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
 {
 
-    public class CAkSwitchCntr_V112 : HircItem
+    public class CAkSwitchCntr_V112 : CAkSwitchCntr
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public AkGroupType eGroupType { get; set; }
@@ -36,6 +37,14 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
                 Parameters.Add(AkSwitchNodeParams.Create(chunk));
 
         }
+
+        public override uint GroupId => ulGroupID;
+
+        public override uint DefaultSwitch => ulDefaultSwitch;
+
+        public override uint ParentId => NodeBaseParams.DirectParentID;
+
+        public override List<SwitchListItem> Items => SwitchList.Select(x => new SwitchListItem() {  SwitchId = x.SwitchId,  ChildNodeIds = x.NodeIdList }).ToList();
     }
 
     public class Children

@@ -29,7 +29,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc
     }
 
 
-    public abstract class CADialogEvent_abs : HircItem
+    public abstract class CADialogEvent : HircItem
     {
         public abstract List<ChildNode> GetChildren();
 
@@ -45,6 +45,52 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc
         {
             public abstract uint GetKey();
             public abstract uint GetAudioNodeId();
+        }
+    }
+
+    public abstract class CAkSwitchCntr : HircItem
+    {
+        public abstract uint GroupId { get; }
+        public abstract uint DefaultSwitch { get; }
+        public abstract uint ParentId { get; }
+        public abstract List<SwitchListItem> Items { get; } 
+
+        public class SwitchListItem
+        {
+            public uint SwitchId { get; set; }
+            public List<uint> ChildNodeIds { get; set; }
+        }
+    }
+
+    public abstract class CAkLayerCntr : HircItem
+    {
+        public abstract uint ParentId { get; }
+        public abstract List<Layer> Layers { get; }
+
+        public class Layer
+        {
+            public uint LayerId { get; set; }
+            public uint RtpcID { get; set; }
+            public List<uint> AssociatedChildDataListIds { get; set; }
+        }
+    }
+
+    public abstract class CAkDialogueEvent : HircItem
+    { 
+        public abstract List<Node> Nodes { get; }
+    
+
+        public abstract class Node
+        {
+            abstract public uint Key { get; }
+            abstract public List<Node> ChildNodes { get; }
+            public abstract List<SoundNode> SoundNodes { get; }
+        }
+
+        public abstract class SoundNode
+        {
+            abstract public uint Key { get; }
+            abstract public uint AudioNodeId { get; }
         }
     }
 }

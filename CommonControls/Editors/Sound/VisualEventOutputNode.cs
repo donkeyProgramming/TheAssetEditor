@@ -25,11 +25,18 @@ namespace CommonControls.Editors.Sound
     public class VisualEventSerializer
     {
         StringBuilder _builder;
+
         public string Start(VisualEventOutputNode root)
         {
             _builder = new StringBuilder();
             HandleNode(root, 0);
             return GetStr();
+        }
+
+        public static string Process(VisualEventOutputNode root)
+        {
+            var serializer = new VisualEventSerializer();
+            return serializer.Start(root);
         }
 
         void HandleNode(VisualEventOutputNode node, int indentation)

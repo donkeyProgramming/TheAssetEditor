@@ -240,5 +240,42 @@ namespace CommonControls.FileTypes.Sound
 
             return output.ToArray();
         }
+
+        public void SaveTextVersion(string savePath, Editors.Sound.NameLookupHelper nameHelper)
+        {
+            StringBuilder output = new StringBuilder();
+            output.AppendLine($"Events (count:{Event0.Count}):");
+            foreach (var item in Event0)
+                output.AppendLine($"\t{item.EventName}[{item.Value}]");
+
+            output.AppendLine();
+            output.AppendLine($"Unkown (count:{Event1.Count}):");
+            foreach (var item in Event1)
+                output.AppendLine($"\t{item.EventName} [{string.Join(", ", item.Values.Select(x=>nameHelper.GetName(x)))}]");
+
+            output.AppendLine();
+            output.AppendLine($"Settings (count:{Event2.Count}) [minValue,maxValue]:");
+            foreach (var item in Event2)
+                output.AppendLine($"\t{item.EventName}[{item.MinValue}, {item.MinValue}]");
+
+            output.AppendLine();
+            output.AppendLine($"Enums group 0 (count:{EventBattleEnums.Count}):");
+            foreach (var item in EventBattleEnums)
+                output.AppendLine($"\t{item.EnumName} [{string.Join(", ", item.EnumValues)}]");
+
+            output.AppendLine();
+            output.AppendLine($"Enums group 1 (count:{EventCampaginEnums.Count}):");
+            foreach (var item in EventCampaginEnums)
+                output.AppendLine($"\t{item.EnumName} [{string.Join(", ", item.EnumValues)}]");
+
+            File.WriteAllText(savePath, output.ToString());
+            // Events 1 value
+            // Voice Events 3values
+            // Settings
+            // Values?
+            // bnk names
+            // Battle enums
+            // Campagin enims
+        }
     }
 }
