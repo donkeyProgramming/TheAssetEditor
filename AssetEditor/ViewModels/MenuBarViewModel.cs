@@ -62,7 +62,7 @@ namespace AssetEditor.ViewModels
         public ICommand OpenTechSkeletonEditorCommand { get; set; }
         public IEditorCreator EditorCreator { get; set; }
         public ICommand GenerateRmv2ReportCommand { get; set; }
-
+        public ICommand GenerateMetaDataReportCommand { get; set; }
         public ICommand CreateAnimPackWarhammerCommand { get; set; }
         public ICommand CreateAnimPack3kCommand { get; set; }
 
@@ -91,7 +91,8 @@ namespace AssetEditor.ViewModels
             OpenAnimationBatchExporterCommand = new RelayCommand(OpenAnimationBatchExporter);
             
             GenerateRmv2ReportCommand = new RelayCommand(GenerateRmv2Report);
-
+            GenerateMetaDataReportCommand = new RelayCommand(GenerateMetaDataReport);
+            
             OpenAttilaPacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Attila));
             OpenRome2RePacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Rome_2_Remastered));
             OpenThreeKingdomsPacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.ThreeKingdoms));
@@ -283,6 +284,13 @@ namespace AssetEditor.ViewModels
         {
             var gameName = GameInformationFactory.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
             var reportGenerator = new Rmv2ReportGenerator(_packfileService);
+            reportGenerator.Create(gameName);
+        }
+
+        void GenerateMetaDataReport()
+        {
+            var gameName = GameInformationFactory.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
+            var reportGenerator = new AnimMetaDataReportGenerator(_packfileService);
             reportGenerator.Create(gameName);
         }
 

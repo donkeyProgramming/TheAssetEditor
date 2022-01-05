@@ -62,7 +62,7 @@ namespace KitbasherEditor.ViewModels.PinTool
                 _selectedVertexList = selectionState.SelectedVertices.ToList();
 
                 SelectedForStaticMeshName.Value = _selectedVertexMesh.Name;
-                SelectedForStaticDescription.Value = $"Selected vertex count : {_selectedVertexList.Count}";
+                SelectedForStaticDescription.Value = $"Num selected verts: {_selectedVertexList.Count}";
             }
         }
 

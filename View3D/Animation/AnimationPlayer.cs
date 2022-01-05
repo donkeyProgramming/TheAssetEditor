@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CommonControls.Common;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -106,28 +107,22 @@ namespace View3D.Animation
                 if (_animationClip == null)
                     return 0;
 
-                return (int)Math.Round((_timeSinceStart.TotalMilliseconds / GetAnimationLengthMs()) * (_animationClip.DynamicFrames.Count() - 1) ) + 1; 
+                return (int)Math.Round((_timeSinceStart.TotalMilliseconds / GetAnimationLengthMs()) * (_animationClip.DynamicFrames.Count() - 1) ); 
             }
             set
             {
+          
                 if (CurrentFrame == value)
                     return;
 
                 if (_animationClip != null)
                 {
                     var frameCount = FrameCount();
+                    var frameIndex = MathUtil.EnsureRange(value, 0, frameCount);
 
-                    if (value < 0)
-                        value = 0;
-                    else if (value > frameCount)
-                        value = frameCount;
-
-                    if (frameCount > 0)
-                    {
-                        var framePercentage = (value / ((float)frameCount)) * GetAnimationLengthMs();
-                        _timeSinceStart = TimeSpan.FromMilliseconds(framePercentage);
-                    }
-
+                    var framePercentage = (frameIndex / ((float)frameCount)) * GetAnimationLengthMs();
+                    _timeSinceStart = TimeSpan.FromMilliseconds(framePercentage);
+                 
                     var currentFrame = CurrentFrame;
                     OnFrameChanged?.Invoke(currentFrame);
                 }

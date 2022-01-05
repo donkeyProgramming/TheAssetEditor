@@ -38,10 +38,10 @@ namespace View3D.SceneNodes
                 for (int modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
                 {
                     var geometry = MeshBuilderService.BuildMeshFromRmvModel(model.ModelList[lodIndex][modelIndex], model.Header.SkeletonName, contextFactory.Create());
-                    var node = new Rmv2MeshNode(model.ModelList[lodIndex][modelIndex], animationPlayer, geometry);
+                    var rmvModel = model.ModelList[lodIndex][modelIndex];
+                    var node = new Rmv2MeshNode(rmvModel.CommonHeader, geometry, rmvModel.Material, animationPlayer);
                     node.Initialize(resourceLibary);
                     
-
                     node.LodIndex = lodIndex;
                     lodNode.AddObject(node);
                 }

@@ -24,16 +24,16 @@
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Alpha"/>
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Use Alpha"/>
                 <Label>:</Label>
-                <ComboBox ItemsSource="{Binding MaterialGeneral.PossibleAlphaModes}" SelectedItem="{Binding MaterialGeneral.AlphaModeValue}" VerticalAlignment="Center"/>
+                <CheckBox IsChecked="{Binding MaterialGeneral.UseAlpha, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center"/>
             </StackPanel>
 
 
             <DockPanel DockPanel.Dock="Top">
                 <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Texture Directory"/>
                 <Label>:</Label>
-                <TextBox Text="{Binding MaterialGeneral.TextureDirectory, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" VerticalContentAlignment="Center"/>
+                <TextBox Text="{Binding MaterialGeneral.TextureDirectory, UpdateSourceTrigger=PropertyChanged,  Mode=TwoWay}" VerticalContentAlignment="Center"/>
             </DockPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">

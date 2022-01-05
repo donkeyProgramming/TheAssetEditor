@@ -431,11 +431,7 @@ Bugs:
 	[DONE]prophetess keeps disabling the alpha -> Change to true and false?
 	[DONE]Static mesh material type 
 	[DONE]Remove bn_ prefix from attachment points
-	Animation transfer tool => missing a frame when scaling bones 
-	Take pivot into account when selection (vertex)	
-	Show duplicate file error 
-	
-	
+
 Fixed 0.25
 	[Done]Skeleton editor
 	[Done]change texture path for missing textures 
@@ -448,33 +444,47 @@ Fixed 0.25
 	[Done]Export mesh and skeleton at scale => Bug + update skeleton name 
 	[Done]assign skeleton while batching 
 	[Done]When saving anims, if framerat is negative, set 20
+	[Done]MetaDataReport
+	[Done]Alpha yes|no
+	[Done]Edit texture dir 
+	[Done]Splitting mesh into logical parts copies something incorrectly. White mesh on face of wolf 
+	[Done]Take pivot into account when selection (vertex)	
+	[Done]Privous frame bug
 	
+	[X]Skeleton tool => copy past skeletons. Scale 
+	[X]AnimTransfer tool => Select output format
+	[X]Show duplicate file error 
+	
+	[?]deleting texture brings it back on save/load
+	Tools on menubar, including the old ctrl+x to not recombine assets when splitting
+	Redo
+	Fix keyboard focus 
 	Re-rigg selected vertexes only
-	Splitting mesh into logical parts copies something incorrectly. White mesh on face of wolf 
-	AnimTransfer tool => Select output format
-	Skeleton tool => copy past skeletons. Scale 
 	Pose tool 
 	Add the seach tool => projectiles\wh_lzd_terradon_rock_02.rigid_model_v2
 	batch export "not working on current folder" => prefix? 
-	Privous frame 
 	Animation speed mult
 	Show time in animation player alongside frame
-	Alpha yes|no
-	Edit texture dir 
-	deleting texture brings it back on save/load
 	Save decal models => dont override material type if there is no need => move to tool instead of save 
 	Some warning about converting troy => rome about textures?
 	Meta editor improvements 
 		copy
+	Create custom materials
 	AnimTransfer => To and from self => auto map
+	Fix audio tool for warhammer
+	Test audio tool for rome 2
+	Add contants from Viz to audio tool db 
+	Create custom audio tool 
+	
 	
 	Tutorials
-		Add attachment points
-		Scale sceleton (upload)
+		Add attachment points to skeleton 
+		Scale Skeleton (upload)
 		Convert shield to mesh 
 		Duplicate animation table
 		Create animated prop  meta
 		Create effect meta
+		Play around 
 	
 	
 	
@@ -496,5 +506,3 @@ Cool assetEditor projects:
 	https://steamcommunity.com/sharedfiles/filedetails/?id=1181220751&searchtext=
 	black karl franze mod 
 	Rat damsel 
-
-	

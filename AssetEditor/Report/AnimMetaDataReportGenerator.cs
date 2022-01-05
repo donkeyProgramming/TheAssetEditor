@@ -21,8 +21,8 @@ namespace AssetEditor.Report
         class FileReport
         {
             //public string MetaType { get; set; }
-            public List<string> FailedFiles { get; set; } = new List<string>();
-            public List<string> CompletedFiles { get; set; } = new List<string>();
+            public List<List<string>> FailedFiles { get; set; } = new List<List<string>>();
+            public List<List<string>> CompletedFiles { get; set; } = new List<List<string>>();
             public List<string> Headers { get; set; } = new List<string>() { "FileName", "Error"};
         }
 
@@ -46,7 +46,6 @@ namespace AssetEditor.Report
             var output = new Dictionary<string, FileReport>();
             
             var fileList = _pfs.FindAllWithExtentionIncludePaths(".meta");
-            //fileList = fileList.Where(x => x.FileName.Contains("snd.meta") == false).ToList();
             var failedFiles = new List<string>();
 
             var metaTable = new List<(string Path, MetaDataFile File)>();
@@ -85,13 +84,13 @@ namespace AssetEditor.Report
                             variableValues.Insert(0, fileName);
                             variableValues.Insert(1, "");
 
-                            output[tagName].CompletedFiles.Add(string.Join("|", variableValues));
+                            output[tagName].CompletedFiles.Add(variableValues);
                             completedTags++;
                         }
                         catch(Exception e)
                         {
                             var variableValues = new List<string>() { fileName, e.Message };
-                            output[tagName].FailedFiles.Add(string.Join("|", variableValues));
+                            output[tagName].FailedFiles.Add(variableValues);
                         }
                     }
 
@@ -113,7 +112,7 @@ namespace AssetEditor.Report
                     content.WriteLine("sep=|");
                     content.WriteLine(string.Join("|", item.Value.Headers));
                     foreach (var competed in item.Value.CompletedFiles)
-                        content.WriteLine(competed);
+                        content.WriteLine(string.Join("|", competed));
 
                     var fileName = gameOutputDir + item.Key + $"_{item.Value.CompletedFiles.Count}.csv";
                     File.WriteAllText(fileName, content.ToString());
@@ -124,16 +123,12 @@ namespace AssetEditor.Report
                     var content = new StringWriter();
                     content.WriteLine("sep=|");
                     foreach (var failed in item.Value.FailedFiles)
-                        content.WriteLine(failed);
+                        content.WriteLine(string.Join("|", failed));
 
                     var fileName = gameOutputDirFailed + item.Key + $"_{item.Value.FailedFiles.Count}.csv";
                     File.WriteAllText(fileName, content.ToString());
                 }
             }
-
-            var orderedOutputList = output
-                .GroupBy(x => x.Value.CompletedFiles.Count / (x.Value.FailedFiles.Count + x.Value.CompletedFiles.Count))
-                .ToList();
 
             foreach (var item in output)
             {
@@ -147,6 +142,23 @@ namespace AssetEditor.Report
                 var fileName = gameOutputDir + "Summary.csv";
                 File.WriteAllText(fileName, content.ToString());
             }
+
+            var commonHeaderContent = new StringWriter();
+            commonHeaderContent.WriteLine("sep=|");
+            commonHeaderContent.WriteLine("Type|FileName|Error|Version|StartTime|EndTime|Filter|Id");
+            foreach (var item in output)
+            {
+                foreach (var competed in item.Value.CompletedFiles)
+                {
+                    commonHeaderContent.Write(item.Key + "|");
+                    commonHeaderContent.WriteLine(string.Join("|", competed.Take(7)));
+                }
+            }
+
+            var commonHeaderFile = gameOutputDir + "CommonHeader.csv";
+            File.WriteAllText(commonHeaderFile, commonHeaderContent.ToString());
+
+            MessageBox.Show($"Done - Created at {outputDir}");
         }
 
         void Write(List<dynamic> dataRecords, string filePath)

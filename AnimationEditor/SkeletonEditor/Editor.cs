@@ -21,6 +21,7 @@ namespace AnimationEditor.SkeletonEditor
         PackFileService _pfs;
         AssetViewModel _techSkeletonNode;
         IComponentManager _componentManager;
+        CopyPasteManager _copyPasteManager;
 
         public NotifyAttr<string> SkeletonName { get; set; } = new NotifyAttr<string>("");
         public NotifyAttr<string> RefMeshName { get; set; } = new NotifyAttr<string>("");
@@ -42,7 +43,7 @@ namespace AnimationEditor.SkeletonEditor
 
         public Vector3ViewModel SelectedBoneRotationOffset { get; set; } = new Vector3ViewModel(0, 0, 0);
         public Vector3ViewModel SelectedBoneTranslationOffset { get; set; } = new Vector3ViewModel(0, 0, 0);
-        public DoubleViewModel BoneScale { get; set; } = new DoubleViewModel(1.5);
+        public DoubleViewModel BoneVisualScale { get; set; } = new DoubleViewModel(1.5);
 
         public ObservableCollection<SkeletonBoneNode> Bones { get; set; } = new ObservableCollection<SkeletonBoneNode>();
 
@@ -66,16 +67,32 @@ namespace AnimationEditor.SkeletonEditor
             set { SetTechSkeletonTransform(value); NotifyPropertyChanged(); }
         }
 
-        public Editor(PackFileService pfs, AssetViewModel techSkeletonNode, IComponentManager componentManager )
+        public DoubleViewModel BoneScale { get; set; } = new DoubleViewModel(1);
+        public NotifyAttr<bool> ApplyBoneScaleToChildren { get; set; } = new NotifyAttr<bool>(true);
+
+        public Editor(PackFileService pfs, AssetViewModel techSkeletonNode, IComponentManager componentManager, CopyPasteManager copyPasteManager)
         {
             _pfs = pfs;
             _techSkeletonNode = techSkeletonNode;
             _componentManager = componentManager;
+            _copyPasteManager = copyPasteManager;
 
             ShowBonesAsWorldTransform.PropertyChanged += (s, e) => UpdateSelectedBoneValues(_selectedBone);
             SelectedBoneTranslationOffset.OnValueChanged += HandleTranslationChanged;
             SelectedBoneRotationOffset.OnValueChanged += HandleTranslationChanged;
-            BoneScale.PropertyChanged += (s,e) =>_techSkeletonNode.SelectedBoneScale((float)BoneScale.Value);
+            BoneVisualScale.PropertyChanged += (s,e) =>_techSkeletonNode.SelectedBoneScale((float)BoneVisualScale.Value);
+            ApplyBoneScaleToChildren.PropertyChanged += ApplyBoneScaleToChildren_PropertyChanged;
+            BoneScale.PropertyChanged += BoneScale_PropertyChanged;
+        }
+
+        private void BoneScale_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ApplyBoneScaleToChildren_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         public void CreateEditor(string skeletonPath)
@@ -237,12 +254,73 @@ namespace AnimationEditor.SkeletonEditor
             RefreshBoneList();
         }
 
-        public void DeleteBone()
+        public void DeleteBoneAction()
         {
             if (_selectedBone == null)
                 return;
 
             _techSkeletonNode.Skeleton.DeleteBone(_selectedBone.BoneIndex);
+        }
+
+        public void CopyBoneAction()
+        {
+            if (_selectedBone == null)
+            {
+                MessageBox.Show("No bone selected");
+                return;
+            }
+
+            var copyItem = new BoneCopyPasteItem()
+            {
+                BoneIndex = SelectedBone.BoneIndex,
+                SourceSkeleton = _techSkeletonNode.Skeleton.Clone()
+            };
+            _copyPasteManager.SetCopyItem(copyItem);
+        }
+
+        public void PasteBoneAction()
+        {
+            if (_selectedBone == null)
+                return;
+
+            var pasteObject = _copyPasteManager.GetPasteObject<BoneCopyPasteItem>();
+            if (pasteObject == null)
+            {
+                MessageBox.Show("No valid object found to paste");
+                return;
+            }
+
+            PasteBones(pasteObject.SourceSkeleton, pasteObject.BoneIndex, _techSkeletonNode.Skeleton, SelectedBone.BoneIndex, true);
+            _techSkeletonNode.Skeleton.RebuildSkeletonMatrix();
+            RefreshBoneList();
+        }
+
+        void PasteBones(GameSkeleton source, int sourceIndex, GameSkeleton target, int targetIndex, bool setUsingWorldTransform = false)
+        {
+            target.CreateChildBone(targetIndex);
+            var newBoneIndex = target.BoneCount - 1;
+
+            target.BoneNames[newBoneIndex] = source.BoneNames[sourceIndex];
+            if (setUsingWorldTransform == false)
+            {
+                target.Translation[newBoneIndex] = source.Translation[sourceIndex];
+                target.Rotation[newBoneIndex] = source.Rotation[sourceIndex];
+            }
+            else
+            {
+                var parentTransform = target.GetWorldTransform(targetIndex);
+                var world = source.GetWorldTransform(sourceIndex);
+
+                var localSpaceMatrix = world * Matrix.Invert(parentTransform);
+                localSpaceMatrix.Decompose(out _, out var quaternionValue, out var translationValue);
+
+                target.Translation[newBoneIndex] = Vector3.Zero;
+                target.Rotation[newBoneIndex] = quaternionValue;
+            }
+
+            var sourceChildBones = source.GetDirectChildBones(sourceIndex);
+            foreach (var childBone in sourceChildBones)
+                PasteBones(source, childBone, target, newBoneIndex);
         }
 
         public void SaveSkeletonAction()

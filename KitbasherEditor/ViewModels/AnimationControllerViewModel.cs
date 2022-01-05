@@ -98,7 +98,7 @@ namespace KitbasherEditor.ViewModels
 
         private void OnAnimationFrameChanged(int currentFrame)
         {
-            CurrentFrame = currentFrame;
+            CurrentFrame = currentFrame+1;
         }
 
         void OnPlayPause()

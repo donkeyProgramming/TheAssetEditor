@@ -32,6 +32,7 @@
 
             <MenuItem Header="Reports">
                 <MenuItem Header="Rmv2" Command="{Binding MenuBar.GenerateRmv2ReportCommand}"/>
+                <MenuItem Header="Meta Data" Command="{Binding MenuBar.GenerateMetaDataReportCommand}"/>
             </MenuItem>
         
             <MenuItem Header="Options">

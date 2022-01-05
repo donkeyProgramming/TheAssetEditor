@@ -7,7 +7,25 @@ namespace CommonControls.Common
 {
     public class MathUtil
     {
-       public static Vector3 GetCenter(BoundingBox box)
+        public static float EnsureRange(float value, float min, float max)
+        {
+            if (value > max)
+                return max;
+            else if (value < min)
+                return min;
+            return value;
+        }
+
+        public static int EnsureRange(int value, int min, int max)
+        {
+            if (value > max)
+                return max;
+            else if (value < min)
+                return min;
+            return value;
+        }
+
+        public static Vector3 GetCenter(BoundingBox box)
         {
             Vector3 finalPos = Vector3.Zero;
             var corners = box.GetCorners();

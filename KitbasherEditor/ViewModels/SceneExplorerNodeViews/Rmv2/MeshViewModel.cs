@@ -20,7 +20,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         IComponentManager _componentManager;
 
         public string ModelName { get { return _meshNode.Material.ModelName; } set { _meshNode.Material.ModelName = value; NotifyPropertyChanged(); } }
-        public string ShaderName { get => _meshNode.RmvModel_depricated.CommonHeader.ShaderParams.ShaderName; }
+        public string ShaderName { get => _meshNode.CommonHeader.ShaderParams.ShaderName; }
         public int VertexCount { get => _meshNode.Geometry.VertexCount(); }
         public int IndexCount { get => _meshNode.Geometry.GetIndexCount(); }  
 
@@ -32,7 +32,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         public Vector3ViewModel Pivot { get { return _pivot; } set { SetAndNotify(ref _pivot, value); } }
 
         public IEnumerable<ModelMaterialEnum> PossibleMaterialTypes { get; set; }
-        public ModelMaterialEnum SelectedMaterialType { get { return _meshNode.RmvModel_depricated.CommonHeader.ModelTypeFlag; } set { UpdateGroupType(value); NotifyPropertyChanged(); } }
+        public ModelMaterialEnum SelectedMaterialType { get { return _meshNode.CommonHeader.ModelTypeFlag; } set { UpdateGroupType(value); NotifyPropertyChanged(); } }
 
         public ICommand CopyPivotToAllMeshesCommand { get; set; }
 

@@ -20,10 +20,8 @@ namespace View3D.SceneNodes
 {
     public class Rmv2MeshNode : SceneNode, ITransformable, IEditableGeometry, ISelectable, IUpdateable, IDrawableItem
     {
-        public RmvModel RmvModel_depricated { get; set; }
         public IMaterial Material { get; set; }
         public MeshObject Geometry { get; set; }
-
         public RmvCommonHeader CommonHeader{ get; set; }
 
         Quaternion _orientation = Quaternion.Identity;
@@ -67,14 +65,13 @@ namespace View3D.SceneNodes
         private Rmv2MeshNode()
         { }
 
-        public Rmv2MeshNode(RmvModel rmvSubModel, AnimationPlayer animationPlayer, MeshObject geometry)
+        public Rmv2MeshNode(RmvCommonHeader commonHeader, MeshObject meshObject, IMaterial material, AnimationPlayer animationPlayer)
         {
-            Material = rmvSubModel.Material.Clone();
-            CommonHeader = rmvSubModel.CommonHeader;
-            RmvModel_depricated = rmvSubModel;
-            Name = rmvSubModel.Material.ModelName;
+            CommonHeader = commonHeader;
+            Material = material;
             AnimationPlayer = animationPlayer;
-            Geometry = geometry;
+            Name = Material.ModelName;
+            Geometry = meshObject;
 
             Position = Vector3.Zero;
             Scale = Vector3.One;
@@ -191,9 +188,10 @@ namespace View3D.SceneNodes
             typedTarget.Scale = Scale;
             typedTarget.LodIndex = LodIndex;
             typedTarget.ReduceMeshOnLodGeneration = ReduceMeshOnLodGeneration;
-
             typedTarget.AnimationPlayer = AnimationPlayer;
-            typedTarget.RmvModel_depricated = RmvModel_depricated.Clone();
+            typedTarget.CommonHeader = CommonHeader;
+            typedTarget.Material = Material.Clone();
+            typedTarget.Geometry = Geometry.Clone();
             typedTarget._resourceLib = _resourceLib;
             typedTarget.Effect = Effect.Clone() as PbrShader;
             typedTarget.Geometry = Geometry.Clone();

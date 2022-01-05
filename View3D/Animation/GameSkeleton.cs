@@ -49,6 +49,8 @@ namespace View3D.Animation
             RebuildSkeletonMatrix();
         }
 
+        GameSkeleton() { }
+
         public void RebuildSkeletonMatrix()
         {
             _worldTransform = new List<Matrix>(new Matrix[BoneCount]);
@@ -67,6 +69,23 @@ namespace View3D.Animation
                     continue;
                 _worldTransform[i] = _worldTransform[i] * _worldTransform[parentIndex];
             }
+        }
+
+        public GameSkeleton Clone()
+        {
+            var clone = new GameSkeleton()
+            {
+                _worldTransform = _worldTransform.ToList(),
+                _parentBoneIds = _parentBoneIds.ToList(),
+                Translation = Translation.ToList(),
+                Rotation = Rotation.ToList(),
+                BoneNames = BoneNames.ToList(),
+                SkeletonName = SkeletonName,
+                AnimationPlayer = AnimationPlayer,
+                _frame = _frame
+            };
+
+            return clone;
         }
 
 
@@ -187,15 +206,19 @@ namespace View3D.Animation
             RebuildSkeletonMatrix();
         }
 
-        public void DeleteBone(int boneIndex)
+        public void DeleteBone(int boneIndex, bool rebuildMatrix = true)
         {
+            var children = GetDirectChildBones(boneIndex);
+            foreach (var child in children)
+                DeleteBone(child, false);
+
             _parentBoneIds.RemoveAt(boneIndex);
             BoneNames.RemoveAt(boneIndex);
             Translation.RemoveAt(boneIndex);
             Rotation.RemoveAt(boneIndex);
-            RebuildSkeletonMatrix();
+
+            if(rebuildMatrix)
+                RebuildSkeletonMatrix();
         }
-
-
     }
 }

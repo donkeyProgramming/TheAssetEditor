@@ -44,6 +44,7 @@ namespace AssetEditor
             services.AddSingleton<ToolFactory>();
             services.AddSingleton<PackFileDataBase>();
             services.AddSingleton<SkeletonAnimationLookUpHelper>();
+            services.AddSingleton<CopyPasteManager>();
 
             services.AddTransient<MainWindow>();
             services.AddTransient<MainViewModel>();

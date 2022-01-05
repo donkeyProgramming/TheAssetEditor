@@ -89,7 +89,7 @@ namespace View3D.Animation
         {
             try
             {
-                var clampedT = EnsureRange(t, 0, 1);
+                var clampedT = MathUtil.EnsureRange(t, 0, 1);
                 int frameIndex = 0;
                 float frameIterpolation = 0;
 
@@ -113,16 +113,6 @@ namespace View3D.Animation
                 logger.Error(e.Message);
                 throw;
             }
-        }
-
-
-        static float EnsureRange(float value, float min, float max)
-        {
-            if (value > max)
-                return max;
-            else if (value < min)
-                return min;
-            return value;
         }
 
         static AnimationClip.KeyFrame GetKeyFrameFromIndex(List<AnimationClip.KeyFrame> keyframes, int frameIndex)

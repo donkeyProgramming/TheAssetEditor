@@ -309,7 +309,7 @@ namespace View3D.Services
         {
             foreach (var material in possibleMaterials)
             {
-                if (mesh.RmvModel_depricated.Material.VertexType != material.VertexType)
+                if (mesh.Material.VertexType != material.VertexType)
                     continue;
 
                 var alphaOn = mesh.Material.AlphaMode != AlphaMode.Opaque;

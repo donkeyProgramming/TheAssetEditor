@@ -24,7 +24,7 @@ namespace View3D.Services
 
             if (original.WeightCount == 4)
             {
-                sourceMesh.BoneWeights = original.VertexArray.Select(x => new BoneWeight(
+                sourceMesh.BoneWeights  = original.VertexArray.Select(x => new BoneWeight(
                     (int)x.BlendIndices.X, (int)x.BlendIndices.Y, (int)x.BlendIndices.Z, (int)x.BlendIndices.W,
                     x.BlendWeights.X, x.BlendWeights.Y, x.BlendWeights.Z, x.BlendWeights.W)).ToArray();
             }
