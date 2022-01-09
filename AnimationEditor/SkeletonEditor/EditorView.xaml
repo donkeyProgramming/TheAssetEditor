@@ -149,8 +149,7 @@
                 <Label      Grid.Row="4" Grid.Column="0" Content="Length Scale"/>
                 <Label      Grid.Row="4" Grid.Column="1" Content=":"/>
                 <DockPanel Grid.Row="4" Grid.Column="2">
-                    <Button Content="Bake" DockPanel.Dock="Right" Width="60"  Click="{s:MethodBinding BakeBoneScaleAction}" Margin="2"/>
-                    <CheckBox Content="Apply to children"  IsChecked="{Binding ApplyBoneScaleToChildren.Value, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" DockPanel.Dock="Right" Margin="2,0,2,0" />
+                    <Button Content="Bake" DockPanel.Dock="Right" Width="60"  Click="{s:MethodBinding BakeSkeletonAction}" Margin="2"/>
 
                     <TextBox Text="{Binding BoneScale.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2" DockPanel.Dock="Left">
                         <b:Interaction.Behaviors>

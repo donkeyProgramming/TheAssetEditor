@@ -12,6 +12,7 @@
             <RowDefinition Height='200'/>
             <RowDefinition Height='auto'/>
             <RowDefinition Height='auto'/>
+            <RowDefinition Height='auto'/>
         </Grid.RowDefinitions>
 
         <GroupBox Grid.Row="0" Header="Packfiles to convert:">
@@ -34,5 +35,8 @@
         </DockPanel>
 
         <Button Grid.Row="2" Content="Apply" Margin="5,5,5,0" Click="{s:MethodBinding Process}"/>
+
+
+        <TextBlock Grid.Row="3" HorizontalAlignment="Center" Text="Note: Can not batch process the active packfile" Margin="5" FontWeight="Bold"/>
     </Grid>
 </UserControl>

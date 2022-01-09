@@ -21,7 +21,7 @@ namespace CommonControls.Editors.AnimationBatchExporter
         PackFileService _pfs;
 
         public ObservableCollection<PackFileListItem> PackfileList { get; set; } = new ObservableCollection<PackFileListItem>();
-        public ObservableCollection<uint> PossibleOutputFormats { get; set; } = new ObservableCollection<uint>();
+        public ObservableCollection<uint> PossibleOutputFormats { get; set; } = new ObservableCollection<uint>() { 5,6,7};
         public NotifyAttr<uint> SelectedOutputFormat { get; set; } = new NotifyAttr<uint>(7);
 
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
@@ -38,10 +38,6 @@ namespace CommonControls.Editors.AnimationBatchExporter
                     continue;
                 PackfileList.Add(new PackFileListItem(item));
             }
-
-            PossibleOutputFormats.Add(5);
-            PossibleOutputFormats.Add(6);
-            PossibleOutputFormats.Add(7);
         }
 
         public void Process()

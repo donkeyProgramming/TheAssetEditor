@@ -41,7 +41,6 @@ namespace AnimationEditor.AnimationTransferTool
                 //Animation = packfileService.FindFile(@"animations\battle\humanoid01b\sword_and_chalice\stand\hu1b_swch_stand_idle_04.anim")
                 //Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\grn_forest_goblins_base.variantmeshdefinition")
             };
-            
 
             editorView.RefInput = new AnimationToolInput()
             {

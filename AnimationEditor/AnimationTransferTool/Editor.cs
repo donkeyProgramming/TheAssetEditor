@@ -279,7 +279,7 @@ namespace AnimationEditor.AnimationTransferTool
             }
         }
 
-        public void SaveAnimation()
+        public void SaveAnimationAction()
         {
             if (Generated.AnimationClip == null || Generated.Skeleton == null || _copyFrom.Skeleton == null)
             {
@@ -287,26 +287,27 @@ namespace AnimationEditor.AnimationTransferTool
                 return;
             }
 
-            SaveAnimation(Generated.AnimationClip, Generated.AnimationName.Value.AnimationFile);
+            SaveAnimation(Generated.AnimationClip, _copyFrom.AnimationName.Value.AnimationFile);
         }
 
         void SaveAnimation(AnimationClip clip, string animationName, bool prompOnOverride = true)
         {
-            var originalPath = animationName;
-            var orgSkeleton = _copyFrom.Skeleton.SkeletonName;
-            var newSkeleton = _copyTo.Skeleton.SkeletonName;
-            var newPath = originalPath.Replace(orgSkeleton, newSkeleton);
-
             var animFile = clip.ConvertToFileFormat(_copyTo.Skeleton);
             if (AnimationSettings.UseScaledSkeletonName.Value)
                 animFile.Header.SkeletonName = AnimationSettings.ScaledSkeletonName.Value;
 
-            var currentFileName = Path.GetFileName(newPath);
-            newPath = newPath.Replace(currentFileName, AnimationSettings.SavePrefix.Value + currentFileName);
-            newPath = SaveHelper.EnsureEnding(newPath, ".anim");
+            if (AnimationSettings.SelectedOutputFormat.Value != 7)
+                animFile.ConvertToVersion(AnimationSettings.SelectedOutputFormat.Value, _skeletonAnimationLookUpHelper, _pfs);
 
             if (AnimationSettings.UseScaledSkeletonName.Value)
                 animFile.Header.SkeletonName = AnimationSettings.ScaledSkeletonName.Value;
+
+            var orgSkeleton = _copyFrom.Skeleton.SkeletonName;
+            var newSkeleton = _copyTo.Skeleton.SkeletonName;
+            var newPath = animationName.Replace(orgSkeleton, newSkeleton);
+            var currentFileName = Path.GetFileName(newPath);
+            newPath = newPath.Replace(currentFileName, AnimationSettings.SavePrefix.Value + currentFileName);
+            newPath = SaveHelper.EnsureEnding(newPath, ".anim");
 
             SaveHelper.Save(_pfs, newPath, null, AnimationFile.ConvertToBytes(animFile), prompOnOverride);
         }
@@ -316,7 +317,6 @@ namespace AnimationEditor.AnimationTransferTool
             if (MessageBox.Show("Are you sure?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 CreateBoneOverview(_copyTo.Skeleton);
         }
-
 
         public void UseTargetAsSource()
         {

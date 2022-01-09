@@ -121,6 +121,8 @@ namespace View3D.Animation
                     var frameIndex = MathUtil.EnsureRange(value, 0, frameCount);
 
                     var framePercentage = (frameIndex / ((float)frameCount)) * GetAnimationLengthMs();
+                    if (float.IsNaN(framePercentage))
+                        framePercentage = 0;
                     _timeSinceStart = TimeSpan.FromMilliseconds(framePercentage);
                  
                     var currentFrame = CurrentFrame;

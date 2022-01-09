@@ -53,10 +53,11 @@ namespace View3D.Commands.Object
             var sourceVert = _source.Geometry.GetVertexExtented(_vertexId);
             foreach (var currentMesh in _meshesToPin)
             {
-                currentMesh.Geometry.ParentSkeletonName = _source.Geometry.ParentSkeletonName;
+                currentMesh.Geometry.ChangeVertexType(_source.Geometry.VertexFormat, _source.Geometry.ParentSkeletonName, false);
 
                 for (int i = 0; i < currentMesh.Geometry.VertexCount(); i++)
                 {
+                    currentMesh.UpdatePivotPoint(Vector3.Zero);
                     currentMesh.Geometry.SetVertexBlendIndex(i, sourceVert.BlendIndices);
                     currentMesh.Geometry.SetVertexWeights(i, sourceVert.BlendWeights);
                 }
@@ -71,6 +72,7 @@ namespace View3D.Commands.Object
             {
                 _meshesToPin[i].Geometry = _originalGeos[i];
                 _meshesToPin[i].Geometry.ParentSkeletonName = _originalSkeletonNames[i];
+                _meshesToPin[i].UpdatePivotPoint(Vector3.Zero);
             }
 
             _selectionManager.SetState(_selectionOldState);

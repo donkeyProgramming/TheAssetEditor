@@ -1,5 +1,6 @@
 ﻿using CommonControls.Common;
 using CommonControls.MathViews;
+using System.Collections.ObjectModel;
 
 namespace AnimationEditor.AnimationTransferTool
 {
@@ -14,5 +15,8 @@ namespace AnimationEditor.AnimationTransferTool
         public NotifyAttr<bool> FreezeUnmapped { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> ApplyRelativeScale { get; set; } = new NotifyAttr<bool>(true);
         public NotifyAttr<string> SavePrefix { get; set; } = new NotifyAttr<string>("cust_");
+
+        public ObservableCollection<uint> PossibleOutputFormats { get; set; } = new ObservableCollection<uint>() { 5,6,7};
+        public NotifyAttr<uint> SelectedOutputFormat { get; set; } = new NotifyAttr<uint>(7);
     }
 }

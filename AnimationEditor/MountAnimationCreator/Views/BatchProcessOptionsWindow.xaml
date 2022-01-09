@@ -13,6 +13,7 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
@@ -35,6 +36,6 @@
         <Label Grid.Row="3" Grid.Column="1" Content=":"/>
         <CheckBox Grid.Row="3" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding CreateAnimations, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="False"/>
 
-        <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Content="Create" Margin="10,2,10,2" Click="Button_Click"/>
+        <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4" Content="Create" Margin="10,2,10,2" Click="Button_Click"/>
     </Grid>
 </Window>

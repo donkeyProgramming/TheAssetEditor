@@ -12,6 +12,7 @@ namespace View3D.Animation
 
         public List<Vector3> Translation { get; private set; }
         public List<Quaternion>Rotation { get; private set; }
+        public List<float> Scale { get; private set; }
         public List<string> BoneNames { get; private set; }
         public int BoneCount { get => BoneNames.Count; }
         public string SkeletonName { get; set; }
@@ -22,7 +23,8 @@ namespace View3D.Animation
         {
             var boneCount = skeletonFile.Bones.Count();
             Translation = new List<Vector3>(new Vector3[boneCount]);
-            Rotation = new List<Quaternion>( new Quaternion[boneCount]);
+            Rotation = new List<Quaternion>(new Quaternion[boneCount]);
+            Scale = new List<float>(new float[boneCount]);
             _parentBoneIds = new List<int>(new int[boneCount]);
             BoneNames = new List<string>(new string[boneCount]);
 
@@ -41,9 +43,11 @@ namespace View3D.Animation
                     skeletonFile.DynamicFrames[skeletonAnimFrameIndex].Quaternion[i].W);
 
                 Translation[i] = new Vector3(
-                    skeletonFile.DynamicFrames[skeletonAnimFrameIndex].Transforms[i].X * 1,
+                    skeletonFile.DynamicFrames[skeletonAnimFrameIndex].Transforms[i].X ,
                     skeletonFile.DynamicFrames[skeletonAnimFrameIndex].Transforms[i].Y,
                     skeletonFile.DynamicFrames[skeletonAnimFrameIndex].Transforms[i].Z);
+
+                Scale[i] = 1;
             }
 
             RebuildSkeletonMatrix();
@@ -58,7 +62,8 @@ namespace View3D.Animation
             {
                 var translationMatrix = Matrix.CreateTranslation(Translation[i]);
                 var rotationMatrix = Matrix.CreateFromQuaternion(Rotation[i]);
-                var transform = rotationMatrix * translationMatrix;
+                var scaleMatrix = Matrix.CreateScale(Scale[i]);
+                var transform = scaleMatrix * rotationMatrix * translationMatrix;
                 _worldTransform[i] = transform;
             }
 
@@ -79,6 +84,7 @@ namespace View3D.Animation
                 _parentBoneIds = _parentBoneIds.ToList(),
                 Translation = Translation.ToList(),
                 Rotation = Rotation.ToList(),
+                Scale = Scale.ToList(),
                 BoneNames = BoneNames.ToList(),
                 SkeletonName = SkeletonName,
                 AnimationPlayer = AnimationPlayer,
@@ -175,7 +181,7 @@ namespace View3D.Animation
                 {
                     Translation = Translation[i],
                     Rotation = Rotation[i],
-                    Scale = Vector3.One,
+                    Scale = new Vector3(Scale[i]),
                     BoneIndex = i,
                     ParentBoneIndex = GetParentBoneIndex(i),
                     WorldTransform = _worldTransform[i]
@@ -187,6 +193,9 @@ namespace View3D.Animation
 
         public AnimInvMatrixFile CreateInvMatrixFile()
         {
+            if (HasBoneScale())
+                throw new System.Exception("Skeleton contains scale and can not be saved. Bake first");
+
             var output = new AnimInvMatrixFile();
 
             output.Version = 1;
@@ -203,6 +212,7 @@ namespace View3D.Animation
             BoneNames.Add("new_bone");
             Translation.Add(Vector3.Zero);
             Rotation.Add(Quaternion.Identity);
+            Scale.Add(1);
             RebuildSkeletonMatrix();
         }
 
@@ -216,9 +226,42 @@ namespace View3D.Animation
             BoneNames.RemoveAt(boneIndex);
             Translation.RemoveAt(boneIndex);
             Rotation.RemoveAt(boneIndex);
+            Scale.RemoveAt(boneIndex);
 
             if(rebuildMatrix)
                 RebuildSkeletonMatrix();
+        }
+
+        public bool HasBoneScale()
+        {
+            foreach (var value in Scale)
+            {
+                if (value != 1)
+                    return true;
+            }
+            return false;
+        }
+
+        public void BakeScaleIntoSkeleton()
+        {
+            for (int i = 0; i < BoneCount; i++)
+            {
+                float scale = GetAccumulatedBoneScale(i);
+                Translation[i] = Translation[i] * scale;
+            }
+
+            for (int i = 0; i < BoneCount; i++)
+                Scale[i] = 1;
+            RebuildSkeletonMatrix();
+        }
+
+        float GetAccumulatedBoneScale(int boneIndex)
+        {
+            var parentIndex = GetParentBoneIndex(boneIndex);
+            if (parentIndex == -1)
+                return 1;
+
+            return GetAccumulatedBoneScale(parentIndex) * Scale[boneIndex];
         }
     }
 }

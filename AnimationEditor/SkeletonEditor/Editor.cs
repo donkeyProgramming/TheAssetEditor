@@ -68,7 +68,6 @@ namespace AnimationEditor.SkeletonEditor
         }
 
         public DoubleViewModel BoneScale { get; set; } = new DoubleViewModel(1);
-        public NotifyAttr<bool> ApplyBoneScaleToChildren { get; set; } = new NotifyAttr<bool>(true);
 
         public Editor(PackFileService pfs, AssetViewModel techSkeletonNode, IComponentManager componentManager, CopyPasteManager copyPasteManager)
         {
@@ -81,18 +80,7 @@ namespace AnimationEditor.SkeletonEditor
             SelectedBoneTranslationOffset.OnValueChanged += HandleTranslationChanged;
             SelectedBoneRotationOffset.OnValueChanged += HandleTranslationChanged;
             BoneVisualScale.PropertyChanged += (s,e) =>_techSkeletonNode.SelectedBoneScale((float)BoneVisualScale.Value);
-            ApplyBoneScaleToChildren.PropertyChanged += ApplyBoneScaleToChildren_PropertyChanged;
-            BoneScale.PropertyChanged += BoneScale_PropertyChanged;
-        }
-
-        private void BoneScale_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void ApplyBoneScaleToChildren_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            throw new NotImplementedException();
+            BoneScale.PropertyChanged += HandleScaleChanged;
         }
 
         public void CreateEditor(string skeletonPath)
@@ -211,6 +199,19 @@ namespace AnimationEditor.SkeletonEditor
             _techSkeletonNode.Skeleton.RebuildSkeletonMatrix();
         }
 
+        private void HandleScaleChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (_selectedBone == null)
+                return;
+
+            var boneIndex = _selectedBone.BoneIndex;
+            _techSkeletonNode.Skeleton.Scale[boneIndex] = (float)BoneScale.Value;
+            _techSkeletonNode.Skeleton.RebuildSkeletonMatrix();
+        }
+
+        public void BakeSkeletonAction() => _techSkeletonNode.Skeleton.BakeScaleIntoSkeleton();
+        
+
         public void FocusSelectedBoneAction()
         {
             if (_selectedBone == null)
@@ -327,6 +328,12 @@ namespace AnimationEditor.SkeletonEditor
         {
             if (_techSkeletonNode.Skeleton == null)
                 return;
+
+            if (_techSkeletonNode.Skeleton.HasBoneScale())
+            {
+                MessageBox.Show("Skeleton has scale, this needs to be baked before the skeleton can be saved");
+                return;
+            }
 
             var skeletonClip = AnimationClip.CreateSkeletonAnimation(_techSkeletonNode.Skeleton);
             var animFile = skeletonClip.ConvertToFileFormat(_techSkeletonNode.Skeleton);

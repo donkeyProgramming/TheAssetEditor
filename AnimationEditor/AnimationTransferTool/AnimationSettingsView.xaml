@@ -72,9 +72,14 @@
             </DockPanel>
 
             <DockPanel >
-                <Label Content="Save Prefix" Width ="{StaticResource labelWidth}"/>
-                <Label Content=":"/>
-                <TextBox Text="{Binding AnimationSettings.SavePrefix.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
+                <Label Content="Save Prefix" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
+                <Label Content=":" DockPanel.Dock="Left"/>
+
+                <ComboBox ItemsSource="{Binding AnimationSettings.PossibleOutputFormats, UpdateSourceTrigger=PropertyChanged}" 
+                      SelectedItem="{Binding AnimationSettings.SelectedOutputFormat.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" DockPanel.Dock="Right" Width="60"/>
+                <Label Content="Format:" DockPanel.Dock="Right"/>
+
+                <TextBox Text="{Binding AnimationSettings.SavePrefix.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center" DockPanel.Dock="Left"/>
             </DockPanel>
 
         </StackPanel>

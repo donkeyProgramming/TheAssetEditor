@@ -62,7 +62,9 @@ namespace CommonControls.Editors.AnimMeta
             if (parser.TryDecodeValue(value, 0, out var vector4, out var _, out var err))
             {
                 Quaternion q = new Quaternion(vector4);
-                Value.Set(MathUtil.ToAxisAngleDegrees(q));
+                var eulerRotation = MathUtil.QuaternionToEulerDegree(q);
+
+                Value.Set(eulerRotation);
             }
             else
             {
@@ -75,7 +77,7 @@ namespace CommonControls.Editors.AnimMeta
             _logger.Here().Information($"GetByteValue Orientation=>{FieldName} {_parser} {ValueAsString} {Value}");
 
             var vector3 = Value.GetAsVector3();
-            var value = MathUtil.FromAxisAngleDegrees(vector3);
+            var value = MathUtil.EulerDegreesToQuaternion(vector3);
             value.Normalize();
             _logger.Here().Information($"GetByteValue Orientation=>Vector computed");
 
