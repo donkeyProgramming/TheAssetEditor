@@ -16,8 +16,6 @@
     </UserControl.Resources>
     <Expander IsExpanded="True" Header="Settings:">
         <StackPanel>
-
-
             <DockPanel>
                 <Label Content="Visability - Generated" Width ="{StaticResource labelWidth}"  />
                 <Label Content=":"/>
@@ -29,11 +27,33 @@
                 <mathviews:Vector3View Vector3="{Binding AnimationSettings.DisplayOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2"/>
             </DockPanel>
 
+            <DockPanel>
+                <Label Content="Time master" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
+                <Label Content=":" DockPanel.Dock="Left"/>
+                <ComboBox Margin="2" ItemsSource="{Binding AnimationSettings.TimeMaster.PossibleValues, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding AnimationSettings.TimeMaster.SelectedValue.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            </DockPanel>
 
             <DockPanel>
-                <Label Content="Scale" Width ="{StaticResource labelWidth}"  DockPanel.Dock="Left"/>
+                <Label Content="Copy Mode" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
                 <Label Content=":" DockPanel.Dock="Left"/>
-                <Button Content="Export Mesh/skeleton at scale" Click="{s:MethodBinding ExportScaledMesh}" DockPanel.Dock="Right" Margin="2,0,2,0"/>
+                <ComboBox Margin="2" ItemsSource="{Binding AnimationSettings.CopyMode.PossibleValues, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding AnimationSettings.CopyMode.SelectedValue.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            </DockPanel>
+
+            <DockPanel>
+                <Label Content="Length matching mode" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
+                <Label Content=":" DockPanel.Dock="Left"/>
+                <ComboBox Margin="2" ItemsSource="{Binding AnimationSettings.LengthMatchingMode.PossibleValues, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding AnimationSettings.LengthMatchingMode.SelectedValue.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            </DockPanel>
+
+            <DockPanel>
+                <Label Content="Combine mode" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
+                <Label Content=":" DockPanel.Dock="Left"/>
+                <ComboBox Margin="2" ItemsSource="{Binding AnimationSettings.CombineMode.PossibleValues, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding AnimationSettings.CombineMode.SelectedValue.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            </DockPanel>
+
+            <DockPanel>
+                <Label Content="Skeleton Scale" Width ="{StaticResource labelWidth}"  DockPanel.Dock="Left"/>
+                <Label Content=":" DockPanel.Dock="Left"/>
 
                 <TextBox Text="{Binding AnimationSettings.Scale.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
                     <TextBox.ToolTip>
@@ -44,14 +64,39 @@
                         <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
                     </b:Interaction.Behaviors>
                 </TextBox>
-               
+
             </DockPanel>
 
-            <DockPanel >
-                <Label Content="Use generated skeleton" Width ="{StaticResource labelWidth}"/>
-                <Label Content=":"/>
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.UseScaledSkeletonName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                <TextBox Text="{Binding AnimationSettings.ScaledSkeletonName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
+            <DockPanel>
+                <Label Content="Animation speed mult" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
+                <Label Content=":" DockPanel.Dock="Left"/>
+                <TextBox Text="{Binding AnimationSettings.SpeedMult.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
+                    <b:Interaction.Behaviors>
+                        <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
+                    </b:Interaction.Behaviors>
+                </TextBox>
+            </DockPanel>
+            <DockPanel>
+                <Label Content="Start and stop time" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
+                <Label Content=":" DockPanel.Dock="Left"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.5*"/>
+                        <ColumnDefinition Width="0.5*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                <TextBox Grid.Column="0" Text="{Binding AnimationSettings.StartTime.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
+                    <b:Interaction.Behaviors>
+                        <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
+                    </b:Interaction.Behaviors>
+                </TextBox>
+
+                    <TextBox Grid.Column="1" Text="{Binding AnimationSettings.StopTime.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
+                    <b:Interaction.Behaviors>
+                        <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
+                    </b:Interaction.Behaviors>
+                </TextBox>
+                </Grid>
             </DockPanel>
 
             <DockPanel >
@@ -61,26 +106,26 @@
                 <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.FreezeUnmapped.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Content="Zero unmapped bones" ToolTip="Set the transform of all unmapped bones to 0"/>
             </DockPanel>
 
-            <DockPanel >
-                <Label Content="Animation speed mult" Width ="{StaticResource labelWidth}"/>
-                <Label Content=":"/>
-                <TextBox Text="{Binding AnimationSettings.SpeedMult.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
-                    <b:Interaction.Behaviors>
-                        <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
-                    </b:Interaction.Behaviors>
-                </TextBox>
-            </DockPanel>
+            <Expander Header="Saving" IsExpanded="True">
+                <StackPanel>
+                    <DockPanel >
+                        <Label Content="Save Prefix" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
+                        <Label Content=":" DockPanel.Dock="Left"/>
+                        <ComboBox Margin="2" DockPanel.Dock="Right" Width="60" ItemsSource="{Binding AnimationSettings.AnimationOutputFormat.PossibleValues, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding AnimationSettings.AnimationOutputFormat.SelectedValue.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                        <Label Content="Format:" DockPanel.Dock="Right"/>
+                        <TextBox Text="{Binding AnimationSettings.SavePrefix.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center" DockPanel.Dock="Left"/>
+                    </DockPanel>
 
-            <DockPanel >
-                <Label Content="Save Prefix" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
-                <Label Content=":" DockPanel.Dock="Left"/>
+                    <DockPanel >
+                        <Label Content="Use generated skeleton" Width ="{StaticResource labelWidth}"/>
+                        <Label Content=":"/>
+                        <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.UseScaledSkeletonName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                        <Button Content="Export Mesh/skeleton at scale" Click="{s:MethodBinding ExportScaledMesh}" DockPanel.Dock="Right" Margin="2"/>
+                        <TextBox Text="{Binding AnimationSettings.ScaledSkeletonName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
 
-                <ComboBox ItemsSource="{Binding AnimationSettings.PossibleOutputFormats, UpdateSourceTrigger=PropertyChanged}" 
-                      SelectedItem="{Binding AnimationSettings.SelectedOutputFormat.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" DockPanel.Dock="Right" Width="60"/>
-                <Label Content="Format:" DockPanel.Dock="Right"/>
-
-                <TextBox Text="{Binding AnimationSettings.SavePrefix.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center" DockPanel.Dock="Left"/>
-            </DockPanel>
+                    </DockPanel>
+                </StackPanel>
+            </Expander>
 
         </StackPanel>
     </Expander>

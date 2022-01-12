@@ -106,8 +106,8 @@ namespace View3D.Animation
             {
                 if (_animationClip == null)
                     return 0;
-
-                return (int)Math.Round((_timeSinceStart.TotalMilliseconds / GetAnimationLengthMs()) * (_animationClip.DynamicFrames.Count() - 1) ); 
+                var frame = (int)Math.Round((_timeSinceStart.TotalMilliseconds / GetAnimationLengthMs()) * (_animationClip.DynamicFrames.Count() - 1));
+                return frame;
             }
             set
             {

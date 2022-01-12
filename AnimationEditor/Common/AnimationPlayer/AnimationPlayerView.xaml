@@ -31,7 +31,7 @@
 
                 <DockPanel Grid.Row="0"  >
                     <Label Content="Main animation:" DockPanel.Dock="Left"/>
-                    <ComboBox DisplayMemberPath="SlotName" ItemsSource="{Binding PlayerItems, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedMainAnimation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" DockPanel.Dock="Right"/>
+                    <ComboBox DisplayMemberPath="SlotName" ItemsSource="{Binding PlayerItems, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" SelectedItem="{Binding SelectedMainAnimation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"   DockPanel.Dock="Right"/>
                 </DockPanel>
                 
                 <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">

@@ -157,7 +157,7 @@ namespace AssetEditor.ViewModels
 
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 
-                KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
+                //KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);
 

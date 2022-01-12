@@ -21,7 +21,7 @@ namespace AnimationEditor.AnimationTransferTool
             _bones = bones;
         }
 
-        public AnimationClip ReMapAnimation(GameSkeleton copyFromSkeleton, GameSkeleton copyToSkeleton, AnimationClip animationToCopy)
+        public AnimationClip ReMapAnimation(GameSkeleton copyFromSkeleton, GameSkeleton copyToSkeleton, AnimationClip animationToCopy, AnimationClip originalAnimation)
         {
             var newFrameCount = (int)(_settings.SpeedMult.Value * animationToCopy.DynamicFrames.Count);
             var newPlayTime = (float)_settings.SpeedMult.Value * animationToCopy.PlayTimeInSec;
@@ -51,7 +51,7 @@ namespace AnimationEditor.AnimationTransferTool
             return newAnimation;
         }
 
-        public void MapAnimationWorld(GameSkeleton copyFromSkeleton, GameSkeleton copyToSkeleton, AnimationClip animationToCopy, AnimationClip newAnimation)
+        void MapAnimationWorld(GameSkeleton copyFromSkeleton, GameSkeleton copyToSkeleton, AnimationClip animationToCopy, AnimationClip newAnimation)
         {
             var frameCount = animationToCopy.DynamicFrames.Count;
             for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
@@ -70,30 +70,22 @@ namespace AnimationEditor.AnimationTransferTool
                         desiredBonePosWorld = copyFromFrame.GetSkeletonAnimatedWorld(copyFromSkeleton, targetBoneIndex) * Matrix.CreateScale(1);
                     }
 
-                    var boneSettings = BoneHelper.GetBoneFromId(_bones, i);
-
                     var fromParentBoneIndex = copyToSkeleton.GetParentBoneIndex(i);
                     if (fromParentBoneIndex != -1)
                     {
+                        // Convert to local space 
                         var parentWorld = currentCopyToFrame.GetSkeletonAnimatedWorld(copyToSkeleton, fromParentBoneIndex);
-
-                        var bonePositionLocalSpace = desiredBonePosWorld * Matrix.Invert(parentWorld);
-                        bonePositionLocalSpace.Decompose(out var _, out var boneRotation, out var bonePosition);
-
-                        if(boneSettings.ApplyRotation.Value == true)
-                            newAnimation.DynamicFrames[frameIndex].Rotation[i] = boneRotation;
-                        if (boneSettings.ApplyTranslation.Value == true)
-                            newAnimation.DynamicFrames[frameIndex].Position[i] = bonePosition;
+                        desiredBonePosWorld = desiredBonePosWorld * Matrix.Invert(parentWorld);
                     }
-                    else
-                    {
-                        desiredBonePosWorld.Decompose(out var _, out var boneRotation, out var bonePosition);
 
-                        if (boneSettings.ApplyRotation.Value == true)
-                            newAnimation.DynamicFrames[frameIndex].Rotation[i] = boneRotation;
-                        if (boneSettings.ApplyTranslation.Value == true)
-                            newAnimation.DynamicFrames[frameIndex].Position[i] = bonePosition;
-                    }
+                    desiredBonePosWorld.Decompose(out var _, out var boneRotation, out var bonePosition);
+
+                    var boneSettings = BoneHelper.GetBoneFromId(_bones, i);
+                    if (boneSettings.ApplyRotation.Value == true)
+                        newAnimation.DynamicFrames[frameIndex].Rotation[i] = boneRotation;
+                    if (boneSettings.ApplyTranslation.Value == true)
+                        newAnimation.DynamicFrames[frameIndex].Position[i] = bonePosition;
+                   
                 }
             }
         }
@@ -317,7 +309,6 @@ namespace AnimationEditor.AnimationTransferTool
                 }
             }
         }
-
 
         void FrezeTaggedBones(GameSkeleton copyToSkeleton, AnimationClip animation)
         {

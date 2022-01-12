@@ -125,7 +125,7 @@ namespace View3D.Animation
         {
             return _worldTransform[boneIndex];
         }
-
+ 
         public Matrix GetAnimatedWorldTranform(int boneIndex)
         {
             if (_frame != null)

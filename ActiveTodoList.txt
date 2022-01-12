@@ -328,16 +328,8 @@ General:
 	Corruption logic detection 
 	Make tutorials on youtube
 
-
-[DONE]Fix new meta tag crash 
-[DONE]Select on right click in tree view
-[DONE]Add file anywhere in tree view
 Open file with external tool in tree view 
-[DONE]AddFix mesh and 3k viewing 
 Start game in debugging mode 
-[DONE]Rerigging window broken in kitbasher 
-[DONE]Bonding box not updating correctly
-[DONE]To and from static mesh not working great 
 
 ----
 
@@ -368,44 +360,6 @@ Remove active lod selection
 --
 
 
-
-kfcs
-kfp
-
-terrain\tiles\campaign\cliff_custom\6x4_inner_right_t1_r3\custom_mesh.rigid_model_v2
-
-terrain\tiles\campaign\dwarf_custom\86x57_karaz_a_karak\custom_mesh.rigid_model_v2
-
-
-terrain\campaigns\warhammer_map_1_1_wood_elves\global_meshes\land_mesh_21.rigid_model_v2
-offset = 336
-
-vert count = 1370
-vert start = 588
-face start = 49908
-size diff = 79320
-
-total vert size = 49320
-
-index size = 2
-vert size = 36
-
-
-
-Global meshes:
-	Default map?
-	
-	
-Texture_arrays:
-		Climat => textures
-		
-Stuff places on top of the map using tile_list.bin?
-
-
-252
-	
-
-
 Take pivot into account when selection
 DDS viwer 
 
@@ -433,52 +387,102 @@ Bugs:
 	[DONE]Remove bn_ prefix from attachment points
 
 Fixed 0.25
-	[Done] Skeleton editor
-	[Done] change texture path for missing textures 
-	[Done] BMI tool window can now be resized again
-	[Done] lots of editors open faster 
-	[Done] Tool scroolbar for people with small screens 
-	[Done] Bug converting anims to v5
-	[Done] Mount editor now works for mounging Rome and attila skeltons on v7 animations for older games
-	[Done] Minor animation saving errors 
-	[Done] Export mesh and skeleton at scale => Bug + update skeleton name 
-	[Done] assign skeleton while batching 
-	[Done] When saving anims, if framerat is negative, set 20
-	[Done] MetaDataReport
-	[Done] Alpha yes|no
-	[Done] Edit texture dir 
-	[Done] Splitting mesh into logical parts copies something incorrectly. White mesh on face of wolf 
-	[Done] Take pivot into account when selection (vertex)	
-	[Done] Privous frame bug
-	[Done] batch export "not working on current folder" => prefix?
-	[Done] MEtadate rotate bug 
-	[Done] Skeleton tool => copy past skeletons. Scale 
-	[Done] Pin tool improvement - Remove piv, set vert type 
-	[Done] Rigging and vertex type change => remove piv 
-	[Done] AnimTransfer tool => Select output format
-	[Done] AnimTransfer tool => Better output name
+	Skeleton editor
+		Make or edit skeleton and tech skeletons. Kitbash skeleton parts to make new base skeletons.
+
+	MountEditor:
+		Updated to work on skeletons from older games
+		Possible to select output format
+		Fixed bug where skeleton name was not updated while batch converting animations
+		Fixed bug when exported scaled mesh and skeleton 
+
+	AnimationBatch Converter:
+		Fix Bug converting anims to v5
+		assign skeleton while batching
+		Added text explaining that it does not work for active folder
+
+	AnimationTransfer Tool:
+		Possible to select output format
+		Better output name
+
+	General animations fixes:
+		When saving anims, if framerate is negative, set 20
+		Fixed Minor animation saving errors for v5
+		Fixed bug when going to previous frame in the animation player
+		
+	Kitbash Editor:
+		Take pivot into account when selection (vertex)	
+		Alpha changed to yes|no
+		Possible to set texture dir 
+		Splitting mesh into logical parts now keeps texture info for ws models
+		BMI tool window can now be resized again
+		Pin tool automatically removes pivot information and sets vertex type
+
+	MetaData editor:
+		Fixed bug when setting rotation. It should no longer feels so random
+
+	General:
+		Lots of editors open faster 
+		Scrollbar for people with small screens 
+		Added option of generation report for how meta data is used by the game
 	
+Fixed 0.26
+	AnimTransfer tool
+		Which anim is length setter
+		"Splice"
+			Unmapped bones used original
+			Add or replace option for mapped bones 
+		Batch process fragment 
+		Time fit - smart, loop, scale time
+		
+		
+		_copy bone logic 
+		Fix bug in animPlay
+		Does not work for poses 
+		Generate circles and names around the new anims?
+		Generated should not be selectable
+		Toolbar - reste camera 
+		
+		Override skeleton in kitbasher? 
+		Goal - Flying squig! 
+		Goal - Power claw 
+
+	Meta editor 
+		Rename super view 
+		Show below 
+		Use new system
+		Preview splice 
+		Show time in animation player alongside frame
+		Animation speed mult in player 
+		When edit auto set new 
+		Rome metas? 
+		Preview error when docking anim is missing 
+		Local and world space for transform where applicable 
+
+	Improved meta editor improve animbin editor 
+		List over types
+		Check if unkown is always the same 
+		Copy to new pack?
+		Validation of skeleton
+		
+	Skeleton tool
+		Only apply transform to self, keep children same 
+		
+	Create custom materials button? 
 
 	
+	Texture editor - convert, create and info 
 	Set textures by path from UI 
-	Meta editor below
 	Show duplicate file error 
 	[?]deleting texture brings it back on save/load
 	Tools on menubar, including the old ctrl+x to not recombine assets when splitting
 	Redo
 	Fix keyboard focus 
-	Re-rigg selected vertexes only
+	Re-rigg selected vertexes only -> Pin tool 
 	Pose tool 
 	Add the seach tool => projectiles\wh_lzd_terradon_rock_02.rigid_model_v2
-	
-	ROM meta 
-	AnimTransfer - Splice 
-	Animation speed mult
-	Show time in animation player alongside frame
 	Save decal models => dont override material type if there is no need => move to tool instead of save 
 	Splice in anim transfer 
-	Meta editor improvements 
-		copy
 	Create custom materials
 	AnimTransfer => To and from self => auto map
 	Fix audio tool for warhammer

@@ -1,4 +1,5 @@
-﻿using AnimationEditor.Common.ReferenceModel;
+﻿using AnimationEditor.Common.AnimationPlayer;
+using AnimationEditor.Common.ReferenceModel;
 using CommonControls.Common;
 using CommonControls.Editors.BoneMapping;
 using CommonControls.Editors.BoneMapping.View;
@@ -32,6 +33,7 @@ namespace AnimationEditor.AnimationTransferTool
         IComponentManager _componentManager;
         AssetViewModel _copyTo;
         AssetViewModel _copyFrom;
+        AnimationPlayerViewModel _player;
         public AssetViewModel Generated { get; set; }
         List<IndexRemapping> _remappingInformaton;
         RemappedAnimatedBoneConfiguration _config;
@@ -48,11 +50,12 @@ namespace AnimationEditor.AnimationTransferTool
             set { SetAndNotify(ref _selectedBone, value); HightlightSelectedBones(value); }
         }
 
-        public Editor(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel copyToAsset, AssetViewModel copyFromAsset, AssetViewModel generated, IComponentManager componentManager)
+        public Editor(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel copyToAsset, AssetViewModel copyFromAsset, AssetViewModel generated, IComponentManager componentManager, AnimationPlayerViewModel player)
         {
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _componentManager = componentManager;
+            _player = player;
 
             _copyTo = copyToAsset;
             _copyFrom = copyFromAsset;
@@ -109,6 +112,9 @@ namespace AnimationEditor.AnimationTransferTool
 
         private void CopyFromSkeletonChanged(GameSkeleton newValue)
         {
+            if (newValue == _copyFrom.Skeleton)
+                return;
+
             _remappingInformaton = null;
             CreateBoneOverview(_copyTo.Skeleton);
             HightlightSelectedBones(null);
@@ -150,7 +156,7 @@ namespace AnimationEditor.AnimationTransferTool
                 _config.SkeletonBoneHighlighter = new SkeletonBoneHighlighter(Generated, _copyFrom);
             }
 
-            _activeBoneMappingWindow = new BoneMappingWindow(new BoneMappingViewModel(_config), true);
+            _activeBoneMappingWindow = new BoneMappingWindow(new BoneMappingViewModel(_config), false);
             _activeBoneMappingWindow.Show();
             _activeBoneMappingWindow.ApplySettings += BoneMappingWindow_Apply;
             _activeBoneMappingWindow.Closed += BoneMappingWindow_Closed;
@@ -204,13 +210,15 @@ namespace AnimationEditor.AnimationTransferTool
             {
                 var newAnimationClip = UpdateAnimation(_copyFrom.AnimationClip);
                 Generated.SetAnimationClip(newAnimationClip, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
+
+                _player.SelectedMainAnimation = _player.PlayerItems.First(x => x.Asset == Generated);
             }
         }
 
         AnimationClip UpdateAnimation(AnimationClip clip)
         {
             var service = new AnimationRemapperService(AnimationSettings, _remappingInformaton, Bones);
-            var newClip = service.ReMapAnimation(_copyFrom.Skeleton, _copyTo.Skeleton, clip);
+            var newClip = service.ReMapAnimation(_copyFrom.Skeleton, _copyTo.Skeleton, clip, null);
             return newClip;
         }
 
@@ -296,8 +304,8 @@ namespace AnimationEditor.AnimationTransferTool
             if (AnimationSettings.UseScaledSkeletonName.Value)
                 animFile.Header.SkeletonName = AnimationSettings.ScaledSkeletonName.Value;
 
-            if (AnimationSettings.SelectedOutputFormat.Value != 7)
-                animFile.ConvertToVersion(AnimationSettings.SelectedOutputFormat.Value, _skeletonAnimationLookUpHelper, _pfs);
+            if (AnimationSettings.AnimationOutputFormat.Value != 7)
+                animFile.ConvertToVersion(AnimationSettings.AnimationOutputFormat.Value, _skeletonAnimationLookUpHelper, _pfs);
 
             if (AnimationSettings.UseScaledSkeletonName.Value)
                 animFile.Header.SkeletonName = AnimationSettings.ScaledSkeletonName.Value;

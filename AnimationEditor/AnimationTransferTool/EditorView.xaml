@@ -12,36 +12,31 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
-            <local:AnimationSettingsView/>
-        </Grid>
+        <local:AnimationSettingsView Grid.Row="0"/>
+        <local:BoneSettingsView Grid.Row="2"/>
 
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <Expander Grid.Row="1" IsExpanded="True" Header="Buttons:">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
 
-            <Button Grid.Row="0" Grid.Column="0" Content="Open bone mapping window" Click="{s:MethodBinding OpenMappingWindow}" Margin="2"/>
-            <Button Grid.Row="0" Grid.Column="1" Content="Save Animation" Click="{s:MethodBinding SaveAnimationAction}" Margin="2"/>
-            <Button Grid.Row="0" Grid.Column="2" Content="Batch Process"  Click="{s:MethodBinding OpenBatchProcessDialog}" Margin="2"/>
+                <Button Grid.Row="0" Grid.Column="0" Content="Open bone mapping window" Click="{s:MethodBinding OpenMappingWindow}" Margin="2"/>
+                <Button Grid.Row="0" Grid.Column="1" Content="Save Animation" Click="{s:MethodBinding SaveAnimationAction}" Margin="2"/>
+                <Button Grid.Row="0" Grid.Column="2" Content="Batch Process"  Click="{s:MethodBinding OpenBatchProcessDialog}" Margin="2"/>
 
-            <Button Grid.Row="1" Grid.Column="0"  Content="Apply Settings" Click="{s:MethodBinding UpdateAnimation}" Margin="2" />
-            <Button Grid.Row="1" Grid.Column="1"  Content="Use Target as Source" Click="{s:MethodBinding UseTargetAsSource}" Margin="2" />
-        </Grid>
-
-        <Grid Grid.Row="3">
-            <local:BoneSettingsView/>
-        </Grid>
-
+                <Button Grid.Row="1" Grid.Column="0"  Content="Apply Settings" Click="{s:MethodBinding UpdateAnimation}" Margin="2" />
+                <Button Grid.Row="1" Grid.Column="1"  Content="Use Target as Source" Click="{s:MethodBinding UseTargetAsSource}" Margin="2" />
+            </Grid>
+        </Expander>
     </Grid>
 </UserControl>

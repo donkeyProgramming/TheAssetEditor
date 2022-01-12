@@ -22,7 +22,7 @@ namespace AnimationEditor.Common.AnimationPlayer
 
 
         int _selectedAnimationCurrentFrame = 0;
-        public int SelectedAnimationCurrentFrame { get { return _selectedAnimationCurrentFrame; } set { SetAndNotifyWhenChanged(ref _selectedAnimationCurrentFrame, value); } }
+        public int SelectedAnimationCurrentFrame { get { return _selectedAnimationCurrentFrame + 1; } set { SetAndNotifyWhenChanged(ref _selectedAnimationCurrentFrame, value); } }
 
         int _selectedAnimationFrameCount = 0;
         public int SelectedAnimationFrameCount { get { return _selectedAnimationFrameCount; } set { SetAndNotifyWhenChanged(ref _selectedAnimationFrameCount, value); } }
@@ -94,7 +94,6 @@ namespace AnimationEditor.Common.AnimationPlayer
             LoopAnimation = false;
             foreach (var item in _assetList)
                 SetFrame(item, SelectedMainAnimation.Asset.Player.FrameCount());
-          
         }
 
         private void MainAnimationChanged(AssetPlayerItem oldAnimation, AssetPlayerItem mainAnimation)
@@ -109,7 +108,7 @@ namespace AnimationEditor.Common.AnimationPlayer
         private void Player_OnFrameChanged(int currentFrame)
         {
             SelectedAnimationCurrentFrame = currentFrame;
-            if (currentFrame == SelectedMainAnimation.Asset.Player.FrameCount())
+            if (SelectedAnimationCurrentFrame == SelectedMainAnimation.Asset.Player.FrameCount())
             {
                 if (LoopAnimation)
                 {

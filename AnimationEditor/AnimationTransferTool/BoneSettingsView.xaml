@@ -13,12 +13,12 @@
     <UserControl.Resources>
         <System:Double x:Key="labelWidth">110</System:Double>
     </UserControl.Resources>
+    <Expander IsExpanded="True" Header="Selected Bone settings:">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="35"/>
-        </Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
 
         <TreeView Grid.Row="0" ItemsSource="{Binding Bones, UpdateSourceTrigger=PropertyChanged}" MaxHeight="400">
             <b:Interaction.Behaviors>
@@ -43,10 +43,8 @@
         </TreeView>
 
         <Grid Grid.Row="1">
-            <StackPanel>
-
-
-                <DockPanel>
+                <StackPanel>
+                    <DockPanel>
                     <Label>
                         <Label.Content>
                             <StackPanel Orientation="Horizontal">
@@ -113,4 +111,5 @@
 
 
     </Grid>
+    </Expander>
 </UserControl>
