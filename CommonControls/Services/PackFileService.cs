@@ -489,6 +489,13 @@ namespace CommonControls.Services
 
         public void Save(PackFileContainer pf, string path, bool createBackup)
         {
+            if (File.Exists(path))
+            {
+                using (Stream stream = new FileStream(path, FileMode.Open))
+                {
+                }
+            }
+
             if(pf.IsCaPackFile)
                 throw new Exception("Can not save ca pack file");
             if (createBackup)
