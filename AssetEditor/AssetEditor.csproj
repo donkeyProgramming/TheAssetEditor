@@ -1,41 +1,45 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <UseWPF>true</UseWPF>
-    <ApplicationIcon>hnet.com-image (1).ico</ApplicationIcon>
-    <AssemblyName>AssetEditor v0.24</AssemblyName>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<UseWPF>true</UseWPF>
+		<ApplicationIcon>hnet.com-image (1).ico</ApplicationIcon>
+		<AssemblyName>AssetEditor v0.24</AssemblyName>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <Optimize>false</Optimize>
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<Optimize>false</Optimize>
+		<PlatformTarget>x64</PlatformTarget>
+		<SignAssembly>false</SignAssembly>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Resource Include="Resources\Schemas\warhammer2_AnimMetaDataSchema.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<SignAssembly>true</SignAssembly>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="27.0.3" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
-    <PackageReference Include="Octokit" Version="0.50.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<Resource Include="Resources\Schemas\warhammer2_AnimMetaDataSchema.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Resource>
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AnimationEditor\AnimationEditor.csproj" />
-    <ProjectReference Include="..\CommonControls\CommonControls.csproj" />
-    <ProjectReference Include="..\KitbasherEditor\KitbasherEditor.csproj" />
-    <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
-    <ProjectReference Include="..\View3D\View3D.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="CsvHelper" Version="27.0.3" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
+		<PackageReference Include="Octokit" Version="0.50.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\AnimationEditor\AnimationEditor.csproj" />
+		<ProjectReference Include="..\CommonControls\CommonControls.csproj" />
+		<ProjectReference Include="..\KitbasherEditor\KitbasherEditor.csproj" />
+		<ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
+		<ProjectReference Include="..\View3D\View3D.csproj" />
+	</ItemGroup>
 
 	<PropertyGroup>
 		<DebugType>embedded</DebugType>
-		<SignAssembly>true</SignAssembly>
 		<Authors>Ole Kristian Homelien</Authors>
 		<Company>Private</Company>
 		<Product>AssetEditor</Product>
