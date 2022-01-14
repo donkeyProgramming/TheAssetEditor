@@ -489,6 +489,11 @@ namespace CommonControls.Services
 
         public void Save(PackFileContainer pf, string path, bool createBackup)
         {
+            if (File.Exists(path) && DirectoryHelper.IsFileLocked(path))
+            {
+                throw new IOException($"Cannot access {path} because another process has locked it, most likely the game.");
+            }
+
             if(pf.IsCaPackFile)
                 throw new Exception("Can not save ca pack file");
             if (createBackup)
