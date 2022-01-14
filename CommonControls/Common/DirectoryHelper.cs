@@ -24,5 +24,21 @@ namespace CommonControls.Common
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
         }
+
+        public static bool IsFileLocked(string path)
+        {
+            try
+            {
+                using (Stream stream = new FileStream(path, FileMode.Open))
+                {
+                }
+            }
+            catch (IOException)
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }
