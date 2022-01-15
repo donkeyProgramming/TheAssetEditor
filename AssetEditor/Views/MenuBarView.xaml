@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:AssetEditor.Views"
+             xmlns:local="clr-namespace:AssetEditor.Views" 
+             xmlns:viewModels="clr-namespace:AssetEditor.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -17,7 +18,27 @@
                     <MenuItem Header="New AnimPack (Warhammer)"  Command="{Binding MenuBar.CreateAnimPackWarhammerCommand}"/>
                     <MenuItem Header="New AnimPack (3k)"  Command="{Binding MenuBar.CreateAnimPack3kCommand}"/>
                 </MenuItem>
-                <MenuItem Header="Recent Files" IsEnabled="False"/>
+                <MenuItem Header="Recent Files" ItemsSource="{Binding MenuBar.RecentPackFiles}">
+                    <MenuItem.Style>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Style.Triggers>
+                                <Trigger Property="HasItems" Value="False">
+                                    <Setter Property="IsEnabled" Value="False" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </MenuItem.Style>
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="Command" Value="{Binding Command}" />
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                    <MenuItem.ItemTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type viewModels:RecentPackFileItem}" ItemsSource="{Binding Path=MenuItems}">
+                            <TextBlock Text="{Binding Header}"/>
+                        </HierarchicalDataTemplate>
+                    </MenuItem.ItemTemplate>
+                </MenuItem>
                 <Separator/>
                 <MenuItem Header="Load all game packfiles">
                     <MenuItem Header="Atilla" Command="{Binding MenuBar.OpenAttilaPacksCommand}"/>

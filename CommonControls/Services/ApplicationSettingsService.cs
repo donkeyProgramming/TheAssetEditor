@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Serilog;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 
@@ -15,6 +16,8 @@ namespace CommonControls.Services
             public GameTypeEnum Game { get; set; }
             public string Path { get; set; }
         }
+
+        public ObservableCollection<string> RecentPackFilePaths = new ObservableCollection<string>();
 
         public List<GamePathPair> GameDirectories { get; set; } = new List<GamePathPair>();
         public GameTypeEnum CurrentGame { get; set; } = GameTypeEnum.Warhammer2;
@@ -56,32 +59,43 @@ namespace CommonControls.Services
             return GetGamePathForGame(game);
         }
 
+        public void ValidateRecentPackFilePaths()
+        {
+            var recentPackfilePaths = CurrentSettings.RecentPackFilePaths;
+            var invalidPacks = recentPackfilePaths.Where(path => !File.Exists(path));
+
+            foreach (var invalidPath in invalidPacks)
+            {
+                recentPackfilePaths.Remove(invalidPath);
+            }
+        }
+
+        public void AddRecentlyOpenedPackFile(string path)
+        {
+            var recentPackFilePaths = CurrentSettings.RecentPackFilePaths;
+
+            if (recentPackFilePaths.Any() && recentPackFilePaths.Last() == path)
+                return;
+
+            if (recentPackFilePaths.Contains(path))
+            {
+                recentPackFilePaths.Remove(path);
+            }
+
+            recentPackFilePaths.Add(path);
+
+            if (recentPackFilePaths.Count > 15)
+            {
+                recentPackFilePaths.RemoveAt(0);
+            }
+            Save();
+        }
+
         public string GetGamePathForGame(GameTypeEnum game)
         {
             var gameDirInfo = CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game);
             return gameDirInfo?.Path;
         }
-
-        //public void AddLastUsedFile(string filePath)
-        //{
-        //    int maxRecentFiles = 5;
-        //
-        //    // Remove the file if it is add already
-        //    var index = CurrentSettings.RecentUsedFiles.IndexOf(filePath);
-        //    if (index != -1)
-        //        CurrentSettings.RecentUsedFiles.RemoveAt(index);
-        //
-        //    // Add the file
-        //    CurrentSettings.RecentUsedFiles.Insert(0, filePath);
-        //
-        //    // Ensure we only have maxRecentFiles in the list
-        //    var currentFileCount = CurrentSettings.RecentUsedFiles.Count;
-        //    if (currentFileCount > maxRecentFiles)
-        //    {
-        //        CurrentSettings.RecentUsedFiles.RemoveRange(maxRecentFiles, currentFileCount - maxRecentFiles);
-        //    }
-        //    Save();
-        //}
 
         public void Save()
         {
@@ -104,6 +118,7 @@ namespace CommonControls.Services
                 CurrentSettings = JsonConvert.DeserializeObject<ApplicationSettings>(content);
 
                 _logger.Here().Information($"Settings loaded.");
+                ValidateRecentPackFilePaths();
             }
             else
             {

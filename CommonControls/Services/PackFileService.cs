@@ -18,11 +18,13 @@ namespace CommonControls.Services
 
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         public PackFileDataBase Database { get; private set; }
+        ApplicationSettingsService _settingsService;
 
-        public PackFileService(PackFileDataBase database, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        public PackFileService(PackFileDataBase database, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService settingsService)
         {
             Database = database;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
+            _settingsService = settingsService;
         }
 
 
@@ -47,6 +49,7 @@ namespace CommonControls.Services
                         if (noCaPacksLoaded == 0 && setToMainPackIfFirst)
                             SetEditablePack(container);
 
+                        _settingsService.AddRecentlyOpenedPackFile(packFileSystemPath);
                         return container;
                     }
                 }
