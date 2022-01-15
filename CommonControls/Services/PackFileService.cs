@@ -2,6 +2,7 @@
 using CommonControls.FileTypes.PackFiles.Models;
 using Serilog;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -225,30 +226,30 @@ namespace CommonControls.Services
             {
                 _logger.Here().Information($"Loading all ca packfiles located in {gameDataFolder}");
                 var allCaPackFiles = GetPackFilesFromManifest(gameDataFolder);
-                var packList = new List<PackFileContainer>();
-                foreach (var packFilePath in allCaPackFiles)
-                {
-                    var path = gameDataFolder + "\\" + packFilePath;
-                    if (File.Exists(path))
+
+                var packBag = new ConcurrentBag<PackFileContainer>();
+
+                Parallel.For(0, allCaPackFiles.Count,
+                    index =>
                     {
-                        using (var fileStram = File.OpenRead(path))
+                        var path = gameDataFolder + "\\" + allCaPackFiles.ElementAt(index);
+                        if (File.Exists(path))
                         {
-                            using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
-                            {
-                                var pack = new PackFileContainer(path, reader, _skeletonAnimationLookUpHelper);
-                                packList.Add(pack);
-                            }
+                            using var fileStram = File.OpenRead(path);
+                            using var reader = new BinaryReader(fileStram, Encoding.ASCII);
+                            var pack = new PackFileContainer(path, reader, _skeletonAnimationLookUpHelper);
+                            packBag.Add(pack);
+                        }
+                        else
+                        {
+                            _logger.Here().Warning($"Ca packfile '{path}' not found, loading skipped");
                         }
                     }
-                    else
-                    {
-                        _logger.Here().Warning($"Ca packfile '{path}' not found, loading skipped");
-                    }
-                }
+                );
 
                 PackFileContainer caPackFileContainer = new PackFileContainer("All CA packs - " + gameName);
                 caPackFileContainer.IsCaPackFile = true;
-                var packFilesOrderedByGroup = packList
+                var packFilesOrderedByGroup = packBag
                     .GroupBy(x => x.Header.LoadOrder)
                     .OrderBy(x => x.Key);
 
