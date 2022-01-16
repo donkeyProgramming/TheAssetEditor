@@ -19,21 +19,44 @@ namespace AssetEditor.Services
                 FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
 
                 var expectedVersion = "v" + fvi.FileMajorPart + "." + fvi.FileMinorPart;
-
                 GitHubClient client = new GitHubClient(new ProductHeaderValue("AssetEditor_instance"));
-                IReadOnlyList<Release> releases = client.Repository.Release.GetAll("olekristianhomelien", "TheAssetEditor").Result;
-            
-                var latest = releases.FirstOrDefault();
-                if (!latest.TagName.Contains(expectedVersion, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    var githubLink = @"https://github.com/olekristianhomelien/TheAssetEditor/releases/latest";
-                    var res = MessageBox.Show("You are using an old version, please go to\nhttps://github.com/olekristianhomelien/TheAssetEditor/releases/latest\nto download \nGo there now?", "Version checker", MessageBoxButton.YesNo);
-                    if (res == MessageBoxResult.Yes)
+
+                client.Repository.Release.GetAll("olekristianhomelien", "TheAssetEditor").ContinueWith(
+                    task =>
                     {
-                        OpenUrl(githubLink);
+                        try
+                        {
+                            if (task.IsFaulted)
+                            {
+                                Exception ex = task.Exception;
+                                while (ex is AggregateException && ex.InnerException != null)
+                                    ex = ex.InnerException;
+                                if (ex != null)
+                                    throw ex;
+                            }
+
+                            var releases = task.Result;
+                            var latest = releases.FirstOrDefault();
+                            if (!latest.TagName.Contains(expectedVersion, StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                var res = MessageBox.Show(
+                                    "You are using an old version, please go to\nhttps://github.com/olekristianhomelien/TheAssetEditor/releases/latest\nto download \nGo there now?",
+                                    "Version checker",
+                                    MessageBoxButton.YesNo
+                                );
+                                if (res == MessageBoxResult.Yes)
+                                {
+                                    var githubLink = @"https://github.com/olekristianhomelien/TheAssetEditor/releases/latest";
+                                    OpenUrl(githubLink);
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show("Unable to contact Github to check for later version");
+                        }
                     }
-                
-                }
+                );
             }
             catch(Exception e)
             {
