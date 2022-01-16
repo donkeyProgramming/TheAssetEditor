@@ -148,6 +148,14 @@ namespace CommonControls.PackFileBrowser
                     var directory = fullPath.Substring(0, directoryEnd);
                     var folder = GetNodeFromPath(root, container,directory);
                     newNode = new TreeNode(fileName, NodeType.File, container, folder, item);
+
+                    // remove any existing files with same name
+                    var existingFile = folder.Children.FirstOrDefault(node => node.Name == item.Name);
+                    if (existingFile != null)
+                    {
+                        folder.Children.Remove(existingFile);
+                    }
+
                     folder.Children.Add(newNode);
                 }
 
