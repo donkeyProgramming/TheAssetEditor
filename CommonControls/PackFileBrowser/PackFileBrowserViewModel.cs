@@ -51,6 +51,7 @@ namespace CommonControls.PackFileBrowser
             _packFileService.Database.PackFilesAdded += Database_PackFilesAdded;
             _packFileService.Database.PackFilesRemoved += Database_PackFilesRemoved;
             _packFileService.Database.PackFileFolderRemoved += Database_PackFileFolderRemoved;
+            _packFileService.Database.PackFileFolderRenamed += Database_PackFileFolderRenamed;
 
             Filter = new PackFileFilter(Files);
 
@@ -72,6 +73,14 @@ namespace CommonControls.PackFileBrowser
             
             node.Parent.Children.Remove(node);
             node.RemoveSelf();
+        }
+
+        private void Database_PackFileFolderRenamed(PackFileContainer container, string folder)
+        {
+            var root = GetPackFileCollectionRootNode(container);
+            var node = GetNodeFromPath(root, container, folder, false);
+
+            node.UnsavedChanged = true;
         }
 
         private void Database_PackFilesRemoved(PackFileContainer container, List<PackFile> files)

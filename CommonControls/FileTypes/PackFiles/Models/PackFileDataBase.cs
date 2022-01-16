@@ -11,6 +11,7 @@ namespace CommonControls.FileTypes.PackFiles.Models
     public delegate void FileUpdated(PackFileContainer container, PackFile file);
     public delegate void PackFileUpdatedDelegate(PackFileContainer container, List<PackFile> file);
     public delegate void PackFileFolderUpdatedDelegate(PackFileContainer container, string folder);
+    public delegate void PackFileFolderRenamedDelegate(PackFileContainer container, string folder);
 
 
     public class PackFileDataBase : NotifyPropertyChangedImpl
@@ -24,6 +25,7 @@ namespace CommonControls.FileTypes.PackFiles.Models
         public event PackFileUpdatedDelegate PackFilesAdded;
         public event PackFileUpdatedDelegate PackFilesRemoved;
         public event PackFileFolderUpdatedDelegate PackFileFolderRemoved;
+        public event PackFileFolderRenamedDelegate PackFileFolderRenamed;
 
         // File updated
         // File added
@@ -80,6 +82,11 @@ namespace CommonControls.FileTypes.PackFiles.Models
         public void TriggerPackFileFolderRemoved(PackFileContainer container, string path)
         {
             PackFileFolderRemoved?.Invoke(container, path);
+        }
+
+        public void TriggerPackFileFolderRenamed(PackFileContainer container, string path)
+        {
+            PackFileFolderRenamed?.Invoke(container, path);
         }
     }
 }
