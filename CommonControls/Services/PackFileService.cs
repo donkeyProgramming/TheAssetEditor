@@ -480,6 +480,9 @@ namespace CommonControls.Services
                 pf.FileList[path.Replace(oldNodePath, newNodePath)] = file;
             }
 
+            _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, pf);
+            _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pf);
+
             Database.TriggerPackFileFolderRenamed(pf, newNodePath);
         }
 
