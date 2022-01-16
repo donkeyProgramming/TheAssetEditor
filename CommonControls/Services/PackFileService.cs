@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using CommonControls.PackFileBrowser;
 
 namespace CommonControls.Services
 {
@@ -462,6 +463,28 @@ namespace CommonControls.Services
 
             Database.TriggerPackFileRemoved(pf, new List<PackFile>() { file  });
             pf.FileList.Remove(key);
+        }
+
+        public void RenameDirectory(PackFileContainer pf, TreeNode node, string newName)
+        {
+            if (pf.IsCaPackFile)
+                throw new Exception("Can not rename in ca pack file");
+
+            var oldNodePath = node.GetFullPath();
+            node.Name = newName;
+            var newNodePath = node.GetFullPath();
+
+            var files = pf.FileList.Where(x => x.Key.StartsWith(oldNodePath)).ToList();
+            foreach (var (path, file) in files)
+            {
+                pf.FileList.Remove(path);
+                pf.FileList[path.Replace(oldNodePath, newNodePath)] = file;
+            }
+
+            _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, pf);
+            _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pf);
+
+            Database.TriggerPackFileFolderRenamed(pf, newNodePath);
         }
 
         // Modify
