@@ -37,12 +37,12 @@ namespace FileTypesTests.FileTypes.RigidModel
          [SetUp]
         public void Init()
         {
-            _pfs = new PackFileService(new PackFileDataBase(), null);
-            _pfs.Load("TestPackPath");
-
-            _resourceLibary = new ResourceLibary(null, _pfs);
-
-            _modelFactory = ModelFactory.Create();
+            //_pfs = new PackFileService(new PackFileDataBase(), null);
+            //_pfs.Load("TestPackPath");
+            //
+            //_resourceLibary = new ResourceLibary(null, _pfs);
+            //
+            //_modelFactory = ModelFactory.Create();
         }
 
         [Test]
