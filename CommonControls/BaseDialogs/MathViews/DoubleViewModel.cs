@@ -1,5 +1,6 @@
 ﻿using CommonControls.Common;
 using System;
+using System.Globalization;
 
 namespace CommonControls.MathViews
 {
@@ -34,7 +35,7 @@ namespace CommonControls.MathViews
         {
             get
             {
-                var valid = double.TryParse(_textvalue, out double result);
+                var valid = double.TryParse(_textvalue.Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out double result);
                 if (valid)
                     return result;
                 return 0;

@@ -2,12 +2,14 @@
 using CommonControls.FileTypes.PackFiles.Models;
 using Serilog;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using CommonControls.PackFileBrowser;
 
 namespace CommonControls.Services
 {
@@ -18,11 +20,13 @@ namespace CommonControls.Services
 
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         public PackFileDataBase Database { get; private set; }
+        ApplicationSettingsService _settingsService;
 
-        public PackFileService(PackFileDataBase database, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        public PackFileService(PackFileDataBase database, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService settingsService)
         {
             Database = database;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
+            _settingsService = settingsService;
         }
 
 
@@ -47,6 +51,7 @@ namespace CommonControls.Services
                         if (noCaPacksLoaded == 0 && setToMainPackIfFirst)
                             SetEditablePack(container);
 
+                        _settingsService.AddRecentlyOpenedPackFile(packFileSystemPath);
                         return container;
                     }
                 }
@@ -222,30 +227,30 @@ namespace CommonControls.Services
             {
                 _logger.Here().Information($"Loading all ca packfiles located in {gameDataFolder}");
                 var allCaPackFiles = GetPackFilesFromManifest(gameDataFolder);
-                var packList = new List<PackFileContainer>();
-                foreach (var packFilePath in allCaPackFiles)
-                {
-                    var path = gameDataFolder + "\\" + packFilePath;
-                    if (File.Exists(path))
+
+                var packBag = new ConcurrentBag<PackFileContainer>();
+
+                Parallel.For(0, allCaPackFiles.Count,
+                    index =>
                     {
-                        using (var fileStram = File.OpenRead(path))
+                        var path = gameDataFolder + "\\" + allCaPackFiles.ElementAt(index);
+                        if (File.Exists(path))
                         {
-                            using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
-                            {
-                                var pack = new PackFileContainer(path, reader, _skeletonAnimationLookUpHelper);
-                                packList.Add(pack);
-                            }
+                            using var fileStram = File.OpenRead(path);
+                            using var reader = new BinaryReader(fileStram, Encoding.ASCII);
+                            var pack = new PackFileContainer(path, reader, _skeletonAnimationLookUpHelper);
+                            packBag.Add(pack);
+                        }
+                        else
+                        {
+                            _logger.Here().Warning($"Ca packfile '{path}' not found, loading skipped");
                         }
                     }
-                    else
-                    {
-                        _logger.Here().Warning($"Ca packfile '{path}' not found, loading skipped");
-                    }
-                }
+                );
 
                 PackFileContainer caPackFileContainer = new PackFileContainer("All CA packs - " + gameName);
                 caPackFileContainer.IsCaPackFile = true;
-                var packFilesOrderedByGroup = packList
+                var packFilesOrderedByGroup = packBag
                     .GroupBy(x => x.Header.LoadOrder)
                     .OrderBy(x => x.Key);
 
@@ -460,6 +465,28 @@ namespace CommonControls.Services
             pf.FileList.Remove(key);
         }
 
+        public void RenameDirectory(PackFileContainer pf, TreeNode node, string newName)
+        {
+            if (pf.IsCaPackFile)
+                throw new Exception("Can not rename in ca pack file");
+
+            var oldNodePath = node.GetFullPath();
+            node.Name = newName;
+            var newNodePath = node.GetFullPath();
+
+            var files = pf.FileList.Where(x => x.Key.StartsWith(oldNodePath)).ToList();
+            foreach (var (path, file) in files)
+            {
+                pf.FileList.Remove(path);
+                pf.FileList[path.Replace(oldNodePath, newNodePath)] = file;
+            }
+
+            _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, pf);
+            _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pf);
+
+            Database.TriggerPackFileFolderRenamed(pf, newNodePath);
+        }
+
         // Modify
         // ---------------------------
         public void RenameFile(PackFileContainer pf, PackFile file, string newName)
@@ -489,6 +516,11 @@ namespace CommonControls.Services
 
         public void Save(PackFileContainer pf, string path, bool createBackup)
         {
+            if (File.Exists(path) && DirectoryHelper.IsFileLocked(path))
+            {
+                throw new IOException($"Cannot access {path} because another process has locked it, most likely the game.");
+            }
+
             if(pf.IsCaPackFile)
                 throw new Exception("Can not save ca pack file");
             if (createBackup)

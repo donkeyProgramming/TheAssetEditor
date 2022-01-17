@@ -80,7 +80,9 @@ namespace CommonControls.PackFileBrowser
 
             if (_selectedNode.NodeType == NodeType.Directory)
             {
-                MessageBox.Show("Not possible to rename a directory at this point");
+                var window = new TextInputWindow("Rename folder", _selectedNode.Name);
+                if (window.ShowDialog() == true)
+                    _packFileService.RenameDirectory(_selectedNode.FileOwner, _selectedNode, window.TextValue);
             }
             else if (_selectedNode.NodeType == NodeType.File)
             {

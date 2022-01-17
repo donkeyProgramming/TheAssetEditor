@@ -15,6 +15,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
@@ -25,6 +26,20 @@ using AssetEditor.Report;
 
 namespace AssetEditor.ViewModels
 {
+    public class RecentPackFileItem
+    {
+        public RecentPackFileItem(string path, Action execute)
+        {
+            Command = new RelayCommand(execute);
+            Header = System.IO.Path.GetFileName(path);
+        }
+
+        public string Header { get; set; }
+        public string Path { get; set; }
+
+        public ICommand Command { get; }
+    }
+
     public class MenuBarViewModel
     {
         ILogger _logger = Logging.Create<MainViewModel>();
@@ -66,6 +81,8 @@ namespace AssetEditor.ViewModels
         public ICommand CreateAnimPackWarhammerCommand { get; set; }
         public ICommand CreateAnimPack3kCommand { get; set; }
 
+        public ObservableCollection<RecentPackFileItem> RecentPackFiles { get; set; } = new ObservableCollection<RecentPackFileItem>();
+
         public MenuBarViewModel(IServiceProvider provider, PackFileService packfileService, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ToolFactory toolFactory, ApplicationSettingsService settingsService)
         {
             _serviceProvider = provider;
@@ -102,6 +119,29 @@ namespace AssetEditor.ViewModels
             OpenHelpCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://tw-modding.com/index.php/Tutorial:AssetEditor") { CreateNoWindow = true }));
             OpenPatreonCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://www.patreon.com/TheAssetEditor") { CreateNoWindow = true }));
             OpenDiscordCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://discord.gg/6Djf2sCczC") { CreateNoWindow = true }));
+
+            var settings = settingsService.CurrentSettings;
+            settings.RecentPackFilePaths.CollectionChanged += (sender, args) => CreateRecentPackFilesItems();
+            CreateRecentPackFilesItems();
+        }
+
+        void CreateRecentPackFilesItems()
+        {
+            var settings = _settingsService.CurrentSettings;
+
+            RecentPackFiles.Clear();
+            var menuItemViewModels = settings.RecentPackFilePaths.Select(path => new RecentPackFileItem(
+                path,
+                () =>
+                {
+                    if (_packfileService.Load(path, true) == null)
+                        MessageBox.Show($"Unable to load packfiles {path}");
+                }
+            ));
+            foreach (var menuItem in menuItemViewModels.Reverse())
+            {
+                RecentPackFiles.Add(menuItem);
+            }
         }
 
         void OpenPackFile()

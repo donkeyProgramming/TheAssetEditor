@@ -51,6 +51,7 @@ namespace CommonControls.PackFileBrowser
             _packFileService.Database.PackFilesAdded += Database_PackFilesAdded;
             _packFileService.Database.PackFilesRemoved += Database_PackFilesRemoved;
             _packFileService.Database.PackFileFolderRemoved += Database_PackFileFolderRemoved;
+            _packFileService.Database.PackFileFolderRenamed += Database_PackFileFolderRenamed;
 
             Filter = new PackFileFilter(Files);
 
@@ -72,6 +73,14 @@ namespace CommonControls.PackFileBrowser
             
             node.Parent.Children.Remove(node);
             node.RemoveSelf();
+        }
+
+        private void Database_PackFileFolderRenamed(PackFileContainer container, string folder)
+        {
+            var root = GetPackFileCollectionRootNode(container);
+            var node = GetNodeFromPath(root, container, folder, false);
+
+            node.UnsavedChanged = true;
         }
 
         private void Database_PackFilesRemoved(PackFileContainer container, List<PackFile> files)
@@ -148,6 +157,14 @@ namespace CommonControls.PackFileBrowser
                     var directory = fullPath.Substring(0, directoryEnd);
                     var folder = GetNodeFromPath(root, container,directory);
                     newNode = new TreeNode(fileName, NodeType.File, container, folder, item);
+
+                    // remove any existing files with same name
+                    var existingFile = folder.Children.FirstOrDefault(node => node.Name == item.Name);
+                    if (existingFile != null)
+                    {
+                        folder.Children.Remove(existingFile);
+                    }
+
                     folder.Children.Add(newNode);
                 }
 

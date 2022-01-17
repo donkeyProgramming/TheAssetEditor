@@ -4,6 +4,7 @@ using CommonControls.FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;
 using Serilog;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -15,7 +16,7 @@ namespace CommonControls.Services
     public class SkeletonAnimationLookUpHelper : IGameComponent, IAnimationFileDiscovered
     {
         ILogger _logger = Logging.Create<SkeletonAnimationLookUpHelper>();
-        Dictionary<string, ObservableCollection<AnimationReference>> _skeletonNameToAnimationMap = new Dictionary<string, ObservableCollection<AnimationReference>>();
+        ConcurrentDictionary<string, ObservableCollection<AnimationReference>> _skeletonNameToAnimationMap = new ConcurrentDictionary<string, ObservableCollection<AnimationReference>>();
 
         public ObservableCollection<string> SkeletonFileNames = new ObservableCollection<string>();
 
@@ -47,10 +48,15 @@ namespace CommonControls.Services
                 }
 
                 var animationSkeletonName = AnimationFile.GetAnimationHeader(file).SkeletonName;
-                if (_skeletonNameToAnimationMap.ContainsKey(animationSkeletonName) == false)
-                    _skeletonNameToAnimationMap.Add(animationSkeletonName, new ObservableCollection<AnimationReference>());
-
-                _skeletonNameToAnimationMap[animationSkeletonName].Add(new AnimationReference(fullPath, container));
+                _skeletonNameToAnimationMap.AddOrUpdate(
+                    animationSkeletonName,
+                    new ObservableCollection<AnimationReference>() { new AnimationReference(fullPath, container) },
+                    (sanimationSkeletonName, animationMap) =>
+                    {
+                        animationMap.Add(new AnimationReference(fullPath, container));
+                        return animationMap;
+                    }
+                );
             }
             catch (Exception e)
             {
@@ -87,9 +93,10 @@ namespace CommonControls.Services
 
         public ObservableCollection<AnimationReference> GetAnimationsForSkeleton(string skeletonName)
         {
-            if (_skeletonNameToAnimationMap.ContainsKey(skeletonName) == false)
-                _skeletonNameToAnimationMap.Add(skeletonName, new ObservableCollection<AnimationReference>());
-            return _skeletonNameToAnimationMap[skeletonName];
+            return _skeletonNameToAnimationMap.GetOrAdd(
+                skeletonName,
+                new ObservableCollection<AnimationReference>()
+            );
         }
 
         public AnimationFile GetSkeletonFileFromName(PackFileService pfs, string skeletonName)
