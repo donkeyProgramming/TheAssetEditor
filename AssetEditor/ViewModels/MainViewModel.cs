@@ -20,6 +20,25 @@ using TextureEditor.ViewModels;
 
 namespace AssetEditor.ViewModels
 {
+    // Helper when binding inside ContextMenu
+    // https://stackoverflow.com/questions/3583507/wpf-binding-a-contextmenu-to-an-mvvm-command
+    public class BindingProxy : Freezable
+    {
+        protected override Freezable CreateInstanceCore()
+        {
+            return new BindingProxy();
+        }
+
+        public object Data
+        {
+            get { return (object)GetValue(DataProperty); }
+            set { SetValue(DataProperty, value); }
+        }
+
+        public static readonly DependencyProperty DataProperty =
+            DependencyProperty.Register("Data", typeof(object), typeof(BindingProxy), new UIPropertyMetadata(null));
+    }
+
     class MainViewModel : NotifyPropertyChangedImpl, IEditorCreator
     {
         ILogger _logger = Logging.Create<MainViewModel>();
@@ -34,6 +53,7 @@ namespace AssetEditor.ViewModels
         public int SelectedEditorIndex { get => _selectedIndex; set => SetAndNotify(ref _selectedIndex, value); }
 
         public ICommand CloseToolCommand { get; set; }
+        public ICommand CloseOtherToolsCommand { get; set; }
 
         public MainViewModel(MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, ToolFactory toolFactory, SchemaManager schemaManager)
         {
@@ -43,6 +63,7 @@ namespace AssetEditor.ViewModels
             MenuBar = menuViewModel;
             MenuBar.EditorCreator = this;
             CloseToolCommand = new RelayCommand<IEditorViewModel>(CloseTool);
+            CloseOtherToolsCommand = new RelayCommand<IEditorViewModel>(CloseOtherTools);
 
             FileTree = new PackFileBrowserViewModel(_packfileService);
             FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, toolFactory, this);
@@ -278,6 +299,15 @@ namespace AssetEditor.ViewModels
             var index = CurrentEditorsList.IndexOf(tool);
             CurrentEditorsList.RemoveAt(index);
             tool.Close();
+        }
+
+        void CloseOtherTools(IEditorViewModel tool)
+        {
+            foreach (var editorViewModel in CurrentEditorsList.ToList())
+            {
+                if (editorViewModel != tool)
+                    CloseTool(editorViewModel);
+            }
         }
 
         public void CreateEmptyEditor(IEditorViewModel editorView)
