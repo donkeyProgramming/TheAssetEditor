@@ -23,6 +23,7 @@ namespace CommonControls.PackFileBrowser
         public ObservableCollection<TreeNode> Files { get; set; } = new ObservableCollection<TreeNode>();
         public PackFileFilter Filter { get; private set; }
         public ICommand DoubleClickCommand { get; set; }
+        public ICommand DropCommand { get; set; }
 
         TreeNode _selectedItem;
         public TreeNode SelectedItem
@@ -36,11 +37,25 @@ namespace CommonControls.PackFileBrowser
             }
         }
 
+        public class DragDoneParameters
+        {
+            public DragDoneParameters(TreeNode draggedNode, TreeNode dropTarget, string dropTargetPath)
+            {
+                DraggedItem = draggedNode;
+                DropTarget = dropTarget;
+                DropTargetPath = dropTargetPath;
+            }
+            public TreeNode DraggedItem;
+            public TreeNode DropTarget;
+            public string DropTargetPath;
+        }
+
         public ContextMenuHandler ContextMenu { get; set; }
 
         public PackFileBrowserViewModel(PackFileService packFileService, bool ignoreCaFiles = false)
         {
             DoubleClickCommand = new RelayCommand<TreeNode>(OnDoubleClick);
+            DropCommand = new RelayCommand<DragDoneParameters>(OnDrop);
 
             _packFileService = packFileService;
             _packFileService.Database.PackFileContainerLoaded += ReloadTree;
@@ -122,6 +137,34 @@ namespace CommonControls.PackFileBrowser
             // using command parmeter to get node causes memory leaks, using selected node for now
             if (SelectedItem != null && SelectedItem.NodeType == NodeType.File)
                 FileOpen?.Invoke(SelectedItem.Item ); 
+        }
+
+        protected virtual void OnDrop(DragDoneParameters dragDoneParameters)
+        {
+            try
+            {
+                var draggedItem = dragDoneParameters.DraggedItem;
+                var dropPath = dragDoneParameters.DropTargetPath;
+                var dropTarget = dragDoneParameters.DropTarget;
+                var container = draggedItem.FileOwner;
+                var draggedFile = draggedItem.Item;
+                var root = GetPackFileCollectionRootNode(container);
+
+                var newFullPath = dropPath + "\\" + draggedFile.Name;
+                if (newFullPath == _packFileService.GetFullPath(draggedFile, container))
+                    return;
+
+                _packFileService.MoveFile(container, draggedFile, dropPath);
+
+                draggedItem.Parent.Children.Remove(draggedItem);
+                dropTarget.Children.Add(draggedItem);
+                draggedItem.Parent = dropTarget;
+
+                root.UnsavedChanged = true;
+            }
+            catch (Exception e)
+            {
+            }
         }
 
         private void ContainerUpdated(PackFileContainer pf)

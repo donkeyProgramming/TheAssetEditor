@@ -72,6 +72,37 @@ namespace CommonControls.PackFileBrowser
             }
         }
 
+        private void treeView_Drop(object sender, DragEventArgs e)
+        {
+            try
+            {
+                if (draggedItem == null)
+                    return;
+
+                var treeItem = sender as TreeViewItem;
+
+                var treeNode = treeItem?.DataContext as TreeNode;
+                if (treeNode == null)
+                    return;
+
+                if (draggedItem.Item == null) // dragging a folder not supported
+                    return;
+
+                if (draggedItem.FileOwner != treeNode.FileOwner) // dragging between pack not supported
+                    return;
+
+                if (treeNode.Item != null) // dragging file onto a file not supported
+                    return;
+
+                var vm = DataContext as PackFileBrowserViewModel;
+                vm.DropCommand.Execute(new PackFileBrowserViewModel.DragDoneParameters(draggedItem, treeNode, treeNode.GetFullPath()));
+                e.Handled = true;
+            }
+            catch (Exception exception)
+            {
+            }
+        }
+
         private void TreeViewItem_PreviewMouseRightButtonDown(object sender, MouseEventArgs e)
         {
             TreeViewItem item = sender as TreeViewItem;

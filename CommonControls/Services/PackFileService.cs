@@ -465,6 +465,20 @@ namespace CommonControls.Services
             pf.FileList.Remove(key);
         }
 
+        public void MoveFile(PackFileContainer pf, PackFile file, string newFolderPath)
+        {
+            if (pf.IsCaPackFile)
+                throw new Exception("Can not add files to ca pack file");
+
+            var newFullPath = newFolderPath + "\\" + file.Name;
+
+            var key = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
+            pf.FileList.Remove(key);
+            pf.FileList[newFullPath] = file;
+
+            _logger.Here().Information($"Moving file {key}");
+        }
+
         public void RenameDirectory(PackFileContainer pf, TreeNode node, string newName)
         {
             if (pf.IsCaPackFile)
