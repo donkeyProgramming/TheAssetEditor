@@ -427,6 +427,8 @@ Fixed 0.25
 		Added option of generation report for how meta data is used by the game
 	
 Fixed 0.26
+	Remember prop joe! 
+
 	AnimTransfer tool
 		Which anim is length setter
 		"Splice"
@@ -446,6 +448,8 @@ Fixed 0.26
 		Override skeleton in kitbasher? 
 		Goal - Flying squig! 
 		Goal - Power claw 
+		
+	View lod header  info 
 
 	Meta editor 
 		Rename super view 
@@ -522,3 +526,20 @@ Cool assetEditor projects:
 	https://steamcommunity.com/sharedfiles/filedetails/?id=1181220751&searchtext=
 	black karl franze mod 
 	Rat damsel 
+
+hu2_orc_2handed_axe
+Warp fireball explotion 
+
+freb_glow_
+
+wh_dlc06_weapon_trail_drakegun_skolder
+wh2_main_machine_warp_lightning_cannon_destruct
+wh2_dlc16_entity_melee_warpstone_impact
+
+
+[data] animations\battle\humanoid03\axe\attacks\hu3_axe_attack_03.anim headbut
+[data] animations\battle\humanoid01\sword_and_shield\attacks\hu1_sws_attack_02.anim kick
+
+
+
+Spine 0

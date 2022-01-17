@@ -4,15 +4,11 @@ using CommonControls.FileTypes.DB;
 using CommonControls.FileTypes.MetaData;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using CommunityToolkit.Mvvm.Input;
 using Serilog;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Windows.Input;
 
 namespace CommonControls.Editors.AnimMeta
 {
@@ -23,7 +19,6 @@ namespace CommonControls.Editors.AnimMeta
         PackFileService _pf;
         SchemaManager _schemaManager;
         MetaDataFile _metaDataFile;
-
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>();
 

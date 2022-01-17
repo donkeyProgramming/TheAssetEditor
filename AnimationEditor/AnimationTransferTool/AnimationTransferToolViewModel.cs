@@ -105,6 +105,24 @@ namespace AnimationEditor.AnimationTransferTool
             creator.CreateEmptyEditor(editorView);
         }
 
+        public static void CreateFlyingSquig(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        {
+            var editorView = toolFactory.CreateEditorViewModel<AnimationTransferToolViewModel>();
+            editorView.MainInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\wh_variantmodels\rp2\grn\grn_squig_herd\grn_squig_herd_01_2b.rigid_model_v2"),
+                Animation = packfileService.FindFile(@"animations\battle\raptor02b\stand\cust_rp2_stand_idle_01.anim"),
+            };
+
+            editorView.RefInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hr1\brt\brt_royal_pegasus\brt_pegasus_01.rigid_model_v2"),
+                Animation = packfileService.FindFile(@"animations\campaign_fauna\horse01\stand\hr1_stand_idle_05.anim")
+            };
+
+            creator.CreateEmptyEditor(editorView);
+        }
+
 
     }
 }

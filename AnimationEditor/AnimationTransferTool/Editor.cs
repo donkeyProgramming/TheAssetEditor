@@ -208,17 +208,17 @@ namespace AnimationEditor.AnimationTransferTool
         {
             if (CanUpdateAnimation(true))
             {
-                var newAnimationClip = UpdateAnimation(_copyFrom.AnimationClip);
+                var newAnimationClip = UpdateAnimation(_copyFrom.AnimationClip, _copyTo.AnimationClip);
                 Generated.SetAnimationClip(newAnimationClip, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
 
                 _player.SelectedMainAnimation = _player.PlayerItems.First(x => x.Asset == Generated);
             }
         }
 
-        AnimationClip UpdateAnimation(AnimationClip clip)
+        AnimationClip UpdateAnimation(AnimationClip animationToCopy, AnimationClip originalAnimation)
         {
             var service = new AnimationRemapperService(AnimationSettings, _remappingInformaton, Bones);
-            var newClip = service.ReMapAnimation(_copyFrom.Skeleton, _copyTo.Skeleton, clip, null);
+            var newClip = service.ReMapAnimation(_copyFrom.Skeleton, _copyTo.Skeleton, animationToCopy, originalAnimation);
             return newClip;
         }
 
@@ -277,7 +277,7 @@ namespace AnimationEditor.AnimationTransferTool
 
                             _logger.Here().Information($"Processing animation {index} / {numItemsToProcess} - {item.DisplayName}");
 
-                            var updatedClip = UpdateAnimation(clip);
+                            var updatedClip = UpdateAnimation(clip, null);
                             SaveAnimation(updatedClip, item.ItemValue.AnimationFile, false);
                             index++;
                         }
