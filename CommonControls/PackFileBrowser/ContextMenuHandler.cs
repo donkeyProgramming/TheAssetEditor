@@ -156,7 +156,9 @@ namespace CommonControls.PackFileBrowser
                 return;
             }
 
-            _selectedNode.Children.Add(new TreeNode("TestF", NodeType.Directory, _selectedNode.FileOwner, _selectedNode));
+            var window = new TextInputWindow("Create folder");
+            if (window.ShowDialog() == true)
+                _selectedNode.Children.Add(new TreeNode(window.TextValue, NodeType.Directory, _selectedNode.FileOwner, _selectedNode));
         }
 
         void DeleteNode()
@@ -370,6 +372,8 @@ namespace CommonControls.PackFileBrowser
             {
                 case ContextItems.Add:
                     return new ContextMenuItem() { Name = "Add"};
+                case ContextItems.Create:
+                    return new ContextMenuItem() { Name = "Create" };
                 case ContextItems.AddFiles:
                     return new ContextMenuItem() { Name = "Add file", Command = AddFilesCommand }; ;
                 case ContextItems.AddDirectory:
@@ -417,6 +421,7 @@ namespace CommonControls.PackFileBrowser
             CopyToEditablePack,
             Duplicate,
             CreateFolder,
+            Create,
 
             Expand,
             CopyFullPath,

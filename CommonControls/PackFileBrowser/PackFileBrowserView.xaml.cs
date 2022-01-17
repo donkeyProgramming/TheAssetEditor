@@ -88,7 +88,7 @@ namespace CommonControls.PackFileBrowser
                 if (draggedItem.Item == null) // dragging a folder not supported
                     return;
 
-                if (draggedItem.FileOwner != treeNode.FileOwner) // dragging between pack not supported
+                if (draggedItem.FileOwner != treeNode.FileOwner) // dragging between different packs not supported
                     return;
 
                 if (treeNode.Item != null) // dragging file onto a file not supported

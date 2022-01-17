@@ -38,6 +38,10 @@ namespace CommonControls.PackFileBrowser
                     var addFolder = Additem(ContextItems.Add, newContextMenu);
                     Additem(ContextItems.AddFiles, addFolder);
                     Additem(ContextItems.AddDirectory, addFolder);
+
+                    var createMenu = Additem(ContextItems.Create, newContextMenu);
+                    Additem(ContextItems.CreateFolder, createMenu);
+
                     AddSeperator(newContextMenu);
 
                     Additem(ContextItems.Expand, newContextMenu);
@@ -57,6 +61,9 @@ namespace CommonControls.PackFileBrowser
                     var addFolder = Additem(ContextItems.Add, newContextMenu);
                     Additem(ContextItems.AddFiles, addFolder);
                     Additem(ContextItems.AddDirectory, addFolder);
+
+                    var createMenu = Additem(ContextItems.Create, newContextMenu);
+                    Additem(ContextItems.CreateFolder, createMenu);
 
                     AddSeperator(newContextMenu);
                     Additem(ContextItems.Rename, newContextMenu);
