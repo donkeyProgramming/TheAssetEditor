@@ -7,6 +7,7 @@
         xmlns:views="clr-namespace:AssetEditor.Views" 
         xmlns:viewFacotry="clr-namespace:AssetEditor.DataTemplates"
         xmlns:viewModels="clr-namespace:AssetEditor.ViewModels"
+        xmlns:common="clr-namespace:CommonControls.Common;assembly=CommonControls"
         mc:Ignorable="d"
         Title="AssetEditor" Height="1024" Width="2000">
     <Window.Resources>
@@ -46,14 +47,14 @@
                      ContentTemplateSelector="{StaticResource EditorSelector}"
                      viewFacotry:ToolFactoryParameter.ViewFactory="{Binding ToolsFactory}">
             <TabControl.Resources>
-                <viewModels:BindingProxy x:Key="Proxy" Data="{Binding}" />
+                <common:BindingProxy x:Key="Proxy" Data="{Binding}" />
             </TabControl.Resources>
 
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <Grid>
                         <Grid.Resources>
-                            <viewModels:BindingProxy x:Key="GridProxy" Data="{Binding}" />
+                            <common:BindingProxy x:Key="GridProxy" Data="{Binding}" />
                         </Grid.Resources>
 
                         <Grid.ColumnDefinitions>
