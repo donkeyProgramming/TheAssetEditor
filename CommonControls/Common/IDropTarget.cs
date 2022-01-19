@@ -5,9 +5,15 @@ using System.Text;
 
 namespace CommonControls.Common
 {
-    public interface IDropTarget
+    public interface IDropTarget<T>
     {
-        bool AllowDrop(TreeNode node, TreeNode targeNode = null);
-        bool Drop(TreeNode node, TreeNode targeNode = null);
+        bool AllowDrop(T node, T targeNode = default);
+        bool Drop(T node, T targeNode = default);
+    }
+
+    public interface IDropTarget<T, U>
+    {
+        bool AllowDrop(T node, T targeNode = default, U additionalData = default);
+        bool Drop(T node, T targeNode = default, U additionalData = default);
     }
 }

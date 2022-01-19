@@ -45,10 +45,21 @@
                      ItemsSource="{Binding CurrentEditorsList, UpdateSourceTrigger=PropertyChanged}"
                      SelectedIndex = "{Binding SelectedEditorIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                      ContentTemplateSelector="{StaticResource EditorSelector}"
-                     viewFacotry:ToolFactoryParameter.ViewFactory="{Binding ToolsFactory}">
+                     viewFacotry:ToolFactoryParameter.ViewFactory="{Binding ToolsFactory}"
+                     Name="EditorsTabControl">
             <TabControl.Resources>
                 <common:BindingProxy x:Key="Proxy" Data="{Binding}" />
             </TabControl.Resources>
+
+            <TabControl.ItemContainerStyle>
+                <Style TargetType="TabItem">
+                    <EventSetter Event="Drop" Handler="tabItem_Drop"/>
+                    <EventSetter Event="PreviewMouseMove" Handler="tabItem_MouseMove"/>
+                    <EventSetter Event="PreviewMouseDown" Handler="tabItem_MouseDown"/>
+                    <Setter Property="AllowDrop" Value="True"/>
+                    <Setter Property="Focusable" Value="False"/>
+                </Style>
+            </TabControl.ItemContainerStyle>
 
             <TabControl.ItemTemplate>
                 <DataTemplate>

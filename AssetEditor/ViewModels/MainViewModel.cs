@@ -20,7 +20,7 @@ using TextureEditor.ViewModels;
 
 namespace AssetEditor.ViewModels
 {
-    class MainViewModel : NotifyPropertyChangedImpl, IEditorCreator
+    class MainViewModel : NotifyPropertyChangedImpl, IEditorCreator, IDropTarget<IEditorViewModel, bool>
     {
         ILogger _logger = Logging.Create<MainViewModel>();
         PackFileService _packfileService;
@@ -295,6 +295,40 @@ namespace AssetEditor.ViewModels
         {
             CurrentEditorsList.Add(editorView);
             SelectedEditorIndex = CurrentEditorsList.Count - 1;
+        }
+
+        public bool AllowDrop(IEditorViewModel node, IEditorViewModel targeNode = default, bool insertAfterTargetNode = default)
+        {
+            return true;
+        }
+
+        public bool Drop(IEditorViewModel node, IEditorViewModel targeNode = default, bool insertAfterTargetNode = default)
+        {
+            var nodeIndex = CurrentEditorsList.IndexOf(node);
+            var targetNodeIndex = CurrentEditorsList.IndexOf(targeNode);
+
+            if (Math.Abs(nodeIndex - targetNodeIndex) == 1) // if tabs next to each other switch places
+            {
+                (CurrentEditorsList[nodeIndex], CurrentEditorsList[targetNodeIndex]) = (CurrentEditorsList[targetNodeIndex], CurrentEditorsList[nodeIndex]);
+            }
+            else // if tabs are not next to each other decide based on insertAfterTargetNode
+            {
+                if (insertAfterTargetNode)
+                    targetNodeIndex += 1;
+
+                var item = CurrentEditorsList[nodeIndex];
+
+                CurrentEditorsList.RemoveAt(nodeIndex);
+
+                if (targetNodeIndex > nodeIndex)
+                    targetNodeIndex--;
+
+                CurrentEditorsList.Insert(targetNodeIndex, item);
+            }
+
+
+            SelectedEditorIndex = CurrentEditorsList.IndexOf(node);
+            return true;
         }
     }
 

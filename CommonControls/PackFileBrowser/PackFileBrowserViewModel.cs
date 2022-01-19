@@ -14,7 +14,7 @@ namespace CommonControls.PackFileBrowser
     public delegate void FileSelectedDelegate(PackFile file);
     public delegate void NodeSelectedDelegate(TreeNode node);
 
-    public class PackFileBrowserViewModel : NotifyPropertyChangedImpl, IDisposable, IDropTarget
+    public class PackFileBrowserViewModel : NotifyPropertyChangedImpl, IDisposable, IDropTarget<TreeNode>
     {
         protected PackFileService _packFileService;
         public event FileSelectedDelegate FileOpen;
