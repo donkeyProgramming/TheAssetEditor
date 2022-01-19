@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using CommonControls.Common;
 
 namespace CommonControls.PackFileBrowser
 {
@@ -76,30 +77,24 @@ namespace CommonControls.PackFileBrowser
         {
             try
             {
-                if (draggedItem == null)
-                    return;
+                if (DataContext is IDropTarget dropContainer)
+                {
 
-                var treeItem = sender as TreeViewItem;
+                    if (draggedItem == null)
+                        return;
 
-                var treeNode = treeItem?.DataContext as TreeNode;
-                if (treeNode == null)
-                    return;
+                    var dropTargetItem = sender as TreeViewItem;
+                    var dropTargetNode = dropTargetItem?.DataContext as TreeNode;
+                    if (dropTargetNode == null)
+                        return;
 
-                if (draggedItem.Item == null) // dragging a folder not supported
-                    return;
-
-                if (draggedItem.FileOwner != treeNode.FileOwner) // dragging between different packs not supported
-                    return;
-
-                if (draggedItem.FileOwner.IsCaPackFile)
-                    return;
-
-                if (treeNode.Item != null) // dragging file onto a file not supported
-                    return;
-
-                var vm = DataContext as PackFileBrowserViewModel;
-                vm.DropCommand.Execute(new PackFileBrowserViewModel.DragDoneParameters(draggedItem, treeNode, treeNode.GetFullPath()));
-                e.Handled = true;
+                    if (dropContainer.AllowDrop(draggedItem, dropTargetNode))
+                    {
+                        dropContainer.Drop(draggedItem, dropTargetNode);
+                        e.Effects = DragDropEffects.None;
+                        e.Handled = true;
+                    }
+                }
             }
             catch (Exception exception)
             {

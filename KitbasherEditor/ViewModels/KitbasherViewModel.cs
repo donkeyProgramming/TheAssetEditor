@@ -134,7 +134,7 @@ namespace KitbasherEditor.ViewModels
             return false;
         }
 
-        public bool AllowDrop(TreeNode node)
+        public bool AllowDrop(TreeNode node, TreeNode targeNode = null)
         {
             if (node != null && node.NodeType == NodeType.File)
             {
@@ -145,7 +145,7 @@ namespace KitbasherEditor.ViewModels
             return false;
         }
 
-        public bool Drop(TreeNode node)
+        public bool Drop(TreeNode node, TreeNode targeNode = null)
         {
             _modelLoader.LoadReference(node.Item );
             return true;

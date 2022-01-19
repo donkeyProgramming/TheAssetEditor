@@ -14,7 +14,7 @@ namespace CommonControls.PackFileBrowser
     public delegate void FileSelectedDelegate(PackFile file);
     public delegate void NodeSelectedDelegate(TreeNode node);
 
-    public class PackFileBrowserViewModel : NotifyPropertyChangedImpl, IDisposable
+    public class PackFileBrowserViewModel : NotifyPropertyChangedImpl, IDisposable, IDropTarget
     {
         protected PackFileService _packFileService;
         public event FileSelectedDelegate FileOpen;
@@ -23,7 +23,6 @@ namespace CommonControls.PackFileBrowser
         public ObservableCollection<TreeNode> Files { get; set; } = new ObservableCollection<TreeNode>();
         public PackFileFilter Filter { get; private set; }
         public ICommand DoubleClickCommand { get; set; }
-        public ICommand DropCommand { get; set; }
 
         TreeNode _selectedItem;
         public TreeNode SelectedItem
@@ -37,25 +36,11 @@ namespace CommonControls.PackFileBrowser
             }
         }
 
-        public class DragDoneParameters
-        {
-            public DragDoneParameters(TreeNode draggedNode, TreeNode dropTarget, string dropTargetPath)
-            {
-                DraggedItem = draggedNode;
-                DropTarget = dropTarget;
-                DropTargetPath = dropTargetPath;
-            }
-            public TreeNode DraggedItem;
-            public TreeNode DropTarget;
-            public string DropTargetPath;
-        }
-
         public ContextMenuHandler ContextMenu { get; set; }
 
         public PackFileBrowserViewModel(PackFileService packFileService, bool ignoreCaFiles = false)
         {
             DoubleClickCommand = new RelayCommand<TreeNode>(OnDoubleClick);
-            DropCommand = new RelayCommand<DragDoneParameters>(OnDrop);
 
             _packFileService = packFileService;
             _packFileService.Database.PackFileContainerLoaded += ReloadTree;
@@ -137,34 +122,6 @@ namespace CommonControls.PackFileBrowser
             // using command parmeter to get node causes memory leaks, using selected node for now
             if (SelectedItem != null && SelectedItem.NodeType == NodeType.File)
                 FileOpen?.Invoke(SelectedItem.Item ); 
-        }
-
-        protected virtual void OnDrop(DragDoneParameters dragDoneParameters)
-        {
-            try
-            {
-                var draggedItem = dragDoneParameters.DraggedItem;
-                var dropPath = dragDoneParameters.DropTargetPath;
-                var dropTarget = dragDoneParameters.DropTarget;
-                var container = draggedItem.FileOwner;
-                var draggedFile = draggedItem.Item;
-                var root = GetPackFileCollectionRootNode(container);
-
-                var newFullPath = dropPath + "\\" + draggedFile.Name;
-                if (newFullPath == _packFileService.GetFullPath(draggedFile, container))
-                    return;
-
-                _packFileService.MoveFile(container, draggedFile, dropPath);
-
-                draggedItem.Parent.Children.Remove(draggedItem);
-                dropTarget.Children.Add(draggedItem);
-                draggedItem.Parent = dropTarget;
-
-                root.UnsavedChanged = true;
-            }
-            catch (Exception e)
-            {
-            }
         }
 
         private void ContainerUpdated(PackFileContainer pf)
@@ -361,6 +318,45 @@ namespace CommonControls.PackFileBrowser
             _packFileService.Database.PackFilesAdded -= Database_PackFilesAdded;
             _packFileService.Database.PackFilesRemoved -= Database_PackFilesRemoved;
             _packFileService.Database.PackFileFolderRemoved -= Database_PackFileFolderRemoved;
+        }
+
+        public bool AllowDrop(TreeNode node, TreeNode targetNode = null)
+        {
+            if (node.Item == null) // dragging a folder not supported
+                return false;
+
+            if (node.FileOwner != targetNode.FileOwner) // dragging between different packs not supported
+                return false;
+
+            if (node.FileOwner.IsCaPackFile) // dragging inside CA pack not supported
+                return false;
+
+            if (targetNode.Item != null) // dragging file onto a file not supported
+                return false;
+
+            return true;
+        }
+
+        public bool Drop(TreeNode node, TreeNode targeNode)
+        {
+            var container = node.FileOwner;
+            var draggedFile = node.Item;
+            var dropPath = targeNode.GetFullPath();
+
+            var newFullPath = dropPath + "\\" + draggedFile.Name;
+            if (newFullPath == _packFileService.GetFullPath(draggedFile, container))
+                return false;
+
+            _packFileService.MoveFile(container, draggedFile, dropPath);
+
+            node.Parent.Children.Remove(node);
+            targeNode.Children.Add(node);
+            node.Parent = targeNode;
+
+            var root = GetPackFileCollectionRootNode(container);
+            root.UnsavedChanged = true;
+
+            return true;
         }
     }
 }
