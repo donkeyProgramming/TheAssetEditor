@@ -439,7 +439,7 @@ namespace CommonControls.Services
         public void DeleteFolder(PackFileContainer pf, string folder)
         {
             if (pf.IsCaPackFile)
-                throw new Exception("Can not add files to ca pack file");
+                throw new Exception("Can not delete folder inside CA pack file");
 
             var folderLower = folder.ToLower();
             var itemsToDelete = pf.FileList.Where(x => x.Key.StartsWith(folderLower));
@@ -456,13 +456,30 @@ namespace CommonControls.Services
         public void DeleteFile(PackFileContainer pf, PackFile file)
         {
             if (pf.IsCaPackFile)
-                throw new Exception("Can not add files to ca pack file");
+                throw new Exception("Can not delete files inside CA pack file");
 
             var key = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
             _logger.Here().Information($"Deleting file {key}");
 
             Database.TriggerPackFileRemoved(pf, new List<PackFile>() { file  });
             pf.FileList.Remove(key);
+        }
+
+        public void MoveFile(PackFileContainer pf, PackFile file, string newFolderPath)
+        {
+            if (pf.IsCaPackFile)
+                throw new Exception("Can not move files inside CA pack file");
+
+            var newFullPath = newFolderPath + "\\" + file.Name;
+
+            var key = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
+            pf.FileList.Remove(key);
+            pf.FileList[newFullPath] = file;
+
+            _logger.Here().Information($"Moving file {key}");
+
+            _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, pf);
+            _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pf);
         }
 
         public void RenameDirectory(PackFileContainer pf, TreeNode node, string newName)
@@ -492,7 +509,7 @@ namespace CommonControls.Services
         public void RenameFile(PackFileContainer pf, PackFile file, string newName)
         {
             if (pf.IsCaPackFile)
-                throw new Exception("Can not add files to ca pack file");
+                throw new Exception("Can not rename file in ca pack file");
 
             var key = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
             pf.FileList.Remove(key);
@@ -509,7 +526,7 @@ namespace CommonControls.Services
             var pf = GetPackFileContainer(file);
 
             if (pf.IsCaPackFile)
-                throw new Exception("Can not add files to ca pack file");
+                throw new Exception("Can not save ca pack file");
             file.DataSource = new MemorySource(data);
             Database.TriggerPackFilesUpdated(pf, new List<PackFile>() { file });
         }

@@ -34,6 +34,7 @@ namespace AssetEditor.ViewModels
         public int SelectedEditorIndex { get => _selectedIndex; set => SetAndNotify(ref _selectedIndex, value); }
 
         public ICommand CloseToolCommand { get; set; }
+        public ICommand CloseOtherToolsCommand { get; set; }
 
         public MainViewModel(MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, ToolFactory toolFactory, SchemaManager schemaManager)
         {
@@ -43,6 +44,7 @@ namespace AssetEditor.ViewModels
             MenuBar = menuViewModel;
             MenuBar.EditorCreator = this;
             CloseToolCommand = new RelayCommand<IEditorViewModel>(CloseTool);
+            CloseOtherToolsCommand = new RelayCommand<IEditorViewModel>(CloseOtherTools);
 
             FileTree = new PackFileBrowserViewModel(_packfileService);
             FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, toolFactory, this);
@@ -280,6 +282,15 @@ namespace AssetEditor.ViewModels
             var index = CurrentEditorsList.IndexOf(tool);
             CurrentEditorsList.RemoveAt(index);
             tool.Close();
+        }
+
+        void CloseOtherTools(IEditorViewModel tool)
+        {
+            foreach (var editorViewModel in CurrentEditorsList.ToList())
+            {
+                if (editorViewModel != tool)
+                    CloseTool(editorViewModel);
+            }
         }
 
         public void CreateEmptyEditor(IEditorViewModel editorView)

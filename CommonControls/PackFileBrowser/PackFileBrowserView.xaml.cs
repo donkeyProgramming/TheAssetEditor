@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using CommonControls.Common;
 
 namespace CommonControls.PackFileBrowser
 {
@@ -68,6 +69,34 @@ namespace CommonControls.PackFileBrowser
                 }
             }
             catch (Exception)
+            {
+            }
+        }
+
+        private void treeView_Drop(object sender, DragEventArgs e)
+        {
+            try
+            {
+                if (DataContext is IDropTarget dropContainer)
+                {
+
+                    if (draggedItem == null)
+                        return;
+
+                    var dropTargetItem = sender as TreeViewItem;
+                    var dropTargetNode = dropTargetItem?.DataContext as TreeNode;
+                    if (dropTargetNode == null)
+                        return;
+
+                    if (dropContainer.AllowDrop(draggedItem, dropTargetNode))
+                    {
+                        dropContainer.Drop(draggedItem, dropTargetNode);
+                        e.Effects = DragDropEffects.None;
+                        e.Handled = true;
+                    }
+                }
+            }
+            catch (Exception exception)
             {
             }
         }
