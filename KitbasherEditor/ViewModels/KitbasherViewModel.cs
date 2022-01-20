@@ -24,7 +24,7 @@ using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels
 {
-    public class KitbasherViewModel : NotifyPropertyChangedImpl, IEditorViewModel, IDropTarget
+    public class KitbasherViewModel : NotifyPropertyChangedImpl, IEditorViewModel, IDropTarget<TreeNode>
     {
         ILogger _logger = Logging.Create<KitbasherViewModel>();
         PackFileService _packFileService;

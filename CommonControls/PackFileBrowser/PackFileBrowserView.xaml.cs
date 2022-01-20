@@ -77,7 +77,7 @@ namespace CommonControls.PackFileBrowser
         {
             try
             {
-                if (DataContext is IDropTarget dropContainer)
+                if (DataContext is IDropTarget<TreeNode> dropContainer)
                 {
 
                     if (draggedItem == null)

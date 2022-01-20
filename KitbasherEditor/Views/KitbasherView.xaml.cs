@@ -29,7 +29,7 @@ namespace KitbasherEditor.Views
         {
             try
             {
-                var dropTarget = DataContext as IDropTarget;
+                var dropTarget = DataContext as IDropTarget<TreeNode>;
                 if (dropTarget != null)
                 {
                     var formats = e.Data.GetFormats();
