@@ -47,6 +47,14 @@ namespace KitbasherEditor.Services
             EditableMeshNode.CreateModelNodesFromFile(rmv, _resourceLibary, _animationView.Player, _geometryFactory);
             EditableMeshNode.SelectedOutputFormat = rmv.Header.Version;
 
+            for(int i=0; i<EditableMeshNode.Children.Count; i++)
+            {
+                if (EditableMeshNode.Children[i] is Rmv2LodNode lodNode)
+                {
+                    lodNode.CameraDistance = rmv.LodHeaders[i].LodCameraDistance;
+                }
+            }
+
             _animationView.SetActiveSkeleton(rmv.Header.SkeletonName);
         }
 
