@@ -93,10 +93,7 @@ namespace CommonControls.Editors.TextEditor
         {
         }
 
-        public bool HasUnsavedChanges()
-        {
-            return false;
-        }
+        public bool HasUnsavedChanges { get; set; }
     }
 
 

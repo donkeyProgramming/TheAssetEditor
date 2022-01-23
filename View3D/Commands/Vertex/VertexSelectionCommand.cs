@@ -54,5 +54,7 @@ namespace View3D.Commands.Vertex
         {
             _selectionManager.SetState(_oldState);
         }
+
+        public override bool IsMutation() => false;
     }
 }

@@ -31,10 +31,23 @@ namespace AssetEditor.ViewModels
         public ObservableCollection<IEditorViewModel> CurrentEditorsList { get; set; } = new ObservableCollection<IEditorViewModel>();
 
         int _selectedIndex;
+        private bool _isClosingWithoutPrompt;
+
         public int SelectedEditorIndex { get => _selectedIndex; set => SetAndNotify(ref _selectedIndex, value); }
 
         public ICommand CloseToolCommand { get; set; }
         public ICommand CloseOtherToolsCommand { get; set; }
+        public ICommand ClosingCommand { get; set; }
+
+        public bool IsClosingWithoutPrompt
+        {
+            get => _isClosingWithoutPrompt;
+            set
+            {
+                _isClosingWithoutPrompt = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         public MainViewModel(MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, ToolFactory toolFactory, SchemaManager schemaManager)
         {
@@ -45,6 +58,7 @@ namespace AssetEditor.ViewModels
             MenuBar.EditorCreator = this;
             CloseToolCommand = new RelayCommand<IEditorViewModel>(CloseTool);
             CloseOtherToolsCommand = new RelayCommand<IEditorViewModel>(CloseOtherTools);
+            ClosingCommand = new RelayCommand<IEditorViewModel>(Closing);
 
             FileTree = new PackFileBrowserViewModel(_packfileService);
             FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, toolFactory, this);
@@ -171,6 +185,20 @@ namespace AssetEditor.ViewModels
             }
         }
 
+        private void Closing(IEditorViewModel editor)
+        {
+            if (!CurrentEditorsList.Any(editor => editor.HasUnsavedChanges) && !FileTree.Files.Any(node => node.UnsavedChanged))
+            {
+                IsClosingWithoutPrompt = true;
+                return;
+            }
+
+            IsClosingWithoutPrompt = MessageBox.Show(
+                "You have unsaved changes. Do you want to quit without saving?",
+                "Quit Without Saving", 
+                MessageBoxButton.YesNo) == MessageBoxResult.Yes;
+        }
+
         private void Compiler_ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
             throw new NotImplementedException();
@@ -273,7 +301,7 @@ namespace AssetEditor.ViewModels
 
         void CloseTool(IEditorViewModel tool)
         {
-            if (tool.HasUnsavedChanges())
+            if (tool.HasUnsavedChanges)
             {
                 if (MessageBox.Show("Unsaved changed - Are you sure?", "Close", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
                     return;

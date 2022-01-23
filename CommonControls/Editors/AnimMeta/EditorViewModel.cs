@@ -120,7 +120,7 @@ namespace CommonControls.Editors.AnimMeta
         {
         }
 
-        public bool HasUnsavedChanges() => false;
+        public bool HasUnsavedChanges { get; set; } = false;
 
         public bool Save()
         {

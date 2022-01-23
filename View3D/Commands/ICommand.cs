@@ -13,6 +13,7 @@ namespace View3D.Commands
         void Execute();
         void Initialize(IComponentManager componentManager);
         string GetHintText();
+        bool IsMutation();
     }
 
 
@@ -56,7 +57,7 @@ namespace View3D.Commands
         protected abstract void ExecuteCommand();
         protected abstract void UndoCommand();
         public abstract string GetHintText();
-
+        public virtual bool IsMutation() => true;
     }
 }
 

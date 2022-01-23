@@ -8,6 +8,9 @@
         xmlns:viewFacotry="clr-namespace:AssetEditor.DataTemplates"
         xmlns:viewModels="clr-namespace:AssetEditor.ViewModels"
         xmlns:common="clr-namespace:CommonControls.Common;assembly=CommonControls"
+        xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
+        behaviors:WindowCancellableClosingBehavior.Closing="{Binding ClosingCommand}"
+        behaviors:WindowCancellableClosingBehavior.IsClosingWithoutPrompt="{Binding IsClosingWithoutPrompt}"
         mc:Ignorable="d"
         Title="AssetEditor" Height="1024" Width="2000">
     <Window.Resources>
@@ -84,7 +87,17 @@
                             </ContextMenu>
                         </Grid.ContextMenu>
                         
-                        <TextBlock Grid.Column="0" Text="{Binding DisplayName.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Grid.Column="0" Text="{Binding DisplayName.Value, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBlock.Style>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasUnsavedChanges}" Value="True">
+                                            <Setter Property="Foreground" Value="Red"/>
+                                        </DataTrigger>
+                                    </Style.Triggers> 
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                         <Button Grid.Column="1" 
                                 Command="{Binding DataContext.CloseToolCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}}" 
                                 CommandParameter="{Binding}"

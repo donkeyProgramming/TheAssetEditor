@@ -128,10 +128,7 @@ namespace AnimationEditor.PropCreator.ViewModels
             Scene = null;
         }
 
-        public bool HasUnsavedChanges()
-        {
-            return false;
-        }
+        public bool HasUnsavedChanges { get; set; }
 
         public bool Save()
         {
