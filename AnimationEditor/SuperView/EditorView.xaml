@@ -4,11 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AnimationEditor.SuperView" xmlns:referencemodel="clr-namespace:AnimationEditor.Common.ReferenceModel"
-             xmlns:s="http://schemas.singulink.com/xaml"
+             xmlns:s="http://schemas.singulink.com/xaml" xmlns:view="clr-namespace:CommonControls.Editors.AnimMeta.View;assembly=CommonControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel>
-        <ListView ItemsSource="{Binding Items, UpdateSourceTrigger=PropertyChanged}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+    <DockPanel>
+        <ListView DockPanel.Dock="Top" ItemsSource="{Binding Items, UpdateSourceTrigger=PropertyChanged}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -20,6 +20,35 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <Button Content="Refresh" Click="{s:MethodBinding Refresh}"/>
-    </StackPanel>
+        <Button Content="Refresh" Click="{s:MethodBinding RefreshAction}" DockPanel.Dock="Top"/>
+
+
+        <TabControl DockPanel.Dock="Top">
+            <TabItem Header="Persistent">
+                <DockPanel>
+                    <TextBlock  DockPanel.Dock="Top">
+                        <Run Text="FilePath: ["/>
+                        <Run Text="{Binding PersistentMetaFilePackFileContainerName.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Run Text="]"/>
+                         <Run Text="{Binding PersistentMetaFilePath.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                    </TextBlock>
+                    <view:MainEditorView DataContext="{Binding PersistentMetaEditor}" DockPanel.Dock="Top"/>
+                </DockPanel>
+            </TabItem>
+            <TabItem Header="Animation">
+                <DockPanel>
+                    <TextBlock  DockPanel.Dock="Top">
+                        <Run Text="FilePath: ["/>
+                        <Run Text="{Binding MetaFilePackFileContainerName.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Run Text="]"/>
+                         <Run Text="{Binding MetaFilePath.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                    </TextBlock>
+
+                    <view:MainEditorView DataContext="{Binding MetaEditor}" DockPanel.Dock="Top"/>
+                </DockPanel>
+            </TabItem>
+        </TabControl>
+        
+        
+    </DockPanel>
 </UserControl>

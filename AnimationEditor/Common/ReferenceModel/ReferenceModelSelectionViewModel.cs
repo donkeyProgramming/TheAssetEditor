@@ -35,7 +35,7 @@ namespace AnimationEditor.Common.ReferenceModel
         public SelectMetaViewModel MetaFileInformation { get; set; }
         public SelectFragAndSlotViewModel FragAndSlotSelection { get; set; }
 
-       
+
 
 
         // Visability
@@ -69,15 +69,9 @@ namespace AnimationEditor.Common.ReferenceModel
             MetaFileInformation = new SelectMetaViewModel(Data, _pfs);
             FragAndSlotSelection = new SelectFragAndSlotViewModel(_pfs, skeletonAnimationLookUpHelper, Data, MetaFileInformation);
 
-            // Data.PropertyChanged += Data_PropertyChanged;
             Data.AnimationChanged += Data_AnimationChanged;
             Data.SkeletonChanged += Data_SkeletonChanged;
             Data.MetaDataChanged += MetaDataChanged;
-        }
-
-        private void Database_ContainerUpdated(PackFileContainer container)
-        {
-          //  throw new NotImplementedException();
         }
 
         private void Data_SkeletonChanged(GameSkeleton newValue)
@@ -111,7 +105,7 @@ namespace AnimationEditor.Common.ReferenceModel
             FragAndSlotSelection.PreviewSelectedSlot();
         }
 
-        public void ViewSelectedMeta() 
+        public void ViewSelectedMeta()
         {
             var fullFileName = _pfs.GetFullPath(_data.MetaData);
             var viewModel = _toolFactory.GetToolViewModelFromFileName(fullFileName);
@@ -144,14 +138,14 @@ namespace AnimationEditor.Common.ReferenceModel
             model.MetaDataItems.Clear();
             model.Player.AnimationRules.Clear();
 
-            var persist = MetaDataFileParser.Open(model.PersistMetaData, _schemaManager);
-            var meta = MetaDataFileParser.Open(model.MetaData, _schemaManager);
-
-            if (persist == null && meta == null)
-                return;
-
-            var fatory = new MetaDataFactory(model.MainNode , _componentManager, model, model.Player, FragAndSlotSelection.FragmentList.SelectedItem);
-            model.MetaDataItems = fatory.Create(persist, meta);
+            //var persist = MetaDataFileParser.Open(model.PersistMetaData, _schemaManager);
+            //var meta = MetaDataFileParser.Open(model.MetaData, _schemaManager);
+            //
+            //if (persist == null && meta == null)
+            //    return;
+            //
+            //var fatory = new MetaDataFactory(model.MainNode, _componentManager, model, model.Player, FragAndSlotSelection.FragmentList.SelectedItem);
+            //model.MetaDataItems = fatory.Create(persist, meta);
 
         }
 
@@ -160,49 +154,4 @@ namespace AnimationEditor.Common.ReferenceModel
             MetaFileInformation.Refresh();
         }
     }
-
-   /* public interface IAttachedItem
-    {
-        View3D.Animation.AnimationPlayer Player { get; }
-        void Update(float t);
-    }
-
-    public class AnimatedPropInstance : IAttachedItem
-    {
-        //AnimationPlayer Player { get; set; }
-        SkeletonBoneAnimationResolver Resolver;
-        SceneNode _modelNode;
-        Vector3 _offset;
-        AnimationFile _animFile;
-        AssetViewModel _parent;
-
-        public AnimatedPropInstance(SceneNode modelNode, View3D.Animation.AnimationPlayer player, AssetViewModel parent, int boneIndex, Vector3 offset, AnimationFile animFile)
-        {
-            Resolver = new SkeletonBoneAnimationResolver(parent, boneIndex);
-            Player = player;
-            _parent = parent;
-            _offset = offset;
-            _animFile = animFile;
-            _modelNode = modelNode;
-
-
-
-            var parentClip = _parent.AnimationClip;
-
-
-        }
-
-        public View3D.Animation.AnimationPlayer Player { get; private set; }
-
-        public void Cleanup()
-        { }
-
-        public void Update(float t)
-        {
-
-
-
-           // _modelNode.ModelMatrix = /*Matrix.CreateTranslation(-_offset) * Resolver.GetTransformIfAnimating();
-        }
-    }*/
 }

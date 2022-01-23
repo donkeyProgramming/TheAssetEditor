@@ -14,10 +14,12 @@ namespace CommonControls.Editors.AnimMeta
 {
     public class EditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
+        public event EditorSavedDelegate EditorSavedEvent;
+
         ILogger _logger = Logging.Create<EditorViewModel>();
 
         PackFileService _pf;
-        SchemaManager _schemaManager;
+        CopyPasteManager _copyPasteManager;
         MetaDataFile _metaDataFile;
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>();
@@ -32,20 +34,24 @@ namespace CommonControls.Editors.AnimMeta
         public MetaDataTagItemViewModel SelectedTag { get => _selectedTag; set => SetAndNotify(ref _selectedTag, value); }
 
 
-        public EditorViewModel(PackFileService pf, SchemaManager schemaManager)
+        public EditorViewModel(PackFileService pf, CopyPasteManager copyPasteManager)
         {
             _pf = pf;
-            _schemaManager = schemaManager;
+            _copyPasteManager = copyPasteManager;
         }
 
         void Initialise(PackFile file)
         {
             _file = file;
-            DisplayName.Value = file.Name;
+            Tags.Clear();
+            DisplayName.Value = file == null ? "" : file.Name;
+
+            if (file == null)
+                return; 
 
             var fileContent = _file.DataSource.ReadData();
-            _metaDataFile = MetaDataFileParser.ParseFile(fileContent, _schemaManager);
-
+            _metaDataFile = MetaDataFileParser.ParseFile(fileContent);
+         
             foreach (var item in _metaDataFile.Items)
                 Tags.Add(new MetaDataTagItemViewModel(item));
         }
@@ -94,26 +100,29 @@ namespace CommonControls.Editors.AnimMeta
 
         public void New()
         {
-
             var dialog = new NewTagWindow();
-            
-            var allDefs = _schemaManager.GetAllMetaDataDefinitions();
-            allDefs = allDefs.OrderBy(x => x.TableName + "_" + x.Version).ToList();
+            var allDefs = MetaEntrySerializer.GetSupportedTypes(); ;
             
             NewTagWindowViewModel model = new NewTagWindowViewModel();
-            model.Items = new ObservableCollection<DbTableDefinition>(allDefs);
+            model.Items = new ObservableCollection<string>(allDefs);
             dialog.DataContext = model;
             
             var res = dialog.ShowDialog();
             if (res.HasValue && res.Value == true)
             {
-                var newEntry = new MetaEntry(model.SelectedItem);
-                var newTagView = new MetaDataTagItemViewModel(newEntry);
+                var newEntry = MetaEntrySerializer.CreateDefault(model.SelectedItem); 
+                var newTagView = new MetaDataTagItemViewModel(newEntry, model.SelectedItem);
                 Tags.Add(newTagView);
             }
-            
+
             dialog.DataContext = null;
         }
+
+        public void PasteAction()
+        { }
+
+        public void CopyAction()
+        { }
 
 
         public void Close()
@@ -156,6 +165,7 @@ namespace CommonControls.Editors.AnimMeta
             }
 
             _logger.Here().Information("Creating metadata file complete");
+            EditorSavedEvent?.Invoke(_file);
             return _file != null;
         }
     }

@@ -21,7 +21,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     [MetaData("MAX_TARGET_SIZE", 10)]
     public class MaxTargetSize_v10 : TargetSize { }
 
-    [MetaData("Min_TARGET_SIZE", 10)]
+    [MetaData("MIN_TARGET_SIZE", 10)]
     public class MinTargetSize_v10 : TargetSize { }
 
 }

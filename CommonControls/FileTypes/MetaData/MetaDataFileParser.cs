@@ -10,15 +10,8 @@ namespace CommonControls.FileTypes.MetaData
 {
     public static class MetaDataFileParser
     {
-        public static MetaDataFile Open(PackFile pfs, SchemaManager schemaManager)
-        {
-            if (pfs == null)
-                return null;
-            var content = pfs.DataSource.ReadData();
-            return ParseFile(content, schemaManager);
-        }
-
-        public static MetaDataFile ParseFile(byte[] fileContent, SchemaManager schemaManager, bool doValidation = true)
+       
+        public static MetaDataFile ParseFile(byte[] fileContent)
         {
             var contentLength = fileContent.Count();
 
@@ -40,66 +33,11 @@ namespace CommonControls.FileTypes.MetaData
 
                 // Convert to sensible stuff
                 foreach (var item in items)
-                {
-                    var schema = schemaManager.GetMetaDataDefinition(item.Name, item.Version);
-                    if (schema.ColumnDefinitions.Count != 0)
-                    {
-                        var knownItem = new MetaEntry(item.Name, item.Version, item.GetData(), schema);
-                        if (doValidation)
-                        {
-                            if (knownItem.Validate())
-                                outputFile.Items.Add(knownItem);
-                            else
-                                outputFile.Items.Add(item);
-                        }
-                        else
-                        {
-                            outputFile.Items.Add(knownItem);
-                        }
-                    }
-                    else
-                    {
-                        outputFile.Items.Add(item);
-                    }
-                }
+                    outputFile.Items.Add(item);
             }
 
             return outputFile;
         }
-
-        public static MetaDataFile ParseFileV2(byte[] fileContent, bool doValidation = true)
-        {
-            var contentLength = fileContent.Count();
-
-            MetaDataFile outputFile = new MetaDataFile()
-            {
-                Version = BitConverter.ToInt32(fileContent, 0)
-            };
-
-            if (outputFile.Version != 2)
-                throw new Exception($"Unknown version - {outputFile.Version}");
-
-            if (contentLength > 8)
-            {
-                int numElements = BitConverter.ToInt32(fileContent, 4);
-                var items = ExploratoryGetEntries(fileContent);
-
-                if (numElements != items.Count)
-                    throw new Exception($"Not the expected amount elements. Expected {numElements}, got {items.Count}");
-
-                // Convert to sensible stuff
-                foreach (var item in items)
-                {
-                   
-                        outputFile.Items.Add(item);
-                    
-                }
-            }
-
-            return outputFile;
-        }
-
-
 
         static List<UnknownMetaEntry> ExploratoryGetEntries(byte[] fileContent)
         {
@@ -170,7 +108,5 @@ namespace CommonControls.FileTypes.MetaData
 
             return false;
         }
-
-
     }
 }

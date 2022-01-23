@@ -17,4 +17,7 @@ namespace CommonControls.Common
         void CreateEmptyEditor(IEditorViewModel editorView);
     }
 
+
+    public delegate void EditorSavedDelegate(PackFile newFile);
+
 }

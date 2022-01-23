@@ -12,10 +12,10 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public bool DistanceCulled { get; set; }
 
         [MetaDataTag(6)]
-        public string ModelName { get; set; }
+        public string ModelName { get; set; } = "";
 
         [MetaDataTag(7)]
-        public string AnimationName { get; set; }
+        public string AnimationName { get; set; } = "";
 
         [MetaDataTag(8)]
         public Vector3 Position { get; set; }

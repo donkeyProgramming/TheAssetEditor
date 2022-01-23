@@ -10,7 +10,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
     
-        <System:Double x:Key="labelWidth">80</System:Double>
+        <System:Double x:Key="labelWidth">120</System:Double>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -34,83 +34,67 @@
             </ListView.ItemContainerStyle>
 
             <ListView.Resources>
-                <DataTemplate DataType="{ x:Type tags:OrientationEditableTagItem}">
-                    <DockPanel LastChildFill="true">
-                        <DockPanel DockPanel.Dock="Top">
-                            <Label FontWeight="bold" Content="Field Name"  Width ="{StaticResource labelWidth}"/>
-                            <Label FontWeight="bold"  Content=":"/>
-                            <Label FontWeight="bold"  Content="{Binding FieldName, UpdateSourceTrigger=PropertyChanged}"/>
-                        </DockPanel>
 
-                        <DockPanel DockPanel.Dock="Top">
-                            <Label Content="Description"  Width ="{StaticResource labelWidth}"/>
-                            <Label Content=":"/>
+
+                <DataTemplate DataType="{ x:Type tags:EditableTagItem}">
+                    <ContentControl>
+                        <ContentControl.ToolTip>
                             <Viewbox StretchDirection="DownOnly" Stretch="Fill" HorizontalAlignment="Left">
                                 <TextBlock TextWrapping="Wrap" VerticalAlignment="Stretch" HorizontalAlignment="Left" Width="700" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"/>
                             </Viewbox>
+                        </ContentControl.ToolTip>
+
+                        <DockPanel >
+                            <Border BorderThickness="0.5" Margin="3" BorderBrush="DarkGray" DockPanel.Dock="Bottom"/>
+
+                            <Label  FontWeight="bold"  Content="{Binding FieldName, UpdateSourceTrigger=PropertyChanged}" Width ="{StaticResource labelWidth}" />
+                            <Label FontWeight="bold"  Content=":"/>
+                            <TextBox Text="{Binding ValueAsString, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Background="{Binding IsValid, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_red}}" VerticalContentAlignment="Center" IsReadOnly="{Binding IsReadOnly}"/>
                         </DockPanel>
 
-                        <DockPanel DockPanel.Dock="Top">
-                            <Label Content="Value"  Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
-                            <Label Content=":"  DockPanel.Dock="Left"/>
-                            <mathviews:Vector3View VerticalContentAlignment="Center" Vector3="{Binding Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Background="{Binding IsValid, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToColour_white_red}}" MinWidth="300" MaxWidth="300" HorizontalAlignment="Left"/>
-                        </DockPanel>
-
-                        <Border BorderThickness="1" Margin="2" BorderBrush="DarkGray"/>
-                    </DockPanel>
+                    </ContentControl>
                 </DataTemplate>
 
                 <DataTemplate DataType="{ x:Type tags:Vector3EditableTagItem}">
-                    <DockPanel LastChildFill="true">
-                        <DockPanel DockPanel.Dock="Top">
-                            <Label FontWeight="bold" Content="Field Name"  Width ="{StaticResource labelWidth}"/>
-                            <Label FontWeight="bold"  Content=":"/>
-                            <Label FontWeight="bold"  Content="{Binding FieldName, UpdateSourceTrigger=PropertyChanged}"/>
-                        </DockPanel>
-
-                        <DockPanel DockPanel.Dock="Top">
-                            <Label Content="Description"  Width ="{StaticResource labelWidth}"/>
-                            <Label Content=":"/>
+                    <ContentControl>
+                        <ContentControl.ToolTip>
                             <Viewbox StretchDirection="DownOnly" Stretch="Fill" HorizontalAlignment="Left">
                                 <TextBlock TextWrapping="Wrap" VerticalAlignment="Stretch" HorizontalAlignment="Left" Width="700" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"/>
                             </Viewbox>
-                        </DockPanel>
+                        </ContentControl.ToolTip>
 
-                        <DockPanel DockPanel.Dock="Top">
-                            <Label Content="Value"  Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
-                            <Label Content=":"  DockPanel.Dock="Left"/>
+                        <DockPanel >
+                            <Border BorderThickness="0.5" Margin="3" BorderBrush="DarkGray" DockPanel.Dock="Bottom"/>
+
+                            <Label  FontWeight="bold"  Content="{Binding FieldName, UpdateSourceTrigger=PropertyChanged}" Width ="{StaticResource labelWidth}" />
+                            <Label FontWeight="bold"  Content=":"/>
                             <mathviews:Vector3View VerticalContentAlignment="Center" Vector3="{Binding Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Background="{Binding IsValid, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToColour_white_red}}" MinWidth="300" MaxWidth="300" HorizontalAlignment="Left"/>
+                            <CheckBox VerticalContentAlignment="Center" ToolTip="Show in worldspace" IsChecked="{Binding ShowAsWorldSpace, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding CanShowAsWorldSpace, UpdateSourceTrigger=PropertyChanged}"/>
                         </DockPanel>
 
-                        <Border BorderThickness="1" Margin="2" BorderBrush="DarkGray"/>
-                    </DockPanel>
+                    </ContentControl>
                 </DataTemplate>
 
-                <DataTemplate DataType="{ x:Type tags:EditableTagItem}">
-                    <DockPanel LastChildFill="true">
-                        <DockPanel DockPanel.Dock="Top">
-                            <Label FontWeight="bold" Content="Field Name"  Width ="{StaticResource labelWidth}"/>
-                            <Label FontWeight="bold"  Content=":"/>
-                            <Label FontWeight="bold"  Content="{Binding FieldName, UpdateSourceTrigger=PropertyChanged}"/>
-                        </DockPanel>
-
-                        <DockPanel DockPanel.Dock="Top">
-                            <Label Content="Description"  Width ="{StaticResource labelWidth}"/>
-                            <Label Content=":"/>
+                <DataTemplate DataType="{ x:Type tags:OrientationEditableTagItem}">
+                    <ContentControl>
+                        <ContentControl.ToolTip>
                             <Viewbox StretchDirection="DownOnly" Stretch="Fill" HorizontalAlignment="Left">
                                 <TextBlock TextWrapping="Wrap" VerticalAlignment="Stretch" HorizontalAlignment="Left" Width="700" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"/>
-                            </Viewbox> 
+                            </Viewbox>
+                        </ContentControl.ToolTip>
+
+                        <DockPanel >
+                            <Border BorderThickness="0.5" Margin="3" BorderBrush="DarkGray" DockPanel.Dock="Bottom"/>
+
+                            <Label  FontWeight="bold"  Content="{Binding FieldName, UpdateSourceTrigger=PropertyChanged}" Width ="{StaticResource labelWidth}" />
+                            <Label FontWeight="bold"  Content=":"/>
+                            <mathviews:Vector3View VerticalContentAlignment="Center" Vector3="{Binding Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Background="{Binding IsValid, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToColour_white_red}}" MinWidth="300" MaxWidth="300" HorizontalAlignment="Left"/>
+                            <CheckBox VerticalContentAlignment="Center" ToolTip="Show in worldspace" IsChecked="{Binding ShowAsWorldSpace, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding CanShowAsWorldSpace, UpdateSourceTrigger=PropertyChanged}"/>
                         </DockPanel>
 
-                        <DockPanel DockPanel.Dock="Top">
-                            <Label Content="Value"  Width ="{StaticResource labelWidth}"/>
-                            <Label Content=":"/>
-                            <TextBox Text="{Binding ValueAsString, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Background="{Binding IsValid, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_red}}"/>
-                        </DockPanel>
-
-                        <Border BorderThickness="1" Margin="2" BorderBrush="DarkGray"/>
-                    </DockPanel>
+                    </ContentControl>
                 </DataTemplate>
+
             </ListView.Resources>
 
         </ListView>

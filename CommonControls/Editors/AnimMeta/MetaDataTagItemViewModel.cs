@@ -1,11 +1,13 @@
 ﻿using CommonControls.Common;
 using CommonControls.FileTypes.MetaData;
 using Filetypes.ByteParsing;
+using Microsoft.Xna.Framework;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 
 namespace CommonControls.Editors.AnimMeta
 {
@@ -13,6 +15,7 @@ namespace CommonControls.Editors.AnimMeta
     {
         ILogger _logger = Logging.Create<MetaDataTagItemViewModel>();
         IMetaEntry _originalItem;
+        string _originalName;
 
         public ObservableCollection<EditableTagItem> Variables { get; set; } = new ObservableCollection<EditableTagItem>();
 
@@ -23,65 +26,110 @@ namespace CommonControls.Editors.AnimMeta
         public MetaDataTagItemViewModel(IMetaEntry item)
         {
             _originalItem = item;
-
+            _originalName = item.Name;
             DisplayName.Value = $"{item.Name}_v{item.Version}";
-            IsDecodedCorrectly.Value = item.DecodedCorrectly;
 
-            if (IsDecodedCorrectly.Value)
-                 Variables = CreateVariableList(item as MetaEntry);
+            try
+            {
+                var typedMetaItem = MetaEntrySerializer.DeSerialize(item);
+                var orderedPropertiesList = typedMetaItem.GetType().GetProperties()
+                           .Where(x => x.CanWrite)
+                           .Where(x => Attribute.IsDefined(x, typeof(MetaDataTagAttribute)))
+                           .OrderBy(x => x.GetCustomAttributes<MetaDataTagAttribute>(false).Single().Order);
+
+                foreach (var prop in orderedPropertiesList)
+                {
+                    var attributeInfo = prop.GetCustomAttributes<MetaDataTagAttribute>(false).Single();
+                    var parser = ByteParserFactory.Create(prop.PropertyType);
+                    var value = prop.GetValue(typedMetaItem);
+                    var itemDiscription = $"Value type is {prop.PropertyType.Name}";
+                    if (string.IsNullOrWhiteSpace(attributeInfo.Description) == false)
+                        itemDiscription = attributeInfo.Description + "\n" + itemDiscription;
+
+                    EditableTagItem editableItem = null;
+                    if (attributeInfo.DisplayOverride == MetaDataTagAttribute.DisplayType.EulerVector || value is Vector3)
+                    {
+                        if (value is Vector3 vector3)
+                            editableItem = new Vector3EditableTagItem(parser as Vector3Parser, vector3);
+                        else if (value is Vector4 quaternion)
+                            editableItem = new OrientationEditableTagItem(parser as Vector4Parser, quaternion);
+                        else
+                            throw new Exception("Unkown item");
+                    }
+                    else
+                    {
+                        editableItem = new EditableTagItem(parser, value.ToString());
+                    }
+
+                    editableItem.Description = itemDiscription;
+                    editableItem.FieldName = prop.Name;
+                    editableItem.IsReadOnly = !attributeInfo.IsEditable;
+                    Variables.Add(editableItem);
+                }
+
+                IsDecodedCorrectly.Value = true;
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error(e.Message);
+                IsDecodedCorrectly.Value = false;
+            }
         }
 
-        ObservableCollection<EditableTagItem> CreateVariableList(MetaEntry entry)
+
+        public MetaDataTagItemViewModel(MetaEntryBase typedMetaItem, string displayName)
         {
-            var output = new ObservableCollection<EditableTagItem>();
+            DisplayName.Value = displayName;
 
-            var data = entry.GetData();
-            var totalBytesRead = 0;
-            int counter = 0;
+            var splitString = displayName.Split("_");
+            var newName = string.Join("_", splitString.SkipLast(1));
+            _originalName = newName;
 
-            foreach(var field in entry.Schema.ColumnDefinitions)
+            try
             {
-                var parser = ByteParserFactory.Create(field.Type);
-                parser.TryDecode(data, totalBytesRead, out var _, out var fieldByteLength, out var _);
+                //var typedMetaItem = MetaEntrySerializer.DeSerialize(item);
+                var orderedPropertiesList = typedMetaItem.GetType().GetProperties()
+                           .Where(x => x.CanWrite)
+                           .Where(x => Attribute.IsDefined(x, typeof(MetaDataTagAttribute)))
+                           .OrderBy(x => x.GetCustomAttributes<MetaDataTagAttribute>(false).Single().Order);
 
-                var byteValue = new byte[fieldByteLength];
-                Array.Copy(data, totalBytesRead, byteValue, 0, fieldByteLength);
+                foreach (var prop in orderedPropertiesList)
+                {
+                    var attributeInfo = prop.GetCustomAttributes<MetaDataTagAttribute>(false).Single();
+                    var parser = ByteParserFactory.Create(prop.PropertyType);
+                    var value = prop.GetValue(typedMetaItem);
+                    var itemDiscription = $"Value type is {prop.PropertyType.Name}";
+                    if (string.IsNullOrWhiteSpace(attributeInfo.Description) == false)
+                        itemDiscription = attributeInfo.Description + "\n" + itemDiscription;
 
-                if (field.Name.Contains("orientation", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    var item = new OrientationEditableTagItem(ByteParsers.Vector4, byteValue)
+                    EditableTagItem editableItem = null;
+                    if (attributeInfo.DisplayOverride == MetaDataTagAttribute.DisplayType.EulerVector || value is Vector3)
                     {
-                        Description = field.Description,
-                        FieldName = $"[{counter + 1}] {field.Name} - { field.Type}",
-                        ValueType = field.Type.ToString(),
-                    };
-                    output.Add(item);
-                }
-                else if (field.Type == DbTypesEnum.Vector3)
-                {
-                    var item = new Vector3EditableTagItem(ByteParsers.Vector3, byteValue)
+                        if (value is Vector3 vector3)
+                            editableItem = new Vector3EditableTagItem(parser as Vector3Parser, vector3);
+                        else if (value is Vector4 quaternion)
+                            editableItem = new OrientationEditableTagItem(parser as Vector4Parser, quaternion);
+                        else
+                            throw new Exception("Unkown item");
+                    }
+                    else
                     {
-                        Description = field.Description,
-                        FieldName = $"[{counter + 1}] {field.Name} - { field.Type}",
-                        ValueType = field.Type.ToString(),
-                    };
-                    output.Add(item);
+                        editableItem = new EditableTagItem(parser, value.ToString());
+                    }
+
+                    editableItem.Description = itemDiscription;
+                    editableItem.FieldName = prop.Name;
+                    editableItem.IsReadOnly = !attributeInfo.IsEditable;
+                    Variables.Add(editableItem);
                 }
-                else
-                {
-                    EditableTagItem item = new EditableTagItem(parser, byteValue)
-                    {
-                        Description = field.Description,
-                        FieldName = $"[{counter + 1}] {field.Name} - { field.Type}",
-                        ValueType = field.Type.ToString(),
-                    };
-                    output.Add(item);
-                }
-                totalBytesRead += fieldByteLength;
-                counter++;
+
+                IsDecodedCorrectly.Value = true;
             }
-
-            return output;
+            catch (Exception e)
+            {
+                _logger.Here().Error(e.Message);
+                IsDecodedCorrectly.Value = false;
+            }
         }
 
         public string HasError()
@@ -101,18 +149,14 @@ namespace CommonControls.Editors.AnimMeta
             _logger.Here().Information("Start " + DisplayName.Value);
             var newItem = new MetaDataTagItem()
             {
-                Name = _originalItem.Name,
-                Version = _originalItem.Version
+                Name = _originalName,
             };
 
-            if (!IsDecodedCorrectly.Value)
+            if (IsDecodedCorrectly.Value == false)
             {
                 _logger.Here().Information("Creating from original data");
                 if (_originalItem == null)
-                {
-                    _logger.Here().Error("Data missing!");
                     throw new Exception("_originalItem is null and IsDecodedCorrectly is false");
-                }
 
                 _logger.Here().Information("Getting data");
                 var data = _originalItem.GetData();

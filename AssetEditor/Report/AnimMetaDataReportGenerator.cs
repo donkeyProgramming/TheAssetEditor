@@ -58,7 +58,7 @@ namespace AssetEditor.Report
                     var data = packFile.DataSource.ReadData();
                     if (data.Length == 0)
                         continue;
-                    var metaData = MetaDataFileParser.ParseFileV2(data);
+                    var metaData = MetaDataFileParser.ParseFile(data);
                     metaTable.Add( (fileName, metaData) );
 
                     var completedTags = 0;

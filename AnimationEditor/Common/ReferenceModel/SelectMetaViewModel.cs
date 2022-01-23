@@ -40,7 +40,5 @@ namespace AnimationEditor.Common.ReferenceModel
             var files = _pfs.FindAllWithExtention(".meta").Where(x => x.Name.Contains("anm.meta"));
             MetaFiles = new ObservableCollection<PackFile>(files);
         }
-
-      
     }
 }
