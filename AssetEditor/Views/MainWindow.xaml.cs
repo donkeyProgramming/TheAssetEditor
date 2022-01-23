@@ -69,6 +69,10 @@ namespace AssetEditor.Views
                         }
                     }
                 }
+                else
+                {
+                    draggedItem = null;
+                }
             }
             catch (Exception)
             {
