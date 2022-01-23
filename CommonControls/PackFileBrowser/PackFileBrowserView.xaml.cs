@@ -67,6 +67,10 @@ namespace CommonControls.PackFileBrowser
                         }
                     }
                 }
+                else
+                {
+                    _draggedItem = null;
+                }
             }
             catch (Exception)
             {
