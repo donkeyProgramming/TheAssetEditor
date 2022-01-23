@@ -32,7 +32,10 @@ namespace View3D.SceneNodes
             for (int lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
             {
                 if (lodIndex >= Children.Count)
-                    AddObject(new Rmv2LodNode("Lod " + lodIndex, lodIndex));
+                {
+                    var cameraDistance = model.LodHeaders[lodIndex]?.LodCameraDistance;
+                    AddObject(new Rmv2LodNode("Lod " + lodIndex, lodIndex, cameraDistance));
+                }
 
                 var lodNode = Children[lodIndex];
                 for (int modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)

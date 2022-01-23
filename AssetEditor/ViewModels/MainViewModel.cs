@@ -35,6 +35,9 @@ namespace AssetEditor.ViewModels
 
         public ICommand CloseToolCommand { get; set; }
         public ICommand CloseOtherToolsCommand { get; set; }
+        public ICommand CloseAllToolsCommand { get; set; }
+        public ICommand CloseToolsToRightCommand { get; set; }
+        public ICommand CloseToolsToLeftCommand { get; set; }
 
         public MainViewModel(MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, ToolFactory toolFactory, SchemaManager schemaManager)
         {
@@ -45,6 +48,9 @@ namespace AssetEditor.ViewModels
             MenuBar.EditorCreator = this;
             CloseToolCommand = new RelayCommand<IEditorViewModel>(CloseTool);
             CloseOtherToolsCommand = new RelayCommand<IEditorViewModel>(CloseOtherTools);
+            CloseAllToolsCommand = new RelayCommand<IEditorViewModel>(CloseAllTools);
+            CloseToolsToRightCommand = new RelayCommand<IEditorViewModel>(CloseToolsToRight);
+            CloseToolsToLeftCommand = new RelayCommand<IEditorViewModel>(CloseToolsToLeft);
 
             FileTree = new PackFileBrowserViewModel(_packfileService);
             FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, toolFactory, this);
@@ -290,6 +296,32 @@ namespace AssetEditor.ViewModels
             {
                 if (editorViewModel != tool)
                     CloseTool(editorViewModel);
+            }
+        }
+
+        void CloseAllTools(IEditorViewModel tool)
+        {
+            foreach (var editorViewModel in CurrentEditorsList.ToList())
+            {
+                CloseTool(editorViewModel);
+            }
+        }
+
+        void CloseToolsToLeft(IEditorViewModel tool)
+        {
+            var index = CurrentEditorsList.IndexOf(tool);
+            for (int i = index-1; i >= 0; i--)
+            {
+                CloseTool(CurrentEditorsList[0]);
+            }
+        }
+
+        void CloseToolsToRight(IEditorViewModel tool)
+        {
+            var index = CurrentEditorsList.IndexOf(tool);
+            for (int i = CurrentEditorsList.Count-1; i > index; i--)
+            {
+                CloseTool(CurrentEditorsList[i]);
             }
         }
 
