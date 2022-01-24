@@ -5,8 +5,10 @@ using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using MonoGame.Framework.WpfInterop;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using TextureEditor.ViewModels;
 using View3D.Components.Component;
@@ -16,7 +18,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 {
     public class MaterialGeneralViewModel : NotifyPropertyChangedImpl
     {
-        public class TextureViewModel : NotifyPropertyChangedImpl
+        public class TextureViewModel : NotifyPropertyChangedImpl, INotifyDataErrorInfo
         {
             PackFileService _packfileService;
             Rmv2MeshNode _meshNode;
@@ -25,19 +27,38 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             bool _useTexture = true;
             public bool UseTexture { get { return _useTexture; } set { SetAndNotify(ref _useTexture, value); UpdatePreviewTexture(value); } }
             public string TextureTypeStr { get; set; }
-            public NotifyAttr<string> Path { get; set; } = new NotifyAttr<string>("");
+
+            public string Path
+            {
+                get => _path;
+                set
+                {
+                    if (_path == value)
+                        return;
+
+                    _path = value;
+                    ValidateTexturePath();
+                    NotifyPropertyChanged();
+
+                    UpdateTexturePath(value);
+                }
+            }
+
             public NotifyAttr<bool> IsVisible { get; set; } = new NotifyAttr<bool>(true);
+
+            private readonly Dictionary<string, List<string>> _errorsByPropertyName = new Dictionary<string, List<string>>();
+            private string _path = "";
 
             public TextureViewModel(Rmv2MeshNode meshNode, PackFileService packfileService, TexureType texureType)
             {
                 _packfileService = packfileService;
                 _meshNode = meshNode;
                 _texureType = texureType;
-                Path.Value = _meshNode.Material.GetTexture(texureType)?.Path;
                 TextureTypeStr = _texureType.ToString();
+                Path = _meshNode.Material.GetTexture(texureType)?.Path;
             }
 
-            public void Preview() => TexturePreviewController.CreateWindow(Path.Value, _packfileService);
+            public void Preview() => TexturePreviewController.CreateWindow(Path, _packfileService);
 
             public void Browse()
             {
@@ -59,6 +80,27 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 }
             }
 
+            private void ValidateTexturePath()
+            {
+                if (Path == null)
+                    return;
+
+                var path = Path.Replace("/", @"\");
+
+                if (!_packfileService.Database.PackFiles.Any(pf => pf.FileList.Any(pair => pair.Key == path)))
+                {
+                    var errorMessage = "Invalid Texture Path!" +
+                                       (TextureTypeStr == "Mask" ? " This is fine on mask textures." : "");
+                    _errorsByPropertyName[nameof(Path)] = new List<string>() {errorMessage};
+                }
+                else
+                {
+                    _errorsByPropertyName[nameof(Path)] = null;
+                }
+
+                OnErrorsChanged(nameof(Path));
+            }
+
             public void Remove()
             {
                 UseTexture = false;
@@ -67,13 +109,27 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 
             void UpdateTexturePath(string newPath)
             {
-                Path.Value = newPath;
-                _meshNode.UpdateTexture(Path.Value, _texureType);
+                Path = newPath;
+                _meshNode.UpdateTexture(Path, _texureType);
             }
 
             void UpdatePreviewTexture(bool value)
             {
                 _meshNode.UseTexture(_texureType, value);
+            }
+
+            public IEnumerable GetErrors(string propertyName)
+            {
+                return _errorsByPropertyName.ContainsKey(propertyName) ?
+                    _errorsByPropertyName[propertyName] : null;
+            }
+
+            public bool HasErrors => _errorsByPropertyName.Any();
+            public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
+
+            private void OnErrorsChanged(string propertyName)
+            {
+                ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
             }
         }
 
@@ -127,7 +183,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 if (onlyShowUsedTextures == false)
                     texture.IsVisible.Value = true;
                 else
-                    texture.IsVisible.Value = !string.IsNullOrWhiteSpace(texture.Path.Value);
+                    texture.IsVisible.Value = !string.IsNullOrWhiteSpace(texture.Path);
             }
         }
 
