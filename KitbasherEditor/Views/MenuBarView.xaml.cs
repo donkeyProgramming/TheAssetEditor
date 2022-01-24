@@ -38,6 +38,12 @@ namespace KitbasherEditor.Views
 
         private void HandleKeyPress(object sender, KeyEventArgs e)
         {
+            if (e.OriginalSource is TextBox)
+            {
+                e.Handled = true;
+                return;
+            }
+
             if (DataContext is IKeyboardHandler keyboardHandler)
             {
                 var res = keyboardHandler.OnKeyReleased(e.Key, e.SystemKey, Keyboard.Modifiers);

@@ -45,7 +45,7 @@
             <ItemsControl ItemsSource="{Binding MaterialGeneral.TextureList, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Top">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid Visibility="{Binding IsVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
+                        <Grid Visibility="{Binding IsVisible.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToHiddenConverter}}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="120"/>
                                 <ColumnDefinition Width="auto"/>
@@ -59,7 +59,26 @@
                             <Label Grid.Column="0" Content="{Binding TextureTypeStr, UpdateSourceTrigger=PropertyChanged}"/>
                             <Label Grid.Column="1" Content=":"/>
                             <CheckBox Grid.Column="2" IsChecked="{Binding UseTexture, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" ToolTip="Preview texture in render window" VerticalContentAlignment="Center"/>
-                            <TextBox Grid.Column="3" Text="{Binding Path.Value, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" VerticalContentAlignment="Center"/>
+                            <TextBox Grid.Column="3" Text="{Binding Path, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"  VerticalContentAlignment="Center">
+                                <Validation.ErrorTemplate>
+                                    <ControlTemplate>
+                                        <StackPanel>
+                                            <Border BorderBrush="Red" BorderThickness="1" ToolTip="{Binding ErrorContent}">
+                                                <AdornedElementPlaceholder x:Name="textBox"/>
+                                            </Border>
+                                        </StackPanel>
+                                    </ControlTemplate>
+                                </Validation.ErrorTemplate>
+                                <TextBox.Style>
+                                    <Style TargetType="{x:Type TextBox}" >
+                                        <Style.Triggers>
+                                            <Trigger Property="Validation.HasError" Value="true">
+                                                <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
                             <Button Grid.Column="4" Content="Browse"  Click="{s:MethodBinding Browse}"/>
                             <Button Grid.Column="5" Content="Preview"  Click="{s:MethodBinding Preview}" Margin="2,0,2,0"/>
                             <Button Grid.Column="6" Content="X"  Click="{s:MethodBinding Remove}" ToolTip="Removes the texture from the model"/>
