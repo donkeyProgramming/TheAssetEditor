@@ -92,7 +92,7 @@ namespace AssetEditor.Views
                     if (draggedItem == null)
                         return;
 
-                    var dropTargetNode = dropTargetItem?.DataContext as KitbasherViewModel;
+                    var dropTargetNode = dropTargetItem?.DataContext as IEditorViewModel;
                     if (dropTargetNode == null)
                         return;
 

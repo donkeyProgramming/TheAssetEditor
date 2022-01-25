@@ -87,7 +87,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 
                 var path = Path.Replace("/", @"\");
 
-                if (!_packfileService.Database.PackFiles.Any(pf => pf.FileList.Any(pair => pair.Key == path)))
+                if (!_packfileService.Database.PackFiles.Any(pf => pf.FileList.Any(pair => pair.Key.Equals(path, StringComparison.OrdinalIgnoreCase))))
                 {
                     var errorMessage = "Invalid Texture Path!" +
                                        (TextureTypeStr == "Mask" ? " This is fine on mask textures." : "");
