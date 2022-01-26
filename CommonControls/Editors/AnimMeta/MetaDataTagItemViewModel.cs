@@ -20,14 +20,15 @@ namespace CommonControls.Editors.AnimMeta
         public ObservableCollection<EditableTagItem> Variables { get; set; } = new ObservableCollection<EditableTagItem>();
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("");
+        public NotifyAttr<string> Description { get; set; } = new NotifyAttr<string>("");
         public NotifyAttr<bool> IsDecodedCorrectly { get; set; } = new NotifyAttr<bool>(false);
-
 
         public MetaDataTagItemViewModel(IMetaEntry item)
         {
             _originalItem = item;
             _originalName = item.Name;
             DisplayName.Value = $"{item.Name}_v{item.Version}";
+            Description.Value = MetaEntrySerializer.GetDescriptionSafe(_originalName);
 
             try
             {
@@ -62,7 +63,7 @@ namespace CommonControls.Editors.AnimMeta
                     }
 
                     editableItem.Description = itemDiscription;
-                    editableItem.FieldName = prop.Name;
+                    editableItem.FieldName = FormatFieldName(prop.Name);
                     editableItem.IsReadOnly = !attributeInfo.IsEditable;
                     Variables.Add(editableItem);
                 }
@@ -76,18 +77,29 @@ namespace CommonControls.Editors.AnimMeta
             }
         }
 
+        string FormatFieldName(string name)
+        {
+            string newName = "";
+            for (int i = 0; i < name.Length; i++)
+            {
+                if (char.IsUpper(name[i]) && i != 0)
+                    newName += " ";
+                newName += name[i];
+            }
+            return newName;
+        }
+
 
         public MetaDataTagItemViewModel(MetaEntryBase typedMetaItem, string displayName)
         {
             DisplayName.Value = displayName;
-
             var splitString = displayName.Split("_");
             var newName = string.Join("_", splitString.SkipLast(1));
             _originalName = newName;
+            Description.Value = MetaEntrySerializer.GetDescriptionSafe(_originalName);
 
             try
             {
-                //var typedMetaItem = MetaEntrySerializer.DeSerialize(item);
                 var orderedPropertiesList = typedMetaItem.GetType().GetProperties()
                            .Where(x => x.CanWrite)
                            .Where(x => Attribute.IsDefined(x, typeof(MetaDataTagAttribute)))
@@ -118,7 +130,7 @@ namespace CommonControls.Editors.AnimMeta
                     }
 
                     editableItem.Description = itemDiscription;
-                    editableItem.FieldName = prop.Name;
+                    editableItem.FieldName = FormatFieldName(prop.Name);
                     editableItem.IsReadOnly = !attributeInfo.IsEditable;
                     Variables.Add(editableItem);
                 }
@@ -142,7 +154,6 @@ namespace CommonControls.Editors.AnimMeta
 
             return null;
         }
-
 
         internal MetaDataTagItem GetAsData()
         {

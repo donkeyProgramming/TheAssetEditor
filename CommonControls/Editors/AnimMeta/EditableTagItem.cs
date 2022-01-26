@@ -16,13 +16,6 @@ namespace CommonControls.Editors.AnimMeta
         byte[] _originalByteValue;
         IByteParser _parser { get; set; }
 
-        public EditableTagItem(IByteParser parser, byte[] value)
-        {
-            _originalByteValue = value;
-            _parser = parser;
-            IsValid = _parser.TryDecode(_originalByteValue, 0, out _valueAsString, out _, out _);
-        }
-
         public EditableTagItem(IByteParser parser, object value)
         {
             _parser = parser;
@@ -30,12 +23,9 @@ namespace CommonControls.Editors.AnimMeta
             Validate();
         }
 
-        public EditableTagItem(IByteParser parser)
-        {
-            _parser = parser;
-        }
+        protected EditableTagItem() { }
 
-            string _valueAsString;
+        string _valueAsString;
         public string ValueAsString { get => _valueAsString; set { SetAndNotify(ref _valueAsString, value); Validate(); } }
 
         public string FieldName { get; set; }
@@ -68,7 +58,7 @@ namespace CommonControls.Editors.AnimMeta
 
         Vector4Parser _parser;
 
-        public OrientationEditableTagItem(Vector4Parser parser, Vector4 value) : base(parser)
+        public OrientationEditableTagItem(Vector4Parser parser, Vector4 value)
         {
             _parser = parser;
 
@@ -104,15 +94,11 @@ namespace CommonControls.Editors.AnimMeta
 
         Vector3Parser _parser;
 
-        public Vector3EditableTagItem(Vector3Parser parser, Vector3 value) : base(parser)
+        public Vector3EditableTagItem(Vector3Parser parser, Vector3 value)
         {
             _parser = parser;
             Value.Set(value);
             IsValid = true;
-            //if (parser.TryDecodeValue(value, 0, out var vector3, out var _, out var err))
-            //    Value.Set(vector3);
-            //else
-            //    IsValid = false;
         }
 
         public override byte[] GetByteValue()

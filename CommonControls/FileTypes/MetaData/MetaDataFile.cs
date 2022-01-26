@@ -47,9 +47,13 @@ namespace CommonControls.FileTypes.MetaData
     public class MetaDataAttribute : Attribute
     {
         public string VersionName { get; private set; }
+        public string Name { get; set; }
+        public int Version { get; set; }
 
         public MetaDataAttribute(string name, int version)
         {
+            Name = name;
+            Version = version;
             VersionName = name + "_" + version;
         }
     }

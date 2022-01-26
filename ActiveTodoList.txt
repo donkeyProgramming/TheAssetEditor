@@ -549,3 +549,6 @@ Spine 0
 
 
 variantmeshes\wh_variantmodels\props\p_cb1b_hu1d\def_crossbow_repeater_01.rigid_model_v2
+
+93491001 
+10-1030
