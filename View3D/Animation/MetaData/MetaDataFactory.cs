@@ -1,15 +1,16 @@
-﻿using CommonControls.FileTypes.Animation;
+﻿using CommonControls.Common;
+using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.FileTypes.MetaData;
-using CommonControls.FileTypes.MetaData.Instances;
+using CommonControls.FileTypes.MetaData.Definitions;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using View3D.Animation.AnimationChange;
 using View3D.Components;
 using View3D.Components.Component;
@@ -23,6 +24,7 @@ namespace View3D.Animation.MetaData
 {
     public class MetaDataFactory
     {
+        ILogger _logger = Logging.Create<MetaDataFactory>();
         SceneNode _root;
         IComponentManager _componentManager;
         ISkeletonProvider _rootSkeleton;
@@ -43,11 +45,7 @@ namespace View3D.Animation.MetaData
             // Clear all
             var output = new List<IMetaDataInstance>();
 
-
-            // animated prop
-            // dock
-            // effect
-            if (metaData == null || metaData.GetItemsOfType("DISABLE_PERSISTENT").Count == 0)
+            if (metaData == null || metaData.GetItemsOfType<DisablePersistant_v10>().Count == 0)
             {
                 var meteaDataPersiste = ApplyMetaData(persistenet);
                 output.AddRange(meteaDataPersiste);
@@ -60,103 +58,86 @@ namespace View3D.Animation.MetaData
 
         List<IMetaDataInstance> ApplyMetaData(MetaDataFile file)
         {
-            var output = new List<IMetaDataInstance>();
-            if (file == null)
-                return output;
+           var output = new List<IMetaDataInstance>();
+           if (file == null)
+               return output;
 
-            // Props
-            var props = file.GetItemsOfType("animated_prop");
-            for (int i = 0; i < props.Count; i++)
-                output.Add(CreateAnimatedProp(AnimatedProp.Create(props[i]), i));
+           foreach(var animatedProp in file.GetItemsOfType<AnimatedProp_v10>())
+               output.Add(CreateAnimatedProp(animatedProp));
+           
+            foreach (var meteDataItem in file.GetItemsOfType<ImpactPosition>())
+                output.Add(CreateStaticLocator(meteDataItem, meteDataItem.Position, "ImpactPos"));
 
-            // World locations
-            foreach (var meta in file.GetItemsOfType("impact_pos").Where(x => x.Version == 10))
-                output.Add(CreateImpactPos(ImpactPosition.Create(meta)));
+            foreach (var meteDataItem in file.GetItemsOfType<TargetPos_10>())
+                output.Add(CreateStaticLocator(meteDataItem, meteDataItem.Position, "TargetPos"));
 
-            foreach (var meta in file.GetItemsOfType("target_pos"))
-                output.Add(CreateTargetPos(TargetPos.Create(meta)));
+            foreach (var meteDataItem in file.GetItemsOfType<FirePos>())
+                output.Add(CreateStaticLocator(meteDataItem, meteDataItem.Position, "FirePos"));
 
-            foreach (var meta in file.GetItemsOfType("fire_pos"))
-                output.Add(CreateFirePos(FirePos.Create(meta)));
+            foreach (var meteDataItem in file.GetItemsOfType<Effect>())
+                output.Add(CreateEffect(meteDataItem));
 
-            // Effects
-            var effects = file.GetItemsOfType("effect").Where(x => x.Version == 11);
-            foreach (var effect in effects)
-                output.Add(CreateEffect(Effect.Create(effect)));
+            foreach (var meteDataItem in file.GetItemsOfType<DockEquipment>())
+                CreateEquimentDock(meteDataItem);
+           
+            foreach (var meteDataItem in file.GetItemsOfType<Transform_v10>())
+                CreateTransform(meteDataItem);
 
-            // Dock
-            foreach (var slot in file.GetItemsOfType("dock_eqpt_rhand"))
-                CreateEquimentDock(DockEquipment.Create(slot), DockEquipmentRule.DockSlot.RightHand);
-
-            foreach (var slot in file.GetItemsOfType("dock_eqpt_lhand"))
-                CreateEquimentDock(DockEquipment.Create(slot), DockEquipmentRule.DockSlot.LeftHand);
-
-            foreach (var slot in file.GetItemsOfType("dock_eqpt_lwaist"))
-                CreateEquimentDock(DockEquipment.Create(slot), DockEquipmentRule.DockSlot.LeftWaist);
-
-            foreach (var slot in file.GetItemsOfType("dock_eqpt_rwaist"))
-                CreateEquimentDock(DockEquipment.Create(slot), DockEquipmentRule.DockSlot.RightWaist);
-
-            foreach (var slot in file.GetItemsOfType("dock_eqpt_back"))
-                CreateEquimentDock(DockEquipment.Create(slot), DockEquipmentRule.DockSlot.Back);
-
-            //foreach (var slot in file.GetItemsOfType("WEAPON_LHAND"))
-            //    CreateEquimentDock(DockEquipment.Create(slot), DockEquipmentRule.DockSlot.LeftHand);
-            //
-            //foreach (var slot in file.GetItemsOfType("WEAPON_RHAND"))
-            //    CreateEquimentDock(DockEquipment.Create(slot), DockEquipmentRule.DockSlot.RightHand);
-
-            // Transform
-            foreach (var transform in file.GetItemsOfType("Transform"))
-                CreateTransform(Transform.Create(transform));
-
-                return output;
+            return output;
         }
 
-        private void CreateTransform(Transform transform)
+        private void CreateTransform(Transform_v10 transform)
         {
             var rule = new TransformBoneRule(transform);
             _rootPlayer.AnimationRules.Add(rule);
         }
-
-        void CreateEquimentDock(DockEquipment animatedPropMeta, DockEquipmentRule.DockSlot slot)
+        
+        void CreateEquimentDock(DockEquipment metaData)
         {
             var resourceLib = _componentManager.GetComponent<ResourceLibary>();
             var skeletonHelper = _componentManager.GetComponent<SkeletonAnimationLookUpHelper>();
             var pfs = resourceLib.Pfs;
+        
+            var animPath = _fragment.Fragments.FirstOrDefault(x=>x.Slot.Value == metaData.AnimationSlotName)?.AnimationFile;
+            if (animPath == null)
+            {
+                _logger.Here().Error($"Unable to create docking, as {metaData.AnimationSlotName} animation is missing");
+                return;
+            }
 
-            var animPath = "";
-            if (slot == DockEquipmentRule.DockSlot.LeftHand)
-                animPath = _fragment.Fragments.First(x => x.Slot.Value == "DOCK_EQUIPMENT_LEFT_HAND").AnimationFile;
-            else if (slot == DockEquipmentRule.DockSlot.RightHand)
-                animPath = _fragment.Fragments.First(x => x.Slot.Value == "DOCK_EQUIPMENT_RIGHT_HAND").AnimationFile;
-
-            else if (slot == DockEquipmentRule.DockSlot.LeftWaist)
-                animPath = _fragment.Fragments.First(x => x.Slot.Value == "DOCK_EQUIPMENT_LEFT_WAIST").AnimationFile;
-            else if (slot == DockEquipmentRule.DockSlot.RightWaist)
-                animPath = _fragment.Fragments.First(x => x.Slot.Value == "DOCK_EQUIPMENT_RIGHT_WAIST").AnimationFile;
-
-            else if (slot == DockEquipmentRule.DockSlot.Back)
-                animPath = _fragment.Fragments.First(x => x.Slot.Value == "DOCK_EQUIPMENT_BACK").AnimationFile;
+            int finalBoneIndex = -1;
+            foreach (var potentialBoneName in metaData.SkeletonNameAlternatives)
+            {
+                finalBoneIndex = _rootSkeleton.Skeleton.GetBoneIndexByName(potentialBoneName);
+                if (finalBoneIndex != -1)
+                    break;
+            }
+            
+            if (finalBoneIndex == -1)
+            {
+                var boneNames = string.Join(", ", metaData.SkeletonNameAlternatives);
+                _logger.Here().Error($"Unable to create docking, as {boneNames} bone is missing");
+                return;
+            }
 
             var pf = pfs.FindFile(animPath);
             var animFile = AnimationFile.Create(pf);
             var clip = new AnimationClip(animFile);
-
-            var rule = new DockEquipmentRule(slot, animatedPropMeta.PropBoneId, clip, _rootSkeleton, animatedPropMeta.StartTime, animatedPropMeta.EndTime);
+        
+            var rule = new DockEquipmentRule(finalBoneIndex, metaData.PropBoneId, clip, _rootSkeleton, metaData.StartTime, metaData.EndTime);
             _rootPlayer.AnimationRules.Add(rule);
         }
 
-        IMetaDataInstance CreateAnimatedProp(AnimatedProp animatedPropMeta, int index)
+        IMetaDataInstance CreateAnimatedProp(AnimatedProp_v10 animatedPropMeta)
         {
-            var propName = "animated_prop_" + index;
+            var propName = "Animated_prop";
 
             var resourceLib = _componentManager.GetComponent<ResourceLibary>();
             var skeletonHelper = _componentManager.GetComponent<SkeletonAnimationLookUpHelper>();
             var graphics = _componentManager.GetComponent<DeviceResolverComponent>();
             var pfs = resourceLib.Pfs;
 
-            var meshPath = pfs.FindFile(animatedPropMeta.MeshName);
+            var meshPath = pfs.FindFile(animatedPropMeta.ModelName);
             var animationPath = pfs.FindFile(animatedPropMeta.AnimationName);
 
             var propPlayer = _componentManager.GetComponent<AnimationsContainerComponent>().RegisterAnimationPlayer(new AnimationPlayer(), propName + Guid.NewGuid());
@@ -172,12 +153,11 @@ namespace View3D.Animation.MetaData
             var animFile = AnimationFile.Create(animationPath);
             var clip = new AnimationClip(animFile);
 
-            var rule = new CopyRootTransform(_rootSkeleton, animatedPropMeta.BoneId, animatedPropMeta.Position, animatedPropMeta.Orientation);
+            var animationRule = new CopyRootTransform(_rootSkeleton, animatedPropMeta.BoneId, animatedPropMeta.Position, new Quaternion(animatedPropMeta.Orientation));
            
-
             // Apply animation
             propPlayer.SetAnimation(clip, skeleton);
-            propPlayer.AnimationRules.Add(rule);
+            propPlayer.AnimationRules.Add(animationRule);
 
             // Add to scene
             _root.AddObject(loadedNode);
@@ -190,53 +170,27 @@ namespace View3D.Animation.MetaData
             return new AnimatedPropInstance(loadedNode, propPlayer);
         }
 
-        IMetaDataInstance CreateImpactPos(ImpactPosition impactMetaData)
+        IMetaDataInstance CreateStaticLocator(DecodedMetaEntryBase metaData, Vector3 position, string displayName, float scale = 0.3f)
         {
             var resourceLib = _componentManager.GetComponent<ResourceLibary>();
 
-            SimpleDrawableNode node = new SimpleDrawableNode("ImpactPos");
-            node.AddItem(Components.Rendering.RenderBuckedId.Line, new CricleRenderItem(resourceLib.GetEffect(ShaderTypes.Line), impactMetaData.Position, 0.3f));
-            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, "ImpactPos", impactMetaData.Position));
-            _root.AddObject(node);
-
-            return new DrawableMetaInstance(impactMetaData.StartTime, impactMetaData.EndTime, node.Name, node);
-        }
-
-        IMetaDataInstance CreateFirePos(FirePos metaData)
-        {
-            var resourceLib = _componentManager.GetComponent<ResourceLibary>();
-
-            SimpleDrawableNode node = new SimpleDrawableNode("FirePos");
-            node.AddItem(Components.Rendering.RenderBuckedId.Line, new CricleRenderItem(resourceLib.GetEffect(ShaderTypes.Line), metaData.Position, 0.3f));
-            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, "FirePos", metaData.Position));
+            SimpleDrawableNode node = new SimpleDrawableNode(displayName);
+            node.AddItem(Components.Rendering.RenderBuckedId.Line, new CricleRenderItem(resourceLib.GetEffect(ShaderTypes.Line), position, scale));
+            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, displayName, position));
             _root.AddObject(node);
 
             return new DrawableMetaInstance(metaData.StartTime, metaData.EndTime, node.Name, node);
         }
-
-        IMetaDataInstance CreateTargetPos(TargetPos metaData)
-        {
-            var resourceLib = _componentManager.GetComponent<ResourceLibary>();
-
-            SimpleDrawableNode node = new SimpleDrawableNode("TargetPos");
-            node.AddItem(Components.Rendering.RenderBuckedId.Line, new CricleRenderItem(resourceLib.GetEffect(ShaderTypes.Line), metaData.Position, 0.3f));
-            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, "TargetPos", metaData.Position));
-            _root.AddObject(node);
-
-            return new DrawableMetaInstance(metaData.StartTime, metaData.EndTime, node.Name, node);
-        }
-
-
 
         IMetaDataInstance CreateEffect(Effect effect)
         {
             var resourceLib = _componentManager.GetComponent<ResourceLibary>();
-
-            SimpleDrawableNode node = new SimpleDrawableNode("Effect:"+ effect.Name);
+        
+            SimpleDrawableNode node = new SimpleDrawableNode("Effect:"+ effect.VfxName);
             node.AddItem(Components.Rendering.RenderBuckedId.Line, new LocatorRenderItem(resourceLib.GetEffect(ShaderTypes.Line), effect.Position, 0.3f));
-            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, effect.Name, effect.Position));
+            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, effect.VfxName, effect.Position));
             _root.AddObject(node);
-
+        
             var instance = new DrawableMetaInstance(effect.StartTime, effect.EndTime, node.Name, node);
             if (effect.Tracking)
                 instance.FollowBone(_rootSkeleton, effect.NodeIndex);

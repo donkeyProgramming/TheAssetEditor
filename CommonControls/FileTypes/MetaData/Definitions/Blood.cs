@@ -6,7 +6,7 @@ using System.Text;
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
     [MetaData("BLOOD", 11)]
-    public class Blood : MetaEntryBase
+    public class Blood : DecodedMetaEntryBase
     {
         [MetaDataTag(5, "Name of the VFX's .xml file in the vfx folder. Leave off the file extension. Note that for this you don't need to add custom vfx to the particles db table and they still require a \"movie\"-type .pack for them to be loaded.")]
         public string VfxName { get; set; } = "";

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -10,26 +11,31 @@ namespace CommonControls.FileTypes.MetaData
     public class MetaDataFile
     {
         public int Version { get; set; }
-        public List<IMetaEntry> Items { get; set; } = new List<IMetaEntry>();
+        public List<BaseMetaEntry> Items { get; set; } = new List<BaseMetaEntry>();
 
-        public List<MetaEntry> GetItemsOfType(string type)
+        public List<T> GetItemsOfType<T>() where T: DecodedMetaEntryBase 
         {
-            var result = Items
-                .Where(x => x is MetaEntry)
-                .Where(x => x.Name.Contains(type, StringComparison.InvariantCultureIgnoreCase))
-                .Select(x => x as MetaEntry)
-                .ToList();
-
-            return result;
+            return Items.Where(x => x is T).Cast<T>().ToList();
         }
     }
 
-    public abstract class MetaEntryBase
-    {
 
+    public abstract class BaseMetaEntry
+    {
+        public string Name { get; set; }
+        
         [MetaDataTag(0, "Version number of the Tag type", MetaDataTagAttribute.DisplayType.None, true)]
         public int Version { get; set; }
+        public byte[] Data { get; set; }
+    }
 
+    public class UnknownMetaEntry : BaseMetaEntry
+    {
+        
+    }
+
+    public abstract class DecodedMetaEntryBase : BaseMetaEntry
+    {
         [MetaDataTag(1, "Time in second when the Tag takes effect")]
         public float StartTime { get; set; }
 
@@ -42,6 +48,7 @@ namespace CommonControls.FileTypes.MetaData
         [MetaDataTag(4, "Id to enable or disable, almost always 0")]
         public int Id { get; set; }
     }
+
 
 
     public class MetaDataAttribute : Attribute
@@ -57,9 +64,6 @@ namespace CommonControls.FileTypes.MetaData
             VersionName = name + "_" + version;
         }
     }
-
-
-
 
     [AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
     public sealed class MetaDataTagAttribute : Attribute
@@ -83,13 +87,4 @@ namespace CommonControls.FileTypes.MetaData
             IsEditable = isEditable;
         }
     }
-
-
-    //[AttributeUsage(AttributeTargets.Method, Inherited = false)]
-    //public class YourAttribute : Attribute
-    //{
-    //    //...
-    //}
-
-
 }

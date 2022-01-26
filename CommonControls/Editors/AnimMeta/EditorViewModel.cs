@@ -28,10 +28,10 @@ namespace CommonControls.Editors.AnimMeta
         public PackFile MainFile { get => _file; set => Initialise(value); }
 
 
-        public ObservableCollection<MetaDataTagItemViewModel> Tags { get; set; } = new ObservableCollection<MetaDataTagItemViewModel>();  
+        public ObservableCollection<MetaTagViewBase> Tags { get; set; } = new ObservableCollection<MetaTagViewBase>();
 
-        MetaDataTagItemViewModel _selectedTag;
-        public MetaDataTagItemViewModel SelectedTag { get => _selectedTag; set => SetAndNotify(ref _selectedTag, value); }
+        MetaTagViewBase _selectedTag;
+        public MetaTagViewBase SelectedTag { get => _selectedTag; set => SetAndNotify(ref _selectedTag, value); }
 
 
         public EditorViewModel(PackFileService pf, CopyPasteManager copyPasteManager)
@@ -42,6 +42,9 @@ namespace CommonControls.Editors.AnimMeta
 
         void Initialise(PackFile file)
         {
+            if (file == _file)
+                return;
+
             _file = file;
             Tags.Clear();
             DisplayName.Value = file == null ? "" : file.Name;
@@ -50,13 +53,23 @@ namespace CommonControls.Editors.AnimMeta
                 return; 
 
             var fileContent = _file.DataSource.ReadData();
-            _metaDataFile = MetaDataFileParser.ParseFile(fileContent);
-         
+
+            var parser = new MetaDataFileParser();
+            _metaDataFile = parser.ParseFile(fileContent);
+
             foreach (var item in _metaDataFile.Items)
-                Tags.Add(new MetaDataTagItemViewModel(item));
+            {
+                if (item is DecodedMetaEntryBase metaBase)
+                    Tags.Add(new MetaDataTagItemViewModel(metaBase));
+                else if (item is UnknownMetaEntry uknMeta)
+                    Tags.Add(new UnkMetaDataTagItemViewModel(uknMeta));
+                else
+                    throw new System.Exception();
+            }
+                
         }
 
-        public void MoveUp()
+        public void MoveUpAction()
         {
             var itemToMove = SelectedTag;
             if (itemToMove == null)
@@ -72,7 +85,7 @@ namespace CommonControls.Editors.AnimMeta
             SelectedTag = itemToMove;
         }
 
-        public void MoveDown()
+        public void MoveDownAction()
         {
             var itemToMove = SelectedTag;
             if (itemToMove == null)
@@ -88,20 +101,19 @@ namespace CommonControls.Editors.AnimMeta
             SelectedTag = itemToMove;
         }
 
-        public void Delete()
+        public void DeleteAction()
         {
-            var item = SelectedTag;
-            if (item == null)
+            if (SelectedTag == null)
                 return;
 
-            Tags.Remove(item);
+            Tags.Remove(SelectedTag);
             SelectedTag = Tags.FirstOrDefault();
         }
 
-        public void New()
+        public void NewAction()
         {
             var dialog = new NewTagWindow();
-            var allDefs = MetaEntrySerializer.GetSupportedTypes(); ;
+            var allDefs = MetaDataTagDeSerializer.GetSupportedTypes();
             
             NewTagWindowViewModel model = new NewTagWindowViewModel();
             model.Items = new ObservableCollection<string>(allDefs);
@@ -110,8 +122,8 @@ namespace CommonControls.Editors.AnimMeta
             var res = dialog.ShowDialog();
             if (res.HasValue && res.Value == true)
             {
-                var newEntry = MetaEntrySerializer.CreateDefault(model.SelectedItem); 
-                var newTagView = new MetaDataTagItemViewModel(newEntry, model.SelectedItem);
+                var newEntry = MetaDataTagDeSerializer.CreateDefault(model.SelectedItem); 
+                var newTagView = new MetaDataTagItemViewModel(newEntry);
                 Tags.Add(newTagView);
             }
 
@@ -119,19 +131,50 @@ namespace CommonControls.Editors.AnimMeta
         }
 
         public void PasteAction()
-        { }
-
-        public void CopyAction()
-        { }
-
-
-        public void Close()
         {
+            var pasteObject = _copyPasteManager.GetPasteObject<MetaDataTagCopyItem>();
+            if (pasteObject == null)
+            {
+                MessageBox.Show("No valid object found to paste");
+                return;
+            }
+
+            try
+            {
+                var typed = MetaDataTagDeSerializer.DeSerialize(pasteObject.Data);
+                Tags.Add(new MetaDataTagItemViewModel(typed));
+            }
+            catch
+            {
+                Tags.Add(new UnkMetaDataTagItemViewModel(pasteObject.Data));
+            }
         }
 
-        public bool HasUnsavedChanges() => false;
+        public void CopyAction()
+        {
+            if (SelectedTag == null)
+                return;
 
-        public bool Save()
+            if (string.IsNullOrWhiteSpace(SelectedTag.HasError()) == false)
+            {
+                MessageBox.Show($"Can not copy object due to: {SelectedTag.HasError()}");
+                return;
+            }
+
+            var tag = SelectedTag.GetAsData();
+            var copyItem = new MetaDataTagCopyItem()
+            {
+                Data = new UnknownMetaEntry()
+                {
+                    Name = tag.Name,
+                    Data = tag.DataItem.Bytes,
+                    Version = SelectedTag.Version.Value,
+                }
+            };
+            _copyPasteManager.SetCopyItem(copyItem);
+        }
+
+        public bool SaveAction()
         {
             var path = _pf.GetFullPath(_file);
 
@@ -155,7 +198,9 @@ namespace CommonControls.Editors.AnimMeta
             }
 
             _logger.Here().Information("Generating bytes");
-            var bytes =  MetaDataFileParser.GenerateBytes(_metaDataFile.Version, tagDataItems);
+
+            MetaDataFileParser parser = new MetaDataFileParser();
+            var bytes = parser.GenerateBytes(_metaDataFile.Version, tagDataItems);
             _logger.Here().Information("Saving");
             var res = SaveHelper.Save(_pf, path, null, bytes);
             if (res != null)
@@ -168,6 +213,11 @@ namespace CommonControls.Editors.AnimMeta
             EditorSavedEvent?.Invoke(_file);
             return _file != null;
         }
+
+        public bool HasUnsavedChanges() => false;
+        public bool Save() => SaveAction();
+        public void Close() { }
+
     }
 }
 

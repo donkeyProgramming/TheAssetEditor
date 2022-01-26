@@ -9,7 +9,7 @@ namespace AnimationEditor.SkeletonEditor
     {
         CopyPasteManager _copyPasteManager;
 
-        public SkeletonEditorViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, SchemaManager schemaManager, CopyPasteManager copyPasteManager) : base(toolFactory, pfs, skeletonHelper, schemaManager, "not_in_use1", "not_in_use2", false)
+        public SkeletonEditorViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager) : base(toolFactory, pfs, skeletonHelper, "not_in_use1", "not_in_use2", false)
         {
             _copyPasteManager = copyPasteManager;
             DisplayName.Value = "Skeleton Editor";

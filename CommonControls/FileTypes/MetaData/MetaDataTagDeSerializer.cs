@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace CommonControls.FileTypes.MetaData
 {
-    public class MetaEntrySerializer
+    public class MetaDataTagDeSerializer
     {
         public static Dictionary<string, Type> _typeTable;
         public static Dictionary<string, string> _descriptionMap;
@@ -145,7 +145,7 @@ namespace CommonControls.FileTypes.MetaData
             return array.Zip(array.Skip(1), (a, b) => (a + 1) == b).All(x => x);
         }
 
-        static Type GetTypeFromMeta(IMetaEntry entry)
+        static Type GetTypeFromMeta(BaseMetaEntry entry)
         {
             EnsureMappingTableCreated();
 
@@ -156,13 +156,13 @@ namespace CommonControls.FileTypes.MetaData
             return _typeTable[key];
         }
 
-        public static MetaEntryBase DeSerialize(IMetaEntry entry)
+        public static DecodedMetaEntryBase DeSerialize(UnknownMetaEntry entry)
         {
             EnsureMappingTableCreated();
 
             var entryInfo = GetEntryInformation(entry);
             var instance = Activator.CreateInstance(entryInfo.type);
-            var bytes = entry.GetData();
+            var bytes = entry.Data;
             int currentIndex = 0;
             foreach (var proptery in entryInfo.Properties)
             {
@@ -175,28 +175,30 @@ namespace CommonControls.FileTypes.MetaData
             if (bytes.Length != currentIndex)
                 throw new Exception("Failed to read object - bytes left");
 
-            return instance as MetaEntryBase;
+            var typedInstance = instance as DecodedMetaEntryBase;
+            typedInstance.Name = entry.Name;
+            typedInstance.Data = bytes;
+            return typedInstance;
         }
 
-        internal static MetaEntryBase CreateDefault(string itemName)
+        internal static DecodedMetaEntryBase CreateDefault(string itemName)
         {
             EnsureMappingTableCreated();
 
             if (_typeTable.ContainsKey(itemName) == false)
                 throw new Exception("Unkown metadata item " + itemName);
 
-            var instance = Activator.CreateInstance(_typeTable[itemName]) as MetaEntryBase;
+            var instance = Activator.CreateInstance(_typeTable[itemName]) as DecodedMetaEntryBase;
 
             var itemNameSplit = itemName.ToUpper().Split("_");
             instance.Version = int.Parse(itemNameSplit.Last());
             return instance;
         }
         
-
-        public static List<(string Header, string Value)> DeSerializeToStrings(IMetaEntry entry)
+        public static List<(string Header, string Value)> DeSerializeToStrings(BaseMetaEntry entry)
         {
             var entryInfo = GetEntryInformation(entry);
-            var bytes = entry.GetData();
+            var bytes = entry.Data;
             int currentIndex = 0;
             var output = new List<(string, string)>();
 
@@ -217,7 +219,7 @@ namespace CommonControls.FileTypes.MetaData
             return output;
         }
 
-        static (Type type, List<PropertyInfo> Properties) GetEntryInformation(IMetaEntry entry)
+        static (Type type, List<PropertyInfo> Properties) GetEntryInformation(BaseMetaEntry entry)
         {
             var metaDataType = GetTypeFromMeta(entry);
             if (metaDataType == null)
@@ -233,13 +235,4 @@ namespace CommonControls.FileTypes.MetaData
             return (metaDataType, orderedPropertiesList);
         }
     }
-
-
-    //[AttributeUsage(AttributeTargets.Method, Inherited = false)]
-    //public class YourAttribute : Attribute
-    //{
-    //    //...
-    //}
-
-
 }

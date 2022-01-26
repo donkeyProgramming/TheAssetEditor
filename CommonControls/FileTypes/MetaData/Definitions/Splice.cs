@@ -6,7 +6,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 {
 
     [MetaData("SPLICE", 11)]
-    public class Splice_v11 : MetaEntryBase
+    public class Splice_v11 : DecodedMetaEntryBase
     {
         [MetaDataTag(5)]
         public string Animation { get; set; } = "";

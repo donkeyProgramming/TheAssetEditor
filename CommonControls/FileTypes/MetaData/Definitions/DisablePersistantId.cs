@@ -7,7 +7,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 
 
     [MetaData("DISABLE_PERSISTENT_ID", 10)]
-    public class DisablePersistantId_v10 : MetaEntryBase
+    public class DisablePersistantId_v10 : DecodedMetaEntryBase
     {
         [MetaDataTag(5)]
         public float Value{ get; set; }
@@ -20,7 +20,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     }
 
     [MetaData("DISABLE_PERSISTENT_ID", 11)]
-    public class DisablePersistantId_v11 : MetaEntryBase
+    public class DisablePersistantId_v11 : DecodedMetaEntryBase
     {
         [MetaDataTag(5)]
         public float Value { get; set; }

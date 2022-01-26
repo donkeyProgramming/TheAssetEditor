@@ -6,7 +6,7 @@ using System.Text;
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
     [MetaData("FIRE_POS", 10)]
-    public class FirePos : MetaEntryBase
+    public class FirePos : DecodedMetaEntryBase
     {
         [MetaDataTag(5, "Measured from the unit's animroot bone, in meters.")]
         public Vector3 Position { get; set; }

@@ -5,7 +5,7 @@ using System.Text;
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
     [MetaData("BLEND_OVERRIDE", 10)]
-    public class BlendOverride_v10 : MetaEntryBase
+    public class BlendOverride_v10 : DecodedMetaEntryBase
     {
         [MetaDataTag(5)]
         public float BlendOutTime { get; set; }

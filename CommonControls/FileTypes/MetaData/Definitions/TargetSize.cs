@@ -6,7 +6,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 {
 
 
-    public class TargetSize : MetaEntryBase
+    public class TargetSize : DecodedMetaEntryBase
     {
         [MetaDataTag(5, "Likely an enum related to unit size. Maybe 0=large, 1=medium, 2=small, 3=very_large, 4=very_small")]
         public int MaxTargetSize { get; set; }

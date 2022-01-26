@@ -6,7 +6,7 @@ using System.Text;
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
     [MetaData("ANIMATED_PROP", 10)]
-    public class AnimatedProp_v10 : MetaEntryBase
+    public class AnimatedProp_v10 : DecodedMetaEntryBase
     {
         [MetaDataTag(5)]
         public bool DistanceCulled { get; set; }

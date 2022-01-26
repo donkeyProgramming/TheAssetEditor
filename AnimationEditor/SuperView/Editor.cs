@@ -17,7 +17,6 @@ namespace AnimationEditor.SuperView
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonHelper;
         AnimationPlayerViewModel _player;
-        SchemaManager _schemaManager;
         IToolFactory _toolFactory;
 
 
@@ -32,18 +31,17 @@ namespace AnimationEditor.SuperView
 
         public ObservableCollection<ReferenceModelSelectionViewModel> Items { get; set; } = new ObservableCollection<ReferenceModelSelectionViewModel>();
 
-        public Editor(IToolFactory toolFactory, SceneContainer scene, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, AnimationPlayerViewModel player, SchemaManager schemaManager)
+        public Editor(IToolFactory toolFactory, SceneContainer scene, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, AnimationPlayerViewModel player, CopyPasteManager copyPasteManager)
         {
             _toolFactory = toolFactory;
             _scene = scene;
             _pfs = pfs;
             _skeletonHelper = skeletonHelper;
             _player = player;
-            _schemaManager = schemaManager;
 
-            PersistentMetaEditor = new CommonControls.Editors.AnimMeta.EditorViewModel(pfs, null);
+            PersistentMetaEditor = new CommonControls.Editors.AnimMeta.EditorViewModel(pfs, copyPasteManager);
             PersistentMetaEditor.EditorSavedEvent += PersistentMetaEditor_EditorSavedEvent;
-            MetaEditor = new CommonControls.Editors.AnimMeta.EditorViewModel(pfs, null);
+            MetaEditor = new CommonControls.Editors.AnimMeta.EditorViewModel(pfs, copyPasteManager);
             MetaEditor.EditorSavedEvent += MetaEditor_EditorSavedEvent;
         }
 
@@ -51,7 +49,7 @@ namespace AnimationEditor.SuperView
         {
             var asset = _scene.AddComponent(new AssetViewModel(_pfs, "Item 0", Color.Black, _scene));
             _player.RegisterAsset(asset);
-            var viewModel = new ReferenceModelSelectionViewModel(_toolFactory, _pfs, asset, "Item 0:", _scene, _skeletonHelper, _schemaManager);
+            var viewModel = new ReferenceModelSelectionViewModel(_toolFactory, _pfs, asset, "Item 0:", _scene, _skeletonHelper);
             viewModel.AllowMetaData.Value = true;
 
             if(input.Mesh != null)
@@ -86,7 +84,9 @@ namespace AnimationEditor.SuperView
                 PersistentMetaFilePath.Value = "";
                 PersistentMetaFilePackFileContainerName.Value = "";
             }
+            
 
+            
             MetaEditor.MainFile = newValue.MetaData;
             if (MetaEditor.MainFile != null)
             {
@@ -98,7 +98,6 @@ namespace AnimationEditor.SuperView
                 MetaFilePath.Value = "";
                 MetaFilePackFileContainerName.Value = "";
             }
-
         }
 
         private void MetaEditor_EditorSavedEvent(CommonControls.FileTypes.PackFiles.Models.PackFile newFile)

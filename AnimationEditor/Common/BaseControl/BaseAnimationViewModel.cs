@@ -56,12 +56,11 @@ namespace AnimationEditor.PropCreator.ViewModels
         object _editor;
         public object Editor { get => _editor; set => SetAndNotify(ref _editor, value); }
 
-        public BaseAnimationViewModel(IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, SchemaManager schemaManager, string headerAsset0, string headerAsset1, bool createDefaultAssets = true)
+        public BaseAnimationViewModel(IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, string headerAsset0, string headerAsset1, bool createDefaultAssets = true)
         {
             _toolFactory = toolFactory;
             _pfs = pfs;
             _skeletonHelper = skeletonHelper;
-            _schemaManager = schemaManager;
             _createDefaultAssets = createDefaultAssets;
 
             Scene = new SceneContainer();
@@ -71,7 +70,6 @@ namespace AnimationEditor.PropCreator.ViewModels
             Scene.AddComponent(new KeyboardComponent(Scene));
             Scene.AddComponent(new MouseComponent(Scene));
             Scene.AddComponent(skeletonHelper);
-            Scene.AddComponent(schemaManager);
             Scene.AddComponent(new ArcBallCamera(Scene));
             Scene.AddComponent(new ClearScreenComponent(Scene));
             Scene.AddComponent(new RenderEngineComponent(Scene));
@@ -88,8 +86,8 @@ namespace AnimationEditor.PropCreator.ViewModels
             var mainAsset = Scene.AddComponent(new AssetViewModel(_pfs, headerAsset0, Color.Black, Scene));
             var refAsset = Scene.AddComponent(new AssetViewModel(_pfs, headerAsset1,  Color.Green, Scene));
 
-            MainModelView = new ReferenceModelSelectionViewModel(_toolFactory, pfs, mainAsset, headerAsset0 + ":", Scene, skeletonHelper, schemaManager);
-            ReferenceModelView = new ReferenceModelSelectionViewModel(_toolFactory, pfs, refAsset, headerAsset1 + ":", Scene, skeletonHelper, schemaManager);
+            MainModelView = new ReferenceModelSelectionViewModel(_toolFactory, pfs, mainAsset, headerAsset0 + ":", Scene, skeletonHelper);
+            ReferenceModelView = new ReferenceModelSelectionViewModel(_toolFactory, pfs, refAsset, headerAsset1 + ":", Scene, skeletonHelper);
         }
 
         private void OnSceneInitialized(WpfGame scene)

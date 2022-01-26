@@ -1,13 +1,13 @@
-﻿using CommonControls.FileTypes.MetaData.Instances;
+﻿using CommonControls.FileTypes.MetaData.Definitions;
 using Microsoft.Xna.Framework;
 
 namespace View3D.Animation.AnimationChange
 {
     public class TransformBoneRule : AnimationChangeRule
     {
-        Transform _metadata;
+        Transform_v10 _metadata;
 
-        public TransformBoneRule(Transform metadata)
+        public TransformBoneRule(Transform_v10 metadata)
         {
             _metadata = metadata;
         }
