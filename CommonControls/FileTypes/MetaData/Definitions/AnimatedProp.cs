@@ -6,16 +6,16 @@ using System.Text;
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
     [MetaData("ANIMATED_PROP", 10)]
-    public class AnimatedProp_v10 : MetaEntryBase
+    public class AnimatedProp_v10 : DecodedMetaEntryBase
     {
         [MetaDataTag(5)]
         public bool DistanceCulled { get; set; }
 
         [MetaDataTag(6)]
-        public string ModelName { get; set; }
+        public string ModelName { get; set; } = "";
 
         [MetaDataTag(7)]
-        public string AnimationName { get; set; }
+        public string AnimationName { get; set; } = "";
 
         [MetaDataTag(8)]
         public Vector3 Position { get; set; }

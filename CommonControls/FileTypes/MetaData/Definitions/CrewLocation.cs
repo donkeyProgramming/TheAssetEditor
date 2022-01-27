@@ -6,7 +6,7 @@ using System.Text;
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
     [MetaData("CREW_LOCATION", 10)]
-    public class CrewLocation_v10 : MetaEntryBase
+    public class CrewLocation_v10 : DecodedMetaEntryBase
     {
         [MetaDataTag(5)]
         public int Unk0 { get; set; }

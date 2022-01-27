@@ -17,26 +17,39 @@ namespace AnimationEditor.SuperView
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonHelper;
         AnimationPlayerViewModel _player;
-        SchemaManager _schemaManager;
         IToolFactory _toolFactory;
+
+
+        public NotifyAttr<string> PersistentMetaFilePath { get; set; } = new NotifyAttr<string>("");
+        public NotifyAttr<string> PersistentMetaFilePackFileContainerName { get; set; } = new NotifyAttr<string>("");
+
+        public NotifyAttr<string> MetaFilePath { get; set; } = new NotifyAttr<string>("");
+        public NotifyAttr<string> MetaFilePackFileContainerName { get; set; } = new NotifyAttr<string>("");
+
+        public CommonControls.Editors.AnimMeta.EditorViewModel PersistentMetaEditor { get; set; }
+        public CommonControls.Editors.AnimMeta.EditorViewModel MetaEditor { get; set; }
 
         public ObservableCollection<ReferenceModelSelectionViewModel> Items { get; set; } = new ObservableCollection<ReferenceModelSelectionViewModel>();
 
-        public Editor(IToolFactory toolFactory, SceneContainer scene, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, AnimationPlayerViewModel player, SchemaManager schemaManager)
+        public Editor(IToolFactory toolFactory, SceneContainer scene, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, AnimationPlayerViewModel player, CopyPasteManager copyPasteManager)
         {
             _toolFactory = toolFactory;
             _scene = scene;
             _pfs = pfs;
             _skeletonHelper = skeletonHelper;
             _player = player;
-            _schemaManager = schemaManager;
+
+            PersistentMetaEditor = new CommonControls.Editors.AnimMeta.EditorViewModel(pfs, copyPasteManager);
+            PersistentMetaEditor.EditorSavedEvent += PersistentMetaEditor_EditorSavedEvent;
+            MetaEditor = new CommonControls.Editors.AnimMeta.EditorViewModel(pfs, copyPasteManager);
+            MetaEditor.EditorSavedEvent += MetaEditor_EditorSavedEvent;
         }
 
         public void Create(AnimationToolInput input)
         {
             var asset = _scene.AddComponent(new AssetViewModel(_pfs, "Item 0", Color.Black, _scene));
             _player.RegisterAsset(asset);
-            var viewModel = new ReferenceModelSelectionViewModel(_toolFactory, _pfs, asset, "Item 0:", _scene, _skeletonHelper, _schemaManager);
+            var viewModel = new ReferenceModelSelectionViewModel(_toolFactory, _pfs, asset, "Item 0:", _scene, _skeletonHelper);
             viewModel.AllowMetaData.Value = true;
 
             if(input.Mesh != null)
@@ -49,15 +62,55 @@ namespace AnimationEditor.SuperView
                 viewModel.FragAndSlotSelection.FragmentList.SelectedItem = viewModel.FragAndSlotSelection.FragmentList.PossibleValues.FirstOrDefault(x => x.FileName == input.FragmentName);
 
                 if (input.AnimationSlot != null)
-                {
                     viewModel.FragAndSlotSelection.FragmentSlotList.SelectedItem = viewModel.FragAndSlotSelection.FragmentSlotList.PossibleValues.FirstOrDefault(x => x.Slot.Id == input.AnimationSlot.Id);
-                }
             }
 
+            asset.MetaDataChanged += Asset_MetaDataChanged;
+
             Items.Add(viewModel);
+            Asset_MetaDataChanged(asset);
         }
 
-        public void Refresh()
+        private void Asset_MetaDataChanged(AssetViewModel newValue)
+        {
+            PersistentMetaEditor.MainFile = newValue.PersistMetaData;
+            if (PersistentMetaEditor.MainFile != null)
+            {
+                PersistentMetaFilePackFileContainerName.Value = _pfs.GetPackFileContainer(PersistentMetaEditor.MainFile).Name;
+                PersistentMetaFilePath.Value = _pfs.GetFullPath(PersistentMetaEditor.MainFile);
+            }
+            else
+            {
+                PersistentMetaFilePath.Value = "";
+                PersistentMetaFilePackFileContainerName.Value = "";
+            }
+            
+
+            
+            MetaEditor.MainFile = newValue.MetaData;
+            if (MetaEditor.MainFile != null)
+            {
+                MetaFilePackFileContainerName.Value = _pfs.GetPackFileContainer(MetaEditor.MainFile).Name;
+                MetaFilePath.Value = _pfs.GetFullPath(MetaEditor.MainFile);
+            }
+            else
+            {
+                MetaFilePath.Value = "";
+                MetaFilePackFileContainerName.Value = "";
+            }
+        }
+
+        private void MetaEditor_EditorSavedEvent(CommonControls.FileTypes.PackFiles.Models.PackFile newFile)
+        {
+            Items.First().MetaFileInformation.SelectedMetaFile = newFile;
+        }
+
+        private void PersistentMetaEditor_EditorSavedEvent(CommonControls.FileTypes.PackFiles.Models.PackFile newFile)
+        {
+            Items.First().MetaFileInformation.SelectedPersistMetaFile = newFile;
+        }
+
+        public void RefreshAction()
         {
             foreach (var item in Items)
                 item.Refresh();

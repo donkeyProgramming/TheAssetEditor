@@ -61,6 +61,8 @@
                     <EventSetter Event="PreviewMouseDown" Handler="tabItem_MouseDown"/>
                     <Setter Property="AllowDrop" Value="True"/>
                     <Setter Property="Focusable" Value="False"/>
+                    <Setter Property="behaviors:MouseMiddleClick.Command" Value="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolCommand}"/>
+                    <Setter Property="behaviors:MouseMiddleClick.CommandParameter" Value="{Binding}"/>
                 </Style>
             </TabControl.ItemContainerStyle>
 
@@ -81,9 +83,20 @@
                                 <MenuItem Header="Close"
                                           Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolCommand}"
                                           CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}" />
-                                <MenuItem Header="Close others"
-                                          Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseOtherToolsCommand}"
-                                          CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
+                                <MenuItem Header="Close Multiple">
+                                    <MenuItem Header="Close Other Tabs"
+                                              Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseOtherToolsCommand}"
+                                              CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
+                                    <MenuItem Header="Close All Tabs"
+                                              Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseAllToolsCommand}"
+                                              CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
+                                    <MenuItem Header="Close Tabs To Left"
+                                              Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolsToLeftCommand}"
+                                              CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
+                                    <MenuItem Header="Close Tabs To Right"
+                                              Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolsToRightCommand}"
+                                              CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
+                                </MenuItem>
                             </ContextMenu>
                         </Grid.ContextMenu>
                         

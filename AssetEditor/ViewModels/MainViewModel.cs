@@ -37,6 +37,7 @@ namespace AssetEditor.ViewModels
 
         public ICommand CloseToolCommand { get; set; }
         public ICommand CloseOtherToolsCommand { get; set; }
+
         public ICommand ClosingCommand { get; set; }
 
         public bool IsClosingWithoutPrompt
@@ -49,6 +50,10 @@ namespace AssetEditor.ViewModels
             }
         }
 
+        public ICommand CloseAllToolsCommand { get; set; }
+        public ICommand CloseToolsToRightCommand { get; set; }
+        public ICommand CloseToolsToLeftCommand { get; set; }
+
         public MainViewModel(MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, ToolFactory toolFactory, SchemaManager schemaManager)
         {
             _packfileService = packfileService;
@@ -59,6 +64,9 @@ namespace AssetEditor.ViewModels
             CloseToolCommand = new RelayCommand<IEditorViewModel>(CloseTool);
             CloseOtherToolsCommand = new RelayCommand<IEditorViewModel>(CloseOtherTools);
             ClosingCommand = new RelayCommand<IEditorViewModel>(Closing);
+            CloseAllToolsCommand = new RelayCommand<IEditorViewModel>(CloseAllTools);
+            CloseToolsToRightCommand = new RelayCommand<IEditorViewModel>(CloseToolsToRight);
+            CloseToolsToLeftCommand = new RelayCommand<IEditorViewModel>(CloseToolsToLeft);
 
             FileTree = new PackFileBrowserViewModel(_packfileService);
             FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, toolFactory, this);
@@ -140,7 +148,7 @@ namespace AssetEditor.ViewModels
                 //AnimMetaBatchProcessor processor = new AnimMetaBatchProcessor();
                 //processor.BatchProcess(_packfileService, schemaManager, "Warhammer");
 
-                //AnimationEditor.SuperView.SuperViewViewModel_Debug.CreateThrot(this, toolFactory, packfileService);
+                AnimationEditor.SuperView.SuperViewViewModel_Debug.CreateThrot(this, toolFactory, packfileService);
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
 
 
@@ -318,6 +326,32 @@ namespace AssetEditor.ViewModels
             {
                 if (editorViewModel != tool)
                     CloseTool(editorViewModel);
+            }
+        }
+
+        void CloseAllTools(IEditorViewModel tool)
+        {
+            foreach (var editorViewModel in CurrentEditorsList.ToList())
+            {
+                CloseTool(editorViewModel);
+            }
+        }
+
+        void CloseToolsToLeft(IEditorViewModel tool)
+        {
+            var index = CurrentEditorsList.IndexOf(tool);
+            for (int i = index-1; i >= 0; i--)
+            {
+                CloseTool(CurrentEditorsList[0]);
+            }
+        }
+
+        void CloseToolsToRight(IEditorViewModel tool)
+        {
+            var index = CurrentEditorsList.IndexOf(tool);
+            for (int i = CurrentEditorsList.Count-1; i > index; i--)
+            {
+                CloseTool(CurrentEditorsList[i]);
             }
         }
 

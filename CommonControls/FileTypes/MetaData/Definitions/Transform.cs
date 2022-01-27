@@ -6,7 +6,7 @@ using System.Text;
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
     [MetaData("TRANSFORM", 10)]
-    public class Transform_v10 : MetaEntryBase
+    public class Transform_v10 : DecodedMetaEntryBase
     {
         [MetaDataTag(5, "ID of the bone which you are moving or rotating.")]
         public int TargetNode{ get; set; }

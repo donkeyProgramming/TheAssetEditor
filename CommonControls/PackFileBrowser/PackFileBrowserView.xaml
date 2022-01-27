@@ -20,7 +20,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <TextBox KeyboardNavigation.TabIndex="0" KeyboardNavigation.IsTabStop="True"  Grid.Row="0" Text="{Binding Filter.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" behaviors:TextBoxExtensions.Watermark="Search filter">
+        <TextBox KeyboardNavigation.TabIndex="0" KeyboardNavigation.IsTabStop="True"  Grid.Row="0" Text="{Binding Filter.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=350}" behaviors:TextBoxExtensions.Watermark="Search filter">
             <TextBox.Resources>
                 <Style TargetType="{x:Type TextBox}">
                     <Style.Triggers>

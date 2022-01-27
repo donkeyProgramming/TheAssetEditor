@@ -7,7 +7,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 {
 
     [MetaData("TARGET_POS", 10)]
-    public class TargetPos_10 : MetaEntryBase
+    public class TargetPos_10 : DecodedMetaEntryBase
     {
         [MetaDataTag(5)]
         public short Unk{ get; set; }

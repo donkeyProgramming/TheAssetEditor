@@ -24,19 +24,10 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <ToolBarTray Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" >
-            <ToolBar>
-                <Button ToolTip="Save"   Click="{s:MethodBinding Save}">
-                    <Image  Style="{StaticResource ImageStyle}" Source="pack://application:,,,/CommonControls;component/Resources/Icons/kitbasher/icons8-save-all-50.png"/>
-                </Button>
-            </ToolBar>
-        </ToolBarTray>
-
-        <local:MetaEntriesListView Grid.Column="0" Grid.ColumnSpan="1" Grid.Row="1"/>
-        <local:EditorValueEditor Grid.Column="1" Grid.ColumnSpan="1" Grid.Row="1"/>
+        <local:MetaEntriesListView Grid.Column="0" Grid.ColumnSpan="1"/>
+        <local:EditorValueEditor Grid.Column="1" Grid.ColumnSpan="1"/>
     </Grid>
 </UserControl>

@@ -32,22 +32,19 @@ namespace CommonControls.PackFileBrowser
             set { SetValue(CustomContextMenuProperty, value); }
         }
 
-
         private void TreeView_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
             {
                 TreeViewItem item = (TreeViewItem)sender;
 
-                item.Focusable = true;
-                item.Focus();
-                item.Focusable = false;
-
                 _lastMouseDown = e.GetPosition(tvParameters);
+
+                _draggedItem = item.DataContext as TreeNode;
             }
         }
         Point _lastMouseDown;
-        TreeNode draggedItem;
+        TreeNode _draggedItem;
 
         private void treeView_MouseMove(object sender, MouseEventArgs e)
         {
@@ -60,12 +57,15 @@ namespace CommonControls.PackFileBrowser
                     if ((Math.Abs(currentPosition.X - _lastMouseDown.X) > 10.0) ||
                         (Math.Abs(currentPosition.Y - _lastMouseDown.Y) > 10.0))
                     {
-                        draggedItem = tvParameters.SelectedItem as TreeNode;
-                        if (draggedItem != null)
+                        if (_draggedItem != null)
                         {
                             DragDropEffects finalDropEffect = DragDrop.DoDragDrop(tvParameters, tvParameters.SelectedValue, DragDropEffects.Move);
                         }
                     }
+                }
+                else
+                {
+                    _draggedItem = null;
                 }
             }
             catch (Exception)
@@ -79,8 +79,7 @@ namespace CommonControls.PackFileBrowser
             {
                 if (DataContext is IDropTarget<TreeNode> dropContainer)
                 {
-
-                    if (draggedItem == null)
+                    if (_draggedItem == null)
                         return;
 
                     var dropTargetItem = sender as TreeViewItem;
@@ -88,9 +87,9 @@ namespace CommonControls.PackFileBrowser
                     if (dropTargetNode == null)
                         return;
 
-                    if (dropContainer.AllowDrop(draggedItem, dropTargetNode))
+                    if (dropContainer.AllowDrop(_draggedItem, dropTargetNode))
                     {
-                        dropContainer.Drop(draggedItem, dropTargetNode);
+                        dropContainer.Drop(_draggedItem, dropTargetNode);
                         e.Effects = DragDropEffects.None;
                         e.Handled = true;
                     }

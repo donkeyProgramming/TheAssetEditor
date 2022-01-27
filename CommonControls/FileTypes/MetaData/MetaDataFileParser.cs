@@ -1,6 +1,8 @@
-﻿using CommonControls.FileTypes.DB;
+﻿using CommonControls.Common;
+using CommonControls.FileTypes.DB;
 using CommonControls.FileTypes.PackFiles.Models;
 using Filetypes.ByteParsing;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,17 +10,18 @@ using System.Text;
 
 namespace CommonControls.FileTypes.MetaData
 {
-    public static class MetaDataFileParser
+    public class MetaDataFileParser
     {
-        public static MetaDataFile Open(PackFile pfs, SchemaManager schemaManager)
+        ILogger _logger = Logging.Create<MetaDataFileParser>();
+
+        public MetaDataFile ParseFile(PackFile pf)
         {
-            if (pfs == null)
+            if (pf == null)
                 return null;
-            var content = pfs.DataSource.ReadData();
-            return ParseFile(content, schemaManager);
+            return ParseFile(pf.DataSource.ReadData());
         }
 
-        public static MetaDataFile ParseFile(byte[] fileContent, SchemaManager schemaManager, bool doValidation = true)
+        public MetaDataFile ParseFile(byte[] fileContent)
         {
             var contentLength = fileContent.Count();
 
@@ -41,24 +44,14 @@ namespace CommonControls.FileTypes.MetaData
                 // Convert to sensible stuff
                 foreach (var item in items)
                 {
-                    var schema = schemaManager.GetMetaDataDefinition(item.Name, item.Version);
-                    if (schema.ColumnDefinitions.Count != 0)
+                    try
                     {
-                        var knownItem = new MetaEntry(item.Name, item.Version, item.GetData(), schema);
-                        if (doValidation)
-                        {
-                            if (knownItem.Validate())
-                                outputFile.Items.Add(knownItem);
-                            else
-                                outputFile.Items.Add(item);
-                        }
-                        else
-                        {
-                            outputFile.Items.Add(knownItem);
-                        }
+                        var deserializedTag = MetaDataTagDeSerializer.DeSerialize(item);
+                        outputFile.Items.Add(deserializedTag);
                     }
-                    else
+                    catch (Exception e)
                     {
+                        _logger.Here().Error($"Failed to parse tag of type {item.Name}_{item.Version} - {e.Message}");
                         outputFile.Items.Add(item);
                     }
                 }
@@ -67,54 +60,20 @@ namespace CommonControls.FileTypes.MetaData
             return outputFile;
         }
 
-        public static MetaDataFile ParseFileV2(byte[] fileContent, bool doValidation = true)
-        {
-            var contentLength = fileContent.Count();
-
-            MetaDataFile outputFile = new MetaDataFile()
-            {
-                Version = BitConverter.ToInt32(fileContent, 0)
-            };
-
-            if (outputFile.Version != 2)
-                throw new Exception($"Unknown version - {outputFile.Version}");
-
-            if (contentLength > 8)
-            {
-                int numElements = BitConverter.ToInt32(fileContent, 4);
-                var items = ExploratoryGetEntries(fileContent);
-
-                if (numElements != items.Count)
-                    throw new Exception($"Not the expected amount elements. Expected {numElements}, got {items.Count}");
-
-                // Convert to sensible stuff
-                foreach (var item in items)
-                {
-                   
-                        outputFile.Items.Add(item);
-                    
-                }
-            }
-
-            return outputFile;
-        }
-
-
-
-        static List<UnknownMetaEntry> ExploratoryGetEntries(byte[] fileContent)
+        List<UnknownMetaEntry> ExploratoryGetEntries(byte[] fileContent)
         {
             int byteLength = fileContent.Length;
             var output = new List<UnknownMetaEntry>();
-            UnknownMetaEntry currentElement = null;
             int currentIndex = 0 + 8; // version and num elements
 
+            UnknownMetaEntry currentElement;
             while (currentIndex != byteLength && (currentElement = GetElement(currentIndex, fileContent, out currentIndex)) != null)
                 output.Add(currentElement);
 
             return output;
         }
 
-        public static byte[] GenerateBytes(int version, IEnumerable<MetaDataTagItem> items)
+        public byte[] GenerateBytes(int version, IEnumerable<MetaDataTagItem> items)
         {
             List<byte> data = new List<byte>();
             data.AddRange(BitConverter.GetBytes(version));
@@ -128,7 +87,7 @@ namespace CommonControls.FileTypes.MetaData
             return data.ToArray();
         }
 
-        static UnknownMetaEntry GetElement(int startIndex, byte[] data, out int updatedByteIndex)
+        UnknownMetaEntry GetElement(int startIndex, byte[] data, out int updatedByteIndex)
         {
             if (!ByteParsers.String.TryDecode(data, startIndex, out var tagName, out var strBytesRead, out string error))
                 throw new Exception($"Unable to detect tagname for MetaData element starting at {startIndex} - {error}");
@@ -151,12 +110,17 @@ namespace CommonControls.FileTypes.MetaData
             byte[] destination = new byte[size];
             Array.Copy(data, start, destination, 0, size);
 
-            var metaTagItem = new UnknownMetaEntry(tagName, version, destination);
+            var metaTagItem = new UnknownMetaEntry()
+            {
+                Name = tagName,
+                Version = version,
+                Data = destination
+            };
 
             return metaTagItem;
         }
 
-        static bool IsAllCapsCaString(int index, byte[] data)
+        bool IsAllCapsCaString(int index, byte[] data)
         {
             if (ByteParsers.String.TryDecode(data, index, out var tagName, out _, out _))
             {
@@ -170,7 +134,5 @@ namespace CommonControls.FileTypes.MetaData
 
             return false;
         }
-
-
     }
 }

@@ -7,7 +7,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 {
 
     [MetaData("DISMEMBER", 10)]
-    public class Dismember_v10 : MetaEntryBase
+    public class Dismember_v10 : DecodedMetaEntryBase
     {
         [MetaDataTag(5)]
         public int BoneIndex { get; set; }

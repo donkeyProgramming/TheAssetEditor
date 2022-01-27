@@ -58,7 +58,9 @@ namespace AssetEditor.Report
                     var data = packFile.DataSource.ReadData();
                     if (data.Length == 0)
                         continue;
-                    var metaData = MetaDataFileParser.ParseFileV2(data);
+
+                    var parser = new MetaDataFileParser();
+                    var metaData = parser.ParseFile(data);
                     metaTable.Add( (fileName, metaData) );
 
                     var completedTags = 0;
@@ -72,7 +74,7 @@ namespace AssetEditor.Report
 
                         try
                         {
-                            var variables = MetaEntrySerializer.DeSerializeToStrings(item);
+                            var variables = MetaDataTagDeSerializer.DeSerializeToStrings(item);
 
                             if (output[tagName].CompletedFiles.Count == 0)
                             {

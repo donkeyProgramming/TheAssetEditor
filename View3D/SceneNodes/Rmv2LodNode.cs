@@ -6,7 +6,12 @@ namespace View3D.SceneNodes
 {
     public class Rmv2LodNode : GroupNode
     {
-        public Rmv2LodNode(string name, int lodIndex) : base(name) { LodValue = lodIndex; }
+        public float? CameraDistance { get; set; }
+
+        public Rmv2LodNode(string name, int lodIndex, float? cameraDistance=null) : base(name) {
+            LodValue = lodIndex;
+            CameraDistance = cameraDistance;
+        }
         public int LodValue { get; set; }
 
         public List<Rmv2MeshNode> GetAllModels(bool onlyVisible)

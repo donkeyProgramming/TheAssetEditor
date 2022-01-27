@@ -5,7 +5,7 @@ using System.Text;
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
     [MetaData("SOUND_DEFEND_TYPE", 10)]
-    public class SoundDefendType_v10 : MetaEntryBase
+    public class SoundDefendType_v10 : DecodedMetaEntryBase
     {
         [MetaDataTag(5)]
         public int Unk0 { get; set; }

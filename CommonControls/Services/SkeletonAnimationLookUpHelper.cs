@@ -17,6 +17,7 @@ namespace CommonControls.Services
     {
         ILogger _logger = Logging.Create<SkeletonAnimationLookUpHelper>();
         ConcurrentDictionary<string, ObservableCollection<AnimationReference>> _skeletonNameToAnimationMap = new ConcurrentDictionary<string, ObservableCollection<AnimationReference>>();
+        object _threadLock = new object();
 
         public ObservableCollection<string> SkeletonFileNames = new ObservableCollection<string>();
 
@@ -37,109 +38,136 @@ namespace CommonControls.Services
 
         public void FileDiscovered(PackFile file, PackFileContainer container, string fullPath)
         {
-            try
+            lock (_threadLock)
             {
-                var brokenAnims = new string[] { "rigidmodels\\buildings\\roman_aqueduct_straight\\roman_aqueduct_straight_piece01_destruct01_anim.anim" };
-
-                if (brokenAnims.Contains(fullPath))
+                try
                 {
-                    _logger.Here().Warning("Skipping loading of known broken file - " + fullPath);
-                    return;
+                    var brokenAnims = new string[] { "rigidmodels\\buildings\\roman_aqueduct_straight\\roman_aqueduct_straight_piece01_destruct01_anim.anim" };
+
+                    if (brokenAnims.Contains(fullPath))
+                    {
+                        _logger.Here().Warning("Skipping loading of known broken file - " + fullPath);
+                        return;
+                    }
+
+                    var newEntry = new ObservableCollection<AnimationReference>() { new AnimationReference(fullPath, container) };
+                    var animationSkeletonName = AnimationFile.GetAnimationHeader(file).SkeletonName;
+                    _skeletonNameToAnimationMap.AddOrUpdate(
+                        animationSkeletonName,
+                        newEntry,
+                        (sanimationSkeletonName, animationMap) =>
+                        {
+                            animationMap.Add(new AnimationReference(fullPath, container));
+                            return animationMap;
+                        }
+                    );
+                }
+                catch (Exception e)
+                {
+                    _logger.Here().Error("Parsing failed for " + fullPath + "\n" + e.ToString());
                 }
 
-                var animationSkeletonName = AnimationFile.GetAnimationHeader(file).SkeletonName;
-                _skeletonNameToAnimationMap.AddOrUpdate(
-                    animationSkeletonName,
-                    new ObservableCollection<AnimationReference>() { new AnimationReference(fullPath, container) },
-                    (sanimationSkeletonName, animationMap) =>
-                    {
-                        animationMap.Add(new AnimationReference(fullPath, container));
-                        return animationMap;
-                    }
-                );
+                if (fullPath.Contains("animations\\skeletons", StringComparison.InvariantCultureIgnoreCase))
+                    SkeletonFileNames.Add(fullPath);
+                else if (fullPath.Contains("tech", StringComparison.InvariantCultureIgnoreCase))
+                    SkeletonFileNames.Add(fullPath);
             }
-            catch (Exception e)
-            {
-                _logger.Here().Error("Parsing failed for " + fullPath + "\n" + e.ToString());
-            }
-
-            if (fullPath.Contains("animations\\skeletons", StringComparison.InvariantCultureIgnoreCase))
-                SkeletonFileNames.Add(fullPath);
-
-            else if (fullPath.Contains("tech", StringComparison.InvariantCultureIgnoreCase))
-                SkeletonFileNames.Add(fullPath);
         }
 
 
         public void UnloadAnimationFromContainer(PackFileService pfs, PackFileContainer packFileContainer)
         {
-            int itemsRemoved = 0;
-            var s = _skeletonNameToAnimationMap.Select(skeleton => (skeleton.Key, skeleton.Value.Where(animations => animations.Container == packFileContainer))).ToList();
-            foreach (var key in s)
+            lock (_threadLock)
             {
-                var copy = key.Item2.Select(x => x).ToList();
-                foreach (var toRemove in copy)
+                int itemsRemoved = 0;
+                var s = _skeletonNameToAnimationMap
+                    .Select(skeleton =>
+                        new
+                        {
+                            SkeletonName = skeleton.Key,
+                            Animations = skeleton.Value.Where(animations => animations.Container == packFileContainer).ToList()
+                        })
+                    .ToList();
+
+                foreach (var key in s)
                 {
-                    _skeletonNameToAnimationMap[key.Key].Remove(toRemove);
-                    itemsRemoved++;
+                    var copy = key.Animations.Select(x => x).ToList();
+                    foreach (var toRemove in copy)
+                    {
+                        _skeletonNameToAnimationMap[key.SkeletonName].Remove(toRemove);
+                        itemsRemoved++;
+                    }
                 }
             }
         }
 
         public List<string> GetAllSkeletonNames()
         {
-            return SkeletonFileNames.Select(x => Path.GetFileNameWithoutExtension(x)).ToList();
+            lock (_threadLock)
+            {
+                return SkeletonFileNames.Select(x => Path.GetFileNameWithoutExtension(x)).ToList();
+            }
         }
 
         public ObservableCollection<AnimationReference> GetAnimationsForSkeleton(string skeletonName)
         {
-            return _skeletonNameToAnimationMap.GetOrAdd(
+            lock (_threadLock)
+            {
+                return _skeletonNameToAnimationMap.GetOrAdd(
                 skeletonName,
-                new ObservableCollection<AnimationReference>()
-            );
+                    new ObservableCollection<AnimationReference>()
+                );
+            }
         }
 
         public AnimationFile GetSkeletonFileFromName(PackFileService pfs, string skeletonName)
         {
-            foreach (var name in SkeletonFileNames)
+            lock (_threadLock)
             {
-                if (name.Contains(skeletonName))
+                foreach (var name in SkeletonFileNames)
                 {
-                    var fullName = Path.GetFileNameWithoutExtension(name);
-                    var lookUpFullName = Path.GetFileNameWithoutExtension(skeletonName); 
-
-                    var file = pfs.FindFile(name);
-                    if (file != null && fullName == lookUpFullName)
+                    if (name.Contains(skeletonName))
                     {
-                        // Make sure its not a tech skeleton
-                        if(pfs.GetFullPath(file).Contains("tech") == false)
-                            return AnimationFile.Create(file );
+                        var fullName = Path.GetFileNameWithoutExtension(name);
+                        var lookUpFullName = Path.GetFileNameWithoutExtension(skeletonName);
+
+                        var file = pfs.FindFile(name);
+                        if (file != null && fullName == lookUpFullName)
+                        {
+                            // Make sure its not a tech skeleton
+                            if (pfs.GetFullPath(file).Contains("tech") == false)
+                                return AnimationFile.Create(file);
+                        }
                     }
                 }
+                return null;
             }
-            return null;
         }
 
         public AnimationReference FindAnimationRefFromPackFile(PackFile animation, PackFileService pfs)
         {
-            var fullPath = pfs.GetFullPath(animation);
-            foreach (var entry in _skeletonNameToAnimationMap.Values)
+            lock (_threadLock)
             {
-                foreach (var s in entry)
-                {
-                    var res = String.Compare(s.AnimationFile, fullPath, StringComparison.InvariantCultureIgnoreCase);
-                    if (res == 0)
-                        return s;
-                }
-            }
 
-            var f = pfs.FindFile(fullPath);
-            if (f != null)
-            {
-                var pf = pfs.GetPackFileContainer(animation);
-                return new AnimationReference(fullPath, pf);  
+                var fullPath = pfs.GetFullPath(animation);
+                foreach (var entry in _skeletonNameToAnimationMap.Values)
+                {
+                    foreach (var s in entry)
+                    {
+                        var res = String.Compare(s.AnimationFile, fullPath, StringComparison.InvariantCultureIgnoreCase);
+                        if (res == 0)
+                            return s;
+                    }
+                }
+
+                var f = pfs.FindFile(fullPath);
+                if (f != null)
+                {
+                    var pf = pfs.GetPackFileContainer(animation);
+                    return new AnimationReference(fullPath, pf);
+                }
+                return null;
             }
-            return null;
         }
 
 
@@ -164,7 +192,5 @@ namespace CommonControls.Services
                 return $"[{Container?.Name}] {AnimationFile}";
              }
         }
-
-
     }
 }

@@ -46,8 +46,8 @@ namespace CommonControls.Editors.AnimMeta.View
 
     class NewTagWindowViewModel : NotifyPropertyChangedImpl
     {
-        public ObservableCollection<DbTableDefinition> Items { get; set; } = new ObservableCollection<DbTableDefinition>();
-        DbTableDefinition _selectedItem;
-        public DbTableDefinition SelectedItem { get => _selectedItem; set { SetAndNotify(ref _selectedItem, value); } }
+        public ObservableCollection<string> Items { get; set; } = new ObservableCollection<string>();
+        string _selectedItem;
+        public string SelectedItem { get => _selectedItem; set { SetAndNotify(ref _selectedItem, value); } }
     }
 }

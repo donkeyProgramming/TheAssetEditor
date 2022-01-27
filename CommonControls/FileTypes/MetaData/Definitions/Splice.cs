@@ -6,13 +6,13 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 {
 
     [MetaData("SPLICE", 11)]
-    public class Splice_v11 : MetaEntryBase
+    public class Splice_v11 : DecodedMetaEntryBase
     {
         [MetaDataTag(5)]
-        public string Animation { get; set; }
+        public string Animation { get; set; } = "";
 
         [MetaDataTag(6)]
-        public string ReferenceAnimation { get; set; }
+        public string ReferenceAnimation { get; set; } = "";
 
         [MetaDataTag(7, "-1 applies the whole animation? | The spliced animation applies to this bone and all of it's children. -1 seems to be the same as 0, ie. animroot, but there's probably something with the pose-type .anim files that makes it distinct.")]
         public int GenericBoneIndex { get; set; }
@@ -47,7 +47,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         [MetaDataTag(19)]
         public string Stretch { get; set; }
         [MetaDataTag(20)]
-        public string ExcludeStripped { get; set; }
+        public string ExcludeStripped { get; set; } = "";
     }
 
 
@@ -55,6 +55,6 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     public class Splice_v12 : Splice_v11
     {
         [MetaDataTag(21)]
-        public string PrimaryPersistent { get; set; }
+        public string PrimaryPersistent { get; set; } = "";
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
     [MetaData("RIDER_CUSTOM_ANIMATION", 10)]
-    public class RiderCustomAnimation_v10 : MetaEntryBase
+    public class RiderCustomAnimation_v10 : DecodedMetaEntryBase
     {
         [MetaDataTag(5)]
         public int Unk0 { get; set; }

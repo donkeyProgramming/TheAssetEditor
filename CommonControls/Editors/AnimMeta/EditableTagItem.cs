@@ -16,12 +16,14 @@ namespace CommonControls.Editors.AnimMeta
         byte[] _originalByteValue;
         IByteParser _parser { get; set; }
 
-        public EditableTagItem(IByteParser parser, byte[] value)
+        public EditableTagItem(IByteParser parser, object value)
         {
-            _originalByteValue = value;
             _parser = parser;
-            IsValid = _parser.TryDecode(_originalByteValue, 0, out _valueAsString, out _, out _);
+            _valueAsString = value.ToString();
+            Validate();
         }
+
+        protected EditableTagItem() { }
 
         string _valueAsString;
         public string ValueAsString { get => _valueAsString; set { SetAndNotify(ref _valueAsString, value); Validate(); } }
@@ -29,6 +31,7 @@ namespace CommonControls.Editors.AnimMeta
         public string FieldName { get; set; }
         public string Description { get; set; }
         public string ValueType { get; set; }
+        public bool IsReadOnly { get; set; } = true;
 
         bool _isValueValid;
         public bool IsValid { get => _isValueValid; set { SetAndNotify(ref _isValueValid, value); } }
@@ -55,21 +58,16 @@ namespace CommonControls.Editors.AnimMeta
 
         Vector4Parser _parser;
 
-        public OrientationEditableTagItem(Vector4Parser parser, byte[] value) : base(parser, value)
+        public OrientationEditableTagItem(Vector4Parser parser, Vector4 value)
         {
             _parser = parser;
 
-            if (parser.TryDecodeValue(value, 0, out var vector4, out var _, out var err))
-            {
-                Quaternion q = new Quaternion(vector4);
-                var eulerRotation = MathUtil.QuaternionToEulerDegree(q);
+            Quaternion q = new Quaternion(value);
+            var eulerRotation = MathUtil.QuaternionToEulerDegree(q);
 
-                Value.Set(eulerRotation);
-            }
-            else
-            {
-                IsValid = false;
-            }
+            Value.Set(eulerRotation);
+            IsValid = true;
+
         }
 
         public override byte[] GetByteValue()
@@ -96,14 +94,11 @@ namespace CommonControls.Editors.AnimMeta
 
         Vector3Parser _parser;
 
-        public Vector3EditableTagItem(Vector3Parser parser, byte[] value) : base(parser, value)
+        public Vector3EditableTagItem(Vector3Parser parser, Vector3 value)
         {
             _parser = parser;
-
-            if (parser.TryDecodeValue(value, 0, out var vector3, out var _, out var err))
-                Value.Set(vector3);
-            else
-                IsValid = false;
+            Value.Set(value);
+            IsValid = true;
         }
 
         public override byte[] GetByteValue()

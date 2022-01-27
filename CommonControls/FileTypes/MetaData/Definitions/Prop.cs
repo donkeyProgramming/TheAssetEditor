@@ -6,16 +6,16 @@ using System.Text;
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
     [MetaData("PROP", 10)]
-    public class Prop_v10 : MetaEntryBase
+    public class Prop_v10 : DecodedMetaEntryBase
     {
         [MetaDataTag(5)]
         public bool DistanceCulled { get; set; }
 
         [MetaDataTag(6, "Path to model. Probably has to be of the \"rigid\" vertex type, so no animated models")]
-        public string ModelName { get; set; }
+        public string ModelName { get; set; } = "";
 
         [MetaDataTag(7, "Always empty?")]
-        public string AnimationName { get; set; }
+        public string AnimationName { get; set; } = "";
 
         [MetaDataTag(8)]
         public Vector3 Position { get; set; }
