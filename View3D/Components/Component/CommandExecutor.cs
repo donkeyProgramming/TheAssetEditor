@@ -82,9 +82,18 @@ namespace View3D.Components.Component
             base.Draw(gameTime);
         }
 
-        public bool HasSavableChanges()
+        public bool HasSavableChanges(ICommand sinceThisCommand = null)
         {
-            return _commands.Any(command => command.IsMutation());
+            if (!_commands.Contains(sinceThisCommand))
+                return _commands.Any(command => command.IsMutation());
+
+            var skipped = _commands.Reverse().SkipWhile(command => command != sinceThisCommand).Skip(1);
+            return skipped.Any(command => command.IsMutation());
+        }
+
+        public ICommand GetLastCommand()
+        {
+            return _commands.Peek();
         }
 
         public override void Update(GameTime gameTime)
