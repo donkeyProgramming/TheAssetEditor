@@ -18,6 +18,7 @@ namespace View3D.Components.Component
 
         ILogger _logger = Logging.Create<CommandExecutor>();
         Stack<ICommand> _commands = new Stack<ICommand>();
+        Stack<ICommand> _commandsOnLastSave = new Stack<ICommand>();
 
         SpriteBatch _spriteBatch;
         string _animationText;
@@ -82,18 +83,12 @@ namespace View3D.Components.Component
             base.Draw(gameTime);
         }
 
-        public bool HasSavableChanges(ICommand sinceThisCommand = null)
+        public bool HasSavableChanges()
         {
-            if (!_commands.Contains(sinceThisCommand))
-                return _commands.Any(command => command.IsMutation());
+            var newCommands = _commands.Except(_commandsOnLastSave);
+            var missingCommands = _commandsOnLastSave.Except(_commands);
 
-            var skipped = _commands.Reverse().SkipWhile(command => command != sinceThisCommand).Skip(1);
-            return skipped.Any(command => command.IsMutation());
-        }
-
-        public ICommand GetLastCommand()
-        {
-            return _commands.Peek();
+            return newCommands.Union(missingCommands).Any(command => command.IsMutation());
         }
 
         public override void Update(GameTime gameTime)
@@ -132,6 +127,11 @@ namespace View3D.Components.Component
             if (CommandStackChanged != null)
                 foreach (var d in CommandStackChanged.GetInvocationList())
                     CommandStackChanged -= (d as CommandStackChangedDelegate);
+        }
+
+        public void SaveStackSnapshot()
+        {
+            _commandsOnLastSave = new Stack<ICommand>(new Stack<ICommand>(_commands));
         }
     }
 }

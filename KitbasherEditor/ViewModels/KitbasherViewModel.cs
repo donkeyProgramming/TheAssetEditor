@@ -44,7 +44,6 @@ namespace KitbasherEditor.ViewModels
 
         KitbashSceneCreator _modelLoader;
         private bool _hasUnsavedChanges;
-        private ICommand _lastCommandOnSave;
 
         public KitbasherViewModel(PackFileService pf, SkeletonAnimationLookUpHelper skeletonHelper)
         {
@@ -86,7 +85,7 @@ namespace KitbasherEditor.ViewModels
 
         private void CommandExecutorOnCommandStackChanged()
         {
-            HasUnsavedChanges = _commandExecutor.HasSavableChanges(_lastCommandOnSave);
+            HasUnsavedChanges = _commandExecutor.HasSavableChanges();
         }
 
         private void OnSceneInitialized(WpfGame scene)
@@ -119,8 +118,8 @@ namespace KitbasherEditor.ViewModels
 
         public bool Save()
         {
-            _lastCommandOnSave = _commandExecutor.GetLastCommand();
-            HasUnsavedChanges = _commandExecutor.HasSavableChanges(_lastCommandOnSave);
+            HasUnsavedChanges = false;
+            _commandExecutor.SaveStackSnapshot();
             return true;
         }
 
