@@ -214,7 +214,7 @@ namespace CommonControls.Editors.AnimMeta
             return _file != null;
         }
 
-        public bool HasUnsavedChanges() => false;
+        public bool HasUnsavedChanges { get; set; } = false;
         public bool Save() => SaveAction();
         public void Close() { }
 
