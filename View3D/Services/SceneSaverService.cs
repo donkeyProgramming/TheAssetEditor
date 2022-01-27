@@ -52,6 +52,8 @@ namespace View3D.Services
                 var res = SaveHelper.Save(_packFileService, path, inputFile, bytes);
                 if (res != null)
                     _editorViewModel.MainFile = res;
+
+                _editorViewModel.Save();
             }
             catch (Exception e)
             {

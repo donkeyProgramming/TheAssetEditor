@@ -10,6 +10,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using View3D.Commands;
 using View3D.Components;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
@@ -117,6 +118,8 @@ namespace KitbasherEditor.ViewModels
 
         public bool Save()
         {
+            HasUnsavedChanges = false;
+            _commandExecutor.SaveStackSnapshot();
             return true;
         }
 

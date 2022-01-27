@@ -18,6 +18,7 @@ namespace View3D.Components.Component
 
         ILogger _logger = Logging.Create<CommandExecutor>();
         Stack<ICommand> _commands = new Stack<ICommand>();
+        Stack<ICommand> _commandsOnLastSave = new Stack<ICommand>();
 
         SpriteBatch _spriteBatch;
         string _animationText;
@@ -84,7 +85,10 @@ namespace View3D.Components.Component
 
         public bool HasSavableChanges()
         {
-            return _commands.Any(command => command.IsMutation());
+            var newCommands = _commands.Except(_commandsOnLastSave);
+            var missingCommands = _commandsOnLastSave.Except(_commands);
+
+            return newCommands.Union(missingCommands).Any(command => command.IsMutation());
         }
 
         public override void Update(GameTime gameTime)
@@ -123,6 +127,11 @@ namespace View3D.Components.Component
             if (CommandStackChanged != null)
                 foreach (var d in CommandStackChanged.GetInvocationList())
                     CommandStackChanged -= (d as CommandStackChangedDelegate);
+        }
+
+        public void SaveStackSnapshot()
+        {
+            _commandsOnLastSave = new Stack<ICommand>(new Stack<ICommand>(_commands));
         }
     }
 }
