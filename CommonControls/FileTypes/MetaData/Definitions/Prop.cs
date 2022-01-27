@@ -14,20 +14,20 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         [MetaDataTag(6, "Path to model. Probably has to be of the \"rigid\" vertex type, so no animated models")]
         public string ModelName { get; set; } = "";
 
-        [MetaDataTag(7, "Always empty?")]
+        [MetaDataTag(7, "Allows an animation to be set, not often used.")]
         public string AnimationName { get; set; } = "";
 
         [MetaDataTag(8)]
         public Vector3 Position { get; set; }
 
         [MetaDataTag(9)]
-        public Vector4 Orientation { get; set; }
+        public Vector4 Orientation { get; set; } = new Vector4(0, 0, 0, 1);
 
         [MetaDataTag(10)]
         public int BoneId { get; set; }
 
-        [MetaDataTag(11, "bind_pose,animation,zeroed,skinned")]
-        public int AttachMethod { get; set; }
+        [MetaDataTag(11, "bind_pose, animation, zeroed, skinned. Always 0 or 2")]
+        public int AttachMethod { get; set; } = 0;
 
         [MetaDataTag(12, "projectile (1) ,weapon_1 (2) ,weapon_2 (3) ,weapon_3 (4) ,weapon_4 (5) ,weapon_5 (6), weapon_6 (7)")]
         public int OverrideProp { get; set; }
