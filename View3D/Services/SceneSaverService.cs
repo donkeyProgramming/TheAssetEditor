@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 using View3D.SceneNodes;
@@ -24,6 +25,15 @@ namespace View3D.Services
         private readonly PackFileService _packFileService;
         private readonly IEditorViewModel _editorViewModel;
         private readonly MainEditableNode _editableMeshNode;
+
+        private static readonly Dictionary<string, TexureType> TemplateStringToTextureTypes = new Dictionary<string, TexureType>
+        {
+            {"GLOSS_PATH", TexureType.Gloss},
+            {"SPECULAR_PATH", TexureType.Specular},
+            {"NORMAL_PATH", TexureType.Normal},
+            {"MASK_PATH", TexureType.Mask},
+            {"DIFFUSE_PATH", TexureType.Diffuse},
+        };
 
         public SceneSaverService(PackFileService packFileService, IEditorViewModel editorViewModel, MainEditableNode editableMeshNode)
         {
@@ -270,7 +280,6 @@ namespace View3D.Services
                     if (materialFile == null)
                     {
                         materialFile = CreateUnknownMaterial(meshes[meshIndex]);
-                        wsModelGeneratedPerfectly = false;
                     }
 
                     sb.Append($"\t\t\t<material part_index=\"{meshIndex}\" lod_index=\"{lodIndex}\">");
@@ -287,22 +296,46 @@ namespace View3D.Services
 
         private string CreateUnknownMaterial(Rmv2MeshNode mesh)
         {
-            var textureName = "?";
-            var texture = mesh.Material.GetTexture(TexureType.Diffuse);
-            if (texture.HasValue)
-                textureName = texture.Value.Path;
             var vertextType = mesh.Material.VertexType;
             var alphaOn = mesh.Material.AlphaMode != AlphaMode.Opaque;
 
-            var vertexName = "uknown";
-            if (vertextType == UiVertexFormat.Cinematic)
-                vertexName = "weighted4";
-            else if (vertextType == UiVertexFormat.Weighted)
-                vertexName = "weighted2";
-            else if (vertextType == UiVertexFormat.Static)
-                vertexName = "static";
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("View3D.Content.Game.MaterialTemplate.xml.material");
+            using var reader = new StreamReader(stream!);
+            var result = reader.ReadToEnd();
 
-            return $" MeshName='{mesh.Name}' Texture='{textureName}' VertType='{vertexName}' Alpha='{alphaOn}'";
+            var shaderPath = vertextType switch
+            {
+                UiVertexFormat.Cinematic => alphaOn ? "weighted4_default_alpha" : "weighted4_default",
+                UiVertexFormat.Weighted => alphaOn ? "weighted2_default_alpha" : "weighted2_default",
+                UiVertexFormat.Static => alphaOn ? "rigid_default_alpha" : "rigid_default",
+                _ => string.Empty
+            };
+
+            result = result.Replace("SHADER_PATH", "shaders/" + shaderPath + ".xml.shader");
+
+            foreach (var (replacment, textureType) in TemplateStringToTextureTypes)
+            {
+                var texture = mesh.Material.GetTexture(textureType);
+                if (texture.HasValue)
+                    result = result.Replace(replacment, texture.Value.Path);
+            }
+
+            var modelFile = _editorViewModel.MainFile;
+            var modelFilePath = _packFileService.GetFullPath(modelFile);
+
+            var modelFileName = Path.GetFileNameWithoutExtension(modelFilePath);
+
+            var fileName = modelFileName + "_alpha_" + (alphaOn ? "on" : "off") + ".xml";
+
+            result = result.Replace("FILE_NAME", fileName);
+
+            var dir = Path.GetDirectoryName(modelFilePath);
+            var fullPath = dir + "\\materials\\" + fileName + ".material";
+
+            if (_packFileService.FindFile(fullPath, _packFileService.GetEditablePack()) == null)
+                SaveHelper.Save(_packFileService, fullPath, null, Encoding.UTF8.GetBytes(result));
+
+            return fullPath;
         }
 
         string CreateKnownMaterial(Rmv2MeshNode mesh, List<WsModelFile> possibleMaterials)
