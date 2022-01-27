@@ -10,6 +10,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using View3D.Commands;
 using View3D.Components;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
@@ -43,6 +44,7 @@ namespace KitbasherEditor.ViewModels
 
         KitbashSceneCreator _modelLoader;
         private bool _hasUnsavedChanges;
+        private ICommand _lastCommandOnSave;
 
         public KitbasherViewModel(PackFileService pf, SkeletonAnimationLookUpHelper skeletonHelper)
         {
@@ -84,7 +86,7 @@ namespace KitbasherEditor.ViewModels
 
         private void CommandExecutorOnCommandStackChanged()
         {
-            HasUnsavedChanges = _commandExecutor.HasSavableChanges();
+            HasUnsavedChanges = _commandExecutor.HasSavableChanges(_lastCommandOnSave);
         }
 
         private void OnSceneInitialized(WpfGame scene)
@@ -117,6 +119,8 @@ namespace KitbasherEditor.ViewModels
 
         public bool Save()
         {
+            _lastCommandOnSave = _commandExecutor.GetLastCommand();
+            HasUnsavedChanges = _commandExecutor.HasSavableChanges(_lastCommandOnSave);
             return true;
         }
 
