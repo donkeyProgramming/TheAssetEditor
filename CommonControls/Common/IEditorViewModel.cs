@@ -8,7 +8,7 @@ namespace CommonControls.Common
         PackFile MainFile { get; set; }
         bool Save();
         void Close();
-        bool HasUnsavedChanges();
+        bool HasUnsavedChanges { get; set; }
     }
 
     public interface IEditorCreator

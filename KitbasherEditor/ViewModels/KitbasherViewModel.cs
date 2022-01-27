@@ -31,17 +31,18 @@ namespace KitbasherEditor.ViewModels
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
         SceneContainer _scene;
+        CommandExecutor _commandExecutor;
         public SceneContainer Scene { get => _scene; set => SetAndNotify(ref _scene, value); }
         public SceneExplorerViewModel SceneExplorer { get; set; }
         public MenuBarViewModel MenuBar { get; set; }
         public AnimationControllerViewModel Animation { get; set; }
-
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("3D Viewer");
 
         public PackFile MainFile { get; set; }
 
         KitbashSceneCreator _modelLoader;
+        private bool _hasUnsavedChanges;
 
         public KitbasherViewModel(PackFileService pf, SkeletonAnimationLookUpHelper skeletonHelper)
         {
@@ -57,7 +58,6 @@ namespace KitbasherEditor.ViewModels
             Scene.AddComponent(new ArcBallCamera(Scene));
             Scene.AddComponent(new SceneManager(Scene));
             Scene.AddComponent(new SelectionManager(Scene));
-            Scene.AddComponent(new CommandExecutor(Scene));
             Scene.AddComponent(new GizmoComponent(Scene));
             Scene.AddComponent(new SelectionComponent(Scene));
             Scene.AddComponent(new ObjectEditor(Scene));
@@ -70,6 +70,9 @@ namespace KitbasherEditor.ViewModels
             Scene.AddComponent(new ViewOnlySelectedComponent(Scene));
             Scene.AddComponent(new LightControllerComponent(Scene));
             Scene.AddComponent(_skeletonAnimationLookUpHelper);
+            _commandExecutor = Scene.AddComponent(new CommandExecutor(Scene));
+
+            _commandExecutor.CommandStackChanged += CommandExecutorOnCommandStackChanged;
 
             Animation = new AnimationControllerViewModel(Scene, _packFileService);
             SceneExplorer = Scene.AddComponent(new SceneExplorerViewModel(Scene, _packFileService, Animation));
@@ -77,6 +80,11 @@ namespace KitbasherEditor.ViewModels
             MenuBar = new MenuBarViewModel(Scene, _packFileService);
             
             Scene.SceneInitialized += OnSceneInitialized;
+        }
+
+        private void CommandExecutorOnCommandStackChanged()
+        {
+            HasUnsavedChanges = _commandExecutor.HasSavableChanges();
         }
 
         private void OnSceneInitialized(WpfGame scene)
@@ -129,9 +137,14 @@ namespace KitbasherEditor.ViewModels
             _modelLoader = null;
         }
 
-        public bool HasUnsavedChanges()
+        public bool HasUnsavedChanges
         {
-            return false;
+            get => _hasUnsavedChanges;
+            set
+            {
+                _hasUnsavedChanges = value;
+                NotifyPropertyChanged();
+            }
         }
 
         public bool AllowDrop(TreeNode node, TreeNode targeNode = null)

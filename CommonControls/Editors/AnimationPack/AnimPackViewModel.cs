@@ -129,7 +129,7 @@ namespace CommonControls.Editors.AnimationPack
             SelectedItemViewModel.ResetChangeLog();
         }
         public void Close() { }
-        public bool HasUnsavedChanges() => false;
+        public bool HasUnsavedChanges { get; set; }
 
         public bool SaveActiveFile()
         {

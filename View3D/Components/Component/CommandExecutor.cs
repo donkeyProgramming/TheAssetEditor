@@ -5,6 +5,7 @@ using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using View3D.Commands;
 using View3D.Utility;
 
@@ -81,6 +82,10 @@ namespace View3D.Components.Component
             base.Draw(gameTime);
         }
 
+        public bool HasSavableChanges()
+        {
+            return _commands.Any(command => command.IsMutation());
+        }
 
         public override void Update(GameTime gameTime)
         {

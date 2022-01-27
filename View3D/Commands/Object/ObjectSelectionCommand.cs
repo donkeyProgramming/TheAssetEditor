@@ -62,6 +62,8 @@ namespace View3D.Commands.Object
         {
             _selectionManager.SetState(_oldState);
         }
+
+        public override bool IsMutation() => false;
     }
 }
     
