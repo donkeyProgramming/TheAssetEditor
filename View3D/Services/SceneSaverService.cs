@@ -313,6 +313,14 @@ namespace View3D.Services
                 _ => string.Empty
             };
 
+            var shaderNamePart = vertextType switch
+            {
+                UiVertexFormat.Cinematic => "_weighted4",
+                UiVertexFormat.Weighted => "_weighted2",
+                UiVertexFormat.Static => "_rigid",
+                _ => string.Empty
+            };
+
             result = result.Replace("SHADER_PATH", "shaders/" + shaderPath + ".xml.shader");
 
             foreach (var (replacment, textureType) in TemplateStringToTextureTypes)
@@ -327,7 +335,7 @@ namespace View3D.Services
 
             var modelFileName = Path.GetFileNameWithoutExtension(modelFilePath);
 
-            var fileName = modelFileName + "_alpha_" + (alphaOn ? "on" : "off") + ".xml";
+            var fileName = modelFileName + shaderNamePart + "_alpha_" + (alphaOn ? "on" : "off") + ".xml";
 
             result = result.Replace("FILE_NAME", fileName);
 
