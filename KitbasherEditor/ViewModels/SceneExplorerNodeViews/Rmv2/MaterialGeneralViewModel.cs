@@ -151,8 +151,15 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 dialog.Filters.Add(new CommonFileDialogFilter("DDS", ".dds,.png"));
                 if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
-                    _logger.Here().Information($"Loading pack file {dialog.FileName}");
-                    Path = System.IO.Path.ChangeExtension(dialog.FileName, ".png");
+                    var fileName = dialog.FileName;
+                    _logger.Here().Information($"Loading pack file {fileName}");
+
+                    if (System.IO.Path.GetExtension(fileName) == ".dds")
+                    {
+                        SaveHelper.SaveDDSTextureAsPNG(fileName);
+                    }
+
+                    Path = System.IO.Path.ChangeExtension(fileName, ".png");
                 }
             }
 
