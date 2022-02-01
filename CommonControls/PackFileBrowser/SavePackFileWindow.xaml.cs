@@ -20,7 +20,8 @@ namespace CommonControls.PackFileBrowser
         public string CurrentFileName { get => _currentFileName; set { _currentFileName = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CurrentFileName")); SelectedFile = null; } }
         PackFileService _packfileService;
 
-
+        // If user clicks on a folder in the tree we blank out the output name by default.
+        public bool ResetNameOnFolderSelect = true;
         public string FilePath { get; private set; }
         public SavePackFileWindow(PackFileService packfileService)
         {
@@ -37,10 +38,10 @@ namespace CommonControls.PackFileBrowser
         {
             _selectedNode = node;
 
-            if (_selectedNode.Item == null)
-                CurrentFileName = "";
-            else
+            if (_selectedNode.Item != null)
                 CurrentFileName = _selectedNode.Item.Name;
+            else if(ResetNameOnFolderSelect)
+                CurrentFileName = "";
 
             SelectedFile = _selectedNode.Item;
         }

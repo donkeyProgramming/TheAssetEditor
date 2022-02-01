@@ -15,10 +15,12 @@
   <ItemGroup>
     <None Remove="1kweupxo.plr~" />
     <None Remove="Content\Game\MaterialTemplate.xml.material" />
+    <None Remove="Content\Other\texconv.exe" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Content\Game\MaterialTemplate.xml.material" />
+    <EmbeddedResource Include="Content\Other\texconv.exe" />
   </ItemGroup>
 
   <ItemGroup>

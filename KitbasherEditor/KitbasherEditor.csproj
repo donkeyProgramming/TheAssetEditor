@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="geometry3Sharp" Version="1.0.324" />
+    <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.11.0" />
     <PackageReference Include="morelinq" Version="3.3.2" />
   </ItemGroup>
 

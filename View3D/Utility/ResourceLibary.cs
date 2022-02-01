@@ -8,7 +8,9 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using View3D.Components;
+using ImageFormat = Pfim.ImageFormat;
 
 namespace View3D.Utility
 {
@@ -69,21 +71,24 @@ namespace View3D.Utility
         }
 
 
-        public Texture2D LoadTexture(string fileName)
+        public Texture2D LoadTexture(string fileName, bool skipCache = false)
         {
-            if (_textureMap.ContainsKey(fileName))
+            if (_textureMap.ContainsKey(fileName) && !skipCache)
                 return _textureMap[fileName];
 
-            var texture = LoadTextureAsTexture2d(fileName, _game.GraphicsDevice, new ImageInformation());
+            var isOnFileSystem = File.Exists(fileName);
+
+            var texture = LoadTextureAsTexture2d(fileName, _game.GraphicsDevice, new ImageInformation(), isOnFileSystem);
             if (texture != null)
                 _textureMap[fileName] = texture;
+
             return texture;
         }
 
         public Texture2D ForceLoadImage(string fileName, out ImageInformation imageInfo)
         {
             imageInfo = new ImageInformation();
-            return LoadTextureAsTexture2d(fileName, _game.GraphicsDevice, imageInfo);
+            return LoadTextureAsTexture2d(fileName, _game.GraphicsDevice, imageInfo, File.Exists(fileName));
         }
 
         public void SaveTexture(Texture2D texture, string path)
@@ -94,17 +99,34 @@ namespace View3D.Utility
             }
         }
 
-        Texture2D LoadTextureAsTexture2d(string fileName, GraphicsDevice device, ImageInformation out_imageInfo)
+        Texture2D LoadTextureAsTexture2d(string fileName, GraphicsDevice device, ImageInformation out_imageInfo, bool isOnFileSystem)
         {
             var file = Pfs.FindFile(fileName);
-            if (file == null)
+
+            if (isOnFileSystem && Path.GetExtension(fileName) == ".png")
+            {
+                // WaitCursor can only be used in a STA thread
+                using (var waitCursor = Thread.CurrentThread.GetApartmentState() == ApartmentState.STA ? new WaitCursor() : null)
+                {
+                    SaveHelper.SavePNGTextureAsDDS(fileName);
+                }
+            }
+
+            if (file == null && !isOnFileSystem)
             {
                 _logger.Here().Error($"Unable to find texture: {fileName}");
                 return null;
             }
             try
             {
-                var content = file.DataSource.ReadData();
+                var fileNameAsDDS = Path.ChangeExtension(fileName, ".dds");
+                if (File.Exists(fileNameAsDDS))
+                {
+                    fileName = fileNameAsDDS;
+                }
+
+                byte[] content = isOnFileSystem ? File.ReadAllBytes(fileName) : file.DataSource.ReadData();
+
                 using (MemoryStream stream = new MemoryStream(content))
                 {
                     using var image = Pfim.Pfim.FromStream(stream);

@@ -4,14 +4,18 @@ using CommonControls.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Windows;
+using Serilog;
 
 namespace CommonControls.Common
 {
     public static class SaveHelper
     {
         public static string BackupFolderPath = "Backup";
+
+        static readonly ILogger _logger = Logging.CreateStatic(typeof(SaveHelper));
 
         public static void Save(PackFileService packFileService, PackFile inputFile)
         {
@@ -168,6 +172,57 @@ namespace CommonControls.Common
                 filename = String.Format("{0}{1}{2}", stub, ix, extension);
             } while (File.Exists(filename));
             return filename;
+        }
+
+        static void EnsureTexconvExists()
+        {
+            var texconvPath = $"{DirectoryHelper.TempDirectory}\\texconv.exe";
+
+            if (!File.Exists(texconvPath))
+            {
+                using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("View3D.Content.Other.texconv.exe");
+                using var fStream = new FileStream(texconvPath, FileMode.OpenOrCreate);
+                stream!.CopyTo(fStream);
+            }
+        }
+
+        public static void SavePNGTextureAsDDS(string pngFilePath)
+        {
+            var texconvPath = $"{DirectoryHelper.TempDirectory}\\texconv.exe";
+
+            EnsureTexconvExists();
+
+            using var pProcess = new System.Diagnostics.Process();
+            pProcess.StartInfo.FileName = texconvPath;
+            pProcess.StartInfo.Arguments =
+                $"-sRGBi -f BC7_UNORM_SRGB -y -o \"{Path.GetDirectoryName(pngFilePath)}\" \"{pngFilePath}\"";
+            pProcess.StartInfo.UseShellExecute = false;
+            pProcess.StartInfo.RedirectStandardOutput = true;
+            pProcess.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+            pProcess.StartInfo.CreateNoWindow = true;
+            pProcess.Start();
+            var output = pProcess.StandardOutput.ReadToEnd();
+            _logger.Here().Information(output);
+            pProcess.WaitForExit();
+        }
+
+        public static void SaveDDSTextureAsPNG(string filePath)
+        {
+            var texconvPath = $"{DirectoryHelper.TempDirectory}\\texconv.exe";
+
+            EnsureTexconvExists();
+
+            using var pProcess = new System.Diagnostics.Process();
+            pProcess.StartInfo.FileName = texconvPath;
+            pProcess.StartInfo.Arguments =
+                $"-ft png -y -o \"{System.IO.Path.GetDirectoryName(filePath)}\" \"{filePath}\"";
+            pProcess.StartInfo.UseShellExecute = false;
+            pProcess.StartInfo.RedirectStandardOutput = true;
+            pProcess.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+            pProcess.StartInfo.CreateNoWindow = true;
+            pProcess.Start();
+            var output = pProcess.StandardOutput.ReadToEnd();
+            _logger.Here().Information(output);
         }
     }
 }
