@@ -21,7 +21,7 @@ namespace AnimationEditor.AnimationTransferTool
             _bones = bones;
         }
 
-        public AnimationClip ReMapAnimation(GameSkeleton copyFromSkeleton, GameSkeleton copyToSkeleton, AnimationClip animationToCopy, AnimationClip originalAnimation)
+        public AnimationClip ReMapAnimation(GameSkeleton copyFromSkeleton, GameSkeleton copyToSkeleton, AnimationClip animationToCopy)
         {
             var newFrameCount = (int)(_settings.SpeedMult.Value * animationToCopy.DynamicFrames.Count);
             var newPlayTime = (float)_settings.SpeedMult.Value * animationToCopy.PlayTimeInSec;
@@ -47,14 +47,6 @@ namespace AnimationEditor.AnimationTransferTool
             return newAnimation;
         }
 
-        void ComputeTime()
-        { }
-
-        void PreperCopyAnimation()
-        { }
-
-        void PreperOriginalAnimation()
-        { }
 
         void MapAnimationWorld(GameSkeleton copyFromSkeleton, GameSkeleton copyToSkeleton, AnimationClip animationToCopy, AnimationClip newAnimation)
         {
@@ -219,7 +211,7 @@ namespace AnimationEditor.AnimationTransferTool
                     var boneSettings = BoneHelper.GetBoneFromId(_bones, i);
 
                     var mappedIndex = _remappingInformaton.FirstOrDefault(x => x.OriginalValue == i);
-                    if (boneSettings.SelectedRelativeBone == null || mappedIndex == null)
+                    if (boneSettings.SelectedRelativeBone.Value == null || mappedIndex == null)
                         continue;
 
                     var targetBoneIndex = mappedIndex.NewValue;
@@ -234,7 +226,7 @@ namespace AnimationEditor.AnimationTransferTool
                     // target hand-  reference point | copyFromSkeleton -> boneIndex self hand mapping index
 
                     var boneIndexAttachmentPointSelf = i;
-                    var boneIndexHandSelf = boneSettings.SelectedRelativeBone.BoneIndex.Value;
+                    var boneIndexHandSelf = boneSettings.SelectedRelativeBone.Value.BoneIndex.Value;
 
 
                     var boneIndexAttachmentPointSource = mappedIndex.NewValue;

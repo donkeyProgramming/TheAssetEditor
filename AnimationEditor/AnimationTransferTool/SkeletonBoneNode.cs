@@ -30,13 +30,10 @@ namespace AnimationEditor.AnimationTransferTool
         public NotifyAttr<bool> ApplyTranslation { get; set; } = new NotifyAttr<bool>(true);
         public NotifyAttr<bool> ApplyRotation { get; set; } = new NotifyAttr<bool>(true);
 
-        public SkeletonBoneNode _selectedRelativeBone;
-        public SkeletonBoneNode SelectedRelativeBone
-        {
-            get { return _selectedRelativeBone; }
-            set { SetAndNotify(ref _selectedRelativeBone, value); }
-        }
 
+        public NotifyAttr<SkeletonBoneNode> SelectedRelativeBone { get; set; } = new NotifyAttr<SkeletonBoneNode>();
+
+       
         public ObservableCollection<SkeletonBoneNode> Children { get; set; } = new ObservableCollection<SkeletonBoneNode>();
     }
 }

@@ -32,6 +32,7 @@ namespace View3D.Utility
             public DxgiFormat Header10_DxgiFormat { get; set; }
             public D3D10ResourceDimension Header10_ResourceDimension { get; set; }
             public uint Header10_MiscFlag { get; set; }
+
             public uint Header10_ArraySize { get; set; }
             public uint Header10_MiscFlags2 { get; set; }
 

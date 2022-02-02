@@ -10,17 +10,11 @@
         <Label Content="Group Information:" FontSize="20" FontWeight="Bold" DockPanel.Dock="Top"/>
 
         <DockPanel DockPanel.Dock="Top">
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
-                <Label Width="100" DockPanel.Dock="Left">Group name</Label>
-                <Label DockPanel.Dock="Left">:</Label>
-                <TextBox Text="{Binding GroupName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
-            </StackPanel>
-
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
+            <DockPanel  DockPanel.Dock="Top" >
                 <Label Width="100" DockPanel.Dock="Left">Camera distance</Label>
                 <Label DockPanel.Dock="Left">:</Label>
                 <TextBox Text="{Binding CameraDistance, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
-            </StackPanel>
+            </DockPanel>
         </DockPanel>
     </DockPanel>
 </UserControl>

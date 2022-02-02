@@ -1,0 +1,126 @@
+﻿From Maruka!
+
+import datetime
+
+def decode_csc(f, debug=False):
+    # current reading position
+    r_pos = f.tell()
+
+    header = int.from_bytes(f.read(8), byteorder='little')
+    time_int = int.from_bytes(f.read(4), byteorder='little')
+    time = datetime.datetime.fromtimestamp(time_int)
+    print('  Time created:', time)
+
+    r_pos = f.tell()
+    # strings start from this offset:
+    strings_offset = int.from_bytes(f.read(4), byteorder='little')
+    print('  pos:', r_pos , '->  str offset:',strings_offset)
+    # unknown, seems to -always- be '80 00 00 03' 
+    f.read(4)
+
+    # unknown, perhaps a length indicator or something ?
+    unknown00 = int.from_bytes(f.read(2), byteorder='little', signed=True)
+
+    # unknown, these 6 bytes seem to always be '0A 00 00 20 41 0D' part of matrices?
+    f.read(6)
+
+    # unknown, so far always '00 00 00 00' padding? part of matrices?
+    f.read(4)
+
+    # unknown, often empty, not always. a float? part of matrices?
+    # examples: storm_level_1.csc ends in 00
+    #           storm_level_2 - _5 end in '40' (as float that's 2.0)
+    # What's diff between those csc?
+    float1 = struct.unpack('f', f.read(4))
+    print('  f1oat?:', float1[0])
+
+    # unknown, so far always '00 00 00 00' padding? part of matrices?
+    f.read(4)
+
+    r_pos = f.tell()
+    # version or something? seems to be 2 bytes. Could also be part of matrices, potentially ?
+    #version = int.from_bytes(f.read(2), byteorder='little')
+    #print('  pos:', r_pos , '->  version?:', version)
+
+    # maybe a bunch of matrices? If that's the case then
+    # how do you determine how many matrices there are when reading? Maybe smth with strings_offset ?
+    matrixList = []
+    i = 0
+    while i < 6:
+        r_pos = f.tell()
+        transformation_matrix = struct.unpack('f' * 12, f.read(4 * 12))
+
+        # matrix, [translate xyz; rotate xyz; scale xyz] (technically just a list)
+        csc_matrix = process_matrix(transformation_matrix)
+
+        matrixList.extend([csc_matrix])
+
+        print('  pos:', r_pos , '->  Matrix', i, ':', csc_matrix)
+        i += 1
+    # skip the rest of the non-string part for now
+    f.seek(strings_offset)
+
+    param_num = int.from_bytes(f.read(2), byteorder='little')
+    # param_version_num = int.from_bytes(f.read(2), byteorder='little')
+    # read 'param' strings until exception, this might work
+    csc_param_list = []
+
+    i = 0
+    while i < param_num:
+        param_text = f.read(int.from_bytes(f.read(2), byteorder='little')).decode('utf-8')
+        # print(param_text)
+        csc_param_list.extend([param_text])
+        i += 1
+
+    # more unknown stuff
+    f.read(4)
+
+    # another version number?
+    par_type_ver = int.from_bytes(f.read(4), byteorder='little')
+    par_type = f.read(int.from_bytes(f.read(2), byteorder='little')).decode('utf-8')
+
+    ver1 = int.from_bytes(f.read(4), byteorder='little')
+    par1 = f.read(int.from_bytes(f.read(2), byteorder='little')).decode('utf-8')
+
+    ver2 = int.from_bytes(f.read(4), byteorder='little')
+    par2 = f.read(int.from_bytes(f.read(2), byteorder='little')).decode('utf-8')
+
+    ver3 = int.from_bytes(f.read(4), byteorder='little')
+    par3 = f.read(int.from_bytes(f.read(2), byteorder='little')).decode('utf-8')
+
+    ver4 = int.from_bytes(f.read(4), byteorder='little')
+    par4 = f.read(int.from_bytes(f.read(2), byteorder='little')).decode('utf-8')
+
+    ver5 = int.from_bytes(f.read(4), byteorder='little')
+    par5 = f.read(int.from_bytes(f.read(2), byteorder='little')).decode('utf-8')
+
+    cscMainList.extend([csc_param_list, [par_type_ver, par_type],
+                        [ver1, par1], [ver2, par2], [ver3, par3], [ver4, par4], [ver5, par5]])
+def process_matrix(mat):
+
+    # the position xyz is encoded in the last 3 values of the matrix.
+    tx = round(mat[9], 8)
+    ty = round(mat[10], 8)
+    tz = round(mat[11], 8)
+
+    # extract scale from rotation matrix, and round it to 8 digits
+    sx = math.sqrt(math.pow(mat[0], 2)+math.pow(mat[1], 2)+math.pow(mat[2], 2))
+    sy = math.sqrt(math.pow(mat[3], 2)+math.pow(mat[4], 2)+math.pow(mat[5], 2))
+    sz = math.sqrt(math.pow(mat[6], 2)+math.pow(mat[7], 2)+math.pow(mat[8], 2))
+
+    # translation matrix to rotation matrix, by removing scale
+    rotation_matrix = np.array([[mat[0]/sx, mat[1]/sx, mat[2]/sx],
+                                [mat[3]/sy, mat[4]/sy, mat[5]/sy],
+                                [mat[6]/sz, mat[7]/sz, mat[8]/sz]])
+
+    # get euler angles from rotation matrix, the returned values are in radians, ...
+    euler_matrix = rotmat_to_eul(rotation_matrix)
+
+    # ... so we need to convert them to degrees, because that's what terry uses. Also immediately
+    # round them to 8 because, again, that's what terry does.
+    rx = round(math.degrees(euler_matrix[1]), 8)
+    ry = round(math.degrees(euler_matrix[0]), 8)
+    rz = round(math.degrees(euler_matrix[2]), 8)
+
+    # return a list translate[xyz]; rotate [xyz]; scale [xyz]
+    return [[tx, ty, tz], [rx, ry, rz], [round(sx, 8), round(sy, 8), round(sz, 8)]]

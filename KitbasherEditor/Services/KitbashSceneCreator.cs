@@ -5,6 +5,7 @@ using CommonControls.Services;
 using KitbasherEditor.ViewModels;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
+using System;
 using System.Collections.Generic;
 using View3D.Components.Component;
 using View3D.Rendering.Geometry;
@@ -47,12 +48,11 @@ namespace KitbasherEditor.Services
             EditableMeshNode.CreateModelNodesFromFile(rmv, _resourceLibary, _animationView.Player, _geometryFactory);
             EditableMeshNode.SelectedOutputFormat = rmv.Header.Version;
 
-            for(int i=0; i<EditableMeshNode.Children.Count; i++)
+            int meshCount = Math.Min(EditableMeshNode.Children.Count, rmv.LodHeaders.Length);
+            for(int i = 0; i < meshCount; i++)
             {
                 if (EditableMeshNode.Children[i] is Rmv2LodNode lodNode)
-                {
                     lodNode.CameraDistance = rmv.LodHeaders[i].LodCameraDistance;
-                }
             }
 
             _animationView.SetActiveSkeleton(rmv.Header.SkeletonName);

@@ -22,7 +22,6 @@ namespace CommonControls.FileTypes.PackFiles.Models
         ILogger _logger = Logging.Create<PackFileContainer>();
 
         public string Name { get; set; }
-        public uint OriginalSize { get; set; }
         public PFHeader Header { get; set; }
         public bool IsCaPackFile { get; set; } = false;
         public string SystemFilePath { get; set; }
@@ -30,15 +29,9 @@ namespace CommonControls.FileTypes.PackFiles.Models
 
         public Dictionary<string, PackFile> FileList { get; set; } = new Dictionary<string, PackFile>();
 
-
         public PackFileContainer(string name)
         {
             Name = name;
-        }
-
-        public override string ToString()
-        {
-            return $"{Name} - {Header?.LoadOrder}";
         }
 
         public PackFileContainer(string packFileSystemPath, BinaryReader reader, IAnimationFileDiscovered animationFileDiscovered)
@@ -65,9 +58,9 @@ namespace CommonControls.FileTypes.PackFiles.Models
 
                 byte isCompressed = 0;
                 if (Header.Version == "PFH5")
-                    isCompressed = reader.ReadByte();   // For warhammer 2, terrain files are compressed
+                    isCompressed = reader.ReadByte();   // Is the file actually compressed, or is it just a compressed format?
 
-                string fullPackedFileName = IOFunctions.TheadUnsafeReadZeroTerminatedAscii(reader, fileNameBuffer).ToLower();
+                string fullPackedFileName = IOFunctions.ReadZeroTerminatedAscii(reader, fileNameBuffer).ToLower();
 
                 var packFileName = Path.GetFileName(fullPackedFileName);
                 var fileContent = new PackFile(packFileName, new PackedFileSource(packedFileSourceParent, offset, size));
@@ -81,7 +74,6 @@ namespace CommonControls.FileTypes.PackFiles.Models
 
             OriginalLoadByteSize = new FileInfo(packFileSystemPath).Length;
         }
-
 
         public void MergePackFileContainer(PackFileContainer other)
         {
@@ -141,5 +133,7 @@ namespace CommonControls.FileTypes.PackFiles.Models
                 writer.Write(data);
             }
         }
+
+        public override string ToString() => $"{Name} - {Header?.LoadOrder}";
     }
 }

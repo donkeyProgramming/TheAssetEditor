@@ -117,7 +117,7 @@ namespace AnimationEditor.AnimationTransferTool
             editorView.RefInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\wh_variantmodels\hr1\brt\brt_royal_pegasus\brt_pegasus_01.rigid_model_v2"),
-                Animation = packfileService.FindFile(@"animations\campaign_fauna\horse01\stand\hr1_stand_idle_05.anim")
+                Animation = packfileService.FindFile(@"animations\battle\horse01\stand\hr1_stand_idle_05.anim")
             };
 
             creator.CreateEmptyEditor(editorView);

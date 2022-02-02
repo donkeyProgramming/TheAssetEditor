@@ -198,10 +198,10 @@ namespace AnimationEditor.AnimationTransferTool
             }
         }
 
-        public void ClearRelativeSelectedBone()
+        public void ClearRelativeSelectedBoneAction()
         {
             if (SelectedBone != null)
-                SelectedBone.SelectedRelativeBone = null;
+                SelectedBone.SelectedRelativeBone.Value = null;
         }
 
         public void UpdateAnimation()
@@ -218,7 +218,7 @@ namespace AnimationEditor.AnimationTransferTool
         AnimationClip UpdateAnimation(AnimationClip animationToCopy, AnimationClip originalAnimation)
         {
             var service = new AnimationRemapperService(AnimationSettings, _remappingInformaton, Bones);
-            var newClip = service.ReMapAnimation(_copyFrom.Skeleton, _copyTo.Skeleton, animationToCopy, originalAnimation);
+            var newClip = service.ReMapAnimation(_copyFrom.Skeleton, _copyTo.Skeleton, animationToCopy);
             return newClip;
         }
 

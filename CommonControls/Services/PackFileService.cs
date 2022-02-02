@@ -228,29 +228,30 @@ namespace CommonControls.Services
                 _logger.Here().Information($"Loading all ca packfiles located in {gameDataFolder}");
                 var allCaPackFiles = GetPackFilesFromManifest(gameDataFolder);
 
-                var packBag = new ConcurrentBag<PackFileContainer>();
-
-                Parallel.For(0, allCaPackFiles.Count,
-                    index =>
+                var packList = new List<PackFileContainer>();
+                foreach (var packFilePath in allCaPackFiles)
+                {
+                    var path = gameDataFolder + "\\" + packFilePath;
+                    if (File.Exists(path))
                     {
-                        var path = gameDataFolder + "\\" + allCaPackFiles.ElementAt(index);
-                        if (File.Exists(path))
+                        using (var fileStram = File.OpenRead(path))
                         {
-                            using var fileStram = File.OpenRead(path);
-                            using var reader = new BinaryReader(fileStram, Encoding.ASCII);
-                            var pack = new PackFileContainer(path, reader, _skeletonAnimationLookUpHelper);
-                            packBag.Add(pack);
-                        }
-                        else
-                        {
-                            _logger.Here().Warning($"Ca packfile '{path}' not found, loading skipped");
+                            using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
+                            {
+                                var pack = new PackFileContainer(path, reader, _skeletonAnimationLookUpHelper);
+                                packList.Add(pack);
+                            }
                         }
                     }
-                );
+                    else
+                    {
+                        _logger.Here().Warning($"Ca packfile '{path}' not found, loading skipped");
+                    }
+                }
 
                 PackFileContainer caPackFileContainer = new PackFileContainer("All CA packs - " + gameName);
                 caPackFileContainer.IsCaPackFile = true;
-                var packFilesOrderedByGroup = packBag
+                var packFilesOrderedByGroup = packList
                     .GroupBy(x => x.Header.LoadOrder)
                     .OrderBy(x => x.Key);
 

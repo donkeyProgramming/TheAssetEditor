@@ -27,29 +27,7 @@
                 <mathviews:Vector3View Vector3="{Binding AnimationSettings.DisplayOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2"/>
             </DockPanel>
 
-            <DockPanel>
-                <Label Content="Time master" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
-                <Label Content=":" DockPanel.Dock="Left"/>
-                <ComboBox Margin="2" ItemsSource="{Binding AnimationSettings.TimeMaster.PossibleValues, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding AnimationSettings.TimeMaster.SelectedValue.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            </DockPanel>
-
-            <DockPanel>
-                <Label Content="Copy Mode" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
-                <Label Content=":" DockPanel.Dock="Left"/>
-                <ComboBox Margin="2" ItemsSource="{Binding AnimationSettings.CopyMode.PossibleValues, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding AnimationSettings.CopyMode.SelectedValue.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            </DockPanel>
-
-            <DockPanel>
-                <Label Content="Length matching mode" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
-                <Label Content=":" DockPanel.Dock="Left"/>
-                <ComboBox Margin="2" ItemsSource="{Binding AnimationSettings.LengthMatchingMode.PossibleValues, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding AnimationSettings.LengthMatchingMode.SelectedValue.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            </DockPanel>
-
-            <DockPanel>
-                <Label Content="Combine mode" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
-                <Label Content=":" DockPanel.Dock="Left"/>
-                <ComboBox Margin="2" ItemsSource="{Binding AnimationSettings.CombineMode.PossibleValues, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding AnimationSettings.CombineMode.SelectedValue.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            </DockPanel>
+          
 
             <DockPanel>
                 <Label Content="Skeleton Scale" Width ="{StaticResource labelWidth}"  DockPanel.Dock="Left"/>
@@ -76,28 +54,7 @@
                     </b:Interaction.Behaviors>
                 </TextBox>
             </DockPanel>
-            <DockPanel>
-                <Label Content="Start and stop time" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
-                <Label Content=":" DockPanel.Dock="Left"/>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="0.5*"/>
-                        <ColumnDefinition Width="0.5*"/>
-                    </Grid.ColumnDefinitions>
-                    
-                <TextBox Grid.Column="0" Text="{Binding AnimationSettings.StartTime.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
-                    <b:Interaction.Behaviors>
-                        <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
-                    </b:Interaction.Behaviors>
-                </TextBox>
 
-                    <TextBox Grid.Column="1" Text="{Binding AnimationSettings.StopTime.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
-                    <b:Interaction.Behaviors>
-                        <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
-                    </b:Interaction.Behaviors>
-                </TextBox>
-                </Grid>
-            </DockPanel>
 
             <DockPanel >
                 <Label Content="Config" Width ="{StaticResource labelWidth}"/>
@@ -106,7 +63,7 @@
                 <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.FreezeUnmapped.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Content="Zero unmapped bones" ToolTip="Set the transform of all unmapped bones to 0"/>
             </DockPanel>
 
-            <Expander Header="Saving" IsExpanded="True">
+            <GroupBox Header="Saving" >
                 <StackPanel>
                     <DockPanel >
                         <Label Content="Save Prefix" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
@@ -125,7 +82,7 @@
 
                     </DockPanel>
                 </StackPanel>
-            </Expander>
+            </GroupBox>
 
         </StackPanel>
     </Expander>

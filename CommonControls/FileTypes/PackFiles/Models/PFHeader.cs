@@ -82,7 +82,7 @@ namespace CommonControls.FileTypes.PackFiles.Models
             }
 
             for (int i = 0; i < ReferenceFileCount; i++)
-                _dependantFiles.Add(IOFunctions.TheadUnsafeReadZeroTerminatedAscii(reader, fileNameBuffer));
+                _dependantFiles.Add(IOFunctions.ReadZeroTerminatedAscii(reader, fileNameBuffer));
 
             HasAdditionalInfo = (ByteMask & HAS_INDEX_WITH_TIMESTAMPS) != 0;
             DataStart = headerOffset + _buffer.Length + pack_file_index_size + packed_file_index_size;
