@@ -49,13 +49,13 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 {
                     var isNewViewModel = string.IsNullOrEmpty(_path);
 
-                    _path = value;
+                    _path = value?.Replace("/", "\\");
                     ValidateTexturePath();
                     NotifyPropertyChanged();
 
-                    UpdateMeshTexture(value, !isNewViewModel);
+                    UpdateMeshTexture(_path, !isNewViewModel);
 
-                    IsWatched = File.Exists(value);
+                    IsWatched = File.Exists(_path);
                 }
             }
 
@@ -72,15 +72,15 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                     CanSaveWatchedCommand = value;
                     CanExportAndWatchCommand = !value;
 
+                    if (_watcher != null)
+                    {
+                        _watcher.Changed -= WatcherOnChanged;
+                        _watcher.Deleted -= WatcherOnDeleted;
+                        _watcher.Dispose();
+                    }
+
                     if (value)
                     {
-                        if (_watcher != null)
-                        {
-                            _watcher.Changed -= WatcherOnChanged;
-                            _watcher.Deleted -= WatcherOnDeleted;
-                            _watcher.Dispose();
-                        }
-
                         var watcher = new FileSystemWatcher(System.IO.Path.GetDirectoryName(Path));
                         watcher.NotifyFilter = NotifyFilters.Attributes
                                                | NotifyFilters.CreationTime

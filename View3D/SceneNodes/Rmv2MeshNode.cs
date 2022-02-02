@@ -98,13 +98,13 @@ namespace View3D.SceneNodes
             }
         }
 
-        Texture2D LoadTexture(TexureType type, bool skipCache = false)
+        Texture2D LoadTexture(TexureType texureType, bool skipCache = false)
         {
-            var texture = Material.GetTexture(type);
+            var texture = Material.GetTexture(texureType);
             if (texture == null)
                 return null;
 
-            return _resourceLib.LoadTexture(texture.Value.Path, skipCache);
+            return _resourceLib.LoadTexture(texture.Value.Path, skipCache, texureType);
         }
 
         public void Update(GameTime time) { }

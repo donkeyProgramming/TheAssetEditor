@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using CommonControls.FileTypes.RigidModel.Types;
+using SharpDX.DirectWrite;
 using View3D.Components;
 using ImageFormat = Pfim.ImageFormat;
 
@@ -71,14 +73,14 @@ namespace View3D.Utility
         }
 
 
-        public Texture2D LoadTexture(string fileName, bool skipCache = false)
+        public Texture2D LoadTexture(string fileName, bool skipCache = false, TexureType texureType = TexureType.Diffuse)
         {
             if (_textureMap.ContainsKey(fileName) && !skipCache)
                 return _textureMap[fileName];
 
             var isOnFileSystem = File.Exists(fileName);
 
-            var texture = LoadTextureAsTexture2d(fileName, _game.GraphicsDevice, new ImageInformation(), isOnFileSystem);
+            var texture = LoadTextureAsTexture2d(fileName, _game.GraphicsDevice, new ImageInformation(), isOnFileSystem, texureType);
             if (texture != null)
                 _textureMap[fileName] = texture;
 
@@ -99,7 +101,7 @@ namespace View3D.Utility
             }
         }
 
-        Texture2D LoadTextureAsTexture2d(string fileName, GraphicsDevice device, ImageInformation out_imageInfo, bool isOnFileSystem)
+        Texture2D LoadTextureAsTexture2d(string fileName, GraphicsDevice device, ImageInformation out_imageInfo, bool isOnFileSystem, TexureType texureType=TexureType.Diffuse)
         {
             var file = Pfs.FindFile(fileName);
 
@@ -108,7 +110,7 @@ namespace View3D.Utility
                 // WaitCursor can only be used in a STA thread
                 using (var waitCursor = Thread.CurrentThread.GetApartmentState() == ApartmentState.STA ? new WaitCursor() : null)
                 {
-                    SaveHelper.SavePNGTextureAsDDS(fileName);
+                    SaveHelper.SavePNGTextureAsDDS(fileName, texureType);
                 }
             }
 

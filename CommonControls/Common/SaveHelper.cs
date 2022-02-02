@@ -7,6 +7,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Windows;
+using CommonControls.FileTypes.RigidModel.Types;
 using Serilog;
 
 namespace CommonControls.Common
@@ -186,8 +187,16 @@ namespace CommonControls.Common
             }
         }
 
-        public static void SavePNGTextureAsDDS(string pngFilePath)
+        public static void SavePNGTextureAsDDS(string pngFilePath, TexureType texureType = TexureType.Diffuse)
         {
+            var texconvArguments = texureType switch
+            {
+                TexureType.Mask => "-f BC3_UNORM -m 1", // disable mipmaps
+                TexureType.Normal => "-f BC3_UNORM",
+                TexureType.Gloss => "-f BC1_UNORM",
+                _ => "-f BC7_UNORM_SRGB",
+            };
+
             var texconvPath = $"{DirectoryHelper.TempDirectory}\\texconv.exe";
 
             EnsureTexconvExists();
@@ -195,7 +204,7 @@ namespace CommonControls.Common
             using var pProcess = new System.Diagnostics.Process();
             pProcess.StartInfo.FileName = texconvPath;
             pProcess.StartInfo.Arguments =
-                $"-sRGBi -f BC7_UNORM_SRGB -y -o \"{Path.GetDirectoryName(pngFilePath)}\" \"{pngFilePath}\"";
+                $"{texconvArguments} -y -o \"{Path.GetDirectoryName(pngFilePath)}\" \"{pngFilePath}\"";
             pProcess.StartInfo.UseShellExecute = false;
             pProcess.StartInfo.RedirectStandardOutput = true;
             pProcess.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
@@ -215,7 +224,7 @@ namespace CommonControls.Common
             using var pProcess = new System.Diagnostics.Process();
             pProcess.StartInfo.FileName = texconvPath;
             pProcess.StartInfo.Arguments =
-                $"-ft png -y -o \"{System.IO.Path.GetDirectoryName(filePath)}\" \"{filePath}\"";
+                $"-ft png -y -o \"{Path.GetDirectoryName(filePath)}\" \"{filePath}\"";
             pProcess.StartInfo.UseShellExecute = false;
             pProcess.StartInfo.RedirectStandardOutput = true;
             pProcess.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
