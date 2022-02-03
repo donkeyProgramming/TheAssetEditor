@@ -191,7 +191,7 @@ namespace CommonControls.Common
         {
             var texconvArguments = texureType switch
             {
-                TexureType.Mask => "-f BC3_UNORM -m 1", // disable mipmaps
+                TexureType.Mask => "-f BC3_UNORM",
                 TexureType.Normal => "-f BC3_UNORM",
                 TexureType.Gloss => "-f BC1_UNORM",
                 _ => "-f BC7_UNORM_SRGB",
