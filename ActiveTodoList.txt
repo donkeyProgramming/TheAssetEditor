@@ -432,6 +432,15 @@ Fixed 0.26
 	Saving bin with no frg should give error
 	PropV10 no override for orientation
 	
+	
+	
+	---
+	Improve loading of packfile
+	Open dds files 
+	fix animation transfer tool
+	Update lod distance UI 
+	---
+	
 	AnimTransfer tool
 		Which anim is length setter
 		"Splice"
@@ -485,7 +494,7 @@ Fixed 0.26
 	Tools on menubar, including the old ctrl+x to not recombine assets when splitting
 	Redo
 	Fix keyboard focus 
-	Re-rigg selected vertexes only -> Pin tool 
+	Re-rigg selected vertexes only -> Pin tool  (fall off)
 	Pose tool 
 	Add the seach tool => projectiles\wh_lzd_terradon_rock_02.rigid_model_v2
 	Save decal models => dont override material type if there is no need => move to tool instead of save 
@@ -530,25 +539,13 @@ Cool assetEditor projects:
 	black karl franze mod 
 	Rat damsel 
 
-hu2_orc_2handed_axe
-Warp fireball explotion 
-
-freb_glow_
-
-wh_dlc06_weapon_trail_drakegun_skolder
-wh2_main_machine_warp_lightning_cannon_destruct
-wh2_dlc16_entity_melee_warpstone_impact
-
-
-[data] animations\battle\humanoid03\axe\attacks\hu3_axe_attack_03.anim headbut
-[data] animations\battle\humanoid01\sword_and_shield\attacks\hu1_sws_attack_02.anim kick
-
-
-
-Spine 0
-
-
-variantmeshes\wh_variantmodels\props\p_cb1b_hu1d\def_crossbow_repeater_01.rigid_model_v2
-
-93491001 
-10-1030
+          return versionEnum switch
+            {
+                PackFileVersion.PFH0 => "PFH0",
+                PackFileVersion.PFH2 => "PFH2",
+                PackFileVersion.PFH3 => "PFH3",
+                PackFileVersion.PFH4 => "PFH4",
+                PackFileVersion.PFH5 => "PFH5",
+                PackFileVersion.PFH6 => "PFH6",
+                _ => throw new System.Exception($"Unknown packfileversion {versionEnum}"),
+            };

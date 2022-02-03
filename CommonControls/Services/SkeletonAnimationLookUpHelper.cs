@@ -61,16 +61,16 @@ namespace CommonControls.Services
                             return animationMap;
                         }
                     );
+
+                    if (fullPath.Contains("animations\\skeletons", StringComparison.InvariantCultureIgnoreCase))
+                        SkeletonFileNames.Add(fullPath);
+                    else if (fullPath.Contains("tech", StringComparison.InvariantCultureIgnoreCase))
+                        SkeletonFileNames.Add(fullPath);
                 }
                 catch (Exception e)
                 {
                     _logger.Here().Error("Parsing failed for " + fullPath + "\n" + e.ToString());
                 }
-
-                if (fullPath.Contains("animations\\skeletons", StringComparison.InvariantCultureIgnoreCase))
-                    SkeletonFileNames.Add(fullPath);
-                else if (fullPath.Contains("tech", StringComparison.InvariantCultureIgnoreCase))
-                    SkeletonFileNames.Add(fullPath);
             }
         }
 

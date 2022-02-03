@@ -34,46 +34,46 @@ namespace CommonControls.FileTypes.PackFiles.Models
             Name = name;
         }
 
-        public PackFileContainer(string packFileSystemPath, BinaryReader reader, IAnimationFileDiscovered animationFileDiscovered)
-        {
-            var fileNameBuffer = new byte[1024];
-            SystemFilePath = packFileSystemPath;
-            Name = Path.GetFileNameWithoutExtension(packFileSystemPath);
-            Header = new PFHeader(reader);
-
-            FileList = new Dictionary<string, PackFile>(Header.FileCount);
-
-            PackedFileSourceParent packedFileSourceParent = new PackedFileSourceParent()
-            {
-                FilePath = packFileSystemPath,
-            };
-
-            long offset = Header.DataStart;
-            for (int i = 0; i < Header.FileCount; i++)
-            {
-                uint size = reader.ReadUInt32();
-
-                if (Header.HasAdditionalInfo)
-                    reader.ReadUInt32();
-
-                byte isCompressed = 0;
-                if (Header.Version == "PFH5")
-                    isCompressed = reader.ReadByte();   // Is the file actually compressed, or is it just a compressed format?
-
-                string fullPackedFileName = IOFunctions.ReadZeroTerminatedAscii(reader, fileNameBuffer).ToLower();
-
-                var packFileName = Path.GetFileName(fullPackedFileName);
-                var fileContent = new PackFile(packFileName, new PackedFileSource(packedFileSourceParent, offset, size));
-
-                if (animationFileDiscovered != null && packFileName.EndsWith(".anim"))
-                    animationFileDiscovered.FileDiscovered(fileContent, this, fullPackedFileName);
-
-                FileList.Add(fullPackedFileName, fileContent);
-                offset += size;
-            }
-
-            OriginalLoadByteSize = new FileInfo(packFileSystemPath).Length;
-        }
+        //public PackFileContainer(string packFileSystemPath, BinaryReader reader, IAnimationFileDiscovered animationFileDiscovered)
+        //{
+        //    var fileNameBuffer = new byte[1024];
+        //    SystemFilePath = packFileSystemPath;
+        //    Name = Path.GetFileNameWithoutExtension(packFileSystemPath);
+        //    Header = new PFHeader(reader);
+        //
+        //    FileList = new Dictionary<string, PackFile>(Header.FileCount);
+        //
+        //    PackedFileSourceParent packedFileSourceParent = new PackedFileSourceParent()
+        //    {
+        //        FilePath = packFileSystemPath,
+        //    };
+        //
+        //    long offset = Header.DataStart;
+        //    for (int i = 0; i < Header.FileCount; i++)
+        //    {
+        //        uint size = reader.ReadUInt32();
+        //
+        //        if (Header.HasAdditionalInfo)
+        //            reader.ReadUInt32();
+        //
+        //        byte isCompressed = 0;
+        //        if (Header.Version == "PFH5")
+        //            isCompressed = reader.ReadByte();   // Is the file actually compressed, or is it just a compressed format?
+        //
+        //        string fullPackedFileName = IOFunctions.ReadZeroTerminatedAscii(reader, fileNameBuffer).ToLower();
+        //
+        //        var packFileName = Path.GetFileName(fullPackedFileName);
+        //        var fileContent = new PackFile(packFileName, new PackedFileSource(packedFileSourceParent, offset, size));
+        //
+        //        if (animationFileDiscovered != null && packFileName.EndsWith(".anim"))
+        //            animationFileDiscovered.FileDiscovered(fileContent, this, fullPackedFileName);
+        //
+        //        FileList.Add(fullPackedFileName, fileContent);
+        //        offset += size;
+        //    }
+        //
+        //    OriginalLoadByteSize = new FileInfo(packFileSystemPath).Length;
+        //}
 
         public void MergePackFileContainer(PackFileContainer other)
         {
@@ -88,9 +88,9 @@ namespace CommonControls.FileTypes.PackFiles.Models
             var sortedFiles = FileList.OrderBy(x => x.Key, StringComparer.Ordinal).ToList();
             foreach (var file in sortedFiles)
             {
-                if (Header.Version == "PFH5")
+                if (Header.Version == PackFileVersion.PFH5)
                     fileNamesOffset += 1;
-                if (Header.HasAdditionalInfo)
+                if (Header.HasIndexWithTimeStamp)
                     fileNamesOffset += 4;
                 fileNamesOffset += 4 + file.Key.Length + 1;    // Size + filename with zero terminator
             }
@@ -100,13 +100,13 @@ namespace CommonControls.FileTypes.PackFiles.Models
             // Save all the files
             foreach (var file in sortedFiles)
             {
-                var fileSize = (int)(file.Value ).DataSource.Size;
+                var fileSize = (int)file.Value.DataSource.Size;
                 writer.Write(fileSize);
 
-                if (Header.HasAdditionalInfo)
+                if (Header.HasIndexWithTimeStamp)
                     writer.Write(0);   // timestamp
 
-                if (Header.Version == "PFH5")
+                if (Header.Version == PackFileVersion.PFH5)
                     writer.Write((byte)0);  // Compression
 
                 // Filename

@@ -133,7 +133,7 @@ namespace CommonControls.Services
                       {
                           using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
                           {
-                              var pfc = new PackFileContainer(packFilePath, reader, _skeletonAnimationLookUpHelper);
+                              var pfc = PackFileSerializer.Load(packFilePath, reader, _skeletonAnimationLookUpHelper);
 
                               _logger.Here().Information($"Seraching through packfile {currentIndex}/{files.Count} -  {packFilePath} {pfc.FileList.Count} files");
 
@@ -216,7 +216,7 @@ namespace CommonControls.Services
 
         public PackFileContainer Load(BinaryReader binaryReader, string packFileSystemPath)
         {
-            var pack = new PackFileContainer(packFileSystemPath, binaryReader, _skeletonAnimationLookUpHelper);
+            var pack = PackFileSerializer.Load(packFileSystemPath, binaryReader, _skeletonAnimationLookUpHelper);
             Database.AddPackFile(pack);
             return pack;
         }
@@ -238,7 +238,7 @@ namespace CommonControls.Services
                         {
                             using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
                             {
-                                var pack = new PackFileContainer(path, reader, _skeletonAnimationLookUpHelper);
+                                var pack = PackFileSerializer.Load(path, reader, _skeletonAnimationLookUpHelper);
                                 packList.Add(pack);
                             }
                         }
@@ -496,7 +496,8 @@ namespace CommonControls.Services
             foreach (var (path, file) in files)
             {
                 pf.FileList.Remove(path);
-                pf.FileList[path.Replace(oldNodePath, newNodePath)] = file;
+                var newPath = path.Replace(oldNodePath, newNodePath);
+                pf.FileList[newPath] = file;
             }
 
             _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, pf);
@@ -547,7 +548,7 @@ namespace CommonControls.Services
             // Check if file has changed in size
             if (pf.OriginalLoadByteSize != -1)
             {
-                var fileInfo = new FileInfo(path);
+                var fileInfo = new FileInfo(pf.SystemFilePath);
                 var byteSize = fileInfo.Length;
                 if (byteSize != pf.OriginalLoadByteSize)
                     throw new Exception("File has been changed outside of AssetEditor. Can not save the file as it will cause corruptions");

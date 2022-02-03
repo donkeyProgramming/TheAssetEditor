@@ -261,6 +261,7 @@ namespace AnimationEditor.SkeletonEditor
                 return;
 
             _techSkeletonNode.Skeleton.DeleteBone(_selectedBone.BoneIndex);
+            RefreshBoneList();
         }
 
         public void CopyBoneAction()
@@ -277,6 +278,7 @@ namespace AnimationEditor.SkeletonEditor
                 SourceSkeleton = _techSkeletonNode.Skeleton.Clone()
             };
             _copyPasteManager.SetCopyItem(copyItem);
+            RefreshBoneList();
         }
 
         public void PasteBoneAction()
