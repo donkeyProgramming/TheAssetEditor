@@ -77,6 +77,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                         _watcher.Changed -= WatcherOnChanged;
                         _watcher.Deleted -= WatcherOnDeleted;
                         _watcher.Dispose();
+                        _watcher = null;
                     }
 
                     if (value)
