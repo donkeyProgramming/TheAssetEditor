@@ -72,7 +72,7 @@ namespace CommonControls.FileTypes.PackFiles.Models
                 var packFileName = Path.GetFileName(fullPackedFileName);
                 var fileContent = new PackFile(packFileName, new PackedFileSource(packedFileSourceParent, offset, size));
 
-                if (animationFileDiscovered != null && packFileName.EndsWith(".anim"))
+                if (animationFileDiscovered != null && packFileName.EndsWith(".anim", StringComparison.OrdinalIgnoreCase))
                     animationFileDiscovered.FileDiscovered(fileContent, this, fullPackedFileName);
 
                 FileList.Add(fullPackedFileName, fileContent);

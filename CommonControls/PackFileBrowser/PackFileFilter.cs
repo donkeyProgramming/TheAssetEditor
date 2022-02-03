@@ -126,10 +126,10 @@ namespace CommonControls.PackFileBrowser
                     hasValidExtention = false;
                     foreach (var extention in _extentionFilter)
                     {
-                        if (file.Name.Contains(extention))
+                        if (file.Name.EndsWith(extention, StringComparison.OrdinalIgnoreCase))
                         {
-                            hasValidExtention = true; 
-                            continue;
+                            hasValidExtention = true;
+                            break;
                         }
                     }
                 }

@@ -104,7 +104,7 @@ namespace CommonControls.Common
         public static string EnsureEnding(string text, string ending)
         {
             text = text.ToLower();
-            bool hasCorrectEnding = text.EndsWith(ending);
+            bool hasCorrectEnding = text.EndsWith(ending, StringComparison.OrdinalIgnoreCase);
             if (!hasCorrectEnding)
             {
                 text = Path.GetFileNameWithoutExtension(text);
