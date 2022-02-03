@@ -62,6 +62,9 @@ namespace CommonControls.Common
                             if (path.Contains(extention) == false)
                                 path += extention;
 
+                            if (path.StartsWith("\\")) // don't create an empty folder if the .pack was selected
+                                path = path.Remove(0, 1);
+
                             filename = path;
                             existingFile = null;
                         }
@@ -124,6 +127,9 @@ namespace CommonControls.Common
                     var path = browser.FilePath;
                     if (path.Contains(extention) == false)
                         path += extention;
+
+                    if (path.StartsWith("\\")) // don't create an empty folder if the .pack was selected
+                        path = path.Remove(0, 1);
 
                     var existingFile = browser.SelectedFile;
                     if (existingFile != null)

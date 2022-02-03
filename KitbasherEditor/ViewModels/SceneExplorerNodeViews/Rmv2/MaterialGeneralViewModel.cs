@@ -309,6 +309,9 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                     }
                 }
 
+                if (newFilePath.StartsWith("\\")) // don't create an empty folder if the .pack was selected
+                    newFilePath = newFilePath.Remove(0, 1);
+
                 var directoryPath = System.IO.Path.GetDirectoryName(newFilePath);
                 if (string.IsNullOrEmpty(newFilePath))
                     return;
