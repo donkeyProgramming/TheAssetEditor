@@ -197,13 +197,21 @@ namespace CommonControls.FileTypes.Animation
             // Remapping tables, not sure how they really should be used, but this works.
             for (int i = 0; i < boneCount; i++)
             {
-                int mappingValue = chunk.ReadInt32();
+                int mappingValue;
+                if (output.Header.Version == 8)
+                    mappingValue = chunk.ReadByte();
+                else
+                    mappingValue = chunk.ReadInt32();
                 output.TranslationMappings.Add(new AnimationBoneMapping(mappingValue));
             }
 
             for (int i = 0; i < boneCount; i++)
             {
-                int mappingValue = chunk.ReadInt32();
+                int mappingValue;
+                if (output.Header.Version == 8)
+                    mappingValue = chunk.ReadByte(); 
+                else
+                    mappingValue = chunk.ReadInt32();
                 output.RotationMappings.Add(new AnimationBoneMapping(mappingValue));
             }
 
