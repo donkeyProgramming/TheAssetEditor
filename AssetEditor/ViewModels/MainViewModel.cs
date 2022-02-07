@@ -54,7 +54,7 @@ namespace AssetEditor.ViewModels
         public ICommand CloseToolsToRightCommand { get; set; }
         public ICommand CloseToolsToLeftCommand { get; set; }
 
-        public MainViewModel(MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, ToolFactory toolFactory, SchemaManager schemaManager)
+        public MainViewModel(MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, ToolFactory toolFactory, SchemaManager schemaManager, SkeletonAnimationLookUpHelper animationLookUpHelper)
         {
             _packfileService = packfileService;
             _packfileService.Database.BeforePackFileContainerRemoved += Database_BeforePackFileContainerRemoved;
@@ -148,7 +148,7 @@ namespace AssetEditor.ViewModels
                 //AnimMetaBatchProcessor processor = new AnimMetaBatchProcessor();
                 //processor.BatchProcess(_packfileService, schemaManager, "Warhammer");
 
-                AnimationEditor.SuperView.SuperViewViewModel_Debug.CreateThrot(this, toolFactory, packfileService);
+                //AnimationEditor.SuperView.SuperViewViewModel_Debug.CreateThrot(this, toolFactory, packfileService);
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
 
 
@@ -160,16 +160,16 @@ namespace AssetEditor.ViewModels
                 //AnimationEditor.MountAnimationCreator.MountAnimationCreator_Debug.CreateLionAndHu01c(this, toolFactory, packfileService);
                 //KitbashEditor_Debug.CreateLoremasterHead(this, toolFactory, packfileService);
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateBowCentigor(this, toolFactory, packfileService);
-                 AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateDamselEditor(this, toolFactory, packfileService);
+                //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 //var f = packfileService.FindFile(@"animations\campaign\database\bin\cam_hero_hu1d_def_spear_and_shield.bin");
                 //
-
+                AnimationEditor.AnimationBuilder.AnimationBuilderViewModel.AnimationBuilder_Debug.CreateExampleAnimation(this, toolFactory, packfileService, animationLookUpHelper);
 
 
                 //packfileService.DeepSearch("wh2_main_vor_deadwood_the_frozen_city", false);
                 //packfileService.DeepSearch("31x11_dragonback_skew_mirror_01", false);
                 //packfileService.DeepSearch("context_viewer", false);
-                
+
 
 
                 //AnimationPackLoader.Load(packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack"));
