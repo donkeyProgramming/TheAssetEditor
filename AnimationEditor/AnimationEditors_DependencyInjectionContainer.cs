@@ -1,4 +1,5 @@
-﻿using AnimationEditor.AnimationTransferTool;
+﻿using AnimationEditor.AnimationBuilder;
+using AnimationEditor.AnimationTransferTool;
 using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.Common.BaseControl;
 using AnimationEditor.MountAnimationCreator;
@@ -18,7 +19,7 @@ namespace AnimationEditor
             serviceCollection.AddTransient<AnimationTransferToolViewModel>();
             serviceCollection.AddTransient<SuperViewViewModel>();
             serviceCollection.AddTransient<SkeletonEditorViewModel>();
-
+            serviceCollection.AddTransient<AnimationBuilderViewModel>();
             serviceCollection.AddTransient<BaseAnimationView>();
         }
 
@@ -29,6 +30,7 @@ namespace AnimationEditor
             factory.RegisterTool<AnimationTransferToolViewModel, BaseAnimationView>();
             factory.RegisterTool<SuperViewViewModel, BaseAnimationView>();
             factory.RegisterTool<SkeletonEditorViewModel, BaseAnimationView>();
+            factory.RegisterTool<AnimationBuilderViewModel, BaseAnimationView>();
         }
     }
 }

@@ -1,0 +1,54 @@
+﻿<UserControl x:Class="AnimationEditor.AnimationBuilder.EditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors" 
+             xmlns:s="http://schemas.singulink.com/xaml"
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="850" d:DesignWidth="800">
+    <DockPanel LastChildFill="False">
+        <Label  DockPanel.Dock="Top" Content="Animation Creator:" FontSize="18" FontWeight="Bold"/>
+
+        <TreeView DockPanel.Dock="Top" ItemsSource="{Binding Bones, UpdateSourceTrigger=PropertyChanged}" MaxHeight="400" Height="400" Margin="5,5,5,1">
+            <b:Interaction.Behaviors>
+                <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedBone, Mode=TwoWay}" />
+            </b:Interaction.Behaviors>
+
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsExpanded" Value="True" />
+                </Style>
+            </TreeView.ItemContainerStyle>
+            <TreeView.ItemTemplate >
+                <HierarchicalDataTemplate ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding BoneName, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text=" - "></TextBlock>
+                        <TextBlock Text="{Binding BoneIndex, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+
+        <Grid DockPanel.Dock="Top" Margin="5,0,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.33*"/>
+                <ColumnDefinition Width="0.33*"/>
+                <ColumnDefinition Width="0.33*"/>
+                <ColumnDefinition Width="0.33*"/>
+                <ColumnDefinition Width="0.33*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="New"  Click="{s:MethodBinding CreateBoneAction}" Margin="0,0,2,0"/>
+            <Button Grid.Column="1" Content="Duplicate"  Click="{s:MethodBinding DuplicateBoneAction}"  Margin="2,0,2,0"/>
+            <Button Grid.Column="2" Content="Delete"  Click="{s:MethodBinding DeleteBoneAction}" Margin="2,0,0,0"/>
+            <Button Grid.Column="3" Content="Copy"  Click="{s:MethodBinding CopyBoneAction}" Margin="2,0,0,0"/>
+            <Button Grid.Column="4" Content="Paste"  Click="{s:MethodBinding PasteBoneAction}" Margin="2,0,0,0"/>
+        </Grid>
+
+        <Button DockPanel.Dock="Top" Margin="5" Content="Save" Click="{s:MethodBinding SaveSkeletonAction}"/>
+    </DockPanel>
+</UserControl>

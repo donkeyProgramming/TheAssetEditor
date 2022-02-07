@@ -23,6 +23,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using AnimationEditor.SkeletonEditor;
 using AssetEditor.Report;
+using AnimationEditor.AnimationBuilder;
 
 namespace AssetEditor.ViewModels
 {
@@ -57,7 +58,7 @@ namespace AssetEditor.ViewModels
         public ICommand OpenAnimMetaDecocderCommand { get; set; }
         public ICommand OpenMountCreatorCommand { get; set; }
         public ICommand OpenAnimationBatchExporterCommand { get; set; }
-
+        public ICommand OpenAnimationBuilderCommand { get; set; }
 
         public ICommand OpenRome2RePacksCommand { get; set; }
         public ICommand OpenThreeKingdomsPacksCommand { get; set; }
@@ -106,7 +107,8 @@ namespace AssetEditor.ViewModels
             OpenSuperViewToolCommand = new RelayCommand(OpenSuperViewTool);
             OpenTechSkeletonEditorCommand = new RelayCommand(OpenTechSkeletonEditor);
             OpenAnimationBatchExporterCommand = new RelayCommand(OpenAnimationBatchExporter);
-            
+            OpenAnimationBuilderCommand = new RelayCommand(OpenOpenAnimationBuilder);
+
             GenerateRmv2ReportCommand = new RelayCommand(GenerateRmv2Report);
             GenerateMetaDataReportCommand = new RelayCommand(GenerateMetaDataReport);
             
@@ -319,6 +321,14 @@ namespace AssetEditor.ViewModels
         }
 
         void OpenAnimationBatchExporter() => AnimationBatchExportViewModel.ShowWindow(_packfileService, _skeletonAnimationLookUpHelper);
+
+        void OpenOpenAnimationBuilder()
+        {
+            {
+                var editorView = _toolFactory.CreateEditorViewModel<AnimationBuilderViewModel>();
+                EditorCreator.CreateEmptyEditor(editorView);
+            }
+        }
 
         void GenerateRmv2Report()
         {
