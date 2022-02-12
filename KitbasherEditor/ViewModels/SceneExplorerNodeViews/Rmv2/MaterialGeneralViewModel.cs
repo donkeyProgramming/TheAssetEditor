@@ -33,8 +33,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             Rmv2MeshNode _meshNode;
             TexureType _texureType;
 
-            FileSystemWatcher _watcher;
-
             public ICommand SaveWatchedCommand { get; set; }
             public ICommand ExportAndWatchCommand { get; set; }
 
@@ -44,18 +42,35 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 
             public string Path
             {
-                get => _path;
+                get => _filePath.Path;
                 set
                 {
-                    var isNewViewModel = string.IsNullOrEmpty(_path);
+                    var isNewViewModel = _filePath == null;
+                    var normalized = value?.Replace("/", "\\");
 
-                    _path = value?.Replace("/", "\\");
+                    if (_filePath is WatchedFilePath watchedFilePath)
+                    {
+                        watchedFilePath.FileChanged -= OnFileChanged;
+                        watchedFilePath.FileDeleted -= OnFileDeleted;
+                    }
+
+                    if (File.Exists(normalized))
+                    {
+                        watchedFilePath = new WatchedFilePath(normalized);
+                        watchedFilePath.FileChanged += OnFileChanged;
+                        watchedFilePath.FileDeleted += OnFileDeleted;
+
+                        _filePath = watchedFilePath;
+                    }
+                    else
+                        _filePath = new FilePath(normalized);
+
                     ValidateTexturePath();
                     NotifyPropertyChanged();
 
-                    UpdateMeshTexture(_path, !isNewViewModel);
+                    UpdateMeshTexture(_filePath.Path, !isNewViewModel);
 
-                    IsWatched = File.Exists(_path);
+                    IsWatched = _filePath is WatchedFilePath;
                 }
             }
 
@@ -71,37 +86,10 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 
                     CanSaveWatchedCommand = value;
                     CanExportAndWatchCommand = !value;
-
-                    if (_watcher != null)
-                    {
-                        _watcher.Changed -= WatcherOnChanged;
-                        _watcher.Deleted -= WatcherOnDeleted;
-                        _watcher.Dispose();
-                        _watcher = null;
-                    }
-
-                    if (value)
-                    {
-                        var watcher = new FileSystemWatcher(System.IO.Path.GetDirectoryName(Path));
-                        watcher.NotifyFilter = NotifyFilters.Attributes
-                                               | NotifyFilters.CreationTime
-                                               | NotifyFilters.DirectoryName
-                                               | NotifyFilters.FileName
-                                               | NotifyFilters.LastAccess
-                                               | NotifyFilters.LastWrite
-                                               | NotifyFilters.Security
-                                               | NotifyFilters.Size;
-                        watcher.Changed += WatcherOnChanged;
-                        watcher.Deleted += WatcherOnDeleted;
-                        watcher.Filter = System.IO.Path.GetFileName(Path);
-                        watcher.EnableRaisingEvents = true;
-
-                        _watcher = watcher;
-                    }
                 }
             }
 
-            private void WatcherOnDeleted(object sender, FileSystemEventArgs e)
+            private void OnFileDeleted(string path)
             {
                 Path = Path; // force validation
             }
@@ -127,7 +115,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             }
 
             private readonly Dictionary<string, List<string>> _errorsByPropertyName = new Dictionary<string, List<string>>();
-            private string _path = "";
+            private IFilePath _filePath;
             private bool _isWatched;
             private bool _canSaveWatchedCommand;
             private bool _canExportAndWatchCommand;
@@ -164,13 +152,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 }
             }
 
-            private void WatcherOnChanged(object sender, FileSystemEventArgs e)
+            private void OnFileChanged(string path)
             {
-                if (e.ChangeType != WatcherChangeTypes.Changed)
-                {
-                    return;
-                }
-
                 // using the Dispatcher so we can use WaitCursor later
                 Application.Current.Dispatcher.Invoke(() => UpdateMeshTexture(Path, true));
                 _logger.Here().Information($"Updating texture {Path}");
