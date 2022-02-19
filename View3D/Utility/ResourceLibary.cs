@@ -110,14 +110,23 @@ namespace View3D.Utility
                     using var image = Pfim.Pfim.FromStream(stream);
                     out_imageInfo.SetFromImage(image);
 
-                    if (image.Format != ImageFormat.Rgba32)
+
+                    Texture2D texture;
+                    if (image.Format == ImageFormat.Rgba32)
+                    {
+                        texture = new Texture2D(device, image.Width, image.Height, true, SurfaceFormat.Bgra32);
+                        texture.SetData(0, null, image.Data, 0, image.DataLen);
+                    }
+                    else if (image.Format == ImageFormat.Rgb8)
+                    {
+                        texture = new Texture2D(device, image.Width, image.Height, true, SurfaceFormat.Rgb8Etc2);
+                        texture.SetData(0, null, image.Data, 0, image.DataLen);
+                    }
+                    else
                     {
                         _logger.Here().Error($"Error loading texture ({fileName} - Unkown textur format {image.Format})");
                         return null;
                     }
-
-                    var texture = new Texture2D(device, image.Width, image.Height, true, SurfaceFormat.Bgra32);
-                    texture.SetData(0, null, image.Data, 0, image.DataLen);
 
                     // Load mipmaps
                     for (int i = 0; i < image.MipMaps.Length; i++)

@@ -95,11 +95,11 @@ namespace CommonControls.FileTypes.Animation
             
             header.AnimationTotalPlayTimeInSec = chunk.ReadSingle();
 
-            bool isSupportedAnimationFile = header.Version == 5 || header.Version == 6 || header.Version == 7 || header.Version == 4;
+            bool isSupportedAnimationFile = header.Version == 4 || header.Version == 5 || header.Version == 6 || header.Version == 7 || header.Version == 8;
             if (!isSupportedAnimationFile)
                 throw new Exception($"Unsuported animation format: {header.Version}");
 
-            return header;
+           return header;
         }
 
 
@@ -194,6 +194,9 @@ namespace CommonControls.FileTypes.Animation
                 };
             }
 
+            if (output.Header.Version == 8)
+                return LoadV8(chunk, output, boneCount);
+
             // Remapping tables, not sure how they really should be used, but this works.
             for (int i = 0; i < boneCount; i++)
             {
@@ -240,6 +243,64 @@ namespace CommonControls.FileTypes.Animation
 
             if (chunk.BytesLeft != 0)
                 throw new Exception($"{chunk.BytesLeft} bytes left in animation");
+
+            return output;
+        }
+
+        static AnimationFile LoadV8(ByteChunk chunk, AnimationFile output, uint boneCount)
+        {
+            var index = chunk.Index;
+            chunk.Index = index;
+
+            /// -----------------
+            var unk0 = chunk.ReadUInt32();
+            var unk1 = chunk.ReadUInt32();
+            var translations = new List<sbyte>();
+            var quaternions = new List<sbyte>();
+
+            for (int i = 0; i < boneCount; i++)
+                translations.Add((sbyte)chunk.ReadByte());
+
+            for (int i = 0; i < boneCount; i++)
+                quaternions.Add((sbyte)chunk.ReadByte());
+
+            var range_map_translation_length = chunk.ReadUInt32();
+            var range_map_quaterion_length = chunk.ReadUInt32();
+            var range_map_translations = new (RmvVector3 Min, RmvVector3 Max)[range_map_translation_length];
+            var range_map_quaternion = new (RmvVector4 Min, RmvVector4 Max)[range_map_quaterion_length];
+
+            for (var i = 0; i < range_map_translation_length; i++)
+            {
+                range_map_translations[i].Min = new RmvVector3(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
+                range_map_translations[i].Max = new RmvVector3(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
+            }
+
+            for (var i = 0; i < range_map_translation_length; i++)
+            {
+                range_map_quaternion[i].Min = new RmvVector4(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
+                range_map_quaternion[i].Max = new RmvVector4(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
+            }
+
+            // Load static frame
+            var const_track_tranlations_count = chunk.ReadUInt32();
+            var const_track_quaternions_count = chunk.ReadUInt32();
+            if(const_track_tranlations_count != 0 || const_track_quaternions_count != 0)
+                output.StaticFrame = ReadFrame(chunk, const_track_tranlations_count, const_track_quaternions_count);
+            
+            var frame_tracks_tranlations_count = chunk.ReadUInt32();
+            var frame_tracks_quaternions_count = chunk.ReadUInt32();
+            var frame_count = chunk.ReadUInt32();
+
+            for (var frameIndex = 0; frameIndex < frame_count; frameIndex++)
+            {
+                var frame = ReadFrame(chunk, frame_tracks_tranlations_count, frame_tracks_quaternions_count);
+                output.DynamicFrames.Add(frame);
+            }
+            if (chunk.BytesLeft != 0)
+                throw new Exception($"{chunk.BytesLeft} bytes left in animation");
+
+
+            // Convert it all to just dynamic frames, dont want to show that shit anywhere else...
 
             return output;
         }

@@ -166,7 +166,8 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
         public void Dispose()
         {
             var selectionMgr = ComponentManager.GetComponent<SelectionManager>();
-            selectionMgr.SelectionChanged -= SelectionMgr_SelectionChanged;
+            if(selectionMgr != null)
+                selectionMgr.SelectionChanged -= SelectionMgr_SelectionChanged;
             _lineRenderer.Dispose();
         }
     }

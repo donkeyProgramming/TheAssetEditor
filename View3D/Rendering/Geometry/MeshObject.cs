@@ -78,9 +78,11 @@ namespace View3D.Rendering.Geometry
             VertexArray[vertexId].Position.Z = VertexArray[vertexId].Position.Z / VertexArray[vertexId].Position.W;
             VertexArray[vertexId].Position.W = 1;
 
-            VertexArray[vertexId].Normal = Vector3.TransformNormal(VertexArray[vertexId].Normal, transform);
-            VertexArray[vertexId].BiNormal = Vector3.TransformNormal(VertexArray[vertexId].BiNormal, transform);
-            VertexArray[vertexId].Tangent = Vector3.TransformNormal(VertexArray[vertexId].Tangent, transform);
+            var normalMatrix = Matrix.Transpose(Matrix.Invert(transform));
+
+            VertexArray[vertexId].Normal = Vector3.TransformNormal(VertexArray[vertexId].Normal, normalMatrix);
+            VertexArray[vertexId].BiNormal = Vector3.TransformNormal(VertexArray[vertexId].BiNormal, normalMatrix);
+            VertexArray[vertexId].Tangent = Vector3.TransformNormal(VertexArray[vertexId].Tangent, normalMatrix);
 
             VertexArray[vertexId].Normal.Normalize();
             VertexArray[vertexId].BiNormal.Normalize();

@@ -43,7 +43,7 @@ namespace CommonControls.Services
                 try
                 {
                     var brokenAnims = new string[] { "rigidmodels\\buildings\\roman_aqueduct_straight\\roman_aqueduct_straight_piece01_destruct01_anim.anim" };
-
+                    return;
                     if (brokenAnims.Contains(fullPath))
                     {
                         _logger.Here().Warning("Skipping loading of known broken file - " + fullPath);
@@ -140,6 +140,12 @@ namespace CommonControls.Services
                         }
                     }
                 }
+
+                // Try loading from path as a backup in case loading failed. Looking at you wh3...
+                var path = $"animations\\skeletons\\{skeletonName}.anim";
+                var animationFile = pfs.FindFile(path);
+                if (animationFile != null)
+                    return AnimationFile.Create(animationFile);
                 return null;
             }
         }
@@ -148,7 +154,6 @@ namespace CommonControls.Services
         {
             lock (_threadLock)
             {
-
                 var fullPath = pfs.GetFullPath(animation);
                 foreach (var entry in _skeletonNameToAnimationMap.Values)
                 {

@@ -8,8 +8,7 @@ namespace CommonControls.FileTypes.RigidModel.Types
 
     public enum TexureType
     {
-        Diffuse = 0,
-        Diffuse_alternative = 27,
+        Diffuse = 0,   
         Normal = 1,
         Mask = 3,
         Ambient_occlusion = 5,
@@ -20,7 +19,9 @@ namespace CommonControls.FileTypes.RigidModel.Types
         Decal_dirtmap = 13,
         Decal_dirtmask = 14,
         Decal_mask = 15,
-        Diffuse_damage = 17
+        Diffuse_damage = 17,
+        BaseColour = 27,
+        MaterialMap = 29,
     }
 
     [Serializable]

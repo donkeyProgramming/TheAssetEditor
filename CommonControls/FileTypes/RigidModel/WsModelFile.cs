@@ -63,12 +63,22 @@ namespace CommonControls.FileTypes.RigidModel
                     Textures[TexureType.Mask] = texturePath;
                 else if (textureSlotName == "s_mask1")
                     Textures[TexureType.Mask] = texturePath;
+                else if (textureSlotName == "t_xml_mask")
+                    Textures[TexureType.Mask] = texturePath;
 
                 if (textureSlotName == "s_normal")
+                    Textures[TexureType.Normal] = texturePath;
+                else if(textureSlotName == "t_xml_material_map")
                     Textures[TexureType.Normal] = texturePath;
 
                 if (textureSlotName == "s_specular")
                     Textures[TexureType.Specular] = texturePath;
+
+                if(textureSlotName == "t_xml_base_colour")
+                    Textures[TexureType.BaseColour] = texturePath;
+
+                if (textureSlotName == "t_xml_material_map")
+                    Textures[TexureType.MaterialMap] = texturePath;
             }
         }
     }

@@ -16,6 +16,7 @@ using CommonControls.Services;
 using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using TextureEditor;
 using View3D;
 
 namespace AssetEditor
@@ -63,6 +64,8 @@ namespace AssetEditor
             CampaignAnimBin_DependencyInjectionContainer.Register(services);
             VariantMeshDefinition_DependencyInjectionContainer.Register(services);
             AnimationFilePreviewEditor_DependencyInjectionContainer.Register(services);
+            TextureEditor_DependencyInjectionContainer.Register(services);
+
             //AnimMetaDecoder_DependencyInjectionContainer.Register(services);
         }
 
@@ -77,6 +80,7 @@ namespace AssetEditor
             CampaignAnimBin_DependencyInjectionContainer.RegisterTools(factory);
             VariantMeshDefinition_DependencyInjectionContainer.RegisterTools(factory);
             AnimationFilePreviewEditor_DependencyInjectionContainer.RegisterTools(factory);
+            TextureEditor_DependencyInjectionContainer.RegisterTools(factory);
             // AnimMetaDecoder_DependencyInjectionContainer.RegisterTools(factory);
         }
 

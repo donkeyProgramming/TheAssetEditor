@@ -60,9 +60,11 @@ namespace AssetEditor.ViewModels
         public ICommand OpenAnimationBatchExporterCommand { get; set; }
         public ICommand OpenAnimationBuilderCommand { get; set; }
 
+        public ICommand SearchCommand { get; set; }
         public ICommand OpenRome2RePacksCommand { get; set; }
         public ICommand OpenThreeKingdomsPacksCommand { get; set; }
         public ICommand OpenWarhammer2PacksCommand { get; set; }
+        public ICommand OpenWarhammer3PacksCommand { get; set; }
         public ICommand OpenTroyPacksCommand { get; set; }
         public ICommand OpenAttilaPacksCommand { get; set; }
 
@@ -79,6 +81,7 @@ namespace AssetEditor.ViewModels
         public IEditorCreator EditorCreator { get; set; }
         public ICommand GenerateRmv2ReportCommand { get; set; }
         public ICommand GenerateMetaDataReportCommand { get; set; }
+        public ICommand GenerateFileListReportCommand { get; set; }
         public ICommand CreateAnimPackWarhammerCommand { get; set; }
         public ICommand CreateAnimPack3kCommand { get; set; }
 
@@ -111,11 +114,15 @@ namespace AssetEditor.ViewModels
 
             GenerateRmv2ReportCommand = new RelayCommand(GenerateRmv2Report);
             GenerateMetaDataReportCommand = new RelayCommand(GenerateMetaDataReport);
-            
+            GenerateFileListReportCommand = new RelayCommand(GenerateFileListReport);
+
+            SearchCommand = new RelayCommand(Search);
+
             OpenAttilaPacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Attila));
             OpenRome2RePacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Rome_2_Remastered));
             OpenThreeKingdomsPacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.ThreeKingdoms));
             OpenWarhammer2PacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Warhammer2));
+            OpenWarhammer3PacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Warhammer3));
             OpenTroyPacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Troy));
 
             OpenHelpCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://tw-modding.com/index.php/Tutorial:AssetEditor") { CreateNoWindow = true }));
@@ -337,12 +344,23 @@ namespace AssetEditor.ViewModels
             reportGenerator.Create(gameName);
         }
 
-        void GenerateMetaDataReport()
-        {
-            var gameName = GameInformationFactory.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
-            var reportGenerator = new AnimMetaDataReportGenerator(_packfileService);
-            reportGenerator.Create(gameName);
-        }
+        void GenerateMetaDataReport() => AnimMetaDataReportGenerator.Generate(_packfileService, _settingsService);
 
+        void GenerateFileListReport() => FileListReportGenerator.Generate(_packfileService, _settingsService);
+
+
+        void Search()
+        {
+            TextInputWindow window = new TextInputWindow("Deep search - Output in console", "");
+            if (window.ShowDialog() == true)
+            {
+                if (string.IsNullOrWhiteSpace(window.TextValue))
+                {
+                    MessageBox.Show("Invalid input");
+                    return;
+                }
+                _packfileService.DeepSearch(window.TextValue, false);
+            }
+        }
     }
 }

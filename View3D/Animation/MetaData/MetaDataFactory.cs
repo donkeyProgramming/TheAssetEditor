@@ -74,7 +74,7 @@ namespace View3D.Animation.MetaData
             foreach (var meteDataItem in file.GetItemsOfType<FirePos>())
                 output.Add(CreateStaticLocator(meteDataItem, meteDataItem.Position, "FirePos"));
 
-            foreach (var meteDataItem in file.GetItemsOfType<Effect>())
+            foreach (var meteDataItem in file.GetItemsOfType<Effect_v11>())
                 output.Add(CreateEffect(meteDataItem));
 
             foreach (var meteDataItem in file.GetItemsOfType<DockEquipment>())
@@ -182,7 +182,7 @@ namespace View3D.Animation.MetaData
             return new DrawableMetaInstance(metaData.StartTime, metaData.EndTime, node.Name, node);
         }
 
-        IMetaDataInstance CreateEffect(Effect effect)
+        IMetaDataInstance CreateEffect(Effect_v11 effect)
         {
             var resourceLib = _componentManager.GetComponent<ResourceLibary>();
         

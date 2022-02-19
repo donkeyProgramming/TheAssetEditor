@@ -1,7 +1,9 @@
 ﻿using CommonControls.BaseDialogs;
+using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using Microsoft.Xna.Framework.Graphics;
+using Serilog;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -10,11 +12,69 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using TextureEditor.Views;
+using View3D.Rendering.Geometry;
 using View3D.Scene;
 using View3D.Utility;
 
 namespace TextureEditor.ViewModels
 {
+    // This really needs some cleanup
+
+    public class TextureEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel, IDisposable
+    {
+        ILogger _logger = Logging.Create<TextureEditorViewModel>();
+        PackFileService _pfs;
+        PackFile _file;
+        TexturePreviewController _controller;
+
+        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>();
+
+        
+        public PackFile MainFile { get => _file; set => Load(value); }
+        public bool HasUnsavedChanges { get => false; set { } }
+
+
+        TexturePreviewViewModel _viewModel;
+        public TexturePreviewViewModel ViewModel 
+        {
+            get => _viewModel;
+            set => SetAndNotify(ref _viewModel, value);
+        }
+
+        public TextureEditorViewModel(PackFileService pfs)
+        {
+            _pfs = pfs;
+        }
+
+        public void Load(PackFile file)
+        {
+            _file = file;
+            DisplayName.Value = file.Name;
+
+            var viewModel = new TexturePreviewViewModel();
+            viewModel.ImagePath.Value = _pfs.GetFullPath(file);
+
+            _controller = new TexturePreviewController(_pfs.GetFullPath(file), viewModel, _pfs);
+            ViewModel = viewModel;
+        }
+
+        public void ShowTextureDetailsInfo() => ViewModel.ShowTextureDetailsInfo();
+
+        public void Close()
+        {
+           
+        }
+
+        public bool Save() => false;
+
+        public void Dispose()
+        {
+            if (_controller != null)
+                _controller.Dispose();
+        }
+    }
+
+
     public class TexturePreviewController : IDisposable
     {
         PackFileService _packFileService;
@@ -23,58 +83,41 @@ namespace TextureEditor.ViewModels
         string _imagePath;
         TexturePreviewViewModel _viewModel;
         SceneContainer _scene;
+        MeshObject _mesh;
 
-        public static void CreateWindow(string imagePath, PackFileService packFileService)
+        public class ViewModelWrapper: NotifyPropertyChangedImpl
+        {
+            TexturePreviewViewModel _viewModel;
+            public TexturePreviewViewModel ViewModel
+            {
+                get => _viewModel;
+                set => SetAndNotify(ref _viewModel, value);
+            }
+
+            public void ShowTextureDetailsInfo() => ViewModel.ShowTextureDetailsInfo();
+        }
+
+        public static void CreateWindow(string imagePath, PackFileService packFileService, MeshObject meshObject)
         {
             TexturePreviewViewModel viewModel = new TexturePreviewViewModel();
             viewModel.ImagePath.Value = imagePath;
 
-            using (var controller = new TexturePreviewController(imagePath, viewModel, packFileService))
+            using (var controller = new TexturePreviewController(imagePath, viewModel, packFileService, meshObject))
             {
                 var containingWindow = new ControllerHostWindow(false, ResizeMode.CanResize);
                 containingWindow.Title = "Texture Preview Window";
-                containingWindow.Content = new TexturePreviewView() { DataContext = viewModel };
+                containingWindow.Content = new TexturePreviewView() { DataContext = new ViewModelWrapper() { ViewModel = viewModel } };
                 containingWindow.ShowDialog();
             }
         }
 
-        public static void CreateFromFilePath(string imageDiskPath, PackFileService packFileService)
-        {
-            try
-            {
-                if (packFileService.HasEditablePackFile() == false)
-                    return;
-
-                var directoryPath = Path.GetDirectoryName(imageDiskPath);
-                var justFileName = Path.GetFileName(imageDiskPath);
-                var temp_packFile = new PackFile(justFileName, new FileSystemSource(imageDiskPath));
-                packFileService.AddFileToPack(packFileService.GetEditablePack(), Path.GetDirectoryName(imageDiskPath), temp_packFile);
-
-                TexturePreviewViewModel viewModel = new TexturePreviewViewModel();
-                viewModel.ImagePath.Value = imageDiskPath;
-
-                using (var controller = new TexturePreviewController(imageDiskPath, viewModel, packFileService))
-                {
-                    var containingWindow = new ControllerHostWindow(false, ResizeMode.CanResize);
-                    containingWindow.Title = "Texture Preview Window";
-                    containingWindow.Content = new TexturePreviewView() { DataContext = viewModel };
-                    containingWindow.ShowDialog();
-                }
-
-                packFileService.DeleteFile(packFileService.GetEditablePack(), temp_packFile);
-            }
-            catch (Exception e)
-            { 
-                
-            }
-        }
-
-
-        public TexturePreviewController(string imagePath, TexturePreviewViewModel viewModel, PackFileService packFileService)
+        public TexturePreviewController(string imagePath, TexturePreviewViewModel viewModel, PackFileService packFileService, MeshObject meshObject = null)
         {
             _imagePath = imagePath;
             _viewModel = viewModel;
             _packFileService = packFileService;
+
+            _mesh = meshObject;
 
             _scene = new SceneContainer();
             _scene.Components.Add(new ResourceLibary(_scene, packFileService ));

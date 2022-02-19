@@ -45,6 +45,7 @@
                     <MenuItem Header="Rome2 Remastered" Command="{Binding MenuBar.OpenRome2RePacksCommand}"/>
                     <MenuItem Header="Three Kingdoms" Command="{Binding MenuBar.OpenThreeKingdomsPacksCommand}"/>
                     <MenuItem Header="Warhammer 2" Command="{Binding MenuBar.OpenWarhammer2PacksCommand}"/>
+                    <MenuItem Header="Warhammer 3" Command="{Binding MenuBar.OpenWarhammer3PacksCommand}"/>
                     <MenuItem Header="Troy" Command="{Binding MenuBar.OpenTroyPacksCommand}"/>
                 </MenuItem>
                 <Separator/>
@@ -54,6 +55,9 @@
             <MenuItem Header="Reports">
                 <MenuItem Header="Rmv2" Command="{Binding MenuBar.GenerateRmv2ReportCommand}"/>
                 <MenuItem Header="Meta Data" Command="{Binding MenuBar.GenerateMetaDataReportCommand}"/>
+                <MenuItem Header="File List" Command="{Binding MenuBar.GenerateFileListReportCommand}"/>
+                <Separator/>
+                <MenuItem Header="Search" Command="{Binding MenuBar.SearchCommand}"/>
             </MenuItem>
         
             <MenuItem Header="Options">
@@ -78,7 +82,6 @@
                 <MenuItem Header="Kitbash Editor" Command="{Binding MenuBar.OpenKitbashEditorCommand}" IsEnabled="False" Visibility="Collapsed"/>
                 <MenuItem Header="Animated prop creator" Command="{Binding MenuBar.OpenPropCreatorCommand}" IsEnabled="False" Visibility="Collapsed"/>
                 <MenuItem Header="Pose Creator" Command="{Binding MenuBar.OpenPropCreatorCommand}" IsEnabled="False" Visibility="Collapsed"/>
-               
             </MenuItem>
 
             <MenuItem Header="About">

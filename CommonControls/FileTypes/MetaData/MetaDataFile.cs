@@ -23,10 +23,11 @@ namespace CommonControls.FileTypes.MetaData
     public abstract class BaseMetaEntry
     {
         public string Name { get; set; }
-        
+        public byte[] Data { get; set; }
+
         [MetaDataTag(0, "Version number of the Tag type", MetaDataTagAttribute.DisplayType.None, true)]
         public int Version { get; set; }
-        public byte[] Data { get; set; }
+       
     }
 
     public class UnknownMetaEntry : BaseMetaEntry
@@ -48,8 +49,6 @@ namespace CommonControls.FileTypes.MetaData
         [MetaDataTag(4, "Id to enable or disable, almost always 0")]
         public int Id { get; set; }
     }
-
-
 
     public class MetaDataAttribute : Attribute
     {

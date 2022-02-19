@@ -44,12 +44,12 @@ namespace CommonControls.FileTypes.MetaData
                 // Convert to sensible stuff
                 foreach (var item in items)
                 {
-                    try
-                    {
-                        var deserializedTag = MetaDataTagDeSerializer.DeSerialize(item);
-                        outputFile.Items.Add(deserializedTag);
-                    }
-                    catch (Exception e)
+                   try
+                   {
+                       var deserializedTag = MetaDataTagDeSerializer.DeSerialize(item);
+                       outputFile.Items.Add(deserializedTag);
+                   }
+                   catch (Exception e)
                     {
                         _logger.Here().Error($"Failed to parse tag of type {item.Name}_{item.Version} - {e.Message}");
                         outputFile.Items.Add(item);

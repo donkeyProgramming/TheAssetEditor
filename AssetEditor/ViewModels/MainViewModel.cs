@@ -86,7 +86,7 @@ namespace AssetEditor.ViewModels
 
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
             {
-                settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Warhammer2;
+                //settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Troy;
                 var gamePath = settingsService.GetGamePathForCurrentGame();
                 if (gamePath != null)
                 {
@@ -101,8 +101,6 @@ namespace AssetEditor.ViewModels
             {
                 //_packfileService.Load(@"C:\Users\ole_k\AssetEditor\MyStuff\raptor2b.pack");
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateFlyingSquig(this, toolFactory, packfileService);
-
-
 
                 //var r = new Rmv2Information(_packfileService);
                 //r.Create(GameInformationFactory.GetGameById(settingsService.CurrentSettings.CurrentGame).DisplayName);
@@ -163,7 +161,7 @@ namespace AssetEditor.ViewModels
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 //var f = packfileService.FindFile(@"animations\campaign\database\bin\cam_hero_hu1d_def_spear_and_shield.bin");
                 //
-                AnimationEditor.AnimationBuilder.AnimationBuilderViewModel.AnimationBuilder_Debug.CreateExampleAnimation(this, toolFactory, packfileService, animationLookUpHelper);
+                //AnimationEditor.AnimationBuilder.AnimationBuilderViewModel.AnimationBuilder_Debug.CreateExampleAnimation(this, toolFactory, packfileService, animationLookUpHelper);
 
 
                 //packfileService.DeepSearch("wh2_main_vor_deadwood_the_frozen_city", false);
@@ -181,11 +179,14 @@ namespace AssetEditor.ViewModels
                 // OpenFile(packfileService.FindFile(@"animations\database\battle\bin\animation_tables.animpack"));
                 // OpenFile(packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack"));
 
-                //OpenFile(packfileService.FindFile(@"variantmeshes\_variantmodels\man\skin\cleopatra_mark_antony_trailer\mark_antony_lod1.rigid_model_v2"));
+                //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1e\cth\cth_dragon_storm_human\cth_dragon_storm_human_body_01.rigid_model_v2"));
 
+                //OpenFile(packfileService.FindFile(@"animations\battle\hybridcreature07\nurgle\attacks\hc7_nurgle_attack_05.anim"));
+                OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc1\tmb\tmb_warsphinx\tex\tmb_warsphinx_armour_01_base_colour.dds"));
+                
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 
-                //KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
+                KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);
 

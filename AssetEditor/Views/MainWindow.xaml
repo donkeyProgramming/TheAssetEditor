@@ -12,7 +12,7 @@
         behaviors:WindowCancellableClosingBehavior.Closing="{Binding ClosingCommand}"
         behaviors:WindowCancellableClosingBehavior.IsClosingWithoutPrompt="{Binding IsClosingWithoutPrompt}"
         mc:Ignorable="d"
-        Title="AssetEditor" Height="1024" Width="2000">
+        Title="AssetEditor v0.26" Height="1024" Width="2000">
     <Window.Resources>
         <viewFacotry:EditorTemplateSelector x:Key="EditorSelector" />
     </Window.Resources>

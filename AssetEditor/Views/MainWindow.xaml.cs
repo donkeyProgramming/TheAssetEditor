@@ -28,6 +28,11 @@ namespace AssetEditor.Views
         public MainWindow()
         {
             InitializeComponent();
+
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            var fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
+
+            Title = $"AssetEditor v{fvi.FileMajorPart}.{fvi.FileMinorPart}";
         }
 
         private void tabItem_MouseDown(object sender, MouseButtonEventArgs e)

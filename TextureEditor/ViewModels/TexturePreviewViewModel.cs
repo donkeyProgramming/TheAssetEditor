@@ -14,10 +14,18 @@ namespace TextureEditor.ViewModels
         public NotifyAttr<ImageSource> ActiveImage { get; set; } = new NotifyAttr<ImageSource>();
         public NotifyAttr<ImageSource> CheckBoardImage { get; set; } = new NotifyAttr<ImageSource>();
 
+
+       //
+       //    <ComboBox  HorizontalAlignment="Center" VerticalAlignment="Center" 
+       //                       SelectedValue="{Binding Path=UvChannelSelectedValue.Value, UpdateSourceTrigger=PropertyChanged}" 
+       //                       ItemsSource="{Binding Path=UvChannelPossibleValues, UpdateSourceTrigger=PropertyChanged}"/>
+       //
+
         public NotifyAttr<string> ImagePath { get; set; } = new NotifyAttr<string>();
         public NotifyAttr<string> Format { get; set; } = new NotifyAttr<string>();
         public NotifyAttr<int> Width { get; set; } = new NotifyAttr<int>();
         public NotifyAttr<int> Height { get; set; } = new NotifyAttr<int>();
+        public NotifyAttr<uint> NumMipMaps { get; set; } = new NotifyAttr<uint>();
 
         public bool FormatRgbaCheckbox { get => _formatCheckbox[0]; set => UpdateFormat(0, value); }
         public bool FormatRCheckbox { get => _formatCheckbox[1]; set => UpdateFormat(1, value); }
@@ -58,6 +66,7 @@ namespace TextureEditor.ViewModels
             Width.Value = _information.Width;
             Height.Value = _information.Height;
             Format.Value = _information.Format.ToString();
+            NumMipMaps.Value = _information.Header_MipMapCount;
 
         }
 

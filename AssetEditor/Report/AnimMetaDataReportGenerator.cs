@@ -5,6 +5,7 @@ using CsvHelper;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Dynamic;
 using System.Globalization;
 using System.IO;
@@ -28,16 +29,26 @@ namespace AssetEditor.Report
 
 
         PackFileService _pfs;
-        public AnimMetaDataReportGenerator(PackFileService pfs)
+        ApplicationSettingsService _settingsService;
+        public AnimMetaDataReportGenerator(PackFileService pfs, ApplicationSettingsService settingsService)
         {
             _pfs = pfs;
+            _settingsService = settingsService;
         }
 
-        public void Create(string gameDirectory, string outputDir = @"c:\temp\AssReports\Meta\")
+        public static void Generate(PackFileService pfs, ApplicationSettingsService settingsService)
         {
-            // Create folders
-            var gameOutputDir = outputDir + $"\\{gameDirectory}\\";
-            var gameOutputDirFailed = outputDir + $"\\{gameDirectory}\\Failed\\";
+            var instance = new AnimMetaDataReportGenerator(pfs, settingsService);
+            instance.Create();
+        }
+
+        public void Create()
+        {
+
+            var gameName = GameInformationFactory.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
+            var timeStamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+            var gameOutputDir = $"{DirectoryHelper.ReportsDirectory}\\MetaData\\{gameName}_{timeStamp}\\";
+            var gameOutputDirFailed = $"{gameOutputDir}\\Failed\\";
             if (Directory.Exists(gameOutputDir))
                 Directory.Delete(gameOutputDir, true);
             DirectoryHelper.EnsureCreated(gameOutputDir);
@@ -75,23 +86,23 @@ namespace AssetEditor.Report
                         try
                         {
                             var variables = MetaDataTagDeSerializer.DeSerializeToStrings(item);
-
+                        
                             if (output[tagName].CompletedFiles.Count == 0)
                             {
                                 foreach (var variable in variables)
                                     output[tagName].Headers.Add(variable.Header);
                             }
-
+                        
                             var variableValues = variables.Select(x => x.Value).ToList();
                             variableValues.Insert(0, fileName);
                             variableValues.Insert(1, "");
-
+                        
                             output[tagName].CompletedFiles.Add(variableValues);
                             completedTags++;
                         }
                         catch(Exception e)
                         {
-                            var variableValues = new List<string>() { fileName, e.Message };
+                            var variableValues = new List<string>() { fileName, e.Message, item.Data.Length.ToString() };
                             output[tagName].FailedFiles.Add(variableValues);
                         }
                     }
@@ -124,6 +135,7 @@ namespace AssetEditor.Report
                 {
                     var content = new StringWriter();
                     content.WriteLine("sep=|");
+                    content.WriteLine("FileName|Error|DataLength");
                     foreach (var failed in item.Value.FailedFiles)
                         content.WriteLine(string.Join("|", failed));
 
@@ -132,18 +144,17 @@ namespace AssetEditor.Report
                 }
             }
 
+            var summaryContent = new StringWriter();
+            summaryContent.WriteLine("sep=|");
+            summaryContent.WriteLine("Tag|Completed|Failed|Ratio");
             foreach (var item in output)
             {
-                var content = new StringWriter();
-                content.WriteLine("sep=|");
-
-                var str = $"{item.Key}| {item.Value.CompletedFiles.Count}/{item.Value.CompletedFiles.Count + item.Value.FailedFiles.Count}";
+                var str = $"{item.Key}| {item.Value.CompletedFiles.Count}| {item.Value.FailedFiles.Count} |{item.Value.FailedFiles.Count}/{item.Value.CompletedFiles.Count + item.Value.FailedFiles.Count}";
                 _logger.Here().Information(str);
-                content.WriteLine(str);
-
-                var fileName = gameOutputDir + "Summary.csv";
-                File.WriteAllText(fileName, content.ToString());
+                summaryContent.WriteLine(str); 
             }
+            var summaryFileName = gameOutputDir + "Summary.csv";
+            File.WriteAllText(summaryFileName, summaryContent.ToString());
 
             var commonHeaderContent = new StringWriter();
             commonHeaderContent.WriteLine("sep=|");
@@ -160,7 +171,8 @@ namespace AssetEditor.Report
             var commonHeaderFile = gameOutputDir + "CommonHeader.csv";
             File.WriteAllText(commonHeaderFile, commonHeaderContent.ToString());
 
-            MessageBox.Show($"Done - Created at {outputDir}");
+            MessageBox.Show($"Done - Created at {gameOutputDir}");
+            Process.Start("explorer.exe", gameOutputDir);
         }
 
         void Write(List<dynamic> dataRecords, string filePath)

@@ -60,10 +60,11 @@ namespace Filetypes.ByteParsing
 
         public virtual bool CanDecode(byte[] buffer, int index, out int bytesRead, out string _error)
         {
-            if (buffer.Length - index < FieldSize)
+            var bytesLeft = buffer.Length - index;
+            if (bytesLeft < FieldSize)
             {
                 bytesRead = 0;
-                _error = "Not enough space in stream";
+                _error = $"Not enough space in stream. Asking for {FieldSize} bytes, but only {bytesLeft} bytes left";
                 return false;
             }
             bytesRead = FieldSize;
@@ -578,10 +579,11 @@ namespace Filetypes.ByteParsing
 
         public bool CanDecode(byte[] buffer, int index, out int bytesRead, out string _error)
         {
-            if (buffer.Length - index < FieldSize)
+            var bytesLeft = buffer.Length - index;
+            if (bytesLeft < FieldSize)
             {
                 bytesRead = 0;
-                _error = "Not enough space in stream";
+                _error = $"Not enough space in stream. Asking for {FieldSize} bytes, but only {bytesLeft} bytes left";
                 return false;
             }
             var value = buffer[index];
@@ -866,10 +868,11 @@ namespace Filetypes.ByteParsing
 
         public override bool CanDecode(byte[] buffer, int index, out int bytesRead, out string _error)
         {
-            if (buffer.Length - index < FieldSize)
+            var bytesLeft = buffer.Length - index;
+            if (bytesLeft < FieldSize)
             {
                 bytesRead = 0;
-                _error = "Not enough space in stream";
+                _error = $"Not enough space in stream. Asking for {FieldSize} bytes, but only {bytesLeft} bytes left";
                 return false;
             }
 

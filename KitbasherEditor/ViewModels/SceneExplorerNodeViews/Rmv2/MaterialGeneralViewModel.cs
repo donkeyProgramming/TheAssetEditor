@@ -55,10 +55,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 _meshNode = meshNode;
                 _texureType = texureType;
                 TextureTypeStr = _texureType.ToString();
-                Path = _meshNode.Material.GetTexture(texureType)?.Path;
+                _path = _meshNode.Material.GetTexture(texureType)?.Path;
+                ValidateTexturePath();
             }
 
-            public void Preview() => TexturePreviewController.CreateWindow(Path, _packfileService);
+            public void Preview() => TexturePreviewController.CreateWindow(Path, _packfileService, _meshNode.Geometry);
 
             public void Browse()
             {

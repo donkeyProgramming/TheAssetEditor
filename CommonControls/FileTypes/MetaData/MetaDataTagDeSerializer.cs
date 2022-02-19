@@ -27,7 +27,8 @@ namespace CommonControls.FileTypes.MetaData
                 where attributes != null && attributes.Length > 0
                 select new { Type = t, Attributes = attributes.Cast<MetaDataAttribute>() };
 
-            foreach (var instance in typesWithMyAttribute)
+            var typesWithMyAttributeList = typesWithMyAttribute.ToList();
+            foreach (var instance in typesWithMyAttributeList)
             {
                 var type = instance.Type;
                 var key = instance.Attributes.First().VersionName;
@@ -118,11 +119,17 @@ namespace CommonControls.FileTypes.MetaData
             _descriptionMap["SOUND_BUILDING"] = "Time, event and position of sound to be triggered";
             _descriptionMap["SOUND_TRIGGER"] = "Time and type of sound to be triggered";
             _descriptionMap["SOUND_SPHERE"] = "Time and type of sound sphere to be triggered";
+            _descriptionMap["CANNOT_DISMEMBER"] = "mark an attack as not causing dismemberment";
+            _descriptionMap["USE_BASE_METADATA"] = "Force the use of metadata in the base anim slot during a hardcoded splice. All metadata in the hardcoded splice slot is ignored.";
+            _descriptionMap["RIDER_ANIMATION_REQUIRED"] = "Mark the mount animation as needing a synced rider animation is corresponding rider slot.";
+            _descriptionMap["SHADER_PARAMETER"] = "Modify specified shader parameter. Blends between two closest values.";
         }
 
         public static string GetDescription(string metaDataTagName)
         {
             EnsureMappingTableCreated();
+            if (_descriptionMap.ContainsKey(metaDataTagName) == false)
+                throw new Exception($"Unable to get description of {metaDataTagName}");
             return _descriptionMap[metaDataTagName];
         }
 
@@ -172,8 +179,9 @@ namespace CommonControls.FileTypes.MetaData
                 proptery.SetValue(instance, value);
             }
 
-            if (bytes.Length != currentIndex)
-                throw new Exception("Failed to read object - bytes left");
+            var bytesLeft = bytes.Length - currentIndex;
+            if (bytesLeft != 0)
+                throw new Exception($"Failed to read object - {bytesLeft} bytes left");
 
             var typedInstance = instance as DecodedMetaEntryBase;
             typedInstance.Name = entry.Name;
@@ -213,8 +221,9 @@ namespace CommonControls.FileTypes.MetaData
                 output.Add((proptery.Name, value));
             }
 
-            if (bytes.Length != currentIndex)
-                throw new Exception("Failed to read object - bytes left");
+            var bytesLeft = bytes.Length - currentIndex;
+            if (bytesLeft != 0)
+                throw new Exception($"Failed to read object - {bytesLeft} bytes left");
 
             return output;
         }
@@ -223,7 +232,7 @@ namespace CommonControls.FileTypes.MetaData
         {
             var metaDataType = GetTypeFromMeta(entry);
             if (metaDataType == null)
-                throw new Exception($"Unable to find decoder for {entry.Name} _ {entry.Version}");
+                throw new Exception($"Unable to find decoder for {entry.Name}_{entry.Version}");
 
             var instance = Activator.CreateInstance(metaDataType);
             var orderedPropertiesList = metaDataType.GetProperties()

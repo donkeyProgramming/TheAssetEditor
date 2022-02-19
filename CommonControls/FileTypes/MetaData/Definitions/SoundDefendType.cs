@@ -17,4 +17,12 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public int Unk2 { get; set; }
 
     }
+
+    [MetaData("SOUND_DEFEND_TYPE", 11)]
+    public class SoundDefendType_v11 : SoundDefendType_v10
+    {
+        [MetaDataTag(8)]
+        public int Unk3 { get; set; }
+
+    }
 }

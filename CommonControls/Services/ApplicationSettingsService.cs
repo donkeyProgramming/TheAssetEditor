@@ -62,7 +62,7 @@ namespace CommonControls.Services
         public void ValidateRecentPackFilePaths()
         {
             var recentPackfilePaths = CurrentSettings.RecentPackFilePaths;
-            var invalidPacks = recentPackfilePaths.Where(path => !File.Exists(path));
+            var invalidPacks = recentPackfilePaths.Where(path => !File.Exists(path)).ToList();
 
             foreach (var invalidPath in invalidPacks)
             {

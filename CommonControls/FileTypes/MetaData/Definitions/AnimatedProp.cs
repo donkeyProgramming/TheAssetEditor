@@ -42,4 +42,20 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         [MetaDataTag(14)]
         public float BlendOutTime { get; set; }
     }
+
+   //[MetaData("ANIMATED_PROP", 12)]
+   //public class AnimatedProp_v12 : AnimatedProp_v11
+   //{
+   //}
+   //
+   //[MetaData("ANIMATED_PROP", 13)]
+   //public class AnimatedProp_v13 : AnimatedProp_v12
+   //{
+   //}
+   //
+   //[MetaData("ANIMATED_PROP", 14)]
+   //public class AnimatedProp_v14 : AnimatedProp_v13
+   //{
+   //}
+
 }
