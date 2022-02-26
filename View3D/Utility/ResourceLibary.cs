@@ -17,7 +17,8 @@ namespace View3D.Utility
         Line,
         Mesh,
         TexturePreview,
-        Phazer,
+        Pbr_SpecGloss,
+        Pbs_MetalRough,
         BasicEffect,
         GeometryInstance,
     }
@@ -55,7 +56,8 @@ namespace View3D.Utility
             Content = _game.Content;
 
             // Load default shaders
-            LoadEffect("Shaders\\Phazer\\main", ShaderTypes.Phazer);
+            LoadEffect("Shaders\\Phazer\\MetalRoughness_main", ShaderTypes.Pbs_MetalRough);
+            LoadEffect("Shaders\\Phazer\\SpecGloss_main", ShaderTypes.Pbr_SpecGloss);
             LoadEffect("Shaders\\Geometry\\BasicShader", ShaderTypes.BasicEffect);
             LoadEffect("Shaders\\TexturePreview", ShaderTypes.TexturePreview);
             LoadEffect("Shaders\\LineShader", ShaderTypes.Line);

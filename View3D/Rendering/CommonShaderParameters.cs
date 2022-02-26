@@ -15,4 +15,10 @@ namespace View3D.Rendering
         public float LightIntensityMult { get; set; }
     }
 
+    public enum RenderFormats
+    { 
+        SpecGloss,
+        MetalRoughness
+    }
+
 }

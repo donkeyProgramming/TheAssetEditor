@@ -49,7 +49,13 @@
     <None Update="ContentOutput\Shaders\Phazer\Main.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="ContentOutput\Shaders\Phazer\MetalRoughness_main.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="ContentOutput\Shaders\Phazer\pbr_lib.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ContentOutput\Shaders\Phazer\SpecGloss_main.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="ContentOutput\Shaders\Phazer\tone_mapping.xnb">
@@ -85,7 +91,7 @@
     <None Update="Content\Shaders\Phazer\common_functions.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Content\Shaders\Phazer\Main.fx">
+    <None Update="Content\Shaders\Phazer\SpecGloss_main.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Content\Shaders\Phazer\pbr_lib.fx">

@@ -40,7 +40,7 @@ namespace AnimationEditor.MountAnimationCreator
         public NotifyAttr<uint> SelectedAnimationOutputFormat{ get; set; } = new NotifyAttr<uint>(7);
         public NotifyAttr<bool> EnsureUniqeFileName { get; set; } = new NotifyAttr<bool>(true);
         
-        public FilterCollection<AnimationSetFile> ActiveOutputFragment { get; set; }
+        public FilterCollection<AnimationFragmentFile> ActiveOutputFragment { get; set; }
         public FilterCollection<FragmentStatusSlotItem> ActiveFragmentSlot { get; set; }
 
         public AnimationSettingsViewModel AnimationSettings { get; set; } = new AnimationSettingsViewModel();
@@ -70,7 +70,7 @@ namespace AnimationEditor.MountAnimationCreator
             SelectedRiderBone = new FilterCollection<SkeletonBoneNode>(null, (x) => UpdateCanSaveAndPreviewStates());
             MountLinkController = new MountLinkViewModel(pfs, skeletonAnimationLookUpHelper, rider, mount, UpdateCanSaveAndPreviewStates);
 
-            ActiveOutputFragment = new FilterCollection<AnimationSetFile>(null, OutputFragmentSelected);
+            ActiveOutputFragment = new FilterCollection<AnimationFragmentFile>(null, OutputFragmentSelected);
             ActiveOutputFragment.SearchFilter = (value, rx) => { return rx.Match(value.FileName).Success; };
 
             ActiveFragmentSlot = new FilterCollection<FragmentStatusSlotItem>(null, (x)=> UpdateCanSaveAndPreviewStates());
@@ -127,7 +127,7 @@ namespace AnimationEditor.MountAnimationCreator
             UpdateCanSaveAndPreviewStates();
         }
 
-        void OutputFragmentSelected(AnimationSetFile fragment)
+        void OutputFragmentSelected(AnimationFragmentFile fragment)
         {
             if (fragment == null)
                 ActiveFragmentSlot.UpdatePossibleValues(null);
@@ -221,7 +221,7 @@ namespace AnimationEditor.MountAnimationCreator
         public void ViewRiderFragmentAction() => ViewFragment(MountLinkController.SelectedRider.SelectedItem);
         public void ViewOutputFragmentAction() => ViewFragment(ActiveOutputFragment.SelectedItem, true);
 
-        void ViewFragment(AnimationSetFile fragment, bool canEdit = false)
+        void ViewFragment(AnimationFragmentFile fragment, bool canEdit = false)
         {
             if (fragment != null)
             {

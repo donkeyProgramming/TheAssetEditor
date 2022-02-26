@@ -93,7 +93,8 @@ namespace KitbasherEditor.ViewModels
             _modelLoader = new KitbashSceneCreator(scene, _packFileService, Animation, MainFile, GeometryGraphicsContextFactory.CreateInstance(Scene.GraphicsDevice));
             MenuBar.ModelLoader = _modelLoader;
             MenuBar.General.ModelSaver = new SceneSaverService(_packFileService, this, _modelLoader.EditableMeshNode);
-            
+            MenuBar.General.WsModelGeneratorService = new WsModelGeneratorService(_packFileService, this, _modelLoader.EditableMeshNode);
+
             SceneExplorer.EditableMeshNode = _modelLoader.EditableMeshNode;
             
             if (MainFile != null)

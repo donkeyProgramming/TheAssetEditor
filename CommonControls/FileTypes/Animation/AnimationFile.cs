@@ -195,7 +195,7 @@ namespace CommonControls.FileTypes.Animation
             }
 
             if (output.Header.Version == 8)
-                return LoadV8(chunk, output, boneCount);
+                return LoadV8_hack(chunk, output, boneCount);
 
             // Remapping tables, not sure how they really should be used, but this works.
             for (int i = 0; i < boneCount; i++)
@@ -247,62 +247,210 @@ namespace CommonControls.FileTypes.Animation
             return output;
         }
 
-        static AnimationFile LoadV8(ByteChunk chunk, AnimationFile output, uint boneCount)
+
+        class AnimationV8OptimizationData
+        {
+            public uint BoneCount { get; private set; }
+            public sbyte[] TranslationBitRate { get; set; }
+            public sbyte[] RotationBitRate { get; set; }
+
+            public (RmvVector3 Min, RmvVector3 Max)[] Range_map_translations { get; set; }
+            public (RmvVector4 Min, RmvVector4 Max) [] Range_map_quaternion { get; set; }
+
+            public AnimationV8OptimizationData(uint boneCount)
+            {
+                BoneCount = boneCount;
+                TranslationBitRate = new sbyte[BoneCount];
+                RotationBitRate = new sbyte[BoneCount];
+            }
+        }
+
+
+        static AnimationFile LoadV8_hack(ByteChunk chunk, AnimationFile output, uint boneCount)
         {
             var index = chunk.Index;
             chunk.Index = index;
 
             /// -----------------
+            /// 
+            output.TranslationMappings.Clear();
+            output.RotationMappings.Clear();
             var unk0 = chunk.ReadUInt32();
             var unk1 = chunk.ReadUInt32();
-            var translations = new List<sbyte>();
-            var quaternions = new List<sbyte>();
 
-            for (int i = 0; i < boneCount; i++)
-                translations.Add((sbyte)chunk.ReadByte());
+            var optimizationData = new AnimationV8OptimizationData(boneCount);
 
+
+            var translationCounter = 0;
+            var translationCounterStatic = 0;
             for (int i = 0; i < boneCount; i++)
-                quaternions.Add((sbyte)chunk.ReadByte());
+            {
+                optimizationData.TranslationBitRate[i] = (sbyte)chunk.ReadByte();
+                int value = -1;
+                if(optimizationData.TranslationBitRate[i] < 0)
+                    value = 10000 + translationCounterStatic++;
+                else if (optimizationData.TranslationBitRate[i] > 0)
+                    value = translationCounter++;
+
+                output.TranslationMappings.Add(new AnimationBoneMapping(value));
+            }
+
+            var roationCounter = 0;
+            var roationCounterStatic = 0;
+            for (int i = 0; i < boneCount; i++)
+            {
+                optimizationData.RotationBitRate[i] = (sbyte)chunk.ReadByte();
+                int value = -1;
+                if (optimizationData.RotationBitRate[i] < 0)
+                    value = 10000 + roationCounterStatic++;
+                else if (optimizationData.RotationBitRate[i] > 0)
+                    value = roationCounter++;
+
+                output.RotationMappings.Add(new AnimationBoneMapping(value));
+            }
 
             var range_map_translation_length = chunk.ReadUInt32();
             var range_map_quaterion_length = chunk.ReadUInt32();
-            var range_map_translations = new (RmvVector3 Min, RmvVector3 Max)[range_map_translation_length];
-            var range_map_quaternion = new (RmvVector4 Min, RmvVector4 Max)[range_map_quaterion_length];
+            optimizationData.Range_map_translations = new (RmvVector3 Min, RmvVector3 Max)[range_map_translation_length];
+            optimizationData.Range_map_quaternion = new (RmvVector4 Min, RmvVector4 Max)[range_map_quaterion_length];
 
             for (var i = 0; i < range_map_translation_length; i++)
             {
-                range_map_translations[i].Min = new RmvVector3(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
-                range_map_translations[i].Max = new RmvVector3(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
+                optimizationData.Range_map_translations[i].Min = new RmvVector3(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
+                optimizationData.Range_map_translations[i].Max = new RmvVector3(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
             }
 
-            for (var i = 0; i < range_map_translation_length; i++)
+            for (var i = 0; i < range_map_quaterion_length; i++)
             {
-                range_map_quaternion[i].Min = new RmvVector4(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
-                range_map_quaternion[i].Max = new RmvVector4(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
+                optimizationData.Range_map_quaternion[i].Min = new RmvVector4(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
+                optimizationData.Range_map_quaternion[i].Max = new RmvVector4(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
             }
 
             // Load static frame
             var const_track_tranlations_count = chunk.ReadUInt32();
             var const_track_quaternions_count = chunk.ReadUInt32();
             if(const_track_tranlations_count != 0 || const_track_quaternions_count != 0)
-                output.StaticFrame = ReadFrame(chunk, const_track_tranlations_count, const_track_quaternions_count);
+                output.StaticFrame = ReadFrameV8(chunk, const_track_tranlations_count, const_track_quaternions_count, false, optimizationData);
             
             var frame_tracks_tranlations_count = chunk.ReadUInt32();
             var frame_tracks_quaternions_count = chunk.ReadUInt32();
             var frame_count = chunk.ReadUInt32();
 
-            for (var frameIndex = 0; frameIndex < frame_count; frameIndex++)
+            if (frame_tracks_tranlations_count != 0 || frame_tracks_quaternions_count != 0)
             {
-                var frame = ReadFrame(chunk, frame_tracks_tranlations_count, frame_tracks_quaternions_count);
-                output.DynamicFrames.Add(frame);
+                for (var frameIndex = 0; frameIndex < frame_count; frameIndex++)
+                {
+                    var frame = ReadFrameV8(chunk, frame_tracks_tranlations_count, frame_tracks_quaternions_count, true, optimizationData);
+                    output.DynamicFrames.Add(frame);
+                }
             }
-            if (chunk.BytesLeft != 0)
-                throw new Exception($"{chunk.BytesLeft} bytes left in animation");
 
+            //if (chunk.BytesLeft != 0)
+            //    throw new Exception($"{chunk.BytesLeft} bytes left in animation");
 
             // Convert it all to just dynamic frames, dont want to show that shit anywhere else...
 
             return output;
+        }
+
+
+        static Frame ReadFrameV8(ByteChunk chunk, uint positions, uint rotations, bool isDynamic, AnimationV8OptimizationData optimizationData)
+        {
+            var frame = new Frame();
+            for(int i = 0; i < optimizationData.BoneCount; i++)
+            {
+                var bitRate = isDynamic ? optimizationData.TranslationBitRate[i] : -optimizationData.TranslationBitRate[i];
+                switch (bitRate)
+                {
+                    case 12:
+                        var vector = new RmvVector3(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
+                        frame.Transforms.Add(vector);
+                        break;
+
+                    case 3:
+                        var d0 = chunk.ReadSBytes(3);
+                        var vecto2r = decode_translation_24_888_ranged(d0, optimizationData, i);
+                        frame.Transforms.Add(vecto2r);
+                        break;
+
+                    case 0:
+                    case -12:
+                    case -3:
+                        break;
+
+                    default:
+                        throw new Exception("Dumb fuck..");
+                }
+            }
+
+            for (int i = 0; i < optimizationData.BoneCount; i++)
+            {
+                var bitRate = isDynamic ? optimizationData.RotationBitRate[i] : -optimizationData.RotationBitRate[i];
+                switch (bitRate)
+                {
+                    case 8:
+                        var maxValue = 1.0f / short.MaxValue;
+                        var quat = new short[4] { chunk.ReadShort(), chunk.ReadShort(), chunk.ReadShort(), chunk.ReadShort() };
+
+                        var quaternion = new RmvVector4(quat[0] * maxValue, quat[1] * maxValue, quat[2] * maxValue, quat[3] * maxValue);
+                        frame.Quaternion.Add(quaternion);
+                        break;
+
+                    case 4:
+                        var d0 = chunk.ReadSBytes(4);
+                        var q = decode_quaternion_32_s8888_ranged(d0, optimizationData, i);
+                        frame.Quaternion.Add(q);
+                        break;
+
+                    case 0:
+                    case -8:
+                    case -4:
+                        break;
+
+                    default:
+                        throw new Exception("Dumb fuck..");
+                }
+            }
+            return frame;
+        }
+
+
+        static RmvVector3 decode_translation_24_888_ranged(sbyte[] bytes, AnimationV8OptimizationData optimizationData, int boneIndex)
+        {
+            RmvVector3 v3Normalized = new RmvVector3();
+            v3Normalized.X = (float)(bytes[0]) / 127.0f;
+            v3Normalized.Y = (float)(bytes[1]) / 127.0f;
+            v3Normalized.Z = (float)(bytes[2]) / 127.0f;
+
+            RmvVector3 x1 = optimizationData.Range_map_translations[boneIndex].Min;
+            RmvVector3 x2 = optimizationData.Range_map_translations[boneIndex].Max;
+
+            RmvVector3 O;
+            O.X = x2.X + v3Normalized.X * x1.X;
+            O.Y = x2.Y + v3Normalized.Y * x1.Y;
+            O.Z = x2.Z + v3Normalized.Z * x1.Z;
+
+            return O;
+        }
+
+        static RmvVector4 decode_quaternion_32_s8888_ranged(sbyte[] bytes, AnimationV8OptimizationData optimizationData, int boneIndex)
+        {
+            var v4NormalizedValue = new RmvVector4();
+            v4NormalizedValue.X = (float)(bytes[0]) / 127.0f;
+            v4NormalizedValue.Y = (float)(bytes[1]) / 127.0f;
+            v4NormalizedValue.Z = (float)(bytes[2]) / 127.0f;
+            v4NormalizedValue.W = (float)(bytes[3]) / 127.0f;
+
+            var quat_range1 = optimizationData.Range_map_quaternion[boneIndex].Min;
+            var quat_range2 = optimizationData.Range_map_quaternion[boneIndex].Max;
+
+            var original_quaternion = new RmvVector4();
+            original_quaternion.X = quat_range2.X + v4NormalizedValue.X * quat_range1.X;
+            original_quaternion.Y = quat_range2.Y + v4NormalizedValue.Y * quat_range1.Y;
+            original_quaternion.Z = quat_range2.Z + v4NormalizedValue.Z * quat_range1.Z;
+            original_quaternion.W = quat_range2.W + v4NormalizedValue.W * quat_range1.W;
+
+            return original_quaternion;
         }
 
         public static byte[] ConvertToBytes(AnimationFile input)
@@ -424,6 +572,12 @@ namespace CommonControls.FileTypes.Animation
             }
             return frame;
         }
+
+
+
+
+
+
 
         public void RemoveOptimizations(AnimationFile skeleton)
         {

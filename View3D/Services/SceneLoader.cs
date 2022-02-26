@@ -3,8 +3,10 @@ using CommonControls.Editors.VariantMeshDefinition;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
+using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -23,9 +25,10 @@ namespace View3D.Services
         PackFileService _packFileService;
         ResourceLibary _resourceLibary;
         IGeometryGraphicsContextFactory _geometryContextFactory;
-
-        public SceneLoader(ResourceLibary resourceLibary, PackFileService pfs, IGeometryGraphicsContextFactory geometryContextFactory)
+        IComponentManager _componentManager;
+        public SceneLoader(ResourceLibary resourceLibary, PackFileService pfs, IGeometryGraphicsContextFactory geometryContextFactory, IComponentManager componentManager)
         {
+            _componentManager = componentManager;
             _packFileService = pfs;
             _resourceLibary = resourceLibary;
             _geometryContextFactory = geometryContextFactory;
@@ -134,9 +137,11 @@ namespace View3D.Services
         {
             var rmvModel = ModelFactory.Create().Load(file.DataSource.ReadData());
 
+            var modelFullPath = _packFileService.GetFullPath(file);
             var modelNode = new Rmv2ModelNode(Path.GetFileName(file.Name));
-            modelNode.CreateModelNodesFromFile(rmvModel, _resourceLibary, player, _geometryContextFactory);
+            modelNode.CreateModelNodesFromFile(rmvModel, _resourceLibary, player, _geometryContextFactory, modelFullPath, _componentManager);
 
+            
             foreach (var mesh in modelNode.GetMeshNodes(0))
                 mesh.AttachmentPointName = attachmentPointName;
 
@@ -156,37 +161,26 @@ namespace View3D.Services
             else
                 parent.AddObject(wsModelNode);
 
-            var buffer = file.DataSource.ReadData();
-            string xmlString = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(xmlString);
-            
-            var geometryNodes = doc.SelectNodes(@"/model/geometry");
-            if (geometryNodes.Count != 0)
-            {
-                var geometryNode = geometryNodes.Item(0);
-                var modelFile = _packFileService.FindFile(geometryNode.InnerText);
+            var wsMaterial = new WsMaterial(file);
+            if (string.IsNullOrWhiteSpace(wsMaterial.GeometryPath) == false)
+            { 
+                var modelFile = _packFileService.FindFile(wsMaterial.GeometryPath);
                 var modelAsBase = wsModelNode as SceneNode;
                 var loadedModelNode = LoadRigidMesh(modelFile, ref modelAsBase, player , attachmentPointName);
-
-                // Materials
-                var materialNodes = doc.SelectNodes(@"/model/materials/material");
-                foreach (XmlNode materialNode in materialNodes)
+               
+                foreach (var materialNode in wsMaterial.MaterialList)
                 {
-                    var materialFilePath = materialNode.InnerText;
-                    var partIndex = materialNode.Attributes.GetNamedItem("part_index").InnerText;
-                    var lodIndex = materialNode.Attributes.GetNamedItem("lod_index").InnerText;
+                    var materialFile = _packFileService.FindFile(materialNode.Material);
+                    var materialConfig = new WsModelMaterialFile(materialFile, "");
 
-                    var materialFile = _packFileService.FindFile(materialFilePath);
-                    var materialConfig = new WsModelFile(materialFile, "");
-
-                    var mesh = loadedModelNode.GetMeshNode(int.Parse(lodIndex), int.Parse(partIndex));
+                    var mesh = loadedModelNode.GetMeshNode(materialNode.LodIndex, materialNode.PartIndex);
                     if (mesh == null)
                     {
-                        _logger.Here().Error($"Trying to access mesh at index {partIndex} at lod {lodIndex}, which is not found ");
+                        _logger.Here().Error($"Trying to access material at index {materialNode.PartIndex} at lod {materialNode.LodIndex}, which is not found ");
                     }
                     else
                     {
+                        mesh.OriginalFilePath = _packFileService.GetFullPath(file);
                         bool useAlpha = materialConfig.Alpha;
                         if (useAlpha)
                             mesh.Material.AlphaMode = AlphaMode.Transparent;
@@ -200,7 +194,12 @@ namespace View3D.Services
                         }
                     }
                 }
+                
+
             }
         }
     }
+
+
+   
 }

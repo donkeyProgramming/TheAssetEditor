@@ -41,14 +41,14 @@ namespace CommonControls.FileTypes.PackFiles.Models
 
     public class PFHeader
     {
-        public static byte[] DefaultTimeStemp = new byte[] { 67, 205, 210, 95 };
+        public static byte[] DefaultTimeStamp = new byte[] { 67, 205, 210, 95 };
 
         /// Used to specify that the header of the PackFile is extended by 20 bytes. Used in Arena.
        
 
 
         public string _strVersion { get; set; }
-        public PackFileVersion Version { get; set; }
+        public PackFileVersion Version { get => PackFileVersionConverter.GetEnum(_strVersion); set => _strVersion = PackFileVersionConverter.ToString(value); }
         
         public int ByteMask { get; set; }
 
@@ -115,10 +115,10 @@ namespace CommonControls.FileTypes.PackFiles.Models
         {
             _strVersion = version;
             ByteMask = (int)type;
-            Buffer = DefaultTimeStemp;
+            Buffer = DefaultTimeStamp;
         }
 
-        public void Save(int fileCount, int fileContentSize, BinaryWriter binaryWriter)
+        public void Save(int fileCount, uint fileContentSize, BinaryWriter binaryWriter)
         {
             foreach (byte c in _strVersion)
                 binaryWriter.Write(c);

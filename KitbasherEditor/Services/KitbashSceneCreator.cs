@@ -27,9 +27,10 @@ namespace KitbasherEditor.Services
         AnimationControllerViewModel _animationView;
         SceneManager _sceneManager;
         IGeometryGraphicsContextFactory _geometryFactory;
-
+        IComponentManager _componentManager;
         public KitbashSceneCreator(IComponentManager componentManager, PackFileService packFileService, AnimationControllerViewModel animationView, PackFile mainFile, IGeometryGraphicsContextFactory geometryFactory)
         {
+            _componentManager = componentManager;
             _packFileService = packFileService;
             _resourceLibary = componentManager.GetComponent<ResourceLibary>();
             _animationView = animationView;
@@ -45,7 +46,8 @@ namespace KitbasherEditor.Services
         {
             var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
 
-            EditableMeshNode.CreateModelNodesFromFile(rmv, _resourceLibary, _animationView.Player, _geometryFactory);
+            var modelFullPath = _packFileService.GetFullPath(file);
+            EditableMeshNode.CreateModelNodesFromFile(rmv, _resourceLibary, _animationView.Player, _geometryFactory, modelFullPath, _componentManager);
             EditableMeshNode.SelectedOutputFormat = rmv.Header.Version;
 
             int meshCount = Math.Min(EditableMeshNode.Children.Count, rmv.LodHeaders.Length);
@@ -97,7 +99,7 @@ namespace KitbasherEditor.Services
 
         SceneNode LoadModel(PackFile file)
         {
-            SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, _geometryFactory);
+            SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, _geometryFactory, _componentManager);
             var loadedNode = loader.Load(file, null, _animationView.Player);
 
             if (loadedNode == null)

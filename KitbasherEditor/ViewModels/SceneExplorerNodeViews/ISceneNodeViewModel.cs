@@ -19,7 +19,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             switch (node)
             {
                 case MainEditableNode mainNode:
-                    return new MainEditableNodeViewModel(mainNode, skeletonAnimationLookUpHelper, animationControllerViewModel, pf);
+                    return new MainEditableNodeViewModel(mainNode, skeletonAnimationLookUpHelper, animationControllerViewModel, pf, componentManager);
                 case Rmv2MeshNode m:
                     return new MeshEditorViewModel(m, pf, skeletonAnimationLookUpHelper, componentManager);
                 case SkeletonNode s:

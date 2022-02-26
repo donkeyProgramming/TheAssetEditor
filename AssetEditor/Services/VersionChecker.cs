@@ -40,7 +40,7 @@ namespace AssetEditor.Services
                             if (!latest.TagName.Contains(expectedVersion, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 var res = MessageBox.Show(
-                                    "You are using an old version, please go to\nhttps://github.com/olekristianhomelien/TheAssetEditor/releases/latest\nto download \nGo there now?",
+                                    $"You are using an old version {expectedVersion}, please go to\nhttps://github.com/olekristianhomelien/TheAssetEditor/releases/latest\nto download {latest.TagName} \nGo there now?",
                                     "Version checker",
                                     MessageBoxButton.YesNo
                                 );

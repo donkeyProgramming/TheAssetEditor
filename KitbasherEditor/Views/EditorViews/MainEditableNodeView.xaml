@@ -10,7 +10,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <System:Double x:Key="labelWidth">135</System:Double>
+        <System:Double x:Key="labelWidth">150</System:Double>
     </UserControl.Resources>
 
     <DockPanel  LastChildFill="False">
@@ -37,12 +37,19 @@
             <Label>:</Label>
             <ComboBox ItemsSource="{Binding PossibleOutputFormats}" SelectedItem="{Binding SelectedOutputFormat}" VerticalAlignment="Center"/>
         </DockPanel>
+
+        <DockPanel DockPanel.Dock="Top">
+            <Label Width ="{StaticResource labelWidth}" Content="Shading Model"/>
+            <Label>:</Label>
+            <ComboBox ItemsSource="{Binding PossibleRenderFormats}" SelectedItem="{Binding SelectedRenderFormat}" VerticalAlignment="Center"/>
+        </DockPanel>
+
         <DockPanel DockPanel.Dock="Top">
             <Label Width ="{StaticResource labelWidth}" Content="Copy textures to pack" />
             <Label>:</Label>
             <Button Content="Copy" Click="{s:MethodBinding CopyTexturesToOutputPack}" Margin="0,2,2,2" Width="50"/>
-            <Label Content="Convertion:"/>
-            <ComboBox SelectedValue="None" VerticalAlignment="Center"/>
+            <Label Content="Convertion:" Visibility="Collapsed"/>
+            <ComboBox SelectedValue="None" VerticalAlignment="Center" Visibility="Collapsed"/>
         </DockPanel>
 
     </DockPanel>

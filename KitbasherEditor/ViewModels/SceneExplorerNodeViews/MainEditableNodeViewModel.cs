@@ -1,11 +1,14 @@
 ﻿using CommonControls.Common;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
+using MonoGame.Framework.WpfInterop;
 using MoreLinq;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using View3D.Components.Rendering;
+using View3D.Rendering;
 using View3D.SceneNodes;
 using static CommonControls.FilterDialog.FilterUserControl;
 
@@ -17,6 +20,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         AnimationControllerViewModel _animationControllerViewModel;
         PackFileService _pfs;
+        IComponentManager _componentManager;
 
         public ObservableCollection<string> SkeletonNameList { get; set; }
 
@@ -31,12 +35,20 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public RmvVersionEnum SelectedOutputFormat { get => _selectedOutputFormat; set { SetAndNotify(ref _selectedOutputFormat, value); _mainNode.SelectedOutputFormat = value; } }
 
 
-        public MainEditableNodeViewModel(MainEditableNode mainNode, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AnimationControllerViewModel animationControllerViewModel, PackFileService pfs)
+        public ObservableCollection<RenderFormats> PossibleRenderFormats { get; set; } = new ObservableCollection<RenderFormats>() { RenderFormats.MetalRoughness, RenderFormats.SpecGloss };
+
+        RenderFormats _selectedRenderFormat;
+        public RenderFormats SelectedRenderFormat { get => _selectedRenderFormat; set { SetAndNotify(ref _selectedRenderFormat, value); _componentManager.GetComponent<RenderEngineComponent>().MainRenderFormat = _selectedRenderFormat; } }
+
+
+        public MainEditableNodeViewModel(MainEditableNode mainNode, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AnimationControllerViewModel animationControllerViewModel, PackFileService pfs, IComponentManager componentManager)
         {
             _mainNode = mainNode;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _animationControllerViewModel = animationControllerViewModel;
             _pfs = pfs;
+            _componentManager = componentManager;
+            _selectedRenderFormat = _componentManager.GetComponent<RenderEngineComponent>().MainRenderFormat;
 
             SkeletonNameList = _skeletonAnimationLookUpHelper.SkeletonFileNames;
             if (_mainNode.Model != null)

@@ -102,7 +102,7 @@ namespace AnimationEditor.Common.ReferenceModel
             _logger.Here().Information($"Loading reference model - {_pfs.GetFullPath(file)}");
 
             var graphics = _componentManager.GetComponent<DeviceResolverComponent>();
-            SceneLoader loader = new SceneLoader(_resourceLibary, _pfs, GeometryGraphicsContextFactory.CreateInstance(graphics.Device));
+            SceneLoader loader = new SceneLoader(_resourceLibary, _pfs, GeometryGraphicsContextFactory.CreateInstance(graphics.Device), _componentManager);
             var loadedNode = loader.Load(file, null, Player);
             if (loadedNode == null)
             {

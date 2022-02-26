@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
 {
-    public class AnimationSetFile : IAnimationPackFile
+    public class AnimationFragmentFile : IAnimationPackFile
     {
         public string FileName { get; set; }
         public AnimationPackFile Parent { get; set; }
@@ -22,8 +22,8 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
         public List<AnimationSetEntry> Fragments { get; set; } = new List<AnimationSetEntry>();
 
 
-        public AnimationSetFile() { }
-        public AnimationSetFile(string fileName, byte[] bytes)
+        public AnimationFragmentFile() { }
+        public AnimationFragmentFile(string fileName, byte[] bytes)
         {
             FileName = fileName;
             if(bytes != null)

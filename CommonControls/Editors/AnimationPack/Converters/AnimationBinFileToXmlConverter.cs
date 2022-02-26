@@ -8,7 +8,7 @@ using System.Xml.Serialization;
 
 namespace CommonControls.Editors.AnimationPack.Converters
 {
-    public class AnimationDbFileToXmlConverter : BaseAnimConverter<AnimationDbFileToXmlConverter.Bin, AnimationDbFile>  
+    public class AnimationBinFileToXmlConverter : BaseAnimConverter<AnimationBinFileToXmlConverter.Bin, FileTypes.AnimationPack.AnimPackFileTypes.AnimationBin>  
     {
         protected override string CleanUpXml(string xmlText)
         {
@@ -19,7 +19,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
         protected override  Bin ConvertBytesToXmlClass(byte[] bytes)
         {
-            AnimationDbFile binFile = new AnimationDbFile("", bytes);
+            FileTypes.AnimationPack.AnimPackFileTypes.AnimationBin binFile = new FileTypes.AnimationPack.AnimPackFileTypes.AnimationBin("", bytes);
             var outputBin = new Bin();
             outputBin.BinEntry = new List<BinEntry>();
 
@@ -39,7 +39,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
         protected override byte[] ConvertToAnimClassBytes(Bin bin, string fileName)
         {
-            var output = new AnimationDbFile(fileName);
+            var output = new FileTypes.AnimationPack.AnimPackFileTypes.AnimationBin(fileName);
             foreach (var item in bin.BinEntry)
             {
                 var entry = new AnimationBinEntry(item.Name, item.Skeleton.Value, item.MountSkeleton.Value)

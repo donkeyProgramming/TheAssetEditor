@@ -5,7 +5,7 @@ using System.IO;
 
 namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
 {
-    public class AnimationDbFile : IAnimationPackFile
+    public class AnimationBin : IAnimationPackFile
     {
         public string FileName { get; set; }
         public AnimationPackFile Parent { get; set; }
@@ -15,7 +15,7 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
         public int TableVersion { get; set; } = 2;
         public List<AnimationBinEntry> AnimationTableEntries { get; set; } = new List<AnimationBinEntry>();
 
-        public AnimationDbFile(string fileName, byte[] data = null)
+        public AnimationBin(string fileName, byte[] data = null)
         {
             FileName = fileName;
             if(data != null)
@@ -53,7 +53,6 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
         {
             public string Name { get; set; }
             public int Unknown { get; set; } = 0;
-
             public FragmentReference() { }
 
             public FragmentReference(ByteChunk data)

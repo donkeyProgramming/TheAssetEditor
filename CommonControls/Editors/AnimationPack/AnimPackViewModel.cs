@@ -103,10 +103,10 @@ namespace CommonControls.Editors.AnimationPack
         void ItemSelected(IAnimationPackFile seletedFile)
         {
             _activeConverter = null;
-            if (seletedFile is AnimationSetFile typedFragment)
-                _activeConverter = new AnimationSetFileToXmlConverter(_skeletonAnimationLookUpHelper);
-            else if (seletedFile is AnimationDbFile typedBin)
-                _activeConverter = new AnimationDbFileToXmlConverter();
+            if (seletedFile is AnimationFragmentFile typedFragment)
+                _activeConverter = new AnimationFragmentFileToXmlConverter(_skeletonAnimationLookUpHelper);
+            else if (seletedFile is FileTypes.AnimationPack.AnimPackFileTypes.AnimationBin typedBin)
+                _activeConverter = new AnimationBinFileToXmlConverter();
             else if (seletedFile is AnimationSet3kFile animSet3k)
                 _activeConverter = new AnimationSet3kFileToXmlConverter(_skeletonAnimationLookUpHelper);
 

@@ -94,11 +94,9 @@ namespace CommonControls.FileTypes.PackFiles.Models
             var header = new PFHeader()
             {
                 _strVersion = new string(reader.ReadChars(4)),      // 4
-                ByteMask = reader.ReadInt32(),                  // 8
-                ReferenceFileCount = reader.ReadUInt32(),       // 12    
+                ByteMask = reader.ReadInt32(),                      // 8
+                ReferenceFileCount = reader.ReadUInt32(),           // 12    
             };
-
-            header.Version = PackFileVersionConverter.GetEnum(header._strVersion);
 
             var pack_file_index_size = reader.ReadUInt32();         // 16
             var pack_file_count = reader.ReadUInt32();              // 20
@@ -112,7 +110,6 @@ namespace CommonControls.FileTypes.PackFiles.Models
             else if (header.Version == PackFileVersion.PFH2 || header.Version == PackFileVersion.PFH3)
             {
                 header.Buffer = reader.ReadBytes(8);
-
                 // Uint64 timestamp
             }
             else if (header.Version == PackFileVersion.PFH4 || header.Version == PackFileVersion.PFH5)
@@ -148,5 +145,53 @@ namespace CommonControls.FileTypes.PackFiles.Models
             return header;
         }
 
+
+        public static void WriteHeader(PFHeader header, uint fileContentSize, BinaryWriter writer)
+        {
+            var packFileTypeStr = PackFileVersionConverter.ToString(header.Version);        // 4
+            foreach (var c in packFileTypeStr)
+                writer.Write(c);
+
+            writer.Write(header.ByteMask);                                                  // 8
+            writer.Write(header.DependantFiles.Count);                                      // 12
+
+            var pack_file_index_size = 0;
+            foreach (var file in header.DependantFiles)
+                pack_file_index_size += file.Length + 1;
+
+            writer.Write(pack_file_index_size);                                             // 16
+            writer.Write(header.FileCount);                                                 // 20
+            writer.Write(fileContentSize);                                                  // 24
+
+
+            switch (header.Version)
+            {
+                case PackFileVersion.PFH0:
+                    break;// Nothing needed to do
+                case PackFileVersion.PFH2:
+                case PackFileVersion.PFH3:
+                    // 64 bit timestamp
+                    writer.Write(0);
+                    writer.Write(0);
+                    break;
+                case PackFileVersion.PFH4:
+                case PackFileVersion.PFH5:
+                    if (header.HasExtendedHeader)
+                        throw new Exception("Not supported packfile type");
+
+                    writer.Write(PFHeader.DefaultTimeStamp);
+                    break;
+
+                default:
+                    throw new Exception("Not supported packfile type");
+            }
+
+            foreach (var file in header.DependantFiles)
+            {
+                foreach (byte c in file)
+                    writer.Write(c);
+                writer.Write((byte)0);
+            }
+        }
     }
 }

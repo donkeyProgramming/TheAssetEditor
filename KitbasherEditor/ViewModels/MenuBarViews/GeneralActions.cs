@@ -19,6 +19,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         RenderEngineComponent _renderEngineComponent;
 
         public SceneSaverService ModelSaver { get; set; }
+        public WsModelGeneratorService WsModelGeneratorService { get; set; }
 
         public GeneralActions(IComponentManager componentManager)
         {
@@ -61,7 +62,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         public void Save() => ModelSaver.Save();
         public void SaveAs() => ModelSaver.SaveAs();
-        public void GenerateWsModel() => ModelSaver.GenerateWsModel();
+        public void GenerateWsModel() => WsModelGeneratorService.GenerateWsModel();
         public void Undo() => _commandExecutor.Undo();
         public void FocusSelection() => _cameraFocusComponent.FocusSelection();
         public void ResetCamera() => _cameraFocusComponent.ResetCamera();

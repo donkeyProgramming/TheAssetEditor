@@ -8,7 +8,7 @@ using System.Xml;
 
 namespace CommonControls.FileTypes.RigidModel
 {
-    public class WsModelFile
+    public class WsModelMaterialFile
     {
         public bool Alpha { get; set; } = false;
         public Dictionary<TexureType, string> Textures { get; set; } = new Dictionary<TexureType, string>();
@@ -16,7 +16,7 @@ namespace CommonControls.FileTypes.RigidModel
         public string Name { get; set; }
         public string FullPath { get; set; }
 
-        public WsModelFile(PackFile pf, string fullPath)
+        public WsModelMaterialFile(PackFile pf, string fullPath)
         {
             FullPath = fullPath;
 
@@ -68,7 +68,7 @@ namespace CommonControls.FileTypes.RigidModel
 
                 if (textureSlotName == "s_normal")
                     Textures[TexureType.Normal] = texturePath;
-                else if(textureSlotName == "t_xml_material_map")
+                else if (textureSlotName == "t_xml_normal")
                     Textures[TexureType.Normal] = texturePath;
 
                 if (textureSlotName == "s_specular")

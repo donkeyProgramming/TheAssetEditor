@@ -41,7 +41,16 @@ namespace CommonControls.FileTypes.AnimationPack
         static IAnimFileSerializer DeterminePossibleSerializers(string fullPath)
         {
             // 3k
-            if (fullPath.Contains("animations/database/", StringComparison.InvariantCultureIgnoreCase))
+
+              if (fullPath.Contains("animations/database/battle/bin/", StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (fullPath.Contains(".bin", StringComparison.InvariantCultureIgnoreCase))
+                    return new AnimationSetSerializer_Wh3();
+                else
+                    return new UnknownAnimFileSerializer();
+            }
+
+            else if (fullPath.Contains("animations/database/", StringComparison.InvariantCultureIgnoreCase))
             {
                 if (fullPath.Contains("matched", StringComparison.InvariantCultureIgnoreCase))
                     return new UnknownAnimFileSerializer();
@@ -50,6 +59,7 @@ namespace CommonControls.FileTypes.AnimationPack
                 else
                     return new AnimationSetSerializer_3K();
             }
+           
             else
             {
                 if (fullPath.Contains(".frg", StringComparison.InvariantCultureIgnoreCase))
@@ -60,9 +70,7 @@ namespace CommonControls.FileTypes.AnimationPack
                     return new AnimationDbFileSerializer();
             }
 
-            return null;
-
-            //throw new Exception();
+            return new UnknownAnimFileSerializer();
         }
 
         public static AnimationPackFile Load(PackFile pf, PackFileService pfs)
@@ -75,24 +83,9 @@ namespace CommonControls.FileTypes.AnimationPack
 
             foreach (var file in files)
             {
-                bool isLoaded = false;
                 var fileLoader = DeterminePossibleSerializers(file.Name);
-                if (fileLoader != null)
-                {
-                    var loadedFile = LoadFile(fileLoader, file, dataChunk);
-                    if (loadedFile != null)
-                    {
-                        output.AddFile(loadedFile);
-                        isLoaded = true;
-                    }
-                }
-
-               if (isLoaded == false)
-               {
-                   var unkownLoader = new UnknownAnimFileSerializer();
-                   var unkownFile = LoadFile(unkownLoader, file, dataChunk);
-                   output.AddFile(unkownFile);
-               }
+                var loadedFile = LoadFile(fileLoader, file, dataChunk);
+                output.AddFile(loadedFile);
             }
 
             return output;
@@ -158,12 +151,12 @@ namespace CommonControls.FileTypes.AnimationPack
 
     public class AnimationSetFileSerializer : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimationSetFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimationFragmentFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
     }
 
     public class AnimationDbFileSerializer : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimationDbFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimationBin(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
     }
 
     public class MatchedAnimFileSerializer : IAnimFileSerializer
@@ -175,6 +168,11 @@ namespace CommonControls.FileTypes.AnimationPack
     public class AnimationSetSerializer_3K : IAnimFileSerializer
     {
         public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimationSet3kFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+    }
+
+    public class AnimationSetSerializer_Wh3 : IAnimFileSerializer
+    {
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimationBinW3(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
     }
 
 

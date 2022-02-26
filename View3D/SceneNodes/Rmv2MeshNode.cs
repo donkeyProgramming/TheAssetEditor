@@ -4,6 +4,7 @@ using CommonControls.FileTypes.RigidModel.MaterialHeaders;
 using CommonControls.FileTypes.RigidModel.Types;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +29,10 @@ namespace View3D.SceneNodes
         Vector3 _position = Vector3.Zero;
         Vector3 _scale = Vector3.One;
         ResourceLibary _resourceLib;
+        IComponentManager _componentManager;
 
+        public string OriginalFilePath { get; set; }
+        public int OriginalPartIndex { get; internal set; }
         public Vector3 Position { get { return _position; } set { _position = value; UpdateMatrix(); } }
         public Vector3 Scale { get { return _scale; } set { _scale = value; UpdateMatrix(); } }
         public Quaternion Orientation { get { return _orientation; } set { _orientation = value; UpdateMatrix(); } }
@@ -47,6 +51,7 @@ namespace View3D.SceneNodes
         bool _isSelectable = true;
         public bool IsSelectable { get => _isSelectable; set => SetAndNotifyWhenChanged(ref _isSelectable, value); }
         public bool ReduceMeshOnLodGeneration { get; set; } = true;
+     
 
         private void UpdateModelMatrix(Matrix value)
         {
@@ -65,8 +70,9 @@ namespace View3D.SceneNodes
         private Rmv2MeshNode()
         { }
 
-        public Rmv2MeshNode(RmvCommonHeader commonHeader, MeshObject meshObject, IMaterial material, AnimationPlayer animationPlayer)
+        public Rmv2MeshNode(RmvCommonHeader commonHeader, MeshObject meshObject, IMaterial material, AnimationPlayer animationPlayer, IComponentManager componentManager)
         {
+            _componentManager = componentManager;
             CommonHeader = commonHeader;
             Material = material;
             AnimationPlayer = animationPlayer;
@@ -82,20 +88,30 @@ namespace View3D.SceneNodes
         {
             _resourceLib = resourceLib;
             if (_resourceLib != null)
-            {
-                Effect = new PbrShader(_resourceLib);
-                Texture2D diffuse = LoadTexture(TexureType.Diffuse);
-                if (diffuse == null)
-                    diffuse = LoadTexture(TexureType.BaseColour);
-                Texture2D specTexture = LoadTexture(TexureType.Specular);
-                Texture2D normalTexture = LoadTexture(TexureType.Normal);
-                Texture2D glossTexture = LoadTexture(TexureType.Gloss);
+                CreateShader();
+        }
 
-                Effect.SetTexture(diffuse, TexureType.Diffuse);
-                Effect.SetTexture(specTexture, TexureType.Specular);
-                Effect.SetTexture(normalTexture, TexureType.Normal);
-                Effect.SetTexture(glossTexture, TexureType.Gloss);
-            }
+        void CreateShader()
+        {
+            if (_componentManager.GetComponent<RenderEngineComponent>().MainRenderFormat == Rendering.RenderFormats.MetalRoughness)
+                Effect = new PbrShader_MetalRoughness(_resourceLib);
+            else
+                Effect = new PbrShader_SpecGloss(_resourceLib);
+
+
+            Texture2D diffuse = LoadTexture(TexureType.Diffuse);
+            Texture2D baseColour = LoadTexture(TexureType.BaseColour);
+            Texture2D specTexture = LoadTexture(TexureType.Specular);
+            Texture2D normalTexture = LoadTexture(TexureType.Normal);
+            Texture2D glossTexture = LoadTexture(TexureType.Gloss);
+            Texture2D materialTexture = LoadTexture(TexureType.MaterialMap);
+
+            Effect.SetTexture(diffuse, TexureType.Diffuse);
+            Effect.SetTexture(baseColour, TexureType.BaseColour);
+            Effect.SetTexture(specTexture, TexureType.Specular);
+            Effect.SetTexture(normalTexture, TexureType.Normal);
+            Effect.SetTexture(glossTexture, TexureType.Gloss);
+            Effect.SetTexture(materialTexture, TexureType.MaterialMap);
         }
 
         Texture2D LoadTexture(TexureType type)
@@ -141,7 +157,10 @@ namespace View3D.SceneNodes
         }
 
         public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)
-        {         
+        {
+            if (renderEngine.MainRenderFormat != Effect.RenderFormat)
+                CreateShader();
+
             Matrix[] data = new Matrix[256];
             for (int i = 0; i < 256; i++)
                 data[i] = Matrix.Identity;
@@ -193,8 +212,11 @@ namespace View3D.SceneNodes
             typedTarget.Material = Material.Clone();
             typedTarget.Geometry = Geometry.Clone();
             typedTarget._resourceLib = _resourceLib;
-            typedTarget.Effect = Effect.Clone() as PbrShader;
+            typedTarget._componentManager = _componentManager;
+            typedTarget.Effect = Effect.Clone() as PbrShader_MetalRoughness;
             typedTarget.Geometry = Geometry.Clone();
+            typedTarget.OriginalFilePath = OriginalFilePath;
+            typedTarget.OriginalPartIndex = OriginalPartIndex;
             base.CopyInto(target);
         }
 

@@ -17,7 +17,6 @@ namespace View3D.Animation
         {
             try
             {
-
                 if (skeleton == null)
                     return null;
 

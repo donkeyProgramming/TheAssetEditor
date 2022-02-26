@@ -97,6 +97,14 @@ namespace Filetypes.ByteParsing
             return bytes;
         }
 
+        public sbyte[] ReadSBytes(int count)
+        {
+            var destination = new sbyte[count];
+            Array.Copy(_buffer, _currentIndex, destination, 0, count);
+            _currentIndex += count;
+            return destination;
+        }
+
         public byte[] GetBytesFromBuffer(int start, int count)
         {
             byte[] destination = new byte[count];

@@ -19,18 +19,18 @@ namespace CommonControls.FileTypes.AnimationPack
             _files.Add(file);
         }
 
-        public List<AnimationSetFile> GetAnimationSets(string skeletonName = null)
+        public List<AnimationFragmentFile> GetAnimationSets(string skeletonName = null)
         {
-            var sets = _files.Where(x => x is AnimationSetFile).Cast<AnimationSetFile>();
+            var sets = _files.Where(x => x is AnimationFragmentFile).Cast<AnimationFragmentFile>();
             if(skeletonName != null)
                 sets = sets.Where(x => x.Skeletons.Values.Contains(skeletonName));
 
             return sets.ToList();
         }
 
-        public static AnimationDbFile CreateExampleWarhammerBin(string binPath)
+        public static AnimationBin CreateExampleWarhammerBin(string binPath)
         {
-            var animDb = new AnimationDbFile(binPath);
+            var animDb = new AnimationBin(binPath);
 
             animDb.AnimationTableEntries.Add(
                 new AnimationBinEntry("ExampleDbRef", "ExampleSkeleton")
@@ -38,20 +38,20 @@ namespace CommonControls.FileTypes.AnimationPack
                     Unknown = 1,
                     FragmentReferences = new List<AnimationBinEntry.FragmentReference>()
                     {
-                            new AnimationBinEntry.FragmentReference() { Name = "FragNameRef0"},
-                            new AnimationBinEntry.FragmentReference() { Name = "FragNameRef1"}
+                        new AnimationBinEntry.FragmentReference() { Name = "FragNameRef0"},
+                        new AnimationBinEntry.FragmentReference() { Name = "FragNameRef1"}
                     }
                 });
 
             return animDb;
         }
 
-        public static AnimationSetFile CreateExampleWarhammerAnimSet(string fragmentName)
+        public static AnimationFragmentFile CreateExampleWarhammerAnimSet(string fragmentName)
         {
             var filename = SaveHelper.EnsureEnding(fragmentName, ".frg");
             var filePath = @"animations/animation_tables/" + filename;
             
-            var animSet = new AnimationSetFile(filePath, null);
+            var animSet = new AnimationFragmentFile(filePath, null);
             
             animSet.Skeletons = new StringArrayTable("ExampleSkeleton", "ExampleSkeleton");
             animSet.Fragments.Add(new AnimationSetEntry()

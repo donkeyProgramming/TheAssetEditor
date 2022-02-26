@@ -47,6 +47,8 @@ namespace View3D.Components.Rendering
         public float LightRotationDegrees { get; set; } = 20;
         public float LightIntensityMult { get; set; } = 6;
 
+        public RenderFormats MainRenderFormat { get; set; } = RenderFormats.MetalRoughness;
+
         public RenderEngineComponent(IComponentManager componentManager) : base(componentManager)
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.RenderEngine;

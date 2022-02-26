@@ -1,15 +1,20 @@
 ﻿using CommonControls.Common;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.RigidModel.Types;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
+using CommunityToolkit.Mvvm.Input;
 using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Windows;
+using System.Windows.Input;
 using TextureEditor.ViewModels;
 using View3D.Components.Component;
 using View3D.SceneNodes;
@@ -22,7 +27,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         {
             PackFileService _packfileService;
             Rmv2MeshNode _meshNode;
-            TexureType _texureType;
+            public TexureType TexureType { get; private set; }
 
             bool _useTexture = true;
             public bool UseTexture { get { return _useTexture; } set { SetAndNotify(ref _useTexture, value); UpdatePreviewTexture(value); } }
@@ -53,8 +58,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             {
                 _packfileService = packfileService;
                 _meshNode = meshNode;
-                _texureType = texureType;
-                TextureTypeStr = _texureType.ToString();
+                TexureType = texureType;
+                TextureTypeStr = TexureType.ToString();
                 _path = _meshNode.Material.GetTexture(texureType)?.Path;
                 ValidateTexturePath();
             }
@@ -111,12 +116,12 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             void UpdateTexturePath(string newPath)
             {
                 Path = newPath;
-                _meshNode.UpdateTexture(Path, _texureType);
+                _meshNode.UpdateTexture(Path, TexureType);
             }
 
             void UpdatePreviewTexture(bool value)
             {
-                _meshNode.UseTexture(_texureType, value);
+                _meshNode.UseTexture(TexureType, value);
             }
 
             public IEnumerable GetErrors(string propertyName)
@@ -136,33 +141,49 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 
         Rmv2MeshNode _meshNode;
         IComponentManager _componentManager;
+        PackFileService _pfs;
 
-        public bool UseAlpha {
-            get { return _meshNode.Material.AlphaMode == AlphaMode.Transparent; } 
+        public ICommand OverwriteTexturesFromWsModelCommand { get; set; }
+       
+        public bool UseAlpha
+        {
+            get => _meshNode.Material.AlphaMode == AlphaMode.Transparent; 
             set 
-            {   if (value)
+            {   
+                if (value)
                     _meshNode.Material.AlphaMode = AlphaMode.Transparent;
                 else
-                     _meshNode.Material.AlphaMode = AlphaMode.Opaque;
+                    _meshNode.Material.AlphaMode = AlphaMode.Opaque;
                 NotifyPropertyChanged();
             } 
         }
-        public string TextureDirectory { get { return _meshNode.Material.TextureDirectory; } set { _meshNode.Material.TextureDirectory = value; NotifyPropertyChanged(); } }
+
         public ObservableCollection<TextureViewModel> TextureList { get; set; } = new ObservableCollection<TextureViewModel>();
 
+        public string TextureDirectory 
+        {
+            get => _meshNode.Material.TextureDirectory; 
+            set { _meshNode.Material.TextureDirectory = value; NotifyPropertyChanged(); } 
+        }
 
         bool _onlyShowUsedTextures = true;
-        public bool OnlyShowUsedTextures { get { return _onlyShowUsedTextures; } set { SetAndNotify(ref _onlyShowUsedTextures, value); UpdateTextureListVisibility(value); } }
+        public bool OnlyShowUsedTextures 
+        { 
+            get => _onlyShowUsedTextures;  
+            set { SetAndNotify(ref _onlyShowUsedTextures, value); UpdateTextureListVisibility(_onlyShowUsedTextures); } }
+
 
         public UiVertexFormat VertexType { get { return _meshNode.Geometry.VertexFormat; } set { ChangeVertexType(value); } }
         public IEnumerable<UiVertexFormat> PossibleVertexTypes { get; set; }
 
-        public MaterialGeneralViewModel(Rmv2MeshNode meshNode, PackFileService pf, IComponentManager componentManager)
+        public MaterialGeneralViewModel(Rmv2MeshNode meshNode, PackFileService pfs, IComponentManager componentManager)
         {
             _componentManager = componentManager;
             _meshNode = meshNode;
+            _pfs = pfs;
             PossibleVertexTypes = new UiVertexFormat[] { UiVertexFormat.Static, UiVertexFormat.Weighted, UiVertexFormat.Cinematic };
-     
+            OverwriteTexturesFromWsModelCommand = new RelayCommand(OverwriteTexturesFromWsModel);
+
             var enumValues = Enum.GetValues(typeof(TexureType)).Cast<TexureType>().ToList();
             var textureEnumValues = _meshNode.Material.GetAllTextures().Select(x => x.TexureType).ToList();
             enumValues.AddRange(textureEnumValues);
@@ -170,7 +191,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 
             foreach (var enumValue in distinctEnumList)
             {
-                var textureView = new TextureViewModel(_meshNode, pf, enumValue);
+                var textureView = new TextureViewModel(_meshNode, _pfs, enumValue);
                 TextureList.Add(textureView);
             }
 
@@ -194,6 +215,57 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             var skeletonName = mainNode.GeEditableMeshRootNode()?.Skeleton.Name;
             _meshNode.Geometry.ChangeVertexType(newFormat, skeletonName);
             NotifyPropertyChanged(nameof(VertexType));
+        }
+
+        private void OverwriteTexturesFromWsModel()
+        {
+            var filePath = _meshNode.OriginalFilePath;
+            if (string.IsNullOrWhiteSpace(filePath) == false)
+            {
+                var file = _pfs.FindFile(filePath);
+                if (file != null)
+                {
+                    PackFile wsModelFile = file;
+                    if (file.Extention.Contains("wsmodel", StringComparison.InvariantCultureIgnoreCase) == false)
+                    {
+                        var newPath = Path.ChangeExtension(filePath, ".wsmodel");
+                        wsModelFile = _pfs.FindFile(newPath);
+                    }
+
+                    if (wsModelFile != null)
+                    {
+                        var wsModel = new WsMaterial(wsModelFile);
+                        var material = wsModel.MaterialList.FirstOrDefault(x => x.LodIndex == 0 && x.PartIndex == _meshNode.OriginalPartIndex);
+                        if(material != null)
+                        {
+                            var wsMaterialFile = _pfs.FindFile(material.Material);
+                            if (wsMaterialFile != null)
+                            {
+                                var wsMaterialFileContent = new WsModelMaterialFile(wsMaterialFile, "");
+                                foreach (var texture in TextureList)
+                                {
+                                    texture.UseTexture = false;
+                                    texture.Path = "";
+                                }
+
+                                foreach (var wsModelTexture in wsMaterialFileContent.Textures)
+                                {
+                                    var textureViewModel = TextureList.First(x => x.TexureType == wsModelTexture.Key);
+                                    textureViewModel.UseTexture = true;
+                                    textureViewModel.Path = wsModelTexture.Value;
+                                }
+
+                                UseAlpha = wsMaterialFileContent.Alpha;
+                                UpdateTextureListVisibility(OnlyShowUsedTextures);
+                                return;
+                            }
+                        }
+
+
+                    }
+                }
+            }
+            MessageBox.Show($"Failed to load textures from WS model - {filePath}", "Error");
         }
     }
 }

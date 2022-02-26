@@ -1,4 +1,5 @@
 ﻿using CommonControls.FileTypes.RigidModel;
+using MonoGame.Framework.WpfInterop;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Animation;
@@ -11,7 +12,6 @@ namespace View3D.SceneNodes
     public class Rmv2ModelNode : GroupNode
     {
         public RmvFile Model { get; set; }
-
         public Rmv2ModelNode(string name, int lodCount = 4)
         {
             Name = name;
@@ -26,7 +26,7 @@ namespace View3D.SceneNodes
             }
         }
 
-        public void CreateModelNodesFromFile(RmvFile model, ResourceLibary resourceLibary, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory)
+        public void CreateModelNodesFromFile(RmvFile model, ResourceLibary resourceLibary, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory, string modelFullPath, IComponentManager componentManager)
         {
             Model = model;
             for (int lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
@@ -42,9 +42,12 @@ namespace View3D.SceneNodes
                 {
                     var geometry = MeshBuilderService.BuildMeshFromRmvModel(model.ModelList[lodIndex][modelIndex], model.Header.SkeletonName, contextFactory.Create());
                     var rmvModel = model.ModelList[lodIndex][modelIndex];
-                    var node = new Rmv2MeshNode(rmvModel.CommonHeader, geometry, rmvModel.Material, animationPlayer);
+                    var node = new Rmv2MeshNode(rmvModel.CommonHeader, geometry, rmvModel.Material, animationPlayer, componentManager);
                     node.Initialize(resourceLibary);
-                    
+                    node.OriginalFilePath = modelFullPath;
+                    node.OriginalPartIndex = modelIndex;
+
+
                     node.LodIndex = lodIndex;
                     lodNode.AddObject(node);
                 }

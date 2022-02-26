@@ -13,8 +13,8 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
 {
     public class MountLinkViewModel : NotifyPropertyChangedImpl
     {
-        public FilterCollection<AnimationSetFile> SelectedMount { get; set; }
-        public FilterCollection<AnimationSetFile> SelectedRider { get; set; }
+        public FilterCollection<AnimationFragmentFile> SelectedMount { get; set; }
+        public FilterCollection<AnimationFragmentFile> SelectedRider { get; set; }
 
         public FilterCollection<FragmentStatusSlotItem> SelectedMountTag { get; set; }
         public FilterCollection<FragmentStatusSlotItem> SelectedRiderTag { get; set; }
@@ -35,8 +35,8 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
 
             SelectedMountTag = new FilterCollection<FragmentStatusSlotItem>(null, MountTagSeleted);
             SelectedRiderTag = new FilterCollection<FragmentStatusSlotItem>(null, RiderTagSelected);
-            SelectedMount = new FilterCollection<AnimationSetFile>(null, (value) => MuntSelected(value, SelectedMountTag, _mount.SkeletonName.Value));
-            SelectedRider = new FilterCollection<AnimationSetFile>(null, (value) => MuntSelected(value, SelectedRiderTag, _rider.SkeletonName.Value));
+            SelectedMount = new FilterCollection<AnimationFragmentFile>(null, (value) => MuntSelected(value, SelectedMountTag, _mount.SkeletonName.Value));
+            SelectedRider = new FilterCollection<AnimationFragmentFile>(null, (value) => MuntSelected(value, SelectedRiderTag, _rider.SkeletonName.Value));
 
             SelectedMountTag.SearchFilter = (value, rx) => { return rx.Match(value.Entry.Value.Slot.Value).Success; };
             SelectedRiderTag.SearchFilter = (value, rx) => { return rx.Match(value.Entry.Value.Slot.Value).Success; };
@@ -70,9 +70,9 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
             }
         }
 
-        public List<AnimationSetFile> LoadFragmentsForSkeleton(string skeletonName, bool onlyPacksThatCanBeSaved = false)
+        public List<AnimationFragmentFile> LoadFragmentsForSkeleton(string skeletonName, bool onlyPacksThatCanBeSaved = false)
         {
-            var outputFragments = new List<AnimationSetFile>();
+            var outputFragments = new List<AnimationFragmentFile>();
             var animPacks = _pfs.FindAllWithExtention(@".animpack");
             foreach (var animPack in animPacks)
             {
@@ -90,7 +90,7 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
             return outputFragments;
         }
 
-        void MuntSelected(AnimationSetFile value, FilterCollection<FragmentStatusSlotItem> collection, string skeletonName)
+        void MuntSelected(AnimationFragmentFile value, FilterCollection<FragmentStatusSlotItem> collection, string skeletonName)
         {
             if (value == null)
             {

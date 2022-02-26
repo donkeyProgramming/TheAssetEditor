@@ -54,7 +54,6 @@ namespace CommonControls.Common
             return false;
         }
     }
-
     public interface IToolFactory
     {
         void RegisterTool<ViewModel, View>(IPackFileToToolSelector toolSelector)

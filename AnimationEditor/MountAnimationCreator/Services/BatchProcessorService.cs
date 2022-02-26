@@ -18,12 +18,12 @@ namespace AnimationEditor.MountAnimationCreator.Services
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         MountAnimationGeneratorService _animationGenerator;
         BatchProcessOptions _batchProcessOptions;
-        AnimationSetFile _mountFragment;
-        AnimationSetFile _riderFragment;
+        AnimationFragmentFile _mountFragment;
+        AnimationFragmentFile _riderFragment;
 
         uint _animationOutputFormat;
         AnimationPackFile _outAnimPack;
-        AnimationSetFile _riderOutputFragment;
+        AnimationFragmentFile _riderOutputFragment;
 
         string _animationPrefix = "new_";
         string _animPackName = "test_tables.animpack";
@@ -46,7 +46,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
             }
         }
 
-        public void Process(AnimationSetFile mountFragment, AnimationSetFile riderFragment)
+        public void Process(AnimationFragmentFile mountFragment, AnimationFragmentFile riderFragment)
         {
             var resultInfo = new ErrorListViewModel.ErrorList();
             _mountFragment = mountFragment;
@@ -155,12 +155,12 @@ namespace AnimationEditor.MountAnimationCreator.Services
         {
             _outAnimPack = new AnimationPackFile();
 
-            var animDb = new AnimationDbFile("animations/animation_tables/" + _animBinName);
+            var animDb = new AnimationBin("animations/animation_tables/" + _animBinName);
             var tableEntry = new AnimationBinEntry(_fragmentName, _riderFragment.Skeletons.Values.First(), "Bin entry using skeleton - " + _mountFragment.Skeletons.Values.First() + " goes here");
             tableEntry.FragmentReferences.Add(new AnimationBinEntry.FragmentReference() { Name = _fragmentName });
             animDb.AnimationTableEntries.Add(tableEntry);
             
-            _riderOutputFragment = new AnimationSetFile("animations/animation_tables/" + _fragmentName + ".frg", null);
+            _riderOutputFragment = new AnimationFragmentFile("animations/animation_tables/" + _fragmentName + ".frg", null);
             _riderOutputFragment.Skeletons = new StringArrayTable(_riderFragment.Skeletons.Values.First(), _riderFragment.Skeletons.Values.First());
             
             _outAnimPack.AddFile(_riderOutputFragment);

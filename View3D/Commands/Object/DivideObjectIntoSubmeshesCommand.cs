@@ -21,6 +21,7 @@ namespace View3D.Commands.Object
         SelectionManager _selectionManager;
         ISelectionState _originalSelectionState;
         ResourceLibary _resourceLib;
+        IComponentManager _componentManager;
 
         public DivideObjectIntoSubmeshesCommand(IEditableGeometry objectToSplit, bool combineOverlappingVertexes)
         {
@@ -35,6 +36,7 @@ namespace View3D.Commands.Object
 
         public override void Initialize(IComponentManager componentManager)
         {
+            _componentManager = componentManager;
             _editableMeshResolver = componentManager.GetComponent<IEditableMeshResolver>();
             _sceneManager = componentManager.GetComponent<SceneManager>();
             _selectionManager = componentManager.GetComponent<SelectionManager>();
@@ -62,7 +64,7 @@ namespace View3D.Commands.Object
                 foreach (var mesh in splitMeshes)
                 {
                     var typedObject = _objectToSplit as Rmv2MeshNode;
-                    var meshNode = new Rmv2MeshNode(typedObject.CommonHeader, mesh, typedObject.Material.Clone(), typedObject.AnimationPlayer);
+                    var meshNode = new Rmv2MeshNode(typedObject.CommonHeader, mesh, typedObject.Material.Clone(), typedObject.AnimationPlayer, _componentManager);
                     meshNode.Initialize(_resourceLib);
                     
                     var meshName = $"{_objectToSplit.Name}_submesh_{counter++}";

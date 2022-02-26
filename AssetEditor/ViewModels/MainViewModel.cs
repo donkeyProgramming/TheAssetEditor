@@ -179,14 +179,16 @@ namespace AssetEditor.ViewModels
                 // OpenFile(packfileService.FindFile(@"animations\database\battle\bin\animation_tables.animpack"));
                 // OpenFile(packfileService.FindFile(@"animations\animation_tables\animation_tables.animpack"));
 
-                //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1e\cth\cth_dragon_storm_human\cth_dragon_storm_human_body_01.rigid_model_v2"));
+                //OpenFile(packfileService.FindFile(@"animations\database\battle\bin\animation_tables.animpack"));
 
-                //OpenFile(packfileService.FindFile(@"animations\battle\hybridcreature07\nurgle\attacks\hc7_nurgle_attack_05.anim"));
-                OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc1\tmb\tmb_warsphinx\tex\tmb_warsphinx_armour_01_base_colour.dds"));
-                
+                OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\ngsw1\dae\dae_nurgling_swarm\dae_nurgling_swarm_01.rigid_model_v2"));
+                //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc1\tmb\tmb_warsphinx\tex\tmb_warsphinx_armour_01_base_colour.dds"));
+                //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu13d\ogr\ogr_skrag\ogr_skrag_01.rigid_model_v2"));
+
+
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
 
-                KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
+                //KitbashEditor_Debug.CreateSlayerHead(this, toolFactory, packfileService);
 
                 //CreateEmptyEditor(editorView);
 
@@ -208,16 +210,6 @@ namespace AssetEditor.ViewModels
                 "You have unsaved changes. Do you want to quit without saving?",
                 "Quit Without Saving", 
                 MessageBoxButton.YesNo) == MessageBoxResult.Yes;
-        }
-
-        private void Compiler_ErrorDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void Compiler_OutputDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            //throw new NotImplementedException();
         }
 
         void MemoryDebugging()

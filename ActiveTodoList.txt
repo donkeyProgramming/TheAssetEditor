@@ -519,7 +519,8 @@ Fixed 0.26
 		[X]Tutorial:Some warning about converting troy => rome about textures?
 	
 	
-	
+	Double click face to select all
+	Packfile name not chancing on save 
 	
 	
 Cool assetEditor projects:
@@ -547,26 +548,59 @@ Refresh animList button
 New texture system/version
 Generate wsmodel/material
 Use correct textues when loading 
-
-
-variants_dds_bl
-
+Animation slots 
 
 variantmeshes\wh_variantmodels\hu1e\cth\cth_dragon_storm_human\cth_dragon_storm_human_body_01.rigid_model_v2
 variantmeshes/wh_variantmodels/hu1e/cth/cth_dragon_storm_human/tex/cth_dragon_storm_human_body_01_specular.dds
 animations\battle\hybridcreature07\nurgle\attacks\hc7_nurgle_attack_05.anim
 
 Wh3
-	Open Texture on dds click
-	Added support
-	Fixed loading bugs
-	Decoded metadata
-		Cannot dismember
-		Effect v12
-		DockEquipment v11
-		RiderAnimationRequired
-		SoundTrigger v11 
-		ShaderParameter
-		UseBaseMetaData
-		
+Open Texture on dds click
+New Anim Meta Editor under super view
+Added support for wh3
+Animation v8 working 
+Added button under materials for models that loads textures from ws model	
+Decoded metadata
+	Cannot dismember
+	Effect v12
+	DockEquipment v11
+	RiderAnimationRequired
+	SoundTrigger v11 
+	ShaderParameter
+	UseBaseMetaData
+	Splice
+	Splice override 
+	
+Fixed bug related to normals when editing geometry 
+Fixed packfile loading bugs
+Fixed rendering for wh3	
+
+Added by Prop_Joe	
+	Folder renaming (experimental)
+	Re-arage files with drag and drop (experimental)
+	List of priv opened files
+	Close all tabs by right clicking tabs
+	Re-arage editor tabs
+	Show camera lod distance in editor
+	Correct focus when typing in textboxes, not longer deleting meshes when pressing delete to remove text
+	Propmt when closing with unsaved changes
+	Edit textures paths directy in editor without opening filebrowser
+	Generate materials if missing for wsmodels (Wh2, currently not working) 
+	
+	Fixed corruption bug when saving while packfile is locked by the game
+	Fix for adding multiple files with the same name
+	
+
+	
+	
+
+	
+	[]wh3 bin
+	[]Generate ws model wh3	
+	
+	
+	
+	
+	
+	
 		

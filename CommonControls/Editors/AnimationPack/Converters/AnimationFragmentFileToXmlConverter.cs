@@ -14,12 +14,12 @@ using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 namespace CommonControls.Editors.AnimationPack.Converters
 {
 
-    public class AnimationSetFileToXmlConverter 
-        : BaseAnimConverter<AnimationSetFileToXmlConverter.Animation, AnimationSetFile>
+    public class AnimationFragmentFileToXmlConverter 
+        : BaseAnimConverter<AnimationFragmentFileToXmlConverter.Animation, AnimationFragmentFile>
     {
         private SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
-        public AnimationSetFileToXmlConverter(SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        public AnimationFragmentFileToXmlConverter(SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
         }
@@ -92,7 +92,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
         protected override Animation ConvertBytesToXmlClass(byte[] bytes)
         {
-            var fragmentFile = new AnimationSetFile("", bytes);
+            var fragmentFile = new AnimationFragmentFile("", bytes);
             var outputBin = new Animation();
             outputBin.AnimationFragmentEntry = new List<AnimationEntry>();
             outputBin.Skeleton = fragmentFile.Skeletons.Values.FirstOrDefault();
@@ -119,7 +119,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
         protected override byte[] ConvertToAnimClassBytes(Animation animation, string fileName)
         {
-            var output = new AnimationSetFile(fileName, null);
+            var output = new AnimationFragmentFile(fileName, null);
             output.Skeletons = new StringArrayTable(animation.Skeleton, animation.Skeleton);
 
             foreach (var item in animation.AnimationFragmentEntry)

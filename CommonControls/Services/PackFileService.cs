@@ -566,7 +566,6 @@ namespace CommonControls.Services
             File.Delete(path);
             File.Move(path + "_temp", path);
 
-
             pf.OriginalLoadByteSize = new FileInfo(path).Length;
             _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pf);
         }

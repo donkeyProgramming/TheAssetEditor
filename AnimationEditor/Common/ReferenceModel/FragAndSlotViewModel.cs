@@ -14,7 +14,7 @@ namespace AnimationEditor.Common.ReferenceModel
         string _currentSkeletonName = "";
         AssetViewModel _asset;
 
-        public FilterCollection<AnimationSetFile> FragmentList { get; set; }
+        public FilterCollection<AnimationFragmentFile> FragmentList { get; set; }
 
         public FilterCollection<AnimationSetEntry> FragmentSlotList { get; set; }
 
@@ -30,7 +30,7 @@ namespace AnimationEditor.Common.ReferenceModel
             _asset = asset;
             _metaViewModel = metaViewModel;
 
-            FragmentList = new FilterCollection<AnimationSetFile>(null, (value) => FragmentSelected(value, FragmentSlotList, _asset.SkeletonName.Value))
+            FragmentList = new FilterCollection<AnimationFragmentFile>(null, (value) => FragmentSelected(value, FragmentSlotList, _asset.SkeletonName.Value))
             {
                 SearchFilter = (value, rx) => { return rx.Match(value.FileName).Success; }
             };
@@ -68,7 +68,7 @@ namespace AnimationEditor.Common.ReferenceModel
 
             if (newValue == null)
             {
-                FragmentList.UpdatePossibleValues(new List<AnimationSetFile>());
+                FragmentList.UpdatePossibleValues(new List<AnimationFragmentFile>());
                 FragmentSlotList.UpdatePossibleValues(new List<AnimationSetEntry>());
                 _currentSkeletonName = "";
                 return;
@@ -97,9 +97,9 @@ namespace AnimationEditor.Common.ReferenceModel
             _asset.SkeletonChanged += OnSkeletonChange;
         }
 
-        public List<AnimationSetFile> LoadFragmentsForSkeleton(string skeletonName, bool onlyPacksThatCanBeSaved = false)
+        public List<AnimationFragmentFile> LoadFragmentsForSkeleton(string skeletonName, bool onlyPacksThatCanBeSaved = false)
         {
-            var outputFragments = new List<AnimationSetFile>();
+            var outputFragments = new List<AnimationFragmentFile>();
             var animPacks = _pfs.FindAllWithExtention(@".animpack");
             foreach (var animPack in animPacks)
             {
@@ -117,7 +117,7 @@ namespace AnimationEditor.Common.ReferenceModel
             return outputFragments;
         }
 
-        void FragmentSelected(AnimationSetFile value, FilterCollection<AnimationSetEntry> collection, string skeletonName)
+        void FragmentSelected(AnimationFragmentFile value, FilterCollection<AnimationSetEntry> collection, string skeletonName)
         {
             if (value == null)
             {
