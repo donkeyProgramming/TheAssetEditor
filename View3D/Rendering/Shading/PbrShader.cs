@@ -51,9 +51,9 @@ namespace View3D.Rendering.Shading
         public bool UseAnimation { set { Effect.Parameters["doAnimation"].SetValue(value); } }
 
 
-        public void SetAnimationParameters(Matrix[] transforms, int weightCount = 4)
+        public void SetAnimationParameters(Matrix[] transforms, int weightCount)
         {
-            Effect.Parameters["WeightCount"].SetValue(weightCount);
+            Effect.Parameters["WeightCount"].SetValue((int)weightCount);
             Effect.Parameters["tranforms"].SetValue(transforms);
         }
 
@@ -118,7 +118,6 @@ namespace View3D.Rendering.Shading
             var newShader = new PbrShader_MetalRoughness(_resourceLibary);
 
             newShader.Effect.Parameters["DiffuseTexture"].SetValue(Effect.Parameters["DiffuseTexture"].GetValueTexture2D());
-            newShader.Effect.Parameters["SpecularTexture"].SetValue(Effect.Parameters["SpecularTexture"].GetValueTexture2D());
             newShader.Effect.Parameters["NormalTexture"].SetValue(Effect.Parameters["NormalTexture"].GetValueTexture2D());
             newShader.Effect.Parameters["GlossTexture"].SetValue(Effect.Parameters["GlossTexture"].GetValueTexture2D());
 

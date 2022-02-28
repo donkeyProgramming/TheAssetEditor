@@ -1,4 +1,5 @@
 ﻿using CommonControls.FileTypes.RigidModel;
+using CommonControls.Services;
 using MonoGame.Framework.WpfInterop;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +27,7 @@ namespace View3D.SceneNodes
             }
         }
 
-        public void CreateModelNodesFromFile(RmvFile model, ResourceLibary resourceLibary, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory, string modelFullPath, IComponentManager componentManager)
+        public void CreateModelNodesFromFile(RmvFile model, ResourceLibary resourceLibary, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory, string modelFullPath, IComponentManager componentManager, PackFileService pfs, bool autoResolveTexture)
         {
             Model = model;
             for (int lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
@@ -47,6 +48,11 @@ namespace View3D.SceneNodes
                     node.OriginalFilePath = modelFullPath;
                     node.OriginalPartIndex = modelIndex;
 
+                    if (autoResolveTexture)
+                    {
+                        MissingTextureResolver missingTextureResolver = new MissingTextureResolver();
+                        missingTextureResolver.ResolveMissingTextures(node, pfs);
+                    }
 
                     node.LodIndex = lodIndex;
                     lodNode.AddObject(node);

@@ -23,6 +23,16 @@ namespace AssetEditor.ViewModels
         bool _loadCaPacksByDefault;
         public bool LoadCaPacksByDefault { get => _loadCaPacksByDefault; set => SetAndNotify(ref _loadCaPacksByDefault, value); }
 
+        bool _autoGenerateAttachmentPointsFromMeshes;
+        public bool AutoGenerateAttachmentPointsFromMeshes { get => _autoGenerateAttachmentPointsFromMeshes; set => SetAndNotify(ref _autoGenerateAttachmentPointsFromMeshes, value); }
+
+        bool _skipLoadingWemFiles;
+        public bool SkipLoadingWemFiles { get => _skipLoadingWemFiles; set => SetAndNotify(ref _skipLoadingWemFiles, value); }
+
+        bool _autoResolveMissingTextures;
+        public bool AutoResolveMissingTextures { get => _autoResolveMissingTextures; set => SetAndNotify(ref _autoResolveMissingTextures, value); }
+
+
         public ICommand SaveCommand { get; set; }
 
         ApplicationSettingsService _settingsService;
@@ -44,6 +54,9 @@ namespace AssetEditor.ViewModels
             CurrentGame = _settingsService.CurrentSettings.CurrentGame;
             UseTextEditorForUnknownFiles = _settingsService.CurrentSettings.UseTextEditorForUnknownFiles;
             LoadCaPacksByDefault = _settingsService.CurrentSettings.LoadCaPacksByDefault;
+            AutoGenerateAttachmentPointsFromMeshes = _settingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes;
+            AutoResolveMissingTextures = _settingsService.CurrentSettings.AutoResolveMissingTextures;
+            SkipLoadingWemFiles = _settingsService.CurrentSettings.SkipLoadingWemFiles;
 
             SaveCommand = new RelayCommand(OnSave);
         }
@@ -53,6 +66,9 @@ namespace AssetEditor.ViewModels
             _settingsService.CurrentSettings.CurrentGame = CurrentGame;
             _settingsService.CurrentSettings.UseTextEditorForUnknownFiles = UseTextEditorForUnknownFiles;
             _settingsService.CurrentSettings.LoadCaPacksByDefault = LoadCaPacksByDefault;
+            _settingsService.CurrentSettings.SkipLoadingWemFiles = SkipLoadingWemFiles;
+            _settingsService.CurrentSettings.AutoResolveMissingTextures = AutoResolveMissingTextures;
+            _settingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes = AutoGenerateAttachmentPointsFromMeshes;
 
             _settingsService.CurrentSettings.GameDirectories.Clear();
             foreach (var item in GameDirectores)

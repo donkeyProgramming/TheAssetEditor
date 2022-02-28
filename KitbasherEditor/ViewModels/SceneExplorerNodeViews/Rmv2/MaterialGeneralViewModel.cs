@@ -18,6 +18,7 @@ using System.Windows.Input;
 using TextureEditor.ViewModels;
 using View3D.Components.Component;
 using View3D.SceneNodes;
+using View3D.Services;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 {
@@ -91,12 +92,14 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 if (Path == null)
                     return;
 
-                var path = Path.Replace("/", @"\");
+                var isFileFound = _packfileService.FindFile(Path) != null;
 
-                if (!_packfileService.Database.PackFiles.Any(pf => pf.FileList.Any(pair => pair.Key.Equals(path, StringComparison.OrdinalIgnoreCase))))
+                if (isFileFound == false && Path.Contains("test_mask.dds"))
+                    isFileFound = true;
+
+                if (isFileFound == false)
                 {
-                    var errorMessage = "Invalid Texture Path!" +
-                                       (TextureTypeStr == "Mask" ? " This is fine on mask textures." : "");
+                    var errorMessage = "Invalid Texture Path!";
                     _errorsByPropertyName[nameof(Path)] = new List<string>() {errorMessage};
                 }
                 else
@@ -143,7 +146,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         IComponentManager _componentManager;
         PackFileService _pfs;
 
-        public ICommand OverwriteTexturesFromWsModelCommand { get; set; }
+        public ICommand ResolveTexturesCommand { get; set; }
        
         public bool UseAlpha
         {
@@ -182,7 +185,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             _meshNode = meshNode;
             _pfs = pfs;
             PossibleVertexTypes = new UiVertexFormat[] { UiVertexFormat.Static, UiVertexFormat.Weighted, UiVertexFormat.Cinematic };
-            OverwriteTexturesFromWsModelCommand = new RelayCommand(OverwriteTexturesFromWsModel);
+            ResolveTexturesCommand = new RelayCommand(ResolveMissingTextures);
 
             var enumValues = Enum.GetValues(typeof(TexureType)).Cast<TexureType>().ToList();
             var textureEnumValues = _meshNode.Material.GetAllTextures().Select(x => x.TexureType).ToList();
@@ -217,55 +220,10 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             NotifyPropertyChanged(nameof(VertexType));
         }
 
-        private void OverwriteTexturesFromWsModel()
+        private void ResolveMissingTextures()
         {
-            var filePath = _meshNode.OriginalFilePath;
-            if (string.IsNullOrWhiteSpace(filePath) == false)
-            {
-                var file = _pfs.FindFile(filePath);
-                if (file != null)
-                {
-                    PackFile wsModelFile = file;
-                    if (file.Extention.Contains("wsmodel", StringComparison.InvariantCultureIgnoreCase) == false)
-                    {
-                        var newPath = Path.ChangeExtension(filePath, ".wsmodel");
-                        wsModelFile = _pfs.FindFile(newPath);
-                    }
-
-                    if (wsModelFile != null)
-                    {
-                        var wsModel = new WsMaterial(wsModelFile);
-                        var material = wsModel.MaterialList.FirstOrDefault(x => x.LodIndex == 0 && x.PartIndex == _meshNode.OriginalPartIndex);
-                        if(material != null)
-                        {
-                            var wsMaterialFile = _pfs.FindFile(material.Material);
-                            if (wsMaterialFile != null)
-                            {
-                                var wsMaterialFileContent = new WsModelMaterialFile(wsMaterialFile, "");
-                                foreach (var texture in TextureList)
-                                {
-                                    texture.UseTexture = false;
-                                    texture.Path = "";
-                                }
-
-                                foreach (var wsModelTexture in wsMaterialFileContent.Textures)
-                                {
-                                    var textureViewModel = TextureList.First(x => x.TexureType == wsModelTexture.Key);
-                                    textureViewModel.UseTexture = true;
-                                    textureViewModel.Path = wsModelTexture.Value;
-                                }
-
-                                UseAlpha = wsMaterialFileContent.Alpha;
-                                UpdateTextureListVisibility(OnlyShowUsedTextures);
-                                return;
-                            }
-                        }
-
-
-                    }
-                }
-            }
-            MessageBox.Show($"Failed to load textures from WS model - {filePath}", "Error");
+            MissingTextureResolver resolver = new MissingTextureResolver();
+            resolver.ResolveMissingTextures(_meshNode, _pfs);
         }
     }
 }

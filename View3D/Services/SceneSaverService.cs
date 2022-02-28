@@ -25,12 +25,14 @@ namespace View3D.Services
         private readonly PackFileService _packFileService;
         private readonly IEditorViewModel _editorViewModel;
         private readonly MainEditableNode _editableMeshNode;
+        ApplicationSettingsService _applicationSettingsService;
 
-        public SceneSaverService(PackFileService packFileService, IEditorViewModel editorViewModel, MainEditableNode editableMeshNode)
+        public SceneSaverService(PackFileService packFileService, IEditorViewModel editorViewModel, MainEditableNode editableMeshNode, ApplicationSettingsService applicationSettingsService)
         {
             _packFileService = packFileService;
             _editorViewModel = editorViewModel;
             _editableMeshNode = editableMeshNode;
+            _applicationSettingsService = applicationSettingsService;
         }
 
         public void Save()
@@ -92,7 +94,7 @@ namespace View3D.Services
                     onlySaveVisible = true;
             }
 
-            var bytes = Save(onlySaveVisible, new List<Rmv2ModelNode>() { _editableMeshNode }, _editableMeshNode.Skeleton.AnimationProvider.Skeleton, _editableMeshNode.SelectedOutputFormat);
+            var bytes = Save(onlySaveVisible, new List<Rmv2ModelNode>() { _editableMeshNode }, _editableMeshNode.Skeleton.AnimationProvider.Skeleton, _editableMeshNode.SelectedOutputFormat, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
             return bytes;
         }
 

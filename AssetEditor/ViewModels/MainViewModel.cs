@@ -4,6 +4,7 @@ using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.DB;
 using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.FileTypes.Sound;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
@@ -99,7 +100,11 @@ namespace AssetEditor.ViewModels
           
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
-                //_packfileService.Load(@"C:\Users\ole_k\AssetEditor\MyStuff\raptor2b.pack");
+
+                //var reportService = new FileListReportGenerator(packfileService, settingsService);
+                //reportService.CompareFiles(@"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer II_20220215105406362.csv", @"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.0.1.0 PackFiles.csv");
+
+                //;
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateFlyingSquig(this, toolFactory, packfileService);
 
                 //var r = new Rmv2Information(_packfileService);
@@ -181,9 +186,9 @@ namespace AssetEditor.ViewModels
 
                 //OpenFile(packfileService.FindFile(@"animations\database\battle\bin\animation_tables.animpack"));
 
-                OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\ngsw1\dae\dae_nurgling_swarm\dae_nurgling_swarm_01.rigid_model_v2"));
+                //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\ngsw1\dae\dae_nurgling_swarm\dae_nurgling_swarm_01.rigid_model_v2"));
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc1\tmb\tmb_warsphinx\tex\tmb_warsphinx_armour_01_base_colour.dds"));
-                //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu13d\ogr\ogr_skrag\ogr_skrag_01.rigid_model_v2"));
+                OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1e\cth\cth_peasant\cth_peasant_head_02.rigid_model_v2"));
 
 
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);

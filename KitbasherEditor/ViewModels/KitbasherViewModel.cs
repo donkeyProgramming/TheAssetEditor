@@ -30,6 +30,7 @@ namespace KitbasherEditor.ViewModels
         ILogger _logger = Logging.Create<KitbasherViewModel>();
         PackFileService _packFileService;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        ApplicationSettingsService _applicationSettingsService;
 
         SceneContainer _scene;
         CommandExecutor _commandExecutor;
@@ -45,10 +46,11 @@ namespace KitbasherEditor.ViewModels
         KitbashSceneCreator _modelLoader;
         private bool _hasUnsavedChanges;
 
-        public KitbasherViewModel(PackFileService pf, SkeletonAnimationLookUpHelper skeletonHelper)
+        public KitbasherViewModel(PackFileService pf, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService)
         {
             _packFileService = pf;
             _skeletonAnimationLookUpHelper = skeletonHelper;
+            _applicationSettingsService = applicationSettingsService;
 
             Scene = new SceneContainer();
             Scene.AddComponent(new DeviceResolverComponent(Scene));
@@ -65,7 +67,7 @@ namespace KitbasherEditor.ViewModels
             Scene.AddComponent(new FaceEditor(Scene));
             Scene.AddComponent(new FocusSelectableObjectComponent(Scene));
             Scene.AddComponent(new ClearScreenComponent(Scene));
-            Scene.AddComponent(new RenderEngineComponent(Scene));
+            Scene.AddComponent(new RenderEngineComponent(Scene, _applicationSettingsService));
             Scene.AddComponent(new GridComponent(Scene));
             Scene.AddComponent(new AnimationsContainerComponent(Scene));
             Scene.AddComponent(new ViewOnlySelectedComponent(Scene));
@@ -90,9 +92,9 @@ namespace KitbasherEditor.ViewModels
 
         private void OnSceneInitialized(WpfGame scene)
         {
-            _modelLoader = new KitbashSceneCreator(scene, _packFileService, Animation, MainFile, GeometryGraphicsContextFactory.CreateInstance(Scene.GraphicsDevice));
+            _modelLoader = new KitbashSceneCreator(scene, _packFileService, Animation, MainFile, GeometryGraphicsContextFactory.CreateInstance(Scene.GraphicsDevice), _applicationSettingsService);
             MenuBar.ModelLoader = _modelLoader;
-            MenuBar.General.ModelSaver = new SceneSaverService(_packFileService, this, _modelLoader.EditableMeshNode);
+            MenuBar.General.ModelSaver = new SceneSaverService(_packFileService, this, _modelLoader.EditableMeshNode, _applicationSettingsService);
             MenuBar.General.WsModelGeneratorService = new WsModelGeneratorService(_packFileService, this, _modelLoader.EditableMeshNode);
 
             SceneExplorer.EditableMeshNode = _modelLoader.EditableMeshNode;

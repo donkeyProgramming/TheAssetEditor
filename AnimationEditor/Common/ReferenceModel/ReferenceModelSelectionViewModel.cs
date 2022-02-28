@@ -17,6 +17,7 @@ namespace AnimationEditor.Common.ReferenceModel
         IComponentManager _componentManager;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         IToolFactory _toolFactory;
+        ApplicationSettingsService _applicationSettingsService;
 
         // Header
         string _headerName;
@@ -52,7 +53,7 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public NotifyAttr<bool> IsControlVisible { get; set; } = new NotifyAttr<bool>(true);
         public NotifyAttr<bool> AllowMetaData { get; set; } = new NotifyAttr<bool>(false);
-        public ReferenceModelSelectionViewModel(IToolFactory toolFactory, PackFileService pf, AssetViewModel data, string headerName, IComponentManager componentManager, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        public ReferenceModelSelectionViewModel(IToolFactory toolFactory, PackFileService pf, AssetViewModel data, string headerName, IComponentManager componentManager, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService applicationSettingsService)
         {
             _toolFactory = toolFactory;
             _pfs = pf;
@@ -60,6 +61,7 @@ namespace AnimationEditor.Common.ReferenceModel
             _componentManager = componentManager;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             Data = data;
+            _applicationSettingsService = applicationSettingsService;
 
             MeshViewModel = new SelectMeshViewModel(_pfs, Data);
             AnimViewModel = new SelectAnimationViewModel(Data, _pfs, skeletonAnimationLookUpHelper);
@@ -140,7 +142,7 @@ namespace AnimationEditor.Common.ReferenceModel
             var persist = parser.ParseFile(model.PersistMetaData);
             var meta = parser.ParseFile(model.MetaData);
 
-            var fatory = new MetaDataFactory(model.MainNode, _componentManager, model, model.Player, FragAndSlotSelection.FragmentList.SelectedItem);
+            var fatory = new MetaDataFactory(model.MainNode, _componentManager, model, model.Player, FragAndSlotSelection.FragmentList.SelectedItem, _applicationSettingsService);
             model.MetaDataItems = fatory.Create(persist, meta);
         }
 

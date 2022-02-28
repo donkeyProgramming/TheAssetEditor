@@ -133,7 +133,7 @@ namespace CommonControls.Services
                       {
                           using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
                           {
-                              var pfc = PackFileSerializer.Load(packFilePath, reader, _skeletonAnimationLookUpHelper);
+                              var pfc = PackFileSerializer.Load(packFilePath, reader, null, null);
 
                               _logger.Here().Information($"Seraching through packfile {currentIndex}/{files.Count} -  {packFilePath} {pfc.FileList.Count} files");
 
@@ -216,7 +216,7 @@ namespace CommonControls.Services
 
         public PackFileContainer Load(BinaryReader binaryReader, string packFileSystemPath)
         {
-            var pack = PackFileSerializer.Load(packFileSystemPath, binaryReader, _skeletonAnimationLookUpHelper);
+            var pack = PackFileSerializer.Load(packFileSystemPath, binaryReader, _skeletonAnimationLookUpHelper, _settingsService);
             Database.AddPackFile(pack);
             return pack;
         }
@@ -238,7 +238,7 @@ namespace CommonControls.Services
                         {
                             using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
                             {
-                                var pack = PackFileSerializer.Load(path, reader, _skeletonAnimationLookUpHelper);
+                                var pack = PackFileSerializer.Load(path, reader, _skeletonAnimationLookUpHelper, _settingsService);
                                 packList.Add(pack);
                             }
                         }

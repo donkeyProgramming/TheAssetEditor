@@ -63,6 +63,9 @@
                     <RowDefinition/>
                     <RowDefinition/>
                     <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Current Game"/>
@@ -78,6 +81,20 @@
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Load Ca Packs By Default"/>
                 <TextBlock Grid.Row="2" Grid.Column="1" Text=":"/>
                 <CheckBox  Grid.Row="2" Grid.Column="2" IsChecked="{Binding LoadCaPacksByDefault, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Skip loading wem (sound) files"/>
+                <TextBlock Grid.Row="3" Grid.Column="1" Text=":"/>
+                <CheckBox  Grid.Row="3" Grid.Column="2" IsChecked="{Binding SkipLoadingWemFiles, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Autogene Attachment Points for meshes"/>
+                <TextBlock Grid.Row="4" Grid.Column="1" Text=":"/>
+                <CheckBox  Grid.Row="4" Grid.Column="2" IsChecked="{Binding AutoGenerateAttachmentPointsFromMeshes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="Auto resolve missing textures"/>
+                <TextBlock Grid.Row="5" Grid.Column="1" Text=":"/>
+                <CheckBox  Grid.Row="5" Grid.Column="2" IsChecked="{Binding AutoResolveMissingTextures, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             </Grid>
         </GroupBox>
     </Grid>

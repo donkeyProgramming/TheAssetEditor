@@ -24,7 +24,7 @@ namespace View3D.Rendering.Shading
     public interface IShaderAnimation
     {
         public bool UseAnimation { set; }
-        public void SetAnimationParameters(Matrix[] transforms, int weightCount = 4);
+        public void SetAnimationParameters(Matrix[] transforms, int weightCount);
     }
 
 

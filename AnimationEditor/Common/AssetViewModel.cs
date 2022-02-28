@@ -34,6 +34,7 @@ namespace AnimationEditor.Common.ReferenceModel
         SkeletonNode _skeletonSceneNode;
         ISceneNode _modelNode;
         IComponentManager _componentManager;
+        ApplicationSettingsService _applicationSettingsService;
 
         bool _isSelectable = false;
         public bool IsSelectable { get => _isSelectable; set { _isSelectable = value; SetSelectableState(); } } 
@@ -63,12 +64,14 @@ namespace AnimationEditor.Common.ReferenceModel
         public NotifyAttr<bool> ShowSkeleton { get; set; }
 
 
-        public AssetViewModel(PackFileService pfs, string description, Color skeletonColour, IComponentManager componentManager)  : base(componentManager)
+        public AssetViewModel(PackFileService pfs, string description, Color skeletonColour, IComponentManager componentManager, ApplicationSettingsService applicationSettingsService)  : base(componentManager)
         {
             Description = description;
             _pfs = pfs;
             _skeletonColor = skeletonColour;
             _componentManager = componentManager;
+            _applicationSettingsService = applicationSettingsService;
+
             ShowMesh = new NotifyAttr<bool>(true, (x) => SetMeshVisability(x));
             ShowSkeleton = new NotifyAttr<bool>(true, (x) => _skeletonSceneNode.IsVisible = ShowSkeleton.Value);
         }
@@ -102,7 +105,7 @@ namespace AnimationEditor.Common.ReferenceModel
             _logger.Here().Information($"Loading reference model - {_pfs.GetFullPath(file)}");
 
             var graphics = _componentManager.GetComponent<DeviceResolverComponent>();
-            SceneLoader loader = new SceneLoader(_resourceLibary, _pfs, GeometryGraphicsContextFactory.CreateInstance(graphics.Device), _componentManager);
+            SceneLoader loader = new SceneLoader(_resourceLibary, _pfs, GeometryGraphicsContextFactory.CreateInstance(graphics.Device), _componentManager, _applicationSettingsService);
             var loadedNode = loader.Load(file, null, Player);
             if (loadedNode == null)
             {

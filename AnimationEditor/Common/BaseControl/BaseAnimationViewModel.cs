@@ -35,7 +35,8 @@ namespace AnimationEditor.PropCreator.ViewModels
         bool _createDefaultAssets;
         protected PackFileService _pfs;
         protected SkeletonAnimationLookUpHelper _skeletonHelper;
-        protected SchemaManager _schemaManager;
+        protected ApplicationSettingsService _applicationSettingsService;
+
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Creator");
         public PackFile MainFile { get; set; }
 
@@ -56,12 +57,13 @@ namespace AnimationEditor.PropCreator.ViewModels
         object _editor;
         public object Editor { get => _editor; set => SetAndNotify(ref _editor, value); }
 
-        public BaseAnimationViewModel(IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, string headerAsset0, string headerAsset1, bool createDefaultAssets = true)
+        public BaseAnimationViewModel(IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService, string headerAsset0, string headerAsset1, bool createDefaultAssets = true)
         {
             _toolFactory = toolFactory;
             _pfs = pfs;
             _skeletonHelper = skeletonHelper;
             _createDefaultAssets = createDefaultAssets;
+            _applicationSettingsService = applicationSettingsService;
 
             Scene = new SceneContainer();
             Scene.AddComponent(new DeviceResolverComponent(Scene));
@@ -72,7 +74,7 @@ namespace AnimationEditor.PropCreator.ViewModels
             Scene.AddComponent(skeletonHelper);
             Scene.AddComponent(new ArcBallCamera(Scene));
             Scene.AddComponent(new ClearScreenComponent(Scene));
-            Scene.AddComponent(new RenderEngineComponent(Scene));
+            Scene.AddComponent(new RenderEngineComponent(Scene, _applicationSettingsService));
             Scene.AddComponent(new GridComponent(Scene));
             Scene.AddComponent(new SceneManager(Scene));
             Scene.AddComponent(new AnimationsContainerComponent(Scene));
@@ -83,11 +85,11 @@ namespace AnimationEditor.PropCreator.ViewModels
 
             Scene.SceneInitialized += OnSceneInitialized;
 
-            var mainAsset = Scene.AddComponent(new AssetViewModel(_pfs, headerAsset0, Color.Black, Scene));
-            var refAsset = Scene.AddComponent(new AssetViewModel(_pfs, headerAsset1,  Color.Green, Scene));
+            var mainAsset = Scene.AddComponent(new AssetViewModel(_pfs, headerAsset0, Color.Black, Scene, _applicationSettingsService));
+            var refAsset = Scene.AddComponent(new AssetViewModel(_pfs, headerAsset1,  Color.Green, Scene, _applicationSettingsService));
 
-            MainModelView = new ReferenceModelSelectionViewModel(_toolFactory, pfs, mainAsset, headerAsset0 + ":", Scene, skeletonHelper);
-            ReferenceModelView = new ReferenceModelSelectionViewModel(_toolFactory, pfs, refAsset, headerAsset1 + ":", Scene, skeletonHelper);
+            MainModelView = new ReferenceModelSelectionViewModel(_toolFactory, pfs, mainAsset, headerAsset0 + ":", Scene, skeletonHelper, _applicationSettingsService);
+            ReferenceModelView = new ReferenceModelSelectionViewModel(_toolFactory, pfs, refAsset, headerAsset1 + ":", Scene, skeletonHelper, _applicationSettingsService);
         }
 
         private void OnSceneInitialized(WpfGame scene)

@@ -9,7 +9,8 @@ namespace AnimationEditor.AnimationTransferTool
 {
     public class AnimationTransferToolViewModel : BaseAnimationViewModel
     {
-        public AnimationTransferToolViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper) : base(toolFactory, pfs, skeletonHelper,"Target", "Source")
+        public AnimationTransferToolViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService) 
+            : base(toolFactory, pfs, skeletonHelper, applicationSettingsService, "Target", "Source")
         {
             DisplayName.Value = "Animation transfer tool";
             Pfs = pfs;
@@ -20,7 +21,7 @@ namespace AnimationEditor.AnimationTransferTool
         public override void Initialize()
         {
             ReferenceModelView.Data.IsSelectable = false;
-            var propAsset = Scene.AddComponent(new AssetViewModel(_pfs, "Generated", Color.Black, Scene));
+            var propAsset = Scene.AddComponent(new AssetViewModel(_pfs, "Generated", Color.Black, Scene, _applicationSettingsService));
             Player.RegisterAsset(propAsset);
             Editor = new Editor(_pfs, _skeletonHelper, MainModelView.Data, ReferenceModelView.Data, propAsset, Scene, Player);
         }

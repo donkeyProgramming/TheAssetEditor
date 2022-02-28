@@ -18,7 +18,7 @@ namespace AnimationEditor.SuperView
         SkeletonAnimationLookUpHelper _skeletonHelper;
         AnimationPlayerViewModel _player;
         IToolFactory _toolFactory;
-
+        ApplicationSettingsService _applicationSettingsService;
 
         public NotifyAttr<string> PersistentMetaFilePath { get; set; } = new NotifyAttr<string>("");
         public NotifyAttr<string> PersistentMetaFilePackFileContainerName { get; set; } = new NotifyAttr<string>("");
@@ -31,13 +31,14 @@ namespace AnimationEditor.SuperView
 
         public ObservableCollection<ReferenceModelSelectionViewModel> Items { get; set; } = new ObservableCollection<ReferenceModelSelectionViewModel>();
 
-        public Editor(IToolFactory toolFactory, SceneContainer scene, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, AnimationPlayerViewModel player, CopyPasteManager copyPasteManager)
+        public Editor(IToolFactory toolFactory, SceneContainer scene, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, AnimationPlayerViewModel player, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService)
         {
             _toolFactory = toolFactory;
             _scene = scene;
             _pfs = pfs;
             _skeletonHelper = skeletonHelper;
             _player = player;
+            _applicationSettingsService = applicationSettingsService;
 
             PersistentMetaEditor = new CommonControls.Editors.AnimMeta.EditorViewModel(pfs, copyPasteManager);
             PersistentMetaEditor.EditorSavedEvent += PersistentMetaEditor_EditorSavedEvent;
@@ -47,9 +48,9 @@ namespace AnimationEditor.SuperView
 
         public void Create(AnimationToolInput input)
         {
-            var asset = _scene.AddComponent(new AssetViewModel(_pfs, "Item 0", Color.Black, _scene));
+            var asset = _scene.AddComponent(new AssetViewModel(_pfs, "Item 0", Color.Black, _scene, _applicationSettingsService));
             _player.RegisterAsset(asset);
-            var viewModel = new ReferenceModelSelectionViewModel(_toolFactory, _pfs, asset, "Item 0:", _scene, _skeletonHelper);
+            var viewModel = new ReferenceModelSelectionViewModel(_toolFactory, _pfs, asset, "Item 0:", _scene, _skeletonHelper, _applicationSettingsService);
             viewModel.AllowMetaData.Value = true;
 
             if(input.Mesh != null)

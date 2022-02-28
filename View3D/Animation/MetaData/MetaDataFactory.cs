@@ -30,14 +30,16 @@ namespace View3D.Animation.MetaData
         ISkeletonProvider _rootSkeleton;
         AnimationPlayer _rootPlayer;
         AnimationFragmentFile _fragment;
+        ApplicationSettingsService _applicationSettingsService;
 
-        public MetaDataFactory(SceneNode root, IComponentManager componentManager, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, AnimationFragmentFile fragment)
+        public MetaDataFactory(SceneNode root, IComponentManager componentManager, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, AnimationFragmentFile fragment, ApplicationSettingsService applicationSettingsService)
         {
             _root = root;
             _componentManager = componentManager;
             _rootSkeleton = skeleton;
             _rootPlayer = rootPlayer;
             _fragment = fragment;
+            _applicationSettingsService = applicationSettingsService;
         }
 
         public List<IMetaDataInstance> Create(MetaDataFile persistenet, MetaDataFile metaData)
@@ -143,7 +145,7 @@ namespace View3D.Animation.MetaData
             var propPlayer = _componentManager.GetComponent<AnimationsContainerComponent>().RegisterAnimationPlayer(new AnimationPlayer(), propName + Guid.NewGuid());
 
             // Configure the mesh
-            SceneLoader loader = new SceneLoader(resourceLib, pfs, GeometryGraphicsContextFactory.CreateInstance(graphics.Device), _componentManager);
+            SceneLoader loader = new SceneLoader(resourceLib, pfs, GeometryGraphicsContextFactory.CreateInstance(graphics.Device), _componentManager, _applicationSettingsService);
             var loadedNode = loader.Load(meshPath, new GroupNode(propName), propPlayer);
 
             // Configure animation

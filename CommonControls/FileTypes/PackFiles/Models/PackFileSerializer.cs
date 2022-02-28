@@ -1,4 +1,5 @@
 ﻿using CommonControls.Common;
+using CommonControls.Services;
 using FileTypes.ByteParsing;
 using Serilog;
 using System;
@@ -29,7 +30,7 @@ namespace CommonControls.FileTypes.PackFiles.Models
     {
         static readonly ILogger _logger = Logging.CreateStatic(typeof(PackFileSerializer));
 
-        public static PackFileContainer Load(string packFileSystemPath, BinaryReader reader, IAnimationFileDiscovered animationFileDiscovered)
+        public static PackFileContainer Load(string packFileSystemPath, BinaryReader reader, IAnimationFileDiscovered animationFileDiscovered, ApplicationSettingsService settings)
         {
             try
             {
@@ -75,7 +76,15 @@ namespace CommonControls.FileTypes.PackFiles.Models
                     if (animationFileDiscovered != null && packFileName.EndsWith(".anim"))
                         animationFileDiscovered.FileDiscovered(fileContent, output, fullPackedFileName);
 
-                    output.FileList.Add(fullPackedFileName, fileContent);
+                    if (settings != null && settings.CurrentSettings.SkipLoadingWemFiles)
+                    {
+                        if (packFileName.EndsWith(".wem", StringComparison.InvariantCultureIgnoreCase) == false)
+                            output.FileList.Add(fullPackedFileName, fileContent);
+                    }
+                    else
+                    {
+                        output.FileList.Add(fullPackedFileName, fileContent);
+                    }
                     offset += size;
                 }
 

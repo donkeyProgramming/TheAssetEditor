@@ -10,7 +10,8 @@ namespace AnimationEditor.MountAnimationCreator
 
     public class MountAnimationCreatorViewModel : BaseAnimationViewModel
     {
-        public MountAnimationCreatorViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper) : base(toolFactory, pfs, skeletonHelper, "Rider", "Mount")
+        public MountAnimationCreatorViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService)
+            : base(toolFactory, pfs, skeletonHelper, applicationSettingsService, "Rider", "Mount")
         {
             DisplayName.Value = "MountAnimCreator";
         }
@@ -18,7 +19,7 @@ namespace AnimationEditor.MountAnimationCreator
         public override void Initialize()
         {
             ReferenceModelView.Data.IsSelectable = true;
-            var propAsset = Scene.AddComponent(new AssetViewModel(_pfs, "NewAnim", Color.Red, Scene));
+            var propAsset = Scene.AddComponent(new AssetViewModel(_pfs, "NewAnim", Color.Red, Scene, _applicationSettingsService));
             Player.RegisterAsset(propAsset);
             Editor = new Editor(_pfs, _skeletonHelper, MainModelView.Data, ReferenceModelView.Data, propAsset, Scene);
         }

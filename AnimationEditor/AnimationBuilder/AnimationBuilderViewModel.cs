@@ -23,8 +23,8 @@ namespace AnimationEditor.AnimationBuilder
         CopyPasteManager _copyPasteManager;
 
 
-        public AnimationBuilderViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager)
-            : base(toolFactory, pfs, skeletonHelper, "Main Node", "not_in_use2", false)
+        public AnimationBuilderViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService)
+            : base(toolFactory, pfs, skeletonHelper, applicationSettingsService, "Main Node", "not_in_use2", false)
         {
             _copyPasteManager = copyPasteManager;
             DisplayName.Value = "Animation Builder";

@@ -264,7 +264,7 @@ PixelInputType main(in VertexInputType input) // main is the default function na
 		float4 tangent = 0;
 		float4 biNormal = 0;
 
-		for (int i = 0; i < WeightCount; i++)
+		for (int i = 0; i < 4; i++)
 		{
 			pos += input.Weights[i] * mul(input.position, PM[i]);
 			normal.xyz += input.Weights[i] * mul(input.normal, (float3x3) PM[i]);

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CommonControls.Services;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.WpfInterop;
 using System;
@@ -40,6 +41,7 @@ namespace View3D.Components.Rendering
         Dictionary<RenderBuckedId, List<IRenderItem>> _renderItems = new Dictionary<RenderBuckedId, List<IRenderItem>>();
         ResourceLibary _resourceLib;
         DeviceResolverComponent _deviceResolver;
+        ApplicationSettingsService _applicationSettingsService;
 
         bool _cullingEnabled = false;
         bool _bigSceneDepthBiasMode = false;
@@ -47,15 +49,19 @@ namespace View3D.Components.Rendering
         public float LightRotationDegrees { get; set; } = 20;
         public float LightIntensityMult { get; set; } = 6;
 
-        public RenderFormats MainRenderFormat { get; set; } = RenderFormats.MetalRoughness;
+        public RenderFormats MainRenderFormat { get; set; } = RenderFormats.SpecGloss;
 
-        public RenderEngineComponent(IComponentManager componentManager) : base(componentManager)
+        public RenderEngineComponent(IComponentManager componentManager, ApplicationSettingsService applicationSettingsService) : base(componentManager)
         {
+            _applicationSettingsService = applicationSettingsService;
             UpdateOrder = (int)ComponentUpdateOrderEnum.RenderEngine;
             DrawOrder = (int)ComponentDrawOrderEnum.RenderEngine;
 
             foreach (RenderBuckedId value in Enum.GetValues(typeof(RenderBuckedId)))
                 _renderItems.Add(value, new List<IRenderItem>(100));
+
+            if (_applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Warhammer3 || _applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.ThreeKingdoms)
+                MainRenderFormat = RenderFormats.MetalRoughness;
         }
 
         public override void Initialize()

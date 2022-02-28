@@ -9,7 +9,8 @@ namespace AnimationEditor.SuperView
     public class SuperViewViewModel : BaseAnimationViewModel
     {
         CopyPasteManager _copyPasteManager;
-        public SuperViewViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager) : base(toolFactory, pfs, skeletonHelper, "not_in_use1", "not_in_use2", false)
+        public SuperViewViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService) 
+            : base(toolFactory, pfs, skeletonHelper, applicationSettingsService, "not_in_use1", "not_in_use2", false)
         {
             _copyPasteManager = copyPasteManager;
             DisplayName.Value = "Super view";
@@ -24,7 +25,7 @@ namespace AnimationEditor.SuperView
             ReferenceModelView.IsControlVisible.Value = false;
             ReferenceModelView.Data.IsSelectable = false;
 
-            var typedEditor = new Editor(_toolFactory ,Scene, _pfs, _skeletonHelper, Player, _copyPasteManager);
+            var typedEditor = new Editor(_toolFactory ,Scene, _pfs, _skeletonHelper, Player, _copyPasteManager, _applicationSettingsService);
             Editor = typedEditor;
 
             if (MainInput == null)

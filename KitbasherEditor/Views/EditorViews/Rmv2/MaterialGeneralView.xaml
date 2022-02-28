@@ -24,9 +24,9 @@
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Load texture from WS"/>
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Missing textures"/>
                 <Label>:</Label>
-                <Button Command="{Binding MaterialGeneral.OverwriteTexturesFromWsModelCommand}" VerticalAlignment="Center" Content="Load textures from WS model"/>
+                <Button Command="{Binding MaterialGeneral.ResolveTexturesCommand}" VerticalAlignment="Center" Content="Try resolve missing texturesl"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">

@@ -27,17 +27,6 @@ namespace View3D.Rendering
                     new VertexElement(76, VertexElementFormat.Vector4, VertexElementUsage.BlendIndices, 0)
                 );
 
-        public VertexPositionNormalTextureCustom(Vector3 pos, Vector3 normal, Vector2 tex, Vector3 tangent = new Vector3(), Vector3 biNormal = new Vector3())
-        {
-            Position = new Vector4(pos, 1);
-            Normal = normal;
-            TextureCoordinate = tex;
-            Tangent = tangent;
-            BiNormal = biNormal;
-            BlendWeights = Vector4.One;
-            BlendIndices = Vector4.Zero;
-        }
-
         VertexDeclaration IVertexType.VertexDeclaration
         {
             get { return VertexDeclaration; }

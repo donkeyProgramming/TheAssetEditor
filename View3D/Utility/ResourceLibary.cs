@@ -8,6 +8,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using View3D.Components;
 
 namespace View3D.Utility
@@ -113,18 +114,40 @@ namespace View3D.Utility
                     out_imageInfo.SetFromImage(image);
 
 
-                    Texture2D texture;
+                    Texture2D texture = null;
                     if (image.Format == ImageFormat.Rgba32)
                     {
-                        texture = new Texture2D(device, image.Width, image.Height, true, SurfaceFormat.Bgra32);
-                        texture.SetData(0, null, image.Data, 0, image.DataLen);
+                        try
+                        {
+                            texture = new Texture2D(device, image.Width, image.Height, true, SurfaceFormat.Bgra32);
+                            texture.SetData(0, null, image.Data, 0, image.DataLen);
+                        }
+                        catch
+                        { }
                     }
-                    else if (image.Format == ImageFormat.Rgb8)
+
+                    // Try loading using all types
+#if DEBUG
+                    if (texture == null)
                     {
-                        texture = new Texture2D(device, image.Width, image.Height, true, SurfaceFormat.Rgb8Etc2);
-                        texture.SetData(0, null, image.Data, 0, image.DataLen);
+                        var possibleSurfaceFormats = Enum.GetValues(typeof(SurfaceFormat)).Cast<SurfaceFormat>();
+                        foreach (var surfaceFormat in possibleSurfaceFormats)
+                        {
+                            try
+                            {
+                                texture = new Texture2D(device, image.Width, image.Height, true, surfaceFormat);
+                                texture.SetData(0, null, image.Data, 0, image.DataLen);
+                                break;
+                            }
+                            catch (Exception e)
+                            {
+                                _logger.Here().Error($"Error loading texture ({fileName} - with format {image.Format}, tried loading as {surfaceFormat})");
+                            }
+                        }
                     }
-                    else
+#endif
+
+                    if(texture == null)
                     {
                         _logger.Here().Error($"Error loading texture ({fileName} - Unkown textur format {image.Format})");
                         return null;

@@ -28,7 +28,8 @@ namespace KitbasherEditor.Services
         SceneManager _sceneManager;
         IGeometryGraphicsContextFactory _geometryFactory;
         IComponentManager _componentManager;
-        public KitbashSceneCreator(IComponentManager componentManager, PackFileService packFileService, AnimationControllerViewModel animationView, PackFile mainFile, IGeometryGraphicsContextFactory geometryFactory)
+        ApplicationSettingsService _applicationSettingsService;
+        public KitbashSceneCreator(IComponentManager componentManager, PackFileService packFileService, AnimationControllerViewModel animationView, PackFile mainFile, IGeometryGraphicsContextFactory geometryFactory, ApplicationSettingsService applicationSettingsService)
         {
             _componentManager = componentManager;
             _packFileService = packFileService;
@@ -36,6 +37,7 @@ namespace KitbasherEditor.Services
             _animationView = animationView;
             _sceneManager = componentManager.GetComponent<SceneManager>();
             _geometryFactory = geometryFactory;
+            _applicationSettingsService = applicationSettingsService;
 
             var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(componentManager, animationView) { IsLockable = false });
             EditableMeshNode = _sceneManager.RootNode.AddObject(new MainEditableNode("Editable Model", skeletonNode, mainFile));
@@ -47,7 +49,7 @@ namespace KitbasherEditor.Services
             var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
 
             var modelFullPath = _packFileService.GetFullPath(file);
-            EditableMeshNode.CreateModelNodesFromFile(rmv, _resourceLibary, _animationView.Player, _geometryFactory, modelFullPath, _componentManager);
+            EditableMeshNode.CreateModelNodesFromFile(rmv, _resourceLibary, _animationView.Player, _geometryFactory, modelFullPath, _componentManager, _packFileService, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
             EditableMeshNode.SelectedOutputFormat = rmv.Header.Version;
 
             int meshCount = Math.Min(EditableMeshNode.Children.Count, rmv.LodHeaders.Length);
@@ -99,7 +101,7 @@ namespace KitbasherEditor.Services
 
         SceneNode LoadModel(PackFile file)
         {
-            SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, _geometryFactory, _componentManager);
+            SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, _geometryFactory, _componentManager, _applicationSettingsService);
             var loadedNode = loader.Load(file, null, _animationView.Player);
 
             if (loadedNode == null)

@@ -26,12 +26,15 @@ namespace View3D.Services
         ResourceLibary _resourceLibary;
         IGeometryGraphicsContextFactory _geometryContextFactory;
         IComponentManager _componentManager;
-        public SceneLoader(ResourceLibary resourceLibary, PackFileService pfs, IGeometryGraphicsContextFactory geometryContextFactory, IComponentManager componentManager)
+        ApplicationSettingsService _applicationSettingsService;
+
+        public SceneLoader(ResourceLibary resourceLibary, PackFileService pfs, IGeometryGraphicsContextFactory geometryContextFactory, IComponentManager componentManager, ApplicationSettingsService applicationSettingsService)
         {
             _componentManager = componentManager;
             _packFileService = pfs;
             _resourceLibary = resourceLibary;
             _geometryContextFactory = geometryContextFactory;
+            _applicationSettingsService = applicationSettingsService;
         }
 
         public SceneNode Load(PackFile file, SceneNode parent, AnimationPlayer player)
@@ -53,7 +56,7 @@ namespace View3D.Services
                     break;
 
                 case ".rigid_model_v2":
-                    LoadRigidMesh(file, ref parent, player, attachmentPointName);
+                    LoadRigidMesh(file, ref parent, player, attachmentPointName, false);
                     break;
 
                 case ".wsmodel":
@@ -133,15 +136,15 @@ namespace View3D.Services
             }
         }
 
-        Rmv2ModelNode LoadRigidMesh(PackFile file, ref SceneNode parent, AnimationPlayer player, string attachmentPointName)
+        Rmv2ModelNode LoadRigidMesh(PackFile file, ref SceneNode parent, AnimationPlayer player, string attachmentPointName, bool isParentWsModel)
         {
             var rmvModel = ModelFactory.Create().Load(file.DataSource.ReadData());
 
             var modelFullPath = _packFileService.GetFullPath(file);
             var modelNode = new Rmv2ModelNode(Path.GetFileName(file.Name));
-            modelNode.CreateModelNodesFromFile(rmvModel, _resourceLibary, player, _geometryContextFactory, modelFullPath, _componentManager);
+            var autoResolveTexture = isParentWsModel == false && _applicationSettingsService.CurrentSettings.AutoResolveMissingTextures;
+            modelNode.CreateModelNodesFromFile(rmvModel, _resourceLibary, player, _geometryContextFactory, modelFullPath, _componentManager, _packFileService, autoResolveTexture);
 
-            
             foreach (var mesh in modelNode.GetMeshNodes(0))
                 mesh.AttachmentPointName = attachmentPointName;
 
@@ -149,6 +152,7 @@ namespace View3D.Services
                 parent = modelNode;
             else
                 parent.AddObject(modelNode);
+
 
             return modelNode;
         }
@@ -166,7 +170,7 @@ namespace View3D.Services
             { 
                 var modelFile = _packFileService.FindFile(wsMaterial.GeometryPath);
                 var modelAsBase = wsModelNode as SceneNode;
-                var loadedModelNode = LoadRigidMesh(modelFile, ref modelAsBase, player , attachmentPointName);
+                var loadedModelNode = LoadRigidMesh(modelFile, ref modelAsBase, player , attachmentPointName, true);
                
                 foreach (var materialNode in wsMaterial.MaterialList)
                 {
