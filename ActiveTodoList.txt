@@ -591,6 +591,7 @@ Wh3
 		Fix for adding multiple files with the same name
 	
 
+
 Settings added:
 	Skip Loading sound files (there are so many and no one cares about them) 
 	Auto resolve textures by default
@@ -601,19 +602,34 @@ Settings added:
 Fixed bug when merging meshes
 Fixed bug when generating lods
 Detect shader model based on selected active game 
+Fixed animation quality issue 
+Display Lod Quality level
 
-BlendWeight issue => renamed VertexPositionNormalTextureCustom variable
- Effect.Parameters["WeightCount"].SetValue((int)weightCount);
  
 Merge mesh quality of life
 Auto generate ws model 
 Ambient light 
+Group meshes after splitting 
 
-variantmeshes\wh_variantmodels\hu16\dae\dae_daemonette\dae_daemonette_favoured_body_02.rigid_model_v2
-	
+Texture converter 
 Bin system + wh3
 Ws model generator 
 Deeezy corruption bug 	
 Animation weight bugs 
 Hold alt/double click when pressing face to select all faces in that mesh 
 Reports => sound 
+
+
+
+
+
+
+
+
+
+variantmeshes\wh_variantmodels\hu1e\cth\cth_peasant\cth_peasant_head_02.rigid_model_v2
+variantmeshes\wh_variantmodels\hu16\dae\dae_daemonette\dae_daemonette_favoured_body_02.rigid_model_v2
+
+10312 <-- Vertex start  
+252 header
+10,564 => Actual start in file

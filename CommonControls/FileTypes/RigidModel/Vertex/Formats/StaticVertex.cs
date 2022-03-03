@@ -16,7 +16,7 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
         public uint VertexSize => (uint)ByteHelper.GetSize<Data>();
         public bool ForceComputeNormals => false;
 
-        public CommonVertex Create(byte[] buffer, int offset, int vertexSize)
+        public CommonVertex Read(byte[] buffer, int offset, int vertexSize)
         {
             var vertexData = ByteHelper.ByteArrayToStructure<Data>(buffer, offset);
 
@@ -38,7 +38,7 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
             return vertex;
         }
 
-        public byte[] ToBytes(CommonVertex vertex)
+        public byte[] Write(CommonVertex vertex)
         {
             if (vertex.WeightCount != 0 || vertex.BoneIndex.Length != 0 || vertex.BoneWeight.Length != 0)
                 throw new Exception($"Unexpected vertex weights for {Type}");

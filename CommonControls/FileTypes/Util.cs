@@ -28,7 +28,7 @@ namespace CommonControls.FileTypes
             var handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
 
             var objectSize = GetSize<T>();
-            if (offset + objectSize >= bytes.Length)
+            if (offset + objectSize > bytes.Length)
                 throw new Exception($"Object {typeof(T)} does not fit into the remaining buffer [offset{offset} + Size{objectSize} => byteBuffer{bytes.Length}]");
 
             try

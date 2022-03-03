@@ -14,7 +14,7 @@ namespace CommonControls.FileTypes.RigidModel.Vertex
             ByteParsers.Float16.TryDecodeValue(data, 4, out var z, out _, out _);
             ByteParsers.Float16.TryDecodeValue(data, 6, out var w, out _, out _);
 
-            if (w > 0.0f)
+            if (w != 0.0f)
             {
                 x *= w;
                 y *= w;
@@ -97,7 +97,7 @@ namespace CommonControls.FileTypes.RigidModel.Vertex
         {
             // var truncatedFloat = ((f * 255.0f) / 2.0f) + 1.0f;
             var truncatedFloat = (f + 1.0f) / 2.0f * 255.0f;
-            return (byte)truncatedFloat;
+            return (byte)Math.Round(truncatedFloat);
         }
 
         static public byte[] CreatePositionVector4(Microsoft.Xna.Framework.Vector4 vector)
@@ -134,7 +134,7 @@ namespace CommonControls.FileTypes.RigidModel.Vertex
             output[0] = NormalToByte(vector.X);
             output[1] = NormalToByte(vector.Y);
             output[2] = NormalToByte(vector.Z);
-            output[3] = NormalToByte(1);
+            output[3] = NormalToByte(-1);
             return output;
         }
 

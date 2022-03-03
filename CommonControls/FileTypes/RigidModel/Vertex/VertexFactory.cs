@@ -7,8 +7,8 @@ namespace CommonControls.FileTypes.RigidModel.Vertex
     public interface IVertexCreator
     {
         VertexFormat Type { get; }
-        CommonVertex Create(byte[] buffer, int offset, int vertexSize);
-        byte[] ToBytes(CommonVertex vertex);
+        CommonVertex Read(byte[] buffer, int offset, int vertexSize);
+        byte[] Write(CommonVertex vertex);
         uint VertexSize { get; }
         bool ForceComputeNormals { get; }
     }
@@ -53,7 +53,7 @@ namespace CommonControls.FileTypes.RigidModel.Vertex
 
             var vertexList = new CommonVertex[vertexCount];
             for (int i = 0; i < vertexCount; i++)
-                vertexList[i] = creator.Create(buffer, vertexStart + i * vertexSize, vertexSize);
+                vertexList[i] = creator.Read(buffer, vertexStart + i * vertexSize, vertexSize);
             return vertexList;
         }
 
@@ -69,7 +69,7 @@ namespace CommonControls.FileTypes.RigidModel.Vertex
 
         public byte[] Save(VertexFormat vertexType, CommonVertex vertex)
         {
-            return _vertexCreators[vertexType].ToBytes(vertex);
+            return _vertexCreators[vertexType].Write(vertex);
         }
 
         public void ReComputeNormals(VertexFormat binaryVertexFormat, ref CommonVertex[] vertexList, ref ushort[] indexList)

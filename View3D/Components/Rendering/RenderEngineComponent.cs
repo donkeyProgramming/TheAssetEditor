@@ -47,7 +47,7 @@ namespace View3D.Components.Rendering
         bool _bigSceneDepthBiasMode = false;
 
         public float LightRotationDegrees { get; set; } = 20;
-        public float LightIntensityMult { get; set; } = 6;
+        public float LightIntensityMult { get; set; } = 1;
 
         public RenderFormats MainRenderFormat { get; set; } = RenderFormats.SpecGloss;
 

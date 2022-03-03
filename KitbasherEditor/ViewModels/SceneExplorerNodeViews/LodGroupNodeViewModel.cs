@@ -30,5 +30,15 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 }
             }
         }
+
+        public byte QualityLvl
+        {
+            get
+            {
+                var lodHeaders = _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().Model.LodHeaders;
+                return lodHeaders[_node.LodValue].QualityLvl;
+            }
+           
+        }
     }
 }

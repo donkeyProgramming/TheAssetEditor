@@ -12,21 +12,6 @@ using System.Linq;
 
 namespace CommonControls.FileTypes.Animation
 {
-
-    /*
-     static inline constexpr float SNORM16_To_Float(int16_t in)
-    {
-        if (in == 32767)
-            return 1.f;
-        
-        if (in == -32768)
-            return -1.f;
-
-        float c = in;
-        return ( c / ( 32767.0f ) );
-    }
-     */
-
     [DebuggerDisplay("AnimationFile - {Header.SkeletonName}[{DynamicFrames.Count}]")]
     public class AnimationFile
     {
@@ -276,77 +261,79 @@ namespace CommonControls.FileTypes.Animation
             output.TranslationMappings.Clear();
             output.RotationMappings.Clear();
             var unk0 = chunk.ReadUInt32();
-            var unk1 = chunk.ReadUInt32();
+            var animationParts = chunk.ReadUInt32();
 
-            var optimizationData = new AnimationV8OptimizationData(boneCount);
-
-
-            var translationCounter = 0;
-            var translationCounterStatic = 0;
-            for (int i = 0; i < boneCount; i++)
+            for (int animationPart = 0; animationPart < animationParts; animationPart++)
             {
-                optimizationData.TranslationBitRate[i] = (sbyte)chunk.ReadByte();
-                int value = -1;
-                if(optimizationData.TranslationBitRate[i] < 0)
-                    value = 10000 + translationCounterStatic++;
-                else if (optimizationData.TranslationBitRate[i] > 0)
-                    value = translationCounter++;
 
-                output.TranslationMappings.Add(new AnimationBoneMapping(value));
-            }
-
-            var roationCounter = 0;
-            var roationCounterStatic = 0;
-            for (int i = 0; i < boneCount; i++)
-            {
-                optimizationData.RotationBitRate[i] = (sbyte)chunk.ReadByte();
-                int value = -1;
-                if (optimizationData.RotationBitRate[i] < 0)
-                    value = 10000 + roationCounterStatic++;
-                else if (optimizationData.RotationBitRate[i] > 0)
-                    value = roationCounter++;
-
-                output.RotationMappings.Add(new AnimationBoneMapping(value));
-            }
-
-            var range_map_translation_length = chunk.ReadUInt32();
-            var range_map_quaterion_length = chunk.ReadUInt32();
-            optimizationData.Range_map_translations = new (RmvVector3 Min, RmvVector3 Max)[range_map_translation_length];
-            optimizationData.Range_map_quaternion = new (RmvVector4 Min, RmvVector4 Max)[range_map_quaterion_length];
-
-            for (var i = 0; i < range_map_translation_length; i++)
-            {
-                optimizationData.Range_map_translations[i].Min = new RmvVector3(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
-                optimizationData.Range_map_translations[i].Max = new RmvVector3(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
-            }
-
-            for (var i = 0; i < range_map_quaterion_length; i++)
-            {
-                optimizationData.Range_map_quaternion[i].Min = new RmvVector4(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
-                optimizationData.Range_map_quaternion[i].Max = new RmvVector4(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
-            }
-
-            // Load static frame
-            var const_track_tranlations_count = chunk.ReadUInt32();
-            var const_track_quaternions_count = chunk.ReadUInt32();
-            if(const_track_tranlations_count != 0 || const_track_quaternions_count != 0)
-                output.StaticFrame = ReadFrameV8(chunk, const_track_tranlations_count, const_track_quaternions_count, false, optimizationData);
-            
-            var frame_tracks_tranlations_count = chunk.ReadUInt32();
-            var frame_tracks_quaternions_count = chunk.ReadUInt32();
-            var frame_count = chunk.ReadUInt32();
-
-            if (frame_tracks_tranlations_count != 0 || frame_tracks_quaternions_count != 0)
-            {
-                for (var frameIndex = 0; frameIndex < frame_count; frameIndex++)
+                var optimizationData = new AnimationV8OptimizationData(boneCount);
+                var translationCounter = 0;
+                var translationCounterStatic = 0;
+                for (int i = 0; i < boneCount; i++)
                 {
-                    var frame = ReadFrameV8(chunk, frame_tracks_tranlations_count, frame_tracks_quaternions_count, true, optimizationData);
-                    output.DynamicFrames.Add(frame);
+                    optimizationData.TranslationBitRate[i] = (sbyte)chunk.ReadByte();
+                    int value = -1;
+                    if (optimizationData.TranslationBitRate[i] < 0)
+                        value = 10000 + translationCounterStatic++;
+                    else if (optimizationData.TranslationBitRate[i] > 0)
+                        value = translationCounter++;
+
+                    output.TranslationMappings.Add(new AnimationBoneMapping(value));
+                }
+
+                var roationCounter = 0;
+                var roationCounterStatic = 0;
+                for (int i = 0; i < boneCount; i++)
+                {
+                    optimizationData.RotationBitRate[i] = (sbyte)chunk.ReadByte();
+                    int value = -1;
+                    if (optimizationData.RotationBitRate[i] < 0)
+                        value = 10000 + roationCounterStatic++;
+                    else if (optimizationData.RotationBitRate[i] > 0)
+                        value = roationCounter++;
+
+                    output.RotationMappings.Add(new AnimationBoneMapping(value));
+                }
+
+                var range_map_translation_length = chunk.ReadUInt32();
+                var range_map_quaterion_length = chunk.ReadUInt32();
+                optimizationData.Range_map_translations = new (RmvVector3 Min, RmvVector3 Max)[range_map_translation_length];
+                optimizationData.Range_map_quaternion = new (RmvVector4 Min, RmvVector4 Max)[range_map_quaterion_length];
+
+                for (var i = 0; i < range_map_translation_length; i++)
+                {
+                    optimizationData.Range_map_translations[i].Min = new RmvVector3(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
+                    optimizationData.Range_map_translations[i].Max = new RmvVector3(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
+                }
+
+                for (var i = 0; i < range_map_quaterion_length; i++)
+                {
+                    optimizationData.Range_map_quaternion[i].Min = new RmvVector4(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
+                    optimizationData.Range_map_quaternion[i].Max = new RmvVector4(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
+                }
+
+                // Load static frame
+                var const_track_tranlations_count = chunk.ReadUInt32();
+                var const_track_quaternions_count = chunk.ReadUInt32();
+                if (const_track_tranlations_count != 0 || const_track_quaternions_count != 0)
+                    output.StaticFrame = ReadFrameV8(chunk, const_track_tranlations_count, const_track_quaternions_count, false, optimizationData);
+
+                var frame_tracks_tranlations_count = chunk.ReadUInt32();
+                var frame_tracks_quaternions_count = chunk.ReadUInt32();
+                var frame_count = chunk.ReadUInt32();
+
+                if (frame_tracks_tranlations_count != 0 || frame_tracks_quaternions_count != 0)
+                {
+                    for (var frameIndex = 0; frameIndex < frame_count; frameIndex++)
+                    {
+                        var frame = ReadFrameV8(chunk, frame_tracks_tranlations_count, frame_tracks_quaternions_count, true, optimizationData);
+                        output.DynamicFrames.Add(frame);
+                    }
                 }
             }
 
-            //if (chunk.BytesLeft != 0)
-            //    throw new Exception($"{chunk.BytesLeft} bytes left in animation");
+            if (chunk.BytesLeft != 0)
+                throw new Exception($"{chunk.BytesLeft} bytes left in animation");
 
             // Convert it all to just dynamic frames, dont want to show that shit anywhere else...
 

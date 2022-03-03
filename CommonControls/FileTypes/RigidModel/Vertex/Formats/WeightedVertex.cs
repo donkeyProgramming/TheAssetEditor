@@ -17,7 +17,7 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
         public uint VertexSize => (uint)ByteHelper.GetSize<Data>() + TintColourSize();
         public bool ForceComputeNormals => false;
 
-        public CommonVertex Create(byte[] buffer, int offset, int vertexSize)
+        public CommonVertex Read(byte[] buffer, int offset, int vertexSize)
         {
             if (AddTintColour)
             {
@@ -62,7 +62,7 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
             }
         }
 
-        public byte[] ToBytes(CommonVertex vertex)
+        public byte[] Write(CommonVertex vertex)
         {
             if (vertex.WeightCount != 2 || vertex.BoneIndex.Length != 2 || vertex.BoneWeight.Length != 2)
                 throw new Exception($"Unexpected vertex weights for {Type}");

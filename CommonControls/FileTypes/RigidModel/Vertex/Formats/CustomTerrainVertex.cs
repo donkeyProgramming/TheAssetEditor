@@ -15,7 +15,7 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
         public uint VertexSize => (uint)ByteHelper.GetSize<Data>();
         public bool ForceComputeNormals => true;
 
-        public CommonVertex Create(byte[] buffer, int offset, int vertexSize)
+        public CommonVertex Read(byte[] buffer, int offset, int vertexSize)
         {
             var vertexData = ByteHelper.ByteArrayToStructure<Data>(buffer, offset);
 
@@ -38,7 +38,7 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
         }
 
 
-        public byte[] ToBytes(CommonVertex vertex)
+        public byte[] Write(CommonVertex vertex)
         {
             throw new NotImplementedException();
         }

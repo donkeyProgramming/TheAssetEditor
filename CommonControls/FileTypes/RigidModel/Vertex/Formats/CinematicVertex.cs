@@ -14,7 +14,7 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
 
         public bool ForceComputeNormals => false;
 
-        public CommonVertex Create(byte[] buffer, int offset, int vertexSize)
+        public CommonVertex Read(byte[] buffer, int offset, int vertexSize)
         {
             if (AddTintColour)
             {
@@ -34,11 +34,13 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
                     BoneWeight = new float[] { vertexData.boneWeight[0] / 255.0f, vertexData.boneWeight[1] / 255.0f, vertexData.boneWeight[2] / 255.0f, vertexData.boneWeight[3] / 255.0f },
                     WeightCount = 4
                 };
+
                 return vertex;
             }
             else
             {
-                var vertexData = ByteHelper.ByteArrayToStructure<Data>(buffer, offset);
+                var bytes = buffer.Skip(offset).Take(32).ToArray();
+                var vertexData = ByteHelper.ByteArrayToStructure<Data>(bytes, 0);
 
                 var vertex = new CommonVertex()
                 {
@@ -55,21 +57,25 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
                     BoneWeight = new float[] { vertexData.boneWeight[0] / 255.0f, vertexData.boneWeight[1] / 255.0f, vertexData.boneWeight[2] / 255.0f, vertexData.boneWeight[3] / 255.0f },
                     WeightCount = 4
                 };
+
                 return vertex;
             }
         }
 
 
-        public byte[] ToBytes(CommonVertex vertex)
+        public byte[] Write(CommonVertex vertex)
         {
             if (vertex.WeightCount != 4 || vertex.BoneIndex.Length != 4 || vertex.BoneWeight.Length != 4)
                 throw new Exception($"Unexpected vertex weights for {Type}");
+
+            var newPos = vertex.Position;
+            newPos.W = 0;
 
             if (AddTintColour)
             {
                 var typedVert = new DataWithColour()
                 {
-                    position = VertexLoadHelper.CreatePositionVector4(vertex.Position),
+                    position = VertexLoadHelper.CreatePositionVector4(newPos),
                     boneIndex = vertex.BoneIndex.ToArray(),
                     boneWeight = vertex.BoneWeight.Select(x => (byte)(x * 255.0f)).ToArray(),
                     normal = VertexLoadHelper.CreateNormalVector3(vertex.Normal),
@@ -86,7 +92,7 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
             {
                 var typedVert = new Data()
                 {
-                    position = VertexLoadHelper.CreatePositionVector4(vertex.Position),
+                    position = VertexLoadHelper.CreatePositionVector4(newPos),
                     boneIndex = vertex.BoneIndex.ToArray(),
                     boneWeight = vertex.BoneWeight.Select(x => (byte)(x * 255.0f)).ToArray(),
                     normal = VertexLoadHelper.CreateNormalVector3(vertex.Normal),
@@ -96,7 +102,8 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
                     biNormal = VertexLoadHelper.CreateNormalVector3(vertex.BiNormal),
                     tangent = VertexLoadHelper.CreateNormalVector3(vertex.Tangent),
                 };
-                return ByteHelper.GetBytes(typedVert);
+                var bytes =  ByteHelper.GetBytes(typedVert);
+                return bytes;
             }
         }
 

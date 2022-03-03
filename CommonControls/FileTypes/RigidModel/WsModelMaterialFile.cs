@@ -76,6 +76,8 @@ namespace CommonControls.FileTypes.RigidModel
 
                 if(textureSlotName == "t_xml_base_colour")
                     Textures[TexureType.BaseColour] = texturePath;
+                else if (textureSlotName == "s_base_colour")
+                    Textures[TexureType.BaseColour] = texturePath;
 
                 if (textureSlotName == "t_xml_material_map")
                     Textures[TexureType.MaterialMap] = texturePath;

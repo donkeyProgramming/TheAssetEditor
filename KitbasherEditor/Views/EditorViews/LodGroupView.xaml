@@ -15,6 +15,12 @@
                 <Label DockPanel.Dock="Left">:</Label>
                 <TextBox Text="{Binding CameraDistance, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
             </DockPanel>
+            
+            <DockPanel  DockPanel.Dock="Top" >
+                <Label Width="100" DockPanel.Dock="Left">Quality Lvl</Label>
+                <Label DockPanel.Dock="Left">:</Label>
+                <TextBox Text="{Binding QualityLvl, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" VerticalAlignment="Center" IsReadOnly="True"/>
+            </DockPanel>
         </DockPanel>
     </DockPanel>
 </UserControl>

@@ -188,7 +188,7 @@ namespace AssetEditor.ViewModels
 
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\ngsw1\dae\dae_nurgling_swarm\dae_nurgling_swarm_01.rigid_model_v2"));
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc1\tmb\tmb_warsphinx\tex\tmb_warsphinx_armour_01_base_colour.dds"));
-                OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1e\cth\cth_peasant\cth_peasant_head_02.rigid_model_v2"));
+                OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.rigid_model_v2"));
 
 
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
