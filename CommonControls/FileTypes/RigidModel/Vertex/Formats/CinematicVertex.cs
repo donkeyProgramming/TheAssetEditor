@@ -39,8 +39,7 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
             }
             else
             {
-                var bytes = buffer.Skip(offset).Take(32).ToArray();
-                var vertexData = ByteHelper.ByteArrayToStructure<Data>(bytes, 0);
+                var vertexData = ByteHelper.ByteArrayToStructure<Data>(buffer, offset);
 
                 var vertex = new CommonVertex()
                 {

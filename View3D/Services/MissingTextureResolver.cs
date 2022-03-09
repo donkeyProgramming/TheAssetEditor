@@ -55,14 +55,17 @@ namespace View3D.Services
                 if (diffusePath == string.Empty)
                     return;
 
-                var baseColour = diffusePath.Replace("diffuse.dds", "base_colour.dds", StringComparison.InvariantCultureIgnoreCase);
-                var materialMapPath = diffusePath.Replace("diffuse.dds", "material_map.dds", StringComparison.InvariantCultureIgnoreCase);
+                var baseColourBasedOnDiffuse = diffusePath.Replace("diffuse.dds", "base_colour.dds", StringComparison.InvariantCultureIgnoreCase);
+                var materialMapPathBasedOnDiffuse = diffusePath.Replace("diffuse.dds", "material_map.dds", StringComparison.InvariantCultureIgnoreCase);
+                UpdateTextureIfMissing(meshNode, pfs, TexureType.BaseColour, baseColourBasedOnDiffuse);
+                UpdateTextureIfMissing(meshNode, pfs, TexureType.MaterialMap, materialMapPathBasedOnDiffuse);
 
-                UpdateTextureIfMissing(meshNode, pfs, TexureType.BaseColour, baseColour);
-                UpdateTextureIfMissing(meshNode, pfs, TexureType.MaterialMap, materialMapPath);
+                var baseColourBasedOnSpec = diffusePath.Replace("specula.dds", "base_colour.dds", StringComparison.InvariantCultureIgnoreCase);
+                var materialMapPathBasedOnSpec = diffusePath.Replace("specula.dds", "material_map.dds", StringComparison.InvariantCultureIgnoreCase);
+                UpdateTextureIfMissing(meshNode, pfs, TexureType.BaseColour, baseColourBasedOnSpec);
+                UpdateTextureIfMissing(meshNode, pfs, TexureType.MaterialMap, materialMapPathBasedOnSpec);
             }
         }
-
 
         string GetTexturePath(Rmv2MeshNode meshNode, TexureType texureType)
         {

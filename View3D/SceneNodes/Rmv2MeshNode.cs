@@ -158,7 +158,7 @@ namespace View3D.SceneNodes
 
         public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)
         {
-            if (renderEngine.MainRenderFormat != Effect.RenderFormat)
+            if (Effect == null || renderEngine.MainRenderFormat != Effect.RenderFormat)
                 CreateShader();
 
             Matrix[] data = new Matrix[256];

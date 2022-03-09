@@ -41,6 +41,12 @@ namespace CommonControls.FileTypes.RigidModel.Transforms
             return new Vector4(X, Y, Z, W);
         }
 
+        public Quaternion ToQuaternion()
+        {
+            return new Quaternion(X, Y, Z, W);
+        }
+
+
         public Vector4 ToVector4(float w)
         {
             return new Vector4(X, Y, Z, w);

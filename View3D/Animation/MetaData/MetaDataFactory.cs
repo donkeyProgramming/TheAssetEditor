@@ -124,7 +124,7 @@ namespace View3D.Animation.MetaData
 
             var pf = pfs.FindFile(animPath);
             var animFile = AnimationFile.Create(pf);
-            var clip = new AnimationClip(animFile);
+            var clip = new AnimationClip(animFile, _rootSkeleton.Skeleton);
         
             var rule = new DockEquipmentRule(finalBoneIndex, metaData.PropBoneId, clip, _rootSkeleton, metaData.StartTime, metaData.EndTime);
             _rootPlayer.AnimationRules.Add(rule);
@@ -153,7 +153,7 @@ namespace View3D.Animation.MetaData
             var skeletonFile = skeletonHelper.GetSkeletonFileFromName(pfs, skeletonName);
             var skeleton = new GameSkeleton(skeletonFile, propPlayer);
             var animFile = AnimationFile.Create(animationPath);
-            var clip = new AnimationClip(animFile);
+            var clip = new AnimationClip(animFile, skeleton);
 
             var animationRule = new CopyRootTransform(_rootSkeleton, animatedPropMeta.BoneId, animatedPropMeta.Position, new Quaternion(animatedPropMeta.Orientation));
            

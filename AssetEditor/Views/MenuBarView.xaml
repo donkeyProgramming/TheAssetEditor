@@ -15,7 +15,8 @@
                 <MenuItem Header="Create">
                     <MenuItem Header="New Packfile"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
                     <Separator/>
-                    <MenuItem Header="New AnimPack (Warhammer)"  Command="{Binding MenuBar.CreateAnimPackWarhammerCommand}"/>
+                    <MenuItem Header="New AnimPack (Warhammer 2)"  Command="{Binding MenuBar.CreateAnimPackWarhammerCommand}"/>
+                    <MenuItem Header="New AnimPack (Warhammer 3)"  Command="{Binding MenuBar.CreateAnimPackWarhammer3Command}"/>
                     <MenuItem Header="New AnimPack (3k)"  Command="{Binding MenuBar.CreateAnimPack3kCommand}"/>
                 </MenuItem>
                 <MenuItem Header="Recent Files" ItemsSource="{Binding MenuBar.RecentPackFiles}">

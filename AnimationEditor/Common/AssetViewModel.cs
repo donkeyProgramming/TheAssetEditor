@@ -236,7 +236,7 @@ namespace AnimationEditor.Common.ReferenceModel
                 var file = _pfs.FindFile(animationReference.AnimationFile, animationReference.Container) ;
                 AnimationName.Value = animationReference;
                 var animation = AnimationFile.Create(file);
-                SetAnimationClip(new AnimationClip(animation), animationReference);
+                SetAnimationClip(new AnimationClip(animation, Skeleton), animationReference);
             }
             else
             {

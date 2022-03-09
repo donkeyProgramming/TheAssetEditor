@@ -24,13 +24,11 @@ namespace View3D.Animation
 
                 if (animationClip != null)
                 {
-                    ApplyAnimation(animationClip.StaticFrame, null, 0, currentFrame, animationClip.RotationMappings, animationClip.TranslationMappings, AnimationBoneMappingType.Static);
-                    
                     if (animationClip.DynamicFrames.Count > frameIndex)
                     {
                         var currentFrameKeys = GetKeyFrameFromIndex(animationClip.DynamicFrames, frameIndex);
                         var nextFrameKeys = GetKeyFrameFromIndex(animationClip.DynamicFrames, frameIndex + 1);
-                        ApplyAnimation(currentFrameKeys, nextFrameKeys, frameIterpolation, currentFrame, animationClip.RotationMappings, animationClip.TranslationMappings, AnimationBoneMappingType.Dynamic);
+                        ApplyAnimation(currentFrameKeys, nextFrameKeys, frameIterpolation, currentFrame);
 
                         // Apply skeleton scale
                         for (int i = 0; i < currentFrame.BoneTransforms.Count(); i++)
@@ -147,19 +145,15 @@ namespace View3D.Animation
             return animationValueCurrentFrame;
         }
 
-        static void ApplyAnimation(AnimationClip.KeyFrame currentFrame, AnimationClip.KeyFrame nextFrame, float animationInterpolation,
-            AnimationFrame finalAnimationFrame, List<AnimationBoneMapping> rotMapping, List<AnimationBoneMapping> transMapping, AnimationBoneMappingType boneMappingMode)
+        static void ApplyAnimation(AnimationClip.KeyFrame currentFrame, AnimationClip.KeyFrame nextFrame, float animationInterpolation, AnimationFrame finalAnimationFrame)
         {
             if (currentFrame == null)
                 return;
 
             for (int i = 0; i < finalAnimationFrame.BoneTransforms.Count(); i++)
             {
-                if (transMapping[i].MappingType == boneMappingMode)
-                    finalAnimationFrame.BoneTransforms[i].Translation = ComputeTranslationCurrentFrame(transMapping[i].Id, currentFrame, nextFrame, animationInterpolation);
-
-                if (rotMapping[i].MappingType == boneMappingMode)
-                    finalAnimationFrame.BoneTransforms[i].Rotation = ComputeRotationsCurrentFrame(rotMapping[i].Id, currentFrame, nextFrame, animationInterpolation);
+                finalAnimationFrame.BoneTransforms[i].Translation = ComputeTranslationCurrentFrame(i, currentFrame, nextFrame, animationInterpolation);
+                finalAnimationFrame.BoneTransforms[i].Rotation = ComputeRotationsCurrentFrame(i, currentFrame, nextFrame, animationInterpolation);
             }
         }
     }

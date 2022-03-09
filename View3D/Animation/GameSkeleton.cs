@@ -37,15 +37,15 @@ namespace View3D.Animation
                 _parentBoneIds[i] = skeletonFile.Bones[i].ParentId;
                 BoneNames[i] = skeletonFile.Bones[i].Name;
                 Rotation[i] = new Quaternion(
-                    skeletonFile.DynamicFrames[skeletonAnimFrameIndex].Quaternion[i].X,
-                    skeletonFile.DynamicFrames[skeletonAnimFrameIndex].Quaternion[i].Y,
-                    skeletonFile.DynamicFrames[skeletonAnimFrameIndex].Quaternion[i].Z,
-                    skeletonFile.DynamicFrames[skeletonAnimFrameIndex].Quaternion[i].W);
+                    skeletonFile.AnimationParts[0].DynamicFrames[skeletonAnimFrameIndex].Quaternion[i].X,
+                    skeletonFile.AnimationParts[0].DynamicFrames[skeletonAnimFrameIndex].Quaternion[i].Y,
+                    skeletonFile.AnimationParts[0].DynamicFrames[skeletonAnimFrameIndex].Quaternion[i].Z,
+                    skeletonFile.AnimationParts[0].DynamicFrames[skeletonAnimFrameIndex].Quaternion[i].W);
 
                 Translation[i] = new Vector3(
-                    skeletonFile.DynamicFrames[skeletonAnimFrameIndex].Transforms[i].X ,
-                    skeletonFile.DynamicFrames[skeletonAnimFrameIndex].Transforms[i].Y,
-                    skeletonFile.DynamicFrames[skeletonAnimFrameIndex].Transforms[i].Z);
+                    skeletonFile.AnimationParts[0].DynamicFrames[skeletonAnimFrameIndex].Transforms[i].X ,
+                    skeletonFile.AnimationParts[0].DynamicFrames[skeletonAnimFrameIndex].Transforms[i].Y,
+                    skeletonFile.AnimationParts[0].DynamicFrames[skeletonAnimFrameIndex].Transforms[i].Z);
 
                 Scale[i] = 1;
             }

@@ -109,6 +109,8 @@ namespace CommonControls.Editors.AnimationPack
                 _activeConverter = new AnimationBinFileToXmlConverter();
             else if (seletedFile is AnimationSet3kFile animSet3k)
                 _activeConverter = new AnimationSet3kFileToXmlConverter(_skeletonAnimationLookUpHelper);
+            else if (seletedFile is FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBin wh3Bin)
+                _activeConverter = new AnimationBinWh3FileToXmlConverter();
 
             if (seletedFile == null || _activeConverter == null || seletedFile.IsUnknownFile)
             {

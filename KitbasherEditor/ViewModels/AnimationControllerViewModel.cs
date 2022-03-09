@@ -191,7 +191,7 @@ namespace KitbasherEditor.ViewModels
             if (Animation != null)
             {
                 var animFile = AnimationFile.Create(Animation);
-                var animClip = new AnimationClip(animFile);
+                var animClip = new AnimationClip(animFile, Skeleton);
 
 
                 Player.SetAnimation(animClip, Skeleton);
@@ -208,7 +208,7 @@ namespace KitbasherEditor.ViewModels
             if (isEnabled && Animation != null)
             {
                 var animFile = AnimationFile.Create(Animation);
-                var animClip = new AnimationClip(animFile);
+                var animClip = new AnimationClip(animFile, Skeleton);
 
                 MaxFrames = animClip.DynamicFrames.Count;
                 CurrentFrame = 0;

@@ -80,11 +80,14 @@ namespace CommonControls.FileTypes.RigidModel
     {
         Unknown = 99,
         Static = 0,
+        Collision_Format = 1,
         Weighted = 3,
         Cinematic = 4,
 
         Position16_bit,
         CustomTerrain,
+
+        CustomTerrain2 = 13,
 
         // Not part of CA code
         Weighted_withTint = 10003,

@@ -273,7 +273,7 @@ namespace AnimationEditor.AnimationTransferTool
                         {
                             var file = _pfs.FindFile(item.ItemValue.AnimationFile, item.ItemValue.Container);
                             var animFile = AnimationFile.Create(file.DataSource.ReadDataAsChunk());
-                            var clip = new AnimationClip(animFile);
+                            var clip = new AnimationClip(animFile, _copyFrom.Skeleton);
 
                             _logger.Here().Information($"Processing animation {index} / {numItemsToProcess} - {item.DisplayName}");
 
@@ -428,9 +428,6 @@ namespace AnimationEditor.AnimationTransferTool
                 scaleAnimClip.DynamicFrames[1].Position.Add(Generated.Skeleton.Translation[i]);
                 scaleAnimClip.DynamicFrames[1].Rotation.Add(Generated.Skeleton.Rotation[i]);
                 scaleAnimClip.DynamicFrames[1].Scale.Add(Vector3.One);
-
-                scaleAnimClip.RotationMappings.Add(new AnimationFile.AnimationBoneMapping(i));
-                scaleAnimClip.TranslationMappings.Add(new AnimationFile.AnimationBoneMapping(i));
             }
 
             scaleAnimClip.DynamicFrames[0].Scale[0] = new Vector3((float)AnimationSettings.Scale.Value);

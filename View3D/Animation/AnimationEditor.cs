@@ -1,6 +1,7 @@
 ﻿using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.RigidModel.Transforms;
 using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using static View3D.Animation.AnimationClip;
@@ -11,6 +12,8 @@ namespace View3D.Animation
     {
         public static AnimationFile ExtractPartOfSkeleton(GameSkeleton skeleton, string skeletonName, int[] bones)
         {
+            throw new NotImplementedException();
+            /*
             // Header
             var animFile = new AnimationFile();
             animFile.Header.SkeletonName = skeletonName;
@@ -47,7 +50,7 @@ namespace View3D.Animation
 
             }
 
-            return animFile;
+            return animFile;*/
             //var sample = AnimationSampler.Sample(0, 0, skeleton, new List<AnimationClip>() { animation }, true, true);
         }
 
@@ -72,14 +75,6 @@ namespace View3D.Animation
                         .FirstOrDefault() - 1;
                 animFile.Bones[i].ParentId = indexOf;
             }
-        }
-
-        public static AnimationClip ExtractPartOfAnimation(AnimationClip existingAnim, int[] bones)
-        {
-            var cpy = existingAnim.Clone();
-            cpy.MergeStaticAndDynamicFrames();
-            cpy.LimitAnimationToSelectedBones(bones);
-            return cpy;
         }
 
         public static void LoopAnimation(AnimationClip newRiderAnim, int loopCounter)
@@ -108,19 +103,12 @@ namespace View3D.Animation
                 var keyframe = AnimationSampler.Sample(t, skeleton, newAnim);
 
                 KeyFrame newKeyFrame = new KeyFrame();
-                for (int mappingIndex = 0; mappingIndex < output.RotationMappings.Count; mappingIndex++)
+                for (int boneIndex = 0; boneIndex < skeleton.BoneCount; boneIndex++)
                 {
-                    var mapping = output.RotationMappings[mappingIndex];
-                    if (mapping.HasValue)
-                        newKeyFrame.Rotation.Add(keyframe.BoneTransforms[mappingIndex].Rotation);
+                    newKeyFrame.Rotation.Add(keyframe.BoneTransforms[boneIndex].Rotation);
+                    newKeyFrame.Position.Add(keyframe.BoneTransforms[boneIndex].Translation);
                 }
 
-                for (int mappingIndex = 0; mappingIndex < output.TranslationMappings.Count; mappingIndex++)
-                {
-                    var mapping = output.TranslationMappings[mappingIndex];
-                    if (mapping.HasValue)
-                        newKeyFrame.Position.Add(keyframe.BoneTransforms[mappingIndex].Translation);
-                }
 
                 for (int b = 0; b < skeleton.BoneCount; b++)
                     newKeyFrame.Scale.Add(Vector3.One);
@@ -135,6 +123,8 @@ namespace View3D.Animation
 
         private static void CreateStaticFrameTable(AnimationFile existingAnim, int[] bones, ref AnimationFile newAnim)
         {
+            throw new NotImplementedException();
+            /*
             newAnim.StaticFrame = new AnimationFile.Frame();
             for (int boneIndex = 0; boneIndex < bones.Length; boneIndex++)
             {
@@ -147,7 +137,7 @@ namespace View3D.Animation
                 var rotationMappingValue = existingAnim.RotationMappings[originalBoneIndex];
                 if (rotationMappingValue.IsStatic)
                     newAnim.StaticFrame.Quaternion.Add(existingAnim.StaticFrame.Quaternion[rotationMappingValue.Id]);
-            }
+            }*/
         }
 
       

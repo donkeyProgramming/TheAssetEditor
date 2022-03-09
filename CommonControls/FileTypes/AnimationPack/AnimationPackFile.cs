@@ -46,6 +46,8 @@ namespace CommonControls.FileTypes.AnimationPack
             return animDb;
         }
 
+
+
         public static AnimationFragmentFile CreateExampleWarhammerAnimSet(string fragmentName)
         {
             var filename = SaveHelper.EnsureEnding(fragmentName, ".frg");
@@ -127,6 +129,24 @@ namespace CommonControls.FileTypes.AnimationPack
             animSet.Entries.Add(row1);
 
             return animSet;
+        }
+
+        public static IAnimationPackFile CreateExampleWarhammer3(string binPath)
+        {
+            var animDb = new AnimationBin(binPath);
+
+            animDb.AnimationTableEntries.Add(
+                new AnimationBinEntry("ExampleDbRef", "ExampleSkeleton")
+                {
+                    Unknown = 1,
+                    FragmentReferences = new List<AnimationBinEntry.FragmentReference>()
+                    {
+                        new AnimationBinEntry.FragmentReference() { Name = "FragNameRef0"},
+                        new AnimationBinEntry.FragmentReference() { Name = "FragNameRef1"}
+                    }
+                });
+
+            return animDb;
         }
     }
 }

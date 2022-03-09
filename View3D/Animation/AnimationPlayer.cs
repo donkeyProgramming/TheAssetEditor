@@ -147,9 +147,7 @@ namespace View3D.Animation
             if (animation != null)
             {
                 // Make sure animation fits
-                var numBones = skeleton.BoneCount;
-                var maxAnimBones = Math.Max(animation.RotationMappings.Count, animation.TranslationMappings.Count);
-                if (maxAnimBones > numBones)
+                if (animation.AnimationBoneCount != skeleton.BoneCount)
                     throw new Exception("This animation does not work for this skeleton!");
             }
 

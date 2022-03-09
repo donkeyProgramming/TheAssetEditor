@@ -4,6 +4,7 @@ using CommonControls.Services;
 using System;
 using System.Collections;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
@@ -128,6 +129,18 @@ namespace CommonControls.Editors.AnimationPack.Converters
                 strArray[i] = bits[i].ToString();
 
             return string.Join(", ", strArray);
+        }
+
+        protected int CreateWeaponFlagInt(string strArray)
+        {
+            var values = strArray.Split(",").Select(x => bool.Parse(x)).ToArray();
+            BitArray b = new BitArray(new int[] { 0 });
+            for (int i = 0; i < 6; i++)
+                b[i] = values[i];
+
+            int[] array = new int[1];
+            b.CopyTo(array, 0);
+            return  array[0];
         }
     }
 }

@@ -237,14 +237,12 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
             // Version 8 fix for different vertex format with same id! 
             if (rmvType == RmvVersionEnum.RMV2_V8)
             {
-                if (material.BinaryVertexFormat == VertexFormat.Weighted)
+                if (material.BinaryVertexFormat == VertexFormat.Weighted )
                     material.BinaryVertexFormat = VertexFormat.Weighted_withTint;
                 else if (material.BinaryVertexFormat == VertexFormat.Cinematic)
                     material.BinaryVertexFormat = VertexFormat.Cinematic_withTint;
                 else if (material.BinaryVertexFormat == VertexFormat.Static)
                     material.BinaryVertexFormat = VertexFormat.Static;
-                else
-                    throw new Exception("Unknown vertex format for material");
             }
 
             return material;

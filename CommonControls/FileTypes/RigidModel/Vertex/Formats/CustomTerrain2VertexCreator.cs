@@ -1,5 +1,4 @@
-﻿using CommonControls.FileTypes;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -7,8 +6,7 @@ using System.Text;
 
 namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
 {
-
-    public class CustomTerrainVertexCreator : IVertexCreator
+    public class CustomTerrain2VertexCreator : IVertexCreator
     {
         public VertexFormat Type => VertexFormat.CustomTerrain;
         public bool AddTintColour { get; set; }
@@ -19,19 +17,18 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
         {
             var vertexData = ByteHelper.ByteArrayToStructure<Data>(buffer, offset);
 
-
             var vertex = new CommonVertex()
             {
                 Position = VertexLoadHelper.CreatVector4Float(vertexData.position).ToVector4(1),
                 Normal = VertexLoadHelper.CreatVector4Float(vertexData.normal).ToVector3(),
                 BiNormal = Vector3.UnitY,
                 Tangent = Vector3.UnitY,
-
-                Uv = Vector2.Zero,// VertexLoadHelper.CreatVector2HalfFloat(vertexData.uv).ToVector2(),
+                Uv = Vector2.Zero,
 
                 BoneIndex = new byte[] { },
                 BoneWeight = new float[] { },
                 WeightCount = 0
+
             };
 
             return vertex;
@@ -43,24 +40,25 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
             throw new NotImplementedException();
         }
 
-        public struct Data //32
+        public struct Data // 48
         {
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
             public byte[] position;     // 4 x 4
 
-            // No idea what all this really iss 
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
             public byte[] normal;       // 4 x 1
 
-            //
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
             public byte[] uv;           // 2 x 2
 
-            //[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-            //public byte[] biNormal;     // 4 x 1
-            //
-            //[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-            //public byte[] tangent;      // 4 x 1
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public byte[] colour0;      // 4 x 1
+
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public byte[] colour1;      // 4 x 1
+
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public byte[] colour2;      // 4 x 1
         }
     }
 }

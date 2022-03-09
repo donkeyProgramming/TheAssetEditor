@@ -36,7 +36,9 @@ namespace CommonControls.FileTypes.RigidModel.Vertex
         {
             _vertexCreators[VertexFormat.Static] = new StaticVertexCreator();
             _vertexCreators[VertexFormat.Position16_bit] = new Position16_bitVertexCreator();
-            _vertexCreators[VertexFormat.CustomTerrain] = new CustomTerrainVertexreator();
+            _vertexCreators[VertexFormat.CustomTerrain] = new CustomTerrainVertexCreator();
+            _vertexCreators[VertexFormat.CustomTerrain2] = new CustomTerrain2VertexCreator();
+            _vertexCreators[VertexFormat.Collision_Format] = new CollisionVertexCreator();
 
             _vertexCreators[VertexFormat.Weighted] = new WeightedVertexCreator();
             _vertexCreators[VertexFormat.Weighted_withTint] = new WeightedVertexCreator() { AddTintColour = true };

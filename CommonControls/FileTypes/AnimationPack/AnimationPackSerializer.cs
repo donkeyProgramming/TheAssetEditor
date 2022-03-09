@@ -40,16 +40,15 @@ namespace CommonControls.FileTypes.AnimationPack
     {
         static IAnimFileSerializer DeterminePossibleSerializers(string fullPath)
         {
-            // 3k
-
-              if (fullPath.Contains("animations/database/battle/bin/", StringComparison.InvariantCultureIgnoreCase))
+            if (fullPath.Contains("animations/database/battle/bin/", StringComparison.InvariantCultureIgnoreCase))
             {
-                if (fullPath.Contains(".bin", StringComparison.InvariantCultureIgnoreCase))
+                if (fullPath.Contains("matched_combat", StringComparison.InvariantCultureIgnoreCase))
+                    return new MatchedAnimFileSerializer();
+                else if (fullPath.Contains(".bin", StringComparison.InvariantCultureIgnoreCase))
                     return new AnimationSetSerializer_Wh3();
                 else
                     return new UnknownAnimFileSerializer();
             }
-
             else if (fullPath.Contains("animations/database/", StringComparison.InvariantCultureIgnoreCase))
             {
                 if (fullPath.Contains("matched", StringComparison.InvariantCultureIgnoreCase))
@@ -172,7 +171,7 @@ namespace CommonControls.FileTypes.AnimationPack
 
     public class AnimationSetSerializer_Wh3 : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimationBinW3(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimPackFileTypes.Wh3.AnimationBin(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
     }
 
 

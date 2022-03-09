@@ -21,10 +21,7 @@ namespace AssetEditor
 
         protected override void OnStartup(StartupEventArgs e)
         {
-#if !DEBUG
-                VersionChecker.CheckVersion();
-#endif
-
+            VersionChecker.CheckVersion();
             Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(DispatcherUnhandledExceptionHandler);
 
             _config = new DependencyInjectionConfig();

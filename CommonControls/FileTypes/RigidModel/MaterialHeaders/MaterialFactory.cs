@@ -2,6 +2,7 @@
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
@@ -33,8 +34,14 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                     var material = _materialCreators[modelTypeEnum].Create(modelTypeEnum, rmvType, data, offset);
                     var actualMaterialSize = material.ComputeSize();
 
-                    if (actualMaterialSize != expectedMaterialSize)
-                        throw new Exception($"Part of material {modelTypeEnum} header not read");
+                    var bytesLeft = expectedMaterialSize - actualMaterialSize; 
+                    if (bytesLeft != 0)
+                    {
+                        byte[] outputArray = new byte[expectedMaterialSize - actualMaterialSize];
+                        Array.ConstrainedCopy(data,  (int)(offset + actualMaterialSize), outputArray,0, (int)(expectedMaterialSize - actualMaterialSize));
+                        File.WriteAllBytes(DirectoryHelper.Temp + "\\ExtraData_"  + modelTypeEnum  + "_Start_" + offset + actualMaterialSize + "_Size_" + (expectedMaterialSize - actualMaterialSize) + ".data", outputArray);
+                        throw new Exception($"Part of material {modelTypeEnum} header not read - {bytesLeft} bytes left in header.");
+                    }
 
                     return material;
                 }
@@ -44,9 +51,15 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                     var material = _materialCreators[ModelMaterialEnum.default_type].Create(modelTypeEnum, rmvType, data, offset);
                     var actualMaterialSize = material.ComputeSize();
 
-                    if (actualMaterialSize != expectedMaterialSize)
+                    var bytesLeft = expectedMaterialSize - actualMaterialSize;
+                    if (bytesLeft != 0)
+                    {
+                        byte[] outputArray = new byte[expectedMaterialSize - actualMaterialSize];
+                        Array.ConstrainedCopy(data, (int)(offset + actualMaterialSize), outputArray, 0, (int)(expectedMaterialSize - actualMaterialSize));
+                        File.WriteAllBytes(DirectoryHelper.Temp + "\\ExtraData_" + modelTypeEnum + "_Start_" + offset + actualMaterialSize + "_Size_" + (expectedMaterialSize - actualMaterialSize) + ".data", outputArray);
                         throw new Exception($"Uknown material - {modelTypeEnum} header not read. Expected Size = {expectedMaterialSize} Actual Size = {actualMaterialSize}");
-
+                    }
+                    
                     return material;
                 }
             }

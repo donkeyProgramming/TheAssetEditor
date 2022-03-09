@@ -24,38 +24,45 @@ namespace CommonControls.Editors.AnimationFilePreviewEditor
                 output.AppendLine($"\t Unknown0_alwaysOne:{animFile.Header.Unknown0_alwaysOne}");
                 output.AppendLine($"\t FrameRate:{animFile.Header.FrameRate}");
                 output.AppendLine($"\t SkeletonName:{animFile.Header.SkeletonName}");
+                output.AppendLine($"\t Unkown_V8_AlwaysSix:{animFile.Header.UnkownValue_v8}");
                 output.AppendLine($"\t FlagCount:{animFile.Header.FlagCount}");
                 for(int i = 0; i < animFile.Header.FlagVariables.Count; i++)
                     output.AppendLine($"\t\t FlagValue[{i}]:{animFile.Header.FlagVariables[i]}");
 
                 output.AppendLine($"\t AnimationTotalPlayTimeInSec:{animFile.Header.AnimationTotalPlayTimeInSec}");
-
+               
                 output.AppendLine("");
                 output.AppendLine($"Bones:{animFile.Bones.Length}");
                 for(int i = 0; i < animFile.Bones.Length; i++)
                     output.AppendLine($"\t [{i}]:{animFile.Bones[i].Name} id:{animFile.Bones[i].Id} parentId:{animFile.Bones[i].ParentId}");
 
-                output.AppendLine("");
-                output.AppendLine($"TranslationMappings:{animFile.TranslationMappings.Count}");
-                for (int i = 0; i < animFile.TranslationMappings.Count; i++)
-                    output.AppendLine($"\t [{i}]:{animFile.TranslationMappings[i]}");
-
-                output.AppendLine("");
-                output.AppendLine($"RotationMappings:{animFile.RotationMappings.Count}");
-                for (int i = 0; i < animFile.RotationMappings.Count; i++)
-                    output.AppendLine($"\t [{i}]:{animFile.RotationMappings[i]}");
-
-                output.AppendLine("");
-                output.AppendLine($"Static frame:");
-                if (animFile.StaticFrame != null)
-                    PrintFrame(output, 1, animFile.StaticFrame);
-
-                output.AppendLine("");
-                output.AppendLine($"Dynamic frames:{animFile.DynamicFrames.Count}");
-                for (int i = 0; i < animFile.DynamicFrames.Count; i++)
+                output.AppendLine($"NumAnimationParts:{animFile.AnimationParts.Count}");
+                int partIndex = 1;
+                foreach (var part in animFile.AnimationParts)
                 {
-                    output.AppendLine($"\t Frame:{i}");
-                    PrintFrame(output, 2, animFile.DynamicFrames[i]);
+                    output.AppendLine("");
+                    output.AppendLine($"\t Animation Index:{partIndex++}");
+                    output.AppendLine($"\t TranslationMappings:{part.TranslationMappings.Count}");
+                    for (int i = 0; i < part.TranslationMappings.Count; i++)
+                        output.AppendLine($"\t\t [{i}]:{part.TranslationMappings[i]}");
+
+                    output.AppendLine("");
+                    output.AppendLine($"\t RotationMappings:{part.RotationMappings.Count}");
+                    for (int i = 0; i < part.RotationMappings.Count; i++)
+                        output.AppendLine($"\t\t [{i}]:{part.RotationMappings[i]}");
+
+                    output.AppendLine("");
+                    output.AppendLine($"\t Static frame:");
+                    if (part.StaticFrame != null)
+                        PrintFrame(output, 2, part.StaticFrame);
+
+                    output.AppendLine("");
+                    output.AppendLine($"\t Dynamic frames:{part.DynamicFrames.Count}");
+                    for (int i = 0; i < part.DynamicFrames.Count; i++)
+                    {
+                        output.AppendLine($"\t\t Frame:{i}");
+                        PrintFrame(output, 3, part.DynamicFrames[i]);
+                    }
                 }
 
                 return output.ToString();

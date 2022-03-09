@@ -592,24 +592,25 @@ Wh3
 	
 
 
-Settings added:
-	Skip Loading sound files (there are so many and no one cares about them) 
-	Auto resolve textures by default
-		Ws model
-		Name pattern 
-	AutoGenerateAttachmentPointsFromMeshes - Mostly for debugging 
+	Settings added:
+		Skip Loading sound files (there are so many and no one cares about them) 
+		Auto resolve textures by default
+			Ws model
+			Name pattern 
+		AutoGenerateAttachmentPointsFromMeshes - Mostly for debugging 
 
-Fixed bug when merging meshes
-Fixed bug when generating lods
-Detect shader model based on selected active game 
-Fixed animation quality issue 
-Display Lod Quality level
+	Fixed bug when merging meshes
+	Fixed bug when generating lods
+	Detect shader model based on selected active game 
+	Fixed animation quality issue 
+	Display Lod Quality level
 
  
 Merge mesh quality of life
 Auto generate ws model 
 Ambient light 
 Group meshes after splitting 
+Ws mesh in reference meshes selection issue on/off
 
 Texture converter 
 Bin system + wh3
@@ -623,8 +624,8 @@ Reports => sound
 
 
 
-
-
+1 for vertex normals when saving, 255 should be 0
+normals loaded -1
 
 
 variantmeshes\wh_variantmodels\hu1e\cth\cth_peasant\cth_peasant_head_02.rigid_model_v2
@@ -633,3 +634,55 @@ variantmeshes\wh_variantmodels\hu16\dae\dae_daemonette\dae_daemonette_favoured_b
 10312 <-- Vertex start  
 252 header
 10,564 => Actual start in file
+
+
+Could this be changed to look at (maybe both) the specular's and gloss_map's path for finding the material_map? 
+Very common to have a diffuse texture name changed, but gloss and specular's left untouched.
+
+
+
+NotImplementedException
+
+
+
+
+
+Trying to find missing textures using specular if diffuse missing
+Correctly load v8 animations 
+spec gloss combine meshes crash Fix
+Open wh3 animation bin files for preview 
+
+Reduction rate in lod node 
+Empy lods save error 
+Wsmodel generation fix 
+
+AnimatedProp/Prop 12,13,14
+Eject_attached
+disable_persistent_id_v11
+BlendOverride - Disable alpah?
+
+
+Known issues:
+	Can not save v8 animations! 
+	Wh3 bin files not picked up by several of the editors 
+	Can not save wh3 animation bins 
+	
+	
+Fix animation
+Active game at the top
+Isseu with game paths
+Small letters
+Bin stuff
+Detect files with empty folder names 
+Wharhammer 3 as defaiult game 
+MetaFile error handling + splice tag! 
+
+
+Validation:
+	Vertex mixing
+	Rigging 
+	Shader combinations
+	missing textures 
+	Vertex count 
+	Ws model mismatch 
+

@@ -5,6 +5,7 @@ using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.FileTypes.DB;
 using CommonControls.Services;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -175,9 +176,11 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
         AnimationClip LoadAnimation(string path)
         {
-            var file = _pfs.FindFile(path);
-            var animation = AnimationFile.Create(file);
-            return new AnimationClip(animation);
+            throw new NotImplementedException();
+
+            //var file = _pfs.FindFile(path);
+            //var animation = AnimationFile.Create(file);
+            //return new AnimationClip(animation);
         }
 
         string GenerateNewAnimationName(string fullPath, string prefix, int numberId = 0)

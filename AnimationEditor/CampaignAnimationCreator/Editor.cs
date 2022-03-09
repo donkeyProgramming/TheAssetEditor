@@ -51,7 +51,6 @@ namespace AnimationEditor.CampaignAnimationCreator
             }
 
             var newAnimation = _selectedAnimationClip.Clone();
-            newAnimation.MergeStaticAndDynamicFrames();
 
             for (int frameIndex = 0; frameIndex < newAnimation.DynamicFrames.Count; frameIndex++)
             {

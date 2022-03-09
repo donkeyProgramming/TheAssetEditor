@@ -26,7 +26,7 @@ namespace AnimationEditor.AnimationTransferTool
             var newFrameCount = (int)(_settings.SpeedMult.Value * animationToCopy.DynamicFrames.Count);
             var newPlayTime = (float)_settings.SpeedMult.Value * animationToCopy.PlayTimeInSec;
 
-            animationToCopy.RemoveOptimizations(copyFromSkeleton);
+            //animationToCopy.RemoveOptimizations(copyFromSkeleton);
             var resampledAnimationToCopy = View3D.Animation.AnimationEditor.ReSample(copyFromSkeleton, animationToCopy, newFrameCount, newPlayTime);
             var newAnimation = CreateNewAnimation(copyToSkeleton, resampledAnimationToCopy);
 
@@ -341,9 +341,6 @@ namespace AnimationEditor.AnimationTransferTool
 
             for (int i = 0; i < skeleton.BoneCount; i++)
             {
-                newAnimation.RotationMappings.Add(new AnimationFile.AnimationBoneMapping(i));
-                newAnimation.TranslationMappings.Add(new AnimationFile.AnimationBoneMapping(i));
-
                 if(newAnimation.DynamicFrames.Count != 0)
                     newAnimation.DynamicFrames[0].Scale[0] = Vector3.One;
             }

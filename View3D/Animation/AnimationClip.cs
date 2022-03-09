@@ -34,45 +34,77 @@ namespace View3D.Animation
         }
 
 
-        public KeyFrame StaticFrame { get; set; } = null;
         public List<KeyFrame> DynamicFrames = new List<KeyFrame>();
         public float PlayTimeInSec { get; set; } = -1;
+        public int AnimationBoneCount { get; private set; }
 
-        public List<AnimationBoneMapping> RotationMappings { get; set; } = new List<AnimationBoneMapping>();
-        public List<AnimationBoneMapping> TranslationMappings { get; set; } = new List<AnimationBoneMapping>();
 
         public AnimationClip() { }
 
-        public AnimationClip(AnimationFile file)
+        public AnimationClip(AnimationFile file, GameSkeleton skeleton)
         {
-            RotationMappings = file.RotationMappings.ToList();
-            TranslationMappings = file.TranslationMappings.ToList();
+            foreach (var animationPart in file.AnimationParts)
+            {
+                var frames = CreateKeyFramesFromAnimationPart(animationPart, skeleton);
+                DynamicFrames.AddRange(frames);
+            }
+
+            var newRotMapping = new List<AnimationBoneMapping>();
+            var newTransMappings = new List<AnimationBoneMapping>();
+
+            for (int i = 0; i < file.Bones.Length; i++)
+            {
+                newRotMapping.Add(new AnimationBoneMapping(i));
+                newTransMappings.Add(new AnimationBoneMapping(i));
+            }
+
             PlayTimeInSec = file.Header.AnimationTotalPlayTimeInSec;
-
-            if (file.StaticFrame != null)
-                StaticFrame = CreateKeyFrame(file.StaticFrame, file.Bones.Length);
-
-            foreach (var frame in file.DynamicFrames)
-                DynamicFrames.Add(CreateKeyFrame(frame, file.Bones.Length));
+            AnimationBoneCount = file.Bones.Length;
         }
 
-       
-        KeyFrame CreateKeyFrame(Frame frame, int totalBoneCount)
+
+        List<KeyFrame> CreateKeyFramesFromAnimationPart(AnimationPart animationPart, GameSkeleton skeleton)
         {
-            var output = new KeyFrame();
-            foreach (var translation in frame.Transforms)
-                output.Position.Add(new Vector3(translation.X, translation.Y, translation.Z));
+            List<KeyFrame> newDynamicFrames = new List<KeyFrame>();
 
-            foreach (var rotation in frame.Quaternion)
-                output.Rotation.Add(new Quaternion(rotation.X, rotation.Y, rotation.Z, rotation.W));
+            var boneCount = animationPart.RotationMappings.Count;
+            var frameCount = animationPart.DynamicFrames.Count;
 
-            output.Scale = Enumerable.Repeat(Vector3.One, totalBoneCount).ToList();
+            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            {
+                var newKeyframe = new KeyFrame();
 
-            return output;
+                for (int boneIndex = 0; boneIndex < boneCount; boneIndex++)
+                {
+                    var translationLookup = animationPart.TranslationMappings[boneIndex];
+                    if (translationLookup.IsDynamic)
+                        newKeyframe.Position.Add(animationPart.DynamicFrames[frameIndex].Transforms[translationLookup.Id].ToVector3());
+                    else if (translationLookup.IsStatic)
+                        newKeyframe.Position.Add(animationPart.StaticFrame.Transforms[translationLookup.Id].ToVector3());
+                    else
+                        newKeyframe.Position.Add(skeleton.Translation[boneIndex]);
+
+                    var rotationLookup = animationPart.RotationMappings[boneIndex];
+                    if (rotationLookup.IsDynamic)
+                        newKeyframe.Rotation.Add(animationPart.DynamicFrames[frameIndex].Quaternion[rotationLookup.Id].ToQuaternion());
+                    else if (rotationLookup.IsStatic)
+                        newKeyframe.Rotation.Add(animationPart.StaticFrame.Quaternion[rotationLookup.Id].ToQuaternion());
+                    else
+                        newKeyframe.Rotation.Add(skeleton.Rotation[boneIndex]);
+
+                    newKeyframe.Scale.Add(Vector3.One);
+                }
+
+                newDynamicFrames.Add(newKeyframe);
+            }
+
+            return newDynamicFrames;
         }
 
         public AnimationFile ConvertToFileFormat(GameSkeleton skeleton)
         {
+            throw new NotImplementedException();
+            /*
             AnimationFile output = new AnimationFile();
 
             var fRate = (DynamicFrames.Count() - 1) / PlayTimeInSec;
@@ -108,240 +140,19 @@ namespace View3D.Animation
                 output.DynamicFrames.Add(CreateFrameFromKeyFrame(frame));
 
             return output;
-        }
-
-        Frame CreateFrameFromKeyFrame(KeyFrame keyFrame)
-        {
-            var frame = new Frame();
-            float scale = 1;
-            for(int i = 0; i < keyFrame.Position.Count; i++)
-            {
-                scale *= keyFrame.Scale[i].X;
-                var trans = keyFrame.Position[i] * scale;
-                frame.Transforms.Add(new RmvVector3(trans.X, trans.Y, trans.Z));
-            }
-
-            foreach (var rot in keyFrame.Rotation)
-                frame.Quaternion.Add(new RmvVector4(rot.X, rot.Y, rot.Z, rot.W));
-
-            return frame;
+            */
         }
 
         public AnimationClip Clone()
         {
             AnimationClip copy = new AnimationClip();
             copy.PlayTimeInSec = PlayTimeInSec;
-
-            foreach (var item in RotationMappings)
-                copy.RotationMappings.Add(item.Clone());
-
-            foreach (var item in TranslationMappings)
-                copy.TranslationMappings.Add(item.Clone());
-            
-            if(StaticFrame != null)
-                copy.StaticFrame = StaticFrame.Clone();
+            copy.AnimationBoneCount = AnimationBoneCount;
 
             foreach (var item in DynamicFrames)
                 copy.DynamicFrames.Add(item.Clone());
 
             return copy;
-        }
-
-
-        public void MergeStaticAndDynamicFrames()
-        {
-            List<KeyFrame> newDynamicFrames = new List<KeyFrame>();
-
-            var boneCount = RotationMappings.Count;
-            var frameCount = DynamicFrames.Count;
-
-            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
-            {
-                var newKeyframe = new KeyFrame();
-
-                for (int boneIndex = 0; boneIndex < boneCount; boneIndex++)
-                {
-                    var translationLookup = TranslationMappings[boneIndex];
-                    if (translationLookup.IsDynamic)
-                        newKeyframe.Position.Add(DynamicFrames[frameIndex].Position[translationLookup.Id]);
-                    else if (translationLookup.IsStatic)
-                        newKeyframe.Position.Add(StaticFrame.Position[translationLookup.Id]);
-
-                    var rotationLookup = RotationMappings[boneIndex];
-                    if (rotationLookup.IsDynamic)
-                        newKeyframe.Rotation.Add(DynamicFrames[frameIndex].Rotation[rotationLookup.Id]);
-                    else if (rotationLookup.IsStatic)
-                        newKeyframe.Rotation.Add(StaticFrame.Rotation[rotationLookup.Id]);
-
-                    newKeyframe.Scale.Add(Vector3.One);
-                }
-
-                newDynamicFrames.Add(newKeyframe);
-            }
-
-            // Update data
-            var newRotMapping = new List<AnimationBoneMapping>();
-            var newTransMappings = new List<AnimationBoneMapping>();
-            var rotCounter = 0;
-            var transCounter = 0;
-
-            for (int i = 0; i < boneCount; i++)
-            {
-                var rotationLookup = RotationMappings[i];
-                if (rotationLookup.HasValue)
-                    newRotMapping.Add(new AnimationBoneMapping(rotCounter++));
-                else
-                    newRotMapping.Add(new AnimationBoneMapping(-1));
-
-                var translationLookup = TranslationMappings[i];
-                if (translationLookup.HasValue)
-                    newTransMappings.Add(new AnimationBoneMapping(transCounter++));
-                else
-                    newTransMappings.Add(new AnimationBoneMapping(-1));
-            }
-
-            TranslationMappings = newTransMappings;
-            RotationMappings = newRotMapping;
-            DynamicFrames = newDynamicFrames;
-            StaticFrame = new KeyFrame();
-        }
-
-
-        public void RemoveOptimizations(GameSkeleton skeleton)
-        {
-            List<KeyFrame> newDynamicFrames = new List<KeyFrame>();
-
-            var boneCount = RotationMappings.Count;
-            var frameCount = DynamicFrames.Count;
-
-            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
-            {
-                var newKeyframe = new KeyFrame();
-
-                for (int boneIndex = 0; boneIndex < boneCount; boneIndex++)
-                {
-                    var translationLookup = TranslationMappings[boneIndex];
-                    if (translationLookup.IsDynamic)
-                        newKeyframe.Position.Add(DynamicFrames[frameIndex].Position[translationLookup.Id]);
-                    else if (translationLookup.IsStatic)
-                        newKeyframe.Position.Add(StaticFrame.Position[translationLookup.Id]);
-                    else 
-                        newKeyframe.Position.Add(skeleton.Translation[boneIndex]);
-
-                    var rotationLookup = RotationMappings[boneIndex];
-                    if (rotationLookup.IsDynamic)
-                        newKeyframe.Rotation.Add(DynamicFrames[frameIndex].Rotation[rotationLookup.Id]);
-                    else if (rotationLookup.IsStatic)
-                        newKeyframe.Rotation.Add(StaticFrame.Rotation[rotationLookup.Id]);
-                    else
-                        newKeyframe.Rotation.Add(skeleton.Rotation[boneIndex]);
-
-                    newKeyframe.Scale.Add(Vector3.One);
-                }
-
-                newDynamicFrames.Add(newKeyframe);
-            }
-
-            // Update data
-            var newRotMapping = new List<AnimationBoneMapping>();
-            var newTransMappings = new List<AnimationBoneMapping>();
-   
-            for (int i = 0; i < boneCount; i++)
-            {
-                newRotMapping.Add(new AnimationBoneMapping(i));
-                newTransMappings.Add(new AnimationBoneMapping(i));
-            }
-
-            TranslationMappings = newTransMappings;
-            RotationMappings = newRotMapping;
-            DynamicFrames = newDynamicFrames;
-            StaticFrame = new KeyFrame();
-        }
-
-
-
-        /// <summary>
-        /// This function assumes that there are only dynamic frames
-        /// </summary>
-        /// <param name="bones"></param>
-        public void LimitAnimationToSelectedBones(int[] bones)
-        {
-            bool hasStatic = (StaticFrame.Position.Count + StaticFrame.Rotation.Count) != 0;
-            if (hasStatic)
-                throw new Exception("This function does not work for animations that contains a static component");
-
-            CreateMappingTable(this, bones, out var newRotMapping, out var newTransMapping);
-            CreateDynamicFrames(bones, out var newDynamicFrames);
-
-            RotationMappings = newRotMapping;
-            TranslationMappings = newTransMapping;
-            DynamicFrames = newDynamicFrames;
-
-        }
-
-        private void CreateDynamicFrames(int[] bones, out List<KeyFrame> newDynamicFrames)
-        {
-            newDynamicFrames = new List<KeyFrame>();
-
-            var boneCount = bones.Length;
-            var frameCount = DynamicFrames.Count;
-
-            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
-            {
-                var newKeyframe = new KeyFrame();
-
-                for (int boneIndex = 0; boneIndex < boneCount; boneIndex++)
-                {
-                    // Find the org bone and look at the mapping
-                    var orgBoneIndex = bones[boneIndex];
-
-                    var translationLookup = TranslationMappings[orgBoneIndex];
-                    if (translationLookup.IsDynamic)
-                        newKeyframe.Position.Add(DynamicFrames[frameIndex].Position[translationLookup.Id]);
-                    else if (translationLookup.IsStatic)
-                        newKeyframe.Position.Add(StaticFrame.Position[translationLookup.Id]);
-
-                    var rotationLookup = RotationMappings[orgBoneIndex];
-                    if (rotationLookup.IsDynamic)
-                        newKeyframe.Rotation.Add(DynamicFrames[frameIndex].Rotation[rotationLookup.Id]);
-                    else if (rotationLookup.IsStatic)
-                        newKeyframe.Rotation.Add(StaticFrame.Rotation[rotationLookup.Id]);
-                }
-
-                newDynamicFrames.Add(newKeyframe);
-            }
-        }
-
-        private void CreateMappingTable(AnimationClip existingAnim, int[] bones, out List<AnimationBoneMapping> rotationMapping, out List<AnimationBoneMapping> translationMapping)
-        {
-            translationMapping = new List<AnimationBoneMapping>();
-            rotationMapping = new List<AnimationBoneMapping>();
-            
-            int transDynamicCounter = 0;
-            int rotDynamicCounter = 0;
-
-            for (int boneIndex = 0; boneIndex < bones.Length; boneIndex++)
-            {
-                var originalBoneIndex = bones[boneIndex];
-
-                // Translation
-                var tanslationMappingValue = existingAnim.TranslationMappings[originalBoneIndex];
-
-                if (tanslationMappingValue.IsStatic)
-                    throw new Exception();
-                else if (tanslationMappingValue.IsDynamic)
-                    translationMapping.Add(new AnimationBoneMapping(transDynamicCounter++));
-                else
-                    translationMapping.Add(new AnimationBoneMapping(-1));
-
-                var rotationMappingValue = existingAnim.RotationMappings[originalBoneIndex];
-                if (rotationMappingValue.IsStatic)
-                    throw new Exception();
-                else if (rotationMappingValue.IsDynamic)
-                    rotationMapping.Add(new AnimationBoneMapping(rotDynamicCounter++));
-                else
-                    rotationMapping.Add(new AnimationBoneMapping(-1));
-            }
         }
 
         public static AnimationClip CreateSkeletonAnimation(GameSkeleton skeleton)
@@ -362,13 +173,6 @@ namespace View3D.Animation
             // Skeletons have two identical frames, dont know why
             clip.DynamicFrames.Add(frame.Clone());
             clip.DynamicFrames.Add(frame.Clone());
-
-            for (int i = 0; i < skeleton.BoneCount; i++)
-            {
-                clip.RotationMappings.Add(new AnimationBoneMapping(i));
-                clip.TranslationMappings.Add(new AnimationBoneMapping(i));
-            }
-
             return clip;
         }
     }

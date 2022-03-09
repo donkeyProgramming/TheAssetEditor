@@ -123,6 +123,8 @@ namespace CommonControls.FileTypes.MetaData
             _descriptionMap["USE_BASE_METADATA"] = "Force the use of metadata in the base anim slot during a hardcoded splice. All metadata in the hardcoded splice slot is ignored.";
             _descriptionMap["RIDER_ANIMATION_REQUIRED"] = "Mark the mount animation as needing a synced rider animation is corresponding rider slot.";
             _descriptionMap["SHADER_PARAMETER"] = "Modify specified shader parameter. Blends between two closest values.";
+            _descriptionMap["EJECT_ATTACHED"] = "Eject the attached riders. Defines the direction of ejection(2D, Y is ignored).";
+         
         }
 
         public static string GetDescription(string metaDataTagName)

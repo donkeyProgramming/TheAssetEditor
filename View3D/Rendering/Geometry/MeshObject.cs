@@ -225,6 +225,10 @@ namespace View3D.Rendering.Geometry
 
         public void ChangeVertexType(UiVertexFormat newFormat, string newSkeletonName, bool updateMesh = true)
         {
+            VertexFormat = UiVertexFormat.Static;
+            if (newFormat == VertexFormat || updateMesh == false)
+                return;
+
             if (!(newFormat == UiVertexFormat.Weighted || newFormat == UiVertexFormat.Static || newFormat == UiVertexFormat.Cinematic))
                 throw new Exception("Not able to change vertex format into this");
 

@@ -70,9 +70,6 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 _animationClip.DynamicFrames[0].Rotation.Add(_fromSkeleton.Rotation[i]);
                 _animationClip.DynamicFrames[0].Position.Add(_fromSkeleton.Translation[i]);
                 _animationClip.DynamicFrames[0].Scale.Add(Vector3.One);
-
-                _animationClip.RotationMappings.Add(new AnimationFile.AnimationBoneMapping(i));
-                _animationClip.TranslationMappings.Add(new AnimationFile.AnimationBoneMapping(i));
             }
 
             _animationPlayer.SetAnimation(_animationClip, _fromSkeleton);

@@ -88,6 +88,13 @@
     <None Remove="Resources\Icons\Save.png" />
     <None Remove="Resources\Icons\Undo.png" />
     <None Remove="Resources\Icons\WordWrap.png" />
+    <None Remove="Resources\SupportApplications\texconv.exe" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\SupportApplications\texconv.exe">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

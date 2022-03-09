@@ -44,16 +44,12 @@ namespace AnimationEditor.MountAnimationCreator.Services
             var rotationOffset = Quaternion.CreateFromYawPitchRoll(MathHelper.ToRadians(rotationOffsetVector.X), MathHelper.ToRadians(rotationOffsetVector.Y), MathHelper.ToRadians(rotationOffsetVector.Z));
 
             var newRiderAnim = riderAnimation.Clone();
-            newRiderAnim.MergeStaticAndDynamicFrames();
-            newRiderAnim.RemoveOptimizations(_riderSkeleton);
 
             View3D.Animation.AnimationEditor.LoopAnimation(newRiderAnim, (int)_animationSettings.LoopCounter.Value);
 
             // Resample
             if (_animationSettings.FitAnimation)
                 newRiderAnim = View3D.Animation.AnimationEditor.ReSample(_riderSkeleton, newRiderAnim, mountAnimation.DynamicFrames.Count, mountAnimation.PlayTimeInSec);
-
-            newRiderAnim.StaticFrame = null;
 
             var maxFrameCount = Math.Min(mountAnimation.DynamicFrames.Count, newRiderAnim.DynamicFrames.Count);
             for (int i = 0; i < maxFrameCount; i++)
