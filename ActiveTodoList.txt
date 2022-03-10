@@ -622,52 +622,34 @@ Reports => sound
 
 
 
+Fixes:
+	* Trying to find missing textures using specular if diffuse texture missing
+	* Correctly load v8 animations 
+	* Fixed crashes when using spec/gloss shader, often when combining meshes.
+	* Open wh3 animation bin files for preview 
+	
+Anim Meta tags decoded:
+	* AnimatedProp 12,13,14 
+	* Prop 12,13,14 
+	* Eject_attached
 
+Known issues:
+	* Can not save v8 animations! 
+	* Wh3 bin files not picked up by several of the editors 
+	* Can not save wh3 animation bins 
+	
 
-1 for vertex normals when saving, 255 should be 0
-normals loaded -1
-
-
-variantmeshes\wh_variantmodels\hu1e\cth\cth_peasant\cth_peasant_head_02.rigid_model_v2
-variantmeshes\wh_variantmodels\hu16\dae\dae_daemonette\dae_daemonette_favoured_body_02.rigid_model_v2
-
-10312 <-- Vertex start  
-252 header
-10,564 => Actual start in file
-
-
-Could this be changed to look at (maybe both) the specular's and gloss_map's path for finding the material_map? 
-Very common to have a diffuse texture name changed, but gloss and specular's left untouched.
-
-
-
-NotImplementedException
-
-
-
-
-
-Trying to find missing textures using specular if diffuse missing
-Correctly load v8 animations 
-spec gloss combine meshes crash Fix
-Open wh3 animation bin files for preview 
-
+better error detection for super view 
+General system for loading and editing animationbin/frg/packs 
 Reduction rate in lod node 
 Empy lods save error 
 Wsmodel generation fix 
-
-AnimatedProp/Prop 12,13,14
-Eject_attached
-disable_persistent_id_v11
-BlendOverride - Disable alpah?
-
-
-Known issues:
-	Can not save v8 animations! 
-	Wh3 bin files not picked up by several of the editors 
-	Can not save wh3 animation bins 
-	
-	
+Texture converter specgloss to metal rough 
+Better lod generation => simplygon
+Better lod generation => group and combine 
+Normal tools 
+Flip face tool  
+Texture watcher
 Fix animation
 Active game at the top
 Isseu with game paths

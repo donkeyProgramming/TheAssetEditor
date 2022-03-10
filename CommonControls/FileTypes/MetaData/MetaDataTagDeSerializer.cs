@@ -202,6 +202,7 @@ namespace CommonControls.FileTypes.MetaData
 
             var itemNameSplit = itemName.ToUpper().Split("_");
             instance.Version = int.Parse(itemNameSplit.Last());
+            instance.Name = string.Join("_", itemNameSplit.Take(itemNameSplit.Length - 1));
             return instance;
         }
         

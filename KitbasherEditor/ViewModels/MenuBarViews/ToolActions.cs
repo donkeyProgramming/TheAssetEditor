@@ -139,7 +139,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             //Generate lod
             for (int lodIndex = 0; lodIndex < lodsToGenerate.Count(); lodIndex++)
             {
-                var deductionRatio = SceneSaverService.GetDefaultLodReductionValue(lodsToGenerate.Count(), lodIndex);
+                var deductionRatio = lodsToGenerate[lodIndex].LodReductionFactor;
 
                 foreach (var modelGroupCollection in modelGroups)
                 {

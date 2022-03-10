@@ -11,15 +11,34 @@
 
         <DockPanel DockPanel.Dock="Top">
             <DockPanel  DockPanel.Dock="Top" >
-                <Label Width="100" DockPanel.Dock="Left">Camera distance</Label>
+                <Label Width="160" DockPanel.Dock="Left">Camera distance</Label>
                 <Label DockPanel.Dock="Left">:</Label>
                 <TextBox Text="{Binding CameraDistance, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
             </DockPanel>
             
             <DockPanel  DockPanel.Dock="Top" >
-                <Label Width="100" DockPanel.Dock="Left">Quality Lvl</Label>
+                <Label Width="160" DockPanel.Dock="Left">Quality Lvl</Label>
                 <Label DockPanel.Dock="Left">:</Label>
                 <TextBox Text="{Binding QualityLvl, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" VerticalAlignment="Center" IsReadOnly="True"/>
+            </DockPanel>
+
+
+            <DockPanel  DockPanel.Dock="Top" >
+                <GroupBox Header="Lod Generation">
+                    <DockPanel>
+                        <DockPanel  DockPanel.Dock="Top" >
+                            <Label Width="160" DockPanel.Dock="Left">Detail Level</Label>
+                            <Label DockPanel.Dock="Left">:</Label>
+                            <TextBox Text="{Binding LodReductionFactor, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
+                        </DockPanel>
+                    
+                        <DockPanel  DockPanel.Dock="Top" >
+                            <Label Width="160" DockPanel.Dock="Left">Disable Alpha and Merge</Label>
+                            <Label DockPanel.Dock="Left">:</Label>
+                            <CheckBox IsChecked="{Binding AllowCombiningOfModelsForLodGeneration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center" IsEnabled="False"/>
+                        </DockPanel>
+                    </DockPanel>
+                </GroupBox>
             </DockPanel>
         </DockPanel>
     </DockPanel>

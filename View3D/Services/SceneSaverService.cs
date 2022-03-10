@@ -101,9 +101,12 @@ namespace View3D.Services
         public static float GetDefaultLodReductionValue(int numLods, int currentLodIndex)
         {
             var lerpValue = (1.0f / (numLods - 1)) * (numLods - 1 - currentLodIndex);
-            var deductionRatio = MathHelper.Lerp(0.25f, 0.75f, lerpValue);
+            var deductionRatio = MathHelper.Lerp(0.25f, 1, lerpValue);
             return deductionRatio;
         }
+
+
+
 
         static RmvLodHeader[] CreateLodHeaders(RmvLodHeader[] baseHeaders, RmvVersionEnum version)
         {
@@ -114,6 +117,8 @@ namespace View3D.Services
                 output[i] = factory.CreateFromBase(version, baseHeaders[i], (uint)i);
             return output;
         }
+
+        
 
         public static byte[] Save(bool onlySaveVisibleNodes, List<Rmv2ModelNode> modelNodes, GameSkeleton skeleton, RmvVersionEnum version, bool enrichModel = true)
         {

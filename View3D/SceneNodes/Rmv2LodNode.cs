@@ -7,12 +7,16 @@ namespace View3D.SceneNodes
     public class Rmv2LodNode : GroupNode
     {
         public float? CameraDistance { get; set; }
+        public float LodReductionFactor { get; set; } = -1;
+        public bool AllowCombiningOfModelsForLodGeneration { get; set; } = false;
+        public int LodValue { get; set; }
 
-        public Rmv2LodNode(string name, int lodIndex, float? cameraDistance=null) : base(name) {
+        public Rmv2LodNode(string name, int lodIndex, float? cameraDistance=null) : base(name)
+        {
             LodValue = lodIndex;
             CameraDistance = cameraDistance;
+            AllowCombiningOfModelsForLodGeneration = false;
         }
-        public int LodValue { get; set; }
 
         public List<Rmv2MeshNode> GetAllModels(bool onlyVisible)
         {

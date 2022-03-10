@@ -40,5 +40,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             }
            
         }
+
+        public float LodReductionFactor
+        {
+            get => _node.LodReductionFactor;
+            set { _node.LodReductionFactor = value; NotifyPropertyChanged(); }
+        }
     }
 }

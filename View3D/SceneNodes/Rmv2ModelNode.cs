@@ -25,6 +25,8 @@ namespace View3D.SceneNodes
                 };
                 AddObject(lodNode);
             }
+
+            UpdateDefaultLodValues();
         }
 
         public void CreateModelNodesFromFile(RmvFile model, ResourceLibary resourceLibary, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory, string modelFullPath, IComponentManager componentManager, PackFileService pfs, bool autoResolveTexture)
@@ -36,6 +38,7 @@ namespace View3D.SceneNodes
                 {
                     var cameraDistance = model.LodHeaders[lodIndex]?.LodCameraDistance;
                     AddObject(new Rmv2LodNode("Lod " + lodIndex, lodIndex, cameraDistance));
+                    UpdateDefaultLodValues();
                 }
 
                 var lodNode = Children[lodIndex];
@@ -111,6 +114,17 @@ namespace View3D.SceneNodes
             var typedTarget = tartet as Rmv2ModelNode;
             typedTarget.Model = Model;
             base.CopyInto(tartet);
+        }
+
+
+        void UpdateDefaultLodValues()
+        {
+            var lodNodes = GetLodNodes();
+            if (lodNodes.Count(x => x.LodReductionFactor == -1) != 0)
+            {
+                for(int i = 0; i < lodNodes.Count; i++)
+                    lodNodes[i].LodReductionFactor = SceneSaverService.GetDefaultLodReductionValue(lodNodes.Count(), i);
+            }
         }
     }
 

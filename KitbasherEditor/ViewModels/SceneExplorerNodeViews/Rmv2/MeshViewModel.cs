@@ -67,7 +67,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 
         private void UpdateGroupType(ModelMaterialEnum value)
         {
-            MessageBox.Show("Changing material type is currently not supported - Default/weighted swaps happen by default when saving");
+            MessageBox.Show("Changing material type is currently not supported - Default/weighted swaps happen by default when saving.\nDid you mean to change vertex type?");
         }
     }
 }
