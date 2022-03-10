@@ -36,7 +36,15 @@ namespace View3D.Animation
 
         public List<KeyFrame> DynamicFrames = new List<KeyFrame>();
         public float PlayTimeInSec { get; set; } = -1;
-        public int AnimationBoneCount { get; private set; }
+        public int AnimationBoneCount
+        {
+            get 
+            {
+                if (DynamicFrames.Count == 0)
+                    return 0;
+                return DynamicFrames[0].Position.Count;
+            }
+        }
 
 
         public AnimationClip() { }
@@ -49,17 +57,7 @@ namespace View3D.Animation
                 DynamicFrames.AddRange(frames);
             }
 
-            var newRotMapping = new List<AnimationBoneMapping>();
-            var newTransMappings = new List<AnimationBoneMapping>();
-
-            for (int i = 0; i < file.Bones.Length; i++)
-            {
-                newRotMapping.Add(new AnimationBoneMapping(i));
-                newTransMappings.Add(new AnimationBoneMapping(i));
-            }
-
             PlayTimeInSec = file.Header.AnimationTotalPlayTimeInSec;
-            AnimationBoneCount = file.Bones.Length;
         }
 
 
@@ -147,7 +145,6 @@ namespace View3D.Animation
         {
             AnimationClip copy = new AnimationClip();
             copy.PlayTimeInSec = PlayTimeInSec;
-            copy.AnimationBoneCount = AnimationBoneCount;
 
             foreach (var item in DynamicFrames)
                 copy.DynamicFrames.Add(item.Clone());

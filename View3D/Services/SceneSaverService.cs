@@ -13,8 +13,8 @@ using View3D.SceneNodes;
 using Microsoft.Xna.Framework;
 using View3D.Animation;
 using CommonControls.FileTypes.RigidModel.LodHeader;
-using CommonControls.FileTypes.RigidModel.Types;
 using CommonControls.FileTypes.RigidModel;
+using CommonControls.BaseDialogs.ErrorListDialog;
 
 namespace View3D.Services
 {
@@ -39,6 +39,8 @@ namespace View3D.Services
         {
             try
             {
+                DisplayValidateDialog();
+
                 var inputFile = _editorViewModel.MainFile ;
                 byte[] bytes = GetBytesToSave();
                 var path = _packFileService.GetFullPath(inputFile);
@@ -59,6 +61,8 @@ namespace View3D.Services
         {
             try
             {
+                DisplayValidateDialog();
+
                 var inputFile = _editorViewModel.MainFile ;
                 byte[] bytes = GetBytesToSave();
 
@@ -104,9 +108,6 @@ namespace View3D.Services
             var deductionRatio = MathHelper.Lerp(0.25f, 1, lerpValue);
             return deductionRatio;
         }
-
-
-
 
         static RmvLodHeader[] CreateLodHeaders(RmvLodHeader[] baseHeaders, RmvVersionEnum version)
         {
@@ -196,5 +197,54 @@ namespace View3D.Services
             logger.Here().Information($"Model saved correctly");
             return outputBytes;
         }
+
+        ErrorListViewModel.ErrorList Validate()
+        {
+            var errorList = new ErrorListViewModel.ErrorList();
+
+            var skeleton = _editableMeshNode.Skeleton.AnimationProvider.Skeleton;
+            var meshes = _editableMeshNode.GetMeshNodes(0);
+
+            // Different skeltons
+            if (skeleton != null)
+            {
+                var activeSkeletonName = skeleton.SkeletonName;
+                var skeltonNames = meshes.Select(x => x.Geometry.ParentSkeletonName).Distinct().ToList();
+
+                if(skeltonNames.Count != 1)
+                    errorList.Error("Skeleton", "Model contains meshes with multiple skeleton references. They will not animate well in game");
+
+                skeltonNames.Remove(activeSkeletonName);
+                if (skeltonNames.Count != 0)
+                    errorList.Error("Skeleton", "Model contains meshes that have not been re-rigged. They will not behave well in game");
+            }
+
+            // Mismatch between static and animated vertex
+            var vertexTypes = meshes.Select(x => x.Geometry.VertexFormat).Distinct().ToList();
+            if (vertexTypes.Contains(UiVertexFormat.Static) && skeleton != null)
+                errorList.Error("Vertex", "Model has a skeleton, but contains meshes with non-animated vertexes. Rig them or they will not behave as expected in game");
+
+            if ((vertexTypes.Contains(UiVertexFormat.Weighted) || vertexTypes.Contains(UiVertexFormat.Cinematic)) && skeleton == null)
+                errorList.Error("Vertex", "Model does not have a skeleton, but has animated vertex data.");
+
+            // Large model count
+            if (meshes.Count > 50)
+                errorList.Warning("Mesh Count", "Model contains a large amount of mehses, maybe they can be combined?");
+
+            // Different pivots
+            var pivots = meshes.Select(x => x.Material.PivotPoint).Distinct().ToList();
+            if (pivots.Count != 1)
+                errorList.Warning("Pivot Point", "Model contains multiple different pivot points, this is almost always not intended");
+
+            return errorList;
+        }
+
+        void DisplayValidateDialog()
+        {
+            var errorList = Validate();
+            if (errorList.HasData)
+                ErrorListWindow.ShowDialog("Potential problems", errorList);
+        }
+
     }
 }

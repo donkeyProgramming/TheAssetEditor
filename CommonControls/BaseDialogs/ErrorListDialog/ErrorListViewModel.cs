@@ -22,6 +22,8 @@ namespace CommonControls.BaseDialogs.ErrorListDialog
         {
             public List<ErrorListDataItem> Errors { get; set; } = new List<ErrorListDataItem>();
 
+            public bool HasData { get => Errors.Count != 0; }
+
             public ErrorListDataItem Error(string itemName, string description)
             {
                 var item = new ErrorListDataItem() { ErrorType = "Error", ItemName = itemName, Description = description, IsError = true };

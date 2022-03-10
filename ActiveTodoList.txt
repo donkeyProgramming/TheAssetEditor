@@ -621,24 +621,9 @@ Hold alt/double click when pressing face to select all faces in that mesh
 Reports => sound 
 
 
+Error when loading userdata before loading ca packfile 
 
-Fixes:
-	* Trying to find missing textures using specular if diffuse texture missing
-	* Correctly load v8 animations 
-	* Fixed crashes when using spec/gloss shader, often when combining meshes.
-	* Open wh3 animation bin files for preview 
-	
-Anim Meta tags decoded:
-	* AnimatedProp 12,13,14 
-	* Prop 12,13,14 
-	* Eject_attached
-
-Known issues:
-	* Can not save v8 animations! 
-	* Wh3 bin files not picked up by several of the editors 
-	* Can not save wh3 animation bins 
-	
-
+Make superview and mount tool work 
 better error detection for super view 
 General system for loading and editing animationbin/frg/packs 
 Reduction rate in lod node 

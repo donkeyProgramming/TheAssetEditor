@@ -55,10 +55,9 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             BoneRotationOffset.OnValueChanged += (viewModel) => BoneRotationUpdated(viewModel, MeshBones.SelectedItem);
             SkeletonDisplayOffset.OnValueChanged += (viewModel) => SkeletonDisplayOffsetUpdated(viewModel);
             RelativeScale.PropertyChanged += (_0, _1) => ApplyMeshFittingTransforms();
-
             MeshBones.SelectedItemChanged += (_) => OnBoneSelected();
 
-            _animationPlayer = _componentManager.GetComponent<AnimationsContainerComponent>().RegisterAnimationPlayer(new AnimationPlayer(), "Temp animation rerig");
+            _animationPlayer = _componentManager.GetComponent<AnimationsContainerComponent>().RegisterAnimationPlayer(new AnimationPlayer(), "Temp animation rerig" + Guid.NewGuid());
             _fromSkeleton = new GameSkeleton(currentSkeletonFile, _animationPlayer);
             
             // Build empty animation

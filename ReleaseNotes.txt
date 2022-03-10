@@ -1,0 +1,32 @@
+V0.30
+----------------------------
+Features:
+	* Its not possible to control the lod detail level by setting a value on the LOD node
+
+Fixes:
+	* Crash when adding new metadata tag
+	* Bug related to changing vertex type 
+	
+
+Known issues:
+	* Can not save v8 animations! 
+	* Wh3 bin files not picked up by several of the editors, causing issues
+	* Can not save wh3 animation bins 
+
+V0.29
+----------------------------
+Fixes:
+	* Trying to find missing textures using specular if diffuse texture missing
+	* Correctly load v8 animations 
+	* Fixed crashes when using spec/gloss shader, often when combining meshes.
+	* Open wh3 animation bin files for preview 
+	
+Anim Meta tags decoded:
+	* AnimatedProp 12,13,14 
+	* Prop 12,13,14 
+	* Eject_attached
+
+Known issues:
+	* Can not save v8 animations! 
+	* Wh3 bin files not picked up by several of the editors 
+	* Can not save wh3 animation bins 

@@ -92,7 +92,10 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 if (Path == null)
                     return;
 
-                var isFileFound = _packfileService.FindFile(Path) != null;
+                var isFileFound = true;
+                
+                if(string.IsNullOrWhiteSpace(Path) == false)
+                    isFileFound = _packfileService.FindFile(Path) != null;
 
                 if (isFileFound == false && Path.Contains("test_mask.dds"))
                     isFileFound = true;
