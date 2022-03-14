@@ -165,12 +165,17 @@ namespace CommonControls.FileTypes.MetaData
             return _typeTable[key];
         }
 
-        public static DecodedMetaEntryBase DeSerialize(UnknownMetaEntry entry)
+        public static BaseMetaEntry DeSerialize(UnknownMetaEntry entry, out string errorMessage)
         {
             EnsureMappingTableCreated();
 
             var entryInfo = GetEntryInformation(entry);
-            var instance = Activator.CreateInstance(entryInfo.type);
+            if (entryInfo == null)
+            {
+                errorMessage = $"Unable to find decoder for {entry.Name}_{entry.Version}";
+                return null;
+            }
+            var instance = Activator.CreateInstance(entryInfo.Type);
             var bytes = entry.Data;
             int currentIndex = 0;
             foreach (var proptery in entryInfo.Properties)
@@ -183,12 +188,53 @@ namespace CommonControls.FileTypes.MetaData
 
             var bytesLeft = bytes.Length - currentIndex;
             if (bytesLeft != 0)
-                throw new Exception($"Failed to read object - {bytesLeft} bytes left");
-
-            var typedInstance = instance as DecodedMetaEntryBase;
+            {
+                errorMessage = $"Failed to read object - {bytesLeft} bytes left";
+                return null;
+            }
+         
+            var typedInstance = instance as BaseMetaEntry;
             typedInstance.Name = entry.Name;
             typedInstance.Data = bytes;
+            errorMessage = null;
             return typedInstance;
+        }
+        
+        public static List<(string Header, string Value)> DeSerializeToStrings(BaseMetaEntry entry, out string errorMessage)
+        {
+            var entryInfo = GetEntryInformation(entry);
+            if (entryInfo == null)
+            {
+                errorMessage = $"Unable to find decoder for {entry.Name}_{entry.Version}";
+                return null;
+            }
+
+            var bytes = entry.Data;
+            int currentIndex = 0;
+            var output = new List<(string, string)>();
+
+            foreach (var proptery in entryInfo.Properties)
+            {
+                var parser = ByteParserFactory.Create(proptery.PropertyType);
+                var result = parser.TryDecode(bytes, currentIndex, out var value, out var bytesRead, out var error);
+                if (result == false)
+                {
+                    errorMessage = $"Failed to serialize {proptery.Name} - {error}";
+                    return null;
+                }
+                currentIndex += bytesRead;
+                output.Add((proptery.Name, value));
+            }
+
+            var bytesLeft = bytes.Length - currentIndex;
+            if (bytesLeft != 0)
+            {
+                errorMessage = $"Failed to read object - {bytesLeft} bytes left";
+                return null;
+            }
+
+            errorMessage = null;
+            return output;
         }
 
         internal static DecodedMetaEntryBase CreateDefault(string itemName)
@@ -205,37 +251,12 @@ namespace CommonControls.FileTypes.MetaData
             instance.Name = string.Join("_", itemNameSplit.Take(itemNameSplit.Length - 1));
             return instance;
         }
-        
-        public static List<(string Header, string Value)> DeSerializeToStrings(BaseMetaEntry entry)
-        {
-            var entryInfo = GetEntryInformation(entry);
-            var bytes = entry.Data;
-            int currentIndex = 0;
-            var output = new List<(string, string)>();
 
-            foreach (var proptery in entryInfo.Properties)
-            {
-                var parser = ByteParserFactory.Create(proptery.PropertyType);
-                var result = parser.TryDecode(bytes, currentIndex, out var value, out var bytesRead, out var error);
-                if (result == false)
-                    throw new Exception($"Failed to serialize {proptery.Name} - {error}");
-                currentIndex += bytesRead;
-
-                output.Add((proptery.Name, value));
-            }
-
-            var bytesLeft = bytes.Length - currentIndex;
-            if (bytesLeft != 0)
-                throw new Exception($"Failed to read object - {bytesLeft} bytes left");
-
-            return output;
-        }
-
-        static (Type type, List<PropertyInfo> Properties) GetEntryInformation(BaseMetaEntry entry)
+        static EntryInfoResult GetEntryInformation(BaseMetaEntry entry)
         {
             var metaDataType = GetTypeFromMeta(entry);
             if (metaDataType == null)
-                throw new Exception($"Unable to find decoder for {entry.Name}_{entry.Version}");
+                return null;
 
             var instance = Activator.CreateInstance(metaDataType);
             var orderedPropertiesList = metaDataType.GetProperties()
@@ -244,7 +265,13 @@ namespace CommonControls.FileTypes.MetaData
                 .OrderBy(x => x.GetCustomAttributes<MetaDataTagAttribute>(false).Single().Order)
                 .ToList();
 
-            return (metaDataType, orderedPropertiesList);
+            return new EntryInfoResult() { Type = metaDataType, Properties = orderedPropertiesList };
+        }
+
+        public class EntryInfoResult
+        {
+            public Type Type { get; set; } 
+            public List<PropertyInfo> Properties { get; set; }
         }
     }
 }

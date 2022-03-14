@@ -57,7 +57,7 @@ namespace CommonControls.Editors.AnimMeta
         ILogger _logger = Logging.Create<MetaDataTagItemViewModel>();
         string _originalName;
 
-        public MetaDataTagItemViewModel(DecodedMetaEntryBase typedMetaItem)
+        public MetaDataTagItemViewModel(BaseMetaEntry typedMetaItem)
         {
             DisplayName.Value = $"{typedMetaItem.Name}_v{typedMetaItem.Version}";
             _originalName = typedMetaItem.Name;

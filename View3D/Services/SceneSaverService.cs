@@ -15,6 +15,7 @@ using View3D.Animation;
 using CommonControls.FileTypes.RigidModel.LodHeader;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.BaseDialogs.ErrorListDialog;
+using View3D.Utility;
 
 namespace View3D.Services
 {
@@ -229,12 +230,22 @@ namespace View3D.Services
 
             // Large model count
             if (meshes.Count > 50)
-                errorList.Warning("Mesh Count", "Model contains a large amount of mehses, maybe they can be combined?");
+                errorList.Warning("Mesh Count", "Model contains a large amount of mehses, might cause performance issues");
+
+            if(ModelCombiner.HasPotentialCombineMeshes(meshes, out _))
+                errorList.Warning("Mesh", "Model contains multiple meshes that can be merged. Consider merging them for performance reasons");
 
             // Different pivots
             var pivots = meshes.Select(x => x.Material.PivotPoint).Distinct().ToList();
             if (pivots.Count != 1)
                 errorList.Warning("Pivot Point", "Model contains multiple different pivot points, this is almost always not intended");
+
+            // Animation and Pivotpoint
+            if (pivots.Count == 1 && skeleton != null)
+            { 
+                if( (pivots.First().X == 0 && pivots.First().Y == 0 && pivots.First().Z == 0) == false)
+                    errorList.Warning("Pivot Point", "Model contains a non zero pivot point and animation, this is almost always not intended");
+            }
 
             return errorList;
         }

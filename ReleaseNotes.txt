@@ -1,3 +1,58 @@
+v0.33
+----------------------------
+	* Gizmo bug - Move with camera head on
+	* Vertex tranform undo bug?
+	* Fix save animations 
+	* Bin stuff 
+	* Changelog with gifs system 
+	* Texture conveter 
+	* Decent texture window
+	* Improve the directX window handling 
+	* Kitbasher memory leaks 
+	* Wireframe view 
+	
+V0.32
+----------------------------
+	* Clean up vertex type mess  
+	* Fix ws model generation 
+	* Rome 2 animted props, Sound, firePos, ImpactPos, Effect 
+	* Attachment point for older games 
+	* Bug with finding textures from Meh => Assign texture from WS model - Use model name, might be different textures in there. Just replace if texture is missing, not always  	
+	* Figure out why pose animations dont work 
+	
+	* First time welcome message! 
+	* Error when loading userdata before loading ca packfile 
+	* Did not recreate lods warning 
+
+	Features:
+		* Auto combine all possible meshes
+		* Warning when items can be combined on save
+		* Warning for mixing pivotpoint and animation 
+		
+	Fixes:
+		* Read meta faster parsing - error handling without exceptions
+		* Fixed bug in reading anim.meta files in some rare cases
+		* Crash when saving a mesh which is contained in a grouping folder within the kitbash editor
+	
+	Known issues:
+		* Can not save v8 animations! 
+		* Wh3 bin files not picked up by several of the editors, causing issues
+		* Can not save wh3 animation bins 
+
+
+V0.31
+----------------------------
+Features:
+	* Simple error checking when saving a mesh to catch common errors
+
+Fixes:
+	* Mesh fitter tool no longer crashing
+	
+Known issues:
+	* Can not save v8 animations! 
+	* Wh3 bin files not picked up by several of the editors, causing issues
+	* Can not save wh3 animation bins
+
 V0.30
 ----------------------------
 Features:

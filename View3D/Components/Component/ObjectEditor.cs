@@ -58,15 +58,20 @@ namespace View3D.Components.Component
 
         public bool CombineMeshes(ObjectSelectionState objectSelectionState, out ErrorList errorMessages)
         {
-            ModelCombiner modelValidator = new ModelCombiner();
-            var objs = objectSelectionState.SelectedObjects().Where(x => x is Rmv2MeshNode).Select(x => x as Rmv2MeshNode);
-            if (!modelValidator.CanCombine(objs.ToList(), out errorMessages))
-                return false;
+            var objs = objectSelectionState.SelectedObjects()
+                .Cast<Rmv2MeshNode>()
+                .Where(x => x != null)
+                .ToList();
 
-            var command = new CombineMeshCommand(objectSelectionState.SelectedObjects());
-            _commandManager.ExecuteCommand(command);
+            var result = ModelCombiner.HasPotentialCombineMeshes(objs, out errorMessages);
+            if (result)
+            {
+                errorMessages = new ErrorList();
+                var command = new CombineMeshCommand(objectSelectionState.SelectedObjects());
+                _commandManager.ExecuteCommand(command);
+            }
             
-            return true;
+            return result;
         }
 
         public void ReduceMesh(List<Rmv2MeshNode> meshNodes, float factor, bool undoable)

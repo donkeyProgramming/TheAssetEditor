@@ -5,6 +5,41 @@ using System.Text;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
+    [MetaData("ANIMATED_PROP", 3)]
+    public class AnimatedProp_v3 : BaseMetaEntry
+    {
+
+        [MetaDataTag(1, "Time in second when the Tag takes effect")]
+        public float StartTime { get; set; }
+
+        [MetaDataTag(2, "Time in second when the Tag stops taking effect")]
+        public float EndTime { get; set; }
+
+        [MetaDataTag(3)]
+        public ushort Filter { get; set; }
+
+
+        [MetaDataTag(4)]
+        public string ModelName { get; set; } = "";
+
+        [MetaDataTag(5)]
+        public string AnimationName { get; set; } = "";
+
+        [MetaDataTag(6)]
+        public Vector3 Position { get; set; }
+
+        [MetaDataTag(7, "", MetaDataTagAttribute.DisplayType.EulerVector)]
+        public Vector4 Orientation { get; set; }
+
+        [MetaDataTag(8)]
+        public int BoneId { get; set; }
+
+        [MetaDataTag(9, "bind_pose (1), animation (2), zeroed (3), skinned (4)")]
+        public int AttachMethod { get; set; }
+
+    }
+
+
     [MetaData("ANIMATED_PROP", 10)]
     public class AnimatedProp_v10 : DecodedMetaEntryBase
     {

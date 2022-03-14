@@ -44,7 +44,6 @@ namespace AssetEditor.Report
 
         public void Create()
         {
-
             var gameName = GameInformationFactory.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
             var timeStamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
             var gameOutputDir = $"{DirectoryHelper.ReportsDirectory}\\MetaData\\{gameName}_{timeStamp}\\";
@@ -85,20 +84,28 @@ namespace AssetEditor.Report
 
                         try
                         {
-                            var variables = MetaDataTagDeSerializer.DeSerializeToStrings(item);
-                        
-                            if (output[tagName].CompletedFiles.Count == 0)
+                            var variables = MetaDataTagDeSerializer.DeSerializeToStrings(item, out var errorMessage);
+                            if (variables != null)
                             {
-                                foreach (var variable in variables)
-                                    output[tagName].Headers.Add(variable.Header);
+
+                                if (output[tagName].CompletedFiles.Count == 0)
+                                {
+                                    foreach (var variable in variables)
+                                        output[tagName].Headers.Add(variable.Header);
+                                }
+
+                                var variableValues = variables.Select(x => x.Value).ToList();
+                                variableValues.Insert(0, fileName);
+                                variableValues.Insert(1, "");
+
+                                output[tagName].CompletedFiles.Add(variableValues);
+                                completedTags++;
                             }
-                        
-                            var variableValues = variables.Select(x => x.Value).ToList();
-                            variableValues.Insert(0, fileName);
-                            variableValues.Insert(1, "");
-                        
-                            output[tagName].CompletedFiles.Add(variableValues);
-                            completedTags++;
+                            else
+                            {
+                                var variableValues = new List<string>() { fileName, errorMessage, item.Data.Length.ToString() };
+                                output[tagName].FailedFiles.Add(variableValues);
+                            }
                         }
                         catch(Exception e)
                         {

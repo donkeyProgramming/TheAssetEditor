@@ -59,10 +59,10 @@ namespace CommonControls.Editors.AnimMeta
 
             foreach (var item in _metaDataFile.Items)
             {
-                if (item is DecodedMetaEntryBase metaBase)
-                    Tags.Add(new MetaDataTagItemViewModel(metaBase));
-                else if (item is UnknownMetaEntry uknMeta)
+                if (item is UnknownMetaEntry uknMeta)
                     Tags.Add(new UnkMetaDataTagItemViewModel(uknMeta));
+                else if (item is BaseMetaEntry metaBase)
+                    Tags.Add(new MetaDataTagItemViewModel(metaBase));
                 else
                     throw new System.Exception();
             }
@@ -141,7 +141,9 @@ namespace CommonControls.Editors.AnimMeta
 
             try
             {
-                var typed = MetaDataTagDeSerializer.DeSerialize(pasteObject.Data);
+                var typed = MetaDataTagDeSerializer.DeSerialize(pasteObject.Data, out var errorStr);
+                if (typed == null)
+                    throw new System.Exception(errorStr);
                 Tags.Add(new MetaDataTagItemViewModel(typed));
             }
             catch

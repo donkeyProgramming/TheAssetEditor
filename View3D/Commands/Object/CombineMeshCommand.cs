@@ -5,14 +5,14 @@ using System.Linq;
 using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
+using View3D.Utility;
 
 namespace View3D.Commands.Object
 {
     public class CombineMeshCommand : CommandBase<CombineMeshCommand>
     {
         List<ISelectable> _objectsToCombine;
-
-        IEditableGeometry _combinedMesh;
+        List<IEditableGeometry> _combinedMeshes = new List<IEditableGeometry>();
 
         SelectionManager _selectionManager;
         ISelectionState _originalSelectionState;
@@ -39,34 +39,58 @@ namespace View3D.Commands.Object
 
             using (new WaitCursor())
             {
-                _combinedMesh = SceneNodeHelper.CloneNode(_objectsToCombine.First()) as IEditableGeometry;
-                _combinedMesh.Name = _objectsToCombine.First().Name + "_Combined";
-                _combinedMesh.Parent.AddObject(_combinedMesh);
+                var combinedMeshes = new List<IEditableGeometry>();
 
-                // Combine
-                var editableGoes = _objectsToCombine.Where(x => x is IEditableGeometry).Select(x =>(IEditableGeometry)x);
-                var newModel = editableGoes.First().Geometry.Clone() as MeshObject;
-                var typedGeo = _objectsToCombine.Select(x => (MeshObject)x.Geometry);
-                newModel.Merge(typedGeo.Skip(1).Take(typedGeo.Count() -1).ToList());
-                _combinedMesh.Geometry = newModel;
+                var geometriesToCombine = _objectsToCombine
+                    .Where(x => x is Rmv2MeshNode)
+                    .Cast<Rmv2MeshNode>()
+                    .ToList();
+                var combineGroups = ModelCombiner.SortMeshesIntoCombinableGroups(geometriesToCombine);
+                foreach (var currentGroup in combineGroups)
+                {
+                    if (currentGroup.Count != 1)
+                    {
+                        var combinedMesh = SceneNodeHelper.CloneNode(currentGroup.First()) as IEditableGeometry;
+                        combinedMesh.Name = currentGroup.First().Name + "_Combined";
 
-                // Remove
+                        var newModel = currentGroup.First().Geometry.Clone();
+                        var typedGeo = currentGroup.Select(x => x.Geometry);
+                        combinedMesh.Geometry = newModel;
+
+                        var geoList = currentGroup.Skip(1).Select(x => x.Geometry).ToList();
+                        newModel.Merge(geoList);
+
+                        _combinedMeshes.Add(combinedMesh);
+                    }
+                    else
+                    {
+                        _combinedMeshes.Add(currentGroup.First());
+                    }
+                }
+
+                // Remove all
                 foreach (var item in _objectsToCombine)
                     item.Parent.RemoveObject(item);
 
-                // Select
+                // Add all
+                foreach(var item in _combinedMeshes)
+                    item.Parent.AddObject(item);
+
+                // Select all new 
                 var currentState = _selectionManager.GetState() as ObjectSelectionState;
                 currentState.Clear();
-                currentState.ModifySelectionSingleObject(_combinedMesh as ISelectable, false);
+                currentState.ModifySelection(_combinedMeshes.Cast<ISelectable>(), false);
             }
         }
 
         protected override void UndoCommand()
         {
             foreach (var item in _objectsToCombine)
-                _combinedMesh.Parent.AddObject(item);
+                item.Parent.AddObject(item);
 
-            _combinedMesh.Parent.RemoveObject(_combinedMesh);
+            foreach(var item in _combinedMeshes)
+                item.Parent.RemoveObject(item);
+
             _selectionManager.SetState(_originalSelectionState);
         }
     }

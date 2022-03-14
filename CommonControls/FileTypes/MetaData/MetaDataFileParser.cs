@@ -5,6 +5,7 @@ using Filetypes.ByteParsing;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -35,21 +36,32 @@ namespace CommonControls.FileTypes.MetaData
 
             if (contentLength > 8)
             {
-                int numElements = BitConverter.ToInt32(fileContent, 4);
+                var expectedElements = BitConverter.ToUInt32(fileContent, 4);
                 var items = ExploratoryGetEntries(fileContent);
 
-                if (numElements != items.Count)
-                    throw new Exception($"Not the expected amount elements. Expected {numElements}, got {items.Count}");
+                if (Debugger.IsAttached)
+                {
+                    if (expectedElements != items.Count)
+                        throw new Exception($"Not the expected amount elements. Expected {expectedElements}, got {items.Count}");
+                }
 
                 // Convert to sensible stuff
                 foreach (var item in items)
                 {
-                   try
-                   {
-                       var deserializedTag = MetaDataTagDeSerializer.DeSerialize(item);
-                       outputFile.Items.Add(deserializedTag);
-                   }
-                   catch (Exception e)
+                    try
+                    {
+                        var deserializedTag = MetaDataTagDeSerializer.DeSerialize(item, out var errorStr);
+                        if (deserializedTag == null)
+                        {
+                            outputFile.Items.Add(item);
+                            _logger.Here().Error($"Failed to parse tag of type {item.Name}_{item.Version} - {errorStr}");
+                        }
+                        else
+                        {
+                            outputFile.Items.Add(deserializedTag);
+                        }
+                    }
+                    catch (Exception e)
                     {
                         _logger.Here().Error($"Failed to parse tag of type {item.Name}_{item.Version} - {e.Message}");
                         outputFile.Items.Add(item);
@@ -128,7 +140,7 @@ namespace CommonControls.FileTypes.MetaData
                     return false;
                 if (tagName.Length < 4)
                     return false;
-                var allCaps = tagName.All(c => char.IsUpper(c) || c == '_' || c == ' ');
+                var allCaps = tagName.All(c => char.IsUpper(c) || c == '_' || c == ' ' || char.IsNumber(c));
                 return allCaps;
             }
 

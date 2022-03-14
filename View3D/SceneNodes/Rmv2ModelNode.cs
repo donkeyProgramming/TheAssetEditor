@@ -88,8 +88,10 @@ namespace View3D.SceneNodes
 
         public List<Rmv2MeshNode> GetMeshNodes(int lod)
         {
-            var lods = GetLodNodes();
-            return lods[lod].Children.Select(x=> x as Rmv2MeshNode).ToList();
+            var lodNodes = GetLodNodes();
+            var lodNode = lodNodes[lod];
+            var meshes = SceneNodeHelper.GetChildrenOfType<Rmv2MeshNode>(lodNode);
+            return meshes;
         }
 
         public List<Rmv2MeshNode> GetMeshesInLod(int lodIndex, bool onlyVisible)
