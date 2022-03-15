@@ -1,30 +1,44 @@
-v0.33
+v0.XX
 ----------------------------
 	* Gizmo bug - Move with camera head on
 	* Vertex tranform undo bug?
 	* Fix save animations 
-	* Bin stuff 
+	* Bin stuff - Rewrite how its all handled
 	* Changelog with gifs system 
 	* Texture conveter 
 	* Decent texture window
 	* Improve the directX window handling 
 	* Kitbasher memory leaks 
 	* Wireframe view 
+	* Checkboxes in ui for rendering flags 
+	* Warning when generating file list and audio files are skipped from loading 
+	
+	
+	
+	
+	
+	
+V0.33
+----------------------------
+	* Attachment point for older games 
+	* Sound editor - Report of all sound names 
+	* Decal support
+	* Keep paramterter index for material paramters 
+	
+	
 	
 V0.32
 ----------------------------
-	* Clean up vertex type mess  
 	* Fix ws model generation 
 	* Rome 2 animted props, Sound, firePos, ImpactPos, Effect 
-	* Attachment point for older games 
 	* Bug with finding textures from Meh => Assign texture from WS model - Use model name, might be different textures in there. Just replace if texture is missing, not always  	
-	* Figure out why pose animations dont work 
 	
 	* First time welcome message! 
 	* Error when loading userdata before loading ca packfile 
 	* Did not recreate lods warning 
 
 	Features:
+		* Added metadata tag support for Rome2 AnimatedProp
 		* Auto combine all possible meshes
 		* Warning when items can be combined on save
 		* Warning for mixing pivotpoint and animation 
@@ -33,6 +47,9 @@ V0.32
 		* Read meta faster parsing - error handling without exceptions
 		* Fixed bug in reading anim.meta files in some rare cases
 		* Crash when saving a mesh which is contained in a grouping folder within the kitbash editor
+		* Cleaned up how different vertex types are handled, making for easier handling of multiple material types 
+		* Fixed crash when trying to save meshes created using the "Freeze Frame tool"
+		* Foxed bug causing pose animations to not load correctly
 	
 	Known issues:
 		* Can not save v8 animations! 

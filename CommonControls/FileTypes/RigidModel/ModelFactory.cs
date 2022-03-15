@@ -73,7 +73,7 @@ namespace CommonControls.FileTypes.RigidModel
             var expectedMaterialSize = meshStart - materialOffset;
 
             var material = MaterialFactory.Create().LoadMaterial(data, materialOffset, rmvVersionEnum, commonHeader.ModelTypeFlag, expectedMaterialSize);
-            var mesh = LoadMesh(data, commonHeader, material.BinaryVertexFormat, modelStartOffset);
+            var mesh = LoadMesh(rmvVersionEnum, data, commonHeader, material.BinaryVertexFormat, modelStartOffset);
 
             return new RmvModel()
             {
@@ -83,7 +83,7 @@ namespace CommonControls.FileTypes.RigidModel
             };
         }
 
-        RmvMesh LoadMesh(byte[] dataArray, RmvCommonHeader commonHeader, VertexFormat binaryVertexFormat, int modelStartOffset)
+        RmvMesh LoadMesh(RmvVersionEnum rmvVersionEnum, byte[] dataArray, RmvCommonHeader commonHeader, VertexFormat binaryVertexFormat, int modelStartOffset)
         {
             var vertexFactory = VertexFactory.Create();
 
@@ -92,11 +92,11 @@ namespace CommonControls.FileTypes.RigidModel
             if(vertexFactory.IsKnownVertex(binaryVertexFormat) == false)
                 throw new Exception($"Unknown vertex format for {commonHeader.ModelTypeFlag} - {binaryVertexFormat}. Size:{expectedVertexSize}");
 
-            var vertexSize = vertexFactory.GetVertexSize(binaryVertexFormat);
+            var vertexSize = vertexFactory.GetVertexSize(binaryVertexFormat, rmvVersionEnum);
             if (expectedVertexSize != vertexSize)
                 throw new Exception($"Vertex size does not match for {commonHeader.ModelTypeFlag} - {binaryVertexFormat}. Expected: {expectedVertexSize} Actual: {vertexSize}");
 
-            var vertexList = vertexFactory.CreateVertexFromBytes(binaryVertexFormat, dataArray, (int)commonHeader.VertexCount, (int)vertexStart, (int)expectedVertexSize);
+            var vertexList = vertexFactory.CreateVertexFromBytes(rmvVersionEnum, binaryVertexFormat, dataArray, (int)commonHeader.VertexCount, (int)vertexStart, (int)expectedVertexSize);
 
             var faceStart = commonHeader.IndexOffset + modelStartOffset;
             var IndexList = new ushort[commonHeader.IndexCount];
@@ -145,7 +145,7 @@ namespace CommonControls.FileTypes.RigidModel
                             throw new Exception("Unexpected FirstMeshOffset");
                     }
 
-                    var modelBytes = SaveModel(models[modelIndex]);
+                    var modelBytes = SaveModel(file.Header.Version, models[modelIndex]);
                     if (models[modelIndex].CommonHeader.MeshSectionSize != modelBytes.Length)
                         throw new Exception("Unexpected MeshSectionSize");
 
@@ -174,12 +174,12 @@ namespace CommonControls.FileTypes.RigidModel
             if (expectedIndexSize != file.LodHeaders[lodIndex].TotalLodIndexSize)
                 throw new Exception("Unexpected TotalLodIndexSize");
 
-            var expectedVertexSize = file.ModelList[lodIndex].Sum(x => x.Mesh.VertexList.Length * VertexFactory.Create().GetVertexSize(x.Material.BinaryVertexFormat));
+            var expectedVertexSize = file.ModelList[lodIndex].Sum(x => x.Mesh.VertexList.Length * VertexFactory.Create().GetVertexSize(x.Material.BinaryVertexFormat, file.Header.Version));
             if (expectedVertexSize != file.LodHeaders[lodIndex].TotalLodVertexSize)
                 throw new Exception("Unexpected TotalLodVertexSize");
         }
 
-        byte[] SaveModel(RmvModel model)
+        byte[] SaveModel(RmvVersionEnum rmvVersion, RmvModel model)
         {
             var vertexFactory = VertexFactory.Create();
             using MemoryStream modelStream = new MemoryStream();
@@ -200,7 +200,7 @@ namespace CommonControls.FileTypes.RigidModel
                 throw new Exception("Unexpected VertexOffset");
 
             foreach (var vertex in model.Mesh.VertexList)
-                modelWriter.Write(vertexFactory.Save(model.Material.BinaryVertexFormat, vertex));
+                modelWriter.Write(vertexFactory.Save(rmvVersion, model.Material.BinaryVertexFormat, vertex));
 
             var indexOffset = modelWriter.BaseStream.Position;
             if (indexOffset != model.CommonHeader.IndexOffset)
@@ -265,7 +265,6 @@ namespace CommonControls.FileTypes.RigidModel
 
                     strBuilder.AppendLine($"\t\t Material: type: {mesh.Material.GetType()} size: {mesh.Material.ComputeSize()}");
                     strBuilder.AppendLine($"\t\t\t MaterialId: {mesh.Material.MaterialId}");
-                    strBuilder.AppendLine($"\t\t\t VertexType: {mesh.Material.VertexType}");
                     strBuilder.AppendLine($"\t\t\t BinaryVertexFormat: {mesh.Material.BinaryVertexFormat}");
                     strBuilder.AppendLine($"\t\t\t PivotPoint: {mesh.Material.PivotPoint}");
                     strBuilder.AppendLine($"\t\t\t AlphaMode: {mesh.Material.AlphaMode}");

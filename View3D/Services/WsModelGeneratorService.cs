@@ -131,7 +131,7 @@ namespace View3D.Services
 
         private string CreateUnknownMaterial(Rmv2MeshNode mesh)
         {
-            var vertextType = mesh.Material.VertexType;
+            var vertextType = mesh.Material.BinaryVertexFormat;
             var alphaOn = mesh.Material.AlphaMode != AlphaMode.Opaque;
 
             using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("View3D.Content.Game.MaterialTemplate.xml.material");
@@ -140,17 +140,17 @@ namespace View3D.Services
 
             var shaderPath = vertextType switch
             {
-                UiVertexFormat.Cinematic => alphaOn ? "weighted4_default_alpha" : "weighted4_default",
-                UiVertexFormat.Weighted => alphaOn ? "weighted2_default_alpha" : "weighted2_default",
-                UiVertexFormat.Static => alphaOn ? "rigid_default_alpha" : "rigid_default",
+                VertexFormat.Cinematic => alphaOn ? "weighted4_default_alpha" : "weighted4_default",
+                VertexFormat.Weighted => alphaOn ? "weighted2_default_alpha" : "weighted2_default",
+                VertexFormat.Static => alphaOn ? "rigid_default_alpha" : "rigid_default",
                 _ => string.Empty
             };
 
             var shaderNamePart = vertextType switch
             {
-                UiVertexFormat.Cinematic => "_weighted4",
-                UiVertexFormat.Weighted => "_weighted2",
-                UiVertexFormat.Static => "_rigid",
+                VertexFormat.Cinematic => "_weighted4",
+                VertexFormat.Weighted => "_weighted2",
+                VertexFormat.Static => "_rigid",
                 _ => string.Empty
             };
 
@@ -185,8 +185,8 @@ namespace View3D.Services
         {
             foreach (var material in possibleMaterials)
             {
-                if (mesh.Material.VertexType != material.VertexType)
-                    continue;
+                //if (mesh.Material.VertexType != material.VertexType)
+                //    continue;
 
                 var alphaOn = mesh.Material.AlphaMode != AlphaMode.Opaque;
                 if (alphaOn && material.Alpha == false)

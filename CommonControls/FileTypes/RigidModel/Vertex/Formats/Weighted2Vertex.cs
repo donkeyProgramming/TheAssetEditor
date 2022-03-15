@@ -10,16 +10,21 @@ using System.Threading.Tasks;
 
 namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
 {
-    public class WeightedVertexCreator : IVertexCreator
+    public class Weighted2VertexCreator : IVertexCreator
     {
         public VertexFormat Type => VertexFormat.Weighted;
-        public bool AddTintColour { get; set; }
-        public uint VertexSize => (uint)ByteHelper.GetSize<Data>() + TintColourSize();
+        public uint GetVertexSize(RmvVersionEnum rmvVersion)
+        {
+            if (rmvVersion == RmvVersionEnum.RMV2_V8)
+                return (uint)ByteHelper.GetSize<Data>() + 4;
+            else
+                return (uint)ByteHelper.GetSize<Data>();
+        }
         public bool ForceComputeNormals => false;
 
-        public CommonVertex Read(byte[] buffer, int offset, int vertexSize)
+        public CommonVertex Read(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize)
         {
-            if (AddTintColour)
+            if (rmvVersion == RmvVersionEnum.RMV2_V8)
             {
                 var vertexData = ByteHelper.ByteArrayToStructure<DataWithColour>(buffer, offset);
 
@@ -62,12 +67,12 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
             }
         }
 
-        public byte[] Write(CommonVertex vertex)
+        public byte[] Write(RmvVersionEnum rmvVersion, CommonVertex vertex)
         {
             if (vertex.WeightCount != 2 || vertex.BoneIndex.Length != 2 || vertex.BoneWeight.Length != 2)
                 throw new Exception($"Unexpected vertex weights for {Type}");
 
-            if (AddTintColour)
+            if (rmvVersion == RmvVersionEnum.RMV2_V8)
             {
                 var typedVert = new DataWithColour()
                 {
@@ -100,13 +105,6 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
                 };
                 return ByteHelper.GetBytes(typedVert);
             }
-        }
-
-        uint TintColourSize()
-        {
-            if (AddTintColour)
-                return 4;
-            return 0;
         }
 
         struct Data    //28

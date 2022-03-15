@@ -68,6 +68,21 @@ namespace CommonControls.FileTypes.RigidModel
             weightedMaterials.Add(ModelMaterialEnum.decal_dirtmap);
             return weightedMaterials;
         }
+
+        public static UiVertexFormat GetToolVertexFormat(VertexFormat format)
+        {
+            return format switch
+            {
+                VertexFormat.Static => UiVertexFormat.Static,
+                VertexFormat.Collision_Format => UiVertexFormat.Static,
+                VertexFormat.Weighted => UiVertexFormat.Weighted,
+                VertexFormat.Cinematic => UiVertexFormat.Cinematic,
+                VertexFormat.Position16_bit => UiVertexFormat.Static,
+                VertexFormat.CustomTerrain => UiVertexFormat.Static,
+                VertexFormat.CustomTerrain2 => UiVertexFormat.Static,
+                _ => throw new Exception("Unknown vertex type")
+            };
+        }
     }
 
     public enum AlphaMode : int
@@ -75,6 +90,9 @@ namespace CommonControls.FileTypes.RigidModel
         Opaque = 0,
         Transparent = 1,
     };
+
+
+    
 
     public enum VertexFormat : uint
     {
@@ -88,10 +106,6 @@ namespace CommonControls.FileTypes.RigidModel
         CustomTerrain,
 
         CustomTerrain2 = 13,
-
-        // Not part of CA code
-        Weighted_withTint = 10003,
-        Cinematic_withTint = 10004,
     };
 
     public enum UiVertexFormat : uint

@@ -15,7 +15,7 @@ namespace View3D.Services
         public static MeshObject BuildMeshFromRmvModel(RmvModel modelPart, string skeletonName, IGraphicsCardGeometry context)
         {
             var output = new MeshObject(context, skeletonName);
-            output.ChangeVertexType(modelPart.Material.VertexType, skeletonName, false);
+            output.ChangeVertexType(ModelMaterialEnumHelper.GetToolVertexFormat(modelPart.Material.BinaryVertexFormat), skeletonName, false);
             output.VertexArray = new VertexPositionNormalTextureCustom[modelPart.Mesh.VertexList.Length];
             output.IndexArray = (ushort[])modelPart.Mesh.IndexList.Clone();
             

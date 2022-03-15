@@ -6,17 +6,22 @@ using System.Runtime.InteropServices;
 
 namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
 {
-    public class CinematicVertexCreator : IVertexCreator
+    public class Weighted4VertexCreator : IVertexCreator
     {
         public VertexFormat Type => VertexFormat.Cinematic;
-        public bool AddTintColour { get; set; }
-        public uint VertexSize => (uint)ByteHelper.GetSize<Data>() + TintColourSize();
-
+        public uint GetVertexSize(RmvVersionEnum rmvVersion)
+        {
+            if (rmvVersion == RmvVersionEnum.RMV2_V8)
+                return (uint)ByteHelper.GetSize<Data>() + 4;
+            else
+                return (uint)ByteHelper.GetSize<Data>();
+        }
+   
         public bool ForceComputeNormals => false;
 
-        public CommonVertex Read(byte[] buffer, int offset, int vertexSize)
+        public CommonVertex Read(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize)
         {
-            if (AddTintColour)
+            if (rmvVersion == RmvVersionEnum.RMV2_V8)
             {
                 var vertexData = ByteHelper.ByteArrayToStructure<DataWithColour>(buffer, offset);
 
@@ -62,7 +67,7 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
         }
 
 
-        public byte[] Write(CommonVertex vertex)
+        public byte[] Write(RmvVersionEnum rmvVersion, CommonVertex vertex)
         {
             if (vertex.WeightCount != 4 || vertex.BoneIndex.Length != 4 || vertex.BoneWeight.Length != 4)
                 throw new Exception($"Unexpected vertex weights for {Type}");
@@ -70,7 +75,7 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
             var newPos = vertex.Position;
             newPos.W = 0;
 
-            if (AddTintColour)
+            if (rmvVersion == RmvVersionEnum.RMV2_V8)
             {
                 var typedVert = new DataWithColour()
                 {
@@ -104,13 +109,6 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
                 var bytes =  ByteHelper.GetBytes(typedVert);
                 return bytes;
             }
-        }
-
-        uint TintColourSize()
-        {
-            if (AddTintColour)
-                return 4;
-            return 0;
         }
 
         public struct Data //32

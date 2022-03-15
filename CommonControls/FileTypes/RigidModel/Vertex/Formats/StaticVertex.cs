@@ -13,10 +13,14 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
     public class StaticVertexCreator : IVertexCreator
     {
         public VertexFormat Type => VertexFormat.Static;
-        public uint VertexSize => (uint)ByteHelper.GetSize<Data>();
+        public uint GetVertexSize(RmvVersionEnum rmvVersion)
+        {
+
+                return (uint)ByteHelper.GetSize<Data>();
+        }
         public bool ForceComputeNormals => false;
 
-        public CommonVertex Read(byte[] buffer, int offset, int vertexSize)
+        public CommonVertex Read(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize)
         {
             var vertexData = ByteHelper.ByteArrayToStructure<Data>(buffer, offset);
 
@@ -38,7 +42,7 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
             return vertex;
         }
 
-        public byte[] Write(CommonVertex vertex)
+        public byte[] Write(RmvVersionEnum rmvVersion, CommonVertex vertex)
         {
             if (vertex.WeightCount != 0 || vertex.BoneIndex.Length != 0 || vertex.BoneWeight.Length != 0)
                 throw new Exception($"Unexpected vertex weights for {Type}");

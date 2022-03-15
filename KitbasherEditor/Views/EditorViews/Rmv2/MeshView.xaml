@@ -66,7 +66,7 @@
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                 <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Material"/>
                 <Label>:</Label>
-                <ComboBox ItemsSource="{Binding Mesh.PossibleMaterialTypes}" SelectedItem="{Binding Mesh.SelectedMaterialType}" VerticalAlignment="Center"/>
+                <ComboBox ItemsSource="{Binding Mesh.PossibleMaterialTypes}" SelectedItem="{Binding Mesh.SelectedMaterialType}" VerticalAlignment="Center" IsEnabled="False"/>
             </StackPanel>
 
         </DockPanel>

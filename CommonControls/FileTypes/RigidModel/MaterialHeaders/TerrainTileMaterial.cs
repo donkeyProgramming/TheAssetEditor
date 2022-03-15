@@ -17,7 +17,6 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 
         public string TerrainBaseStr { get; set; }
         public ModelMaterialEnum MaterialId { get; set; } = ModelMaterialEnum.TerrainTiles;
-        UiVertexFormat IMaterial.VertexType { get; set; } = UiVertexFormat.Static;
         public string TextureDirectory { get => ""; set { } }
 
         uint Unknown0 { get; set; }

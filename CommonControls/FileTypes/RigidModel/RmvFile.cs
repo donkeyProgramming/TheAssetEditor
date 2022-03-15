@@ -25,7 +25,7 @@ namespace CommonControls.FileTypes.RigidModel
             for (int lodIndex = 0; lodIndex < Header.LodCount; lodIndex++)
             {
                 for (var modelIndex = 0; modelIndex < ModelList[lodIndex].Length; modelIndex++)
-                    UpdateModelHeader(ModelList[lodIndex][modelIndex]);
+                    UpdateModelHeader(ModelList[lodIndex][modelIndex], Header.Version);
             }
 
             uint lodHeaderSize = LodHeaderFactory.Create().GetHeaderSize(Header.Version);
@@ -37,7 +37,7 @@ namespace CommonControls.FileTypes.RigidModel
                 var lodHeader = LodHeaders[lodIndex];
 
                 lodHeader.MeshCount = (uint)ModelList[lodIndex].Length;
-                lodHeader.TotalLodVertexSize = (uint)ModelList[lodIndex].Sum(x => x.CommonHeader.VertexCount * VertexFactory.Create().GetVertexSize(x.Material.BinaryVertexFormat));
+                lodHeader.TotalLodVertexSize = (uint)ModelList[lodIndex].Sum(x => x.CommonHeader.VertexCount * VertexFactory.Create().GetVertexSize(x.Material.BinaryVertexFormat, Header.Version));
                 lodHeader.TotalLodIndexSize = (uint)ModelList[lodIndex].Sum(x => x.CommonHeader.IndexCount * sizeof(ushort));
                 lodHeader.FirstMeshOffset = headerOffset + modelOffset;
                 LodHeaders[lodIndex] = lodHeader;
@@ -46,10 +46,10 @@ namespace CommonControls.FileTypes.RigidModel
             }
         }
 
-        void UpdateModelHeader(RmvModel model)
+        void UpdateModelHeader(RmvModel model, RmvVersionEnum rmvVersion)
         {
             var headerDataSize = ByteHelper.GetSize<RmvCommonHeader>() + model.Material.ComputeSize();
-            var vertexSize = VertexFactory.Create().GetVertexSize(model.Material.BinaryVertexFormat);
+            var vertexSize = VertexFactory.Create().GetVertexSize(model.Material.BinaryVertexFormat, rmvVersion);
 
             var header = model.CommonHeader;
 

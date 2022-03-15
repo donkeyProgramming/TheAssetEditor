@@ -13,7 +13,6 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
     {
         public VertexFormat BinaryVertexFormat { get; set; } = VertexFormat.CustomTerrain;
         public ModelMaterialEnum MaterialId { get; set; } = ModelMaterialEnum.TerrainTiles;
-        UiVertexFormat IMaterial.VertexType { get; set; } = UiVertexFormat.Static;
 
         public Vector3 PivotPoint { get; set; } = Vector3.Zero;
         public AlphaMode AlphaMode { get; set; } = AlphaMode.Opaque;

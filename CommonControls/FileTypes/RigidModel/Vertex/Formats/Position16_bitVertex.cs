@@ -11,10 +11,14 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
     {
         public VertexFormat Type => VertexFormat.Position16_bit;
         public bool AddTintColour { get; set; }
-        public uint VertexSize => (uint)ByteHelper.GetSize<Data>();
+        public uint GetVertexSize(RmvVersionEnum rmvVersion)
+        {
+      
+                return (uint)ByteHelper.GetSize<Data>();
+        }
         public bool ForceComputeNormals => true;
 
-        public CommonVertex Read(byte[] buffer, int offset, int vertexSize)
+        public CommonVertex Read(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize)
         {
             var vertexData = ByteHelper.ByteArrayToStructure<Data>(buffer, offset);
 
@@ -37,7 +41,7 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
         }
 
 
-        public byte[] Write(CommonVertex vertex)
+        public byte[] Write(RmvVersionEnum rmvVersion, CommonVertex vertex)
         {
             throw new NotImplementedException();
         }

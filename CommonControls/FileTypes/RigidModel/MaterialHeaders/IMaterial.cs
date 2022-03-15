@@ -7,7 +7,6 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
     public interface IMaterial
     {
         public ModelMaterialEnum MaterialId { get; set; }
-        UiVertexFormat VertexType { get; set; }
         VertexFormat BinaryVertexFormat { get; set; }
         Vector3 PivotPoint { get; set; }
         AlphaMode AlphaMode { get; set; }

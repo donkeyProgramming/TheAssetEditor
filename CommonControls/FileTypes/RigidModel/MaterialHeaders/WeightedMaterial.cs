@@ -15,8 +15,9 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 {
     public class WeightedMaterial : IMaterial
     {
-        public UiVertexFormat VertexType { get; set; } = UiVertexFormat.Unknown;
+        //public UiVertexFormat VertexType { get; set; } = UiVertexFormat.Unknown;
         public VertexFormat BinaryVertexFormat { get; set; } = VertexFormat.Unknown;
+
         public Vector3 PivotPoint { get; set; }
         public AlphaMode AlphaMode { get; set; }
         public string ModelName { get; set; }
@@ -41,7 +42,6 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
         {
             return new WeightedMaterial()
             {
-                VertexType = VertexType,
                 BinaryVertexFormat = BinaryVertexFormat,
                 MatrixIndex = MatrixIndex,
                 ParentMatrixIndex = ParentMatrixIndex,
@@ -150,50 +150,19 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 
         public void UpdateEnumsBeforeSaving(UiVertexFormat uiVertexFormat, RmvVersionEnum outputVersion)
         {
-            if (outputVersion == RmvVersionEnum.RMV2_V8)
+            BinaryVertexFormat = uiVertexFormat switch
             {
-                if (uiVertexFormat == UiVertexFormat.Cinematic)
-                {
-                    VertexType = UiVertexFormat.Cinematic;
-                    BinaryVertexFormat = VertexFormat.Cinematic_withTint;
-                }
-                else if (uiVertexFormat == UiVertexFormat.Weighted)
-                {
-                    VertexType = UiVertexFormat.Weighted;
-                    BinaryVertexFormat = VertexFormat.Weighted_withTint;
-                }
-                else
-                {
-                    VertexType = UiVertexFormat.Static;
-                    BinaryVertexFormat = VertexFormat.Static;
-                }
-            }
-            else
-            {
-                if (uiVertexFormat == UiVertexFormat.Cinematic)
-                {
-                    VertexType = UiVertexFormat.Cinematic;
-                    BinaryVertexFormat = VertexFormat.Cinematic;
-                }
-                else if (uiVertexFormat == UiVertexFormat.Weighted)
-                {
-                    VertexType = UiVertexFormat.Weighted;
-                    BinaryVertexFormat = VertexFormat.Weighted;
-                }
-                else
-                {
-                    VertexType = UiVertexFormat.Static;
-                    BinaryVertexFormat = VertexFormat.Static;
-                }
-            }
+                UiVertexFormat.Cinematic => VertexFormat.Cinematic,
+                UiVertexFormat.Weighted => VertexFormat.Weighted,
+                UiVertexFormat.Static => VertexFormat.Static,
+                _ => throw new Exception($"Unknown vertex type - {uiVertexFormat}"),
+            };
 
             // Overwrite the material type for static meshes
             if (BinaryVertexFormat == VertexFormat.Static)
                 MaterialId = ModelMaterialEnum.default_type;
             else
                 MaterialId = ModelMaterialEnum.weighted;
-
-
         }
 
         public void EnrichDataBeforeSaving(string[] boneNames, BoundingBox boundingBox)
@@ -218,7 +187,6 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                 Vec4Params = LoadVec4Params(Header.Vec4ParamCount, dataArray, ref dataOffset),
 
                 MaterialId = materialId,
-                VertexType = (UiVertexFormat)Header._vertexType,
                 BinaryVertexFormat = (VertexFormat)Header._vertexType,
                 ModelName = Util.SanatizeFixedString(Encoding.ASCII.GetString(Header._modelName)),
                 Filters = Util.SanatizeFixedString(Encoding.ASCII.GetString(Header.Filters)),
@@ -234,17 +202,6 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
             if (material.IntParams.Count != 0)
                 material.AlphaMode = (AlphaMode)material.IntParams.First();
 
-            // Version 8 fix for different vertex format with same id! 
-            if (rmvType == RmvVersionEnum.RMV2_V8)
-            {
-                if (material.BinaryVertexFormat == VertexFormat.Weighted )
-                    material.BinaryVertexFormat = VertexFormat.Weighted_withTint;
-                else if (material.BinaryVertexFormat == VertexFormat.Cinematic)
-                    material.BinaryVertexFormat = VertexFormat.Cinematic_withTint;
-                else if (material.BinaryVertexFormat == VertexFormat.Static)
-                    material.BinaryVertexFormat = VertexFormat.Static;
-            }
-
             return material;
         }
 
@@ -257,7 +214,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
             // Create the header
             var header = new WeightedMaterialStruct()
             {
-                _vertexType = (ushort)typedMaterial.VertexType,
+                _vertexType = (ushort)typedMaterial.BinaryVertexFormat,
                 _modelName = ByteHelper.CreateFixLengthString(typedMaterial.ModelName, 32),
                 _textureDir = ByteHelper.CreateFixLengthString(typedMaterial.TextureDirectory, 256),
                 Filters = ByteHelper.CreateFixLengthString(typedMaterial.Filters, 256),
@@ -355,6 +312,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 
             return textures;
         }
+
         List<string> LoadStringParams(uint StringParamCount, byte[] dataArray, ref int dataOffset)
         {
             var output = new List<string>();

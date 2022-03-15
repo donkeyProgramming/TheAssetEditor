@@ -7,9 +7,9 @@ namespace CommonControls.FileTypes.RigidModel.Vertex
     public interface IVertexCreator
     {
         VertexFormat Type { get; }
-        CommonVertex Read(byte[] buffer, int offset, int vertexSize);
-        byte[] Write(CommonVertex vertex);
-        uint VertexSize { get; }
+        CommonVertex Read(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize);
+        byte[] Write(RmvVersionEnum rmvVersion, CommonVertex vertex);
+        uint GetVertexSize(RmvVersionEnum rmvVersion); 
         bool ForceComputeNormals { get; }
     }
 
@@ -40,28 +40,25 @@ namespace CommonControls.FileTypes.RigidModel.Vertex
             _vertexCreators[VertexFormat.CustomTerrain2] = new CustomTerrain2VertexCreator();
             _vertexCreators[VertexFormat.Collision_Format] = new CollisionVertexCreator();
 
-            _vertexCreators[VertexFormat.Weighted] = new WeightedVertexCreator();
-            _vertexCreators[VertexFormat.Weighted_withTint] = new WeightedVertexCreator() { AddTintColour = true };
-
-            _vertexCreators[VertexFormat.Cinematic] = new CinematicVertexCreator();
-            _vertexCreators[VertexFormat.Cinematic_withTint] = new CinematicVertexCreator() { AddTintColour = true };
+            _vertexCreators[VertexFormat.Weighted] = new Weighted2VertexCreator();
+            _vertexCreators[VertexFormat.Cinematic] = new Weighted4VertexCreator();
         }
 
         public static VertexFactory Create() => new VertexFactory();
 
-        public CommonVertex[] CreateVertexFromBytes(VertexFormat format, byte[] buffer, int vertexCount, int vertexStart, int vertexSize)
+        public CommonVertex[] CreateVertexFromBytes(RmvVersionEnum rmvVersion, VertexFormat format, byte[] buffer, int vertexCount, int vertexStart, int vertexSize)
         {
             var creator = _vertexCreators[format];
 
             var vertexList = new CommonVertex[vertexCount];
             for (int i = 0; i < vertexCount; i++)
-                vertexList[i] = creator.Read(buffer, vertexStart + i * vertexSize, vertexSize);
+                vertexList[i] = creator.Read(rmvVersion, buffer, vertexStart + i * vertexSize, vertexSize);
             return vertexList;
         }
 
-        public uint GetVertexSize(VertexFormat format)
+        public uint GetVertexSize(VertexFormat format, RmvVersionEnum rmvVersion)
         {
-            return _vertexCreators[format].VertexSize;
+            return _vertexCreators[format].GetVertexSize(rmvVersion);
         }
 
         public bool IsKnownVertex(VertexFormat format)
@@ -69,9 +66,9 @@ namespace CommonControls.FileTypes.RigidModel.Vertex
             return _vertexCreators.ContainsKey(format);
         }
 
-        public byte[] Save(VertexFormat vertexType, CommonVertex vertex)
+        public byte[] Save(RmvVersionEnum rmvVersion, VertexFormat vertexType, CommonVertex vertex)
         {
-            return _vertexCreators[vertexType].Write(vertex);
+            return _vertexCreators[vertexType].Write(rmvVersion, vertex);
         }
 
         public void ReComputeNormals(VertexFormat binaryVertexFormat, ref CommonVertex[] vertexList, ref ushort[] indexList)

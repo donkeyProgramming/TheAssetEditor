@@ -32,10 +32,10 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public Vector4 Orientation { get; set; }
 
         [MetaDataTag(8)]
-        public int BoneId { get; set; }
+        public int Unkown1 { get; set; }
 
-        [MetaDataTag(9, "bind_pose (1), animation (2), zeroed (3), skinned (4)")]
-        public int AttachMethod { get; set; }
+        [MetaDataTag(9)]
+        public int Unkown0 { get; set; }
 
     }
 

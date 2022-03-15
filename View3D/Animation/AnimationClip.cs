@@ -40,9 +40,10 @@ namespace View3D.Animation
         {
             get 
             {
-                if (DynamicFrames.Count == 0)
-                    return 0;
-                return DynamicFrames[0].Position.Count;
+                var dynamicBones = 0;
+                if (DynamicFrames.Count != 0)
+                    return DynamicFrames[0].Position.Count;
+                return dynamicBones;
             }
         }
 
@@ -67,6 +68,9 @@ namespace View3D.Animation
 
             var boneCount = animationPart.RotationMappings.Count;
             var frameCount = animationPart.DynamicFrames.Count;
+
+            if (frameCount == 0 && animationPart.StaticFrame != null)
+                frameCount = 1; // Poses
 
             for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
