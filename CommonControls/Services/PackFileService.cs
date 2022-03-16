@@ -34,7 +34,12 @@ namespace CommonControls.Services
         {
             try
             {
-                var noCaPacksLoaded = Database.PackFiles.Count(x => !x.IsCaPackFile);
+                var caPacksLoaded = Database.PackFiles.Count(x => x.IsCaPackFile);
+                if (caPacksLoaded == 0)
+                {
+                    MessageBox.Show("You are trying to load a packfile before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.", "Error");
+                    return null;
+                }
 
                 if (!File.Exists(packFileSystemPath))
                 {
@@ -48,7 +53,8 @@ namespace CommonControls.Services
                     {
                         var container = Load(reader, packFileSystemPath);
 
-                        if (noCaPacksLoaded == 0 && setToMainPackIfFirst)
+                        var notCaPacksLoaded = Database.PackFiles.Count(x => !x.IsCaPackFile);
+                        if (notCaPacksLoaded == 0 && setToMainPackIfFirst)
                             SetEditablePack(container);
 
                         _settingsService.AddRecentlyOpenedPackFile(packFileSystemPath);
@@ -69,7 +75,6 @@ namespace CommonControls.Services
         {
             return FindAllWithExtentionIncludePaths(extention, packFileContainer).Select(x => x.Item2).ToList();
         }
-
 
         public List<(string FileName, PackFile Pack)> FindAllWithExtentionIncludePaths(string extention, PackFileContainer packFileContainer = null)
         {

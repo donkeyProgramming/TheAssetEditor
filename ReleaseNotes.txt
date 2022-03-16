@@ -1,44 +1,45 @@
 v0.XX
 ----------------------------
-	* Gizmo bug - Move with camera head on
-	* Vertex tranform undo bug?
-	* Fix save animations 
+	* Vertex tranform undo bug
 	* Bin stuff - Rewrite how its all handled
 	* Changelog with gifs system 
 	* Texture conveter 
 	* Decent texture window
 	* Improve the directX window handling 
 	* Kitbasher memory leaks 
-	* Wireframe view 
 	* Checkboxes in ui for rendering flags 
 	* Warning when generating file list and audio files are skipped from loading 
-	* Convert useAlpha to bool
-	
-	
-V0.33
-----------------------------
 	* Attachment point for older games 
 	* Sound editor - Report of all sound names 
 	* Decal support
 	* Keep paramterter index for material paramters 
-	* Improve lod generation, vertex type and merge 
+	* Gizmo bug - Move with camera head on
 	* Rome 2 Sound, firePos, ImpactPos, Effect 
+	* First time welcome message! 
+	* Did not recreate lods warning 
+	* Fix save animations
+	
+V0.33
+----------------------------
+	* Convert useAlpha to bool
+	* Gizmo bug - Move with camera head on
+	* Improve lod generation, vertex type and merge 
+	* Wireframe view 
+	
+	
 	
 V0.32
 ----------------------------
-	* First time welcome message! 
-	* Error when loading userdata before loading ca packfile 
-	* Did not recreate lods warning 
-
 	Features:
 		* WsModel generator updated to WH3
 		* Added metadata tag support for Rome2 AnimatedProp
 		* Auto combine all possible meshes
 		* Warning when items can be combined on save
 		* Warning for mixing pivotpoint and animation 
+		* Error when loading usper packs before loading ca packfile 
 		
 	Fixes:
-		* Read meta faster parsing - error handling without exceptions
+		* Faster meta data parsing - error handling without exceptions
 		* Fixed bug in reading anim.meta files in some rare cases
 		* Crash when saving a mesh which is contained in a grouping folder within the kitbash editor
 		* Cleaned up how different vertex types are handled, making for easier handling of multiple material types 

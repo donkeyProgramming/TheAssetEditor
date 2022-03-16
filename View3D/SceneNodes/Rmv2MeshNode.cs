@@ -70,7 +70,7 @@ namespace View3D.SceneNodes
         private Rmv2MeshNode()
         { }
 
-        public Rmv2MeshNode(RmvCommonHeader commonHeader, MeshObject meshObject, IMaterial material, AnimationPlayer animationPlayer, IComponentManager componentManager)
+        public Rmv2MeshNode(RmvCommonHeader commonHeader, MeshObject meshObject, IMaterial material, AnimationPlayer animationPlayer, IComponentManager componentManager, PbrShader shader = null)
         {
             _componentManager = componentManager;
             CommonHeader = commonHeader;
@@ -82,12 +82,14 @@ namespace View3D.SceneNodes
             Position = Vector3.Zero;
             Scale = Vector3.One;
             Orientation = Quaternion.Identity;
+
+            Effect = shader;
         }
 
         public void Initialize(ResourceLibary resourceLib)
         {
             _resourceLib = resourceLib;
-            if (_resourceLib != null)
+            if (_resourceLib != null && Effect == null)
                 CreateShader();
         }
 
