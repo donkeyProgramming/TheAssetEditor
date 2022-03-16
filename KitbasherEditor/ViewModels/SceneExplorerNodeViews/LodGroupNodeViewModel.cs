@@ -1,4 +1,5 @@
 ﻿using CommonControls.Common;
+using CommonControls.MathViews;
 using MonoGame.Framework.WpfInterop;
 using View3D.Components.Component;
 using View3D.SceneNodes;
@@ -14,7 +15,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         {
             _node = node;
             _componentManager = componentManager;
+            LodReductionFactor = new DoubleViewModel(_node.LodReductionFactor);
+            LodReductionFactor.OnValueChanged += (value) => _node.LodReductionFactor = (float)value;
         }
+
+
 
         public float? CameraDistance
         {
@@ -41,10 +46,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
            
         }
 
-        public float LodReductionFactor
-        {
-            get => _node.LodReductionFactor;
-            set { _node.LodReductionFactor = value; NotifyPropertyChanged(); }
-        }
+        public DoubleViewModel LodReductionFactor { get; set; } = new DoubleViewModel(1);
+
     }
 }

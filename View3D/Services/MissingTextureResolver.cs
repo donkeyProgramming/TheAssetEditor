@@ -30,17 +30,8 @@ namespace View3D.Services
                     if (wsMaterialFile != null)
                     {
                         var wsMaterialFileContent = new WsModelMaterialFile(wsMaterialFile, "");
-                        foreach (var texture in textureTypes)
-                        {
-                            meshNode.UpdateTexture("", texture);
-                            meshNode.UseTexture(texture, false);
-                        }
-
                         foreach (var wsModelTexture in wsMaterialFileContent.Textures)
-                        {
-                            meshNode.UpdateTexture(wsModelTexture.Value, wsModelTexture.Key);
-                            meshNode.UseTexture(wsModelTexture.Key, true);
-                        }
+                            UpdateTextureIfMissing(meshNode, pfs, wsModelTexture.Key, wsModelTexture.Value);
 
                         meshNode.Material.AlphaMode = AlphaMode.Opaque;
                         if (wsMaterialFileContent.Alpha)

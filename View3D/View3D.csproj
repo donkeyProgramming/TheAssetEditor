@@ -14,11 +14,13 @@
 
   <ItemGroup>
     <None Remove="1kweupxo.plr~" />
-    <None Remove="Content\Game\MaterialTemplate.xml.material" />
+    <None Remove="Content\Game\MaterialTemplate_wh2.xml.material" />
+    <None Remove="Content\Game\MaterialTemplate_wh3.xml.material" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Content\Game\MaterialTemplate.xml.material" />
+    <EmbeddedResource Include="Content\Game\MaterialTemplate_wh2.xml.material" />
+    <EmbeddedResource Include="Content\Game\MaterialTemplate_wh3.xml.material" />
   </ItemGroup>
 
   <ItemGroup>

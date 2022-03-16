@@ -12,10 +12,7 @@ v0.XX
 	* Wireframe view 
 	* Checkboxes in ui for rendering flags 
 	* Warning when generating file list and audio files are skipped from loading 
-	
-	
-	
-	
+	* Convert useAlpha to bool
 	
 	
 V0.33
@@ -24,20 +21,17 @@ V0.33
 	* Sound editor - Report of all sound names 
 	* Decal support
 	* Keep paramterter index for material paramters 
-	
-	
+	* Improve lod generation, vertex type and merge 
+	* Rome 2 Sound, firePos, ImpactPos, Effect 
 	
 V0.32
 ----------------------------
-	* Fix ws model generation 
-	* Rome 2 animted props, Sound, firePos, ImpactPos, Effect 
-	* Bug with finding textures from Meh => Assign texture from WS model - Use model name, might be different textures in there. Just replace if texture is missing, not always  	
-	
 	* First time welcome message! 
 	* Error when loading userdata before loading ca packfile 
 	* Did not recreate lods warning 
 
 	Features:
+		* WsModel generator updated to WH3
 		* Added metadata tag support for Rome2 AnimatedProp
 		* Auto combine all possible meshes
 		* Warning when items can be combined on save
@@ -49,7 +43,9 @@ V0.32
 		* Crash when saving a mesh which is contained in a grouping folder within the kitbash editor
 		* Cleaned up how different vertex types are handled, making for easier handling of multiple material types 
 		* Fixed crash when trying to save meshes created using the "Freeze Frame tool"
-		* Foxed bug causing pose animations to not load correctly
+		* Fixed bug causing pose animations to not load correctly
+		* Fixed decimal issue for Lod Reduction factor
+		* Overwriting textures incorrectly when trying to guess texture pats when loading rmv2 files 
 	
 	Known issues:
 		* Can not save v8 animations! 

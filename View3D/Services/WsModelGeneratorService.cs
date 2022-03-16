@@ -25,14 +25,15 @@ namespace View3D.Services
         private readonly PackFileService _packFileService;
         private readonly IEditorViewModel _editorViewModel;
         private readonly MainEditableNode _editableMeshNode;
+        private readonly List<WsModelMaterialFile> _existingMaterials;
+
 
         private static readonly Dictionary<string, TexureType> TemplateStringToTextureTypes = new Dictionary<string, TexureType>
         {
-            {"GLOSS_PATH", TexureType.Gloss},
-            {"SPECULAR_PATH", TexureType.Specular},
+            {"BASE_COLOUR_PATH", TexureType.BaseColour},
+            {"MATERIAL_MAP", TexureType.MaterialMap},
             {"NORMAL_PATH", TexureType.Normal},
             {"MASK_PATH", TexureType.Mask},
-            {"DIFFUSE_PATH", TexureType.Diffuse},
         };
 
         public WsModelGeneratorService(PackFileService packFileService, IEditorViewModel editorViewModel, MainEditableNode editableMeshNode)
@@ -40,6 +41,8 @@ namespace View3D.Services
             _packFileService = packFileService;
             _editorViewModel = editorViewModel;
             _editableMeshNode = editableMeshNode;
+
+            _existingMaterials = LoadAllExistingMaterials();
         }
 
         public void GenerateWsModel()
@@ -64,41 +67,19 @@ namespace View3D.Services
                 var modelFilePath = _packFileService.GetFullPath(modelFile);
                 var wsModelPath = Path.ChangeExtension(modelFilePath, ".wsmodel");
 
+                var wsModelData = GenerateWsModel(modelFilePath, onlySaveVisible);
                 var existingWsModelFile = _packFileService.FindFile(wsModelPath, _packFileService.GetEditablePack());
-
-                var wsModelData = GenerateWsModel(modelFilePath, onlySaveVisible, out var wsModelGeneratedPerfectly);
-                if (wsModelGeneratedPerfectly == false)
-                    MessageBox.Show("Unable to correclty generate WS model, this file needs manual work before its can be used by the game!");
-
                 SaveHelper.Save(_packFileService, wsModelPath, existingWsModelFile, Encoding.UTF8.GetBytes(wsModelData));
             }
             catch (Exception e)
             {
-                _logger.Here().Error("Error generating ws model - " + e.ToString());
+                _logger.Here().Error("Error generating ws model - " + e.Message);
                 MessageBox.Show("Generation failed!");
             }
         }
 
-
-        string GenerateWsModel(string modelFilePath, bool onlyVisible, out bool wsModelGeneratedPerfectly)
+        string GenerateWsModel(string modelFilePath, bool onlyVisible)
         {
-            wsModelGeneratedPerfectly = true;
-
-            var materialPacks = _packFileService.FindAllWithExtentionIncludePaths(".material");
-            materialPacks = materialPacks.Where(x => x.Item2.Name.Contains(".xml.material")).ToList();
-            List<WsModelMaterialFile> materialList = new List<WsModelMaterialFile>();
-            foreach (var materialPack in materialPacks)
-            {
-                try
-                {
-                    materialList.Add(new WsModelMaterialFile(materialPack.Item2, materialPack.Item1));
-                }
-                catch (Exception e)
-                {
-                    _logger.Here().Error("Error loading material for wsmodel generation - " + e.ToString());
-                }
-            }
-
             var sb = new StringBuilder();
 
             sb.Append("<model version=\"1\">\n");
@@ -109,14 +90,10 @@ namespace View3D.Services
             for (int lodIndex = 0; lodIndex < lodNodes.Count; lodIndex++)
             {
                 var meshes = _editableMeshNode.GetMeshesInLod(lodIndex, onlyVisible);
+                var uniqueNames = GenerateUniqueNames(meshes);
                 for (int meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
                 {
-                    var materialFile = CreateKnownMaterial(meshes[meshIndex], materialList);
-                    if (materialFile == null)
-                    {
-                        materialFile = CreateUnknownMaterial(meshes[meshIndex]);
-                    }
-
+                    var materialFile = GetMaterialName(meshes[meshIndex], uniqueNames[meshIndex]);
                     sb.Append($"\t\t\t<material part_index=\"{meshIndex}\" lod_index=\"{lodIndex}\">");
                     sb.Append(materialFile);
                     sb.Append("</material>\n");
@@ -129,100 +106,150 @@ namespace View3D.Services
             return sb.ToString();
         }
 
-        private string CreateUnknownMaterial(Rmv2MeshNode mesh)
+        private List<string> GenerateUniqueNames(List<Rmv2MeshNode> meshes)
         {
-            var vertextType = mesh.Material.BinaryVertexFormat;
-            var alphaOn = mesh.Material.AlphaMode != AlphaMode.Opaque;
+            var output = new List<string>();
+            foreach (var mesh in meshes)
+            {
+                var fileName = mesh.Name;  
+                for (var index = 0; index < 1024; index++)
+                {
+                    var name = (index == 0) ? fileName : string.Format("{0} _{1}", fileName, index);
+                    if (output.Contains(name))
+                        continue;
 
-            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("View3D.Content.Game.MaterialTemplate.xml.material");
+                    fileName = name;
+                    break;
+                }
+
+                output.Add(fileName);
+            }
+
+            return output;
+        }
+
+        string GetMaterialName(Rmv2MeshNode mesh, string uniqueName)
+        {
+            var materialFileName = FindApplicableExistingMaterial(mesh);
+            if (materialFileName == null)
+                materialFileName = CreateNewMaterial(mesh, uniqueName);
+            return materialFileName;
+        }
+
+
+        string LoadMaterialTemplate()
+        {
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("View3D.Content.Game.MaterialTemplate_wh3.xml.material");
             using var reader = new StreamReader(stream!);
             var result = reader.ReadToEnd();
+            return result;
+        }
 
-            var shaderPath = vertextType switch
+        string CreateNewMaterial(Rmv2MeshNode mesh, string uniqueName)
+        {
+            var materialTemplate = LoadMaterialTemplate();
+            var vertexType = ModelMaterialEnumHelper.GetToolVertexFormat(mesh.Material.BinaryVertexFormat);
+            var alphaOn = mesh.Material.AlphaMode != AlphaMode.Opaque;
+
+            var shaderNamePart = vertexType switch
             {
-                VertexFormat.Cinematic => alphaOn ? "weighted4_default_alpha" : "weighted4_default",
-                VertexFormat.Weighted => alphaOn ? "weighted2_default_alpha" : "weighted2_default",
-                VertexFormat.Static => alphaOn ? "rigid_default_alpha" : "rigid_default",
-                _ => string.Empty
+                UiVertexFormat.Cinematic => "weighted4",
+                UiVertexFormat.Weighted => "weighted2",
+                UiVertexFormat.Static => "rigid",
+                _ => throw new Exception("Unknown vertex type")
             };
 
-            var shaderNamePart = vertextType switch
-            {
-                VertexFormat.Cinematic => "_weighted4",
-                VertexFormat.Weighted => "_weighted2",
-                VertexFormat.Static => "_rigid",
-                _ => string.Empty
-            };
+            // Update the shader name
+            var shaderAlphaStr = "";
+            if (alphaOn)
+                shaderAlphaStr = "_alpha";
+            var shaderName = $"shaders/{shaderNamePart}_character{shaderAlphaStr}.xml.shader";
+            materialTemplate = materialTemplate.Replace("SHADER_PATH", shaderName);
 
-            result = result.Replace("SHADER_PATH", "shaders/" + shaderPath + ".xml.shader");
-
+            // Update the textures
             foreach (var (replacment, textureType) in TemplateStringToTextureTypes)
             {
                 var texture = mesh.Material.GetTexture(textureType);
                 if (texture.HasValue)
-                    result = result.Replace(replacment, texture.Value.Path);
+                    materialTemplate = materialTemplate.Replace(replacment, texture.Value.Path);
+                else
+                    materialTemplate.Replace(replacment, "test_mask.dds");
             }
+
+            // Save the new file
+            var fileName = uniqueName + "_" + shaderNamePart + "_alpha_" + (alphaOn ? "on" : "off") + ".xml";
+            materialTemplate = materialTemplate.Replace("FILE_NAME", fileName);
 
             var modelFile = _editorViewModel.MainFile;
             var modelFilePath = _packFileService.GetFullPath(modelFile);
-
-            var modelFileName = Path.GetFileNameWithoutExtension(modelFilePath);
-
-            var fileName = modelFileName + shaderNamePart + "_alpha_" + (alphaOn ? "on" : "off") + ".xml";
-
-            result = result.Replace("FILE_NAME", fileName);
-
             var dir = Path.GetDirectoryName(modelFilePath);
             var fullPath = dir + "\\materials\\" + fileName + ".material";
-
-            if (_packFileService.FindFile(fullPath, _packFileService.GetEditablePack()) == null)
-                SaveHelper.Save(_packFileService, fullPath, null, Encoding.UTF8.GetBytes(result));
+            SaveHelper.Save(_packFileService, fullPath, null, Encoding.UTF8.GetBytes(materialTemplate), false);
 
             return fullPath;
         }
 
-        string CreateKnownMaterial(Rmv2MeshNode mesh, List<WsModelMaterialFile> possibleMaterials)
+        string FindApplicableExistingMaterial(Rmv2MeshNode mesh)
         {
-            foreach (var material in possibleMaterials)
+            foreach (var material in _existingMaterials)
             {
-                //if (mesh.Material.VertexType != material.VertexType)
-                //    continue;
-
-                var alphaOn = mesh.Material.AlphaMode != AlphaMode.Opaque;
-                if (alphaOn && material.Alpha == false)
-                    continue;
-
-                bool texturesOk = true;
-                foreach (var modelTexture in mesh.GetTextures())
-                {
-                    var path = modelTexture.Value;
-                    var modelTextureType = modelTexture.Key;
-
-                    if (path.Contains("test_mask", StringComparison.InvariantCultureIgnoreCase))
-                        continue;
-
-                    var materialHasTexture = material.Textures.TryGetValue(modelTextureType, out var materialTexurePath);
-                    if (materialHasTexture == false)
-                    {
-                        texturesOk = false;
-                        break;
-                    }
-
-                    var arePathsEqual = materialTexurePath.Contains(path, StringComparison.InvariantCultureIgnoreCase);
-                    if (arePathsEqual == false)
-                    {
-                        texturesOk = false;
-                        break;
-                    }
-                }
-
-                if (texturesOk)
-                {
+                var isMatch = IsMaterialMatch(mesh, material);
+                if (isMatch)
                     return material.FullPath;
-                }
             }
 
             return null;
+        }
+
+        bool IsMaterialMatch(Rmv2MeshNode mesh, WsModelMaterialFile material)
+        {
+            var vertexType = ModelMaterialEnumHelper.GetToolVertexFormat(mesh.Material.BinaryVertexFormat);
+            if (vertexType != material.VertexType)
+                return false;
+
+            var alphaOn = mesh.Material.AlphaMode != AlphaMode.Opaque;
+            if (alphaOn && material.Alpha == false)
+                return false;
+
+            foreach (var modelTexture in mesh.GetTextures()) // ToDo - Remove textures we dont care about 
+            {
+                var path = modelTexture.Value;
+                var modelTextureType = modelTexture.Key;
+
+                if (path.Contains("test_mask", StringComparison.InvariantCultureIgnoreCase))
+                    continue;
+
+                var materialHasTexture = material.Textures.TryGetValue(modelTextureType, out var materialTexurePath);
+                if (materialHasTexture == false)
+                    return false;
+
+                var arePathsEqual = materialTexurePath.Contains(path, StringComparison.InvariantCultureIgnoreCase);
+                if (arePathsEqual == false)
+                    return false;
+            }
+
+            return true;
+        }
+
+        List<WsModelMaterialFile> LoadAllExistingMaterials()
+        {
+            var materialPacks = _packFileService.FindAllWithExtentionIncludePaths(".material");
+            materialPacks = materialPacks.Where(x => x.Item2.Name.Contains(".xml.material")).ToList();
+            var materialList = new List<WsModelMaterialFile>();
+            foreach (var materialPack in materialPacks)
+            {
+                try
+                {
+                    var material = new WsModelMaterialFile(materialPack.Item2, materialPack.Item1);
+                    materialList.Add(material);
+                }
+                catch (Exception e)
+                {
+                    _logger.Here().Error($"Error loading material for wsmodel generation - {e.Message}");
+                }
+            }
+
+            return materialList;
         }
     }
 }
