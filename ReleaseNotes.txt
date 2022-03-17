@@ -1,32 +1,54 @@
 v0.XX
 ----------------------------
 	* Vertex tranform undo bug
-	* Bin stuff - Rewrite how its all handled
+	
 	* Changelog with gifs system 
 	* Texture conveter 
 	* Decent texture window
 	* Improve the directX window handling 
 	* Kitbasher memory leaks 
-	* Checkboxes in ui for rendering flags 
 	* Warning when generating file list and audio files are skipped from loading 
 	* Attachment point for older games 
 	* Sound editor - Report of all sound names 
 	* Decal support
-	* Keep paramterter index for material paramters 
-	* Gizmo bug - Move with camera head on
+	* Wireframe view 
 	* Rome 2 Sound, firePos, ImpactPos, Effect 
 	* First time welcome message! 
 	* Did not recreate lods warning 
+	* Keep correct material ID for decals and what not 
+	* Keep paramterter index for material paramters 
+	
+V0.34
+----------------------------
 	* Fix save animations
+	* Bin stuff - Rewrite how its all handled
+
+-- Live stream Kitbash editor 
 	
 V0.33
 ----------------------------
 	* Convert useAlpha to bool
-	* Gizmo bug - Move with camera head on
+	* Better loading of Alpha values from WsModel -> katarin lower lods 
+	
+	* Texture watcher
+	* Button to kill missing textures 
+		* Export > png
+		* Read back < png
+		* Watch
+		* Export UV map 
+	
+	* Static prop => missing from skeleton error 
+		* Skeleton not found => dont delete ref
+
+	* Attach to not working for katerina septer 
+
 	* Improve lod generation, vertex type and merge 
-	* Wireframe view 
+	* Checkboxes in ui for rendering flags 
 	
-	
+	Fixes:
+		* Split meshes improvements - Can now break up the mammoth without killing the program
+		* Fixed meshes being transformed far away when moving them with the camera facing an axis.
+		* Fixed bug in WsModel generation, skipping textures that are not used by why3
 	
 V0.32
 ----------------------------

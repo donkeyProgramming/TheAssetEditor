@@ -128,6 +128,12 @@ namespace View3D.Components.Input
             return lastPos - Position();
         }
 
+        public float DeltaPositionLength()
+        {
+            var lastPos = new Vector2(_lastMousesState.X, _lastMousesState.Y).Length();
+            return lastPos - Position().Length();
+        }
+
         public int DeletaScrollWheel()
         {
             return _lastMousesState.ScrollWheelValue - _currentMouseState.ScrollWheelValue;

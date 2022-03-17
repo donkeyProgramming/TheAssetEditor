@@ -213,6 +213,9 @@ namespace View3D.Services
 
             foreach (var modelTexture in mesh.GetTextures()) // ToDo - Remove textures we dont care about 
             {
+                if (TemplateStringToTextureTypes.ContainsValue(modelTexture.Key) == false)
+                    continue;
+
                 var path = modelTexture.Value;
                 var modelTextureType = modelTexture.Key;
 

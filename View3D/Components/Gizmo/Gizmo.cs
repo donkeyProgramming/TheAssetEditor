@@ -174,9 +174,6 @@ namespace View3D.Components.Gizmo
 
 
             // fill array with vertex-data
-
-            #region Fill Axis-Line array
-
             var vertexList = new List<VertexPositionColor>(18);
 
             // helper to apply colors
@@ -217,8 +214,6 @@ namespace View3D.Components.Gizmo
 
             // -- Convert to array -- //
             _translationLineVertices = vertexList.ToArray();
-
-            #endregion
         }
 
         public void ResetDeltas()
@@ -358,11 +353,9 @@ namespace View3D.Components.Gizmo
 
         private void HandleTranslateAndScale(Vector2 mousePosition, out Vector3 out_transformLocal, out Vector3 out_transfromWorld)
         {
-            Ray ray = _camera.CreateCameraRay(mousePosition); 
+ 
 
-            Matrix transform = Matrix.Invert(_rotationMatrix);
-            ray.Position = Vector3.Transform(ray.Position, transform);
-            ray.Direction = Vector3.TransformNormal(ray.Direction, transform);
+           
 
             Plane plane;
             switch (ActiveAxis)
@@ -378,14 +371,27 @@ namespace View3D.Components.Gizmo
                     throw new Exception("This should never happen - No axis inside HandleTranslateAndScale");
             }
 
+
+            Ray ray = _camera.CreateCameraRay(mousePosition);
+            Matrix transform = Matrix.Invert(_rotationMatrix);
+            ray.Position = Vector3.Transform(ray.Position, transform);
+            ray.Direction = Vector3.TransformNormal(ray.Direction, transform);
+
             Vector3 deltaTransform = Vector3.Zero;
             float? intersection = ray.Intersects(plane);
             if (intersection.HasValue)
             {
-                _intersectPosition = (ray.Position + (ray.Direction * intersection.Value));
+                _intersectPosition = ray.Position + (ray.Direction * intersection.Value);
                 var mouseDragDelta = Vector3.Zero;
                 if (_lastIntersectionPosition != Vector3.Zero)
                     mouseDragDelta = _intersectPosition - _lastIntersectionPosition;
+
+                var length = mouseDragDelta.Length();
+                if (length > 0.5f)
+                {
+                    var direction = Vector3.Normalize(mouseDragDelta);
+                    mouseDragDelta = direction * 0.5f;
+                }
                 switch (ActiveAxis)
                 {
                     case GizmoAxis.X:
@@ -398,6 +404,9 @@ namespace View3D.Components.Gizmo
                         deltaTransform = new Vector3(0, 0, mouseDragDelta.Z);
                         break;
                 }
+
+                if(deltaTransform != Vector3.Zero)
+                    Console.WriteLine(mouseDragDelta);
 
                 _lastIntersectionPosition = _intersectPosition;
             }
