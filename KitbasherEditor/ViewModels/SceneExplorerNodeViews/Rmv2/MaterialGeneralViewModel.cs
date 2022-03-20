@@ -150,7 +150,9 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         PackFileService _pfs;
 
         public ICommand ResolveTexturesCommand { get; set; }
-       
+        public ICommand DeleteMissingTexturesCommand { get; set; }
+        
+
         public bool UseAlpha
         {
             get => _meshNode.Material.AlphaMode == AlphaMode.Transparent; 
@@ -189,12 +191,20 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             _pfs = pfs;
             PossibleVertexTypes = new UiVertexFormat[] { UiVertexFormat.Static, UiVertexFormat.Weighted, UiVertexFormat.Cinematic };
             ResolveTexturesCommand = new RelayCommand(ResolveMissingTextures);
+            DeleteMissingTexturesCommand = new RelayCommand(DeleteMissingTextures);
 
+
+            CreateTextureList();
+        }
+
+        void CreateTextureList()
+        {
             var enumValues = Enum.GetValues(typeof(TexureType)).Cast<TexureType>().ToList();
             var textureEnumValues = _meshNode.Material.GetAllTextures().Select(x => x.TexureType).ToList();
             enumValues.AddRange(textureEnumValues);
             var distinctEnumList = enumValues.Distinct();
 
+            TextureList.Clear();
             foreach (var enumValue in distinctEnumList)
             {
                 var textureView = new TextureViewModel(_meshNode, _pfs, enumValue);
@@ -227,6 +237,13 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         {
             MissingTextureResolver resolver = new MissingTextureResolver();
             resolver.ResolveMissingTextures(_meshNode, _pfs);
+        }
+
+        private void DeleteMissingTextures()
+        {
+            MissingTextureResolver resolver = new MissingTextureResolver();
+            resolver.DeleteMissingTextures(_meshNode, _pfs);
+            CreateTextureList();
         }
     }
 }

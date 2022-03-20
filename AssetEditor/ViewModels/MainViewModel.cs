@@ -18,6 +18,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using TextureEditor.ViewModels;
+using View3D.Utility;
 
 namespace AssetEditor.ViewModels
 {
@@ -100,7 +101,6 @@ namespace AssetEditor.ViewModels
           
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
-
                 //var reportService = new FileListReportGenerator(packfileService, settingsService);
                 //reportService.CompareFiles(@"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.0.1.0 PackFiles.csv", @"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.0.2.0 PackFiles.csv");
 

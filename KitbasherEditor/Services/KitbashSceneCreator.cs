@@ -40,7 +40,7 @@ namespace KitbasherEditor.Services
             _applicationSettingsService = applicationSettingsService;
 
             var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(componentManager, animationView) { IsLockable = false });
-            EditableMeshNode = _sceneManager.RootNode.AddObject(new MainEditableNode("Editable Model", skeletonNode, mainFile));
+            EditableMeshNode = _sceneManager.RootNode.AddObject(new MainEditableNode("Editable Model", skeletonNode, mainFile, packFileService));
             ReferenceMeshRoot = _sceneManager.RootNode.AddObject(new GroupNode("Reference meshs") { IsEditable = false, IsLockable = false });
         }
 

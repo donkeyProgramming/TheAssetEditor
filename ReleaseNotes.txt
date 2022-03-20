@@ -17,6 +17,7 @@ v0.XX
 	* Did not recreate lods warning 
 	* Keep correct material ID for decals and what not 
 	* Keep paramterter index for material paramters 
+	* Multiple shader types for wsmodel, also settings
 	
 V0.34
 ----------------------------
@@ -29,26 +30,37 @@ V0.33
 ----------------------------
 	* Convert useAlpha to bool
 	* Better loading of Alpha values from WsModel -> katarin lower lods 
-	
+	* Remove missing textures 
 	* Texture watcher
 	* Button to kill missing textures 
 		* Export > png
 		* Read back < png
 		* Watch
 		* Export UV map 
+		
+		
+	Create texture project | Refrsh | Point to existing texture project
+		If exist, ask to delete. -> Add missing textures 
+		Refresh to update textures
+
+		Create new textures in pack with name 
+		Use path after variant mesh for folder 
 	
+	* Browse texture gets and converts textures from png
 	* Static prop => missing from skeleton error 
 		* Skeleton not found => dont delete ref
 
 	* Attach to not working for katerina septer 
 
-	* Improve lod generation, vertex type and merge 
+	* Improve lod generation, vertex type and merge, Alpha
 	* Checkboxes in ui for rendering flags 
+	* Raname file not working 
 	
 	Fixes:
 		* Split meshes improvements - Can now break up the mammoth without killing the program
 		* Fixed meshes being transformed far away when moving them with the camera facing an axis.
-		* Fixed bug in WsModel generation, skipping textures that are not used by why3
+		* Fixed bug in WsModel generation, skipping textures that are not used by wh3
+		* Fixed error when creating MetaData tags for Effects 
 	
 V0.32
 ----------------------------

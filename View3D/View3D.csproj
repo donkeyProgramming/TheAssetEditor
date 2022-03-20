@@ -16,11 +16,13 @@
     <None Remove="1kweupxo.plr~" />
     <None Remove="Content\Game\MaterialTemplate_wh2.xml.material" />
     <None Remove="Content\Game\MaterialTemplate_wh3.xml.material" />
+    <None Remove="Content\Game\texconv.exe" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Content\Game\MaterialTemplate_wh2.xml.material" />
     <EmbeddedResource Include="Content\Game\MaterialTemplate_wh3.xml.material" />
+    <EmbeddedResource Include="Content\Game\texconv.exe" />
   </ItemGroup>
 
   <ItemGroup>

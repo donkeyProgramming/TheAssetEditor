@@ -10,6 +10,16 @@ namespace View3D.Services
 {
     public class MissingTextureResolver
     {
+        public void DeleteMissingTextures(Rmv2MeshNode meshNode, PackFileService pfs)
+        {
+            var textures = meshNode.GetTextures();
+            foreach (var texture in textures)
+            {
+                if (pfs.FindFile(texture.Value) == null)
+                    meshNode.UpdateTexture("", texture.Key);
+            }
+        }
+
         public void ResolveMissingTextures(Rmv2MeshNode meshNode, PackFileService pfs)
         {
             var textureTypes = Enum.GetValues(typeof(TexureType)).Cast<TexureType>().ToList();

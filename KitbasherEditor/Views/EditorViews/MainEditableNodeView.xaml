@@ -52,5 +52,73 @@
             <ComboBox SelectedValue="None" VerticalAlignment="Center" Visibility="Collapsed"/>
         </DockPanel>
 
+
+        <DockPanel DockPanel.Dock="Top" Margin="0,15,0,0">
+            <GroupBox Header="File based texture editing">
+                <DockPanel DockPanel.Dock="Top">
+                    <DockPanel DockPanel.Dock="Top" LastChildFill="False">
+                        <Label Width ="{StaticResource labelWidth}" Content="Process" />
+                        <Label>:</Label> 
+                        <Button Content="Create Project" Command="{Binding TextureFileEditorServiceViewModel.CreateProjectCommand}" Margin="0,2,2,2" Width="100" 
+                                IsEnabled="{Binding TextureFileEditorServiceViewModel.IsRunning.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvBoolConverter}}"/>
+                        <Button Content="Add Missing" Command="{Binding TextureFileEditorServiceViewModel.AddMissingTextureCommand}" Margin="0,2,2,2" Width="100" 
+                                IsEnabled="{Binding TextureFileEditorServiceViewModel.IsRunning.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Content="Update Textures" Command="{Binding TextureFileEditorServiceViewModel.RefreshTexturesCommand}" Margin="0,2,2,2" Width="100" 
+                                IsEnabled="{Binding TextureFileEditorServiceViewModel.IsRunning.Value, UpdateSourceTrigger=PropertyChanged}"/>
+               
+                    </DockPanel>
+
+                    <DockPanel DockPanel.Dock="Top">
+                        <Label Width ="{StaticResource labelWidth}" Content="New files prefix" />
+                        <Label>:</Label>
+                        <TextBox Text="{Binding TextureFileEditorServiceViewModel.FilePrefix.Value, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"
+                                 IsEnabled="{Binding TextureFileEditorServiceViewModel.IsRunning.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvBoolConverter}}"/>
+                    </DockPanel>
+
+                    <DockPanel DockPanel.Dock="Top">
+                        <Label Width ="{StaticResource labelWidth}" Content="FilePath" />
+                        <Label>:</Label>
+                        <Button Content="Open" Command="{Binding TextureFileEditorServiceViewModel.OpenFolderCommand}" DockPanel.Dock="Right" Margin="2,0,0,0" Width="50"/>
+                        <Button Content="Browse" DockPanel.Dock="Right" Margin="2,0,0,0" Width="50" 
+                                IsEnabled="{Binding TextureFileEditorServiceViewModel.IsRunning.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvBoolConverter}}"/>
+                        <TextBox Text="{Binding TextureFileEditorServiceViewModel.FilePath.Value, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" IsReadOnly="true" 
+                                 IsEnabled="{Binding TextureFileEditorServiceViewModel.IsRunning.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvBoolConverter}}"/>
+                    </DockPanel>
+
+                    <DockPanel DockPanel.Dock="Top">
+                        <Label Width ="{StaticResource labelWidth}" Content="Textures" />
+                        <Label>:</Label>
+                        <DataGrid ItemsSource="{Binding TextureFileEditorServiceViewModel.TextureList, UpdateSourceTrigger=PropertyChanged}" 
+                                  AutoGenerateColumns="False" CanUserAddRows="False" ToolTipService.ShowOnDisabled="True" 
+                                  IsEnabled="{Binding TextureFileEditorServiceViewModel.IsRunning.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvBoolConverter}}">
+                            
+                            <DataGrid.RowStyle>
+                                <Style TargetType="DataGridRow">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasErrors}" Value="true">
+                                            <Setter Property="Background" Value="White"></Setter>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding HasErrors}" Value="false">
+                                            <Setter Property="Background" Value="Red"></Setter>
+                                            <Setter Property="ToolTip" Value="{Binding ErrorString}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.RowStyle>
+
+                            <DataGrid.Columns>
+                                <DataGridCheckBoxColumn Header="Found" Binding="{Binding IsFoundInProjectFolder, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
+                                <DataGridCheckBoxColumn Header="Export" Binding="{Binding PartOfProject, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                <DataGridTextColumn Header="Type" Binding="{Binding Type}" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Path" Binding="{Binding PackFilePath}" IsReadOnly="true" />
+                                <DataGridTextColumn Header="Error" Binding="{Binding ErrorString, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="true" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </DockPanel>
+
+                </DockPanel>
+            </GroupBox>
+        </DockPanel>
+   
     </DockPanel>
 </UserControl>

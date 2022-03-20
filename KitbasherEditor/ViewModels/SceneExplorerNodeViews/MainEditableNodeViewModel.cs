@@ -40,6 +40,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         RenderFormats _selectedRenderFormat;
         public RenderFormats SelectedRenderFormat { get => _selectedRenderFormat; set { SetAndNotify(ref _selectedRenderFormat, value); _componentManager.GetComponent<RenderEngineComponent>().MainRenderFormat = _selectedRenderFormat; } }
 
+        public TextureFileEditorServiceViewModel TextureFileEditorServiceViewModel { get; set; }
+
 
         public MainEditableNodeViewModel(MainEditableNode mainNode, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AnimationControllerViewModel animationControllerViewModel, PackFileService pfs, IComponentManager componentManager)
         {
@@ -58,6 +60,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             }
 
             SetCurrentOuputFormat(_mainNode.SelectedOutputFormat);
+            TextureFileEditorServiceViewModel = new TextureFileEditorServiceViewModel(mainNode, pfs);
         }
 
         public void SetCurrentOuputFormat(RmvVersionEnum format)
