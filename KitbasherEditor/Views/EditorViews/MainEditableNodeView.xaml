@@ -52,6 +52,12 @@
             <ComboBox SelectedValue="None" VerticalAlignment="Center" Visibility="Collapsed"/>
         </DockPanel>
 
+        <DockPanel DockPanel.Dock="Top" LastChildFill="False">
+            <Label Width ="{StaticResource labelWidth}" Content="Missing textures" />
+            <Label>:</Label>
+            <Button Content="Delete" Click="{s:MethodBinding DeleteAllMissingTexturesAction}" Margin="0,2,2,2" Width="50"/>
+        </DockPanel>
+
 
         <DockPanel DockPanel.Dock="Top" Margin="0,15,0,0">
             <GroupBox Header="File based texture editing">
@@ -59,13 +65,9 @@
                     <DockPanel DockPanel.Dock="Top" LastChildFill="False">
                         <Label Width ="{StaticResource labelWidth}" Content="Process" />
                         <Label>:</Label> 
-                        <Button Content="Create Project" Command="{Binding TextureFileEditorServiceViewModel.CreateProjectCommand}" Margin="0,2,2,2" Width="100" 
-                                IsEnabled="{Binding TextureFileEditorServiceViewModel.IsRunning.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvBoolConverter}}"/>
-                        <Button Content="Add Missing" Command="{Binding TextureFileEditorServiceViewModel.AddMissingTextureCommand}" Margin="0,2,2,2" Width="100" 
-                                IsEnabled="{Binding TextureFileEditorServiceViewModel.IsRunning.Value, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Button Content="Update Textures" Command="{Binding TextureFileEditorServiceViewModel.RefreshTexturesCommand}" Margin="0,2,2,2" Width="100" 
-                                IsEnabled="{Binding TextureFileEditorServiceViewModel.IsRunning.Value, UpdateSourceTrigger=PropertyChanged}"/>
-               
+                        <Button Content="Create Project" Command="{Binding TextureFileEditorServiceViewModel.CreateProjectCommand}" Margin="0,2,2,2" Width="100"/>
+                        <Button Content="Add Missing" Command="{Binding TextureFileEditorServiceViewModel.AddMissingTextureCommand}" Margin="0,2,2,2" Width="100"/>
+                        <Button Content="Update Textures" Command="{Binding TextureFileEditorServiceViewModel.RefreshTexturesCommand}" Margin="0,2,2,2" Width="100"/>
                     </DockPanel>
 
                     <DockPanel DockPanel.Dock="Top">
@@ -79,10 +81,8 @@
                         <Label Width ="{StaticResource labelWidth}" Content="FilePath" />
                         <Label>:</Label>
                         <Button Content="Open" Command="{Binding TextureFileEditorServiceViewModel.OpenFolderCommand}" DockPanel.Dock="Right" Margin="2,0,0,0" Width="50"/>
-                        <Button Content="Browse" DockPanel.Dock="Right" Margin="2,0,0,0" Width="50" 
-                                IsEnabled="{Binding TextureFileEditorServiceViewModel.IsRunning.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvBoolConverter}}"/>
-                        <TextBox Text="{Binding TextureFileEditorServiceViewModel.FilePath.Value, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" IsReadOnly="true" 
-                                 IsEnabled="{Binding TextureFileEditorServiceViewModel.IsRunning.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvBoolConverter}}"/>
+                        <Button Content="Browse" DockPanel.Dock="Right" Margin="2,0,0,0" Width="50"  Command="{Binding TextureFileEditorServiceViewModel.BrowseCommand}"/>
+                        <TextBox Text="{Binding TextureFileEditorServiceViewModel.FilePath.Value, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" IsReadOnly="true"/>
                     </DockPanel>
 
                     <DockPanel DockPanel.Dock="Top">
@@ -110,7 +110,8 @@
                                 <DataGridCheckBoxColumn Header="Found" Binding="{Binding IsFoundInProjectFolder, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
                                 <DataGridCheckBoxColumn Header="Export" Binding="{Binding PartOfProject, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                                 <DataGridTextColumn Header="Type" Binding="{Binding Type}" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="Path" Binding="{Binding PackFilePath}" IsReadOnly="true" />
+                                <DataGridTextColumn Header="PackFilePath" Binding="{Binding PackFilePath}" IsReadOnly="true" />
+                                <DataGridTextColumn Header="SystemPath" Binding="{Binding SystemFilePath}" IsReadOnly="true" />
                                 <DataGridTextColumn Header="Error" Binding="{Binding ErrorString, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="true" />
                             </DataGrid.Columns>
                         </DataGrid>

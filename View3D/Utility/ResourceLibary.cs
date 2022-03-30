@@ -72,10 +72,13 @@ namespace View3D.Utility
         }
 
 
-        public Texture2D LoadTexture(string fileName)
+        public Texture2D LoadTexture(string fileName, bool forceRefreshTexture = false)
         {
-            if (_textureMap.ContainsKey(fileName))
-                return _textureMap[fileName];
+            if (forceRefreshTexture == false)
+            {
+                if (_textureMap.ContainsKey(fileName))
+                    return _textureMap[fileName];
+            }
 
             var texture = LoadTextureAsTexture2d(fileName, _game.GraphicsDevice, new ImageInformation());
             if (texture != null)

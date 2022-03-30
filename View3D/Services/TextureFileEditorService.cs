@@ -25,8 +25,6 @@ namespace View3D.Services
             public string Error { get; set; }
         }
 
-
-        public bool IsRunning { get; set; } = false;
         public string OutputDirectory{ get; set; }
        
         public List<TexureType> ValidTextureTypes { get => new List<TexureType>() { TexureType.BaseColour, TexureType.Normal, TexureType.Mask, TexureType.MaterialMap }; }
@@ -41,104 +39,19 @@ namespace View3D.Services
             _node = node;
         }
 
-        public void AddTexture(string textureGameName, TexureType type)
-        {
-            var currentFileName = Path.GetFileNameWithoutExtension(textureGameName);
-            var newFileName = FilePreFix + currentFileName + ".png";
 
-            var systemFilePath = OutputDirectory + "\\" + newFileName;
-
-            var newTexture = new Texture()
-            { 
-                GamePath = textureGameName,
-                Error = "",
-                SystemPath = systemFilePath,
-                Type = type,
-            };
-
-            _textures.Add(newTexture);
+        public void CreateProject(string systemPath, string prefix, List<Texture> textures)
+        { 
+        
         }
-
-
 
         public List<Texture> GetCurrentTextures() => _textures;
 
-        public void Start()
+        public void SaveUvMaps(string projectPath)
         {
-            if (IsRunning)
-                return;
-
-         
-            if (Directory.Exists(OutputDirectory))
-            {
-                DeleteExistingUvMapsInDirectory(OutputDirectory);
-                var files = Directory.GetFiles(OutputDirectory);
-                if (files.Length != 0)
-                {
-                    if (MessageBox.Show("The output folder is not empty and some file will be overwritten.\nContinue?", "Warning", MessageBoxButton.YesNo) == MessageBoxResult.No)
-                        return;
-                }
-
-                try
-                {
-                    Directory.Delete(OutputDirectory);
-                }
-                catch
-                {
-                    MessageBox.Show("Unable to clean up the directory, some files are in use.\nCan not start the process");
-                    return;
-                }
-            }
-
-            DirectoryHelper.EnsureCreated(OutputDirectory);
-
-            // if some overwirte, give warning before next
-            foreach (var texture in _textures)
-            {
-                var packFile = _pfs.FindFile(texture.GamePath);
-                TextureConverter.SaveAsPNG(packFile, texture.SystemPath);
-            }
-
-            // Delete existing uv maps 
-            
             var meshes = _node.GetMeshesInLod(0, false);
             foreach (var mesh in meshes)
-                ExportUvMap(OutputDirectory, mesh);
-
-            // Assign
-
-            IsRunning = true;
-        }
-
-        private void DeleteExistingUvMapsInDirectory(string directory)
-        {
-            var files = Directory.GetFiles(directory);
-            foreach (var file in files)
-            {
-                if (file.Contains("Uv_map_"))
-                {
-                    try
-                    {
-                        File.Delete(file);
-                    }
-                    catch
-                    { }
-                }
-            }
-        }
-
-        public void Refresh()
-        {
-           // TextureConverter
-        }
-
-        public void Stop()
-        {
-            if (!IsRunning)
-                return;
-            IsRunning = false;
-
-            _textures.Clear();
+                ExportUvMap(projectPath+ "\\UvMaps\\", mesh);
         }
 
         private void ExportUvMap(string outputDirectory, Rmv2MeshNode mesh)
@@ -174,8 +87,8 @@ namespace View3D.Services
                 break;
             }
 
+            DirectoryHelper.EnsureCreated(outputDirectory);
             image.Save(imagePathWithoutExtention);
         }
-
     }
 }

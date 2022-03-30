@@ -13,10 +13,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using View3D.SceneNodes;
 using View3D.Services;
 using View3D.Utility;
+using MessageBox = System.Windows.MessageBox;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
@@ -31,7 +33,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             public bool IsFoundInProjectFolder { get; set; }
      
             public string PackFilePath { get; set; }
-    
+            public string UpdatedPackFilePath { get; set; }
+
             public TexureType Type { get; set; }
             public bool HasErrors { get; set; }
             public string ErrorString { get; set; } = "";
@@ -49,7 +52,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
  
 
         public NotifyAttr<bool> IsRunning { get; set; } = new NotifyAttr<bool>(false);
-
         public NotifyAttr<string> FilePath { get; set; } = new NotifyAttr<string>("");
         public NotifyAttr<string> FilePrefix { get; set; } = new NotifyAttr<string>("");
 
@@ -68,10 +70,10 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             _mainNode = mainNode;
             _textureService = _mainNode.TextureFileEditorService;
 
-            CreateDefaultView();  
+            UpdateViewData();
         }
 
-        void CreateDefaultView()
+        void UpdateViewData()
         {
             var projectFolder = _textureService.ProjectPath;
             if (string.IsNullOrEmpty(projectFolder))
@@ -90,6 +92,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             foreach (var texture in allTexutes)
             {
                 var fileSystemName = DetermineTextureName(projectFolder, texture.Path);
+                var updateTexturePath = DetermineUpdatedTextureName(fileSystemName);
                 var isValidPath = _pfs.FindFile(texture.Path) != null;
                 var isValidTextureType = _textureService.ValidTextureTypes.Contains(texture.TexureType);
                 var isFoundInProjectFolder = directoryContent.Contains(fileSystemName, StringComparer.InvariantCultureIgnoreCase);
@@ -106,6 +109,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                     IsFoundInProjectFolder = isFoundInProjectFolder,
                     PackFilePath = texture.Path,
                     SystemFilePath = DetermineTextureName(projectFolder, texture.Path),
+                    UpdatedPackFilePath = updateTexturePath,
                     Type = texture.TexureType,
                     PartOfProject = string.IsNullOrWhiteSpace(errorStr),
                     HasErrors = string.IsNullOrWhiteSpace(errorStr),
@@ -135,6 +139,14 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             return path;
         }
 
+        string DetermineUpdatedTextureName(string fileSystemPath)
+        {
+            var filePath = fileSystemPath;
+            filePath = filePath.Replace(DirectoryHelper.Temp, "variantmeshes\\wh_variantmodels", StringComparison.InvariantCultureIgnoreCase);
+            filePath = Path.ChangeExtension(filePath, "dds");
+            return filePath;
+        }
+
         string DetermineDefaultProjectName(MainEditableNode node)
         {
             var path = _pfs.GetFullPath(node.MainPackFile);
@@ -144,7 +156,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             return projectDir;
         }
 
-
         public void CreateProject()
         {
             // Ensure folder is created and empty! 
@@ -153,16 +164,24 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
             if (Directory.Exists(projectPath))
             {
-                if (MessageBox.Show($"Project folder {projectPath} already exists. Do you want to delete it?", "Warning", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                var numFiles = Directory.GetFiles(projectPath).Length;
+                if (numFiles != 0)
                 {
-                    try
+                    if (MessageBox.Show($"Project folder {projectPath} already exists. Do you want to delete it?", "Warning", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
-                        Directory.Delete(projectPath, true);
+                        try
+                        {
+                            Directory.Delete(projectPath, true);
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.Here().Error($"Unable to delete folder {e.Message}");
+                            MessageBox.Show("Unable to delete folder - Can not createa a new project");
+                            return;
+                        }
                     }
-                    catch(Exception e)
+                    else
                     {
-                        _logger.Here().Error($"Unable to delete folder {e.Message}");
-                        MessageBox.Show("Unable to delete folder - Can not createa a new project");
                         return;
                     }
                 }
@@ -177,24 +196,43 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 {
                     var folderPath = Path.GetDirectoryName(texture.SystemFilePath);
                     DirectoryHelper.EnsureCreated(folderPath);
+                    ExportTextureToFile(texture); 
+                }
+            }
 
-                    ExportTextureToFile(texture);
-                    var texturePackFile = AddTextureToPackFile(texture);
+            UpdateTexturesFromDirectory();
+            _textureService.SaveUvMaps(projectPath);
+            UpdateViewData();
+            OpenFolder();
+        }
+
+        void UpdateTexturesFromDirectory()
+        {
+            foreach (var texture in TextureList)
+            {
+                if (texture.PartOfProject)
+                {
+                    AddTextureToPackFile(texture);
 
                     // Determine which models use this texture and update them
                     var allMeshes = _mainNode.GetMeshesInLod(0, false);
                     foreach (var model in allMeshes)
-                    { 
+                    {
+                        // To array to create a copy of the list, so we dont get an exception while changing the list while itterating
+                        var modelTextures = model.Material.GetAllTextures().ToArray();
+                        foreach (var modelTexture in modelTextures)
+                        {
+                            var equalType = modelTexture.TexureType == texture.Type;
+                            var equalPath = string.Compare(modelTexture.Path, texture.PackFilePath, StringComparison.InvariantCultureIgnoreCase) == 0;
+                            if (equalType && equalPath)
+                                model.UpdateTexture(texture.UpdatedPackFilePath, modelTexture.TexureType, true);
+                        }
                     }
-                   
                 }
             }
-
-
-            // Export Uv maps
-            CreateDefaultView();
-            OpenFolder();
         }
+
+
         private bool ExportTextureToFile(TextureItem texture)
         {
             var packFile = _pfs.FindFile(texture.PackFilePath);
@@ -214,8 +252,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         public void AddMissingTextures()
         {
-            _textureService.Stop();
-            IsRunning.Value = _textureService.IsRunning;
+    
         }
 
         void OpenFolder()
@@ -227,10 +264,22 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         }
 
         void Browse()
-        { }
+        {
+            using var dialog = new FolderBrowserDialog();
+            dialog.SelectedPath = FilePath.Value;
+            var result = dialog.ShowDialog();
+            if (result != DialogResult.OK)
+                return;
+
+            FilePath.Value = dialog.SelectedPath;
+            _textureService.ProjectPath = dialog.SelectedPath;
+            UpdateViewData();
+        }
 
         void RefreshTextures()
-        { }
+        {
+            UpdateTexturesFromDirectory();
+        }
 
         string CreateDefaultOutputDirectoryPath(MainEditableNode mainNode)
         {

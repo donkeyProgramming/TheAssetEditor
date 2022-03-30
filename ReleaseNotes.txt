@@ -18,6 +18,9 @@ v0.XX
 	* Keep correct material ID for decals and what not 
 	* Keep paramterter index for material paramters 
 	* Multiple shader types for wsmodel, also settings
+	* Allow moving uvs 
+	* Combine textures 
+	* "save only visible" should only care about lod0 meshes 
 	
 V0.34
 ----------------------------
@@ -28,35 +31,42 @@ V0.34
 	
 V0.33
 ----------------------------
-	* Convert useAlpha to bool
+	* Convert useAlpha to bool in code 
 	* Better loading of Alpha values from WsModel -> katarin lower lods 
-	* Remove missing textures 
-	* Texture watcher
-	* Button to kill missing textures 
-		* Export > png
-		* Read back < png
-		* Watch
-		* Export UV map 
-		
-		
-	Create texture project | Refrsh | Point to existing texture project
-		If exist, ask to delete. -> Add missing textures 
-		Refresh to update textures
-
-		Create new textures in pack with name 
-		Use path after variant mesh for folder 
+	
+	Imprivement to vertex debugger
+		Show all values
+		Toggle normal/tanget/binormals
 	
 	* Browse texture gets and converts textures from png
 	* Static prop => missing from skeleton error 
 		* Skeleton not found => dont delete ref
 
 	* Attach to not working for katerina septer 
-
 	* Improve lod generation, vertex type and merge, Alpha
+	
 	* Checkboxes in ui for rendering flags 
 	* Raname file not working 
+	* Check file bug for older games on discord
+	* Phazer shader improvements 
 	
+	Texture tool:
+		* Find out why the texture change slightly [Done]
+		* Explanation for what the files do 
+		* UVs [Done]
+		* Open existing project => OpenFolderCommand
+		* Error handling
+			* Convertion failed
+			* File not found 
+		* Add textures 
+		* Remove missing textures from file => DeleteAllMissingTexturesAction
+		* Add texture from file in normal texture view (import) 
+		* Add more info to the texture list [Done]
+		* Update all lods 
+		* Project file?
+		
 	Fixes:
+		* Button to remove missing textures from mesh
 		* Split meshes improvements - Can now break up the mammoth without killing the program
 		* Fixed meshes being transformed far away when moving them with the camera facing an axis.
 		* Fixed bug in WsModel generation, skipping textures that are not used by wh3

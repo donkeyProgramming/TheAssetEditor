@@ -116,13 +116,15 @@ namespace View3D.SceneNodes
             Effect.SetTexture(materialTexture, TexureType.MaterialMap);
         }
 
-        Texture2D LoadTexture(TexureType type)
+        Texture2D LoadTexture(TexureType type, bool forceRefreshTexture = false)
         {
+
             var texture = Material.GetTexture(type);
             if (texture == null)
                 return null;
 
-            return _resourceLib.LoadTexture(texture.Value.Path);
+            return _resourceLib.LoadTexture(texture.Value.Path, forceRefreshTexture);
+
         }
 
         public void Update(GameTime time) { }
@@ -145,11 +147,11 @@ namespace View3D.SceneNodes
             return MathUtil.GetCenter(Geometry.BoundingBox) + Position;
         }
 
-        public void UpdateTexture(string path, TexureType texureType)
+        public void UpdateTexture(string path, TexureType texureType, bool forceRefreshTexture = false)
         {
             Material.SetTexture(texureType, path);
 
-            var texture = LoadTexture(texureType);
+            var texture = LoadTexture(texureType, forceRefreshTexture);
             Effect.SetTexture(texture, texureType);
         }
 
