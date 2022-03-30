@@ -66,6 +66,11 @@ V0.33
 		* Update all lods 
 		* Project file?
 			PackFileName, SystemFileName, Type
+			
+		* Update project 
+			* Read cfg
+			* Add missing textures
+			* update UI 
 		
 	Fixes:
 		* Button to remove missing textures from mesh
