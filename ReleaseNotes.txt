@@ -54,6 +54,7 @@ V0.33
 		* Find out why the texture change slightly [Done]
 		* Explanation for what the files do 
 		* UVs [Done]
+		* Alpha issue?
 		* Open existing project => OpenFolderCommand
 		* Error handling
 			* Convertion failed
@@ -64,6 +65,7 @@ V0.33
 		* Add more info to the texture list [Done]
 		* Update all lods 
 		* Project file?
+			PackFileName, SystemFileName, Type
 		
 	Fixes:
 		* Button to remove missing textures from mesh

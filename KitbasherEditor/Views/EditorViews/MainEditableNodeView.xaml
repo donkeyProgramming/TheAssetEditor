@@ -64,16 +64,16 @@
                 <DockPanel DockPanel.Dock="Top">
                     <DockPanel DockPanel.Dock="Top" LastChildFill="False">
                         <Label Width ="{StaticResource labelWidth}" Content="Process" />
-                        <Label>:</Label> 
+                        <Label>:</Label>
                         <Button Content="Create Project" Command="{Binding TextureFileEditorServiceViewModel.CreateProjectCommand}" Margin="0,2,2,2" Width="100"/>
-                        <Button Content="Add Missing" Command="{Binding TextureFileEditorServiceViewModel.AddMissingTextureCommand}" Margin="0,2,2,2" Width="100"/>
+                        <Button Content="Refresh Project" Command="{Binding TextureFileEditorServiceViewModel.RefreshProjectCommand}" Margin="0,2,2,2" Width="100" IsEnabled="False"/>
                         <Button Content="Update Textures" Command="{Binding TextureFileEditorServiceViewModel.RefreshTexturesCommand}" Margin="0,2,2,2" Width="100"/>
                     </DockPanel>
 
                     <DockPanel DockPanel.Dock="Top">
                         <Label Width ="{StaticResource labelWidth}" Content="New files prefix" />
                         <Label>:</Label>
-                        <TextBox Text="{Binding TextureFileEditorServiceViewModel.FilePrefix.Value, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"
+                        <TextBox Text="{Binding TextureFileEditorServiceViewModel.FilePrefix, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"
                                  IsEnabled="{Binding TextureFileEditorServiceViewModel.IsRunning.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvBoolConverter}}"/>
                     </DockPanel>
 
@@ -95,10 +95,10 @@
                             <DataGrid.RowStyle>
                                 <Style TargetType="DataGridRow">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding HasErrors}" Value="true">
+                                        <DataTrigger Binding="{Binding HasErrors}" Value="false">
                                             <Setter Property="Background" Value="White"></Setter>
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding HasErrors}" Value="false">
+                                        <DataTrigger Binding="{Binding HasErrors}" Value="true">
                                             <Setter Property="Background" Value="Red"></Setter>
                                             <Setter Property="ToolTip" Value="{Binding ErrorString}"/>
                                         </DataTrigger>
@@ -108,7 +108,7 @@
 
                             <DataGrid.Columns>
                                 <DataGridCheckBoxColumn Header="Found" Binding="{Binding IsFoundInProjectFolder, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
-                                <DataGridCheckBoxColumn Header="Export" Binding="{Binding PartOfProject, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                <DataGridCheckBoxColumn Header="Use" Binding="{Binding PartOfProject, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                                 <DataGridTextColumn Header="Type" Binding="{Binding Type}" IsReadOnly="True"/>
                                 <DataGridTextColumn Header="PackFilePath" Binding="{Binding PackFilePath}" IsReadOnly="true" />
                                 <DataGridTextColumn Header="SystemPath" Binding="{Binding SystemFilePath}" IsReadOnly="true" />
