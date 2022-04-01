@@ -72,10 +72,15 @@ V0.33
 			* Add missing textures
 			* update UI 
 		
-	Fixes:
-		* Button to remove missing textures from mesh
-		* Split meshes improvements - Can now break up the mammoth without killing the program
-		* Fixed meshes being transformed far away when moving them with the camera facing an axis.
+		
+		
+	Features:
+		* TextureProject - Beta. Export textures and UVs as PNGs and import them again. Please report any bugs or ideas for improvements. 
+		* Button to remove missing textures from mesh (For removing left over wh2 textures from wh3 models)
+		* Split Mesh tool improvements - Can now break up the mammoth without killing the program (ish)
+		
+	Fixes:	
+		* Fixed bug where meshes being transformed far away when moving them with the camera facing an axis.
 		* Fixed bug in WsModel generation, skipping textures that are not used by wh3
 		* Fixed error when creating MetaData tags for Effects 
 	
