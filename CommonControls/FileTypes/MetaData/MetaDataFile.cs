@@ -13,7 +13,7 @@ namespace CommonControls.FileTypes.MetaData
         public int Version { get; set; }
         public List<BaseMetaEntry> Items { get; set; } = new List<BaseMetaEntry>();
 
-        public List<T> GetItemsOfType<T>() where T: DecodedMetaEntryBase 
+        public List<T> GetItemsOfType<T>() 
         {
             return Items.Where(x => x is T).Cast<T>().ToList();
         }

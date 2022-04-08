@@ -120,7 +120,7 @@ namespace CommonControls.FileTypes.AnimationPack
             }
             catch(Exception e)
             {
-                return null;
+                return new UnknownAnimFile(animationInfoDataFile.Name, data.Buffer);
             }
         }
 
@@ -171,7 +171,7 @@ namespace CommonControls.FileTypes.AnimationPack
 
     public class AnimationSetSerializer_Wh3 : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimPackFileTypes.Wh3.AnimationBin(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimPackFileTypes.Wh3.AnimationBinWh3(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
     }
 
 

@@ -14,9 +14,9 @@ namespace AnimationEditor.Common.ReferenceModel
         string _currentSkeletonName = "";
         AssetViewModel _asset;
 
-        public FilterCollection<AnimationFragmentFile> FragmentList { get; set; }
+        public FilterCollection<IAnimationBinGenericFormat> FragmentList { get; set; }
 
-        public FilterCollection<AnimationSetEntry> FragmentSlotList { get; set; }
+        public FilterCollection<AnimationBinEntryGenericFormat> FragmentSlotList { get; set; }
 
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
@@ -30,13 +30,13 @@ namespace AnimationEditor.Common.ReferenceModel
             _asset = asset;
             _metaViewModel = metaViewModel;
 
-            FragmentList = new FilterCollection<AnimationFragmentFile>(null, (value) => FragmentSelected(value, FragmentSlotList, _asset.SkeletonName.Value))
+            FragmentList = new FilterCollection<IAnimationBinGenericFormat>(null, (value) => FragmentSelected(value, FragmentSlotList, _asset.SkeletonName.Value))
             {
-                SearchFilter = (value, rx) => { return rx.Match(value.FileName).Success; }
+                SearchFilter = (value, rx) => { return rx.Match(value.FullPath).Success; }
             };
-            FragmentSlotList = new FilterCollection<AnimationSetEntry>(null, FragmentSlotSelected)
+            FragmentSlotList = new FilterCollection<AnimationBinEntryGenericFormat>(null, FragmentSlotSelected)
             {
-                SearchFilter = (value, rx) => { return rx.Match(value.Slot.Value).Success; }
+                SearchFilter = (value, rx) => { return rx.Match(value.SlotName).Success; }
             };
 
             OnSkeletonChange(_asset.Skeleton);
@@ -48,9 +48,9 @@ namespace AnimationEditor.Common.ReferenceModel
         {
             if (FragmentList.SelectedItem != null && FragmentList.SelectedItem != null)
             {
-                var animPack = FragmentList.SelectedItem.Parent;
-                CommonControls.Editors.AnimationPack.AnimPackViewModel.ShowPreviewWinodow(animPack, _pfs, _skeletonAnimationLookUpHelper, FragmentList.SelectedItem.FileName);
-            }
+                var animPack = FragmentList.SelectedItem.PackFileReference;
+                CommonControls.Editors.AnimationPack.AnimPackViewModel.ShowPreviewWinodow(animPack, _pfs, _skeletonAnimationLookUpHelper, FragmentList.SelectedItem.FullPath);
+           }
         }
 
         void Subscribe()
@@ -68,8 +68,8 @@ namespace AnimationEditor.Common.ReferenceModel
 
             if (newValue == null)
             {
-                FragmentList.UpdatePossibleValues(new List<AnimationFragmentFile>());
-                FragmentSlotList.UpdatePossibleValues(new List<AnimationSetEntry>());
+                FragmentList.UpdatePossibleValues(new List<IAnimationBinGenericFormat>());
+                FragmentSlotList.UpdatePossibleValues(new List<AnimationBinEntryGenericFormat>());
                 _currentSkeletonName = "";
                 return;
             }
@@ -97,10 +97,10 @@ namespace AnimationEditor.Common.ReferenceModel
             _asset.SkeletonChanged += OnSkeletonChange;
         }
 
-        public List<AnimationFragmentFile> LoadFragmentsForSkeleton(string skeletonName, bool onlyPacksThatCanBeSaved = false)
+        public List<IAnimationBinGenericFormat> LoadFragmentsForSkeleton(string skeletonName, bool onlyPacksThatCanBeSaved = false)
         {
-            var outputFragments = new List<AnimationFragmentFile>();
-            var animPacks = _pfs.FindAllWithExtention(@".animpack");
+            var outputFragments = new List<IAnimationBinGenericFormat>();
+            var animPacks = _pfs.GetAllAnimPacks();
             foreach (var animPack in animPacks)
             {
                 if (onlyPacksThatCanBeSaved == true)
@@ -110,22 +110,22 @@ namespace AnimationEditor.Common.ReferenceModel
                 }
 
                 var animPackFile = AnimationPackSerializer.Load(animPack, _pfs);
-                var fragments = animPackFile.GetAnimationSets(skeletonName);
+                var fragments = animPackFile.GetGenericAnimationSets(skeletonName);
                 foreach (var fragment in fragments)
                     outputFragments.Add(fragment);
             }
             return outputFragments;
         }
 
-        void FragmentSelected(AnimationFragmentFile value, FilterCollection<AnimationSetEntry> collection, string skeletonName)
+        void FragmentSelected(IAnimationBinGenericFormat value, FilterCollection<AnimationBinEntryGenericFormat> animationSlotsCollection, string skeletonName)
         {
             if (value == null)
             {
-                collection.UpdatePossibleValues(null);
+                animationSlotsCollection.UpdatePossibleValues(null);
                 return;
             }
 
-            var newSkeletonName = value.Skeletons.Values.FirstOrDefault();
+            var newSkeletonName = value.SkeletonName;
             var existingSkeletonName = Path.GetFileNameWithoutExtension(skeletonName);
             if (newSkeletonName != existingSkeletonName)
             {
@@ -133,10 +133,10 @@ namespace AnimationEditor.Common.ReferenceModel
                 return;
             }
 
-            collection.UpdatePossibleValues(value.Fragments);
+            animationSlotsCollection.UpdatePossibleValues(value.Entries);
         }
 
-        private void FragmentSlotSelected(AnimationSetEntry value)
+        private void FragmentSlotSelected(AnimationBinEntryGenericFormat value)
         {
             if(value == null)
             {
@@ -156,22 +156,22 @@ namespace AnimationEditor.Common.ReferenceModel
                     _asset.SetAnimation(null);
                 }
 
-                if (string.IsNullOrWhiteSpace(value.MetaDataFile) == false)
-                    _metaViewModel.SelectedMetaFile = _pfs.FindFile(value.MetaDataFile);
+                if (string.IsNullOrWhiteSpace(value.MetaFile) == false)
+                    _metaViewModel.SelectedMetaFile = _pfs.FindFile(value.MetaFile);
                 else
                     _metaViewModel.SelectedMetaFile = null;
 
-                var persist = FragmentSlotList.PossibleValues.FirstOrDefault(x => x.Slot.Value == "PERSISTENT_METADATA_ALIVE");
-                if (persist != null && string.IsNullOrWhiteSpace(persist.MetaDataFile) == false)
-                    _metaViewModel.SelectedPersistMetaFile = _pfs.FindFile(persist.MetaDataFile);
+                var persist = FragmentSlotList.PossibleValues.FirstOrDefault(x => x.SlotName == "PERSISTENT_METADATA_ALIVE");
+                if (persist != null && string.IsNullOrWhiteSpace(persist.MetaFile) == false)
+                    _metaViewModel.SelectedPersistMetaFile = _pfs.FindFile(persist.MetaFile);
                 else
                     _metaViewModel.SelectedPersistMetaFile = null;
 
                 if (_metaViewModel.SelectedPersistMetaFile == null)
                 {
-                    var persistFlying = FragmentSlotList.PossibleValues.FirstOrDefault(x => x.Slot.Value == "PERSISTENT_METADATA_FLYING");
-                    if (persistFlying != null && string.IsNullOrWhiteSpace(persistFlying.MetaDataFile) == false)
-                        _metaViewModel.SelectedPersistMetaFile = _pfs.FindFile(persistFlying.MetaDataFile);
+                    var persistFlying = FragmentSlotList.PossibleValues.FirstOrDefault(x => x.SlotName == "PERSISTENT_METADATA_FLYING");
+                    if (persistFlying != null && string.IsNullOrWhiteSpace(persistFlying.MetaFile) == false)
+                        _metaViewModel.SelectedPersistMetaFile = _pfs.FindFile(persistFlying.MetaFile);
                 }
             }
         }

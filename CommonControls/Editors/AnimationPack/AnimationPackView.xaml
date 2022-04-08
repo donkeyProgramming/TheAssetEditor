@@ -25,9 +25,12 @@
                 <MenuItem Header="_File">
                     <MenuItem Header="Save" Click="{s:MethodBinding Save}"/>
                     <Separator/>
-                    <MenuItem Header="New AnimationSet (warhammer)"  Click="{s:MethodBinding CreateEmptyWarhammerAnimSetFile}" />
+                    <MenuItem Header="New AnimationSet (Wh3)"  Click="{s:MethodBinding CreateEmptyWarhammer3AnimSetFile}" />
                     <MenuItem Header="New AnimationSet (3k)"  Click="{s:MethodBinding CreateEmpty3kAnimSetFile}" />
                     <MenuItem Header="View Selected As Table" Click="{s:MethodBinding ViewSelectedAsTable}" Visibility="Collapsed"/>
+                    <Separator/>
+                    <MenuItem Header="Export animation slots (Wh3)"  Click="{s:MethodBinding ExportAnimationSlotsWh3Action}" />
+                    <MenuItem Header="Export animation slots (Wh2)"  Click="{s:MethodBinding ExportAnimationSlotsWh2Action}" />
                 </MenuItem>
             </Menu>
         </DockPanel>

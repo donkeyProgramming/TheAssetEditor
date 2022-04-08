@@ -29,10 +29,10 @@ namespace View3D.Animation.MetaData
         IComponentManager _componentManager;
         ISkeletonProvider _rootSkeleton;
         AnimationPlayer _rootPlayer;
-        AnimationFragmentFile _fragment;
+        IAnimationBinGenericFormat _fragment;
         ApplicationSettingsService _applicationSettingsService;
 
-        public MetaDataFactory(SceneNode root, IComponentManager componentManager, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, AnimationFragmentFile fragment, ApplicationSettingsService applicationSettingsService)
+        public MetaDataFactory(SceneNode root, IComponentManager componentManager, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment, ApplicationSettingsService applicationSettingsService)
         {
             _root = root;
             _componentManager = componentManager;
@@ -64,7 +64,7 @@ namespace View3D.Animation.MetaData
            if (file == null)
                return output;
 
-           foreach(var animatedProp in file.GetItemsOfType<AnimatedProp_v10>())
+           foreach(var animatedProp in file.GetItemsOfType<IAnimatedPropMeta>())
                output.Add(CreateAnimatedProp(animatedProp));
            
             foreach (var meteDataItem in file.GetItemsOfType<ImpactPosition>())
@@ -100,7 +100,9 @@ namespace View3D.Animation.MetaData
             var skeletonHelper = _componentManager.GetComponent<SkeletonAnimationLookUpHelper>();
             var pfs = resourceLib.Pfs;
         
-            var animPath = _fragment.Fragments.FirstOrDefault(x=>x.Slot.Value == metaData.AnimationSlotName)?.AnimationFile;
+            var animPath = _fragment.Entries.FirstOrDefault(x=>x.SlotName == metaData.AnimationSlotName)?.AnimationFile;
+            if(animPath == null)
+                animPath = _fragment.Entries.FirstOrDefault(x => x.SlotName  == metaData.AnimationSlotName + "_2")?.AnimationFile;  // CA has introduced a DOCK_2 for some reason.
             if (animPath == null)
             {
                 _logger.Here().Error($"Unable to create docking, as {metaData.AnimationSlotName} animation is missing");
@@ -130,7 +132,7 @@ namespace View3D.Animation.MetaData
             _rootPlayer.AnimationRules.Add(rule);
         }
 
-        IMetaDataInstance CreateAnimatedProp(AnimatedProp_v10 animatedPropMeta)
+        IMetaDataInstance CreateAnimatedProp(IAnimatedPropMeta animatedPropMeta)
         {
             var propName = "Animated_prop";
 

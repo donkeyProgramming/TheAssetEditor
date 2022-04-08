@@ -24,6 +24,7 @@ using CommunityToolkit.Mvvm.Input;
 using AnimationEditor.SkeletonEditor;
 using AssetEditor.Report;
 using AnimationEditor.AnimationBuilder;
+using CommonControls.Editors.AnimationPack;
 
 namespace AssetEditor.ViewModels
 {
@@ -82,7 +83,6 @@ namespace AssetEditor.ViewModels
         public ICommand GenerateRmv2ReportCommand { get; set; }
         public ICommand GenerateMetaDataReportCommand { get; set; }
         public ICommand GenerateFileListReportCommand { get; set; }
-        public ICommand CreateAnimPackWarhammerCommand { get; set; }
         public ICommand CreateAnimPackWarhammer3Command { get; set; }
         public ICommand CreateAnimPack3kCommand { get; set; }
 
@@ -99,7 +99,6 @@ namespace AssetEditor.ViewModels
             OpenSettingsWindowCommand = new RelayCommand(ShowSettingsDialog);
             OpenPackFileCommand = new RelayCommand(OpenPackFile);
             CreateNewPackFileCommand = new RelayCommand(CreatePackFile);
-            CreateAnimPackWarhammerCommand = new RelayCommand(CreateAnimationDbWarhammer);
             CreateAnimPackWarhammer3Command = new RelayCommand(CreateAnimationDbWarhammer3);
             CreateAnimPack3kCommand = new RelayCommand(CreateAnimationDb3k);
             OpenAssetEditorFolderCommand = new RelayCommand(OpenAssetEditorFolder);
@@ -200,103 +199,15 @@ namespace AssetEditor.ViewModels
             }
         }
 
-
-        void CreateAnimationDb(bool includeWarhamemrBin)
-        {
-            TextInputWindow window = new TextInputWindow("New AnimPack name", "");
-            if (window.ShowDialog() == true)
-            {
-                // Is extention correct
-                var fileName = SaveHelper.EnsureEnding(window.TextValue, ".animpack");
-                var filePath = @"animations/animation_tables/" + fileName;
-               
-                if (!SaveHelper.IsFilenameUnique(_packfileService, filePath))
-                {
-                    MessageBox.Show("Filename is not unique");
-                    return;
-                }
-
-                // Create dummy data
-                var animPack = new AnimationPackFile();
-
-                var binPath = @"animations/animation_tables/" + SaveHelper.EnsureEnding(fileName, "_tables.bin");
-                var animDb = AnimationPackFile.CreateExampleWarhammerBin(binPath);
-                animPack.AddFile(animDb);
-
-                // Save
-                SaveHelper.Save(_packfileService, filePath, null, AnimationPackSerializer.ConvertToBytes(animPack));
-            }
-        }
-
-        void CreateAnimationDbWarhammer()
-        {
-            TextInputWindow window = new TextInputWindow("New AnimPack name", "");
-            if (window.ShowDialog() == true)
-            {
-                var fileName = SaveHelper.EnsureEnding(window.TextValue, ".animpack");
-                var filePath = @"animations/animation_tables/" + fileName;
-
-                if (!SaveHelper.IsFilenameUnique(_packfileService, filePath))
-                {
-                    MessageBox.Show("Filename is not unique");
-                    return;
-                }
-
-                // Create dummy data
-                var animPack = new AnimationPackFile();
-                var binPath = @"animations/animation_tables/" + SaveHelper.EnsureEnding(fileName, "_tables.bin");
-                var animDb = AnimationPackFile.CreateExampleWarhammerBin(binPath);
-                animPack.AddFile(animDb);
-
-                SaveHelper.Save(_packfileService, filePath, null, AnimationPackSerializer.ConvertToBytes(animPack));
-            }
-        }
-
-
         void CreateAnimationDbWarhammer3()
         {
-            TextInputWindow window = new TextInputWindow("New AnimPack name", "");
-            if (window.ShowDialog() == true)
-            {
-                var fileName = SaveHelper.EnsureEnding(window.TextValue, ".animpack");
-                var filePath = @"animations/database/battle/bin/" + fileName;
-
-                if (!SaveHelper.IsFilenameUnique(_packfileService, filePath))
-                {
-                    MessageBox.Show("Filename is not unique");
-                    return;
-                }
-
-                // Create dummy data
-                var animPack = new AnimationPackFile();
-                var binPath = @"animations/database/battle/bin" + SaveHelper.EnsureEnding(fileName, ".bin");
-                var exampleFile = AnimationPackFile.CreateExampleWarhammer3(binPath);
-                animPack.AddFile(exampleFile);
-                SaveHelper.Save(_packfileService, filePath, null, AnimationPackSerializer.ConvertToBytes(animPack));
-            }
+            AnimationPackSampleDataCreator.CreateAnimationDbWarhammer3(_packfileService);
         }
 
         void CreateAnimationDb3k()
         {
-            TextInputWindow window = new TextInputWindow("New AnimPack name", "");
-            if (window.ShowDialog() == true)
-            {
-                var fileName = SaveHelper.EnsureEnding(window.TextValue, ".animpack");
-                var filePath = @"animations/database/battle/bin/" + fileName;
-                //animations\database\battle\bin\animation_tables.animpack
-                if (!SaveHelper.IsFilenameUnique(_packfileService, filePath))
-                {
-                    MessageBox.Show("Filename is not unique");
-                    return;
-                }
-
-                // Create dummy data
-                var animPack = new AnimationPackFile();
-                SaveHelper.Save(_packfileService, filePath, null, AnimationPackSerializer.ConvertToBytes(animPack));
-            }
+            AnimationPackSampleDataCreator.CreateAnimationDb3k(_packfileService);
         }
-
-
 
         void OpenAssetEditorFolder()
         {

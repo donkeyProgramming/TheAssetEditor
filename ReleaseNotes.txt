@@ -20,17 +20,7 @@ v0.XX
 	* Multiple shader types for wsmodel, also settings
 	* Allow moving uvs 
 	* Combine textures 
-	* "save only visible" should only care about lod0 meshes 
-	
-V0.34
-----------------------------
-	* Fix save animations
-	* Bin stuff - Rewrite how its all handled
-
--- Live stream Kitbash editor 
-	
-V0.33
-----------------------------
+	* "save only visible" should only care about lod0 meshes 	
 	* Convert useAlpha to bool in code 
 	* Better loading of Alpha values from WsModel -> katarin lower lods 
 	
@@ -44,7 +34,6 @@ V0.33
 
 	* Attach to not working for katerina septer 
 	* Improve lod generation, vertex type and merge, Alpha
-	
 	* Checkboxes in ui for rendering flags 
 	* Raname file not working 
 	* Check file bug for older games on discord
@@ -71,6 +60,31 @@ V0.33
 			* Read cfg
 			* Add missing textures
 			* update UI 
+	
+	-- Live stream Kitbash editor 
+	
+	
+	
+	
+	
+V0.34
+----------------------------
+	BugFixes:
+		* Animation can be saved
+		* Correct animation slot definition (thanks to ChaosRobie)
+		* Super view (metadata editor and preview) working again. Try loading Throt in it! 
+		* Skeleton editor working again
+		* Animation Transfer tool working again
+		* Campagin Animation Creator working again
+		* AnimPacks for wh3 can be viewed and edited, with validation on save
+		* Correctly setting loaded packfiles to be the main EditablePack file
+		* Some quality of life changes to the animPackEditor. Warning about unsaved files, export list of possible animationSlots++
+
+
+	
+V0.33
+----------------------------
+
 		
 		
 		

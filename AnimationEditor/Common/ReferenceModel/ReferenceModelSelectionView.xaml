@@ -90,7 +90,7 @@
                     <ComboBox
                           IsEditable="True"
                           IsTextSearchEnabled="false"
-                          DisplayMemberPath="Slot.Value"
+                          DisplayMemberPath="SlotName"
                           Text="{Binding FragAndSlotSelection.FragmentSlotList.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                           ItemsSource="{Binding FragAndSlotSelection.FragmentSlotList.Values}" 
                           SelectedItem="{Binding FragAndSlotSelection.FragmentSlotList.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>

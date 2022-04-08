@@ -105,9 +105,7 @@ namespace View3D.Animation
 
         public AnimationFile ConvertToFileFormat(GameSkeleton skeleton)
         {
-            throw new NotImplementedException();
-            /*
-            AnimationFile output = new AnimationFile();
+            var output = new AnimationFile();
 
             var fRate = (DynamicFrames.Count() - 1) / PlayTimeInSec;
             output.Header.FrameRate = (float)Math.Floor(fRate);
@@ -117,6 +115,7 @@ namespace View3D.Animation
             output.Header.Version = 7;
             output.Header.AnimationTotalPlayTimeInSec = PlayTimeInSec;
             output.Header.SkeletonName = skeleton.SkeletonName;
+            output.AnimationParts.Add(new AnimationPart());
 
             output.Bones = new BoneInfo[skeleton.BoneCount];
             for (int i = 0; i < skeleton.BoneCount; i++)
@@ -127,22 +126,34 @@ namespace View3D.Animation
                     Name = skeleton.BoneNames[i],
                     ParentId = skeleton.GetParentBoneIndex(i)
                 };
+
+                output.AnimationParts[0].RotationMappings.Add(new AnimationBoneMapping(i));
+                output.AnimationParts[0].TranslationMappings.Add(new AnimationBoneMapping(i));
+            }
+        
+            foreach (var frame in DynamicFrames)
+                output.AnimationParts[0].DynamicFrames.Add(CreateFrameFromKeyFrame(frame));
+
+            return output; 
+        }
+
+        private Frame CreateFrameFromKeyFrame(KeyFrame frame)
+        { 
+            var output = new Frame();
+
+            foreach (var pos in frame.Position)
+                output.Transforms.Add(new RmvVector3(pos));
+
+            foreach (var rot in frame.Rotation)
+                output.Quaternion.Add(new RmvVector4(rot.X, rot.Y, rot.Z, rot.W));
+
+            foreach (var scale in frame.Scale)
+            {
+                if (scale.LengthSquared() != 3)
+                    throw new Exception("Can not save animation with scale");
             }
 
-            // Mappings
-            output.RotationMappings = RotationMappings.ToList();
-            output.TranslationMappings = TranslationMappings.ToList();
-
-            // Static
-            if (StaticFrame != null)
-                output.StaticFrame = CreateFrameFromKeyFrame(StaticFrame);
-
-            // Dynamic
-            foreach (var frame in DynamicFrames)
-                output.DynamicFrames.Add(CreateFrameFromKeyFrame(frame));
-
             return output;
-            */
         }
 
         public AnimationClip Clone()

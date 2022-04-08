@@ -12,9 +12,12 @@ using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using TextureEditor.ViewModels;
@@ -101,8 +104,10 @@ namespace AssetEditor.ViewModels
           
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
+              
+
                 //var reportService = new FileListReportGenerator(packfileService, settingsService);
-                //reportService.CompareFiles(@"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.0.1.0 PackFiles.csv", @"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.0.2.0 PackFiles.csv");
+                //reportService.CompareFiles(@"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.0.2.0 PackFiles.csv", @"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.1.0.0 PackFiles.csv");
 
                 //;
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateFlyingSquig(this, toolFactory, packfileService);

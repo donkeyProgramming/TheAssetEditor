@@ -3,10 +3,11 @@ using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
 {
-    public class AnimationBin : IAnimationPackFile
+    public class AnimationBinWh3 : IAnimationPackFile, IAnimationBinGenericFormat
     {
         public string FileName { get; set; }
         public AnimationPackFile Parent { get; set; }
@@ -19,13 +20,13 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
         public uint TableSubVersion { get; set; } = 3;
         public string Name { get; set; }
         public string MountBin { get; set; }
-        public string UnknownValue0 { get; set; }
+        public string Unkown { get; set; }
         public string SkeletonName { get; set; }
         public string LocomotionGraph { get; set; }
         public short UnknownValue1 { get; set; }
 
 
-        public AnimationBin(string fileName, byte[] data = null)
+        public AnimationBinWh3(string fileName, byte[] data = null)
         {
             FileName = fileName;
             if (data != null)
@@ -40,7 +41,7 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
             memStream.Write(ByteParsers.UInt32.EncodeValue(TableSubVersion, out _));
             memStream.Write(ByteParsers.String.WriteCaString(Name.ToLower()));
             memStream.Write(ByteParsers.String.WriteCaString(MountBin.ToLower()));
-            memStream.Write(ByteParsers.String.WriteCaString(UnknownValue0.ToLower()));
+            memStream.Write(ByteParsers.String.WriteCaString(Unkown.ToLower()));
             memStream.Write(ByteParsers.String.WriteCaString(SkeletonName.ToLower()));
             memStream.Write(ByteParsers.String.WriteCaString(LocomotionGraph.ToLower()));
             memStream.Write(ByteParsers.Short.EncodeValue(UnknownValue1, out _));
@@ -50,7 +51,7 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
             {
                 memStream.Write(ByteParsers.UInt32.EncodeValue(animationEntry.AnimationId, out _));
                 memStream.Write(ByteParsers.Single.EncodeValue(animationEntry.BlendIn, out _));
-                memStream.Write(ByteParsers.Single.EncodeValue(animationEntry.BlendOut, out _));
+                memStream.Write(ByteParsers.Single.EncodeValue(animationEntry.SelectionWeight, out _));
                 memStream.Write(ByteParsers.Int32.EncodeValue(animationEntry.WeaponBools, out _));
                 memStream.Write(ByteParsers.Bool.EncodeValue(animationEntry.Unk, out _));
                 memStream.Write(ByteParsers.UInt32.EncodeValue((uint)animationEntry.AnimationRefs.Count, out _));
@@ -81,10 +82,11 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
 
             Name = chunk.ReadString();
             MountBin = chunk.ReadString();
-            UnknownValue0 = chunk.ReadString(); // Always empty, could be a short
+            Unkown = chunk.ReadString(); // Always empty, could be a short
             SkeletonName = chunk.ReadString();
             LocomotionGraph = chunk.ReadString();
             UnknownValue1 = chunk.ReadShort();
+            AnimationTableEntries.Clear();
 
             var count = chunk.ReadUInt32();
             for (int i = 0; i < count; i++)
@@ -100,23 +102,10 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
                 {
                     AnimationId = animID,
                     BlendIn = blend0,
-                    BlendOut = blend1,
+                    SelectionWeight = blend1,
                     WeaponBools = boneWeaponbools,
                     Unk = frgUnk0,
                 };
-                //
-                //if (frgUnk0 != 0)
-                //{ 
-                //
-                //}
-
-
-                //
-
-                if (frgUnk0 == true)
-                { 
-                
-                }
 
                 for (int varientCounter = 0; varientCounter < numVariants; varientCounter++)
                 {
@@ -138,13 +127,47 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
             if (chunk.BytesLeft != 0)
                 throw new Exception($"{chunk.BytesLeft} bytes left");
         }
+
+
+        string IAnimationBinGenericFormat.Name { get => Name; }
+        string IAnimationBinGenericFormat.SkeletonName { get => SkeletonName;}
+        List<AnimationBinEntryGenericFormat> IAnimationBinGenericFormat.Entries 
+        {
+            get 
+            {
+                var output = new List<AnimationBinEntryGenericFormat>();
+                foreach (var item in AnimationTableEntries)
+                {
+                    var index = -1;
+                    if (item.AnimationRefs.Count != 1)
+                        index = 1;
+                    foreach (var animation in item.AnimationRefs)
+                    {
+                        output.Add(new AnimationBinEntryGenericFormat()
+                        {
+                            AnimationFile = animation.AnimationFile,
+                            MetaFile = animation.AnimationMetaFile,
+                            SoundFile = animation.AnimationSoundMetaFile,
+                            SlotName = AnimationSlotTypeHelperWh3.GetFromId((int)item.AnimationId).Value,
+                            Index = index
+                        });
+                    }
+                }
+
+                return output;
+            } 
+        }
+
+        string IAnimationBinGenericFormat.FullPath => FileName;
+
+        AnimationPackFile IAnimationBinGenericFormat.PackFileReference => Parent;
     }
 
     public class AnimationBinEntry
     {
         public uint AnimationId { get; set; }
         public float BlendIn { get; set; }
-        public float BlendOut{ get; set; }
+        public float SelectionWeight{ get; set; }
         public int WeaponBools { get; set; }
         public bool Unk { get; set; }
         public List<AnimationRef> AnimationRefs { get; set; } = new List<AnimationRef>();

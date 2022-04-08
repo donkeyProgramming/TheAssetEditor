@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>hnet.com-image (1).ico</ApplicationIcon>
-    <AssemblyName>AssetEditor v0.33</AssemblyName>
+    <AssemblyName>AssetEditor v0.34</AssemblyName>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -46,9 +46,9 @@
 		<PackageProjectUrl>https://github.com/olekristianhomelien/TheAssetEditor</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/olekristianhomelien/TheAssetEditor</RepositoryUrl>
 		<RepositoryType>GIT</RepositoryType>
-		<AssemblyVersion>0.33.0.0</AssemblyVersion>
-		<FileVersion>0.33.0.0</FileVersion>
-		<PackageId>AssetEditor v0.33</PackageId>
+		<AssemblyVersion>0.34.0.0</AssemblyVersion>
+		<FileVersion>0.34.0.0</FileVersion>
+		<PackageId>AssetEditor v0.34</PackageId>
 	</PropertyGroup>
 
 </Project>

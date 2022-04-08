@@ -340,8 +340,9 @@ namespace AnimationEditor.SkeletonEditor
             var skeletonClip = AnimationClip.CreateSkeletonAnimation(_techSkeletonNode.Skeleton);
             var animFile = skeletonClip.ConvertToFileFormat(_techSkeletonNode.Skeleton);
             animFile.Header.SkeletonName = SourceSkeletonName.Value;
+            var animationBytes = AnimationFile.ConvertToBytes(animFile);
 
-            var result = SaveHelper.Save(_pfs, SkeletonName.Value, null, AnimationFile.ConvertToBytes(animFile));
+            var result = SaveHelper.Save(_pfs, SkeletonName.Value, null, animationBytes);
             SkeletonName.Value = _pfs.GetFullPath(result);
 
             var invMatrixFile = _techSkeletonNode.Skeleton.CreateInvMatrixFile();

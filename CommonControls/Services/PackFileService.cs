@@ -52,9 +52,8 @@ namespace CommonControls.Services
                     using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
                     {
                         var container = Load(reader, packFileSystemPath);
-
                         var notCaPacksLoaded = Database.PackFiles.Count(x => !x.IsCaPackFile);
-                        if (notCaPacksLoaded == 0 && setToMainPackIfFirst)
+                        if (container.IsCaPackFile == false && setToMainPackIfFirst)
                             SetEditablePack(container);
 
                         _settingsService.AddRecentlyOpenedPackFile(packFileSystemPath);
@@ -74,6 +73,16 @@ namespace CommonControls.Services
         public List<PackFile> FindAllWithExtention(string extention, PackFileContainer packFileContainer = null)
         {
             return FindAllWithExtentionIncludePaths(extention, packFileContainer).Select(x => x.Item2).ToList();
+        }
+
+        public List<PackFile> GetAllAnimPacks()
+        {
+            var animPacks = FindAllWithExtention(@".animpack");
+            var itemsToRemove = animPacks.Where(x => GetFullPath(x).Contains("animation_culture_packs", StringComparison.InvariantCultureIgnoreCase)).ToList();
+            foreach (var item in itemsToRemove)
+                animPacks.Remove(item);
+
+            return animPacks;
         }
 
         public List<(string FileName, PackFile Pack)> FindAllWithExtentionIncludePaths(string extention, PackFileContainer packFileContainer = null)

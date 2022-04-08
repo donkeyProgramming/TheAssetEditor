@@ -7,7 +7,10 @@ using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows;
 
 namespace CommonControls.Editors.AnimationPack
@@ -61,13 +64,13 @@ namespace CommonControls.Editors.AnimationPack
             return null;
         }
 
-        public void CreateEmptyWarhammerAnimSetFile()
+        public void CreateEmptyWarhammer3AnimSetFile()
         {
             var fileName = GetAnimSetFileName();
             if (fileName == null)
                 return;
 
-            var animSet = AnimationPackFile.CreateExampleWarhammerAnimSet(fileName);
+            var animSet = AnimationPackSampleDataCreator.CreateExampleWarhammer3AnimSet(fileName);
             AnimationPackItems.PossibleValues.Add(animSet);
             AnimationPackItems.UpdatePossibleValues(AnimationPackItems.PossibleValues);
         }
@@ -79,7 +82,7 @@ namespace CommonControls.Editors.AnimationPack
             if (fileName == null)
                 return;
 
-            var animSet = AnimationPackFile.CreateExample3kAnimSet(fileName);
+            var animSet = AnimationPackSampleDataCreator.CreateExample3kAnimSet(fileName);
             AnimationPackItems.PossibleValues.Add(animSet);
             AnimationPackItems.UpdatePossibleValues(AnimationPackItems.PossibleValues);
         }
@@ -109,8 +112,8 @@ namespace CommonControls.Editors.AnimationPack
                 _activeConverter = new AnimationBinFileToXmlConverter();
             else if (seletedFile is AnimationSet3kFile animSet3k)
                 _activeConverter = new AnimationSet3kFileToXmlConverter(_skeletonAnimationLookUpHelper);
-            else if (seletedFile is FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBin wh3Bin)
-                _activeConverter = new AnimationBinWh3FileToXmlConverter();
+            else if (seletedFile is FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3 wh3Bin)
+                _activeConverter = new AnimationBinWh3FileToXmlConverter(_skeletonAnimationLookUpHelper);
 
             if (seletedFile == null || _activeConverter == null || seletedFile.IsUnknownFile)
             {
@@ -156,6 +159,8 @@ namespace CommonControls.Editors.AnimationPack
             seletedFile.IsChanged.Value = true;
 
             SelectedItemViewModel.ResetChangeLog();
+            HasUnsavedChanges = true;
+
 
             return true;
         }
@@ -183,7 +188,14 @@ namespace CommonControls.Editors.AnimationPack
 
             var savePath = _pfs.GetFullPath(MainFile);
 
-            SaveHelper.Save(_pfs, savePath, null, AnimationPackSerializer.ConvertToBytes(newAnimPack));
+            var result = SaveHelper.Save(_pfs, savePath, null, AnimationPackSerializer.ConvertToBytes(newAnimPack));
+            if (result != null)
+            {
+                HasUnsavedChanges = false;
+                foreach (var file in AnimationPackItems.PossibleValues)
+                    file.IsChanged.Value = false;
+            }
+
             return true;
         }
 
@@ -226,6 +238,33 @@ namespace CommonControls.Editors.AnimationPack
             //}
 
             return true;
+        }
+
+        public void ExportAnimationSlotsWh3Action()
+        {
+            var slots = AnimationSlotTypeHelperWh3.Values.Select(x => x.Id + "\t\t" + x.Value).ToList();
+            SaveAnimationSlotsToFile(slots);
+        }
+
+        public void ExportAnimationSlotsWh2Action()
+        {
+            var slots = AnimationSlotTypeHelper.Values.Select(x => x.Id + "\t\t" + x.Value).ToList();
+            SaveAnimationSlotsToFile(slots);
+        }
+
+        void SaveAnimationSlotsToFile(List<string> slots)
+        {
+            using var dlg = new System.Windows.Forms.SaveFileDialog();
+            dlg.Filter = "Text files(*.txt) | *.txt | All files(*.*) | *.* ";
+            if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                return;
+            string path = dlg.FileName;
+
+            StringBuilder sb = new StringBuilder();
+            foreach (var slot in slots)
+                sb.AppendLine(slot);
+
+            File.WriteAllText(path, sb.ToString());
         }
 
         public static void ShowPreviewWinodow(AnimationPackFile animationPackFile, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, string selectedFileName)

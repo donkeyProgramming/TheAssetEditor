@@ -5,6 +5,18 @@ using System.Text;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
+
+    public interface IAnimatedPropMeta
+    {
+        public string ModelName { get; set; }
+        public string AnimationName { get; set; }
+        public float StartTime { get; set; }
+        public float EndTime { get; set; }
+        public int BoneId { get; set; }
+        public Vector3 Position { get; set; }
+        public Vector4 Orientation { get; set; }
+    }
+
     [MetaData("ANIMATED_PROP", 3)]
     public class AnimatedProp_v3 : BaseMetaEntry
     {
@@ -41,7 +53,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 
 
     [MetaData("ANIMATED_PROP", 10)]
-    public class AnimatedProp_v10 : DecodedMetaEntryBase
+    public class AnimatedProp_v10 : DecodedMetaEntryBase, IAnimatedPropMeta
     {
         [MetaDataTag(5)]
         public bool DistanceCulled { get; set; }
@@ -79,7 +91,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     }
 
     [MetaData("ANIMATED_PROP", 12)]
-    public class AnimatedProp_v12 : DecodedMetaEntryBase
+    public class AnimatedProp_v12 : DecodedMetaEntryBase, IAnimatedPropMeta
     {
         [MetaDataTag(5)]
         public bool DistanceCulled { get; set; }
@@ -116,7 +128,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     }
 
     [MetaData("ANIMATED_PROP", 13)]
-    public class AnimatedProp_v13 : DecodedMetaEntryBase
+    public class AnimatedProp_v13 : DecodedMetaEntryBase, IAnimatedPropMeta
     {
         [MetaDataTag(5)]
         public bool DistanceCulled { get; set; }
@@ -156,7 +168,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     }
 
     [MetaData("ANIMATED_PROP", 14)]
-   public class AnimatedProp_v14 : DecodedMetaEntryBase
+   public class AnimatedProp_v14 : DecodedMetaEntryBase, IAnimatedPropMeta
     {
 
         [MetaDataTag(5, "")]
