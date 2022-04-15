@@ -22,11 +22,16 @@ namespace CommonControls.BaseDialogs
             InitializeComponent();
         }
 
-        public TextInputWindow(string title, string initialValue = "")
+        public TextInputWindow(string title, string initialValue = "", bool focusTextInput = false)
         {
             InitializeComponent();
             Title = title;
             TextValue = initialValue;
+
+            if (focusTextInput)
+            {
+                TextBoxItem.Focus();
+            }
         }
 
         public string TextValue 

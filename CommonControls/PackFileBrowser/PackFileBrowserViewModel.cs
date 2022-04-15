@@ -1,4 +1,4 @@
-﻿using CommonControls.Common;
+using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
@@ -23,6 +23,7 @@ namespace CommonControls.PackFileBrowser
         public ObservableCollection<TreeNode> Files { get; set; } = new ObservableCollection<TreeNode>();
         public PackFileFilter Filter { get; private set; }
         public ICommand DoubleClickCommand { get; set; }
+        public ICommand ClearTextCommand { get; set; }
 
         TreeNode _selectedItem;
         public TreeNode SelectedItem
@@ -41,6 +42,7 @@ namespace CommonControls.PackFileBrowser
         public PackFileBrowserViewModel(PackFileService packFileService, bool ignoreCaFiles = false)
         {
             DoubleClickCommand = new RelayCommand<TreeNode>(OnDoubleClick);
+            ClearTextCommand = new RelayCommand(OnClearText);
 
             _packFileService = packFileService;
             _packFileService.Database.PackFileContainerLoaded += ReloadTree;
@@ -115,6 +117,11 @@ namespace CommonControls.PackFileBrowser
                     parent = parent.Parent;
                 }
             }
+        }
+
+        protected virtual void OnClearText()
+        {
+            Filter.FilterText = "";
         }
 
         protected virtual void OnDoubleClick(TreeNode node) 
