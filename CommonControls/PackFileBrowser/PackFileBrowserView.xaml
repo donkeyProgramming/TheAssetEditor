@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="CommonControls.PackFileBrowser.PackFileBrowserView"
+<UserControl x:Class="CommonControls.PackFileBrowser.PackFileBrowserView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -20,7 +20,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <TextBox KeyboardNavigation.TabIndex="0" KeyboardNavigation.IsTabStop="True"  Grid.Row="0" Text="{Binding Filter.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=350}" behaviors:TextBoxExtensions.Watermark="Search filter">
+        <TextBox x:Name="FilterTextBoxItem" KeyboardNavigation.TabIndex="0" KeyboardNavigation.IsTabStop="True"  Grid.Column="1" Grid.Row="0" Text="{Binding Filter.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=350}" behaviors:TextBoxExtensions.Watermark="Search filter">
             <TextBox.Resources>
                 <Style TargetType="{x:Type TextBox}">
                     <Style.Triggers>
@@ -30,8 +30,12 @@
                     </Style.Triggers>
                 </Style>
             </TextBox.Resources>
-
         </TextBox>
+        <Button Click="ClearButtonClick" Command="{Binding ClearTextCommand}" Padding="4,0" HorizontalAlignment="Right" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="0">
+            <Button.Content>
+                Clear
+            </Button.Content>
+        </Button>
 
         <TreeView  x:Name="tvParameters"
             AllowDrop="True"

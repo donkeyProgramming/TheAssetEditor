@@ -1,4 +1,4 @@
-﻿using CommonControls.BaseDialogs;
+using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
@@ -156,7 +156,7 @@ namespace CommonControls.PackFileBrowser
                 return;
             }
 
-            var window = new TextInputWindow("Create folder");
+            var window = new TextInputWindow("Create folder", default, true);
             if (window.ShowDialog() == true)
                 _selectedNode.Children.Add(new TreeNode(window.TextValue, NodeType.Directory, _selectedNode.FileOwner, _selectedNode));
         }

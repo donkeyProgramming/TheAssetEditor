@@ -100,6 +100,11 @@ namespace CommonControls.PackFileBrowser
             }
         }
 
+        private void ClearButtonClick(object sender, RoutedEventArgs e)
+        {
+            FilterTextBoxItem.Focus();
+        }
+
         private void TreeViewItem_PreviewMouseRightButtonDown(object sender, MouseEventArgs e)
         {
             TreeViewItem item = sender as TreeViewItem;
