@@ -2,8 +2,11 @@
 using CommonControls.Services;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using MonoGame.Framework.WpfInterop;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Input;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
@@ -54,8 +57,22 @@ namespace KitbasherEditor.ViewModels
             _sceneManager.SceneObjectRemoved += (a, b) => RebuildTree();
 
             ContextMenu = new SceneExplorerContextMenuHandler(_commandExecutor);
+            ContextMenu.SelectedNodesChanged += OnSelectedNodesChanged;
 
             SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
+        }
+
+        private void OnSelectedNodesChanged(IEnumerable<ISceneNode> selectedNodes)
+        {
+
+            foreach (var node in SelectedObjects.ToList())
+            {
+                SelectedObjects.Remove(node);
+            }
+            foreach (var node in selectedNodes)
+            {
+                SelectedObjects.Add(node);
+            }
         }
 
         private void SelectedObjects_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -64,6 +81,34 @@ namespace KitbasherEditor.ViewModels
             {
                 SelectedObjects.CollectionChanged -= SelectedObjects_CollectionChanged;
                 _selectionManager.SelectionChanged -= SelectionChanged;
+
+                try
+                {
+                    if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add && Keyboard.IsKeyDown(Key.LeftCtrl))
+                    {
+                        var newItem = e.NewItems[0] as ISceneNode;
+                        var newItemIndex = newItem.Parent.Children.IndexOf(newItem);
+                        var selectedWithoutNewItem = SelectedObjects.Except(new List<ISceneNode>(){newItem});
+
+                        if (selectedWithoutNewItem.Any())
+                        {
+                            var existingSelectionIndex = selectedWithoutNewItem
+                                .Select(obj => newItem.Parent.Children.IndexOf(obj))
+                                .OrderBy(index => Math.Abs(index-newItemIndex))
+                                .First();
+
+                            var isAscending = newItemIndex < existingSelectionIndex;
+                            var min = isAscending ? newItemIndex : existingSelectionIndex;
+                            var max = isAscending ? existingSelectionIndex : newItemIndex;
+
+                            for (int i=min; i<max; i++)
+                            {
+                                var element = newItem.Parent.Children.ElementAt(i);
+                                SelectedObjects.Add(element);
+                            }
+                        }
+                    }
+                } catch {}
 
                 var objectState = new ObjectSelectionState();
                 foreach (var item in SelectedObjects)
@@ -110,12 +155,12 @@ namespace KitbasherEditor.ViewModels
             if (SelectedObjects.Count == 1)
             {
                 SelectedNodeViewModel = SceneNodeViewFactory.Create(SelectedObjects.First(), _skeletonAnimationLookUpHelper, _packFileService, _animationControllerViewModel, _componentManager);
-                ContextMenu.Create(SelectedObjects.First());
+                ContextMenu.Create(SelectedObjects);
             }
             else
             {
                 SelectedNodeViewModel = null;
-                ContextMenu.Create(null);
+                ContextMenu.Create(SelectedObjects);
             }
         }
 
