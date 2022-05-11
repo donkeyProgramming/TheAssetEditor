@@ -1,5 +1,6 @@
 ﻿using CommonControls.Common;
 using MonoGame.Framework.WpfInterop;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Components.Component;
@@ -69,5 +70,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         public void ToggleBackFaceRendering() => _renderEngineComponent.ToggelBackFaceRendering();
         public void ToggleLargeSceneRendering() => _renderEngineComponent.ToggleLargeSceneRendering();
+
+        public void GenerateWsModelForWh2() => WsModelGeneratorService.GenerateWsModelForWh2();
     }
 }
