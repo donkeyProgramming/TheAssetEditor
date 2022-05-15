@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Windows.Input;
 
 namespace CommonControls.Editors.AnimationPack
 {
@@ -32,11 +33,38 @@ namespace CommonControls.Editors.AnimationPack
         SimpleTextEditorViewModel _selectedItemViewModel;
         public SimpleTextEditorViewModel SelectedItemViewModel { get => _selectedItemViewModel; set => SetAndNotify(ref _selectedItemViewModel, value); }
 
+        public ICommand RemoveCommand { get; set; }
+        public ICommand RenameCommand { get; set; }
 
         public AnimPackViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
+
+            RemoveCommand = new RelayCommand(Remove);
+            RenameCommand = new RelayCommand(Rename);
+        }
+
+        private void Rename()
+        {
+            var animFile = AnimationPackItems.PossibleValues.FirstOrDefault(file => file == AnimationPackItems.SelectedItem);
+            if (animFile == null)
+                return;
+
+            var window = new TextInputWindow("Rename Anim File", animFile.FileName);
+            if (window.ShowDialog() == true)
+                animFile.FileName = window.TextValue;
+
+            // way to refresh the view
+            AnimationPackItems.RefreshFilter();
+        }
+
+        private void Remove()
+        {
+            AnimationPackItems.PossibleValues.Remove(AnimationPackItems.SelectedItem);
+
+            // way to refresh the view
+            AnimationPackItems.RefreshFilter();
         }
 
         public void Load(AnimationPackFile animPack)
