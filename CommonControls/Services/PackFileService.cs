@@ -60,12 +60,11 @@ namespace CommonControls.Services
                         return container;
                     }
                 }
-
-                
             }
             catch (Exception e)
             {
-                _logger.Here().Error($"Trying to load file {packFileSystemPath}. Error : {e}");
+                MessageBox.Show($"Failed to load file {packFileSystemPath}. Error : {e.Message}", "Error");
+                _logger.Here().Error($"Failed to load file {packFileSystemPath}. Error : {e}");
                 return null;
             }
         }
@@ -317,6 +316,9 @@ namespace CommonControls.Services
         // ---------------------------
         public PackFileContainer CreateNewPackFileContainer(string name, PackFileCAType type)
         {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new Exception("Name can not be empty");
+
             var newPackFile = new PackFileContainer(name)
             {
                 Header = new PFHeader("PFH5", type),
@@ -331,6 +333,9 @@ namespace CommonControls.Services
         {
             if (container.IsCaPackFile)
                 throw new Exception("Can not add files to ca pack file");
+
+            if (string.IsNullOrWhiteSpace(newFile.Name))
+                throw new Exception("Name can not be empty");
 
             if (!string.IsNullOrWhiteSpace(directoryPath))
                 directoryPath += "\\";
@@ -502,6 +507,9 @@ namespace CommonControls.Services
             if (pf.IsCaPackFile)
                 throw new Exception("Can not rename in ca pack file");
 
+            if (string.IsNullOrWhiteSpace(newName))
+                throw new Exception("Name can not be empty");
+
             var oldNodePath = node.GetFullPath();
             node.Name = newName;
             var newNodePath = node.GetFullPath();
@@ -510,7 +518,10 @@ namespace CommonControls.Services
             foreach (var (path, file) in files)
             {
                 pf.FileList.Remove(path);
-                var newPath = path.Replace(oldNodePath, newNodePath);
+                var newPath = newNodePath;
+                if (oldNodePath.Length != 0)
+                    newPath = path.Replace(oldNodePath, newNodePath);
+
                 pf.FileList[newPath] = file;
             }
 
@@ -526,6 +537,9 @@ namespace CommonControls.Services
         {
             if (pf.IsCaPackFile)
                 throw new Exception("Can not rename file in ca pack file");
+
+            if (string.IsNullOrWhiteSpace(newName))
+                throw new Exception("Name can not be empty");
 
             var key = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
             pf.FileList.Remove(key);

@@ -11,7 +11,7 @@ namespace CommonControls.FileTypes.MetaData
         public static Dictionary<string, Type> _typeTable;
         public static Dictionary<string, string> _descriptionMap;
 
-        static void EnsureMappingTableCreated()
+        public static void EnsureMappingTableCreated()
         {
             if (_typeTable != null)
                 return;
@@ -46,7 +46,29 @@ namespace CommonControls.FileTypes.MetaData
 
                 // Ensure we have a decription
                 GetDescription(instance.Attributes.First().Name);
-            } 
+                
+            }
+
+            return;
+            // Check that we can create an instance
+            foreach (var type in _typeTable.Keys)
+            {
+                var instance = CreateDefault(type);
+
+                Type t = instance.GetType();
+                PropertyInfo[] props = t.GetProperties();
+
+                foreach (var prop in props)
+                {
+                    if (prop.Name.ToLower() == "data")
+                        continue;
+
+                    var value = prop.GetValue(instance);
+                    if (value == null)
+                        throw new Exception($"{type} contains null value for attribute {prop.Name}");
+                }
+               
+            }
         }
 
         static void CreateDescriptions()
@@ -129,7 +151,6 @@ namespace CommonControls.FileTypes.MetaData
 
         public static string GetDescription(string metaDataTagName)
         {
-            EnsureMappingTableCreated();
             if (_descriptionMap.ContainsKey(metaDataTagName) == false)
                 throw new Exception($"Unable to get description of {metaDataTagName}");
             return _descriptionMap[metaDataTagName];
@@ -137,7 +158,6 @@ namespace CommonControls.FileTypes.MetaData
 
         public static string GetDescriptionSafe(string metaDataTagName)
         {
-            EnsureMappingTableCreated();
             if (_descriptionMap.ContainsKey(metaDataTagName) == false)
                 return "Missing";
             return _descriptionMap[metaDataTagName];
@@ -145,7 +165,6 @@ namespace CommonControls.FileTypes.MetaData
 
         public static List<string> GetSupportedTypes()
         {
-            EnsureMappingTableCreated();
             return _typeTable.Select(x => x.Key).ToList();
         }
 
@@ -156,8 +175,6 @@ namespace CommonControls.FileTypes.MetaData
 
         static Type GetTypeFromMeta(BaseMetaEntry entry)
         {
-            EnsureMappingTableCreated();
-
             var key = entry.Name + "_" + entry.Version;
             if (_typeTable.ContainsKey(key) == false)
                 return null;
@@ -167,8 +184,6 @@ namespace CommonControls.FileTypes.MetaData
 
         public static BaseMetaEntry DeSerialize(UnknownMetaEntry entry, out string errorMessage)
         {
-            EnsureMappingTableCreated();
-
             var entryInfo = GetEntryInformation(entry);
             if (entryInfo == null)
             {
@@ -237,14 +252,12 @@ namespace CommonControls.FileTypes.MetaData
             return output;
         }
 
-        internal static DecodedMetaEntryBase CreateDefault(string itemName)
+        internal static BaseMetaEntry CreateDefault(string itemName)
         {
-            EnsureMappingTableCreated();
-
             if (_typeTable.ContainsKey(itemName) == false)
                 throw new Exception("Unkown metadata item " + itemName);
 
-            var instance = Activator.CreateInstance(_typeTable[itemName]) as DecodedMetaEntryBase;
+            var instance = Activator.CreateInstance(_typeTable[itemName]) as BaseMetaEntry;
 
             var itemNameSplit = itemName.ToUpper().Split("_");
             instance.Version = int.Parse(itemNameSplit.Last());

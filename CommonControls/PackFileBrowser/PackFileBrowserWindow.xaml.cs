@@ -25,6 +25,15 @@ namespace CommonControls.PackFileBrowser
             PreviewKeyDown += HandleEsc;
         }
 
+        ~PackFileBrowserWindow()
+        {
+            PreviewKeyDown -= HandleEsc;
+            ViewModel.FileOpen -= ViewModel_FileOpen;
+            ViewModel.Dispose();
+            ViewModel = null;
+            DataContext = null;
+        }
+
         private void HandleEsc(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape)

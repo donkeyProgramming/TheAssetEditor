@@ -73,7 +73,7 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
         public List<AnimationFragmentFile> LoadFragmentsForSkeleton(string skeletonName, bool onlyPacksThatCanBeSaved = false)
         {
             var outputFragments = new List<AnimationFragmentFile>();
-            var animPacks = _pfs.FindAllWithExtention(@".animpack");
+            var animPacks = _pfs.GetAllAnimPacks();
             foreach (var animPack in animPacks)
             {
                 if (onlyPacksThatCanBeSaved == true)

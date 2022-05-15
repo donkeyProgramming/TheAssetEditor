@@ -191,6 +191,12 @@ namespace View3D.Services
                         else
                             mesh.Material.AlphaMode = AlphaMode.Opaque;
 
+                        foreach (var oldTexture in mesh.Material.GetAllTextures())
+                        {
+                            mesh.Material.SetTexture(oldTexture.TexureType, "");
+                            mesh.UpdateTexture("", oldTexture.TexureType);
+                        }
+
                         foreach (var newTexture in materialConfig.Textures)
                         {
                             mesh.Material.SetTexture(newTexture.Key, newTexture.Value);

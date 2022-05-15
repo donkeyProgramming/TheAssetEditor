@@ -16,7 +16,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         [MetaDataTag(7)]
         public float BlendOutTime { get; set; }
 
-        public virtual string AnimationSlotName { get; }
+        public virtual string AnimationSlotName { get; } = "";
         public virtual string[] SkeletonNameAlternatives { get; } = new string[] { "" };
     }
 
@@ -104,8 +104,6 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         [MetaDataTag(8)]
         public float UnknownFloat { get; set; }
     }
-
-
 
     [MetaData("WEAPON_HIP", 10)]
     public class WeaponHip_v10 : DockEquipment

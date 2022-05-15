@@ -33,7 +33,6 @@ namespace View3D.Animation.AnimationChange
                 var offsetFrame = AnimationSampler.Sample(0, _skeletonProvider.Skeleton, _dockAnimation);
                 _offset = offsetFrame.GetSkeletonAnimatedWorldDiff(_skeletonProvider.Skeleton, _dockTargetkBoneId, _equipmentSlotToDock);
 
-
                 var propTransform = _skeletonProvider.Skeleton.GetAnimatedWorldTranform(_dockTargetkBoneId);
                 frame.BoneTransforms[_equipmentSlotToDock].WorldTransform = _offset * propTransform;
             }

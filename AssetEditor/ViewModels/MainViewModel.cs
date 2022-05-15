@@ -3,6 +3,7 @@ using AssetEditor.Views.Settings;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.DB;
+using CommonControls.FileTypes.MetaData;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.Sound;
 using CommonControls.PackFileBrowser;
@@ -101,11 +102,11 @@ namespace AssetEditor.ViewModels
                         MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
                 }
             }
-          
+
+            MetaDataTagDeSerializer.EnsureMappingTableCreated();
+
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
-              
-
                 //var reportService = new FileListReportGenerator(packfileService, settingsService);
                 //reportService.CompareFiles(@"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.0.2.0 PackFiles.csv", @"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.1.0.0 PackFiles.csv");
 

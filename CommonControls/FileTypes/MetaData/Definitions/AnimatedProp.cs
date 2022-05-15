@@ -20,7 +20,6 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     [MetaData("ANIMATED_PROP", 3)]
     public class AnimatedProp_v3 : BaseMetaEntry
     {
-
         [MetaDataTag(1, "Time in second when the Tag takes effect")]
         public float StartTime { get; set; }
 
@@ -38,17 +37,16 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public string AnimationName { get; set; } = "";
 
         [MetaDataTag(6)]
-        public Vector3 Position { get; set; }
+        public Vector3 Position { get; set; } = Vector3.Zero;
 
         [MetaDataTag(7, "", MetaDataTagAttribute.DisplayType.EulerVector)]
-        public Vector4 Orientation { get; set; }
+        public Vector4 Orientation { get; set; } = new Vector4(0, 0, 0, 1);
 
         [MetaDataTag(8)]
         public int Unkown1 { get; set; }
 
         [MetaDataTag(9)]
         public int Unkown0 { get; set; }
-
     }
 
 
@@ -68,7 +66,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public Vector3 Position { get; set; }
 
         [MetaDataTag(9, "", MetaDataTagAttribute.DisplayType.EulerVector)]
-        public Vector4 Orientation { get; set; }
+        public Vector4 Orientation { get; set; } = new Vector4(0, 0, 0, 1);
 
         [MetaDataTag(10)]
         public int BoneId { get; set; }
@@ -109,7 +107,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public Vector3 Position { get; set; }
 
         [MetaDataTag(10, "", MetaDataTagAttribute.DisplayType.EulerVector)]
-        public Vector4 Orientation { get; set; }
+        public Vector4 Orientation { get; set; } = new Vector4(0, 0, 0, 1);
 
         [MetaDataTag(11)]
         public int BoneId { get; set; }
@@ -146,7 +144,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public Vector3 Position { get; set; }
 
         [MetaDataTag(10, "", MetaDataTagAttribute.DisplayType.EulerVector)]
-        public Vector4 Orientation { get; set; }
+        public Vector4 Orientation { get; set; } = new Vector4(0, 0, 0, 1);
 
         [MetaDataTag(11)]
         public float Unkown { get; set; }
@@ -190,10 +188,10 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public Vector3 Position { get; set; }
 
         [MetaDataTag(11, "", MetaDataTagAttribute.DisplayType.EulerVector)]
-        public Vector4 Orientation { get; set; }
+        public Vector4 Orientation { get; set; } = new Vector4(0, 0, 0, 1);
 
         [MetaDataTag(12)]
-        public float Unkown { get; set; }
+        public float Scale { get; set; } = 1;
 
         [MetaDataTag(13)]
         public int BoneId { get; set; }

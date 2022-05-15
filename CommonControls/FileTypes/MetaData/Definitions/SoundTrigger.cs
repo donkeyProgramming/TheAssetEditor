@@ -22,6 +22,6 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     class SoundTrigger_v11 : SoundTrigger_v10
     {
         [MetaDataTag(8)]
-        public string Unknown { get; set; }
+        public string Unknown { get; set; } = "";
     }
 }
