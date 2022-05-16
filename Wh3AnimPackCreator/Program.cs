@@ -1,6 +1,14 @@
-﻿using CommonControls.FileTypes.PackFiles.Models;
+﻿using CommonControls.FileTypes.AnimationPack;
+using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
+using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3;
+using CommonControls.FileTypes.MetaData;
+using CommonControls.FileTypes.MetaData.Definitions;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
+using MoreLinq;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Wh3AnimPackCreator
@@ -9,16 +17,186 @@ namespace Wh3AnimPackCreator
     {
         static void Main(string[] args)
         {
-            var wh3 = new InformationContainer(GameTypeEnum.Warhammer3);
+            //AnimationSlotTypeHelper
+            var content = File.ReadAllLines(@"C:\Users\ole_k\Desktop\Strings\AllAnimTypesTroy.txt");
+            var counter = 0;
+            foreach (var line in content)
+            {
+                var result =  AnimationSlotTypeHelper.GetfromValue(line);
+                if (result == null)
+                {
+                    Console.WriteLine(line);
+                    counter++;
+                }
+
+
+            }
+
+
+
+
+            MetaDataTagDeSerializer.EnsureMappingTableCreated();
+            var metaParser = new MetaDataFileParser();
+            var settings = new ApplicationSettingsService();
+            var gameSettings = settings.CurrentSettings.GameDirectories.First(x => x.Game == GameTypeEnum.Troy);
+
+            var pfs = new PackFileService(new PackFileDataBase(), null, settings);
+            pfs.LoadAllCaFiles(gameSettings.Path, gameSettings.Game.ToString());
+
+            try
+            {
+                // Create output packfile
+                var outputPfs = new PackFileService(new PackFileDataBase(), null, new ApplicationSettingsService());
+                outputPfs.CreateNewPackFileContainer("AnimResource_v0_cerberus", PackFileCAType.MOD);
+                AnimationPackFile outputAnimPackFile = new AnimationPackFile();
+
+
+                var currentFragmentName = @"animations/animation_tables/cerb1_mth_dlc_cerberus.frg";
+                PrintDebugInformation(pfs, currentFragmentName);
+
+                // Create output bin
+                //var currentOutputAnimBin = new AnimationBinWh3(Path.GetFileNameWithoutExtension(currentFragmentName));
+                
+                // Do the work
+                var animContainer = GetAnimationContainers(pfs, currentFragmentName);
+
+                var groupedSlots = animContainer.FragmentFile.Fragments.GroupBy(x => x.Slot.Value).ToList();
+
+                var animFilesToCopy = new List<string>();
+                var metaFilesToCopy = new List<string>();
+                foreach (var groupedSlot in groupedSlots)
+                {
+                    Console.WriteLine($"\t {groupedSlot.Key}[{groupedSlot.Count()}]");
+
+                    foreach (var slot in groupedSlot)
+                    {
+                        if (string.IsNullOrWhiteSpace(slot.AnimationFile) == false)
+                            animFilesToCopy.Add(slot.AnimationFile);
+
+                        if (string.IsNullOrWhiteSpace(slot.MetaDataFile) == false)
+                            metaFilesToCopy.Add(slot.MetaDataFile);
+                    }
+                }
+
+                var distinctAnimFiles = animFilesToCopy.Distinct();
+                Console.WriteLine($"AnimFiles {distinctAnimFiles.Count()}:");
+                distinctAnimFiles.ForEach(i => Console.WriteLine($"\t {i}"));
+
+                var distinctMetaFiles = metaFilesToCopy.Distinct();
+                Console.WriteLine($"MetaFiles {distinctMetaFiles.Count()}:");
+                distinctMetaFiles.ForEach(i => Console.WriteLine($"\t {i}"));
+
+                // Add the packfile
+
+
+                //outputAnimPackFile.
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+
+            //var wh3 = new InformationContainer(GameTypeEnum.Warhammer3);
             //var troy = new InformationContainer(GameTypeEnum.Troy);
 
 
         }
 
 
+        static (AnimationBin AnimBin, AnimationFragmentFile FragmentFile) GetAnimationContainers(PackFileService pfs, string fragmentName)
+        {
+            var gameAnimPackFile = pfs.FindFile(@"animations\animation_tables\animation_tables.animpack");
+            var gameAnimPack = AnimationPackSerializer.Load(gameAnimPackFile, pfs);
+            var animBin = gameAnimPack.Files.First(x => x.FileName == @"animations/animation_tables/animation_tables.bin") as AnimationBin;
+            var fragment = gameAnimPack.Files.First(x => x.FileName == fragmentName) as AnimationFragmentFile;
 
-        static void CollectData(PackFile s)
-        { }
+            return (animBin, fragment);
+        }
+
+
+        static void PrintDebugInformation(PackFileService pfs, string fragmentName)
+        {
+            try
+            {
+                var metaParser = new MetaDataFileParser();
+                var currentFragmentName = fragmentName;
+                Console.Clear();
+                Console.WriteLine($"Starting Debug Print - {currentFragmentName}");
+
+                var gameAnimPackFile = pfs.FindFile(@"animations\animation_tables\animation_tables.animpack");
+                var gameAnimPack = AnimationPackSerializer.Load(gameAnimPackFile, pfs);
+                var animBin = gameAnimPack.Files.First(x => x.FileName == @"animations/animation_tables/animation_tables.bin") as AnimationBin;
+                var fragment = gameAnimPack.Files.First(x => x.FileName == currentFragmentName) as AnimationFragmentFile;
+
+                var allMetaTags = new List<string>();
+                var allEffects = new List<string>();
+                var allSoundEvents = new List<string>();
+
+                foreach (var slot in fragment.Fragments)
+                {
+                    var animationName = slot.AnimationFile;
+                    var meta = slot.MetaDataFile;
+                    var sound = slot.SoundMetaDataFile;
+
+                    if (string.IsNullOrWhiteSpace(meta) == false)
+                    {
+                        var metaPackFile = pfs.FindFile(meta);
+                        if (metaPackFile != null)
+                        {
+                            var metaFile = metaParser.ParseFile(metaPackFile.DataSource.ReadData());
+                            foreach (var metaEntry in metaFile.Items)
+                            {
+                                allMetaTags.Add(metaEntry.DisplayName);
+
+                                if (metaEntry is Effect_v11 effectMeta)
+                                    allEffects.Add(effectMeta.VfxName);
+                            }
+                        }
+                    }
+
+                    if (string.IsNullOrWhiteSpace(sound) == false)
+                    {
+                        var metaPackFile = pfs.FindFile(sound);
+                        if (metaPackFile != null)
+                        {
+                            var metaFile = metaParser.ParseFile(metaPackFile.DataSource.ReadData());
+                            foreach (var metaEntry in metaFile.Items)
+                            {
+                                allMetaTags.Add(metaEntry.DisplayName);
+
+                                if (metaEntry is SoundTrigger_v10 soundMeta)
+                                    allSoundEvents.Add(soundMeta.SoundEvent);
+                            }
+                        }
+                    }
+                }
+
+                // Print data
+                var distinctMetaTags = allMetaTags.Distinct();
+                var distinctEffects = allEffects.Distinct();
+                var distinctSoundEvents = allSoundEvents.Distinct();
+
+                Console.WriteLine("\t MetaTags:");
+                foreach (var item in distinctMetaTags)
+                    Console.WriteLine($"\t\t {item}");
+
+                Console.WriteLine("\n\t Effects:");
+                foreach (var item in distinctEffects)
+                    Console.WriteLine($"\t\t {item}");
+
+                Console.WriteLine("\n\t SoundEvents:");
+                foreach (var item in distinctSoundEvents)
+                    Console.WriteLine($"\t\t {item}");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            Console.WriteLine($"Done Debug Print");
+        }
 
 
     }

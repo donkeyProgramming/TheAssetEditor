@@ -5,6 +5,7 @@ using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
@@ -110,7 +111,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
             return binFile.ToByteArray();
         }
 
-        protected override ITextConverter.SaveError Validate(XmlFormat type, string s, PackFileService pfs)
+        protected override ITextConverter.SaveError Validate(XmlFormat type, string s, PackFileService pfs, string filepath)
         {
             try
             {
@@ -139,6 +140,19 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
                 if (pfs.FindFile(type.Data.LocomotionGraph) == null)
                     errorList.Error("LocomotionGraph", $"LocomotionGraph {type.Data.LocomotionGraph} is not found");
+
+                if (string.IsNullOrWhiteSpace(type.Data.Name))
+                {
+                    errorList.Error("Name", $"Name can not be empty");
+                }
+                else
+                {
+                    var filename = Path.GetFileNameWithoutExtension(filepath).ToLowerInvariant();
+                    if(filename != type.Data.Name.ToLowerInvariant())
+                        errorList.Error("Name", $"The name of the bin file has to be the same as the provided name. {filename} vs {type.Data.Name}");
+                }
+
+
 
                 foreach (var animation in type.Animations)
                 {

@@ -19,7 +19,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
         public string GetSyntaxType() => "XML";
         public bool CanSaveOnError() => false;
 
-        protected abstract ITextConverter.SaveError Validate(XmlType type, string s, PackFileService pfs);
+        protected abstract ITextConverter.SaveError Validate(XmlType type, string s, PackFileService pfs, string filepath);
         protected abstract XmlType ConvertBytesToXmlClass(byte[] bytes);
         protected abstract byte[] ConvertToAnimClassBytes(XmlType xmlType, string path);
         protected virtual string CleanUpXml(string xmlText) => xmlText;
@@ -67,7 +67,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
                     return null;
                 }
 
-                error = Validate(obj, text, pfs);
+                error = Validate(obj, text, pfs, filePath);
                 if (error != null)
                     return null;
 

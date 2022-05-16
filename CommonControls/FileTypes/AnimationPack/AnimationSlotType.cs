@@ -1,5 +1,8 @@
-﻿using System;
+﻿using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
+using CommonControls.Services;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,6 +45,47 @@ namespace CommonControls.FileTypes.AnimationPack
         {
             PopulateList();
             return Values[id];
+        }
+
+        static public void ExportAnimationDebugList(PackFileService pfs)
+        {
+            var data = new Dictionary<string, List<string>>();
+            foreach (var slot in AnimationSlotTypeHelper.Values)
+                data[slot.Value] = new List<string>();
+
+            var animPacks = pfs.GetAllAnimPacks();
+            foreach (var animPack in animPacks)
+            {
+                var animPackFile = AnimationPackSerializer.Load(animPack, pfs);
+                var fragments = animPackFile.Files.Where(x=>x.FileName.EndsWith(".frg")).ToList();
+
+                foreach (var fragment in fragments)
+                {
+                    var typedFragment = fragment as AnimationFragmentFile;
+                    if (typedFragment == null)
+                        continue;
+
+                    foreach (var entry in typedFragment.Fragments)
+                    {
+                        var slotName = entry.Slot.Value;
+                        if (data.ContainsKey(slotName) == false)
+                            data[slotName] = new List<string>();
+
+                        var fileName = Path.GetFileNameWithoutExtension(entry.AnimationFile);
+                        data[slotName].Add(fileName);
+                    }
+                }
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"sep=|");
+            sb.AppendLine($"Slot|Files");
+            foreach (var row in data)
+            {
+                var files = string.Join(", ", row.Value.Distinct());
+                sb.AppendLine($"{row.Key.PadRight(45, ' ')}\t| {files}");
+            }
+            File.WriteAllText(@"C:\temp\AllAnimationsTroy.csv", sb.ToString());
         }
 
         static public AnimationSlotType GetfromValue(string value)
@@ -4059,40 +4103,40 @@ namespace CommonControls.FileTypes.AnimationPack
             return Values.FirstOrDefault(x => x.Value == riderAnim);
         }
 
-        static public void ExportAnimationDebugList()
+        static public void ExportAnimationDebugList(PackFileService pfs)
         {
-            //var data = new Dictionary<string, List<string>>();
-            // foreach (var slot in AnimationSlotTypeHelperWh3.Values)
-            //     data[slot.Value] = new List<string>();
-            //
-            //var animPacks = _packfileService.GetAllAnimPacks();
-            //foreach (var animPack in animPacks)
-            //{
-            //    var animPackFile = AnimationPackSerializer.Load(animPack, _packfileService);
-            //    var fragments = animPackFile.GetGenericAnimationSets();
-            //
-            //    foreach (var fragment in fragments)
-            //    {
-            //        foreach (var entry in fragment.Entries)
-            //        {
-            //            if (data.ContainsKey(entry.SlotName) == false)
-            //                data[entry.SlotName] = new List<string>();
-            //
-            //            var fileName = Path.GetFileNameWithoutExtension(entry.AnimationFile);
-            //            data[entry.SlotName].Add(fileName);
-            //        }
-            //    }
-            //}
-            //
-            //StringBuilder sb = new StringBuilder();
-            //sb.AppendLine($"sep=|");
-            //sb.AppendLine($"Slot|Files");
-            //foreach (var row in data)
-            //{
-            //    var files = string.Join(", ", row.Value.Distinct());
-            //    sb.AppendLine($"{row.Key.PadRight(45, ' ')}\t| {files}");
-            //}
-            //File.WriteAllText(@"C:\temp\AllAnimationsWh3.csv", sb.ToString());
+            var data = new Dictionary<string, List<string>>();
+             foreach (var slot in AnimationSlotTypeHelperWh3.Values)
+                 data[slot.Value] = new List<string>();
+            
+            var animPacks = pfs.GetAllAnimPacks();
+            foreach (var animPack in animPacks)
+            {
+                var animPackFile = AnimationPackSerializer.Load(animPack, pfs);
+                var fragments = animPackFile.GetGenericAnimationSets();
+            
+                foreach (var fragment in fragments)
+                {
+                    foreach (var entry in fragment.Entries)
+                    {
+                        if (data.ContainsKey(entry.SlotName) == false)
+                            data[entry.SlotName] = new List<string>();
+            
+                        var fileName = Path.GetFileNameWithoutExtension(entry.AnimationFile);
+                        data[entry.SlotName].Add(fileName);
+                    }
+                }
+            }
+            
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"sep=|");
+            sb.AppendLine($"Slot|Files");
+            foreach (var row in data)
+            {
+                var files = string.Join(", ", row.Value.Distinct());
+                sb.AppendLine($"{row.Key.PadRight(45, ' ')}\t| {files}");
+            }
+            File.WriteAllText(@"C:\temp\AllAnimationsWh3.csv", sb.ToString());
         }
 
         static void PopulateList()

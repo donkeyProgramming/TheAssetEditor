@@ -6,7 +6,7 @@ using System.Text;
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
     [MetaData("SOUND_TRIGGER", 10)]
-    class SoundTrigger_v10 : DecodedMetaEntryBase
+    public class SoundTrigger_v10 : DecodedMetaEntryBase
     {
         [MetaDataTag(5)]
         public string SoundEvent { get; set; } = "";
@@ -19,7 +19,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     }
 
     [MetaData("SOUND_TRIGGER", 11)]
-    class SoundTrigger_v11 : SoundTrigger_v10
+    public  class SoundTrigger_v11 : SoundTrigger_v10
     {
         [MetaDataTag(8)]
         public string Unknown { get; set; } = "";

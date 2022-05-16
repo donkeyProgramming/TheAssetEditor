@@ -27,6 +27,8 @@ namespace CommonControls.FileTypes.MetaData
 
         [MetaDataTag(0, "Version number of the Tag type", MetaDataTagAttribute.DisplayType.None, true)]
         public int Version { get; set; }
+
+        public string DisplayName { get => $"{Name}_{Version}"; }
        
     }
 

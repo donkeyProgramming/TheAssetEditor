@@ -25,7 +25,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
             return xmlText;
         }
 
-        protected override ITextConverter.SaveError Validate(AnimationSet type, string s, PackFileService pfs)
+        protected override ITextConverter.SaveError Validate(AnimationSet type, string s, PackFileService pfs, string filepath)
         {
             return null;
         }

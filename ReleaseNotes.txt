@@ -112,12 +112,15 @@ V0.35
 		* Rename and remove bins inside animpack (Thanks to propJoe)
 		* Invert selection in tree views (Thanks to propJoe)
 		* When loading ws model, delete other textures found in RMV2
+		* Binfile validation on name 
 		
 	BugFixes:
 		* Transform meta tag now correctly validate and can be saved
 		* All meta tags should be possible to create, no more crashes
 		* TargetPos_v10 metatag added 
-		* The tool sometimes creates file names with no names. That is making a lot of issues. Better error detection for this, might break stuff 
+		* The tool sometimes creates file names with no names. That is making a lot of issues. Better error detection for this, might break stuff
+		* Better default valudes for multiple animmeta files 
+		
 	
 	
 	

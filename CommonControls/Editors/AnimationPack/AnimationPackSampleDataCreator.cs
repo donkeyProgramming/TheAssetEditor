@@ -71,7 +71,7 @@ namespace CommonControls.Editors.AnimationPack
             {
                 TableVersion = 4,
                 TableSubVersion = 3,
-                Name = "hu1_empire_sword",
+                Name = binName,
                 Unkown = "",
                 MountBin = "",
                 SkeletonName = "humanoid01",

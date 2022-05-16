@@ -61,7 +61,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
         }
 
 
-        protected override ITextConverter.SaveError Validate(Bin type, string s, PackFileService pfs)
+        protected override ITextConverter.SaveError Validate(Bin type, string s, PackFileService pfs, string filepath)
         {
             return null;
         }

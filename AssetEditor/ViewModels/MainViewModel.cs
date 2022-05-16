@@ -92,7 +92,7 @@ namespace AssetEditor.ViewModels
 
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
             {
-                //settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Rome_2_Remastered;
+                settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Troy;
                 var gamePath = settingsService.GetGamePathForCurrentGame();
                 if (gamePath != null)
                 {
@@ -107,6 +107,9 @@ namespace AssetEditor.ViewModels
 
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
+
+                AnimationSlotTypeHelper.ExportAnimationDebugList(packfileService);
+
                 //var reportService = new FileListReportGenerator(packfileService, settingsService);
                 //reportService.CompareFiles(@"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.0.2.0 PackFiles.csv", @"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.1.0.0 PackFiles.csv");
 

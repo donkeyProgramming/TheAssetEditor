@@ -4,11 +4,13 @@ using Filetypes.ByteParsing;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
 namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
 {
+    [DebuggerDisplay("AnimationFragmentFile - {FileName}")]
     public class AnimationFragmentFile : IAnimationPackFile
     {
         public string FileName { get; set; }
