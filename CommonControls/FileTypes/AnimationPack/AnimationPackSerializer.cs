@@ -72,7 +72,7 @@ namespace CommonControls.FileTypes.AnimationPack
             return new UnknownAnimFileSerializer();
         }
 
-        public static AnimationPackFile Load(PackFile pf, PackFileService pfs)
+        public static AnimationPackFile Load(PackFile pf, PackFileService pfs, BaseAnimationSlotHelper animationSlotCreator = null)
         {
             var output = new AnimationPackFile();
             output.FileName = pfs.GetFullPath(pf);
@@ -83,7 +83,7 @@ namespace CommonControls.FileTypes.AnimationPack
             foreach (var file in files)
             {
                 var fileLoader = DeterminePossibleSerializers(file.Name);
-                var loadedFile = LoadFile(fileLoader, file, dataChunk);
+                var loadedFile = LoadFile(fileLoader, file, dataChunk, animationSlotCreator);
                 output.AddFile(loadedFile);
             }
 
@@ -112,11 +112,11 @@ namespace CommonControls.FileTypes.AnimationPack
             return memStream.ToArray();
         }
 
-        static IAnimationPackFile LoadFile(IAnimFileSerializer serializer, AnimationInfoDataFile animationInfoDataFile, ByteChunk data)
+        static IAnimationPackFile LoadFile(IAnimFileSerializer serializer, AnimationInfoDataFile animationInfoDataFile, ByteChunk data, BaseAnimationSlotHelper animationSlotCreator)
         {
             try
             {
-                return serializer.Load(animationInfoDataFile, data);
+                return serializer.Load(animationInfoDataFile, data, animationSlotCreator);
             }
             catch(Exception e)
             {
@@ -140,38 +140,38 @@ namespace CommonControls.FileTypes.AnimationPack
 
     public interface IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile animFileInfo, ByteChunk data);
+        public IAnimationPackFile Load(AnimationInfoDataFile animFileInfo, ByteChunk data, BaseAnimationSlotHelper animationSlotCreator);
     }
 
     public class UnknownAnimFileSerializer : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new UnknownAnimFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data, BaseAnimationSlotHelper animationSlotCreator) => new UnknownAnimFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
     }
 
     public class AnimationSetFileSerializer : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimationFragmentFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data, BaseAnimationSlotHelper animationSlotCreator) => new AnimationFragmentFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size), animationSlotCreator);
     }
 
     public class AnimationDbFileSerializer : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimationBin(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data, BaseAnimationSlotHelper animationSlotCreator) => new AnimationBin(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
     }
 
     public class MatchedAnimFileSerializer : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new MatchedAnimFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data, BaseAnimationSlotHelper animationSlotCreator) => new MatchedAnimFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
     }
 
 
     public class AnimationSetSerializer_3K : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimationSet3kFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data, BaseAnimationSlotHelper animationSlotCreator) => new AnimationSet3kFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
     }
 
     public class AnimationSetSerializer_Wh3 : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimPackFileTypes.Wh3.AnimationBinWh3(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data, BaseAnimationSlotHelper animationSlotCreator) => new AnimPackFileTypes.Wh3.AnimationBinWh3(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
     }
 
 

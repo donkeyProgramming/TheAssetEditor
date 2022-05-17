@@ -24,23 +24,28 @@ namespace CommonControls.Editors.AnimationPack
 {
     public class AnimationPackSampleDataCreator
     {
-        public static void CreateAnimationDbWarhammer3(PackFileService pfs)
+        public static PackFile CreateAnimationDbWarhammer3(PackFileService pfs)
         {
             TextInputWindow window = new TextInputWindow("New AnimPack name", "");
             if (window.ShowDialog() == true)
+                return CreateAnimationDbWarhammer3(pfs, window.TextValue);
+            return null;
+        }
+
+        public static PackFile CreateAnimationDbWarhammer3(PackFileService pfs, string name)
+        {
+
+            var fileName = SaveHelper.EnsureEnding(name, ".animpack");
+            var filePath = @"animations/database/battle/bin/" + fileName;
+
+            if (!SaveHelper.IsFilenameUnique(pfs, filePath))
             {
-                var fileName = SaveHelper.EnsureEnding(window.TextValue, ".animpack");
-                var filePath = @"animations/database/battle/bin/" + fileName;
-
-                if (!SaveHelper.IsFilenameUnique(pfs, filePath))
-                {
-                    MessageBox.Show("Filename is not unique");
-                    return;
-                }
-
-                var animPack = new AnimationPackFile();
-                SaveHelper.Save(pfs, filePath, null, AnimationPackSerializer.ConvertToBytes(animPack));
+                MessageBox.Show("Filename is not unique");
+                return null;
             }
+
+            var animPack = new AnimationPackFile();
+            return SaveHelper.Save(pfs, filePath, null, AnimationPackSerializer.ConvertToBytes(animPack));
         }
 
         public static void CreateAnimationDb3k(PackFileService pfs)

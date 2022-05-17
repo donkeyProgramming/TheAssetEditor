@@ -1,6 +1,7 @@
-﻿using CommonControls.FileTypes.AnimationPack;
+﻿using CommonControls.Common;
+using CommonControls.Editors.AnimationPack;
+using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
-using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3;
 using CommonControls.FileTypes.MetaData;
 using CommonControls.FileTypes.MetaData.Definitions;
 using CommonControls.FileTypes.PackFiles.Models;
@@ -8,98 +9,105 @@ using CommonControls.Services;
 using MoreLinq;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace Wh3AnimPackCreator
 {
-    class Program
+    partial class Program
     {
+
+
         static void Main(string[] args)
         {
-            //AnimationSlotTypeHelper
-            var content = File.ReadAllLines(@"C:\Users\ole_k\Desktop\Strings\AllAnimTypesTroy.txt");
-            var counter = 0;
-            foreach (var line in content)
-            {
-                var result =  AnimationSlotTypeHelper.GetfromValue(line);
-                if (result == null)
-                {
-                    Console.WriteLine(line);
-                    counter++;
-                }
-
-
-            }
-
-
-
-
             MetaDataTagDeSerializer.EnsureMappingTableCreated();
-            var metaParser = new MetaDataFileParser();
-            var settings = new ApplicationSettingsService();
-            var gameSettings = settings.CurrentSettings.GameDirectories.First(x => x.Game == GameTypeEnum.Troy);
+           // var metaParser = new MetaDataFileParser();
 
-            var pfs = new PackFileService(new PackFileDataBase(), null, settings);
-            pfs.LoadAllCaFiles(gameSettings.Path, gameSettings.Game.ToString());
+            var troyGameSettings = new ApplicationSettingsService().CurrentSettings.GameDirectories.First(x => x.Game == GameTypeEnum.Troy);
+            var troyPfs = new PackFileService(new PackFileDataBase(), new SkeletonAnimationLookUpHelper(), new ApplicationSettingsService());
+            troyPfs.LoadAllCaFiles(troyGameSettings.Path, troyGameSettings.Game.ToString());
+
+            var wh3Pfs = new PackFileService(new PackFileDataBase(), new SkeletonAnimationLookUpHelper(), new ApplicationSettingsService());
+            var pfsContainer = wh3Pfs.CreateNewPackFileContainer("AnimResource_v0_cerberus", PackFileCAType.MOD);
+            wh3Pfs.SetEditablePack(pfsContainer);
+            var wh3AnimPack = new AnimationPackFile();
 
             try
             {
-                // Create output packfile
-                var outputPfs = new PackFileService(new PackFileDataBase(), null, new ApplicationSettingsService());
-                outputPfs.CreateNewPackFileContainer("AnimResource_v0_cerberus", PackFileCAType.MOD);
-                AnimationPackFile outputAnimPackFile = new AnimationPackFile();
-
-
                 var currentFragmentName = @"animations/animation_tables/cerb1_mth_dlc_cerberus.frg";
-                PrintDebugInformation(pfs, currentFragmentName);
+                AnimationTransferHelper instance = new AnimationTransferHelper(troyPfs, new TroyResourceSwapRules(), wh3Pfs, wh3AnimPack);
+                instance.Run(currentFragmentName);
 
-                // Create output bin
-                //var currentOutputAnimBin = new AnimationBinWh3(Path.GetFileNameWithoutExtension(currentFragmentName));
-                
-                // Do the work
-                var animContainer = GetAnimationContainers(pfs, currentFragmentName);
-
-                var groupedSlots = animContainer.FragmentFile.Fragments.GroupBy(x => x.Slot.Value).ToList();
-
-                var animFilesToCopy = new List<string>();
-                var metaFilesToCopy = new List<string>();
-                foreach (var groupedSlot in groupedSlots)
-                {
-                    Console.WriteLine($"\t {groupedSlot.Key}[{groupedSlot.Count()}]");
-
-                    foreach (var slot in groupedSlot)
-                    {
-                        if (string.IsNullOrWhiteSpace(slot.AnimationFile) == false)
-                            animFilesToCopy.Add(slot.AnimationFile);
-
-                        if (string.IsNullOrWhiteSpace(slot.MetaDataFile) == false)
-                            metaFilesToCopy.Add(slot.MetaDataFile);
-                    }
-                }
-
-                var distinctAnimFiles = animFilesToCopy.Distinct();
-                Console.WriteLine($"AnimFiles {distinctAnimFiles.Count()}:");
-                distinctAnimFiles.ForEach(i => Console.WriteLine($"\t {i}"));
-
-                var distinctMetaFiles = metaFilesToCopy.Distinct();
-                Console.WriteLine($"MetaFiles {distinctMetaFiles.Count()}:");
-                distinctMetaFiles.ForEach(i => Console.WriteLine($"\t {i}"));
-
-                // Add the packfile
-
-
-                //outputAnimPackFile.
-
+                var bytes = AnimationPackSerializer.ConvertToBytes(wh3AnimPack);
+                SaveHelper.Save(wh3Pfs, @"animations/database/battle/bin/AnimPackTest.animpack", null, bytes);
+                wh3Pfs.Save(pfsContainer, "C:\\temp\\temp_animResources.pack", false);              
             }
             catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
+            { 
             }
+            return;
+            
 
 
-            //var wh3 = new InformationContainer(GameTypeEnum.Warhammer3);
-            //var troy = new InformationContainer(GameTypeEnum.Troy);
+
+           //
+           //     return;
+           //
+           //
+           //     // Create output packfile
+           //     var outputPfs = new PackFileService(new PackFileDataBase(), null, new ApplicationSettingsService());
+           //     
+           //     AnimationPackFile outputAnimPackFile = new AnimationPackFile();
+           //
+           //
+           //     
+           //     PrintDebugInformation(troyPfs, currentFragmentName);
+           //
+           //     // Create output bin
+           //     //var currentOutputAnimBin = new AnimationBinWh3(Path.GetFileNameWithoutExtension(currentFragmentName));
+           //     
+           //     // Do the work
+           //     var animContainer = GetAnimationContainers(troyPfs, currentFragmentName);
+           //
+           //     var groupedSlots = animContainer.FragmentFile.Fragments.GroupBy(x => x.Slot.Value).ToList();
+           //
+           //     var animFilesToCopy = new List<string>();
+           //     var metaFilesToCopy = new List<string>();
+           //     foreach (var groupedSlot in groupedSlots)
+           //     {
+           //         Console.WriteLine($"\t {groupedSlot.Key}[{groupedSlot.Count()}]");
+           //
+           //         foreach (var slot in groupedSlot)
+           //         {
+           //             if (string.IsNullOrWhiteSpace(slot.AnimationFile) == false)
+           //                 animFilesToCopy.Add(slot.AnimationFile);
+           //
+           //             if (string.IsNullOrWhiteSpace(slot.MetaDataFile) == false)
+           //                 metaFilesToCopy.Add(slot.MetaDataFile);
+           //         }
+           //     }
+           //
+           //     var distinctAnimFiles = animFilesToCopy.Distinct();
+           //     Console.WriteLine($"AnimFiles {distinctAnimFiles.Count()}:");
+           //     distinctAnimFiles.ForEach(i => Console.WriteLine($"\t {i}"));
+           //
+           //     var distinctMetaFiles = metaFilesToCopy.Distinct();
+           //     Console.WriteLine($"MetaFiles {distinctMetaFiles.Count()}:");
+           //     distinctMetaFiles.ForEach(i => Console.WriteLine($"\t {i}"));
+           //
+           //     // Add the packfile
+           //
+           //
+           //     //outputAnimPackFile.
+           //
+           // }
+           // catch (Exception e)
+           // {
+           //     Console.WriteLine(e.Message);
+           // }
+           //
+           //
+           //var wh3 = new InformationContainer(GameTypeEnum.Warhammer3);
+           //var troy = new InformationContainer(GameTypeEnum.Troy);
 
 
         }
@@ -125,20 +133,27 @@ namespace Wh3AnimPackCreator
                 Console.Clear();
                 Console.WriteLine($"Starting Debug Print - {currentFragmentName}");
 
+                var slotCreator = new BaseAnimationSlotHelper(GameTypeEnum.Troy);
                 var gameAnimPackFile = pfs.FindFile(@"animations\animation_tables\animation_tables.animpack");
-                var gameAnimPack = AnimationPackSerializer.Load(gameAnimPackFile, pfs);
+                var gameAnimPack = AnimationPackSerializer.Load(gameAnimPackFile, pfs, slotCreator);
                 var animBin = gameAnimPack.Files.First(x => x.FileName == @"animations/animation_tables/animation_tables.bin") as AnimationBin;
                 var fragment = gameAnimPack.Files.First(x => x.FileName == currentFragmentName) as AnimationFragmentFile;
 
                 var allMetaTags = new List<string>();
                 var allEffects = new List<string>();
                 var allSoundEvents = new List<string>();
+                var missingSlots = new List<string>();
 
                 foreach (var slot in fragment.Fragments)
                 {
                     var animationName = slot.AnimationFile;
                     var meta = slot.MetaDataFile;
                     var sound = slot.SoundMetaDataFile;
+
+
+                    var wh3SlotName = AnimationSlotTypeHelperWh3.GetfromValue(slot.Slot.Value);
+                    if (wh3SlotName == null)
+                        missingSlots.Add(slot.Slot.Value);
 
                     if (string.IsNullOrWhiteSpace(meta) == false)
                     {
@@ -177,6 +192,7 @@ namespace Wh3AnimPackCreator
                 var distinctMetaTags = allMetaTags.Distinct();
                 var distinctEffects = allEffects.Distinct();
                 var distinctSoundEvents = allSoundEvents.Distinct();
+                var distinctMissingSlots = missingSlots.Distinct();
 
                 Console.WriteLine("\t MetaTags:");
                 foreach (var item in distinctMetaTags)
@@ -189,6 +205,10 @@ namespace Wh3AnimPackCreator
                 Console.WriteLine("\n\t SoundEvents:");
                 foreach (var item in distinctSoundEvents)
                     Console.WriteLine($"\t\t {item}");
+
+                Console.WriteLine("\n\t MissingSlots:");
+                foreach (var item in distinctMissingSlots)
+                    Console.WriteLine($"\t\t {item}");
             }
             catch (Exception e)
             {
@@ -197,8 +217,6 @@ namespace Wh3AnimPackCreator
 
             Console.WriteLine($"Done Debug Print");
         }
-
-
     }
 
 

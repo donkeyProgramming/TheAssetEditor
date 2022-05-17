@@ -13,6 +13,8 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
     [DebuggerDisplay("AnimationFragmentFile - {FileName}")]
     public class AnimationFragmentFile : IAnimationPackFile
     {
+        BaseAnimationSlotHelper _animationSlotCreator;
+
         public string FileName { get; set; }
         public AnimationPackFile Parent { get; set; }
         public bool IsUnknownFile { get; set; } = false;
@@ -25,8 +27,9 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
 
 
         public AnimationFragmentFile() { }
-        public AnimationFragmentFile(string fileName, byte[] bytes)
+        public AnimationFragmentFile(string fileName, byte[] bytes, BaseAnimationSlotHelper animationSlotCreator = null)
         {
+            _animationSlotCreator = animationSlotCreator;
             FileName = fileName;
             if(bytes != null)
                 CreateFromBytes(bytes);
@@ -43,7 +46,7 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
 
             Fragments.Clear();
             for (int i = 0; i < numFragItems; i++)
-                Fragments.Add(new AnimationSetEntry(data));
+                Fragments.Add(new AnimationSetEntry(data, _animationSlotCreator));
         }
 
         public byte[] ToByteArray()
@@ -98,12 +101,15 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
         public string Comment { get; set; } = string.Empty;
         public bool Ignore { get; set; } = false;
 
-        public AnimationSetEntry(ByteChunk data)
+        public AnimationSetEntry(ByteChunk data, BaseAnimationSlotHelper animationSlotCreator)
         {
             _id = data.ReadInt32();
             _slot = data.ReadInt32();
 
-            Slot = AnimationSlotTypeHelper.GetFromId(_slot);
+            if(animationSlotCreator== null)
+                Slot = DefaultAnimationSlotTypeHelper.GetFromId(_slot);
+            else
+                Slot = animationSlotCreator.GetFromId(_slot);
 
             AnimationFile = data.ReadString();
             MetaDataFile = data.ReadString();

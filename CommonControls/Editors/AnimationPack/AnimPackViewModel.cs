@@ -276,7 +276,7 @@ namespace CommonControls.Editors.AnimationPack
 
         public void ExportAnimationSlotsWh2Action()
         {
-            var slots = AnimationSlotTypeHelper.Values.Select(x => x.Id + "\t\t" + x.Value).ToList();
+            var slots = DefaultAnimationSlotTypeHelper.Values.Select(x => x.Id + "\t\t" + x.Value).ToList();
             SaveAnimationSlotsToFile(slots);
         }
 

@@ -98,7 +98,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
                 // Add an empty fragment entry
                 _riderOutputFragment.Fragments.Add(new AnimationSetEntry()
                 {
-                    Slot = AnimationSlotTypeHelper.GetfromValue(riderSlot),
+                    Slot = DefaultAnimationSlotTypeHelper.GetfromValue(riderSlot),
                     Skeleton = _riderFragment.Skeletons.Values.First()
                 });
 
@@ -145,8 +145,8 @@ namespace AnimationEditor.MountAnimationCreator.Services
         List<(string, string)> GetMatchedAnimations()
         {
             return _mountFragment.Fragments
-                .Where(x => AnimationSlotTypeHelper.GetMatchingRiderAnimation(x.Slot.Value) != null)
-                .Select(x => (AnimationSlotTypeHelper.GetMatchingRiderAnimation(x.Slot.Value).Value, x.Slot.Value))
+                .Where(x => DefaultAnimationSlotTypeHelper.GetMatchingRiderAnimation(x.Slot.Value) != null)
+                .Select(x => (DefaultAnimationSlotTypeHelper.GetMatchingRiderAnimation(x.Slot.Value).Value, x.Slot.Value))
                 .Distinct()
                 .ToList();
         }

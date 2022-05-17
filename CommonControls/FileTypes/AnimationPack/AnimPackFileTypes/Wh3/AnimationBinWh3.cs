@@ -18,12 +18,12 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
 
         public uint TableVersion { get; set; } = 4;
         public uint TableSubVersion { get; set; } = 3;
-        public string Name { get; set; }
-        public string MountBin { get; set; }
-        public string Unkown { get; set; }
-        public string SkeletonName { get; set; }
-        public string LocomotionGraph { get; set; }
-        public short UnknownValue1 { get; set; }
+        public string Name { get; set; } = "";
+        public string MountBin { get; set; } = "";
+        public string Unkown { get; set; } = "";
+        public string SkeletonName { get; set; } = "";
+        public string LocomotionGraph { get; set; } = "";
+        public short UnknownValue1 { get; set; } = 0;
 
 
         public AnimationBinWh3(string fileName, byte[] data = null)

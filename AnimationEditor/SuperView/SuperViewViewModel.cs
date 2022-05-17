@@ -44,7 +44,7 @@ namespace AnimationEditor.SuperView
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_alarielle.variantmeshdefinition"),
                 FragmentName = @"animations/animation_tables/hu1b_alarielle_staff_and_sword.frg",
-                AnimationSlot = AnimationSlotTypeHelper.GetfromValue("STAND")
+                AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("STAND")
             };
         //editorView.MainInput = new AnimationToolInput()
         //{
@@ -69,7 +69,7 @@ namespace AnimationEditor.SuperView
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_throt.variantmeshdefinition"),
                 FragmentName = @"animations/animation_tables/hu17_dlc16_throt.frg",
-                AnimationSlot = AnimationSlotTypeHelper.GetfromValue("ATTACK_5")
+                AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("ATTACK_5")
             };
 
             creator.CreateEmptyEditor(editorView);
