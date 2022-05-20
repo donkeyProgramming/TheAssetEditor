@@ -8,7 +8,7 @@ namespace CommonControls.FileTypes.MetaData
 {
     public class MetaDataTagDeSerializer
     {
-        public static Dictionary<string, List<Type>> _typeTable;
+        public static Dictionary<string, Type> _typeTable;
         public static Dictionary<string, string> _descriptionMap;
 
         public static void EnsureMappingTableCreated()
@@ -16,7 +16,7 @@ namespace CommonControls.FileTypes.MetaData
             if (_typeTable != null)
                 return;
 
-            _typeTable = new Dictionary<string, List<Type>>();
+            _typeTable = new Dictionary<string, Type>();
 
             CreateDescriptions();
 
@@ -33,9 +33,9 @@ namespace CommonControls.FileTypes.MetaData
                 var type = instance.Type;
                 var key = instance.Attributes.First().VersionName;
                 if (_typeTable.ContainsKey(key) == false)
-                    _typeTable.Add(key, new List<Type>());
+                    _typeTable.Add(key, type);
 
-                _typeTable[key].Add(type);
+                _typeTable[key] = (type);
 
                 var orderedPropertiesList = type.GetProperties()
                     .Where(x => x.CanWrite)
@@ -175,7 +175,7 @@ namespace CommonControls.FileTypes.MetaData
             return array.Zip(array.Skip(1), (a, b) => (a + 1) == b).All(x => x);
         }
 
-        static List<Type> GetTypeFromMeta(BaseMetaEntry entry)
+        static Type GetTypeFromMeta(BaseMetaEntry entry)
         {
             var key = entry.Name + "_" + entry.Version;
             if (_typeTable.ContainsKey(key) == false)
