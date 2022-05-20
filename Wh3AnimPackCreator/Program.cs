@@ -20,7 +20,6 @@ namespace Wh3AnimPackCreator
         static void Main(string[] args)
         {
             MetaDataTagDeSerializer.EnsureMappingTableCreated();
-           // var metaParser = new MetaDataFileParser();
 
             var troyGameSettings = new ApplicationSettingsService().CurrentSettings.GameDirectories.First(x => x.Game == GameTypeEnum.Troy);
             var troyPfs = new PackFileService(new PackFileDataBase(), new SkeletonAnimationLookUpHelper(), new ApplicationSettingsService());
@@ -33,16 +32,25 @@ namespace Wh3AnimPackCreator
 
             try
             {
-                var currentFragmentName = @"animations/animation_tables/cerb1_mth_dlc_cerberus.frg";
+                //  var currentFragmentName = @"animations/animation_tables/cerb1_mth_dlc_cerberus.frg";
+                var currentFragmentName = @"animations/animation_tables/ce1_myth_dlc_centaur_spear_and_shield.frg";
                 AnimationTransferHelper instance = new AnimationTransferHelper(troyPfs, new TroyResourceSwapRules(), wh3Pfs, wh3AnimPack);
                 instance.Run(currentFragmentName);
 
+                // Copy the skeleton db
+                var battleSkeletonTable = troyPfs.FindFile(@"db\battle_skeletons_tables\data__");
+                SaveHelper.Save(wh3Pfs, @"db\battle_skeletons_tables\troy_data__", null, battleSkeletonTable.DataSource.ReadData());
+
+                // Save the animPack
                 var bytes = AnimationPackSerializer.ConvertToBytes(wh3AnimPack);
                 SaveHelper.Save(wh3Pfs, @"animations/database/battle/bin/AnimPackTest.animpack", null, bytes);
-                wh3Pfs.Save(pfsContainer, "C:\\temp\\temp_animResources.pack", false);              
+
+                // Save the packfile
+                wh3Pfs.Save(pfsContainer, "C:\\temp\\temp_animResources.pack", false);
             }
             catch (Exception e)
-            { 
+            {
+                Console.WriteLine(e.Message);
             }
             return;
             

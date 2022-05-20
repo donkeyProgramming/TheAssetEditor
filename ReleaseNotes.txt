@@ -94,6 +94,9 @@ Planned V0.35:
 	Phazer shader
 	Warning for only 1 lod in rmv2 
 	
+		metafile splice
+	Resize animpack editor 
+	
 	Unload packfile not working correctly 
 	PackFileBrowserWindow vs SavePackFileWindow
 
@@ -101,10 +104,7 @@ Planned V0.35:
 	
 V0.35
 ----------------------------
-	Metafile scale 
-	metafile splice
-	metafile error handling
-	Debug code for packfiles not loading 
+	Bug => Super view load vmd from mixu
 
 	Features:
 		* Clear button added to packfile filter text (Thanks to Bapp)
@@ -112,7 +112,9 @@ V0.35
 		* Rename and remove bins inside animpack (Thanks to propJoe)
 		* Invert selection in tree views (Thanks to propJoe)
 		* When loading ws model, delete other textures found in RMV2
-		* Binfile validation on name 
+		* Binfile validation on name and gives the correct default value 
+		* Copy filepath of file inside animpack
+		* Scale suported for animated props in super view 
 		
 	BugFixes:
 		* Transform meta tag now correctly validate and can be saved
@@ -120,6 +122,9 @@ V0.35
 		* TargetPos_v10 metatag added 
 		* The tool sometimes creates file names with no names. That is making a lot of issues. Better error detection for this, might break stuff
 		* Better default valudes for multiple animmeta files 
+		* Fixed bug in AnimPack validation
+		* Better handling of duplicate file names 
+		* Fixed infinate error loop in super view related to bone ID for metadata
 		
 	
 	
@@ -136,8 +141,6 @@ V0.34
 		* AnimPacks for wh3 can be viewed and edited, with validation on save
 		* Correctly setting loaded packfiles to be the main EditablePack file
 		* Some quality of life changes to the animPackEditor. Warning about unsaved files, export list of possible animationSlots++
-
-
 	
 V0.33
 ----------------------------

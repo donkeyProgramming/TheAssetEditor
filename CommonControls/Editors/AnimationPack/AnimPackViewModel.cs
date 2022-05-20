@@ -35,6 +35,7 @@ namespace CommonControls.Editors.AnimationPack
 
         public ICommand RemoveCommand { get; set; }
         public ICommand RenameCommand { get; set; }
+        public ICommand CopyFullPathCommand { get; set; }
 
         public AnimPackViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
@@ -43,7 +44,10 @@ namespace CommonControls.Editors.AnimationPack
 
             RemoveCommand = new RelayCommand(Remove);
             RenameCommand = new RelayCommand(Rename);
+            CopyFullPathCommand = new RelayCommand(CopyFullPath);
         }
+
+
 
         private void Rename()
         {
@@ -65,6 +69,11 @@ namespace CommonControls.Editors.AnimationPack
 
             // way to refresh the view
             AnimationPackItems.RefreshFilter();
+        }
+
+        private void CopyFullPath()
+        {
+            Clipboard.SetText(AnimationPackItems.SelectedItem.FileName);
         }
 
         public void Load(AnimationPackFile animPack)

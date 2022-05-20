@@ -130,16 +130,22 @@ namespace CommonControls.Editors.AnimationPack.Converters
                 if (string.IsNullOrWhiteSpace(type.Data.SkeletonName))
                     return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Missing skeleton item on root" };
 
-                if (string.IsNullOrWhiteSpace(type.Data.LocomotionGraph))
-                    return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Missing skeleton item on root" };
 
 
                 var errorList = new ErrorList();
                 if (_skeletonAnimationLookUpHelper.GetSkeletonFileFromName(pfs, type.Data.SkeletonName) == null)
                     errorList.Error("Skeleton", $"Skeleton {type.Data.SkeletonName} is not found");
 
-                if (pfs.FindFile(type.Data.LocomotionGraph) == null)
-                    errorList.Error("LocomotionGraph", $"LocomotionGraph {type.Data.LocomotionGraph} is not found");
+
+                if (string.IsNullOrWhiteSpace(type.Data.LocomotionGraph))
+                {
+                    errorList.Warning("LocomotionGraph", $"LocomotionGraph not provided");
+                }
+                else
+                {
+                    if (pfs.FindFile(type.Data.LocomotionGraph) == null)
+                        errorList.Error("LocomotionGraph", $"LocomotionGraph {type.Data.LocomotionGraph} is not found");
+                }
 
                 if (string.IsNullOrWhiteSpace(type.Data.Name))
                 {

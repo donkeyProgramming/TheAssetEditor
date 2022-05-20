@@ -37,6 +37,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public float UnknownFloat { get; set; }
     }
 
+
     /// <summary>
     /// Dock left hand
     /// </summary>
@@ -52,6 +53,13 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     {
         [MetaDataTag(8)]
         public float UnknownFloat { get; set; }
+    }
+
+    [MetaData("DOCK_EQPT_LHAND", 11, "Troy")]
+    public class DockEquipmentLHand_v11_Troy : DockEquipmentLHand_v10
+    {
+        [MetaDataTag(8)]
+        public byte UnknownFloat { get; set; }
     }
 
     /// <summary>

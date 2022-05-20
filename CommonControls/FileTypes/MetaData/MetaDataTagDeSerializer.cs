@@ -8,7 +8,7 @@ namespace CommonControls.FileTypes.MetaData
 {
     public class MetaDataTagDeSerializer
     {
-        public static Dictionary<string, Type> _typeTable;
+        public static Dictionary<string, List<Type>> _typeTable;
         public static Dictionary<string, string> _descriptionMap;
 
         public static void EnsureMappingTableCreated()
@@ -16,7 +16,7 @@ namespace CommonControls.FileTypes.MetaData
             if (_typeTable != null)
                 return;
 
-            _typeTable = new Dictionary<string, Type>();
+            _typeTable = new Dictionary<string, List<Type>>();
 
             CreateDescriptions();
 
@@ -32,7 +32,10 @@ namespace CommonControls.FileTypes.MetaData
             {
                 var type = instance.Type;
                 var key = instance.Attributes.First().VersionName;
-                _typeTable.Add(key, type);
+                if (_typeTable.ContainsKey(key) == false)
+                    _typeTable.Add(key, new List<Type>());
+
+                _typeTable[key].Add(type);
 
                 var orderedPropertiesList = type.GetProperties()
                     .Where(x => x.CanWrite)
@@ -45,11 +48,10 @@ namespace CommonControls.FileTypes.MetaData
                     throw new Exception("Invalid ids");
 
                 // Ensure we have a decription
-                GetDescription(instance.Attributes.First().Name);
-                
+                GetDescription(instance.Attributes.First().Name);  
             }
 
-            return;
+#if DEBUG
             // Check that we can create an instance
             foreach (var type in _typeTable.Keys)
             {
@@ -67,8 +69,8 @@ namespace CommonControls.FileTypes.MetaData
                     if (value == null)
                         throw new Exception($"{type} contains null value for attribute {prop.Name}");
                 }
-               
             }
+#endif
         }
 
         static void CreateDescriptions()
@@ -173,7 +175,7 @@ namespace CommonControls.FileTypes.MetaData
             return array.Zip(array.Skip(1), (a, b) => (a + 1) == b).All(x => x);
         }
 
-        static Type GetTypeFromMeta(BaseMetaEntry entry)
+        static List<Type> GetTypeFromMeta(BaseMetaEntry entry)
         {
             var key = entry.Name + "_" + entry.Version;
             if (_typeTable.ContainsKey(key) == false)

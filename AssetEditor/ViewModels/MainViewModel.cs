@@ -92,7 +92,8 @@ namespace AssetEditor.ViewModels
 
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
             {
-                settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Troy;
+                //settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Warhammer3;
+                //settingsService.CurrentSettings.SkipLoadingWemFiles = false;
                 var gamePath = settingsService.GetGamePathForCurrentGame();
                 if (gamePath != null)
                 {
@@ -111,7 +112,8 @@ namespace AssetEditor.ViewModels
                 //DefaultAnimationSlotTypeHelper.ExportAnimationDebugList(packfileService);
 
                 //var reportService = new FileListReportGenerator(packfileService, settingsService);
-                //reportService.CompareFiles(@"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.0.2.0 PackFiles.csv", @"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.1.0.0 PackFiles.csv");
+                //var comparePath = reportService.Create();
+                //reportService.CompareFiles(@"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.1.0.0 PackFiles.csv", @"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.2.0.0 Packfiles.csv");
 
                 //;
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateFlyingSquig(this, toolFactory, packfileService);

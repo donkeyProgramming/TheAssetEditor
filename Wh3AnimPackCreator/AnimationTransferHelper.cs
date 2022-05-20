@@ -1,4 +1,5 @@
-﻿using CommonControls.FileTypes.AnimationPack;
+﻿using CommonControls.Common;
+using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3;
 using CommonControls.FileTypes.PackFiles.Models;
@@ -17,7 +18,7 @@ namespace Wh3AnimPackCreator
         PackFileService _outputPfs;
         AnimationPackFile _outputAnimPack;
 
-        readonly string _filePrefix = "tr_";
+        readonly string _filePrefix = "";
         ResourecSwapRules _resourecSwapRules;
 
         public AnimationTransferHelper(PackFileService inputPfs, ResourecSwapRules resourecSwapRules, PackFileService outputPfs, AnimationPackFile outputAnimPack)
@@ -41,6 +42,7 @@ namespace Wh3AnimPackCreator
             var groupedSlots = fragment.Fragments.GroupBy(x => x.Slot.Value).ToList();
 
             AnimationBinWh3 wh3Bin = CreateAnimationBin(animContainer.AnimBin, fragmentName);
+           
             _outputAnimPack.AddFile(wh3Bin);
             foreach (var groupedSlot in groupedSlots)
             {
@@ -62,24 +64,68 @@ namespace Wh3AnimPackCreator
                 }
             }
 
+            CopySkeleton(fragment.Skeletons.Values.First());
             CopyAnimationFiles(animFilesToCopy);
             CopyMetaFiles(metaFilesToCopy);
+        }
+
+        private void CopySkeleton(string skeletonName)
+        {
+            var skeletonFile = _inputPfs.FindFile($"animations\\skeletons\\{skeletonName}.anim");
+            var invMatrixFile = _inputPfs.FindFile($"animations\\skeletons\\{skeletonName}.bone_inv_trans_mats");
+
+            var finalSkeletonName = UpdateFileName($"animations\\skeletons\\{skeletonName}.anim");
+            var finalInvMatrixFile = UpdateFileName($"animations\\skeletons\\{skeletonName}.bone_inv_trans_mats");
+
+            if (_outputPfs.FindFile(finalSkeletonName) == null)
+                SaveHelper.Save(_outputPfs, finalSkeletonName, null, skeletonFile.DataSource.ReadData());
+
+            if (_outputPfs.FindFile(finalInvMatrixFile) == null)
+                SaveHelper.Save(_outputPfs, finalInvMatrixFile, null, invMatrixFile.DataSource.ReadData());
         }
 
         void CopyAnimationFiles(List<string> animationFiles)
         {
             var distinctAnimFiles = animationFiles.Distinct();
+
             Console.WriteLine();
             Console.WriteLine($"\t Copying Animation Files {distinctAnimFiles.Count()}:");
-            distinctAnimFiles.ForEach(i => Console.WriteLine($"\t\t {i}"));
+            foreach (var animationFile in distinctAnimFiles)
+            {
+                Console.WriteLine($"\t\t {animationFile}");
+                var finalName = UpdateFileName(animationFile);
+                if (_outputPfs.FindFile(finalName) != null)
+                    continue;
+
+                var file = _inputPfs.FindFile(animationFile);
+                if (file == null)
+                    continue;
+
+                SaveHelper.Save(_outputPfs, finalName, null, file.DataSource.ReadData());
+            }
         }
 
         void CopyMetaFiles(List<string> metaFiles)
         {
             var distinctMetaFiles = metaFiles.Distinct();
+
             Console.WriteLine();
             Console.WriteLine($"\t Copying Meta Files {distinctMetaFiles.Count()}:");
-            distinctMetaFiles.ForEach(i => Console.WriteLine($"\t\t {i}"));
+            foreach (var metaFile in distinctMetaFiles)
+            {
+                Console.WriteLine($"\t\t {metaFile}");
+                var finalName = UpdateFileName(metaFile);
+                if (_outputPfs.FindFile(finalName) != null)
+                    continue;
+
+                var file = _inputPfs.FindFile(metaFile);
+                if (file == null)
+                    continue;
+
+                // Validate the meta and convert if needed
+
+                SaveHelper.Save(_outputPfs, finalName, null, file.DataSource.ReadData());
+            }
         }
 
         AnimationBinWh3 CreateAnimationBin(AnimationBin bin, string fragment)
@@ -88,10 +134,10 @@ namespace Wh3AnimPackCreator
 
             var name = @"animations/database/battle/bin/" + _filePrefix + Path.GetFileNameWithoutExtension(fragment) + ".bin";
             return new AnimationBinWh3(name)
-            { 
-                Name = _filePrefix + Path.GetFileNameWithoutExtension(fragment) + ".bin",
-                SkeletonName = binInstance.SkeletonName,
-                LocomotionGraph = "locomoationGraph.."
+            {
+                Name = _filePrefix + Path.GetFileNameWithoutExtension(fragment),
+                SkeletonName = _filePrefix + binInstance.SkeletonName,
+                LocomotionGraph = @"animations\locomotion_graphs\entity_locomotion_graph.xml"
             };
         }
 
@@ -134,12 +180,12 @@ namespace Wh3AnimPackCreator
 
         string UpdateFileName(string inputFileName)
         {
+            if (string.IsNullOrWhiteSpace(inputFileName))
+                return string.Empty;
             var fileName = Path.GetFileName(inputFileName);
             var path = Path.GetDirectoryName(inputFileName);
             var newName = $"{path}\\{_filePrefix}{fileName}";
             return newName;
-
-
         }
     }
 }

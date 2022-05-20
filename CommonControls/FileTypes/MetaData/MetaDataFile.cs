@@ -57,12 +57,14 @@ namespace CommonControls.FileTypes.MetaData
         public string VersionName { get; private set; }
         public string Name { get; set; }
         public int Version { get; set; }
+        public string OnlyForGames{ get; set; } ="";
 
-        public MetaDataAttribute(string name, int version)
+        public MetaDataAttribute(string name, int version, string onlyForGames = "")
         {
             Name = name;
             Version = version;
             VersionName = name + "_" + version;
+            OnlyForGames = onlyForGames;
         }
     }
 

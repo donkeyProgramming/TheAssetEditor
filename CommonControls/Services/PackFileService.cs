@@ -13,6 +13,7 @@ using CommonControls.PackFileBrowser;
 
 namespace CommonControls.Services
 {
+
     public class PackFileService
     {
         ILogger _logger = Logging.Create<PackFileService>();
@@ -146,7 +147,7 @@ namespace CommonControls.Services
                       {
                           using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
                           {
-                              var pfc = PackFileSerializer.Load(packFilePath, reader, null, null);
+                              var pfc = PackFileSerializer.Load(packFilePath, reader, null, null, new CaPackDuplicatePackFileResolver());
 
                               _logger.Here().Information($"Seraching through packfile {currentIndex}/{files.Count} -  {packFilePath} {pfc.FileList.Count} files");
 
@@ -229,7 +230,7 @@ namespace CommonControls.Services
 
         public PackFileContainer Load(BinaryReader binaryReader, string packFileSystemPath)
         {
-            var pack = PackFileSerializer.Load(packFileSystemPath, binaryReader, _skeletonAnimationLookUpHelper, _settingsService);
+            var pack = PackFileSerializer.Load(packFileSystemPath, binaryReader, _skeletonAnimationLookUpHelper, _settingsService, new CustomPackDuplicatePackFileResolver());
             Database.AddPackFile(pack);
             return pack;
         }
@@ -251,7 +252,7 @@ namespace CommonControls.Services
                         {
                             using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
                             {
-                                var pack = PackFileSerializer.Load(path, reader, _skeletonAnimationLookUpHelper, _settingsService);
+                                var pack = PackFileSerializer.Load(path, reader, _skeletonAnimationLookUpHelper, _settingsService, new CaPackDuplicatePackFileResolver());
                                 packList.Add(pack);
                             }
                         }

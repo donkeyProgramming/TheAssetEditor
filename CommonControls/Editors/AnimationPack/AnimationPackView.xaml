@@ -72,10 +72,9 @@
 
                 <ListView.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Rename" 
-                                  Command="{Binding RenameCommand}" />
-                        <MenuItem Header="Remove" 
-                                  Command="{Binding RemoveCommand}"/>
+                        <MenuItem Header="Rename" Command="{Binding RenameCommand}" />
+                        <MenuItem Header="Remove" Command="{Binding RemoveCommand}"/>
+                        <MenuItem Header="Copy Full Path" Command="{Binding CopyFullPathCommand}"/>
                     </ContextMenu>
                 </ListView.ContextMenu>
 
