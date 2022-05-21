@@ -127,7 +127,7 @@ namespace CommonControls.FileTypes.AnimationPack
 
     public static class AnimationSlotTypeHelperWh3
     {
-        static BaseAnimationSlotHelper Instance;
+        public static BaseAnimationSlotHelper Instance;
         public static List<AnimationSlotType> Values { get { Create(); return Instance.Values; } }
 
         static public AnimationSlotType GetFromId(int id)
@@ -152,6 +152,37 @@ namespace CommonControls.FileTypes.AnimationPack
         static void Create()
         {
             Instance = new BaseAnimationSlotHelper(GameTypeEnum.Warhammer3);
+        }
+    }
+
+
+    public static class AnimationSlotTypeHelper3k
+    {
+        public static BaseAnimationSlotHelper Instance;
+        public static List<AnimationSlotType> Values { get { Create(); return Instance.Values; } }
+
+        static public AnimationSlotType GetFromId(int id)
+        {
+            Create();
+            return Values[id];
+        }
+
+        static public AnimationSlotType GetfromValue(string value)
+        {
+            Create();
+            var upperStr = value.ToUpper();
+            return Values.FirstOrDefault(x => x.Value == upperStr);
+        }
+
+        static public AnimationSlotType GetMatchingRiderAnimation(string value)
+        {
+            var riderAnim = "RIDER_" + value;
+            return Values.FirstOrDefault(x => x.Value == riderAnim);
+        }
+
+        static void Create()
+        {
+            Instance = new BaseAnimationSlotHelper(GameTypeEnum.Warhammer2);
         }
     }
 

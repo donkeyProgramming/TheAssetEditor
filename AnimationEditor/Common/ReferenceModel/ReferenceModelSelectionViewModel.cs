@@ -67,7 +67,7 @@ namespace AnimationEditor.Common.ReferenceModel
             AnimViewModel = new SelectAnimationViewModel(Data, _pfs, skeletonAnimationLookUpHelper);
             SkeletonInformation = new SkeletonPreviewViewModel(Data);
             MetaFileInformation = new SelectMetaViewModel(Data, _pfs);
-            FragAndSlotSelection = new SelectFragAndSlotViewModel(_pfs, skeletonAnimationLookUpHelper, Data, MetaFileInformation);
+            FragAndSlotSelection = new SelectFragAndSlotViewModel(_pfs, skeletonAnimationLookUpHelper, Data, MetaFileInformation, applicationSettingsService);
 
             Data.AnimationChanged += Data_AnimationChanged;
             Data.SkeletonChanged += Data_SkeletonChanged;

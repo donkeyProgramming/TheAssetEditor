@@ -49,16 +49,18 @@ namespace AnimationEditor.MountAnimationCreator
         AssetViewModel _mount;
         AssetViewModel _rider;
         AssetViewModel _newAnimation;
+        private readonly ApplicationSettingsService _applicationSettings;
         List<int> _mountVertexes = new List<int>();
         Rmv2MeshNode _mountVertexOwner;
         PackFileService _pfs;
         SelectionManager _selectionManager;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
-        public Editor(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, AssetViewModel mount, AssetViewModel newAnimation, IComponentManager componentManager)
+        public Editor(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, AssetViewModel mount, AssetViewModel newAnimation, IComponentManager componentManager, ApplicationSettingsService applicationSettings)
         {
             _pfs = pfs;
             _newAnimation = newAnimation;
+            _applicationSettings = applicationSettings;
             _mount = mount;
             _rider = rider;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
@@ -226,7 +228,8 @@ namespace AnimationEditor.MountAnimationCreator
             if (fragment != null)
             {
                 var animPack = fragment.Parent;
-                CommonControls.Editors.AnimationPack.AnimPackViewModel.ShowPreviewWinodow(animPack, _pfs, _skeletonAnimationLookUpHelper, fragment.FileName);
+                var packFile = _pfs.FindFile(animPack.FileName);
+                CommonControls.Editors.AnimationPack.AnimPackViewModel.ShowPreviewWinodow(packFile, _pfs, _skeletonAnimationLookUpHelper, fragment.FileName, _applicationSettings);
             }
         }
 

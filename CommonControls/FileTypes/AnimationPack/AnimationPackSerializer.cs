@@ -38,14 +38,18 @@ namespace CommonControls.FileTypes.AnimationPack
 
     public static class AnimationPackSerializer
     {
-        static IAnimFileSerializer DeterminePossibleSerializers(string fullPath)
+        static IAnimFileSerializer DeterminePossibleSerializers(string fullPath, GameTypeEnum preferedGame)
         {
             if (fullPath.Contains("animations/database/battle/bin/", StringComparison.InvariantCultureIgnoreCase))
             {
                 if (fullPath.Contains("matched_combat", StringComparison.InvariantCultureIgnoreCase))
                     return new MatchedAnimFileSerializer();
                 else if (fullPath.Contains(".bin", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    if (preferedGame == GameTypeEnum.ThreeKingdoms)
+                        return new AnimationSetSerializer_3K();
                     return new AnimationSetSerializer_Wh3();
+                }
                 else
                     return new UnknownAnimFileSerializer();
             }
@@ -72,7 +76,7 @@ namespace CommonControls.FileTypes.AnimationPack
             return new UnknownAnimFileSerializer();
         }
 
-        public static AnimationPackFile Load(PackFile pf, PackFileService pfs, BaseAnimationSlotHelper animationSlotCreator = null)
+        public static AnimationPackFile Load(PackFile pf, PackFileService pfs, BaseAnimationSlotHelper animationSlotCreator = null, GameTypeEnum preferedGame = GameTypeEnum.Unknown)
         {
             var output = new AnimationPackFile();
             output.FileName = pfs.GetFullPath(pf);
@@ -82,7 +86,7 @@ namespace CommonControls.FileTypes.AnimationPack
 
             foreach (var file in files)
             {
-                var fileLoader = DeterminePossibleSerializers(file.Name);
+                var fileLoader = DeterminePossibleSerializers(file.Name, preferedGame);
                 var loadedFile = LoadFile(fileLoader, file, dataChunk, animationSlotCreator);
                 output.AddFile(loadedFile);
             }
