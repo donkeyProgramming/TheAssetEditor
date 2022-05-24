@@ -16,33 +16,52 @@ using System.Windows.Input;
 
 namespace CommonControls.Editors.AnimationPack
 {
+
     public class AnimPackViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        AnimationPackFile _animPack;
         ITextConverter _activeConverter;
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("");
 
         PackFile _packFile;
-        public PackFile MainFile { get => _packFile; set { _packFile = value; Load(AnimationPackSerializer.Load(_packFile, _pfs)); } }
+        public PackFile MainFile { get => _packFile; set { _packFile = value; Load(); } }
 
         public FilterCollection<IAnimationPackFile> AnimationPackItems { get; set; }
 
         SimpleTextEditorViewModel _selectedItemViewModel;
         public SimpleTextEditorViewModel SelectedItemViewModel { get => _selectedItemViewModel; set => SetAndNotify(ref _selectedItemViewModel, value); }
 
+        public GameTypeEnum[] PreferedSerializedTypes { get => new GameTypeEnum[] { GameTypeEnum.Unknown, GameTypeEnum.Warhammer3, GameTypeEnum.Warhammer2, GameTypeEnum.Troy, GameTypeEnum.ThreeKingdoms }; }
+
+        GameTypeEnum _preferedSerializedType = GameTypeEnum.Unknown;
+        public GameTypeEnum PreferedSerializedType
+        {
+            get => _preferedSerializedType;
+            set { SetAndNotifyWhenChanged(ref _preferedSerializedType, value); Load(); }
+        }
+
         public ICommand RemoveCommand { get; set; }
         public ICommand RenameCommand { get; set; }
+        public ICommand CopyFullPathCommand { get; set; }
 
-        public AnimPackViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        public AnimPackViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService appSettings)
         {
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
 
+            AnimationPackItems = new FilterCollection<IAnimationPackFile>(new List<IAnimationPackFile>(), ItemSelected, BeforeItemSelected)
+            {
+                SearchFilter = (value, rx) => { return rx.Match(value.FileName).Success; }
+            };
+
+            if (PreferedSerializedTypes.Contains(appSettings.CurrentSettings.CurrentGame))
+                _preferedSerializedType = appSettings.CurrentSettings.CurrentGame;
+
             RemoveCommand = new RelayCommand(Remove);
             RenameCommand = new RelayCommand(Rename);
+            CopyFullPathCommand = new RelayCommand(CopyFullPath);
         }
 
         private void Rename()
@@ -67,16 +86,17 @@ namespace CommonControls.Editors.AnimationPack
             AnimationPackItems.RefreshFilter();
         }
 
-        public void Load(AnimationPackFile animPack)
+        private void CopyFullPath()
         {
-            _animPack = animPack;
+            Clipboard.SetText(AnimationPackItems.SelectedItem.FileName);
+        }
+
+        public void Load()
+        {
+            BaseAnimationSlotHelper slotResolver = new BaseAnimationSlotHelper(_preferedSerializedType);
+            var animPack = AnimationPackSerializer.Load(_packFile, _pfs, slotResolver, _preferedSerializedType);
             var itemNames = animPack.Files.ToList();
-
-            AnimationPackItems = new FilterCollection<IAnimationPackFile>(itemNames, ItemSelected, BeforeItemSelected)
-            {
-                SearchFilter = (value, rx) => { return rx.Match(value.FileName).Success; }
-            };
-
+            AnimationPackItems.UpdatePossibleValues(itemNames); 
             DisplayName.Value = animPack.FileName;
         }
 
@@ -147,8 +167,8 @@ namespace CommonControls.Editors.AnimationPack
             {
                 SelectedItemViewModel = new SimpleTextEditorViewModel();
                 SelectedItemViewModel.SaveCommand = null;
-                SelectedItemViewModel.TextEditor.ShowLineNumbers(true);
-                SelectedItemViewModel.TextEditor.SetSyntaxHighlighting("XML");
+                SelectedItemViewModel.TextEditor?.ShowLineNumbers(true);
+                SelectedItemViewModel.TextEditor?.SetSyntaxHighlighting("XML");
                 SelectedItemViewModel.Text = "";
                 SelectedItemViewModel.ResetChangeLog();
                 return;
@@ -156,8 +176,8 @@ namespace CommonControls.Editors.AnimationPack
 
             SelectedItemViewModel = new SimpleTextEditorViewModel();
             SelectedItemViewModel.SaveCommand = new RelayCommand(() => SaveActiveFile());
-            SelectedItemViewModel.TextEditor.ShowLineNumbers(true);
-            SelectedItemViewModel.TextEditor.SetSyntaxHighlighting(_activeConverter.GetSyntaxType());
+            SelectedItemViewModel.TextEditor?.ShowLineNumbers(true);
+            SelectedItemViewModel.TextEditor?.SetSyntaxHighlighting(_activeConverter.GetSyntaxType());
             SelectedItemViewModel.Text = _activeConverter.GetText(seletedFile.ToByteArray());
             SelectedItemViewModel.ResetChangeLog();
         }
@@ -209,7 +229,7 @@ namespace CommonControls.Editors.AnimationPack
             }
 
             var newAnimPack = new AnimationPackFile();
-            newAnimPack.FileName = _animPack.FileName;
+            newAnimPack.FileName = _pfs.GetFullPath(MainFile);
 
             foreach (var file in AnimationPackItems.PossibleValues)
                 newAnimPack.AddFile(file);
@@ -276,7 +296,7 @@ namespace CommonControls.Editors.AnimationPack
 
         public void ExportAnimationSlotsWh2Action()
         {
-            var slots = AnimationSlotTypeHelper.Values.Select(x => x.Id + "\t\t" + x.Value).ToList();
+            var slots = DefaultAnimationSlotTypeHelper.Values.Select(x => x.Id + "\t\t" + x.Value).ToList();
             SaveAnimationSlotsToFile(slots);
         }
 
@@ -295,13 +315,20 @@ namespace CommonControls.Editors.AnimationPack
             File.WriteAllText(path, sb.ToString());
         }
 
-        public static void ShowPreviewWinodow(AnimationPackFile animationPackFile, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, string selectedFileName)
+        public static void ShowPreviewWinodow(PackFile animationPackFile, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, string selectedFileName, ApplicationSettingsService applicationSettings)
         {
-            var controller = new AnimPackViewModel(pfs, skeletonAnimationLookUpHelper);
-            controller.Load(animationPackFile);
+            if (animationPackFile == null)
+            {
+                MessageBox.Show("Unable to resolve packfile");
+                return;
+            }
+
+            var controller = new AnimPackViewModel(pfs, skeletonAnimationLookUpHelper, applicationSettings);
+            controller.MainFile = animationPackFile;
+            controller.Load();
 
             var containingWindow = new Window();
-            containingWindow.Title = animationPackFile.FileName;
+            containingWindow.Title = animationPackFile.Name;
 
 
             containingWindow.DataContext = controller;

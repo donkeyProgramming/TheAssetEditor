@@ -5,6 +5,7 @@ using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
@@ -35,7 +36,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
             var binFile = new FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3("", bytes);
             var outputBin = new XmlFormat();
 
-            outputBin.Version = "Wh3";
+            outputBin.Version = binFile.TableVersion == 4 ? "Wh3" : "ThreeKingdom";
             outputBin.Data = new GeneralBinData()
             {
                 TableVersion = binFile.TableVersion,
@@ -110,7 +111,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
             return binFile.ToByteArray();
         }
 
-        protected override ITextConverter.SaveError Validate(XmlFormat type, string s, PackFileService pfs)
+        protected override ITextConverter.SaveError Validate(XmlFormat type, string s, PackFileService pfs, string filepath)
         {
             try
             {
@@ -120,25 +121,42 @@ namespace CommonControls.Editors.AnimationPack.Converters
                 if (type.Animations == null)
                     return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Animation section of xml missing" };
 
-                if (type.Data.TableVersion != 4)
-                    return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Incorrect TableVersion - must be 4" };
+                if (!(type.Data.TableVersion == 2 || type.Data.TableVersion == 4))
+                    return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Incorrect TableVersion - must be 4 (wh3) or 2 (3k)" };
 
-                if (type.Data.TableSubVersion != 3)
-                    return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Incorrect TableSubVersion - must be 3" };
+                if (type.Data.TableVersion == 4 && type.Data.TableSubVersion != 3)
+                    return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Incorrect TableSubVersion - must be 3 for wh3" };
 
                 if (string.IsNullOrWhiteSpace(type.Data.SkeletonName))
                     return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Missing skeleton item on root" };
-
-                if (string.IsNullOrWhiteSpace(type.Data.LocomotionGraph))
-                    return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Missing skeleton item on root" };
-
 
                 var errorList = new ErrorList();
                 if (_skeletonAnimationLookUpHelper.GetSkeletonFileFromName(pfs, type.Data.SkeletonName) == null)
                     errorList.Error("Skeleton", $"Skeleton {type.Data.SkeletonName} is not found");
 
-                if (pfs.FindFile(type.Data.LocomotionGraph) == null)
-                    errorList.Error("LocomotionGraph", $"LocomotionGraph {type.Data.LocomotionGraph} is not found");
+                if (type.Data.TableVersion == 4)
+                {
+                    if (string.IsNullOrWhiteSpace(type.Data.LocomotionGraph))
+                    {
+                        errorList.Warning("LocomotionGraph", $"LocomotionGraph not provided");
+                    }
+                    else
+                    {
+                        if (pfs.FindFile(type.Data.LocomotionGraph) == null)
+                            errorList.Error("LocomotionGraph", $"LocomotionGraph {type.Data.LocomotionGraph} is not found");
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(type.Data.Name))
+                {
+                    errorList.Error("Name", $"Name can not be empty");
+                }
+                else
+                {
+                    var filename = Path.GetFileNameWithoutExtension(filepath).ToLowerInvariant();
+                    if(filename != type.Data.Name.ToLowerInvariant())
+                        errorList.Error("Name", $"The name of the bin file has to be the same as the provided name. {filename} vs {type.Data.Name}");
+                }
 
                 foreach (var animation in type.Animations)
                 {
@@ -172,74 +190,6 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
             return null;
         }
-
-
-        /*
-         
-         
-
-            var lastIndex = 0;
-          
-            for(int i = 0; i < xmlAnimation.AnimationFragmentEntry.Count; i++)
-            {
-                var item = xmlAnimation.AnimationFragmentEntry[i];
-                lastIndex = text.IndexOf("<AnimationFragmentEntry", lastIndex + 1, StringComparison.InvariantCultureIgnoreCase);
-
-                if (item.Slot == null)
-                    return GenerateError(text, lastIndex, "No slot provided");
-
-                var slot = AnimationSlotTypeHelper.GetfromValue(item.Slot);
-                if (slot == null)
-                    return GenerateError(text, lastIndex, $"{item.Slot} is an invalid animation slot.");
-
-                if (item.File == null)
-                    return GenerateError(text, lastIndex, "No file item provided");
-
-                if (item.Meta == null)
-                    return GenerateError(text, lastIndex, "No meta item provided");
-
-                if (item.Sound == null)
-                    return GenerateError(text, lastIndex, "No sound item provided");
-
-                if (item.BlendInTime == null)
-                    return GenerateError(text, lastIndex, "No BlendInTime item provided");
-
-                if (item.SelectionWeight == null)
-                    return GenerateError(text, lastIndex, "No SelectionWeight item provided");
-
-                if (item.WeaponBone == null)
-                    return GenerateError(text, lastIndex, "No WeaponBone item provided");
-
-                if (ValidateBoolArray(item.WeaponBone) == false)
-                    return GenerateError(text, lastIndex, "WeaponBone bool array contains invalid values. Should contain 6 true/false values");
-            }
-
-            var errorList = new ErrorList();
-            if(_skeletonAnimationLookUpHelper.GetSkeletonFileFromName(pfs, xmlAnimation.Skeleton) == null)
-                errorList.Warning("Root", $"Skeleton {xmlAnimation.Skeleton} is not found");
-
-            foreach (var item in xmlAnimation.AnimationFragmentEntry)
-            {
-                if (string.IsNullOrWhiteSpace(item.File.Value))
-                    errorList.Warning(item.Slot, "Item does not have an animation");
-
-                if(pfs.FindFile(item.File.Value) == null)
-                    errorList.Warning(item.Slot, $"Animation {item.File.Value} is not found");
-
-                if (item.Meta.Value != "" && pfs.FindFile(item.Meta.Value) == null)
-                    errorList.Warning(item.Slot, $"Meta {item.Meta.Value} is not found");
-
-                if (item.Sound.Value != "" && pfs.FindFile(item.Sound.Value) == null)
-                    errorList.Warning(item.Slot, $"Sound {item.Sound.Value} is not found");
-            }
-
-            if(errorList.Errors.Count != 0)
-                ErrorListWindow.ShowDialog("Errors", errorList, false);
-
-            return null;
-        }
-         */
-
 
         [XmlRoot(ElementName = "Instance")]
         public class Instance

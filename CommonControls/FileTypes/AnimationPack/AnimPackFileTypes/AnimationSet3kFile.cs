@@ -32,22 +32,22 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
 
         public void CreateFromBytes(byte[] bytes)
         {
-            var chunk = new ByteChunk(bytes);
+                var chunk = new ByteChunk(bytes);
 
-            Version = chunk.ReadUInt32();
-            MountFragment = chunk.ReadString();
-            MountSkeleton = chunk.ReadString();
-            FragmentName = chunk.ReadString();
-            SkeletonName = chunk.ReadString();
-            IsSimpleFlight = chunk.ReadBool();
+                Version = chunk.ReadUInt32();
+                MountFragment = chunk.ReadString();
+                MountSkeleton = chunk.ReadString();
+                FragmentName = chunk.ReadString();
+                SkeletonName = chunk.ReadString();
+                IsSimpleFlight = chunk.ReadBool();
 
-            Entries = new List<AnimationSetEntry>();
-            var count = chunk.ReadUInt32();
-            for (int i = 0; i < count; i++)
-                Entries.Add(new AnimationSetEntry(chunk));
+                Entries = new List<AnimationSetEntry>();
+                var count = chunk.ReadUInt32();
+                for (int i = 0; i < count; i++)
+                    Entries.Add(new AnimationSetEntry(chunk));
 
-            if (chunk.BytesLeft != 0)
-                throw new Exception("More data in stream - AnimationSet3kFile");
+                if (chunk.BytesLeft != 0)
+                    throw new Exception("More data in stream - AnimationSet3kFile");
         }
 
         public byte[] ToByteArray()

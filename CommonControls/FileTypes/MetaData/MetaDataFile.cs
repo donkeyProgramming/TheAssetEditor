@@ -24,9 +24,12 @@ namespace CommonControls.FileTypes.MetaData
     {
         public string Name { get; set; }
         public byte[] Data { get; set; }
+        public virtual string Description { get; } = "";
 
         [MetaDataTag(0, "Version number of the Tag type", MetaDataTagAttribute.DisplayType.None, true)]
         public int Version { get; set; }
+
+        public string DisplayName { get => $"{Name}_{Version}{Description}"; }
        
     }
 
@@ -50,17 +53,26 @@ namespace CommonControls.FileTypes.MetaData
         public int Id { get; set; }
     }
 
+
+    public enum MetaDataAttributePriority
+    {
+        High = 0,
+        Low = 10,
+    }
+
     public class MetaDataAttribute : Attribute
     {
         public string VersionName { get; private set; }
         public string Name { get; set; }
         public int Version { get; set; }
+        public MetaDataAttributePriority Priority { get; set; } = MetaDataAttributePriority.High;
 
-        public MetaDataAttribute(string name, int version)
+        public MetaDataAttribute(string name, int version, MetaDataAttributePriority priority = MetaDataAttributePriority.High)
         {
             Name = name;
             Version = version;
             VersionName = name + "_" + version;
+            Priority = priority;
         }
     }
 

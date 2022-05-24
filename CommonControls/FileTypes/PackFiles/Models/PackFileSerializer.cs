@@ -10,6 +10,8 @@ using System.Linq;
 namespace CommonControls.FileTypes.PackFiles.Models
 {
 
+
+
     public static class PackFileVersionConverter
     {
         static List<(PackFileVersion EnumValue, string StringValue)> _values = new List<(PackFileVersion EnumValue, string StringValue)>()
@@ -30,7 +32,7 @@ namespace CommonControls.FileTypes.PackFiles.Models
     {
         static readonly ILogger _logger = Logging.CreateStatic(typeof(PackFileSerializer));
 
-        public static PackFileContainer Load(string packFileSystemPath, BinaryReader reader, IAnimationFileDiscovered animationFileDiscovered, ApplicationSettingsService settings)
+        public static PackFileContainer Load(string packFileSystemPath, BinaryReader reader, IAnimationFileDiscovered animationFileDiscovered, ApplicationSettingsService settings, IDuplicatePackFileResolver dubplicatePackFileResolver)
         {
             try
             {
@@ -76,14 +78,32 @@ namespace CommonControls.FileTypes.PackFiles.Models
                     if (animationFileDiscovered != null && packFileName.EndsWith(".anim"))
                         animationFileDiscovered.FileDiscovered(fileContent, output, fullPackedFileName);
 
+                    bool addFile = true;
+
+                    // Should we skip sound files? 
                     if (settings != null && settings.CurrentSettings.SkipLoadingWemFiles)
+                        addFile = packFileName.EndsWith(".wem", StringComparison.InvariantCultureIgnoreCase) == false;
+
+                    if (addFile)
                     {
-                        if (packFileName.EndsWith(".wem", StringComparison.InvariantCultureIgnoreCase) == false)
+                        if (dubplicatePackFileResolver.CheckForDuplicates)
+                        {
+                            var containsKey = output.FileList.ContainsKey(fullPackedFileName);
+                            if (containsKey)
+                            {
+                                if (dubplicatePackFileResolver.KeepDuplicateFile(fullPackedFileName))
+                                    output.FileList.Add(fullPackedFileName + Guid.NewGuid().ToString(), fileContent);
+                            }
+                            else
+                            {
+                                output.FileList.Add(fullPackedFileName, fileContent);
+                            }
+                        }
+                        else
+                        {
                             output.FileList.Add(fullPackedFileName, fileContent);
-                    }
-                    else
-                    {
-                        output.FileList.Add(fullPackedFileName, fileContent);
+                        }
+                        
                     }
                     offset += size;
                 }

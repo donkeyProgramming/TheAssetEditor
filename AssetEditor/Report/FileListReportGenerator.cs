@@ -46,7 +46,7 @@ namespace AssetEditor.Report
             instance.Create();
         }
 
-        public void Create()
+        public string Create()
         {
             var outputFolder = DirectoryHelper.ReportsDirectory + "\\FileList";
             DirectoryHelper.EnsureCreated(outputFolder);
@@ -79,6 +79,7 @@ namespace AssetEditor.Report
 
             MessageBox.Show($"Done - Created at {outputFilePath}");
             Process.Start("explorer.exe", outputFilePath);
+            return outputFilePath;
         }
 
         bool IsDb(string fileName) => fileName.StartsWith(@"db\", StringComparison.InvariantCultureIgnoreCase);

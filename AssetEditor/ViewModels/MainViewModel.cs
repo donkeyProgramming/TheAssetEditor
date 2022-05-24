@@ -3,6 +3,7 @@ using AssetEditor.Views.Settings;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.DB;
+using CommonControls.FileTypes.MetaData;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.Sound;
 using CommonControls.PackFileBrowser;
@@ -91,7 +92,8 @@ namespace AssetEditor.ViewModels
 
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
             {
-                //settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Rome_2_Remastered;
+                //settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Warhammer3;
+                //settingsService.CurrentSettings.SkipLoadingWemFiles = false;
                 var gamePath = settingsService.GetGamePathForCurrentGame();
                 if (gamePath != null)
                 {
@@ -101,13 +103,17 @@ namespace AssetEditor.ViewModels
                         MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
                 }
             }
-          
+
+            MetaDataTagDeSerializer.EnsureMappingTableCreated();
+
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
-              
+
+                //DefaultAnimationSlotTypeHelper.ExportAnimationDebugList(packfileService);
 
                 //var reportService = new FileListReportGenerator(packfileService, settingsService);
-                //reportService.CompareFiles(@"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.0.2.0 PackFiles.csv", @"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.1.0.0 PackFiles.csv");
+                //var comparePath = reportService.Create();
+                //reportService.CompareFiles(@"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.1.0.0 PackFiles.csv", @"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.2.0.0 Packfiles.csv");
 
                 //;
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateFlyingSquig(this, toolFactory, packfileService);

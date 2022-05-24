@@ -187,5 +187,14 @@ namespace View3D.Animation
             clip.DynamicFrames.Add(frame.Clone());
             return clip;
         }
+
+        public void ScaleAnimation(float scale)
+        {
+            foreach (var frame in DynamicFrames)
+            {
+                for (int i = 0; i < AnimationBoneCount; i++)
+                    frame.Scale[i] = new Vector3(scale);
+            }
+        }
     }
 }

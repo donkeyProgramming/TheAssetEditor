@@ -82,13 +82,27 @@ namespace CommonControls.PackFileBrowser
             {
                 var window = new TextInputWindow("Rename folder", _selectedNode.Name);
                 if (window.ShowDialog() == true)
+                {
+                    if (string.IsNullOrWhiteSpace(window.TextValue))
+                    {
+                        MessageBox.Show("Folder name can not be empty!");
+                        return;
+                    }
                     _packFileService.RenameDirectory(_selectedNode.FileOwner, _selectedNode, window.TextValue);
+                }
             }
             else if (_selectedNode.NodeType == NodeType.File)
             {
                 var window = new TextInputWindow("Rename file", _selectedNode.Item.Name);
                 if (window.ShowDialog() == true)
+                {
+                    if (string.IsNullOrWhiteSpace(window.TextValue))
+                    {
+                        MessageBox.Show("File name can not be empty!");
+                        return;
+                    }
                     _packFileService.RenameFile(_selectedNode.FileOwner, _selectedNode.Item, window.TextValue);
+                }
             }
         }
 
@@ -158,7 +172,14 @@ namespace CommonControls.PackFileBrowser
 
             var window = new TextInputWindow("Create folder", default, true);
             if (window.ShowDialog() == true)
+            {
+                if (string.IsNullOrWhiteSpace(window.TextValue))
+                {
+                    MessageBox.Show("Folder name can not be empty!");
+                    return;
+                }
                 _selectedNode.Children.Add(new TreeNode(window.TextValue, NodeType.Directory, _selectedNode.FileOwner, _selectedNode));
+            }
         }
 
         void DeleteNode()

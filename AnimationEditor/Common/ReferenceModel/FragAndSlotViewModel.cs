@@ -21,15 +21,15 @@ namespace AnimationEditor.Common.ReferenceModel
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         SelectMetaViewModel _metaViewModel;
+        private readonly ApplicationSettingsService _applicationSettings;
 
-
-        public SelectFragAndSlotViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel asset, SelectMetaViewModel metaViewModel)
+        public SelectFragAndSlotViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel asset, SelectMetaViewModel metaViewModel, ApplicationSettingsService applicationSettings)
         {
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _asset = asset;
             _metaViewModel = metaViewModel;
-
+            _applicationSettings = applicationSettings;
             FragmentList = new FilterCollection<IAnimationBinGenericFormat>(null, (value) => FragmentSelected(value, FragmentSlotList, _asset.SkeletonName.Value))
             {
                 SearchFilter = (value, rx) => { return rx.Match(value.FullPath).Success; }
@@ -49,7 +49,8 @@ namespace AnimationEditor.Common.ReferenceModel
             if (FragmentList.SelectedItem != null && FragmentList.SelectedItem != null)
             {
                 var animPack = FragmentList.SelectedItem.PackFileReference;
-                CommonControls.Editors.AnimationPack.AnimPackViewModel.ShowPreviewWinodow(animPack, _pfs, _skeletonAnimationLookUpHelper, FragmentList.SelectedItem.FullPath);
+                var packFile = _pfs.FindFile(animPack.FileName);
+                CommonControls.Editors.AnimationPack.AnimPackViewModel.ShowPreviewWinodow(packFile, _pfs, _skeletonAnimationLookUpHelper, FragmentList.SelectedItem.FullPath, _applicationSettings);
            }
         }
 

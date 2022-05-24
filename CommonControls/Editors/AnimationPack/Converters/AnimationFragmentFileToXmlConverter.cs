@@ -24,7 +24,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
         }
 
-        protected override ITextConverter.SaveError Validate(Animation xmlAnimation, string text, PackFileService pfs)
+        protected override ITextConverter.SaveError Validate(Animation xmlAnimation, string text, PackFileService pfs, string filepath)
         {
             if (string.IsNullOrWhiteSpace(xmlAnimation.Skeleton))
                 return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Missing skeleton item on root" };
@@ -39,7 +39,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
                 if (item.Slot == null)
                     return GenerateError(text, lastIndex, "No slot provided");
 
-                var slot = AnimationSlotTypeHelper.GetfromValue(item.Slot);
+                var slot = DefaultAnimationSlotTypeHelper.GetfromValue(item.Slot);
                 if (slot == null)
                     return GenerateError(text, lastIndex, $"{item.Slot} is an invalid animation slot.");
 
@@ -133,7 +133,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
                     BlendInTime = item.BlendInTime.Value,
                     Ignore = false,
                     SelectionWeight = item.SelectionWeight.Value,
-                    Slot = AnimationSlotTypeHelper.GetfromValue(item.Slot),
+                    Slot = DefaultAnimationSlotTypeHelper.GetfromValue(item.Slot),
                     Skeleton = animation.Skeleton,
                     Unknown0 = item.Unknown,
                 };

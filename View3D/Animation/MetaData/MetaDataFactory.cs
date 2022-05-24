@@ -149,6 +149,7 @@ namespace View3D.Animation.MetaData
             // Configure the mesh
             SceneLoader loader = new SceneLoader(resourceLib, pfs, GeometryGraphicsContextFactory.CreateInstance(graphics.Device), _componentManager, _applicationSettingsService);
             var loadedNode = loader.Load(meshPath, new GroupNode(propName), propPlayer);
+            
 
             // Configure animation
             var skeletonName = SceneNodeHelper.GetSkeletonName(loadedNode);
@@ -156,6 +157,8 @@ namespace View3D.Animation.MetaData
             var skeleton = new GameSkeleton(skeletonFile, propPlayer);
             var animFile = AnimationFile.Create(animationPath);
             var clip = new AnimationClip(animFile, skeleton);
+            clip.ScaleAnimation(animatedPropMeta.Scale);
+
 
             var animationRule = new CopyRootTransform(_rootSkeleton, animatedPropMeta.BoneId, animatedPropMeta.Position, new Quaternion(animatedPropMeta.Orientation));
            
@@ -233,6 +236,9 @@ namespace View3D.Animation.MetaData
 
     public class DrawableMetaInstance : IMetaDataInstance
     {
+        ILogger _logger = Logging.Create<MetaDataFactory>();
+        bool _hasError = false;
+
         SceneNode _node;
         string _description;
         public AnimationPlayer Player => null;
@@ -253,8 +259,19 @@ namespace View3D.Animation.MetaData
 
         public void Update(float currentTime)
         {
-            if(_animationResolver != null)
-                _node.ModelMatrix = _animationResolver.GetWorldTransform();
+            if (_hasError)
+                return;
+
+            try
+            {
+                if (_animationResolver != null)
+                    _node.ModelMatrix = _animationResolver.GetWorldTransform();
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error($"Error in {nameof(DrawableMetaInstance)} - {e.Message}");
+                _hasError = true;
+            }
         }
 
         public void CleanUp()

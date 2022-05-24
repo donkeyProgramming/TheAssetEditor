@@ -137,7 +137,7 @@ namespace CommonControls.Editors.TextEditor
         public void ResetChangeLog()
         {
             _textChanged = false;
-               TextEditor.ClearUndoStack();
+               TextEditor?.ClearUndoStack();
         }
     }
 }

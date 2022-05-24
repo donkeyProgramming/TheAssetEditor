@@ -1,7 +1,8 @@
+loc50+
+
 v0.XX
 ----------------------------
-	* Vertex tranform undo bug
-	
+	* Vertex tranform undo bug	
 	* Changelog with gifs system 
 	* Texture conveter 
 	* Decent texture window
@@ -24,6 +25,7 @@ v0.XX
 	* Convert useAlpha to bool in code 
 	* Better loading of Alpha values from WsModel -> katarin lower lods 
 	
+	
 	Imprivement to vertex debugger
 		Show all values
 		Toggle normal/tanget/binormals
@@ -38,6 +40,9 @@ v0.XX
 	* Raname file not working 
 	* Check file bug for older games on discord
 	* Phazer shader improvements 
+	* UV editor 
+	* Simple texture tool. Brighter, contreast, tint. Polygon selection and apply to inside 
+	* Tint control and write to WS model 
 	
 	Texture tool:
 		* Find out why the texture change slightly [Done]
@@ -63,7 +68,64 @@ v0.XX
 	
 	-- Live stream Kitbash editor 
 	
+Planned V0.35: 
 	
+	Texture fixer 
+	Troy resource pack!
+	Kill schama manager code 
+	Check for lod count when loading textures -> Warning for textures missing lods 
+	Icon for which attributes in a metatag that the superview uses 
+	SoundMeta_v2
+	
+	
+	Fix Mount Editor Editor for wh2 
+		Frags from more games 
+		Mount anim without animroot https://discord.com/channels/519116643830464513/917057637462470697/966032037498732584
+	AnimatedProp v4
+	SoundMeta_v2
+	MetaData Splice preview 
+		Splice -> Fit animation length + meta info about the anim (fps and lenfth in time)
+	Rmv2 to text for debugging?
+	Animpack updater => wh2 to wh3 
+	Texture converter => wh2 to wh3
+	Vertex debugger => show all values. Checkboxes for normal, tangent and bi
+	Checkboxes in ui for rendering flags
+	Resource pack => All animations from 3k and Troy. Other games as well?
+	Phazer shader
+	Warning for only 1 lod in rmv2 
+	
+		metafile splice
+	Resize animpack editor 
+	
+	Unload packfile not working correctly 
+	PackFileBrowserWindow vs SavePackFileWindow
+
+	
+	
+V0.35
+----------------------------
+	Bug => Super view load vmd from mixu
+
+	Features:
+		* Clear button added to packfile filter text (Thanks to Bapp)
+		* Auto focus the input field when creating a folder inside a packfile (Thanks to Bapp)	
+		* Rename and remove bins inside animpack (Thanks to propJoe)
+		* Invert selection in tree views (Thanks to propJoe)
+		* When loading ws model, delete other textures found in RMV2
+		* Binfile validation on name and gives the correct default value 
+		* Copy filepath of file inside animpack
+		* Scale suported for animated props in super view 
+		
+	BugFixes:
+		* Transform meta tag now correctly validate and can be saved
+		* All meta tags should be possible to create, no more crashes
+		* TargetPos_v10 metatag added 
+		* The tool sometimes creates file names with no names. That is making a lot of issues. Better error detection for this, might break stuff
+		* Better default valudes for multiple animmeta files 
+		* Fixed bug in AnimPack validation
+		* Better handling of duplicate file names 
+		* Fixed infinate error loop in super view related to bone ID for metadata
+		
 	
 	
 	
@@ -79,15 +141,9 @@ V0.34
 		* AnimPacks for wh3 can be viewed and edited, with validation on save
 		* Correctly setting loaded packfiles to be the main EditablePack file
 		* Some quality of life changes to the animPackEditor. Warning about unsaved files, export list of possible animationSlots++
-
-
 	
 V0.33
 ----------------------------
-
-		
-		
-		
 	Features:
 		* TextureProject - Beta. Export textures and UVs as PNGs and import them again. Please report any bugs or ideas for improvements. 
 		* Button to remove missing textures from mesh (For removing left over wh2 textures from wh3 models)

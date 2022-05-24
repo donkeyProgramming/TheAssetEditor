@@ -71,10 +71,11 @@ namespace CommonControls.PackFileBrowser
         private void Database_PackFileFolderRemoved(PackFileContainer container, string folder)
         {
             var root = GetPackFileCollectionRootNode(container);
-            var node = GetNodeFromPath(root, container, folder, false);
-            
-            node.Parent.Children.Remove(node);
-            node.RemoveSelf();
+            var nodeToDelete = GetNodeFromPath(root, container, folder, false);
+
+            var parent = nodeToDelete.Parent;
+            parent.Children.Remove(nodeToDelete);
+            nodeToDelete.RemoveSelf();
         }
 
         private void Database_PackFileFolderRenamed(PackFileContainer container, string folder)
@@ -238,7 +239,6 @@ namespace CommonControls.PackFileBrowser
             }
             else
             {
-
                 var directoryEnd = fullPath.LastIndexOf(Path.DirectorySeparatorChar);
                 var directory = fullPath.Substring(0, directoryEnd);
                 var parent = GetNodeFromPath(root, container, directory, createIfMissing);

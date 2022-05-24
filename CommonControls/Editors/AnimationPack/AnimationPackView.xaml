@@ -32,6 +32,9 @@
                     <MenuItem Header="Export animation slots (Wh3)"  Click="{s:MethodBinding ExportAnimationSlotsWh3Action}" />
                     <MenuItem Header="Export animation slots (Wh2)"  Click="{s:MethodBinding ExportAnimationSlotsWh2Action}" />
                 </MenuItem>
+                <ComboBox ItemsSource="{Binding PreferedSerializedTypes}" SelectedItem="{Binding PreferedSerializedType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                    
+                </ComboBox>
             </Menu>
         </DockPanel>
 
@@ -72,10 +75,9 @@
 
                 <ListView.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Rename" 
-                                  Command="{Binding RenameCommand}" />
-                        <MenuItem Header="Remove" 
-                                  Command="{Binding RemoveCommand}"/>
+                        <MenuItem Header="Rename" Command="{Binding RenameCommand}" />
+                        <MenuItem Header="Remove" Command="{Binding RemoveCommand}"/>
+                        <MenuItem Header="Copy Full Path" Command="{Binding CopyFullPathCommand}"/>
                     </ContextMenu>
                 </ListView.ContextMenu>
 

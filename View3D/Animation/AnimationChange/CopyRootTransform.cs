@@ -1,10 +1,16 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CommonControls.Common;
+using Microsoft.Xna.Framework;
+using Serilog;
+using System;
 using View3D.SceneNodes;
 
 namespace View3D.Animation.AnimationChange
 {
     public class CopyRootTransform : AnimationChangeRule
     {
+        ILogger _logger = Logging.Create<CopyRootTransform>();
+        bool _hasError = false;
+
         ISkeletonProvider _skeletonProvider;
         int _boneId;
         Vector3 _offsetPos;
@@ -20,12 +26,20 @@ namespace View3D.Animation.AnimationChange
 
         public override void TransformBone(AnimationFrame frame, int boneId, float v)       
         {
-            if (boneId != 0)
+            if (boneId != 0 || _hasError)
                 return;
 
-            var transform = _skeletonProvider.Skeleton.GetAnimatedWorldTranform(_boneId);
-            Matrix m = Matrix.CreateFromQuaternion(_offsetRot) * Matrix.CreateTranslation(_offsetPos) * transform;
-            frame.BoneTransforms[0].WorldTransform = m;
+            try
+            {
+                var transform = _skeletonProvider.Skeleton.GetAnimatedWorldTranform(_boneId);
+                Matrix m = Matrix.CreateFromQuaternion(_offsetRot) * Matrix.CreateTranslation(_offsetPos) * transform;
+                frame.BoneTransforms[0].WorldTransform = m;
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error($"Error in {nameof(CopyRootTransform)} - {e.Message}");
+                _hasError = true;
+            }
         }
     }
 }

@@ -33,7 +33,7 @@ namespace CommonControls.Editors.AnimMeta
         public UnkMetaDataTagItemViewModel(UnknownMetaEntry unknownMeta)
         {
             IsDecodedCorrectly.Value = false;
-            DisplayName.Value = $"{unknownMeta.Name}_v{unknownMeta.Version}";
+            DisplayName.Value = unknownMeta.DisplayName;
             Version.Value = unknownMeta.Version;
             _input = unknownMeta;
         }
@@ -59,7 +59,7 @@ namespace CommonControls.Editors.AnimMeta
 
         public MetaDataTagItemViewModel(BaseMetaEntry typedMetaItem)
         {
-            DisplayName.Value = $"{typedMetaItem.Name}_v{typedMetaItem.Version}";
+            DisplayName.Value = typedMetaItem.DisplayName;
             _originalName = typedMetaItem.Name;
             Description.Value = MetaDataTagDeSerializer.GetDescriptionSafe(_originalName);
             Version.Value = typedMetaItem.Version;
