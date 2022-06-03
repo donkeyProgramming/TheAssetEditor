@@ -90,6 +90,13 @@ namespace AssetEditor.ViewModels
                 settingsService.Save();
             }
 
+            //var anim3k = new BaseAnimationSlotHelper(GameTypeEnum.ThreeKingdoms).Values.Select(X => X.Value).ToList();
+            //var animWh2 = new BaseAnimationSlotHelper(GameTypeEnum.Warhammer3).Values.Select(X => X.Value).ToList();
+            //var iff = anim3k.Except(animWh2).ToList();
+            //var iff2 = animWh2.Except(animWh2).ToList();
+            //var dsfg = packfileService.Load(@"C:\Users\ole_k\Desktop\3k_animations.pack", false, true);
+            //new BaseAnimationSlotHelper(GameTypeEnum.ThreeKingdoms).ExportAnimationDebugList(packfileService, @"3kanims");
+
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
             {
                 //settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Warhammer3;
@@ -104,10 +111,14 @@ namespace AssetEditor.ViewModels
                 }
             }
 
+
+
             MetaDataTagDeSerializer.EnsureMappingTableCreated();
 
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
+
+                //new BaseAnimationSlotHelper(GameTypeEnum.Warhammer2).ExportAnimationDebugList(packfileService, @"c:\temp\3kanims.txt");
 
                 //DefaultAnimationSlotTypeHelper.ExportAnimationDebugList(packfileService);
 

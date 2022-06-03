@@ -22,7 +22,7 @@ namespace CommonControls.Editors.AnimationPack
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         ITextConverter _activeConverter;
-
+        ApplicationSettingsService _appSettings;
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("");
 
         PackFile _packFile;
@@ -33,14 +33,6 @@ namespace CommonControls.Editors.AnimationPack
         SimpleTextEditorViewModel _selectedItemViewModel;
         public SimpleTextEditorViewModel SelectedItemViewModel { get => _selectedItemViewModel; set => SetAndNotify(ref _selectedItemViewModel, value); }
 
-        public GameTypeEnum[] PreferedSerializedTypes { get => new GameTypeEnum[] { GameTypeEnum.Unknown, GameTypeEnum.Warhammer3, GameTypeEnum.Warhammer2, GameTypeEnum.Troy, GameTypeEnum.ThreeKingdoms }; }
-
-        GameTypeEnum _preferedSerializedType = GameTypeEnum.Unknown;
-        public GameTypeEnum PreferedSerializedType
-        {
-            get => _preferedSerializedType;
-            set { SetAndNotifyWhenChanged(ref _preferedSerializedType, value); Load(); }
-        }
 
         public ICommand RemoveCommand { get; set; }
         public ICommand RenameCommand { get; set; }
@@ -50,14 +42,12 @@ namespace CommonControls.Editors.AnimationPack
         {
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
+            _appSettings = appSettings;
 
             AnimationPackItems = new FilterCollection<IAnimationPackFile>(new List<IAnimationPackFile>(), ItemSelected, BeforeItemSelected)
             {
                 SearchFilter = (value, rx) => { return rx.Match(value.FileName).Success; }
             };
-
-            if (PreferedSerializedTypes.Contains(appSettings.CurrentSettings.CurrentGame))
-                _preferedSerializedType = appSettings.CurrentSettings.CurrentGame;
 
             RemoveCommand = new RelayCommand(Remove);
             RenameCommand = new RelayCommand(Rename);
@@ -93,8 +83,7 @@ namespace CommonControls.Editors.AnimationPack
 
         public void Load()
         {
-            BaseAnimationSlotHelper slotResolver = new BaseAnimationSlotHelper(_preferedSerializedType);
-            var animPack = AnimationPackSerializer.Load(_packFile, _pfs, slotResolver, _preferedSerializedType);
+            var animPack = AnimationPackSerializer.Load(_packFile, _pfs);
             var itemNames = animPack.Files.ToList();
             AnimationPackItems.UpdatePossibleValues(itemNames); 
             DisplayName.Value = animPack.FileName;
@@ -123,18 +112,6 @@ namespace CommonControls.Editors.AnimationPack
             AnimationPackItems.UpdatePossibleValues(AnimationPackItems.PossibleValues);
         }
 
-
-        public void CreateEmpty3kAnimSetFile()
-        {
-            var fileName = GetAnimSetFileName();
-            if (fileName == null)
-                return;
-
-            var animSet = AnimationPackSampleDataCreator.CreateExample3kAnimSet(fileName);
-            AnimationPackItems.PossibleValues.Add(animSet);
-            AnimationPackItems.UpdatePossibleValues(AnimationPackItems.PossibleValues);
-        }
-
         public void SetSelectedFile(string path)
         {
             AnimationPackItems.SelectedItem = AnimationPackItems.PossibleValues.FirstOrDefault(x => x.FileName == path);
@@ -155,11 +132,9 @@ namespace CommonControls.Editors.AnimationPack
         {
             _activeConverter = null;
             if (seletedFile is AnimationFragmentFile typedFragment)
-                _activeConverter = new AnimationFragmentFileToXmlConverter(_skeletonAnimationLookUpHelper);
+                _activeConverter = new AnimationFragmentFileToXmlConverter(_skeletonAnimationLookUpHelper, _appSettings.CurrentSettings.CurrentGame);
             else if (seletedFile is FileTypes.AnimationPack.AnimPackFileTypes.AnimationBin typedBin)
                 _activeConverter = new AnimationBinFileToXmlConverter();
-            else if (seletedFile is AnimationSet3kFile animSet3k)
-                _activeConverter = new AnimationSet3kFileToXmlConverter(_skeletonAnimationLookUpHelper);
             else if (seletedFile is FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3 wh3Bin)
                 _activeConverter = new AnimationBinWh3FileToXmlConverter(_skeletonAnimationLookUpHelper);
 

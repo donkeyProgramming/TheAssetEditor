@@ -36,14 +36,14 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
             using MemoryStream memStream = new MemoryStream();
 
             memStream.Write(ByteParsers.UInt32.EncodeValue(TableVersion, out _));
-            if(TableSubVersion == 4)
+            if(TableVersion == 4)
                 memStream.Write(ByteParsers.UInt32.EncodeValue(TableSubVersion, out _));
 
             memStream.Write(ByteParsers.String.WriteCaString(Name.ToLower()));
             memStream.Write(ByteParsers.String.WriteCaString(MountBin.ToLower()));
             memStream.Write(ByteParsers.String.WriteCaString(Unkown.ToLower()));
             memStream.Write(ByteParsers.String.WriteCaString(SkeletonName.ToLower()));
-            if (TableSubVersion == 4)
+            if (TableVersion == 4)
                 memStream.Write(ByteParsers.String.WriteCaString(LocomotionGraph.ToLower()));
 
             memStream.Write(ByteParsers.Short.EncodeValue(UnknownValue1, out _));
@@ -162,6 +162,7 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
         {
             get 
             {
+
                 var output = new List<AnimationBinEntryGenericFormat>();
                 foreach (var item in AnimationTableEntries)
                 {
@@ -170,12 +171,19 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
                         index = 1;
                     foreach (var animation in item.AnimationRefs)
                     {
+                        var slotName = string.Empty;
+                        if (TableVersion == 2)
+                            slotName = AnimationSlotTypeHelper3k.GetFromId((int)item.AnimationId).Value;
+                        else
+                            slotName = AnimationSlotTypeHelperWh3.GetFromId((int)item.AnimationId).Value;
+
                         output.Add(new AnimationBinEntryGenericFormat()
                         {
                             AnimationFile = animation.AnimationFile,
                             MetaFile = animation.AnimationMetaFile,
                             SoundFile = animation.AnimationSoundMetaFile,
-                            SlotName = AnimationSlotTypeHelper3k.GetFromId((int)item.AnimationId).Value,
+                            SlotIndex = (int)item.AnimationId,
+                            SlotName = slotName,
                             Index = index
                         });
                     }

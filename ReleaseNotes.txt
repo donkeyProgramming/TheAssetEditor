@@ -94,40 +94,59 @@ Planned V0.35:
 	Phazer shader
 	Warning for only 1 lod in rmv2 
 	
-		metafile splice
+	Hydra anim, 3k anim for dead 
+	
+	metafile splice
 	Resize animpack editor 
 	
 	Unload packfile not working correctly 
 	PackFileBrowserWindow vs SavePackFileWindow
 
 	
+	Campaing bin for 3k, troy and improive for wh3 
+	White space in model filename on save
+	Splice tag 
+	Clean up animpack stuff a bit. Wh2/Troy into same format?
+	Animation bin capability validator 
+	Improved material editor (ws model) 
+	
+V0.36
+----------------------------
+	Error for metadata splice - display
+	Saving scaled animation in anim transfer tool 
+	Give the name of the file causing "empty folder" error 
+	Time in superview 
+	Prop 13 and 14 (3k)
+	wh2 support for anim
+	improved textures for shader 
+	White space in model filename on save
+	Skeleton tool issues 
+	Allow resize in the animpack editor 
 	
 V0.35
 ----------------------------
-	Bug => Super view load vmd from mixu
-
 	Features:
 		* Clear button added to packfile filter text (Thanks to Bapp)
 		* Auto focus the input field when creating a folder inside a packfile (Thanks to Bapp)	
 		* Rename and remove bins inside animpack (Thanks to propJoe)
 		* Invert selection in tree views (Thanks to propJoe)
 		* When loading ws model, delete other textures found in RMV2
-		* Binfile validation on name and gives the correct default value 
-		* Copy filepath of file inside animpack
-		* Scale suported for animated props in super view 
+		* Animation Binfile validation on file name and gives the correct default value 
+		* Copy file path of file inside animpack
+		* Scale supported for animated props in super view 
+		* Support for editing and creating animation sets for 3k
 		
 	BugFixes:
 		* Transform meta tag now correctly validate and can be saved
-		* All meta tags should be possible to create, no more crashes
+		* All meta tags should be possible to create, no more crashes!
 		* TargetPos_v10 metatag added 
-		* The tool sometimes creates file names with no names. That is making a lot of issues. Better error detection for this, might break stuff
-		* Better default valudes for multiple animmeta files 
-		* Fixed bug in AnimPack validation
-		* Better handling of duplicate file names 
-		* Fixed infinate error loop in super view related to bone ID for metadata
-		
-	
-	
+		* The tool sometimes creates file names with no names. That is making a lot of issues. Better error detection for this, might break stuff. Let me know!
+		* Better default values for multiple animmeta files 
+		* Fixed a bug in AnimPack validation for wahammer 3
+		* Better handling of duplicate file names when loading packfiles 
+		* Fixed infinite error loop in super view related to bone ID for metadata. Program should no longer hang 
+		* Error when opening some vmds 
+
 	
 V0.34
 ----------------------------
@@ -182,16 +201,16 @@ V0.32
 
 V0.31
 ----------------------------
-Features:
-	* Simple error checking when saving a mesh to catch common errors
+	Features:
+		* Simple error checking when saving a mesh to catch common errors
 
-Fixes:
-	* Mesh fitter tool no longer crashing
-	
-Known issues:
-	* Can not save v8 animations! 
-	* Wh3 bin files not picked up by several of the editors, causing issues
-	* Can not save wh3 animation bins
+	Fixes:
+		* Mesh fitter tool no longer crashing
+		
+	Known issues:
+		* Can not save v8 animations! 
+		* Wh3 bin files not picked up by several of the editors, causing issues
+		* Can not save wh3 animation bins
 
 V0.30
 ----------------------------

@@ -27,6 +27,5 @@ namespace CommonControls.FileTypes.MetaData
 
         public string Name { get; set; } = ""; // Only name, no _v10 stuff here. Used for saving
         public TagData DataItem { get; set; }
-        public bool IsDecodedCorrectly { get; set; } = false;
     }
 }

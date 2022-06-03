@@ -44,12 +44,20 @@ namespace CommonControls.FileTypes.AnimationPack
         {
             switch (game)
             {
+                case GameTypeEnum.Warhammer2:
+                    Load("CommonControls.Resources.AnimationSlots.Warhammer2AnimationSlots.txt");
+                    break;
+
                 case GameTypeEnum.Warhammer3:
                     Load("CommonControls.Resources.AnimationSlots.Warhammer3AnimationSlots.txt");
                     break;
 
                 case GameTypeEnum.Troy:
                     Load("CommonControls.Resources.AnimationSlots.TroyAnimationSlots.txt");
+                    break;
+
+                case GameTypeEnum.ThreeKingdoms:
+                    Load("CommonControls.Resources.AnimationSlots.3kAnimationSlots.txt");
                     break;
 
                 default:
@@ -91,6 +99,7 @@ namespace CommonControls.FileTypes.AnimationPack
         public void ExportAnimationDebugList(PackFileService pfs, string outputName)
         {
             var data = new Dictionary<string, List<string>>();
+            var indexList = new Dictionary<string, int>();
             foreach (var slot in Values)
                 data[slot.Value] = new List<string>();
 
@@ -109,17 +118,19 @@ namespace CommonControls.FileTypes.AnimationPack
 
                         var fileName = Path.GetFileNameWithoutExtension(entry.AnimationFile);
                         data[entry.SlotName].Add(fileName);
+                        indexList[entry.SlotName] = entry.SlotIndex;
                     }
                 }
             }
 
             StringBuilder sb = new StringBuilder();
             sb.AppendLine($"sep=|");
-            sb.AppendLine($"Slot|Files");
+            sb.AppendLine($"SlotName|SlotIndex|Files");
             foreach (var row in data)
             {
                 var files = string.Join(", ", row.Value.Distinct());
-                sb.AppendLine($"{row.Key.PadRight(45, ' ')}\t| {files}");
+                var slotId = indexList.ContainsKey(row.Key) ? indexList[row.Key].ToString() : "";
+                sb.AppendLine($"{row.Key.PadRight(45, ' ')}\t|{slotId.PadRight(5)}| {files}");
             }
             File.WriteAllText($"C:\\temp\\{outputName}.csv", sb.ToString());
         }
@@ -127,7 +138,7 @@ namespace CommonControls.FileTypes.AnimationPack
 
     public static class AnimationSlotTypeHelperWh3
     {
-        public static BaseAnimationSlotHelper Instance;
+        static BaseAnimationSlotHelper Instance;
         public static List<AnimationSlotType> Values { get { Create(); return Instance.Values; } }
 
         static public AnimationSlotType GetFromId(int id)
@@ -151,7 +162,14 @@ namespace CommonControls.FileTypes.AnimationPack
 
         static void Create()
         {
-            Instance = new BaseAnimationSlotHelper(GameTypeEnum.Warhammer3);
+            if (Instance == null)
+                Instance = new BaseAnimationSlotHelper(GameTypeEnum.Warhammer3);
+        }
+
+        public static BaseAnimationSlotHelper GetInstance()
+        {
+            Create();
+            return Instance;
         }
     }
 
@@ -182,7 +200,50 @@ namespace CommonControls.FileTypes.AnimationPack
 
         static void Create()
         {
-            Instance = new BaseAnimationSlotHelper(GameTypeEnum.Warhammer2);
+            if(Instance == null)
+                Instance = new BaseAnimationSlotHelper(GameTypeEnum.ThreeKingdoms);
+        }
+
+        public static BaseAnimationSlotHelper GetInstance()
+        {
+            Create();
+            return Instance;
+        }
+    }
+    public static class AnimationSlotTypeHelperTroy
+    {
+        public static BaseAnimationSlotHelper Instance;
+        public static List<AnimationSlotType> Values { get { Create(); return Instance.Values; } }
+
+        static public AnimationSlotType GetFromId(int id)
+        {
+            Create();
+            return Values[id];
+        }
+
+        static public AnimationSlotType GetfromValue(string value)
+        {
+            Create();
+            var upperStr = value.ToUpper();
+            return Values.FirstOrDefault(x => x.Value == upperStr);
+        }
+
+        static public AnimationSlotType GetMatchingRiderAnimation(string value)
+        {
+            var riderAnim = "RIDER_" + value;
+            return Values.FirstOrDefault(x => x.Value == riderAnim);
+        }
+
+        static void Create()
+        {
+            if (Instance == null)
+                Instance = new BaseAnimationSlotHelper(GameTypeEnum.Troy);
+        }
+
+        public static BaseAnimationSlotHelper GetInstance()
+        {
+            Create();
+            return Instance;
         }
     }
 
@@ -214,6 +275,12 @@ namespace CommonControls.FileTypes.AnimationPack
         {
             if(Instance == null)
                 Instance = new BaseAnimationSlotHelper(GameTypeEnum.Warhammer2);
+        }
+
+        public static BaseAnimationSlotHelper GetInstance()
+        {
+            Create();
+            return Instance;
         }
     }
 }

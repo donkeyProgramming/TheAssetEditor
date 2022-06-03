@@ -5,8 +5,13 @@ using System.Text;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
+    public interface IEffectMeta
+    { 
+        public string VfxName { get; set; }
+    }
+
     [MetaData("EFFECT", 11)]
-    public class Effect_v11 : DecodedMetaEntryBase
+    public class Effect_v11 : DecodedMetaEntryBase, IEffectMeta
     {
         [MetaDataTag(5, "Name of the VFX's .xml file in the vfx folder. Leave off the file extension. Note that for this you don't need to add custom vfx to the particles db table and they still require a \"movie\"-type .pack for them to be loaded.")]
         public string VfxName { get; set; } = "";
@@ -37,7 +42,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     }
 
     [MetaData("EFFECT", 12)]
-    public class Effect_v12 : DecodedMetaEntryBase
+    public class Effect_v12 : DecodedMetaEntryBase, IEffectMeta
     {
         [MetaDataTag(5, "Name of the VFX's .xml file in the vfx folder. Leave off the file extension. Note that for this you don't need to add custom vfx to the particles db table and they still require a \"movie\"-type .pack for them to be loaded.")]
         public string VfxName { get; set; } = "";

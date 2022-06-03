@@ -161,7 +161,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
             tableEntry.FragmentReferences.Add(new AnimationBinEntry.FragmentReference() { Name = _fragmentName });
             animDb.AnimationTableEntries.Add(tableEntry);
             
-            _riderOutputFragment = new AnimationFragmentFile("animations/animation_tables/" + _fragmentName + ".frg", null);
+            _riderOutputFragment = new AnimationFragmentFile("animations/animation_tables/" + _fragmentName + ".frg", null, GameTypeEnum.Warhammer2);
             _riderOutputFragment.Skeletons = new StringArrayTable(_riderFragment.Skeletons.Values.First(), _riderFragment.Skeletons.Values.First());
             
             _outAnimPack.AddFile(_riderOutputFragment);

@@ -33,10 +33,13 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
         protected override XmlFormat ConvertBytesToXmlClass(byte[] bytes)
         {
+            
             var binFile = new FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3("", bytes);
             var outputBin = new XmlFormat();
 
+            var slotHelper = binFile.TableVersion == 4 ? AnimationSlotTypeHelperWh3.GetInstance() : AnimationSlotTypeHelper3k.GetInstance();
             outputBin.Version = binFile.TableVersion == 4 ? "Wh3" : "ThreeKingdom";
+            
             outputBin.Data = new GeneralBinData()
             {
                 TableVersion = binFile.TableVersion,
@@ -52,7 +55,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
             {
                 outputBin.Animations.Add(new Animation()
                 {
-                    Slot = AnimationSlotTypeHelperWh3.GetFromId((int)animation.AnimationId).Value,
+                    Slot = slotHelper.GetFromId((int)animation.AnimationId).Value,
                     BlendId = animation.BlendIn,
                     BlendOut = animation.SelectionWeight,
                     Unk = animation.Unk,
@@ -86,11 +89,13 @@ namespace CommonControls.Editors.AnimationPack.Converters
             binFile.UnknownValue1 = xmlBin.Data.UnknownValue1_RelatedToFlight;
             binFile.Unkown = "";
 
+            var slotHelper = binFile.TableVersion == 4 ? AnimationSlotTypeHelperWh3.GetInstance() : AnimationSlotTypeHelper3k.GetInstance();
+
             foreach (var animationEntry in xmlBin.Animations)
             {
                 binFile.AnimationTableEntries.Add(new FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry() 
                 { 
-                    AnimationId = (uint)AnimationSlotTypeHelperWh3.GetfromValue(animationEntry.Slot).Id,
+                    AnimationId = (uint)slotHelper.GetfromValue(animationEntry.Slot).Id,
                     BlendIn = animationEntry.BlendId,
                     SelectionWeight = animationEntry.BlendOut,
                     WeaponBools = CreateWeaponFlagInt(animationEntry.WeaponBone),
@@ -147,6 +152,8 @@ namespace CommonControls.Editors.AnimationPack.Converters
                     }
                 }
 
+                var slotHelper = type.Data.TableVersion == 4 ? AnimationSlotTypeHelperWh3.GetInstance() : AnimationSlotTypeHelper3k.GetInstance();
+
                 if (string.IsNullOrWhiteSpace(type.Data.Name))
                 {
                     errorList.Error("Name", $"Name can not be empty");
@@ -160,9 +167,9 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
                 foreach (var animation in type.Animations)
                 {
-                    var slot = AnimationSlotTypeHelperWh3.GetfromValue(animation.Slot);
+                    var slot = slotHelper.GetfromValue(animation.Slot);
                     if (slot == null)
-                        errorList.Error(animation.Slot, $"Not a valid animation slot");
+                        errorList.Error(animation.Slot, $"Not a valid animation slot for game");
 
                     if (animation.Ref == null || animation.Ref.Count == 0)
                         errorList.Error(animation.Slot, "Slot does not have any animations");

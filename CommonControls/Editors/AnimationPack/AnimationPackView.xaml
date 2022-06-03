@@ -25,16 +25,12 @@
                 <MenuItem Header="_File">
                     <MenuItem Header="Save" Click="{s:MethodBinding Save}"/>
                     <Separator/>
-                    <MenuItem Header="New AnimationSet (Wh3)"  Click="{s:MethodBinding CreateEmptyWarhammer3AnimSetFile}" />
-                    <MenuItem Header="New AnimationSet (3k)"  Click="{s:MethodBinding CreateEmpty3kAnimSetFile}" />
+                    <MenuItem Header="New AnimationSet (Wh3/3K)"  Click="{s:MethodBinding CreateEmptyWarhammer3AnimSetFile}" />
                     <MenuItem Header="View Selected As Table" Click="{s:MethodBinding ViewSelectedAsTable}" Visibility="Collapsed"/>
                     <Separator/>
                     <MenuItem Header="Export animation slots (Wh3)"  Click="{s:MethodBinding ExportAnimationSlotsWh3Action}" />
                     <MenuItem Header="Export animation slots (Wh2)"  Click="{s:MethodBinding ExportAnimationSlotsWh2Action}" />
                 </MenuItem>
-                <ComboBox ItemsSource="{Binding PreferedSerializedTypes}" SelectedItem="{Binding PreferedSerializedType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                    
-                </ComboBox>
             </Menu>
         </DockPanel>
 

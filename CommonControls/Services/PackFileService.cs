@@ -30,16 +30,20 @@ namespace CommonControls.Services
             _settingsService = settingsService;
         }
 
+        public bool TriggerFileUpdates { get; set; } = true;
 
-        public PackFileContainer Load(string packFileSystemPath, bool setToMainPackIfFirst = false) 
+
+        public PackFileContainer Load(string packFileSystemPath, bool setToMainPackIfFirst = false, bool allowLoadWithoutCaPackFiles = false) 
         {
             try
             {
                 var caPacksLoaded = Database.PackFiles.Count(x => x.IsCaPackFile);
-                if (caPacksLoaded == 0)
+                if (caPacksLoaded == 0 && allowLoadWithoutCaPackFiles != true)
                 {
-                    MessageBox.Show("You are trying to load a packfile before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.", "Error");
-                    return null;
+                    MessageBox.Show("You are trying to load a packfile before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
+                    
+                    if(System.Diagnostics.Debugger.IsAttached)
+                        return null;
                 }
 
                 if (!File.Exists(packFileSystemPath))
@@ -343,10 +347,13 @@ namespace CommonControls.Services
             directoryPath += newFile.Name;
             container.FileList[directoryPath.ToLower()] = newFile;
 
-            _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, container);
-            _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, container);
+            if (TriggerFileUpdates)
+            {
+                _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, container);
+                _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, container);
 
-            Database.TriggerPackFileAdded(container, new List<PackFile>() { newFile  });
+                Database.TriggerPackFileAdded(container, new List<PackFile>() { newFile });
+            }
         }
 
         public void AddFilesToPack(PackFileContainer container, List<string> directoryPaths, List<PackFile> newFiles)

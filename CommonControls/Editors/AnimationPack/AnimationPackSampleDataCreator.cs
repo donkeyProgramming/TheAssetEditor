@@ -130,59 +130,5 @@ namespace CommonControls.Editors.AnimationPack
 
             return outputFile;
         }
-
-        public static AnimationSet3kFile CreateExample3kAnimSet(string fragmentName)
-        {
-            var filename = SaveHelper.EnsureEnding(fragmentName, ".bin");
-            var filePath = @"animations/database/battle/bin/" + filename;
-
-            var animSet = new AnimationSet3kFile(filePath, null);
-            animSet.MountSkeleton = "horse_1h095";
-            animSet.FragmentName = "infantry_1h095_hero";
-            animSet.SkeletonName = "male01";
-            animSet.IsSimpleFlight = false;
-            animSet.MountFragment = "cavalry_1h095_hero";
-
-            var row0 = new AnimationSet3kFile.AnimationSetEntry()
-            {
-                Slot = 0,
-                BlendWeight = 0.15f,
-                SelectionWeight = 1,
-                Flag = false,
-                WeaponBone = 47,
-                Animations = new List<AnimationSet3kFile.AnimationSetEntry.AnimationEntry>()
-                {
-                    new AnimationSet3kFile.AnimationSetEntry.AnimationEntry()
-                    {
-                        AnimationFile = @"animations/skeletons/male01.anim",
-                        MetaFile = @"animations/battle/persistent/cav_1h095_mandatory_persistent_metadata_alive_0.anm.meta",
-                        SoundMeta = @"animations/audio/battle/persistent/cav_1h095_mandatory_persistent_metadata_alive_0.{e20c2u}.snd.meta",
-                    }
-                }
-            };
-
-            var row1 = new AnimationSet3kFile.AnimationSetEntry()
-            {
-                Slot = 3,
-                BlendWeight = 0.15f,
-                SelectionWeight = 1,
-                Flag = false,
-                WeaponBone = 47,
-                Animations = new List<AnimationSet3kFile.AnimationSetEntry.AnimationEntry>()
-                {
-                    new AnimationSet3kFile.AnimationSetEntry.AnimationEntry()
-                    {
-                        AnimationFile = @"animations/skeletons/male01.anim",
-                        MetaFile = @"animations/battle/persistent/cav_1h095_mandatory_persistent_metadata_alive_0.anm.meta",
-                        SoundMeta = @"animations/audio/battle/persistent/cav_1h095_mandatory_persistent_metadata_alive_0.{e20c2u}.snd.meta",
-                    }
-                }
-            };
-
-            animSet.Entries.Add(row0);
-            animSet.Entries.Add(row1);
-
-            return animSet;
-        }
     }
 }

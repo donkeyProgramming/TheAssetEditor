@@ -1,5 +1,6 @@
 ﻿using CommonControls.Common;
 using CommonControls.FileTypes.DB;
+using CommonControls.Services;
 using Filetypes.ByteParsing;
 using System;
 using System.Collections;
@@ -13,7 +14,7 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
     [DebuggerDisplay("AnimationFragmentFile - {FileName}")]
     public class AnimationFragmentFile : IAnimationPackFile
     {
-        BaseAnimationSlotHelper _animationSlotCreator;
+        GameTypeEnum _preferedGame = GameTypeEnum.Warhammer2;
 
         public string FileName { get; set; }
         public AnimationPackFile Parent { get; set; }
@@ -25,11 +26,11 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
         public int MaxSlotId { get; set; }
         public List<AnimationSetEntry> Fragments { get; set; } = new List<AnimationSetEntry>();
 
+       
 
         public AnimationFragmentFile() { }
-        public AnimationFragmentFile(string fileName, byte[] bytes, BaseAnimationSlotHelper animationSlotCreator = null)
+        public AnimationFragmentFile(string fileName, byte[] bytes, GameTypeEnum preferedGame)
         {
-            _animationSlotCreator = animationSlotCreator;
             FileName = fileName;
             if(bytes != null)
                 CreateFromBytes(bytes);
@@ -46,7 +47,7 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
 
             Fragments.Clear();
             for (int i = 0; i < numFragItems; i++)
-                Fragments.Add(new AnimationSetEntry(data, _animationSlotCreator));
+                Fragments.Add(new AnimationSetEntry(data, _preferedGame));
         }
 
         public byte[] ToByteArray()
@@ -80,8 +81,6 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
 
             return memStream.ToArray();
         }
-
-
     }
 
     public class AnimationSetEntry
@@ -101,15 +100,15 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
         public string Comment { get; set; } = string.Empty;
         public bool Ignore { get; set; } = false;
 
-        public AnimationSetEntry(ByteChunk data, BaseAnimationSlotHelper animationSlotCreator)
+        public AnimationSetEntry(ByteChunk data, GameTypeEnum preferedGame)
         {
             _id = data.ReadInt32();
             _slot = data.ReadInt32();
 
-            if(animationSlotCreator== null)
+            if(preferedGame == GameTypeEnum.Troy)
                 Slot = DefaultAnimationSlotTypeHelper.GetFromId(_slot);
             else
-                Slot = animationSlotCreator.GetFromId(_slot);
+                Slot = AnimationSlotTypeHelperTroy.GetFromId(_slot);
 
             AnimationFile = data.ReadString();
             MetaDataFile = data.ReadString();

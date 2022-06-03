@@ -18,10 +18,12 @@ namespace CommonControls.Editors.AnimationPack.Converters
         : BaseAnimConverter<AnimationFragmentFileToXmlConverter.Animation, AnimationFragmentFile>
     {
         private SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        GameTypeEnum _preferedGame;
 
-        public AnimationFragmentFileToXmlConverter(SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        public AnimationFragmentFileToXmlConverter(SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, GameTypeEnum preferedGame)
         {
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
+            _preferedGame = preferedGame;
         }
 
         protected override ITextConverter.SaveError Validate(Animation xmlAnimation, string text, PackFileService pfs, string filepath)
@@ -92,7 +94,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
         protected override Animation ConvertBytesToXmlClass(byte[] bytes)
         {
-            var fragmentFile = new AnimationFragmentFile("", bytes);
+            var fragmentFile = new AnimationFragmentFile("", bytes, _preferedGame);
             var outputBin = new Animation();
             outputBin.AnimationFragmentEntry = new List<AnimationEntry>();
             outputBin.Skeleton = fragmentFile.Skeletons.Values.FirstOrDefault();
@@ -119,7 +121,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
         protected override byte[] ConvertToAnimClassBytes(Animation animation, string fileName)
         {
-            var output = new AnimationFragmentFile(fileName, null);
+            var output = new AnimationFragmentFile(fileName, null, _preferedGame);
             output.Skeletons = new StringArrayTable(animation.Skeleton, animation.Skeleton);
 
             foreach (var item in animation.AnimationFragmentEntry)
@@ -133,7 +135,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
                     BlendInTime = item.BlendInTime.Value,
                     Ignore = false,
                     SelectionWeight = item.SelectionWeight.Value,
-                    Slot = DefaultAnimationSlotTypeHelper.GetfromValue(item.Slot),
+                    Slot = _preferedGame == GameTypeEnum.Troy ? AnimationSlotTypeHelperTroy.GetfromValue(item.Slot) :  DefaultAnimationSlotTypeHelper.GetfromValue(item.Slot),
                     Skeleton = animation.Skeleton,
                     Unknown0 = item.Unknown,
                 };

@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Resources\AnimationSlots\3kAnimationSlots.txt" />
     <None Remove="Resources\AnimationSlots\TroyAnimationSlots.txt" />
     <None Remove="Resources\AnimationSlots\Warhammer2AnimationSlots.txt" />
     <None Remove="Resources\AnimationSlots\Warhammer3AnimationSlots.txt" />
@@ -115,6 +116,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\AnimationSlots\3kAnimationSlots.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\AnimationSlots\Warhammer3AnimationSlots.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
