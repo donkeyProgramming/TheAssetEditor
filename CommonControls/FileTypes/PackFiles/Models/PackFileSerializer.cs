@@ -92,7 +92,10 @@ namespace CommonControls.FileTypes.PackFiles.Models
                             if (containsKey)
                             {
                                 if (dubplicatePackFileResolver.KeepDuplicateFile(fullPackedFileName))
+                                {
+                                    _logger.Here().Warning($"Duplicate file found {fullPackedFileName}");
                                     output.FileList.Add(fullPackedFileName + Guid.NewGuid().ToString(), fileContent);
+                                }
                             }
                             else
                             {

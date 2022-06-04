@@ -19,14 +19,19 @@ namespace AnimationEditor.Common.AnimationPlayer
      
         ILogger _logger = Logging.Create<AnimationPlayerViewModel>();
 
+        float _selectedAnimationCurrentTime = 0;
+        public float SelectedAnimationCurrentTime { get { return _selectedAnimationCurrentTime; } set { SetAndNotifyWhenChanged(ref _selectedAnimationCurrentTime, value); } }
 
+        float _selectedAnimationMaxTime = 0;
+        public float SelectedAnimationMaxTime { get { return _selectedAnimationMaxTime; } set { SetAndNotifyWhenChanged(ref _selectedAnimationMaxTime, value); } }
+        int _selectedAnimationFps = 0;
+        public int SelectedAnimationFps { get { return _selectedAnimationFps; } set { SetAndNotifyWhenChanged(ref _selectedAnimationFps, value); } }
 
         int _selectedAnimationCurrentFrame = 0;
         public int SelectedAnimationCurrentFrame { get { return _selectedAnimationCurrentFrame + 1; } set { SetAndNotifyWhenChanged(ref _selectedAnimationCurrentFrame, value); } }
 
         int _selectedAnimationFrameCount = 0;
         public int SelectedAnimationFrameCount { get { return _selectedAnimationFrameCount; } set { SetAndNotifyWhenChanged(ref _selectedAnimationFrameCount, value); } }
-
 
         bool _isEnabled;
         public bool IsEnabled { get { return _isEnabled; } set { SetAndNotify(ref _isEnabled, value); OnEnableChanged(IsEnabled); } }
@@ -102,12 +107,17 @@ namespace AnimationEditor.Common.AnimationPlayer
                 oldAnimation.Asset.Player.OnFrameChanged -= Player_OnFrameChanged;
 
             SelectedAnimationFrameCount = mainAnimation.MaxFrames;
+            //SelectedAnimationFps = mainAnimation.MaxFrames
             mainAnimation.Asset.Player.OnFrameChanged += Player_OnFrameChanged;
         }
 
         private void Player_OnFrameChanged(int currentFrame)
         {
+            SelectedAnimationFrameCount = SelectedMainAnimation.Asset.Player.FrameCount();
             SelectedAnimationCurrentFrame = currentFrame;
+            SelectedAnimationCurrentTime = SelectedMainAnimation.Asset.Player.GetTimeInMs() / 1000;
+            SelectedAnimationMaxTime = SelectedMainAnimation.Asset.Player.GetAnimationLengthMs() / 1000;
+            SelectedAnimationFps = SelectedMainAnimation.Asset.Player.GetFPS();
             if (SelectedAnimationCurrentFrame == SelectedMainAnimation.Asset.Player.FrameCount())
             {
                 if (LoopAnimation)
@@ -206,7 +216,6 @@ namespace AnimationEditor.Common.AnimationPlayer
 
         void PrivFrame(AssetViewModel item)
         {
-
             item.Player.Pause();
             item.Player.CurrentFrame--;
 
@@ -233,7 +242,6 @@ namespace AnimationEditor.Common.AnimationPlayer
             int _maxFrames = 0;
             public int MaxFrames { get { return _maxFrames; } set { SetAndNotify(ref _maxFrames, value); } }
 
-
             string _animationName;
             public string AnimationName { get { return _animationName; } set { SetAndNotify(ref _animationName, value); } }
 
@@ -255,9 +263,6 @@ namespace AnimationEditor.Common.AnimationPlayer
                 SlotName = Asset.Description;
                 MaxFrames = Asset.Player.FrameCount();
             }
-
         }
     }
-
-    
 }

@@ -185,7 +185,7 @@ namespace AssetEditor.ViewModels
                 //AnimationEditor.MountAnimationCreator.MountAnimationCreator_Debug.CreateLionAndHu01c(this, toolFactory, packfileService);
                 //KitbashEditor_Debug.CreateLoremasterHead(this, toolFactory, packfileService);
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateBowCentigor(this, toolFactory, packfileService);
-                //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateDamselEditor(this, toolFactory, packfileService);
+                AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 //var f = packfileService.FindFile(@"animations\campaign\database\bin\cam_hero_hu1d_def_spear_and_shield.bin");
                 //
                 //AnimationEditor.AnimationBuilder.AnimationBuilderViewModel.AnimationBuilder_Debug.CreateExampleAnimation(this, toolFactory, packfileService, animationLookUpHelper);
@@ -208,7 +208,7 @@ namespace AssetEditor.ViewModels
 
                 //OpenFile(packfileService.FindFile(@"animations\database\battle\bin\animation_tables.animpack"));
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\ksl\ksl_katarin\ksl_katarin_cloth_cloak_01.rigid_model_v2"));
-                OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\ksl\ksl_katarin\ksl_katarin_01.rigid_model_v2"));
+                //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\ksl\ksl_katarin\ksl_katarin_01.rigid_model_v2"));
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hq3\nor\nor_war_mammoth\nor_war_mammoth_warshrine_01.rigid_model_v2"));
                 
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc1\tmb\tmb_warsphinx\tex\tmb_warsphinx_armour_01_base_colour.dds"));

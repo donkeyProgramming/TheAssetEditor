@@ -156,7 +156,7 @@ namespace AssetEditor.Report
             var summaryContent = new StringWriter();
             summaryContent.WriteLine("sep=|");
             summaryContent.WriteLine("Tag|Completed|Failed|Ratio");
-            foreach (var item in output)
+            foreach (var item in output.OrderBy(x=>x.Key))
             {
                 var str = $"{item.Key}| {item.Value.CompletedFiles.Count}| {item.Value.FailedFiles.Count} |{item.Value.FailedFiles.Count}/{item.Value.CompletedFiles.Count + item.Value.FailedFiles.Count}";
                 _logger.Here().Information(str);

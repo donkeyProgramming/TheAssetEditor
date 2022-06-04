@@ -32,8 +32,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         {
             Items = new ObservableCollection<ContextMenuItem>();
 
-            _contextMenu.Add(new ContextMenuItem("Invert Selection", new RelayCommand(InvertSelection)));
-
             if (!activeNodes.Any())
                 return;
 
@@ -44,11 +42,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 return;
 
             if (CanMakeEditable(_activeNode))
-            {
                 _contextMenu.Add(new ContextMenuItem("Make Editable", new RelayCommand(MakeEditable)));
-            }
-
-            _contextMenu.Add(new ContextMenuItem("Select Similarly Named", new RelayCommand(SelectSimilar)));
 
             if (IsUngroupable(_activeNode))
                 _contextMenu.Add(new ContextMenuItem("Ungroup", new RelayCommand(Ungroup)));
@@ -58,6 +52,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             else if (IsUnlockable(_activeNode))
                 _contextMenu.Add(new ContextMenuItem("Unlock", new RelayCommand(ToggleLock)));
 
+            if (_contextMenu.Count != 0)
+                _contextMenu.Add(null);
+            _contextMenu.Add(new ContextMenuItem("Invert Selection", new RelayCommand(InvertSelection)));
+            _contextMenu.Add(new ContextMenuItem("Select Similarly Named", new RelayCommand(SelectSimilar)));
+
             if (IsRemovable(_activeNode))
             {
                 if (_contextMenu.Count != 0)
@@ -65,8 +64,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 _contextMenu.Add(new ContextMenuItem("Remove", new RelayCommand(RemoveNode)));
             }
         }
-
-
 
         bool CanMakeEditable(ISceneNode node)
         {

@@ -22,7 +22,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
     { 
         Save,
         SaveAs,
-        GenerateWsModel,
+        GenerateWsModelForWh3,
         GenerateWsModelForWh2,
         OpenImportReference,
         ImportReferencePaladin,
@@ -120,8 +120,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         {
             _actionList[MenuActionType.Save] = new MenuAction(General.Save) { EnableRule = ActionEnabledRule.Always, ToolTip = "Save" };
             _actionList[MenuActionType.SaveAs] = new MenuAction(General.SaveAs) { EnableRule = ActionEnabledRule.Always, ToolTip = "Save as" };
-            _actionList[MenuActionType.GenerateWsModel] = new MenuAction(General.GenerateWsModel) { EnableRule = ActionEnabledRule.Always, ToolTip = "Generate ws model" };
-            _actionList[MenuActionType.GenerateWsModelForWh2] = new MenuAction(General.GenerateWsModelForWh2) { EnableRule = ActionEnabledRule.Always, ToolTip = "Generate ws model for warhammer 2" };
+            _actionList[MenuActionType.GenerateWsModelForWh3] = new MenuAction(General.GenerateWsModelWh3) { EnableRule = ActionEnabledRule.Always, ToolTip = "Generate ws model (Wh3)" };
+            _actionList[MenuActionType.GenerateWsModelForWh2] = new MenuAction(General.GenerateWsModelForWh2) { EnableRule = ActionEnabledRule.Always, ToolTip = "Generate ws model (Wh2)" };
             _actionList[MenuActionType.OpenImportReference] = new MenuAction(ImportReference) { EnableRule = ActionEnabledRule.Always, ToolTip = "Import Reference model" };
             _actionList[MenuActionType.ImportReferencePaladin] = new MenuAction(ImportReference_PaladinVMD) { EnableRule = ActionEnabledRule.Always, ToolTip = "Import Paladin Reference model" };
             _actionList[MenuActionType.ImportReferenceSlayer] = new MenuAction(ImportReference_Slayer) { EnableRule = ActionEnabledRule.Always, ToolTip = "Import Slayer Reference model" };
@@ -192,8 +192,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "(Un)Group selection", Action = _actionList[MenuActionType.Group] });
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "Reduce mesh by 10%", Action = _actionList[MenuActionType.ReduceMesh10x] });
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "Sort models by name", Action = _actionList[MenuActionType.SortModelsByName] });
-            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Generat Ws Model", Action = _actionList[MenuActionType.GenerateWsModel] });
-            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Generat Ws Model for warhammer 2", Action = _actionList[MenuActionType.GenerateWsModelForWh2] });
+            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Generat Ws Model (Wh3)", Action = _actionList[MenuActionType.GenerateWsModelForWh3] });
+            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Generat Ws Model (Wh2)", Action = _actionList[MenuActionType.GenerateWsModelForWh2] });
 
             MenuItems[3].Children.Add(new ToolbarItem() { Name = "Focus camera", Action = _actionList[MenuActionType.FocusSelection] });
             MenuItems[3].Children.Add(new ToolbarItem() { Name = "Reset camera", Action = _actionList[MenuActionType.ResetCamera] });

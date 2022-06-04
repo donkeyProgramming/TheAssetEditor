@@ -46,13 +46,14 @@ namespace CommonControls.PackFileBrowser
         public string Name { get => _name; set => SetAndNotify(ref _name, value); }
         public TreeNode(string name, NodeType type, PackFileContainer ower, TreeNode parent, PackFile packFile = null)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new Exception("Packfile name or folder is empty, this is not allowed! Please report as a bug if it happens outside of packfile loading! If it happens while loading clean up the packfile in RPFM");
             Name = name;
             NodeType = type;
             Item = packFile;
             FileOwner = ower;
             Parent = parent;
+
+            if (string.IsNullOrWhiteSpace(name))
+                throw new Exception($"Packfile name or folder is empty '{GetFullPath()}', this is not allowed! Please report as a bug if it happens outside of packfile loading! If it happens while loading clean up the packfile in RPFM");
         }
 
         public string GetFullPath()

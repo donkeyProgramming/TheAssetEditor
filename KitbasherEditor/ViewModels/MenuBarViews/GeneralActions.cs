@@ -63,7 +63,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         public void Save() => ModelSaver.Save();
         public void SaveAs() => ModelSaver.SaveAs();
-        public void GenerateWsModel() => WsModelGeneratorService.GenerateWsModel();
+        public void GenerateWsModelWh3() => WsModelGeneratorService.GenerateWsModel(CommonControls.Services.GameTypeEnum.Warhammer3);
         public void Undo() => _commandExecutor.Undo();
         public void FocusSelection() => _cameraFocusComponent.FocusSelection();
         public void ResetCamera() => _cameraFocusComponent.ResetCamera();
@@ -71,6 +71,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public void ToggleBackFaceRendering() => _renderEngineComponent.ToggelBackFaceRendering();
         public void ToggleLargeSceneRendering() => _renderEngineComponent.ToggleLargeSceneRendering();
 
-        public void GenerateWsModelForWh2() => WsModelGeneratorService.GenerateWsModelForWh2();
+        public void GenerateWsModelForWh2() => WsModelGeneratorService.GenerateWsModel(CommonControls.Services.GameTypeEnum.Warhammer2);
     }
 }

@@ -97,7 +97,8 @@ Planned V0.35:
 	Hydra anim, 3k anim for dead 
 	
 	metafile splice
-	Resize animpack editor 
+	
+	Global resource manager 
 	
 	Unload packfile not working correctly 
 	PackFileBrowserWindow vs SavePackFileWindow
@@ -109,19 +110,41 @@ Planned V0.35:
 	Clean up animpack stuff a bit. Wh2/Troy into same format?
 	Animation bin capability validator 
 	Improved material editor (ws model) 
+	Skeleton db parser for splice 
+	List which metadata is possible for each game 
+	Matched combat files 
+	
+
+	wh2 support for anim
+	Remember super view and 3d view editor sized on tab change 
+	Tint for wsmodels! 
+	Improve the pin for animated meshes 
+	make the selection box for drag and drop smaller, or fix the drag end drop to select faces correctly
+	
+	Improve the update screen. It looks like shit! 
+	Focus in animEditors (ctrl f) and reset 
+	Allow resize in the animpack editor (remember tab change!)
+	White space in model filename on save
+	Saving scaled animation in anim transfer tool 
+	Fix buttons for time line
+	Saving animpack, if contains matched combat give error instead of crash 
+	
 	
 V0.36
-----------------------------
-	Error for metadata splice - display
-	Saving scaled animation in anim transfer tool 
-	Give the name of the file causing "empty folder" error 
-	Time in superview 
-	Prop 13 and 14 (3k)
-	wh2 support for anim
-	improved textures for shader 
-	White space in model filename on save
-	Skeleton tool issues 
-	Allow resize in the animpack editor 
+----------------------------	
+	Features:
+		* Improved shader and light textures (Thanks to Phazer)
+		* Decoded meta tags. Prop_12, Prop_13, Prop_14, AnimatedProp_12, AnimatedProp_13, AnimatedProp_14, DisablePersistantId_11
+		* Time in seconds displayed in superview 
+		* Show the name of files inside packfile that causes loading issues 
+		* Support for wh2 ws model generation, again (Thanks to ZZ bob)
+		
+	BugFixes:
+		* Fixed error when deleting bones in the skeletonEditor
+		* Pushed the selection related option in the kitbash editor context menu down. Back to how it was some time ago.
+		* White space issue for ws model generation 
+		* Animation transfer tool can save scaled animations again! 
+		
 	
 V0.35
 ----------------------------
