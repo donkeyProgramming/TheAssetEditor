@@ -25,6 +25,12 @@ namespace CommonControls.Common
         public bool CanOpen(string fullPath)
         {
             var extention = Regex.Match(fullPath, @"\..*").Value;
+            if (extention.Contains("{") && extention.Contains("}"))
+            {
+                var index = extention.IndexOf("}");
+                extention = extention.Remove(0, index+1);
+            }
+
             foreach (var validExt in _validExtentions)
             {
                 if (validExt == extention)

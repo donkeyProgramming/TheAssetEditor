@@ -112,23 +112,52 @@ Planned V0.35:
 	Improved material editor (ws model) 
 	Skeleton db parser for splice 
 	List which metadata is possible for each game 
-	Matched combat files 
-	
-
 	wh2 support for anim
-	Remember super view and 3d view editor sized on tab change 
 	Tint for wsmodels! 
-	Improve the pin for animated meshes 
-	make the selection box for drag and drop smaller, or fix the drag end drop to select faces correctly
 	
-	Improve the update screen. It looks like shit! 
-	Focus in animEditors (ctrl f) and reset 
-	Allow resize in the animpack editor (remember tab change!)
 	White space in model filename on save
-	Saving scaled animation in anim transfer tool 
+	
+	Do a seach for all files and list the ones starting with <PROPERTY_SET> in content. Its CA internal assetpipeline files which they have forgotten to remove 
+	Filter matadata tags by supported game	
+	
+	Remember super view and 3d view editor sized on tab change 
+	
+	
+	Focus in animEditors (ctrl f) and reset 
+	
+	>> Improve the pin for animated meshes 
+	
+	User Error window 
+	
+	
+V0.37
+----------------------------
+	
+	Matched combat files
+	Allow resize in the animpack editor (remember tab change!)
 	Fix buttons for time line
+	
+	Auto wh2 => wh3 fragment/bin converter 
+	Shortcuts for kitbesh common command (extract, grow selection, split, combine) 
+	Improve the update screen. It looks like shit! 
+	Meta report error for atilla => https://discord.com/channels/@me/950789780768186439/982407930085249076
 	Saving animpack, if contains matched combat give error instead of crash 
 	
+	animated_prop13/prop13 for 3k
+	
+	Phazer shader and light controls 
+	
+	Start making unit tests...
+	
+	Meta file issue = https://discord.com/channels/373745291289034763/795235087352201226/982699359550443530
+	Animated prop scale issue  https://discord.com/channels/@me/960643531406454844/982409997839396885
+	make the selection box for drag and drop smaller, or fix the drag end drop to select faces correctly
+	Matched combat for wh3 
+	Show warnig when openin CA animpack, about not datacoring this file! 
+	Make it eaiser to understand, animpack editor 
+	
+	BugFixes:
+		* Meta file editor correctly opens snd.meta files 
 	
 V0.36
 ----------------------------	
@@ -237,33 +266,33 @@ V0.31
 
 V0.30
 ----------------------------
-Features:
-	* Its not possible to control the lod detail level by setting a value on the LOD node
+	Features:
+		* Its not possible to control the lod detail level by setting a value on the LOD node
 
-Fixes:
-	* Crash when adding new metadata tag
-	* Bug related to changing vertex type 
-	
+	Fixes:
+		* Crash when adding new metadata tag
+		* Bug related to changing vertex type 
+		
 
-Known issues:
-	* Can not save v8 animations! 
-	* Wh3 bin files not picked up by several of the editors, causing issues
-	* Can not save wh3 animation bins 
+	Known issues:
+		* Can not save v8 animations! 
+		* Wh3 bin files not picked up by several of the editors, causing issues
+		* Can not save wh3 animation bins 
 
 V0.29
 ----------------------------
-Fixes:
-	* Trying to find missing textures using specular if diffuse texture missing
-	* Correctly load v8 animations 
-	* Fixed crashes when using spec/gloss shader, often when combining meshes.
-	* Open wh3 animation bin files for preview 
-	
-Anim Meta tags decoded:
-	* AnimatedProp 12,13,14 
-	* Prop 12,13,14 
-	* Eject_attached
+	Fixes:
+		* Trying to find missing textures using specular if diffuse texture missing
+		* Correctly load v8 animations 
+		* Fixed crashes when using spec/gloss shader, often when combining meshes.
+		* Open wh3 animation bin files for preview 
+		
+	Anim Meta tags decoded:
+		* AnimatedProp 12,13,14 
+		* Prop 12,13,14 
+		* Eject_attached
 
-Known issues:
-	* Can not save v8 animations! 
-	* Wh3 bin files not picked up by several of the editors 
-	* Can not save wh3 animation bins 
+	Known issues:
+		* Can not save v8 animations! 
+		* Wh3 bin files not picked up by several of the editors 
+		* Can not save wh3 animation bins 
