@@ -66,15 +66,17 @@ namespace View3D.Components.Component
         public override void Update(GameTime gameTime)
         {
             bool lightMoved = false;
+            bool DirlightMoved_X = false;
+            bool DirlightMoved_Y = false;
             bool lightIntensityChanged = false;
             if (_keyboard.IsKeyDown(Keys.PageUp) && !_keyboard.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngine.LightRotationDegrees += 1.0f;
+                _renderEngine.EnvLightRotationDegrees_Y += 1.0f;
                 lightMoved = true;
             }
             else if (_keyboard.IsKeyDown(Keys.PageDown) && !_keyboard.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngine.LightRotationDegrees -= 1.0f;
+                _renderEngine.DirLightRotationDegrees_Y -= 1.0f;
                 lightMoved = true;
             }
 
@@ -89,14 +91,43 @@ namespace View3D.Components.Component
                 lightIntensityChanged = true;
             }
 
-            if (_renderEngine.LightRotationDegrees >= 360)
-                _renderEngine.LightRotationDegrees = 0;
+            // TODO: Phazer Code: added this code for the directional light
+            else if (_keyboard.IsKeyDown(Keys.Right) && _keyboard.IsKeyDown(Keys.LeftAlt))
+            {
+                _renderEngine.DirLightRotationDegrees_Y -= 1.0f;
+                DirlightMoved_Y = true;
+            }
+            else if (_keyboard.IsKeyDown(Keys.Left) && _keyboard.IsKeyDown(Keys.LeftAlt))
+            {
+                _renderEngine.DirLightRotationDegrees_Y += 1.0f;
+                DirlightMoved_Y = true;
+            }
+            else if (_keyboard.IsKeyDown(Keys.Up) && _keyboard.IsKeyDown(Keys.LeftAlt))
+            {
+                _renderEngine.DirLightRotationDegrees_X -= 1.0f;
+                DirlightMoved_X = true;
+            }
+            else if (_keyboard.IsKeyDown(Keys.Down) && _keyboard.IsKeyDown(Keys.LeftAlt))
+            {
+                _renderEngine.DirLightRotationDegrees_X += 1.0f;
+                DirlightMoved_X = true;
+            }
+            else if (_keyboard.IsKeyDown(Keys.Home) && _keyboard.IsKeyDown(Keys.LeftAlt))
+            {
+                ResetLilghtingParams();
+                lightMoved = true;
+            }
 
-            if (_renderEngine.LightIntensityMult < 0)
-                _renderEngine.LightIntensityMult = 0;
+            ClampLightValues();
 
             if (lightMoved)
-                CreateAnimation($"Light rotation: {_renderEngine.LightRotationDegrees}");
+                CreateAnimation($"Env rotation Y: {_renderEngine.EnvLightRotationDegrees_Y}");
+
+            if (DirlightMoved_X)
+                CreateAnimation($"DirLight rotation X: {_renderEngine.DirLightRotationDegrees_X}");
+
+            if (DirlightMoved_Y)
+                CreateAnimation($"DirLight rotation Y: {_renderEngine.DirLightRotationDegrees_Y}");
 
             if (lightIntensityChanged)
                 CreateAnimation($"Light intensity: {_renderEngine.LightIntensityMult}");
@@ -109,6 +140,47 @@ namespace View3D.Components.Component
 
             base.Update(gameTime);
         }
+
+
+        public void ResetLilghtingParams()
+        {
+            _renderEngine.LightIntensityMult = 1.0f;
+            _renderEngine.EnvLightRotationDegrees_Y = 0.0f;
+            _renderEngine.DirLightRotationDegrees_X = 0.0f;
+            _renderEngine.DirLightRotationDegrees_Y = 0.0f;
+        }
+
+
+        private void ClampLightValues()
+        {
+            // (keep rotation = [0; 306])
+
+            // enviroment rotation
+            if (_renderEngine.EnvLightRotationDegrees_Y > 360.0f)
+                _renderEngine.EnvLightRotationDegrees_Y = 0;
+
+            if (_renderEngine.EnvLightRotationDegrees_Y < 0)
+                _renderEngine.EnvLightRotationDegrees_Y = 360.0f;
+
+            // diretional lighting rotation, 
+            if (_renderEngine.DirLightRotationDegrees_X > 360.0f)
+                _renderEngine.DirLightRotationDegrees_X = 0.0f;
+
+            if (_renderEngine.DirLightRotationDegrees_X < 0)
+                _renderEngine.DirLightRotationDegrees_X = 360.0f;
+
+
+            if (_renderEngine.DirLightRotationDegrees_Y < 0)
+                _renderEngine.DirLightRotationDegrees_Y = 360.0f;
+
+            if (_renderEngine.DirLightRotationDegrees_Y > 360.0f)
+                _renderEngine.DirLightRotationDegrees_Y = 0.0f;
+
+
+            if (_renderEngine.LightIntensityMult < 0)
+                _renderEngine.LightIntensityMult = 0;
+        }
+
 
         public void Dispose()
         {

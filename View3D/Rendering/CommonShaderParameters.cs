@@ -11,7 +11,10 @@ namespace View3D.Rendering
         public Matrix Projection { get; set; }
         public Vector3 CameraPosition { get; set; }
         public Vector3 CameraLookAt { get; set; }
-        public float LightRotationRadians { get; set; }
+        public float EnvLightRotationsRadians_Y { get; set; }
+        public float DirLightRotationRadians_X { get; set; }
+        public float DirLightRotationRadians_Y { get; set; }
+
         public float LightIntensityMult { get; set; }
     }
 

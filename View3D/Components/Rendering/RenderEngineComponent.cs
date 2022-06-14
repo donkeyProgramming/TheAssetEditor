@@ -46,7 +46,9 @@ namespace View3D.Components.Rendering
         bool _cullingEnabled = false;
         bool _bigSceneDepthBiasMode = false;
 
-        public float LightRotationDegrees { get; set; } = 20;
+        public float EnvLightRotationDegrees_Y { get; set; } = 20;
+        public float DirLightRotationDegrees_X { get; set; } = 0;
+        public float DirLightRotationDegrees_Y { get; set; } = 0;
         public float LightIntensityMult { get; set; } = 1;
 
         public RenderFormats MainRenderFormat { get; set; } = RenderFormats.SpecGloss;
@@ -153,7 +155,14 @@ namespace View3D.Components.Rendering
                 View = _camera.ViewMatrix,
                 CameraPosition = _camera.Position,
                 CameraLookAt = _camera.LookAt,
-                LightRotationRadians = MathHelper.ToRadians(LightRotationDegrees),
+                EnvLightRotationsRadians_Y = MathHelper.ToRadians(EnvLightRotationDegrees_Y),
+
+                // Phazer Code: 
+                DirLightRotationRadians_X = MathHelper.ToRadians(DirLightRotationDegrees_X),
+
+                DirLightRotationRadians_Y = MathHelper.ToRadians(DirLightRotationDegrees_Y),
+                // END: Phazer Code: 
+
                 LightIntensityMult = LightIntensityMult
             };
 
