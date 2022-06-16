@@ -3,8 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
 using View3D.Utility;
@@ -66,37 +64,66 @@ namespace View3D.Components.Component
         public override void Update(GameTime gameTime)
         {
             bool lightMoved = false;
+            bool DirlightMoved_X = false;
+            bool DirlightMoved_Y = false;
             bool lightIntensityChanged = false;
             if (_keyboard.IsKeyDown(Keys.PageUp) && !_keyboard.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngine.LightRotationDegrees += 1.0f;
+                _renderEngine.EnvLightRotationDegrees_Y += 1.0f;
                 lightMoved = true;
             }
             else if (_keyboard.IsKeyDown(Keys.PageDown) && !_keyboard.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngine.LightRotationDegrees -= 1.0f;
+                _renderEngine.EnvLightRotationDegrees_Y -= 1.0f;
                 lightMoved = true;
             }
 
             if (_keyboard.IsKeyDown(Keys.PageUp) && _keyboard.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngine.LightIntensityMult += 0.1f;
+                _renderEngine.LightIntensityMult += 0.05f;
                 lightIntensityChanged = true;
             }
             else if (_keyboard.IsKeyDown(Keys.PageDown) && _keyboard.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngine.LightIntensityMult -= 0.1f;
+                _renderEngine.LightIntensityMult -= 0.05f;
                 lightIntensityChanged = true;
+            }            
+            else if (_keyboard.IsKeyDown(Keys.Right) && _keyboard.IsKeyDown(Keys.LeftAlt))
+            {
+                _renderEngine.DirLightRotationDegrees_Y -= 1.0f;
+                DirlightMoved_Y = true;
+            }
+            else if (_keyboard.IsKeyDown(Keys.Left) && _keyboard.IsKeyDown(Keys.LeftAlt))
+            {
+                _renderEngine.DirLightRotationDegrees_Y += 1.0f;
+                DirlightMoved_Y = true;
+            }
+            else if (_keyboard.IsKeyDown(Keys.Up) && _keyboard.IsKeyDown(Keys.LeftAlt))
+            {
+                _renderEngine.DirLightRotationDegrees_X -= 1.0f;
+                DirlightMoved_X = true;
+            }
+            else if (_keyboard.IsKeyDown(Keys.Down) && _keyboard.IsKeyDown(Keys.LeftAlt))
+            {
+                _renderEngine.DirLightRotationDegrees_X += 1.0f;
+                DirlightMoved_X = true;
+            }
+            else if (_keyboard.IsKeyDown(Keys.Home) && _keyboard.IsKeyDown(Keys.LeftAlt))
+            {
+                ResetLilghtingParams();
+                lightMoved = true;
             }
 
-            if (_renderEngine.LightRotationDegrees >= 360)
-                _renderEngine.LightRotationDegrees = 0;
-
-            if (_renderEngine.LightIntensityMult < 0)
-                _renderEngine.LightIntensityMult = 0;
+            LimitLightValues();
 
             if (lightMoved)
-                CreateAnimation($"Light rotation: {_renderEngine.LightRotationDegrees}");
+                CreateAnimation($"Env rotation Y: {_renderEngine.EnvLightRotationDegrees_Y}");
+
+            if (DirlightMoved_X)
+                CreateAnimation($"DirLight rotation X: {_renderEngine.DirLightRotationDegrees_X}");
+
+            if (DirlightMoved_Y)
+                CreateAnimation($"DirLight rotation Y: {_renderEngine.DirLightRotationDegrees_Y}");
 
             if (lightIntensityChanged)
                 CreateAnimation($"Light intensity: {_renderEngine.LightIntensityMult}");
@@ -109,6 +136,42 @@ namespace View3D.Components.Component
 
             base.Update(gameTime);
         }
+
+        
+        public void ResetLilghtingParams()
+        {
+            _renderEngine.LightIntensityMult = 1.0f;
+            _renderEngine.EnvLightRotationDegrees_Y = 20.0f;
+            _renderEngine.DirLightRotationDegrees_X = 0.0f;
+            _renderEngine.DirLightRotationDegrees_Y = 0.0f;
+        }
+
+        private static float LimitAndWrapAroundDregrees(float degrees)
+        {
+
+            if (degrees > 360.0f)
+                return 0.0f;
+
+
+            if (degrees < 0.0f)
+                return 360.0f;
+
+            return degrees;
+
+        }
+
+        private void LimitLightValues()
+        {
+            _renderEngine.EnvLightRotationDegrees_Y = LimitAndWrapAroundDregrees(_renderEngine.EnvLightRotationDegrees_Y);            
+            
+            _renderEngine.DirLightRotationDegrees_X = LimitAndWrapAroundDregrees(_renderEngine.DirLightRotationDegrees_X);
+            _renderEngine.DirLightRotationDegrees_Y = LimitAndWrapAroundDregrees(_renderEngine.DirLightRotationDegrees_Y);
+
+
+            if (_renderEngine.LightIntensityMult < 0)
+                _renderEngine.LightIntensityMult = 0;
+        }
+
 
         public void Dispose()
         {
