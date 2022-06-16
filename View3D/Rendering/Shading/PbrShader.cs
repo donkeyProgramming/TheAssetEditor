@@ -43,21 +43,7 @@ namespace View3D.Rendering.Shading
             Effect.Parameters["View"].SetValue(commonShaderParameters.View);
             Effect.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
             Effect.Parameters["EnvMapTransform"].SetValue((Matrix.CreateRotationY(commonShaderParameters.EnvLightRotationsRadians_Y)));
-
-            // Phazer Code: Directional Light Matrix 
-
-            Effect.Parameters["DirLightTransform"].SetValue(
-                (
-                Matrix.CreateRotationY(commonShaderParameters.DirLightRotationRadians_Y) *
-                Matrix.CreateRotationX(commonShaderParameters.DirLightRotationRadians_X)
-                )
-                );
-            // Phazer COde: End
-
-
-
-
-
+            Effect.Parameters["DirLightTransform"].SetValue(Matrix.CreateRotationY(commonShaderParameters.DirLightRotationRadians_Y) * Matrix.CreateRotationX(commonShaderParameters.DirLightRotationRadians_X));       
             Effect.Parameters["LightMult"].SetValue(commonShaderParameters.LightIntensityMult);
             Effect.Parameters["World"].SetValue(modelMatrix);
             Effect.Parameters["CameraPos"].SetValue(commonShaderParameters.CameraPosition);

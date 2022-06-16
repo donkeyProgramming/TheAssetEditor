@@ -155,7 +155,7 @@ float3 getBlueNormal(PixelInputType input)
 
 float get_cube_env_scale_factor()
 {
-    return LightMult * 0.1;
+    return 1.0f;
 }
 
 float adjust_linear_smoothness(in const float linear_smoothness)

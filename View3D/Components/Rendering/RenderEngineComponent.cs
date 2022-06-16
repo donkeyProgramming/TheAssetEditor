@@ -155,14 +155,9 @@ namespace View3D.Components.Rendering
                 View = _camera.ViewMatrix,
                 CameraPosition = _camera.Position,
                 CameraLookAt = _camera.LookAt,
-                EnvLightRotationsRadians_Y = MathHelper.ToRadians(EnvLightRotationDegrees_Y),
-
-                // Phazer Code: 
+                EnvLightRotationsRadians_Y = MathHelper.ToRadians(EnvLightRotationDegrees_Y),                
                 DirLightRotationRadians_X = MathHelper.ToRadians(DirLightRotationDegrees_X),
-
                 DirLightRotationRadians_Y = MathHelper.ToRadians(DirLightRotationDegrees_Y),
-                // END: Phazer Code: 
-
                 LightIntensityMult = LightIntensityMult
             };
 

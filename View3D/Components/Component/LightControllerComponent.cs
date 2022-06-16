@@ -3,8 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
 using View3D.Utility;
@@ -76,22 +74,20 @@ namespace View3D.Components.Component
             }
             else if (_keyboard.IsKeyDown(Keys.PageDown) && !_keyboard.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngine.DirLightRotationDegrees_Y -= 1.0f;
+                _renderEngine.EnvLightRotationDegrees_Y -= 1.0f;
                 lightMoved = true;
             }
 
             if (_keyboard.IsKeyDown(Keys.PageUp) && _keyboard.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngine.LightIntensityMult += 0.1f;
+                _renderEngine.LightIntensityMult += 0.05f;
                 lightIntensityChanged = true;
             }
             else if (_keyboard.IsKeyDown(Keys.PageDown) && _keyboard.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngine.LightIntensityMult -= 0.1f;
+                _renderEngine.LightIntensityMult -= 0.05f;
                 lightIntensityChanged = true;
-            }
-
-            // TODO: Phazer Code: added this code for the directional light
+            }            
             else if (_keyboard.IsKeyDown(Keys.Right) && _keyboard.IsKeyDown(Keys.LeftAlt))
             {
                 _renderEngine.DirLightRotationDegrees_Y -= 1.0f;
@@ -118,7 +114,7 @@ namespace View3D.Components.Component
                 lightMoved = true;
             }
 
-            ClampLightValues();
+            LimitLightValues();
 
             if (lightMoved)
                 CreateAnimation($"Env rotation Y: {_renderEngine.EnvLightRotationDegrees_Y}");
@@ -141,40 +137,35 @@ namespace View3D.Components.Component
             base.Update(gameTime);
         }
 
-
+        
         public void ResetLilghtingParams()
         {
             _renderEngine.LightIntensityMult = 1.0f;
-            _renderEngine.EnvLightRotationDegrees_Y = 0.0f;
+            _renderEngine.EnvLightRotationDegrees_Y = 20.0f;
             _renderEngine.DirLightRotationDegrees_X = 0.0f;
             _renderEngine.DirLightRotationDegrees_Y = 0.0f;
         }
 
-
-        private void ClampLightValues()
+        private static float LimitAndWrapAroundDregrees(float degrees)
         {
-            // (keep rotation = [0; 306])
 
-            // enviroment rotation
-            if (_renderEngine.EnvLightRotationDegrees_Y > 360.0f)
-                _renderEngine.EnvLightRotationDegrees_Y = 0;
-
-            if (_renderEngine.EnvLightRotationDegrees_Y < 0)
-                _renderEngine.EnvLightRotationDegrees_Y = 360.0f;
-
-            // diretional lighting rotation, 
-            if (_renderEngine.DirLightRotationDegrees_X > 360.0f)
-                _renderEngine.DirLightRotationDegrees_X = 0.0f;
-
-            if (_renderEngine.DirLightRotationDegrees_X < 0)
-                _renderEngine.DirLightRotationDegrees_X = 360.0f;
+            if (degrees > 360.0f)
+                return 0.0f;
 
 
-            if (_renderEngine.DirLightRotationDegrees_Y < 0)
-                _renderEngine.DirLightRotationDegrees_Y = 360.0f;
+            if (degrees < 0.0f)
+                return 360.0f;
 
-            if (_renderEngine.DirLightRotationDegrees_Y > 360.0f)
-                _renderEngine.DirLightRotationDegrees_Y = 0.0f;
+            return degrees;
+
+        }
+
+        private void LimitLightValues()
+        {
+            _renderEngine.EnvLightRotationDegrees_Y = LimitAndWrapAroundDregrees(_renderEngine.EnvLightRotationDegrees_Y);            
+            
+            _renderEngine.DirLightRotationDegrees_X = LimitAndWrapAroundDregrees(_renderEngine.DirLightRotationDegrees_X);
+            _renderEngine.DirLightRotationDegrees_Y = LimitAndWrapAroundDregrees(_renderEngine.DirLightRotationDegrees_Y);
 
 
             if (_renderEngine.LightIntensityMult < 0)
