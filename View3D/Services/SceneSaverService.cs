@@ -120,8 +120,6 @@ namespace View3D.Services
             return output;
         }
 
-        
-
         public static byte[] Save(bool onlySaveVisibleNodes, List<Rmv2ModelNode> modelNodes, GameSkeleton skeleton, RmvVersionEnum version, bool enrichModel = true)
         {
             var logger = Logging.Create<SceneSaverService>();

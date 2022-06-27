@@ -68,7 +68,7 @@ namespace AnimationEditor.SuperView
             editorView.MainInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_throt.variantmeshdefinition"),
-                FragmentName = @"animations/animation_tables/hu17_dlc16_throt.frg",
+                FragmentName = @"animations/database/battle/bin/hu17_dlc16_throt.bin",
                 AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("ATTACK_5")
             };
 
@@ -81,9 +81,9 @@ namespace AnimationEditor.SuperView
             var editorView = toolFactory.CreateEditorViewModel<SuperViewViewModel>();
             editorView.MainInput = new AnimationToolInput()
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\dae_plaguebearer_plagueridden.variantmeshdefinitio"),
-                FragmentName = @"animations/animation_tables/hu17_dlc16_throt.frg",
-                AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("ATTACK_5")
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\dae_plaguebearer_plagueridden.variantmeshdefinition"),
+                FragmentName = @"animations/database/battle/bin/hu4d_wh3_nurgle_sword_on_palanquin.bin",
+                AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("STAND_IDLE_2")
             };
 
             creator.CreateEmptyEditor(editorView);

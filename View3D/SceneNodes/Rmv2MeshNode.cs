@@ -43,7 +43,6 @@ namespace View3D.SceneNodes
         public bool DisplayPivotPoint { get; set; } = false;
 
         public override Matrix ModelMatrix { get => base.ModelMatrix; set => UpdateModelMatrix(value); }
-
         public PbrShader Effect { get; private set; }
         public int LodIndex { get; set; } = -1;
         
@@ -180,6 +179,7 @@ namespace View3D.SceneNodes
             }
 
             Effect.SetAnimationParameters(data, Geometry.WeightCount);
+            Effect.SetScaleMult(ScaleMult);
             Effect.UseAnimation = AnimationPlayer.IsEnabled;
             
             if(AttachmentBoneResolver != null)
@@ -221,6 +221,7 @@ namespace View3D.SceneNodes
             typedTarget.Geometry = Geometry.Clone();
             typedTarget.OriginalFilePath = OriginalFilePath;
             typedTarget.OriginalPartIndex = OriginalPartIndex;
+            typedTarget.ScaleMult = ScaleMult;
             base.CopyInto(target);
         }
 

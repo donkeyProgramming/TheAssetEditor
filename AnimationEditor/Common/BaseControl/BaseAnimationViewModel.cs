@@ -6,8 +6,10 @@ using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.DB;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
+using System.Windows.Input;
 using View3D.Components;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
@@ -57,6 +59,11 @@ namespace AnimationEditor.PropCreator.ViewModels
         object _editor;
         public object Editor { get => _editor; set => SetAndNotify(ref _editor, value); }
 
+        FocusSelectableObjectComponent _focusComponent;
+        public ICommand ResetCameraCommand { get; set; }
+        public ICommand FocusCamerasCommand { get; set; }
+        
+
         public BaseAnimationViewModel(IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService, string headerAsset0, string headerAsset1, bool createDefaultAssets = true)
         {
             _toolFactory = toolFactory;
@@ -82,6 +89,7 @@ namespace AnimationEditor.PropCreator.ViewModels
             Scene.AddComponent(new SelectionComponent(Scene));
             Scene.AddComponent(new CommandExecutor(Scene));
             Scene.AddComponent(new LightControllerComponent(Scene));
+            _focusComponent = Scene.AddComponent(new FocusSelectableObjectComponent(Scene));
 
             Scene.SceneInitialized += OnSceneInitialized;
 
@@ -90,7 +98,13 @@ namespace AnimationEditor.PropCreator.ViewModels
 
             MainModelView = new ReferenceModelSelectionViewModel(_toolFactory, pfs, mainAsset, headerAsset0 + ":", Scene, skeletonHelper, _applicationSettingsService);
             ReferenceModelView = new ReferenceModelSelectionViewModel(_toolFactory, pfs, refAsset, headerAsset1 + ":", Scene, skeletonHelper, _applicationSettingsService);
+
+            ResetCameraCommand = new RelayCommand(ResetCamera);
+            FocusCamerasCommand = new RelayCommand(FocusCamera);
         }
+
+        void ResetCamera() => _focusComponent.ResetCamera();
+        void FocusCamera() => _focusComponent.FocusSelection();
 
         private void OnSceneInitialized(WpfGame scene)
         {

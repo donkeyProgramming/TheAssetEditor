@@ -21,13 +21,24 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <ContentControl Grid.Row="1" Grid.Column="0" Content="{Binding Scene, Mode=OneTime}"/>
+        <Menu Grid.Row="1" Grid.Column="0">
+            <MenuItem Header="General" IsEnabled="False">
+                <MenuItem Header="Save shortcut file" />
+            </MenuItem>
+            <MenuItem Header="Camera">
+                <MenuItem Header="Focus Selection" Command="{Binding FocusCamerasCommand}"/>
+                <MenuItem Header="Reset" Command="{Binding ResetCameraCommand}"/>
+            </MenuItem>
+        </Menu>
 
-        <GridSplitter Grid.Row="1" Grid.RowSpan="2" Grid.Column="1"  HorizontalAlignment="Stretch">
+        <ContentControl Grid.Row="2" Grid.Column="0" Content="{Binding Scene, Mode=OneTime}"/>
+
+        <GridSplitter Grid.Row="1" Grid.RowSpan="3" Grid.Column="1"  HorizontalAlignment="Stretch">
             <GridSplitter.Template>
                 <ControlTemplate TargetType="{x:Type GridSplitter}">
                     <Grid>
@@ -37,9 +48,7 @@
                 </ControlTemplate>
             </GridSplitter.Template>
         </GridSplitter>
-
-
-            <Grid Grid.Row="1" Grid.Column="2" Grid.RowSpan="2" >
+        <Grid Grid.Row="1" Grid.Column="2" Grid.RowSpan="3" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
@@ -53,7 +62,7 @@
             <referencemodel:ReferenceModelSelectionView Grid.Row="1" DataContext="{Binding ReferenceModelView, Mode=OneTime}" Visibility="{Binding IsControlVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}"/>
             <Rectangle Grid.Row="2" Fill="LightGray" Height="3" Margin="2,2,2,2"/>
 
-            <ScrollViewer  Grid.Row="3" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer  Grid.Row="3" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto">
                 <DockPanel  DockPanel.Dock="Top">
                     <ContentControl Content="{Binding Editor, UpdateSourceTrigger=PropertyChanged}" >
                         <ContentControl.Resources>
@@ -88,6 +97,6 @@
         </Grid>
  
 
-        <animationplayer:AnimationPlayerView Grid.Row="2" Grid.Column="0" DataContext="{Binding Player, Mode=OneTime}"/>
+        <animationplayer:AnimationPlayerView Grid.Row="3" Grid.Column="0" DataContext="{Binding Player, Mode=OneTime}"/>
     </Grid>
 </UserControl>

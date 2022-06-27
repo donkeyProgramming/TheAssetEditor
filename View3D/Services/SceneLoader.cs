@@ -205,12 +205,7 @@ namespace View3D.Services
                         }
                     }
                 }
-                
-
             }
         }
     }
-
-
-   
 }

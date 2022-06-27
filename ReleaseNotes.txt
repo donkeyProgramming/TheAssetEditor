@@ -157,17 +157,18 @@ V0.37
 		frg extention when making wh3 animpack bin 
 	Filter animations for anim transfer tool batch processor 
 	shortcuts
-
-----
-	Creaet Shortcut files! 
+		Creaet Shortcut files! 
 	multiple editors 
 	open vmd in kitbasher - all referebces
-	Animated prop scale issue  https://discord.com/channels/@me/960643531406454844/982409997839396885
 	
+
+V0.36
+----
 	Features:
-		* Lod Generation now follow CA optimzation rules
-		* Improved mesh overview found under the "Editable model" node in the kitbash editor. The information is read only in the LOD node 
-	
+		* Lod Generation now follow CA optimization rules
+		* Improved mesh overview found under the "Editable model" node in the kitbash editor. The information is read only in the LOD node now
+		* Reset and focus camera in all views 
+		
 	BugFixes:
 		* Meta file editor correctly opens snd.meta files 
 		* Sometimes selecting faces deselects the face mode, this has been improved so it should happen less 
@@ -175,7 +176,8 @@ V0.37
 		* Fixed bug related to bounding box calculation. No more floating banners! 
 		* Fixed bug related to getting material settings from ws models where lod index is not 0
 		* Fixed some strange bugs related to lod generation 
-		* Popup dialog now centered on screen
+		* Popup dialog now centered on screen (for most..)
+		* Fixed scale bug for animated props 
 V0.36
 ----------------------------	
 	Features:

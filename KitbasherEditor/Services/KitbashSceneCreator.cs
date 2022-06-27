@@ -49,13 +49,6 @@ namespace KitbasherEditor.Services
             var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
 
             var modelFullPath = _packFileService.GetFullPath(file);
-
-            // This should use the scene loader...
-
-            //SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, _geometryFactory, _componentManager, _applicationSettingsService);
-            //var loadedNode = loader.Load(file, null, _animationView.Player);
-            //
-
             EditableMeshNode.CreateModelNodesFromFile(rmv, _resourceLibary, _animationView.Player, _geometryFactory, modelFullPath, _componentManager, _packFileService, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
             EditableMeshNode.SelectedOutputFormat = rmv.Header.Version;
 
@@ -67,6 +60,35 @@ namespace KitbasherEditor.Services
             }
 
             _animationView.SetActiveSkeleton(rmv.Header.SkeletonName);
+            /*
+            //var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
+            var modelFullPath = _packFileService.GetFullPath(file);
+
+            if (modelFullPath.EndsWith(".rigid_model_v2", StringComparison.InvariantCultureIgnoreCase))
+            {
+                SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, _geometryFactory, _componentManager, _applicationSettingsService);
+                var loadedNodes = loader.Load(file, null, _animationView.Player);
+                foreach (var child in loadedNodes.Children)
+                {
+                    EditableMeshNode.AddObject(child);
+                }
+
+            }
+            else if (modelFullPath.EndsWith(".wsmodel", StringComparison.InvariantCultureIgnoreCase))
+            {
+                Load
+            }
+            else if (modelFullPath.EndsWith(".variantmeshdefinition", StringComparison.InvariantCultureIgnoreCase))
+            {
+                LoadReference(file);
+                // _animationView.SetActiveSkeleton(rmv.Header.SkeletonName)
+            }
+            else
+            {
+                throw new Exception($"Unkown file extention, unable to load model {modelFullPath}");
+            }
+            
+             */
         }
 
         public void LoadReference(string path)

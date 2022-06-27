@@ -119,6 +119,8 @@ bool UseAlpha = false;
 float4x4 tranforms[256];
 int WeightCount = 0;
   */
+
+float ModelRenderScale = 1;
 SamplerState SampleType
 {
 	//Texture = <tex_cube_specular>;
@@ -279,7 +281,7 @@ PixelInputType main(in VertexInputType input) // main is the default function na
 {
     PixelInputType output;
 
-    float fac = 1;
+    float fac = ModelRenderScale;
     float4x4 scale4x4 = float4x4(
 		fac, 0, 0, 0,
 		0, fac, 0, 0,

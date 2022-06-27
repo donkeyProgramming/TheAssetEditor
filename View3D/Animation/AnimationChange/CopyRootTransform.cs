@@ -26,11 +26,12 @@ namespace View3D.Animation.AnimationChange
 
         public override void TransformBone(AnimationFrame frame, int boneId, float v)       
         {
-            if (boneId != 0 || _hasError)
+            if (boneId != 0 || _hasError || _boneId == -1 )
                 return;
 
             try
             {
+         
                 var transform = _skeletonProvider.Skeleton.GetAnimatedWorldTranform(_boneId);
                 Matrix m = Matrix.CreateFromQuaternion(_offsetRot) * Matrix.CreateTranslation(_offsetPos) * transform;
                 frame.BoneTransforms[0].WorldTransform = m;

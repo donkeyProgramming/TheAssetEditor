@@ -157,8 +157,8 @@ namespace View3D.Animation.MetaData
             var skeleton = new GameSkeleton(skeletonFile, propPlayer);
             var animFile = AnimationFile.Create(animationPath);
             var clip = new AnimationClip(animFile, skeleton);
-            clip.ScaleAnimation(animatedPropMeta.Scale);
-
+            loadedNode.ScaleMult = animatedPropMeta.Scale;
+            //clip.ScaleAnimation(animatedPropMeta.Scale);
 
             var animationRule = new CopyRootTransform(_rootSkeleton, animatedPropMeta.BoneId, animatedPropMeta.Position, new Quaternion(animatedPropMeta.Orientation));
            
