@@ -74,6 +74,7 @@ namespace View3D.Components.Component
             return result;
         }
 
+
         public void ReduceMesh(List<Rmv2MeshNode> meshNodes, float factor, bool undoable)
         {
             var command = new ReduceMeshCommand(meshNodes, factor);

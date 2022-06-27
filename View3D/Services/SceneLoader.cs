@@ -139,7 +139,7 @@ namespace View3D.Services
         Rmv2ModelNode LoadRigidMesh(PackFile file, ref SceneNode parent, AnimationPlayer player, string attachmentPointName, bool isParentWsModel)
         {
             var rmvModel = ModelFactory.Create().Load(file.DataSource.ReadData());
-
+            
             var modelFullPath = _packFileService.GetFullPath(file);
             var modelNode = new Rmv2ModelNode(Path.GetFileName(file.Name));
             var autoResolveTexture = isParentWsModel == false && _applicationSettingsService.CurrentSettings.AutoResolveMissingTextures;

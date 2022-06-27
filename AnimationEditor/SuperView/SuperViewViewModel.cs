@@ -74,5 +74,19 @@ namespace AnimationEditor.SuperView
 
             creator.CreateEmptyEditor(editorView);
         }
+
+
+        public static void CreatePlaguebearer(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        {
+            var editorView = toolFactory.CreateEditorViewModel<SuperViewViewModel>();
+            editorView.MainInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\dae_plaguebearer_plagueridden.variantmeshdefinitio"),
+                FragmentName = @"animations/animation_tables/hu17_dlc16_throt.frg",
+                AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("ATTACK_5")
+            };
+
+            creator.CreateEmptyEditor(editorView);
+        }
     }
 }

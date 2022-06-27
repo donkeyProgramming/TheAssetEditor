@@ -14,6 +14,7 @@ namespace CommonControls.BaseDialogs.ErrorListDialog
     {
         public ErrorListWindow()
         {
+            Owner = Application.Current.MainWindow;
             InitializeComponent();
         }
 

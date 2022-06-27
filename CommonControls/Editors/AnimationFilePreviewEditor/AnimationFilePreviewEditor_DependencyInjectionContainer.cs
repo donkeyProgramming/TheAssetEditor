@@ -17,8 +17,8 @@ namespace CommonControls.Editors.AnimationFilePreviewEditor
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<TextEditorViewModel<AnimFileToTextConverter>, TextEditorView>(new ExtentionToTool(".anim"));
-            factory.RegisterTool<TextEditorViewModel<InvMatrixToTextConverter>, TextEditorView>(new ExtentionToTool(".bone_inv_trans_mats"));
+            factory.RegisterFileTool<TextEditorViewModel<AnimFileToTextConverter>, TextEditorView>(new ExtentionToTool(EditorEnums.XML_Editor, new[] { ".anim" }));
+            factory.RegisterFileTool<TextEditorViewModel<InvMatrixToTextConverter>, TextEditorView>(new ExtentionToTool(EditorEnums.XML_Editor, new[] { ".bone_inv_trans_mats" }));
         }
     }
 }

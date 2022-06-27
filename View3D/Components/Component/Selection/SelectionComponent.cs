@@ -82,8 +82,9 @@ namespace View3D.Components.Component.Selection
                 {
                     var selectionRectangle = CreateSelectionRectangle(_startDrag, _currentMousePos);
 
-                    var rectArea = RectArea(selectionRectangle);
-                    if (rectArea > 8)
+                    var isSelectionRect = IsSelectionRectangle(selectionRectangle);
+                    _logger.Here().Information($"Selection click: IsRect {isSelectionRect} ({selectionRectangle.Width},{selectionRectangle.Height})");
+                    if (isSelectionRect)
                         SelectFromRectangle(selectionRectangle, _keyboardComponent.IsKeyDown(Keys.LeftShift), _keyboardComponent.IsKeyDown(Keys.LeftControl));
                     else
                         SelectFromPoint(_currentMousePos, _keyboardComponent.IsKeyDown(Keys.LeftShift), _keyboardComponent.IsKeyDown(Keys.LeftControl));
@@ -285,9 +286,13 @@ namespace View3D.Components.Component.Selection
             return new Rectangle(x, y, width, height);
         }
 
-        int RectArea(Rectangle rect)
+        bool IsSelectionRectangle(Rectangle rect)
         {
-            return rect.Width * rect.Height;
+            var area = rect.Width * rect.Height;
+            if (area < 10)
+                return false;
+
+            return true;
         }
 
         public void Dispose()

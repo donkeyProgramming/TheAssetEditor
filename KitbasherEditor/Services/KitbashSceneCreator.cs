@@ -49,6 +49,13 @@ namespace KitbasherEditor.Services
             var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
 
             var modelFullPath = _packFileService.GetFullPath(file);
+
+            // This should use the scene loader...
+
+            //SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, _geometryFactory, _componentManager, _applicationSettingsService);
+            //var loadedNode = loader.Load(file, null, _animationView.Player);
+            //
+
             EditableMeshNode.CreateModelNodesFromFile(rmv, _resourceLibary, _animationView.Player, _geometryFactory, modelFullPath, _componentManager, _packFileService, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
             EditableMeshNode.SelectedOutputFormat = rmv.Header.Version;
 

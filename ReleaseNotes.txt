@@ -130,9 +130,11 @@ Planned V0.35:
 	User Error window 
 	
 	
+	var result = ToolSelectorWindow.CreateAndShow(new[] { EditorEnums.Kitbash_Editor, EditorEnums.XML_Editor});
+	
 V0.37
 ----------------------------
-	
+	mount editor not working correctly and make it easier to use. A few click should take you 95% 
 	Matched combat files
 	Allow resize in the animpack editor (remember tab change!)
 	Fix buttons for time line
@@ -145,20 +147,35 @@ V0.37
 	
 	animated_prop13/prop13 for 3k
 	
-	Phazer shader and light controls 
-	
 	Start making unit tests...
 	
 	Meta file issue = https://discord.com/channels/373745291289034763/795235087352201226/982699359550443530
-	Animated prop scale issue  https://discord.com/channels/@me/960643531406454844/982409997839396885
-	make the selection box for drag and drop smaller, or fix the drag end drop to select faces correctly
+		
 	Matched combat for wh3 
 	Show warnig when openin CA animpack, about not datacoring this file! 
 	Make it eaiser to understand, animpack editor 
+		frg extention when making wh3 animpack bin 
+	Filter animations for anim transfer tool batch processor 
+	shortcuts
+
+----
+	Creaet Shortcut files! 
+	multiple editors 
+	open vmd in kitbasher - all referebces
+	Animated prop scale issue  https://discord.com/channels/@me/960643531406454844/982409997839396885
+	
+	Features:
+		* Lod Generation now follow CA optimzation rules
+		* Improved mesh overview found under the "Editable model" node in the kitbash editor. The information is read only in the LOD node 
 	
 	BugFixes:
 		* Meta file editor correctly opens snd.meta files 
-	
+		* Sometimes selecting faces deselects the face mode, this has been improved so it should happen less 
+		* Improved rendering and light controllers for wh3 and older games (thanks to Phazer)
+		* Fixed bug related to bounding box calculation. No more floating banners! 
+		* Fixed bug related to getting material settings from ws models where lod index is not 0
+		* Fixed some strange bugs related to lod generation 
+		* Popup dialog now centered on screen
 V0.36
 ----------------------------	
 	Features:

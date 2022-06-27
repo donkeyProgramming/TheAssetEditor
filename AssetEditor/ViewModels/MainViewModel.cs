@@ -1,10 +1,12 @@
 ﻿using AssetEditor.Report;
 using AssetEditor.Views.Settings;
+using CommonControls.BaseDialogs.ToolSelector;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.DB;
 using CommonControls.FileTypes.MetaData;
 using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.Sound;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
@@ -117,7 +119,6 @@ namespace AssetEditor.ViewModels
 
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
-
                 //new BaseAnimationSlotHelper(GameTypeEnum.Warhammer2).ExportAnimationDebugList(packfileService, @"c:\temp\3kanims.txt");
 
                 //DefaultAnimationSlotTypeHelper.ExportAnimationDebugList(packfileService);
@@ -185,7 +186,7 @@ namespace AssetEditor.ViewModels
                 //AnimationEditor.MountAnimationCreator.MountAnimationCreator_Debug.CreateLionAndHu01c(this, toolFactory, packfileService);
                 //KitbashEditor_Debug.CreateLoremasterHead(this, toolFactory, packfileService);
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateBowCentigor(this, toolFactory, packfileService);
-                AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateDamselEditor(this, toolFactory, packfileService);
+                //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateDamselEditor(this, toolFactory, packfileService);
                 //var f = packfileService.FindFile(@"animations\campaign\database\bin\cam_hero_hu1d_def_spear_and_shield.bin");
                 //
                 //AnimationEditor.AnimationBuilder.AnimationBuilderViewModel.AnimationBuilder_Debug.CreateExampleAnimation(this, toolFactory, packfileService, animationLookUpHelper);
@@ -208,7 +209,7 @@ namespace AssetEditor.ViewModels
 
                 //OpenFile(packfileService.FindFile(@"animations\database\battle\bin\animation_tables.animpack"));
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\ksl\ksl_katarin\ksl_katarin_cloth_cloak_01.rigid_model_v2"));
-                //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\ksl\ksl_katarin\ksl_katarin_01.rigid_model_v2"));
+                OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\ksl\ksl_katarin\ksl_katarin_01.rigid_model_v2"));
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hq3\nor\nor_war_mammoth\nor_war_mammoth_warshrine_01.rigid_model_v2"));
                 
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc1\tmb\tmb_warsphinx\tex\tmb_warsphinx_armour_01_base_colour.dds"));
@@ -317,13 +318,30 @@ namespace AssetEditor.ViewModels
                 return;
             }
 
+           
+
             var fullFileName = _packfileService.GetFullPath(file );
-            var editorViewModel = ToolsFactory.GetToolViewModelFromFileName(fullFileName);
-            if (editorViewModel == null)
+            var allEditors = ToolsFactory.GetAllToolViewModelFromFileName(fullFileName);
+            Type selectedEditor = null;
+            if (allEditors.Count == 0)
             {
                 _logger.Here().Warning($"Trying to open file {file.Name}, but there are no valid tools for it.");
                 return;
             }
+            else if (allEditors.Count == 1)
+            {
+                selectedEditor = allEditors.First().Type;
+            }
+            else
+            {
+                var selectedToolType = ToolSelectorWindow.CreateAndShow(allEditors.Select(x => x.EditorType));
+                if (selectedToolType == EditorEnums.None)
+                    return;
+                selectedEditor = allEditors.First(x => x.EditorType == selectedToolType).Type;
+            }
+
+            var editorViewModel = ToolsFactory.CreateFromType(selectedEditor);
+            //var editorViewModel = ToolsFactory.GetDefaultToolViewModelFromFileName(fullFileName);
 
             _logger.Here().Information($"Opening {file.Name} with {editorViewModel.GetType().Name}");
             editorViewModel.MainFile = file;

@@ -229,11 +229,6 @@ namespace View3D.SceneNodes
             Material.PivotPoint = newPiv;
         }
 
-        public void RecomputeBoundingBox()
-        {
-            Geometry.BuildBoundingBox();
-        }
-
         public Dictionary<TexureType, string> GetTextures()
         {
             var enumCollection = Enum.GetValues(typeof(TexureType));

@@ -166,6 +166,8 @@ namespace View3D.Services
                             Mesh = MeshBuilderService.CreateRmvMeshFromGeometry(meshes[meshIndex].Geometry)
                         };
 
+                        newModel.UpdateBoundingBox(meshes[meshIndex].Geometry.BoundingBox);
+
                         var boneNames = new string[0];
                         if (skeleton != null)
                             boneNames = skeleton.BoneNames.Select(x => x.Replace("bn_", "")).ToArray();

@@ -49,7 +49,7 @@ namespace CommonControls.FileTypes.RigidModel.LodHeader
         public uint TotalLodIndexSize { get => _totalLodIndexSize; set => _totalLodIndexSize = value; }
         public uint FirstMeshOffset { get => _firstMeshOffset; set => _firstMeshOffset = value; }
 
-        public byte QualityLvl { get => 0; }
+        public byte QualityLvl { get => 0; set { } }
         public float LodCameraDistance { get => _lodCameraDistance; set => _lodCameraDistance = value; }
 
         public int GetHeaderSize() => ByteHelper.GetSize(typeof(Rmv2LodHeader_V6));

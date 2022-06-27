@@ -17,7 +17,7 @@ namespace KitbasherEditor
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<KitbasherViewModel, KitbasherView>(new ExtentionToTool(".rigid_model_v2", ".wsmodel.rigid_model_v2"));
+            factory.RegisterFileTool<KitbasherViewModel, KitbasherView>(new ExtentionToTool(EditorEnums.Kitbash_Editor, new[] { ".rigid_model_v2", ".wsmodel.rigid_model_v2" }, new[] { ".wsmodel", ".variantmeshdefinition" }));
         }
     }
 

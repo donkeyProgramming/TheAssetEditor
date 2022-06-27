@@ -33,7 +33,7 @@ namespace View3D.Services
             if (wsModelFile != null)
             {
                 var wsModel = new WsMaterial(wsModelFile);
-                var material = wsModel.MaterialList.FirstOrDefault(x => x.LodIndex == 0 && x.PartIndex == meshNode.OriginalPartIndex);
+                var material = wsModel.MaterialList.FirstOrDefault(x => x.LodIndex == meshNode.LodIndex && x.PartIndex == meshNode.OriginalPartIndex);
                 if (material != null)
                 {
                     var wsMaterialFile = pfs.FindFile(material.Material);

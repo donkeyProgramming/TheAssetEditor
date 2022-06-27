@@ -405,9 +405,6 @@ namespace View3D.Components.Gizmo
                         break;
                 }
 
-                if(deltaTransform != Vector3.Zero)
-                    Console.WriteLine(mouseDragDelta);
-
                 _lastIntersectionPosition = _intersectPosition;
             }
 

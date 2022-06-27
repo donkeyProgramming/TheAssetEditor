@@ -441,8 +441,5 @@ namespace View3D.Rendering.Geometry
         {
             Context.RebuildIndexBuffer(IndexArray);
         }
-
-
-
     }
 }

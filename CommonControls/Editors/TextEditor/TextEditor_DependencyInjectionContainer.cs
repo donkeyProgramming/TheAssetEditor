@@ -14,7 +14,10 @@ namespace CommonControls.Editors.TextEditor
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<TextEditorViewModel<DefaultTextConverter>, TextEditorView>(new ExtentionToTool(".json", ".xml", ".txt", ".wsmodel", ".xml.material", ".anim.meta.xml", ".anm.meta.xml", ".snd.meta.xml", ".bmd.xml", ".csv" ));
+            factory.RegisterFileTool<TextEditorViewModel<DefaultTextConverter>, TextEditorView>(
+                new ExtentionToTool( 
+                    EditorEnums.XML_Editor,
+                    new[] { ".json", ".xml", ".txt", ".wsmodel", ".xml.material", ".anim.meta.xml", ".anm.meta.xml", ".snd.meta.xml", ".bmd.xml", ".csv" } ));
         }
     }
 }
