@@ -75,6 +75,9 @@ namespace View3D.Animation.MetaData
 
             foreach (var meteDataItem in file.GetItemsOfType<FirePos>())
                 output.Add(CreateStaticLocator(meteDataItem, meteDataItem.Position, "FirePos"));
+            
+            foreach (var meteDataItem in file.GetItemsOfType<SplashAttack_v10>())
+                output.Add(CreateSplashAttack(meteDataItem, "SplashAttack"));
 
             foreach (var meteDataItem in file.GetItemsOfType<Effect_v11>())
                 output.Add(CreateEffect(meteDataItem));
@@ -184,6 +187,21 @@ namespace View3D.Animation.MetaData
             _root.AddObject(node);
 
             return new DrawableMetaInstance(metaData.StartTime, metaData.EndTime, node.Name, node);
+        }
+        
+        IMetaDataInstance CreateSplashAttack(SplashAttack_v10 splashAttack, string displayName)
+        {
+            var resourceLib = _componentManager.GetComponent<ResourceLibary>();
+            float scale = 0.3f;
+
+            SimpleDrawableNode node = new SimpleDrawableNode(displayName);
+            node.AddItem(Components.Rendering.RenderBuckedId.Line, new CricleRenderItem(resourceLib.GetEffect(ShaderTypes.Line), splashAttack.StartPosition, scale));
+            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, displayName, splashAttack.StartPosition));
+            node.AddItem(Components.Rendering.RenderBuckedId.Line, new CricleRenderItem(resourceLib.GetEffect(ShaderTypes.Line), splashAttack.EndPosition, scale));
+            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, displayName, splashAttack.EndPosition));
+            _root.AddObject(node);
+
+            return new DrawableMetaInstance(splashAttack.StartTime, splashAttack.EndTime, node.Name, node);
         }
 
         IMetaDataInstance CreateEffect(Effect_v11 effect)
