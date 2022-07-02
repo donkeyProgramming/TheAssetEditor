@@ -34,6 +34,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextureEditor", "TextureEdi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimationEditor", "AnimationEditor\AnimationEditor.csproj", "{0FCB6133-32A4-4115-BD53-474C703E7B34}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Experiments", "Experiments", "{FF70C4FA-A9A7-4DEC-87A3-4BF5F23EF336}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wh3AnimPackCreator", "Wh3AnimPackCreator\Wh3AnimPackCreator.csproj", "{3A205F23-1862-4F06-B9D8-DF82810515B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +84,10 @@ Global
 		{0FCB6133-32A4-4115-BD53-474C703E7B34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FCB6133-32A4-4115-BD53-474C703E7B34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0FCB6133-32A4-4115-BD53-474C703E7B34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A205F23-1862-4F06-B9D8-DF82810515B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A205F23-1862-4F06-B9D8-DF82810515B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A205F23-1862-4F06-B9D8-DF82810515B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A205F23-1862-4F06-B9D8-DF82810515B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -92,6 +100,7 @@ Global
 		{F49D5D98-DF95-4A31-A42F-DA6D92C242DD} = {C174C249-D109-49BE-8BC5-42A0D5DEDBDA}
 		{70708A4D-A71A-487A-87DE-47E526F2E142} = {07AC615B-A8FC-4E1A-BDD5-BC11452429A0}
 		{0FCB6133-32A4-4115-BD53-474C703E7B34} = {07AC615B-A8FC-4E1A-BDD5-BC11452429A0}
+		{3A205F23-1862-4F06-B9D8-DF82810515B3} = {FF70C4FA-A9A7-4DEC-87A3-4BF5F23EF336}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AB5968F3-98ED-4AFF-98EA-0DBEDCACADF2}

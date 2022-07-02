@@ -71,10 +71,10 @@
     <None Update="ContentOutput\Textures\Phazer\Brdf_rgba32f_raw.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="ContentOutput\Textures\Phazer\DIFFUSE_irr_qwantani_rgba32f.xnb">
+    <None Update="ContentOutput\Textures\Phazer\DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="ContentOutput\Textures\Phazer\SkyOnly_SpecularHDR.xnb">
+    <None Update="ContentOutput\Textures\Phazer\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Content\Fonts\DefaultFont.spritefont">

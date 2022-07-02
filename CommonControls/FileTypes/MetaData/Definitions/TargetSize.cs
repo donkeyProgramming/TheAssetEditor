@@ -4,8 +4,6 @@ using System.Text;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
-
-
     public class TargetSize : DecodedMetaEntryBase
     {
         [MetaDataTag(5, "Likely an enum related to unit size. Maybe 0=large, 1=medium, 2=small, 3=very_large, 4=very_small")]
@@ -23,5 +21,20 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 
     [MetaData("MIN_TARGET_SIZE", 10)]
     public class MinTargetSize_v10 : TargetSize { }
+
+
+    [MetaData("MAX_TARGET_SIZE", 11)]
+    public class MaxTargetSize_v11 : TargetSize
+    {
+        [MetaDataTag(8)]
+        public int Unk2 { get; set; }
+    }
+
+    [MetaData("MIN_TARGET_SIZE", 11)]
+    public class MinTargetSize_v11 : TargetSize 
+    {
+        [MetaDataTag(8)]
+        public int Unk2 { get; set; }
+    }
 
 }

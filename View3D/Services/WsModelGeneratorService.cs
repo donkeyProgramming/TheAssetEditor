@@ -34,6 +34,9 @@ namespace View3D.Services
             {"MATERIAL_MAP", TexureType.MaterialMap},
             {"NORMAL_PATH", TexureType.Normal},
             {"MASK_PATH", TexureType.Mask},
+            {"DIFFUSE_PATH", TexureType.Diffuse },
+            {"GLOSS_PATH", TexureType.Gloss },
+            {"SPECULAR_PATH", TexureType.Specular },
         };
 
         public WsModelGeneratorService(PackFileService packFileService, IEditorViewModel editorViewModel, MainEditableNode editableMeshNode)
@@ -45,10 +48,13 @@ namespace View3D.Services
             _existingMaterials = LoadAllExistingMaterials();
         }
 
-        public void GenerateWsModel()
+        public void GenerateWsModel(GameTypeEnum game = GameTypeEnum.Warhammer3)
         {
             try
             {
+                if (MessageBox.Show($"Generate ws model for {game}", "", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                    return;
+
                 if (_packFileService.GetEditablePack() == null)
                 {
                     MessageBox.Show("No editable pack selected", "error");
@@ -67,7 +73,15 @@ namespace View3D.Services
                 var modelFilePath = _packFileService.GetFullPath(modelFile);
                 var wsModelPath = Path.ChangeExtension(modelFilePath, ".wsmodel");
 
-                var wsModelData = GenerateWsModel(modelFilePath, onlySaveVisible);
+      
+                var materialTemplate = game switch
+                {
+                    GameTypeEnum.Warhammer3 => LoadMaterialTemplate("View3D.Content.Game.MaterialTemplate_wh3.xml.material"),
+                    GameTypeEnum.Warhammer2 => LoadMaterialTemplate("View3D.Content.Game.MaterialTemplate_wh2.xml.material"),
+                    _ => throw new Exception("Unkown game - unable to generate ws model")
+                };
+
+                var wsModelData = CreateWsModel(modelFilePath, onlySaveVisible, materialTemplate);
                 var existingWsModelFile = _packFileService.FindFile(wsModelPath, _packFileService.GetEditablePack());
                 SaveHelper.Save(_packFileService, wsModelPath, existingWsModelFile, Encoding.UTF8.GetBytes(wsModelData));
             }
@@ -78,7 +92,8 @@ namespace View3D.Services
             }
         }
 
-        string GenerateWsModel(string modelFilePath, bool onlyVisible)
+
+        string CreateWsModel(string modelFilePath, bool onlyVisible, string materialTemplate)
         {
             var sb = new StringBuilder();
 
@@ -93,7 +108,7 @@ namespace View3D.Services
                 var uniqueNames = GenerateUniqueNames(meshes);
                 for (int meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
                 {
-                    var materialFile = GetMaterialName(meshes[meshIndex], uniqueNames[meshIndex]);
+                    var materialFile = GetOrCreateMaterial(meshes[meshIndex], uniqueNames[meshIndex], materialTemplate);
                     sb.Append($"\t\t\t<material part_index=\"{meshIndex}\" lod_index=\"{lodIndex}\">");
                     sb.Append(materialFile);
                     sb.Append("</material>\n");
@@ -111,10 +126,10 @@ namespace View3D.Services
             var output = new List<string>();
             foreach (var mesh in meshes)
             {
-                var fileName = mesh.Name;  
+                var fileName = mesh.Name;
                 for (var index = 0; index < 1024; index++)
                 {
-                    var name = (index == 0) ? fileName : string.Format("{0} _{1}", fileName, index);
+                    var name = (index == 0) ? fileName : string.Format("{0}_{1}", fileName, index);
                     if (output.Contains(name))
                         continue;
 
@@ -128,26 +143,25 @@ namespace View3D.Services
             return output;
         }
 
-        string GetMaterialName(Rmv2MeshNode mesh, string uniqueName)
+        string GetOrCreateMaterial(Rmv2MeshNode mesh, string uniqueName, string materialTemplate)
         {
+            uniqueName = uniqueName.Trim();
             var materialFileName = FindApplicableExistingMaterial(mesh);
             if (materialFileName == null)
-                materialFileName = CreateNewMaterial(mesh, uniqueName);
+                materialFileName = CreateNewMaterial(mesh, uniqueName, materialTemplate);
             return materialFileName;
         }
 
-
-        string LoadMaterialTemplate()
+        string LoadMaterialTemplate(string key)
         {
-            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("View3D.Content.Game.MaterialTemplate_wh3.xml.material");
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(key);
             using var reader = new StreamReader(stream!);
             var result = reader.ReadToEnd();
             return result;
         }
 
-        string CreateNewMaterial(Rmv2MeshNode mesh, string uniqueName)
+        string CreateNewMaterial(Rmv2MeshNode mesh, string uniqueName, string materialTemplate)
         {
-            var materialTemplate = LoadMaterialTemplate();
             var vertexType = ModelMaterialEnumHelper.GetToolVertexFormat(mesh.Material.BinaryVertexFormat);
             var alphaOn = mesh.Material.AlphaMode != AlphaMode.Opaque;
 
@@ -171,7 +185,10 @@ namespace View3D.Services
             {
                 var texture = mesh.Material.GetTexture(textureType);
                 if (texture.HasValue)
+                {
                     materialTemplate = materialTemplate.Replace(replacment, texture.Value.Path);
+                    Log.Write(Serilog.Events.LogEventLevel.Information, $"writing {replacment} {textureType} {texture.Value.Path}");
+                }                
                 else
                     materialTemplate.Replace(replacment, "test_mask.dds");
             }

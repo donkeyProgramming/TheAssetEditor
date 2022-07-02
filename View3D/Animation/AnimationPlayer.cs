@@ -158,11 +158,24 @@ namespace View3D.Animation
             Refresh();
         }
 
-        float GetAnimationLengthMs()
+        public float GetAnimationLengthMs()
         {
             if (_animationClip != null)
                 return _animationClip.PlayTimeInSec * 1000;
             return 0;
+        }
+
+        public float GetTimeInMs()
+        {
+            return (float)_timeSinceStart.TotalMilliseconds;
+        }
+
+        public int GetFPS()
+        {
+            if (_animationClip == null)
+                return 0;
+            var fps = (_animationClip.DynamicFrames.Count / _animationClip.PlayTimeInSec);
+            return (int)fps;
         }
 
         public void Update(GameTime gameTime)

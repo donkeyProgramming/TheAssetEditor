@@ -1,4 +1,5 @@
-﻿using CommonControls.Common;
+﻿using CommonControls.BaseDialogs.ToolSelector;
+using CommonControls.Common;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
 using MonoGame.Framework.WpfInterop;
@@ -10,10 +11,12 @@ using System.Linq;
 using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.SceneNodes;
+using View3D.Services;
 using static CommonControls.FilterDialog.FilterUserControl;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
+
     public class MainEditableNodeViewModel : NotifyPropertyChangedImpl, ISceneNodeViewModel
     {
         MainEditableNode _mainNode;
@@ -42,6 +45,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         public TextureFileEditorServiceViewModel TextureFileEditorServiceViewModel { get; set; }
 
+        public ObservableCollection<LodGroupNodeViewModel> LodNodes { get; set; } = new ObservableCollection<LodGroupNodeViewModel>();
 
         public MainEditableNodeViewModel(MainEditableNode mainNode, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AnimationControllerViewModel animationControllerViewModel, PackFileService pfs, IComponentManager componentManager)
         {
@@ -61,6 +65,9 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
             SetCurrentOuputFormat(_mainNode.SelectedOutputFormat);
             TextureFileEditorServiceViewModel = new TextureFileEditorServiceViewModel(mainNode, pfs);
+
+            UpdateLodInformationAction();
+           
         }
 
         public void SetCurrentOuputFormat(RmvVersionEnum format)
@@ -120,6 +127,24 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                     var sourcePackContainer = _pfs.GetPackFileContainer(file);
                     _pfs.CopyFileFromOtherPackFile(sourcePackContainer, tex.Path, _pfs.GetEditablePack());
                 }
+            }
+        }
+
+
+        public void UpdateLodInformationAction()
+        {
+            LodNodes.Clear();
+            foreach (var lodNode in _mainNode.GetLodNodes())
+                LodNodes.Add(new LodGroupNodeViewModel(lodNode, _componentManager));
+        }
+
+        public void DeleteAllMissingTexturesAction()
+        {
+            var meshes = _mainNode.GetMeshesInLod(0, false);
+            foreach (var mesh in meshes)
+            {
+                var resolver = new MissingTextureResolver();
+                resolver.DeleteMissingTextures(mesh, _pfs);
             }
         }
 

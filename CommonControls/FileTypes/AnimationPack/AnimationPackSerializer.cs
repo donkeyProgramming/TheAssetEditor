@@ -55,8 +55,6 @@ namespace CommonControls.FileTypes.AnimationPack
                     return new UnknownAnimFileSerializer();
                 else if (fullPath.Contains("trigger_database", StringComparison.InvariantCultureIgnoreCase))
                     return new UnknownAnimFileSerializer();
-                else
-                    return new AnimationSetSerializer_3K();
             }
            
             else
@@ -72,7 +70,7 @@ namespace CommonControls.FileTypes.AnimationPack
             return new UnknownAnimFileSerializer();
         }
 
-        public static AnimationPackFile Load(PackFile pf, PackFileService pfs)
+        public static AnimationPackFile Load(PackFile pf, PackFileService pfs, GameTypeEnum preferedGame = GameTypeEnum.Unknown)
         {
             var output = new AnimationPackFile();
             output.FileName = pfs.GetFullPath(pf);
@@ -83,7 +81,7 @@ namespace CommonControls.FileTypes.AnimationPack
             foreach (var file in files)
             {
                 var fileLoader = DeterminePossibleSerializers(file.Name);
-                var loadedFile = LoadFile(fileLoader, file, dataChunk);
+                var loadedFile = LoadFile(fileLoader, file, dataChunk, preferedGame);
                 output.AddFile(loadedFile);
             }
 
@@ -112,13 +110,13 @@ namespace CommonControls.FileTypes.AnimationPack
             return memStream.ToArray();
         }
 
-        static IAnimationPackFile LoadFile(IAnimFileSerializer serializer, AnimationInfoDataFile animationInfoDataFile, ByteChunk data)
+        static IAnimationPackFile LoadFile(IAnimFileSerializer serializer, AnimationInfoDataFile animationInfoDataFile, ByteChunk data, GameTypeEnum preferedGame)
         {
             try
             {
-                return serializer.Load(animationInfoDataFile, data);
+                return serializer.Load(animationInfoDataFile, data, preferedGame);
             }
-            catch(Exception e)
+            catch
             {
                 return new UnknownAnimFile(animationInfoDataFile.Name, data.Buffer);
             }
@@ -140,38 +138,32 @@ namespace CommonControls.FileTypes.AnimationPack
 
     public interface IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile animFileInfo, ByteChunk data);
+        public IAnimationPackFile Load(AnimationInfoDataFile animFileInfo, ByteChunk data, GameTypeEnum preferedGame);
     }
 
     public class UnknownAnimFileSerializer : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new UnknownAnimFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data, GameTypeEnum preferedGam ) => new UnknownAnimFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
     }
 
     public class AnimationSetFileSerializer : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimationFragmentFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data, GameTypeEnum preferedGame) => new AnimationFragmentFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size), preferedGame);
     }
 
     public class AnimationDbFileSerializer : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimationBin(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data, GameTypeEnum preferedGame) => new AnimationBin(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
     }
 
     public class MatchedAnimFileSerializer : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new MatchedAnimFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
-    }
-
-
-    public class AnimationSetSerializer_3K : IAnimFileSerializer
-    {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimationSet3kFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data, GameTypeEnum preferedGame) => new MatchedAnimFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
     }
 
     public class AnimationSetSerializer_Wh3 : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data) => new AnimPackFileTypes.Wh3.AnimationBinWh3(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data, GameTypeEnum preferedGame) => new AnimPackFileTypes.Wh3.AnimationBinWh3(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
     }
 
 

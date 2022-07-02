@@ -10,12 +10,12 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     {
         [MetaDataTag(5, "cone/circle (0), corridor (1)")]
         public int AoeShape { get; set; }
-        
+
         [MetaDataTag(6)]
-        public Vector3 StartPosition { get; set; }
+        public Vector3 StartPosition { get; set; } = Vector3.Zero;
         
         [MetaDataTag(7)]
-        public Vector3 EndPosition { get; set; }
+        public Vector3 EndPosition { get; set; } = Vector3.Zero;
 
         [MetaDataTag(8, "Min = 0, Max = 20")]
         public float WidthForCorridor { get; set; }
@@ -28,9 +28,9 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         
         [MetaDataTag(11, "Min = 0, Max = 100")]
         public float ImpactSpeed { get; set; }
-        
+
         [MetaDataTag(12)]
-        public string GroupSound { get; set; }
+        public string GroupSound { get; set; } = "";
     }
 
 

@@ -20,6 +20,7 @@ namespace CommonControls.FileTypes.RigidModel
         public ModelFactory(bool logLoadedFile = false)
         {
             _logLoadedFile = logLoadedFile;
+            _logLoadedFile = true;
         }
 
         public RmvFile Load(byte[] bytes)
@@ -216,7 +217,7 @@ namespace CommonControls.FileTypes.RigidModel
             return modelBytes;
         }
 
-        public void DumpToLog(RmvFile rmvFile, int totalSize = -1)
+        public string DumpToLog(RmvFile rmvFile, int totalSize = -1)
         {
             var strBuilder = new StringBuilder();
 
@@ -263,6 +264,19 @@ namespace CommonControls.FileTypes.RigidModel
                     strBuilder.AppendLine($"\t\t\t Shader.UnknownValues: {string.Join("", mesh.CommonHeader.ShaderParams.UnknownValues.Select(x => x.ToString()))}");
                     strBuilder.AppendLine($"\t\t\t Shader.AllZeroValues: {string.Join("", mesh.CommonHeader.ShaderParams.AllZeroValues.Select(x => x.ToString()))}");
 
+                    strBuilder.AppendLine($"\t\t\t BoundingBox: {mesh.CommonHeader.BoundingBox.MinimumX},{mesh.CommonHeader.BoundingBox.MaximumX} | {mesh.CommonHeader.BoundingBox.MinimumY},{mesh.CommonHeader.BoundingBox.MaximumY} | {mesh.CommonHeader.BoundingBox.MinimumZ},{mesh.CommonHeader.BoundingBox.MaximumZ}");
+                    strBuilder.AppendLine($"\t\t\t BoundingBox.Width {mesh.CommonHeader.BoundingBox.Width}");
+                    strBuilder.AppendLine($"\t\t\t BoundingBox.Height {mesh.CommonHeader.BoundingBox.Height}");
+                    strBuilder.AppendLine($"\t\t\t BoundingBox.Depth {mesh.CommonHeader.BoundingBox.Depth}");
+
+                    var vertexList = mesh.Mesh.VertexList.Select(x => x.GetPosistionAsVec3());
+                    var computedBB = Microsoft.Xna.Framework.BoundingBox.CreateFromPoints(vertexList);
+
+                    strBuilder.AppendLine($"\t\t\t Computed BoundingBox: {computedBB.Min.X},{computedBB.Max.X} | {computedBB.Min.Y},{computedBB.Max.Y}  | {computedBB.Min.Z},{computedBB.Max.Z} ");
+                    strBuilder.AppendLine($"\t\t\t Computed BoundingBox.Width {Math.Abs( computedBB.Min.X - computedBB.Max.X)}");
+                    strBuilder.AppendLine($"\t\t\t Computed BoundingBox.Height {Math.Abs(computedBB.Min.Y - computedBB.Max.Y)}");
+                    strBuilder.AppendLine($"\t\t\t Computed BoundingBox.Depth {Math.Abs(computedBB.Min.Z - computedBB.Max.Z)}");
+
                     strBuilder.AppendLine($"\t\t Material: type: {mesh.Material.GetType()} size: {mesh.Material.ComputeSize()}");
                     strBuilder.AppendLine($"\t\t\t MaterialId: {mesh.Material.MaterialId}");
                     strBuilder.AppendLine($"\t\t\t BinaryVertexFormat: {mesh.Material.BinaryVertexFormat}");
@@ -280,8 +294,9 @@ namespace CommonControls.FileTypes.RigidModel
                     strBuilder.AppendLine($"\t\t\t IndexList.Length: {mesh.Mesh.IndexList.Length}");
                 }
             }
-
-            _logger.Here().Information(strBuilder.ToString());
+            var output = strBuilder.ToString();
+            _logger.Here().Information(output);
+            return output;
         }
     }
 }

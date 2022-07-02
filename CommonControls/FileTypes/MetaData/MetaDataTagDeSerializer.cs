@@ -8,15 +8,15 @@ namespace CommonControls.FileTypes.MetaData
 {
     public class MetaDataTagDeSerializer
     {
-        public static Dictionary<string, Type> _typeTable;
+        public static Dictionary<string, List<Type>> _typeTable;
         public static Dictionary<string, string> _descriptionMap;
 
-        static void EnsureMappingTableCreated()
+        public static void EnsureMappingTableCreated()
         {
             if (_typeTable != null)
                 return;
 
-            _typeTable = new Dictionary<string, Type>();
+            _typeTable = new Dictionary<string, List<Type>>();
 
             CreateDescriptions();
 
@@ -27,12 +27,18 @@ namespace CommonControls.FileTypes.MetaData
                 where attributes != null && attributes.Length > 0
                 select new { Type = t, Attributes = attributes.Cast<MetaDataAttribute>() };
 
-            var typesWithMyAttributeList = typesWithMyAttribute.ToList();
+            var typesWithMyAttributeList = typesWithMyAttribute.Select(x=> new { Type = x.Type, AttributeInfo = x.Attributes.First() })
+                .OrderBy(x=>x.AttributeInfo.Priority)
+                .ToList();
+
             foreach (var instance in typesWithMyAttributeList)
             {
                 var type = instance.Type;
-                var key = instance.Attributes.First().VersionName;
-                _typeTable.Add(key, type);
+                var key = instance.AttributeInfo.VersionName;
+                if (_typeTable.ContainsKey(key) == false)
+                    _typeTable.Add(key, new List<Type>());
+
+                _typeTable[key].Add(type);
 
                 var orderedPropertiesList = type.GetProperties()
                     .Where(x => x.CanWrite)
@@ -45,8 +51,29 @@ namespace CommonControls.FileTypes.MetaData
                     throw new Exception("Invalid ids");
 
                 // Ensure we have a decription
-                GetDescription(instance.Attributes.First().Name);
-            } 
+                GetDescription(instance.AttributeInfo.Name);  
+            }
+
+#if DEBUG
+            // Check that we can create an instance
+            foreach (var type in _typeTable.Keys)
+            {
+                var instance = CreateDefault(type);
+
+                Type t = instance.GetType();
+                PropertyInfo[] props = t.GetProperties();
+
+                foreach (var prop in props)
+                {
+                    if (prop.Name.ToLower() == "data")
+                        continue;
+
+                    var value = prop.GetValue(instance);
+                    if (value == null)
+                        throw new Exception($"{type} contains null value for attribute {prop.Name}");
+                }
+            }
+#endif
         }
 
         static void CreateDescriptions()
@@ -124,12 +151,10 @@ namespace CommonControls.FileTypes.MetaData
             _descriptionMap["RIDER_ANIMATION_REQUIRED"] = "Mark the mount animation as needing a synced rider animation is corresponding rider slot.";
             _descriptionMap["SHADER_PARAMETER"] = "Modify specified shader parameter. Blends between two closest values.";
             _descriptionMap["EJECT_ATTACHED"] = "Eject the attached riders. Defines the direction of ejection(2D, Y is ignored).";
-         
         }
 
         public static string GetDescription(string metaDataTagName)
         {
-            EnsureMappingTableCreated();
             if (_descriptionMap.ContainsKey(metaDataTagName) == false)
                 throw new Exception($"Unable to get description of {metaDataTagName}");
             return _descriptionMap[metaDataTagName];
@@ -137,7 +162,6 @@ namespace CommonControls.FileTypes.MetaData
 
         public static string GetDescriptionSafe(string metaDataTagName)
         {
-            EnsureMappingTableCreated();
             if (_descriptionMap.ContainsKey(metaDataTagName) == false)
                 return "Missing";
             return _descriptionMap[metaDataTagName];
@@ -145,7 +169,6 @@ namespace CommonControls.FileTypes.MetaData
 
         public static List<string> GetSupportedTypes()
         {
-            EnsureMappingTableCreated();
             return _typeTable.Select(x => x.Key).ToList();
         }
 
@@ -154,10 +177,8 @@ namespace CommonControls.FileTypes.MetaData
             return array.Zip(array.Skip(1), (a, b) => (a + 1) == b).All(x => x);
         }
 
-        static Type GetTypeFromMeta(BaseMetaEntry entry)
+        static List<Type> GetTypesFromMeta(BaseMetaEntry entry)
         {
-            EnsureMappingTableCreated();
-
             var key = entry.Name + "_" + entry.Version;
             if (_typeTable.ContainsKey(key) == false)
                 return null;
@@ -167,43 +188,60 @@ namespace CommonControls.FileTypes.MetaData
 
         public static BaseMetaEntry DeSerialize(UnknownMetaEntry entry, out string errorMessage)
         {
-            EnsureMappingTableCreated();
-
-            var entryInfo = GetEntryInformation(entry);
-            if (entryInfo == null)
+            var entryInfoList = GetEntryInformation(entry);
+            if (entryInfoList == null)
             {
                 errorMessage = $"Unable to find decoder for {entry.Name}_{entry.Version}";
                 return null;
             }
-            var instance = Activator.CreateInstance(entryInfo.Type);
-            var bytes = entry.Data;
-            int currentIndex = 0;
-            foreach (var proptery in entryInfo.Properties)
+
+            errorMessage = null;
+            foreach (var entryInfo in entryInfoList)
             {
-                var parser = ByteParserFactory.Create(proptery.PropertyType);
-                var value = parser.GetValueAsObject(bytes, currentIndex, out var bytesRead);
-                currentIndex += bytesRead;
-                proptery.SetValue(instance, value);
+                var instance = Activator.CreateInstance(entryInfo.Type);
+                var bytes = entry.Data;
+                int currentIndex = 0;
+                foreach (var proptery in entryInfo.Properties)
+                {
+                    var parser = ByteParserFactory.Create(proptery.PropertyType);
+                    try
+                    {
+                        var value = parser.GetValueAsObject(bytes, currentIndex, out var bytesRead);
+                        currentIndex += bytesRead;
+                        proptery.SetValue(instance, value);
+                        errorMessage = "";
+                    }
+                    catch (Exception e)
+                    {
+                        errorMessage = $"Failed to read object - {e.Message} bytes left";
+                        break;
+                    }
+                }
+
+                if (errorMessage != "")
+                    continue;
+
+                var bytesLeft = bytes.Length - currentIndex;
+                if (bytesLeft != 0)
+                {
+                    errorMessage = $"Failed to read object - {bytesLeft} bytes left";
+                    continue;
+                }
+
+                var typedInstance = instance as BaseMetaEntry;
+                typedInstance.Name = entry.Name;
+                typedInstance.Data = bytes;
+                errorMessage = null;
+                return typedInstance;
             }
 
-            var bytesLeft = bytes.Length - currentIndex;
-            if (bytesLeft != 0)
-            {
-                errorMessage = $"Failed to read object - {bytesLeft} bytes left";
-                return null;
-            }
-         
-            var typedInstance = instance as BaseMetaEntry;
-            typedInstance.Name = entry.Name;
-            typedInstance.Data = bytes;
-            errorMessage = null;
-            return typedInstance;
+            return null;
         }
         
         public static List<(string Header, string Value)> DeSerializeToStrings(BaseMetaEntry entry, out string errorMessage)
         {
-            var entryInfo = GetEntryInformation(entry);
-            if (entryInfo == null)
+            var entryInfoList = GetEntryInformation(entry);
+            if (entryInfoList == null)
             {
                 errorMessage = $"Unable to find decoder for {entry.Name}_{entry.Version}";
                 return null;
@@ -212,39 +250,48 @@ namespace CommonControls.FileTypes.MetaData
             var bytes = entry.Data;
             int currentIndex = 0;
             var output = new List<(string, string)>();
-
-            foreach (var proptery in entryInfo.Properties)
-            {
-                var parser = ByteParserFactory.Create(proptery.PropertyType);
-                var result = parser.TryDecode(bytes, currentIndex, out var value, out var bytesRead, out var error);
-                if (result == false)
-                {
-                    errorMessage = $"Failed to serialize {proptery.Name} - {error}";
-                    return null;
-                }
-                currentIndex += bytesRead;
-                output.Add((proptery.Name, value));
-            }
-
-            var bytesLeft = bytes.Length - currentIndex;
-            if (bytesLeft != 0)
-            {
-                errorMessage = $"Failed to read object - {bytesLeft} bytes left";
-                return null;
-            }
-
             errorMessage = null;
+
+            foreach (var entryInfo in entryInfoList)
+            {
+                errorMessage = "";
+                foreach (var proptery in entryInfo.Properties)
+                {
+                    var parser = ByteParserFactory.Create(proptery.PropertyType);
+                    var result = parser.TryDecode(bytes, currentIndex, out var value, out var bytesRead, out var error);
+                    if (result == false)
+                    {
+                        errorMessage = $"Failed to serialize {proptery.Name} - {error}";
+                        break;
+                    }
+                    currentIndex += bytesRead;
+                    output.Add((proptery.Name, value));
+                }
+
+                if (errorMessage != "")
+                    continue;
+
+                var bytesLeft = bytes.Length - currentIndex;
+                if (bytesLeft != 0)
+                {
+                    errorMessage = $"Failed to read object - {bytesLeft} bytes left";
+                    continue;
+                }
+
+                errorMessage = null;
+                return output;
+            }
+
             return output;
         }
 
-        internal static DecodedMetaEntryBase CreateDefault(string itemName)
+        internal static BaseMetaEntry CreateDefault(string itemName)
         {
-            EnsureMappingTableCreated();
-
             if (_typeTable.ContainsKey(itemName) == false)
                 throw new Exception("Unkown metadata item " + itemName);
 
-            var instance = Activator.CreateInstance(_typeTable[itemName]) as DecodedMetaEntryBase;
+            var type = _typeTable[itemName].First();
+            var instance = Activator.CreateInstance(type) as BaseMetaEntry;
 
             var itemNameSplit = itemName.ToUpper().Split("_");
             instance.Version = int.Parse(itemNameSplit.Last());
@@ -252,20 +299,27 @@ namespace CommonControls.FileTypes.MetaData
             return instance;
         }
 
-        static EntryInfoResult GetEntryInformation(BaseMetaEntry entry)
+        static List<EntryInfoResult> GetEntryInformation(BaseMetaEntry entry)
         {
-            var metaDataType = GetTypeFromMeta(entry);
-            if (metaDataType == null)
+            var metaDataTypes = GetTypesFromMeta(entry);
+            if (metaDataTypes == null)
                 return null;
 
-            var instance = Activator.CreateInstance(metaDataType);
-            var orderedPropertiesList = metaDataType.GetProperties()
-                .Where(x => x.CanWrite)
-                .Where(x => Attribute.IsDefined(x, typeof(MetaDataTagAttribute)))
-                .OrderBy(x => x.GetCustomAttributes<MetaDataTagAttribute>(false).Single().Order)
-                .ToList();
+            var output = new List<EntryInfoResult>();
+            foreach (var metaDataType in metaDataTypes)
+            {
+                var instance = Activator.CreateInstance(metaDataType);
+                var orderedPropertiesList = metaDataType.GetProperties()
+                    .Where(x => x.CanWrite)
+                    .Where(x => Attribute.IsDefined(x, typeof(MetaDataTagAttribute)))
+                    .OrderBy(x => x.GetCustomAttributes<MetaDataTagAttribute>(false).Single().Order)
+                    .ToList();
 
-            return new EntryInfoResult() { Type = metaDataType, Properties = orderedPropertiesList };
+                var entryInfo = new EntryInfoResult() { Type = metaDataType, Properties = orderedPropertiesList };
+                output.Add(entryInfo);
+            }
+
+            return output;
         }
 
         public class EntryInfoResult

@@ -98,7 +98,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
                 // Add an empty fragment entry
                 _riderOutputFragment.Fragments.Add(new AnimationSetEntry()
                 {
-                    Slot = AnimationSlotTypeHelper.GetfromValue(riderSlot),
+                    Slot = DefaultAnimationSlotTypeHelper.GetfromValue(riderSlot),
                     Skeleton = _riderFragment.Skeletons.Values.First()
                 });
 
@@ -145,8 +145,8 @@ namespace AnimationEditor.MountAnimationCreator.Services
         List<(string, string)> GetMatchedAnimations()
         {
             return _mountFragment.Fragments
-                .Where(x => AnimationSlotTypeHelper.GetMatchingRiderAnimation(x.Slot.Value) != null)
-                .Select(x => (AnimationSlotTypeHelper.GetMatchingRiderAnimation(x.Slot.Value).Value, x.Slot.Value))
+                .Where(x => DefaultAnimationSlotTypeHelper.GetMatchingRiderAnimation(x.Slot.Value) != null)
+                .Select(x => (DefaultAnimationSlotTypeHelper.GetMatchingRiderAnimation(x.Slot.Value).Value, x.Slot.Value))
                 .Distinct()
                 .ToList();
         }
@@ -161,7 +161,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
             tableEntry.FragmentReferences.Add(new AnimationBinEntry.FragmentReference() { Name = _fragmentName });
             animDb.AnimationTableEntries.Add(tableEntry);
             
-            _riderOutputFragment = new AnimationFragmentFile("animations/animation_tables/" + _fragmentName + ".frg", null);
+            _riderOutputFragment = new AnimationFragmentFile("animations/animation_tables/" + _fragmentName + ".frg", null, GameTypeEnum.Warhammer2);
             _riderOutputFragment.Skeletons = new StringArrayTable(_riderFragment.Skeletons.Values.First(), _riderFragment.Skeletons.Values.First());
             
             _outAnimPack.AddFile(_riderOutputFragment);

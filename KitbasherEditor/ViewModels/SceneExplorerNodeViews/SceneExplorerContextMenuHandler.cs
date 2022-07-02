@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text.RegularExpressions;
 using View3D.Commands.Object;
 using View3D.Components.Component;
 using View3D.SceneNodes;
@@ -18,24 +19,30 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public Rmv2ModelNode EditableMeshNode { get; internal set; }
 
         ISceneNode _activeNode;
+        IEnumerable<ISceneNode> _activeNodes;
+
+        public event ValueChangedDelegate<IEnumerable<ISceneNode>> SelectedNodesChanged;
 
         public SceneExplorerContextMenuHandler(CommandExecutor commandExecutor)
         {
             CommandExecutor = commandExecutor;
         }
 
-        public void Create(ISceneNode activeNode)
+        public void Create(IEnumerable<ISceneNode> activeNodes)
         {
-            _activeNode = activeNode;
-
             Items = new ObservableCollection<ContextMenuItem>();
-            if (activeNode == null)
+
+            if (!activeNodes.Any())
+                return;
+
+            _activeNodes = activeNodes;
+            _activeNode = activeNodes.First();
+
+            if (_activeNodes.Count() > 1)
                 return;
 
             if (CanMakeEditable(_activeNode))
-            {
                 _contextMenu.Add(new ContextMenuItem("Make Editable", new RelayCommand(MakeEditable)));
-            }
 
             if (IsUngroupable(_activeNode))
                 _contextMenu.Add(new ContextMenuItem("Ungroup", new RelayCommand(Ungroup)));
@@ -45,6 +52,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             else if (IsUnlockable(_activeNode))
                 _contextMenu.Add(new ContextMenuItem("Unlock", new RelayCommand(ToggleLock)));
 
+            if (_contextMenu.Count != 0)
+                _contextMenu.Add(null);
+            _contextMenu.Add(new ContextMenuItem("Invert Selection", new RelayCommand(InvertSelection)));
+            _contextMenu.Add(new ContextMenuItem("Select Similarly Named", new RelayCommand(SelectSimilar)));
+
             if (IsRemovable(_activeNode))
             {
                 if (_contextMenu.Count != 0)
@@ -52,8 +64,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 _contextMenu.Add(new ContextMenuItem("Remove", new RelayCommand(RemoveNode)));
             }
         }
-
-
 
         bool CanMakeEditable(ISceneNode node)
         {
@@ -171,6 +181,27 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 CommandExecutor.ExecuteCommand(new UnGroupObjectsCommand(_activeNode.Parent, _activeNode.Children.Select(x => x as ISelectable).ToList(), _activeNode));
             else if (_activeNode.Parent is GroupNode g && g.IsUngroupable)
                 CommandExecutor.ExecuteCommand(new UnGroupObjectsCommand(_activeNode.Parent.Parent, new List<ISelectable>() { _activeNode as ISelectable }, _activeNode.Parent));
+        }
+
+        void InvertSelection()
+        {
+            var x = _activeNode.Parent.Children.Except(_activeNodes).ToList();
+            SelectedNodesChanged?.Invoke(_activeNode.Parent.Children.Except(_activeNodes).ToList());
+        }
+
+        void SelectSimilar()
+        {
+            var m = Regex.Match(_activeNode.Name, @".*_");
+            if (!m.Success)
+                return;
+
+            var selectedNodes = _activeNode.Parent.Children.Where(siblingNode =>
+            {
+                var siblingMatchResult = Regex.Match(siblingNode.Name, @".*_");
+                return siblingMatchResult.Success && siblingMatchResult.Value == m.Value;
+            });
+
+            SelectedNodesChanged?.Invoke(selectedNodes.ToList());
         }
 
         void ToggleLock()

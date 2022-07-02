@@ -14,7 +14,7 @@ namespace CommonControls.Editors.AnimationPack
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<AnimPackViewModel, AnimationPackView>(new ExtentionToTool(".animpack"));
+            factory.RegisterFileTool<AnimPackViewModel, AnimationPackView>(new ExtentionToTool(EditorEnums.AnimationPack_Editor, new[] { ".animpack" }));
             //factory.RegisterTool<TextEditorViewModel<CampaignAnimBinToXmlConverter>, TextEditorView>(new PathToTool(".bin", @"animations\database\battle\bin"));
         }
     }

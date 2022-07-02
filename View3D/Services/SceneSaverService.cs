@@ -120,8 +120,6 @@ namespace View3D.Services
             return output;
         }
 
-        
-
         public static byte[] Save(bool onlySaveVisibleNodes, List<Rmv2ModelNode> modelNodes, GameSkeleton skeleton, RmvVersionEnum version, bool enrichModel = true)
         {
             var logger = Logging.Create<SceneSaverService>();
@@ -165,6 +163,8 @@ namespace View3D.Services
                             Material = meshes[meshIndex].Material,
                             Mesh = MeshBuilderService.CreateRmvMeshFromGeometry(meshes[meshIndex].Geometry)
                         };
+
+                        newModel.UpdateBoundingBox(meshes[meshIndex].Geometry.BoundingBox);
 
                         var boneNames = new string[0];
                         if (skeleton != null)

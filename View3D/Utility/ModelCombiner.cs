@@ -116,6 +116,35 @@ namespace View3D.Utility
             return groupedOutput;
         }
 
+        public static List<Rmv2MeshNode> CombineMeshes(List<Rmv2MeshNode> geometriesToCombine)
+        {
+            var combinedMeshes = new List<Rmv2MeshNode>();
+            var combineGroups = SortMeshesIntoCombinableGroups(geometriesToCombine);
+            foreach (var currentGroup in combineGroups)
+            {
+                if (currentGroup.Count != 1)
+                {
+                    var combinedMesh = SceneNodeHelper.CloneNode(currentGroup.First());
+                    combinedMesh.Name = currentGroup.First().Name + "_Combined";
+
+                    var newModel = currentGroup.First().Geometry.Clone();
+                    var typedGeo = currentGroup.Select(x => x.Geometry);
+                    combinedMesh.Geometry = newModel;
+
+                    var geoList = currentGroup.Skip(1).Select(x => x.Geometry).ToList();
+                    newModel.Merge(geoList);
+
+                    combinedMeshes.Add(combinedMesh);
+                }
+                else
+                {
+                    combinedMeshes.Add(currentGroup.First());
+                }
+            }
+
+            return combinedMeshes;
+        }
+
         private static bool ValidateTextures(Rmv2MeshNode item0, string item0Name, Rmv2MeshNode item1, string item1Name, out string textureErrorMsg)
         {
             var textureList0 = item0.GetTextures();

@@ -42,11 +42,11 @@ namespace View3D.Rendering.Shading
         {
             Effect.Parameters["View"].SetValue(commonShaderParameters.View);
             Effect.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
-            Effect.Parameters["EnvMapTransform"].SetValue((Matrix.CreateRotationY(commonShaderParameters.LightRotationRadians)));
+            Effect.Parameters["EnvMapTransform"].SetValue((Matrix.CreateRotationY(commonShaderParameters.EnvLightRotationsRadians_Y)));
+            Effect.Parameters["DirLightTransform"].SetValue(Matrix.CreateRotationY(commonShaderParameters.DirLightRotationRadians_Y) * Matrix.CreateRotationX(commonShaderParameters.DirLightRotationRadians_X));       
             Effect.Parameters["LightMult"].SetValue(commonShaderParameters.LightIntensityMult);
             Effect.Parameters["World"].SetValue(modelMatrix);
-            Effect.Parameters["CameraPos"].SetValue(commonShaderParameters.CameraPosition);
-        }
+            Effect.Parameters["CameraPos"].SetValue(commonShaderParameters.CameraPosition);        }
 
         public bool UseAnimation { set { Effect.Parameters["doAnimation"].SetValue(value); } }
 
@@ -56,6 +56,9 @@ namespace View3D.Rendering.Shading
             Effect.Parameters["WeightCount"].SetValue((int)weightCount);
             Effect.Parameters["tranforms"].SetValue(transforms);
         }
+
+        public virtual void SetScaleMult(float scaleMult)
+        { }
 
         public abstract IShader Clone();
     }
@@ -122,6 +125,11 @@ namespace View3D.Rendering.Shading
             newShader.Effect.Parameters["GlossTexture"].SetValue(Effect.Parameters["GlossTexture"].GetValueTexture2D());
 
             return newShader;
+        }
+
+        public override void SetScaleMult(float scaleMult)
+        {
+            Effect.Parameters["ModelRenderScale"].SetValue(scaleMult);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -8,30 +9,60 @@ using System.Windows.Controls;
 
 namespace CommonControls.Common
 {
+    public class PackFileToToolSelectorResult
+    {
+        public bool CanOpen { get; set; } = false;
+        public bool IsCoreTool { get; set; } = false;
+    }
+
     public interface IPackFileToToolSelector
     {
-        bool CanOpen(string fullPath);
+        PackFileToToolSelectorResult CanOpen(string fullPath);
+        EditorEnums EditorType { get; }
     }
 
     public class ExtentionToTool : IPackFileToToolSelector
     {
-        string[] _validExtentions;
+        string[] _validExtentionsCore;
+        string[] _validExtentionsOptimal;
 
-        public ExtentionToTool(params string[] extentions)
+        public ExtentionToTool(EditorEnums editorDisplayName, string[] coreTools, string[] optionalTools = null)
         {
-            _validExtentions = extentions;
+            _validExtentionsCore = coreTools;
+            _validExtentionsOptimal = optionalTools;
+            EditorType = editorDisplayName;
         }
 
-        public bool CanOpen(string fullPath)
+        public EditorEnums EditorType {get; private set;}
+
+        public PackFileToToolSelectorResult CanOpen(string fullPath)
         {
             var extention = Regex.Match(fullPath, @"\..*").Value;
-            foreach (var validExt in _validExtentions)
+            if (extention.Contains("{") && extention.Contains("}"))
             {
-                if (validExt == extention)
-                    return true;
+                var index = extention.IndexOf("}");
+                extention = extention.Remove(0, index+1);
             }
 
-            return false;
+            if (_validExtentionsCore != null)
+            {
+                foreach (var validExt in _validExtentionsCore)
+                {
+                    if (validExt == extention)
+                        return new PackFileToToolSelectorResult() { CanOpen = true, IsCoreTool = true};
+                }
+            }
+
+            if (_validExtentionsOptimal != null)
+            {
+                foreach (var validExt in _validExtentionsOptimal)
+                {
+                    if (validExt == extention)
+                        return new PackFileToToolSelectorResult() { CanOpen = true, IsCoreTool = false };
+                }
+            }
+
+            return new PackFileToToolSelectorResult() { CanOpen = false, IsCoreTool = false };
         }
     }
 
@@ -40,29 +71,29 @@ namespace CommonControls.Common
         string _extention;
         string _requiredPathSubString;
 
-        public PathToTool(string extention, string requiredPathSubString)
+        public PathToTool(EditorEnums editorDisplayName, string extention, string requiredPathSubString)
         {
             _extention = extention;
             _requiredPathSubString = requiredPathSubString;
+            EditorType = editorDisplayName;
         }
 
-        public bool CanOpen(string fullPath)
+        public EditorEnums EditorType { get; private set; }
+
+        public PackFileToToolSelectorResult CanOpen(string fullPath)
         {
             var extention = Regex.Match(fullPath, @"\..*").Value;
             if (_extention == extention && fullPath.Contains(_requiredPathSubString))
-                return true;
-            return false;
+                return new PackFileToToolSelectorResult() { CanOpen = true, IsCoreTool = true };
+
+            return new PackFileToToolSelectorResult() { CanOpen = false, IsCoreTool = false };
         }
     }
     public interface IToolFactory
     {
-        void RegisterTool<ViewModel, View>(IPackFileToToolSelector toolSelector)
+        void RegisterFileTool<ViewModel, View>(IPackFileToToolSelector toolSelector)
                where ViewModel : IEditorViewModel
                where View : Control;
-
-        void RegisterToolAsDefault<ViewModel, View>()
-           where ViewModel : IEditorViewModel
-           where View : Control;
 
         void RegisterTool<ViewModel, View>()
             where ViewModel : IEditorViewModel
@@ -73,7 +104,7 @@ namespace CommonControls.Common
             where ViewModel : IEditorViewModel;
 
         Window CreateToolAsWindow(IEditorViewModel viewModel);
-        IEditorViewModel GetToolViewModelFromFileName(string filename);
+        IEditorViewModel GetDefaultToolViewModelFromFileName(string filename);
     }
 
     public class ToolFactory : IToolFactory
@@ -84,14 +115,12 @@ namespace CommonControls.Common
         Dictionary<Type, Type> _viewModelToViewMap = new Dictionary<Type, Type>();
         Dictionary<IPackFileToToolSelector, Type> _extentionToToolMap = new Dictionary<IPackFileToToolSelector, Type>();
 
-        Type _defaultViewModelType;
-
         public ToolFactory(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
 
-        public void RegisterTool<ViewModel, View>(IPackFileToToolSelector toolSelector)
+        public void RegisterFileTool<ViewModel, View>(IPackFileToToolSelector toolSelector)
                    where ViewModel : IEditorViewModel
                    where View : Control
         {
@@ -100,14 +129,6 @@ namespace CommonControls.Common
             var viewModelType = typeof(ViewModel);
             _extentionToToolMap[toolSelector] = viewModelType;
 
-        }
-
-        public void RegisterToolAsDefault<ViewModel, View>()
-           where ViewModel : IEditorViewModel
-           where View : Control
-        {
-            RegisterTool<ViewModel, View>();
-            _defaultViewModelType = typeof(ViewModel);
         }
 
         public void RegisterTool<ViewModel, View>()
@@ -162,21 +183,16 @@ namespace CommonControls.Common
             return newWindow;
         }
 
-        public IEditorViewModel GetToolViewModelFromFileName(string filename)
+        public IEditorViewModel GetDefaultToolViewModelFromFileName(string filename)
         {
             foreach (var toolLoopUp in _extentionToToolMap)
             {
-                if (toolLoopUp.Key.CanOpen(filename))
+                var result = toolLoopUp.Key.CanOpen(filename);
+                if (result.CanOpen && result.IsCoreTool)
                 {
                     var instance = (IEditorViewModel)_serviceProvider.GetService(toolLoopUp.Value);
                     return instance;
                 }
-            }
-
-            if (_defaultViewModelType != null)
-            {
-                var instance = (IEditorViewModel)_serviceProvider.GetService(_defaultViewModelType);
-                return instance;
             }
 
             var error = $"Attempting to get view model for file {filename}, unable to find tool based on extention";
@@ -184,10 +200,43 @@ namespace CommonControls.Common
             return null;
         }
 
+        public List<ToolInformation> GetAllToolViewModelFromFileName(string filename)
+        {
+            var output = new List<ToolInformation>();
+            foreach (var toolLoopUp in _extentionToToolMap)
+            {
+                var result = toolLoopUp.Key.CanOpen(filename);
+                if (result.CanOpen)
+                    output.Add(new ToolInformation() { EditorType = toolLoopUp.Key .EditorType, IsCoreTool = result.IsCoreTool, Type = toolLoopUp.Value});
+            }
+
+            if (output.Count == 0)
+            {
+                var error = $"Attempting to get view model for file {filename}, unable to find tool based on extention";
+                _logger.Here().Error(error);
+                return null;
+            }
+
+            return output.OrderBy(x=>x.IsCoreTool).ToList();
+        }
+
+        public IEditorViewModel CreateFromType(Type type)
+        {
+            var instance = (IEditorViewModel)_serviceProvider.GetService(type);
+            return instance;
+        }
+
         public ViewModel CreateEditorViewModel<ViewModel>() where ViewModel : IEditorViewModel
         {
             var instance = (ViewModel)_serviceProvider.GetService(typeof(ViewModel));
             return instance;
         }
+    }
+
+    public class ToolInformation
+    { 
+        public EditorEnums EditorType { get; set; }
+        public bool IsCoreTool { get; set; } = false;
+        public Type Type { get; set; }
     }
 }

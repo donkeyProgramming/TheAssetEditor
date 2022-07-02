@@ -27,7 +27,6 @@ namespace AssetEditor.Report
             public List<string> Headers { get; set; } = new List<string>() { "FileName", "Error"};
         }
 
-
         PackFileService _pfs;
         ApplicationSettingsService _settingsService;
         public AnimMetaDataReportGenerator(PackFileService pfs, ApplicationSettingsService settingsService)
@@ -62,6 +61,9 @@ namespace AssetEditor.Report
             for (int i = 0; i < fileList.Count; i++)
             {
                 var fileName = fileList[i].FileName;
+                //if (fileName.Contains("hu1_2hh_knockback_l_01.anm.meta") == false)
+                //    continue;
+
                 var packFile = fileList[i].Pack;
                 try
                 {
@@ -76,7 +78,7 @@ namespace AssetEditor.Report
                     var completedTags = 0;
                     foreach (var item in metaData.Items)
                     {
-                        var tagName = item.Name + "_v" + item.Version;
+                        var tagName = item.DisplayName;
                         tagName = tagName.ToLower();
 
                         if (output.ContainsKey(tagName) == false)
@@ -154,7 +156,7 @@ namespace AssetEditor.Report
             var summaryContent = new StringWriter();
             summaryContent.WriteLine("sep=|");
             summaryContent.WriteLine("Tag|Completed|Failed|Ratio");
-            foreach (var item in output)
+            foreach (var item in output.OrderBy(x=>x.Key))
             {
                 var str = $"{item.Key}| {item.Value.CompletedFiles.Count}| {item.Value.FailedFiles.Count} |{item.Value.FailedFiles.Count}/{item.Value.CompletedFiles.Count + item.Value.FailedFiles.Count}";
                 _logger.Here().Information(str);

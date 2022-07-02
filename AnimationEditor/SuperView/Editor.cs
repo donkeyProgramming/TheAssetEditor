@@ -60,10 +60,10 @@ namespace AnimationEditor.SuperView
 
             if (input.FragmentName != null)
             {
-                viewModel.FragAndSlotSelection.FragmentList.SelectedItem = viewModel.FragAndSlotSelection.FragmentList.PossibleValues.FirstOrDefault(x => x.Name == input.FragmentName);
+                viewModel.FragAndSlotSelection.FragmentList.SelectedItem = viewModel.FragAndSlotSelection.FragmentList.PossibleValues.FirstOrDefault(x => x.FullPath == input.FragmentName);
 
-                //if (input.AnimationSlot != null)
-                //    viewModel.FragAndSlotSelection.FragmentSlotList.SelectedItem = viewModel.FragAndSlotSelection.FragmentSlotList.PossibleValues.FirstOrDefault(x => x.SlotName == input.AnimationSlot);
+                if (input.AnimationSlot != null)
+                    viewModel.FragAndSlotSelection.FragmentSlotList.SelectedItem = viewModel.FragAndSlotSelection.FragmentSlotList.PossibleValues.FirstOrDefault(x => x.SlotName == input.AnimationSlot.Value);
             }
 
             asset.MetaDataChanged += Asset_MetaDataChanged;
@@ -85,8 +85,6 @@ namespace AnimationEditor.SuperView
                 PersistentMetaFilePath.Value = "";
                 PersistentMetaFilePackFileContainerName.Value = "";
             }
-            
-
             
             MetaEditor.MainFile = newValue.MetaData;
             if (MetaEditor.MainFile != null)

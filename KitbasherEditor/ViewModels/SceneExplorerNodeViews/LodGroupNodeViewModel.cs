@@ -1,6 +1,7 @@
 ﻿using CommonControls.Common;
 using CommonControls.MathViews;
 using MonoGame.Framework.WpfInterop;
+using System.Linq;
 using View3D.Components.Component;
 using View3D.SceneNodes;
 
@@ -15,11 +16,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         {
             _node = node;
             _componentManager = componentManager;
-            LodReductionFactor = new DoubleViewModel(_node.LodReductionFactor);
-            LodReductionFactor.OnValueChanged += (value) => _node.LodReductionFactor = (float)value;
         }
-
-
 
         public float? CameraDistance
         {
@@ -43,10 +40,28 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 var lodHeaders = _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().Model.LodHeaders;
                 return lodHeaders[_node.LodValue].QualityLvl;
             }
-           
+            set 
+            {
+                var lodHeaders = _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().Model.LodHeaders;
+                lodHeaders[_node.LodValue].QualityLvl = value;
+                NotifyPropertyChanged();
+            }
         }
 
-        public DoubleViewModel LodReductionFactor { get; set; } = new DoubleViewModel(1);
+        public float LodReductionFactor
+        {
+            get => _node.LodReductionFactor;
+            set
+            {
+                _node.LodReductionFactor = value;
+                NotifyPropertyChanged();
+            }
+        }
 
+        public int LodIndex { get => _node.LodValue; }
+        public bool OptimizeLod { get => _node.OptimizeLod; set => _node.OptimizeLod = value; }
+        public int PolygonCount { get => _node.GetAllModels(false).Sum(x=>x.Geometry.VertexCount() / 3); }
+        public int TextureCount { get => _node.GetAllModels(false).SelectMany(x => x.Material.GetAllTextures().Select(x => x.Path)).Distinct().Count(); }
+        public int MeshCount { get => _node.GetAllModels(false).Count(); }
     }
 }

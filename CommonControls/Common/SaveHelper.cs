@@ -1,6 +1,7 @@
 ﻿using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +13,7 @@ namespace CommonControls.Common
     public static class SaveHelper
     {
         public static string BackupFolderPath = "Backup";
+        static readonly ILogger _logger = Logging.CreateStatic(typeof(SaveHelper));
 
         public static void Save(PackFileService packFileService, PackFile inputFile)
         {
@@ -67,6 +69,9 @@ namespace CommonControls.Common
                     }
                 }
             }
+
+            _logger.Here().Information($"Saving file {filename}");
+
             if (existingFile == null)
             {
                 var directoryPath = Path.GetDirectoryName(filename);

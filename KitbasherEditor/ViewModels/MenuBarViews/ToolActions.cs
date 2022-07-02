@@ -22,6 +22,7 @@ using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 using View3D.Services;
+using View3D.Utility;
 using MessageBox = System.Windows.MessageBox;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
@@ -134,32 +135,42 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                     child.Parent.RemoveObject(child);
             }
 
-            var modelGroups = firtLod.GetAllModelsGrouped(false);
+            var meshList = firtLod.GetAllModelsGrouped(false).SelectMany(x => x.Value).ToList(); 
 
             //Generate lod
             for (int lodIndex = 0; lodIndex < lodsToGenerate.Count(); lodIndex++)
             {
                 var deductionRatio = lodsToGenerate[lodIndex].LodReductionFactor;
+                var optimize = lodsToGenerate[lodIndex].OptimizeLod;
 
-                foreach (var modelGroupCollection in modelGroups)
+                // We want to work on a clone of all the meshes
+                var clonedMeshes = meshList.Select(x => SceneNodeHelper.CloneNode(x)).ToList();
+
+                if (optimize)
                 {
-                    ISceneNode parentNode = lodsToGenerate[lodIndex];
-                    if (modelGroupCollection.Key is Rmv2LodNode == false && modelGroupCollection.Key is GroupNode groupNode)
+                    foreach (var mesh in clonedMeshes)
                     {
-                        parentNode = SceneNodeHelper.CloneNode(groupNode);
-                        lodsToGenerate[lodIndex].AddObject(parentNode);
+                        mesh.Geometry.ChangeVertexType(UiVertexFormat.Weighted, mesh.Geometry.ParentSkeletonName);
+                        mesh.Material.AlphaMode = AlphaMode.Opaque;
                     }
 
-                    foreach (var mesh in modelGroupCollection.Value)
+                    // Combine if possible 
+                    var errorList = new ErrorListViewModel.ErrorList();
+                    var canCombine = ModelCombiner.HasPotentialCombineMeshes(clonedMeshes, out errorList);
+                    if (canCombine)
                     {
-                        var clone = SceneNodeHelper.CloneNode(mesh);
-
-                        var reduceValue = deductionRatio;
-                        if (clone.ReduceMeshOnLodGeneration == false)
-                            reduceValue = 1;
-                        _objectEditor.ReduceMesh(clone, reduceValue, false);
-                        parentNode.AddObject(clone);
+                        var newMeshList = ModelCombiner.CombineMeshes(clonedMeshes);
+                        clonedMeshes = newMeshList;
                     }
+                }
+
+                foreach (var mesh in clonedMeshes)
+                {
+                    var reduceValue = deductionRatio;
+                    if (mesh.ReduceMeshOnLodGeneration == false)
+                        reduceValue = 1;
+                    _objectEditor.ReduceMesh(mesh, reduceValue, false);
+                    lodsToGenerate[lodIndex].AddObject(mesh); 
                 }
             }
         }

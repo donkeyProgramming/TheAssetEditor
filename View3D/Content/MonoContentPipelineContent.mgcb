@@ -71,13 +71,13 @@
 /processor:PassThroughProcessor
 /build:Textures/Phazer/Brdf_rgba32f_raw.DDS
 
-#begin Textures/Phazer/DIFFUSE_irr_qwantani_rgba32f.dds
+#begin Textures/Phazer/DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128.dds
 /importer:TextureImporter
 /processor:PassThroughProcessor
-/build:Textures/Phazer/DIFFUSE_irr_qwantani_rgba32f.dds
+/build:Textures/Phazer/DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128.dds
 
-#begin Textures/Phazer/SkyOnly_SpecularHDR.dds
+#begin Textures/Phazer/SPECULAR_RADIANCE_edited_kloppenheim_06_512x512.dds
 /importer:TextureImporter
 /processor:PassThroughProcessor
-/build:Textures/Phazer/SkyOnly_SpecularHDR.dds
+/build:Textures/Phazer/SPECULAR_RADIANCE_edited_kloppenheim_06_512x512.dds
 

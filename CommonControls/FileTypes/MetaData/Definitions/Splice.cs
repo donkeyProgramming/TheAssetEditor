@@ -33,21 +33,20 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public float RightArmWeight { get; set; }
         [MetaDataTag(14)]
         public float LegsWeight { get; set; }
-
         [MetaDataTag(15)]
         public float BlendInTime { get; set; }
 
         [MetaDataTag(16)]
         public float BlendOutTime { get; set; }
 
-        [MetaDataTag(17)]
-        public string Additive { get; set; }
-        [MetaDataTag(18)]
-        public string WeaponPose { get; set; }
-        [MetaDataTag(19)]
-        public string Stretch { get; set; }
-        [MetaDataTag(20)]
-        public string ExcludeStripped { get; set; } = "";
+        [MetaDataTag(17, "true or false as text")]
+        public string Additive { get; set; } = "false";
+        [MetaDataTag(18, "true or false as text")]
+        public string WeaponPose { get; set; } = "false";
+        [MetaDataTag(19, "true or false as text")]
+        public string Stretch { get; set; } = "false";
+        [MetaDataTag(20, "true or false as text")]
+        public string ExcludeStripped { get; set; } = "false";
     }
 
 

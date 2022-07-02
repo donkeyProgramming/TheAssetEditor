@@ -19,7 +19,7 @@ namespace TextureEditor
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<TextureEditorViewModel, TexturePreviewView>(new ExtentionToTool(".dds", ".png", ".jpeg"));
+            factory.RegisterFileTool<TextureEditorViewModel, TexturePreviewView>(new ExtentionToTool(EditorEnums.Texture_Editor, new[] { ".dds", ".png", ".jpeg" }));
         }
     }
 }

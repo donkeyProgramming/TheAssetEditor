@@ -67,7 +67,7 @@ namespace AnimationEditor.Common.ReferenceModel
             AnimViewModel = new SelectAnimationViewModel(Data, _pfs, skeletonAnimationLookUpHelper);
             SkeletonInformation = new SkeletonPreviewViewModel(Data);
             MetaFileInformation = new SelectMetaViewModel(Data, _pfs);
-            FragAndSlotSelection = new SelectFragAndSlotViewModel(_pfs, skeletonAnimationLookUpHelper, Data, MetaFileInformation);
+            FragAndSlotSelection = new SelectFragAndSlotViewModel(_pfs, skeletonAnimationLookUpHelper, Data, MetaFileInformation, applicationSettingsService);
 
             Data.AnimationChanged += Data_AnimationChanged;
             Data.SkeletonChanged += Data_SkeletonChanged;
@@ -108,7 +108,7 @@ namespace AnimationEditor.Common.ReferenceModel
         public void ViewSelectedMeta()
         {
             var fullFileName = _pfs.GetFullPath(_data.MetaData);
-            var viewModel = _toolFactory.GetToolViewModelFromFileName(fullFileName);
+            var viewModel = _toolFactory.GetDefaultToolViewModelFromFileName(fullFileName);
             viewModel.MainFile = _data.MetaData;
             var window = _toolFactory.CreateToolAsWindow(viewModel);
             window.Show();
@@ -117,7 +117,7 @@ namespace AnimationEditor.Common.ReferenceModel
         public void ViewSelectedPersistMeta()
         {
             var fullFileName = _pfs.GetFullPath(_data.PersistMetaData);
-            var viewModel = _toolFactory.GetToolViewModelFromFileName(fullFileName);
+            var viewModel = _toolFactory.GetDefaultToolViewModelFromFileName(fullFileName);
             viewModel.MainFile = _data.PersistMetaData;
             var window = _toolFactory.CreateToolAsWindow(viewModel);
             window.Width = 800;

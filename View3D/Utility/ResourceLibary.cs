@@ -66,13 +66,16 @@ namespace View3D.Utility
             DefaultFont = LoadFont("Fonts//DefaultFont");
             CommonSpriteBatch = new SpriteBatch(_game.GraphicsDevice);
 
-            PbrDiffuse = Content.Load<TextureCube>("textures\\phazer\\DIFFUSE_irr_qwantani_rgba32f");
-            PbrSpecular = Content.Load<TextureCube>("textures\\phazer\\SkyOnly_SpecularHDR");   // Skyonly
+            //PbrSpecular= LoadTexture(@"C:\Users\ole_k\Downloads\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512.dds", false, true);
+            //PbrDiffuse  = LoadTexture(@"C:\Users\ole_k\Downloads\DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128.dds", false, true);
+
+            PbrDiffuse = Content.Load<TextureCube>("textures\\phazer\\DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128");
+            PbrSpecular = Content.Load<TextureCube>("textures\\phazer\\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512");  
             PbrLut = Content.Load<Texture2D>("textures\\phazer\\Brdf_rgba32f_raw");
         }
 
 
-        public Texture2D LoadTexture(string fileName, bool forceRefreshTexture = false)
+        public Texture2D LoadTexture(string fileName, bool forceRefreshTexture = false, bool fromFile = false)
         {
             if (forceRefreshTexture == false)
             {
@@ -80,16 +83,16 @@ namespace View3D.Utility
                     return _textureMap[fileName];
             }
 
-            var texture = LoadTextureAsTexture2d(fileName, _game.GraphicsDevice, new ImageInformation());
+            var texture = LoadTextureAsTexture2d(fileName, _game.GraphicsDevice, new ImageInformation(), fromFile);
             if (texture != null)
                 _textureMap[fileName] = texture;
             return texture;
         }
 
-        public Texture2D ForceLoadImage(string fileName, out ImageInformation imageInfo)
+        public Texture2D ForceLoadImage(string fileName, out ImageInformation imageInfo, bool fromFile = false)
         {
             imageInfo = new ImageInformation();
-            return LoadTextureAsTexture2d(fileName, _game.GraphicsDevice, imageInfo);
+            return LoadTextureAsTexture2d(fileName, _game.GraphicsDevice, imageInfo, fromFile);
         }
 
         public void SaveTexture(Texture2D texture, string path)
@@ -100,18 +103,41 @@ namespace View3D.Utility
             }
         }
 
-        Texture2D LoadTextureAsTexture2d(string fileName, GraphicsDevice device, ImageInformation out_imageInfo)
+        Texture2D LoadTextureAsTexture2d(string fileName, GraphicsDevice device, ImageInformation out_imageInfo, bool fromFile)
         {
-            var file = Pfs.FindFile(fileName);
-            if (file == null)
-            {
-                _logger.Here().Error($"Unable to find texture: {fileName}");
-                return null;
-            }
+            byte[] imageContent = null;
             try
             {
-                var content = file.DataSource.ReadData();
-                using (MemoryStream stream = new MemoryStream(content))
+                if (fromFile)
+                {
+                    if (File.Exists(fileName) == false)
+                    {
+                        _logger.Here().Error($"Unable to find texture: {fileName}");
+                        return null;
+                    }
+
+                    imageContent = File.ReadAllBytes(fileName);
+                }
+                else
+                {
+                    var imageFile = Pfs.FindFile(fileName);
+                    if (imageFile == null)
+                    {
+                        _logger.Here().Error($"Unable to find texture: {fileName}");
+                        return null;
+                    }
+                    imageContent = imageFile.DataSource.ReadData();
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error($"Error loading texture {fileName} - {e.Message})");
+                return null;
+            }
+
+            try
+            {
+                using (MemoryStream stream = new MemoryStream(imageContent))
                 {
                     using var image = Pfim.Pfim.FromStream(stream);
                     out_imageInfo.SetFromImage(image);
@@ -126,7 +152,9 @@ namespace View3D.Utility
                             texture.SetData(0, null, image.Data, 0, image.DataLen);
                         }
                         catch
-                        { }
+                        {
+                            _logger.Here().Error($"Error loading texture ({fileName} - with format {image.Format}, tried loading as {ImageFormat.Rgba32})");
+                        }
                     }
 
                     // Try loading using all types

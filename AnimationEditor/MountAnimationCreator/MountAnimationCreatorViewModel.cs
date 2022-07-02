@@ -21,7 +21,7 @@ namespace AnimationEditor.MountAnimationCreator
             ReferenceModelView.Data.IsSelectable = true;
             var propAsset = Scene.AddComponent(new AssetViewModel(_pfs, "NewAnim", Color.Red, Scene, _applicationSettingsService));
             Player.RegisterAsset(propAsset);
-            Editor = new Editor(_pfs, _skeletonHelper, MainModelView.Data, ReferenceModelView.Data, propAsset, Scene);
+            Editor = new Editor(_pfs, _skeletonHelper, MainModelView.Data, ReferenceModelView.Data, propAsset, Scene, _applicationSettingsService);
         }
     }
 

@@ -7,6 +7,8 @@
              xmlns:filterdialog="clr-namespace:CommonControls.FilterDialog;assembly=CommonControls" 
              xmlns:System="clr-namespace:System;assembly=System.Runtime"
              xmlns:s="http://schemas.singulink.com/xaml"
+                  xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls" xmlns:common="clr-namespace:CommonControls.Common;assembly=CommonControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -14,13 +16,16 @@
     </UserControl.Resources>
 
     <DockPanel  LastChildFill="False">
+
         <DockPanel DockPanel.Dock="Top">
             <TextBlock  FontSize="20" FontWeight="Bold" >Main Node:</TextBlock>
         </DockPanel>
-        <DockPanel DockPanel.Dock="Top">
-            <Label Width ="{StaticResource labelWidth}" Content="Skeleton"/>
-            <Label>:</Label>
-            <filterdialog:CollapsableFilterControl  VerticalContentAlignment="Center"
+        <Expander IsExpanded="True" Header="General" DockPanel.Dock="Top">
+            <DockPanel DockPanel.Dock="Top">
+                <DockPanel DockPanel.Dock="Top">
+                    <Label Width ="{StaticResource labelWidth}" Content="Skeleton"/>
+                    <Label>:</Label>
+                    <filterdialog:CollapsableFilterControl  VerticalContentAlignment="Center"
                                 SelectedItem="{Binding SkeletonName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                 SearchItems="{Binding SkeletonNameList, UpdateSourceTrigger=PropertyChanged}"     
                                 OnSearch="{Binding FilterByFullPath, UpdateSourceTrigger=PropertyChanged}"   
@@ -30,37 +35,64 @@
                                 MaxHeight="400"
                                 ShowLabel="false"
                                 LabelText="Target Anim"/>
-        </DockPanel>
+                </DockPanel>
 
-        <DockPanel DockPanel.Dock="Top">
-            <Label Width ="{StaticResource labelWidth}" Content="Output format"/>
-            <Label>:</Label>
-            <ComboBox ItemsSource="{Binding PossibleOutputFormats}" SelectedItem="{Binding SelectedOutputFormat}" VerticalAlignment="Center"/>
-        </DockPanel>
+                <DockPanel DockPanel.Dock="Top">
+                    <Label Width ="{StaticResource labelWidth}" Content="Output format"/>
+                    <Label>:</Label>
+                    <ComboBox ItemsSource="{Binding PossibleOutputFormats}" SelectedItem="{Binding SelectedOutputFormat}" VerticalAlignment="Center"/>
+                </DockPanel>
 
-        <DockPanel DockPanel.Dock="Top">
-            <Label Width ="{StaticResource labelWidth}" Content="Shading Model"/>
-            <Label>:</Label>
-            <ComboBox ItemsSource="{Binding PossibleRenderFormats}" SelectedItem="{Binding SelectedRenderFormat}" VerticalAlignment="Center"/>
-        </DockPanel>
+                <DockPanel DockPanel.Dock="Top">
+                    <Label Width ="{StaticResource labelWidth}" Content="Shading Model"/>
+                    <Label>:</Label>
+                    <ComboBox ItemsSource="{Binding PossibleRenderFormats}" SelectedItem="{Binding SelectedRenderFormat}" VerticalAlignment="Center"/>
+                </DockPanel>
 
-        <DockPanel DockPanel.Dock="Top">
-            <Label Width ="{StaticResource labelWidth}" Content="Copy textures to pack" />
-            <Label>:</Label>
-            <Button Content="Copy" Click="{s:MethodBinding CopyTexturesToOutputPack}" Margin="0,2,2,2" Width="50"/>
-            <Label Content="Convertion:" Visibility="Collapsed"/>
-            <ComboBox SelectedValue="None" VerticalAlignment="Center" Visibility="Collapsed"/>
-        </DockPanel>
+                <DockPanel DockPanel.Dock="Top">
+                    <Label Width ="{StaticResource labelWidth}" Content="Copy textures to pack" />
+                    <Label>:</Label>
+                    <Button Content="Copy" Click="{s:MethodBinding CopyTexturesToOutputPack}" Margin="0,2,2,2" Width="50"/>
+                    <Label Content="Convertion:" Visibility="Collapsed"/>
+                    <ComboBox SelectedValue="None" VerticalAlignment="Center" Visibility="Collapsed"/>
+                </DockPanel>
 
-        <DockPanel DockPanel.Dock="Top" LastChildFill="False">
-            <Label Width ="{StaticResource labelWidth}" Content="Missing textures" />
-            <Label>:</Label>
-            <Button Content="Delete" Click="{s:MethodBinding DeleteAllMissingTexturesAction}" Margin="0,2,2,2" Width="50"/>
-        </DockPanel>
-
+                <DockPanel DockPanel.Dock="Top" LastChildFill="False">
+                    <Label Width ="{StaticResource labelWidth}" Content="Missing textures" />
+                    <Label>:</Label>
+                    <Button Content="Delete" Click="{s:MethodBinding DeleteAllMissingTexturesAction}" Margin="0,2,2,2" Width="50"/>
+                </DockPanel>
+            </DockPanel>
+        </Expander>
 
         <DockPanel DockPanel.Dock="Top" Margin="0,15,0,0">
-            <GroupBox Header="File based texture editing">
+            <Expander Header="Lod Settings" IsExpanded="True">
+
+                <DockPanel DockPanel.Dock="Top">
+                    <Label Width ="{StaticResource labelWidth}" Content="" />
+                    <Label>:</Label>
+                    <DataGrid ItemsSource="{Binding LodNodes, UpdateSourceTrigger=PropertyChanged}" 
+                                  AutoGenerateColumns="False" CanUserAddRows="False" ToolTipService.ShowOnDisabled="True" DockPanel.Dock="Top">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Index" Binding="{Binding LodIndex, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
+                            <common:DataGridNumericColumn Header="Distance" Binding="{Binding CameraDistance, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            <common:DataGridNumericColumn Header="Qlt Level" Binding="{Binding QualityLvl, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            <common:DataGridNumericColumn Header="Reduction Factor" Binding="{Binding LodReductionFactor, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                            <DataGridCheckBoxColumn Header="Optimize" Binding="{Binding OptimizeLod, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  />
+
+                            <common:DataGridNumericColumn Header="Polygons" Binding="{Binding PolygonCount}" IsReadOnly="True" />
+                            <common:DataGridNumericColumn Header="Meshes" Binding="{Binding MeshCount}" IsReadOnly="True" />
+                            <common:DataGridNumericColumn Header="Textures" Binding="{Binding TextureCount}" IsReadOnly="True" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button DockPanel.Dock="Bottom" Click="{s:MethodBinding UpdateLodInformationAction}">Refresh</Button>
+                </DockPanel>
+
+            </Expander>
+        </DockPanel>
+
+        <DockPanel DockPanel.Dock="Top" Margin="0,15,0,0">
+            <Expander IsExpanded="True" Header="File based texture editing">
                 <DockPanel DockPanel.Dock="Top">
                     <DockPanel DockPanel.Dock="Top" LastChildFill="False">
                         <Label Width ="{StaticResource labelWidth}" Content="Process" />
@@ -91,7 +123,7 @@
                         <DataGrid ItemsSource="{Binding TextureFileEditorServiceViewModel.TextureList, UpdateSourceTrigger=PropertyChanged}" 
                                   AutoGenerateColumns="False" CanUserAddRows="False" ToolTipService.ShowOnDisabled="True" 
                                   IsEnabled="{Binding TextureFileEditorServiceViewModel.IsRunning.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvBoolConverter}}">
-                            
+
                             <DataGrid.RowStyle>
                                 <Style TargetType="DataGridRow">
                                     <Style.Triggers>
@@ -118,8 +150,10 @@
                     </DockPanel>
 
                 </DockPanel>
-            </GroupBox>
+            </Expander>
         </DockPanel>
-   
+
+       
+
     </DockPanel>
 </UserControl>

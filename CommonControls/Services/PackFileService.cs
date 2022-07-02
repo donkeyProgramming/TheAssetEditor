@@ -13,6 +13,7 @@ using CommonControls.PackFileBrowser;
 
 namespace CommonControls.Services
 {
+
     public class PackFileService
     {
         ILogger _logger = Logging.Create<PackFileService>();
@@ -29,16 +30,20 @@ namespace CommonControls.Services
             _settingsService = settingsService;
         }
 
+        public bool TriggerFileUpdates { get; set; } = true;
 
-        public PackFileContainer Load(string packFileSystemPath, bool setToMainPackIfFirst = false) 
+
+        public PackFileContainer Load(string packFileSystemPath, bool setToMainPackIfFirst = false, bool allowLoadWithoutCaPackFiles = false) 
         {
             try
             {
                 var caPacksLoaded = Database.PackFiles.Count(x => x.IsCaPackFile);
-                if (caPacksLoaded == 0)
+                if (caPacksLoaded == 0 && allowLoadWithoutCaPackFiles != true)
                 {
-                    MessageBox.Show("You are trying to load a packfile before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.", "Error");
-                    return null;
+                    MessageBox.Show("You are trying to load a packfile before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
+                    
+                    if(System.Diagnostics.Debugger.IsAttached)
+                        return null;
                 }
 
                 if (!File.Exists(packFileSystemPath))
@@ -60,12 +65,11 @@ namespace CommonControls.Services
                         return container;
                     }
                 }
-
-                
             }
             catch (Exception e)
             {
-                _logger.Here().Error($"Trying to load file {packFileSystemPath}. Error : {e}");
+                MessageBox.Show($"Failed to load file {packFileSystemPath}. Error : {e.Message}", "Error");
+                _logger.Here().Error($"Failed to load file {packFileSystemPath}. Error : {e}");
                 return null;
             }
         }
@@ -147,7 +151,7 @@ namespace CommonControls.Services
                       {
                           using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
                           {
-                              var pfc = PackFileSerializer.Load(packFilePath, reader, null, null);
+                              var pfc = PackFileSerializer.Load(packFilePath, reader, null, null, new CaPackDuplicatePackFileResolver());
 
                               _logger.Here().Information($"Seraching through packfile {currentIndex}/{files.Count} -  {packFilePath} {pfc.FileList.Count} files");
 
@@ -230,7 +234,7 @@ namespace CommonControls.Services
 
         public PackFileContainer Load(BinaryReader binaryReader, string packFileSystemPath)
         {
-            var pack = PackFileSerializer.Load(packFileSystemPath, binaryReader, _skeletonAnimationLookUpHelper, _settingsService);
+            var pack = PackFileSerializer.Load(packFileSystemPath, binaryReader, _skeletonAnimationLookUpHelper, _settingsService, new CustomPackDuplicatePackFileResolver());
             Database.AddPackFile(pack);
             return pack;
         }
@@ -252,7 +256,7 @@ namespace CommonControls.Services
                         {
                             using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
                             {
-                                var pack = PackFileSerializer.Load(path, reader, _skeletonAnimationLookUpHelper, _settingsService);
+                                var pack = PackFileSerializer.Load(path, reader, _skeletonAnimationLookUpHelper, _settingsService, new CaPackDuplicatePackFileResolver());
                                 packList.Add(pack);
                             }
                         }
@@ -317,6 +321,9 @@ namespace CommonControls.Services
         // ---------------------------
         public PackFileContainer CreateNewPackFileContainer(string name, PackFileCAType type)
         {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new Exception("Name can not be empty");
+
             var newPackFile = new PackFileContainer(name)
             {
                 Header = new PFHeader("PFH5", type),
@@ -332,15 +339,21 @@ namespace CommonControls.Services
             if (container.IsCaPackFile)
                 throw new Exception("Can not add files to ca pack file");
 
+            if (string.IsNullOrWhiteSpace(newFile.Name))
+                throw new Exception("Name can not be empty");
+
             if (!string.IsNullOrWhiteSpace(directoryPath))
                 directoryPath += "\\";
             directoryPath += newFile.Name;
             container.FileList[directoryPath.ToLower()] = newFile;
 
-            _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, container);
-            _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, container);
+            if (TriggerFileUpdates)
+            {
+                _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, container);
+                _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, container);
 
-            Database.TriggerPackFileAdded(container, new List<PackFile>() { newFile  });
+                Database.TriggerPackFileAdded(container, new List<PackFile>() { newFile });
+            }
         }
 
         public void AddFilesToPack(PackFileContainer container, List<string> directoryPaths, List<PackFile> newFiles)
@@ -502,6 +515,9 @@ namespace CommonControls.Services
             if (pf.IsCaPackFile)
                 throw new Exception("Can not rename in ca pack file");
 
+            if (string.IsNullOrWhiteSpace(newName))
+                throw new Exception("Name can not be empty");
+
             var oldNodePath = node.GetFullPath();
             node.Name = newName;
             var newNodePath = node.GetFullPath();
@@ -510,7 +526,10 @@ namespace CommonControls.Services
             foreach (var (path, file) in files)
             {
                 pf.FileList.Remove(path);
-                var newPath = path.Replace(oldNodePath, newNodePath);
+                var newPath = newNodePath;
+                if (oldNodePath.Length != 0)
+                    newPath = path.Replace(oldNodePath, newNodePath);
+
                 pf.FileList[newPath] = file;
             }
 
@@ -526,6 +545,9 @@ namespace CommonControls.Services
         {
             if (pf.IsCaPackFile)
                 throw new Exception("Can not rename file in ca pack file");
+
+            if (string.IsNullOrWhiteSpace(newName))
+                throw new Exception("Name can not be empty");
 
             var key = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
             pf.FileList.Remove(key);

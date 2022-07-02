@@ -1,4 +1,5 @@
 ﻿using CommonControls.FileTypes.RigidModel.MaterialHeaders;
+using Microsoft.Xna.Framework;
 
 namespace CommonControls.FileTypes.RigidModel
 {
@@ -27,6 +28,12 @@ namespace CommonControls.FileTypes.RigidModel
             header.ModelTypeFlag = newValue;
             CommonHeader = header;
         }
-    }
 
+        public void UpdateBoundingBox(BoundingBox bb)
+        {
+            var header = CommonHeader;
+            header.BoundingBox.UpdateBoundingBox(bb);
+            CommonHeader = header;
+        }
+    }
 }

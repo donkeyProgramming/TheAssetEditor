@@ -69,13 +69,8 @@ namespace CommonControls.FileTypes.PackFiles.Models
                 fileNamesOffset2 += fileSize + headerSpesificBytes + strLength;
             }
 
-
-                //Header.Save(FileList.Count(), (uint)fileNamesOffset, writer);
-
             Header.FileCount = (uint)FileList.Count();
             PackFileSerializer.WriteHeader(Header, (uint)fileNamesOffset, writer);
-
-   
 
             // Save all the files
             foreach (var file in sortedFiles)

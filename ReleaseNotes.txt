@@ -1,7 +1,8 @@
+loc50+
+
 v0.XX
 ----------------------------
-	* Vertex tranform undo bug
-	
+	* Vertex tranform undo bug	
 	* Changelog with gifs system 
 	* Texture conveter 
 	* Decent texture window
@@ -24,6 +25,7 @@ v0.XX
 	* Convert useAlpha to bool in code 
 	* Better loading of Alpha values from WsModel -> katarin lower lods 
 	
+	
 	Imprivement to vertex debugger
 		Show all values
 		Toggle normal/tanget/binormals
@@ -38,6 +40,9 @@ v0.XX
 	* Raname file not working 
 	* Check file bug for older games on discord
 	* Phazer shader improvements 
+	* UV editor 
+	* Simple texture tool. Brighter, contreast, tint. Polygon selection and apply to inside 
+	* Tint control and write to WS model 
 	
 	Texture tool:
 		* Find out why the texture change slightly [Done]
@@ -63,9 +68,156 @@ v0.XX
 	
 	-- Live stream Kitbash editor 
 	
+Planned V0.35: 
+	
+	Texture fixer 
+	Troy resource pack!
+	Kill schama manager code 
+	Check for lod count when loading textures -> Warning for textures missing lods 
+	Icon for which attributes in a metatag that the superview uses 
+	SoundMeta_v2
 	
 	
+	Fix Mount Editor Editor for wh2 
+		Frags from more games 
+		Mount anim without animroot https://discord.com/channels/519116643830464513/917057637462470697/966032037498732584
+	AnimatedProp v4
+	SoundMeta_v2
+	MetaData Splice preview 
+		Splice -> Fit animation length + meta info about the anim (fps and lenfth in time)
+	Rmv2 to text for debugging?
+	Animpack updater => wh2 to wh3 
+	Texture converter => wh2 to wh3
+	Vertex debugger => show all values. Checkboxes for normal, tangent and bi
+	Checkboxes in ui for rendering flags
+	Resource pack => All animations from 3k and Troy. Other games as well?
+	Phazer shader
+	Warning for only 1 lod in rmv2 
 	
+	Hydra anim, 3k anim for dead 
+	
+	metafile splice
+	
+	Global resource manager 
+	
+	Unload packfile not working correctly 
+	PackFileBrowserWindow vs SavePackFileWindow
+
+	
+	Campaing bin for 3k, troy and improive for wh3 
+	White space in model filename on save
+	Splice tag 
+	Clean up animpack stuff a bit. Wh2/Troy into same format?
+	Animation bin capability validator 
+	Improved material editor (ws model) 
+	Skeleton db parser for splice 
+	List which metadata is possible for each game 
+	wh2 support for anim
+	Tint for wsmodels! 
+	
+	White space in model filename on save
+	
+	Do a seach for all files and list the ones starting with <PROPERTY_SET> in content. Its CA internal assetpipeline files which they have forgotten to remove 
+	Filter matadata tags by supported game	
+	
+	Remember super view and 3d view editor sized on tab change 
+	
+	
+	Focus in animEditors (ctrl f) and reset 
+	
+	>> Improve the pin for animated meshes 
+	
+	User Error window 
+	
+	
+	var result = ToolSelectorWindow.CreateAndShow(new[] { EditorEnums.Kitbash_Editor, EditorEnums.XML_Editor});
+	
+V0.37
+----------------------------
+	mount editor not working correctly and make it easier to use. A few click should take you 95% 
+	Matched combat files
+	Allow resize in the animpack editor (remember tab change!)
+	Fix buttons for time line
+	
+	Auto wh2 => wh3 fragment/bin converter 
+	Shortcuts for kitbesh common command (extract, grow selection, split, combine) 
+	Improve the update screen. It looks like shit! 
+	Meta report error for atilla => https://discord.com/channels/@me/950789780768186439/982407930085249076
+	Saving animpack, if contains matched combat give error instead of crash 
+	
+	animated_prop13/prop13 for 3k
+	
+	Start making unit tests...
+	
+	Meta file issue = https://discord.com/channels/373745291289034763/795235087352201226/982699359550443530
+		
+	Matched combat for wh3 
+	Show warnig when openin CA animpack, about not datacoring this file! 
+	Make it eaiser to understand, animpack editor 
+		frg extention when making wh3 animpack bin 
+	Filter animations for anim transfer tool batch processor 
+	shortcuts
+		Creaet Shortcut files! 
+	multiple editors 
+	open vmd in kitbasher - all referebces
+	
+
+V0.36
+----
+	Features:
+		* Lod Generation now follow CA optimization rules
+		* Improved mesh overview found under the "Editable model" node in the kitbash editor. The information is read only in the LOD node now
+		* Reset and focus camera in all views 
+		
+	BugFixes:
+		* Meta file editor correctly opens snd.meta files 
+		* Sometimes selecting faces deselects the face mode, this has been improved so it should happen less 
+		* Improved rendering and light controllers for wh3 and older games (thanks to Phazer)
+		* Fixed bug related to bounding box calculation. No more floating banners! 
+		* Fixed bug related to getting material settings from ws models where lod index is not 0
+		* Fixed some strange bugs related to lod generation 
+		* Popup dialog now centered on screen (for most..)
+		* Fixed scale bug for animated props 
+V0.36
+----------------------------	
+	Features:
+		* Improved shader and light textures (Thanks to Phazer)
+		* Decoded meta tags. Prop_12, Prop_13, Prop_14, AnimatedProp_12, AnimatedProp_13, AnimatedProp_14, DisablePersistantId_11
+		* Time in seconds displayed in superview 
+		* Show the name of files inside packfile that causes loading issues 
+		* Support for wh2 ws model generation, again (Thanks to ZZ bob)
+		
+	BugFixes:
+		* Fixed error when deleting bones in the skeletonEditor
+		* Pushed the selection related option in the kitbash editor context menu down. Back to how it was some time ago.
+		* White space issue for ws model generation 
+		* Animation transfer tool can save scaled animations again! 
+		
+	
+V0.35
+----------------------------
+	Features:
+		* Clear button added to packfile filter text (Thanks to Bapp)
+		* Auto focus the input field when creating a folder inside a packfile (Thanks to Bapp)	
+		* Rename and remove bins inside animpack (Thanks to propJoe)
+		* Invert selection in tree views (Thanks to propJoe)
+		* When loading ws model, delete other textures found in RMV2
+		* Animation Binfile validation on file name and gives the correct default value 
+		* Copy file path of file inside animpack
+		* Scale supported for animated props in super view 
+		* Support for editing and creating animation sets for 3k
+		
+	BugFixes:
+		* Transform meta tag now correctly validate and can be saved
+		* All meta tags should be possible to create, no more crashes!
+		* TargetPos_v10 metatag added 
+		* The tool sometimes creates file names with no names. That is making a lot of issues. Better error detection for this, might break stuff. Let me know!
+		* Better default values for multiple animmeta files 
+		* Fixed a bug in AnimPack validation for wahammer 3
+		* Better handling of duplicate file names when loading packfiles 
+		* Fixed infinite error loop in super view related to bone ID for metadata. Program should no longer hang 
+		* Error when opening some vmds 
+
 	
 V0.34
 ----------------------------
@@ -79,15 +231,9 @@ V0.34
 		* AnimPacks for wh3 can be viewed and edited, with validation on save
 		* Correctly setting loaded packfiles to be the main EditablePack file
 		* Some quality of life changes to the animPackEditor. Warning about unsaved files, export list of possible animationSlots++
-
-
 	
 V0.33
 ----------------------------
-
-		
-		
-		
 	Features:
 		* TextureProject - Beta. Export textures and UVs as PNGs and import them again. Please report any bugs or ideas for improvements. 
 		* Button to remove missing textures from mesh (For removing left over wh2 textures from wh3 models)
@@ -126,46 +272,46 @@ V0.32
 
 V0.31
 ----------------------------
-Features:
-	* Simple error checking when saving a mesh to catch common errors
+	Features:
+		* Simple error checking when saving a mesh to catch common errors
 
-Fixes:
-	* Mesh fitter tool no longer crashing
-	
-Known issues:
-	* Can not save v8 animations! 
-	* Wh3 bin files not picked up by several of the editors, causing issues
-	* Can not save wh3 animation bins
+	Fixes:
+		* Mesh fitter tool no longer crashing
+		
+	Known issues:
+		* Can not save v8 animations! 
+		* Wh3 bin files not picked up by several of the editors, causing issues
+		* Can not save wh3 animation bins
 
 V0.30
 ----------------------------
-Features:
-	* Its not possible to control the lod detail level by setting a value on the LOD node
+	Features:
+		* Its not possible to control the lod detail level by setting a value on the LOD node
 
-Fixes:
-	* Crash when adding new metadata tag
-	* Bug related to changing vertex type 
-	
+	Fixes:
+		* Crash when adding new metadata tag
+		* Bug related to changing vertex type 
+		
 
-Known issues:
-	* Can not save v8 animations! 
-	* Wh3 bin files not picked up by several of the editors, causing issues
-	* Can not save wh3 animation bins 
+	Known issues:
+		* Can not save v8 animations! 
+		* Wh3 bin files not picked up by several of the editors, causing issues
+		* Can not save wh3 animation bins 
 
 V0.29
 ----------------------------
-Fixes:
-	* Trying to find missing textures using specular if diffuse texture missing
-	* Correctly load v8 animations 
-	* Fixed crashes when using spec/gloss shader, often when combining meshes.
-	* Open wh3 animation bin files for preview 
-	
-Anim Meta tags decoded:
-	* AnimatedProp 12,13,14 
-	* Prop 12,13,14 
-	* Eject_attached
+	Fixes:
+		* Trying to find missing textures using specular if diffuse texture missing
+		* Correctly load v8 animations 
+		* Fixed crashes when using spec/gloss shader, often when combining meshes.
+		* Open wh3 animation bin files for preview 
+		
+	Anim Meta tags decoded:
+		* AnimatedProp 12,13,14 
+		* Prop 12,13,14 
+		* Eject_attached
 
-Known issues:
-	* Can not save v8 animations! 
-	* Wh3 bin files not picked up by several of the editors 
-	* Can not save wh3 animation bins 
+	Known issues:
+		* Can not save v8 animations! 
+		* Wh3 bin files not picked up by several of the editors 
+		* Can not save wh3 animation bins 

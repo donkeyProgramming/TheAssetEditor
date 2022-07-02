@@ -12,11 +12,10 @@ namespace View3D.Commands.Object
     public class CombineMeshCommand : CommandBase<CombineMeshCommand>
     {
         List<ISelectable> _objectsToCombine;
-        List<IEditableGeometry> _combinedMeshes = new List<IEditableGeometry>();
+        List<Rmv2MeshNode> _combinedMeshes = new List<Rmv2MeshNode>();
 
         SelectionManager _selectionManager;
         ISelectionState _originalSelectionState;
-
 
         public CombineMeshCommand(List<ISelectable> objectsToCombine)
         {
@@ -45,28 +44,7 @@ namespace View3D.Commands.Object
                     .Where(x => x is Rmv2MeshNode)
                     .Cast<Rmv2MeshNode>()
                     .ToList();
-                var combineGroups = ModelCombiner.SortMeshesIntoCombinableGroups(geometriesToCombine);
-                foreach (var currentGroup in combineGroups)
-                {
-                    if (currentGroup.Count != 1)
-                    {
-                        var combinedMesh = SceneNodeHelper.CloneNode(currentGroup.First()) as IEditableGeometry;
-                        combinedMesh.Name = currentGroup.First().Name + "_Combined";
-
-                        var newModel = currentGroup.First().Geometry.Clone();
-                        var typedGeo = currentGroup.Select(x => x.Geometry);
-                        combinedMesh.Geometry = newModel;
-
-                        var geoList = currentGroup.Skip(1).Select(x => x.Geometry).ToList();
-                        newModel.Merge(geoList);
-
-                        _combinedMeshes.Add(combinedMesh);
-                    }
-                    else
-                    {
-                        _combinedMeshes.Add(currentGroup.First());
-                    }
-                }
+                _combinedMeshes = ModelCombiner.CombineMeshes(geometriesToCombine);
 
                 // Remove all
                 foreach (var item in _objectsToCombine)
@@ -80,6 +58,7 @@ namespace View3D.Commands.Object
                 var currentState = _selectionManager.GetState() as ObjectSelectionState;
                 currentState.Clear();
                 currentState.ModifySelection(_combinedMeshes.Cast<ISelectable>(), false);
+                
             }
         }
 

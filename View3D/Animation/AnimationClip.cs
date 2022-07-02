@@ -131,29 +131,38 @@ namespace View3D.Animation
                 output.AnimationParts[0].TranslationMappings.Add(new AnimationBoneMapping(i));
             }
         
-            foreach (var frame in DynamicFrames)
-                output.AnimationParts[0].DynamicFrames.Add(CreateFrameFromKeyFrame(frame));
+
+            for(int i = 0; i < DynamicFrames.Count; i++)
+                output.AnimationParts[0].DynamicFrames.Add(CreateFrameFromKeyFrame(i, skeleton));
 
             return output; 
         }
 
-        private Frame CreateFrameFromKeyFrame(KeyFrame frame)
-        { 
+        private Frame CreateFrameFromKeyFrame(int frameIndex, GameSkeleton skeleton)
+        {
+            KeyFrame frame = DynamicFrames[frameIndex];
             var output = new Frame();
 
-            foreach (var pos in frame.Position)
-                output.Transforms.Add(new RmvVector3(pos));
-
-            foreach (var rot in frame.Rotation)
-                output.Quaternion.Add(new RmvVector4(rot.X, rot.Y, rot.Z, rot.W));
-
-            foreach (var scale in frame.Scale)
+            for (int boneIndex = 0; boneIndex < frame.Position.Count(); boneIndex++)
             {
-                if (scale.LengthSquared() != 3)
-                    throw new Exception("Can not save animation with scale");
+                var scale = GetAccumulatedBoneScale(boneIndex, frameIndex, skeleton);
+                var transform = frame.Position[boneIndex] * scale;
+                output.Transforms.Add(new RmvVector3(transform));
+
+                var rot = frame.Rotation[boneIndex];
+                output.Quaternion.Add(new RmvVector4(rot.X, rot.Y, rot.Z, rot.W));
             }
 
             return output;
+        }
+
+        float GetAccumulatedBoneScale(int boneIndex, int frameIndex, GameSkeleton skeleton)
+        {
+            var parentIndex = skeleton.GetParentBoneIndex(boneIndex);
+            if (parentIndex == -1)
+                return DynamicFrames[frameIndex].Scale[boneIndex].X;
+
+            return GetAccumulatedBoneScale(parentIndex, frameIndex, skeleton) * DynamicFrames[frameIndex].Scale[boneIndex].X;
         }
 
         public AnimationClip Clone()
@@ -186,6 +195,15 @@ namespace View3D.Animation
             clip.DynamicFrames.Add(frame.Clone());
             clip.DynamicFrames.Add(frame.Clone());
             return clip;
+        }
+
+        public void ScaleAnimation(float scale)
+        {
+            foreach (var frame in DynamicFrames)
+            {
+                for (int i = 0; i < AnimationBoneCount; i++)
+                    frame.Scale[i] = new Vector3(scale);
+            }
         }
     }
 }

@@ -12,7 +12,7 @@ namespace CommonControls.FileTypes.AnimationPack
         public AnimationPackFile PackFileReference { get; }
         public string Name { get; }
         public string FullPath { get; }
-        public string SkeletonName { get;  }
+        public string SkeletonName { get; }
         public List<AnimationBinEntryGenericFormat> Entries { get;  }
         
     }
@@ -20,6 +20,7 @@ namespace CommonControls.FileTypes.AnimationPack
     public class AnimationBinEntryGenericFormat
     {
         public int Index { get; set; } = -1;
+        public int SlotIndex { get; set; }
         public string SlotName { get; set; }
         public string DisplayName { get => GetDisplayName(); }
         public string AnimationFile { get; set; }

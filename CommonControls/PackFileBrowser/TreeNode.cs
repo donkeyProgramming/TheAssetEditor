@@ -33,7 +33,6 @@ namespace CommonControls.PackFileBrowser
         public TreeNode Parent { get; set; }
         public ObservableCollection<TreeNode> Children { get; set; } = new ObservableCollection<TreeNode>();
 
-
         bool _unsavedChanged;
         public bool UnsavedChanged { get => _unsavedChanged; set => SetAndNotify(ref _unsavedChanged, value); }
 
@@ -52,6 +51,9 @@ namespace CommonControls.PackFileBrowser
             Item = packFile;
             FileOwner = ower;
             Parent = parent;
+
+            if (string.IsNullOrWhiteSpace(name))
+                throw new Exception($"Packfile name or folder is empty '{GetFullPath()}', this is not allowed! Please report as a bug if it happens outside of packfile loading! If it happens while loading clean up the packfile in RPFM");
         }
 
         public string GetFullPath()

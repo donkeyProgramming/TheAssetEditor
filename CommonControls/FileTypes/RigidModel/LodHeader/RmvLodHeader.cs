@@ -26,7 +26,7 @@ namespace CommonControls.FileTypes.RigidModel.LodHeader
         uint TotalLodVertexSize { get; set; }
         uint TotalLodIndexSize { get; set; }
         uint FirstMeshOffset { get; set; }
-        byte QualityLvl { get; }
+        byte QualityLvl { get; set; }
         float LodCameraDistance { get; set; }
 
         int GetHeaderSize();

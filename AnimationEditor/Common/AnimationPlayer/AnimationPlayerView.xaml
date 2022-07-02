@@ -27,6 +27,7 @@
                     <RowDefinition/>
                     <RowDefinition/>
                     <RowDefinition/>
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
 
                 <DockPanel Grid.Row="0"  >
@@ -34,14 +35,26 @@
                     <ComboBox DisplayMemberPath="SlotName" ItemsSource="{Binding PlayerItems, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" SelectedItem="{Binding SelectedMainAnimation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"   DockPanel.Dock="Right"/>
                 </DockPanel>
                 
-                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                    <TextBlock Text="Frame "/>
-                    <TextBlock Text="{Binding SelectedAnimationCurrentFrame, UpdateSourceTrigger=PropertyChanged}"/>
-                    <TextBlock Text=" / "/>
-                    <TextBlock Text="{Binding SelectedAnimationFrameCount, UpdateSourceTrigger=PropertyChanged}"/>
+                <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Frame "/>
+                        <TextBlock Text="{Binding SelectedAnimationCurrentFrame, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text=" / "/>
+                        <TextBlock Text="{Binding SelectedAnimationFrameCount, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Time["/>
+                        <TextBlock Text="{Binding SelectedAnimationFps, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text=" fps]"/>
+                        <TextBlock Text="{Binding SelectedAnimationCurrentTime, StringFormat=N2, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text=" / "/>
+                        <TextBlock Text="{Binding SelectedAnimationMaxTime, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
                 </StackPanel>
 
-                <StackPanel Grid.Row="2" Orientation="Horizontal"  HorizontalAlignment="Center" Margin="2,2,2,2" >
+      
+
+                <StackPanel Grid.Row="3" Orientation="Horizontal"  HorizontalAlignment="Center" Margin="2,2,2,2" >
                     <Button Click="{s:MethodBinding SetAnimationFirstFrame}" FontSize="20">⏮︎</Button>
                     <Button Click="{s:MethodBinding SetAnimationPrivFrame}" FontSize="20">⏪</Button>
                     <ToggleButton Click="{s:MethodBinding TogleAnimationPausePlay}" FontSize="20">⏯︎</ToggleButton>
@@ -49,7 +62,7 @@
                     <Button Click="{s:MethodBinding SetAnimationLastFrame}" FontSize="20">⏭</Button>
                 </StackPanel>
 
-                <CheckBox IsChecked="{Binding LoopAnimation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Grid.Row="3" Content="Loop" HorizontalAlignment="Center"/>
+                <CheckBox IsChecked="{Binding LoopAnimation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Grid.Row="4" Content="Loop" HorizontalAlignment="Center"/>
             </Grid>
 
             <ListView  Grid.Column="2" ItemsSource="{Binding PlayerItems, UpdateSourceTrigger=PropertyChanged}">

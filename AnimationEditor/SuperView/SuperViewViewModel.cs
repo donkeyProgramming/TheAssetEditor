@@ -44,7 +44,7 @@ namespace AnimationEditor.SuperView
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_alarielle.variantmeshdefinition"),
                 FragmentName = @"animations/animation_tables/hu1b_alarielle_staff_and_sword.frg",
-                AnimationSlot = AnimationSlotTypeHelper.GetfromValue("STAND")
+                AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("STAND")
             };
         //editorView.MainInput = new AnimationToolInput()
         //{
@@ -68,8 +68,22 @@ namespace AnimationEditor.SuperView
             editorView.MainInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_throt.variantmeshdefinition"),
-                FragmentName = @"animations/animation_tables/hu17_dlc16_throt.frg",
-                AnimationSlot = AnimationSlotTypeHelper.GetfromValue("ATTACK_5")
+                FragmentName = @"animations/database/battle/bin/hu17_dlc16_throt.bin",
+                AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("ATTACK_5")
+            };
+
+            creator.CreateEmptyEditor(editorView);
+        }
+
+
+        public static void CreatePlaguebearer(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        {
+            var editorView = toolFactory.CreateEditorViewModel<SuperViewViewModel>();
+            editorView.MainInput = new AnimationToolInput()
+            {
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\dae_plaguebearer_plagueridden.variantmeshdefinition"),
+                FragmentName = @"animations/database/battle/bin/hu4d_wh3_nurgle_sword_on_palanquin.bin",
+                AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("STAND_IDLE_2")
             };
 
             creator.CreateEmptyEditor(editorView);

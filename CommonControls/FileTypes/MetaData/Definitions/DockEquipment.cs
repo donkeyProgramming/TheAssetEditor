@@ -16,7 +16,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         [MetaDataTag(7)]
         public float BlendOutTime { get; set; }
 
-        public virtual string AnimationSlotName { get; }
+        public virtual string AnimationSlotName { get; } = "";
         public virtual string[] SkeletonNameAlternatives { get; } = new string[] { "" };
     }
 
@@ -37,6 +37,47 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public float UnknownFloat { get; set; }
     }
 
+    [MetaData("DOCK_EQPT_RHAND", 11, MetaDataAttributePriority.Low)]
+    public class DockEquipmentRHand_v11_Troy : DockEquipmentLHand_v10
+    {
+        public override string Description { get; } = "_TroyOnly";
+
+        [MetaDataTag(8)]
+        public byte UnknownFloat { get; set; }
+    }
+
+
+    [MetaData("DOCK_EQPT_RHAND", 14, MetaDataAttributePriority.Low)]
+    public class DockEquipmentRHand_v14_Troy : DockEquipmentLHand_v10
+    {
+        public override string Description { get; } = "_TroyOnly";
+
+        [MetaDataTag(8)]
+        public byte UnkownByte0 { get; set; }
+
+        [MetaDataTag(9)]
+        public byte UnkownByte1 { get; set; }
+
+        [MetaDataTag(10)]
+        public byte UnkownByte4 { get; set; }
+
+        [MetaDataTag(11)]
+        public float UnknownFloat0 { get; set; }
+
+        [MetaDataTag(12)]
+        public float UnknownFloat1 { get; set; }
+
+        [MetaDataTag(13)]
+        public float UnknownFloat2 { get; set; }
+
+        [MetaDataTag(14)]
+        public float UnknownFloat3 { get; set; }
+
+        [MetaDataTag(15)]
+        public float UnknownFloat4 { get; set; }
+    }
+
+
     /// <summary>
     /// Dock left hand
     /// </summary>
@@ -52,6 +93,46 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     {
         [MetaDataTag(8)]
         public float UnknownFloat { get; set; }
+    }
+
+    [MetaData("DOCK_EQPT_LHAND", 11, MetaDataAttributePriority.Low)]
+    public class DockEquipmentLHand_v11_Troy : DockEquipmentLHand_v10
+    {
+        public override string Description { get; } = "_TroyOnly";
+
+        [MetaDataTag(8)]
+        public byte UnknownFloat { get; set; }
+    }
+
+
+    [MetaData("DOCK_EQPT_LHAND", 14, MetaDataAttributePriority.Low)]
+    public class DockEquipmentLHand_v14_Troy : DockEquipmentLHand_v10
+    {
+        public override string Description { get; } = "_TroyOnly";
+
+        [MetaDataTag(8)]
+        public byte UnkownByte0 { get; set; }
+
+        [MetaDataTag(9)]
+        public byte UnkownByte1 { get; set; }
+
+        [MetaDataTag(10)]
+        public byte UnkownByte4 { get; set; }
+
+        [MetaDataTag(11)]
+        public float UnknownFloat0 { get; set; }
+
+        [MetaDataTag(12)]
+        public float UnknownFloat1 { get; set; }
+
+        [MetaDataTag(13)]
+        public float UnknownFloat2 { get; set; }
+
+        [MetaDataTag(14)]
+        public float UnknownFloat3 { get; set; }
+
+        [MetaDataTag(15)]
+        public float UnknownFloat4 { get; set; }
     }
 
     /// <summary>
@@ -71,6 +152,45 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public float UnknownFloat { get; set; }
     }
 
+    [MetaData("DOCK_EQPT_RWAIST", 11, MetaDataAttributePriority.Low)]
+    public class DockEquipmentRWaist_v11_Troy : DockEquipmentLHand_v10
+    {
+        public override string Description { get; } = "_TroyOnly";
+
+        [MetaDataTag(8)]
+        public byte UnknownFloat { get; set; }
+    }
+
+    [MetaData("DOCK_EQPT_RWAIST", 14, MetaDataAttributePriority.Low)]
+    public class DockEquipmentRWaist_v14_Troy : DockEquipmentLHand_v10
+    {
+        public override string Description { get; } = "_TroyOnly";
+
+        [MetaDataTag(8)]
+        public byte UnkownByte0 { get; set; }
+
+        [MetaDataTag(9)]
+        public byte UnkownByte1 { get; set; }
+
+        [MetaDataTag(10)]
+        public byte UnkownByte4 { get; set; }
+
+        [MetaDataTag(11)]
+        public float UnknownFloat0 { get; set; }
+
+        [MetaDataTag(12)]
+        public float UnknownFloat1 { get; set; }
+
+        [MetaDataTag(13)]
+        public float UnknownFloat2 { get; set; }
+
+        [MetaDataTag(14)]
+        public float UnknownFloat3 { get; set; }
+
+        [MetaDataTag(15)]
+        public float UnknownFloat4 { get; set; }
+    }
+
     /// <summary>
     /// Dock left waist
     /// </summary>
@@ -86,6 +206,45 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     {
         [MetaDataTag(8)]
         public float UnknownFloat { get; set; }
+    }
+
+    [MetaData("DOCK_EQPT_LWAIST", 11, MetaDataAttributePriority.Low)]
+    public class DockEquipmentLWaist_v11_Troy : DockEquipmentLHand_v10
+    {
+        public override string Description { get; } = "_TroyOnly";
+
+        [MetaDataTag(8)]
+        public byte UnknownFloat { get; set; }
+    }
+
+    [MetaData("DOCK_EQPT_LWAIST", 14, MetaDataAttributePriority.Low)]
+    public class DockEquipmentLWaist_v14_Troy : DockEquipmentLHand_v10
+    {
+        public override string Description { get; } = "_TroyOnly";
+
+        [MetaDataTag(8)]
+        public byte UnkownByte0 { get; set; }
+
+        [MetaDataTag(9)]
+        public byte UnkownByte1 { get; set; }
+
+        [MetaDataTag(10)]
+        public byte UnkownByte4 { get; set; }
+
+        [MetaDataTag(11)]
+        public float UnknownFloat0 { get; set; }
+
+        [MetaDataTag(12)]
+        public float UnknownFloat1 { get; set; }
+
+        [MetaDataTag(13)]
+        public float UnknownFloat2 { get; set; }
+
+        [MetaDataTag(14)]
+        public float UnknownFloat3 { get; set; }
+
+        [MetaDataTag(15)]
+        public float UnknownFloat4 { get; set; }
     }
 
     /// <summary>
@@ -105,7 +264,44 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public float UnknownFloat { get; set; }
     }
 
+    [MetaData("DOCK_EQPT_BACK", 11, MetaDataAttributePriority.Low)]
+    public class DockEquipmentBack_v11_Troy : DockEquipmentLHand_v10
+    {
+        public override string Description { get; } = "_TroyOnly";
 
+        [MetaDataTag(8)]
+        public byte UnknownFloat { get; set; }
+    }
+
+    [MetaData("DOCK_EQPT_BACK", 14, MetaDataAttributePriority.Low)]
+    public class DockEquipmentBack_v14_Troy : DockEquipmentLHand_v10
+    {
+        public override string Description { get; } = "_TroyOnly";
+
+        [MetaDataTag(8)]
+        public byte UnkownByte0 { get; set; }
+
+        [MetaDataTag(9)]
+        public byte UnkownByte1 { get; set; }
+
+        [MetaDataTag(10)]
+        public byte UnkownByte4 { get; set; }
+
+        [MetaDataTag(11)]
+        public float UnknownFloat0 { get; set; }
+
+        [MetaDataTag(12)]
+        public float UnknownFloat1 { get; set; }
+
+        [MetaDataTag(13)]
+        public float UnknownFloat2 { get; set; }
+
+        [MetaDataTag(14)]
+        public float UnknownFloat3 { get; set; }
+
+        [MetaDataTag(15)]
+        public float UnknownFloat4 { get; set; }
+    }
 
     [MetaData("WEAPON_HIP", 10)]
     public class WeaponHip_v10 : DockEquipment
@@ -124,6 +320,15 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public float UnknownFloat { get; set; }
     }
 
+    [MetaData("WEAPON_RHAND", 11, MetaDataAttributePriority.Low)]
+    public class WeaponRHand_v11_Troy : DockEquipmentLHand_v10
+    {
+        public override string Description { get; } = "_TroyOnly";
+
+        [MetaDataTag(8)]
+        public byte UnknownFloat { get; set; }
+    }
+
     [MetaData("WEAPON_LHAND", 10)]
     public class WeaponLHand_v10 : DockEquipment
     {
@@ -137,6 +342,15 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public float UnknownFloat { get; set; }
     }
 
+    [MetaData("WEAPON_LHAND", 11, MetaDataAttributePriority.Low)]
+    public class WeaponLHand_v11_Troy : DockEquipmentLHand_v10
+    {
+        public override string Description { get; } = "_TroyOnly";
+
+        [MetaDataTag(8)]
+        public byte UnknownFloat { get; set; }
+    }
+
     [MetaData("WEAPON_ON", 10)]
     public class WeaponOn_v10 : DockEquipment
     {
@@ -147,5 +361,44 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     {
         [MetaDataTag(8)]
         public float UnknownFloat { get; set; }
+    }
+
+    [MetaData("WEAPON_ON", 11, MetaDataAttributePriority.Low)]
+    public class WeaponOn_v11_Troy : DockEquipmentLHand_v10
+    {
+        public override string Description { get; } = "_TroyOnly";
+
+        [MetaDataTag(8)]
+        public byte UnknownFloat { get; set; }
+    }
+
+    [MetaData("WEAPON_ON", 14, MetaDataAttributePriority.Low)]
+    public class WeaponOn_v14_Troy : DockEquipmentLHand_v10
+    {
+        public override string Description { get; } = "_TroyOnly";
+
+        [MetaDataTag(8)]
+        public byte UnkownByte0 { get; set; }
+
+        [MetaDataTag(9)]
+        public byte UnkownByte1 { get; set; }
+
+        [MetaDataTag(10)]
+        public byte UnkownByte4 { get; set; }
+
+        [MetaDataTag(11)]
+        public float UnknownFloat0 { get; set; }
+
+        [MetaDataTag(12)]
+        public float UnknownFloat1 { get; set; }
+
+        [MetaDataTag(13)]
+        public float UnknownFloat2 { get; set; }
+
+        [MetaDataTag(14)]
+        public float UnknownFloat3 { get; set; }
+
+        [MetaDataTag(15)]
+        public float UnknownFloat4 { get; set; }
     }
 }

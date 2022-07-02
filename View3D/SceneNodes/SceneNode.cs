@@ -57,6 +57,7 @@ namespace View3D.SceneNodes
 
         virtual public Matrix ModelMatrix { get; set; } = Matrix.Identity;
         virtual public Matrix RenderMatrix { get; protected set; } = Matrix.Identity;
+        public float ScaleMult { get; set; } = 1;
 
         public override string ToString() => Name;
 
@@ -95,6 +96,7 @@ namespace View3D.SceneNodes
             typedTarget.SceneManager = SceneManager;
             typedTarget.IsEditable = IsEditable;
             typedTarget.IsVisible = IsVisible;
+            typedTarget.ScaleMult = ScaleMult;
             typedTarget.Name = Name + " - Clone";
         }
     }

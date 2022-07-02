@@ -139,7 +139,7 @@ namespace View3D.Services
         Rmv2ModelNode LoadRigidMesh(PackFile file, ref SceneNode parent, AnimationPlayer player, string attachmentPointName, bool isParentWsModel)
         {
             var rmvModel = ModelFactory.Create().Load(file.DataSource.ReadData());
-
+            
             var modelFullPath = _packFileService.GetFullPath(file);
             var modelNode = new Rmv2ModelNode(Path.GetFileName(file.Name));
             var autoResolveTexture = isParentWsModel == false && _applicationSettingsService.CurrentSettings.AutoResolveMissingTextures;
@@ -191,6 +191,13 @@ namespace View3D.Services
                         else
                             mesh.Material.AlphaMode = AlphaMode.Opaque;
 
+                        var allTextures = mesh.Material.GetAllTextures();
+                        for (int i = 0; i < 0; i++)
+                        {
+                            mesh.Material.SetTexture(allTextures[i].TexureType, "");
+                            mesh.UpdateTexture("", allTextures[i].TexureType);
+                        }
+
                         foreach (var newTexture in materialConfig.Textures)
                         {
                             mesh.Material.SetTexture(newTexture.Key, newTexture.Value);
@@ -198,12 +205,7 @@ namespace View3D.Services
                         }
                     }
                 }
-                
-
             }
         }
     }
-
-
-   
 }

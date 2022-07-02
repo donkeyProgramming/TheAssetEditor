@@ -1,27 +1,20 @@
-﻿using AssetEditor.Report;
-using AssetEditor.Views.Settings;
+﻿using AssetEditor.Views.Settings;
+using CommonControls.BaseDialogs.ToolSelector;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.DB;
+using CommonControls.FileTypes.MetaData;
 using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.FileTypes.Sound;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
-using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Input;
-using TextureEditor.ViewModels;
-using View3D.Utility;
 
 namespace AssetEditor.ViewModels
 {
@@ -89,9 +82,17 @@ namespace AssetEditor.ViewModels
                 settingsService.Save();
             }
 
+            //var anim3k = new BaseAnimationSlotHelper(GameTypeEnum.ThreeKingdoms).Values.Select(X => X.Value).ToList();
+            //var animWh2 = new BaseAnimationSlotHelper(GameTypeEnum.Warhammer3).Values.Select(X => X.Value).ToList();
+            //var iff = anim3k.Except(animWh2).ToList();
+            //var iff2 = animWh2.Except(animWh2).ToList();
+            //var dsfg = packfileService.Load(@"C:\Users\ole_k\Desktop\3k_animations.pack", false, true);
+            //new BaseAnimationSlotHelper(GameTypeEnum.ThreeKingdoms).ExportAnimationDebugList(packfileService, @"3kanims");
+
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
             {
-                //settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Rome_2_Remastered;
+                //settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Warhammer3;
+                //settingsService.CurrentSettings.SkipLoadingWemFiles = false;
                 var gamePath = settingsService.GetGamePathForCurrentGame();
                 if (gamePath != null)
                 {
@@ -101,13 +102,20 @@ namespace AssetEditor.ViewModels
                         MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
                 }
             }
-          
+
+
+
+            MetaDataTagDeSerializer.EnsureMappingTableCreated();
+
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
-              
+                //new BaseAnimationSlotHelper(GameTypeEnum.Warhammer2).ExportAnimationDebugList(packfileService, @"c:\temp\3kanims.txt");
+
+                //DefaultAnimationSlotTypeHelper.ExportAnimationDebugList(packfileService);
 
                 //var reportService = new FileListReportGenerator(packfileService, settingsService);
-                //reportService.CompareFiles(@"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.0.2.0 PackFiles.csv", @"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.1.0.0 PackFiles.csv");
+                //var comparePath = reportService.Create();
+                //reportService.CompareFiles(@"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.1.0.0 PackFiles.csv", @"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.2.0.0 Packfiles.csv");
 
                 //;
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateFlyingSquig(this, toolFactory, packfileService);
@@ -156,7 +164,7 @@ namespace AssetEditor.ViewModels
                 //AnimMetaBatchProcessor processor = new AnimMetaBatchProcessor();
                 //processor.BatchProcess(_packfileService, schemaManager, "Warhammer");
 
-                //AnimationEditor.SuperView.SuperViewViewModel_Debug.CreateThrot(this, toolFactory, packfileService);
+                AnimationEditor.SuperView.SuperViewViewModel_Debug.CreatePlaguebearer(this, toolFactory, packfileService);
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
 
 
@@ -191,7 +199,7 @@ namespace AssetEditor.ViewModels
 
                 //OpenFile(packfileService.FindFile(@"animations\database\battle\bin\animation_tables.animpack"));
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\ksl\ksl_katarin\ksl_katarin_cloth_cloak_01.rigid_model_v2"));
-                OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\ksl\ksl_katarin\ksl_katarin_01.rigid_model_v2"));
+                //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\ksl\ksl_katarin\ksl_katarin_01.rigid_model_v2"));
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hq3\nor\nor_war_mammoth\nor_war_mammoth_warshrine_01.rigid_model_v2"));
                 
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc1\tmb\tmb_warsphinx\tex\tmb_warsphinx_armour_01_base_colour.dds"));
@@ -300,13 +308,30 @@ namespace AssetEditor.ViewModels
                 return;
             }
 
+           
+
             var fullFileName = _packfileService.GetFullPath(file );
-            var editorViewModel = ToolsFactory.GetToolViewModelFromFileName(fullFileName);
-            if (editorViewModel == null)
+            var allEditors = ToolsFactory.GetAllToolViewModelFromFileName(fullFileName);
+            Type selectedEditor = null;
+            if (allEditors.Count == 0)
             {
                 _logger.Here().Warning($"Trying to open file {file.Name}, but there are no valid tools for it.");
                 return;
             }
+            else if (allEditors.Count == 1)
+            {
+                selectedEditor = allEditors.First().Type;
+            }
+            else
+            {
+                var selectedToolType = ToolSelectorWindow.CreateAndShow(allEditors.Select(x => x.EditorType));
+                if (selectedToolType == EditorEnums.None)
+                    return;
+                selectedEditor = allEditors.First(x => x.EditorType == selectedToolType).Type;
+            }
+
+            var editorViewModel = ToolsFactory.CreateFromType(selectedEditor);
+            //var editorViewModel = ToolsFactory.GetDefaultToolViewModelFromFileName(fullFileName);
 
             _logger.Here().Information($"Opening {file.Name} with {editorViewModel.GetType().Name}");
             editorViewModel.MainFile = file;

@@ -27,6 +27,7 @@ namespace CommonControls.BaseDialogs
             InitializeComponent();
             Title = title;
             TextValue = initialValue;
+            Owner = Application.Current.MainWindow;
 
             if (focusTextInput)
             {

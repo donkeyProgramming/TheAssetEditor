@@ -10,9 +10,6 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     public class TargetPos_10 : DecodedMetaEntryBase
     {
         [MetaDataTag(5)]
-        public short Unk{ get; set; }
-
-        [MetaDataTag(6)]
-        public Vector3 Position { get; set; }
+        public Vector3 Position { get; set; } = Vector3.Zero;
     }
 }
