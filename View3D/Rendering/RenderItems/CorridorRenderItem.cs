@@ -20,6 +20,7 @@ namespace View3D.Rendering.RenderItems
         private VertexPositionColor[] _startCircleVertecies;
         private VertexPositionColor[] _endCircleVertecies;
         private VertexPositionColor[] _connectionCircleVertecies;
+        private VertexPositionColor[] _edgesVertecies;
 
         public Matrix ModelMatrix { get; set; } = Matrix.Identity;
 
@@ -56,12 +57,13 @@ namespace View3D.Rendering.RenderItems
             _planeVectorPN.Normalize();
             
             var fullCircle = 2 * MathF.PI;
-            var steps = 20;
+            var steps = 16;
             var stepsSize = fullCircle / steps;
 
             _startCircleVertecies = new VertexPositionColor[steps+1];
             _endCircleVertecies = new VertexPositionColor[steps+1];
-            _connectionCircleVertecies =  new VertexPositionColor[2*(steps + 1)];
+            _connectionCircleVertecies = new VertexPositionColor[2*(steps + 1)];
+            _edgesVertecies =  new VertexPositionColor[4*(steps + 1)];
             for (int i = 0; i < steps + 1; i++)
             {
                 float angle = stepsSize * i;
@@ -71,6 +73,10 @@ namespace View3D.Rendering.RenderItems
                 _endCircleVertecies[i] = new VertexPositionColor(_endPos + rotatedVector * _halfWidth, _colour);
                 _connectionCircleVertecies[2*i] = new VertexPositionColor(_startCircleVertecies[i].Position, _colour);
                 _connectionCircleVertecies[2*i+1] = new VertexPositionColor(_endCircleVertecies[i].Position, _colour);
+                _edgesVertecies[4*i] = new VertexPositionColor(_startPos, _colour);
+                _edgesVertecies[4*i+1] = new VertexPositionColor(_startCircleVertecies[i].Position, _colour);
+                _edgesVertecies[4*i+2] = new VertexPositionColor(_endPos, _colour);
+                _edgesVertecies[4*i+3] = new VertexPositionColor(_endCircleVertecies[i].Position, _colour);
             }
         }
 
@@ -86,6 +92,7 @@ namespace View3D.Rendering.RenderItems
                 device.DrawUserPrimitives(PrimitiveType.LineStrip, _startCircleVertecies, 0, _startCircleVertecies.Count()-1);
                 device.DrawUserPrimitives(PrimitiveType.LineStrip, _endCircleVertecies, 0, _endCircleVertecies.Count()-1);
                 device.DrawUserPrimitives(PrimitiveType.LineList, _connectionCircleVertecies, 0, _connectionCircleVertecies.Count() / 2);
+                device.DrawUserPrimitives(PrimitiveType.LineList, _edgesVertecies, 0, _edgesVertecies.Count() / 2);
             }
         }
     }
