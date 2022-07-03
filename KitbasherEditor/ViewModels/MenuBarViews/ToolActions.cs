@@ -116,6 +116,12 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public void CreateLods()
         {
             var rootNode = _editableMeshResolver.GeEditableMeshRootNode();
+            var lodGenerationService = new LodGenerationService(_objectEditor);
+            lodGenerationService.CreateLodsForRootNode(rootNode);
+
+            return;
+
+
             var lods = rootNode.GetLodNodes();
 
             var firtLod = lods.First();
@@ -141,7 +147,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             for (int lodIndex = 0; lodIndex < lodsToGenerate.Count(); lodIndex++)
             {
                 var deductionRatio = lodsToGenerate[lodIndex].LodReductionFactor;
-                var optimize = lodsToGenerate[lodIndex].OptimizeLod;
+                var optimize = lodsToGenerate[lodIndex].OptimizeLod_Alpha;
 
                 // We want to work on a clone of all the meshes
                 var clonedMeshes = meshList.Select(x => SceneNodeHelper.CloneNode(x)).ToList();

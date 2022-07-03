@@ -116,7 +116,7 @@ namespace View3D.Utility
             return groupedOutput;
         }
 
-        public static List<Rmv2MeshNode> CombineMeshes(List<Rmv2MeshNode> geometriesToCombine)
+        public static List<Rmv2MeshNode> CombineMeshes(List<Rmv2MeshNode> geometriesToCombine, bool addPrefix = false)
         {
             var combinedMeshes = new List<Rmv2MeshNode>();
             var combineGroups = SortMeshesIntoCombinableGroups(geometriesToCombine);
@@ -125,7 +125,9 @@ namespace View3D.Utility
                 if (currentGroup.Count != 1)
                 {
                     var combinedMesh = SceneNodeHelper.CloneNode(currentGroup.First());
-                    combinedMesh.Name = currentGroup.First().Name + "_Combined";
+                    combinedMesh.Name = currentGroup.First().Name;
+                    if(addPrefix)
+                        combinedMesh.Name += "_Combined";
 
                     var newModel = currentGroup.First().Geometry.Clone();
                     var typedGeo = currentGroup.Select(x => x.Geometry);

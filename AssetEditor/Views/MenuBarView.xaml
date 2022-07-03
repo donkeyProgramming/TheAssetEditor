@@ -85,6 +85,13 @@
                 <MenuItem Header="Pose Creator" Command="{Binding MenuBar.OpenPropCreatorCommand}" IsEnabled="False" Visibility="Collapsed"/>
             </MenuItem>
 
+            <MenuItem Header="Tutorials">
+                <MenuItem Header="[YT]Animated Prop" Command="{Binding MenuBar.OpenAnimatedPropTutorialCommand}"/>
+                <MenuItem Header="[YT]Custom Animation Pack" Command="{Binding MenuBar.OpenAnimPackTutorialCommand}"/>
+                <MenuItem Header="Manual" Command="{Binding MenuBar.OpenHelpCommand}"/>
+                <MenuItem Header="Discord" Command="{Binding MenuBar.OpenDiscordCommand}"/>
+            </MenuItem>
+
             <MenuItem Header="About">
                 <MenuItem Header="Manual" Command="{Binding MenuBar.OpenHelpCommand}"/>
                 <MenuItem Header="Discord" Command="{Binding MenuBar.OpenDiscordCommand}"/>

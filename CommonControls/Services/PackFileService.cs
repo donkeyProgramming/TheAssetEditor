@@ -470,7 +470,9 @@ namespace CommonControls.Services
                 throw new Exception("Can not delete folder inside CA pack file");
 
             var folderLower = folder.ToLower();
-            var itemsToDelete = pf.FileList.Where(x => x.Key.StartsWith(folderLower));
+            var itemsToDelete = pf.FileList
+                .Where(x => string.Equals(Path.GetDirectoryName(x.Key), folder, StringComparison.InvariantCultureIgnoreCase))
+                .ToList();
 
             Database.TriggerPackFileFolderRemoved(pf, folder);
 

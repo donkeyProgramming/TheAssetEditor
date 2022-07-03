@@ -75,8 +75,8 @@ Planned V0.35:
 	Kill schama manager code 
 	Check for lod count when loading textures -> Warning for textures missing lods 
 	Icon for which attributes in a metatag that the superview uses 
-	SoundMeta_v2
-	
+	' ,SoundMeta_v2
+	98kkkkkk
 	
 	Fix Mount Editor Editor for wh2 
 		Frags from more games 
@@ -150,8 +150,10 @@ V0.37
 	Start making unit tests...
 	
 	Meta file issue = https://discord.com/channels/373745291289034763/795235087352201226/982699359550443530
-		
-	Matched combat for wh3 
+
+8atched combat for wh3 
+
+
 	Show warnig when openin CA animpack, about not datacoring this file! 
 	Make it eaiser to understand, animpack editor 
 		frg extention when making wh3 animpack bin 
@@ -160,10 +162,54 @@ V0.37
 		Creaet Shortcut files! 
 	multiple editors 
 	open vmd in kitbasher - all referebces
+	UV tools 
+	Improve lod - remove all tiny meshes 
 	
+	Lod - split into two vertex and alpha. Only convert animated4 => 2! 
+	
+V0.38
+----------------------------
+	Improve the update / welcome screen 
+		Welcome screen
+		Update screen
+	Open vmd and ws in kitbash editor
+	Shortcut files
+		SuperView
+		AnimationTransfer
+		KitbashEditor
+	Shotcuts for kitbash tools 
+	Fix button for timeline
+	Compute texture usage 
+	AnimPack fixes 
+	
+	Match combat decoding for wh3 
+	Fix the "." bug in mesh reduction view 
+	Deleting folders does not work. Generate ws model, delete material folder. Files not added back
+	
+	Filter animations in anim transfer tool
+	When saving animmeta, make it all pop into anim where is and remove saving question
+	* Tutorial toolbar
+	* ws model generation
+	* Lod issue 
+	Hide skeleton for animated props 
+	Different colours for animated prop skeletons 
+	Redo scale functionalty for animated prop
+	Effect_v11 and transform in metadatafactory. SHould use interface 
 
-V0.36
-----
+V0.38
+----------------------------	
+	Features:
+		* Added "tutorial" toolbar  
+	
+	BugFixes:
+		* Animated prop scale issue - still bugs related to this. Imitating the game is hard!  
+		* Generate ws model bug - Much better at reusing and fixed a few minor bugs 
+		* Generte Lod bug - Added two flags instead of just one. Combine alpha and combine mesh
+		* Generte Lod bug - Fixed bug related to static meshes 
+		* Fixed bug related to deleting folders 
+
+V0.37
+----------------------------
 	Features:
 		* Lod Generation now follow CA optimization rules
 		* Improved mesh overview found under the "Editable model" node in the kitbash editor. The information is read only in the LOD node now
