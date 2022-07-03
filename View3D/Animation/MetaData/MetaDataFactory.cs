@@ -157,8 +157,12 @@ namespace View3D.Animation.MetaData
             var skeleton = new GameSkeleton(skeletonFile, propPlayer);
             var animFile = AnimationFile.Create(animationPath);
             var clip = new AnimationClip(animFile, skeleton);
+            loadedNode.ForeachNodeRecursive((node) =>
+            {
+                if (node is SceneNode selectable)
+                    selectable.ScaleMult = animatedPropMeta.Scale;
+            });
             loadedNode.ScaleMult = animatedPropMeta.Scale;
-            //clip.ScaleAnimation(animatedPropMeta.Scale);
 
             var animationRule = new CopyRootTransform(_rootSkeleton, animatedPropMeta.BoneId, animatedPropMeta.Position, new Quaternion(animatedPropMeta.Orientation));
            
@@ -171,7 +175,7 @@ namespace View3D.Animation.MetaData
 
             var skeletonSceneNode = new SkeletonNode(_componentManager, new SimpleSkeletonProvider(skeleton));
             skeletonSceneNode.NodeColour = Color.Yellow;
-
+            skeletonSceneNode.ScaleMult = animatedPropMeta.Scale;
             loadedNode.AddObject(skeletonSceneNode);
 
             return new AnimatedPropInstance(loadedNode, propPlayer);

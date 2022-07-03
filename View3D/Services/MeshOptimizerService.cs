@@ -95,7 +95,7 @@ namespace View3D.Services
                 outputVerts[i] = vert;
             }
 
-            var clone = original.Clone(false) as MeshObject;
+            var clone = original.Clone(false);
             clone.IndexArray = destIndices[0].Select(x => (ushort)x).ToArray();
             clone.VertexArray = outputVerts;
 

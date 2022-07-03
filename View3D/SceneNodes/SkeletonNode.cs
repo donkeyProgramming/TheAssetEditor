@@ -59,8 +59,7 @@ namespace View3D.SceneNodes
 
             if (IsVisible && skeleton != null/* && _animationProvider.IsActive*/)
             {
-                _lineRenderer.Clear();
-
+                _lineRenderer.Clear(); 
                 for (int i = 0; i < skeleton.BoneCount; i++)
                 {
                     float scale = SkeletonScale;
@@ -72,13 +71,14 @@ namespace View3D.SceneNodes
                     }
 
                     var boneMatrix = skeleton.GetAnimatedWorldTranform(i);
-                    _lineRenderer.AddCube(Matrix.CreateScale(scale) * Matrix.CreateScale(0.05f) * boneMatrix * parentWorld, drawColour);
+                    _lineRenderer.AddCube(Matrix.CreateScale(scale) * Matrix.CreateScale(0.05f) * boneMatrix * Matrix.CreateScale(ScaleMult) * parentWorld, drawColour);
                     
                     var parentIndex = skeleton.GetParentBoneIndex(i);
                     if (parentIndex != -1)
                     {
-                        var parentBoneMatrix = skeleton.GetAnimatedWorldTranform(parentIndex);
-                        _lineRenderer.AddLine(Vector3.Transform(boneMatrix.Translation, parentWorld), Vector3.Transform(parentBoneMatrix.Translation, parentWorld));
+                        var currentBoneMatrix = boneMatrix * Matrix.CreateScale(ScaleMult);
+                        var parentBoneMatrix = skeleton.GetAnimatedWorldTranform(parentIndex) * Matrix.CreateScale(ScaleMult);
+                        _lineRenderer.AddLine(Vector3.Transform(currentBoneMatrix.Translation, parentWorld), Vector3.Transform(parentBoneMatrix.Translation, parentWorld));
                     }
                 }
 

@@ -61,19 +61,10 @@ namespace View3D.Services
                     return;
                 }
 
-                var isAllVisible = SceneNodeHelper.AreAllNodesVisible(_editableMeshNode);
-                bool onlySaveVisible = false;
-                if (isAllVisible == false)
-                {
-                    if (MessageBox.Show("Only generate for visible nodes?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                        onlySaveVisible = true;
-                }
-
                 var modelFile = _editorViewModel.MainFile;
                 var modelFilePath = _packFileService.GetFullPath(modelFile);
                 var wsModelPath = Path.ChangeExtension(modelFilePath, ".wsmodel");
 
-      
                 var materialTemplate = game switch
                 {
                     GameTypeEnum.Warhammer3 => LoadMaterialTemplate("View3D.Content.Game.MaterialTemplate_wh3.xml.material"),
@@ -81,7 +72,7 @@ namespace View3D.Services
                     _ => throw new Exception("Unkown game - unable to generate ws model")
                 };
 
-                var wsModelData = CreateWsModel(modelFilePath, onlySaveVisible, materialTemplate);
+                var wsModelData = CreateWsModel(game, modelFilePath, materialTemplate);
                 var existingWsModelFile = _packFileService.FindFile(wsModelPath, _packFileService.GetEditablePack());
                 SaveHelper.Save(_packFileService, wsModelPath, existingWsModelFile, Encoding.UTF8.GetBytes(wsModelData));
             }
@@ -93,7 +84,7 @@ namespace View3D.Services
         }
 
 
-        string CreateWsModel(string modelFilePath, bool onlyVisible, string materialTemplate)
+        string CreateWsModel(GameTypeEnum game, string modelFilePath, string materialTemplate)
         {
             var sb = new StringBuilder();
 
@@ -104,15 +95,17 @@ namespace View3D.Services
             var lodNodes = _editableMeshNode.GetLodNodes();
             for (int lodIndex = 0; lodIndex < lodNodes.Count; lodIndex++)
             {
-                var meshes = _editableMeshNode.GetMeshesInLod(lodIndex, onlyVisible);
+                var meshes = _editableMeshNode.GetMeshesInLod(lodIndex, false);
                 var uniqueNames = GenerateUniqueNames(meshes);
                 for (int meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
                 {
-                    var materialFile = GetOrCreateMaterial(meshes[meshIndex], uniqueNames[meshIndex], materialTemplate);
-                    sb.Append($"\t\t\t<material part_index=\"{meshIndex}\" lod_index=\"{lodIndex}\">");
+                    var materialFile = GetOrCreateMaterial(game, meshes[meshIndex], uniqueNames[meshIndex], materialTemplate);
+                    sb.Append($"\t\t\t<material lod_index=\"{lodIndex}\" part_index=\"{meshIndex}\">");
                     sb.Append(materialFile);
                     sb.Append("</material>\n");
                 }
+
+                sb.AppendLine();
             }
 
             sb.Append("\t</materials>\n");
@@ -143,10 +136,10 @@ namespace View3D.Services
             return output;
         }
 
-        string GetOrCreateMaterial(Rmv2MeshNode mesh, string uniqueName, string materialTemplate)
+        string GetOrCreateMaterial(GameTypeEnum game, Rmv2MeshNode mesh, string uniqueName, string materialTemplate)
         {
             uniqueName = uniqueName.Trim();
-            var materialFileName = FindApplicableExistingMaterial(mesh);
+            var materialFileName = FindApplicableExistingMaterial(game, mesh);
             if (materialFileName == null)
                 materialFileName = CreateNewMaterial(mesh, uniqueName, materialTemplate);
             return materialFileName;
@@ -206,11 +199,11 @@ namespace View3D.Services
             return fullPath;
         }
 
-        string FindApplicableExistingMaterial(Rmv2MeshNode mesh)
+        string FindApplicableExistingMaterial(GameTypeEnum game, Rmv2MeshNode mesh)
         {
             foreach (var material in _existingMaterials)
             {
-                var isMatch = IsMaterialMatch(mesh, material);
+                var isMatch = IsMaterialMatch(game, mesh, material);
                 if (isMatch)
                     return material.FullPath;
             }
@@ -218,7 +211,7 @@ namespace View3D.Services
             return null;
         }
 
-        bool IsMaterialMatch(Rmv2MeshNode mesh, WsModelMaterialFile material)
+        bool IsMaterialMatch(GameTypeEnum game, Rmv2MeshNode mesh, WsModelMaterialFile material)
         {
             var vertexType = ModelMaterialEnumHelper.GetToolVertexFormat(mesh.Material.BinaryVertexFormat);
             if (vertexType != material.VertexType)
@@ -228,7 +221,21 @@ namespace View3D.Services
             if (alphaOn && material.Alpha == false)
                 return false;
 
-            foreach (var modelTexture in mesh.GetTextures()) // ToDo - Remove textures we dont care about 
+            var originalTextures = mesh.GetTextures();
+            if (game == GameTypeEnum.Warhammer3)
+            {
+                var tempTextureArray = new Dictionary<TexureType, string>();
+                var itemsToSkip = new TexureType[] { TexureType.Specular, TexureType.Diffuse, TexureType.Gloss };
+                foreach (var texture in originalTextures)
+                {
+                    if (itemsToSkip.Contains(texture.Key))
+                        continue;
+                    tempTextureArray[texture.Key] = texture.Value;
+                }
+                originalTextures = tempTextureArray;
+            }
+
+            foreach (var modelTexture in originalTextures) 
             {
                 if (TemplateStringToTextureTypes.ContainsValue(modelTexture.Key) == false)
                     continue;
