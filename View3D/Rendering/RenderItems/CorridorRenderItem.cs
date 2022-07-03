@@ -1,8 +1,11 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
+using SharpDX;
 using View3D.Components.Rendering;
+using Color = Microsoft.Xna.Framework.Color;
+using Matrix = Microsoft.Xna.Framework.Matrix;
+using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace View3D.Rendering.RenderItems
 {
@@ -13,6 +16,10 @@ namespace View3D.Rendering.RenderItems
         Vector3 _endPos;
         private float _width;
         Color _colour = Color.Red;
+        private float _halfWidth;
+        private VertexPositionColor[] _startCircleVertecies;
+        private VertexPositionColor[] _endCircleVertecies;
+        private VertexPositionColor[] _connectionCircleVertecies;
 
         public Matrix ModelMatrix { get; set; } = Matrix.Identity;
 
@@ -22,6 +29,7 @@ namespace View3D.Rendering.RenderItems
             _startPos = startPos;
             _endPos = endPos;
             _width = width;
+            Init();
         }
 
         public CorridorRenderItem(Effect shader, Vector3 startPos, Vector3 endPos, float width, Color color)
@@ -31,36 +39,43 @@ namespace View3D.Rendering.RenderItems
             _endPos = endPos;
             _width = width;
             _colour = color;
+            Init();
         }
-
-        public void Draw(GraphicsDevice device, CommonShaderParameters parameters)
+        
+        private void Init()
         {
-            float halfWidth = _width / 2;
+            _halfWidth = _width / 2;
             Vector3 normal = _endPos - _startPos;
             normal.Normalize();
-            Vector3 vectorZ = new Vector3(0, 0, 1);
-            Vector3 planeVectorZ = Vector3.Cross(normal, Vector3.Cross(vectorZ, normal));
-            Vector3 planeVectorZN = Vector3.Cross(vectorZ, normal);
-            // Vector3 halfWidthVector = Vector3.Normalize(planeVectorZ + planeVectorZN) * _width / 2;
+            var random = new Random();
+            Vector3 vectorP = new Vector3(RandomUtil.NextFloat(random, -1.0f, 1.0f), RandomUtil.NextFloat(random, -1.0f, 1.0f), RandomUtil.NextFloat(random, -1.0f, 1.0f));
+            vectorP.Normalize();            
+            Vector3 _planeVectorP = Vector3.Cross(normal, Vector3.Cross(vectorP, normal));
+            Vector3 _planeVectorPN = Vector3.Cross(vectorP, normal);
+            _planeVectorP.Normalize();
+            _planeVectorPN.Normalize();
             
             var fullCircle = 2 * MathF.PI;
             var steps = 20;
             var stepsSize = fullCircle / steps;
 
-            var _startCircleVertecies = new VertexPositionColor[steps+1];
-            var _endCircleVertecies = new VertexPositionColor[steps+1];
-            var _connectionCircleVertecies =  new VertexPositionColor[2*(steps + 1)];
+            _startCircleVertecies = new VertexPositionColor[steps+1];
+            _endCircleVertecies = new VertexPositionColor[steps+1];
+            _connectionCircleVertecies =  new VertexPositionColor[2*(steps + 1)];
             for (int i = 0; i < steps + 1; i++)
             {
                 float angle = stepsSize * i;
-                Vector3 rotatedVector = planeVectorZ * MathF.Cos(angle) + planeVectorZN * MathF.Sin(angle);
+                Vector3 rotatedVector = _planeVectorP * MathF.Cos(angle) + _planeVectorPN * MathF.Sin(angle);
                 rotatedVector.Normalize();
-                _startCircleVertecies[i] = new VertexPositionColor(_startPos + rotatedVector * halfWidth, _colour);
-                _endCircleVertecies[i] = new VertexPositionColor(_endPos + rotatedVector * halfWidth, _colour);
+                _startCircleVertecies[i] = new VertexPositionColor(_startPos + rotatedVector * _halfWidth, _colour);
+                _endCircleVertecies[i] = new VertexPositionColor(_endPos + rotatedVector * _halfWidth, _colour);
                 _connectionCircleVertecies[2*i] = new VertexPositionColor(_startCircleVertecies[i].Position, _colour);
                 _connectionCircleVertecies[2*i+1] = new VertexPositionColor(_endCircleVertecies[i].Position, _colour);
             }
+        }
 
+        public void Draw(GraphicsDevice device, CommonShaderParameters parameters)
+        {
             _shader.Parameters["View"].SetValue(parameters.View);
             _shader.Parameters["Projection"].SetValue(parameters.Projection);
             _shader.Parameters["World"].SetValue(ModelMatrix);

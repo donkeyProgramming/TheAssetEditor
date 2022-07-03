@@ -224,11 +224,10 @@ namespace View3D.Animation.MetaData
             node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, displayName, textPos));
             
             node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineSegmentRenderItem(resourceLib.GetEffect(ShaderTypes.Line), splashAttack.StartPosition, splashAttack.EndPosition));
+            
             if (splashAttack.AoeShape == 0) // Cone or Sphere
             {
-                Vector3 normal = splashAttack.EndPosition - splashAttack.StartPosition;
-                float distance = Vector3.Distance(splashAttack.StartPosition, splashAttack.EndPosition);
-
+                node.AddItem(Components.Rendering.RenderBuckedId.Normal, new ConeRenderItem(resourceLib.GetStaticEffect(ShaderTypes.Line), splashAttack.StartPosition, splashAttack.EndPosition, splashAttack.AngleForCone));
             }
             if (splashAttack.AoeShape == 1) // Corridor
             {
