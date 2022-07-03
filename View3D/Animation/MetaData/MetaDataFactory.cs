@@ -10,6 +10,7 @@ using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using SharpDX.Direct2D1.Effects;
 using View3D.Animation.AnimationChange;
@@ -88,24 +89,6 @@ namespace View3D.Animation.MetaData
            
             foreach (var meteDataItem in file.GetItemsOfType<Transform_v10>())
                 CreateTransform(meteDataItem);
-            
-            // Debug
-            // var resourceLib = _componentManager.GetComponent<ResourceLibary>();
-            // Vector3 origin = new Vector3(0);
-            // String text = "CoordinateSystem";
-            // SimpleDrawableNode node = new SimpleDrawableNode(text);
-            // Vector3 vectorX = new Vector3(5, 0, 0);
-            // node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineSegmentRenderItem(resourceLib.GetEffect(ShaderTypes.Line), origin, vectorX,  Color.Red));
-            // node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, "X", vectorX));
-            // Vector3 vectorY = new Vector3(0, 5, 0);
-            // node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineSegmentRenderItem(resourceLib.GetEffect(ShaderTypes.Line), origin, vectorY,  Color.Green));
-            // node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, "Y", vectorY));
-            // Vector3 vectorZ = new Vector3(0, 0, 5);
-            // node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineSegmentRenderItem(resourceLib.GetEffect(ShaderTypes.Line), origin, vectorZ, Color.Blue));
-            // node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, "Z", vectorZ));
-            //
-            // _root.AddObject(node);
-            // output.Add(new DrawableMetaInstance(0.0f, 1.0f, node.Name, node));
 
             return output;
         }
@@ -213,6 +196,12 @@ namespace View3D.Animation.MetaData
         
         IMetaDataInstance CreateSplashAttack(SplashAttack_v10 splashAttack, string displayName, float scale = 0.3f)
         {
+            float distance =  Vector3.Distance(splashAttack.StartPosition, splashAttack.EndPosition);
+            if (distance < 0.00001)
+            {
+                throw new ConstraintException($"{displayName}: the distance between StartPosition {splashAttack.StartPosition} and EndPosition {splashAttack.EndPosition} is close to 0");
+            }
+
             var resourceLib = _componentManager.GetComponent<ResourceLibary>();
             Vector3 textPos = (splashAttack.EndPosition + splashAttack.StartPosition) / 2;
 
@@ -227,23 +216,19 @@ namespace View3D.Animation.MetaData
             
             if (splashAttack.AoeShape == 0) // Cone or Sphere
             {
+                if (splashAttack.AngleForCone / 2 < 0.1)
+                {
+                    throw new ConstraintException($"{displayName}: the half-angle {splashAttack.AngleForCone / 2} of the cone is close to 0");
+                }
                 node.AddItem(Components.Rendering.RenderBuckedId.Normal, new ConeRenderItem(resourceLib.GetStaticEffect(ShaderTypes.Line), splashAttack.StartPosition, splashAttack.EndPosition, splashAttack.AngleForCone));
             }
             if (splashAttack.AoeShape == 1) // Corridor
             {
-                // Vector3 normal = splashAttack.EndPosition - splashAttack.StartPosition;
-                // normal.Normalize();
-                // Vector3 vectorZ = new Vector3(0, 0, 1);
-                // Vector3 planeVectorZ = Vector3.Cross(normal, Vector3.Cross(vectorZ, normal));
-                // Vector3 planeVectorZN = Vector3.Cross(vectorZ, normal);
-                // node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineSegmentRenderItem(resourceLib.GetEffect(ShaderTypes.Line), splashAttack.StartPosition, planeVectorZ + splashAttack.StartPosition, Color.Blue));
-                // node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineSegmentRenderItem(resourceLib.GetEffect(ShaderTypes.Line), splashAttack.StartPosition, planeVectorZN + splashAttack.StartPosition, Color.Green));
-                // Vector3 widthVector = Vector3.Normalize(planeVectorZ + planeVectorZN) * splashAttack.WidthForCorridor / 2;
-                // node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineSegmentRenderItem(resourceLib.GetEffect(ShaderTypes.Line), splashAttack.StartPosition, widthVector + splashAttack.StartPosition, Color.Yellow));
+                if (splashAttack.WidthForCorridor < 0.0001)
+                {
+                    throw new ConstraintException($"{displayName}: the WidthForCorridor {splashAttack.WidthForCorridor} of the corridor is close to 0");
+                }
                 node.AddItem(Components.Rendering.RenderBuckedId.Normal, new CorridorRenderItem(resourceLib.GetStaticEffect(ShaderTypes.Line), splashAttack.StartPosition, splashAttack.EndPosition, splashAttack.WidthForCorridor));
-            }
-            else
-            {
             }
             _root.AddObject(node);
 

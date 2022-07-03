@@ -8,6 +8,7 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Windows;
 using CommonControls.Editors.AnimationPack.Converters;
+using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3;
 using CommonControls.FileTypes.PackFiles.Models;
@@ -19,16 +20,27 @@ namespace AssetEditor.Report
         ILogger _logger = Logging.Create<AnimMetaDataJsonsGenerator>();
         PackFileService _pfs;
         ApplicationSettingsService _settingsService;
+        JsonSerializerSettings _jsonOptions;
+        
         public AnimMetaDataJsonsGenerator(PackFileService pfs, ApplicationSettingsService settingsService)
         {
             _pfs = pfs;
             _settingsService = settingsService;
+            _jsonOptions = new JsonSerializerSettings { Formatting = Formatting.Indented };
         }
 
         public static void Generate(PackFileService pfs, ApplicationSettingsService settingsService)
         {
             var instance = new AnimMetaDataJsonsGenerator(pfs, settingsService);
             instance.Create();
+        }
+
+        void dumpAsJson(string gameOutputDir, string fileName, object? data)
+        {
+            string jsonString = JsonConvert.SerializeObject(data, _jsonOptions);
+            string json_filepath = Path.Join(gameOutputDir, fileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(json_filepath));
+            File.WriteAllText(json_filepath, jsonString);
         }
 
         public void Create()
@@ -56,38 +68,39 @@ namespace AssetEditor.Report
                 }
             }
 
-            var fileList = _pfs.FindAllWithExtentionIncludePaths(".meta");
-            for (int i = 0; i < fileList.Count; i++)
+            var allMeta = _pfs.FindAllWithExtentionIncludePaths(".meta");
+            foreach (var (fileName,packFile) in allMeta)
             {
-                var fileName = fileList[i].FileName;
-                var packFile = fileList[i].Pack;
-
-                if (fileName.Contains(".snd."))
-                {
-                    continue;
-                }
-                // _logger.Here().Information($"Parsing {fileName}");
-
                 try
                 {
                     var data = packFile.DataSource.ReadData(); 
                     if (data.Length == 0)
                         continue;
-
+            
                     var parser = new MetaDataFileParser();
                     var metaData = parser.ParseFile(data);
-  
-                    var options = new JsonSerializerSettings { Formatting = Formatting.Indented };
-                    string jsonString = JsonConvert.SerializeObject(metaData, options);
-                    string json_filepath = Path.Join(gameOutputDir, fileName + ".json");
-                    Directory.CreateDirectory(Path.GetDirectoryName(json_filepath));
-                    File.WriteAllText(json_filepath, jsonString);
+                    dumpAsJson(gameOutputDir, fileName + ".json", metaData);
                 }
                 catch(Exception e)
                 {
-                    _logger.Here().Information($"Parsing failed {fileName} - {e.Message}");
+                    _logger.Here().Information($"Meta parsing failed {fileName} - {e.Message}");
                 }
             }
+            
+            var allAnimations = _pfs.FindAllWithExtentionIncludePaths(".anim");
+            foreach (var (fileName,packFile) in allAnimations)
+            {
+                try
+                {
+                    var animationHeader = AnimationFile.GetAnimationHeader(packFile);
+                    dumpAsJson(gameOutputDir, fileName + ".header.json", animationHeader);
+                }
+                catch(Exception e)
+                {
+                    _logger.Here().Information($"Animation parsing failed {fileName} - {e.Message}");
+                }
+            }
+
             MessageBox.Show($"Done - Created at {gameOutputDir}");
             Process.Start("explorer.exe", gameOutputDir);
         }

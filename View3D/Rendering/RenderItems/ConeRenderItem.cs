@@ -35,14 +35,9 @@ namespace View3D.Rendering.RenderItems
             Init();
         }
 
-        public ConeRenderItem(Effect shader, Vector3 startPos, Vector3 endPos, float coneAngle, Color color)
+        public ConeRenderItem(Effect shader, Vector3 startPos, Vector3 endPos, float coneAngle, Color color): this(shader, startPos, endPos, coneAngle)
         {
-            _shader = shader;
-            _startPos = startPos;
-            _endPos = endPos;
-            _coneAngle = coneAngle;
             _colour = color;
-            Init();
         }
 
         private void Init()

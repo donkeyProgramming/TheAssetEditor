@@ -33,14 +33,9 @@ namespace View3D.Rendering.RenderItems
             Init();
         }
 
-        public CorridorRenderItem(Effect shader, Vector3 startPos, Vector3 endPos, float width, Color color)
+        public CorridorRenderItem(Effect shader, Vector3 startPos, Vector3 endPos, float width, Color color) : this(shader, startPos, endPos, width)
         {
-            _shader = shader;
-            _startPos = startPos;
-            _endPos = endPos;
-            _width = width;
             _colour = color;
-            Init();
         }
         
         private void Init()
