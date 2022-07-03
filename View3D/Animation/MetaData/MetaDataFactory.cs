@@ -11,6 +11,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SharpDX.Direct2D1.Effects;
 using View3D.Animation.AnimationChange;
 using View3D.Components;
 using View3D.Components.Component;
@@ -77,7 +78,7 @@ namespace View3D.Animation.MetaData
                 output.Add(CreateStaticLocator(meteDataItem, meteDataItem.Position, "FirePos"));
             
             foreach (var meteDataItem in file.GetItemsOfType<SplashAttack_v10>())
-                output.Add(CreateSplashAttack(meteDataItem, "SplashAttack"));
+                output.Add(CreateSplashAttack(meteDataItem, $"SplashAttack_{Math.Round(meteDataItem.EndTime, 2)}", 0.1f));
 
             foreach (var meteDataItem in file.GetItemsOfType<Effect_v11>())
                 output.Add(CreateEffect(meteDataItem));
@@ -87,6 +88,24 @@ namespace View3D.Animation.MetaData
            
             foreach (var meteDataItem in file.GetItemsOfType<Transform_v10>())
                 CreateTransform(meteDataItem);
+            
+            // Debug
+            // var resourceLib = _componentManager.GetComponent<ResourceLibary>();
+            // Vector3 origin = new Vector3(0);
+            // String text = "CoordinateSystem";
+            // SimpleDrawableNode node = new SimpleDrawableNode(text);
+            // Vector3 vectorX = new Vector3(5, 0, 0);
+            // node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineSegmentRenderItem(resourceLib.GetEffect(ShaderTypes.Line), origin, vectorX,  Color.Red));
+            // node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, "X", vectorX));
+            // Vector3 vectorY = new Vector3(0, 5, 0);
+            // node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineSegmentRenderItem(resourceLib.GetEffect(ShaderTypes.Line), origin, vectorY,  Color.Green));
+            // node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, "Y", vectorY));
+            // Vector3 vectorZ = new Vector3(0, 0, 5);
+            // node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineSegmentRenderItem(resourceLib.GetEffect(ShaderTypes.Line), origin, vectorZ, Color.Blue));
+            // node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, "Z", vectorZ));
+            //
+            // _root.AddObject(node);
+            // output.Add(new DrawableMetaInstance(0.0f, 1.0f, node.Name, node));
 
             return output;
         }
@@ -192,16 +211,41 @@ namespace View3D.Animation.MetaData
             return new DrawableMetaInstance(metaData.StartTime, metaData.EndTime, node.Name, node);
         }
         
-        IMetaDataInstance CreateSplashAttack(SplashAttack_v10 splashAttack, string displayName)
+        IMetaDataInstance CreateSplashAttack(SplashAttack_v10 splashAttack, string displayName, float scale = 0.3f)
         {
             var resourceLib = _componentManager.GetComponent<ResourceLibary>();
-            float scale = 0.3f;
+            Vector3 textPos = (splashAttack.EndPosition + splashAttack.StartPosition) / 2;
 
             SimpleDrawableNode node = new SimpleDrawableNode(displayName);
-            node.AddItem(Components.Rendering.RenderBuckedId.Line, new CricleRenderItem(resourceLib.GetEffect(ShaderTypes.Line), splashAttack.StartPosition, scale));
-            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, displayName, splashAttack.StartPosition));
-            node.AddItem(Components.Rendering.RenderBuckedId.Line, new CricleRenderItem(resourceLib.GetEffect(ShaderTypes.Line), splashAttack.EndPosition, scale));
-            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, displayName, splashAttack.EndPosition));
+            node.AddItem(Components.Rendering.RenderBuckedId.Line, new LocatorRenderItem(resourceLib.GetEffect(ShaderTypes.Line), splashAttack.StartPosition, scale));
+            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, "StartPos", splashAttack.StartPosition));
+            node.AddItem(Components.Rendering.RenderBuckedId.Line, new LocatorRenderItem(resourceLib.GetEffect(ShaderTypes.Line), splashAttack.EndPosition, scale));
+            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, "EndPos", splashAttack.EndPosition));
+            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, displayName, textPos));
+            
+            node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineSegmentRenderItem(resourceLib.GetEffect(ShaderTypes.Line), splashAttack.StartPosition, splashAttack.EndPosition));
+            if (splashAttack.AoeShape == 0) // Cone or Sphere
+            {
+                Vector3 normal = splashAttack.EndPosition - splashAttack.StartPosition;
+                float distance = Vector3.Distance(splashAttack.StartPosition, splashAttack.EndPosition);
+
+            }
+            if (splashAttack.AoeShape == 1) // Corridor
+            {
+                // Vector3 normal = splashAttack.EndPosition - splashAttack.StartPosition;
+                // normal.Normalize();
+                // Vector3 vectorZ = new Vector3(0, 0, 1);
+                // Vector3 planeVectorZ = Vector3.Cross(normal, Vector3.Cross(vectorZ, normal));
+                // Vector3 planeVectorZN = Vector3.Cross(vectorZ, normal);
+                // node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineSegmentRenderItem(resourceLib.GetEffect(ShaderTypes.Line), splashAttack.StartPosition, planeVectorZ + splashAttack.StartPosition, Color.Blue));
+                // node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineSegmentRenderItem(resourceLib.GetEffect(ShaderTypes.Line), splashAttack.StartPosition, planeVectorZN + splashAttack.StartPosition, Color.Green));
+                // Vector3 widthVector = Vector3.Normalize(planeVectorZ + planeVectorZN) * splashAttack.WidthForCorridor / 2;
+                // node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineSegmentRenderItem(resourceLib.GetEffect(ShaderTypes.Line), splashAttack.StartPosition, widthVector + splashAttack.StartPosition, Color.Yellow));
+                node.AddItem(Components.Rendering.RenderBuckedId.Normal, new CorridorRenderItem(resourceLib.GetStaticEffect(ShaderTypes.Line), splashAttack.StartPosition, splashAttack.EndPosition, splashAttack.WidthForCorridor));
+            }
+            else
+            {
+            }
             _root.AddObject(node);
 
             return new DrawableMetaInstance(splashAttack.StartTime, splashAttack.EndTime, node.Name, node);
