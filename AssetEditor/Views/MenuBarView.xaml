@@ -56,6 +56,7 @@
                 <MenuItem Header="Rmv2" Command="{Binding MenuBar.GenerateRmv2ReportCommand}"/>
                 <MenuItem Header="Meta Data" Command="{Binding MenuBar.GenerateMetaDataReportCommand}"/>
                 <MenuItem Header="File List" Command="{Binding MenuBar.GenerateFileListReportCommand}"/>
+                <MenuItem Header="Meta Jsons" Command="{Binding MenuBar.GenerateMetaDataJsonsReportCommand}"/>
                 <Separator/>
                 <MenuItem Header="Search" Command="{Binding MenuBar.SearchCommand}"/>
             </MenuItem>

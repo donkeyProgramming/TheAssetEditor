@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Newtonsoft.Json;
 
 namespace CommonControls.FileTypes.MetaData
 {
@@ -23,6 +24,8 @@ namespace CommonControls.FileTypes.MetaData
     public abstract class BaseMetaEntry
     {
         public string Name { get; set; }
+        
+        [JsonIgnore]
         public byte[] Data { get; set; }
         public virtual string Description { get; } = "";
 

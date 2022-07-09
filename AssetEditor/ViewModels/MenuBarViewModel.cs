@@ -83,6 +83,7 @@ namespace AssetEditor.ViewModels
         public ICommand GenerateRmv2ReportCommand { get; set; }
         public ICommand GenerateMetaDataReportCommand { get; set; }
         public ICommand GenerateFileListReportCommand { get; set; }
+        public ICommand GenerateMetaDataJsonsReportCommand { get; set; }
         public ICommand CreateAnimPackWarhammer3Command { get; set; }
         public ICommand CreateAnimPack3kCommand { get; set; }
         public ICommand OpenAnimatedPropTutorialCommand { get; set; }
@@ -118,6 +119,8 @@ namespace AssetEditor.ViewModels
             GenerateRmv2ReportCommand = new RelayCommand(GenerateRmv2Report);
             GenerateMetaDataReportCommand = new RelayCommand(GenerateMetaDataReport);
             GenerateFileListReportCommand = new RelayCommand(GenerateFileListReport);
+            GenerateMetaDataJsonsReportCommand = new RelayCommand(GenerateMetaDataJsonsReport);
+            
 
             SearchCommand = new RelayCommand(Search);
 
@@ -290,6 +293,8 @@ namespace AssetEditor.ViewModels
         void GenerateMetaDataReport() => AnimMetaDataReportGenerator.Generate(_packfileService, _settingsService);
 
         void GenerateFileListReport() => FileListReportGenerator.Generate(_packfileService, _settingsService);
+        
+        void GenerateMetaDataJsonsReport() => AnimMetaDataJsonsGenerator.Generate(_packfileService, _settingsService);
 
 
         void Search()
