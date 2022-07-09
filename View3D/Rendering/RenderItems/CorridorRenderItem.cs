@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
-using SharpDX;
 using View3D.Components.Rendering;
 using Color = Microsoft.Xna.Framework.Color;
 using Matrix = Microsoft.Xna.Framework.Matrix;
@@ -44,7 +43,8 @@ namespace View3D.Rendering.RenderItems
             Vector3 normal = _endPos - _startPos;
             normal.Normalize();
             var random = new Random();
-            Vector3 vectorP = new Vector3(RandomUtil.NextFloat(random, -1.0f, 1.0f), RandomUtil.NextFloat(random, -1.0f, 1.0f), RandomUtil.NextFloat(random, -1.0f, 1.0f));
+            Func<Random, float> RandomFloat = random => (float)(2 * random.NextDouble() - 1);
+            Vector3 vectorP = new Vector3(RandomFloat(random), RandomFloat(random), RandomFloat(random));
             vectorP.Normalize();            
             Vector3 _planeVectorP = Vector3.Cross(normal, Vector3.Cross(vectorP, normal));
             Vector3 _planeVectorPN = Vector3.Cross(vectorP, normal);
@@ -52,7 +52,7 @@ namespace View3D.Rendering.RenderItems
             _planeVectorPN.Normalize();
             
             var fullCircle = 2 * MathF.PI;
-            var steps = 16;
+            var steps = 30;
             var stepsSize = fullCircle / steps;
 
             _startCircleVertecies = new VertexPositionColor[steps+1];

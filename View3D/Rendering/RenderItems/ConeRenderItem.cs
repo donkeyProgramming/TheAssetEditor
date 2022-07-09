@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
-using SharpDX;
 using View3D.Components.Rendering;
 using Color = Microsoft.Xna.Framework.Color;
 using Matrix = Microsoft.Xna.Framework.Matrix;
@@ -18,36 +16,37 @@ namespace View3D.Rendering.RenderItems
         Effect _shader;
         Vector3 _startPos;
         Vector3 _endPos;
-        private float _coneAngle; // in degrees
+        private float _coneAngleDegrees;
         Color _colour = Color.Red;
-        private VertexPositionColor[][] _circles;
+        private VertexPositionColor[] _circles; // Array of {#circleCount} circles X {#steps} points each X 2 (to draw it with 1 device.DrawUserPrimitives call using PrimitiveType.LineList)
         private VertexPositionColor[] _lastCircle;
         private VertexPositionColor[] _rays;
 
         public Matrix ModelMatrix { get; set; } = Matrix.Identity;
 
-        public ConeRenderItem(Effect shader, Vector3 startPos, Vector3 endPos, float coneAngle)
+        public ConeRenderItem(Effect shader, Vector3 startPos, Vector3 endPos, float coneAngleDegrees)
         {
             _shader = shader;
             _startPos = startPos;
             _endPos = endPos;
-            _coneAngle = coneAngle;
+            _coneAngleDegrees = coneAngleDegrees;
             Init();
         }
 
-        public ConeRenderItem(Effect shader, Vector3 startPos, Vector3 endPos, float coneAngle, Color color): this(shader, startPos, endPos, coneAngle)
+        public ConeRenderItem(Effect shader, Vector3 startPos, Vector3 endPos, float coneAngleDegrees, Color color): this(shader, startPos, endPos, coneAngleDegrees)
         {
             _colour = color;
         }
 
         private void Init()
         {
-            float halfAngle = MathHelper.ToRadians(_coneAngle / 2);
+            float halfAngle = MathHelper.ToRadians(_coneAngleDegrees / 2);
             Vector3 normal = _endPos - _startPos;
             normal.Normalize();
             float distance = Vector3.Distance(_startPos, _endPos);
             var random = new Random();
-            Vector3 vectorP = new Vector3(RandomUtil.NextFloat(random, -1.0f, 1.0f), RandomUtil.NextFloat(random, -1.0f, 1.0f), RandomUtil.NextFloat(random, -1.0f, 1.0f));
+            Func<Random, float> RandomFloat = random => (float)(2 * random.NextDouble() - 1);
+            Vector3 vectorP = new Vector3(RandomFloat(random), RandomFloat(random), RandomFloat(random));
             vectorP.Normalize();
             
             Vector3 planeVectorP = Vector3.Cross(normal, Vector3.Cross(vectorP, normal));
@@ -70,7 +69,7 @@ namespace View3D.Rendering.RenderItems
             var steps = 20;
             var stepsSize = fullCircle / steps;
 
-            if (!(Math.Abs(_coneAngle - 360.0f) < 0.001f))
+            if (!(Math.Abs(_coneAngleDegrees - 360.0f) < 0.001f))
             {
                 _lastCircle = new VertexPositionColor[steps + 1];
                 _rays = new VertexPositionColor[2 * (steps + 1)];
@@ -85,19 +84,24 @@ namespace View3D.Rendering.RenderItems
                 }
             }
             
-            // Array of {#circleCount} circles of {#steps+1} points each
-            _circles = new VertexPositionColor[circleCount][];
+            _circles = new VertexPositionColor[circleCount * 2 * steps];
             for (int i = 0; i < circleCount; i++)
             {
-                _circles[i] = new VertexPositionColor[steps + 1];
                 float sectorAngle = circleSteps[i];
                 
-                for (int j = 0; j < steps + 1; j++)
+                for (int j = 0; j < steps ; j++)
                 {
                     float angle = stepsSize * j;
                     Vector3 rotatedVector = normal * MathF.Cos(sectorAngle) + planeVectorP * MathF.Sin(sectorAngle) * MathF.Sin(angle) + planeVectorPN * MathF.Cos(angle) * MathF.Sin(sectorAngle);
                     rotatedVector.Normalize();
-                    _circles[i][j] = new VertexPositionColor(_startPos + rotatedVector * distance, _colour);
+                    _circles[i * (2* steps) + 2*j] = new VertexPositionColor(_startPos + rotatedVector * distance, _colour);
+                    _circles[i * (2* steps) + 2*j + 1] = new VertexPositionColor(_startPos + rotatedVector * distance, _colour);
+                }
+                
+                // fix points
+                for (int j = 0; j < steps; j++)
+                {
+                    _circles[i * (2* steps) + 2 * j + 1] = _circles[i * (2* steps) + (2 * j + 2) % (2 * steps)];
                 }
             }
         }
@@ -111,14 +115,11 @@ namespace View3D.Rendering.RenderItems
             foreach (var pass in _shader.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                for (int i = 0; i < _circles.Length; i++)
+                device.DrawUserPrimitives(PrimitiveType.LineList, _circles, 0, _circles.Count()/2);
+                if (!(Math.Abs(_coneAngleDegrees - 360.0f) < 0.001f))
                 {
-                    device.DrawUserPrimitives(PrimitiveType.LineStrip, _circles[i], 0, _circles[i].Count()-1);
-                    if (!(Math.Abs(_coneAngle - 360.0f) < 0.001f))
-                    {
-                        device.DrawUserPrimitives(PrimitiveType.LineStrip, _lastCircle, 0, _lastCircle.Count()-1);
-                        device.DrawUserPrimitives(PrimitiveType.LineList, _rays, 0, _rays.Count()/ 2);
-                    }
+                    device.DrawUserPrimitives(PrimitiveType.LineStrip, _lastCircle, 0, _lastCircle.Count()-1);
+                    device.DrawUserPrimitives(PrimitiveType.LineList, _rays, 0, _rays.Count()/ 2);
                 }
             }
         }

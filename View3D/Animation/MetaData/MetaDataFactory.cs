@@ -1,7 +1,6 @@
 ﻿using CommonControls.Common;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.AnimationPack;
-using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.FileTypes.MetaData;
 using CommonControls.FileTypes.MetaData.Definitions;
 using CommonControls.Services;
@@ -12,10 +11,10 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using SharpDX.Direct2D1.Effects;
 using View3D.Animation.AnimationChange;
 using View3D.Components;
 using View3D.Components.Component;
+using View3D.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.Rendering.RenderItems;
 using View3D.SceneNodes;
@@ -216,7 +215,9 @@ namespace View3D.Animation.MetaData
             node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, "EndPos", splashAttack.EndPosition));
             node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, displayName, textPos));
             
-            node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineSegmentRenderItem(resourceLib.GetEffect(ShaderTypes.Line), splashAttack.StartPosition, splashAttack.EndPosition));
+            var lineRenderer = new LineMeshRender(resourceLib);
+            lineRenderer.AddLine(splashAttack.StartPosition, splashAttack.EndPosition, Color.Red);
+            node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
             
             if (splashAttack.AoeShape == 0) // Cone or Sphere
             {
@@ -234,6 +235,7 @@ namespace View3D.Animation.MetaData
                 }
                 node.AddItem(Components.Rendering.RenderBuckedId.Normal, new CorridorRenderItem(resourceLib.GetStaticEffect(ShaderTypes.Line), splashAttack.StartPosition, splashAttack.EndPosition, splashAttack.WidthForCorridor));
             }
+            
             _root.AddObject(node);
 
             return new DrawableMetaInstance(splashAttack.StartTime, splashAttack.EndTime, node.Name, node);
