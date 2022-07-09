@@ -188,10 +188,13 @@ namespace View3D.Animation.MetaData
         IMetaDataInstance CreateStaticLocator(DecodedMetaEntryBase metaData, Vector3 position, string displayName, float scale = 0.3f)
         {
             var resourceLib = _componentManager.GetComponent<ResourceLibary>();
+            var lineRenderer = new LineMeshRender(resourceLib);
 
             SimpleDrawableNode node = new SimpleDrawableNode(displayName);
-            node.AddItem(Components.Rendering.RenderBuckedId.Line, new CricleRenderItem(resourceLib.GetEffect(ShaderTypes.Line), position, scale));
+            lineRenderer.AddCircle(position, scale, Color.Red);
             node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, displayName, position));
+            
+            node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
             _root.AddObject(node);
 
             return new DrawableMetaInstance(metaData.StartTime, metaData.EndTime, node.Name, node);
@@ -206,23 +209,22 @@ namespace View3D.Animation.MetaData
             }
 
             var resourceLib = _componentManager.GetComponent<ResourceLibary>();
+            var lineRenderer = new LineMeshRender(resourceLib);
             Vector3 textPos = (splashAttack.EndPosition + splashAttack.StartPosition) / 2;
 
             SimpleDrawableNode node = new SimpleDrawableNode(displayName);
-            node.AddItem(Components.Rendering.RenderBuckedId.Line, new LocatorRenderItem(resourceLib.GetEffect(ShaderTypes.Line), splashAttack.StartPosition, scale));
-            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, "StartPos", splashAttack.StartPosition));
-            node.AddItem(Components.Rendering.RenderBuckedId.Line, new LocatorRenderItem(resourceLib.GetEffect(ShaderTypes.Line), splashAttack.EndPosition, scale));
-            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, "EndPos", splashAttack.EndPosition));
-            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, displayName, textPos));
             
-            var lineRenderer = new LineMeshRender(resourceLib);
+            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, "StartPos", splashAttack.StartPosition));
+            lineRenderer.AddLocator(splashAttack.StartPosition, scale, Color.Red);
+            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, "EndPos", splashAttack.EndPosition));
+            lineRenderer.AddLocator(splashAttack.EndPosition, scale, Color.Red);
+            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, displayName, textPos));
             lineRenderer.AddLine(splashAttack.StartPosition, splashAttack.EndPosition, Color.Red);
-            node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
             
             Vector3 normal = splashAttack.EndPosition - splashAttack.StartPosition;  // corresponds to Z
             normal.Normalize();
             var random = new Random();
-            Func<Random, float> RandomFloat = random => (float)(2 * random.NextDouble() - 1);
+            Func<Random, float> RandomFloat = r => (float)(2 * r.NextDouble() - 1);
             Vector3 vectorP = new Vector3(RandomFloat(random), RandomFloat(random), RandomFloat(random));
             vectorP.Normalize();
             
@@ -230,37 +232,34 @@ namespace View3D.Animation.MetaData
             Vector3 planeVectorPN = Vector3.Cross(vectorP, normal); // corresponds to Y
             planeVectorP.Normalize();
             planeVectorPN.Normalize();
-            
-            Vector3 vectorX = new Vector3(1, 0, 0);
-            Vector3 vectorY = new Vector3(0, 1, 0);
-            Vector3 vectorZ = new Vector3(0, 0, 1);
 
-            Matrix rotationM = new Matrix(
-                Vector3.Dot(vectorX, planeVectorP), Vector3.Dot(vectorY, planeVectorP), Vector3.Dot(vectorZ, planeVectorP), 0,
-                Vector3.Dot(vectorX, planeVectorPN), Vector3.Dot(vectorY, planeVectorPN), Vector3.Dot(vectorZ, planeVectorPN), 0,
-                Vector3.Dot(vectorX, normal), Vector3.Dot(vectorY, normal), Vector3.Dot(vectorZ, normal), 0,
-                0, 0, 0, 1
-            );
+            Matrix rotationM = MathUtil.CreateRotation(new []
+            {
+                planeVectorP,
+                planeVectorPN,
+                normal
+            });
             
             if (splashAttack.AoeShape == 0) // Cone or Sphere
             {
-                if (splashAttack.AngleForCone / 2 < 0.1)
+                if (MathUtil.CompareEqualFloats(splashAttack.AngleForCone / 2, tolerance: 0.1f))
                 {
                     throw new ConstraintException($"{displayName}: the half-angle {splashAttack.AngleForCone / 2} of the cone is close to 0");
                 }
                 Matrix transformationM = rotationM * Matrix.CreateScale(distance) * Matrix.CreateTranslation(splashAttack.StartPosition);
-                node.AddItem(Components.Rendering.RenderBuckedId.Normal, new ConeRenderItem(resourceLib.GetStaticEffect(ShaderTypes.Line), splashAttack.StartPosition, splashAttack.EndPosition, transformationM, splashAttack.AngleForCone));
+                lineRenderer.AddConeSplash(splashAttack.StartPosition, splashAttack.EndPosition, transformationM, splashAttack.AngleForCone, Color.Red);
             }
             if (splashAttack.AoeShape == 1) // Corridor
             {
-                if (splashAttack.WidthForCorridor < 0.0001)
+                if (MathUtil.CompareEqualFloats(splashAttack.WidthForCorridor, tolerance: 0.001f))
                 {
                     throw new ConstraintException($"{displayName}: the WidthForCorridor {splashAttack.WidthForCorridor} of the corridor is close to 0");
                 }
                 Matrix transformationM = rotationM * Matrix.CreateScale(splashAttack.WidthForCorridor / 2) * Matrix.CreateTranslation(splashAttack.StartPosition);
-                node.AddItem(Components.Rendering.RenderBuckedId.Normal, new CorridorRenderItem(resourceLib.GetStaticEffect(ShaderTypes.Line), splashAttack.StartPosition, splashAttack.EndPosition, transformationM, splashAttack.WidthForCorridor));
+                lineRenderer.AddCorridorSplash(splashAttack.StartPosition, splashAttack.EndPosition, transformationM, Color.Red);
             }
             
+            node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
             _root.AddObject(node);
 
             return new DrawableMetaInstance(splashAttack.StartTime, splashAttack.EndTime, node.Name, node);
@@ -269,10 +268,13 @@ namespace View3D.Animation.MetaData
         IMetaDataInstance CreateEffect(Effect_v11 effect)
         {
             var resourceLib = _componentManager.GetComponent<ResourceLibary>();
+            var lineRenderer = new LineMeshRender(resourceLib);
         
             SimpleDrawableNode node = new SimpleDrawableNode("Effect:"+ effect.VfxName);
-            node.AddItem(Components.Rendering.RenderBuckedId.Line, new LocatorRenderItem(resourceLib.GetEffect(ShaderTypes.Line), effect.Position, 0.3f));
+            lineRenderer.AddLocator(effect.Position, 0.3f, Color.Red);
             node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, effect.VfxName, effect.Position));
+            
+            node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
             _root.AddObject(node);
         
             var instance = new DrawableMetaInstance(effect.StartTime, effect.EndTime, node.Name, node);
