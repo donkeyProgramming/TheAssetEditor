@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using View3D.Animation.AnimationChange;
 using View3D.Utility;
@@ -12,10 +11,10 @@ namespace View3D.Animation
 {
     public class ExternalAnimationAttachmentResolver
     {
-        public AnimationPlayer ExternalPlayer { get; set; }
-        public int ExternalBoneIndex { get; set; } = -1;
-        public bool HasAnimation { get { return ExternalPlayer != null && ExternalBoneIndex != -1; } }
-        public Matrix Transform { get; set; } = Matrix.Identity;
+        private AnimationPlayer ExternalPlayer { get; set; }
+        private int ExternalBoneIndex { get; set; } = -1;
+        private bool HasAnimation => ExternalPlayer != null && ExternalBoneIndex != -1;
+        private Matrix Transform { get; set; } = Matrix.Identity;
 
         public void UpdateNode(GameTime time)
         {
@@ -27,7 +26,7 @@ namespace View3D.Animation
             {
                 if (time != null)
                     ExternalPlayer.Update(time);
-                Transform = ExternalPlayer._skeleton.GetAnimatedWorldTranform(ExternalBoneIndex);
+                Transform = ExternalPlayer.GameSkeleton.GetAnimatedWorldTranform(ExternalBoneIndex);
             }
         }
     }
@@ -86,9 +85,9 @@ namespace View3D.Animation
     {
         public event FrameChanged OnFrameChanged;
         public AnimationPlayerSettings Settings { get; set; } = new AnimationPlayerSettings();
-        public ExternalAnimationAttachmentResolver ExternalAnimationRef { get; set; } = new ExternalAnimationAttachmentResolver();
+        private ExternalAnimationAttachmentResolver ExternalAnimationRef { get; set; } = new ExternalAnimationAttachmentResolver();
 
-        public GameSkeleton _skeleton;
+        GameSkeleton _skeleton;
         TimeSpanExtension _timeSinceStart;
         AnimationFrame _currentAnimFrame;
         AnimationClip _animationClip;
@@ -101,27 +100,22 @@ namespace View3D.Animation
 
         public List<AnimationChangeRule> AnimationRules { get; set; } = new List<AnimationChangeRule>();
 
-        public int TimeUsToFrame(long timeUs)
+        public GameSkeleton GameSkeleton => _skeleton;
+
+        private int TimeUsToFrame(long timeUs)
         {
             int frame = (int)(timeUs / _animationClip.MicrosecondsPerFrame);
             return MathUtil.EnsureRange(frame, 0, FrameCount() - 1);
         }
         
-        public long FrameToStartTimeUs(int frame)
+        private long FrameToStartTimeUs(int frame)
         {
-            if (_animationClip.MicrosecondsPerFrame <= 0)
-                return 0;
-            return MathUtil.EnsureRange((long) _animationClip.MicrosecondsPerFrame * frame, 0L, GetAnimationLengthUs() - _animationClip.MicrosecondsPerFrame);
+            return _animationClip.MicrosecondsPerFrame <= 0 ? 0 : MathUtil.EnsureRange( _animationClip.MicrosecondsPerFrame * frame, 0L, GetAnimationLengthUs() - _animationClip.MicrosecondsPerFrame);
         }
 
         public int CurrentFrame
         {
-            get 
-            {
-                if (_animationClip == null)
-                    return 0;
-                return TimeUsToFrame(_timeSinceStart.TotalMicrosecondsAsLong);
-            }
+            get => _animationClip == null ? 0 : TimeUsToFrame(_timeSinceStart.TotalMicrosecondsAsLong);
             set
             {
                 if (CurrentFrame == value)
@@ -147,7 +141,7 @@ namespace View3D.Animation
             SetAnimationArray(animation , skeleton);
         }
 
-        public void SetAnimationArray(AnimationClip animation, GameSkeleton skeleton)
+        private void SetAnimationArray(AnimationClip animation, GameSkeleton skeleton)
         {
             if (animation != null)
             {
@@ -172,9 +166,7 @@ namespace View3D.Animation
         
         public long GetAnimationLengthUs()
         {
-            if (_animationClip != null)
-                return _animationClip.PlayTimeUs;
-            return 0;
+            return _animationClip?.PlayTimeUs ?? 0;
         }
 
         public long GetTimeUs()
@@ -182,11 +174,11 @@ namespace View3D.Animation
             return _timeSinceStart.TotalMicrosecondsAsLong;
         }
 
-        public int GetFPS()
+        public int GetFps()
         {
             if (_animationClip == null)
                 return 0;
-            var fps = (_animationClip.DynamicFrames.Count / _animationClip.PlayTimeInSec);
+            var fps = _animationClip.DynamicFrames.Count / _animationClip.PlayTimeInSec;
             return (int)fps;
         }
 
@@ -209,8 +201,7 @@ namespace View3D.Animation
                     }
                 }
 
-                if (ExternalAnimationRef != null)
-                    ExternalAnimationRef.UpdateNode(gameTime);
+                ExternalAnimationRef?.UpdateNode(gameTime);
 
                 OnFrameChanged?.Invoke(CurrentFrame);
             }
@@ -233,8 +224,7 @@ namespace View3D.Animation
                 if (animationLengthUs != 0)
                     sampleT = (float) _timeSinceStart.TotalMicrosecondsAsLong / animationLengthUs;
                 _currentAnimFrame = AnimationSampler.Sample(sampleT, _skeleton, _animationClip, AnimationRules);
-                if (_skeleton != null)
-                    _skeleton.Update();
+                _skeleton?.Update();
             }
             catch
             {
@@ -251,9 +241,7 @@ namespace View3D.Animation
             IsPlaying = false;
             _currentAnimFrame = null;
             IsEnabled = false;
-
-            if (_skeleton != null)
-                _skeleton.Update();
+            _skeleton?.Update();
         }
 
         public void Play(bool value) { IsPlaying = value;  }
@@ -264,31 +252,25 @@ namespace View3D.Animation
         }
 
         public int FrameCount()
-         {
-            if (_animationClip != null)
-                return _animationClip.DynamicFrames.Count();
-            return 0;
+        {
+            return _animationClip != null ? _animationClip.DynamicFrames.Count() : 0;
         }
-
-
-
-
 
         //-------------Move to somewhere else
         /*
         void OffsetAnimation(AnimationFrame currentFrame)
         {
             var translationMatrix = Matrix.Identity;
-            var roationMatrix = Matrix.Identity;
+            var rotationMatrix = Matrix.Identity;
 
             if (Settings.UseTranslationOffset)
                 translationMatrix = Matrix.CreateTranslation(new Vector3(Settings.TranslationOffsetX, Settings.TranslationOffsetY, Settings.TranslationOffsetZ));
 
             if (Settings.UseRotationOffset)
-                roationMatrix = Matrix.CreateRotationX(MathHelper.ToRadians(Settings.RotationOffsetX)) * Matrix.CreateRotationY(MathHelper.ToRadians(Settings.RotationOffsetY)) * Matrix.CreateRotationZ(MathHelper.ToRadians(Settings.RotationOffsetZ));
+                rotationMatrix = Matrix.CreateRotationX(MathHelper.ToRadians(Settings.RotationOffsetX)) * Matrix.CreateRotationY(MathHelper.ToRadians(Settings.RotationOffsetY)) * Matrix.CreateRotationZ(MathHelper.ToRadians(Settings.RotationOffsetZ));
 
             var matrix = currentFrame.BoneTransforms[0].WorldTransform;
-            matrix = roationMatrix * translationMatrix * matrix;
+            matrix = rotationMatrix * translationMatrix * matrix;
             currentFrame.BoneTransforms[0].WorldTransform = matrix;
         }
 
@@ -305,7 +287,7 @@ namespace View3D.Animation
         {
             if (Settings.FreezeAnimationRoot)
             {
-                Vector3 rootOfset = new Vector3(0);
+                Vector3 rootOffset = new Vector3(0);
                 Vector3 animRootOffset = new Vector3(0);
                 foreach (var boneTransform in currentFrame.BoneTransforms)
                 {
@@ -322,7 +304,7 @@ namespace View3D.Animation
                         if (boneTransform.BoneIndex == 7)
                         {
                             var matrix = boneTransform.WorldTransform;
-                            rootOfset += boneTransform.WorldTransform.Translation;
+                            rootOffset += boneTransform.WorldTransform.Translation;
                             matrix.Translation = new Vector3(0, 0, 0);
                             boneTransform.WorldTransform = Matrix.Identity;
                         }
@@ -335,7 +317,7 @@ namespace View3D.Animation
                     if (boneTransform.ParentBoneIndex == 0 && test)
                     {
                         var matrix = boneTransform.WorldTransform;
-                        matrix.Translation -= rootOfset;
+                        matrix.Translation -= rootOffset;
                         boneTransform.WorldTransform = Matrix.Identity;
                     }
                 }

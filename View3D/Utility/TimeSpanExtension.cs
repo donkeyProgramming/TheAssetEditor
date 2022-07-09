@@ -19,12 +19,9 @@ namespace View3D.Utility
             TimeSpan = timeSpan;
         }
         
-        public int Microseconds
-        {
-            get { return (int)((TimeSpan.Ticks / TicksPerMicrosecond) % 1000); }
-        }
-        
-        
+        public int Microseconds => (int)((TimeSpan.Ticks / TicksPerMicrosecond) % 1000);
+
+
         // Returns the total number of Microseconds rounded to the nearest whole number
         public long TotalMicrosecondsAsLong
         {

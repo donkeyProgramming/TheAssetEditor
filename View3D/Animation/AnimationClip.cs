@@ -39,11 +39,8 @@ namespace View3D.Animation
 
         public List<KeyFrame> DynamicFrames = new List<KeyFrame>();
         
-        public long PlayTimeUs
-        {
-            get { return _playTimeUs; }
-        }
-        
+        public long PlayTimeUs => _playTimeUs;
+
         public long MicrosecondsPerFrame
         {
             get
@@ -58,10 +55,7 @@ namespace View3D.Animation
 
         public float PlayTimeInSec
         {
-            get
-            {
-                return (float) _playTimeUs / MicrosecondsPerSecond;
-            }
+            get => (float) _playTimeUs / MicrosecondsPerSecond;
             set
             {
                 if (DynamicFrames.Count == 0)
@@ -69,7 +63,7 @@ namespace View3D.Animation
                     throw new ArgumentException("Trying to set Play time when DynamicFrames is empty");
                 }
 
-                // make sure we have whole number of microsec per frame
+                // make sure we have whole number of microsecond per frame
                 long framePlayTimeUs = (long) Math.Ceiling(value / DynamicFrames.Count * MicrosecondsPerSecond);
                 _playTimeUs = framePlayTimeUs * DynamicFrames.Count;
             }
@@ -206,8 +200,10 @@ namespace View3D.Animation
 
         public AnimationClip Clone()
         {
-            AnimationClip copy = new AnimationClip();
-            copy.PlayTimeInSec = PlayTimeInSec;
+            AnimationClip copy = new AnimationClip
+            {
+                PlayTimeInSec = PlayTimeInSec
+            };
 
             foreach (var item in DynamicFrames)
                 copy.DynamicFrames.Add(item.Clone());

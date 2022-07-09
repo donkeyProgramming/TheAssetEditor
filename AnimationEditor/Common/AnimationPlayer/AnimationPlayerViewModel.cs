@@ -117,7 +117,7 @@ namespace AnimationEditor.Common.AnimationPlayer
             SelectedAnimationCurrentFrame = currentFrame;
             SelectedAnimationCurrentTime = (float) SelectedMainAnimation.Asset.Player.GetTimeUs() / 1_000_000;
             SelectedAnimationMaxTime = (float) SelectedMainAnimation.Asset.Player.GetAnimationLengthUs() / 1_000_000;
-            SelectedAnimationFps = SelectedMainAnimation.Asset.Player.GetFPS();
+            SelectedAnimationFps = SelectedMainAnimation.Asset.Player.GetFps();
             if (SelectedAnimationCurrentFrame == SelectedMainAnimation.Asset.Player.FrameCount())
             {
                 if (LoopAnimation)
