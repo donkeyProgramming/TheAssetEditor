@@ -35,7 +35,7 @@ namespace View3D.Utility
                 // if (temp < MinMicroSeconds)
                 //     throw new OverflowException("");
 
-                return TimeSpan.Ticks / TicksPerMicrosecond + (long) Math.Round(TimeSpan.Ticks % 10d);
+                return TimeSpan.Ticks / TicksPerMicrosecond + (long) Math.Round(TimeSpan.Ticks % TicksPerMicrosecond / (float) TicksPerMicrosecond);
             }
         }
         
