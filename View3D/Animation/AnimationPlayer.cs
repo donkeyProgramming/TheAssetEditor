@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using View3D.Animation.AnimationChange;
+using View3D.Utility;
 
 namespace View3D.Animation
 {
@@ -88,7 +89,7 @@ namespace View3D.Animation
         public ExternalAnimationAttachmentResolver ExternalAnimationRef { get; set; } = new ExternalAnimationAttachmentResolver();
 
         public GameSkeleton _skeleton;
-        TimeSpan _timeSinceStart;
+        TimeSpanExtension _timeSinceStart;
         AnimationFrame _currentAnimFrame;
         AnimationClip _animationClip;
 
@@ -100,19 +101,17 @@ namespace View3D.Animation
 
         public List<AnimationChangeRule> AnimationRules { get; set; } = new List<AnimationChangeRule>();
 
-        public static int TimeMsToFrame(double timeMs, double totalTimeMs, int frameCount)
+        public int TimeUsToFrame(long timeUs)
         {
-            double timeRatio = timeMs / totalTimeMs;
-            return MathUtil.EnsureRange((int)Math.Floor(timeRatio * frameCount), 0, frameCount - 1);
+            int frame = (int)(timeUs / _animationClip.MicrosecondsPerFrame);
+            return MathUtil.EnsureRange(frame, 0, FrameCount() - 1);
         }
         
-        public static double frameToStartTimeMs(int frame, int frameCount,  double totalTimeMs, double offsetMs=1E-3)
+        public long FrameToStartTimeUs(int frame)
         {
-            double frameDurationMs = totalTimeMs / frameCount;
-            if (double.IsNaN(frameDurationMs))
+            if (_animationClip.MicrosecondsPerFrame <= 0)
                 return 0;
-            // adding a tiny offset to avoid the edge case in TimeMsToFrame method
-            return MathUtil.EnsureRange(frameDurationMs * frame + offsetMs, 0.0d, totalTimeMs - frameDurationMs + offsetMs);
+            return MathUtil.EnsureRange((long) _animationClip.MicrosecondsPerFrame * frame, 0L, GetAnimationLengthUs() - _animationClip.MicrosecondsPerFrame);
         }
 
         public int CurrentFrame
@@ -121,7 +120,7 @@ namespace View3D.Animation
             {
                 if (_animationClip == null)
                     return 0;
-                return TimeMsToFrame(_timeSinceStart.TotalMilliseconds, GetAnimationLengthMs(), FrameCount());
+                return TimeUsToFrame(_timeSinceStart.TotalMicrosecondsAsLong);
             }
             set
             {
@@ -131,8 +130,8 @@ namespace View3D.Animation
                 if (_animationClip != null)
                 {
                     int frameIndex = MathUtil.EnsureRange(value, 0, FrameCount() -1);
-                    double timeInMs = frameToStartTimeMs(frameIndex, FrameCount(), GetAnimationLengthMs());
-                    _timeSinceStart = TimeSpan.FromMilliseconds(timeInMs);
+                    long timeInUs = FrameToStartTimeUs(frameIndex);
+                    _timeSinceStart = TimeSpanExtension.FromMicroseconds(timeInUs);
                     OnFrameChanged?.Invoke(CurrentFrame);
                 }
                 else
@@ -160,20 +159,27 @@ namespace View3D.Animation
             AnimationRules.Clear();
             _skeleton = skeleton;
             _animationClip = animation;
-            _timeSinceStart = TimeSpan.FromSeconds(0);
+            _timeSinceStart = new TimeSpanExtension();
             Refresh();
         }
 
-        public float GetAnimationLengthMs()
+        // public long GetAnimationLengthMs()
+        // {
+        //     if (_animationClip != null)
+        //         return _animationClip.PlayTimeUs / 1000;
+        //     return 0;
+        // }
+        
+        public long GetAnimationLengthUs()
         {
             if (_animationClip != null)
-                return _animationClip.PlayTimeInSec * 1000;
+                return _animationClip.PlayTimeUs;
             return 0;
         }
 
-        public float GetTimeInMs()
+        public long GetTimeUs()
         {
-            return (float)_timeSinceStart.TotalMilliseconds;
+            return _timeSinceStart.TotalMicrosecondsAsLong;
         }
 
         public int GetFPS()
@@ -186,19 +192,19 @@ namespace View3D.Animation
 
         public void Update(GameTime gameTime)
         {
-            float animationLengthMs = GetAnimationLengthMs();
-            if (animationLengthMs != 0 && IsPlaying && IsEnabled)
+            long animationLengthUs = GetAnimationLengthUs();
+            if (animationLengthUs != 0 && IsPlaying && IsEnabled)
             {
-                _timeSinceStart += gameTime.ElapsedGameTime;
-                if (_timeSinceStart.TotalMilliseconds >= animationLengthMs)
+                _timeSinceStart.TimeSpan += gameTime.ElapsedGameTime;
+                if (_timeSinceStart.TotalMicrosecondsAsLong >= animationLengthUs)
                 {
                     if (LoopAnimation)
                     {
-                        _timeSinceStart = TimeSpan.FromSeconds(0);
+                        _timeSinceStart = new TimeSpanExtension();
                     }
                     else
                     {
-                        _timeSinceStart = TimeSpan.FromMilliseconds(animationLengthMs);
+                        _timeSinceStart = TimeSpanExtension.FromMicroseconds(animationLengthUs);
                         IsPlaying = false;
                     }
                 }
@@ -223,9 +229,9 @@ namespace View3D.Animation
                 }
                 //Fix this so if crash no break
                 float sampleT = 0;
-                float animationLengthMs = GetAnimationLengthMs();
-                if (animationLengthMs != 0)
-                    sampleT = (float)(_timeSinceStart.TotalMilliseconds / animationLengthMs);
+                long animationLengthUs = GetAnimationLengthUs();
+                if (animationLengthUs != 0)
+                    sampleT = (float) _timeSinceStart.TotalMicrosecondsAsLong / animationLengthUs;
                 _currentAnimFrame = AnimationSampler.Sample(sampleT, _skeleton, _animationClip, AnimationRules);
                 if (_skeleton != null)
                     _skeleton.Update();
