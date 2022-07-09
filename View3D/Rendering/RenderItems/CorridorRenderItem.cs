@@ -13,6 +13,7 @@ namespace View3D.Rendering.RenderItems
         Effect _shader;
         Vector3 _startPos;
         Vector3 _endPos;
+        Matrix _transformationM;
         private float _width;
         Color _colour = Color.Red;
         private float _halfWidth;
@@ -23,16 +24,17 @@ namespace View3D.Rendering.RenderItems
 
         public Matrix ModelMatrix { get; set; } = Matrix.Identity;
 
-        public CorridorRenderItem(Effect shader, Vector3 startPos, Vector3 endPos, float width)
+        public CorridorRenderItem(Effect shader, Vector3 startPos, Vector3 endPos, Matrix transformationM,  float width)
         {
             _shader = shader;
             _startPos = startPos;
             _endPos = endPos;
             _width = width;
+            _transformationM = transformationM;
             Init();
         }
 
-        public CorridorRenderItem(Effect shader, Vector3 startPos, Vector3 endPos, float width, Color color) : this(shader, startPos, endPos, width)
+        public CorridorRenderItem(Effect shader, Vector3 startPos, Vector3 endPos, Matrix transformationM, float width, Color color) : this(shader, startPos, endPos, transformationM, width)
         {
             _colour = color;
         }
@@ -40,17 +42,8 @@ namespace View3D.Rendering.RenderItems
         private void Init()
         {
             _halfWidth = _width / 2;
-            Vector3 normal = _endPos - _startPos;
-            normal.Normalize();
-            var random = new Random();
-            Func<Random, float> RandomFloat = random => (float)(2 * random.NextDouble() - 1);
-            Vector3 vectorP = new Vector3(RandomFloat(random), RandomFloat(random), RandomFloat(random));
-            vectorP.Normalize();            
-            Vector3 _planeVectorP = Vector3.Cross(normal, Vector3.Cross(vectorP, normal));
-            Vector3 _planeVectorPN = Vector3.Cross(vectorP, normal);
-            _planeVectorP.Normalize();
-            _planeVectorPN.Normalize();
-            
+            Vector3 diffVector = _endPos - _startPos;
+
             var fullCircle = 2 * MathF.PI;
             var steps = 30;
             var stepsSize = fullCircle / steps;
@@ -62,10 +55,9 @@ namespace View3D.Rendering.RenderItems
             for (int i = 0; i < steps + 1; i++)
             {
                 float angle = stepsSize * i;
-                Vector3 rotatedVector = _planeVectorP * MathF.Cos(angle) + _planeVectorPN * MathF.Sin(angle);
-                rotatedVector.Normalize();
-                _startCircleVertecies[i] = new VertexPositionColor(_startPos + rotatedVector * _halfWidth, _colour);
-                _endCircleVertecies[i] = new VertexPositionColor(_endPos + rotatedVector * _halfWidth, _colour);
+                Vector3 trandformedVector = Vector3.Transform(new Vector3(MathF.Cos(angle), MathF.Sin(angle), 0), _transformationM);
+                _startCircleVertecies[i] = new VertexPositionColor(trandformedVector, _colour);
+                _endCircleVertecies[i] = new VertexPositionColor(diffVector + trandformedVector, _colour);
                 _connectionCircleVertecies[2*i] = new VertexPositionColor(_startCircleVertecies[i].Position, _colour);
                 _connectionCircleVertecies[2*i+1] = new VertexPositionColor(_endCircleVertecies[i].Position, _colour);
                 _edgesVertecies[4*i] = new VertexPositionColor(_startPos, _colour);

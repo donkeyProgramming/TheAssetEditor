@@ -16,6 +16,7 @@ namespace View3D.Rendering.RenderItems
         Effect _shader;
         Vector3 _startPos;
         Vector3 _endPos;
+        Matrix _transformationM;
         private float _coneAngleDegrees;
         Color _colour = Color.Red;
         private VertexPositionColor[] _circles; // Array of {#circleCount} circles X {#steps} points each X 2 (to draw it with 1 device.DrawUserPrimitives call using PrimitiveType.LineList)
@@ -24,16 +25,17 @@ namespace View3D.Rendering.RenderItems
 
         public Matrix ModelMatrix { get; set; } = Matrix.Identity;
 
-        public ConeRenderItem(Effect shader, Vector3 startPos, Vector3 endPos, float coneAngleDegrees)
+        public ConeRenderItem(Effect shader, Vector3 startPos, Vector3 endPos, Matrix transformationM, float coneAngleDegrees)
         {
             _shader = shader;
             _startPos = startPos;
             _endPos = endPos;
+            _transformationM = transformationM;
             _coneAngleDegrees = coneAngleDegrees;
             Init();
         }
 
-        public ConeRenderItem(Effect shader, Vector3 startPos, Vector3 endPos, float coneAngleDegrees, Color color): this(shader, startPos, endPos, coneAngleDegrees)
+        public ConeRenderItem(Effect shader, Vector3 startPos, Vector3 endPos, Matrix transformationM, float coneAngleDegrees, Color color): this(shader, startPos, endPos, transformationM, coneAngleDegrees)
         {
             _colour = color;
         }
@@ -41,18 +43,6 @@ namespace View3D.Rendering.RenderItems
         private void Init()
         {
             float halfAngle = MathHelper.ToRadians(_coneAngleDegrees / 2);
-            Vector3 normal = _endPos - _startPos;
-            normal.Normalize();
-            float distance = Vector3.Distance(_startPos, _endPos);
-            var random = new Random();
-            Func<Random, float> RandomFloat = random => (float)(2 * random.NextDouble() - 1);
-            Vector3 vectorP = new Vector3(RandomFloat(random), RandomFloat(random), RandomFloat(random));
-            vectorP.Normalize();
-            
-            Vector3 planeVectorP = Vector3.Cross(normal, Vector3.Cross(vectorP, normal));
-            Vector3 planeVectorPN = Vector3.Cross(vectorP, normal);
-            planeVectorP.Normalize();
-            planeVectorPN.Normalize();
 
             var circleSteps = new List<float>();
             var angleStep = MathF.PI / 60;
@@ -76,9 +66,9 @@ namespace View3D.Rendering.RenderItems
                 for (int j = 0; j < steps + 1; j++)
                 {
                     float angle = stepsSize * j;
-                    Vector3 rotatedVector = normal * MathF.Cos(halfAngle) + planeVectorP * MathF.Sin(halfAngle) * MathF.Sin(angle) + planeVectorPN * MathF.Cos(angle) * MathF.Sin(halfAngle);
-                    rotatedVector.Normalize();
-                    _lastCircle[j] = new VertexPositionColor(_startPos + rotatedVector * distance, _colour);
+                    Vector3 circleVector = new Vector3( MathF.Sin(angle) * MathF.Sin(halfAngle), MathF.Cos(angle) * MathF.Sin(halfAngle), MathF.Cos(halfAngle));
+                    Vector3 trandformedVector = Vector3.Transform(circleVector, _transformationM);
+                    _lastCircle[j] = new VertexPositionColor(trandformedVector, _colour);
                     _rays[2*j] = new VertexPositionColor(_startPos, _colour);
                     _rays[2*j+1] = new VertexPositionColor(_lastCircle[j].Position, _colour);
                 }
@@ -92,10 +82,10 @@ namespace View3D.Rendering.RenderItems
                 for (int j = 0; j < steps ; j++)
                 {
                     float angle = stepsSize * j;
-                    Vector3 rotatedVector = normal * MathF.Cos(sectorAngle) + planeVectorP * MathF.Sin(sectorAngle) * MathF.Sin(angle) + planeVectorPN * MathF.Cos(angle) * MathF.Sin(sectorAngle);
-                    rotatedVector.Normalize();
-                    _circles[i * (2* steps) + 2*j] = new VertexPositionColor(_startPos + rotatedVector * distance, _colour);
-                    _circles[i * (2* steps) + 2*j + 1] = new VertexPositionColor(_startPos + rotatedVector * distance, _colour);
+                    Vector3 circleVector = new Vector3( MathF.Sin(angle) * MathF.Sin(sectorAngle), MathF.Cos(angle) * MathF.Sin(sectorAngle), MathF.Cos(sectorAngle));
+                    Vector3 trandformedVector = Vector3.Transform(circleVector, _transformationM);
+                    _circles[i * (2* steps) + 2*j] = new VertexPositionColor(trandformedVector, _colour);
+                    _circles[i * (2* steps) + 2*j + 1] = new VertexPositionColor(trandformedVector, _colour);
                 }
                 
                 // fix points

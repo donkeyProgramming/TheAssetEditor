@@ -219,13 +219,37 @@ namespace View3D.Animation.MetaData
             lineRenderer.AddLine(splashAttack.StartPosition, splashAttack.EndPosition, Color.Red);
             node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
             
+            Vector3 normal = splashAttack.EndPosition - splashAttack.StartPosition;  // corresponds to Z
+            normal.Normalize();
+            var random = new Random();
+            Func<Random, float> RandomFloat = random => (float)(2 * random.NextDouble() - 1);
+            Vector3 vectorP = new Vector3(RandomFloat(random), RandomFloat(random), RandomFloat(random));
+            vectorP.Normalize();
+            
+            Vector3 planeVectorP = Vector3.Cross(normal, Vector3.Cross(vectorP, normal)); // corresponds to X
+            Vector3 planeVectorPN = Vector3.Cross(vectorP, normal); // corresponds to Y
+            planeVectorP.Normalize();
+            planeVectorPN.Normalize();
+            
+            Vector3 vectorX = new Vector3(1, 0, 0);
+            Vector3 vectorY = new Vector3(0, 1, 0);
+            Vector3 vectorZ = new Vector3(0, 0, 1);
+
+            Matrix rotationM = new Matrix(
+                Vector3.Dot(vectorX, planeVectorP), Vector3.Dot(vectorY, planeVectorP), Vector3.Dot(vectorZ, planeVectorP), 0,
+                Vector3.Dot(vectorX, planeVectorPN), Vector3.Dot(vectorY, planeVectorPN), Vector3.Dot(vectorZ, planeVectorPN), 0,
+                Vector3.Dot(vectorX, normal), Vector3.Dot(vectorY, normal), Vector3.Dot(vectorZ, normal), 0,
+                0, 0, 0, 1
+            );
+            
             if (splashAttack.AoeShape == 0) // Cone or Sphere
             {
                 if (splashAttack.AngleForCone / 2 < 0.1)
                 {
                     throw new ConstraintException($"{displayName}: the half-angle {splashAttack.AngleForCone / 2} of the cone is close to 0");
                 }
-                node.AddItem(Components.Rendering.RenderBuckedId.Normal, new ConeRenderItem(resourceLib.GetStaticEffect(ShaderTypes.Line), splashAttack.StartPosition, splashAttack.EndPosition, splashAttack.AngleForCone));
+                Matrix transformationM = rotationM * Matrix.CreateScale(distance) * Matrix.CreateTranslation(splashAttack.StartPosition);
+                node.AddItem(Components.Rendering.RenderBuckedId.Normal, new ConeRenderItem(resourceLib.GetStaticEffect(ShaderTypes.Line), splashAttack.StartPosition, splashAttack.EndPosition, transformationM, splashAttack.AngleForCone));
             }
             if (splashAttack.AoeShape == 1) // Corridor
             {
@@ -233,7 +257,8 @@ namespace View3D.Animation.MetaData
                 {
                     throw new ConstraintException($"{displayName}: the WidthForCorridor {splashAttack.WidthForCorridor} of the corridor is close to 0");
                 }
-                node.AddItem(Components.Rendering.RenderBuckedId.Normal, new CorridorRenderItem(resourceLib.GetStaticEffect(ShaderTypes.Line), splashAttack.StartPosition, splashAttack.EndPosition, splashAttack.WidthForCorridor));
+                Matrix transformationM = rotationM * Matrix.CreateScale(splashAttack.WidthForCorridor / 2) * Matrix.CreateTranslation(splashAttack.StartPosition);
+                node.AddItem(Components.Rendering.RenderBuckedId.Normal, new CorridorRenderItem(resourceLib.GetStaticEffect(ShaderTypes.Line), splashAttack.StartPosition, splashAttack.EndPosition, transformationM, splashAttack.WidthForCorridor));
             }
             
             _root.AddObject(node);
