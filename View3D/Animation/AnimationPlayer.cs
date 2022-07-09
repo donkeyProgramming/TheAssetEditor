@@ -100,39 +100,45 @@ namespace View3D.Animation
 
         public List<AnimationChangeRule> AnimationRules { get; set; } = new List<AnimationChangeRule>();
 
+        public static int TimeMsToFrame(double timeMs, double totalTimeMs, int frameCount)
+        {
+            double timeRatio = timeMs / totalTimeMs;
+            return MathUtil.EnsureRange((int)Math.Floor(timeRatio * frameCount), 0, frameCount - 1);
+        }
+        
+        public static double frameToStartTimeMs(int frame, int frameCount,  double totalTimeMs, double offsetMs=1E-3)
+        {
+            double frameDurationMs = totalTimeMs / frameCount;
+            if (double.IsNaN(frameDurationMs))
+                return 0;
+            // adding a tiny offset to avoid the edge case in TimeMsToFrame method
+            return MathUtil.EnsureRange(frameDurationMs * frame + offsetMs, 0.0d, totalTimeMs - frameDurationMs + offsetMs);
+        }
+
         public int CurrentFrame
         {
             get 
             {
                 if (_animationClip == null)
                     return 0;
-                var frame = (int)Math.Round((_timeSinceStart.TotalMilliseconds / GetAnimationLengthMs()) * (_animationClip.DynamicFrames.Count() - 1));
-                return frame;
+                return TimeMsToFrame(_timeSinceStart.TotalMilliseconds, GetAnimationLengthMs(), FrameCount());
             }
             set
             {
-          
                 if (CurrentFrame == value)
                     return;
 
                 if (_animationClip != null)
                 {
-                    var frameCount = FrameCount();
-                    var frameIndex = MathUtil.EnsureRange(value, 0, frameCount);
-
-                    var framePercentage = (frameIndex / ((float)frameCount)) * GetAnimationLengthMs();
-                    if (float.IsNaN(framePercentage))
-                        framePercentage = 0;
-                    _timeSinceStart = TimeSpan.FromMilliseconds(framePercentage);
-                 
-                    var currentFrame = CurrentFrame;
-                    OnFrameChanged?.Invoke(currentFrame);
+                    int frameIndex = MathUtil.EnsureRange(value, 0, FrameCount() -1);
+                    double timeInMs = frameToStartTimeMs(frameIndex, FrameCount(), GetAnimationLengthMs());
+                    _timeSinceStart = TimeSpan.FromMilliseconds(timeInMs);
+                    OnFrameChanged?.Invoke(CurrentFrame);
                 }
                 else
                 {
                     OnFrameChanged?.Invoke(0);
                 }
-
                 Refresh();
             }
         }

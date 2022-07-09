@@ -7,6 +7,15 @@ namespace CommonControls.Common
 {
     public class MathUtil
     {
+        public static double EnsureRange(double value, double min, double max)
+        {
+            if (value > max)
+                return max;
+            else if (value < min)
+                return min;
+            return value;
+        }
+        
         public static float EnsureRange(float value, float min, float max)
         {
             if (value > max)
