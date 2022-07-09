@@ -10,17 +10,17 @@ namespace View3D.Rendering
 {
     public class LineMeshRender : IDisposable
     {
-        Effect _shader;
-        List<VertexPositionColor> _originalVertecies = new List<VertexPositionColor>();
+        private Effect _shader;
+        private List<VertexPositionColor> _originalVertices = new List<VertexPositionColor>();
 
-        public LineMeshRender(ResourceLibary resourceLibary)
+        public LineMeshRender(ResourceLibary resourceLibrary)
         {
-            _shader = resourceLibary.GetStaticEffect(ShaderTypes.Line);
+            _shader = resourceLibrary.GetStaticEffect(ShaderTypes.Line);
         }
 
         public void Clear()
         {
-            _originalVertecies = new List<VertexPositionColor>();
+            _originalVertices = new List<VertexPositionColor>();
         }
 
         public void CreateLineList(List<(Vector3, Vector3)> lines)
@@ -61,22 +61,22 @@ namespace View3D.Rendering
 
         public void AddLine(Vector3 pointA, Vector3 pointB)
         {
-            _originalVertecies.Add(new VertexPositionColor(pointA, Color.Black));
-            _originalVertecies.Add(new VertexPositionColor(pointB, Color.Black));
+            _originalVertices.Add(new VertexPositionColor(pointA, Color.Black));
+            _originalVertices.Add(new VertexPositionColor(pointB, Color.Black));
         }
 
         public void AddLine(Vector3 pointA, Vector3 pointB, Color color)
         {
-            _originalVertecies.Add(new VertexPositionColor(pointA, color));
-            _originalVertecies.Add(new VertexPositionColor(pointB, color));
+            _originalVertices.Add(new VertexPositionColor(pointA, color));
+            _originalVertices.Add(new VertexPositionColor(pointB, color));
         }
 
         public void CreateGrid()
         {
-            int lineCount = 10;
-            float spacing = 1;
-            float length = 10;
-            float offset = (lineCount * spacing) / 2;
+            const int lineCount = 10;
+            const float spacing = 1;
+            const float length = 10;
+            const float offset = (lineCount * spacing) / 2;
 
             var list = new List<(Vector3, Vector3)>();
             for (int i = 0; i <= lineCount; i++)
@@ -116,15 +116,15 @@ namespace View3D.Rendering
         
         public void AddLocator(Vector3 pos, float size, Color color)
         {
-            var vertecies = new VertexPositionColor[6];
+            var vertices = new VertexPositionColor[6];
             var halfLength = size / 2;
-            vertecies[0] = new VertexPositionColor(pos + new Vector3(-halfLength, 0, 0), color);
-            vertecies[1] = new VertexPositionColor(pos + new Vector3(halfLength, 0, 0), color);
-            vertecies[2] = new VertexPositionColor(pos + new Vector3(0, -halfLength, 0), color);
-            vertecies[3] = new VertexPositionColor(pos + new Vector3(0, halfLength, 0), color);
-            vertecies[4] = new VertexPositionColor(pos + new Vector3(0, 0, -halfLength), color);
-            vertecies[5] = new VertexPositionColor(pos + new Vector3(0, 0, halfLength), color);
-            _originalVertecies.AddRange(vertecies);
+            vertices[0] = new VertexPositionColor(pos + new Vector3(-halfLength, 0, 0), color);
+            vertices[1] = new VertexPositionColor(pos + new Vector3(halfLength, 0, 0), color);
+            vertices[2] = new VertexPositionColor(pos + new Vector3(0, -halfLength, 0), color);
+            vertices[3] = new VertexPositionColor(pos + new Vector3(0, halfLength, 0), color);
+            vertices[4] = new VertexPositionColor(pos + new Vector3(0, 0, -halfLength), color);
+            vertices[5] = new VertexPositionColor(pos + new Vector3(0, 0, halfLength), color);
+            _originalVertices.AddRange(vertices);
         }
         
         private IEnumerable<(int, float, float)> CircleAnglesGenerator(int steps = 20)
@@ -170,24 +170,24 @@ namespace View3D.Rendering
         
         public void AddCircle(Vector3 pos, float size, Color color)
         {
-            var steps = 20;
-            var vertecies = new VertexPositionColor[2* (steps+1)];
+            const int steps = 20;
+            var vertices = new VertexPositionColor[2* (steps+1)];
 
             // TODO: implement using matrix and CreateCircle
             foreach (var (i, cos, sin) in CircleAnglesGenerator())
             {
                 var x = pos.X + size * cos;
                 var z = pos.Z + size * sin;
-                vertecies[2*i] = new VertexPositionColor(new Vector3(x, pos.Y, z), color);
-                vertecies[2*i + 1] = vertecies[2*i];
+                vertices[2*i] = new VertexPositionColor(new Vector3(x, pos.Y, z), color);
+                vertices[2*i + 1] = vertices[2*i];
             }
             
             // fix points
             for (int i = 0; i < steps; i++)
             {
-                vertecies[2*i + 1] = vertecies[2*i + 2];
+                vertices[2*i + 1] = vertices[2*i + 2];
             }
-            _originalVertecies.AddRange(vertecies);
+            _originalVertices.AddRange(vertices);
         }
 
         public void AddCorridorSplash(Vector3 startPos, Vector3 endPos, Matrix transformationM, Color color, int steps = 30)
@@ -208,10 +208,10 @@ namespace View3D.Rendering
                 edgesVertices[4*i+2] = new VertexPositionColor(endPos, color);
                 edgesVertices[4*i+3] = new VertexPositionColor(endCircleVertices[2*i].Position, color);
             }
-            _originalVertecies.AddRange(startCircleVertices);
-            _originalVertecies.AddRange(endCircleVertices);
-            _originalVertecies.AddRange(connectionCircleVertices);
-            _originalVertecies.AddRange(edgesVertices);
+            _originalVertices.AddRange(startCircleVertices);
+            _originalVertices.AddRange(endCircleVertices);
+            _originalVertices.AddRange(connectionCircleVertices);
+            _originalVertices.AddRange(edgesVertices);
         }
         
         public void AddConeSplash(Vector3 startPos, Vector3 endPos, Matrix transformationM, float coneAngleDegrees, Color color, int steps = 30, int angleSteps=60)
@@ -236,8 +236,8 @@ namespace View3D.Rendering
                     rays[2*j] = new VertexPositionColor(startPos, color);
                     rays[2*j+1] = new VertexPositionColor(lastCircle[2*j].Position, color);
                 }
-                _originalVertecies.AddRange(lastCircle);
-                _originalVertecies.AddRange(rays);
+                _originalVertices.AddRange(lastCircle);
+                _originalVertices.AddRange(rays);
             }
 
             int coneCircleSize = 2 * (steps + 1);
@@ -254,12 +254,12 @@ namespace View3D.Rendering
             }
             Vector3.Transform(circlesVectors, ref transformationM, circlesVectors);
             var circles = circlesVectors.Select(v => new VertexPositionColor(v, color)).ToArray();
-            _originalVertecies.AddRange(circles);
+            _originalVertices.AddRange(circles);
         }
 
         public void Render(GraphicsDevice device, CommonShaderParameters commonShaderParameters, Matrix modelMatrix)
         {
-            if (_originalVertecies.Count() != 0)
+            if (_originalVertices.Count() != 0)
             {
                 _shader.Parameters["View"].SetValue(commonShaderParameters.View);
                 _shader.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
@@ -268,7 +268,7 @@ namespace View3D.Rendering
                 foreach (var pass in _shader.CurrentTechnique.Passes)
                 {
                     pass.Apply();
-                    device.DrawUserPrimitives(PrimitiveType.LineList, _originalVertecies.ToArray(), 0, _originalVertecies.Count() / 2);
+                    device.DrawUserPrimitives(PrimitiveType.LineList, _originalVertices.ToArray(), 0, _originalVertices.Count() / 2);
                 }
             }
         }

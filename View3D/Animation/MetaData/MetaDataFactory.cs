@@ -25,13 +25,13 @@ namespace View3D.Animation.MetaData
 {
     public class MetaDataFactory
     {
-        ILogger _logger = Logging.Create<MetaDataFactory>();
-        SceneNode _root;
-        IComponentManager _componentManager;
-        ISkeletonProvider _rootSkeleton;
-        AnimationPlayer _rootPlayer;
-        IAnimationBinGenericFormat _fragment;
-        ApplicationSettingsService _applicationSettingsService;
+        private ILogger _logger = Logging.Create<MetaDataFactory>();
+        private SceneNode _root;
+        private IComponentManager _componentManager;
+        private ISkeletonProvider _rootSkeleton;
+        private AnimationPlayer _rootPlayer;
+        private IAnimationBinGenericFormat _fragment;
+        private ApplicationSettingsService _applicationSettingsService;
 
         public MetaDataFactory(SceneNode root, IComponentManager componentManager, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment, ApplicationSettingsService applicationSettingsService)
         {
@@ -43,15 +43,15 @@ namespace View3D.Animation.MetaData
             _applicationSettingsService = applicationSettingsService;
         }
 
-        public List<IMetaDataInstance> Create(MetaDataFile persistenet, MetaDataFile metaData)
+        public List<IMetaDataInstance> Create(MetaDataFile persistent, MetaDataFile metaData)
         {
             // Clear all
             var output = new List<IMetaDataInstance>();
 
             if (metaData == null || metaData.GetItemsOfType<DisablePersistant_v10>().Count == 0)
             {
-                var meteaDataPersiste = ApplyMetaData(persistenet);
-                output.AddRange(meteaDataPersiste);
+                var metaDataPersistent = ApplyMetaData(persistent);
+                output.AddRange(metaDataPersistent);
             }
 
             var metaDataInstances = ApplyMetaData(metaData);
@@ -59,37 +59,31 @@ namespace View3D.Animation.MetaData
             return output;
         }
 
-        List<IMetaDataInstance> ApplyMetaData(MetaDataFile file)
+        private IEnumerable<IMetaDataInstance> ApplyMetaData(MetaDataFile file)
         {
            var output = new List<IMetaDataInstance>();
            if (file == null)
                return output;
 
-           foreach(var animatedProp in file.GetItemsOfType<IAnimatedPropMeta>())
-               output.Add(CreateAnimatedProp(animatedProp));
+           output.AddRange(file.GetItemsOfType<IAnimatedPropMeta>().Select(CreateAnimatedProp));
+
+           output.AddRange(file.GetItemsOfType<ImpactPosition>().Select(meteDataItem => CreateStaticLocator(meteDataItem, meteDataItem.Position, "ImpactPos")));
+
+           output.AddRange(file.GetItemsOfType<TargetPos_10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, meteDataItem.Position, "TargetPos")));
+
+           output.AddRange(file.GetItemsOfType<FirePos>().Select(meteDataItem => CreateStaticLocator(meteDataItem, meteDataItem.Position, "FirePos")));
+
+           output.AddRange(file.GetItemsOfType<SplashAttack_v10>().Select(meteDataItem => CreateSplashAttack(meteDataItem, $"SplashAttack_{Math.Round(meteDataItem.EndTime, 2)}", 0.1f)));
+
+           output.AddRange(file.GetItemsOfType<Effect_v11>().Select(CreateEffect));
+
+           foreach (var meteDataItem in file.GetItemsOfType<DockEquipment>())
+               CreateEquipmentDock(meteDataItem);
            
-            foreach (var meteDataItem in file.GetItemsOfType<ImpactPosition>())
-                output.Add(CreateStaticLocator(meteDataItem, meteDataItem.Position, "ImpactPos"));
+           foreach (var meteDataItem in file.GetItemsOfType<Transform_v10>())
+               CreateTransform(meteDataItem);
 
-            foreach (var meteDataItem in file.GetItemsOfType<TargetPos_10>())
-                output.Add(CreateStaticLocator(meteDataItem, meteDataItem.Position, "TargetPos"));
-
-            foreach (var meteDataItem in file.GetItemsOfType<FirePos>())
-                output.Add(CreateStaticLocator(meteDataItem, meteDataItem.Position, "FirePos"));
-            
-            foreach (var meteDataItem in file.GetItemsOfType<SplashAttack_v10>())
-                output.Add(CreateSplashAttack(meteDataItem, $"SplashAttack_{Math.Round(meteDataItem.EndTime, 2)}", 0.1f));
-
-            foreach (var meteDataItem in file.GetItemsOfType<Effect_v11>())
-                output.Add(CreateEffect(meteDataItem));
-
-            foreach (var meteDataItem in file.GetItemsOfType<DockEquipment>())
-                CreateEquimentDock(meteDataItem);
-           
-            foreach (var meteDataItem in file.GetItemsOfType<Transform_v10>())
-                CreateTransform(meteDataItem);
-
-            return output;
+           return output;
         }
 
         private void CreateTransform(Transform_v10 transform)
@@ -97,16 +91,15 @@ namespace View3D.Animation.MetaData
             var rule = new TransformBoneRule(transform);
             _rootPlayer.AnimationRules.Add(rule);
         }
-        
-        void CreateEquimentDock(DockEquipment metaData)
+
+        private void CreateEquipmentDock(DockEquipment metaData)
         {
             var resourceLib = _componentManager.GetComponent<ResourceLibary>();
             var skeletonHelper = _componentManager.GetComponent<SkeletonAnimationLookUpHelper>();
             var pfs = resourceLib.Pfs;
         
-            var animPath = _fragment.Entries.FirstOrDefault(x=>x.SlotName == metaData.AnimationSlotName)?.AnimationFile;
-            if(animPath == null)
-                animPath = _fragment.Entries.FirstOrDefault(x => x.SlotName  == metaData.AnimationSlotName + "_2")?.AnimationFile;  // CA has introduced a DOCK_2 for some reason.
+            var animPath = _fragment.Entries.FirstOrDefault(x=>x.SlotName == metaData.AnimationSlotName)?.AnimationFile ??
+                           _fragment.Entries.FirstOrDefault(x => x.SlotName  == metaData.AnimationSlotName + "_2")?.AnimationFile;
             if (animPath == null)
             {
                 _logger.Here().Error($"Unable to create docking, as {metaData.AnimationSlotName} animation is missing");
@@ -136,7 +129,7 @@ namespace View3D.Animation.MetaData
             _rootPlayer.AnimationRules.Add(rule);
         }
 
-        IMetaDataInstance CreateAnimatedProp(IAnimatedPropMeta animatedPropMeta)
+        private IMetaDataInstance CreateAnimatedProp(IAnimatedPropMeta animatedPropMeta)
         {
             var propName = "Animated_prop";
 
@@ -185,7 +178,7 @@ namespace View3D.Animation.MetaData
             return new AnimatedPropInstance(loadedNode, propPlayer);
         }
 
-        IMetaDataInstance CreateStaticLocator(DecodedMetaEntryBase metaData, Vector3 position, string displayName, float scale = 0.3f)
+        private IMetaDataInstance CreateStaticLocator(DecodedMetaEntryBase metaData, Vector3 position, string displayName, float scale = 0.3f)
         {
             var resourceLib = _componentManager.GetComponent<ResourceLibary>();
             var lineRenderer = new LineMeshRender(resourceLib);
@@ -199,11 +192,11 @@ namespace View3D.Animation.MetaData
 
             return new DrawableMetaInstance(metaData.StartTime, metaData.EndTime, node.Name, node);
         }
-        
-        IMetaDataInstance CreateSplashAttack(SplashAttack_v10 splashAttack, string displayName, float scale = 0.3f)
+
+        private IMetaDataInstance CreateSplashAttack(SplashAttack_v10 splashAttack, string displayName, float scale = 0.3f)
         {
             float distance =  Vector3.Distance(splashAttack.StartPosition, splashAttack.EndPosition);
-            if (distance < 0.00001)
+            if (MathUtil.CompareEqualFloats(distance))
             {
                 throw new ConstraintException($"{displayName}: the distance between StartPosition {splashAttack.StartPosition} and EndPosition {splashAttack.EndPosition} is close to 0");
             }
@@ -265,7 +258,7 @@ namespace View3D.Animation.MetaData
             return new DrawableMetaInstance(splashAttack.StartTime, splashAttack.EndTime, node.Name, node);
         }
 
-        IMetaDataInstance CreateEffect(Effect_v11 effect)
+        private IMetaDataInstance CreateEffect(Effect_v11 effect)
         {
             var resourceLib = _componentManager.GetComponent<ResourceLibary>();
             var lineRenderer = new LineMeshRender(resourceLib);
@@ -293,7 +286,7 @@ namespace View3D.Animation.MetaData
 
     public class AnimatedPropInstance : IMetaDataInstance
     {
-        SceneNode _node;
+        private SceneNode _node;
 
         public AnimationPlayer Player { get; private set; }
 
@@ -315,14 +308,14 @@ namespace View3D.Animation.MetaData
 
     public class DrawableMetaInstance : IMetaDataInstance
     {
-        ILogger _logger = Logging.Create<MetaDataFactory>();
-        bool _hasError = false;
+        private ILogger _logger = Logging.Create<MetaDataFactory>();
+        private bool _hasError = false;
 
-        SceneNode _node;
-        string _description;
+        private SceneNode _node;
+        private string _description;
         public AnimationPlayer Player => null;
 
-        SkeletonBoneAnimationResolver _animationResolver;
+        private SkeletonBoneAnimationResolver _animationResolver;
 
         public DrawableMetaInstance(float startTime, float endTime, string description, SceneNode node)
         {
