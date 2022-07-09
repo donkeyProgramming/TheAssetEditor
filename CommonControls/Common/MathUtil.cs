@@ -7,20 +7,11 @@ namespace CommonControls.Common
 {
     public class MathUtil
     {
-        public static float EnsureRange(float value, float min, float max)
+        public static T EnsureRange<T>(T value, T min, T max)  where T : IComparable<T>
         {
-            if (value > max)
+            if (value.CompareTo(max) > 0)
                 return max;
-            else if (value < min)
-                return min;
-            return value;
-        }
-
-        public static int EnsureRange(int value, int min, int max)
-        {
-            if (value > max)
-                return max;
-            else if (value < min)
+            else if (value.CompareTo(min) < 0)
                 return min;
             return value;
         }
