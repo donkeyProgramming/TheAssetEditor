@@ -33,9 +33,42 @@ namespace View3D.Animation
             }
         }
 
+        private const long MicrosecondsPerSecond = 1_000_000;
+
+        private long _playTimeUs = -1 * MicrosecondsPerSecond;
 
         public List<KeyFrame> DynamicFrames = new List<KeyFrame>();
-        public float PlayTimeInSec { get; set; } = -1;
+        
+        public long PlayTimeUs => _playTimeUs;
+
+        public long MicrosecondsPerFrame
+        {
+            get
+            {
+                if (DynamicFrames.Count == 0)
+                {
+                    return -1;
+                }
+                return _playTimeUs / DynamicFrames.Count;
+            }
+        }
+
+        public float PlayTimeInSec
+        {
+            get => (float) _playTimeUs / MicrosecondsPerSecond;
+            set
+            {
+                if (DynamicFrames.Count == 0)
+                {
+                    throw new ArgumentException("Trying to set Play time when DynamicFrames is empty");
+                }
+
+                // make sure we have whole number of microsecond per frame
+                long framePlayTimeUs = (long) Math.Ceiling(value / DynamicFrames.Count * MicrosecondsPerSecond);
+                _playTimeUs = framePlayTimeUs * DynamicFrames.Count;
+            }
+        }
+
         public int AnimationBoneCount
         {
             get 
@@ -167,8 +200,10 @@ namespace View3D.Animation
 
         public AnimationClip Clone()
         {
-            AnimationClip copy = new AnimationClip();
-            copy.PlayTimeInSec = PlayTimeInSec;
+            AnimationClip copy = new AnimationClip
+            {
+                PlayTimeInSec = PlayTimeInSec
+            };
 
             foreach (var item in DynamicFrames)
                 copy.DynamicFrames.Add(item.Clone());
@@ -178,10 +213,7 @@ namespace View3D.Animation
 
         public static AnimationClip CreateSkeletonAnimation(GameSkeleton skeleton)
         {
-            var clip = new AnimationClip()
-            {
-                PlayTimeInSec = 0.1f,
-            };
+            var clip = new AnimationClip();
 
             var frame = new KeyFrame();
             for (int i = 0; i < skeleton.BoneCount; i++)
@@ -194,6 +226,8 @@ namespace View3D.Animation
             // Skeletons have two identical frames, dont know why
             clip.DynamicFrames.Add(frame.Clone());
             clip.DynamicFrames.Add(frame.Clone());
+
+            clip.PlayTimeInSec = 0.1f;
             return clip;
         }
 

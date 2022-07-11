@@ -7,22 +7,18 @@ namespace CommonControls.Common
 {
     public class MathUtil
     {
-        public static float EnsureRange(float value, float min, float max)
+        public static T EnsureRange<T>(T value, T min, T max)  where T : IComparable<T>
         {
-            if (value > max)
+            if (value.CompareTo(max) > 0)
                 return max;
-            else if (value < min)
+            else if (value.CompareTo(min) < 0)
                 return min;
             return value;
         }
-
-        public static int EnsureRange(int value, int min, int max)
+        
+        public static bool CompareEqualFloats(float lhs, float rhs=0f, float tolerance=1E-6f)
         {
-            if (value > max)
-                return max;
-            else if (value < min)
-                return min;
-            return value;
+            return Math.Abs(lhs - rhs) < tolerance;
         }
 
         public static Vector3 GetCenter(BoundingBox box)
@@ -146,6 +142,38 @@ namespace CommonControls.Common
             var y = MathHelper.ToRadians(angles_degrees.Y);
             var z = MathHelper.ToRadians(angles_degrees.Z);
             return Matrix.CreateRotationX(x) * Matrix.CreateRotationY(y) * Matrix.CreateRotationZ(z);
+        }
+        
+        public static Matrix CreateRotation(Vector3[] vectors, Vector3[] basis=null)
+        {
+            if (vectors.Length != 3)
+            {
+                throw new ArgumentException("Number of vectors should be equal to 3");
+            }
+            if (basis != null)
+            {
+                if (vectors.Length != basis.Length || basis.Length != 3)
+                {
+                    throw new ArgumentException("Number of vectors should match and be equal to 3");
+                }
+            }
+
+            if (basis == null)
+            {
+                basis = new Vector3[]
+                {
+                    new Vector3(1, 0, 0),
+                    new Vector3(0, 1, 0),
+                    new Vector3(0, 0, 1),
+                };
+            }
+            Matrix rotationM = new Matrix(
+                Vector3.Dot(basis[0], vectors[0]), Vector3.Dot(basis[1], vectors[0]), Vector3.Dot(basis[2], vectors[0]), 0,
+                Vector3.Dot(basis[0], vectors[1]), Vector3.Dot(basis[1], vectors[1]), Vector3.Dot(basis[2], vectors[1]), 0,
+                Vector3.Dot(basis[0], vectors[2]), Vector3.Dot(basis[1], vectors[2]), Vector3.Dot(basis[2], vectors[2]), 0,
+                0, 0, 0, 1
+            );
+            return rotationM;
         }
 
         public static Vector3 SanitiseScaleVector(Vector3 v)
