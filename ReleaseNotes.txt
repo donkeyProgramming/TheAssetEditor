@@ -196,6 +196,27 @@ V0.38
 	Redo scale functionalty for animated prop
 	Effect_v11 and transform in metadatafactory. SHould use interface 
 
+
+
+
+V0.39
+
+
+
+Bug in pm when merging / generating lods https://discord.com/channels/373745291289034763/795235087352201226/995357361923428362
+animtranfer tool filter for batch processing 
+Loadin ws model for ksl_kossar_armoured_pistol_1h_01.rigid_model_v2 not working 
+ctrl click to expand all in file tree view 
+Remove animation combiner tool from the dropdown of tools 
+
+Static mesh issue
+buttons for animation players working correctly (Klissian)
+Splash attack metadata visualization(Klissian)
+Animation data report (Klissian)
+
+
+
+
 V0.38
 ----------------------------	
 	Features:

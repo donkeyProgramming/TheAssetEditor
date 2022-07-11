@@ -214,7 +214,7 @@ namespace CommonControls.Common
             {
                 var error = $"Attempting to get view model for file {filename}, unable to find tool based on extention";
                 _logger.Here().Error(error);
-                return null;
+                return new List<ToolInformation>();
             }
 
             return output.OrderBy(x=>x.IsCoreTool).ToList();
