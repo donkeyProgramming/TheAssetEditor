@@ -53,10 +53,12 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
 
             var vertex = new CommonVertex()
             {
-                // VertexFormat = ´default` format has X and Z swapped 
+             
                 Position = VertexLoadHelper.CreatVector4HalfFloat(vertexData.position).ToVector4(1),
 
-                // 'bitangent' is stored before 'tangent' when VertexFormat = ´default`
+                /*  VertexFormat = ´default` format has X and Z swapped 
+                    'bitangent' is stored before 'tangent' when VertexFormat = ´default` 
+                */
                 Normal = _swapXZ(VertexLoadHelper.CreatVector4Byte(vertexData.normal).ToVector3()),
                 BiNormal = _swapXZ(VertexLoadHelper.CreatVector4Byte(vertexData.tangent).ToVector3()),
                 Tangent = _swapXZ(VertexLoadHelper.CreatVector4Byte(vertexData.biNormal).ToVector3()),
