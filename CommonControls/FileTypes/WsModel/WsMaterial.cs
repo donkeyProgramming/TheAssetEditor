@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 
-namespace CommonControls.FileTypes.RigidModel
+namespace CommonControls.FileTypes.WsModel
 {
     public class WsMaterial
     {

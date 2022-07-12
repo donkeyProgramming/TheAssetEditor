@@ -12,16 +12,6 @@ namespace CommonControls.FileTypes.RigidModel
         public RmvModel()
         { }
 
-        public RmvModel Clone()
-        {
-            return new RmvModel()
-            {
-                CommonHeader = CommonHeader,
-                Material = Material.Clone(),
-                Mesh = null
-            };
-        }
-
         public void UpdateModelTypeFlag(ModelMaterialEnum newValue)
         {
             var header = CommonHeader;

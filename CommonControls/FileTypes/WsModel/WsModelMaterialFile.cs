@@ -1,12 +1,12 @@
 ﻿using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.RigidModel.Types;
-using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 
-namespace CommonControls.FileTypes.RigidModel
+namespace CommonControls.FileTypes.WsModel
 {
     public class WsModelMaterialFile
     {

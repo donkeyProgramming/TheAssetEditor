@@ -50,6 +50,7 @@ namespace View3D.SceneNodes
                     node.Initialize(resourceLibary);
                     node.OriginalFilePath = modelFullPath;
                     node.OriginalPartIndex = modelIndex;
+                    node.LodIndex = lodIndex;
 
                     if (autoResolveTexture)
                     {
@@ -57,7 +58,6 @@ namespace View3D.SceneNodes
                         missingTextureResolver.ResolveMissingTextures(node, pfs);
                     }
 
-                    node.LodIndex = lodIndex;
                     lodNode.AddObject(node);
                 }
             }

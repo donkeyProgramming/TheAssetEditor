@@ -99,7 +99,6 @@ namespace View3D.SceneNodes
             else
                 Effect = new PbrShader_SpecGloss(_resourceLib);
 
-
             Texture2D diffuse = LoadTexture(TexureType.Diffuse);
             Texture2D baseColour = LoadTexture(TexureType.BaseColour);
             Texture2D specTexture = LoadTexture(TexureType.Specular);

@@ -1,10 +1,8 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace CommonControls.FileTypes.RigidModel
+namespace CommonControls.FileTypes.Vmd
 {
     public class VariantMeshDefinition
     {

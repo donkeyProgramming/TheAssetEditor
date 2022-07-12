@@ -1,5 +1,4 @@
 ﻿using CommonControls.Common;
-using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using Serilog;
 using System;
@@ -10,11 +9,9 @@ using System.Reflection;
 using System.Text;
 using System.Windows;
 using View3D.SceneNodes;
-using Microsoft.Xna.Framework;
-using View3D.Animation;
-using CommonControls.FileTypes.RigidModel.LodHeader;
 using CommonControls.FileTypes.RigidModel.Types;
 using CommonControls.FileTypes.RigidModel;
+using CommonControls.FileTypes.WsModel;
 
 namespace View3D.Services
 {

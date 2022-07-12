@@ -2,15 +2,13 @@
 using CommonControls.Editors.TextEditor;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using Filetypes.ByteParsing;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
-using static CommonControls.FileTypes.RigidModel.VariantMeshDefinition;
+using static CommonControls.FileTypes.Vmd.VariantMeshDefinition;
 
 namespace CommonControls.Editors.VariantMeshDefinition
 {

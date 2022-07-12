@@ -9,28 +9,6 @@ using View3D.Utility;
 
 namespace View3D.Animation
 {
-    public class ExternalAnimationAttachmentResolver
-    {
-        private AnimationPlayer ExternalPlayer { get; set; }
-        private int ExternalBoneIndex { get; set; } = -1;
-        private bool HasAnimation => ExternalPlayer != null && ExternalBoneIndex != -1;
-        private Matrix Transform { get; set; } = Matrix.Identity;
-
-        public void UpdateNode(GameTime time)
-        {
-            if (!HasAnimation || ExternalPlayer == null)
-            {
-                Transform = Matrix.Identity;
-            }
-            else
-            {
-                if (time != null)
-                    ExternalPlayer.Update(time);
-                Transform = ExternalPlayer.GameSkeleton.GetAnimatedWorldTranform(ExternalBoneIndex);
-            }
-        }
-    }
-
     public class AnimationFrame
     {
         public class BoneKeyFrame
@@ -60,32 +38,11 @@ namespace View3D.Animation
         }
     }
 
-    public class AnimationPlayerSettings
-    {
-        public bool UseTranslationOffset { get; set; } = false;
-        public float TranslationOffsetX { get; set; } = 0;
-        public float TranslationOffsetY { get; set; } = 0;
-        public float TranslationOffsetZ { get; set; } = 0;
-
-        public bool UseRotationOffset { get; set; } = false;
-        public float RotationOffsetX { get; set; } = 0;
-        public float RotationOffsetY { get; set; } = 0;
-        public float RotationOffsetZ { get; set; } = 0;
-
-        public bool FreezeAnimationRoot { get; set; } = false;
-        public bool FreezeAnimationBone { get; set; } = false;
-        public int FreezeAnimationBoneIndex { get; set; } = -1;
-
-        public bool UseAnimationSnap { get; set; } = false;
-        public bool OnlySnapTranslations { get; set; } = false;
-    }
 
     public delegate void FrameChanged(int currentFrame);
     public class AnimationPlayer
     {
         public event FrameChanged OnFrameChanged;
-        public AnimationPlayerSettings Settings { get; set; } = new AnimationPlayerSettings();
-        private ExternalAnimationAttachmentResolver ExternalAnimationRef { get; set; } = new ExternalAnimationAttachmentResolver();
 
         GameSkeleton _skeleton;
         TimeSpanExtension _timeSinceStart;
@@ -200,8 +157,6 @@ namespace View3D.Animation
                         IsPlaying = false;
                     }
                 }
-
-                ExternalAnimationRef?.UpdateNode(gameTime);
 
                 OnFrameChanged?.Invoke(CurrentFrame);
             }

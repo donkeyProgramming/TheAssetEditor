@@ -1,5 +1,6 @@
 ﻿using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.RigidModel.Types;
+using CommonControls.FileTypes.WsModel;
 using CommonControls.Services;
 using System;
 using System.IO;
