@@ -20,7 +20,8 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
         }
         public bool ForceComputeNormals => false;
 
-        public CommonVertex Read(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize)
+        // preserved for me to look at, for reference :)
+        public CommonVertex ___old_Read(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize)
         {
             var vertexData = ByteHelper.ByteArrayToStructure<Data>(buffer, offset);
 
@@ -41,6 +42,37 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
 
             return vertex;
         }
+
+        static Vector3 _swapXZ(Vector3 v)
+        {
+            return new Vector3(v.Z, v.Y, v.X);
+        }
+        public CommonVertex Read(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize)
+        {
+            var vertexData = ByteHelper.ByteArrayToStructure<Data>(buffer, offset);
+
+            var vertex = new CommonVertex()
+            {
+                // VertexFormat = ´default` format has X and Z swapped 
+                Position = VertexLoadHelper.CreatVector4HalfFloat(vertexData.position).ToVector4(1),
+
+                // 'bitangent' is stored before 'tangent' when VertexFormat = ´default`
+                Normal = _swapXZ(VertexLoadHelper.CreatVector4Byte(vertexData.normal).ToVector3()),
+                BiNormal = _swapXZ(VertexLoadHelper.CreatVector4Byte(vertexData.tangent).ToVector3()),
+                Tangent = _swapXZ(VertexLoadHelper.CreatVector4Byte(vertexData.biNormal).ToVector3()),
+
+                Uv = VertexLoadHelper.CreatVector2HalfFloat(vertexData.uv).ToVector2(),
+
+                Colour = VertexLoadHelper.CreatVector4Byte(vertexData.RGBA).ToVector4(),
+
+                BoneIndex = new byte[0],
+                BoneWeight = new float[0]
+            };
+
+            return vertex;
+        }
+
+
 
         public byte[] Write(RmvVersionEnum rmvVersion, CommonVertex vertex)
         {
