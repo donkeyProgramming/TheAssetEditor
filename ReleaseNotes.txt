@@ -214,15 +214,23 @@ ctrl click to expand all in file tree view
 
 
 	Static mesh issue
+	Add more tutorials 
 
+V0.39
+----------------------------
 
 Features:
 	* Animation report (Thanks to Klissian)
 	* Splash Attack visualization in supevview (Thanks to Klissian)
+	* New Metatags decoded: SoundTrigger_v2, SoundBuilding_v2, Effect_v5, RHandPose_v2 and LHandPose_v2 (Thanks to Farfadet)
+	* Added more tutorials under the tutorials dropdown (thanks to Masked Mustachio)
 
 BugFixes:
+	* Static meshes now load/save correctly. Should no longer get incorrect shading in game when using static meshes. (Thanks to Phazer)
 	* Fixed bug where textures were not resolved correctly when loading rigid_model_v2 files
 	* Previous and next frame buttons working correctly (Thanks to Klissian)
+	* Fixed error when creating LODs
+	
 
 
 V0.38

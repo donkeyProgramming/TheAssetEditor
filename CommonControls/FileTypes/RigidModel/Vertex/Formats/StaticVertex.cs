@@ -1,53 +1,14 @@
-﻿using CommonControls.FileTypes;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
 {
     public class StaticVertexCreator : IVertexCreator
     {
         public VertexFormat Type => VertexFormat.Static;
-        public uint GetVertexSize(RmvVersionEnum rmvVersion)
-        {
-
-            return (uint)ByteHelper.GetSize<Data>();
-        }
+        public uint GetVertexSize(RmvVersionEnum rmvVersion) => (uint)ByteHelper.GetSize<Data>();
         public bool ForceComputeNormals => false;
-
-        // preserved for me to look at, for reference :)
-        public CommonVertex ___old_Read(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize)
-        {
-            var vertexData = ByteHelper.ByteArrayToStructure<Data>(buffer, offset);
-
-            var vertex = new CommonVertex()
-            {
-                Position = VertexLoadHelper.CreatVector4HalfFloat(vertexData.position).ToVector4(1),
-                Normal = VertexLoadHelper.CreatVector4Byte(vertexData.normal).ToVector3(),
-                BiNormal = VertexLoadHelper.CreatVector4Byte(vertexData.biNormal).ToVector3(),
-                Tangent = VertexLoadHelper.CreatVector4Byte(vertexData.tangent).ToVector3(),
-
-                Uv = VertexLoadHelper.CreatVector2HalfFloat(vertexData.uv).ToVector2(),
-
-                Colour = VertexLoadHelper.CreatVector4Byte(vertexData.RGBA).ToVector4(),
-
-                BoneIndex = new byte[0],
-                BoneWeight = new float[0]
-            };
-
-            return vertex;
-        }
-
-
-        static Vector3 SwapXZ(Vector3 v)
-        {
-            return new Vector3(v.Z, v.Y, v.X);
-        }
 
         public CommonVertex Read(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize)
         {
@@ -74,9 +35,6 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
             return vertex;
         }
 
-
-
-
         public byte[] Write(RmvVersionEnum rmvVersion, CommonVertex vertex)
         {
             if (vertex.WeightCount != 0 || vertex.BoneIndex.Length != 0 || vertex.BoneWeight.Length != 0)
@@ -98,6 +56,8 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
 
             return ByteHelper.GetBytes(typedVert);
         }
+
+        private static Vector3 SwapXZ(Vector3 v) => new Vector3(v.Z, v.Y, v.X);
 
         struct Data //32
         {

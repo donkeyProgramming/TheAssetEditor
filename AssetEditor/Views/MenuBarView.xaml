@@ -86,10 +86,14 @@
             </MenuItem>
 
             <MenuItem Header="Tutorials">
-                <MenuItem Header="[YT]Animated Prop" Command="{Binding MenuBar.OpenAnimatedPropTutorialCommand}"/>
-                <MenuItem Header="[YT]Custom Animation Pack" Command="{Binding MenuBar.OpenAnimPackTutorialCommand}"/>
+                <MenuItem Header="[YT]AssetEditor Basics" Command="{Binding MenuBar.OpenAssetEdBasicTutorialCommand}"/>
+                <MenuItem Header="[YT]Example: Skag Reskin" Command="{Binding MenuBar.OpenSkragTutorialCommand}"/>
+                <MenuItem Header="[YT]Example: Tzar Guard with gun" Command="{Binding MenuBar.OpenTzarGuardTutorialCommand}"/>
+                <MenuItem Header="[YT]Animated Prop and custom Animation Packs" Command="{Binding MenuBar.OpenAnimatedPropTutorialCommand}"/>
+                <Separator/>
+                <MenuItem Header="Ask questions:" Command="{Binding MenuBar.OpenDiscordCommand}"/>
+                <Separator/>
                 <MenuItem Header="Manual" Command="{Binding MenuBar.OpenHelpCommand}"/>
-                <MenuItem Header="Discord" Command="{Binding MenuBar.OpenDiscordCommand}"/>
             </MenuItem>
 
             <MenuItem Header="About">
