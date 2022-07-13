@@ -26,6 +26,8 @@ namespace CommonControls.PackFileBrowser
                 {
                     Additem(ContextItems.Close, newContextMenu);
                     Additem(ContextItems.Expand, newContextMenu);
+                    Additem(ContextItems.Collapse, newContextMenu);
+                    AddSeperator(newContextMenu);
                 }
                 else
                 {
@@ -45,6 +47,7 @@ namespace CommonControls.PackFileBrowser
                     AddSeperator(newContextMenu);
 
                     Additem(ContextItems.Expand, newContextMenu);
+                    Additem(ContextItems.Collapse, newContextMenu);
                     AddSeperator(newContextMenu);
                     Additem(ContextItems.Save, newContextMenu);
                     Additem(ContextItems.SaveAs, newContextMenu);
@@ -72,6 +75,7 @@ namespace CommonControls.PackFileBrowser
 
                 }
                 Additem(ContextItems.Expand, newContextMenu);
+                Additem(ContextItems.Collapse, newContextMenu);
                 Additem(ContextItems.Export, newContextMenu);
             }
 

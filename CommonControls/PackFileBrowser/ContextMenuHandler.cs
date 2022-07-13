@@ -36,6 +36,8 @@ namespace CommonControls.PackFileBrowser
         public ICommand CreateFolderCommand { get; set; }
         public ICommand SetAsEditabelPackCommand { get; set; }
         public ICommand ExpandAllChildrenCommand { get; set; }
+        public ICommand CollapseAllChildrenCommand { get; set; }
+        
         public ICommand OpenPack_FileNotpadPluss_Command { get; set; }
         public ICommand OpenPackFile_HxD_Command { get; set; }
         public ICommand SavePackFileAsCommand { get; set; }
@@ -65,6 +67,7 @@ namespace CommonControls.PackFileBrowser
             CopyToEditablePackCommand = new RelayCommand(CopyToEditablePack);
             SetAsEditabelPackCommand = new RelayCommand(SetAsEditabelPack);
             ExpandAllChildrenCommand = new RelayCommand(ExpandAllChildren);
+            CollapseAllChildrenCommand = new RelayCommand(CollapsAllChildren);
             ExportCommand = new RelayCommand(ExportToFolder);
             OpenPack_FileNotpadPluss_Command = new RelayCommand(() => OpenPackFileUsing(@"C:\Program Files (x86)\Notepad++\notepad++.exe", _selectedNode.Item));
             OpenPackFile_HxD_Command = new RelayCommand(() => OpenPackFileUsing(@"C:\Program Files\HxD\HxD.exe", _selectedNode.Item));
@@ -289,10 +292,8 @@ namespace CommonControls.PackFileBrowser
             _packFileService.SetEditablePack(_selectedNode.FileOwner);
         }
 
-        void ExpandAllChildren()
-        {
-            ExpandAllRecursive(_selectedNode);
-        }
+        void ExpandAllChildren() => ExpandAllRecursive(_selectedNode);
+        void CollapsAllChildren() => CollapsAllRecursive(_selectedNode);
 
         void ExportToFolder()
         {
@@ -365,6 +366,13 @@ namespace CommonControls.PackFileBrowser
                 ExpandAllRecursive(child);
         }
 
+        void CollapsAllRecursive(TreeNode node)
+        {
+            node.IsNodeExpanded = false;
+            foreach (var child in node.Children)
+                CollapsAllRecursive(child);
+        }
+
         public abstract void Create(TreeNode node);
        
 
@@ -406,7 +414,9 @@ namespace CommonControls.PackFileBrowser
                 case ContextItems.CreateFolder:
                     return new ContextMenuItem() { Name = "Create Folder", Command = CreateFolderCommand }; ;
                 case ContextItems.Expand:
-                    return new ContextMenuItem() { Name = "Expand", Command = ExpandAllChildrenCommand }; ;
+                    return new ContextMenuItem() { Name = "Expand (Ctrl + double click)", Command = ExpandAllChildrenCommand }; ;
+                case ContextItems.Collapse:
+                    return new ContextMenuItem() { Name = "Collapse", Command = CollapseAllChildrenCommand }; ;
                 case ContextItems.CopyFullPath:
                     return new ContextMenuItem() { Name = "Copy full path", Command = CopyNodePathCommand };
                 case ContextItems.Export:
@@ -445,6 +455,7 @@ namespace CommonControls.PackFileBrowser
             Create,
 
             Expand,
+            Collapse,
             CopyFullPath,
             Export,
             Rename,

@@ -208,13 +208,10 @@ make time in superview copyable
 
 Clean up animatin player. Combine the one in superview and kitbasher
 
-Bug in pm when merging / generating lods https://discord.com/channels/373745291289034763/795235087352201226/995357361923428362
 animtranfer tool filter for batch processing 
-ctrl click to expand all in file tree view 
 
 
-	Static mesh issue
-	Add more tutorials 
+
 
 V0.39
 ----------------------------
@@ -224,6 +221,8 @@ Features:
 	* Splash Attack visualization in supevview (Thanks to Klissian)
 	* New Metatags decoded: SoundTrigger_v2, SoundBuilding_v2, Effect_v5, RHandPose_v2 and LHandPose_v2 (Thanks to Farfadet)
 	* Added more tutorials under the tutorials dropdown (thanks to Masked Mustachio)
+	* Ctrl + double click expands all child nodes in the packfile tree view 
+	* Collapse all added to packfile tree view context menu 
 
 BugFixes:
 	* Static meshes now load/save correctly. Should no longer get incorrect shading in game when using static meshes. (Thanks to Phazer)

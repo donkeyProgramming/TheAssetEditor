@@ -18,6 +18,7 @@ namespace CommonControls.PackFileBrowser
             if (node.NodeType != NodeType.File)
             {
                 Additem(ContextItems.Expand, Items);
+                Additem(ContextItems.Collapse, Items);
                 AddSeperator(Items);
                 Additem(ContextItems.CreateFolder, Items);
             }
