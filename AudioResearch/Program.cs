@@ -57,8 +57,32 @@ namespace AudioResearch
             Console.WriteLine("Result:");
             var allHircs = globalSoundDatabase.SelectMany(x => x.Value.Hircs);
             PrintHircData(allHircs);
-
-            Console.WriteLine("Hello World!");
+        
+            /* Result:
+                    Total HircObjects: 664157 Unknown: 109997 Decoding Errors:0
+                     Correct:
+                             Sound: Count: 485805
+                             Action: Count: 37790
+                             Event: Count: 30565
+                     Error:
+                             Attenuation: 5472/5472 Failed
+                             LFO: 78/78 Failed
+                             Envelope: 5/5 Failed
+                             SequenceContainer: 63005/63005 Failed
+                             State: 7461/7461 Failed
+                             LayerContainer: 12770/12770 Failed
+                             ActorMixer: 8708/8708 Failed
+                             SwitchContainer: 5065/5065 Failed
+                             FxCustom: 2025/2025 Failed
+                             FxShareSet: 166/166 Failed
+                             Dialogue_Event: 212/212 Failed
+                             Music_Track: 2415/2415 Failed
+                             Music_Segment: 1833/1833 Failed
+                             Music_Random_Sequence: 328/328 Failed
+                             Music_Switch: 19/19 Failed
+                             Audio_Bus: 375/375 Failed
+                             AuxiliaryBus: 60/60 Failed
+            */
         }
 
 
@@ -178,4 +202,4 @@ namespace AudioResearch
             }
         }
      */
-}
+        }

@@ -5,22 +5,24 @@ using System.Text;
 
 namespace CommonControls.FileTypes.Sound.WWise.Hirc
 {
-    public abstract class CAkEvent : HircItem
+    public interface ICAkEvent
     {
-        public abstract List<uint> GetActionIds();
+        public List<uint> GetActionIds();
     }
 
-    public abstract class CAkSound : HircItem
+    public interface ICAkSound 
     {
-        public abstract uint GetParentId();
-        public abstract uint GetSourceId();
+        public uint GetParentId();
+        public uint GetSourceId();
     }
 
-    public abstract class CAkAction : HircItem
+    public interface ICAkAction
     {
-        public abstract ActionType GetActionType();
-        public abstract uint GetSoundId();
+        public ActionType GetActionType();
+        public uint GetSoundId();
     }
+
+    // Conert to interfaces 
 
     public abstract class CAkRanSeqCnt : HircItem
     {

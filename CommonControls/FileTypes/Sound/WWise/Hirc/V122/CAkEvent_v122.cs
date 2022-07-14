@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace CommonControls.FileTypes.Sound.WWise.Hirc.V122
 {
-    public class CAkEvent_v122 : CAkEvent
+    public class CAkEvent_v122 : HircItem, ICAkEvent
     {
         public class Action
         {
@@ -21,7 +21,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V122
                 Actions.Add(new Action() { ActionId = chunk.ReadUInt32() });
         }
 
-        public override List<uint> GetActionIds()
+        public List<uint> GetActionIds()
         {
             return Actions.Select(x => x.ActionId).ToList();
         }

@@ -5,7 +5,7 @@ using System;
 
 namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 {
-    public class CAkAction_v136 : CAkAction
+    public class CAkAction_v136 : HircItem, ICAkAction 
     {
         public ActionType ActionType { get; set; }
         public uint idExt { get; set; }
@@ -26,8 +26,8 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             //AkPlayActionParams = AkPlayActionParams.Create(chunk);
         }
 
-        public override ActionType GetActionType() => ActionType;
-        public override uint GetSoundId() => idExt;
+        public ActionType GetActionType() => ActionType;
+        public uint GetSoundId() => idExt;
     }
 
     public class AkPlayActionParams

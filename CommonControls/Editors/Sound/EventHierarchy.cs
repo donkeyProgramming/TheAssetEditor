@@ -7,7 +7,7 @@ using CommonControls.FileTypes.Sound.WWise.Hirc.V122;
 using MoreLinq;
 
 namespace CommonControls.Editors.Sound
-{
+{/*
     public class EventHierarchy
     {
         string _ownerFileName;
@@ -51,7 +51,7 @@ namespace CommonControls.Editors.Sound
                 ProcessUnknownChild(item, currentNode);
         }
 
-        void ProcessChild(CAkEvent item, VisualEventOutputNode currentNode)
+        void ProcessChild(HircItem item, VisualEventOutputNode currentNode)
         {
             var name = _nameHelper.GetName(item.Id);
             var eventNode = currentNode.AddChild($"-> Event:{name}[{item.Id}] ownerFile:[{item.OwnerFile}|{item.IndexInFile}]");
@@ -175,7 +175,7 @@ namespace CommonControls.Editors.Sound
             foreach (var child in distinctChildren)
                 ProcessGenericChild(child, currentOutputNode);
         }
-    }
+    }*/
 
 
 }

@@ -211,7 +211,7 @@ namespace CommonControls.Editors.Sound
 
         void ParsBnkFiles(ExtenededSoundDataBase masterDb, NameLookupHelper nameHelper, List<PackFile> files, VisualEventOutputNode parent, Stopwatch timer)
         {
-            for(int fileIndex = 0; fileIndex < files.Count; fileIndex++)
+            /*for(int fileIndex = 0; fileIndex < files.Count; fileIndex++)
             {
                 try
                 {
@@ -249,7 +249,7 @@ namespace CommonControls.Editors.Sound
                 }
                 catch
                 { }
-            }
+            }*/
         }
 
         public void CreateHircList(ExtenededSoundDataBase db, string outputName, NameLookupHelper nameLookupHelper)

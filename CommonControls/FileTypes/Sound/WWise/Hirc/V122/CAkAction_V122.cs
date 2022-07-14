@@ -4,7 +4,7 @@ using Filetypes.ByteParsing;
 
 namespace CommonControls.FileTypes.Sound.WWise.Hirc.V122
 {
-    public class CAkAction_V122 : CAkAction
+    public class CAkAction_V122 : HircItem, ICAkAction
     {
         public ActionType ActionType { get; set; }
         public uint SoundId { get; set; }
@@ -15,7 +15,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V122
             SoundId = chunk.ReadUInt32();
         }
 
-        public override ActionType GetActionType() => ActionType;
-        public override uint GetSoundId() => SoundId;
+        public ActionType GetActionType() => ActionType;
+        public uint GetSoundId() => SoundId;
     }
 }

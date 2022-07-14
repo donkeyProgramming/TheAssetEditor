@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
 {
-    public class CAkSound_V112 : CAkSound
+    public class CAkSound_V112 : HircItem, ICAkSound
     {
         public AkBankSourceData AkBankSourceData { get; set; }
         public NodeBaseParams NodeBaseParams { get; set; }
@@ -17,8 +17,8 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
             NodeBaseParams = NodeBaseParams.Create(chunk);
         }
 
-        public override uint GetParentId() => NodeBaseParams.DirectParentID;
-        public override uint GetSourceId() => AkBankSourceData.akMediaInformation.SourceId;
+        public uint GetParentId() => NodeBaseParams.DirectParentID;
+        public uint GetSourceId() => AkBankSourceData.akMediaInformation.SourceId;
     }
 
     public class AkBankSourceData
