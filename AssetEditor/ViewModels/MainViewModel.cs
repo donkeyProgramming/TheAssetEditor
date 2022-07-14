@@ -165,7 +165,7 @@ namespace AssetEditor.ViewModels
                 //AnimMetaBatchProcessor processor = new AnimMetaBatchProcessor();
                 //processor.BatchProcess(_packfileService, schemaManager, "Warhammer");
 
-                //AnimationEditor.SuperView.SuperViewViewModel_Debug.CreatePlaguebearer(this, toolFactory, packfileService);
+                AnimationEditor.SuperView.SuperViewViewModel_Debug.CreateThrot(this, toolFactory, packfileService);
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
 
 
@@ -200,7 +200,7 @@ namespace AssetEditor.ViewModels
 
                 //OpenFile(packfileService.FindFile(@"animations\database\battle\bin\animation_tables.animpack"));
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\ksl\ksl_katarin\ksl_katarin_cloth_cloak_01.rigid_model_v2"));
-                OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\ksl\ksl_katarin\ksl_katarin_01.rigid_model_v2"));
+                //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\ksl\ksl_katarin\ksl_katarin_01.rigid_model_v2"));
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hq3\nor\nor_war_mammoth\nor_war_mammoth_warshrine_01.rigid_model_v2"));
                 
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc1\tmb\tmb_warsphinx\tex\tmb_warsphinx_armour_01_base_colour.dds"));

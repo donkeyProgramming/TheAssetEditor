@@ -22,7 +22,7 @@ namespace View3D.Animation
 
                 var currentFrame = skeleton.CreateAnimationFrame();
 
-                if (animationClip != null)
+                if (animationClip != null && skeleton != null)
                 {
                     if (animationClip.DynamicFrames.Count > frameIndex)
                     {

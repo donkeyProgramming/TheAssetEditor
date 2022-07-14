@@ -188,16 +188,12 @@ V0.38
 	
 	Filter animations in anim transfer tool
 	When saving animmeta, make it all pop into anim where is and remove saving question
-	* Tutorial toolbar
-	* ws model generation
-	* Lod issue 
 	Hide skeleton for animated props 
 	Different colours for animated prop skeletons 
 	Redo scale functionalty for animated prop
 	Effect_v11 and transform in metadatafactory. SHould use interface 
 
-Clean up render list items 
-One dispsable large list and one on the go. All types of line items made in a factory and works for both
+
 
 
 
@@ -206,15 +202,17 @@ V0.39
 Check metadata factory
 make time in superview copyable
 
-Clean up animatin player. Combine the one in superview and kitbasher
 
-animtranfer tool filter for batch processing 
 
 
 
 
 V0.39
 ----------------------------
+
+Clean up animatin player. Combine the one in superview and kitbasher
+animtranfer tool filter for batch processing 
+Clean up render list items  - One dispsable large list and one on the go. All types of line items made in a factory and works for both
 
 Features:
 	* Animation report (Thanks to Klissian)
@@ -229,6 +227,7 @@ BugFixes:
 	* Fixed bug where textures were not resolved correctly when loading rigid_model_v2 files
 	* Previous and next frame buttons working correctly (Thanks to Klissian)
 	* Fixed error when creating LODs
+	* Fixed crash when using prop meta tags 
 	
 
 

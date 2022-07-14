@@ -14,7 +14,7 @@ namespace CommonControls.FileTypes.RigidModel
     public class ModelFactory
     {
         ILogger _logger = Logging.Create<ModelFactory>();
-        public static ModelFactory Create(bool logLoadedFile = true) => new ModelFactory();
+        public static ModelFactory Create(bool logLoadedFile = false) => new ModelFactory(logLoadedFile);
 
         bool _logLoadedFile;
         public ModelFactory(bool logLoadedFile = false)
@@ -154,6 +154,7 @@ namespace CommonControls.FileTypes.RigidModel
                 }
             }
 
+            // Reload the model to make sure we created something the game can load. Better to get an error here then later.
             var bytes = ms.ToArray();
 
             _logger.Here().Information("Attempting to reload model");
@@ -184,7 +185,7 @@ namespace CommonControls.FileTypes.RigidModel
         {
             var vertexFactory = VertexFactory.Create();
             using MemoryStream modelStream = new MemoryStream();
-            using var modelWriter = new BinaryWriter(modelStream);
+            using var binaryWriter = new BinaryWriter(modelStream);
 
             if (model.CommonHeader.IndexCount != model.Mesh.IndexList.Length)
                 throw new Exception("Unexpected IndexCount");
@@ -193,22 +194,22 @@ namespace CommonControls.FileTypes.RigidModel
                 throw new Exception("Unexpected IndexCount");
 
             model.UpdateModelTypeFlag(model.Material.MaterialId); 
-            modelWriter.Write(ByteHelper.GetBytes(model.CommonHeader));
-            modelWriter.Write(MaterialFactory.Create().Save(model.CommonHeader.ModelTypeFlag, model.Material));
+            binaryWriter.Write(ByteHelper.GetBytes(model.CommonHeader));
+            binaryWriter.Write(MaterialFactory.Create().Save(model.CommonHeader.ModelTypeFlag, model.Material));
 
-            var vertStart = modelWriter.BaseStream.Position;
+            var vertStart = binaryWriter.BaseStream.Position;
             if (vertStart != model.CommonHeader.VertexOffset)
                 throw new Exception("Unexpected VertexOffset");
 
             foreach (var vertex in model.Mesh.VertexList)
-                modelWriter.Write(vertexFactory.Save(rmvVersion, model.Material.BinaryVertexFormat, vertex));
+                binaryWriter.Write(vertexFactory.Save(rmvVersion, model.Material.BinaryVertexFormat, vertex));
 
-            var indexOffset = modelWriter.BaseStream.Position;
+            var indexOffset = binaryWriter.BaseStream.Position;
             if (indexOffset != model.CommonHeader.IndexOffset)
                 throw new Exception("Unexpected IndexOffset");
 
             foreach (var index in model.Mesh.IndexList)
-                modelWriter.Write(index);
+                binaryWriter.Write(index);
 
             var modelBytes = modelStream.ToArray();
             if (model.CommonHeader.MeshSectionSize != modelBytes.Length)

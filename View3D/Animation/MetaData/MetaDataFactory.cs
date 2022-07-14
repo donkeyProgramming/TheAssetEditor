@@ -140,20 +140,30 @@ namespace View3D.Animation.MetaData
 
             var meshPath = pfs.FindFile(animatedPropMeta.ModelName);
             var animationPath = pfs.FindFile(animatedPropMeta.AnimationName);
-
             var propPlayer = _componentManager.GetComponent<AnimationsContainerComponent>().RegisterAnimationPlayer(new AnimationPlayer(), propName + Guid.NewGuid());
 
             // Configure the mesh
             SceneLoader loader = new SceneLoader(resourceLib, pfs, GeometryGraphicsContextFactory.CreateInstance(graphics.Device), _componentManager, _applicationSettingsService);
             var loadedNode = loader.Load(meshPath, new GroupNode(propName), propPlayer);
-            
 
             // Configure animation
-            var skeletonName = SceneNodeHelper.GetSkeletonName(loadedNode);
-            var skeletonFile = skeletonHelper.GetSkeletonFileFromName(pfs, skeletonName);
-            var skeleton = new GameSkeleton(skeletonFile, propPlayer);
-            var animFile = AnimationFile.Create(animationPath);
-            var clip = new AnimationClip(animFile, skeleton);
+            if (animationPath != null)
+            {
+                var skeletonName = SceneNodeHelper.GetSkeletonName(loadedNode);
+                var skeletonFile = skeletonHelper.GetSkeletonFileFromName(pfs, skeletonName);
+                var skeleton = new GameSkeleton(skeletonFile, propPlayer);
+                var animFile = AnimationFile.Create(animationPath);
+                var clip = new AnimationClip(animFile, skeleton);
+                propPlayer.SetAnimation(clip, skeleton);
+
+                // Add the prop skeleton
+                var skeletonSceneNode = new SkeletonNode(_componentManager, new SimpleSkeletonProvider(skeleton));
+                skeletonSceneNode.NodeColour = Color.Yellow;
+                skeletonSceneNode.ScaleMult = animatedPropMeta.Scale;
+                loadedNode.AddObject(skeletonSceneNode);
+            }
+
+            // Configure scale
             loadedNode.ForeachNodeRecursive((node) =>
             {
                 if (node is SceneNode selectable)
@@ -161,19 +171,12 @@ namespace View3D.Animation.MetaData
             });
             loadedNode.ScaleMult = animatedPropMeta.Scale;
 
+            // Add the animation rules
             var animationRule = new CopyRootTransform(_rootSkeleton, animatedPropMeta.BoneId, animatedPropMeta.Position, new Quaternion(animatedPropMeta.Orientation));
-           
-            // Apply animation
-            propPlayer.SetAnimation(clip, skeleton);
             propPlayer.AnimationRules.Add(animationRule);
 
             // Add to scene
             _root.AddObject(loadedNode);
-
-            var skeletonSceneNode = new SkeletonNode(_componentManager, new SimpleSkeletonProvider(skeleton));
-            skeletonSceneNode.NodeColour = Color.Yellow;
-            skeletonSceneNode.ScaleMult = animatedPropMeta.Scale;
-            loadedNode.AddObject(skeletonSceneNode);
 
             return new AnimatedPropInstance(loadedNode, propPlayer);
         }

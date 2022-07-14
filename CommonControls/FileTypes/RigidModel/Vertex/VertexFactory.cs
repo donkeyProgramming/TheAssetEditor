@@ -56,20 +56,11 @@ namespace CommonControls.FileTypes.RigidModel.Vertex
             return vertexList;
         }
 
-        public uint GetVertexSize(VertexFormat format, RmvVersionEnum rmvVersion)
-        {
-            return _vertexCreators[format].GetVertexSize(rmvVersion);
-        }
+        public uint GetVertexSize(VertexFormat format, RmvVersionEnum rmvVersion) => _vertexCreators[format].GetVertexSize(rmvVersion);
 
-        public bool IsKnownVertex(VertexFormat format)
-        {
-            return _vertexCreators.ContainsKey(format);
-        }
-
-        public byte[] Save(RmvVersionEnum rmvVersion, VertexFormat vertexType, CommonVertex vertex)
-        {
-            return _vertexCreators[vertexType].Write(rmvVersion, vertex);
-        }
+        public bool IsKnownVertex(VertexFormat format) => _vertexCreators.ContainsKey(format);
+       
+        public byte[] Save(RmvVersionEnum rmvVersion, VertexFormat vertexType, CommonVertex vertex) => _vertexCreators[vertexType].Write(rmvVersion, vertex);
 
         public void ReComputeNormals(VertexFormat binaryVertexFormat, ref CommonVertex[] vertexList, ref ushort[] indexList)
         {
