@@ -1,16 +1,9 @@
 ﻿using AnimationEditor.Common.ReferenceModel;
 using CommonControls.Common;
-using CommonControls.Services;
-using CommunityToolkit.Mvvm.Input;
-using MonoGame.Framework.WpfInterop;
 using Serilog;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Windows.Input;
-using View3D.Utility;
 
 namespace AnimationEditor.Common.AnimationPlayer
 {

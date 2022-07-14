@@ -19,7 +19,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
 
         public override List<Node> Nodes => AkDecisionTree.Root.ChildNodes;
 
-        protected override void Create(ByteChunk chunk)
+        protected override void CreateSpesificData(ByteChunk chunk)
         {
             uProbability = chunk.ReadByte();
             uTreeDepth = chunk.ReadUInt32();

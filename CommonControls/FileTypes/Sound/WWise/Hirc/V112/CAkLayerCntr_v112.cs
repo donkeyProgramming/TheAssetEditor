@@ -19,7 +19,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
 
 
 
-        protected override void Create(ByteChunk chunk)
+        protected override void CreateSpesificData(ByteChunk chunk)
         {
             NodeBaseParams = NodeBaseParams.Create(chunk);
             Children = Children.Create(chunk);

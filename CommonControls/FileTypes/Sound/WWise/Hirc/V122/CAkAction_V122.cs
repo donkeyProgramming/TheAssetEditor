@@ -9,7 +9,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V122
         public ActionType ActionType { get; set; }
         public uint SoundId { get; set; }
 
-        protected override void Create(ByteChunk chunk)
+        protected override void CreateSpesificData(ByteChunk chunk)
         {
             ActionType = (ActionType)chunk.ReadUShort();
             SoundId = chunk.ReadUInt32();

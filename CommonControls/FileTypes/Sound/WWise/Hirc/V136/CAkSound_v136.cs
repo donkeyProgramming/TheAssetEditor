@@ -2,11 +2,10 @@
 using CommonControls.FileTypes.Sound.WWise.Hirc;
 using Filetypes.ByteParsing;
 using System;
-using System.Collections.Generic;
 
-namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
+namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 {
-    public class CAkSound_V112 : CAkSound
+    public class CAkSound_v136 : CAkSound
     {
         public AkBankSourceData AkBankSourceData { get; set; }
         public NodeBaseParams NodeBaseParams { get; set; }
@@ -35,11 +34,8 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
             var output = new AkBankSourceData()
             {
                 PluginId = chunk.ReadUInt32(),
-                //PluginId_type = chunk.ReadUShort(),
-                //PluginId_company = chunk.ReadUShort(),
                 StreamType = (SourceType)chunk.ReadByte()
             };
-
 
             output.PluginId_type = (ushort)(output.PluginId >> 0 & 0x000F);
             output.PluginId_company = (ushort)(output.PluginId >> 4 & 0x03FF);
@@ -52,32 +48,26 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
             if (output.PluginId_type == 0x02)
                 output.uSize = chunk.ReadUInt32();
 
-            output.akMediaInformation = AkMediaInformation.Create(chunk, output.StreamType);
+            output.akMediaInformation = AkMediaInformation.Create(chunk);
 
             return output;
         }
     }
 
-
     public class AkMediaInformation
     {
         public uint SourceId { get; set; }
-        public uint FileId { get; set; }
-        public uint uFileOffset { get; set; }
         public uint uInMemoryMediaSize { get; set; }
         public byte uSourceBits { get; set; }
 
-        public static AkMediaInformation Create(ByteChunk chunk, SourceType sourceType)
+        public static AkMediaInformation Create(ByteChunk chunk)
         {
-            var instance = new AkMediaInformation();
-            instance.SourceId = chunk.ReadUInt32();
-            instance.FileId = chunk.ReadUInt32();
-            if (sourceType == SourceType.Data_BNK)
-                instance.uFileOffset = chunk.ReadUInt32();
-            instance.uInMemoryMediaSize = chunk.ReadUInt32();
-            instance.uSourceBits = chunk.ReadByte();
-            return instance;
-
+            return new AkMediaInformation()
+            {
+                SourceId = chunk.ReadUInt32(),
+                uInMemoryMediaSize = chunk.ReadUInt32(),
+                uSourceBits = chunk.ReadByte(),
+            };
         }
     }
 }

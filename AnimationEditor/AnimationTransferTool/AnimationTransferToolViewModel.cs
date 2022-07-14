@@ -29,7 +29,7 @@ namespace AnimationEditor.AnimationTransferTool
 
     public static class AnimationTransferTool_Debug
     {
-        public static void CreateDamselEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        public static void CreateDwardAndEmpArcher(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
             var editorView = toolFactory.CreateEditorViewModel<AnimationTransferToolViewModel>();
             editorView.MainInput = new AnimationToolInput()

@@ -209,8 +209,6 @@ make time in superview copyable
 
 V0.39
 ----------------------------
-
-Clean up animatin player. Combine the one in superview and kitbasher
 animtranfer tool filter for batch processing 
 Clean up render list items  - One dispsable large list and one on the go. All types of line items made in a factory and works for both
 

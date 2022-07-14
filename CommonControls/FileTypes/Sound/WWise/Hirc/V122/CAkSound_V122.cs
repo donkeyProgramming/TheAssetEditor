@@ -10,7 +10,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V122
         public AkBankSourceData AkBankSourceData { get; set; }
         public NodeBaseParams NodeBaseParams { get; set; }
 
-        protected override void Create(ByteChunk chunk)
+        protected override void CreateSpesificData(ByteChunk chunk)
         {
             AkBankSourceData = AkBankSourceData.Create(chunk);
             NodeBaseParams = NodeBaseParams.Create(chunk);

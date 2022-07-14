@@ -18,7 +18,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V122
         public List<CAkSwitchPackage> SwitchList { get; set; } = new List<CAkSwitchPackage>();
         public List<AkSwitchNodeParams> Parameters { get; set; } = new List<AkSwitchNodeParams>();
 
-        protected override void Create(ByteChunk chunk)
+        protected override void CreateSpesificData(ByteChunk chunk)
         {
             NodeBaseParams = NodeBaseParams.Create(chunk);
             eGroupType = (AkGroupType)chunk.ReadByte();

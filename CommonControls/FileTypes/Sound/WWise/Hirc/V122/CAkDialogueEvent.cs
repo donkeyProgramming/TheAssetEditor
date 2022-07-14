@@ -17,7 +17,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V122
         public byte uMode;
         public AkDecisionTree AkDecisionTree;
 
-        protected override void Create(ByteChunk chunk)
+        protected override void CreateSpesificData(ByteChunk chunk)
         {
             uProbability = chunk.ReadByte();
             uTreeDepth = chunk.ReadUInt32();

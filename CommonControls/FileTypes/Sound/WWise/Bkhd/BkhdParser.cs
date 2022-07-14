@@ -26,6 +26,9 @@ namespace CommonControls.FileTypes.Sound.WWise.Bkhd
             if (bkdh.dwBankGeneratorVersion == 2147483770)
                 bkdh.dwBankGeneratorVersion = 122;
 
+            if (bkdh.dwBankGeneratorVersion == 2147483784)
+                bkdh.dwBankGeneratorVersion = 136;
+
             soundDb.Header = bkdh;
         }
     }

@@ -13,7 +13,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V122
         public List<CAkLayer> LayerList { get; set; } = new List<CAkLayer>();
         public byte bIsContinuousValidation { get; set; }
 
-        protected override void Create(ByteChunk chunk)
+        protected override void CreateSpesificData(ByteChunk chunk)
         {
             NodeBaseParams = NodeBaseParams.Create(chunk);
             Children = Children.Create(chunk);

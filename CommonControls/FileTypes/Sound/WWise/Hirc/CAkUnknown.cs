@@ -8,9 +8,9 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc
         public string ErrorMsg { get; set; }
 
 
-        protected override void Create(ByteChunk chunk)
+        protected override void CreateSpesificData(ByteChunk chunk)
         {
-
+            chunk.ReadBytes((int)Size-4);
         }
     }
 }

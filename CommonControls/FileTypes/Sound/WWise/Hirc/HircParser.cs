@@ -28,9 +28,10 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc
             {
                 case 112: return CreateFactory_v112();
                 case 122: return CreateFactory_v122();
+                case 136: return CreateFactory_v136();
             }
 
-            throw new Exception("Unkown Version");
+            throw new Exception($"Unkown Version {version}");
         }
 
         public static HircFactory CreateFactory_v122()
@@ -59,11 +60,24 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc
             return instance;
         }
 
+        public static HircFactory CreateFactory_v136()
+        {
+            var instance = new HircFactory();
+            instance.RegisterHirc(HircType.Sound, () => new V136.CAkSound_v136());
+            instance.RegisterHirc(HircType.Event, () => new V136.CAkEvent_v136());
+            instance.RegisterHirc(HircType.Action, () => new V136.CAkAction_v136());
+            //instance.RegisterHirc(HircType.SwitchContainer, () => new V136.CAkSwitchCntr_V136());
+            //instance.RegisterHirc(HircType.SequenceContainer, () => new V136.CAkRanSeqCnt_V136());
+            //instance.RegisterHirc(HircType.LayerContainer, () => new V136.CAkLayerCntr_vV136());
+            //instance.RegisterHirc(HircType.Dialogue_Event, () => new V136.CAkDialogueEvent_V136());
+            return instance;
+        }
 
     }
 
     public class HircParser : IParser
     {
+
         public void Parse(string fileName, ByteChunk chunk, SoundDataBase soundDb)
         {
             var chunkSize = chunk.ReadUInt32();
@@ -72,34 +86,28 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc
 
             var factory = HircFactory.CreateFactory(soundDb.Header.dwBankGeneratorVersion);
 
-            for (uint i = 0; i < numItems; i++)
+            for (uint itemIndex = 0; itemIndex < numItems; itemIndex++)
             {
                 var hircType = (HircType)chunk.PeakByte();
-
-                if (i == 1475)
-                {
-                }
 
                 var start = chunk.Index;
                 try
                 {
                     var hircItem = factory.CreateInstance(hircType);
-                    hircItem.IndexInFile = i;
+                    hircItem.IndexInFile = itemIndex;
                     hircItem.OwnerFile = fileName;
                     hircItem.Parse(chunk);
                     soundDb.Hircs.Add(hircItem);
                 }
                 catch (Exception e)
                 {
-                    failedItems.Add(i);
+                    failedItems.Add(itemIndex);
                     chunk.Index = start;
 
-                    var unkInstance = new CAkUnknown() { ErrorMsg = e.Message, IndexInFile = i, OwnerFile = fileName };
+                    var unkInstance = new CAkUnknown() { ErrorMsg = e.Message, IndexInFile = itemIndex, OwnerFile = fileName };
                     unkInstance.Parse(chunk);
                     soundDb.Hircs.Add(unkInstance);
                 }
-
-
             }
         }
     }

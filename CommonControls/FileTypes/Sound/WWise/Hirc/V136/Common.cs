@@ -1,52 +1,10 @@
-﻿using CommonControls.FileTypes.Sound.WWise;
-using Filetypes.ByteParsing;
+﻿using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
-namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
+namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 {
-
-    public class CAkSwitchCntr_V112 : CAkSwitchCntr
-    {
-        public NodeBaseParams NodeBaseParams { get; set; }
-        public AkGroupType eGroupType { get; set; }
-        public uint ulGroupID { get; set; }   // Enum group name
-        public uint ulDefaultSwitch { get; set; }    // Default value name
-        public byte bIsContinuousValidation { get; set; }
-        public Children Children { get; set; }
-        public List<CAkSwitchPackage> SwitchList { get; set; } = new List<CAkSwitchPackage>();
-        public List<AkSwitchNodeParams> Parameters { get; set; } = new List<AkSwitchNodeParams>();
-
-        protected override void CreateSpesificData(ByteChunk chunk)
-        {
-            NodeBaseParams = NodeBaseParams.Create(chunk);
-            eGroupType = (AkGroupType)chunk.ReadByte();
-            ulGroupID = chunk.ReadUInt32();
-            ulDefaultSwitch = chunk.ReadUInt32();
-            bIsContinuousValidation = chunk.ReadByte();
-            Children = Children.Create(chunk);
-
-            var switchListCount = chunk.ReadUInt32();
-            for (int i = 0; i < switchListCount; i++)
-                SwitchList.Add(CAkSwitchPackage.Create(chunk));
-
-            var paramCount = chunk.ReadUInt32();
-            for (int i = 0; i < paramCount; i++)
-                Parameters.Add(AkSwitchNodeParams.Create(chunk));
-
-        }
-
-        public override uint GroupId => ulGroupID;
-
-        public override uint DefaultSwitch => ulDefaultSwitch;
-
-        public override uint ParentId => NodeBaseParams.DirectParentID;
-
-        public override List<SwitchListItem> Items => SwitchList.Select(x => new SwitchListItem() {  SwitchId = x.SwitchId,  ChildNodeIds = x.NodeIdList }).ToList();
-    }
-
     public class Children
     {
         public List<uint> ChildIdList { get; set; } = new List<uint>(); // Probably the name of something, or at least a reference to something interesting
@@ -128,10 +86,12 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
         {
             var node = new NodeBaseParams();
             node.NodeInitialFxParams = NodeInitialFxParams.Create(chunk);
+            
             node.bOverrideAttachmentParams = chunk.ReadByte();
             node.OverrideBusId = chunk.ReadUInt32();
             node.DirectParentID = chunk.ReadUInt32();
             node.byBitVector = chunk.ReadByte();
+
             node.NodeInitialParams = NodeInitialParams.Create(chunk);
             node.PositioningParams = PositioningParams.Create(chunk);
             node.AuxParams = AuxParams.Create(chunk);
@@ -257,30 +217,41 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
 
     public class PositioningParams
     {
-        public byte uByVector { get; set; }
+        public byte uBitsPositioning { get; set; }
         public byte uBits3d { get; set; }
         public uint uAttenuationID { get; set; }
 
         public byte ePathMode { get; set; }
         public float TransitionTime { get; set; }
+
+
+
         public List<AkPathVertex> VertexList { get; set; } = new List<AkPathVertex>();
         public List<AkPathListItemOffset> PlayListItems { get; set; } = new List<AkPathListItemOffset>();
         public List<Ak3DAutomationParams> Params { get; set; } = new List<Ak3DAutomationParams>();
 
         public static PositioningParams Create(ByteChunk chunk)
         {
+            //has_automation = (e3DPositionType != 1)
+
             var instance = new PositioningParams();
-            instance.uByVector = chunk.ReadByte();
+            instance.uBitsPositioning = chunk.ReadByte();
 
-            var bPositioningInfoOverrideParent = (instance.uByVector >> 0 & 1) == 1;
-            var cbIs3DPositioningAvailable = (instance.uByVector >> 3 & 1) == 1;
+            var has_positioning = ((instance.uBitsPositioning >> 0) & 1) == 1;
+            var has_3d = ((instance.uBitsPositioning >> 1) & 1) == 1;
+            if (has_positioning)
+            {
 
-            if (bPositioningInfoOverrideParent && cbIs3DPositioningAvailable)
+            }
+
+            if (has_positioning && has_3d)
             {
                 instance.uBits3d = chunk.ReadByte();
-                instance.uAttenuationID = chunk.ReadUInt32();
 
-                if ((instance.uBits3d >> 0 & 1) == 0)
+                var e3DPositionType = (instance.uBitsPositioning >> 5) & 3;
+                var has_automation = (e3DPositionType != 0);
+
+                if (has_automation)
                 {
                     instance.ePathMode = chunk.ReadByte();
                     instance.TransitionTime = chunk.ReadSingle();
@@ -288,19 +259,44 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
                     var numVertexes = chunk.ReadUInt32();
                     for (int i = 0; i < numVertexes; i++)
                         instance.VertexList.Add(AkPathVertex.Create(chunk));
-
+                    
                     var numPlayListItems = chunk.ReadUInt32();
                     for (int i = 0; i < numPlayListItems; i++)
                         instance.PlayListItems.Add(AkPathListItemOffset.Create(chunk));
-
-                    //var numParams = 4;
+                    
+                    //var numParams = 2 ;
                     //if (instance.ePathMode == 0x05)   //StepRandomPickNewPath
                     //    numParams = 1;
                     for (int i = 0; i < numPlayListItems; i++)
                         instance.Params.Add(Ak3DAutomationParams.Create(chunk));
                 }
+
             }
 
+
+            //var bPositioningInfoOverrideParent = (instance.uBitsPositioning >> 0 & 1) == 1;
+            //var cbIs3DPositioningAvailable = (instance.uBitsPositioning >> 3 & 1) == 1;
+            //e3DPositionType = (uBitsPositioning >> 5) & 3
+            //has_automation = (e3DPositionType != 0) #(3d == 1 or 3d != 1 and 3d == 2)
+
+            //if (bPositioningInfoOverrideParent)
+            //{ 
+            //    
+            //}
+            //
+            //if (bPositioningInfoOverrideParent && cbIs3DPositioningAvailable)
+            //{
+            //    //instance.uAttenuationID = chunk.ReadUInt32();
+            //
+            //    if ((instance.uBits3d >> 0 & 1) == 0)
+            //    {
+            //        instance.ePathMode = chunk.ReadByte();
+            //        instance.TransitionTime = chunk.ReadSingle();
+            //
+            //        
+            //    }
+            //}
+            //
 
             return instance;
         }
@@ -364,6 +360,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
         public uint auxID1 { get; set; }
         public uint auxID2 { get; set; }
         public uint auxID3 { get; set; }
+        public uint reflectionsAuxBus { get; set; }
 
         public static AuxParams Create(ByteChunk chunk)
         {
@@ -377,6 +374,8 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
                 instance.auxID2 = chunk.ReadUInt32();
                 instance.auxID3 = chunk.ReadUInt32();
             }
+
+            instance.reflectionsAuxBus = chunk.ReadUInt32();
 
             return instance;
         }
@@ -403,12 +402,17 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
     public class StateChunk
     {
         public List<AkStateGroupChunk> StateChunks { get; set; } = new List<AkStateGroupChunk>();
+        public List<AkStatePropertyInfo> StateProps { get; set; } = new List<AkStatePropertyInfo>();
 
         public static StateChunk Create(ByteChunk chunk)
         {
             var instance = new StateChunk();
-            var value = chunk.ReadUInt32();
-            for (int i = 0; i < value; i++)
+            var numStateProps = chunk.ReadByte();
+            for (int i = 0; i < numStateProps; i++)
+                instance.StateProps.Add(AkStatePropertyInfo.Create(chunk));
+
+            var numStateGroups = chunk.ReadByte();
+            for (int i = 0; i < numStateGroups; i++)
                 instance.StateChunks.Add(AkStateGroupChunk.Create(chunk));
             return instance;
         }
@@ -427,7 +431,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
             instance.ulStateGroupID = chunk.ReadUInt32();
             instance.eStateSyncType = chunk.ReadByte();
 
-            var count = chunk.ReadUShort();
+            var count = chunk.ReadByte();
             for (int i = 0; i < count; i++)
                 instance.States.Add(AkState.Create(chunk));
 
@@ -508,4 +512,19 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
         }
     }
 
+    public class AkStatePropertyInfo
+    {
+        public byte PropertyId { get; set; }
+        public byte accumType { get; set; }
+        public byte inDb { get; set; }
+
+        public static AkStatePropertyInfo Create(ByteChunk chunk)
+        {
+            var instance = new AkStatePropertyInfo();
+            instance.PropertyId = chunk.ReadByte();
+            instance.accumType = chunk.ReadByte();
+            instance.inDb = chunk.ReadByte();
+            return instance;
+        }
+    }
 }

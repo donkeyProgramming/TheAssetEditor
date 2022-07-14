@@ -14,7 +14,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
 
         public List<Action> Actions { get; set; } = new List<Action>();
 
-        protected override void Create(ByteChunk chunk)
+        protected override void CreateSpesificData(ByteChunk chunk)
         {
             var actionCount = chunk.ReadUInt32();
             for (int i = 0; i < actionCount; i++)

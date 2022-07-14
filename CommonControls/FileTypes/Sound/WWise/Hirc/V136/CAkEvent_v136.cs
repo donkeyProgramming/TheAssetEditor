@@ -3,9 +3,9 @@ using Filetypes.ByteParsing;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CommonControls.FileTypes.Sound.WWise.Hirc.V122
+namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 {
-    public class CAkEvent_v122 : CAkEvent
+    public class CAkEvent_v136 : CAkEvent
     {
         public class Action
         {
@@ -16,7 +16,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V122
 
         protected override void CreateSpesificData(ByteChunk chunk)
         {
-            var actionCount = chunk.ReadUInt32();
+            var actionCount = chunk.ReadByte();
             for (int i = 0; i < actionCount; i++)
                 Actions.Add(new Action() { ActionId = chunk.ReadUInt32() });
         }

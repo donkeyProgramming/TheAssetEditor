@@ -36,10 +36,19 @@ namespace CommonControls.FileTypes.Sound.WWise
                 Size = chunk.ReadUInt32();
                 Id = chunk.ReadUInt32();
 
-                Create(chunk);
+                if (Id == 1039375795)
+                { }
 
-                chunk.Index = (int)(objectStartIndex + 5 + Size);
-                HasError = false;
+                CreateSpesificData(chunk);
+                var currentIndex = chunk.Index;
+                var computedIndex = (int)(objectStartIndex + 5 + Size);
+                
+                // Can run this check as Actions are not fully implemented
+                //if(currentIndex != computedIndex)
+                //    throw new Exception($" {currentIndex - computedIndex} bytes left while parsing");
+
+                chunk.Index = computedIndex;
+                HasError = false;      
             }
             catch (Exception e)
             {
@@ -50,7 +59,7 @@ namespace CommonControls.FileTypes.Sound.WWise
             }
         }
 
-        protected abstract void Create(ByteChunk chunk);
+        protected abstract void CreateSpesificData(ByteChunk chunk);
 
     }
 

@@ -60,7 +60,8 @@ namespace View3D.Animation
             {
                 if (DynamicFrames.Count == 0)
                 {
-                    throw new ArgumentException("Trying to set Play time when DynamicFrames is empty");
+                    _playTimeUs = (long)(value * MicrosecondsPerSecond);
+                    return;
                 }
 
                 // make sure we have whole number of microsecond per frame
@@ -200,14 +201,11 @@ namespace View3D.Animation
 
         public AnimationClip Clone()
         {
-            AnimationClip copy = new AnimationClip
-            {
-                PlayTimeInSec = PlayTimeInSec
-            };
-
+            AnimationClip copy = new AnimationClip();
             foreach (var item in DynamicFrames)
                 copy.DynamicFrames.Add(item.Clone());
-
+            copy.PlayTimeInSec = PlayTimeInSec;
+            
             return copy;
         }
 
