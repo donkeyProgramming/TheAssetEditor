@@ -16,9 +16,10 @@ namespace AudioResearch
         static void Main(string[] args)
         {
             string[] allBnkFiles = GetAllBnkFiles();
+            var datDb = CreateDatDb();
 
             Console.WriteLine($"Found {allBnkFiles.Length} bnk files");
-            allBnkFiles = FilterUnvantedFiles(allBnkFiles, out var removedFiles);
+            allBnkFiles = FilterUnvantedFiles(allBnkFiles, new[] { "media", "init.bnk", "animation_blood_data.bnk" }, out var removedFiles);
             Console.WriteLine($"Found {allBnkFiles.Length} bnk files after filtering");
 
             var globalSoundDatabase = new Dictionary<string, SoundDataBase>();
@@ -109,17 +110,16 @@ namespace AudioResearch
             }
         }
 
-        static string[] FilterUnvantedFiles(string[] files, out string[] removedFiles)
+        static string[] FilterUnvantedFiles(string[] files, string[] removeFilters, out string[] removedFiles)
         {
             var tempRemoveFiles = new List<string>();
             var fileList = files.ToList();
 
             // Files that contains multiple items not decoded.
-            var removeFilter = new[]{ "media", "init.bnk", "animation_blood_data.bnk" };
 
             foreach (var file in fileList)
             {
-                foreach (var removeName in removeFilter)
+                foreach (var removeName in removeFilters)
                 {
                     if (file.Contains(removeName))
                     {
@@ -154,6 +154,30 @@ namespace AudioResearch
             if (allBnkFiles.Length != 611)
                 throw new Exception("The export folder should contain 611 bnk files. (Core files + English Folder)");
             return allBnkFiles;
+        }
+
+        private static string[] GetAllDatFiles()
+        {
+            var allDatFiles = Directory.GetFiles(GetExportedWWiseFolder(), "*.dat", SearchOption.AllDirectories);
+            if (allDatFiles.Length != 15)
+                throw new Exception("The export folder should contain 15 dat files.");
+            return allDatFiles;
+        }
+
+        private static SoundDatFile CreateDatDb()
+        {
+            var datFiles = GetAllDatFiles();
+            datFiles = FilterUnvantedFiles(datFiles, new[] { "bank_splits.dat" }, out var removedFiles);     
+            
+            var masterDat = new SoundDatFile();
+            foreach (var datFile in datFiles)
+            {
+                var pf = new PackFile(datFile, new FileSystemSource(datFile));
+                var parsedFile = DatParser.Parse(pf, false);
+                masterDat.Merge(parsedFile);
+            }
+
+            return masterDat;
         }
     }
 

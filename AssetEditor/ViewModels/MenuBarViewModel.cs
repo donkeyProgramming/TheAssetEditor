@@ -51,6 +51,7 @@ namespace AssetEditor.ViewModels
         ToolFactory _toolFactory;
         ApplicationSettingsService _settingsService;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        public IEditorCreator EditorCreator { get; set; }
 
         public ICommand OpenSettingsWindowCommand { get; set; }
         public ICommand CreateNewPackFileCommand { get; set; }
@@ -59,6 +60,7 @@ namespace AssetEditor.ViewModels
         public ICommand OpenAnimMetaDecocderCommand { get; set; }
         public ICommand OpenMountCreatorCommand { get; set; }
         public ICommand OpenAnimationBatchExporterCommand { get; set; }
+        public ICommand OpenWh2AnimpackUpdaterCommand { get; set; }
         public ICommand OpenAnimationBuilderCommand { get; set; }
 
         public ICommand SearchCommand { get; set; }
@@ -72,6 +74,7 @@ namespace AssetEditor.ViewModels
         public ICommand OpenHelpCommand { get; set; }
         public ICommand OpenPatreonCommand { get; set; }
         public ICommand OpenDiscordCommand { get; set; }
+        public ICommand DownloadRmeCommand { get; set; }
 
         public ICommand OpenKitbashEditorCommand { get; set; }
         public ICommand OpenCampaignAnimCreatorCommand { get; set; }
@@ -79,13 +82,15 @@ namespace AssetEditor.ViewModels
         public ICommand OpenAnimationTransferToolCommand { get; set; }
         public ICommand OpenSuperViewToolCommand { get; set; }
         public ICommand OpenTechSkeletonEditorCommand { get; set; }
-        public IEditorCreator EditorCreator { get; set; }
+     
         public ICommand GenerateRmv2ReportCommand { get; set; }
         public ICommand GenerateMetaDataReportCommand { get; set; }
         public ICommand GenerateFileListReportCommand { get; set; }
         public ICommand GenerateMetaDataJsonsReportCommand { get; set; }
         public ICommand CreateAnimPackWarhammer3Command { get; set; }
         public ICommand CreateAnimPack3kCommand { get; set; }
+        
+        // Tutorials
         public ICommand OpenAnimatedPropTutorialCommand { get; set; }
         public ICommand OpenAssetEdBasicTutorialCommand { get; set; }
         public ICommand OpenSkragTutorialCommand { get; set; }
@@ -117,6 +122,7 @@ namespace AssetEditor.ViewModels
             OpenSuperViewToolCommand = new RelayCommand(OpenSuperViewTool);
             OpenTechSkeletonEditorCommand = new RelayCommand(OpenTechSkeletonEditor);
             OpenAnimationBatchExporterCommand = new RelayCommand(OpenAnimationBatchExporter);
+            OpenWh2AnimpackUpdaterCommand = new RelayCommand(OpenWh2AnimpackUpdater);
             OpenAnimationBuilderCommand = new RelayCommand(OpenOpenAnimationBuilder);
 
             GenerateRmv2ReportCommand = new RelayCommand(GenerateRmv2Report);
@@ -142,6 +148,7 @@ namespace AssetEditor.ViewModels
             OpenHelpCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://tw-modding.com/index.php/Tutorial:AssetEditor") { CreateNoWindow = true }));
             OpenPatreonCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://www.patreon.com/TheAssetEditor") { CreateNoWindow = true }));
             OpenDiscordCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://discord.gg/6Djf2sCczC") { CreateNoWindow = true }));
+            DownloadRmeCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://github.com/mr-phazer/RME_Release/releases/latest") { CreateNoWindow = true }));
 
             var settings = settingsService.CurrentSettings;
             settings.RecentPackFilePaths.CollectionChanged += (sender, args) => CreateRecentPackFilesItems();
@@ -279,12 +286,15 @@ namespace AssetEditor.ViewModels
 
         void OpenAnimationBatchExporter() => AnimationBatchExportViewModel.ShowWindow(_packfileService, _skeletonAnimationLookUpHelper);
 
+        void OpenWh2AnimpackUpdater()
+        { 
+        }
+        
+
         void OpenOpenAnimationBuilder()
         {
-            {
-                var editorView = _toolFactory.CreateEditorViewModel<AnimationBuilderViewModel>();
-                EditorCreator.CreateEmptyEditor(editorView);
-            }
+            var editorView = _toolFactory.CreateEditorViewModel<AnimationBuilderViewModel>();
+            EditorCreator.CreateEmptyEditor(editorView);
         }
 
         void GenerateRmv2Report()

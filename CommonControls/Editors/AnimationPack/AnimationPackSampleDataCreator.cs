@@ -32,11 +32,16 @@ namespace CommonControls.Editors.AnimationPack
             return null;
         }
 
-        public static PackFile CreateAnimationDbWarhammer3(PackFileService pfs, string name)
+        public static string GenerateWh3AnimPackName(string name)
         {
-
             var fileName = SaveHelper.EnsureEnding(name, ".animpack");
             var filePath = @"animations/database/battle/bin/" + fileName;
+            return filePath;
+        }
+
+        public static PackFile CreateAnimationDbWarhammer3(PackFileService pfs, string name)
+        {
+            var filePath = GenerateWh3AnimPackName(name);
 
             if (!SaveHelper.IsFilenameUnique(pfs, filePath))
             {

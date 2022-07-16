@@ -209,8 +209,16 @@ make time in superview copyable
 
 V0.39
 ----------------------------
-animtranfer tool filter for batch processing 
 Clean up render list items  - One dispsable large list and one on the go. All types of line items made in a factory and works for both
+Convert wh2 animpack to wh3 format 
+Phazer link
+Fix datParser so it does not break wh2 
+
+
+OpenWh2AnimpackUpdaterCommand
+DownloadRmeCommand
+
+TL;DR - Fixed some huge bugs, auto upgrade Wh2 animpacks to Wh3, added tutorials and quality of life fixes
 
 Features:
 	* Animation report (Thanks to Klissian)
@@ -219,6 +227,7 @@ Features:
 	* Added more tutorials under the tutorials dropdown (thanks to Masked Mustachio)
 	* Ctrl + double click expands all child nodes in the packfile tree view 
 	* Collapse all added to packfile tree view context menu 
+	* Lot of code related to audio modding (Work in progres)
 
 BugFixes:
 	* Static meshes now load/save correctly. Should no longer get incorrect shading in game when using static meshes. (Thanks to Phazer)
@@ -226,6 +235,13 @@ BugFixes:
 	* Previous and next frame buttons working correctly (Thanks to Klissian)
 	* Fixed error when creating LODs
 	* Fixed crash when using prop meta tags 
+	
+New tutorials:
+	https://www.youtube.com/watch?v=b68hSHZ5raY
+	https://www.youtube.com/watch?v=7HN4oA2LsFM
+	https://www.youtube.com/watch?v=MhvbZfNp8Qw
+	https://www.youtube.com/watch?v=ONRAKJUmuiM
+	https://www.youtube.com/watch?v=AXw99yc74CY
 	
 
 
