@@ -2,7 +2,6 @@
 using CommonControls.Editors.AnimationPack;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
-using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3;
 using CommonControls.FileTypes.PackFiles.Models;
 using Serilog;
 using System;
@@ -54,8 +53,7 @@ namespace CommonControls.Services
 
                 foreach (var binEntry in animationBinEntries)
                 {
-
-                    var wh3Bin = new AnimationBinWh3(binEntry.Name);
+                    var wh3Bin = new FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3(binEntry.Name);
                     wh3Bin.SkeletonName = binEntry.SkeletonName;
                     wh3Bin.MountBin = binEntry.MountName;
                     wh3Bin.LocomotionGraph = "animations/locomotion_graphs/entity_locomotion_graph.xml";
@@ -63,6 +61,23 @@ namespace CommonControls.Services
                     var fragment = animFrags.First(x => string.Equals(x.FileName, binEntry.Name, StringComparison.InvariantCultureIgnoreCase));
                     foreach (var animationSetEntry in fragment.Fragments)
                     {
+                        var newBinEntry = new FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry();
+
+                        var wh2Slot = DefaultAnimationSlotTypeHelper.GetFromId(animationSetEntry.Slot.Id);
+                        var wh3Slot = AnimationSlotTypeHelperWh3.GetfromValue(wh2Slot.Value);
+
+                        newBinEntry.AnimationId = (uint)wh3Slot.Id;
+                        newBinEntry.BlendIn = animationSetEntry.BlendInTime;
+                        newBinEntry.SelectionWeight = animationSetEntry.SelectionWeight;
+                        newBinEntry.WeaponBools = animationSetEntry.WeaponBone;
+                        newBinEntry.AnimationRefs.Add(new FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef() 
+                        { 
+                            AnimationFile = "",
+                            AnimationMetaFile = "",
+                            AnimationSoundMetaFile = "",
+                        });
+
+                        wh3Bin.AnimationTableEntries.Add(newBinEntry);
 
                         processedFragments++;
                     }
@@ -75,9 +90,6 @@ namespace CommonControls.Services
                 var outputAnimPackName = AnimationPackSampleDataCreator.GenerateWh3AnimPackName(animPackPathWithoutExtentions + "_wh3");
                 SaveHelper.Save(_pfs, outputAnimPackName, null, AnimationPackSerializer.ConvertToBytes(outputWh3AnimPack), false);
             }
-
         }
-
-
     }
 }

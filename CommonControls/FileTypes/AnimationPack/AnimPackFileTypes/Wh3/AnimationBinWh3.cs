@@ -204,7 +204,7 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
         public float BlendIn { get; set; }
         public float SelectionWeight{ get; set; }
         public int WeaponBools { get; set; }
-        public bool Unk { get; set; }
+        public bool Unk { get; set; } = false;
         public List<AnimationRef> AnimationRefs { get; set; } = new List<AnimationRef>();
 
         public class AnimationRef 

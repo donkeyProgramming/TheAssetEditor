@@ -202,13 +202,6 @@ V0.39
 Check metadata factory
 make time in superview copyable
 
-
-
-
-
-
-V0.39
-----------------------------
 Clean up render list items  - One dispsable large list and one on the go. All types of line items made in a factory and works for both
 Convert wh2 animpack to wh3 format 
 Phazer link
@@ -218,7 +211,12 @@ Fix datParser so it does not break wh2
 OpenWh2AnimpackUpdaterCommand
 DownloadRmeCommand
 
-TL;DR - Fixed some huge bugs, auto upgrade Wh2 animpacks to Wh3, added tutorials and quality of life fixes
+
+
+
+V0.39
+----------------------------
+TL;DR - Fixed some huge bugs, added tutorials and quality of life fixes
 
 Features:
 	* Animation report (Thanks to Klissian)

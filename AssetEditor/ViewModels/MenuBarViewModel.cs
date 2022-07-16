@@ -287,7 +287,10 @@ namespace AssetEditor.ViewModels
         void OpenAnimationBatchExporter() => AnimationBatchExportViewModel.ShowWindow(_packfileService, _skeletonAnimationLookUpHelper);
 
         void OpenWh2AnimpackUpdater()
-        { 
+        {
+            _packfileService.HasEditablePackFile();
+            var service = new AnimPackUpdaterService(_packfileService);
+            service.Process(_packfileService.GetEditablePack());
         }
         
 
