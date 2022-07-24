@@ -120,7 +120,15 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
             var rootNode = _editableMeshResolver.GeEditableMeshRootNode();
             var lodGenerationService = new LodGenerationService(_objectEditor);
-            lodGenerationService.CopyLod0ToEveryLodSlot(rootNode);
+
+            rootNode.GetLodNodes().ForEach(x =>
+            {
+                x.LodReductionFactor = 1;
+                x.OptimizeLod_Alpha = false;
+                x.OptimizeLod_Vertex = false;
+            });
+
+            lodGenerationService.CreateLodsForRootNode(rootNode);
         }
         public void CreateLods()
         {
