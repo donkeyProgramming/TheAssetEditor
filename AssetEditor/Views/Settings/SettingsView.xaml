@@ -66,6 +66,7 @@
                     <RowDefinition/>
                     <RowDefinition/>
                     <RowDefinition/>
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Current Game"/>
@@ -95,6 +96,10 @@
                 <TextBlock Grid.Row="5" Grid.Column="0" Text="Auto resolve missing textures"/>
                 <TextBlock Grid.Row="5" Grid.Column="1" Text=":"/>
                 <CheckBox  Grid.Row="5" Grid.Column="2" IsChecked="{Binding AutoResolveMissingTextures, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="Hide wh2 texture selectors if warhammer 3 is selected"/>
+                <TextBlock Grid.Row="6" Grid.Column="1" Text=":"/>
+                <CheckBox  Grid.Row="6" Grid.Column="2" IsChecked="{Binding HideWh2TextureSelectors, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             </Grid>
         </GroupBox>
     </Grid>

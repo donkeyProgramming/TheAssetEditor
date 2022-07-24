@@ -27,6 +27,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         public class TextureViewModel : NotifyPropertyChangedImpl, INotifyDataErrorInfo
         {
             PackFileService _packfileService;
+            ApplicationSettingsService _appSettingsService;
             Rmv2MeshNode _meshNode;
             public TexureType TexureType { get; private set; }
 
@@ -55,7 +56,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             private readonly Dictionary<string, List<string>> _errorsByPropertyName = new Dictionary<string, List<string>>();
             private string _path = "";
 
-            public TextureViewModel(Rmv2MeshNode meshNode, PackFileService packfileService, TexureType texureType)
+            public TextureViewModel(Rmv2MeshNode meshNode, PackFileService packfileService, TexureType texureType, ApplicationSettingsService appSettingsService)
             {
                 _packfileService = packfileService;
                 _meshNode = meshNode;
@@ -63,6 +64,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 TextureTypeStr = TexureType.ToString();
                 _path = _meshNode.Material.GetTexture(texureType)?.Path;
                 ValidateTexturePath();
+                _appSettingsService = appSettingsService;
             }
 
             public void Preview() => TexturePreviewController.CreateWindow(Path, _packfileService, _meshNode.Geometry);
@@ -148,6 +150,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         Rmv2MeshNode _meshNode;
         IComponentManager _componentManager;
         PackFileService _pfs;
+        ApplicationSettingsService _applicationSettingsService;
 
         public ICommand ResolveTexturesCommand { get; set; }
         public ICommand DeleteMissingTexturesCommand { get; set; }
@@ -184,11 +187,12 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         public UiVertexFormat VertexType { get { return _meshNode.Geometry.VertexFormat; } set { ChangeVertexType(value); } }
         public IEnumerable<UiVertexFormat> PossibleVertexTypes { get; set; }
 
-        public MaterialGeneralViewModel(Rmv2MeshNode meshNode, PackFileService pfs, IComponentManager componentManager)
+        public MaterialGeneralViewModel(Rmv2MeshNode meshNode, PackFileService pfs, IComponentManager componentManager, ApplicationSettingsService applicationSettings)
         {
             _componentManager = componentManager;
             _meshNode = meshNode;
             _pfs = pfs;
+            _applicationSettingsService = applicationSettings;
             PossibleVertexTypes = new UiVertexFormat[] { UiVertexFormat.Static, UiVertexFormat.Weighted, UiVertexFormat.Cinematic };
             ResolveTexturesCommand = new RelayCommand(ResolveMissingTextures);
             DeleteMissingTexturesCommand = new RelayCommand(DeleteMissingTextures);
@@ -207,7 +211,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             TextureList.Clear();
             foreach (var enumValue in distinctEnumList)
             {
-                var textureView = new TextureViewModel(_meshNode, _pfs, enumValue);
+                var textureView = new TextureViewModel(_meshNode, _pfs, enumValue, _applicationSettingsService);
                 TextureList.Add(textureView);
             }
 
@@ -218,6 +222,17 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         {
             foreach (var texture in TextureList)
             {
+                if(_applicationSettingsService.CurrentSettings.HideWh2TextureSelectors && 
+                   _applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Warhammer3)
+                {
+                    if(texture.TexureType == TexureType.Diffuse  ||
+                       texture.TexureType == TexureType.Specular ||
+                       texture.TexureType == TexureType.Gloss)
+                    {
+                        texture.IsVisible.Value = false;
+                        continue;
+                    }
+                }
                 if (onlyShowUsedTextures == false)
                     texture.IsVisible.Value = true;
                 else

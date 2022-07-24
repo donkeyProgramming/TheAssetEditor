@@ -78,7 +78,7 @@ namespace KitbasherEditor.ViewModels
             _commandExecutor.CommandStackChanged += CommandExecutorOnCommandStackChanged;
 
             Animation = new AnimationControllerViewModel(Scene, _packFileService);
-            SceneExplorer = Scene.AddComponent(new SceneExplorerViewModel(Scene, _packFileService, Animation));
+            SceneExplorer = Scene.AddComponent(new SceneExplorerViewModel(Scene, _packFileService, Animation, _applicationSettingsService));
             
             MenuBar = new MenuBarViewModel(Scene, _packFileService);
             
