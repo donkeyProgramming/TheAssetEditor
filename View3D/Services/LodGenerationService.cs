@@ -26,6 +26,19 @@ namespace View3D.Services
             _objectEditor = objectEditor;
         }
 
+        private void DeleteAllLods(List<Rmv2LodNode> lodRootNodes)
+        {
+            foreach (var lod in lodRootNodes)
+            {
+                var itemsToDelete = new List<ISceneNode>();
+                foreach (var child in lod.Children)
+                    itemsToDelete.Add(child);
+
+                foreach (var child in itemsToDelete)
+                    child.Parent.RemoveObject(child);
+            }
+        }
+
         public void CreateLodsForRootNode(Rmv2ModelNode rootNode)
         {
             var lods = rootNode.GetLodNodes();
@@ -40,15 +53,7 @@ namespace View3D.Services
                 .ToArray();
 
             // Delete all the lods
-            foreach (var lod in lodRootNodes)
-            {
-                var itemsToDelete = new List<ISceneNode>();
-                foreach (var child in lod.Children)
-                    itemsToDelete.Add(child);
-
-                foreach (var child in itemsToDelete)
-                    child.Parent.RemoveObject(child);
-            }
+            DeleteAllLods(lodRootNodes);
 
             var meshList = firtLod.GetAllModelsGrouped(false).SelectMany(x => x.Value).ToList();
             var generatedLod = CreateLods(meshList, lodGenerationSettings);
@@ -57,6 +62,31 @@ namespace View3D.Services
             {
                 foreach (var mesh in generatedLod[i])
                     lodRootNodes[i].AddObject(mesh);
+            }
+        }
+
+        public void CopyLod0ToEveryLodSlot(Rmv2ModelNode rootNode)
+        {
+            var lods = rootNode.GetLodNodes();
+            var firtLod = lods.First();
+            var lodRootNodes = lods
+                .Skip(1)
+                .Take(rootNode.Children.Count - 1)
+                .ToList();
+
+            var lodGenerationSettings = lodRootNodes
+                .Select(x => new Settings() { LodRectionFactor = x.LodReductionFactor, OptimizeAlpha = x.OptimizeLod_Alpha, OptimizeVertex = x.OptimizeLod_Vertex })
+                .ToArray();
+
+            DeleteAllLods(lodRootNodes);
+            var meshList = firtLod.GetAllModelsGrouped(false).SelectMany(x => x.Value).ToList();
+
+            for (int i = 0; i < lodRootNodes.Count; i++)
+            {
+                foreach (var mesh in meshList)
+                {
+                    lodRootNodes[i].AddObject(mesh);
+                }
             }
         }
 
