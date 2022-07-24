@@ -66,7 +66,18 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 ValidateTexturePath();
                 _appSettingsService = appSettingsService;
             }
+            public void Paste()
+            {
+                var path = Clipboard.GetText();
+                if (_packfileService.FindFile(path) == null)
+                {
+                    MessageBox.Show($"Invalid path or path not found {path}", "Attention", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    return;
+                }
 
+                UpdateTexturePath(path);
+
+            }
             public void Preview() => TexturePreviewController.CreateWindow(Path, _packfileService, _meshNode.Geometry);
 
             public void Browse()
