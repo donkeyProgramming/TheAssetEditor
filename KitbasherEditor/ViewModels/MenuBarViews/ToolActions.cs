@@ -113,6 +113,23 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _objectEditor.ReduceMesh(meshNodes, 0.9f, true);
         }
 
+        public void CopyLod0ToEveryLods()
+        {
+            var res = MessageBox.Show("Are you sure to copy lod 0 to every lod slots? This cannot be undone!", "Attention", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (res != MessageBoxResult.Yes) return;
+
+            var rootNode = _editableMeshResolver.GeEditableMeshRootNode();
+            var lodGenerationService = new LodGenerationService(_objectEditor);
+
+            rootNode.GetLodNodes().ForEach(x =>
+            {
+                x.LodReductionFactor = 1;
+                x.OptimizeLod_Alpha = false;
+                x.OptimizeLod_Vertex = false;
+            });
+
+            lodGenerationService.CreateLodsForRootNode(rootNode);
+        }
         public void CreateLods()
         {
             var rootNode = _editableMeshResolver.GeEditableMeshRootNode();

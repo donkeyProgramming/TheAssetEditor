@@ -26,6 +26,19 @@ namespace View3D.Services
             _objectEditor = objectEditor;
         }
 
+        private void DeleteAllLods(List<Rmv2LodNode> lodRootNodes)
+        {
+            foreach (var lod in lodRootNodes)
+            {
+                var itemsToDelete = new List<ISceneNode>();
+                foreach (var child in lod.Children)
+                    itemsToDelete.Add(child);
+
+                foreach (var child in itemsToDelete)
+                    child.Parent.RemoveObject(child);
+            }
+        }
+
         public void CreateLodsForRootNode(Rmv2ModelNode rootNode)
         {
             var lods = rootNode.GetLodNodes();
@@ -40,15 +53,7 @@ namespace View3D.Services
                 .ToArray();
 
             // Delete all the lods
-            foreach (var lod in lodRootNodes)
-            {
-                var itemsToDelete = new List<ISceneNode>();
-                foreach (var child in lod.Children)
-                    itemsToDelete.Add(child);
-
-                foreach (var child in itemsToDelete)
-                    child.Parent.RemoveObject(child);
-            }
+            DeleteAllLods(lodRootNodes);
 
             var meshList = firtLod.GetAllModelsGrouped(false).SelectMany(x => x.Value).ToList();
             var generatedLod = CreateLods(meshList, lodGenerationSettings);
@@ -94,7 +99,7 @@ namespace View3D.Services
                 // Reduce the polygon count
                 foreach (var mesh in originalMeshClone)
                 {
-                    if (mesh.ReduceMeshOnLodGeneration)
+                    if (mesh.ReduceMeshOnLodGeneration && settings[lodIndex].LodRectionFactor != 1)
                         _objectEditor.ReduceMesh(mesh, deductionRatio, false);
                 }
 

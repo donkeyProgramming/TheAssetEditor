@@ -32,6 +32,9 @@ namespace AssetEditor.ViewModels
         bool _autoResolveMissingTextures;
         public bool AutoResolveMissingTextures { get => _autoResolveMissingTextures; set => SetAndNotify(ref _autoResolveMissingTextures, value); }
 
+        bool _hideWh2TextureSelectors;
+        public bool HideWh2TextureSelectors { get => _hideWh2TextureSelectors; set => SetAndNotify(ref _hideWh2TextureSelectors, value); }
+
 
         public ICommand SaveCommand { get; set; }
 
@@ -57,6 +60,7 @@ namespace AssetEditor.ViewModels
             AutoGenerateAttachmentPointsFromMeshes = _settingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes;
             AutoResolveMissingTextures = _settingsService.CurrentSettings.AutoResolveMissingTextures;
             SkipLoadingWemFiles = _settingsService.CurrentSettings.SkipLoadingWemFiles;
+            HideWh2TextureSelectors = _settingsService.CurrentSettings.HideWh2TextureSelectors;
 
             SaveCommand = new RelayCommand(OnSave);
         }
@@ -69,6 +73,7 @@ namespace AssetEditor.ViewModels
             _settingsService.CurrentSettings.SkipLoadingWemFiles = SkipLoadingWemFiles;
             _settingsService.CurrentSettings.AutoResolveMissingTextures = AutoResolveMissingTextures;
             _settingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes = AutoGenerateAttachmentPointsFromMeshes;
+            _settingsService.CurrentSettings.HideWh2TextureSelectors = HideWh2TextureSelectors;
 
             _settingsService.CurrentSettings.GameDirectories.Clear();
             foreach (var item in GameDirectores)
