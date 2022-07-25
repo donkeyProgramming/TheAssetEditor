@@ -14,14 +14,14 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
     public static class SceneNodeViewFactory
     {
-        public static ISceneNodeViewModel Create(ISceneNode node, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService pf, AnimationControllerViewModel animationControllerViewModel, IComponentManager componentManager)
+        public static ISceneNodeViewModel Create(ISceneNode node, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService pf, AnimationControllerViewModel animationControllerViewModel, IComponentManager componentManager, ApplicationSettingsService applicationSettingsService)
         {
             switch (node)
             {
                 case MainEditableNode mainNode:
                     return new MainEditableNodeViewModel(mainNode, skeletonAnimationLookUpHelper, animationControllerViewModel, pf, componentManager);
                 case Rmv2MeshNode m:
-                    return new MeshEditorViewModel(m, pf, skeletonAnimationLookUpHelper, componentManager);
+                    return new MeshEditorViewModel(m, pf, skeletonAnimationLookUpHelper, componentManager, applicationSettingsService);
                 case SkeletonNode s:
                     return new SkeletonSceneNodeViewModel(s, pf, skeletonAnimationLookUpHelper);
                 case Rmv2LodNode n:

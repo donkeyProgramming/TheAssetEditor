@@ -28,6 +28,9 @@ namespace CommonControls.Services
         public bool AutoGenerateAttachmentPointsFromMeshes { get; set; } = true;
         public bool IsFirstTimeStartingApplication { get; set; } = true;
         public bool IsDeveloperRun { get; set; } = false;
+        public bool HideWh2TextureSelectors { get; set; } = false;
+
+
     }
 
     public class ApplicationSettingsService

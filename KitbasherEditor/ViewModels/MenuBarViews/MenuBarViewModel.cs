@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using View3D.Components.Component;
@@ -69,6 +70,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         GrowFaceSelection,
         ConvertFaceToVertexSelection,
+        CopyLod0ToEveryLodSlot,
     }
 
     public class MenuBarViewModel : IKeyboardHandler
@@ -168,6 +170,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _actionList[MenuActionType.GrowFaceSelection] = new MenuAction(Tools.ExpandFaceSelection) { EnableRule = ActionEnabledRule.FaceSelected, ToolTip = "Grow selection" };
             _actionList[MenuActionType.ConvertFaceToVertexSelection] = new MenuAction(Tools.ConvertFacesToVertex) { EnableRule = ActionEnabledRule.FaceSelected, ToolTip = "Convert selected faces to vertexes" };
             _actionList[MenuActionType.OpenVertexDebuggerTool] = new MenuAction(Tools.ShowVertexDebugInfo) { EnableRule = ActionEnabledRule.ObjectOrVertexSelected, ToolTip = "Open vertex debugger" };
+
+            _actionList[MenuActionType.CopyLod0ToEveryLodSlot] = new MenuAction(Tools.CopyLod0ToEveryLods) { EnableRule = ActionEnabledRule.Always, ToolTip = "Copy LOD 0 to every LOD slot" };
         }
 
         void CreateMenu()
@@ -192,8 +196,11 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "(Un)Group selection", Action = _actionList[MenuActionType.Group] });
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "Reduce mesh by 10%", Action = _actionList[MenuActionType.ReduceMesh10x] });
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "Sort models by name", Action = _actionList[MenuActionType.SortModelsByName] });
+            MenuItems[2].Children.Add(new ToolbarItem() { IsSeparator = true });
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "Generat Ws Model (Wh3)", Action = _actionList[MenuActionType.GenerateWsModelForWh3] });
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "Generat Ws Model (Wh2)", Action = _actionList[MenuActionType.GenerateWsModelForWh2] });
+            MenuItems[2].Children.Add(new ToolbarItem() { IsSeparator = true });
+            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Copy lod 0 to every lod slot", Action = _actionList[MenuActionType.CopyLod0ToEveryLodSlot] });
 
             MenuItems[3].Children.Add(new ToolbarItem() { Name = "Focus camera", Action = _actionList[MenuActionType.FocusSelection] });
             MenuItems[3].Children.Add(new ToolbarItem() { Name = "Reset camera", Action = _actionList[MenuActionType.ResetCamera] });

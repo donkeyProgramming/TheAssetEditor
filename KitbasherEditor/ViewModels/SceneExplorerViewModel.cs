@@ -21,6 +21,7 @@ namespace KitbasherEditor.ViewModels
         SelectionManager _selectionManager;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         PackFileService _packFileService;
+        ApplicationSettingsService _applicationSettingsService;
         AnimationControllerViewModel _animationControllerViewModel;
 
         public ObservableCollection<ISceneNode> _sceneGraphRootNodes = new ObservableCollection<ISceneNode>();
@@ -38,12 +39,13 @@ namespace KitbasherEditor.ViewModels
         public MainEditableNode EditableMeshNode { get => _editableMeshNode; set { _editableMeshNode = value; ContextMenu.EditableMeshNode = value; } }
 
 
-        public SceneExplorerViewModel(IComponentManager componentManager, PackFileService packFileService, AnimationControllerViewModel animationControllerViewModel)
+        public SceneExplorerViewModel(IComponentManager componentManager, PackFileService packFileService, AnimationControllerViewModel animationControllerViewModel, ApplicationSettingsService applicationSettingsService)
         {
             _componentManager = componentManager;
             _animationControllerViewModel = animationControllerViewModel;
 
             _packFileService = packFileService;
+            _applicationSettingsService = applicationSettingsService;
 
             _skeletonAnimationLookUpHelper = _componentManager.GetComponent<SkeletonAnimationLookUpHelper>();
             _sceneManager = _componentManager.GetComponent<SceneManager>();
@@ -154,7 +156,7 @@ namespace KitbasherEditor.ViewModels
 
             if (SelectedObjects.Count == 1)
             {
-                SelectedNodeViewModel = SceneNodeViewFactory.Create(SelectedObjects.First(), _skeletonAnimationLookUpHelper, _packFileService, _animationControllerViewModel, _componentManager);
+                SelectedNodeViewModel = SceneNodeViewFactory.Create(SelectedObjects.First(), _skeletonAnimationLookUpHelper, _packFileService, _animationControllerViewModel, _componentManager, _applicationSettingsService);
                 ContextMenu.Create(SelectedObjects);
             }
             else

@@ -216,7 +216,11 @@ namespace View3D.SceneNodes
             typedTarget.Geometry = Geometry.Clone();
             typedTarget._resourceLib = _resourceLib;
             typedTarget._componentManager = _componentManager;
-            typedTarget.Effect = Effect.Clone() as PbrShader_MetalRoughness;
+            //warhammer 2 compat
+            if (typedTarget.Effect != null) 
+            {
+                typedTarget.Effect = Effect.Clone() as PbrShader_MetalRoughness;
+            }
             typedTarget.Geometry = Geometry.Clone();
             typedTarget.OriginalFilePath = OriginalFilePath;
             typedTarget.OriginalPartIndex = OriginalPartIndex;
