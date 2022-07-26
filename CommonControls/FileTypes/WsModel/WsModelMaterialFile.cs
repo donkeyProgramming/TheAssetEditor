@@ -11,7 +11,7 @@ namespace CommonControls.FileTypes.WsModel
     public class WsModelMaterialFile
     {
         public bool Alpha { get; set; } = false;
-        public Dictionary<TexureType, string> Textures { get; set; } = new Dictionary<TexureType, string>();
+        public Dictionary<TextureType, string> Textures { get; set; } = new Dictionary<TextureType, string>();
         public UiVertexFormat VertexType { get; set; } = UiVertexFormat.Unknown;
         public string Name { get; set; }
         public string FullPath { get; set; }
@@ -54,33 +54,33 @@ namespace CommonControls.FileTypes.WsModel
                 var texturePath = pathNode[0].InnerText;
 
                 if (textureSlotName == "s_diffuse")
-                    Textures[TexureType.Diffuse] = texturePath;
+                    Textures[TextureType.Diffuse] = texturePath;
 
                 if (textureSlotName == "s_gloss")
-                    Textures[TexureType.Gloss] = texturePath;
+                    Textures[TextureType.Gloss] = texturePath;
 
                 if (textureSlotName == "s_mask")
-                    Textures[TexureType.Mask] = texturePath;
+                    Textures[TextureType.Mask] = texturePath;
                 else if (textureSlotName == "s_mask1")
-                    Textures[TexureType.Mask] = texturePath;
+                    Textures[TextureType.Mask] = texturePath;
                 else if (textureSlotName == "t_xml_mask")
-                    Textures[TexureType.Mask] = texturePath;
+                    Textures[TextureType.Mask] = texturePath;
 
                 if (textureSlotName == "s_normal")
-                    Textures[TexureType.Normal] = texturePath;
+                    Textures[TextureType.Normal] = texturePath;
                 else if (textureSlotName == "t_xml_normal")
-                    Textures[TexureType.Normal] = texturePath;
+                    Textures[TextureType.Normal] = texturePath;
 
                 if (textureSlotName == "s_specular")
-                    Textures[TexureType.Specular] = texturePath;
+                    Textures[TextureType.Specular] = texturePath;
 
                 if(textureSlotName == "t_xml_base_colour")
-                    Textures[TexureType.BaseColour] = texturePath;
+                    Textures[TextureType.BaseColour] = texturePath;
                 else if (textureSlotName == "s_base_colour")
-                    Textures[TexureType.BaseColour] = texturePath;
+                    Textures[TextureType.BaseColour] = texturePath;
 
                 if (textureSlotName == "t_xml_material_map")
-                    Textures[TexureType.MaterialMap] = texturePath;
+                    Textures[TextureType.MaterialMap] = texturePath;
             }
         }
     }

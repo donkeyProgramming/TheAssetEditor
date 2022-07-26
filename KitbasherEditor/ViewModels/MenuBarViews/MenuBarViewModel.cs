@@ -71,6 +71,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         GrowFaceSelection,
         ConvertFaceToVertexSelection,
         CopyLod0ToEveryLodSlot,
+        UpdateWh2Model
     }
 
     public class MenuBarViewModel : IKeyboardHandler
@@ -166,12 +167,14 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _actionList[MenuActionType.OpenSkeletonResharper] = new MenuAction(Tools.OpenSkeletonReshaperTool) { EnableRule = ActionEnabledRule.AtleastOneObjectSelected, ToolTip = "Open the skeleton modeling tool" };
             _actionList[MenuActionType.OpenReRiggingTool] = new MenuAction(Tools.OpenReRiggingTool) { EnableRule = ActionEnabledRule.AtleastOneObjectSelected, ToolTip = "Open the re-rigging tool" };
             _actionList[MenuActionType.OpenPinTool] = new MenuAction(Tools.PinMeshToMesh) { EnableRule = ActionEnabledRule.Always, ToolTip = "Open the pin tool" };
+            _actionList[MenuActionType.CopyLod0ToEveryLodSlot] = new MenuAction(Tools.CopyLod0ToEveryLods) { EnableRule = ActionEnabledRule.Always, ToolTip = "Copy LOD 0 to every LOD slot" };
+            _actionList[MenuActionType.UpdateWh2Model] = new MenuAction(Tools.UpdateWh2Model) { EnableRule = ActionEnabledRule.Always, ToolTip = "Convert Wh2 model to wh3 format" };
 
             _actionList[MenuActionType.GrowFaceSelection] = new MenuAction(Tools.ExpandFaceSelection) { EnableRule = ActionEnabledRule.FaceSelected, ToolTip = "Grow selection" };
             _actionList[MenuActionType.ConvertFaceToVertexSelection] = new MenuAction(Tools.ConvertFacesToVertex) { EnableRule = ActionEnabledRule.FaceSelected, ToolTip = "Convert selected faces to vertexes" };
             _actionList[MenuActionType.OpenVertexDebuggerTool] = new MenuAction(Tools.ShowVertexDebugInfo) { EnableRule = ActionEnabledRule.ObjectOrVertexSelected, ToolTip = "Open vertex debugger" };
 
-            _actionList[MenuActionType.CopyLod0ToEveryLodSlot] = new MenuAction(Tools.CopyLod0ToEveryLods) { EnableRule = ActionEnabledRule.Always, ToolTip = "Copy LOD 0 to every LOD slot" };
+            
         }
 
         void CreateMenu()
@@ -201,6 +204,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "Generat Ws Model (Wh2)", Action = _actionList[MenuActionType.GenerateWsModelForWh2] });
             MenuItems[2].Children.Add(new ToolbarItem() { IsSeparator = true });
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "Copy lod 0 to every lod slot", Action = _actionList[MenuActionType.CopyLod0ToEveryLodSlot] });
+            MenuItems[2].Children.Add(new ToolbarItem() { IsSeparator = true });
+            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Update Wh2=>Wh3", Action = _actionList[MenuActionType.UpdateWh2Model] });
 
             MenuItems[3].Children.Add(new ToolbarItem() { Name = "Focus camera", Action = _actionList[MenuActionType.FocusSelection] });
             MenuItems[3].Children.Add(new ToolbarItem() { Name = "Reset camera", Action = _actionList[MenuActionType.ResetCamera] });
@@ -345,7 +350,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         void ImportReference_Slayer() => ModelLoader.LoadReference(@"variantmeshes\variantmeshdefinitions\dwf_giant_slayers.variantmeshdefinition");
         void ImportReference_Goblin() => ModelLoader.LoadReference(@"variantmeshes\variantmeshdefinitions\grn_forest_goblins_base.variantmeshdefinition");
         void ImportDebugMap() => MapLoaderService.Load(_packFileService, _componentManager, ModelLoader);
-
         void ClearConsole() => Console.Clear();
     }
 }

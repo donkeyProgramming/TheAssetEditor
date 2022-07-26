@@ -29,7 +29,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             PackFileService _packfileService;
             ApplicationSettingsService _appSettingsService;
             Rmv2MeshNode _meshNode;
-            public TexureType TexureType { get; private set; }
+            public TextureType TexureType { get; private set; }
 
             bool _useTexture = true;
             public bool UseTexture { get { return _useTexture; } set { SetAndNotify(ref _useTexture, value); UpdatePreviewTexture(value); } }
@@ -56,7 +56,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             private readonly Dictionary<string, List<string>> _errorsByPropertyName = new Dictionary<string, List<string>>();
             private string _path = "";
 
-            public TextureViewModel(Rmv2MeshNode meshNode, PackFileService packfileService, TexureType texureType, ApplicationSettingsService appSettingsService)
+            public TextureViewModel(Rmv2MeshNode meshNode, PackFileService packfileService, TextureType texureType, ApplicationSettingsService appSettingsService)
             {
                 _packfileService = packfileService;
                 _meshNode = meshNode;
@@ -214,7 +214,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 
         void CreateTextureList()
         {
-            var enumValues = Enum.GetValues(typeof(TexureType)).Cast<TexureType>().ToList();
+            var enumValues = Enum.GetValues(typeof(TextureType)).Cast<TextureType>().ToList();
             var textureEnumValues = _meshNode.Material.GetAllTextures().Select(x => x.TexureType).ToList();
             enumValues.AddRange(textureEnumValues);
             var distinctEnumList = enumValues.Distinct();
@@ -236,9 +236,9 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 if(_applicationSettingsService.CurrentSettings.HideWh2TextureSelectors && 
                    _applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Warhammer3)
                 {
-                    if(texture.TexureType == TexureType.Diffuse  ||
-                       texture.TexureType == TexureType.Specular ||
-                       texture.TexureType == TexureType.Gloss)
+                    if(texture.TexureType == TextureType.Diffuse  ||
+                       texture.TexureType == TextureType.Specular ||
+                       texture.TexureType == TextureType.Gloss)
                     {
                         texture.IsVisible.Value = false;
                         continue;

@@ -39,7 +39,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
             return (uint)ByteHelper.GetSize<CustomTerrainStruct>();
         }
 
-        public RmvTexture? GetTexture(TexureType texureType)
+        public RmvTexture? GetTexture(TextureType texureType)
         {
             return null;
         }
@@ -50,7 +50,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
             throw new NotImplementedException();
         }
 
-        public void SetTexture(TexureType texureType, string path)
+        public void SetTexture(TextureType texureType, string path)
         {
         }
 

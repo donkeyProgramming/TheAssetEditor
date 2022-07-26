@@ -17,8 +17,8 @@ namespace View3D.Rendering.Shading
     public interface IShaderTextures
     {
         bool UseAlpha { set; }
-         void SetTexture(Texture2D texture, TexureType type);
-        void UseTexture(bool value, TexureType type);
+         void SetTexture(Texture2D texture, TextureType type);
+        void UseTexture(bool value, TextureType type);
     }
 
     public interface IShaderAnimation

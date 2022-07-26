@@ -99,24 +99,23 @@ namespace View3D.SceneNodes
             else
                 Effect = new PbrShader_SpecGloss(_resourceLib);
 
-            Texture2D diffuse = LoadTexture(TexureType.Diffuse);
-            Texture2D baseColour = LoadTexture(TexureType.BaseColour);
-            Texture2D specTexture = LoadTexture(TexureType.Specular);
-            Texture2D normalTexture = LoadTexture(TexureType.Normal);
-            Texture2D glossTexture = LoadTexture(TexureType.Gloss);
-            Texture2D materialTexture = LoadTexture(TexureType.MaterialMap);
+            Texture2D diffuse = LoadTexture(TextureType.Diffuse);
+            Texture2D baseColour = LoadTexture(TextureType.BaseColour);
+            Texture2D specTexture = LoadTexture(TextureType.Specular);
+            Texture2D normalTexture = LoadTexture(TextureType.Normal);
+            Texture2D glossTexture = LoadTexture(TextureType.Gloss);
+            Texture2D materialTexture = LoadTexture(TextureType.MaterialMap);
 
-            Effect.SetTexture(diffuse, TexureType.Diffuse);
-            Effect.SetTexture(baseColour, TexureType.BaseColour);
-            Effect.SetTexture(specTexture, TexureType.Specular);
-            Effect.SetTexture(normalTexture, TexureType.Normal);
-            Effect.SetTexture(glossTexture, TexureType.Gloss);
-            Effect.SetTexture(materialTexture, TexureType.MaterialMap);
+            Effect.SetTexture(diffuse, TextureType.Diffuse);
+            Effect.SetTexture(baseColour, TextureType.BaseColour);
+            Effect.SetTexture(specTexture, TextureType.Specular);
+            Effect.SetTexture(normalTexture, TextureType.Normal);
+            Effect.SetTexture(glossTexture, TextureType.Gloss);
+            Effect.SetTexture(materialTexture, TextureType.MaterialMap);
         }
 
-        Texture2D LoadTexture(TexureType type, bool forceRefreshTexture = false)
+        Texture2D LoadTexture(TextureType type, bool forceRefreshTexture = false)
         {
-
             var texture = Material.GetTexture(type);
             if (texture == null)
                 return null;
@@ -145,7 +144,7 @@ namespace View3D.SceneNodes
             return MathUtil.GetCenter(Geometry.BoundingBox) + Position;
         }
 
-        public void UpdateTexture(string path, TexureType texureType, bool forceRefreshTexture = false)
+        public void UpdateTexture(string path, TextureType texureType, bool forceRefreshTexture = false)
         {
             Material.SetTexture(texureType, path);
 
@@ -153,7 +152,7 @@ namespace View3D.SceneNodes
             Effect.SetTexture(texture, texureType);
         }
 
-        public void UseTexture(TexureType texureType, bool value)
+        public void UseTexture(TextureType texureType, bool value)
         {
             Effect.UseTexture(value, texureType);
         }
@@ -233,18 +232,18 @@ namespace View3D.SceneNodes
             Material.PivotPoint = newPiv;
         }
 
-        public Dictionary<TexureType, string> GetTextures()
+        public Dictionary<TextureType, string> GetTextures()
         {
-            var enumCollection = Enum.GetValues(typeof(TexureType));
-            Dictionary<TexureType, string> output = new Dictionary<TexureType, string>();
+            var enumCollection = Enum.GetValues(typeof(TextureType));
+            Dictionary<TextureType, string> output = new Dictionary<TextureType, string>();
 
             foreach (var enumValue in enumCollection)
             {
-                var texture = Material.GetTexture((TexureType)enumValue);
+                var texture = Material.GetTexture((TextureType)enumValue);
                 if (texture != null && texture.HasValue)
                 {
                     if (string.IsNullOrWhiteSpace(texture.Value.Path) == false)
-                        output[(TexureType)enumValue] = texture.Value.Path;
+                        output[(TextureType)enumValue] = texture.Value.Path;
                 }
             }
 

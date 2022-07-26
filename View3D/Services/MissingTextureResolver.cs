@@ -23,7 +23,7 @@ namespace View3D.Services
 
         public void ResolveMissingTextures(Rmv2MeshNode meshNode, PackFileService pfs)
         {
-            var textureTypes = Enum.GetValues(typeof(TexureType)).Cast<TexureType>().ToList();
+            var textureTypes = Enum.GetValues(typeof(TextureType)).Cast<TextureType>().ToList();
 
             var filePath = meshNode.OriginalFilePath;
             if (string.IsNullOrWhiteSpace(filePath))
@@ -53,23 +53,23 @@ namespace View3D.Services
             else
             {
                 // Ws model not found, try resolving using pattern
-                var diffusePath = GetTexturePath(meshNode, TexureType.Diffuse);
+                var diffusePath = GetTexturePath(meshNode, TextureType.Diffuse);
                 if (diffusePath == string.Empty)
                     return;
 
                 var baseColourBasedOnDiffuse = diffusePath.Replace("diffuse.dds", "base_colour.dds", StringComparison.InvariantCultureIgnoreCase);
                 var materialMapPathBasedOnDiffuse = diffusePath.Replace("diffuse.dds", "material_map.dds", StringComparison.InvariantCultureIgnoreCase);
-                UpdateTextureIfMissing(meshNode, pfs, TexureType.BaseColour, baseColourBasedOnDiffuse);
-                UpdateTextureIfMissing(meshNode, pfs, TexureType.MaterialMap, materialMapPathBasedOnDiffuse);
+                UpdateTextureIfMissing(meshNode, pfs, TextureType.BaseColour, baseColourBasedOnDiffuse);
+                UpdateTextureIfMissing(meshNode, pfs, TextureType.MaterialMap, materialMapPathBasedOnDiffuse);
 
                 var baseColourBasedOnSpec = diffusePath.Replace("specula.dds", "base_colour.dds", StringComparison.InvariantCultureIgnoreCase);
                 var materialMapPathBasedOnSpec = diffusePath.Replace("specula.dds", "material_map.dds", StringComparison.InvariantCultureIgnoreCase);
-                UpdateTextureIfMissing(meshNode, pfs, TexureType.BaseColour, baseColourBasedOnSpec);
-                UpdateTextureIfMissing(meshNode, pfs, TexureType.MaterialMap, materialMapPathBasedOnSpec);
+                UpdateTextureIfMissing(meshNode, pfs, TextureType.BaseColour, baseColourBasedOnSpec);
+                UpdateTextureIfMissing(meshNode, pfs, TextureType.MaterialMap, materialMapPathBasedOnSpec);
             }
         }
 
-        string GetTexturePath(Rmv2MeshNode meshNode, TexureType texureType)
+        string GetTexturePath(Rmv2MeshNode meshNode, TextureType texureType)
         {
             var texture = meshNode.Material.GetTexture(texureType);
             if (texture == null)
@@ -78,7 +78,7 @@ namespace View3D.Services
         }
 
 
-        void UpdateTextureIfMissing(Rmv2MeshNode meshNode, PackFileService pfs, TexureType texureType, string newPath)
+        void UpdateTextureIfMissing(Rmv2MeshNode meshNode, PackFileService pfs, TextureType texureType, string newPath)
         {
             var newFile = pfs.FindFile(newPath);
             if (newFile == null)

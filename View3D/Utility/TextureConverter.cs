@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 
 namespace View3D.Utility
 {
@@ -29,7 +30,7 @@ namespace View3D.Utility
             return texconvPath;
         }
 
-        public static bool SaveAsPNG(PackFile pfs, string outputFileName)
+        public static bool SaveAsPNG(PackFile pfs, string outputFileName, bool overwrite = true)
         {
             try
             {
@@ -41,7 +42,7 @@ namespace View3D.Utility
                 File.WriteAllBytes(tempFilePath, bytes);
 
                 var pngPath = SaveDDSTextureAsPNG(tempFilePath);
-                File.Move(pngPath, outputFileName);
+                File.Move(pngPath, outputFileName, overwrite);
                 File.Delete(tempFilePath);
             }
             catch (Exception e)
@@ -52,8 +53,13 @@ namespace View3D.Utility
 
             var newFileFound = File.Exists(outputFileName);
             if (newFileFound == false)
-                _logger.Here().Error($"Failed to create texture as PNG for unkown reason");
+            {
+                Thread.Sleep(500);
+                newFileFound = File.Exists(outputFileName);
+            }
 
+            if (newFileFound == false)
+                _logger.Here().Error($"Failed to create texture as PNG for unkown reason");
             return newFileFound;
         }
 
@@ -75,7 +81,7 @@ namespace View3D.Utility
             return Path.ChangeExtension(fileToConvert, ".png");
         }
 
-        public static PackFile LoadTexture(PackFileService pfs, string packFilePath, string systemFilePath, TexureType texureType)
+        public static PackFile LoadTexture(PackFileService pfs, string packFilePath, string systemFilePath, TextureType texureType)
         {
             var ddsPath = SaveTextureAsDDS(systemFilePath, texureType);
             var data = File.ReadAllBytes(ddsPath);
@@ -85,14 +91,14 @@ namespace View3D.Utility
             return result;
         }
 
-        public static string SaveTextureAsDDS(string systemFilePath, TexureType texureType)
+        public static string SaveTextureAsDDS(string systemFilePath, TextureType texureType)
         {
             var texconvArguments = texureType switch
             {
-                TexureType.BaseColour => "-f BC1_UNORM_SRGB",
-                TexureType.MaterialMap => "-f BC1_UNORM_SRGB",
-                TexureType.Normal => "-f BC3_UNORM",
-                TexureType.Mask => "-f BC3_UNORM",
+                TextureType.BaseColour => "-f BC1_UNORM_SRGB",
+                TextureType.MaterialMap => "-f BC1_UNORM_SRGB",
+                TextureType.Normal => "-f BC3_UNORM",
+                TextureType.Mask => "-f BC3_UNORM",
                 _ => throw new Exception("Unkown texture type"),
             };
 

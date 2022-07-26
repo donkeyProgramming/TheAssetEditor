@@ -1,6 +1,9 @@
-﻿using CommonControls.FileTypes.RigidModel;
+﻿using CommonControls.Common;
+using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
 using MonoGame.Framework.WpfInterop;
+using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Animation;
@@ -12,7 +15,9 @@ namespace View3D.SceneNodes
 {
     public class Rmv2ModelNode : GroupNode
     {
+        private readonly ILogger _logger = Logging.Create<Rmv2ModelNode>();
         public RmvFile Model { get; set; }
+
         public Rmv2ModelNode(string name, int lodCount = 4)
         {
             Name = name;
@@ -54,8 +59,16 @@ namespace View3D.SceneNodes
 
                     if (autoResolveTexture)
                     {
-                        MissingTextureResolver missingTextureResolver = new MissingTextureResolver();
-                        missingTextureResolver.ResolveMissingTextures(node, pfs);
+                        try
+                        {
+                            MissingTextureResolver missingTextureResolver = new MissingTextureResolver();
+                            missingTextureResolver.ResolveMissingTextures(node, pfs);
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.Here().Error($"Error while trying to resolve textures from WS model while loading model, {e.Message}");
+                        }
+                        
                     }
 
                     lodNode.AddObject(node);

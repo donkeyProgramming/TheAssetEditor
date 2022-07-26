@@ -81,9 +81,7 @@ namespace View3D.Components.Component.Selection
                 if (_isMouseDown)
                 {
                     var selectionRectangle = CreateSelectionRectangle(_startDrag, _currentMousePos);
-
                     var isSelectionRect = IsSelectionRectangle(selectionRectangle);
-                    _logger.Here().Information($"Selection click: IsRect {isSelectionRect} ({selectionRectangle.Width},{selectionRectangle.Height})");
                     if (isSelectionRect)
                         SelectFromRectangle(selectionRectangle, _keyboardComponent.IsKeyDown(Keys.LeftShift), _keyboardComponent.IsKeyDown(Keys.LeftControl));
                     else

@@ -27,7 +27,7 @@ namespace View3D.Services
         readonly string ProjectFileName = "TextureProject.Json";
         public class Texture
         {
-            public TexureType Type { get; set; }
+            public TextureType Type { get; set; }
             public string GamePath { get; set; }
             public string SystemPath { get; set; }
         }
@@ -41,13 +41,13 @@ namespace View3D.Services
             public string PackFilePath { get; set; }
             public string UpdatedPackFilePath { get; set; }
 
-            public TexureType Type { get; set; }
+            public TextureType Type { get; set; }
             public bool HasErrors { get; set; }
             public string ErrorString { get; set; } = "";
         }
 
         //public List<Texture> GetCurrentTextures() => _textures;
-        public List<TexureType> ValidTextureTypes { get => new List<TexureType>() { TexureType.BaseColour, TexureType.Normal, TexureType.Mask, TexureType.MaterialMap }; }
+        public List<TextureType> ValidTextureTypes { get => new List<TextureType>() { TextureType.BaseColour, TextureType.Normal, TextureType.Mask, TextureType.MaterialMap }; }
         public List<TextureItem> TextureList { get; set; } = new List<TextureItem>();
 
         List<Texture> _textures { get; set; } = new List<Texture>();

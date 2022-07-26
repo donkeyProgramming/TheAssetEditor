@@ -20,7 +20,6 @@ namespace CommonControls.FileTypes.RigidModel
         public ModelFactory(bool logLoadedFile = false)
         {
             _logLoadedFile = logLoadedFile;
-            _logLoadedFile = true;
         }
 
         public RmvFile Load(byte[] bytes)

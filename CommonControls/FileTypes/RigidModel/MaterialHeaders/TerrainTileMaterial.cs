@@ -52,7 +52,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
             return (uint)ByteHelper.GetSize<TerrainTileStruct>();
         }
 
-        public RmvTexture? GetTexture(TexureType texureType)
+        public RmvTexture? GetTexture(TextureType texureType)
         {
             return null;
         }
@@ -61,7 +61,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
         {
             return new List<RmvTexture>();
         }
-        public void SetTexture(TexureType texureType, string path)
+        public void SetTexture(TextureType texureType, string path)
         {
         }
 

@@ -25,15 +25,15 @@ namespace View3D.Services
         private readonly List<WsModelMaterialFile> _existingMaterials;
 
 
-        private static readonly Dictionary<string, TexureType> TemplateStringToTextureTypes = new Dictionary<string, TexureType>
+        private static readonly Dictionary<string, TextureType> TemplateStringToTextureTypes = new Dictionary<string, TextureType>
         {
-            {"BASE_COLOUR_PATH", TexureType.BaseColour},
-            {"MATERIAL_MAP", TexureType.MaterialMap},
-            {"NORMAL_PATH", TexureType.Normal},
-            {"MASK_PATH", TexureType.Mask},
-            {"DIFFUSE_PATH", TexureType.Diffuse },
-            {"GLOSS_PATH", TexureType.Gloss },
-            {"SPECULAR_PATH", TexureType.Specular },
+            {"BASE_COLOUR_PATH", TextureType.BaseColour},
+            {"MATERIAL_MAP", TextureType.MaterialMap},
+            {"NORMAL_PATH", TextureType.Normal},
+            {"MASK_PATH", TextureType.Mask},
+            {"DIFFUSE_PATH", TextureType.Diffuse },
+            {"GLOSS_PATH", TextureType.Gloss },
+            {"SPECULAR_PATH", TextureType.Specular },
         };
 
         public WsModelGeneratorService(PackFileService packFileService, IEditorViewModel editorViewModel, MainEditableNode editableMeshNode)
@@ -221,8 +221,8 @@ namespace View3D.Services
             var originalTextures = mesh.GetTextures();
             if (game == GameTypeEnum.Warhammer3)
             {
-                var tempTextureArray = new Dictionary<TexureType, string>();
-                var itemsToSkip = new TexureType[] { TexureType.Specular, TexureType.Diffuse, TexureType.Gloss };
+                var tempTextureArray = new Dictionary<TextureType, string>();
+                var itemsToSkip = new TextureType[] { TextureType.Specular, TextureType.Diffuse, TextureType.Gloss };
                 foreach (var texture in originalTextures)
                 {
                     if (itemsToSkip.Contains(texture.Key))

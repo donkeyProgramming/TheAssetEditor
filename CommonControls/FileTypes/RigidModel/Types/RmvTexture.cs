@@ -6,7 +6,7 @@ using System.Text;
 namespace CommonControls.FileTypes.RigidModel.Types
 {
 
-    public enum TexureType
+    public enum TextureType
     {
         Diffuse = 0,   
         Normal = 1,
@@ -28,7 +28,7 @@ namespace CommonControls.FileTypes.RigidModel.Types
     [StructLayout(LayoutKind.Sequential)]
     public struct RmvTexture
     {
-        public TexureType TexureType;
+        public TextureType TexureType;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
         byte[] _path;
 

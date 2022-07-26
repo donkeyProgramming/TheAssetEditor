@@ -22,7 +22,6 @@ using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 using View3D.Services;
-using View3D.Utility;
 using MessageBox = System.Windows.MessageBox;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
@@ -135,67 +134,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             var rootNode = _editableMeshResolver.GeEditableMeshRootNode();
             var lodGenerationService = new LodGenerationService(_objectEditor);
             lodGenerationService.CreateLodsForRootNode(rootNode);
-
-            return;
-
-
-            var lods = rootNode.GetLodNodes();
-
-            var firtLod = lods.First();
-            var lodsToGenerate = lods
-                .Skip(1)
-                .Take(rootNode.Children.Count - 1)
-                .ToList();
-
-            // Delete all the lods
-            foreach (var lod in lodsToGenerate)
-            {
-                var itemsToDelete = new List<ISceneNode>();
-                foreach (var child in lod.Children)
-                    itemsToDelete.Add(child);
-
-                foreach (var child in itemsToDelete)
-                    child.Parent.RemoveObject(child);
-            }
-
-            var meshList = firtLod.GetAllModelsGrouped(false).SelectMany(x => x.Value).ToList(); 
-
-            //Generate lod
-            for (int lodIndex = 0; lodIndex < lodsToGenerate.Count(); lodIndex++)
-            {
-                var deductionRatio = lodsToGenerate[lodIndex].LodReductionFactor;
-                var optimize = lodsToGenerate[lodIndex].OptimizeLod_Alpha;
-
-                // We want to work on a clone of all the meshes
-                var clonedMeshes = meshList.Select(x => SceneNodeHelper.CloneNode(x)).ToList();
-
-                if (optimize)
-                {
-                    foreach (var mesh in clonedMeshes)
-                    {
-                        mesh.Geometry.ChangeVertexType(UiVertexFormat.Weighted, mesh.Geometry.ParentSkeletonName);
-                        mesh.Material.AlphaMode = AlphaMode.Opaque;
-                    }
-
-                    // Combine if possible 
-                    var errorList = new ErrorListViewModel.ErrorList();
-                    var canCombine = ModelCombiner.HasPotentialCombineMeshes(clonedMeshes, out errorList);
-                    if (canCombine)
-                    {
-                        var newMeshList = ModelCombiner.CombineMeshes(clonedMeshes);
-                        clonedMeshes = newMeshList;
-                    }
-                }
-
-                foreach (var mesh in clonedMeshes)
-                {
-                    var reduceValue = deductionRatio;
-                    if (mesh.ReduceMeshOnLodGeneration == false)
-                        reduceValue = 1;
-                    _objectEditor.ReduceMesh(mesh, reduceValue, false);
-                    lodsToGenerate[lodIndex].AddObject(mesh); 
-                }
-            }
         }
 
         public void ConvertFacesToVertex()
@@ -334,7 +272,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
             var config = new RemappedAnimatedBoneConfiguration();
 
-
             config.MeshSkeletonName = selectedMeshSkeleton;
             config.MeshBones = AnimatedBoneHelper.CreateFromSkeleton(newSkeletonFile, animatedBoneIndexes.Select(x => x.BoneIndex.Value).ToList());
 
@@ -352,6 +289,24 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 var remapping = AnimatedBoneHelper.BuildRemappingList(config.MeshBones.First());
                 _componentManager.GetComponent<CommandExecutor>().ExecuteCommand(new RemapBoneIndexesCommand(selectedMeshses, remapping, config.ParnetModelSkeletonName));
             }
+        }
+
+        internal void UpdateWh2Model()
+        {
+            var res = MessageBox.Show("Are you sure you want to update the model? This cannot be undone!", "Attention", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (res != MessageBoxResult.Yes) 
+                return;
+
+            var rootNode = _editableMeshResolver.GeEditableMeshRootNode();
+            var lods = rootNode.GetLodNodes();
+            var firtLod = lods.First();
+            var meshList = firtLod.GetAllModelsGrouped(false).SelectMany(x => x.Value).ToList();
+            var filename = _packFileService.GetFullPath(rootNode.MainPackFile);
+
+            var service = new Rmv2UpdaterService(_packFileService, true);
+            service.UpdateWh2Models(filename, meshList, out var errorList);
+
+            ErrorListWindow.ShowDialog("Converter", errorList);
         }
 
         public void ShowVertexDebugInfo()

@@ -195,52 +195,117 @@ V0.38
 
 
 
+Showcase video
+---------------
+Kitbash 
+Animtransfer 
+Super view 
+
+I am planning on putting together a small showcase for what is possible with AssetEditor (if AE was not used let me know!). As a port of this I would love to showcase some units from mods created by you. Probably just a few seconds of each unit. I am getting some help for putting this together so I have high hopes for it to look good!
+I was thinking about the following:
+https://steamcommunity.com/sharedfiles/filedetails/?id=2790154343&searchtext=
+ 
+Would you be ok with that?
 
 
-V0.39
+
+[X]Stratovarius https://steamcommunity.com/sharedfiles/filedetails/?id=2838941228  Pick what you think is cool
+[X]Stratovarius https://steamcommunity.com/sharedfiles/filedetails/?id=2839832771 
+[X]Stratovarius https://steamcommunity.com/sharedfiles/filedetails/?id=2826930183 Pick what you think is cool, this mod also includes the above mod
+[X]Mixu: https://steamcommunity.com/sharedfiles/filedetails/?id=2825728189 Some of the more complex units, like the gnoblars riding gboblas, the guys on the rihno and some of the lords
+[X]Banners https://steamcommunity.com/sharedfiles/filedetails/?id=2817760696 Pick what you think is cool
+[X]Spooky https://steamcommunity.com/sharedfiles/filedetails/?id=2834975276 
+[X]Theakrus https://steamcommunity.com/sharedfiles/filedetails/?id=2815393743 Pick what you think is cool
+[X]Theakrus https://steamcommunity.com/sharedfiles/filedetails/?id=2829202482 Pick what you think is cool
+[X]Theakrus https://steamcommunity.com/sharedfiles/filedetails/?id=2809344514 Pick what you think is cool
+[]Eustace https://steamcommunity.com/sharedfiles/filedetails/?id=2810496470 Pick what you think is cool
+[X]Calm: https://steamcommunity.com/sharedfiles/filedetails/?id=2797285787
+[X]Calm https://steamcommunity.com/sharedfiles/filedetails/?id=2797285695
+[X]Calm Mod in PM
+[X]Frob https://steamcommunity.com/sharedfiles/filedetails/?id=2794880709
+[X]Poljanan https://steamcommunity.com/sharedfiles/filedetails/?id=2798625567 Pick what you think is cool
+[X]Poljanan https://steamcommunity.com/sharedfiles/filedetails/?id=2831340705 Pick what you think is cool
+[X]LazyIcarus https://steamcommunity.com/sharedfiles/filedetails/?id=2805809756
+[X]Belisarian  https://steamcommunity.com/sharedfiles/filedetails/?id=2838392345 neferat Nagash  Bone Colossus 
+[X]All is Dust  https://steamcommunity.com/sharedfiles/filedetails/?id=2821429625 Pick what you think is cool
+[X] Xoudad  https://steamcommunity.com/sharedfiles/filedetails/?id=2824164139
+[X]dead baron https://steamcommunity.com/sharedfiles/filedetails/?id=2790154343 Pick what you think is cool
+
+
+wh2
+[]blackoutsider https://steamcommunity.com/sharedfiles/filedetails/?id=2803454486&searchtext=blackoutsider
+[]Toumaï https://steamcommunity.com/sharedfiles/filedetails/?id=2613006061 Pick what you think is cool
+Snek https://steamcommunity.com/workshop/filedetails/?id=2712622457
+[X] Xoudad https://steamcommunity.com/sharedfiles/filedetails/?id=2565578923 Pick what you think is cool
+zerg93 https://steamcommunity.com/sharedfiles/filedetails/?id=2814474888&searchtext=
+[X]Calm https://steamcommunity.com/sharedfiles/filedetails/?id=2561473008
+[X]Calm https://steamcommunity.com/sharedfiles/filedetails/?id=2560027487 Pick what you think is cool + the animal keeper on the tiger
+[X]TheDuke: https://steamcommunity.com/workshop/filedetails/?id=1980004789 -The riders on dionsours 
+---------------
+
+
+variantmeshes/wh_variantmodels/hu1/ksl/ksl_katarin/tex/ksl_katarin_head_01_specular.dds
 
 Check metadata factory
 make time in superview copyable
 
 Clean up render list items  - One dispsable large list and one on the go. All types of line items made in a factory and works for both
-Convert wh2 animpack to wh3 format 
+
 Phazer link
-Fix datParser so it does not break wh2 
-
-
-OpenWh2AnimpackUpdaterCommand
-DownloadRmeCommand
 
 
 
+
+
+Display props
+Rewrite metasystem?
+Show coordinates of bones for easy placement of stuff. Update when animating. World and local 
+
+
+V0.40
+----------------------------
+Link to latest Dietrich tutorial
+importing textures without mipmap error
+Better error message for stuff with lod loading error. open in rpfm bug 
+Finish Convert wh2 animpack to wh3 format 
+size of backup folder warning -> always put backups in one location 
+ public void CreateLods() needs to delete old code 
+ Fix datParser so it does not break wh2 
+ Find unreferensed textures 
+
+Features:
+	zzBob quality of life changes 
+
+Bugfixes:
+	zzBob copy fix
 
 V0.39
 ----------------------------
-TL;DR - Fixed some huge bugs, added tutorials and quality of life fixes
+	TL;DR - Fixed some huge bugs, added tutorials and quality of life fixes
 
-Features:
-	* Animation report (Thanks to Klissian)
-	* Splash Attack visualization in supevview (Thanks to Klissian)
-	* New Metatags decoded: SoundTrigger_v2, SoundBuilding_v2, Effect_v5, RHandPose_v2 and LHandPose_v2 (Thanks to Farfadet)
-	* Added more tutorials under the tutorials dropdown (thanks to Masked Mustachio)
-	* Ctrl + double click expands all child nodes in the packfile tree view 
-	* Collapse all added to packfile tree view context menu 
-	* Lot of code related to audio modding (Work in progres)
+	Features:
+		* Animation report (Thanks to Klissian)
+		* Splash Attack visualization in supevview (Thanks to Klissian)
+		* New Metatags decoded: SoundTrigger_v2, SoundBuilding_v2, Effect_v5, RHandPose_v2 and LHandPose_v2 (Thanks to Farfadet)
+		* Added more tutorials under the tutorials dropdown (thanks to Masked Mustachio)
+		* Ctrl + double click expands all child nodes in the packfile tree view 
+		* Collapse all added to packfile tree view context menu 
+		* Lot of code related to audio modding (Work in progres)
 
-BugFixes:
-	* Static meshes now load/save correctly. Should no longer get incorrect shading in game when using static meshes. (Thanks to Phazer)
-	* Fixed bug where textures were not resolved correctly when loading rigid_model_v2 files
-	* Previous and next frame buttons working correctly (Thanks to Klissian)
-	* Fixed error when creating LODs
-	* Fixed crash when using prop meta tags 
-	
-New tutorials:
-	https://www.youtube.com/watch?v=b68hSHZ5raY
-	https://www.youtube.com/watch?v=7HN4oA2LsFM
-	https://www.youtube.com/watch?v=MhvbZfNp8Qw
-	https://www.youtube.com/watch?v=ONRAKJUmuiM
-	https://www.youtube.com/watch?v=AXw99yc74CY
-	
+	BugFixes:
+		* Static meshes now load/save correctly. Should no longer get incorrect shading in game when using static meshes. (Thanks to Phazer)
+		* Fixed bug where textures were not resolved correctly when loading rigid_model_v2 files
+		* Previous and next frame buttons working correctly (Thanks to Klissian)
+		* Fixed error when creating LODs
+		* Fixed crash when using prop meta tags 
+		
+	New tutorials:
+		https://www.youtube.com/watch?v=b68hSHZ5raY
+		https://www.youtube.com/watch?v=7HN4oA2LsFM
+		https://www.youtube.com/watch?v=MhvbZfNp8Qw
+		https://www.youtube.com/watch?v=ONRAKJUmuiM
+		https://www.youtube.com/watch?v=AXw99yc74CY
+		
 
 
 V0.38

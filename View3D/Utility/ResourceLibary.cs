@@ -142,7 +142,6 @@ namespace View3D.Utility
                     using var image = Pfim.Pfim.FromStream(stream);
                     out_imageInfo.SetFromImage(image);
 
-
                     Texture2D texture = null;
                     if (image.Format == ImageFormat.Rgba32)
                     {

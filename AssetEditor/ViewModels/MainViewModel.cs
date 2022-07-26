@@ -103,8 +103,6 @@ namespace AssetEditor.ViewModels
                 }
             }
 
-
-
             MetaDataTagDeSerializer.EnsureMappingTableCreated();
 
             if (settingsService.CurrentSettings.IsDeveloperRun)

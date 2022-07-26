@@ -31,13 +31,13 @@ namespace CommonControls.Services
             }
         }
 
-        public void SavePNGTextureAsDDS(string pngFilePath, TexureType texureType = TexureType.Diffuse)
+        public void SavePNGTextureAsDDS(string pngFilePath, TextureType texureType = TextureType.Diffuse)
         {
             var texconvArguments = texureType switch
             {
-                TexureType.Mask => "-f BC3_UNORM",
-                TexureType.Normal => "-f BC3_UNORM",
-                TexureType.Gloss => "-f BC1_UNORM",
+                TextureType.Mask => "-f BC3_UNORM",
+                TextureType.Normal => "-f BC3_UNORM",
+                TextureType.Gloss => "-f BC1_UNORM",
                 _ => "-f BC7_UNORM_SRGB",
             };
 

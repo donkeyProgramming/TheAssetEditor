@@ -11,8 +11,8 @@ namespace View3D.Rendering.Shading
         public Effect Effect { get; protected set; }
         public RenderFormats RenderFormat { get; protected set; }
 
-        protected Dictionary<TexureType, EffectParameter> _textures = new Dictionary<TexureType, EffectParameter>();
-        protected Dictionary<TexureType, EffectParameter> _useTextures = new Dictionary<TexureType, EffectParameter>();
+        protected Dictionary<TextureType, EffectParameter> _textures = new Dictionary<TextureType, EffectParameter>();
+        protected Dictionary<TextureType, EffectParameter> _useTextures = new Dictionary<TextureType, EffectParameter>();
         protected ResourceLibary _resourceLibary;
         
         public PbrShader(ResourceLibary resourceLibary, RenderFormats renderFormat)
@@ -24,7 +24,7 @@ namespace View3D.Rendering.Shading
         public bool UseAlpha { set { Effect.Parameters["UseAlpha"].SetValue(value); } }
         public Vector3 TintColour { set { Effect.Parameters["TintColour"].SetValue(value); } }
 
-        public void SetTexture(Texture2D texture, TexureType type)
+        public void SetTexture(Texture2D texture, TextureType type)
         {
             if (_textures.ContainsKey(type))
                 _textures[type]?.SetValue(texture);
@@ -32,7 +32,7 @@ namespace View3D.Rendering.Shading
             UseTexture(texture != null, type);
         }
 
-        public void UseTexture(bool value, TexureType type)
+        public void UseTexture(bool value, TextureType type)
         {
             if (_useTextures.ContainsKey(type))
                 _useTextures[type].SetValue(value);
@@ -69,15 +69,15 @@ namespace View3D.Rendering.Shading
         {
             Effect = resourceLibary.GetEffect(ShaderTypes.Pbr_SpecGloss);
 
-            _textures.Add(TexureType.Diffuse, Effect.Parameters["DiffuseTexture"]);
-            _textures.Add(TexureType.Specular, Effect.Parameters["SpecularTexture"]);
-            _textures.Add(TexureType.Normal, Effect.Parameters["NormalTexture"]);
-            _textures.Add(TexureType.Gloss, Effect.Parameters["GlossTexture"]);
+            _textures.Add(TextureType.Diffuse, Effect.Parameters["DiffuseTexture"]);
+            _textures.Add(TextureType.Specular, Effect.Parameters["SpecularTexture"]);
+            _textures.Add(TextureType.Normal, Effect.Parameters["NormalTexture"]);
+            _textures.Add(TextureType.Gloss, Effect.Parameters["GlossTexture"]);
 
-            _useTextures.Add(TexureType.Diffuse, Effect.Parameters["UseDiffuse"]);
-            _useTextures.Add(TexureType.Specular, Effect.Parameters["UseSpecular"]);
-            _useTextures.Add(TexureType.Normal, Effect.Parameters["UseNormal"]);
-            _useTextures.Add(TexureType.Gloss, Effect.Parameters["UseGloss"]);
+            _useTextures.Add(TextureType.Diffuse, Effect.Parameters["UseDiffuse"]);
+            _useTextures.Add(TextureType.Specular, Effect.Parameters["UseSpecular"]);
+            _useTextures.Add(TextureType.Normal, Effect.Parameters["UseNormal"]);
+            _useTextures.Add(TextureType.Gloss, Effect.Parameters["UseGloss"]);
 
             Effect.Parameters["tex_cube_diffuse"]?.SetValue(resourceLibary.PbrDiffuse);
             Effect.Parameters["tex_cube_specular"]?.SetValue(resourceLibary.PbrSpecular);
@@ -103,13 +103,13 @@ namespace View3D.Rendering.Shading
         {
             Effect = resourceLibary.GetEffect(ShaderTypes.Pbs_MetalRough);
 
-            _textures.Add(TexureType.BaseColour, Effect.Parameters["DiffuseTexture"]);
-            _textures.Add(TexureType.Normal, Effect.Parameters["NormalTexture"]);
-            _textures.Add(TexureType.MaterialMap, Effect.Parameters["GlossTexture"]);
+            _textures.Add(TextureType.BaseColour, Effect.Parameters["DiffuseTexture"]);
+            _textures.Add(TextureType.Normal, Effect.Parameters["NormalTexture"]);
+            _textures.Add(TextureType.MaterialMap, Effect.Parameters["GlossTexture"]);
 
-            _useTextures.Add(TexureType.BaseColour, Effect.Parameters["UseDiffuse"]);
-            _useTextures.Add(TexureType.Normal, Effect.Parameters["UseNormal"]);
-            _useTextures.Add(TexureType.MaterialMap, Effect.Parameters["UseGloss"]);
+            _useTextures.Add(TextureType.BaseColour, Effect.Parameters["UseDiffuse"]);
+            _useTextures.Add(TextureType.Normal, Effect.Parameters["UseNormal"]);
+            _useTextures.Add(TextureType.MaterialMap, Effect.Parameters["UseGloss"]);
 
             Effect.Parameters["tex_cube_diffuse"]?.SetValue(resourceLibary.PbrDiffuse);
             Effect.Parameters["tex_cube_specular"]?.SetValue(resourceLibary.PbrSpecular);

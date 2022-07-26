@@ -15,7 +15,7 @@ namespace CommonControls.BaseDialogs.ErrorListDialog
             public string ItemName { get; set; }
             public string Description { get; set; }
             public bool IsError { get; set; } = false;
-
+            
         }
 
         public class ErrorList

@@ -74,6 +74,21 @@ namespace CommonControls.Services
             }
         }
 
+        public List<string> SearchForFile(string partOfFileName)
+        {
+            var output = new List<string>();
+            foreach (var pf in Database.PackFiles)
+            {
+                foreach (var file in pf.FileList)
+                {
+                    if(file.Key.Contains(partOfFileName, StringComparison.InvariantCultureIgnoreCase))
+                        output.Add(file.Key);
+                }
+            }
+
+            return output;
+        }
+
         public List<PackFile> FindAllWithExtention(string extention, PackFileContainer packFileContainer = null)
         {
             return FindAllWithExtentionIncludePaths(extention, packFileContainer).Select(x => x.Item2).ToList();

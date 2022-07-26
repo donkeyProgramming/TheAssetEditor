@@ -99,7 +99,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
             return headerDataSize;
         }
 
-        public RmvTexture? GetTexture(TexureType texureType)
+        public RmvTexture? GetTexture(TextureType texureType)
         {
             if (TexturesParams.Count(x => x.TexureType == texureType) != 0)
                 return TexturesParams.FirstOrDefault(x => x.TexureType == texureType);
@@ -111,7 +111,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
             return TexturesParams;
         }
 
-        public void SetTexture(TexureType texureType, string path)
+        public void SetTexture(TextureType texureType, string path)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
