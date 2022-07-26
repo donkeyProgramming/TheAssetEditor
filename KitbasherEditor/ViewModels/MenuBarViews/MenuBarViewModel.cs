@@ -205,7 +205,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             MenuItems[2].Children.Add(new ToolbarItem() { IsSeparator = true });
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "Copy lod 0 to every lod slot", Action = _actionList[MenuActionType.CopyLod0ToEveryLodSlot] });
             MenuItems[2].Children.Add(new ToolbarItem() { IsSeparator = true });
-            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Update Wh2=>Wh3 (Textures Experimatal)", Action = _actionList[MenuActionType.UpdateWh2Model] });
+            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Update Wh2=>Wh3 (Textures Experimental)", Action = _actionList[MenuActionType.UpdateWh2Model] });
 
             MenuItems[3].Children.Add(new ToolbarItem() { Name = "Focus camera", Action = _actionList[MenuActionType.FocusSelection] });
             MenuItems[3].Children.Add(new ToolbarItem() { Name = "Reset camera", Action = _actionList[MenuActionType.ResetCamera] });
