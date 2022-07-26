@@ -190,6 +190,9 @@ namespace View3D.Services
             float luminosity_Diffuse = (0.2126f * diffusePixel.X + 0.7152f * diffusePixel.Y + 0.0722f * diffusePixel.Z);
 
 
+            // "rules" (heuristic) for creating metal map
+            // TODO: improve, as it in some situations it doesn't look "pefect"
+            // TODO: possibly include 'smoothness' to detetimne metalicity also
             if (Math.Abs(luminosity_Diffuse - luminosity_Specular) < 0.15)
                 return 0.1f;
 
@@ -206,9 +209,8 @@ namespace View3D.Services
                 return 0.0f;
 
             return 0.0f;
-
-
         }
+
 
         static private MS::Vector4 PowVec4(MS::Vector4 v, float e)
         {
@@ -279,7 +281,7 @@ namespace View3D.Services
                        Vector4ToColor(new MS::Vector4(0.0f, 1.0f, 0.0f, 1.0f)));
 
                     }
-                    // END: BEGIN: DEBUGGIN CODE
+                    // END: DEBUGGIN CODE
                 }
             }
 
