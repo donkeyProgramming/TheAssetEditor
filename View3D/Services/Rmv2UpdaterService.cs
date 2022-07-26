@@ -160,10 +160,6 @@ namespace View3D.Services
             return texDiffuse;
         }
 
-        //private static MS::Color ColorToFloatColor(Color c)
-        //{
-        //    return new MS::Color(((float)c.R)/255.0f, ((float)c.G) / 255.0f, ((float)c.B) / 255.0f, ((float)c.A) / 255.0f);            
-        //}
         private static MS::Vector4 ColorToVector4(Color c)
         {            
             return new MS::Vector4(
@@ -175,7 +171,7 @@ namespace View3D.Services
             );
         }
         
-        private static Color VecToColor(MS::Vector4 v)
+        private static Color Vector4ToColor(MS::Vector4 v)
         {
             return Color.FromArgb(
                 (int)Math.Clamp((float)(v.W) * 255.0f, 0.0f, 255.0f),
@@ -225,6 +221,10 @@ namespace View3D.Services
             );
         }
 
+        // TODO: To Ole:
+        // this method was meant to create the base_colour, but it creates both the base_color and material map        // 
+        // They are somewhat interpendent, but could possibly be split up, 
+        // should I refactor and do it like you intended?
         private bool CreateBaseColourMap(Dictionary<TextureType, Bitmap> textureDictionary, string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
         {
             
@@ -261,11 +261,11 @@ namespace View3D.Services
                     baseColorFloat = PowVec4(baseColorFloat, 1.0f / 2.2f);
                     baseColorFloat.W = alphaDiffuse;
 
-                    outBaseColourTex.SetPixel(x, y, VecToColor(baseColorFloat));
+                    outBaseColourTex.SetPixel(x, y, Vector4ToColor(baseColorFloat));
 
                     var metalness = GetMetalNess(spcularColorFloat, diffuseColorFloat);
                     outMaterialMapTex.SetPixel(x, y,
-                        VecToColor(new MS::Vector4(metalness, roughness, 0.0f, 1.0f)));
+                        Vector4ToColor(new MS::Vector4(metalness, roughness, 0.0f, 1.0f)));
 
                     // TODO REMOVE: 
                     // Debuggin code should NOT be removed yeat, as the algo is still being fine tuned
@@ -273,10 +273,10 @@ namespace View3D.Services
                     if (false)
                     {
                         outBaseColourTex.SetPixel(x, y,
-                            VecToColor(new MS::Vector4(roughness, roughness, roughness, 1.0f)));
+                            Vector4ToColor(new MS::Vector4(roughness, roughness, roughness, 1.0f)));
 
                         outMaterialMapTex.SetPixel(x, y,
-                       VecToColor(new MS::Vector4(0.0f, 1.0f, 0.0f, 1.0f)));
+                       Vector4ToColor(new MS::Vector4(0.0f, 1.0f, 0.0f, 1.0f)));
 
                     }
                     // END: BEGIN: DEBUGGIN CODE
@@ -303,9 +303,13 @@ namespace View3D.Services
 
         }
 
+        // TODO: To Ole:
+        // this method was meant to create the material_map, 
+        //  but the material map and basecolor are somewhat interpendent, CAN be split up, MAYBE detrimental down the line
+        // should I refactor and do it like you intneded?
         private bool CreateMaterialMap(Dictionary<TextureType, Bitmap> textureDictionary, string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
         {
-
+            
 
             //var diffuse = textureDictionary[TextureType.Diffuse];
             //using var materialMap = new Bitmap(diffuse.Width, diffuse.Height);
