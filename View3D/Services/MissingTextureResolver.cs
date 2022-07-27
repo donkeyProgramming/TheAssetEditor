@@ -62,8 +62,13 @@ namespace View3D.Services
                 UpdateTextureIfMissing(meshNode, pfs, TextureType.BaseColour, baseColourBasedOnDiffuse);
                 UpdateTextureIfMissing(meshNode, pfs, TextureType.MaterialMap, materialMapPathBasedOnDiffuse);
 
-                var baseColourBasedOnSpec = diffusePath.Replace("specula.dds", "base_colour.dds", StringComparison.InvariantCultureIgnoreCase);
-                var materialMapPathBasedOnSpec = diffusePath.Replace("specula.dds", "material_map.dds", StringComparison.InvariantCultureIgnoreCase);
+
+                var specularPath = GetTexturePath(meshNode, TextureType.Specular);
+                if (specularPath == string.Empty)
+                    return;
+
+                var baseColourBasedOnSpec = specularPath.Replace("specular.dds", "base_colour.dds", StringComparison.InvariantCultureIgnoreCase);
+                var materialMapPathBasedOnSpec = specularPath.Replace("specular.dds", "material_map.dds", StringComparison.InvariantCultureIgnoreCase);
                 UpdateTextureIfMissing(meshNode, pfs, TextureType.BaseColour, baseColourBasedOnSpec);
                 UpdateTextureIfMissing(meshNode, pfs, TextureType.MaterialMap, materialMapPathBasedOnSpec);
             }
@@ -91,8 +96,6 @@ namespace View3D.Services
                 meshNode.UpdateTexture(newPath, texureType);
                 meshNode.UseTexture(texureType, true);
             }
-
-
         }
 
     }
