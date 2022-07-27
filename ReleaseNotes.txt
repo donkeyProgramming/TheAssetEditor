@@ -273,11 +273,22 @@ size of backup folder warning -> always put backups in one location
  Fix datParser so it does not break wh2 
  Find unreferensed textures 
 
-Features:
-	zzBob quality of life changes 
 
-Bugfixes:
-	zzBob copy fix
+V0.40
+----------------------------
+
+	Features:
+		Automatic texture updater. Tool->Update Wh2=>Wh3 (Textures Experimental) - Thanks to Phazer
+		Added a GREAT into tutorial under the tutorials tab. - Thanks to Dietrich
+		Option to hide warhammer 2 texture slots when loading warhammer 3 models - Thanks ot Z bb
+		Use lod 0 for all lods. Tools->Copy lod 1 to every lod slot - Thanks ot Z bb
+		Memory usage indicator. - Thanks ot Z bb
+		Paste button for quick textures updating - Thanks ot Z bb)
+
+	Bugfixes:
+		Fixed error when generating lods for non wh3 models - Thanks ot Z bb
+		Fixed duplicate mesh error for non wh3 models - Thanks ot Z bb
+		Fixed texture loading error 
 
 V0.39
 ----------------------------

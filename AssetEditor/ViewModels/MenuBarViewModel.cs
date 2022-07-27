@@ -92,7 +92,8 @@ namespace AssetEditor.ViewModels
         
         // Tutorials
         public ICommand OpenAnimatedPropTutorialCommand { get; set; }
-        public ICommand OpenAssetEdBasicTutorialCommand { get; set; }
+        public ICommand OpenAssetEdBasic0TutorialCommand { get; set; }
+        public ICommand OpenAssetEdBasic1TutorialCommand { get; set; }
         public ICommand OpenSkragTutorialCommand { get; set; }
         public ICommand OpenTzarGuardTutorialCommand { get; set; }
         public ICommand OpenKostalynTutorialCommand { get; set; }
@@ -140,7 +141,8 @@ namespace AssetEditor.ViewModels
             OpenTroyPacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Troy));
 
             OpenAnimatedPropTutorialCommand =  new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://www.youtube.com/watch?v=b68hSHZ5raY") { CreateNoWindow = true }));
-            OpenAssetEdBasicTutorialCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://www.youtube.com/watch?v=7HN4oA2LsFM") { CreateNoWindow = true }));
+            OpenAssetEdBasic0TutorialCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://www.youtube.com/watch?v=iVjAVEn8jYc") { CreateNoWindow = true }));
+            OpenAssetEdBasic1TutorialCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://www.youtube.com/watch?v=7HN4oA2LsFM") { CreateNoWindow = true }));
             OpenSkragTutorialCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://www.youtube.com/watch?v=MhvbZfNp8Qw") { CreateNoWindow = true }));
             OpenTzarGuardTutorialCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://www.youtube.com/watch?v=ONRAKJUmuiM") { CreateNoWindow = true }));
             OpenKostalynTutorialCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://www.youtube.com/watch?v=AXw99yc74CY") { CreateNoWindow = true }));

@@ -91,7 +91,8 @@
             </MenuItem>
 
             <MenuItem Header="Tutorials">
-                <MenuItem Header="[YT]AssetEditor Basics" Command="{Binding MenuBar.OpenAssetEdBasicTutorialCommand}"/>
+                <MenuItem Header="[YT]AssetEditor Basics 1" Command="{Binding MenuBar.OpenAssetEdBasic0TutorialCommand}"/>
+                <MenuItem Header="[YT]AssetEditor Basics 2" Command="{Binding MenuBar.OpenAssetEdBasic1TutorialCommand}"/>
                 <MenuItem Header="[YT]Example: Skag Reskin" Command="{Binding MenuBar.OpenSkragTutorialCommand}"/>
                 <MenuItem Header="[YT]Example: Tzar Guard with gun" Command="{Binding MenuBar.OpenTzarGuardTutorialCommand}"/>
                 <MenuItem Header="[YT]Example: Kostaltyn Reskin" Command="{Binding MenuBar.OpenKostalynTutorialCommand}"/>
