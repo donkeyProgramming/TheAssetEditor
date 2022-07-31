@@ -167,16 +167,25 @@ namespace AudioResearch
         private static SoundDatFile CreateDatDb()
         {
             var datFiles = GetAllDatFiles();
-            datFiles = FilterUnvantedFiles(datFiles, new[] { "bank_splits.dat" }, out var removedFiles);     
-            
+            datFiles = FilterUnvantedFiles(datFiles, new[] { "bank_splits.dat", "campaign_music.dat", "battle_music.dat" }, out var removedFiles);     
+
+            var failedDatParsing = new List<(string, string)>();        
             var masterDat = new SoundDatFile();
             foreach (var datFile in datFiles)
             {
-                var pf = new PackFile(datFile, new FileSystemSource(datFile));
-                var parsedFile = DatParser.Parse(pf, false);
-                masterDat.Merge(parsedFile);
+                try
+                {
+                    var pf = new PackFile(datFile, new FileSystemSource(datFile));
+                    var parsedFile = DatParser.Parse(pf, false);
+                    masterDat.Merge(parsedFile);
+                }
+                catch (Exception e)
+                {
+                    failedDatParsing.Add((datFile, e.Message));
+                }
             }
 
+            //masterDat.DumpToFile(@"c:\temp\audiodump.txt");
             return masterDat;
         }
     }

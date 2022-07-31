@@ -115,7 +115,7 @@ namespace CommonControls.Editors.Sound
             var fileNameDump4 = string.Join(", \n", fileNameDump3);
 
             foreach (var item in fileNameDump3)
-                masterDat.Event3.Add(new SoundDatFile.EventType3() { EventName = item });
+                masterDat.Unknown.Add(item );
 
             var nameHelper = new NameLookupHelper(masterDat.CreateFileNameList());
 

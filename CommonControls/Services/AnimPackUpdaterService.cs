@@ -1,4 +1,5 @@
-﻿using CommonControls.Common;
+﻿using CommonControls.BaseDialogs.ErrorListDialog;
+using CommonControls.Common;
 using CommonControls.Editors.AnimationPack;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
@@ -24,6 +25,8 @@ namespace CommonControls.Services
 
         public void Process(PackFileContainer packFileContainer, GameTypeEnum existingPackVersion = GameTypeEnum.Warhammer2, GameTypeEnum outputFormat = GameTypeEnum.Warhammer3)
         {
+            var errorList = new ErrorListViewModel.ErrorList();
+
             if (outputFormat != GameTypeEnum.Warhammer3)
                 throw new Exception($"{outputFormat} selected as output, only Warhammer 3 is currently supported");
             
@@ -58,27 +61,9 @@ namespace CommonControls.Services
                     wh3Bin.MountBin = binEntry.MountName;
                     wh3Bin.LocomotionGraph = "animations/locomotion_graphs/entity_locomotion_graph.xml";
 
-                    var fragment = animFrags.First(x => string.Equals(x.FileName, binEntry.Name, StringComparison.InvariantCultureIgnoreCase));
-                    foreach (var animationSetEntry in fragment.Fragments)
+                    foreach (var fragment in animFrags)
                     {
-                        var newBinEntry = new FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry();
-
-                        var wh2Slot = DefaultAnimationSlotTypeHelper.GetFromId(animationSetEntry.Slot.Id);
-                        var wh3Slot = AnimationSlotTypeHelperWh3.GetfromValue(wh2Slot.Value);
-
-                        newBinEntry.AnimationId = (uint)wh3Slot.Id;
-                        newBinEntry.BlendIn = animationSetEntry.BlendInTime;
-                        newBinEntry.SelectionWeight = animationSetEntry.SelectionWeight;
-                        newBinEntry.WeaponBools = animationSetEntry.WeaponBone;
-                        newBinEntry.AnimationRefs.Add(new FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef() 
-                        { 
-                            AnimationFile = "",
-                            AnimationMetaFile = "",
-                            AnimationSoundMetaFile = "",
-                        });
-
-                        wh3Bin.AnimationTableEntries.Add(newBinEntry);
-
+                        //ProcessWhFragment(fragment, ref wh3Bin, ref errorList);
                         processedFragments++;
                     }
 
@@ -91,5 +76,31 @@ namespace CommonControls.Services
                 SaveHelper.Save(_pfs, outputAnimPackName, null, AnimationPackSerializer.ConvertToBytes(outputWh3AnimPack), false);
             }
         }
+
+        //void ProcessWhFragment(AnimationFragmentFile fragmentToProcess, ref FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3 wh3Bin, ref ErrorListViewModel.ErrorList errorList)
+        //{
+        //    foreach (var animationSetEntry in fragmentToProcess.Fragments)
+        //    {
+        //        var newBinEntry = new FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry();
+        //
+        //        var wh2Slot = DefaultAnimationSlotTypeHelper.GetFromId(animationSetEntry.Slot.Id);
+        //        var wh3Slot = AnimationSlotTypeHelperWh3.GetfromValue(wh2Slot.Value);
+        //
+        //        newBinEntry.AnimationId = (uint)wh3Slot.Id;
+        //        newBinEntry.BlendIn = animationSetEntry.BlendInTime;
+        //        newBinEntry.SelectionWeight = animationSetEntry.SelectionWeight;
+        //        newBinEntry.WeaponBools = animationSetEntry.WeaponBone;
+        //        newBinEntry.AnimationRefs.Add(new FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef()
+        //        {
+        //            AnimationFile = "",
+        //            AnimationMetaFile = "",
+        //            AnimationSoundMetaFile = "",
+        //        });
+        //
+        //        wh3Bin.AnimationTableEntries.Add(newBinEntry);
+        //
+        //        processedFragments++;
+        //    }
+        //}
     }
 }

@@ -277,14 +277,17 @@ Finish Convert wh2 animpack to wh3 format
 V0.41
 ----------------------------
 	>>Fix error for dindi
-	use all animations for a skeleton
+	>>use all animations for a skeleton
+	>>Splice preview 
 	importing textures without mipmap error
 	size of backup folder warning -> always put backups in one location 
 	change skeleton in animtransfer tool does not trigger change 
 	Splice in animtransfer tool. 
-	Splice preview 
+	Improve skeleton tool saving, set name 
+	
 	Renaming file should trigger skeleton update 
 	Dump all the shader shit to file 
+	
 
 V0.40
 ----------------------------
