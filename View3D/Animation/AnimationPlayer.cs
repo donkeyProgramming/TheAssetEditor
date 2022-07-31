@@ -19,9 +19,19 @@ namespace View3D.Animation
             public Vector3 Translation { get; set; }
             public Vector3 Scale { get; set; }
             public Matrix WorldTransform { get; set; }
+
+            public void ComputeWorldMatrixFromComponents()
+            {
+                var rotation = Rotation;
+                var translation = Translation;
+                var scale = Scale;
+                WorldTransform = Matrix.CreateScale(scale) * Matrix.CreateFromQuaternion(rotation) * Matrix.CreateTranslation(translation);
+            }
         }
 
         public List<BoneKeyFrame> BoneTransforms = new List<BoneKeyFrame>();
+        
+
 
         public Matrix GetSkeletonAnimatedWorld(GameSkeleton gameSkeleton, int boneIndex)
         {
@@ -50,14 +60,11 @@ namespace View3D.Animation
         AnimationClip _animationClip;
 
         public bool IsPlaying { get; private set; } = true;
-        public double SpeedMultiplication { get; set; }
         public bool IsEnabled { get; set; } = false;
         public bool LoopAnimation { get; set; } = true;
         public bool MarkedForRemoval { get; set; } = false;
 
-        public List<AnimationChangeRule> AnimationRules { get; set; } = new List<AnimationChangeRule>();
-
-        public GameSkeleton GameSkeleton => _skeleton;
+        public List<IAnimationChangeRule> AnimationRules { get; set; } = new List<IAnimationChangeRule>();
 
         private int TimeUsToFrame(long timeUs)
         {
@@ -93,16 +100,10 @@ namespace View3D.Animation
             }
         }
 
-        public void SetAnimation(AnimationClip animation, GameSkeleton skeleton)
+        public void SetAnimation(AnimationClip animation, GameSkeleton skeleton, bool allowAnimationsFromDifferentSkeletons = false)
         {
-            SetAnimationArray(animation , skeleton);
-        }
-
-        private void SetAnimationArray(AnimationClip animation, GameSkeleton skeleton)
-        {
-            if (animation != null)
-            {
-                // Make sure animation fits
+            if (allowAnimationsFromDifferentSkeletons == false && (animation != null && _skeleton != null))
+            { 
                 if (animation.AnimationBoneCount != skeleton.BoneCount)
                     throw new Exception("This animation does not work for this skeleton!");
             }
@@ -114,30 +115,7 @@ namespace View3D.Animation
             Refresh();
         }
 
-        // public long GetAnimationLengthMs()
-        // {
-        //     if (_animationClip != null)
-        //         return _animationClip.PlayTimeUs / 1000;
-        //     return 0;
-        // }
-        
-        public long GetAnimationLengthUs()
-        {
-            return _animationClip?.PlayTimeUs ?? 0;
-        }
 
-        public long GetTimeUs()
-        {
-            return _timeSinceStart.TotalMicrosecondsAsLong;
-        }
-
-        public int GetFps()
-        {
-            if (_animationClip == null)
-                return 0;
-            var fps = _animationClip.DynamicFrames.Count / _animationClip.PlayTimeInSec;
-            return (int)fps;
-        }
 
         public void Update(GameTime gameTime)
         {
@@ -199,86 +177,17 @@ namespace View3D.Animation
             _skeleton?.Update();
         }
 
-        public void Play(bool value) { IsPlaying = value;  }
-
-        public AnimationFrame GetCurrentAnimationFrame()
+        public int GetFps()
         {
-            return _currentAnimFrame;
+            if (_animationClip == null)
+                return 0;
+            var fps = _animationClip.DynamicFrames.Count / _animationClip.PlayTimeInSec;
+            return (int)fps;
         }
 
-        public int FrameCount()
-        {
-            return _animationClip != null ? _animationClip.DynamicFrames.Count() : 0;
-        }
-
-        //-------------Move to somewhere else
-        /*
-        void OffsetAnimation(AnimationFrame currentFrame)
-        {
-            var translationMatrix = Matrix.Identity;
-            var rotationMatrix = Matrix.Identity;
-
-            if (Settings.UseTranslationOffset)
-                translationMatrix = Matrix.CreateTranslation(new Vector3(Settings.TranslationOffsetX, Settings.TranslationOffsetY, Settings.TranslationOffsetZ));
-
-            if (Settings.UseRotationOffset)
-                rotationMatrix = Matrix.CreateRotationX(MathHelper.ToRadians(Settings.RotationOffsetX)) * Matrix.CreateRotationY(MathHelper.ToRadians(Settings.RotationOffsetY)) * Matrix.CreateRotationZ(MathHelper.ToRadians(Settings.RotationOffsetZ));
-
-            var matrix = currentFrame.BoneTransforms[0].WorldTransform;
-            matrix = rotationMatrix * translationMatrix * matrix;
-            currentFrame.BoneTransforms[0].WorldTransform = matrix;
-        }
-
-        void HandleSnapToExternalAnimation(AnimationFrame currentFrame)
-        {
-            if (ExternalAnimationRef.HasAnimation && Settings.UseAnimationSnap)
-            {
-                var refTransform = ExternalAnimationRef.Transform;
-                currentFrame.BoneTransforms[0].WorldTransform = Matrix.CreateTranslation(refTransform.Translation); ;// * currentFrame.BoneTransforms[0].Transform ;
-            }
-        }
-
-        void HandleFreezeAnimation(AnimationFrame currentFrame)
-        {
-            if (Settings.FreezeAnimationRoot)
-            {
-                Vector3 rootOffset = new Vector3(0);
-                Vector3 animRootOffset = new Vector3(0);
-                foreach (var boneTransform in currentFrame.BoneTransforms)
-                {
-                    if (boneTransform.BoneIndex == 0)
-                    {
-                        var matrix = boneTransform.WorldTransform;
-                        animRootOffset += boneTransform.WorldTransform.Translation;
-                        matrix.Translation = new Vector3(0, 0, 0);
-                        boneTransform.WorldTransform = Matrix.Identity;
-                    }
-
-                    if (Settings.FreezeAnimationBone)
-                    {
-                        if (boneTransform.BoneIndex == 7)
-                        {
-                            var matrix = boneTransform.WorldTransform;
-                            rootOffset += boneTransform.WorldTransform.Translation;
-                            matrix.Translation = new Vector3(0, 0, 0);
-                            boneTransform.WorldTransform = Matrix.Identity;
-                        }
-                    }
-                }
-
-                foreach (var boneTransform in currentFrame.BoneTransforms)
-                {
-                    bool test = Settings.FreezeAnimationBone && boneTransform.BoneIndex != 7;
-                    if (boneTransform.ParentBoneIndex == 0 && test)
-                    {
-                        var matrix = boneTransform.WorldTransform;
-                        matrix.Translation -= rootOffset;
-                        boneTransform.WorldTransform = Matrix.Identity;
-                    }
-                }
-            }
-        }
-        */
-        ////
+        public AnimationFrame GetCurrentAnimationFrame() => _currentAnimFrame;
+        public int FrameCount() => _animationClip != null ? _animationClip.DynamicFrames.Count() : 0;
+        public long GetAnimationLengthUs() => _animationClip?.PlayTimeUs ?? 0;
+        public long GetTimeUs() => _timeSinceStart.TotalMicrosecondsAsLong;
     }
 }

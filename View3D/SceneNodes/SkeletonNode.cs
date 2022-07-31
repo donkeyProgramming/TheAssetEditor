@@ -1,14 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.WpfInterop;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using View3D.Animation;
 using View3D.Components.Rendering;
 using View3D.Rendering;
-using View3D.Rendering.Geometry;
 using View3D.Rendering.RenderItems;
 using View3D.Utility;
 
@@ -16,22 +11,11 @@ namespace View3D.SceneNodes
 {
     public interface ISkeletonProvider
     { 
-        bool IsActive { get; }
         GameSkeleton Skeleton { get;  }
     }
 
-    public class SimpleSkeletonProvider : ISkeletonProvider
+    public class SkeletonNode : GroupNode, ISkeletonProvider, IDrawableItem, IDisposable
     {
-        public SimpleSkeletonProvider(GameSkeleton skeleton) { Skeleton = skeleton; }
-        public bool IsActive => true;
-
-        public GameSkeleton Skeleton { get; private set; }
-    }
-
-
-    public class SkeletonNode : GroupNode, IDrawableItem, IDisposable
-    {
-        public ISkeletonProvider AnimationProvider { get; private set; }
         LineMeshRender _lineRenderer;
 
         public Color NodeColour = Color.Black;
@@ -42,25 +26,26 @@ namespace View3D.SceneNodes
         public float SkeletonScale { get; set; } = 1;
         public float SelectedBoneScaleMult { get; set; } = 1.5f;
 
-        public SkeletonNode(IComponentManager componentManager, ISkeletonProvider animationProvider, string name = "Skeleton") : base(name)
+        public GameSkeleton Skeleton { get; set; }
+
+        public SkeletonNode(IComponentManager componentManager, GameSkeleton skeleton, string name = "Skeleton") : base(name)
         {
             _lineRenderer = new LineMeshRender(componentManager.GetComponent<ResourceLibary>());
-            AnimationProvider = animationProvider;
+            Skeleton = skeleton;
         }
+
+        protected SkeletonNode() { }
 
         public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)
         {
-            var skeleton = AnimationProvider.Skeleton;
-           
-            if (skeleton != null)
-                Name = AnimationProvider.Skeleton.SkeletonName;
-            else
-                Name = "Skeleton ";
+            Name = "Skeleton ";
+            if (Skeleton != null)
+                Name = Skeleton.SkeletonName;
 
-            if (IsVisible && skeleton != null/* && _animationProvider.IsActive*/)
+            if (IsVisible && Skeleton != null)
             {
                 _lineRenderer.Clear(); 
-                for (int i = 0; i < skeleton.BoneCount; i++)
+                for (int i = 0; i < Skeleton.BoneCount; i++)
                 {
                     float scale = SkeletonScale;
                     Color drawColour = NodeColour;
@@ -70,14 +55,14 @@ namespace View3D.SceneNodes
                         scale *= SelectedBoneScaleMult;
                     }
 
-                    var boneMatrix = skeleton.GetAnimatedWorldTranform(i);
+                    var boneMatrix = Skeleton.GetAnimatedWorldTranform(i);
                     _lineRenderer.AddCube(Matrix.CreateScale(scale) * Matrix.CreateScale(0.05f) * boneMatrix * Matrix.CreateScale(ScaleMult) * parentWorld, drawColour);
                     
-                    var parentIndex = skeleton.GetParentBoneIndex(i);
+                    var parentIndex = Skeleton.GetParentBoneIndex(i);
                     if (parentIndex != -1)
                     {
                         var currentBoneMatrix = boneMatrix * Matrix.CreateScale(ScaleMult);
-                        var parentBoneMatrix = skeleton.GetAnimatedWorldTranform(parentIndex) * Matrix.CreateScale(ScaleMult);
+                        var parentBoneMatrix = Skeleton.GetAnimatedWorldTranform(parentIndex) * Matrix.CreateScale(ScaleMult);
                         _lineRenderer.AddLine(Vector3.Transform(currentBoneMatrix.Translation, parentWorld), Vector3.Transform(parentBoneMatrix.Translation, parentWorld));
                     }
                 }
@@ -85,9 +70,6 @@ namespace View3D.SceneNodes
                 renderEngine.AddRenderItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = _lineRenderer, ModelMatrix = Matrix.Identity });
             }
         }
-
-
-        protected SkeletonNode() { }
 
         public override ISceneNode CreateCopyInstance() => new SkeletonNode();
 
@@ -99,6 +81,7 @@ namespace View3D.SceneNodes
             typedTarget.LineColour = LineColour;
             typedTarget.SelectedBoneIndex = SelectedBoneIndex;
             typedTarget.SkeletonScale = SkeletonScale;
+            typedTarget.Skeleton = Skeleton;
             base.CopyInto(target);
         }
 

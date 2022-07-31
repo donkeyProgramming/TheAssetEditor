@@ -264,31 +264,42 @@ Show coordinates of bones for easy placement of stuff. Update when animating. Wo
 
 V0.40
 ----------------------------
-Link to latest Dietrich tutorial
-importing textures without mipmap error
+
+
 Better error message for stuff with lod loading error. open in rpfm bug 
 Finish Convert wh2 animpack to wh3 format 
-size of backup folder warning -> always put backups in one location 
- public void CreateLods() needs to delete old code 
+
  Fix datParser so it does not break wh2 
  Find unreferensed textures 
 
 
+
+V0.41
+----------------------------
+	>>Fix error for dindi
+	use all animations for a skeleton
+	importing textures without mipmap error
+	size of backup folder warning -> always put backups in one location 
+	change skeleton in animtransfer tool does not trigger change 
+	Splice in animtransfer tool. 
+	Splice preview 
+	Renaming file should trigger skeleton update 
+	Dump all the shader shit to file 
+
 V0.40
 ----------------------------
-
 	Features:
-		Automatic texture updater. Tool->Update Wh2=>Wh3 (Textures Experimental) - Thanks to Phazer
-		Added a GREAT into tutorial under the tutorials tab. - Thanks to Dietrich
-		Option to hide warhammer 2 texture slots when loading warhammer 3 models - Thanks ot Z bb
-		Use lod 0 for all lods. Tools->Copy lod 1 to every lod slot - Thanks ot Z bb
-		Memory usage indicator. - Thanks ot Z bb
-		Paste button for quick textures updating - Thanks ot Z bb)
+		* Automatic texture updater. Tool->Update Wh2=>Wh3 (Textures Experimental) - Thanks to Phazer
+		* Added a GREAT into tutorial under the tutorials tab. - Thanks to Dietrich
+		* Option to hide warhammer 2 texture slots when loading warhammer 3 models - Thanks to Z bb
+		* Use lod 0 for all lods. Tools->Copy lod 1 to every lod slot - Thanks to Z bb
+		* Memory usage indicator. - Thanks to Z bb
+		* Paste button for quick textures updating - Thanks to Z bb
 
 	Bugfixes:
-		Fixed error when generating lods for non wh3 models - Thanks ot Z bb
-		Fixed duplicate mesh error for non wh3 models - Thanks ot Z bb
-		Fixed texture loading error 
+		* Fixed error when generating lods for non wh3 models - Thanks to Z bb
+		* Fixed duplicate mesh error for non wh3 models - Thanks to Z bb
+		* Fixed texture loading error 
 
 V0.39
 ----------------------------

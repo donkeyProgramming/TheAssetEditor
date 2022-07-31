@@ -13,7 +13,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public SkeletonSceneNodeViewModel(SkeletonNode node, PackFileService pf, SkeletonAnimationLookUpHelper animLookUp)
         {
             _meshNode = node;
-            CreateBoneOverview(_meshNode.AnimationProvider.Skeleton);
+            CreateBoneOverview(_meshNode.Skeleton);
             BoneScale.PropertyChanged += BoneScale_PropertyChanged;
         }
 

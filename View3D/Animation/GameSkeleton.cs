@@ -174,7 +174,7 @@ namespace View3D.Animation
             return output;
         }
 
-        public AnimationFrame CreateAnimationFrame()
+        public AnimationFrame ConvertToAnimationFrame()
         {
             var currentFrame = new AnimationFrame();
             for (int i = 0; i < BoneCount; i++)

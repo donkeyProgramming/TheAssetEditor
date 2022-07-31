@@ -99,7 +99,6 @@ namespace CommonControls.Common
             where ViewModel : IEditorViewModel
             where View : Control;
 
-
         ViewModel CreateEditorViewModel<ViewModel>()
             where ViewModel : IEditorViewModel;
 

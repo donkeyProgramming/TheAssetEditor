@@ -11,19 +11,22 @@ using System.Linq;
 using System.Windows.Input;
 using View3D.Animation;
 using View3D.Components.Component;
-using View3D.SceneNodes;
 using static CommonControls.FilterDialog.FilterUserControl;
 using static CommonControls.Services.SkeletonAnimationLookUpHelper;
 
 namespace KitbasherEditor.ViewModels
 {
-
-    public class AnimationControllerViewModel : NotifyPropertyChangedImpl, ISkeletonProvider
+    public class AnimationControllerViewModel : NotifyPropertyChangedImpl
     {
         ILogger _logger = Logging.Create<AnimationControllerViewModel>();
         IComponentManager _componentManager;
         PackFileService _packFileService;
 
+        PackFile _skeletonPackFile;
+        PackFile Animation;
+
+        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        AnimationPlayer _player;
 
         string _headerText = "No animation selected";
         public string HeaderText { get { return _headerText; } set { SetAndNotify(ref _headerText, value); } }
@@ -43,20 +46,16 @@ namespace KitbasherEditor.ViewModels
 
         public OnSeachDelegate FilterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 
+        
 
-        PackFile _skeletonPackFile;
-        PackFile Animation;
-
-        public AnimationPlayer Player { get; set; }
-
-        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-
+        public AnimationPlayer GetPlayer() => _player;
 
         int _currentFrame = 0;
         public int CurrentFrame { get { return _currentFrame; } set { SetAndNotify(ref _currentFrame, value); } }
 
         int _maxFrames = 0;
         public int MaxFrames { get { return _maxFrames; } set { SetAndNotify(ref _maxFrames, value);  } }
+
 
         public ICommand PausePlayCommand { get; set; }
         public ICommand NextFrameCommand { get; set; }
@@ -68,23 +67,17 @@ namespace KitbasherEditor.ViewModels
         bool _isEnabled;
         public bool IsEnabled { get { return _isEnabled; } set { SetAndNotify(ref _isEnabled, value); OnEnableChanged(IsEnabled); } }
 
-
-
-        // interface - ISkeletonProvider
-        public bool IsActive => IsEnabled;
-
-        public GameSkeleton Skeleton { get; set; }
-
         public AnimationControllerViewModel(IComponentManager componentManager, PackFileService pf)
         {
             _componentManager = componentManager;
             _packFileService = pf;
             _skeletonAnimationLookUpHelper = _componentManager.GetComponent<SkeletonAnimationLookUpHelper>();
+
             SkeletonList = _skeletonAnimationLookUpHelper.SkeletonFileNames;
 
             var animCollection = _componentManager.GetComponent<AnimationsContainerComponent>();
-            Player = animCollection.RegisterAnimationPlayer(new AnimationPlayer(), "MainPlayer");
-            Player.OnFrameChanged += OnAnimationFrameChanged;
+            _player = animCollection.RegisterAnimationPlayer(new AnimationPlayer(), "MainPlayer");
+            _player.OnFrameChanged += (currentFrame) => CurrentFrame = currentFrame + 1;
 
             PausePlayCommand = new RelayCommand(OnPlayPause);
             NextFrameCommand = new RelayCommand(OnNextFrame);
@@ -96,14 +89,9 @@ namespace KitbasherEditor.ViewModels
             IsEnabled = false;
         }
 
-        private void OnAnimationFrameChanged(int currentFrame)
-        {
-            CurrentFrame = currentFrame+1;
-        }
-
         void OnPlayPause()
         {
-            var player = Player;
+            var player = _player;
             if (player.IsPlaying)
                 player.Pause();
             else
@@ -112,29 +100,29 @@ namespace KitbasherEditor.ViewModels
 
         void OnNextFrame()
         {
-            Player.Pause();
-            Player.CurrentFrame++;
+            _player.Pause();
+            _player.CurrentFrame++;
         }
 
         void OnPrivFrame()
         {
-            Player.Pause();
-            Player.CurrentFrame--;
+            _player.Pause();
+            _player.CurrentFrame--;
         }
 
         void OnFirstFrame()
         {
-            Player.Pause();
-            Player.CurrentFrame = 0;
+            _player.Pause();
+            _player.CurrentFrame = 0;
         }
 
         void OnLastFrame()
         {
-            Player.Pause();
-            Player.CurrentFrame = Player.FrameCount();
+            _player.Pause();
+            _player.CurrentFrame = _player.FrameCount();
         }
 
-        public void SetActiveSkeleton(string skeletonName)
+        public void SetActiveSkeletonFromName(string skeletonName)
         {
             string animationFolder = "animations\\skeletons\\";
             var skeletonFilePath = animationFolder + skeletonName + ".anim";
@@ -154,7 +142,6 @@ namespace KitbasherEditor.ViewModels
         {
             HeaderText = "";
             _skeletonPackFile = null;
-            Skeleton = null;
             AnimationsForCurrentSkeleton = new ObservableCollection<AnimationReference>();
             if (!string.IsNullOrWhiteSpace(selectedSkeletonPath))
             {
@@ -165,11 +152,7 @@ namespace KitbasherEditor.ViewModels
                 {
                     HeaderText = _skeletonPackFile.Name + " - No Animation";
                     AnimationsForCurrentSkeleton = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(Path.GetFileNameWithoutExtension(_skeletonPackFile.Name));
-
-                    var skeletonAnimationFile = AnimationFile.Create(_skeletonPackFile);
-                    Skeleton = new GameSkeleton(skeletonAnimationFile, Player);
                 }
-
             }
 
             SelectedAnimation = null;
@@ -188,39 +171,52 @@ namespace KitbasherEditor.ViewModels
             else
                 HeaderText = "No Skeleton - No Animation";
 
-            if (Animation != null)
+            var skeleton = GetModelSkeleton();
+            var isAnimationDataPresent = Animation != null && skeleton != null;
+            if (isAnimationDataPresent)
             {
                 var animFile = AnimationFile.Create(Animation);
-                var animClip = new AnimationClip(animFile, Skeleton);
+                var animClip = new AnimationClip(animFile, skeleton);
 
+                _player.SetAnimation(animClip, skeleton, true);
+                if(_player.IsPlaying && _player.IsEnabled)
+                    _player.Play();
 
-                Player.SetAnimation(animClip, Skeleton);
-                if(Player.IsPlaying && Player.IsEnabled)
-                    Player.Play();
-
-                MaxFrames = Player.FrameCount();
+                MaxFrames = _player.FrameCount();
                 CurrentFrame = 0;
             }
         }
 
         private void OnEnableChanged(bool isEnabled)
         {
-            if (isEnabled && Animation != null)
+            var skeleton = GetModelSkeleton();
+            var isAnimationDataPresent = Animation != null && skeleton != null;
+            if (isEnabled && isAnimationDataPresent)
             {
                 var animFile = AnimationFile.Create(Animation);
-                var animClip = new AnimationClip(animFile, Skeleton);
+                var animClip = new AnimationClip(animFile, skeleton);
 
                 MaxFrames = animClip.DynamicFrames.Count;
                 CurrentFrame = 0;
 
-                Player.SetAnimation(animClip, Skeleton);
+                _player.SetAnimation(animClip, skeleton, true);
             }
             else
             {
-                Player.SetAnimation(null, Skeleton);
+                _player.SetAnimation(null, skeleton, true);
             }
 
-            Player.IsEnabled = isEnabled;
+            _player.IsEnabled = isEnabled;
+        }
+
+        GameSkeleton GetModelSkeleton()
+        {
+            var meshResolver = _componentManager.GetComponent<IEditableMeshResolver>();
+            if (meshResolver == null)
+                return null;
+
+            var skeleton = meshResolver.GeEditableMeshRootNode()?.SkeletonNode?.Skeleton;
+            return skeleton;
         }
     }
 }

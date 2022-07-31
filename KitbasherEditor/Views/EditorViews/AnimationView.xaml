@@ -46,8 +46,8 @@
                     <Expander.Header>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock VerticalAlignment="Bottom">
-                        <Run FontSize="14" FontWeight="Bold" Text="{Binding HeaderText, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Run Text="{Binding SelectedAnimation.FullPath, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+                                <Run FontSize="14" FontWeight="Bold" Text="{Binding HeaderText, UpdateSourceTrigger=PropertyChanged}"/>
+                                <Run Text="{Binding SelectedAnimation.FullPath, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
                             </TextBlock>
                         </StackPanel>
                     </Expander.Header>
@@ -67,14 +67,14 @@
                                 <TextBlock Text="Skeleton" Width="70" DockPanel.Dock="Left" Height="20"/>
                                 <TextBlock Text=" : " DockPanel.Dock="Left"/>
                                 <filterdialog:CollapsableFilterControl  
-                            SelectedItem="{Binding SelectedSkeleton, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                            SearchItems="{Binding SkeletonList, UpdateSourceTrigger=PropertyChanged}"     
-                            OnSearch="{Binding FilterByFullPath, UpdateSourceTrigger=PropertyChanged}"   
-                            IsManipulationEnabled="False"
-                            LabelTotalWidth="0"   
-                            ShowLabel="False"
-                            LabelText="External Skeleton"
-                            IsEnabled="False"/>
+                                    SelectedItem="{Binding SelectedSkeleton, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                    SearchItems="{Binding SkeletonList, UpdateSourceTrigger=PropertyChanged}"     
+                                    OnSearch="{Binding FilterByFullPath, UpdateSourceTrigger=PropertyChanged}"   
+                                    IsManipulationEnabled="False"
+                                    LabelTotalWidth="0"   
+                                    ShowLabel="False"
+                                    LabelText="External Skeleton"
+                                    IsEnabled="true"/>
                             </DockPanel>
                         </Grid>
 

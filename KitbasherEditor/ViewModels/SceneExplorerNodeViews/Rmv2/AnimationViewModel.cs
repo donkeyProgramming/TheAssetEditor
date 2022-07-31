@@ -71,7 +71,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             if (newValue != null && newValue.BoneIndex.Value != -1)
             {
                 _meshNode.AttachmentPointName = newValue.Name.Value;
-                _meshNode.AttachmentBoneResolver = new SkeletonBoneAnimationResolver(mainNode.Skeleton.AnimationProvider, newValue.BoneIndex.Value);
+                _meshNode.AttachmentBoneResolver = new SkeletonBoneAnimationResolver(mainNode.SkeletonNode, newValue.BoneIndex.Value);
             }
             else
             {

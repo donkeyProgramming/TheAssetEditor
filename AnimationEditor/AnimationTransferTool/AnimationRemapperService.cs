@@ -31,24 +31,26 @@ namespace AnimationEditor.AnimationTransferTool
             var newAnimation = CreateNewAnimation(copyToSkeleton, resampledAnimationToCopy);
 
             if (copyFromSkeleton.SkeletonName != copyToSkeleton.SkeletonName)
-                MapAnimationWorld(copyFromSkeleton, copyToSkeleton, resampledAnimationToCopy, newAnimation);
+                TransferAnimationWorld(copyFromSkeleton, copyToSkeleton, resampledAnimationToCopy, newAnimation);
             else
                 newAnimation = resampledAnimationToCopy;
 
             if (_settings.ApplyRelativeScale.Value)
                 ApplyRelativeScale(copyFromSkeleton, copyToSkeleton, newAnimation);
 
+            // Apply the "rules"
             SnapBonesToWorld(copyFromSkeleton, copyToSkeleton, newAnimation, resampledAnimationToCopy);
             FreezeBones(copyToSkeleton, newAnimation);
             ApplyOffsets(copyToSkeleton, newAnimation);
             FixAttachmentPoints(copyFromSkeleton, copyToSkeleton, newAnimation, resampledAnimationToCopy);
-            ScaleAnimation(newAnimation, copyToSkeleton); 
-            
+            ApplyAnimationScale(newAnimation, copyToSkeleton);
+            ApplyBoneLengthMult(newAnimation, copyToSkeleton);
+
             return newAnimation;
         }
 
 
-        void MapAnimationWorld(GameSkeleton copyFromSkeleton, GameSkeleton copyToSkeleton, AnimationClip animationToCopy, AnimationClip newAnimation)
+        void TransferAnimationWorld(GameSkeleton copyFromSkeleton, GameSkeleton copyToSkeleton, AnimationClip animationToCopy, AnimationClip newAnimation)
         {
             var frameCount = animationToCopy.DynamicFrames.Count;
             for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
@@ -269,7 +271,7 @@ namespace AnimationEditor.AnimationTransferTool
             }
         }
 
-        void ScaleAnimation(AnimationClip animation, GameSkeleton copyToSkeleton)
+        void ApplyAnimationScale(AnimationClip animation, GameSkeleton copyToSkeleton)
         {
             var frameCount = animation.DynamicFrames.Count;
             for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
@@ -277,6 +279,12 @@ namespace AnimationEditor.AnimationTransferTool
                  animation.DynamicFrames[frameIndex].Scale[0] = new Vector3((float) _settings.Scale.Value);
             }
 
+
+        }
+
+        void ApplyBoneLengthMult(AnimationClip animation, GameSkeleton copyToSkeleton)
+        {
+            var frameCount = animation.DynamicFrames.Count;
             for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
                 for (int boneIndex = 0; boneIndex < copyToSkeleton.BoneCount; boneIndex++)

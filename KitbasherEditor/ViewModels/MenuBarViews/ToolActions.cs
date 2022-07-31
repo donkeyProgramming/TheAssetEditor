@@ -216,7 +216,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public void OpenReRiggingTool()
         {
             var root = _editableMeshResolver.GeEditableMeshRootNode();
-            var skeletonName = root.Skeleton.Name;
+            var skeletonName = root.SkeletonNode.Name;
             Remap(_selectionManager.GetState<ObjectSelectionState>(), skeletonName);
         }
 

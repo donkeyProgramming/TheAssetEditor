@@ -82,11 +82,11 @@ namespace AnimationEditor.Common.ReferenceModel
             _resourceLibary = _componentManager.GetComponent<ResourceLibary>();
             var animComp = _componentManager.GetComponent<AnimationsContainerComponent>();
 
-            _parentNode = rootNode.AddObject(new GroupNode(Description)) as GroupNode;
+            _parentNode = rootNode.AddObject(new GroupNode(Description));
             Player = animComp.RegisterAnimationPlayer(new View3D.Animation.AnimationPlayer(), Description);
 
             // Create skeleton
-            _skeletonSceneNode = new SkeletonNode(_componentManager, this);
+            _skeletonSceneNode = new SkeletonNode(_componentManager, Skeleton);
             _skeletonSceneNode.NodeColour = _skeletonColor;
             _parentNode.AddObject(_skeletonSceneNode);
 

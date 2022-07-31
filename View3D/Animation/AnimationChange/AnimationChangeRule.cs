@@ -1,14 +1,18 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace View3D.Animation.AnimationChange
+﻿namespace View3D.Animation.AnimationChange
 {
-    public abstract class AnimationChangeRule
+    public interface IAnimationChangeRule
     {
-        public virtual void TransformBone(AnimationFrame frame, int boneId, float v) { }
-
-        public virtual void ApplyWorldTransform(AnimationFrame frame, float time) { }
     }
+
+    public interface IWorldSpaceAnimationRule : IAnimationChangeRule
+    {
+        void TransformFrameWorldSpace(AnimationFrame frame, float time);
+    }
+
+    public interface ILocalSpaceAnimationRule : IAnimationChangeRule
+    {
+        void TransformFrameLocalSpace(AnimationFrame frame, int boneId, float time);
+    }
+
+
 }

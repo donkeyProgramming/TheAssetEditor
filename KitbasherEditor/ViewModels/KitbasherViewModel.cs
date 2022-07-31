@@ -94,17 +94,17 @@ namespace KitbasherEditor.ViewModels
         {
             _modelLoader = new KitbashSceneCreator(scene, _packFileService, Animation, MainFile, GeometryGraphicsContextFactory.CreateInstance(Scene.GraphicsDevice), _applicationSettingsService);
             MenuBar.ModelLoader = _modelLoader;
-            MenuBar.General.ModelSaver = new SceneSaverService(_packFileService, this, _modelLoader.EditableMeshNode, _applicationSettingsService);
-            MenuBar.General.WsModelGeneratorService = new WsModelGeneratorService(_packFileService, this, _modelLoader.EditableMeshNode);
+            MenuBar.General.ModelSaver = new SceneSaverService(_packFileService, this, _modelLoader.MainNode, _applicationSettingsService);
+            MenuBar.General.WsModelGeneratorService = new WsModelGeneratorService(_packFileService, this, _modelLoader.MainNode);
 
-            SceneExplorer.EditableMeshNode = _modelLoader.EditableMeshNode;
+            SceneExplorer.EditableMeshNode = _modelLoader.MainNode;
             
             if (MainFile != null)
             {
                 try
                 {
                     _modelLoader.LoadMainEditableModel(MainFile );
-                    var nodes = _modelLoader.EditableMeshNode.GetMeshNodes(0)
+                    var nodes = _modelLoader.MainNode.GetMeshNodes(0)
                         .Select(x => x as ISelectable)
                         .Where(x => x != null)
                         .ToList();

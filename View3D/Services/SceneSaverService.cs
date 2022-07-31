@@ -99,7 +99,7 @@ namespace View3D.Services
                     onlySaveVisible = true;
             }
 
-            var bytes = Save(onlySaveVisible, new List<Rmv2ModelNode>() { _editableMeshNode }, _editableMeshNode.Skeleton.AnimationProvider.Skeleton, _editableMeshNode.SelectedOutputFormat, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
+            var bytes = Save(onlySaveVisible, new List<Rmv2ModelNode>() { _editableMeshNode }, _editableMeshNode.SkeletonNode.Skeleton, _editableMeshNode.SelectedOutputFormat, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
             return bytes;
         }
 
@@ -203,7 +203,7 @@ namespace View3D.Services
         {
             var errorList = new ErrorListViewModel.ErrorList();
 
-            var skeleton = _editableMeshNode.Skeleton.AnimationProvider.Skeleton;
+            var skeleton = _editableMeshNode.SkeletonNode.Skeleton;
             var meshes = _editableMeshNode.GetMeshNodes(0);
 
             // Different skeltons

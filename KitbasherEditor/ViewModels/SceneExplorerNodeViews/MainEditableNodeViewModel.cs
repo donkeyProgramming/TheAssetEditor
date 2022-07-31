@@ -1,13 +1,13 @@
-﻿using CommonControls.BaseDialogs.ToolSelector;
-using CommonControls.Common;
+﻿using CommonControls.Common;
+using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
 using MonoGame.Framework.WpfInterop;
 using MoreLinq;
-using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using View3D.Animation;
 using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.SceneNodes;
@@ -16,7 +16,6 @@ using static CommonControls.FilterDialog.FilterUserControl;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
-
     public class MainEditableNodeViewModel : NotifyPropertyChangedImpl, ISceneNodeViewModel
     {
         MainEditableNode _mainNode;
@@ -32,7 +31,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public OnSeachDelegate FilterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 
 
-        public ObservableCollection<RmvVersionEnum> PossibleOutputFormats { get; set; } = new ObservableCollection<RmvVersionEnum>();
+        public ObservableCollection<RmvVersionEnum> PossibleOutputFormats { get; set; } = new ObservableCollection<RmvVersionEnum>() { RmvVersionEnum.RMV2_V6, RmvVersionEnum.RMV2_V7, RmvVersionEnum.RMV2_V8};
 
         RmvVersionEnum _selectedOutputFormat;
         public RmvVersionEnum SelectedOutputFormat { get => _selectedOutputFormat; set { SetAndNotify(ref _selectedOutputFormat, value); _mainNode.SelectedOutputFormat = value; } }
@@ -63,53 +62,35 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 UpdateSkeletonName();
             }
 
-            SetCurrentOuputFormat(_mainNode.SelectedOutputFormat);
+            SelectedOutputFormat = _mainNode.SelectedOutputFormat;
             TextureFileEditorServiceViewModel = new TextureFileEditorServiceViewModel(mainNode, pfs);
 
             UpdateLodInformationAction();
-           
-        }
-
-        public void SetCurrentOuputFormat(RmvVersionEnum format)
-        {
-            SelectedOutputFormat = format;
-
-            PossibleOutputFormats.Clear();
-            if (SelectedOutputFormat == RmvVersionEnum.RMV2_V6)
-            {
-                PossibleOutputFormats.Add(RmvVersionEnum.RMV2_V6);
-                PossibleOutputFormats.Add(RmvVersionEnum.RMV2_V7);
-                PossibleOutputFormats.Add(RmvVersionEnum.RMV2_V8);
-            }
-            else if (SelectedOutputFormat == RmvVersionEnum.RMV2_V7 || SelectedOutputFormat == RmvVersionEnum.RMV2_V8)
-            {
-                PossibleOutputFormats.Add(RmvVersionEnum.RMV2_V6);
-                PossibleOutputFormats.Add(RmvVersionEnum.RMV2_V7);
-                PossibleOutputFormats.Add(RmvVersionEnum.RMV2_V8);
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
         }
 
         void UpdateSkeletonName()
         {
-            string cleanName = "";
+            
+            string cleanSkeletonName = "";
             if (!string.IsNullOrWhiteSpace(SkeletonName))
-                cleanName = Path.GetFileNameWithoutExtension(SkeletonName);
-
-            if (_mainNode.Model != null)
-                SetSkeletonName(_mainNode, cleanName);
-
-            _animationControllerViewModel.SetActiveSkeleton(cleanName);   
-        }
-
-        void SetSkeletonName(MainEditableNode node, string skeletonName)
-        {
-            var header = node.Model.Header;
-            header.SkeletonName = skeletonName;
-            node.Model.Header = header;
+                cleanSkeletonName = Path.GetFileNameWithoutExtension(SkeletonName);
+            _mainNode.SetSkeletonFromName(cleanSkeletonName);
+            //if (_mainNode.Model != null)
+            //{
+            //    string animationFolder = "animations\\skeletons\\";
+            //    var skeletonFilePath = animationFolder + cleanSkeletonName + ".anim";
+            //    var skeletonPfs = _pfs.FindFile(skeletonFilePath);
+            //    if (skeletonPfs != null)
+            //    {
+            //        var animClip = AnimationFile.Create(skeletonPfs);
+            //        _mainNode.SkeletonNode.Skeleton = new GameSkeleton(animClip, _animationControllerViewModel.GetPlayer());
+            //    }
+            //    var header = _mainNode.Model.Header;
+            //    header.SkeletonName = cleanSkeletonName;
+            //    _mainNode.Model.Header = header;
+            //}
+            //
+            //_animationControllerViewModel.SetActiveSkeletonFromName(cleanSkeletonName);   
         }
 
         public void CopyTexturesToOutputPack()
@@ -122,14 +103,13 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             foreach (var tex in distinctTextures)
             {
                 var file = _pfs.FindFile(tex.Path);    
-                if (file  != null)
+                if (file != null)
                 {
                     var sourcePackContainer = _pfs.GetPackFileContainer(file);
                     _pfs.CopyFileFromOtherPackFile(sourcePackContainer, tex.Path, _pfs.GetEditablePack());
                 }
             }
         }
-
 
         public void UpdateLodInformationAction()
         {

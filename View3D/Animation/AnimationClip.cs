@@ -31,6 +31,13 @@ namespace View3D.Animation
                     Scale = new List<Vector3>(Scale)
                 };
             }
+
+            public int GetBoneCountFromFrame()
+            {
+                if (Position.Count == Rotation.Count && Rotation.Count == Scale.Count)
+                    return Position.Count;
+                throw new Exception($"Not all attribues have the same count P: {Position.Count} R:{Rotation.Count} S:{Scale.Count}");
+            }
         }
 
         private const long MicrosecondsPerSecond = 1_000_000;
@@ -100,7 +107,7 @@ namespace View3D.Animation
         {
             List<KeyFrame> newDynamicFrames = new List<KeyFrame>();
 
-            var boneCount = animationPart.RotationMappings.Count;
+            var animationSkeletonBoneCount = animationPart.RotationMappings.Count;
             var frameCount = animationPart.DynamicFrames.Count;
 
             if (frameCount == 0 && animationPart.StaticFrame != null)
@@ -110,25 +117,31 @@ namespace View3D.Animation
             {
                 var newKeyframe = new KeyFrame();
 
-                for (int boneIndex = 0; boneIndex < boneCount; boneIndex++)
+                for (int animationSkeletonBoneIndex = 0; animationSkeletonBoneIndex < animationSkeletonBoneCount; animationSkeletonBoneIndex++)
                 {
-                    var translationLookup = animationPart.TranslationMappings[boneIndex];
-                    if (translationLookup.IsDynamic)
-                        newKeyframe.Position.Add(animationPart.DynamicFrames[frameIndex].Transforms[translationLookup.Id].ToVector3());
-                    else if (translationLookup.IsStatic)
-                        newKeyframe.Position.Add(animationPart.StaticFrame.Transforms[translationLookup.Id].ToVector3());
-                    else
-                        newKeyframe.Position.Add(skeleton.Translation[boneIndex]);
+                    // We can apply animations to a skeleton where the skeleton of the animation is different then the skeleton we are applying it to
+                    // If that is the case we just discard the information.
+                    bool isBoneIndexValid = animationSkeletonBoneIndex < skeleton.BoneCount;
+                    if (isBoneIndexValid)
+                    {
+                        var translationLookup = animationPart.TranslationMappings[animationSkeletonBoneIndex];
+                        if (translationLookup.IsDynamic)
+                            newKeyframe.Position.Add(animationPart.DynamicFrames[frameIndex].Transforms[translationLookup.Id].ToVector3());
+                        else if (translationLookup.IsStatic)
+                            newKeyframe.Position.Add(animationPart.StaticFrame.Transforms[translationLookup.Id].ToVector3());
+                        else
+                            newKeyframe.Position.Add(skeleton.Translation[animationSkeletonBoneIndex]);
 
-                    var rotationLookup = animationPart.RotationMappings[boneIndex];
-                    if (rotationLookup.IsDynamic)
-                        newKeyframe.Rotation.Add(animationPart.DynamicFrames[frameIndex].Quaternion[rotationLookup.Id].ToQuaternion());
-                    else if (rotationLookup.IsStatic)
-                        newKeyframe.Rotation.Add(animationPart.StaticFrame.Quaternion[rotationLookup.Id].ToQuaternion());
-                    else
-                        newKeyframe.Rotation.Add(skeleton.Rotation[boneIndex]);
+                        var rotationLookup = animationPart.RotationMappings[animationSkeletonBoneIndex];
+                        if (rotationLookup.IsDynamic)
+                            newKeyframe.Rotation.Add(animationPart.DynamicFrames[frameIndex].Quaternion[rotationLookup.Id].ToQuaternion());
+                        else if (rotationLookup.IsStatic)
+                            newKeyframe.Rotation.Add(animationPart.StaticFrame.Quaternion[rotationLookup.Id].ToQuaternion());
+                        else
+                            newKeyframe.Rotation.Add(skeleton.Rotation[animationSkeletonBoneIndex]);
 
-                    newKeyframe.Scale.Add(Vector3.One);
+                        newKeyframe.Scale.Add(Vector3.One);
+                    }
                 }
 
                 newDynamicFrames.Add(newKeyframe);

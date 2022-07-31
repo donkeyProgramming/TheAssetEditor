@@ -246,7 +246,6 @@ namespace View3D.Services
                     smoothness = (float)Math.Pow(smoothness, 2.0 / 1.0);
                     float roughness = Math.Clamp(1.0f - smoothness, 0.0f, 1.0f);
 
-
                     var diffuseColorFloat = ColorToVector4(inputDiffuseTex.GetPixel(x, y));
                     var spcularColorFloat = ColorToVector4(inputSpecularTex.GetPixel(x, y));
 
@@ -274,12 +273,8 @@ namespace View3D.Services
                     // BEGIN: DEBUGGIN CODE
                     if (false)
                     {
-                        outBaseColourTex.SetPixel(x, y,
-                            Vector4ToColor(new MS::Vector4(roughness, roughness, roughness, 1.0f)));
-
-                        outMaterialMapTex.SetPixel(x, y,
-                       Vector4ToColor(new MS::Vector4(0.0f, 1.0f, 0.0f, 1.0f)));
-
+                        outBaseColourTex.SetPixel(x, y, Vector4ToColor(new MS::Vector4(roughness, roughness, roughness, 1.0f)));
+                        outMaterialMapTex.SetPixel(x, y,Vector4ToColor(new MS::Vector4(0.0f, 1.0f, 0.0f, 1.0f)));
                     }
                     // END: DEBUGGIN CODE
                 }
@@ -302,7 +297,6 @@ namespace View3D.Services
                 outputList.Ok($"{modelPath}-{model.Name}", $"Generated new `material_map texture");
 
             return result;
-
         }
 
         // TODO: To Ole:

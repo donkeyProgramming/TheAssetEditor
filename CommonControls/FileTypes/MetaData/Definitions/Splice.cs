@@ -4,7 +4,6 @@ using System.Text;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
-
     [MetaData("SPLICE", 11)]
     public class Splice_v11 : DecodedMetaEntryBase
     {

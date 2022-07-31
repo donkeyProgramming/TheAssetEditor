@@ -157,7 +157,7 @@ namespace View3D.Animation.MetaData
                 propPlayer.SetAnimation(clip, skeleton);
 
                 // Add the prop skeleton
-                var skeletonSceneNode = new SkeletonNode(_componentManager, new SimpleSkeletonProvider(skeleton));
+                var skeletonSceneNode = new SkeletonNode(_componentManager, skeleton);
                 skeletonSceneNode.NodeColour = Color.Yellow;
                 skeletonSceneNode.ScaleMult = animatedPropMeta.Scale;
                 loadedNode.AddObject(skeletonSceneNode);

@@ -4,72 +4,62 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using View3D.Animation.AnimationChange;
-using View3D.SceneNodes;
-using static CommonControls.FileTypes.Animation.AnimationFile;
 
 namespace View3D.Animation
 {
     public class AnimationSampler
     {
-        public static AnimationFrame Sample(int frameIndex, float frameIterpolation, GameSkeleton skeleton, AnimationClip animationClip, List<AnimationChangeRule> animationChangeRules = null, Nullable<float> time = null)
+        public static AnimationFrame Sample(int frameIndex, float frameIterpolation, GameSkeleton skeleton, AnimationClip animationClip, List<IAnimationChangeRule> animationChangeRules = null)
         {
             try
             {
                 if (skeleton == null)
                     return null;
 
-                var currentFrame = skeleton.CreateAnimationFrame();
+                var currentFrame = skeleton.ConvertToAnimationFrame();
 
-                if (animationClip != null && skeleton != null)
+                // Apply the animation to the skeleton frame
+                if (animationClip != null)
                 {
                     if (animationClip.DynamicFrames.Count > frameIndex)
                     {
                         var currentFrameKeys = GetKeyFrameFromIndex(animationClip.DynamicFrames, frameIndex);
                         var nextFrameKeys = GetKeyFrameFromIndex(animationClip.DynamicFrames, frameIndex + 1);
-                        ApplyAnimation(currentFrameKeys, nextFrameKeys, frameIterpolation, currentFrame);
-
-                        // Apply skeleton scale
-                        for (int i = 0; i < currentFrame.BoneTransforms.Count(); i++)
-                            currentFrame.BoneTransforms[i].Scale = animationClip.DynamicFrames[frameIndex].Scale[i];
+                        InterpolateFrame(currentFrameKeys, nextFrameKeys, frameIterpolation, currentFrame);
                     }
                 }
           
-                for (int i = 0; i < currentFrame.BoneTransforms.Count(); i++)
+                // Compute the worldspace values
+                for (int boneIndex = 0; boneIndex < currentFrame.BoneTransforms.Count(); boneIndex++)
                 {
-                    Quaternion rotation = currentFrame.BoneTransforms[i].Rotation;
-                    Vector3 translation = currentFrame.BoneTransforms[i].Translation;
-
-                    currentFrame.BoneTransforms[i].WorldTransform =
-                        Matrix.CreateScale(currentFrame.BoneTransforms[i].Scale) * 
-                        Matrix.CreateFromQuaternion(rotation) *
-                        Matrix.CreateTranslation(translation);
-               
+                    currentFrame.BoneTransforms[boneIndex].ComputeWorldMatrixFromComponents();
                     if (animationChangeRules != null)
                     {
-                        foreach (var rule in animationChangeRules)
-                            rule.TransformBone(currentFrame, i, time.Value * animationClip.PlayTimeInSec);
+                        foreach (var rule in animationChangeRules.OfType<ILocalSpaceAnimationRule>())
+                            rule.TransformFrameLocalSpace(currentFrame, boneIndex, animationClip.PlayTimeInSec);
                     }
 
-                    var parentindex = currentFrame.BoneTransforms[i].ParentBoneIndex;
+                    var parentindex = currentFrame.BoneTransforms[boneIndex].ParentBoneIndex;
                     if (parentindex == -1)
                         continue;
 
-                    currentFrame.BoneTransforms[i].WorldTransform = currentFrame.BoneTransforms[i].WorldTransform * currentFrame.BoneTransforms[parentindex].WorldTransform;
+                    currentFrame.BoneTransforms[boneIndex].WorldTransform = currentFrame.BoneTransforms[boneIndex].WorldTransform * currentFrame.BoneTransforms[parentindex].WorldTransform;
                 }
 
+                // Apply animation rules
                 if (animationChangeRules != null)
                 {
-                    foreach (var rule in animationChangeRules)
-                        rule.ApplyWorldTransform(currentFrame, time.Value * animationClip.PlayTimeInSec);
+                    foreach (var rule in animationChangeRules.OfType<IWorldSpaceAnimationRule>())
+                        rule.TransformFrameWorldSpace(currentFrame, animationClip.PlayTimeInSec);
                 }
 
-
-                for (int i = 0; i < skeleton.BoneCount; i++)
+                // Remove the skeleten info from the world transform.
+                // This is applied again in the animation shader.
+                for (int boneIndex = 0; boneIndex < skeleton.BoneCount; boneIndex++)
                 {
-                    var inv = Matrix.Invert(skeleton.GetWorldTransform(i));
-                    currentFrame.BoneTransforms[i].WorldTransform = Matrix.Multiply(inv, currentFrame.BoneTransforms[i].WorldTransform);
+                    var inv = Matrix.Invert(skeleton.GetWorldTransform(boneIndex));
+                    currentFrame.BoneTransforms[boneIndex].WorldTransform = Matrix.Multiply(inv, currentFrame.BoneTransforms[boneIndex].WorldTransform);
                 }
 
                 return currentFrame;
@@ -82,11 +72,11 @@ namespace View3D.Animation
             }
         }
 
-        public static AnimationFrame Sample(float t, GameSkeleton skeleton, AnimationClip animationClip, List<AnimationChangeRule> animationChangeRules = null)
+        public static AnimationFrame Sample(float t_between_0_and_1, GameSkeleton skeleton, AnimationClip animationClip, List<IAnimationChangeRule> animationChangeRules = null)
         {
             try
             {
-                var clampedT = MathUtil.EnsureRange(t, 0, 1);
+                var clampedT = MathUtil.EnsureRange(t_between_0_and_1, 0, 1);
                 int frameIndex = 0;
                 float frameIterpolation = 0;
 
@@ -102,7 +92,7 @@ namespace View3D.Animation
                     frameIterpolation = frameWithLeftover - clampedFrame; 
                 }
 
-                return Sample(frameIndex, frameIterpolation, skeleton, animationClip, animationChangeRules, t);
+                return Sample(frameIndex, frameIterpolation, skeleton, animationClip, animationChangeRules);
             }
             catch (Exception e)
             {
@@ -121,14 +111,11 @@ namespace View3D.Animation
             return keyframes[frameIndex];
         }
 
-        static Quaternion ComputeRotationsCurrentFrame(int boneIndex, AnimationClip.KeyFrame currentFrame, AnimationClip.KeyFrame nextFrame, float animationInterpolation)
+        static Quaternion ComputeRotationCurrentFrame(int boneIndex, AnimationClip.KeyFrame currentFrame, AnimationClip.KeyFrame nextFrame, float animationInterpolation)
         {
             var animationValueCurrentFrame = currentFrame.Rotation[boneIndex];
             if (nextFrame != null)
-            {
-                var animationValueNextFrame = nextFrame.Rotation[boneIndex];
-                animationValueCurrentFrame = Quaternion.Slerp(animationValueCurrentFrame, animationValueNextFrame, animationInterpolation);
-            }
+                animationValueCurrentFrame = Quaternion.Slerp(animationValueCurrentFrame, nextFrame.Rotation[boneIndex], animationInterpolation);
             animationValueCurrentFrame.Normalize();
             return animationValueCurrentFrame;
         }
@@ -137,23 +124,33 @@ namespace View3D.Animation
         {
             var animationValueCurrentFrame = currentFrame.Position[boneIndex];
             if (nextFrame != null)
-            {
-                var animationValueNextFrame = nextFrame.Position[boneIndex];
-                animationValueCurrentFrame = Vector3.Lerp(animationValueCurrentFrame, animationValueNextFrame, animationInterpolation);
-            }
+                animationValueCurrentFrame = Vector3.Lerp(animationValueCurrentFrame, nextFrame.Position[boneIndex], animationInterpolation);
 
             return animationValueCurrentFrame;
         }
 
-        static void ApplyAnimation(AnimationClip.KeyFrame currentFrame, AnimationClip.KeyFrame nextFrame, float animationInterpolation, AnimationFrame finalAnimationFrame)
+        static Vector3 ComputeScaleCurrentFrame(int boneIndex, AnimationClip.KeyFrame currentFrame, AnimationClip.KeyFrame nextFrame, float animationInterpolation)
+        {
+            var animationValueCurrentFrame = currentFrame.Scale[boneIndex];
+            if (nextFrame != null)
+                animationValueCurrentFrame = Vector3.Lerp(animationValueCurrentFrame, nextFrame.Scale[boneIndex], animationInterpolation);
+
+            return animationValueCurrentFrame;
+        }
+
+        static void InterpolateFrame(AnimationClip.KeyFrame currentFrame, AnimationClip.KeyFrame nextFrame, float animationInterpolation, AnimationFrame finalAnimationFrame)
         {
             if (currentFrame == null)
                 return;
 
-            for (int i = 0; i < finalAnimationFrame.BoneTransforms.Count(); i++)
+            var skeletonBoneCount = finalAnimationFrame.BoneTransforms.Count();
+            var animBoneCount = currentFrame.GetBoneCountFromFrame();
+            var boneCount = Math.Min(skeletonBoneCount, animBoneCount);
+            for (int boneIndex = 0; boneIndex < boneCount; boneIndex++)
             {
-                finalAnimationFrame.BoneTransforms[i].Translation = ComputeTranslationCurrentFrame(i, currentFrame, nextFrame, animationInterpolation);
-                finalAnimationFrame.BoneTransforms[i].Rotation = ComputeRotationsCurrentFrame(i, currentFrame, nextFrame, animationInterpolation);
+                finalAnimationFrame.BoneTransforms[boneIndex].Translation = ComputeTranslationCurrentFrame(boneIndex, currentFrame, nextFrame, animationInterpolation);
+                finalAnimationFrame.BoneTransforms[boneIndex].Rotation = ComputeRotationCurrentFrame(boneIndex, currentFrame, nextFrame, animationInterpolation);
+                finalAnimationFrame.BoneTransforms[boneIndex].Scale = ComputeScaleCurrentFrame(boneIndex, currentFrame, nextFrame, animationInterpolation);
             }
         }
     }

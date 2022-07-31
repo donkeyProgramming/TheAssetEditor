@@ -1,23 +1,47 @@
-﻿using CommonControls.FileTypes.PackFiles.Models;
+﻿using CommonControls.FileTypes.Animation;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
+using System;
+using System.IO;
+using View3D.Animation;
 using View3D.Services;
 
 namespace View3D.SceneNodes
 {
     public class MainEditableNode : Rmv2ModelNode
     {
-        public SkeletonNode Skeleton { get; private set; }
+        private readonly PackFileService _pfs;
+
+        public SkeletonNode SkeletonNode { get; private set; }
         public PackFile MainPackFile { get; private set; }
         public RmvVersionEnum SelectedOutputFormat { get; set; }
         public TextureFileEditorService TextureFileEditorService { get; set; }
+        AnimationPlayer _player;
 
-        public MainEditableNode(string name, SkeletonNode skeletonNode, PackFile mainFile, PackFileService pfs) : base(name)
+        public MainEditableNode(AnimationPlayer player, string name, SkeletonNode skeletonNode, PackFile mainFile, PackFileService pfs) : base(name)
         {
-            Skeleton = skeletonNode;
+            _pfs = pfs;
+            _player = player;
+            SkeletonNode = skeletonNode;
             MainPackFile = mainFile;
             TextureFileEditorService = new TextureFileEditorService(this, pfs);
         }
 
+        public void SetSkeletonFromName(string skeletonName)
+        {
+            string cleanSkeletonName = "";
+            if (!string.IsNullOrWhiteSpace(skeletonName))
+                cleanSkeletonName = Path.GetFileNameWithoutExtension(skeletonName);
+            
+            string animationFolder = "animations\\skeletons\\";
+            var skeletonFilePath = animationFolder + cleanSkeletonName + ".anim";
+            var skeletonPfs = _pfs.FindFile(skeletonFilePath);
+            if (skeletonPfs != null)
+            {
+                var animClip = AnimationFile.Create(skeletonPfs);
+                SkeletonNode.Skeleton = new GameSkeleton(animClip, _player);
+            }
+        }
     }
 }

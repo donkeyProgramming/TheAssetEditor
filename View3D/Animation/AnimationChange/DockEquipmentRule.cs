@@ -6,7 +6,7 @@ using View3D.SceneNodes;
 
 namespace View3D.Animation.AnimationChange
 {
-    public class DockEquipmentRule : AnimationChangeRule
+    public class DockEquipmentRule : IWorldSpaceAnimationRule
     {
         ILogger _logger = Logging.Create<CopyRootTransform>();
         bool _hasError = false;
@@ -40,7 +40,7 @@ namespace View3D.Animation.AnimationChange
             }
         }
 
-        public override void ApplyWorldTransform(AnimationFrame frame, float time)
+        public void TransformFrameWorldSpace(AnimationFrame frame, float time)
         {
             if (_hasError)
                 return;

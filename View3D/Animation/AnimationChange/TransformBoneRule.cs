@@ -6,7 +6,7 @@ using System;
 
 namespace View3D.Animation.AnimationChange
 {
-    public class TransformBoneRule : AnimationChangeRule
+    public class TransformBoneRule : ILocalSpaceAnimationRule
     {
         ILogger _logger = Logging.Create<CopyRootTransform>();
         bool _hasError = false;
@@ -17,7 +17,9 @@ namespace View3D.Animation.AnimationChange
             _metadata = metadata;
         }
 
-        public override void TransformBone(AnimationFrame frame, int boneId, float v)
+        public void TransformFrameWorldSpace(AnimationFrame frame, float time) { }
+
+        public void TransformFrameLocalSpace(AnimationFrame frame, int boneId, float time)
         {
             if (boneId != _metadata.TargetNode || _hasError)
                 return;

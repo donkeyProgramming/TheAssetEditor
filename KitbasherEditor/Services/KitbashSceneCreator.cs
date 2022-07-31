@@ -19,8 +19,8 @@ namespace KitbasherEditor.Services
     {
         ILogger _logger = Logging.Create<KitbashSceneCreator>();
 
-        public MainEditableNode EditableMeshNode { get; private set; }
-        public ISceneNode ReferenceMeshRoot { get; private set; }
+        public MainEditableNode MainNode { get; private set; }
+        public ISceneNode ReferenceMeshNode { get; private set; }
 
         PackFileService _packFileService;
         ResourceLibary _resourceLibary;
@@ -29,66 +29,40 @@ namespace KitbasherEditor.Services
         IGeometryGraphicsContextFactory _geometryFactory;
         IComponentManager _componentManager;
         ApplicationSettingsService _applicationSettingsService;
+
         public KitbashSceneCreator(IComponentManager componentManager, PackFileService packFileService, AnimationControllerViewModel animationView, PackFile mainFile, IGeometryGraphicsContextFactory geometryFactory, ApplicationSettingsService applicationSettingsService)
         {
             _componentManager = componentManager;
             _packFileService = packFileService;
-            _resourceLibary = componentManager.GetComponent<ResourceLibary>();
             _animationView = animationView;
-            _sceneManager = componentManager.GetComponent<SceneManager>();
             _geometryFactory = geometryFactory;
             _applicationSettingsService = applicationSettingsService;
 
-            var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(componentManager, animationView) { IsLockable = false });
-            EditableMeshNode = _sceneManager.RootNode.AddObject(new MainEditableNode("Editable Model", skeletonNode, mainFile, packFileService));
-            ReferenceMeshRoot = _sceneManager.RootNode.AddObject(new GroupNode("Reference meshs") { IsEditable = false, IsLockable = false });
+            _resourceLibary = componentManager.GetComponent<ResourceLibary>();
+            _sceneManager = componentManager.GetComponent<SceneManager>();
+
+            var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(componentManager, null) { IsLockable = false });
+            MainNode = _sceneManager.RootNode.AddObject(new MainEditableNode(_animationView.GetPlayer(), "Editable Model", skeletonNode, mainFile, packFileService));
+            ReferenceMeshNode = _sceneManager.RootNode.AddObject(new GroupNode("Reference meshs") { IsEditable = false, IsLockable = false });
         }
 
         public void LoadMainEditableModel(PackFile file)
         {
+            var modelFullPath = _packFileService.GetFullPath(file);
             var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
 
-            var modelFullPath = _packFileService.GetFullPath(file);
-            EditableMeshNode.CreateModelNodesFromFile(rmv, _resourceLibary, _animationView.Player, _geometryFactory, modelFullPath, _componentManager, _packFileService, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
-            EditableMeshNode.SelectedOutputFormat = rmv.Header.Version;
+            MainNode.CreateModelNodesFromFile(rmv, _resourceLibary, _animationView.GetPlayer(), _geometryFactory, modelFullPath, _componentManager, _packFileService, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
+            MainNode.SelectedOutputFormat = rmv.Header.Version;
 
-            int meshCount = Math.Min(EditableMeshNode.Children.Count, rmv.LodHeaders.Length);
+            int meshCount = Math.Min(MainNode.Children.Count, rmv.LodHeaders.Length);
             for(int i = 0; i < meshCount; i++)
             {
-                if (EditableMeshNode.Children[i] is Rmv2LodNode lodNode)
+                if (MainNode.Children[i] is Rmv2LodNode lodNode)
                     lodNode.CameraDistance = rmv.LodHeaders[i].LodCameraDistance;
             }
 
-            _animationView.SetActiveSkeleton(rmv.Header.SkeletonName);
-            /*
-            //var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
-            var modelFullPath = _packFileService.GetFullPath(file);
-
-            if (modelFullPath.EndsWith(".rigid_model_v2", StringComparison.InvariantCultureIgnoreCase))
-            {
-                SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, _geometryFactory, _componentManager, _applicationSettingsService);
-                var loadedNodes = loader.Load(file, null, _animationView.Player);
-                foreach (var child in loadedNodes.Children)
-                {
-                    EditableMeshNode.AddObject(child);
-                }
-
-            }
-            else if (modelFullPath.EndsWith(".wsmodel", StringComparison.InvariantCultureIgnoreCase))
-            {
-                Load
-            }
-            else if (modelFullPath.EndsWith(".variantmeshdefinition", StringComparison.InvariantCultureIgnoreCase))
-            {
-                LoadReference(file);
-                // _animationView.SetActiveSkeleton(rmv.Header.SkeletonName)
-            }
-            else
-            {
-                throw new Exception($"Unkown file extention, unable to load model {modelFullPath}");
-            }
-            
-             */
+            MainNode.SetSkeletonFromName(rmv.Header.SkeletonName);
+            _animationView.SetActiveSkeletonFromName(rmv.Header.SkeletonName);
         }
 
         public void LoadReference(string path)
@@ -118,20 +92,20 @@ namespace KitbasherEditor.Services
             });
 
             foreach (var node in lodNodes)
-                SceneNodeHelper.MakeNodeEditable(EditableMeshNode, node);
+                SceneNodeHelper.MakeNodeEditable(MainNode, node);
         }
 
         public void LoadReference(PackFile file)
         {
             _logger.Here().Information($"Loading reference model - {_packFileService.GetFullPath(file)}");
             var result = LoadModel(file);
-            ReferenceMeshRoot.AddObject(result);
+            ReferenceMeshNode.AddObject(result);
         }
 
         SceneNode LoadModel(PackFile file)
         {
             SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, _geometryFactory, _componentManager, _applicationSettingsService);
-            var loadedNode = loader.Load(file, null, _animationView.Player);
+            var loadedNode = loader.Load(file, null, _animationView.GetPlayer());
 
             if (loadedNode == null)
             {
@@ -149,10 +123,10 @@ namespace KitbasherEditor.Services
 
                 if (node is Rmv2MeshNode mesh && string.IsNullOrWhiteSpace(mesh.AttachmentPointName) == false)
                 {
-                    if (EditableMeshNode.Skeleton.AnimationProvider?.Skeleton != null)
+                    if (MainNode.SkeletonNode.Skeleton != null)
                     {
-                        int boneIndex = EditableMeshNode.Skeleton.AnimationProvider.Skeleton.GetBoneIndexByName(mesh.AttachmentPointName);
-                        mesh.AttachmentBoneResolver = new SkeletonBoneAnimationResolver(EditableMeshNode.Skeleton.AnimationProvider, boneIndex);
+                        int boneIndex = MainNode.SkeletonNode.Skeleton.GetBoneIndexByName(mesh.AttachmentPointName);
+                        mesh.AttachmentBoneResolver = new SkeletonBoneAnimationResolver(MainNode.SkeletonNode, boneIndex);
                     }
                 }
             });
