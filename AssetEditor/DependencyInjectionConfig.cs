@@ -9,6 +9,7 @@ using CommonControls.Editors.AnimMeta;
 using CommonControls.Editors.CampaignAnimBin;
 using CommonControls.Editors.TextEditor;
 using CommonControls.Editors.VariantMeshDefinition;
+using CommonControls.Editors.Wtui;
 using CommonControls.FileTypes.DB;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Resources;
@@ -65,6 +66,7 @@ namespace AssetEditor
             VariantMeshDefinition_DependencyInjectionContainer.Register(services);
             AnimationFilePreviewEditor_DependencyInjectionContainer.Register(services);
             TextureEditor_DependencyInjectionContainer.Register(services);
+            TwUi_DependencyInjectionContainer.Register(services);
 
             //AnimMetaDecoder_DependencyInjectionContainer.Register(services);
         }
@@ -81,6 +83,8 @@ namespace AssetEditor
             VariantMeshDefinition_DependencyInjectionContainer.RegisterTools(factory);
             AnimationFilePreviewEditor_DependencyInjectionContainer.RegisterTools(factory);
             TextureEditor_DependencyInjectionContainer.RegisterTools(factory);
+            TwUi_DependencyInjectionContainer.RegisterTools(factory);
+
             // AnimMetaDecoder_DependencyInjectionContainer.RegisterTools(factory);
         }
 
@@ -91,5 +95,4 @@ namespace AssetEditor
             mainWindow.Show();
         }
     }
-
 }
