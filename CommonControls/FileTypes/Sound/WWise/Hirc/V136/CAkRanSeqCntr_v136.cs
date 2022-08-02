@@ -27,6 +27,8 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 
         protected override void CreateSpesificData(ByteChunk chunk)
         {
+            NodeBaseParams = NodeBaseParams.Create(chunk);
+
             sLoopCount = chunk.ReadUShort();
             sLoopModMin = chunk.ReadUShort();
             sLoopModMax = chunk.ReadUShort();
