@@ -214,6 +214,7 @@ namespace CommonControls.FileTypes.Sound.WWise
         StatePropNum_Priority = 0x07,
         PriorityDistanceOffset = 0x08,
         CenterPCT = 0x0E,
+        UnknownThing = 0x4A,
     }
 
     public enum AkGroupType : byte
@@ -227,5 +228,27 @@ namespace CommonControls.FileTypes.Sound.WWise
         GameParameter = 0x00,
         Modulator = 0x01,
         MIDIParameter = 0x01,
+    }
+
+    public enum AkTransitionMode : byte
+    {
+        Disabled = 0x00,
+        CrossFadeAmp = 0x01,
+        CrossFadePower = 0x02,
+        Delay = 0x03,
+        SampleAccurate = 0x04,
+        TriggerRate = 0x05,
+    }
+
+    public enum AkRandomMode : byte
+    {
+        Normal = 0x00,
+        Shuffle = 0x01,
+    }
+
+    public enum AkContainerMode : byte
+    {
+        Random = 0x00,
+        Sequence = 0x01,
     }
 }
