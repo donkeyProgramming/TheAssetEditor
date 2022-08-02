@@ -219,8 +219,6 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
     {
         public byte uBitsPositioning { get; set; }
         public byte uBits3d { get; set; }
-        public uint uAttenuationID { get; set; }
-
         public byte ePathMode { get; set; }
         public float TransitionTime { get; set; }
 
@@ -394,7 +392,15 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 
         public static AdvSettingsParams Create(ByteChunk chunk)
         {
-            return new AdvSettingsParams() { byBitVector = chunk.ReadByte(), eVirtualQueueBehavior = chunk.ReadByte(), u16MaxNumInstance = chunk.ReadUShort(), eBelowThresholdBehavior = chunk.ReadByte(), byBitVector2 = chunk.ReadByte() };
+            var node = new AdvSettingsParams();
+
+            node.byBitVector = chunk.ReadByte();
+            node.eVirtualQueueBehavior = chunk.ReadByte();
+            node.u16MaxNumInstance = chunk.ReadUShort();
+            node.eBelowThresholdBehavior = chunk.ReadByte();
+            node.byBitVector2 = chunk.ReadByte();
+
+            return node;
         }
     }
 
