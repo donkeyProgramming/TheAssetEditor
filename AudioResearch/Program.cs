@@ -9,6 +9,7 @@ using System.Linq;
 
 namespace AudioResearch
 {
+    // RPFC - Real time parameter control 
     class Program
     {
         static string OnlyProcessThisFile = "";// "battle_individual_magic__warhammer3.bnk";

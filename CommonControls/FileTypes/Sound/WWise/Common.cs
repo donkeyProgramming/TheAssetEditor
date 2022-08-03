@@ -36,7 +36,7 @@ namespace CommonControls.FileTypes.Sound.WWise
                 Size = chunk.ReadUInt32();
                 Id = chunk.ReadUInt32();
 
-                if (Id == 1039375795)
+                if (Id == 12883889)
                 { }
 
                 CreateSpesificData(chunk);

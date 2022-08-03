@@ -63,6 +63,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc
         public static HircFactory CreateFactory_v136()
         {
             var instance = new HircFactory();
+            instance.RegisterHirc(HircType.ActorMixer, () => new V136.CAkActorMixer_v136());
             instance.RegisterHirc(HircType.Sound, () => new V136.CAkSound_v136());
             instance.RegisterHirc(HircType.Event, () => new V136.CAkEvent_v136());
             instance.RegisterHirc(HircType.Action, () => new V136.CAkAction_v136());

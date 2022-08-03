@@ -17,9 +17,9 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
         public float fTransitionTimeModMin { get; set; }
         public float fTransitionTimeModMax { get; set; }
         public ushort wAvoidRepeatCount { get; set; }
-        public AkTransitionMode eTransitionMode { get; set; }
-        public AkRandomMode eRandomMode { get; set; }
-        public AkContainerMode eMode { get; set; }
+        public byte eTransitionMode { get; set; }
+        public byte eRandomMode { get; set; }
+        public byte eMode { get; set; }
         public byte byBitVector { get; set; }
 
         public Children Children { get; set; }
@@ -37,9 +37,9 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 
             wAvoidRepeatCount = chunk.ReadUShort();
 
-            eTransitionMode = (AkTransitionMode)chunk.ReadByte();
-            eRandomMode = (AkRandomMode)chunk.ReadByte();
-            eMode = (AkContainerMode)chunk.ReadByte();
+            eTransitionMode = chunk.ReadByte();
+            eRandomMode = chunk.ReadByte();
+            eMode = chunk.ReadByte();
             byBitVector = chunk.ReadByte();
 
             Children = Children.Create(chunk);
