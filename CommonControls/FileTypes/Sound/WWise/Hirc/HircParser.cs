@@ -70,7 +70,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc
             instance.RegisterHirc(HircType.SwitchContainer, () => new V136.CAkSwitchCntr_v136());
             instance.RegisterHirc(HircType.SequenceContainer, () => new V136.CAkRanSeqCntr_v136());
             instance.RegisterHirc(HircType.LayerContainer, () => new V136.CAkLayerCntr_v136());
-            //instance.RegisterHirc(HircType.Dialogue_Event, () => new V136.CAkDialogueEvent_V136());
+            instance.RegisterHirc(HircType.Dialogue_Event, () => new V136.CAkDialogueEvent_v136());
             return instance;
         }
 
