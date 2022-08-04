@@ -169,8 +169,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _actionList[MenuActionType.OpenReRiggingTool] = new MenuAction(Tools.OpenReRiggingTool) { EnableRule = ActionEnabledRule.AtleastOneObjectSelected, ToolTip = "Open the re-rigging tool" };
             _actionList[MenuActionType.OpenPinTool] = new MenuAction(Tools.PinMeshToMesh) { EnableRule = ActionEnabledRule.Always, ToolTip = "Open the pin tool" };
             _actionList[MenuActionType.CopyLod0ToEveryLodSlot] = new MenuAction(Tools.CopyLod0ToEveryLods) { EnableRule = ActionEnabledRule.Always, ToolTip = "Copy LOD 0 to every LOD slot" };
-            _actionList[MenuActionType.UpdateWh2Model] = new MenuAction(Tools.UpdateWh2Model) { EnableRule = ActionEnabledRule.Always, ToolTip = "Convert Wh2 model to wh3 format" };
-            _actionList[MenuActionType.UpdateWh2Model_TheOtherWay] = new MenuAction(Tools.UpdateWh2Model_TheOtherWay) { EnableRule = ActionEnabledRule.Always, ToolTip = "Convert Wh2 model to wh3 format (new techique)" };
+            _actionList[MenuActionType.UpdateWh2Model] = new MenuAction(Tools.UpdateWh2Model_ConvertAdditiveBlending) { EnableRule = ActionEnabledRule.Always, ToolTip = "Convert Wh2 model to wh3 format" };
+            _actionList[MenuActionType.UpdateWh2Model_TheOtherWay] = new MenuAction(Tools.UpdateWh2Model_ConvertComparativeBlending) { EnableRule = ActionEnabledRule.Always, ToolTip = "Convert Wh2 model to wh3 format (new techique)" };
 
             _actionList[MenuActionType.GrowFaceSelection] = new MenuAction(Tools.ExpandFaceSelection) { EnableRule = ActionEnabledRule.FaceSelected, ToolTip = "Grow selection" };
             _actionList[MenuActionType.ConvertFaceToVertexSelection] = new MenuAction(Tools.ConvertFacesToVertex) { EnableRule = ActionEnabledRule.FaceSelected, ToolTip = "Convert selected faces to vertexes" };

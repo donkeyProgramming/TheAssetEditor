@@ -309,12 +309,12 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         //    ErrorListWindow.ShowDialog("Converter", errorList);
         //}
 
-        internal void UpdateWh2Model()
+        internal void UpdateWh2Model_ConvertAdditiveBlending()
         {
             UpdateWh2ModelAndConvert(Rmv2UpdaterService.ConversionTechniqueEnum.AdditiveBlending);
         }
 
-        internal void UpdateWh2Model_TheOtherWay()
+        internal void UpdateWh2Model_ConvertComparativeBlending()
         {
             UpdateWh2ModelAndConvert(Rmv2UpdaterService.ConversionTechniqueEnum.ComparativeBlending);
         }
