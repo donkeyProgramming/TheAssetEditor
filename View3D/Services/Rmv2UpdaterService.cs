@@ -18,8 +18,19 @@ using MS = Microsoft.Xna.Framework;
 
 namespace View3D.Services
 {
+    
+
     public class Rmv2UpdaterService
     {
+
+        public enum ConversionTechniqueEnum
+        {
+
+            AdditiveBlending,
+            ComparativeBlending,
+
+        }
+
         private readonly PackFileService _pfs;
         private readonly string _outputFolder = DirectoryHelper.Temp + "\\TextureUpdater\\";
         private readonly bool _autoGenerateMissingTextures = false;
@@ -34,14 +45,14 @@ namespace View3D.Services
             DirectoryHelper.EnsureCreated(_outputFolder);
         }
 
-        public void UpdateWh2Models(string modelPath, List<Rmv2MeshNode> models, out ErrorListViewModel.ErrorList outputList)
+        public void UpdateWh2Models(string modelPath, List<Rmv2MeshNode> models, ConversionTechniqueEnum conversionTechnique, out ErrorListViewModel.ErrorList outputList)
         {
             outputList = new ErrorListViewModel.ErrorList();
             foreach (var model in models)
-                ProcessModel(modelPath, model, outputList);
+                ProcessModel(modelPath, model, conversionTechnique, outputList);
         }
 
-        private void ProcessModel(string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
+        private void ProcessModel(string modelPath, Rmv2MeshNode model, ConversionTechniqueEnum conversionTechnique, ErrorListViewModel.ErrorList outputList)
         {
             if (_tryMatchingTexturesByName)
             {
@@ -76,11 +87,23 @@ namespace View3D.Services
                     }
                     else
                     {
-                        if (textures.ContainsKey(TextureType.BaseColour) == false)
-                            CreateBaseColourMap(textureDictionary, modelPath, model, outputList);
 
-                        if (textures.ContainsKey(TextureType.MaterialMap) == false)
-                            CreateMaterialMap(textureDictionary, modelPath, model, outputList);
+                        switch (conversionTechnique)
+                        {
+                            case ConversionTechniqueEnum.AdditiveBlending:
+                                ConvertAdditiveBlending(textureDictionary, modelPath, model, outputList);
+                                break;
+
+                            case ConversionTechniqueEnum.ComparativeBlending:
+                                ConvertUsingcomparativeBlending(textureDictionary, modelPath, model, outputList);
+                                break;
+                        }
+
+                        //if (textures.ContainsKey(TextureType.BaseColour) == false)
+                        
+
+                        //if (textures.ContainsKey(TextureType.MaterialMap) == false)
+                        //    CreateMaterialMap(textureDictionary, modelPath, model, outputList);
                     }
                 }
             }
@@ -227,7 +250,7 @@ namespace View3D.Services
         // this method was meant to create the base_colour, but it creates both the base_color and material map        // 
         // They are somewhat interpendent, but could possibly be split up, 
         // should I refactor and do it like you intended?
-        private bool CreateBaseColourMap(Dictionary<TextureType, Bitmap> textureDictionary, string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
+        private bool ConvertAdditiveBlending(Dictionary<TextureType, Bitmap> textureDictionary, string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
         {
             
             var inputDiffuseTex = textureDictionary[TextureType.Diffuse];
@@ -303,7 +326,7 @@ namespace View3D.Services
         // this method was meant to create the material_map, 
         //  but the material map and basecolor are somewhat interpendent, CAN be split up, MAYBE detrimental down the line
         // should I refactor and do it like you intneded?
-        private bool CreateMaterialMap(Dictionary<TextureType, Bitmap> textureDictionary, string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
+        private bool ConvertUsingcomparativeBlending(Dictionary<TextureType, Bitmap> textureDictionary, string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
         {
             
 

@@ -291,10 +291,38 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             }
         }
 
+        //internal void UpdateWh2Model()
+        //{
+        //    var res = MessageBox.Show("Are you sure you want to update the model? This cannot be undone!", "Attention", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+        //    if (res != MessageBoxResult.Yes) 
+        //        return;
+
+        //    var rootNode = _editableMeshResolver.GeEditableMeshRootNode();
+        //    var lods = rootNode.GetLodNodes();
+        //    var firtLod = lods.First();
+        //    var meshList = firtLod.GetAllModelsGrouped(false).SelectMany(x => x.Value).ToList();
+        //    var filename = _packFileService.GetFullPath(rootNode.MainPackFile);
+
+        //    var service = new Rmv2UpdaterService(_packFileService, true);
+        //    service.UpdateWh2Models(filename, meshList, Rmv2UpdaterService.ConversionTechniqueEnum.AdditiveBlending, out var errorList);
+
+        //    ErrorListWindow.ShowDialog("Converter", errorList);
+        //}
+
         internal void UpdateWh2Model()
         {
+            UpdateWh2ModelAndConvert(Rmv2UpdaterService.ConversionTechniqueEnum.AdditiveBlending);
+        }
+
+        internal void UpdateWh2Model_TheOtherWay()
+        {
+            UpdateWh2ModelAndConvert(Rmv2UpdaterService.ConversionTechniqueEnum.ComparativeBlending);
+        }
+
+        internal void UpdateWh2ModelAndConvert(Rmv2UpdaterService.ConversionTechniqueEnum conversionTechnique)
+        {
             var res = MessageBox.Show("Are you sure you want to update the model? This cannot be undone!", "Attention", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-            if (res != MessageBoxResult.Yes) 
+            if (res != MessageBoxResult.Yes)
                 return;
 
             var rootNode = _editableMeshResolver.GeEditableMeshRootNode();
@@ -304,10 +332,12 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             var filename = _packFileService.GetFullPath(rootNode.MainPackFile);
 
             var service = new Rmv2UpdaterService(_packFileService, true);
-            service.UpdateWh2Models(filename, meshList, out var errorList);
+            service.UpdateWh2Models(filename, meshList, Rmv2UpdaterService.ConversionTechniqueEnum.AdditiveBlending, out var errorList);
 
             ErrorListWindow.ShowDialog("Converter", errorList);
         }
+
+
 
         public void ShowVertexDebugInfo()
         {
