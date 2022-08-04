@@ -332,7 +332,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             var filename = _packFileService.GetFullPath(rootNode.MainPackFile);
 
             var service = new Rmv2UpdaterService(_packFileService, true);
-            service.UpdateWh2Models(filename, meshList, Rmv2UpdaterService.ConversionTechniqueEnum.AdditiveBlending, out var errorList);
+            service.UpdateWh2Models(filename, meshList, conversionTechnique, out var errorList);
 
             ErrorListWindow.ShowDialog("Converter", errorList);
         }

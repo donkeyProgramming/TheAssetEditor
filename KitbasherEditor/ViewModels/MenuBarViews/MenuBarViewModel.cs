@@ -71,8 +71,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         GrowFaceSelection,
         ConvertFaceToVertexSelection,
         CopyLod0ToEveryLodSlot,
-        UpdateWh2Model,
-        UpdateWh2Model_TheOtherWay
+        UpdateWh2Model_Technique1,
+        UpdateWh2Model_Technique2
     }
 
     public class MenuBarViewModel : IKeyboardHandler
@@ -169,8 +169,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _actionList[MenuActionType.OpenReRiggingTool] = new MenuAction(Tools.OpenReRiggingTool) { EnableRule = ActionEnabledRule.AtleastOneObjectSelected, ToolTip = "Open the re-rigging tool" };
             _actionList[MenuActionType.OpenPinTool] = new MenuAction(Tools.PinMeshToMesh) { EnableRule = ActionEnabledRule.Always, ToolTip = "Open the pin tool" };
             _actionList[MenuActionType.CopyLod0ToEveryLodSlot] = new MenuAction(Tools.CopyLod0ToEveryLods) { EnableRule = ActionEnabledRule.Always, ToolTip = "Copy LOD 0 to every LOD slot" };
-            _actionList[MenuActionType.UpdateWh2Model] = new MenuAction(Tools.UpdateWh2Model_ConvertAdditiveBlending) { EnableRule = ActionEnabledRule.Always, ToolTip = "Convert Wh2 model to wh3 format" };
-            _actionList[MenuActionType.UpdateWh2Model_TheOtherWay] = new MenuAction(Tools.UpdateWh2Model_ConvertComparativeBlending) { EnableRule = ActionEnabledRule.Always, ToolTip = "Convert Wh2 model to wh3 format (new techique)" };
+            _actionList[MenuActionType.UpdateWh2Model_Technique1] = new MenuAction(Tools.UpdateWh2Model_ConvertAdditiveBlending) { EnableRule = ActionEnabledRule.Always, ToolTip = "Convert Wh2 model to wh3 format" };
+            _actionList[MenuActionType.UpdateWh2Model_Technique2] = new MenuAction(Tools.UpdateWh2Model_ConvertComparativeBlending) { EnableRule = ActionEnabledRule.Always, ToolTip = "Convert Wh2 model to wh3 format (new techique)" };
 
             _actionList[MenuActionType.GrowFaceSelection] = new MenuAction(Tools.ExpandFaceSelection) { EnableRule = ActionEnabledRule.FaceSelected, ToolTip = "Grow selection" };
             _actionList[MenuActionType.ConvertFaceToVertexSelection] = new MenuAction(Tools.ConvertFacesToVertex) { EnableRule = ActionEnabledRule.FaceSelected, ToolTip = "Convert selected faces to vertexes" };
@@ -207,8 +207,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             MenuItems[2].Children.Add(new ToolbarItem() { IsSeparator = true });
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "Copy lod 0 to every lod slot", Action = _actionList[MenuActionType.CopyLod0ToEveryLodSlot] });
             MenuItems[2].Children.Add(new ToolbarItem() { IsSeparator = true });
-            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Update Wh2=>Wh3 (Textures Experimental)", Action = _actionList[MenuActionType.UpdateWh2Model] });
-            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Update Wh2=>Wh3 (Textures Experimental, NEW technique))", Action = _actionList[MenuActionType.UpdateWh2Model_TheOtherWay] });
+            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Update Wh2=>Wh3 (Textures Experimental, Additive Blending)", Action = _actionList[MenuActionType.UpdateWh2Model_Technique1] });
+            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Update Wh2=>Wh3 (Textures Experimental, Comparative Blending))", Action = _actionList[MenuActionType.UpdateWh2Model_Technique2] });
 
             MenuItems[3].Children.Add(new ToolbarItem() { Name = "Focus camera", Action = _actionList[MenuActionType.FocusSelection] });
             MenuItems[3].Children.Add(new ToolbarItem() { Name = "Reset camera", Action = _actionList[MenuActionType.ResetCamera] });

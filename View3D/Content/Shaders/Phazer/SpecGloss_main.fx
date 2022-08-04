@@ -462,6 +462,10 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
 
     bumpNormal = getBlueNormal(input);
 
+
+    // TODO remove testcode
+    //return float4(bumpNormal.rgb, 1);
+
 	
     if (UseNormal == false)
     {
