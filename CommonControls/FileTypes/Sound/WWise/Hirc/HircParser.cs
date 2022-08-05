@@ -76,7 +76,13 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc
             instance.RegisterHirc(HircType.SwitchContainer, () => new V136.CAkSwitchCntr_v136());
             instance.RegisterHirc(HircType.SequenceContainer, () => new V136.CAkRanSeqCntr_v136());
             instance.RegisterHirc(HircType.LayerContainer, () => new V136.CAkLayerCntr_v136());
-            //instance.RegisterHirc(HircType.Dialogue_Event, () => new V136.CAkDialogueEvent_V136());
+            instance.RegisterHirc(HircType.Dialogue_Event, () => new V136.CAkDialogueEvent_v136());
+            instance.RegisterHirc(HircType.Music_Track, () => new V136.CAkMusicTrack_v136());
+            instance.RegisterHirc(HircType.Music_Segment, () => new V136.CAkMusicSegment_v136());
+            instance.RegisterHirc(HircType.Music_Random_Sequence, () => new V136.CAkMusicRanSeqCntr_v136());
+            instance.RegisterHirc(HircType.Music_Switch, () => new V136.CAkMusicSwitchCntr_v136());
+            instance.RegisterHirc(HircType.FxCustom, () => new V136.CAkFxCustom_v136());
+            instance.RegisterHirc(HircType.FxShareSet, () => new V136.CAkFxShareSet_v136());
             return instance;
         }
 
