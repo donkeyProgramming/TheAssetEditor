@@ -17,7 +17,6 @@ namespace CommonControls.FileTypes.Sound.WWise
     {
         ILogger _logger = Logging.Create<HircItem>();
 
-        public string DisplayName { get; set; }
         public string OwnerFile { get; set; }
         public uint IndexInFile { get; set; }
         public bool HasError { get; set; } = true;

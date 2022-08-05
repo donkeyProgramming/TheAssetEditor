@@ -25,6 +25,7 @@ using AnimationEditor.SkeletonEditor;
 using AssetEditor.Report;
 using AnimationEditor.AnimationBuilder;
 using CommonControls.Editors.AnimationPack;
+using CommonControls.Editors.AudioEditor;
 
 namespace AssetEditor.ViewModels
 {
@@ -62,6 +63,7 @@ namespace AssetEditor.ViewModels
         public ICommand OpenAnimationBatchExporterCommand { get; set; }
         public ICommand OpenWh2AnimpackUpdaterCommand { get; set; }
         public ICommand OpenAnimationBuilderCommand { get; set; }
+        public ICommand OpenAudioEditorCommand { get; set; }
 
         public ICommand SearchCommand { get; set; }
         public ICommand OpenRome2RePacksCommand { get; set; }
@@ -124,6 +126,7 @@ namespace AssetEditor.ViewModels
             OpenTechSkeletonEditorCommand = new RelayCommand(OpenTechSkeletonEditor);
             OpenAnimationBatchExporterCommand = new RelayCommand(OpenAnimationBatchExporter);
             OpenWh2AnimpackUpdaterCommand = new RelayCommand(OpenWh2AnimpackUpdater);
+            OpenAudioEditorCommand = new RelayCommand(OpenAudioEditor);
             OpenAnimationBuilderCommand = new RelayCommand(OpenOpenAnimationBuilder);
 
             GenerateRmv2ReportCommand = new RelayCommand(GenerateRmv2Report);
@@ -278,7 +281,14 @@ namespace AssetEditor.ViewModels
         {
             var editorView = _toolFactory.CreateEditorViewModel<SuperViewViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
-        }     
+        }
+
+        private void OpenAudioEditor()
+        {
+            var editorView = _toolFactory.CreateEditorViewModel<AudioEditorViewModel>();
+            EditorCreator.CreateEmptyEditor(editorView);
+        }
+
 
         void OpenTechSkeletonEditor()
         {

@@ -19,6 +19,12 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc
         {
             if (_itemList.ContainsKey(type))
                 return _itemList[type]();
+
+            else if (type == HircType.Audio_Bus)
+            { }
+            else if (type == HircType.FxCustom)
+            { }
+
             return new CAkUnknown();
         }
 

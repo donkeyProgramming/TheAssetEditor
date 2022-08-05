@@ -271,7 +271,7 @@ Finish Convert wh2 animpack to wh3 format
 
  Fix datParser so it does not break wh2 
  Find unreferensed textures 
-
+make wh2 bin in same format at wh3 
 
 
 V0.41

@@ -12,10 +12,6 @@ namespace CommonControls.Editors.Sound
 
         public Dictionary<uint, List<HircItem>> HircList { get => _hircList; }
 
-        public ExtenededSoundDataBase()
-        {
-        }
-
         public void AddHircItems(List<HircItem> hircList)
         {
             foreach (var item in hircList)
@@ -33,6 +29,14 @@ namespace CommonControls.Editors.Sound
                 return _hircList[id];
 
             _errorNode.AddChild($"Item with id {id} not found");
+            return new List<HircItem>();
+        }
+
+        public List<HircItem> GetHircObject(uint id)
+        {
+            if (_hircList.ContainsKey(id))
+                return _hircList[id];
+
             return new List<HircItem>();
         }
     }
