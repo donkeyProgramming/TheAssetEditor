@@ -1,13 +1,19 @@
 ﻿using CommonControls.Editors.AudioEditor;
+using CommonControls.Editors.Sound;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.Sound;
 using CommonControls.FileTypes.Sound.WWise;
 using CommonControls.FileTypes.Sound.WWise.Hirc;
+using CommonControls.Services;
+using MoreLinq;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace AudioResearch
 {
@@ -17,106 +23,124 @@ namespace AudioResearch
     {
         static void Main(string[] args)
         {
+            // Create a progam
             Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+            GameInformationFactory.Create();
+            var pfs = GetPackFileService();
 
-            string[] allBnkFiles = GetAllBnkFiles();
-            var datDb = CreateDatDb();
-
+            // Load data
             WwiseDataLoader builder = new WwiseDataLoader();
-            var bnkList = builder.LoadBnkFiles(new BnkFileProvider(GetAllBnkFiles()));
+            var bnkList = builder.LoadBnkFiles(pfs);
+            var globalDb = builder.BuildMasterSoundDatabase(bnkList);
+            var nameHelper = builder.BuildNameHelper(pfs);
+            var s = nameHelper.GetName(803409642, out var found);
+
+            // Check data
+            var missingEvents = GetMissingEventNameCount(globalDb, nameHelper);
+            Debug.Assert(missingEvents == 0);
+
+            // Investigate when items share values 
+            var multiRef = globalDb.HircList.Where(x => x.Value.Count > 1).OrderByDescending(x=>x.Value.Count).ToList();
+            var countByType = multiRef.CountBy(x => x.Value.First().Type).ToList();
+
+            var multiRefNames = multiRef.Select(x =>
+            {
+                var name = nameHelper.GetName(x.Key, out var found) + $" {x.Value.First().Type}";
+                var areIdentical = AreEqual(x.Value);
+                var differentTypes = x.Value.Select(x => x.Type).Distinct().ToList();
+                return new { DisplayName = name, Found = found, AreIdentical = areIdentical, Values = x.Value, Types = differentTypes };
+            });
+
+            var multiRefNames_notIdentical = multiRefNames.Where(x => x.AreIdentical == false).ToList();
+            var multiRefNames_notIdentical_count = multiRefNames_notIdentical.CountBy(x => x.Values.First().Type).ToList();
+
+            var dialog = multiRefNames_notIdentical.Where(x => x.Values.First().Type == HircType.Dialogue_Event).ToList();
+
+            var multiRefNames_Identical = multiRefNames.Where(x => x.AreIdentical == true).ToList();
+            var multiRefNames_Identical_count = multiRefNames_Identical.CountBy(x => x.Values.First().Type).ToList();
+
+            var itemsWhereTypeIsDifferent = multiRefNames.Where(X => X.Types.Count() != 1).ToList();
+
+            var itemsWhereWeKnowTheName = multiRefNames_notIdentical.Where(x => x.Found == true);
+
+
+            var stuff = globalDb.HircList.Where(x => x.Value.Count > 1).OrderByDescending(x => x.Value.Count).ToList();
+
+            var allHircs = globalDb.HircList.SelectMany(x => x.Value).ToList();
+            var hircInFile = allHircs.Where(x => x.OwnerFile.Contains("battle_vo_orders_")).ToList();
+            var eventHircsInFile = hircInFile.Where(x => x.Type == HircType.Event).Select(x=>nameHelper.GetName(x.Id)).ToList();
+
+            //var fileNames = hircInFile
+            //    .Select(x => x.OwnerFile)
+            //    .Distinct()
+            //    .Select(x=>x.Replace("battle_vo_orders_", ""))
+            //    .Select(x => x.Replace("_core.bnk", ""))
+            //    .Select(x => x.Replace("__warhammer3.bnk", ""))
+            //    .Select(x => x.Replace("__warhammer2.bnk", ""))
+            //    .Select(x => x.Replace("warhammer3.bnk", ""))
+            //    .Select(x => x.Replace("warhammer2.bnk", ""))
+            //    .Select(x => x.Replace("_", ""))
+            //    .Where(x=>x.Length != 0)
+            //    .Select(x=>uint.Parse(x))
+            //    .Select(x=>nameHelper.GetName(x))
+            //    .ToList();
+            //
+            //
+            //var fileNamesD = fileNames.Distinct().ToList();
+
+            var areHircsEqual = multiRef.Select(x => AreEqual(x.Value)).ToList();
+
+            var notFoundMulti = multiRefNames.Where(x => x.Found == false).ToList();
+            var foundMulti = multiRefNames.Where(x => x.Found == true).ToList();
+
+            
+
+
+            // nameHelper.
+            //
             Console.ReadLine();
         }
 
-        static string[] FilterUnvantedFiles(string[] files, string[] removeFilters, out string[] removedFiles)
+        static bool AreEqual(List<HircItem> hircList)
         {
-            var tempRemoveFiles = new List<string>();
-            var fileList = files.ToList();
-
-            // Files that contains multiple items not decoded.
-
-            foreach (var file in fileList)
+            var first = hircList.First();
+            var bytes = first.Size;
+            foreach (var hirc in hircList.Skip(1))
             {
-                foreach (var removeName in removeFilters)
-                {
-                    if (file.Contains(removeName))
-                    {
-                        tempRemoveFiles.Add(file);
-                        break;
-                    }
-                }
+                if (bytes != hirc.Size)
+                    return false;
             }
 
-            foreach (var item in tempRemoveFiles)
-                fileList.Remove(item);
-
-            removedFiles = tempRemoveFiles.ToArray();
-            return fileList.ToArray();
+            return true;
         }
 
-        static string GetExportedWWiseFolder()
+        static int GetMissingEventNameCount(ExtenededSoundDataBase globalDb, WWiseNameLookUpHelper nameHelper)
         {
-            var possibleFolders = new[] { @"C:\Users\ole_k\Desktop\Wh3 sounds\audio\wwise", @"c:\KlissiansFolders.." };
-            foreach (var folder in possibleFolders)
+            var hircEvents = globalDb.HircList
+                .Select(x => x.Value.First())
+                .Where(x => x.Type == HircType.Event)
+                .ToList();
+
+            var hircNames = hircEvents.Select(x =>
             {
-                if (Directory.Exists(folder))
-                    return folder;
-            }
+                var name = nameHelper.GetName(x.Id, out var found);
+                return new { DisplayName = name, Found = found };
+            });
 
-            throw new Exception("Exported folder not found. Please add to the array above...");
+            var notFoundEvents = hircNames.Where(x => x.Found == false).ToList();
+            return notFoundEvents.Count;
         }
 
-        private static string[] GetAllBnkFiles()
+        static PackFileService GetPackFileService()
         {
-            var allBnkFiles = Directory.GetFiles(GetExportedWWiseFolder(), "*.bnk", SearchOption.AllDirectories);
-            if (allBnkFiles.Length != 611)
-                throw new Exception("The export folder should contain 611 bnk files. (Core files + English Folder)");
-            return allBnkFiles;
+            var appSettings = new ApplicationSettingsService();
+            appSettings.CurrentSettings.SkipLoadingWemFiles = true;
+            var gamePath = appSettings.CurrentSettings.GameDirectories.First(x => x.Game == GameTypeEnum.Warhammer3);
+            PackFileService pfs = new PackFileService(new PackFileDataBase(), new SkeletonAnimationLookUpHelper(), appSettings);
+            pfs.LoadAllCaFiles(gamePath.Path, GameInformationFactory.GetGameById(GameTypeEnum.Warhammer3).DisplayName);
+
+            return pfs;
         }
-
-        private static string[] GetAllDatFiles()
-        {
-            var allDatFiles = Directory.GetFiles(GetExportedWWiseFolder(), "*.dat", SearchOption.AllDirectories);
-            if (allDatFiles.Length != 15)
-                throw new Exception("The export folder should contain 15 dat files.");
-            return allDatFiles;
-        }
-
-        private static SoundDatFile CreateDatDb()
-        {
-            var datFiles = GetAllDatFiles();
-            datFiles = FilterUnvantedFiles(datFiles, new[] { "bank_splits.dat", "campaign_music.dat", "battle_music.dat" }, out var removedFiles);     
-
-            var failedDatParsing = new List<(string, string)>();        
-            var masterDat = new SoundDatFile();
-            foreach (var datFile in datFiles)
-            {
-                try
-                {
-                    var pf = new PackFile(datFile, new FileSystemSource(datFile));
-                    var parsedFile = DatParser.Parse(pf, false);
-                    masterDat.Merge(parsedFile);
-                }
-                catch (Exception e)
-                {
-                    failedDatParsing.Add((datFile, e.Message));
-                }
-            }
-            return masterDat;
-        }
-
-        class BnkFileProvider : IBnkProvider
-        {
-            private readonly string[] _diskPaths;
-
-            public BnkFileProvider(string[] diskPaths)
-            {
-                _diskPaths = diskPaths;
-            }
-
-            public List<PackFile> GetBnkFiles() => _diskPaths.Select(x => new PackFile(x, new FileSystemSource(x))).ToList();
-            public string GetFullName(PackFile pf) => pf.Name;
-        }
-
     }
 
 

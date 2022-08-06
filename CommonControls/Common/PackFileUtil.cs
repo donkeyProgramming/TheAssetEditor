@@ -1,4 +1,5 @@
 ﻿using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ namespace CommonControls.Common
 {
     public static class PackFileUtil
     {
-        public static List<PackFile> FilterUnvantedFiles(List<PackFile> files, string[] removeFilters, out PackFile[] removedFiles)
+        public static List<PackFile> FilterUnvantedFiles(PackFileService pfs, List<PackFile> files, string[] removeFilters, out PackFile[] removedFiles)
         {
             var tempRemoveFiles = new List<PackFile>();
             var fileList = files.ToList();
@@ -16,9 +17,10 @@ namespace CommonControls.Common
             // Files that contains multiple items not decoded.
             foreach (var file in fileList)
             {
+                var fullName = pfs.GetFullPath(file);
                 foreach (var removeName in removeFilters)
                 {
-                    if (file.Name.Contains(removeName))
+                    if (fullName.Contains(removeName))
                     {
                         tempRemoveFiles.Add(file);
                         break;

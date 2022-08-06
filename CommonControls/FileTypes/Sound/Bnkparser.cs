@@ -14,7 +14,7 @@ namespace CommonControls.FileTypes.Sound
 
     public class Bnkparser
     {
-        public static SoundDataBase Parse(PackFile file)
+        public static SoundDataBase Parse(PackFile file, string fullName)
         {
             var chunk = file.DataSource.ReadDataAsChunk();
 
@@ -29,7 +29,7 @@ namespace CommonControls.FileTypes.Sound
                 var cc4 = Encoding.UTF8.GetString(chunk.ReadBytes(4));
                 if (cc4 == "\0\0\0\0")
                     cc4 = Encoding.UTF8.GetString(chunk.ReadBytes(4));
-                parsers[cc4].Parse(file.Name, chunk, soundDb);
+                parsers[cc4].Parse(fullName, chunk, soundDb);
             }
 
             return soundDb;

@@ -27,7 +27,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
         }
 
         public ActionType GetActionType() => ActionType;
-        public uint GetSoundId() => idExt;
+        public uint GetChildId() => idExt;
     }
 
     public class AkPlayActionParams

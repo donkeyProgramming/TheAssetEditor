@@ -16,6 +16,6 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
         }
 
         public ActionType GetActionType() => ActionType;
-        public uint GetSoundId() => SoundId;
+        public uint GetChildId() => SoundId;
     }
 }

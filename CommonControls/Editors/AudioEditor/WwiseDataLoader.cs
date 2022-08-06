@@ -8,31 +8,14 @@ using CommonControls.Services;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
+
+
 namespace CommonControls.Editors.AudioEditor
 {
-    public interface IBnkProvider
-    {
-        List<PackFile> GetBnkFiles();
-        string GetFullName(PackFile pf);
-    }
-
-    public class PackFileBnkProvider : IBnkProvider
-    {
-        private readonly PackFileService _pfs;
-
-        public PackFileBnkProvider(PackFileService pfs)
-        {
-            _pfs = pfs;
-        }
-
-        public List<PackFile> GetBnkFiles() => _pfs.FindAllWithExtention(".bnk");
-        public string GetFullName(PackFile pf) => _pfs.GetFullPath(pf);
-    }
-
-
     public class WwiseDataLoader
     {
         ILogger _logger = Logging.Create<WwiseDataLoader>();
@@ -45,15 +28,11 @@ namespace CommonControls.Editors.AudioEditor
             return masterDb;
         }
 
-        public List<string> LoadPotentialWWiseSounds()
-        {
-            return new List<string>();
-        }
 
         public SoundDatFile LoadWhDatDbForWh3(PackFileService pfs, out List<string> failedFiles)
         {
             var datFiles = pfs.FindAllWithExtention(".dat");
-            datFiles = PackFileUtil.FilterUnvantedFiles(datFiles, new[] { "bank_splits.dat", "campaign_music.dat", "battle_music.dat" }, out var removedFiles);
+            datFiles = PackFileUtil.FilterUnvantedFiles(pfs, datFiles, new[] { "bank_splits.dat", "campaign_music.dat", "battle_music.dat" }, out var removedFiles);
 
             var failedDatParsing = new List<(string, string)>();
             var masterDat = new SoundDatFile();
@@ -74,12 +53,62 @@ namespace CommonControls.Editors.AudioEditor
             return masterDat;
         }
 
-
-        public List<SoundDataBase> LoadBnkFiles(IBnkProvider fileProvider)
+        public WWiseNameLookUpHelper BuildNameHelper(PackFileService pfs)
         {
-            var bankFiles = fileProvider.GetBnkFiles();
-            var wantedBnkFiles = PackFileUtil.FilterUnvantedFiles(bankFiles, new[] { "media", "init.bnk", "animation_blood_data.bnk" }, out var removedFiles);
+            WWiseNameLookUpHelper helper = new WWiseNameLookUpHelper();
+            var wh3Db = LoadWhDatDbForWh3(pfs, out var _);
+            var wh3DbNameList = wh3Db.CreateFileNameList();
+            helper.AddNames(wh3DbNameList);
 
+            // Add all the bnk file names 
+            var bnkFiles = pfs.FindAllWithExtention(".bnk");
+            var bnkNames = bnkFiles.Select(x => x.Name.Replace(".bnk", "")).ToArray();
+            helper.AddNames(bnkNames);
+
+            // Load all string from the game exe
+            //if (File.Exists(@"C:\Users\ole_k\Desktop\Strings\game_wh3_1_2.txt"))
+            //{
+            //    var exeContent = File.ReadAllLines(@"C:\Users\ole_k\Desktop\Strings\game_wh3_1_2.txt");
+            //    exeContent = exeContent.Select(x => x.ToLower()).ToArray();
+            //    var exeContentDistinct = exeContent.Distinct().ToArray();
+            //    helper.AddNames(exeContent);
+            //}
+            //
+            //// Load all from wwiser
+            //if (File.Exists(@"C:\Users\ole_k\Desktop\Wh3 sounds\wwiser.txt"))
+            //{
+            //    var filecontent = File.ReadAllLines(@"C:\Users\ole_k\Desktop\Wh3 sounds\wwiser.txt");
+            //    helper.AddNames(filecontent);
+            //}
+            //
+            //// Load all from game db tables
+            //if (Directory.Exists(@"C:\Users\ole_k\Desktop\Wh3 sounds\DbTables"))
+            //{
+            //    var files = Directory.GetFiles(@"C:\Users\ole_k\Desktop\Wh3 sounds\DbTables");
+            //    foreach (var file in files)
+            //    {
+            //        var fileLines = File.ReadAllLines(file);
+            //        foreach (var fileLine in fileLines)
+            //        {
+            //            var content = fileLine.Split("\t");
+            //            helper.AddNames(content);
+            //        }
+            //    }
+            //}
+
+            return helper;
+        }
+
+
+
+        public List<SoundDataBase> LoadBnkFiles(PackFileService pfs, bool onlyEnglish = true)
+        {
+            var bankFiles = pfs.FindAllWithExtention(".bnk");
+            var removeFilter = new List<string>() { "media", "init.bnk", "animation_blood_data.bnk" };
+            if(onlyEnglish)
+                removeFilter.AddRange(new List<string>() { "chinese", "french(france)", "german", "italian", "polish", "russian", "spanish(spain)" });
+            
+            var wantedBnkFiles = PackFileUtil.FilterUnvantedFiles(pfs, bankFiles, removeFilter.ToArray(), out var removedFiles);;
             _logger.Here().Information($"Parsing game sounds. {bankFiles.Count} bnk files found. {wantedBnkFiles.Count} after filtering");
 
             var globalSoundDatabase = new Dictionary<string, SoundDataBase>();
@@ -89,12 +118,12 @@ namespace CommonControls.Editors.AudioEditor
             var counter = 1;
             foreach (var bnkFile in wantedBnkFiles)
             {
-                var name = fileProvider.GetFullName(bnkFile);
+                var name = pfs.GetFullPath(bnkFile);
                 _logger.Here().Information($"{counter++}/{wantedBnkFiles.Count()} - {name}");
 
                 try
                 {
-                    var soundDb = Bnkparser.Parse(bnkFile);
+                    var soundDb = Bnkparser.Parse(bnkFile, name);
                     PrintHircList(soundDb.Hircs, name);
 
                     if (soundDb.Hircs.Count(y => (y is CAkUnknown) == true || y.HasError) != 0)

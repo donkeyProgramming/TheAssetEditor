@@ -179,32 +179,32 @@ namespace CommonControls.Editors.Sound
             var fileRoot = parent.AddChild("File information:");
             var masterDb = new ExtenededSoundDataBase();
             
-            var currentFile = 0;
-            foreach (var file in files)
-            {
-                try
-                {
-                    var localDb = Bnkparser.Parse(file);
-                    var eventCount = localDb.Hircs.Count(x => x.Type == HircType.Event);
-                    var dialogEventCount = localDb.Hircs.Count(x => x.Type == HircType.Dialogue_Event);
-
-                    var fileOutputStr = $"{file.Name} Events:{eventCount} DialogEvents: {dialogEventCount}";  // Some kind of failed items/unsupporeted item log as well
-                    fileRoot.AddChild(fileOutputStr);
-
-                    masterDb.AddHircItems(localDb.Hircs);
-
-                    _logger.Here().Information($"{currentFile}/{files.Count} {fileOutputStr}");
-                }
-                catch (Exception e)
-                {
-                    _logger.Here().Information($"{currentFile}/{files.Count} {file.Name} Error:{e.Message}");
-                    fileRoot.AddChild($"{file.Name} Error:{e.Message}");
-                }
-
-                currentFile++;
-            }
-
-            _logger.Here().Information($"Generating Master DB Done [{timer.Elapsed.TotalSeconds}s]");
+            //var currentFile = 0;
+            //foreach (var file in files)
+            //{
+            //    try
+            //    {
+            //        var localDb = Bnkparser.Parse(file);
+            //        var eventCount = localDb.Hircs.Count(x => x.Type == HircType.Event);
+            //        var dialogEventCount = localDb.Hircs.Count(x => x.Type == HircType.Dialogue_Event);
+            //
+            //        var fileOutputStr = $"{file.Name} Events:{eventCount} DialogEvents: {dialogEventCount}";  // Some kind of failed items/unsupporeted item log as well
+            //        fileRoot.AddChild(fileOutputStr);
+            //
+            //        masterDb.AddHircItems(localDb.Hircs);
+            //
+            //        _logger.Here().Information($"{currentFile}/{files.Count} {fileOutputStr}");
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        _logger.Here().Information($"{currentFile}/{files.Count} {file.Name} Error:{e.Message}");
+            //        fileRoot.AddChild($"{file.Name} Error:{e.Message}");
+            //    }
+            //
+            //    currentFile++;
+            //}
+            //
+            //_logger.Here().Information($"Generating Master DB Done [{timer.Elapsed.TotalSeconds}s]");
 
             return masterDb;
         }

@@ -8,7 +8,7 @@ namespace CommonControls.Editors.AudioEditor
     {
         Dictionary<uint, string> _hashValueMap = new Dictionary<uint, string>();
 
-        public void AddSounds(string[] names)
+        public void AddNames(string[] names)
         {
             foreach (var name in names)
             {
@@ -17,7 +17,7 @@ namespace CommonControls.Editors.AudioEditor
             }
         }
 
-        public void AddSounds(List<string> names)
+        public void AddNames(List<string> names)
         {
             foreach (var name in names)
             {
@@ -50,5 +50,7 @@ namespace CommonControls.Editors.AudioEditor
                 return _hashValueMap[value];
             return value.ToString();
         }
+
+        public string GetName(uint value) => GetName(value, out var _);
     }
 }

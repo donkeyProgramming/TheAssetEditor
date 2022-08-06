@@ -2,6 +2,7 @@
 using CommonControls.Editors.Sound;
 using CommonControls.FileTypes.Sound.WWise;
 using CommonControls.FileTypes.Sound.WWise.Hirc;
+using CommonControls.FileTypes.Sound.WWise.Hirc.V136;
 using MoreLinq;
 using Serilog;
 using System;
@@ -26,8 +27,9 @@ namespace CommonControls.Editors.AudioEditor
 
         public WWiseTreeParser(ExtenededSoundDataBase globalSoundDb, WWiseNameLookUpHelper nameLookUpHelper)
         {
+            _hircProcessMap.Add(HircType.Event, ProcessEvent);
             _hircProcessMap.Add(HircType.Action, ProcessAction);
-            _hircProcessMap.Add(HircType.Action, ProcessSwitchControl);
+            _hircProcessMap.Add(HircType.SwitchContainer, ProcessSwitchControl);
             _globalSoundDb = globalSoundDb;
             _nameLookUpHelper = nameLookUpHelper;
         }
@@ -36,7 +38,10 @@ namespace CommonControls.Editors.AudioEditor
         {
             HircTreeItem root = new HircTreeItem();
             ProcessHircObject(item, root);
-            return root;
+            var actualRoot = root.Children.FirstOrDefault();
+            actualRoot.Parent = null;
+            root.Children = null;
+            return actualRoot;
         }
 
         void ProcessHircObject(HircItem item, HircTreeItem parent)
@@ -44,8 +49,20 @@ namespace CommonControls.Editors.AudioEditor
             if (_hircProcessMap.TryGetValue(item.Type, out var func))
                 func(item, parent);
 
-            // Handle unkown
+            var unkownNode = new HircTreeItem() { DisplayName = $"Unkown node type {item.Type} for Id {item.Id} in {item.OwnerFile}", Item = item };
+            parent.Children.Add(unkownNode);
         }
+
+        void ProcessEvent(HircItem item, HircTreeItem parent)
+        {
+            var actionHirc = GetAsType<ICAkEvent>(item);
+            var actionTreeNode = new HircTreeItem() { DisplayName = $"Event {_nameLookUpHelper.GetName(item.Id)}", Item = item };
+            parent.Children.Add(actionTreeNode);
+
+            var actions = actionHirc.GetActionIds();
+            ProcessChildrenOfNode(actions, actionTreeNode);
+        }
+
 
         void ProcessAction(HircItem item, HircTreeItem parent)
         {
@@ -53,14 +70,26 @@ namespace CommonControls.Editors.AudioEditor
             var actionTreeNode = new HircTreeItem() { DisplayName = $"Action {actionHirc.GetActionType()}", Item = item };
             parent.Children.Add(actionTreeNode);
 
-            var soundId = actionHirc.GetSoundId();
+            var soundId = actionHirc.GetChildId();
             ProcessChildOfNode(soundId, actionTreeNode);
+        }
 
-            //
-            //
-            //ar node = currentNode.AddChild($"CAkAction ActionType:[{item.GetActionType()}] \tId:[{item.Id}] ownerFile:[{item.OwnerFile}|{item.IndexInFile}]");
-            ///var actionRefs = _db.GetHircObject(item.GetSoundId(), _ownerFileName, _errorNode);
-            //rocessChildrenOfNode(actionRefs, node);
+        void ProcessSwitchControl(HircItem item, HircTreeItem parent)
+        {
+            var switchControl = GetAsType<CAkSwitchCntr_v136>(item);
+            var switchType = _nameLookUpHelper.GetName(switchControl.ulGroupID);
+            var defaultValue = _nameLookUpHelper.GetName(switchControl.ulDefaultSwitch);
+            var switchControlNode = new HircTreeItem() { DisplayName = $"Switch {switchType} DefaultValue:{defaultValue}", Item = item };
+            parent.Children.Add(switchControlNode);
+
+            foreach (var switchCase in switchControl.SwitchList)
+            {
+                var switchValue = _nameLookUpHelper.GetName(switchCase.SwitchId);
+                var switchValueNode = new HircTreeItem() { DisplayName = $"SwitchValue: {switchValue}", Item = item };
+                switchControlNode.Children.Add(switchValueNode);
+
+                ProcessChildrenOfNode(switchCase.NodeIdList, switchValueNode);
+            }
         }
 
         void ProcessChildOfNode(uint hircId, HircTreeItem parent)
@@ -73,8 +102,13 @@ namespace CommonControls.Editors.AudioEditor
                 ProcessHircObject(hircItem, parent);
         }
 
-        void ProcessSwitchControl(HircItem item, HircTreeItem parent)
-        { }
+        void ProcessChildrenOfNode(List<uint> ids, HircTreeItem parent)
+        {
+            foreach (var id in ids)
+                ProcessChildOfNode(id, parent);
+        }
+
+ 
 
         //void ProcessSwitchControl(CAkSwitchCntr item, VisualEventOutputNode currentNode)
         //{

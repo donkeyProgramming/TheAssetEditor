@@ -46,27 +46,48 @@
         </Menu>
 
 
-        <TreeView Grid.Row="1" Grid.Column="0" ItemsSource="{Binding TreeList, UpdateSourceTrigger=PropertyChanged}">
-            <TreeView.ItemContainerStyle>
-                <Style TargetType="{x:Type TreeViewItem}">
-                    <Setter Property="IsExpanded" Value="True" />
-                </Style>
-            </TreeView.ItemContainerStyle>
+        <DockPanel Grid.Row="1" Grid.Column="0">
+            <DockPanel DockPanel.Dock="Top">
+                <ComboBox DockPanel.Dock="Top"
+                          IsEditable="True"
+                          IsTextSearchEnabled="true"
+                          DisplayMemberPath="DisplayName"
+                          Text="{Binding EventFilter.EventList.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                          ItemsSource="{Binding EventFilter.EventList.Values}" 
+                          SelectedItem="{Binding EventFilter.EventList.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                    <ComboBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </ComboBox.ItemsPanel>
+                </ComboBox>
+            </DockPanel>
+            
+            
+            
+            <TreeView  ItemsSource="{Binding TreeList, UpdateSourceTrigger=PropertyChanged}">
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="IsExpanded" Value="True" />
+                    </Style>
+                    
+                </TreeView.ItemContainerStyle>
 
-            <b:Interaction.Behaviors>
-                <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedNode, Mode=TwoWay}" />
-            </b:Interaction.Behaviors>
+                <b:Interaction.Behaviors>
+                    <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedNode, Mode=TwoWay}" />
+                </b:Interaction.Behaviors>
 
-            <TreeView.ItemTemplate >
-                <HierarchicalDataTemplate ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Name.Value, UpdateSourceTrigger=PropertyChanged}"/>
-                        <TextBlock Text="  ["></TextBlock>
-                        <TextBlock Text="{Binding Guid.Value, UpdateSourceTrigger=PropertyChanged}"/>
-                        <TextBlock Text="]"></TextBlock>
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
+                <TreeView.ItemTemplate >
+                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}" ToolTip>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Text=""></TextBlock>
+                            <TextBlock Text=""></TextBlock>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+        </DockPanel>
+       
     </Grid>
 </UserControl>

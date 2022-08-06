@@ -19,7 +19,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc
     public interface ICAkAction
     {
         public ActionType GetActionType();
-        public uint GetSoundId();
+        public uint GetChildId();
     }
 
     // Conert to interfaces 
