@@ -4,6 +4,7 @@ using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.Sound;
 using CommonControls.FileTypes.Sound.WWise;
 using CommonControls.FileTypes.Sound.WWise.Hirc;
+using CommonControls.FileTypes.Sound.WWise.Hirc.V136;
 using CommonControls.Services;
 using MoreLinq;
 using Serilog;
@@ -33,6 +34,22 @@ namespace AudioResearch
             var bnkList = builder.LoadBnkFiles(pfs);
             var globalDb = builder.BuildMasterSoundDatabase(bnkList);
             var nameHelper = builder.BuildNameHelper(pfs);
+
+
+
+            var allHircs = globalDb.HircList.SelectMany(x => x.Value).ToList();
+            var allActorMixers = allHircs.Where(x=>x.Type == HircType.Audio_Bus || x.Type == HircType.AuxiliaryBus);
+            var actorsWithName = allActorMixers.Select(x =>
+                {
+                    var name = nameHelper.GetName(x.Id, out var found);
+                    return new { name = name, Found = found, Obj = x };
+                })
+                .OrderByDescending(x => x.Found).ToList();
+            var instance = allActorMixers.First(x => x.Id == 260354713);
+            //var instanceChildIds = instance.Children.ChildIdList;
+            //var instanceOfChildren = allHircs.Where(x => instanceChildIds.Contains(x.Id)).ToList();
+
+
             var s = nameHelper.GetName(803409642, out var found);
 
             // Check data
@@ -66,7 +83,7 @@ namespace AudioResearch
 
             var stuff = globalDb.HircList.Where(x => x.Value.Count > 1).OrderByDescending(x => x.Value.Count).ToList();
 
-            var allHircs = globalDb.HircList.SelectMany(x => x.Value).ToList();
+            
             var hircInFile = allHircs.Where(x => x.OwnerFile.Contains("battle_vo_orders_")).ToList();
             var eventHircsInFile = hircInFile.Where(x => x.Type == HircType.Event).Select(x=>nameHelper.GetName(x.Id)).ToList();
 

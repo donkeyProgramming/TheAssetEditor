@@ -78,7 +78,7 @@
                 </b:Interaction.Behaviors>
 
                 <TreeView.ItemTemplate >
-                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}" ToolTip>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}"/>
                             <TextBlock Text=""></TextBlock>

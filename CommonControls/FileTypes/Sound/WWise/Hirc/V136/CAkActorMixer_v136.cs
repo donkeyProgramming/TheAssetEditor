@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 {
-    class CAkActorMixer_v136 : HircItem
+    public class CAkActorMixer_v136 : HircItem
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public Children Children { get; set; }

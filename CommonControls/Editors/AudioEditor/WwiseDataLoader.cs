@@ -66,35 +66,35 @@ namespace CommonControls.Editors.AudioEditor
             helper.AddNames(bnkNames);
 
             // Load all string from the game exe
-            //if (File.Exists(@"C:\Users\ole_k\Desktop\Strings\game_wh3_1_2.txt"))
-            //{
-            //    var exeContent = File.ReadAllLines(@"C:\Users\ole_k\Desktop\Strings\game_wh3_1_2.txt");
-            //    exeContent = exeContent.Select(x => x.ToLower()).ToArray();
-            //    var exeContentDistinct = exeContent.Distinct().ToArray();
-            //    helper.AddNames(exeContent);
-            //}
-            //
-            //// Load all from wwiser
-            //if (File.Exists(@"C:\Users\ole_k\Desktop\Wh3 sounds\wwiser.txt"))
-            //{
-            //    var filecontent = File.ReadAllLines(@"C:\Users\ole_k\Desktop\Wh3 sounds\wwiser.txt");
-            //    helper.AddNames(filecontent);
-            //}
-            //
-            //// Load all from game db tables
-            //if (Directory.Exists(@"C:\Users\ole_k\Desktop\Wh3 sounds\DbTables"))
-            //{
-            //    var files = Directory.GetFiles(@"C:\Users\ole_k\Desktop\Wh3 sounds\DbTables");
-            //    foreach (var file in files)
-            //    {
-            //        var fileLines = File.ReadAllLines(file);
-            //        foreach (var fileLine in fileLines)
-            //        {
-            //            var content = fileLine.Split("\t");
-            //            helper.AddNames(content);
-            //        }
-            //    }
-            //}
+           if (File.Exists(@"C:\Users\ole_k\Desktop\Strings\game_wh3_1_2.txt"))
+           {
+               var exeContent = File.ReadAllLines(@"C:\Users\ole_k\Desktop\Strings\game_wh3_1_2.txt");
+               exeContent = exeContent.Select(x => x.ToLower()).ToArray();
+               var exeContentDistinct = exeContent.Distinct().ToArray();
+               helper.AddNames(exeContent);
+           }
+           
+           // Load all from wwiser
+           if (File.Exists(@"C:\Users\ole_k\Desktop\Wh3 sounds\wwiser.txt"))
+           {
+               var filecontent = File.ReadAllLines(@"C:\Users\ole_k\Desktop\Wh3 sounds\wwiser.txt");
+               helper.AddNames(filecontent);
+           }
+           
+           // Load all from game db tables
+           if (Directory.Exists(@"C:\Users\ole_k\Desktop\Wh3 sounds\DbTables"))
+           {
+               var files = Directory.GetFiles(@"C:\Users\ole_k\Desktop\Wh3 sounds\DbTables");
+               foreach (var file in files)
+               {
+                   var fileLines = File.ReadAllLines(file);
+                   foreach (var fileLine in fileLines)
+                   {
+                       var content = fileLine.Split("\t");
+                       helper.AddNames(content);
+                   }
+               }
+           }
 
             return helper;
         }
