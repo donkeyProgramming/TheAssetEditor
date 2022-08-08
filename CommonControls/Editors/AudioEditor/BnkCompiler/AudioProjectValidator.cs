@@ -135,7 +135,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             foreach (var wwiseEvent in projectFile.Events)
             {
                 var actionKey = wwiseEvent.Action;
-                if (projectFile.Actions.Any(x => x.Id == actionKey) == false)
+                if (projectFile.Actions.Any(x => string.Equals(x.Id, actionKey, StringComparison.InvariantCultureIgnoreCase) == false))
                 {
                     errorList.Error("Event", $"Event {wwiseEvent.Id} is pointing to an invalid or unknown Action {actionKey}");
                     return false;
@@ -144,7 +144,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 
             foreach (var action in projectFile.Actions)
             {
-                var actionKey = action.Child;
+                var actionKey = action.Child.ToLower().Trim();
                 if (allIds.Contains(actionKey) == false)
                 {
                     errorList.Error("Action", $"Action {action.Id} is pointing to an invalid or unknown object {actionKey}");

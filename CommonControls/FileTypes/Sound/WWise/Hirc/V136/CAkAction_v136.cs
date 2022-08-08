@@ -37,6 +37,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             var objectSize = HircHeaderSize + 4 + 1 + AkPropBundle0.ComputeSize() + AkPropBundle1.ComputeSize() + AkPlayActionParams.ComputeSize();
 
             using var memStream = WriteHeader((uint)objectSize);
+            memStream.Write(ByteParsers.UShort.EncodeValue((ushort)ActionType, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(idExt, out _));
             memStream.Write(ByteParsers.Byte.EncodeValue(idExt_4, out _));
             memStream.Write(AkPropBundle0.GetAsBytes());

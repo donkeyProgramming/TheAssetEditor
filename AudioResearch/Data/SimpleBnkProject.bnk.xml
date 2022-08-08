@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<root OutputFile="SimpelBnkProject.bnk">
+
+	<Event Id="Play_custom_ogre_unit_selected">
+		<AudioBus>Battle</AudioBus>
+		<Action>Action_custom_ogre_unit_selected</Action>
+	</Event>
+
+	<Action Id="Action_custom_ogre_unit_selected">
+		<Child>CustomAudioFile_Medium</Child>
+	</Action>
+
+	<GameSound Id="CustomAudioFile_Medium">464995906.wem</GameSound>
+	
+</root>

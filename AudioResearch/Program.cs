@@ -27,23 +27,32 @@ namespace AudioResearch
             // Create a progam
             Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
             GameInformationFactory.Create();
-            var pfs = GetPackFileService();
+            var pfs = GetPackFileService(skipLoadingWemFiles:false);
 
-            // Load data
+            // Compile some bnkFiles
+            //BnkCompilerTest.Run(@"Data\SimpleBnkProject.bnk.xml", pfs);
+
+            // Load all game data
             WwiseDataLoader builder = new WwiseDataLoader();
             var bnkList = builder.LoadBnkFiles(pfs);
             var globalDb = builder.BuildMasterSoundDatabase(bnkList);
             var nameHelper = builder.BuildNameHelper(pfs);
 
+            // Explore some data
+            //Ole_DataExploration(globalDb, nameHelper);
 
+            Console.ReadLine();
+        }
 
+        private static void Ole_DataExploration(ExtenededSoundDataBase globalDb, WWiseNameLookUpHelper nameHelper)
+        {
             var allHircs = globalDb.HircList.SelectMany(x => x.Value).ToList();
-            var allActorMixers = allHircs.Where(x=>x.Type == HircType.Audio_Bus || x.Type == HircType.AuxiliaryBus);
+            var allActorMixers = allHircs.Where(x => x.Type == HircType.Audio_Bus || x.Type == HircType.AuxiliaryBus);
             var actorsWithName = allActorMixers.Select(x =>
-                {
-                    var name = nameHelper.GetName(x.Id, out var found);
-                    return new { name = name, Found = found, Obj = x };
-                })
+            {
+                var name = nameHelper.GetName(x.Id, out var found);
+                return new { name = name, Found = found, Obj = x };
+            })
                 .OrderByDescending(x => x.Found).ToList();
             var instance = allActorMixers.First(x => x.Id == 260354713);
             //var instanceChildIds = instance.Children.ChildIdList;
@@ -57,7 +66,7 @@ namespace AudioResearch
             Debug.Assert(missingEvents == 0);
 
             // Investigate when items share values 
-            var multiRef = globalDb.HircList.Where(x => x.Value.Count > 1).OrderByDescending(x=>x.Value.Count).ToList();
+            var multiRef = globalDb.HircList.Where(x => x.Value.Count > 1).OrderByDescending(x => x.Value.Count).ToList();
             var countByType = multiRef.CountBy(x => x.Value.First().Type).ToList();
 
             var multiRefNames = multiRef.Select(x =>
@@ -83,9 +92,9 @@ namespace AudioResearch
 
             var stuff = globalDb.HircList.Where(x => x.Value.Count > 1).OrderByDescending(x => x.Value.Count).ToList();
 
-            
+
             var hircInFile = allHircs.Where(x => x.OwnerFile.Contains("battle_vo_orders_")).ToList();
-            var eventHircsInFile = hircInFile.Where(x => x.Type == HircType.Event).Select(x=>nameHelper.GetName(x.Id)).ToList();
+            var eventHircsInFile = hircInFile.Where(x => x.Type == HircType.Event).Select(x => nameHelper.GetName(x.Id)).ToList();
 
             //var fileNames = hircInFile
             //    .Select(x => x.OwnerFile)
@@ -109,14 +118,9 @@ namespace AudioResearch
 
             var notFoundMulti = multiRefNames.Where(x => x.Found == false).ToList();
             var foundMulti = multiRefNames.Where(x => x.Found == true).ToList();
-
-            
-
-
-            // nameHelper.
-            //
-            Console.ReadLine();
         }
+
+
 
         static bool AreEqual(List<HircItem> hircList)
         {
@@ -148,10 +152,10 @@ namespace AudioResearch
             return notFoundEvents.Count;
         }
 
-        static PackFileService GetPackFileService()
+        static PackFileService GetPackFileService(bool skipLoadingWemFiles = true)
         {
             var appSettings = new ApplicationSettingsService();
-            appSettings.CurrentSettings.SkipLoadingWemFiles = true;
+            appSettings.CurrentSettings.SkipLoadingWemFiles = skipLoadingWemFiles;
             var gamePath = appSettings.CurrentSettings.GameDirectories.First(x => x.Game == GameTypeEnum.Warhammer3);
             PackFileService pfs = new PackFileService(new PackFileDataBase(), new SkeletonAnimationLookUpHelper(), appSettings);
             pfs.LoadAllCaFiles(gamePath.Path, GameInformationFactory.GetGameById(GameTypeEnum.Warhammer3).DisplayName);
