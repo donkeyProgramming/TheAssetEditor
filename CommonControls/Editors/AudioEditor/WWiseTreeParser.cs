@@ -30,6 +30,9 @@ namespace CommonControls.Editors.AudioEditor
             _hircProcessMap.Add(HircType.Event, ProcessEvent);
             _hircProcessMap.Add(HircType.Action, ProcessAction);
             _hircProcessMap.Add(HircType.SwitchContainer, ProcessSwitchControl);
+            _hircProcessMap.Add(HircType.LayerContainer, ProcessLayerContainer);
+            _hircProcessMap.Add(HircType.SequenceContainer, ProcessSequenceContainer);
+            _hircProcessMap.Add(HircType.Sound, ProcessSound);
             _globalSoundDb = globalSoundDb;
             _nameLookUpHelper = nameLookUpHelper;
         }
@@ -47,10 +50,14 @@ namespace CommonControls.Editors.AudioEditor
         void ProcessHircObject(HircItem item, HircTreeItem parent)
         {
             if (_hircProcessMap.TryGetValue(item.Type, out var func))
+            {
                 func(item, parent);
-
-            var unkownNode = new HircTreeItem() { DisplayName = $"Unkown node type {item.Type} for Id {item.Id} in {item.OwnerFile}", Item = item };
-            parent.Children.Add(unkownNode);
+            }
+            else
+            {
+                var unkownNode = new HircTreeItem() { DisplayName = $"Unkown node type {item.Type} for Id {item.Id} in {item.OwnerFile}", Item = item };
+                parent.Children.Add(unkownNode);
+            }
         }
 
         void ProcessEvent(HircItem item, HircTreeItem parent)
@@ -74,12 +81,19 @@ namespace CommonControls.Editors.AudioEditor
             ProcessChildOfNode(soundId, actionTreeNode);
         }
 
+        private void ProcessSound(HircItem item, HircTreeItem parent)
+        {
+            var soundHirc = GetAsType<ICAkSound>(item);
+            var soundTreeNode = new HircTreeItem() { DisplayName = $"Sound {soundHirc.GetSourceId()}.wav", Item = item };
+            parent.Children.Add(soundTreeNode);
+        }
+
         void ProcessSwitchControl(HircItem item, HircTreeItem parent)
         {
             var switchControl = GetAsType<CAkSwitchCntr_v136>(item);
             var switchType = _nameLookUpHelper.GetName(switchControl.ulGroupID);
             var defaultValue = _nameLookUpHelper.GetName(switchControl.ulDefaultSwitch);
-            var switchControlNode = new HircTreeItem() { DisplayName = $"Switch {switchType} DefaultValue:{defaultValue}", Item = item };
+            var switchControlNode = new HircTreeItem() { DisplayName = $"Switch {switchType} DefaultValue: {defaultValue}", Item = item };
             parent.Children.Add(switchControlNode);
 
             foreach (var switchCase in switchControl.SwitchList)
@@ -91,6 +105,32 @@ namespace CommonControls.Editors.AudioEditor
                 ProcessChildrenOfNode(switchCase.NodeIdList, switchValueNode);
             }
         }
+
+        private void ProcessLayerContainer(HircItem item, HircTreeItem parent)
+        {
+            var layerContainer = GetAsType<CAkLayerCntr_v136>(item);
+            var layerNode = new HircTreeItem() { DisplayName = $"Layer Container", Item = item };
+            parent.Children.Add(layerNode);
+
+            foreach (var layer in layerContainer.LayerList)
+            {
+                var rtcp = _nameLookUpHelper.GetName(layer.rtpcID);
+                var layerContainerNode = new HircTreeItem() { DisplayName = $"Layer - rptc:{rtcp}", Item = item };
+                layerNode.Children.Add(layerContainerNode);
+                foreach (var child in layer.CAssociatedChildDataList)
+                    ProcessChildOfNode(child.ulAssociatedChildID, layerNode);
+            }
+        }
+
+        private void ProcessSequenceContainer(HircItem item, HircTreeItem parent)
+        {
+            var layerContainer = GetAsType<CAkRanSeqCnt>(item);
+            var layerNode = new HircTreeItem() { DisplayName = $"Rand Container", Item = item };
+            parent.Children.Add(layerNode);
+
+            ProcessChildrenOfNode(layerContainer.GetChildren(), layerNode);
+        }
+
 
         void ProcessChildOfNode(uint hircId, HircTreeItem parent)
         {
