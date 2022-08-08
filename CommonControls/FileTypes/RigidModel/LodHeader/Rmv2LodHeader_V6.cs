@@ -29,7 +29,6 @@ namespace CommonControls.FileTypes.RigidModel.LodHeader
                 _lodCameraDistance = source.LodCameraDistance,
             };
         }
-
         public byte[] Save(RmvLodHeader rmvLodHeader)
         {
             return ByteHelper.GetBytes((Rmv2LodHeader_V6)rmvLodHeader);
