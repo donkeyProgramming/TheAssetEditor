@@ -11,15 +11,21 @@ using System.Linq;
 using View3D.SceneNodes;
 using View3D.Utility;
 
-
 using MS = Microsoft.Xna.Framework;
-
-
 
 namespace View3D.Services
 {
     public class Rmv2UpdaterService
     {
+
+        public enum ConversionTechniqueEnum
+        {
+
+            AdditiveBlending,
+            ComparativeBlending,
+
+        }
+
         private readonly PackFileService _pfs;
         private readonly string _outputFolder = DirectoryHelper.Temp + "\\TextureUpdater\\";
         private readonly bool _autoGenerateMissingTextures = false;
@@ -27,21 +33,21 @@ namespace View3D.Services
         private readonly bool _deleteOldTextures = false;
 
         public Rmv2UpdaterService(PackFileService pfs, bool autoGenerateMissingTextures = true)
-        {          
+        {
 
             _pfs = pfs;
             _autoGenerateMissingTextures = autoGenerateMissingTextures;
             DirectoryHelper.EnsureCreated(_outputFolder);
         }
 
-        public void UpdateWh2Models(string modelPath, List<Rmv2MeshNode> models, out ErrorListViewModel.ErrorList outputList)
+        public void UpdateWh2Models(string modelPath, List<Rmv2MeshNode> models, ConversionTechniqueEnum conversionTechnique, out ErrorListViewModel.ErrorList outputList)
         {
             outputList = new ErrorListViewModel.ErrorList();
             foreach (var model in models)
-                ProcessModel(modelPath, model, outputList);
+                ProcessModel(modelPath, model, conversionTechnique, outputList);
         }
 
-        private void ProcessModel(string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
+        private void ProcessModel(string modelPath, Rmv2MeshNode model, ConversionTechniqueEnum conversionTechnique, ErrorListViewModel.ErrorList outputList)
         {
             if (_tryMatchingTexturesByName)
             {
@@ -76,11 +82,17 @@ namespace View3D.Services
                     }
                     else
                     {
-                        if (textures.ContainsKey(TextureType.BaseColour) == false)
-                            CreateBaseColourMap(textureDictionary, modelPath, model, outputList);
+                        switch (conversionTechnique)
+                        {
+                            case ConversionTechniqueEnum.AdditiveBlending:
+                                ConvertAdditiveBlending(textureDictionary, modelPath, model, outputList);
+                                break;
 
-                        if (textures.ContainsKey(TextureType.MaterialMap) == false)
-                            CreateMaterialMap(textureDictionary, modelPath, model, outputList);
+                            case ConversionTechniqueEnum.ComparativeBlending:
+                                ConvertUsingcomparativeBlending(textureDictionary, modelPath, model, outputList);
+                                break;
+                        }
+
                     }
                 }
             }
@@ -160,56 +172,42 @@ namespace View3D.Services
             return texDiffuse;
         }
 
-        private static MS::Vector4 ColorToVector4(Color c)
-        {            
-            return new MS::Vector4(
-                Math.Clamp(((float)c.R) / 255.0f, 0.0f, 1.0f),
-                Math.Clamp(((float)c.G) / 255.0f, 0.0f, 1.0f),
-                Math.Clamp(((float)c.B) / 255.0f, 0.0f, 1.0f),
-                Math.Clamp(((float)c.A) / 255.0f, 0.0f, 1.0f)
 
-            );
-        }
-        
-        private static Color Vector4ToColor(MS::Vector4 v)
-        {
-            return Color.FromArgb(
-                (int)Math.Clamp((float)(v.W) * 255.0f, 0.0f, 255.0f),
-                (int)Math.Clamp((float)(v.X) * 255.0f, 0.0f, 255.0f),
-                (int)Math.Clamp((float)(v.Y) * 255.0f, 0.0f, 255.0f),
-                (int)Math.Clamp((float)(v.Z) * 255.0f, 0.0f, 255.0f)
-                
-            );
 
-        }
 
         private static float GetMetalNess(MS::Vector4 specularPixel, MS::Vector4 diffusePixel)
         {
             // calculate luminosity
-            float luminosity_Specular = (0.2126f * specularPixel.X + 0.7152f * specularPixel.Y + 0.0722f * specularPixel.Z);
-            float luminosity_Diffuse = (0.2126f * diffusePixel.X + 0.7152f * diffusePixel.Y + 0.0722f * diffusePixel.Z);
+            float luminosity_Specular = ColorHelper.GetPixelLuminosity(specularPixel);
+            float luminosity_Diffuse = ColorHelper.GetPixelLuminosity(diffusePixel);
 
 
             // "rules" (heuristic) for creating metal map
             // TODO: improve, as it in some situations it doesn't look "pefect"
             // TODO: possibly include 'smoothness' to detetimne metalicity also
-            if (Math.Abs(luminosity_Diffuse - luminosity_Specular) < 0.15)
-                return 0.1f;
+            if (luminosity_Specular > 0.3f)
+                return 1.0f;
+
+
 
             if (luminosity_Diffuse < 0.1f)
+            {
                 return 1.0f;
+            }
 
-            if (luminosity_Specular > 0.5f)
-                return 1.0f;
-
-            if (specularPixel.X == specularPixel.Y && specularPixel.Y == specularPixel.Z)
-                return 0.0f;
+            //if (specularPixel.X == specularPixel.Y && specularPixel.Y == specularPixel.Z)
+            //  return 0.0f;
 
             if (luminosity_Specular < 0.1)
                 return 0.0f;
 
+            if (Math.Abs(luminosity_Diffuse - luminosity_Specular) < 0.15)
+                return 0.0f;
+
+
             return 0.0f;
         }
+
 
 
         static private MS::Vector4 PowVec4(MS::Vector4 v, float e)
@@ -219,35 +217,29 @@ namespace View3D.Services
                 (float)Math.Pow(v.Y, e),
                 (float)Math.Pow(v.Z, e),
                 (float)Math.Pow(v.W, e)
-                
+
             );
         }
-
-        // TODO: To Ole:
-        // this method was meant to create the base_colour, but it creates both the base_color and material map        // 
-        // They are somewhat interpendent, but could possibly be split up, 
-        // should I refactor and do it like you intended?
-        private bool CreateBaseColourMap(Dictionary<TextureType, Bitmap> textureDictionary, string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
+                
+        private bool ConvertAdditiveBlending(Dictionary<TextureType, Bitmap> textureDictionary, string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
         {
-            
             var inputDiffuseTex = textureDictionary[TextureType.Diffuse];
+
             var inputSpecularTex = textureDictionary[TextureType.Specular];
             var inputGlosMapTex = textureDictionary[TextureType.Gloss];
 
             var outBaseColourTex = new Bitmap(inputDiffuseTex.Width, inputDiffuseTex.Height);
-            var outMaterialMapTex = new Bitmap(inputDiffuseTex.Width, inputDiffuseTex.Height);                        
+            var outMaterialMapTex = new Bitmap(inputDiffuseTex.Width, inputDiffuseTex.Height);
 
             for (int y = 0; y < inputDiffuseTex.Height; y++)
             {
                 for (int x = 0; x < inputDiffuseTex.Width; x++)
                 {
                     // get roughness from WH2 smoothness (gloss_map.r)
-                    float smoothness = Math.Clamp((float)(inputGlosMapTex.GetPixel(x, y).R) / 255.0f, 0.0f, 1.0f);
-                    smoothness = (float)Math.Pow(smoothness, 2.0 / 1.0);
-                    float roughness = Math.Clamp(1.0f - smoothness, 0.0f, 1.0f);
+                    float roughness = GetRoughnessFromPixel(inputGlosMapTex, y, x);
 
-                    var diffuseColorFloat = ColorToVector4(inputDiffuseTex.GetPixel(x, y));
-                    var spcularColorFloat = ColorToVector4(inputSpecularTex.GetPixel(x, y));
+                    var diffuseColorFloat = ColorHelper.ColorToVector4(inputDiffuseTex.GetPixel(x, y));
+                    var spcularColorFloat = ColorHelper.ColorToVector4(inputSpecularTex.GetPixel(x, y));
 
                     var alphaDiffuse = diffuseColorFloat.W;
 
@@ -262,64 +254,105 @@ namespace View3D.Services
                     baseColorFloat = PowVec4(baseColorFloat, 1.0f / 2.2f);
                     baseColorFloat.W = alphaDiffuse;
 
-                    outBaseColourTex.SetPixel(x, y, Vector4ToColor(baseColorFloat));
+                    outBaseColourTex.SetPixel(x, y, ColorHelper.Vector4ToColor(baseColorFloat));
 
                     var metalness = GetMetalNess(spcularColorFloat, diffuseColorFloat);
                     outMaterialMapTex.SetPixel(x, y,
-                        Vector4ToColor(new MS::Vector4(metalness, roughness, 0.0f, 1.0f)));
+                        ColorHelper.Vector4ToColor(new MS::Vector4(metalness, roughness, 0.0f, 1.0f)));
 
-                    // TODO REMOVE: 
-                    // Debuggin code should NOT be removed yeat, as the algo is still being fine tuned
-                    // BEGIN: DEBUGGIN CODE
-                    if (false)
-                    {
-                        outBaseColourTex.SetPixel(x, y, Vector4ToColor(new MS::Vector4(roughness, roughness, roughness, 1.0f)));
-                        outMaterialMapTex.SetPixel(x, y,Vector4ToColor(new MS::Vector4(0.0f, 1.0f, 0.0f, 1.0f)));
-                    }
-                    // END: DEBUGGIN CODE
+                    
                 }
             }
 
-            // do the replacement, 
-            
-            // TODO: to Ole:
-            // it is: '_base_colour' and 'material_map', you had written '_materialmap' and '_basecolour' :)
-            // this gives errors around the program, in the converter window, it seams
+            // do the replacement ops
             var packFilePathBaseColor = model.GetTextures()[TextureType.Diffuse].Replace("_diffuse", "_base_colour");
             var packFilePath_MaterialMap = model.GetTextures()[TextureType.Gloss].Replace("_gloss_map", "_material_map");
 
             var result = SaveAndApplyBitmapAsModelTexture(outBaseColourTex, packFilePathBaseColor, TextureType.BaseColour, modelPath, model, outputList);
-            if(result)
+            if (result)
                 outputList.Ok($"{modelPath}-{model.Name}", $"Generated new 'base_colour' texture");
 
             var result_material_map = SaveAndApplyBitmapAsModelTexture(outMaterialMapTex, packFilePath_MaterialMap, TextureType.MaterialMap, modelPath, model, outputList);
-            if(result_material_map)
+            if (result_material_map)
                 outputList.Ok($"{modelPath}-{model.Name}", $"Generated new `material_map texture");
 
             return result;
         }
 
-        // TODO: To Ole:
-        // this method was meant to create the material_map, 
-        //  but the material map and basecolor are somewhat interpendent, CAN be split up, MAYBE detrimental down the line
-        // should I refactor and do it like you intneded?
-        private bool CreateMaterialMap(Dictionary<TextureType, Bitmap> textureDictionary, string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
+        private static float GetRoughnessFromPixel(Bitmap inputGlosMapTex, int y, int x)
         {
+            const float smooth_gamma_scale = 1.0f/0.90f; // rough const test roughness adjuster value
+
+            float smoothness = Math.Clamp((float)(inputGlosMapTex.GetPixel(x, y).R) / 255.0f, 0.0f, 1.0f);
+            float roughness = Math.Clamp(1.0f - smoothness, 0.0f, 1.0f);
+
+            roughness = (float)Math.Pow(roughness, (1.0 / 2.2) * smooth_gamma_scale);
+
+            return roughness; 
+
+        }
+                
+        private bool ConvertUsingcomparativeBlending(Dictionary<TextureType, Bitmap> textureDictionary, string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
+        {   
+            var inputDiffuseTex = textureDictionary[TextureType.Diffuse];
+            var inputSpecularTex = textureDictionary[TextureType.Specular];
+            var inputGlosMapTex = textureDictionary[TextureType.Gloss];
+
+            var outBaseColourTex = new Bitmap(inputDiffuseTex.Width, inputDiffuseTex.Height);
+            var outMaterialMapTex = new Bitmap(inputDiffuseTex.Width, inputDiffuseTex.Height);                 
+
             
+            for (int y = 0; y < inputDiffuseTex.Height; y++)
+            {
+                for (int x = 0; x < inputDiffuseTex.Width; x++)
+                {
 
-            //var diffuse = textureDictionary[TextureType.Diffuse];
-            //using var materialMap = new Bitmap(diffuse.Width, diffuse.Height);
+                    float roughness = GetRoughnessFromPixel(inputGlosMapTex, y, x);
 
-            //// ---------------
-            //// Update the texture...
-            //// ---------------
+                    var diffusePixelFloat = ColorHelper.ColorToVector4(inputDiffuseTex.GetPixel(x, y));
 
-            //var packFilePath = model.GetTextures()[TextureType.Diffuse].Replace("_diffuse", "_materialmap");
-            //var result = SaveAndApplyBitmapAsModelTexture(materialMap, packFilePath, TextureType.MaterialMap, modelPath, model, outputList);
-            //if (result)
-            //    outputList.Ok($"{modelPath}-{model.Name}", $"Generated new material map");
-            //return result;
-            return true;
+                    var alphaDiffuse = diffusePixelFloat.W; // save the the diffuse alpha for later.
+                    var specularPixelFloat = ColorHelper.ColorToVector4(inputSpecularTex.GetPixel(x, y));
+
+                    // get metalmess before (any potential) gamma stuff is done on the pixels
+                    var metalnessValue = GetMetalNess(specularPixelFloat, diffusePixelFloat);
+
+                    // Get "brightness" (luminosity) from spec amd diffuse, 
+                    // reason: to obtain a scalar (float) to decribe the RGB, that can be used in comparisions....
+                    var luminosity_Specular = ColorHelper.GetPixelLuminosity(specularPixelFloat);
+                    var luminosity_Diffuse = ColorHelper.GetPixelLuminosity(diffusePixelFloat);
+
+                    // Taking the pixel from spec or gloss, based on which is brightest (luminosioty),
+                    // with a slight adjustment, to include a tiny bit more diffuse
+                    // this MIGHT work in most cases:                   
+                    var baseColorPixelFloat = (luminosity_Specular - 0.07 >= luminosity_Diffuse) ? specularPixelFloat : diffusePixelFloat;
+                                        
+                    // adjust base_colour brightness
+                    const float brightNess = 1.3f; // rough const test pre-gamma brightness adjusted
+                    baseColorPixelFloat = ColorHelper.linear_to_gamma_accurate(baseColorPixelFloat * brightNess);
+                    baseColorPixelFloat.W = alphaDiffuse; // store the alpha value read from the diffuse
+
+                    // store pixels
+                    outBaseColourTex.SetPixel(x, y, ColorHelper.Vector4ToColor(baseColorPixelFloat));
+                    outMaterialMapTex.SetPixel(x, y, ColorHelper.Vector4ToColor(new MS::Vector4(metalnessValue, roughness, 0.0f, 1.0f)));
+
+                }
+            }                     
+
+            // Do the texture replacement operations            
+            var packFilePath_Mask = model.GetTextures()[TextureType.Mask];
+            var packFilePathBaseColor = model.GetTextures()[TextureType.Diffuse].Replace("_diffuse", "_base_colour");
+            var packFilePath_MaterialMap = model.GetTextures()[TextureType.Gloss].Replace("_gloss_map", "_material_map");
+                        
+            var result = SaveAndApplyBitmapAsModelTexture(outBaseColourTex, packFilePathBaseColor, TextureType.BaseColour, modelPath, model, outputList);
+            if (result)
+                outputList.Ok($"{modelPath}-{model.Name}", $"Generated new 'base_colour' texture (comparitive blending)");
+
+            var result_material_map = SaveAndApplyBitmapAsModelTexture(outMaterialMapTex, packFilePath_MaterialMap, TextureType.MaterialMap, modelPath, model, outputList);
+            if (result_material_map)
+                outputList.Ok($"{modelPath}-{model.Name}", $"Generated new `material_map texture (heuristic metalmask, inverted gloss");
+
+            return result;
         }
 
 
@@ -355,7 +388,7 @@ namespace View3D.Services
         {
             try
             {
-                var diskPath = _outputFolder + "tempImage_" + Guid.NewGuid() +".png";
+                var diskPath = _outputFolder + "tempImage_" + Guid.NewGuid() + ".png";
                 if (File.Exists(diskPath))
                     File.Delete(diskPath);
 
@@ -366,7 +399,7 @@ namespace View3D.Services
                 if (File.Exists(diskPath))
                     File.Delete(diskPath);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 outputList.Error($"{modelPath}-{model.Name}", $"Converting from png to dds failed for {outputTextureType}. Reason: {e.Message}");
                 return false;
@@ -374,7 +407,6 @@ namespace View3D.Services
 
             return true;
         }
-
 
 
         private void DeleteWh2TextureReferences(Rmv2MeshNode model)
@@ -385,5 +417,86 @@ namespace View3D.Services
             model.UpdateTexture("", TextureType.Diffuse);
             model.UpdateTexture("", TextureType.Gloss);
         }
+
+        static class ColorHelper
+        {
+            public static float gamma_accurate_component(float linear_val)
+            {
+                const float srgb_gamma_ramp_inflection_point = 0.0031308f;
+
+                if (linear_val <= srgb_gamma_ramp_inflection_point)
+                {
+                    return 12.92f * linear_val;
+                }
+                else
+                {
+                    const float a = 0.055f;
+
+                    return ((1.0f + a) * (float)Math.Pow(linear_val, 1.0 / 2.4)) - a;
+                }
+            }
+
+            public static float linear_accurate_component(float srgb_val)
+            {
+                const float inflection_point = 0.04045f;
+
+                if (srgb_val <= inflection_point)
+                {
+                    return srgb_val / 12.92f;
+                }
+                else
+                {
+                    const float a = 0.055f;
+                    return (float)Math.Pow((srgb_val + a) / (1.0f + a), 2.4f);
+                }
+            }
+
+            public static MS::Vector4 gamaa_to_linear_accurate(MS::Vector4 fGamma)
+            {
+                return new MS::Vector4(linear_accurate_component(fGamma.X), linear_accurate_component(fGamma.Y), linear_accurate_component(fGamma.Z), 1.0f);
+            }
+            public static MS::Vector4 linear_to_gamma_accurate(MS::Vector4 _vPixel)
+            {
+
+                return new MS::Vector4(
+                    gamma_accurate_component(_vPixel.X),
+                    gamma_accurate_component(_vPixel.Y),
+                    gamma_accurate_component(_vPixel.Z),
+                    1.0f
+               );
+
+            }
+
+            public static MS::Vector4 ColorToVector4(Color c)
+            {
+                return new MS::Vector4(
+                    Math.Clamp(((float)c.R) / 255.0f, 0.0f, 1.0f),
+                    Math.Clamp(((float)c.G) / 255.0f, 0.0f, 1.0f),
+                    Math.Clamp(((float)c.B) / 255.0f, 0.0f, 1.0f),
+                    Math.Clamp(((float)c.A) / 255.0f, 0.0f, 1.0f)
+
+                );
+            }
+
+            public static Color Vector4ToColor(MS::Vector4 v)
+            {
+                return Color.FromArgb(
+                    (int)Math.Clamp((float)(v.W) * 255.0f, 0.0f, 255.0f),
+                    (int)Math.Clamp((float)(v.X) * 255.0f, 0.0f, 255.0f),
+                    (int)Math.Clamp((float)(v.Y) * 255.0f, 0.0f, 255.0f),
+                    (int)Math.Clamp((float)(v.Z) * 255.0f, 0.0f, 255.0f)
+
+                );
+
+            }
+
+            public static float GetPixelLuminosity(MS::Vector4 vColor)
+            {
+                return (0.2126f * vColor.X + 0.7152f * vColor.Y + 0.0722f * vColor.Z);
+            }
+
+
+        }
+
     }
 }
