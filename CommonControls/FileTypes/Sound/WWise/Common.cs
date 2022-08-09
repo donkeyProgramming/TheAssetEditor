@@ -3,6 +3,7 @@ using Filetypes.ByteParsing;
 using Newtonsoft.Json;
 using Serilog;
 using System;
+using System.IO;
 using System.Text;
 
 namespace CommonControls.FileTypes.Sound.WWise
@@ -17,6 +18,7 @@ namespace CommonControls.FileTypes.Sound.WWise
     {
         ILogger _logger = Logging.Create<HircItem>();
 
+        public static readonly uint HircHeaderSize = 5;
         public string OwnerFile { get; set; }
         public uint IndexInFile { get; set; }
         public bool HasError { get; set; } = true;
@@ -34,9 +36,6 @@ namespace CommonControls.FileTypes.Sound.WWise
                 Type = (HircType)chunk.ReadByte();
                 Size = chunk.ReadUInt32();
                 Id = chunk.ReadUInt32();
-
-                if (Id == 12883889)
-                { }
 
                 CreateSpesificData(chunk);
                 var currentIndex = chunk.Index;
@@ -56,6 +55,16 @@ namespace CommonControls.FileTypes.Sound.WWise
                 _logger.Here().Error("\n" + "\n" + Type + jsonStr);
                 throw;
             }
+        }
+
+        protected MemoryStream WriteHeader(uint expectedSize)
+        {
+            var memStream = new MemoryStream();
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)Type, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(expectedSize, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(Id, out _));
+
+            return memStream;
         }
 
         protected abstract void CreateSpesificData(ByteChunk chunk);

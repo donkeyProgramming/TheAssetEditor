@@ -141,6 +141,20 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 
             return output;
         }
+
+        public uint ComputeSize()
+        {
+            if (Values.Count != 0)
+                throw new NotImplementedException();
+            return 1;
+        }
+
+        public byte[] GetAsBytes()
+        {
+            if (Values.Count != 0)
+                throw new NotImplementedException();
+            return new byte[] { 0 };
+        }
     }
 
     public class AkPropBundleMinMax

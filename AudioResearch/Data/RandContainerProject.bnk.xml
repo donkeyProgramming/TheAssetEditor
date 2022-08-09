@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<root OutputFile="Custom.bnk">
+
+	<Event Id="Play_custom_ogre_unit_selected">
+		<AudioBus>Battle</AudioBus>
+		<Action>Action_custom_ogre_unit_selected</Action>
+	</Event>
+
+	<Action Id="Action_custom_ogre_unit_selected">
+		<Child>Custom_ogre_unit_selected_switch</Child>
+	</Action>
+
+	<SwitchContainer Id="Custom_ogre_unit_selected_switch">
+		<SwitchEnum>Battle_Group_Size_Ogres</SwitchEnum>
+			<DefaultValue>0</DefaultValue>
+
+			<SwitchCase value="Off">NoSound</SwitchCase>
+			<SwitchCase value="Small">CustomAudioFile_Small</SwitchCase>
+			<SwitchCase value="Medium">CustomAudioFile_Medium</SwitchCase>
+			<SwitchCase value="Large">CustomAudioFile_Large</SwitchCase>
+		</SwitchContainer>
+
+	<RandContainer Id="MyRandContainer">
+		<Child Weight="5000">CustomAudioFile_Small</Child>
+		<Child Weight="5000">CustomAudioFile_Large</Child>
+		<Child Weight="5000">CustomAudioFile_Medium</Child>
+	</RandContainer>
+
+	<CustomSound Id="CustomAudioFile_Small">CustomAudio/myfile_Small.wem</CustomSound>
+	<CustomSound Id="CustomAudioFile_Large">CustomAudio/myfile_Large.wem</CustomSound>
+	<GameSound Id="CustomAudioFile_Medium">811558528.wem</GameSound>
+	<GameSound Id="NoSound">0.wem</GameSound>
+
+</root>

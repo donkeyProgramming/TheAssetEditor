@@ -2,6 +2,7 @@
 using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace CommonControls.FileTypes.Sound.WWise.Bkhd
@@ -38,13 +39,33 @@ namespace CommonControls.FileTypes.Sound.WWise.Bkhd
 
         public string OwnerFileName { get; set; }
 
-        public uint Size { get; set; }
+        public uint Size { get; set; }  // Not acutally part of header
         public uint dwBankGeneratorVersion { get; set; }
         public uint dwSoundBankID { get; set; }     // Name of the file
         public uint dwLanguageID { get; set; }      // Enum 11 - English
         public uint bFeedbackInBank { get; set; }
         public uint dwProjectID { get; set; }
         public uint padding { get; set; }
+
+
+        public byte[] GetAsByteArray()
+        {
+            using var memStream = new MemoryStream();
+            memStream.Write(ByteParsers.UInt32.EncodeValue(Size, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(dwBankGeneratorVersion, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(dwSoundBankID, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(dwLanguageID, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(bFeedbackInBank, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(dwProjectID, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(padding, out _));
+            var byteArray = memStream.ToArray();
+
+            // Reload the object to ensure sanity
+            var parser = new BkhdParser();
+            parser.Parse("name", new ByteChunk(byteArray), new SoundDataBase());
+
+            return byteArray;
+        }
     }
 
 }

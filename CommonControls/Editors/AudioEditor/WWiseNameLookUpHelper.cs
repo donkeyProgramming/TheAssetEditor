@@ -28,7 +28,7 @@ namespace CommonControls.Editors.AudioEditor
 
         public static uint ComputeWWiseHash(string name)
         {
-            var lower = name.ToLower();
+            var lower = name.ToLower().Trim();
             var bytes = Encoding.UTF8.GetBytes(lower);
 
             uint hashValue = 2166136261;

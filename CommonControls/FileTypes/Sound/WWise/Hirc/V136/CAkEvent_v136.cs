@@ -21,9 +21,26 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
                 Actions.Add(new Action() { ActionId = chunk.ReadUInt32() });
         }
 
-        public List<uint> GetActionIds()
+        public List<uint> GetActionIds() => Actions.Select(x => x.ActionId).ToList();
+
+        public byte[] GetAsByteArray()
         {
-            return Actions.Select(x => x.ActionId).ToList();
+            // Compute size
+            var objectSize = HircHeaderSize + 1 + 4 * Actions.Count-1;
+
+            using var memStream = WriteHeader((uint)objectSize);
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)Actions.Count, out _));
+            foreach(var action in Actions)
+                memStream.Write(ByteParsers.UInt32.EncodeValue(action.ActionId, out _));
+
+            var byteArray = memStream.ToArray();
+
+            // Reload the object to ensure sanity
+            var copyInstance = new CAkEvent_v136();
+            var chunk = new ByteChunk(byteArray);
+            copyInstance.Parse(chunk);
+
+            return byteArray;
         }
     }
 }
