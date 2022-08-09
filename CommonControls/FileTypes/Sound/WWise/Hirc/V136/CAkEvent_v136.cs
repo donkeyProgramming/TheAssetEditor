@@ -26,7 +26,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
         public byte[] GetAsByteArray()
         {
             // Compute size
-            var objectSize = HircHeaderSize + 1 + 4 * Actions.Count;
+            var objectSize = HircHeaderSize + 1 + 4 * Actions.Count-1;
 
             using var memStream = WriteHeader((uint)objectSize);
             memStream.Write(ByteParsers.Byte.EncodeValue((byte)Actions.Count, out _));
@@ -37,7 +37,8 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 
             // Reload the object to ensure sanity
             var copyInstance = new CAkEvent_v136();
-            copyInstance.Parse(new ByteChunk(byteArray));
+            var chunk = new ByteChunk(byteArray);
+            copyInstance.Parse(chunk);
 
             return byteArray;
         }

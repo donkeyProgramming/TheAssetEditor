@@ -15,13 +15,10 @@ namespace AudioResearch
 
             if (errorList.Errors.Count == 0 && result)
             {
-                var editPack = pfs.GetEditablePack();
-                var bnkPackFile = editPack.FileList.First().Value;
-
-                // Save to disk
-                var chunk = bnkPackFile.DataSource.ReadDataAsChunk();
+                // Save to disk for easy debug
+                var chunk = compiler.OutputBnkFile.DataSource.ReadDataAsChunk();
                 var outputName = projectFilePath.Replace(".bnk.xml", ".bnk");
-                chunk.SaveToFile($"Data\\{outputName}");
+                chunk.SaveToFile($"{outputName}");
 
                 return true;
             }

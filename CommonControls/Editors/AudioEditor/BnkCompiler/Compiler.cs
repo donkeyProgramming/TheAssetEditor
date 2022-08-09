@@ -4,6 +4,7 @@ using CommonControls.FileTypes.Sound;
 using CommonControls.FileTypes.Sound.WWise.Bkhd;
 using CommonControls.FileTypes.Sound.WWise.Hirc.V136;
 using CommonControls.Services;
+using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,6 +17,8 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
     public class Compiler
     {
         private readonly PackFileService _pfs;
+        public PackFile OutputBnkFile { get; private set; }
+        public PackFile OutputDatFile { get; private set; }
 
         public Compiler(PackFileService pfs)
         {
@@ -33,40 +36,61 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             if (validationResult == false)
                 return false;
 
-            BuildBnk(projectFile);
-            BuildDat(projectFile);
+            OutputBnkFile = BuildBnk(projectFile);
+            OutputDatFile = BuildDat(projectFile);
             BuildNameLookUpFile(projectFile);
 
             return true;
         }
 
 
-        void BuildBnk(AudioProjectXml projectFile)
+        PackFile BuildBnk(AudioProjectXml projectFile)
         {
             var bnkName = Path.GetFileNameWithoutExtension(projectFile.OutputFile);
+
+            projectFile.GameSounds.Clear();
+            projectFile.Actions.Clear();
 
             var sounds = projectFile.GameSounds.Select(x => CompileGameSound(x)).ToList();
             var actions = projectFile.Actions.Select(x => CompileAction(x, bnkName)).ToList();
             var events = projectFile.Events.Select(x => CompileEvent(x)).ToList();
-            var header = CompileHeader(projectFile, 123, bnkName);
+            var header = CompileHeader(projectFile, bnkName);
 
-            var allBytes = new List<byte>();
-            allBytes.AddRange(header);
-            allBytes.AddRange(sounds.SelectMany(x=>x));
-            allBytes.AddRange(actions.SelectMany(x => x));
-            allBytes.AddRange(events.SelectMany(x => x));
-            var byteArray = allBytes.ToArray();
+            // Compose it all - Header
+            using var memStream = new MemoryStream();
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)'B', out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)'K', out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)'H', out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)'D', out _));
+            memStream.Write(header);
 
-            // Parse the bank for sanity
-            var result = Bnkparser.Parse(new PackFile("TestFile.bnk", new MemorySource(byteArray)), "test\\TestFile.bnk");
+            // Compose it all - Hirc List
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)'H', out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)'I', out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)'R', out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)'C', out _));
+
+            var hircCount = sounds.Count + actions.Count + events.Count();
+            var hitcByteData = new List<byte>();
+            hitcByteData.AddRange(sounds.SelectMany(x => x));
+            hitcByteData.AddRange(actions.SelectMany(x => x));
+            hitcByteData.AddRange(events.SelectMany(x => x));
+
+            memStream.Write(ByteParsers.UInt32.EncodeValue((uint)hitcByteData.Count(), out _));// Size
+            memStream.Write(ByteParsers.UInt32.EncodeValue((uint)hircCount, out _));// object count
+            memStream.Write(hitcByteData.ToArray());
+
+            // Convert to output and parse for sanity
+            var bnkPackFile = new PackFile("TestFile.bnk", new MemorySource(memStream.ToArray()));
+            var result = Bnkparser.Parse(bnkPackFile, "test\\TestFile.bnk"); ;
+            return bnkPackFile;
         }
 
-        byte[] CompileHeader(AudioProjectXml projectFile, uint sizeOfObjects, string bnkName)
+        byte[] CompileHeader(AudioProjectXml projectFile, string bnkName)
         {
-            var sizeOfHeader = 7 * 4;
             var header = new BkhdHeader()
             {
-                Size = (uint)(sizeOfObjects + sizeOfHeader),
+                Size = 0x18,
                 dwBankGeneratorVersion = 0x80000088,
                 dwSoundBankID = ConvertStringToWWiseId(bnkName),
                 dwLanguageID = 393239870,
@@ -75,10 +99,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
                 padding = 0x04,
             };
 
-            header.GetAsByteArray();
-
-
-            return new byte[] { };
+            return header.GetAsByteArray();
         }
 
         private byte[] CompileGameSound(GameSound inputSound)
@@ -96,7 +117,8 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
                 new CAkEvent_v136.Action(){ ActionId = ConvertStringToWWiseId(inputEvent.Action)}
             };
 
-            return wwiseEvent.GetAsByteArray();
+            var byteArray =  wwiseEvent.GetAsByteArray();
+            return byteArray;
         }
 
         byte[] CompileAction(Action inputAction, string bnkName)
@@ -113,9 +135,9 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             return wwiseAction.GetAsByteArray();
         }
 
-        void BuildDat(AudioProjectXml projectFile)
-        { 
-        
+        PackFile BuildDat(AudioProjectXml projectFile)
+        {
+            return null;
         }
 
         private void BuildNameLookUpFile(AudioProjectXml projectFile)

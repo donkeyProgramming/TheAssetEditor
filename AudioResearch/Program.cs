@@ -28,9 +28,11 @@ namespace AudioResearch
             Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
             GameInformationFactory.Create();
             var pfs = GetPackFileService(skipLoadingWemFiles:false);
+            var newPackFile = pfs.CreateNewPackFileContainer("CustomPackFile", PackFileCAType.MOD);
+            pfs.SetEditablePack(newPackFile);
 
             // Compile some bnkFiles
-            //BnkCompilerTest.Run(@"Data\SimpleBnkProject.bnk.xml", pfs);
+            BnkCompilerTest.Run(@"Data\SimpleBnkProject.bnk.xml", pfs);
 
             // Load all game data
             WwiseDataLoader builder = new WwiseDataLoader();
