@@ -2,6 +2,7 @@
 using CommonControls.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -33,6 +34,22 @@ namespace CommonControls.Common
 
             removedFiles = tempRemoveFiles.ToArray();
             return fileList;
+        }
+
+        public static string SaveFile(PackFile file, string path)
+        {
+            var dirPath = Path.GetDirectoryName(path);
+            DirectoryHelper.EnsureCreated(dirPath);
+            var content = file.DataSource.ReadData();
+            using var filestream = File.Create(path);
+            filestream.Write(content);
+            return path;
+        }
+
+        public static string SaveFileToTempDir(PackFile file)
+        {
+            var exportPath = DirectoryHelper.Temp + "\\" + file.Name;
+            return SaveFile(file, exportPath);
         }
     }
 }
