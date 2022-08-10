@@ -18,7 +18,7 @@ namespace CommonControls.FileTypes.Sound.WWise
     {
         ILogger _logger = Logging.Create<HircItem>();
 
-        public static readonly uint HircHeaderSize = 5;
+        public static readonly uint HircHeaderSize = 4; // 2x uint. Type is not included for some reason
         public string OwnerFile { get; set; }
         public uint IndexInFile { get; set; }
         public bool HasError { get; set; } = true;
@@ -40,10 +40,6 @@ namespace CommonControls.FileTypes.Sound.WWise
                 CreateSpesificData(chunk);
                 var currentIndex = chunk.Index;
                 var computedIndex = (int)(objectStartIndex + 5 + Size);
-                
-                // Can run this check as Actions are not fully implemented
-                //if(currentIndex != computedIndex)
-                //    throw new Exception($" {currentIndex - computedIndex} bytes left while parsing");
 
                 chunk.Index = computedIndex;
                 HasError = false;      
@@ -51,24 +47,23 @@ namespace CommonControls.FileTypes.Sound.WWise
             catch (Exception e)
             {
                 _logger.Here().Error("Failed to parse object - " + e.Message);
-                var jsonStr = JsonConvert.SerializeObject(this, Formatting.Indented);
-                _logger.Here().Error("\n" + "\n" + Type + jsonStr);
                 throw;
             }
         }
 
-        protected MemoryStream WriteHeader(uint expectedSize)
+        protected MemoryStream WriteHeader()
         {
             var memStream = new MemoryStream();
             memStream.Write(ByteParsers.Byte.EncodeValue((byte)Type, out _));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(expectedSize, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(Size, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(Id, out _));
 
             return memStream;
         }
 
         protected abstract void CreateSpesificData(ByteChunk chunk);
-
+        public abstract void ComputeSize();
+        public abstract byte[] GetAsByteArray();
     }
 
     public enum HircType : byte

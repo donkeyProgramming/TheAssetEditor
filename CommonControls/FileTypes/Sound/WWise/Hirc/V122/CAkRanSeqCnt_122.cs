@@ -60,6 +60,9 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V122
 
         public override uint GetParentId() => NodeBaseParams.DirectParentID;
         public override List<uint> GetChildren() => AkPlaylist.Select(x => x.PlayId).ToList();
+
+        public override void ComputeSize() => throw new NotImplementedException();
+        public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
 
 

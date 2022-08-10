@@ -24,7 +24,7 @@ namespace CommonControls.Editors.AudioEditor
         {
             ExtenededSoundDataBase masterDb = new ExtenededSoundDataBase();
             foreach (var db in soundDatabases)
-                masterDb.AddHircItems(db.Hircs);
+                masterDb.AddHircItems(db.HircChuck.Hircs);
             return masterDb;
         }
 
@@ -124,9 +124,9 @@ namespace CommonControls.Editors.AudioEditor
                 try
                 {
                     var soundDb = Bnkparser.Parse(bnkFile, name);
-                    PrintHircList(soundDb.Hircs, name);
+                    PrintHircList(soundDb.HircChuck.Hircs, name);
 
-                    if (soundDb.Hircs.Count(y => (y is CAkUnknown) == true || y.HasError) != 0)
+                    if (soundDb.HircChuck.Hircs.Count(y => (y is CAkUnknown) == true || y.HasError) != 0)
                         banksWithUnknowns.Add(name);
 
                     globalSoundDatabase.Add(name, soundDb);
@@ -143,7 +143,7 @@ namespace CommonControls.Editors.AudioEditor
             if (failedBnks.Any())
                 _logger.Here().Error($"{failedBnks.Count} banks failed: {string.Join("\n", failedBnks)}");
 
-            var allHircs = globalSoundDatabase.SelectMany(x => x.Value.Hircs);
+            var allHircs = globalSoundDatabase.SelectMany(x => x.Value.HircChuck.Hircs);
             PrintHircList(allHircs, "All");
 
             return globalSoundDatabase.Select(x => x.Value).ToList();

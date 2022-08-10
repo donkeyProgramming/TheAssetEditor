@@ -188,12 +188,21 @@ namespace Filetypes.ByteParsing
             return output;
         }
 
-
         public ByteChunk CreateSub(int size)
         {
             var data = ReadBytes(size);
             return new ByteChunk(data);
         }
+
+
+        public ByteChunk PeakChunk(int size)
+        {
+            var currentIndex = _currentIndex;
+            var chunk = CreateSub(size);
+            _currentIndex = currentIndex;
+            return chunk;
+        }
+
         public string ReadFixedLength(int length) => ReadFixedLengthString(ByteParsers.String, length);
         public string ReadZeroTerminatedStr() => ReadZeroTerminatedString(ByteParsers.String);
 

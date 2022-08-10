@@ -19,6 +19,9 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
 
         public uint GetParentId() => NodeBaseParams.DirectParentID;
         public uint GetSourceId() => AkBankSourceData.akMediaInformation.SourceId;
+
+        public override void ComputeSize() => throw new NotImplementedException();
+        public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
 
     public class AkBankSourceData

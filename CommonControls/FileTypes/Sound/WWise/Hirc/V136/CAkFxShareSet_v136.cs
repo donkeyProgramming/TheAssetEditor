@@ -35,7 +35,9 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             var numValues = chunk.ReadShort();
             for (int i = 0; i < numValues; i++)
                 propertyValuesList.Add(PluginPropertyValue.Create(chunk));
-
         }
+
+        public override void ComputeSize() => throw new NotImplementedException();
+        public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using CommonControls.FileTypes.Sound.WWise.Hirc;
 using Filetypes.ByteParsing;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -25,5 +26,8 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V122
         {
             return Actions.Select(x => x.ActionId).ToList();
         }
+
+        public override void ComputeSize() => throw new NotImplementedException();
+        public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
 }

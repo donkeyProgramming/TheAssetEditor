@@ -11,8 +11,8 @@ namespace CommonControls.FileTypes.Sound.WWise.Stid
 
         public void Parse(string fileName, ByteChunk chunk, SoundDataBase soundDb)
         {
-            var size = chunk.ReadUInt32();
-            chunk.Index += (int)size;
+            var chunckHeader = BnkChunkHeader.CreateFromBytes(chunk);
+            chunk.Index += (int)chunckHeader.ChunkSize;
         }
     }
 }

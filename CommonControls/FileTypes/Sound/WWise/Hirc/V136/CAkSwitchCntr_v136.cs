@@ -34,7 +34,9 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             var paramCount = chunk.ReadUInt32();
             for (int i = 0; i < paramCount; i++)
                 Parameters.Add(AkSwitchNodeParams.Create(chunk));
-
         }
+
+        public override void ComputeSize() => throw new NotImplementedException();
+        public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
 }

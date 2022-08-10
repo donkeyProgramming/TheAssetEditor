@@ -24,6 +24,9 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V122
 
             bIsContinuousValidation = chunk.ReadByte();
         }
+
+        public override void ComputeSize() => throw new NotImplementedException();
+        public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
 
     public class CAkLayer

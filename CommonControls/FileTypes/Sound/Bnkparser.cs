@@ -5,9 +5,7 @@ using CommonControls.FileTypes.Sound.WWise.Hirc;
 using CommonControls.FileTypes.Sound.WWise.Stid;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace CommonControls.FileTypes.Sound
 {
@@ -18,21 +16,40 @@ namespace CommonControls.FileTypes.Sound
         {
             var chunk = file.DataSource.ReadDataAsChunk();
 
-            var soundDb = new SoundDataBase();
+            var bnkFile = new SoundDataBase();
             var parsers = new Dictionary<string, IParser>();
             parsers["BKHD"] = new BkhdParser();
             parsers["HIRC"] = new HircParser();
             parsers["STID"] = new StidParser();
 
             while (chunk.BytesLeft != 0)
-            {
-                var cc4 = Encoding.UTF8.GetString(chunk.ReadBytes(4));
-                if (cc4 == "\0\0\0\0")
-                    cc4 = Encoding.UTF8.GetString(chunk.ReadBytes(4));
-                parsers[cc4].Parse(fullName, chunk, soundDb);
+            {    
+                var chunckHeader = BnkChunkHeader.PeakFromBytes(chunk);
+                var indexBeforeRead = chunk.Index;
+                var expectedIndexAfterRead = indexBeforeRead + BnkChunkHeader.HeaderByteSize + chunckHeader.ChunkSize;
+                parsers[chunckHeader.Tag].Parse(fullName, chunk, bnkFile);
+
+                var headerTag = chunckHeader.Tag;
+                var hircSizes = bnkFile.HircChuck.Hircs.Sum(x => x.Size);
+                var bytesRead = expectedIndexAfterRead - indexBeforeRead;
+                var expectedHircChuckSize = hircSizes + (bnkFile.HircChuck.NumHircItems * 5) + 4;
+                var areEqual = expectedHircChuckSize == chunckHeader.ChunkSize;
+
+                if (headerTag == "HIRC")
+                {
+                    if (areEqual == false)
+                        throw new Exception();
+                }
+
+                // Verify index
+                if (chunk.Index != expectedIndexAfterRead)
+                    throw new Exception("Error parsing bnk, incorrect num bytes read");
             }
 
-            return soundDb;
+            if(chunk.BytesLeft != 0)
+                throw new Exception("Error parsing bnk, bytes left");
+
+            return bnkFile;
         }
     }
 }

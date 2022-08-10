@@ -17,7 +17,7 @@ namespace AudioResearch
             {
                 // Save to disk for easy debug
                 var chunk = compiler.OutputBnkFile.DataSource.ReadDataAsChunk();
-                var outputName = projectFilePath.Replace(".bnk.xml", ".bnk");
+                var outputName = projectFilePath.Replace(".bnk.xml", ".bnk").ToLower();
                 chunk.SaveToFile($"{outputName}");
 
                 return true;

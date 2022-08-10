@@ -30,13 +30,12 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             }
         }
 
-        public byte[] GetAsByteArray()
+        public override byte[] GetAsByteArray()
         {
             if (ActionType != ActionType.Play)
                 throw new Exception("Unsuported action type");
-            var objectSize = HircHeaderSize + 4 + 1 + AkPropBundle0.ComputeSize() + AkPropBundle1.ComputeSize() + AkPlayActionParams.ComputeSize();
 
-            using var memStream = WriteHeader((uint)objectSize);
+            using var memStream = WriteHeader();
             memStream.Write(ByteParsers.UShort.EncodeValue((ushort)ActionType, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(idExt, out _));
             memStream.Write(ByteParsers.Byte.EncodeValue(idExt_4, out _));
@@ -52,6 +51,12 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 
             return byteArray;
         }
+
+        public override void ComputeSize()
+        {
+            Size = (uint)(HircHeaderSize + 4 + 1 + AkPropBundle0.ComputeSize() + AkPropBundle1.ComputeSize() + AkPlayActionParams.ComputeSize());
+        }
+
 
         public ActionType GetActionType() => ActionType;
         public uint GetChildId() => idExt;

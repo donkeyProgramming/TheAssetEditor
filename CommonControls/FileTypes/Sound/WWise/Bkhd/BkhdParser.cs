@@ -14,7 +14,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Bkhd
             var bkdh = new BkhdHeader()
             {
                 OwnerFileName = fileName,
-                Size = chunk.ReadUInt32(),
+                ChunkHeader = BnkChunkHeader.CreateFromBytes(chunk),
 
                 dwBankGeneratorVersion = chunk.ReadUInt32(),
                 dwSoundBankID = chunk.ReadUInt32(),
@@ -32,32 +32,17 @@ namespace CommonControls.FileTypes.Sound.WWise.Bkhd
 
             soundDb.Header = bkdh;
         }
-    }
 
-    public class BkhdHeader
-    {
-
-        public string OwnerFileName { get; set; }
-
-        public uint Size { get; set; }  // Not acutally part of header
-        public uint dwBankGeneratorVersion { get; set; }
-        public uint dwSoundBankID { get; set; }     // Name of the file
-        public uint dwLanguageID { get; set; }      // Enum 11 - English
-        public uint bFeedbackInBank { get; set; }
-        public uint dwProjectID { get; set; }
-        public uint padding { get; set; }
-
-
-        public byte[] GetAsByteArray()
+        public static byte[] GetAsByteArray(BkhdHeader header)
         {
             using var memStream = new MemoryStream();
-            memStream.Write(ByteParsers.UInt32.EncodeValue(Size, out _));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(dwBankGeneratorVersion, out _));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(dwSoundBankID, out _));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(dwLanguageID, out _));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(bFeedbackInBank, out _));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(dwProjectID, out _));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(padding, out _));
+            memStream.Write(BnkChunkHeader.GetAsByteArray(header.ChunkHeader));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(header.dwBankGeneratorVersion, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(header.dwSoundBankID, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(header.dwLanguageID, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(header.bFeedbackInBank, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(header.dwProjectID, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(header.padding, out _));
             var byteArray = memStream.ToArray();
 
             // Reload the object to ensure sanity

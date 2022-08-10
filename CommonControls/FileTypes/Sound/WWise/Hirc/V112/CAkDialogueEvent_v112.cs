@@ -28,7 +28,8 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
             uMode = chunk.ReadByte();
             AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth);
         }
-
+        public override void ComputeSize() => throw new NotImplementedException();
+        public override byte[] GetAsByteArray() => throw new NotImplementedException();
 
 
     }

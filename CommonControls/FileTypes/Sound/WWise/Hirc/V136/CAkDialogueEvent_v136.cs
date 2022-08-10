@@ -31,6 +31,9 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             AkPropBundle0 = AkPropBundle.Create(chunk);
             AkPropBundle1 = AkPropBundleMinMax.Create(chunk);
         }
+
+        public override void ComputeSize() => throw new NotImplementedException();
+        public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
 
 

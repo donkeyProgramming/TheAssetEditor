@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<root OutputFile="SimpelBnkProject.bnk">
+<root OutputFile="SimpleBnkProject.bnk">
 
 	<Event Id="Play_custom_ogre_unit_selected">
 		<AudioBus>Battle</AudioBus>

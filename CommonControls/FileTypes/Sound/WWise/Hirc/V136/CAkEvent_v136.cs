@@ -23,12 +23,9 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 
         public List<uint> GetActionIds() => Actions.Select(x => x.ActionId).ToList();
 
-        public byte[] GetAsByteArray()
+        public override byte[] GetAsByteArray()
         {
-            // Compute size
-            var objectSize = HircHeaderSize + 1 + 4 * Actions.Count-1;
-
-            using var memStream = WriteHeader((uint)objectSize);
+            using var memStream = WriteHeader();
             memStream.Write(ByteParsers.Byte.EncodeValue((byte)Actions.Count, out _));
             foreach(var action in Actions)
                 memStream.Write(ByteParsers.UInt32.EncodeValue(action.ActionId, out _));
@@ -41,6 +38,11 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             copyInstance.Parse(chunk);
 
             return byteArray;
+        }
+
+        public override void ComputeSize()
+        { 
+            Size = (uint)(HircHeaderSize + 1 + 4 * Actions.Count);
         }
     }
 }
