@@ -101,6 +101,13 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 
             return node;
         }
+
+        public static NodeBaseParams CreateDefault()
+        {
+            throw new NotImplementedException(); 
+            NodeBaseParams instance = new NodeBaseParams();
+            return instance;
+        }
     }
 
     public class NodeInitialParams

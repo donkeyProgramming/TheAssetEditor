@@ -54,7 +54,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 
         public override void ComputeSize()
         {
-            Size = (uint)(HircHeaderSize + 4 + 1 + AkPropBundle0.ComputeSize() + AkPropBundle1.ComputeSize() + AkPlayActionParams.ComputeSize());
+            Size = (uint)(HircHeaderSize + 2 + 4 + 1 + AkPropBundle0.ComputeSize() + AkPropBundle1.ComputeSize() + AkPlayActionParams.ComputeSize());
         }
 
 
