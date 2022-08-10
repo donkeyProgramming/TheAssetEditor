@@ -47,6 +47,7 @@ namespace CommonControls.Editors.BoneMapping
             MeshBones.RefreshFilter();
 
             ParentModelBones.SearchFilterExtended += FilterParentBones;
+            ParentModelBones.RefreshFilter();
         }
 
         void FilterMeshBones(FilterCollection<AnimatedBone> value, Regex regex)
