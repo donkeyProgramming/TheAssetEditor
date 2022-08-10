@@ -71,7 +71,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         GrowFaceSelection,
         ConvertFaceToVertexSelection,
         CopyLod0ToEveryLodSlot,
-        UpdateWh2Model
+        UpdateWh2Model_Technique1,
+        UpdateWh2Model_Technique2
     }
 
     public class MenuBarViewModel : IKeyboardHandler
@@ -168,7 +169,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _actionList[MenuActionType.OpenReRiggingTool] = new MenuAction(Tools.OpenReRiggingTool) { EnableRule = ActionEnabledRule.AtleastOneObjectSelected, ToolTip = "Open the re-rigging tool" };
             _actionList[MenuActionType.OpenPinTool] = new MenuAction(Tools.PinMeshToMesh) { EnableRule = ActionEnabledRule.Always, ToolTip = "Open the pin tool" };
             _actionList[MenuActionType.CopyLod0ToEveryLodSlot] = new MenuAction(Tools.CopyLod0ToEveryLods) { EnableRule = ActionEnabledRule.Always, ToolTip = "Copy LOD 0 to every LOD slot" };
-            _actionList[MenuActionType.UpdateWh2Model] = new MenuAction(Tools.UpdateWh2Model) { EnableRule = ActionEnabledRule.Always, ToolTip = "Convert Wh2 model to wh3 format" };
+            
+            _actionList[MenuActionType.UpdateWh2Model_Technique1] = new MenuAction(Tools.UpdateWh2Model_ConvertAdditiveBlending) { EnableRule = ActionEnabledRule.Always, ToolTip = "Convert Wh2 model to wh3 format" };
+            _actionList[MenuActionType.UpdateWh2Model_Technique1 ] = new MenuAction(Tools.UpdateWh2Model_ConvertComparativeBlending) { EnableRule = ActionEnabledRule.Always, ToolTip = "Convert Wh2 model to wh3 format" };
 
             _actionList[MenuActionType.GrowFaceSelection] = new MenuAction(Tools.ExpandFaceSelection) { EnableRule = ActionEnabledRule.FaceSelected, ToolTip = "Grow selection" };
             _actionList[MenuActionType.ConvertFaceToVertexSelection] = new MenuAction(Tools.ConvertFacesToVertex) { EnableRule = ActionEnabledRule.FaceSelected, ToolTip = "Convert selected faces to vertexes" };
@@ -200,12 +203,14 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "Reduce mesh by 10%", Action = _actionList[MenuActionType.ReduceMesh10x] });
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "Sort models by name", Action = _actionList[MenuActionType.SortModelsByName] });
             MenuItems[2].Children.Add(new ToolbarItem() { IsSeparator = true });
-            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Generat Ws Model (Wh3)", Action = _actionList[MenuActionType.GenerateWsModelForWh3] });
-            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Generat Ws Model (Wh2)", Action = _actionList[MenuActionType.GenerateWsModelForWh2] });
+            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Generate WSMODEL (WH3)", Action = _actionList[MenuActionType.GenerateWsModelForWh3] });
+            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Generate WSMODEL (WH2)", Action = _actionList[MenuActionType.GenerateWsModelForWh2] });
             MenuItems[2].Children.Add(new ToolbarItem() { IsSeparator = true });
             MenuItems[2].Children.Add(new ToolbarItem() { Name = "Copy lod 0 to every lod slot", Action = _actionList[MenuActionType.CopyLod0ToEveryLodSlot] });
             MenuItems[2].Children.Add(new ToolbarItem() { IsSeparator = true });
-            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Update Wh2=>Wh3 (Textures Experimental)", Action = _actionList[MenuActionType.UpdateWh2Model] });
+
+            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Update WH2=>WH3 (Textures Experimental)", Action = _actionList[MenuActionType.UpdateWh2Model_Technique1] });
+            MenuItems[2].Children.Add(new ToolbarItem() { Name = "Update WH2=>WH3 (Textures Experimental, new technique)", Action = _actionList[MenuActionType.UpdateWh2Model_Technique1] });
 
             MenuItems[3].Children.Add(new ToolbarItem() { Name = "Focus camera", Action = _actionList[MenuActionType.FocusSelection] });
             MenuItems[3].Children.Add(new ToolbarItem() { Name = "Reset camera", Action = _actionList[MenuActionType.ResetCamera] });
