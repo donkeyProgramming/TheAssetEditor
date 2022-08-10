@@ -16,15 +16,16 @@ using MS = Microsoft.Xna.Framework;
 namespace View3D.Services
 {
     public class Rmv2UpdaterService
-    {
-
-        public enum ConversionTechniqueEnum
+    {        
+        // TODO: maybe make nested inside a class, as there could be multiple options for generation the metal map too....
+        public enum BaseColourGenerationTechniqueEnum
         {
 
             AdditiveBlending,
             ComparativeBlending,
 
         }
+        
 
         private readonly PackFileService _pfs;
         private readonly string _outputFolder = DirectoryHelper.Temp + "\\TextureUpdater\\";
@@ -40,14 +41,14 @@ namespace View3D.Services
             DirectoryHelper.EnsureCreated(_outputFolder);
         }
 
-        public void UpdateWh2Models(string modelPath, List<Rmv2MeshNode> models, ConversionTechniqueEnum conversionTechnique, out ErrorListViewModel.ErrorList outputList)
+        public void UpdateWh2Models(string modelPath, List<Rmv2MeshNode> models, BaseColourGenerationTechniqueEnum conversionTechnique, out ErrorListViewModel.ErrorList outputList)
         {
             outputList = new ErrorListViewModel.ErrorList();
             foreach (var model in models)
                 ProcessModel(modelPath, model, conversionTechnique, outputList);
         }
 
-        private void ProcessModel(string modelPath, Rmv2MeshNode model, ConversionTechniqueEnum conversionTechnique, ErrorListViewModel.ErrorList outputList)
+        private void ProcessModel(string modelPath, Rmv2MeshNode model, BaseColourGenerationTechniqueEnum conversionTechnique, ErrorListViewModel.ErrorList outputList)
         {
             if (_tryMatchingTexturesByName)
             {
@@ -84,12 +85,12 @@ namespace View3D.Services
                     {
                         switch (conversionTechnique)
                         {
-                            case ConversionTechniqueEnum.AdditiveBlending:
-                                ConvertAdditiveBlending(textureDictionary, modelPath, model, outputList);
+                            case BaseColourGenerationTechniqueEnum.AdditiveBlending:
+                                ConvertTextureAdditiveBlending(textureDictionary, modelPath, model, outputList);
                                 break;
 
-                            case ConversionTechniqueEnum.ComparativeBlending:
-                                ConvertUsingcomparativeBlending(textureDictionary, modelPath, model, outputList);
+                            case BaseColourGenerationTechniqueEnum.ComparativeBlending:
+                                ConvertTexturesUsingComparativeBlending(textureDictionary, modelPath, model, outputList);
                                 break;
                         }
 
@@ -173,21 +174,22 @@ namespace View3D.Services
         }
 
 
-
-
+        /// <summary>
+        /// Get per-pixel metalness, from simple "rules of thumb" (Heuristics)
+        /// </summary>
         private static float GetMetalNess(MS::Vector4 specularPixel, MS::Vector4 diffusePixel)
         {
-            // calculate luminosity
+            // calculate luminosity, to have a scalars to use in comparisons
             float luminosity_Specular = ColorHelper.GetPixelLuminosity(specularPixel);
             float luminosity_Diffuse = ColorHelper.GetPixelLuminosity(diffusePixel);
-
 
             // "rules" (heuristic) for creating metal map
             // TODO: improve, as it in some situations it doesn't look "pefect"
             // TODO: possibly include 'smoothness' to detetimne metalicity also
             if (luminosity_Specular > 0.3f)
+            {
                 return 1.0f;
-
+            }               
 
 
             if (luminosity_Diffuse < 0.1f)
@@ -195,36 +197,28 @@ namespace View3D.Services
                 return 1.0f;
             }
 
+            // TODO: maybe re-enable, could be useful
             //if (specularPixel.X == specularPixel.Y && specularPixel.Y == specularPixel.Z)
             //  return 0.0f;
 
             if (luminosity_Specular < 0.1)
+            {
                 return 0.0f;
+            }
+
 
             if (Math.Abs(luminosity_Diffuse - luminosity_Specular) < 0.15)
+            {
                 return 0.0f;
-
+            }
 
             return 0.0f;
         }
 
-
-
-        static private MS::Vector4 PowVec4(MS::Vector4 v, float e)
-        {
-            return new MS::Vector4(
-                (float)Math.Pow(v.X, e),
-                (float)Math.Pow(v.Y, e),
-                (float)Math.Pow(v.Z, e),
-                (float)Math.Pow(v.W, e)
-
-            );
-        }
-                
-        private bool ConvertAdditiveBlending(Dictionary<TextureType, Bitmap> textureDictionary, string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
+                        
+        private bool ConvertTextureAdditiveBlending(Dictionary<TextureType, Bitmap> textureDictionary, string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
         {
             var inputDiffuseTex = textureDictionary[TextureType.Diffuse];
-
             var inputSpecularTex = textureDictionary[TextureType.Specular];
             var inputGlosMapTex = textureDictionary[TextureType.Gloss];
 
@@ -244,27 +238,27 @@ namespace View3D.Services
                     var alphaDiffuse = diffuseColorFloat.W;
 
                     // Additive blending of specular and diffuse to get base_colour 
-                    // might not always produce good results
+                    // might not always produce good results, EDIT: didn't!
                     var baseColorFloat = MS::Vector4.Clamp(
                             diffuseColorFloat + spcularColorFloat,
                             new MS::Vector4(0.0f, 0.0f, 0.0f, 0.0f),
                             new MS::Vector4(1.0f, 1.0f, 1.0f, 1.0f)
                         );
 
-                    baseColorFloat = PowVec4(baseColorFloat, 1.0f / 2.2f);
+                    baseColorFloat = ColorHelper.PowVec4(baseColorFloat, 1.0f / 2.2f);
                     baseColorFloat.W = alphaDiffuse;
 
                     outBaseColourTex.SetPixel(x, y, ColorHelper.Vector4ToColor(baseColorFloat));
 
                     var metalness = GetMetalNess(spcularColorFloat, diffuseColorFloat);
+
                     outMaterialMapTex.SetPixel(x, y,
                         ColorHelper.Vector4ToColor(new MS::Vector4(metalness, roughness, 0.0f, 1.0f)));
-
                     
                 }
             }
 
-            // do the replacement ops
+            // Do the texture replacement operations
             var packFilePathBaseColor = model.GetTextures()[TextureType.Diffuse].Replace("_diffuse", "_base_colour");
             var packFilePath_MaterialMap = model.GetTextures()[TextureType.Gloss].Replace("_gloss_map", "_material_map");
 
@@ -279,6 +273,9 @@ namespace View3D.Services
             return result;
         }
 
+        /// <summary>
+        /// Obtain WH3 roughness from WH2 gloss (smoothness)
+        /// </summary>
         private static float GetRoughnessFromPixel(Bitmap inputGlosMapTex, int y, int x)
         {
             const float smooth_gamma_scale = 1.0f/0.90f; // rough const test roughness adjuster value
@@ -292,7 +289,7 @@ namespace View3D.Services
 
         }
                 
-        private bool ConvertUsingcomparativeBlending(Dictionary<TextureType, Bitmap> textureDictionary, string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
+        private bool ConvertTexturesUsingComparativeBlending(Dictionary<TextureType, Bitmap> textureDictionary, string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
         {   
             var inputDiffuseTex = textureDictionary[TextureType.Diffuse];
             var inputSpecularTex = textureDictionary[TextureType.Specular];
@@ -324,11 +321,13 @@ namespace View3D.Services
 
                     // Taking the pixel from spec or gloss, based on which is brightest (luminosioty),
                     // with a slight adjustment, to include a tiny bit more diffuse
-                    // this MIGHT work in most cases:                   
-                    var baseColorPixelFloat = (luminosity_Specular - 0.07 >= luminosity_Diffuse) ? specularPixelFloat : diffusePixelFloat;
+                    // this MIGHT work in most cases:               
+                    const float specular_threshold_offet = 0.07f;
+                    var baseColorPixelFloat = 
+                        (luminosity_Specular - specular_threshold_offet >= luminosity_Diffuse) ? specularPixelFloat : diffusePixelFloat;
                                         
                     // adjust base_colour brightness
-                    const float brightNess = 1.3f; // rough const test pre-gamma brightness adjusted
+                    const float brightNess = 1.3f; // rough const test pre-gamma brightness adjusted (evil:))
                     baseColorPixelFloat = ColorHelper.linear_to_gamma_accurate(baseColorPixelFloat * brightNess);
                     baseColorPixelFloat.W = alphaDiffuse; // store the alpha value read from the diffuse
 
@@ -420,6 +419,9 @@ namespace View3D.Services
 
         static class ColorHelper
         {
+            /// <summary>
+            /// roughly equilvant to 'x2 = pow(x1, 1/2.2)', just much more precise color-space-wise
+            /// </summary>
             public static float gamma_accurate_component(float linear_val)
             {
                 const float srgb_gamma_ramp_inflection_point = 0.0031308f;
@@ -436,6 +438,9 @@ namespace View3D.Services
                 }
             }
 
+            /// <summary>
+            /// roughly equilvant to 'x2 = power(x1, 2.2)', just much more precise color-space-wise
+            /// </summary>
             public static float linear_accurate_component(float srgb_val)
             {
                 const float inflection_point = 0.04045f;
@@ -451,10 +456,30 @@ namespace View3D.Services
                 }
             }
 
+            /// <summary>
+            /// Does per component "pow" on a Vector4
+            /// </summary>
+            static public MS::Vector4 PowVec4(MS::Vector4 v, float e)
+            {
+                return new MS::Vector4(
+                    (float)Math.Pow(v.X, e),
+                    (float)Math.Pow(v.Y, e),
+                    (float)Math.Pow(v.Z, e),
+                    (float)Math.Pow(v.W, e)
+                );
+            }
+
+            /// <summary>
+            /// Gamma to linear for Vector4, does not affect alpha
+            /// </summary>
             public static MS::Vector4 gamaa_to_linear_accurate(MS::Vector4 fGamma)
             {
-                return new MS::Vector4(linear_accurate_component(fGamma.X), linear_accurate_component(fGamma.Y), linear_accurate_component(fGamma.Z), 1.0f);
+                return new MS::Vector4(linear_accurate_component(fGamma.X), linear_accurate_component(fGamma.Y), linear_accurate_component(fGamma.Z), fGamma.W);
             }
+
+            /// <summary>
+            /// Linear to Gamma for Vector4, does not affect alpha
+            /// </summary>
             public static MS::Vector4 linear_to_gamma_accurate(MS::Vector4 _vPixel)
             {
 
@@ -462,11 +487,13 @@ namespace View3D.Services
                     gamma_accurate_component(_vPixel.X),
                     gamma_accurate_component(_vPixel.Y),
                     gamma_accurate_component(_vPixel.Z),
-                    1.0f
+                    _vPixel.W
                );
-
             }
 
+            /// <summary>
+            /// Converts RGBA8888 system.draw.Color to UNORM float4 (Vector4)
+            /// </summary>
             public static MS::Vector4 ColorToVector4(Color c)
             {
                 return new MS::Vector4(
@@ -478,6 +505,9 @@ namespace View3D.Services
                 );
             }
 
+            /// <summary>
+            /// Converts UNORM float4 (Vector4) to RGBA8888 system.draw.Color 
+            /// </summary>
             public static Color Vector4ToColor(MS::Vector4 v)
             {
                 return Color.FromArgb(
@@ -490,11 +520,13 @@ namespace View3D.Services
 
             }
 
+            /// <summary>
+            /// Get pixel luminosity from a Vector4 (in UNORM float32_4)
+            /// </summary>            
             public static float GetPixelLuminosity(MS::Vector4 vColor)
             {
                 return (0.2126f * vColor.X + 0.7152f * vColor.Y + 0.0722f * vColor.Z);
             }
-
 
         }
 

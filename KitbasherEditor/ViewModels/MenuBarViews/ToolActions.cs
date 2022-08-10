@@ -293,15 +293,15 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         internal void UpdateWh2Model_ConvertAdditiveBlending()
         {
-            UpdateWh2ModelAndConvert(Rmv2UpdaterService.ConversionTechniqueEnum.AdditiveBlending);
+            UpdateWh2ModelAndConvert(Rmv2UpdaterService.BaseColourGenerationTechniqueEnum.AdditiveBlending);
         }
 
         internal void UpdateWh2Model_ConvertComparativeBlending()
         {
-            UpdateWh2ModelAndConvert(Rmv2UpdaterService.ConversionTechniqueEnum.ComparativeBlending);
+            UpdateWh2ModelAndConvert(Rmv2UpdaterService.BaseColourGenerationTechniqueEnum.ComparativeBlending);
         }
 
-        internal void UpdateWh2ModelAndConvert(Rmv2UpdaterService.ConversionTechniqueEnum conversionTechnique)
+        internal void UpdateWh2ModelAndConvert(Rmv2UpdaterService.BaseColourGenerationTechniqueEnum conversionTechnique)
         {
             var res = MessageBox.Show("Are you sure you want to update the model? This cannot be undone!", "Attention", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (res != MessageBoxResult.Yes)
