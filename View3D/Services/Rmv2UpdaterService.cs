@@ -20,13 +20,10 @@ namespace View3D.Services
         // TODO: maybe make nested inside a class, as there could be multiple options for generation the metal map too....
         public enum BaseColourGenerationTechniqueEnum
         {
-
             AdditiveBlending,
             ComparativeBlending,
-
         }
         
-
         private readonly PackFileService _pfs;
         private readonly string _outputFolder = DirectoryHelper.Temp + "\\TextureUpdater\\";
         private readonly bool _autoGenerateMissingTextures = false;
@@ -108,7 +105,6 @@ namespace View3D.Services
                 outputList.Error($"{modelPath}-{model.Name}", $"Failed to update to wh3 format");
         }
 
-
         private bool MatchMissingTexturesByName(string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
         {
             var normalOK = UpdateTextureBasedOnName(model, TextureType.Normal, TextureType.Normal, "_normal", "_normal", modelPath, outputList);
@@ -164,7 +160,6 @@ namespace View3D.Services
             return false;
         }
 
-
         private static Bitmap BitMapFromTextureType(TextureType textureType, Dictionary<TextureType, Bitmap> textureDictionary)
         {
             var tempBitmap = textureDictionary[textureType];
@@ -191,7 +186,6 @@ namespace View3D.Services
                 return 1.0f;
             }               
 
-
             if (luminosity_Diffuse < 0.1f)
             {
                 return 1.0f;
@@ -205,7 +199,6 @@ namespace View3D.Services
             {
                 return 0.0f;
             }
-
 
             if (Math.Abs(luminosity_Diffuse - luminosity_Specular) < 0.15)
             {
