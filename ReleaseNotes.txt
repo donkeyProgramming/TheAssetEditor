@@ -290,7 +290,9 @@ V0.41
 	
 	Dump all the shader shit to file 
 	Check for big letters when merging textures and // vs \\ 
-	
+	Create anim.meta from superview if its missing 
+	bugfixes
+	splice in meta chos
 
 V0.40
 ----------------------------

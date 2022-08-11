@@ -2,6 +2,7 @@
 using CommonControls.FileTypes.Sound.WWise.Hirc;
 using Filetypes.ByteParsing;
 using System;
+using System.IO;
 
 namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 {
@@ -19,8 +20,24 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
         public uint GetParentId() => NodeBaseParams.DirectParentID;
         public uint GetSourceId() => AkBankSourceData.akMediaInformation.SourceId;
 
-        public override void ComputeSize() => throw new NotImplementedException();
-        public override byte[] GetAsByteArray() => throw new NotImplementedException();
+        public override void ComputeSize()
+        {
+            Size = BnkChunkHeader.HeaderByteSize + AkBankSourceData.GetSize() + NodeBaseParams.GetSize() - 4;
+        }
+
+        public override byte[] GetAsByteArray()
+        {
+            using var memStream = WriteHeader();
+            memStream.Write(AkBankSourceData.GetAsByteArray());
+            memStream.Write(NodeBaseParams.GetAsByteArray());
+            var byteArray = memStream.ToArray();
+
+            // Reload the object to ensure sanity
+            var copyInstance = new CAkSound_v136();
+            copyInstance.Parse(new ByteChunk(byteArray));
+
+            return byteArray;
+        }
     }
 
     public class AkBankSourceData
@@ -55,6 +72,21 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 
             return output;
         }
+
+        public uint GetSize() => 14;
+        
+        public byte[] GetAsByteArray()
+        {
+            using var memStream = new MemoryStream();
+            memStream.Write(ByteParsers.UInt32.EncodeValue(PluginId, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)StreamType, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(akMediaInformation.SourceId, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(akMediaInformation.uInMemoryMediaSize, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue(akMediaInformation.uSourceBits, out _));
+            return memStream.ToArray();
+        }
+
+
     }
 
     public class AkMediaInformation

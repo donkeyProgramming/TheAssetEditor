@@ -213,6 +213,8 @@ namespace CommonControls.FileTypes.Sound.WWise
     {
         Volume = 0x00,
         Pitch = 0x02,
+        LPF = 0x03,
+        HPF = 0x04,
         MakeUpGain = 0x06,
         StatePropNum_Priority = 0x07,
         PriorityDistanceOffset = 0x08,

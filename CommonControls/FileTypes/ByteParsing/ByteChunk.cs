@@ -11,11 +11,23 @@ namespace Filetypes.ByteParsing
     public class ByteChunk
     {
         byte[] _buffer;
-        int _currentIndex;
+
+
+        int _currentIndex = 0;
+        public int CurrentIndex
+        {
+            get => _currentIndex; 
+            private set 
+            {
+                _currentIndex = value;
+                if (_currentIndex < 0)
+                    throw new IndexOutOfRangeException();
+            }
+        }
         public ByteChunk(byte[] buffer, int index = 0)
         {
             _buffer = buffer;
-            _currentIndex = index;
+            CurrentIndex = index;
         }
 
         public void Reset()
@@ -38,26 +50,26 @@ namespace Filetypes.ByteParsing
             return new ByteChunk(bytes);
         }
 
-        public int BytesLeft => _buffer.Length - _currentIndex;
-        public int Index { get { return _currentIndex; } set { _currentIndex = value;} }
+        public int BytesLeft => _buffer.Length - CurrentIndex;
+        public int Index { get { return CurrentIndex; } set { CurrentIndex = value;} }
 
         public byte[] Buffer { get { return _buffer; } }
 
         T Read<T>(SpesificByteParser<T> parser)
         {
-            if (!parser.TryDecodeValue(_buffer, _currentIndex, out T value, out int bytesRead, out string error))
+            if (!parser.TryDecodeValue(_buffer, CurrentIndex, out T value, out int bytesRead, out string error))
                 throw new Exception("Unable to parse :" + error);
 
-            _currentIndex += bytesRead;
+            CurrentIndex += bytesRead;
             return value;
         }
 
         string ReadFixedLengthString(StringParser parser, int length)
         {
-            if (!parser.TryDecodeFixedLength(_buffer, _currentIndex, length, out var value, out int bytesRead))
+            if (!parser.TryDecodeFixedLength(_buffer, CurrentIndex, length, out var value, out int bytesRead))
                 throw new Exception("Unable to parse");
 
-            _currentIndex += bytesRead;
+            CurrentIndex += bytesRead;
             return value;
         }
 
@@ -65,17 +77,17 @@ namespace Filetypes.ByteParsing
 
         string ReadZeroTerminatedString(StringParser parser)
         {
-            if (!parser.TryDecodeZeroTerminatedString(_buffer, _currentIndex, out var value, out int bytesRead))
+            if (!parser.TryDecodeZeroTerminatedString(_buffer, CurrentIndex, out var value, out int bytesRead))
                 throw new Exception("Unable to parse");
 
-            _currentIndex += bytesRead;
+            CurrentIndex += bytesRead;
             return value;
             
         }
 
         T Peak<T>(SpesificByteParser<T> parser)
         {
-            if (!parser.TryDecodeValue(_buffer, _currentIndex, out T value, out int bytesRead, out string error))
+            if (!parser.TryDecodeValue(_buffer, CurrentIndex, out T value, out int bytesRead, out string error))
                 throw new Exception("Unable to parse :" + error);
 
             return value;
@@ -83,25 +95,25 @@ namespace Filetypes.ByteParsing
 
         public byte[] ReadBytesUntil(int index)
         {
-            var length = index - _currentIndex;
+            var length = index - CurrentIndex;
             byte[] destination = new byte[length];
             Array.Copy(_buffer, index, destination, 0, length);
-            _currentIndex += length;
+            CurrentIndex += length;
             return destination;
         }
 
         public byte[] ReadBytes(int count)
         {
-            var bytes = GetBytesFromBuffer(_currentIndex, count);
-            _currentIndex += count;
+            var bytes = GetBytesFromBuffer(CurrentIndex, count);
+            CurrentIndex += count;
             return bytes;
         }
 
         public sbyte[] ReadSBytes(int count)
         {
             var destination = new sbyte[count];
-            Array.Copy(_buffer, _currentIndex, destination, 0, count);
-            _currentIndex += count;
+            Array.Copy(_buffer, CurrentIndex, destination, 0, count);
+            CurrentIndex += count;
             return destination;
         }
 
@@ -115,23 +127,23 @@ namespace Filetypes.ByteParsing
 
         public void Advance(int byteCount)
         {
-            _currentIndex += byteCount;
+            CurrentIndex += byteCount;
         }
 
         public void Read(IByteParser parser, out string value, out string error)
         {
-            if (!parser.TryDecode(_buffer, _currentIndex, out  value, out int bytesRead, out error))
+            if (!parser.TryDecode(_buffer, CurrentIndex, out  value, out int bytesRead, out error))
                 throw new Exception("Unable to parse :" + error);
 
-            _currentIndex += bytesRead;
+            CurrentIndex += bytesRead;
         }
 
         public void Read<T>(SpesificByteParser<T> parser, out T value, out string error)
         {
-            if (!parser.TryDecodeValue(_buffer, _currentIndex, out value, out int bytesRead, out error))
+            if (!parser.TryDecodeValue(_buffer, CurrentIndex, out value, out int bytesRead, out error))
                 throw new Exception("Unable to parse :" + error);
 
-            _currentIndex += bytesRead;
+            CurrentIndex += bytesRead;
         }
 
         public string ReadStringAscii() => Read(ByteParsers.StringAscii);
@@ -158,7 +170,7 @@ namespace Filetypes.ByteParsing
             var output = new List<UnknownParseResult.Item>();
             foreach (var parser in parsers)
             {
-                var result = parser.TryDecode(_buffer, _currentIndex, out string value, out int bytesRead, out string error);
+                var result = parser.TryDecode(_buffer, CurrentIndex, out string value, out int bytesRead, out string error);
                 var item = new UnknownParseResult.Item()
                 { 
                     Result = result,
@@ -175,7 +187,7 @@ namespace Filetypes.ByteParsing
 
         public UnknownParseResult[] PeakUnknown(int numBytes)
         {
-            var index = _currentIndex;
+            var index = CurrentIndex;
 
             var output = new UnknownParseResult[numBytes];
             for (int i = 0; i < numBytes; i++)
@@ -184,7 +196,7 @@ namespace Filetypes.ByteParsing
                 ReadByte();
             }
 
-            _currentIndex = index;
+            CurrentIndex = index;
             return output;
         }
 
@@ -197,9 +209,9 @@ namespace Filetypes.ByteParsing
 
         public ByteChunk PeakChunk(int size)
         {
-            var currentIndex = _currentIndex;
+            var currentIndex = CurrentIndex;
             var chunk = CreateSub(size);
-            _currentIndex = currentIndex;
+            CurrentIndex = currentIndex;
             return chunk;
         }
 
@@ -284,7 +296,7 @@ namespace Filetypes.ByteParsing
 
         public override string ToString()
         {
-            return $"ByteParser[Size = {_buffer?.Length}, index = {_currentIndex}]";
+            return $"ByteParser[Size = {_buffer?.Length}, index = {CurrentIndex}]";
         }
     }
 }

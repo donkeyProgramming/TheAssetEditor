@@ -79,6 +79,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             // Convert to output and parse for sanity
             var bnkPackFile = new PackFile("TestFile.bnk", new MemorySource(bytes));
             var result = Bnkparser.Parse(bnkPackFile, "test\\TestFile.bnk"); 
+
             return bnkPackFile;
         }
 
@@ -109,7 +110,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
                 Type = HircType.Sound,
                 AkBankSourceData = new AkBankSourceData()
                 {
-                    PluginId = 0x0004000,
+                    PluginId = 0x0004001,
                     StreamType = SourceType.Straming,
                     akMediaInformation = new AkMediaInformation()
                     {

@@ -1,6 +1,7 @@
 ﻿using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
@@ -62,8 +63,6 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
     public class NodeBaseParams
     {
         public NodeInitialFxParams NodeInitialFxParams { get; set; }
-
-
         public byte bOverrideAttachmentParams { get; set; }
         public uint OverrideBusId { get; set; }
         public uint DirectParentID { get; set; }
@@ -104,9 +103,104 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 
         public static NodeBaseParams CreateDefault()
         {
-            throw new NotImplementedException(); 
             NodeBaseParams instance = new NodeBaseParams();
+            instance.NodeInitialFxParams = new NodeInitialFxParams()
+            {
+                bIsOverrideParentFX = 0,
+                FxList = new List<FXChunk>(),
+                bitsFXBypass = 0,
+            };
+            instance.bOverrideAttachmentParams = 0;
+            instance.OverrideBusId = 0;
+            instance.DirectParentID = 0;
+            instance.byBitVector = 0;
+            instance.NodeInitialParams = new NodeInitialParams()
+            {
+                AkPropBundle0 = new AkPropBundle()
+                {
+                    Values = new List<AkPropBundle.AkPropBundleInstance>(),
+                },
+                AkPropBundle1 = new AkPropBundleMinMax()
+                {
+                    Values = new List<AkPropBundleMinMax.AkPropBundleInstance>()
+                    {
+                        new AkPropBundleMinMax.AkPropBundleInstance()
+                        {
+                            Type = AkPropBundleType.Volume,
+                            Max = 0,
+                            Min = -3
+                        },
+                        new AkPropBundleMinMax.AkPropBundleInstance()
+                        {
+                            Type = AkPropBundleType.Pitch,
+                            Max = 100,
+                            Min = -100
+                        },
+                        new AkPropBundleMinMax.AkPropBundleInstance()
+                        {
+                            Type = AkPropBundleType.LPF,
+                            Max = 0,
+                            Min = 15
+                        },
+                        new AkPropBundleMinMax.AkPropBundleInstance()
+                        {
+                            Type = AkPropBundleType.HPF,
+                            Max = 30,
+                            Min = 0
+                        },
+                    },
+                }
+            };
+
+            instance.PositioningParams = new PositioningParams()
+            {
+                uBitsPositioning = 0x00
+            };
+            instance.AuxParams = new AuxParams()
+            {
+                byBitVector = 0,
+                reflectionsAuxBus = 0
+            };
+            instance.AdvSettingsParams = new AdvSettingsParams()
+            {
+                byBitVector = 0x10,
+                eVirtualQueueBehavior = 0x01,
+                u16MaxNumInstance = 0,
+                eBelowThresholdBehavior = 0x01,
+                byBitVector2 = 0x04
+            };
+            instance.StateChunk = new StateChunk();
+            instance.InitialRTPC = new InitialRTPC();
             return instance;
+        }
+
+        public byte[] GetAsByteArray()
+        {
+            using var memStream = new MemoryStream();
+            memStream.Write(NodeInitialFxParams.GetAsByteArray());
+
+            memStream.Write(ByteParsers.Byte.EncodeValue(bOverrideAttachmentParams, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(OverrideBusId, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(DirectParentID, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue(byBitVector, out _));
+
+            memStream.Write(NodeInitialParams.GetAsByteArray());
+            memStream.Write(PositioningParams.GetAsByteArray());
+            memStream.Write(AuxParams.GetAsByteArray());
+            memStream.Write(AdvSettingsParams.GetAsByteArray());
+            memStream.Write(StateChunk.GetAsByteArray());
+            memStream.Write(InitialRTPC.GetAsByteArray());
+
+
+            var byteArray = memStream.ToArray();
+            if (byteArray.Length != GetSize())
+                throw new Exception("Invalid size");
+            return byteArray;
+        }
+
+        internal uint GetSize()
+        {
+            return NodeInitialFxParams.GetSize() + 10 + NodeInitialParams.GetSize() + PositioningParams.GetSize() + AuxParams.GetSize() + AdvSettingsParams.GetSize() + StateChunk.GetSize() + InitialRTPC.GetSize();
         }
     }
 
@@ -122,6 +216,17 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
                 AkPropBundle0 = AkPropBundle.Create(chunk),
                 AkPropBundle1 = AkPropBundleMinMax.Create(chunk),
             };
+        }
+
+
+        public uint GetSize() => AkPropBundle0.GetSize() + AkPropBundle1.GetSize();
+
+        public byte[] GetAsByteArray()
+        {
+            using var memStream = new MemoryStream();
+            memStream.Write(AkPropBundle0.GetAsBytes());
+            memStream.Write(AkPropBundle1.GetAsBytes());
+            return memStream.ToArray();
         }
     }
 
@@ -149,7 +254,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             return output;
         }
 
-        public uint ComputeSize()
+        public uint GetSize()
         {
             if (Values.Count != 0)
                 throw new NotImplementedException();
@@ -160,7 +265,11 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
         {
             if (Values.Count != 0)
                 throw new NotImplementedException();
-            return new byte[] { 0 };
+
+            var byteArray = new byte[] { 0};
+            if (byteArray.Length != GetSize())
+                throw new Exception("Invalid size");
+            return byteArray;
         }
     }
 
@@ -191,12 +300,32 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 
             return output;
         }
+
+        public uint GetSize() => 1 + (uint)(Values.Count * 9);
+
+        public byte[] GetAsBytes()
+        {
+            using var memStream = new MemoryStream();
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)Values.Count, out _));
+            foreach(var value in Values)
+                memStream.Write(ByteParsers.Byte.EncodeValue((byte)value.Type, out _));
+
+            foreach (var value in Values)
+            {
+                memStream.Write(ByteParsers.Single.EncodeValue((byte)value.Min, out _));
+                memStream.Write(ByteParsers.Single.EncodeValue((byte)value.Max, out _));
+            }
+
+            var byteArray = memStream.ToArray();
+            if (byteArray.Length != GetSize())
+                throw new Exception("Invalid size");
+            return byteArray;
+        }
     }
 
     public class NodeInitialFxParams
     {
         public byte bIsOverrideParentFX { get; set; }
-
         public byte bitsFXBypass { get; set; }
         public List<FXChunk> FxList { get; set; } = new List<FXChunk>();
 
@@ -214,6 +343,16 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             }
 
             return instance;
+        }
+
+        public uint GetSize() => 2;
+
+        public byte[] GetAsByteArray()
+        {
+            using var memStream = new MemoryStream();
+            memStream.Write(ByteParsers.Byte.EncodeValue(bIsOverrideParentFX, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue(bitsFXBypass, out _));
+            return memStream.ToArray();
         }
     }
 
@@ -251,17 +390,11 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 
         public static PositioningParams Create(ByteChunk chunk)
         {
-            //has_automation = (e3DPositionType != 1)
-
             var instance = new PositioningParams();
             instance.uBitsPositioning = chunk.ReadByte();
 
             var has_positioning = ((instance.uBitsPositioning >> 0) & 1) == 1;
             var has_3d = ((instance.uBitsPositioning >> 1) & 1) == 1;
-            if (has_positioning)
-            {
-
-            }
 
             if (has_positioning && has_3d)
             {
@@ -282,42 +415,23 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
                     var numPlayListItems = chunk.ReadUInt32();
                     for (int i = 0; i < numPlayListItems; i++)
                         instance.PlayListItems.Add(AkPathListItemOffset.Create(chunk));
-                    
-                    //var numParams = 2 ;
-                    //if (instance.ePathMode == 0x05)   //StepRandomPickNewPath
-                    //    numParams = 1;
+
                     for (int i = 0; i < numPlayListItems; i++)
                         instance.Params.Add(Ak3DAutomationParams.Create(chunk));
                 }
-
             }
 
-
-            //var bPositioningInfoOverrideParent = (instance.uBitsPositioning >> 0 & 1) == 1;
-            //var cbIs3DPositioningAvailable = (instance.uBitsPositioning >> 3 & 1) == 1;
-            //e3DPositionType = (uBitsPositioning >> 5) & 3
-            //has_automation = (e3DPositionType != 0) #(3d == 1 or 3d != 1 and 3d == 2)
-
-            //if (bPositioningInfoOverrideParent)
-            //{ 
-            //    
-            //}
-            //
-            //if (bPositioningInfoOverrideParent && cbIs3DPositioningAvailable)
-            //{
-            //    //instance.uAttenuationID = chunk.ReadUInt32();
-            //
-            //    if ((instance.uBits3d >> 0 & 1) == 0)
-            //    {
-            //        instance.ePathMode = chunk.ReadByte();
-            //        instance.TransitionTime = chunk.ReadSingle();
-            //
-            //        
-            //    }
-            //}
-            //
-
             return instance;
+        }
+
+        public uint GetSize() => 1;
+
+        public byte[] GetAsByteArray()
+        {
+            if (uBitsPositioning != 0)
+                throw new NotImplementedException();
+
+            return new byte[] { 0 };
         }
     }
 
@@ -398,6 +512,24 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 
             return instance;
         }
+
+
+        public uint GetSize() => 5;
+
+        public byte[] GetAsByteArray()
+        {
+            if (byBitVector != 0)
+                throw new NotImplementedException();
+
+            using var memStream = new MemoryStream();
+            memStream.Write(ByteParsers.Byte.EncodeValue(byBitVector, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(reflectionsAuxBus, out _));
+
+            var byteArray = memStream.ToArray();
+            if (byteArray.Length != GetSize())
+                throw new Exception("Invalid size");
+            return byteArray;
+        }
     }
 
 
@@ -423,6 +555,23 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 
             return node;
         }
+
+        public uint GetSize() => 6;
+
+        public byte[] GetAsByteArray()
+        {
+            using var memStream = new MemoryStream();
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)byBitVector, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)eVirtualQueueBehavior, out _));
+            memStream.Write(ByteParsers.UShort.EncodeValue((byte)u16MaxNumInstance, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)eBelowThresholdBehavior, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)byBitVector2, out _));
+
+            var byteArray = memStream.ToArray();
+            if (byteArray.Length != GetSize())
+                throw new Exception("Invalid size");
+            return byteArray;
+        }
     }
 
 
@@ -442,6 +591,23 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             for (int i = 0; i < numStateGroups; i++)
                 instance.StateChunks.Add(AkStateGroupChunk.Create(chunk));
             return instance;
+        }
+
+        public uint GetSize() => 2;
+
+        public byte[] GetAsByteArray()
+        {
+            if (StateChunks.Count != 0 || StateProps.Count != 0)
+                throw new NotImplementedException();
+
+            using var memStream = new MemoryStream();
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)StateChunks.Count, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)StateProps.Count, out _));
+
+            var byteArray = memStream.ToArray();
+            if (byteArray.Length != GetSize())
+                throw new Exception("Invalid size");
+            return byteArray;
         }
     }
 
@@ -492,6 +658,22 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
                 instance.RTPCList.Add(RTPC.Create(chunk));
 
             return instance;
+        }
+
+
+        public uint GetSize() => 2;
+
+        public byte[] GetAsByteArray()
+        {
+            if (RTPCList.Count != 0)
+                throw new NotImplementedException();
+
+            using var memStream = new MemoryStream();
+            memStream.Write(ByteParsers.UShort.EncodeValue((ushort)RTPCList.Count, out _));
+            var byteArray = memStream.ToArray();
+            if (byteArray.Length != GetSize())
+                throw new Exception("Invalid size");
+            return byteArray;
         }
     }
 
