@@ -50,8 +50,6 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             if (ValidateGameSounds(projectFile, ref errorList) == false)
                 return false;
 
-
-
             return true;
         }
 
@@ -99,11 +97,35 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
                     return false;
                 }
 
-                if (string.IsNullOrEmpty(action.Child))
+                if(action.ChildList == null || action.ChildList.Count == 0)
                 {
-                    errorList.Error("Action", $"{action.Child} is missing Children");
+                    errorList.Error("Action", $"{action.Id} is missing Children");
                     return false;
                 }
+
+                foreach (var child in action.ChildList)
+                {
+                    if (string.IsNullOrEmpty(child.Type))
+                    {
+                        errorList.Error("Action", $"{action.Id} contains a child missing ID");
+                        return false;
+                    }
+
+                    if (child.Type.Equals("Play", StringComparison.OrdinalIgnoreCase) == false)
+                    {
+                        errorList.Error("Action", $"{action.Id} contains a child with invalid type. Only Play supported.");
+                        return false;
+                    }
+
+                    if (string.IsNullOrEmpty(child.Text))
+                    {
+                        errorList.Error("Action", $"{action.Id} contains a child missing Key");
+                        return false;
+                    }
+
+                }
+
+               
             }
             return true;
         }
@@ -144,11 +166,14 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 
             foreach (var action in projectFile.Actions)
             {
-                var actionKey = action.Child.ToLower().Trim();
-                if (allIds.Contains(actionKey) == false)
+                foreach (var child in action.ChildList)
                 {
-                    errorList.Error("Action", $"Action {action.Id} is pointing to an invalid or unknown object {actionKey}");
-                    return false;
+                    var actionKey = child.Text.ToLower().Trim();
+                    if (allIds.Contains(actionKey) == false)
+                    {
+                        errorList.Error("Action", $"Action {action.Id} is pointing to an invalid or unknown object {actionKey}");
+                        return false;
+                    }
                 }
             }
 

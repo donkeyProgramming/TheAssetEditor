@@ -15,10 +15,11 @@ namespace AudioResearch
 
             if (errorList.Errors.Count == 0 && result)
             {
+                var project = compiler.ProjectFile;
+
                 // Save to disk for easy debug
                 var chunk = compiler.OutputBnkFile.DataSource.ReadDataAsChunk();
-                var outputName = projectFilePath.Replace(".bnk.xml", ".bnk").ToLower();
-                chunk.SaveToFile($"{outputName}");
+                chunk.SaveToFile($"Data\\{project.OutputFile}".ToLower().Trim());
 
                 return true;
             }

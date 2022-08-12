@@ -21,6 +21,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         private readonly PackFileService _pfs;
         public PackFile OutputBnkFile { get; private set; }
         public PackFile OutputDatFile { get; private set; }
+        public AudioProjectXml ProjectFile { get; private set; }
 
         public Compiler(PackFileService pfs)
         {
@@ -30,17 +31,17 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         public bool Compile(string projectAsString, out ErrorListViewModel.ErrorList errorList)
         {
             errorList = new ErrorListViewModel.ErrorList();
-            var projectFile = LoadFile(projectAsString, ref errorList);
-            if (projectFile == null)
+            ProjectFile = LoadFile(projectAsString, ref errorList);
+            if (ProjectFile == null)
                 return false;
 
-            var validationResult = AudioProjectValidator.Validate(projectFile, _pfs, ref errorList);
+            var validationResult = AudioProjectValidator.Validate(ProjectFile, _pfs, ref errorList);
             if (validationResult == false)
                 return false;
 
-            OutputBnkFile = BuildBnk(projectFile);
-            OutputDatFile = BuildDat(projectFile);
-            BuildNameLookUpFile(projectFile);
+            OutputBnkFile = BuildBnk(ProjectFile);
+            OutputDatFile = BuildDat(ProjectFile);
+            BuildNameLookUpFile(ProjectFile);
 
             return true;
         }
@@ -101,6 +102,8 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 
         private CAkSound_v136 ConvertToWWiseGameSound(GameSound inputSound)
         {
+            var filename = $"audio\\wwise\\{inputSound.Text}";
+            var file = _pfs.FindFile(filename);
             var soundIdStr = Path.GetFileNameWithoutExtension(inputSound.Text).Trim();
             var soundId = uint.Parse(soundIdStr);
 
@@ -110,12 +113,12 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
                 Type = HircType.Sound,
                 AkBankSourceData = new AkBankSourceData()
                 {
-                    PluginId = 0x0004001,
-                    StreamType = SourceType.Straming,
+                    PluginId = 0x00040001,
+                    StreamType = SourceType.Data_BNK,
                     akMediaInformation = new AkMediaInformation()
                     {
                         SourceId = soundId,
-                        uInMemoryMediaSize = 999,
+                        uInMemoryMediaSize = (uint)file.DataSource.Size,
                         uSourceBits = 0x00,
                     }
                 },
@@ -139,11 +142,14 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 
         CAkAction_v136 ConvertToWWiseAction(Action inputAction, string bnkName)
         {
+            if (inputAction.ChildList.Count != 1)
+                throw new NotImplementedException();
+
             var wwiseAction = new CAkAction_v136();
             wwiseAction.Id = ConvertStringToWWiseId(inputAction.Id);
             wwiseAction.Type = FileTypes.Sound.WWise.HircType.Action;
             wwiseAction.ActionType = FileTypes.Sound.WWise.ActionType.Play;
-            wwiseAction.idExt = ConvertStringToWWiseId(inputAction.Child);
+            wwiseAction.idExt = ConvertStringToWWiseId(inputAction.ChildList.First().Text);
 
             wwiseAction.AkPlayActionParams.byBitVector = 0x04;
             wwiseAction.AkPlayActionParams.bankId = ConvertStringToWWiseId(bnkName);
@@ -188,6 +194,8 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
                 return null;
             }
         }
+
+
         public static Stream GenerateStreamFromString(string s)
         {
             var stream = new MemoryStream();

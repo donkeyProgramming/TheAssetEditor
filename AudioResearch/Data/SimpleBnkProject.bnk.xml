@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<root OutputFile="SimpleBnkProject.bnk">
+<root OutputFile="SimpleBnkProject.bnk" OutputGame="wh3">
 
 	<Event Id="Play_custom_ogre_unit_selected">
 		<AudioBus>Battle</AudioBus>
@@ -7,7 +7,7 @@
 	</Event>
 
 	<Action Id="Action_custom_ogre_unit_selected">
-		<Child>CustomAudioFile_Medium</Child>
+		<Child Type="Play">CustomAudioFile_Medium</Child>
 	</Action>
 
 	<GameSound Id="CustomAudioFile_Medium">464995906.wem</GameSound>

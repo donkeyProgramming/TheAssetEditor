@@ -35,19 +35,15 @@
 
         <Menu Grid.ColumnSpan="3">
             <MenuItem Header="_File">
-                <MenuItem Header="Save" Click="{s:MethodBinding Save}"/>
-                <Separator/>
-                <MenuItem Header="New AnimationSet (Wh3/3K)"  Click="{s:MethodBinding CreateEmptyWarhammer3AnimSetFile}" />
-                <MenuItem Header="View Selected As Table" Click="{s:MethodBinding ViewSelectedAsTable}" Visibility="Collapsed"/>
-                <Separator/>
-                <MenuItem Header="Export animation slots (Wh3)"  Click="{s:MethodBinding ExportAnimationSlotsWh3Action}" />
-                <MenuItem Header="Export animation slots (Wh2)"  Click="{s:MethodBinding ExportAnimationSlotsWh2Action}" />
+                <MenuItem Header="Load all bnks" Click="{s:MethodBinding LoadAllBnksAction}"/>
+                <MenuItem Header="Load one bnks" Click="{s:MethodBinding BrowseBnkAction}"/>
             </MenuItem>
         </Menu>
 
 
         <DockPanel Grid.Row="1" Grid.Column="0">
             <DockPanel DockPanel.Dock="Top">
+                <Label DockPanel.Dock="Left" Content="Events:"/>
                 <ComboBox DockPanel.Dock="Top"
                           IsEditable="True"
                           IsTextSearchEnabled="true"
@@ -61,16 +57,46 @@
                         </ItemsPanelTemplate>
                     </ComboBox.ItemsPanel>
                 </ComboBox>
+                
             </DockPanel>
-            
-            
-            
+            <DockPanel DockPanel.Dock="Top">
+                <Expander DockPanel.Dock="Top" Header="Extra:">
+                    <DockPanel>
+                        <Grid DockPanel.Dock="Top">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <DockPanel Grid.Column="0">
+                                <CheckBox DockPanel.Dock="Top" Content="Show ID" IsChecked="{Binding ShowIds.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                <CheckBox DockPanel.Dock="Top" Content="Show File Name" IsChecked="{Binding ShowBnkName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                <CheckBox DockPanel.Dock="Top" Content="Use bnk name ref" IsChecked="{Binding UseBnkNameWhileParsing.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            </DockPanel>
+
+                            <DockPanel Grid.Column="1">
+                                <CheckBox DockPanel.Dock="Top" Content="Show Events" IsChecked="{Binding ShowEvents.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                <CheckBox DockPanel.Dock="Top" Content="Show Dialogs" IsChecked="{Binding ShowDialogEvents.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                <CheckBox DockPanel.Dock="Top" Content="Show Music" IsChecked="{Binding ShowMusicEvents.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            </DockPanel>
+                        </Grid>
+                        <DockPanel>
+                            <Label Content="Find by id:"/>
+                            <Button DockPanel.Dock="Right" Content="Find" Margin="3"/>
+                            <TextBox Margin="3"></TextBox>
+                        </DockPanel>
+                    </DockPanel>
+
+
+                </Expander>
+            </DockPanel>
+
             <TreeView  ItemsSource="{Binding TreeList, UpdateSourceTrigger=PropertyChanged}">
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="{x:Type TreeViewItem}">
                         <Setter Property="IsExpanded" Value="True" />
                     </Style>
-                    
+
                 </TreeView.ItemContainerStyle>
 
                 <b:Interaction.Behaviors>
@@ -88,6 +114,9 @@
                 </TreeView.ItemTemplate>
             </TreeView>
         </DockPanel>
-       
+        <DockPanel Grid.Row="1" Grid.Column="3" LastChildFill="True">
+            <Button DockPanel.Dock="Bottom" Content="Play Sound" Height="20" Margin="5" Click="{s:MethodBinding PlaySelectedSoundAction}" IsEnabled="{Binding IsPlaySoundButtonEnabled.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <TextBox  DockPanel.Dock="Top" IsReadOnly="True" Text="{Binding SelectedNodeText.Value, UpdateSourceTrigger=PropertyChanged}" />
+        </DockPanel>
     </Grid>
 </UserControl>

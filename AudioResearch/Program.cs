@@ -27,7 +27,13 @@ namespace AudioResearch
             // Create a progam
             Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
             GameInformationFactory.Create();
-            var pfs = GetPackFileService(skipLoadingWemFiles:false);
+            var pfs = GetPackFileService(skipLoadingWemFiles: false);
+
+            var pathToPackFileWithSounds = "Path to packfile with sounds";
+            if (File.Exists(pathToPackFileWithSounds))
+                pfs.Load(pathToPackFileWithSounds);
+            
+            // Create an output pack
             var newPackFile = pfs.CreateNewPackFileContainer("CustomPackFile", PackFileCAType.MOD);
             pfs.SetEditablePack(newPackFile);
 
@@ -42,8 +48,51 @@ namespace AudioResearch
 
             // Explore some data
             //Ole_DataExploration(globalDb, nameHelper);
-
+            //Ole_DataExploration2(pfs, globalDb, nameHelper);
             Console.ReadLine();
+        }
+
+        private static void Ole_DataExploration2(PackFileService pfs, ExtenededSoundDataBase globalDb, WWiseNameLookUpHelper nameHelper)
+        {
+            var allSounds = globalDb.HircList.Where(X => X.Value.First() is CAkSound_v136).Select(x => x.Value.First()).Cast<CAkSound_v136>().ToList();
+
+            var streamTypes = allSounds.CountBy(x => x.AkBankSourceData.StreamType).ToList();
+            var parentIds = allSounds.CountBy(x => nameHelper.GetName(x.NodeBaseParams.DirectParentID)).OrderByDescending(x => x.Value).ToList();
+
+            var actorsWithName = allSounds.Select(x =>
+            {
+                var name = nameHelper.GetName(x.Id, out var found);
+                return new { name = name, Found = found, Obj = x };
+            })
+             .OrderByDescending(x => x.Found)
+             .ToList();
+
+            var onluFound = actorsWithName.Where(X => X.Found).Select(X => X.name).ToList();
+
+
+
+            foreach (var sound in allSounds)
+            {
+                var streamType = sound.AkBankSourceData.StreamType;
+                var filename = $"audio\\wwise\\{sound.AkBankSourceData.akMediaInformation.SourceId}.wem";
+                var bnkSize = sound.AkBankSourceData.akMediaInformation.uInMemoryMediaSize;
+                var file = pfs.FindFile(filename);
+                var size = file?.DataSource.Size;
+
+                if (file != null)
+                {
+
+                }
+                else
+                {
+
+                }
+
+                if (file != null && streamType == SourceType.Data_BNK)
+                {
+
+                }
+            }
         }
 
         private static void Ole_DataExploration(ExtenededSoundDataBase globalDb, WWiseNameLookUpHelper nameHelper)

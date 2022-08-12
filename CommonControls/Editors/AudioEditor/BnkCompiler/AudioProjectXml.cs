@@ -13,11 +13,20 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         public string Id { get; set; }
     }
 
+    [XmlRoot(ElementName = "Child")]
+    public class ActionChild
+    {
+        [XmlAttribute(AttributeName = "Type")]
+        public string Type { get; set; }
+        [XmlText]
+        public string Text { get; set; }
+    }
+
     [XmlRoot(ElementName = "Action")]
     public class Action
     {
         [XmlElement(ElementName = "Child")]
-        public string Child { get; set; }
+        public List<ActionChild> ChildList { get; set; }
         [XmlAttribute(AttributeName = "Id")]
         public string Id { get; set; }
     }
@@ -103,6 +112,8 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 
         [XmlAttribute(AttributeName = "OutputFile")]
         public string OutputFile { get; set; }
+        [XmlAttribute(AttributeName = "Game")]
+        public string OutputGame { get; set; } = "wh3";
     }
 
 }
