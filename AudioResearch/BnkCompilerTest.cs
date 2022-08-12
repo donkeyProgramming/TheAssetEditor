@@ -24,7 +24,7 @@ namespace AudioResearch
                 return true;
             }
 
-            return false;
+            throw new System.Exception("Something went wrong");
         }
     }
 }

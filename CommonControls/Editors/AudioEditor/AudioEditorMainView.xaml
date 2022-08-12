@@ -80,10 +80,14 @@
                                 <CheckBox DockPanel.Dock="Top" Content="Show Music" IsChecked="{Binding ShowMusicEvents.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                             </DockPanel>
                         </Grid>
-                        <DockPanel>
-                            <Label Content="Find by id:"/>
+                        <DockPanel DockPanel.Dock="Top">
+                            <Label Content="Find by id:" Width="75"/>
                             <Button DockPanel.Dock="Right" Content="Find" Margin="3"/>
                             <TextBox Margin="3"></TextBox>
+                        </DockPanel>
+                        <DockPanel DockPanel.Dock="Top">
+                            <Label Content="Event count:"/>
+                            <TextBox Margin="3" IsReadOnly="True"/>
                         </DockPanel>
                     </DockPanel>
 

@@ -260,7 +260,8 @@ Phazer link
 Display props
 Rewrite metasystem?
 Show coordinates of bones for easy placement of stuff. Update when animating. World and local 
-
+Hey Ole, one issue I have run into is having trouble getting the props from the Armoured Kossar to play with me in Super View.  Is this something we might get in the future?
+I can't get them to play with my thane, but they don't play with the basic Armoured Kossar either AFAIK and tried a bit.
 
 V0.40
 ----------------------------
