@@ -92,6 +92,24 @@
     <None Remove="Resources\Icons\Save.png" />
     <None Remove="Resources\Icons\Undo.png" />
     <None Remove="Resources\Icons\WordWrap.png" />
+    <None Remove="Resources\vgstream\avcodec-vgmstream-58.dll" />
+    <None Remove="Resources\vgstream\avformat-vgmstream-58.dll" />
+    <None Remove="Resources\vgstream\avutil-vgmstream-56.dll" />
+    <None Remove="Resources\vgstream\COPYING" />
+    <None Remove="Resources\vgstream\in_vgmstream.dll" />
+    <None Remove="Resources\vgstream\jansson.dll" />
+    <None Remove="Resources\vgstream\libatrac9.dll" />
+    <None Remove="Resources\vgstream\libcelt-0061.dll" />
+    <None Remove="Resources\vgstream\libcelt-0110.dll" />
+    <None Remove="Resources\vgstream\libg719_decode.dll" />
+    <None Remove="Resources\vgstream\libmpg123-0.dll" />
+    <None Remove="Resources\vgstream\libspeex.dll" />
+    <None Remove="Resources\vgstream\libvorbis.dll" />
+    <None Remove="Resources\vgstream\README.md" />
+    <None Remove="Resources\vgstream\swresample-vgmstream-3.dll" />
+    <None Remove="Resources\vgstream\test.exe" />
+    <None Remove="Resources\vgstream\USAGE.md" />
+    <None Remove="Resources\vgstream\xmp-vgmstream.dll" />
   </ItemGroup>
 
   <ItemGroup>
@@ -128,6 +146,24 @@
     <EmbeddedResource Include="Resources\AnimationSlots\TroyAnimationSlots.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\vgstream\avcodec-vgmstream-58.dll" />
+    <EmbeddedResource Include="Resources\vgstream\avformat-vgmstream-58.dll" />
+    <EmbeddedResource Include="Resources\vgstream\avutil-vgmstream-56.dll" />
+    <EmbeddedResource Include="Resources\vgstream\COPYING" />
+    <EmbeddedResource Include="Resources\vgstream\in_vgmstream.dll" />
+    <EmbeddedResource Include="Resources\vgstream\jansson.dll" />
+    <EmbeddedResource Include="Resources\vgstream\libatrac9.dll" />
+    <EmbeddedResource Include="Resources\vgstream\libcelt-0061.dll" />
+    <EmbeddedResource Include="Resources\vgstream\libcelt-0110.dll" />
+    <EmbeddedResource Include="Resources\vgstream\libg719_decode.dll" />
+    <EmbeddedResource Include="Resources\vgstream\libmpg123-0.dll" />
+    <EmbeddedResource Include="Resources\vgstream\libspeex.dll" />
+    <EmbeddedResource Include="Resources\vgstream\libvorbis.dll" />
+    <EmbeddedResource Include="Resources\vgstream\README.md" />
+    <EmbeddedResource Include="Resources\vgstream\swresample-vgmstream-3.dll" />
+    <EmbeddedResource Include="Resources\vgstream\test.exe" />
+    <EmbeddedResource Include="Resources\vgstream\USAGE.md" />
+    <EmbeddedResource Include="Resources\vgstream\xmp-vgmstream.dll" />
     <Resource Include="Resources\Icons\Copy.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>

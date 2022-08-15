@@ -77,7 +77,6 @@
                             <DockPanel Grid.Column="1">
                                 <CheckBox DockPanel.Dock="Top" Content="Show Events" IsChecked="{Binding ShowEvents.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                                 <CheckBox DockPanel.Dock="Top" Content="Show Dialogs" IsChecked="{Binding ShowDialogEvents.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                                <CheckBox DockPanel.Dock="Top" Content="Show Music" IsChecked="{Binding ShowMusicEvents.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                             </DockPanel>
                         </Grid>
                         <DockPanel DockPanel.Dock="Top">
