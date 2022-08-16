@@ -155,7 +155,7 @@ namespace View3D.Animation
             var output = new AnimationFile();
 
             var fRate = (DynamicFrames.Count() - 1) / PlayTimeInSec;
-            output.Header.FrameRate = (float)Math.Floor(fRate);
+            output.Header.FrameRate = (float)Math.Round(fRate);
             if (output.Header.FrameRate <= 0)
                 output.Header.FrameRate = 20;
 
