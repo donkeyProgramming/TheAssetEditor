@@ -4,6 +4,7 @@ using CommonControls.Editors.TextEditor;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.Sound;
 using CommonControls.FileTypes.Sound.WWise;
+using CommonControls.FileTypes.Sound.WWise.Hirc;
 using CommonControls.Services;
 using System;
 using System.Collections.Generic;
@@ -37,27 +38,21 @@ namespace CommonControls.Editors.AudioEditor
             _lookUpHelper = lookUpHelper;
             _globalDb = globalDb;
 
-            var allEvents = _globalDb.HircList.SelectMany(x => x.Value)
-                .Where(x => x.Type == HircType.Event)
-                .ToList();
-
-            var selectedableList = allEvents.Select(x => new SelectedHircItem() { HircItem = x, DisplayName = _lookUpHelper.GetName(x.Id), Id = x.Id, PackFile = x.OwnerFile, IndexInFile = x.IndexInFile }).ToList();
-
-            EventList = new FilterCollection<SelectedHircItem>(selectedableList)
+            EventList = new FilterCollection<SelectedHircItem>(new List<SelectedHircItem>())
             {
                 SearchFilter = (value, rx) => { return rx.Match(value.DisplayName).Success; }
             };
+
+            Refresh(true, true);
         }
 
-        public void Refresh(bool showEvents, bool showDialogEvents, bool showMusicEvents)
+        public void Refresh(bool showEvents, bool showDialogEvents)
         {
             var typesToShow = new List<HircType>();
             if (showEvents)
                 typesToShow.Add(HircType.Event);
             if (showDialogEvents)
                 typesToShow.Add(HircType.Dialogue_Event);
-            if (showMusicEvents)
-                typesToShow.Add(HircType.Music_Track);
 
             var allEvents = _globalDb.HircList.SelectMany(x => x.Value)
                 .Where(x => typesToShow.Contains(x.Type))
@@ -87,7 +82,6 @@ namespace CommonControls.Editors.AudioEditor
         public NotifyAttr<bool> UseBnkNameWhileParsing { get; set; }
         public NotifyAttr<bool> ShowEvents { get; set; }
         public NotifyAttr<bool> ShowDialogEvents { get; set; }
-        public NotifyAttr<bool> ShowMusicEvents { get; set; }
 
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Editor");
@@ -97,6 +91,7 @@ namespace CommonControls.Editors.AudioEditor
 
         WWiseNameLookUpHelper _lookUpHelper;
         ExtenededSoundDataBase _globalDb;
+        SoundPlayer _player;
 
         public AudioEditorViewModel(PackFileService pfs)
         {
@@ -106,21 +101,20 @@ namespace CommonControls.Editors.AudioEditor
             _globalDb = builder.BuildMasterSoundDatabase(bnkList);
             _lookUpHelper = builder.BuildNameHelper(pfs);
 
+            _player = new SoundPlayer(pfs, _lookUpHelper);
             ShowIds = new NotifyAttr<bool>(false, RefeshList);
             ShowBnkName = new NotifyAttr<bool>(false, RefeshList);
             UseBnkNameWhileParsing = new NotifyAttr<bool>(false, RefeshList);
             ShowEvents = new NotifyAttr<bool>(true, RefeshList);
             ShowDialogEvents = new NotifyAttr<bool>(true, RefeshList);
-            ShowMusicEvents = new NotifyAttr<bool>(true, RefeshList);
 
             EventFilter = new EventSelectionFilter(_lookUpHelper, _globalDb);
             EventFilter.EventList.SelectedItemChanged += OnEventSelected;
             RefeshList(true);
         }
 
-        void RefeshList(bool newValue) => EventFilter.Refresh(ShowEvents.Value, ShowDialogEvents.Value, ShowMusicEvents.Value);
+        void RefeshList(bool newValue) => EventFilter.Refresh(ShowEvents.Value, ShowDialogEvents.Value);
 
-        WWiseTreeParser CreateWWiseParser() => new WWiseTreeParser(_globalDb, _lookUpHelper, ShowIds.Value, ShowBnkName.Value, UseBnkNameWhileParsing.Value);
 
         private void OnEventSelected(SelectedHircItem newValue)
         {
@@ -132,7 +126,8 @@ namespace CommonControls.Editors.AudioEditor
                 _selectedNode = null;
                 TreeList.Clear();
 
-                var rootNode = CreateWWiseParser().BuildEventHierarchy(newValue.HircItem);
+                var parser = new WWiseTreeParserChildren(_globalDb, _lookUpHelper, ShowIds.Value, ShowBnkName.Value, UseBnkNameWhileParsing.Value);
+                var rootNode = parser.BuildHierarchy(newValue.HircItem);
                 TreeList.Add(rootNode);
             }
         }
@@ -153,18 +148,43 @@ namespace CommonControls.Editors.AudioEditor
         {
             if (selectedNode != null)
             {
-                var hircAsString = JsonSerializer.Serialize(selectedNode.Item, new JsonSerializerOptions() { WriteIndented = true});
+                var hircAsString = JsonSerializer.Serialize((object)selectedNode.Item, new JsonSerializerOptions() { WriteIndented = true});
                 SelectedNodeText.Value = hircAsString;
 
+                var parser = new WWiseTreeParserParent(_globalDb, _lookUpHelper, true, true, true);
+                var rootNode = parser.BuildHierarchy(selectedNode.Item);
 
-                //var rootNode = CreateWWiseParser().FindAllParents(newValue.HircItem);
-                //TreeList.Add(rootNode);
+                var flatList = GetListstuff(rootNode);
+                flatList.Reverse();
+
+
+                SelectedNodeText.Value += "\n\nParent structure:\n";
+                foreach (var str in flatList)
+                    SelectedNodeText.Value += "\t" + str + "\n";
 
             }
             else
             {
                 SelectedNodeText.Value = "";
             }
+        }
+
+        List<string> GetListstuff(HircTreeItem root)
+        {
+            var childData = new List<string>();
+            if (root.Children != null)
+            {
+                foreach (var child in root.Children)
+                    childData.AddRange(GetListstuff(child));
+            }
+
+            childData.Add(root.DisplayName);
+            return childData;
+        }
+
+        public void PlaySelectedSoundAction()
+        {
+            _player.PlaySound(TreeList.FirstOrDefault(), _selectedNode.Item as ICAkSound);
         }
     }
 }

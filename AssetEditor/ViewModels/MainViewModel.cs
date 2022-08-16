@@ -54,6 +54,9 @@ namespace AssetEditor.ViewModels
 
         public MainViewModel(MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, ToolFactory toolFactory, SchemaManager schemaManager, SkeletonAnimationLookUpHelper animationLookUpHelper)
         {
+
+            
+
             _packfileService = packfileService;
             _packfileService.Database.BeforePackFileContainerRemoved += Database_BeforePackFileContainerRemoved;
 
@@ -107,6 +110,9 @@ namespace AssetEditor.ViewModels
 
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
+
+ 
+                
                 //new BaseAnimationSlotHelper(GameTypeEnum.Warhammer2).ExportAnimationDebugList(packfileService, @"c:\temp\3kanims.txt");
 
                 //DefaultAnimationSlotTypeHelper.ExportAnimationDebugList(packfileService);
@@ -200,7 +206,7 @@ namespace AssetEditor.ViewModels
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\ksl\ksl_katarin\ksl_katarin_cloth_cloak_01.rigid_model_v2"));
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\ksl\ksl_katarin\ksl_katarin_01.rigid_model_v2"));
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hq3\nor\nor_war_mammoth\nor_war_mammoth_warshrine_01.rigid_model_v2"));
-                
+
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc1\tmb\tmb_warsphinx\tex\tmb_warsphinx_armour_01_base_colour.dds"));
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.rigid_model_v2"));
 
