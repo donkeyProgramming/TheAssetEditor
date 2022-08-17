@@ -184,7 +184,14 @@ namespace CommonControls.Editors.AudioEditor
 
         public void PlaySelectedSoundAction()
         {
+            if (_selectedNode == null) return;
             _player.PlaySound(TreeList.FirstOrDefault(), _selectedNode.Item as ICAkSound);
+        }
+
+        public void ExtractSelectedSoundAction()
+        {
+            if (_selectedNode == null) return;
+            _player.ExtractSound(TreeList.FirstOrDefault(), _selectedNode.Item as ICAkSound);
         }
     }
 }

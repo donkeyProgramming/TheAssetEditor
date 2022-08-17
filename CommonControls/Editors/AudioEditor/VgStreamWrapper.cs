@@ -17,12 +17,12 @@ namespace CommonControls.Editors.AudioEditor
         public static string GetAudioFolder() => $"{DirectoryHelper.Temp}\\Audio";
         public static void EnsureCreated() => GetCliPath();
 
-        public static bool ExportFile(string fileNameWithoutExtention, byte[] data, out string outputSoundFilePath)
+        public static bool ExportFile(string fileName, byte[] data, out string outputSoundFilePath, bool keepWem = true)
         {
             outputSoundFilePath = null;
             var cliPath = GetCliPath();
-            var wemName = $"{GetAudioFolder()}\\{fileNameWithoutExtention}.wem";
-            var wavName = $"{GetAudioFolder()}\\{fileNameWithoutExtention}.wav";
+            var wemName = $"{fileName}.wem";
+            var wavName = $"{fileName}.wav";
 
             try
             {
@@ -49,6 +49,10 @@ namespace CommonControls.Editors.AudioEditor
                 pProcess.WaitForExit();
 
                 outputSoundFilePath = wavName;
+
+                if(!keepWem)
+                    File.Delete(wemName);
+
                 return true;
             }
             catch (Exception e)
