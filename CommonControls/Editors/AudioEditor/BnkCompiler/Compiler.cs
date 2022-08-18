@@ -46,6 +46,13 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             return true;
         }
 
+        public bool CompileAll(out ErrorListViewModel.ErrorList errorList)
+        {
+            errorList = new ErrorListViewModel.ErrorList();
+            errorList.Ok("Compiler", "Finished");
+            return true;
+        }
+
         PackFile BuildBnk(AudioProjectXml projectFile)
         {
             var bnkName = Path.GetFileNameWithoutExtension(projectFile.OutputFile);

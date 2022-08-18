@@ -27,6 +27,10 @@ using AssetEditor.Report;
 using AnimationEditor.AnimationBuilder;
 using CommonControls.Editors.AnimationPack;
 using CommonControls.Editors.AudioEditor;
+using CommonControls.BaseDialogs.ErrorListDialog;
+using System.Reflection;
+using System.IO;
+using System.Text;
 
 namespace AssetEditor.ViewModels
 {
@@ -65,6 +69,8 @@ namespace AssetEditor.ViewModels
         public ICommand OpenWh2AnimpackUpdaterCommand { get; set; }
         public ICommand OpenAnimationBuilderCommand { get; set; }
         public ICommand OpenAudioEditorCommand { get; set; }
+        public ICommand CompileAudioProjectsCommand { get; set; }
+        public ICommand CreateExampleAudioProjectCommand { get; set; }
 
         public ICommand SearchCommand { get; set; }
         public ICommand OpenRome2RePacksCommand { get; set; }
@@ -128,6 +134,8 @@ namespace AssetEditor.ViewModels
             OpenAnimationBatchExporterCommand = new RelayCommand(OpenAnimationBatchExporter);
             OpenWh2AnimpackUpdaterCommand = new RelayCommand(OpenWh2AnimpackUpdater);
             OpenAudioEditorCommand = new RelayCommand(OpenAudioEditor);
+            CompileAudioProjectsCommand = new RelayCommand(CompileAudioProjects);
+            CreateExampleAudioProjectCommand = new RelayCommand(CreateExampleAudioProject);
             OpenAnimationBuilderCommand = new RelayCommand(OpenOpenAnimationBuilder);
 
             GenerateRmv2ReportCommand = new RelayCommand(GenerateRmv2Report);
@@ -290,6 +298,26 @@ namespace AssetEditor.ViewModels
             EditorCreator.CreateEmptyEditor(editorView);
         }
 
+        private void CompileAudioProjects()
+        {
+            var compiler = new CommonControls.Editors.AudioEditor.BnkCompiler.Compiler(_packfileService);
+            compiler.CompileAll(out var errorList);
+            ErrorListWindow.ShowDialog("Compile Result:", errorList);
+        }
+
+        private void CreateExampleAudioProject()
+        {
+            if (_packfileService.HasEditablePackFile() == false)
+                return;
+
+            var pack = _packfileService.GetEditablePack();
+            var resourcePath = "AssetEditor.Resources.ExampleAudioProject.xml";
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath);
+            using StreamReader reader = new StreamReader(stream);
+            var text = reader.ReadToEnd();
+            var byteArray = Encoding.ASCII.GetBytes(text);
+            _packfileService.AddFileToPack(pack, "AudioProjects", new PackFile("ExampleBnkProject.bnk.xml", new MemorySource(byteArray)));
+        }
 
         void OpenTechSkeletonEditor()
         {
