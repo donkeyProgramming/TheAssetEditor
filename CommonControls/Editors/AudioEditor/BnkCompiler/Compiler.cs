@@ -183,7 +183,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         {
             try
             {
-                using var stream = GenerateStreamFromString(projectAsString);
+                using var stream = GenerateStreamFromString(projectAsString.ToLowerInvariant());
                 XmlSerializer serializer = new XmlSerializer(typeof(AudioProjectXml));
                 var result = serializer.Deserialize(stream);
                 return result as AudioProjectXml;

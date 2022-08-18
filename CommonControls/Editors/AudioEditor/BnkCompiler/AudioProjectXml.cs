@@ -89,6 +89,15 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         public string Text { get; set; }
     }
 
+    [XmlRoot(ElementName = "FileSound")]
+    public class FileSound
+    {
+        [XmlAttribute(AttributeName = "Id")]
+        public string Id { get; set; }
+        [XmlText]
+        public string Text { get; set; }
+    }
+
     [XmlRoot(ElementName = "root")]
     public class AudioProjectXml
     {
@@ -109,6 +118,9 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 
         [XmlElement(ElementName = "GameSound")]
         public List<GameSound> GameSounds { get; set; }
+
+        [XmlElement(ElementName = "FileSound")]
+        public List<FileSound> FileSounds { get; set; }
 
         [XmlAttribute(AttributeName = "OutputFile")]
         public string OutputFile { get; set; }
