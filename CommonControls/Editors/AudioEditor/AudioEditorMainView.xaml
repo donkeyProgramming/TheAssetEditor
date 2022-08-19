@@ -94,7 +94,10 @@
                 </Expander>
             </DockPanel>
 
-            <TreeView  ItemsSource="{Binding TreeList, UpdateSourceTrigger=PropertyChanged}">
+            <TreeView  ItemsSource="{Binding TreeList, UpdateSourceTrigger=PropertyChanged}"
+                        VirtualizingPanel.IsVirtualizing="True"
+                VirtualizingPanel.VirtualizationMode="Recycling"
+            VirtualizingPanel.IsVirtualizingWhenGrouping="True">
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="{x:Type TreeViewItem}">
                         <Setter Property="IsExpanded" Value="True" />

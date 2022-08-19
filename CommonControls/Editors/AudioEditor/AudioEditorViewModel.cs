@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace CommonControls.Editors.AudioEditor
 {
@@ -118,7 +119,7 @@ namespace CommonControls.Editors.AudioEditor
 
         private void OnEventSelected(SelectedHircItem newValue)
         {
-            if (newValue?.Id == _selectedNode?.Item.Id)
+            if (newValue?.Id == _selectedNode?.Item?.Id)
                 return;
 
             if (newValue != null)
@@ -148,7 +149,7 @@ namespace CommonControls.Editors.AudioEditor
         {
             if (selectedNode != null)
             {
-                var hircAsString = JsonSerializer.Serialize((object)selectedNode.Item, new JsonSerializerOptions() { WriteIndented = true});
+                var hircAsString = JsonSerializer.Serialize((object)selectedNode.Item, new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter() }, WriteIndented = true});
                 SelectedNodeText.Value = hircAsString;
 
                 var parser = new WWiseTreeParserParent(_globalDb, _lookUpHelper, true, true, true);
@@ -161,7 +162,6 @@ namespace CommonControls.Editors.AudioEditor
                 SelectedNodeText.Value += "\n\nParent structure:\n";
                 foreach (var str in flatList)
                     SelectedNodeText.Value += "\t" + str + "\n";
-
             }
             else
             {

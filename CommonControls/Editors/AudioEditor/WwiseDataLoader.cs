@@ -103,7 +103,7 @@ namespace CommonControls.Editors.AudioEditor
 
         public List<SoundDataBase> LoadBnkFiles(PackFileService pfs, bool onlyEnglish = true)
         {
-            var bankFiles = pfs.FindAllWithExtention(".bnk");
+            var bankFiles = pfs.FindAllWithExtentionIncludePaths(".bnk");
             var removeFilter = new List<string>() { "media", "init.bnk", "animation_blood_data.bnk" };
             if(onlyEnglish)
                 removeFilter.AddRange(new List<string>() { "chinese", "french(france)", "german", "italian", "polish", "russian", "spanish(spain)" });

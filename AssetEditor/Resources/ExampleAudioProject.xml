@@ -3,13 +3,13 @@
 
 	<Event Id="Play_custom_ogre_unit_selected">
 		<AudioBus>Battle</AudioBus>
-		<Action>Action_custom_ogre_unit_selected</Action>
+		<Action>Custom_unit_selection_start</Action>
 	</Event>
 
-	<Action Id="Action_custom_ogre_unit_selected">
-		<Child Type="Play">CustomAudioFile_Medium</Child>
+	<Action Id="Custom_unit_selection_start">
+		<Child Type="Play">CustomAudioFile_ID</Child>
 	</Action>
 
-	<GameSound Id="CustomAudioFile_Medium">Audio/WWise/English(uk)/378298469.wem</GameSound>
+	<GameSound Id="CustomAudioFile_ID">Audio/WWise/English(uk)/378298469.wem</GameSound>
 
 </root>
