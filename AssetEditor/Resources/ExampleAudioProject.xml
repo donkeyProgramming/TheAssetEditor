@@ -10,6 +10,6 @@
 		<Child Type="Play">CustomAudioFile_Medium</Child>
 	</Action>
 
-	<GameSound Id="CustomAudioFile_Medium">464995906.wem</GameSound>
-	<GameSound Id="CustomAudioFile_Medium">464995906.wem</GameSound>
+	<GameSound Id="CustomAudioFile_Medium">Audio/WWise/English(uk)/378298469.wem</GameSound>
+
 </root>

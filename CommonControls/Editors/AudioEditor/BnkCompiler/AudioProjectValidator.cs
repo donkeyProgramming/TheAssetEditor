@@ -136,7 +136,6 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 
         static bool ValidateGameSounds(AudioProjectXml projectFile, ref ErrorListViewModel.ErrorList errorList)
         {
-
             foreach (var gameSound in projectFile.GameSounds)
             {
                 if (string.IsNullOrEmpty(gameSound.Id))
@@ -156,29 +155,29 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 
         static bool ValidateFileSounds(AudioProjectXml projectFile, ref ErrorListViewModel.ErrorList errorList)
         {
-            foreach (var gameSound in projectFile.GameSounds)
+            foreach (var fileSound in projectFile.FileSounds)
             {
-                if (string.IsNullOrEmpty(gameSound.Id))
+                if (string.IsNullOrEmpty(fileSound.Id))
                 {
                     errorList.Error("FileSound", "FileSound is missing ID");
                     return false;
                 }
 
-                if (string.IsNullOrEmpty(gameSound.Text))
+                if (string.IsNullOrEmpty(fileSound.Text))
                 {
-                    errorList.Error("FileSound", $"{gameSound.Id} is missing file path");
+                    errorList.Error("FileSound", $"{fileSound.Id} is missing file path");
                     return false;
                 }
 
-                if(Path.GetExtension(gameSound.Text).ToLowerInvariant() != ".wem")
+                if(Path.GetExtension(fileSound.Text).ToLowerInvariant() != ".wem")
                 {
-                    errorList.Error("FileSound", $"{gameSound.Id} has incorrect extention. Must be wem");
+                    errorList.Error("FileSound", $"{fileSound.Id} has incorrect extention. Must be wem");
                     return false;
                 }
 
-                if (File.Exists(gameSound.Text) == false)
+                if (File.Exists(fileSound.Text) == false)
                 {
-                    errorList.Error("FileSound", $"{gameSound.Id} not found on disk");
+                    errorList.Error("FileSound", $"{fileSound.Id} not found on disk");
                     return false;
                 }
             }

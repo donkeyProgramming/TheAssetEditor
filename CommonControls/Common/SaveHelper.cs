@@ -33,6 +33,83 @@ namespace CommonControls.Common
             }
         }
 
+        static bool PrompOverrideOrNew(PackFileService packFileService, PackFile existingFile, out string newFullPath)
+        {
+            var owningPack = packFileService.GetPackFileContainer(existingFile);
+            var fullPath = packFileService.GetFullPath(existingFile, owningPack);
+            newFullPath = fullPath;
+
+            if (MessageBox.Show($"Replace existing file?\n{fullPath} \nin packfile:{owningPack.Name}", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
+            {
+                var extention = Path.GetExtension(fullPath);
+                using (var browser = new SavePackFileWindow(packFileService))
+                {
+                    browser.ViewModel.Filter.SetExtentions(new List<string>() { extention });
+                    if (browser.ShowDialog() == true)
+                    {
+                        var path = browser.FilePath;
+                        if (path.Contains(extention) == false)
+                            path += extention;
+
+                        newFullPath = path;
+                    }
+                    else
+                    {
+                        // Cancel pressed - dont save
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                // Cancel pressed - dont save
+                return false;
+            }
+
+            return true;
+        }
+
+        public static PackFile SaveBytes(PackFileService packFileService, string fullPath, byte[] bytes, bool promptSaveOverride = true)
+        {
+            var directoryPath = Path.GetDirectoryName(fullPath);
+            var filePath = Path.GetFileNameWithoutExtension(fullPath);
+            var pf = new PackFile(filePath, new MemorySource(bytes));
+            return SavePackFile(packFileService, directoryPath, pf, promptSaveOverride);
+        }
+
+        public static PackFile SavePackFile(PackFileService packFileService, string folder, PackFile pf, bool promptSaveOverride = true)
+        {
+            if (packFileService.HasEditablePackFile() == false)
+                return null;
+
+            var editablePack = packFileService.GetEditablePack();
+            var fullPath = Path.Combine(folder, pf.Name);
+            var existingFile = packFileService.FindFile(fullPath, editablePack);
+
+            if (existingFile != null && promptSaveOverride == false)
+            {
+                var prompResult = PrompOverrideOrNew(packFileService, existingFile, out var newFullPath);
+                if (prompResult == false)
+                    return null;    // User did not want to save
+                fullPath = newFullPath;
+            }
+
+            existingFile = packFileService.FindFile(fullPath, editablePack);
+            if (existingFile == null)
+            {
+                // Create new
+                var directoryPath = Path.GetDirectoryName(fullPath);
+                packFileService.AddFileToPack(editablePack, directoryPath, pf);
+                return pf;
+            }
+            else
+            {
+                // Update existing
+                packFileService.SaveFile(existingFile, pf.DataSource.ReadData());
+                return existingFile;
+            }
+        }
+
         public static PackFile Save(PackFileService packFileService, string filename, PackFile packFile, byte[] updatedData = null, bool promptSaveOverride = true)
         {
             filename = filename.ToLower();

@@ -1,4 +1,5 @@
 ﻿using CommonControls.BaseDialogs.ErrorListDialog;
+using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.Sound;
 using CommonControls.FileTypes.Sound.WWise;
@@ -18,9 +19,16 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 {
     public class Compiler
     {
+        public class CompileResult
+        {
+            public PackFile OutputBnkFile { get; set; }
+            public PackFile OutputDatFile { get; set; }
+            public PackFile NameList { get; set; }
+            public List<PackFile> AudioFiles { get; set; } = new List<PackFile>();
+        }
+
         private readonly PackFileService _pfs;
-        public PackFile OutputBnkFile { get; private set; }
-        public PackFile OutputDatFile { get; private set; }
+
         public AudioProjectXml ProjectFile { get; private set; }
 
         public Compiler(PackFileService pfs)
@@ -28,36 +36,88 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             _pfs = pfs;
         }
 
-        public bool Compile(string projectAsString, out ErrorListViewModel.ErrorList errorList)
+        public bool CompileAll(out ErrorListViewModel.ErrorList outputList)
         {
-            errorList = new ErrorListViewModel.ErrorList();
-            ProjectFile = LoadFile(projectAsString, ref errorList);
-            if (ProjectFile == null)
+            outputList = new ErrorListViewModel.ErrorList();
+
+            if (_pfs.HasEditablePackFile() == false)
                 return false;
 
-            var validationResult = AudioProjectValidator.Validate(ProjectFile, _pfs, ref errorList);
-            if (validationResult == false)
-                return false;
+            var allProjectFiles = _pfs.FindAllWithExtention(".xml").Where(x => x.Name.Contains("bnk.xml"));
+            outputList.Ok("Compiler", $"{allProjectFiles.Count()} projects found to compile.");
 
-            OutputBnkFile = BuildBnk(ProjectFile);
-            OutputDatFile = BuildDat(ProjectFile);
-            BuildNameLookUpFile(ProjectFile);
+            foreach (var file in allProjectFiles)
+            {
+                outputList.Ok("Compiler", $"Starting {_pfs.GetFullPath(file)}");
+                var compileResult = CompileProject(file, ref outputList);
+                if (compileResult != null)
+                {
+                    SaveHelper.SavePackFile(_pfs, "wwise\\audio", compileResult.OutputBnkFile, true);
+                    SaveHelper.SavePackFile(_pfs, "wwise\\audio", compileResult.OutputDatFile, true);
 
+                    //foreach(var audioFile in compileResult.AudioFiles)
+                    //    SaveHelper.SavePackFile(_pfs, "wwise\\audio", audioFile, true);
+                }
+
+                outputList.Ok("Compiler", $"Finished {_pfs.GetFullPath(file)}. Overall result:{true}");
+            }
             return true;
         }
 
-        public bool CompileAll(out ErrorListViewModel.ErrorList errorList)
+        public CompileResult CompileProject(PackFile packfile, ref ErrorListViewModel.ErrorList errorList)
         {
-            errorList = new ErrorListViewModel.ErrorList();
-            errorList.Ok("Compiler", "Finished");
-            return true;
+            ProjectFile = LoadFile(packfile, ref errorList);
+            if (ProjectFile == null)
+                return null;
+
+            var validationResult = AudioProjectValidator.Validate(ProjectFile, _pfs, ref errorList);
+            if (validationResult == false)
+                return null;
+
+            var bnkFile = BuildBnk(ProjectFile);
+            var datFile = BuildDat(ProjectFile);
+            var files0 = BuildGameAudioFiles(ProjectFile);
+            var files1 = BuildFileAudioFiles(ProjectFile);
+            var nameList = BuildNameLookUpFile(ProjectFile);
+
+            return new CompileResult()
+            {
+                OutputBnkFile = bnkFile,
+                OutputDatFile = datFile,
+                NameList = nameList
+            };
+        }
+
+        private List<PackFile> BuildGameAudioFiles(AudioProjectXml projectFile)
+        {
+            foreach (var file in projectFile.GameSounds)
+            {
+                // If language file, copy
+                var dirName = Path.GetDirectoryName(file.Text);
+                var fileName = Path.GetFileNameWithoutExtension(file.Text);
+
+                //var dirNamess = Path.
+            }
+
+            return new List<PackFile>();
+        }
+
+        private List<PackFile> BuildFileAudioFiles(AudioProjectXml projectFile)
+        {
+            foreach (var file in projectFile.GameSounds)
+            {
+                // Import
+                // Give name
+                // Save 
+
+            }
+            return new List<PackFile>();
         }
 
         PackFile BuildBnk(AudioProjectXml projectFile)
         {
             var bnkName = Path.GetFileNameWithoutExtension(projectFile.OutputFile);
             
-
             // Header
             var bankHeader = CompileHeader(projectFile, bnkName);  
 
@@ -85,7 +145,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             var bytes = memStream.ToArray();
 
             // Convert to output and parse for sanity
-            var bnkPackFile = new PackFile("TestFile.bnk", new MemorySource(bytes));
+            var bnkPackFile = new PackFile(projectFile.OutputFile, new MemorySource(bytes));
             var result = Bnkparser.Parse(bnkPackFile, "test\\TestFile.bnk"); 
 
             return bnkPackFile;
@@ -109,8 +169,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 
         private CAkSound_v136 ConvertToWWiseGameSound(GameSound inputSound)
         {
-            var filename = $"audio\\wwise\\{inputSound.Text}";
-            var file = _pfs.FindFile(filename);
+            var file = _pfs.FindFile(inputSound.Text);
             var soundIdStr = Path.GetFileNameWithoutExtension(inputSound.Text).Trim();
             var soundId = uint.Parse(soundIdStr);
 
@@ -166,31 +225,35 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 
         PackFile BuildDat(AudioProjectXml projectFile)
         {
+            var outputName = "event_data__" + Path.GetFileNameWithoutExtension(projectFile.OutputFile) + ".dat";
             var datFile = new SoundDatFile();
 
             foreach (var wwiseEvent in projectFile.Events)
                 datFile.Event0.Add(new SoundDatFile.EventWithValue() { EventName = wwiseEvent.Id, Value = 0 });
 
             var bytes = DatParser.GetAsByteArray(datFile);
-            var packFile = new PackFile("testfile.data", new MemorySource(bytes));
+            var packFile = new PackFile(outputName, new MemorySource(bytes));
             var reparsedSanityFile = DatParser.Parse(packFile, false);
             return packFile;
         }
 
-        private void BuildNameLookUpFile(AudioProjectXml projectFile)
+        private PackFile BuildNameLookUpFile(AudioProjectXml projectFile)
         {
-            
+            return null;
         }
 
 
         uint ConvertStringToWWiseId(string id) => WWiseNameLookUpHelper.ComputeWWiseHash(id);
        
 
-        AudioProjectXml LoadFile(string projectAsString, ref ErrorListViewModel.ErrorList errorList)
+        AudioProjectXml LoadFile(PackFile packfile, ref ErrorListViewModel.ErrorList errorList)
         {
             try
             {
-                using var stream = GenerateStreamFromString(projectAsString.ToLowerInvariant());
+                var bytes = packfile.DataSource.ReadData();
+                var str = Encoding.UTF8.GetString(bytes);
+
+                using var stream = GenerateStreamFromString(str);
                 XmlSerializer serializer = new XmlSerializer(typeof(AudioProjectXml));
                 var result = serializer.Deserialize(stream);
                 return result as AudioProjectXml;
