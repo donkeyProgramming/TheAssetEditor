@@ -9,12 +9,12 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 {
     public class CAkDialogueEvent_v136 : HircItem
     {
-        public byte uProbability;
-        public uint uTreeDepth;
-        public ArgumentList ArgumentList;
-        public uint uTreeDataSize;
-        public byte uMode;
-        public AkDecisionTree AkDecisionTree;
+        public byte uProbability { get; set; }
+        public uint uTreeDepth { get; set; }
+        public ArgumentList ArgumentList { get; set; }
+        public uint uTreeDataSize { get; set; }
+        public byte uMode { get; set; }
+        public AkDecisionTree AkDecisionTree { get; set; }
 
         public AkPropBundle AkPropBundle0 { get; set; }
         public AkPropBundleMinMax AkPropBundle1 { get; set; }

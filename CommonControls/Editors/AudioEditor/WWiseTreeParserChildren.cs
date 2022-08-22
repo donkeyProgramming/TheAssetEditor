@@ -33,7 +33,7 @@ namespace CommonControls.Editors.AudioEditor
         {
             if (node.IsAudioNode)
             {
-                var dialogEventNode = new HircTreeItem() { DisplayName = $"Audio {_nameLookUpHelper.GetName(node.Key)} -> {node.AudioNodeId}", Item = owner };
+                var dialogEventNode = new HircTreeItem() { DisplayName = $"Node {_nameLookUpHelper.GetName(node.Key)}", Item = owner };
                 parent.Children.Add(dialogEventNode);
                 ProcessNext(node.AudioNodeId, dialogEventNode);
             }
