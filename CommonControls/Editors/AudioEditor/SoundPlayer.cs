@@ -10,7 +10,7 @@ using System.Text;
 
 namespace CommonControls.Editors.AudioEditor
 {
-    class SoundPlayer
+    public class SoundPlayer
     {
         ILogger _logger = Logging.Create<SoundPlayer>();
         private readonly PackFileService _pfs;
@@ -26,10 +26,17 @@ namespace CommonControls.Editors.AudioEditor
         public bool PlaySound(HircTreeItem rootNode, ICAkSound wwiseSound)
         {
             var outputName = _lookUpHelper.GetName(rootNode.Item.Id) + "-" + wwiseSound.GetSourceId();
+            return PlaySound(wwiseSound.GetSourceId(), outputName);
+        }
 
-            var audioFile = _pfs.FindFile($"audio\\wwise\\{wwiseSound.GetSourceId()}.wem");
+        public bool PlaySound(uint id, string outputName = null)
+        {
+            if (outputName == null)
+                outputName = Guid.NewGuid().ToString();
+
+            var audioFile = _pfs.FindFile($"audio\\wwise\\{id}.wem");
             if (audioFile == null)
-                audioFile = _pfs.FindFile($"audio\\wwise\\{_language}\\{wwiseSound.GetSourceId()}.wem");
+                audioFile = _pfs.FindFile($"audio\\wwise\\{_language}\\{id}.wem");
 
             if (audioFile == null)
             {
@@ -39,7 +46,7 @@ namespace CommonControls.Editors.AudioEditor
 
             var result = VgStreamWrapper.ExportFile(outputName, audioFile.DataSource.ReadData(), out var soundPath);
             if (result)
-            { 
+            {
                 var p = new Process();
                 p.StartInfo = new ProcessStartInfo(soundPath)
                 {

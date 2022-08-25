@@ -229,7 +229,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             var datFile = new SoundDatFile();
 
             foreach (var wwiseEvent in projectFile.Events)
-                datFile.Event0.Add(new SoundDatFile.EventWithValue() { EventName = wwiseEvent.Id, Value = 0 });
+                datFile.Event0.Add(new SoundDatFile.EventWithValue() { EventName = wwiseEvent.Id, Value = 400 });
 
             var bytes = DatParser.GetAsByteArray(datFile);
             var packFile = new PackFile(outputName, new MemorySource(bytes));
