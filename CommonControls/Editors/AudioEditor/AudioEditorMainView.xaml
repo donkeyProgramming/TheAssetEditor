@@ -100,9 +100,8 @@
             VirtualizingPanel.IsVirtualizingWhenGrouping="True">
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="{x:Type TreeViewItem}">
-                        <Setter Property="IsExpanded" Value="false" />
+                        <Setter Property="IsExpanded" Value="true" />
                     </Style>
-
                 </TreeView.ItemContainerStyle>
 
                 <b:Interaction.Behaviors>

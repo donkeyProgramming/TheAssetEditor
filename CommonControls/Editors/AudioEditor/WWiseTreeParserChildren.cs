@@ -18,6 +18,10 @@ namespace CommonControls.Editors.AudioEditor
             _hircProcessChildMap.Add(HircType.Sound, ProcessSound);
             _hircProcessChildMap.Add(HircType.ActorMixer, ProcessActorMixer);
             _hircProcessChildMap.Add(HircType.Dialogue_Event, ProcessDialogEvent);
+            _hircProcessChildMap.Add(HircType.Music_Track, ProcessMusicTrack);
+            _hircProcessChildMap.Add(HircType.Music_Segment, ProcessMusicSegment);
+            //_hircProcessChildMap.Add(HircType.Music_Switch, ProcessDialogEvent);
+            //_hircProcessChildMap.Add(HircType.Music_Random_Sequence, ProcessDialogEvent);
         }
 
         private void ProcessDialogEvent(HircItem item, HircTreeItem parent)
@@ -119,5 +123,26 @@ namespace CommonControls.Editors.AudioEditor
 
             ProcessNext(layerContainer.GetChildren(), layerNode);
         }
+
+        private void ProcessMusicTrack(HircItem item, HircTreeItem parent)
+        {
+            var hirc = GetAsType<CAkMusicTrack_v136>(item);
+            var node = new HircTreeItem() { DisplayName = $"Music Track", Item = item };
+            parent.Children.Add(node);
+
+            foreach (var sourceItem in hirc.pSourceList)
+                ProcessNext(sourceItem.akMediaInformation.SourceId, node);
+        }
+
+        private void ProcessMusicSegment(HircItem item, HircTreeItem parent)
+        {
+            var hirc = GetAsType<CAkMusicSegment_v136>(item);
+            var node = new HircTreeItem() { DisplayName = $"Music Segment", Item = item };
+            parent.Children.Add(node);
+
+            foreach (var childId in hirc.MusicNodeParams.Children.ChildIdList)
+                ProcessNext(childId, node);
+        }
+
     }
 }

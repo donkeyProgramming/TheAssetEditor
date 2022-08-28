@@ -13,7 +13,6 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
         public double fDuration { get; set; }
         public List<AkMusicMarkerWwise> pArrayMarkersList { get; set; } = new List<AkMusicMarkerWwise>();
 
-
         protected override void CreateSpesificData(ByteChunk chunk)
         {
             MusicNodeParams = MusicNodeParams.Create(chunk);
