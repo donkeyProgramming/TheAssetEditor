@@ -40,8 +40,13 @@ namespace CommonControls.Common
             var extention = Regex.Match(fullPath, @"\..*").Value;
             if (extention.Contains("{") && extention.Contains("}"))
             {
-                var index = extention.IndexOf("}");
-                extention = extention.Remove(0, index+1);
+                var ext2 = Regex.Match(extention, @"\..*\.(.*)\.(.*)");
+                if(ext2.Success)
+                {
+                    extention = "." + ext2.Groups[1].Value + "." + ext2.Groups[2].Value;
+                }
+                //var index = extention.IndexOf("}");
+                //extention = extention.Remove(0, index+1);
             }
 
             if (_validExtentionsCore != null)
