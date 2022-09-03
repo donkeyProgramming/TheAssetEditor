@@ -19,6 +19,7 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
             <Button Grid.Row="1" Grid.Column="0" Content="Up"  Margin="5,5,5,0"  Click="{s:MethodBinding MoveUpAction}"/>
@@ -27,10 +28,13 @@
             <Button Grid.Row="2" Grid.Column="0" Content="Copy"  Margin="5,5,5,0" Click="{s:MethodBinding CopyAction}"/>
             <Button Grid.Row="2" Grid.Column="1" Content="Paste"  Margin="5,5,5,0" Click="{s:MethodBinding PasteAction}"/>
 
+            <Button Grid.Row="3" Grid.Column="0" Content="Mark to copy multiple"  Margin="5,5,5,0" Click="{s:MethodBinding PickCopyMultiple}"/>
+            <Button Grid.Row="3" Grid.Column="1" Content="Clear all copy muliple"  Margin="5,5,5,0" Click="{s:MethodBinding ClearCopyMultiple}"/>
+
             <Button Grid.Row="0" Grid.Column="0" Content="New"  Margin="5,5,5,0"  Click="{s:MethodBinding NewAction}"/>
             <Button Grid.Row="0" Grid.Column="1" Content="Delete"  Margin="5,5,5,0"  Click="{s:MethodBinding DeleteAction}"/>
             
-            <Button Grid.Row="3" Grid.ColumnSpan="2" Content="Save"  Margin="5,5,5,0"  Click="{s:MethodBinding SaveAction}"/>
+            <Button Grid.Row="4" Grid.ColumnSpan="2" Content="Save"  Margin="5,5,5,0"  Click="{s:MethodBinding SaveAction}"/>
         </Grid>
 
         <ListView DockPanel.Dock="Bottom"
