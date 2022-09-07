@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CommonControls.SelectionListDialog"
+        xmlns:behaviors="clr-namespace:CommonControls.Behaviors" 
         xmlns:s="http://schemas.singulink.com/xaml"
         mc:Ignorable="d"
     Title="{Binding WindowTitle}" Height="450" Width="800">
@@ -14,11 +15,15 @@
         </Grid.RowDefinitions>
 
         <local:SelectionListView/>
-
-        <DockPanel Grid.Row="1" LastChildFill="False">
+        
+        <DockPanel Grid.Row="1">
             <Button DockPanel.Dock="Left" Content="Select All" Margin="2,2,2,2" Width="80" Click="{s:MethodBinding SelectAll}" />
             <Button DockPanel.Dock="Left"  Content="Deselect All" Margin="2,2,2,2" Width="80" Click="{s:MethodBinding DeselectAll}" />
             <Button DockPanel.Dock="Right" Content="Ok" Margin="2,2,2,2" Width="80" Click="OkButton_Click"/>
+            <StackPanel>
+                <Label  DockPanel.Dock="Left" Content="Filter:" VerticalContentAlignment="Center"/>
+                <TextBox x:Name="SearchTextBox" Height="20" behaviors:TextBoxExtensions.Watermark="Search filter, regEx supported"/>
+            </StackPanel>
         </DockPanel>
 
     </Grid>
