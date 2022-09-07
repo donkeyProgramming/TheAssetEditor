@@ -27,7 +27,6 @@ namespace CommonControls.SelectionListDialog
 
         SolidColorBrush _noErrorBackground = new SolidColorBrush(Colors.White);
         SolidColorBrush _errorBackground = new SolidColorBrush(Colors.Red);
-        IEnumerable _originalUntypedList;
         public SelectionListWindow()
         {
             InitializeComponent();
@@ -39,11 +38,8 @@ namespace CommonControls.SelectionListDialog
             Close();
         }
 
-        private void FilterConditionChanged<T>()
+        private void FilterConditionChanged<T>( ObservableCollection<SelectionListViewModel<T>.Item> originalList)
         {
-            if (_originalUntypedList == null) 
-                throw new InvalidOperationException("SetDataContextAndFilterConfig is not called first");
-
             SelectionListViewModel<T> typedDataContext = (SelectionListViewModel<T>)DataContext;
             using (new WaitCursor())
             {
@@ -58,10 +54,9 @@ namespace CommonControls.SelectionListDialog
                 if (string.IsNullOrWhiteSpace(filterText))
                 {
                     typedDataContext.ItemList.Clear();
-                    foreach (var item in _originalUntypedList)
+                    foreach (var item in originalList)
                     {
-                        SelectionListViewModel<T>.Item typedItem = (SelectionListViewModel<T>.Item)item;
-                        typedDataContext.ItemList.Add(typedItem);
+                        typedDataContext.ItemList.Add(item);
                     }
                     toolTip.IsOpen = false;
                     SearchTextBox.Background = _noErrorBackground;
@@ -73,12 +68,11 @@ namespace CommonControls.SelectionListDialog
                     Regex rx = null;
                     typedDataContext.ItemList.Clear();
                     rx = new Regex(filterText, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-                    foreach (var item in _originalUntypedList)
+                    foreach (var item in originalList)
                     {
-                        SelectionListViewModel<T>.Item typedItem = (SelectionListViewModel<T>.Item)item;
-                        var result = rx.Matches(typedItem.DisplayName).Count > 0;
+                        var result = rx.Matches(item.DisplayName).Count > 0;
                         if (result)
-                            typedDataContext.ItemList.Add(typedItem);
+                            typedDataContext.ItemList.Add(item);
                             
                     }
                     toolTip.IsOpen = false;
@@ -98,9 +92,9 @@ namespace CommonControls.SelectionListDialog
 
         public void SetDataContextAndFilterConfig<T>(SelectionListViewModel<T> dc)
         {
-            _originalUntypedList = dc.ItemList.ToList();
             DataContext = dc;
-            SearchTextBox.TextChanged += (sender, e) => FilterConditionChanged<T>();
+            var list = new ObservableCollection<SelectionListViewModel<T>.Item>(dc.ItemList);
+            SearchTextBox.TextChanged += (sender, e) => FilterConditionChanged<T>(list);
         }
         public static SelectionListWindow ShowDialog<T>(string titel, IEnumerable<SelectionListViewModel<T>.Item> itemList, bool modal = true)
         {
