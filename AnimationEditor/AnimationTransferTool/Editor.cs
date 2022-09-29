@@ -131,6 +131,7 @@ namespace AnimationEditor.AnimationTransferTool
 
         public void FreezePositionAndRotation()
         {
+            MessageBox.Show("this feature is currently broken because I gave up on it", "admiralnelson");
             var newAnimationClip = UpdateAnimation(_copyFrom.AnimationClip, _copyTo.AnimationClip);
 
             if (ModelBoneList.SelectedItem == null)
