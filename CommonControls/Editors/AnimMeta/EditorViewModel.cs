@@ -133,10 +133,11 @@ namespace CommonControls.Editors.AnimMeta
 
         public void PasteAction()
         {
-            var pasteObjects = _copyPasteManager.GetPasteObjects<ICopyPastItem>().ToList().ConvertAll(x => x as MetaDataTagCopyItem);
+            var pasteObjList = _copyPasteManager.GetPasteObjects<ICopyPastItem>();
 
-            if (pasteObjects != null)
+            if (pasteObjList != null)
             {
+                var pasteObjects = pasteObjList.ToList().ConvertAll(x => x as MetaDataTagCopyItem);
                 var confirm = MessageBox.Show($"Paste {pasteObjects.Count} metadata objects?", "paste milord?", MessageBoxButton.YesNo);
                 if (confirm != MessageBoxResult.Yes) return;
 
@@ -195,6 +196,7 @@ namespace CommonControls.Editors.AnimMeta
         {
             _prevSelectedTag = null;
             _selectedTags.Clear();
+            _copyPasteManager.Clear();
         }
 
         public void CopyAction()
