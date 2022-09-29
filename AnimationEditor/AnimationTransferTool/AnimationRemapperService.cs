@@ -46,7 +46,7 @@ namespace AnimationEditor.AnimationTransferTool
             ApplyAnimationScale(newAnimation, copyToSkeleton);
             ApplyBoneLengthMult(newAnimation, copyToSkeleton);
 
-            return newAnimation;
+           return newAnimation;
         }
 
 
@@ -314,6 +314,8 @@ namespace AnimationEditor.AnimationTransferTool
 
                         if (boneSettings.FreezeRotation.Value)
                             animation.DynamicFrames[frameIndex].Rotation[i] = Quaternion.Identity;
+                        if (boneSettings.FreezeRotationZ.Value)
+                            animation.DynamicFrames[frameIndex].Rotation[i] = new Quaternion(0, 0, animation.DynamicFrames[0].Rotation[i].Z, animation.DynamicFrames[0].Rotation[i].W);
                     }
                     else
                     {

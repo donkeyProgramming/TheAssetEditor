@@ -9,13 +9,12 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 {
     public class CAkDialogueEvent_v136 : HircItem
     {
-
-        public byte uProbability;
-        public uint uTreeDepth;
-        public ArgumentList ArgumentList;
-        public uint uTreeDataSize;
-        public byte uMode;
-        public AkDecisionTree AkDecisionTree;
+        public byte uProbability { get; set; }
+        public uint uTreeDepth { get; set; }
+        public ArgumentList ArgumentList { get; set; }
+        public uint uTreeDataSize { get; set; }
+        public byte uMode { get; set; }
+        public AkDecisionTree AkDecisionTree { get; set; }
 
         public AkPropBundle AkPropBundle0 { get; set; }
         public AkPropBundleMinMax AkPropBundle1 { get; set; }
@@ -42,13 +41,13 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
         [DebuggerDisplay("Node Key:[{key}] Children:[{Children.Count}] Sounds:[{SoundNodes.Count}]")]
         public class Node
         {
-            public uint key;
-            public uint audioNodeId;
-            public ushort children_uIdx;
-            public ushort children_uCount;
-            public ushort uWeight;
-            public ushort uProbability;
-
+            public uint Key { get; set; }
+            public uint AudioNodeId { get; set; }
+            public ushort Children_uIdx { get; set; }
+            public ushort Children_uCount { get; set; }
+            public ushort uWeight { get; set; }
+            public ushort uProbability { get; set; }
+            public bool IsAudioNode { get; set; }
             public List<Node> Children { get; set; } = new List<Node>();
             //public List<SoundNode> SoundNodes { get; set; } = new List<SoundNode>();
 
@@ -79,10 +78,11 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
                     {
                         var node = new Node()
                         {
-                            key = key_,
-                            audioNodeId = chunk.ReadUInt32(),
+                            Key = key_,
+                            AudioNodeId = chunk.ReadUInt32(),
                             uWeight = chunk.ReadUShort(),
                             uProbability = chunk.ReadUShort(),
+                            IsAudioNode = true,
                         };
                         Children.Add(node);
                     }
@@ -90,11 +90,12 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
                     {
                         var node = new Node()
                         {
-                            key = key_,
-                            children_uIdx = chunk.ReadUShort(),
-                            children_uCount = chunk.ReadUShort(),
+                            Key = key_,
+                            Children_uIdx = chunk.ReadUShort(),
+                            Children_uCount = chunk.ReadUShort(),
                             uWeight = chunk.ReadUShort(),
                             uProbability = chunk.ReadUShort(),
+                            IsAudioNode = false,
                         };
                         Children.Add(node);
                     }
@@ -103,8 +104,8 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 
                 foreach (var child in Children)
                 {
-                    if (child.children_uCount > 0)
-                        child.Parse(chunk, child.children_uCount, size, currentTreeDepth + 1, maxTreeDepth);
+                    if (child.Children_uCount > 0)
+                        child.Parse(chunk, child.Children_uCount, size, currentTreeDepth + 1, maxTreeDepth);
                 }
             }
         }
@@ -130,7 +131,6 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 
         public AkDecisionTree(ByteChunk chunk, uint maxTreeDepth, uint size)
         {
-
             Root = new Node();
             Root.Parse(chunk, 1, size, 0, maxTreeDepth); //first Node is at depth 0
         }
@@ -153,8 +153,6 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             {
                 ulGroup = chunk.ReadUInt32();
                 eGroupType = (AkGroupType)chunk.ReadByte();
-
-
             }
         }
     }

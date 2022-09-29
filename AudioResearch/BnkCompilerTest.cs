@@ -1,4 +1,6 @@
-﻿using CommonControls.Editors.AudioEditor.BnkCompiler;
+﻿using CommonControls.BaseDialogs.ErrorListDialog;
+using CommonControls.Editors.AudioEditor.BnkCompiler;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using System.IO;
 using System.Linq;
@@ -10,15 +12,19 @@ namespace AudioResearch
         public static bool Run(string projectFilePath, PackFileService pfs)
         {
             var compiler = new Compiler(pfs);
-            var fileContent = File.ReadAllText(projectFilePath);
-            var result = compiler.Compile(fileContent, out var errorList);
+            var fileContent = File.ReadAllBytes(projectFilePath);
+            var packFile = new PackFile("project", new MemorySource(fileContent));
 
-            if (errorList.Errors.Count == 0 && result)
+            var compileResultLog = new ErrorListViewModel.ErrorList();
+            var result = compiler.CompileProject(packFile, ref compileResultLog);
+
+            if (compileResultLog.Errors.Count == 0 && result != null)
             {
                 var project = compiler.ProjectFile;
 
                 // Save to disk for easy debug
-                var chunk = compiler.OutputBnkFile.DataSource.ReadDataAsChunk();
+                var bnkFile = result.OutputBnkFile;
+                var chunk = bnkFile.DataSource.ReadDataAsChunk();
                 chunk.SaveToFile($"Data\\{project.OutputFile}".ToLower().Trim());
 
                 return true;

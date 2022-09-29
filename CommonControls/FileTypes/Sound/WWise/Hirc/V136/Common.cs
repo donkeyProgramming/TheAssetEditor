@@ -123,7 +123,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
                 AkPropBundle1 = new AkPropBundleMinMax()
                 {
                     Values = new List<AkPropBundleMinMax.AkPropBundleInstance>()
-                    {
+                    /*{
                         new AkPropBundleMinMax.AkPropBundleInstance()
                         {
                             Type = AkPropBundleType.Volume,
@@ -148,7 +148,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
                             Max = 30,
                             Min = 0
                         },
-                    },
+                    },*/
                 }
             };
 
@@ -218,7 +218,6 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             };
         }
 
-
         public uint GetSize() => AkPropBundle0.GetSize() + AkPropBundle1.GetSize();
 
         public byte[] GetAsByteArray()
@@ -238,7 +237,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             public float Value { get; set; }
         }
 
-        public List<AkPropBundleInstance> Values = new List<AkPropBundleInstance>();
+        public List<AkPropBundleInstance> Values { get; set; } = new List<AkPropBundleInstance>();
 
         public static AkPropBundle Create(ByteChunk chunk)
         {
@@ -282,7 +281,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             public float Max { get; set; }
         }
 
-        public List<AkPropBundleInstance> Values = new List<AkPropBundleInstance>();
+        public List<AkPropBundleInstance> Values { get; set; } = new List<AkPropBundleInstance>();
 
         public static AkPropBundleMinMax Create(ByteChunk chunk)
         {

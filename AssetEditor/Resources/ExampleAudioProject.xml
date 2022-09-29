@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<root OutputFile="SimpleBnkProject.bnk" OutputGame="wh3">
+
+	<Event Id="Play_custom_ogre_unit_selected">
+		<AudioBus>Battle</AudioBus>
+		<Action>Custom_unit_selection_start</Action>
+	</Event>
+
+	<Action Id="Custom_unit_selection_start">
+		<Child Type="Play">CustomAudioFile_ID</Child>
+	</Action>
+
+	<GameSound Id="CustomAudioFile_ID">Audio/WWise/English(uk)/378298469.wem</GameSound>
+
+</root>

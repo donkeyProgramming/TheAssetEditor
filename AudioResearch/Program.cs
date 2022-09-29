@@ -32,19 +32,31 @@ namespace AudioResearch
             var pathToPackFileWithSounds = "Path to packfile with sounds";
             if (File.Exists(pathToPackFileWithSounds))
                 pfs.Load(pathToPackFileWithSounds);
-            
+
+            var f = pfs.FindAllFilesInDirectory("audio\\wwise");
+            var orders = f.OrderByDescending(x => x.DataSource.Size).ToList();
+
+
+            //SoundPlayer player = new SoundPlayer(pfs, null);
+            //player.PlaySound(219414162);
+
+
             // Create an output pack
             var newPackFile = pfs.CreateNewPackFileContainer("CustomPackFile", PackFileCAType.MOD);
             pfs.SetEditablePack(newPackFile);
 
             // Compile some bnkFiles
-            BnkCompilerTest.Run(@"Data\SimpleBnkProject.bnk.xml", pfs);
+            //BnkCompilerTest.Run(@"Data\SimpleBnkProject.bnk.xml", pfs);
 
             // Load all game data
             WwiseDataLoader builder = new WwiseDataLoader();
             var bnkList = builder.LoadBnkFiles(pfs);
             var globalDb = builder.BuildMasterSoundDatabase(bnkList);
             var nameHelper = builder.BuildNameHelper(pfs);
+
+            var a0 = nameHelper.GetName(3113488887);
+            var a1 = nameHelper.GetName(112324978);
+            var a2 = nameHelper.GetName(2411227174);
 
             // Explore some data
             //Ole_DataExploration(globalDb, nameHelper);

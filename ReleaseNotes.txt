@@ -253,7 +253,7 @@ Clean up render list items  - One dispsable large list and one on the go. All ty
 
 Phazer link
 
-
+terrain/battles/wh3_main_macro_ksl_mountains_01_ogr_camp/tile_map.bmd.xml
 
 
 
@@ -265,14 +265,22 @@ I can't get them to play with my thane, but they don't play with the basic Armou
 
 V0.40
 ----------------------------
+saving small meshes causes bounding box crashes 
+deleting wsmodel makes it impossible to generate it again
+Pressing X on textures brings then back when saving and loadin
+Texture editor, uv combiner 
+Improve texture project feature
+Simplygon support 
 
 
 Better error message for stuff with lod loading error. open in rpfm bug 
 Finish Convert wh2 animpack to wh3 format 
 
+in animbin editor, see the slot version bla bla used. 
  Fix datParser so it does not break wh2 
  Find unreferensed textures 
 make wh2 bin in same format at wh3 
+Preview effects in audio land
 
 
 V0.41
@@ -294,6 +302,7 @@ V0.41
 	Create anim.meta from superview if its missing 
 	bugfixes
 	splice in meta chos
+	
 
 V0.40
 ----------------------------

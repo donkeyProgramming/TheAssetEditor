@@ -84,6 +84,7 @@
                         <Label Content=":" Visibility="Hidden"/>
                         <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding SelectedBone.FreezeTranslation.Value}" Content="Freeze position" Margin="0,0,5,0" ToolTip="Set the bone position to 0,0,0"/>
                         <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding SelectedBone.FreezeRotation.Value}" Content="Freeze Rotation" Margin="0,0,5,0" ToolTip="Set the bone rotation to 0,0,0"/>
+                        <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding SelectedBone.FreezeRotationZ.Value}" Content="Freeze Rotation Z" Margin="0,0,5,0" ToolTip="Set the bone rotation to 0,0, to some rotation Z at frame 1"/>
                         <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding SelectedBone.ForceSnapToWorld.Value}" Content="Snap worldspace" ToolTip="Sets the bone transform to the same as the target, no magic attempted"/>
                     </DockPanel>
 

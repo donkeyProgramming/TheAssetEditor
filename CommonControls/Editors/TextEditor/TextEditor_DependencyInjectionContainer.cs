@@ -17,7 +17,7 @@ namespace CommonControls.Editors.TextEditor
             factory.RegisterFileTool<TextEditorViewModel<DefaultTextConverter>, TextEditorView>(
                 new ExtentionToTool( 
                     EditorEnums.XML_Editor,
-                    new[] { ".json", ".xml", ".txt", ".wsmodel", ".xml.material", ".anim.meta.xml", ".anm.meta.xml", ".snd.meta.xml", ".bmd.xml", ".csv" } ));
+                    new[] { ".json", ".xml", ".txt", ".wsmodel", ".xml.material", ".anim.meta.xml", ".anm.meta.xml", ".snd.meta.xml", ".bmd.xml", ".csv", ".bnk.xml" } ));
         }
     }
 }
