@@ -23,7 +23,7 @@ namespace CommonControls.Editors.AudioEditor
             _pfs = pfs;
             _lookUpHelper = lookUpHelper;
         }
-public void ExtractSound(HircTreeItem rootNode, ICAkSound wwiseSound)
+        public void ExtractSound(HircTreeItem rootNode, ICAkSound wwiseSound)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.FileName = ".wav";
@@ -43,9 +43,11 @@ public void ExtractSound(HircTreeItem rootNode, ICAkSound wwiseSound)
             VgStreamWrapper.ExportFile(outputName, audioFile.DataSource.ReadData(), out var _, false);
         }
 
-
-        public void PlaySound(HircTreeItem rootNode, ICAkSound wwiseSound){
+        public bool PlaySound(HircTreeItem rootNode, ICAkSound wwiseSound)
+        {
             var outputName = _lookUpHelper.GetName(rootNode.Item.Id) + "-" + wwiseSound.GetSourceId();
+            return PlaySound(wwiseSound.GetSourceId(), outputName);
+        }
 
         public bool PlaySound(uint id, string outputName = null)
         {
@@ -54,7 +56,7 @@ public void ExtractSound(HircTreeItem rootNode, ICAkSound wwiseSound)
 
             var audioFile = _pfs.FindFile($"audio\\wwise\\{id}.wem");
            if (audioFile == null)
-                audioFile = _pfs.FindFile($"audio\\wwise\\english(uk)\\{wwiseSound.GetSourceId()}.wem");
+                audioFile = _pfs.FindFile($"audio\\wwise\\english(uk)\\{id}.wem");
             if (audioFile == null)
             {
                 _logger.Here().Error("Unable to find sound");
