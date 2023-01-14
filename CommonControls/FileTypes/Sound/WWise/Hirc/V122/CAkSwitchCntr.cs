@@ -36,7 +36,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V122
                 Parameters.Add(AkSwitchNodeParams.Create(chunk));
         }
 
-        public override void ComputeSize() => throw new NotImplementedException();
+        public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
 

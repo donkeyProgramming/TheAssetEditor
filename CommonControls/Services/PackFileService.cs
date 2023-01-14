@@ -200,29 +200,33 @@ namespace CommonControls.Services
             return filesWithResult.Select(x=>x.Value).ToList();
         }
 
-        public List<PackFile> FindAllFilesInDirectory(string dir, PackFileContainer packFileContainer = null)
+        public List<PackFile> FindAllFilesInDirectory(string dir, bool includeSubFolders = true)
         {
             dir = dir.Replace('/', '\\').ToLower();
             List<PackFile> output = new List<PackFile>();
-            if (packFileContainer == null)
+            
+            foreach (var pf in Database.PackFiles)
             {
-                foreach (var pf in Database.PackFiles)
+                foreach (var file in pf.FileList)
                 {
-                    foreach (var file in pf.FileList)
+                    bool includeFile = false;
+                    if (includeSubFolders)
                     {
-                        if (file.Key.IndexOf(dir) == 0)
-                            output.Add(file.Value );
+                        includeFile = file.Key.IndexOf(dir) == 0;
                     }
-                }
-            }
-            else
-            {
-                foreach (var file in packFileContainer.FileList)
-                {
-                    if (file.Key.IndexOf(dir) == 0)
+                    else
+                    {
+                        var dirName = Path.GetDirectoryName(file.Key);
+                        var compareResult = string.Compare(dirName, dir, StringComparison.InvariantCultureIgnoreCase);
+                        if (compareResult == 0)
+                            includeFile = true;
+                    }
+                            
+                    if (includeFile)
                         output.Add(file.Value );
                 }
             }
+            
 
             return output;
         }

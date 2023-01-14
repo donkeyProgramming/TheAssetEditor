@@ -1,4 +1,5 @@
-﻿using CommonControls.Editors.AudioEditor;
+﻿using CommonControls.Common;
+using CommonControls.Editors.AudioEditor;
 using CommonControls.Editors.Sound;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.Sound;
@@ -27,18 +28,82 @@ namespace AudioResearch
             // Create a progam
             Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
             GameInformationFactory.Create();
-            var pfs = GetPackFileService(skipLoadingWemFiles: false);
+
+            //LoadAllTest();
+            CompileTest0();
+
+            //DialogEventsAsTables.ExportAllDialogEventsAsTable();
+            //DialogEventsAsTables.ExportSystemFileAsTable(@"C:\Users\ole_k\Downloads\battle_vo_orders_999999999__core.bnk", "custom_");
+
+            //CompileTest();
+        }
+
+        static void CompileTest0()
+        {
+            var pfs = PackFileUtil.CreatePackFileService();
+
+            var audioFile = PackFileUtil.CreatePackFileFromSystem(@"Data\CustomSoundCompile\790209750.wem", out var _);
+            pfs.AddFilesToPack(pfs.GetEditablePack(), new List<string>() { @"audio\wwise", }, new List<PackFile>() { audioFile });
+
+            // var audioProject = PackFileUtil.CreatePackFileFromSystem("", out var _);
+            // pfs.AddFilesToPack(pfs.GetEditablePack(), new List<string>() { "audio//wwise", }, new List<PackFile>() { audioProject });
+
+            BnkCompilerTest.Run(@"Data\CustomSoundCompile\Project.xml", pfs, out var outputFile);
+
+            // Run wwiser with export to xml and wwiser names 
+            var fullPath = Directory.GetCurrentDirectory() + "\\" + outputFile; 
+            ExecuteCommand("C:\\Users\\ole_k\\Desktop\\audio_research\\WWiser\\wwiser.pyz " + fullPath);
+        }
+
+        public static void ExecuteCommand(string Command)
+        {
+            ProcessStartInfo ProcessInfo;
+            Process Process;
+
+            ProcessInfo = new ProcessStartInfo("cmd.exe", "/K " + Command);
+            ProcessInfo.CreateNoWindow = true;
+            ProcessInfo.UseShellExecute = true;
+
+            Process = Process.Start(ProcessInfo);
+        }
+
+
+        static void LoadAllTest()
+        {
+            var pfs = ResearchUtil.GetPackFileService(skipLoadingWemFiles: false);
 
             var pathToPackFileWithSounds = "Path to packfile with sounds";
             if (File.Exists(pathToPackFileWithSounds))
                 pfs.Load(pathToPackFileWithSounds);
 
-            var f = pfs.FindAllFilesInDirectory("audio\\wwise");
-            var orders = f.OrderByDescending(x => x.DataSource.Size).ToList();
+            // Create an output pack
+            var newPackFile = pfs.CreateNewPackFileContainer("CustomPackFile", PackFileCAType.MOD);
+            pfs.SetEditablePack(newPackFile);
+
+            // Load all game data
+            WwiseDataLoader builder = new WwiseDataLoader();
+            var bnkList = builder.LoadBnkFiles(pfs);
+            var globalDb = builder.BuildMasterSoundDatabase(bnkList);
+            var nameHelper = builder.BuildNameHelper(pfs);
+            nameHelper.SaveToFile(@"C:\Users\ole_k\Desktop\audio research\WWiser\wwnames.txt");
+
+            Console.ReadLine();
+        }
+
+        static void CompileTest()
+        {
+            var pfs = ResearchUtil.GetPackFileService(skipLoadingWemFiles: false);
+
+            var pathToPackFileWithSounds = "Path to packfile with sounds";
+            if (File.Exists(pathToPackFileWithSounds))
+                pfs.Load(pathToPackFileWithSounds);
+
+            var allNonLangFiles = pfs.FindAllFilesInDirectory("audio\\wwise", false);
+            var orderedAllNonLangFiles = allNonLangFiles.OrderByDescending(x => x.DataSource.Size).ToList();
 
 
-            //SoundPlayer player = new SoundPlayer(pfs, null);
-            //player.PlaySound(219414162);
+            SoundPlayer player = new SoundPlayer(pfs, null);
+            player.PlaySound(713853811);    // I will continue, later
 
 
             // Create an output pack
@@ -64,6 +129,7 @@ namespace AudioResearch
             Console.ReadLine();
         }
 
+       
         private static void Ole_DataExploration2(PackFileService pfs, ExtenededSoundDataBase globalDb, WWiseNameLookUpHelper nameHelper)
         {
             var allSounds = globalDb.HircList.Where(X => X.Value.First() is CAkSound_v136).Select(x => x.Value.First()).Cast<CAkSound_v136>().ToList();
@@ -215,16 +281,7 @@ namespace AudioResearch
             return notFoundEvents.Count;
         }
 
-        static PackFileService GetPackFileService(bool skipLoadingWemFiles = true)
-        {
-            var appSettings = new ApplicationSettingsService();
-            appSettings.CurrentSettings.SkipLoadingWemFiles = skipLoadingWemFiles;
-            var gamePath = appSettings.CurrentSettings.GameDirectories.First(x => x.Game == GameTypeEnum.Warhammer3);
-            PackFileService pfs = new PackFileService(new PackFileDataBase(), new SkeletonAnimationLookUpHelper(), appSettings);
-            pfs.LoadAllCaFiles(gamePath.Path, GameInformationFactory.GetGameById(GameTypeEnum.Warhammer3).DisplayName);
 
-            return pfs;
-        }
     }
 
 

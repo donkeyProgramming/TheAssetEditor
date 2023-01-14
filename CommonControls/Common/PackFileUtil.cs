@@ -72,10 +72,34 @@ namespace CommonControls.Common
             return path;
         }
 
-        public static string SaveFileToTempDir(PackFile file)
+        public static PackFileService CreatePackFileServiceFromSystemFile(string path)
         {
-            var exportPath = DirectoryHelper.Temp + "\\" + file.Name;
-            return SaveFile(file, exportPath);
+            if (File.Exists(path) == false)
+                throw new Exception();
+
+            var pfs = CreatePackFileService();
+            var container = pfs.GetAllPackfileContainers().First();
+            pfs.AddFileToPack(container, "systemfile", new PackFile(Path.GetFileName(path), new FileSystemSource(path)));
+
+            return pfs;
+        }
+
+        public static PackFileService CreatePackFileService()
+        {
+
+            var pfs = new PackFileService(new PackFileDataBase(), new SkeletonAnimationLookUpHelper(), new ApplicationSettingsService());
+            var container = pfs.CreateNewPackFileContainer("temp", PackFileCAType.MOD);
+            pfs.SetEditablePack(container);
+
+            return pfs;
+        }
+
+        public static PackFile CreatePackFileFromSystem(string filePath, out string directoryPath)
+        {
+            var fileSource = new FileSystemSource(filePath);
+            var packfile = new PackFile(Path.GetFileName(filePath), fileSource);
+            directoryPath = Path.GetDirectoryName(filePath);
+            return packfile;
         }
     }
 }

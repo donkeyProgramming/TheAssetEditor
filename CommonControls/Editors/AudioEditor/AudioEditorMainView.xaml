@@ -37,6 +37,7 @@
             <MenuItem Header="_File">
                 <MenuItem Header="Load all bnks" Click="{s:MethodBinding LoadAllBnksAction}"/>
                 <MenuItem Header="Load one bnks" Click="{s:MethodBinding BrowseBnkAction}"/>
+                <MenuItem Header="Export id list" Click="{s:MethodBinding ExportIdListAction}"/>
             </MenuItem>
         </Menu>
 

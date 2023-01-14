@@ -5,7 +5,6 @@ using CommonControls.FileTypes.Sound;
 using CommonControls.FileTypes.Sound.WWise;
 using CommonControls.FileTypes.Sound.WWise.Bkhd;
 using CommonControls.FileTypes.Sound.WWise.Hirc;
-using CommonControls.FileTypes.Sound.WWise.Hirc.V136;
 using CommonControls.Services;
 using Filetypes.ByteParsing;
 using System;
@@ -17,6 +16,7 @@ using System.Xml.Serialization;
 
 namespace CommonControls.Editors.AudioEditor.BnkCompiler
 {
+
     public class Compiler
     {
         public class CompileResult
@@ -36,7 +36,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             _pfs = pfs;
         }
 
-        public bool CompileAll(out ErrorListViewModel.ErrorList outputList)
+        public bool CompileAllProjects(out ErrorListViewModel.ErrorList outputList)
         {
             outputList = new ErrorListViewModel.ErrorList();
 
@@ -74,154 +74,38 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             if (validationResult == false)
                 return null;
 
-            var bnkFile = BuildBnk(ProjectFile);
+            var generator = new WWiseObjectGenerator(_pfs, ProjectFile);
+            var wwiseProject = generator.Generate();
+
+            var bnkFile = ConvertToPackFile(wwiseProject, ProjectFile.OutputFile);
             var datFile = BuildDat(ProjectFile);
-            var files0 = BuildGameAudioFiles(ProjectFile);
-            var files1 = BuildFileAudioFiles(ProjectFile);
-            var nameList = BuildNameLookUpFile(ProjectFile);
 
             return new CompileResult()
             {
                 OutputBnkFile = bnkFile,
                 OutputDatFile = datFile,
-                NameList = nameList
+                NameList = null
             };
         }
 
-        private List<PackFile> BuildGameAudioFiles(AudioProjectXml projectFile)
+        PackFile ConvertToPackFile(WWiseObjectGenerator.WWiseProject wWiseProject, string outputFile)
         {
-            foreach (var file in projectFile.GameSounds)
-            {
-                // If language file, copy
-                var dirName = Path.GetDirectoryName(file.Text);
-                var fileName = Path.GetFileNameWithoutExtension(file.Text);
-
-                //var dirNamess = Path.
-            }
-
-            return new List<PackFile>();
-        }
-
-        private List<PackFile> BuildFileAudioFiles(AudioProjectXml projectFile)
-        {
-            foreach (var file in projectFile.GameSounds)
-            {
-                // Import
-                // Give name
-                // Save 
-
-            }
-            return new List<PackFile>();
-        }
-
-        PackFile BuildBnk(AudioProjectXml projectFile)
-        {
-            var bnkName = Path.GetFileNameWithoutExtension(projectFile.OutputFile);
-            
-            // Header
-            var bankHeader = CompileHeader(projectFile, bnkName);  
-
-            //-------------------
-            // Build Hirc list
-
-            var hircList = new List<HircItem>();
-            hircList.AddRange(projectFile.GameSounds.Select(x => ConvertToWWiseGameSound(x)));
-            hircList.AddRange(projectFile.Actions.Select(x => ConvertToWWiseAction(x, bnkName)));
-            hircList.AddRange(projectFile.Events.Select(x => ConvertToWWiseEvent(x)));
-            hircList.ForEach(x => x.ComputeSize());
-
-            HircChunk hircChunk = new HircChunk();
-            hircChunk.Hircs.AddRange(hircList);
-            hircChunk.ChunkHeader.ChunkSize = (uint)(hircChunk.Hircs.Sum(x=>x.Size) + (hircChunk.Hircs.Count() * 5) + 4);
-            hircChunk.NumHircItems = (uint)hircChunk.Hircs.Count();
-            
-            var hircParse = new HircParser();
-            var hircBytes = hircParse.GetAsBytes(hircChunk);
+            var headerBytes = BkhdParser.GetAsByteArray(wWiseProject.Header);
+            var hircBytes = new HircParser().GetAsBytes(wWiseProject.HircItems);
 
             // Write
             using var memStream = new MemoryStream();
-            memStream.Write(bankHeader);
+            memStream.Write(headerBytes);
             memStream.Write(hircBytes);
             var bytes = memStream.ToArray();
 
             // Convert to output and parse for sanity
-            var bnkPackFile = new PackFile(projectFile.OutputFile, new MemorySource(bytes));
-            var result = Bnkparser.Parse(bnkPackFile, "test\\TestFile.bnk"); 
+            var bnkPackFile = new PackFile(outputFile, new MemorySource(bytes));
+            var result = Bnkparser.Parse(bnkPackFile, "test\\TestFile.bnk");
 
             return bnkPackFile;
         }
 
-        byte[] CompileHeader(AudioProjectXml projectFile, string bnkName)
-        {
-            var soundBankId = ConvertStringToWWiseId(bnkName);
-            var header = new BkhdHeader()
-            {
-                dwBankGeneratorVersion = 0x80000088,
-                dwSoundBankID = soundBankId,
-                dwLanguageID = 393239870,
-                bFeedbackInBank = 0x10,
-                dwProjectID = 2361,
-                padding = 0x04,
-            };
-
-            return BkhdParser.GetAsByteArray(header);
-        }
-
-        private CAkSound_v136 ConvertToWWiseGameSound(GameSound inputSound)
-        {
-            var file = _pfs.FindFile(inputSound.Text);
-            var soundIdStr = Path.GetFileNameWithoutExtension(inputSound.Text).Trim();
-            var soundId = uint.Parse(soundIdStr);
-
-            var wwiseSound = new CAkSound_v136()
-            {
-                Id = ConvertStringToWWiseId(inputSound.Id),
-                Type = HircType.Sound,
-                AkBankSourceData = new AkBankSourceData()
-                {
-                    PluginId = 0x00040001,
-                    StreamType = SourceType.Data_BNK,
-                    akMediaInformation = new AkMediaInformation()
-                    {
-                        SourceId = soundId,
-                        uInMemoryMediaSize = (uint)file.DataSource.Size,
-                        uSourceBits = 0x00,
-                    }
-                },
-                NodeBaseParams = NodeBaseParams.CreateDefault()
-            };
-
-            return wwiseSound;
-        }
-
-        CAkEvent_v136 ConvertToWWiseEvent(Event inputEvent)
-        {
-            var wwiseEvent = new CAkEvent_v136();
-            wwiseEvent.Id = ConvertStringToWWiseId(inputEvent.Id);
-            wwiseEvent.Type = FileTypes.Sound.WWise.HircType.Event;
-            wwiseEvent.Actions = new List<CAkEvent_v136.Action>()
-            { 
-                new CAkEvent_v136.Action(){ ActionId = ConvertStringToWWiseId(inputEvent.Action)}
-            };
-            return wwiseEvent;
-        }
-
-        CAkAction_v136 ConvertToWWiseAction(Action inputAction, string bnkName)
-        {
-            if (inputAction.ChildList.Count != 1)
-                throw new NotImplementedException();
-
-            var wwiseAction = new CAkAction_v136();
-            wwiseAction.Id = ConvertStringToWWiseId(inputAction.Id);
-            wwiseAction.Type = FileTypes.Sound.WWise.HircType.Action;
-            wwiseAction.ActionType = FileTypes.Sound.WWise.ActionType.Play;
-            wwiseAction.idExt = ConvertStringToWWiseId(inputAction.ChildList.First().Text);
-
-            wwiseAction.AkPlayActionParams.byBitVector = 0x04;
-            wwiseAction.AkPlayActionParams.bankId = ConvertStringToWWiseId(bnkName);
-
-            return wwiseAction;
-        }
 
         PackFile BuildDat(AudioProjectXml projectFile)
         {
@@ -236,14 +120,6 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             var reparsedSanityFile = DatParser.Parse(packFile, false);
             return packFile;
         }
-
-        private PackFile BuildNameLookUpFile(AudioProjectXml projectFile)
-        {
-            return null;
-        }
-
-
-        uint ConvertStringToWWiseId(string id) => WWiseNameLookUpHelper.ComputeWWiseHash(id);
        
 
         AudioProjectXml LoadFile(PackFile packfile, ref ErrorListViewModel.ErrorList errorList)

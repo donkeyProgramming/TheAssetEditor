@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace CommonControls.Editors.AudioEditor
@@ -52,5 +53,23 @@ namespace CommonControls.Editors.AudioEditor
         }
 
         public string GetName(uint value) => GetName(value, out var _);
+
+        public void SaveToFileWithId(string path)
+        {
+            var stringbuilder = new StringBuilder();
+            foreach (var item in _hashValueMap)
+                stringbuilder.AppendLine($"{item.Key}, {item.Value}");
+
+            File.WriteAllText(path, stringbuilder.ToString());
+        }
+
+        public void SaveToFile(string path)
+        {
+            var stringbuilder = new StringBuilder();
+            foreach (var item in _hashValueMap)
+                stringbuilder.AppendLine($"{item.Value}");
+
+            File.WriteAllText(path, stringbuilder.ToString());
+        }
     }
 }

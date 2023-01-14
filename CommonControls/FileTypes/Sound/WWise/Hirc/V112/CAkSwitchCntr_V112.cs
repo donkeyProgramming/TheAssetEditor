@@ -46,7 +46,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V112
 
         public override List<SwitchListItem> Items => SwitchList.Select(x => new SwitchListItem() {  SwitchId = x.SwitchId,  ChildNodeIds = x.NodeIdList }).ToList();
 
-        public override void ComputeSize() => throw new NotImplementedException();
+        public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
 

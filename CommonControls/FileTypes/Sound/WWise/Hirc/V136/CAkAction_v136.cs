@@ -52,7 +52,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             return byteArray;
         }
 
-        public override void ComputeSize()
+        public override void UpdateSize()
         {
             Size = (uint)(HircHeaderSize + 2 + 4 + 1 + AkPropBundle0.GetSize() + AkPropBundle1.GetSize() + AkPlayActionParams.ComputeSize());
         }

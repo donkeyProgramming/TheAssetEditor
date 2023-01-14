@@ -301,7 +301,7 @@ namespace AssetEditor.ViewModels
         private void CompileAudioProjects()
         {
             var compiler = new CommonControls.Editors.AudioEditor.BnkCompiler.Compiler(_packfileService);
-            compiler.CompileAll(out var errorList);
+            compiler.CompileAllProjects(out var errorList);
             ErrorListWindow.ShowDialog("Compile Result:", errorList);
         }
 

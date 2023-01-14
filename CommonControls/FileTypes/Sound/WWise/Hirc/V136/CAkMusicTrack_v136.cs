@@ -51,7 +51,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             iLookAheadTime = chunk.ReadInt32();
         }
 
-        public override void ComputeSize() => throw new NotImplementedException();
+        public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
 

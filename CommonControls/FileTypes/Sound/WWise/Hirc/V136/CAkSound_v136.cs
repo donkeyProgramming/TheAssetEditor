@@ -20,7 +20,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
         public uint GetParentId() => NodeBaseParams.DirectParentID;
         public uint GetSourceId() => AkBankSourceData.akMediaInformation.SourceId;
 
-        public override void ComputeSize()
+        public override void UpdateSize()
         {
             Size = BnkChunkHeader.HeaderByteSize + AkBankSourceData.GetSize() + NodeBaseParams.GetSize() - 4;
         }

@@ -25,7 +25,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
                 pArrayMarkersList.Add(AkMusicMarkerWwise.Create(chunk));
         }
 
-        public override void ComputeSize() => throw new NotImplementedException();
+        public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
 

@@ -62,7 +62,7 @@ namespace CommonControls.FileTypes.Sound.WWise
         }
 
         protected abstract void CreateSpesificData(ByteChunk chunk);
-        public abstract void ComputeSize();
+        public abstract void UpdateSize();
         public abstract byte[] GetAsByteArray();
     }
 

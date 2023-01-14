@@ -14,6 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Data\CustomSoundCompile\790209750.wem">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\CustomSoundCompile\Project.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Data\RandContainerProject.bnk.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

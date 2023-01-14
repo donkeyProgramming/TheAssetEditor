@@ -149,7 +149,7 @@ namespace CommonControls.Editors.AudioEditor
         {
             if (selectedNode != null)
             {
-                var hircAsString = JsonSerializer.Serialize((object)selectedNode.Item, new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter() }, WriteIndented = true});
+                var hircAsString = JsonSerializer.Serialize((object)selectedNode.Item, new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter() }, WriteIndented = true });
                 SelectedNodeText.Value = hircAsString;
 
                 var parser = new WWiseTreeParserParent(_globalDb, _lookUpHelper, true, true, true);
@@ -185,6 +185,97 @@ namespace CommonControls.Editors.AudioEditor
         public void PlaySelectedSoundAction()
         {
             _player.PlaySound(TreeList.FirstOrDefault(), _selectedNode.Item as ICAkSound);
+        }
+
+
+        class OutputTest
+        {
+            public string EventName;
+            public List<string> keys = new List<string>();
+            public List<string[]> Table;
+
+            public List<string> PrettyTable;
+            public string PrettyKeys;
+        }
+
+        public void ExportIdListAction()
+        {
+            var dialogs = _globalDb.HircList.SelectMany(x => x.Value).Where(x => x.Type == HircType.Dialogue_Event).Cast<FileTypes.Sound.WWise.Hirc.V136.CAkDialogueEvent_v136>().ToList();
+
+            var whereRootNotZero = dialogs.Where(x => x.AkDecisionTree.Root.Key != 0).ToList();
+            var whereFirstNotZero = dialogs.Where(x => x.AkDecisionTree.Root.Children.First().Key != 0).ToList();
+            var counts = dialogs.Select(x => x.ArgumentList.Arguments.Count()).Distinct().ToList();
+
+            List<OutputTest> test = new List<OutputTest>();
+
+            foreach (var dialog in dialogs)
+            {
+                var numArgs = dialog.ArgumentList.Arguments.Count()-1;
+                var root = dialog.AkDecisionTree.Root.Children.First();
+
+                if (numArgs != 0)
+                {
+                    var rowIndex = 0;
+                    var table = new List<string>();
+                    foreach (var children in root.Children)
+                        GenerateRow(children, 0, numArgs, new Stack<string>(), table);
+
+                    var keys = dialog.ArgumentList.Arguments.Select(x => _lookUpHelper.GetName(x.ulGroup)).ToList();
+                    test.Add(new OutputTest()
+                    {
+                        EventName = _lookUpHelper.GetName(dialog.Id),
+                        keys = keys,
+                        //Table = table,
+
+                        PrettyKeys = string.Join("|", keys),
+                        PrettyTable = table.Select(x=> string.Join("|", x)).ToList()
+                    });
+
+                    var last = test.Last();
+
+                    var wholeStr = new StringBuilder();
+                    wholeStr.AppendLine("sep=|");
+                    wholeStr.AppendLine(last.PrettyKeys);
+                    foreach (var row in last.PrettyTable)
+                        wholeStr.AppendLine(row);
+                    DirectoryHelper.EnsureCreated("c:\\temp\\wwiseDialogEvents");
+                    System.IO.File.WriteAllText($"c:\\temp\\wwiseDialogEvents\\{last.EventName}.csv", wholeStr.ToString());
+
+                }
+
+            }
+
+            // Remove root, remove first
+           //What is ""Node 0"" as first node // first audio node. ALways only 1?
+           //
+           //var cool = test.Where(x => x.EventName.Contains("vo_order_Attack", StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+
+            //var args = dialogs.Cast<FileTypes.Sound.WWise.Hirc.V136.CAkDialogueEvent_v136>().Select(x => x.ArgumentList).SelectMany(x=>x.Arguments).ToList();
+            //
+            //var groupTypes = args.Select(x => x.eGroupType).Distinct().OrderByDescending(x=>x).ToList();
+            //var argTypes = args.GroupBy(x => x.eGroupType).OrderBy(x => x.Key).ToList();
+            //
+            //var items2 = argTypes.Select(x => $"{x.Key}: { string.Join(",", x.Select(y => y.ulGroup).Distinct())}").ToList();
+            //var test = string.Join("\n", items2);
+
+            _lookUpHelper.SaveToFileWithId("c:\\temp\\wwiseIds.txt");
+        }
+
+        void GenerateRow(FileTypes.Sound.WWise.Hirc.V136.AkDecisionTree.Node currentNode, int currentArgrument, int numArguments, Stack<string> pushList, List<string> outputList)
+        {
+            var currentNodeContent = _lookUpHelper.GetName(currentNode.Key);
+            pushList.Push(currentNodeContent);
+
+            bool isDone = numArguments == currentArgrument;
+            if (isDone)
+            {
+                outputList.Add(string.Join("|", pushList.ToArray().Reverse()));
+            }
+            else
+            {
+                foreach (var child in currentNode.Children)
+                    GenerateRow(child, currentArgrument + 1, numArguments, pushList, outputList);
+            }
         }
     }
 }

@@ -31,7 +31,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             AkPropBundle1 = AkPropBundleMinMax.Create(chunk);
         }
 
-        public override void ComputeSize() => throw new NotImplementedException();
+        public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
 
@@ -49,7 +49,6 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             public ushort uProbability { get; set; }
             public bool IsAudioNode { get; set; }
             public List<Node> Children { get; set; } = new List<Node>();
-            //public List<SoundNode> SoundNodes { get; set; } = new List<SoundNode>();
 
             public Node()
             {
@@ -109,23 +108,6 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
                 }
             }
         }
-
-        //This could probably be added back in (no idea how to do that)
-        //public class SoundNode 
-        //{
-        //    public uint key;
-        //    public uint audioNodeId;
-        //    public ushort uWeight;
-        //    public ushort uProbability;
-        //
-        //    public SoundNode(ByteChunk chunk)
-        //    {
-        //        key = chunk.ReadUInt32();
-        //        audioNodeId = chunk.ReadUInt32();
-        //        uWeight = chunk.ReadUShort();
-        //        uProbability = chunk.ReadUShort();
-        //    }
-        //}
 
         public Node Root { get; set; }
 

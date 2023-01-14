@@ -51,9 +51,6 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             if (ValidateGameSounds(projectFile, ref errorList) == false)
                 return false;
 
-            if (ValidateFileSounds(projectFile, ref errorList) == false)
-                return false;
-
             return true;
         }
 
@@ -80,10 +77,10 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
                 }
                 else
                 {
-                    var validAudioBusses = new string[] { "battle" };
+                    var validAudioBusses = new string[] { "battle", "master" };
                     if (validAudioBusses.Contains(wwiseEvent.AudioBus.ToLower()) == false)
                     {
-                        errorList.Error("Event", $"{wwiseEvent.Id} has an unkown audio buss");
+                        errorList.Error("Event", $"{wwiseEvent.Id} has an unkown audio buss - {wwiseEvent.AudioBus}");
                         return false;
                     }
                 }
@@ -121,7 +118,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
                         return false;
                     }
 
-                    if (string.IsNullOrEmpty(child.Text))
+                    if (string.IsNullOrEmpty(child.Id))
                     {
                         errorList.Error("Action", $"{action.Id} contains a child missing Key");
                         return false;
@@ -144,40 +141,9 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
                     return false;
                 }
 
-                if (string.IsNullOrEmpty(gameSound.Text))
+                if (string.IsNullOrEmpty(gameSound.Path))
                 {
                     errorList.Error("GameSound", $"{gameSound.Id} is missing file path");
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        static bool ValidateFileSounds(AudioProjectXml projectFile, ref ErrorListViewModel.ErrorList errorList)
-        {
-            foreach (var fileSound in projectFile.FileSounds)
-            {
-                if (string.IsNullOrEmpty(fileSound.Id))
-                {
-                    errorList.Error("FileSound", "FileSound is missing ID");
-                    return false;
-                }
-
-                if (string.IsNullOrEmpty(fileSound.Text))
-                {
-                    errorList.Error("FileSound", $"{fileSound.Id} is missing file path");
-                    return false;
-                }
-
-                if(Path.GetExtension(fileSound.Text).ToLowerInvariant() != ".wem")
-                {
-                    errorList.Error("FileSound", $"{fileSound.Id} has incorrect extention. Must be wem");
-                    return false;
-                }
-
-                if (File.Exists(fileSound.Text) == false)
-                {
-                    errorList.Error("FileSound", $"{fileSound.Id} not found on disk");
                     return false;
                 }
             }
@@ -202,7 +168,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             {
                 foreach (var child in action.ChildList)
                 {
-                    var actionKey = child.Text.ToLower().Trim();
+                    var actionKey = child.Id.ToLower().Trim();
                     if (allIds.Contains(actionKey) == false)
                     {
                         errorList.Error("Action", $"Action {action.Id} is pointing to an invalid or unknown object {actionKey}");
@@ -213,7 +179,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 
             foreach (var gameSound in projectFile.GameSounds)
             {
-                var gameSoundPath = gameSound.Text.ToLower().Trim();
+                var gameSoundPath = gameSound.Path.ToLower().Trim();
                 var fileRef = pfs.FindFile(gameSoundPath);
                 if (fileRef == null)
                 {

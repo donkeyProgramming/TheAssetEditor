@@ -40,7 +40,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             return byteArray;
         }
 
-        public override void ComputeSize()
+        public override void UpdateSize()
         { 
             Size = (uint)(HircHeaderSize + 1 + (4 * Actions.Count));
         }

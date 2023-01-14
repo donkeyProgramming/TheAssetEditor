@@ -221,7 +221,6 @@ Would you be ok with that?
 []Eustace https://steamcommunity.com/sharedfiles/filedetails/?id=2810496470 Pick what you think is cool
 [X]Calm: https://steamcommunity.com/sharedfiles/filedetails/?id=2797285787
 [X]Calm https://steamcommunity.com/sharedfiles/filedetails/?id=2797285695
-[X]Calm Mod in PM
 [X]Frob https://steamcommunity.com/sharedfiles/filedetails/?id=2794880709
 [X]Poljanan https://steamcommunity.com/sharedfiles/filedetails/?id=2798625567 Pick what you think is cool
 [X]Poljanan https://steamcommunity.com/sharedfiles/filedetails/?id=2831340705 Pick what you think is cool
@@ -266,6 +265,7 @@ I can't get them to play with my thane, but they don't play with the basic Armou
 V0.40
 ----------------------------
 saving small meshes causes bounding box crashes 
+remove backup feature 
 
 Better error message for stuff with lod loading error. open in rpfm bug 
 Finish Convert wh2 animpack to wh3 format 
@@ -278,6 +278,16 @@ make wh2 bin in same format at wh3
 
 V0.41
 ----------------------------
+View dat files
+View single bnk | all bnks 
+Export event to json
+Remove wem files from filelist treeview 
+AkPropBundle enums 
+Rename to audio explorer 
+
+Persistent_WM_Warp_Lightning_Cannon_Idle  | Battle_Individual_Artillery_Screaming_Bell_Persistent
+/// - ui_click_custom_battle_add_unit -> Mechanical button sound 
+
 	>>Fix error for dindi
 	>>use all animations for a skeleton
 	>>Splice preview 
@@ -289,6 +299,7 @@ V0.41
 	Splice in animtransfer tool. 
 	Improve skeleton tool saving, set name 
 	Renaming file should trigger skeleton update 
+	Add tutorial => https://www.youtube.com/watch?v=gV6qVXFDWf8
 	
 	Dump all the shader shit to file 
 	Check for big letters when merging textures and // vs \\ 

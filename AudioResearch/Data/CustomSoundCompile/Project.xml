@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<root OutputFile="ui_audio_compile.bnk" OutputGame="wh3">
+
+	<!--Settings packfiles, packfiledirectory-->
+
+	<!--Events-->
+	<Event Id="UI_Click_foobar_foobar" AudioBus="Master">
+		<Action>UI_Click_foobar_foobar_Play</Action>
+	</Event>
+
+
+
+	<!--Actions-->
+	<Action Id="UI_Click_foobar_foobar_Play" ForceId="1975625412">
+		<Child Type="Play" Id="CustomAudioFile_ID"/>
+	</Action>
+
+
+	<!--Sounds-->
+	<GameSound Id="CustomAudioFile_ID" ForceId="3990607256" Source="Pack|System" Convert="False">Audio/WWise/790209750.wem</GameSound>
+
+
+	<!--Dump all ids-->
+	<!--Load ids from file-->
+	<!--Generate wwnames.txt-->
+	<!--Extract single hirc, include children-->
+	<!--Extract hirc id, name, children-->
+	<!--Extract ID table-->
+	<!--Extract dialog event tables, ID-->
+	<!--Convert to xml using wwiser-->
+	
+	
+	<!--Not supported stuff-->
+	<!--DialogEvents-->
+	<DialogEvent Id="battle_vo_order_halt">
+		<MergeTable Source="Pack|System">customSounds/dialogEvents/battle_vo_order_halt_halflings.csv</MergeTable>
+		<MergeTable Source="Pack|System">customSounds/dialogEvents/battle_vo_order_halt_super_goblins.csv</MergeTable>
+	</DialogEvent>
+
+
+	<!--Containers-->
+	<RandomContainer id="my_container" ForceId="222s2ss">
+		<Instance chance="5000" child="CustomAudioFile_ID"/>
+	</RandomContainer>
+</root>
