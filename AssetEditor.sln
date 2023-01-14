@@ -26,6 +26,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{ECAC322F-8FA4-4F98-98D5-5E18464025C7}"
 	ProjectSection(SolutionItems) = preProject
 		ActiveTodoList.txt = ActiveTodoList.txt
+		ReleaseNotes.txt = ReleaseNotes.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeshDecimator", "MeshDecimator\MeshDecimator.csproj", "{F49D5D98-DF95-4A31-A42F-DA6D92C242DD}"
