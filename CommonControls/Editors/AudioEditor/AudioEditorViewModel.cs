@@ -9,6 +9,7 @@ using CommonControls.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -84,8 +85,12 @@ namespace CommonControls.Editors.AudioEditor
         public NotifyAttr<bool> ShowEvents { get; set; }
         public NotifyAttr<bool> ShowDialogEvents { get; set; }
 
+        public NotifyAttr<bool> IsPlaySoundButtonEnabled { get; set; } = new NotifyAttr<bool>(false);
+        public NotifyAttr<bool> CanExportCurrrentDialogEventAsCsvAction { get; set; } = new NotifyAttr<bool>(false);
 
-        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Editor");
+
+
+        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Explorer");
         public NotifyAttr<string> SelectedNodeText { get; set; } = new NotifyAttr<string>("");
         public PackFile MainFile { get => _mainFile; set { _mainFile = value; Load(_mainFile); } }
         public bool HasUnsavedChanges { get; set; }
@@ -150,14 +155,13 @@ namespace CommonControls.Editors.AudioEditor
             if (selectedNode != null)
             {
                 var hircAsString = JsonSerializer.Serialize((object)selectedNode.Item, new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter() }, WriteIndented = true });
-                SelectedNodeText.Value = hircAsString;
+                SelectedNodeText.Value = selectedNode.Item.Type.ToString() + " Id: " + selectedNode.Item.Id + "\n" + hircAsString;
 
                 var parser = new WWiseTreeParserParent(_globalDb, _lookUpHelper, true, true, true);
                 var rootNode = parser.BuildHierarchy(selectedNode.Item);
 
-                var flatList = GetListstuff(rootNode);
+                var flatList = GetParentStructure(rootNode);
                 flatList.Reverse();
-
 
                 SelectedNodeText.Value += "\n\nParent structure:\n";
                 foreach (var str in flatList)
@@ -167,15 +171,18 @@ namespace CommonControls.Editors.AudioEditor
             {
                 SelectedNodeText.Value = "";
             }
+
+            IsPlaySoundButtonEnabled.Value = _selectedNode?.Item is ICAkSound;
+            CanExportCurrrentDialogEventAsCsvAction.Value = _selectedNode?.Item is FileTypes.Sound.WWise.Hirc.V136.CAkDialogueEvent_v136;
         }
 
-        List<string> GetListstuff(HircTreeItem root)
+        List<string> GetParentStructure(HircTreeItem root)
         {
             var childData = new List<string>();
             if (root.Children != null)
             {
                 foreach (var child in root.Children)
-                    childData.AddRange(GetListstuff(child));
+                    childData.AddRange(GetParentStructure(child));
             }
 
             childData.Add(root.DisplayName);
@@ -184,98 +191,26 @@ namespace CommonControls.Editors.AudioEditor
 
         public void PlaySelectedSoundAction()
         {
-            _player.PlaySound(TreeList.FirstOrDefault(), _selectedNode.Item as ICAkSound);
+            var soundEvent = _selectedNode.Item as ICAkSound;
+            if (soundEvent == null)
+                return;
+            _player.PlaySound(TreeList.FirstOrDefault(), soundEvent);
         }
 
-
-        class OutputTest
+        public void ExportCurrrentDialogEventAsCsvAction()
         {
-            public string EventName;
-            public List<string> keys = new List<string>();
-            public List<string[]> Table;
+            var dialogEvent = _selectedNode.Item as FileTypes.Sound.WWise.Hirc.V136.CAkDialogueEvent_v136;
+            if (dialogEvent == null)
+                return;
 
-            public List<string> PrettyTable;
-            public string PrettyKeys;
+            DialogEventToCvsConverter converter = new DialogEventToCvsConverter(_lookUpHelper);
+            converter.DumpAndOpen(dialogEvent);
         }
 
         public void ExportIdListAction()
         {
-            var dialogs = _globalDb.HircList.SelectMany(x => x.Value).Where(x => x.Type == HircType.Dialogue_Event).Cast<FileTypes.Sound.WWise.Hirc.V136.CAkDialogueEvent_v136>().ToList();
-
-            var whereRootNotZero = dialogs.Where(x => x.AkDecisionTree.Root.Key != 0).ToList();
-            var whereFirstNotZero = dialogs.Where(x => x.AkDecisionTree.Root.Children.First().Key != 0).ToList();
-            var counts = dialogs.Select(x => x.ArgumentList.Arguments.Count()).Distinct().ToList();
-
-            List<OutputTest> test = new List<OutputTest>();
-
-            foreach (var dialog in dialogs)
-            {
-                var numArgs = dialog.ArgumentList.Arguments.Count()-1;
-                var root = dialog.AkDecisionTree.Root.Children.First();
-
-                if (numArgs != 0)
-                {
-                    var rowIndex = 0;
-                    var table = new List<string>();
-                    foreach (var children in root.Children)
-                        GenerateRow(children, 0, numArgs, new Stack<string>(), table);
-
-                    var keys = dialog.ArgumentList.Arguments.Select(x => _lookUpHelper.GetName(x.ulGroup)).ToList();
-                    test.Add(new OutputTest()
-                    {
-                        EventName = _lookUpHelper.GetName(dialog.Id),
-                        keys = keys,
-                        //Table = table,
-
-                        PrettyKeys = string.Join("|", keys),
-                        PrettyTable = table.Select(x=> string.Join("|", x)).ToList()
-                    });
-
-                    var last = test.Last();
-
-                    var wholeStr = new StringBuilder();
-                    wholeStr.AppendLine("sep=|");
-                    wholeStr.AppendLine(last.PrettyKeys);
-                    foreach (var row in last.PrettyTable)
-                        wholeStr.AppendLine(row);
-                    DirectoryHelper.EnsureCreated("c:\\temp\\wwiseDialogEvents");
-                    System.IO.File.WriteAllText($"c:\\temp\\wwiseDialogEvents\\{last.EventName}.csv", wholeStr.ToString());
-
-                }
-
-            }
-
-            // Remove root, remove first
-           //What is ""Node 0"" as first node // first audio node. ALways only 1?
-           //
-           //var cool = test.Where(x => x.EventName.Contains("vo_order_Attack", StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
-
-            //var args = dialogs.Cast<FileTypes.Sound.WWise.Hirc.V136.CAkDialogueEvent_v136>().Select(x => x.ArgumentList).SelectMany(x=>x.Arguments).ToList();
-            //
-            //var groupTypes = args.Select(x => x.eGroupType).Distinct().OrderByDescending(x=>x).ToList();
-            //var argTypes = args.GroupBy(x => x.eGroupType).OrderBy(x => x.Key).ToList();
-            //
-            //var items2 = argTypes.Select(x => $"{x.Key}: { string.Join(",", x.Select(y => y.ulGroup).Distinct())}").ToList();
-            //var test = string.Join("\n", items2);
-
             _lookUpHelper.SaveToFileWithId("c:\\temp\\wwiseIds.txt");
-        }
-
-        void GenerateRow(FileTypes.Sound.WWise.Hirc.V136.AkDecisionTree.Node currentNode, int currentArgrument, int numArguments, Stack<string> pushList, List<string> outputList)
-        {
-            var currentNodeContent = _lookUpHelper.GetName(currentNode.Key);
-            pushList.Push(currentNodeContent);
-
-            bool isDone = numArguments == currentArgrument;
-            if (isDone)
-            {
-                outputList.Add(string.Join("|", pushList.ToArray().Reverse()));
-            }
-            else
-            {
-                foreach (var child in currentNode.Children)
-                    GenerateRow(child, currentArgrument + 1, numArguments, pushList, outputList);
-            }
+            Process.Start("explorer.exe", "c:\\temp");
         }
     }
 }

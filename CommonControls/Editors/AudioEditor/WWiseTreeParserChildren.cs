@@ -30,24 +30,37 @@ namespace CommonControls.Editors.AudioEditor
             var dialogEventNode = new HircTreeItem() { DisplayName = $"Dialog_Event {_nameLookUpHelper.GetName(item.Id)}", Item = item };
             parent.Children.Add(dialogEventNode);
 
-            ProcessNode(hirc.AkDecisionTree.Root, dialogEventNode, item);
+            ProcessNode(hirc.AkDecisionTree.Root, dialogEventNode, item, 0);
         }
 
-        void ProcessNode(AkDecisionTree.Node node, HircTreeItem parent, HircItem owner)
+        void ProcessNode(AkDecisionTree.Node node, HircTreeItem parent, HircItem owner, uint depdth)
         {
             if (node.IsAudioNode)
             {
-                var dialogEventNode = new HircTreeItem() { DisplayName = $"Node {_nameLookUpHelper.GetName(node.Key)}", Item = owner };
-                parent.Children.Add(dialogEventNode);
-                ProcessNext(node.AudioNodeId, dialogEventNode);
+                if (node.Key != 0)  // If key is 0, its has no info and is just a filler. Remove it.
+                {
+                    var dialogEventNode = new HircTreeItem() { DisplayName = $"Node {_nameLookUpHelper.GetName(node.Key)}", Item = owner };
+                    parent.Children.Add(dialogEventNode);
+                    ProcessNext(node.AudioNodeId, dialogEventNode);
+                }
+                else
+                {
+                    ProcessNext(node.AudioNodeId, parent);
+                }
             }
             else
             {
-                var dialogEventNode = new HircTreeItem() { DisplayName = $"{_nameLookUpHelper.GetName(node.Key)}", Item = owner };
-                parent.Children.Add(dialogEventNode);
+                var nextNode = parent;
+                depdth += 1;
+                if (depdth > 2) // For some reason we can always skip the first 2 nodes
+                {
+                    var dialogEventNode = new HircTreeItem() { DisplayName = $"{_nameLookUpHelper.GetName(node.Key)}", Item = owner };
+                    parent.Children.Add(dialogEventNode);
+                    nextNode = dialogEventNode;
+                }
 
                 foreach (var child in node.Children)
-                    ProcessNode(child, dialogEventNode, owner);
+                    ProcessNode(child, nextNode, owner, depdth);
             }
         }
 

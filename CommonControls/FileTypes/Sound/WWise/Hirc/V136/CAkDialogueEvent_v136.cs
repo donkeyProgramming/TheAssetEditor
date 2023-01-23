@@ -38,7 +38,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 
     public class AkDecisionTree
     {
-        [DebuggerDisplay("Node Key:[{key}] Children:[{Children.Count}] Sounds:[{SoundNodes.Count}]")]
+        [DebuggerDisplay("Node Key:[{key}] Children:[{Children.Count}]")]
         public class Node
         {
             public uint Key { get; set; }

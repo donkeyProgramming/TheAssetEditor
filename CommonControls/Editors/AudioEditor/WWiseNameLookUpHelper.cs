@@ -45,7 +45,7 @@ namespace CommonControls.Editors.AudioEditor
         }
 
         public string GetName(uint value, out bool found)
-        {
+        { 
             found = _hashValueMap.ContainsKey(value);
             if (found)
                 return _hashValueMap[value];
