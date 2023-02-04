@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<root OutputFile="ui_audio_compile.bnk" OutputGame="wh3">
+<root OutputFile="ui_audio_compile.bnk" OutputGame="Warhammer3" version="1">
 
 	<!--Settings packfiles, packfiledirectory-->
 
@@ -11,13 +11,13 @@
 
 
 	<!--Actions-->
-	<Action Id="UI_Click_foobar_foobar_Play" ForceId="1975625412">
+	<Action Id="UI_Click_foobar_foobar_Play" ForceId="623217198">
 		<Child Type="Play" Id="CustomAudioFile_ID"/>
 	</Action>
 
 
 	<!--Sounds-->
-	<GameSound Id="CustomAudioFile_ID" ForceId="3990607256" Source="Pack|System" Convert="False">Audio/WWise/790209750.wem</GameSound>
+	<GameSound Id="CustomAudioFile_ID" ForceId="264282125" Source="Pack|System" Convert="False">Audio/WWise/790209750.wem</GameSound>
 
 
 	<!--Dump all ids-->
@@ -32,7 +32,7 @@
 	
 	<!--Not supported stuff-->
 	<!--DialogEvents-->
-	<DialogEvent Id="battle_vo_order_halt">
+	<DialogEvent Id="battle_vo_order_halt" bnkFile="gamebnk.bnk">
 		<MergeTable Source="Pack|System">customSounds/dialogEvents/battle_vo_order_halt_halflings.csv</MergeTable>
 		<MergeTable Source="Pack|System">customSounds/dialogEvents/battle_vo_order_halt_super_goblins.csv</MergeTable>
 	</DialogEvent>

@@ -37,15 +37,17 @@ namespace CommonControls.Editors.AudioEditor
         {
             if (node.IsAudioNode)
             {
-                if (node.Key != 0)  // If key is 0, its has no info and is just a filler. Remove it.
+                if (node.Key != 0)
                 {
-                    var dialogEventNode = new HircTreeItem() { DisplayName = $"Node {_nameLookUpHelper.GetName(node.Key)}", Item = owner };
+                    var dialogEventNode = new HircTreeItem() { DisplayName = $"{_nameLookUpHelper.GetName(node.Key)}", Item = owner };
                     parent.Children.Add(dialogEventNode);
                     ProcessNext(node.AudioNodeId, dialogEventNode);
                 }
                 else
                 {
-                    ProcessNext(node.AudioNodeId, parent);
+                    var dialogEventNode = new HircTreeItem() { DisplayName = $"Default", Item = owner };
+                    parent.Children.Add(dialogEventNode);
+                    ProcessNext(node.AudioNodeId, dialogEventNode);
                 }
             }
             else

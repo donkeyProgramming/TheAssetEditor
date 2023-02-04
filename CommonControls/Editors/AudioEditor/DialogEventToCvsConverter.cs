@@ -39,7 +39,7 @@ namespace CommonControls.Editors.AudioEditor
             foreach (var children in root.Children)
                 GenerateRow(children, 0, numArgs, new Stack<string>(), table, _nameLookUpHelper);
 
-            var keys = dialogEvent.ArgumentList.Arguments.Select(x => _nameLookUpHelper.GetName(x.ulGroup)).ToList();
+            var keys = dialogEvent.ArgumentList.Arguments.Select(x => _nameLookUpHelper.GetName(x.ulGroupId)).ToList();
             var prettyKeys = string.Join("|", keys);
             prettyKeys += "|WWiseChild";
             var prettyTable = table.Select(x => string.Join("|", x)).ToList();

@@ -59,7 +59,9 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             hircList.ForEach(x => x.UpdateSize());
 
             output.HircItems = new HircChunk();
-            output.HircItems.Hircs.AddRange(hircList);
+            output.HircItems.SetFromHircList(hircList);
+
+            // Validate this is same as before
             output.HircItems.ChunkHeader.ChunkSize = (uint)(output.HircItems.Hircs.Sum(x => x.Size) + (output.HircItems.Hircs.Count() * 5) + 4);
             output.HircItems.NumHircItems = (uint)output.HircItems.Hircs.Count();
 
@@ -85,7 +87,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 
             var wwiseAction = new CAkAction_v136();
             wwiseAction.Id = GetHircItemId(inputAction.Id);
-            wwiseAction.Type =HircType.Action;
+            wwiseAction.Type = HircType.Action;
             wwiseAction.ActionType = ActionType.Play;
             wwiseAction.idExt = GetHircItemId(inputAction.ChildList.First().Id);
 
@@ -95,8 +97,6 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             return wwiseAction;
         }
 
-
-
         BkhdHeader ConstructHeader(string bnkName)
         {
             var soundBankId = ConvertStringToWWiseId(bnkName);
@@ -104,7 +104,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             {
                 dwBankGeneratorVersion = 0x80000088,
                 dwSoundBankID = soundBankId,
-                dwLanguageID = 393239870, // English(UK) / SFX for UI?
+                dwLanguageID = 550298558, // English(UK)
                 bFeedbackInBank = 0x10,
                 dwProjectID = 2361,
                 padding = 0x04,
@@ -125,13 +125,13 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
                 Type = HircType.Sound,
                 AkBankSourceData = new AkBankSourceData()
                 {
-                    PluginId = 0x00040001,  // [Vorbis]
+                    PluginId = 0x00010001,  // [PCM]
                     StreamType = SourceType.Data_BNK,
                     akMediaInformation = new AkMediaInformation()
                     {
                         SourceId = soundId,
                         uInMemoryMediaSize = (uint)file.DataSource.Size,
-                        uSourceBits = 0x00,
+                        uSourceBits = 0x01,
                     }
                 },
                 NodeBaseParams = NodeBaseParams.CreateDefault()

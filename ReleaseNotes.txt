@@ -262,6 +262,14 @@ Show coordinates of bones for easy placement of stuff. Update when animating. Wo
 Hey Ole, one issue I have run into is having trouble getting the props from the Armoured Kossar to play with me in Super View.  Is this something we might get in the future?
 I can't get them to play with my thane, but they don't play with the basic Armoured Kossar either AFAIK and tried a bit.
 
+
+
+v0.41
+----------------------------
+Audio Explorer v1 
+Lots of changes done by others and me. I might have lost control over this release, its been a while...
+
+
 V0.40
 ----------------------------
 saving small meshes causes bounding box crashes 

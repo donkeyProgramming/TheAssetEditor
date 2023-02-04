@@ -3,6 +3,7 @@ using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 
 namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
@@ -26,7 +27,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             ArgumentList = new ArgumentList(chunk, uTreeDepth);
             uTreeDataSize = chunk.ReadUInt32();
             uMode = chunk.ReadByte();
-            AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth, Size);
+            AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth, Size, uTreeDataSize);
             AkPropBundle0 = AkPropBundle.Create(chunk);
             AkPropBundle1 = AkPropBundleMinMax.Create(chunk);
         }
@@ -38,7 +39,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
 
     public class AkDecisionTree
     {
-        [DebuggerDisplay("Node Key:[{key}] Children:[{Children.Count}]")]
+        [DebuggerDisplay("Node Key:[{Key}] Children:[{Children.Count}]")]
         public class Node
         {
             public uint Key { get; set; }
@@ -58,7 +59,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             {
                 for (uint i = 0; i < parentCount; i++)
                 {
-                    var key_ = chunk.ReadUInt32();
+                    var key = chunk.ReadUInt32();
 
                     //is_id is a test for checking if the next bytes form an audioNodeId rather than uIdx+uCount
                     //and that's used to know if the node is a branch or leaf
@@ -66,39 +67,30 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
                     //looks like its if either the peaked uIdx or uCount are larger than the number of bytes in the block, then it's an audioNodeId
                     //and that makes sense because it's like referring to an amount of chairs that is more than the number of atoms in the universe, nonsense
                     var peak = chunk.PeakUint32();
+
                     var uidx = peak >> 0 & 0xFFFF;
                     var ucnt = peak >> 16 & 0xFFFF;
-                    var count_max = size;// chunk.BytesLeft;
+                    var count_max = size;
+
                     var is_id = (uidx > count_max || ucnt > count_max);
-
                     var is_max = currentTreeDepth == maxTreeDepth;
+                    var node = new Node();
+                    node.Key = key;
+                    node.IsAudioNode = is_max || is_id;
 
-                    if (is_max || is_id)
+                    if (node.IsAudioNode)
                     {
-                        var node = new Node()
-                        {
-                            Key = key_,
-                            AudioNodeId = chunk.ReadUInt32(),
-                            uWeight = chunk.ReadUShort(),
-                            uProbability = chunk.ReadUShort(),
-                            IsAudioNode = true,
-                        };
-                        Children.Add(node);
+                        node.AudioNodeId = chunk.ReadUInt32();
                     }
                     else
                     {
-                        var node = new Node()
-                        {
-                            Key = key_,
-                            Children_uIdx = chunk.ReadUShort(),
-                            Children_uCount = chunk.ReadUShort(),
-                            uWeight = chunk.ReadUShort(),
-                            uProbability = chunk.ReadUShort(),
-                            IsAudioNode = false,
-                        };
-                        Children.Add(node);
+                        node.Children_uIdx = chunk.ReadUShort();
+                        node.Children_uCount = chunk.ReadUShort(); 
                     }
-                    
+
+                    node.uWeight = chunk.ReadUShort();
+                    node.uProbability = chunk.ReadUShort();
+                    Children.Add(node);
                 }
 
                 foreach (var child in Children)
@@ -110,11 +102,84 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
         }
 
         public Node Root { get; set; }
+        public Node RootNew { get; set; }
+        public List<Node> NewApporach { get; set; } = new List<Node>();
 
-        public AkDecisionTree(ByteChunk chunk, uint maxTreeDepth, uint size)
+        public AkDecisionTree(ByteChunk chunk, uint maxTreeDepth, uint size, uint uTreeDataSize)
         {
+            var indexRec = chunk.Index;
             Root = new Node();
             Root.Parse(chunk, 1, size, 0, maxTreeDepth); //first Node is at depth 0
+
+            chunk.Index = indexRec;
+            
+            var numNodes = uTreeDataSize / 12;
+            for (int i = 0; i < numNodes; i++)
+            {
+                var node = new Node();
+                node.Key = chunk.ReadUInt32();
+
+                node.AudioNodeId = chunk.PeakUint32();
+                node.Children_uIdx = chunk.ReadUShort();
+                node.Children_uCount = chunk.ReadUShort();
+
+                node.uWeight = chunk.ReadUShort();
+                node.uProbability = chunk.ReadUShort();
+                NewApporach.Add(node);
+            }
+
+            RootNew = NewApporach.First();
+            ConvertToTree(RootNew, maxTreeDepth, 0);
+        }
+
+        void ConvertToTree(Node root, uint maxDepth, uint currentDepth)
+        {
+            var childCount = root.Children_uCount;
+            var firstChildIndex = root.Children_uIdx;
+
+            for (int i = 0; i < childCount; i++)
+            {
+                var isAtMaxDepth = maxDepth == currentDepth;
+                var isOutsideRange = firstChildIndex + i >= NewApporach.Count;  // Can be replaced with key == 0???!?!?!?
+                if (isOutsideRange && isAtMaxDepth == false)
+                {
+                    if (root.Key != 0)
+                    {
+
+                    }
+                }
+                else
+                {
+                    if (root.Key == 0)
+                    { 
+                    }
+                }
+                if (isAtMaxDepth || isOutsideRange)
+                {
+                    root.IsAudioNode = true;
+                    root.Children_uCount = 0;
+                    root.Children_uIdx = 0;
+                }
+                else
+                {
+                    root.AudioNodeId = 0;
+                    var child = NewApporach[firstChildIndex + i];
+                    root.Children.Add(child);
+                    ConvertToTree(child, maxDepth, currentDepth + 1);
+                }
+            }
+        }
+
+        void ConvertTo2DArray()
+        {
+            Node[][] array;
+        }
+
+        public void UpdateSortingAndIndex()
+        { 
+            // Sort
+            // Update index
+            // Update count
         }
     }
 
@@ -123,61 +188,21 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
         public List<Argument> Arguments { get; set; } = new List<Argument>();
         public ArgumentList(ByteChunk chunk, uint numItems)
         {
-            for (uint i = 0; i < numItems; i++)
-                Arguments.Add(new Argument(chunk));
+            for (int i = 0; i < numItems; i++)
+                Arguments.Add(new Argument());
+
+            for (int i = 0; i < numItems; i++)
+                Arguments[i].ulGroupId = chunk.ReadUInt32();
+
+            for (int i = 0; i < numItems; i++)
+                Arguments[i].eGroupType = (AkGroupType)chunk.ReadByte();
         }
 
         public class Argument
         {
-            public uint ulGroup { get; set; }
+            public uint ulGroupId { get; set; }
             public AkGroupType eGroupType { get; set; }
-            public Argument(ByteChunk chunk)
-            {
-                ulGroup = chunk.ReadUInt32();
-                eGroupType = (AkGroupType)chunk.ReadByte();
-            }
         }
     }
-
-
-
-
-    /*
-      public class AkBankSourceData
-    {
-        public uint PluginId { get; set; }
-        public ushort PluginId_type { get; set; }
-        public ushort PluginId_company { get; set; }
-        public SourceType StreamType { get; set; }
-
-        public AkMediaInformation akMediaInformation { get; set; }
-        public uint uSize { get; set; }
-        public static AkBankSourceData Create(ByteChunk chunk)
-        {
-            var output = new AkBankSourceData()
-            {
-                PluginId = chunk.ReadUInt32(),
-                //PluginId_type = chunk.ReadUShort(),
-                //PluginId_company = chunk.ReadUShort(),
-                StreamType = (SourceType)chunk.ReadByte()
-            };
-
-         
-            output.PluginId_type = (ushort)((output.PluginId >> 0) & 0x000F);
-            output.PluginId_company = (ushort)((output.PluginId >> 4) & 0x03FF);
-
-            if (output.StreamType != SourceType.Straming)
-            {
-             //   throw new Exception();
-            }
-
-            if (output.PluginId_type == 0x02)
-                output.uSize = chunk.ReadUInt32();
-
-            output.akMediaInformation = AkMediaInformation.Create(chunk);
-
-            return output;
-        }
-    }
-     */
+    
 }

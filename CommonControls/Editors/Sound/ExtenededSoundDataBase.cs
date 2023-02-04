@@ -23,15 +23,6 @@ namespace CommonControls.Editors.Sound
             }
         }
 
-        public List<HircItem> GetHircObject(uint id, string bnkFile, VisualEventOutputNode _errorNode)
-        {
-            if (_hircList.ContainsKey(id))
-                return _hircList[id];
-
-            _errorNode.AddChild($"Item with id {id} not found");
-            return new List<HircItem>();
-        }
-
         public List<HircItem> GetHircObject(uint id)
         {
             if (_hircList.ContainsKey(id))

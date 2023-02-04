@@ -111,7 +111,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
                 bitsFXBypass = 0,
             };
             instance.bOverrideAttachmentParams = 0;
-            instance.OverrideBusId = 0;
+            instance.OverrideBusId = 3803692087;    // "Master Audio Bus"
             instance.DirectParentID = 0;
             instance.byBitVector = 0;
             instance.NodeInitialParams = new NodeInitialParams()
@@ -123,38 +123,13 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
                 AkPropBundle1 = new AkPropBundleMinMax()
                 {
                     Values = new List<AkPropBundleMinMax.AkPropBundleInstance>()
-                    /*{
-                        new AkPropBundleMinMax.AkPropBundleInstance()
-                        {
-                            Type = AkPropBundleType.Volume,
-                            Max = 0,
-                            Min = -3
-                        },
-                        new AkPropBundleMinMax.AkPropBundleInstance()
-                        {
-                            Type = AkPropBundleType.Pitch,
-                            Max = 100,
-                            Min = -100
-                        },
-                        new AkPropBundleMinMax.AkPropBundleInstance()
-                        {
-                            Type = AkPropBundleType.LPF,
-                            Max = 0,
-                            Min = 15
-                        },
-                        new AkPropBundleMinMax.AkPropBundleInstance()
-                        {
-                            Type = AkPropBundleType.HPF,
-                            Max = 30,
-                            Min = 0
-                        },
-                    },*/
                 }
             };
 
             instance.PositioningParams = new PositioningParams()
             {
-                uBitsPositioning = 0x00
+                uBitsPositioning = 0x03,
+                uBits3d = 0x08
             };
             instance.AuxParams = new AuxParams()
             {
@@ -163,11 +138,11 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             };
             instance.AdvSettingsParams = new AdvSettingsParams()
             {
-                byBitVector = 0x10,
-                eVirtualQueueBehavior = 0x01,
+                byBitVector = 0x00,
+                eVirtualQueueBehavior = 0x01,   // [FromElapsedTime]
                 u16MaxNumInstance = 0,
-                eBelowThresholdBehavior = 0x01,
-                byBitVector2 = 0x04
+                eBelowThresholdBehavior = 0,
+                byBitVector2 = 0
             };
             instance.StateChunk = new StateChunk();
             instance.InitialRTPC = new InitialRTPC();
@@ -423,14 +398,19 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             return instance;
         }
 
-        public uint GetSize() => 1;
+        public uint GetSize() 
+        {
+            if (uBitsPositioning != 0x03 && uBits3d != 0x08)
+                throw new NotImplementedException();
+            return 2;
+        }
 
         public byte[] GetAsByteArray()
         {
-            if (uBitsPositioning != 0)
+            if (uBitsPositioning != 0x03 && uBits3d != 0x08)
                 throw new NotImplementedException();
 
-            return new byte[] { 0 };
+            return new byte[] { 0x03, 0x08 };
         }
     }
 

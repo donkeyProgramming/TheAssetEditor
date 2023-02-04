@@ -11,9 +11,23 @@ namespace CommonControls.FileTypes.Sound.WWise.Bkhd
     {
         public void Parse(string fileName, ByteChunk chunk, SoundDataBase soundDb)
         {
+            var bkdh = Create(chunk);
+            bkdh.OwnerFileName = fileName;
+
+            if (bkdh.dwBankGeneratorVersion == 2147483770)
+                bkdh.dwBankGeneratorVersion = 122;
+
+            if (bkdh.dwBankGeneratorVersion == 2147483784)
+                bkdh.dwBankGeneratorVersion = 136;
+
+            soundDb.Header = bkdh;
+        }
+
+        public static BkhdHeader Create(ByteChunk chunk)
+        {
             var bkdh = new BkhdHeader()
             {
-                OwnerFileName = fileName,
+                OwnerFileName = "Not Provided",
                 ChunkHeader = BnkChunkHeader.CreateFromBytes(chunk),
 
                 dwBankGeneratorVersion = chunk.ReadUInt32(),
@@ -30,7 +44,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Bkhd
             if (bkdh.dwBankGeneratorVersion == 2147483784)
                 bkdh.dwBankGeneratorVersion = 136;
 
-            soundDb.Header = bkdh;
+            return bkdh;
         }
 
         public static byte[] GetAsByteArray(BkhdHeader header)

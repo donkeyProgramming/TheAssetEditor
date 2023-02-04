@@ -69,7 +69,7 @@ namespace AudioResearch
                     foreach (var children in root.Children)
                         GenerateRow(children, 0, numArgs, new Stack<string>(), table, nameHelper);
 
-                    var keys = dialog.ArgumentList.Arguments.Select(x => nameHelper.GetName(x.ulGroup)).ToList();
+                    var keys = dialog.ArgumentList.Arguments.Select(x => nameHelper.GetName(x.ulGroupId)).ToList();
                     test.Add(new OutputTest()
                     {
                         EventName = nameHelper.GetName(dialog.Id),

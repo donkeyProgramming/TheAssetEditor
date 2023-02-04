@@ -85,7 +85,9 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         [XmlAttribute(AttributeName = "OutputFile")]
         public string OutputFile { get; set; }
         [XmlAttribute(AttributeName = "Game")]
-        public string OutputGame { get; set; } = "wh3";
+        public string OutputGame { get; set; } = "Warhammer3";
+        [XmlAttribute(AttributeName = "Version")]
+        public string Version { get; set; } = "1";
     }
 
 }

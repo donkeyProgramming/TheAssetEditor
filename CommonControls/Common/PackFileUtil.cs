@@ -94,7 +94,7 @@ namespace CommonControls.Common
             return pfs;
         }
 
-        public static PackFile CreatePackFileFromSystem(string filePath, out string directoryPath)
+        public static PackFile CreateNewPackFileFromSystem(string filePath, out string directoryPath)
         {
             var fileSource = new FileSystemSource(filePath);
             var packfile = new PackFile(Path.GetFileName(filePath), fileSource);

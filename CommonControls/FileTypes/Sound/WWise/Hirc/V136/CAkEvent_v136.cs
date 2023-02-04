@@ -44,5 +44,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
         { 
             Size = (uint)(HircHeaderSize + 1 + (4 * Actions.Count));
         }
+
+
     }
 }

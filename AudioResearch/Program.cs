@@ -29,8 +29,11 @@ namespace AudioResearch
             Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
             GameInformationFactory.Create();
 
-            //LoadAllTest();
-            CompileTest0();
+
+            //LoadBnkFromFile(@"C:\temp\wwiseextracttest.bnk");
+            //BnkFileManipulatorTests.ExtractToOwnPack();
+            LoadAllTest();
+            //CompileTest0();
 
             //DialogEventsAsTables.ExportAllDialogEventsAsTable();
             //DialogEventsAsTables.ExportSystemFileAsTable(@"C:\Users\ole_k\Downloads\battle_vo_orders_999999999__core.bnk", "custom_");
@@ -38,11 +41,24 @@ namespace AudioResearch
             //CompileTest();
         }
 
+        static void LoadBnkFromFile(string path)
+        {
+            var pfs = PackFileUtil.CreatePackFileService();
+
+            var audioFile = PackFileUtil.CreateNewPackFileFromSystem(path, out var _);
+            pfs.AddFilesToPack(pfs.GetEditablePack(), new List<string>() { @"audio\wwise", }, new List<PackFile>() { audioFile });
+
+            WwiseDataLoader builder = new WwiseDataLoader();
+            var bnkList = builder.LoadBnkFiles(pfs);
+            var globalDb = builder.BuildMasterSoundDatabase(bnkList);
+            var nameHelper = builder.BuildNameHelper(pfs);
+        }
+
         static void CompileTest0()
         {
             var pfs = PackFileUtil.CreatePackFileService();
 
-            var audioFile = PackFileUtil.CreatePackFileFromSystem(@"Data\CustomSoundCompile\790209750.wem", out var _);
+            var audioFile = PackFileUtil.CreateNewPackFileFromSystem(@"Data\CustomSoundCompile\790209750.wem", out var _);
             pfs.AddFilesToPack(pfs.GetEditablePack(), new List<string>() { @"audio\wwise", }, new List<PackFile>() { audioFile });
 
             // var audioProject = PackFileUtil.CreatePackFileFromSystem("", out var _);
@@ -53,6 +69,7 @@ namespace AudioResearch
             // Run wwiser with export to xml and wwiser names 
             var fullPath = Directory.GetCurrentDirectory() + "\\" + outputFile; 
             ExecuteCommand("C:\\Users\\ole_k\\Desktop\\audio_research\\WWiser\\wwiser.pyz " + fullPath);
+            DirectoryHelper.OpenFolderAndSelectFile(fullPath);
         }
 
         public static void ExecuteCommand(string Command)
@@ -85,7 +102,7 @@ namespace AudioResearch
             var bnkList = builder.LoadBnkFiles(pfs);
             var globalDb = builder.BuildMasterSoundDatabase(bnkList);
             var nameHelper = builder.BuildNameHelper(pfs);
-            nameHelper.SaveToFile(@"C:\Users\ole_k\Desktop\audio research\WWiser\wwnames.txt");
+            //nameHelper.SaveToFile(@"C:\Users\ole_k\Desktop\audio research\WWiser\wwnames.txt");
 
             Console.ReadLine();
         }

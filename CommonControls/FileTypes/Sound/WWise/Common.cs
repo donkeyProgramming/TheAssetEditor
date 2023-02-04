@@ -33,6 +33,7 @@ namespace CommonControls.FileTypes.Sound.WWise
             {
                 var objectStartIndex = chunk.Index;
 
+                IndexInFile = (uint)objectStartIndex;
                 Type = (HircType)chunk.ReadByte();
                 Size = chunk.ReadUInt32();
                 Id = chunk.ReadUInt32();

@@ -28,7 +28,7 @@ namespace CommonControls.FileTypes.Sound.WWise.Hirc.V136
             ArgumentList = new ArgumentList(chunk, uTreeDepth);
             uTreeDataSize = chunk.ReadUInt32();
             uMode = chunk.ReadByte();
-            AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth, Size);
+            AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth, Size, uTreeDataSize);
         }
 
         public override void UpdateSize() => throw new NotImplementedException();
