@@ -295,6 +295,7 @@ namespace AssetEditor.ViewModels
         private void OpenAudioEditor()
         {
             var editorView = _toolFactory.CreateEditorViewModel<AudioEditorViewModel>();
+            editorView.OpenAllBnks();
             EditorCreator.CreateEmptyEditor(editorView);
         }
 

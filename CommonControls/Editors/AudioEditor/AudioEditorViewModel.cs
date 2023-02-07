@@ -102,17 +102,36 @@ namespace CommonControls.Editors.AudioEditor
         public AudioEditorViewModel(PackFileService pfs)
         {
             _pfs = pfs;
-            WwiseDataLoader builder = new WwiseDataLoader();
-            var bnkList = builder.LoadBnkFiles(pfs);
-            _globalDb = builder.BuildMasterSoundDatabase(bnkList);
-            _lookUpHelper = builder.BuildNameHelper(pfs);
 
-            _player = new SoundPlayer(pfs, _lookUpHelper);
             ShowIds = new NotifyAttr<bool>(false, RefeshList);
             ShowBnkName = new NotifyAttr<bool>(false, RefeshList);
             UseBnkNameWhileParsing = new NotifyAttr<bool>(false, RefeshList);
             ShowEvents = new NotifyAttr<bool>(true, RefeshList);
             ShowDialogEvents = new NotifyAttr<bool>(true, RefeshList);
+        }
+
+
+        private void Load(PackFile mainFile)
+        {
+            WwiseDataLoader builder = new WwiseDataLoader();
+            var bnk = builder.LoadBnkFile(mainFile, _pfs);
+            _globalDb = builder.BuildMasterSoundDatabase(bnk);
+            _lookUpHelper = builder.BuildNameHelper(_pfs);
+            _player = new SoundPlayer(_pfs, _lookUpHelper);
+
+            EventFilter = new EventSelectionFilter(_lookUpHelper, _globalDb);
+            EventFilter.EventList.SelectedItemChanged += OnEventSelected;
+            RefeshList(true);
+        }
+
+        public void OpenAllBnks()
+        {
+            WwiseDataLoader builder = new WwiseDataLoader();
+            var bnkList = builder.LoadBnkFiles(_pfs);
+            _globalDb = builder.BuildMasterSoundDatabase(bnkList);
+            _lookUpHelper = builder.BuildNameHelper(_pfs);
+
+            _player = new SoundPlayer(_pfs, _lookUpHelper);
 
             EventFilter = new EventSelectionFilter(_lookUpHelper, _globalDb);
             EventFilter.EventList.SelectedItemChanged += OnEventSelected;
@@ -138,7 +157,7 @@ namespace CommonControls.Editors.AudioEditor
             }
         }
 
-        private void Load(PackFile mainFile) { }
+
 
         public void Close()
         {
@@ -212,5 +231,7 @@ namespace CommonControls.Editors.AudioEditor
             _lookUpHelper.SaveToFileWithId("c:\\temp\\wwiseIds.txt");
             Process.Start("explorer.exe", "c:\\temp");
         }
+
+
     }
 }

@@ -17,7 +17,8 @@ namespace CommonControls.Editors.AudioEditor
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<AudioEditorViewModel, AudioEditorMainView>();
+            //factory.RegisterTool<AudioEditorViewModel, AudioEditorMainView>();
+            factory.RegisterFileTool<AudioEditorViewModel, AudioEditorMainView>(new ExtentionToTool(EditorEnums.AudioExplorer_Editor, new[] { ".bnk"}));
         }
     }
 }

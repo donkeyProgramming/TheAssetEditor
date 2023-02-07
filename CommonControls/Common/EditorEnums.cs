@@ -13,6 +13,7 @@ namespace CommonControls.Common
         AnimationTransfer_Editor,
         Texture_Editor,
         AnimationPack_Editor,
+        AudioExplorer_Editor,
         None,
     }
 }

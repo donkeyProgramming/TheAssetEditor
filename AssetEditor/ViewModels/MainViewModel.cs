@@ -54,9 +54,6 @@ namespace AssetEditor.ViewModels
 
         public MainViewModel(MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, ToolFactory toolFactory, SchemaManager schemaManager, SkeletonAnimationLookUpHelper animationLookUpHelper)
         {
-
-            
-
             _packfileService = packfileService;
             _packfileService.Database.BeforePackFileContainerRemoved += Database_BeforePackFileContainerRemoved;
 

@@ -29,7 +29,6 @@ namespace AudioResearch
             Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
             GameInformationFactory.Create();
 
-
             //LoadBnkFromFile(@"C:\temp\wwiseextracttest.bnk");
             //BnkFileManipulatorTests.ExtractToOwnPack();
             LoadAllTest();

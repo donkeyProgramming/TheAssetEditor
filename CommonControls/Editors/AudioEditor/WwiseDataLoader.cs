@@ -28,6 +28,8 @@ namespace CommonControls.Editors.AudioEditor
             return masterDb;
         }
 
+        public ExtenededSoundDataBase BuildMasterSoundDatabase(SoundDataBase soundDatabase) => BuildMasterSoundDatabase(new List<SoundDataBase>() { soundDatabase });
+
 
         public SoundDatFile LoadWhDatDbForWh3(PackFileService pfs, out List<string> failedFiles)
         {
@@ -99,6 +101,14 @@ namespace CommonControls.Editors.AudioEditor
             return helper;
         }
 
+       public SoundDataBase LoadBnkFile(PackFile bnkFile, PackFileService pfs)
+       {
+            var name = pfs.GetFullPath(bnkFile);
+            var soundDb = Bnkparser.Parse(bnkFile, name);
+            PrintHircList(soundDb.HircChuck.Hircs, name);
+            return soundDb;
+        }
+
 
 
         public List<SoundDataBase> LoadBnkFiles(PackFileService pfs, bool onlyEnglish = true)
@@ -111,7 +121,7 @@ namespace CommonControls.Editors.AudioEditor
             var wantedBnkFiles = PackFileUtil.FilterUnvantedFiles(pfs, bankFiles, removeFilter.ToArray(), out var removedFiles);;
             _logger.Here().Information($"Parsing game sounds. {bankFiles.Count} bnk files found. {wantedBnkFiles.Count} after filtering");
 
-            var globalSoundDatabase = new Dictionary<string, SoundDataBase>();
+            var globalSoundDatabase = new List<SoundDataBase>();
             var banksWithUnknowns = new List<string>();
             var failedBnks = new List<(string bnkFile, string Error)>();
 
@@ -123,13 +133,11 @@ namespace CommonControls.Editors.AudioEditor
 
                 try
                 {
-                    var soundDb = Bnkparser.Parse(bnkFile, name);
-                    PrintHircList(soundDb.HircChuck.Hircs, name);
-
+                    var soundDb = LoadBnkFile(bnkFile, pfs);
                     if (soundDb.HircChuck.Hircs.Count(y => (y is CAkUnknown) == true || y.HasError) != 0)
                         banksWithUnknowns.Add(name);
 
-                    globalSoundDatabase.Add(name, soundDb);
+                    globalSoundDatabase.Add(soundDb);
                 }
                 catch (Exception e)
                 {
@@ -143,11 +151,13 @@ namespace CommonControls.Editors.AudioEditor
             if (failedBnks.Any())
                 _logger.Here().Error($"{failedBnks.Count} banks failed: {string.Join("\n", failedBnks)}");
 
-            var allHircs = globalSoundDatabase.SelectMany(x => x.Value.HircChuck.Hircs);
+            var allHircs = globalSoundDatabase.SelectMany(x => x.HircChuck.Hircs);
             PrintHircList(allHircs, "All");
 
-            return globalSoundDatabase.Select(x => x.Value).ToList();
+            return globalSoundDatabase;
         }
+
+
 
         void PrintHircList(IEnumerable<HircItem> hircItems, string header)
         {
