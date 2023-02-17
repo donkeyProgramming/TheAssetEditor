@@ -37,7 +37,8 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public void Refresh()
         {
-            var files = _pfs.FindAllWithExtention(".meta").Where(x => x.Name.Contains("anm.meta"));
+            // usually they end with .anim.meta but a few are just .meta, skip sound files (.snd.meta)
+            var files = _pfs.FindAllWithExtention(".meta").Where(x => !x.Name.Contains(".snd."));
             MetaFiles = new ObservableCollection<PackFile>(files);
         }
     }
