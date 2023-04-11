@@ -10,7 +10,7 @@ namespace Audio.FileFormats.WWise.Hirc
 {
     public class HircParser : IParser
     {
-        public void Parse(string fileName, ByteChunk chunk, SoundDataBase bnkFile)
+        public void Parse(string fileName, ByteChunk chunk, ParsedBnkFile bnkFile)
         {
             bnkFile.HircChuck = new HircChunk();
             bnkFile.HircChuck.ChunkHeader = BnkChunkHeader.CreateFromBytes(chunk);
@@ -59,7 +59,7 @@ namespace Audio.FileFormats.WWise.Hirc
             var byteArray = memStream.ToArray();
 
             // For sanity, read back
-            Parse("name", new ByteChunk(byteArray), new SoundDataBase() { Header = new Bkhd.BkhdHeader() { dwBankGeneratorVersion = 136 } });
+            Parse("name", new ByteChunk(byteArray), new ParsedBnkFile() { Header = new Bkhd.BkhdHeader() { dwBankGeneratorVersion = 136 } });
 
             return byteArray;
         }

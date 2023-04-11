@@ -1,4 +1,5 @@
-﻿using Audio.Utility;
+﻿using Audio.Storage;
+using Audio.Utility;
 using CommonControls.FileTypes.PackFiles.Models;
 using Filetypes.ByteParsing;
 using System.Collections.Generic;
@@ -250,7 +251,7 @@ namespace Audio.FileFormats
             return output.ToArray();
         }
 
-        public void SaveTextVersion(string savePath, NameLookupHelper nameHelper)
+        public void SaveTextVersion(string savePath, IAudioRepository audioRepository)
         {
             StringBuilder output = new StringBuilder();
             output.AppendLine($"Events (count:{Event0.Count}):");
@@ -260,7 +261,7 @@ namespace Audio.FileFormats
             output.AppendLine();
             output.AppendLine($"Unkown (count:{VoiceEvents.Count}):");
             foreach (var item in VoiceEvents)
-                output.AppendLine($"\t{item.EventName} [{string.Join(", ", item.Values.Select(x => nameHelper.GetName(x)))}]");
+                output.AppendLine($"\t{item.EventName} [{string.Join(", ", item.Values.Select(x => audioRepository.GetNameFromHash(x)))}]");
 
             output.AppendLine();
             output.AppendLine($"Settings (count:{SettingValues.Count}) [minValue,maxValue]:");

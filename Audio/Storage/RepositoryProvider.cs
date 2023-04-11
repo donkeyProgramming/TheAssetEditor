@@ -1,7 +1,4 @@
 ﻿using Audio.FileFormats.WWise;
-using Audio.Utility;
-using CommonControls.Editors.AudioEditor;
-using CommonControls.Services;
 using System.Collections.Generic;
 
 namespace Audio.Storage
@@ -13,32 +10,30 @@ namespace Audio.Storage
 
     public class AudioData
     {
-        public Dictionary<uint, string> NameLookup { get; set; }
+        public Dictionary<uint, string> NameLookUpTable { get; set; }
         public Dictionary<uint, List<HircItem>> HircObjects { get; set; }
     }
 
     public class CreateRepositoryFromAllPackFiles : RepositoryProvider
     {
-        WwiseDataLoader _wwiseDataLoader;
-        PackFileService _pfs;
+        private readonly WWiseBnkLoader _wwiseDataLoader;
+        private readonly WWiseNameLoader _wwiseNameLoader;
 
-        public CreateRepositoryFromAllPackFiles(WwiseDataLoader wwiseDataLoader, PackFileService pfs)
+        public CreateRepositoryFromAllPackFiles(WWiseBnkLoader wwiseDataLoader, WWiseNameLoader wwiseNameLoader)
         {
             _wwiseDataLoader = wwiseDataLoader;
-            _pfs = pfs;
+            _wwiseNameLoader = wwiseNameLoader;
         }
 
         public AudioData Load()
         {
-            WwiseNameLookupBuilder load = new WwiseNameLookupBuilder();
-
-            var bnkList = _wwiseDataLoader.LoadBnkFiles(_pfs);
-            //var globalDb = _wwiseDataLoader.BuildMasterSoundDatabase(bnkList);
+            var nameList = _wwiseNameLoader.BuildNameHelper();
+            var bnkList = _wwiseDataLoader.LoadBnkFiles();
 
             return new AudioData()
             {
-                NameLookup = load.BuildNameHelper(_pfs),
-                HircObjects = bnkList.HircList
+                NameLookUpTable = nameList,
+                HircObjects = bnkList
             };
         }
     }

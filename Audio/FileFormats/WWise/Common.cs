@@ -11,7 +11,7 @@ namespace Audio.FileFormats.WWise
 
     interface IParser
     {
-        void Parse(string fileName, ByteChunk chunk, SoundDataBase soundDb);
+        void Parse(string fileName, ByteChunk chunk, ParsedBnkFile soundDb);
     }
 
     public abstract class HircItem

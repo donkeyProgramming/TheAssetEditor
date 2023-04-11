@@ -12,11 +12,17 @@ namespace Audio.FileFormats
 
     public class Bnkparser
     {
-        public static SoundDataBase Parse(PackFile file, string fullName)
+        Dictionary<string, IParser> parsers;// = new();
+        public Bnkparser()
+        { 
+        
+        }
+
+        public static ParsedBnkFile Parse(PackFile file, string fullName)
         {
             var chunk = file.DataSource.ReadDataAsChunk();
 
-            var bnkFile = new SoundDataBase();
+            var bnkFile = new ParsedBnkFile();
             var parsers = new Dictionary<string, IParser>();
             parsers["BKHD"] = new BkhdParser();
             parsers["HIRC"] = new HircParser();

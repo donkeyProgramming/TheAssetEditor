@@ -9,7 +9,7 @@ namespace Audio.FileFormats.WWise.Bkhd
 {
     public class BkhdParser : IParser
     {
-        public void Parse(string fileName, ByteChunk chunk, SoundDataBase soundDb)
+        public void Parse(string fileName, ByteChunk chunk, ParsedBnkFile soundDb)
         {
             var bkdh = Create(chunk);
             bkdh.OwnerFileName = fileName;
@@ -61,7 +61,7 @@ namespace Audio.FileFormats.WWise.Bkhd
 
             // Reload the object to ensure sanity
             var parser = new BkhdParser();
-            parser.Parse("name", new ByteChunk(byteArray), new SoundDataBase());
+            parser.Parse("name", new ByteChunk(byteArray), new ParsedBnkFile());
 
             return byteArray;
         }

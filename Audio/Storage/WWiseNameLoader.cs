@@ -1,26 +1,34 @@
 ﻿using Audio.FileFormats;
+using Audio.Utility;
 using CommonControls.Common;
-using CommonControls.Editors.AudioEditor;
 using CommonControls.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Audio.Utility
+namespace Audio.Storage
 {
-    public class WwiseNameLookupBuilder
+    public class WWiseNameLoader
     {
-        private Dictionary<uint, string> NameLookup { get; set; } = new Dictionary<uint, string>();
+        private readonly PackFileService _pfs;
 
-        public Dictionary<uint, string> BuildNameHelper(PackFileService pfs)
+        private Dictionary<uint, string> _nameLookUp { get; set; } = new Dictionary<uint, string>();
+
+
+        public WWiseNameLoader(PackFileService pfs)
         {
-            var wh3Db = LoadWhDatDbForWh3(pfs, out var _);
+            _pfs = pfs;
+        }
+
+        public Dictionary<uint, string> BuildNameHelper()
+        {
+            var wh3Db = LoadWhDatDbForWh3(_pfs, out var _);
             var wh3DbNameList = wh3Db.CreateFileNameList();
             AddNames(wh3DbNameList);
 
             // Add all the bnk file names 
-            var bnkFiles = pfs.FindAllWithExtention(".bnk");
+            var bnkFiles = _pfs.FindAllWithExtention(".bnk");
             var bnkNames = bnkFiles.Select(x => x.Name.Replace(".bnk", "")).ToArray();
             AddNames(bnkNames);
 
@@ -55,7 +63,7 @@ namespace Audio.Utility
                 }
             }
 
-            return NameLookup;
+            return _nameLookUp;
         }
 
         // Move to a datfile loader
@@ -88,8 +96,8 @@ namespace Audio.Utility
         {
             foreach (var name in names)
             {
-                var hashVal = WWiseNameLookUpHelper.ComputeWWiseHash(name);
-                NameLookup[hashVal] = name;
+                var hashVal = WWiseHash.ComputeHash(name);
+                _nameLookUp[hashVal] = name;
             }
         }
     }

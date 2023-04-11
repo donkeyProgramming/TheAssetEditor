@@ -21,7 +21,7 @@ namespace Audio.Storage
         public AudioRepository(RepositoryProvider provider)
         {
             var data = provider.Load();
-            NameLookUpTable = data.NameLookup;
+            NameLookUpTable = data.NameLookUpTable;
             HircObjects = data.HircObjects;
         }
 

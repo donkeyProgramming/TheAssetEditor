@@ -1,6 +1,7 @@
 ﻿using Audio.FileFormats;
 using Audio.FileFormats.WWise.Bkhd;
 using Audio.FileFormats.WWise.Hirc;
+using Audio.Utility;
 using CommonControls.FileTypes.PackFiles.Models;
 using Filetypes.ByteParsing;
 using System;
@@ -47,7 +48,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         public byte[] CopyHircToOwnBnk(ByteChunk wholeBnkChunk, uint hircId, string outputBnkNameWithoutExtention)
         {
             var header = BkhdParser.Create(wholeBnkChunk);
-            header.dwSoundBankID = WWiseNameLookUpHelper.ComputeWWiseHash(outputBnkNameWithoutExtention);
+            header.dwSoundBankID = WWiseHash.ComputeHash(outputBnkNameWithoutExtention);
 
             wholeBnkChunk.Index = 0;
             var hirc = FindHirc(wholeBnkChunk, hircId);

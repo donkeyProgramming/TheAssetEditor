@@ -1,10 +1,10 @@
 ﻿using System.Text;
 
-namespace CommonControls.Editors.AudioEditor
+namespace Audio.Utility
 {
-    public static class WWiseNameLookUpHelper
+    public static class WWiseHash
     {
-        public static uint ComputeWWiseHash(string name)
+        public static uint ComputeHash(string name)
         {
             var lower = name.ToLower().Trim();
             var bytes = Encoding.UTF8.GetBytes(lower);

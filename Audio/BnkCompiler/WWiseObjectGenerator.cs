@@ -2,6 +2,7 @@
 using Audio.FileFormats.WWise.Bkhd;
 using Audio.FileFormats.WWise.Hirc;
 using Audio.FileFormats.WWise.Hirc.V136;
+using Audio.Utility;
 using CommonControls.Services;
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             _allProjectItems.AddRange(_projectFile.GameSounds);
         }
 
-        uint ConvertStringToWWiseId(string id) => WWiseNameLookUpHelper.ComputeWWiseHash(id);
+        uint ConvertStringToWWiseId(string id) => WWiseHash.ComputeHash(id);
        
         uint GetHircItemId(string reference)
         {
