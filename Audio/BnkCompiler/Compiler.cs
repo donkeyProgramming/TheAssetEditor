@@ -24,12 +24,14 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             public PackFile OutputBnkFile { get; set; }
             public PackFile OutputDatFile { get; set; }
             public PackFile NameList { get; set; }
-            public List<PackFile> AudioFiles { get; set; } = new List<PackFile>();
         }
 
         private readonly PackFileService _pfs;
 
         public AudioProjectXml ProjectFile { get; private set; }
+        public bool ExportResultToFile { get; set; }
+        public bool ConvertResultToXml { get; set; }
+        public bool ThrowOnError { get; set; }
 
         public Compiler(PackFileService pfs)
         {
@@ -70,7 +72,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             if (pf == null)
                 throw new Exception();
 
-            var errorList = new ErrorListViewModel.ErrorList();
+            errorList = new ErrorListViewModel.ErrorList();
             return CompileProject(pf, ref errorList);
         }
 
@@ -151,7 +153,6 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
                 return null;
             }
         }
-
 
         public static Stream GenerateStreamFromString(string s)
         {

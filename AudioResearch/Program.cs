@@ -76,6 +76,12 @@ namespace AudioResearch
             compiler.ConvertResultToXml = true;
             compiler.ThrowOnError = true;
             var result = compiler.CompileProject(@"audioprojects\Project.xml", out var errorList);
+
+            
+            
+            
+            
+            
             //PackFileUtil.SaveFile(result.OutputBnkFile, $"Data\\{compiler.ProjectFile.OutputFile}".ToLower().Trim());
             //ConvertBnkToXml($"Data\\{compiler.ProjectFile.OutputFile}".ToLower().Trim())
 
