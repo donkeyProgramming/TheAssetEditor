@@ -1,39 +1,42 @@
-﻿using Audio.FileFormats.WWise;
-using Audio.FileFormats.WWise.Bkhd;
+﻿using Audio.FileFormats.WWise.Bkhd;
 using Audio.FileFormats.WWise.Hirc;
 using Audio.FileFormats.WWise.Stid;
 using CommonControls.FileTypes.PackFiles.Models;
+using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Audio.FileFormats
+namespace Audio.FileFormats.WWise
 {
+    interface IParser
+    {
+        void Parse(string fileName, ByteChunk chunk, ParsedBnkFile soundDb);
+    }
+
 
     public class Bnkparser
     {
-        Dictionary<string, IParser> parsers;// = new();
+        Dictionary<string, IParser> _parsers = new Dictionary<string, IParser>();
+
         public Bnkparser()
-        { 
-        
+        {
+            _parsers["BKHD"] = new BkhdParser();
+            _parsers["HIRC"] = new HircParser();
+            _parsers["STID"] = new StidParser();
         }
 
-        public static ParsedBnkFile Parse(PackFile file, string fullName)
+        public ParsedBnkFile Parse(PackFile file, string fullName)
         {
             var chunk = file.DataSource.ReadDataAsChunk();
-
             var bnkFile = new ParsedBnkFile();
-            var parsers = new Dictionary<string, IParser>();
-            parsers["BKHD"] = new BkhdParser();
-            parsers["HIRC"] = new HircParser();
-            parsers["STID"] = new StidParser();
 
             while (chunk.BytesLeft != 0)
             {
                 var chunckHeader = BnkChunkHeader.PeakFromBytes(chunk);
                 var indexBeforeRead = chunk.Index;
                 var expectedIndexAfterRead = indexBeforeRead + BnkChunkHeader.HeaderByteSize + chunckHeader.ChunkSize;
-                parsers[chunckHeader.Tag].Parse(fullName, chunk, bnkFile);
+                _parsers[chunckHeader.Tag].Parse(fullName, chunk, bnkFile);
 
                 var headerTag = chunckHeader.Tag;
                 var hircSizes = bnkFile.HircChuck.Hircs.Sum(x => x.Size);
@@ -44,7 +47,7 @@ namespace Audio.FileFormats
                 if (headerTag == "HIRC")
                 {
                     if (areEqual == false)
-                        throw new Exception();
+                        throw new Exception("Error parsing bnk, expected and actuall not matching");
                 }
 
                 // Verify index

@@ -1,4 +1,6 @@
 ﻿using Audio.FileFormats;
+using Audio.FileFormats.Dat;
+using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Bkhd;
 using Audio.FileFormats.WWise.Hirc;
 using CommonControls.BaseDialogs.ErrorListDialog;
@@ -99,7 +101,8 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 
             // Convert to output and parse for sanity
             var bnkPackFile = new PackFile(outputFile, new MemorySource(bytes));
-            var result = Bnkparser.Parse(bnkPackFile, "test\\TestFile.bnk");
+            var parser = new Bnkparser();
+            var result = parser.Parse(bnkPackFile, "test\\TestFile.bnk");
 
             return bnkPackFile;
         }
@@ -113,9 +116,9 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             foreach (var wwiseEvent in projectFile.Events)
                 datFile.Event0.Add(new SoundDatFile.EventWithValue() { EventName = wwiseEvent.Id, Value = 400 });
 
-            var bytes = DatParser.GetAsByteArray(datFile);
+            var bytes = DatFileParser.GetAsByteArray(datFile);
             var packFile = new PackFile(outputName, new MemorySource(bytes));
-            var reparsedSanityFile = DatParser.Parse(packFile, false);
+            var reparsedSanityFile = DatFileParser.Parse(packFile, false);
             return packFile;
         }
        

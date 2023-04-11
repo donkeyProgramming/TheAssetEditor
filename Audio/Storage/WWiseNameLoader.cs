@@ -1,4 +1,4 @@
-﻿using Audio.FileFormats;
+﻿using Audio.FileFormats.Dat;
 using Audio.Utility;
 using CommonControls.Common;
 using CommonControls.Services;
@@ -78,7 +78,7 @@ namespace Audio.Storage
             {
                 try
                 {
-                    var parsedFile = DatParser.Parse(datFile, false);
+                    var parsedFile = DatFileParser.Parse(datFile, false);
                     masterDat.Merge(parsedFile);
                 }
                 catch (Exception e)

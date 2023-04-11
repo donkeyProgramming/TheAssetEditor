@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace Audio.FileFormats
+namespace Audio.FileFormats.WWise
 {
     public class BnkChunkHeader
     {

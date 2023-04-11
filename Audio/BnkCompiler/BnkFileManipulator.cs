@@ -1,4 +1,5 @@
 ﻿using Audio.FileFormats;
+using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Bkhd;
 using Audio.FileFormats.WWise.Hirc;
 using Audio.Utility;
@@ -65,7 +66,8 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             var bytes = memStream.ToArray();
 
             var bnkPackFile = new PackFile(outputBnkNameWithoutExtention, new MemorySource(bytes));
-            var result = Bnkparser.Parse(bnkPackFile, "test\\TestFile.bnk");
+            var parser = new Bnkparser();
+            var result = parser.Parse(bnkPackFile, "test\\TestFile.bnk");
 
             return bytes;
         }

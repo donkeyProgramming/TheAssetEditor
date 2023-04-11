@@ -1,5 +1,4 @@
-﻿using Audio.FileFormats;
-using Filetypes.ByteParsing;
+﻿using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
 using System.IO;

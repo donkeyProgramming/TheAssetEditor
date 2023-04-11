@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Audio.FileFormats;
 
 namespace Audio.FileFormats.WWise.Hirc
 {

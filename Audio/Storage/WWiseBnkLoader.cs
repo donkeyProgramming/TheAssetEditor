@@ -1,5 +1,4 @@
-﻿using Audio.FileFormats;
-using Audio.FileFormats.WWise;
+﻿using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Hirc;
 using Audio.Utility;
 using CommonControls.Common;
@@ -17,16 +16,18 @@ namespace Audio.Storage
     public class WWiseBnkLoader
     {
         private readonly PackFileService _pfs;
+        private readonly Bnkparser _bnkparser;
         ILogger _logger = Logging.Create<WWiseBnkLoader>();
 
-        public WWiseBnkLoader(PackFileService pfs)
+        public WWiseBnkLoader(PackFileService pfs, Bnkparser bnkparser)
         {
             _pfs = pfs;
+            _bnkparser = bnkparser;
         }
 
         public ParsedBnkFile LoadBnkFile(PackFile bnkFile, string bnkFileName, bool printData = false)
         {
-            var soundDb = Bnkparser.Parse(bnkFile, bnkFileName);
+            var soundDb = _bnkparser.Parse(bnkFile, bnkFileName);
             if (printData)
                 PrintHircList(soundDb.HircChuck.Hircs, bnkFileName);
             return soundDb;
@@ -46,6 +47,7 @@ namespace Audio.Storage
             var parsedBnkList = new List<ParsedBnkFile>();
             var banksWithUnknowns = new List<string>();
             var failedBnks = new List<(string bnkFile, string Error)>();
+         
 
             var counter = 1;
             Parallel.ForEach(wantedBnkFiles, bnkFile =>

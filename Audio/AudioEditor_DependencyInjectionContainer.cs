@@ -1,4 +1,5 @@
 ﻿using Audio.AudioEditor;
+using Audio.FileFormats.WWise;
 using Audio.Presentation;
 using Audio.Storage;
 using Audio.Utility;
@@ -19,6 +20,7 @@ namespace Audio
             
             serviceCollection.AddTransient<WWiseBnkLoader>();
             serviceCollection.AddTransient<WWiseNameLoader>();
+            serviceCollection.AddTransient<Bnkparser>();
 
             serviceCollection.AddTransient<SoundPlayer>();
             serviceCollection.AddTransient<AudioDebugExportHelper>();
