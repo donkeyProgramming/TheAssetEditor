@@ -1,4 +1,5 @@
 ﻿using Audio.FileFormats.WWise;
+using CommonControls.Common;
 using System.Collections.Generic;
 
 namespace Audio.Storage
@@ -27,6 +28,8 @@ namespace Audio.Storage
 
         public AudioData Load()
         {
+            using var _ = new WaitCursor();
+    
             var nameList = _wwiseNameLoader.BuildNameHelper();
             var bnkList = _wwiseDataLoader.LoadBnkFiles();
 

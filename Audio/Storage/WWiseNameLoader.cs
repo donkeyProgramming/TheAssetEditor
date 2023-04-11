@@ -96,7 +96,7 @@ namespace Audio.Storage
         {
             foreach (var name in names)
             {
-                var hashVal = WWiseHash.ComputeHash(name);
+                var hashVal = WWiseHash.Compute(name);
                 _nameLookUp[hashVal] = name;
             }
         }

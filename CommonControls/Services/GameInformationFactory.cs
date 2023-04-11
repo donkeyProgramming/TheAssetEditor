@@ -29,18 +29,18 @@ namespace CommonControls.Services
         public string ShortID { get; set; }
     }
 
-    public static class GameInformationFactory
+    public class GameInformationFactory
     {
-        public static GameInformation Warhammer { get; private set; }
-        public static GameInformation Warhammer2 { get; private set; }
-        public static GameInformation Warhammer3 { get; private set; }
-        public static GameInformation Troy { get; private set; }
-        public static GameInformation ThreeKingdoms { get; private set; }
-        public static GameInformation Rome2Remastered { get; private set; }
-        public static GameInformation Attilla { get; private set; }
-        public static List<GameInformation> Games { get; private set; }
+        public GameInformation Warhammer { get; private set; }
+        public GameInformation Warhammer2 { get; private set; }
+        public GameInformation Warhammer3 { get; private set; }
+        public GameInformation Troy { get; private set; }
+        public GameInformation ThreeKingdoms { get; private set; }
+        public GameInformation Rome2Remastered { get; private set; }
+        public GameInformation Attilla { get; private set; }
+        public List<GameInformation> Games { get; private set; }
 
-        public static void Create()
+        public GameInformationFactory()
         {
             Warhammer = new GameInformation() { Type = GameTypeEnum.Warhammer1, DisplayName = "Warhammer", DefaultPackType = "PFH4", ShortID = "warhammer" };
             Warhammer2 = new GameInformation() { Type = GameTypeEnum.Warhammer2, DisplayName = "Warhammer II", DefaultPackType = "PFH5", ShortID = "warhammer2" };
@@ -52,10 +52,9 @@ namespace CommonControls.Services
             Games = new List<GameInformation>() { Warhammer, Warhammer2, Warhammer3, Troy, ThreeKingdoms, Rome2Remastered, Attilla };
         }
 
-        public static GameInformation GetGameById(GameTypeEnum type)
+        public GameInformation GetGameById(GameTypeEnum type)
         {
             return Games.FirstOrDefault(x => x.Type == type);
         }
-
     }
 }

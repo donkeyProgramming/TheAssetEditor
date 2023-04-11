@@ -31,18 +31,20 @@ namespace AssetEditor.Report
         ILogger _logger = Logging.Create<FileListReportGenerator>();
         PackFileService _pfs;
         ApplicationSettingsService _settingsService;
+        private readonly GameInformationFactory _gameInformationFactory;
         HashAlgorithm _md5Instance;
 
-        public FileListReportGenerator(PackFileService pfs, ApplicationSettingsService settingsService)
+        public FileListReportGenerator(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
             _pfs = pfs;
             _settingsService = settingsService;
+            _gameInformationFactory = gameInformationFactory;
             _md5Instance = MD5.Create();
         }
 
-        public static void Generate(PackFileService pfs, ApplicationSettingsService settingsService)
+        public static void Generate(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
-            var instance = new FileListReportGenerator(pfs, settingsService);
+            var instance = new FileListReportGenerator(pfs, settingsService, gameInformationFactory);
             instance.Create();
         }
 
@@ -50,7 +52,7 @@ namespace AssetEditor.Report
         {
             var outputFolder = DirectoryHelper.ReportsDirectory + "\\FileList";
             DirectoryHelper.EnsureCreated(outputFolder);
-            var gameName = GameInformationFactory.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
+            var gameName = _gameInformationFactory.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
             var outputFileName = $"{gameName} {DateTime.Now.ToString("yyyyMMddHHmmssfff")}.csv";
             var outputFilePath = $"{outputFolder}\\{outputFileName}";
 
@@ -116,7 +118,7 @@ namespace AssetEditor.Report
             var oldData = LoadFile(oldFilePath);
             var newData = LoadFile(newFilePath);
 
-            var gameName = GameInformationFactory.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
+            var gameName = _gameInformationFactory.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
             var gameFolder = $"{gameName}_fileCompare_{DateTime.Now.ToString("yyyyMMddHHmmss")}";
 
             var outputFolder = DirectoryHelper.ReportsDirectory + "\\FileList\\" + gameFolder;

@@ -64,6 +64,16 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             return true;
         }
 
+        public CompileResult CompileProject(string path, out ErrorListViewModel.ErrorList errorList)
+        {
+            var pf = _pfs.FindFile(path);
+            if (pf == null)
+                throw new Exception();
+
+            var errorList = new ErrorListViewModel.ErrorList();
+            return CompileProject(pf, ref errorList);
+        }
+
         public CompileResult CompileProject(PackFile packfile, ref ErrorListViewModel.ErrorList errorList)
         {
             ProjectFile = LoadFile(packfile, ref errorList);

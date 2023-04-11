@@ -39,11 +39,11 @@ namespace AssetEditor.ViewModels
         public ICommand SaveCommand { get; set; }
 
         ApplicationSettingsService _settingsService;
-        public SettingsViewModel(ApplicationSettingsService settingsService)
+        public SettingsViewModel(ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
             _settingsService = settingsService;
 
-            foreach (var game in GameInformationFactory.Games)
+            foreach (var game in gameInformationFactory.Games)
             {
                 GameDirectores.Add(
                     new GamePathItem()

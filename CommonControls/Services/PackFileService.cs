@@ -19,15 +19,17 @@ namespace CommonControls.Services
         ILogger _logger = Logging.Create<PackFileService>();
 
 
-        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         public PackFileDataBase Database { get; private set; }
-        ApplicationSettingsService _settingsService;
+        private readonly ApplicationSettingsService _settingsService;
+        private readonly GameInformationFactory _gameInformationFactory;
 
-        public PackFileService(PackFileDataBase database, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService settingsService)
+        public PackFileService(PackFileDataBase database, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
             Database = database;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _settingsService = settingsService;
+            _gameInformationFactory = gameInformationFactory;
         }
 
         public bool TriggerFileUpdates { get; set; } = true;
@@ -256,6 +258,13 @@ namespace CommonControls.Services
             var pack = PackFileSerializer.Load(packFileSystemPath, binaryReader, _skeletonAnimationLookUpHelper, _settingsService, new CustomPackDuplicatePackFileResolver());
             Database.AddPackFile(pack);
             return pack;
+        }
+
+        public bool LoadAllCaFiles(GameTypeEnum gameEnum)
+        {
+            var game = _gameInformationFactory.GetGameById(gameEnum);
+            var path = _settingsService.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Type);
+            return LoadAllCaFiles(path.Path, game.DisplayName);
         }
 
         public bool LoadAllCaFiles(string gameDataFolder, string gameName)

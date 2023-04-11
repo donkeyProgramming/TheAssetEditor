@@ -25,6 +25,7 @@ namespace AssetEditor
             Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(DispatcherUnhandledExceptionHandler);
 
             _config = new DependencyInjectionConfig();
+            _config.ConfigureResources();
             _config.ShowMainWindow();
         }
 

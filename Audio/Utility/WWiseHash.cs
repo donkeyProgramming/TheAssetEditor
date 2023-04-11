@@ -4,7 +4,7 @@ namespace Audio.Utility
 {
     public static class WWiseHash
     {
-        public static uint ComputeHash(string name)
+        public static uint Compute(string name)
         {
             var lower = name.ToLower().Trim();
             var bytes = Encoding.UTF8.GetBytes(lower);

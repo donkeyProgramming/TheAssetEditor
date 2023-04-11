@@ -23,16 +23,12 @@ namespace Audio
             serviceCollection.AddTransient<Bnkparser>();
 
             serviceCollection.AddTransient<SoundPlayer>();
-            serviceCollection.AddTransient<AudioDebugExportHelper>();
-            
-            // Clanup loading
-
+            serviceCollection.AddTransient<AudioResearchHelper>();
         }
 
         public static void RegisterTools(IToolFactory factory)
         {
             factory.RegisterTool<AudioEditorViewModel, AudioEditorMainView>();
-          //  factory.RegisterFileTool<AudioEditorViewModel, AudioEditorMainView>(new ExtentionToTool(EditorEnums.AudioExplorer_Editor, new[] { ".bnk" }));
         }
     }
 }

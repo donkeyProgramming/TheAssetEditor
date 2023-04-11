@@ -34,7 +34,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             _allProjectItems.AddRange(_projectFile.GameSounds);
         }
 
-        uint ConvertStringToWWiseId(string id) => WWiseHash.ComputeHash(id);
+        uint ConvertStringToWWiseId(string id) => WWiseHash.Compute(id);
        
         uint GetHircItemId(string reference)
         {

@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AssetEditor\AssetEditor.csproj" />
     <ProjectReference Include="..\Audio\Audio.csproj" />
     <ProjectReference Include="..\CommonControls\CommonControls.csproj" />
   </ItemGroup>

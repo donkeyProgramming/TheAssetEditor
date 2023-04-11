@@ -3,10 +3,7 @@ using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using Audio.Utility;
 using CommonControls.Common;
-using CommonControls.Editors.AudioEditor;
 using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.Json;
@@ -14,15 +11,13 @@ using System.Text.Json.Serialization;
 
 namespace Audio.AudioEditor
 {
-
     public class AudioEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
         public EventSelectionFilter EventFilter { get; set; }
        
-        private readonly PackFileService _pfs;
         private readonly IAudioRepository _audioRepository;
         private readonly SoundPlayer _soundPlayer;
-        private readonly AudioDebugExportHelper _audioDebugExportHelper;
+        private readonly AudioResearchHelper _audioResearchHelper;
 
         PackFile _mainFile;
         HircTreeItem _selectedNode;
@@ -45,12 +40,11 @@ namespace Audio.AudioEditor
         public PackFile MainFile { get => _mainFile; set { _mainFile = value; } }
         public bool HasUnsavedChanges { get; set; }
 
-        public AudioEditorViewModel(PackFileService pfs, IAudioRepository audioRepository, SoundPlayer soundPlayer, AudioDebugExportHelper audioDebugExportHelper)
+        public AudioEditorViewModel(IAudioRepository audioRepository, SoundPlayer soundPlayer, AudioResearchHelper audioResearchHelper)
         {
-            _pfs = pfs;
             _audioRepository = audioRepository;
             _soundPlayer = soundPlayer;
-            _audioDebugExportHelper = audioDebugExportHelper;
+            _audioResearchHelper = audioResearchHelper;
 
             ShowIds = new NotifyAttr<bool>(false, RefeshList);
             ShowBnkName = new NotifyAttr<bool>(false, RefeshList);
@@ -111,7 +105,7 @@ namespace Audio.AudioEditor
         }
        
         public void PlaySelectedSoundAction() => _soundPlayer.PlaySound(_selectedNode.Item as ICAkSound, TreeList.First().Parent.Item.Id);    
-        public void ExportCurrrentDialogEventAsCsvAction() => _audioDebugExportHelper.ExportDialogEventsToFile(_selectedNode.Item as CAkDialogueEvent_v136, true);
-        public void ExportIdListAction() => _audioDebugExportHelper.ExportNamesToFile("c:\\temp\\wwiseIds.txt", true);
+        public void ExportCurrrentDialogEventAsCsvAction() => _audioResearchHelper.ExportDialogEventsToFile(_selectedNode.Item as CAkDialogueEvent_v136, true);
+        public void ExportIdListAction() => _audioResearchHelper.ExportNamesToFile("c:\\temp\\wwiseIds.txt", true);
     }
 }

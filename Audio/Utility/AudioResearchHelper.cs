@@ -11,12 +11,12 @@ using System.Text;
 
 namespace Audio.Utility
 {
-    public class AudioDebugExportHelper
+    public class AudioResearchHelper
     {
-        ILogger _logger = Logging.Create<AudioDebugExportHelper>();
+        ILogger _logger = Logging.Create<AudioResearchHelper>();
         private readonly IAudioRepository _audioRepository;
 
-        public AudioDebugExportHelper(IAudioRepository audioRepository)
+        public AudioResearchHelper(IAudioRepository audioRepository)
         {
             _audioRepository = audioRepository;
         }

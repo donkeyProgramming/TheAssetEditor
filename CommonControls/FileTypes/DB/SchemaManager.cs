@@ -14,7 +14,7 @@ using CommonControls.Services;
 
 namespace CommonControls.FileTypes.DB
 {
-    public class SchemaManager : IGameComponent
+    /*public class SchemaManager : IGameComponent
     {
         ILogger _logger = Logging.Create<SchemaManager>();
 
@@ -25,8 +25,8 @@ namespace CommonControls.FileTypes.DB
 
         public SchemaManager()
         {
-            foreach (var game in GameInformationFactory.Games)
-                Load(game.Type);
+            //foreach (var game in GameInformationFactory.Games)
+            //    Load(game.Type);
         }
 
         public void UpdateCurrentTableDefinitions(SchemaFile schemaFile)
@@ -262,5 +262,5 @@ namespace CommonControls.FileTypes.DB
         public GameTypeEnum GameEnum { get; set; }
         public int Version { get; set; } = 1;
         public Dictionary<string, List<DbTableDefinition>> TableDefinitions { get; set; } = new Dictionary<string, List<DbTableDefinition>>();
-    }
+    }*/
 }

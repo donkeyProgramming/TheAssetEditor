@@ -76,21 +76,21 @@ namespace CommonControls.Common
         {
             if (File.Exists(path) == false)
                 throw new Exception();
-
+        
             var pfs = CreatePackFileService();
             var container = pfs.GetAllPackfileContainers().First();
             pfs.AddFileToPack(container, "systemfile", new PackFile(Path.GetFileName(path), new FileSystemSource(path)));
-
+        
             return pfs;
         }
-
+        
         public static PackFileService CreatePackFileService()
         {
-
-            var pfs = new PackFileService(new PackFileDataBase(), new SkeletonAnimationLookUpHelper(), new ApplicationSettingsService());
+        
+            var pfs = new PackFileService(new PackFileDataBase(), new SkeletonAnimationLookUpHelper(), new ApplicationSettingsService(), new GameInformationFactory());
             var container = pfs.CreateNewPackFileContainer("temp", PackFileCAType.MOD);
             pfs.SetEditablePack(container);
-
+        
             return pfs;
         }
 
@@ -100,6 +100,35 @@ namespace CommonControls.Common
             var packfile = new PackFile(Path.GetFileName(filePath), fileSource);
             directoryPath = Path.GetDirectoryName(filePath);
             return packfile;
+        }
+
+        public static void LoadFilesFromDisk(PackFileService pfs, IEnumerable<FileRef> fileRefs)
+        {
+            var packFileList = new List<PackFile>();
+            var pathList = new List<string>();
+
+            foreach(var fileRef in fileRefs) 
+            {
+                var fileSource = new FileSystemSource(fileRef.SystemPath);
+                var packfile = new PackFile(Path.GetFileName(fileRef.SystemPath), fileSource);
+
+                packFileList.Add(packfile);
+                pathList.Add(fileRef.PackFilePath);
+            }
+
+            pfs.AddFilesToPack(pfs.GetEditablePack(), pathList, packFileList);
+        }
+
+        public class FileRef
+        { 
+            public string SystemPath { get; set; }
+            public string PackFilePath { get; set; }
+
+            public FileRef(string systemPath, string packFilePath)
+            {
+                SystemPath = systemPath;
+                PackFilePath = packFilePath;
+            }
         }
     }
 }

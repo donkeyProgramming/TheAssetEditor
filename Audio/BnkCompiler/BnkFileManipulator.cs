@@ -49,7 +49,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         public byte[] CopyHircToOwnBnk(ByteChunk wholeBnkChunk, uint hircId, string outputBnkNameWithoutExtention)
         {
             var header = BkhdParser.Create(wholeBnkChunk);
-            header.dwSoundBankID = WWiseHash.ComputeHash(outputBnkNameWithoutExtention);
+            header.dwSoundBankID = WWiseHash.Compute(outputBnkNameWithoutExtention);
 
             wholeBnkChunk.Index = 0;
             var hirc = FindHirc(wholeBnkChunk, hircId);

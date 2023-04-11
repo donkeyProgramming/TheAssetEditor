@@ -1,11 +1,16 @@
-﻿using Audio.FileFormats.WWise;
+﻿using AssetEditor;
+using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Hirc.V136;
+using Audio.Storage;
 using Audio.Utility;
 using CommonControls.Common;
 using CommonControls.Editors.AudioEditor;
+using CommonControls.Editors.AudioEditor.BnkCompiler;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
+using Microsoft.Extensions.DependencyInjection;
 using MoreLinq;
+using Octokit;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -21,11 +26,76 @@ namespace AudioResearch
     // RPFC - Real time parameter control 
     class Program
     {
+
+        /*
+        public static bool Run(string projectFilePath, PackFileService pfs, out string outputFile)
+        {
+            outputFile = null;
+            var compiler = new Compiler(pfs);
+            var fileContent = File.ReadAllBytes(projectFilePath);
+            var packFile = new PackFile("project", new MemorySource(fileContent));
+
+            var compileResultLog = new ErrorListViewModel.ErrorList();
+            var result = compiler.CompileProject(packFile, ref compileResultLog);
+
+            if (compileResultLog.Errors.Count == 0 && result != null)
+            {
+                var project = compiler.ProjectFile;
+
+                // Save to disk for easy debug
+                var bnkFile = result.OutputBnkFile;
+                var chunk = bnkFile.DataSource.ReadDataAsChunk();
+                outputFile = $"Data\\{project.OutputFile}".ToLower().Trim();
+                chunk.SaveToFile(outputFile);
+
+                return true;
+            }
+
+            throw new System.Exception("Something went wrong");
+        }
+         */
+
         static void Main(string[] args)
         {
+            var applicationBuilder = new DependencyInjectionConfig();
+            using var scope = applicationBuilder.ServiceProvider.CreateScope();
+
+            var settings = scope.ServiceProvider.GetService<ApplicationSettingsService>();
+            settings.CurrentSettings.SkipLoadingWemFiles = true;
+
+            var pfs = scope.ServiceProvider.GetService<PackFileService>();
+            pfs.LoadAllCaFiles(GameTypeEnum.Warhammer3);
+            PackFileUtil.LoadFilesFromDisk(pfs, new[] 
+            { 
+                new PackFileUtil.FileRef( packFilePath: @"audio\wwise", systemPath:@"Data\CustomSoundCompile\790209750.wem"),
+                new PackFileUtil.FileRef( packFilePath: @"audioprojects", systemPath:@"Data\CustomSoundCompile\Project.xml")
+            } );
+
+            var compiler = scope.ServiceProvider.GetService<Compiler>();
+            compiler.ExportResultToFile = true;
+            compiler.ConvertResultToXml = true;
+            compiler.ThrowOnError = true;
+            var result = compiler.CompileProject(@"audioprojects\Project.xml", out var errorList);
+            //PackFileUtil.SaveFile(result.OutputBnkFile, $"Data\\{compiler.ProjectFile.OutputFile}".ToLower().Trim());
+            //ConvertBnkToXml($"Data\\{compiler.ProjectFile.OutputFile}".ToLower().Trim())
+
+
+            //
+            // var container = pfs.CreateNewPackFileContainer("myStuff", PackFileCAType.MOD);
+            // pfs.AddFilesToPack(container, "asd\asdasd", new PackFile());
+            // pfs.AddFilesToPack(container, "asd\asdasd", new PackFile());
+            // pfs.AddFilesToPack(container, "asd\asdasd", new PackFile());
+            //
+
+            //
+            // var bnkLoader = scope.ServiceProvider.GetService<WWiseBnkLoader>();
+            // var load = bnkLoader.LoadBnkFile(null, "", true);
+
+
+
             // Create a progam
             Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
-            GameInformationFactory.Create();
+            //GameInformationFactory.Create();
 
             //LoadBnkFromFile(@"C:\temp\wwiseextracttest.bnk");
             //BnkFileManipulatorTests.ExtractToOwnPack();
@@ -35,7 +105,7 @@ namespace AudioResearch
             //DialogEventsAsTables.ExportAllDialogEventsAsTable();
             //DialogEventsAsTables.ExportSystemFileAsTable(@"C:\Users\ole_k\Downloads\battle_vo_orders_999999999__core.bnk", "custom_");
 
-            //CompileTest();
+            //CompileTestH
         }
 
        /* static void LoadBnkFromFile(string path)
@@ -51,12 +121,13 @@ namespace AudioResearch
             var nameHelper = builder.BuildNameHelper(pfs);
         }*/
 
-        /*static void CompileTest0()
+        static void CompileTest0()
         {
             var pfs = PackFileUtil.CreatePackFileService();
 
             var audioFile = PackFileUtil.CreateNewPackFileFromSystem(@"Data\CustomSoundCompile\790209750.wem", out var _);
             pfs.AddFilesToPack(pfs.GetEditablePack(), new List<string>() { @"audio\wwise", }, new List<PackFile>() { audioFile });
+
 
             // var audioProject = PackFileUtil.CreatePackFileFromSystem("", out var _);
             // pfs.AddFilesToPack(pfs.GetEditablePack(), new List<string>() { "audio//wwise", }, new List<PackFile>() { audioProject });
@@ -67,7 +138,14 @@ namespace AudioResearch
             var fullPath = Directory.GetCurrentDirectory() + "\\" + outputFile; 
             ExecuteCommand("C:\\Users\\ole_k\\Desktop\\audio_research\\WWiser\\wwiser.pyz " + fullPath);
             DirectoryHelper.OpenFolderAndSelectFile(fullPath);
-        }*/
+        }
+
+        static void ConvertBnkToXml(string path)
+        {
+            var fullPath = Directory.GetCurrentDirectory() + "\\" + path;
+            ExecuteCommand("C:\\Users\\ole_k\\Desktop\\audio_research\\WWiser\\wwiser.pyz " + fullPath);
+            DirectoryHelper.OpenFolderAndSelectFile(fullPath);
+        }
 
         public static void ExecuteCommand(string Command)
         {
