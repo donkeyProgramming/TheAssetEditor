@@ -1,11 +1,9 @@
-﻿using CommonControls.Common;
+﻿using Audio.FileFormats.WWise;
+using Audio.FileFormats.WWise.Hirc.V136;
+using Audio.Utility;
+using CommonControls.Common;
 using CommonControls.Editors.AudioEditor;
-using CommonControls.Editors.Sound;
 using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.FileTypes.Sound;
-using CommonControls.FileTypes.Sound.WWise;
-using CommonControls.FileTypes.Sound.WWise.Hirc;
-using CommonControls.FileTypes.Sound.WWise.Hirc.V136;
 using CommonControls.Services;
 using MoreLinq;
 using Serilog;
@@ -31,7 +29,7 @@ namespace AudioResearch
 
             //LoadBnkFromFile(@"C:\temp\wwiseextracttest.bnk");
             //BnkFileManipulatorTests.ExtractToOwnPack();
-            LoadAllTest();
+            //LoadAllTest(); <- Make this work
             //CompileTest0();
 
             //DialogEventsAsTables.ExportAllDialogEventsAsTable();
@@ -40,7 +38,7 @@ namespace AudioResearch
             //CompileTest();
         }
 
-        static void LoadBnkFromFile(string path)
+       /* static void LoadBnkFromFile(string path)
         {
             var pfs = PackFileUtil.CreatePackFileService();
 
@@ -51,9 +49,9 @@ namespace AudioResearch
             var bnkList = builder.LoadBnkFiles(pfs);
             var globalDb = builder.BuildMasterSoundDatabase(bnkList);
             var nameHelper = builder.BuildNameHelper(pfs);
-        }
+        }*/
 
-        static void CompileTest0()
+        /*static void CompileTest0()
         {
             var pfs = PackFileUtil.CreatePackFileService();
 
@@ -69,7 +67,7 @@ namespace AudioResearch
             var fullPath = Directory.GetCurrentDirectory() + "\\" + outputFile; 
             ExecuteCommand("C:\\Users\\ole_k\\Desktop\\audio_research\\WWiser\\wwiser.pyz " + fullPath);
             DirectoryHelper.OpenFolderAndSelectFile(fullPath);
-        }
+        }*/
 
         public static void ExecuteCommand(string Command)
         {
@@ -84,7 +82,7 @@ namespace AudioResearch
         }
 
 
-        static void LoadAllTest()
+       /* static void LoadAllTest()
         {
             var pfs = ResearchUtil.GetPackFileService(skipLoadingWemFiles: false);
 
@@ -104,9 +102,9 @@ namespace AudioResearch
             //nameHelper.SaveToFile(@"C:\Users\ole_k\Desktop\audio research\WWiser\wwnames.txt");
 
             Console.ReadLine();
-        }
+        }*/
 
-        static void CompileTest()
+       /* static void CompileTest()
         {
             var pfs = ResearchUtil.GetPackFileService(skipLoadingWemFiles: false);
 
@@ -143,10 +141,10 @@ namespace AudioResearch
             //Ole_DataExploration(globalDb, nameHelper);
             //Ole_DataExploration2(pfs, globalDb, nameHelper);
             Console.ReadLine();
-        }
+        }*/
 
        
-        private static void Ole_DataExploration2(PackFileService pfs, ExtenededSoundDataBase globalDb, WWiseNameLookUpHelper nameHelper)
+       /* private static void Ole_DataExploration2(PackFileService pfs, ExtenededSoundDataBase globalDb, WWiseNameLookUpHelper nameHelper)
         {
             var allSounds = globalDb.HircList.Where(X => X.Value.First() is CAkSound_v136).Select(x => x.Value.First()).Cast<CAkSound_v136>().ToList();
 
@@ -187,9 +185,9 @@ namespace AudioResearch
 
                 }
             }
-        }
+        }*/
 
-        private static void Ole_DataExploration(ExtenededSoundDataBase globalDb, WWiseNameLookUpHelper nameHelper)
+       /* private static void Ole_DataExploration(ExtenededSoundDataBase globalDb, WWiseNameLookUpHelper nameHelper)
         {
             var allHircs = globalDb.HircList.SelectMany(x => x.Value).ToList();
             var allActorMixers = allHircs.Where(x => x.Type == HircType.Audio_Bus || x.Type == HircType.AuxiliaryBus);
@@ -263,7 +261,7 @@ namespace AudioResearch
 
             var notFoundMulti = multiRefNames.Where(x => x.Found == false).ToList();
             var foundMulti = multiRefNames.Where(x => x.Found == true).ToList();
-        }
+        }*/
 
 
 
@@ -280,7 +278,7 @@ namespace AudioResearch
             return true;
         }
 
-        static int GetMissingEventNameCount(ExtenededSoundDataBase globalDb, WWiseNameLookUpHelper nameHelper)
+       /* static int GetMissingEventNameCount(ExtenededSoundDataBase globalDb, WWiseNameLookUpHelper nameHelper)
         {
             var hircEvents = globalDb.HircList
                 .Select(x => x.Value.First())
@@ -295,7 +293,7 @@ namespace AudioResearch
 
             var notFoundEvents = hircNames.Where(x => x.Found == false).ToList();
             return notFoundEvents.Count;
-        }
+        }*/
 
 
     }

@@ -11,14 +11,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace AnimationEditor.AnimationBuilder
+namespace Audio.Presentation
 {
     /// <summary>
-    /// Interaction logic for EditorView.xaml
+    /// Interaction logic for AudioEditorMainView.xaml
     /// </summary>
-    public partial class EditorView : UserControl
+    public partial class AudioEditorMainView : UserControl
     {
-        public EditorView()
+        public AudioEditorMainView()
         {
             InitializeComponent();
         }

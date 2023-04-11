@@ -39,6 +39,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\AnimationEditor\AnimationEditor.csproj" />
+		<ProjectReference Include="..\Audio\Audio.csproj" />
 		<ProjectReference Include="..\CommonControls\CommonControls.csproj" />
 		<ProjectReference Include="..\KitbasherEditor\KitbasherEditor.csproj" />
 		<ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />

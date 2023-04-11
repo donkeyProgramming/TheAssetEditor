@@ -1,5 +1,6 @@
 ﻿using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
+using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -36,20 +37,19 @@ namespace CommonControls.Common
             return fileList;
         }
 
-        public static List<PackFile> FilterUnvantedFiles(PackFileService pfs, List<(string FileName, PackFile Pf)> files, string[] removeFilters, out PackFile[] removedFiles)
+        public static Dictionary<string, PackFile> FilterUnvantedFiles(Dictionary<string,PackFile> files, string[] removeFilters, out string[] removedFiles)
         {
-            var tempRemoveFiles = new List<PackFile>();
-            var fileList = files.Select(x=>x.Pf).ToList();
+            var tempRemoveFiles = new List<string>();
+            var fileList = files.ToDictionary();  // Create a copy
 
-            // Files that contains multiple items not decoded.
             foreach (var file in files)
             {
-                var fullName = file.FileName;
+                var fullName = file.Key;
                 foreach (var removeName in removeFilters)
                 {
                     if (fullName.Contains(removeName))
                     {
-                        tempRemoveFiles.Add(file.Pf);
+                        tempRemoveFiles.Add(file.Key);
                         break;
                     }
                 }

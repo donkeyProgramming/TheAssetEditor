@@ -1,25 +1,18 @@
-﻿using CommonControls.Common;
+﻿using Audio.FileFormats.WWise;
+using Audio.FileFormats.WWise.Hirc.V136;
+using CommonControls.Common;
 using CommonControls.Editors.AudioEditor;
-using CommonControls.Editors.Sound;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.FileTypes.Sound;
-using CommonControls.FileTypes.Sound.WWise;
-using CommonControls.FileTypes.Sound.WWise.Hirc;
-using CommonControls.FileTypes.Sound.WWise.Hirc.V136;
 using CommonControls.Services;
 using MoreLinq;
-using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace AudioResearch
 {
-    public static class DialogEventsAsTables
+    /*public static class DialogEventsAsTables
     {
         class OutputTest
         {
@@ -108,5 +101,5 @@ namespace AudioResearch
 
             pushList.Pop();
         }
-    }
+    }*/
 }

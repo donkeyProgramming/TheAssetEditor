@@ -31,6 +31,7 @@ using CommonControls.BaseDialogs.ErrorListDialog;
 using System.Reflection;
 using System.IO;
 using System.Text;
+using Audio.AudioEditor;
 
 namespace AssetEditor.ViewModels
 {
@@ -295,7 +296,6 @@ namespace AssetEditor.ViewModels
         private void OpenAudioEditor()
         {
             var editorView = _toolFactory.CreateEditorViewModel<AudioEditorViewModel>();
-            editorView.OpenAllBnks();
             EditorCreator.CreateEmptyEditor(editorView);
         }
 

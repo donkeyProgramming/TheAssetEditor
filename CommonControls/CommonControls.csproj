@@ -419,9 +419,4 @@
     </Page>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="FileTypes\Sound\WWise\Hirc\V112\" />
-    <Folder Include="FileTypes\Sound\WWise\Hirc\V122\" />
-  </ItemGroup>
-
 </Project>
