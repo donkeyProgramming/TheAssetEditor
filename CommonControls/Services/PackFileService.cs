@@ -244,7 +244,7 @@ namespace CommonControls.Services
                 if (string.IsNullOrWhiteSpace(res) == false)
                     return res;
             }
-            throw new Exception("Unknown path for " + file.Name);
+             throw new Exception("Unknown path for " + file.Name);
         }
 
         public PackFileContainer Load(BinaryReader binaryReader, string packFileSystemPath)
