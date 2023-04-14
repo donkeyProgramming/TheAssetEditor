@@ -211,8 +211,9 @@ namespace AnimationEditor.Common.ReferenceModel
         {
             SkeletonName.Value = skeletonName;
             Skeleton = new GameSkeleton(animFile, Player);
-
+         
             AnimationClip = null;
+            _skeletonSceneNode.Skeleton = Skeleton;
             Player.SetAnimation(null, Skeleton);
             SkeletonChanged?.Invoke(Skeleton);
         }

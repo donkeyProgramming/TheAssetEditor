@@ -1,15 +1,26 @@
-﻿using CommonControls.BaseDialogs.ErrorListDialog;
+﻿using Audio.BnkCompiler.Validation;
+using CommonControls.BaseDialogs.ErrorListDialog;
 using CommonControls.Services;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Data;
 
 namespace CommonControls.Editors.AudioEditor.BnkCompiler
 {
+
+
+
+    /*
     public static class AudioProjectValidator
     {
         public static bool Validate(AudioProjectXml projectFile, PackFileService pfs, ref ErrorListViewModel.ErrorList errorList)
         {
+
+            AudioProjectXmlValidator ss = new AudioProjectXmlValidator(pfs, projectFile);
+            ss.Validate(projectFile);
+
             if (ValidateOutputPath(projectFile, ref errorList) == false)
                 return false;
 
@@ -214,5 +225,5 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             return allIds;
         }
 
-    }
+    }*/
 }

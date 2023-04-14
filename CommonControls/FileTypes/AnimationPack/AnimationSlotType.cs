@@ -49,7 +49,7 @@ namespace CommonControls.FileTypes.AnimationPack
                     break;
 
                 case GameTypeEnum.Warhammer3:
-                    Load("CommonControls.Resources.AnimationSlots.Warhammer3AnimationSlots.txt");
+                    Load("CommonControls.Resources.AnimationSlots.Warhammer3AnimationSlots_dlc23.txt");
                     break;
 
                 case GameTypeEnum.Troy:
@@ -66,9 +66,11 @@ namespace CommonControls.FileTypes.AnimationPack
             }
         }
 
-        public AnimationSlotType GetFromId(int id)
+        public AnimationSlotType TryGetFromId(int id)
         {
-            return Values[id];
+            if(id >= 0 && id < Values.Count)
+                return Values[id];
+            return null;
         }
 
         public AnimationSlotType GetfromValue(string value)

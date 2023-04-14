@@ -39,9 +39,9 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         uint GetHircItemId(string reference)
         {
             var item = _allProjectItems.First(x => x.Id == reference);
-            if (string.IsNullOrWhiteSpace(item.ForceId))
-                return ConvertStringToWWiseId(item.Id);
-            return uint.Parse(item.ForceId);
+            if (item.ForceId.HasValue == true)
+                return item.ForceId.Value;
+            return ConvertStringToWWiseId(item.Id);
         }
 
         public WWiseProject Generate()

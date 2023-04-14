@@ -6,11 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.5.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CommonControls\CommonControls.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="BnkCompiler\ObjectGeneration\" />
   </ItemGroup>
 
 </Project>

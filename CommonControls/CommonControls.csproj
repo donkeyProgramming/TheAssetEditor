@@ -17,6 +17,7 @@
     <None Remove="Resources\AnimationSlots\TroyAnimationSlots.txt" />
     <None Remove="Resources\AnimationSlots\Warhammer2AnimationSlots.txt" />
     <None Remove="Resources\AnimationSlots\Warhammer3AnimationSlots.txt" />
+    <None Remove="Resources\AnimationSlots\Warhammer3AnimationSlots_dlc23.txt" />
     <None Remove="Resources\Icons\Copy.png" />
     <None Remove="Resources\Icons\Cut.png" />
     <None Remove="Resources\Icons\Delete.png" />
@@ -135,6 +136,9 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\AnimationSlots\3kAnimationSlots.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\AnimationSlots\Warhammer3AnimationSlots_dlc23.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\AnimationSlots\Warhammer3AnimationSlots.txt">

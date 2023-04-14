@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 namespace CommonControls.Editors.AudioEditor.BnkCompiler
 {
+    // Convert to abstract class
     public interface IHircProjectItem
     {
-        public string ForceId { get; set; }
+        public uint? ForceId { get; set; }
         public string Id { get; set; }
     }
 
@@ -15,7 +16,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         public string Id { get; set; }
 
         [XmlAttribute(AttributeName = "ForceId")]
-        public string ForceId { get; set; }
+        public uint? ForceId { get; set; }
 
         
         [XmlElement(ElementName = "Action")]
@@ -38,7 +39,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         public string Id { get; set; }
 
         [XmlAttribute(AttributeName = "ForceId")]
-        public string ForceId { get; set; }
+        public uint? ForceId { get; set; }
     }
 
 
@@ -60,13 +61,10 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         public string Id { get; set; }
 
         [XmlAttribute(AttributeName = "ForceId")]
-        public string ForceId { get; set; }
+        public uint? ForceId { get; set; }
 
         [XmlText]
         public string Path { get; set; }
-
-
-
     }
 
     [XmlRoot(ElementName = "root")]
