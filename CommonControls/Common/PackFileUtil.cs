@@ -1,5 +1,6 @@
 ﻿using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
+using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -36,20 +37,19 @@ namespace CommonControls.Common
             return fileList;
         }
 
-        public static List<PackFile> FilterUnvantedFiles(PackFileService pfs, List<(string FileName, PackFile Pf)> files, string[] removeFilters, out PackFile[] removedFiles)
+        public static Dictionary<string, PackFile> FilterUnvantedFiles(Dictionary<string,PackFile> files, string[] removeFilters, out string[] removedFiles)
         {
-            var tempRemoveFiles = new List<PackFile>();
-            var fileList = files.Select(x=>x.Pf).ToList();
+            var tempRemoveFiles = new List<string>();
+            var fileList = files.ToDictionary();  // Create a copy
 
-            // Files that contains multiple items not decoded.
             foreach (var file in files)
             {
-                var fullName = file.FileName;
+                var fullName = file.Key;
                 foreach (var removeName in removeFilters)
                 {
                     if (fullName.Contains(removeName))
                     {
-                        tempRemoveFiles.Add(file.Pf);
+                        tempRemoveFiles.Add(file.Key);
                         break;
                     }
                 }
@@ -72,10 +72,63 @@ namespace CommonControls.Common
             return path;
         }
 
-        public static string SaveFileToTempDir(PackFile file)
+        public static PackFileService CreatePackFileServiceFromSystemFile(string path)
         {
-            var exportPath = DirectoryHelper.Temp + "\\" + file.Name;
-            return SaveFile(file, exportPath);
+            if (File.Exists(path) == false)
+                throw new Exception();
+        
+            var pfs = CreatePackFileService();
+            var container = pfs.GetAllPackfileContainers().First();
+            pfs.AddFileToPack(container, "systemfile", new PackFile(Path.GetFileName(path), new FileSystemSource(path)));
+        
+            return pfs;
+        }
+        
+        public static PackFileService CreatePackFileService()
+        {
+        
+            var pfs = new PackFileService(new PackFileDataBase(), new SkeletonAnimationLookUpHelper(), new ApplicationSettingsService(), new GameInformationFactory());
+            var container = pfs.CreateNewPackFileContainer("temp", PackFileCAType.MOD);
+            pfs.SetEditablePack(container);
+        
+            return pfs;
+        }
+
+        public static PackFile CreateNewPackFileFromSystem(string filePath, out string directoryPath)
+        {
+            var fileSource = new FileSystemSource(filePath);
+            var packfile = new PackFile(Path.GetFileName(filePath), fileSource);
+            directoryPath = Path.GetDirectoryName(filePath);
+            return packfile;
+        }
+
+        public static void LoadFilesFromDisk(PackFileService pfs, IEnumerable<FileRef> fileRefs)
+        {
+            var packFileList = new List<PackFile>();
+            var pathList = new List<string>();
+
+            foreach(var fileRef in fileRefs) 
+            {
+                var fileSource = new FileSystemSource(fileRef.SystemPath);
+                var packfile = new PackFile(Path.GetFileName(fileRef.SystemPath), fileSource);
+
+                packFileList.Add(packfile);
+                pathList.Add(fileRef.PackFilePath);
+            }
+
+            pfs.AddFilesToPack(pfs.GetEditablePack(), pathList, packFileList);
+        }
+
+        public class FileRef
+        { 
+            public string SystemPath { get; set; }
+            public string PackFilePath { get; set; }
+
+            public FileRef(string systemPath, string packFilePath)
+            {
+                SystemPath = systemPath;
+                PackFilePath = packFilePath;
+            }
         }
     }
 }

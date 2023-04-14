@@ -20,18 +20,20 @@ namespace AssetEditor.Report
         ILogger _logger = Logging.Create<AnimMetaDataJsonsGenerator>();
         PackFileService _pfs;
         ApplicationSettingsService _settingsService;
+        private readonly GameInformationFactory _gameInformationFactory;
         JsonSerializerSettings _jsonOptions;
         
-        public AnimMetaDataJsonsGenerator(PackFileService pfs, ApplicationSettingsService settingsService)
+        public AnimMetaDataJsonsGenerator(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
             _pfs = pfs;
             _settingsService = settingsService;
+            _gameInformationFactory = gameInformationFactory;
             _jsonOptions = new JsonSerializerSettings { Formatting = Formatting.Indented };
         }
 
-        public static void Generate(PackFileService pfs, ApplicationSettingsService settingsService)
+        public static void Generate(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
-            var instance = new AnimMetaDataJsonsGenerator(pfs, settingsService);
+            var instance = new AnimMetaDataJsonsGenerator(pfs, settingsService, gameInformationFactory);
             instance.Create();
         }
 
@@ -45,7 +47,7 @@ namespace AssetEditor.Report
 
         public void Create()
         {
-            var gameName = GameInformationFactory.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
+            var gameName = _gameInformationFactory.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
             var timeStamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
             var gameOutputDir = $"{DirectoryHelper.ReportsDirectory}\\MetaDataJsons\\{gameName}_{timeStamp}\\";
             if (Directory.Exists(gameOutputDir))

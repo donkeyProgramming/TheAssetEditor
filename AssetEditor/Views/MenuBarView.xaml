@@ -82,7 +82,7 @@
                 <MenuItem Header="Warhammer 2 Animpack Updater" Command="{Binding MenuBar.OpenWh2AnimpackUpdaterCommand}" Visibility="Collapsed"  />
                 <Separator/>
                 <MenuItem Header="Audio (work in progress)">
-                    <MenuItem Header="Audio Editor" Command="{Binding MenuBar.OpenAudioEditorCommand}"/>
+                    <MenuItem Header="Audio Explorer" Command="{Binding MenuBar.OpenAudioEditorCommand}"/>
                     <MenuItem Header="Compile Audio Projects" Command="{Binding MenuBar.CompileAudioProjectsCommand}"/>
                     <MenuItem Header="Create Example Audio Project" Command="{Binding MenuBar.CreateExampleAudioProjectCommand}"/>
                 </MenuItem>

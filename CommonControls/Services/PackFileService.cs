@@ -19,15 +19,17 @@ namespace CommonControls.Services
         ILogger _logger = Logging.Create<PackFileService>();
 
 
-        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         public PackFileDataBase Database { get; private set; }
-        ApplicationSettingsService _settingsService;
+        private readonly ApplicationSettingsService _settingsService;
+        private readonly GameInformationFactory _gameInformationFactory;
 
-        public PackFileService(PackFileDataBase database, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService settingsService)
+        public PackFileService(PackFileDataBase database, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
             Database = database;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _settingsService = settingsService;
+            _gameInformationFactory = gameInformationFactory;
         }
 
         public bool TriggerFileUpdates { get; set; } = true;
@@ -200,29 +202,33 @@ namespace CommonControls.Services
             return filesWithResult.Select(x=>x.Value).ToList();
         }
 
-        public List<PackFile> FindAllFilesInDirectory(string dir, PackFileContainer packFileContainer = null)
+        public List<PackFile> FindAllFilesInDirectory(string dir, bool includeSubFolders = true)
         {
             dir = dir.Replace('/', '\\').ToLower();
             List<PackFile> output = new List<PackFile>();
-            if (packFileContainer == null)
+            
+            foreach (var pf in Database.PackFiles)
             {
-                foreach (var pf in Database.PackFiles)
+                foreach (var file in pf.FileList)
                 {
-                    foreach (var file in pf.FileList)
+                    bool includeFile = false;
+                    if (includeSubFolders)
                     {
-                        if (file.Key.IndexOf(dir) == 0)
-                            output.Add(file.Value );
+                        includeFile = file.Key.IndexOf(dir) == 0;
                     }
-                }
-            }
-            else
-            {
-                foreach (var file in packFileContainer.FileList)
-                {
-                    if (file.Key.IndexOf(dir) == 0)
+                    else
+                    {
+                        var dirName = Path.GetDirectoryName(file.Key);
+                        var compareResult = string.Compare(dirName, dir, StringComparison.InvariantCultureIgnoreCase);
+                        if (compareResult == 0)
+                            includeFile = true;
+                    }
+                            
+                    if (includeFile)
                         output.Add(file.Value );
                 }
             }
+            
 
             return output;
         }
@@ -252,6 +258,13 @@ namespace CommonControls.Services
             var pack = PackFileSerializer.Load(packFileSystemPath, binaryReader, _skeletonAnimationLookUpHelper, _settingsService, new CustomPackDuplicatePackFileResolver());
             Database.AddPackFile(pack);
             return pack;
+        }
+
+        public bool LoadAllCaFiles(GameTypeEnum gameEnum)
+        {
+            var game = _gameInformationFactory.GetGameById(gameEnum);
+            var path = _settingsService.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Type);
+            return LoadAllCaFiles(path.Path, game.DisplayName);
         }
 
         public bool LoadAllCaFiles(string gameDataFolder, string gameName)

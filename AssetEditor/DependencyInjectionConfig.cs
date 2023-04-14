@@ -2,11 +2,11 @@
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
+using Audio;
 using CommonControls.Common;
 using CommonControls.Editors.AnimationFilePreviewEditor;
 using CommonControls.Editors.AnimationPack;
 using CommonControls.Editors.AnimMeta;
-using CommonControls.Editors.AudioEditor;
 using CommonControls.Editors.CampaignAnimBin;
 using CommonControls.Editors.TextEditor;
 using CommonControls.Editors.VariantMeshDefinition;
@@ -23,7 +23,7 @@ using View3D;
 
 namespace AssetEditor
 {
-    class DependencyInjectionConfig
+    public class DependencyInjectionConfig
     {
         public IServiceProvider ServiceProvider { get; private set; }
         
@@ -31,14 +31,17 @@ namespace AssetEditor
         {
             Logging.Configure(Serilog.Events.LogEventLevel.Information);
             DirectoryHelper.EnsureCreated();
-            ResourceController.Load();
-            GameInformationFactory.Create();
-
+            
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
 
             ServiceProvider = serviceCollection.BuildServiceProvider();
             RegisterTools(ServiceProvider.GetService<ToolFactory>());
+        }
+
+        public void ConfigureResources()
+        {
+            ResourceController.Load();
         }
 
         private void ConfigureServices(IServiceCollection services)
@@ -48,6 +51,7 @@ namespace AssetEditor
             services.AddSingleton<PackFileDataBase>();
             services.AddSingleton<SkeletonAnimationLookUpHelper>();
             services.AddSingleton<CopyPasteManager>();
+            services.AddSingleton<GameInformationFactory>();
 
             services.AddTransient<MainWindow>();
             services.AddTransient<MainViewModel>();
@@ -55,7 +59,6 @@ namespace AssetEditor
             services.AddTransient<SettingsViewModel>();
             services.AddTransient<MenuBarViewModel>();
             services.AddTransient<PackFileService>();
-            services.AddTransient<SchemaManager>();
 
             TextEditor_DependencyInjectionContainer.Register(services);
             KitbasherEditor_DependencyInjectionContainer.Register(services);

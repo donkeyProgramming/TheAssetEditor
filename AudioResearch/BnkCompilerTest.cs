@@ -9,8 +9,9 @@ namespace AudioResearch
 {
     public static class BnkCompilerTest
     {
-        public static bool Run(string projectFilePath, PackFileService pfs)
+        public static bool Run(string projectFilePath, PackFileService pfs, out string outputFile)
         {
+            outputFile = null;
             var compiler = new Compiler(pfs);
             var fileContent = File.ReadAllBytes(projectFilePath);
             var packFile = new PackFile("project", new MemorySource(fileContent));
@@ -25,7 +26,8 @@ namespace AudioResearch
                 // Save to disk for easy debug
                 var bnkFile = result.OutputBnkFile;
                 var chunk = bnkFile.DataSource.ReadDataAsChunk();
-                chunk.SaveToFile($"Data\\{project.OutputFile}".ToLower().Trim());
+                outputFile = $"Data\\{project.OutputFile}".ToLower().Trim();
+                chunk.SaveToFile(outputFile);
 
                 return true;
             }

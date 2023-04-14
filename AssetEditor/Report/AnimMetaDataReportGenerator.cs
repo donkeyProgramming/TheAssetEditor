@@ -29,21 +29,24 @@ namespace AssetEditor.Report
 
         PackFileService _pfs;
         ApplicationSettingsService _settingsService;
-        public AnimMetaDataReportGenerator(PackFileService pfs, ApplicationSettingsService settingsService)
+        private readonly GameInformationFactory _gameInformationFactory;
+
+        public AnimMetaDataReportGenerator(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
             _pfs = pfs;
             _settingsService = settingsService;
+            _gameInformationFactory = gameInformationFactory;
         }
 
-        public static void Generate(PackFileService pfs, ApplicationSettingsService settingsService)
+        public static void Generate(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
-            var instance = new AnimMetaDataReportGenerator(pfs, settingsService);
+            var instance = new AnimMetaDataReportGenerator(pfs, settingsService, gameInformationFactory);
             instance.Create();
         }
 
         public void Create()
         {
-            var gameName = GameInformationFactory.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
+            var gameName = _gameInformationFactory.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
             var timeStamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
             var gameOutputDir = $"{DirectoryHelper.ReportsDirectory}\\MetaData\\{gameName}_{timeStamp}\\";
             var gameOutputDirFailed = $"{gameOutputDir}\\Failed\\";

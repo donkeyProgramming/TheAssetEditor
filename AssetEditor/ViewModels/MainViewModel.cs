@@ -52,11 +52,8 @@ namespace AssetEditor.ViewModels
         public ICommand CloseToolsToRightCommand { get; set; }
         public ICommand CloseToolsToLeftCommand { get; set; }
 
-        public MainViewModel(MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, ToolFactory toolFactory, SchemaManager schemaManager, SkeletonAnimationLookUpHelper animationLookUpHelper)
+        public MainViewModel(GameInformationFactory gameInformationFactory, MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, ToolFactory toolFactory, SkeletonAnimationLookUpHelper animationLookUpHelper)
         {
-
-            
-
             _packfileService = packfileService;
             _packfileService.Database.BeforePackFileContainerRemoved += Database_BeforePackFileContainerRemoved;
 
@@ -99,7 +96,7 @@ namespace AssetEditor.ViewModels
                 var gamePath = settingsService.GetGamePathForCurrentGame();
                 if (gamePath != null)
                 {
-                    var gameName = GameInformationFactory.GetGameById(settingsService.CurrentSettings.CurrentGame).DisplayName;
+                    var gameName = gameInformationFactory.GetGameById(settingsService.CurrentSettings.CurrentGame).DisplayName;
                     var loadRes = _packfileService.LoadAllCaFiles(gamePath, gameName);
                     if (!loadRes)
                         MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
@@ -259,15 +256,15 @@ namespace AssetEditor.ViewModels
 
         void DebugCampaignBins(ApplicationSettingsService settingsService)
         {
-            var game = GameTypeEnum.Warhammer2;
-            var gName = GameInformationFactory.GetGameById(game).DisplayName;
-            var gPath = settingsService.GetGamePathForGame(game);
-            var gRes = _packfileService.LoadAllCaFiles(gPath, gName);
-
-            //var allFiles = _packfileService.FindAllFilesInDirectory(@"animations/database/campaign/bin");
-            var allFiles = _packfileService.FindAllFilesInDirectory(@"animations/campaign/database/bin");
-
-            AnimationCampaignBinHelper.BatchProcess(allFiles);
+            //var game = GameTypeEnum.Warhammer2;
+            //var gName = GameInformationFactory.GetGameById(game).DisplayName;
+            //var gPath = settingsService.GetGamePathForGame(game);
+            //var gRes = _packfileService.LoadAllCaFiles(gPath, gName);
+            //
+            ////var allFiles = _packfileService.FindAllFilesInDirectory(@"animations/database/campaign/bin");
+            //var allFiles = _packfileService.FindAllFilesInDirectory(@"animations/campaign/database/bin");
+            //
+            //AnimationCampaignBinHelper.BatchProcess(allFiles);
         }
 
         private bool Database_BeforePackFileContainerRemoved(PackFileContainer container)

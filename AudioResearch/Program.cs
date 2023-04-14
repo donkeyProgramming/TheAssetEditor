@@ -1,12 +1,16 @@
-﻿using CommonControls.Editors.AudioEditor;
-using CommonControls.Editors.Sound;
+﻿using AssetEditor;
+using Audio.FileFormats.WWise;
+using Audio.FileFormats.WWise.Hirc.V136;
+using Audio.Storage;
+using Audio.Utility;
+using CommonControls.Common;
+using CommonControls.Editors.AudioEditor;
+using CommonControls.Editors.AudioEditor.BnkCompiler;
 using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.FileTypes.Sound;
-using CommonControls.FileTypes.Sound.WWise;
-using CommonControls.FileTypes.Sound.WWise.Hirc;
-using CommonControls.FileTypes.Sound.WWise.Hirc.V136;
 using CommonControls.Services;
+using Microsoft.Extensions.DependencyInjection;
 using MoreLinq;
+using Octokit;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -22,23 +26,182 @@ namespace AudioResearch
     // RPFC - Real time parameter control 
     class Program
     {
+
+        /*
+        public static bool Run(string projectFilePath, PackFileService pfs, out string outputFile)
+        {
+            outputFile = null;
+            var compiler = new Compiler(pfs);
+            var fileContent = File.ReadAllBytes(projectFilePath);
+            var packFile = new PackFile("project", new MemorySource(fileContent));
+
+            var compileResultLog = new ErrorListViewModel.ErrorList();
+            var result = compiler.CompileProject(packFile, ref compileResultLog);
+
+            if (compileResultLog.Errors.Count == 0 && result != null)
+            {
+                var project = compiler.ProjectFile;
+
+                // Save to disk for easy debug
+                var bnkFile = result.OutputBnkFile;
+                var chunk = bnkFile.DataSource.ReadDataAsChunk();
+                outputFile = $"Data\\{project.OutputFile}".ToLower().Trim();
+                chunk.SaveToFile(outputFile);
+
+                return true;
+            }
+
+            throw new System.Exception("Something went wrong");
+        }
+         */
+
         static void Main(string[] args)
         {
+            var applicationBuilder = new DependencyInjectionConfig();
+            using var scope = applicationBuilder.ServiceProvider.CreateScope();
+
+            var settings = scope.ServiceProvider.GetService<ApplicationSettingsService>();
+            settings.CurrentSettings.SkipLoadingWemFiles = true;
+
+            var pfs = scope.ServiceProvider.GetService<PackFileService>();
+            pfs.LoadAllCaFiles(GameTypeEnum.Warhammer3);
+            PackFileUtil.LoadFilesFromDisk(pfs, new[] 
+            { 
+                new PackFileUtil.FileRef( packFilePath: @"audio\wwise", systemPath:@"Data\CustomSoundCompile\790209750.wem"),
+                new PackFileUtil.FileRef( packFilePath: @"audioprojects", systemPath:@"Data\CustomSoundCompile\Project.xml")
+            } );
+
+            var compiler = scope.ServiceProvider.GetService<Compiler>();
+            compiler.ExportResultToFile = true;
+            compiler.ConvertResultToXml = true;
+            compiler.ThrowOnError = true;
+            var result = compiler.CompileProject(@"audioprojects\Project.xml", out var errorList);
+
+            
+            
+            
+            
+            
+            //PackFileUtil.SaveFile(result.OutputBnkFile, $"Data\\{compiler.ProjectFile.OutputFile}".ToLower().Trim());
+            //ConvertBnkToXml($"Data\\{compiler.ProjectFile.OutputFile}".ToLower().Trim())
+
+
+            //
+            // var container = pfs.CreateNewPackFileContainer("myStuff", PackFileCAType.MOD);
+            // pfs.AddFilesToPack(container, "asd\asdasd", new PackFile());
+            // pfs.AddFilesToPack(container, "asd\asdasd", new PackFile());
+            // pfs.AddFilesToPack(container, "asd\asdasd", new PackFile());
+            //
+
+            //
+            // var bnkLoader = scope.ServiceProvider.GetService<WWiseBnkLoader>();
+            // var load = bnkLoader.LoadBnkFile(null, "", true);
+
+
+
             // Create a progam
             Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
-            GameInformationFactory.Create();
-            var pfs = GetPackFileService(skipLoadingWemFiles: false);
+            //GameInformationFactory.Create();
+
+            //LoadBnkFromFile(@"C:\temp\wwiseextracttest.bnk");
+            //BnkFileManipulatorTests.ExtractToOwnPack();
+            //LoadAllTest(); <- Make this work
+            //CompileTest0();
+
+            //DialogEventsAsTables.ExportAllDialogEventsAsTable();
+            //DialogEventsAsTables.ExportSystemFileAsTable(@"C:\Users\ole_k\Downloads\battle_vo_orders_999999999__core.bnk", "custom_");
+
+            //CompileTestH
+        }
+
+       /* static void LoadBnkFromFile(string path)
+        {
+            var pfs = PackFileUtil.CreatePackFileService();
+
+            var audioFile = PackFileUtil.CreateNewPackFileFromSystem(path, out var _);
+            pfs.AddFilesToPack(pfs.GetEditablePack(), new List<string>() { @"audio\wwise", }, new List<PackFile>() { audioFile });
+
+            WwiseDataLoader builder = new WwiseDataLoader();
+            var bnkList = builder.LoadBnkFiles(pfs);
+            var globalDb = builder.BuildMasterSoundDatabase(bnkList);
+            var nameHelper = builder.BuildNameHelper(pfs);
+        }*/
+
+        static void CompileTest0()
+        {
+            var pfs = PackFileUtil.CreatePackFileService();
+
+            var audioFile = PackFileUtil.CreateNewPackFileFromSystem(@"Data\CustomSoundCompile\790209750.wem", out var _);
+            pfs.AddFilesToPack(pfs.GetEditablePack(), new List<string>() { @"audio\wwise", }, new List<PackFile>() { audioFile });
+
+
+            // var audioProject = PackFileUtil.CreatePackFileFromSystem("", out var _);
+            // pfs.AddFilesToPack(pfs.GetEditablePack(), new List<string>() { "audio//wwise", }, new List<PackFile>() { audioProject });
+
+            BnkCompilerTest.Run(@"Data\CustomSoundCompile\Project.xml", pfs, out var outputFile);
+
+            // Run wwiser with export to xml and wwiser names 
+            var fullPath = Directory.GetCurrentDirectory() + "\\" + outputFile; 
+            ExecuteCommand("C:\\Users\\ole_k\\Desktop\\audio_research\\WWiser\\wwiser.pyz " + fullPath);
+            DirectoryHelper.OpenFolderAndSelectFile(fullPath);
+        }
+
+        static void ConvertBnkToXml(string path)
+        {
+            var fullPath = Directory.GetCurrentDirectory() + "\\" + path;
+            ExecuteCommand("C:\\Users\\ole_k\\Desktop\\audio_research\\WWiser\\wwiser.pyz " + fullPath);
+            DirectoryHelper.OpenFolderAndSelectFile(fullPath);
+        }
+
+        public static void ExecuteCommand(string Command)
+        {
+            ProcessStartInfo ProcessInfo;
+            Process Process;
+
+            ProcessInfo = new ProcessStartInfo("cmd.exe", "/K " + Command);
+            ProcessInfo.CreateNoWindow = true;
+            ProcessInfo.UseShellExecute = true;
+
+            Process = Process.Start(ProcessInfo);
+        }
+
+
+       /* static void LoadAllTest()
+        {
+            var pfs = ResearchUtil.GetPackFileService(skipLoadingWemFiles: false);
 
             var pathToPackFileWithSounds = "Path to packfile with sounds";
             if (File.Exists(pathToPackFileWithSounds))
                 pfs.Load(pathToPackFileWithSounds);
 
-            var f = pfs.FindAllFilesInDirectory("audio\\wwise");
-            var orders = f.OrderByDescending(x => x.DataSource.Size).ToList();
+            // Create an output pack
+            var newPackFile = pfs.CreateNewPackFileContainer("CustomPackFile", PackFileCAType.MOD);
+            pfs.SetEditablePack(newPackFile);
+
+            // Load all game data
+            WwiseDataLoader builder = new WwiseDataLoader();
+            var bnkList = builder.LoadBnkFiles(pfs);
+            var globalDb = builder.BuildMasterSoundDatabase(bnkList);
+            var nameHelper = builder.BuildNameHelper(pfs);
+            //nameHelper.SaveToFile(@"C:\Users\ole_k\Desktop\audio research\WWiser\wwnames.txt");
+
+            Console.ReadLine();
+        }*/
+
+       /* static void CompileTest()
+        {
+            var pfs = ResearchUtil.GetPackFileService(skipLoadingWemFiles: false);
+
+            var pathToPackFileWithSounds = "Path to packfile with sounds";
+            if (File.Exists(pathToPackFileWithSounds))
+                pfs.Load(pathToPackFileWithSounds);
+
+            var allNonLangFiles = pfs.FindAllFilesInDirectory("audio\\wwise", false);
+            var orderedAllNonLangFiles = allNonLangFiles.OrderByDescending(x => x.DataSource.Size).ToList();
 
 
-            //SoundPlayer player = new SoundPlayer(pfs, null);
-            //player.PlaySound(219414162);
+            SoundPlayer player = new SoundPlayer(pfs, null);
+            player.PlaySound(713853811);    // I will continue, later
 
 
             // Create an output pack
@@ -62,9 +225,10 @@ namespace AudioResearch
             //Ole_DataExploration(globalDb, nameHelper);
             //Ole_DataExploration2(pfs, globalDb, nameHelper);
             Console.ReadLine();
-        }
+        }*/
 
-        private static void Ole_DataExploration2(PackFileService pfs, ExtenededSoundDataBase globalDb, WWiseNameLookUpHelper nameHelper)
+       
+       /* private static void Ole_DataExploration2(PackFileService pfs, ExtenededSoundDataBase globalDb, WWiseNameLookUpHelper nameHelper)
         {
             var allSounds = globalDb.HircList.Where(X => X.Value.First() is CAkSound_v136).Select(x => x.Value.First()).Cast<CAkSound_v136>().ToList();
 
@@ -105,9 +269,9 @@ namespace AudioResearch
 
                 }
             }
-        }
+        }*/
 
-        private static void Ole_DataExploration(ExtenededSoundDataBase globalDb, WWiseNameLookUpHelper nameHelper)
+       /* private static void Ole_DataExploration(ExtenededSoundDataBase globalDb, WWiseNameLookUpHelper nameHelper)
         {
             var allHircs = globalDb.HircList.SelectMany(x => x.Value).ToList();
             var allActorMixers = allHircs.Where(x => x.Type == HircType.Audio_Bus || x.Type == HircType.AuxiliaryBus);
@@ -181,7 +345,7 @@ namespace AudioResearch
 
             var notFoundMulti = multiRefNames.Where(x => x.Found == false).ToList();
             var foundMulti = multiRefNames.Where(x => x.Found == true).ToList();
-        }
+        }*/
 
 
 
@@ -198,7 +362,7 @@ namespace AudioResearch
             return true;
         }
 
-        static int GetMissingEventNameCount(ExtenededSoundDataBase globalDb, WWiseNameLookUpHelper nameHelper)
+       /* static int GetMissingEventNameCount(ExtenededSoundDataBase globalDb, WWiseNameLookUpHelper nameHelper)
         {
             var hircEvents = globalDb.HircList
                 .Select(x => x.Value.First())
@@ -213,18 +377,9 @@ namespace AudioResearch
 
             var notFoundEvents = hircNames.Where(x => x.Found == false).ToList();
             return notFoundEvents.Count;
-        }
+        }*/
 
-        static PackFileService GetPackFileService(bool skipLoadingWemFiles = true)
-        {
-            var appSettings = new ApplicationSettingsService();
-            appSettings.CurrentSettings.SkipLoadingWemFiles = skipLoadingWemFiles;
-            var gamePath = appSettings.CurrentSettings.GameDirectories.First(x => x.Game == GameTypeEnum.Warhammer3);
-            PackFileService pfs = new PackFileService(new PackFileDataBase(), new SkeletonAnimationLookUpHelper(), appSettings);
-            pfs.LoadAllCaFiles(gamePath.Path, GameInformationFactory.GetGameById(GameTypeEnum.Warhammer3).DisplayName);
 
-            return pfs;
-        }
     }
 
 

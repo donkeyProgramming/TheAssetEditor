@@ -27,11 +27,11 @@ namespace Wh3AnimPackCreator
             MetaDataTagDeSerializer.EnsureMappingTableCreated();
 
             var troyGameSettings = new ApplicationSettingsService().CurrentSettings.GameDirectories.First(x => x.Game == GameTypeEnum.Troy);
-            var troyPfs = new PackFileService(new PackFileDataBase(), new SkeletonAnimationLookUpHelper(), new ApplicationSettingsService());
+            var troyPfs = new PackFileService(new PackFileDataBase(), new SkeletonAnimationLookUpHelper(), new ApplicationSettingsService(), new GameInformationFactory());
             troyPfs.LoadAllCaFiles(troyGameSettings.Path, troyGameSettings.Game.ToString());
             troyPfs.TriggerFileUpdates = false;
 
-            var wh3Pfs = new PackFileService(new PackFileDataBase(), new SkeletonAnimationLookUpHelper(), new ApplicationSettingsService());
+            var wh3Pfs = new PackFileService(new PackFileDataBase(), new SkeletonAnimationLookUpHelper(), new ApplicationSettingsService(), new GameInformationFactory());
             wh3Pfs.TriggerFileUpdates = false;
             var pfsContainer = wh3Pfs.CreateNewPackFileContainer("AnimResource_v0_cerberus", PackFileCAType.MOD);
             wh3Pfs.SetEditablePack(pfsContainer);

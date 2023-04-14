@@ -31,6 +31,7 @@ using CommonControls.BaseDialogs.ErrorListDialog;
 using System.Reflection;
 using System.IO;
 using System.Text;
+using Audio.AudioEditor;
 
 namespace AssetEditor.ViewModels
 {
@@ -51,7 +52,7 @@ namespace AssetEditor.ViewModels
     public class MenuBarViewModel
     {
         ILogger _logger = Logging.Create<MainViewModel>();
-
+        private readonly GameInformationFactory _gameInformationFactory;
         IServiceProvider _serviceProvider;
         PackFileService _packfileService;
         ToolFactory _toolFactory;
@@ -109,8 +110,9 @@ namespace AssetEditor.ViewModels
         
         public ObservableCollection<RecentPackFileItem> RecentPackFiles { get; set; } = new ObservableCollection<RecentPackFileItem>();
 
-        public MenuBarViewModel(IServiceProvider provider, PackFileService packfileService, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ToolFactory toolFactory, ApplicationSettingsService settingsService)
+        public MenuBarViewModel(GameInformationFactory gameInformationFactory, IServiceProvider provider, PackFileService packfileService, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ToolFactory toolFactory, ApplicationSettingsService settingsService)
         {
+            _gameInformationFactory = gameInformationFactory;
             _serviceProvider = provider;
             _packfileService = packfileService;
             _toolFactory = toolFactory;
@@ -212,7 +214,7 @@ namespace AssetEditor.ViewModels
             }
             using (new WaitCursor())
             {
-                _packfileService.LoadAllCaFiles(gamePath.Path, GameInformationFactory.GetGameById(game).DisplayName);
+                _packfileService.LoadAllCaFiles(gamePath.Path, _gameInformationFactory.GetGameById(game).DisplayName);
             }
         }
 
@@ -301,7 +303,7 @@ namespace AssetEditor.ViewModels
         private void CompileAudioProjects()
         {
             var compiler = new CommonControls.Editors.AudioEditor.BnkCompiler.Compiler(_packfileService);
-            compiler.CompileAll(out var errorList);
+            compiler.CompileAllProjects(out var errorList);
             ErrorListWindow.ShowDialog("Compile Result:", errorList);
         }
 
@@ -343,16 +345,16 @@ namespace AssetEditor.ViewModels
 
         void GenerateRmv2Report()
         {
-            var gameName = GameInformationFactory.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
+            var gameName = _gameInformationFactory.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
             var reportGenerator = new Rmv2ReportGenerator(_packfileService);
             reportGenerator.Create(gameName);
         }
 
-        void GenerateMetaDataReport() => AnimMetaDataReportGenerator.Generate(_packfileService, _settingsService);
+        void GenerateMetaDataReport() => AnimMetaDataReportGenerator.Generate(_packfileService, _settingsService, _gameInformationFactory);
 
-        void GenerateFileListReport() => FileListReportGenerator.Generate(_packfileService, _settingsService);
+        void GenerateFileListReport() => FileListReportGenerator.Generate(_packfileService, _settingsService, _gameInformationFactory);
         
-        void GenerateMetaDataJsonsReport() => AnimMetaDataJsonsGenerator.Generate(_packfileService, _settingsService);
+        void GenerateMetaDataJsonsReport() => AnimMetaDataJsonsGenerator.Generate(_packfileService, _settingsService, _gameInformationFactory);
 
 
         void Search()
