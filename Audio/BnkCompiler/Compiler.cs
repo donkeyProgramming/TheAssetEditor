@@ -1,4 +1,4 @@
-﻿using Audio.FileFormats;
+﻿using Audio.BnkCompiler.Validation;
 using Audio.FileFormats.Dat;
 using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Bkhd;
@@ -31,7 +31,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         public AudioProjectXml ProjectFile { get; private set; }
         public bool ExportResultToFile { get; set; }
         public bool ConvertResultToXml { get; set; }
-        public bool ThrowOnError { get; set; }
+        public bool ThrowOnCompileError { get; set; }
 
         public Compiler(PackFileService pfs)
         {
@@ -41,28 +41,28 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         public bool CompileAllProjects(out ErrorListViewModel.ErrorList outputList)
         {
             outputList = new ErrorListViewModel.ErrorList();
-
-            if (_pfs.HasEditablePackFile() == false)
-                return false;
-
-            var allProjectFiles = _pfs.FindAllWithExtention(".xml").Where(x => x.Name.Contains("bnk.xml"));
-            outputList.Ok("Compiler", $"{allProjectFiles.Count()} projects found to compile.");
-
-            foreach (var file in allProjectFiles)
-            {
-                outputList.Ok("Compiler", $"Starting {_pfs.GetFullPath(file)}");
-                var compileResult = CompileProject(file, ref outputList);
-                if (compileResult != null)
-                {
-                    SaveHelper.SavePackFile(_pfs, "wwise\\audio", compileResult.OutputBnkFile, true);
-                    SaveHelper.SavePackFile(_pfs, "wwise\\audio", compileResult.OutputDatFile, true);
-
-                    //foreach(var audioFile in compileResult.AudioFiles)
-                    //    SaveHelper.SavePackFile(_pfs, "wwise\\audio", audioFile, true);
-                }
-
-                outputList.Ok("Compiler", $"Finished {_pfs.GetFullPath(file)}. Overall result:{true}");
-            }
+            //
+            //if (_pfs.HasEditablePackFile() == false)
+            //    return false;
+            //
+            //var allProjectFiles = _pfs.FindAllWithExtention(".xml").Where(x => x.Name.Contains("bnk.xml"));
+            //outputList.Ok("Compiler", $"{allProjectFiles.Count()} projects found to compile.");
+            //
+            //foreach (var file in allProjectFiles)
+            //{
+            //    outputList.Ok("Compiler", $"Starting {_pfs.GetFullPath(file)}");
+            //    var compileResult = CompileProject(file, ref outputList);
+            //    if (compileResult != null)
+            //    {
+            //        SaveHelper.SavePackFile(_pfs, "wwise\\audio", compileResult.OutputBnkFile, true);
+            //        SaveHelper.SavePackFile(_pfs, "wwise\\audio", compileResult.OutputDatFile, true);
+            //
+            //        //foreach(var audioFile in compileResult.AudioFiles)
+            //        //    SaveHelper.SavePackFile(_pfs, "wwise\\audio", audioFile, true);
+            //    }
+            //
+            //    outputList.Ok("Compiler", $"Finished {_pfs.GetFullPath(file)}. Overall result:{true}");
+            //}
             return true;
         }
 
@@ -72,20 +72,29 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             if (pf == null)
                 throw new Exception();
 
-            errorList = new ErrorListViewModel.ErrorList();
-            return CompileProject(pf, ref errorList);
+            return CompileProject(pf, out errorList);
         }
 
-        public CompileResult CompileProject(PackFile packfile, ref ErrorListViewModel.ErrorList errorList)
+        public CompileResult CompileProject(PackFile packfile, out ErrorListViewModel.ErrorList errorList)
         {
-            ProjectFile = LoadFile(packfile, ref errorList);
+            errorList = new ErrorListViewModel.ErrorList();
+
+            ProjectFile = LoadProjectFile(packfile, ref errorList);
             if (ProjectFile == null)
                 return null;
 
-            var validationResult = AudioProjectValidator.Validate(ProjectFile, _pfs, ref errorList);
-            if (validationResult == false)
-                return null;
+            // Validate
+            var validator = new AudioProjectXmlValidator(_pfs, ProjectFile);
+            var result = validator.Validate(ProjectFile);
+            if (result.IsValid == false)
+            {
+                foreach (var error in result.Errors)
+                    errorList.Error("BnkCompiler", error.ErrorMessage);
 
+                return null;
+            }
+
+            // Build the wwise object graph
             var generator = new WWiseObjectGenerator(_pfs, ProjectFile);
             var wwiseProject = generator.Generate();
 
@@ -135,7 +144,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         }
        
 
-        AudioProjectXml LoadFile(PackFile packfile, ref ErrorListViewModel.ErrorList errorList)
+        AudioProjectXml LoadProjectFile(PackFile packfile, ref ErrorListViewModel.ErrorList errorList)
         {
             try
             {
@@ -145,7 +154,10 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
                 using var stream = GenerateStreamFromString(str);
                 XmlSerializer serializer = new XmlSerializer(typeof(AudioProjectXml));
                 var result = serializer.Deserialize(stream);
-                return result as AudioProjectXml;
+                var typedResult = result as AudioProjectXml;
+                if (typedResult == null)
+                    throw new Exception($"Error loading project, typed result is null, actual: '{result}'");
+                return typedResult;
             }
             catch (Exception e)
             {

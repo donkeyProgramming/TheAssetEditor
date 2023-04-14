@@ -74,7 +74,7 @@ namespace AudioResearch
             var compiler = scope.ServiceProvider.GetService<Compiler>();
             compiler.ExportResultToFile = true;
             compiler.ConvertResultToXml = true;
-            compiler.ThrowOnError = true;
+            compiler.ThrowOnCompileError = true;
             var result = compiler.CompileProject(@"audioprojects\Project.xml", out var errorList);
 
             

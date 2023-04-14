@@ -66,9 +66,11 @@ namespace CommonControls.FileTypes.AnimationPack
             }
         }
 
-        public AnimationSlotType GetFromId(int id)
+        public AnimationSlotType TryGetFromId(int id)
         {
-            return Values[id];
+            if(id >= 0 && id < Values.Count)
+                return Values[id];
+            return null;
         }
 
         public AnimationSlotType GetfromValue(string value)

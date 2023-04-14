@@ -53,9 +53,14 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
             foreach (var animation in binFile.AnimationTableEntries)
             {
+                var slotValue = slotHelper.TryGetFromId((int)animation.AnimationId);
+                var slotString = $"Not found [id={(int)animation.AnimationId}]";
+                if (slotValue != null)
+                    slotString = slotValue.Value;
+
                 outputBin.Animations.Add(new Animation()
                 {
-                    Slot = slotHelper.GetFromId((int)animation.AnimationId).Value,
+                    Slot = slotString,
                     BlendId = animation.BlendIn,
                     BlendOut = animation.SelectionWeight,
                     Unk = animation.Unk,
