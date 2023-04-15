@@ -4,7 +4,6 @@ using Audio.FileFormats.Dat;
 using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Bkhd;
 using Audio.FileFormats.WWise.Hirc;
-using CommonControls.BaseDialogs.ErrorListDialog;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
@@ -65,8 +64,6 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 
                     //foreach(var audioFile in compileResult.AudioFiles)
                     //    SaveHelper.SavePackFile(_pfs, "wwise\\audio", audioFile, true);
-
-                   
                 }
 
                 outputList.Ok("Compiler", $"Finished {_pfs.GetFullPath(file)}. Overall result:{compileResult != null}");
