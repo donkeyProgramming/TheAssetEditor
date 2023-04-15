@@ -2,14 +2,13 @@
 using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Bkhd;
 using Audio.FileFormats.WWise.Hirc;
-using Audio.Utility;
 using CommonControls.FileTypes.PackFiles.Models;
 using Filetypes.ByteParsing;
 using System;
 using System.IO;
 using System.Linq;
 
-namespace CommonControls.Editors.AudioEditor.BnkCompiler
+namespace Audio.Utility
 {
     public class BnkFileManipulator
     {
@@ -40,7 +39,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
                 }
                 else
                     throw new Exception();
-                    
+
             }
 
             return null;
