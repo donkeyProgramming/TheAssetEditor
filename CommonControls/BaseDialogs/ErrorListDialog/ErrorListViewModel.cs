@@ -44,6 +44,15 @@ namespace CommonControls.BaseDialogs.ErrorListDialog
                 Errors.Add(item);
                 return item;
             }
+
+            public void AddAllErrors(ErrorList instanceErrorList)
+            {
+                foreach (var error in instanceErrorList.Errors)
+                {
+                    var item = new ErrorListDataItem() { ErrorType = error.ErrorType, ItemName = error.ItemName, Description = error.Description };
+                    Errors.Add(item);
+                }
+            }
         }
 
         /*   Dump to csv         // Entry : For each mount item:

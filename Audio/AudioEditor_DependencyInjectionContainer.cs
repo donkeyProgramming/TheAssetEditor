@@ -1,9 +1,12 @@
 ﻿using Audio.AudioEditor;
+using Audio.BnkCompiler.ObjectGeneration;
+using Audio.BnkCompiler.ObjectGeneration.Warhammer3;
 using Audio.FileFormats.WWise;
 using Audio.Presentation;
 using Audio.Storage;
 using Audio.Utility;
 using CommonControls.Common;
+using CommonControls.Editors.AudioEditor.BnkCompiler;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Audio
@@ -24,6 +27,14 @@ namespace Audio
 
             serviceCollection.AddTransient<SoundPlayer>();
             serviceCollection.AddTransient<AudioResearchHelper>();
+
+            serviceCollection.AddScoped<ActionGenerator>();
+            serviceCollection.AddScoped<EventGenerator>();
+            serviceCollection.AddScoped<GameSoundGenerator>();
+            serviceCollection.AddScoped<GeneratorFactory>();
+            serviceCollection.AddScoped<HircChuckBuilder>();
+            serviceCollection.AddScoped<BnkHeaderBuilder>();
+            serviceCollection.AddScoped<Compiler>();
         }
 
         public static void RegisterTools(IToolFactory factory)

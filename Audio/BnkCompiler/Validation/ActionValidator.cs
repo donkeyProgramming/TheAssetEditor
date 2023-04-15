@@ -12,7 +12,10 @@ namespace Audio.BnkCompiler.Validation
         public ActionValidator(List<IHircProjectItem> allItems)
         {
             RuleFor(x => x.Id).NotEmpty().WithMessage("Item is missing ID");
-            RuleFor(x => x.ChildList).ForEach(x=>x.SetValidator(new ActionChildValidator(allItems)));
+            RuleFor(x => x.ChildList)
+                .NotEmpty().WithMessage("No child added.")
+                .Must(x=>x.Count == 1).WithMessage("Only one action child is supported at this time.")
+                .ForEach(x=>x.SetValidator(new ActionChildValidator(allItems)));
         }
     }
 

@@ -302,7 +302,7 @@ namespace AssetEditor.ViewModels
 
         private void CompileAudioProjects()
         {
-            var compiler = new CommonControls.Editors.AudioEditor.BnkCompiler.Compiler(_packfileService);
+            var compiler = _serviceProvider.GetService<CommonControls.Editors.AudioEditor.BnkCompiler.Compiler>();
             compiler.CompileAllProjects(out var errorList);
             ErrorListWindow.ShowDialog("Compile Result:", errorList);
         }

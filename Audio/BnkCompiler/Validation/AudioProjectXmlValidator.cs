@@ -14,6 +14,8 @@ namespace Audio.BnkCompiler.Validation
         {
             var allItems = GetAllItems(projectXml);
 
+            RuleFor(x => x).NotNull().WithMessage("Project file is missing");
+
             // Validate project settings output file
             RuleFor(x => x.OutputFile)
                 .NotEmpty().WithMessage("Output file is missing or invalid. eg MyFileName.bnk")
