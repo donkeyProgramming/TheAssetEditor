@@ -3,7 +3,7 @@
     "OutputGame": "Warhammer3",
     "BnkName": "ui_audio_compile",
     "OutputFilePath": "D:\\Research\\Audio\\CustomBnks",
-    "WWiserPath": "D:\\Research\\Audio\\WWiser\\\\wwiser.pyz",
+    "WWiserPath": "D:\\Research\\Audio\\WWiser\\wwiser.pyz",
 
     "ConvertResultToXml": true,
     "ThrowOnCompileError": true,
