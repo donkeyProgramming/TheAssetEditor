@@ -51,17 +51,29 @@ namespace AudioResearch
             });
 
             var audioRepo = application.GetService<IAudioRepository>();
+            
+            // Load
             var dialogEvent = audioRepo.GetHircObject(263775993).First() as CAkDialogueEvent_v136;  // battle_vo_conversation_own_unit_under_ranged_attack
+
+            // Update
+            // Sort ids
+            // Get as bytes
+            // Load whole bnk with each item as byte item
+            // Replace the item
+            // Save
+
+            // Question:
+            // Can all referenced things be in an other bnk? Check
 
             var audioResearchHelper = application.GetService<AudioResearchHelper>();
             //audioResearchHelper.ExportDialogEventsToFile(dialogEvent);
 
             var manipulator = new BnkFileManipulator();
             var hirc = manipulator.FindHirc(loadedFiles.First(), "myBnk.bnk", 263775993);
-           
 
 
-            // Load
+
+            // Load and update - dialogEvent
             // Combine
             // Insert back into
 
