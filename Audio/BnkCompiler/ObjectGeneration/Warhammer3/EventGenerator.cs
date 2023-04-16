@@ -15,12 +15,15 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             var wwiseEvent = new CAkEvent_v136();
             wwiseEvent.Id = repository.GetHircItemId(inputEvent.Id);
             wwiseEvent.Type = HircType.Event;
-            wwiseEvent.Actions = new List<CAkEvent_v136.Action>()
-            {
-                new CAkEvent_v136.Action(){ ActionId = repository.GetHircItemId(inputEvent.Action)}
-            };
+            wwiseEvent.Actions = inputEvent.Actions.Select(x => CreateActionFromInputEvent(x, repository)).ToList();
+
             wwiseEvent.UpdateSize();
             return wwiseEvent;
+        }
+
+        private static CAkEvent_v136.Action CreateActionFromInputEvent(string actionId, HircProjectItemRepository repository)
+        {
+            return new CAkEvent_v136.Action() { ActionId = repository.GetHircItemId(actionId) };
         }
 
         public List<CAkEvent_v136> ConvertToWWise(IEnumerable<Event> inputEvent, HircProjectItemRepository repository)

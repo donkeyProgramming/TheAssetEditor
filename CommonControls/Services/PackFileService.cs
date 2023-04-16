@@ -347,7 +347,7 @@ namespace CommonControls.Services
 
         // Add
         // ---------------------------
-        public PackFileContainer CreateNewPackFileContainer(string name, PackFileCAType type)
+        public PackFileContainer CreateNewPackFileContainer(string name, PackFileCAType type, bool setEditablePack = false)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new Exception("Name can not be empty");
@@ -358,6 +358,8 @@ namespace CommonControls.Services
                 
             };
             Database.AddPackFile(newPackFile);
+            if(setEditablePack)
+                SetEditablePack(newPackFile);
             return newPackFile;
         }
 

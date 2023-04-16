@@ -1,0 +1,55 @@
+{
+  "ProjectSettings": {
+    "OutputGame": "Warhammer3",
+    "BnkName": "ui_audio_compile",
+    "OutputFilePath": "c:\\temp\\fileExport",
+    "WWiserPath": "C:\\Users\\ole_k\\Desktop\\audio_research\\WWiser\\wwiser.pyz",
+
+    "ConvertResultToXml": true,
+    "ThrowOnCompileError": true,
+    "ExportResultToFile": true
+  },
+
+  "Events": [
+    {
+      "AudioBus": "Master",
+      "Id": "UI_Click_foobar_foobar",
+      "OverrideId": 623217198,
+      "Actions": [ "UI_Click_foobar_foobar_Play", "UI_Click_foobar_foobar_Stop" ]
+    },
+    {
+      "AudioBus": "Master",
+      "Id": "UI_Click_foobar_foobar2",
+      "Actions": [ "UI_Click_foobar_foobar_Play", "UI_Click_foobar_foobar_Stop" ]
+    }
+  ],
+
+  "Actions": [
+    {
+      "Id": "UI_Click_foobar_foobar_Play",
+      "OverrideId": 23,
+      "ChildId": "CustomAudioFile_ID",
+      "Type": "Play"
+    },
+
+    {
+      "Id": "UI_Click_foobar_foobar_Stop",
+      "ChildId": "CustomAudioFile_ID",
+      "Type": "Play"
+    }
+  ],
+
+  "GameSounds": [
+    {
+      "Id": "CustomAudioFile_ID",
+      "OverrideId": 2312,
+      "Path": "Audio/WWise/790209750.wem",
+      "SourceType": "PackFile",
+      "ConvertToWem": false
+    },
+    {
+      "Id": "CustomAudioFile_ID",
+      "Path": "Audio/WWise/790209750.wem"
+    }
+  ]
+}

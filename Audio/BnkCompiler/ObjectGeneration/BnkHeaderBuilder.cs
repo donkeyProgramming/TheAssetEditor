@@ -7,9 +7,9 @@ namespace Audio.BnkCompiler.ObjectGeneration
 {
     public class BnkHeaderBuilder
     {
-        public BkhdHeader Generate(AudioProjectXml projectFile)
+        public BkhdHeader Generate(AudioInputProject projectFile)
         {
-            var bnkName = Path.GetFileNameWithoutExtension(projectFile.OutputFile);
+            var bnkName = projectFile.ProjectSettings.BnkName;
             var soundBankId = WWiseHash.Compute(bnkName);
             var header = new BkhdHeader()
             {

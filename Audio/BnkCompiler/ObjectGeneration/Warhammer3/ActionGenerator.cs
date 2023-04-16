@@ -14,7 +14,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             wwiseAction.Id = repository.GetHircItemId(inputAction.Id);
             wwiseAction.Type = HircType.Action;
             wwiseAction.ActionType = ActionType.Play;
-            wwiseAction.idExt = repository.GetHircItemId(inputAction.ChildList.First().Id);
+            wwiseAction.idExt = repository.GetHircItemId(inputAction.ChildId);
 
             wwiseAction.AkPlayActionParams.byBitVector = 0x04;
             wwiseAction.AkPlayActionParams.bankId = repository.ConvertStringToWWiseId(bnkName);

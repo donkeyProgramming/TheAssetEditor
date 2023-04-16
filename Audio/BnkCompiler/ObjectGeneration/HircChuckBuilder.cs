@@ -4,14 +4,12 @@ using Audio.FileFormats.WWise.Hirc;
 using Audio.FileFormats.WWise.Hirc.V136;
 using CommonControls.Editors.AudioEditor.BnkCompiler;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace Audio.BnkCompiler.ObjectGeneration
 {
     public class HircChuckBuilder
     {
-
         private readonly ActionGenerator _actionGenerator;
         private readonly EventGenerator _eventGenerator;
         private readonly GameSoundGenerator _soundGenerator;
@@ -23,13 +21,11 @@ namespace Audio.BnkCompiler.ObjectGeneration
             _soundGenerator = soundGenerator;
         }
 
-        public HircChunk Generate(AudioProjectXml projectFile)
+        public HircChunk Generate(AudioInputProject projectFile)
         {
-            var bnkName = Path.GetFileNameWithoutExtension(projectFile.OutputFile);
-
             // Build Hirc list. Order is important! 
             var repo = BuildRepository(projectFile);
-            var hircList = ConvertProjectToHircObjects(projectFile, repo, bnkName);
+            var hircList = ConvertProjectToHircObjects(projectFile, repo);
 
             var hircChuck = new HircChunk();
             hircChuck.SetFromHircList(hircList);
@@ -41,7 +37,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
             return hircChuck;
         }
 
-        private static HircProjectItemRepository BuildRepository(AudioProjectXml projectFile)
+        private static HircProjectItemRepository BuildRepository(AudioInputProject projectFile)
         {
             var repo = new HircProjectItemRepository();
             repo.AddCollection(projectFile.Events);
@@ -50,20 +46,17 @@ namespace Audio.BnkCompiler.ObjectGeneration
             return repo;
         }
 
-        private List<HircItem> ConvertProjectToHircObjects(AudioProjectXml project, HircProjectItemRepository repo, string bnkName)
+        private List<HircItem> ConvertProjectToHircObjects(AudioInputProject project, HircProjectItemRepository repo)
         {
             var hircList = new List<HircItem>();
-            hircList.AddRange(_generatorFactory.Procsss(project.GameSounds, repo));
-            hircList.AddRange(_generatorFactory.Procsss(project.Actions, bnkName, repo));
-            hircList.AddRange(_generatorFactory.Procsss(project.Events, repo));
+            hircList.AddRange(Procsss(project.GameSounds, repo));
+            hircList.AddRange(Procsss(project.Actions, project.ProjectSettings.BnkName, repo));
+            hircList.AddRange(Procsss(project.Events, repo));
             return hircList;
         }
 
-
-
-
-        public List<CAkAction_v136> Procsss(List<Action> audioEvent, string bnkName, HircProjectItemRepository repository) => _actionGenerator.ConvertToWWise(audioEvent, bnkName, repository);
-        public List<CAkEvent_v136> Procsss(List<Event> audioEvent, HircProjectItemRepository repository) => _eventGenerator.ConvertToWWise(audioEvent, repository);
-        public List<CAkSound_v136> Procsss(List<GameSound> audioEvent, HircProjectItemRepository repository) => _soundGenerator.ConvertToWWise(audioEvent, repository);
+        List<CAkAction_v136> Procsss(List<Action> audioEvent, string bnkName, HircProjectItemRepository repository) => _actionGenerator.ConvertToWWise(audioEvent, bnkName, repository);
+        List<CAkEvent_v136> Procsss(List<Event> audioEvent, HircProjectItemRepository repository) => _eventGenerator.ConvertToWWise(audioEvent, repository);
+        List<CAkSound_v136> Procsss(List<GameSound> audioEvent, HircProjectItemRepository repository) => _soundGenerator.ConvertToWWise(audioEvent, repository);
     }
 }

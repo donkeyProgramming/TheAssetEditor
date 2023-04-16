@@ -31,7 +31,6 @@ namespace Audio
             serviceCollection.AddScoped<ActionGenerator>();
             serviceCollection.AddScoped<EventGenerator>();
             serviceCollection.AddScoped<GameSoundGenerator>();
-            serviceCollection.AddScoped<GeneratorFactory>();
             serviceCollection.AddScoped<HircChuckBuilder>();
             serviceCollection.AddScoped<BnkHeaderBuilder>();
             serviceCollection.AddScoped<Compiler>();

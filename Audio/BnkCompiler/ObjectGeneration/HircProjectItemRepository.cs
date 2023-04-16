@@ -7,9 +7,9 @@ namespace Audio.BnkCompiler.ObjectGeneration
 {
     public class HircProjectItemRepository
     {
-        private List<IHircProjectItem> _allProjectItems = new List<IHircProjectItem>();
+        private List<IAudioProjectHircItem> _allProjectItems = new List<IAudioProjectHircItem>();
 
-        public void AddCollection(IEnumerable<IHircProjectItem> collection)
+        public void AddCollection(IEnumerable<IAudioProjectHircItem> collection)
         {
             _allProjectItems.AddRange(collection);
         }
@@ -17,8 +17,8 @@ namespace Audio.BnkCompiler.ObjectGeneration
         public uint GetHircItemId(string reference)
         {
             var item = _allProjectItems.First(x => x.Id == reference);
-            if (item.ForceId.HasValue == true)
-                return item.ForceId.Value;
+            if (item.OverrideId != 0)
+                return item.OverrideId;
             return ConvertStringToWWiseId(item.Id);
         }
 

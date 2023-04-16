@@ -4,7 +4,6 @@ using System.Text;
 
 namespace Audio.FileFormats.WWise
 {
-
     public enum HircType : byte
     {
         State = 0x01,

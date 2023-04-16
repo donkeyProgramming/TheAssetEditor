@@ -6,9 +6,4 @@ using Action = CommonControls.Editors.AudioEditor.BnkCompiler.Action;
 
 namespace Audio.BnkCompiler.ObjectGeneration
 {
-    public class GeneratorFactory
-    {
-
-
-    }
 }

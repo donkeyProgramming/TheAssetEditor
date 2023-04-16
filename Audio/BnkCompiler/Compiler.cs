@@ -4,14 +4,16 @@ using Audio.FileFormats.Dat;
 using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Bkhd;
 using Audio.FileFormats.WWise.Hirc;
+using Audio.Utility;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
+using CommunityToolkit.Diagnostics;
 using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Xml.Serialization;
+using System.Text.Json;
 using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 
 namespace CommonControls.Editors.AudioEditor.BnkCompiler
@@ -28,10 +30,6 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         private readonly PackFileService _pfs;
         private readonly HircChuckBuilder _hircBuilder;
         private readonly BnkHeaderBuilder _headerBuilder;
-
-        public bool ExportResultToFile { get; set; }
-        public bool ConvertResultToXml { get; set; }
-        public bool ThrowOnCompileError { get; set; }
 
         public Compiler(PackFileService pfs, HircChuckBuilder hircBuilder, BnkHeaderBuilder headerBuilder)
         {
@@ -61,9 +59,6 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
                 {
                     SaveHelper.SavePackFile(_pfs, "wwise\\audio", compileResult.OutputBnkFile, true);
                     SaveHelper.SavePackFile(_pfs, "wwise\\audio", compileResult.OutputDatFile, true);
-
-                    //foreach(var audioFile in compileResult.AudioFiles)
-                    //    SaveHelper.SavePackFile(_pfs, "wwise\\audio", audioFile, true);
                 }
 
                 outputList.Ok("Compiler", $"Finished {_pfs.GetFullPath(file)}. Overall result:{compileResult != null}");
@@ -73,39 +68,49 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 
         public CompileResult CompileProject(string path, out ErrorList errorList)
         {
-            var pf = _pfs.FindFile(path);
-            if (pf == null)
-                throw new Exception();
+            var projectPackFile = _pfs.FindFile(path);
+            Guard.IsNotNull(projectPackFile);
 
-            return CompileProject(pf, out errorList);
+            return CompileProject(projectPackFile, out errorList);
         }
 
         public CompileResult CompileProject(PackFile packfile, out ErrorList errorList)
         {
             errorList = new ErrorList();
 
-            var projectFile = LoadProjectFile(packfile, ref errorList);
+            var audioProject = LoadProjectFile(packfile, ref errorList);
 
             // Validate
-            if (ValidateProject(projectFile, out errorList) == false)
+            if (ValidateProject(audioProject, out errorList) == false)
                 return null;
 
             // Build the wwise object graph 
-            var header = _headerBuilder.Generate(projectFile);
-            var hircChunk = _hircBuilder.Generate(projectFile);
+            var header = _headerBuilder.Generate(audioProject);
+            var hircChunk = _hircBuilder.Generate(audioProject);
 
-            var bnkFile = ConvertToPackFile(header, hircChunk, projectFile.OutputFile);
-            var datFile = BuildDat(projectFile);
-
-            return new CompileResult()
+            var compileResult = new CompileResult()
             {
-                OutputBnkFile = bnkFile,
-                OutputDatFile = datFile,
+                OutputBnkFile = ConvertToPackFile(header, hircChunk, audioProject.ProjectSettings.BnkName),
+                OutputDatFile = BuildDat(audioProject),
                 NameList = null
             };
+
+            if (audioProject.ProjectSettings.ExportResultToFile)
+            {
+                var bnkPath = Path.Combine(audioProject.ProjectSettings.OutputFilePath, $"{audioProject.ProjectSettings.BnkName}.bnk");
+                File.WriteAllBytes(bnkPath, compileResult.OutputBnkFile.DataSource.ReadData());
+
+                var datPath = Path.Combine(audioProject.ProjectSettings.OutputFilePath, $"{audioProject.ProjectSettings.BnkName}.dat");
+                File.WriteAllBytes(datPath, compileResult.OutputDatFile.DataSource.ReadData());
+
+                if (audioProject.ProjectSettings.ConvertResultToXml)
+                    BnkToXmlConverter.Convert(audioProject.ProjectSettings.WWiserPath, bnkPath, true);
+            }
+
+            return compileResult;
         }
 
-        bool ValidateProject(AudioProjectXml projectFile, out ErrorList errorList)
+        bool ValidateProject(AudioInputProject projectFile, out ErrorList errorList)
         {
             errorList = new ErrorList();
 
@@ -114,7 +119,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             if (result.IsValid == false)
             {
                 foreach (var error in result.Errors)
-                    errorList.Error("BnkCompiler", error.ErrorMessage);
+                    errorList.Error("BnkCompiler", $"{error.PropertyName} - {error.ErrorMessage}");
 
                 return false;
             }
@@ -140,10 +145,9 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             return bnkPackFile;
         }
 
-
-        PackFile BuildDat(AudioProjectXml projectFile)
+        PackFile BuildDat(AudioInputProject projectFile)
         {
-            var outputName = "event_data__" + Path.GetFileNameWithoutExtension(projectFile.OutputFile) + ".dat";
+            var outputName = $"event_data__{projectFile.ProjectSettings.BnkName}.dat";
             var datFile = new SoundDatFile();
 
             foreach (var wwiseEvent in projectFile.Events)
@@ -156,36 +160,21 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         }
 
 
-        AudioProjectXml LoadProjectFile(PackFile packfile, ref ErrorList errorList)
+        AudioInputProject LoadProjectFile(PackFile packfile, ref ErrorList errorList)
         {
             try
             {
+                // Dont allow other attributes then waht is known
                 var bytes = packfile.DataSource.ReadData();
                 var str = Encoding.UTF8.GetString(bytes);
-
-                using var stream = GenerateStreamFromString(str);
-                XmlSerializer serializer = new XmlSerializer(typeof(AudioProjectXml));
-                var result = serializer.Deserialize(stream);
-                var typedResult = result as AudioProjectXml;
-                if (typedResult == null)
-                    throw new Exception($"Error loading project, typed result is null, actual: '{result}'");
-                return typedResult;
+                var myDeserializedClass = JsonSerializer.Deserialize<AudioInputProject>(str);
+                return myDeserializedClass;
             }
             catch (Exception e)
             {
-                errorList.Error("Unable to serialize project file", $"{e.Message} Please validate the XML at https://www.w3schools.com/xml/xml_validator.asp");
+                errorList.Error("Unable to load project file", $"{e.Message} Please validate the Json using an online validator.");
                 return null;
             }
-        }
-
-        public static Stream GenerateStreamFromString(string s)
-        {
-            var stream = new MemoryStream();
-            var writer = new StreamWriter(stream);
-            writer.Write(s);
-            writer.Flush();
-            stream.Position = 0;
-            return stream;
         }
     }
 }
