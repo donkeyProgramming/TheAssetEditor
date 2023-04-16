@@ -61,18 +61,7 @@ namespace Audio.Utility
                 ss.AppendLine(row);
 
             var wholeFile = ss.ToString();
-
-
-            /*
-             
-                         var text = ExportDialogEventsToFile(dialogEvent);
-            var name = _nameLookUpHelper.GetName(dialogEvent.Id);
-            var folderPath = "c:\\temp\\wwiseDialogEvents";
-            var filePath = $"{folderPath}\\{name}.csv";
-            DirectoryHelper.EnsureCreated(folderPath);
-            File.WriteAllText(filePath, text.ToString());
-            DirectoryHelper.OpenFolderAndSelectFile(filePath);
-             */
+            File.WriteAllText("D:\\Research\\Audio\\Temp\\table.csv", wholeFile);
         }
 
         static void GenerateRow(AkDecisionTree.Node currentNode, int currentArgrument, int numArguments, Stack<string> pushList, List<string> outputList, IAudioRepository audioRepository)
@@ -84,7 +73,7 @@ namespace Audio.Utility
             if (isDone)
             {
                 var currentLine = pushList.ToArray().Reverse().ToList();
-                currentLine.Add(currentNode.AudioNodeId.ToString());  // Add the wwise child node
+                currentLine.Add(audioRepository.GetNameFromHash(currentNode.AudioNodeId));  // Add the wwise child node
                 outputList.Add(string.Join("|", currentLine));
             }
             else

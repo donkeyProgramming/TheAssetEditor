@@ -18,13 +18,14 @@ namespace Audio.FileFormats.WWise
     public class Bnkparser
     {
         Dictionary<string, IParser> _parsers = new Dictionary<string, IParser>();
-
         public Bnkparser()
         {
             _parsers["BKHD"] = new BkhdParser();
             _parsers["HIRC"] = new HircParser();
             _parsers["STID"] = new StidParser();
         }
+
+        public void UseHircByteFactory(bool value) => (_parsers["HIRC"] as HircParser).UseByteFactory = value;
 
         public ParsedBnkFile Parse(PackFile file, string fullName)
         {

@@ -102,7 +102,7 @@ namespace CommonControls.Common
             return packfile;
         }
 
-        public static void LoadFilesFromDisk(PackFileService pfs, IEnumerable<FileRef> fileRefs)
+        public static List<PackFile> LoadFilesFromDisk(PackFileService pfs, IEnumerable<FileRef> fileRefs)
         {
             var packFileList = new List<PackFile>();
             var pathList = new List<string>();
@@ -117,6 +117,7 @@ namespace CommonControls.Common
             }
 
             pfs.AddFilesToPack(pfs.GetEditablePack(), pathList, packFileList);
+            return packFileList;
         }
 
         public class FileRef

@@ -9,6 +9,21 @@ namespace Audio.FileFormats.WWise.Hirc
 {
     public class HircParser : IParser
     {
+        public bool UseByteFactory { get; set; } = false;
+
+        public HircParser()
+        { 
+            
+        }
+
+        HircFactory GetHircFactory(uint bnkVersion)
+        {
+            if (UseByteFactory)
+                return HircFactory.CreateByteHircFactory();
+
+            return HircFactory.CreateFactory(bnkVersion);
+        }
+
         public void Parse(string fileName, ByteChunk chunk, ParsedBnkFile bnkFile)
         {
             bnkFile.HircChuck = new HircChunk();
@@ -16,8 +31,8 @@ namespace Audio.FileFormats.WWise.Hirc
             bnkFile.HircChuck.NumHircItems = chunk.ReadUInt32();
 
             var failedItems = new List<uint>();
-            var factory = HircFactory.CreateFactory(bnkFile.Header.dwBankGeneratorVersion);
-
+            HircFactory factory = GetHircFactory(bnkFile.Header.dwBankGeneratorVersion);
+          
             for (uint itemIndex = 0; itemIndex < bnkFile.HircChuck.NumHircItems; itemIndex++)
             {
                 var hircType = (HircType)chunk.PeakByte();
