@@ -1,6 +1,8 @@
-﻿using Audio.FileFormats.WWise.Hirc.V136;
+﻿using Audio.AudioEditor;
+using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using CommonControls.Common;
+using MoreLinq;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -83,6 +85,36 @@ namespace Audio.Utility
             }
 
             pushList.Pop();
+        }
+
+
+        public void GenerateActorMixerTree(string filename = "actorTree.txt")
+        {
+            var mixers = _audioRepository.GetAllOfType<CAkActorMixer_v136>();
+            var allRootNodes = mixers.Select(x => new WWiseTreeParserParent(_audioRepository, true, true, false).BuildHierarchyAsFlatList(x))
+                .Select(x => x.First())
+                .DistinctBy(x => x.Item.Id).ToList()
+                .ToList();
+
+            var inverse = allRootNodes.Select(x => new WWiseTreeParserChildren(_audioRepository, true, true, false).BuildHierarchy(x.Item));
+            var ss = new StringBuilder();
+            foreach (var item in inverse)
+                ConvertToString(item, 0, ss);
+
+            var wholeDataString = ss.ToString();
+            var lines = wholeDataString.Split('\n').Count();
+            File.WriteAllText($"D:\\Research\\Audio\\{filename}", wholeDataString);
+        }
+
+
+        static void ConvertToString(HircTreeItem item, int indentation, StringBuilder ss)
+        {
+            if (item.Item == null)
+                return;
+
+            ss.AppendLine($"{new string('\t', indentation)}{item.DisplayName}");
+            foreach (var childItem in item.Children)
+                ConvertToString(childItem, indentation + 1, ss);
         }
     }
 }

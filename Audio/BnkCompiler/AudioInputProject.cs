@@ -1,5 +1,6 @@
 ﻿// Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
 using System.Collections.Generic;
+using System.Security.Cryptography.Xml;
 
 namespace CommonControls.Editors.AudioEditor.BnkCompiler
 {
@@ -28,7 +29,6 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 
         public string Path { get; set; }
         public string SourceType { get; set; } = SourceType_Pack;
-        public string Source { get; set; }
         public bool ConvertToWem { get; set; } = false;
     }
 
@@ -47,10 +47,10 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 
     public class AudioInputProject
     {
-        public ProjectSettings ProjectSettings { get; set; }
-        public List<Event> Events { get; set; }
-        public List<Action> Actions { get; set; }
-        public List<GameSound> GameSounds { get; set; }
+        public ProjectSettings ProjectSettings { get; set; } = new ProjectSettings();
+        public List<Event> Events { get; set; } = new List<Event>();
+        public List<Action> Actions { get; set; } = new List<Action>();
+        public List<GameSound> GameSounds { get; set; } = new List<GameSound>();
     }
 
     /*

@@ -1,13 +1,23 @@
-﻿using Audio.FileFormats.WWise.Hirc.V136;
+﻿using Audio.AudioEditor;
+using Audio.FileFormats.WWise;
+using Audio.FileFormats.WWise.Hirc;
+using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using Audio.Utility;
 using CommonControls.Common;
 using CommonControls.Editors.AudioEditor.BnkCompiler;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
+using CommunityToolkit.Diagnostics;
+using MoreLinq;
+using MoreLinq.Extensions;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using static CommonControls.Editors.AudioEditor.BnkCompiler.Compiler;
+using System.Text;
+using System.Text.Json;
+using Action = CommonControls.Editors.AudioEditor.BnkCompiler.Action;
 
 namespace AudioResearch
 {
@@ -16,8 +26,79 @@ namespace AudioResearch
         static void Main(string[] args)
         {
             // CompileTest();
-            TableTest();
+            //TableTest();
+            DoSomeStuff();
         }
+
+
+        public static void DoSomeStuff()
+        {
+            using var application = new SimpleApplication();
+
+            var pfs = application.GetService<PackFileService>();
+            pfs.LoadAllCaFiles(GameTypeEnum.Warhammer3);
+            pfs.CreateNewPackFileContainer("SoundOutput", PackFileCAType.MOD, true);
+            //PackFileUtil.LoadFilesFromDisk(pfs, new[]
+            //{
+            //    new PackFileUtil.FileRef( packFilePath: @"audio\wwise", systemPath:@"D:\Research\Audio\Working pack\audio_ovn\wwise\english(uk)\campaign_diplomacy__ovn.bnk"),
+            //    new PackFileUtil.FileRef( packFilePath: @"audio\wwise", systemPath:@"D:\Research\Audio\Working pack\audio_ovn\wwise\event_data__ovn.dat"),
+            //});
+
+
+            var audioRepo = application.GetService<IAudioRepository>();
+            var sounds = audioRepo.GetAllOfType<CAkSound_v136>();
+
+            var sortedItems =audioRepo.HircObjects
+                .Select(x =>
+                {
+                    var itemTypes = x.Value.Select(x => x.Type).ToList();
+                    var allTypesDistincted = itemTypes.Distinct().Count() == 1;
+                    return new { Id = x.Key, Count = x.Value.Count(), Type=itemTypes.First(), Items = x.Value, ItemsSameType = allTypesDistincted };
+                })
+               .OrderByDescending(x => x.Count)
+               .Where(x => x.Type == HircType.Sound)
+               .ToList();
+
+            // Write mixer
+            // Write CAkFxShareSet
+            // Fix write order
+            // Fix bus override
+            // Fix parent for sounds (mixer)
+            // Fix bugs and be happy :) 
+            // Work out a UI -> Add template for tables? Generate them in the weird rpfm export format
+
+            foreach (var sound in sounds)
+            {
+                var result = JsonSerializer.Serialize(sound, new JsonSerializerOptions() { WriteIndented = true, IgnoreNullValues = true });
+                File.WriteAllText($"D:\\Research\\Audio\\Temp\\{sound.Id}.json", result);
+            }
+
+
+            /*
+             * Write order
+             CAkAttenuation
+For all mixers
+	Find children - order by id (smallest top)
+		For each child write audio - smallest top
+		Write mixer
+	Write mixer
+CAkFxShareSet
+Order events by id (smallest top)
+	Order actions for event (Smallest top)
+             */
+
+            //
+            //var projectExporter = new AudioProjectExporter();
+            //projectExporter.CreateFromRepository(audioRepo, "OvnProject.json");
+
+            //var researchHelper = application.GetService<AudioResearchHelper>();
+            //researchHelper.GenerateActorMixerTree("cr_mixerTree.txt");
+            //
+
+        }
+
+
+
 
 
         static void CompileTest()

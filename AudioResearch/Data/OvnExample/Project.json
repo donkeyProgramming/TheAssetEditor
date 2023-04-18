@@ -1,0 +1,678 @@
+{
+  "ProjectSettings": {
+    "Version": 1,
+    "OutputGame": "Warhammer3",
+    "BnkName": "campaign_diplomacy__ovn",
+    "OutputFilePath": "D:\\Research\\Audio\\CustomBnks",
+    "WWiserPath": "D:\\Research\\Audio\\WWiser\\wwiser.pyz",
+    "ConvertResultToXml": false,
+    "ThrowOnCompileError": false,
+    "ExportResultToFile": false
+  },
+  "Events": [
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Tyrion_Dip_Halfling_Neg_02_Action"
+      ],
+      "Id": "Play_HEF_Tyrion_Dip_Halfling_Neg_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Tyrion_Dip_Halfling_Neg_02_Action"
+      ],
+      "Id": "Play_HEF_Tyrion_Dip_Halfling_Neg_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Tyrion_Dip_Halfling_Neg_01_Action"
+      ],
+      "Id": "Play_HEF_Tyrion_Dip_Halfling_Neg_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Tyrion_Dip_Halfling_Neg_01_Action"
+      ],
+      "Id": "Play_HEF_Tyrion_Dip_Halfling_Neg_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Tyrion_Dip_Halfling_Neu_01_Action"
+      ],
+      "Id": "Play_HEF_Tyrion_Dip_Halfling_Neu_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Tyrion_Dip_Halfling_Neu_01_Action"
+      ],
+      "Id": "Play_HEF_Tyrion_Dip_Halfling_Neu_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Tyrion_Dip_Halfling_Neu_02_Action"
+      ],
+      "Id": "Play_HEF_Tyrion_Dip_Halfling_Neu_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Tyrion_Dip_Halfling_Neu_02_Action"
+      ],
+      "Id": "Play_HEF_Tyrion_Dip_Halfling_Neu_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Alarielle_Dip_Halfling_Neu_01_Action"
+      ],
+      "Id": "Play_HEF_Alarielle_Dip_Halfling_Neu_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Alarielle_Dip_Halfling_Neu_01_Action"
+      ],
+      "Id": "Play_HEF_Alarielle_Dip_Halfling_Neu_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Alarielle_Dip_Halfling_Neu_02_Action"
+      ],
+      "Id": "Play_HEF_Alarielle_Dip_Halfling_Neu_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Alarielle_Dip_Halfling_Neu_02_Action"
+      ],
+      "Id": "Play_HEF_Alarielle_Dip_Halfling_Neu_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_EMP_KF_Dip_Halfling_Greet_Neu_01_Action"
+      ],
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Neu_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_EMP_KF_Dip_Halfling_Greet_Neu_01_Action"
+      ],
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Neu_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_EMP_KF_Dip_Halfling_Greet_Neu_02_Action"
+      ],
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Neu_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_EMP_KF_Dip_Halfling_Greet_Neu_02_Action"
+      ],
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Neu_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_EMP_KF_Dip_Halfling_Greet_Pos_02_Action"
+      ],
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Pos_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_EMP_KF_Dip_Halfling_Greet_Pos_02_Action"
+      ],
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Pos_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_EMP_KF_Dip_Halfling_Greet_Pos_01_Action"
+      ],
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Pos_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_EMP_KF_Dip_Halfling_Greet_Pos_01_Action"
+      ],
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Pos_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Alarielle_Dip_Halfling_Neg_02_Action"
+      ],
+      "Id": "Play_HEF_Alarielle_Dip_Halfling_Neg_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Alarielle_Dip_Halfling_Neg_02_Action"
+      ],
+      "Id": "Play_HEF_Alarielle_Dip_Halfling_Neg_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Alarielle_Dip_Halfling_Neg_01_Action"
+      ],
+      "Id": "Play_HEF_Alarielle_Dip_Halfling_Neg_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Alarielle_Dip_Halfling_Neg_01_Action"
+      ],
+      "Id": "Play_HEF_Alarielle_Dip_Halfling_Neg_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Teclis_Dip_Halfling_Greet_Neg_01_Action"
+      ],
+      "Id": "Play_HEF_Teclis_Dip_Halfling_Greet_Neg_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Teclis_Dip_Halfling_Greet_Neg_01_Action"
+      ],
+      "Id": "Play_HEF_Teclis_Dip_Halfling_Greet_Neg_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Teclis_Dip_Halfling_Greet_Neg_02_Action"
+      ],
+      "Id": "Play_HEF_Teclis_Dip_Halfling_Greet_Neg_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Teclis_Dip_Halfling_Greet_Neg_02_Action"
+      ],
+      "Id": "Play_HEF_Teclis_Dip_Halfling_Greet_Neg_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Teclis_Dip_Halfling_Greet_Neu_02_Action"
+      ],
+      "Id": "Play_HEF_Teclis_Dip_Halfling_Greet_Neu_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Teclis_Dip_Halfling_Greet_Neu_02_Action"
+      ],
+      "Id": "Play_HEF_Teclis_Dip_Halfling_Greet_Neu_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Teclis_Dip_Halfling_Greet_Neu_01_Action"
+      ],
+      "Id": "Play_HEF_Teclis_Dip_Halfling_Greet_Neu_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Teclis_Dip_Halfling_Greet_Neu_01_Action"
+      ],
+      "Id": "Play_HEF_Teclis_Dip_Halfling_Greet_Neu_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Imrik_Dip_Halfling_Neu_01_Action"
+      ],
+      "Id": "Play_HEF_Imrik_Dip_Halfling_Neu_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Imrik_Dip_Halfling_Neu_01_Action"
+      ],
+      "Id": "Play_HEF_Imrik_Dip_Halfling_Neu_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Imrik_Dip_Halfling_Neu_02_Action"
+      ],
+      "Id": "Play_HEF_Imrik_Dip_Halfling_Neu_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Imrik_Dip_Halfling_Neu_02_Action"
+      ],
+      "Id": "Play_HEF_Imrik_Dip_Halfling_Neu_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Imrik_Dip_Halfling_Neg_02_Action"
+      ],
+      "Id": "Play_HEF_Imrik_Dip_Halfling_Neg_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Imrik_Dip_Halfling_Neg_02_Action"
+      ],
+      "Id": "Play_HEF_Imrik_Dip_Halfling_Neg_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Imrik_Dip_Halfling_Neg_01_Action"
+      ],
+      "Id": "Play_HEF_Imrik_Dip_Halfling_Neg_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_HEF_Imrik_Dip_Halfling_Neg_01_Action"
+      ],
+      "Id": "Play_HEF_Imrik_Dip_Halfling_Neg_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_EMP_KF_Dip_Halfling_Greet_Neg_02_Action"
+      ],
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Neg_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_EMP_KF_Dip_Halfling_Greet_Neg_02_Action"
+      ],
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Neg_02",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_EMP_KF_Dip_Halfling_Greet_Neg_01_Action"
+      ],
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Neg_01",
+      "OverrideId": 0
+    },
+    {
+      "AudioBus": "Master",
+      "Actions": [
+        "Play_EMP_KF_Dip_Halfling_Greet_Neg_01_Action"
+      ],
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Neg_01",
+      "OverrideId": 0
+    }
+  ],
+  "Actions": [
+    {
+      "ChildId": "Play_HEF_Tyrion_Dip_Halfling_Neg_02_GameSound",
+      "Type": "Play",
+      "Id": "Play_HEF_Tyrion_Dip_Halfling_Neg_02_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_HEF_Tyrion_Dip_Halfling_Neg_01_GameSound",
+      "Type": "Play",
+      "Id": "Play_HEF_Tyrion_Dip_Halfling_Neg_01_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_HEF_Tyrion_Dip_Halfling_Neu_01_GameSound",
+      "Type": "Play",
+      "Id": "Play_HEF_Tyrion_Dip_Halfling_Neu_01_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_HEF_Tyrion_Dip_Halfling_Neu_02_GameSound",
+      "Type": "Play",
+      "Id": "Play_HEF_Tyrion_Dip_Halfling_Neu_02_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_HEF_Alarielle_Dip_Halfling_Neu_01_GameSound",
+      "Type": "Play",
+      "Id": "Play_HEF_Alarielle_Dip_Halfling_Neu_01_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_HEF_Alarielle_Dip_Halfling_Neu_02_GameSound",
+      "Type": "Play",
+      "Id": "Play_HEF_Alarielle_Dip_Halfling_Neu_02_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_EMP_KF_Dip_Halfling_Greet_Neu_01_GameSound",
+      "Type": "Play",
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Neu_01_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_EMP_KF_Dip_Halfling_Greet_Neu_02_GameSound",
+      "Type": "Play",
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Neu_02_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_EMP_KF_Dip_Halfling_Greet_Pos_02_GameSound",
+      "Type": "Play",
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Pos_02_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_EMP_KF_Dip_Halfling_Greet_Pos_01_GameSound",
+      "Type": "Play",
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Pos_01_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_HEF_Alarielle_Dip_Halfling_Neg_02_GameSound",
+      "Type": "Play",
+      "Id": "Play_HEF_Alarielle_Dip_Halfling_Neg_02_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_HEF_Alarielle_Dip_Halfling_Neg_01_GameSound",
+      "Type": "Play",
+      "Id": "Play_HEF_Alarielle_Dip_Halfling_Neg_01_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_HEF_Teclis_Dip_Halfling_Greet_Neg_01_GameSound",
+      "Type": "Play",
+      "Id": "Play_HEF_Teclis_Dip_Halfling_Greet_Neg_01_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_HEF_Teclis_Dip_Halfling_Greet_Neg_02_GameSound",
+      "Type": "Play",
+      "Id": "Play_HEF_Teclis_Dip_Halfling_Greet_Neg_02_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_HEF_Teclis_Dip_Halfling_Greet_Neu_02_GameSound",
+      "Type": "Play",
+      "Id": "Play_HEF_Teclis_Dip_Halfling_Greet_Neu_02_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_HEF_Teclis_Dip_Halfling_Greet_Neu_01_GameSound",
+      "Type": "Play",
+      "Id": "Play_HEF_Teclis_Dip_Halfling_Greet_Neu_01_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_HEF_Imrik_Dip_Halfling_Neu_01_GameSound",
+      "Type": "Play",
+      "Id": "Play_HEF_Imrik_Dip_Halfling_Neu_01_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_HEF_Imrik_Dip_Halfling_Neu_02_GameSound",
+      "Type": "Play",
+      "Id": "Play_HEF_Imrik_Dip_Halfling_Neu_02_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_HEF_Imrik_Dip_Halfling_Neg_02_GameSound",
+      "Type": "Play",
+      "Id": "Play_HEF_Imrik_Dip_Halfling_Neg_02_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_HEF_Imrik_Dip_Halfling_Neg_01_GameSound",
+      "Type": "Play",
+      "Id": "Play_HEF_Imrik_Dip_Halfling_Neg_01_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_EMP_KF_Dip_Halfling_Greet_Neg_02_GameSound",
+      "Type": "Play",
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Neg_02_Action",
+      "OverrideId": 0
+    },
+    {
+      "ChildId": "Play_EMP_KF_Dip_Halfling_Greet_Neg_01_GameSound",
+      "Type": "Play",
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Neg_01_Action",
+      "OverrideId": 0
+    }
+  ],
+  "GameSounds": [
+    {
+      "Path": "Audio\\WWise\\729867288.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_HEF_Tyrion_Dip_Halfling_Neg_02_GameSound",
+      "OverrideId": 393272007
+    },
+    {
+      "Path": "Audio\\WWise\\906470917.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_HEF_Tyrion_Dip_Halfling_Neg_01_GameSound",
+      "OverrideId": 392191538
+    },
+    {
+      "Path": "Audio\\WWise\\784496158.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_HEF_Tyrion_Dip_Halfling_Neu_01_GameSound",
+      "OverrideId": 1055814769
+    },
+    {
+      "Path": "Audio\\WWise\\362402037.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_HEF_Tyrion_Dip_Halfling_Neu_02_GameSound",
+      "OverrideId": 1044989864
+    },
+    {
+      "Path": "Audio\\WWise\\78056990.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_HEF_Alarielle_Dip_Halfling_Neu_01_GameSound",
+      "OverrideId": 390450090
+    },
+    {
+      "Path": "Audio\\WWise\\597442619.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_HEF_Alarielle_Dip_Halfling_Neu_02_GameSound",
+      "OverrideId": 1011584867
+    },
+    {
+      "Path": "Audio\\WWise\\44369822.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Neu_01_GameSound",
+      "OverrideId": 994861338
+    },
+    {
+      "Path": "Audio\\WWise\\622310682.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Neu_02_GameSound",
+      "OverrideId": 246556496
+    },
+    {
+      "Path": "Audio\\WWise\\139425245.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Pos_02_GameSound",
+      "OverrideId": 54928189
+    },
+    {
+      "Path": "Audio\\WWise\\799837429.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Pos_01_GameSound",
+      "OverrideId": 911099858
+    },
+    {
+      "Path": "Audio\\WWise\\189934425.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_HEF_Alarielle_Dip_Halfling_Neg_02_GameSound",
+      "OverrideId": 160849763
+    },
+    {
+      "Path": "Audio\\WWise\\909199361.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_HEF_Alarielle_Dip_Halfling_Neg_01_GameSound",
+      "OverrideId": 574497750
+    },
+    {
+      "Path": "Audio\\WWise\\145898663.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_HEF_Teclis_Dip_Halfling_Greet_Neg_01_GameSound",
+      "OverrideId": 583267925
+    },
+    {
+      "Path": "Audio\\WWise\\180316358.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_HEF_Teclis_Dip_Halfling_Greet_Neg_02_GameSound",
+      "OverrideId": 470467193
+    },
+    {
+      "Path": "Audio\\WWise\\452912437.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_HEF_Teclis_Dip_Halfling_Greet_Neu_02_GameSound",
+      "OverrideId": 595729122
+    },
+    {
+      "Path": "Audio\\WWise\\749366078.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_HEF_Teclis_Dip_Halfling_Greet_Neu_01_GameSound",
+      "OverrideId": 509185723
+    },
+    {
+      "Path": "Audio\\WWise\\348912078.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_HEF_Imrik_Dip_Halfling_Neu_01_GameSound",
+      "OverrideId": 473810610
+    },
+    {
+      "Path": "Audio\\WWise\\765779622.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_HEF_Imrik_Dip_Halfling_Neu_02_GameSound",
+      "OverrideId": 1040212471
+    },
+    {
+      "Path": "Audio\\WWise\\402319398.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_HEF_Imrik_Dip_Halfling_Neg_02_GameSound",
+      "OverrideId": 867046681
+    },
+    {
+      "Path": "Audio\\WWise\\1062243494.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_HEF_Imrik_Dip_Halfling_Neg_01_GameSound",
+      "OverrideId": 315135414
+    },
+    {
+      "Path": "Audio\\WWise\\801098497.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Neg_02_GameSound",
+      "OverrideId": 533983270
+    },
+    {
+      "Path": "Audio\\WWise\\825230199.wem",
+      "SourceType": "PackFile",
+      "Source": null,
+      "ConvertToWem": false,
+      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Neg_01_GameSound",
+      "OverrideId": 802269084
+    }
+  ]
+}

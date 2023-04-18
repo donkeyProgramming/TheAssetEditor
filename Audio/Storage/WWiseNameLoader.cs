@@ -3,12 +3,10 @@ using Audio.Utility;
 using CommonControls.Common;
 using CommonControls.Services;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.Unicode;
 
 namespace Audio.Storage
 {
@@ -17,7 +15,6 @@ namespace Audio.Storage
         private readonly PackFileService _pfs;
 
         private Dictionary<uint, string> _nameLookUp { get; set; } = new Dictionary<uint, string>();
-
 
         public WWiseNameLoader(PackFileService pfs)
         {

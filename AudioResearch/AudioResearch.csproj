@@ -25,6 +25,9 @@
     <None Update="Data\CustomSoundCompile\Project.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Data\OvnExample\Project.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Data\RandContainerProject.bnk.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -21,6 +21,21 @@ namespace Audio.FileFormats.WWise.Hirc
         public uint GetChildId();
     }
 
+    public interface ICAkActorMixer
+    {
+        public uint GetFxShareSet();
+        public uint GetOverrideBusId();
+        public uint GetDirectParent();
+        public List<uint> GetChildren();
+    }
+
+
+
+
+
+
+
+
     // Conert to interfaces 
 
     public abstract class CAkRanSeqCnt : HircItem
