@@ -41,8 +41,8 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 Type = HircType.Sound,
                 AkBankSourceData = new AkBankSourceData()
                 {
-                    PluginId = 0x00010001,  // [PCM]
-                    StreamType = SourceType.Data_BNK,
+                    PluginId = 0x00040001,  // [VORBIS]
+                    StreamType = SourceType.Straming,
                     akMediaInformation = new AkMediaInformation()
                     {
                         SourceId = soundId,
@@ -52,6 +52,10 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 },
                 NodeBaseParams = NodeBaseParams.CreateDefault()
             };
+
+            var mixer = repository.GetActionMixerForSound(inputSound.Id);
+            if (mixer != null)
+                wwiseSound.NodeBaseParams.DirectParentID = repository.GetHircItemId(mixer.Id);
 
             wwiseSound.UpdateSize();
             return wwiseSound;

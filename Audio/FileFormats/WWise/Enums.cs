@@ -156,6 +156,8 @@ namespace Audio.FileFormats.WWise
         MakeUpGain = 0x06,
         StatePropNum_Priority = 0x07,
         PriorityDistanceOffset = 0x08,
+        UserAuxSendVolume0 = 0x13,
+        InitialDelay = 0x3B,
         CenterPCT = 0x0E,
         UnknownThing = 0x4A,
     }

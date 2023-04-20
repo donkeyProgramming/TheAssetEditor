@@ -24,7 +24,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             var allActorChildren = actorMixer.ActorMixerChildren.ToList();
             var allSoundsChildren = actorMixer.Sounds.ToList();
             var allChildren = allActorChildren.Concat(allSoundsChildren);
-            var allChildIds = allActorChildren
+            var allChildIds = allChildren
                 .Select(x => repository.GetHircItemId(x))
                 .OrderBy(x=>x)
                 .ToList();
@@ -38,7 +38,14 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             {
                 ChildIdList = allChildIds
             };
-            
+
+            var mixer = repository.GetActionMixerParentForActorMixer(actorMixer.Id);
+            if (mixer != null)
+                wwiseActorMixer.NodeBaseParams.DirectParentID = repository.GetHircItemId(mixer.Id);
+
+            // If there is a parent, tell the vector to overrwirte it
+            wwiseActorMixer.NodeBaseParams.byBitVector = mixer != null ? (byte)0x01 : (byte)0x0;
+
             wwiseActorMixer.UpdateSize();
             return wwiseActorMixer;
         }
