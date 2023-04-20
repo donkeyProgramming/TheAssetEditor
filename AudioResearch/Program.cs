@@ -27,76 +27,11 @@ namespace AudioResearch
         {
             // CompileTest();
             //TableTest();
-            DoSomeStuff();
+            OvnTest.Compile();
+            //GeneratOvnProject();
         }
 
-
-        public static void DoSomeStuff()
-        {
-            using var application = new SimpleApplication();
-
-            var pfs = application.GetService<PackFileService>();
-            pfs.LoadAllCaFiles(GameTypeEnum.Warhammer3);
-            pfs.CreateNewPackFileContainer("SoundOutput", PackFileCAType.MOD, true);
-            //PackFileUtil.LoadFilesFromDisk(pfs, new[]
-            //{
-            //    new PackFileUtil.FileRef( packFilePath: @"audio\wwise", systemPath:@"D:\Research\Audio\Working pack\audio_ovn\wwise\english(uk)\campaign_diplomacy__ovn.bnk"),
-            //    new PackFileUtil.FileRef( packFilePath: @"audio\wwise", systemPath:@"D:\Research\Audio\Working pack\audio_ovn\wwise\event_data__ovn.dat"),
-            //});
-
-
-            var audioRepo = application.GetService<IAudioRepository>();
-            var sounds = audioRepo.GetAllOfType<CAkSound_v136>();
-
-            var sortedItems =audioRepo.HircObjects
-                .Select(x =>
-                {
-                    var itemTypes = x.Value.Select(x => x.Type).ToList();
-                    var allTypesDistincted = itemTypes.Distinct().Count() == 1;
-                    return new { Id = x.Key, Count = x.Value.Count(), Type=itemTypes.First(), Items = x.Value, ItemsSameType = allTypesDistincted };
-                })
-               .OrderByDescending(x => x.Count)
-               .Where(x => x.Type == HircType.Sound)
-               .ToList();
-
-            // Write mixer
-            // Write CAkFxShareSet
-            // Fix write order
-            // Fix bus override
-            // Fix parent for sounds (mixer)
-            // Fix bugs and be happy :) 
-            // Work out a UI -> Add template for tables? Generate them in the weird rpfm export format
-
-            foreach (var sound in sounds)
-            {
-                var result = JsonSerializer.Serialize(sound, new JsonSerializerOptions() { WriteIndented = true, IgnoreNullValues = true });
-                File.WriteAllText($"D:\\Research\\Audio\\Temp\\{sound.Id}.json", result);
-            }
-
-
-            /*
-             * Write order
-             CAkAttenuation
-For all mixers
-	Find children - order by id (smallest top)
-		For each child write audio - smallest top
-		Write mixer
-	Write mixer
-CAkFxShareSet
-Order events by id (smallest top)
-	Order actions for event (Smallest top)
-             */
-
-            //
-            //var projectExporter = new AudioProjectExporter();
-            //projectExporter.CreateFromRepository(audioRepo, "OvnProject.json");
-
-            //var researchHelper = application.GetService<AudioResearchHelper>();
-            //researchHelper.GenerateActorMixerTree("cr_mixerTree.txt");
-            //
-
-        }
-
+      
 
 
 
@@ -136,6 +71,7 @@ Order events by id (smallest top)
             // Load
             var dialogEvent = audioRepo.GetHircObject(263775993).First() as CAkDialogueEvent_v136;  // battle_vo_conversation_own_unit_under_ranged_attack
 
+
             // Update
             // Sort ids
             // Get as bytes
@@ -161,6 +97,27 @@ Order events by id (smallest top)
 
 
 
+        }
+
+
+
+        static void TestDialogEventSerialization()
+        {
+            using var application = new SimpleApplication();
+
+            var pfs = application.GetService<PackFileService>();
+            pfs.LoadAllCaFiles(GameTypeEnum.Warhammer3);
+            var audioRepo = application.GetService<IAudioRepository>();
+
+            var dialogEvents = audioRepo.GetAllOfType<CAkDialogueEvent_v136>();
+            foreach(var dialogEvent in dialogEvents) 
+            {
+
+                var bytes = dialogEvent.GetAsByteArray();
+                var chuck = new Filetypes.ByteParsing.ByteChunk(bytes);
+                var reParsedObject = new CAkDialogueEvent_v136();
+                reParsedObject.Parse(chuck);
+            }
         }
     }
 }

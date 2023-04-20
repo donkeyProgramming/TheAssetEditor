@@ -28,10 +28,11 @@ namespace Audio
             serviceCollection.AddTransient<SoundPlayer>();
             serviceCollection.AddTransient<AudioResearchHelper>();
 
-            serviceCollection.AddScoped<ActionGenerator>();
-            serviceCollection.AddScoped<EventGenerator>();
-            serviceCollection.AddScoped<GameSoundGenerator>();
-            serviceCollection.AddScoped<HircChuckBuilder>();
+            serviceCollection.AddScoped<IWWiseHircGenerator, ActionGenerator>();
+            serviceCollection.AddScoped<IWWiseHircGenerator, EventGenerator>();
+            serviceCollection.AddScoped<IWWiseHircGenerator, SoundGenerator>();
+            serviceCollection.AddScoped<IWWiseHircGenerator, ActorMixerGenerator>();
+            serviceCollection.AddScoped<HichBuilder>();
             serviceCollection.AddScoped<BnkHeaderBuilder>();
             serviceCollection.AddScoped<Compiler>();
         }

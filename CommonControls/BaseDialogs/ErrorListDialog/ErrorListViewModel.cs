@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace CommonControls.BaseDialogs.ErrorListDialog
 {
+  
     public class ErrorListViewModel
     {
         public List<ErrorListDataItem> ErrorItems { get; set; }
         public string WindowTitle { get; set; } = "Error";
 
+        [DebuggerDisplay("{ErrorType}:{ItemName}-{Description}")]
         public class ErrorListDataItem
         {
             public string ErrorType { get; set; }

@@ -1,4 +1,5 @@
 ﻿// Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
+using Audio.BnkCompiler;
 using System.Collections.Generic;
 using System.Security.Cryptography.Xml;
 
@@ -18,24 +19,26 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 
     public class Event : IAudioProjectHircItem
     {
-        public string AudioBus { get; set; }
+        public string AudioBus { get; set; } = null;
         public List<string> Actions { get; set; }
     }
 
     public class GameSound : IAudioProjectHircItem
     {
-        public static string SourceType_Pack = "PackFile";
-        public static string SourceType_System = "FileSystem";
-
         public string Path { get; set; }
-        public string SourceType { get; set; } = SourceType_Pack;
-        public bool ConvertToWem { get; set; } = false;
+    }
+
+    public class ActorMixer : IAudioProjectHircItem
+    {
+        public string AudioBus { get; set; } = null;
+        public List<string> Sounds { get; set; }
+        public List<string> ActorMixerChildren { get; set; }
     }
 
     public class ProjectSettings
     {
         public int Version { get; set; } = 1;
-        public string OutputGame { get; set; } = "Warhammer3";
+        public string OutputGame { get; set; } = CompilerConstants.Game_Warhammer3;
         public string BnkName { get; set; }
         public string OutputFilePath { get; set; }
         public string WWiserPath { get; set; }
@@ -51,6 +54,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         public List<Event> Events { get; set; } = new List<Event>();
         public List<Action> Actions { get; set; } = new List<Action>();
         public List<GameSound> GameSounds { get; set; } = new List<GameSound>();
+        public List<ActorMixer> ActorMixers { get; set; } = new List<ActorMixer>();
     }
 
     /*

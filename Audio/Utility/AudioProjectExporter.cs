@@ -3,7 +3,6 @@ using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using CommonControls.Editors.AudioEditor.BnkCompiler;
 using CommunityToolkit.Diagnostics;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,7 +14,7 @@ namespace Audio.Utility
 {
     public class AudioProjectExporter
     {
-        void AddItemToProject(CAkEvent_v136 wwiseEvent, IAudioRepository repository, AudioInputProject project)
+        void AddEventToProject(CAkEvent_v136 wwiseEvent, IAudioRepository repository, AudioInputProject project)
         {
             Guard.IsNotNull(wwiseEvent);
             Guard.IsEqualTo(wwiseEvent.Actions.Count, 1);
@@ -32,7 +31,6 @@ namespace Audio.Utility
                 Actions = new List<string> { actionName },
                 AudioBus = "Master"
             };
-            project.Events.Add(projectEvent);
 
             // Actions
             var wwiseActionId = wwiseEvent.Actions.First();
@@ -61,11 +59,9 @@ namespace Audio.Utility
             // Write sound
             var projectSound = new GameSound()
             {
-                ConvertToWem = false,
                 Id = soundName,
                 OverrideId = wwiseSoundInstance.Id,
                 Path = $"Audio\\WWise\\{wwiseSoundInstance.AkBankSourceData.akMediaInformation.SourceId}.wem",
-                SourceType = "PackFile"
             };
 
             project.Events.Add(projectEvent);
@@ -75,22 +71,68 @@ namespace Audio.Utility
 
         public AudioInputProject CreateFromRepository(IAudioRepository repository)
         {
-            var events = repository.GetAllOfType<CAkEvent_v136>();
-            
-            //var fxShareSets = repository.GetAllOfType<CAkFxShareSet_v136>();
-            //var mixers = repository.GetAllOfType<CAkActorMixer_v136>();
-
             var project = new AudioInputProject();
+
+            var events = repository.GetAllOfType<CAkEvent_v136>();
             foreach (var wwiseEvent in events)
-                AddItemToProject(wwiseEvent, repository, project);
+                AddEventToProject(wwiseEvent, repository, project);
+
+            var mixers = repository.GetAllOfType<CAkActorMixer_v136>();
+            AddMixersToProject(mixers, repository, project);
 
             return project;
+        }
+
+        void AddMixersToProject(List<CAkActorMixer_v136> mixers, IAudioRepository repository, AudioInputProject project)
+        {
+            // Revese the list, to get better ordering.
+            mixers.Reverse();
+            var mixerNames = GenerateMixerNames(mixers);
+
+            foreach (var mixer in mixers)
+            {
+                var childen = mixer.Children.ChildIdList;
+                var childHircs = childen.Select(x => repository.GetHircObject(x)).SelectMany(x => x).ToList();
+                var audioChildren = childHircs.Where(x => x is CAkSound_v136).ToList();
+                var mixerChildren = childHircs.Where(x => x is CAkActorMixer_v136).ToList();
+
+
+                var outputMixer = new ActorMixer
+                {
+                    Id = mixerNames[mixer.Id],
+                    OverrideId = mixer.Id,
+                    AudioBus = "Master",
+                    Sounds = audioChildren.Select(x => project.GameSounds.First(sound => sound.OverrideId == x.Id).Id).ToList(),
+                    ActorMixerChildren = mixerChildren.Select(x => mixerNames[x.Id]).ToList(),
+                };
+
+                project.ActorMixers.Add(outputMixer);
+            }
+        }
+
+        Dictionary<uint, string> GenerateMixerNames(List<CAkActorMixer_v136> mixers)
+        {
+            var mixerCounter = 0;
+            var nameDictionary = new Dictionary<uint, string>();
+            foreach (var mixer in mixers)
+            {
+                if (mixer.NodeBaseParams.DirectParentID == 0)
+                    nameDictionary.Add(mixer.Id, "RootMixer");
+                else
+ 
+                    nameDictionary.Add(mixer.Id, $"ActorMixer_{mixerCounter++}");
+            }
+
+            // Ensure we have one name for each mixer
+            Guard.Equals(mixers.Count(), nameDictionary.Count());
+
+            return nameDictionary;
         }
 
         public void CreateFromRepository(IAudioRepository repository, string filename = "audioProject.json")
         { 
             var project = CreateFromRepository(repository);
-            var json = JsonConvert.SerializeObject(project, Formatting.Indented);
+            var json = JsonSerializer.Serialize(project, new JsonSerializerOptions() { WriteIndented = true, IgnoreNullValues = true});
             File.WriteAllText($"D:\\Research\\Audio\\{filename}", json);
         }
     }

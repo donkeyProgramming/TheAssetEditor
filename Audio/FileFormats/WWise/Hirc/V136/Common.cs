@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace Audio.FileFormats.WWise.Hirc.V136
 {
@@ -18,6 +17,25 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 instance.ChildIdList.Add(chunk.ReadUInt32());
 
             return instance;
+        }
+
+        public uint GetSize()
+        {
+            return (uint)(ChildIdList.Count * 4 + 4);
+        }
+
+        internal ReadOnlySpan<byte> GetAsByteArray()
+        {
+            using var memStream = new MemoryStream();
+            memStream.Write(ByteParsers.UInt32.EncodeValue((uint)ChildIdList.Count, out _));
+
+            foreach(var child in ChildIdList)
+                memStream.Write(ByteParsers.UInt32.EncodeValue(child, out _));
+
+            var byteArray = memStream.ToArray();
+            if (byteArray.Length != GetSize())
+                throw new Exception("Invalid size");
+            return byteArray;
         }
     }
 

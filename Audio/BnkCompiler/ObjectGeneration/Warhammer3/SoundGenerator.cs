@@ -5,16 +5,28 @@ using CommonControls.Services;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using CommunityToolkit.Diagnostics;
+using System;
 
 namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
-    public class GameSoundGenerator
+    public class SoundGenerator : IWWiseHircGenerator
     {
+        public string GameName => CompilerConstants.Game_Warhammer3;
+        public Type AudioProjectType => typeof(GameSound);
+ 
         private readonly PackFileService _pfs;
 
-        public GameSoundGenerator(PackFileService pfs)
+        public SoundGenerator(PackFileService pfs)
         {
             _pfs = pfs;
+        }
+
+        public HircItem ConvertToWWise(IAudioProjectHircItem projectItem, AudioInputProject project, HircProjectItemRepository repository)
+        {
+            var typedProjectItem = projectItem as GameSound;
+            Guard.IsNotNull(typedProjectItem);
+            return ConvertToWWise(typedProjectItem, repository);
         }
 
         public CAkSound_v136 ConvertToWWise(GameSound inputSound, HircProjectItemRepository repository)
@@ -49,10 +61,5 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
         {
             return inputSound.Select(x => ConvertToWWise(x, repository)).ToList();
         }
-
     }
-
-
-
-
 }

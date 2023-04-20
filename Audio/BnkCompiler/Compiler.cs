@@ -28,10 +28,10 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         }
 
         private readonly PackFileService _pfs;
-        private readonly HircChuckBuilder _hircBuilder;
+        private readonly HichBuilder _hircBuilder;
         private readonly BnkHeaderBuilder _headerBuilder;
 
-        public Compiler(PackFileService pfs, HircChuckBuilder hircBuilder, BnkHeaderBuilder headerBuilder)
+        public Compiler(PackFileService pfs, HichBuilder hircBuilder, BnkHeaderBuilder headerBuilder)
         {
             _pfs = pfs;
             _hircBuilder = hircBuilder;

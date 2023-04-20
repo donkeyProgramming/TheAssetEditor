@@ -41,10 +41,10 @@ namespace Audio.BnkCompiler.Validation
 
             var duplicates = query.Where(x => x.Counter != 1).ToList();
             foreach (var duplicate in duplicates)
-                context.AddFailure("Duplicate key", $"{duplicate.Element} is used {duplicate.Counter} times. Ids must be unique");
+                context.AddFailure("Duplicate key", $"'{duplicate.Element}' is used {duplicate.Counter} times. Ids must be unique");
         }
 
-        // Unreferenced check
+        // Check for unreferenced ids
 
         List<IAudioProjectHircItem> GetAllItems(AudioInputProject projectXml)
         {

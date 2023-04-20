@@ -33,7 +33,14 @@
       "OverrideId": 264282125,
       "Path": "Audio/WWise/790209750.wem",
       "SourceType": "PackFile",
-      "ConvertToWem": false
+      "ConvertToWem": false,
     }
   ]
+
+  "Mixer": {
+    "Id": "MyMixer1",
+    "OverrideId": 264282125,
+    "ChildMixers": "MyMixer2",
+    "ChildSouds": [ "CustomAudioFile_ID", "CustomAudioFile_ID", "CustomAudioFile_ID", "CustomAudioFile_ID", "CustomAudioFile_ID" ]
+  }
 }

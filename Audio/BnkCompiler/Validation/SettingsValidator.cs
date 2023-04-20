@@ -14,12 +14,12 @@ namespace Audio.BnkCompiler.Validation
                 .Must(x => x == 1).WithMessage("Only version one is allowed");
 
             RuleFor(x => x.OutputGame)
-                .NotEmpty().WithMessage("Output game not selected. Only 'Warhammer3' is supporeted")
-                .Must(x => string.Compare(x, "warhammer3", StringComparison.InvariantCultureIgnoreCase) == 0).WithMessage("Only warhammer 3 is supported");
+                .NotEmpty().WithMessage($"Output game not selected. Only '{CompilerConstants.Game_Warhammer3}' is supporeted")
+                .Must(x => string.Compare(x, CompilerConstants.Game_Warhammer3, StringComparison.InvariantCultureIgnoreCase) == 0).WithMessage("Only warhammer 3 is supported");
 
             RuleFor(x => x.BnkName)
                  .NotEmpty().WithMessage("Bnk name missing, mest end with .bnk. Example: 'mybank'")
-                 .Must(x => Path.GetExtension(x).ToLower() == string.Empty).WithMessage("bnkName should not include any exptentions");
+                 .Must(x => Path.GetExtension(x)?.ToLower() == string.Empty).WithMessage("bnkName should not include any exptentions");
 
             // Export to file 
             RuleFor(x => x)
