@@ -1,18 +1,23 @@
-﻿using Audio.FileFormats.WWise.Hirc.V136;
-using Audio.Storage;
+﻿using Audio.Storage;
 using Audio.Utility;
 using CommonControls.Common;
 using CommonControls.Editors.AudioEditor.BnkCompiler;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace AudioResearch
 {
+
+    /*
+     * Custom sound in animMeta
+    * Custom sound for button/ui
+    * Custom sound triggered by script
+    * Custom sound for movie
+    * Custom sound for diplomacy line
+     */
+
     internal class OvnTest
     {
         public static void Compile()
@@ -20,7 +25,8 @@ namespace AudioResearch
             using var application = new SimpleApplication();
 
             var pfs = application.GetService<PackFileService>();
-            //pfs.LoadAllCaFiles(GameTypeEnum.Warhammer3);
+            // pfs.LoadAllCaFiles(GameTypeEnum.Warhammer3);
+
             pfs.CreateNewPackFileContainer("SoundOutput", PackFileCAType.MOD, true);
             PackFileUtil.LoadFilesFromDisk(pfs, new[]
             {
@@ -60,6 +66,5 @@ namespace AudioResearch
             var projectExporter = new AudioProjectExporter();
             projectExporter.CreateFromRepository(audioRepo, "OvnProject.json");
         }
-
     }
 }
