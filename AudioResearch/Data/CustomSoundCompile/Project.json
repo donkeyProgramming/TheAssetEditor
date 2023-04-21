@@ -10,6 +10,15 @@
     "ExportResultToFile": true
   },
 
+
+  "AudioImport": [
+    {
+      "Path": "c:\\sfgsdfg.mp3",
+      "OutputName": "GameSound_CustomAudioFile_ID",
+      "Language": "english(uk)"
+    }
+  ],
+
   "Events": [
     {
       "AudioBus": "Master",
@@ -34,6 +43,10 @@
       "Path": "Audio/WWise/790209750.wem",
       "SourceType": "PackFile",
       "ConvertToWem": false,
+    },
+
+    {
+      "Id": "ImportedAudioFile",
     }
   ]
 

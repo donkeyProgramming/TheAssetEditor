@@ -31,7 +31,7 @@ using CommonControls.BaseDialogs.ErrorListDialog;
 using System.Reflection;
 using System.IO;
 using System.Text;
-using Audio.AudioEditor;
+using Audio.Presentation.AudioExplorer;
 
 namespace AssetEditor.ViewModels
 {

@@ -11,7 +11,7 @@ namespace AudioResearch
 {
 
     /*
-     * Custom sound in animMeta
+    * Custom sound in animMeta
     * Custom sound for button/ui
     * Custom sound triggered by script
     * Custom sound for movie
@@ -44,7 +44,7 @@ namespace AudioResearch
             var compileResult = compiler.CompileProject(@"audioprojects\Project.json", out var errorList);
         }
 
-        public static void GenerateProjectFromBnk()
+        public static void GenerateProjectFromBnk(bool userOverrideIds)
         {
             using var application = new SimpleApplication();
 
@@ -63,7 +63,7 @@ namespace AudioResearch
             var hircs = audioRepo.HircObjects.Select(x => x.Value.First());
             var ids = hircs.Select(x => $"{x.Id}-{x.Type}").ToList();
 
-            var projectExporter = new AudioProjectExporter();
+            var projectExporter = new AudioProjectExporter(userOverrideIds);
             projectExporter.CreateFromRepository(audioRepo, "OvnProject.json");
         }
     }
