@@ -14,6 +14,13 @@ namespace Audio.Utility
 {
     public class AudioProjectExporter
     {
+        private readonly bool _userOverrideIds;
+
+        public AudioProjectExporter(bool userOverrideIds = true)
+        {
+            _userOverrideIds = userOverrideIds;
+        }
+
         void AddEventToProject(CAkEvent_v136 wwiseEvent, IAudioRepository repository, AudioInputProject project)
         {
             Guard.IsNotNull(wwiseEvent);
@@ -49,6 +56,9 @@ namespace Audio.Utility
                 Type = "Play"
             };
 
+            if (_userOverrideIds == false)
+                projectAction.OverrideId = 0;
+
             // Sound
             var wwiseGameSoundId = wwiseActionInstance.GetChildId();
             var wwiseGameSounds = repository.GetHircObject(wwiseGameSoundId);
@@ -60,7 +70,7 @@ namespace Audio.Utility
             var projectSound = new GameSound()
             {
                 Id = soundName,
-                OverrideId = wwiseSoundInstance.Id,
+                OverrideId = wwiseSoundInstance.Id, // Sound ids must be overwritten for now 
                 Path = $"Audio\\WWise\\{wwiseSoundInstance.AkBankSourceData.akMediaInformation.SourceId}.wem",
             };
 
@@ -96,7 +106,6 @@ namespace Audio.Utility
                 var audioChildren = childHircs.Where(x => x is CAkSound_v136).ToList();
                 var mixerChildren = childHircs.Where(x => x is CAkActorMixer_v136).ToList();
 
-
                 var outputMixer = new ActorMixer
                 {
                     Id = mixerNames[mixer.Id],
@@ -105,6 +114,9 @@ namespace Audio.Utility
                     Sounds = audioChildren.Select(x => project.GameSounds.First(sound => sound.OverrideId == x.Id).Id).ToList(),
                     ActorMixerChildren = mixerChildren.Select(x => mixerNames[x.Id]).ToList(),
                 };
+
+                if (_userOverrideIds == false)
+                    outputMixer.OverrideId = 0;
 
                 project.ActorMixers.Add(outputMixer);
             }

@@ -14,6 +14,7 @@ namespace CommonControls.Common
         Texture_Editor,
         AnimationPack_Editor,
         AudioExplorer_Editor,
+        AudioCompiler_Editor,
         None,
     }
 }

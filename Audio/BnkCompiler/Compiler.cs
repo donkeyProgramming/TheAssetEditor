@@ -43,7 +43,10 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             outputList = new ErrorList();
 
             if (_pfs.HasEditablePackFile() == false)
+            {
+                outputList.Error("Compiler", "No Editable pack is set");
                 return false;
+            }
 
             var allProjectFiles = _pfs.FindAllWithExtention(".xml").Where(x => x.Name.Contains("bnk.xml"));
             outputList.Ok("Compiler", $"{allProjectFiles.Count()} projects found to compile.");
@@ -168,6 +171,11 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
                 var bytes = packfile.DataSource.ReadData();
                 var str = Encoding.UTF8.GetString(bytes);
                 var myDeserializedClass = JsonSerializer.Deserialize<AudioInputProject>(str);
+                if(myDeserializedClass == null) 
+                {
+                    errorList.Error("Unable to load project file", "Please validate the Json using an online validator.");
+                    return null;
+                }
                 return myDeserializedClass;
             }
             catch (Exception e)

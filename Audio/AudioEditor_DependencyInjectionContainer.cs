@@ -1,12 +1,13 @@
-﻿using Audio.AudioEditor;
-using Audio.BnkCompiler.ObjectGeneration;
+﻿using Audio.BnkCompiler.ObjectGeneration;
 using Audio.BnkCompiler.ObjectGeneration.Warhammer3;
 using Audio.FileFormats.WWise;
-using Audio.Presentation;
+using Audio.Presentation.AudioExplorer;
+using Audio.Presentation.Compiler;
 using Audio.Storage;
 using Audio.Utility;
 using CommonControls.Common;
 using CommonControls.Editors.AudioEditor.BnkCompiler;
+using CommonControls.Editors.TextEditor;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Audio
@@ -17,6 +18,9 @@ namespace Audio
         {
             serviceCollection.AddScoped<AudioEditorMainView>();
             serviceCollection.AddScoped<AudioEditorViewModel>();
+
+            serviceCollection.AddScoped<CompilerView>();
+            serviceCollection.AddScoped<CompilerViewModel>();
 
             serviceCollection.AddScoped<RepositoryProvider, CreateRepositoryFromAllPackFiles>();
             serviceCollection.AddScoped<IAudioRepository, AudioRepository>();
@@ -40,6 +44,7 @@ namespace Audio
         public static void RegisterTools(IToolFactory factory)
         {
             factory.RegisterTool<AudioEditorViewModel, AudioEditorMainView>();
+            factory.RegisterFileTool<CompilerViewModel, CompilerView>( new ExtentionToTool( EditorEnums.AudioCompiler_Editor,  new[] { ".audio_json"}));
         }
     }
 }

@@ -27,6 +27,7 @@ namespace AudioResearch
         {
             // CompileTest();
             //TableTest();
+            //OvnTest.GenerateProjectFromBnk(false);
             OvnTest.Compile();
             //GeneratOvnProject();
         }
