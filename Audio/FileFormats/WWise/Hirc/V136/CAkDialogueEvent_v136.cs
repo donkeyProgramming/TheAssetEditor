@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -26,13 +27,37 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             ArgumentList = new ArgumentList(chunk, uTreeDepth);
             uTreeDataSize = chunk.ReadUInt32();
             uMode = chunk.ReadByte();
-            AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth, Size, uTreeDataSize);
+            AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth, uTreeDataSize, Size);
             AkPropBundle0 = AkPropBundle.Create(chunk);
             AkPropBundle1 = AkPropBundleMinMax.Create(chunk);
         }
 
         public override void UpdateSize() => throw new NotImplementedException();
-        public override byte[] GetAsByteArray() => throw new NotImplementedException();
+        public override byte[] GetAsByteArray()
+        {
+            using var memStream = WriteHeader();
+            memStream.Write(ByteParsers.Byte.EncodeValue(uProbability, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(uTreeDepth, out _));
+            memStream.Write(ArgumentList.GetAsBytes());
+            memStream.Write(ByteParsers.UInt32.EncodeValue(uTreeDataSize, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue(uMode, out _));
+            memStream.Write(AkDecisionTree.GetAsBytes());
+            memStream.Write(AkPropBundle0.GetAsBytes());
+            memStream.Write(AkPropBundle1.GetAsBytes());
+            var byteArray = memStream.ToArray();
+
+            #if DEBUG //Reparse
+                Console.WriteLine("IN DEBUG");
+                var copyInstance = new CAkDialogueEvent_v136();
+                copyInstance.Parse(new ByteChunk(byteArray));
+                Debug.Assert(uProbability == copyInstance.uProbability);
+                Debug.Assert(uTreeDepth == copyInstance.uTreeDepth);
+                Debug.Assert(uTreeDataSize == copyInstance.uTreeDataSize);
+                Debug.Assert(uMode == copyInstance.uMode);
+            #endif
+
+            return byteArray;
+        }
     }
 
 
@@ -41,6 +66,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         [DebuggerDisplay("Node Key:[{Key}] Children:[{Children.Count}]")]
         public class Node
         {
+            public const uint SerializationByteSize = 12;
             public uint Key { get; set; }
             public uint AudioNodeId { get; set; }
             public ushort Children_uIdx { get; set; }
@@ -53,30 +79,42 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             public Node()
             {
             }
+            
+            public Node(ByteChunk chunk)
+            {
+                Key = chunk.ReadUInt32();
 
-            public void Parse(ByteChunk chunk, uint parentCount, uint size, uint currentTreeDepth, uint maxTreeDepth)
+                AudioNodeId = chunk.PeakUint32();
+                Children_uIdx = chunk.ReadUShort();
+                Children_uCount = chunk.ReadUShort();
+
+                uWeight = chunk.ReadUShort();
+                uProbability = chunk.ReadUShort();
+            }
+           
+            /* public void Parse(ByteChunk chunk, uint parentCount, uint size, uint currentTreeDepth, uint maxTreeDepth)
             {
                 for (uint i = 0; i < parentCount; i++)
                 {
                     var key = chunk.ReadUInt32();
-
+            
                     //is_id is a test for checking if the next bytes form an audioNodeId rather than uIdx+uCount
                     //and that's used to know if the node is a branch or leaf
                     //this is needed because there are some leafs that are not at "maxTreeDepth", it's very very few of them
                     //looks like its if either the peaked uIdx or uCount are larger than the number of bytes in the block, then it's an audioNodeId
                     //and that makes sense because it's like referring to an amount of chairs that is more than the number of atoms in the universe, nonsense
                     var peak = chunk.PeakUint32();
-
+            
                     var uidx = peak >> 0 & 0xFFFF;
                     var ucnt = peak >> 16 & 0xFFFF;
                     var count_max = size;
-
+            
                     var is_id = uidx > count_max || ucnt > count_max;
                     var is_max = currentTreeDepth == maxTreeDepth;
                     var node = new Node();
                     node.Key = key;
                     node.IsAudioNode = is_max || is_id;
-
+            
                     if (node.IsAudioNode)
                     {
                         node.AudioNodeId = chunk.ReadUInt32();
@@ -86,49 +124,79 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                         node.Children_uIdx = chunk.ReadUShort();
                         node.Children_uCount = chunk.ReadUShort();
                     }
-
+            
                     node.uWeight = chunk.ReadUShort();
                     node.uProbability = chunk.ReadUShort();
                     Children.Add(node);
                 }
-
+            
                 foreach (var child in Children)
                 {
                     if (child.Children_uCount > 0)
                         child.Parse(chunk, child.Children_uCount, size, currentTreeDepth + 1, maxTreeDepth);
                 }
+            }*/
+
+            public byte[] GetAsBytes()
+            {
+                using var memStream = new MemoryStream();
+                memStream.Write(ByteParsers.UInt32.EncodeValue(Key, out _));
+                if (IsAudioNode)
+                {
+                    memStream.Write(ByteParsers.UInt32.EncodeValue(AudioNodeId, out _));
+                } else
+                {
+                    memStream.Write(ByteParsers.UShort.EncodeValue(Children_uIdx, out _));
+                    memStream.Write(ByteParsers.UShort.EncodeValue(Children_uCount, out _));
+                }
+                memStream.Write(ByteParsers.UShort.EncodeValue(uWeight, out _));
+                memStream.Write(ByteParsers.UShort.EncodeValue(uProbability, out _));
+                var byteArray = memStream.ToArray();
+
+                #if DEBUG //Reparse
+                    var copyInstance = new Node(new ByteChunk(byteArray));
+                    Debug.Assert(Key == copyInstance.Key);
+                    if (IsAudioNode)
+                    {
+                        Debug.Assert(AudioNodeId == copyInstance.AudioNodeId);
+                    } else
+                    {
+                        Debug.Assert(Children_uIdx == copyInstance.Children_uIdx);
+                        Debug.Assert(Children_uCount == copyInstance.Children_uCount);
+                    }
+                    Debug.Assert(uWeight == copyInstance.uWeight);
+                    Debug.Assert(uProbability == copyInstance.uProbability);
+                #endif
+                
+                return byteArray;
             }
         }
 
         public Node Root { get; set; }
-        public Node RootNew { get; set; }
+        // public Node RootNew { get; set; }
         public List<Node> NewApporach { get; set; } = new List<Node>();
 
-        public AkDecisionTree(ByteChunk chunk, uint maxTreeDepth, uint size, uint uTreeDataSize)
+        // TODO: a hack for now. Not sure if it's a const.
+        // Maybe we want to calculate it dynamically via methods or keep track of it on edit/remove node methods
+        private uint _maxTreeDepth;
+
+        public AkDecisionTree(ByteChunk chunk, uint maxTreeDepth, uint uTreeDataSize, uint size)
         {
-            var indexRec = chunk.Index;
-            Root = new Node();
-            Root.Parse(chunk, 1, size, 0, maxTreeDepth); //first Node is at depth 0
+            // var indexRec = chunk.Index;
+            // Root = new Node();
+            // Root.Parse(chunk, 1, size, 0, maxTreeDepth); //first Node is at depth 0
+            // chunk.Index = indexRec;
 
-            chunk.Index = indexRec;
-
-            var numNodes = uTreeDataSize / 12;
+            _maxTreeDepth = maxTreeDepth;
+            var numNodes = uTreeDataSize / Node.SerializationByteSize;
             for (int i = 0; i < numNodes; i++)
             {
-                var node = new Node();
-                node.Key = chunk.ReadUInt32();
-
-                node.AudioNodeId = chunk.PeakUint32();
-                node.Children_uIdx = chunk.ReadUShort();
-                node.Children_uCount = chunk.ReadUShort();
-
-                node.uWeight = chunk.ReadUShort();
-                node.uProbability = chunk.ReadUShort();
-                NewApporach.Add(node);
+                NewApporach.Add(new Node(chunk));
             }
 
-            RootNew = NewApporach.First();
-            ConvertToTree(RootNew, maxTreeDepth, 0);
+            Node rootNew = NewApporach.First();
+            ConvertToTree(rootNew, maxTreeDepth, 0);
+            Root = rootNew;
         }
 
         void ConvertToTree(Node root, uint maxDepth, uint currentDepth)
@@ -180,6 +248,22 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             // Update index
             // Update count
         }
+
+        public byte[] GetAsBytes()
+        {
+            using var memStream = new MemoryStream();
+            foreach (var e in NewApporach)
+            {
+                memStream.Write(e.GetAsBytes());
+            }
+            var byteArray = memStream.ToArray();
+            
+            #if DEBUG //Reparse
+                var copyInstance = new AkDecisionTree(new ByteChunk(byteArray), _maxTreeDepth , (uint) NewApporach.Count * Node.SerializationByteSize,0);
+            #endif
+            
+            return byteArray;
+        }
     }
 
     public class ArgumentList
@@ -201,6 +285,33 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         {
             public uint ulGroupId { get; set; }
             public AkGroupType eGroupType { get; set; }
+        }
+        
+        public byte[] GetAsBytes()
+        {
+            using var memStream = new MemoryStream();
+            foreach (var e in Arguments)
+            {
+                memStream.Write(ByteParsers.UInt32.EncodeValue(e.ulGroupId, out _));
+            }
+            foreach (var e in Arguments)
+            {
+                memStream.Write(ByteParsers.Byte.EncodeValue((byte) e.eGroupType, out _));
+            }
+            
+            var byteArray = memStream.ToArray();
+
+            #if DEBUG //Reparse
+                var copyInstance = new ArgumentList(new ByteChunk(byteArray), (uint) Arguments.Count);
+                for (int i = 0; i < Arguments.Count; i++)
+                {
+                    Debug.Assert(Arguments[i].ulGroupId == copyInstance.Arguments[i].ulGroupId);
+                    Debug.Assert(Arguments[i].eGroupType == copyInstance.Arguments[i].eGroupType);
+                }
+            #endif
+
+
+            return byteArray;
         }
     }
 
