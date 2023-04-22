@@ -42,8 +42,8 @@ namespace Audio.Utility
                 return;
             }
 
-            var numArgs = dialogEvent.ArgumentList.Arguments.Count() - 1;
-            var root = dialogEvent.AkDecisionTree.Root.Children.First();
+            var numArgs = dialogEvent.ArgumentList.Arguments.Count();// - 1
+            var root = dialogEvent.AkDecisionTree.Root;
             if (numArgs == 0)
                 throw new Exception("Error Converting to CSV - No arguments in DialogEvent");
 
@@ -63,7 +63,7 @@ namespace Audio.Utility
                 ss.AppendLine(row);
 
             var wholeFile = ss.ToString();
-            File.WriteAllText("D:\\Research\\Audio\\Temp\\table.csv", wholeFile);
+            File.WriteAllText("F:\\DialogueEvent.csv", wholeFile);
         }
 
         static void GenerateRow(AkDecisionTree.Node currentNode, int currentArgrument, int numArguments, Stack<string> pushList, List<string> outputList, IAudioRepository audioRepository)
@@ -71,7 +71,7 @@ namespace Audio.Utility
             var currentNodeContent = audioRepository.GetNameFromHash(currentNode.Key);
             pushList.Push(currentNodeContent);
 
-            bool isDone = numArguments == currentArgrument;
+            bool isDone = numArguments == currentArgrument + 1;
             if (isDone)
             {
                 var currentLine = pushList.ToArray().Reverse().ToList();
@@ -85,6 +85,56 @@ namespace Audio.Utility
             }
 
             pushList.Pop();
+        }
+        
+        public void CustomExportDialogEventsToFile(CAkDialogueEvent_v136 dialogEvent, bool openFile = false)
+        {
+            if (dialogEvent == null)
+            {
+                _logger.Here().Warning("Error Converting to CSV - DialogEvent not correct version");
+                return;
+            }
+
+            var numArgs = dialogEvent.ArgumentList.Arguments.Count();// - 1
+            var root = dialogEvent.AkDecisionTree.Root;
+            if (numArgs == 0)
+                throw new Exception("Error Converting to CSV - No arguments in DialogEvent");
+
+            var gkeys = dialogEvent.ArgumentList.Arguments.Select(x => _audioRepository.GetNameFromHash(x.ulGroupId)).ToList();
+            var table = new List<string>();
+            GenerateCustomRow(root, -1, 0, gkeys, table, _audioRepository);
+            var prettyKeys = "Key|uWeight|uProbability|IsAudioNode|audioNodeName|Children_uCount|Children_uIdx|parentId";
+
+            var ss = new StringBuilder();
+            ss.AppendLine(prettyKeys);
+            foreach (var row in table)
+                ss.AppendLine(row);
+
+            var wholeFile = ss.ToString();
+            File.WriteAllText("F:\\DialogueEvent.csv", wholeFile);
+        }
+        static void GenerateCustomRow(AkDecisionTree.Node cNode, int pId, int depth, List<string> gkeys, List<string> outputList, IAudioRepository audioRepository)
+        {
+            var currentNodeContent = audioRepository.GetNameFromHash(cNode.Key);
+            if (currentNodeContent == "0")
+            {
+                currentNodeContent = "Any";
+            }
+            var audioNodeName = $"{cNode.AudioNodeId}";
+            string keyName;
+            if (cNode.IsAudioNode)
+            {
+                audioNodeName = $"{audioRepository.GetNameFromHash(cNode.AudioNodeId)}({cNode.AudioNodeId})";
+                keyName = $"{currentNodeContent}({cNode.Key})";
+            }
+            else
+            {
+                keyName = $"{gkeys[depth]} == {currentNodeContent}({cNode.Key})";
+            }
+            outputList.Add($"{keyName}|{cNode.uWeight}|{cNode.uProbability}|{cNode.IsAudioNode}|{audioNodeName}|{cNode.Children_uCount}|{cNode.Children_uIdx}|{pId}");
+            var cId = outputList.Count - 1;
+            foreach (var child in cNode.Children)
+                GenerateCustomRow(child, cId, depth+1, gkeys, outputList, audioRepository);
         }
 
 
