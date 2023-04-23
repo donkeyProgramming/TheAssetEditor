@@ -13,6 +13,7 @@ using MoreLinq;
 using MoreLinq.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -28,11 +29,12 @@ namespace AudioResearch
             var r = WWiseHash.Compute("Play_HEF_Teclis_Dip_Halfling_Greet_Neg_01");
 
             // CompileTest();
-            //TableTest();"
+            //TableTest();
+            //OvnTest.GenerateProjectFromBnk(false);
             var currentProjectName = $"Data\\OvnExample\\Project.json";
             OvnTest.GenerateProjectFromBnk(currentProjectName, true, true, true);
             OvnTest.Compile(currentProjectName);
-            //GeneratOvnProject();
+            TestDialogEventSerialization();
         }
 
 
@@ -116,11 +118,14 @@ namespace AudioResearch
             var dialogEvents = audioRepo.GetAllOfType<CAkDialogueEvent_v136>();
             foreach(var dialogEvent in dialogEvents) 
             {
-
+                dialogEvent.AkDecisionTree.VerifyState();
                 var bytes = dialogEvent.GetAsByteArray();
                 var chuck = new Filetypes.ByteParsing.ByteChunk(bytes);
                 var reParsedObject = new CAkDialogueEvent_v136();
                 reParsedObject.Parse(chuck);
+                // reParsedObject.AkDecisionTree.VerifyState();
+                // Debug.Assert(dialogEvent.AkDecisionTree.Flatten());
+                Console.WriteLine($"Main.Success: {dialogEvent.Id}");
             }
         }
     }
