@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using MoreLinq;
 
@@ -30,7 +31,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             uMode = chunk.ReadByte();
             #if DEBUG
                 var treebytes = chunk.PeakChunk((int) uTreeDataSize);
-                AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth, uTreeDataSize, Size);
+                AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth, uTreeDataSize);
                 var x = AkDecisionTree.GetAsBytes();
                 if (!treebytes.Buffer.SequenceEqual(x))
                 {
@@ -39,7 +40,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 }
                 Debug.Assert(treebytes.Buffer.SequenceEqual(x));
             #else
-                AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth, uTreeDataSize, Size);
+                AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth, uTreeDataSize);
             #endif
             AkPropBundle0 = AkPropBundle.Create(chunk);
             AkPropBundle1 = AkPropBundleMinMax.Create(chunk);
@@ -75,61 +76,52 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
     public class AkDecisionTree
     {
-        [DebuggerDisplay("Node Key:[{Key}] Children:[{Children.Count}]")]
-        public class Node
+
+        public abstract class BaseNode
         {
             public uint Key { get; set; }
+            public bool IsAudioNode { get; set; }
             public uint AudioNodeId { get; set; }
-            public ushort Children_uIdx { get; set; }
-            public ushort Children_uCount { get; set; }
             public ushort uWeight { get; set; }
             public ushort uProbability { get; set; }
-            public bool IsAudioNode { get; set; }
-            public List<Node> Children { get; set; } = new List<Node>();
+        }
+        public class SerializedNode: BaseNode
+        {
+            public ushort Children_uIdx { get; set; }
+            public ushort Children_uCount { get; set; }
+            
             private int _SerializationByteSize() => Marshal.SizeOf(Key) + 
                                                     Marshal.SizeOf(AudioNodeId) + // == Marshal.SizeOf(Children_uIdx) + Marshal.SizeOf(Children_uCount)
                                                     Marshal.SizeOf(uWeight) + 
                                                     Marshal.SizeOf(uProbability);
             
-            public static readonly int SerializationByteSize = new Node()._SerializationByteSize();
-            
-            public Node()
+            public static readonly int SerializationByteSize = new SerializedNode()._SerializationByteSize();
+
+            private SerializedNode()
             {
             }
+
+            public SerializedNode(Node node)
+            {
+                Key = node.Key;
+                IsAudioNode = node.IsAudioNode;
+                AudioNodeId = node.AudioNodeId;
+                uWeight = node.uWeight;
+                uProbability = node.uProbability;
+                Children_uCount = (ushort) node.Children.Count;
+                Children_uIdx = 0;
+            }
             
-            //TODO: How to make this constructor available only for outer class?
-            public Node(ByteChunk chunk)
+            public SerializedNode(ByteChunk chunk)
             {
                 Key = chunk.ReadUInt32();
-
                 AudioNodeId = chunk.PeakUint32();
                 Children_uIdx = chunk.ReadUShort();
                 Children_uCount = chunk.ReadUShort();
-
                 uWeight = chunk.ReadUShort();
                 uProbability = chunk.ReadUShort();
             }
-
-            public void VerifyState()
-            {
-                if (IsAudioNode){
-                    if (Children_uIdx > 0){
-                        throw new ArgumentException($"AudioNode has invalid Children_uIdx: {Children_uIdx}. Should be 0");
-                    }
-                    if (Children_uCount > 0){
-                        throw new ArgumentException($"AudioNode has invalid Children_uCount: {Children_uCount}. Should be 0");
-                    }
-                }
-                else{
-                    if (Children_uIdx == 0){
-                        throw new ArgumentException($"LogicNode has invalid Children_uIdx: {Children_uIdx}. Should be greater 0");
-                    }
-                    if (Children_uCount == 0){
-                        throw new ArgumentException($"LogicNode has invalid Children_uCount: {Children_uCount}. Should be greater 0");
-                    }
-                }
-            }
-
+            
             public byte[] GetAsBytes()
             {
                 using var memStream = new MemoryStream();
@@ -147,7 +139,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 var byteArray = memStream.ToArray();
 
                 #if DEBUG //Reparse
-                    var copyInstance = new Node(new ByteChunk(byteArray));
+                    var copyInstance = new SerializedNode(new ByteChunk(byteArray));
                     Debug.Assert(Key == copyInstance.Key);
                     if (IsAudioNode)
                     {
@@ -163,69 +155,91 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 
                 return byteArray;
             }
-        }
 
-        public Node Root { get; set; }
+            public void VerifyState()
+            {
+                if (IsAudioNode){
+                    if (Children_uIdx > 0){
+                        throw new ArgumentException($"AudioNode has invalid Children_uIdx: {Children_uIdx}. Should be 0");
+                    }
+                    if (Children_uCount > 0){
+                        throw new ArgumentException($"AudioNode has invalid Children_uCount: {Children_uCount}. Should be 0");
+                    }
+                }
+                else{
+                    if (Children_uCount == 0){
+                        throw new ArgumentException($"LogicNode has invalid Children_uCount: {Children_uCount}. Should be greater 0");
+                    }
+                }
+            }
+        }
+        
+        [DebuggerDisplay("Node Key:[{Key}] Children:[{Children.Count}]")]
+        public class Node: BaseNode
+        {
+            public List<Node> Children { get; set; } = new List<Node>();
+
+            public Node(SerializedNode sNode)
+            {
+                Key = sNode.Key;
+                IsAudioNode = sNode.IsAudioNode;
+                AudioNodeId = sNode.AudioNodeId;
+                uWeight = sNode.uWeight;
+                uProbability = sNode.uProbability;
+            }
+
+        }
 
         // TODO: a hack for now. Not sure if it's a const.
         // Maybe we want to calculate it dynamically via methods or keep track of it on edit/remove node methods
-        private uint _maxTreeDepth;
-
-        public AkDecisionTree(ByteChunk chunk, uint maxTreeDepth, uint uTreeDataSize, uint size)
+        private readonly uint _maxTreeDepth;
+        public Node Root { get; set; }
+        
+        public AkDecisionTree(ByteChunk chunk, uint maxTreeDepth, uint uTreeDataSize)
         {
             _maxTreeDepth = maxTreeDepth;
-            var numNodes = uTreeDataSize / Node.SerializationByteSize;
-            List<Node> flattenTree = new List<Node>((int) numNodes);
-            Enumerable.Range(0, (int) numNodes).ForEach(_ => flattenTree.Add(new Node(chunk)));
-
-            Node rootNew = flattenTree.First();
-            ConvertToTree(rootNew, maxTreeDepth, 0, flattenTree);
-            Root = rootNew;
-        }
-
-        private static void ConvertToTree(Node node, uint maxDepth, uint currentDepth, IReadOnlyList<Node> flattenTree)
-        {
-            var childCount = node.Children_uCount;
-            var firstChildIndex = node.Children_uIdx;
-
-            for (int i = 0; i < childCount; i++)
+            var numNodes = uTreeDataSize / SerializedNode.SerializationByteSize;
+            var flattenTree = new List<SerializedNode>();
+            Enumerable.Range(0, (int) numNodes).ForEach(_ => flattenTree.Add(new SerializedNode(chunk)));
+            
+            Node ConvertNode(ushort parentsFirstChildIndex, ushort childIndex, uint currentDepth)
             {
-                var isAtMaxDepth = maxDepth == currentDepth;
-                var isOutsideRange = firstChildIndex + i >= flattenTree.Count;  // Can be replaced with key == 0???!?!?!?
-                /*if (isOutsideRange && isAtMaxDepth == false)
-                {
-                    if (node.Key != 0)
-                    {
-
-                    }
+                var sNode = flattenTree[parentsFirstChildIndex + childIndex];
+                var isAtMaxDepth = currentDepth == maxTreeDepth;
+                var isOutsideRange = sNode.Children_uIdx >= flattenTree.Count;
+                if (isAtMaxDepth || isOutsideRange){
+                    sNode.IsAudioNode = true;
+                    sNode.Children_uCount = 0;
+                    sNode.Children_uIdx = 0;
+                    return new Node(sNode);
                 }
-                else
-                {
-                    if (node.Key == 0)
-                    {
-                    }
-                }*/
-                if (isAtMaxDepth || isOutsideRange)
-                {
-                    node.IsAudioNode = true;
-                    node.Children_uCount = 0;
-                    node.Children_uIdx = 0;
-                }
-                else
-                {
-                    node.AudioNodeId = 0;
-                    var child = flattenTree[firstChildIndex + i];
-                    node.Children.Add(child);
-                    ConvertToTree(child, maxDepth, currentDepth + 1, flattenTree);
-                }
+                sNode.AudioNodeId = 0;
+                var node = new Node(sNode);
+                Enumerable.Range(0, sNode.Children_uCount).ForEach(i => node.Children.Add(
+                    ConvertNode(sNode.Children_uIdx, (ushort) i,currentDepth + 1)));
+                return node;
             }
+
+            Root = ConvertNode(0, 0, 0);
+            #if DEBUG
+                flattenTree.ForEach(e => e.VerifyState());
+            #endif
         }
 
         public void VerifyState()
         {
             void Verify(Node node)
             {
-                node.VerifyState();
+                if (node.IsAudioNode){ 
+                    Debug.Assert(node.Children.Count == 0);// is leaf
+                }
+                else{
+                    //LogicNode
+                    Debug.Assert(node.Children.Count > 0); // is not leaf
+                    if (!node.Children.First().IsAudioNode){
+                        //Debug.Assert(node.Children.First().Key == 0); // Not TRUE: the first children of logicalNodes has key == 0
+                    }
+                }
             }
             BfsTreeTraversal(Verify);
         }
@@ -290,19 +304,31 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         {
             Node[][] array;
         }
-        
-        public void UpdateSortingAndIndex()
-        {
-            // Sort
-            // Update index
-            // Update count
-        }
 
-        public List<Node> Flatten()
+        public List<SerializedNode> Flatten()
         {
-            var flattenTree = new List<Node>();
-            void FlattenInternal(Node node) => flattenTree.Add(node);
+            var flattenTree = new List<SerializedNode>();
+            var idxHashMap = new Dictionary<Node, int>();
+
+            void FlattenInternal(Node node)
+            {
+                flattenTree.Add(new SerializedNode(node));
+                var idx = flattenTree.Count - 1;
+                idxHashMap.Add(node, idx);
+            }
+            
+            void UpdateIndex(Node node)
+            {
+                if (node.Children.Count == 0){
+                    return;
+                }
+                var idxNode = idxHashMap[node];
+                var sNode = flattenTree[idxNode];
+                sNode.Children_uIdx = (ushort) idxHashMap[node.Children.First()];
+            }
+
             MixedTreeTraversal(FlattenInternal);
+            BfsTreeTraversal(UpdateIndex);
             return flattenTree;
         }
 
@@ -315,7 +341,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             var byteArray = memStream.ToArray();
             #if DEBUG //Reparse
                 var copyInstance = new AkDecisionTree(new ByteChunk(byteArray), _maxTreeDepth , 
-                    (uint) (flattenTree.Count * Node.SerializationByteSize),0);
+                    (uint) (flattenTree.Count * SerializedNode.SerializationByteSize));
             #endif
             return byteArray;
         }

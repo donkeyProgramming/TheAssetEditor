@@ -103,7 +103,7 @@ namespace Audio.Utility
             var gkeys = dialogEvent.ArgumentList.Arguments.Select(x => _audioRepository.GetNameFromHash(x.ulGroupId)).ToList();
             var table = new List<string>();
             GenerateCustomRow(root, -1, 0, gkeys, table, _audioRepository);
-            var prettyKeys = "Key|uWeight|uProbability|IsAudioNode|audioNodeName|Children_uCount|Children_uIdx|parentId";
+            var prettyKeys = "Key|uWeight|uProbability|IsAudioNode|audioNodeName|parentId";
 
             var ss = new StringBuilder();
             ss.AppendLine(prettyKeys);
@@ -131,7 +131,7 @@ namespace Audio.Utility
             {
                 keyName = $"{gkeys[depth]} == {currentNodeContent}({cNode.Key})";
             }
-            outputList.Add($"{keyName}|{cNode.uWeight}|{cNode.uProbability}|{cNode.IsAudioNode}|{audioNodeName}|{cNode.Children_uCount}|{cNode.Children_uIdx}|{pId}");
+            outputList.Add($"{keyName}|{cNode.uWeight}|{cNode.uProbability}|{cNode.IsAudioNode}|{audioNodeName}|{pId}");
             var cId = outputList.Count - 1;
             foreach (var child in cNode.Children)
                 GenerateCustomRow(child, cId, depth+1, gkeys, outputList, audioRepository);

@@ -13,6 +13,7 @@ using MoreLinq;
 using MoreLinq.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -28,8 +29,9 @@ namespace AudioResearch
             // CompileTest();
             //TableTest();
             //OvnTest.GenerateProjectFromBnk(false);
-            OvnTest.Compile();
+            // OvnTest.Compile();
             //GeneratOvnProject();
+            TestDialogEventSerialization();
         }
 
       
@@ -113,11 +115,14 @@ namespace AudioResearch
             var dialogEvents = audioRepo.GetAllOfType<CAkDialogueEvent_v136>();
             foreach(var dialogEvent in dialogEvents) 
             {
-
+                dialogEvent.AkDecisionTree.VerifyState();
                 var bytes = dialogEvent.GetAsByteArray();
                 var chuck = new Filetypes.ByteParsing.ByteChunk(bytes);
                 var reParsedObject = new CAkDialogueEvent_v136();
                 reParsedObject.Parse(chuck);
+                // reParsedObject.AkDecisionTree.VerifyState();
+                // Debug.Assert(dialogEvent.AkDecisionTree.Flatten());
+                Console.WriteLine($"Main.Success: {dialogEvent.Id}");
             }
         }
     }
