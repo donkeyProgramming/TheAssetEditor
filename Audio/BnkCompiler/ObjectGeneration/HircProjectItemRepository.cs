@@ -24,10 +24,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
     
         public uint GetHircItemId(string reference)
         {
-            var item = _allProjectItems.First(x => x.Id == reference);
-            if (item.OverrideId != 0)
-                return item.OverrideId;
-            return ConvertStringToWWiseId(item.Id);
+            return _allProjectItems.First(x => x.Id == reference).SerializationId;
         }
 
         public IAudioProjectHircItem GetActionMixerForSound(string soundId)

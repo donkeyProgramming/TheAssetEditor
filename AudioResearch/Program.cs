@@ -25,14 +25,17 @@ namespace AudioResearch
     {
         static void Main(string[] args)
         {
+            var r = WWiseHash.Compute("Play_HEF_Teclis_Dip_Halfling_Greet_Neg_01");
+
             // CompileTest();
-            //TableTest();
-            //OvnTest.GenerateProjectFromBnk(false);
-            OvnTest.Compile();
+            //TableTest();"
+            var currentProjectName = $"Data\\OvnExample\\Project.json";
+            OvnTest.GenerateProjectFromBnk(currentProjectName, true, true, true);
+            OvnTest.Compile(currentProjectName);
             //GeneratOvnProject();
         }
 
-      
+
 
 
 

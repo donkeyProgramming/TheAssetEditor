@@ -20,5 +20,23 @@ namespace Audio.Utility
 
             return hashValue;
         }
+
+
+
+
+
+        public static uint Compute30(string name)
+        {
+            //v
+            //uint thirtyBitMask = 0x3FFFFFFF; // 30-bit mask
+            //uint thirtyBitHash = fnvHash & thirtyBitMask;
+
+            var hash = Compute(name);
+
+            var numBits = 30;
+            var mask = ((1 << numBits)-1);
+            var final = ((hash >> numBits)) ^ (hash & mask);
+            return (uint)final;
+        }
     }
 }

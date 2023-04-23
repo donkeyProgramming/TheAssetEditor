@@ -1,14 +1,18 @@
-﻿// Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
-using Audio.BnkCompiler;
+﻿using Audio.BnkCompiler;
+using Audio.Utility;
+using System;
 using System.Collections.Generic;
-using System.Security.Cryptography.Xml;
+using System.Text.Json.Serialization;
 
 namespace CommonControls.Editors.AudioEditor.BnkCompiler
 {
     public abstract class IAudioProjectHircItem
     {
         public string Id { get; set; }
-        public uint OverrideId { get; set; }
+        public uint OverrideId { get; set; } = 0;
+
+        [JsonIgnore]
+        public uint SerializationId { get; set; }
     }
 
     public class Action : IAudioProjectHircItem
@@ -55,6 +59,22 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         public List<Action> Actions { get; set; } = new List<Action>();
         public List<GameSound> GameSounds { get; set; } = new List<GameSound>();
         public List<ActorMixer> ActorMixers { get; set; } = new List<ActorMixer>();
+
+        public void ComputeAllWriteIds(bool allowOverrideIdForActions, bool allowOverrideIdForMixers, bool allowOverrideIdForSounds)
+        {
+            Events.ForEach(x => Process(x, false, WWiseHash.Compute));
+            Actions.ForEach(x => Process(x, allowOverrideIdForActions, WWiseHash.Compute));
+            ActorMixers.ForEach(x => Process(x, allowOverrideIdForMixers, WWiseHash.Compute30));
+            GameSounds.ForEach(x => Process(x, allowOverrideIdForSounds, WWiseHash.Compute30));
+        }
+
+        void Process(IAudioProjectHircItem item, bool allowUseOfOverrideID, Func<string, uint> hashFunc)
+        {
+            if (item.OverrideId != 0 && allowUseOfOverrideID)
+                item.SerializationId = item.OverrideId;
+            else
+                item.SerializationId = hashFunc(item.Id);
+        }
     }
 
     /*

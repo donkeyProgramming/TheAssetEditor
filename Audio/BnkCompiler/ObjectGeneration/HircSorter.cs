@@ -38,12 +38,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
             return sortedProjectItems;
         }
 
-        uint GetSortingId(IAudioProjectHircItem item) 
-        {
-            if (item.OverrideId != 0)
-                return item.OverrideId;
-            return WWiseHash.Compute(item.Id);
-        }
+        uint GetSortingId(IAudioProjectHircItem item) => item.SerializationId;
 
         List<ActorMixer> SortActorMixerList(AudioInputProject project)
         {

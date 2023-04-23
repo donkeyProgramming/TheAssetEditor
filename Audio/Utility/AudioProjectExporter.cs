@@ -1,6 +1,7 @@
 ﻿using Audio.AudioEditor;
 using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
+using CommonControls.Common;
 using CommonControls.Editors.AudioEditor.BnkCompiler;
 using CommunityToolkit.Diagnostics;
 using System.Collections.Generic;
@@ -14,11 +15,15 @@ namespace Audio.Utility
 {
     public class AudioProjectExporter
     {
-        private readonly bool _userOverrideIds;
+        private readonly bool _useSoundIdFromBnk;
+        private readonly bool _useMixerIdFromBnk;
+        private readonly bool _useActionIdFromBnk;
 
-        public AudioProjectExporter(bool userOverrideIds = true)
+        public AudioProjectExporter(bool useSoundIdFromBnk = true, bool useMixerIdFromBnk = true, bool useActionIdFromBnk = true)
         {
-            _userOverrideIds = userOverrideIds;
+            _useSoundIdFromBnk = useSoundIdFromBnk;
+            _useMixerIdFromBnk = useMixerIdFromBnk;
+            _useActionIdFromBnk = useActionIdFromBnk;
         }
 
         void AddEventToProject(CAkEvent_v136 wwiseEvent, IAudioRepository repository, AudioInputProject project)
@@ -35,6 +40,7 @@ namespace Audio.Utility
             var projectEvent = new Event()
             {
                 Id = eventName,
+                OverrideId = wwiseEvent.Id,
                 Actions = new List<string> { actionName },
                 AudioBus = "Master"
             };
@@ -51,13 +57,10 @@ namespace Audio.Utility
             var projectAction = new Action()
             {
                 Id = actionName,
-                ChildId = soundName,
                 OverrideId = wwiseActionInstance.Id,
+                ChildId = soundName,
                 Type = "Play"
             };
-
-            if (_userOverrideIds == false)
-                projectAction.OverrideId = 0;
 
             // Sound
             var wwiseGameSoundId = wwiseActionInstance.GetChildId();
@@ -70,7 +73,7 @@ namespace Audio.Utility
             var projectSound = new GameSound()
             {
                 Id = soundName,
-                OverrideId = wwiseSoundInstance.Id, // Sound ids must be overwritten for now 
+                OverrideId = wwiseSoundInstance.Id,
                 Path = $"Audio\\WWise\\{wwiseSoundInstance.AkBankSourceData.akMediaInformation.SourceId}.wem",
             };
 
@@ -109,14 +112,11 @@ namespace Audio.Utility
                 var outputMixer = new ActorMixer
                 {
                     Id = mixerNames[mixer.Id],
-                    OverrideId = mixer.Id,
                     AudioBus = "Master",
-                    Sounds = audioChildren.Select(x => project.GameSounds.First(sound => sound.OverrideId == x.Id).Id).ToList(),
+                    OverrideId = mixer.Id,
+                    Sounds = audioChildren.Select(x => project.GameSounds.First(sound => sound.OverrideId == x.Id).Id).ToList(), // we have to match on this
                     ActorMixerChildren = mixerChildren.Select(x => mixerNames[x.Id]).ToList(),
                 };
-
-                if (_userOverrideIds == false)
-                    outputMixer.OverrideId = 0;
 
                 project.ActorMixers.Add(outputMixer);
             }
@@ -141,11 +141,12 @@ namespace Audio.Utility
             return nameDictionary;
         }
 
-        public void CreateFromRepository(IAudioRepository repository, string filename = "audioProject.json")
+        public void CreateFromRepository(IAudioRepository repository, string path = "audioProject.json")
         { 
             var project = CreateFromRepository(repository);
             var json = JsonSerializer.Serialize(project, new JsonSerializerOptions() { WriteIndented = true, IgnoreNullValues = true});
-            File.WriteAllText($"D:\\Research\\Audio\\{filename}", json);
+            DirectoryHelper.EnsureCreated(path);
+            File.WriteAllText(path, json);
         }
     }
 }

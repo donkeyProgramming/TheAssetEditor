@@ -20,7 +20,7 @@ namespace AudioResearch
 
     internal class OvnTest
     {
-        public static void Compile()
+        public static void Compile(string systemPath)
         {
             using var application = new SimpleApplication();
 
@@ -30,7 +30,7 @@ namespace AudioResearch
             pfs.CreateNewPackFileContainer("SoundOutput", PackFileCAType.MOD, true);
             PackFileUtil.LoadFilesFromDisk(pfs, new[]
             {
-                new PackFileUtil.FileRef( packFilePath: @"audioprojects", systemPath:@"Data\OvnExample\Project.json")
+                new PackFileUtil.FileRef( packFilePath: @"audioprojects", systemPath: systemPath)
             });
 
             // Load all wems
@@ -44,7 +44,7 @@ namespace AudioResearch
             var compileResult = compiler.CompileProject(@"audioprojects\Project.json", out var errorList);
         }
 
-        public static void GenerateProjectFromBnk(bool userOverrideIds)
+        public static void GenerateProjectFromBnk(string path, bool useSoundIdFromBnk = true, bool useMixerIdFromBnk = true, bool useActionIdFromBnk = true)
         {
             using var application = new SimpleApplication();
 
@@ -63,8 +63,8 @@ namespace AudioResearch
             var hircs = audioRepo.HircObjects.Select(x => x.Value.First());
             var ids = hircs.Select(x => $"{x.Id}-{x.Type}").ToList();
 
-            var projectExporter = new AudioProjectExporter(userOverrideIds);
-            projectExporter.CreateFromRepository(audioRepo, "OvnProject.json");
+            var projectExporter = new AudioProjectExporter(useSoundIdFromBnk, useMixerIdFromBnk, useActionIdFromBnk);
+            projectExporter.CreateFromRepository(audioRepo, path);
         }
     }
 }

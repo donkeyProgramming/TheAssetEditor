@@ -20,16 +20,14 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 {
     public class Compiler
     {
-        public class CompileResult
-        {
-            public PackFile OutputBnkFile { get; set; }
-            public PackFile OutputDatFile { get; set; }
-            public PackFile NameList { get; set; }
-        }
 
         private readonly PackFileService _pfs;
         private readonly HichBuilder _hircBuilder;
         private readonly BnkHeaderBuilder _headerBuilder;
+
+        public bool AllowOverrideIdForActions { get; set; } = true;
+        public bool AllowOverrideIdForMixers { get; set; } = true;
+        public bool AllowOverrideIdForSounds { get; set; } = true;
 
         public Compiler(PackFileService pfs, HichBuilder hircBuilder, BnkHeaderBuilder headerBuilder)
         {
@@ -87,6 +85,8 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             if (ValidateProject(audioProject, out errorList) == false)
                 return null;
 
+            audioProject.ComputeAllWriteIds(AllowOverrideIdForActions, AllowOverrideIdForMixers, AllowOverrideIdForSounds);
+
             // Build the wwise object graph 
             var header = _headerBuilder.Generate(audioProject);
             var hircChunk = _hircBuilder.Generate(audioProject);
@@ -98,6 +98,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
                 NameList = null
             };
 
+            // Move somewhere else 
             if (audioProject.ProjectSettings.ExportResultToFile)
             {
                 var bnkPath = Path.Combine(audioProject.ProjectSettings.OutputFilePath, $"{audioProject.ProjectSettings.BnkName}.bnk");
@@ -184,5 +185,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
                 return null;
             }
         }
+
+
     }
 }
