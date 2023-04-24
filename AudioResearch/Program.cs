@@ -1,4 +1,17 @@
-
+using Action = System.Action;
+using Audio.FileFormats.WWise.Hirc.V136;
+using Audio.Storage;
+using Audio.Utility;
+using CommonControls.Common;
+using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.Services;
+using MoreLinq;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using static AudioResearch.Program.LogicalChaining;
 
 namespace AudioResearch
 {
