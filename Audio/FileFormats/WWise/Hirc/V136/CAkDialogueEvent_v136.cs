@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using MoreLinq;
 
@@ -80,7 +79,10 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public abstract class BaseNode
         {
             public uint Key { get; set; }
-            public bool IsAudioNode { get; set; }
+            
+            // Some Nodes at the _maxDepth have AudioNodeId == 0 and no children so we cannot use AudioNodeId = 0 to check
+            // so we should check for children instead - works for now
+            public bool IsAudioNode => throw new NotImplementedException(); 
             public uint AudioNodeId { get; set; }
             public ushort uWeight { get; set; }
             public ushort uProbability { get; set; }
@@ -89,6 +91,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         {
             public ushort Children_uIdx { get; set; }
             public ushort Children_uCount { get; set; }
+            public bool IsAudioNode => Children_uCount == 0;
             
             private int _SerializationByteSize() => Marshal.SizeOf(Key) + 
                                                     Marshal.SizeOf(AudioNodeId) + // == Marshal.SizeOf(Children_uIdx) + Marshal.SizeOf(Children_uCount)
@@ -104,7 +107,6 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             public SerializedNode(Node node)
             {
                 Key = node.Key;
-                IsAudioNode = node.IsAudioNode;
                 AudioNodeId = node.AudioNodeId;
                 uWeight = node.uWeight;
                 uProbability = node.uProbability;
@@ -177,22 +179,49 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         [DebuggerDisplay("Node Key:[{Key}] Children:[{Children.Count}]")]
         public class Node: BaseNode
         {
+            public bool IsAudioNode => Children.Count == 0;
             public List<Node> Children { get; set; } = new List<Node>();
 
+            private Node(uint key, uint audioNodeId, ushort uweight, ushort uprobability)
+            {
+                if (uProbability > 100){
+                    throw new ArgumentException($"uProbability ({uProbability}) is greater than 100");
+                }
+                Key = key;
+                AudioNodeId = audioNodeId;
+                uWeight = uweight;
+                uProbability = uprobability;
+            }
+            
             public Node(SerializedNode sNode)
             {
                 Key = sNode.Key;
-                IsAudioNode = sNode.IsAudioNode;
                 AudioNodeId = sNode.AudioNodeId;
                 uWeight = sNode.uWeight;
                 uProbability = sNode.uProbability;
             }
+            
+            public void VerifyState()
+            {
+                if (IsAudioNode){
+                    Debug.Assert(Children.Count == 0);
+                }
+                else{
+                    Debug.Assert(AudioNodeId == 0);
+                    Debug.Assert(Children.Count > 0);
+                }
+            }
 
+            public static Node CreateDecisionNode(uint key, ushort uWeight, ushort uProbability) => 
+                new Node(key,  0, uWeight, uProbability);
+            
+            public static Node CreateAudioNode(uint key, ushort uWeight, ushort uProbability, uint audioNodeId) =>
+                new Node(key, audioNodeId, uWeight, uProbability);
         }
 
-        // TODO: a hack for now. Not sure if it's a const.
-        // Maybe we want to calculate it dynamically via methods or keep track of it on edit/remove node methods
-        private readonly uint _maxTreeDepth;
+        // It's immutable. _maxTreeDepth equals to the actual depth of three. AudioNode should be at this level.
+        //But it's not always true. CA uses some kind of 'optimization' and AudioNode might be on the same level as DecisionNodes...
+        public readonly uint _maxTreeDepth;
         public Node Root { get; set; }
         
         public AkDecisionTree(ByteChunk chunk, uint maxTreeDepth, uint uTreeDataSize)
@@ -208,7 +237,6 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 var isAtMaxDepth = currentDepth == maxTreeDepth;
                 var isOutsideRange = sNode.Children_uIdx >= flattenTree.Count;
                 if (isAtMaxDepth || isOutsideRange){
-                    sNode.IsAudioNode = true;
                     sNode.Children_uCount = 0;
                     sNode.Children_uIdx = 0;
                     return new Node(sNode);
@@ -226,57 +254,158 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             #endif
         }
 
+
+        public Node AddAudioNode(
+            List<(uint key, ushort weight, ushort probability)> decisionNodes, 
+            (uint key, ushort audioId, ushort weight, ushort probability) audioNode)
+        {
+            if (decisionNodes.Count + 1 + 1 > _maxTreeDepth){ // 1 for the root and 1 for a leaf
+                throw new ArgumentException($"DecisionPathChain is too Long");
+            }
+
+            var cNode = Root;
+            decisionNodes.ForEach(e =>
+            {
+                var selected = cNode.Children.Where(x => x.Key == e.key);
+                
+                if (selected.Count() > 1){
+                    throw new ArgumentException($"Many nodes were selected");
+                }
+
+                if (!selected.Any()){
+                    cNode = Node.CreateDecisionNode(e.key, e.weight, e.probability);
+                    cNode.Children.Add(cNode);
+                    return;
+                }
+
+                cNode = selected.First();
+            });
+            
+            var aNode = Node.CreateAudioNode(audioNode.key,  audioNode.weight, audioNode.probability, audioNode.audioId);
+            cNode.Children.Add(aNode);
+            return cNode.Children.Last();
+        }
+
+
+        public List<Node> GetAudioNodes()
+        {
+            var audioNodes = new List<Node>();
+            void GetAudioNode(Node node)
+            {
+                if (node.IsAudioNode){
+                    audioNodes.Add(node);
+                }
+            }
+
+            DfsTreeTraversal(GetAudioNode);
+            return audioNodes;
+        }
+        public List<List<Node>> GetDecisionPaths()
+        {
+            var decisionPaths = new List<List<Node>>();
+            
+            var stack = new Stack<Node>();
+            void GetDecisionPathsInternal()
+            {
+                while (stack.Count > 0){
+
+                    var peek = stack.Peek();
+                    if (peek.IsAudioNode){
+                        decisionPaths.Add(stack.ToList());
+                    }
+                    var node = stack.Pop();
+                    Enumerable.Range(0, node.Children.Count).Reverse()
+                        .ForEach(i => stack.Push(node.Children[i]));
+                }
+            }
+            
+            stack.Push(Root);
+            GetDecisionPathsInternal();
+            return decisionPaths;
+        }
+
+        public int NodeCount()
+        {
+            int count = 0;
+            BfsTreeTraversal(_ => count += 1);
+            return count;
+        }
+
+        public int Depth()
+        {
+            int depth = 0;
+            DfsTreeTraversal((_, d) => depth = (d > depth) ? d : depth);
+            return depth;
+        }
         public void VerifyState()
         {
             void Verify(Node node)
             {
-                if (node.IsAudioNode){ 
-                    Debug.Assert(node.Children.Count == 0);// is leaf
-                }
-                else{
-                    //LogicNode
-                    Debug.Assert(node.Children.Count > 0); // is not leaf
+                node.VerifyState();
+                if (!node.IsAudioNode){ 
                     if (!node.Children.First().IsAudioNode){
                         //Debug.Assert(node.Children.First().Key == 0); // Not TRUE: the first children of logicalNodes has key == 0
                     }
                 }
             }
             BfsTreeTraversal(Verify);
+            
+            //False: Leaves are at maxDepth
+            // BfsTreeTraversal((node, d) =>
+            // {
+            //     if (node.Children.Count == 0){
+            //         Debug.Assert(d == _maxTreeDepth);
+            //     }
+            //                      
+            // });
+            
         }
-
-        public void BfsTreeTraversal(Action<Node> func)
+        
+        public void BfsTreeTraversal(Action<Node, int, int> func)
         {
-            void TreeTraversalInternal(Queue<Node> queue)
+            void TreeTraversalInternal(Queue<(Node, int, int)> queue)
             {
                 while (queue.Count > 0)
                 {
-                    var node = queue.Dequeue();
-                    func(node);
-                    node.Children.ForEach(queue.Enqueue);
+                    var (node, depth, childIdx) = queue.Dequeue();
+                    func(node, depth, childIdx);
+                    int i = 0; 
+                    node.Children.ForEach(e => queue.Enqueue((e,depth+1, i++)));
                 }
             }
 
-            var queue = new Queue<Node>();
-            queue.Enqueue(Root);
+            var queue = new Queue<(Node, int, int)>();
+            queue.Enqueue((Root, 0, 0));
             TreeTraversalInternal(queue);
         }
         
-        public void DfsTreeTraversal(Action<Node> func)
+        public void BfsTreeTraversal(Action<Node, int> func) =>
+            BfsTreeTraversal((node, depth, childIdx) => func(node, depth));
+        public void BfsTreeTraversal(Action<Node> func) =>
+            BfsTreeTraversal((node, depth, childIdx) => func(node));
+        
+        public void DfsTreeTraversal(Action<Node, int, int> func)
         {
-            void TreeTraversalInternal(Stack<Node> stack)
+            void TreeTraversalInternal(Stack<(Node, int, int)> stack)
             {
                 while (stack.Count > 0)
                 {
-                    var node = stack.Pop();
-                    func(node);
-                    node.Children.ForEach(stack.Push);
+                    var (node, depth, childIdx) = stack.Pop();
+                    func(node, depth, childIdx);
+                    Enumerable.Range(0, node.Children.Count).Reverse()
+                        .ForEach(i => stack.Push((node.Children[i],depth+1, i)));
                 }
             }
 
-            var stack = new Stack<Node>();
-            stack.Push(Root);
+            var stack = new Stack<(Node, int, int)>();
+            stack.Push((Root, 0, 0));
             TreeTraversalInternal(stack);
         }
+        
+        public void DfsTreeTraversal(Action<Node, int> func) =>
+            DfsTreeTraversal((node, depth, childIdx) => func(node, depth));
+        public void DfsTreeTraversal(Action<Node> func) =>
+            DfsTreeTraversal((node, depth, childIdx) => func(node));
         
         public void MixedTreeTraversal(Action<Node> func)
         {
