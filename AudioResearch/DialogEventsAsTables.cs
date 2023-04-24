@@ -1,7 +1,6 @@
 ﻿using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Hirc.V136;
 using CommonControls.Common;
-using CommonControls.Editors.AudioEditor;
 using CommonControls.Services;
 using MoreLinq;
 using System;
