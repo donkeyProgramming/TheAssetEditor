@@ -1,7 +1,7 @@
-﻿using Audio.Storage;
+﻿using Audio.BnkCompiler;
+using Audio.Storage;
 using Audio.Utility;
 using CommonControls.Common;
-using CommonControls.Editors.AudioEditor.BnkCompiler;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using System.IO;
@@ -20,17 +20,16 @@ namespace AudioResearch
 
     internal class OvnTest
     {
-        public static void Compile()
+        public static void Compile(string systemPath, bool useSoundIdFromBnk = true, bool useMixerIdFromBnk = true, bool useActionIdFromBnk = true)
         {
             using var application = new SimpleApplication();
 
             var pfs = application.GetService<PackFileService>();
             // pfs.LoadAllCaFiles(GameTypeEnum.Warhammer3);
-
             pfs.CreateNewPackFileContainer("SoundOutput", PackFileCAType.MOD, true);
             PackFileUtil.LoadFilesFromDisk(pfs, new[]
             {
-                new PackFileUtil.FileRef( packFilePath: @"audioprojects", systemPath:@"Data\OvnExample\Project.json")
+                new PackFileUtil.FileRef( packFilePath: @"audioprojects", systemPath: systemPath)
             });
 
             // Load all wems
@@ -40,11 +39,20 @@ namespace AudioResearch
                 .ToList();
             PackFileUtil.LoadFilesFromDisk(pfs, wemReferences);
 
-            var compiler = application.GetService<Compiler>();
-            var compileResult = compiler.CompileProject(@"audioprojects\Project.json", out var errorList);
+            var compiler = application.GetService<CompilerService>();
+            var compilerSettings = new CompilerSettings()
+            {
+                UserOerrideIdForActions = useActionIdFromBnk,
+                UseOverrideIdForSounds = useSoundIdFromBnk,
+                UseOverrideIdForMixers = useMixerIdFromBnk,
+                ConvertResultToXml = true,
+                FileExportPath = "D:\\Research\\Audio\\CustomBnks",
+            };
+
+            var result = compiler.Compile(@"audioprojects\ProjectSimple.json", compilerSettings);
         }
 
-        public static void GenerateProjectFromBnk(bool userOverrideIds)
+        public static void GenerateProjectFromBnk(string path)
         {
             using var application = new SimpleApplication();
 
@@ -63,8 +71,8 @@ namespace AudioResearch
             var hircs = audioRepo.HircObjects.Select(x => x.Value.First());
             var ids = hircs.Select(x => $"{x.Id}-{x.Type}").ToList();
 
-            var projectExporter = new AudioProjectExporter(userOverrideIds);
-            projectExporter.CreateFromRepository(audioRepo, "OvnProject.json");
+            var projectExporter = new AudioProjectExporterSimple();
+            projectExporter.CreateFromRepositoryToFile(audioRepo, "campaign_diplomacy__ovn", path);
         }
     }
 }

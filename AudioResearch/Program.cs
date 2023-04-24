@@ -1,27 +1,3 @@
-﻿using Action = System.Action;
-using Audio.AudioEditor;
-using Audio.FileFormats.WWise;
-using Audio.FileFormats.WWise.Hirc;
-using Audio.FileFormats.WWise.Hirc.V136;
-using Audio.Storage;
-using Audio.Utility;
-using CommonControls.Common;
-using CommonControls.Editors.AudioEditor.BnkCompiler;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
-using CommunityToolkit.Diagnostics;
-using MoreLinq;
-// using MoreLinq.Extensions;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using Serilog;
-using static AudioResearch.Program.LogicalChaining;
 
 
 namespace AudioResearch
@@ -33,32 +9,41 @@ namespace AudioResearch
             // CompileTest();
             //TableTest();
             //OvnTest.GenerateProjectFromBnk(false);
+
             // OvnTest.Compile();
             //GeneratOvnProject();
             TestDialogEventSerialization();
             // LogicalChainingTest();
+
+            var currentProjectName = $"Data\\OvnExample\\ProjectSimple.json";
+            //OvnTest.GenerateProjectFromBnk(currentProjectName);
+
+
+            OvnTest.Compile(currentProjectName, false, false, false);
+            //TestDialogEventSerialization();
+
         }
 
-      
 
+       
 
 
 
         static void CompileTest()
         {
-            using var application = new SimpleApplication();
-
-            var pfs = application.GetService<PackFileService>();
-            //pfs.LoadAllCaFiles(GameTypeEnum.Warhammer3);
-            pfs.CreateNewPackFileContainer("SoundOutput", PackFileCAType.MOD, true);
-            PackFileUtil.LoadFilesFromDisk(pfs, new[]
-            {
-                new PackFileUtil.FileRef( packFilePath: @"audio\wwise", systemPath:@"Data\CustomSoundCompile\790209750.wem"),
-                new PackFileUtil.FileRef( packFilePath: @"audioprojects", systemPath:@"Data\CustomSoundCompile\Project.json")
-            });
-
-            var compiler = application.GetService<Compiler>();
-            var compileResult = compiler.CompileProject(@"audioprojects\Project.json", out var errorList);
+            //using var application = new SimpleApplication();
+            //
+            //var pfs = application.GetService<PackFileService>();
+            ////pfs.LoadAllCaFiles(GameTypeEnum.Warhammer3);
+            //pfs.CreateNewPackFileContainer("SoundOutput", PackFileCAType.MOD, true);
+            //PackFileUtil.LoadFilesFromDisk(pfs, new[]
+            //{
+            //    new PackFileUtil.FileRef( packFilePath: @"audio\wwise", systemPath:@"Data\CustomSoundCompile\790209750.wem"),
+            //    new PackFileUtil.FileRef( packFilePath: @"audioprojects", systemPath:@"Data\CustomSoundCompile\Project.json")
+            //});
+            //
+            //var compiler = application.GetService<Compiler>();
+            //var compileResult = compiler.CompileProject(@"audioprojects\Project.json", out var errorList);
         }
 
 
@@ -106,6 +91,7 @@ namespace AudioResearch
 
 
         }
+
 
 
 

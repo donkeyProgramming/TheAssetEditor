@@ -1,5 +1,4 @@
-﻿using CommonControls.Editors.AudioEditor.BnkCompiler;
-using CommonControls.Services;
+﻿using CommonControls.Services;
 using FluentValidation;
 using SharpDX.WIC;
 using System.Collections.Generic;
@@ -7,13 +6,9 @@ using System.Linq;
 
 namespace Audio.BnkCompiler.Validation
 {
-
-
-
-
-    public class AudioProjectXmlValidator : AbstractValidator<AudioInputProject>
+    public class AudioProjectXmlValidator : AbstractValidator<CompilerData>
     {
-        public AudioProjectXmlValidator(PackFileService pfs, AudioInputProject projectXml)
+        public AudioProjectXmlValidator(PackFileService pfs, CompilerData projectXml)
         {
             var allItems = GetAllItems(projectXml);
             
@@ -28,10 +23,10 @@ namespace Audio.BnkCompiler.Validation
             RuleFor(x => x).Custom((projectFile, context) => ValidateUniqeIds(projectXml, context));
         }
 
-        void ValidateUniqeIds(AudioInputProject projectXml, ValidationContext<AudioInputProject> context)
+        void ValidateUniqeIds(CompilerData projectXml, ValidationContext<CompilerData> context)
         {
             var allIds = GetAllItems(projectXml)
-             .Select(x => x.Id)
+             .Select(x => x.Name)
              .ToList();
 
             var query = allIds.GroupBy(x => x)
@@ -46,7 +41,7 @@ namespace Audio.BnkCompiler.Validation
 
         // Check for unreferenced ids
 
-        List<IAudioProjectHircItem> GetAllItems(AudioInputProject projectXml)
+        List<IAudioProjectHircItem> GetAllItems(CompilerData projectXml)
         {
             var output = new List<IAudioProjectHircItem>();
             output.AddRange(projectXml.Actions);

@@ -1,13 +1,11 @@
 ﻿using Audio.FileFormats.WWise.Bkhd;
 using Audio.Utility;
-using CommonControls.Editors.AudioEditor.BnkCompiler;
-using System.IO;
 
 namespace Audio.BnkCompiler.ObjectGeneration
 {
     public class BnkHeaderBuilder
     {
-        public BkhdHeader Generate(AudioInputProject projectFile)
+        public BkhdHeader Generate(CompilerData projectFile)
         {
             var bnkName = projectFile.ProjectSettings.BnkName;
             var soundBankId = WWiseHash.Compute(bnkName);

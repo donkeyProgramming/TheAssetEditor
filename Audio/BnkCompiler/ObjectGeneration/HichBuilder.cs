@@ -1,6 +1,5 @@
 ﻿using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Hirc;
-using CommonControls.Editors.AudioEditor.BnkCompiler;
 using CommunityToolkit.Diagnostics;
 using System;
 using System.Collections.Generic;
@@ -18,11 +17,10 @@ namespace Audio.BnkCompiler.ObjectGeneration
             _wwiseHircGenerators = wwiseHircGenerators;
         }
 
-        public HircChunk Generate(AudioInputProject projectFile)
+        public HircChunk Generate(CompilerData projectFile)
         {
             // Build Hirc list. Order is important! 
-            var repo = new HircProjectItemRepository(projectFile);
-            var hircList = ConvertProjectToHircObjects(projectFile, repo);
+            var hircList = ConvertProjectToHircObjects(projectFile);
            
             var hircChuck = new HircChunk();
             hircChuck.SetFromHircList(hircList);
@@ -34,13 +32,13 @@ namespace Audio.BnkCompiler.ObjectGeneration
             return hircChuck;
         }
 
-        private List<HircItem> ConvertProjectToHircObjects(AudioInputProject project, HircProjectItemRepository repo)
+        private List<HircItem> ConvertProjectToHircObjects(CompilerData project)
         {
             var sortedProjectHircList = _hircSorter.Sort(project);
             var wwiseHircs = sortedProjectHircList.Select(hircProjectItem =>
             {
                 var generator = FindGenerator(hircProjectItem, project.ProjectSettings.OutputGame);
-                return generator.ConvertToWWise(hircProjectItem, project, repo);
+                return generator.ConvertToWWise(hircProjectItem, project);
             }).ToList();
             return wwiseHircs;
         }
