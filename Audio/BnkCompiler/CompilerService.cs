@@ -16,7 +16,7 @@ namespace Audio.BnkCompiler
 
     public class CompilerService
     {
-        ILogger _logger = Logging.Create<CompilerConsoleLogger>();
+        ILogger _logger = Logging.Create<CompilerService>();
         ICompilerLogger _errorLogger;
 
         ProjectLoader _loader;
@@ -63,6 +63,7 @@ namespace Audio.BnkCompiler
                 return false;
             }
 
+            _logger.Here().Information("Bnk file generated successfully");
             return true;
         }
     }
