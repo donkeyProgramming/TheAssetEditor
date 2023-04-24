@@ -40,6 +40,7 @@ namespace Audio
             serviceCollection.AddScoped<CompilerService>();
             serviceCollection.AddScoped<ICompilerLogger, CompilerConsoleLogger>();
             serviceCollection.AddScoped<ProjectLoader>();
+            serviceCollection.AddScoped<WemFileImporter>();
             serviceCollection.AddScoped<Compiler>();
             serviceCollection.AddScoped<ResultHandler>();
        

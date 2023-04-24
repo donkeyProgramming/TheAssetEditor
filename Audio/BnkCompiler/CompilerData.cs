@@ -43,6 +43,7 @@ namespace Audio.BnkCompiler
         public int Version { get; set; } = 1;
         public string OutputGame { get; set; } = CompilerConstants.Game_Warhammer3;
         public string BnkName { get; set; }
+        public string Language { get; internal set; }
     }
 
     public class CompilerData
@@ -54,6 +55,7 @@ namespace Audio.BnkCompiler
         public List<Action> Actions { get; set; } = new List<Action>();
         public List<GameSound> GameSounds { get; set; } = new List<GameSound>();
         public List<ActorMixer> ActorMixers { get; set; } = new List<ActorMixer>();
+
 
         public void PreperForCompile(bool allowOverrideIdForActions, bool allowOverrideIdForMixers, bool allowOverrideIdForSounds)
         {

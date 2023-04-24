@@ -38,34 +38,41 @@ namespace Audio.BnkCompiler
         ProjectLoader _loader;
         Compiler _compiler;
         ResultHandler _resultHandler;
+        WemFileImporter _wemFileImporter;
 
-        public CompilerService(ICompilerLogger logger, ProjectLoader loader, Compiler compiler, ResultHandler resultHandler)
+        public CompilerService(ICompilerLogger logger, ProjectLoader loader, WemFileImporter wemFileImporter, Compiler compiler, ResultHandler resultHandler)
         {
             _errorLogger = logger;
             _loader = loader;
+            _wemFileImporter = wemFileImporter;
             _compiler = compiler;
             _resultHandler = resultHandler;
         }
 
         public bool Compile(string packFilePath, CompilerSettings settings) 
         {
-            var loadResult = _loader.LoadProject(packFilePath, settings);
-            if (loadResult.Success == false)
+            var project = _loader.LoadProject(packFilePath, settings);
+            if (project.Success == false)
             {
-                _errorLogger.Log(loadResult.ErrorList);
+                _errorLogger.Log(project.ErrorList);
                 return false;
             }
 
-            // Generate sounds if needed
-
-            var compileResult = _compiler.CompileProject(loadResult.Item);
-            if(compileResult.Success == false) 
+            var importResult = _wemFileImporter.ImportAudio(project.Item);
+            if (importResult.Success == false)
             {
-                _errorLogger.Log(compileResult.ErrorList);
+                _errorLogger.Log(importResult.ErrorList);
                 return false;
             }
 
-            var handlerResult = _resultHandler.ProcessResult(compileResult.Item, settings);
+            var compilerOutput = _compiler.CompileProject(project.Item);
+            if(compilerOutput.Success == false) 
+            {
+                _errorLogger.Log(compilerOutput.ErrorList);
+                return false;
+            }
+
+            var handlerResult = _resultHandler.ProcessResult(compilerOutput.Item, project.Item, settings);
             if (handlerResult.Success == false) 
             {
                 _errorLogger.Log(handlerResult.ErrorList);

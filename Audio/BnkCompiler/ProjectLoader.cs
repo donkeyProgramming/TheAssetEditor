@@ -87,6 +87,7 @@ namespace Audio.BnkCompiler
             compilerData.ActorMixers.Add(mixer);
             compilerData.ProjectSettings.Version = input.Settings.Version;
             compilerData.ProjectSettings.BnkName = input.Settings.BnkName;
+            compilerData.ProjectSettings.Language = input.Settings.Langauge;
 
             foreach (var simpleEvent in input.Events)
             {
