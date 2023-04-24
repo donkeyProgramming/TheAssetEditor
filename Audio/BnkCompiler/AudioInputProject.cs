@@ -44,12 +44,15 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         public int Version { get; set; } = 1;
         public string OutputGame { get; set; } = CompilerConstants.Game_Warhammer3;
         public string BnkName { get; set; }
-        public string OutputFilePath { get; set; }
-        public string WWiserPath { get; set; }
 
-        public bool ConvertResultToXml { get; set; } = false;
-        public bool ThrowOnCompileError { get; set; } = false;
-        public bool ExportResultToFile { get; set; } = false;
+        public string AudioMixer { get; set; }
+    }
+
+
+    public class SimpleEvent
+    { 
+        public string Id { get; set; }
+        public string SoundFile { get; set; }
     }
 
     public class AudioInputProject
@@ -59,6 +62,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         public List<Action> Actions { get; set; } = new List<Action>();
         public List<GameSound> GameSounds { get; set; } = new List<GameSound>();
         public List<ActorMixer> ActorMixers { get; set; } = new List<ActorMixer>();
+        public List<SimpleEvent> SimpleEvents {get;set;} = new List<SimpleEvent>(); 
 
         public void ComputeAllWriteIds(bool allowOverrideIdForActions, bool allowOverrideIdForMixers, bool allowOverrideIdForSounds)
         {

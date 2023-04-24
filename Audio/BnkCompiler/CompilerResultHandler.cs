@@ -1,9 +1,13 @@
-﻿using CommonControls.FileTypes.PackFiles.Models;
+﻿using Audio.Utility;
+using CommonControls.FileTypes.PackFiles.Models;
+using CommunityToolkit.Diagnostics;
+using System.IO;
 
 namespace CommonControls.Editors.AudioEditor.BnkCompiler
 {
     public class CompileResult
     {
+        public AudioInputProject Project { get; set; }
         public PackFile OutputBnkFile { get; set; }
         public PackFile OutputDatFile { get; set; }
         public PackFile NameList { get; set; }
@@ -12,9 +16,29 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
 
     public class CompilerResultHandler
     {
+        public string WWiserPath { get; set; } = "D:\\Research\\Audio\\WWiser\\wwiser.pyz";
 
-        public string WWiserPath { get; set; }
-        public string OutputPath { get; set; }
+        public void SaveToPackFile()
+        { 
+        
+        }
+
+        public void SaveToFile(CompileResult result, string outputDirectory, bool convertResultToXml)
+        {
+            var bnkPath = Path.Combine(outputDirectory, $"{result.Project.ProjectSettings.BnkName}.bnk");
+            File.WriteAllBytes(bnkPath, result.OutputBnkFile.DataSource.ReadData());
+
+            var datPath = Path.Combine(outputDirectory, $"{result.Project.ProjectSettings.BnkName}.dat");
+            File.WriteAllBytes(datPath, result.OutputDatFile.DataSource.ReadData());
+
+            if (convertResultToXml)
+            {
+                Guard.IsNotNullOrEmpty(WWiserPath);
+                BnkToXmlConverter.Convert(WWiserPath, bnkPath, true);
+            }
+        }
+
+
         /*
          * 
          *  public bool CompileAllProjects(out ErrorList outputList)
@@ -50,20 +74,7 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
          */
 
 
-        /*
-         *             // Move somewhere else 
-                if (audioProject.ProjectSettings.ExportResultToFile)
-                {
-                    var bnkPath = Path.Combine(audioProject.ProjectSettings.OutputFilePath, $"{audioProject.ProjectSettings.BnkName}.bnk");
-                    File.WriteAllBytes(bnkPath, compileResult.OutputBnkFile.DataSource.ReadData());
 
-                    var datPath = Path.Combine(audioProject.ProjectSettings.OutputFilePath, $"{audioProject.ProjectSettings.BnkName}.dat");
-                    File.WriteAllBytes(datPath, compileResult.OutputDatFile.DataSource.ReadData());
-
-                    if (audioProject.ProjectSettings.ConvertResultToXml)
-                        BnkToXmlConverter.Convert(audioProject.ProjectSettings.WWiserPath, bnkPath, true);
-                }
-         */
     }
 
 }

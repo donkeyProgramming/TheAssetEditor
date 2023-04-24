@@ -7,13 +7,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using Action = CommonControls.Editors.AudioEditor.BnkCompiler.Action;
 
 namespace Audio.Utility
 {
-    public class AudioProjectExporter
+    public class AudioProjectExporterSimple
     {
-        public AudioProjectExporter()
+
+        public AudioProjectExporterSimple()
         {
         }
 
@@ -23,18 +23,8 @@ namespace Audio.Utility
             Guard.IsEqualTo(wwiseEvent.Actions.Count, 1);
 
             var eventName = repository.GetNameFromHash(wwiseEvent.Id, out var found);
-            var actionName = $"{eventName}_Action";
-            var soundName = $"{eventName}_GameSound";
             Guard.IsTrue(found);
 
-            // Write Event
-            var projectEvent = new Event()
-            {
-                Id = eventName,
-                OverrideId = wwiseEvent.Id,
-                Actions = new List<string> { actionName },
-                AudioBus = "Master"
-            };
 
             // Actions
             var wwiseActionId = wwiseEvent.Actions.First();
@@ -44,15 +34,6 @@ namespace Audio.Utility
             var wwiseActionInstance = wwiseActions.First() as CAkAction_v136;
             Guard.IsNotNull(wwiseActionInstance);
 
-            // Write Action
-            var projectAction = new Action()
-            {
-                Id = actionName,
-                OverrideId = wwiseActionInstance.Id,
-                ChildId = soundName,
-                Type = "Play"
-            };
-
             // Sound
             var wwiseGameSoundId = wwiseActionInstance.GetChildId();
             var wwiseGameSounds = repository.GetHircObject(wwiseGameSoundId);
@@ -60,17 +41,14 @@ namespace Audio.Utility
             var wwiseSoundInstance = wwiseGameSounds.First() as CAkSound_v136;
             Guard.IsNotNull(wwiseSoundInstance);
 
-            // Write sound
-            var projectSound = new GameSound()
+            // Write Event
+            var projectEvent = new SimpleEvent()
             {
-                Id = soundName,
-                OverrideId = wwiseSoundInstance.Id,
-                Path = $"Audio\\WWise\\{wwiseSoundInstance.AkBankSourceData.akMediaInformation.SourceId}.wem",
+                Id = eventName,
+                SoundFile = $"Audio\\WWise\\{wwiseSoundInstance.AkBankSourceData.akMediaInformation.SourceId}.wem",
             };
 
-            project.Events.Add(projectEvent);
-            project.Actions.Add(projectAction);
-            project.GameSounds.Add(projectSound);
+            project.SimpleEvents.Add(projectEvent);
         }
 
         public AudioInputProject CreateFromRepository(IAudioRepository repository, string bnkName)
@@ -81,9 +59,6 @@ namespace Audio.Utility
             var events = repository.GetAllOfType<CAkEvent_v136>();
             foreach (var wwiseEvent in events)
                 AddEventToProject(wwiseEvent, repository, project);
-
-            var mixers = repository.GetAllOfType<CAkActorMixer_v136>();
-            AddMixersToProject(mixers, repository, project);
 
             return project;
         }

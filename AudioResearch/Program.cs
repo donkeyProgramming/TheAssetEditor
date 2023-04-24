@@ -26,15 +26,13 @@ namespace AudioResearch
     {
         static void Main(string[] args)
         {
-            var r = WWiseHash.Compute("Play_HEF_Teclis_Dip_Halfling_Greet_Neg_01");
-
             // CompileTest();
             //TableTest();
             //OvnTest.GenerateProjectFromBnk(false);
             var currentProjectName = $"Data\\OvnExample\\Project.json";
-            OvnTest.GenerateProjectFromBnk(currentProjectName, true, true, true);
-            OvnTest.Compile(currentProjectName);
-            TestDialogEventSerialization();
+            OvnTest.GenerateProjectFromBnk(currentProjectName);
+            OvnTest.Compile(currentProjectName, false, true , false);
+            //TestDialogEventSerialization();
         }
 
 
@@ -107,26 +105,26 @@ namespace AudioResearch
 
 
 
-        static void TestDialogEventSerialization()
-        {
-            using var application = new SimpleApplication();
-
-            var pfs = application.GetService<PackFileService>();
-            pfs.LoadAllCaFiles(GameTypeEnum.Warhammer3);
-            var audioRepo = application.GetService<IAudioRepository>();
-
-            var dialogEvents = audioRepo.GetAllOfType<CAkDialogueEvent_v136>();
-            foreach(var dialogEvent in dialogEvents) 
-            {
-                dialogEvent.AkDecisionTree.VerifyState();
-                var bytes = dialogEvent.GetAsByteArray();
-                var chuck = new Filetypes.ByteParsing.ByteChunk(bytes);
-                var reParsedObject = new CAkDialogueEvent_v136();
-                reParsedObject.Parse(chuck);
-                // reParsedObject.AkDecisionTree.VerifyState();
-                // Debug.Assert(dialogEvent.AkDecisionTree.Flatten());
-                Console.WriteLine($"Main.Success: {dialogEvent.Id}");
-            }
-        }
+        //static void TestDialogEventSerialization()
+        //{
+        //    using var application = new SimpleApplication();
+        //
+        //    var pfs = application.GetService<PackFileService>();
+        //    pfs.LoadAllCaFiles(GameTypeEnum.Warhammer3);
+        //    var audioRepo = application.GetService<IAudioRepository>();
+        //
+        //    var dialogEvents = audioRepo.GetAllOfType<CAkDialogueEvent_v136>();
+        //    foreach(var dialogEvent in dialogEvents) 
+        //    {
+        //        dialogEvent.AkDecisionTree.VerifyState();
+        //        var bytes = dialogEvent.GetAsByteArray();
+        //        var chuck = new Filetypes.ByteParsing.ByteChunk(bytes);
+        //        var reParsedObject = new CAkDialogueEvent_v136();
+        //        reParsedObject.Parse(chuck);
+        //        // reParsedObject.AkDecisionTree.VerifyState();
+        //        // Debug.Assert(dialogEvent.AkDecisionTree.Flatten());
+        //        Console.WriteLine($"Main.Success: {dialogEvent.Id}");
+        //    }
+        //}
     }
 }

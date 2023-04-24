@@ -9,6 +9,7 @@ using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using CommunityToolkit.Diagnostics;
+using SharpDX.MediaFoundation;
 using System;
 using System.IO;
 using System.Linq;
@@ -25,9 +26,9 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
         private readonly HichBuilder _hircBuilder;
         private readonly BnkHeaderBuilder _headerBuilder;
 
-        public bool AllowOverrideIdForActions { get; set; } = true;
-        public bool AllowOverrideIdForMixers { get; set; } = true;
-        public bool AllowOverrideIdForSounds { get; set; } = true;
+        public bool UserOerrideIdForActions { get; set; } = false;
+        public bool UseOverrideIdForMixers { get; set; } = false;
+        public bool UseOverrideIdForSounds { get; set; } = false;
 
         public Compiler(PackFileService pfs, HichBuilder hircBuilder, BnkHeaderBuilder headerBuilder)
         {
@@ -85,31 +86,28 @@ namespace CommonControls.Editors.AudioEditor.BnkCompiler
             if (ValidateProject(audioProject, out errorList) == false)
                 return null;
 
-            audioProject.ComputeAllWriteIds(AllowOverrideIdForActions, AllowOverrideIdForMixers, AllowOverrideIdForSounds);
+            audioProject.ComputeAllWriteIds(UserOerrideIdForActions, UseOverrideIdForMixers, UseOverrideIdForSounds);
+
+            //Ensure all write ids are not causing conflicts
+            //var allWriteIds = audioProject.
 
             // Build the wwise object graph 
             var header = _headerBuilder.Generate(audioProject);
             var hircChunk = _hircBuilder.Generate(audioProject);
 
+
+            var allIds = hircChunk.Hircs.Select(x => x.Id).ToList();
+            var originalCount = allIds.Count();
+            var uniqueCount = allIds.Distinct().Count();
+            Guard.IsEqualTo(originalCount, uniqueCount);
+
             var compileResult = new CompileResult()
             {
+                Project = audioProject,
                 OutputBnkFile = ConvertToPackFile(header, hircChunk, audioProject.ProjectSettings.BnkName),
                 OutputDatFile = BuildDat(audioProject),
-                NameList = null
+                NameList = null,
             };
-
-            // Move somewhere else 
-            if (audioProject.ProjectSettings.ExportResultToFile)
-            {
-                var bnkPath = Path.Combine(audioProject.ProjectSettings.OutputFilePath, $"{audioProject.ProjectSettings.BnkName}.bnk");
-                File.WriteAllBytes(bnkPath, compileResult.OutputBnkFile.DataSource.ReadData());
-
-                var datPath = Path.Combine(audioProject.ProjectSettings.OutputFilePath, $"{audioProject.ProjectSettings.BnkName}.dat");
-                File.WriteAllBytes(datPath, compileResult.OutputDatFile.DataSource.ReadData());
-
-                if (audioProject.ProjectSettings.ConvertResultToXml)
-                    BnkToXmlConverter.Convert(audioProject.ProjectSettings.WWiserPath, bnkPath, true);
-            }
 
             return compileResult;
         }

@@ -20,7 +20,7 @@ namespace AudioResearch
 
     internal class OvnTest
     {
-        public static void Compile(string systemPath)
+        public static void Compile(string systemPath, bool useSoundIdFromBnk = true, bool useMixerIdFromBnk = true, bool useActionIdFromBnk = true)
         {
             using var application = new SimpleApplication();
 
@@ -41,10 +41,20 @@ namespace AudioResearch
             PackFileUtil.LoadFilesFromDisk(pfs, wemReferences);
 
             var compiler = application.GetService<Compiler>();
+            compiler.UserOerrideIdForActions = useActionIdFromBnk;
+            compiler.UseOverrideIdForSounds = useSoundIdFromBnk;
+            compiler.UseOverrideIdForMixers = useMixerIdFromBnk;
+
             var compileResult = compiler.CompileProject(@"audioprojects\Project.json", out var errorList);
+
+            if (compileResult != null)
+            {
+                var resultHandler = new CompilerResultHandler();
+                resultHandler.SaveToFile(compileResult, "D:\\Research\\Audio\\CustomBnks", true);
+            }
         }
 
-        public static void GenerateProjectFromBnk(string path, bool useSoundIdFromBnk = true, bool useMixerIdFromBnk = true, bool useActionIdFromBnk = true)
+        public static void GenerateProjectFromBnk(string path)
         {
             using var application = new SimpleApplication();
 
@@ -63,8 +73,8 @@ namespace AudioResearch
             var hircs = audioRepo.HircObjects.Select(x => x.Value.First());
             var ids = hircs.Select(x => $"{x.Id}-{x.Type}").ToList();
 
-            var projectExporter = new AudioProjectExporter(useSoundIdFromBnk, useMixerIdFromBnk, useActionIdFromBnk);
-            projectExporter.CreateFromRepository(audioRepo, path);
+            var projectExporter = new AudioProjectExporterSimple();
+            projectExporter.CreateFromRepositoryToFile(audioRepo, "campaign_diplomacy__ovn", path);
         }
     }
 }
