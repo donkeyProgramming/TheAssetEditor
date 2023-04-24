@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using CommonControls.Common;
-
 using static CommonControls.Common.CustomExtensions;
 
 namespace Audio.FileFormats.WWise.Hirc.V136
@@ -167,10 +166,19 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                         throw new ArgumentException($"AudioNode has invalid Children_uIdx: {Children_uIdx}. Should be 0"));
                     If(Children_uCount > 0).Then(_ =>
                         throw new ArgumentException($"AudioNode has invalid Children_uCount: {Children_uCount}. Should be 0"));
+                    
+                    If(uWeight != 50 && uProbability != 100).Then(_ =>
+                        throw new ArgumentException($"AudioNode can only have uWeight or uProbability modified"));
                 }
                 else{
                     If(Children_uCount == 0).Then(_ =>
                         throw new ArgumentException($"LogicNode has invalid Children_uCount: {Children_uCount}. Should be greater 0"));
+                    
+                    If(uWeight != 50).Then(_ =>
+                        throw new ArgumentException($"LogicNode should have uWeight{uWeight} equal to 50"));
+                    
+                    If(uProbability != 100).Then(_ =>
+                        throw new ArgumentException($"LogicNode should have uProbability{uProbability} equal to 100"));
                 }
             }
         }
@@ -209,6 +217,8 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                         {
                             Debug.Assert(AudioNodeId == 0);
                             Debug.Assert(Children.Count > 0);
+                            Debug.Assert(uWeight == 50);
+                            Debug.Assert(uProbability == 100);
                         }
                     );
             }
