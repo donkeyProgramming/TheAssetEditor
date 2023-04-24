@@ -11,10 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Text.Json;
-using Serilog;
-using static AudioResearch.Program.LogicalChaining;
+using static CommonControls.Common.CustomExtensions;
 
 namespace AudioResearch
 {
@@ -22,6 +19,11 @@ namespace AudioResearch
     {
         static void Main(string[] args)
         {
+            if (Environment.GetEnvironmentVariable("KlissanEnv") != null){
+                TestDialogEventSerialization();
+                return;
+            }
+            
             // CompileTest();
             //TableTest();
             //OvnTest.GenerateProjectFromBnk(false);
@@ -33,11 +35,8 @@ namespace AudioResearch
 
             var currentProjectName = $"Data\\OvnExample\\ProjectSimple.json";
             //OvnTest.GenerateProjectFromBnk(currentProjectName);
-
-
+            
             OvnTest.Compile(currentProjectName, false, false, false);
-            //TestDialogEventSerialization();
-
         }
 
 
