@@ -1,5 +1,4 @@
 ﻿using AnimationEditor.AnimationTransferTool;
-using AnimationEditor.AnimationTransferTool;
 using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.PropCreator.ViewModels;
@@ -8,14 +7,12 @@ using AssetEditor.Views.Settings;
 using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using CommonControls.Editors.AnimationBatchExporter;
-using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Serilog;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -26,7 +23,6 @@ using AnimationEditor.SkeletonEditor;
 using AssetEditor.Report;
 using AnimationEditor.AnimationBuilder;
 using CommonControls.Editors.AnimationPack;
-using CommonControls.Editors.AudioEditor;
 using CommonControls.BaseDialogs.ErrorListDialog;
 using System.Reflection;
 using System.IO;
@@ -302,9 +298,9 @@ namespace AssetEditor.ViewModels
 
         private void CompileAudioProjects()
         {
-            var compiler = _serviceProvider.GetService<CommonControls.Editors.AudioEditor.BnkCompiler.Compiler>();
-            compiler.CompileAllProjects(out var errorList);
-            ErrorListWindow.ShowDialog("Compile Result:", errorList);
+            //var compiler = _serviceProvider.GetService<Compiler>();
+            //compiler.CompileAllProjects(out var errorList);
+            //ErrorListWindow.ShowDialog("Compile Result:", errorList);
         }
 
         private void CreateExampleAudioProject()

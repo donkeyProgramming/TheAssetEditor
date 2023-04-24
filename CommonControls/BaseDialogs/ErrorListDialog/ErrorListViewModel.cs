@@ -18,8 +18,11 @@ namespace CommonControls.BaseDialogs.ErrorListDialog
             public string ItemName { get; set; }
             public string Description { get; set; }
             public bool IsError { get; set; } = false;
-            
+
+            public string PrettyString { get => $"{ErrorType}:{ItemName}-{Description}"; }
         }
+
+
 
         public class ErrorList
         {

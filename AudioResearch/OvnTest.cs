@@ -1,7 +1,7 @@
-﻿using Audio.Storage;
+﻿using Audio.BnkCompiler;
+using Audio.Storage;
 using Audio.Utility;
 using CommonControls.Common;
-using CommonControls.Editors.AudioEditor.BnkCompiler;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using System.IO;
@@ -26,7 +26,6 @@ namespace AudioResearch
 
             var pfs = application.GetService<PackFileService>();
             // pfs.LoadAllCaFiles(GameTypeEnum.Warhammer3);
-
             pfs.CreateNewPackFileContainer("SoundOutput", PackFileCAType.MOD, true);
             PackFileUtil.LoadFilesFromDisk(pfs, new[]
             {
@@ -40,18 +39,17 @@ namespace AudioResearch
                 .ToList();
             PackFileUtil.LoadFilesFromDisk(pfs, wemReferences);
 
-            var compiler = application.GetService<Compiler>();
-            compiler.UserOerrideIdForActions = useActionIdFromBnk;
-            compiler.UseOverrideIdForSounds = useSoundIdFromBnk;
-            compiler.UseOverrideIdForMixers = useMixerIdFromBnk;
-
-            var compileResult = compiler.CompileProject(@"audioprojects\Project.json", out var errorList);
-
-            if (compileResult != null)
+            var compiler = application.GetService<CompilerService>();
+            var compilerSettings = new CompilerSettings()
             {
-                var resultHandler = new CompilerResultHandler();
-                resultHandler.SaveToFile(compileResult, "D:\\Research\\Audio\\CustomBnks", true);
-            }
+                UserOerrideIdForActions = useActionIdFromBnk,
+                UseOverrideIdForSounds = useSoundIdFromBnk,
+                UseOverrideIdForMixers = useMixerIdFromBnk,
+                ConvertResultToXml = true,
+                FileExportPath = "D:\\Research\\Audio\\CustomBnks",
+            };
+
+            var result = compiler.Compile(@"audioprojects\ProjectSimple.json", compilerSettings);
         }
 
         public static void GenerateProjectFromBnk(string path)

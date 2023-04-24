@@ -1,4 +1,5 @@
-﻿using Audio.BnkCompiler.ObjectGeneration;
+﻿using Audio.BnkCompiler;
+using Audio.BnkCompiler.ObjectGeneration;
 using Audio.BnkCompiler.ObjectGeneration.Warhammer3;
 using Audio.FileFormats.WWise;
 using Audio.Presentation.AudioExplorer;
@@ -6,8 +7,6 @@ using Audio.Presentation.Compiler;
 using Audio.Storage;
 using Audio.Utility;
 using CommonControls.Common;
-using CommonControls.Editors.AudioEditor.BnkCompiler;
-using CommonControls.Editors.TextEditor;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Audio
@@ -38,7 +37,12 @@ namespace Audio
             serviceCollection.AddScoped<IWWiseHircGenerator, ActorMixerGenerator>();
             serviceCollection.AddScoped<HichBuilder>();
             serviceCollection.AddScoped<BnkHeaderBuilder>();
+            serviceCollection.AddScoped<CompilerService>();
+            serviceCollection.AddScoped<ICompilerLogger, CompilerConsoleLogger>();
+            serviceCollection.AddScoped<ProjectLoader>();
             serviceCollection.AddScoped<Compiler>();
+            serviceCollection.AddScoped<ResultHandler>();
+       
         }
 
         public static void RegisterTools(IToolFactory factory)

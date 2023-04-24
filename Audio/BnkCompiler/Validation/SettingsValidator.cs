@@ -1,5 +1,4 @@
-﻿using CommonControls.Editors.AudioEditor.BnkCompiler;
-using FluentValidation;
+﻿using FluentValidation;
 using System;
 using System.IO;
 
@@ -9,7 +8,6 @@ namespace Audio.BnkCompiler.Validation
     {
         public SettingsValidator()
         {
-
             RuleFor(x => x.Version)
                 .Must(x => x == 1).WithMessage("Only version one is allowed");
 
@@ -18,8 +16,8 @@ namespace Audio.BnkCompiler.Validation
                 .Must(x => string.Compare(x, CompilerConstants.Game_Warhammer3, StringComparison.InvariantCultureIgnoreCase) == 0).WithMessage("Only warhammer 3 is supported");
 
             RuleFor(x => x.BnkName)
-                 .NotEmpty().WithMessage("Bnk name missing, mest end with .bnk. Example: 'mybank'")
-                 .Must(x => Path.GetExtension(x)?.ToLower() == string.Empty).WithMessage("bnkName should not include any exptentions");
+                 .NotEmpty().WithMessage("Bnk name missing, Example: 'mybank'")
+                 .Must(x => Path.GetExtension(x)?.ToLower() == string.Empty).WithMessage("bnkName should not include any extension");
         }
     }
 }

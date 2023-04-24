@@ -1,97 +1,100 @@
 {
-  "ProjectSettings": {
+  "Settings": {
     "Version": 1,
     "OutputGame": "Warhammer3",
-    "BnkName": "campaign_diplomacy__ovn"
+    "BnkName": "campaign_diplomacy__ovn",
+    "RootAudioMixer": "54848735",
+    "Language": "English(uk)"
   },
-  "SimpleEvents": [
+
+  "Events": [
     {
-      "Id": "Play_HEF_Tyrion_Dip_Halfling_Neg_02",
-      "SoundFile": "Audio\\WWise\\729867288.wem"
+      "Name": "Play_HEF_Tyrion_Dip_Halfling_Neg_02",
+      "Sound": "Audio\\WWise\\729867288.wem"
     },
     {
-      "Id": "Play_HEF_Tyrion_Dip_Halfling_Neg_01",
-      "SoundFile": "Audio\\WWise\\906470917.wem"
+      "Name": "Play_HEF_Tyrion_Dip_Halfling_Neg_01",
+      "Sound": "Audio\\WWise\\906470917.wem"
     },
     {
-      "Id": "Play_HEF_Tyrion_Dip_Halfling_Neu_01",
-      "SoundFile": "Audio\\WWise\\784496158.wem"
+      "Name": "Play_HEF_Tyrion_Dip_Halfling_Neu_01",
+      "Sound": "Audio\\WWise\\784496158.wem"
     },
     {
-      "Id": "Play_HEF_Tyrion_Dip_Halfling_Neu_02",
-      "SoundFile": "Audio\\WWise\\362402037.wem"
+      "Name": "Play_HEF_Tyrion_Dip_Halfling_Neu_02",
+      "Sound": "Audio\\WWise\\362402037.wem"
     },
     {
-      "Id": "Play_HEF_Alarielle_Dip_Halfling_Neu_01",
-      "SoundFile": "Audio\\WWise\\78056990.wem"
+      "Name": "Play_HEF_Alarielle_Dip_Halfling_Neu_01",
+      "Sound": "Audio\\WWise\\78056990.wem"
     },
     {
-      "Id": "Play_HEF_Alarielle_Dip_Halfling_Neu_02",
-      "SoundFile": "Audio\\WWise\\597442619.wem"
+      "Name": "Play_HEF_Alarielle_Dip_Halfling_Neu_02",
+      "Sound": "Audio\\WWise\\597442619.wem"
     },
     {
-      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Neu_01",
-      "SoundFile": "Audio\\WWise\\44369822.wem"
+      "Name": "Play_EMP_KF_Dip_Halfling_Greet_Neu_01",
+      "Sound": "Audio\\WWise\\44369822.wem"
     },
     {
-      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Neu_02",
-      "SoundFile": "Audio\\WWise\\622310682.wem"
+      "Name": "Play_EMP_KF_Dip_Halfling_Greet_Neu_02",
+      "Sound": "Audio\\WWise\\622310682.wem"
     },
     {
-      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Pos_02",
-      "SoundFile": "Audio\\WWise\\139425245.wem"
+      "Name": "Play_EMP_KF_Dip_Halfling_Greet_Pos_02",
+      "Sound": "Audio\\WWise\\139425245.wem"
     },
     {
-      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Pos_01",
-      "SoundFile": "Audio\\WWise\\799837429.wem"
+      "Name": "Play_EMP_KF_Dip_Halfling_Greet_Pos_01",
+      "Sound": "Audio\\WWise\\799837429.wem"
     },
     {
-      "Id": "Play_HEF_Alarielle_Dip_Halfling_Neg_02",
-      "SoundFile": "Audio\\WWise\\189934425.wem"
+      "Name": "Play_HEF_Alarielle_Dip_Halfling_Neg_02",
+      "Sound": "Audio\\WWise\\189934425.wem"
     },
     {
-      "Id": "Play_HEF_Alarielle_Dip_Halfling_Neg_01",
-      "SoundFile": "Audio\\WWise\\909199361.wem"
+      "Name": "Play_HEF_Alarielle_Dip_Halfling_Neg_01",
+      "Sound": "Audio\\WWise\\909199361.wem"
     },
     {
-      "Id": "Play_HEF_Teclis_Dip_Halfling_Greet_Neg_01",
-      "SoundFile": "Audio\\WWise\\145898663.wem"
+      "Name": "Play_HEF_Teclis_Dip_Halfling_Greet_Neg_01",
+      "Sound": "Audio\\WWise\\145898663.wem"
     },
     {
-      "Id": "Play_HEF_Teclis_Dip_Halfling_Greet_Neg_02",
-      "SoundFile": "Audio\\WWise\\180316358.wem"
+      "Name": "Play_HEF_Teclis_Dip_Halfling_Greet_Neg_02",
+      "Sound": "Audio\\WWise\\180316358.wem"
     },
     {
-      "Id": "Play_HEF_Teclis_Dip_Halfling_Greet_Neu_02",
-      "SoundFile": "Audio\\WWise\\452912437.wem"
+      "Name": "Play_HEF_Teclis_Dip_Halfling_Greet_Neu_02",
+      "Sound": "Audio\\WWise\\452912437.wem"
     },
     {
-      "Id": "Play_HEF_Teclis_Dip_Halfling_Greet_Neu_01",
-      "SoundFile": "Audio\\WWise\\749366078.wem"
+      "Name": "Play_HEF_Teclis_Dip_Halfling_Greet_Neu_01",
+      "Sound": "Audio\\WWise\\749366078.wem"
     },
     {
-      "Id": "Play_HEF_Imrik_Dip_Halfling_Neu_01",
-      "SoundFile": "Audio\\WWise\\348912078.wem"
+      "Name": "Play_HEF_Imrik_Dip_Halfling_Neu_01",
+      "Sound": "Audio\\WWise\\348912078.wem"
     },
     {
-      "Id": "Play_HEF_Imrik_Dip_Halfling_Neu_02",
-      "SoundFile": "Audio\\WWise\\765779622.wem"
+      "Name": "Play_HEF_Imrik_Dip_Halfling_Neu_02",
+      "Sound": "Audio\\WWise\\765779622.wem"
     },
     {
-      "Id": "Play_HEF_Imrik_Dip_Halfling_Neg_02",
-      "SoundFile": "Audio\\WWise\\402319398.wem"
+      "Name": "Play_HEF_Imrik_Dip_Halfling_Neg_02",
+      "Sound": "Audio\\WWise\\402319398.wem"
     },
     {
-      "Id": "Play_HEF_Imrik_Dip_Halfling_Neg_01",
-      "SoundFile": "Audio\\WWise\\1062243494.wem"
+      "Name": "Play_HEF_Imrik_Dip_Halfling_Neg_01",
+      "Sound": "Audio\\WWise\\1062243494.wem"
     },
     {
-      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Neg_02",
-      "SoundFile": "Audio\\WWise\\801098497.wem"
+      "Name": "Play_EMP_KF_Dip_Halfling_Greet_Neg_02",
+      "Sound": "Audio\\WWise\\801098497.wem"
     },
     {
-      "Id": "Play_EMP_KF_Dip_Halfling_Greet_Neg_01",
-      "SoundFile": "Audio\\WWise\\825230199.wem"
+      "Name": "Play_EMP_KF_Dip_Halfling_Greet_Neg_01",
+      "Sound": "Audio\\WWise\\825230199.wem"
     }
   ]
 }

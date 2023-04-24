@@ -1,6 +1,4 @@
-﻿using Audio.Utility;
-using CommonControls.Editors.AudioEditor.BnkCompiler;
-using CommunityToolkit.Diagnostics;
+﻿using CommunityToolkit.Diagnostics;
 using MoreLinq;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,14 +7,14 @@ namespace Audio.BnkCompiler.ObjectGeneration
 {
     public class HircSorter
     {
-        public List<IAudioProjectHircItem> Sort(AudioInputProject project) 
+        public List<IAudioProjectHircItem> Sort(CompilerData project) 
         {
             // Sort
             var sortedProjectItems = new List<IAudioProjectHircItem>();
             var mixers = SortActorMixerList(project);
             foreach (var mixer in mixers)
             {
-                var audioChildren = mixer.Sounds.Select(x => project.GameSounds.First(gameSound => gameSound.Id == x)).ToList();
+                var audioChildren = mixer.Sounds.Select(x => project.GameSounds.First(gameSound => gameSound.Name == x)).ToList();
                 var sortedAudioChildren = audioChildren.OrderBy(x => GetSortingId(x)).ToList();
 
                 sortedProjectItems.AddRange(sortedAudioChildren);
@@ -27,7 +25,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
             var sortedEvents = project.Events.OrderBy(x => GetSortingId(x)).ToList();
             foreach (var currentEvent in sortedEvents)
             {
-                var actions = currentEvent.Actions.Select(x => project.Actions.First(action => action.Id == x)).ToList();
+                var actions = currentEvent.Actions.Select(x => project.Actions.First(action => action.Name == x)).ToList();
                 var sortedActions = actions.OrderBy(x => GetSortingId(x)).ToList();
 
                 sortedProjectItems.AddRange(sortedActions);
@@ -40,7 +38,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
 
         uint GetSortingId(IAudioProjectHircItem item) => item.SerializationId;
 
-        List<ActorMixer> SortActorMixerList(AudioInputProject project)
+        List<ActorMixer> SortActorMixerList(CompilerData project)
         {
             List<ActorMixer> output = new List<ActorMixer>();
 
@@ -52,7 +50,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
             var root = roots.First();
             output.Add(root);
 
-            var children = root.ActorMixerChildren.Select(childId => project.ActorMixers.First(x => x.Id == childId)).ToList();
+            var children = root.ActorMixerChildren.Select(childId => project.ActorMixers.First(x => x.Name == childId)).ToList();
             ProcessChildren(children, output, project);
 
             output.Reverse();
@@ -61,14 +59,14 @@ namespace Audio.BnkCompiler.ObjectGeneration
         }
 
 
-        void ProcessChildren(List<ActorMixer> children, List<ActorMixer> outputList, AudioInputProject project)
+        void ProcessChildren(List<ActorMixer> children, List<ActorMixer> outputList, CompilerData project)
         {
             var sortedChildren = children.OrderByDescending(x => GetSortingId(x)).ToList();
 
             outputList.AddRange(sortedChildren);
             foreach (var child in sortedChildren)
             {
-                var childOfChildren = child.ActorMixerChildren.Select(childId => project.ActorMixers.First(x => x.Id == childId)).ToList();
+                var childOfChildren = child.ActorMixerChildren.Select(childId => project.ActorMixers.First(x => x.Name == childId)).ToList();
                 ProcessChildren(childOfChildren, outputList, project);
             }
         }
@@ -82,7 +80,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
 
                 bool isReferenced = mixers
                     .Where(x => x != currentMixer)
-                    .Any(x => x.ActorMixerChildren.Contains(currentMixer.Id));
+                    .Any(x => x.ActorMixerChildren.Contains(currentMixer.Name));
                 if (isReferenced)
                     return true;
             }

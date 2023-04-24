@@ -1,13 +1,4 @@
-﻿using CommonControls.Common;
-using CommonControls.Editors.AudioEditor.BnkCompiler;
-using CommonControls.Services;
-using Filetypes.ByteParsing;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-
-namespace AudioResearch
+﻿namespace AudioResearch
 {
     static class BnkFileManipulatorTests
     {

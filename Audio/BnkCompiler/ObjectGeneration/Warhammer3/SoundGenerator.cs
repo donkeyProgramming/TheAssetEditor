@@ -1,6 +1,5 @@
 ﻿using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.FileFormats.WWise;
-using CommonControls.Editors.AudioEditor.BnkCompiler;
 using CommonControls.Services;
 using System.IO;
 using System.Collections.Generic;
@@ -22,14 +21,14 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             _pfs = pfs;
         }
 
-        public HircItem ConvertToWWise(IAudioProjectHircItem projectItem, AudioInputProject project, HircProjectItemRepository repository)
+        public HircItem ConvertToWWise(IAudioProjectHircItem projectItem, CompilerData project)
         {
             var typedProjectItem = projectItem as GameSound;
             Guard.IsNotNull(typedProjectItem);
-            return ConvertToWWise(typedProjectItem, repository);
+            return ConvertToWWise(typedProjectItem, project);
         }
 
-        public CAkSound_v136 ConvertToWWise(GameSound inputSound, HircProjectItemRepository repository)
+        public CAkSound_v136 ConvertToWWise(GameSound inputSound, CompilerData project)
         {
             var file = _pfs.FindFile(inputSound.Path);
             var soundIdStr = Path.GetFileNameWithoutExtension(inputSound.Path).Trim();
@@ -37,7 +36,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 
             var wwiseSound = new CAkSound_v136()
             {
-                Id = repository.GetHircItemId(inputSound.Id),
+                Id = project.GetHircItemIdFromName(inputSound.Name),
                 Type = HircType.Sound,
                 AkBankSourceData = new AkBankSourceData()
                 {
@@ -53,17 +52,17 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 NodeBaseParams = NodeBaseParams.CreateDefault()
             };
 
-            var mixer = repository.GetActionMixerForSound(inputSound.Id);
+            var mixer = project.GetActionMixerForSound(inputSound.Name);
             if (mixer != null)
-                wwiseSound.NodeBaseParams.DirectParentID = repository.GetHircItemId(mixer.Id);
+                wwiseSound.NodeBaseParams.DirectParentID = project.GetHircItemIdFromName(mixer.Name);
 
             wwiseSound.UpdateSize();
             return wwiseSound;
         }
 
-        public List<CAkSound_v136> ConvertToWWise(IEnumerable<GameSound> inputSound, HircProjectItemRepository repository)
+        public List<CAkSound_v136> ConvertToWWise(IEnumerable<GameSound> inputSound, CompilerData project)
         {
-            return inputSound.Select(x => ConvertToWWise(x, repository)).ToList();
+            return inputSound.Select(x => ConvertToWWise(x, project)).ToList();
         }
     }
 }

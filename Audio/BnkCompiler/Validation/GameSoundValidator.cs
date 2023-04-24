@@ -1,5 +1,4 @@
-﻿using CommonControls.Editors.AudioEditor.BnkCompiler;
-using CommonControls.Services;
+﻿using CommonControls.Services;
 using FluentValidation;
 
 namespace Audio.BnkCompiler.Validation
@@ -8,12 +7,17 @@ namespace Audio.BnkCompiler.Validation
     {
         public GameSoundValidator(PackFileService pfs) 
         {
-            RuleFor(x => x.Id).NotEmpty().WithMessage("Item is missing ID");
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Item is missing ID");
             RuleFor(x => x.Path)
-                .NotEmpty().WithMessage(x => $"GameSound '{x.Id}' is missing file path")
-                .Must(x=>BeValidPath(x, pfs)).WithMessage(x => $"GameSound '{x.Id}' path does not point to anything: {x.Path}");
+                .NotEmpty().WithMessage(x => $"GameSound '{x.Name}' is missing file path")
+                .Must(x=>BeValidPath(x, pfs)).WithMessage(x => $"GameSound '{x.Name}' path does not point to anything: {x.Path}");
         }
 
-        private bool BeValidPath(string path, PackFileService pfs) => pfs.FindFile(path) != null;
+        private bool BeValidPath(string path, PackFileService pfs)
+        {
+            if(string.IsNullOrWhiteSpace(path)) 
+                return false;
+            return pfs.FindFile(path) != null;
+        }
     }
 }
