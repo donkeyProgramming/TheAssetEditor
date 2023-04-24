@@ -1,13 +1,4 @@
-﻿using Audio.BnkCompiler;
-using Audio.FileFormats.WWise.Hirc.V136;
-using Audio.Storage;
-using Audio.Utility;
-using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
-using MoreLinq;
-using MoreLinq.Extensions;
-using System.Linq;
+
 
 namespace AudioResearch
 {
@@ -18,12 +9,19 @@ namespace AudioResearch
             // CompileTest();
             //TableTest();
             //OvnTest.GenerateProjectFromBnk(false);
+
+            // OvnTest.Compile();
+            //GeneratOvnProject();
+            TestDialogEventSerialization();
+            // LogicalChainingTest();
+
             var currentProjectName = $"Data\\OvnExample\\ProjectSimple.json";
             //OvnTest.GenerateProjectFromBnk(currentProjectName);
 
 
             OvnTest.Compile(currentProjectName, false, false, false);
             //TestDialogEventSerialization();
+
         }
 
 
@@ -96,26 +94,210 @@ namespace AudioResearch
 
 
 
-        //static void TestDialogEventSerialization()
-        //{
-        //    using var application = new SimpleApplication();
-        //
-        //    var pfs = application.GetService<PackFileService>();
-        //    pfs.LoadAllCaFiles(GameTypeEnum.Warhammer3);
-        //    var audioRepo = application.GetService<IAudioRepository>();
-        //
-        //    var dialogEvents = audioRepo.GetAllOfType<CAkDialogueEvent_v136>();
-        //    foreach(var dialogEvent in dialogEvents) 
-        //    {
-        //        dialogEvent.AkDecisionTree.VerifyState();
-        //        var bytes = dialogEvent.GetAsByteArray();
-        //        var chuck = new Filetypes.ByteParsing.ByteChunk(bytes);
-        //        var reParsedObject = new CAkDialogueEvent_v136();
-        //        reParsedObject.Parse(chuck);
-        //        // reParsedObject.AkDecisionTree.VerifyState();
-        //        // Debug.Assert(dialogEvent.AkDecisionTree.Flatten());
-        //        Console.WriteLine($"Main.Success: {dialogEvent.Id}");
-        //    }
-        //}
+
+        static void TestDialogEventSerialization()
+        {
+            using var application = new SimpleApplication();
+
+            var pfs = application.GetService<PackFileService>();
+            pfs.LoadAllCaFiles(GameTypeEnum.Warhammer3);
+            var audioRepo = application.GetService<IAudioRepository>();
+
+            Func<uint, string> unHash = audioRepo.GetNameFromHash;
+            
+            
+            var deTypes = new ArrayList();
+            
+            var dialogEvents = audioRepo.GetAllOfType<CAkDialogueEvent_v136>();
+
+            dialogEvents.ForEach(e => e.AkDecisionTree.VerifyState());
+            
+            var modes = dialogEvents.GroupBy(e => e.uMode);
+            Console.WriteLine($"Modes:");
+            modes.ForEach(e => Console.WriteLine($"{(e.Key, e.Count())}"));
+            modes.First(e => e.Key == 1)
+                .ForEach(e => Console.WriteLine($"\t{audioRepo.GetNameFromHash(e.Id)}, {e.AkDecisionTree.NodeCount()}"));
+
+            Console.WriteLine("uWeight != 50:");
+            dialogEvents.ForEach(
+                e =>
+                {
+                    var nodes = new List<AkDecisionTree.Node>();
+                    e.AkDecisionTree.BfsTreeTraversal(
+                        node => If(node.uWeight != 50).Then(_ => nodes.Add(node))
+                    );
+                    If(nodes.Count > 0).Then(_ =>
+                        Console.WriteLine($"\t{unHash(e.Id)}: {String.Join(", ", nodes.Select(e => (unHash(e.Key), e.uWeight)))}")
+                    );
+                }
+            );
+            
+            Console.WriteLine("uProbability != 100:");
+            dialogEvents.ForEach(
+                e =>
+                {
+                    var nodes = new List<AkDecisionTree.Node>();
+                    e.AkDecisionTree.BfsTreeTraversal(
+                        node => If(node.uProbability != 100).Then(_ => nodes.Add(node))
+                    );
+                    If(nodes.Count > 0).Then(_ =>
+                        Console.WriteLine($"\t{unHash(e.Id)}: {String.Join(", ", nodes.Select(e => (unHash(e.Key), e.uProbability)))}")
+                    );
+                }
+            );
+            
+                        
+            Console.WriteLine("uWeight != 50 && uProbability != 100:");
+            dialogEvents.ForEach(
+                e =>
+                {
+                    var nodes = new List<AkDecisionTree.Node>();
+                    e.AkDecisionTree.BfsTreeTraversal(
+                        node => If(node.uWeight != 50 && node.uProbability != 100).Then(_ => nodes.Add(node))
+                    );
+                    If(nodes.Count > 0).Then(_ =>
+                        Console.WriteLine($"\t{unHash(e.Id)}: {String.Join(", ", nodes.Select(e => (unHash(e.Key), e.uWeight, e.uProbability)))}")
+                    );
+                }
+            );
+            
+            Console.WriteLine("Actual depth != _maxDepth:");
+            dialogEvents.ForEach(
+                e => If(e.AkDecisionTree.Depth() != e.AkDecisionTree._maxTreeDepth)
+                    .Then(_ => Console.WriteLine($"\t{unHash(e.Id)}: {e.AkDecisionTree.Depth()}/{e.AkDecisionTree._maxTreeDepth}"))
+            );
+            
+            Console.WriteLine("Depths of the leaves:");
+            dialogEvents.ForEach(
+                e =>
+                {
+                    var values = new HashSet<int>();
+                    e.AkDecisionTree.BfsTreeTraversal(
+                        (node, depth) => If(node.Children.Count == 0 && depth != e.AkDecisionTree._maxTreeDepth)
+                            .Then(_ => values.Add(depth))
+                    );
+                    If(values.Count > 0).Then(_ =>
+                        Console.WriteLine($"\t{unHash(e.Id)}(nc={e.AkDecisionTree.NodeCount()})(d={e.AkDecisionTree._maxTreeDepth}): {String.Join(", ", values)}")
+                    );
+                }
+            );
+            return;
+            foreach(var dialogEvent in dialogEvents) 
+            {
+                // dialogEvent.AkDecisionTree.VerifyState();
+                // var bytes = dialogEvent.GetAsByteArray();
+                // var chuck = new Filetypes.ByteParsing.ByteChunk(bytes);
+                // var reParsedObject = new CAkDialogueEvent_v136();
+                // reParsedObject.Parse(chuck);
+                // reParsedObject.AkDecisionTree.VerifyState();
+                // Debug.Assert(dialogEvent.AkDecisionTree.Flatten());
+
+                deTypes.Add(dialogEvent.Type);
+
+
+                // dialogEvent.AkDecisionTree.BfsTreeTraversal(CheckWeightAndProb);
+                dialogEvent.AkDecisionTree.BfsTreeTraversal(node =>
+                {
+                    if (node.AudioNodeId == 0 && node.Children.Count == 0){
+                        Console.WriteLine($"Weird Node ({audioRepo.GetNameFromHash(node.Key)}): {audioRepo.GetNameFromHash(dialogEvent.Id)}({dialogEvent.Id}) | nodeCount: {dialogEvent.AkDecisionTree.NodeCount()}");
+                    }
+                });
+                // Console.WriteLine($"Main.Success: {audioRepo.GetNameFromHash(dialogEvent.Id)}({dialogEvent.Id})");
+            }
+
+        }
+
+
+
+        public class LogicalChaining
+        {
+
+            private bool _condition;
+            private bool _isValid = true;
+            private LogicalChaining(bool condition)
+            {
+                _condition = condition;
+            }
+
+            public static LogicalChaining If(bool condition) 
+                => new LogicalChaining(condition);
+            
+            public LogicalChaining Then(Action action)
+            {
+                if (_isValid && _condition){
+                    action();
+                }
+                return this;
+            }
+
+            //Enable style: _ => doStuff()
+            public LogicalChaining Then(Action<bool> action) 
+            {
+                if (_isValid && _condition){
+                    action(true);
+                }
+                return this;
+            }
+            
+            public void Else(Action action)
+            {
+                if (_isValid && !_condition){
+                    action();
+                }
+            }
+            
+            //Enable style: _ => doStuff()
+            public void Else(Action<bool> action)
+            {
+                if (_isValid && !_condition){
+                    action(true);
+                }
+            }
+            
+            
+            public LogicalChaining ElseIf(bool condition)
+            {
+                if (!_isValid){
+                    return this;
+                }
+                
+                if (_condition){
+                    _isValid = false; // Turn off all the rest sequence
+                }else{
+                    _condition = condition;
+                }
+                return this;
+            }
+
+            private static void LogicalChainingTest()
+            {
+                {
+                    int x = 2;
+                    If(true).Then(_ => x *= 2).Else(_ => x /= 2);
+                    Debug.Assert(x == 4);
+                }
+                {
+                    int x = 2, y = 3;
+                    If(false).Then(_ => x *= 2).Else(_ => x /= 2);
+                    Debug.Assert(x == 1);
+                }
+                {
+                    int x = 2, y = 3;
+                    If(false).Else(_ => x /= 2);
+                    Debug.Assert(x == 1);
+                }
+                {
+                    int x = 2, y = 3;
+                    If(true).ElseIf(true).Then(_ => x *= 2);
+                    Debug.Assert(x == 2);
+                }
+                {
+                    int x = 2, y = 3;
+                    If(false).ElseIf(true).Then(_ => x *= 2);
+                    Debug.Assert(x == 4);
+                }
+            
+            }
+        }
     }
 }
