@@ -43,7 +43,6 @@ namespace Audio
             serviceCollection.AddScoped<WemFileImporter>();
             serviceCollection.AddScoped<Compiler>();
             serviceCollection.AddScoped<ResultHandler>();
-       
         }
 
         public static void RegisterTools(IToolFactory factory)
