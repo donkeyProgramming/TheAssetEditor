@@ -36,7 +36,7 @@ namespace Audio.AudioEditor
 
         void ProcessNode(AkDecisionTree.Node node, HircTreeItem parent, HircItem owner, uint depdth)
         {
-            if (node.IsAudioNode)
+            if (node.IsAudioNode())
             {
                 if (node.Key != 0)
                 {

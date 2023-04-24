@@ -21,7 +21,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using Serilog;
-using static AudioResearch.Program.LogicalChaining;
+using static CommonControls.Common.CustomExtensions;
 
 
 namespace AudioResearch
@@ -219,99 +219,6 @@ namespace AudioResearch
                 // Console.WriteLine($"Main.Success: {audioRepo.GetNameFromHash(dialogEvent.Id)}({dialogEvent.Id})");
             }
 
-        }
-
-
-
-        public class LogicalChaining
-        {
-
-            private bool _condition;
-            private bool _isValid = true;
-            private LogicalChaining(bool condition)
-            {
-                _condition = condition;
-            }
-
-            public static LogicalChaining If(bool condition) 
-                => new LogicalChaining(condition);
-            
-            public LogicalChaining Then(Action action)
-            {
-                if (_isValid && _condition){
-                    action();
-                }
-                return this;
-            }
-
-            //Enable style: _ => doStuff()
-            public LogicalChaining Then(Action<bool> action) 
-            {
-                if (_isValid && _condition){
-                    action(true);
-                }
-                return this;
-            }
-            
-            public void Else(Action action)
-            {
-                if (_isValid && !_condition){
-                    action();
-                }
-            }
-            
-            //Enable style: _ => doStuff()
-            public void Else(Action<bool> action)
-            {
-                if (_isValid && !_condition){
-                    action(true);
-                }
-            }
-            
-            
-            public LogicalChaining ElseIf(bool condition)
-            {
-                if (!_isValid){
-                    return this;
-                }
-                
-                if (_condition){
-                    _isValid = false; // Turn off all the rest sequence
-                }else{
-                    _condition = condition;
-                }
-                return this;
-            }
-
-            private static void LogicalChainingTest()
-            {
-                {
-                    int x = 2;
-                    If(true).Then(_ => x *= 2).Else(_ => x /= 2);
-                    Debug.Assert(x == 4);
-                }
-                {
-                    int x = 2, y = 3;
-                    If(false).Then(_ => x *= 2).Else(_ => x /= 2);
-                    Debug.Assert(x == 1);
-                }
-                {
-                    int x = 2, y = 3;
-                    If(false).Else(_ => x /= 2);
-                    Debug.Assert(x == 1);
-                }
-                {
-                    int x = 2, y = 3;
-                    If(true).ElseIf(true).Then(_ => x *= 2);
-                    Debug.Assert(x == 2);
-                }
-                {
-                    int x = 2, y = 3;
-                    If(false).ElseIf(true).Then(_ => x *= 2);
-                    Debug.Assert(x == 4);
-                }
-            
-            }
         }
     }
 }

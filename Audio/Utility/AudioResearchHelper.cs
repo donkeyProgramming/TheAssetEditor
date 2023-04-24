@@ -122,7 +122,7 @@ namespace Audio.Utility
             }
             var audioNodeName = $"{cNode.AudioNodeId}";
             string keyName;
-            if (cNode.IsAudioNode)
+            if (cNode.IsAudioNode())
             {
                 audioNodeName = $"{audioRepository.GetNameFromHash(cNode.AudioNodeId)}({cNode.AudioNodeId})";
                 keyName = $"{currentNodeContent}({cNode.Key})";
@@ -131,7 +131,7 @@ namespace Audio.Utility
             {
                 keyName = $"{gkeys[depth]} == {currentNodeContent}({cNode.Key})";
             }
-            outputList.Add($"{keyName}|{cNode.uWeight}|{cNode.uProbability}|{cNode.IsAudioNode}|{audioNodeName}|{pId}");
+            outputList.Add($"{keyName}|{cNode.uWeight}|{cNode.uProbability}|{cNode.IsAudioNode()}|{audioNodeName}|{pId}");
             var cId = outputList.Count - 1;
             foreach (var child in cNode.Children)
                 GenerateCustomRow(child, cId, depth+1, gkeys, outputList, audioRepository);

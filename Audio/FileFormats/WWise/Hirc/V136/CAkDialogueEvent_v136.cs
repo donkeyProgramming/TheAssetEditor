@@ -6,7 +6,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using MoreLinq;
+using CommonControls.Common;
+
+using static CommonControls.Common.CustomExtensions;
 
 namespace Audio.FileFormats.WWise.Hirc.V136
 {
@@ -82,7 +84,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             
             // Some Nodes at the _maxDepth have AudioNodeId == 0 and no children so we cannot use AudioNodeId = 0 to check
             // so we should check for children instead - works for now
-            public bool IsAudioNode => throw new NotImplementedException(); 
+            public abstract bool IsAudioNode(); 
             public uint AudioNodeId { get; set; }
             public ushort uWeight { get; set; }
             public ushort uProbability { get; set; }
@@ -91,7 +93,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         {
             public ushort Children_uIdx { get; set; }
             public ushort Children_uCount { get; set; }
-            public bool IsAudioNode => Children_uCount == 0;
+            public override bool IsAudioNode() => Children_uCount == 0;
             
             private int _SerializationByteSize() => Marshal.SizeOf(Key) + 
                                                     Marshal.SizeOf(AudioNodeId) + // == Marshal.SizeOf(Children_uIdx) + Marshal.SizeOf(Children_uCount)
@@ -128,7 +130,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             {
                 using var memStream = new MemoryStream();
                 memStream.Write(ByteParsers.UInt32.EncodeValue(Key, out _));
-                if (IsAudioNode)
+                if (IsAudioNode())
                 {
                     memStream.Write(ByteParsers.UInt32.EncodeValue(AudioNodeId, out _));
                 } else
@@ -143,7 +145,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 #if DEBUG //Reparse
                     var copyInstance = new SerializedNode(new ByteChunk(byteArray));
                     Debug.Assert(Key == copyInstance.Key);
-                    if (IsAudioNode)
+                    if (IsAudioNode())
                     {
                         Debug.Assert(AudioNodeId == copyInstance.AudioNodeId);
                     } else
@@ -160,18 +162,15 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
             public void VerifyState()
             {
-                if (IsAudioNode){
-                    if (Children_uIdx > 0){
-                        throw new ArgumentException($"AudioNode has invalid Children_uIdx: {Children_uIdx}. Should be 0");
-                    }
-                    if (Children_uCount > 0){
-                        throw new ArgumentException($"AudioNode has invalid Children_uCount: {Children_uCount}. Should be 0");
-                    }
+                if (IsAudioNode()){
+                    If(Children_uIdx > 0).Then(_ =>
+                        throw new ArgumentException($"AudioNode has invalid Children_uIdx: {Children_uIdx}. Should be 0"));
+                    If(Children_uCount > 0).Then(_ =>
+                        throw new ArgumentException($"AudioNode has invalid Children_uCount: {Children_uCount}. Should be 0"));
                 }
                 else{
-                    if (Children_uCount == 0){
-                        throw new ArgumentException($"LogicNode has invalid Children_uCount: {Children_uCount}. Should be greater 0");
-                    }
+                    If(Children_uCount == 0).Then(_ =>
+                        throw new ArgumentException($"LogicNode has invalid Children_uCount: {Children_uCount}. Should be greater 0"));
                 }
             }
         }
@@ -179,14 +178,14 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         [DebuggerDisplay("Node Key:[{Key}] Children:[{Children.Count}]")]
         public class Node: BaseNode
         {
-            public bool IsAudioNode => Children.Count == 0;
+            public override bool IsAudioNode() => Children.Count == 0;
             public List<Node> Children { get; set; } = new List<Node>();
 
             private Node(uint key, uint audioNodeId, ushort uweight, ushort uprobability)
             {
-                if (uProbability > 100){
-                    throw new ArgumentException($"uProbability ({uProbability}) is greater than 100");
-                }
+                If(uProbability > 100).Then(_ => 
+                    throw new ArgumentException($"uProbability ({uProbability}) is greater than 100"));
+                
                 Key = key;
                 AudioNodeId = audioNodeId;
                 uWeight = uweight;
@@ -203,13 +202,15 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             
             public void VerifyState()
             {
-                if (IsAudioNode){
-                    Debug.Assert(Children.Count == 0);
-                }
-                else{
-                    Debug.Assert(AudioNodeId == 0);
-                    Debug.Assert(Children.Count > 0);
-                }
+                If(IsAudioNode())
+                    .Then(_ => 
+                            Debug.Assert(Children.Count == 0))
+                    .Else(_ =>
+                        {
+                            Debug.Assert(AudioNodeId == 0);
+                            Debug.Assert(Children.Count > 0);
+                        }
+                    );
             }
 
             public static Node CreateDecisionNode(uint key, ushort uWeight, ushort uProbability) => 
@@ -229,22 +230,23 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             _maxTreeDepth = maxTreeDepth;
             var numNodes = uTreeDataSize / SerializedNode.SerializationByteSize;
             var flattenTree = new List<SerializedNode>();
-            Enumerable.Range(0, (int) numNodes).ForEach(_ => flattenTree.Add(new SerializedNode(chunk)));
+            For(numNodes, _ => 
+                    flattenTree.Add(new SerializedNode(chunk)));
             
             Node ConvertNode(ushort parentsFirstChildIndex, ushort childIndex, uint currentDepth)
             {
                 var sNode = flattenTree[parentsFirstChildIndex + childIndex];
                 var isAtMaxDepth = currentDepth == maxTreeDepth;
                 var isOutsideRange = sNode.Children_uIdx >= flattenTree.Count;
-                if (isAtMaxDepth || isOutsideRange){
+                if(isAtMaxDepth || isOutsideRange){
                     sNode.Children_uCount = 0;
                     sNode.Children_uIdx = 0;
                     return new Node(sNode);
                 }
                 sNode.AudioNodeId = 0;
                 var node = new Node(sNode);
-                Enumerable.Range(0, sNode.Children_uCount).ForEach(i => node.Children.Add(
-                    ConvertNode(sNode.Children_uIdx, (ushort) i,currentDepth + 1)));
+                For(sNode.Children_uCount, i => 
+                        node.Children.Add(ConvertNode(sNode.Children_uIdx, (ushort) i,currentDepth + 1)));
                 return node;
             }
 
@@ -259,20 +261,18 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             List<(uint key, ushort weight, ushort probability)> decisionNodes, 
             (uint key, ushort audioId, ushort weight, ushort probability) audioNode)
         {
-            if (decisionNodes.Count + 1 + 1 > _maxTreeDepth){ // 1 for the root and 1 for a leaf
-                throw new ArgumentException($"DecisionPathChain is too Long");
-            }
+            If(decisionNodes.Count + 1 + 1 > _maxTreeDepth).Then( _ => // 1 for the root and 1 for a leaf
+                throw new ArgumentException($"DecisionPathChain is too Long"));
 
             var cNode = Root;
             decisionNodes.ForEach(e =>
             {
                 var selected = cNode.Children.Where(x => x.Key == e.key);
                 
-                if (selected.Count() > 1){
-                    throw new ArgumentException($"Many nodes were selected");
-                }
+                If(selected.Count() > 1).Then(_ =>
+                    throw new ArgumentException($"Many nodes were selected"));
 
-                if (!selected.Any()){
+                if(!selected.Any()){
                     cNode = Node.CreateDecisionNode(e.key, e.weight, e.probability);
                     cNode.Children.Add(cNode);
                     return;
@@ -292,9 +292,8 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             var audioNodes = new List<Node>();
             void GetAudioNode(Node node)
             {
-                if (node.IsAudioNode){
-                    audioNodes.Add(node);
-                }
+                If(node.IsAudioNode()).Then(_ =>
+                    audioNodes.Add(node));
             }
 
             DfsTreeTraversal(GetAudioNode);
@@ -310,12 +309,10 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 while (stack.Count > 0){
 
                     var peek = stack.Peek();
-                    if (peek.IsAudioNode){
-                        decisionPaths.Add(stack.ToList());
-                    }
+                    If(peek.IsAudioNode()).Then(_ =>
+                        decisionPaths.Add(stack.ToList()));
                     var node = stack.Pop();
-                    Enumerable.Range(0, node.Children.Count).Reverse()
-                        .ForEach(i => stack.Push(node.Children[i]));
+                    node.Children.ForEachReverse(stack.Push);
                 }
             }
             
@@ -342,8 +339,8 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             void Verify(Node node)
             {
                 node.VerifyState();
-                if (!node.IsAudioNode){ 
-                    if (!node.Children.First().IsAudioNode){
+                if (!node.IsAudioNode()){ 
+                    if (!node.Children.First().IsAudioNode()){
                         //Debug.Assert(node.Children.First().Key == 0); // Not TRUE: the first children of logicalNodes has key == 0
                     }
                 }
@@ -369,8 +366,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 {
                     var (node, depth, childIdx) = queue.Dequeue();
                     func(node, depth, childIdx);
-                    int i = 0; 
-                    node.Children.ForEach(e => queue.Enqueue((e,depth+1, i++)));
+                    node.Children.ForEach((e, i) => queue.Enqueue((e, depth+1, i)));
                 }
             }
 
@@ -392,8 +388,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 {
                     var (node, depth, childIdx) = stack.Pop();
                     func(node, depth, childIdx);
-                    Enumerable.Range(0, node.Children.Count).Reverse()
-                        .ForEach(i => stack.Push((node.Children[i],depth+1, i)));
+                    node.Children.ForEach((e, i) => stack.Push((e, depth+1, i)));
                 }
             }
 
@@ -419,9 +414,8 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             
             void TreeTraversalInternal(Node node)
             {
-                if(!visitedNodes.Contains(node)) {
-                    VisitAndDo(node);
-                }
+                If(!visitedNodes.Contains(node)).Then(_ =>
+                    VisitAndDo(node));
                 node.Children.ForEach(VisitAndDo);
                 node.Children.ForEach(TreeTraversalInternal);
             }
@@ -481,10 +475,12 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public List<Argument> Arguments { get; set; } = new List<Argument>();
         public ArgumentList(ByteChunk chunk, uint numItems)
         {
-            var range = Enumerable.Range(0, (int) numItems).ToList();
-            range.ForEach(_ => Arguments.Add(new Argument()));
-            range.ForEach(i => Arguments[i].ulGroupId = chunk.ReadUInt32());
-            range.ForEach(i => Arguments[i].eGroupType = (AkGroupType)chunk.ReadByte());
+            For(numItems, _ 
+                    => Arguments.Add(new Argument()));
+            For((int) numItems, i 
+                    => Arguments[i].ulGroupId = chunk.ReadUInt32());
+            For((int) numItems, i 
+                    => Arguments[i].eGroupType = (AkGroupType)chunk.ReadByte());
         }
 
         public class Argument
@@ -502,7 +498,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
             #if DEBUG //Reparse
                 var copyInstance = new ArgumentList(new ByteChunk(byteArray), (uint) Arguments.Count);
-                Enumerable.Range(0, Arguments.Count).ForEach(i =>
+                For(Arguments.Count, i =>
                     {
                         Debug.Assert(Arguments[i].ulGroupId == copyInstance.Arguments[i].ulGroupId);
                         Debug.Assert(Arguments[i].eGroupType == copyInstance.Arguments[i].eGroupType);
