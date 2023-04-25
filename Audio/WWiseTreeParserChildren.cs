@@ -38,9 +38,9 @@ namespace Audio.AudioEditor
         {
             if (node.IsAudioNode())
             {
-                if (node.Key != 0)
+                if (node.Content.Key != 0)
                 {
-                    var dialogEventNode = new HircTreeItem() { DisplayName = $"{_repository.GetNameFromHash(node.Key)}", Item = owner };
+                    var dialogEventNode = new HircTreeItem() { DisplayName = $"{_repository.GetNameFromHash(node.Content.Key)}", Item = owner };
                     parent.Children.Add(dialogEventNode);
                     ProcessNext(node.AudioNodeId, dialogEventNode);
                 }
@@ -57,7 +57,7 @@ namespace Audio.AudioEditor
                 depdth += 1;
                 if (depdth > 2) // For some reason we can always skip the first 2 nodes
                 {
-                    var dialogEventNode = new HircTreeItem() { DisplayName = $"{_repository.GetNameFromHash(node.Key)}", Item = owner };
+                    var dialogEventNode = new HircTreeItem() { DisplayName = $"{_repository.GetNameFromHash(node.Content.Key)}", Item = owner };
                     parent.Children.Add(dialogEventNode);
                     nextNode = dialogEventNode;
                 }

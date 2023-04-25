@@ -139,10 +139,10 @@ namespace AudioResearch
                 {
                     var nodes = new List<AkDecisionTree.Node>();
                     e.AkDecisionTree.BfsTreeTraversal(
-                        node => If(node.uWeight != 50).Then(_ => nodes.Add(node))
+                        node => If(node.Content.uWeight != 50).Then(_ => nodes.Add(node))
                     );
                     If(nodes.Count > 0).Then(_ =>
-                        Console.WriteLine($"\t{unHash(e.Id)}: {String.Join(", ", nodes.Select(e => (unHash(e.Key), e.uWeight)))}")
+                        Console.WriteLine($"\t{unHash(e.Id)}: {String.Join(", ", nodes.Select(e => (unHash(e.Content.Key), e.Content.uWeight)))}")
                     );
                 }
             );
@@ -153,10 +153,10 @@ namespace AudioResearch
                 {
                     var nodes = new List<AkDecisionTree.Node>();
                     e.AkDecisionTree.BfsTreeTraversal(
-                        node => If(node.uProbability != 100).Then(_ => nodes.Add(node))
+                        node => If(node.Content.uProbability != 100).Then(_ => nodes.Add(node))
                     );
                     If(nodes.Count > 0).Then(_ =>
-                        Console.WriteLine($"\t{unHash(e.Id)}: {String.Join(", ", nodes.Select(e => (unHash(e.Key), e.uProbability)))}")
+                        Console.WriteLine($"\t{unHash(e.Id)}: {String.Join(", ", nodes.Select(e => (unHash(e.Content.Key), e.Content.uProbability)))}")
                     );
                 }
             );
@@ -168,10 +168,10 @@ namespace AudioResearch
                 {
                     var nodes = new List<AkDecisionTree.Node>();
                     e.AkDecisionTree.BfsTreeTraversal(
-                        node => If(node.uWeight != 50 && node.uProbability != 100).Then(_ => nodes.Add(node))
+                        node => If(node.Content.uWeight != 50 && node.Content.uProbability != 100).Then(_ => nodes.Add(node))
                     );
                     If(nodes.Count > 0).Then(_ =>
-                        Console.WriteLine($"\t{unHash(e.Id)}: {String.Join(", ", nodes.Select(e => (unHash(e.Key), e.uWeight, e.uProbability)))}")
+                        Console.WriteLine($"\t{unHash(e.Id)}: {String.Join(", ", nodes.Select(e => (unHash(e.Content.Key), e.Content.uWeight, e.Content.uProbability)))}")
                     );
                 }
             );
@@ -214,7 +214,7 @@ namespace AudioResearch
                 dialogEvent.AkDecisionTree.BfsTreeTraversal(node =>
                 {
                     if (node.AudioNodeId == 0 && node.Children.Count == 0){
-                        Console.WriteLine($"Weird Node ({audioRepo.GetNameFromHash(node.Key)}): {audioRepo.GetNameFromHash(dialogEvent.Id)}({dialogEvent.Id}) | nodeCount: {dialogEvent.AkDecisionTree.NodeCount()}");
+                        Console.WriteLine($"Weird Node ({audioRepo.GetNameFromHash(node.Content.Key)}): {audioRepo.GetNameFromHash(dialogEvent.Id)}({dialogEvent.Id}) | nodeCount: {dialogEvent.AkDecisionTree.NodeCount()}");
                     }
                 });
                 // Console.WriteLine($"Main.Success: {audioRepo.GetNameFromHash(dialogEvent.Id)}({dialogEvent.Id})");

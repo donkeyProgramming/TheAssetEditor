@@ -77,16 +77,28 @@ namespace Audio.FileFormats.WWise.Hirc.V136
     public class AkDecisionTree
     {
 
-        public abstract class BaseNode
+        public struct NodeContent
         {
             public uint Key { get; set; }
+            public ushort uWeight { get; set; }
+            public ushort uProbability { get; set; }
+
+            NodeContent(uint key)
+            {
+                Key = key;
+                uWeight = 50;
+                uProbability = 100;
+            }
+        }
+
+        public abstract class BaseNode
+        {
+            public NodeContent Content;
             
             // Some Nodes at the _maxDepth have AudioNodeId == 0 and no children so we cannot use AudioNodeId = 0 to check
             // so we should check for children instead - works for now
             public abstract bool IsAudioNode(); 
             public uint AudioNodeId { get; set; }
-            public ushort uWeight { get; set; }
-            public ushort uProbability { get; set; }
         }
         public class SerializedNode: BaseNode
         {
@@ -94,10 +106,10 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             public ushort Children_uCount { get; set; }
             public override bool IsAudioNode() => Children_uCount == 0;
             
-            private int _SerializationByteSize() => Marshal.SizeOf(Key) + 
+            private int _SerializationByteSize() => Marshal.SizeOf(Content.Key) + 
                                                     Marshal.SizeOf(AudioNodeId) + // == Marshal.SizeOf(Children_uIdx) + Marshal.SizeOf(Children_uCount)
-                                                    Marshal.SizeOf(uWeight) + 
-                                                    Marshal.SizeOf(uProbability);
+                                                    Marshal.SizeOf(Content.uWeight) + 
+                                                    Marshal.SizeOf(Content.uProbability);
             
             public static readonly int SerializationByteSize = new SerializedNode()._SerializationByteSize();
 
@@ -107,28 +119,26 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
             public SerializedNode(Node node)
             {
-                Key = node.Key;
+                Content = node.Content;
                 AudioNodeId = node.AudioNodeId;
-                uWeight = node.uWeight;
-                uProbability = node.uProbability;
                 Children_uCount = (ushort) node.Children.Count;
                 Children_uIdx = 0;
             }
             
             public SerializedNode(ByteChunk chunk)
             {
-                Key = chunk.ReadUInt32();
+                Content.Key = chunk.ReadUInt32();
                 AudioNodeId = chunk.PeakUint32();
                 Children_uIdx = chunk.ReadUShort();
                 Children_uCount = chunk.ReadUShort();
-                uWeight = chunk.ReadUShort();
-                uProbability = chunk.ReadUShort();
+                Content.uWeight = chunk.ReadUShort();
+                Content.uProbability = chunk.ReadUShort();
             }
             
             public byte[] GetAsBytes()
             {
                 using var memStream = new MemoryStream();
-                memStream.Write(ByteParsers.UInt32.EncodeValue(Key, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue(Content.Key, out _));
                 if (IsAudioNode())
                 {
                     memStream.Write(ByteParsers.UInt32.EncodeValue(AudioNodeId, out _));
@@ -137,13 +147,13 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                     memStream.Write(ByteParsers.UShort.EncodeValue(Children_uIdx, out _));
                     memStream.Write(ByteParsers.UShort.EncodeValue(Children_uCount, out _));
                 }
-                memStream.Write(ByteParsers.UShort.EncodeValue(uWeight, out _));
-                memStream.Write(ByteParsers.UShort.EncodeValue(uProbability, out _));
+                memStream.Write(ByteParsers.UShort.EncodeValue(Content.uWeight, out _));
+                memStream.Write(ByteParsers.UShort.EncodeValue(Content.uProbability, out _));
                 var byteArray = memStream.ToArray();
 
                 #if DEBUG //Reparse
                     var copyInstance = new SerializedNode(new ByteChunk(byteArray));
-                    Debug.Assert(Key == copyInstance.Key);
+                    Debug.Assert(Content.Key == copyInstance.Content.Key);
                     if (IsAudioNode())
                     {
                         Debug.Assert(AudioNodeId == copyInstance.AudioNodeId);
@@ -152,8 +162,8 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                         Debug.Assert(Children_uIdx == copyInstance.Children_uIdx);
                         Debug.Assert(Children_uCount == copyInstance.Children_uCount);
                     }
-                    Debug.Assert(uWeight == copyInstance.uWeight);
-                    Debug.Assert(uProbability == copyInstance.uProbability);
+                    Debug.Assert(Content.uWeight == copyInstance.Content.uWeight);
+                    Debug.Assert(Content.uProbability == copyInstance.Content.uProbability);
                 #endif
                 
                 return byteArray;
@@ -167,18 +177,18 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                     If(Children_uCount > 0).Then(_ =>
                         throw new ArgumentException($"AudioNode has invalid Children_uCount: {Children_uCount}. Should be 0"));
                     
-                    If(uWeight != 50 && uProbability != 100).Then(_ =>
+                    If(Content.uWeight != 50 && Content.uProbability != 100).Then(_ =>
                         throw new ArgumentException($"AudioNode can only have uWeight or uProbability modified"));
                 }
                 else{
                     If(Children_uCount == 0).Then(_ =>
                         throw new ArgumentException($"LogicNode has invalid Children_uCount: {Children_uCount}. Should be greater 0"));
                     
-                    If(uWeight != 50).Then(_ =>
-                        throw new ArgumentException($"LogicNode should have uWeight{uWeight} equal to 50"));
+                    If(Content.uWeight != 50).Then(_ =>
+                        throw new ArgumentException($"LogicNode should have uWeight{Content.uWeight} equal to 50"));
                     
-                    If(uProbability != 100).Then(_ =>
-                        throw new ArgumentException($"LogicNode should have uProbability{uProbability} equal to 100"));
+                    If(Content.uProbability != 100).Then(_ =>
+                        throw new ArgumentException($"LogicNode should have uProbability{Content.uProbability} equal to 100"));
                 }
             }
         }
@@ -191,21 +201,19 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
             private Node(uint key, uint audioNodeId, ushort uweight, ushort uprobability)
             {
-                If(uProbability > 100).Then(_ => 
-                    throw new ArgumentException($"uProbability ({uProbability}) is greater than 100"));
+                If(Content.uProbability > 100).Then(_ => 
+                    throw new ArgumentException($"uProbability ({Content.uProbability}) is greater than 100"));
                 
-                Key = key;
+                Content.Key = key;
                 AudioNodeId = audioNodeId;
-                uWeight = uweight;
-                uProbability = uprobability;
+                Content.uWeight = uweight;
+                Content.uProbability = uprobability;
             }
             
             public Node(SerializedNode sNode)
             {
-                Key = sNode.Key;
+                Content = sNode.Content;
                 AudioNodeId = sNode.AudioNodeId;
-                uWeight = sNode.uWeight;
-                uProbability = sNode.uProbability;
             }
             
             public void VerifyState()
@@ -217,8 +225,8 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                         {
                             Debug.Assert(AudioNodeId == 0);
                             Debug.Assert(Children.Count > 0);
-                            Debug.Assert(uWeight == 50);
-                            Debug.Assert(uProbability == 100);
+                            Debug.Assert(Content.uWeight == 50);
+                            Debug.Assert(Content.uProbability == 100);
                         }
                     );
             }
@@ -268,7 +276,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
 
         public Node AddAudioNode(
-            List<(uint key, ushort weight, ushort probability)> decisionNodes, 
+            List<NodeContent> decisionNodes, 
             (uint key, ushort audioId, ushort weight, ushort probability) audioNode)
         {
             If(decisionNodes.Count + 1 + 1 > _maxTreeDepth).Then( _ => // 1 for the root and 1 for a leaf
@@ -277,13 +285,13 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             var cNode = Root;
             decisionNodes.ForEach(e =>
             {
-                var selected = cNode.Children.Where(x => x.Key == e.key);
+                var selected = cNode.Children.Where(x => x.Content.Key == e.Key);
                 
                 If(selected.Count() > 1).Then(_ =>
                     throw new ArgumentException($"Many nodes were selected"));
 
                 if(!selected.Any()){
-                    cNode = Node.CreateDecisionNode(e.key, e.weight, e.probability);
+                    cNode = Node.CreateDecisionNode(e.Key, e.uWeight, e.uProbability);
                     cNode.Children.Add(cNode);
                     return;
                 }
