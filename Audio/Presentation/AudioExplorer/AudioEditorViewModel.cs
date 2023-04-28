@@ -105,7 +105,7 @@ namespace Audio.Presentation.AudioExplorer
             CanExportCurrrentDialogEventAsCsvAction.Value = _selectedNode?.Item is CAkDialogueEvent_v136;
         }
 
-        public void PlaySelectedSoundAction() => _soundPlayer.PlaySound(_selectedNode.Item as ICAkSound, TreeList.First().Parent.Item.Id);
+        public void PlaySelectedSoundAction() => _soundPlayer.PlaySound(_selectedNode.Item as ICAkSound, TreeList.First().Item.Id);
         public void ExportCurrrentDialogEventAsCsvAction() => _audioResearchHelper.ExportDialogEventsToFile(_selectedNode.Item as CAkDialogueEvent_v136, true);
         public void ExportIdListAction() => _audioResearchHelper.ExportNamesToFile("c:\\temp\\wwiseIds.txt", true);
     }
