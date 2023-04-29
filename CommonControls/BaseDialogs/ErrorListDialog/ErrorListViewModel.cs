@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text;
 
@@ -8,7 +9,7 @@ namespace CommonControls.BaseDialogs.ErrorListDialog
   
     public class ErrorListViewModel
     {
-        public List<ErrorListDataItem> ErrorItems { get; set; }
+        public ObservableCollection<ErrorListDataItem> ErrorItems { get; set; } = new ObservableCollection<ErrorListDataItem>();
         public string WindowTitle { get; set; } = "Error";
 
         [DebuggerDisplay("{ErrorType}:{ItemName}-{Description}")]
@@ -18,8 +19,6 @@ namespace CommonControls.BaseDialogs.ErrorListDialog
             public string ItemName { get; set; }
             public string Description { get; set; }
             public bool IsError { get; set; } = false;
-
-            public string PrettyString { get => $"{ErrorType}:{ItemName}-{Description}"; }
         }
 
 

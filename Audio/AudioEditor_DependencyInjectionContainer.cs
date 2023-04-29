@@ -38,7 +38,6 @@ namespace Audio
             serviceCollection.AddScoped<HichBuilder>();
             serviceCollection.AddScoped<BnkHeaderBuilder>();
             serviceCollection.AddScoped<CompilerService>();
-            serviceCollection.AddScoped<ICompilerLogger, CompilerConsoleLogger>();
             serviceCollection.AddScoped<ProjectLoader>();
             serviceCollection.AddScoped<WemFileImporter>();
             serviceCollection.AddScoped<Compiler>();
@@ -48,7 +47,7 @@ namespace Audio
         public static void RegisterTools(IToolFactory factory)
         {
             factory.RegisterTool<AudioEditorViewModel, AudioEditorMainView>();
-            factory.RegisterFileTool<CompilerViewModel, CompilerView>( new ExtentionToTool( EditorEnums.AudioCompiler_Editor,  new[] { ".audio_json"}));
+            factory.RegisterTool<CompilerViewModel, CompilerView>();// ( new ExtentionToTool( EditorEnums.AudioCompiler_Editor,  new[] { ".audio_json"}));
         }
     }
 }

@@ -1,6 +1,7 @@
 {
   "Settings": {
     "Version": 1,
+    "ProjectType": "Simple",
     "OutputGame": "Warhammer3",
     "BnkName": "campaign_diplomacy__ovn",
     "RootAudioMixer": "54848735",

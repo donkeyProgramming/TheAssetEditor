@@ -41,6 +41,7 @@ namespace Audio.BnkCompiler
     public class ProjectSettings
     {
         public int Version { get; set; } = 1;
+        public string ProjectType { get; set; }
         public string OutputGame { get; set; } = CompilerConstants.Game_Warhammer3;
         public string BnkName { get; set; }
         public string Language { get; internal set; }

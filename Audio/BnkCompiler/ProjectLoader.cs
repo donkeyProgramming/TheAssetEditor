@@ -41,13 +41,13 @@ namespace Audio.BnkCompiler
                 // Validate the input file
                 var validateInputResult = ValidateInputFile(projectFile);
                 if (validateInputResult.Success == false)
-                    return Result<CompilerData>.FromError(validateInputResult.ErrorList);
+                    return Result<CompilerData>.FromError(validateInputResult.LogItems);
 
                 // Convert and validate to compiler input
                 var compilerData = ConvertSimpleInputToCompilerData(projectFile, settings);
                 var validateProjectResult = ValidateProjectFile(compilerData);
                 if (validateProjectResult.Success == false)
-                    return Result<CompilerData>.FromError(validateProjectResult.ErrorList);
+                    return Result<CompilerData>.FromError(validateProjectResult.LogItems);
 
                 return Result<CompilerData>.FromOk(compilerData);
             }

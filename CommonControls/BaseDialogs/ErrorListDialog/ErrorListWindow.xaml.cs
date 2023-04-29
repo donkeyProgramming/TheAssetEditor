@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -28,8 +29,8 @@ namespace CommonControls.BaseDialogs.ErrorListDialog
             var window = new ErrorListWindow();
             window.DataContext = new ErrorListViewModel()
             {
-                WindowTitle = titel + " (" + errorItems.Errors.Count(x=>x.IsError) + ")",
-                ErrorItems = errorItems.Errors
+                WindowTitle = titel + " (" + errorItems.Errors.Count(x => x.IsError) + ")",
+                ErrorItems = new ObservableCollection<ErrorListDataItem>(errorItems.Errors)
             };
             if (modal)
                 window.ShowDialog();

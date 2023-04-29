@@ -2,7 +2,8 @@
   "ProjectSettings": {
     "Version": 1,
     "OutputGame": "Warhammer3",
-    "BnkName": "campaign_diplomacy__ovn"
+    "BnkName": "campaign_diplomacy__ovn",
+    "ProjectType": "Advance"
   },
   "Events": [
     {

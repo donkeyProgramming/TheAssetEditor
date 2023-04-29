@@ -28,6 +28,7 @@ using System.Reflection;
 using System.IO;
 using System.Text;
 using Audio.Presentation.AudioExplorer;
+using Audio.Presentation.Compiler;
 
 namespace AssetEditor.ViewModels
 {
@@ -298,9 +299,8 @@ namespace AssetEditor.ViewModels
 
         private void CompileAudioProjects()
         {
-            //var compiler = _serviceProvider.GetService<Compiler>();
-            //compiler.CompileAllProjects(out var errorList);
-            //ErrorListWindow.ShowDialog("Compile Result:", errorList);
+            var editorView = _toolFactory.CreateEditorViewModel<CompilerViewModel>();
+            EditorCreator.CreateEmptyEditor(editorView);
         }
 
         private void CreateExampleAudioProject()

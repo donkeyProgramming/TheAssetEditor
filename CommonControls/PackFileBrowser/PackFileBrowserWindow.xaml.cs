@@ -1,6 +1,7 @@
 ﻿using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
@@ -13,7 +14,16 @@ namespace CommonControls.PackFileBrowser
     {
         public PackFile SelectedFile { get; set; }
         public PackFileBrowserViewModel ViewModel { get; set; }
-        public PackFileBrowserWindow(PackFileService packfileService)
+
+        public PackFileBrowserWindow(PackFileService packfileService) => Create(packfileService);
+
+        public PackFileBrowserWindow(PackFileService packfileService, string[] extentions )
+        {
+            Create(packfileService);
+            ViewModel.Filter.SetExtentions(extentions.ToList());
+        }
+
+        void Create(PackFileService packfileService)
         {
             ViewModel = new PackFileBrowserViewModel(packfileService);
             ViewModel.ContextMenu = new OpenFileContexMenuHandler(packfileService);
@@ -24,6 +34,8 @@ namespace CommonControls.PackFileBrowser
 
             PreviewKeyDown += HandleEsc;
         }
+
+        public new bool ShowDialog() => (this as Window).ShowDialog() == true && SelectedFile != null;
 
         private void HandleEsc(object sender, KeyEventArgs e)
         {
