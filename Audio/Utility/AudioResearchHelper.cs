@@ -1,6 +1,8 @@
-﻿using Audio.FileFormats.WWise.Hirc.V136;
+﻿using Audio.AudioEditor;
+using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using CommonControls.Common;
+using MoreLinq;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -40,8 +42,8 @@ namespace Audio.Utility
                 return;
             }
 
-            var numArgs = dialogEvent.ArgumentList.Arguments.Count() - 1;
-            var root = dialogEvent.AkDecisionTree.Root.Children.First();
+            var numArgs = dialogEvent.ArgumentList.Arguments.Count();// - 1
+            var root = dialogEvent.AkDecisionTree.Root;
             if (numArgs == 0)
                 throw new Exception("Error Converting to CSV - No arguments in DialogEvent");
 
@@ -61,18 +63,7 @@ namespace Audio.Utility
                 ss.AppendLine(row);
 
             var wholeFile = ss.ToString();
-
-
-            /*
-             
-                         var text = ExportDialogEventsToFile(dialogEvent);
-            var name = _nameLookUpHelper.GetName(dialogEvent.Id);
-            var folderPath = "c:\\temp\\wwiseDialogEvents";
-            var filePath = $"{folderPath}\\{name}.csv";
-            DirectoryHelper.EnsureCreated(folderPath);
-            File.WriteAllText(filePath, text.ToString());
-            DirectoryHelper.OpenFolderAndSelectFile(filePath);
-             */
+            File.WriteAllText("F:\\DialogueEvent.csv", wholeFile);
         }
 
         static void GenerateRow(AkDecisionTree.Node currentNode, int currentArgrument, int numArguments, Stack<string> pushList, List<string> outputList, IAudioRepository audioRepository)
@@ -80,11 +71,11 @@ namespace Audio.Utility
             var currentNodeContent = audioRepository.GetNameFromHash(currentNode.Key);
             pushList.Push(currentNodeContent);
 
-            bool isDone = numArguments == currentArgrument;
+            bool isDone = numArguments == currentArgrument + 1;
             if (isDone)
             {
                 var currentLine = pushList.ToArray().Reverse().ToList();
-                currentLine.Add(currentNode.AudioNodeId.ToString());  // Add the wwise child node
+                currentLine.Add(audioRepository.GetNameFromHash(currentNode.AudioNodeId));  // Add the wwise child node
                 outputList.Add(string.Join("|", currentLine));
             }
             else
@@ -94,6 +85,86 @@ namespace Audio.Utility
             }
 
             pushList.Pop();
+        }
+        
+        public void CustomExportDialogEventsToFile(CAkDialogueEvent_v136 dialogEvent, bool openFile = false)
+        {
+            if (dialogEvent == null)
+            {
+                _logger.Here().Warning("Error Converting to CSV - DialogEvent not correct version");
+                return;
+            }
+
+            var numArgs = dialogEvent.ArgumentList.Arguments.Count();// - 1
+            var root = dialogEvent.AkDecisionTree.Root;
+            if (numArgs == 0)
+                throw new Exception("Error Converting to CSV - No arguments in DialogEvent");
+
+            var gkeys = dialogEvent.ArgumentList.Arguments.Select(x => _audioRepository.GetNameFromHash(x.ulGroupId)).ToList();
+            var table = new List<string>();
+            GenerateCustomRow(root, -1, 0, gkeys, table, _audioRepository);
+            var prettyKeys = "Key|uWeight|uProbability|IsAudioNode|audioNodeName|parentId";
+
+            var ss = new StringBuilder();
+            ss.AppendLine(prettyKeys);
+            foreach (var row in table)
+                ss.AppendLine(row);
+
+            var wholeFile = ss.ToString();
+            File.WriteAllText("F:\\DialogueEvent.csv", wholeFile);
+        }
+        static void GenerateCustomRow(AkDecisionTree.Node cNode, int pId, int depth, List<string> gkeys, List<string> outputList, IAudioRepository audioRepository)
+        {
+            var currentNodeContent = audioRepository.GetNameFromHash(cNode.Key);
+            if (currentNodeContent == "0")
+            {
+                currentNodeContent = "Any";
+            }
+            var audioNodeName = $"{cNode.AudioNodeId}";
+            string keyName;
+            if (cNode.IsAudioNode)
+            {
+                audioNodeName = $"{audioRepository.GetNameFromHash(cNode.AudioNodeId)}({cNode.AudioNodeId})";
+                keyName = $"{currentNodeContent}({cNode.Key})";
+            }
+            else
+            {
+                keyName = $"{gkeys[depth]} == {currentNodeContent}({cNode.Key})";
+            }
+            outputList.Add($"{keyName}|{cNode.uWeight}|{cNode.uProbability}|{cNode.IsAudioNode}|{audioNodeName}|{pId}");
+            var cId = outputList.Count - 1;
+            foreach (var child in cNode.Children)
+                GenerateCustomRow(child, cId, depth+1, gkeys, outputList, audioRepository);
+        }
+
+
+        public void GenerateActorMixerTree(string filename = "actorTree.txt")
+        {
+            var mixers = _audioRepository.GetAllOfType<CAkActorMixer_v136>();
+            var allRootNodes = mixers.Select(x => new WWiseTreeParserParent(_audioRepository, true, true, false).BuildHierarchyAsFlatList(x))
+                .Select(x => x.First())
+                .DistinctBy(x => x.Item.Id).ToList()
+                .ToList();
+
+            var inverse = allRootNodes.Select(x => new WWiseTreeParserChildren(_audioRepository, true, true, false).BuildHierarchy(x.Item));
+            var ss = new StringBuilder();
+            foreach (var item in inverse)
+                ConvertToString(item, 0, ss);
+
+            var wholeDataString = ss.ToString();
+            var lines = wholeDataString.Split('\n').Count();
+            File.WriteAllText($"D:\\Research\\Audio\\{filename}", wholeDataString);
+        }
+
+
+        static void ConvertToString(HircTreeItem item, int indentation, StringBuilder ss)
+        {
+            if (item.Item == null)
+                return;
+
+            ss.AppendLine($"{new string('\t', indentation)}{item.DisplayName}");
+            foreach (var childItem in item.Children)
+                ConvertToString(childItem, indentation + 1, ss);
         }
     }
 }

@@ -91,15 +91,12 @@ namespace CommonControls.FileTypes.PackFiles.Models
     {
         public long Size { get; private set; }
 
-        public long Offset
-        {
-            get;
-            private set;
-        }
+        public long Offset { get;private set;}
 
         PackedFileSourceParent _parent;
 
         public PackedFileSourceParent Parent { get => _parent; }
+
         public PackedFileSource(PackedFileSourceParent parent, long offset, long length)
         {
             Offset = offset;
@@ -135,7 +132,6 @@ namespace CommonControls.FileTypes.PackFiles.Models
             knownStream.Read(data, 0, (int)Size);
             return data;
         }
-
 
         public ByteChunk ReadDataAsChunk()
         {

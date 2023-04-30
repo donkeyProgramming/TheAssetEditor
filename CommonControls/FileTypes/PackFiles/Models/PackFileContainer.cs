@@ -100,15 +100,13 @@ namespace CommonControls.FileTypes.PackFiles.Models
             // Write the files
             foreach (var file in sortedFiles)
             {
-                var data = (file.Value ).DataSource.ReadData();
+                var data = file.Value.DataSource.ReadData();
                 var offset = writer.BaseStream.Position;
                 var dataLength = data.Length;
-                (file.Value ).DataSource = new PackedFileSource(packedFileSourceParent, offset, dataLength);
+                file.Value.DataSource = new PackedFileSource(packedFileSourceParent, offset, dataLength);
 
                 writer.Write(data);
             }
         }
-
-        public override string ToString() => $"{Name} - {Header?.LoadOrder}";
     }
 }

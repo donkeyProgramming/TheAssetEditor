@@ -28,8 +28,6 @@ namespace Audio.Storage
 
         public AudioData Load()
         {
-            using var _ = new WaitCursor();
-    
             var nameList = _wwiseNameLoader.BuildNameHelper();
             var bnkList = _wwiseDataLoader.LoadBnkFiles();
 

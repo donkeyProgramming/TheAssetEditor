@@ -11,7 +11,7 @@ namespace Audio.FileFormats.WWise
         ILogger _logger = Logging.Create<HircItem>();
 
         public static readonly uint HircHeaderSize = 4; // 2x uint. Type is not included for some reason
-        public string OwnerFile { get; set; }
+        public string OwnerFile { get; set; } = "OwnerFile Not Set";
         public uint IndexInFile { get; set; }
         public bool HasError { get; set; } = true;
 

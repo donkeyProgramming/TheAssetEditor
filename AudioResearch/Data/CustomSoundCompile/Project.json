@@ -1,0 +1,59 @@
+{
+  "ProjectSettings": {
+    "OutputGame": "Warhammer3",
+    "BnkName": "ui_audio_compile",
+    "OutputFilePath": "D:\\Research\\Audio\\CustomBnks",
+    "WWiserPath": "D:\\Research\\Audio\\WWiser\\wwiser.pyz",
+
+    "ConvertResultToXml": true,
+    "ThrowOnCompileError": true,
+    "ExportResultToFile": true
+  },
+
+
+  "AudioImport": [
+    {
+      "Path": "c:\\sfgsdfg.mp3",
+      "OutputName": "GameSound_CustomAudioFile_ID",
+      "Language": "english(uk)"
+    }
+  ],
+
+  "Events": [
+    {
+      "AudioBus": "Master",
+      "Id": "UI_Click_foobar_foobar",
+      "Actions": [ "UI_Click_foobar_foobar_Play" ]
+    }
+  ],
+
+  "Actions": [
+    {
+      "Id": "UI_Click_foobar_foobar_Play",
+      "OverrideId": 623217198,
+      "ChildId": "CustomAudioFile_ID",
+      "Type": "Play"
+    }
+  ],
+
+  "GameSounds": [
+    {
+      "Id": "CustomAudioFile_ID",
+      "OverrideId": 264282125,
+      "Path": "Audio/WWise/790209750.wem",
+      "SourceType": "PackFile",
+      "ConvertToWem": false,
+    },
+
+    {
+      "Id": "ImportedAudioFile",
+    }
+  ]
+
+  "Mixer": {
+    "Id": "MyMixer1",
+    "OverrideId": 264282125,
+    "ChildMixers": "MyMixer2",
+    "ChildSouds": [ "CustomAudioFile_ID", "CustomAudioFile_ID", "CustomAudioFile_ID", "CustomAudioFile_ID", "CustomAudioFile_ID" ]
+  }
+}

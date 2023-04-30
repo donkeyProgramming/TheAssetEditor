@@ -10,7 +10,7 @@ namespace Audio.FileFormats.WWise.Bkhd
     {
         public void Parse(string fileName, ByteChunk chunk, ParsedBnkFile soundDb)
         {
-            var bkdh = Create(chunk);
+            var bkdh = ReadHeader(chunk);
             bkdh.OwnerFileName = fileName;
 
             if (bkdh.dwBankGeneratorVersion == 2147483770)
@@ -22,7 +22,7 @@ namespace Audio.FileFormats.WWise.Bkhd
             soundDb.Header = bkdh;
         }
 
-        public static BkhdHeader Create(ByteChunk chunk)
+        public BkhdHeader ReadHeader(ByteChunk chunk)
         {
             var bkdh = new BkhdHeader()
             {

@@ -36,7 +36,7 @@ namespace Audio.FileFormats.WWise.Hirc
             throw new Exception($"Unkown Version {version}");
         }
 
-        public static HircFactory CreateFactory_v122()
+        static HircFactory CreateFactory_v122()
         {
             var instance = new HircFactory();
             instance.RegisterHirc(HircType.Sound, () => new V122.CAkSound_V122());
@@ -49,7 +49,7 @@ namespace Audio.FileFormats.WWise.Hirc
             return instance;
         }
 
-        public static HircFactory CreateFactory_v112()
+        static HircFactory CreateFactory_v112()
         {
             var instance = new HircFactory();
             instance.RegisterHirc(HircType.Sound, () => new V112.CAkSound_V112());
@@ -62,7 +62,7 @@ namespace Audio.FileFormats.WWise.Hirc
             return instance;
         }
 
-        public static HircFactory CreateFactory_v136()
+        static HircFactory CreateFactory_v136()
         {
             var instance = new HircFactory();
             instance.RegisterHirc(HircType.ActorMixer, () => new V136.CAkActorMixer_v136());
@@ -82,5 +82,13 @@ namespace Audio.FileFormats.WWise.Hirc
             return instance;
         }
 
+        public static HircFactory CreateByteHircFactory()
+        {
+            var instance = new HircFactory();
+            var hircTypes = Enum.GetValues(typeof(HircType)) as HircType[];
+            foreach (var hircType in hircTypes)
+                instance.RegisterHirc(hircType, () => new ByteHirc());
+            return instance;
+        }
     }
 }

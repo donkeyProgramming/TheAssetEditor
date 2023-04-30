@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Audio.Storage
 {
@@ -14,7 +15,6 @@ namespace Audio.Storage
         private readonly PackFileService _pfs;
 
         private Dictionary<uint, string> _nameLookUp { get; set; } = new Dictionary<uint, string>();
-
 
         public WWiseNameLoader(PackFileService pfs)
         {
@@ -63,6 +63,15 @@ namespace Audio.Storage
                 }
             }
 
+            var wwiseIdFiles = _pfs.FindAllWithExtention(".wwiseids");
+            foreach (var item in wwiseIdFiles)
+            {
+                var data = Encoding.UTF8.GetString(item.DataSource.ReadData());
+                data =data.Replace("\r", "");
+                var splitData = data.Split("\n");
+                AddNames(splitData);
+            }
+
             return _nameLookUp;
         }
 
@@ -96,7 +105,7 @@ namespace Audio.Storage
         {
             foreach (var name in names)
             {
-                var hashVal = WWiseHash.Compute(name);
+                var hashVal = WWiseHash.Compute(name.Trim());
                 _nameLookUp[hashVal] = name;
             }
         }

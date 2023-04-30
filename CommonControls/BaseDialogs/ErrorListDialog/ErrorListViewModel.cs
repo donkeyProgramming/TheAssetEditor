@@ -1,22 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Text;
 
 namespace CommonControls.BaseDialogs.ErrorListDialog
 {
+  
     public class ErrorListViewModel
     {
-        public List<ErrorListDataItem> ErrorItems { get; set; }
+        public ObservableCollection<ErrorListDataItem> ErrorItems { get; set; } = new ObservableCollection<ErrorListDataItem>();
         public string WindowTitle { get; set; } = "Error";
 
+        [DebuggerDisplay("{ErrorType}:{ItemName}-{Description}")]
         public class ErrorListDataItem
         {
             public string ErrorType { get; set; }
             public string ItemName { get; set; }
             public string Description { get; set; }
             public bool IsError { get; set; } = false;
-            
         }
+
+
 
         public class ErrorList
         {
@@ -43,6 +48,15 @@ namespace CommonControls.BaseDialogs.ErrorListDialog
                 var item = new ErrorListDataItem() { ErrorType = "Ok", ItemName = itemName, Description = description };
                 Errors.Add(item);
                 return item;
+            }
+
+            public void AddAllErrors(ErrorList instanceErrorList)
+            {
+                foreach (var error in instanceErrorList.Errors)
+                {
+                    var item = new ErrorListDataItem() { ErrorType = error.ErrorType, ItemName = error.ItemName, Description = error.Description };
+                    Errors.Add(item);
+                }
             }
         }
 

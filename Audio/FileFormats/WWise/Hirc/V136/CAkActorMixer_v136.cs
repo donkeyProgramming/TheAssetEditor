@@ -16,8 +16,24 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             Children = Children.Create(chunk);
         }
 
-        public override void UpdateSize() => throw new NotImplementedException();
-        public override byte[] GetAsByteArray() => throw new NotImplementedException();
+        public override void UpdateSize()
+        {
+            Size = BnkChunkHeader.HeaderByteSize + Children.GetSize() + NodeBaseParams.GetSize()-4;
+        }
+
+        public override byte[] GetAsByteArray()
+        {
+            using var memStream = WriteHeader();
+            memStream.Write(NodeBaseParams.GetAsByteArray());
+            memStream.Write(Children.GetAsByteArray());
+            var byteArray = memStream.ToArray();
+
+            // Reload the object to ensure sanity
+            var copyInstance = new CAkActorMixer_v136();
+            copyInstance.Parse(new ByteChunk(byteArray));
+
+            return byteArray;
+        }
     }
 }
 

@@ -1,9 +1,4 @@
-﻿using CommonControls.BaseDialogs.ErrorListDialog;
-using CommonControls.Editors.AudioEditor.BnkCompiler;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
-using System.IO;
-using System.Linq;
+﻿using CommonControls.Services;
 
 namespace AudioResearch
 {

@@ -1,0 +1,39 @@
+﻿<UserControl x:Class="Audio.Presentation.Compiler.CompilerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Audio.Presentation.Compiler"
+             xmlns:s="http://schemas.singulink.com/xaml" 
+             xmlns:errorlistdialog="clr-namespace:CommonControls.BaseDialogs.ErrorListDialog;assembly=CommonControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" LastChildFill="True">
+            <Label Content="Project:"/>
+            <Button DockPanel.Dock="Right" Margin="2,2,2,2"  Content="Browse" Click="{s:MethodBinding BrowseProjectFileAction}"/>
+            <Border  BorderBrush="Black"  BorderThickness="1">
+                <TextBlock Background="White" Margin="2,2,2,2" Text="{Binding ProjectFilePath.Value, UpdateSourceTrigger=PropertyChanged}" />
+            </Border>
+        </DockPanel>
+
+        <DockPanel Grid.Row="1">
+            <Button Content="Documentation" Margin="50,10,50,0" Click="{s:MethodBinding DisplayDocumantationAction}"/>
+        </DockPanel>
+
+
+        <DockPanel Grid.Row="2">
+            <Button Content="Compile" Margin="2,10,2,10" Height="50" Click="{s:MethodBinding CompileProjectAction}"/>
+        </DockPanel>
+
+        <errorlistdialog:ErrorListView Grid.Row="3" DataContext="{Binding ProjectResult.Value, UpdateSourceTrigger=PropertyChanged}"/>
+        
+    </Grid>
+</UserControl>

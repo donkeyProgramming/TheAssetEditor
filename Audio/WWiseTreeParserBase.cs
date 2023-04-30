@@ -41,29 +41,25 @@ namespace Audio.AudioEditor
             return actualRoot;
         }
 
-        public List<string> BuildHierarchyAsFlatList(HircItem item)
+        public List<HircTreeItem> BuildHierarchyAsFlatList(HircItem item)
         {
             var rootNode = BuildHierarchy(item);
 
             var flatList = GetHircParents(rootNode);
-            flatList.Reverse();
-
+            //flatList.Reverse();
             return flatList;
         }
 
-
-
-
-        List<string> GetHircParents(HircTreeItem root)
+        List<HircTreeItem> GetHircParents(HircTreeItem root)
         {
-            var childData = new List<string>();
+            var childData = new List<HircTreeItem>();
             if (root.Children != null)
             {
                 foreach (var child in root.Children)
                     childData.AddRange(GetHircParents(child));
             }
 
-            childData.Add(root.DisplayName);
+            childData.Add(root);
             return childData;
         }
 
@@ -84,6 +80,9 @@ namespace Audio.AudioEditor
 
         protected void ProcessNext(uint hircId, HircTreeItem parent)
         {
+            if (hircId == 0)
+                return;
+
             var instances = _repository.GetHircObject(hircId);
             var hircItem = instances.FirstOrDefault();
             if (hircItem == null)

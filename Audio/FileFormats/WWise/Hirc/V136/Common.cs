@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace Audio.FileFormats.WWise.Hirc.V136
 {
@@ -18,6 +17,25 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 instance.ChildIdList.Add(chunk.ReadUInt32());
 
             return instance;
+        }
+
+        public uint GetSize()
+        {
+            return (uint)(ChildIdList.Count * 4 + 4);
+        }
+
+        internal ReadOnlySpan<byte> GetAsByteArray()
+        {
+            using var memStream = new MemoryStream();
+            memStream.Write(ByteParsers.UInt32.EncodeValue((uint)ChildIdList.Count, out _));
+
+            foreach(var child in ChildIdList)
+                memStream.Write(ByteParsers.UInt32.EncodeValue(child, out _));
+
+            var byteArray = memStream.ToArray();
+            if (byteArray.Length != GetSize())
+                throw new Exception("Invalid size");
+            return byteArray;
         }
     }
 
@@ -111,14 +129,19 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 bitsFXBypass = 0,
             };
             instance.bOverrideAttachmentParams = 0;
-            instance.OverrideBusId = 3803692087;    // "Master Audio Bus"
+            instance.OverrideBusId = 0;    // "Master Audio Bus"
             instance.DirectParentID = 0;
             instance.byBitVector = 0;
             instance.NodeInitialParams = new NodeInitialParams()
             {
                 AkPropBundle0 = new AkPropBundle()
                 {
-                    Values = new List<AkPropBundle.AkPropBundleInstance>(),
+                    Values = new List<AkPropBundle.AkPropBundleInstance>() 
+                    {
+                        new AkPropBundle.AkPropBundleInstance(){Type = AkPropBundleType.StatePropNum_Priority, Value = 100},
+                        new AkPropBundle.AkPropBundleInstance(){Type = AkPropBundleType.UserAuxSendVolume0, Value = -96},
+                        new AkPropBundle.AkPropBundleInstance(){Type = AkPropBundleType.InitialDelay, Value = 0.5199999809265137f},
+                    }
                 },
                 AkPropBundle1 = new AkPropBundleMinMax()
                 {
@@ -230,20 +253,20 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
         public uint GetSize()
         {
-            if (Values.Count != 0)
-                throw new NotImplementedException();
-            return 1;
+            return (uint)Values.Count * 5 + 1;
         }
 
         public byte[] GetAsBytes()
         {
-            if (Values.Count != 0)
-                throw new NotImplementedException();
+            using var memStream = new MemoryStream();
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)Values.Count, out _));
+            foreach (var v in Values)
+                memStream.Write(ByteParsers.Byte.EncodeValue((byte)v.Type, out _));
 
-            var byteArray = new byte[] { 0 };
-            if (byteArray.Length != GetSize())
-                throw new Exception("Invalid size");
-            return byteArray;
+            foreach (var v in Values)
+                memStream.Write(ByteParsers.Single.EncodeValue(v.Value, out _));
+
+            return memStream.ToArray();
         }
     }
 

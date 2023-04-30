@@ -19,7 +19,16 @@
     <None Update="Data\CustomSoundCompile\790209750.wem">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Data\CustomSoundCompile\Project.xml">
+    <None Update="Data\CustomSoundCompile\ComplexExample.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\CustomSoundCompile\Project.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\OvnExample\ProjectSimple.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\OvnExample\Project.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Data\RandContainerProject.bnk.xml">

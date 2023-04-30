@@ -1,6 +1,9 @@
-﻿using Audio.AudioEditor;
+﻿using Audio.BnkCompiler;
+using Audio.BnkCompiler.ObjectGeneration;
+using Audio.BnkCompiler.ObjectGeneration.Warhammer3;
 using Audio.FileFormats.WWise;
-using Audio.Presentation;
+using Audio.Presentation.AudioExplorer;
+using Audio.Presentation.Compiler;
 using Audio.Storage;
 using Audio.Utility;
 using CommonControls.Common;
@@ -15,6 +18,9 @@ namespace Audio
             serviceCollection.AddScoped<AudioEditorMainView>();
             serviceCollection.AddScoped<AudioEditorViewModel>();
 
+            serviceCollection.AddScoped<CompilerView>();
+            serviceCollection.AddScoped<CompilerViewModel>();
+
             serviceCollection.AddScoped<RepositoryProvider, CreateRepositoryFromAllPackFiles>();
             serviceCollection.AddScoped<IAudioRepository, AudioRepository>();
             
@@ -24,11 +30,24 @@ namespace Audio
 
             serviceCollection.AddTransient<SoundPlayer>();
             serviceCollection.AddTransient<AudioResearchHelper>();
+
+            serviceCollection.AddScoped<IWWiseHircGenerator, ActionGenerator>();
+            serviceCollection.AddScoped<IWWiseHircGenerator, EventGenerator>();
+            serviceCollection.AddScoped<IWWiseHircGenerator, SoundGenerator>();
+            serviceCollection.AddScoped<IWWiseHircGenerator, ActorMixerGenerator>();
+            serviceCollection.AddScoped<HichBuilder>();
+            serviceCollection.AddScoped<BnkHeaderBuilder>();
+            serviceCollection.AddScoped<CompilerService>();
+            serviceCollection.AddScoped<ProjectLoader>();
+            serviceCollection.AddScoped<WemFileImporter>();
+            serviceCollection.AddScoped<Compiler>();
+            serviceCollection.AddScoped<ResultHandler>();
         }
 
         public static void RegisterTools(IToolFactory factory)
         {
             factory.RegisterTool<AudioEditorViewModel, AudioEditorMainView>();
+            factory.RegisterTool<CompilerViewModel, CompilerView>();// ( new ExtentionToTool( EditorEnums.AudioCompiler_Editor,  new[] { ".audio_json"}));
         }
     }
 }

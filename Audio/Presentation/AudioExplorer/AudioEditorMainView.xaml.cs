@@ -11,7 +11,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Audio.Presentation
+namespace Audio.Presentation.AudioExplorer
 {
     /// <summary>
     /// Interaction logic for AudioEditorMainView.xaml

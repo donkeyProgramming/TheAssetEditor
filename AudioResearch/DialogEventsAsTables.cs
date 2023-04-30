@@ -1,7 +1,6 @@
 ﻿using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Hirc.V136;
 using CommonControls.Common;
-using CommonControls.Editors.AudioEditor;
 using CommonControls.Services;
 using MoreLinq;
 using System;
@@ -12,7 +11,7 @@ using System.Text;
 
 namespace AudioResearch
 {
-    /*public static class DialogEventsAsTables
+    /*public class DialogEventsAsTables
     {
         class OutputTest
         {
@@ -21,20 +20,20 @@ namespace AudioResearch
             public string PrettyKeys;
         }
 
-        public static void ExportAllDialogEventsAsTable(string outputFilePrefix = "")
+        public void ExportAllDialogEventsAsTable(string outputFilePrefix = "")
         {
             var pfs = ResearchUtil.GetPackFileService();
             ExportAsTable(pfs, outputFilePrefix);
         }
 
 
-        public static void ExportSystemFileAsTable(string systemPath, string outputFilePrefix = "")
+        public void ExportSystemFileAsTable(string systemPath, string outputFilePrefix = "")
         {
             var pfs = PackFileUtil.CreatePackFileServiceFromSystemFile(systemPath);
             ExportAsTable(pfs, outputFilePrefix);
         }
 
-        static void ExportAsTable(PackFileService pfs, string outputFilePrefix = "")
+        void ExportAsTable(PackFileService pfs, string outputFilePrefix = "")
         {
             var gamePfs = ResearchUtil.GetPackFileService();
 

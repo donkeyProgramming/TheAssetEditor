@@ -88,10 +88,6 @@ namespace Audio.Storage
             var allHircs = parsedBnkList.SelectMany(x => x.HircChuck.Hircs);
             PrintHircList(allHircs, "All");
 
-            // Log errors:
-            if (banksWithUnknowns.Any())
-                _logger.Here().Warning($"{banksWithUnknowns.Count} banks contains unknown info : {string.Join("\n", banksWithUnknowns)}");
-
             if (failedBnks.Any())
                 _logger.Here().Error($"{failedBnks.Count} banks failed: {string.Join("\n", failedBnks)}");
 
