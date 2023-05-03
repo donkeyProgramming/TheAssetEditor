@@ -1,4 +1,5 @@
 ﻿using CommonControls.Common;
+using CommunityToolkit.Diagnostics;
 using Serilog;
 using System;
 using System.IO;
@@ -7,36 +8,74 @@ using System.Reflection;
 
 namespace Audio.Utility
 {
-    public static class VgStreamWrapper
+    public class VgStreamWrapper
     {
-        static readonly ILogger _logger = Logging.CreateStatic(typeof(VgStreamWrapper));
+        ILogger _logger = Logging.Create<VgStreamWrapper>();
 
-        public static string GetVgStreamFolder() => $"{DirectoryHelper.Temp}\\VgStream";
-        public static string GetAudioFolder() => $"{DirectoryHelper.Temp}\\Audio";
-        public static void EnsureCreated() => GetCliPath();
+        string VgStreamFolderName => $"{DirectoryHelper.Temp}\\VgStream";
+        string AudioFolderName => $"{DirectoryHelper.Temp}\\Audio";
+        void EnsureCreated() => GetCliPath();
 
-        public static bool ExportFile(string fileNameWithoutExtention, byte[] data, out string outputSoundFilePath)
+        public VgStreamWrapper()
         {
-            outputSoundFilePath = null;
-            var cliPath = GetCliPath();
-            var wemName = $"{GetAudioFolder()}\\{fileNameWithoutExtention}.wem";
-            var wavName = $"{GetAudioFolder()}\\{fileNameWithoutExtention}.wav";
-
             try
             {
-                File.WriteAllBytes(wemName, data);
+                EnsureCreated();
             }
             catch (Exception e)
             {
-                _logger.Here().Error(e.Message);
-                return false;
+                _logger.Here().Error($"Unable to create VgStreamWrapper: {e.Message}");
             }
+        }
 
+        public Result<string> ConvertFromWem(string fileNameWithoutExtention, byte[] wemBytes)
+        {
+            Guard.IsNotNull(wemBytes);
+            Guard.IsNotNullOrEmpty(fileNameWithoutExtention);
+
+            var wemName = $"{AudioFolderName}\\{fileNameWithoutExtention}.wem";
+            var wavName = $"{AudioFolderName}\\{fileNameWithoutExtention}.wav";
+
+            _logger.Here().Information($"Trying to export sound '{fileNameWithoutExtention}' - {wemBytes.Length} bytes");
+   
+            var exportResult = ExportFile(wemName, wemBytes);
+            if(exportResult.Failed)
+                return Result<string>.FromError(exportResult.LogItems);
+
+            return ConvertFileUsingVgSteam(wemName, wavName);
+        }
+
+        public Result<string> ConvertToWem(string systemPath)
+        {
+            Guard.IsNotNullOrEmpty(systemPath);
+           
+            if (File.Exists(systemPath) == false)
+                return Result<string>.FromError("VgSteam", $"File not found '{systemPath}'");
+
+            var fileNameWithoutExtention = Path.GetFileNameWithoutExtension(systemPath);
+            var wemName = $"{AudioFolderName}\\{fileNameWithoutExtention}.wem";
+            return ConvertFileUsingVgSteam(systemPath, wemName);
+        }
+
+        /// <summary>
+        ///  VgSteam CLI converts files automatically depending on extentions
+        /// </summary>
+        /// <returns>Path of the new file</returns>
+        private Result<string> ConvertFileUsingVgSteam(string sourceFileName, string targetFileName)
+        {
             try
             {
+                var cliPath = GetCliPath();
+                _logger.Here().Information($"VgSteam path is '{cliPath}'");
+                _logger.Here().Information($"Trying to convert {sourceFileName} to {targetFileName}");
+
+
+                var arguments = $"-o \"{targetFileName}\" \"{sourceFileName}\"";
+                _logger.Here().Information($"{cliPath} {arguments}");
+
                 using var pProcess = new System.Diagnostics.Process();
                 pProcess.StartInfo.FileName = cliPath;
-                pProcess.StartInfo.Arguments = $"-o \"{wavName}\" \"{wemName}\"";
+                pProcess.StartInfo.Arguments = arguments;
                 pProcess.StartInfo.UseShellExecute = false;
                 pProcess.StartInfo.RedirectStandardOutput = true;
                 pProcess.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
@@ -46,22 +85,42 @@ namespace Audio.Utility
                 _logger.Here().Information(output);
                 pProcess.WaitForExit();
 
-                outputSoundFilePath = wavName;
-                return true;
+                var outputSoundFilePath = targetFileName;
+                var doesFileExist = File.Exists(outputSoundFilePath);
+                _logger.Here().Information($"File readback result for converted file {outputSoundFilePath} is : {doesFileExist}");
+                if (doesFileExist == false)
+                    return Result<string>.FromError("VgSteam", "Failed to convert file");
+                return Result<string>.FromOk(outputSoundFilePath);
             }
             catch (Exception e)
             {
                 _logger.Here().Error(e.Message);
-                return false;
+                return Result<string>.FromError("Convert error", e.Message);
             }
         }
 
-        static public string GetCliPath()
+        Result<bool> ExportFile(string filePath, byte[] bytes)
         {
-            DirectoryHelper.EnsureCreated(GetVgStreamFolder());
-            DirectoryHelper.EnsureCreated(GetAudioFolder());
+            try
+            {
+                DirectoryHelper.EnsureCreated(filePath);
+                File.WriteAllBytes(filePath, bytes);
+                _logger.Here().Information("All bytes written to file");
+                return Result<bool>.FromOk(true);
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error(e.Message);
+                return Result<bool>.FromError("Write error", e.Message);
+            }
+        }
 
-            var vgStreamCli = $"{GetVgStreamFolder()}\\test.exe";
+        string GetCliPath()
+        {
+            DirectoryHelper.EnsureCreated(VgStreamFolderName);
+            DirectoryHelper.EnsureCreated(AudioFolderName);
+
+            var vgStreamCli = $"{VgStreamFolderName}\\test.exe";
             if (File.Exists(vgStreamCli))
                 return vgStreamCli;
 
@@ -75,11 +134,14 @@ namespace Audio.Utility
             foreach (var file in vgStreamFiles)
             {
                 var fileName = file.Replace(folderName, "", StringComparison.InvariantCultureIgnoreCase);
-                var outputFileName = $"{GetVgStreamFolder()}\\{fileName}";
+                var outputFileName = $"{VgStreamFolderName}\\{fileName}";
                 using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(file);
                 using var fStream = new FileStream(outputFileName, FileMode.OpenOrCreate);
                 stream!.CopyTo(fStream);
             }
+
+            if (File.Exists(vgStreamCli) == false)
+                throw new Exception("Failed to create vgStreamCli - Unkown error");
 
             return vgStreamCli;
         }

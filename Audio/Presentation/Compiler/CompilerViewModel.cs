@@ -15,7 +15,7 @@ namespace Audio.Presentation.Compiler
         private readonly CompilerService _compilerService;
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Compiler");
-        public NotifyAttr<string> ProjectFilePath { get; set; } = new NotifyAttr<string>("Not selected");
+        public NotifyAttr<string> ProjectFilePath { get; set; } = new NotifyAttr<string>("audioprojects\\projectsimple.json");
         public NotifyAttr<ErrorListViewModel> ProjectResult { get; set; } = new NotifyAttr<ErrorListViewModel>(new ErrorListViewModel());
 
         public CompilerViewModel(PackFileService pfs, CompilerService compilerService)
@@ -36,8 +36,8 @@ namespace Audio.Presentation.Compiler
             ProjectResult.Value.ErrorItems.Clear();
             var result = _compilerService.Compile(ProjectFilePath.Value, CompilerSettings.Default());
 
-            ProjectResult.Value.ErrorItems.Add(new ErrorListDataItem() { IsError = result.Success, ErrorType = "Result", Description = $"Compile result is '{result.Success}'" });
-            if (result.Success == false)
+            ProjectResult.Value.ErrorItems.Add(new ErrorListDataItem() { IsError = result.IsSuccess, ErrorType = "Result", Description = $"Compile result is '{result.IsSuccess}'" });
+            if (result.IsSuccess == false)
                 result.LogItems.Errors.ForEach(x => ProjectResult.Value.ErrorItems.Add(x));
         }
 

@@ -15,6 +15,8 @@ namespace Audio
     {
         public static void Register(IServiceCollection serviceCollection)
         {
+            serviceCollection.AddSingleton<VgStreamWrapper>();
+
             serviceCollection.AddScoped<AudioEditorMainView>();
             serviceCollection.AddScoped<AudioEditorViewModel>();
 
@@ -39,7 +41,7 @@ namespace Audio
             serviceCollection.AddScoped<BnkHeaderBuilder>();
             serviceCollection.AddScoped<CompilerService>();
             serviceCollection.AddScoped<ProjectLoader>();
-            serviceCollection.AddScoped<WemFileImporter>();
+            serviceCollection.AddScoped<AudioFileImporter>();
             serviceCollection.AddScoped<Compiler>();
             serviceCollection.AddScoped<ResultHandler>();
         }
