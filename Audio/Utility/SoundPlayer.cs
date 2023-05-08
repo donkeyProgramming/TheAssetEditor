@@ -1,30 +1,27 @@
 ﻿using Audio.FileFormats.WWise.Hirc;
 using CommonControls.Common;
-using Audio.AudioEditor;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using Serilog;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 using Audio.Storage;
-using System.Runtime.InteropServices.WindowsRuntime;
+using CommonControls.FileTypes.PackFiles.Models;
 
 namespace Audio.Utility
 {
     public class SoundPlayer
     {
         ILogger _logger = Logging.Create<SoundPlayer>();
+        private readonly string _language = "english(uk)";
 
         private readonly PackFileService _pfs;
         private readonly IAudioRepository _audioRepository;
-        private readonly string _language = "english(uk)";
+        private readonly VgStreamWrapper _vgStreamWrapper;
 
-        public SoundPlayer(PackFileService pfs, IAudioRepository audioRepository)
+        public SoundPlayer(PackFileService pfs, IAudioRepository audioRepository, VgStreamWrapper vgStreamWrapper)
         {
             _pfs = pfs;
             _audioRepository = audioRepository;
+            _vgStreamWrapper = vgStreamWrapper;
         }
 
         public bool PlaySound(ICAkSound wwiseSound, uint parentEventId)
@@ -39,26 +36,22 @@ namespace Audio.Utility
             return PlaySound(wwiseSound.GetSourceId(), outputName);
         }
 
-        public bool PlaySound(uint id, string outputName = null)
+        public bool PlaySound(uint id, string outputName)
         {
-            if (outputName == null)
-                outputName = Guid.NewGuid().ToString();
-
-            var audioFile = _pfs.FindFile($"audio\\wwise\\{id}.wem");
-            if (audioFile == null)
-                audioFile = _pfs.FindFile($"audio\\wwise\\{_language}\\{id}.wem");
-
+            var audioFile = FindSoundFile(_language, id);
             if (audioFile == null)
             {
                 _logger.Here().Error("Unable to find sound");
                 return true;
             }
 
-            var result = VgStreamWrapper.ExportFile(outputName, audioFile.DataSource.ReadData(), out var soundPath);
-            if (result)
+            _logger.Here().Information($"Trying to play Sound '{_pfs.GetFullPath(audioFile)}'");
+            var result = _vgStreamWrapper.ConvertFromWem(outputName, audioFile.DataSource.ReadData());
+            if (result.IsSuccess)
             {
-                var p = new Process();
-                p.StartInfo = new ProcessStartInfo(soundPath)
+                _logger.Here().Information($"Sound converted, playing: '{result.Item}'");
+                using var p = new Process();
+                p.StartInfo = new ProcessStartInfo(result.Item)
                 {
                     UseShellExecute = true
                 };
@@ -69,8 +62,15 @@ namespace Audio.Utility
                 _logger.Here().Error("Unable to export sound");
             }
 
-            return result;
+            return result.IsSuccess;
         }
 
+        PackFile FindSoundFile(string language, uint soundId)
+        {
+            var audioFile = _pfs.FindFile($"audio\\wwise\\{soundId}.wem");
+            if (audioFile == null)
+                audioFile = _pfs.FindFile($"audio\\wwise\\{language}\\{soundId}.wem");
+            return audioFile;
+        }
     }
 }

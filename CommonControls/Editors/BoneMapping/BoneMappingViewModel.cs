@@ -3,11 +3,9 @@ using Microsoft.Win32;
 using Newtonsoft.Json;
 using Serilog;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Xml;
@@ -224,6 +222,7 @@ namespace CommonControls.Editors.BoneMapping
         void FindApplicableSettingsFiles()
         {
             AllConfigPaths = new ObservableCollection<string>();
+            DirectoryHelper.EnsureCreated(DirectoryHelper.AnimationIndexMappingDirectory);
             var files = Directory.GetFiles(DirectoryHelper.AnimationIndexMappingDirectory);
             foreach (var file in files)
             {

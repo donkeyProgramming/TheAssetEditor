@@ -6,7 +6,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <ListView  ItemsSource="{Binding ErrorItems, Mode=OneTime}">
+        <ListView  ItemsSource="{Binding ErrorItems, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}">
             <ListView.Resources>
                 <Style TargetType="{x:Type ListViewItem}">
                     <Style.Triggers>

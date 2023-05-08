@@ -8,15 +8,17 @@ namespace Audio.BnkCompiler
         {
             public string Name { get; set; }
             public string Sound { get; set; }
+            public string FileSystemSound { get; set; }
         }
 
         public class ProjectSettings
         {
             public int Version { get; set; } = 1;
+            public string ProjectType { get; set; }
             public string OutputGame { get; set; } = CompilerConstants.Game_Warhammer3;
             public string BnkName { get; set; }
             public string RootAudioMixer { get; set; } = CompilerConstants.Mixers_Diplomacy;
-            public string Langauge { get; set; } = CompilerConstants.Language_English;
+            public string Language { get; set; } = CompilerConstants.Language_English;
         }
 
         public ProjectSettings Settings { get; set; } = new ProjectSettings();

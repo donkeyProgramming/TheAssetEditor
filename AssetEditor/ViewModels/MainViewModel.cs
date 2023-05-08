@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -107,9 +108,17 @@ namespace AssetEditor.ViewModels
 
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
+                CreateTestPackFiles(packfileService);
+                PackFileUtil.LoadFilesFromDisk(_packfileService, new PackFileUtil.FileRef(packFilePath: @"audioprojects", systemPath: @"C:\Users\ole_k\source\repos\TheAssetEditor\AudioResearch\Data\OvnExample\ProjectSimple.json"));
+               
+                // Load all wems
+                var wemReferences = Directory.GetFiles(@"D:\Research\Audio\Working pack\audio_ovn\wwise\english(uk)")
+                    .Where(x => Path.GetExtension(x) == ".wem")
+                    .Select(x => new PackFileUtil.FileRef(packFilePath: @"audio\wwise", systemPath: x))
+                    .ToList();
+                PackFileUtil.LoadFilesFromDisk(_packfileService, wemReferences);
 
- 
-                
+
                 //new BaseAnimationSlotHelper(GameTypeEnum.Warhammer2).ExportAnimationDebugList(packfileService, @"c:\temp\3kanims.txt");
 
                 //DefaultAnimationSlotTypeHelper.ExportAnimationDebugList(packfileService);
@@ -215,7 +224,7 @@ namespace AssetEditor.ViewModels
                 //CreateEmptyEditor(editorView);
 
 
-                CreateTestPackFiles(packfileService);
+               
                 //TexturePreviewController.CreateFromFilePath(@"C:\Users\ole_k\Desktop\TroyOrc.dds", _packfileService);
             }
         }

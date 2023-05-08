@@ -2,11 +2,12 @@
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using SharpDX.MediaFoundation;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
-using System.Text.Json;
+
 
 namespace Audio.BnkCompiler
 {
@@ -34,26 +35,45 @@ namespace Audio.BnkCompiler
                 // Load the file
                 var bytes = packfile.DataSource.ReadData();
                 var str = Encoding.UTF8.GetString(bytes);
-                var projectFile = JsonSerializer.Deserialize<CompilerInputProject>(str);
+                var projectFile = JsonConvert.DeserializeObject<CompilerInputProject>(str, new JsonSerializerSettings() { MissingMemberHandling = MissingMemberHandling.Error});
                 if (projectFile == null)
                     return Result<CompilerData>.FromError("BnkCompiler-Loader", "Unable to load file. Please validate the Json using an online validator.");
 
                 // Validate the input file
                 var validateInputResult = ValidateInputFile(projectFile);
-                if (validateInputResult.Success == false)
-                    return Result<CompilerData>.FromError(validateInputResult.ErrorList);
+                if (validateInputResult.IsSuccess == false)
+                    return Result<CompilerData>.FromError(validateInputResult.LogItems);
 
                 // Convert and validate to compiler input
                 var compilerData = ConvertSimpleInputToCompilerData(projectFile, settings);
+                SaveCompilerDataToPackFile(compilerData, settings, packfile);
                 var validateProjectResult = ValidateProjectFile(compilerData);
-                if (validateProjectResult.Success == false)
-                    return Result<CompilerData>.FromError(validateProjectResult.ErrorList);
+                if (validateProjectResult.IsSuccess == false)
+                    return Result<CompilerData>.FromError(validateProjectResult.LogItems);
 
                 return Result<CompilerData>.FromOk(compilerData);
+            }
+            catch (JsonSerializationException e)
+            {
+                return Result<CompilerData>.FromError("BnkCompiler-Loader", $"{e.Message}");
             }
             catch (Exception e)
             {
                 return Result<CompilerData>.FromError("BnkCompiler-Loader", $"{e.Message}");
+            }
+        }
+
+        private void SaveCompilerDataToPackFile(CompilerData compilerData, CompilerSettings settings, PackFile packfile)
+        {
+            if (settings.SaveGeneratedCompilerInput)
+            {
+                var filePath = _pfs.GetFullPath(packfile);
+                var fileNameWithoutExtenetion = Path.GetFileNameWithoutExtension(filePath);
+                var directory = Path.GetDirectoryName(filePath);
+
+                var compilerDataAsStr = JsonConvert.SerializeObject(compilerData, Formatting.Indented);
+                var outputName = $"{fileNameWithoutExtenetion}_generated.json";
+                _pfs.AddFileToPack(_pfs.GetEditablePack(), directory, PackFile.CreateFromASCII(outputName, compilerDataAsStr));
             }
         }
 
@@ -87,7 +107,7 @@ namespace Audio.BnkCompiler
             compilerData.ActorMixers.Add(mixer);
             compilerData.ProjectSettings.Version = input.Settings.Version;
             compilerData.ProjectSettings.BnkName = input.Settings.BnkName;
-            compilerData.ProjectSettings.Language = input.Settings.Langauge;
+            compilerData.ProjectSettings.Language = input.Settings.Language;
 
             foreach (var simpleEvent in input.Events)
             {
@@ -112,6 +132,7 @@ namespace Audio.BnkCompiler
                 {
                     Name = soundId,
                     Path = simpleEvent.Sound,
+                    SystemFilePath = simpleEvent.FileSystemSound
                 };
 
                 mixer.Sounds.Add(defaultSound.Name);
@@ -124,5 +145,7 @@ namespace Audio.BnkCompiler
             compilerData.PreperForCompile(settings.UserOerrideIdForActions, settings.UseOverrideIdForMixers, settings.UseOverrideIdForSounds);
             return compilerData;
         }
+
+
     }
 }

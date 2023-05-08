@@ -5,18 +5,19 @@ namespace CommonControls.Common
 {
     public class Result<T>
     {
-        public ErrorList ErrorList { get; private set; }
-        public bool Success { get; private set; }
+        public ErrorList LogItems { get; private set; }
+        public bool IsSuccess { get; private set; }
+        public bool Failed { get => !IsSuccess; }
         public T Item { get; private  set; }
 
         public static Result<T> FromError(string errorGroup, string description)
         {
             var item = new Result<T>()
             {
-                Success = false,
-                ErrorList = new ErrorList()
+                IsSuccess = false,
+                LogItems = new ErrorList()
             };
-            item.ErrorList.Error(errorGroup, description);
+            item.LogItems.Error(errorGroup, description);
             return item;
         }
 
@@ -24,11 +25,11 @@ namespace CommonControls.Common
         {
             var item = new Result<T>()
             {
-                Success = false,
-                ErrorList = new ErrorList()
+                IsSuccess = false,
+                LogItems = new ErrorList()
             };
             foreach (var error in result.Errors)
-                item.ErrorList.Error(errorGroup, $"{error.PropertyName} - {error.ErrorMessage}");
+                item.LogItems.Error(errorGroup, $"{error.PropertyName} - {error.ErrorMessage}");
             return item;
         }
 
@@ -36,11 +37,11 @@ namespace CommonControls.Common
         {
             var item = new Result<T>()
             {
-                Success = false,
-                ErrorList = new ErrorList()
+                IsSuccess = false,
+                LogItems = new ErrorList()
             };
             foreach (var error in errorList.Errors)
-                item.ErrorList.Error(error.ErrorType, error.Description);
+                item.LogItems.Error(error.ErrorType, error.Description);
             return item;
         }
 
@@ -48,7 +49,7 @@ namespace CommonControls.Common
         {
             var item = new Result<T>()
             {
-                Success = true,
+                IsSuccess = true,
                 Item = obj
             };
             return item;

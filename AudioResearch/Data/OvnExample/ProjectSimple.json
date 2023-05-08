@@ -1,6 +1,7 @@
 {
   "Settings": {
     "Version": 1,
+    "ProjectType": "Simple",
     "OutputGame": "Warhammer3",
     "BnkName": "campaign_diplomacy__ovn",
     "RootAudioMixer": "54848735",
@@ -14,7 +15,7 @@
     },
     {
       "Name": "Play_HEF_Tyrion_Dip_Halfling_Neg_01",
-      "Sound": "Audio\\WWise\\906470917.wem"
+      "FileSystemSound": "Audio\\WWise\\906470917.wem"
     },
     {
       "Name": "Play_HEF_Tyrion_Dip_Halfling_Neu_01",
