@@ -29,7 +29,6 @@ namespace Audio.BnkCompiler
     public class GameSound : IAudioProjectHircItem
     {
         public string Path { get; set; }
-        [JsonIgnore]
         public string SystemFilePath { get; set; }
     }
 

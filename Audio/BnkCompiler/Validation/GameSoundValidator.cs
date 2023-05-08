@@ -1,5 +1,7 @@
 ﻿using CommonControls.Services;
 using FluentValidation;
+using System;
+using System.IO;
 
 namespace Audio.BnkCompiler.Validation
 {
@@ -7,17 +9,37 @@ namespace Audio.BnkCompiler.Validation
     {
         public GameSoundValidator(PackFileService pfs) 
         {
+            RuleFor(x => x).NotNull().WithMessage("Item is null");
             RuleFor(x => x.Name).NotEmpty().WithMessage("Item is missing ID");
-            RuleFor(x => x.Path)
-                .NotEmpty().WithMessage(x => $"GameSound '{x.Name}' is missing file path")
-                .Must(x=>BeValidPath(x, pfs)).WithMessage(x => $"GameSound '{x.Name}' path does not point to a file: '{x.Path}'");
+            RuleFor(x => x)
+                .Custom((x, context) => 
+                {
+                    bool hasPackFileRef = string.IsNullOrWhiteSpace(x.Path) == false;
+                    bool hasSystemFileRef = string.IsNullOrWhiteSpace(x.SystemFilePath) == false;
+                    var refCount = Convert.ToInt32(hasPackFileRef) + Convert.ToInt32(hasSystemFileRef);
+                    if (refCount != 1)
+                    {
+                        context.AddFailure("Boop boop");
+                        return;
+                    }
+                    if (hasPackFileRef)
+                        EnsureIsValidPackFileRef(x, pfs, context);
+
+                    if (hasSystemFileRef)
+                        EnsureValidFileSystemRef(x, context);
+                });
         }
 
-        private bool BeValidPath(string path, PackFileService pfs)
+        private void EnsureIsValidPackFileRef(GameSound gamesound, PackFileService pfs, ValidationContext<GameSound> context)
         {
-            if(string.IsNullOrWhiteSpace(path)) 
-                return false;
-            return pfs.FindFile(path) != null;
+            if(pfs.FindFile(gamesound.Path) == null)
+                context.AddFailure($"{gamesound.Name} - Path does not poing to a valid packfile '{gamesound.Path}'");
+        }
+
+        private void EnsureValidFileSystemRef(GameSound gamesound, ValidationContext<GameSound> context)
+        {
+            if (File.Exists(gamesound.SystemFilePath) == false)
+                context.AddFailure($"{gamesound.Name} - SystemFilePath does not poing to a valid file on disk '{gamesound.SystemFilePath}'");
         }
     }
 }
