@@ -45,7 +45,6 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             AkPropBundle0 = AkPropBundle.Create(chunk);
             AkPropBundle1 = AkPropBundleMinMax.Create(chunk);
         }
-
         public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray()
         {
@@ -71,6 +70,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
             return byteArray;
         }
+       
     }
 
 
@@ -83,11 +83,18 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             public ushort uWeight { get; set; }
             public ushort uProbability { get; set; }
 
-            NodeContent(uint key)
+            public NodeContent(uint key)
             {
                 Key = key;
                 uWeight = 50;
                 uProbability = 100;
+            }
+            
+            public NodeContent(uint key, ushort uweight, ushort uprobability)
+            {
+                Key = key;
+                uWeight = uweight;
+                uProbability = uprobability;
             }
         }
 
@@ -215,6 +222,12 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 Content = sNode.Content;
                 AudioNodeId = sNode.AudioNodeId;
             }
+
+            public Node Copy()
+            {
+                var copy = new Node(Content.Key, AudioNodeId, Content.uWeight, Content.uProbability);
+                return copy;
+            }
             
             public void VerifyState()
             {
@@ -242,6 +255,12 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         //But it's not always true. CA uses some kind of 'optimization' and AudioNode might be on the same level as DecisionNodes...
         public readonly uint _maxTreeDepth;
         public Node Root { get; set; }
+
+        private AkDecisionTree(uint maxTreeDepth)
+        {
+            _maxTreeDepth = maxTreeDepth;
+            Root = null;
+        }
         
         public AkDecisionTree(ByteChunk chunk, uint maxTreeDepth, uint uTreeDataSize)
         {
@@ -274,33 +293,46 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             #endif
         }
 
-
-        public Node AddAudioNode(
-            List<NodeContent> decisionNodes, 
-            (uint key, ushort audioId, ushort weight, ushort probability) audioNode)
+        // Returns a copy of the tree with a root only
+        public AkDecisionTree BaseCopy()
         {
-            If(decisionNodes.Count + 1 + 1 > _maxTreeDepth).Then( _ => // 1 for the root and 1 for a leaf
-                throw new ArgumentException($"DecisionPathChain is too Long"));
+            var copy = new AkDecisionTree(_maxTreeDepth);
+            copy.Root = Root.Copy(); // No children are copied
+            return copy;
+        }
+
+
+        public Node AddAudioNode(List<NodeContent> nodes, uint audioNodeId)
+        {
+            If(nodes.Count != _maxTreeDepth).Then( _ => // the root is not counted
+                throw new ArgumentException($"DecisionPathChain is too Long or too short"));
 
             var cNode = Root;
-            decisionNodes.ForEach(e =>
+            nodes.GetRange(0, nodes.Count - 1).ForEach(e =>
             {
                 var selected = cNode.Children.Where(x => x.Content.Key == e.Key);
                 
-                If(selected.Count() > 1).Then(_ =>
-                    throw new ArgumentException($"Many nodes were selected"));
+                If(selected.Count() > 1).Then(_ => 
+                                                  throw new ArgumentException($"Many nodes were selected"));
 
                 if(!selected.Any()){
-                    cNode = Node.CreateDecisionNode(e.Key, e.uWeight, e.uProbability);
-                    cNode.Children.Add(cNode);
+                    var node = Node.CreateDecisionNode(e.Key, e.uWeight, e.uProbability);
+                    cNode.Children.Add(node);
+                    cNode = node;
                     return;
                 }
 
                 cNode = selected.First();
             });
             
-            var aNode = Node.CreateAudioNode(audioNode.key,  audioNode.weight, audioNode.probability, audioNode.audioId);
-            cNode.Children.Add(aNode);
+            //Add audio Node
+            var aNode = nodes.Last();
+            var selected = cNode.Children.Where(x => x.Content.Key == aNode.Key);
+            if (selected.Any()){
+                throw new ArgumentException($"AudioNode with a key ({aNode.Key}) already exists."); //TODO: it will print the hash of the key. Should be more explicit
+            }
+            var audioNode = Node.CreateAudioNode(aNode.Key,  aNode.uWeight, aNode.uProbability, audioNodeId);
+            cNode.Children.Add(audioNode);
             return cNode.Children.Last();
         }
 
@@ -317,25 +349,31 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             DfsTreeTraversal(GetAudioNode);
             return audioNodes;
         }
-        public List<List<Node>> GetDecisionPaths()
+        public List<(NodeContent[], uint)> GetDecisionPaths()
         {
-            var decisionPaths = new List<List<Node>>();
+            var decisionPaths = new List<(NodeContent[], uint)>();
             
             var stack = new Stack<Node>();
             void GetDecisionPathsInternal()
             {
-                while (stack.Count > 0){
-
-                    var peek = stack.Peek();
-                    If(peek.IsAudioNode()).Then(_ =>
-                        decisionPaths.Add(stack.ToList()));
-                    var node = stack.Pop();
-                    node.Children.ForEachReverse(stack.Push);
-                }
+                var peek = stack.Peek();
+                If(peek.IsAudioNode()).Then(_ =>
+                    decisionPaths.Add(
+                        (stack.Select(e => e.Content).Reverse().ToArray(), peek.AudioNodeId)
+                        )
+                    );
+                // var node = stack.Pop();
+                peek.Children.ForEach(e =>
+                {
+                    stack.Push(e);
+                    GetDecisionPathsInternal();
+                    stack.Pop();
+                });
             }
             
             stack.Push(Root);
             GetDecisionPathsInternal();
+            stack.Pop();
             return decisionPaths;
         }
 
