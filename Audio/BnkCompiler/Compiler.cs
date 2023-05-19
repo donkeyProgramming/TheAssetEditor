@@ -25,6 +25,8 @@ namespace Audio.BnkCompiler
         public static readonly string Game_Warhammer3 = "Warhammer3";
         public static readonly string Language_English = "English(uk)";
         public static readonly string Mixers_Diplomacy = "54848735";
+
+        public static readonly string[] Possible_Languages = new string[] { Language_English };
     }
 
     public class Compiler

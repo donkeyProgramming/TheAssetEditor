@@ -7,6 +7,7 @@ namespace Audio.AudioEditor
     {
         public string DisplayName { get; set; } = string.Empty;
         public HircItem Item { get; set; }
+        public bool IsMetaNode { get; set; } // things like switch nodes
 
 
         public List<HircTreeItem> Children { get; set; } = new List<HircTreeItem>();

@@ -70,7 +70,7 @@ namespace Audio.AudioEditor
             var sound = GetAsType<ICAkSound>(item);
             var node = new HircTreeItem() { DisplayName = $"Sound {GetDisplayId(item.Id, item.OwnerFile, false)} cant have parents", Item = item };
             parent.Children.Add(node);
-            ProcessNext(sound.GetParentId(), node);
+            ProcessNext(sound.GetDirectParentId(), node);
         }
 
         protected override string GetDisplayId(uint id, string fileName, bool hidenNameIfMissing)

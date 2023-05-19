@@ -90,7 +90,7 @@ namespace Audio.AudioEditor
         private void ProcessSound(HircItem item, HircTreeItem parent)
         {
             var soundHirc = GetAsType<ICAkSound>(item);
-            var soundTreeNode = new HircTreeItem() { DisplayName = $"Sound {soundHirc.GetSourceId()}.wav", Item = item };
+            var soundTreeNode = new HircTreeItem() { DisplayName = $"Sound {soundHirc.GetSourceId()}.wem", Item = item };
             parent.Children.Add(soundTreeNode);
         }
 
@@ -114,7 +114,7 @@ namespace Audio.AudioEditor
             foreach (var switchCase in switchControl.SwitchList)
             {
                 var switchValue = _repository.GetNameFromHash(switchCase.SwitchId);
-                var switchValueNode = new HircTreeItem() { DisplayName = $"SwitchValue: {switchValue}", Item = item };
+                var switchValueNode = new HircTreeItem() { DisplayName = $"SwitchValue: {switchValue}", Item = item, IsMetaNode = true};
                 switchControlNode.Children.Add(switchValueNode);
 
                 ProcessNext(switchCase.NodeIdList, switchValueNode);

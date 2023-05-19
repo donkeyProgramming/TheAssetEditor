@@ -5,6 +5,7 @@ using Audio.Storage;
 using Audio.Utility;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
+using MoreLinq;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.Json;
@@ -47,11 +48,11 @@ namespace Audio.Presentation.AudioExplorer
             _soundPlayer = soundPlayer;
             _audioResearchHelper = audioResearchHelper;
 
-            ShowIds = new NotifyAttr<bool>(false, RefeshList);
-            ShowBnkName = new NotifyAttr<bool>(false, RefeshList);
-            UseBnkNameWhileParsing = new NotifyAttr<bool>(false, RefeshList);
-            ShowEvents = new NotifyAttr<bool>(true, RefeshList);
-            ShowDialogEvents = new NotifyAttr<bool>(true, RefeshList);
+            ShowIds = new NotifyAttr<bool>(false, RefreshList);
+            ShowBnkName = new NotifyAttr<bool>(false, RefreshList);
+            UseBnkNameWhileParsing = new NotifyAttr<bool>(false, RefreshList);
+            ShowEvents = new NotifyAttr<bool>(true, RefreshList);
+            ShowDialogEvents = new NotifyAttr<bool>(true, RefreshList);
 
             EventFilter = new EventSelectionFilter(_audioRepository);
             EventFilter.EventList.SelectedItemChanged += OnEventSelected;
@@ -64,7 +65,7 @@ namespace Audio.Presentation.AudioExplorer
 
         public bool Save() => true;
 
-        void RefeshList(bool newValue) => EventFilter.Refresh(ShowEvents.Value, ShowDialogEvents.Value);
+        void RefreshList(bool newValue) => EventFilter.Refresh(ShowEvents.Value, ShowDialogEvents.Value);
 
         private void OnEventSelected(SelectedHircItem newValue)
         {
@@ -84,29 +85,44 @@ namespace Audio.Presentation.AudioExplorer
 
         void OnNodeSelected(HircTreeItem selectedNode)
         {
-            if (selectedNode != null)
-            {
-                var hircAsString = JsonSerializer.Serialize((object)selectedNode.Item, new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter() }, WriteIndented = true });
-                SelectedNodeText.Value = selectedNode.Item.Type.ToString() + " Id: " + selectedNode.Item.Id + "\n" + hircAsString;
-
-                var parser = new WWiseTreeParserParent(_audioRepository, true, true, true);
-                var nodeNames = parser.BuildHierarchyAsFlatList(selectedNode.Item);
-
-                SelectedNodeText.Value += "\n\nParent structure:\n";
-                foreach (var nodeName in nodeNames)
-                    SelectedNodeText.Value += "\t" + nodeName + "\n";
-            }
-            else
-            {
-                SelectedNodeText.Value = "";
-            }
-
             IsPlaySoundButtonEnabled.Value = _selectedNode?.Item is ICAkSound;
             CanExportCurrrentDialogEventAsCsvAction.Value = _selectedNode?.Item is CAkDialogueEvent_v136;
+
+            SelectedNodeText.Value = "";
+
+            if (selectedNode == null)
+            {
+                
+                return;
+            }
+             
+            var hircAsString = JsonSerializer.Serialize((object)selectedNode.Item, new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter() }, WriteIndented = true });
+            SelectedNodeText.Value = hircAsString;
+
+            if (selectedNode.Item.Type == FileFormats.WWise.HircType.Sound)
+            {
+                var findAudioParentStructureHelper = new FindAudioParentStructureHelper();
+                var parentStructs = findAudioParentStructureHelper.Compute(selectedNode.Item as CAkSound_v136, _audioRepository);
+
+                SelectedNodeText.Value += "\n\nParent structure:\n";
+                foreach (var parentStruct in parentStructs)
+                {
+                    SelectedNodeText.Value += "\t"+parentStruct.Description + "\n";
+                    foreach(var graphItem in parentStruct.GraphItems) 
+                        SelectedNodeText.Value += "\t\t" + graphItem.Description + "\n";
+
+                    SelectedNodeText.Value += "\n";
+                }
+            }
         }
 
         public void PlaySelectedSoundAction() => _soundPlayer.PlaySound(_selectedNode.Item as ICAkSound, TreeList.First().Item.Id);
         public void ExportCurrrentDialogEventAsCsvAction() => _audioResearchHelper.ExportDialogEventsToFile(_selectedNode.Item as CAkDialogueEvent_v136, true);
         public void ExportIdListAction() => _audioResearchHelper.ExportNamesToFile("c:\\temp\\wwiseIds.txt", true);
     }
+
+   
+
+
 }
+

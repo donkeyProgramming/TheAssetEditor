@@ -11,7 +11,7 @@ namespace Audio.FileFormats.WWise.Hirc
 
     public interface ICAkSound
     {
-        public uint GetParentId();
+        public uint GetDirectParentId();
         public uint GetSourceId();
     }
 

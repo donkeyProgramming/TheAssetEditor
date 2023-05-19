@@ -93,7 +93,7 @@ namespace AssetEditor.ViewModels
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
             {
                 //settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Warhammer3;
-                //settingsService.CurrentSettings.SkipLoadingWemFiles = false;
+                //settingsService.CurrentSettings.SkipLoadingWemFiles = true;
                 var gamePath = settingsService.GetGamePathForCurrentGame();
                 if (gamePath != null)
                 {

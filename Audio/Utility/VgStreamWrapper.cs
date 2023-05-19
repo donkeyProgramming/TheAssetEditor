@@ -120,7 +120,7 @@ namespace Audio.Utility
             DirectoryHelper.EnsureCreated(VgStreamFolderName);
             DirectoryHelper.EnsureCreated(AudioFolderName);
 
-            var vgStreamCli = $"{VgStreamFolderName}\\test.exe";
+            var vgStreamCli = $"{VgStreamFolderName}\\vgstream.exe";
             if (File.Exists(vgStreamCli))
                 return vgStreamCli;
 
@@ -141,7 +141,7 @@ namespace Audio.Utility
             }
 
             if (File.Exists(vgStreamCli) == false)
-                throw new Exception("Failed to create vgStreamCli - Unkown error");
+                throw new Exception("Failed to create vgStreamCli - Unknown error");
 
             return vgStreamCli;
         }

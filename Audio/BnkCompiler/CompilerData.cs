@@ -58,7 +58,6 @@ namespace Audio.BnkCompiler
         public List<GameSound> GameSounds { get; set; } = new List<GameSound>();
         public List<ActorMixer> ActorMixers { get; set; } = new List<ActorMixer>();
 
-
         public void PreperForCompile(bool allowOverrideIdForActions, bool allowOverrideIdForMixers, bool allowOverrideIdForSounds)
         {
             _allProjectItems.AddRange(Events);

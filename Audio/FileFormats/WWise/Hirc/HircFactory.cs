@@ -79,6 +79,8 @@ namespace Audio.FileFormats.WWise.Hirc
             instance.RegisterHirc(HircType.Music_Switch, () => new V136.CAkMusicSwitchCntr_v136());
             instance.RegisterHirc(HircType.FxCustom, () => new V136.CAkFxCustom_v136());
             instance.RegisterHirc(HircType.FxShareSet, () => new V136.CAkFxShareSet_v136());
+            instance.RegisterHirc(HircType.Audio_Bus, () => new V136.CAkBus_v136());
+            instance.RegisterHirc(HircType.AuxiliaryBus, () => new V136.CAkAuxBus_v136());
             return instance;
         }
 

@@ -19,13 +19,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\AudioCompilerExample.json" />
 	  <None Remove="Resources\Schemas\ExampleAudioProject.xml" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="Resources\ExampleAudioProject.xml">
-		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\AudioCompilerExample.json" />
 		<Resource Include="Resources\Schemas\warhammer2_AnimMetaDataSchema.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Resource>

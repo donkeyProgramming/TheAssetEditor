@@ -105,7 +105,7 @@ namespace Audio.BnkCompiler
                 RootParentId = input.Settings.RootAudioMixer,
             };
             compilerData.ActorMixers.Add(mixer);
-            compilerData.ProjectSettings.Version = input.Settings.Version;
+            compilerData.ProjectSettings.Version = 1;
             compilerData.ProjectSettings.BnkName = input.Settings.BnkName;
             compilerData.ProjectSettings.Language = input.Settings.Language;
 

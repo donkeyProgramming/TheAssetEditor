@@ -14,7 +14,7 @@ namespace Audio.FileFormats.WWise.Hirc.V122
             NodeBaseParams = NodeBaseParams.Create(chunk);
         }
 
-        public uint GetParentId() => NodeBaseParams.DirectParentID;
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentID;
         public uint GetSourceId() => AkBankSourceData.akMediaInformation.SourceId;
 
         public override void UpdateSize() => throw new NotImplementedException();
