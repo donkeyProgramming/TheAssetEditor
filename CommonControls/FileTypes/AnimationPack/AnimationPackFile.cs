@@ -1,6 +1,4 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
-using CommonControls.FileTypes.DB;
+﻿using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using System.Collections.Generic;
 using System.Linq;
 

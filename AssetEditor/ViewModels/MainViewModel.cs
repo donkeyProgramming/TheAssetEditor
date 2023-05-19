@@ -1,4 +1,5 @@
 ﻿using AssetEditor.Views.Settings;
+using Audio;
 using CommonControls.BaseDialogs.ToolSelector;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
@@ -109,14 +110,10 @@ namespace AssetEditor.ViewModels
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
                 CreateTestPackFiles(packfileService);
-                PackFileUtil.LoadFilesFromDisk(_packfileService, new PackFileUtil.FileRef(packFilePath: @"audioprojects", systemPath: @"C:\Users\ole_k\source\repos\TheAssetEditor\AudioResearch\Data\OvnExample\ProjectSimple.json"));
-               
-                // Load all wems
-                var wemReferences = Directory.GetFiles(@"D:\Research\Audio\Working pack\audio_ovn\wwise\english(uk)")
-                    .Where(x => Path.GetExtension(x) == ".wem")
-                    .Select(x => new PackFileUtil.FileRef(packFilePath: @"audio\wwise", systemPath: x))
-                    .ToList();
-                PackFileUtil.LoadFilesFromDisk(_packfileService, wemReferences);
+                //AudioTool_Debug.CreateOvnCompilerProject(packfileService);
+                AnimationEditor.MountAnimationCreator.MountAnimationCreator_Debug.CreateLionAndHu01c(this, toolFactory, packfileService);
+
+
 
 
                 //new BaseAnimationSlotHelper(GameTypeEnum.Warhammer2).ExportAnimationDebugList(packfileService, @"c:\temp\3kanims.txt");
@@ -184,7 +181,7 @@ namespace AssetEditor.ViewModels
                 //var loadRes = _packfileService.LoadAllCaFiles(romePath, gameName);
                 ////
                 //AnimationEditor.MountAnimationCreator.MountAnimationCreator_Debug.CreateRome2WolfRider(this, toolFactory, packfileService);
-                //AnimationEditor.MountAnimationCreator.MountAnimationCreator_Debug.CreateLionAndHu01c(this, toolFactory, packfileService);
+
                 //KitbashEditor_Debug.CreateLoremasterHead(this, toolFactory, packfileService);
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateBowCentigor(this, toolFactory, packfileService);
                 //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateDamselEditor(this, toolFactory, packfileService);
@@ -224,7 +221,7 @@ namespace AssetEditor.ViewModels
                 //CreateEmptyEditor(editorView);
 
 
-               
+
                 //TexturePreviewController.CreateFromFilePath(@"C:\Users\ole_k\Desktop\TroyOrc.dds", _packfileService);
             }
         }

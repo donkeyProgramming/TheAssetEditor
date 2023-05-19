@@ -7,7 +7,10 @@ using Audio.Presentation.Compiler;
 using Audio.Storage;
 using Audio.Utility;
 using CommonControls.Common;
+using CommonControls.Services;
 using Microsoft.Extensions.DependencyInjection;
+using System.IO;
+using System.Linq;
 
 namespace Audio
 {
@@ -52,6 +55,24 @@ namespace Audio
             factory.RegisterTool<CompilerViewModel, CompilerView>();// ( new ExtentionToTool( EditorEnums.AudioCompiler_Editor,  new[] { ".audio_json"}));
         }
     }
+
+    public static class AudioTool_Debug
+    {
+        public static void CreateOvnCompilerProject(PackFileService pfs)
+        {
+            PackFileUtil.LoadFilesFromDisk(pfs, new PackFileUtil.FileRef(packFilePath: @"audioprojects", systemPath: @"C:\Users\ole_k\source\repos\TheAssetEditor\AudioResearch\Data\OvnExample\ProjectSimple.json"));
+            
+            // Load all wems
+            var wemReferences = Directory.GetFiles(@"D:\Research\Audio\Working pack\audio_ovn\wwise\english(uk)")
+                .Where(x => Path.GetExtension(x) == ".wem")
+                .Select(x => new PackFileUtil.FileRef(packFilePath: @"audio\wwise", systemPath: x))
+                .ToList();
+            PackFileUtil.LoadFilesFromDisk(pfs, wemReferences);
+        }
+    }
+
+        
+
 }
 
 /*
