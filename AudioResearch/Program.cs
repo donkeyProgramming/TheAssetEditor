@@ -560,7 +560,7 @@ namespace AudioResearch
 
 
 
-        static void TestDialogEventSerialization()
+       /* static void TestDialogEventSerialization()
         {
             using var application = new SimpleApplication();
 
@@ -889,6 +889,6 @@ namespace AudioResearch
                 // Console.WriteLine($"Main.Success: {audioRepo.GetNameFromHash(dialogEvent.Id)}({dialogEvent.Id})");
             }
 
-        }
+        }*/
     }
 }

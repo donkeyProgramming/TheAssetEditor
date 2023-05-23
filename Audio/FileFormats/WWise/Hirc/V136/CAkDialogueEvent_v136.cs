@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using CommonControls.Common;
 using static CommonControls.Common.CustomExtensions;
+using MoreLinq;
 
 namespace Audio.FileFormats.WWise.Hirc.V136
 {
@@ -92,16 +93,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             public ushort Children_uCount { get; set; }
             public override bool IsAudioNode() => Children_uCount == 0;
             
-            private int _SerializationByteSize() => 4 + 
-                                                    4 + // == Marshal.SizeOf(Children_uIdx) + Marshal.SizeOf(Children_uCount)
-                                                    2 + 
-                                                    2;
-            
-            public static readonly int SerializationByteSize = new SerializedNode()._SerializationByteSize();
-
-            private SerializedNode()
-            {
-            }
+            public static readonly int SerializationByteSize = 12;
 
             public SerializedNode(Node node)
             {
@@ -128,7 +120,8 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 if (IsAudioNode())
                 {
                     memStream.Write(ByteParsers.UInt32.EncodeValue(AudioNodeId, out _));
-                } else
+                } 
+                else
                 {
                     memStream.Write(ByteParsers.UShort.EncodeValue(Children_uIdx, out _));
                     memStream.Write(ByteParsers.UShort.EncodeValue(Children_uCount, out _));
@@ -136,30 +129,27 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 memStream.Write(ByteParsers.UShort.EncodeValue(Content.uWeight, out _));
                 memStream.Write(ByteParsers.UShort.EncodeValue(Content.uProbability, out _));
                 var byteArray = memStream.ToArray();
-
                 return byteArray;
             }
 
             public void VerifyState()
             {
                 if (IsAudioNode()){
-                    If(Children_uIdx > 0).Then(_ =>
-                        throw new ArgumentException($"AudioNode has invalid Children_uIdx: {Children_uIdx}. Should be 0"));
-                    If(Children_uCount > 0).Then(_ =>
-                        throw new ArgumentException($"AudioNode has invalid Children_uCount: {Children_uCount}. Should be 0"));
-                    
-                    If(Content.uWeight != 50 && Content.uProbability != 100).Then(_ =>
-                        throw new ArgumentException($"AudioNode can only have uWeight or uProbability modified"));
+                    if (Children_uIdx > 0)
+                        throw new ArgumentException($"AudioNode has invalid Children_uIdx: {Children_uIdx}. Should be 0");
+                    if (Children_uCount > 0)
+                        throw new ArgumentException($"AudioNode has invalid Children_uCount: {Children_uCount}. Should be 0");
+                    if (Content.uWeight != 50 && Content.uProbability != 100)
+                        throw new ArgumentException($"AudioNode can only have uWeight or uProbability modified");
                 }
-                else{
-                    If(Children_uCount == 0).Then(_ =>
-                        throw new ArgumentException($"LogicNode has invalid Children_uCount: {Children_uCount}. Should be greater 0"));
-                    
-                    If(Content.uWeight != 50).Then(_ =>
-                        throw new ArgumentException($"LogicNode should have uWeight{Content.uWeight} equal to 50"));
-                    
-                    If(Content.uProbability != 100).Then(_ =>
-                        throw new ArgumentException($"LogicNode should have uProbability{Content.uProbability} equal to 100"));
+                else
+                {
+                    if (Children_uCount == 0)
+                        throw new ArgumentException($"LogicNode has invalid Children_uCount: {Children_uCount}. Should be greater 0");
+                    if (Content.uWeight != 50)
+                        throw new ArgumentException($"LogicNode should have uWeight{Content.uWeight} equal to 50");
+                    if (Content.uProbability != 100)
+                        throw new ArgumentException($"LogicNode should have uProbability{Content.uProbability} equal to 100");
                 }
             }
         }
@@ -238,14 +228,16 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 var sNode = flattenTree[parentsFirstChildIndex + childIndex];
                 var isAtMaxDepth = currentDepth == maxTreeDepth;
                 var isOutsideRange = sNode.Children_uIdx >= flattenTree.Count;
-                if(isAtMaxDepth || isOutsideRange){
+                if(isAtMaxDepth || isOutsideRange)
+                {
                     sNode.Children_uCount = 0;
                     sNode.Children_uIdx = 0;
                     return new Node(sNode);
                 }
+
                 sNode.AudioNodeId = 0;
                 var node = new Node(sNode);
-                For(sNode.Children_uCount, i => node.Children.Add(ConvertNode(sNode.Children_uIdx, (ushort) i,currentDepth + 1)));
+                Enumerable.Range(0, sNode.Children_uCount).ForEach(i=>node.Children.Add(ConvertNode(sNode.Children_uIdx, (ushort)i, currentDepth + 1)));
                 return node;
             }
 
@@ -295,19 +287,6 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             return cNode.Children.Last();
         }
 
-
-        public List<Node> GetAudioNodes()
-        {
-            var audioNodes = new List<Node>();
-            void GetAudioNode(Node node)
-            {
-                If(node.IsAudioNode()).Then(_ =>
-                    audioNodes.Add(node));
-            }
-
-            DfsTreeTraversal(GetAudioNode);
-            return audioNodes;
-        }
         public List<(NodeContent[], uint)> GetDecisionPaths()
         {
             var decisionPaths = new List<(NodeContent[], uint)>();
@@ -400,7 +379,6 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         }
         
         public void DfsTreeTraversal(Action<Node, int> func) =>  DfsTreeTraversal((node, depth, childIdx) => func(node, depth));
-        public void DfsTreeTraversal(Action<Node> func) =>  DfsTreeTraversal((node, depth, childIdx) => func(node));
         
         public void MixedTreeTraversal(Action<Node> func)
         {
