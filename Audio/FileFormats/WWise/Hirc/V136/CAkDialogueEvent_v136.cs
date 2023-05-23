@@ -77,7 +77,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
     public class AkDecisionTree
     {
 
-        public struct NodeContent
+        public class NodeContent
         {
             public uint Key { get; set; }
             public ushort uWeight { get; set; }
@@ -100,7 +100,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
         public abstract class BaseNode
         {
-            public NodeContent Content;
+            public NodeContent Content { get; set; } = new NodeContent(0,0,0);
             
             // Some Nodes at the _maxDepth have AudioNodeId == 0 and no children so we cannot use AudioNodeId = 0 to check
             // so we should check for children instead - works for now
@@ -113,10 +113,10 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             public ushort Children_uCount { get; set; }
             public override bool IsAudioNode() => Children_uCount == 0;
             
-            private int _SerializationByteSize() => Marshal.SizeOf(Content.Key) + 
+            private int _SerializationByteSize() => 4 + 
                                                     Marshal.SizeOf(AudioNodeId) + // == Marshal.SizeOf(Children_uIdx) + Marshal.SizeOf(Children_uCount)
-                                                    Marshal.SizeOf(Content.uWeight) + 
-                                                    Marshal.SizeOf(Content.uProbability);
+                                                    2 + 
+                                                   2;
             
             public static readonly int SerializationByteSize = new SerializedNode()._SerializationByteSize();
 

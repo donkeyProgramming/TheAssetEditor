@@ -8,6 +8,7 @@ namespace AudioResearch
     public class SimpleApplication : IDisposable
     {
         public bool SkipLoadingWemFiles { get; set; } = true;
+        public bool LoadAllCaFiles { get; set; } = true;
         IServiceScope _serviceScope;
 
         public SimpleApplication()
@@ -18,6 +19,12 @@ namespace AudioResearch
             // Configure based on settings
             var settingsService = _serviceScope.ServiceProvider.GetService<ApplicationSettingsService>();
             settingsService.CurrentSettings.SkipLoadingWemFiles = SkipLoadingWemFiles;
+
+            if (LoadAllCaFiles)
+            {
+                var pfs = GetService<PackFileService>();
+                pfs.LoadAllCaFiles(GameTypeEnum.Warhammer3);
+            }
         }
 
         public T GetService<T>() => _serviceScope.ServiceProvider.GetService<T>();

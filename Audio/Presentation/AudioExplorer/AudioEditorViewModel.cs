@@ -3,16 +3,23 @@ using Audio.FileFormats.WWise.Hirc;
 using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using Audio.Utility;
+using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using MoreLinq;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Windows;
+using static System.ComponentModel.Design.ObjectSelectorEditor;
 
 namespace Audio.Presentation.AudioExplorer
 {
+
+
     public class AudioEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
         public EventSelectionFilter EventFilter { get; set; }
@@ -36,6 +43,9 @@ namespace Audio.Presentation.AudioExplorer
 
         public NotifyAttr<bool> IsPlaySoundButtonEnabled { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> CanExportCurrrentDialogEventAsCsvAction { get; set; } = new NotifyAttr<bool>(false);
+
+
+        
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Explorer");
         public NotifyAttr<string> SelectedNodeText { get; set; } = new NotifyAttr<string>("");
@@ -89,14 +99,11 @@ namespace Audio.Presentation.AudioExplorer
             CanExportCurrrentDialogEventAsCsvAction.Value = _selectedNode?.Item is CAkDialogueEvent_v136;
 
             SelectedNodeText.Value = "";
-
-            if (selectedNode == null)
-            {
-                
-                return;
-            }
              
-            var hircAsString = JsonSerializer.Serialize((object)selectedNode.Item, new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter() }, WriteIndented = true });
+            if (selectedNode == null || selectedNode.Item == null)
+                return;
+             
+            var hircAsString = JsonSerializer.Serialize((object)selectedNode.Item, new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter(), new WwiseJsonNumberConverterFactory(_audioRepository) }, WriteIndented = true });
             SelectedNodeText.Value = hircAsString;
 
             if (selectedNode.Item.Type == FileFormats.WWise.HircType.Sound)
@@ -119,6 +126,35 @@ namespace Audio.Presentation.AudioExplorer
         public void PlaySelectedSoundAction() => _soundPlayer.PlaySound(_selectedNode.Item as ICAkSound, TreeList.First().Item.Id);
         public void ExportCurrrentDialogEventAsCsvAction() => _audioResearchHelper.ExportDialogEventsToFile(_selectedNode.Item as CAkDialogueEvent_v136, true);
         public void ExportIdListAction() => _audioResearchHelper.ExportNamesToFile("c:\\temp\\wwiseIds.txt", true);
+        public void LoadHircFromIdAction()
+        {
+            var window = new TextInputWindow("Hirc Input", "Hirc ID", true);
+            if (window.ShowDialog() == true)
+            {
+                var hircStr = window.TextValue;
+                if (string.IsNullOrEmpty(hircStr))
+                {
+                    MessageBox.Show("No id provided");
+                    return;
+                }
+
+                if (uint.TryParse(hircStr, out var hircId) == false)
+                {
+                    MessageBox.Show("Not a valid ID");
+                    return;
+                }
+
+                var foundHircs = _audioRepository.GetHircObject(hircId);
+                if (foundHircs.Count() == 0)
+                {
+                    MessageBox.Show($"No hircs found with id {hircId}");
+                    return;
+                }
+
+                var hircAsString = JsonSerializer.Serialize<object[]>(foundHircs.ToArray(), new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter(), new WwiseJsonNumberConverterFactory(_audioRepository) }, WriteIndented = true });
+                SelectedNodeText.Value = hircAsString;
+            }
+        }
     }
 
    

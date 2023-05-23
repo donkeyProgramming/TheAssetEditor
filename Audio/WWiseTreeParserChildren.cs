@@ -3,6 +3,8 @@ using Audio.FileFormats.WWise.Hirc;
 using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using Audio.Utility;
+using MoreLinq;
+using System.Linq;
 
 namespace Audio.AudioEditor
 {
@@ -79,12 +81,35 @@ namespace Audio.AudioEditor
 
         void ProcessAction(HircItem item, HircTreeItem parent)
         {
-            var actionHirc = GetAsType<ICAkAction>(item);
+            var actionHirc = GetAsType<CAkAction_v136>(item);
             var actionTreeNode = new HircTreeItem() { DisplayName = $"Action {actionHirc.GetActionType()}", Item = item };
             parent.Children.Add(actionTreeNode);
-
             var childId = actionHirc.GetChildId();
-            ProcessNext(childId, actionTreeNode);
+
+            // Override child id if type is setState based on parameters 
+            if (actionHirc.GetActionType() == ActionType.SetState)
+            {
+                var stateGroupId = actionHirc.AkSetStateParams.ulStateGroupID;
+
+                var musicSwitches = _repository.HircObjects
+                   .SelectMany(x => x.Value)
+                   .Where(X => X.Type == HircType.Music_Switch)
+                   .DistinctBy(x => x.Id)
+                   .Cast<CAkMusicSwitchCntr_v136>()
+                   .ToList();
+
+                foreach (var musicSwitch in musicSwitches)
+                {
+                    var allArgs = musicSwitch.ArgumentList.Arguments.Select(x => x.ulGroupId).ToList();
+                    if (allArgs.Contains(stateGroupId))
+                        ProcessNext(musicSwitch.Id, actionTreeNode);
+                }
+            }
+            else
+            {
+
+                ProcessNext(childId, actionTreeNode);
+            }
         }
 
         private void ProcessSound(HircItem item, HircTreeItem parent)

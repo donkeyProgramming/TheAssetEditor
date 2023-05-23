@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Audio.FileFormats.WWise.Hirc.V136
 {
-    public class CAkMusicTrack_v136 : HircItem
+    public class CAkMusicTrack_v136 : HircItem, INodeBaseParamsAccessor
     {
 
         public byte uFlags { get; set; }

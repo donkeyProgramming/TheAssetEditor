@@ -37,6 +37,7 @@
                 <MenuItem Header="Load all bnks" Click="{s:MethodBinding LoadAllBnksAction}" IsEnabled="False"/>
                 <MenuItem Header="Load one bnks" Click="{s:MethodBinding BrowseBnkAction}" IsEnabled="False"/>
                 <MenuItem Header="Export id list" Click="{s:MethodBinding ExportIdListAction}"/>
+                <MenuItem Header="Load Hirc From ID" Click="{s:MethodBinding LoadHircFromIdAction}"/>
             </MenuItem>
         </Menu>
 

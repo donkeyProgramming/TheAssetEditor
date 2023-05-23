@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 namespace Audio.FileFormats.WWise.Hirc.V136
 {
-    public class CAkRanSeqCntr_v136 : CAkRanSeqCnt
+    public class CAkRanSeqCntr_v136 : CAkRanSeqCnt, INodeBaseParamsAccessor
     {
         public NodeBaseParams NodeBaseParams { get; set; }
 

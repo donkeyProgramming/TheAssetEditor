@@ -29,6 +29,12 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using SharpDX.DXGI;
 using System.Transactions;
 using System.Threading.Tasks;
+using Octokit;
+using System.Text.Json.Serialization;
+using System.Text.Json;
+using Audio.BnkCompiler;
+using System.Text;
+using SharpDX.DirectWrite;
 
 namespace AudioResearch
 {
@@ -272,10 +278,14 @@ namespace AudioResearch
 
         static void DataExplore()
         {
-            using var application = new SimpleApplication();
 
-            var pfs = application.GetService<PackFileService>();
-            pfs.LoadAllCaFiles(GameTypeEnum.Warhammer3);
+            
+
+            using var application = new SimpleApplication()
+            {
+                SkipLoadingWemFiles = true,
+                LoadAllCaFiles = true,
+            };
 
             //var helper = application.GetService<AudioResearchHelper>();
             //helper.GenerateActorMixerTree();
@@ -284,34 +294,215 @@ namespace AudioResearch
             //new EventBusBuilder().DoWork(audioRepo);
             //new AudioBusTreeBuilder().DoWork(audioRepo);
 
-            var sounds = audioRepo.HircObjects
+            var x = audioRepo.HircObjects.SelectMany(x => x.Value).Where(x=>x.Type == HircType.State).ToList();
+
+            var tests = audioRepo.GetHircObject(964666289);
+
+            var allBusses = audioRepo.HircObjects
+             .SelectMany(x => x.Value)
+             .Where(x => x.Type == HircType.Audio_Bus || x.Type == HircType.AuxiliaryBus)
+             //.DistinctBy(x => x.Id)
+             .Cast<CAkBus_v136>()
+             .ToList();
+
+
+            var allBussesStateGroupIDs = allBusses
+                .SelectMany(x => x.StateChunk.StateChunks.Select(y=>y.ulStateGroupID))
+                .Distinct()
+                .Select(x =>
+                {
+                    var name = audioRepo.GetNameFromHash(x, out var found);
+                    return new { Id = x, Name = name, Found = found };
+                })
+                .OrderByDescending(x => x.Found)
+                .ToList();
+
+
+            var allSwitches = audioRepo.HircObjects
+               .SelectMany(x => x.Value)
+               .Where(x => x.Type == HircType.SwitchContainer)
+               .Cast<CAkSwitchCntr_v136>()
+               .ToList();
+
+
+            var allSwitchesSwitchId = allSwitches
+            .SelectMany(x => x.SwitchList.Select(y => y.SwitchId))
+            .Distinct()
+            .Select(x =>
+            {
+                var name = audioRepo.GetNameFromHash(x, out var found);
+                return new { Id = x, Name = name, Found = found };
+            })
+            .OrderByDescending(x => x.Found)
+            .ToList();
+
+            var option = new JsonSerializerOptions()
+            {
+                Converters = { new JsonStringEnumConverter(), new WwiseJsonNumberConverterFactory(audioRepo) }, 
+                WriteIndented = true 
+            };
+
+            var allHircs = audioRepo.HircObjects.SelectMany(x => x.Value);
+
+
+            /*
+                     State = 0x01,
+        Sound = 0x02,
+        Action = 0x03,
+         = 0x04,
+         = 0x05,
+         = 0x06,
+         = 0x07,
+         = 0x08,
+         = 0x09,
+        //
+         = 0x0a,
+         = 0x0b,
+         = 0x0c,
+         = 0x0d,
+        //
+        Attenuation = 0x0e,
+         = 0x0f,
+        FxShareSet = 0x10,
+        FxCustom = 0x11,
+         = 0x12,
+        LFO = 0x13,
+        Envelope = 0x14,
+        AudioDevice = 0x15,
+        TimeMod = 0x16,
+             */
+
+
+            var objectTypes = new List<HircType> 
+            { 
+                HircType.Event, 
+                HircType.SequenceContainer, 
+                HircType.SwitchContainer, 
+                HircType.ActorMixer, 
+                HircType.Audio_Bus, 
+                HircType.LayerContainer, 
+                HircType.Music_Segment, 
+                HircType.Music_Track,
+                HircType.Music_Random_Sequence,
+                HircType.Music_Switch,
+                HircType.Dialogue_Event,
+                HircType.AuxiliaryBus,
+                //HircType.Sound,
+                HircType.FxCustom,
+                HircType.FxShareSet,
+                HircType.Action
+            };
+
+            StringBuilder master = new StringBuilder();
+            StringBuilder ids = new StringBuilder();
+            foreach (var item in objectTypes)
+            {
+                var itemGroup = allHircs.Where(x => x.Type == item).ToArray();
+                var hircAsString = JsonSerializer.Serialize<object[]>(itemGroup, option);
+                File.WriteAllText($"c:\\temp\\HircList\\{item}.json", hircAsString);
+                
+                master.AppendLine(item + " count:" + itemGroup.Count());
+                master.AppendLine(hircAsString + "\n\n");
+
+                var localIds = itemGroup.Select(x => $"{x.Id} {x.Type} {x.OwnerFile} {x.IndexInFile}").ToList();
+                localIds.ForEach(x => ids.AppendLine(x));
+            }
+
+            //File.WriteAllText($"c:\\temp\\HircList\\master.json", master.ToString());
+            File.WriteAllText($"c:\\temp\\HircList\\ids.txt", ids.ToString());
+
+            return;
+
+            // var switchulStateGroupIDs = allSwitches
+            //     .Select(x => x.ulGroupID)
+            //     .Distinct()
+            //     .Select(x =>
+            //     {
+            //         var name = audioRepo.GetNameFromHash(x, out var found);
+            //         return new { Id = x, Name = name, Found = found };
+            //     })
+            //     .OrderByDescending(x => x.Found)
+            //     .ToList();
+
+            //var devents = audioRepo.HircObjects
+            // .SelectMany(x => x.Value)
+            // .Where(x => x.Type == HircType.Dialogue_Event)
+            // .DistinctBy(x => x.Id)
+            // .Cast<CAkDialogueEvent_v136>()
+            // .ToList();
+
+
+
+
+            var baseParamsProviders = audioRepo.HircObjects
+               .SelectMany(x => x.Value)
+               .Where(x => x is INodeBaseParamsAccessor)
+               //.DistinctBy(x => x.Id)
+               .ToList();
+
+            var ulStateGroupIDs = baseParamsProviders
+                .SelectMany(x => (x as INodeBaseParamsAccessor).NodeBaseParams.StateChunk.StateChunks.Select(y => y.ulStateGroupID))
+                .Distinct()
+                .Select(x =>
+                {
+                    var name = audioRepo.GetNameFromHash(x, out var found);
+                    return new { Id = x, Name = name, Found = found };
+                })
+                .OrderByDescending(x => x.Found)
+                .ToList();
+
+
+            var baseParams = audioRepo.HircObjects
+             .SelectMany(x => x.Value)
+             .Where(x=>x is INodeBaseParamsAccessor)
+             .DistinctBy(x => x.Id)
+             //.Cast<INodeBaseParamsAccessor>()
+             .ToList();
+
+
+            
+
+            var handyData = baseParams
+                .Select(x => new
+                {
+                    Id = x.Id,
+                    BaseParamsAccessor = x as INodeBaseParamsAccessor,
+                    AllStateProps = (x as INodeBaseParamsAccessor).NodeBaseParams.StateChunk.StateProps,
+                    AllSateChunks = (x as INodeBaseParamsAccessor).NodeBaseParams.StateChunk.StateChunks,
+                    AllSateChunksStates = (x as INodeBaseParamsAccessor).NodeBaseParams.StateChunk.StateChunks.SelectMany(x=>x.States).ToList(),
+                });
+
+
+            var test0 = handyData.Where(x => x.AllSateChunksStates.FirstOrDefault(x => x.ulStateID == 964666289) != null).ToList();
+            var test1 = handyData.Where(x => x.AllSateChunksStates.FirstOrDefault(x => x.ulStateID == 3501906231) != null).ToList();    // This is correct 
+
+
+            var test2 = handyData.Where(x => x.AllSateChunksStates.FirstOrDefault(x => x.ulStateInstanceID == 964666289) != null).ToList();
+            var test3 = handyData.Where(x => x.AllSateChunksStates.FirstOrDefault(x => x.ulStateInstanceID == 3501906231) != null).ToList();
+
+            //var eventAndName = events.Select(x =>
+            //    {
+            //        var name = audioRepo.GetNameFromHash(x.Id, out var found);
+            //        return new { Id = x.Id, Name = name, Found = found };
+            //    })
+            //    .OrderByDescending(x => x.Found)
+            //    .ToList();
+            //
+            //var missingCount = eventAndName.Where(x => x.Found == false).Count();
+            //
+            //
+            var t = audioRepo.GetHircObject(110788530);
+            //var t2 = audioRepo.GetHircObject(3501906231);
+
+
+
+    var sounds = audioRepo.HircObjects
                 .SelectMany(x => x.Value)
                 .DistinctBy(x => x.Id)
                 .Where(x => x.Type == HircType.Sound)
                 .Cast<CAkSound_v136>()
                 .ToList();
 
-
-            var counter = 1;
-            var totalCount = sounds.Count;
-            var helper = new FindAudioParentStructureHelper(audioRepo);
-            Parallel.ForEach(sounds, sound => 
-            {
-                counter++;
-                helper.Compute(sound, audioRepo);
-            
-            
-              if(counter % 1000 == 0)
-                Console.WriteLine($"{counter}/{totalCount}");
-            });
-
-            //foreach (var sound in sounds)
-            //{
-            //    helper.Compute(sound, audioRepo);
-            //    counter++;
-            //      if (counter % 1000 == 0)
-            //        Console.WriteLine($"{counter}/{totalCount}");
-            //}
 
         }
 

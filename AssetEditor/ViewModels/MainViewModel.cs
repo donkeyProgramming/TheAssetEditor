@@ -111,7 +111,7 @@ namespace AssetEditor.ViewModels
             {
                 CreateTestPackFiles(packfileService);
                 //AudioTool_Debug.CreateOvnCompilerProject(packfileService);
-                AnimationEditor.MountAnimationCreator.MountAnimationCreator_Debug.CreateLionAndHu01c(this, toolFactory, packfileService);
+                //AnimationEditor.MountAnimationCreator.MountAnimationCreator_Debug.CreateLionAndHu01c(this, toolFactory, packfileService);
 
 
 
