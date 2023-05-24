@@ -69,7 +69,6 @@ namespace Audio.Utility
                 _logger.Here().Information($"VgSteam path is '{cliPath}'");
                 _logger.Here().Information($"Trying to convert {sourceFileName} to {targetFileName}");
 
-
                 var arguments = $"-o \"{targetFileName}\" \"{sourceFileName}\"";
                 _logger.Here().Information($"{cliPath} {arguments}");
 
@@ -79,7 +78,7 @@ namespace Audio.Utility
                 pProcess.StartInfo.UseShellExecute = false;
                 pProcess.StartInfo.RedirectStandardOutput = true;
                 pProcess.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                pProcess.StartInfo.CreateNoWindow = true;
+                pProcess.StartInfo.CreateNoWindow = false;
                 pProcess.Start();
                 var output = pProcess.StandardOutput.ReadToEnd();
                 _logger.Here().Information(output);
@@ -89,7 +88,7 @@ namespace Audio.Utility
                 var doesFileExist = File.Exists(outputSoundFilePath);
                 _logger.Here().Information($"File readback result for converted file {outputSoundFilePath} is : {doesFileExist}");
                 if (doesFileExist == false)
-                    return Result<string>.FromError("VgSteam", "Failed to convert file");
+                    return Result<string>.FromError("VgSteam", $"Failed to convert file - File {outputSoundFilePath} no found on disk");
                 return Result<string>.FromOk(outputSoundFilePath);
             }
             catch (Exception e)
@@ -103,7 +102,7 @@ namespace Audio.Utility
         {
             try
             {
-                DirectoryHelper.EnsureCreated(filePath);
+                DirectoryHelper.EnsureFileFolderCreated(filePath);
                 File.WriteAllBytes(filePath, bytes);
                 _logger.Here().Information("All bytes written to file");
                 return Result<bool>.FromOk(true);

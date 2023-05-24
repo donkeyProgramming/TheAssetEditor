@@ -68,7 +68,7 @@ namespace Audio.Utility
 
         static void GenerateRow(AkDecisionTree.Node currentNode, int currentArgrument, int numArguments, Stack<string> pushList, List<string> outputList, IAudioRepository audioRepository)
         {
-            var currentNodeContent = audioRepository.GetNameFromHash(currentNode.Content.Key);
+            var currentNodeContent = audioRepository.GetNameFromHash(currentNode.Key);
             pushList.Push(currentNodeContent);
 
             bool isDone = numArguments == currentArgrument + 1;
@@ -115,7 +115,7 @@ namespace Audio.Utility
         }
         static void GenerateCustomRow(AkDecisionTree.Node cNode, int pId, int depth, List<string> gkeys, List<string> outputList, IAudioRepository audioRepository)
         {
-            var currentNodeContent = audioRepository.GetNameFromHash(cNode.Content.Key);
+            var currentNodeContent = audioRepository.GetNameFromHash(cNode.Key);
             if (currentNodeContent == "0")
             {
                 currentNodeContent = "Any";
@@ -125,13 +125,13 @@ namespace Audio.Utility
             if (cNode.IsAudioNode())
             {
                 audioNodeName = $"{audioRepository.GetNameFromHash(cNode.AudioNodeId)}({cNode.AudioNodeId})";
-                keyName = $"{currentNodeContent}({cNode.Content.Key})";
+                keyName = $"{currentNodeContent}({cNode.Key})";
             }
             else
             {
-                keyName = $"{gkeys[depth]} == {currentNodeContent}({cNode.Content.Key})";
+                keyName = $"{gkeys[depth]} == {currentNodeContent}({cNode.Key})";
             }
-            outputList.Add($"{keyName}|{cNode.Content.uWeight}|{cNode.Content.uProbability}|{cNode.IsAudioNode()}|{audioNodeName}|{pId}");
+            outputList.Add($"{keyName}|{cNode.uWeight}|{cNode.uProbability}|{cNode.IsAudioNode()}|{audioNodeName}|{pId}");
             var cId = outputList.Count - 1;
             foreach (var child in cNode.Children)
                 GenerateCustomRow(child, cId, depth+1, gkeys, outputList, audioRepository);

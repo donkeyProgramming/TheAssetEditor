@@ -44,7 +44,7 @@ namespace AudioResearch
         {
             if (Environment.GetEnvironmentVariable("KlissanEnv") != null)
             {
-                TestDialogEventSerialization();
+                //TestDialogEventSerialization();
                 return;
             }
 
@@ -54,7 +54,7 @@ namespace AudioResearch
 
             // OvnTest.Compile();
             //GeneratOvnProject();
-            TestDialogEventSerialization();
+           // TestDialogEventSerialization();
             // LogicalChainingTest();
 
             var currentProjectName = $"Data\\OvnExample\\ProjectSimple.json";
@@ -293,6 +293,12 @@ namespace AudioResearch
             var audioRepo = application.GetService<IAudioRepository>();
             //new EventBusBuilder().DoWork(audioRepo);
             //new AudioBusTreeBuilder().DoWork(audioRepo);
+
+
+            //var myDialog = audioRepo.GetHircObject(674874555).First() as CAkDialogueEvent_v136;
+            //var worker = new DecisionPathHelper();
+            //var lines = worker.CreateLines(myDialog, audioRepo);
+
 
             var x = audioRepo.HircObjects.SelectMany(x => x.Value).Where(x=>x.Type == HircType.State).ToList();
 
@@ -560,7 +566,7 @@ namespace AudioResearch
 
 
 
-       /* static void TestDialogEventSerialization()
+      /* static void TestDialogEventSerialization()
         {
             using var application = new SimpleApplication();
 
@@ -581,7 +587,6 @@ namespace AudioResearch
 
             var dialogEvents = audioRepo.GetAllOfType<CAkDialogueEvent_v136>();
 
-            dialogEvents.ForEach(e => e.AkDecisionTree.VerifyState());
 
             var modes = dialogEvents.GroupBy(e => e.uMode);
             Console.WriteLine($"Modes:");
@@ -865,29 +870,7 @@ namespace AudioResearch
                 Debug.Assert(before == after);
             });
             return;
-            foreach (var dialogEvent in dialogEvents)
-            {
-                // dialogEvent.AkDecisionTree.VerifyState();
-                // var bytes = dialogEvent.GetAsByteArray();
-                // var chuck = new Filetypes.ByteParsing.ByteChunk(bytes);
-                // var reParsedObject = new CAkDialogueEvent_v136();
-                // reParsedObject.Parse(chuck);
-                // reParsedObject.AkDecisionTree.VerifyState();
-                // Debug.Assert(dialogEvent.AkDecisionTree.Flatten());
-
-                deTypes.Add(dialogEvent.Type);
-
-
-                // dialogEvent.AkDecisionTree.BfsTreeTraversal(CheckWeightAndProb);
-                dialogEvent.AkDecisionTree.BfsTreeTraversal(node =>
-                {
-                    if (node.AudioNodeId == 0 && node.Children.Count == 0)
-                    {
-                        Console.WriteLine($"Weird Node ({audioRepo.GetNameFromHash(node.Content.Key)}): {audioRepo.GetNameFromHash(dialogEvent.Id)}({dialogEvent.Id}) | nodeCount: {dialogEvent.AkDecisionTree.NodeCount()}");
-                    }
-                });
-                // Console.WriteLine($"Main.Success: {audioRepo.GetNameFromHash(dialogEvent.Id)}({dialogEvent.Id})");
-            }
+          
 
         }*/
     }

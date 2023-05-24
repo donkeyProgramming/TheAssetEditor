@@ -23,49 +23,25 @@ namespace Audio.AudioEditor
             _hircProcessChildMap.Add(HircType.Dialogue_Event, ProcessDialogEvent);
             _hircProcessChildMap.Add(HircType.Music_Track, ProcessMusicTrack);
             _hircProcessChildMap.Add(HircType.Music_Segment, ProcessMusicSegment);
-            //_hircProcessChildMap.Add(HircType.Music_Switch, ProcessDialogEvent);
-            //_hircProcessChildMap.Add(HircType.Music_Random_Sequence, ProcessDialogEvent);
+            _hircProcessChildMap.Add(HircType.Music_Switch, ProcessMusicSwitch);
+            _hircProcessChildMap.Add(HircType.Music_Random_Sequence, ProcessRandMusicContainer);
         }
 
         private void ProcessDialogEvent(HircItem item, HircTreeItem parent)
         {
             var hirc = GetAsType<CAkDialogueEvent_v136>(item);
-            var dialogEventNode = new HircTreeItem() { DisplayName = $"Dialog_Event {_repository.GetNameFromHash(item.Id)}", Item = item };
+
+            DecisionPathHelper helper = new DecisionPathHelper(_repository);
+            var paths = helper.GetDecisionPaths(hirc);
+
+            var dialogEventNode = new HircTreeItem() { DisplayName = $"Dialog_Event {_repository.GetNameFromHash(item.Id)} - [{paths.Header.GetAsString()}]", Item = item };
             parent.Children.Add(dialogEventNode);
 
-            ProcessNode(hirc.AkDecisionTree.Root, dialogEventNode, item, 0);
-        }
-
-        void ProcessNode(AkDecisionTree.Node node, HircTreeItem parent, HircItem owner, uint depdth)
-        {
-            if (node.IsAudioNode())
+            foreach(var path in paths.Paths) 
             {
-                if (node.Content.Key != 0)
-                {
-                    var dialogEventNode = new HircTreeItem() { DisplayName = $"{_repository.GetNameFromHash(node.Content.Key)}", Item = owner };
-                    parent.Children.Add(dialogEventNode);
-                    ProcessNext(node.AudioNodeId, dialogEventNode);
-                }
-                else
-                {
-                    var dialogEventNode = new HircTreeItem() { DisplayName = $"Default", Item = owner };
-                    parent.Children.Add(dialogEventNode);
-                    ProcessNext(node.AudioNodeId, dialogEventNode);
-                }
-            }
-            else
-            {
-                var nextNode = parent;
-                depdth += 1;
-                if (depdth > 2) // For some reason we can always skip the first 2 nodes
-                {
-                    var dialogEventNode = new HircTreeItem() { DisplayName = $"{_repository.GetNameFromHash(node.Content.Key)}", Item = owner };
-                    parent.Children.Add(dialogEventNode);
-                    nextNode = dialogEventNode;
-                }
-
-                foreach (var child in node.Children)
-                    ProcessNode(child, nextNode, owner, depdth);
+                var pathNode = new HircTreeItem() { DisplayName = path.GetAsString(), Item = hirc, IsExpanded = false };
+                dialogEventNode.Children.Add(pathNode);
+                ProcessNext(path.ChildNodeId, pathNode);
             }
         }
 
@@ -90,7 +66,6 @@ namespace Audio.AudioEditor
             if (actionHirc.GetActionType() == ActionType.SetState)
             {
                 var stateGroupId = actionHirc.AkSetStateParams.ulStateGroupID;
-
                 var musicSwitches = _repository.HircObjects
                    .SelectMany(x => x.Value)
                    .Where(X => X.Type == HircType.Music_Switch)
@@ -103,6 +78,19 @@ namespace Audio.AudioEditor
                     var allArgs = musicSwitch.ArgumentList.Arguments.Select(x => x.ulGroupId).ToList();
                     if (allArgs.Contains(stateGroupId))
                         ProcessNext(musicSwitch.Id, actionTreeNode);
+                }
+
+                var normalSwitches = _repository.HircObjects
+                   .SelectMany(x => x.Value)
+                   .Where(X => X.Type == HircType.SwitchContainer)
+                   .DistinctBy(x => x.Id)
+                   .Cast<CAkSwitchCntr_v136>()
+                   .ToList();
+
+                foreach (var normalSwitch in normalSwitches)
+                {
+                    if (normalSwitch.ulGroupID == stateGroupId)
+                        ProcessNext(normalSwitch.Id, actionTreeNode);
                 }
             }
             else
@@ -183,6 +171,38 @@ namespace Audio.AudioEditor
 
             foreach (var childId in hirc.MusicNodeParams.Children.ChildIdList)
                 ProcessNext(childId, node);
+        }
+
+        private void ProcessMusicSwitch(HircItem item, HircTreeItem parent)
+        {
+            var hirc = GetAsType<CAkMusicSwitchCntr_v136>(item);
+
+            DecisionPathHelper helper = new DecisionPathHelper(_repository);
+            var paths = helper.GetDecisionPaths(hirc);
+
+            var dialogEventNode = new HircTreeItem() { DisplayName = $"Music Switch {_repository.GetNameFromHash(item.Id)} - [{paths.Header.GetAsString()}]", Item = item };
+            parent.Children.Add(dialogEventNode);
+
+            foreach (var path in paths.Paths)
+            {
+                var pathNode = new HircTreeItem() { DisplayName = path.GetAsString(), Item = hirc, IsExpanded = false };
+                dialogEventNode.Children.Add(pathNode);
+                ProcessNext(path.ChildNodeId, pathNode);
+            }
+        }
+
+
+        private void ProcessRandMusicContainer(HircItem item, HircTreeItem parent)
+        {
+            var hirc = GetAsType<CAkMusicRanSeqCntr_v136>(item);
+            var node = new HircTreeItem() { DisplayName = $"Music Rand Container", Item = item };
+            parent.Children.Add(node);
+
+            if (hirc.pPlayList.Any())
+            {
+                foreach (var playList in hirc.pPlayList.First().pPlayList)
+                    ProcessNext(playList.SegmentID, node);
+            }
         }
     }
 }
