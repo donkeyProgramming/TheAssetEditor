@@ -16,4 +16,11 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         [MetaDataTag(7, "blend_in_default, blend_out_default, blend_in_crossfade, blend_out_crossfade ,blend_in_time,blend_out_time")]
         public int BlendMethod { get; set; }
     }
+    
+    [MetaData("BLEND_OVERRIDE", 11)]
+    public class BlendOverride_v11 : BlendOverride_v10
+    {
+        [MetaDataTag(8)] // some kind of scaling?
+        public float UnknownFloat_v11 { get; set; }
+    }
 }

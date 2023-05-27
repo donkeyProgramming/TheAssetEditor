@@ -96,6 +96,8 @@ namespace CommonControls.FileTypes.MetaData
             _descriptionMap["WEAPON_HIP"] = "Weapon bone is spliced relative to hip between start and end times; set value to weapon bone index";
             _descriptionMap["DOCK_EQPT_LHAND"] = "missing";
             _descriptionMap["DOCK_EQPT_RHAND"] = "missing";
+            _descriptionMap["DOCK_EQPT_LHAND_2"] = "missing"; //TODO
+            _descriptionMap["DOCK_EQPT_RHAND_2"] = "missing"; //TODO
             _descriptionMap["DOCK_EQPT_LWAIST"] = "missing";
             _descriptionMap["DOCK_EQPT_RWAIST"] = "missing";
             _descriptionMap["DOCK_EQPT_BACK"] = "Weapon bone is spliced relative to spine2 between start and end times; set value to weapon bone index";

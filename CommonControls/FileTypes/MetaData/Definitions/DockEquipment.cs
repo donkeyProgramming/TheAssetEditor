@@ -4,6 +4,21 @@ using System.Text;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
+    public abstract class DockEquipmentOld : DecodedMetaEntryBaseOld
+    {
+        //TODO verify
+        [MetaDataTag(4, "(Might be not true for old  meta version) 0=\"Weapon Bone 1\" in .frg but \"be_prop_0\" in a typical VMD. 1=\"Weapon Bone 2\" in .frg but \"be_prop_1\" in VMD. etc.")]
+        public int PropBoneId { get; set; }
+
+        [MetaDataTag(5)]
+        public float BlendInTime { get; set; }
+
+        [MetaDataTag(6)]
+        public float BlendOutTime { get; set; }
+
+        public virtual string AnimationSlotName { get; } = "";
+        public virtual string[] SkeletonNameAlternatives { get; } = new string[] { "" };
+    }
 
     public abstract class DockEquipment : DecodedMetaEntryBase
     {
@@ -23,6 +38,13 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     /// <summary>
     /// Dock right hand
     /// </summary>
+    [MetaData("DOCK_EQPT_RHAND", 3)]
+    public class DockEquipmentRHand_v3 : DockEquipmentOld
+    {
+        public override string AnimationSlotName => "DOCK_EQUIPMENT_RIGHT_HAND";
+        public override string[] SkeletonNameAlternatives { get; } = new string[] { "hand_right" };
+    }
+    
     [MetaData("DOCK_EQPT_RHAND", 10)]
     public class DockEquipmentRHand_v10 : DockEquipment
     {
@@ -32,6 +54,14 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 
     [MetaData("DOCK_EQPT_RHAND", 11)]
     public class DockEquipmentRHand_v11 : DockEquipmentRHand_v10
+    {
+        [MetaDataTag(8)]
+        public float UnknownFloat { get; set; }
+    }
+    
+    // TODO: proper inheritance
+    [MetaData("DOCK_EQPT_RHAND_2", 11)]
+    public class DockEquipmentRHand2_v11 : DockEquipmentRHand_v10
     {
         [MetaDataTag(8)]
         public float UnknownFloat { get; set; }
@@ -81,6 +111,13 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     /// <summary>
     /// Dock left hand
     /// </summary>
+    [MetaData("DOCK_EQPT_LHAND", 3)]
+    public class DockEquipmentLHand_v3 : DockEquipmentOld
+    {
+        public override string AnimationSlotName => "DOCK_EQUIPMENT_LEFT_HAND";
+        public override string[] SkeletonNameAlternatives { get; } = new string[] { "hand_left" };
+    }
+    
     [MetaData("DOCK_EQPT_LHAND", 10)]
     public class DockEquipmentLHand_v10 : DockEquipment
     {
@@ -90,6 +127,14 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 
     [MetaData("DOCK_EQPT_LHAND", 11)]
     public class DockEquipmentLHand_v11 : DockEquipmentLHand_v10
+    {
+        [MetaDataTag(8)]
+        public float UnknownFloat { get; set; }
+    }    
+    
+    // TODO: proper inheritance
+    [MetaData("DOCK_EQPT_LHAND_2", 11)]
+    public class DockEquipmentLHand2_v11 : DockEquipmentLHand_v10
     {
         [MetaDataTag(8)]
         public float UnknownFloat { get; set; }
@@ -194,6 +239,12 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     /// <summary>
     /// Dock left waist
     /// </summary>
+    [MetaData("DOCK_EQPT_LWAIST", 3)]
+    public class DockEquipmentLWaist_v3 : DockEquipmentOld
+    {
+        public override string AnimationSlotName => "DOCK_EQUIPMENT_LEFT_WAIST";
+        public override string[] SkeletonNameAlternatives { get; } = new string[] { "root" };
+    }
     [MetaData("DOCK_EQPT_LWAIST", 10)]
     public class DockEquipmentLWaist_v10 : DockEquipment
     {
@@ -303,8 +354,25 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public float UnknownFloat4 { get; set; }
     }
 
+    [MetaData("WEAPON_HIP", 3)]
+    public class WeaponHip_v3 : DockEquipmentOld
+    {
+    }
+    
     [MetaData("WEAPON_HIP", 10)]
     public class WeaponHip_v10 : DockEquipment
+    {
+    }
+
+    [MetaData("WEAPON_HIP", 11)]
+    public class WeaponHip_v11 : WeaponHip_v10
+    {
+        [MetaDataTag(8)]
+        public float UnknownFloat { get; set; }
+    }
+
+    [MetaData("WEAPON_RHAND", 3)]
+    public class WeaponRHand_v3 : DockEquipmentOld
     {
     }
 
@@ -327,6 +395,10 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 
         [MetaDataTag(8)]
         public byte UnknownFloat { get; set; }
+    }
+    [MetaData("WEAPON_LHAND", 3)]
+    public class WeaponLHand_v3 : DockEquipmentOld
+    {
     }
 
     [MetaData("WEAPON_LHAND", 10)]

@@ -5,6 +5,31 @@ using System.Text;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
+    [MetaData("SPLASH_ATTACK", 3)]
+    public class SplashAttack_v3 : DecodedMetaEntryBaseOld
+    {
+        [MetaDataTag(4, "cone/circle (0), corridor (1)")]
+        public int AoeShape { get; set; }
+
+        [MetaDataTag(5)]
+        public Vector3 StartPosition { get; set; } = Vector3.Zero;
+        
+        [MetaDataTag(6)]
+        public Vector3 EndPosition { get; set; } = Vector3.Zero;
+
+        [MetaDataTag(7, "Min = 0, Max = 20")]
+        public float WidthForCorridor { get; set; }
+        
+        [MetaDataTag(8, "Min = 0, Max = 360")]
+        public float AngleForCone { get; set; }
+        
+        [MetaDataTag(9, "Min = 0, Max = 10000")]
+        public float ImpactMassInKg { get; set; }
+        
+        [MetaDataTag(10, "Min = 0, Max = 100")]
+        public float ImpactSpeed { get; set; }
+    }
+    
     [MetaData("SPLASH_ATTACK", 10)]
     public class SplashAttack_v10 : DecodedMetaEntryBase
     {

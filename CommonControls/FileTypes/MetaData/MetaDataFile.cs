@@ -40,6 +40,17 @@ namespace CommonControls.FileTypes.MetaData
     {
         
     }
+    public abstract class DecodedMetaEntryBaseOld : BaseMetaEntry
+    {
+        [MetaDataTag(1, "Time in second when the Tag takes effect")]
+        public float StartTime { get; set; }
+
+        [MetaDataTag(2, "Time in second when the Tag stops taking effect")]
+        public float EndTime { get; set; }
+
+        [MetaDataTag(3, "Filter to enable or disable, almost always empty")]
+        public string Filter { get; set; } = "";
+    }
 
     public abstract class DecodedMetaEntryBase : BaseMetaEntry
     {
