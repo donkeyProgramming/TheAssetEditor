@@ -148,6 +148,13 @@ namespace CommonControls.FileTypes.MetaData
             _descriptionMap["SOUND_BUILDING"] = "Time, event and position of sound to be triggered";
             _descriptionMap["SOUND_TRIGGER"] = "Time and type of sound to be triggered";
             _descriptionMap["SOUND_SPHERE"] = "Time and type of sound sphere to be triggered";
+            _descriptionMap["SOUND_SPHERE_LINK"] = "TODO";
+            _descriptionMap["POSITION"] = "TODO";
+            _descriptionMap["SOUND_POSITION"] = "TODO";
+            _descriptionMap["SYNC_MARKER"] = "TODO";
+            _descriptionMap["VOLUMETRIC_EFFECT"] = "TODO";
+            _descriptionMap["TURRET_ATTACHMENT"] = "TODO";
+            _descriptionMap["PARENT_CONSTRAINT"] = "TODO";
             _descriptionMap["CANNOT_DISMEMBER"] = "mark an attack as not causing dismemberment";
             _descriptionMap["USE_BASE_METADATA"] = "Force the use of metadata in the base anim slot during a hardcoded splice. All metadata in the hardcoded splice slot is ignored.";
             _descriptionMap["RIDER_ANIMATION_REQUIRED"] = "Mark the mount animation as needing a synced rider animation is corresponding rider slot.";

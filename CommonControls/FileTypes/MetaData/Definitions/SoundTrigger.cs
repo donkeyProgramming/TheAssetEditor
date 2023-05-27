@@ -61,4 +61,160 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         [MetaDataTag(6)]
         public int UnknownInt2 { get; set; }
     }
+    
+       
+    [MetaData("SOUND_SPHERE", 10)]
+    public class SoundSphere_v10 : DecodedMetaEntryBase
+    {
+        [MetaDataTag(5)] 
+        public string UnknownString { get; set; } = "";
+        
+        [MetaDataTag(6)]
+        public float UnknownFloat0_v10 { get; set; }
+
+        [MetaDataTag(7)]
+        public float UnknownFloat1_v10 { get; set; }
+    }
+    
+           
+    [MetaData("POSITION", 10)]
+    public class Position_v10 : DecodedMetaEntryBase
+    {
+        //making up value types just to be able to parse it
+        //the short one might str length
+        
+        [MetaDataTag(5)]
+        public Vector3 Position { get; set; }
+    }
+    
+              
+    [MetaData("SOUND_POSITION", 10)]
+    public class SoundPosition_v10 : DecodedMetaEntryBase
+    {
+        [MetaDataTag(5)] 
+        public string UnknownString_v10 { get; set; } = "";
+
+        [MetaDataTag(6)]
+        public Vector3 ProbablyPosition { get; set; }
+        
+        [MetaDataTag(7)]
+        public Vector4 ProbablyOrientation { get; set; }
+        
+        [MetaDataTag(8)]
+        public int UnknownInt_v10 { get; set; }
+    }
+    
+                  
+    [MetaData("WOUNDED_POSE", 10)]
+    public class WoundedPose_v10 : DecodedMetaEntryBase
+    {
+        [MetaDataTag(5)] 
+        public string UnknownString { get; set; } = "";
+    }
+                  
+    [MetaData("SOUND_SPHERE_LINK", 10)]
+    public class SoundSphereLink_v10 : DecodedMetaEntryBase
+    {
+    }         
+    
+    [MetaData("SYNC_MARKER", 10)]
+    public class SyncMarker_v10 : DecodedMetaEntryBase
+    {
+    }
+    
+    [MetaData("VOLUMETRIC_EFFECT", 10)]
+    public class VolumetricEffect_v10 : DecodedMetaEntryBase
+    {
+        [MetaDataTag(5)] 
+        public string UnknownString { get; set; } = "";
+        
+        [MetaDataTag(6)]
+        public Vector3 Unknown0_v10 { get; set; }
+        
+        [MetaDataTag(7)]
+        public Vector4 Unknown1_v10 { get; set; }
+        
+        [MetaDataTag(8)]
+        public Vector3 Unknown2_v10 { get; set; }
+        
+        [MetaDataTag(9)]
+        public Vector3 Unknown3_v10 { get; set; }
+        
+        [MetaDataTag(10)]
+        public Vector4 Unknown4_v10 { get; set; }
+        
+        [MetaDataTag(11)]
+        public Vector3 Unknown5_v11 { get; set; }
+    }
+    
+    [MetaData("TURRET_ATTACHMENT", 14)]
+    public class TurretAttachment_v14 : DecodedMetaEntryBase
+    {
+        [MetaDataTag(5)]
+        public int UnknownInt0 { get; set; }
+        [MetaDataTag(6)]
+        public int UnknownInt1 { get; set; }
+        [MetaDataTag(7)]
+        public int UnknownInt2 { get; set; }
+        [MetaDataTag(8)]
+        public int UnknownInt3 { get; set; }
+        [MetaDataTag(9)]
+        public int UnknownInt4 { get; set; }
+        [MetaDataTag(10)]
+        public int UnknownInt5 { get; set; }
+        [MetaDataTag(11)]
+        public int UnknownInt6 { get; set; }
+        [MetaDataTag(12)]
+        public int UnknownInt7 { get; set; }
+        
+        [MetaDataTag(13)]
+        public float UnknownFloat0 { get; set; }
+        [MetaDataTag(14)]
+        public float UnknownFloat1 { get; set; }
+        
+        [MetaDataTag(15)]
+        public int UnknownInt8 { get; set; }
+        [MetaDataTag(16)]
+        public int UnknownInt9 { get; set; }
+        [MetaDataTag(17)]
+        public int UnknownInt10 { get; set; }
+        [MetaDataTag(18)]
+        public int UnknownInt11 { get; set; }
+        [MetaDataTag(19)]
+        public int UnknownInt12 { get; set; }
+    }
+    
+        
+    [MetaData("PARENT_CONSTRAINT", 10)]
+    public class ParentConstraint_v10 : DecodedMetaEntryBase
+    {
+        [MetaDataTag(5)]
+        public int UnknownInt0 { get; set; }
+        [MetaDataTag(6)]
+        public int UnknownInt1 { get; set; }
+        
+        [MetaDataTag(7)]
+        public float UnknownFloat0 { get; set; }
+        
+        //or floats
+        [MetaDataTag(8)]
+        public int UnknownInt2 { get; set; }
+        [MetaDataTag(9)]
+        public int UnknownInt3 { get; set; }
+        [MetaDataTag(10)]
+        public int UnknownInt4 { get; set; }
+        [MetaDataTag(11)]
+        public int UnknownInt5 { get; set; }
+        [MetaDataTag(12)]
+        public int UnknownInt6 { get; set; }
+        
+        [MetaDataTag(13)]
+        public float UnknownFloat1 { get; set; }
+        
+        // or floats
+        [MetaDataTag(14)]
+        public int UnknownInt7 { get; set; }
+        [MetaDataTag(15)]
+        public int UnknownInt8 { get; set; }
+    }
 }
