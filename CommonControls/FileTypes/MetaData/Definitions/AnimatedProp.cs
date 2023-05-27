@@ -18,19 +18,28 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public float Scale{ get; }
     }
 
-    [MetaData("ANIMATED_PROP", 3)]
-    public class AnimatedProp_v3 : BaseMetaEntry
+    [MetaData("ANIMATED_PROP", 0)]
+    public class AnimatedProp_v0 : DecodedMetaEntryBase_v0
     {
-        [MetaDataTag(1, "Time in second when the Tag takes effect")]
-        public float StartTime { get; set; }
-
-        [MetaDataTag(2, "Time in second when the Tag stops taking effect")]
-        public float EndTime { get; set; }
+        [MetaDataTag(2)]
+        public string ModelName { get; set; } = "";
 
         [MetaDataTag(3)]
-        public ushort Filter { get; set; }
+        public string AnimationName { get; set; } = "";
 
+        [MetaDataTag(4)]
+        public Vector3 Position { get; set; } = Vector3.Zero;
 
+        [MetaDataTag(5, "", MetaDataTagAttribute.DisplayType.EulerVector)]
+        public Vector4 Orientation { get; set; } = new Vector4(0, 0, 0, 1);
+
+        [MetaDataTag(6)]
+        public int UnknownInt_v0 { get; set; }
+    }    
+
+    [MetaData("ANIMATED_PROP", 2)]
+    public class AnimatedProp_v2 : DecodedMetaEntryBase_v2
+    {
         [MetaDataTag(4)]
         public string ModelName { get; set; } = "";
 
@@ -44,10 +53,21 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public Vector4 Orientation { get; set; } = new Vector4(0, 0, 0, 1);
 
         [MetaDataTag(8)]
-        public int Unkown1 { get; set; }
+        public int UnknownInt_v0 { get; set; }
+    }    
 
+    [MetaData("ANIMATED_PROP", 3)]
+    public class AnimatedProp_v3 : AnimatedProp_v2
+    {
         [MetaDataTag(9)]
-        public int Unkown0 { get; set; }
+        public int UnknownInt0_v3 { get; set; }
+    }    
+    
+    [MetaData("ANIMATED_PROP", 4)]
+    public class AnimatedProp_v4 : AnimatedProp_v3
+    {
+        [MetaDataTag(10)]
+        public int UnkownInt0_v4 { get; set; }
     }
 
 

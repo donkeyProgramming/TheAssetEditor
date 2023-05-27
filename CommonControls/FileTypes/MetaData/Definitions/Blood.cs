@@ -5,6 +5,29 @@ using System.Text;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
+    [MetaData("BLOOD", 5)]
+    public class Blood_v5 : DecodedMetaEntryBase_v2
+    {
+        [MetaDataTag(4, "Name of the VFX's .xml file in the vfx folder. Leave off the file extension. Note that for this you don't need to add custom vfx to the particles db table and they still require a \"movie\"-type .pack for them to be loaded.")]
+        public string VfxName { get; set; } = "";
+
+        [MetaDataTag(5)] 
+        public string UnknownBoolAsStr { get; set; } = "";
+
+        [MetaDataTag(6)]
+        public Vector3 Position { get; set; }
+
+        [MetaDataTag(7, "", MetaDataTagAttribute.DisplayType.EulerVector)]
+        public Vector4 Orientation { get; set; }
+        
+        [MetaDataTag(8, "Bone the effect is attached to")]
+        public int NodeIndex { get; set; }
+
+        [MetaDataTag(9, "Scale of the effect")]
+        public float Scale { get; set; }
+    }
+    
+    
     [MetaData("BLOOD", 11)]
     public class Blood_v11 : DecodedMetaEntryBase
     {

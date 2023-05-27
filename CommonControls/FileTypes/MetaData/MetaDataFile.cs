@@ -40,7 +40,19 @@ namespace CommonControls.FileTypes.MetaData
     {
         
     }
-    public abstract class DecodedMetaEntryBaseOld : BaseMetaEntry
+    public abstract class DecodedMetaEntryBase_v0 : BaseMetaEntry
+    {
+        [MetaDataTag(1)]
+        public int UnknownIntBase_v0 { get; set; }
+    }
+    
+    public abstract class DecodedMetaEntryBase_v1 : DecodedMetaEntryBase_v0
+    {
+        [MetaDataTag(2)]
+        public int UnknownIntBase_v1 { get; set; }
+    }
+    
+    public abstract class DecodedMetaEntryBase_v2 : BaseMetaEntry
     {
         [MetaDataTag(1, "Time in second when the Tag takes effect")]
         public float StartTime { get; set; }

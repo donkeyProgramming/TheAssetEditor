@@ -6,7 +6,7 @@ using System.Text;
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
     [MetaData("SPLASH_ATTACK", 3)]
-    public class SplashAttack_v3 : DecodedMetaEntryBaseOld
+    public class SplashAttack_v3 : DecodedMetaEntryBase_v2
     {
         [MetaDataTag(4, "cone/circle (0), corridor (1)")]
         public int AoeShape { get; set; }

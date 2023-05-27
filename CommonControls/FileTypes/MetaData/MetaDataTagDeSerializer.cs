@@ -150,6 +150,7 @@ namespace CommonControls.FileTypes.MetaData
             _descriptionMap["SOUND_TRIGGER"] = "Time and type of sound to be triggered";
             _descriptionMap["SOUND_SPHERE"] = "Time and type of sound sphere to be triggered";
             _descriptionMap["SOUND_SPHERE_LINK"] = "TODO";
+            _descriptionMap["SOUND_IMPACT"] = "TODO";
             _descriptionMap["POSITION"] = "TODO";
             _descriptionMap["SOUND_POSITION"] = "TODO";
             _descriptionMap["SYNC_MARKER"] = "TODO";
@@ -159,6 +160,9 @@ namespace CommonControls.FileTypes.MetaData
             _descriptionMap["CANNOT_DISMEMBER"] = "mark an attack as not causing dismemberment";
             _descriptionMap["ALLOW_LEG_DISMEMBER"] = "TODO";
             _descriptionMap["ALLOW_FRONT_LEG_DISMEMBER"] = "TODO";
+            _descriptionMap["CAMPAIGN_DISMEMBER"] = "TODO";
+            _descriptionMap["FACEFX"] = "TODO";
+            _descriptionMap["PULL_ROPE"] = "TODO";
             _descriptionMap["CROP_MARKER"] = "TODO";
             _descriptionMap["NOT_HERO_TARGET"] = "TODO";
             _descriptionMap["DIE_PERMANENTLY"] = "TODO";

@@ -5,8 +5,18 @@ using System.Text;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
+    [MetaData("SOUND_IMPACT", 2)]
+    public class SoundImpact_v2 : DecodedMetaEntryBase_v2
+    {
+        [MetaDataTag(4)]
+        public int UnknownInt1 { get; set; }
+
+        [MetaDataTag(5)]
+        public int UnknownInt2 { get; set; }
+    }
+    
     [MetaData("SOUND_TRIGGER", 2)]
-    public class SoundTrigger_v2 : DecodedMetaEntryBaseOld
+    public class SoundTrigger_v2 : DecodedMetaEntryBase_v2
     {
         [MetaDataTag(4)]
         public int UnknownInt1 { get; set; }
@@ -16,7 +26,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     }
     
     [MetaData("SOUND_TRIGGER", 4)]
-    public class SoundTrigger_v4 : DecodedMetaEntryBaseOld
+    public class SoundTrigger_v4 : DecodedMetaEntryBase_v2
     {
         [MetaDataTag(4)]
         public string SoundEvent { get; set; } = "";
@@ -50,7 +60,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     
     
     [MetaData("SOUND_BUILDING", 2)]
-    public class SoundBuilding_v2 : DecodedMetaEntryBaseOld
+    public class SoundBuilding_v2 : DecodedMetaEntryBase_v2
     {
         [MetaDataTag(4)]
         public int UnknownInt1 { get; set; }
@@ -105,6 +115,20 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     }
     
                   
+    [MetaData("WOUNDED_POSE", 0)]
+    public class WoundedPose_v0 : DecodedMetaEntryBase_v0
+    {
+        [MetaDataTag(2)] 
+        public string UnknownString { get; set; } = "";
+    }
+                  
+    [MetaData("WOUNDED_POSE", 2)]
+    public class WoundedPose_v2 : DecodedMetaEntryBase_v2
+    {
+        [MetaDataTag(4)] 
+        public string UnknownString { get; set; } = "";
+    }
+                  
     [MetaData("WOUNDED_POSE", 10)]
     public class WoundedPose_v10 : DecodedMetaEntryBase
     {
@@ -121,32 +145,11 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     public class SyncMarker_v10 : DecodedMetaEntryBase
     {
     }
-    
-    [MetaData("VOLUMETRIC_EFFECT", 10)]
-    public class VolumetricEffect_v10 : DecodedMetaEntryBase
+    [MetaData("PULL_ROPE", 2)]
+    public class PullRope_v2 : DecodedMetaEntryBase_v2
     {
-        [MetaDataTag(5)] 
-        public string UnknownString { get; set; } = "";
-        
-        [MetaDataTag(6)]
-        public Vector3 Unknown0_v10 { get; set; }
-        
-        [MetaDataTag(7)]
-        public Vector4 Unknown1_v10 { get; set; }
-        
-        [MetaDataTag(8)]
-        public Vector3 Unknown2_v10 { get; set; }
-        
-        [MetaDataTag(9)]
-        public Vector3 Unknown3_v10 { get; set; }
-        
-        [MetaDataTag(10)]
-        public Vector4 Unknown4_v10 { get; set; }
-        
-        [MetaDataTag(11)]
-        public Vector3 Unknown5_v11 { get; set; }
     }
-    
+
     [MetaData("TURRET_ATTACHMENT", 14)]
     public class TurretAttachment_v14 : DecodedMetaEntryBase
     {

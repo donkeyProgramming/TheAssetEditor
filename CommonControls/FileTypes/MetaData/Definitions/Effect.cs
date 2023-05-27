@@ -9,19 +9,29 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     { 
         public string VfxName { get; set; }
     }
-
-    [MetaData("EFFECT", 5)]
-    public class Effect_v5 : BaseMetaEntry, IEffectMeta
+    
+    [MetaData("EFFECT", 1)]
+    public class Effect_v1: DecodedMetaEntryBase_v1, IEffectMeta
     {
-        [MetaDataTag(1, "Time in second when the Tag takes effect")]
-        public float StartTime { get; set; }
+        [MetaDataTag(3, "Name of the VFX's .xml file in the vfx folder. Leave off the file extension. Note that for this you don't need to add custom vfx to the particles db table and they still require a \"movie\"-type .pack for them to be loaded.")]
+        public string VfxName { get; set; } = "";
 
-        [MetaDataTag(2, "Time in second when the Tag stops taking effect")]
-        public float EndTime { get; set; }
+        [MetaDataTag(4, "True, false or empty.")]
+        public string BoolUnkown { get; set; } = "";
 
-        [MetaDataTag(3)]
-        public ushort Filter { get; set; }
+        [MetaDataTag(5)]
+        public Vector3 Position { get; set; } = Vector3.Zero;
 
+        [MetaDataTag(6, "", MetaDataTagAttribute.DisplayType.EulerVector)]
+        public Vector4 Orientation { get; set; } = new Vector4(0, 0, 0, 1);
+
+        [MetaDataTag(7, "Bone the effect is attached to, use -1 for it to just spawn and not follow animations")]
+        public int NodeIndex { get; set; }
+    }
+    
+    [MetaData("EFFECT", 2)]
+    public class Effect_v2:  DecodedMetaEntryBase_v2, IEffectMeta
+    {
         [MetaDataTag(4, "Name of the VFX's .xml file in the vfx folder. Leave off the file extension. Note that for this you don't need to add custom vfx to the particles db table and they still require a \"movie\"-type .pack for them to be loaded.")]
         public string VfxName { get; set; } = "";
 
@@ -36,9 +46,25 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 
         [MetaDataTag(8, "Bone the effect is attached to, use -1 for it to just spawn and not follow animations")]
         public int NodeIndex { get; set; }
+    }
 
+    [MetaData("EFFECT", 3)]
+    public class Effect_v3 : Effect_v2
+    {
         [MetaDataTag(9, "Scale of the effect")]
         public float Scale { get; set; } = 1;
+    }
+    
+    [MetaData("EFFECT", 4)]
+    public class Effect_v4: Effect_v2
+    {
+        //TODO: exactly same ???
+    }
+
+    [MetaData("EFFECT", 5)]
+    public class Effect_v5 : Effect_v3
+    {
+        //TODO: exactly same ???
     }
 
     [MetaData("EFFECT", 11)]

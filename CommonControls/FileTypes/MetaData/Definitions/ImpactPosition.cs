@@ -6,7 +6,7 @@ using System.Text;
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
     [MetaData("IMPACT_POS", 2)]
-    public class ImpactPosition_v2 : DecodedMetaEntryBaseOld
+    public class ImpactPosition_v2 : DecodedMetaEntryBase_v2
     {
         [MetaDataTag(4)]
         public Vector3 Position { get; set; }

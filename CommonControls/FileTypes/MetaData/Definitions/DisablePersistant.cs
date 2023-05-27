@@ -5,7 +5,7 @@ using System.Text;
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
     [MetaData("DISABLE_PERSISTENT", 2)]
-    public class DisablePersistant_v2 : DecodedMetaEntryBaseOld
+    public class DisablePersistant_v2 : DecodedMetaEntryBase_v2
     {
     }
     

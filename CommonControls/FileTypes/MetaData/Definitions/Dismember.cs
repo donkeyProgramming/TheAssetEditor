@@ -5,6 +5,22 @@ using System.Text;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
+    
+    [MetaData("DISMEMBER", 2)]
+    public class Dismember_v2 : DecodedMetaEntryBase_v2
+    {
+        [MetaDataTag(4)]
+        public int BoneIndex { get; set; }
+
+        [MetaDataTag(5)]
+        public float BonePosition { get; set; }
+
+        [MetaDataTag(6)]
+        public Vector3 Direction { get; set; }
+
+        [MetaDataTag(7)]
+        public Vector3 Rotation { get; set; }
+    }
 
     [MetaData("DISMEMBER", 10)]
     public class Dismember_v10 : DecodedMetaEntryBase
@@ -31,4 +47,16 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     public class AllowFrontLegDismember_v10 : DecodedMetaEntryBase
     {
     }
+    
+    
+    [MetaData("CAMPAIGN_DISMEMBER", 2)]
+    public class CampaignDismember_v2 : DecodedMetaEntryBase_v2
+    {
+        [MetaDataTag(4)]
+        public int UnknownInt0_v2 { get; set; }
+        
+        [MetaDataTag(5)] 
+        public string AnimationString { get; set; } = "";
+    }
+    
 }

@@ -5,8 +5,9 @@ using System.Text;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
-    [MetaData("PROP", 4)]
-    public class Prop_v4 : DecodedMetaEntryBaseOld
+    
+    [MetaData("PROP", 2)]
+    public class Prop_v2 : DecodedMetaEntryBase_v2
     {
         [MetaDataTag(4)]
         public string ModelName { get; set; } = "";
@@ -22,10 +23,18 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 
         [MetaDataTag(8)]
         public int BoneId { get; set; }
-
+    }
+    
+    [MetaData("PROP", 3)]
+    public class Prop_v3 : Prop_v2
+    {
         [MetaDataTag(9, "bind_pose (1), animation (2), zeroed (3), skinned (4)")]
         public int AttachMethod { get; set; }
-
+    }
+    
+    [MetaData("PROP", 4)]
+    public class Prop_v4 : Prop_v3
+    {
         [MetaDataTag(10, "projectile (1) ,weapon_1 (2) ,weapon_2 (3) ,weapon_3 (4) ,weapon_4 (5) ,weapon_5 (6),weapon_6 (7)")]
         public int OverrideProp { get; set; }
     }
