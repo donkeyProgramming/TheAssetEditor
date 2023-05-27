@@ -122,6 +122,7 @@ namespace CommonControls.FileTypes.MetaData
             _descriptionMap["POSITION"] = "Generic position";
             _descriptionMap["FIRE_POS"] = "Position where projectile is created; start time is the time of projectile spawn";
             _descriptionMap["IMPACT_POS"] = "Position where impact originates; start time is the time of impact";
+            _descriptionMap["IMPACT_DIRECTION_POS"] = "TODO";
             _descriptionMap["TARGET_POS"] = "Indicates position of target";
             _descriptionMap["CAMERA_SHAKE_POS"] = "Start a camera shake at position";
             _descriptionMap["WOUNDED_POSE"] = "Specify the wounded pose in the last frame";
@@ -156,6 +157,18 @@ namespace CommonControls.FileTypes.MetaData
             _descriptionMap["TURRET_ATTACHMENT"] = "TODO";
             _descriptionMap["PARENT_CONSTRAINT"] = "TODO";
             _descriptionMap["CANNOT_DISMEMBER"] = "mark an attack as not causing dismemberment";
+            _descriptionMap["ALLOW_LEG_DISMEMBER"] = "TODO";
+            _descriptionMap["ALLOW_FRONT_LEG_DISMEMBER"] = "TODO";
+            _descriptionMap["CROP_MARKER"] = "TODO";
+            _descriptionMap["NOT_HERO_TARGET"] = "TODO";
+            _descriptionMap["DIE_PERMANENTLY"] = "TODO";
+            _descriptionMap["DISABLE_ENEMY_COLLISION"] = "TODO";
+            _descriptionMap["MARK_RIGHT_FOOT_FRONT"] = "TODO";
+            _descriptionMap["NO CHAINING"] = "TODO";
+            _descriptionMap["NOT_REGULAR_TARGET"] = "TODO";
+            _descriptionMap["START_CLIMB"] = "TODO";
+            _descriptionMap["MATERIAL_FLAG"] = "TODO";
+            _descriptionMap["FREEZE_WEAPON"] = "TODO";
             _descriptionMap["USE_BASE_METADATA"] = "Force the use of metadata in the base anim slot during a hardcoded splice. All metadata in the hardcoded splice slot is ignored.";
             _descriptionMap["RIDER_ANIMATION_REQUIRED"] = "Mark the mount animation as needing a synced rider animation is corresponding rider slot.";
             _descriptionMap["SHADER_PARAMETER"] = "Modify specified shader parameter. Blends between two closest values.";

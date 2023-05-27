@@ -217,4 +217,71 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         [MetaDataTag(15)]
         public int UnknownInt8 { get; set; }
     }
+    
+            
+    [MetaData("CROP_MARKER", 10)]
+    public class CropMarker_v10 : DecodedMetaEntryBase
+    {
+    }
+            
+    [MetaData("NOT_HERO_TARGET", 10)]
+    public class NotHeroTarget_v10 : DecodedMetaEntryBase
+    {
+    }
+            
+    [MetaData("DIE_PERMANENTLY", 10)]
+    public class DiePermamently_v10 : DecodedMetaEntryBase
+    {
+    }
+            
+    [MetaData("DISABLE_ENEMY_COLLISION", 10)]
+    public class DisableEnemyCollision_v10 : DecodedMetaEntryBase
+    {
+    }
+            
+    [MetaData("MARK_RIGHT_FOOT_FRONT", 10)]
+    public class MarkRightFootFront_v10 : DecodedMetaEntryBase
+    {
+    }
+            
+    [MetaData("NO CHAINING", 10)]
+    public class NoChaining_v10 : DecodedMetaEntryBase
+    {
+    }
+            
+    [MetaData("NOT_REGULAR_TARGET", 10)]
+    public class NotRegularTarget_v10 : DecodedMetaEntryBase
+    {
+    }
+            
+    [MetaData("START_CLIMB", 10)]
+    public class StartClimb_v10 : DecodedMetaEntryBase
+    {
+    }
+            
+    [MetaData("MATERIAL_FLAG", 10)]
+    public class MaterialFlag_v10 : DecodedMetaEntryBase
+    {
+        [MetaDataTag(5)]
+        public int UnknownInt0_v10 { get; set; }
+        
+        [MetaDataTag(6)]
+        public float UnknownFloat0_v10 { get; set; }
+        
+        [MetaDataTag(7)]
+        public int UnknownInt1_v10 { get; set; }
+    }
+            
+    [MetaData("FREEZE_WEAPON", 10)]
+    public class FreezeWeapon_v10 : DecodedMetaEntryBase
+    {
+        [MetaDataTag(5)]
+        public int UnknownInt0 { get; set; }
+        
+        [MetaDataTag(6)] 
+        public string UnknownString { get; set; } = "";
+        
+        [MetaDataTag(7)]
+        public Vector3 Unknown0_v10 { get; set; }
+    }
 }

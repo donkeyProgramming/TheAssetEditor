@@ -21,4 +21,14 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         [MetaDataTag(8)]
         public Vector3 Rotation { get; set; }
     }
+    
+    
+    [MetaData("ALLOW_LEG_DISMEMBER", 10)]
+    public class AllowLegDismember_v10 : DecodedMetaEntryBase
+    {
+    }
+    [MetaData("ALLOW_FRONT_LEG_DISMEMBER", 10)]
+    public class AllowFrontLegDismember_v10 : DecodedMetaEntryBase
+    {
+    }
 }

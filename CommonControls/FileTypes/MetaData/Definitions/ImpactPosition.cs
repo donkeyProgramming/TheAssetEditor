@@ -13,9 +13,14 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     }
     
     [MetaData("IMPACT_POS", 10)]
-    public class ImpactPosition : DecodedMetaEntryBase
+    public class ImpactPosition_v10 : DecodedMetaEntryBase
     {
         [MetaDataTag(5)]
         public Vector3 Position { get; set; }
+    }
+    
+    [MetaData("IMPACT_DIRECTION_POS", 10)]
+    public class ImpactDirectionPosition_v10 : ImpactPosition_v10
+    {
     }
 }
