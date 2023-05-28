@@ -93,9 +93,20 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     public class AnimatedProp_v13 : Prop_v13, IAnimatedPropMeta
     {
     }
-
+   
     [MetaData("ANIMATED_PROP", 14)]
    public class AnimatedProp_v14 : Prop_v14, IAnimatedPropMeta
+   {
+   }
+   
+   
+   [MetaData("ANIMATED_PROP", 12, MetaDataAttributePriority.Low)]
+   public class AnimatedProp_v12_3K : Prop_v12_3K, IAnimatedPropMeta
+   {
+   }
+
+   [MetaData("ANIMATED_PROP", 13, MetaDataAttributePriority.Low)]
+   public class AnimatedProp_v13_3K : Prop_v13_3K, IAnimatedPropMeta
    {
    }
 
