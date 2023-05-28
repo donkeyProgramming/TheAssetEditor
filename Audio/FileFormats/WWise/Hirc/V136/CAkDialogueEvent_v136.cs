@@ -26,6 +26,11 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
         protected override void CreateSpesificData(ByteChunk chunk)
         {
+
+            if (Id == 1006389157)
+            { 
+            }
+
             uProbability = chunk.ReadByte();
             uTreeDepth = chunk.ReadUInt32();
             ArgumentList = new ArgumentList(chunk, uTreeDepth);
@@ -122,25 +127,32 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             var flattenTree = new List<BinaryNode>();
             Enumerable.Range(0, (int)numNodes).ForEach(i=>flattenTree.Add(new BinaryNode(chunk)));
 
-            Node ConvertNode(ushort parentsFirstChildIndex, ushort childIndex, uint currentDepth)
+            Root = ConvertListToGraph(flattenTree, _maxTreeDepth, 0, 0, 0);
+        }
+
+        Node ConvertListToGraph(List<BinaryNode> flattenTree, uint maxTreeDepth, ushort parentsFirstChildIndex, ushort childIndex, uint currentDepth)
+        {
+            var sNode = flattenTree[parentsFirstChildIndex + childIndex];
+            var isAtMaxDepth = currentDepth == maxTreeDepth;
+            var isOutsideRange = sNode.Children_uIdx >= flattenTree.Count;
+            
+            if (isAtMaxDepth || isOutsideRange)
             {
-                var sNode = flattenTree[parentsFirstChildIndex + childIndex];
-                var isAtMaxDepth = currentDepth == maxTreeDepth;
-                var isOutsideRange = sNode.Children_uIdx >= flattenTree.Count;
-                if( isAtMaxDepth || isOutsideRange)
-                {
-                    sNode.Children_uCount = 0;
-                    sNode.Children_uIdx = 0;
-                    return new Node(sNode);
-                }
-
-                sNode.AudioNodeId = 0;
-                var node = new Node(sNode);
-                Enumerable.Range(0, sNode.Children_uCount).ForEach(i=>node.Children.Add(ConvertNode(sNode.Children_uIdx, (ushort)i, currentDepth + 1)));
-                return node;
+                sNode.Children_uCount = 0;
+                sNode.Children_uIdx = 0;
+                return new Node(sNode); // Audio node
             }
-
-            Root = ConvertNode(0, 0, 0);
+            else
+            {
+                sNode.AudioNodeId = 0;
+                var pathNode = new Node(sNode);
+                for (int i = 0; i < sNode.Children_uCount; i++)
+                {
+                    var childNode = ConvertListToGraph(flattenTree, maxTreeDepth, sNode.Children_uIdx, (ushort)i, currentDepth + 1);
+                    pathNode.Children.Add(childNode);
+                }
+                return pathNode;
+            }
         }
 
         public byte[] GetAsBytes()

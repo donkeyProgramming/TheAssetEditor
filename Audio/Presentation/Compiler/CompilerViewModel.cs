@@ -5,6 +5,7 @@ using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using System.Diagnostics;
+using System.Linq;
 using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 
 namespace Audio.Presentation.Compiler
@@ -22,6 +23,12 @@ namespace Audio.Presentation.Compiler
         {
             _pfs = pfs;
             _compilerService = compilerService;
+
+            var audioProjectFiles = pfs.FindAllFilesInDirectory("audioprojects")
+                .Where(x=>x.Extention.ToLower() == ".json");
+
+            if (audioProjectFiles.Any())
+                ProjectFilePath.Value = pfs.GetFullPath(audioProjectFiles.First());
         }
 
         public void BrowseProjectFileAction()

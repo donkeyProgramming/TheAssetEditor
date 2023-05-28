@@ -1,5 +1,7 @@
 ﻿using CommonControls.Common;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommunityToolkit.Diagnostics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 using Serilog;
 using System;
 using System.IO;
@@ -43,6 +45,15 @@ namespace Audio.Utility
                 return Result<string>.FromError(exportResult.LogItems);
 
             return ConvertFileUsingVgSteam(wemName, wavName);
+        }
+
+        public Result<string> ConvertToWem(PackFile packFile)
+        {
+            var filename = $"{AudioFolderName}\\{packFile.Name}";
+            DirectoryHelper.EnsureFileFolderCreated(filename);
+            File.WriteAllBytes(filename, packFile.DataSource.ReadData());
+
+            return ConvertToWem(filename);
         }
 
         public Result<string> ConvertToWem(string systemPath)

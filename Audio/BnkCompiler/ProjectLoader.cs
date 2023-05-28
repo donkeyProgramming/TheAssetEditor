@@ -132,7 +132,6 @@ namespace Audio.BnkCompiler
                 {
                     Name = soundId,
                     Path = simpleEvent.Sound,
-                    SystemFilePath = simpleEvent.FileSystemSound
                 };
 
                 mixer.Sounds.Add(defaultSound.Name);

@@ -42,6 +42,10 @@ namespace AudioResearch
     {
         static void Main(string[] args)
         {
+
+            DecisionPathHelper test = new DecisionPathHelper(null);
+            test.Write();
+
             if (Environment.GetEnvironmentVariable("KlissanEnv") != null)
             {
                 //TestDialogEventSerialization();

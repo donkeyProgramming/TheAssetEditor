@@ -8,11 +8,11 @@
   "Events": [
     {
       "Name": "Play_Diplo_01",
-      "Sound": "Audio\\WWise\\729867288.wem"
+      "Sound": "Audio\\WWise\\1000175847.wem"
     },
     {
       "Name": "Play_Diplo_02",
-      "FileSystemSound": "C:\\Users\\username\\soundLib\\wet-fart-6139.mp3"
+      "Sound": "C:\\Users\\username\\soundLib\\wet-fart-6139.mp3"
     }
   ]
 }

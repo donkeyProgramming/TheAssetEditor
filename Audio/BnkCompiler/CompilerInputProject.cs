@@ -8,7 +8,6 @@ namespace Audio.BnkCompiler
         {
             public string Name { get; set; }
             public string Sound { get; set; }
-            public string FileSystemSound { get; set; }
         }
 
         public class ProjectSettings

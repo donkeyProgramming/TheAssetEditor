@@ -24,7 +24,7 @@ namespace Audio.BnkCompiler
 
         void SaveToPackFile(CompileResult compileResult, CompilerData compilerData, CompilerSettings settings)
         {
-            var ouputPath = "wwise\\audio";
+            var ouputPath = "audio\\wwise";
             if (string.IsNullOrWhiteSpace(compilerData.ProjectSettings.Language) == false)
                 ouputPath += $"\\{compilerData.ProjectSettings.Language}";
 
