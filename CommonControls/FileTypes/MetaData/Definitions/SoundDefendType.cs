@@ -49,6 +49,15 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     {
         [MetaDataTag(8)]
         public int UnknownInt0_v11 { get; set; }
-
+    }
+    
+    
+    [MetaData("SOUND_DEFEND_TYPE", 11, MetaDataAttributePriority.Low)]
+    public class SoundDefendType_v11_Troy : SoundDefendType_v10
+    {
+        public override string Description { get; } = "_TroyOnly";
+        
+        [MetaDataTag(8)]
+        public byte UnknownByte0_v11_troy { get; set; }
     }
 }

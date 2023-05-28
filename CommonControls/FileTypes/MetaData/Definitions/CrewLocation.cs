@@ -21,6 +21,16 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public Vector4 Orientation{ get; set; }
     }
     
+    [MetaData("CREW_LOCATION", 3)]
+    public class CrewLocation_v3 : CrewLocation_v2
+    {
+        [MetaDataTag(8)]
+        public int UnknownInt0_v3 { get; set; }
+
+        [MetaDataTag(9)]
+        public int UnknownInt1_v3 { get; set; }
+    }
+    
     [MetaData("CREW_LOCATION", 10)]
     public class CrewLocation_v10 : DecodedMetaEntryBase
     {
@@ -38,9 +48,9 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public Vector4 Orientation{ get; set; }
 
         [MetaDataTag(9)]
-        public int UnknownInt0_v10 { get; set; }
+        public int UnknownInt0_v3 { get; set; }
 
         [MetaDataTag(10)]
-        public int UnknownInt1_v10 { get; set; }
+        public int UnknownInt1_v3 { get; set; }
     }
 }

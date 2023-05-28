@@ -23,4 +23,14 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         [MetaDataTag(8)] // some kind of scaling?
         public float UnknownFloat_v11 { get; set; }
     }
+    
+        
+    [MetaData("BLEND_OVERRIDE", 11, MetaDataAttributePriority.Low)]
+    public class BlendOverride_v11_Troy : BlendOverride_v10
+    {
+        public override string Description { get; } = "_TroyOnly";
+        
+        [MetaDataTag(8)] // some kind of scaling?
+        public byte UnknownByte_v11_troy { get; set; }
+    }
 }
