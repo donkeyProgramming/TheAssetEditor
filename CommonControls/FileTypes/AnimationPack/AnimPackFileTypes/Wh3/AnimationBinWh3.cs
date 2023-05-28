@@ -184,6 +184,9 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
                             SoundFile = animation.AnimationSoundMetaFile,
                             SlotIndex = (int)item.AnimationId,
                             SlotName = slotName,
+                            BlendInTime = item.BlendIn,
+                            SelectionWeight = item.SelectionWeight,
+                            WeaponBools = item.WeaponBools,
                             Index = index
                         });
                     }

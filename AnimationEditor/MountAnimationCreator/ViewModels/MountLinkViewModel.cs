@@ -1,7 +1,6 @@
 ﻿using AnimationEditor.Common.ReferenceModel;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
-using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.Services;
 using System;
 using System.Collections.Generic;
@@ -13,11 +12,11 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
 {
     public class MountLinkViewModel : NotifyPropertyChangedImpl
     {
-        public FilterCollection<AnimationFragmentFile> SelectedMount { get; set; }
-        public FilterCollection<AnimationFragmentFile> SelectedRider { get; set; }
+        public FilterCollection<IAnimationBinGenericFormat> AnimationSetForMount { get; set; }
+        public FilterCollection<IAnimationBinGenericFormat> AnimationSetForRider { get; set; }
 
-        public FilterCollection<FragmentStatusSlotItem> SelectedMountTag { get; set; }
-        public FilterCollection<FragmentStatusSlotItem> SelectedRiderTag { get; set; }
+        public FilterCollection<AnimationBinEntryGenericFormat> SelectedMountTag { get; set; }
+        public FilterCollection<AnimationBinEntryGenericFormat> SelectedRiderTag { get; set; }
 
         AssetViewModel _rider;
         AssetViewModel _mount;
@@ -32,16 +31,16 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
             _rider = rider;
             _mount = mount;
             _validateAction = validate;
+       
+            AnimationSetForMount = new FilterCollection<IAnimationBinGenericFormat>(null, (value) => UpdateAnimationSet(value, SelectedMountTag, _mount.SkeletonName.Value));
+            AnimationSetForRider = new FilterCollection<IAnimationBinGenericFormat>(null, (value) => UpdateAnimationSet(value, SelectedRiderTag, _rider.SkeletonName.Value));
+            SelectedMountTag = new FilterCollection<AnimationBinEntryGenericFormat>(null, MountTagSeleted);
+            SelectedRiderTag = new FilterCollection<AnimationBinEntryGenericFormat>(null, RiderTagSelected);
 
-            SelectedMountTag = new FilterCollection<FragmentStatusSlotItem>(null, MountTagSeleted);
-            SelectedRiderTag = new FilterCollection<FragmentStatusSlotItem>(null, RiderTagSelected);
-            SelectedMount = new FilterCollection<AnimationFragmentFile>(null, (value) => MuntSelected(value, SelectedMountTag, _mount.SkeletonName.Value));
-            SelectedRider = new FilterCollection<AnimationFragmentFile>(null, (value) => MuntSelected(value, SelectedRiderTag, _rider.SkeletonName.Value));
-
-            SelectedMountTag.SearchFilter = (value, rx) => { return rx.Match(value.Entry.Value.Slot.Value).Success; };
-            SelectedRiderTag.SearchFilter = (value, rx) => { return rx.Match(value.Entry.Value.Slot.Value).Success; };
-            SelectedMount.SearchFilter = (value, rx) => { return rx.Match(value.FileName).Success; };
-            SelectedRider.SearchFilter = (value, rx) => { return rx.Match(value.FileName).Success; };
+            SelectedMountTag.SearchFilter = (value, rx) => { return rx.Match(value.SlotName).Success    ; };
+            SelectedRiderTag.SearchFilter = (value, rx) => { return rx.Match(value.SlotName).Success; };
+            AnimationSetForMount.SearchFilter = (value, rx) => { return rx.Match(value.FullPath).Success; };
+            AnimationSetForRider.SearchFilter = (value, rx) => { return rx.Match(value.FullPath).Success; };
 
             ReloadFragments();
         }
@@ -51,28 +50,28 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
             if (mount)
             {
                 var mountSkeletonName = Path.GetFileNameWithoutExtension(_mount.SkeletonName.Value);
-                var allPossibleMount = LoadFragmentsForSkeleton(mountSkeletonName);
-                SelectedMount.UpdatePossibleValues(allPossibleMount);
+                var allPossibleMount = LoadAnimationSetForSkeleton(mountSkeletonName);
+                AnimationSetForMount.UpdatePossibleValues(allPossibleMount);
             }
 
             if (rider)
             {
-                var selectedSlotId = SelectedRiderTag.SelectedItem?.Entry.Value.Slot.Id;
-                var selectedRider = SelectedRider.SelectedItem?.FileName;
+                var selectedSlotId = SelectedRiderTag.SelectedItem?.SlotIndex;
+                var selectedRider = AnimationSetForRider.SelectedItem?.FullPath;
                 var riderSkeletonName = Path.GetFileNameWithoutExtension(_rider.SkeletonName.Value);
-                var allPossibleRider = LoadFragmentsForSkeleton(riderSkeletonName);
-                SelectedRider.UpdatePossibleValues(allPossibleRider);
+                var allPossibleRider = LoadAnimationSetForSkeleton(riderSkeletonName);
+                AnimationSetForRider.UpdatePossibleValues(allPossibleRider);
                 if (selectedRider != null)
-                    SelectedRider.SelectedItem = SelectedRider.Values.FirstOrDefault(x => x.FileName == selectedRider);
-
+                    AnimationSetForRider.SelectedItem = AnimationSetForRider.Values.FirstOrDefault(x => x.Name == selectedRider);
+                
                 if (selectedSlotId != null)
-                    SelectedRiderTag.SelectedItem = SelectedRiderTag.Values.FirstOrDefault(x => x.Entry.Value.Slot.Id == selectedSlotId.Value);
+                    SelectedRiderTag.SelectedItem = SelectedRiderTag.Values.FirstOrDefault(x => x.SlotIndex== selectedSlotId.Value);
             }
         }
 
-        public List<AnimationFragmentFile> LoadFragmentsForSkeleton(string skeletonName, bool onlyPacksThatCanBeSaved = false)
+        public List<IAnimationBinGenericFormat> LoadAnimationSetForSkeleton(string skeletonName, bool onlyPacksThatCanBeSaved = false)
         {
-            var outputFragments = new List<AnimationFragmentFile>();
+            var outputFragments = new List<IAnimationBinGenericFormat>();
             var animPacks = _pfs.GetAllAnimPacks();
             foreach (var animPack in animPacks)
             {
@@ -83,14 +82,14 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
                 }
 
                 var animPackFile = AnimationPackSerializer.Load(animPack, _pfs);
-                var fragments = animPackFile.GetAnimationSets(skeletonName);
+                var fragments = animPackFile.GetGenericAnimationSets(skeletonName);
                 foreach (var fragment in fragments)
                     outputFragments.Add(fragment);
             }
             return outputFragments;
         }
 
-        void MuntSelected(AnimationFragmentFile value, FilterCollection<FragmentStatusSlotItem> collection, string skeletonName)
+        void UpdateAnimationSet(IAnimationBinGenericFormat value, FilterCollection<AnimationBinEntryGenericFormat> collection, string skeletonName)
         {
             if (value == null)
             {
@@ -99,7 +98,7 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
                 return;
             }
 
-            var newSkeletonName = value.Skeletons.Values.FirstOrDefault();
+            var newSkeletonName = value.SkeletonName;
             var existingSkeletonName = Path.GetFileNameWithoutExtension(skeletonName);
             if (newSkeletonName != existingSkeletonName)
             {
@@ -107,30 +106,30 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
                 return;
             }
 
-            collection.UpdatePossibleValues(value.Fragments.Select(x => new FragmentStatusSlotItem(x)));
+            collection.UpdatePossibleValues(value.Entries);
             _validateAction();
         }
 
-        private void MountTagSeleted(FragmentStatusSlotItem value)
+        private void MountTagSeleted(AnimationBinEntryGenericFormat value)
         {
             if (value != null)
             {
-                var file = _pfs.FindFile(value.Entry.Value.AnimationFile);
+                var file = _pfs.FindFile(value.AnimationFile);
                 var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file, _pfs);
                 _mount.SetAnimation(animationRef);
 
-                var lookUp = "RIDER_" + value.Entry.Value.Slot.Value;
+                var lookUp = "RIDER_" + value.SlotName;
                 SelectedRiderTag.Filter = "";
-                SelectedRiderTag.SelectedItem = SelectedRiderTag.Values.FirstOrDefault(x => x.Entry.Value.Slot.Value == lookUp);
+                SelectedRiderTag.SelectedItem = SelectedRiderTag.Values.FirstOrDefault(x => x.SlotName == lookUp);
             }
             _validateAction();
         }
 
-        private void RiderTagSelected(FragmentStatusSlotItem value)
+        private void RiderTagSelected(AnimationBinEntryGenericFormat value)
         {
             if (value != null)
             {
-                var file = _pfs.FindFile(value.Entry.Value.AnimationFile);
+                var file = _pfs.FindFile(value.AnimationFile);
                 if (file == null)
                 {
                     _rider.SetAnimation(null);
@@ -143,6 +142,5 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
             }
             _validateAction();
         }
-       
     }
 }

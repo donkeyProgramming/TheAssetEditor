@@ -2,34 +2,34 @@
 using CommonControls.Common;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.AnimationPack;
-using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
-using CommonControls.FileTypes.DB;
+using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3;
 using CommonControls.Services;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using View3D.Animation;
+using static CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry;
 
 namespace AnimationEditor.MountAnimationCreator.Services
 {
     class BatchProcessorService
     {
         PackFileService _pfs;
+        GameSkeleton _riderSkeleton;
+        GameSkeleton _mountSkeleton;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         MountAnimationGeneratorService _animationGenerator;
         BatchProcessOptions _batchProcessOptions;
-        AnimationFragmentFile _mountFragment;
-        AnimationFragmentFile _riderFragment;
+        IAnimationBinGenericFormat _mountFragment;
+        IAnimationBinGenericFormat _riderFragment;
 
         uint _animationOutputFormat;
         AnimationPackFile _outAnimPack;
-        AnimationFragmentFile _riderOutputFragment;
+        AnimationBinWh3 _riderOutputBin;
 
         string _animationPrefix = "new_";
         string _animPackName = "test_tables.animpack";
         string _animBinName = "test_tables.bin";
-        string _fragmentName = "hu1_test_hr1_hammer";
 
         public BatchProcessorService(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, MountAnimationGeneratorService animationGenerator, BatchProcessOptions batchProcessOptions, uint animationOutputFormat)
         {
@@ -39,19 +39,23 @@ namespace AnimationEditor.MountAnimationCreator.Services
             _batchProcessOptions = batchProcessOptions;
             _animationOutputFormat = animationOutputFormat;
 
+          
+
             if (_batchProcessOptions != null)
             {
                 _animPackName = SaveHelper.EnsureEnding(batchProcessOptions.AnimPackName, ".animpack");
                 _animBinName = SaveHelper.EnsureEnding(batchProcessOptions.AnimPackName, "_tables.bin");
-                _fragmentName = SaveHelper.EnsureEnding(batchProcessOptions.FragmentName, ".frg");
             }
         }
 
-        public void Process(AnimationFragmentFile mountFragment, AnimationFragmentFile riderFragment)
+        public void Process(IAnimationBinGenericFormat mountFragment, IAnimationBinGenericFormat riderFragment)
         {
             var resultInfo = new ErrorListViewModel.ErrorList();
             _mountFragment = mountFragment;
             _riderFragment = riderFragment;
+
+            _mountSkeleton = LoadSkeleton(_mountFragment.SkeletonName);
+            _riderSkeleton = LoadSkeleton(_riderFragment.SkeletonName);
 
             CreateAnimPackFile();
             CreateFragmentAndAnimations(resultInfo);
@@ -74,34 +78,48 @@ namespace AnimationEditor.MountAnimationCreator.Services
         void CreateAnimation( string riderSlot, string mountSlot, ErrorListViewModel.ErrorList resultInfo)
         {
             // Does the rider have this?
-            var riderHasAnimation = _riderFragment.Fragments.FirstOrDefault(x => x.Slot.Value == riderSlot) != null;
+            var riderHasAnimation = _riderFragment.Entries.FirstOrDefault(x => x.SlotName == riderSlot) != null;
             if (riderHasAnimation)
             {
                 // Create a copy of the animation fragment entry
-                var riderFragment = _riderFragment.Fragments.First(x => x.Slot.Value == riderSlot);
-                var newRiderFragment = riderFragment.Clone();
-                _riderOutputFragment.Fragments.Add(newRiderFragment);
-
-                var mountFragment = _mountFragment.Fragments.First(x => x.Slot.Value == mountSlot);
+                var riderFragment = _riderFragment.Entries.First(x => x.SlotName == riderSlot);
+                var mountFragment = _mountFragment.Entries.First(x => x.SlotName == mountSlot);
 
                 // Generate new animation
-                var riderAnim = LoadAnimation(riderFragment.AnimationFile);
-                var mountAnim = LoadAnimation(mountFragment.AnimationFile);
-                var savedAnimName = SaveSingleAnim(mountAnim, riderAnim, newRiderFragment.AnimationFile);
+                var riderAnim = LoadAnimation(riderFragment.AnimationFile, _riderSkeleton);
+                var mountAnim = LoadAnimation(mountFragment.AnimationFile, _mountSkeleton);
+                var savedAnimName = SaveSingleAnim(mountAnim, riderAnim, riderFragment.AnimationFile);
 
-                newRiderFragment.AnimationFile = savedAnimName;
 
+                var newEntry = new CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()
+                {
+                    AnimationId = (uint)riderFragment.SlotIndex,
+                    BlendIn = riderFragment.BlendInTime,
+                    SelectionWeight = riderFragment.SelectionWeight,
+                    WeaponBools = riderFragment.WeaponBools,
+                    Unk = false,
+                    AnimationRefs = new List<AnimationRef>()
+                    {
+                        new AnimationRef()
+                        {
+                            AnimationFile = savedAnimName,
+                            AnimationMetaFile = riderFragment.AnimationFile,
+                            AnimationSoundMetaFile = riderFragment.SoundFile
+                        }
+                    }
+                };
+
+                _riderOutputBin.AnimationTableEntries.Add(newEntry);
                 resultInfo.Ok(mountSlot, "Matching animation found in rider ("+ riderSlot + "). New animation created");
             }
             else
             {
                 // Add an empty fragment entry
-                _riderOutputFragment.Fragments.Add(new AnimationSetEntry()
+                _riderOutputBin.AnimationTableEntries.Add(new CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()
                 {
-                    Slot = DefaultAnimationSlotTypeHelper.GetfromValue(riderSlot),
-                    Skeleton = _riderFragment.Skeletons.Values.First()
+                    AnimationId = (uint)DefaultAnimationSlotTypeHelper.GetfromValue(riderSlot).Id,
                 });
-
+            
                 resultInfo.Error(mountSlot, "Expected slot missing in  rider (" + riderSlot + "), this need to be resolved!");
             }
         }
@@ -126,17 +144,34 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
         void CopyAnimations(string riderSlot, ErrorListViewModel.ErrorList resultInfo)
         {
-            var fragmentEntry = _riderFragment.Fragments.First(x => x.Slot.Value == riderSlot);
-            _riderOutputFragment.Fragments.Add(fragmentEntry.Clone());
+           var fragmentEntry = _riderFragment.Entries.First(x => x.SlotName == riderSlot);
+            var newEntry = new CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()
+            {
+                AnimationId = (uint)fragmentEntry.SlotIndex,
+                BlendIn = fragmentEntry.BlendInTime,
+                SelectionWeight = fragmentEntry.SelectionWeight,
+                WeaponBools = fragmentEntry.WeaponBools,
+                Unk = false,
+                AnimationRefs = new List<AnimationRef>()
+                {
+                    new AnimationRef()
+                    {
+                        AnimationFile = fragmentEntry.AnimationFile,
+                        AnimationMetaFile = fragmentEntry.AnimationFile,
+                        AnimationSoundMetaFile = fragmentEntry.SoundFile
+                    }
+                }
+            };
 
-            resultInfo.Ok(riderSlot, "Animation copied from rider");
+           _riderOutputBin.AnimationTableEntries.Add(newEntry);
+           resultInfo.Ok(riderSlot, "Animation copied from rider");
         }
 
         List<string> GetAnimationsThatRequireNoChanges()
         {
-            return _riderFragment.Fragments
-                   .Where(x => MountAnimationGeneratorService.IsCopyOnlyAnimation(x.Slot.Value))
-                   .Select(x => x.Slot.Value)
+            return _riderFragment.Entries
+                   .Where(x => MountAnimationGeneratorService.IsCopyOnlyAnimation(x.SlotName))
+                   .Select(x => x.SlotName)
                    .Distinct()
                    .ToList();
         }
@@ -144,43 +179,45 @@ namespace AnimationEditor.MountAnimationCreator.Services
         // Animations where rider and mount needs the same amount of frames
         List<(string, string)> GetMatchedAnimations()
         {
-            return _mountFragment.Fragments
-                .Where(x => DefaultAnimationSlotTypeHelper.GetMatchingRiderAnimation(x.Slot.Value) != null)
-                .Select(x => (DefaultAnimationSlotTypeHelper.GetMatchingRiderAnimation(x.Slot.Value).Value, x.Slot.Value))
+            return _mountFragment.Entries
+                .Where(x => DefaultAnimationSlotTypeHelper.GetMatchingRiderAnimation(x.SlotName) != null)
+                .Select(x => (DefaultAnimationSlotTypeHelper.GetMatchingRiderAnimation(x.SlotName).Value, x.SlotName))
                 .Distinct()
                 .ToList();
         }
 
-
         void CreateAnimPackFile()
         {
             _outAnimPack = new AnimationPackFile();
+            _riderOutputBin = new AnimationBinWh3(@"animations/database/battle/bin/" + _animBinName)
+            {
+                SkeletonName = _riderFragment.SkeletonName,
+                Name = Path.GetFileNameWithoutExtension(_animBinName),
+                LocomotionGraph = @"animations/locomotion_graphs/entity_locomotion_graph.xml",
+                UnknownValue1 = 0,
+                MountBin = _mountFragment.Name
+            };
 
-            var animDb = new AnimationBin("animations/animation_tables/" + _animBinName);
-            var tableEntry = new AnimationBinEntry(_fragmentName, _riderFragment.Skeletons.Values.First(), "Bin entry using skeleton - " + _mountFragment.Skeletons.Values.First() + " goes here");
-            tableEntry.FragmentReferences.Add(new AnimationBinEntry.FragmentReference() { Name = _fragmentName });
-            animDb.AnimationTableEntries.Add(tableEntry);
-            
-            _riderOutputFragment = new AnimationFragmentFile("animations/animation_tables/" + _fragmentName + ".frg", null, GameTypeEnum.Warhammer2);
-            _riderOutputFragment.Skeletons = new StringArrayTable(_riderFragment.Skeletons.Values.First(), _riderFragment.Skeletons.Values.First());
-            
-            _outAnimPack.AddFile(_riderOutputFragment);
-            _outAnimPack.AddFile(animDb);
+            _outAnimPack.AddFile(_riderOutputBin);
         }
 
         void SaveFiles()
         {
             var bytes = AnimationPackSerializer.ConvertToBytes(_outAnimPack);
-            SaveHelper.Save(_pfs, "animations\\animation_tables\\" + _animPackName, null, bytes);
+            SaveHelper.Save(_pfs, "animations\\database\\battle\\bin\\" + _animPackName, null, bytes);
         }
 
-        AnimationClip LoadAnimation(string path)
+        AnimationClip LoadAnimation(string path, GameSkeleton skeleton)
         {
-            throw new NotImplementedException();
+            var file = _pfs.FindFile(path);
+            var animation = AnimationFile.Create(file);
+            return new AnimationClip(animation, skeleton);
+        }
 
-            //var file = _pfs.FindFile(path);
-            //var animation = AnimationFile.Create(file);
-            //return new AnimationClip(animation);
+        GameSkeleton LoadSkeleton(string skeletonName)
+        {
+            var skeletonFile = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, skeletonName);          
+            return new GameSkeleton(skeletonFile, null);
         }
 
         string GenerateNewAnimationName(string fullPath, string prefix, int numberId = 0)
