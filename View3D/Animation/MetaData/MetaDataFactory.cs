@@ -67,11 +67,11 @@ namespace View3D.Animation.MetaData
 
            output.AddRange(file.GetItemsOfType<IAnimatedPropMeta>().Select(CreateAnimatedProp));
 
-           output.AddRange(file.GetItemsOfType<ImpactPosition>().Select(meteDataItem => CreateStaticLocator(meteDataItem, meteDataItem.Position, "ImpactPos")));
+           output.AddRange(file.GetItemsOfType<ImpactPosition_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, meteDataItem.Position, "ImpactPos")));
 
            output.AddRange(file.GetItemsOfType<TargetPos_10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, meteDataItem.Position, "TargetPos")));
 
-           output.AddRange(file.GetItemsOfType<FirePos>().Select(meteDataItem => CreateStaticLocator(meteDataItem, meteDataItem.Position, "FirePos")));
+           output.AddRange(file.GetItemsOfType<FirePos_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, meteDataItem.Position, "FirePos")));
 
            output.AddRange(file.GetItemsOfType<SplashAttack_v10>().Select(meteDataItem => CreateSplashAttack(meteDataItem, $"SplashAttack_{Math.Round(meteDataItem.EndTime, 2)}", 0.1f)));
 

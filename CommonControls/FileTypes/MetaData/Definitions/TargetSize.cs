@@ -27,14 +27,28 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     public class MaxTargetSize_v11 : TargetSize
     {
         [MetaDataTag(8)]
-        public int Unk2 { get; set; }
+        public int UnknownInt_v11 { get; set; }
     }
 
     [MetaData("MIN_TARGET_SIZE", 11)]
     public class MinTargetSize_v11 : TargetSize 
     {
         [MetaDataTag(8)]
-        public int Unk2 { get; set; }
+        public int UnknownInt_v11 { get; set; }
+    }
+    
+    [MetaData("MAX_TARGET_SIZE", 11, MetaDataAttributePriority.Low)]
+    public class MaxTargetSize_v11_Troy : TargetSize
+    {
+        public override string Description { get; } = "_TroyOnly";
+        [MetaDataTag(8)]
+        public byte UnknownByte_v11_troy { get; set; }
     }
 
+    // [MetaData("MAX_TARGET_SIZE", 14)]
+    // public class MaxTargetSize_v14 : TargetSize
+    // {
+    //     [MetaDataTag(8)]
+    //     public int UnknownInt_v11 { get; set; }
+    // }
 }
