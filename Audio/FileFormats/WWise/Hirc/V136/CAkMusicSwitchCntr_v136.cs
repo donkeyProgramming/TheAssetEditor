@@ -4,17 +4,20 @@ using System.Collections.Generic;
 
 namespace Audio.FileFormats.WWise.Hirc.V136
 {
-    public class CAkMusicSwitchCntr_v136 : HircItem
+    public class CAkMusicSwitchCntr_v136 : HircItem, INodeBaseParamsAccessor
     {
+        public NodeBaseParams NodeBaseParams => MusicTransNodeParams.MusicNodeParams.NodeBaseParams;
 
         public MusicTransNodeParams MusicTransNodeParams { get; set; }
         public byte bIsContinuePlayback { get; set; }
 
-        public uint uTreeDepth;
-        public ArgumentList ArgumentList;
-        public uint uTreeDataSize;
-        public byte uMode;
-        public AkDecisionTree AkDecisionTree;
+      
+
+        public uint uTreeDepth { get; set; }
+        public ArgumentList ArgumentList { get; set; }
+        public uint uTreeDataSize { get; set; }
+        public byte uMode { get; set; }
+        public AkDecisionTree AkDecisionTree { get; set; }
 
 
         protected override void CreateSpesificData(ByteChunk chunk)

@@ -42,6 +42,7 @@ namespace Audio.FileFormats.WWise.Hirc
                 {
                     var hircItem = factory.CreateInstance(hircType);
                     hircItem.IndexInFile = itemIndex;
+                    hircItem.ByteIndexInFile = itemIndex;
                     hircItem.OwnerFile = fileName;
                     hircItem.Parse(chunk);
                     bnkFile.HircChuck.Hircs.Add(hircItem);
@@ -51,7 +52,7 @@ namespace Audio.FileFormats.WWise.Hirc
                     failedItems.Add(itemIndex);
                     chunk.Index = start;
 
-                    var unkInstance = new CAkUnknown() { ErrorMsg = e.Message, IndexInFile = itemIndex, OwnerFile = fileName };
+                    var unkInstance = new CAkUnknown() { ErrorMsg = e.Message, ByteIndexInFile = itemIndex, OwnerFile = fileName };
                     unkInstance.Parse(chunk);
                     bnkFile.HircChuck.Hircs.Add(unkInstance);
                 }

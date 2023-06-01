@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>hnet.com-image (1).ico</ApplicationIcon>
-    <AssemblyName>AssetEditor v0.44</AssemblyName>
+    <AssemblyName>AssetEditor v0.45</AssemblyName>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -19,13 +19,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\AudioCompilerExample.json" />
 	  <None Remove="Resources\Schemas\ExampleAudioProject.xml" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="Resources\ExampleAudioProject.xml">
-		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\AudioCompilerExample.json" />
 		<Resource Include="Resources\Schemas\warhammer2_AnimMetaDataSchema.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Resource>
@@ -54,9 +53,9 @@
 		<PackageProjectUrl>https://github.com/donkeyProgramming/TheAssetEditor</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/donkeyProgramming/TheAssetEditor</RepositoryUrl>
 		<RepositoryType>GIT</RepositoryType>
-		<AssemblyVersion>0.44.0.0</AssemblyVersion>
-		<FileVersion>0.44.0.0</FileVersion>
-		<PackageId>AssetEditor v0.44</PackageId>
+		<AssemblyVersion>0.45.0.0</AssemblyVersion>
+		<FileVersion>0.45.0.0</FileVersion>
+		<PackageId>AssetEditor v0.45</PackageId>
 	</PropertyGroup>
 
 </Project>

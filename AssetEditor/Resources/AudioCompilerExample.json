@@ -1,0 +1,19 @@
+{
+  "Settings": {
+    "BnkName": "campaign_diplomacy__example",
+    "RootAudioMixer": "54848735",
+    "Language": "English(uk)"
+  },
+
+  "Events": [
+    {
+      "Name": "Play_Diplo_01",
+      "Sound": "Audio\\WWise\\1000175847.wem"
+    },
+    {
+      "Name": "Play_Diplo_02",
+      "Sound": "C:\\Users\\username\\soundLib\\wet-fart-6139.mp3"
+    }
+  ]
+}
+

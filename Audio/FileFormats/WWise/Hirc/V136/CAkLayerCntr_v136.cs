@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Audio.FileFormats.WWise.Hirc.V136
 {
-    public class CAkLayerCntr_v136 : HircItem
+    public class CAkLayerCntr_v136 : HircItem, INodeBaseParamsAccessor
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public Children Children { get; set; }

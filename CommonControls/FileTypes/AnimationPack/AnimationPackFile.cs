@@ -1,6 +1,4 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
-using CommonControls.FileTypes.DB;
+﻿using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,7 +12,6 @@ namespace CommonControls.FileTypes.AnimationPack
         public string FullPath { get; }
         public string SkeletonName { get; }
         public List<AnimationBinEntryGenericFormat> Entries { get;  }
-        
     }
 
     public class AnimationBinEntryGenericFormat
@@ -26,6 +23,9 @@ namespace CommonControls.FileTypes.AnimationPack
         public string AnimationFile { get; set; }
         public string MetaFile { get; set; }
         public string SoundFile { get; set; }
+        public float BlendInTime { get; set; }
+        public float SelectionWeight { get; set; }
+        public int WeaponBools { get; set; }
 
         string GetDisplayName()
         {
@@ -49,14 +49,14 @@ namespace CommonControls.FileTypes.AnimationPack
             _files.Add(file);
         }
 
-        public List<AnimationFragmentFile> GetAnimationSets(string skeletonName = null)
+        /*public List<AnimationFragmentFile> GetAnimationSets(string skeletonName = null)
         {
             var sets = _files.Where(x => x is AnimationFragmentFile).Cast<AnimationFragmentFile>();
             if(skeletonName != null)
                 sets = sets.Where(x => x.Skeletons.Values.Contains(skeletonName));
 
             return sets.ToList();
-        }
+        }*/
 
         public List<IAnimationBinGenericFormat> GetGenericAnimationSets(string skeletonName = null)
         {

@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Audio.FileFormats.WWise.Hirc.V136
 {
-    public class CAkSound_v136 : HircItem, ICAkSound
+    public class CAkSound_v136 : HircItem, ICAkSound, INodeBaseParamsAccessor
     {
         public AkBankSourceData AkBankSourceData { get; set; }
         public NodeBaseParams NodeBaseParams { get; set; }
@@ -14,7 +14,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             NodeBaseParams = NodeBaseParams.Create(chunk);
         }
 
-        public uint GetParentId() => NodeBaseParams.DirectParentID;
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentID;
         public uint GetSourceId() => AkBankSourceData.akMediaInformation.SourceId;
 
         public override void UpdateSize()

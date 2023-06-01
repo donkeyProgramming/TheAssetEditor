@@ -36,7 +36,7 @@ namespace Audio.AudioEditor
                 .Where(x => typesToShow.Contains(x.Type))
                 .ToList();
    
-            var selectedableList = allEvents.Select(x => new SelectedHircItem() { HircItem = x, DisplayName = _repository.GetNameFromHash(x.Id), Id = x.Id, PackFile = x.OwnerFile, IndexInFile = x.IndexInFile }).ToList();
+            var selectedableList = allEvents.Select(x => new SelectedHircItem() { HircItem = x, DisplayName = _repository.GetNameFromHash(x.Id), Id = x.Id, PackFile = x.OwnerFile, IndexInFile = x.ByteIndexInFile }).ToList();
             EventList.Filter = "";
             EventList.UpdatePossibleValues(selectedableList);
         }

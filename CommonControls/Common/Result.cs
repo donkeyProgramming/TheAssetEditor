@@ -6,14 +6,15 @@ namespace CommonControls.Common
     public class Result<T>
     {
         public ErrorList LogItems { get; private set; }
-        public bool Success { get; private set; }
+        public bool IsSuccess { get; private set; }
+        public bool Failed { get => !IsSuccess; }
         public T Item { get; private  set; }
 
         public static Result<T> FromError(string errorGroup, string description)
         {
             var item = new Result<T>()
             {
-                Success = false,
+                IsSuccess = false,
                 LogItems = new ErrorList()
             };
             item.LogItems.Error(errorGroup, description);
@@ -24,7 +25,7 @@ namespace CommonControls.Common
         {
             var item = new Result<T>()
             {
-                Success = false,
+                IsSuccess = false,
                 LogItems = new ErrorList()
             };
             foreach (var error in result.Errors)
@@ -36,7 +37,7 @@ namespace CommonControls.Common
         {
             var item = new Result<T>()
             {
-                Success = false,
+                IsSuccess = false,
                 LogItems = new ErrorList()
             };
             foreach (var error in errorList.Errors)
@@ -48,7 +49,7 @@ namespace CommonControls.Common
         {
             var item = new Result<T>()
             {
-                Success = true,
+                IsSuccess = true,
                 Item = obj
             };
             return item;

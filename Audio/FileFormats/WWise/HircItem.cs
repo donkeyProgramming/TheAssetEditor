@@ -3,6 +3,7 @@ using Filetypes.ByteParsing;
 using Serilog;
 using System;
 using System.IO;
+using System.Text.Json;
 
 namespace Audio.FileFormats.WWise
 {
@@ -12,12 +13,13 @@ namespace Audio.FileFormats.WWise
 
         public static readonly uint HircHeaderSize = 4; // 2x uint. Type is not included for some reason
         public string OwnerFile { get; set; } = "OwnerFile Not Set";
-        public uint IndexInFile { get; set; }
+        public uint ByteIndexInFile { get; set; }
         public bool HasError { get; set; } = true;
 
         public HircType Type { get; set; }
         public uint Size { get; set; }
         public uint Id { get; set; }
+        public uint IndexInFile { get; set; }
 
         public void Parse(ByteChunk chunk)
         {
@@ -25,11 +27,10 @@ namespace Audio.FileFormats.WWise
             {
                 var objectStartIndex = chunk.Index;
 
-                IndexInFile = (uint)objectStartIndex;
+                ByteIndexInFile = (uint)objectStartIndex;
                 Type = (HircType)chunk.ReadByte();
                 Size = chunk.ReadUInt32();
                 Id = chunk.ReadUInt32();
-
                 CreateSpesificData(chunk);
                 var currentIndex = chunk.Index;
                 var computedIndex = (int)(objectStartIndex + 5 + Size);
@@ -39,7 +40,7 @@ namespace Audio.FileFormats.WWise
             }
             catch (Exception e)
             {
-                _logger.Here().Error("Failed to parse object - " + e.Message);
+                _logger.Here().Error($"Failed to parse object {Id} in {OwnerFile} at index {IndexInFile}- " + e.Message);
                 throw;
             }
         }
@@ -57,6 +58,10 @@ namespace Audio.FileFormats.WWise
         protected abstract void CreateSpesificData(ByteChunk chunk);
         public abstract void UpdateSize();
         public abstract byte[] GetAsByteArray();
+
     }
+
+
+
 
 }

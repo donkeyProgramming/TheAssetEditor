@@ -4,12 +4,14 @@ using System.Collections.Generic;
 
 namespace Audio.FileFormats.WWise.Hirc.V136
 {
-    public class CAkMusicSegment_v136 : HircItem
+    public class CAkMusicSegment_v136 : HircItem, INodeBaseParamsAccessor
     {
 
         public MusicNodeParams MusicNodeParams { get; set; }
         public double fDuration { get; set; }
         public List<AkMusicMarkerWwise> pArrayMarkersList { get; set; } = new List<AkMusicMarkerWwise>();
+
+        public NodeBaseParams NodeBaseParams => MusicNodeParams.NodeBaseParams;
 
         protected override void CreateSpesificData(ByteChunk chunk)
         {

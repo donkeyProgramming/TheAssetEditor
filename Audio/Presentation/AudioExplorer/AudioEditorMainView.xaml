@@ -37,6 +37,7 @@
                 <MenuItem Header="Load all bnks" Click="{s:MethodBinding LoadAllBnksAction}" IsEnabled="False"/>
                 <MenuItem Header="Load one bnks" Click="{s:MethodBinding BrowseBnkAction}" IsEnabled="False"/>
                 <MenuItem Header="Export id list" Click="{s:MethodBinding ExportIdListAction}"/>
+                <MenuItem Header="Load Hirc From ID" Click="{s:MethodBinding LoadHircFromIdAction}"/>
             </MenuItem>
         </Menu>
 
@@ -103,7 +104,7 @@
             VirtualizingPanel.IsVirtualizingWhenGrouping="True">
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="{x:Type TreeViewItem}">
-                        <Setter Property="IsExpanded" Value="true" />
+                        <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
                     </Style>
                 </TreeView.ItemContainerStyle>
 
@@ -122,9 +123,8 @@
                 </TreeView.ItemTemplate>
             </TreeView>
         </DockPanel>
-        <DockPanel Grid.Row="1" Grid.Column="4" LastChildFill="True">
+        <DockPanel Grid.Row="1" Grid.Column="3" LastChildFill="True">
             <Button DockPanel.Dock="Bottom" Content="Play Sound" Height="20" Margin="5" Click="{s:MethodBinding PlaySelectedSoundAction}" IsEnabled="{Binding IsPlaySoundButtonEnabled.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            <Button DockPanel.Dock="Bottom" Content="Extract sound" Height="20" Margin="5" Click="{s:MethodBinding ExtractSelectedSoundAction}" IsEnabled="{Binding IsPlaySoundButtonEnabled.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             <TextBox  DockPanel.Dock="Top" IsReadOnly="True" Text="{Binding SelectedNodeText.Value, UpdateSourceTrigger=PropertyChanged}" />
         </DockPanel>
     </Grid>

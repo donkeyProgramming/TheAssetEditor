@@ -13,6 +13,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public AkPropBundle AkPropBundle0 { get; set; } = new AkPropBundle();
         public AkPropBundle AkPropBundle1 { get; set; } = new AkPropBundle();
         public AkPlayActionParams AkPlayActionParams { get; set; } = new AkPlayActionParams();
+        public AkSetStateParams AkSetStateParams { get; set; } = new AkSetStateParams();
 
         protected override void CreateSpesificData(ByteChunk chunk)
         {
@@ -26,12 +27,18 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 AkPropBundle1 = AkPropBundle.Create(chunk);
                 AkPlayActionParams = AkPlayActionParams.Create(chunk);
             }
+            else if (ActionType == ActionType.SetState)
+            {
+                AkPropBundle0 = AkPropBundle.Create(chunk);
+                AkPropBundle1 = AkPropBundle.Create(chunk);
+                AkSetStateParams = AkSetStateParams.Create(chunk);
+            }
         }
 
         public override byte[] GetAsByteArray()
         {
             if (ActionType != ActionType.Play)
-                throw new Exception("Unsuported action type");
+                throw new Exception("Unsupported action type");
 
             using var memStream = WriteHeader();
             memStream.Write(ByteParsers.UShort.EncodeValue((ushort)ActionType, out _));
@@ -84,6 +91,35 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             var allbytes = new List<byte>();
             allbytes.AddRange(ByteParsers.Byte.EncodeValue(byBitVector, out _));
             allbytes.AddRange(ByteParsers.UInt32.EncodeValue(bankId, out _));
+            return allbytes.ToArray();
+        }
+    }
+
+
+    public class AkSetStateParams
+    {
+        public uint ulStateGroupID { get; set; }
+        public uint ulTargetStateID { get; set; }
+
+        public static AkSetStateParams Create(ByteChunk chunk)
+        {
+            return new AkSetStateParams()
+            {
+                ulStateGroupID = chunk.ReadUInt32(),
+                ulTargetStateID = chunk.ReadUInt32(),
+            };
+        }
+
+        internal uint ComputeSize()
+        {
+            return 8;
+        }
+
+        public byte[] GetAsBytes()
+        {
+            var allbytes = new List<byte>();
+            allbytes.AddRange(ByteParsers.UInt32.EncodeValue(ulStateGroupID, out _));
+            allbytes.AddRange(ByteParsers.UInt32.EncodeValue(ulTargetStateID, out _));
             return allbytes.ToArray();
         }
     }

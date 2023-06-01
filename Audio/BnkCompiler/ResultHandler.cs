@@ -9,7 +9,6 @@ namespace Audio.BnkCompiler
     public class ResultHandler
     {
         private readonly PackFileService _pfs;
-        public string WWiserPath { get; set; } = "D:\\Research\\Audio\\WWiser\\wwiser.pyz";
 
         public ResultHandler(PackFileService pfs)
         {
@@ -19,13 +18,13 @@ namespace Audio.BnkCompiler
         internal Result<bool> ProcessResult(CompileResult compileResult, CompilerData compilerData, CompilerSettings settings)
         {
             SaveToPackFile(compileResult, compilerData, settings);
-            ExportToDirectory(compileResult, settings.FileExportPath, settings.ConvertResultToXml);
+            ExportToDirectory(compileResult, settings);
             return Result<bool>.FromOk(true);
         }
 
         void SaveToPackFile(CompileResult compileResult, CompilerData compilerData, CompilerSettings settings)
         {
-            var ouputPath = "wwise\\audio";
+            var ouputPath = "audio\\wwise";
             if (string.IsNullOrWhiteSpace(compilerData.ProjectSettings.Language) == false)
                 ouputPath += $"\\{compilerData.ProjectSettings.Language}";
 
@@ -33,8 +32,11 @@ namespace Audio.BnkCompiler
             SaveHelper.SavePackFile(_pfs, ouputPath, compileResult.OutputDatFile, false);
         }
 
-        void ExportToDirectory(CompileResult result, string outputDirectory, bool convertResultToXml)
+        void ExportToDirectory(CompileResult result, CompilerSettings settings)
         {
+            string outputDirectory = settings.FileExportPath;
+            bool convertResultToXml = settings.ConvertResultToXml;
+
             if (string.IsNullOrWhiteSpace(outputDirectory) == false)
             {
                 var bnkPath = Path.Combine(outputDirectory, $"{result.Project.ProjectSettings.BnkName}.bnk");
@@ -45,8 +47,8 @@ namespace Audio.BnkCompiler
 
                 if (convertResultToXml)
                 {
-                    Guard.IsNotNullOrEmpty(WWiserPath);
-                    BnkToXmlConverter.Convert(WWiserPath, bnkPath, true);
+                    Guard.IsNotNullOrEmpty(settings.WWiserPath);
+                    BnkToXmlConverter.Convert(settings.WWiserPath, bnkPath, true);
                 }
             }
         }

@@ -6,9 +6,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 {
     public class CAkMusicRanSeqCntr_v136 : HircItem
     {
-
         public MusicTransNodeParams MusicTransNodeParams { get; set; }
-
         public List<AkMusicRanSeqPlaylistItem> pPlayList { get; set; } = new List<AkMusicRanSeqPlaylistItem>();
 
 

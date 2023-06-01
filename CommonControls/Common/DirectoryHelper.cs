@@ -29,9 +29,15 @@ namespace CommonControls.Common
 
         public static void EnsureCreated(string path)
         {
-            var directoryPath = Path.GetDirectoryName(path);
-            if (!Directory.Exists(directoryPath))
-                Directory.CreateDirectory(directoryPath);
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+        }
+
+        public static void EnsureFileFolderCreated(string filePath)
+        {
+            var folder = Path.GetDirectoryName(filePath);
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
         }
 
         public static bool IsFileLocked(string path)

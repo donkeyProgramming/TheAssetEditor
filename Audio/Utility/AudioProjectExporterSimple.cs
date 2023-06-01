@@ -24,7 +24,6 @@ namespace Audio.Utility
             var eventName = repository.GetNameFromHash(wwiseEvent.Id, out var found);
             Guard.IsTrue(found);
 
-
             // Actions
             var wwiseActionId = wwiseEvent.Actions.First();
             var wwiseActions = repository.GetHircObject(wwiseActionId.ActionId);

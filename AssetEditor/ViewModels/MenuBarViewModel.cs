@@ -309,12 +309,12 @@ namespace AssetEditor.ViewModels
                 return;
 
             var pack = _packfileService.GetEditablePack();
-            var resourcePath = "AssetEditor.Resources.ExampleAudioProject.xml";
+            var resourcePath = "AssetEditor.Resources.AudioCompilerExample.json";
             using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath);
             using StreamReader reader = new StreamReader(stream);
             var text = reader.ReadToEnd();
             var byteArray = Encoding.ASCII.GetBytes(text);
-            _packfileService.AddFileToPack(pack, "AudioProjects", new PackFile("ExampleBnkProject.bnk.xml", new MemorySource(byteArray)));
+            _packfileService.AddFileToPack(pack, "AudioProjects", new PackFile("AudioCompilerExample.json", new MemorySource(byteArray)));
         }
 
         void OpenTechSkeletonEditor()

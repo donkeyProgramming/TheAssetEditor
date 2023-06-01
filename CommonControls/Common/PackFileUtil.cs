@@ -86,7 +86,6 @@ namespace CommonControls.Common
         
         public static PackFileService CreatePackFileService()
         {
-        
             var pfs = new PackFileService(new PackFileDataBase(), new SkeletonAnimationLookUpHelper(), new ApplicationSettingsService(), new GameInformationFactory());
             var container = pfs.CreateNewPackFileContainer("temp", PackFileCAType.MOD);
             pfs.SetEditablePack(container);
@@ -110,7 +109,10 @@ namespace CommonControls.Common
             foreach(var fileRef in fileRefs) 
             {
                 var fileSource = new FileSystemSource(fileRef.SystemPath);
-                var packfile = new PackFile(Path.GetFileName(fileRef.SystemPath), fileSource);
+                var packfileName = fileRef.OverrideName;
+                if (packfileName == null)
+                    packfileName = Path.GetFileName(fileRef.SystemPath);
+                var packfile = new PackFile(packfileName, fileSource);
 
                 packFileList.Add(packfile);
                 pathList.Add(fileRef.PackFilePath);
@@ -120,15 +122,25 @@ namespace CommonControls.Common
             return packFileList;
         }
 
+        public static List<PackFile> LoadFilesFromDisk(PackFileService pfs, FileRef fileRef) => LoadFilesFromDisk(pfs, new FileRef[] { fileRef });
+
         public class FileRef
         { 
             public string SystemPath { get; set; }
             public string PackFilePath { get; set; }
+            public string OverrideName { get; set; } = null;
 
             public FileRef(string systemPath, string packFilePath)
             {
                 SystemPath = systemPath;
                 PackFilePath = packFilePath;
+            }
+
+            public FileRef(string systemPath, string packFilePath, string overrideName)
+            {
+                SystemPath = systemPath;
+                PackFilePath = packFilePath;
+                OverrideName = overrideName;    
             }
         }
     }

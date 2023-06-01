@@ -20,15 +20,22 @@ namespace Audio.BnkCompiler
         public PackFile NameList { get; set; }
     }
 
+    internal static class CompilerConstants
+    {
+        public static readonly string Game_Warhammer3 = "Warhammer3";
+        public static readonly string Language_English = "English(uk)";
+        public static readonly string Mixers_Diplomacy = "54848735";
+
+        public static readonly string[] Possible_Languages = new string[] { Language_English };
+    }
+
     public class Compiler
     {
-        private readonly PackFileService _pfs;
         private readonly HichBuilder _hircBuilder;
         private readonly BnkHeaderBuilder _headerBuilder;
 
-        public Compiler(PackFileService pfs, HichBuilder hircBuilder, BnkHeaderBuilder headerBuilder)
+        public Compiler(HichBuilder hircBuilder, BnkHeaderBuilder headerBuilder)
         {
-            _pfs = pfs;
             _hircBuilder = hircBuilder;
             _headerBuilder = headerBuilder;
         }

@@ -1,6 +1,5 @@
 ﻿using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
-using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.Services;
 using System.Collections.Generic;
 using System.IO;

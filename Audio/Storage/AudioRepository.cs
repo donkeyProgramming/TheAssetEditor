@@ -15,6 +15,7 @@ namespace Audio.Storage
         void ExportNameListToFile(string outputDirectory, bool includeIds = false);
         List<T> GetAllOfType<T>() where T : HircItem;
         List<HircItem> GetHircObject(uint id);
+        List<HircItem> GetHircObject(uint id, string owningFileName);
         string GetNameFromHash(uint value);
         string GetNameFromHash(uint value, out bool found);
     }
@@ -37,6 +38,12 @@ namespace Audio.Storage
                 return HircObjects[id];
 
             return new List<HircItem>();
+        }
+
+        public List<HircItem> GetHircObject(uint id, string owningFileName)
+        {
+            var hircs = GetHircObject(id).Where(x=>x.OwnerFile == owningFileName).ToList();
+            return hircs;
         }
 
         // Name lookup
@@ -75,6 +82,8 @@ namespace Audio.Storage
             var path = Path.Combine(outputDirectory, "AudioNames.wwiseids");
             File.WriteAllText(path, ss.ToString());
         }
+
+
     }
 
 }

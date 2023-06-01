@@ -122,7 +122,7 @@ namespace Audio.Utility
             }
             var audioNodeName = $"{cNode.AudioNodeId}";
             string keyName;
-            if (cNode.IsAudioNode)
+            if (cNode.IsAudioNode())
             {
                 audioNodeName = $"{audioRepository.GetNameFromHash(cNode.AudioNodeId)}({cNode.AudioNodeId})";
                 keyName = $"{currentNodeContent}({cNode.Key})";
@@ -131,7 +131,7 @@ namespace Audio.Utility
             {
                 keyName = $"{gkeys[depth]} == {currentNodeContent}({cNode.Key})";
             }
-            outputList.Add($"{keyName}|{cNode.uWeight}|{cNode.uProbability}|{cNode.IsAudioNode}|{audioNodeName}|{pId}");
+            outputList.Add($"{keyName}|{cNode.uWeight}|{cNode.uProbability}|{cNode.IsAudioNode()}|{audioNodeName}|{pId}");
             var cId = outputList.Count - 1;
             foreach (var child in cNode.Children)
                 GenerateCustomRow(child, cId, depth+1, gkeys, outputList, audioRepository);
@@ -141,15 +141,16 @@ namespace Audio.Utility
         public void GenerateActorMixerTree(string filename = "actorTree.txt")
         {
             var mixers = _audioRepository.GetAllOfType<CAkActorMixer_v136>();
-            var allRootNodes = mixers.Select(x => new WWiseTreeParserParent(_audioRepository, true, true, false).BuildHierarchyAsFlatList(x))
-                .Select(x => x.First())
-                .DistinctBy(x => x.Item.Id).ToList()
+
+            var allRootNodes = mixers
+                .Where(x => x.NodeBaseParams.DirectParentID == 0)
+                .DistinctBy(x => x.Id)
                 .ToList();
 
-            var inverse = allRootNodes.Select(x => new WWiseTreeParserChildren(_audioRepository, true, true, false).BuildHierarchy(x.Item));
+            var mixerTrees = allRootNodes.Select(x => new WWiseTreeParserChildren(_audioRepository, true, true, false).BuildHierarchy(x)).ToList();
             var ss = new StringBuilder();
-            foreach (var item in inverse)
-                ConvertToString(item, 0, ss);
+            foreach (var mixer in mixerTrees)
+                ConvertToString(mixer, 0, ss);
 
             var wholeDataString = ss.ToString();
             var lines = wholeDataString.Split('\n').Count();
@@ -157,14 +158,32 @@ namespace Audio.Utility
         }
 
 
-        static void ConvertToString(HircTreeItem item, int indentation, StringBuilder ss)
+        void ConvertToString(HircTreeItem item, int indentation, StringBuilder ss)
         {
             if (item.Item == null)
                 return;
 
-            ss.AppendLine($"{new string('\t', indentation)}{item.DisplayName}");
+            var itemName = item.DisplayName;
+            if (item.Item is CAkActorMixer_v136 actorMixer)
+                itemName = $"ActorMixer {_audioRepository.GetNameFromHash(actorMixer.Id)} - Bus:{_audioRepository.GetNameFromHash(actorMixer.NodeBaseParams.OverrideBusId)}";
+            else
+                return;
+            ss.AppendLine($"{new string('\t', indentation)}{itemName}");
             foreach (var childItem in item.Children)
                 ConvertToString(childItem, indentation + 1, ss);
         }
+
+
+        // List all sounds
+        // Find owning event (parent, parent, parent)
+        // Find override bus id for the parent graph override busId != 0 
     }
 }
+
+
+// For all dialog events
+// For all events 
+// Event => Action => Switch =>
+//                              DecratatorNode : SwitchCase
+//                                      Sound
+//                                      Sound

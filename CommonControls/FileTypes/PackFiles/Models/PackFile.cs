@@ -23,6 +23,12 @@ namespace CommonControls.FileTypes.PackFiles.Models
         public override string ToString() { return Name; }
 
         public string Extention { get => Path.GetExtension(Name); }
+
+
+        public static PackFile CreateFromBytes(string fileName, byte[] bytes) => new PackFile(fileName, new MemorySource(bytes));
+        public static PackFile CreateFromASCII(string fileName, string str) => new PackFile(fileName, new MemorySource(System.Text.Encoding.ASCII.GetBytes(str)));
     }
+
+
 
 }
