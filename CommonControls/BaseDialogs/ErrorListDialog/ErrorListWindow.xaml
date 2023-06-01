@@ -12,6 +12,11 @@
         </Grid.RowDefinitions>
         
         <errorlistdialog:ErrorListView />
-        <Button Grid.Row="1" Content="Close" Margin="2,2,2,2" Click="Button_Click"/>
+        <DockPanel LastChildFill="True">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                <Button Content="Close" Margin="2,2,2,2" Click="Button_Click"/>
+                <Button Content="Save Report" Margin="2,2,2,2" Click="SaveReport_Click"/>
+            </StackPanel>
+        </DockPanel>
     </Grid>
 </Window>
