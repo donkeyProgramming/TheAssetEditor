@@ -9,14 +9,13 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        
-        <errorlistdialog:ErrorListView />
-        <DockPanel LastChildFill="True">
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                <Button Content="Close" Margin="2,2,2,2" Click="Button_Click"/>
-                <Button Content="Save Report" Margin="2,2,2,2" Click="SaveReport_Click"/>
-            </StackPanel>
-        </DockPanel>
+
+        <errorlistdialog:ErrorListView Grid.Row="0" />
+        <StackPanel Orientation="Horizontal" Grid.Row="1">
+            <Button Content="Close" Margin="2,2,2,2" Click="Button_Click"/>
+            <Button Content="Save Report" Margin="2,2,2,2" Click="SaveReport_Click"/>
+        </StackPanel>
     </Grid>
 </Window>
