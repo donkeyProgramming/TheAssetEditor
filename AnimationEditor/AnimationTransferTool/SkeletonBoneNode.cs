@@ -26,7 +26,7 @@ namespace AnimationEditor.AnimationTransferTool
         public NotifyAttr<bool> ForceSnapToWorld { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> FreezeTranslation { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> FreezeRotation { get; set; } = new NotifyAttr<bool>(false);
-
+        public NotifyAttr<bool> FreezeRotationZ { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> ApplyTranslation { get; set; } = new NotifyAttr<bool>(true);
         public NotifyAttr<bool> ApplyRotation { get; set; } = new NotifyAttr<bool>(true);
 

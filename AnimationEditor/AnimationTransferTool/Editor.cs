@@ -39,6 +39,7 @@ namespace AnimationEditor.AnimationTransferTool
         RemappedAnimatedBoneConfiguration _config;
         BoneMappingWindow _activeBoneMappingWindow;
 
+        public FilterCollection<SkeletonBoneNode> ModelBoneList { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
         public ObservableCollection<SkeletonBoneNode> Bones { get; set; } = new ObservableCollection<SkeletonBoneNode>();
         public ObservableCollection<SkeletonBoneNode> FlatBoneList { get; set; } = new ObservableCollection<SkeletonBoneNode>();
         public AnimationSettings AnimationSettings { get; set; } = new AnimationSettings();
@@ -126,6 +127,30 @@ namespace AnimationEditor.AnimationTransferTool
             _config = null;
             AnimationSettings.UseScaledSkeletonName.Value = false;
             AnimationSettings.ScaledSkeletonName.Value = "";
+        }
+
+        public void FreezePositionAndRotation()
+        {
+            MessageBox.Show("this feature is currently broken because I gave up on it", "admiralnelson");
+            var newAnimationClip = UpdateAnimation(_copyFrom.AnimationClip, _copyTo.AnimationClip);
+
+            if (ModelBoneList.SelectedItem == null)
+            {
+                MessageBox.Show("No root bone selected");
+                return;
+            }
+
+            for (int frameIndex = 0; frameIndex < newAnimationClip.DynamicFrames.Count; frameIndex++)
+            {
+                var frame = newAnimationClip.DynamicFrames[frameIndex];
+                frame.Position[ModelBoneList.SelectedItem.BoneIndex.Value] = Vector3.Zero;
+                frame.Rotation[ModelBoneList.SelectedItem.BoneIndex.Value] = Quaternion.Identity;
+            }
+
+            
+            //_selectedUnit.AnimationChanged -= AnimationChanged;
+            Generated.SetAnimationClip(newAnimationClip, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
+            //_selectedUnit.AnimationChanged += AnimationChanged;
         }
 
         public void OpenMappingWindow()
@@ -267,6 +292,11 @@ namespace AnimationEditor.AnimationTransferTool
                 {
                     var index = 1;
                     var numItemsToProcess = items.Count(x => x.IsChecked.Value);
+                    if(numItemsToProcess > 50)
+                    {
+                        var confirm = MessageBox.Show("about to process 50 or more items! continue milord?", "sire...", MessageBoxButton.YesNo);
+                        if (confirm != MessageBoxResult.Yes) return;
+                    }
                     foreach (var item in items)
                     {
                         if (item.IsChecked.Value)

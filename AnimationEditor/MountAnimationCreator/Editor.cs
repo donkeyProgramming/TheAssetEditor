@@ -241,7 +241,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public void SaveCurrentAnimationAction()
         {
-            var service = new BatchProcessorService(_pfs, _skeletonAnimationLookUpHelper, CreateAnimationGenerator(), null, SelectedAnimationOutputFormat.Value);
+            var service = new BatchProcessorService(_pfs, _skeletonAnimationLookUpHelper, CreateAnimationGenerator(), new BatchProcessOptions { SavePrefix = SavePrefixText.Value}, SelectedAnimationOutputFormat.Value);
             service.SaveSingleAnim(_mount.AnimationClip, _rider.AnimationClip, _rider.AnimationName.Value.AnimationFile);
         }
 
@@ -250,7 +250,7 @@ namespace AnimationEditor.MountAnimationCreator
             var mountFrag = MountLinkController.AnimationSetForMount.SelectedItem;
             var riderFrag = MountLinkController.AnimationSetForRider.SelectedItem;
             
-            var newFileName = "new_" + Path.GetFileNameWithoutExtension(riderFrag.FullPath);
+            var newFileName = SavePrefixText.Value + Path.GetFileNameWithoutExtension(riderFrag.FullPath);
             var batchSettings = BatchProcessOptionsWindow.ShowDialog(newFileName, SavePrefixText.Value);
             if (batchSettings != null)
             {

@@ -2,6 +2,7 @@
 using CommonControls.Editors.TextEditor;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using System;
 using System.Collections.Generic;
@@ -125,6 +126,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
         {
             try
             {
+
                 if (type.Data == null)
                     return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Data section of xml missing" };
 
@@ -183,12 +185,18 @@ namespace CommonControls.Editors.AnimationPack.Converters
                     {
                         if (pfs.FindFile(animationRef.File) == null)
                             errorList.Warning(animation.Slot, $"Animation file {animationRef.File} is not found");
+                        else if(!IsAnimFile(animationRef.File, pfs))
+                            errorList.Error(animation.Slot, $"Animation file {animationRef.File} does not appears to be a valid animation file");
 
-                        if (animationRef.Meta != "" && pfs.FindFile(animationRef.Meta) == null)
+                        if (pfs.FindFile(animationRef.Meta) == null)
                             errorList.Warning(animation.Slot, $"Meta file {animationRef.Meta} is not found");
+                        else if (!IsAnimMetaFile(animationRef.Meta, pfs))
+                            errorList.Error(animation.Slot, $"Meta file {animationRef.Meta} does not appear to be a valid meta animation");
 
-                        if (animationRef.Sound != "" && pfs.FindFile(animationRef.Sound) == null)
+                        if (pfs.FindFile(animationRef.Sound) == null)
                             errorList.Warning(animation.Slot, $"Sound file {animationRef.Sound} is not found");
+                        else if (!IsSndMetaFile(animationRef.Sound, pfs))
+                            errorList.Error(animation.Slot, $"Sound file {animationRef.Sound} does not appear to be a valid meta sound");
                     }
                 }
 
@@ -202,6 +210,36 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
             return null;
         }
+
+        private bool IsAnimFile(string file, PackFileService pfs)
+        {
+            bool endsWithAnim = file.EndsWith(".anim");
+
+            var theFile = pfs.FindFile(file);
+            var data = theFile.DataSource.ReadData(20);
+            bool headerIsReallyAnimFile = (data[0] == 0x06) || (data[0] == 0x07) || (data[0] == 0x08); //check if version is not 6 7 8 (or just check if it's 2)
+            return endsWithAnim && headerIsReallyAnimFile;
+        }
+        private bool IsAnimMetaFile(string file, PackFileService pfs)
+        {
+            bool endsWithDotMeta = file.EndsWith(".anm.meta") || file.EndsWith(".meta");
+
+            var theFile = pfs.FindFile(file);
+            var data = theFile.DataSource.ReadData(20);
+            bool headerIsReallyAnimMetaFile = data[0] == 0x02; //check if version is not 6 7 8 (or just check if it's 2)
+            return endsWithDotMeta && headerIsReallyAnimMetaFile;
+        }
+
+        private bool IsSndMetaFile(string file, PackFileService pfs)
+        {
+            bool endsWithDotMeta = file.EndsWith(".snd.meta");
+
+            var theFile = pfs.FindFile(file);
+            var data = theFile.DataSource.ReadData(20);
+            bool headerIsReallyAnimMetaFile = data[0] == 0x02; //check if version is not 6 7 8 (or just check if it's 2)
+            return endsWithDotMeta && headerIsReallyAnimMetaFile;
+        }
+
 
         [XmlRoot(ElementName = "Instance")]
         public class Instance

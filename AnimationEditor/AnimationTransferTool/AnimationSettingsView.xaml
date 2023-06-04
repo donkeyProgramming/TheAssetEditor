@@ -84,6 +84,23 @@
                 </StackPanel>
             </GroupBox>
 
+            <DockPanel>
+                <StackPanel>
+                    <DockPanel>
+                        <Label Content="Root bone for animation war beast convert operation" Width ="300"/>
+                        <Label Content=":"/>
+                        <ComboBox Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" 
+                          IsEditable="True"
+                          IsTextSearchEnabled="false"
+                          DisplayMemberPath="BoneName"
+                          Text="{Binding ModelBoneList.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                          ItemsSource="{Binding ModelBoneList.Values}" 
+                          SelectedItem="{Binding ModelBoneList.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                    </DockPanel>
+                    <Button  Content="convert to war beast!" Click="{s:MethodBinding FreezePositionAndRotation}" Margin="2" />
+                </StackPanel>
+            </DockPanel>
+
         </StackPanel>
     </Expander>
 </UserControl>

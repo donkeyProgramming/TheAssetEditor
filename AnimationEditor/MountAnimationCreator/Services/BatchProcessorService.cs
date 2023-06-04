@@ -27,7 +27,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
         AnimationPackFile _outAnimPack;
         AnimationBinWh3 _riderOutputBin;
 
-        string _animationPrefix = "new_";
+        
         string _animPackName = "test_tables.animpack";
         string _animBinName = "test_tables.bin";
 
@@ -103,7 +103,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
                         new AnimationRef()
                         {
                             AnimationFile = savedAnimName,
-                            AnimationMetaFile = riderFragment.AnimationFile,
+                            AnimationMetaFile = riderFragment.MetaFile,
                             AnimationSoundMetaFile = riderFragment.SoundFile
                         }
                     }
@@ -126,7 +126,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
         public string SaveSingleAnim(AnimationClip mountAnim, AnimationClip riderAnim, string originalAnimationName)
         {
-            var newAnimationName = GenerateNewAnimationName(originalAnimationName, _animationPrefix);
+            var newAnimationName = GenerateNewAnimationName(originalAnimationName, _batchProcessOptions.SavePrefix);
 
             var newAnimation = _animationGenerator.GenerateMountAnimation(mountAnim, riderAnim);
 
@@ -157,7 +157,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
                     new AnimationRef()
                     {
                         AnimationFile = fragmentEntry.AnimationFile,
-                        AnimationMetaFile = fragmentEntry.AnimationFile,
+                        AnimationMetaFile = fragmentEntry.MetaFile,
                         AnimationSoundMetaFile = fragmentEntry.SoundFile
                     }
                 }
