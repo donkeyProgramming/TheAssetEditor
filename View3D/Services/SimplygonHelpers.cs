@@ -185,10 +185,6 @@ namespace View3D.Services
                 detVertex.BiNormal = new Vector3(bitangentsTuple.GetItem(0), bitangentsTuple.GetItem(1), bitangentsTuple.GetItem(2));
                 bitangentsTuple.Dispose();
             }
-
-
         }
-    }
-
-    
+    }    
 }

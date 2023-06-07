@@ -139,7 +139,7 @@
 
   <ItemGroup>
     <Reference Include="SimplygonDotNetWrapper">
-      <HintPath>C:\Program Files\Simplygon\10\SimplygonDotNetWrapper.dll</HintPath>
+      <HintPath>SimplygonDotNetWrapper.dll</HintPath>
     </Reference>
   </ItemGroup>
 
