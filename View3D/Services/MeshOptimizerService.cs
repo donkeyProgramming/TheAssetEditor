@@ -6,25 +6,30 @@ using System.Linq;
 using System.Text;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
+using Simplygon;
+using System.Windows.Interop;
+using SharpDX.Direct3D9;
+using System.Reflection;
+using System.Windows.Controls;
 
 namespace View3D.Services
 {
     public class MeshOptimizerService
     {
-        public static MeshObject CreatedReducedCopy(MeshObject original, float factor)
+        public static MeshObject CreatedReducedCopyOld(MeshObject original, float factor)
         {
             var quality = factor;
             var sourceVertices = original.VertexArray.Select(x => new MeshDecimator.Math.Vector3d(x.Position.X, x.Position.Y, x.Position.Z)).ToArray();
             var sourceSubMeshIndices = original.IndexArray.Select(x => (int)x).ToArray();
 
-            var sourceMesh = new Mesh(sourceVertices, sourceSubMeshIndices);
+            var sourceMesh = new MeshDecimator.Mesh(sourceVertices, sourceSubMeshIndices);
             sourceMesh.Normals = original.VertexArray.Select(x => new MeshDecimator.Math.Vector3(x.Normal.X, x.Normal.Y, x.Normal.Z)).ToArray();
             sourceMesh.Tangents = original.VertexArray.Select(x => new MeshDecimator.Math.Vector4(x.Tangent.X, x.Tangent.Y, x.Tangent.Z, 0)).ToArray(); // Should last 0 be 1?
             sourceMesh.SetUVs(0, original.VertexArray.Select(x => new MeshDecimator.Math.Vector2(x.TextureCoordinate.X, x.TextureCoordinate.Y)).ToArray());
 
             if (original.WeightCount == 4)
             {
-                sourceMesh.BoneWeights  = original.VertexArray.Select(x => new BoneWeight(
+                sourceMesh.BoneWeights = original.VertexArray.Select(x => new BoneWeight(
                     (int)x.BlendIndices.X, (int)x.BlendIndices.Y, (int)x.BlendIndices.Z, (int)x.BlendIndices.W,
                     x.BlendWeights.X, x.BlendWeights.Y, x.BlendWeights.Z, x.BlendWeights.W)).ToArray();
             }
@@ -46,7 +51,7 @@ namespace View3D.Services
 
             var algorithm = MeshDecimation.CreateAlgorithm(Algorithm.Default);
             algorithm.Verbose = true;
-            Mesh destMesh = MeshDecimation.DecimateMesh(algorithm, sourceMesh, targetTriangleCount);
+            MeshDecimator.Mesh destMesh = MeshDecimation.DecimateMesh(algorithm, sourceMesh, targetTriangleCount);
 
             var destVertices = destMesh.Vertices;
             var destNormals = destMesh.Normals;
@@ -104,5 +109,43 @@ namespace View3D.Services
 
             return clone;
         }
+
+        public static MeshObject CreatedReducedCopy(MeshObject originalMesh, float factor)
+        {
+            MeshObject newMesh = originalMesh.Clone(false);
+            using (ISimplygon sg = Simplygon.Loader.InitSimplygon(out var simplygonErrorCode, out var simplygonErrorMessage))
+            {
+                if (simplygonErrorCode == Simplygon.EErrorCodes.NoError)
+                {
+                    return GetReducedMeshSimplygon(sg, originalMesh, factor);
+
+                }
+                else // simplygon failed to initializes, use old mesh reducer
+                {
+                    return CreatedReducedCopyOld(originalMesh, factor);
+                }
+            }
+        } 
+
+        private static MeshObject GetReducedMeshSimplygon(ISimplygon sg, MeshObject originalMesh, float factor)
+        {
+            SimplygonHelpers.InitSGGeometryDataObject(sg, out var pGeometryData, originalMesh);
+            SimplygonHelpers.FillSGVertices(ref pGeometryData, originalMesh);
+            SimplygonHelpers.FillSGTriangles(ref pGeometryData, originalMesh);
+            SimplygonHelpers.ReduceSGMesh(sg, pGeometryData, out var newPackedDataSG, factor);
+
+            var reducedMesh = originalMesh.Clone(false);
+            reducedMesh.VertexArray = new VertexPositionNormalTextureCustom[newPackedDataSG.GetVertexCount()];
+            reducedMesh.IndexArray = new ushort[newPackedDataSG.GetVertexIds().GetItemCount()];
+
+            SimplygonHelpers.CopySGIndicesToMesh(newPackedDataSG, ref reducedMesh);
+            SimplygonHelpers.CopySGVerticesToMesh(newPackedDataSG, ref reducedMesh);
+
+            reducedMesh.RebuildIndexBuffer();
+            reducedMesh.RebuildVertexBuffer();
+
+            return reducedMesh;
+        }
+
     }
 }
