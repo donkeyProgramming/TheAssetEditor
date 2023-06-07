@@ -9,110 +9,101 @@ using Microsoft.Xna.Framework;
 namespace View3D.Services
 {
     /// <summary>
-    /// Collections of methods to interact with simplygo
+    /// Collections of methods to interact with simplygon, do the dirt work
     /// </summary>
     public class SimplygonHelpers
     {
-        public static void InitSGGeometryDataObject(ISimplygon sg, out spGeometryData pGeometryData, MeshObject originalMesh)
+        public static void InitSGGeometryDataObject(ISimplygon sg, out spGeometryData geometryDataSG, MeshObject originalMesh)
         {
             // -- create SG GeomtryData object and allocate space for mesh
-            pGeometryData = sg.CreateGeometryData();            
-            pGeometryData.SetTriangleCount(((uint)originalMesh.GetIndexCount()) / 3);
-            pGeometryData.SetVertexCount((uint)originalMesh.GetVertexList().Count);
+            geometryDataSG = sg.CreateGeometryData();            
+            geometryDataSG.SetTriangleCount(((uint)originalMesh.GetIndexCount()) / 3);
+            geometryDataSG.SetVertexCount((uint)originalMesh.GetVertexList().Count);
 
-            pGeometryData.AddBoneWeights(4); 
+            geometryDataSG.AddBoneWeights(4); 
 
-            pGeometryData.AddNormals();
-            pGeometryData.AddTangents(0);
+            geometryDataSG.AddNormals();
+            geometryDataSG.AddTangents(0);
 
-            pGeometryData.AddTexCoords(0); // add two texcoord channels, if format is "default" (static props)
-            pGeometryData.AddTexCoords(1); // TODO: AE should support 2 texture channel as some "default"/static models use it
+            geometryDataSG.AddTexCoords(0); // add two texcoord channels, if format is "default" (static props)
+            geometryDataSG.AddTexCoords(1); // TODO: AE should support 2 texture channel as some "default"/static models use it
 
         }
         public static void FillSGVertices(ref spGeometryData geometryDataSG, MeshObject originalMesh)
         {         
             for (int vertexIndex = 0; vertexIndex < originalMesh.VertexArray.Length; vertexIndex++)
             {
-                ref var srcVertex = ref originalMesh.VertexArray[vertexIndex];
+                ref var sourceVertex = ref originalMesh.VertexArray[vertexIndex];
 
-                // pos (x,y,z)
-                var coords = geometryDataSG.GetCoords();
-                coords.SetTupleSize(3);
-                coords.SetTuple(vertexIndex, new float[] { srcVertex.Position3().X, srcVertex.Position3().Y, srcVertex.Position3().Z });
+                // Allocate pos (x,y,z)
+                var positions = geometryDataSG.GetCoords();
+                positions.SetTupleSize(3);
+                positions.SetTuple(vertexIndex, new float[] { sourceVertex.Position3().X, sourceVertex.Position3().Y, sourceVertex.Position3().Z });
 
-                // bone indices[4]
-                var bone_ids = geometryDataSG.GetBoneIds();
-                bone_ids.SetTupleSize(4);
-                bone_ids.SetTuple(vertexIndex, new int[] { (int)srcVertex.BlendIndices.X, (int)srcVertex.BlendIndices.Y, (int)srcVertex.BlendIndices.Z, (int)srcVertex.BlendIndices.W });
+                // Allocate bone indices[4]
+                var boneIndices = geometryDataSG.GetBoneIds();
+                boneIndices.SetTupleSize(4);
+                boneIndices.SetTuple(vertexIndex, new int[] { (int)sourceVertex.BlendIndices.X, (int)sourceVertex.BlendIndices.Y, (int)sourceVertex.BlendIndices.Z, (int)sourceVertex.BlendIndices.W });
 
-                // bone weights[4]
-                var bone_weights = geometryDataSG.GetBoneWeights();
-                bone_weights.SetTupleSize(4);
-                bone_weights.SetTuple(vertexIndex, new float[] { srcVertex.BlendWeights.X, srcVertex.BlendWeights.Y, srcVertex.BlendWeights.Z, srcVertex.BlendWeights.W });
+                // Allocate bone weights[4]
+                var boneWeights = geometryDataSG.GetBoneWeights();
+                boneWeights.SetTupleSize(4);
+                boneWeights.SetTuple(vertexIndex, new float[] { sourceVertex.BlendWeights.X, sourceVertex.BlendWeights.Y, sourceVertex.BlendWeights.Z, sourceVertex.BlendWeights.W });
             }
         }
         public static void FillSGTriangles(ref spGeometryData geometryDataSG, MeshObject originalMesh)
         {
             // -- construct triangles, and add values for polygon corners
-            // -- construct triangles, and add values for polygon corners
-            for (int cornerIndex = 0; cornerIndex < originalMesh.IndexArray.Length; cornerIndex++)
-            {
-                //auto & index = oMeshData.oUnpackedMesh.vecIndices[index];
+            for (int cornerIndex = 0; cornerIndex < originalMesh.IndexArray.Length; cornerIndex++) 
+            {                
                 ushort vertexIndex = originalMesh.IndexArray[cornerIndex];
 
                 // set vertex index for the triangle corner
                 geometryDataSG.GetVertexIds().SetItem(cornerIndex, vertexIndex);
 
-                ref var vertex = ref originalMesh.VertexArray[vertexIndex];
+                ref var sourceVertex = ref originalMesh.VertexArray[vertexIndex];
 
                 // -- set tex_coords channel 1
-                var tex_coords = geometryDataSG.GetTexCoords(0);
-                tex_coords.SetTupleSize(2);
-                tex_coords.SetTuple(cornerIndex, new float[] { vertex.TextureCoordinate.X, vertex.TextureCoordinate.Y });
+                var TextureCoords1 = geometryDataSG.GetTexCoords(0);
+                TextureCoords1.SetTupleSize(2);
+                TextureCoords1.SetTuple(cornerIndex, new float[] { sourceVertex.TextureCoordinate.X, sourceVertex.TextureCoordinate.Y });
 
                 // -- set tex_coords channel 2 (empty in Ole's "commom format")
                 // TODO: extend "common format" to having 2 UV channels, as many/some "default/static" models use that
-                var tex_coords2 = geometryDataSG.GetTexCoords(1);
-                tex_coords2.SetTupleSize(2);
-                tex_coords2.SetTuple(cornerIndex, new float[] { 0, 0 });
+                var textureCoords2 = geometryDataSG.GetTexCoords(1);
+                textureCoords2.SetTupleSize(2);
+                textureCoords2.SetTuple(cornerIndex, new float[] { 0, 0 });
 
                 // -- Set normals
                 var normals = geometryDataSG.GetNormals();
                 normals.SetTupleSize(3);
-                normals.SetTuple(cornerIndex, new float[] { vertex.Normal.X, vertex.Normal.Y, vertex.Normal.Z });
+                normals.SetTuple(cornerIndex, new float[] { sourceVertex.Normal.X, sourceVertex.Normal.Y, sourceVertex.Normal.Z });
 
                 // -- Set tangents
                 var tangents = geometryDataSG.GetTangents(0);
                 tangents.SetTupleSize(3);
-                tangents.SetTuple(cornerIndex, new float[] { vertex.Tangent.X, vertex.Tangent.Y, vertex.Tangent.Z });
+                tangents.SetTuple(cornerIndex, new float[] { sourceVertex.Tangent.X, sourceVertex.Tangent.Y, sourceVertex.Tangent.Z });
 
                 // -- Set bitangents
                 var bitangents = geometryDataSG.GetBitangents(0);
                 bitangents.SetTupleSize(3);
-                bitangents.SetTuple(cornerIndex, new float[] { vertex.BiNormal.X, vertex.BiNormal.Y, vertex.BiNormal.Z });
+                bitangents.SetTuple(cornerIndex, new float[] { sourceVertex.BiNormal.X, sourceVertex.BiNormal.Y, sourceVertex.BiNormal.Z });
             }
         }                
         public static void ReduceSGMesh(ISimplygon sg, spGeometryData pGeometryData, out spPackedGeometryData packedGeometryDataSG, float factor)
         {
-            //******************************************************************************************
-            //	Reduce the mesh
-            //******************************************************************************************
-            var triangle_count_before = pGeometryData.GetTriangleCount();
-
-            // -- create scene and add mesh
+            // -- create scene graph and add mesh
             var sgScene = sg.CreateScene();
             var mesh = sg.CreateSceneMesh();
             mesh.SetGeometry(pGeometryData);
             sgScene.GetRootNode().AddChild(mesh);
-
+            
             // -- create SG mesh reduction processor, which only exists in the following scope, and thus is cleaned up at the end
             using (var sgReductionProcessor = sg.CreateReductionProcessor())
-            {
-                //var  = sg.CreateReductionProcessor();
+            {                
                 sgReductionProcessor.SetScene(sgScene);
 
-                Simplygon.spReductionSettings sgReductionSettings = sgReductionProcessor.GetReductionSettings();
-                //Simplygon::spRepairSettings sgRepairSettings = g_sgReductionProcessor->GetRepairSettings();
+                Simplygon.spReductionSettings sgReductionSettings = sgReductionProcessor.GetReductionSettings();                
 
                 // -- Set reduction stop condition and reduction ratio
                 sgReductionSettings.SetReductionTargets(Simplygon.EStopCondition.All, true, false, false, false);
@@ -130,21 +121,11 @@ namespace View3D.Services
 
                 // -- Do the processing
                 sgReductionProcessor.RunProcessing();
-            }
-            var triangle_count_after_unpacked = pGeometryData.GetTriangleCount();
+            }            
 
+            // -- convert to "packed vertex", where all "info" is in the vertex struct, for rendering/Rmv2
             packedGeometryDataSG = pGeometryData.NewPackedCopy();
-
-            /******************************************************************************************
-                Copy the reduced mesh back into buffer
-            *******************************************************************************************/
-            var vertexCountAfter = packedGeometryDataSG.GetVertexCount();
-
-
-            //auto before = triangle_count_before;
-            var triangle_count_after = packedGeometryDataSG.GetTriangleCount();
-
-
+            
         }
         public static void CopySGIndicesToMesh(spPackedGeometryData packedGeometryDataSG, ref MeshObject destMesh)
         {
@@ -171,9 +152,8 @@ namespace View3D.Services
                 // -- Copy bone indices
                 var boneIndicesArray = packedGeomtryDataSG.GetBoneIds();
                 var boneIndexTuple = boneIndicesArray.GetTuple(vertexIndex);
-
-                detVertex.BlendIndices = new Vector4(boneIndexTuple.GetItem(0), boneIndexTuple.GetItem(1), boneIndexTuple.GetItem(2), boneIndexTuple.GetItem(3));
-                boneIndexTuple.Dispose(); // INFO: I have to do this to avoid SG crashing on cleanup.
+                detVertex.BlendIndices = new Vector4(boneIndexTuple.GetItem(0), boneIndexTuple.GetItem(1), boneIndexTuple.GetItem(2), boneIndexTuple.GetItem(3));                
+                boneIndexTuple.Dispose(); // INFO: I have to do this to avoid SG crashing on GC cleanup. Could avoid "tuple" and calc indexes "manually", but would look messier
 
                 // -- Copy bone weights
                 var boneWeightArray = packedGeomtryDataSG.GetBoneWeights();
@@ -182,10 +162,10 @@ namespace View3D.Services
                 boneWeightTuple.Dispose();
 
                 // -- Copy UVs
-                var tex_coords = packedGeomtryDataSG.GetTexCoords(0);
-                var tex_coords_data = tex_coords.GetTuple(vertexIndex);
-                detVertex.TextureCoordinate = new Vector2(tex_coords_data.GetItem(0), tex_coords_data.GetItem(1));
-                tex_coords_data.Dispose();
+                var textureCoords1 = packedGeomtryDataSG.GetTexCoords(0);
+                var TextureCoord1Tuple = textureCoords1.GetTuple(vertexIndex);
+                detVertex.TextureCoordinate = new Vector2(TextureCoord1Tuple.GetItem(0), TextureCoord1Tuple.GetItem(1));
+                TextureCoord1Tuple.Dispose();
 
                 // set normals
                 var normalsArray = packedGeomtryDataSG.GetNormals();

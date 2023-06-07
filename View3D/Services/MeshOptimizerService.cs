@@ -16,7 +16,22 @@ namespace View3D.Services
 {
     public class MeshOptimizerService
     {
-        public static MeshObject CreatedReducedCopyOld(MeshObject original, float factor)
+        public static MeshObject CreatedReducedCopy(MeshObject originalMesh, float factor)
+        {
+            MeshObject newMesh = originalMesh.Clone(false);
+            using (ISimplygon sg = Simplygon.Loader.InitSimplygon(out var simplygonErrorCode, out var simplygonErrorMessage))
+            {
+                if (simplygonErrorCode == Simplygon.EErrorCodes.NoError)
+                {
+                    return GetReducedMeshSimplygon(sg, originalMesh, factor);
+                }
+                else // simplygon failed to initializes, use old mesh reducer
+                {
+                    return CreatedReducedCopyDefault(originalMesh, factor);
+                }
+            }
+        }
+        public static MeshObject CreatedReducedCopyDefault(MeshObject original, float factor)
         {
             var quality = factor;
             var sourceVertices = original.VertexArray.Select(x => new MeshDecimator.Math.Vector3d(x.Position.X, x.Position.Y, x.Position.Z)).ToArray();
@@ -108,39 +123,26 @@ namespace View3D.Services
             clone.RebuildVertexBuffer();
 
             return clone;
-        }
-
-        public static MeshObject CreatedReducedCopy(MeshObject originalMesh, float factor)
-        {
-            MeshObject newMesh = originalMesh.Clone(false);
-            using (ISimplygon sg = Simplygon.Loader.InitSimplygon(out var simplygonErrorCode, out var simplygonErrorMessage))
-            {
-                if (simplygonErrorCode == Simplygon.EErrorCodes.NoError)
-                {
-                    return GetReducedMeshSimplygon(sg, originalMesh, factor);
-
-                }
-                else // simplygon failed to initializes, use old mesh reducer
-                {
-                    return CreatedReducedCopyOld(originalMesh, factor);
-                }
-            }
-        } 
+        }      
 
         private static MeshObject GetReducedMeshSimplygon(ISimplygon sg, MeshObject originalMesh, float factor)
         {
+            // -- Copy MeshObject data into Simplygon containers
             SimplygonHelpers.InitSGGeometryDataObject(sg, out var pGeometryData, originalMesh);
             SimplygonHelpers.FillSGVertices(ref pGeometryData, originalMesh);
             SimplygonHelpers.FillSGTriangles(ref pGeometryData, originalMesh);
             SimplygonHelpers.ReduceSGMesh(sg, pGeometryData, out var newPackedDataSG, factor);
 
+            // -- Make new MeshObject to fit reduces mesh
             var reducedMesh = originalMesh.Clone(false);
             reducedMesh.VertexArray = new VertexPositionNormalTextureCustom[newPackedDataSG.GetVertexCount()];
             reducedMesh.IndexArray = new ushort[newPackedDataSG.GetVertexIds().GetItemCount()];
 
+            // -- Copy mesh data from Simplygon containers to MeshObject
             SimplygonHelpers.CopySGIndicesToMesh(newPackedDataSG, ref reducedMesh);
             SimplygonHelpers.CopySGVerticesToMesh(newPackedDataSG, ref reducedMesh);
 
+            // -- Update VRAM buffers
             reducedMesh.RebuildIndexBuffer();
             reducedMesh.RebuildVertexBuffer();
 
