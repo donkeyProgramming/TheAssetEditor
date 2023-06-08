@@ -7,7 +7,7 @@ using System.Text;
 using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
-using View3D.Services;
+using View3D.Services.MeshOptimization;
 
 namespace View3D.Commands.Object
 {
