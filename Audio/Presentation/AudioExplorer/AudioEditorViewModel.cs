@@ -109,7 +109,7 @@ namespace Audio.Presentation.AudioExplorer
             if (selectedNode.Item.Type == FileFormats.WWise.HircType.Sound)
             {
                 var findAudioParentStructureHelper = new FindAudioParentStructureHelper();
-                var parentStructs = findAudioParentStructureHelper.Compute(selectedNode.Item as CAkSound_v136, _audioRepository);
+                var parentStructs = findAudioParentStructureHelper.Compute(selectedNode.Item, _audioRepository);
 
                 SelectedNodeText.Value += "\n\nParent structure:\n";
                 foreach (var parentStruct in parentStructs)

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Navigation;
+using System.Windows.Shapes;
+using Audio.FileFormats.WWise.Hirc;
+using Audio.FileFormats.WWise.Hirc.Shared;
 using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 
@@ -37,7 +40,7 @@ namespace Audio.Utility
             _audioRepository = audioRepository;
         }
 
-        public DecisionPathCollection GetDecisionPaths(CAkDialogueEvent_v136 dialogEvent) => GetDecisionPaths(dialogEvent.AkDecisionTree, dialogEvent.ArgumentList);
+        public DecisionPathCollection GetDecisionPaths(ICADialogEvent dialogEvent) => GetDecisionPaths(dialogEvent.AkDecisionTree, dialogEvent.ArgumentList);
         public DecisionPathCollection GetDecisionPaths(CAkMusicSwitchCntr_v136 musicSwitch) => GetDecisionPaths(musicSwitch.AkDecisionTree, musicSwitch.ArgumentList);
 
         DecisionPathCollection GetDecisionPaths(AkDecisionTree decisionTree, ArgumentList argumentsList)

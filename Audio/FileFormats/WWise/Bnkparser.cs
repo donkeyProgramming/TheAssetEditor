@@ -53,7 +53,7 @@ namespace Audio.FileFormats.WWise
 
                 // Verify index
                 if (chunk.Index != expectedIndexAfterRead)
-                    throw new Exception("Error parsing bnk, incorrect num bytes read");
+                    throw new Exception($"Error parsing bnk with tag '{headerTag}', incorrect num bytes read");
             }
 
             if (chunk.BytesLeft != 0)

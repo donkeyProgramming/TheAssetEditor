@@ -105,4 +105,26 @@ namespace View3D.Services
             return clone;
         }
     }
+
+
+    public class SimplygonOptimizerService
+    {
+        public static MeshObject CreatedReducedCopy(MeshObject original, float factor)
+        {
+            // Code to convert MeshObject into Simplygon format
+            // Call simplygon
+            
+            // Build new vertex buffer based on simplygon mesh
+            var outputVerts = new VertexPositionNormalTextureCustom[destVertices.Length];
+
+            var clone = original.Clone(false);
+            clone.IndexArray = destIndices[0].Select(x => (ushort)x).ToArray();
+            clone.VertexArray = outputVerts;
+
+            clone.RebuildIndexBuffer();
+            clone.RebuildVertexBuffer();
+
+            return clone;
+        }
+    }
 }

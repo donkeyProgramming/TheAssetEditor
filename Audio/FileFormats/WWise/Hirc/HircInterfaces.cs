@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Audio.FileFormats.WWise.Hirc.Shared;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -19,7 +20,15 @@ namespace Audio.FileFormats.WWise.Hirc
     {
         public ActionType GetActionType();
         public uint GetChildId();
+        public uint GetStateGroupId();
     }
+
+    public interface ICADialogEvent
+    {
+        public ArgumentList ArgumentList { get; }
+        public AkDecisionTree AkDecisionTree { get; }
+    }
+
 
     public interface ICAkActorMixer
     {

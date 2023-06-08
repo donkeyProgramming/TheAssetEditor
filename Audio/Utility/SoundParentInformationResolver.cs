@@ -1,5 +1,6 @@
 ﻿using Audio.AudioEditor;
 using Audio.FileFormats.WWise;
+using Audio.FileFormats.WWise.Hirc;
 using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using CommunityToolkit.Diagnostics;
@@ -30,9 +31,10 @@ namespace Audio.Utility
             public uint BusId { get; set; }
         }
 
-        public List<ParentStructure> Compute(CAkSound_v136 sound, IAudioRepository audioRepository)
+        public List<ParentStructure> Compute(HircItem sound, IAudioRepository audioRepository)
         {
             Guard.IsNotNull(sound);
+            Guard.IsNotNull(sound as ICAkSound);
             Guard.IsNotNull(audioRepository);
 
             var output = new List<ParentStructure>();
@@ -42,7 +44,7 @@ namespace Audio.Utility
         }
 
 
-        ParentStructure GetAudioParentStructure(CAkSound_v136 sound, IAudioRepository audioRepository, out List<BusItem> busses)
+        ParentStructure GetAudioParentStructure(HircItem sound, IAudioRepository audioRepository, out List<BusItem> busses)
         {
             busses = new List<BusItem>();
             var output = new ParentStructure()

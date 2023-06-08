@@ -84,12 +84,7 @@ namespace AssetEditor.ViewModels
                 settingsService.Save();
             }
 
-            //var anim3k = new BaseAnimationSlotHelper(GameTypeEnum.ThreeKingdoms).Values.Select(X => X.Value).ToList();
-            //var animWh2 = new BaseAnimationSlotHelper(GameTypeEnum.Warhammer3).Values.Select(X => X.Value).ToList();
-            //var iff = anim3k.Except(animWh2).ToList();
-            //var iff2 = animWh2.Except(animWh2).ToList();
-            //var dsfg = packfileService.Load(@"C:\Users\ole_k\Desktop\3k_animations.pack", false, true);
-            //new BaseAnimationSlotHelper(GameTypeEnum.ThreeKingdoms).ExportAnimationDebugList(packfileService, @"3kanims");
+            settingsService.CurrentSettings.LoadCaPacksByDefault = false;
 
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
             {
@@ -111,7 +106,7 @@ namespace AssetEditor.ViewModels
             {
                 CreateTestPackFiles(packfileService);
                 //AudioTool_Debug.CreateOvnCompilerProject(packfileService);
-                AnimationEditor.MountAnimationCreator.MountAnimationCreator_Debug.CreateLionAndHu01c(this, toolFactory, packfileService);
+                //AnimationEditor.MountAnimationCreator.MountAnimationCreator_Debug.CreateLionAndHu01c(this, toolFactory, packfileService);
 
 
 
@@ -257,20 +252,6 @@ namespace AssetEditor.ViewModels
             //    GC.Collect();
             //    GC.WaitForPendingFinalizers();
             //}
-        }
-
-
-        void DebugCampaignBins(ApplicationSettingsService settingsService)
-        {
-            //var game = GameTypeEnum.Warhammer2;
-            //var gName = GameInformationFactory.GetGameById(game).DisplayName;
-            //var gPath = settingsService.GetGamePathForGame(game);
-            //var gRes = _packfileService.LoadAllCaFiles(gPath, gName);
-            //
-            ////var allFiles = _packfileService.FindAllFilesInDirectory(@"animations/database/campaign/bin");
-            //var allFiles = _packfileService.FindAllFilesInDirectory(@"animations/campaign/database/bin");
-            //
-            //AnimationCampaignBinHelper.BatchProcess(allFiles);
         }
 
         private bool Database_BeforePackFileContainerRemoved(PackFileContainer container)

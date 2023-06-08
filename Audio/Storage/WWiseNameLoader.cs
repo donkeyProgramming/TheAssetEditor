@@ -1,6 +1,7 @@
 ﻿using Audio.FileFormats.Dat;
 using Audio.Utility;
 using CommonControls.Common;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace Audio.Storage
 
         public Dictionary<uint, string> BuildNameHelper()
         {
-            var wh3Db = LoadWhDatDbForWh3(_pfs, out var _);
+            var wh3Db = LoadDatFiles(_pfs, out var _);
             var wh3DbNameList = wh3Db.CreateFileNameList();
             AddNames(wh3DbNameList);
 
@@ -75,8 +76,7 @@ namespace Audio.Storage
             return _nameLookUp;
         }
 
-        // Move to a datfile loader
-        SoundDatFile LoadWhDatDbForWh3(PackFileService pfs, out List<string> failedFiles)
+        SoundDatFile LoadDatFiles(PackFileService pfs, out List<string> failedFiles)
         {
             var datFiles = pfs.FindAllWithExtention(".dat");
             datFiles = PackFileUtil.FilterUnvantedFiles(pfs, datFiles, new[] { "bank_splits.dat", "campaign_music.dat", "battle_music.dat", "icudt61l.dat" }, out var removedFiles);
@@ -87,7 +87,7 @@ namespace Audio.Storage
             {
                 try
                 {
-                    var parsedFile = DatFileParser.Parse(datFile, false);
+                    var parsedFile = LoadDatFile(datFile);
                     masterDat.Merge(parsedFile);
                 }
                 catch (Exception e)
@@ -100,6 +100,19 @@ namespace Audio.Storage
             failedFiles = failedDatParsing.Select(x => x.Item1).ToList();
             return masterDat;
         }
+
+        SoundDatFile LoadDatFile(PackFile datFile)
+        {
+            try
+            {
+                return DatFileParser.Parse(datFile, false);
+            }
+            catch 
+            {
+                return DatFileParser.Parse(datFile, true);
+            }
+        }
+
 
         void AddNames(string[] names)
         {

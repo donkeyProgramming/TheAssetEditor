@@ -44,7 +44,7 @@ namespace CommonControls.Services
                 {
                     MessageBox.Show("You are trying to load a packfile before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
                     
-                    if(System.Diagnostics.Debugger.IsAttached)
+                    if(System.Diagnostics.Debugger.IsAttached == false)
                         return null;
                 }
 

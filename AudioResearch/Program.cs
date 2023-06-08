@@ -42,6 +42,8 @@ namespace AudioResearch
     {
         static void Main(string[] args)
         {
+            new LotrDataLoading().Run();
+            return;
 
             DecisionPathHelper test = new DecisionPathHelper(null);
             test.Write();
@@ -51,6 +53,8 @@ namespace AudioResearch
                 //TestDialogEventSerialization();
                 return;
             }
+
+            
 
             DataExplore();
             //TableTest();
@@ -282,13 +286,9 @@ namespace AudioResearch
 
         static void DataExplore()
         {
-
-            
-
             using var application = new SimpleApplication()
             {
                 SkipLoadingWemFiles = true,
-                LoadAllCaFiles = true,
             };
 
             //var helper = application.GetService<AudioResearchHelper>();

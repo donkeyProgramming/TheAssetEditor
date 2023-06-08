@@ -29,7 +29,7 @@ namespace Audio.AudioEditor
 
         private void ProcessDialogEvent(HircItem item, HircTreeItem parent)
         {
-            var hirc = GetAsType<CAkDialogueEvent_v136>(item);
+            var hirc = GetAsType<ICADialogEvent>(item);
 
             DecisionPathHelper helper = new DecisionPathHelper(_repository);
             var paths = helper.GetDecisionPaths(hirc);
@@ -39,7 +39,7 @@ namespace Audio.AudioEditor
 
             foreach(var path in paths.Paths) 
             {
-                var pathNode = new HircTreeItem() { DisplayName = path.GetAsString(), Item = hirc, IsExpanded = false };
+                var pathNode = new HircTreeItem() { DisplayName = path.GetAsString(), Item = item, IsExpanded = false };
                 dialogEventNode.Children.Add(pathNode);
                 ProcessNext(path.ChildNodeId, pathNode);
             }
@@ -57,7 +57,7 @@ namespace Audio.AudioEditor
 
         void ProcessAction(HircItem item, HircTreeItem parent)
         {
-            var actionHirc = GetAsType<CAkAction_v136>(item);
+            var actionHirc = GetAsType<ICAkAction>(item);
             var actionTreeNode = new HircTreeItem() { DisplayName = $"Action {actionHirc.GetActionType()}", Item = item };
             parent.Children.Add(actionTreeNode);
             var childId = actionHirc.GetChildId();
@@ -65,7 +65,7 @@ namespace Audio.AudioEditor
             // Override child id if type is setState based on parameters 
             if (actionHirc.GetActionType() == ActionType.SetState)
             {
-                var stateGroupId = actionHirc.AkSetStateParams.ulStateGroupID;
+                var stateGroupId = actionHirc.GetStateGroupId();
                 var musicSwitches = _repository.HircObjects
                    .SelectMany(x => x.Value)
                    .Where(X => X.Type == HircType.Music_Switch)
