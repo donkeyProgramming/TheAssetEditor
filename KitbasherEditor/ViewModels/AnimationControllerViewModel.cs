@@ -76,7 +76,7 @@ namespace KitbasherEditor.ViewModels
             SkeletonList = _skeletonAnimationLookUpHelper.SkeletonFileNames;
 
             var animCollection = _componentManager.GetComponent<AnimationsContainerComponent>();
-            _player = animCollection.RegisterAnimationPlayer(new AnimationPlayer(), "MainPlayer");
+            _player = animCollection.RegisterAnimationPlayer(new AnimationPlayer(componentManager), "MainPlayer");
             _player.OnFrameChanged += (currentFrame) => CurrentFrame = currentFrame + 1;
 
             PausePlayCommand = new RelayCommand(OnPlayPause);

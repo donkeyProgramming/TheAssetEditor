@@ -140,7 +140,7 @@ namespace View3D.Animation.MetaData
 
             var meshPath = pfs.FindFile(animatedPropMeta.ModelName);
             var animationPath = pfs.FindFile(animatedPropMeta.AnimationName);
-            var propPlayer = _componentManager.GetComponent<AnimationsContainerComponent>().RegisterAnimationPlayer(new AnimationPlayer(), propName + Guid.NewGuid());
+            var propPlayer = _componentManager.GetComponent<AnimationsContainerComponent>().RegisterAnimationPlayer(new AnimationPlayer(_componentManager), propName + Guid.NewGuid());
 
             // Configure the mesh
             SceneLoader loader = new SceneLoader(resourceLib, pfs, GeometryGraphicsContextFactory.CreateInstance(graphics.Device), _componentManager, _applicationSettingsService);

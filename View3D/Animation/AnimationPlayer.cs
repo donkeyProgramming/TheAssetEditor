@@ -1,10 +1,13 @@
 ﻿using CommonControls.Common;
 using Microsoft.Xna.Framework;
+using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using View3D.Animation.AnimationChange;
+using View3D.Components;
+using View3D.Components.Component.Selection;
 using View3D.Utility;
 
 namespace View3D.Animation
@@ -50,7 +53,7 @@ namespace View3D.Animation
 
 
     public delegate void FrameChanged(int currentFrame);
-    public class AnimationPlayer
+    public class AnimationPlayer : BaseComponent
     {
         public event FrameChanged OnFrameChanged;
 
@@ -58,6 +61,10 @@ namespace View3D.Animation
         TimeSpanExtension _timeSinceStart;
         AnimationFrame _currentAnimFrame;
         AnimationClip _animationClip;
+
+        public AnimationPlayer(IComponentManager componentManager) : base(componentManager)
+        {
+        }
 
         public bool IsPlaying { get; private set; } = true;
         public bool IsEnabled { get; set; } = false;
@@ -97,6 +104,15 @@ namespace View3D.Animation
                     OnFrameChanged?.Invoke(0);
                 }
                 Refresh();
+
+                var selection = ComponentManager.GetComponent<SelectionManager>().GetState<BoneSelectionState>();
+                if(selection != null)
+                {
+                    selection.CurrentAnimation = _animationClip;
+                    selection.Skeleton = _skeleton;
+                    selection.CurrentFrame = CurrentFrame; 
+                }
+                
             }
         }
 

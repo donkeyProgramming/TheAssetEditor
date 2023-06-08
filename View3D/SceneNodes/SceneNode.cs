@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using View3D.Animation;
 using View3D.Components.Component;
 using View3D.Components.Rendering;
 using View3D.Rendering.Geometry;

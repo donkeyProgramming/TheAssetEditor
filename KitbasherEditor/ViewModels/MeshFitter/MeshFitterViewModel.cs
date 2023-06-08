@@ -57,7 +57,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             RelativeScale.PropertyChanged += (_0, _1) => ApplyMeshFittingTransforms();
             MeshBones.SelectedItemChanged += (_) => OnBoneSelected();
 
-            _animationPlayer = _componentManager.GetComponent<AnimationsContainerComponent>().RegisterAnimationPlayer(new AnimationPlayer(), "Temp animation rerig" + Guid.NewGuid());
+            _animationPlayer = _componentManager.GetComponent<AnimationsContainerComponent>().RegisterAnimationPlayer(new AnimationPlayer(componentManager), "Temp animation rerig" + Guid.NewGuid());
             _fromSkeleton = new GameSkeleton(currentSkeletonFile, _animationPlayer);
             
             // Build empty animation

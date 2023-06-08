@@ -3,8 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Media.Animation;
+using View3D.Animation;
+using View3D.Commands.Object;
 using View3D.Rendering.Geometry;
+using View3D.SceneNodes;
 using View3D.Utility;
+using static CommonControls.Editors.AnimationPack.Converters.AnimationBinFileToXmlConverter;
 
 namespace View3D.Utility
 {
@@ -145,6 +150,30 @@ namespace View3D.Utility
             if (vertices.Count() == 0)
                 vertices = null;
             return vertices != null;
+        }
+
+        internal static bool IntersectBones(BoundingFrustum boundingFrustum, Rmv2MeshNode sceneNode, GameSkeleton skeleton, Matrix matrix, out List<int> bones)
+        {
+            bones = new List<int>();
+
+            if (sceneNode.AnimationPlayer == null) return false;
+
+            var animPlayer = sceneNode.AnimationPlayer;
+            var currentFrame = animPlayer.GetCurrentAnimationFrame();
+            var totalBones = currentFrame.BoneTransforms.Count;
+
+            for (int boneIdx= 0; boneIdx < totalBones; boneIdx++)
+            {
+                var bone = currentFrame.GetSkeletonAnimatedWorld(skeleton, boneIdx);
+                bone.Decompose(out var _, out var _, out var trans);
+                if (boundingFrustum.Contains(Vector3.Transform(trans, matrix)) != ContainmentType.Disjoint)
+                    bones.Add(boneIdx);
+            }
+
+            bones = bones.Distinct().ToList();
+            if (bones.Count() == 0)
+                bones = null;
+            return bones != null;
         }
     }
 }

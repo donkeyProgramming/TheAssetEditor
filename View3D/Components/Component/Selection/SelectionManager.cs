@@ -80,7 +80,9 @@ namespace View3D.Components.Component.Selection
                 case GeometrySelectionMode.Vertex:
                     _currentState = new VertexSelectionState(selectedObj, _vertexSelectionFallof);
                     break;
-
+                case GeometrySelectionMode.Bone:
+                    _currentState = new BoneSelectionState(selectedObj);
+                    break;
                 default:
                     throw new Exception();
             }
