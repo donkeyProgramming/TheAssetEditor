@@ -79,6 +79,10 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                     ButtonEnabled = vertexSelectionState.SelectionCount() != 0;
                     ShowVertexFalloff.Value = true;
                 }
+                else if (state is BoneSelectionState boneSelectionState)
+                {
+                    ButtonEnabled = boneSelectionState.SelectionCount() != 0;
+                }
             }
         }
 

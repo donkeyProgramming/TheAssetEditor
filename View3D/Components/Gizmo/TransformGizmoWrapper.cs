@@ -9,6 +9,7 @@ using View3D.Commands.Vertex;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
+using View3D.SceneNodes;
 
 namespace View3D.Components.Gizmo
 {
@@ -56,6 +57,36 @@ namespace View3D.Components.Gizmo
 
                 Position = (Position / vertSelectionState.SelectedVertices.Count);
             }
+        }
+
+
+        public TransformGizmoWrapper(List<int> selectedBones, ISelectionState boneSelection)
+        {
+            _selectionState = boneSelection;
+
+            if (_selectionState is BoneSelectionState boneSelectionState)
+            {
+                _effectedObjects = new List<MeshObject> { boneSelectionState.RenderObject.Geometry };
+
+                var sceneNode = boneSelectionState.RenderObject as Rmv2MeshNode;
+                var animPlayer = sceneNode.AnimationPlayer;
+                var currentFrame = animPlayer.GetCurrentAnimationFrame();
+                var skeleton = boneSelectionState.Skeleton;
+
+                if (currentFrame == null) return;
+                var totalBones = currentFrame.BoneTransforms.Count;
+
+                for (int boneIdx = 0; boneIdx < totalBones; boneIdx++)
+                {
+                    var bone = currentFrame.GetSkeletonAnimatedWorld(skeleton, boneIdx);
+                    bone.Decompose(out var _, out var _, out var trans);
+                    Position += trans;
+
+                }
+
+                Position = (Position / totalBones);
+            }
+
         }
 
         public void Start(CommandExecutor commandManager)
@@ -197,6 +228,11 @@ namespace View3D.Components.Gizmo
             {
                 if (vertexSelectionState.SelectedVertices.Count != 0)
                     return new  TransformGizmoWrapper(new List<MeshObject>(){vertexSelectionState.RenderObject.Geometry}, vertexSelectionState);
+            }
+            else if (state is BoneSelectionState boneSelectionState)
+            {
+                if (boneSelectionState.SelectedBones.Count != 0)
+                    return new TransformGizmoWrapper(boneSelectionState.SelectedBones, boneSelectionState);
             }
             return null;
         }

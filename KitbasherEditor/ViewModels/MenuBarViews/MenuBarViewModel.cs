@@ -46,6 +46,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         SelectObject,
         SelectFace,
         SelectVertex,
+        SelectBone,
         
         ViewOnlySelected,
         FocusSelection,
@@ -313,6 +314,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 _actionList[MenuActionType.SelectFace].TriggerAction();
             else if (state.Mode == GeometrySelectionMode.Vertex)
                 _actionList[MenuActionType.SelectVertex].TriggerAction();
+            else if (state.Mode == GeometrySelectionMode.Bone)
+                _actionList[MenuActionType.SelectBone].TriggerAction();
             else
                 throw new NotImplementedException("Unkown state");
 

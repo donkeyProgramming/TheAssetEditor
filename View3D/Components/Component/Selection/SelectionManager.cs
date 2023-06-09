@@ -17,6 +17,7 @@ using View3D.Rendering.Shading;
 using View3D.Scene;
 using View3D.SceneNodes;
 using View3D.Utility;
+using static CommonControls.Editors.AnimationPack.Converters.AnimationBinFileToXmlConverter;
 
 namespace View3D.Components.Component.Selection
 {
@@ -153,6 +154,32 @@ namespace View3D.Components.Component.Selection
                 var vertexObject = selectionVertexState.RenderObject as Rmv2MeshNode;
                 _renderEngine.AddRenderItem(RenderBuckedId.Selection, new VertexRenderItem() { Node = vertexObject, ModelMatrix = vertexObject.RenderMatrix, SelectedVertices = selectionVertexState, VertexRenderer = VertexRenderer });
                 _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeoRenderItem() { ModelMatrix = vertexObject.RenderMatrix, Geometry = vertexObject.Geometry, Shader = _wireframeEffect });
+            }
+
+            if (selectionState is BoneSelectionState boneSelectionState)
+            {
+                var sceneNode = boneSelectionState.RenderObject as Rmv2MeshNode;
+                var animPlayer = sceneNode.AnimationPlayer;
+                var currentFrame = animPlayer.GetCurrentAnimationFrame();
+                var skeleton = boneSelectionState.Skeleton;
+
+                if (currentFrame != null && skeleton != null)
+                {
+                    var bones = boneSelectionState.CurrentSelection();
+                    var renderMatrix = sceneNode.RenderMatrix;
+                    var parentWorld = Matrix.Identity;
+                    foreach (var boneIdx in bones)
+                    {
+                        //var currentBoneMatrix = boneMatrix * Matrix.CreateScale(ScaleMult);
+                        //var parentBoneMatrix = Skeleton.GetAnimatedWorldTranform(parentIndex) * Matrix.CreateScale(ScaleMult);
+                        //_lineRenderer.AddLine(Vector3.Transform(currentBoneMatrix.Translation, parentWorld), Vector3.Transform(parentBoneMatrix.Translation, parentWorld));
+                        var bone = currentFrame.GetSkeletonAnimatedWorld(skeleton, boneIdx);
+                        bone.Decompose(out var _, out var _, out var trans);
+                        _lineGeometry.AddCube(Matrix.CreateScale(0.05f) *  bone * renderMatrix * parentWorld, Color.Red);
+                        _renderEngine.AddRenderItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = _lineGeometry, ModelMatrix = Matrix.Identity });
+
+                    }
+                }
             }
 
             base.Draw(gameTime);

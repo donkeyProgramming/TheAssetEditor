@@ -112,7 +112,9 @@ namespace View3D.Components.Gizmo
 
         public override void Update(GameTime gameTime)
         {
-            if ( !(_selectionManager.GetState().Mode == GeometrySelectionMode.Object || _selectionManager.GetState().Mode == GeometrySelectionMode.Vertex))
+            if ( !(_selectionManager.GetState().Mode == GeometrySelectionMode.Object || 
+                   _selectionManager.GetState().Mode == GeometrySelectionMode.Vertex ||
+                   _selectionManager.GetState().Mode == GeometrySelectionMode.Bone))
                 return;
 
             if (!_isEnabled)
@@ -150,7 +152,9 @@ namespace View3D.Components.Gizmo
 
         public override void Draw(GameTime gameTime)
         {
-            if (!(_selectionManager.GetState().Mode == GeometrySelectionMode.Object || _selectionManager.GetState().Mode == GeometrySelectionMode.Vertex))
+            if (!(_selectionManager.GetState().Mode == GeometrySelectionMode.Object || 
+                  _selectionManager.GetState().Mode == GeometrySelectionMode.Vertex ||
+                  _selectionManager.GetState().Mode == GeometrySelectionMode.Bone))
                 return;
             if (!_isEnabled)
                 return;

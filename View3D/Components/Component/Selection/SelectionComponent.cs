@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
+using View3D.Commands.Bone;
 using View3D.Commands.Face;
 using View3D.Commands.Object;
 using View3D.Commands.Vertex;
@@ -145,12 +146,13 @@ namespace View3D.Components.Component.Selection
                 var vertexObject = boneState.RenderObject as Rmv2MeshNode;
                 if (GeometryIntersection.IntersectBones(unprojectedSelectionRect, vertexObject, boneState.Skeleton, vertexObject.RenderMatrix, out var bones))
                 {
-                    foreach (var bone in bones)
+                    foreach (var bone in boneState.SelectedBones)
                     {
                         _logger.Information($"bone id: {bone}");
                     }
-                    //throw new Exception("test");
                     //TODO: select the bone and display the gizmo 
+                    var boneSelectionCommand = new BoneSelectionCommand(bones, true, removeSelection);
+                    _commandManager.ExecuteCommand(boneSelectionCommand);
                     return;
                 }
             }
