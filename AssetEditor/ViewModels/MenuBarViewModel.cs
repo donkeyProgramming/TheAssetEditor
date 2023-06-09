@@ -88,8 +88,9 @@ namespace AssetEditor.ViewModels
         public ICommand OpenPropCreatorCommand { get; set; }
         public ICommand OpenAnimationTransferToolCommand { get; set; }
         public ICommand OpenSuperViewToolCommand { get; set; }
-        public ICommand OpenTechSkeletonEditorCommand { get; set; }
-     
+        public ICommand OpenTechSkeletonEditorCommand { get; set; }        
+
+
         public ICommand GenerateRmv2ReportCommand { get; set; }
         public ICommand GenerateMetaDataReportCommand { get; set; }
         public ICommand GenerateFileListReportCommand { get; set; }

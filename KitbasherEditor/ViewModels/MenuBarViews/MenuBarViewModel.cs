@@ -46,6 +46,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         SelectObject,
         SelectFace,
         SelectVertex,
+        SelectBone,
         
         ViewOnlySelected,
         FocusSelection,
@@ -147,6 +148,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _actionList[MenuActionType.SelectObject] = new MenuAction(() => { Gizmo.UpdateSelectionMode(GeometrySelectionMode.Object); }) { EnableRule = ActionEnabledRule.Always, ToolTip = "Object Mode", Hotkey = new Hotkey(Key.F1, ModifierKeys.None) };
             _actionList[MenuActionType.SelectFace] = new MenuAction(() => { Gizmo.UpdateSelectionMode(GeometrySelectionMode.Face); }) { EnableRule = ActionEnabledRule.Always, ToolTip = "Face Mode", Hotkey = new Hotkey(Key.F2, ModifierKeys.None) };
             _actionList[MenuActionType.SelectVertex] = new MenuAction(() => { Gizmo.UpdateSelectionMode(GeometrySelectionMode.Vertex); }) { EnableRule = ActionEnabledRule.Always, ToolTip = "Vertex Mode", Hotkey = new Hotkey(Key.F3, ModifierKeys.None) };
+            _actionList[MenuActionType.SelectBone] = new MenuAction(() => { Gizmo.UpdateSelectionMode(GeometrySelectionMode.Bone); }) { EnableRule = ActionEnabledRule.Always, ToolTip = "Bone Mode", Hotkey = new Hotkey(Key.F10, ModifierKeys.None) };
 
             _actionList[MenuActionType.ViewOnlySelected] = new MenuAction(Tools.ToggleShowSelection) { EnableRule = ActionEnabledRule.Always, ToolTip = "View only selected", Hotkey = new Hotkey(Key.Space, ModifierKeys.None) };
             _actionList[MenuActionType.ResetCamera] = new MenuAction(General.ResetCamera) { EnableRule = ActionEnabledRule.Always, ToolTip = "Reset camera", Hotkey = new Hotkey(Key.F4, ModifierKeys.None) };
@@ -313,6 +315,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 _actionList[MenuActionType.SelectFace].TriggerAction();
             else if (state.Mode == GeometrySelectionMode.Vertex)
                 _actionList[MenuActionType.SelectVertex].TriggerAction();
+            else if (state.Mode == GeometrySelectionMode.Bone)
+                _actionList[MenuActionType.SelectBone].TriggerAction();
             else
                 throw new NotImplementedException("Unkown state");
 

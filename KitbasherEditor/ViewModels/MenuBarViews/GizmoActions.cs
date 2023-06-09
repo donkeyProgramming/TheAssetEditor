@@ -30,6 +30,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 _selectionComponent.SetFaceSelectionMode();
             else if (mode == GeometrySelectionMode.Vertex)
                 _selectionComponent.SetVertexSelectionMode();
+            else if (mode == GeometrySelectionMode.Bone)
+                _selectionComponent.SetBoneSelectionMode();
             else
                 throw new NotImplementedException("Unkown state");
         }

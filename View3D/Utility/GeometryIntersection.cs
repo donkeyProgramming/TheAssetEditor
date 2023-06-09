@@ -160,6 +160,8 @@ namespace View3D.Utility
 
             var animPlayer = sceneNode.AnimationPlayer;
             var currentFrame = animPlayer.GetCurrentAnimationFrame();
+
+            if (currentFrame == null) return false;
             var totalBones = currentFrame.BoneTransforms.Count;
 
             for (int boneIdx= 0; boneIdx < totalBones; boneIdx++)
