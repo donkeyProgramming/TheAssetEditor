@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using View3D.Commands;
+using View3D.Commands.Bone;
 using View3D.Commands.Vertex;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
@@ -26,7 +28,7 @@ namespace View3D.Components.Gizmo
         Quaternion _orientation = Quaternion.Identity;
         public Quaternion Orientation { get => _orientation; set { _orientation = value; } }
 
-        TransformVertexCommand _activeCommand;
+        ICommand _activeCommand;
 
         List<MeshObject> _effectedObjects;
         ISelectionState _selectionState;
@@ -74,9 +76,10 @@ namespace View3D.Components.Gizmo
                 var skeleton = boneSelectionState.Skeleton;
 
                 if (currentFrame == null) return;
-                var totalBones = currentFrame.BoneTransforms.Count;
 
-                for (int boneIdx = 0; boneIdx < totalBones; boneIdx++)
+                var bones = boneSelectionState.SelectedBones;
+                var totalBones = bones.Count;
+                foreach (var boneIdx in bones)
                 {
                     var bone = currentFrame.GetSkeletonAnimatedWorld(skeleton, boneIdx);
                     bone.Decompose(out var _, out var _, out var trans);
@@ -94,24 +97,48 @@ namespace View3D.Components.Gizmo
             if (_activeCommand != null)
             {
                  //   MessageBox.Show("Transform debug check - Please inform the creator of the tool that you got this message. Would also love it if you tried undoing your last command to see if that works..\n E-001");
-                _activeCommand.InvertWindingOrder = _invertedWindingOrder;
-                _activeCommand.Transform = _totalGizomTransform;
-                _activeCommand.PivotPoint = Position;
-                commandManager.ExecuteCommand(_activeCommand);
-                _activeCommand = null;
+                 if(_activeCommand is TransformVertexCommand transformVertexCommand)
+                {
+                    transformVertexCommand.InvertWindingOrder = _invertedWindingOrder;
+                    transformVertexCommand.Transform = _totalGizomTransform;
+                    transformVertexCommand.PivotPoint = Position;
+                    commandManager.ExecuteCommand(_activeCommand);
+                    _activeCommand = null;
+                }
+                else if (_activeCommand is TransformBoneCommand transformBoneCommand)
+                {
+                    transformBoneCommand.Transform = _totalGizomTransform;
+                    transformBoneCommand.PivotPoint = Position;
+                    commandManager.ExecuteCommand(_activeCommand);
+                    _activeCommand = null;
+                }
             }
 
             _totalGizomTransform = Matrix.Identity;
-            _activeCommand = new TransformVertexCommand(_effectedObjects, Position);
+            if(_selectionState is BoneSelectionState boneSelectionState)
+            {
+                _activeCommand = new TransformBoneCommand(boneSelectionState.SelectedBones, Position, boneSelectionState);
+            }
+            else
+            {
+                _activeCommand = new TransformVertexCommand(_effectedObjects, Position);
+            }
         }
 
         public void Stop(CommandExecutor commandManager)
         {
-            if (_activeCommand != null)
+            if (_activeCommand is TransformVertexCommand transformVertexCommand)
             {
-                _activeCommand.InvertWindingOrder = _invertedWindingOrder;
-                _activeCommand.Transform = _totalGizomTransform;
-                _activeCommand.PivotPoint = Position;
+                transformVertexCommand.InvertWindingOrder = _invertedWindingOrder;
+                transformVertexCommand.Transform = _totalGizomTransform;
+                transformVertexCommand.PivotPoint = Position;
+                commandManager.ExecuteCommand(_activeCommand);
+                _activeCommand = null;
+            }
+            else if (_activeCommand is TransformBoneCommand transformBoneCommand)
+            {
+                transformBoneCommand.Transform = _totalGizomTransform;
+                transformBoneCommand.PivotPoint = Position;
                 commandManager.ExecuteCommand(_activeCommand);
                 _activeCommand = null;
             }

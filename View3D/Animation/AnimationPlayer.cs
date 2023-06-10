@@ -4,6 +4,7 @@ using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Windows;
 using View3D.Animation.AnimationChange;
 using View3D.Components;
@@ -34,7 +35,10 @@ namespace View3D.Animation
 
         public List<BoneKeyFrame> BoneTransforms = new List<BoneKeyFrame>();
         
-
+        public Matrix GetLocalTransform(int boneIndex)
+        {
+            return BoneTransforms[boneIndex].WorldTransform;
+        }
 
         public Matrix GetSkeletonAnimatedWorld(GameSkeleton gameSkeleton, int boneIndex)
         {
@@ -48,6 +52,12 @@ namespace View3D.Animation
             var bone1Transform = GetSkeletonAnimatedWorld(gameSkeleton, boneIndex1);
 
             return bone1Transform * Matrix.Invert(bone0Transform);
+        }
+
+        public Matrix GetSkeletonAnimatedBoneFromWorld(GameSkeleton gameSkeleton, int boneIndex, Matrix objectInWorldTransform)
+        {
+            Matrix output = Matrix.Invert(gameSkeleton.GetWorldTransform(boneIndex)) * objectInWorldTransform;
+            return output;
         }
     }
 
