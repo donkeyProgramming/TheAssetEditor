@@ -17,7 +17,6 @@ namespace View3D.Services.MeshOptimization
 
             return GetMeshFromPackedGeometry(originalMesh, reducedPackedGeometryData);
         }
-
         private static spGeometryData InitSimplygonGeometry(ISimplygon sg, MeshObject originalMesh)
         {
             // -- create SG GeomtryData object and allocate space for mesh
