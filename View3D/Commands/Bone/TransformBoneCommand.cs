@@ -15,22 +15,17 @@ namespace View3D.Commands.Bone
         BoneSelectionState _boneSelectionState;
         int _currentFrame;
         AnimationClip.KeyFrame _oldFrame;
-
-        public Vector3 PivotPoint;
         public Matrix Transform { get; set; }
 
-        SelectionManager _selectionManager;
         ISelectionState _oldSelectionState;
 
 
-        public TransformBoneCommand(List<int> selectedBones, Vector3 pivotPoint, BoneSelectionState state)
+        public TransformBoneCommand(List<int> selectedBones, BoneSelectionState state)
         {
             _selectedBones = selectedBones;
             _boneSelectionState = state;
             _currentFrame = state.CurrentFrame;
             _oldFrame = state.CurrentAnimation.DynamicFrames[_currentFrame].Copy();
-
-            PivotPoint = pivotPoint;
         }
 
         public override string GetHintText()
@@ -40,35 +35,43 @@ namespace View3D.Commands.Bone
 
         public override void Initialize(IComponentManager componentManager)
         {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
+            
         }
 
         protected override void ExecuteCommand()
         {
-            _oldSelectionState = _selectionManager.GetStateCopy();
+            _oldSelectionState = _boneSelectionState;
+            _oldFrame = _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Copy();
+        }
+
+        public void ApplyTransformation(Matrix newPosition)
+        {
             Console.WriteLine($" gizmo moved: {Transform.Translation}");
-            Console.WriteLine($" gizmo pivotPoint: {PivotPoint}");
-            var selectedBone = _selectedBones[0];
-            var node = _boneSelectionState.RenderObject as Rmv2MeshNode;
-            var animationPlayer = node.AnimationPlayer;
-            var currentAnimFrame = animationPlayer.GetCurrentAnimationFrame();
-            var currentLocalBoneTransform = currentAnimFrame.GetLocalTransform(selectedBone);
-            var currentBoneWorldTransform = currentAnimFrame.GetSkeletonAnimatedWorld(_boneSelectionState.Skeleton, selectedBone);
-            Console.WriteLine($"current bone pos: {currentBoneWorldTransform.Translation}");
-            Console.WriteLine($"current bone local pos: {currentLocalBoneTransform.Translation}");
-            currentBoneWorldTransform.Translation = currentBoneWorldTransform.Translation + Transform.Translation;
-            var newBoneTransform = currentAnimFrame.GetSkeletonAnimatedBoneFromWorld(_boneSelectionState.Skeleton, selectedBone, currentBoneWorldTransform );
-            Console.WriteLine($"new bone local pos: {newBoneTransform.Translation}");
-            Console.WriteLine($"new bone pos: {currentBoneWorldTransform.Translation}");
+            //Console.WriteLine($" gizmo pivotPoint: {PivotPoint}");
+            foreach (var selectedBone in _selectedBones)
+            {
+                var node = _boneSelectionState.RenderObject as Rmv2MeshNode;
+                var animationPlayer = node.AnimationPlayer;
+                var currentAnimFrame = animationPlayer.GetCurrentAnimationFrame();
+                var currentBoneWorldTransform = currentAnimFrame.GetSkeletonAnimatedWorld(_boneSelectionState.Skeleton, selectedBone);
+                currentBoneWorldTransform.Translation += Transform.Translation;
+                var newBoneTransform = currentAnimFrame.GetSkeletonAnimatedBoneFromWorld(_boneSelectionState.Skeleton, selectedBone, newPosition);
+                //currentBoneWorldTransform.Decompose(out var _, out var _, out var trans);
+                //var delta = PivotPoint - currentBoneWorldTransform.Translation;
+                Console.WriteLine(_boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Position[selectedBone]);
+                newBoneTransform.Decompose(out var scale, out var rot, out var trans);
 
-            //convert bone from world pos to bone pos
-            //manipulate the bones
-
+                _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Position[selectedBone] += trans;
+                _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Rotation[selectedBone] = rot;
+                _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Scale[selectedBone] = scale;
+            }
         }
 
         protected override void UndoCommand()
         {
-            //restore from _oldFrame
+            var selectionState = _oldSelectionState as BoneSelectionState;
+            selectionState.CurrentAnimation.DynamicFrames[_currentFrame] = _oldFrame;
+
         }
 
     }

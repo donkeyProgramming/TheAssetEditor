@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Media.Animation;
 using View3D.Commands;
 using View3D.Commands.Bone;
 using View3D.Commands.Vertex;
@@ -82,8 +83,13 @@ namespace View3D.Components.Gizmo
                 foreach (var boneIdx in bones)
                 {
                     var bone = currentFrame.GetSkeletonAnimatedWorld(skeleton, boneIdx);
-                    bone.Decompose(out var _, out var _, out var trans);
+                    bone.Decompose(out var scale, out var rot, out var trans);
                     Position += trans;
+
+                    //TODO: FIXME compute the average quarternion of selected bones
+                    Orientation = rot;
+                    //TODO: FIXME compute the average scale of selected bones
+                    Scale = scale;
 
                 }
 
@@ -107,8 +113,9 @@ namespace View3D.Components.Gizmo
                 }
                 else if (_activeCommand is TransformBoneCommand transformBoneCommand)
                 {
-                    transformBoneCommand.Transform = _totalGizomTransform;
-                    transformBoneCommand.PivotPoint = Position;
+                    var matrix = _totalGizomTransform;
+                    matrix.Translation = Position;
+                    transformBoneCommand.Transform = matrix;
                     commandManager.ExecuteCommand(_activeCommand);
                     _activeCommand = null;
                 }
@@ -117,7 +124,7 @@ namespace View3D.Components.Gizmo
             _totalGizomTransform = Matrix.Identity;
             if(_selectionState is BoneSelectionState boneSelectionState)
             {
-                _activeCommand = new TransformBoneCommand(boneSelectionState.SelectedBones, Position, boneSelectionState);
+                _activeCommand = new TransformBoneCommand(boneSelectionState.SelectedBones, boneSelectionState);
             }
             else
             {
@@ -137,8 +144,9 @@ namespace View3D.Components.Gizmo
             }
             else if (_activeCommand is TransformBoneCommand transformBoneCommand)
             {
-                transformBoneCommand.Transform = _totalGizomTransform;
-                transformBoneCommand.PivotPoint = Position;
+                var matrix = _totalGizomTransform;
+                matrix.Translation = Position;
+                transformBoneCommand.Transform = matrix;
                 commandManager.ExecuteCommand(_activeCommand);
                 _activeCommand = null;
             }
@@ -199,6 +207,17 @@ namespace View3D.Components.Gizmo
         {
             transform.Decompose(out var scale, out var rot, out var trans);
 
+
+            if(_selectionState is BoneSelectionState boneSelectionState)
+            {
+                var objCenter = Vector3.Zero;
+                if (pivotType == PivotType.ObjectCenter)
+                    objCenter = Position;
+
+                TransformBone(Matrix.CreateTranslation(Position) * Matrix.CreateFromQuaternion(Orientation), objCenter);
+                return;
+            }
+
             foreach (var geo in _effectedObjects)
             {
                 var objCenter = Vector3.Zero;
@@ -232,6 +251,14 @@ namespace View3D.Components.Gizmo
             }
         }
 
+        void TransformBone(Matrix transform, Vector3 objCenter)
+        {
+            if(_activeCommand is TransformBoneCommand transformBoneCommand)
+            {
+                var m = Matrix.CreateTranslation(-objCenter) * transform * Matrix.CreateTranslation(objCenter);
+                transformBoneCommand.ApplyTransformation(m);
+            }
+        }
         void TransformVertex(Matrix transform, MeshObject geo, Vector3 objCenter, int index)
         {
             var m = Matrix.CreateTranslation(-objCenter) * transform * Matrix.CreateTranslation(objCenter);

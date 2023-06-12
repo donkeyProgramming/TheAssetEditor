@@ -35,11 +35,6 @@ namespace View3D.Animation
 
         public List<BoneKeyFrame> BoneTransforms = new List<BoneKeyFrame>();
         
-        public Matrix GetLocalTransform(int boneIndex)
-        {
-            return BoneTransforms[boneIndex].WorldTransform;
-        }
-
         public Matrix GetSkeletonAnimatedWorld(GameSkeleton gameSkeleton, int boneIndex)
         {
             Matrix output = gameSkeleton.GetWorldTransform(boneIndex) * BoneTransforms[boneIndex].WorldTransform;
@@ -56,7 +51,8 @@ namespace View3D.Animation
 
         public Matrix GetSkeletonAnimatedBoneFromWorld(GameSkeleton gameSkeleton, int boneIndex, Matrix objectInWorldTransform)
         {
-            Matrix output = Matrix.Invert(gameSkeleton.GetWorldTransform(boneIndex)) * objectInWorldTransform;
+            var parentIndex = BoneTransforms[boneIndex].ParentBoneIndex;
+            Matrix output =  objectInWorldTransform * Matrix.Invert(GetSkeletonAnimatedWorld(gameSkeleton, boneIndex));
             return output;
         }
     }
