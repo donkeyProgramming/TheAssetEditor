@@ -16,6 +16,7 @@ namespace View3D.Commands.Bone
         int _currentFrame;
         AnimationClip.KeyFrame _oldFrame;
         public Matrix Transform { get; set; }
+        private Matrix _oldTransform = Matrix.Identity;
 
         ISelectionState _oldSelectionState;
 
@@ -46,6 +47,14 @@ namespace View3D.Commands.Bone
 
         public void ApplyTransformation(Matrix newPosition)
         {
+            if(_oldTransform ==  Matrix.Identity)
+            {
+                _oldTransform = newPosition;
+                return;
+            }
+
+            var matrixDelta = newPosition - _oldTransform;
+            _oldTransform = newPosition;
             Console.WriteLine($" gizmo moved: {Transform.Translation}");
             //Console.WriteLine($" gizmo pivotPoint: {PivotPoint}");
             foreach (var selectedBone in _selectedBones)
@@ -54,10 +63,9 @@ namespace View3D.Commands.Bone
                 var animationPlayer = node.AnimationPlayer;
                 var currentAnimFrame = animationPlayer.GetCurrentAnimationFrame();
                 var currentBoneWorldTransform = currentAnimFrame.GetSkeletonAnimatedWorld(_boneSelectionState.Skeleton, selectedBone);
-                currentBoneWorldTransform.Translation += Transform.Translation;
-                var newBoneTransform = currentAnimFrame.GetSkeletonAnimatedBoneFromWorld(_boneSelectionState.Skeleton, selectedBone, newPosition);
-                //currentBoneWorldTransform.Decompose(out var _, out var _, out var trans);
-                //var delta = PivotPoint - currentBoneWorldTransform.Translation;
+                currentBoneWorldTransform.Translation += matrixDelta.Translation;
+                var newBoneTransform = currentAnimFrame.GetSkeletonAnimatedBoneFromWorld(_boneSelectionState.Skeleton, selectedBone, currentBoneWorldTransform);
+
                 Console.WriteLine(_boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Position[selectedBone]);
                 newBoneTransform.Decompose(out var scale, out var rot, out var trans);
 
