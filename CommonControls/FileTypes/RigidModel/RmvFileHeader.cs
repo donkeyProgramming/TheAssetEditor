@@ -29,7 +29,8 @@ namespace CommonControls.FileTypes.RigidModel
                 if (result == false)
                     throw new Exception();
                 return Util.SanatizeFixedString(value);
-            }
+
+}
             set
             {
                 SetSkeletonName(value);

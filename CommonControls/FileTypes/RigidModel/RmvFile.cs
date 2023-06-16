@@ -14,14 +14,16 @@ namespace CommonControls.FileTypes.RigidModel
 
     public class RmvFile
     {
+
         public RmvFileHeader Header { get; set; }
         public RmvLodHeader[] LodHeaders { get; set; }
         public RmvModel[][] ModelList { get; set; }
 
-        public RmvFile() { }
+        public RmvFile() { }       
 
         public void UpdateOffsets()
         {
+
             for (int lodIndex = 0; lodIndex < Header.LodCount; lodIndex++)
             {
                 for (var modelIndex = 0; modelIndex < ModelList[lodIndex].Length; modelIndex++)
@@ -65,5 +67,8 @@ namespace CommonControls.FileTypes.RigidModel
 
             model.CommonHeader = header;
         }
+
+ 
+
     }
 }

@@ -8,7 +8,6 @@ using System.Text;
 
 namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 {
-
     public class CustomTerrainMaterial : IMaterial
     {
         public VertexFormat BinaryVertexFormat { get; set; } = VertexFormat.CustomTerrain;
@@ -75,6 +74,11 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                 MaterialId = materialId,
                 TexturePath = Util.SanatizeFixedString(Encoding.ASCII.GetString(header.TexturePath)),
             };
+        }
+
+        public IMaterial CreateEmpty(ModelMaterialEnum materialId, RmvVersionEnum rmvType, VertexFormat vertexFormat)
+        { 
+            return new CustomTerrainMaterial();
         }
 
         public byte[] Save(IMaterial material)

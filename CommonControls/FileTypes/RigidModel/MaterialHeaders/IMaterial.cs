@@ -26,6 +26,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
     public interface IMaterialCreator
     {
         IMaterial Create(ModelMaterialEnum materialId, RmvVersionEnum rmvType, byte[] dataArray, int dataOffset);
+        IMaterial CreateEmpty(ModelMaterialEnum materialId, RmvVersionEnum rmvType, VertexFormat vertexFormat);
         byte[] Save(IMaterial material);
     }
 }

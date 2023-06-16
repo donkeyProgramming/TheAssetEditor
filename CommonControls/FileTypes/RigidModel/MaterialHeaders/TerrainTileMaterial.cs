@@ -87,6 +87,10 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                 BinaryVertexFormat = VertexFormat.Position16_bit,
             };
         }
+        public IMaterial CreateEmpty(ModelMaterialEnum materialId, RmvVersionEnum rmvType, VertexFormat vertexFormat)
+        {            
+            return new CustomTerrainMaterial();
+        }
 
         public byte[] Save(IMaterial material)
         {

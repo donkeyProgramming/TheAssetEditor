@@ -1,5 +1,6 @@
 ﻿using CommonControls.Common;
 using Serilog;
+using SharpDX.MediaFoundation;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,8 +19,8 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
         {
             // Get all the weighted materials. Different enums, but same header
             var weightedEnums = ModelMaterialEnumHelper.GetAllWeightedMaterials();
-            foreach(var enumValue in weightedEnums)
-                _materialCreators[enumValue] = new WeighterMaterialCreator();
+            foreach (var enumValue in weightedEnums)
+                _materialCreators[enumValue] = new WeightedMaterialCreator();
 
             _materialCreators[ModelMaterialEnum.TerrainTiles] = new TerrainTileMaterialCreator();
             _materialCreators[ModelMaterialEnum.custom_terrain] = new CustomTerrainMaterialCreator();
@@ -34,12 +35,12 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                     var material = _materialCreators[modelTypeEnum].Create(modelTypeEnum, rmvType, data, offset);
                     var actualMaterialSize = material.ComputeSize();
 
-                    var bytesLeft = expectedMaterialSize - actualMaterialSize; 
+                    var bytesLeft = expectedMaterialSize - actualMaterialSize;
                     if (bytesLeft != 0)
                     {
                         byte[] outputArray = new byte[expectedMaterialSize - actualMaterialSize];
-                        Array.ConstrainedCopy(data,  (int)(offset + actualMaterialSize), outputArray,0, (int)(expectedMaterialSize - actualMaterialSize));
-                        File.WriteAllBytes(DirectoryHelper.Temp + "\\ExtraData_"  + modelTypeEnum  + "_Start_" + offset + actualMaterialSize + "_Size_" + (expectedMaterialSize - actualMaterialSize) + ".data", outputArray);
+                        Array.ConstrainedCopy(data, (int)(offset + actualMaterialSize), outputArray, 0, (int)(expectedMaterialSize - actualMaterialSize));
+                        File.WriteAllBytes(DirectoryHelper.Temp + "\\ExtraData_" + modelTypeEnum + "_Start_" + offset + actualMaterialSize + "_Size_" + (expectedMaterialSize - actualMaterialSize) + ".data", outputArray);
                         throw new Exception($"Part of material {modelTypeEnum} header not read - {bytesLeft} bytes left in header.");
                     }
 
@@ -59,7 +60,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                         File.WriteAllBytes(DirectoryHelper.Temp + "\\ExtraData_" + modelTypeEnum + "_Start_" + offset + actualMaterialSize + "_Size_" + (expectedMaterialSize - actualMaterialSize) + ".data", outputArray);
                         throw new Exception($"Uknown material - {modelTypeEnum} header not read. Expected Size = {expectedMaterialSize} Actual Size = {actualMaterialSize}");
                     }
-                    
+
                     return material;
                 }
             }
@@ -69,11 +70,32 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
             }
         }
 
+        public IMaterial CreateMaterial(RmvVersionEnum rmvType, ModelMaterialEnum modelTypeEnum, VertexFormat vertexFormat)
+        {
+            if (_materialCreators.ContainsKey(modelTypeEnum))
+            {
+                var material = _materialCreators[modelTypeEnum].CreateEmpty(modelTypeEnum, rmvType, vertexFormat);
+
+                return material;
+            }
+
+            throw new Exception($"Error Creating material - {modelTypeEnum} is not a supported material");
+        }
+
         public byte[] Save(ModelMaterialEnum modelTypeEnum, IMaterial material)
         {
             return _materialCreators[modelTypeEnum].Save(material);
         }
 
         public List<ModelMaterialEnum> GetSupportedMaterials() => _materialCreators.Keys.Select(x => x).ToList();
+
+        /// <summary>
+        /// Rertunns the supported material Creators
+        /// </summary>        
+        public Dictionary<ModelMaterialEnum, IMaterialCreator> GetSuppertedCreators() => _materialCreators;
+
+
+
+
     }
 }

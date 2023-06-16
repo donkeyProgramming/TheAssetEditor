@@ -87,7 +87,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                 stringParamSize += res.Length;
             }
 
-            var headerDataSize = (uint)(ByteHelper.GetSize<WeightedMaterialStruct>() +
+            var headerDataSize = (uint)(ByteHelper.GetSize<CommonMaterialStruct>() +
                 ByteHelper.GetSize<RmvAttachmentPoint>() * AttachmentPointParams.Count +
                 ByteHelper.GetSize<RmvTexture>() * TexturesParams.Count +
                 stringParamSize +
@@ -171,12 +171,15 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
         }
     }
 
-    public class WeighterMaterialCreator : IMaterialCreator
+    /// <summary>
+    /// TODO: Renamamed from "WeightedMaterialCreator as it fits for at lest 7 RigidMaterials, the most common ones
+    /// </summary>
+    public class WeightedMaterialCreator : IMaterialCreator
     {
         public IMaterial Create(ModelMaterialEnum materialId, RmvVersionEnum rmvType, byte[] dataArray, int dataOffset)
         {
-            var Header = ByteHelper.ByteArrayToStructure<WeightedMaterialStruct>(dataArray, dataOffset);
-            dataOffset += ByteHelper.GetSize<WeightedMaterialStruct>();
+            var Header = ByteHelper.ByteArrayToStructure<CommonMaterialStruct>(dataArray, dataOffset);
+            dataOffset += ByteHelper.GetSize<CommonMaterialStruct>();
             var material = new WeightedMaterial()
             {
                 AttachmentPointParams = LoadAttachmentPoints(Header.AttachmentPointCount, dataArray, ref dataOffset),
@@ -205,6 +208,34 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
             return material;
         }
 
+        public IMaterial CreateEmpty(ModelMaterialEnum materialId, RmvVersionEnum rmvType, VertexFormat vertexFormat)
+        {
+            // TODO: DEBUGGIN: remove these 2 line where sure they are not needed for this
+            //var Header = ByteHelper.ByteArrayToStructure<WeightedMaterialStruct>(dataArray, dataOffset);
+            //dataOffset += ByteHelper.GetSize<WeightedMaterialStruct>();
+            var material = new WeightedMaterial()
+            {
+                MaterialId = ModelMaterialEnum.weighted,
+                BinaryVertexFormat = vertexFormat,
+                ModelName = "mesh1",
+                TextureDirectory = "variantmeshes\\mesh1",
+                OriginalTransform = new RmvTransform(),
+                Filters = new string(""),
+                PivotPoint = new Vector3(0, 0, 0),
+                StringParams = new List<String>(),
+                FloatParams = new List<float>(),
+                Vec4Params = new List<RmvVector4>(),
+                IntParams = new List<int>(),
+                AttachmentPointParams = new List<RmvAttachmentPoint>(),
+                TexturesParams = new List<RmvTexture>(),
+            };
+
+            // Alpha mode
+            material.AlphaMode = AlphaMode.Opaque;
+            
+            return material;
+        }
+
         public byte[] Save(IMaterial material)
         {
             var typedMaterial = material as WeightedMaterial;
@@ -212,7 +243,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                 throw new Exception("Incorrect material provided for WeightedMaterial::Save");
 
             // Create the header
-            var header = new WeightedMaterialStruct()
+            var header = new CommonMaterialStruct()
             {
                 _vertexType = (ushort)typedMaterial.BinaryVertexFormat,
                 _modelName = ByteHelper.CreateFixLengthString(typedMaterial.ModelName, 32),
@@ -396,7 +427,10 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 
     }
 
-    struct WeightedMaterialStruct
+    /// <summary>
+    /// TODO: Renamed this struct from "WeightedMaterialStruct" as it the same for several RigidMaterials
+    /// </summary>
+    struct CommonMaterialStruct
     {
         public ushort _vertexType;
 

@@ -1,9 +1,11 @@
-﻿using CommonControls.Common;
+﻿using Assimp;
+using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel.Transforms;
 using CommonControls.Services;
 using Filetypes.ByteParsing;
 using Serilog;
+using SharpDX;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -169,6 +171,42 @@ namespace CommonControls.FileTypes.Animation
             return header;
         }
 
+        public int GetIdFromBoneName(string name)
+        {
+            var result = Bones.Where(x => x.Name == name);
+
+            var id = result.FirstOrDefault();
+
+            return (id==null ? -1 : id.Id);
+    
+             
+
+            //int id1 =
+            
+
+   var boneNameQuery = from bone in Bones
+                    where bone.Name.ToLower().Equals(name.ToLower())
+                    select bone;
+
+    if (boneNameQuery.Count() == 0)
+    {
+        return -1;
+    }
+
+    return boneNameQuery.First().Id;           
+
+    // ------------------ OLD CODE ---------------------------
+            
+    foreach (var bone in Bones)
+    {
+        if (bone.Name.ToLower() == name.ToLower())
+        {
+            return bone.Id;
+        }
+    }
+
+    return -1;
+}
 
         public static AnimationFile Create(PackFile file)
         {

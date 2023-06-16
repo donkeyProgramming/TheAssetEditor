@@ -1,7 +1,9 @@
 using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
+using CommonControls.ModelImportExport;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -12,7 +14,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Forms.Integration;
 using System.Windows.Input;
+
 
 namespace CommonControls.PackFileBrowser
 {
@@ -26,6 +31,7 @@ namespace CommonControls.PackFileBrowser
         public ICommand RenameNodeCommand { get; set; }
         public ICommand AddFilesFromDirectory { get; set; }
         public ICommand AddFilesCommand { get; set; }
+        public ICommand AddFilesWithConversionCommand { get; set; }
         public ICommand CloseNodeCommand { get; set; }
         public ICommand DeleteCommand { get; set; }
         public ICommand SavePackFileCommand { get; set; }
@@ -56,6 +62,7 @@ namespace CommonControls.PackFileBrowser
 
             RenameNodeCommand = new RelayCommand(OnRenameNode);
             AddFilesCommand = new RelayCommand(OnAddFilesCommand);
+            AddFilesWithConversionCommand = new RelayCommand(OnAddFilesWithConversionCommand);            
             AddFilesFromDirectory = new RelayCommand(OnAddFilesFromDirectory);
             DuplicateCommand = new RelayCommand(DuplicateNode);
             CreateFolderCommand = new RelayCommand(CreateFolder);
@@ -111,6 +118,8 @@ namespace CommonControls.PackFileBrowser
 
         void OnAddFilesCommand()
         {
+        
+        
             if (_selectedNode.FileOwner.IsCaPackFile)
             {
                 MessageBox.Show("Unable to edit CA packfile");
@@ -127,11 +136,62 @@ namespace CommonControls.PackFileBrowser
                 foreach (var file in files)
                 {
                     var fileName = Path.GetFileName(file);
+
                     var packFile = new PackFile(fileName, new MemorySource(File.ReadAllBytes(file)));
+
                     _packFileService.AddFileToPack(_selectedNode.FileOwner, parentPath, packFile);
                 }
             }
         }
+        void OnAddFilesWithConversionCommand()
+        {
+            var parentPath = _selectedNode.GetFullPath(); // get pack path, at mouse pointer        
+
+            if (_selectedNode.FileOwner.IsCaPackFile)
+            {
+                MessageBox.Show("Unable to edit CA packfile");
+                return;
+            }
+
+            
+
+
+            var dialog = new CommonOpenFileDialog();
+            dialog.IsFolderPicker = false;
+            dialog.Multiselect = true;
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                //var parentPath = _selectedNode.GetFullPath();
+                var files = dialog.FileNames;
+                foreach (var file in files)
+                {
+                    var inFileName = Path.GetFileName(file);
+                    var fileNameNoExt = Path.GetFileNameWithoutExtension(inFileName);
+                    var fileName = fileNameNoExt + ".rigid_model_v2";
+
+                    byte[] buffer = null;
+                    try
+                    {
+                        var assimpImporterService = new AssimpImporter(_packFileService);
+                        assimpImporterService.ImportScene(file);
+                        var rmv2File = assimpImporterService.MakeRMV2File();
+                        var factory = ModelFactory.Create();
+                        buffer = factory.Save(rmv2File);
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show($"Failed to import model file {inFileName}. Error : {e.Message}", "Error");
+                        _logger.Here().Error($"Failed to load file {inFileName}. Error : {e}");                        
+                    }
+
+                    // -- add test file to pack
+                    var packFile = new PackFile(fileName, new MemorySource(buffer));
+                    _packFileService.AddFileToPack(_selectedNode.FileOwner, parentPath, packFile);                    
+                    
+                }
+            }
+        }
+        
 
         void OnAddFilesFromDirectory()
         {
@@ -148,6 +208,7 @@ namespace CommonControls.PackFileBrowser
                 var parentPath = _selectedNode.GetFullPath();
                 _packFileService.AddFolderContent(_selectedNode.FileOwner, parentPath, dialog.FileName);
             }
+            
         }
 
         void DuplicateNode()
@@ -405,6 +466,8 @@ namespace CommonControls.PackFileBrowser
                     return new ContextMenuItem() { Name = "Create" };
                 case ContextItems.AddFiles:
                     return new ContextMenuItem() { Name = "Add file", Command = AddFilesCommand }; ;
+                case ContextItems.AddFilesWithConversion:
+                    return new ContextMenuItem() { Name = "Add files (with conversion)", Command = AddFilesWithConversionCommand }; ;
                 case ContextItems.AddDirectory:
                     return new ContextMenuItem() { Name = "Add directory", Command = AddFilesFromDirectory };
                 case ContextItems.CopyToEditablePack:
@@ -448,6 +511,7 @@ namespace CommonControls.PackFileBrowser
         { 
             Add,
             AddFiles,
+            AddFilesWithConversion,
             AddDirectory,
             CopyToEditablePack,
             Duplicate,

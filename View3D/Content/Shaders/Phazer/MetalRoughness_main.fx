@@ -180,7 +180,14 @@ struct PixelInputType
     float3 normal : NORMAL0;
     float3 tangent : TANGENT;
     float3 binormal : BINORMAL;
-
+    
+    // TODO: REMOVE THID DEBUGGIN CODE
+    float3 originalNormal : NORMAL1;
+    float3 originalTangent : NORMAL2;
+    float3 originalBitangent : NORMAL3;
+    
+   // TODO: END_ REMOVE THID DEBUGGIN CODE    
+    
     float3 viewDirection : TEXCOORD1;
     float3 worldPosition : TEXCOORD5;
 
@@ -337,8 +344,14 @@ PixelInputType main(in VertexInputType input) // main is the default function na
 
 	// Calculate the position of the vertex in the world.
     output.viewDirection = normalize(CameraPos - output.worldPosition);
+    
+    // TODO: DEBUGGIN CODE: remove! Sends the models original, untransformed normal        
+    output.originalNormal = input.normal;    
+    output.originalTangent = input.tangent;    
+    output.originalBitangent = input.binormal;    
+    // TODO: END: DEBUGGIN CODE: remove! Sends the models original, untransformed normal        
+    
     return output;
-
 }
 
 // --------------------------------------- Pixel shader Math/Helper functons ---------------------------------------------
@@ -580,7 +593,9 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
     float metalness = GlossTex.r; // metal mask channel
 																			
 	// transorm roughness response, make more "shiny", this is just guess work, it might be TOO shiny
-    float roughness = pow(GlossTex.g, 2.2f); // roughness channel
+    float roughness = pow(GlossTex.g, 1.77f); // roughness channel
+    
+    //float roughness = GlossTex.g; // roughness channel, less shiny
 
 	
 	
@@ -639,9 +654,13 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
     float ambinent = 0.0f;
     float3 finalColor = float4(mapped, 1); // + float4(ambinent, ambinent, ambinent,0);
 
+	// TODO: DEUGGING: re-enable once donce
     return float4(finalColor, 1);
 
+	// TODO: DEBUGGING: remove once done    
+    //return float4(input.originalTangent.rgb, 1);
 }
+
 float4 SimplePixel(in PixelInputType _input /*, bool bIsFrontFace : SV_IsFrontFace*/) : SV_TARGET0
 {
     return float4(1, 0, 0, 1);
