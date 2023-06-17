@@ -567,10 +567,10 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
     float3 finalColor = float4(mapped, 1); // + float4(ambinent, ambinent, ambinent,0);
 
      // TODO: DEUGGING: re-enable once donce
-    //return float4(finalColor, 1);
+    return float4(finalColor, 1);
 
 	// TODO: DEBUGGING: remove once done    
-    return float4(input.originalTangent.rgb, 1);
+    //return float4(input.originalTangent.rgb, 1);
 }
 
 float4 SimplePixel(in PixelInputType _input /*, bool bIsFrontFace : SV_IsFrontFace*/) : SV_TARGET0
