@@ -177,16 +177,15 @@ namespace CommonControls.PackFileBrowser
                         var rmv2File = assimpImporterService.MakeRMV2File();
                         var factory = ModelFactory.Create();
                         buffer = factory.Save(rmv2File);
+                        
+                        var packFile = new PackFile(fileName, new MemorySource(buffer));
+                        _packFileService.AddFileToPack(_selectedNode.FileOwner, parentPath, packFile);
                     }
                     catch (Exception e)
                     {
                         MessageBox.Show($"Failed to import model file {inFileName}. Error : {e.Message}", "Error");
                         _logger.Here().Error($"Failed to load file {inFileName}. Error : {e}");                        
-                    }
-
-                    // -- add test file to pack
-                    var packFile = new PackFile(fileName, new MemorySource(buffer));
-                    _packFileService.AddFileToPack(_selectedNode.FileOwner, parentPath, packFile);                    
+                    }                
                     
                 }
             }

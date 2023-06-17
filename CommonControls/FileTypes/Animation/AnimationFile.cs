@@ -173,40 +173,12 @@ namespace CommonControls.FileTypes.Animation
 
         public int GetIdFromBoneName(string name)
         {
-            var result = Bones.Where(x => x.Name == name);
+            var result = Bones.Where(x => x.Name.ToLower() == name.ToLower());
 
             var id = result.FirstOrDefault();
 
-            return (id==null ? -1 : id.Id);
-    
-             
-
-            //int id1 =
-            
-
-   var boneNameQuery = from bone in Bones
-                    where bone.Name.ToLower().Equals(name.ToLower())
-                    select bone;
-
-    if (boneNameQuery.Count() == 0)
-    {
-        return -1;
-    }
-
-    return boneNameQuery.First().Id;           
-
-    // ------------------ OLD CODE ---------------------------
-            
-    foreach (var bone in Bones)
-    {
-        if (bone.Name.ToLower() == name.ToLower())
-        {
-            return bone.Id;
+            return (id == null ? -1 : id.Id);
         }
-    }
-
-    return -1;
-}
 
         public static AnimationFile Create(PackFile file)
         {
@@ -387,23 +359,23 @@ namespace CommonControls.FileTypes.Animation
                 switch (bitRate)
                 {
                     case 12:
-                        var vector = new RmvVector3(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
-                        frame.Transforms.Add(vector);
-                        break;
+                    var vector = new RmvVector3(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
+                    frame.Transforms.Add(vector);
+                    break;
 
                     case 3:
-                        var d0 = chunk.ReadSBytes(3);
-                        var vecto2r = AnimationFileLoadHelpers.Decode_translation_24_888_ranged(d0, optimizationData, i);
-                        frame.Transforms.Add(vecto2r);
-                        break;
+                    var d0 = chunk.ReadSBytes(3);
+                    var vecto2r = AnimationFileLoadHelpers.Decode_translation_24_888_ranged(d0, optimizationData, i);
+                    frame.Transforms.Add(vecto2r);
+                    break;
 
                     case 0:
                     case -12:
                     case -3:
-                        break;
+                    break;
 
                     default:
-                        throw new Exception("Unknown bit optimization");
+                    throw new Exception("Unknown bit optimization");
                 }
             }
 
@@ -413,26 +385,26 @@ namespace CommonControls.FileTypes.Animation
                 switch (bitRate)
                 {
                     case 8:
-                        var maxValue = 1.0f / short.MaxValue;
-                        var quat = new short[4] { chunk.ReadShort(), chunk.ReadShort(), chunk.ReadShort(), chunk.ReadShort() };
+                    var maxValue = 1.0f / short.MaxValue;
+                    var quat = new short[4] { chunk.ReadShort(), chunk.ReadShort(), chunk.ReadShort(), chunk.ReadShort() };
 
-                        var quaternion = new RmvVector4(quat[0] * maxValue, quat[1] * maxValue, quat[2] * maxValue, quat[3] * maxValue);
-                        frame.Quaternion.Add(quaternion);
-                        break;
+                    var quaternion = new RmvVector4(quat[0] * maxValue, quat[1] * maxValue, quat[2] * maxValue, quat[3] * maxValue);
+                    frame.Quaternion.Add(quaternion);
+                    break;
 
                     case 4:
-                        var d0 = chunk.ReadSBytes(4);
-                        var q = AnimationFileLoadHelpers.Decode_quaternion_32_s8888_ranged(d0, optimizationData, i);
-                        frame.Quaternion.Add(q);
-                        break;
+                    var d0 = chunk.ReadSBytes(4);
+                    var q = AnimationFileLoadHelpers.Decode_quaternion_32_s8888_ranged(d0, optimizationData, i);
+                    frame.Quaternion.Add(q);
+                    break;
 
                     case 0:
                     case -8:
                     case -4:
-                        break;
+                    break;
 
                     default:
-                        throw new Exception("Unknown bit optimization");
+                    throw new Exception("Unknown bit optimization");
                 }
             }
             return frame;

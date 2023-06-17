@@ -146,7 +146,7 @@ namespace CommonControls.ModelImportExport
                         (_skeletonFile != null) ? ModelMaterialEnum.weighted : ModelMaterialEnum.default_type,
                         (_skeletonFile != null) ? FileTypes.RigidModel.VertexFormat.Cinematic : FileTypes.RigidModel.VertexFormat.Static);
 
-                    cuurentMeshRef.Mesh = MakeMeshUnindexed(_assScene.Meshes[meshIndex]);
+                    cuurentMeshRef.Mesh = MakeMeshIndexed(_assScene.Meshes[meshIndex]);
 
                     cuurentMeshRef.Material.ModelName = _assScene.Meshes[meshIndex].Name;
 
@@ -250,15 +250,14 @@ namespace CommonControls.ModelImportExport
                 var v0 = assInputMesh.Faces[assFaceIndex].Indices[0];
                 var v1 = assInputMesh.Faces[assFaceIndex].Indices[1];
                 var v2 = assInputMesh.Faces[assFaceIndex].Indices[2];
-
-                // make sequential indices (0,1,2,3,4...)
+                                
                 unindexesMesh.IndexList[assFaceIndex * 3 + 0] = (ushort)v0;
                 unindexesMesh.IndexList[assFaceIndex * 3 + 1] = (ushort)v1;
                 unindexesMesh.IndexList[assFaceIndex * 3 + 2] = (ushort)v2;
 
-                originalVerticesPacked[v0] = MakePackedVertex(assInputMesh.Vertices[v0], assInputMesh.Normals[v0], assInputMesh.TextureCoordinateChannels[0][v0], assInputMesh.Tangents[v0], assInputMesh.BiTangents[v0]);
-                originalVerticesPacked[v1] = MakePackedVertex(assInputMesh.Vertices[v1], assInputMesh.Normals[v1], assInputMesh.TextureCoordinateChannels[0][v1], assInputMesh.Tangents[v1], assInputMesh.BiTangents[v1]);
-                originalVerticesPacked[v2] = MakePackedVertex(assInputMesh.Vertices[v2], assInputMesh.Normals[v2], assInputMesh.TextureCoordinateChannels[0][v2], assInputMesh.Tangents[v2], assInputMesh.BiTangents[v2]);
+                //originalVerticesPacked[v0] = MakePackedVertex(assInputMesh.Vertices[v0], assInputMesh.Normals[v0], assInputMesh.TextureCoordinateChannels[0][v0], assInputMesh.Tangents[v0], assInputMesh.BiTangents[v0]);
+                //originalVerticesPacked[v1] = MakePackedVertex(assInputMesh.Vertices[v1], assInputMesh.Normals[v1], assInputMesh.TextureCoordinateChannels[0][v1], assInputMesh.Tangents[v1], assInputMesh.BiTangents[v1]);
+                //originalVerticesPacked[v2] = MakePackedVertex(assInputMesh.Vertices[v2], assInputMesh.Normals[v2], assInputMesh.TextureCoordinateChannels[0][v2], assInputMesh.Tangents[v2], assInputMesh.BiTangents[v2]);
             }
 
             return unindexesMesh;

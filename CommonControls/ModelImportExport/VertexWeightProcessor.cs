@@ -91,15 +91,15 @@ namespace CommonControls.ModelImportExport
             }
 
             //influences.Sort(CompareInfluencesByWeight);
-            influences.OrderBy(influence => influence.weight);
+            influences = influences.OrderByDescending(influence => influence.weight).ToList();
 
 
             var DEBUG_BREAK_1 = 1;
-            //for (int weightIndex = 0; weightIndex < vertex.WeightCount; weightIndex++)
-            //{
-            //    vertex.BoneIndex[weightIndex] = (byte)influences[weightIndex].index;
-            //    vertex.BoneWeight[weightIndex] = influences[weightIndex].weight;
-            //}
+            for (int weightIndex = 0; weightIndex < vertex.WeightCount; weightIndex++)
+            {
+                vertex.BoneIndex[weightIndex] = (byte)influences[weightIndex].index;
+                vertex.BoneWeight[weightIndex] = influences[weightIndex].weight;
+            }
 
             //int CompareInfluencesByWeight(VertexInfluence i1, VertexInfluence i2)
             //{
