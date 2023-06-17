@@ -18,6 +18,7 @@ namespace CommonControls.ModelImportExport
             {
                 throw new Exception("Error. Trying to add more than 4 weights");
             }
+
             vertex.WeightCount++;
             vertex.BoneIndex[vertex.WeightCount - 1] = (byte)boneIndex;
             vertex.BoneWeight[vertex.WeightCount - 1] = weight;
@@ -90,45 +91,13 @@ namespace CommonControls.ModelImportExport
                 influences[weightIndex].weight = vertex.BoneWeight[weightIndex];
             }
 
-            //influences.Sort(CompareInfluencesByWeight);
             influences = influences.OrderByDescending(influence => influence.weight).ToList();
 
-
-            var DEBUG_BREAK_1 = 1;
             for (int weightIndex = 0; weightIndex < vertex.WeightCount; weightIndex++)
             {
                 vertex.BoneIndex[weightIndex] = (byte)influences[weightIndex].index;
                 vertex.BoneWeight[weightIndex] = influences[weightIndex].weight;
             }
-
-            //int CompareInfluencesByWeight(VertexInfluence i1, VertexInfluence i2)
-            //{
-            //    if (i1.weight > i2.weight)
-            //    {
-            //        return -1;
-            //    }
-            //    if (i1.weight < i2.weight)
-            //    {
-            //        return 1;
-            //    }
-
-            //    return 0;  // if none is larger than the other, they must be equal
-            //}
-
-            //Func<VertexInfluence, VertexInfluence, int> cmp = (VertexInfluence i1, VertexInfluence i2) => 
-            //{
-            //    if (i1.weight > i2.weight)
-            //    {
-            //        return -1;
-            //    }
-            //    if (i1.weight < i2.weight)
-            //    {
-            //        return 1;
-            //    }
-
-            //    return 0;  // if none is larger than the other, they must be equal                    
-            //};
-
         }
     }
 
