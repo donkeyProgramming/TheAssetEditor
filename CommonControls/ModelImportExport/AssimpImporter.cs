@@ -5,25 +5,16 @@ using System.Collections.Generic;
 using System.Text;
 using CommonControls.FileTypes.RigidModel.LodHeader;
 using CommonControls.FileTypes.RigidModel.MaterialHeaders;
-using CommonControls.FileTypes.RigidModel.Transforms;
-using CommonControls.FileTypes.RigidModel.Types;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.RigidModel.Vertex;
 using Assimp;
 using CommonControls.FileTypes.Animation;
-using Serilog.Formatting.Raw;
-using static CommonControls.Editors.AnimationPack.Converters.AnimationBinFileToXmlConverter;
-using CommonControls.FileTypes.Animation;
 using System.Windows.Forms;
-using System.IO;
 using Filetypes.ByteParsing;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using SharpDX.Direct3D9;
 using Serilog;
 using CommonControls.Common;
-using SharpDX.MediaFoundation;
 
 namespace CommonControls.ModelImportExport
 {
@@ -41,7 +32,17 @@ namespace CommonControls.ModelImportExport
         }
         public void ImportScene(string fileName)
         {
-            ImportAssimpScene(fileName);
+            try
+            {
+                ImportAssimpSceneImplemention(fileName);
+            }
+            catch (Exception ex)
+            {
+                _logger.Here().Warning($"Assimp Failedr on: \r '{fileName}', Excpetion Messahe:\r{ex.Message}.\r\rP0ossibly unsported format.");
+                MessageBox.Show($"Assimp Failed on: '{fileName}', {ex.Message} possible unsported format", "File Import Error");
+
+                return;
+            }
         }
         private string GetSkeletonString()
         {
@@ -52,29 +53,30 @@ namespace CommonControls.ModelImportExport
             SearchNodesRecursiveLocal(parent, ref tempSkeletonString);
 
             return tempSkeletonString;
+        }
 
-            void SearchNodesRecursiveLocal(Node parent, ref string skeletonString)
+        void SearchNodesRecursiveLocal(Node parent, ref string skeletonString)
+        {
+            foreach (var node in parent.Children)
             {
-                foreach (var node in parent.Children)
+                if (node.Name.Contains("skeleton"))
                 {
-                    if (node.Name.Contains("skeleton"))
-                    {
-                        skeletonString = node.Name.Replace("skeleton//", "");
-                    }
-
-                    if (skeletonString.Length > 0)
-                    {
-                        return;
-                    }
-
-                    SearchNodesRecursiveLocal(node, ref skeletonString);
+                    skeletonString = node.Name.Replace("skeleton//", "");
                 }
+
+                if (skeletonString.Length > 0)
+                {
+                    return;
+                }
+
+                SearchNodesRecursiveLocal(node, ref skeletonString);
             }
         }
+
         private void LoadSkeletonFile()
         {
             var skeletonId = GetSkeletonString();
-            var skeletonFolder = @"animations\skeletons\";
+            var skeletonFolder = @"nimations\skeletons\";
             var animExt = "anim";
             var fullPath = skeletonFolder + skeletonId + "." + animExt;
 
@@ -94,7 +96,7 @@ namespace CommonControls.ModelImportExport
             {
                 _logger.Here().Error($"Unexcpted error opening '{fullPath}' Cause unkownw!");
                 MessageBox.Show($"Unknown error opening '{fullPath}'\rCause unkownw!", "Unexpect Error");
-                return;                
+                return;
             }
 
             var rawByeData = skeletonPackFile.DataSource.ReadData();
@@ -146,17 +148,12 @@ namespace CommonControls.ModelImportExport
                         (_skeletonFile != null) ? ModelMaterialEnum.weighted : ModelMaterialEnum.default_type,
                         (_skeletonFile != null) ? FileTypes.RigidModel.VertexFormat.Cinematic : FileTypes.RigidModel.VertexFormat.Static);
 
-                    cuurentMeshRef.Mesh = MakeMeshIndexed(_assScene.Meshes[meshIndex]);
+                    //ref cuurentMeshRef.Mesh = ref MakeMeshIndexed(_assScene.Meshes[meshIndex]);
 
-                    cuurentMeshRef.Material.ModelName = _assScene.Meshes[meshIndex].Name;
+                    var materialIndex = _assScene.Meshes[meshIndex].MaterialIndex;
+                    SetDefaultTexturres(cuurentMeshRef);
 
-                    cuurentMeshRef.Material.SetTexture(FileTypes.RigidModel.Types.TextureType.BaseColour, @"commontextures\default_base_colour.dds");
-                    cuurentMeshRef.Material.SetTexture(FileTypes.RigidModel.Types.TextureType.Normal, @"commontextures\default_normal.dds");
-                    cuurentMeshRef.Material.SetTexture(FileTypes.RigidModel.Types.TextureType.MaterialMap, @"commontextures\default_material_mat.dds");
-
-                    cuurentMeshRef.Material.SetTexture(FileTypes.RigidModel.Types.TextureType.Diffuse, @"commontextures\default_metal_material_map.dds");
-                    cuurentMeshRef.Material.SetTexture(FileTypes.RigidModel.Types.TextureType.Specular, @"commontextures\default_metal_material_map.dds");
-                    cuurentMeshRef.Material.SetTexture(FileTypes.RigidModel.Types.TextureType.Gloss, @"commontextures\default_metal_material_map.dds");
+                    //ProcessMaterial(_assScene.Materials[materialIndex], );
                 };
             }
 
@@ -164,8 +161,21 @@ namespace CommonControls.ModelImportExport
 
             return outputFile;
         }
-        private void ImportAssimpScene(string fileName)
+
+        private static void SetDefaultTexturres(RmvModel cuurentMeshRef)
         {
+            cuurentMeshRef.Material.SetTexture(FileTypes.RigidModel.Types.TextureType.BaseColour, @"commontextures\default_base_colour.dds");
+            cuurentMeshRef.Material.SetTexture(FileTypes.RigidModel.Types.TextureType.Normal, @"commontextures\default_normal.dds");
+            cuurentMeshRef.Material.SetTexture(FileTypes.RigidModel.Types.TextureType.MaterialMap, @"commontextures\default_material_mat.dds");
+
+            cuurentMeshRef.Material.SetTexture(FileTypes.RigidModel.Types.TextureType.Diffuse, @"commontextures\default_metal_material_map.dds");
+            cuurentMeshRef.Material.SetTexture(FileTypes.RigidModel.Types.TextureType.Specular, @"commontextures\default_metal_material_map.dds");
+            cuurentMeshRef.Material.SetTexture(FileTypes.RigidModel.Types.TextureType.Gloss, @"commontextures\default_metal_material_map.dds");
+        }
+
+        private void ImportAssimpSceneImplemention(string fileName)
+        {
+
             using (var importer = new AssimpContext())
             {
                 // -- left all the flags outcommented, 
@@ -184,7 +194,7 @@ namespace CommonControls.ModelImportExport
                    PostProcessSteps.CalculateTangentSpace |
                    //PostProcessSteps.FixInFacingNormals |
                    PostProcessSteps.GlobalScale
-                   );                
+                   );
             }
 
             LoadSkeletonFile();
@@ -250,7 +260,7 @@ namespace CommonControls.ModelImportExport
                 var v0 = assInputMesh.Faces[assFaceIndex].Indices[0];
                 var v1 = assInputMesh.Faces[assFaceIndex].Indices[1];
                 var v2 = assInputMesh.Faces[assFaceIndex].Indices[2];
-                                
+
                 unindexesMesh.IndexList[assFaceIndex * 3 + 0] = (ushort)v0;
                 unindexesMesh.IndexList[assFaceIndex * 3 + 1] = (ushort)v1;
                 unindexesMesh.IndexList[assFaceIndex * 3 + 2] = (ushort)v2;
@@ -363,10 +373,3 @@ namespace CommonControls.ModelImportExport
         }
     }
 };
-
-
-
-
-
-
-

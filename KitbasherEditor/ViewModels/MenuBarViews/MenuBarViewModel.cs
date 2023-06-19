@@ -122,8 +122,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         void CreateActions()
         {
-            _actionList[MenuActionType.Save] = new MenuAction(General.Save) { EnableRule = ActionEnabledRule.Always, ToolTip = "Save", Hotkey = new Hotkey(Key.S, ModifierKeys.Control) };
-            _actionList[MenuActionType.SaveAs] = new MenuAction(General.SaveAs) { EnableRule = ActionEnabledRule.Always, ToolTip = "Save as (Byt A DICK)". };
+            _actionList[MenuActionType.Save] = new MenuAction(General.Save) { EnableRule = ActionEnabledRule.Always, ToolTip = "Save" };
+            _actionList[MenuActionType.SaveAs] = new MenuAction(General.SaveAs) { EnableRule = ActionEnabledRule.Always, ToolTip = "Save as" };
             _actionList[MenuActionType.GenerateWsModelForWh3] = new MenuAction(General.GenerateWsModelWh3) { EnableRule = ActionEnabledRule.Always, ToolTip = "Generate ws model (Wh3)" };
             _actionList[MenuActionType.GenerateWsModelForWh2] = new MenuAction(General.GenerateWsModelForWh2) { EnableRule = ActionEnabledRule.Always, ToolTip = "Generate ws model (Wh2)" };
             _actionList[MenuActionType.OpenImportReference] = new MenuAction(ImportReference) { EnableRule = ActionEnabledRule.Always, ToolTip = "Import Reference model" };
@@ -137,6 +137,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _actionList[MenuActionType.SortModelsByName] = new MenuAction(General.SortMeshes) { EnableRule = ActionEnabledRule.Always, ToolTip = "Sort models by name" };
 
             _actionList[MenuActionType.Group] = new MenuAction(Tools.GroupItems) { EnableRule = ActionEnabledRule.AtleastOneObjectSelected, ToolTip = "(Un)Group", Hotkey = new Hotkey(Key.G, ModifierKeys.Control) };
+            _actionList[MenuActionType.Gizmo_ScaleUp] = new MenuAction(Gizmo.ScaleGizmoUp) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Add, ModifierKeys.None) };
             _actionList[MenuActionType.Gizmo_ScaleUp] = new MenuAction(Gizmo.ScaleGizmoUp) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Add, ModifierKeys.None) };
             _actionList[MenuActionType.Gizmo_ScaleDown] = new MenuAction(Gizmo.ScaleGizmoDown) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Subtract, ModifierKeys.None) };
             _actionList[MenuActionType.Gizmo_Arrow] = new MenuAction(Gizmo.Cursor) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Q, ModifierKeys.None) };
@@ -182,7 +183,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         void CreateMenu()
         {
-            MenuItems.Add(new ToolbarItem() { Name = "File" });
+            MenuItems.Add(new ToolbarItem() { Name = "File", });
             MenuItems.Add(new ToolbarItem() { Name = "Debug" });
             MenuItems.Add(new ToolbarItem() { Name = "Tools" });
             MenuItems.Add(new ToolbarItem() { Name = "Rendering" });

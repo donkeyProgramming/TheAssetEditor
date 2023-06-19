@@ -463,10 +463,16 @@ namespace CommonControls.PackFileBrowser
                     return new ContextMenuItem() { Name = "Add"};
                 case ContextItems.Create:
                     return new ContextMenuItem() { Name = "Create" };
-                case ContextItems.AddFiles:
+                case ContextItems.Import:
+                    return new ContextMenuItem() { Name = "import" };
+                case ContextItems.AddFiles:     
                     return new ContextMenuItem() { Name = "Add file", Command = AddFilesCommand }; ;
-                case ContextItems.AddFilesWithConversion:
-                    return new ContextMenuItem() { Name = "Add files (with conversion)", Command = AddFilesWithConversionCommand }; ;
+                 case ContextItems.Import3dModelFile:                
+                    return new ContextMenuItem() { Name = "Import 3d Model File", Command = AddFilesWithConversionCommand }; ;
+                case ContextItems.ImportImageToDDS:
+                    return new ContextMenuItem() { Name = "Image->DDS and Import", Command = AddFilesWithConversionCommand }; ;
+                case ContextItems.ImportAnimation:
+                    return new ContextMenuItem() { Name = "Import Amimation from 3d Model Format", Command = AddFilesWithConversionCommand }; ;
                 case ContextItems.AddDirectory:
                     return new ContextMenuItem() { Name = "Add directory", Command = AddFilesFromDirectory };
                 case ContextItems.CopyToEditablePack:
@@ -510,8 +516,14 @@ namespace CommonControls.PackFileBrowser
         { 
             Add,
             AddFiles,
-            AddFilesWithConversion,
+            Import, 
+            Import3dModelFile,
+            MakeWSMOdelFromRM2Paths, 
+            ImportImageToDDS,
+            ImportAudio,
+            ImportAnimation,
             AddDirectory,
+
             CopyToEditablePack,
             Duplicate,
             CreateFolder,

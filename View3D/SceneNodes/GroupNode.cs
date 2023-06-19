@@ -32,10 +32,7 @@ namespace View3D.SceneNodes
             base.ModelMatrix = value;
             RenderMatrix = value;
         }
-
-
     }
-
     public class WsModelGroup : GroupNode
     {
         public WsModelGroup(string name = "") : base(name)

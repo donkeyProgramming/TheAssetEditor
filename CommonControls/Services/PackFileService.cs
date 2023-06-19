@@ -646,9 +646,10 @@ namespace CommonControls.Services
             {
                 if (Database.PackFiles[i].FileList.ContainsKey(lowerPath))
                 {
-                    return Database.PackFiles[i].FileList[lowerPath] ;
+                    return Database.PackFiles[i].FileList[lowerPath];
                 }
             }
+
             _logger.Here().Warning($"File not found");
             return null;
         }
