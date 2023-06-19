@@ -161,13 +161,6 @@ namespace View3D.Components.Gizmo
 
         public void GizmoRotateEvent(Matrix rotation, PivotType pivot)
         {
-            rotation.Decompose(out var _, out var q, out var _);
-            //how to get rotation in degrees?
-            Orientation = q;
-            var yaw = Math.Atan2(2.0 * (Orientation.Y * Orientation.Z + Orientation.W * Orientation.X), Orientation.W * Orientation.W - Orientation.X * Orientation.X - Orientation.Y * Orientation.Y + Orientation.Z * Orientation.Z);
-            var pitch = Math.Asin(-2.0 * (Orientation.X * Orientation.Z - Orientation.W * Orientation.Y));
-            var roll = Math.Atan2(2.0 * (Orientation.X * Orientation.Y + Orientation.W * Orientation.Z), Orientation.W * Orientation.W + Orientation.X * Orientation.X - Orientation.Y * Orientation.Y - Orientation.Z * Orientation.Z);
-            Console.WriteLine($"yaw {yaw * (180 / Math.PI)} pitch ${pitch * (180 / Math.PI)} ${roll * (180 / Math.PI)}");
             ApplyTransform(rotation, pivot);
             _totalGizomTransform *= rotation;
         }
@@ -221,7 +214,7 @@ namespace View3D.Components.Gizmo
                 if (pivotType == PivotType.ObjectCenter)
                     objCenter = Position;
 
-                TransformBone(Matrix.CreateTranslation(Position) * Matrix.CreateFromQuaternion(Orientation), objCenter);
+                TransformBone(Matrix.CreateTranslation(Position) * Matrix.CreateFromQuaternion(Orientation) * Matrix.CreateScale(Scale), objCenter);
                 return;
             }
 
