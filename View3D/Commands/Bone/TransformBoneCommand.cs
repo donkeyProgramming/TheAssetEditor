@@ -68,9 +68,9 @@ namespace View3D.Commands.Bone
 
                 Console.WriteLine(_boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Position[selectedBone]);
                 newBoneTransform.Decompose(out var scale, out var rot, out var trans);
-
+                newPosition.Decompose(out var _, out var rot2, out var _);
                 _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Position[selectedBone] += trans;
-                _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Rotation[selectedBone] = rot;
+                _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Rotation[selectedBone] *= rot2;
                 _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Scale[selectedBone] = scale;
             }
         }

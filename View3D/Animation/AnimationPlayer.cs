@@ -116,7 +116,8 @@ namespace View3D.Animation
                 {
                     selection.CurrentAnimation = _animationClip;
                     selection.Skeleton = _skeleton;
-                    selection.CurrentFrame = CurrentFrame; 
+                    selection.CurrentFrame = CurrentFrame;
+                    selection.SelectedBones.Clear();
                 }
                 
             }
