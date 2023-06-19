@@ -210,9 +210,6 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 
         public IMaterial CreateEmpty(ModelMaterialEnum materialId, RmvVersionEnum rmvType, VertexFormat vertexFormat)
         {
-            // TODO: DEBUGGIN: remove these 2 line where sure they are not needed for this
-            //var Header = ByteHelper.ByteArrayToStructure<WeightedMaterialStruct>(dataArray, dataOffset);
-            //dataOffset += ByteHelper.GetSize<WeightedMaterialStruct>();
             var material = new WeightedMaterial()
             {
                 MaterialId = ModelMaterialEnum.weighted,

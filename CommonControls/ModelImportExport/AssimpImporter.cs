@@ -45,7 +45,7 @@ namespace CommonControls.ModelImportExport
         }
         private string GetSkeletonString()
         {
-            string tempSkeletonString = new string("");
+            string tempSkeletonString = "";
 
             var parent = _assScene.RootNode;
 
@@ -115,8 +115,7 @@ namespace CommonControls.ModelImportExport
                 },
                 LodHeaders = new RmvLodHeader[lodCount],
             };
-
-            // TODO: remove these if init above works right
+            
             for (int i = 0; i < lodCount; i++)
             {
                 outputFile.LodHeaders[i] =

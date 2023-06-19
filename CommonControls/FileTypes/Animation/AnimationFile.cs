@@ -1,11 +1,9 @@
-﻿using Assimp;
+﻿using CommonControls.FileTypes.PackFiles.Models; // If remove this one, the "Pack" file in this file 
+using Serilog;
 using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel.Transforms;
 using CommonControls.Services;
 using Filetypes.ByteParsing;
-using Serilog;
-using SharpDX;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,11 +13,13 @@ using System.Linq;
 namespace CommonControls.FileTypes.Animation
 {
     [DebuggerDisplay("AnimationFile - {Header.SkeletonName}[{DynamicFrames.Count}]")]
+    
     public class AnimationFile
     {
         #region Sub classes
         public class BoneInfo
-        {
+        {        
+            public const int NO_PARENT_ID =  - 1;
             public string Name { get; set; }
             public int Id { get; set; }
             public int ParentId { get; set; }
@@ -173,11 +173,17 @@ namespace CommonControls.FileTypes.Animation
 
         public int GetIdFromBoneName(string name)
         {
-            var result = Bones.Where(x => x.Name.ToLower() == name.ToLower());
+            var result = Bones.Where(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
 
-            var id = result.FirstOrDefault();
+            var boneInfo = result.FirstOrDefault();
 
-            return (id == null ? -1 : id.Id);
+            if (boneInfo == null)
+            {
+                return -1;
+            }
+
+            return boneInfo.Id;
+
         }
 
         public static AnimationFile Create(PackFile file)
