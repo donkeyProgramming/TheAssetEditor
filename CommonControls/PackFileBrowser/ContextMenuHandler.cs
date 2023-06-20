@@ -142,8 +142,7 @@ namespace CommonControls.PackFileBrowser
             }
         }
         void OnImport3DModelCommand()
-        {
-            var parentPath = _selectedNode.GetFullPath(); // get pack path, at mouse pointer        
+        {         
 
             if (_selectedNode.FileOwner.IsCaPackFile)
             {
@@ -151,18 +150,20 @@ namespace CommonControls.PackFileBrowser
                 return;
             }
 
+            var parentPath = _selectedNode.GetFullPath(); // get pack path, at mouse pointer        
             var dialog = new CommonOpenFileDialog();
             dialog.IsFolderPicker = false;
             dialog.Multiselect = true;
+            
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            {
-                //var parentPath = _selectedNode.GetFullPath();
+            {                
                 var files = dialog.FileNames;
                 foreach (var file in files)
                 {                    
                     try
                     {
-                        AssimpDiskService.ImportAssimpDiskFileToPack(_packFileService, _selectedNode.FileOwner, parentPath, file);                                                 
+                        var assimpDiskService = new AssimpDiskService(_packFileService);
+                        assimpDiskService.ImportAssimpDiskFileToPack(_selectedNode.FileOwner, parentPath, file);                                                 
                     }
                     catch (Exception e)
                     {
