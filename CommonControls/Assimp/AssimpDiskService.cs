@@ -2,6 +2,7 @@
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
+using static CommonControls.Editors.AnimationPack.Converters.AnimationBinFileToXmlConverter;
 
 namespace CommonControls.ModelImportExport
 {
@@ -11,7 +12,7 @@ namespace CommonControls.ModelImportExport
         {
             var fileNameNoExt = Path.GetFileNameWithoutExtension(filePath);
             var rigidModelExtension = ".rigid_model_v2";
-            var outFileName = fileNameNoExt + rigidModelExtension;
+            var outFileName = fileNameNoExt + rigidModelExtension;            
 
             var assimpImporterService = new AssimpImporter(pfs);
             assimpImporterService.ImportScene(filePath);
