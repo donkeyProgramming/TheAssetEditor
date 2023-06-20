@@ -169,6 +169,17 @@ namespace CommonControls.FileTypes.Animation
             return header;
         }
 
+        public int GetIdFromBoneName(string name)
+        {
+            var result = Bones.Where(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+            var boneInfo = result.FirstOrDefault();
+
+            if (boneInfo == null)          
+                return -1;            
+
+            return boneInfo.Id;
+        }
 
         public static AnimationFile Create(PackFile file)
         {
