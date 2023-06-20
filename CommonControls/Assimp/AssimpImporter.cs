@@ -15,9 +15,12 @@ using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using Serilog;
 using CommonControls.Common;
+using Assimp.Unmanaged;
+
 
 namespace CommonControls.ModelImportExport
-{    public class AssimpImporter
+{
+    public class AssimpImporter
     {
         ILogger _logger = Serilog.Log.ForContext<AssimpImporter>();
 
@@ -29,11 +32,20 @@ namespace CommonControls.ModelImportExport
         {
             _packFileService = packFileService;
         }
+
+        public string[] GetSupportedFormatExtendtions()
+        {
+            var unmangedLibrary = Assimp.Unmanaged.AssimpLibrary.Instance;
+            var supportExtenstionList = unmangedLibrary.GetExtensionList();
+
+            return supportExtenstionList;
+        }
+
         public void ImportScene(string fileName)
         {
             ImportAssimpScene(fileName);
         }
-        private string GetSkeletonString()
+        private string GetSkeletonName()
         {
             string tempSkeletonString = "";
 
@@ -42,54 +54,42 @@ namespace CommonControls.ModelImportExport
             SearchNodesRecursiveLocal(parent, ref tempSkeletonString);
 
             return tempSkeletonString;
+        }
 
-            void SearchNodesRecursiveLocal(Node parent, ref string skeletonString)
+        void SearchNodesRecursiveLocal(Node parent, ref string skeletonString)
+        {
+            foreach (var node in parent.Children)
             {
-                foreach (var node in parent.Children)
-                {
-                    if (node.Name.Contains("skeleton"))
-                    {
-                        skeletonString = node.Name.Replace("skeleton//", "");
-                    }
+                if (node.Name.Contains("skeleton"))
+                    skeletonString = node.Name.Replace("skeleton//", "");
 
-                    if (skeletonString.Length > 0)
-                    {
-                        return;
-                    }
+                if (skeletonString.Length > 0)
+                    return;
 
-                    SearchNodesRecursiveLocal(node, ref skeletonString);
-                }
+                SearchNodesRecursiveLocal(node, ref skeletonString);
             }
         }
+
         private void LoadSkeletonFile()
         {
-            var skeletonId = GetSkeletonString();
+            var skeletonId = GetSkeletonName();
             var skeletonFolder = @"animations\skeletons\";
             var animExt = "anim";
-            var fullPath = skeletonFolder + skeletonId + "." + animExt;
+            var fullPath = $"{skeletonFolder}{skeletonId}.{animExt}";
 
-            var fileNamesResult = _packFileService.SearchForFile(fullPath);
+            var packFileSkeleton = _packFileService.FindFile(fullPath);
 
-            PackFile skeletonPackFile = null;
-            if (!fileNamesResult.Any())
+            if (packFileSkeleton == null)
             {
                 _logger.Here().Warning($"Failed to Find skeleton '{fullPath}', it doesn't exist.");
                 MessageBox.Show($"Couldn't find skeleton '{fullPath}' \rMake sure to Load All CA Packs before importing Rigged Models!\rOr add the appropiate skeleton to your project\r\rFile Will be imported as a non-rigged model.", "Skeleton Missing Warning");
                 return;
             }
 
-            skeletonPackFile = _packFileService.FindFile(fileNamesResult[0]);
-
-            if (skeletonPackFile == null) // very unlikely to happen, as it was found above, 
-            {
-                _logger.Here().Error($"Unexcpted error opening '{fullPath}' Cause unkownw!");
-                MessageBox.Show($"Unknown error opening '{fullPath}'\rCause unkownw!", "Unexpect Error");
-                return;
-            }
-
-            var rawByeData = skeletonPackFile.DataSource.ReadData();
-            _skeletonFile = AnimationFile.Create(new ByteChunk(rawByeData));
+            var rawByteDataSkeleton = packFileSkeleton.DataSource.ReadData();
+            _skeletonFile = AnimationFile.Create(new ByteChunk(rawByteDataSkeleton));
         }
+
         public RmvFile MakeRMV2File()
         {
             int lodCount = 4; // make 4 idential LODs for compatibility reasons
@@ -117,11 +117,11 @@ namespace CommonControls.ModelImportExport
                     };
             }
 
-            outputFile.ModelList = new RmvModel[lodCount][]; // lods  
+            outputFile.ModelList = new RmvModel[lodCount][];
 
             for (int lodIndex = 0; lodIndex < lodCount; lodIndex++)
             {
-                outputFile.ModelList[lodIndex] = new RmvModel[_assScene.MeshCount]; // Meshes
+                outputFile.ModelList[lodIndex] = new RmvModel[_assScene.MeshCount];
 
                 for (int meshIndex = 0; meshIndex < _assScene.MeshCount; meshIndex++)
                 {
@@ -153,6 +153,7 @@ namespace CommonControls.ModelImportExport
 
             return outputFile;
         }
+
         private void ImportAssimpScene(string fileName)
         {
             using (var importer = new AssimpContext())
@@ -303,16 +304,14 @@ namespace CommonControls.ModelImportExport
                 WeightCount = 0,
             };
 
+            var numWeight = 0;
             if (_skeletonFile != null)
             {
-                vertex.BoneIndex = new byte[4];
-                vertex.BoneWeight = new float[4];
+                numWeight = 4;
             }
-            else
-            {
-                vertex.BoneIndex = new byte[0];
-                vertex.BoneWeight = new float[0];
-            };
+
+            vertex.BoneIndex = new byte[numWeight];
+            vertex.BoneWeight = new float[numWeight];
 
             return vertex;
         }
