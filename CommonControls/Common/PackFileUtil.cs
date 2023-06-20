@@ -102,7 +102,7 @@ namespace CommonControls.Common
             return packfile;
         }
 
-        public static void ImporAssimpDiskFileToPack(PackFileService pfs, PackFileContainer container, string parentPackPath, string filePath)
+        public static void ImportAssimpDiskFileToPack(PackFileService pfs, PackFileContainer container, string parentPackPath, string filePath)
         {
             var fileNameNoExt = Path.GetFileNameWithoutExtension(filePath);
             var rigidModelExtension = ".rigid_model_v2";
