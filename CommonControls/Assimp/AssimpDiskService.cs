@@ -2,12 +2,18 @@
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using static CommonControls.Editors.AnimationPack.Converters.AnimationBinFileToXmlConverter;
+using CommonControls.Common;
+using Serilog;
+using System;
+using System.Windows;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace CommonControls.ModelImportExport
 {
     public class AssimpDiskService
     {
+        ILogger _logger = Logging.Create<AssimpDiskService>();
+
         private PackFileService _packfileService;
         public AssimpDiskService(PackFileService pfs)
         {
@@ -17,7 +23,7 @@ namespace CommonControls.ModelImportExport
         {
             var fileNameNoExt = Path.GetFileNameWithoutExtension(filePath);
             var rigidModelExtension = ".rigid_model_v2";
-            var outFileName = fileNameNoExt + rigidModelExtension;            
+            var outFileName = fileNameNoExt + rigidModelExtension;
 
             var assimpImporterService = new AssimpImporter(_packfileService);
             assimpImporterService.ImportScene(filePath);
@@ -30,14 +36,36 @@ namespace CommonControls.ModelImportExport
             _packfileService.AddFileToPack(container, parentPackPath, packFile);
         }
 
-        static public string GetDialogFilterStringSupportedFormats()
+       public void Import3dModelToPackTree(PackFileContainer owner, string parentPath)       
+       {            
+            var dialog = new CommonOpenFileDialog();
+            dialog.IsFolderPicker = false;
+            dialog.Multiselect = true;
+
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                var files = dialog.FileNames;
+                foreach (var file in files)
+                {
+                    try
+                    {                        
+                        ImportAssimpDiskFileToPack(owner, parentPath, file);
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show($"Failed to import model file {file}. Error : {e.Message}", "Error");
+                        _logger.Here().Error($"Failed to load file {file}. Error : {e}");
+                    }
+                }
+            }
+        }
+
+        static public string GetDialogFilterSupportedFormats()
         {
             var unmangedLibrary = Assimp.Unmanaged.AssimpLibrary.Instance;
             var suportetFileExtensions = unmangedLibrary.GetExtensionList();
 
             var filter = "3d Models (ALL)|";
-            // Example: \"Image files (*.bmp, *.jpg)|*.bmp;*.jpg|All files (*.*)|*.*\"'
-
 
             // All model formats in one
             foreach (var ext in suportetFileExtensions)

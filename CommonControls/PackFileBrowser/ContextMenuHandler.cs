@@ -141,37 +141,18 @@ namespace CommonControls.PackFileBrowser
                 }
             }
         }
-        void OnImport3DModelCommand()
-        {         
 
+        void OnImport3DModelCommand()
+        {
             if (_selectedNode.FileOwner.IsCaPackFile)
             {
                 MessageBox.Show("Unable to edit CA packfile");
                 return;
             }
-
-            var parentPath = _selectedNode.GetFullPath(); // get pack path, at mouse pointer        
-            var dialog = new CommonOpenFileDialog();
-            dialog.IsFolderPicker = false;
-            dialog.Multiselect = true;
             
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            {                
-                var files = dialog.FileNames;
-                foreach (var file in files)
-                {                    
-                    try
-                    {
-                        var assimpDiskService = new AssimpDiskService(_packFileService);
-                        assimpDiskService.ImportAssimpDiskFileToPack(_selectedNode.FileOwner, parentPath, file);                                                 
-                    }
-                    catch (Exception e)
-                    {
-                        MessageBox.Show($"Failed to import model file {file}. Error : {e.Message}", "Error");
-                        _logger.Here().Error($"Failed to load file {file}. Error : {e}");
-                    }
-                }
-            }
+            var parentPath = _selectedNode.GetFullPath(); // get pack path, at mouse pointer        
+            var assimpDiskService = new AssimpDiskService(_packFileService);
+            assimpDiskService.Import3dModelToPackTree(_selectedNode.FileOwner, parentPath);
         }
 
         void OnAddFilesFromDirectory()
