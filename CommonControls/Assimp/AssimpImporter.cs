@@ -17,7 +17,6 @@ using Serilog;
 using CommonControls.Common;
 using Assimp.Unmanaged;
 
-
 namespace CommonControls.ModelImportExport
 {
     public class AssimpImporter
@@ -305,10 +304,8 @@ namespace CommonControls.ModelImportExport
             };
 
             var numWeight = 0;
-            if (_skeletonFile != null)
-            {
-                numWeight = 4;
-            }
+            if (_skeletonFile != null)            
+                numWeight = 4;            
 
             vertex.BoneIndex = new byte[numWeight];
             vertex.BoneWeight = new float[numWeight];
