@@ -162,7 +162,7 @@ namespace CommonControls.PackFileBrowser
                 {                    
                     try
                     {
-                        PackFileUtil.ImportAssimpDiskFileToPack(_packFileService, _selectedNode.FileOwner, parentPath, file);                                                 
+                        AssimpDiskService.ImportAssimpDiskFileToPack(_packFileService, _selectedNode.FileOwner, parentPath, file);                                                 
                     }
                     catch (Exception e)
                     {

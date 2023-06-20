@@ -24,5 +24,29 @@ namespace CommonControls.ModelImportExport
             pfs.AddFileToPack(container, parentPackPath, packFile);
         }
 
+        static public string GetDialogFilterStringSupportedFormats()
+        {
+            var unmangedLibrary = Assimp.Unmanaged.AssimpLibrary.Instance;
+            var suportetFileExtensions = unmangedLibrary.GetExtensionList();
+
+            var filter = "3d Models (ALL)|";
+            // Example: \"Image files (*.bmp, *.jpg)|*.bmp;*.jpg|All files (*.*)|*.*\"'
+
+            // All model formats in one
+            foreach (var ext in suportetFileExtensions)
+            {
+                filter += "*" + ext + ";";
+            }
+
+            // ech model format separately
+            foreach (var ext in suportetFileExtensions)
+            {
+                filter += "|" + ext.Remove(0, 1) + "(" + ext + ")|" + "*" + ext;
+            }
+
+            filter += "|All files(*.*) | *.*";
+
+            return filter;
+        }
     }
 }
