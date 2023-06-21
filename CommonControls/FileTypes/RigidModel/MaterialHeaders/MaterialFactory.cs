@@ -69,6 +69,18 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
             }
         }
 
+        public IMaterial CreateMaterial(RmvVersionEnum rmvType, ModelMaterialEnum modelTypeEnum, VertexFormat vertexFormat)
+        {
+            if (_materialCreators.ContainsKey(modelTypeEnum))
+            {
+                var material = _materialCreators[modelTypeEnum].CreateEmpty(modelTypeEnum, rmvType, vertexFormat);
+
+                return material;
+            }
+
+            throw new Exception($"Error Creating material - {modelTypeEnum} is not a supported material");
+        }
+
         public byte[] Save(ModelMaterialEnum modelTypeEnum, IMaterial material)
         {
             return _materialCreators[modelTypeEnum].Save(material);

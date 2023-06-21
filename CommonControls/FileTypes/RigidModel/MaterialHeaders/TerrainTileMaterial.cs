@@ -88,6 +88,11 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
             };
         }
 
+        public IMaterial CreateEmpty(ModelMaterialEnum materialId, RmvVersionEnum rmvType, VertexFormat vertexFormat)
+        {
+            return new TerrainTileMaterial();
+        }
+
         public byte[] Save(IMaterial material)
         {
             throw new NotImplementedException();

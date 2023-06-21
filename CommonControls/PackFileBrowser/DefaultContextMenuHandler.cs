@@ -45,6 +45,9 @@ namespace CommonControls.PackFileBrowser
                     Additem(ContextItems.CreateFolder, createMenu);
 
                     AddSeperator(newContextMenu);
+                    var importSubMenu = Additem(ContextItems.Import, newContextMenu);                    
+                    Additem(ContextItems.Import3DModel, importSubMenu);                  
+                    AddSeperator(newContextMenu);
 
                     Additem(ContextItems.Expand, newContextMenu);
                     Additem(ContextItems.Collapse, newContextMenu);
@@ -67,6 +70,11 @@ namespace CommonControls.PackFileBrowser
 
                     var createMenu = Additem(ContextItems.Create, newContextMenu);
                     Additem(ContextItems.CreateFolder, createMenu);
+
+                    AddSeperator(newContextMenu);
+                    var importSubMenu = Additem(ContextItems.Import, newContextMenu);
+                    Additem(ContextItems.Import3DModel, importSubMenu);
+                    AddSeperator(newContextMenu);
 
                     AddSeperator(newContextMenu);
                     Additem(ContextItems.Rename, newContextMenu);

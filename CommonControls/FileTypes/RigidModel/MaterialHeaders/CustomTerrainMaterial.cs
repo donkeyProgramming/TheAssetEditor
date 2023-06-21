@@ -77,6 +77,11 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
             };
         }
 
+        public IMaterial CreateEmpty(ModelMaterialEnum materialId, RmvVersionEnum rmvType, VertexFormat vertexFormat)
+        {
+            return new CustomTerrainMaterial();
+        }
+
         public byte[] Save(IMaterial material)
         {
             throw new NotImplementedException();

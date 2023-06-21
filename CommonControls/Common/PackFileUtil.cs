@@ -1,11 +1,12 @@
 ﻿using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.FileTypes.RigidModel;
+using CommonControls.ModelImportExport;
 using CommonControls.Services;
 using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace CommonControls.Common
 {
@@ -37,7 +38,7 @@ namespace CommonControls.Common
             return fileList;
         }
 
-        public static Dictionary<string, PackFile> FilterUnvantedFiles(Dictionary<string,PackFile> files, string[] removeFilters, out string[] removedFiles)
+        public static Dictionary<string, PackFile> FilterUnvantedFiles(Dictionary<string, PackFile> files, string[] removeFilters, out string[] removedFiles)
         {
             var tempRemoveFiles = new List<string>();
             var fileList = files.ToDictionary();  // Create a copy
@@ -76,20 +77,20 @@ namespace CommonControls.Common
         {
             if (File.Exists(path) == false)
                 throw new Exception();
-        
+
             var pfs = CreatePackFileService();
             var container = pfs.GetAllPackfileContainers().First();
             pfs.AddFileToPack(container, "systemfile", new PackFile(Path.GetFileName(path), new FileSystemSource(path)));
-        
+
             return pfs;
         }
-        
+
         public static PackFileService CreatePackFileService()
         {
             var pfs = new PackFileService(new PackFileDataBase(), new SkeletonAnimationLookUpHelper(), new ApplicationSettingsService(), new GameInformationFactory());
             var container = pfs.CreateNewPackFileContainer("temp", PackFileCAType.MOD);
             pfs.SetEditablePack(container);
-        
+
             return pfs;
         }
 
@@ -106,7 +107,7 @@ namespace CommonControls.Common
             var packFileList = new List<PackFile>();
             var pathList = new List<string>();
 
-            foreach(var fileRef in fileRefs) 
+            foreach (var fileRef in fileRefs)
             {
                 var fileSource = new FileSystemSource(fileRef.SystemPath);
                 var packfileName = fileRef.OverrideName;
@@ -125,7 +126,7 @@ namespace CommonControls.Common
         public static List<PackFile> LoadFilesFromDisk(PackFileService pfs, FileRef fileRef) => LoadFilesFromDisk(pfs, new FileRef[] { fileRef });
 
         public class FileRef
-        { 
+        {
             public string SystemPath { get; set; }
             public string PackFilePath { get; set; }
             public string OverrideName { get; set; } = null;
@@ -140,7 +141,7 @@ namespace CommonControls.Common
             {
                 SystemPath = systemPath;
                 PackFilePath = packFilePath;
-                OverrideName = overrideName;    
+                OverrideName = overrideName;
             }
         }
     }
