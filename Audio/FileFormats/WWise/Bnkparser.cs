@@ -1,4 +1,6 @@
 ﻿using Audio.FileFormats.WWise.Bkhd;
+using Audio.FileFormats.WWise.Data;
+using Audio.FileFormats.WWise.Didx;
 using Audio.FileFormats.WWise.Hirc;
 using Audio.FileFormats.WWise.Stid;
 using CommonControls.FileTypes.PackFiles.Models;
@@ -14,7 +16,6 @@ namespace Audio.FileFormats.WWise
         void Parse(string fileName, ByteChunk chunk, ParsedBnkFile soundDb);
     }
 
-
     public class Bnkparser
     {
         Dictionary<string, IParser> _parsers = new Dictionary<string, IParser>();
@@ -23,6 +24,8 @@ namespace Audio.FileFormats.WWise
             _parsers["BKHD"] = new BkhdParser();
             _parsers["HIRC"] = new HircParser();
             _parsers["STID"] = new StidParser();
+            _parsers["DIDX"] = new DidxParser();
+            _parsers["DATA"] = new DataParser();
         }
 
         public void UseHircByteFactory(bool value) => (_parsers["HIRC"] as HircParser).UseByteFactory = value;
