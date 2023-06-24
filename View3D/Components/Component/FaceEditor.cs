@@ -1,30 +1,21 @@
-﻿using Microsoft.Xna.Framework.Input;
-using MonoGame.Framework.WpfInterop;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using View3D.Commands.Face;
 using View3D.Commands.Object;
 using View3D.Components.Component.Selection;
-using View3D.Components.Input;
 using View3D.SceneNodes;
 using View3D.Services;
+using View3D.Utility;
 
 namespace View3D.Components.Component
 {
     public class FaceEditor : BaseComponent
     {
         CommandExecutor _commandManager;
-        SelectionManager _selectionManager;
 
-        public FaceEditor(IComponentManager componentManager) : base(componentManager)
+        public FaceEditor(ComponentManagerResolver componentManagerResolver, CommandExecutor commandExecutor) : base(componentManagerResolver.ComponentManager)
         {
-        }
-
-        public override void Initialize()
-        {
-            _commandManager = ComponentManager.GetComponent<CommandExecutor>();
-            _selectionManager = ComponentManager.GetComponent<SelectionManager>();
-            base.Initialize();
+            _commandManager = commandExecutor;
         }
 
         public void DeleteFaces(FaceSelectionState faceSelectionState)

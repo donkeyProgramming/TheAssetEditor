@@ -6,34 +6,38 @@ using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using View3D.Components.Input;
+using View3D.Utility;
 
 namespace View3D.Components.Rendering
 {
     public class ArcBallCamera : BaseComponent, IDisposable
     {
-        ILogger _logger = Logging.Create<ArcBallCamera>();
         GraphicsDevice _graphicsDevice;
         MouseComponent _mouse;
         KeyboardComponent _keyboard;
 
-        public ArcBallCamera(IComponentManager componentManager, float yaw = 0.8f, float pitch = -0.32f, float currentZoom = 10) : base(componentManager)
+        public ArcBallCamera(ComponentManagerResolver componentManagerResolver, DeviceResolverComponent deviceResolverComponent, KeyboardComponent keyboardComponent, MouseComponent mouseComponent) 
+            : base(componentManagerResolver.ComponentManager)
         {
-            Zoom = currentZoom;
-            Yaw = yaw;
-            Pitch = pitch;
-            //_lookAt = lookAt;
-
+            Zoom = 10;
+            Yaw = 0.8f;
+            Pitch = 0.32f;
             UpdateOrder = (int)ComponentUpdateOrderEnum.Camera;
+
+            _deviceResolverComponent = deviceResolverComponent;
+            _mouse = mouseComponent;
+            _keyboard = keyboardComponent;
+
+
         }
 
         public override void Initialize()
         {
-            var graphics = ComponentManager.GetComponent<DeviceResolverComponent>();
-            _graphicsDevice = graphics.Device;
-            _mouse = ComponentManager.GetComponent<MouseComponent>();
-            _keyboard = ComponentManager.GetComponent<KeyboardComponent>();
+      
+            _graphicsDevice = _deviceResolverComponent.Device;
             base.Initialize();
         }
 
@@ -164,6 +168,11 @@ namespace View3D.Components.Rendering
 
 
         private Matrix viewMatrix;
+        private readonly ComponentManagerResolver _componentManagerResolver;
+        private readonly DeviceResolverComponent _deviceResolverComponent;
+        private readonly MouseComponent _mouseComponent;
+        private readonly KeyboardComponent _keyboardComponent;
+
         public Matrix ViewMatrix
         {
             get

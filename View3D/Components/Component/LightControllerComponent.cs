@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Framework.WpfInterop;
 using System;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
@@ -16,23 +15,28 @@ namespace View3D.Components.Component
         string _animationText;
         GameTime _animationStart;
         bool _startAnimation;
-        KeyboardComponent _keyboard;
-        RenderEngineComponent _renderEngine;
+  
+        private readonly ResourceLibary _resourceLibary;
+        private readonly DeviceResolverComponent _deviceResolverComponent;
+        private readonly KeyboardComponent _keyboardComponent;
+        private readonly RenderEngineComponent _renderEngineComponent;
 
-        public LightControllerComponent(IComponentManager componentManager) : base(componentManager)
+        public LightControllerComponent(ComponentManagerResolver componentManagerResolver,
+            ResourceLibary resourceLibary, DeviceResolverComponent deviceResolverComponent, KeyboardComponent keyboardComponent, RenderEngineComponent renderEngineComponent) 
+            : base(componentManagerResolver.ComponentManager)
         {
-
+            _resourceLibary = resourceLibary;
+            _deviceResolverComponent = deviceResolverComponent;
+            _keyboardComponent = keyboardComponent;
+            _renderEngineComponent = renderEngineComponent;
         }
 
         public override void Initialize()
         {
-            var resourceLib = ComponentManager.GetComponent<ResourceLibary>();
-            var graphics = ComponentManager.GetComponent<DeviceResolverComponent>();
-            _keyboard = ComponentManager.GetComponent<KeyboardComponent>();
-            _renderEngine = ComponentManager.GetComponent<RenderEngineComponent>();
 
-            _font = resourceLib.DefaultFont;
-            _spriteBatch = new SpriteBatch(graphics.Device);
+
+            _font = _resourceLibary.DefaultFont;
+            _spriteBatch = new SpriteBatch(_deviceResolverComponent.Device);
         }
 
 
@@ -67,48 +71,48 @@ namespace View3D.Components.Component
             bool DirlightMoved_X = false;
             bool DirlightMoved_Y = false;
             bool lightIntensityChanged = false;
-            if (_keyboard.IsKeyDown(Keys.PageUp) && !_keyboard.IsKeyDown(Keys.LeftAlt))
+            if (_keyboardComponent.IsKeyDown(Keys.PageUp) && !_keyboardComponent.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngine.EnvLightRotationDegrees_Y += 1.0f;
+                _renderEngineComponent.EnvLightRotationDegrees_Y += 1.0f;
                 lightMoved = true;
             }
-            else if (_keyboard.IsKeyDown(Keys.PageDown) && !_keyboard.IsKeyDown(Keys.LeftAlt))
+            else if (_keyboardComponent.IsKeyDown(Keys.PageDown) && !_keyboardComponent.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngine.EnvLightRotationDegrees_Y -= 1.0f;
+                _renderEngineComponent.EnvLightRotationDegrees_Y -= 1.0f;
                 lightMoved = true;
             }
 
-            if (_keyboard.IsKeyDown(Keys.PageUp) && _keyboard.IsKeyDown(Keys.LeftAlt))
+            if (_keyboardComponent.IsKeyDown(Keys.PageUp) && _keyboardComponent.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngine.LightIntensityMult += 0.05f;
+                _renderEngineComponent.LightIntensityMult += 0.05f;
                 lightIntensityChanged = true;
             }
-            else if (_keyboard.IsKeyDown(Keys.PageDown) && _keyboard.IsKeyDown(Keys.LeftAlt))
+            else if (_keyboardComponent.IsKeyDown(Keys.PageDown) && _keyboardComponent.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngine.LightIntensityMult -= 0.05f;
+                _renderEngineComponent.LightIntensityMult -= 0.05f;
                 lightIntensityChanged = true;
             }            
-            else if (_keyboard.IsKeyDown(Keys.Right) && _keyboard.IsKeyDown(Keys.LeftAlt))
+            else if (_keyboardComponent.IsKeyDown(Keys.Right) && _keyboardComponent.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngine.DirLightRotationDegrees_Y -= 1.0f;
+                _renderEngineComponent.DirLightRotationDegrees_Y -= 1.0f;
                 DirlightMoved_Y = true;
             }
-            else if (_keyboard.IsKeyDown(Keys.Left) && _keyboard.IsKeyDown(Keys.LeftAlt))
+            else if (_keyboardComponent.IsKeyDown(Keys.Left) && _keyboardComponent.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngine.DirLightRotationDegrees_Y += 1.0f;
+                _renderEngineComponent.DirLightRotationDegrees_Y += 1.0f;
                 DirlightMoved_Y = true;
             }
-            else if (_keyboard.IsKeyDown(Keys.Up) && _keyboard.IsKeyDown(Keys.LeftAlt))
+            else if (_keyboardComponent.IsKeyDown(Keys.Up) && _keyboardComponent.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngine.DirLightRotationDegrees_X -= 1.0f;
+                _renderEngineComponent.DirLightRotationDegrees_X -= 1.0f;
                 DirlightMoved_X = true;
             }
-            else if (_keyboard.IsKeyDown(Keys.Down) && _keyboard.IsKeyDown(Keys.LeftAlt))
+            else if (_keyboardComponent.IsKeyDown(Keys.Down) && _keyboardComponent.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngine.DirLightRotationDegrees_X += 1.0f;
+                _renderEngineComponent.DirLightRotationDegrees_X += 1.0f;
                 DirlightMoved_X = true;
             }
-            else if (_keyboard.IsKeyDown(Keys.Home) && _keyboard.IsKeyDown(Keys.LeftAlt))
+            else if (_keyboardComponent.IsKeyDown(Keys.Home) && _keyboardComponent.IsKeyDown(Keys.LeftAlt))
             {
                 ResetLilghtingParams();
                 lightMoved = true;
@@ -117,16 +121,16 @@ namespace View3D.Components.Component
             LimitLightValues();
 
             if (lightMoved)
-                CreateAnimation($"Env rotation Y: {_renderEngine.EnvLightRotationDegrees_Y}");
+                CreateAnimation($"Env rotation Y: {_renderEngineComponent.EnvLightRotationDegrees_Y}");
 
             if (DirlightMoved_X)
-                CreateAnimation($"DirLight rotation X: {_renderEngine.DirLightRotationDegrees_X}");
+                CreateAnimation($"DirLight rotation X: {_renderEngineComponent.DirLightRotationDegrees_X}");
 
             if (DirlightMoved_Y)
-                CreateAnimation($"DirLight rotation Y: {_renderEngine.DirLightRotationDegrees_Y}");
+                CreateAnimation($"DirLight rotation Y: {_renderEngineComponent.DirLightRotationDegrees_Y}");
 
             if (lightIntensityChanged)
-                CreateAnimation($"Light intensity: {_renderEngine.LightIntensityMult}");
+                CreateAnimation($"Light intensity: {_renderEngineComponent.LightIntensityMult}");
 
             if (_startAnimation == true)
             {
@@ -140,10 +144,10 @@ namespace View3D.Components.Component
         
         public void ResetLilghtingParams()
         {
-            _renderEngine.LightIntensityMult = 1.0f;
-            _renderEngine.EnvLightRotationDegrees_Y = 20.0f;
-            _renderEngine.DirLightRotationDegrees_X = 0.0f;
-            _renderEngine.DirLightRotationDegrees_Y = 0.0f;
+            _renderEngineComponent.LightIntensityMult = 1.0f;
+            _renderEngineComponent.EnvLightRotationDegrees_Y = 20.0f;
+            _renderEngineComponent.DirLightRotationDegrees_X = 0.0f;
+            _renderEngineComponent.DirLightRotationDegrees_Y = 0.0f;
         }
 
         private static float LimitAndWrapAroundDregrees(float degrees)
@@ -162,14 +166,14 @@ namespace View3D.Components.Component
 
         private void LimitLightValues()
         {
-            _renderEngine.EnvLightRotationDegrees_Y = LimitAndWrapAroundDregrees(_renderEngine.EnvLightRotationDegrees_Y);            
-            
-            _renderEngine.DirLightRotationDegrees_X = LimitAndWrapAroundDregrees(_renderEngine.DirLightRotationDegrees_X);
-            _renderEngine.DirLightRotationDegrees_Y = LimitAndWrapAroundDregrees(_renderEngine.DirLightRotationDegrees_Y);
+            _renderEngineComponent.EnvLightRotationDegrees_Y = LimitAndWrapAroundDregrees(_renderEngineComponent.EnvLightRotationDegrees_Y);
+
+            _renderEngineComponent.DirLightRotationDegrees_X = LimitAndWrapAroundDregrees(_renderEngineComponent.DirLightRotationDegrees_X);
+            _renderEngineComponent.DirLightRotationDegrees_Y = LimitAndWrapAroundDregrees(_renderEngineComponent.DirLightRotationDegrees_Y);
 
 
-            if (_renderEngine.LightIntensityMult < 0)
-                _renderEngine.LightIntensityMult = 0;
+            if (_renderEngineComponent.LightIntensityMult < 0)
+                _renderEngineComponent.LightIntensityMult = 0;
         }
 
 

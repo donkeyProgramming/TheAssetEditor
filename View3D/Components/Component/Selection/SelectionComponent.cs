@@ -17,7 +17,6 @@ using View3D.Utility;
 
 namespace View3D.Components.Component.Selection
 {
-
     public class SelectionComponent : BaseComponent, IDisposable
     {
         ILogger _logger = Logging.Create<SelectionManager>();
@@ -28,7 +27,11 @@ namespace View3D.Components.Component.Selection
         KeyboardComponent _keyboardComponent;
         MouseComponent _mouseComponent;
         ArcBallCamera _camera;
+
         SelectionManager _selectionManager;
+
+        private readonly DeviceResolverComponent _deviceResolverComponent;
+        
         SceneManager _sceneManger;
         CommandExecutor _commandManager;
 
@@ -36,23 +39,30 @@ namespace View3D.Components.Component.Selection
         Vector2 _startDrag;
         Vector2 _currentMousePos;
 
-        public SelectionComponent(IComponentManager componentManager) : base(componentManager) { }
+        public SelectionComponent(ComponentManagerResolver componentManagerResolver,
+            MouseComponent mouseComponent, KeyboardComponent keyboardComponent,
+            ArcBallCamera camera, SelectionManager selectionManager,
+            DeviceResolverComponent deviceResolverComponent,
+            SceneManager sceneManager, CommandExecutor commandExecutor
+            ) 
+            : base(componentManagerResolver.ComponentManager)
+        {
+            _mouseComponent = mouseComponent;
+            _keyboardComponent = keyboardComponent;
+            _camera = camera;
+            _selectionManager = selectionManager;
+            _deviceResolverComponent = deviceResolverComponent;
+            _sceneManger = sceneManager;
+            _commandManager = commandExecutor;
+        }
 
         public override void Initialize()
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.SelectionComponent;
             DrawOrder = (int)ComponentDrawOrderEnum.SelectionComponent;
 
-            _mouseComponent = ComponentManager.GetComponent<MouseComponent>();
-            _keyboardComponent = ComponentManager.GetComponent<KeyboardComponent>();
-            _camera = ComponentManager.GetComponent<ArcBallCamera>();
-            _sceneManger = ComponentManager.GetComponent<SceneManager>();
-            _selectionManager = ComponentManager.GetComponent<SelectionManager>();
-            _commandManager = ComponentManager.GetComponent<CommandExecutor>();
-            var graphicsResolver = ComponentManager.GetComponent<DeviceResolverComponent>();
-
-            _spriteBatch = new SpriteBatch(graphicsResolver.Device);
-            _textTexture = new Texture2D(graphicsResolver.Device, 1, 1);
+            _spriteBatch = new SpriteBatch(_deviceResolverComponent.Device);
+            _textTexture = new Texture2D(_deviceResolverComponent.Device, 1, 1);
             _textTexture.SetData(new Color[1 * 1] { Color.White });
 
             base.Initialize();

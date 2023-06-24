@@ -1,9 +1,7 @@
-﻿using MonoGame.Framework.WpfInterop;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
+using View3D.Utility;
 
 namespace View3D.Components.Component
 {
@@ -14,14 +12,12 @@ namespace View3D.Components.Component
 
         Dictionary<ISceneNode, bool> _visMap;       
 
-        public ViewOnlySelectedComponent(IComponentManager componentManager) : base(componentManager)
+        public ViewOnlySelectedComponent(ComponentManagerResolver componentManagerResolver,
+            SceneManager sceneManager, SelectionManager selectionManager)
+            : base(componentManagerResolver.ComponentManager)
         {
-        }
-
-        public override void Initialize()
-        {
-            _sceneManager = ComponentManager.GetComponent<SceneManager>();
-            _selectionManager = ComponentManager.GetComponent<SelectionManager>();
+            _sceneManager = sceneManager;
+            _selectionManager = selectionManager;
         }
 
         public void Toggle()

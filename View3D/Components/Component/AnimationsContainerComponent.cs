@@ -1,12 +1,10 @@
 ﻿using CommonControls.Common;
 using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
 using Serilog;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using View3D.Animation;
+using View3D.Utility;
 
 namespace View3D.Components.Component
 {
@@ -16,7 +14,7 @@ namespace View3D.Components.Component
 
         Dictionary<string, AnimationPlayer> _playerMap = new Dictionary<string, AnimationPlayer>();
 
-        public AnimationsContainerComponent(IComponentManager componentManager) : base(componentManager)
+        public AnimationsContainerComponent(ComponentManagerResolver componentManagerResolver) : base(componentManagerResolver.ComponentManager)
         {
             UpdateOrder= (int)ComponentUpdateOrderEnum.Animation;
         }

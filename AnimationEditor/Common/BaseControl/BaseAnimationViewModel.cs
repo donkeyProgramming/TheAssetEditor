@@ -75,21 +75,21 @@ namespace AnimationEditor.PropCreator.ViewModels
             Scene = new SceneContainer();
             Scene.AddComponent(new DeviceResolverComponent(Scene));
             Scene.AddComponent(new ResourceLibary(Scene, pfs));
-            Scene.AddComponent(new FpsComponent(Scene));
-            Scene.AddComponent(new KeyboardComponent(Scene));
-            Scene.AddComponent(new MouseComponent(Scene));
+            //Scene.AddComponent(new FpsComponent(new ComponentManagerResolver(Scene), ));
+            //Scene.AddComponent(new KeyboardComponent(new ComponentManagerResolver(Scene), Scene));
+            //Scene.AddComponent(new MouseComponent(new ComponentManagerResolver(Scene), Scene));
             Scene.AddComponent(skeletonHelper);
-            Scene.AddComponent(new ArcBallCamera(Scene));
-            Scene.AddComponent(new ClearScreenComponent(Scene));
-            Scene.AddComponent(new RenderEngineComponent(Scene, _applicationSettingsService));
-            Scene.AddComponent(new GridComponent(Scene));
-            Scene.AddComponent(new SceneManager(Scene));
-            Scene.AddComponent(new AnimationsContainerComponent(Scene));
-            Scene.AddComponent(new SelectionManager(Scene));
-            Scene.AddComponent(new SelectionComponent(Scene));
-            Scene.AddComponent(new CommandExecutor(Scene));
-            Scene.AddComponent(new LightControllerComponent(Scene));
-            _focusComponent = Scene.AddComponent(new FocusSelectableObjectComponent(Scene));
+            ////Scene.AddComponent(new ArcBallCamera(Scene));
+            //Scene.AddComponent(new ClearScreenComponent(Scene));
+            //Scene.AddComponent(new RenderEngineComponent(Scene, _applicationSettingsService));
+            //Scene.AddComponent(new GridComponent(Scene));
+            //Scene.AddComponent(new SceneManager(Scene));
+            //Scene.AddComponent(new AnimationsContainerComponent(Scene));
+            //Scene.AddComponent(new SelectionManager(Scene));
+            //Scene.AddComponent(new SelectionComponent(Scene));
+            //Scene.AddComponent(new CommandExecutor(Scene));
+            //Scene.AddComponent(new LightControllerComponent(Scene));
+            //_focusComponent = Scene.AddComponent(new FocusSelectableObjectComponent(Scene));
 
             Scene.SceneInitialized += OnSceneInitialized;
 

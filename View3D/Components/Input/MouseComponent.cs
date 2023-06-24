@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using View3D.Components;
+using View3D.Utility;
 
 namespace View3D.Components.Input
 {
@@ -49,7 +50,7 @@ namespace View3D.Components.Input
             } 
         }
 
-        public MouseComponent(WpfGame game) : base(game)
+        public MouseComponent(ComponentManagerResolver componentManagerResolver, WpfGame game) : base(componentManagerResolver.ComponentManager)
         {
             _wpfMouse = new WpfMouse(game);
             _wpfMouse.CaptureMouseWithin = true;

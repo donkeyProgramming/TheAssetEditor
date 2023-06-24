@@ -23,10 +23,12 @@ namespace View3D.Components.Component
         public ISceneNode RootNode { get; private set; }
 
         RenderEngineComponent _renderEngine;
+        private readonly ComponentManagerResolver _componentManagerResolver;
 
-        public SceneManager(IComponentManager componentManager) : base(componentManager) 
+        public SceneManager(ComponentManagerResolver componentManagerResolver) : base(componentManagerResolver.ComponentManager) 
         {
             RootNode = new GroupNode("Root") { SceneManager = this, IsEditable = true, IsLockable = false };
+            _componentManagerResolver = componentManagerResolver;
         }
 
         public override void Initialize()

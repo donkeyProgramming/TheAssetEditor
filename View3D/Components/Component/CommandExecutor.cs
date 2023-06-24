@@ -24,14 +24,16 @@ namespace View3D.Components.Component
         string _animationText;
         GameTime _animationStart;
         bool _startAnimation;
+        private readonly DeviceResolverComponent _deviceResolverComponent;
 
-        public CommandExecutor(IComponentManager componentManager) : base(componentManager)
-        { }
+        public CommandExecutor(ComponentManagerResolver componentManagerResolver, DeviceResolverComponent deviceResolverComponent) : base(componentManagerResolver.ComponentManager)
+        {
+            _deviceResolverComponent = deviceResolverComponent;
+        }
 
         public override void Initialize()
         {
-            var graphicsResolver = ComponentManager.GetComponent<DeviceResolverComponent>();
-            _spriteBatch = new SpriteBatch(graphicsResolver.Device);
+            _spriteBatch = new SpriteBatch(_deviceResolverComponent.Device);
         }
 
         public void ExecuteCommand(ICommand command, bool isUndoable = true)

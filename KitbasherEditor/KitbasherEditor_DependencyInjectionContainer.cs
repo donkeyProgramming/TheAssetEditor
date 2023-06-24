@@ -3,6 +3,17 @@ using CommonControls.Services;
 using KitbasherEditor.ViewModels;
 using KitbasherEditor.Views;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Xna.Framework;
+using MonoGame.Framework.WpfInterop;
+using System.Collections.Generic;
+using View3D.Components;
+using View3D.Components.Component;
+using View3D.Components.Component.Selection;
+using View3D.Components.Gizmo;
+using View3D.Components.Input;
+using View3D.Components.Rendering;
+using View3D.Scene;
+using View3D.Utility;
 
 namespace KitbasherEditor
 {
@@ -13,12 +24,74 @@ namespace KitbasherEditor
             serviceCollection.AddTransient<KitbasherView>();
             serviceCollection.AddTransient<KitbasherViewModel>();
             serviceCollection.AddTransient<IEditorViewModel, KitbasherViewModel>();
+
+
+            serviceCollection.AddSingleton<SceneContainer>();
+            serviceCollection.AddSingleton<WpfGame>( x=> x.GetService<SceneContainer>() as WpfGame);
+
+            serviceCollection.AddSingleton<ComponentManagerResolver>();
+            serviceCollection.AddSingleton<ComponentInserter>();
+
+
+            RegisterGameComponent<DeviceResolverComponent>(serviceCollection);
+            RegisterGameComponent<CommandExecutor>(serviceCollection);
+            RegisterGameComponent<KeyboardComponent>(serviceCollection);
+            RegisterGameComponent<MouseComponent>(serviceCollection);
+            RegisterGameComponent<ResourceLibary>(serviceCollection);
+            RegisterGameComponent<FpsComponent>(serviceCollection);
+            RegisterGameComponent<ArcBallCamera>(serviceCollection);
+            RegisterGameComponent<SceneManager>(serviceCollection);
+            RegisterGameComponent<SelectionManager>(serviceCollection);
+            RegisterGameComponent<GizmoComponent>(serviceCollection);
+            RegisterGameComponent<SelectionComponent>(serviceCollection);
+            RegisterGameComponent<ObjectEditor>(serviceCollection);
+            RegisterGameComponent<FaceEditor>(serviceCollection);
+            RegisterGameComponent<FocusSelectableObjectComponent>(serviceCollection);
+            RegisterGameComponent<RenderEngineComponent>(serviceCollection);
+
+
+            RegisterGameComponent<ClearScreenComponent>(serviceCollection);
+            RegisterGameComponent<GridComponent>(serviceCollection);
+            RegisterGameComponent<AnimationsContainerComponent>(serviceCollection);
+            RegisterGameComponent<ViewOnlySelectedComponent>(serviceCollection);
+            RegisterGameComponent<LightControllerComponent>(serviceCollection);
+            //RegisterGameComponent<RenderEngineComponent>(serviceCollection);
+            //RegisterGameComponent<RenderEngineComponent>(serviceCollection);
+            //RegisterGameComponent<RenderEngineComponent>(serviceCollection);
+        }
+
+        public static void RegisterGameComponent<T>(IServiceCollection serviceCollection) where T : class, IGameComponent
+        {
+            serviceCollection.AddScoped<T>();
+            serviceCollection.AddScoped<IGameComponent, T>(x => x.GetService<T>());
+
         }
 
         public static void RegisterTools(IToolFactory factory)
         {
             factory.RegisterFileTool<KitbasherViewModel, KitbasherView>(new ExtentionToTool(EditorEnums.Kitbash_Editor, new[] { ".rigid_model_v2", ".wsmodel.rigid_model_v2" }/*, new[] { ".wsmodel", ".variantmeshdefinition" }*/));
         }
+
+
+        public class ComponentInserter
+        {
+            private readonly ComponentManagerResolver _componentManagerResolver;
+            private readonly IEnumerable<IGameComponent> _components;
+
+            public ComponentInserter(ComponentManagerResolver componentManagerResolver, IEnumerable<IGameComponent> components)
+            {
+                _componentManagerResolver = componentManagerResolver;
+                _components = components;
+            }
+
+            public void Execute()
+            {
+                foreach (var component in _components)
+                    _componentManagerResolver.ComponentManager.AddComponent(component);
+            }
+        }
+
+    
     }
 
 

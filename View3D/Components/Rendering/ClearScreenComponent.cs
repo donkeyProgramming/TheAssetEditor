@@ -1,28 +1,21 @@
 ﻿using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using View3D.Utility;
 
 namespace View3D.Components.Rendering
 {
     public class ClearScreenComponent : BaseComponent
     {
-        DeviceResolverComponent _deviceResolver;
-        public ClearScreenComponent(IComponentManager component) : base(component)
+        private readonly DeviceResolverComponent _deviceResolverComponent;
+
+        public ClearScreenComponent(ComponentManagerResolver componentManagerResolver, DeviceResolverComponent deviceResolverComponent) : base(componentManagerResolver.ComponentManager)
         {
             DrawOrder = (int)ComponentDrawOrderEnum.ClearScreenComponent;
-        }
-
-        public override void Initialize()
-        {
-            _deviceResolver = ComponentManager.GetComponent<DeviceResolverComponent>();
-            base.Initialize();
+            _deviceResolverComponent = deviceResolverComponent;
         }
 
         public override void Draw(GameTime gameTime)
         {
-            _deviceResolver.Device.Clear(Color.CornflowerBlue);
+            _deviceResolverComponent.Device.Clear(Color.CornflowerBlue);
         }
     }
 }

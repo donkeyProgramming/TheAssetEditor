@@ -1,7 +1,4 @@
-﻿using CommonControls.Common;
-using MonoGame.Framework.WpfInterop;
-using Serilog;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using View3D.Commands.Object;
 using View3D.Components.Component.Selection;
@@ -13,20 +10,12 @@ namespace View3D.Components.Component
 {
     public class ObjectEditor : BaseComponent
     {
-        ILogger _logger = Logging.Create<ObjectEditor>();
+        private readonly CommandExecutor _commandManager;
 
-        CommandExecutor _commandManager;
-
-        public ObjectEditor(IComponentManager componentManager) : base(componentManager)
+        public ObjectEditor(ComponentManagerResolver componentManagerResolver, CommandExecutor commandExecutor) : base(componentManagerResolver.ComponentManager)
         {
+            _commandManager = commandExecutor;
         }
-
-        public override void Initialize()
-        {
-            _commandManager = ComponentManager.GetComponent<CommandExecutor>();
-            base.Initialize();
-        }
-
 
         public void DeleteObject(ObjectSelectionState objectSelectionState)
         {

@@ -1,13 +1,9 @@
 ﻿using CommonControls.Common;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using View3D.Components.Input;
 using View3D.Components.Rendering;
 using View3D.SceneNodes;
 using View3D.Utility;
@@ -18,21 +14,17 @@ namespace View3D.Components.Component.Selection
     {
         ILogger _logger = Logging.Create<FocusSelectableObjectComponent>();
 
-        SelectionManager _selectionManager;
-        ArcBallCamera _archballCamera;
-        SceneManager _sceneManager;
+        private readonly  SelectionManager _selectionManager;
+        private readonly ArcBallCamera _arcBallCamera;
+        private readonly  SceneManager _sceneManager;
 
-        public FocusSelectableObjectComponent(IComponentManager componentManager) : base(componentManager) { }
-
-        public override void Initialize()
+        public FocusSelectableObjectComponent(ComponentManagerResolver componentManagerResolver, SelectionManager selectionManager, ArcBallCamera arcBallCamera, SceneManager sceneManager ) 
+            : base(componentManagerResolver.ComponentManager)
         {
-            _selectionManager = ComponentManager.GetComponent<SelectionManager>();
-            _archballCamera = ComponentManager.GetComponent<ArcBallCamera>();
-            _sceneManager = ComponentManager.GetComponent<SceneManager>();
-
-            base.Initialize();
+            _selectionManager = selectionManager;
+            _arcBallCamera = arcBallCamera;
+            _sceneManager = sceneManager;
         }
-
 
         public void FocusSelection()
         {
@@ -56,8 +48,8 @@ namespace View3D.Components.Component.Selection
             double boundSphereRadius = bbCorners.Select(x => Vector3.Distance(x, bbCenter)).Max();
             double camDistance = ((boundSphereRadius * 2.0) / Math.Tan(fov / 2.0)) / 2;
 
-            _archballCamera.LookAt = bbCenter;
-            _archballCamera.Zoom = (float)camDistance;
+            _arcBallCamera.LookAt = bbCenter;
+            _arcBallCamera.Zoom = (float)camDistance;
         }
 
         void Focus(ISelectionState selectionState)
@@ -74,7 +66,7 @@ namespace View3D.Components.Component.Selection
                 var objectPos = _sceneManager.GetWorldPosition(vertexSelection.RenderObject).Translation;
                 if (vertexList.Count == 0)
                 {
-                    _archballCamera.LookAt = objectPos;
+                    _arcBallCamera.LookAt = objectPos;
                     return;
                 }
                
@@ -83,7 +75,7 @@ namespace View3D.Components.Component.Selection
                     averageVertexPos += vertexSelection.RenderObject.Geometry.GetVertexById(vertexIndex);
 
                 averageVertexPos = averageVertexPos / vertexList.Count;
-                _archballCamera.LookAt = averageVertexPos + objectPos;
+                _arcBallCamera.LookAt = averageVertexPos + objectPos;
             }
             else if (selectionState is FaceSelectionState faceSelection)
             {
@@ -91,7 +83,7 @@ namespace View3D.Components.Component.Selection
                 var objectPos = _sceneManager.GetWorldPosition(faceSelection.RenderObject).Translation;
                 if (faceList.Count == 0)
                 {
-                    _archballCamera.LookAt = objectPos;
+                    _arcBallCamera.LookAt = objectPos;
                     return;
                 }
 
@@ -108,15 +100,15 @@ namespace View3D.Components.Component.Selection
                     averageFacePos += (face0 + face1 + face2) / 3;
                 }
                 averageFacePos = averageFacePos / faceList.Count;
-                _archballCamera.LookAt = averageFacePos + objectPos;
+                _arcBallCamera.LookAt = averageFacePos + objectPos;
             }
         }
 
 
         public void ResetCamera()
         {
-            _archballCamera.LookAt = Vector3.Zero;
-            _archballCamera.Zoom = 10;
+            _arcBallCamera.LookAt = Vector3.Zero;
+            _arcBallCamera.Zoom = 10;
         }
 
         public void Dispose()

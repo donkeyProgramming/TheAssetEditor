@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using View3D.Components;
+using View3D.Utility;
 
 namespace View3D.Components.Input
 {
@@ -20,7 +21,7 @@ namespace View3D.Components.Input
 
         WpfKeyboard _wpfKeyboard;
 
-        public KeyboardComponent(WpfGame game) : base(game)
+        public KeyboardComponent(ComponentManagerResolver componentManagerResolver, WpfGame game) : base(componentManagerResolver.ComponentManager)
         {
             _wpfKeyboard = new WpfKeyboard(game);
             UpdateOrder = (int)ComponentUpdateOrderEnum.Input;

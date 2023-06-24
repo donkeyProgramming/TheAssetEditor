@@ -22,6 +22,7 @@ using View3D.Scene;
 using View3D.SceneNodes;
 using View3D.Services;
 using View3D.Utility;
+using static KitbasherEditor.KitbasherEditor_DependencyInjectionContainer;
 
 namespace KitbasherEditor.ViewModels
 {
@@ -46,34 +47,38 @@ namespace KitbasherEditor.ViewModels
         KitbashSceneCreator _modelLoader;
         private bool _hasUnsavedChanges;
 
-        public KitbasherViewModel(PackFileService pf, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService)
+        public KitbasherViewModel(PackFileService pf, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService,
+            SceneContainer sceneContainer, ComponentInserter componentInserter, CommandExecutor commandExecutor)
         {
             _packFileService = pf;
             _skeletonAnimationLookUpHelper = skeletonHelper;
             _applicationSettingsService = applicationSettingsService;
 
-            Scene = new SceneContainer();
-            Scene.AddComponent(new DeviceResolverComponent(Scene));
-            Scene.AddComponent(new ResourceLibary(Scene, pf));
-            Scene.AddComponent(new FpsComponent(Scene));
-            Scene.AddComponent(new KeyboardComponent(Scene));
-            Scene.AddComponent(new MouseComponent(Scene));
-            Scene.AddComponent(new ArcBallCamera(Scene));
-            Scene.AddComponent(new SceneManager(Scene));
-            Scene.AddComponent(new SelectionManager(Scene));
-            Scene.AddComponent(new GizmoComponent(Scene));
-            Scene.AddComponent(new SelectionComponent(Scene));
-            Scene.AddComponent(new ObjectEditor(Scene));
-            Scene.AddComponent(new FaceEditor(Scene));
-            Scene.AddComponent(new FocusSelectableObjectComponent(Scene));
-            Scene.AddComponent(new ClearScreenComponent(Scene));
-            Scene.AddComponent(new RenderEngineComponent(Scene, _applicationSettingsService));
-            Scene.AddComponent(new GridComponent(Scene));
-            Scene.AddComponent(new AnimationsContainerComponent(Scene));
-            Scene.AddComponent(new ViewOnlySelectedComponent(Scene));
-            Scene.AddComponent(new LightControllerComponent(Scene));
+            Scene = sceneContainer;
+            _commandExecutor = commandExecutor;
+            componentInserter.Execute();
+            //Scene.AddComponent(new DeviceResolverComponent(Scene));
+            // Scene.AddComponent(new ResourceLibary(Scene, pf));
+            //Scene.AddComponent(resourceLibary);
+            //Scene.AddComponent(new FpsComponent(Scene));
+            //Scene.AddComponent(new KeyboardComponent(Scene));
+            //Scene.AddComponent(new MouseComponent(Scene));
+            //Scene.AddComponent(new ArcBallCamera(Scene));
+            //Scene.AddComponent(new SceneManager(Scene));
+          // Scene.AddComponent(new SelectionManager(Scene));
+          // Scene.AddComponent(new GizmoComponent(Scene));
+          // Scene.AddComponent(new SelectionComponent(Scene));
+           //Scene.AddComponent(new ObjectEditor(Scene));
+         //  Scene.AddComponent(new FaceEditor(Scene));
+           //Scene.AddComponent(new FocusSelectableObjectComponent(Scene));
+            //Scene.AddComponent(new ClearScreenComponent(Scene));
+            //Scene.AddComponent(new RenderEngineComponent(Scene, _applicationSettingsService));
+           // Scene.AddComponent(new GridComponent(Scene));
+            //Scene.AddComponent(new AnimationsContainerComponent(Scene));
+          //  Scene.AddComponent(new ViewOnlySelectedComponent(Scene));
+           // Scene.AddComponent(new LightControllerComponent(Scene));
             Scene.AddComponent(_skeletonAnimationLookUpHelper);
-            _commandExecutor = Scene.AddComponent(new CommandExecutor(Scene));
+            //_commandExecutor = Scene.AddComponent(new CommandExecutor(Scene));
 
             _commandExecutor.CommandStackChanged += CommandExecutorOnCommandStackChanged;
 

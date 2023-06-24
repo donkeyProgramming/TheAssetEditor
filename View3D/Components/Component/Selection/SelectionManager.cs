@@ -1,20 +1,11 @@
 ﻿using CommonControls.Common;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using View3D.Components.Gizmo;
-using View3D.Components.Input;
 using View3D.Components.Rendering;
 using View3D.Rendering;
-using View3D.Rendering.Geometry;
 using View3D.Rendering.RenderItems;
 using View3D.Rendering.Shading;
-using View3D.Scene;
 using View3D.SceneNodes;
 using View3D.Utility;
 
@@ -24,34 +15,37 @@ namespace View3D.Components.Component.Selection
     public class SelectionManager : BaseComponent, IDisposable
     {
         public event SelectionChangedDelegate SelectionChanged;
-
-        ILogger _logger = Logging.Create<SelectionManager>();
         ISelectionState _currentState;
-        RenderEngineComponent _renderEngine;
+        private readonly RenderEngineComponent _renderEngine;
         BasicShader _wireframeEffect;
         BasicShader _selectedFacesEffect;
 
         LineMeshRender _lineGeometry;
         VertexInstanceMesh VertexRenderer;
         float _vertexSelectionFallof = 0;
+        private readonly ResourceLibary _resourceLib;
+        private readonly DeviceResolverComponent _deviceResolverComponent;
 
-        public SelectionManager(IComponentManager componentManager ) : base(componentManager) {}
+        public SelectionManager(ComponentManagerResolver componentManagerResolver, RenderEngineComponent renderEngine, ResourceLibary resourceLib, DeviceResolverComponent deviceResolverComponent ) : base(componentManagerResolver.ComponentManager)
+        {
+            _renderEngine = renderEngine;
+            _resourceLib = resourceLib;
+            _deviceResolverComponent = deviceResolverComponent;
+        }
 
 
         public override void Initialize()
         {
             CreateSelectionSate(GeometrySelectionMode.Object, null);
-            _renderEngine = ComponentManager.GetComponent<RenderEngineComponent>();
-            var resourceLibary = ComponentManager.GetComponent<ResourceLibary>();
-            var deviceResolver = ComponentManager.GetComponent<DeviceResolverComponent>();
+           
 
-            _lineGeometry = new LineMeshRender(resourceLibary);
+            _lineGeometry = new LineMeshRender(_resourceLib);
             VertexRenderer = new VertexInstanceMesh(ComponentManager);
 
-            _wireframeEffect = new BasicShader(deviceResolver.Device);
+            _wireframeEffect = new BasicShader(_deviceResolverComponent.Device);
             _wireframeEffect.DiffuseColor = Vector3.Zero;
 
-            _selectedFacesEffect = new BasicShader(deviceResolver.Device);
+            _selectedFacesEffect = new BasicShader(_deviceResolverComponent.Device);
             _selectedFacesEffect.DiffuseColor = new Vector3(1, 0, 0);
             _selectedFacesEffect.SpecularColor = new Vector3(1, 0, 0);
             _selectedFacesEffect.EnableDefaultLighting();

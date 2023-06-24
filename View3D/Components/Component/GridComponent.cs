@@ -14,20 +14,21 @@ namespace View3D.Components.Component
 {
     public class GridComponent : BaseComponent, IDisposable
     {
-        ILogger _logger = Logging.Create<GridComponent>();
-
-        RenderEngineComponent _renderComponent;
         LineMeshRender _gridMesh;
+        private readonly RenderEngineComponent _renderEngineComponent;
+        private readonly ResourceLibary _resourceLibary;
 
-        public GridComponent(IComponentManager componentManager) : base(componentManager)
+        public GridComponent(ComponentManagerResolver componentManagerResolver, RenderEngineComponent renderEngineComponent, ResourceLibary resourceLibary) 
+            : base(componentManagerResolver.ComponentManager)
         {
+            _renderEngineComponent = renderEngineComponent;
+            _resourceLibary = resourceLibary;
         }
 
         public override void Initialize()
         {
-            _renderComponent = ComponentManager.GetComponent<RenderEngineComponent>();
-            var resourceLib = ComponentManager.GetComponent<ResourceLibary>();
-            _gridMesh = new LineMeshRender(resourceLib);
+
+            _gridMesh = new LineMeshRender(_resourceLibary);
             _gridMesh.CreateGrid();
 
             base.Initialize();
@@ -35,7 +36,7 @@ namespace View3D.Components.Component
 
         public override void Draw(GameTime gameTime)
         {
-            _renderComponent.AddRenderItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = _gridMesh, ModelMatrix = Matrix.Identity });
+            _renderEngineComponent.AddRenderItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = _gridMesh, ModelMatrix = Matrix.Identity });
             base.Draw(gameTime);
         }
 

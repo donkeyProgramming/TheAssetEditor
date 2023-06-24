@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Framework.WpfInterop;
 using View3D.Utility;
 
 namespace View3D.Components.Component
@@ -13,18 +12,20 @@ namespace View3D.Components.Component
         private int _frames;
         private int _liveFrames;
         private TimeSpan _timeElapsed;
+        private readonly ResourceLibary _resourceLibary;
+        private readonly DeviceResolverComponent _deviceResolverComponent;
 
-        public FpsComponent(IComponentManager componentManager) : base(componentManager)
+        public FpsComponent(ComponentManagerResolver componentManagerResolver, ResourceLibary resourceLibary, DeviceResolverComponent deviceResolverComponent)
+            : base(componentManagerResolver.ComponentManager)
         {
+            _resourceLibary = resourceLibary;
+            _deviceResolverComponent = deviceResolverComponent;
         }
 
         protected override void LoadContent()
         {
-            var resourceLib = ComponentManager.GetComponent<ResourceLibary>();
-            var graphics = ComponentManager.GetComponent<DeviceResolverComponent>();
-            _font = resourceLib.DefaultFont;
-
-            _spriteBatch = new SpriteBatch(graphics.Device);
+            _font = _resourceLibary.DefaultFont;
+            _spriteBatch = new SpriteBatch(_deviceResolverComponent.Device);
         }
 
         public override void Update(GameTime gameTime)
