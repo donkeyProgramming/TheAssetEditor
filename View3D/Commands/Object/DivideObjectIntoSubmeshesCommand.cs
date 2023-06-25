@@ -18,7 +18,6 @@ namespace View3D.Commands.Object
 
         List<GroupNode> _newGroupNodes = new List<GroupNode>();
 
-        IEditableMeshResolver _editableMeshResolver;
         SceneManager _sceneManager;
         SelectionManager _selectionManager;
         ISelectionState _originalSelectionState;
@@ -38,7 +37,6 @@ namespace View3D.Commands.Object
         public override void Initialize(IComponentManager componentManager)
         {
             _componentManager = componentManager;
-            _editableMeshResolver = componentManager.GetComponent<IEditableMeshResolver>();
             _sceneManager = componentManager.GetComponent<SceneManager>();
             _selectionManager = componentManager.GetComponent<SelectionManager>();
             _resourceLib = componentManager.GetComponent<ResourceLibary>();

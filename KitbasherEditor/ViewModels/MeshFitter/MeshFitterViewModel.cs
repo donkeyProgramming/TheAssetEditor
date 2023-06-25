@@ -75,7 +75,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             _animationPlayer.Play();
 
             var resourceLib = _componentManager.GetComponent<ResourceLibary>();
-            _currentSkeletonNode = new SkeletonNode(_componentManager, _fromSkeleton);
+            _currentSkeletonNode = new SkeletonNode(resourceLib, _fromSkeleton);
             _currentSkeletonNode.SelectedNodeColour = Color.White;
             _componentManager.GetComponent<SceneManager>().RootNode.AddObject(_currentSkeletonNode);
 
@@ -116,7 +116,9 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 BonePositionOffset.Set(MeshBones.SelectedItem.BonePosOffset.X, MeshBones.SelectedItem.BonePosOffset.Y, MeshBones.SelectedItem.BonePosOffset.Z);
 
                 _currentSkeletonNode.SelectedBoneIndex = MeshBones.SelectedItem.BoneIndex.Value;
-                _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().SkeletonNode.SelectedBoneIndex = MeshBones.SelectedItem.MappedBoneIndex.Value;
+                var sceneManager = _componentManager.GetComponent<SceneManager>();
+                var rootNode = sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+                rootNode.SkeletonNode.SelectedBoneIndex = MeshBones.SelectedItem.MappedBoneIndex.Value;
             }
             else
             {
@@ -125,7 +127,11 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 BonePositionOffset.Set(0);
 
                 _currentSkeletonNode.SelectedBoneIndex = null;
-                _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().SkeletonNode.SelectedBoneIndex = null;
+
+
+                var sceneManager = _componentManager.GetComponent<SceneManager>();
+                var rootNode = sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+                rootNode.SkeletonNode.SelectedBoneIndex = null;
             }
         }
 
@@ -296,7 +302,9 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 mesh.AnimationPlayer = _oldAnimationPlayer;
 
             // Remove the skeleton node
-            _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().SkeletonNode.SelectedBoneIndex = null; 
+            var sceneManager = _componentManager.GetComponent<SceneManager>();
+            var rootNode = sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            rootNode.SkeletonNode.SelectedBoneIndex = null; 
             _componentManager.GetComponent<SceneManager>().RootNode.RemoveObject(_currentSkeletonNode);
         }
 
@@ -339,7 +347,8 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 .Select(x=>(int)x)
                 .ToList();
 
-            var targetSkeleton = componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().SkeletonNode;
+            var rootNode = sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            var targetSkeleton = rootNode.SkeletonNode;
             var targetSkeletonFile = skeletonHelper.GetSkeletonFileFromName(pfs, targetSkeleton.Name);
             
             RemappedAnimatedBoneConfiguration config = new RemappedAnimatedBoneConfiguration();

@@ -1,6 +1,7 @@
 ﻿using CommonControls.Common;
 using CommonControls.Services;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
+using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels
 {
-    public class SceneExplorerViewModel : NotifyPropertyChangedImpl, IEditableMeshResolver
+    public class SceneExplorerViewModel : NotifyPropertyChangedImpl
     {
         IComponentManager _componentManager;
         SceneManager _sceneManager;
@@ -39,7 +40,8 @@ namespace KitbasherEditor.ViewModels
         public MainEditableNode EditableMeshNode { get => _editableMeshNode; set { _editableMeshNode = value; ContextMenu.EditableMeshNode = value; } }
 
 
-        public SceneExplorerViewModel(IComponentManager componentManager, PackFileService packFileService, AnimationControllerViewModel animationControllerViewModel, ApplicationSettingsService applicationSettingsService)
+        public SceneExplorerViewModel(IComponentManager componentManager, PackFileService packFileService, AnimationControllerViewModel animationControllerViewModel,
+            ApplicationSettingsService applicationSettingsService)
         {
             _componentManager = componentManager;
             _animationControllerViewModel = animationControllerViewModel;
@@ -214,15 +216,6 @@ namespace KitbasherEditor.ViewModels
                     item.Children[i].IsExpanded = i == newLodLevel;
                 }
             }
-        }
-
-        public void Initialize()
-        {
-        }
-
-        public MainEditableNode GeEditableMeshRootNode()
-        {
-            return EditableMeshNode;
         }
     }
 }

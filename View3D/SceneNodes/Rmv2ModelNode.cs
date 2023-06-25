@@ -34,7 +34,8 @@ namespace View3D.SceneNodes
             UpdateDefaultLodValues();
         }
 
-        public void CreateModelNodesFromFile(RmvFile model, ResourceLibary resourceLibary, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory, string modelFullPath, IComponentManager componentManager, PackFileService pfs, bool autoResolveTexture)
+        public void CreateModelNodesFromFile(RmvFile model, ResourceLibary resourceLibary, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory, string modelFullPath,
+            IComponentManager componentManager, PackFileService pfs, bool autoResolveTexture)
         {
             Model = model;
             for (int lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)

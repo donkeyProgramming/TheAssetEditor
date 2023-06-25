@@ -6,8 +6,4 @@ using View3D.SceneNodes;
 
 namespace View3D.Components.Component
 {
-    public interface IEditableMeshResolver : IGameComponent
-    {
-        MainEditableNode GeEditableMeshRootNode();
-    }
 }

@@ -253,8 +253,10 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 
         void ChangeVertexType(UiVertexFormat newFormat)
         {
-            var mainNode = _componentManager.GetComponent<IEditableMeshResolver>();
-            var skeletonName = mainNode.GeEditableMeshRootNode()?.SkeletonNode.Name;
+            var scenaManager = _componentManager.GetComponent<SceneManager>();
+            var root = scenaManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+
+            var skeletonName = root?.SkeletonNode.Name;
             _meshNode.Geometry.ChangeVertexType(newFormat, skeletonName);
             NotifyPropertyChanged(nameof(VertexType));
         }

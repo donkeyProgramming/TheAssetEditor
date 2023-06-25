@@ -1,6 +1,10 @@
-﻿using CommonControls.Common;
+﻿using _componentManager.ViewModels.MenuBarViews;
+using CommonControls.Common;
+using CommonControls.Common.MenuSystem;
 using CommonControls.Services;
+using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels;
+using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
@@ -12,7 +16,9 @@ using View3D.Components.Component.Selection;
 using View3D.Components.Gizmo;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
+using View3D.Rendering.Geometry;
 using View3D.Scene;
+using View3D.SceneNodes;
 using View3D.Utility;
 
 namespace KitbasherEditor
@@ -32,6 +38,8 @@ namespace KitbasherEditor
             serviceCollection.AddSingleton<ComponentManagerResolver>();
             serviceCollection.AddSingleton<ComponentInserter>();
 
+            serviceCollection.AddScoped<IDeviceResolver, DeviceResolverComponent>(x => x.GetService<DeviceResolverComponent>());
+            
 
             RegisterGameComponent<DeviceResolverComponent>(serviceCollection);
             RegisterGameComponent<CommandExecutor>(serviceCollection);
@@ -55,9 +63,33 @@ namespace KitbasherEditor
             RegisterGameComponent<AnimationsContainerComponent>(serviceCollection);
             RegisterGameComponent<ViewOnlySelectedComponent>(serviceCollection);
             RegisterGameComponent<LightControllerComponent>(serviceCollection);
+            RegisterGameComponent<SkeletonAnimationLookUpHelper>(serviceCollection);
             //RegisterGameComponent<RenderEngineComponent>(serviceCollection);
             //RegisterGameComponent<RenderEngineComponent>(serviceCollection);
-            //RegisterGameComponent<RenderEngineComponent>(serviceCollection);
+
+            serviceCollection.AddScoped<KitbashSceneCreator>();
+            
+
+            serviceCollection.AddScoped<TransformToolViewModel>();
+            serviceCollection.AddScoped<MenuBarViewModel>();
+
+            serviceCollection.AddScoped<GizmoActions>();
+            serviceCollection.AddScoped<VisibilityHandler>();
+
+            serviceCollection.AddScoped<GeneralActions>();
+            serviceCollection.AddScoped<ToolActions>();
+
+
+            serviceCollection.AddScoped<WindowKeyboard>();
+
+            serviceCollection.AddScoped<KitbashSceneCreator>();
+            serviceCollection.AddScoped<IGeometryGraphicsContextFactory, GeometryGraphicsContextFactory>();
+
+
+            serviceCollection.AddScoped<AnimationControllerViewModel>();
+            
+
+
         }
 
         public static void RegisterGameComponent<T>(IServiceCollection serviceCollection) where T : class, IGameComponent
@@ -71,7 +103,6 @@ namespace KitbasherEditor
         {
             factory.RegisterFileTool<KitbasherViewModel, KitbasherView>(new ExtentionToTool(EditorEnums.Kitbash_Editor, new[] { ".rigid_model_v2", ".wsmodel.rigid_model_v2" }/*, new[] { ".wsmodel", ".variantmeshdefinition" }*/));
         }
-
 
         public class ComponentInserter
         {

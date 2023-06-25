@@ -86,7 +86,7 @@ namespace AnimationEditor.Common.ReferenceModel
             Player = animComp.RegisterAnimationPlayer(new View3D.Animation.AnimationPlayer(), Description);
 
             // Create skeleton
-            _skeletonSceneNode = new SkeletonNode(_componentManager, Skeleton);
+            _skeletonSceneNode = new SkeletonNode(_resourceLibary, Skeleton);
             _skeletonSceneNode.NodeColour = _skeletonColor;
             _parentNode.AddObject(_skeletonSceneNode);
 

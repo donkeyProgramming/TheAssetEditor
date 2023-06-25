@@ -13,9 +13,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         Dictionary<ButtonVisabilityRule, Func<bool>> _buttonVisabilityRules = new Dictionary<ButtonVisabilityRule, Func<bool>>();
 
         SelectionManager _selectionManager;
-        public VisibilityHandler(IComponentManager componentManager)
+        public VisibilityHandler(SelectionManager selectionManager)
         {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
+            _selectionManager = selectionManager;
 
             _buttonVisabilityRules[ButtonVisabilityRule.Always] = AllwaysTrueRule;
             _buttonVisabilityRules[ButtonVisabilityRule.ObjectMode] = IsObjectMode;

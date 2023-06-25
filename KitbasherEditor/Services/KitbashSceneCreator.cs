@@ -19,7 +19,7 @@ namespace KitbasherEditor.Services
     {
         ILogger _logger = Logging.Create<KitbashSceneCreator>();
 
-        public MainEditableNode MainNode { get; private set; }
+        private MainEditableNode MainNode { get; set; }
         public ISceneNode ReferenceMeshNode { get; private set; }
 
         PackFileService _packFileService;
@@ -30,20 +30,26 @@ namespace KitbasherEditor.Services
         IComponentManager _componentManager;
         ApplicationSettingsService _applicationSettingsService;
 
-        public KitbashSceneCreator(IComponentManager componentManager, PackFileService packFileService, AnimationControllerViewModel animationView, PackFile mainFile, IGeometryGraphicsContextFactory geometryFactory, ApplicationSettingsService applicationSettingsService)
+        public KitbashSceneCreator(ComponentManagerResolver componentManagerResolver, ResourceLibary resourceLibary, SceneManager sceneManager,
+            PackFileService packFileService, AnimationControllerViewModel animationView, IGeometryGraphicsContextFactory geometryFactory, ApplicationSettingsService applicationSettingsService)
         {
-            _componentManager = componentManager;
+            _componentManager = componentManagerResolver.ComponentManager;
             _packFileService = packFileService;
             _animationView = animationView;
             _geometryFactory = geometryFactory;
             _applicationSettingsService = applicationSettingsService;
 
-            _resourceLibary = componentManager.GetComponent<ResourceLibary>();
-            _sceneManager = componentManager.GetComponent<SceneManager>();
+            _resourceLibary = resourceLibary;
+            _sceneManager = sceneManager;
 
-            var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(componentManager, null) { IsLockable = false });
-            MainNode = _sceneManager.RootNode.AddObject(new MainEditableNode(_animationView.GetPlayer(), "Editable Model", skeletonNode, mainFile, packFileService));
-            ReferenceMeshNode = _sceneManager.RootNode.AddObject(new GroupNode("Reference meshs") { IsEditable = false, IsLockable = false });
+           
+        }
+
+        public void Create(PackFile mainFile)
+        {
+            var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(_resourceLibary, null) { IsLockable = false });
+            MainNode = _sceneManager.RootNode.AddObject(new MainEditableNode(_animationView.GetPlayer(), SpecialNodes.EditableModel, skeletonNode, mainFile, _packFileService));
+            ReferenceMeshNode = _sceneManager.RootNode.AddObject(new GroupNode(SpecialNodes.ReferenceMeshs) { IsEditable = false, IsLockable = false });
         }
 
         public void LoadMainEditableModel(PackFile file)
@@ -51,7 +57,9 @@ namespace KitbasherEditor.Services
             var modelFullPath = _packFileService.GetFullPath(file);
             var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
 
-            MainNode.CreateModelNodesFromFile(rmv, _resourceLibary, _animationView.GetPlayer(), _geometryFactory, modelFullPath, _componentManager, _packFileService, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
+            MainNode.CreateModelNodesFromFile(rmv, _resourceLibary, _animationView.GetPlayer(), _geometryFactory,
+                modelFullPath, _componentManager, _packFileService, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
+
             MainNode.SelectedOutputFormat = rmv.Header.Version;
 
             int meshCount = Math.Min(MainNode.Children.Count, rmv.LodHeaders.Length);

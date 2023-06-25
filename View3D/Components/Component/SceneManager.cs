@@ -1,9 +1,9 @@
 ﻿using CommonControls.Common;
 using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using View3D.Components.Rendering;
 using View3D.SceneNodes;
@@ -14,6 +14,14 @@ namespace View3D.Components.Component
     public delegate void SceneObjectAddedDelegate(ISceneNode parent, ISceneNode added);
     public delegate void SceneObjectRemovedDelegate(ISceneNode parent, ISceneNode toRemove);
 
+
+    public static class SpecialNodes
+    {
+        public static  string Root { get => "Root"; }
+        public static string EditableModel { get => "Editable Model"; }
+        public static string ReferenceMeshs { get => "Reference meshs"; }
+    }
+
     public class SceneManager : BaseComponent, IDisposable
     {
         public event SceneObjectAddedDelegate SceneObjectAdded;
@@ -22,19 +30,21 @@ namespace View3D.Components.Component
         ILogger _logger = Logging.Create<SceneManager>();
         public ISceneNode RootNode { get; private set; }
 
-        RenderEngineComponent _renderEngine;
-        private readonly ComponentManagerResolver _componentManagerResolver;
 
-        public SceneManager(ComponentManagerResolver componentManagerResolver) : base(componentManagerResolver.ComponentManager) 
+        private readonly RenderEngineComponent _renderEngineComponent;
+
+        public SceneManager(ComponentManagerResolver componentManagerResolver, RenderEngineComponent renderEngineComponent) : base(componentManagerResolver.ComponentManager) 
         {
-            RootNode = new GroupNode("Root") { SceneManager = this, IsEditable = true, IsLockable = false };
-            _componentManagerResolver = componentManagerResolver;
+            _renderEngineComponent = renderEngineComponent;
+
+            RootNode = new GroupNode(SpecialNodes.Root) { SceneManager = this, IsEditable = true, IsLockable = false };
         }
 
-        public override void Initialize()
+
+        public T GetNodeByName<T>(string name) where T : class, ISceneNode
         {
-            _renderEngine = ComponentManager.GetComponent<RenderEngineComponent>();
-            base.Initialize();
+            var node = GetEnumeratorConditional(x => x.Name == name).FirstOrDefault() as T;
+            return node;
         }
 
         public IEnumerable<ISceneNode> GetEnumeratorConditional(Func<ISceneNode, bool> condition)
@@ -168,7 +178,7 @@ namespace View3D.Components.Component
                 foreach (var child in root.Children)
                 {
                     if (child is IDrawableItem drawableNode && child.IsVisible)
-                        drawableNode.Render(_renderEngine, parentMatrix);
+                        drawableNode.Render(_renderEngineComponent, parentMatrix);
                     DrawBasicSceneHirarchy(child, parentMatrix * child.ModelMatrix);
                 }
             }

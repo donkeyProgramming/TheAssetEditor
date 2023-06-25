@@ -1,123 +1,147 @@
-﻿using CommonControls.Common;
+﻿using _componentManager.ViewModels.MenuBarViews;
 using CommonControls.Common.MenuSystem;
 using CommonControls.PackFileBrowser;
 using CommonControls.Resources;
 using CommonControls.Services;
-using CommunityToolkit.Mvvm.Input;
 using KitbasherEditor.Services;
-using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
-    public enum MenuActionType
-    { 
-        Save,
-        SaveAs,
-        GenerateWsModelForWh3,
-        GenerateWsModelForWh2,
-        OpenImportReference,
-        ImportReferencePaladin,
-        ImportReferenceSlayer,
-        ImportReferenceGoblin,
-        ImportMapForDebug,
-        DeleteLods,
-        ClearConsole,
-        SortModelsByName,
 
-        Group,
-        Undo,
-        Gizmo_ScaleUp,
-        Gizmo_ScaleDown,
-        Gizmo_Arrow,
-        Gizmo_Move,
-        Gizmo_Rotate,
-        Gizmo_Scale,
 
-        SelectObject,
-        SelectFace,
-        SelectVertex,
-        
-        ViewOnlySelected,
-        FocusSelection,
-        ResetCamera,
-        ToogleBackFaceRendering,
-        ToggleLargeSceneRendering,
-
-        DevideToSubmesh,
-        DevideToSubmesh_withoutCombining,
-        MergeSelectedMeshes,
-        DuplicateSelected,
-        DeleteSelected,
-        ConvertSelectedMeshIntoStaticAtCurrentAnimFrame,
-
-        ReduceMesh10x,
-        CreateLod,
-        OpenBmiTool,
-        OpenSkeletonResharper,
-        OpenReRiggingTool,
-        OpenPinTool,
-        OpenVertexDebuggerTool,
-
-        GrowFaceSelection,
-        ConvertFaceToVertexSelection,
-        CopyLod0ToEveryLodSlot,
-        UpdateWh2Model_Technique1,
-        UpdateWh2Model_Technique2
+    public interface IMenuGroupProvider
+    {
+        public int SortingOrder { get; }
+        public void UpdateVisability();
     }
+
+
+    public interface IToolAction
+    {
+        public MenuActionType ActionType { get; }
+        public string ToolTip { get; }
+        public ActionEnabledRule ActionEnabledRule { get; }
+
+        public void Execute();
+    }
+
+
+  //  public class LoadReferenceModel : IToolAction
+  //  {
+  //      private readonly PackFileService _packFileService;
+  //
+  //      //   _actionList[MenuActionType.OpenImportReference] = new MenuAction(ImportReference) { EnableRule = , ToolTip =  };
+  //      public MenuActionType ActionType => MenuActionType.OpenImportReference;
+  //      public string ToolTip => "Import Reference model";
+  //      public ActionEnabledRule ActionEnabledRule => ActionEnabledRule.Always;
+  //
+  //      public LoadReferenceModel(PackFileService packFileService)
+  //      {
+  //          _packFileService = packFileService;
+  //      }
+  //
+  //      public void Execute()
+  //      {
+  //          using (var browser = new PackFileBrowserWindow(_packFileService))
+  //          {
+  //              browser.ViewModel.Filter.SetExtentions(new List<string>() { ".variantmeshdefinition", ".wsmodel", ".rigid_model_v2" });
+  //              if (browser.ShowDialog() == true && browser.SelectedFile != null)
+  //              {
+  //                  ModelLoader.LoadReference(browser.SelectedFile);
+  //              }
+  //          }
+  //      }
+  //  }
+
+
+
+    public class GizmoMenu : IMenuGroupProvider
+    {
+        public GizmoMenu()
+        { 
+        }
+
+        public int SortingOrder => 1;
+
+
+
+        public void Add()
+        {
+
+            
+
+
+          // _actionList[MenuActionType.Gizmo_ScaleUp] = new MenuAction(Gizmo.ScaleGizmoUp) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Add, ModifierKeys.None) };
+          // _actionList[MenuActionType.Gizmo_ScaleDown] = new MenuAction(Gizmo.ScaleGizmoDown) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Subtract, ModifierKeys.None) };
+          // _actionList[MenuActionType.Gizmo_Arrow] = new MenuAction(Gizmo.Cursor) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Q, ModifierKeys.None) };
+          // _actionList[MenuActionType.Gizmo_Move] = new MenuAction(Gizmo.Move) { EnableRule = ActionEnabledRule.Always, ToolTip = "Move Gizmo", Hotkey = new Hotkey(Key.W, ModifierKeys.None) };
+          // _actionList[MenuActionType.Gizmo_Rotate] = new MenuAction(Gizmo.Rotate) { EnableRule = ActionEnabledRule.Always, ToolTip = "Rotate Gizmo", Hotkey = new Hotkey(Key.E, ModifierKeys.None) };
+          // _actionList[MenuActionType.Gizmo_Scale] = new MenuAction(Gizmo.Scale) { EnableRule = ActionEnabledRule.Always, ToolTip = "Scale Gizmo", Hotkey = new Hotkey(Key.R, ModifierKeys.None) };
+          //
+          //
+          // CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Arrow], "Gizmo", true) { Image = ResourceController.Gizmo_CursorIcon });
+          // CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Move], "Gizmo") { Image = ResourceController.Gizmo_MoveIcon });
+          // CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Rotate], "Gizmo") { Image = ResourceController.Gizmo_RotateIcon });
+          // CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Scale], "Gizmo") { Image = ResourceController.Gizmo_ScaleIcon });
+        }
+
+        public void UpdateVisability()
+        { 
+        }
+            
+    }
+
+
+
 
     public class MenuBarViewModel : IKeyboardHandler
     {
         public ObservableCollection<ToolbarItem> MenuItems { get; set; } = new ObservableCollection<ToolbarItem>();
         public ObservableCollection<MenuBarButton> CustomButtons { get; set; } = new ObservableCollection<MenuBarButton>();
 
-        public KitbashSceneCreator ModelLoader { get; set; }
+        public KitbashSceneCreator SceneCreator { get; private set; }
         public GizmoActions Gizmo { get; set; }
         public GeneralActions General { get; set; }
         public ToolActions Tools { get; set; }
         public TransformToolViewModel TransformTool { get; set; }
 
-        IComponentManager _componentManager;
+
         ActionHotkeyHandler _commandFactory = new ActionHotkeyHandler();
         VisibilityHandler _ruleFactory;
         WindowKeyboard _keyboard = new WindowKeyboard();
         PackFileService _packFileService;
-        SelectionManager _selectionManager;
         CommandExecutor _commandExecutor;
 
         Dictionary<MenuActionType, MenuAction> _actionList = new Dictionary<MenuActionType, MenuAction>();
 
-        public MenuBarViewModel(IComponentManager componentManager, PackFileService packFileService)
+        public MenuBarViewModel( SelectionManager selectionManager, CommandExecutor commandExecutor,  PackFileService packFileService,
+            VisibilityHandler visibilityHandler, TransformToolViewModel transformToolViewModel, GizmoActions gizmoActions, GeneralActions generalActions, ToolActions toolActions,
+            KitbashSceneCreator kitbashSceneCreator)
         {
-            _componentManager = componentManager;
             _packFileService = packFileService;
+            _ruleFactory = visibilityHandler;
+            SceneCreator = kitbashSceneCreator;
 
-
-            _ruleFactory = new VisibilityHandler(componentManager);
-            TransformTool = new TransformToolViewModel(componentManager);
-            Gizmo = new GizmoActions(TransformTool, componentManager);
-            General = new GeneralActions(componentManager);
-            Tools = new ToolActions(componentManager, _packFileService, _keyboard);
+            TransformTool = transformToolViewModel;
+            Gizmo = gizmoActions;
+            General = generalActions;
+            Tools = toolActions;
 
             CreateActions();
             CreateButtons();
             CreateMenu();
             ProcessHotkeys();
+            selectionManager.SelectionChanged += OnSelectionChanged;
 
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-            _selectionManager.SelectionChanged += OnSelectionChanged;
-
-            _commandExecutor = componentManager.GetComponent<CommandExecutor>();
-            _commandExecutor.CommandStackChanged += OnUndoStackChanged;
+            _commandExecutor = commandExecutor;
+            commandExecutor.CommandStackChanged += OnUndoStackChanged;
         }
 
         void CreateActions()
@@ -176,8 +200,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _actionList[MenuActionType.GrowFaceSelection] = new MenuAction(Tools.ExpandFaceSelection) { EnableRule = ActionEnabledRule.FaceSelected, ToolTip = "Grow selection" };
             _actionList[MenuActionType.ConvertFaceToVertexSelection] = new MenuAction(Tools.ConvertFacesToVertex) { EnableRule = ActionEnabledRule.FaceSelected, ToolTip = "Convert selected faces to vertexes" };
             _actionList[MenuActionType.OpenVertexDebuggerTool] = new MenuAction(Tools.ShowVertexDebugInfo) { EnableRule = ActionEnabledRule.ObjectOrVertexSelected, ToolTip = "Open vertex debugger" };
-
-            
         }
 
         void CreateMenu()
@@ -240,7 +262,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         void CreateSelectionButtons()
         {
             CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Arrow], "Gizmo", true) { Image = ResourceController.Gizmo_CursorIcon });
-            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Move],"Gizmo") { Image = ResourceController.Gizmo_MoveIcon });
+            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Move], "Gizmo") { Image = ResourceController.Gizmo_MoveIcon });
             CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Rotate], "Gizmo") { Image = ResourceController.Gizmo_RotateIcon});
             CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Scale],"Gizmo") {  Image = ResourceController.Gizmo_ScaleIcon });
 
@@ -346,15 +368,15 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 browser.ViewModel.Filter.SetExtentions(new List<string>() { ".variantmeshdefinition", ".wsmodel", ".rigid_model_v2" });
                 if (browser.ShowDialog() == true && browser.SelectedFile != null)
                 {
-                    ModelLoader.LoadReference(browser.SelectedFile);
+                    SceneCreator.LoadReference(browser.SelectedFile);
                 }
             }
         }
 
-        void ImportReference_PaladinVMD() => ModelLoader.LoadReference(@"variantmeshes\variantmeshdefinitions\brt_paladin.variantmeshdefinition");
-        void ImportReference_Slayer() => ModelLoader.LoadReference(@"variantmeshes\variantmeshdefinitions\dwf_giant_slayers.variantmeshdefinition");
-        void ImportReference_Goblin() => ModelLoader.LoadReference(@"variantmeshes\variantmeshdefinitions\grn_forest_goblins_base.variantmeshdefinition");
-        void ImportDebugMap() => MapLoaderService.Load(_packFileService, _componentManager, ModelLoader);
+        void ImportReference_PaladinVMD() => SceneCreator.LoadReference(@"variantmeshes\variantmeshdefinitions\brt_paladin.variantmeshdefinition");
+        void ImportReference_Slayer() => SceneCreator.LoadReference(@"variantmeshes\variantmeshdefinitions\dwf_giant_slayers.variantmeshdefinition");
+        void ImportReference_Goblin() => SceneCreator.LoadReference(@"variantmeshes\variantmeshdefinitions\grn_forest_goblins_base.variantmeshdefinition");
+        void ImportDebugMap() => MapLoaderService.Load(_packFileService, SceneCreator);
         void ClearConsole() => Console.Clear();
     }
 }

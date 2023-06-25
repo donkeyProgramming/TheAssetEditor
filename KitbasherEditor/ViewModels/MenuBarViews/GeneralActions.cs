@@ -8,6 +8,7 @@ using View3D.Components.Component.Selection;
 using View3D.Components.Rendering;
 using View3D.SceneNodes;
 using View3D.Services;
+using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
@@ -15,32 +16,37 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
     { 
         CommandExecutor _commandExecutor;
         FocusSelectableObjectComponent _cameraFocusComponent;
-        IEditableMeshResolver _editableMeshResolver;
+        private readonly ComponentManagerResolver _componentManagerResolver;
+        
         ObjectEditor _objectEditor;
         RenderEngineComponent _renderEngineComponent;
+        private readonly SceneManager _sceneManager;
 
         public SceneSaverService ModelSaver { get; set; }
         public WsModelGeneratorService WsModelGeneratorService { get; set; }
 
-        public GeneralActions(IComponentManager componentManager)
+        public GeneralActions(CommandExecutor commandExecutor, FocusSelectableObjectComponent cameraFocusComponent,
+            ComponentManagerResolver componentManagerResolver, ObjectEditor objectEditor, RenderEngineComponent renderEngineComponent, SceneManager sceneManager )
         {
-            _commandExecutor = componentManager.GetComponent<CommandExecutor>();
-            _cameraFocusComponent = componentManager.GetComponent<FocusSelectableObjectComponent>();
-            _editableMeshResolver = componentManager.GetComponent<IEditableMeshResolver>();
-            _objectEditor = componentManager.GetComponent<ObjectEditor>();
-            _renderEngineComponent = componentManager.GetComponent<RenderEngineComponent>();
+            _commandExecutor = commandExecutor;
+            _cameraFocusComponent = cameraFocusComponent;
+            _componentManagerResolver = componentManagerResolver;
+            _objectEditor = objectEditor;
+            _renderEngineComponent = renderEngineComponent;
+            _sceneManager = sceneManager;
         }
 
         public void SortMeshes()
         {
-            var lod0 = _editableMeshResolver.GeEditableMeshRootNode().GetLodNodes().FirstOrDefault();
+            var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            var lod0 = rootNode.GetLodNodes().FirstOrDefault();
             if (lod0 != null)
                 _objectEditor.SortMeshes(lod0);
         }
 
         public void DeleteLods()
         {
-            var rootNode = _editableMeshResolver.GeEditableMeshRootNode();
+            var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             var lods = rootNode.GetLodNodes();
 
             var firtLod = lods.First();

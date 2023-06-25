@@ -7,7 +7,13 @@ using System.Text;
 
 namespace View3D.Components
 {
-    public class DeviceResolverComponent : BaseComponent
+
+    public interface IDeviceResolver
+    {
+        public GraphicsDevice Device { get; }
+    }
+
+    public class DeviceResolverComponent : BaseComponent, IDeviceResolver
     {
         WpfGame _game;
         public DeviceResolverComponent(WpfGame game) : base(game)
@@ -16,5 +22,17 @@ namespace View3D.Components
         }
 
         public GraphicsDevice Device { get => _game.GraphicsDevice; }
+    }
+
+    public class ManualDeviceResolver : IDeviceResolver
+    {
+        private readonly GraphicsDevice _device;
+
+        public ManualDeviceResolver(GraphicsDevice device)
+        {
+            _device = device;
+        }
+
+        public GraphicsDevice Device { get => _device; }
     }
 }

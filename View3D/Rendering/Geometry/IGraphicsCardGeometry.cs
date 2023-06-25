@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using View3D.Components;
 
 namespace View3D.Rendering.Geometry
 {
@@ -77,20 +78,22 @@ namespace View3D.Rendering.Geometry
     }
     public class GeometryGraphicsContextFactory : IGeometryGraphicsContextFactory
     {
-        GraphicsDevice Device;
-        public GeometryGraphicsContextFactory(GraphicsDevice device)
+        private readonly IDeviceResolver _deviceResolverComponent;
+        
+        public GeometryGraphicsContextFactory(IDeviceResolver deviceResolverComponent)
         {
-            Device = device;
+
+            _deviceResolverComponent = deviceResolverComponent;
         }
 
         public static GeometryGraphicsContextFactory CreateInstance(GraphicsDevice device)
         {
-            return new GeometryGraphicsContextFactory(device);
+            return new GeometryGraphicsContextFactory(new ManualDeviceResolver(device));
         }
 
         public IGraphicsCardGeometry Create()
         {
-            return new GraphicsCardGeometry(Device);
+            return new GraphicsCardGeometry(_deviceResolverComponent.Device);
         }
     }
 }

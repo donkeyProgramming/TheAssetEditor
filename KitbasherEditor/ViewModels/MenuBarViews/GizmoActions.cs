@@ -12,11 +12,13 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         SelectionComponent _selectionComponent;
         TransformToolViewModel _transformToolViewModel;
 
-        public GizmoActions(TransformToolViewModel transformToolViewModel, IComponentManager componentManager)
+        public GizmoActions(TransformToolViewModel transformToolViewModel, SelectionComponent selectionComponent, GizmoComponent gizmoComponent)
         {
-            _transformToolViewModel = transformToolViewModel;
-            _gizmoComponent = componentManager.GetComponent<GizmoComponent>();
-            _selectionComponent = componentManager.GetComponent<SelectionComponent>();
+          _transformToolViewModel = transformToolViewModel;
+            _selectionComponent = selectionComponent;
+            _gizmoComponent = gizmoComponent;
+            // _gizmoComponent = componentManager.GetComponent<GizmoComponent>();
+            // _selectionComponent = componentManager.GetComponent<SelectionComponent>();
         }
 
         public void UpdateSelectionMode(GeometrySelectionMode mode)

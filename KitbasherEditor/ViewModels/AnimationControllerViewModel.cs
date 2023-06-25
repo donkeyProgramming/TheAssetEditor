@@ -11,6 +11,7 @@ using System.Linq;
 using System.Windows.Input;
 using View3D.Animation;
 using View3D.Components.Component;
+using View3D.SceneNodes;
 using static CommonControls.FilterDialog.FilterUserControl;
 using static CommonControls.Services.SkeletonAnimationLookUpHelper;
 
@@ -18,14 +19,13 @@ namespace KitbasherEditor.ViewModels
 {
     public class AnimationControllerViewModel : NotifyPropertyChangedImpl
     {
-        ILogger _logger = Logging.Create<AnimationControllerViewModel>();
-        IComponentManager _componentManager;
         PackFileService _packFileService;
 
         PackFile _skeletonPackFile;
         PackFile Animation;
 
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly SceneManager _sceneManager;
         AnimationPlayer _player;
 
         string _headerText = "No animation selected";
@@ -67,15 +67,15 @@ namespace KitbasherEditor.ViewModels
         bool _isEnabled;
         public bool IsEnabled { get { return _isEnabled; } set { SetAndNotify(ref _isEnabled, value); OnEnableChanged(IsEnabled); } }
 
-        public AnimationControllerViewModel(IComponentManager componentManager, PackFileService pf)
+        public AnimationControllerViewModel( PackFileService pf, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
+            AnimationsContainerComponent animationsContainerComponent, SceneManager sceneManager)
         {
-            _componentManager = componentManager;
             _packFileService = pf;
-            _skeletonAnimationLookUpHelper = _componentManager.GetComponent<SkeletonAnimationLookUpHelper>();
-
+            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
+            _sceneManager = sceneManager;
             SkeletonList = _skeletonAnimationLookUpHelper.SkeletonFileNames;
 
-            var animCollection = _componentManager.GetComponent<AnimationsContainerComponent>();
+            var animCollection = animationsContainerComponent;
             _player = animCollection.RegisterAnimationPlayer(new AnimationPlayer(), "MainPlayer");
             _player.OnFrameChanged += (currentFrame) => CurrentFrame = currentFrame + 1;
 
@@ -211,11 +211,11 @@ namespace KitbasherEditor.ViewModels
 
         GameSkeleton GetModelSkeleton()
         {
-            var meshResolver = _componentManager.GetComponent<IEditableMeshResolver>();
-            if (meshResolver == null)
+            var node = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            if (node == null)
                 return null;
 
-            var skeleton = meshResolver.GeEditableMeshRootNode()?.SkeletonNode?.Skeleton;
+            var skeleton = node?.SkeletonNode?.Skeleton;
             return skeleton;
         }
     }

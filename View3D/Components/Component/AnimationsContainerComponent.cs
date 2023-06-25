@@ -10,8 +10,6 @@ namespace View3D.Components.Component
 {
     public class AnimationsContainerComponent : BaseComponent
     {
-        ILogger _logger = Logging.Create<AnimationsContainerComponent>();
-
         Dictionary<string, AnimationPlayer> _playerMap = new Dictionary<string, AnimationPlayer>();
 
         public AnimationsContainerComponent(ComponentManagerResolver componentManagerResolver) : base(componentManagerResolver.ComponentManager)

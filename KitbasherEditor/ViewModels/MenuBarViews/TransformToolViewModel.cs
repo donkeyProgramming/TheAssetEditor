@@ -2,7 +2,6 @@
 using CommonControls.MathViews;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
 using System.ComponentModel;
 using System.Windows.Input;
 using View3D.Components.Component;
@@ -46,16 +45,16 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public NotifyAttr<bool> ShowVertexFalloff { get; set; } = new NotifyAttr<bool>(false);
 
 
-        public TransformToolViewModel(IComponentManager componentManager)
+        public TransformToolViewModel(SelectionManager selectionManager, CommandExecutor commandExecutor)
         {
             ApplyCommand = new RelayCommand(ApplyTransform);
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-            _commandExecutor = componentManager.GetComponent<CommandExecutor>();
-
-            _selectionManager.SelectionChanged += SelectionChanged;
 
             VertexMovementFalloff = new NotifyAttr<DoubleViewModel>(new DoubleViewModel());
             VertexMovementFalloff.Value.PropertyChanged += VertexMovementFalloffChanged;
+            _selectionManager = selectionManager;
+            _commandExecutor = commandExecutor;
+
+            _selectionManager.SelectionChanged += SelectionChanged;
         }
 
         public void VertexMovementFalloffChanged(object sender, PropertyChangedEventArgs e)

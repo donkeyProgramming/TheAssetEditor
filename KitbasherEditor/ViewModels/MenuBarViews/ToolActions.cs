@@ -22,9 +22,10 @@ using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 using View3D.Services;
+using View3D.Utility;
 using MessageBox = System.Windows.MessageBox;
 
-namespace KitbasherEditor.ViewModels.MenuBarViews
+namespace _componentManager.ViewModels.MenuBarViews
 {
     public class ToolActions : NotifyPropertyChangedImpl
     {
@@ -32,24 +33,26 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         SelectionManager _selectionManager;
         ObjectEditor _objectEditor;
         FaceEditor _faceEditor;
-        IEditableMeshResolver _editableMeshResolver;
+
         ViewOnlySelectedComponent _viewOnlySelectedComp;
+        private readonly SceneManager _sceneManager;
         PackFileService _packFileService;
         SkeletonAnimationLookUpHelper _skeletonHelper;
         WindowKeyboard _keyboard;
 
-        public ToolActions(IComponentManager componentManager, PackFileService packFileService, WindowKeyboard keyboard)
+        public ToolActions(ComponentManagerResolver componentManagerResolver, PackFileService packFileService, WindowKeyboard keyboard, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
+            SelectionManager selectionManager, ObjectEditor objectEditor, FaceEditor faceEditor, ViewOnlySelectedComponent viewOnlySelectedComponent, SceneManager sceneManager)
         {
             _packFileService = packFileService;
-            _componentManager = componentManager;
-            _skeletonHelper = _componentManager.GetComponent<SkeletonAnimationLookUpHelper>();
+            _componentManager = componentManagerResolver.ComponentManager;
+            _skeletonHelper = skeletonAnimationLookUpHelper;
             _keyboard = keyboard;
 
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-            _objectEditor = componentManager.GetComponent<ObjectEditor>();
-            _faceEditor = componentManager.GetComponent<FaceEditor>();
-            _editableMeshResolver = componentManager.GetComponent<IEditableMeshResolver>();
-            _viewOnlySelectedComp = componentManager.GetComponent<ViewOnlySelectedComponent>();
+            _selectionManager = selectionManager;
+            _objectEditor = objectEditor;
+            _faceEditor = faceEditor;
+            _viewOnlySelectedComp = viewOnlySelectedComponent;
+            _sceneManager = sceneManager;
         }
 
         public void DivideSubMesh()
@@ -117,7 +120,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             var res = MessageBox.Show("Are you sure to copy lod 0 to every lod slots? This cannot be undone!", "Attention", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (res != MessageBoxResult.Yes) return;
 
-            var rootNode = _editableMeshResolver.GeEditableMeshRootNode();
+            var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             var lodGenerationService = new LodGenerationService(_objectEditor);
 
             rootNode.GetLodNodes().ForEach(x =>
@@ -131,7 +134,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         }
         public void CreateLods()
         {
-            var rootNode = _editableMeshResolver.GeEditableMeshRootNode();
+            var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             var lodGenerationService = new LodGenerationService(_objectEditor);
             lodGenerationService.CreateLodsForRootNode(rootNode);
         }
@@ -193,7 +196,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             List<Rmv2MeshNode> meshes = new List<Rmv2MeshNode>();
 
             GroupNode groupNodeContainer = new GroupNode("staticMesh");
-            var root = _editableMeshResolver.GeEditableMeshRootNode();
+            var root = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             var lod0 = root.GetLodNodes()[0];
             lod0.AddObject(groupNodeContainer);
             foreach (var obj in selectedObjects)
@@ -215,7 +218,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         public void OpenReRiggingTool()
         {
-            var root = _editableMeshResolver.GeEditableMeshRootNode();
+            var root = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             var skeletonName = root.SkeletonNode.Name;
             Remap(_selectionManager.GetState<ObjectSelectionState>(), skeletonName);
         }
@@ -307,7 +310,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             if (res != MessageBoxResult.Yes)
                 return;
 
-            var rootNode = _editableMeshResolver.GeEditableMeshRootNode();
+            var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             var lods = rootNode.GetLodNodes();
             var firtLod = lods.First();
             var meshList = firtLod.GetAllModelsGrouped(false).SelectMany(x => x.Value).ToList();
