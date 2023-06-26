@@ -51,7 +51,7 @@ namespace AssetEditor
             services.AddSingleton<ApplicationSettingsService>();
             services.AddSingleton<ToolFactory>();
             services.AddSingleton<PackFileDataBase>();
-            services.AddScoped<SkeletonAnimationLookUpHelper>();
+            services.AddSingleton<SkeletonAnimationLookUpHelper>();
             services.AddSingleton<CopyPasteManager>();
             services.AddSingleton<GameInformationFactory>();
 

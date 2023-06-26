@@ -1,5 +1,4 @@
-﻿using Assimp.Unmanaged;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using Microsoft.Xna.Framework;
 using Serilog;
 using System;
@@ -7,11 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using View3D.Components.Rendering;
 using View3D.SceneNodes;
-using View3D.Utility;
 
 namespace View3D.Components.Component.Selection
 {
-    public class FocusSelectableObjectComponent : BaseComponent
+    public class FocusSelectableObjectComponent 
     {
         ILogger _logger = Logging.Create<FocusSelectableObjectComponent>();
 
@@ -19,8 +17,7 @@ namespace View3D.Components.Component.Selection
         private readonly ArcBallCamera _arcBallCamera;
         private readonly  SceneManager _sceneManager;
 
-        public FocusSelectableObjectComponent(ComponentManagerResolver componentManagerResolver, SelectionManager selectionManager, ArcBallCamera arcBallCamera, SceneManager sceneManager ) 
-            : base(componentManagerResolver.ComponentManager)
+        public FocusSelectableObjectComponent(SelectionManager selectionManager, ArcBallCamera arcBallCamera, SceneManager sceneManager ) 
         {
             _selectionManager = selectionManager;
             _arcBallCamera = arcBallCamera;

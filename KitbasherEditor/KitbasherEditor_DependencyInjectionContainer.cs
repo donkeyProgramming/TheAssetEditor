@@ -89,16 +89,15 @@ namespace KitbasherEditor
             RegisterGameComponent<GizmoComponent>(serviceCollection);
             RegisterGameComponent<SelectionManager>(serviceCollection);
             RegisterGameComponent<SelectionComponent>(serviceCollection);
-            RegisterGameComponent<FocusSelectableObjectComponent>(serviceCollection);
             RegisterGameComponent<RenderEngineComponent>(serviceCollection);
             RegisterGameComponent<ClearScreenComponent>(serviceCollection);
             RegisterGameComponent<GridComponent>(serviceCollection);
             RegisterGameComponent<AnimationsContainerComponent>(serviceCollection);
             RegisterGameComponent<ViewOnlySelectedComponent>(serviceCollection);
             RegisterGameComponent<LightControllerComponent>(serviceCollection);
-            //RegisterGameComponent<SkeletonAnimationLookUpHelper>(serviceCollection);
 
 
+            serviceCollection.AddScoped<FocusSelectableObjectComponent>();
             serviceCollection.AddScoped<KitbashSceneCreator>();
             serviceCollection.AddScoped<FaceEditor>();
             serviceCollection.AddScoped<ObjectEditor>();
@@ -150,6 +149,9 @@ namespace KitbasherEditor
             serviceCollection.AddTransient<PinMeshToVertexCommand>();
             serviceCollection.AddTransient<RemapBoneIndexesCommand>();
 
+
+            // Add all ICommand as AddTransient
+            // Add all Comonents as scoped
 
 
         }

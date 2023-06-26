@@ -78,7 +78,7 @@ namespace AnimationEditor.PropCreator.ViewModels
             //Scene.AddComponent(new FpsComponent(new ComponentManagerResolver(Scene), ));
             //Scene.AddComponent(new KeyboardComponent(new ComponentManagerResolver(Scene), Scene));
             //Scene.AddComponent(new MouseComponent(new ComponentManagerResolver(Scene), Scene));
-            Scene.AddComponent(skeletonHelper);
+            //Scene.AddComponent(skeletonHelper);
             ////Scene.AddComponent(new ArcBallCamera(Scene));
             //Scene.AddComponent(new ClearScreenComponent(Scene));
             //Scene.AddComponent(new RenderEngineComponent(Scene, _applicationSettingsService));
