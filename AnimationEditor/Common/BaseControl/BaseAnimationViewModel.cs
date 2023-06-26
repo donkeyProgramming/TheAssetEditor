@@ -72,7 +72,7 @@ namespace AnimationEditor.PropCreator.ViewModels
             _createDefaultAssets = createDefaultAssets;
             _applicationSettingsService = applicationSettingsService;
 
-            Scene = new SceneContainer();
+            Scene = new SceneContainer(null, null);
             Scene.AddComponent(new DeviceResolverComponent(Scene));
             Scene.AddComponent(new ResourceLibary(Scene, pfs));
             //Scene.AddComponent(new FpsComponent(new ComponentManagerResolver(Scene), ));

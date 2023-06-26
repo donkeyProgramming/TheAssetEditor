@@ -12,6 +12,7 @@ using KitbasherEditor.ViewModels.PinTool;
 using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views.EditorViews;
 using MonoGame.Framework.WpfInterop;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -36,13 +37,16 @@ namespace _componentManager.ViewModels.MenuBarViews
 
         ViewOnlySelectedComponent _viewOnlySelectedComp;
         private readonly SceneManager _sceneManager;
+        private readonly CommandExecutor _commandExecutor;
+        private readonly IServiceProvider _serviceProvider;
         PackFileService _packFileService;
         SkeletonAnimationLookUpHelper _skeletonHelper;
         WindowKeyboard _keyboard;
 
-        public ToolActions(ComponentManagerResolver componentManagerResolver, PackFileService packFileService, WindowKeyboard keyboard, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
-            SelectionManager selectionManager, ObjectEditor objectEditor, FaceEditor faceEditor, ViewOnlySelectedComponent viewOnlySelectedComponent, SceneManager sceneManager)
+        public ToolActions(IServiceProvider serviceProvider, ComponentManagerResolver componentManagerResolver, PackFileService packFileService, WindowKeyboard keyboard, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
+            SelectionManager selectionManager, ObjectEditor objectEditor, FaceEditor faceEditor, ViewOnlySelectedComponent viewOnlySelectedComponent, SceneManager sceneManager, CommandExecutor commandExecutor)
         {
+            _serviceProvider = serviceProvider;
             _packFileService = packFileService;
             _componentManager = componentManagerResolver.ComponentManager;
             _skeletonHelper = skeletonAnimationLookUpHelper;
@@ -53,6 +57,7 @@ namespace _componentManager.ViewModels.MenuBarViews
             _faceEditor = faceEditor;
             _viewOnlySelectedComp = viewOnlySelectedComponent;
             _sceneManager = sceneManager;
+            _commandExecutor = commandExecutor;
         }
 
         public void DivideSubMesh()
@@ -163,7 +168,7 @@ namespace _componentManager.ViewModels.MenuBarViews
 
                 var window = new ControllerHostWindow(true, ResizeMode.CanResize)
                 {
-                    DataContext = new BmiViewModel(skeleton, meshNode, _componentManager),
+                    DataContext = new BmiViewModel(skeleton, meshNode, _componentManager, _commandExecutor),
                     Title = "Bmi Tool",
                     Content = new BmiView(),
                 };
@@ -175,7 +180,7 @@ namespace _componentManager.ViewModels.MenuBarViews
         public void OpenSkeletonReshaperTool()
         {
             var state = _selectionManager.GetState<ObjectSelectionState>();
-            MeshFitterViewModel.ShowView(state.CurrentSelection(), _componentManager, _skeletonHelper, _packFileService);
+            MeshFitterViewModel.ShowView(state.CurrentSelection(), _componentManager, _skeletonHelper, _packFileService, _commandExecutor);
         }
 
         public void CreateStaticMeshes()
@@ -210,11 +215,10 @@ namespace _componentManager.ViewModels.MenuBarViews
             }
 
             var cmd = new CreateAnimatedMeshPoseCommand(meshes, frame, true);
-            var commandExecutor = _componentManager.GetComponent<CommandExecutor>();
-            commandExecutor.ExecuteCommand(cmd, false);
+            _commandExecutor.ExecuteCommand(cmd, false);
         }
 
-        public void PinMeshToMesh() => PinToolViewModel.ShowWindow(_componentManager);
+        public void PinMeshToMesh() => PinToolViewModel.ShowWindow(_componentManager, _commandExecutor);
 
         public void OpenReRiggingTool()
         {
@@ -290,7 +294,7 @@ namespace _componentManager.ViewModels.MenuBarViews
             if (window.Result == true)
             {
                 var remapping = AnimatedBoneHelper.BuildRemappingList(config.MeshBones.First());
-                _componentManager.GetComponent<CommandExecutor>().ExecuteCommand(new RemapBoneIndexesCommand(selectedMeshses, remapping, config.ParnetModelSkeletonName));
+                _commandExecutor.ExecuteCommand(new RemapBoneIndexesCommand(selectedMeshses, remapping, config.ParnetModelSkeletonName));
             }
         }
 
@@ -323,7 +327,7 @@ namespace _componentManager.ViewModels.MenuBarViews
         }
         public void ShowVertexDebugInfo()
         {
-            VertexDebuggerViewModel.Create(_componentManager);
+            VertexDebuggerViewModel.Create(_serviceProvider, _componentManager);
         }
     }
 }

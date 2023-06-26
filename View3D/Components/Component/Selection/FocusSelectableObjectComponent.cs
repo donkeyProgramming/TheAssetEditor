@@ -1,4 +1,5 @@
-﻿using CommonControls.Common;
+﻿using Assimp.Unmanaged;
+using CommonControls.Common;
 using Microsoft.Xna.Framework;
 using Serilog;
 using System;
@@ -29,6 +30,18 @@ namespace View3D.Components.Component.Selection
         public void FocusSelection()
         {
             Focus(_selectionManager.GetState());
+        }
+
+        public void FocusScene()
+        {
+            var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+
+            var nodes = mainNode.GetMeshNodes(0)
+                .Select(x => x as ISelectable)
+                .Where(x => x != null)
+                .ToList();
+
+            FocusObjects(nodes);
         }
 
         public void FocusObjects(List<ISelectable> items)

@@ -1,11 +1,15 @@
 ﻿using CommonControls.Common;
 using CommonControls.Services;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
+using MediatR;
 using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Transactions;
 using System.Windows.Input;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
@@ -14,7 +18,8 @@ using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels
 {
-    public class SceneExplorerViewModel : NotifyPropertyChangedImpl
+    public class SceneExplorerViewModel : NotifyPropertyChangedImpl,
+        INotificationHandler<SelectionChangedEvent>
     {
         IComponentManager _componentManager;
         SceneManager _sceneManager;
@@ -36,7 +41,7 @@ namespace KitbasherEditor.ViewModels
 
         public SceneExplorerContextMenuHandler ContextMenu { get; set; }
 
-
+        bool _ignoreSelectionChanges = false;
         public SceneExplorerViewModel(ComponentManagerResolver componentManagerResolver, PackFileService packFileService, AnimationControllerViewModel animationControllerViewModel,
             ApplicationSettingsService applicationSettingsService, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, CommandExecutor commandExecutor, SelectionManager selectionManager, SceneManager sceneManager)
         {
@@ -51,7 +56,6 @@ namespace KitbasherEditor.ViewModels
             _commandExecutor = commandExecutor;
             _selectionManager = selectionManager;
 
-            _selectionManager.SelectionChanged += SelectionChanged; // ToDo - MediatR
 
             SceneGraphRootNodes.Add(_sceneManager.RootNode);
 
@@ -81,7 +85,7 @@ namespace KitbasherEditor.ViewModels
             try
             {
                 SelectedObjects.CollectionChanged -= SelectedObjects_CollectionChanged;
-                _selectionManager.SelectionChanged -= SelectionChanged;
+                _ignoreSelectionChanges = true;
 
                 try
                 {
@@ -142,7 +146,7 @@ namespace KitbasherEditor.ViewModels
             finally
             {
                 SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
-                _selectionManager.SelectionChanged += SelectionChanged;
+                _ignoreSelectionChanges = false;
             }
             
             UpdateViewModelAndContextMenyBasedOnSelection();
@@ -213,6 +217,13 @@ namespace KitbasherEditor.ViewModels
                     item.Children[i].IsExpanded = i == newLodLevel;
                 }
             }
+        }
+
+        public Task Handle(SelectionChangedEvent notification, CancellationToken cancellationToken)
+        {
+            if(_ignoreSelectionChanges == false)
+                SelectionChanged(notification.NewState);
+            return Task.CompletedTask;
         }
     }
 }

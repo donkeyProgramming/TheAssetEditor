@@ -1,8 +1,11 @@
 ﻿using CommonControls.Common;
 using CommonControls.MathViews;
 using CommunityToolkit.Mvvm.Input;
+using MediatR;
 using Microsoft.Xna.Framework;
 using System.ComponentModel;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
@@ -10,7 +13,8 @@ using View3D.Components.Gizmo;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
-    public class TransformToolViewModel : NotifyPropertyChangedImpl
+    public class TransformToolViewModel : NotifyPropertyChangedImpl,
+        INotificationHandler<SelectionChangedEvent>
     {
         public enum TransformMode
         { 
@@ -53,8 +57,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             VertexMovementFalloff.Value.PropertyChanged += VertexMovementFalloffChanged;
             _selectionManager = selectionManager;
             _commandExecutor = commandExecutor;
-
-            _selectionManager.SelectionChanged += SelectionChanged;
         }
 
         public void VertexMovementFalloffChanged(object sender, PropertyChangedEventArgs e)
@@ -146,6 +148,12 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 default:
                     throw new System.Exception();
             }
+        }
+
+        public Task Handle(SelectionChangedEvent notification, CancellationToken cancellationToken)
+        {
+            SelectionChanged(notification.NewState);
+            return Task.CompletedTask;
         }
     }
 }

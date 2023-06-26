@@ -16,6 +16,7 @@ namespace KitbasherEditor.ViewModels.PinTool
     public class PinToolViewModel
     {
         IComponentManager _componentManager;
+        private readonly CommandExecutor _commandExecutor;
 
         public NotifyAttr<bool> IsPintToPointMode { get; set; } = new NotifyAttr<bool>(true);
         public NotifyAttr<bool> IsSkinwrapMode { get; set; } = new NotifyAttr<bool>(false);
@@ -30,9 +31,10 @@ namespace KitbasherEditor.ViewModels.PinTool
         public NotifyAttr<string> SelectedForStaticDescription { get; set; } = new NotifyAttr<string>($"Selected vertex count : ");
 
 
-        public PinToolViewModel(IComponentManager componentManager)
+        public PinToolViewModel(IComponentManager componentManager, CommandExecutor commandExecutor)
         {
             _componentManager = componentManager;
+            _commandExecutor = commandExecutor;
         }
 
         public void ClearSourcedMeshCollection() => SourceMeshCollection.Clear();
@@ -125,8 +127,7 @@ namespace KitbasherEditor.ViewModels.PinTool
             }
 
              var cmd = new PinMeshToVertexCommand(AffectedMeshCollection, _selectedVertexMesh, _selectedVertexList.First());
-             var commandExecutor = _componentManager.GetComponent<CommandExecutor>();
-             commandExecutor.ExecuteCommand(cmd);
+            _commandExecutor.ExecuteCommand(cmd);
         }
 
         void ApplySkinWrapRigging()
@@ -160,15 +161,14 @@ namespace KitbasherEditor.ViewModels.PinTool
 
 
             var cmd = new SkinWrapRiggingCommand(AffectedMeshCollection, SourceMeshCollection);
-            var commandExecutor = _componentManager.GetComponent<CommandExecutor>();
-            commandExecutor.ExecuteCommand(cmd);
+            _commandExecutor.ExecuteCommand(cmd);
         }
 
-        public static void ShowWindow(IComponentManager componentManager)
+        public static void ShowWindow(IComponentManager componentManager, CommandExecutor commandExecutor)
         {
             var window = new ControllerHostWindow(true)
             {
-                DataContext = new PinToolViewModel(componentManager),
+                DataContext = new PinToolViewModel(componentManager, commandExecutor),
                 Title = "Pin tool",
                 Content = new PinToolView(),
                 Width = 360,

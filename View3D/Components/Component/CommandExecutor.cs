@@ -1,39 +1,35 @@
-﻿using CommonControls.Common;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Framework.WpfInterop;
-using Serilog;
+﻿using CommonControls.Events;
+using MediatR;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using View3D.Commands;
 using View3D.Utility;
 
 namespace View3D.Components.Component
 {
     public delegate void CommandStackChangedDelegate();
-    public class CommandExecutor : BaseComponent, IDisposable
+
+    public class CommandStackChangedEvent : INotification
     {
-        public event CommandStackChangedDelegate CommandStackChanged;
+        public string HintText { get; internal set; }
+        public bool IsMutation { get; internal set; }
+    }
 
-        ILogger _logger = Logging.Create<CommandExecutor>();
-        Stack<ICommand> _commands = new Stack<ICommand>();
-        Stack<ICommand> _commandsOnLastSave = new Stack<ICommand>();
+    public class CommandStackUndoEvent : INotification
+    {
+        public string HintText { get; set; }
+    }
 
-        SpriteBatch _spriteBatch;
-        string _animationText;
-        GameTime _animationStart;
-        bool _startAnimation;
-        private readonly DeviceResolverComponent _deviceResolverComponent;
+    public class CommandExecutor
+    {
+        private readonly Stack<ICommand> _commands = new Stack<ICommand>();
+        private readonly IMediator _mediator;
+        private readonly ComponentManagerResolver _componentManagerResolver;
 
-        public CommandExecutor(ComponentManagerResolver componentManagerResolver, DeviceResolverComponent deviceResolverComponent) : base(componentManagerResolver.ComponentManager)
+        public CommandExecutor(IMediator mediator, ComponentManagerResolver componentManagerResolver) 
         {
-            _deviceResolverComponent = deviceResolverComponent;
-        }
-
-        public override void Initialize()
-        {
-            _spriteBatch = new SpriteBatch(_deviceResolverComponent.Device);
+            _mediator = mediator;
+            _componentManagerResolver = componentManagerResolver;
         }
 
         public void ExecuteCommand(ICommand command, bool isUndoable = true)
@@ -42,18 +38,29 @@ namespace View3D.Components.Component
                 throw new ArgumentNullException("Command is null");
             if(isUndoable)
                 _commands.Push(command);
-            command.Initialize(ComponentManager);
+            command.Initialize(_componentManagerResolver.ComponentManager);
             command.Execute();
 
-            CreateAnimation($"Command added: {command.GetHintText()}");
-            if(isUndoable)
-                CommandStackChanged?.Invoke();
+            if (isUndoable)
+            {
+                _mediator.PublishSync(new CommandStackChangedEvent() 
+                {
+                    HintText = command.GetHintText(),
+                    IsMutation = command.IsMutation(),
+                });
+            }
         }
 
-        void CreateAnimation(string text)
+        public bool CanUndo() => _commands.Count != 0;
+
+        public void Undo()
         {
-            _animationText = text;
-            _startAnimation = true;
+            if (CanUndo())
+            {
+                var command = _commands.Pop();
+                command.Undo();
+                _mediator.PublishSync(new CommandStackUndoEvent() { HintText = GetUndoHint() });
+            }
         }
 
         public string GetUndoHint()
@@ -61,79 +68,7 @@ namespace View3D.Components.Component
             if (!CanUndo())
                 return "No items to undo";
 
-            var obj = _commands.Peek();
-            return obj.GetHintText();
-        }
-
-        public override void Draw(GameTime gameTime)
-        {
-            if (_animationStart != null)
-            {
-                var resourceLib = ComponentManager.GetComponent<ResourceLibary>();
-
-                var timeDiff = (gameTime.TotalGameTime - _animationStart.TotalGameTime).TotalMilliseconds;
-                float lerpValue = (float)timeDiff / 2000.0f;
-                var alphaValue = MathHelper.Lerp(1, 0, lerpValue);
-                if (lerpValue >= 1)
-                    _animationStart = null;
-
-                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-                _spriteBatch.DrawString(resourceLib.DefaultFont, _animationText, new Vector2(5,20), new Color(0, 0, 0, alphaValue));
-                _spriteBatch.End();
-            }
-
-            base.Draw(gameTime);
-        }
-
-        public bool HasSavableChanges()
-        {
-            var newCommands = _commands.Except(_commandsOnLastSave);
-            var missingCommands = _commandsOnLastSave.Except(_commands);
-
-            return newCommands.Union(missingCommands).Any(command => command.IsMutation());
-        }
-
-        public override void Update(GameTime gameTime)
-        {
-            if (_startAnimation == true)
-            {
-                _animationStart = gameTime;
-            }
-            _startAnimation = false;
-
-            base.Update(gameTime);
-        }
-
-        public bool CanUndo()
-        {
-            return _commands.Count != 0;
-        }
-
-        public void Undo()
-        {
-            if (CanUndo())
-            {
-                CreateAnimation($"Command Undone: {GetUndoHint()}");
-
-                var command = _commands.Pop();
-                command.Undo();
-                CommandStackChanged?.Invoke();
-            }
-        }
-
-        public void Dispose()
-        {
-            _spriteBatch.Dispose();
-            _spriteBatch = null;
-
-            if (CommandStackChanged != null)
-                foreach (var d in CommandStackChanged.GetInvocationList())
-                    CommandStackChanged -= (d as CommandStackChangedDelegate);
-        }
-
-        public void SaveStackSnapshot()
-        {
-            _commandsOnLastSave = new Stack<ICommand>(new Stack<ICommand>(_commands));
+            return _commands.Peek().GetHintText();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using MediatR;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -16,7 +17,9 @@ namespace MonoGame.Framework.WpfInterop
         public void RemoveComponent<T>(T comp) where T : IGameComponent;
     }
 
-
+    public class SceneInitializedEvent : INotification
+    {
+    }
 
     /// <summary>
     /// The replacement for <see cref="Game"/>. Unlike <see cref="Game"/> the <see cref="WpfGame"/> is a WPF control and can be hosted inside WPF windows.
@@ -24,6 +27,8 @@ namespace MonoGame.Framework.WpfInterop
     public abstract class WpfGame : D3D11Host, IComponentManager
     {
         public event SceneInitializedDelegate SceneInitialized;
+
+        private readonly IMediator _mediator;
         private readonly string _contentDir;
 
         #region Fields
@@ -39,11 +44,11 @@ namespace MonoGame.Framework.WpfInterop
         /// <summary>
         /// Creates a new instance of a game host panel.
         /// </summary>
-        protected WpfGame(string contentDir = "ContentOutput")
+        protected WpfGame(IMediator mediator, string contentDir = "ContentOutput")
         {
             if (string.IsNullOrEmpty(contentDir))
                 throw new ArgumentNullException(nameof(contentDir));
-
+            _mediator = mediator;
             _contentDir = contentDir;
 
             Focusable = true;
@@ -145,6 +150,7 @@ namespace MonoGame.Framework.WpfInterop
 
             LoadContent();
             SceneInitialized?.Invoke(this);
+            _mediator.Publish(new SceneInitializedEvent()).GetAwaiter().GetResult();
         }
 
         /// <summary>

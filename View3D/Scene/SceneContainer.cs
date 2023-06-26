@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using MediatR;
+using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 
 namespace View3D.Scene
@@ -7,6 +8,10 @@ namespace View3D.Scene
     {
         private bool _disposed;
         WpfGraphicsDeviceService _diviceService;
+
+        public SceneContainer(IMediator mediator, string contentDir = "ContentOutput") : base(mediator, contentDir)
+        {
+        }
 
         protected override void Initialize()
         {

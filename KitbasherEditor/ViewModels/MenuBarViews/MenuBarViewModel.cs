@@ -4,104 +4,22 @@ using CommonControls.PackFileBrowser;
 using CommonControls.Resources;
 using CommonControls.Services;
 using KitbasherEditor.Services;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
-
-
-    public interface IMenuGroupProvider
-    {
-        public int SortingOrder { get; }
-        public void UpdateVisability();
-    }
-
-
-    public interface IToolAction
-    {
-        public MenuActionType ActionType { get; }
-        public string ToolTip { get; }
-        public ActionEnabledRule ActionEnabledRule { get; }
-
-        public void Execute();
-    }
-
-
-  //  public class LoadReferenceModel : IToolAction
-  //  {
-  //      private readonly PackFileService _packFileService;
-  //
-  //      //   _actionList[MenuActionType.OpenImportReference] = new MenuAction(ImportReference) { EnableRule = , ToolTip =  };
-  //      public MenuActionType ActionType => MenuActionType.OpenImportReference;
-  //      public string ToolTip => "Import Reference model";
-  //      public ActionEnabledRule ActionEnabledRule => ActionEnabledRule.Always;
-  //
-  //      public LoadReferenceModel(PackFileService packFileService)
-  //      {
-  //          _packFileService = packFileService;
-  //      }
-  //
-  //      public void Execute()
-  //      {
-  //          using (var browser = new PackFileBrowserWindow(_packFileService))
-  //          {
-  //              browser.ViewModel.Filter.SetExtentions(new List<string>() { ".variantmeshdefinition", ".wsmodel", ".rigid_model_v2" });
-  //              if (browser.ShowDialog() == true && browser.SelectedFile != null)
-  //              {
-  //                  ModelLoader.LoadReference(browser.SelectedFile);
-  //              }
-  //          }
-  //      }
-  //  }
-
-
-
-    public class GizmoMenu : IMenuGroupProvider
-    {
-        public GizmoMenu()
-        { 
-        }
-
-        public int SortingOrder => 1;
-
-
-
-        public void Add()
-        {
-
-            
-
-
-          // _actionList[MenuActionType.Gizmo_ScaleUp] = new MenuAction(Gizmo.ScaleGizmoUp) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Add, ModifierKeys.None) };
-          // _actionList[MenuActionType.Gizmo_ScaleDown] = new MenuAction(Gizmo.ScaleGizmoDown) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Subtract, ModifierKeys.None) };
-          // _actionList[MenuActionType.Gizmo_Arrow] = new MenuAction(Gizmo.Cursor) { EnableRule = ActionEnabledRule.Always, ToolTip = "Select Gizmo", Hotkey = new Hotkey(Key.Q, ModifierKeys.None) };
-          // _actionList[MenuActionType.Gizmo_Move] = new MenuAction(Gizmo.Move) { EnableRule = ActionEnabledRule.Always, ToolTip = "Move Gizmo", Hotkey = new Hotkey(Key.W, ModifierKeys.None) };
-          // _actionList[MenuActionType.Gizmo_Rotate] = new MenuAction(Gizmo.Rotate) { EnableRule = ActionEnabledRule.Always, ToolTip = "Rotate Gizmo", Hotkey = new Hotkey(Key.E, ModifierKeys.None) };
-          // _actionList[MenuActionType.Gizmo_Scale] = new MenuAction(Gizmo.Scale) { EnableRule = ActionEnabledRule.Always, ToolTip = "Scale Gizmo", Hotkey = new Hotkey(Key.R, ModifierKeys.None) };
-          //
-          //
-          // CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Arrow], "Gizmo", true) { Image = ResourceController.Gizmo_CursorIcon });
-          // CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Move], "Gizmo") { Image = ResourceController.Gizmo_MoveIcon });
-          // CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Rotate], "Gizmo") { Image = ResourceController.Gizmo_RotateIcon });
-          // CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Scale], "Gizmo") { Image = ResourceController.Gizmo_ScaleIcon });
-        }
-
-        public void UpdateVisability()
-        { 
-        }
-            
-    }
-
-
-
-
-    public class MenuBarViewModel : IKeyboardHandler
+    public class MenuBarViewModel : IKeyboardHandler,
+        INotificationHandler<CommandStackChangedEvent>,
+        INotificationHandler<SelectionChangedEvent>
     {
         public ObservableCollection<ToolbarItem> MenuItems { get; set; } = new ObservableCollection<ToolbarItem>();
         public ObservableCollection<MenuBarButton> CustomButtons { get; set; } = new ObservableCollection<MenuBarButton>();
@@ -138,10 +56,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             CreateButtons();
             CreateMenu();
             ProcessHotkeys();
-            selectionManager.SelectionChanged += OnSelectionChanged;
 
             _commandExecutor = commandExecutor;
-            commandExecutor.CommandStackChanged += OnUndoStackChanged;
         }
 
         void CreateActions()
@@ -321,12 +237,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             }
         }
 
-        private void OnUndoStackChanged()
-        {
-            _actionList[MenuActionType.Undo].ToolTip = _commandExecutor.GetUndoHint();
-            _actionList[MenuActionType.Undo].IsActionEnabled.Value = _commandExecutor.CanUndo();
-        }
-
         private void OnSelectionChanged(ISelectionState state)
         {
             if (state.Mode == GeometrySelectionMode.Object)
@@ -378,5 +288,18 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         void ImportReference_Goblin() => SceneCreator.LoadReference(@"variantmeshes\variantmeshdefinitions\grn_forest_goblins_base.variantmeshdefinition");
         void ImportDebugMap() => MapLoaderService.Load(_packFileService, SceneCreator);
         void ClearConsole() => Console.Clear();
+
+        public Task Handle(CommandStackChangedEvent notification, CancellationToken cancellationToken)
+        {
+            _actionList[MenuActionType.Undo].ToolTip = notification.HintText;
+            _actionList[MenuActionType.Undo].IsActionEnabled.Value = _commandExecutor.CanUndo();
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(SelectionChangedEvent notification, CancellationToken cancellationToken)
+        {
+            OnSelectionChanged(notification.NewState);
+            return Task.CompletedTask;
+        }
     }
 }

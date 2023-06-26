@@ -1,11 +1,14 @@
 ﻿using _componentManager.ViewModels.MenuBarViews;
 using CommonControls.Common;
 using CommonControls.Common.MenuSystem;
+using CommonControls.Events;
 using CommonControls.Services;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels;
 using KitbasherEditor.ViewModels.MenuBarViews;
+using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
@@ -18,7 +21,6 @@ using View3D.Components.Input;
 using View3D.Components.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.Scene;
-using View3D.SceneNodes;
 using View3D.Services;
 using View3D.Utility;
 
@@ -26,11 +28,36 @@ namespace KitbasherEditor
 {
     public class KitbasherEditor_DependencyInjectionContainer
     {
+        public static void RegisterNotificationHandler<TNotification, TImplementation>(IServiceCollection serviceCollection)
+            where TNotification : INotification 
+            where TImplementation : class, INotificationHandler<TNotification>
+        {
+            serviceCollection.AddScoped<INotificationHandler<TNotification>, TImplementation>(x =>x.GetRequiredService<TImplementation>());
+        }
+
         public static void Register(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddTransient<KitbasherView>();
-            serviceCollection.AddTransient<KitbasherViewModel>();
-            serviceCollection.AddTransient<IEditorViewModel, KitbasherViewModel>();
+
+            RegisterNotificationHandler<SceneInitializedEvent, KitbasherViewModel>(serviceCollection);
+            RegisterNotificationHandler<FileSavedEvent, KitbasherViewModel>(serviceCollection);
+            RegisterNotificationHandler<CommandStackChangedEvent, KitbasherViewModel>(serviceCollection);
+
+            RegisterNotificationHandler<CommandStackChangedEvent, CommandStackRenderer>(serviceCollection);
+            RegisterNotificationHandler<CommandStackUndoEvent, CommandStackRenderer>(serviceCollection);
+
+
+            RegisterNotificationHandler<SelectionChangedEvent, GizmoComponent>(serviceCollection);
+            RegisterNotificationHandler<SelectionChangedEvent, MenuBarViewModel>(serviceCollection);
+            RegisterNotificationHandler<SelectionChangedEvent, VertexDebuggerViewModel>(serviceCollection);
+            RegisterNotificationHandler<SelectionChangedEvent, SceneExplorerViewModel>(serviceCollection);
+            RegisterNotificationHandler<SelectionChangedEvent, TransformToolViewModel>(serviceCollection);
+
+            serviceCollection.AddScoped<VertexDebuggerViewModel>();
+
+
+            serviceCollection.AddScoped<KitbasherView>();
+            serviceCollection.AddScoped<KitbasherViewModel>();
+            serviceCollection.AddScoped<IEditorViewModel, KitbasherViewModel>();
 
 
             serviceCollection.AddSingleton<SceneContainer>();
@@ -40,10 +67,13 @@ namespace KitbasherEditor
             serviceCollection.AddSingleton<ComponentInserter>();
 
             serviceCollection.AddScoped<IDeviceResolver, DeviceResolverComponent>(x => x.GetService<DeviceResolverComponent>());
+            serviceCollection.AddScoped<CommandExecutor>();
+
+
             
 
             RegisterGameComponent<DeviceResolverComponent>(serviceCollection);
-            RegisterGameComponent<CommandExecutor>(serviceCollection);
+            RegisterGameComponent<CommandStackRenderer>(serviceCollection);
             RegisterGameComponent<KeyboardComponent>(serviceCollection);
             RegisterGameComponent<MouseComponent>(serviceCollection);
             RegisterGameComponent<ResourceLibary>(serviceCollection);

@@ -1,10 +1,14 @@
 ﻿using CommonControls.MathViews;
 using KitbasherEditor.Views.EditorViews.VertexDebugger;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.ObjectModel;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using View3D.Components;
 using View3D.Components.Component.Selection;
@@ -17,7 +21,8 @@ using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels.VertexDebugger
 {
-    class VertexDebuggerViewModel : BaseComponent, IDisposable
+    class VertexDebuggerViewModel : BaseComponent, IDisposable,
+        INotificationHandler<SelectionChangedEvent>
     {
         public class VertexInstance
         {
@@ -55,7 +60,7 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
         LineMeshRender _lineRenderer;
         Effect _lineShader;
 
-        public VertexDebuggerViewModel(IComponentManager componentManager) : base(componentManager)
+        public VertexDebuggerViewModel(ComponentManagerResolver componentManagerResolver) : base(componentManagerResolver.ComponentManager)
         {
 
         }
@@ -67,17 +72,11 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
             _lineRenderer = new LineMeshRender(resourceLib);
 
             var selectionMgr = ComponentManager.GetComponent<SelectionManager>();
-            selectionMgr.SelectionChanged += SelectionMgr_SelectionChanged;
             Refresh();
 
             base.Initialize();
         }
 
-
-        private void SelectionMgr_SelectionChanged(ISelectionState state)
-        {
-            Refresh();
-        }
 
         public void Refresh()
         {
@@ -146,11 +145,10 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
             }
         }
 
-        public static void Create(IComponentManager componentManager)
+        public static void Create(IServiceProvider serviceProvider, IComponentManager componentManager)
         {
             var renderComp = componentManager.GetComponent<RenderEngineComponent>();
-
-            var viewModel = new VertexDebuggerViewModel(componentManager);
+            var viewModel = serviceProvider.GetService<VertexDebuggerViewModel>();
             componentManager.AddComponent(viewModel);
 
             var containingWindow = new Window();
@@ -165,10 +163,13 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
 
         public void Dispose()
         {
-            var selectionMgr = ComponentManager.GetComponent<SelectionManager>();
-            if(selectionMgr != null)
-                selectionMgr.SelectionChanged -= SelectionMgr_SelectionChanged;
             _lineRenderer.Dispose();
+        }
+
+        public Task Handle(SelectionChangedEvent notification, CancellationToken cancellationToken)
+        {
+            Refresh();
+            return Task.CompletedTask;
         }
     }
 }

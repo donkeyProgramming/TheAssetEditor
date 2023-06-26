@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Forms;
 using View3D.Animation;
 using View3D.Commands.Object;
 using View3D.Components.Component;
@@ -26,6 +27,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
         GameSkeleton _fromSkeleton;
 
         IComponentManager _componentManager;
+        private readonly CommandExecutor _commandExecutor;
         AnimationClip _animationClip;
         AnimationPlayer _animationPlayer;
         AnimationPlayer _oldAnimationPlayer;
@@ -42,13 +44,14 @@ namespace KitbasherEditor.ViewModels.MeshFitter
         public Vector3ViewModel BonePositionOffset { get; set; } = new Vector3ViewModel(0);
         public Vector3ViewModel BoneRotationOffset { get; set; } = new Vector3ViewModel(0);
 
-        public MeshFitterViewModel(Window ownerWindow, RemappedAnimatedBoneConfiguration configuration, List<Rmv2MeshNode> meshNodes, GameSkeleton targetSkeleton, AnimationFile currentSkeletonFile, IComponentManager componentManager) : base(configuration)
+        public MeshFitterViewModel(Window ownerWindow, RemappedAnimatedBoneConfiguration configuration, List<Rmv2MeshNode> meshNodes, GameSkeleton targetSkeleton, AnimationFile currentSkeletonFile, IComponentManager componentManager, CommandExecutor commandExecutor) : base(configuration)
         {
             _window = ownerWindow;
 
             _meshNodes = meshNodes;
             _targetSkeleton = targetSkeleton;
             _componentManager = componentManager;
+            _commandExecutor = commandExecutor;
             ScaleFactor.PropertyChanged += (_0, _1) => ApplyMeshFittingTransforms();
             BoneScaleFactor.PropertyChanged+=(_0, _1) => BoneScaleUpdate((float)BoneScaleFactor.Value, MeshBones.SelectedItem);
             BonePositionOffset.OnValueChanged += (viewModel) => BonePositionUpdated(viewModel, MeshBones.SelectedItem);
@@ -312,11 +315,11 @@ namespace KitbasherEditor.ViewModels.MeshFitter
         {
             var frame = AnimationSampler.Sample(0, _fromSkeleton, _animationClip);
             var cmd = new CreateAnimatedMeshPoseCommand(_meshNodes, frame);
-            _componentManager.GetComponent<CommandExecutor>().ExecuteCommand(cmd);   
+            _commandExecutor.ExecuteCommand(cmd);   
             _window.Close();
         }
 
-        public static void ShowView(List<ISelectable> meshesToFit, IComponentManager componentManager, SkeletonAnimationLookUpHelper skeletonHelper, PackFileService pfs)
+        public static void ShowView(List<ISelectable> meshesToFit, IComponentManager componentManager, SkeletonAnimationLookUpHelper skeletonHelper, PackFileService pfs, CommandExecutor commandExecutor)
         {
             var sceneManager = componentManager.GetComponent<SceneManager>();
             var resourceLib = componentManager.GetComponent<ResourceLibary>();
@@ -334,7 +337,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             if (allSkeltonNames.Count() != 1)
             {
                 var commaList = string.Join(",", allSkeltonNames);
-                MessageBox.Show($"Unexpected number of skeletons - {commaList}. This tool only works for one skeleton");
+                System.Windows.MessageBox.Show($"Unexpected number of skeletons - {commaList}. This tool only works for one skeleton");
                 return;
             }
 
@@ -363,7 +366,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             containingWindow.Title = "MeshFitter";
             containingWindow.Width = 1200;
             containingWindow.Height = 1100;
-            containingWindow.DataContext = new MeshFitterViewModel(containingWindow, config, meshNodes, targetSkeleton.Skeleton, currentSkeletonFile, componentManager);
+            containingWindow.DataContext = new MeshFitterViewModel(containingWindow, config, meshNodes, targetSkeleton.Skeleton, currentSkeletonFile, componentManager, commandExecutor);
             containingWindow.Content = new MeshFitterView();
             containingWindow.Closed += ContainingWindow_Closed;
             containingWindow.Show();

@@ -16,6 +16,7 @@ namespace KitbasherEditor.ViewModels.BmiEditor
     {
         Rmv2MeshNode _meshNode;
         IComponentManager _componentManager;
+        private readonly CommandExecutor _commandExecutor;
         GameSkeleton _skeleton;
 
         public ObservableCollection<SkeletonBoneNode> Bones { get; set; } = new ObservableCollection<SkeletonBoneNode>();
@@ -41,9 +42,10 @@ namespace KitbasherEditor.ViewModels.BmiEditor
             set { SetAndNotify(ref _scaleFactor, value); }
         }
 
-        public BmiViewModel(GameSkeleton skeleton, Rmv2MeshNode meshNode, IComponentManager componentManager)
+        public BmiViewModel(GameSkeleton skeleton, Rmv2MeshNode meshNode, IComponentManager componentManager, CommandExecutor commandExecutor)
         {
             _componentManager = componentManager;
+            _commandExecutor = commandExecutor;
             _meshNode = meshNode;
             _skeleton = skeleton;
             CreateBoneOverview(_skeleton);
@@ -62,7 +64,7 @@ namespace KitbasherEditor.ViewModels.BmiEditor
         public void Apply()
         {
             var cmd = new GrowMeshCommand(_skeleton, _meshNode, (float)_scaleFactor.Value, Bones.First().GetAllCheckedChildBoneIndexes());
-            _componentManager.GetComponent<CommandExecutor>().ExecuteCommand(cmd);
+            _commandExecutor.ExecuteCommand(cmd);
         }
 
         void CreateBoneOverview(GameSkeleton skeleton)

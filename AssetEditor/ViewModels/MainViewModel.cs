@@ -9,17 +9,23 @@ using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
 namespace AssetEditor.ViewModels
 {
+
+
     class MainViewModel : NotifyPropertyChangedImpl, IEditorCreator, IDropTarget<IEditorViewModel, bool>
     {
         ILogger _logger = Logging.Create<MainViewModel>();
@@ -54,11 +60,13 @@ namespace AssetEditor.ViewModels
         public ICommand CloseToolsToRightCommand { get; set; }
         public ICommand CloseToolsToLeftCommand { get; set; }
 
+
+
+
         public MainViewModel(GameInformationFactory gameInformationFactory, MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, ToolFactory toolFactory, SkeletonAnimationLookUpHelper animationLookUpHelper)
         {
             _packfileService = packfileService;
             _packfileService.Database.BeforePackFileContainerRemoved += Database_BeforePackFileContainerRemoved;
-
             MenuBar = menuViewModel;
             MenuBar.EditorCreator = this;
             CloseToolCommand = new RelayCommand<IEditorViewModel>(CloseTool);
@@ -84,7 +92,8 @@ namespace AssetEditor.ViewModels
                 settingsService.Save();
             }
 
-           
+
+
 
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
             {
@@ -414,6 +423,8 @@ namespace AssetEditor.ViewModels
             SelectedEditorIndex = CurrentEditorsList.IndexOf(node);
             return true;
         }
+
+
     }
 
 }

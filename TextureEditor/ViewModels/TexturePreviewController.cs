@@ -119,7 +119,7 @@ namespace TextureEditor.ViewModels
 
             _mesh = meshObject;
 
-            _scene = new SceneContainer();
+            _scene = new SceneContainer(null, null);
             _scene.Components.Add(new ResourceLibary(_scene, packFileService ));
             _scene.ForceCreate();
 

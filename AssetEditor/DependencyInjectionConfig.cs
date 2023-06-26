@@ -11,7 +11,6 @@ using CommonControls.Editors.CampaignAnimBin;
 using CommonControls.Editors.TextEditor;
 using CommonControls.Editors.VariantMeshDefinition;
 using CommonControls.Editors.Wtui;
-using CommonControls.FileTypes.DB;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Resources;
 using CommonControls.Services;
@@ -20,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using TextureEditor;
 using View3D;
+using MediatR;
 
 namespace AssetEditor
 {
@@ -46,6 +46,8 @@ namespace AssetEditor
 
         private void ConfigureServices(IServiceCollection services)
         {
+            services.AddMediatR(typeof(App));
+
             services.AddSingleton<ApplicationSettingsService>();
             services.AddSingleton<ToolFactory>();
             services.AddSingleton<PackFileDataBase>();

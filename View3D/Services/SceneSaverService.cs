@@ -15,20 +15,24 @@ using CommonControls.FileTypes.RigidModel;
 using CommonControls.BaseDialogs.ErrorListDialog;
 using View3D.Utility;
 using View3D.Components.Component;
+using MonoGame.Framework.WpfInterop;
+using MediatR;
+using CommonControls.Events;
 
 namespace View3D.Services
 {
     public class SceneSaverService
     {
         ILogger _logger = Logging.Create<SceneSaverService>();
-
+        private readonly IMediator _mediator;
         private readonly PackFileService _packFileService;
         private readonly ActiveFileResolver _activeFileResolver;
         private readonly SceneManager _sceneManager;
         private readonly ApplicationSettingsService _applicationSettingsService;
 
-        public SceneSaverService(PackFileService packFileService, ActiveFileResolver activeFileResolver, SceneManager sceneManager, ApplicationSettingsService applicationSettingsService)
+        public SceneSaverService(IMediator mediator, PackFileService packFileService, ActiveFileResolver activeFileResolver, SceneManager sceneManager, ApplicationSettingsService applicationSettingsService)
         {
+            _mediator = mediator;
             _packFileService = packFileService;
             _activeFileResolver = activeFileResolver;
             _sceneManager = sceneManager;
@@ -45,7 +49,8 @@ namespace View3D.Services
                 byte[] bytes = GetBytesToSave();
                 var path = _packFileService.GetFullPath(inputFile);
                 var res = SaveHelper.Save(_packFileService, path, inputFile, bytes);
-                //_activeFileResolver.Save(); ToDo - MediatR
+
+                _mediator.PublishSync(new FileSavedEvent()); // Move into filehelper at some point?
             }
             catch (Exception e)
             {

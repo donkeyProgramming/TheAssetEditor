@@ -1,6 +1,6 @@
-﻿using CommonControls.Common;
+﻿using CommonControls.Events;
+using MediatR;
 using Microsoft.Xna.Framework;
-using Serilog;
 using System;
 using View3D.Components.Rendering;
 using View3D.Rendering;
@@ -11,11 +11,15 @@ using View3D.Utility;
 
 namespace View3D.Components.Component.Selection
 {
-    public delegate void SelectionChangedDelegate(ISelectionState state);
+    public class SelectionChangedEvent : INotification
+    {
+        public ISelectionState NewState { get; internal set; }
+    }
+
     public class SelectionManager : BaseComponent, IDisposable
     {
-        public event SelectionChangedDelegate SelectionChanged;
         ISelectionState _currentState;
+        private readonly IMediator _mediator;
         private readonly RenderEngineComponent _renderEngine;
         BasicShader _wireframeEffect;
         BasicShader _selectedFacesEffect;
@@ -26,20 +30,20 @@ namespace View3D.Components.Component.Selection
         private readonly ResourceLibary _resourceLib;
         private readonly DeviceResolverComponent _deviceResolverComponent;
 
-        public SelectionManager(ComponentManagerResolver componentManagerResolver, RenderEngineComponent renderEngine, ResourceLibary resourceLib, DeviceResolverComponent deviceResolverComponent ) : base(componentManagerResolver.ComponentManager)
+        public SelectionManager(IMediator mediator, ComponentManagerResolver componentManagerResolver, RenderEngineComponent renderEngine, ResourceLibary resourceLib, DeviceResolverComponent deviceResolverComponent ) : base(componentManagerResolver.ComponentManager)
         {
+            _mediator = mediator;
             _renderEngine = renderEngine;
             _resourceLib = resourceLib;
             _deviceResolverComponent = deviceResolverComponent;
         }
 
-
+        bool _sendEvents = false;
         public override void Initialize()
         {
-            CreateSelectionSate(GeometrySelectionMode.Object, null);
-           
+            CreateSelectionSate(GeometrySelectionMode.Object, null, false);
 
-            _lineGeometry = new LineMeshRender(_resourceLib);
+             _lineGeometry = new LineMeshRender(_resourceLib);
             VertexRenderer = new VertexInstanceMesh(ComponentManager);
 
             _wireframeEffect = new BasicShader(_deviceResolverComponent.Device);
@@ -53,7 +57,7 @@ namespace View3D.Components.Component.Selection
             base.Initialize();
         }
 
-        public ISelectionState CreateSelectionSate(GeometrySelectionMode mode, ISelectable selectedObj)
+        public ISelectionState CreateSelectionSate(GeometrySelectionMode mode, ISelectable selectedObj, bool sendEvent)
         {
             if (_currentState != null)
             {
@@ -84,26 +88,12 @@ namespace View3D.Components.Component.Selection
             return _currentState;
         }
 
-        public ISelectionState GetState()
-        {
-            return _currentState;
-        }
+        public ISelectionState GetState() => _currentState;
+        public State GetState<State>() where State: class, ISelectionState => _currentState as State;
+        public ISelectionState GetStateCopy() => _currentState.Clone();
+        public State GetStateCopy<State>() where State : class, ISelectionState => GetState<State>().Clone() as State;
 
-        public State GetState<State>() where State: class, ISelectionState
-        {
-            return _currentState as State;
-        }
-
-        public ISelectionState GetStateCopy()
-        {
-            return _currentState.Clone();
-        }
-
-        public State GetStateCopy<State>() where State : class, ISelectionState
-        {
-            return GetState<State>().Clone() as State;
-        }
-
+        
         public void SetState(ISelectionState state)
         {
             _currentState.SelectionChanged -= SelectionManager_SelectionChanged;
@@ -114,7 +104,8 @@ namespace View3D.Components.Component.Selection
 
         private void SelectionManager_SelectionChanged(ISelectionState state)
         {
-            SelectionChanged?.Invoke(state);
+            if(_sendEvents)
+             _mediator.PublishSync(new SelectionChangedEvent { NewState = state });
         }
 
         public override void Draw(GameTime gameTime)
@@ -160,11 +151,6 @@ namespace View3D.Components.Component.Selection
             VertexRenderer = null;
             _lineGeometry.Dispose();
             _lineGeometry = null;
-
-            if (SelectionChanged != null)
-                foreach (var d in SelectionChanged.GetInvocationList())
-                    SelectionChanged -= (d as SelectionChangedDelegate);
-
 
             _currentState?.Clear();
             _currentState = null;

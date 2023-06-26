@@ -7,10 +7,14 @@ using View3D.Components.Rendering;
 using View3D.Components.Input;
 using View3D.Components.Component.Selection;
 using View3D.Utility;
+using MediatR;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace View3D.Components.Gizmo
 {
-    public class GizmoComponent : BaseComponent, IDisposable
+    public class GizmoComponent : BaseComponent, IDisposable, 
+        INotificationHandler<SelectionChangedEvent>
     {   
         private readonly MouseComponent _mouse;
         private readonly KeyboardComponent _keyboard;
@@ -45,8 +49,6 @@ namespace View3D.Components.Gizmo
        
         public override void Initialize()
         {
-            _selectionManager.SelectionChanged += OnSelectionChanged;
-
             _gizmo = new Gizmo(_camera, _mouse, _deviceResolverComponent.Device, new SpriteBatch(_deviceResolverComponent.Device), _resourceLibary.DefaultFont);
             _gizmo.ActivePivot = PivotType.ObjectCenter;
             _gizmo.TranslateEvent += GizmoTranslateEvent;
@@ -170,6 +172,12 @@ namespace View3D.Components.Gizmo
         public void Dispose()
         {
             _gizmo.Dispose();
+        }
+
+        public Task Handle(SelectionChangedEvent notification, CancellationToken cancellationToken)
+        {
+            OnSelectionChanged(notification.NewState);
+            return Task.CompletedTask;
         }
     }
 }
