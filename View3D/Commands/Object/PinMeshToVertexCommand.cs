@@ -7,7 +7,7 @@ using View3D.SceneNodes;
 
 namespace View3D.Commands.Object
 {
-    public class PinMeshToVertexCommand : CommandBase<PinMeshToVertexCommand>
+    public class PinMeshToVertexCommand : ICommand
     {
         ISelectionState _selectionOldState;
         SelectionManager _selectionManager;
@@ -27,17 +27,15 @@ namespace View3D.Commands.Object
             _vertexId = vertexId;
         }
 
-        public override string GetHintText()
-        {
-            return "Pin meshes to vertex";
-        }
+        public string HintText { get => "Pin meshes to vertex"; }
+        public bool IsMutation { get => true; }
 
         public PinMeshToVertexCommand(SelectionManager selectionManager)
         {
             _selectionManager = selectionManager;
         }
 
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             // Create undo state
             _originalGeos = _meshesToPin.Select(x => x.Geometry.Clone()).ToList();
@@ -61,7 +59,7 @@ namespace View3D.Commands.Object
             }
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             for (int i = 0; i < _meshesToPin.Count; i++)
             {

@@ -4,13 +4,17 @@ using View3D.SceneNodes;
 namespace View3D.Commands.Object
 {
 
-    public class ObjectSelectionModeCommand : CommandBase<ObjectSelectionModeCommand>
+    public class ObjectSelectionModeCommand : ICommand
     {
         SelectionManager _selectionManager;
 
         GeometrySelectionMode _newMode;
         ISelectable _selectedItem;
         ISelectionState _oldState;
+
+
+        public string HintText { get => "Select Object"; }
+        public bool IsMutation { get => false; }
 
         public void Configure(GeometrySelectionMode newMode)
         {
@@ -23,15 +27,13 @@ namespace View3D.Commands.Object
             _newMode = newMode;
         }
 
-        public override string GetHintText() => "Select Object";
 
-
-        public  ObjectSelectionModeCommand(SelectionManager selectionManager)
+        public ObjectSelectionModeCommand(SelectionManager selectionManager)
         {
             _selectionManager = selectionManager;
         }
 
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _oldState = _selectionManager.GetStateCopy();
             var newSelectionState = _selectionManager.CreateSelectionSate(_newMode, _selectedItem);
@@ -44,11 +46,11 @@ namespace View3D.Commands.Object
                 (newSelectionState as VertexSelectionState).RenderObject = _selectedItem;
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             _selectionManager.SetState(_oldState);
         }
 
-        public override bool IsMutation() => false;
+
     }
 }

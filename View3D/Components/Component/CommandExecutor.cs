@@ -1,5 +1,7 @@
-﻿using CommonControls.Events;
+﻿using CommonControls.Common;
+using CommonControls.Events;
 using MediatR;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using View3D.Commands;
@@ -22,6 +24,7 @@ namespace View3D.Components.Component
 
     public class CommandExecutor
     {
+        protected ILogger _logger = Logging.Create<CommandExecutor>();
         private readonly Stack<ICommand> _commands = new Stack<ICommand>();
         private readonly IMediator _mediator;
         private readonly ComponentManagerResolver _componentManagerResolver;
@@ -38,15 +41,23 @@ namespace View3D.Components.Component
                 throw new ArgumentNullException("Command is null");
             if(isUndoable)
                 _commands.Push(command);
-            command.Initialize(_componentManagerResolver.ComponentManager);
-            command.Execute();
+ 
+            _logger.Here().Information($"Executing {command.GetType().Name}");
+            try
+            {
+                command.Execute();
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error($"Failed to execute command : {e}");
+            }
 
             if (isUndoable)
             {
                 _mediator.PublishSync(new CommandStackChangedEvent() 
                 {
-                    HintText = command.GetHintText(),
-                    IsMutation = command.IsMutation(),
+                    HintText = command.HintText,
+                    IsMutation = command.IsMutation,
                 });
             }
         }
@@ -58,7 +69,17 @@ namespace View3D.Components.Component
             if (CanUndo())
             {
                 var command = _commands.Pop();
-                command.Undo();
+                _logger.Here().Information($"Undoing {command.GetType().Name}");
+                try
+                {
+                    command.Undo();
+                }
+                catch (Exception e)
+                {
+                    _logger.Here().Error($"Failed to Undoing command : {e}");
+                }
+
+
                 _mediator.PublishSync(new CommandStackUndoEvent() { HintText = GetUndoHint() });
             }
         }
@@ -68,7 +89,7 @@ namespace View3D.Components.Component
             if (!CanUndo())
                 return "No items to undo";
 
-            return _commands.Peek().GetHintText();
+            return _commands.Peek().HintText;
         }
     }
 }

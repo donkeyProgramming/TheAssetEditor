@@ -38,7 +38,6 @@ namespace _componentManager.ViewModels.MenuBarViews
 
         ViewOnlySelectedComponent _viewOnlySelectedComp;
         private readonly SceneManager _sceneManager;
-        private readonly CommandExecutor _commandExecutor;
         private readonly CommandFactory _commandFactory;
         private readonly IServiceProvider _serviceProvider;
         PackFileService _packFileService;
@@ -46,7 +45,7 @@ namespace _componentManager.ViewModels.MenuBarViews
         WindowKeyboard _keyboard;
 
         public ToolActions(IServiceProvider serviceProvider, ComponentManagerResolver componentManagerResolver, PackFileService packFileService, WindowKeyboard keyboard, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
-            SelectionManager selectionManager, ObjectEditor objectEditor, FaceEditor faceEditor, ViewOnlySelectedComponent viewOnlySelectedComponent, SceneManager sceneManager, CommandExecutor commandExecutor, CommandFactory commandFactory)
+            SelectionManager selectionManager, ObjectEditor objectEditor, FaceEditor faceEditor, ViewOnlySelectedComponent viewOnlySelectedComponent, SceneManager sceneManager, CommandFactory commandFactory)
         {
             _serviceProvider = serviceProvider;
             _packFileService = packFileService;
@@ -59,7 +58,6 @@ namespace _componentManager.ViewModels.MenuBarViews
             _faceEditor = faceEditor;
             _viewOnlySelectedComp = viewOnlySelectedComponent;
             _sceneManager = sceneManager;
-            _commandExecutor = commandExecutor;
             _commandFactory = commandFactory;
         }
 
@@ -183,7 +181,7 @@ namespace _componentManager.ViewModels.MenuBarViews
         public void OpenSkeletonReshaperTool()
         {
             var state = _selectionManager.GetState<ObjectSelectionState>();
-            MeshFitterViewModel.ShowView(state.CurrentSelection(), _componentManager, _skeletonHelper, _packFileService, _commandExecutor, _commandFactory);
+            MeshFitterViewModel.ShowView(state.CurrentSelection(), _componentManager, _skeletonHelper, _packFileService, _commandFactory);
         }
 
         public void CreateStaticMeshes()
@@ -300,8 +298,6 @@ namespace _componentManager.ViewModels.MenuBarViews
             if (window.Result == true)
             {
                 var remapping = AnimatedBoneHelper.BuildRemappingList(config.MeshBones.First());
-                _commandExecutor.ExecuteCommand(new RemapBoneIndexesCommand());
-
                 _commandFactory.Create<RemapBoneIndexesCommand>().Configure(x => x.Configure(selectedMeshses, remapping, config.ParnetModelSkeletonName)).BuildAndExecute();
             }
         }

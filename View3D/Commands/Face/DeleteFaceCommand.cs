@@ -4,7 +4,7 @@ using View3D.Rendering.Geometry;
 
 namespace View3D.Commands.Face
 {
-    public class DeleteFaceCommand : CommandBase<DeleteFaceCommand>
+    public class DeleteFaceCommand : ICommand
     {
         FaceSelectionState _originalSelectionState;
         MeshObject _originalGeometry;
@@ -13,7 +13,9 @@ namespace View3D.Commands.Face
         MeshObject _geo;
         private readonly SelectionManager _selectionManager;
 
-        public override string GetHintText() => "Delete Faces";
+
+        public string HintText { get => "Delete Faces"; }
+        public bool IsMutation { get => true; }
 
         public DeleteFaceCommand(SelectionManager selectionManager)
         {
@@ -26,7 +28,7 @@ namespace View3D.Commands.Face
             _geo = geoObject;
         }
 
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             // Create undo state
             _originalSelectionState = _selectionManager.GetStateCopy<FaceSelectionState>();
@@ -37,7 +39,7 @@ namespace View3D.Commands.Face
             _selectionManager.GetState<FaceSelectionState>().Clear();
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             _originalSelectionState.RenderObject.Geometry = _originalGeometry;
             _selectionManager.SetState(_originalSelectionState);

@@ -4,10 +4,13 @@ using View3D.Components.Component.Selection;
 
 namespace View3D.Commands.Face
 {
-    public class ConvertFacesToVertexSelectionCommand : CommandBase<DeleteFaceCommand>
+    public class ConvertFacesToVertexSelectionCommand : ICommand
     {
         private readonly SelectionManager _selectionManager;
         FaceSelectionState _originalSelectionState;
+
+        public string HintText { get => "Convert Faces To Vertex"; }
+        public bool IsMutation { get => true; }
 
         public ConvertFacesToVertexSelectionCommand(SelectionManager selectionManager)
         {
@@ -19,9 +22,7 @@ namespace View3D.Commands.Face
             _originalSelectionState = currentSelectionState;
         }
 
-        public override string GetHintText() => "Convert Faces To Vertex";
-
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             var renderObject = _originalSelectionState.RenderObject;
             var geometry = renderObject.Geometry;
@@ -40,7 +41,7 @@ namespace View3D.Commands.Face
             _selectionManager.SetState(vertexState);
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             _selectionManager.SetState(_originalSelectionState);
         }

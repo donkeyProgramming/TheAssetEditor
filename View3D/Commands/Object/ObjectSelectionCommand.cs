@@ -1,13 +1,16 @@
 ﻿using CommonControls.Common;
+using Serilog;
 using System.Collections.Generic;
 using System.Linq;
+using View3D.Commands.Face;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 
 namespace View3D.Commands.Object
 {
-    public class ObjectSelectionCommand : CommandBase<ObjectSelectionCommand>
+    public class ObjectSelectionCommand : ICommand
     {
+        ILogger _logger = Logging.Create<ObjectSelectionCommand>();
         SelectionManager _selectionManager;
 
         ISelectionState _oldState;
@@ -15,8 +18,8 @@ namespace View3D.Commands.Object
         bool _isRemove;
         List<ISelectable> _items { get; set; } = new List<ISelectable>();
 
-        public override string GetHintText() => "Object Selected";
-        public override bool IsMutation() => false;
+        public string HintText { get => "Object Selected"; }
+        public bool IsMutation { get => false; }
 
         public ObjectSelectionCommand(SelectionManager selectionManager)
         {
@@ -37,7 +40,7 @@ namespace View3D.Commands.Object
             _isRemove = removeSelection;
         }
 
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _oldState = _selectionManager.GetStateCopy();
             var currentState = _selectionManager.GetState() as ObjectSelectionState;
@@ -51,7 +54,7 @@ namespace View3D.Commands.Object
             currentState.ModifySelection(_items, _isRemove);
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             _selectionManager.SetState(_oldState);
         }

@@ -7,7 +7,7 @@ using View3D.Utility;
 
 namespace View3D.Commands.Object
 {
-    public class CombineMeshCommand : CommandBase<CombineMeshCommand>
+    public class CombineMeshCommand : ICommand
     {
         List<ISelectable> _objectsToCombine;
         List<Rmv2MeshNode> _combinedMeshes = new List<Rmv2MeshNode>();
@@ -26,11 +26,12 @@ namespace View3D.Commands.Object
             _objectsToCombine = new List<ISelectable>(objectsToCombine);
         }
 
-        public override string GetHintText() => "Combine Objects";
+        public string HintText { get => "Combine Objects"; }
+        public bool IsMutation { get => true; }
 
 
 
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _originalSelectionState = _selectionManager.GetStateCopy();
 
@@ -60,7 +61,7 @@ namespace View3D.Commands.Object
             }
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             foreach (var item in _objectsToCombine)
                 item.Parent.AddObject(item);

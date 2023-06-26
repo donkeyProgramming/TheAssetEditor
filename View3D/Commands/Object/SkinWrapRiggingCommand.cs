@@ -7,7 +7,7 @@ using View3D.Utility;
 
 namespace View3D.Commands.Object
 {
-    public class SkinWrapRiggingCommand : CommandBase<SkinWrapRiggingCommand>
+    public class SkinWrapRiggingCommand : ICommand
     {
         ISelectionState _selectionOldState;
         SelectionManager _selectionManager;
@@ -18,15 +18,13 @@ namespace View3D.Commands.Object
         List<Rmv2MeshNode> _affectedMeshes;
         List<Rmv2MeshNode> _sources;
 
+        public string HintText { get => "Skin wrap re-rigging"; }
+        public bool IsMutation { get => true; }
+
         public void Configure(IEnumerable<Rmv2MeshNode> affectedMeshes, IEnumerable<Rmv2MeshNode> sources)
         {
             _affectedMeshes = affectedMeshes.ToList();
             _sources = sources.ToList();
-        }
-
-        public override string GetHintText()
-        {
-            return "Skin wrap re-rigging";
         }
 
         public SkinWrapRiggingCommand(SelectionManager selectionManager)
@@ -34,7 +32,7 @@ namespace View3D.Commands.Object
             _selectionManager = selectionManager;;
         }
 
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             // Create undo state
             _originalGeos = _affectedMeshes.Select(x => x.Geometry.Clone()).ToList();
@@ -76,7 +74,7 @@ namespace View3D.Commands.Object
             }
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             for (int i = 0; i < _affectedMeshes.Count; i++)
             {

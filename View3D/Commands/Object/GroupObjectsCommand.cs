@@ -6,7 +6,7 @@ using View3D.SceneNodes;
 
 namespace View3D.Commands.Object
 {
-    public class GroupObjectsCommand : CommandBase<GroupObjectsCommand>
+    public class GroupObjectsCommand : ICommand
     {
         SelectionManager _selectionManager;
         ISelectionState _oldState;
@@ -20,7 +20,8 @@ namespace View3D.Commands.Object
             _parent = parent;
         }
 
-        public override string GetHintText() => "Group Objects";
+        public string HintText { get => "Group Objects"; }
+        public bool IsMutation { get => true; }
 
 
         public GroupObjectsCommand(SelectionManager selectionManager)
@@ -28,7 +29,7 @@ namespace View3D.Commands.Object
             _selectionManager = selectionManager;
         }
 
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _oldState = _selectionManager.GetStateCopy();
             var groupNode = _parent.AddObject(new GroupNode("New Group") { IsUngroupable = true, IsSelectable = true, IsLockable = true });
@@ -46,7 +47,7 @@ namespace View3D.Commands.Object
             currentState.ModifySelection(itemsToSelect, false);
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             var groupNode = _itemsToGroup.First().Parent;
 
@@ -62,7 +63,7 @@ namespace View3D.Commands.Object
         }
     }
 
-    public class UnGroupObjectsCommand : CommandBase<UnGroupObjectsCommand>
+    public class UnGroupObjectsCommand : ICommand
     {
         SelectionManager _selectionManager;
         ISelectionState _oldState;
@@ -78,17 +79,16 @@ namespace View3D.Commands.Object
             _oldGroupNode = groupNode;
         }
 
-        public override string GetHintText()
-        {
-            return "Ungroup objects";
-        }
+
+        public string HintText { get => "Ungroup objects"; }
+        public bool IsMutation { get => true; }
 
         public UnGroupObjectsCommand(SelectionManager selectionManager)
         {
             _selectionManager = selectionManager;
         }
 
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _oldState = _selectionManager.GetStateCopy();
 
@@ -106,7 +106,7 @@ namespace View3D.Commands.Object
             currentState.ModifySelection(_itemsToUngroup, false);
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             foreach (var item in _itemsToUngroup)
             {
@@ -122,7 +122,7 @@ namespace View3D.Commands.Object
         }
     }
 
-    public class AddObjectsToGroupCommand : CommandBase<AddObjectsToGroupCommand>
+    public class AddObjectsToGroupCommand : ICommand
     {
         ISelectionState _originalSelectionState;
 
@@ -142,9 +142,10 @@ namespace View3D.Commands.Object
             _selectionManager = selectionManager;
         }
 
-        public override string GetHintText() => "Add Objects to group";
-        
-        protected override void ExecuteCommand()
+        public string HintText { get => "Add Objects to group"; }
+        public bool IsMutation { get => true; }
+
+        public void Execute()
         {
             // Create undo state
             _originalSelectionState = _selectionManager.GetStateCopy();
@@ -162,7 +163,7 @@ namespace View3D.Commands.Object
             currentState.ModifySelection(_itemsToAdd, false);
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             var rootNode = _groupToAddItemsTo.Parent;
             foreach (var item in _itemsToAdd)

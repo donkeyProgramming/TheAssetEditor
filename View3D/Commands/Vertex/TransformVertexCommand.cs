@@ -7,7 +7,7 @@ using View3D.Rendering.Geometry;
 namespace View3D.Commands.Vertex
 {
 
-    public class TransformVertexCommand : CommandBase<TransformVertexCommand>
+    public class TransformVertexCommand : ICommand
     {
         List<MeshObject> _geometryList;
         public Vector3 PivotPoint;
@@ -23,7 +23,8 @@ namespace View3D.Commands.Vertex
             PivotPoint = pivotPoint;
         }
 
-        public override string GetHintText() => "Transform";
+        public string HintText { get => "Transform"; }
+        public bool IsMutation { get => true; }
 
 
         public TransformVertexCommand(SelectionManager selectionManager)
@@ -31,13 +32,13 @@ namespace View3D.Commands.Vertex
             _selectionManager = selectionManager;
         }
 
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _oldSelectionState = _selectionManager.GetStateCopy();
             // Nothing to do, vertexes already updated
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             Transform.Decompose(out var scale, out var rot, out var trans);
 

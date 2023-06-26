@@ -4,7 +4,7 @@ using View3D.SceneNodes;
 
 namespace View3D.Commands.Face
 {
-    public class DuplicateFacesCommand : CommandBase<DuplicateFacesCommand>
+    public class DuplicateFacesCommand : ICommand
     {
         SelectionManager _selectionManager;
 
@@ -16,6 +16,9 @@ namespace View3D.Commands.Face
         List<int> _facesToDelete;
         ISelectable _inputNode;
         bool _deleteOriginal;
+
+        public string HintText { get => "Duplicate Faces"; }
+        public bool IsMutation { get => true; }
 
         public DuplicateFacesCommand(SelectionManager selectionManager)
         {
@@ -29,9 +32,9 @@ namespace View3D.Commands.Face
             _deleteOriginal = deleteOriginal;
         }
 
-        public override string GetHintText() => "Duplicate Faces";
 
-        protected override void ExecuteCommand()
+
+        public void Execute()
         {
             _oldState = _selectionManager.GetStateCopy();
 
@@ -63,7 +66,7 @@ namespace View3D.Commands.Face
             _selectionManager.SetState(objectState);
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             _newObject.Parent.RemoveObject(_newObject);
 

@@ -1,11 +1,14 @@
 ﻿using CommonControls.Common;
+using Serilog;
 using System.Collections.Generic;
+using View3D.Commands.Face;
 using View3D.Components.Component.Selection;
 
 namespace View3D.Commands.Vertex
 {
-    public class VertexSelectionCommand : CommandBase<VertexSelectionCommand>
+    public class VertexSelectionCommand : ICommand
     {
+        ILogger _logger = Logging.Create<VertexSelectionCommand>();
         SelectionManager _selectionManager;
         ISelectionState _oldState;
 
@@ -13,8 +16,11 @@ namespace View3D.Commands.Vertex
         bool _isRemove;
         List<int> _selectedVertices;
 
-        public override string GetHintText() => "Select Vertex";
-        public override bool IsMutation() => false;
+
+
+        public string HintText { get => "Select Vertex"; }
+        public bool IsMutation { get => false; }
+
 
         public void Configure(List<int> selectedVertices, bool isAdd, bool isRemove)
         {
@@ -28,7 +34,7 @@ namespace View3D.Commands.Vertex
             _selectionManager = selectionManager;
         }
 
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _oldState = _selectionManager.GetStateCopy();
             var currentState = _selectionManager.GetState() as VertexSelectionState;
@@ -42,7 +48,7 @@ namespace View3D.Commands.Vertex
             currentState.EnsureSorted();
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             _selectionManager.SetState(_oldState);
         }

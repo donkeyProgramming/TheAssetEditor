@@ -7,7 +7,7 @@ using View3D.Services.MeshOptimization;
 namespace View3D.Commands.Object
 {
 
-    public class ReduceMeshCommand : CommandBase<ObjectSelectionModeCommand>
+    public class ReduceMeshCommand : ICommand
     {
         List<Rmv2MeshNode> _meshList;
         List<MeshObject> _originalGeometry = new List<MeshObject>();
@@ -26,10 +26,11 @@ namespace View3D.Commands.Object
             _factor = factor;
         }
 
-        public override string GetHintText() => "Reduce mesh";
+        public string HintText { get => "Reduce mesh"; }
+        public bool IsMutation { get => true; }
 
 
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _oldState = _selectionManager.GetStateCopy();
 
@@ -42,7 +43,7 @@ namespace View3D.Commands.Object
             }
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             for (int i = 0; i < _meshList.Count; i++)
                 _meshList[i].Geometry = _originalGeometry[i];

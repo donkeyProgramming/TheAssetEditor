@@ -1,11 +1,13 @@
 ﻿using CommonControls.Common;
+using Serilog;
 using System.Collections.Generic;
 using View3D.Components.Component.Selection;
 
 namespace View3D.Commands.Face
 {
-    public class FaceSelectionCommand : CommandBase<FaceSelectionCommand>
+    public class FaceSelectionCommand : ICommand
     {
+        ILogger _logger = Logging.Create<FaceSelectionCommand>();
         SelectionManager _selectionManager;
 
         ISelectionState _oldState;
@@ -13,8 +15,8 @@ namespace View3D.Commands.Face
         bool _isRemove;
         List<int> _selectedFaces;
 
-        public override string GetHintText() => "Face selected";
-        public override bool IsMutation() => false;
+        public string HintText { get => "Face selected"; }
+        public bool IsMutation { get => false; }
 
         public FaceSelectionCommand(SelectionManager selectionManager)
         {
@@ -35,7 +37,7 @@ namespace View3D.Commands.Face
             _isRemove = removeSelection;
         }
 
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _oldState = _selectionManager.GetStateCopy();
             var currentState = _selectionManager.GetState() as FaceSelectionState;
@@ -49,11 +51,9 @@ namespace View3D.Commands.Face
             currentState.EnsureSorted();
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             _selectionManager.SetState(_oldState);
         }
-
-        
     }
 }

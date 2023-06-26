@@ -1,17 +1,22 @@
 ﻿using CommonControls.Common;
+using Serilog;
 using System.Collections.Generic;
 using System.Linq;
+using View3D.Commands.Face;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 
 namespace View3D.Commands.Object
 {
-    public class DeleteObjectsCommand : CommandBase<DeleteObjectsCommand>
+    public class DeleteObjectsCommand : ICommand
     {
+        ILogger _logger = Logging.Create<DeleteObjectsCommand>();
         List<SceneNode> _itemsToDelete;
         SelectionManager _selectionManager;
         ISelectionState _oldState;
 
+        public string HintText { get => "Delete Object"; }
+        public bool IsMutation { get => true; }
 
         public DeleteObjectsCommand(SelectionManager selectionManager)
         {
@@ -28,10 +33,7 @@ namespace View3D.Commands.Object
             _itemsToDelete = new List<SceneNode>() { itemToDelete };
         }
 
-        public override string GetHintText() => "Delete Object";
-
-
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _oldState = _selectionManager.GetStateCopy();
 
@@ -42,7 +44,7 @@ namespace View3D.Commands.Object
             _selectionManager.CreateSelectionSate(GeometrySelectionMode.Object, null);
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             foreach (var item in _itemsToDelete)
                 item.Parent.AddObject(item);

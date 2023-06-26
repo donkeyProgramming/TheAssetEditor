@@ -1,6 +1,8 @@
 ﻿using CommonControls.Common;
+using Serilog;
 using System.Collections.Generic;
 using System.Linq;
+using View3D.Commands.Face;
 using View3D.Components.Component.Selection;
 using View3D.Rendering.Shading;
 using View3D.SceneNodes;
@@ -9,21 +11,25 @@ using View3D.Utility;
 
 namespace View3D.Commands.Object
 {
-    public class DivideObjectIntoSubmeshesCommand : CommandBase<DivideObjectIntoSubmeshesCommand>
+    public class DivideObjectIntoSubmeshesCommand : ICommand
     {
+        ILogger _logger = Logging.Create<FaceSelectionCommand>();
+
         IEditableGeometry _objectToSplit;
         bool _combineOverlappingVertexes;
 
         List<GroupNode> _newGroupNodes = new List<GroupNode>();
-
-
+        private readonly ComponentManagerResolver _componentManagerResolver;
         SelectionManager _selectionManager;
         ISelectionState _originalSelectionState;
         ResourceLibary _resourceLib;
 
+        public string HintText { get => "Divide Object"; }
+        public bool IsMutation { get => true; }
+
         public DivideObjectIntoSubmeshesCommand(ComponentManagerResolver componentManagerResolver, SelectionManager selectionManager, ResourceLibary resourceLibary)
         {
-            _componentManager = componentManagerResolver.ComponentManager;
+            _componentManagerResolver = componentManagerResolver;
             _selectionManager = selectionManager;
             _resourceLib = resourceLibary;
         }
@@ -34,11 +40,7 @@ namespace View3D.Commands.Object
             _combineOverlappingVertexes = combineOverlappingVertexes;
         }
 
-        public override string GetHintText() => "Divide Object";
-
-
-
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _originalSelectionState = _selectionManager.GetStateCopy();
 
@@ -76,7 +78,7 @@ namespace View3D.Commands.Object
 
                     var typedObject = _objectToSplit as Rmv2MeshNode;
                     var shader = typedObject.Effect.Clone() as PbrShader;
-                    var meshNode = new Rmv2MeshNode(typedObject.CommonHeader, mesh, typedObject.Material.Clone(), typedObject.AnimationPlayer, _componentManager, shader);
+                    var meshNode = new Rmv2MeshNode(typedObject.CommonHeader, mesh, typedObject.Material.Clone(), typedObject.AnimationPlayer, _componentManagerResolver.ComponentManager, shader);
                     meshNode.Initialize(_resourceLib);
                     meshNode.IsVisible = true;
 
@@ -96,7 +98,7 @@ namespace View3D.Commands.Object
             }
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             foreach(var item in _newGroupNodes)       
                 item.Parent.RemoveObject(item);

@@ -1,32 +1,37 @@
 ﻿using CommonControls.Common;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using View3D.Commands.Face;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 
 namespace View3D.Commands.Object
 {
-    public class DuplicateObjectCommand : CommandBase<DuplicateObjectCommand>
+    public class DuplicateObjectCommand : ICommand
     {
+        ILogger _logger = Logging.Create<FaceSelectionCommand>();
         List<ISceneNode> _objectsToCopy;
         List<ISceneNode> _clonedObjects = new List<ISceneNode>();
         SelectionManager _selectionManager;
 
         ISelectionState _oldState;
+
+        public string HintText { get => "Duplicate Object"; }
+        public bool IsMutation { get => true; }
+
         public void Configure(List<ISceneNode> objectsToCopy)
         {
             _objectsToCopy = new List<ISceneNode>(objectsToCopy);
         }
-
-        public override string GetHintText() => "Duplicate Object";
 
         public DuplicateObjectCommand(SelectionManager selectionManager)
         {
             _selectionManager = selectionManager;
         }
 
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _logger.Here().Information($"Command info - Items[{string.Join(',', _objectsToCopy.Select(x => x.Name))}]");
 
@@ -48,7 +53,7 @@ namespace View3D.Commands.Object
             _selectionManager.SetState(objectState);
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             foreach (var item in _clonedObjects)
                 item.Parent.RemoveObject(item);
