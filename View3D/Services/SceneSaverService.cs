@@ -73,7 +73,7 @@ namespace View3D.Services
                             path += ".rigid_model_v2";
 
                         var res = SaveHelper.Save(_packFileService, path, inputFile, bytes);
-                        _activeFileResolver.ActiveFileName = path;  // TODO: Ensure working
+                        _activeFileResolver.ActiveFileName = path;
                     }
                 }
             }
