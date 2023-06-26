@@ -15,7 +15,6 @@ using CommonControls.FileTypes.RigidModel;
 using CommonControls.BaseDialogs.ErrorListDialog;
 using View3D.Utility;
 using View3D.Components.Component;
-using MonoGame.Framework.WpfInterop;
 using MediatR;
 using CommonControls.Events;
 

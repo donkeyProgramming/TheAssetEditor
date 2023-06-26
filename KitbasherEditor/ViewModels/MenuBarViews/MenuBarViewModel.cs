@@ -39,7 +39,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         Dictionary<MenuActionType, MenuAction> _actionList = new Dictionary<MenuActionType, MenuAction>();
 
-        public MenuBarViewModel( SelectionManager selectionManager, CommandExecutor commandExecutor,  PackFileService packFileService,
+        public MenuBarViewModel(CommandExecutor commandExecutor,  PackFileService packFileService,
             VisibilityHandler visibilityHandler, TransformToolViewModel transformToolViewModel, GizmoActions gizmoActions, GeneralActions generalActions, ToolActions toolActions,
             KitbashSceneCreator kitbashSceneCreator)
         {

@@ -1,8 +1,6 @@
 ﻿using CommonControls.Common.MenuSystem;
-using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using View3D.Components.Component.Selection;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews

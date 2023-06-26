@@ -138,21 +138,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 _vector3.Set(0);
         }
 
-        GizmoMode ConvertToGizmoMode(TransformMode mode)
-        {
-            switch (mode)
-            {
-                case TransformMode.Rotate:
-                    return GizmoMode.Rotate;
-                case TransformMode.Scale:
-                    return GizmoMode.NonUniformScale;
-                case TransformMode.Translate:
-                    return GizmoMode.Translate;
-                default:
-                    throw new System.Exception();
-            }
-        }
-
         public Task Handle(SelectionChangedEvent notification, CancellationToken cancellationToken)
         {
             SelectionChanged(notification.NewState);

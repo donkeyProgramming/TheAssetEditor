@@ -1,29 +1,25 @@
 ﻿using CommonControls.Common;
-using MonoGame.Framework.WpfInterop;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Components.Component;
-using View3D.Components.Component.Selection;
 using View3D.Components.Rendering;
 using View3D.SceneNodes;
 using View3D.Services;
-using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
     public class GeneralActions : NotifyPropertyChangedImpl
     { 
         private readonly CommandExecutor _commandExecutor;
-        private readonly FocusSelectableObjectComponent _cameraFocusComponent;       
+        private readonly FocusSelectableObjectService _cameraFocusComponent;       
         private readonly ObjectEditor _objectEditor;
         private readonly RenderEngineComponent _renderEngineComponent;
         private readonly SceneManager _sceneManager;
         private readonly SceneSaverService _sceneSaverService;
-        public WsModelGeneratorService WsModelGeneratorService { get; set; }
+        private readonly WsModelGeneratorService _wsModelGeneratorService;
 
-        public GeneralActions(CommandExecutor commandExecutor, FocusSelectableObjectComponent cameraFocusComponent,
-            ObjectEditor objectEditor, RenderEngineComponent renderEngineComponent, SceneManager sceneManager, SceneSaverService sceneSaverService )
+        public GeneralActions(CommandExecutor commandExecutor, FocusSelectableObjectService cameraFocusComponent,
+            ObjectEditor objectEditor, RenderEngineComponent renderEngineComponent, SceneManager sceneManager, SceneSaverService sceneSaverService, WsModelGeneratorService wsModelGeneratorService)
         {
             _commandExecutor = commandExecutor;
             _cameraFocusComponent = cameraFocusComponent;
@@ -31,6 +27,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _renderEngineComponent = renderEngineComponent;
             _sceneManager = sceneManager;
             _sceneSaverService = sceneSaverService;
+            _wsModelGeneratorService = wsModelGeneratorService;
         }
 
         public void SortMeshes()
@@ -66,7 +63,12 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         public void Save() => _sceneSaverService.Save();
         public void SaveAs() => _sceneSaverService.SaveAs();
-        public void GenerateWsModelWh3() => WsModelGeneratorService.GenerateWsModel(CommonControls.Services.GameTypeEnum.Warhammer3);
+        public void GenerateWsModelWh3()
+        {
+            var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            _wsModelGeneratorService.GenerateWsModel(mainNode, CommonControls.Services.GameTypeEnum.Warhammer3);
+        }
+
         public void Undo() => _commandExecutor.Undo();
         public void FocusSelection() => _cameraFocusComponent.FocusSelection();
         public void ResetCamera() => _cameraFocusComponent.ResetCamera();
@@ -74,6 +76,10 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public void ToggleBackFaceRendering() => _renderEngineComponent.ToggelBackFaceRendering();
         public void ToggleLargeSceneRendering() => _renderEngineComponent.ToggleLargeSceneRendering();
 
-        public void GenerateWsModelForWh2() => WsModelGeneratorService.GenerateWsModel(CommonControls.Services.GameTypeEnum.Warhammer2);
+        public void GenerateWsModelForWh2()
+        {
+            var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            _wsModelGeneratorService.GenerateWsModel(mainNode, CommonControls.Services.GameTypeEnum.Warhammer2);
+        }
     }
 }

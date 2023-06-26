@@ -40,8 +40,6 @@ namespace View3D.Commands.Object
             _selectionOldState = _selectionManager.GetStateCopy();
 
             // Update the meshes
-            var calculators = _sources.Select(x => new MeshDistanceCalculator(x.Geometry)).ToArray();
-
             foreach (var affectedMesh in _affectedMeshes)
             {
                 // Set skeleton and vertex type from first source object
@@ -54,15 +52,15 @@ namespace View3D.Commands.Object
                 for (int i = 0; i < affectedMesh.Geometry.VertexCount(); i++)
                 {
                     var currentVertex = affectedMesh.Geometry.VertexArray[i].Position3();
-                    foreach (var distanceCalculator in calculators)
+                    foreach (var source in _sources)
                     {
-                        var closestIndex = distanceCalculator.FindClosestVertexIndex(currentVertex, out float distance);
+                        var closestIndex = IntersectionMath.FindClosestVertexIndex(source.Geometry, currentVertex, out float distance);
                         if (distance < clostestDist)
                         {
 
                             clostestDist = distance;
                             closestVertexId = closestIndex;
-                            closestMesh = distanceCalculator.Mesh;
+                            closestMesh = source.Geometry;
                         }
                     }
 

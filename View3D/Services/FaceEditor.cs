@@ -5,11 +5,10 @@ using View3D.Commands.Face;
 using View3D.Commands.Object;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
-using View3D.Services;
 
-namespace View3D.Components.Component
+namespace View3D.Services
 {
-    public class FaceEditor 
+    public class FaceEditor
     {
         private readonly CommandFactory _commandFactory;
 

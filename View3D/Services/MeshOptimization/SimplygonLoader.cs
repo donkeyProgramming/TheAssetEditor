@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Simplygon;
 
 namespace Simplygon
 {
@@ -48,7 +49,9 @@ namespace Simplygon
                 ISimplygon simplygon = null;
                 if (!string.IsNullOrWhiteSpace(licenseDataText))
                 {
+                    
                     simplygon = Simplygon.InitializeSimplygon(sdkPath, licenseDataText);
+                   
                 }
                 else
                 {
@@ -70,7 +73,7 @@ namespace Simplygon
 
                 string exceptionMessage = string.Format($"Failed to load Simplygon from {sdkPath}\nErrorCode: {errorCode}\nMessage: {ex.Message}");
                 Console.Error.WriteLine(exceptionMessage);
-                
+
                 errorMessage = exceptionMessage;
             }
             catch (SEHException ex)

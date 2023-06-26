@@ -36,7 +36,7 @@ namespace _componentManager.ViewModels.MenuBarViews
         ObjectEditor _objectEditor;
         FaceEditor _faceEditor;
 
-        ViewOnlySelectedComponent _viewOnlySelectedComp;
+        ViewOnlySelectedService _viewOnlySelectedComp;
         private readonly SceneManager _sceneManager;
         private readonly CommandFactory _commandFactory;
         private readonly IServiceProvider _serviceProvider;
@@ -45,7 +45,7 @@ namespace _componentManager.ViewModels.MenuBarViews
         WindowKeyboard _keyboard;
 
         public ToolActions(IServiceProvider serviceProvider, ComponentManagerResolver componentManagerResolver, PackFileService packFileService, WindowKeyboard keyboard, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
-            SelectionManager selectionManager, ObjectEditor objectEditor, FaceEditor faceEditor, ViewOnlySelectedComponent viewOnlySelectedComponent, SceneManager sceneManager, CommandFactory commandFactory)
+            SelectionManager selectionManager, ObjectEditor objectEditor, FaceEditor faceEditor, ViewOnlySelectedService viewOnlySelectedComponent, SceneManager sceneManager, CommandFactory commandFactory)
         {
             _serviceProvider = serviceProvider;
             _packFileService = packFileService;

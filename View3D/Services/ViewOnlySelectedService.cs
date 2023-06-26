@@ -1,20 +1,18 @@
 ﻿using System.Collections.Generic;
+using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
-using View3D.Utility;
 
-namespace View3D.Components.Component
+namespace View3D.Services
 {
-    public class ViewOnlySelectedComponent : BaseComponent
+    public class ViewOnlySelectedService
     {
         SceneManager _sceneManager;
         SelectionManager _selectionManager;
 
-        Dictionary<ISceneNode, bool> _visMap;       
+        Dictionary<ISceneNode, bool> _visMap;
 
-        public ViewOnlySelectedComponent(ComponentManagerResolver componentManagerResolver,
-            SceneManager sceneManager, SelectionManager selectionManager)
-            : base(componentManagerResolver.ComponentManager)
+        public ViewOnlySelectedService(SceneManager sceneManager, SelectionManager selectionManager)
         {
             _sceneManager = sceneManager;
             _selectionManager = selectionManager;

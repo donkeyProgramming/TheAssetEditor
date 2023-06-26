@@ -1,9 +1,7 @@
-﻿
-using AnimationEditor.Common.AnimationPlayer;
+﻿using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
-using CommonControls.FileTypes.DB;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
@@ -11,11 +9,8 @@ using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using System.Windows.Input;
 using View3D.Components;
-using View3D.Components.Component;
-using View3D.Components.Component.Selection;
-using View3D.Components.Input;
-using View3D.Components.Rendering;
 using View3D.Scene;
+using View3D.Services;
 using View3D.Utility;
 
 namespace AnimationEditor.PropCreator.ViewModels
@@ -26,10 +21,6 @@ namespace AnimationEditor.PropCreator.ViewModels
         public PackFile Animation { get; set; }
         public string FragmentName { get; set; }
         public AnimationSlotType AnimationSlot { get; set; }
-
-        //AnimationSlotTypeHelper
-        // Fragment
-        // Slot
     }
 
     public abstract class BaseAnimationViewModel : NotifyPropertyChangedImpl, IEditorViewModel
@@ -59,7 +50,7 @@ namespace AnimationEditor.PropCreator.ViewModels
         object _editor;
         public object Editor { get => _editor; set => SetAndNotify(ref _editor, value); }
 
-        FocusSelectableObjectComponent _focusComponent;
+        FocusSelectableObjectService _focusComponent;
         public ICommand ResetCameraCommand { get; set; }
         public ICommand FocusCamerasCommand { get; set; }
         

@@ -14,7 +14,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using View3D.Components.Component;
-using View3D.Components.Component.Selection;
 using View3D.Scene;
 using View3D.Services;
 
@@ -31,7 +30,7 @@ namespace KitbasherEditor.ViewModels
         ILogger _logger = Logging.Create<KitbasherViewModel>();
         private readonly PackFileService _packFileService;
         private readonly KitbashSceneCreator _kitbashSceneCreator;
-        private readonly FocusSelectableObjectComponent _focusSelectableObjectComponent;
+        private readonly FocusSelectableObjectService _focusSelectableObjectComponent;
         private readonly ActiveFileResolver _activeFileResolver;
 
         public SceneContainer Scene { get; set; }
@@ -47,7 +46,7 @@ namespace KitbasherEditor.ViewModels
         public KitbasherViewModel(PackFileService packFileService, 
             SceneContainer sceneContainer, ComponentInserter componentInserter, MenuBarViewModel menuBarViewModel, 
             AnimationControllerViewModel animationControllerViewModel,
-            KitbashSceneCreator kitbashSceneCreator, SceneExplorerViewModel sceneExplorerViewModel, ActiveFileResolver activeFileResolver, FocusSelectableObjectComponent focusSelectableObjectComponent)
+            KitbashSceneCreator kitbashSceneCreator, SceneExplorerViewModel sceneExplorerViewModel, ActiveFileResolver activeFileResolver, FocusSelectableObjectService focusSelectableObjectComponent)
         {
             _packFileService = packFileService;
             _activeFileResolver = activeFileResolver;

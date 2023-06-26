@@ -93,11 +93,11 @@ namespace KitbasherEditor
             RegisterGameComponent<ClearScreenComponent>(serviceCollection);
             RegisterGameComponent<GridComponent>(serviceCollection);
             RegisterGameComponent<AnimationsContainerComponent>(serviceCollection);
-            RegisterGameComponent<ViewOnlySelectedComponent>(serviceCollection);
             RegisterGameComponent<LightControllerComponent>(serviceCollection);
 
 
-            serviceCollection.AddScoped<FocusSelectableObjectComponent>();
+            serviceCollection.AddScoped<ViewOnlySelectedService>();
+            serviceCollection.AddScoped<FocusSelectableObjectService>();
             serviceCollection.AddScoped<KitbashSceneCreator>();
             serviceCollection.AddScoped<FaceEditor>();
             serviceCollection.AddScoped<ObjectEditor>();
@@ -124,7 +124,6 @@ namespace KitbasherEditor
 
             serviceCollection.AddScoped<SceneSaverService>();
             serviceCollection.AddScoped<WsModelGeneratorService>();
-
 
             serviceCollection.AddScoped<CommandFactory>();
 

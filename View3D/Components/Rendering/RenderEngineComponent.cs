@@ -73,10 +73,6 @@ namespace View3D.Components.Rendering
         public override void Initialize()
         {
             RebuildRasterStates(_cullingEnabled, _bigSceneDepthBiasMode);
-
-    
-           
-
             base.Initialize();
         }
 

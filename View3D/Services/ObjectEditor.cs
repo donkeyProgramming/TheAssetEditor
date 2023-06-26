@@ -7,7 +7,7 @@ using View3D.SceneNodes;
 using View3D.Utility;
 using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 
-namespace View3D.Components.Component
+namespace View3D.Services
 {
     public class ObjectEditor
     {
@@ -53,7 +53,7 @@ namespace View3D.Components.Component
                 errorMessages = new ErrorList();
                 _commandFactory.Create<CombineMeshCommand>().Configure(x => x.Configure(objectSelectionState.SelectedObjects())).BuildAndExecute();
             }
-            
+
             return result;
         }
 
@@ -126,6 +126,6 @@ namespace View3D.Components.Component
             }
         }
 
-      
+
     }
 }

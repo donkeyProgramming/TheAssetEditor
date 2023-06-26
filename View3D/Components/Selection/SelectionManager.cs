@@ -43,7 +43,7 @@ namespace View3D.Components.Component.Selection
             CreateSelectionSate(GeometrySelectionMode.Object, null, false);
 
              _lineGeometry = new LineMeshRender(_resourceLib);
-            VertexRenderer = new VertexInstanceMesh(ComponentManager);
+            VertexRenderer = new VertexInstanceMesh(_deviceResolverComponent, _resourceLib);
 
             _wireframeEffect = new BasicShader(_deviceResolverComponent.Device);
             _wireframeEffect.DiffuseColor = Vector3.Zero;

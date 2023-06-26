@@ -117,7 +117,7 @@ namespace View3D.Components.Component.Selection
             var currentState = _selectionManager.GetState();
             if (currentState.Mode == GeometrySelectionMode.Face && currentState is FaceSelectionState faceState)
             {
-                if (GeometryIntersection.IntersectFaces(unprojectedSelectionRect, faceState.RenderObject.Geometry, faceState.RenderObject.RenderMatrix, out var faces))
+                if (IntersectionMath.IntersectFaces(unprojectedSelectionRect, faceState.RenderObject.Geometry, faceState.RenderObject.RenderMatrix, out var faces))
                 {
                     _commandFactory.Create<FaceSelectionCommand>().Configure(x => x.Configure(faces, isSelectionModification, removeSelection)).BuildAndExecute();
                     return;
@@ -125,7 +125,7 @@ namespace View3D.Components.Component.Selection
             }
             else if (currentState.Mode == GeometrySelectionMode.Vertex && currentState is VertexSelectionState vertexState)
             {
-                if (GeometryIntersection.IntersectVertices(unprojectedSelectionRect, vertexState.RenderObject.Geometry, vertexState.RenderObject.RenderMatrix, out var vertices))
+                if (IntersectionMath.IntersectVertices(unprojectedSelectionRect, vertexState.RenderObject.Geometry, vertexState.RenderObject.RenderMatrix, out var vertices))
                 {
                     _commandFactory.Create<VertexSelectionCommand>().Configure(x => x.Configure(vertices, isSelectionModification, removeSelection)).BuildAndExecute();
                     return;
@@ -151,7 +151,7 @@ namespace View3D.Components.Component.Selection
             var currentState = _selectionManager.GetState();
             if (currentState is FaceSelectionState faceState)
             {  
-                if (GeometryIntersection.IntersectFace(ray, faceState.RenderObject.Geometry, faceState.RenderObject.RenderMatrix, out var selectedFace) != null)
+                if (IntersectionMath.IntersectFace(ray, faceState.RenderObject.Geometry, faceState.RenderObject.RenderMatrix, out var selectedFace) != null)
                 {
                     _commandFactory.Create<FaceSelectionCommand>().Configure(x => x.Configure(selectedFace.Value, isSelectionModification, removeSelection)).BuildAndExecute();
                     return;
@@ -160,7 +160,7 @@ namespace View3D.Components.Component.Selection
 
             if (currentState is VertexSelectionState vertexState)
             {
-                if (GeometryIntersection.IntersectVertex(ray, vertexState.RenderObject.Geometry, _camera.Position, vertexState.RenderObject.RenderMatrix, out var selecteVert) != null)
+                if (IntersectionMath.IntersectVertex(ray, vertexState.RenderObject.Geometry, _camera.Position, vertexState.RenderObject.RenderMatrix, out var selecteVert) != null)
                 {
                     _commandFactory.Create<VertexSelectionCommand>().Configure(x => x.Configure(new List<int>() { selecteVert }, isSelectionModification, removeSelection)).BuildAndExecute();
                     return;

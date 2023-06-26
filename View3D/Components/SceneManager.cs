@@ -103,7 +103,7 @@ namespace View3D.Components.Component
                     if (selectableNode is Rmv2MeshNode meshNode)
                         pivotPoint = meshNode.Material.PivotPoint;
 
-                    if (GeometryIntersection.IntersectObject(frustrum, selectableNode.Geometry, selectableNode.ModelMatrix * Matrix.CreateTranslation(pivotPoint)))
+                    if (IntersectionMath.IntersectObject(frustrum, selectableNode.Geometry, selectableNode.ModelMatrix * Matrix.CreateTranslation(pivotPoint)))
                         output_selectedNodes.Add(selectableNode);
                 }
 
@@ -126,7 +126,7 @@ namespace View3D.Components.Component
                     if (selectableNode is Rmv2MeshNode meshNode)
                         pivotPoint = meshNode.Material.PivotPoint;
 
-                    var distance = GeometryIntersection.IntersectObject(ray, selectableNode.Geometry, selectableNode.ModelMatrix * Matrix.CreateTranslation(pivotPoint));
+                    var distance = IntersectionMath.IntersectObject(ray, selectableNode.Geometry, selectableNode.ModelMatrix * Matrix.CreateTranslation(pivotPoint));
                     if (distance != null)
                     {
                         if (distance < bestDistance)

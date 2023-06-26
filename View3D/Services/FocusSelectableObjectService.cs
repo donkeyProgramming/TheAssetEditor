@@ -4,20 +4,22 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using View3D.Components.Component;
+using View3D.Components.Component.Selection;
 using View3D.Components.Rendering;
 using View3D.SceneNodes;
 
-namespace View3D.Components.Component.Selection
+namespace View3D.Services
 {
-    public class FocusSelectableObjectComponent 
+    public class FocusSelectableObjectService
     {
-        ILogger _logger = Logging.Create<FocusSelectableObjectComponent>();
+        ILogger _logger = Logging.Create<FocusSelectableObjectService>();
 
-        private readonly  SelectionManager _selectionManager;
+        private readonly SelectionManager _selectionManager;
         private readonly ArcBallCamera _arcBallCamera;
-        private readonly  SceneManager _sceneManager;
+        private readonly SceneManager _sceneManager;
 
-        public FocusSelectableObjectComponent(SelectionManager selectionManager, ArcBallCamera arcBallCamera, SceneManager sceneManager ) 
+        public FocusSelectableObjectService(SelectionManager selectionManager, ArcBallCamera arcBallCamera, SceneManager sceneManager)
         {
             _selectionManager = selectionManager;
             _arcBallCamera = arcBallCamera;
@@ -56,7 +58,7 @@ namespace View3D.Components.Component.Selection
 
             double fov = MathHelper.ToRadians(45);
             double boundSphereRadius = bbCorners.Select(x => Vector3.Distance(x, bbCenter)).Max();
-            double camDistance = ((boundSphereRadius * 2.0) / Math.Tan(fov / 2.0)) / 2;
+            double camDistance = boundSphereRadius * 2.0 / Math.Tan(fov / 2.0) / 2;
 
             _arcBallCamera.LookAt = bbCenter;
             _arcBallCamera.Zoom = (float)camDistance;
@@ -79,7 +81,7 @@ namespace View3D.Components.Component.Selection
                     _arcBallCamera.LookAt = objectPos;
                     return;
                 }
-               
+
                 var averageVertexPos = Vector3.Zero;
                 foreach (var vertexIndex in vertexList)
                     averageVertexPos += vertexSelection.RenderObject.Geometry.GetVertexById(vertexIndex);
@@ -100,9 +102,9 @@ namespace View3D.Components.Component.Selection
                 var averageFacePos = Vector3.Zero;
                 foreach (var faceIndex in faceList)
                 {
-                    var index0 = faceSelection.RenderObject.Geometry.GetIndex(faceIndex+0);
-                    var index1 = faceSelection.RenderObject.Geometry.GetIndex(faceIndex+1);
-                    var index2 = faceSelection.RenderObject.Geometry.GetIndex(faceIndex+2);
+                    var index0 = faceSelection.RenderObject.Geometry.GetIndex(faceIndex + 0);
+                    var index1 = faceSelection.RenderObject.Geometry.GetIndex(faceIndex + 1);
+                    var index2 = faceSelection.RenderObject.Geometry.GetIndex(faceIndex + 2);
 
                     var face0 = faceSelection.RenderObject.Geometry.GetVertexById(index0);
                     var face1 = faceSelection.RenderObject.Geometry.GetVertexById(index1);
