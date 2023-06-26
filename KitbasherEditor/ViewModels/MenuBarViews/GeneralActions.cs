@@ -14,26 +14,23 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 {
     public class GeneralActions : NotifyPropertyChangedImpl
     { 
-        CommandExecutor _commandExecutor;
-        FocusSelectableObjectComponent _cameraFocusComponent;
-        private readonly ComponentManagerResolver _componentManagerResolver;
-        
-        ObjectEditor _objectEditor;
-        RenderEngineComponent _renderEngineComponent;
+        private readonly CommandExecutor _commandExecutor;
+        private readonly FocusSelectableObjectComponent _cameraFocusComponent;       
+        private readonly ObjectEditor _objectEditor;
+        private readonly RenderEngineComponent _renderEngineComponent;
         private readonly SceneManager _sceneManager;
-
-        public SceneSaverService ModelSaver { get; set; }
+        private readonly SceneSaverService _sceneSaverService;
         public WsModelGeneratorService WsModelGeneratorService { get; set; }
 
         public GeneralActions(CommandExecutor commandExecutor, FocusSelectableObjectComponent cameraFocusComponent,
-            ComponentManagerResolver componentManagerResolver, ObjectEditor objectEditor, RenderEngineComponent renderEngineComponent, SceneManager sceneManager )
+            ObjectEditor objectEditor, RenderEngineComponent renderEngineComponent, SceneManager sceneManager, SceneSaverService sceneSaverService )
         {
             _commandExecutor = commandExecutor;
             _cameraFocusComponent = cameraFocusComponent;
-            _componentManagerResolver = componentManagerResolver;
             _objectEditor = objectEditor;
             _renderEngineComponent = renderEngineComponent;
             _sceneManager = sceneManager;
+            _sceneSaverService = sceneSaverService;
         }
 
         public void SortMeshes()
@@ -67,8 +64,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             }
         }
 
-        public void Save() => ModelSaver.Save();
-        public void SaveAs() => ModelSaver.SaveAs();
+        public void Save() => _sceneSaverService.Save();
+        public void SaveAs() => _sceneSaverService.SaveAs();
         public void GenerateWsModelWh3() => WsModelGeneratorService.GenerateWsModel(CommonControls.Services.GameTypeEnum.Warhammer3);
         public void Undo() => _commandExecutor.Undo();
         public void FocusSelection() => _cameraFocusComponent.FocusSelection();

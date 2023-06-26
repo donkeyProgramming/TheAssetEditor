@@ -16,16 +16,17 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         ObservableCollection<ContextMenuItem> _contextMenu;
         public ObservableCollection<ContextMenuItem> Items { get => _contextMenu; set => SetAndNotify(ref _contextMenu, value); }
         CommandExecutor CommandExecutor { get; }
-        public Rmv2ModelNode EditableMeshNode { get; internal set; }
 
         ISceneNode _activeNode;
         IEnumerable<ISceneNode> _activeNodes;
+        private readonly SceneManager _sceneManager;
 
         public event ValueChangedDelegate<IEnumerable<ISceneNode>> SelectedNodesChanged;
 
-        public SceneExplorerContextMenuHandler(CommandExecutor commandExecutor)
+        public SceneExplorerContextMenuHandler(CommandExecutor commandExecutor, SceneManager sceneManager)
         {
             CommandExecutor = commandExecutor;
+            _sceneManager = sceneManager;
         }
 
         public void Create(IEnumerable<ISceneNode> activeNodes)
@@ -172,7 +173,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         void MakeEditable()
         {
-            SceneNodeHelper.MakeNodeEditable(EditableMeshNode, _activeNode);
+            var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            SceneNodeHelper.MakeNodeEditable(mainNode, _activeNode);
         }
 
         void Ungroup()

@@ -4,9 +4,7 @@ using CommonControls.Services;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Windows;
 using View3D.SceneNodes;
@@ -16,6 +14,7 @@ using CommonControls.FileTypes.RigidModel.LodHeader;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.BaseDialogs.ErrorListDialog;
 using View3D.Utility;
+using View3D.Components.Component;
 
 namespace View3D.Services
 {
@@ -24,15 +23,15 @@ namespace View3D.Services
         ILogger _logger = Logging.Create<SceneSaverService>();
 
         private readonly PackFileService _packFileService;
-        private readonly IEditorViewModel _editorViewModel;
-        private readonly MainEditableNode _editableMeshNode;
-        ApplicationSettingsService _applicationSettingsService;
+        private readonly ActiveFileResolver _activeFileResolver;
+        private readonly SceneManager _sceneManager;
+        private readonly ApplicationSettingsService _applicationSettingsService;
 
-        public SceneSaverService(PackFileService packFileService, IEditorViewModel editorViewModel, MainEditableNode editableMeshNode, ApplicationSettingsService applicationSettingsService)
+        public SceneSaverService(PackFileService packFileService, ActiveFileResolver activeFileResolver, SceneManager sceneManager, ApplicationSettingsService applicationSettingsService)
         {
             _packFileService = packFileService;
-            _editorViewModel = editorViewModel;
-            _editableMeshNode = editableMeshNode;
+            _activeFileResolver = activeFileResolver;
+            _sceneManager = sceneManager;
             _applicationSettingsService = applicationSettingsService;
         }
 
@@ -42,14 +41,11 @@ namespace View3D.Services
             {
                 DisplayValidateDialog();
 
-                var inputFile = _editorViewModel.MainFile ;
+                var inputFile = _activeFileResolver.Get();
                 byte[] bytes = GetBytesToSave();
                 var path = _packFileService.GetFullPath(inputFile);
                 var res = SaveHelper.Save(_packFileService, path, inputFile, bytes);
-                if (res != null)
-                    _editorViewModel.MainFile = res;
-
-                _editorViewModel.Save();
+                //_activeFileResolver.Save(); ToDo - MediatR
             }
             catch (Exception e)
             {
@@ -64,7 +60,7 @@ namespace View3D.Services
             {
                 DisplayValidateDialog();
 
-                var inputFile = _editorViewModel.MainFile ;
+                var inputFile = _activeFileResolver.Get() ;
                 byte[] bytes = GetBytesToSave();
 
                 using (var browser = new SavePackFileWindow(_packFileService))
@@ -77,8 +73,7 @@ namespace View3D.Services
                             path += ".rigid_model_v2";
 
                         var res = SaveHelper.Save(_packFileService, path, inputFile, bytes);
-                        if (res != null)
-                            _editorViewModel.MainFile = res;
+                        _activeFileResolver.ActiveFileName = path;  // TODO: Ensure working
                     }
                 }
             }
@@ -91,7 +86,8 @@ namespace View3D.Services
 
         private byte[] GetBytesToSave()
         {
-            var isAllVisible = SceneNodeHelper.AreAllNodesVisible(_editableMeshNode);
+            var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            var isAllVisible = SceneNodeHelper.AreAllNodesVisible(mainNode);
             bool onlySaveVisible = false;
             if (isAllVisible == false)
             {
@@ -99,7 +95,7 @@ namespace View3D.Services
                     onlySaveVisible = true;
             }
 
-            var bytes = Save(onlySaveVisible, new List<Rmv2ModelNode>() { _editableMeshNode }, _editableMeshNode.SkeletonNode.Skeleton, _editableMeshNode.SelectedOutputFormat, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
+            var bytes = Save(onlySaveVisible, new List<Rmv2ModelNode>() { mainNode }, mainNode.SkeletonNode.Skeleton, mainNode.SelectedOutputFormat, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
             return bytes;
         }
 
@@ -202,9 +198,10 @@ namespace View3D.Services
         ErrorListViewModel.ErrorList Validate()
         {
             var errorList = new ErrorListViewModel.ErrorList();
+            var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
 
-            var skeleton = _editableMeshNode.SkeletonNode.Skeleton;
-            var meshes = _editableMeshNode.GetMeshNodes(0);
+            var skeleton = mainNode.SkeletonNode.Skeleton;
+            var meshes = mainNode.GetMeshNodes(0);
 
             // Different skeltons
             if (skeleton != null)

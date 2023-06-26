@@ -12,27 +12,24 @@ using System.Linq;
 using System.Windows;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
-using View3D.Rendering.Geometry;
 using View3D.Scene;
 using View3D.SceneNodes;
 using View3D.Services;
-using View3D.Utility;
+
 using static KitbasherEditor.KitbasherEditor_DependencyInjectionContainer;
+
 
 namespace KitbasherEditor.ViewModels
 {
     public class KitbasherViewModel : NotifyPropertyChangedImpl, IEditorViewModel, IDropTarget<TreeNode>
     {
         ILogger _logger = Logging.Create<KitbasherViewModel>();
-        PackFileService _packFileService;
-        ApplicationSettingsService _applicationSettingsService;
-
-        SceneContainer _scene;
-        CommandExecutor _commandExecutor;
-        private readonly ResourceLibary _resourceLibary;
-        private readonly ComponentManagerResolver _componentManagerResolver;
+        private readonly PackFileService _packFileService;
+        private SceneContainer _scene;
+        private readonly CommandExecutor _commandExecutor;
         private readonly SceneManager _sceneManager;
         private readonly KitbashSceneCreator _kitbashSceneCreator;
+        private readonly ActiveFileResolver _activeFileResolver;
 
         public SceneContainer Scene { get => _scene; set => SetAndNotify(ref _scene, value); }
         public SceneExplorerViewModel SceneExplorer { get; set; }
@@ -46,35 +43,33 @@ namespace KitbasherEditor.ViewModels
 
         private bool _hasUnsavedChanges;
 
-        public KitbasherViewModel(PackFileService pf, ApplicationSettingsService applicationSettingsService,
+        public KitbasherViewModel(PackFileService packFileService, 
             SceneContainer sceneContainer, ComponentInserter componentInserter, CommandExecutor commandExecutor, MenuBarViewModel menuBarViewModel, 
-            ResourceLibary resourceLibary, ComponentManagerResolver componentManagerResolver, SceneManager sceneManager, AnimationControllerViewModel animationControllerViewModel,
-            KitbashSceneCreator kitbashSceneCreator)
+            SceneManager sceneManager, AnimationControllerViewModel animationControllerViewModel,
+            KitbashSceneCreator kitbashSceneCreator, SceneExplorerViewModel sceneExplorerViewModel, ActiveFileResolver activeFileResolver)
         {
-            _packFileService = pf;
-            _applicationSettingsService = applicationSettingsService;
+            _packFileService = packFileService;
+
             Scene = sceneContainer;
+            _kitbashSceneCreator = kitbashSceneCreator;
             _commandExecutor = commandExecutor;
+            _sceneManager = sceneManager;
 
             componentInserter.Execute();
             
-
-
-            _commandExecutor.CommandStackChanged += CommandExecutorOnCommandStackChanged;
+            _commandExecutor.CommandStackChanged += CommandExecutorOnCommandStackChanged;  // ToDo - MediatR
 
             Animation = animationControllerViewModel;
-            _kitbashSceneCreator = kitbashSceneCreator;
-            SceneExplorer = new SceneExplorerViewModel(Scene, _packFileService, Animation, _applicationSettingsService);
-
+            SceneExplorer = sceneExplorerViewModel;
+            _activeFileResolver = activeFileResolver;
             MenuBar = menuBarViewModel;
-            _resourceLibary = resourceLibary;
-            _componentManagerResolver = componentManagerResolver;
-            _sceneManager = sceneManager;
-            Scene.SceneInitialized += OnSceneInitialized;
+
+            Scene.SceneInitialized += OnSceneInitialized; // ToDo - MediatR
         }
 
         public void OpenEditor(PackFile file)
         {
+            // TODO
         }
 
         private void CommandExecutorOnCommandStackChanged()
@@ -84,20 +79,15 @@ namespace KitbasherEditor.ViewModels
 
         private void OnSceneInitialized(WpfGame scene)
         {
+            _activeFileResolver.ActiveFileName = _packFileService.GetFullPath(MainFile);
             _kitbashSceneCreator.Create(MainFile);
 
-            var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-
-            MenuBar.General.ModelSaver = new SceneSaverService(_packFileService, this, mainNode, _applicationSettingsService);
-            MenuBar.General.WsModelGeneratorService = new WsModelGeneratorService(_packFileService, this, mainNode);
-
-            SceneExplorer.EditableMeshNode = mainNode;  // WTF is this used for?
-            
             if (MainFile != null)
             {
                 try
                 {
-                    _kitbashSceneCreator.LoadMainEditableModel(MainFile );
+                    var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+                    _kitbashSceneCreator.LoadMainEditableModel(MainFile);
 
                     var nodes = mainNode.GetMeshNodes(0)
                         .Select(x => x as ISelectable)
@@ -125,16 +115,13 @@ namespace KitbasherEditor.ViewModels
         {
             Scene.Dispose();
             Scene.SceneInitialized -= OnSceneInitialized;
-
             MenuBar = null;
             Scene = null;
-            _packFileService = null;
             Scene = null;
             SceneExplorer = null;
             MenuBar = null;
             Animation = null;
             MainFile = null;
-            
         }
 
         public bool HasUnsavedChanges
@@ -160,7 +147,7 @@ namespace KitbasherEditor.ViewModels
 
         public bool Drop(TreeNode node, TreeNode targeNode = null)
         {
-            _kitbashSceneCreator.LoadReference(node.Item );
+            _kitbashSceneCreator.LoadReference(node.Item);
             return true;
         }
     }

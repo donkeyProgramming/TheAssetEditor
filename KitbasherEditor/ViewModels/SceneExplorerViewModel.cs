@@ -1,7 +1,6 @@
 ﻿using CommonControls.Common;
 using CommonControls.Services;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
-using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
@@ -11,6 +10,7 @@ using System.Windows.Input;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
+using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels
 {
@@ -36,39 +36,36 @@ namespace KitbasherEditor.ViewModels
 
         public SceneExplorerContextMenuHandler ContextMenu { get; set; }
 
-        MainEditableNode _editableMeshNode;
-        public MainEditableNode EditableMeshNode { get => _editableMeshNode; set { _editableMeshNode = value; ContextMenu.EditableMeshNode = value; } }
 
-
-        public SceneExplorerViewModel(IComponentManager componentManager, PackFileService packFileService, AnimationControllerViewModel animationControllerViewModel,
-            ApplicationSettingsService applicationSettingsService)
+        public SceneExplorerViewModel(ComponentManagerResolver componentManagerResolver, PackFileService packFileService, AnimationControllerViewModel animationControllerViewModel,
+            ApplicationSettingsService applicationSettingsService, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, CommandExecutor commandExecutor, SelectionManager selectionManager, SceneManager sceneManager)
         {
-            _componentManager = componentManager;
+            _componentManager = componentManagerResolver.ComponentManager;
             _animationControllerViewModel = animationControllerViewModel;
 
             _packFileService = packFileService;
             _applicationSettingsService = applicationSettingsService;
 
-            _skeletonAnimationLookUpHelper = _componentManager.GetComponent<SkeletonAnimationLookUpHelper>();
-            _sceneManager = _componentManager.GetComponent<SceneManager>();
-            _commandExecutor = componentManager.GetComponent<CommandExecutor>();
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-            _selectionManager.SelectionChanged += SelectionChanged;
+            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
+            _sceneManager = sceneManager;
+            _commandExecutor = commandExecutor;
+            _selectionManager = selectionManager;
+
+            _selectionManager.SelectionChanged += SelectionChanged; // ToDo - MediatR
 
             SceneGraphRootNodes.Add(_sceneManager.RootNode);
 
             _sceneManager.SceneObjectAdded += (a, b) => RebuildTree();
             _sceneManager.SceneObjectRemoved += (a, b) => RebuildTree();
 
-            ContextMenu = new SceneExplorerContextMenuHandler(_commandExecutor);
-            ContextMenu.SelectedNodesChanged += OnSelectedNodesChanged;
+            ContextMenu = new SceneExplorerContextMenuHandler(_commandExecutor, _sceneManager);
+            ContextMenu.SelectedNodesChanged += OnSelectedNodesChanged; // ToDo - MediatR
 
             SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
         }
 
         private void OnSelectedNodesChanged(IEnumerable<ISceneNode> selectedNodes)
         {
-
             foreach (var node in SelectedObjects.ToList())
             {
                 SelectedObjects.Remove(node);

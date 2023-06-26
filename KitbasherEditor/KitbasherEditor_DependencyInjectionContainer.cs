@@ -19,6 +19,7 @@ using View3D.Components.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.Scene;
 using View3D.SceneNodes;
+using View3D.Services;
 using View3D.Utility;
 
 namespace KitbasherEditor
@@ -68,8 +69,8 @@ namespace KitbasherEditor
             //RegisterGameComponent<RenderEngineComponent>(serviceCollection);
 
             serviceCollection.AddScoped<KitbashSceneCreator>();
-            
 
+            serviceCollection.AddScoped<SceneExplorerViewModel>();
             serviceCollection.AddScoped<TransformToolViewModel>();
             serviceCollection.AddScoped<MenuBarViewModel>();
 
@@ -87,10 +88,19 @@ namespace KitbasherEditor
 
 
             serviceCollection.AddScoped<AnimationControllerViewModel>();
+
+            serviceCollection.AddScoped<ActiveFileResolver>();
+
+            serviceCollection.AddScoped<SceneSaverService>();
+            serviceCollection.AddScoped<WsModelGeneratorService>();
             
 
 
+
+
         }
+
+       
 
         public static void RegisterGameComponent<T>(IServiceCollection serviceCollection) where T : class, IGameComponent
         {
@@ -103,6 +113,7 @@ namespace KitbasherEditor
         {
             factory.RegisterFileTool<KitbasherViewModel, KitbasherView>(new ExtentionToTool(EditorEnums.Kitbash_Editor, new[] { ".rigid_model_v2", ".wsmodel.rigid_model_v2" }/*, new[] { ".wsmodel", ".variantmeshdefinition" }*/));
         }
+
 
         public class ComponentInserter
         {
