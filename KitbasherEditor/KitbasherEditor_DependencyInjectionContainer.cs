@@ -14,6 +14,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using System.Collections.Generic;
+using View3D.Commands;
+using View3D.Commands.Face;
+using View3D.Commands.Object;
+using View3D.Commands.Vertex;
 using View3D.Components;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
@@ -61,18 +65,18 @@ namespace KitbasherEditor
             serviceCollection.AddScoped<IEditorViewModel, KitbasherViewModel>();
 
 
-            serviceCollection.AddSingleton<SceneContainer>();
-            serviceCollection.AddSingleton<WpfGame>( x=> x.GetService<SceneContainer>() as WpfGame);
+            serviceCollection.AddScoped<SceneContainer>();
+            serviceCollection.AddScoped<WpfGame>( x=> x.GetService<SceneContainer>() as WpfGame);
 
-            serviceCollection.AddSingleton<ComponentManagerResolver>();
-            serviceCollection.AddSingleton<ComponentInserter>();
+            serviceCollection.AddScoped<ComponentManagerResolver>();
+            serviceCollection.AddScoped<ComponentInserter>();
 
             serviceCollection.AddScoped<IDeviceResolver, DeviceResolverComponent>(x => x.GetService<DeviceResolverComponent>());
             serviceCollection.AddScoped<CommandExecutor>();
             
             serviceCollection.AddScoped<SceneNodeViewFactory>();
-
-
+       
+            
 
             RegisterGameComponent<DeviceResolverComponent>(serviceCollection);
             RegisterGameComponent<CommandStackRenderer>(serviceCollection);
@@ -85,23 +89,19 @@ namespace KitbasherEditor
             RegisterGameComponent<GizmoComponent>(serviceCollection);
             RegisterGameComponent<SelectionManager>(serviceCollection);
             RegisterGameComponent<SelectionComponent>(serviceCollection);
-            RegisterGameComponent<ObjectEditor>(serviceCollection);
-            RegisterGameComponent<FaceEditor>(serviceCollection);
             RegisterGameComponent<FocusSelectableObjectComponent>(serviceCollection);
             RegisterGameComponent<RenderEngineComponent>(serviceCollection);
-
-
             RegisterGameComponent<ClearScreenComponent>(serviceCollection);
             RegisterGameComponent<GridComponent>(serviceCollection);
             RegisterGameComponent<AnimationsContainerComponent>(serviceCollection);
             RegisterGameComponent<ViewOnlySelectedComponent>(serviceCollection);
             RegisterGameComponent<LightControllerComponent>(serviceCollection);
-            RegisterGameComponent<SkeletonAnimationLookUpHelper>(serviceCollection);
-            //RegisterGameComponent<RenderEngineComponent>(serviceCollection);
-            //RegisterGameComponent<RenderEngineComponent>(serviceCollection);
+            //RegisterGameComponent<SkeletonAnimationLookUpHelper>(serviceCollection);
+
 
             serviceCollection.AddScoped<KitbashSceneCreator>();
-
+            serviceCollection.AddScoped<FaceEditor>();
+            serviceCollection.AddScoped<ObjectEditor>();
             serviceCollection.AddScoped<SceneExplorerViewModel>();
             serviceCollection.AddScoped<TransformToolViewModel>();
             serviceCollection.AddScoped<MenuBarViewModel>();
@@ -125,14 +125,36 @@ namespace KitbasherEditor
 
             serviceCollection.AddScoped<SceneSaverService>();
             serviceCollection.AddScoped<WsModelGeneratorService>();
-            
 
+
+            serviceCollection.AddScoped<CommandFactory>();
+
+            serviceCollection.AddTransient<ConvertFacesToVertexSelectionCommand>();
+            serviceCollection.AddTransient<FaceSelectionCommand>();
+            serviceCollection.AddTransient<DuplicateFacesCommand>();
+            serviceCollection.AddTransient<VertexSelectionCommand>();
+            serviceCollection.AddTransient<ObjectSelectionCommand>();
+            serviceCollection.AddTransient<DeleteFaceCommand>();
+            serviceCollection.AddTransient<DeleteObjectsCommand>();
+            serviceCollection.AddTransient<ReduceMeshCommand>();
+            serviceCollection.AddTransient<TransformVertexCommand>();
+            serviceCollection.AddTransient<CombineMeshCommand>();
+            serviceCollection.AddTransient<CreateAnimatedMeshPoseCommand>();
+            serviceCollection.AddTransient<DivideObjectIntoSubmeshesCommand>();
+            serviceCollection.AddTransient<DuplicateObjectCommand>();
+            serviceCollection.AddTransient<AddObjectsToGroupCommand>();
+            serviceCollection.AddTransient<UnGroupObjectsCommand>();
+            serviceCollection.AddTransient<GroupObjectsCommand>();
+            serviceCollection.AddTransient<GrowMeshCommand>();
+            serviceCollection.AddTransient<ObjectSelectionModeCommand>();
+            serviceCollection.AddTransient<PinMeshToVertexCommand>();
+            serviceCollection.AddTransient<RemapBoneIndexesCommand>();
 
 
 
         }
 
-       
+
 
         public static void RegisterGameComponent<T>(IServiceCollection serviceCollection) where T : class, IGameComponent
         {

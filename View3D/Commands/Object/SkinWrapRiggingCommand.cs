@@ -1,8 +1,5 @@
-﻿using MonoGame.Framework.WpfInterop;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
@@ -21,7 +18,7 @@ namespace View3D.Commands.Object
         List<Rmv2MeshNode> _affectedMeshes;
         List<Rmv2MeshNode> _sources;
 
-        public SkinWrapRiggingCommand(IEnumerable<Rmv2MeshNode> affectedMeshes, IEnumerable<Rmv2MeshNode> sources)
+        public void Configure(IEnumerable<Rmv2MeshNode> affectedMeshes, IEnumerable<Rmv2MeshNode> sources)
         {
             _affectedMeshes = affectedMeshes.ToList();
             _sources = sources.ToList();
@@ -32,10 +29,9 @@ namespace View3D.Commands.Object
             return "Skin wrap re-rigging";
         }
 
-        public override void Initialize(IComponentManager componentManager)
+        public SkinWrapRiggingCommand(SelectionManager selectionManager)
         {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-            base.Initialize(componentManager);
+            _selectionManager = selectionManager;;
         }
 
         protected override void ExecuteCommand()

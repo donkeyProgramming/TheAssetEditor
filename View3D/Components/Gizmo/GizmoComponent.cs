@@ -10,6 +10,7 @@ using View3D.Utility;
 using MediatR;
 using System.Threading.Tasks;
 using System.Threading;
+using View3D.Commands;
 
 namespace View3D.Components.Gizmo
 {
@@ -23,7 +24,7 @@ namespace View3D.Components.Gizmo
         private readonly ArcBallCamera _camera;
         private readonly ResourceLibary _resourceLibary;
         private readonly DeviceResolverComponent _deviceResolverComponent;
-
+        private readonly CommandFactory _commandFactory;
         Gizmo _gizmo;
         bool _isEnabled = false;
         TransformGizmoWrapper _activeTransformation;
@@ -32,7 +33,7 @@ namespace View3D.Components.Gizmo
 
         public GizmoComponent(ComponentManagerResolver componentManagerResolver,
             KeyboardComponent keyboardComponent, MouseComponent mouseComponent, ArcBallCamera camera, CommandExecutor commandExecutor,
-            ResourceLibary resourceLibary, DeviceResolverComponent deviceResolverComponent,
+            ResourceLibary resourceLibary, DeviceResolverComponent deviceResolverComponent, CommandFactory commandFactory,
             SelectionManager selectionManager) : base(componentManagerResolver.ComponentManager)
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.Gizmo;
@@ -44,6 +45,7 @@ namespace View3D.Components.Gizmo
             _commandManager = commandExecutor;
             _resourceLibary = resourceLibary;
             _deviceResolverComponent = deviceResolverComponent;
+            _commandFactory = commandFactory;
             _selectionManager = selectionManager;
         }
        
@@ -61,7 +63,7 @@ namespace View3D.Components.Gizmo
         private void OnSelectionChanged(ISelectionState state)
         {
             _gizmo.Selection.Clear();
-            _activeTransformation = TransformGizmoWrapper.CreateFromSelectionState(state);
+            _activeTransformation = TransformGizmoWrapper.CreateFromSelectionState(state, _commandFactory);
             if(_activeTransformation != null)
                 _gizmo.Selection.Add(_activeTransformation);
 

@@ -10,8 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using System.Windows.Forms;
 using View3D.Animation;
+using View3D.Commands;
 using View3D.Commands.Object;
 using View3D.Components.Component;
 using View3D.SceneNodes;
@@ -28,6 +28,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
 
         IComponentManager _componentManager;
         private readonly CommandExecutor _commandExecutor;
+        private readonly CommandFactory _commandFactory;
         AnimationClip _animationClip;
         AnimationPlayer _animationPlayer;
         AnimationPlayer _oldAnimationPlayer;
@@ -44,7 +45,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
         public Vector3ViewModel BonePositionOffset { get; set; } = new Vector3ViewModel(0);
         public Vector3ViewModel BoneRotationOffset { get; set; } = new Vector3ViewModel(0);
 
-        public MeshFitterViewModel(Window ownerWindow, RemappedAnimatedBoneConfiguration configuration, List<Rmv2MeshNode> meshNodes, GameSkeleton targetSkeleton, AnimationFile currentSkeletonFile, IComponentManager componentManager, CommandExecutor commandExecutor) : base(configuration)
+        public MeshFitterViewModel(Window ownerWindow, RemappedAnimatedBoneConfiguration configuration, List<Rmv2MeshNode> meshNodes, GameSkeleton targetSkeleton, AnimationFile currentSkeletonFile, IComponentManager componentManager, CommandExecutor commandExecutor, CommandFactory commandFactory) : base(configuration)
         {
             _window = ownerWindow;
 
@@ -52,6 +53,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             _targetSkeleton = targetSkeleton;
             _componentManager = componentManager;
             _commandExecutor = commandExecutor;
+            _commandFactory = commandFactory;
             ScaleFactor.PropertyChanged += (_0, _1) => ApplyMeshFittingTransforms();
             BoneScaleFactor.PropertyChanged+=(_0, _1) => BoneScaleUpdate((float)BoneScaleFactor.Value, MeshBones.SelectedItem);
             BonePositionOffset.OnValueChanged += (viewModel) => BonePositionUpdated(viewModel, MeshBones.SelectedItem);
@@ -314,12 +316,15 @@ namespace KitbasherEditor.ViewModels.MeshFitter
         public void SaveAndClose()
         {
             var frame = AnimationSampler.Sample(0, _fromSkeleton, _animationClip);
-            var cmd = new CreateAnimatedMeshPoseCommand(_meshNodes, frame);
-            _commandExecutor.ExecuteCommand(cmd);   
+
+
+
+            _commandFactory.Create<CreateAnimatedMeshPoseCommand>().Configure(x => x.Configure(_meshNodes, frame)).BuildAndExecute();
+
             _window.Close();
         }
 
-        public static void ShowView(List<ISelectable> meshesToFit, IComponentManager componentManager, SkeletonAnimationLookUpHelper skeletonHelper, PackFileService pfs, CommandExecutor commandExecutor)
+        public static void ShowView(List<ISelectable> meshesToFit, IComponentManager componentManager, SkeletonAnimationLookUpHelper skeletonHelper, PackFileService pfs, CommandExecutor commandExecutor, CommandFactory commandFactory)
         {
             var sceneManager = componentManager.GetComponent<SceneManager>();
             var resourceLib = componentManager.GetComponent<ResourceLibary>();
@@ -366,7 +371,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             containingWindow.Title = "MeshFitter";
             containingWindow.Width = 1200;
             containingWindow.Height = 1100;
-            containingWindow.DataContext = new MeshFitterViewModel(containingWindow, config, meshNodes, targetSkeleton.Skeleton, currentSkeletonFile, componentManager, commandExecutor);
+            containingWindow.DataContext = new MeshFitterViewModel(containingWindow, config, meshNodes, targetSkeleton.Skeleton, currentSkeletonFile, componentManager, commandExecutor, commandFactory);
             containingWindow.Content = new MeshFitterView();
             containingWindow.Closed += ContainingWindow_Closed;
             containingWindow.Show();

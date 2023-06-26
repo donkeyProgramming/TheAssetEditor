@@ -1,9 +1,7 @@
 ﻿using CommonControls.Common;
-using MonoGame.Framework.WpfInterop;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Components.Component.Selection;
-using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Utility;
 
@@ -17,20 +15,20 @@ namespace View3D.Commands.Object
         SelectionManager _selectionManager;
         ISelectionState _originalSelectionState;
 
-        public CombineMeshCommand(List<ISelectable> objectsToCombine)
+
+        public CombineMeshCommand(SelectionManager selectionManager)
+        {
+            _selectionManager = selectionManager;
+        }
+
+        public void Configure(List<ISelectable> objectsToCombine)
         {
             _objectsToCombine = new List<ISelectable>(objectsToCombine);
         }
 
-        public override string GetHintText()
-        {
-            return "Combine Objects";
-        }
+        public override string GetHintText() => "Combine Objects";
 
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-        }
+
 
         protected override void ExecuteCommand()
         {

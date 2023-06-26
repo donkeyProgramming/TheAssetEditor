@@ -11,30 +11,36 @@ namespace View3D.Commands.Face
 
         List<int> _facesToDelete;
         MeshObject _geo;
+        private readonly SelectionManager _selectionManager;
 
-        public DeleteFaceCommand(MeshObject geoObject, List<int> facesToDelete)
+        public override string GetHintText() => "Delete Faces";
+
+        public DeleteFaceCommand(SelectionManager selectionManager)
+        {
+            _selectionManager = selectionManager;
+        }
+
+        public void Configure(MeshObject geoObject, List<int> facesToDelete)
         {
             _facesToDelete = facesToDelete;
             _geo = geoObject;
         }
 
-        public override string GetHintText() => "Delete Faces";
-
         protected override void ExecuteCommand()
         {
             // Create undo state
-            _originalSelectionState = _componentManager.GetComponent<SelectionManager>().GetStateCopy<FaceSelectionState>();
+            _originalSelectionState = _selectionManager.GetStateCopy<FaceSelectionState>();
             _originalGeometry = _geo.Clone();
 
             // Execute
             _geo.RemoveFaces(_facesToDelete);
-            _componentManager.GetComponent<SelectionManager>().GetState<FaceSelectionState>().Clear();
+            _selectionManager.GetState<FaceSelectionState>().Clear();
         }
 
         protected override void UndoCommand()
         {
             _originalSelectionState.RenderObject.Geometry = _originalGeometry;
-            _componentManager.GetComponent<SelectionManager>().SetState(_originalSelectionState);
+            _selectionManager.SetState(_originalSelectionState);
         }
     }
 }

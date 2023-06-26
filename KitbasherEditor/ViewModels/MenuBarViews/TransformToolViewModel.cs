@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using View3D.Commands;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Components.Gizmo;
@@ -28,8 +29,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         SelectionManager _selectionManager;
         CommandExecutor _commandExecutor;
+        private readonly CommandFactory _commandFactory;
 
-        public ICommand ApplyCommand { get; set; }
+        public System.Windows.Input.ICommand ApplyCommand { get; set; }
 
         bool _buttonEnabled = false;
         public bool ButtonEnabled { get { return _buttonEnabled; } set { SetAndNotify(ref _buttonEnabled, value); } }
@@ -49,7 +51,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public NotifyAttr<bool> ShowVertexFalloff { get; set; } = new NotifyAttr<bool>(false);
 
 
-        public TransformToolViewModel(SelectionManager selectionManager, CommandExecutor commandExecutor)
+        public TransformToolViewModel(SelectionManager selectionManager, CommandExecutor commandExecutor, CommandFactory commandFactory)
         {
             ApplyCommand = new RelayCommand(ApplyTransform);
 
@@ -57,6 +59,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             VertexMovementFalloff.Value.PropertyChanged += VertexMovementFalloffChanged;
             _selectionManager = selectionManager;
             _commandExecutor = commandExecutor;
+            _commandFactory = commandFactory;
         }
 
         public void VertexMovementFalloffChanged(object sender, PropertyChangedEventArgs e)
@@ -100,7 +103,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         void ApplyTransform()
         {
-            var transform = TransformGizmoWrapper.CreateFromSelectionState(_selectionManager.GetState());
+            var transform = TransformGizmoWrapper.CreateFromSelectionState(_selectionManager.GetState(), _commandFactory);
             if (transform == null || _activeMode == TransformMode.None) 
                 return;
 

@@ -1,5 +1,4 @@
-﻿using MonoGame.Framework.WpfInterop;
-using View3D.Components.Component.Selection;
+﻿using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 
 namespace View3D.Commands.Object
@@ -13,25 +12,23 @@ namespace View3D.Commands.Object
         ISelectable _selectedItem;
         ISelectionState _oldState;
 
-        public ObjectSelectionModeCommand(GeometrySelectionMode newMode)
+        public void Configure(GeometrySelectionMode newMode)
         {
             _newMode = newMode;
-           
         }
 
-        public ObjectSelectionModeCommand(ISelectable selectedItem, GeometrySelectionMode newMode) : this(newMode)
+        public void  Configure(ISelectable selectedItem, GeometrySelectionMode newMode)
         {
             _selectedItem = selectedItem;
+            _newMode = newMode;
         }
 
-        public override string GetHintText()
-        {
-            return "Select Object";
-        }
+        public override string GetHintText() => "Select Object";
 
-        public override void Initialize(IComponentManager componentManager)
+
+        public  ObjectSelectionModeCommand(SelectionManager selectionManager)
         {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
+            _selectionManager = selectionManager;
         }
 
         protected override void ExecuteCommand()

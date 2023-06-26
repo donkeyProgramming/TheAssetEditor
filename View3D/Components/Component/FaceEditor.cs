@@ -1,21 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using View3D.Commands;
 using View3D.Commands.Face;
 using View3D.Commands.Object;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 using View3D.Services;
-using View3D.Utility;
 
 namespace View3D.Components.Component
 {
-    public class FaceEditor : BaseComponent
+    public class FaceEditor 
     {
-        CommandExecutor _commandManager;
+        private readonly CommandFactory _commandFactory;
 
-        public FaceEditor(ComponentManagerResolver componentManagerResolver, CommandExecutor commandExecutor) : base(componentManagerResolver.ComponentManager)
+        public FaceEditor(CommandFactory commandFactory)
         {
-            _commandManager = commandExecutor;
+            _commandFactory = commandFactory;
         }
 
         public void DeleteFaces(FaceSelectionState faceSelectionState)
@@ -25,13 +25,11 @@ namespace View3D.Components.Component
 
             if (selectedFaceCount == totalObjectFaceCount)
             {
-                var command = new DeleteObjectsCommand(new List<ISelectable>() { faceSelectionState.RenderObject });
-                _commandManager.ExecuteCommand(command);
+                _commandFactory.Create<DeleteObjectsCommand>().Configure(x => x.Configure(new List<ISelectable>() { faceSelectionState.RenderObject })).BuildAndExecute();
             }
             else
             {
-                var command = new DeleteFaceCommand(faceSelectionState.RenderObject.Geometry, faceSelectionState.CurrentSelection());
-                _commandManager.ExecuteCommand(command);
+                _commandFactory.Create<DeleteFaceCommand>().Configure(x => x.Configure(faceSelectionState.RenderObject.Geometry, faceSelectionState.CurrentSelection())).BuildAndExecute();
             }
         }
 
@@ -49,20 +47,23 @@ namespace View3D.Components.Component
             var meshService = new MeshSplitterService();
             var newSelection = meshService.GrowFaceSelection(faceSelectionState.RenderObject.Geometry, selectedFaceIndecies, combineOverlappingVertexes);
 
-            var selectCmd = new FaceSelectionCommand(newSelection);
-            _commandManager.ExecuteCommand(selectCmd);
+            _commandFactory.Create<FaceSelectionCommand>()
+               .Configure(x => x.Configure(newSelection))
+               .BuildAndExecute();
         }
 
         public void DuplicatedSelectedFacesToNewMesh(FaceSelectionState faceSelectionState, bool deleteOriginal)
         {
-            var selectCmd = new DuplicateFacesCommand(faceSelectionState.RenderObject, faceSelectionState.SelectedFaces, deleteOriginal);
-            _commandManager.ExecuteCommand(selectCmd);
+            _commandFactory.Create<DuplicateFacesCommand>()
+             .Configure(x => x.Configure(faceSelectionState.RenderObject, faceSelectionState.SelectedFaces, deleteOriginal))
+             .BuildAndExecute();
         }
 
         public void ConvertSelectionToVertex(FaceSelectionState faceSelectionState)
         {
-            var selectCmd = new ConvertFacesToVertexSelectionCommand(faceSelectionState);
-            _commandManager.ExecuteCommand(selectCmd);
+            _commandFactory.Create<ConvertFacesToVertexSelectionCommand>()
+                .Configure(x => x.Configure(faceSelectionState))
+                .BuildAndExecute();
         }
     }
 }

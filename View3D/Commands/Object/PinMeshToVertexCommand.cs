@@ -1,10 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using View3D.Animation;
 using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
@@ -24,7 +20,7 @@ namespace View3D.Commands.Object
         int _vertexId;
 
 
-        public PinMeshToVertexCommand(IEnumerable<Rmv2MeshNode> meshesToPin, Rmv2MeshNode source, int vertexId)
+        public void Configure(IEnumerable<Rmv2MeshNode> meshesToPin, Rmv2MeshNode source, int vertexId)
         {
             _meshesToPin = meshesToPin.ToList();
             _source = source;
@@ -36,10 +32,9 @@ namespace View3D.Commands.Object
             return "Pin meshes to vertex";
         }
 
-        public override void Initialize(IComponentManager componentManager)
+        public PinMeshToVertexCommand(SelectionManager selectionManager)
         {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-            base.Initialize(componentManager);
+            _selectionManager = selectionManager;
         }
 
         protected override void ExecuteCommand()

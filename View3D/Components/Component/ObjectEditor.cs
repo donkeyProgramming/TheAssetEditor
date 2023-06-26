@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using View3D.Commands;
 using View3D.Commands.Object;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
@@ -8,41 +9,35 @@ using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 
 namespace View3D.Components.Component
 {
-    public class ObjectEditor : BaseComponent
+    public class ObjectEditor
     {
-        private readonly CommandExecutor _commandManager;
+        private readonly CommandFactory _commandFactory;
 
-        public ObjectEditor(ComponentManagerResolver componentManagerResolver, CommandExecutor commandExecutor) : base(componentManagerResolver.ComponentManager)
+        public ObjectEditor(CommandFactory commandFactory)
         {
-            _commandManager = commandExecutor;
+            _commandFactory = commandFactory;
         }
 
         public void DeleteObject(ObjectSelectionState objectSelectionState)
         {
             var selection = objectSelectionState.CurrentSelection();
             if (selection.Count != 0)
-            {
-                var command = new DeleteObjectsCommand(selection);
-                _commandManager.ExecuteCommand(command);
-            }
+                _commandFactory.Create<DeleteObjectsCommand>().Configure(x => x.Configure(selection)).BuildAndExecute();
         }
 
         public void DuplicateObject(ObjectSelectionState objectSelectionState)
         {
             if (objectSelectionState.CurrentSelection().Count != 0)
             {
-                var command = new DuplicateObjectCommand(objectSelectionState.CurrentSelection().Select(x => (ISceneNode)x).ToList());
-                _commandManager.ExecuteCommand(command);
+                var objectsToCopy = objectSelectionState.CurrentSelection().Select(x => (ISceneNode)x).ToList();
+                _commandFactory.Create<DuplicateObjectCommand>().Configure(x => x.Configure(objectsToCopy)).BuildAndExecute();
             }
         }
 
         public void DivideIntoSubmeshes(ObjectSelectionState objectSelectionState, bool combineOverlappingVertexes)
         {
             if (objectSelectionState.GetSingleSelectedObject() is IEditableGeometry drawableNode)
-            {
-                var command = new DivideObjectIntoSubmeshesCommand(drawableNode, combineOverlappingVertexes);
-                _commandManager.ExecuteCommand(command);
-            }
+                _commandFactory.Create<DivideObjectIntoSubmeshesCommand>().Configure(x => x.Configure(drawableNode, combineOverlappingVertexes)).BuildAndExecute();
         }
 
         public bool CombineMeshes(ObjectSelectionState objectSelectionState, out ErrorList errorMessages)
@@ -56,8 +51,7 @@ namespace View3D.Components.Component
             if (result)
             {
                 errorMessages = new ErrorList();
-                var command = new CombineMeshCommand(objectSelectionState.SelectedObjects());
-                _commandManager.ExecuteCommand(command);
+                _commandFactory.Create<CombineMeshCommand>().Configure(x => x.Configure(objectSelectionState.SelectedObjects())).BuildAndExecute();
             }
             
             return result;
@@ -66,15 +60,13 @@ namespace View3D.Components.Component
 
         public void ReduceMesh(List<Rmv2MeshNode> meshNodes, float factor, bool undoable)
         {
-            var command = new ReduceMeshCommand(meshNodes, factor);
-            _commandManager.ExecuteCommand(command, undoable);
+            _commandFactory.Create<ReduceMeshCommand>()
+                .Configure(x => x.Configure(meshNodes, factor))
+                .IsUndoable(undoable)
+                .BuildAndExecute();
         }
 
-        public void ReduceMesh(Rmv2MeshNode meshNode, float factor, bool undoable)
-        {
-            var command = new ReduceMeshCommand(new List<Rmv2MeshNode>() { meshNode }, factor);
-            _commandManager.ExecuteCommand(command, undoable);
-        }
+        public void ReduceMesh(Rmv2MeshNode meshNode, float factor, bool undoable) => ReduceMesh(new List<Rmv2MeshNode> { meshNode }, factor, undoable);
 
         public void GroupItems(ObjectSelectionState selectionState)
         {
@@ -89,8 +81,7 @@ namespace View3D.Components.Component
             var numDifferentParents = parents.Distinct().Count();
             if (numDifferentParents == 1 && parents.First() is GroupNode groupNode && groupNode.IsUngroupable)
             {
-                var ungroupCommand = new UnGroupObjectsCommand(parents.First().Parent, selectedObjects, groupNode);
-                _commandManager.ExecuteCommand(ungroupCommand);
+                _commandFactory.Create<UnGroupObjectsCommand>().Configure(x => x.Configure(parents.First().Parent, selectedObjects, groupNode)).BuildAndExecute();
                 return;
             }
 
@@ -104,9 +95,7 @@ namespace View3D.Components.Component
 
                 var itemsInGroup = groupParent.Children;
                 var itemsToAdd = selectedObjects.Where(x => itemsInGroup.Contains(x) == false).ToList();
-
-                var addItemToGroupCmd = new AddObjectsToGroupCommand(groupParent, itemsToAdd);
-                _commandManager.ExecuteCommand(addItemToGroupCmd);
+                _commandFactory.Create<AddObjectsToGroupCommand>().Configure(x => x.Configure(groupParent, itemsToAdd)).BuildAndExecute();
                 return;
             }
 
@@ -115,9 +104,8 @@ namespace View3D.Components.Component
             var parent = selectionState.SelectedObjects().First().Parent;
             if (parent is GroupNode parentGroupNode && parentGroupNode.IsUngroupable)
                 parent = parent.Parent;
-            var cmd = new GroupObjectsCommand(parent, selectionState.CurrentSelection());
-            _commandManager.ExecuteCommand(cmd);
-            
+
+            _commandFactory.Create<GroupObjectsCommand>().Configure(x => x.Configure(parent, selectionState.CurrentSelection())).BuildAndExecute();
         }
 
         public void SortMeshes(ISceneNode node)

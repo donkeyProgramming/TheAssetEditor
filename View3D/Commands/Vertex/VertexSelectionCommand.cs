@@ -1,12 +1,6 @@
 ﻿using CommonControls.Common;
-using MonoGame.Framework.WpfInterop;
-using Serilog;
 using System.Collections.Generic;
-using System.Linq;
-using View3D.Components.Component;
 using View3D.Components.Component.Selection;
-using View3D.Rendering;
-using View3D.Scene;
 
 namespace View3D.Commands.Vertex
 {
@@ -19,21 +13,19 @@ namespace View3D.Commands.Vertex
         bool _isRemove;
         List<int> _selectedVertices;
 
-        public VertexSelectionCommand(List<int> selectedVertices, bool isAdd, bool isRemove)
+        public override string GetHintText() => "Select Vertex";
+        public override bool IsMutation() => false;
+
+        public void Configure(List<int> selectedVertices, bool isAdd, bool isRemove)
         {
             _selectedVertices = selectedVertices;
             _isAdd = isAdd;
             _isRemove = isRemove;
         }
 
-        public override string GetHintText()
+        public VertexSelectionCommand(SelectionManager selectionManager)
         {
-            return "Select Vertex";
-        }
-
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
+            _selectionManager = selectionManager;
         }
 
         protected override void ExecuteCommand()
@@ -55,6 +47,6 @@ namespace View3D.Commands.Vertex
             _selectionManager.SetState(_oldState);
         }
 
-        public override bool IsMutation() => false;
+      
     }
 }

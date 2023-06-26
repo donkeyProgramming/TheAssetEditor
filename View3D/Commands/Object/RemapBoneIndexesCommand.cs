@@ -17,7 +17,7 @@ namespace View3D.Commands.Object
         List<MeshObject> _originalGeometry;
         string _originalSkeletonName;
 
-        public RemapBoneIndexesCommand(List<Rmv2MeshNode> meshNodeList, List<IndexRemapping> mapping, string newSkeletonName)
+        public void Configure(List<Rmv2MeshNode> meshNodeList, List<IndexRemapping> mapping, string newSkeletonName)
         {
             _meshNodeList = meshNodeList;
             _mapping = mapping;

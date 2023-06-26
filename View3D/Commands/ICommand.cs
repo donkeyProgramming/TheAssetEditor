@@ -39,7 +39,7 @@ namespace View3D.Commands
     {
         private readonly CommandExecutor _commandExecutor;
         private readonly T _command;
-        private bool _isUndoable = false;
+        private bool _isUndoable = true;
 
         public CommandBuilder(CommandExecutor commandExecutor, T command)
         {

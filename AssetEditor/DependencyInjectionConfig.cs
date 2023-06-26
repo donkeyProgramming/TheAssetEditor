@@ -35,7 +35,7 @@ namespace AssetEditor
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
 
-            ServiceProvider = serviceCollection.BuildServiceProvider();
+            ServiceProvider = serviceCollection.BuildServiceProvider(validateScopes:true);
             RegisterTools(ServiceProvider.GetService<ToolFactory>());
         }
 
@@ -51,16 +51,16 @@ namespace AssetEditor
             services.AddSingleton<ApplicationSettingsService>();
             services.AddSingleton<ToolFactory>();
             services.AddSingleton<PackFileDataBase>();
-            services.AddSingleton<SkeletonAnimationLookUpHelper>();
+            services.AddScoped<SkeletonAnimationLookUpHelper>();
             services.AddSingleton<CopyPasteManager>();
             services.AddSingleton<GameInformationFactory>();
 
-            services.AddTransient<MainWindow>();
-            services.AddTransient<MainViewModel>();
-            services.AddTransient<SettingsWindow>();
-            services.AddTransient<SettingsViewModel>();
-            services.AddTransient<MenuBarViewModel>();
-            services.AddTransient<PackFileService>();
+            services.AddScoped<MainWindow>();
+            services.AddScoped<MainViewModel>();
+            services.AddScoped<SettingsWindow>();
+            services.AddScoped<SettingsViewModel>();
+            services.AddScoped<MenuBarViewModel>();
+            services.AddScoped<PackFileService>();
 
             TextEditor_DependencyInjectionContainer.Register(services);
             KitbasherEditor_DependencyInjectionContainer.Register(services);
@@ -97,8 +97,9 @@ namespace AssetEditor
 
         public void ShowMainWindow()
         {
-            var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
-            mainWindow.DataContext = ServiceProvider.GetRequiredService<MainViewModel>();
+            using var scope = ServiceProvider.CreateScope();
+            var mainWindow = scope.ServiceProvider.GetRequiredService<MainWindow>();
+            mainWindow.DataContext = scope.ServiceProvider.GetRequiredService<MainViewModel>();
             mainWindow.Show();
         }
     }

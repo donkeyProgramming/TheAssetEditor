@@ -18,6 +18,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using View3D.Animation;
+using View3D.Commands;
 using View3D.Commands.Object;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
@@ -38,13 +39,14 @@ namespace _componentManager.ViewModels.MenuBarViews
         ViewOnlySelectedComponent _viewOnlySelectedComp;
         private readonly SceneManager _sceneManager;
         private readonly CommandExecutor _commandExecutor;
+        private readonly CommandFactory _commandFactory;
         private readonly IServiceProvider _serviceProvider;
         PackFileService _packFileService;
         SkeletonAnimationLookUpHelper _skeletonHelper;
         WindowKeyboard _keyboard;
 
         public ToolActions(IServiceProvider serviceProvider, ComponentManagerResolver componentManagerResolver, PackFileService packFileService, WindowKeyboard keyboard, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
-            SelectionManager selectionManager, ObjectEditor objectEditor, FaceEditor faceEditor, ViewOnlySelectedComponent viewOnlySelectedComponent, SceneManager sceneManager, CommandExecutor commandExecutor)
+            SelectionManager selectionManager, ObjectEditor objectEditor, FaceEditor faceEditor, ViewOnlySelectedComponent viewOnlySelectedComponent, SceneManager sceneManager, CommandExecutor commandExecutor, CommandFactory commandFactory)
         {
             _serviceProvider = serviceProvider;
             _packFileService = packFileService;
@@ -58,6 +60,7 @@ namespace _componentManager.ViewModels.MenuBarViews
             _viewOnlySelectedComp = viewOnlySelectedComponent;
             _sceneManager = sceneManager;
             _commandExecutor = commandExecutor;
+            _commandFactory = commandFactory;
         }
 
         public void DivideSubMesh()
@@ -168,7 +171,7 @@ namespace _componentManager.ViewModels.MenuBarViews
 
                 var window = new ControllerHostWindow(true, ResizeMode.CanResize)
                 {
-                    DataContext = new BmiViewModel(skeleton, meshNode, _componentManager, _commandExecutor),
+                    DataContext = new BmiViewModel(skeleton, meshNode, _commandFactory),
                     Title = "Bmi Tool",
                     Content = new BmiView(),
                 };
@@ -180,7 +183,7 @@ namespace _componentManager.ViewModels.MenuBarViews
         public void OpenSkeletonReshaperTool()
         {
             var state = _selectionManager.GetState<ObjectSelectionState>();
-            MeshFitterViewModel.ShowView(state.CurrentSelection(), _componentManager, _skeletonHelper, _packFileService, _commandExecutor);
+            MeshFitterViewModel.ShowView(state.CurrentSelection(), _componentManager, _skeletonHelper, _packFileService, _commandExecutor, _commandFactory);
         }
 
         public void CreateStaticMeshes()
@@ -214,11 +217,13 @@ namespace _componentManager.ViewModels.MenuBarViews
                 }
             }
 
-            var cmd = new CreateAnimatedMeshPoseCommand(meshes, frame, true);
-            _commandExecutor.ExecuteCommand(cmd, false);
+            _commandFactory.Create<CreateAnimatedMeshPoseCommand>()
+                .IsUndoable(false)
+                .Configure(x=>x.Configure(meshes, frame, true))
+                .BuildAndExecute();
         }
 
-        public void PinMeshToMesh() => PinToolViewModel.ShowWindow(_componentManager, _commandExecutor);
+        public void PinMeshToMesh() => PinToolViewModel.ShowWindow(_selectionManager,_commandFactory);
 
         public void OpenReRiggingTool()
         {
@@ -277,13 +282,14 @@ namespace _componentManager.ViewModels.MenuBarViews
                 .OrderBy(x => x.BoneIndex.Value).
                 ToList();
 
-            var config = new RemappedAnimatedBoneConfiguration();
+            var config = new RemappedAnimatedBoneConfiguration
+            {
+                MeshSkeletonName = selectedMeshSkeleton,
+                MeshBones = AnimatedBoneHelper.CreateFromSkeleton(newSkeletonFile, animatedBoneIndexes.Select(x => x.BoneIndex.Value).ToList()),
 
-            config.MeshSkeletonName = selectedMeshSkeleton;
-            config.MeshBones = AnimatedBoneHelper.CreateFromSkeleton(newSkeletonFile, animatedBoneIndexes.Select(x => x.BoneIndex.Value).ToList());
-
-            config.ParnetModelSkeletonName = targetSkeletonName;
-            config.ParentModelBones = AnimatedBoneHelper.CreateFromSkeleton(existingSkeletonFile);
+                ParnetModelSkeletonName = targetSkeletonName,
+                ParentModelBones = AnimatedBoneHelper.CreateFromSkeleton(existingSkeletonFile)
+            };
 
             if (targetSkeletonName == selectedMeshSkeleton)
                 MessageBox.Show("Trying to map to and from the same skeleton. This does not really make any sense if you are trying to make the mesh fit an other skeleton.", "Error", MessageBoxButton.OK);
@@ -294,7 +300,9 @@ namespace _componentManager.ViewModels.MenuBarViews
             if (window.Result == true)
             {
                 var remapping = AnimatedBoneHelper.BuildRemappingList(config.MeshBones.First());
-                _commandExecutor.ExecuteCommand(new RemapBoneIndexesCommand(selectedMeshses, remapping, config.ParnetModelSkeletonName));
+                _commandExecutor.ExecuteCommand(new RemapBoneIndexesCommand());
+
+                _commandFactory.Create<RemapBoneIndexesCommand>().Configure(x => x.Configure(selectedMeshses, remapping, config.ParnetModelSkeletonName)).BuildAndExecute();
             }
         }
 

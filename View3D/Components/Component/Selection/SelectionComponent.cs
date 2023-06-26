@@ -1,12 +1,10 @@
-﻿using CommonControls.Common;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Framework.WpfInterop;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using View3D.Commands;
 using View3D.Commands.Face;
 using View3D.Commands.Object;
 using View3D.Commands.Vertex;
@@ -19,8 +17,6 @@ namespace View3D.Components.Component.Selection
 {
     public class SelectionComponent : BaseComponent, IDisposable
     {
-        ILogger _logger = Logging.Create<SelectionManager>();
-
         SpriteBatch _spriteBatch;
         Texture2D _textTexture;
 
@@ -31,7 +27,7 @@ namespace View3D.Components.Component.Selection
         SelectionManager _selectionManager;
 
         private readonly DeviceResolverComponent _deviceResolverComponent;
-        
+        private readonly CommandFactory _commandFactory;
         SceneManager _sceneManger;
         CommandExecutor _commandManager;
 
@@ -42,9 +38,8 @@ namespace View3D.Components.Component.Selection
         public SelectionComponent(ComponentManagerResolver componentManagerResolver,
             MouseComponent mouseComponent, KeyboardComponent keyboardComponent,
             ArcBallCamera camera, SelectionManager selectionManager,
-            DeviceResolverComponent deviceResolverComponent,
-            SceneManager sceneManager, CommandExecutor commandExecutor
-            ) 
+            DeviceResolverComponent deviceResolverComponent, CommandFactory commandFactory,
+            SceneManager sceneManager, CommandExecutor commandExecutor) 
             : base(componentManagerResolver.ComponentManager)
         {
             _mouseComponent = mouseComponent;
@@ -52,6 +47,7 @@ namespace View3D.Components.Component.Selection
             _camera = camera;
             _selectionManager = selectionManager;
             _deviceResolverComponent = deviceResolverComponent;
+            _commandFactory = commandFactory;
             _sceneManger = sceneManager;
             _commandManager = commandExecutor;
         }
@@ -123,8 +119,7 @@ namespace View3D.Components.Component.Selection
             {
                 if (GeometryIntersection.IntersectFaces(unprojectedSelectionRect, faceState.RenderObject.Geometry, faceState.RenderObject.RenderMatrix, out var faces))
                 {
-                    var faceSelectionCommand = new FaceSelectionCommand(faces, isSelectionModification, removeSelection);
-                    _commandManager.ExecuteCommand(faceSelectionCommand);
+                    _commandFactory.Create<FaceSelectionCommand>().Configure(x => x.Configure(faces, isSelectionModification, removeSelection)).BuildAndExecute();
                     return;
                 }
             }
@@ -132,8 +127,7 @@ namespace View3D.Components.Component.Selection
             {
                 if (GeometryIntersection.IntersectVertices(unprojectedSelectionRect, vertexState.RenderObject.Geometry, vertexState.RenderObject.RenderMatrix, out var vertices))
                 {
-                    var vertexSelectionCommand = new VertexSelectionCommand(vertices, isSelectionModification, removeSelection);
-                    _commandManager.ExecuteCommand(vertexSelectionCommand);
+                    _commandFactory.Create<VertexSelectionCommand>().Configure(x => x.Configure(vertices, isSelectionModification, removeSelection)).BuildAndExecute();
                     return;
                 }
             }
@@ -143,15 +137,11 @@ namespace View3D.Components.Component.Selection
             {
                 // Only clear selection if we are not in geometry mode and the selection count is not empty
                 if (currentState.Mode != GeometrySelectionMode.Object || currentState.SelectionCount() != 0)
-                {
-                    var selectionCommand = new ObjectSelectionCommand(new List<ISelectable>(), false, false);
-                    _commandManager.ExecuteCommand(selectionCommand);
-                }
+                    _commandFactory.Create<ObjectSelectionCommand>().Configure(x => x.Configure(new List<ISelectable>(), false, false)).BuildAndExecute();
             }
             else if (selectedObjects != null)
             {
-                var selectionCommand = new ObjectSelectionCommand(selectedObjects, isSelectionModification, removeSelection);
-                _commandManager.ExecuteCommand(selectionCommand);
+                _commandFactory.Create<ObjectSelectionCommand>().Configure(x => x.Configure(selectedObjects, isSelectionModification, removeSelection)).BuildAndExecute();
             }
         }
 
@@ -163,8 +153,7 @@ namespace View3D.Components.Component.Selection
             {  
                 if (GeometryIntersection.IntersectFace(ray, faceState.RenderObject.Geometry, faceState.RenderObject.RenderMatrix, out var selectedFace) != null)
                 {
-                    FaceSelectionCommand faceSelectionCommand = new FaceSelectionCommand(selectedFace.Value, isSelectionModification, removeSelection);
-                    _commandManager.ExecuteCommand(faceSelectionCommand);
+                    _commandFactory.Create<FaceSelectionCommand>().Configure(x => x.Configure(selectedFace.Value, isSelectionModification, removeSelection)).BuildAndExecute();
                     return;
                 }
             }
@@ -173,8 +162,7 @@ namespace View3D.Components.Component.Selection
             {
                 if (GeometryIntersection.IntersectVertex(ray, vertexState.RenderObject.Geometry, _camera.Position, vertexState.RenderObject.RenderMatrix, out var selecteVert) != null)
                 {
-                    var selectCommand = new VertexSelectionCommand(new List<int>() { selecteVert }, isSelectionModification, removeSelection);
-                    _commandManager.ExecuteCommand(selectCommand);
+                    _commandFactory.Create<VertexSelectionCommand>().Configure(x => x.Configure(new List<int>() { selecteVert }, isSelectionModification, removeSelection)).BuildAndExecute();
                     return;
                 }
             }
@@ -185,15 +173,11 @@ namespace View3D.Components.Component.Selection
             {
                 // Only clear selection if we are not in geometry mode and the selection count is not empty
                 if (currentState.Mode != GeometrySelectionMode.Object || currentState.SelectionCount() != 0)
-                {
-                    var selectionCommand = new ObjectSelectionCommand(new List<ISelectable>(), false, false);
-                    _commandManager.ExecuteCommand(selectionCommand);
-                }
+                    _commandFactory.Create<ObjectSelectionCommand>().Configure(x => x.Configure(new List<ISelectable>(), false, false)).BuildAndExecute();
             }
             else if(selectedObject != null)
             {
-                var selectionCommand = new ObjectSelectionCommand(selectedObject, isSelectionModification, removeSelection);
-                _commandManager.ExecuteCommand(selectionCommand);
+                _commandFactory.Create<ObjectSelectionCommand>().Configure(x => x.Configure(selectedObject, isSelectionModification, removeSelection)).BuildAndExecute();
             }
         }
 
@@ -202,7 +186,7 @@ namespace View3D.Components.Component.Selection
             var selectionState = _selectionManager.GetState();
             if (_selectionManager.GetState().Mode != GeometrySelectionMode.Object)
             {
-                _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(selectionState.GetSingleSelectedObject(), GeometrySelectionMode.Object));
+                _commandFactory.Create<ObjectSelectionModeCommand>().Configure(x => x.Configure(selectionState.GetSingleSelectedObject(), GeometrySelectionMode.Object)).BuildAndExecute();
                 return true;
             }
             return false;
@@ -216,7 +200,7 @@ namespace View3D.Components.Component.Selection
                 var selectedObject = selectionState.GetSingleSelectedObject();
                 if (selectedObject != null)
                 {
-                    _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(selectedObject, GeometrySelectionMode.Face));
+                    _commandFactory.Create<ObjectSelectionModeCommand>().Configure(x => x.Configure(selectedObject, GeometrySelectionMode.Face)).BuildAndExecute();
                     return true;
                 }
 
@@ -232,7 +216,7 @@ namespace View3D.Components.Component.Selection
                 var selectedObject = selectionState.GetSingleSelectedObject();
                 if (selectedObject != null)
                 {
-                    _commandManager.ExecuteCommand(new ObjectSelectionModeCommand(selectedObject, GeometrySelectionMode.Vertex));
+                    _commandFactory.Create<ObjectSelectionModeCommand>().Configure(x => x.Configure(selectedObject, GeometrySelectionMode.Vertex)).BuildAndExecute();
                     return true;
                 }
             }

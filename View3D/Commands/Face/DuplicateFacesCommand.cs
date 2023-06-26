@@ -1,45 +1,39 @@
-﻿using MonoGame.Framework.WpfInterop;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 
 namespace View3D.Commands.Face
 {
-   public class DuplicateFacesCommand : CommandBase<DuplicateFacesCommand>
-   {
-       SelectionManager _selectionManager;
-   
+    public class DuplicateFacesCommand : CommandBase<DuplicateFacesCommand>
+    {
+        SelectionManager _selectionManager;
+
+        // Undo variables
         ISelectionState _oldState;
- 
-   
+        ISelectable _newObject;
+
+        // Input variables
         List<int> _facesToDelete;
         ISelectable _inputNode;
-
-        ISelectable _newObject;
         bool _deleteOriginal;
 
-       public DuplicateFacesCommand(ISelectable geoObject, List<int> facesToDelete, bool deleteOriginal)
-       {
-           _facesToDelete = facesToDelete;
-           _inputNode = geoObject;
-            _deleteOriginal = deleteOriginal;
-       }
-
-        public override string GetHintText()
+        public DuplicateFacesCommand(SelectionManager selectionManager)
         {
-            return "Duplicate Faces";
+            _selectionManager = selectionManager;
         }
 
-        public override void Initialize(IComponentManager componentManager)
-       {
-           _selectionManager = componentManager.GetComponent<SelectionManager>();
-       }
-   
-       protected override void ExecuteCommand()
-       {
-           _oldState = _selectionManager.GetStateCopy();
+        public void Configure(ISelectable geoObject, List<int> facesToDelete, bool deleteOriginal)
+        {
+            _facesToDelete = facesToDelete;
+            _inputNode = geoObject;
+            _deleteOriginal = deleteOriginal;
+        }
+
+        public override string GetHintText() => "Duplicate Faces";
+
+        protected override void ExecuteCommand()
+        {
+            _oldState = _selectionManager.GetStateCopy();
 
             // Clone the object
             _newObject = SceneNodeHelper.CloneNode(_inputNode);
@@ -67,18 +61,16 @@ namespace View3D.Commands.Face
             var objectState = new ObjectSelectionState();
             objectState.ModifySelectionSingleObject(_newObject, false);
             _selectionManager.SetState(objectState);
-       }
-   
-       protected override void UndoCommand()
-       {
+        }
+
+        protected override void UndoCommand()
+        {
             _newObject.Parent.RemoveObject(_newObject);
 
             if (_deleteOriginal)
                 _inputNode.Parent.AddObject(_inputNode);
 
             _selectionManager.SetState(_oldState);
-
-          
-       }
-   }
+        }
+    }
 }

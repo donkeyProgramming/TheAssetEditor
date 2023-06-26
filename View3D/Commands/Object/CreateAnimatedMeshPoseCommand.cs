@@ -17,17 +17,14 @@ namespace View3D.Commands.Object
         AnimationFrame _frame;
         bool _convertToStaticFrame;
 
-        public CreateAnimatedMeshPoseCommand(List<Rmv2MeshNode> meshNodes, AnimationFrame frame, bool convertToStaticFrame = false)
+        public void Configure(List<Rmv2MeshNode> meshNodes, AnimationFrame frame, bool convertToStaticFrame = false)
         {
             _meshNodes = new List<Rmv2MeshNode>(meshNodes);
             _frame = frame;
             _convertToStaticFrame = convertToStaticFrame;
         }
 
-        public override string GetHintText()
-        {
-            return "Created static mesh from animation"; 
-        }
+        public override string GetHintText() => "Created static mesh from animation";
 
         protected override void ExecuteCommand()
         {

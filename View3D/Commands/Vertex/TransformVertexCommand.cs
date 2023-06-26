@@ -1,14 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using View3D.Components.Component;
 using View3D.Components.Component.Selection;
-using View3D.Components.Gizmo;
 using View3D.Rendering.Geometry;
-using View3D.SceneNodes;
 
 namespace View3D.Commands.Vertex
 {
@@ -23,20 +17,18 @@ namespace View3D.Commands.Vertex
         SelectionManager _selectionManager;
         ISelectionState _oldSelectionState;
 
-        public TransformVertexCommand(List<MeshObject> geometryList, Vector3 pivotPoint)
+        public void Configure(List<MeshObject> geometryList, Vector3 pivotPoint)
         {
             _geometryList = geometryList;
             PivotPoint = pivotPoint;
         }
 
-        public override string GetHintText()
-        {
-            return "Transform";
-        }
+        public override string GetHintText() => "Transform";
 
-        public override void Initialize(IComponentManager componentManager)
+
+        public TransformVertexCommand(SelectionManager selectionManager)
         {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
+            _selectionManager = selectionManager;
         }
 
         protected override void ExecuteCommand()

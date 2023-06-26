@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
+using View3D.Commands;
 using View3D.Commands.Object;
 using View3D.Components.Component;
 using View3D.SceneNodes;
@@ -20,13 +21,15 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         ISceneNode _activeNode;
         IEnumerable<ISceneNode> _activeNodes;
         private readonly SceneManager _sceneManager;
+        private readonly CommandFactory _commandFactory;
 
         public event ValueChangedDelegate<IEnumerable<ISceneNode>> SelectedNodesChanged;
 
-        public SceneExplorerContextMenuHandler(CommandExecutor commandExecutor, SceneManager sceneManager)
+        public SceneExplorerContextMenuHandler(CommandExecutor commandExecutor, SceneManager sceneManager, CommandFactory commandFactory)
         {
             CommandExecutor = commandExecutor;
             _sceneManager = sceneManager;
+            _commandFactory = commandFactory;
         }
 
         public void Create(IEnumerable<ISceneNode> activeNodes)
@@ -167,8 +170,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         void RemoveNode()
         {
-            var deleteCommand = new DeleteObjectsCommand(_activeNode as SceneNode);
-            CommandExecutor.ExecuteCommand(deleteCommand);
+            _commandFactory.Create<DeleteObjectsCommand>().Configure(x => x.Configure(_activeNode as SceneNode)).BuildAndExecute();
         }
 
         void MakeEditable()
@@ -180,9 +182,9 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         void Ungroup()
         {
             if (_activeNode is GroupNode gn && gn.IsUngroupable)
-                CommandExecutor.ExecuteCommand(new UnGroupObjectsCommand(_activeNode.Parent, _activeNode.Children.Select(x => x as ISelectable).ToList(), _activeNode));
+                _commandFactory.Create<UnGroupObjectsCommand>().Configure(x => x.Configure(_activeNode.Parent, _activeNode.Children.Select(x => x as ISelectable).ToList(), _activeNode)).BuildAndExecute();
             else if (_activeNode.Parent is GroupNode g && g.IsUngroupable)
-                CommandExecutor.ExecuteCommand(new UnGroupObjectsCommand(_activeNode.Parent.Parent, new List<ISelectable>() { _activeNode as ISelectable }, _activeNode.Parent));
+                _commandFactory.Create<UnGroupObjectsCommand>().Configure(x => x.Configure(_activeNode.Parent.Parent, new List<ISelectable>() { _activeNode as ISelectable }, _activeNode.Parent)).BuildAndExecute();
         }
 
         void InvertSelection()

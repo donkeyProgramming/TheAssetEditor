@@ -1,5 +1,4 @@
-﻿using MonoGame.Framework.WpfInterop;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using View3D.Components.Component.Selection;
 
@@ -7,10 +6,15 @@ namespace View3D.Commands.Face
 {
     public class ConvertFacesToVertexSelectionCommand : CommandBase<DeleteFaceCommand>
     {
-        SelectionManager _selectionManager;
+        private readonly SelectionManager _selectionManager;
         FaceSelectionState _originalSelectionState;
 
-        public ConvertFacesToVertexSelectionCommand(FaceSelectionState currentSelectionState)
+        public ConvertFacesToVertexSelectionCommand(SelectionManager selectionManager)
+        {
+            _selectionManager = selectionManager;
+        }
+
+        public void Configure(FaceSelectionState currentSelectionState)
         {
             _originalSelectionState = currentSelectionState;
         }
@@ -33,12 +37,12 @@ namespace View3D.Commands.Face
 
             var vertexState = new VertexSelectionState(renderObject, 0);
             vertexState.ModifySelection(selectedFaceIndecies.Distinct(), false);
-            _componentManager.GetComponent<SelectionManager>().SetState(vertexState);
+            _selectionManager.SetState(vertexState);
         }
 
         protected override void UndoCommand()
         {
-            _componentManager.GetComponent<SelectionManager>().SetState(_originalSelectionState);
+            _selectionManager.SetState(_originalSelectionState);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -226,7 +227,8 @@ namespace CommonControls.Common
 
         public IEditorViewModel CreateFromType(Type type)
         {
-            var instance = (IEditorViewModel)_serviceProvider.GetService(type);
+            var scope = _serviceProvider.CreateScope();
+            var instance = scope.ServiceProvider.GetService(type) as IEditorViewModel;
             return instance;
         }
 

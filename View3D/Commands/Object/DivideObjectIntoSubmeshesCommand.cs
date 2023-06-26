@@ -1,8 +1,6 @@
 ﻿using CommonControls.Common;
-using MonoGame.Framework.WpfInterop;
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Rendering.Shading;
 using View3D.SceneNodes;
@@ -11,36 +9,34 @@ using View3D.Utility;
 
 namespace View3D.Commands.Object
 {
-    class DivideObjectIntoSubmeshesCommand : CommandBase<DivideObjectIntoSubmeshesCommand>
+    public class DivideObjectIntoSubmeshesCommand : CommandBase<DivideObjectIntoSubmeshesCommand>
     {
         IEditableGeometry _objectToSplit;
         bool _combineOverlappingVertexes;
 
         List<GroupNode> _newGroupNodes = new List<GroupNode>();
 
-        SceneManager _sceneManager;
+
         SelectionManager _selectionManager;
         ISelectionState _originalSelectionState;
         ResourceLibary _resourceLib;
 
-        public DivideObjectIntoSubmeshesCommand(IEditableGeometry objectToSplit, bool combineOverlappingVertexes)
+        public DivideObjectIntoSubmeshesCommand(ComponentManagerResolver componentManagerResolver, SelectionManager selectionManager, ResourceLibary resourceLibary)
+        {
+            _componentManager = componentManagerResolver.ComponentManager;
+            _selectionManager = selectionManager;
+            _resourceLib = resourceLibary;
+        }
+
+        public void Configure(IEditableGeometry objectToSplit, bool combineOverlappingVertexes)
         {
             _objectToSplit = objectToSplit;
             _combineOverlappingVertexes = combineOverlappingVertexes;
         }
 
-        public override string GetHintText()
-        {
-            return "Divide Object";
-        }
+        public override string GetHintText() => "Divide Object";
 
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _componentManager = componentManager;
-            _sceneManager = componentManager.GetComponent<SceneManager>();
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-            _resourceLib = componentManager.GetComponent<ResourceLibary>();
-        }
+
 
         protected override void ExecuteCommand()
         {

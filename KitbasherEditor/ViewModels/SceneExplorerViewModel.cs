@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using View3D.Commands;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
@@ -29,7 +30,7 @@ namespace KitbasherEditor.ViewModels
         ISceneNodeViewModel _selectedNodeViewModel;
         public ISceneNodeViewModel SelectedNodeViewModel { get { return _selectedNodeViewModel; } set { SetAndNotify(ref _selectedNodeViewModel, value); } }
 
-        public SceneExplorerViewModel(SceneNodeViewFactory sceneNodeViewFactory, CommandExecutor commandExecutor, SelectionManager selectionManager, SceneManager sceneManager)
+        public SceneExplorerViewModel(SceneNodeViewFactory sceneNodeViewFactory, CommandExecutor commandExecutor, SelectionManager selectionManager, SceneManager sceneManager, CommandFactory commandFactory)
         {
             _sceneNodeViewFactory = sceneNodeViewFactory;
             _sceneManager = sceneManager;
@@ -40,7 +41,7 @@ namespace KitbasherEditor.ViewModels
             _sceneManager.SceneObjectAdded += (a, b) => RebuildTree();
             _sceneManager.SceneObjectRemoved += (a, b) => RebuildTree();
 
-            ContextMenu = new SceneExplorerContextMenuHandler(commandExecutor, _sceneManager);
+            ContextMenu = new SceneExplorerContextMenuHandler(commandExecutor, _sceneManager, commandFactory);
             ContextMenu.SelectedNodesChanged += OnSelectedNodesChanged; // ToDo - MediatR
 
             SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;

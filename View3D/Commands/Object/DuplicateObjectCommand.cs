@@ -1,13 +1,8 @@
 ﻿using CommonControls.Common;
-using MonoGame.Framework.WpfInterop;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using View3D.Components.Component;
 using View3D.Components.Component.Selection;
-using View3D.Rendering;
 using View3D.SceneNodes;
 
 namespace View3D.Commands.Object
@@ -19,19 +14,16 @@ namespace View3D.Commands.Object
         SelectionManager _selectionManager;
 
         ISelectionState _oldState;
-        public DuplicateObjectCommand(List<ISceneNode> objectsToCopy)
+        public void Configure(List<ISceneNode> objectsToCopy)
         {
             _objectsToCopy = new List<ISceneNode>(objectsToCopy);
         }
 
-        public override string GetHintText()
-        {
-            return "Duplicate Object";
-        }
+        public override string GetHintText() => "Duplicate Object";
 
-        public override void Initialize(IComponentManager componentManager)
+        public DuplicateObjectCommand(SelectionManager selectionManager)
         {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
+            _selectionManager = selectionManager;
         }
 
         protected override void ExecuteCommand()

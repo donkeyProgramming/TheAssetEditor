@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using View3D.Commands;
 using View3D.Commands.Vertex;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
@@ -28,14 +29,15 @@ namespace View3D.Components.Gizmo
         TransformVertexCommand _activeCommand;
 
         List<MeshObject> _effectedObjects;
+        private readonly CommandFactory _commandFactory;
         ISelectionState _selectionState;
 
         Matrix _totalGizomTransform = Matrix.Identity;
         bool _invertedWindingOrder = false;
 
-        public TransformGizmoWrapper(List<MeshObject> effectedObjects, ISelectionState vertexSelectionState)
+        public TransformGizmoWrapper(CommandFactory commandFactory, List<MeshObject> effectedObjects, ISelectionState vertexSelectionState)
         {
-           
+            _commandFactory = commandFactory;
             _selectionState = vertexSelectionState;
 
             if (_selectionState as ObjectSelectionState != null)
@@ -71,7 +73,7 @@ namespace View3D.Components.Gizmo
             }
 
             _totalGizomTransform = Matrix.Identity;
-            _activeCommand = new TransformVertexCommand(_effectedObjects, Position);
+            _activeCommand = _commandFactory.Create<TransformVertexCommand>().Configure(x=>x.Configure(_effectedObjects, Position)).Build();
         }
 
         public void Stop(CommandExecutor commandManager)
@@ -185,18 +187,18 @@ namespace View3D.Components.Gizmo
             return Position;
         }
 
-        public static TransformGizmoWrapper CreateFromSelectionState(ISelectionState state)
+        public static TransformGizmoWrapper CreateFromSelectionState(ISelectionState state, CommandFactory commandFactory)
         {
             if (state is ObjectSelectionState objectSelectionState)
             {
                 var transformables = objectSelectionState.CurrentSelection().Where(x => x is ITransformable).Select(x => x.Geometry);
                 if (transformables.Any())
-                    return new TransformGizmoWrapper(transformables.ToList(), state);
+                    return new TransformGizmoWrapper(commandFactory, transformables.ToList(), state);
             }
             else if (state is VertexSelectionState vertexSelectionState)
             {
                 if (vertexSelectionState.SelectedVertices.Count != 0)
-                    return new  TransformGizmoWrapper(new List<MeshObject>(){vertexSelectionState.RenderObject.Geometry}, vertexSelectionState);
+                    return new  TransformGizmoWrapper(commandFactory, new List<MeshObject>(){vertexSelectionState.RenderObject.Geometry}, vertexSelectionState);
             }
             return null;
         }

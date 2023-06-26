@@ -1,13 +1,7 @@
 ﻿using CommonControls.Common;
-using MonoGame.Framework.WpfInterop;
-using Serilog;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using View3D.Components.Component;
 using View3D.Components.Component.Selection;
-using View3D.Rendering;
 using View3D.SceneNodes;
 
 namespace View3D.Commands.Object
@@ -18,25 +12,24 @@ namespace View3D.Commands.Object
         SelectionManager _selectionManager;
         ISelectionState _oldState;
 
-        public DeleteObjectsCommand(List<ISelectable> itemsToDelete)
+
+        public DeleteObjectsCommand(SelectionManager selectionManager)
+        {
+            _selectionManager = selectionManager;
+        }
+
+        public void Configure(List<ISelectable> itemsToDelete)
         {
             _itemsToDelete = new List<SceneNode>(itemsToDelete.Select(x=>x as SceneNode));
         }
 
-        public DeleteObjectsCommand(SceneNode itemToDelete)
+        public void Configure(SceneNode itemToDelete)
         {
             _itemsToDelete = new List<SceneNode>() { itemToDelete };
         }
 
-        public override string GetHintText()
-        {
-            return "Delete Object";
-        }
+        public override string GetHintText() => "Delete Object";
 
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-        }
 
         protected override void ExecuteCommand()
         {
