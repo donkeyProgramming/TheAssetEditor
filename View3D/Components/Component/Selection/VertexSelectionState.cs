@@ -46,7 +46,7 @@ namespace View3D.Components.Component.Selection
             }
 
             UpdateWeights(_selectionDistanceFallof);
-            SelectionChanged?.Invoke(this);
+            SelectionChanged?.Invoke(this, true);
         }
 
         public void UpdateWeights(float distanceOffset)
@@ -106,7 +106,7 @@ namespace View3D.Components.Component.Selection
         public void Clear()
         {
             SelectedVertices.Clear();
-            SelectionChanged?.Invoke(this);
+            SelectionChanged?.Invoke(this, true);
         }
 
         public void EnsureSorted()

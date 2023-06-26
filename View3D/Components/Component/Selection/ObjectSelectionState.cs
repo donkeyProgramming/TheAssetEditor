@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using View3D.Rendering;
 using View3D.SceneNodes;
 
 namespace View3D.Components.Component.Selection
@@ -19,7 +18,7 @@ namespace View3D.Components.Component.Selection
             else if (!onlyRemove)
                 _selectionList.Add(newSelectionItem);
 
-            SelectionChanged?.Invoke(this);
+            SelectionChanged?.Invoke(this, true);
         }
 
         public void ModifySelection(IEnumerable<ISelectable> newSelectionItems, bool onlyRemove)
@@ -41,7 +40,7 @@ namespace View3D.Components.Component.Selection
                 }
             }
 
-            SelectionChanged?.Invoke(this);
+            SelectionChanged?.Invoke(this, true);
         }
 
 
@@ -55,7 +54,7 @@ namespace View3D.Components.Component.Selection
             if (_selectionList.Count != 0)
             {
                 _selectionList.Clear();
-                SelectionChanged?.Invoke(this);
+                SelectionChanged?.Invoke(this, true);
             }
         }
 

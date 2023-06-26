@@ -31,7 +31,7 @@ namespace View3D.Components.Component.Selection
                         SelectedFaces.Add(newSelectionItem);
                 }
             }
-            SelectionChanged?.Invoke(this);
+            SelectionChanged?.Invoke(this, true);
         }
 
 
@@ -43,7 +43,7 @@ namespace View3D.Components.Component.Selection
         public void Clear()
         {
             SelectedFaces.Clear();
-            SelectionChanged?.Invoke(this);
+            SelectionChanged?.Invoke(this, true);
         }
 
 

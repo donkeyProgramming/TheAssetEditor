@@ -14,7 +14,7 @@ namespace View3D.Components.Component.Selection
     };
 
 
-    public delegate void SelectionStateChanged(ISelectionState state);
+    public delegate void SelectionStateChanged(ISelectionState state, bool sendEvent);
     public interface ISelectionState
     {
         ISelectionState Clone();

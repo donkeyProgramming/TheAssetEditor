@@ -80,8 +80,8 @@ namespace KitbasherEditor
             RegisterGameComponent<FpsComponent>(serviceCollection);
             RegisterGameComponent<ArcBallCamera>(serviceCollection);
             RegisterGameComponent<SceneManager>(serviceCollection);
-            RegisterGameComponent<SelectionManager>(serviceCollection);
             RegisterGameComponent<GizmoComponent>(serviceCollection);
+            RegisterGameComponent<SelectionManager>(serviceCollection);
             RegisterGameComponent<SelectionComponent>(serviceCollection);
             RegisterGameComponent<ObjectEditor>(serviceCollection);
             RegisterGameComponent<FaceEditor>(serviceCollection);

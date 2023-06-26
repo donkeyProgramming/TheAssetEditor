@@ -38,7 +38,6 @@ namespace View3D.Components.Component.Selection
             _deviceResolverComponent = deviceResolverComponent;
         }
 
-        bool _sendEvents = false;
         public override void Initialize()
         {
             CreateSelectionSate(GeometrySelectionMode.Object, null, false);
@@ -57,7 +56,7 @@ namespace View3D.Components.Component.Selection
             base.Initialize();
         }
 
-        public ISelectionState CreateSelectionSate(GeometrySelectionMode mode, ISelectable selectedObj, bool sendEvent)
+        public ISelectionState CreateSelectionSate(GeometrySelectionMode mode, ISelectable selectedObj, bool sendEvent = true)
         {
             if (_currentState != null)
             {
@@ -84,7 +83,7 @@ namespace View3D.Components.Component.Selection
             }
 
             _currentState.SelectionChanged += SelectionManager_SelectionChanged;
-            SelectionManager_SelectionChanged(_currentState);
+            SelectionManager_SelectionChanged(_currentState, sendEvent);
             return _currentState;
         }
 
@@ -99,12 +98,12 @@ namespace View3D.Components.Component.Selection
             _currentState.SelectionChanged -= SelectionManager_SelectionChanged;
             _currentState = state;
             _currentState.SelectionChanged += SelectionManager_SelectionChanged;
-            SelectionManager_SelectionChanged(_currentState);
+            SelectionManager_SelectionChanged(_currentState, true);
         }
 
-        private void SelectionManager_SelectionChanged(ISelectionState state)
+        private void SelectionManager_SelectionChanged(ISelectionState state, bool sendEvent)
         {
-            if(_sendEvents)
+            //if(sendEvent)
              _mediator.PublishSync(new SelectionChangedEvent { NewState = state });
         }
 
