@@ -22,7 +22,7 @@ namespace KitbasherEditor.ViewModels
         PackFile _skeletonPackFile;
         PackFile Animation;
 
-        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly SceneManager _sceneManager;
         AnimationPlayer _player;
 

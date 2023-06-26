@@ -1,31 +1,21 @@
 ﻿using AssetEditor.Views.Settings;
-using Audio;
 using CommonControls.BaseDialogs.ToolSelector;
 using CommonControls.Common;
-using CommonControls.FileTypes.AnimationPack;
-using CommonControls.FileTypes.DB;
 using CommonControls.FileTypes.MetaData;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Net.NetworkInformation;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
 namespace AssetEditor.ViewModels
 {
-
-
     class MainViewModel : NotifyPropertyChangedImpl, IEditorCreator, IDropTarget<IEditorViewModel, bool>
     {
         ILogger _logger = Logging.Create<MainViewModel>();

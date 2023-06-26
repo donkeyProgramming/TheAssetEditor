@@ -90,8 +90,8 @@ namespace KitbasherEditor.ViewModels
         {
             if (node != null && node.NodeType == NodeType.File)
             {
-                var extention = Path.GetExtension(node.Name).ToLower();
-                if (extention == ".rigid_model_v2" || extention == ".wsmodel" || extention == ".variantmeshdefinition")
+                var extension = Path.GetExtension(node.Name).ToLower();
+                if (extension == ".rigid_model_v2" || extension == ".wsmodel" || extension == ".variantmeshdefinition")
                     return true;
             }
             return false;

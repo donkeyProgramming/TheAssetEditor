@@ -92,7 +92,6 @@ namespace View3D.Components.Component.Selection
         public ISelectionState GetStateCopy() => _currentState.Clone();
         public State GetStateCopy<State>() where State : class, ISelectionState => GetState<State>().Clone() as State;
 
-        
         public void SetState(ISelectionState state)
         {
             _currentState.SelectionChanged -= SelectionManager_SelectionChanged;

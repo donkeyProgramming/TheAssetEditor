@@ -6,6 +6,7 @@ using CommonControls.Services;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels;
 using KitbasherEditor.ViewModels.MenuBarViews;
+using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
 using MediatR;
@@ -68,9 +69,10 @@ namespace KitbasherEditor
 
             serviceCollection.AddScoped<IDeviceResolver, DeviceResolverComponent>(x => x.GetService<DeviceResolverComponent>());
             serviceCollection.AddScoped<CommandExecutor>();
-
-
             
+            serviceCollection.AddScoped<SceneNodeViewFactory>();
+
+
 
             RegisterGameComponent<DeviceResolverComponent>(serviceCollection);
             RegisterGameComponent<CommandStackRenderer>(serviceCollection);
