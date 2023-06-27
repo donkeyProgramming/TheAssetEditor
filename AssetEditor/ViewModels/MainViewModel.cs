@@ -282,6 +282,7 @@ namespace AssetEditor.ViewModels
 
         public void OpenFile(PackFile file)
         {
+            
             if (file == null)
             {
                 _logger.Here().Error($"Attempting to open file, but file is NULL");

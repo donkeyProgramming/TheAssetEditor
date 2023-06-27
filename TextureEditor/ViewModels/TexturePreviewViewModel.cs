@@ -14,13 +14,6 @@ namespace TextureEditor.ViewModels
         public NotifyAttr<ImageSource> ActiveImage { get; set; } = new NotifyAttr<ImageSource>();
         public NotifyAttr<ImageSource> CheckBoardImage { get; set; } = new NotifyAttr<ImageSource>();
 
-
-       //
-       //    <ComboBox  HorizontalAlignment="Center" VerticalAlignment="Center" 
-       //                       SelectedValue="{Binding Path=UvChannelSelectedValue.Value, UpdateSourceTrigger=PropertyChanged}" 
-       //                       ItemsSource="{Binding Path=UvChannelPossibleValues, UpdateSourceTrigger=PropertyChanged}"/>
-       //
-
         public NotifyAttr<string> ImagePath { get; set; } = new NotifyAttr<string>();
         public NotifyAttr<string> Format { get; set; } = new NotifyAttr<string>();
         public NotifyAttr<int> Width { get; set; } = new NotifyAttr<int>();

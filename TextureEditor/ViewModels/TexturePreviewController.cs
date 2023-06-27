@@ -18,8 +18,6 @@ using View3D.Utility;
 
 namespace TextureEditor.ViewModels
 {
-    // This really needs some cleanup
-
     public class TextureEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel, IDisposable
     {
         ILogger _logger = Logging.Create<TextureEditorViewModel>();
