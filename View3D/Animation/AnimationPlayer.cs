@@ -76,6 +76,7 @@ namespace View3D.Animation
         public bool IsEnabled { get; set; } = false;
         public bool LoopAnimation { get; set; } = true;
         public bool MarkedForRemoval { get; set; } = false;
+        public string Description { get; set; }
 
         public List<IAnimationChangeRule> AnimationRules { get; set; } = new List<IAnimationChangeRule>();
 
@@ -112,7 +113,7 @@ namespace View3D.Animation
                 Refresh();
 
                 var selection = ComponentManager.GetComponent<SelectionManager>().GetState<BoneSelectionState>();
-                if(selection != null)
+                if(selection != null && Description == "Rider")
                 {
                     selection.CurrentAnimation = _animationClip;
                     selection.Skeleton = _skeleton;

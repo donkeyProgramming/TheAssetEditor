@@ -195,6 +195,7 @@ namespace AnimationEditor.Common.AnimationPlayer
         void NextFrame(AssetViewModel item)
         {
             item.Player.Pause();
+            item.Player.Description = item.Description;
             item.Player.CurrentFrame++;
 
             foreach (var attachedItem in item.MetaDataItems)
@@ -202,6 +203,7 @@ namespace AnimationEditor.Common.AnimationPlayer
                 if (attachedItem.Player != null)
                 {
                     attachedItem.Player.Pause();
+                    attachedItem.Player.Description = item.Description;
                     attachedItem.Player.CurrentFrame = item.Player.CurrentFrame;
                 }
             }
