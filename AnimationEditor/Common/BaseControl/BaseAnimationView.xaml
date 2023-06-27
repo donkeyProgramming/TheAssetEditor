@@ -11,6 +11,7 @@
              xmlns:superview="clr-namespace:AnimationEditor.SuperView"
              xmlns:skeletoneditor="clr-namespace:AnimationEditor.SkeletonEditor"
              xmlns:animationbuilder="clr-namespace:AnimationEditor.AnimationBuilder"
+             xmlns:animationkeyframeeditor="clr-namespace:AnimationEditor.AnimationKeyframeEditor"
              mc:Ignorable="d" >
     <Grid>
         <Grid.ColumnDefinitions>
@@ -88,6 +89,10 @@
 
                             <DataTemplate DataType="{ x:Type animationbuilder:Editor}">
                                 <animationbuilder:EditorView  />
+                            </DataTemplate>
+
+                            <DataTemplate DataType="{ x:Type animationkeyframeeditor:Editor}">
+                                <animationkeyframeeditor:EditorView  />
                             </DataTemplate>
 
                         </ContentControl.Resources>

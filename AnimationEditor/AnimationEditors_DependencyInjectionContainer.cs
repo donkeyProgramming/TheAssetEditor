@@ -1,4 +1,5 @@
 ﻿using AnimationEditor.AnimationBuilder;
+using AnimationEditor.AnimationKeyframeEditor;
 using AnimationEditor.AnimationTransferTool;
 using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.Common.BaseControl;
@@ -14,6 +15,7 @@ namespace AnimationEditor
     {
         public static void Register(IServiceCollection serviceCollection)
         {
+            serviceCollection.AddTransient<AnimationKeyframeEditorViewModel>();
             serviceCollection.AddTransient<MountAnimationCreatorViewModel>();
             serviceCollection.AddTransient<CampaignAnimationCreatorViewModel>();
             serviceCollection.AddTransient<AnimationTransferToolViewModel>();
@@ -25,6 +27,7 @@ namespace AnimationEditor
 
         public static void RegisterTools(IToolFactory factory)
         {
+            factory.RegisterTool<AnimationKeyframeEditorViewModel, BaseAnimationView>();
             factory.RegisterTool<MountAnimationCreatorViewModel, BaseAnimationView>();
             factory.RegisterTool<CampaignAnimationCreatorViewModel, BaseAnimationView>();
             factory.RegisterTool<AnimationTransferToolViewModel, BaseAnimationView>();

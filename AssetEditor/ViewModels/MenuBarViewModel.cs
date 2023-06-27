@@ -3,6 +3,7 @@ using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SuperView;
+using AnimationEditor.AnimationKeyframeEditor;
 using AssetEditor.Views.Settings;
 using CommonControls.BaseDialogs;
 using CommonControls.Common;
@@ -63,6 +64,7 @@ namespace AssetEditor.ViewModels
         public ICommand OpenAssetEditorFolderCommand { get; set; }
         public ICommand OpenAnimMetaDecocderCommand { get; set; }
         public ICommand OpenMountCreatorCommand { get; set; }
+        public ICommand OpenAnimationKeyframeCommand { get; set; }
         public ICommand OpenAnimationBatchExporterCommand { get; set; }
         public ICommand OpenWh2AnimpackUpdaterCommand { get; set; }
         public ICommand OpenAnimationBuilderCommand { get; set; }
@@ -126,6 +128,7 @@ namespace AssetEditor.ViewModels
             OpenKitbashEditorCommand = new RelayCommand(OpenKitbasherTool);
             OpenAnimMetaDecocderCommand = new RelayCommand(OpenAnimMetaDecocder);
             OpenMountCreatorCommand = new RelayCommand(OpenMountCreator);
+            OpenAnimationKeyframeCommand = new RelayCommand(OpenAnimationKeyframeEditor);
             OpenPropCreatorCommand = new RelayCommand(OpenPropCreatorEditor);
             OpenCampaignAnimCreatorCommand = new RelayCommand(OpenCampaignAnimCreatorEditor);
             OpenAnimationTransferToolCommand = new RelayCommand(OpenAnimationTransferTool);
@@ -271,6 +274,12 @@ namespace AssetEditor.ViewModels
         void OpenMountCreator()
         {
             var editorView = _toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            EditorCreator.CreateEmptyEditor(editorView);
+        }
+
+        void OpenAnimationKeyframeEditor()
+        {
+            var editorView = _toolFactory.CreateEditorViewModel<AnimationKeyframeEditorViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
 

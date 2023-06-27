@@ -76,6 +76,7 @@
                 <MenuItem Header="Animation Transfer Tool" Command="{Binding MenuBar.OpenAnimationTransferToolCommand}" />
                 <MenuItem Header="Super view" Command="{Binding MenuBar.OpenSuperViewToolCommand}" />
                 <MenuItem Header="Skeleton Editor" Command="{Binding MenuBar.OpenTechSkeletonEditorCommand}" />
+                <MenuItem Header="Animation Keyframe Editor (WIP)" Command="{Binding MenuBar.OpenAnimationKeyframeCommand}" />
 
                 <Separator/>
                 <MenuItem Header="Animation File Batch converter" Command="{Binding MenuBar.OpenAnimationBatchExporterCommand}" />
