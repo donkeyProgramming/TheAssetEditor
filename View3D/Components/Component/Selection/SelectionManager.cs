@@ -175,7 +175,7 @@ namespace View3D.Components.Component.Selection
                         //_lineRenderer.AddLine(Vector3.Transform(currentBoneMatrix.Translation, parentWorld), Vector3.Transform(parentBoneMatrix.Translation, parentWorld));
                         var bone = currentFrame.GetSkeletonAnimatedWorld(skeleton, boneIdx);
                         bone.Decompose(out var _, out var _, out var trans);
-                        _lineGeometry.AddCube(Matrix.CreateScale(0.05f) *  bone * renderMatrix * parentWorld, Color.Red);
+                        _lineGeometry.AddCube(Matrix.CreateScale(0.06f) *  bone * renderMatrix * parentWorld, Color.Red);
                         _renderEngine.AddRenderItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = _lineGeometry, ModelMatrix = Matrix.Identity });
 
                     }

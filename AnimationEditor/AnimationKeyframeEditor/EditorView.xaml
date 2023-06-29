@@ -192,10 +192,10 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" Content="Select"  Click="{s:MethodBinding EnterSelectMode}" Margin="0,0,2,0"/>
-            <Button Grid.Column="1" Content="Select previous bones"  Click="{s:MethodBinding CreateBoneAction}" Margin="0,0,2,0"/>
-            <Button Grid.Column="2" Content="Move"  Click="{s:MethodBinding CreateBoneAction}" Margin="0,0,2,0"/>
-            <Button Grid.Column="3" Content="Rotate"  Click="{s:MethodBinding DuplicateBoneAction}"  Margin="2,0,2,0"/>
-            <Button Grid.Column="4" Content="Scale"  Click="{s:MethodBinding CopyBoneAction}" Margin="2,0,0,0"/>
+            <Button Grid.Column="1" Content="Select previous bones"  Click="{s:MethodBinding SelectPreviousBones}" Margin="0,0,2,0"/>
+            <Button Grid.Column="2" Content="Move"  Click="{s:MethodBinding EnterMoveMode}" Margin="0,0,2,0"/>
+            <Button Grid.Column="3" Content="Rotate"  Click="{s:MethodBinding EnterRotateMode}"  Margin="2,0,2,0"/>
+            <Button Grid.Column="4" Content="Scale"  Click="{s:MethodBinding EnterScaleMode}" Margin="2,0,0,0"/>
         </Grid>
         <Grid DockPanel.Dock="Top" Margin="4,5,5,0">
 

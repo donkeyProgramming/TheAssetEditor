@@ -37,7 +37,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private SelectionManager _selectionManager;
         private SelectionComponent _selectionComponent;
         private TransformToolViewModel _transformToolVIewModel;
-        private GizmoComponent _gizmoComponent;
+        private GizmoActions _gizmoActions;
         private CommandExecutor _commandManager;
         private SceneManager _sceneManager;
 
@@ -67,13 +67,13 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _rider = rider;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _selectionManager = componentManager.GetComponent<SelectionManager>();
-            _gizmoComponent = componentManager.GetComponent<GizmoComponent>();
             _commandManager = componentManager.GetComponent<CommandExecutor>();
             _selectionComponent = componentManager.GetComponent<SelectionComponent>();
             _sceneManager = componentManager.GetComponent<SceneManager>();
-
-            _transformToolVIewModel = new TransformToolViewModel(componentManager);
             
+            _transformToolVIewModel = new TransformToolViewModel(componentManager);
+            _gizmoActions = new GizmoActions(_transformToolVIewModel, componentManager);
+
 
             DisplayGeneratedSkeleton = new NotifyAttr<bool>(true, (value) => _newAnimation.ShowSkeleton.Value = value);
             DisplayGeneratedMesh = new NotifyAttr<bool>(true, (value) => { if (_newAnimation.MainNode != null) _newAnimation.ShowMesh.Value = value; });
@@ -219,6 +219,20 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
         }
 
+        public void EnterMoveMode()
+        {         
+            _gizmoActions.Move();
+        }
+
+        public void EnterRotateMode()
+        {
+            _gizmoActions.Rotate();
+        }
+
+        public void EnterScaleMode()
+        {
+            _gizmoActions.Scale();
+        }
 
     }
 }

@@ -80,23 +80,34 @@ namespace View3D.Components.Gizmo
 
                 var bones = boneSelectionState.SelectedBones;
                 var totalBones = bones.Count;
+                var rotations = new List<Quaternion>();
                 foreach (var boneIdx in bones)
                 {
                     var bone = currentFrame.GetSkeletonAnimatedWorld(skeleton, boneIdx);
                     bone.Decompose(out var scale, out var rot, out var trans);
                     Position += trans;
-
-                    //TODO: FIXME compute the average quarternion of selected bones
-                    Orientation = rot;
-                    //TODO: FIXME compute the average scale of selected bones
-                    Scale = scale;
+                    Scale += scale;
+                    rotations.Add(rot);
 
                 }
 
+                Orientation = AverageOrientation(rotations);
                 Position = (Position / totalBones);
+                Scale = (Scale / totalBones);
             }
 
         }
+
+        private Quaternion AverageOrientation(List<Quaternion> orientations) 
+        {
+            Quaternion average = orientations[0];
+            for (int i = 1; i < orientations.Count; i++)
+            {
+                average = Quaternion.Slerp(average, orientations[i], 1.0f / (i + 1));
+            }
+            return average;
+        }
+
 
         public void Start(CommandExecutor commandManager)
         {
@@ -214,7 +225,7 @@ namespace View3D.Components.Gizmo
                 if (pivotType == PivotType.ObjectCenter)
                     objCenter = Position;
 
-                TransformBone(Matrix.CreateTranslation(Position) * Matrix.CreateFromQuaternion(Orientation) * Matrix.CreateScale(Scale), objCenter);
+                TransformBone(Matrix.CreateTranslation(Position) /* Matrix.CreateFromQuaternion(Orientation) * Matrix.CreateScale(Scale)*/, objCenter);
                 return;
             }
 
