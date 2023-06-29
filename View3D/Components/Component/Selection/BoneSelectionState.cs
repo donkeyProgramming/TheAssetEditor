@@ -60,6 +60,10 @@ namespace View3D.Components.Component.Selection
             SelectedBones = SelectedBones.Distinct().OrderBy(x => x).ToList();
         }
 
+        public void DeselectAnimRootNode()
+        {
+            SelectedBones.RemoveAll(bone => bone == 0);
+        }
 
         public ISelectionState Clone()
         {

@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CommonControls\CommonControls.csproj" />
+    <ProjectReference Include="..\KitbasherEditor\KitbasherEditor.csproj" />
     <ProjectReference Include="..\View3D\View3D.csproj" />
   </ItemGroup>
 

@@ -4,6 +4,7 @@ using AnimationEditor.MountAnimationCreator.ViewModels;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
+using KitbasherEditor.ViewModels.MenuBarViews;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
 using SharpDX.Direct3D9;
@@ -11,9 +12,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using View3D.Animation;
+using View3D.Commands.Object;
+using View3D.Components.Component;
 using View3D.Components.Component.Selection;
+using View3D.Components.Gizmo;
+using View3D.SceneNodes;
 using SkeletonBoneNode = AnimationEditor.Common.ReferenceModel.SkeletonBoneNode;
 
 namespace AnimationEditor.AnimationKeyframeEditor
@@ -28,7 +35,16 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private AssetViewModel _rider;
         private SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private SelectionManager _selectionManager;
+        private SelectionComponent _selectionComponent;
+        private TransformToolViewModel _transformToolVIewModel;
+        private GizmoComponent _gizmoComponent;
+        private CommandExecutor _commandManager;
+        private SceneManager _sceneManager;
 
+        private int _currentFrameNumber = 0;
+        public int CurrentFrameNumber { get { return _currentFrameNumber; } set { SetAndNotifyWhenChanged(ref _currentFrameNumber, value); } }
+
+        public NotifyAttr<bool> AllowToSelectAnimRoot { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> CanPreview { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> DisplayGeneratedSkeleton { get;  set; } = new NotifyAttr<bool>();
         public NotifyAttr<bool> DisplayGeneratedMesh { get;  set; } = new NotifyAttr<bool>(); 
@@ -40,7 +56,9 @@ namespace AnimationEditor.AnimationKeyframeEditor
         public AnimationSettingsViewModel AnimationSettings { get; set; } = new AnimationSettingsViewModel();
 
 
-        public Editor(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, AssetViewModel mount, AssetViewModel newAnimation, IComponentManager componentManager, ApplicationSettingsService applicationSettings)
+        public Editor(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
+                     AssetViewModel rider, AssetViewModel mount, AssetViewModel newAnimation, 
+                     IComponentManager componentManager, ApplicationSettingsService applicationSettings)
         {
             _pfs = pfs;
             _newAnimation = newAnimation;
@@ -49,6 +67,13 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _rider = rider;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _selectionManager = componentManager.GetComponent<SelectionManager>();
+            _gizmoComponent = componentManager.GetComponent<GizmoComponent>();
+            _commandManager = componentManager.GetComponent<CommandExecutor>();
+            _selectionComponent = componentManager.GetComponent<SelectionComponent>();
+            _sceneManager = componentManager.GetComponent<SceneManager>();
+
+            _transformToolVIewModel = new TransformToolViewModel(componentManager);
+            
 
             DisplayGeneratedSkeleton = new NotifyAttr<bool>(true, (value) => _newAnimation.ShowSkeleton.Value = value);
             DisplayGeneratedMesh = new NotifyAttr<bool>(true, (value) => { if (_newAnimation.MainNode != null) _newAnimation.ShowMesh.Value = value; });
@@ -71,7 +96,28 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             MountSkeletonChanged(_mount.Skeleton);
             RiderSkeletonChanges(_rider.Skeleton);
+
+            _rider.Player.OnFrameChanged += OnFrameTick;
+            _selectionManager.SelectionChanged += OnSelectionChanged;
         }
+
+        private void OnSelectionChanged(ISelectionState state)
+        {
+            if(state is BoneSelectionState boneSelectionState)
+            {
+                if(!AllowToSelectAnimRoot.Value)
+                {
+                    boneSelectionState.DeselectAnimRootNode();
+                }
+            }
+        }
+
+        private void OnFrameTick(int currentFrame)
+        {
+            CurrentFrameNumber = currentFrame + 1;
+        }
+
+        
 
         private void OutputAnimationSetSelected(IAnimationBinGenericFormat animationSet)
         {
@@ -129,5 +175,50 @@ namespace AnimationEditor.AnimationKeyframeEditor
             UpdateCanSaveAndPreviewStates();
             MountLinkController.ReloadFragments(false, true);
         }
+
+        public void InsertNewFrame()
+        {
+            MessageBox.Show("insert new frame");
+        }
+
+        public void DuplicateFrame()
+        {
+            MessageBox.Show("DuplicateFrame");
+        }
+
+        private ISelectable FindSelectableObject(ISceneNode node)
+        {
+            if (node is ISelectable selectableNode) return selectableNode;
+            foreach (var slot in node.Children)
+            {
+                return FindSelectableObject(slot);   
+            }
+            return null;
+        }
+
+        public void EnterSelectMode()
+        {
+            if (_sceneManager.RootNode.Children.Count == 0) return;
+
+            var root = _sceneManager.RootNode.Children[0];
+            if (root.Children.Count < 2) return;
+            var variantMeshRoot = root.Children[1];
+            if (variantMeshRoot.Children.Count == 0) return;
+            var selectableNode = FindSelectableObject(variantMeshRoot);
+
+            if(selectableNode != null)
+            {
+                var selectCommand = new ObjectSelectionCommand(new List<ISelectable> { selectableNode }, false, false);
+                _commandManager.ExecuteCommand(selectCommand);
+                _selectionComponent.SetBoneSelectionMode();
+                _rider.Player.Pause();
+                _rider.Player.CurrentFrame++;
+                if (_rider.Player.CurrentFrame + 1 == _rider.Player.FrameCount()) return;
+                _rider.Player.CurrentFrame--;
+
+            }
+        }
+
+
     }
 }

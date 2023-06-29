@@ -8,7 +8,7 @@
              xmlns:s="http://schemas.singulink.com/xaml"
              xmlns:nodes="clr-namespace:AnimationEditor.AnimationBuilder.Nodes"
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls"
-             xmlns:filterdialog="clr-namespace:CommonControls.FilterDialog;assembly=CommonControls" 
+             xmlns:filterdialog="clr-namespace:CommonControls.FilterDialog;assembly=CommonControls" xmlns:animationkeyframeeditor="clr-namespace:AnimationEditor.AnimationKeyframeEditor" d:DataContext="{d:DesignInstance Type=animationkeyframeeditor:Editor}"
              mc:Ignorable="d" 
              d:DesignHeight="850" d:DesignWidth="800">
     <UserControl.Resources>
@@ -161,8 +161,16 @@
 
     <DockPanel LastChildFill="False">
         <Label  DockPanel.Dock="Top" Content="Animation Key Frame Editor" FontSize="18" FontWeight="Bold"/>
-        <Label  DockPanel.Dock="Top" Content="You are currently editing frame Nr: 0" FontSize="18" FontWeight="Bold"/>
+        <Label  DockPanel.Dock="Top" ContentStringFormat="You are currently editing frame Nr: {0}"  Content="{Binding CurrentFrameNumber, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" FontSize="18" FontWeight="Bold"/>
 
+        <Grid DockPanel.Dock="Top" Margin="5,0,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <CheckBox DockPanel.Dock="Top" Content="Allow to select animroot node" IsChecked="{Binding AllowToSelectAnimRoot.Value, UpdateSourceTrigger=PropertyChanged}"  />
+        </Grid>
+        
         <Grid DockPanel.Dock="Top" Margin="5,0,5,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -170,9 +178,9 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="Insert New Frame"  Click="{s:MethodBinding CreateBoneAction}" Margin="0,0,2,0"/>
-            <Button Grid.Column="1" Content="Duplicate Frame"  Click="{s:MethodBinding DuplicateBoneAction}"  Margin="2,0,2,0"/>
-            <Button Grid.Column="2" Content="Reset Pose"  Click="{s:MethodBinding CopyBoneAction}" Margin="2,0,0,0"/>
+            <Button Grid.Column="0" Content="Insert New Frame"  Click="{s:MethodBinding InsertNewFrame}" Margin="0,0,2,0"/>
+            <Button Grid.Column="1" Content="Duplicate Frame"  Click="{s:MethodBinding DuplicateFrame}"  Margin="2,0,2,0"/>
+            <Button Grid.Column="2" Content="Reset Pose"  Click="{s:MethodBinding ResetPose}" Margin="2,0,0,0"/>
         </Grid>
         <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
             <Grid.ColumnDefinitions>
@@ -183,7 +191,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="Select"  Click="{s:MethodBinding CreateBoneAction}" Margin="0,0,2,0"/>
+            <Button Grid.Column="0" Content="Select"  Click="{s:MethodBinding EnterSelectMode}" Margin="0,0,2,0"/>
             <Button Grid.Column="1" Content="Select previous bones"  Click="{s:MethodBinding CreateBoneAction}" Margin="0,0,2,0"/>
             <Button Grid.Column="2" Content="Move"  Click="{s:MethodBinding CreateBoneAction}" Margin="0,0,2,0"/>
             <Button Grid.Column="3" Content="Rotate"  Click="{s:MethodBinding DuplicateBoneAction}"  Margin="2,0,2,0"/>
