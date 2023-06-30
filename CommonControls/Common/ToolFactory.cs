@@ -95,7 +95,7 @@ namespace CommonControls.Common
             where View : Control;
     }
 
-    public class ToolFactory 
+    public class ToolFactory :IToolFactory
     {
         ILogger _logger = Logging.Create<IToolFactory>();
         IServiceProvider _serviceProvider;
@@ -195,6 +195,14 @@ namespace CommonControls.Common
             }
 
             return output.OrderBy(x=>x.IsCoreTool).ToList();
+        }
+
+        public ViewModel Create<ViewModel>() where ViewModel : IEditorViewModel
+        {
+            var scope = _serviceProvider.CreateScope();
+            var instance = scope.ServiceProvider.GetService< ViewModel>();
+            instance.ServiceScope = scope;
+            return instance;
         }
     }
 

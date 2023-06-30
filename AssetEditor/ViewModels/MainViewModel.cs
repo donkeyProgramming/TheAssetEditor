@@ -308,6 +308,8 @@ namespace AssetEditor.ViewModels
 
             var index = CurrentEditorsList.IndexOf(tool);
             CurrentEditorsList.RemoveAt(index);
+            if (tool.ServiceScope != null)
+                tool.ServiceScope.Dispose();
             tool.Close();
         }
 

@@ -21,6 +21,7 @@ using TextureEditor;
 using View3D;
 using MediatR;
 using View3D.Components;
+using KitbasherEditor.Views;
 
 namespace AssetEditor
 {
@@ -57,13 +58,12 @@ namespace AssetEditor
             services.AddMediatR(typeof(App));
 
             services.AddSingleton<ApplicationSettingsService>();
-            services.AddSingleton<IToolFactory, IToolFactory>();
+            services.AddSingleton<IToolFactory, ToolFactory>();
             services.AddSingleton<PackFileDataBase>();
             services.AddSingleton<SkeletonAnimationLookUpHelper>();
             services.AddSingleton<CopyPasteManager>();
             services.AddSingleton<GameInformationFactory>();
-       
-
+            
             services.AddScoped<MainWindow>();
             services.AddScoped<MainViewModel>();
             services.AddScoped<SettingsWindow>();
