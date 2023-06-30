@@ -4,9 +4,17 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Serialization;
 
 namespace MonoGame.Framework.WpfInterop
 {
+
+
+
+    //public interface
+
+
     public delegate void SceneInitializedDelegate(WpfGame scene);
 
 

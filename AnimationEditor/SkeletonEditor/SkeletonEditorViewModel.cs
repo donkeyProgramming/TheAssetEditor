@@ -1,7 +1,8 @@
 ﻿using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.Common;
-using CommonControls.FileTypes.DB;
 using CommonControls.Services;
+using View3D.Components;
+using View3D.Scene;
 
 namespace AnimationEditor.SkeletonEditor
 {
@@ -9,15 +10,16 @@ namespace AnimationEditor.SkeletonEditor
     {
         CopyPasteManager _copyPasteManager;
 
-        public SkeletonEditorViewModel(IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService) 
-            : base(toolFactory, pfs, skeletonHelper, applicationSettingsService, "not_in_use1", "not_in_use2", false)
+        public SkeletonEditorViewModel(IComponentInserter componentInserter, MainScene scene, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService) 
+            : base(scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
         {
+            Set("not_in_use1", "not_in_use2", false);
             _copyPasteManager = copyPasteManager;
             DisplayName.Value = "Skeleton Editor";
-            Pfs = pfs;
+
+            componentInserter.Execute();
         }
 
-        public PackFileService Pfs { get; }
 
         public override void Initialize()
         {
@@ -37,37 +39,37 @@ namespace AnimationEditor.SkeletonEditor
 
         public static class TechSkeleton_Debug
         {
-            //public static void CreateDamselEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
-            //{
-            //    var editorView = toolFactory.CreateEditorViewModel<TechSkeletonEditorViewModel>();
-            //    editorView.MainInput = new AnimationToolInput()
-            //    {
-            //        Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_alarielle.variantmeshdefinition"),
-            //        FragmentName = @"animations/animation_tables/hu1b_alarielle_staff_and_sword.frg",
-            //        AnimationSlot = AnimationSlotTypeHelper.GetfromValue("STAND")
-            //    };
-            //    editorView.MainInput = new AnimationToolInput()
-            //    {
-            //        Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_throt.variantmeshdefinition"),
-            //        FragmentName = @"animations/animation_tables/hu17_dlc16_throt.frg",
-            //        AnimationSlot = AnimationSlotTypeHelper.GetfromValue("ATTACK_5")
-            //    };
-            //
-            //    //editorView.MainInput = new AnimationToolInput()
-            //    //{
-            //    //    Mesh = packfileService.FindFile(@"warmachines\engines\emp_steam_tank\emp_steam_tank01.rigid_model_v2"),
-            //    //    FragmentName = @"animations/animation_tables/wm_steam_tank01.frg",
-            //    //    AnimationSlot = AnimationSlotTypeHelper.GetfromValue("STAND")
-            //    //};
-            //    //editorView.MainInput = new AnimationToolInput()
-            //    //{
-            //    //    Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\emp_state_troops_crossbowmen_ror.variantmeshdefinition"),
-            //    //    FragmentName = @"animations/animation_tables/hu1_empire_sword_crossbow.frg",
-            //    //    AnimationSlot = AnimationSlotTypeHelper.GetfromValue("FIRE_HIGH")
-            //    //};
-            //
-            //    creator.CreateEmptyEditor(editorView);
-            //}
+            public static void CreateDamselEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+            {
+                //var editorView = toolFactory.Create<TechSkeletonEditorViewModel>();
+                //editorView.MainInput = new AnimationToolInput()
+                //{
+                //    Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_alarielle.variantmeshdefinition"),
+                //    FragmentName = @"animations/animation_tables/hu1b_alarielle_staff_and_sword.frg",
+                //    AnimationSlot = AnimationSlotTypeHelper.GetfromValue("STAND")
+                //};
+                //editorView.MainInput = new AnimationToolInput()
+                //{
+                //    Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_throt.variantmeshdefinition"),
+                //    FragmentName = @"animations/animation_tables/hu17_dlc16_throt.frg",
+                //    AnimationSlot = AnimationSlotTypeHelper.GetfromValue("ATTACK_5")
+                //};
+            
+                //editorView.MainInput = new AnimationToolInput()
+                //{
+                //    Mesh = packfileService.FindFile(@"warmachines\engines\emp_steam_tank\emp_steam_tank01.rigid_model_v2"),
+                //    FragmentName = @"animations/animation_tables/wm_steam_tank01.frg",
+                //    AnimationSlot = AnimationSlotTypeHelper.GetfromValue("STAND")
+                //};
+                //editorView.MainInput = new AnimationToolInput()
+                //{
+                //    Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\emp_state_troops_crossbowmen_ror.variantmeshdefinition"),
+                //    FragmentName = @"animations/animation_tables/hu1_empire_sword_crossbow.frg",
+                //    AnimationSlot = AnimationSlotTypeHelper.GetfromValue("FIRE_HIGH")
+                //};
+            
+                //creator.CreateEmptyEditor(editorView);
+            }
         }
     }
 }

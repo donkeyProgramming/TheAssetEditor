@@ -1,17 +1,19 @@
 ﻿using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.Common;
-using CommonControls.FileTypes.DB;
+
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
+using View3D.Scene;
 
 namespace AnimationEditor.AnimationTransferTool
 {
     public class AnimationTransferToolViewModel : BaseAnimationViewModel
     {
-        public AnimationTransferToolViewModel(IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService) 
-            : base(toolFactory, pfs, skeletonHelper, applicationSettingsService, "Target", "Source")
+        public AnimationTransferToolViewModel(MainScene scene, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService) 
+            : base(scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
         {
+            Set("Target", "Source", true);
             DisplayName.Value = "Animation transfer tool";
             Pfs = pfs;
         }

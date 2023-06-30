@@ -3,7 +3,6 @@ using CommonControls.Common;
 using CommonControls.FileTypes.Animation;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
 using System.Linq;
 using System.Windows;
 using View3D.Animation;
@@ -18,7 +17,7 @@ namespace AnimationEditor.CampaignAnimationCreator
         PackFileService _pfs;
         AnimationClip _selectedAnimationClip;
 
-        public Editor(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, IComponentManager componentManager)
+        public Editor(PackFileService pfs, AssetViewModel rider )
         {
             _pfs = pfs;
             _selectedUnit = rider;

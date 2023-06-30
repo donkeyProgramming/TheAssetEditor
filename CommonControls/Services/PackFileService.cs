@@ -2,7 +2,6 @@
 using CommonControls.FileTypes.PackFiles.Models;
 using Serilog;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,7 +17,6 @@ namespace CommonControls.Services
     {
         ILogger _logger = Logging.Create<PackFileService>();
 
-
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         public PackFileDataBase Database { get; private set; }
         private readonly ApplicationSettingsService _settingsService;
@@ -33,7 +31,6 @@ namespace CommonControls.Services
         }
 
         public bool TriggerFileUpdates { get; set; } = true;
-
 
         public PackFileContainer Load(string packFileSystemPath, bool setToMainPackIfFirst = false, bool allowLoadWithoutCaPackFiles = false) 
         {

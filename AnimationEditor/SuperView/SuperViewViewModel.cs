@@ -1,23 +1,22 @@
 ﻿using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
-using CommonControls.FileTypes.DB;
 using CommonControls.Services;
+using View3D.Scene;
 
 namespace AnimationEditor.SuperView
 {
     public class SuperViewViewModel : BaseAnimationViewModel
     {
         CopyPasteManager _copyPasteManager;
-        public SuperViewViewModel(IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService) 
-            : base(toolFactory, pfs, skeletonHelper, applicationSettingsService, "not_in_use1", "not_in_use2", false)
+        public SuperViewViewModel(MainScene scene, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService) 
+            : base(scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
         {
+            Set("not_in_use1", "not_in_use2", false);
             _copyPasteManager = copyPasteManager;
             DisplayName.Value = "Super view";
-            Pfs = pfs;
         }
 
-        public PackFileService Pfs { get; }
 
         public override void Initialize()
         {

@@ -6,11 +6,10 @@ using CommonControls.Services;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using View3D.Animation;
+using View3D.Scene;
 
 namespace AnimationEditor.AnimationBuilder
 {
-
-
 
     public class AnimationBuilderInput
     {
@@ -22,10 +21,10 @@ namespace AnimationEditor.AnimationBuilder
     {
         CopyPasteManager _copyPasteManager;
 
-
-        public AnimationBuilderViewModel(IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService)
-            : base(toolFactory, pfs, skeletonHelper, applicationSettingsService, "Main Node", "not_in_use2", false)
+        public AnimationBuilderViewModel(MainScene scene,IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService)
+            : base(scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
         {
+            Set("Main Node", "not_in_use2", false);
             _copyPasteManager = copyPasteManager;
             DisplayName.Value = "Animation Builder";
             Pfs = pfs;

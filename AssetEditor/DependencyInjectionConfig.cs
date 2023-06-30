@@ -20,8 +20,6 @@ using System;
 using TextureEditor;
 using View3D;
 using MediatR;
-using View3D.Components;
-using KitbasherEditor.Views;
 
 namespace AssetEditor
 {
@@ -32,7 +30,6 @@ namespace AssetEditor
             new View3D_DependencyContainer(),
             new KitbasherEditor_DependencyInjectionContainer(),
         };
-
 
         public IServiceProvider ServiceProvider { get; private set; }
         
@@ -63,13 +60,14 @@ namespace AssetEditor
             services.AddSingleton<SkeletonAnimationLookUpHelper>();
             services.AddSingleton<CopyPasteManager>();
             services.AddSingleton<GameInformationFactory>();
-            
+            services.AddSingleton<PackFileService>();
+
             services.AddScoped<MainWindow>();
             services.AddScoped<MainViewModel>();
             services.AddScoped<SettingsWindow>();
             services.AddScoped<SettingsViewModel>();
             services.AddScoped<MenuBarViewModel>();
-            services.AddScoped<PackFileService>();
+          
 
             foreach (var container in dependencyContainers)
                 container.Register(services);

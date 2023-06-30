@@ -4,15 +4,17 @@ using CommonControls.Common;
 using CommonControls.FileTypes.DB;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
+using View3D.Scene;
 
 namespace AnimationEditor.MountAnimationCreator
 {
 
     public class MountAnimationCreatorViewModel : BaseAnimationViewModel
     {
-        public MountAnimationCreatorViewModel(IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService)
-            : base(toolFactory, pfs, skeletonHelper, applicationSettingsService, "Rider", "Mount")
+        public MountAnimationCreatorViewModel(MainScene scene, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService)
+            : base(scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
         {
+            Set("Rider", "Mount", true);
             DisplayName.Value = "MountAnimCreator";
         }
 

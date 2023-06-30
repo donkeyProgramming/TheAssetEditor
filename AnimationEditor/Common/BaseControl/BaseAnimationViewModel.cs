@@ -9,10 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using System.Windows.Input;
-using View3D.Components;
 using View3D.Scene;
 using View3D.Services;
-using View3D.Utility;
 
 namespace AnimationEditor.PropCreator.ViewModels
 {
@@ -55,45 +53,28 @@ namespace AnimationEditor.PropCreator.ViewModels
         FocusSelectableObjectService _focusComponent;
         public ICommand ResetCameraCommand { get; set; }
         public ICommand FocusCamerasCommand { get; set; }
-        
 
-        public BaseAnimationViewModel(IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService, string headerAsset0, string headerAsset1, bool createDefaultAssets = true)
+        string _headerAsset0; string _headerAsset1;
+
+        public BaseAnimationViewModel(MainScene sceneContainer, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService)
         {
             _toolFactory = toolFactory;
             _pfs = pfs;
             _skeletonHelper = skeletonHelper;
-            _createDefaultAssets = createDefaultAssets;
             _applicationSettingsService = applicationSettingsService;
 
-            Scene = new MainScene(null, null);
-            Scene.AddComponent(new DeviceResolverComponent(Scene));
-            Scene.AddComponent(new ResourceLibary(Scene, pfs));
-            //Scene.AddComponent(new FpsComponent(new ComponentManagerResolver(Scene), ));
-            //Scene.AddComponent(new KeyboardComponent(new ComponentManagerResolver(Scene), Scene));
-            //Scene.AddComponent(new MouseComponent(new ComponentManagerResolver(Scene), Scene));
-            //Scene.AddComponent(skeletonHelper);
-            ////Scene.AddComponent(new ArcBallCamera(Scene));
-            //Scene.AddComponent(new ClearScreenComponent(Scene));
-            //Scene.AddComponent(new RenderEngineComponent(Scene, _applicationSettingsService));
-            //Scene.AddComponent(new GridComponent(Scene));
-            //Scene.AddComponent(new SceneManager(Scene));
-            //Scene.AddComponent(new AnimationsContainerComponent(Scene));
-            //Scene.AddComponent(new SelectionManager(Scene));
-            //Scene.AddComponent(new SelectionComponent(Scene));
-            //Scene.AddComponent(new CommandExecutor(Scene));
-            //Scene.AddComponent(new LightControllerComponent(Scene));
-            //_focusComponent = Scene.AddComponent(new FocusSelectableObjectComponent(Scene));
-
+            Scene = sceneContainer;
             Scene.SceneInitialized += OnSceneInitialized;
-
-            var mainAsset = Scene.AddComponent(new AssetViewModel(_pfs, headerAsset0, Color.Black, Scene, _applicationSettingsService));
-            var refAsset = Scene.AddComponent(new AssetViewModel(_pfs, headerAsset1,  Color.Green, Scene, _applicationSettingsService));
-
-            MainModelView = new ReferenceModelSelectionViewModel(_toolFactory, pfs, mainAsset, headerAsset0 + ":", Scene, skeletonHelper, _applicationSettingsService);
-            ReferenceModelView = new ReferenceModelSelectionViewModel(_toolFactory, pfs, refAsset, headerAsset1 + ":", Scene, skeletonHelper, _applicationSettingsService);
 
             ResetCameraCommand = new RelayCommand(ResetCamera);
             FocusCamerasCommand = new RelayCommand(FocusCamera);
+        }
+
+        protected void Set(string headerAsset0, string headerAsset1, bool createDefaultAssets)
+        {
+            _headerAsset0 = headerAsset0;
+            _headerAsset1 = headerAsset1;
+            _createDefaultAssets = createDefaultAssets;
         }
 
         void ResetCamera() => _focusComponent.ResetCamera();
@@ -101,6 +82,12 @@ namespace AnimationEditor.PropCreator.ViewModels
 
         private void OnSceneInitialized(WpfGame scene)
         {
+            var mainAsset = Scene.AddComponent(new AssetViewModel(_pfs, _headerAsset0, Color.Black, Scene, _applicationSettingsService));
+            var refAsset = Scene.AddComponent(new AssetViewModel(_pfs, _headerAsset1, Color.Green, Scene, _applicationSettingsService));
+
+            MainModelView = new ReferenceModelSelectionViewModel(_toolFactory, _pfs, mainAsset, _headerAsset0 + ":", Scene, _skeletonHelper, _applicationSettingsService);
+            ReferenceModelView = new ReferenceModelSelectionViewModel(_toolFactory, _pfs, refAsset, _headerAsset1 + ":", Scene, _skeletonHelper, _applicationSettingsService);
+
             if (_createDefaultAssets)
             {
                 Player.RegisterAsset(MainModelView.Data);
