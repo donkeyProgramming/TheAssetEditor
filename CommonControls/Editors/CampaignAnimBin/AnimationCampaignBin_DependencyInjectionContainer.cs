@@ -14,7 +14,7 @@ namespace CommonControls.Editors.CampaignAnimBin
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterFileTool<TextEditorViewModel<CampaignAnimBinToXmlConverter>, TextEditorView>(new PathToTool(EditorEnums.XML_Editor, ".bin", @"animations\campaign\database"));
+            factory.RegisterTool<TextEditorViewModel<CampaignAnimBinToXmlConverter>, TextEditorView>(new PathToTool(EditorEnums.XML_Editor, ".bin", @"animations\campaign\database"));
         }
     }
 }

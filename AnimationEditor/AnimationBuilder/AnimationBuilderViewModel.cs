@@ -55,7 +55,7 @@ namespace AnimationEditor.AnimationBuilder
             {
                 var factory = new AnimationNodeFactory(animationLookUpHelper, "humanoid01d");
 
-                var editorView = toolFactory.CreateEditorViewModel<AnimationBuilderViewModel>();
+                var editorView = toolFactory.Create<AnimationBuilderViewModel>();
                 editorView.Input = new AnimationBuilderInput()
                 {
                     ModelFile = @"variantmeshes\variantmeshdefinitions\def_malekith.variantmeshdefinition",

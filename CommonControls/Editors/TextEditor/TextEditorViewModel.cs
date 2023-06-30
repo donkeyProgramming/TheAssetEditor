@@ -2,6 +2,7 @@
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Input;
 
@@ -15,6 +16,7 @@ namespace CommonControls.Editors.TextEditor
     public class TextEditorViewModel<TextConverter> : NotifyPropertyChangedImpl, ITextEditorViewModel, IEditorViewModel
         where TextConverter : ITextConverter
     {
+        public IServiceScope ServiceScope { get; set; }
         public ICommand SaveCommand { get; set; }
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>();

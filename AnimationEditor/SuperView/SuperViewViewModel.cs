@@ -39,7 +39,7 @@ namespace AnimationEditor.SuperView
     {
         public static void CreateDamselEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<SuperViewViewModel>();
+            var editorView = toolFactory.Create<SuperViewViewModel>();
             editorView.MainInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_alarielle.variantmeshdefinition"),
@@ -64,7 +64,7 @@ namespace AnimationEditor.SuperView
 
         public static void CreateThrot(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<SuperViewViewModel>();
+            var editorView = toolFactory.Create<SuperViewViewModel>();
             editorView.MainInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_throt.variantmeshdefinition"),
@@ -78,7 +78,7 @@ namespace AnimationEditor.SuperView
 
         public static void CreatePlaguebearer(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<SuperViewViewModel>();
+            var editorView = toolFactory.Create<SuperViewViewModel>();
             editorView.MainInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\dae_plaguebearer_plagueridden.variantmeshdefinition"),

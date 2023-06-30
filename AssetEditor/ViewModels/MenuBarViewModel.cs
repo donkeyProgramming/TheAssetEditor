@@ -263,43 +263,43 @@ namespace AssetEditor.ViewModels
         }
         void OpenPropCreatorEditor()
         {
-            var editorView = _toolFactory.CreateEditorViewModel<BaseAnimationViewModel>();
+            var editorView = _toolFactory.Create<BaseAnimationViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
 
         void OpenMountCreator()
         {
-            var editorView = _toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = _toolFactory.Create<MountAnimationCreatorViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
 
         void OpenCampaignAnimCreatorEditor()
         {
-            var editorView = _toolFactory.CreateEditorViewModel<CampaignAnimationCreatorViewModel>();
+            var editorView = _toolFactory.Create<CampaignAnimationCreatorViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
 
         void OpenAnimationTransferTool()
         {
-            var editorView = _toolFactory.CreateEditorViewModel<AnimationTransferToolViewModel>();
+            var editorView = _toolFactory.Create<AnimationTransferToolViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
 
         void OpenSuperViewTool()
         {
-            var editorView = _toolFactory.CreateEditorViewModel<SuperViewViewModel>();
+            var editorView = _toolFactory.Create<SuperViewViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
 
         private void OpenAudioEditor()
         {
-            var editorView = _toolFactory.CreateEditorViewModel<AudioEditorViewModel>();
+            var editorView = _toolFactory.Create<AudioEditorViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
 
         private void CompileAudioProjects()
         {
-            var editorView = _toolFactory.CreateEditorViewModel<CompilerViewModel>();
+            var editorView = _toolFactory.Create<CompilerViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
 
@@ -319,7 +319,7 @@ namespace AssetEditor.ViewModels
 
         void OpenTechSkeletonEditor()
         {
-            var editorView = _toolFactory.CreateEditorViewModel<SkeletonEditorViewModel>();
+            var editorView = _toolFactory.Create<SkeletonEditorViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
 
@@ -335,7 +335,7 @@ namespace AssetEditor.ViewModels
 
         void OpenOpenAnimationBuilder()
         {
-            var editorView = _toolFactory.CreateEditorViewModel<AnimationBuilderViewModel>();
+            var editorView = _toolFactory.Create<AnimationBuilderViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
 

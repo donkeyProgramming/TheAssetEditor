@@ -5,7 +5,6 @@ using System.Windows.Media;
 
 namespace AssetEditor.DataTemplates
 {
-
     public class EditorTemplateSelector : DataTemplateSelector
     {
         public override DataTemplate SelectTemplate(object item, DependencyObject container)

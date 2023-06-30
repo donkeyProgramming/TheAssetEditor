@@ -108,18 +108,18 @@ namespace AnimationEditor.Common.ReferenceModel
         public void ViewSelectedMeta()
         {
             var fullFileName = _pfs.GetFullPath(_data.MetaData);
-            var viewModel = _toolFactory.GetDefaultToolViewModelFromFileName(fullFileName);
+            var viewModel = _toolFactory.Create(fullFileName);
             viewModel.MainFile = _data.MetaData;
-            var window = _toolFactory.CreateToolAsWindow(viewModel);
+            var window = _toolFactory.CreateAsWindow(viewModel);
             window.Show();
         }
 
         public void ViewSelectedPersistMeta()
         {
             var fullFileName = _pfs.GetFullPath(_data.PersistMetaData);
-            var viewModel = _toolFactory.GetDefaultToolViewModelFromFileName(fullFileName);
+            var viewModel = _toolFactory.Create(fullFileName);
             viewModel.MainFile = _data.PersistMetaData;
-            var window = _toolFactory.CreateToolAsWindow(viewModel);
+            var window = _toolFactory.CreateAsWindow(viewModel);
             window.Width = 800;
             window.Height = 450;
             window.Title = "Persistent meta file - " + fullFileName;

@@ -5,6 +5,7 @@ using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using System.Windows.Input;
@@ -25,6 +26,7 @@ namespace AnimationEditor.PropCreator.ViewModels
 
     public abstract class BaseAnimationViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
+        public IServiceScope ServiceScope { get; set; }
         bool _createDefaultAssets;
         protected PackFileService _pfs;
         protected SkeletonAnimationLookUpHelper _skeletonHelper;

@@ -31,7 +31,7 @@ namespace AnimationEditor.AnimationTransferTool
     {
         public static void CreateDwardAndEmpArcher(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<AnimationTransferToolViewModel>();
+            var editorView = toolFactory.Create<AnimationTransferToolViewModel>();
             editorView.MainInput = new AnimationToolInput()
             {
                 //Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\wef_bladesinger.variantmeshdefinition"),
@@ -57,7 +57,7 @@ namespace AnimationEditor.AnimationTransferTool
 
         public static void CreateChaosSpawn(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<AnimationTransferToolViewModel>();
+            var editorView = toolFactory.Create<AnimationTransferToolViewModel>();
             editorView.MainInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\bst_chaos_spawn.variantmeshdefinition")
@@ -74,7 +74,7 @@ namespace AnimationEditor.AnimationTransferTool
 
         public static void CreateGreatEagle(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<AnimationTransferToolViewModel>();
+            var editorView = toolFactory.Create<AnimationTransferToolViewModel>();
             editorView.MainInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_great_eagle.variantmeshdefinition")
@@ -91,7 +91,7 @@ namespace AnimationEditor.AnimationTransferTool
 
         public static void CreateBowCentigor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<AnimationTransferToolViewModel>();
+            var editorView = toolFactory.Create<AnimationTransferToolViewModel>();
             editorView.MainInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\bst_centigors_base.variantmeshdefinition")
@@ -108,7 +108,7 @@ namespace AnimationEditor.AnimationTransferTool
 
         public static void CreateFlyingSquig(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<AnimationTransferToolViewModel>();
+            var editorView = toolFactory.Create<AnimationTransferToolViewModel>();
             editorView.MainInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\wh_variantmodels\rp2\grn\grn_squig_herd\grn_squig_herd_01_2b.rigid_model_v2"),

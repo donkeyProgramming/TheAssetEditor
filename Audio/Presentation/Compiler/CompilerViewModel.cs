@@ -4,6 +4,7 @@ using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
+using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using System.Linq;
 using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
@@ -12,6 +13,7 @@ namespace Audio.Presentation.Compiler
 {
     public class CompilerViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
+        public IServiceScope ServiceScope { get; set; }
         private readonly PackFileService _pfs;
         private readonly CompilerService _compilerService;
 

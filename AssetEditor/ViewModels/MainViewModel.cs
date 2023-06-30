@@ -50,9 +50,6 @@ namespace AssetEditor.ViewModels
         public ICommand CloseToolsToRightCommand { get; set; }
         public ICommand CloseToolsToLeftCommand { get; set; }
 
-
-
-
         public MainViewModel(GameInformationFactory gameInformationFactory, MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, ToolFactory toolFactory, SkeletonAnimationLookUpHelper animationLookUpHelper)
         {
             _packfileService = packfileService;
@@ -82,13 +79,8 @@ namespace AssetEditor.ViewModels
                 settingsService.Save();
             }
 
-
-
-
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
             {
-                //settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Warhammer3;
-                //settingsService.CurrentSettings.SkipLoadingWemFiles = true;
                 var gamePath = settingsService.GetGamePathForCurrentGame();
                 if (gamePath != null)
                 {
@@ -297,29 +289,8 @@ namespace AssetEditor.ViewModels
                 return;
             }
 
-           
-
             var fullFileName = _packfileService.GetFullPath(file );
-            var allEditors = ToolsFactory.GetAllToolViewModelFromFileName(fullFileName);
-            Type selectedEditor = null;
-            if (allEditors.Count == 0)
-            {
-                _logger.Here().Warning($"Trying to open file {file.Name}, but there are no valid tools for it.");
-                return;
-            }
-            else if (allEditors.Count == 1)
-            {
-                selectedEditor = allEditors.First().Type;
-            }
-            else
-            {
-                var selectedToolType = ToolSelectorWindow.CreateAndShow(allEditors.Select(x => x.EditorType));
-                if (selectedToolType == EditorEnums.None)
-                    return;
-                selectedEditor = allEditors.First(x => x.EditorType == selectedToolType).Type;
-            }
-
-            var editorViewModel = ToolsFactory.CreateFromType(selectedEditor);
+            var editorViewModel = ToolsFactory.Create(fullFileName);
 
             _logger.Here().Information($"Opening {file.Name} with {editorViewModel.GetType().Name}");
             editorViewModel.MainFile = file;

@@ -29,7 +29,7 @@ namespace AnimationEditor.MountAnimationCreator
     {
         public static void CreateDamselAndGrymgoreEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
 
             editorView.MainInput = new AnimationToolInput()
             {
@@ -47,7 +47,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public static void CreateKarlAndSquigEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
 
             editorView.MainInput = new AnimationToolInput()
             {
@@ -64,7 +64,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public static void CreateBroodHorrorEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
 
             editorView.MainInput = new AnimationToolInput()
             {
@@ -81,7 +81,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public static void CreateLionAndHu01b(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
 
             editorView.MainInput = new AnimationToolInput()
             {
@@ -98,7 +98,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public static void CreateLionAndHu01c(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
 
             editorView.MainInput = new AnimationToolInput()
             {
@@ -115,7 +115,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public static void CreateRaptorAndHu01b(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
 
             editorView.MainInput = new AnimationToolInput()
             {
@@ -132,7 +132,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public static void CreateRaptorAndHu01d(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
 
             editorView.MainInput = new AnimationToolInput()
             {
@@ -149,7 +149,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public static void CreateRaptorAndHu02(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
 
             editorView.MainInput = new AnimationToolInput()
             {
@@ -167,7 +167,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public static void CreateRome2WolfRider(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
 
             editorView.MainInput = new AnimationToolInput()
             {
@@ -186,7 +186,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public static void CreateRome2WolfRiderAttack(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
 
             editorView.MainInput = new AnimationToolInput()
             {

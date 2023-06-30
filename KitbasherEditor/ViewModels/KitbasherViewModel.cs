@@ -6,6 +6,7 @@ using CommonControls.Services;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
@@ -27,6 +28,7 @@ namespace KitbasherEditor.ViewModels
         INotificationHandler<SceneInitializedEvent>, 
         INotificationHandler<CommandStackChangedEvent>
     {
+        public IServiceScope ServiceScope { get; set; }
         ILogger _logger = Logging.Create<KitbasherViewModel>();
         private readonly PackFileService _packFileService;
         private readonly KitbashSceneCreator _kitbashSceneCreator;
@@ -84,6 +86,8 @@ namespace KitbasherEditor.ViewModels
                 NotifyPropertyChanged();
             }
         }
+
+
 
         public bool AllowDrop(TreeNode node, TreeNode targeNode = null)
         {

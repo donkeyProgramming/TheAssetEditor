@@ -14,7 +14,7 @@ namespace CommonControls.Editors.VariantMeshDefinition
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterFileTool<TextEditorViewModel<VariantMeshToXmlConverter>, TextEditorView>(new ExtentionToTool(EditorEnums.XML_Editor, new[] { ".variantmeshdefinition" }));
+            factory.RegisterTool<TextEditorViewModel<VariantMeshToXmlConverter>, TextEditorView>(new ExtentionToTool(EditorEnums.XML_Editor, new[] { ".variantmeshdefinition" }));
         }
     }
 }

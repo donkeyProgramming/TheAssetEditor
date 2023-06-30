@@ -1,9 +1,11 @@
 ﻿using CommonControls.FileTypes.PackFiles.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CommonControls.Common
 {
     public interface IEditorViewModel
     {
+        IServiceScope ServiceScope { get; set; }
         NotifyAttr<string> DisplayName { get; set; }
         PackFile MainFile { get; set; }
         bool Save();
@@ -17,7 +19,5 @@ namespace CommonControls.Common
         void CreateEmptyEditor(IEditorViewModel editorView);
     }
 
-
     public delegate void EditorSavedDelegate(PackFile newFile);
-
 }

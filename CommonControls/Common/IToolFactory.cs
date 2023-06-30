@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CommonControls.BaseDialogs.ToolSelector;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -97,19 +97,13 @@ namespace CommonControls.Common
     }
     public interface IToolFactory
     {
-        void RegisterFileTool<ViewModel, View>(IPackFileToToolSelector toolSelector)
-               where ViewModel : IEditorViewModel
-               where View : Control;
-
-        void RegisterTool<ViewModel, View>()
+        IEditorViewModel Create(string fullFileName, bool useDefaultTool = false);
+        ViewModel Create<ViewModel>() where ViewModel : IEditorViewModel;
+        Window CreateAsWindow(IEditorViewModel viewModel);
+        Type GetViewTypeFromViewModel(Type viewModelType);
+        void RegisterTool<ViewModel, View>(IPackFileToToolSelector toolSelector = null)
             where ViewModel : IEditorViewModel
             where View : Control;
-
-        ViewModel CreateEditorViewModel<ViewModel>()
-            where ViewModel : IEditorViewModel;
-
-        Window CreateToolAsWindow(IEditorViewModel viewModel);
-        IEditorViewModel GetDefaultToolViewModelFromFileName(string filename);
     }
 
     public class ToolFactory : IToolFactory
@@ -125,18 +119,7 @@ namespace CommonControls.Common
             _serviceProvider = serviceProvider;
         }
 
-        public void RegisterFileTool<ViewModel, View>(IPackFileToToolSelector toolSelector)
-                   where ViewModel : IEditorViewModel
-                   where View : Control
-        {
-            RegisterTool<ViewModel, View>();
-
-            var viewModelType = typeof(ViewModel);
-            _extentionToToolMap[toolSelector] = viewModelType;
-
-        }
-
-        public void RegisterTool<ViewModel, View>()
+        public void RegisterTool<ViewModel, View>(IPackFileToToolSelector toolSelector = null)
             where ViewModel : IEditorViewModel
             where View : Control
         {
@@ -152,6 +135,9 @@ namespace CommonControls.Common
             }
 
             _viewModelToViewMap[viewModelType] = viewType;
+
+            if (toolSelector != null)
+                _extentionToToolMap[toolSelector] = viewModelType;
         }
 
         public Type GetViewTypeFromViewModel(Type viewModelType)
@@ -160,7 +146,42 @@ namespace CommonControls.Common
             return _viewModelToViewMap[viewModelType];
         }
 
-        public Window CreateToolAsWindow(IEditorViewModel viewModel)
+        public IEditorViewModel Create(string fullFileName, bool useDefaultTool = false)
+        {
+            var allEditors = GetAllPossibleEditors(fullFileName);
+
+            if (allEditors.Count == 0)
+            {
+                _logger.Here().Warning($"Trying to open file {fullFileName}, but there are no valid tools for it.");
+                return null;
+            }
+
+            Type selectedEditor = null;
+            if (allEditors.Count == 1 || useDefaultTool)
+            {
+                selectedEditor = allEditors.First().Type;
+            }
+            else
+            {
+                var selectedToolType = ToolSelectorWindow.CreateAndShow(allEditors.Select(x => x.EditorType));
+                if (selectedToolType == EditorEnums.None)
+                    return null;
+                selectedEditor = allEditors.First(x => x.EditorType == selectedToolType).Type;
+            }
+
+            var scope = _serviceProvider.CreateScope();
+            var instance = scope.ServiceProvider.GetService(selectedEditor) as IEditorViewModel;
+            instance.ServiceScope = scope;
+            return instance;
+        }
+
+        public ViewModel Create<ViewModel>() where ViewModel : IEditorViewModel
+        {
+            var instance = (ViewModel)_serviceProvider.GetService(typeof(ViewModel));
+            return instance;
+        }
+
+        public Window CreateAsWindow(IEditorViewModel viewModel)
         {
             var toolView = _viewModelToViewMap[viewModel.GetType()];
             var instance = (Control)Activator.CreateInstance(toolView);
@@ -172,40 +193,7 @@ namespace CommonControls.Common
             return newWindow;
         }
 
-        public Window CreateToolAsWindow<ViewModel>(out IEditorViewModel viewModelInstance)
-            where ViewModel : IEditorViewModel
-        {
-            var viewType = _viewModelToViewMap[typeof(ViewModel)];
-            var viewModelType = typeof(ViewModel);
-
-            var view = _serviceProvider.GetService(viewType);
-            viewModelInstance = _serviceProvider.GetService(viewModelType) as IEditorViewModel;
-
-            Window newWindow = new Window();
-            newWindow.Content = view;
-            newWindow.DataContext = viewModelInstance;
-
-            return newWindow;
-        }
-
-        public IEditorViewModel GetDefaultToolViewModelFromFileName(string filename)
-        {
-            foreach (var toolLoopUp in _extentionToToolMap)
-            {
-                var result = toolLoopUp.Key.CanOpen(filename);
-                if (result.CanOpen && result.IsCoreTool)
-                {
-                    var instance = (IEditorViewModel)_serviceProvider.GetService(toolLoopUp.Value);
-                    return instance;
-                }
-            }
-
-            var error = $"Attempting to get view model for file {filename}, unable to find tool based on extention";
-            _logger.Here().Error(error);
-            return null;
-        }
-
-        public List<ToolInformation> GetAllToolViewModelFromFileName(string filename)
+        List<ToolInformation> GetAllPossibleEditors(string filename)
         {
             var output = new List<ToolInformation>();
             foreach (var toolLoopUp in _extentionToToolMap)
@@ -217,7 +205,7 @@ namespace CommonControls.Common
 
             if (output.Count == 0)
             {
-                var error = $"Attempting to get view model for file {filename}, unable to find tool based on extention";
+                var error = $"Attempting to get view model for file {filename}, unable to find tool based on extension";
                 _logger.Here().Error(error);
                 return new List<ToolInformation>();
             }
@@ -225,18 +213,7 @@ namespace CommonControls.Common
             return output.OrderBy(x=>x.IsCoreTool).ToList();
         }
 
-        public IEditorViewModel CreateFromType(Type type)
-        {
-            var scope = _serviceProvider.CreateScope();
-            var instance = scope.ServiceProvider.GetService(type) as IEditorViewModel;
-            return instance;
-        }
 
-        public ViewModel CreateEditorViewModel<ViewModel>() where ViewModel : IEditorViewModel
-        {
-            var instance = (ViewModel)_serviceProvider.GetService(typeof(ViewModel));
-            return instance;
-        }
     }
 
     public class ToolInformation

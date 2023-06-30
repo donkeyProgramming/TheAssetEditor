@@ -25,7 +25,7 @@ namespace AnimationEditor.CampaignAnimationCreator
     {
         public static void CreateDamselEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<CampaignAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<CampaignAnimationCreatorViewModel>();
             editorView.MainInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_damsel_campaign_01.variantmeshdefinition"),
