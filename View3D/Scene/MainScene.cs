@@ -1,16 +1,18 @@
 ﻿using MediatR;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
+using View3D.Components;
 
 namespace View3D.Scene
 {
-    public class SceneContainer : WpfGame
+    public class MainScene : WpfGame
     {
         private bool _disposed;
         WpfGraphicsDeviceService _diviceService;
 
-        public SceneContainer(IMediator mediator, string contentDir = "ContentOutput") : base(mediator, contentDir)
+        public MainScene(IMediator mediator, string contentDir = "ContentOutput") : base(mediator, contentDir)
         {
+
         }
 
         protected override void Initialize()

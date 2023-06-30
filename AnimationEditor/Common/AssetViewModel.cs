@@ -64,7 +64,7 @@ namespace AnimationEditor.Common.ReferenceModel
         public NotifyAttr<bool> ShowSkeleton { get; set; }
 
 
-        public AssetViewModel(PackFileService pfs, string description, Color skeletonColour, IComponentManager componentManager, ApplicationSettingsService applicationSettingsService)  : base(componentManager)
+        public AssetViewModel(PackFileService pfs, string description, Color skeletonColour, IComponentManager componentManager, ApplicationSettingsService applicationSettingsService)  : base()
         {
             Description = description;
             _pfs = pfs;

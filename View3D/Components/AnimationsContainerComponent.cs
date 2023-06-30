@@ -12,7 +12,7 @@ namespace View3D.Components.Component
     {
         Dictionary<string, AnimationPlayer> _playerMap = new Dictionary<string, AnimationPlayer>();
 
-        public AnimationsContainerComponent(ComponentManagerResolver componentManagerResolver) : base(componentManagerResolver.ComponentManager)
+        public AnimationsContainerComponent()
         {
             UpdateOrder= (int)ComponentUpdateOrderEnum.Animation;
         }

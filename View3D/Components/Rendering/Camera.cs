@@ -1,15 +1,8 @@
-﻿using CommonControls.Common;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Framework.WpfInterop;
-using Serilog;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using View3D.Components.Input;
-using View3D.Utility;
 
 namespace View3D.Components.Rendering
 {
@@ -19,8 +12,7 @@ namespace View3D.Components.Rendering
         MouseComponent _mouse;
         KeyboardComponent _keyboard;
 
-        public ArcBallCamera(ComponentManagerResolver componentManagerResolver, DeviceResolverComponent deviceResolverComponent, KeyboardComponent keyboardComponent, MouseComponent mouseComponent) 
-            : base(componentManagerResolver.ComponentManager)
+        public ArcBallCamera( DeviceResolverComponent deviceResolverComponent, KeyboardComponent keyboardComponent, MouseComponent mouseComponent) 
         {
             Zoom = 10;
             Yaw = 0.8f;
@@ -30,13 +22,10 @@ namespace View3D.Components.Rendering
             _deviceResolverComponent = deviceResolverComponent;
             _mouse = mouseComponent;
             _keyboard = keyboardComponent;
-
-
         }
 
         public override void Initialize()
         {
-      
             _graphicsDevice = _deviceResolverComponent.Device;
             base.Initialize();
         }
@@ -166,12 +155,8 @@ namespace View3D.Components.Rendering
 
         #region ICamera Members        
 
-
         private Matrix viewMatrix;
-        private readonly ComponentManagerResolver _componentManagerResolver;
         private readonly DeviceResolverComponent _deviceResolverComponent;
-        private readonly MouseComponent _mouseComponent;
-        private readonly KeyboardComponent _keyboardComponent;
 
         public Matrix ViewMatrix
         {
@@ -194,23 +179,11 @@ namespace View3D.Components.Rendering
         }
         #endregion
 
-        bool IsMouseMoveKeyDown(MouseState state)
-        {
-            if (state.LeftButton == ButtonState.Pressed)    // Rotate
-                return true;
-
-            if (state.RightButton == ButtonState.Pressed)    // Pan
-                return true;
-
-            return false;
-        }
-
         public override void Update(GameTime gameTime)
         {
             Update(_mouse, _keyboard);
         }
 
-       
         public void Update(MouseComponent mouse, KeyboardComponent keyboard)
         {
             if (!mouse.IsMouseOwner(this))

@@ -53,8 +53,7 @@ namespace View3D.Components.Rendering
 
         public RenderFormats MainRenderFormat { get; set; } = RenderFormats.SpecGloss;
 
-        public RenderEngineComponent(ArcBallCamera camera, ResourceLibary resourceLib, DeviceResolverComponent deviceResolverComponent, ApplicationSettingsService applicationSettingsService, ComponentManagerResolver componentManagerResolver) 
-            : base(componentManagerResolver.ComponentManager)
+        public RenderEngineComponent(ArcBallCamera camera, ResourceLibary resourceLib, DeviceResolverComponent deviceResolverComponent, ApplicationSettingsService applicationSettingsService) 
         {
             _camera = camera;
             _resourceLib = resourceLib;

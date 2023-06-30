@@ -10,18 +10,6 @@ using System.Windows.Controls;
 
 namespace CommonControls.Common
 {
-    public class PackFileToToolSelectorResult
-    {
-        public bool CanOpen { get; set; } = false;
-        public bool IsCoreTool { get; set; } = false;
-    }
-
-    public interface IPackFileToToolSelector
-    {
-        PackFileToToolSelectorResult CanOpen(string fullPath);
-        EditorEnums EditorType { get; }
-    }
-
     public class ExtentionToTool : IPackFileToToolSelector
     {
         string[] _validExtentionsCore;
@@ -95,6 +83,7 @@ namespace CommonControls.Common
             return new PackFileToToolSelectorResult() { CanOpen = false, IsCoreTool = false };
         }
     }
+
     public interface IToolFactory
     {
         IEditorViewModel Create(string fullFileName, bool useDefaultTool = false);
@@ -106,9 +95,9 @@ namespace CommonControls.Common
             where View : Control;
     }
 
-    public class ToolFactory : IToolFactory
+    public class ToolFactory 
     {
-        ILogger _logger = Logging.Create<ToolFactory>();
+        ILogger _logger = Logging.Create<IToolFactory>();
         IServiceProvider _serviceProvider;
 
         Dictionary<Type, Type> _viewModelToViewMap = new Dictionary<Type, Type>();
@@ -175,11 +164,6 @@ namespace CommonControls.Common
             return instance;
         }
 
-        public ViewModel Create<ViewModel>() where ViewModel : IEditorViewModel
-        {
-            var instance = (ViewModel)_serviceProvider.GetService(typeof(ViewModel));
-            return instance;
-        }
 
         public Window CreateAsWindow(IEditorViewModel viewModel)
         {
@@ -212,14 +196,24 @@ namespace CommonControls.Common
 
             return output.OrderBy(x=>x.IsCoreTool).ToList();
         }
-
-
     }
 
-    public class ToolInformation
+    class ToolInformation
     { 
         public EditorEnums EditorType { get; set; }
         public bool IsCoreTool { get; set; } = false;
         public Type Type { get; set; }
+    }
+
+    public class PackFileToToolSelectorResult
+    {
+        public bool CanOpen { get; set; } = false;
+        public bool IsCoreTool { get; set; } = false;
+    }
+
+    public interface IPackFileToToolSelector
+    {
+        PackFileToToolSelectorResult CanOpen(string fullPath);
+        EditorEnums EditorType { get; }
     }
 }

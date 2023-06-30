@@ -33,7 +33,7 @@ namespace View3D.Components.Component
 
         private readonly RenderEngineComponent _renderEngineComponent;
 
-        public SceneManager(ComponentManagerResolver componentManagerResolver, RenderEngineComponent renderEngineComponent) : base(componentManagerResolver.ComponentManager) 
+        public SceneManager(RenderEngineComponent renderEngineComponent) 
         {
             _renderEngineComponent = renderEngineComponent;
 

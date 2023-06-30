@@ -20,11 +20,19 @@ using System;
 using TextureEditor;
 using View3D;
 using MediatR;
+using View3D.Components;
 
 namespace AssetEditor
 {
     public class DependencyInjectionConfig
     {
+        DependencyContainer[] dependencyContainers = new DependencyContainer[]
+        {
+            new View3D_DependencyContainer(),
+            new KitbasherEditor_DependencyInjectionContainer(),
+        };
+
+
         public IServiceProvider ServiceProvider { get; private set; }
         
         public DependencyInjectionConfig()
@@ -36,7 +44,7 @@ namespace AssetEditor
             ConfigureServices(serviceCollection);
 
             ServiceProvider = serviceCollection.BuildServiceProvider(validateScopes:true);
-            RegisterTools(ServiceProvider.GetService<ToolFactory>());
+            RegisterTools(ServiceProvider.GetService<IToolFactory>());
         }
 
         public void ConfigureResources()
@@ -49,11 +57,12 @@ namespace AssetEditor
             services.AddMediatR(typeof(App));
 
             services.AddSingleton<ApplicationSettingsService>();
-            services.AddSingleton<ToolFactory>();
+            services.AddSingleton<IToolFactory, IToolFactory>();
             services.AddSingleton<PackFileDataBase>();
             services.AddSingleton<SkeletonAnimationLookUpHelper>();
             services.AddSingleton<CopyPasteManager>();
             services.AddSingleton<GameInformationFactory>();
+       
 
             services.AddScoped<MainWindow>();
             services.AddScoped<MainViewModel>();
@@ -62,9 +71,10 @@ namespace AssetEditor
             services.AddScoped<MenuBarViewModel>();
             services.AddScoped<PackFileService>();
 
+            foreach (var container in dependencyContainers)
+                container.Register(services);
+
             TextEditor_DependencyInjectionContainer.Register(services);
-            KitbasherEditor_DependencyInjectionContainer.Register(services);
-            View3D_DependencyInjectionContainer.Register(services);
             AnimMetaEditor_DependencyInjectionContainer.Register(services);
             AnimationEditors_DependencyInjectionContainer.Register(services);
             AnimationPack_DependencyInjectionContainer.Register(services);
@@ -80,9 +90,10 @@ namespace AssetEditor
 
         void RegisterTools(IToolFactory factory)
         {
+            foreach (var container in dependencyContainers)
+                container.RegisterTools(factory);
+
             TextEditor_DependencyInjectionContainer.RegisterTools(factory);
-            KitbasherEditor_DependencyInjectionContainer.RegisterTools(factory);
-            View3D_DependencyInjectionContainer.RegisterTools(factory);
             AnimMetaEditor_DependencyInjectionContainer.RegisterTools(factory);
             AnimationEditors_DependencyInjectionContainer.RegisterTools(factory);
             AnimationPack_DependencyInjectionContainer.RegisterTools(factory);

@@ -10,7 +10,7 @@ namespace AnimationEditor.MountAnimationCreator
 
     public class MountAnimationCreatorViewModel : BaseAnimationViewModel
     {
-        public MountAnimationCreatorViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService)
+        public MountAnimationCreatorViewModel(IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService)
             : base(toolFactory, pfs, skeletonHelper, applicationSettingsService, "Rider", "Mount")
         {
             DisplayName.Value = "MountAnimCreator";

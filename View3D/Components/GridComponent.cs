@@ -18,8 +18,7 @@ namespace View3D.Components.Component
         private readonly RenderEngineComponent _renderEngineComponent;
         private readonly ResourceLibary _resourceLibary;
 
-        public GridComponent(ComponentManagerResolver componentManagerResolver, RenderEngineComponent renderEngineComponent, ResourceLibary resourceLibary) 
-            : base(componentManagerResolver.ComponentManager)
+        public GridComponent(RenderEngineComponent renderEngineComponent, ResourceLibary resourceLibary) 
         {
             _renderEngineComponent = renderEngineComponent;
             _resourceLibary = resourceLibary;

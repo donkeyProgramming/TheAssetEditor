@@ -21,9 +21,7 @@ namespace View3D.Components.Component
         private readonly KeyboardComponent _keyboardComponent;
         private readonly RenderEngineComponent _renderEngineComponent;
 
-        public LightControllerComponent(ComponentManagerResolver componentManagerResolver,
-            ResourceLibary resourceLibary, DeviceResolverComponent deviceResolverComponent, KeyboardComponent keyboardComponent, RenderEngineComponent renderEngineComponent) 
-            : base(componentManagerResolver.ComponentManager)
+        public LightControllerComponent(ResourceLibary resourceLibary, DeviceResolverComponent deviceResolverComponent, KeyboardComponent keyboardComponent, RenderEngineComponent renderEngineComponent) 
         {
             _resourceLibary = resourceLibary;
             _deviceResolverComponent = deviceResolverComponent;

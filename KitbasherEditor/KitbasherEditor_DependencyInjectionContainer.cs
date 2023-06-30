@@ -9,185 +9,56 @@ using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
-using System.Collections.Generic;
-using View3D.Commands;
-using View3D.Commands.Face;
-using View3D.Commands.Object;
-using View3D.Commands.Vertex;
-using View3D.Components;
+using View3D;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
-using View3D.Components.Gizmo;
-using View3D.Components.Input;
-using View3D.Components.Rendering;
-using View3D.Rendering.Geometry;
-using View3D.Scene;
-using View3D.Services;
-using View3D.Utility;
 
 namespace KitbasherEditor
 {
-    public class KitbasherEditor_DependencyInjectionContainer
+    public class KitbasherEditor_DependencyInjectionContainer : DependencyContainer
     {
-        public static void RegisterNotificationHandler<TNotification, TImplementation>(IServiceCollection serviceCollection)
-            where TNotification : INotification 
-            where TImplementation : class, INotificationHandler<TNotification>
+        public override void Register(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddScoped<INotificationHandler<TNotification>, TImplementation>(x =>x.GetRequiredService<TImplementation>());
-        }
-
-        public static void Register(IServiceCollection serviceCollection)
-        {
-
+            // Events
             RegisterNotificationHandler<SceneInitializedEvent, KitbasherViewModel>(serviceCollection);
             RegisterNotificationHandler<FileSavedEvent, KitbasherViewModel>(serviceCollection);
             RegisterNotificationHandler<CommandStackChangedEvent, KitbasherViewModel>(serviceCollection);
-
-            RegisterNotificationHandler<CommandStackChangedEvent, CommandStackRenderer>(serviceCollection);
-            RegisterNotificationHandler<CommandStackUndoEvent, CommandStackRenderer>(serviceCollection);
-
-
-            RegisterNotificationHandler<SelectionChangedEvent, GizmoComponent>(serviceCollection);
             RegisterNotificationHandler<SelectionChangedEvent, MenuBarViewModel>(serviceCollection);
             RegisterNotificationHandler<SelectionChangedEvent, VertexDebuggerViewModel>(serviceCollection);
             RegisterNotificationHandler<SelectionChangedEvent, SceneExplorerViewModel>(serviceCollection);
             RegisterNotificationHandler<SelectionChangedEvent, TransformToolViewModel>(serviceCollection);
 
+            // Creators
+            serviceCollection.AddScoped<KitbashSceneCreator>();
+            serviceCollection.AddScoped<SceneNodeViewFactory>();
+
+            // View models
             serviceCollection.AddScoped<VertexDebuggerViewModel>();
-
-
             serviceCollection.AddScoped<KitbasherView>();
             serviceCollection.AddScoped<KitbasherViewModel>();
             serviceCollection.AddScoped<IEditorViewModel, KitbasherViewModel>();
-
-
-            serviceCollection.AddScoped<SceneContainer>();
-            serviceCollection.AddScoped<WpfGame>( x=> x.GetService<SceneContainer>() as WpfGame);
-
-            serviceCollection.AddScoped<ComponentManagerResolver>();
-            serviceCollection.AddScoped<ComponentInserter>();
-
-            serviceCollection.AddScoped<IDeviceResolver, DeviceResolverComponent>(x => x.GetService<DeviceResolverComponent>());
-            serviceCollection.AddScoped<CommandExecutor>();
-            
-            serviceCollection.AddScoped<SceneNodeViewFactory>();
-       
-            
-
-            RegisterGameComponent<DeviceResolverComponent>(serviceCollection);
-            RegisterGameComponent<CommandStackRenderer>(serviceCollection);
-            RegisterGameComponent<KeyboardComponent>(serviceCollection);
-            RegisterGameComponent<MouseComponent>(serviceCollection);
-            RegisterGameComponent<ResourceLibary>(serviceCollection);
-            RegisterGameComponent<FpsComponent>(serviceCollection);
-            RegisterGameComponent<ArcBallCamera>(serviceCollection);
-            RegisterGameComponent<SceneManager>(serviceCollection);
-            RegisterGameComponent<GizmoComponent>(serviceCollection);
-            RegisterGameComponent<SelectionManager>(serviceCollection);
-            RegisterGameComponent<SelectionComponent>(serviceCollection);
-            RegisterGameComponent<RenderEngineComponent>(serviceCollection);
-            RegisterGameComponent<ClearScreenComponent>(serviceCollection);
-            RegisterGameComponent<GridComponent>(serviceCollection);
-            RegisterGameComponent<AnimationsContainerComponent>(serviceCollection);
-            RegisterGameComponent<LightControllerComponent>(serviceCollection);
-
-
-            serviceCollection.AddScoped<ViewOnlySelectedService>();
-            serviceCollection.AddScoped<FocusSelectableObjectService>();
-            serviceCollection.AddScoped<KitbashSceneCreator>();
-            serviceCollection.AddScoped<FaceEditor>();
-            serviceCollection.AddScoped<ObjectEditor>();
             serviceCollection.AddScoped<SceneExplorerViewModel>();
+            serviceCollection.AddScoped<AnimationControllerViewModel>();
+
+            // Menubar 
             serviceCollection.AddScoped<TransformToolViewModel>();
             serviceCollection.AddScoped<MenuBarViewModel>();
-
             serviceCollection.AddScoped<GizmoActions>();
             serviceCollection.AddScoped<VisibilityHandler>();
-
             serviceCollection.AddScoped<GeneralActions>();
             serviceCollection.AddScoped<ToolActions>();
 
-
+            // Misc
             serviceCollection.AddScoped<WindowKeyboard>();
-
-            serviceCollection.AddScoped<KitbashSceneCreator>();
-            serviceCollection.AddScoped<IGeometryGraphicsContextFactory, GeometryGraphicsContextFactory>();
-
-
-            serviceCollection.AddScoped<AnimationControllerViewModel>();
-
-            serviceCollection.AddScoped<ActiveFileResolver>();
-
-            serviceCollection.AddScoped<SceneSaverService>();
-            serviceCollection.AddScoped<WsModelGeneratorService>();
-
-            serviceCollection.AddScoped<CommandFactory>();
-
-            serviceCollection.AddTransient<ConvertFacesToVertexSelectionCommand>();
-            serviceCollection.AddTransient<FaceSelectionCommand>();
-            serviceCollection.AddTransient<DuplicateFacesCommand>();
-            serviceCollection.AddTransient<VertexSelectionCommand>();
-            serviceCollection.AddTransient<ObjectSelectionCommand>();
-            serviceCollection.AddTransient<DeleteFaceCommand>();
-            serviceCollection.AddTransient<DeleteObjectsCommand>();
-            serviceCollection.AddTransient<ReduceMeshCommand>();
-            serviceCollection.AddTransient<TransformVertexCommand>();
-            serviceCollection.AddTransient<CombineMeshCommand>();
-            serviceCollection.AddTransient<CreateAnimatedMeshPoseCommand>();
-            serviceCollection.AddTransient<DivideObjectIntoSubmeshesCommand>();
-            serviceCollection.AddTransient<DuplicateObjectCommand>();
-            serviceCollection.AddTransient<AddObjectsToGroupCommand>();
-            serviceCollection.AddTransient<UnGroupObjectsCommand>();
-            serviceCollection.AddTransient<GroupObjectsCommand>();
-            serviceCollection.AddTransient<GrowMeshCommand>();
-            serviceCollection.AddTransient<ObjectSelectionModeCommand>();
-            serviceCollection.AddTransient<PinMeshToVertexCommand>();
-            serviceCollection.AddTransient<RemapBoneIndexesCommand>();
-
-
-            // Add all ICommand as AddTransient
-            // Add all Comonents as scoped
-
-
+            serviceCollection.AddScoped<KitbashViewDropHandler>();  
         }
 
-
-
-        public static void RegisterGameComponent<T>(IServiceCollection serviceCollection) where T : class, IGameComponent
-        {
-            serviceCollection.AddScoped<T>();
-            serviceCollection.AddScoped<IGameComponent, T>(x => x.GetService<T>());
-
-        }
-
-        public static void RegisterTools(IToolFactory factory)
+        public override void RegisterTools(IToolFactory factory)
         {
             factory.RegisterTool<KitbasherViewModel, KitbasherView>(new ExtentionToTool(EditorEnums.Kitbash_Editor, new[] { ".rigid_model_v2", ".wsmodel.rigid_model_v2" }/*, new[] { ".wsmodel", ".variantmeshdefinition" }*/));
         }
-
-
-        public class ComponentInserter
-        {
-            private readonly ComponentManagerResolver _componentManagerResolver;
-            private readonly IEnumerable<IGameComponent> _components;
-
-            public ComponentInserter(ComponentManagerResolver componentManagerResolver, IEnumerable<IGameComponent> components)
-            {
-                _componentManagerResolver = componentManagerResolver;
-                _components = components;
-            }
-
-            public void Execute()
-            {
-                foreach (var component in _components)
-                    _componentManagerResolver.ComponentManager.AddComponent(component);
-            }
-        }
-
     
     }
 

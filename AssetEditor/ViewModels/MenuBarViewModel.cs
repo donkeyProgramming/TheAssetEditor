@@ -52,7 +52,7 @@ namespace AssetEditor.ViewModels
         private readonly GameInformationFactory _gameInformationFactory;
         IServiceProvider _serviceProvider;
         PackFileService _packfileService;
-        ToolFactory _toolFactory;
+        IToolFactory _toolFactory;
         ApplicationSettingsService _settingsService;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         public IEditorCreator EditorCreator { get; set; }
@@ -107,7 +107,7 @@ namespace AssetEditor.ViewModels
         
         public ObservableCollection<RecentPackFileItem> RecentPackFiles { get; set; } = new ObservableCollection<RecentPackFileItem>();
 
-        public MenuBarViewModel(GameInformationFactory gameInformationFactory, IServiceProvider provider, PackFileService packfileService, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ToolFactory toolFactory, ApplicationSettingsService settingsService)
+        public MenuBarViewModel(GameInformationFactory gameInformationFactory, IServiceProvider provider, PackFileService packfileService, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, IToolFactory toolFactory, ApplicationSettingsService settingsService)
         {
             _gameInformationFactory = gameInformationFactory;
             _serviceProvider = provider;

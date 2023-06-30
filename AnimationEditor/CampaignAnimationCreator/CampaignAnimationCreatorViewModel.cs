@@ -7,7 +7,7 @@ namespace AnimationEditor.CampaignAnimationCreator
 {
     public class CampaignAnimationCreatorViewModel : BaseAnimationViewModel
     {
-        public CampaignAnimationCreatorViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService) 
+        public CampaignAnimationCreatorViewModel(IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService) 
             : base(toolFactory, pfs, skeletonHelper, applicationSettingsService,"Model", "Not_in_use")
         {
             DisplayName.Value = "Campaign Animation Creator";

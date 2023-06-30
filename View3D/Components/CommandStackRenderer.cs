@@ -15,10 +15,12 @@ namespace View3D.Components.Component
         string _animationText;
         GameTime _animationStart;
         bool _startAnimation;
+        private readonly ResourceLibary _resourceLibary;
         private readonly DeviceResolverComponent _deviceResolverComponent;
 
-        public CommandStackRenderer(ComponentManagerResolver componentManagerResolver, DeviceResolverComponent deviceResolverComponent) : base(componentManagerResolver.ComponentManager)
+        public CommandStackRenderer(ResourceLibary resourceLibary, DeviceResolverComponent deviceResolverComponent)
         {
+            _resourceLibary = resourceLibary;
             _deviceResolverComponent = deviceResolverComponent;
         }
 
@@ -32,8 +34,6 @@ namespace View3D.Components.Component
         {
             if (_animationStart != null)
             {
-                var resourceLib = ComponentManager.GetComponent<ResourceLibary>();
-
                 var timeDiff = (gameTime.TotalGameTime - _animationStart.TotalGameTime).TotalMilliseconds;
                 float lerpValue = (float)timeDiff / 2000.0f;
                 var alphaValue = MathHelper.Lerp(1, 0, lerpValue);
@@ -41,7 +41,7 @@ namespace View3D.Components.Component
                     _animationStart = null;
 
                 _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-                _spriteBatch.DrawString(resourceLib.DefaultFont, _animationText, new Vector2(5, 20), new Color(0, 0, 0, alphaValue));
+                _spriteBatch.DrawString(_resourceLibary.DefaultFont, _animationText, new Vector2(5, 20), new Color(0, 0, 0, alphaValue));
                 _spriteBatch.End();
             }
 

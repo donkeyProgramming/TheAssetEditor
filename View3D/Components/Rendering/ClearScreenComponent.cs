@@ -7,7 +7,7 @@ namespace View3D.Components.Rendering
     {
         private readonly DeviceResolverComponent _deviceResolverComponent;
 
-        public ClearScreenComponent(ComponentManagerResolver componentManagerResolver, DeviceResolverComponent deviceResolverComponent) : base(componentManagerResolver.ComponentManager)
+        public ClearScreenComponent(DeviceResolverComponent deviceResolverComponent)
         {
             DrawOrder = (int)ComponentDrawOrderEnum.ClearScreenComponent;
             _deviceResolverComponent = deviceResolverComponent;

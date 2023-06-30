@@ -31,10 +31,10 @@ namespace View3D.Components.Gizmo
         bool _isCtrlPressed = false;
 
 
-        public GizmoComponent(ComponentManagerResolver componentManagerResolver,
+        public GizmoComponent(
             KeyboardComponent keyboardComponent, MouseComponent mouseComponent, ArcBallCamera camera, CommandExecutor commandExecutor,
             ResourceLibary resourceLibary, DeviceResolverComponent deviceResolverComponent, CommandFactory commandFactory,
-            SelectionManager selectionManager) : base(componentManagerResolver.ComponentManager)
+            SelectionManager selectionManager)
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.Gizmo;
             DrawOrder = (int)ComponentDrawOrderEnum.Gizmo;

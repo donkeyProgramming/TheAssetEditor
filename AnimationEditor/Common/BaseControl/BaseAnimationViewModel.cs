@@ -36,8 +36,8 @@ namespace AnimationEditor.PropCreator.ViewModels
         public PackFile MainFile { get; set; }
 
         protected IToolFactory _toolFactory;
-        SceneContainer _scene;
-        public SceneContainer Scene { get => _scene; set => SetAndNotify(ref _scene, value); }
+        MainScene _scene;
+        public MainScene Scene { get => _scene; set => SetAndNotify(ref _scene, value); }
 
         public ReferenceModelSelectionViewModel MainModelView { get; set; }
         public ReferenceModelSelectionViewModel ReferenceModelView { get; set; }
@@ -65,7 +65,7 @@ namespace AnimationEditor.PropCreator.ViewModels
             _createDefaultAssets = createDefaultAssets;
             _applicationSettingsService = applicationSettingsService;
 
-            Scene = new SceneContainer(null, null);
+            Scene = new MainScene(null, null);
             Scene.AddComponent(new DeviceResolverComponent(Scene));
             Scene.AddComponent(new ResourceLibary(Scene, pfs));
             //Scene.AddComponent(new FpsComponent(new ComponentManagerResolver(Scene), ));

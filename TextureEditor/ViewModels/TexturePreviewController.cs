@@ -81,7 +81,7 @@ namespace TextureEditor.ViewModels
         TextureToTextureRenderer _textureRenderer;
         string _imagePath;
         TexturePreviewViewModel _viewModel;
-        SceneContainer _scene;
+        MainScene _scene;
         MeshObject _mesh;
 
         public class ViewModelWrapper: NotifyPropertyChangedImpl
@@ -118,7 +118,7 @@ namespace TextureEditor.ViewModels
 
             _mesh = meshObject;
 
-            _scene = new SceneContainer(null, null);
+            _scene = new MainScene(null, null);
             _scene.Components.Add(new ResourceLibary(_scene, packFileService ));
             _scene.ForceCreate();
 

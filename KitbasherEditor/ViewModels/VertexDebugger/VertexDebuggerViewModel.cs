@@ -59,19 +59,22 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
 
         LineMeshRender _lineRenderer;
         Effect _lineShader;
+        private readonly RenderEngineComponent _renderEngineComponent;
+        private readonly ResourceLibary _resourceLibary;
+        private readonly SelectionManager _selectionManager;
 
-        public VertexDebuggerViewModel(ComponentManagerResolver componentManagerResolver) : base(componentManagerResolver.ComponentManager)
+        public VertexDebuggerViewModel(RenderEngineComponent renderEngineComponent, ResourceLibary resourceLibary, SelectionManager selectionManager) 
         {
-
+            _renderEngineComponent = renderEngineComponent;
+            _resourceLibary = resourceLibary;
+            _selectionManager = selectionManager;
         }
 
         public override void Initialize()
         {
-            var resourceLib = ComponentManager.GetComponent<ResourceLibary>();
-            _lineShader = resourceLib.GetStaticEffect(ShaderTypes.Line);
-            _lineRenderer = new LineMeshRender(resourceLib);
+            _lineShader = _resourceLibary.GetStaticEffect(ShaderTypes.Line);
+            _lineRenderer = new LineMeshRender(_resourceLibary);
 
-            var selectionMgr = ComponentManager.GetComponent<SelectionManager>();
             Refresh();
 
             base.Initialize();
@@ -82,9 +85,8 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
         {
             VertexList.Clear();
             SelectedVertex = null;
-            var selectionMgr = ComponentManager.GetComponent<SelectionManager>();
 
-            if (selectionMgr.GetState() is VertexSelectionState selection)
+            if (_selectionManager.GetState() is VertexSelectionState selection)
             {
                 var mesh = selection.GetSingleSelectedObject() as Rmv2MeshNode;
                 var vertexList = selection.SelectedVertices;
@@ -118,16 +120,15 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
         {
             _lineRenderer.Clear();
 
-            var selection = ComponentManager.GetComponent<SelectionManager>().GetState<VertexSelectionState>();
+            var selection = _selectionManager.GetState<VertexSelectionState>();
             if (selection != null)
             {
-                var renderEngine = ComponentManager.GetComponent<RenderEngineComponent>();
                 var mesh = selection.GetSingleSelectedObject() as Rmv2MeshNode;
 
                 if (SelectedVertex != null)
                 {
                     var bb = BoundingBox.CreateFromSphere(new BoundingSphere(mesh.Geometry.GetVertexById(SelectedVertex.Id), 0.05f));
-                    renderEngine.AddRenderItem(RenderBuckedId.Normal, new BoundingBoxRenderItem(_lineShader, bb, Color.White));
+                    _renderEngineComponent.AddRenderItem(RenderBuckedId.Normal, new BoundingBoxRenderItem(_lineShader, bb, Color.White));
                 }
 
                 var vertexList = selection.SelectedVertices;
@@ -141,7 +142,7 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
                     _lineRenderer.AddLine(pos, pos + vertexInfo.Tangent * scale, Color.Blue);
                 }
 
-                renderEngine.AddRenderItem(RenderBuckedId.Normal, new LineRenderItem() { LineMesh = _lineRenderer, ModelMatrix = mesh.ModelMatrix * Matrix.CreateTranslation(mesh.Material.PivotPoint) });
+                _renderEngineComponent.AddRenderItem(RenderBuckedId.Normal, new LineRenderItem() { LineMesh = _lineRenderer, ModelMatrix = mesh.ModelMatrix * Matrix.CreateTranslation(mesh.Material.PivotPoint) });
             }
         }
 

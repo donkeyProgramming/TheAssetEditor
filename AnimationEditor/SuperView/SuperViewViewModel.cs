@@ -9,7 +9,7 @@ namespace AnimationEditor.SuperView
     public class SuperViewViewModel : BaseAnimationViewModel
     {
         CopyPasteManager _copyPasteManager;
-        public SuperViewViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService) 
+        public SuperViewViewModel(IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService) 
             : base(toolFactory, pfs, skeletonHelper, applicationSettingsService, "not_in_use1", "not_in_use2", false)
         {
             _copyPasteManager = copyPasteManager;

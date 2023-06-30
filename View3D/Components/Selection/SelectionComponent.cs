@@ -29,18 +29,17 @@ namespace View3D.Components.Component.Selection
         private readonly DeviceResolverComponent _deviceResolverComponent;
         private readonly CommandFactory _commandFactory;
         SceneManager _sceneManger;
-        CommandExecutor _commandManager;
+
 
         bool _isMouseDown = false;
         Vector2 _startDrag;
         Vector2 _currentMousePos;
 
-        public SelectionComponent(ComponentManagerResolver componentManagerResolver,
+        public SelectionComponent(
             MouseComponent mouseComponent, KeyboardComponent keyboardComponent,
             ArcBallCamera camera, SelectionManager selectionManager,
             DeviceResolverComponent deviceResolverComponent, CommandFactory commandFactory,
-            SceneManager sceneManager, CommandExecutor commandExecutor) 
-            : base(componentManagerResolver.ComponentManager)
+            SceneManager sceneManager ) 
         {
             _mouseComponent = mouseComponent;
             _keyboardComponent = keyboardComponent;
@@ -49,7 +48,6 @@ namespace View3D.Components.Component.Selection
             _deviceResolverComponent = deviceResolverComponent;
             _commandFactory = commandFactory;
             _sceneManger = sceneManager;
-            _commandManager = commandExecutor;
         }
 
         public override void Initialize()

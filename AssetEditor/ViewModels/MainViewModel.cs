@@ -23,7 +23,7 @@ namespace AssetEditor.ViewModels
         public PackFileBrowserViewModel FileTree { get; private set; }
         public MenuBarViewModel MenuBar { get; set; }
 
-        public ToolFactory ToolsFactory { get; set; }
+        public IToolFactory ToolsFactory { get; set; }
         public ObservableCollection<IEditorViewModel> CurrentEditorsList { get; set; } = new ObservableCollection<IEditorViewModel>();
 
         int _selectedIndex;
@@ -50,7 +50,7 @@ namespace AssetEditor.ViewModels
         public ICommand CloseToolsToRightCommand { get; set; }
         public ICommand CloseToolsToLeftCommand { get; set; }
 
-        public MainViewModel(GameInformationFactory gameInformationFactory, MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, ToolFactory toolFactory, SkeletonAnimationLookUpHelper animationLookUpHelper)
+        public MainViewModel(GameInformationFactory gameInformationFactory, MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, IToolFactory toolFactory, SkeletonAnimationLookUpHelper animationLookUpHelper)
         {
             _packfileService = packfileService;
             _packfileService.Database.BeforePackFileContainerRemoved += Database_BeforePackFileContainerRemoved;

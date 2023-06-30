@@ -13,7 +13,7 @@ namespace AnimationEditor.SuperView
 {
     public class Editor
     {
-        SceneContainer _scene;
+        MainScene _scene;
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonHelper;
         AnimationPlayerViewModel _player;
@@ -31,7 +31,7 @@ namespace AnimationEditor.SuperView
 
         public ObservableCollection<ReferenceModelSelectionViewModel> Items { get; set; } = new ObservableCollection<ReferenceModelSelectionViewModel>();
 
-        public Editor(IToolFactory toolFactory, SceneContainer scene, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, AnimationPlayerViewModel player, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService)
+        public Editor(IToolFactory toolFactory, MainScene scene, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, AnimationPlayerViewModel player, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService)
         {
             _toolFactory = toolFactory;
             _scene = scene;

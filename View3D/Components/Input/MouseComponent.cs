@@ -5,9 +5,7 @@ using MonoGame.Framework.WpfInterop;
 using MonoGame.Framework.WpfInterop.Input;
 using Serilog;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using View3D.Components;
+using View3D.Scene;
 using View3D.Utility;
 
 namespace View3D.Components.Input
@@ -42,15 +40,11 @@ namespace View3D.Components.Input
                     }
 
                     _mouseOwner = value;
-                    //if (_mouseOwner == null)
-                    //    _logger.Here().Information($"Setting MouseOwner = null");
-                    //else
-                    //    _logger.Here().Information($"Setting MouseOwner = {_mouseOwner.GetType().Name}");
                 }
             } 
         }
 
-        public MouseComponent(ComponentManagerResolver componentManagerResolver, WpfGame game) : base(componentManagerResolver.ComponentManager)
+        public MouseComponent(MainScene game) 
         {
             _wpfMouse = new WpfMouse(game);
             _wpfMouse.CaptureMouseWithin = true;
@@ -63,8 +57,6 @@ namespace View3D.Components.Input
                 return true;
             return false;
         }
-
-
 
         public override void Update(GameTime t)
         {

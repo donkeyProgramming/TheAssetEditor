@@ -30,7 +30,7 @@ namespace View3D.Components.Component.Selection
         private readonly ResourceLibary _resourceLib;
         private readonly DeviceResolverComponent _deviceResolverComponent;
 
-        public SelectionManager(IMediator mediator, ComponentManagerResolver componentManagerResolver, RenderEngineComponent renderEngine, ResourceLibary resourceLib, DeviceResolverComponent deviceResolverComponent ) : base(componentManagerResolver.ComponentManager)
+        public SelectionManager(IMediator mediator, RenderEngineComponent renderEngine, ResourceLibary resourceLib, DeviceResolverComponent deviceResolverComponent)
         {
             _mediator = mediator;
             _renderEngine = renderEngine;

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using View3D.Components;
+using View3D.Scene;
 
 namespace View3D.Utility
 {
@@ -31,8 +32,8 @@ namespace View3D.Utility
         Dictionary<string, Texture2D> _textureMap = new Dictionary<string, Texture2D>();
         Dictionary<ShaderTypes, Effect> _shaders = new Dictionary<ShaderTypes, Effect>();
 
-        public PackFileService Pfs { get; private set; }
-        public ContentManager Content { get; set; }
+        PackFileService Pfs { get; set; }
+        ContentManager Content { get; set; }
         public SpriteBatch CommonSpriteBatch{ get; private set; }
         public SpriteFont DefaultFont { get; private set; }
 
@@ -40,11 +41,11 @@ namespace View3D.Utility
         public TextureCube PbrSpecular { get; private set; }
         public Texture2D PbrLut { get; private set; }
 
-        WpfGame _game;
-        public ResourceLibary(WpfGame game, PackFileService pf) : base(game)
+        MainScene _scene;
+        public ResourceLibary(MainScene mainScene, PackFileService pf) 
         {
             Pfs = pf;
-            _game = game;
+            _scene = mainScene;
         }
 
         public SpriteFont LoadFont(string path)
@@ -54,7 +55,7 @@ namespace View3D.Utility
 
         public override void Initialize()
         {
-            Content = _game.Content;
+            Content = _scene.Content;
 
             // Load default shaders
             LoadEffect("Shaders\\Phazer\\MetalRoughness_main", ShaderTypes.Pbs_MetalRough);
@@ -64,7 +65,7 @@ namespace View3D.Utility
             LoadEffect("Shaders\\LineShader", ShaderTypes.Line);
 
             DefaultFont = LoadFont("Fonts//DefaultFont");
-            CommonSpriteBatch = new SpriteBatch(_game.GraphicsDevice);
+            CommonSpriteBatch = new SpriteBatch(_scene.GraphicsDevice);
 
             //PbrSpecular= LoadTexture(@"C:\Users\ole_k\Downloads\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512.dds", false, true);
             //PbrDiffuse  = LoadTexture(@"C:\Users\ole_k\Downloads\DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128.dds", false, true);
@@ -83,7 +84,7 @@ namespace View3D.Utility
                     return _textureMap[fileName];
             }
 
-            var texture = LoadTextureAsTexture2d(fileName, _game.GraphicsDevice, new ImageInformation(), fromFile);
+            var texture = LoadTextureAsTexture2d(fileName, _scene.GraphicsDevice, new ImageInformation(), fromFile);
             if (texture != null)
                 _textureMap[fileName] = texture;
             return texture;
@@ -92,7 +93,7 @@ namespace View3D.Utility
         public Texture2D ForceLoadImage(string fileName, out ImageInformation imageInfo, bool fromFile = false)
         {
             imageInfo = new ImageInformation();
-            return LoadTextureAsTexture2d(fileName, _game.GraphicsDevice, imageInfo, fromFile);
+            return LoadTextureAsTexture2d(fileName, _scene.GraphicsDevice, imageInfo, fromFile);
         }
 
         public void SaveTexture(Texture2D texture, string path)

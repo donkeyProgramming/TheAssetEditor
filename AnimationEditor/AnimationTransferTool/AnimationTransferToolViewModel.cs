@@ -9,7 +9,7 @@ namespace AnimationEditor.AnimationTransferTool
 {
     public class AnimationTransferToolViewModel : BaseAnimationViewModel
     {
-        public AnimationTransferToolViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService) 
+        public AnimationTransferToolViewModel(IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService) 
             : base(toolFactory, pfs, skeletonHelper, applicationSettingsService, "Target", "Source")
         {
             DisplayName.Value = "Animation transfer tool";

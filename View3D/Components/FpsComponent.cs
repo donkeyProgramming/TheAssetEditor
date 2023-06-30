@@ -15,8 +15,7 @@ namespace View3D.Components.Component
         private readonly ResourceLibary _resourceLibary;
         private readonly DeviceResolverComponent _deviceResolverComponent;
 
-        public FpsComponent(ComponentManagerResolver componentManagerResolver, ResourceLibary resourceLibary, DeviceResolverComponent deviceResolverComponent)
-            : base(componentManagerResolver.ComponentManager)
+        public FpsComponent(ResourceLibary resourceLibary, DeviceResolverComponent deviceResolverComponent)
         {
             _resourceLibary = resourceLibary;
             _deviceResolverComponent = deviceResolverComponent;

@@ -10,15 +10,13 @@ using Microsoft.Extensions.DependencyInjection;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using View3D.Components;
 using View3D.Components.Component;
 using View3D.Scene;
 using View3D.Services;
-
-using static KitbasherEditor.KitbasherEditor_DependencyInjectionContainer;
 
 namespace KitbasherEditor.ViewModels
 {
@@ -33,9 +31,10 @@ namespace KitbasherEditor.ViewModels
         private readonly PackFileService _packFileService;
         private readonly KitbashSceneCreator _kitbashSceneCreator;
         private readonly FocusSelectableObjectService _focusSelectableObjectComponent;
+        private readonly KitbashViewDropHandler _dropHandler;
         private readonly ActiveFileResolver _activeFileResolver;
 
-        public SceneContainer Scene { get; set; }
+        public MainScene Scene { get; set; }
         public SceneExplorerViewModel SceneExplorer { get; set; }
         public MenuBarViewModel MenuBar { get; set; }
         public AnimationControllerViewModel Animation { get; set; }
@@ -46,15 +45,15 @@ namespace KitbasherEditor.ViewModels
         private bool _hasUnsavedChanges;
 
         public KitbasherViewModel(PackFileService packFileService, 
-            SceneContainer sceneContainer, ComponentInserter componentInserter, MenuBarViewModel menuBarViewModel, 
-            AnimationControllerViewModel animationControllerViewModel,
-            KitbashSceneCreator kitbashSceneCreator, SceneExplorerViewModel sceneExplorerViewModel, ActiveFileResolver activeFileResolver, FocusSelectableObjectService focusSelectableObjectComponent)
+            MainScene sceneContainer, MenuBarViewModel menuBarViewModel, 
+            AnimationControllerViewModel animationControllerViewModel, IComponentInserter componentInserter,
+            KitbashSceneCreator kitbashSceneCreator, SceneExplorerViewModel sceneExplorerViewModel, ActiveFileResolver activeFileResolver, FocusSelectableObjectService focusSelectableObjectComponent, KitbashViewDropHandler dropHandler)
         {
             _packFileService = packFileService;
             _activeFileResolver = activeFileResolver;
             _kitbashSceneCreator = kitbashSceneCreator;
             _focusSelectableObjectComponent = focusSelectableObjectComponent;
-
+            _dropHandler = dropHandler;
             Scene = sceneContainer;
             Animation = animationControllerViewModel;
             SceneExplorer = sceneExplorerViewModel;
@@ -87,24 +86,9 @@ namespace KitbasherEditor.ViewModels
             }
         }
 
+        public bool AllowDrop(TreeNode node, TreeNode targeNode = null) => _dropHandler.AllowDrop(node, targeNode);
+        public bool Drop(TreeNode node, TreeNode targeNode = null) => _dropHandler.Drop(node, targeNode);
 
-
-        public bool AllowDrop(TreeNode node, TreeNode targeNode = null)
-        {
-            if (node != null && node.NodeType == NodeType.File)
-            {
-                var extension = Path.GetExtension(node.Name).ToLower();
-                if (extension == ".rigid_model_v2" || extension == ".wsmodel" || extension == ".variantmeshdefinition")
-                    return true;
-            }
-            return false;
-        }
-
-        public bool Drop(TreeNode node, TreeNode targeNode = null)
-        {
-            _kitbashSceneCreator.LoadReference(node.Item);
-            return true;
-        }
 
         public Task Handle(FileSavedEvent notification, CancellationToken cancellationToken)
         {
