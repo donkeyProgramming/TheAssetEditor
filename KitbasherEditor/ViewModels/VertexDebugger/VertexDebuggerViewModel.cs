@@ -1,14 +1,12 @@
-﻿using CommonControls.MathViews;
+﻿using Common;
+using CommonControls.MathViews;
 using KitbasherEditor.Views.EditorViews.VertexDebugger;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.ObjectModel;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using View3D.Components;
 using View3D.Components.Component.Selection;
@@ -21,8 +19,7 @@ using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels.VertexDebugger
 {
-    class VertexDebuggerViewModel : BaseComponent, IDisposable,
-        INotificationHandler<SelectionChangedEvent>
+    class VertexDebuggerViewModel : BaseComponent, IDisposable
     {
         public class VertexInstance
         {
@@ -63,11 +60,12 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
         private readonly ResourceLibary _resourceLibary;
         private readonly SelectionManager _selectionManager;
 
-        public VertexDebuggerViewModel(RenderEngineComponent renderEngineComponent, ResourceLibary resourceLibary, SelectionManager selectionManager) 
+        public VertexDebuggerViewModel(RenderEngineComponent renderEngineComponent, ResourceLibary resourceLibary, SelectionManager selectionManager, EventHub eventHub) 
         {
             _renderEngineComponent = renderEngineComponent;
             _resourceLibary = resourceLibary;
             _selectionManager = selectionManager;
+            eventHub.Register<SelectionChangedEvent>(Handle);
         }
 
         public override void Initialize()
@@ -167,10 +165,9 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
             _lineRenderer.Dispose();
         }
 
-        public Task Handle(SelectionChangedEvent notification, CancellationToken cancellationToken)
+        void Handle(SelectionChangedEvent notification)
         {
             Refresh();
-            return Task.CompletedTask;
         }
     }
 }

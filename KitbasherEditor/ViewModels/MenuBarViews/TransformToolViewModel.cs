@@ -1,12 +1,9 @@
-﻿using CommonControls.Common;
+﻿using Common;
+using CommonControls.Common;
 using CommonControls.MathViews;
 using CommunityToolkit.Mvvm.Input;
-using MediatR;
 using Microsoft.Xna.Framework;
 using System.ComponentModel;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Input;
 using View3D.Commands;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
@@ -14,8 +11,7 @@ using View3D.Components.Gizmo;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
-    public class TransformToolViewModel : NotifyPropertyChangedImpl,
-        INotificationHandler<SelectionChangedEvent>
+    public class TransformToolViewModel : NotifyPropertyChangedImpl
     {
         public enum TransformMode
         { 
@@ -51,7 +47,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public NotifyAttr<bool> ShowVertexFalloff { get; set; } = new NotifyAttr<bool>(false);
 
 
-        public TransformToolViewModel(SelectionManager selectionManager, CommandExecutor commandExecutor, CommandFactory commandFactory)
+        public TransformToolViewModel(SelectionManager selectionManager, CommandExecutor commandExecutor, CommandFactory commandFactory, EventHub eventHub)
         {
             ApplyCommand = new RelayCommand(ApplyTransform);
 
@@ -60,6 +56,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _selectionManager = selectionManager;
             _commandExecutor = commandExecutor;
             _commandFactory = commandFactory;
+            eventHub.Register<SelectionChangedEvent>(Handle);
         }
 
         public void VertexMovementFalloffChanged(object sender, PropertyChangedEventArgs e)
@@ -138,10 +135,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 _vector3.Set(0);
         }
 
-        public Task Handle(SelectionChangedEvent notification, CancellationToken cancellationToken)
+        void Handle(SelectionChangedEvent notification)
         {
             SelectionChanged(notification.NewState);
-            return Task.CompletedTask;
         }
     }
 }

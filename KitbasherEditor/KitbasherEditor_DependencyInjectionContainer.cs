@@ -1,7 +1,6 @@
 ﻿using _componentManager.ViewModels.MenuBarViews;
 using CommonControls.Common;
 using CommonControls.Common.MenuSystem;
-using CommonControls.Events;
 using CommonControls.Services;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels;
@@ -10,10 +9,7 @@ using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
 using Microsoft.Extensions.DependencyInjection;
-using MonoGame.Framework.WpfInterop;
 using View3D;
-using View3D.Components.Component;
-using View3D.Components.Component.Selection;
 
 namespace KitbasherEditor
 {
@@ -21,15 +17,6 @@ namespace KitbasherEditor
     {
         public override void Register(IServiceCollection serviceCollection)
         {
-            // Events
-            RegisterNotificationHandler<SceneInitializedEvent, KitbasherViewModel>(serviceCollection);
-            RegisterNotificationHandler<FileSavedEvent, KitbasherViewModel>(serviceCollection);
-            RegisterNotificationHandler<CommandStackChangedEvent, KitbasherViewModel>(serviceCollection);
-            RegisterNotificationHandler<SelectionChangedEvent, MenuBarViewModel>(serviceCollection);
-            RegisterNotificationHandler<SelectionChangedEvent, VertexDebuggerViewModel>(serviceCollection);
-            RegisterNotificationHandler<SelectionChangedEvent, SceneExplorerViewModel>(serviceCollection);
-            RegisterNotificationHandler<SelectionChangedEvent, TransformToolViewModel>(serviceCollection);
-
             // Creators
             serviceCollection.AddScoped<KitbashSceneCreator>();
             serviceCollection.AddScoped<SceneNodeViewFactory>();

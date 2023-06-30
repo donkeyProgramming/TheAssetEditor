@@ -16,7 +16,6 @@ using MonoGame.Framework.WpfInterop;
 using View3D.Rendering.Geometry;
 using View3D.Scene;
 using View3D.Services;
-using MediatR;
 
 namespace View3D
 {
@@ -47,11 +46,6 @@ namespace View3D
 
             // Commands
             RegisterCommands(serviceCollection);
-
-            // Notifications
-            RegisterNotificationHandler<CommandStackChangedEvent, CommandStackRenderer>(serviceCollection);
-            RegisterNotificationHandler<CommandStackUndoEvent, CommandStackRenderer>(serviceCollection);
-            RegisterNotificationHandler<SelectionChangedEvent, GizmoComponent>(serviceCollection);
         }
 
         void RegisterComponents(IServiceCollection serviceCollection)
@@ -109,13 +103,6 @@ namespace View3D
         public virtual void Register(IServiceCollection serviceCollection){}
 
         public virtual void RegisterTools(IToolFactory factory){  }
-
-        protected void RegisterNotificationHandler<TNotification, TImplementation>(IServiceCollection serviceCollection)
-            where TNotification : INotification
-            where TImplementation : class, INotificationHandler<TNotification>
-        {
-            serviceCollection.AddScoped<INotificationHandler<TNotification>, TImplementation>(x => x.GetRequiredService<TImplementation>());
-        }
 
         protected void RegisterGameComponent<T>(IServiceCollection serviceCollection) where T : class, IGameComponent
         {

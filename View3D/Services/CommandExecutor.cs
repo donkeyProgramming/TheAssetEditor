@@ -1,23 +1,20 @@
-﻿using CommonControls.Common;
+﻿using Common;
+using CommonControls.Common;
 using CommonControls.Events;
-using MediatR;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using View3D.Commands;
-using View3D.Utility;
 
 namespace View3D.Components.Component
 {
-    public delegate void CommandStackChangedDelegate();
-
-    public class CommandStackChangedEvent : INotification
+    public class CommandStackChangedEvent
     {
         public string HintText { get; internal set; }
         public bool IsMutation { get; internal set; }
     }
 
-    public class CommandStackUndoEvent : INotification
+    public class CommandStackUndoEvent 
     {
         public string HintText { get; set; }
     }
@@ -26,13 +23,11 @@ namespace View3D.Components.Component
     {
         protected ILogger _logger = Logging.Create<CommandExecutor>();
         private readonly Stack<ICommand> _commands = new Stack<ICommand>();
-        private readonly IMediator _mediator;
-        private readonly ComponentManagerResolver _componentManagerResolver;
+        private readonly EventHub _eventHub;
 
-        public CommandExecutor(IMediator mediator, ComponentManagerResolver componentManagerResolver) 
+        public CommandExecutor(EventHub eventHub) 
         {
-            _mediator = mediator;
-            _componentManagerResolver = componentManagerResolver;
+            _eventHub = eventHub;
         }
 
         public void ExecuteCommand(ICommand command, bool isUndoable = true)
@@ -54,7 +49,7 @@ namespace View3D.Components.Component
 
             if (isUndoable)
             {
-                _mediator.PublishSync(new CommandStackChangedEvent() 
+                _eventHub.Publish(new CommandStackChangedEvent() 
                 {
                     HintText = command.HintText,
                     IsMutation = command.IsMutation,
@@ -79,8 +74,7 @@ namespace View3D.Components.Component
                     _logger.Here().Error($"Failed to Undoing command : {e}");
                 }
 
-
-                _mediator.PublishSync(new CommandStackUndoEvent() { HintText = GetUndoHint() });
+                _eventHub.Publish(new CommandStackUndoEvent() { HintText = GetUndoHint() });
             }
         }
 

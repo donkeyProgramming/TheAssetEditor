@@ -1,17 +1,15 @@
-﻿using CommonControls.Common;
+﻿using Common;
+using CommonControls.Common;
 using CommonControls.Events;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using View3D.Components;
 using View3D.Components.Component;
@@ -20,11 +18,8 @@ using View3D.Services;
 
 namespace KitbasherEditor.ViewModels
 {
-    public class KitbasherViewModel : NotifyPropertyChangedImpl, IEditorViewModel, 
-        IDropTarget<TreeNode>,
-        INotificationHandler<FileSavedEvent>,
-        INotificationHandler<SceneInitializedEvent>, 
-        INotificationHandler<CommandStackChangedEvent>
+    public class KitbasherViewModel : NotifyPropertyChangedImpl, IEditorViewModel,
+        IDropTarget<TreeNode>
     {
         public IServiceScope ServiceScope { get; set; }
         ILogger _logger = Logging.Create<KitbasherViewModel>();
@@ -44,8 +39,8 @@ namespace KitbasherEditor.ViewModels
         public PackFile MainFile { get; set; }
         private bool _hasUnsavedChanges;
 
-        public KitbasherViewModel(PackFileService packFileService, 
-            MainScene sceneContainer, MenuBarViewModel menuBarViewModel, 
+        public KitbasherViewModel(PackFileService packFileService, EventHub eventHub,
+            MainScene sceneContainer, MenuBarViewModel menuBarViewModel,
             AnimationControllerViewModel animationControllerViewModel, IComponentInserter componentInserter,
             KitbashSceneCreator kitbashSceneCreator, SceneExplorerViewModel sceneExplorerViewModel, ActiveFileResolver activeFileResolver, FocusSelectableObjectService focusSelectableObjectComponent, KitbashViewDropHandler dropHandler)
         {
@@ -60,6 +55,11 @@ namespace KitbasherEditor.ViewModels
             MenuBar = menuBarViewModel;
 
             componentInserter.Execute();
+
+            eventHub.Register<FileSavedEvent>(Handle);
+            eventHub.Register<CommandStackChangedEvent>(Handle);
+            eventHub.Register<SceneInitializedEvent>(Handle);
+            eventHub.Register<PackFileSavedEvent>(Handle);
         }
 
         public bool Save() => true;
@@ -90,13 +90,17 @@ namespace KitbasherEditor.ViewModels
         public bool Drop(TreeNode node, TreeNode targeNode = null) => _dropHandler.Drop(node, targeNode);
 
 
-        public Task Handle(FileSavedEvent notification, CancellationToken cancellationToken)
-        {
-            HasUnsavedChanges = false;
-            return Task.CompletedTask;
+        void Handle(PackFileSavedEvent notification)
+        { 
+        
         }
 
-        public Task Handle(SceneInitializedEvent notification, CancellationToken cancellationToken)
+         void Handle(FileSavedEvent notification)
+        {
+            HasUnsavedChanges = false;
+        }
+
+        public void Handle(SceneInitializedEvent notification)
         {
             _activeFileResolver.ActiveFileName = _packFileService.GetFullPath(MainFile);
             _kitbashSceneCreator.Create(MainFile);
@@ -116,14 +120,12 @@ namespace KitbasherEditor.ViewModels
                 }
             }
 
-            return Task.CompletedTask;
         }
 
-        public Task Handle(CommandStackChangedEvent notification, CancellationToken cancellationToken)
+        public void Handle(CommandStackChangedEvent notification)
         {
             if(notification.IsMutation)
                 HasUnsavedChanges = true;
-            return Task.CompletedTask;
         }
     }
 }

@@ -7,17 +7,15 @@ using View3D.Components.Rendering;
 using View3D.Components.Input;
 using View3D.Components.Component.Selection;
 using View3D.Utility;
-using MediatR;
-using System.Threading.Tasks;
-using System.Threading;
 using View3D.Commands;
+using Common;
 
 namespace View3D.Components.Gizmo
 {
-    public class GizmoComponent : BaseComponent, IDisposable, 
-        INotificationHandler<SelectionChangedEvent>
+    public class GizmoComponent : BaseComponent, IDisposable
     {   
         private readonly MouseComponent _mouse;
+        private readonly EventHub _eventHub;
         private readonly KeyboardComponent _keyboard;
         private readonly SelectionManager _selectionManager;
         private readonly CommandExecutor _commandManager;
@@ -31,14 +29,14 @@ namespace View3D.Components.Gizmo
         bool _isCtrlPressed = false;
 
 
-        public GizmoComponent(
+        public GizmoComponent(EventHub eventHub,
             KeyboardComponent keyboardComponent, MouseComponent mouseComponent, ArcBallCamera camera, CommandExecutor commandExecutor,
             ResourceLibary resourceLibary, DeviceResolverComponent deviceResolverComponent, CommandFactory commandFactory,
             SelectionManager selectionManager)
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.Gizmo;
             DrawOrder = (int)ComponentDrawOrderEnum.Gizmo;
-
+            _eventHub = eventHub;
             _keyboard = keyboardComponent;
             _mouse = mouseComponent;
             _camera = camera;
@@ -47,6 +45,8 @@ namespace View3D.Components.Gizmo
             _deviceResolverComponent = deviceResolverComponent;
             _commandFactory = commandFactory;
             _selectionManager = selectionManager;
+
+            _eventHub.Register<SelectionChangedEvent>(Handle);
         }
        
         public override void Initialize()
@@ -176,10 +176,6 @@ namespace View3D.Components.Gizmo
             _gizmo.Dispose();
         }
 
-        public Task Handle(SelectionChangedEvent notification, CancellationToken cancellationToken)
-        {
-            OnSelectionChanged(notification.NewState);
-            return Task.CompletedTask;
-        }
+        public void Handle(SelectionChangedEvent notification) => OnSelectionChanged(notification.NewState);
     }
 }

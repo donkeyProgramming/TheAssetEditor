@@ -1,18 +1,13 @@
-﻿using MediatR;
+﻿using Common;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Serialization;
+
 
 namespace MonoGame.Framework.WpfInterop
 {
-
-
-
-    //public interface
 
 
     public delegate void SceneInitializedDelegate(WpfGame scene);
@@ -25,7 +20,7 @@ namespace MonoGame.Framework.WpfInterop
         public void RemoveComponent<T>(T comp) where T : IGameComponent;
     }
 
-    public class SceneInitializedEvent : INotification
+    public class SceneInitializedEvent
     {
     }
 
@@ -36,7 +31,7 @@ namespace MonoGame.Framework.WpfInterop
     {
         public event SceneInitializedDelegate SceneInitialized;
 
-        private readonly IMediator _mediator;
+        private readonly EventHub _eventHub;
         private readonly string _contentDir;
 
         #region Fields
@@ -52,11 +47,11 @@ namespace MonoGame.Framework.WpfInterop
         /// <summary>
         /// Creates a new instance of a game host panel.
         /// </summary>
-        protected WpfGame(IMediator mediator, string contentDir = "ContentOutput")
+        protected WpfGame(EventHub eventHub, string contentDir = "ContentOutput")
         {
             if (string.IsNullOrEmpty(contentDir))
                 throw new ArgumentNullException(nameof(contentDir));
-            _mediator = mediator;
+            _eventHub = eventHub;
             _contentDir = contentDir;
 
             Focusable = true;
@@ -158,7 +153,7 @@ namespace MonoGame.Framework.WpfInterop
 
             LoadContent();
             SceneInitialized?.Invoke(this);
-            _mediator.Publish(new SceneInitializedEvent()).GetAwaiter().GetResult();
+            _eventHub.Publish(new SceneInitializedEvent());
         }
 
         /// <summary>

@@ -1,5 +1,5 @@
-﻿using CommonControls.Events;
-using MediatR;
+﻿using Common;
+using CommonControls.Events;
 using Microsoft.Xna.Framework;
 using System;
 using View3D.Components.Rendering;
@@ -11,7 +11,7 @@ using View3D.Utility;
 
 namespace View3D.Components.Component.Selection
 {
-    public class SelectionChangedEvent : INotification
+    public class SelectionChangedEvent
     {
         public ISelectionState NewState { get; internal set; }
     }
@@ -19,7 +19,7 @@ namespace View3D.Components.Component.Selection
     public class SelectionManager : BaseComponent, IDisposable
     {
         ISelectionState _currentState;
-        private readonly IMediator _mediator;
+        private readonly EventHub _eventHub;
         private readonly RenderEngineComponent _renderEngine;
         BasicShader _wireframeEffect;
         BasicShader _selectedFacesEffect;
@@ -30,9 +30,9 @@ namespace View3D.Components.Component.Selection
         private readonly ResourceLibary _resourceLib;
         private readonly DeviceResolverComponent _deviceResolverComponent;
 
-        public SelectionManager(IMediator mediator, RenderEngineComponent renderEngine, ResourceLibary resourceLib, DeviceResolverComponent deviceResolverComponent)
+        public SelectionManager(EventHub eventHub, RenderEngineComponent renderEngine, ResourceLibary resourceLib, DeviceResolverComponent deviceResolverComponent)
         {
-            _mediator = mediator;
+            _eventHub = eventHub;
             _renderEngine = renderEngine;
             _resourceLib = resourceLib;
             _deviceResolverComponent = deviceResolverComponent;
@@ -102,8 +102,7 @@ namespace View3D.Components.Component.Selection
 
         private void SelectionManager_SelectionChanged(ISelectionState state, bool sendEvent)
         {
-            //if(sendEvent)
-             _mediator.PublishSync(new SelectionChangedEvent { NewState = state });
+            _eventHub.Publish(new SelectionChangedEvent { NewState = state });
         }
 
         public override void Draw(GameTime gameTime)

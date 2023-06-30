@@ -1,25 +1,21 @@
 ﻿using _componentManager.ViewModels.MenuBarViews;
+using Common;
 using CommonControls.Common.MenuSystem;
 using CommonControls.PackFileBrowser;
 using CommonControls.Resources;
 using CommonControls.Services;
 using KitbasherEditor.Services;
-using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
-    public class MenuBarViewModel : IKeyboardHandler,
-        INotificationHandler<CommandStackChangedEvent>,
-        INotificationHandler<SelectionChangedEvent>
+    public class MenuBarViewModel : IKeyboardHandler
     {
         public ObservableCollection<ToolbarItem> MenuItems { get; set; } = new ObservableCollection<ToolbarItem>();
         public ObservableCollection<MenuBarButton> CustomButtons { get; set; } = new ObservableCollection<MenuBarButton>();
@@ -39,7 +35,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         Dictionary<MenuActionType, MenuAction> _actionList = new Dictionary<MenuActionType, MenuAction>();
 
-        public MenuBarViewModel(CommandExecutor commandExecutor,  PackFileService packFileService,
+        public MenuBarViewModel(CommandExecutor commandExecutor,  PackFileService packFileService, EventHub eventHub,
             VisibilityHandler visibilityHandler, TransformToolViewModel transformToolViewModel, GizmoActions gizmoActions, GeneralActions generalActions, ToolActions toolActions,
             KitbashSceneCreator kitbashSceneCreator)
         {
@@ -58,6 +54,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             ProcessHotkeys();
 
             _commandExecutor = commandExecutor;
+
+            eventHub.Register<CommandStackChangedEvent>(Handle);
+            eventHub.Register<SelectionChangedEvent>(Handle);
         }
 
         void CreateActions()
@@ -289,17 +288,16 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         void ImportDebugMap() => MapLoaderService.Load(_packFileService, SceneCreator);
         void ClearConsole() => Console.Clear();
 
-        public Task Handle(CommandStackChangedEvent notification, CancellationToken cancellationToken)
+        public void Handle(CommandStackChangedEvent notification)
         {
             _actionList[MenuActionType.Undo].ToolTip = notification.HintText;
             _actionList[MenuActionType.Undo].IsActionEnabled.Value = _commandExecutor.CanUndo();
-            return Task.CompletedTask;
         }
 
-        public Task Handle(SelectionChangedEvent notification, CancellationToken cancellationToken)
+        public void Handle(SelectionChangedEvent notification)
         {
             OnSelectionChanged(notification.NewState);
-            return Task.CompletedTask;
+
         }
     }
 }

@@ -1,15 +1,13 @@
-﻿using MediatR;
+﻿using Common;
+using CommonControls.Events;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Threading;
-using System.Threading.Tasks;
+
 using View3D.Utility;
 
 namespace View3D.Components.Component
 {
-    public class CommandStackRenderer : BaseComponent, 
-        INotificationHandler<CommandStackChangedEvent>,
-        INotificationHandler<CommandStackUndoEvent>
+    public class CommandStackRenderer : BaseComponent
     {
         SpriteBatch _spriteBatch;
         string _animationText;
@@ -17,11 +15,16 @@ namespace View3D.Components.Component
         bool _startAnimation;
         private readonly ResourceLibary _resourceLibary;
         private readonly DeviceResolverComponent _deviceResolverComponent;
+        private readonly EventHub _eventHub;
 
-        public CommandStackRenderer(ResourceLibary resourceLibary, DeviceResolverComponent deviceResolverComponent)
+        public CommandStackRenderer(ResourceLibary resourceLibary, DeviceResolverComponent deviceResolverComponent, EventHub eventHub)
         {
             _resourceLibary = resourceLibary;
             _deviceResolverComponent = deviceResolverComponent;
+            _eventHub = eventHub;
+
+            _eventHub.Register<CommandStackUndoEvent>(Handle);
+            _eventHub.Register<CommandStackChangedEvent>(Handle);
         }
 
         public void Dispose()
@@ -70,17 +73,8 @@ namespace View3D.Components.Component
             base.Update(gameTime);
         }
 
-        public Task Handle(CommandStackChangedEvent notification, CancellationToken cancellationToken)
-        {
-            CreateAnimation($"Command added: {notification.HintText}");
-            return Task.CompletedTask;
-        }
-
-        public Task Handle(CommandStackUndoEvent notification, CancellationToken cancellationToken)
-        {
-            CreateAnimation($"Command Undone: {notification.HintText}");
-            return Task.CompletedTask;
-        }
+        void Handle(CommandStackChangedEvent notification) => CreateAnimation($"Command added: {notification.HintText}");
+        void Handle(CommandStackUndoEvent notification) => CreateAnimation($"Command Undone: {notification.HintText}"); 
     }
 }
 

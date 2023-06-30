@@ -1,6 +1,8 @@
 ﻿using CommonControls.BaseDialogs.ToolSelector;
+using CommonControls.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using SharpDX.MediaFoundation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -99,13 +101,14 @@ namespace CommonControls.Common
     {
         ILogger _logger = Logging.Create<IToolFactory>();
         IServiceProvider _serviceProvider;
-
+        private readonly ScopeRepository _scopeRepository;
         Dictionary<Type, Type> _viewModelToViewMap = new Dictionary<Type, Type>();
         Dictionary<IPackFileToToolSelector, Type> _extentionToToolMap = new Dictionary<IPackFileToToolSelector, Type>();
 
-        public ToolFactory(IServiceProvider serviceProvider)
+        public ToolFactory(IServiceProvider serviceProvider, ScopeRepository scopeRepository)
         {
             _serviceProvider = serviceProvider;
+            _scopeRepository = scopeRepository;
         }
 
         public void RegisterTool<ViewModel, View>(IPackFileToToolSelector toolSelector = null)
@@ -161,6 +164,7 @@ namespace CommonControls.Common
             var scope = _serviceProvider.CreateScope();
             var instance = scope.ServiceProvider.GetService(selectedEditor) as IEditorViewModel;
             instance.ServiceScope = scope;
+            _scopeRepository.Add(scope);
             return instance;
         }
 

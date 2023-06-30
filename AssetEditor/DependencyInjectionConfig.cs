@@ -19,7 +19,8 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using TextureEditor;
 using View3D;
-using MediatR;
+using CommonControls.Events;
+using Common;
 
 namespace AssetEditor
 {
@@ -52,8 +53,6 @@ namespace AssetEditor
 
         private void ConfigureServices(IServiceCollection services)
         {
-            services.AddMediatR(typeof(App));
-
             services.AddSingleton<ApplicationSettingsService>();
             services.AddSingleton<IToolFactory, ToolFactory>();
             services.AddSingleton<PackFileDataBase>();
@@ -62,12 +61,15 @@ namespace AssetEditor
             services.AddSingleton<GameInformationFactory>();
             services.AddSingleton<PackFileService>();
 
+            services.AddSingleton<GlobalEventSender>();
+            services.AddSingleton<ScopeRepository>();
+            services.AddScoped<EventHub>();
+
             services.AddScoped<MainWindow>();
             services.AddScoped<MainViewModel>();
             services.AddScoped<SettingsWindow>();
             services.AddScoped<SettingsViewModel>();
             services.AddScoped<MenuBarViewModel>();
-          
 
             foreach (var container in dependencyContainers)
                 container.Register(services);

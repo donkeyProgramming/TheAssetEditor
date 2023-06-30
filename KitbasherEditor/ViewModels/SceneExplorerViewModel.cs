@@ -1,12 +1,10 @@
-﻿using CommonControls.Common;
+﻿using Common;
+using CommonControls.Common;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
-using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using View3D.Commands;
 using View3D.Components.Component;
@@ -15,8 +13,7 @@ using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels
 {
-    public class SceneExplorerViewModel : NotifyPropertyChangedImpl,
-        INotificationHandler<SelectionChangedEvent>
+    public class SceneExplorerViewModel : NotifyPropertyChangedImpl
     {
         SceneManager _sceneManager;
         SelectionManager _selectionManager;
@@ -30,7 +27,7 @@ namespace KitbasherEditor.ViewModels
         ISceneNodeViewModel _selectedNodeViewModel;
         public ISceneNodeViewModel SelectedNodeViewModel { get { return _selectedNodeViewModel; } set { SetAndNotify(ref _selectedNodeViewModel, value); } }
 
-        public SceneExplorerViewModel(SceneNodeViewFactory sceneNodeViewFactory, CommandExecutor commandExecutor, SelectionManager selectionManager, SceneManager sceneManager, CommandFactory commandFactory)
+        public SceneExplorerViewModel(SceneNodeViewFactory sceneNodeViewFactory, CommandExecutor commandExecutor, SelectionManager selectionManager, SceneManager sceneManager, CommandFactory commandFactory, EventHub eventHub)
         {
             _sceneNodeViewFactory = sceneNodeViewFactory;
             _sceneManager = sceneManager;
@@ -45,6 +42,7 @@ namespace KitbasherEditor.ViewModels
             ContextMenu.SelectedNodesChanged += OnSelectedNodesChanged; // ToDo - MediatR
 
             SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
+            eventHub.Register<SelectionChangedEvent>(Handle);
         }
 
         private void OnSelectedNodesChanged(IEnumerable<ISceneNode> selectedNodes)
@@ -194,11 +192,10 @@ namespace KitbasherEditor.ViewModels
             }
         }
 
-        public Task Handle(SelectionChangedEvent notification, CancellationToken cancellationToken)
+        void Handle(SelectionChangedEvent notification)
         {
             if(_ignoreSelectionChanges == false)
                 SelectionChanged(notification.NewState);
-            return Task.CompletedTask;
         }
     }
 }

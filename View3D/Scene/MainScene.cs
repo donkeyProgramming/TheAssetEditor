@@ -1,7 +1,7 @@
-﻿using MediatR;
+﻿using Common;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
-using View3D.Components;
+
 
 namespace View3D.Scene
 {
@@ -10,7 +10,7 @@ namespace View3D.Scene
         private bool _disposed;
         WpfGraphicsDeviceService _diviceService;
 
-        public MainScene(IMediator mediator, string contentDir = "ContentOutput") : base(mediator, contentDir)
+        public MainScene(EventHub eventHub, string contentDir = "ContentOutput") : base(eventHub, contentDir)
         {
 
         }
