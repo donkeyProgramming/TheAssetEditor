@@ -49,11 +49,4 @@ namespace KitbasherEditor.Views
             }
         }
     }
-
-    public class UserControlKeyboardHandler
-    {
-        public UserControlKeyboardHandler()
-            {}
-    
-    }
 }
