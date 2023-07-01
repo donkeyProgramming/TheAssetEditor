@@ -5,30 +5,45 @@ using Common;
 using CommonControls.Common;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
-using View3D.Animation.MetaData;
+using MonoGame.Framework.WpfInterop;
+using View3D.Components;
 using View3D.Scene;
 
 namespace AnimationEditor.MountAnimationCreator
 {
-    public class MountAnimationCreatorViewModel : BaseAnimationViewModel
+    public class MountAnimationCreatorViewModel : BaseAnimationViewModel<Editor>
     {
-        private readonly AssetViewModelEditor _assetViewModelBuilder;
+        private readonly ReferenceModelSelectionViewModelBuilder _referenceModelSelectionViewModelBuilder;
+        private readonly AssetViewModelBuilder _assetViewModelBuilder;
 
-        public MountAnimationCreatorViewModel(AnimationPlayerViewModel animationPlayerViewModel, EventHub eventHub, MetaDataFactory metaDataFactory, AssetViewModelEditor assetViewModelBuilder, MainScene scene, IToolFactory toolFactory, PackFileService pfs, 
-            SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService)
-            : base(animationPlayerViewModel, eventHub, metaDataFactory, assetViewModelBuilder, scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
+        public MountAnimationCreatorViewModel(Editor editor,
+            IComponentInserter componentInserter, 
+            ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder, 
+            AnimationPlayerViewModel animationPlayerViewModel, 
+            EventHub eventHub,
+            AssetViewModelBuilder assetViewModelBuilder, 
+            MainScene scene)
+            : base(componentInserter, animationPlayerViewModel, scene)
         {
-            Set("Rider", "Mount", true);
             DisplayName.Value = "MountAnimCreator";
+            Editor = editor;
+            _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
             _assetViewModelBuilder = assetViewModelBuilder;
+
+            eventHub.Register<SceneInitializedEvent>(Initialize);
         }
 
-        public override void Initialize()
+        void Initialize(SceneInitializedEvent sceneInitializedEvent)
         {
+            MainModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(true, "Rider", Color.Black, MainInput);
+            ReferenceModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(true, "Mount", Color.Black, RefInput);
+
             ReferenceModelView.Value.Data.IsSelectable = true;
+
             var propAsset = _assetViewModelBuilder.CreateAsset("New Anim", Color.Red);
             Player.RegisterAsset(propAsset);
-            Editor = new Editor(_assetViewModelBuilder, _pfs, _skeletonHelper, MainModelView.Value.Data, ReferenceModelView.Value.Data, propAsset, Scene, _applicationSettingsService);
+           
+            Editor.Create(MainModelView.Value.Data, ReferenceModelView.Value.Data, propAsset);
         }
     }
 

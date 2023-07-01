@@ -20,12 +20,12 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
 
         AssetViewModel _rider;
         AssetViewModel _mount;
-        private readonly AssetViewModelEditor _assetViewModelEditor;
+        private readonly AssetViewModelBuilder _assetViewModelEditor;
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         Action _validateAction;
 
-        public MountLinkViewModel(AssetViewModelEditor assetViewModelEditor, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, AssetViewModel mount, Action validate)
+        public MountLinkViewModel(AssetViewModelBuilder assetViewModelEditor, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, AssetViewModel mount, Action validate)
         {
             _assetViewModelEditor = assetViewModelEditor;
             _pfs = pfs;

@@ -3,38 +3,46 @@ using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
 using Common;
 using CommonControls.Common;
-
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
-using View3D.Animation.MetaData;
+using MonoGame.Framework.WpfInterop;
 using View3D.Components;
 using View3D.Scene;
 
 namespace AnimationEditor.AnimationTransferTool
 {
-    public class AnimationTransferToolViewModel : BaseAnimationViewModel
+    public class AnimationTransferToolViewModel : BaseAnimationViewModel<Editor>
     {
-        private readonly AssetViewModelEditor _assetViewModelBuilder;
+        private readonly ReferenceModelSelectionViewModelBuilder _referenceModelSelectionViewModelBuilder;
+        private readonly AssetViewModelBuilder _assetViewModelBuilder;
 
-        public AnimationTransferToolViewModel(AnimationPlayerViewModel animationPlayerViewModel, EventHub eventHub, IComponentInserter componentInserter, MetaDataFactory metaDataFactory,AssetViewModelEditor assetViewModelBuilder, MainScene scene, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService) 
-            : base(animationPlayerViewModel, eventHub, metaDataFactory, assetViewModelBuilder, scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
+        public AnimationTransferToolViewModel(
+            Editor editor,
+            ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder, 
+            AnimationPlayerViewModel animationPlayerViewModel,
+            EventHub eventHub, 
+            IComponentInserter componentInserter,
+            AssetViewModelBuilder assetViewModelBuilder, 
+            MainScene scene) 
+            : base( componentInserter, animationPlayerViewModel, scene)
         {
-            Set("Target", "Source", true);
             DisplayName.Value = "Animation transfer tool";
+            Editor = editor;
+            _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
             _assetViewModelBuilder = assetViewModelBuilder;
-            Pfs = pfs;
 
-            componentInserter.Execute();
+            eventHub.Register<SceneInitializedEvent>(Initialize);
         }
 
-        public PackFileService Pfs { get; }
-
-        public override void Initialize()
+        void Initialize(SceneInitializedEvent sceneInitializedEvent)
         {
+            MainModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(true, "Target", Color.Black, MainInput);
+            ReferenceModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(false, "Source", Color.Black, RefInput);
+
             ReferenceModelView.Value.Data.IsSelectable = false;
-            var propAsset = _assetViewModelBuilder.CreateAsset("Generated", Color.Black);
-            Player.RegisterAsset(propAsset);
-            Editor = new Editor(_assetViewModelBuilder, _pfs, _skeletonHelper, MainModelView.Value.Data, ReferenceModelView.Value.Data, propAsset, Scene, Player);
+            var generatedAnimationAsset = _assetViewModelBuilder.CreateAsset("Generated", Color.Black);
+            Player.RegisterAsset(generatedAnimationAsset);
+            Editor.Create(MainModelView.Value.Data, ReferenceModelView.Value.Data, generatedAnimationAsset);
         }
     }
 

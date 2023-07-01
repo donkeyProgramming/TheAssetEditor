@@ -45,7 +45,7 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public NotifyAttr<bool> IsControlVisible { get; set; } = new NotifyAttr<bool>(true);
         public NotifyAttr<bool> AllowMetaData { get; set; } = new NotifyAttr<bool>(false);
-        public ReferenceModelSelectionViewModel(MetaDataFactory metaDataFactory, IToolFactory toolFactory, PackFileService pf, AssetViewModel data, string headerName, IComponentManager componentManager, AssetViewModelEditor assetViewModelEditor,
+        public ReferenceModelSelectionViewModel(MetaDataFactory metaDataFactory, IToolFactory toolFactory, PackFileService pf, AssetViewModel data, string headerName, AssetViewModelBuilder assetViewModelEditor,
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService applicationSettingsService)
         {
             _metaDataFactory = metaDataFactory;

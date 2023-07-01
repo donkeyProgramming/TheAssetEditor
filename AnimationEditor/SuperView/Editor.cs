@@ -2,23 +2,22 @@
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.Common;
+using CommonControls.Editors.AnimMeta;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
 using System.Collections.ObjectModel;
 using System.Linq;
 using View3D.Animation.MetaData;
-using View3D.Scene;
 
 namespace AnimationEditor.SuperView
 {
     public class Editor
     {
-        MainScene _scene;
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonHelper;
         AnimationPlayerViewModel _player;
         private readonly MetaDataFactory _metaDataFactory;
-        private readonly AssetViewModelEditor _assetViewModelBuilder;
+        private readonly AssetViewModelBuilder _assetViewModelBuilder;
         IToolFactory _toolFactory;
         ApplicationSettingsService _applicationSettingsService;
 
@@ -28,33 +27,36 @@ namespace AnimationEditor.SuperView
         public NotifyAttr<string> MetaFilePath { get; set; } = new NotifyAttr<string>("");
         public NotifyAttr<string> MetaFilePackFileContainerName { get; set; } = new NotifyAttr<string>("");
 
-        public CommonControls.Editors.AnimMeta.EditorViewModel PersistentMetaEditor { get; set; }
-        public CommonControls.Editors.AnimMeta.EditorViewModel MetaEditor { get; set; }
+        public EditorViewModel PersistentMetaEditor { get; set; }
+        public EditorViewModel MetaEditor { get; set; }
 
         public ObservableCollection<ReferenceModelSelectionViewModel> Items { get; set; } = new ObservableCollection<ReferenceModelSelectionViewModel>();
 
-        public Editor(MetaDataFactory metaDataFactory, AssetViewModelEditor assetViewModelBuilder, IToolFactory toolFactory, MainScene scene, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, AnimationPlayerViewModel player, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService)
+        public Editor(MetaDataFactory metaDataFactory, AssetViewModelBuilder assetViewModelBuilder, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, AnimationPlayerViewModel player, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService)
         {
             _metaDataFactory = metaDataFactory;
             _assetViewModelBuilder = assetViewModelBuilder;
             _toolFactory = toolFactory;
-            _scene = scene;
             _pfs = pfs;
             _skeletonHelper = skeletonHelper;
             _player = player;
             _applicationSettingsService = applicationSettingsService;
 
-            PersistentMetaEditor = new CommonControls.Editors.AnimMeta.EditorViewModel(pfs, copyPasteManager);
+            PersistentMetaEditor = new EditorViewModel(pfs, copyPasteManager);
             PersistentMetaEditor.EditorSavedEvent += PersistentMetaEditor_EditorSavedEvent;
-            MetaEditor = new CommonControls.Editors.AnimMeta.EditorViewModel(pfs, copyPasteManager);
+            MetaEditor = new EditorViewModel(pfs, copyPasteManager);
             MetaEditor.EditorSavedEvent += MetaEditor_EditorSavedEvent;
         }
 
-        public void Create(AnimationToolInput input)
+        public Editor Create(AnimationToolInput input)
         {
+
+
+
+
             var asset = _assetViewModelBuilder.CreateAsset("Item 0", Color.Black);
             _player.RegisterAsset(asset);
-            var viewModel = new ReferenceModelSelectionViewModel(_metaDataFactory, _toolFactory, _pfs, asset, "Item 0:", _scene, _assetViewModelBuilder, _skeletonHelper, _applicationSettingsService);
+            var viewModel = new ReferenceModelSelectionViewModel(_metaDataFactory, _toolFactory, _pfs, asset, "Item 0:", _assetViewModelBuilder, _skeletonHelper, _applicationSettingsService);
             viewModel.AllowMetaData.Value = true;
 
             if (input.Mesh != null)
@@ -75,6 +77,7 @@ namespace AnimationEditor.SuperView
 
             Items.Add(viewModel);
             Asset_MetaDataChanged(asset);
+            return this;
         }
 
         private void Asset_MetaDataChanged(AssetViewModel newValue)

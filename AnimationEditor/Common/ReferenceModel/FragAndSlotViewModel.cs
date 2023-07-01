@@ -17,13 +17,13 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public FilterCollection<AnimationBinEntryGenericFormat> FragmentSlotList { get; set; }
 
-        private readonly AssetViewModelEditor _assetViewModelEditor;
+        private readonly AssetViewModelBuilder _assetViewModelEditor;
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         SelectMetaViewModel _metaViewModel;
         private readonly ApplicationSettingsService _applicationSettings;
 
-        public SelectFragAndSlotViewModel(AssetViewModelEditor assetViewModelEditor, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel asset, SelectMetaViewModel metaViewModel, ApplicationSettingsService applicationSettings)
+        public SelectFragAndSlotViewModel(AssetViewModelBuilder assetViewModelEditor, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel asset, SelectMetaViewModel metaViewModel, ApplicationSettingsService applicationSettings)
         {
             _assetViewModelEditor = assetViewModelEditor;
             _pfs = pfs;

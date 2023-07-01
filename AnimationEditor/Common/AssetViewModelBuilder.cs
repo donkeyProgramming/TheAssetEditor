@@ -1,11 +1,9 @@
-﻿using AnimationEditor.AnimationBuilder;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Serilog;
 using System;
 using View3D.Animation;
@@ -20,9 +18,9 @@ using static CommonControls.Services.SkeletonAnimationLookUpHelper;
 
 namespace AnimationEditor.Common.ReferenceModel
 {
-    public class AssetViewModelEditor
+    public class AssetViewModelBuilder
     {
-        ILogger _logger = Logging.Create<AssetViewModelEditor>();
+        ILogger _logger = Logging.Create<AssetViewModelBuilder>();
         private readonly IGeometryGraphicsContextFactory _geometryGraphicsContextFactory;
         private readonly MainScene _mainScene;
         private readonly IServiceProvider _serviceProvider;
@@ -33,7 +31,7 @@ namespace AnimationEditor.Common.ReferenceModel
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly SceneLoader _sceneLoader;
 
-        public AssetViewModelEditor(IGeometryGraphicsContextFactory geometryGraphicsContextFactory, MainScene mainScene, 
+        public AssetViewModelBuilder(IGeometryGraphicsContextFactory geometryGraphicsContextFactory, MainScene mainScene, 
             IServiceProvider serviceProvider, ResourceLibary resourceLibary, SceneManager sceneManager, PackFileService packFileService,
             AnimationsContainerComponent animationsContainerComponent, ApplicationSettingsService applicationSettingsService, SceneLoader sceneLoader)
         {

@@ -4,28 +4,41 @@ using AnimationEditor.PropCreator.ViewModels;
 using Common;
 using CommonControls.Common;
 using CommonControls.Services;
-using View3D.Animation.MetaData;
+using Microsoft.Xna.Framework;
+using MonoGame.Framework.WpfInterop;
+using View3D.Components;
 using View3D.Scene;
 
 namespace AnimationEditor.CampaignAnimationCreator
 {
-    public class CampaignAnimationCreatorViewModel : BaseAnimationViewModel
+    public class CampaignAnimationCreatorViewModel : BaseAnimationViewModel<Editor>
     {
-        private readonly AssetViewModelEditor _assetViewModelBuilder;
+        private readonly ReferenceModelSelectionViewModelBuilder _referenceModelSelectionViewModelBuilder;
 
-        public CampaignAnimationCreatorViewModel(AnimationPlayerViewModel animationPlayerViewModel, EventHub eventHub,MetaDataFactory metaDataFactory,AssetViewModelEditor assetViewModelBuilder,MainScene scene, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService) 
-            : base(animationPlayerViewModel, eventHub, metaDataFactory, assetViewModelBuilder, scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
+        public CampaignAnimationCreatorViewModel(Editor editor,
+            IComponentInserter componentInserter, 
+            ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder,
+            AnimationPlayerViewModel animationPlayerViewModel,
+            EventHub eventHub,
+            MainScene scene) 
+            : base(componentInserter, animationPlayerViewModel, scene)
         {
-            Set("model", "not_in_use", true);
             DisplayName.Value = "Campaign Animation Creator";
-            _assetViewModelBuilder = assetViewModelBuilder;
+            Editor = editor;
+            _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
+
+            eventHub.Register<SceneInitializedEvent>(Initialize);
         }
 
-        public override void Initialize()
+        void Initialize(SceneInitializedEvent sceneInitializedEvent)
         {
+            MainModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(true, "model", Color.Black, MainInput);
+            ReferenceModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(false, "not_in_use2", Color.Black, RefInput);
+
             ReferenceModelView.Value.Data.IsSelectable = true;
             ReferenceModelView.Value.IsControlVisible.Value = false;
-            Editor = new Editor(_assetViewModelBuilder, _pfs, MainModelView.Value.Data);
+
+            Editor.Create(MainModelView.Value.Data);
         }
     }
 

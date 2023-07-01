@@ -4,42 +4,40 @@ using AnimationEditor.PropCreator.ViewModels;
 using Common;
 using CommonControls.Common;
 using CommonControls.Services;
-using View3D.Animation.MetaData;
+using Microsoft.Xna.Framework;
+using MonoGame.Framework.WpfInterop;
 using View3D.Components;
 using View3D.Scene;
 
 namespace AnimationEditor.SkeletonEditor
 {
-    public class SkeletonEditorViewModel : BaseAnimationViewModel
+    public class SkeletonEditorViewModel : BaseAnimationViewModel<Editor>
     {
-        private readonly AssetViewModelEditor _assetViewModelBuilder;
-        CopyPasteManager _copyPasteManager;
+        private readonly ReferenceModelSelectionViewModelBuilder _referenceModelSelectionViewModelBuilder;
 
-        public SkeletonEditorViewModel(AnimationPlayerViewModel animationPlayerViewModel, EventHub eventHub, MetaDataFactory metaDataFactory, AssetViewModelEditor assetViewModelBuilder, IComponentInserter componentInserter, MainScene scene, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService) 
-            : base(animationPlayerViewModel, eventHub, metaDataFactory, assetViewModelBuilder, scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
+        public SkeletonEditorViewModel(Editor editor, ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder, AnimationPlayerViewModel animationPlayerViewModel, EventHub eventHub, IComponentInserter componentInserter, MainScene scene) 
+            : base(componentInserter, animationPlayerViewModel, scene)
         {
-            Set("not_in_use1", "not_in_use2", false);
-            _assetViewModelBuilder = assetViewModelBuilder;
-            _copyPasteManager = copyPasteManager;
+            Editor = editor;
+            _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
+
             DisplayName.Value = "Skeleton Editor";
 
+            eventHub.Register<SceneInitializedEvent>(Initialize);
             componentInserter.Execute();
         }
 
-        public override void Initialize()
+        void Initialize(SceneInitializedEvent sceneInitializedEvent)
         {
+            MainModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(false, "not_in_use1", Color.Black, null);
+            ReferenceModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(false, "not_in_use2", Color.Black, null);
+
             MainModelView.Value.IsControlVisible.Value = false;
             ReferenceModelView.Value.IsControlVisible.Value = false;
             ReferenceModelView.Value.Data.IsSelectable = false;
 
-            var typedEditor = new Editor(_pfs, MainModelView.Value.Data, Scene, _copyPasteManager, _assetViewModelBuilder);
-            Editor = typedEditor;
 
-            if (MainInput == null)
-                MainInput = new AnimationToolInput();
-
-            //typedEditor.Create(@"warmachines\chariot\grn_wolf_chariot\tech\grn_wolf_chariot_01.anim");
-            typedEditor.CreateEditor(@"variantmeshes\wh_variantmodels\hq3\nor\nor_war_mammoth\tech\nor_war_mammoth_howdah_01.anim");
+            Editor.CreateEditor(MainModelView.Value.Data, @"variantmeshes\wh_variantmodels\hq3\nor\nor_war_mammoth\tech\nor_war_mammoth_howdah_01.anim");
         }
 
         public static class TechSkeleton_Debug

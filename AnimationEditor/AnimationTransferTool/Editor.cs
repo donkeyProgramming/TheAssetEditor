@@ -4,7 +4,6 @@ using CommonControls.Common;
 using CommonControls.Editors.BoneMapping;
 using CommonControls.Editors.BoneMapping.View;
 using CommonControls.FileTypes.Animation;
-using CommonControls.FileTypes.RigidModel;
 using CommonControls.SelectionListDialog;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
@@ -17,20 +16,15 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using View3D.Animation;
-using View3D.Commands.Object;
-using View3D.Components.Component;
-using View3D.SceneNodes;
-using View3D.Services;
 
 namespace AnimationEditor.AnimationTransferTool
 {
     public class Editor : NotifyPropertyChangedImpl
     {
         ILogger _logger = Logging.Create<Editor>();
-        private readonly AssetViewModelEditor _assetViewModelBuilder;
+        private readonly AssetViewModelBuilder _assetViewModelBuilder;
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        IComponentManager _componentManager;
         AssetViewModel _copyTo;
         AssetViewModel _copyFrom;
         AnimationPlayerViewModel _player;
@@ -51,14 +45,19 @@ namespace AnimationEditor.AnimationTransferTool
             set { SetAndNotify(ref _selectedBone, value); HightlightSelectedBones(value); }
         }
 
-        public Editor(AssetViewModelEditor assetViewModelBuilder, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel copyToAsset, AssetViewModel copyFromAsset, AssetViewModel generated, IComponentManager componentManager, AnimationPlayerViewModel player)
+        public Editor(AssetViewModelBuilder assetViewModelBuilder, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AnimationPlayerViewModel player)
         {
             _assetViewModelBuilder = assetViewModelBuilder;
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
-            _componentManager = componentManager;
             _player = player;
 
+            AnimationSettings.DisplayOffset.OnValueChanged += DisplayOffset_OnValueChanged;
+            DisplayOffset_OnValueChanged(new CommonControls.MathViews.Vector3ViewModel(0,0,2));
+        }
+
+        public Editor Create(AssetViewModel copyToAsset, AssetViewModel copyFromAsset, AssetViewModel generated)
+        {
             _copyTo = copyToAsset;
             _copyFrom = copyFromAsset;
             Generated = generated;
@@ -66,14 +65,13 @@ namespace AnimationEditor.AnimationTransferTool
             _copyFrom.SkeletonChanged += CopyFromSkeletonChanged;
             _copyTo.MeshChanged += CopyToMeshChanged;
 
-            AnimationSettings.DisplayOffset.OnValueChanged += DisplayOffset_OnValueChanged;
-            DisplayOffset_OnValueChanged(new CommonControls.MathViews.Vector3ViewModel(0,0,2));
-
             if (_copyTo.Skeleton != null)
                 CopyToMeshChanged(_copyTo);
 
             if (_copyFrom.Skeleton != null)
                 CopyFromSkeletonChanged(_copyFrom.Skeleton);
+
+            return this;
         }
 
         private void DisplayOffset_OnValueChanged(CommonControls.MathViews.Vector3ViewModel newValue)

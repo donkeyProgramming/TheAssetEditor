@@ -10,7 +10,7 @@ namespace AnimationEditor.Common.ReferenceModel
     public class SelectMetaViewModel : NotifyPropertyChangedImpl
     {
         PackFileService _pfs;
-        private readonly AssetViewModelEditor _assetViewModelEditor;
+        private readonly AssetViewModelBuilder _assetViewModelEditor;
         AssetViewModel _data;
 
         ObservableCollection<PackFile> _metaList = new ObservableCollection<PackFile>();
@@ -27,7 +27,7 @@ namespace AnimationEditor.Common.ReferenceModel
         public OnSeachDelegate FiterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 
 
-        public SelectMetaViewModel(AssetViewModelEditor assetViewModelEditor, AssetViewModel data, PackFileService pfs)
+        public SelectMetaViewModel(AssetViewModelBuilder assetViewModelEditor, AssetViewModel data, PackFileService pfs)
         {
             _assetViewModelEditor = assetViewModelEditor;
             _data = data;

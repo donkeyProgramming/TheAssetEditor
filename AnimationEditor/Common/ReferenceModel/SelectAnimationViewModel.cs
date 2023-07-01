@@ -10,7 +10,7 @@ namespace AnimationEditor.Common.ReferenceModel
     public class SelectAnimationViewModel : NotifyPropertyChangedImpl
     {
         PackFileService _pfs;
-        private readonly AssetViewModelEditor _assetViewModelEditor;
+        private readonly AssetViewModelBuilder _assetViewModelEditor;
         AssetViewModel _data;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
@@ -23,7 +23,7 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public OnSeachDelegate FiterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 
-        public SelectAnimationViewModel(AssetViewModelEditor assetViewModelEditor, AssetViewModel data, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        public SelectAnimationViewModel(AssetViewModelBuilder assetViewModelEditor, AssetViewModel data, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             _assetViewModelEditor = assetViewModelEditor;
             _data = data;

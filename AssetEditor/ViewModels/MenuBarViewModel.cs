@@ -21,9 +21,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using AnimationEditor.SkeletonEditor;
 using AssetEditor.Report;
-using AnimationEditor.AnimationBuilder;
 using CommonControls.Editors.AnimationPack;
-using CommonControls.BaseDialogs.ErrorListDialog;
 using System.Reflection;
 using System.IO;
 using System.Text;
@@ -263,8 +261,8 @@ namespace AssetEditor.ViewModels
         }
         void OpenPropCreatorEditor()
         {
-            var editorView = _toolFactory.Create<BaseAnimationViewModel>();
-            EditorCreator.CreateEmptyEditor(editorView);
+            //var editorView = _toolFactory.Create<BaseAnimationViewModel>();
+            //EditorCreator.CreateEmptyEditor(editorView);
         }
 
         void OpenMountCreator()
@@ -335,8 +333,8 @@ namespace AssetEditor.ViewModels
 
         void OpenOpenAnimationBuilder()
         {
-            var editorView = _toolFactory.Create<AnimationBuilderViewModel>();
-            EditorCreator.CreateEmptyEditor(editorView);
+           // var editorView = _toolFactory.Create<AnimationBuilderViewModel>();
+           // EditorCreator.CreateEmptyEditor(editorView);
         }
 
         void GenerateRmv2Report()

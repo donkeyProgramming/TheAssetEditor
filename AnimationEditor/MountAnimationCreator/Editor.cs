@@ -52,19 +52,18 @@ namespace AnimationEditor.MountAnimationCreator
         private readonly ApplicationSettingsService _applicationSettings;
         List<int> _mountVertexes = new List<int>();
         Rmv2MeshNode _mountVertexOwner;
-        private readonly AssetViewModelEditor _assetViewModelBuilder;
+        private readonly AssetViewModelBuilder _assetViewModelBuilder;
         PackFileService _pfs;
         SelectionManager _selectionManager;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
-        public Editor(AssetViewModelEditor assetViewModelBuilder, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, AssetViewModel mount, AssetViewModel newAnimation, IComponentManager componentManager, ApplicationSettingsService applicationSettings)
+        public Editor(AssetViewModelBuilder assetViewModelBuilder, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, IComponentManager componentManager, ApplicationSettingsService applicationSettings)
         {
             _assetViewModelBuilder = assetViewModelBuilder;
             _pfs = pfs;
-            _newAnimation = newAnimation;
+         
             _applicationSettings = applicationSettings;
-            _mount = mount;
-            _rider = rider;
+     
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _selectionManager = componentManager.GetComponent<SelectionManager>();
 
@@ -72,7 +71,7 @@ namespace AnimationEditor.MountAnimationCreator
             DisplayGeneratedMesh = new NotifyAttr<bool>(true, (value) => { if (_newAnimation.MainNode != null) _newAnimation.ShowMesh.Value = value; });
 
             SelectedRiderBone = new FilterCollection<SkeletonBoneNode>(null, (x) => UpdateCanSaveAndPreviewStates());
-            MountLinkController = new MountLinkViewModel(_assetViewModelBuilder, pfs, skeletonAnimationLookUpHelper, rider, mount, UpdateCanSaveAndPreviewStates);
+         
 
             ActiveOutputFragment = new FilterCollection<IAnimationBinGenericFormat>(null, OutputAnimationSetSelected);
             ActiveOutputFragment.SearchFilter = (value, rx) => { return rx.Match(value.FullPath).Success; };
@@ -80,15 +79,28 @@ namespace AnimationEditor.MountAnimationCreator
             ActiveFragmentSlot = new FilterCollection<AnimationBinEntryGenericFormat>(null, (x)=> UpdateCanSaveAndPreviewStates());
             ActiveFragmentSlot.SearchFilter = (value, rx) => { return rx.Match(value.SlotName).Success; };
 
-            _mount.SkeletonChanged += MountSkeletonChanged;
-            _mount.AnimationChanged += TryReGenerateAnimation;
-            _rider.SkeletonChanged += RiderSkeletonChanges;
-            _rider.AnimationChanged += TryReGenerateAnimation;
+
            
             AnimationSettings.SettingsChanged += () => TryReGenerateAnimation(null);
 
             MountSkeletonChanged(_mount.Skeleton);
             RiderSkeletonChanges(_rider.Skeleton);
+        }
+
+        internal Editor Create(AssetViewModel rider, AssetViewModel mount, AssetViewModel newAnimation)
+        {
+            _newAnimation = newAnimation;
+            _mount = mount;
+            _rider = rider;
+
+            _mount.SkeletonChanged += MountSkeletonChanged;
+            _mount.AnimationChanged += TryReGenerateAnimation;
+            _rider.SkeletonChanged += RiderSkeletonChanges;
+            _rider.AnimationChanged += TryReGenerateAnimation;
+
+            MountLinkController = new MountLinkViewModel(_assetViewModelBuilder, _pfs, _skeletonAnimationLookUpHelper, rider, mount, UpdateCanSaveAndPreviewStates);
+
+            return this;
         }
 
         private void TryReGenerateAnimation(AnimationClip newValue = null)
@@ -266,5 +278,7 @@ namespace AnimationEditor.MountAnimationCreator
                 ActiveOutputFragment.UpdatePossibleValues(MountLinkController.LoadAnimationSetForSkeleton(_rider.Skeleton.SkeletonName, true));
             }
         }
+
+
     }
 }

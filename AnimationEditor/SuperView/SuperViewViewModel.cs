@@ -5,38 +5,32 @@ using Common;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
-using View3D.Animation.MetaData;
+using MonoGame.Framework.WpfInterop;
 using View3D.Components;
 using View3D.Scene;
 
 namespace AnimationEditor.SuperView
 {
-    public class SuperViewViewModel : BaseAnimationViewModel
+    public class SuperViewViewModel : BaseAnimationViewModel<Editor>
     {
-        private readonly Editor _superView;
+        private readonly ReferenceModelSelectionViewModelBuilder _referenceModelSelectionViewModelBuilder;
 
-        public SuperViewViewModel(Editor superView, AnimationPlayerViewModel animationPlayerViewModel, EventHub eventHub, MetaDataFactory metaDataFactory, AssetViewModelEditor assetViewModelBuilder, IComponentInserter componentInserter, MainScene scene, IToolFactory toolFactory, PackFileService pfs, 
-            SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService) 
-            : base(animationPlayerViewModel, eventHub, metaDataFactory, assetViewModelBuilder, scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
+        public SuperViewViewModel(ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder, Editor editor, AnimationPlayerViewModel animationPlayerViewModel, EventHub eventHub, 
+            IComponentInserter componentInserter,  MainScene scene) 
+            : base(componentInserter, animationPlayerViewModel, scene)
         {
-            Set("not_in_use1", "not_in_use2", false);
-            _superView = superView;
             DisplayName.Value = "Super view";
-            componentInserter.Execute();
+            _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
+            Editor = editor;
+           
+            eventHub.Register<SceneInitializedEvent>(Initialize);
         }
 
-        public override void Initialize()
+        void Initialize(SceneInitializedEvent sceneInitializedEvent)
         {
-            MainModelView.Value.IsControlVisible.Value = false;
-            ReferenceModelView.Value.IsControlVisible.Value = false;
-            ReferenceModelView.Value.Data.IsSelectable = false;
-
-            Editor = _superView;
-
-            if (MainInput == null)
-                MainInput = new AnimationToolInput();
-
-            _superView.Create(MainInput);
+            MainModelView.Value = _referenceModelSelectionViewModelBuilder.CreateEmpty();
+            ReferenceModelView.Value = _referenceModelSelectionViewModelBuilder.CreateEmpty();
+            Editor.Create(MainInput); 
         }
     }
 
