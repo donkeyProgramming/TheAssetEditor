@@ -21,13 +21,9 @@ namespace AnimationEditor.SuperView
         {
             Set("not_in_use1", "not_in_use2", false);
             _superView = superView;
-
-
             DisplayName.Value = "Super view";
-
             componentInserter.Execute();
         }
-
 
         public override void Initialize()
         {
@@ -35,7 +31,6 @@ namespace AnimationEditor.SuperView
             ReferenceModelView.Value.IsControlVisible.Value = false;
             ReferenceModelView.Value.Data.IsSelectable = false;
 
-            //var typedEditor = new Editor(_metaDataFactory, _assetViewModelBuilder, _toolFactory ,Scene, _pfs, _skeletonHelper, Player, _copyPasteManager, _applicationSettingsService);
             Editor = _superView;
 
             if (MainInput == null)
