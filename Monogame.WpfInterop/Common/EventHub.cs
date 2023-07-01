@@ -10,6 +10,8 @@ namespace Common
         public void Publish<T>(T instance)
         {
             _callbackList.TryGetValue(typeof(T), out var callbackItems);
+            if (callbackItems == null)
+                return;
             foreach(var callbackItem in callbackItems)
             {
                 Action<T> action = (Action<T>)callbackItem;

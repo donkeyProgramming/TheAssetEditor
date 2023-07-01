@@ -1,11 +1,14 @@
 ﻿using AnimationEditor.AnimationBuilder.Nodes;
+using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
+using Common;
 using CommonControls.Common;
 using CommonControls.FileTypes.DB;
 using CommonControls.Services;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using View3D.Animation;
+using View3D.Animation.MetaData;
 using View3D.Scene;
 
 namespace AnimationEditor.AnimationBuilder
@@ -21,8 +24,8 @@ namespace AnimationEditor.AnimationBuilder
     {
         CopyPasteManager _copyPasteManager;
 
-        public AnimationBuilderViewModel(MainScene scene,IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService)
-            : base(scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
+        public AnimationBuilderViewModel(EventHub eventHub, MetaDataFactory metaDataFactory, AssetViewModelBuilder assetViewModelBuilder, MainScene scene,IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService)
+            : base(eventHub, metaDataFactory, assetViewModelBuilder, scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
         {
             Set("Main Node", "not_in_use2", false);
             _copyPasteManager = copyPasteManager;
@@ -35,11 +38,11 @@ namespace AnimationEditor.AnimationBuilder
 
         public override void Initialize()
         {
-            MainModelView.IsControlVisible.Value = true;
-            ReferenceModelView.IsControlVisible.Value = false;
-            ReferenceModelView.Data.IsSelectable = false;
+            MainModelView.Value.IsControlVisible.Value = true;
+            ReferenceModelView.Value.IsControlVisible.Value = false;
+            ReferenceModelView.Value.Data.IsSelectable = false;
 
-            var typedEditor = new Editor(_pfs, MainModelView.Data, Scene, _copyPasteManager);
+            var typedEditor = new Editor(_pfs, MainModelView.Value.Data, Scene, _copyPasteManager);
             Editor = typedEditor;
 
             if (MainInput == null)

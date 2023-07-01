@@ -8,11 +8,6 @@ using System.Collections.Generic;
 
 namespace MonoGame.Framework.WpfInterop
 {
-
-
-    public delegate void SceneInitializedDelegate(WpfGame scene);
-
-
     public interface IComponentManager
     {
         public T GetComponent<T>() where T : IGameComponent;
@@ -29,8 +24,6 @@ namespace MonoGame.Framework.WpfInterop
     /// </summary>
     public abstract class WpfGame : D3D11Host, IComponentManager
     {
-        public event SceneInitializedDelegate SceneInitialized;
-
         private readonly EventHub _eventHub;
         private readonly string _contentDir;
 
@@ -152,7 +145,6 @@ namespace MonoGame.Framework.WpfInterop
             Components.ComponentRemoved += ComponentRemoved;
 
             LoadContent();
-            SceneInitialized?.Invoke(this);
             _eventHub.Publish(new SceneInitializedEvent());
         }
 

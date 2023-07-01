@@ -2,6 +2,7 @@
 using AnimationEditor.AnimationTransferTool;
 using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.Common.BaseControl;
+using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.SkeletonEditor;
 using AnimationEditor.SuperView;
@@ -14,13 +15,18 @@ namespace AnimationEditor
     {
         public static void Register(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddTransient<MountAnimationCreatorViewModel>();
-            serviceCollection.AddTransient<CampaignAnimationCreatorViewModel>();
-            serviceCollection.AddTransient<AnimationTransferToolViewModel>();
-            serviceCollection.AddTransient<SuperViewViewModel>();
-            serviceCollection.AddTransient<SkeletonEditorViewModel>();
-            serviceCollection.AddTransient<AnimationBuilderViewModel>();
-            serviceCollection.AddTransient<BaseAnimationView>();
+            serviceCollection.AddScoped<AssetViewModelBuilder>();
+            serviceCollection.AddTransient<AssetViewModel>();
+
+
+
+            serviceCollection.AddScoped<MountAnimationCreatorViewModel>();
+            serviceCollection.AddScoped<CampaignAnimationCreatorViewModel>();
+            serviceCollection.AddScoped<AnimationTransferToolViewModel>();
+            serviceCollection.AddScoped<SuperViewViewModel>();
+            serviceCollection.AddScoped<SkeletonEditorViewModel>();
+            serviceCollection.AddScoped<AnimationBuilderViewModel>();
+            serviceCollection.AddScoped<BaseAnimationView>();
         }
 
         public static void RegisterTools(IToolFactory factory)

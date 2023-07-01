@@ -1,30 +1,40 @@
-﻿using AnimationEditor.PropCreator.ViewModels;
+﻿using AnimationEditor.Common.ReferenceModel;
+using AnimationEditor.PropCreator.ViewModels;
+using Common;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
+using View3D.Animation.MetaData;
+using View3D.Components;
 using View3D.Scene;
 
 namespace AnimationEditor.SuperView
 {
     public class SuperViewViewModel : BaseAnimationViewModel
     {
+        private readonly MetaDataFactory _metaDataFactory;
+        private readonly AssetViewModelBuilder _assetViewModelBuilder;
         CopyPasteManager _copyPasteManager;
-        public SuperViewViewModel(MainScene scene, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService) 
-            : base(scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
+        public SuperViewViewModel(EventHub eventHub, MetaDataFactory metaDataFactory, AssetViewModelBuilder assetViewModelBuilder, IComponentInserter componentInserter, MainScene scene, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService) 
+            : base(eventHub, metaDataFactory, assetViewModelBuilder, scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
         {
             Set("not_in_use1", "not_in_use2", false);
+            _metaDataFactory = metaDataFactory;
+            _assetViewModelBuilder = assetViewModelBuilder;
             _copyPasteManager = copyPasteManager;
             DisplayName.Value = "Super view";
+
+            componentInserter.Execute();
         }
 
 
         public override void Initialize()
         {
-            MainModelView.IsControlVisible.Value = false;
-            ReferenceModelView.IsControlVisible.Value = false;
-            ReferenceModelView.Data.IsSelectable = false;
+            MainModelView.Value.IsControlVisible.Value = false;
+            ReferenceModelView.Value.IsControlVisible.Value = false;
+            ReferenceModelView.Value.Data.IsSelectable = false;
 
-            var typedEditor = new Editor(_toolFactory ,Scene, _pfs, _skeletonHelper, Player, _copyPasteManager, _applicationSettingsService);
+            var typedEditor = new Editor(_metaDataFactory, _assetViewModelBuilder, _toolFactory ,Scene, _pfs, _skeletonHelper, Player, _copyPasteManager, _applicationSettingsService);
             Editor = typedEditor;
 
             if (MainInput == null)

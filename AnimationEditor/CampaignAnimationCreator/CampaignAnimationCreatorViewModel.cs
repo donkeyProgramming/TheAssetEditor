@@ -1,14 +1,17 @@
-﻿using AnimationEditor.PropCreator.ViewModels;
+﻿using AnimationEditor.Common.ReferenceModel;
+using AnimationEditor.PropCreator.ViewModels;
+using Common;
 using CommonControls.Common;
 using CommonControls.Services;
+using View3D.Animation.MetaData;
 using View3D.Scene;
 
 namespace AnimationEditor.CampaignAnimationCreator
 {
     public class CampaignAnimationCreatorViewModel : BaseAnimationViewModel
     {
-        public CampaignAnimationCreatorViewModel(MainScene scene, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService) 
-            : base(scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
+        public CampaignAnimationCreatorViewModel(EventHub eventHub,MetaDataFactory metaDataFactory,AssetViewModelBuilder assetViewModelBuilder,MainScene scene, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService) 
+            : base(eventHub, metaDataFactory, assetViewModelBuilder, scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
         {
             Set("model", "not_in_use", true);
             DisplayName.Value = "Campaign Animation Creator";
@@ -16,9 +19,9 @@ namespace AnimationEditor.CampaignAnimationCreator
 
         public override void Initialize()
         {
-            ReferenceModelView.Data.IsSelectable = true;
-            ReferenceModelView.IsControlVisible.Value = false;
-            Editor = new Editor(_pfs, MainModelView.Data);
+            ReferenceModelView.Value.Data.IsSelectable = true;
+            ReferenceModelView.Value.IsControlVisible.Value = false;
+            Editor = new Editor(_pfs, MainModelView.Value.Data);
         }
     }
 

@@ -22,6 +22,7 @@ namespace AnimationEditor.SkeletonEditor
         AssetViewModel _techSkeletonNode;
         IComponentManager _componentManager;
         CopyPasteManager _copyPasteManager;
+        private readonly AssetViewModelBuilder _assetViewModelBuilder;
 
         public NotifyAttr<string> SkeletonName { get; set; } = new NotifyAttr<string>("");
         public NotifyAttr<string> RefMeshName { get; set; } = new NotifyAttr<string>("");
@@ -69,13 +70,13 @@ namespace AnimationEditor.SkeletonEditor
 
         public DoubleViewModel BoneScale { get; set; } = new DoubleViewModel(1);
 
-        public Editor(PackFileService pfs, AssetViewModel techSkeletonNode, IComponentManager componentManager, CopyPasteManager copyPasteManager)
+        public Editor(PackFileService pfs, AssetViewModel techSkeletonNode, IComponentManager componentManager, CopyPasteManager copyPasteManager, AssetViewModelBuilder assetViewModelBuilder)
         {
             _pfs = pfs;
             _techSkeletonNode = techSkeletonNode;
             _componentManager = componentManager;
             _copyPasteManager = copyPasteManager;
-
+            _assetViewModelBuilder = assetViewModelBuilder;
             ShowBonesAsWorldTransform.PropertyChanged += (s, e) => UpdateSelectedBoneValues(_selectedBone);
             SelectedBoneTranslationOffset.OnValueChanged += HandleTranslationChanged;
             SelectedBoneRotationOffset.OnValueChanged += HandleTranslationChanged;
@@ -372,7 +373,7 @@ namespace AnimationEditor.SkeletonEditor
                 if (browser.ShowDialog() == true && browser.SelectedFile != null)
                 {
                     var file = browser.SelectedFile;
-                    _techSkeletonNode.SetMesh(file);
+                    _assetViewModelBuilder.SetMesh(_techSkeletonNode, file);
                     RefMeshName.Value = _pfs.GetFullPath(file);
                     CreateEditor(_techSkeletonNode.SkeletonName.Value);
                 }

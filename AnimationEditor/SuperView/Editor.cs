@@ -2,11 +2,11 @@
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.Common;
-using CommonControls.FileTypes.DB;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
 using System.Collections.ObjectModel;
 using System.Linq;
+using View3D.Animation.MetaData;
 using View3D.Scene;
 
 namespace AnimationEditor.SuperView
@@ -17,6 +17,8 @@ namespace AnimationEditor.SuperView
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonHelper;
         AnimationPlayerViewModel _player;
+        private readonly MetaDataFactory _metaDataFactory;
+        private readonly AssetViewModelBuilder _assetViewModelBuilder;
         IToolFactory _toolFactory;
         ApplicationSettingsService _applicationSettingsService;
 
@@ -31,8 +33,10 @@ namespace AnimationEditor.SuperView
 
         public ObservableCollection<ReferenceModelSelectionViewModel> Items { get; set; } = new ObservableCollection<ReferenceModelSelectionViewModel>();
 
-        public Editor(IToolFactory toolFactory, MainScene scene, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, AnimationPlayerViewModel player, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService)
+        public Editor(MetaDataFactory metaDataFactory, AssetViewModelBuilder assetViewModelBuilder, IToolFactory toolFactory, MainScene scene, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, AnimationPlayerViewModel player, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService)
         {
+            _metaDataFactory = metaDataFactory;
+            _assetViewModelBuilder = assetViewModelBuilder;
             _toolFactory = toolFactory;
             _scene = scene;
             _pfs = pfs;
@@ -48,13 +52,14 @@ namespace AnimationEditor.SuperView
 
         public void Create(AnimationToolInput input)
         {
-            var asset = _scene.AddComponent(new AssetViewModel(_pfs, "Item 0", Color.Black, _scene, _applicationSettingsService));
+            var asset = _assetViewModelBuilder.CreateAsset("Item 0", Color.Black);
             _player.RegisterAsset(asset);
-            var viewModel = new ReferenceModelSelectionViewModel(_toolFactory, _pfs, asset, "Item 0:", _scene, _skeletonHelper, _applicationSettingsService);
+            var viewModel = new ReferenceModelSelectionViewModel(_metaDataFactory, _toolFactory, _pfs, asset, "Item 0:", _scene, _skeletonHelper, _applicationSettingsService);
             viewModel.AllowMetaData.Value = true;
 
-            if(input.Mesh != null)
-                viewModel.Data.SetMesh(input.Mesh);
+            if (input.Mesh != null)
+                _assetViewModelBuilder.SetMesh(asset, input.Mesh);
+
             if (input.Animation != null)
                 viewModel.Data.SetAnimation(_skeletonHelper.FindAnimationRefFromPackFile(input.Animation, _pfs));
 

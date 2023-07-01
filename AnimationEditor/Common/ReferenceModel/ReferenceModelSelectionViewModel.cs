@@ -1,10 +1,8 @@
 ﻿using CommonControls.Common;
-using CommonControls.FileTypes.DB;
 using CommonControls.FileTypes.MetaData;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using MonoGame.Framework.WpfInterop;
-using Serilog;
 using View3D.Animation;
 using View3D.Animation.MetaData;
 
@@ -12,12 +10,9 @@ namespace AnimationEditor.Common.ReferenceModel
 {
     public class ReferenceModelSelectionViewModel : NotifyPropertyChangedImpl
     {
-        ILogger _logger = Logging.Create<ReferenceModelSelectionViewModel>();
-        PackFileService _pfs;
-        IComponentManager _componentManager;
-        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        IToolFactory _toolFactory;
-        ApplicationSettingsService _applicationSettingsService;
+        private readonly PackFileService _pfs;
+        private readonly MetaDataFactory _metaDataFactory;
+        private readonly IToolFactory _toolFactory;
 
         // Header
         string _headerName;
@@ -35,9 +30,6 @@ namespace AnimationEditor.Common.ReferenceModel
         public SelectMetaViewModel MetaFileInformation { get; set; }
         public SelectFragAndSlotViewModel FragAndSlotSelection { get; set; }
 
-
-
-
         // Visability
         bool _isVisible = true;
         public bool IsVisible
@@ -53,17 +45,15 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public NotifyAttr<bool> IsControlVisible { get; set; } = new NotifyAttr<bool>(true);
         public NotifyAttr<bool> AllowMetaData { get; set; } = new NotifyAttr<bool>(false);
-        public ReferenceModelSelectionViewModel(IToolFactory toolFactory, PackFileService pf, AssetViewModel data, string headerName, IComponentManager componentManager, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService applicationSettingsService)
+        public ReferenceModelSelectionViewModel(MetaDataFactory metaDataFactory, IToolFactory toolFactory, PackFileService pf, AssetViewModel data, string headerName, IComponentManager componentManager, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService applicationSettingsService)
         {
+            _metaDataFactory = metaDataFactory;
             _toolFactory = toolFactory;
             _pfs = pf;
             HeaderName = headerName;
-            _componentManager = componentManager;
-            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             Data = data;
-            _applicationSettingsService = applicationSettingsService;
 
-            MeshViewModel = new SelectMeshViewModel(_pfs, Data);
+            MeshViewModel = new SelectMeshViewModel(_pfs, Data, null);  // Todo
             AnimViewModel = new SelectAnimationViewModel(Data, _pfs, skeletonAnimationLookUpHelper);
             SkeletonInformation = new SkeletonPreviewViewModel(Data);
             MetaFileInformation = new SelectMetaViewModel(Data, _pfs);
@@ -105,27 +95,11 @@ namespace AnimationEditor.Common.ReferenceModel
             FragAndSlotSelection.PreviewSelectedSlot();
         }
 
-        public void ViewSelectedMeta()
-        {
-            var fullFileName = _pfs.GetFullPath(_data.MetaData);
-            var viewModel = _toolFactory.Create(fullFileName);
-            viewModel.MainFile = _data.MetaData;
-            var window = _toolFactory.CreateAsWindow(viewModel);
-            window.Show();
-        }
+        public void ViewSelectedMeta() => ViewMetaDataFile(_data.MetaData, "Meta file - ");
+        public void ViewSelectedPersistMeta() => ViewMetaDataFile(_data.PersistMetaData, "Persistent meta file - ");
 
-        public void ViewSelectedPersistMeta()
-        {
-            var fullFileName = _pfs.GetFullPath(_data.PersistMetaData);
-            var viewModel = _toolFactory.Create(fullFileName);
-            viewModel.MainFile = _data.PersistMetaData;
-            var window = _toolFactory.CreateAsWindow(viewModel);
-            window.Width = 800;
-            window.Height = 450;
-            window.Title = "Persistent meta file - " + fullFileName;
 
-            window.Show();
-        }
+
 
 
         void MetaDataChanged(AssetViewModel model)
@@ -141,14 +115,25 @@ namespace AnimationEditor.Common.ReferenceModel
             var parser = new MetaDataFileParser();
             var persist = parser.ParseFile(model.PersistMetaData);
             var meta = parser.ParseFile(model.MetaData);
-
-            var fatory = new MetaDataFactory(model.MainNode, _componentManager, model, model.Player, FragAndSlotSelection.FragmentList.SelectedItem, _applicationSettingsService);
-            model.MetaDataItems = fatory.Create(persist, meta);
+            model.MetaDataItems = _metaDataFactory.Create(persist, meta, model.MainNode, model, model.Player, FragAndSlotSelection.FragmentList.SelectedItem);
         }
 
         public void Refresh()
         {
             MetaFileInformation.Refresh();
+        }
+
+        void ViewMetaDataFile(PackFile packFile, string windowTitlePrefix)
+        {
+            var fullFileName = _pfs.GetFullPath(_data.PersistMetaData);
+            var viewModel = _toolFactory.Create(fullFileName);
+            viewModel.MainFile = packFile;
+            var window = _toolFactory.CreateAsWindow(viewModel);
+            window.Width = 800;
+            window.Height = 450;
+            window.Title = "Persistent meta file - " + fullFileName;
+
+            window.Show();
         }
     }
 }

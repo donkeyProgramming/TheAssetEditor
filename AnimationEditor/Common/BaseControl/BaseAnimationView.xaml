@@ -58,8 +58,8 @@
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <referencemodel:ReferenceModelSelectionView Grid.Row="0" DataContext="{Binding MainModelView, Mode=OneTime}"  Visibility="{Binding IsControlVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}"/>
-            <referencemodel:ReferenceModelSelectionView Grid.Row="1" DataContext="{Binding ReferenceModelView, Mode=OneTime}" Visibility="{Binding IsControlVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}"/>
+            <referencemodel:ReferenceModelSelectionView Grid.Row="0" DataContext="{Binding MainModelView.Value, Mode=TwoWay}"  Visibility="{Binding IsControlVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}"/>
+            <referencemodel:ReferenceModelSelectionView Grid.Row="1" DataContext="{Binding ReferenceModelView.Value, Mode=TwoWay}" Visibility="{Binding IsControlVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}"/>
             <Rectangle Grid.Row="2" Fill="LightGray" Height="3" Margin="2,2,2,2"/>
 
             <ScrollViewer  Grid.Row="3" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto">

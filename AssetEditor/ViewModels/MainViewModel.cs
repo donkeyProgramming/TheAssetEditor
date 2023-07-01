@@ -115,7 +115,7 @@ namespace AssetEditor.ViewModels
                 //reportService.CompareFiles(@"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.2.0.0 PackFiles.csv", @"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.3.0.0 Packfiles.csv");
 
                 //;
-                //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateDwardAndEmpArcher(this, toolFactory, packfileService);
+                AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateDwardAndEmpArcher(this, toolFactory, packfileService);
 
                 //var r = new Rmv2Information(_packfileService);
                 //r.Create(GameInformationFactory.GetGameById(settingsService.CurrentSettings.CurrentGame).DisplayName);
@@ -200,7 +200,7 @@ namespace AssetEditor.ViewModels
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hq3\nor\nor_war_mammoth\nor_war_mammoth_warshrine_01.rigid_model_v2"));
 
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc1\tmb\tmb_warsphinx\tex\tmb_warsphinx_armour_01_base_colour.dds"));
-                OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.rigid_model_v2"));
+                //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.rigid_model_v2"));
 
 
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);

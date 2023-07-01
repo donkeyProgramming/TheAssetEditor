@@ -10,11 +10,13 @@ namespace AnimationEditor.Common.ReferenceModel
     {
         PackFileService _pfs;
         AssetViewModel _data;
+        private readonly AssetViewModelBuilder _assetViewModelBuilder;
 
-        public SelectMeshViewModel(PackFileService pfs, AssetViewModel data)
+        public SelectMeshViewModel(PackFileService pfs, AssetViewModel data, AssetViewModelBuilder assetViewModelBuilder )
         {
             _pfs = pfs;
             _data = data;
+            _assetViewModelBuilder = assetViewModelBuilder;
         }
 
         public void BrowseMesh()
@@ -32,7 +34,7 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public void SetMesh(PackFile meshPackFile)
         {
-            _data.SetMesh(meshPackFile);
+            _assetViewModelBuilder.SetMesh(_data, meshPackFile);
         }
     }
 

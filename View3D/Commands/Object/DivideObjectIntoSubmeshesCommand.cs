@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using View3D.Commands.Face;
 using View3D.Components.Component.Selection;
+using View3D.Components.Rendering;
 using View3D.Rendering.Shading;
 using View3D.SceneNodes;
 using View3D.Services;
@@ -23,15 +24,17 @@ namespace View3D.Commands.Object
         SelectionManager _selectionManager;
         ISelectionState _originalSelectionState;
         ResourceLibary _resourceLib;
+        private readonly RenderEngineComponent _renderEngineComponent;
 
         public string HintText { get => "Divide Object"; }
         public bool IsMutation { get => true; }
 
-        public DivideObjectIntoSubmeshesCommand(ComponentManagerResolver componentManagerResolver, SelectionManager selectionManager, ResourceLibary resourceLibary)
+        public DivideObjectIntoSubmeshesCommand(ComponentManagerResolver componentManagerResolver, SelectionManager selectionManager, ResourceLibary resourceLibary, RenderEngineComponent renderEngineComponent)
         {
             _componentManagerResolver = componentManagerResolver;
             _selectionManager = selectionManager;
             _resourceLib = resourceLibary;
+            _renderEngineComponent = renderEngineComponent;
         }
 
         public void Configure(IEditableGeometry objectToSplit, bool combineOverlappingVertexes)
@@ -78,7 +81,7 @@ namespace View3D.Commands.Object
 
                     var typedObject = _objectToSplit as Rmv2MeshNode;
                     var shader = typedObject.Effect.Clone() as PbrShader;
-                    var meshNode = new Rmv2MeshNode(typedObject.CommonHeader, mesh, typedObject.Material.Clone(), typedObject.AnimationPlayer, _componentManagerResolver.ComponentManager, shader);
+                    var meshNode = new Rmv2MeshNode(typedObject.CommonHeader, mesh, typedObject.Material.Clone(), typedObject.AnimationPlayer, _renderEngineComponent, shader);
                     meshNode.Initialize(_resourceLib);
                     meshNode.IsVisible = true;
 

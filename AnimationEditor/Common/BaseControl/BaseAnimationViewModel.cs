@@ -1,5 +1,6 @@
 ﻿using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
+using Common;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.PackFiles.Models;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using System.Windows.Input;
+using View3D.Animation.MetaData;
 using View3D.Scene;
 using View3D.Services;
 
@@ -33,12 +35,14 @@ namespace AnimationEditor.PropCreator.ViewModels
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Creator");
         public PackFile MainFile { get; set; }
 
+        private readonly MetaDataFactory _metaDataFactory;
+        private readonly AssetViewModelBuilder _assetViewModelBuilder;
         protected IToolFactory _toolFactory;
         MainScene _scene;
         public MainScene Scene { get => _scene; set => SetAndNotify(ref _scene, value); }
 
-        public ReferenceModelSelectionViewModel MainModelView { get; set; }
-        public ReferenceModelSelectionViewModel ReferenceModelView { get; set; }
+        public NotifyAttr<ReferenceModelSelectionViewModel> MainModelView { get; set; } = new NotifyAttr<ReferenceModelSelectionViewModel>();
+        public NotifyAttr<ReferenceModelSelectionViewModel> ReferenceModelView { get; set; } = new NotifyAttr<ReferenceModelSelectionViewModel>();
         public AnimationPlayerViewModel Player { get; set; } = new AnimationPlayerViewModel();
 
 
@@ -56,18 +60,21 @@ namespace AnimationEditor.PropCreator.ViewModels
 
         string _headerAsset0; string _headerAsset1;
 
-        public BaseAnimationViewModel(MainScene sceneContainer, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService)
+        public BaseAnimationViewModel(EventHub eventHub, MetaDataFactory metaDataFactory, AssetViewModelBuilder assetViewModelBuilder, MainScene sceneContainer, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService)
         {
             _toolFactory = toolFactory;
             _pfs = pfs;
             _skeletonHelper = skeletonHelper;
             _applicationSettingsService = applicationSettingsService;
-
+            _metaDataFactory = metaDataFactory;
+            _assetViewModelBuilder = assetViewModelBuilder;
             Scene = sceneContainer;
-            Scene.SceneInitialized += OnSceneInitialized;
+
 
             ResetCameraCommand = new RelayCommand(ResetCamera);
             FocusCamerasCommand = new RelayCommand(FocusCamera);
+
+            eventHub.Register<SceneInitializedEvent>(OnSceneInitialized);
         }
 
         protected void Set(string headerAsset0, string headerAsset1, bool createDefaultAssets)
@@ -80,31 +87,31 @@ namespace AnimationEditor.PropCreator.ViewModels
         void ResetCamera() => _focusComponent.ResetCamera();
         void FocusCamera() => _focusComponent.FocusSelection();
 
-        private void OnSceneInitialized(WpfGame scene)
+        private void OnSceneInitialized(SceneInitializedEvent scene)
         {
-            var mainAsset = Scene.AddComponent(new AssetViewModel(_pfs, _headerAsset0, Color.Black, Scene, _applicationSettingsService));
-            var refAsset = Scene.AddComponent(new AssetViewModel(_pfs, _headerAsset1, Color.Green, Scene, _applicationSettingsService));
+            var mainAsset = _assetViewModelBuilder.CreateAsset(_headerAsset0, Color.Black);
+            var refAsset = _assetViewModelBuilder.CreateAsset(_headerAsset1, Color.Black);
 
-            MainModelView = new ReferenceModelSelectionViewModel(_toolFactory, _pfs, mainAsset, _headerAsset0 + ":", Scene, _skeletonHelper, _applicationSettingsService);
-            ReferenceModelView = new ReferenceModelSelectionViewModel(_toolFactory, _pfs, refAsset, _headerAsset1 + ":", Scene, _skeletonHelper, _applicationSettingsService);
+            MainModelView.Value = new ReferenceModelSelectionViewModel(_metaDataFactory,_toolFactory, _pfs, mainAsset, _headerAsset0 + ":", Scene, _skeletonHelper, _applicationSettingsService);
+            ReferenceModelView.Value = new ReferenceModelSelectionViewModel(_metaDataFactory, _toolFactory, _pfs, refAsset, _headerAsset1 + ":", Scene, _skeletonHelper, _applicationSettingsService);
 
             if (_createDefaultAssets)
             {
-                Player.RegisterAsset(MainModelView.Data);
-                Player.RegisterAsset(ReferenceModelView.Data);
+                Player.RegisterAsset(MainModelView.Value.Data);
+                Player.RegisterAsset(ReferenceModelView.Value.Data);
 
                 if (MainInput != null)
                 {
-                    MainModelView.Data.SetMesh(MainInput.Mesh);
+                    _assetViewModelBuilder.SetMesh(mainAsset, MainInput.Mesh);
                     if (MainInput.Animation != null)
-                        MainModelView.Data.SetAnimation(_skeletonHelper.FindAnimationRefFromPackFile(MainInput.Animation, _pfs));
+                        MainModelView.Value.Data.SetAnimation(_skeletonHelper.FindAnimationRefFromPackFile(MainInput.Animation, _pfs));
                 }
 
                 if (RefInput != null)
                 {
-                    ReferenceModelView.Data.SetMesh(RefInput.Mesh);
+                    _assetViewModelBuilder.SetMesh(refAsset, RefInput.Mesh);
                     if (RefInput.Animation != null)
-                        ReferenceModelView.Data.SetAnimation(_skeletonHelper.FindAnimationRefFromPackFile(RefInput.Animation, _pfs));
+                        ReferenceModelView.Value.Data.SetAnimation(_skeletonHelper.FindAnimationRefFromPackFile(RefInput.Animation, _pfs));
                 }
             }
 
@@ -118,7 +125,6 @@ namespace AnimationEditor.PropCreator.ViewModels
         public void Close()
         {
             Scene.Dispose();
-            Scene.SceneInitialized -= OnSceneInitialized;
             Scene = null;
         }
 

@@ -8,6 +8,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using View3D.Components.Component;
+using View3D.Components.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Services;
@@ -26,14 +27,13 @@ namespace KitbasherEditor.Services
         ResourceLibary _resourceLibary;
         AnimationControllerViewModel _animationView;
         SceneManager _sceneManager;
+        private readonly RenderEngineComponent _renderEngineComponent;
         IGeometryGraphicsContextFactory _geometryFactory;
-        IComponentManager _componentManager;
         ApplicationSettingsService _applicationSettingsService;
 
-        public KitbashSceneCreator(ComponentManagerResolver componentManagerResolver, ResourceLibary resourceLibary, SceneManager sceneManager,
+        public KitbashSceneCreator(ResourceLibary resourceLibary, SceneManager sceneManager, RenderEngineComponent renderEngineComponent,
             PackFileService packFileService, AnimationControllerViewModel animationView, IGeometryGraphicsContextFactory geometryFactory, ApplicationSettingsService applicationSettingsService)
         {
-            _componentManager = componentManagerResolver.ComponentManager;
             _packFileService = packFileService;
             _animationView = animationView;
             _geometryFactory = geometryFactory;
@@ -41,8 +41,7 @@ namespace KitbasherEditor.Services
 
             _resourceLibary = resourceLibary;
             _sceneManager = sceneManager;
-
-           
+            _renderEngineComponent = renderEngineComponent;
         }
 
         public void Create(PackFile mainFile)
@@ -58,7 +57,7 @@ namespace KitbasherEditor.Services
             var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
 
             MainNode.CreateModelNodesFromFile(rmv, _resourceLibary, _animationView.GetPlayer(), _geometryFactory,
-                modelFullPath, _componentManager, _packFileService, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
+                modelFullPath, _renderEngineComponent, _packFileService, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
 
             MainNode.SelectedOutputFormat = rmv.Header.Version;
 
@@ -112,7 +111,7 @@ namespace KitbasherEditor.Services
 
         SceneNode LoadModel(PackFile file)
         {
-            SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, _geometryFactory, _componentManager, _applicationSettingsService);
+            SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, _geometryFactory, _renderEngineComponent, _applicationSettingsService);
             var loadedNode = loader.Load(file, null, _animationView.GetPlayer());
 
             if (loadedNode == null)
