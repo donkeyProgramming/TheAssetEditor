@@ -10,6 +10,7 @@ namespace AnimationEditor.Common.ReferenceModel
     public class SelectMetaViewModel : NotifyPropertyChangedImpl
     {
         PackFileService _pfs;
+        private readonly AssetViewModelEditor _assetViewModelEditor;
         AssetViewModel _data;
 
         ObservableCollection<PackFile> _metaList = new ObservableCollection<PackFile>();
@@ -17,17 +18,18 @@ namespace AnimationEditor.Common.ReferenceModel
 
 
         PackFile _selectedMetaFiles;
-        public PackFile SelectedMetaFile { get => _selectedMetaFiles; set { SetAndNotify(ref _selectedMetaFiles, value); _data.SetMetaFile(_selectedMetaFiles, _selectedPersistMeta); } }
+        public PackFile SelectedMetaFile { get => _selectedMetaFiles; set { SetAndNotify(ref _selectedMetaFiles, value); _assetViewModelEditor.SetMetaFile(_data, _selectedMetaFiles, _selectedPersistMeta); } }
 
         PackFile _selectedPersistMeta;
-        public PackFile SelectedPersistMetaFile { get => _selectedPersistMeta; set { SetAndNotify(ref _selectedPersistMeta, value); _data.SetMetaFile(_selectedMetaFiles, _selectedPersistMeta); } } 
+        public PackFile SelectedPersistMetaFile { get => _selectedPersistMeta; set { SetAndNotify(ref _selectedPersistMeta, value); _assetViewModelEditor.SetMetaFile(_data,_selectedMetaFiles, _selectedPersistMeta); } } 
 
 
         public OnSeachDelegate FiterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 
 
-        public SelectMetaViewModel(AssetViewModel data, PackFileService pfs)
+        public SelectMetaViewModel(AssetViewModelEditor assetViewModelEditor, AssetViewModel data, PackFileService pfs)
         {
+            _assetViewModelEditor = assetViewModelEditor;
             _data = data;
             _pfs = pfs;
 

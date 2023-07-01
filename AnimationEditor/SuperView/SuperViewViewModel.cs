@@ -1,4 +1,5 @@
-﻿using AnimationEditor.Common.ReferenceModel;
+﻿using AnimationEditor.Common.AnimationPlayer;
+using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
 using Common;
 using CommonControls.Common;
@@ -12,16 +13,16 @@ namespace AnimationEditor.SuperView
 {
     public class SuperViewViewModel : BaseAnimationViewModel
     {
-        private readonly MetaDataFactory _metaDataFactory;
-        private readonly AssetViewModelBuilder _assetViewModelBuilder;
-        CopyPasteManager _copyPasteManager;
-        public SuperViewViewModel(EventHub eventHub, MetaDataFactory metaDataFactory, AssetViewModelBuilder assetViewModelBuilder, IComponentInserter componentInserter, MainScene scene, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService) 
-            : base(eventHub, metaDataFactory, assetViewModelBuilder, scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
+        private readonly Editor _superView;
+
+        public SuperViewViewModel(Editor superView, AnimationPlayerViewModel animationPlayerViewModel, EventHub eventHub, MetaDataFactory metaDataFactory, AssetViewModelEditor assetViewModelBuilder, IComponentInserter componentInserter, MainScene scene, IToolFactory toolFactory, PackFileService pfs, 
+            SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService) 
+            : base(animationPlayerViewModel, eventHub, metaDataFactory, assetViewModelBuilder, scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
         {
             Set("not_in_use1", "not_in_use2", false);
-            _metaDataFactory = metaDataFactory;
-            _assetViewModelBuilder = assetViewModelBuilder;
-            _copyPasteManager = copyPasteManager;
+            _superView = superView;
+
+
             DisplayName.Value = "Super view";
 
             componentInserter.Execute();
@@ -34,13 +35,13 @@ namespace AnimationEditor.SuperView
             ReferenceModelView.Value.IsControlVisible.Value = false;
             ReferenceModelView.Value.Data.IsSelectable = false;
 
-            var typedEditor = new Editor(_metaDataFactory, _assetViewModelBuilder, _toolFactory ,Scene, _pfs, _skeletonHelper, Player, _copyPasteManager, _applicationSettingsService);
-            Editor = typedEditor;
+            //var typedEditor = new Editor(_metaDataFactory, _assetViewModelBuilder, _toolFactory ,Scene, _pfs, _skeletonHelper, Player, _copyPasteManager, _applicationSettingsService);
+            Editor = _superView;
 
             if (MainInput == null)
                 MainInput = new AnimationToolInput();
 
-            typedEditor.Create(MainInput);
+            _superView.Create(MainInput);
         }
     }
 

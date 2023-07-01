@@ -1,6 +1,7 @@
 ﻿using AnimationEditor.AnimationBuilder;
 using AnimationEditor.AnimationTransferTool;
 using AnimationEditor.CampaignAnimationCreator;
+using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.BaseControl;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.MountAnimationCreator;
@@ -15,8 +16,13 @@ namespace AnimationEditor
     {
         public static void Register(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddScoped<AssetViewModelBuilder>();
+            serviceCollection.AddScoped<AssetViewModelEditor>();
             serviceCollection.AddTransient<AssetViewModel>();
+            serviceCollection.AddScoped<AnimationPlayerViewModel>();
+
+
+            serviceCollection.AddScoped<SuperView.Editor>();
+
 
 
 

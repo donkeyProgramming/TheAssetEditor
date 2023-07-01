@@ -18,7 +18,7 @@ namespace AnimationEditor.SuperView
         SkeletonAnimationLookUpHelper _skeletonHelper;
         AnimationPlayerViewModel _player;
         private readonly MetaDataFactory _metaDataFactory;
-        private readonly AssetViewModelBuilder _assetViewModelBuilder;
+        private readonly AssetViewModelEditor _assetViewModelBuilder;
         IToolFactory _toolFactory;
         ApplicationSettingsService _applicationSettingsService;
 
@@ -33,7 +33,7 @@ namespace AnimationEditor.SuperView
 
         public ObservableCollection<ReferenceModelSelectionViewModel> Items { get; set; } = new ObservableCollection<ReferenceModelSelectionViewModel>();
 
-        public Editor(MetaDataFactory metaDataFactory, AssetViewModelBuilder assetViewModelBuilder, IToolFactory toolFactory, MainScene scene, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, AnimationPlayerViewModel player, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService)
+        public Editor(MetaDataFactory metaDataFactory, AssetViewModelEditor assetViewModelBuilder, IToolFactory toolFactory, MainScene scene, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, AnimationPlayerViewModel player, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService)
         {
             _metaDataFactory = metaDataFactory;
             _assetViewModelBuilder = assetViewModelBuilder;
@@ -54,14 +54,14 @@ namespace AnimationEditor.SuperView
         {
             var asset = _assetViewModelBuilder.CreateAsset("Item 0", Color.Black);
             _player.RegisterAsset(asset);
-            var viewModel = new ReferenceModelSelectionViewModel(_metaDataFactory, _toolFactory, _pfs, asset, "Item 0:", _scene, _skeletonHelper, _applicationSettingsService);
+            var viewModel = new ReferenceModelSelectionViewModel(_metaDataFactory, _toolFactory, _pfs, asset, "Item 0:", _scene, _assetViewModelBuilder, _skeletonHelper, _applicationSettingsService);
             viewModel.AllowMetaData.Value = true;
 
             if (input.Mesh != null)
                 _assetViewModelBuilder.SetMesh(asset, input.Mesh);
 
             if (input.Animation != null)
-                viewModel.Data.SetAnimation(_skeletonHelper.FindAnimationRefFromPackFile(input.Animation, _pfs));
+                _assetViewModelBuilder.SetAnimation(viewModel.Data,_skeletonHelper.FindAnimationRefFromPackFile(input.Animation, _pfs));
 
             if (input.FragmentName != null)
             {
@@ -120,7 +120,7 @@ namespace AnimationEditor.SuperView
                 item.Refresh();
 
             foreach (var item in Items)
-                item.Data.ReApplyMeta();
+                item.Data.TriggerMeshChanged();
         }
 
     }

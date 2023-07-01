@@ -27,7 +27,7 @@ namespace AnimationEditor.AnimationTransferTool
     public class Editor : NotifyPropertyChangedImpl
     {
         ILogger _logger = Logging.Create<Editor>();
-
+        private readonly AssetViewModelEditor _assetViewModelBuilder;
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         IComponentManager _componentManager;
@@ -51,8 +51,9 @@ namespace AnimationEditor.AnimationTransferTool
             set { SetAndNotify(ref _selectedBone, value); HightlightSelectedBones(value); }
         }
 
-        public Editor(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel copyToAsset, AssetViewModel copyFromAsset, AssetViewModel generated, IComponentManager componentManager, AnimationPlayerViewModel player)
+        public Editor(AssetViewModelEditor assetViewModelBuilder, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel copyToAsset, AssetViewModel copyFromAsset, AssetViewModel generated, IComponentManager componentManager, AnimationPlayerViewModel player)
         {
+            _assetViewModelBuilder = assetViewModelBuilder;
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _componentManager = componentManager;
@@ -102,7 +103,7 @@ namespace AnimationEditor.AnimationTransferTool
 
         private void CopyToMeshChanged(AssetViewModel newValue)
         {
-            Generated.CopyMeshFromOther(newValue);
+            _assetViewModelBuilder.CopyMeshFromOther(Generated, newValue);
             CreateBoneOverview(newValue.Skeleton);
             HightlightSelectedBones(null);
 
@@ -122,35 +123,11 @@ namespace AnimationEditor.AnimationTransferTool
 
             var standAnim = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(newValue.SkeletonName).FirstOrDefault(x => x.AnimationFile.Contains("stand"));
             if(standAnim != null)
-                _copyFrom.SetAnimation(standAnim);
+                _assetViewModelBuilder.SetAnimation(_copyFrom, standAnim);
 
             _config = null;
             AnimationSettings.UseScaledSkeletonName.Value = false;
             AnimationSettings.ScaledSkeletonName.Value = "";
-        }
-
-        public void FreezePositionAndRotation()
-        {
-            MessageBox.Show("this feature is currently broken because I gave up on it", "admiralnelson");
-            var newAnimationClip = UpdateAnimation(_copyFrom.AnimationClip, _copyTo.AnimationClip);
-
-            if (ModelBoneList.SelectedItem == null)
-            {
-                MessageBox.Show("No root bone selected");
-                return;
-            }
-
-            for (int frameIndex = 0; frameIndex < newAnimationClip.DynamicFrames.Count; frameIndex++)
-            {
-                var frame = newAnimationClip.DynamicFrames[frameIndex];
-                frame.Position[ModelBoneList.SelectedItem.BoneIndex.Value] = Vector3.Zero;
-                frame.Rotation[ModelBoneList.SelectedItem.BoneIndex.Value] = Quaternion.Identity;
-            }
-
-            
-            //_selectedUnit.AnimationChanged -= AnimationChanged;
-            Generated.SetAnimationClip(newAnimationClip, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
-            //_selectedUnit.AnimationChanged += AnimationChanged;
         }
 
         public void OpenMappingWindow()
@@ -234,7 +211,7 @@ namespace AnimationEditor.AnimationTransferTool
             if (CanUpdateAnimation(true))
             {
                 var newAnimationClip = UpdateAnimation(_copyFrom.AnimationClip, _copyTo.AnimationClip);
-                Generated.SetAnimationClip(newAnimationClip, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
+                _assetViewModelBuilder.SetAnimationClip(Generated, newAnimationClip, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
 
                 _player.SelectedMainAnimation = _player.PlayerItems.First(x => x.Asset == Generated);
             }
@@ -362,7 +339,7 @@ namespace AnimationEditor.AnimationTransferTool
             {
                 AnimationSettings.UseScaledSkeletonName.Value = false;
                 AnimationSettings.ScaledSkeletonName.Value = "";
-                _copyFrom.CopyMeshFromOther(_copyTo);
+                _assetViewModelBuilder.CopyMeshFromOther(_copyFrom, _copyTo);
             }
         }
 

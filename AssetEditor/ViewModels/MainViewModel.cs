@@ -115,7 +115,7 @@ namespace AssetEditor.ViewModels
                 //reportService.CompareFiles(@"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.2.0.0 PackFiles.csv", @"C:\Users\ole_k\AssetEditor\Reports\FileList\Warhammer III 1.3.0.0 Packfiles.csv");
 
                 //;
-                AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateDwardAndEmpArcher(this, toolFactory, packfileService);
+                //AnimationEditor.AnimationTransferTool.AnimationTransferTool_Debug.CreateDwardAndEmpArcher(this, toolFactory, packfileService);
 
                 //var r = new Rmv2Information(_packfileService);
                 //r.Create(GameInformationFactory.GetGameById(settingsService.CurrentSettings.CurrentGame).DisplayName);
@@ -161,7 +161,7 @@ namespace AssetEditor.ViewModels
                 //AnimMetaBatchProcessor processor = new AnimMetaBatchProcessor();
                 //processor.BatchProcess(_packfileService, schemaManager, "Warhammer");
 
-                //AnimationEditor.SuperView.SuperViewViewModel_Debug.CreateThrot(this, toolFactory, packfileService);
+                AnimationEditor.SuperView.SuperViewViewModel_Debug.CreateThrot(this, toolFactory, packfileService);
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
 
 

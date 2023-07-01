@@ -14,11 +14,13 @@ namespace AnimationEditor.CampaignAnimationCreator
         public FilterCollection<SkeletonBoneNode> ModelBoneList { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
 
         AssetViewModel _selectedUnit;
+        private readonly AssetViewModelEditor _assetViewModelEditor;
         PackFileService _pfs;
         AnimationClip _selectedAnimationClip;
 
-        public Editor(PackFileService pfs, AssetViewModel rider )
+        public Editor(AssetViewModelEditor assetViewModelEditor, PackFileService pfs, AssetViewModel rider )
         {
+            _assetViewModelEditor = assetViewModelEditor;
             _pfs = pfs;
             _selectedUnit = rider;
             _selectedUnit.SkeletonChanged += SkeletonChanged;
@@ -59,7 +61,7 @@ namespace AnimationEditor.CampaignAnimationCreator
             }
 
             _selectedUnit.AnimationChanged -= AnimationChanged;
-            _selectedUnit.SetAnimationClip(newAnimation, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
+            _assetViewModelEditor.SetAnimationClip(_selectedUnit, newAnimation, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
             _selectedUnit.AnimationChanged += AnimationChanged;
         }
 

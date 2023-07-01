@@ -20,12 +20,14 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
 
         AssetViewModel _rider;
         AssetViewModel _mount;
+        private readonly AssetViewModelEditor _assetViewModelEditor;
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         Action _validateAction;
 
-        public MountLinkViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, AssetViewModel mount, Action validate)
+        public MountLinkViewModel(AssetViewModelEditor assetViewModelEditor, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, AssetViewModel mount, Action validate)
         {
+            _assetViewModelEditor = assetViewModelEditor;
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _rider = rider;
@@ -116,7 +118,7 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
             {
                 var file = _pfs.FindFile(value.AnimationFile);
                 var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file, _pfs);
-                _mount.SetAnimation(animationRef);
+                _assetViewModelEditor.SetAnimation(_mount, animationRef);
 
                 var lookUp = "RIDER_" + value.SlotName;
                 SelectedRiderTag.Filter = "";
@@ -132,12 +134,12 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
                 var file = _pfs.FindFile(value.AnimationFile);
                 if (file == null)
                 {
-                    _rider.SetAnimation(null);
+                    _assetViewModelEditor.SetAnimation(_rider, null);
                 }
                 else
                 {
                     var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file, _pfs);
-                    _rider.SetAnimation(animationRef);
+                    _assetViewModelEditor.SetAnimation(_rider, animationRef);
                 }
             }
             _validateAction();

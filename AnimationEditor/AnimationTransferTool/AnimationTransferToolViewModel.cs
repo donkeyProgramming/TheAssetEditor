@@ -1,4 +1,5 @@
-﻿using AnimationEditor.Common.ReferenceModel;
+﻿using AnimationEditor.Common.AnimationPlayer;
+using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
 using Common;
 using CommonControls.Common;
@@ -13,10 +14,10 @@ namespace AnimationEditor.AnimationTransferTool
 {
     public class AnimationTransferToolViewModel : BaseAnimationViewModel
     {
-        private readonly AssetViewModelBuilder _assetViewModelBuilder;
+        private readonly AssetViewModelEditor _assetViewModelBuilder;
 
-        public AnimationTransferToolViewModel(EventHub eventHub, IComponentInserter componentInserter, MetaDataFactory metaDataFactory,AssetViewModelBuilder assetViewModelBuilder, MainScene scene, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService) 
-            : base(eventHub, metaDataFactory, assetViewModelBuilder, scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
+        public AnimationTransferToolViewModel(AnimationPlayerViewModel animationPlayerViewModel, EventHub eventHub, IComponentInserter componentInserter, MetaDataFactory metaDataFactory,AssetViewModelEditor assetViewModelBuilder, MainScene scene, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService) 
+            : base(animationPlayerViewModel, eventHub, metaDataFactory, assetViewModelBuilder, scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
         {
             Set("Target", "Source", true);
             DisplayName.Value = "Animation transfer tool";
@@ -33,7 +34,7 @@ namespace AnimationEditor.AnimationTransferTool
             ReferenceModelView.Value.Data.IsSelectable = false;
             var propAsset = _assetViewModelBuilder.CreateAsset("Generated", Color.Black);
             Player.RegisterAsset(propAsset);
-            Editor = new Editor(_pfs, _skeletonHelper, MainModelView.Value.Data, ReferenceModelView.Value.Data, propAsset, Scene, Player);
+            Editor = new Editor(_assetViewModelBuilder, _pfs, _skeletonHelper, MainModelView.Value.Data, ReferenceModelView.Value.Data, propAsset, Scene, Player);
         }
     }
 

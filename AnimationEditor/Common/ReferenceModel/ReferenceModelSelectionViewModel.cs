@@ -45,7 +45,8 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public NotifyAttr<bool> IsControlVisible { get; set; } = new NotifyAttr<bool>(true);
         public NotifyAttr<bool> AllowMetaData { get; set; } = new NotifyAttr<bool>(false);
-        public ReferenceModelSelectionViewModel(MetaDataFactory metaDataFactory, IToolFactory toolFactory, PackFileService pf, AssetViewModel data, string headerName, IComponentManager componentManager, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService applicationSettingsService)
+        public ReferenceModelSelectionViewModel(MetaDataFactory metaDataFactory, IToolFactory toolFactory, PackFileService pf, AssetViewModel data, string headerName, IComponentManager componentManager, AssetViewModelEditor assetViewModelEditor,
+            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService applicationSettingsService)
         {
             _metaDataFactory = metaDataFactory;
             _toolFactory = toolFactory;
@@ -54,10 +55,10 @@ namespace AnimationEditor.Common.ReferenceModel
             Data = data;
 
             MeshViewModel = new SelectMeshViewModel(_pfs, Data, null);  // Todo
-            AnimViewModel = new SelectAnimationViewModel(Data, _pfs, skeletonAnimationLookUpHelper);
+            AnimViewModel = new SelectAnimationViewModel(assetViewModelEditor, Data, _pfs, skeletonAnimationLookUpHelper);
             SkeletonInformation = new SkeletonPreviewViewModel(Data);
-            MetaFileInformation = new SelectMetaViewModel(Data, _pfs);
-            FragAndSlotSelection = new SelectFragAndSlotViewModel(_pfs, skeletonAnimationLookUpHelper, Data, MetaFileInformation, applicationSettingsService);
+            MetaFileInformation = new SelectMetaViewModel(assetViewModelEditor, Data, _pfs);
+            FragAndSlotSelection = new SelectFragAndSlotViewModel(assetViewModelEditor, _pfs, skeletonAnimationLookUpHelper, Data, MetaFileInformation, applicationSettingsService);
 
             Data.AnimationChanged += Data_AnimationChanged;
             Data.SkeletonChanged += Data_SkeletonChanged;
@@ -97,10 +98,6 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public void ViewSelectedMeta() => ViewMetaDataFile(_data.MetaData, "Meta file - ");
         public void ViewSelectedPersistMeta() => ViewMetaDataFile(_data.PersistMetaData, "Persistent meta file - ");
-
-
-
-
 
         void MetaDataChanged(AssetViewModel model)
         {

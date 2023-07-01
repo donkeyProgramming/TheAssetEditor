@@ -1,4 +1,5 @@
-﻿using AnimationEditor.Common.ReferenceModel;
+﻿using AnimationEditor.Common.AnimationPlayer;
+using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
 using Common;
 using CommonControls.Common;
@@ -11,11 +12,11 @@ namespace AnimationEditor.SkeletonEditor
 {
     public class SkeletonEditorViewModel : BaseAnimationViewModel
     {
-        private readonly AssetViewModelBuilder _assetViewModelBuilder;
+        private readonly AssetViewModelEditor _assetViewModelBuilder;
         CopyPasteManager _copyPasteManager;
 
-        public SkeletonEditorViewModel(EventHub eventHub, MetaDataFactory metaDataFactory, AssetViewModelBuilder assetViewModelBuilder, IComponentInserter componentInserter, MainScene scene, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService) 
-            : base(eventHub, metaDataFactory, assetViewModelBuilder, scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
+        public SkeletonEditorViewModel(AnimationPlayerViewModel animationPlayerViewModel, EventHub eventHub, MetaDataFactory metaDataFactory, AssetViewModelEditor assetViewModelBuilder, IComponentInserter componentInserter, MainScene scene, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService) 
+            : base(animationPlayerViewModel, eventHub, metaDataFactory, assetViewModelBuilder, scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
         {
             Set("not_in_use1", "not_in_use2", false);
             _assetViewModelBuilder = assetViewModelBuilder;

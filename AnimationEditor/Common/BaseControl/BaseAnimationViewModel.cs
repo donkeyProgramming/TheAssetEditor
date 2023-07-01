@@ -36,14 +36,14 @@ namespace AnimationEditor.PropCreator.ViewModels
         public PackFile MainFile { get; set; }
 
         private readonly MetaDataFactory _metaDataFactory;
-        private readonly AssetViewModelBuilder _assetViewModelBuilder;
+        private readonly AssetViewModelEditor _assetViewModelBuilder;
         protected IToolFactory _toolFactory;
         MainScene _scene;
         public MainScene Scene { get => _scene; set => SetAndNotify(ref _scene, value); }
 
         public NotifyAttr<ReferenceModelSelectionViewModel> MainModelView { get; set; } = new NotifyAttr<ReferenceModelSelectionViewModel>();
         public NotifyAttr<ReferenceModelSelectionViewModel> ReferenceModelView { get; set; } = new NotifyAttr<ReferenceModelSelectionViewModel>();
-        public AnimationPlayerViewModel Player { get; set; } = new AnimationPlayerViewModel();
+        public AnimationPlayerViewModel Player { get; set; }
 
 
         public AnimationToolInput MainInput { get; set; }
@@ -60,7 +60,7 @@ namespace AnimationEditor.PropCreator.ViewModels
 
         string _headerAsset0; string _headerAsset1;
 
-        public BaseAnimationViewModel(EventHub eventHub, MetaDataFactory metaDataFactory, AssetViewModelBuilder assetViewModelBuilder, MainScene sceneContainer, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService)
+        public BaseAnimationViewModel(AnimationPlayerViewModel animationPlayerViewModel, EventHub eventHub, MetaDataFactory metaDataFactory, AssetViewModelEditor assetViewModelBuilder, MainScene sceneContainer, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService)
         {
             _toolFactory = toolFactory;
             _pfs = pfs;
@@ -69,7 +69,7 @@ namespace AnimationEditor.PropCreator.ViewModels
             _metaDataFactory = metaDataFactory;
             _assetViewModelBuilder = assetViewModelBuilder;
             Scene = sceneContainer;
-
+            Player = animationPlayerViewModel;
 
             ResetCameraCommand = new RelayCommand(ResetCamera);
             FocusCamerasCommand = new RelayCommand(FocusCamera);
@@ -89,50 +89,40 @@ namespace AnimationEditor.PropCreator.ViewModels
 
         private void OnSceneInitialized(SceneInitializedEvent scene)
         {
-            var mainAsset = _assetViewModelBuilder.CreateAsset(_headerAsset0, Color.Black);
-            var refAsset = _assetViewModelBuilder.CreateAsset(_headerAsset1, Color.Black);
-
-            MainModelView.Value = new ReferenceModelSelectionViewModel(_metaDataFactory,_toolFactory, _pfs, mainAsset, _headerAsset0 + ":", Scene, _skeletonHelper, _applicationSettingsService);
-            ReferenceModelView.Value = new ReferenceModelSelectionViewModel(_metaDataFactory, _toolFactory, _pfs, refAsset, _headerAsset1 + ":", Scene, _skeletonHelper, _applicationSettingsService);
-
-            if (_createDefaultAssets)
-            {
-                Player.RegisterAsset(MainModelView.Value.Data);
-                Player.RegisterAsset(ReferenceModelView.Value.Data);
-
-                if (MainInput != null)
-                {
-                    _assetViewModelBuilder.SetMesh(mainAsset, MainInput.Mesh);
-                    if (MainInput.Animation != null)
-                        MainModelView.Value.Data.SetAnimation(_skeletonHelper.FindAnimationRefFromPackFile(MainInput.Animation, _pfs));
-                }
-
-                if (RefInput != null)
-                {
-                    _assetViewModelBuilder.SetMesh(refAsset, RefInput.Mesh);
-                    if (RefInput.Animation != null)
-                        ReferenceModelView.Value.Data.SetAnimation(_skeletonHelper.FindAnimationRefFromPackFile(RefInput.Animation, _pfs));
-                }
-            }
+            MainModelView.Value = CreateAsset(_headerAsset0, Color.Black, MainInput);
+            ReferenceModelView.Value = CreateAsset(_headerAsset1, Color.Black, RefInput);
 
             Initialize();
         }
 
-        public virtual void Initialize()
-        { 
+        ReferenceModelSelectionViewModel CreateAsset(string header, Color skeletonColour, AnimationToolInput input)
+        {
+            var mainAsset = _assetViewModelBuilder.CreateAsset(header, skeletonColour);
+            var returnObj = new ReferenceModelSelectionViewModel(_metaDataFactory, _toolFactory, _pfs, mainAsset, header + ":", Scene, _assetViewModelBuilder, _skeletonHelper, _applicationSettingsService);
+
+            if (_createDefaultAssets)
+            {
+                Player.RegisterAsset(returnObj.Data);
+
+                if (input != null)
+                {
+                    _assetViewModelBuilder.SetMesh(mainAsset, input.Mesh);
+                    if (input.Animation != null)
+                        _assetViewModelBuilder.SetAnimation(returnObj.Data, _skeletonHelper.FindAnimationRefFromPackFile(input.Animation, _pfs));
+                }
+            }
+            return returnObj;
         }
 
         public void Close()
         {
-            Scene.Dispose();
             Scene = null;
         }
 
         public bool HasUnsavedChanges { get; set; }
 
-        public bool Save()
-        {
-            return true;
-        }
+        public bool Save() => true;
+
+        public virtual void Initialize() { }
     }
 }

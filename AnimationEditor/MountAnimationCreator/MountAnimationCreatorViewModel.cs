@@ -1,8 +1,8 @@
-﻿using AnimationEditor.Common.ReferenceModel;
+﻿using AnimationEditor.Common.AnimationPlayer;
+using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
 using Common;
 using CommonControls.Common;
-using CommonControls.FileTypes.DB;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
 using View3D.Animation.MetaData;
@@ -10,13 +10,13 @@ using View3D.Scene;
 
 namespace AnimationEditor.MountAnimationCreator
 {
-
     public class MountAnimationCreatorViewModel : BaseAnimationViewModel
     {
-        private readonly AssetViewModelBuilder _assetViewModelBuilder;
+        private readonly AssetViewModelEditor _assetViewModelBuilder;
 
-        public MountAnimationCreatorViewModel(EventHub eventHub, MetaDataFactory metaDataFactory, AssetViewModelBuilder assetViewModelBuilder, MainScene scene, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService)
-            : base(eventHub, metaDataFactory, assetViewModelBuilder, scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
+        public MountAnimationCreatorViewModel(AnimationPlayerViewModel animationPlayerViewModel, EventHub eventHub, MetaDataFactory metaDataFactory, AssetViewModelEditor assetViewModelBuilder, MainScene scene, IToolFactory toolFactory, PackFileService pfs, 
+            SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService)
+            : base(animationPlayerViewModel, eventHub, metaDataFactory, assetViewModelBuilder, scene, toolFactory, pfs, skeletonHelper, applicationSettingsService)
         {
             Set("Rider", "Mount", true);
             DisplayName.Value = "MountAnimCreator";
@@ -28,7 +28,7 @@ namespace AnimationEditor.MountAnimationCreator
             ReferenceModelView.Value.Data.IsSelectable = true;
             var propAsset = _assetViewModelBuilder.CreateAsset("New Anim", Color.Red);
             Player.RegisterAsset(propAsset);
-            Editor = new Editor(_pfs, _skeletonHelper, MainModelView.Value.Data, ReferenceModelView.Value.Data, propAsset, Scene, _applicationSettingsService);
+            Editor = new Editor(_assetViewModelBuilder, _pfs, _skeletonHelper, MainModelView.Value.Data, ReferenceModelView.Value.Data, propAsset, Scene, _applicationSettingsService);
         }
     }
 

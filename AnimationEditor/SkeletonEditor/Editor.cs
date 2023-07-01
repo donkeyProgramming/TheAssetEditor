@@ -22,7 +22,7 @@ namespace AnimationEditor.SkeletonEditor
         AssetViewModel _techSkeletonNode;
         IComponentManager _componentManager;
         CopyPasteManager _copyPasteManager;
-        private readonly AssetViewModelBuilder _assetViewModelBuilder;
+        private readonly AssetViewModelEditor _assetViewModelBuilder;
 
         public NotifyAttr<string> SkeletonName { get; set; } = new NotifyAttr<string>("");
         public NotifyAttr<string> RefMeshName { get; set; } = new NotifyAttr<string>("");
@@ -70,7 +70,7 @@ namespace AnimationEditor.SkeletonEditor
 
         public DoubleViewModel BoneScale { get; set; } = new DoubleViewModel(1);
 
-        public Editor(PackFileService pfs, AssetViewModel techSkeletonNode, IComponentManager componentManager, CopyPasteManager copyPasteManager, AssetViewModelBuilder assetViewModelBuilder)
+        public Editor(PackFileService pfs, AssetViewModel techSkeletonNode, IComponentManager componentManager, CopyPasteManager copyPasteManager, AssetViewModelEditor assetViewModelBuilder)
         {
             _pfs = pfs;
             _techSkeletonNode = techSkeletonNode;
@@ -91,7 +91,7 @@ namespace AnimationEditor.SkeletonEditor
                 UpdateSelectedBoneValues(null);
                 var packFile = _pfs.FindFile(skeletonPath);
                 SkeletonName.Value = skeletonPath;
-                _techSkeletonNode.SetSkeleton(packFile);
+                _assetViewModelBuilder.SetSkeleton(_techSkeletonNode, packFile);
                 RefreshBoneList();
                 IsTechSkeleton = skeletonPath.ToLower().Contains("tech");
                 SourceSkeletonName.Value = _techSkeletonNode.Skeleton.SkeletonName;

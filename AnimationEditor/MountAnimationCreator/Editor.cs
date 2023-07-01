@@ -52,12 +52,14 @@ namespace AnimationEditor.MountAnimationCreator
         private readonly ApplicationSettingsService _applicationSettings;
         List<int> _mountVertexes = new List<int>();
         Rmv2MeshNode _mountVertexOwner;
+        private readonly AssetViewModelEditor _assetViewModelBuilder;
         PackFileService _pfs;
         SelectionManager _selectionManager;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
-        public Editor(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, AssetViewModel mount, AssetViewModel newAnimation, IComponentManager componentManager, ApplicationSettingsService applicationSettings)
+        public Editor(AssetViewModelEditor assetViewModelBuilder, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, AssetViewModel mount, AssetViewModel newAnimation, IComponentManager componentManager, ApplicationSettingsService applicationSettings)
         {
+            _assetViewModelBuilder = assetViewModelBuilder;
             _pfs = pfs;
             _newAnimation = newAnimation;
             _applicationSettings = applicationSettings;
@@ -70,7 +72,7 @@ namespace AnimationEditor.MountAnimationCreator
             DisplayGeneratedMesh = new NotifyAttr<bool>(true, (value) => { if (_newAnimation.MainNode != null) _newAnimation.ShowMesh.Value = value; });
 
             SelectedRiderBone = new FilterCollection<SkeletonBoneNode>(null, (x) => UpdateCanSaveAndPreviewStates());
-            MountLinkController = new MountLinkViewModel(pfs, skeletonAnimationLookUpHelper, rider, mount, UpdateCanSaveAndPreviewStates);
+            MountLinkController = new MountLinkViewModel(_assetViewModelBuilder, pfs, skeletonAnimationLookUpHelper, rider, mount, UpdateCanSaveAndPreviewStates);
 
             ActiveOutputFragment = new FilterCollection<IAnimationBinGenericFormat>(null, OutputAnimationSetSelected);
             ActiveOutputFragment.SearchFilter = (value, rx) => { return rx.Match(value.FullPath).Success; };
@@ -95,7 +97,10 @@ namespace AnimationEditor.MountAnimationCreator
             if (CanPreview.Value)
                 CreateMountAnimationAction();
             else
-                _newAnimation?.SetAnimation(null);
+            {
+                if (_newAnimation != null)
+                    _assetViewModelBuilder.SetAnimation(_newAnimation, null);
+            }
         }
 
         private void MountSkeletonChanged(GameSkeleton newValue)
@@ -174,8 +179,8 @@ namespace AnimationEditor.MountAnimationCreator
             var newRiderAnim = CreateAnimationGenerator().GenerateMountAnimation(_mount.AnimationClip, _rider.AnimationClip);
 
             // Apply
-            _newAnimation.CopyMeshFromOther(_rider);
-            _newAnimation.SetAnimationClip(newRiderAnim, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
+            _assetViewModelBuilder.CopyMeshFromOther(_newAnimation, _rider);
+            _assetViewModelBuilder.SetAnimationClip(_newAnimation, newRiderAnim, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
             _newAnimation.ShowSkeleton.Value = DisplayGeneratedSkeleton.Value;
             _newAnimation.ShowMesh.Value = DisplayGeneratedMesh.Value;
             UpdateCanSaveAndPreviewStates();
