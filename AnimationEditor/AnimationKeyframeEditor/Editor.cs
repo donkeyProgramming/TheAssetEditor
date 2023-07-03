@@ -220,17 +220,20 @@ namespace AnimationEditor.AnimationKeyframeEditor
         }
 
         public void EnterMoveMode()
-        {         
+        {
+            if(_selectionManager.GetState().Mode != GeometrySelectionMode.Bone) return;
             _gizmoActions.Move();
         }
 
         public void EnterRotateMode()
         {
+            if (_selectionManager.GetState().Mode != GeometrySelectionMode.Bone) return;
             _gizmoActions.Rotate();
         }
 
         public void EnterScaleMode()
         {
+            if (_selectionManager.GetState().Mode != GeometrySelectionMode.Bone) return;
             _gizmoActions.Scale();
         }
 

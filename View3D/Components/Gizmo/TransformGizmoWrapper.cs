@@ -163,24 +163,68 @@ namespace View3D.Components.Gizmo
             }
         }
 
+        Vector3 ToEulerAngles(Quaternion quaternion)
+        {
+            Vector3 eulerAngles;
+
+            // Extract the pitch (x-axis rotation)
+            float sinPitch = 2.0f * (quaternion.W * quaternion.X + quaternion.Y * quaternion.Z);
+            float cosPitch = 1.0f - 2.0f * (quaternion.X * quaternion.X + quaternion.Y * quaternion.Y);
+            eulerAngles.X = (float)Math.Atan2(sinPitch, cosPitch);
+
+            // Extract the yaw (y-axis rotation)
+            float sinYaw = 2.0f * (quaternion.W * quaternion.Y - quaternion.Z * quaternion.X);
+            if (Math.Abs(sinYaw) >= 1)
+                eulerAngles.Y = (float)Math.CopySign(Math.PI / 2, sinYaw); // Use 90 degrees if out of range
+            else
+                eulerAngles.Y = (float)Math.Asin(sinYaw);
+
+            // Extract the roll (z-axis rotation)
+            float sinRoll = 2.0f * (quaternion.W * quaternion.Z + quaternion.X * quaternion.Y);
+            float cosRoll = 1.0f - 2.0f * (quaternion.Y * quaternion.Y + quaternion.Z * quaternion.Z);
+            eulerAngles.Z = (float)Math.Atan2(sinRoll, cosRoll);
+
+            return eulerAngles;
+        }
+
+        Matrix FixRotationAxis(Matrix transform)
+        {
+            Vector3 scale;
+            Quaternion rotation;
+            Vector3 translation;
+            transform.Decompose(out scale, out rotation, out translation);
+
+            // Swap the X and Y rotations
+            Vector3 euler = ToEulerAngles(rotation);
+            rotation = Quaternion.CreateFromYawPitchRoll(euler.Y, euler.X, euler.Z);
+
+            // Recompose the transform with the fixed rotation
+            Matrix fixedTransform = Matrix.CreateScale(scale) * Matrix.CreateFromQuaternion(rotation) * Matrix.CreateTranslation(translation);
+            return fixedTransform;
+        }
+
+
         public void GizmoTranslateEvent(Vector3 translation, PivotType pivot)
         {
-            ApplyTransform(Matrix.CreateTranslation(translation), pivot);
+            ApplyTransform(Matrix.CreateTranslation(translation), pivot, GizmoMode.Translate);
             Position += translation;
             _totalGizomTransform *= Matrix.CreateTranslation(translation);
         }
 
         public void GizmoRotateEvent(Matrix rotation, PivotType pivot)
         {
-            ApplyTransform(rotation, pivot);
+            ApplyTransform(rotation, pivot, GizmoMode.Rotate);
             _totalGizomTransform *= rotation;
+            var fixedTransform = FixRotationAxis(_totalGizomTransform);
+            fixedTransform.Decompose(out var _, out var quat, out var _);
+            Orientation = quat;
         }
 
         public void GizmoScaleEvent(Vector3 scale, PivotType pivot)
         {
             var realScale = scale + Vector3.One;
             var scaleMatrix = Matrix.CreateScale(scale + Vector3.One);
-            ApplyTransform(scaleMatrix, pivot);
+            ApplyTransform(scaleMatrix, pivot, GizmoMode.UniformScale);
             
             Scale += scale;
 
@@ -214,7 +258,7 @@ namespace View3D.Components.Gizmo
             return result;
         }
 
-        void ApplyTransform(Matrix transform, PivotType pivotType)
+        void ApplyTransform(Matrix transform, PivotType pivotType, GizmoMode gizmoMode)
         {
             transform.Decompose(out var scale, out var rot, out var trans);
 
@@ -225,7 +269,7 @@ namespace View3D.Components.Gizmo
                 if (pivotType == PivotType.ObjectCenter)
                     objCenter = Position;
 
-                TransformBone(Matrix.CreateTranslation(Position) /* Matrix.CreateFromQuaternion(Orientation) * Matrix.CreateScale(Scale)*/, objCenter);
+                TransformBone(Matrix.CreateScale(Scale) * Matrix.CreateFromQuaternion(rot) * Matrix.CreateTranslation(Position), objCenter, gizmoMode);
                 return;
             }
 
@@ -262,12 +306,12 @@ namespace View3D.Components.Gizmo
             }
         }
 
-        void TransformBone(Matrix transform, Vector3 objCenter)
+        void TransformBone(Matrix transform, Vector3 objCenter, GizmoMode gizmoMode)
         {
             if(_activeCommand is TransformBoneCommand transformBoneCommand)
             {
                 var m = Matrix.CreateTranslation(-objCenter) * transform * Matrix.CreateTranslation(objCenter);
-                transformBoneCommand.ApplyTransformation(m);
+                transformBoneCommand.ApplyTransformation(m, gizmoMode);
             }
         }
         void TransformVertex(Matrix transform, MeshObject geo, Vector3 objCenter, int index)

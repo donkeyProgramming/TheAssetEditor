@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using View3D.Animation;
 using View3D.Components.Component.Selection;
+using View3D.Components.Gizmo;
 using View3D.SceneNodes;
 
 namespace View3D.Commands.Bone
@@ -45,7 +46,7 @@ namespace View3D.Commands.Bone
             _oldFrame = _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Copy();
         }
 
-        public void ApplyTransformation(Matrix newPosition)
+        public void ApplyTransformation(Matrix newPosition, GizmoMode gizmoMode)
         {
             if(_oldTransform ==  Matrix.Identity)
             {
@@ -68,10 +69,22 @@ namespace View3D.Commands.Bone
 
                 Console.WriteLine(_boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Position[selectedBone]);
                 newBoneTransform.Decompose(out var scale, out var rot, out var trans);
-                newPosition.Decompose(out var newScale, out var rot2, out var _);
-                _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Position[selectedBone] += trans;
-                _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Rotation[selectedBone] *= rot2;
-                _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Scale[selectedBone] = newScale;
+                newPosition.Decompose(out var newScale, out var rot2, out var trans2);
+                switch (gizmoMode)
+                {
+                    case GizmoMode.Translate:
+                        _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Position[selectedBone] += trans;
+                        break;
+                    case GizmoMode.Rotate:
+                        _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Rotation[selectedBone] *= rot2;
+                        break;
+                    case GizmoMode.NonUniformScale:
+                    case GizmoMode.UniformScale:
+                        _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Scale[selectedBone] = scale;
+                        break;
+                    default:
+                        throw new InvalidOperationException("unknown gizmo mode");
+                }
             }
         }
 
