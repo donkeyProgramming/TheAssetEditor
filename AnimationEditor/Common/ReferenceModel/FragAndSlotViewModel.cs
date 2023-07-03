@@ -17,13 +17,15 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public FilterCollection<AnimationBinEntryGenericFormat> FragmentSlotList { get; set; }
 
+        private readonly AssetViewModelBuilder _assetViewModelEditor;
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         SelectMetaViewModel _metaViewModel;
         private readonly ApplicationSettingsService _applicationSettings;
 
-        public SelectFragAndSlotViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel asset, SelectMetaViewModel metaViewModel, ApplicationSettingsService applicationSettings)
+        public SelectFragAndSlotViewModel(AssetViewModelBuilder assetViewModelEditor, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel asset, SelectMetaViewModel metaViewModel, ApplicationSettingsService applicationSettings)
         {
+            _assetViewModelEditor = assetViewModelEditor;
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _asset = asset;
@@ -140,8 +142,8 @@ namespace AnimationEditor.Common.ReferenceModel
         {
             if(value == null)
             {
-                _asset.SetAnimation(null);
-                _asset.SetMetaFile(null, null);
+                _assetViewModelEditor.SetAnimation(_asset,null);
+                _assetViewModelEditor.SetMetaFile(_asset,null, null);
             }
             else
             {
@@ -149,11 +151,11 @@ namespace AnimationEditor.Common.ReferenceModel
                 {
                     var file = _pfs.FindFile(value.AnimationFile);
                     var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file, _pfs);
-                    _asset.SetAnimation(animationRef);
+                    _assetViewModelEditor.SetAnimation(_asset,animationRef);
                 }
                 else
                 {
-                    _asset.SetAnimation(null);
+                    _assetViewModelEditor.SetAnimation(_asset,null);
                 }
 
                 if (string.IsNullOrWhiteSpace(value.MetaFile) == false)

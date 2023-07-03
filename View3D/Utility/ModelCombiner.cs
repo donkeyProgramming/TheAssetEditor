@@ -7,36 +7,6 @@ namespace View3D.Utility
 {
     public class ModelCombiner
     {
-        public bool CanCombine(List<Rmv2MeshNode> items, out ErrorList errors)
-        {
-            errors = new ErrorList();
-            foreach (var outerLoopItem in items)
-            {
-                foreach (var innerLoopItem in items)
-                {
-                    if (outerLoopItem == innerLoopItem)
-                        continue;
-
-                    var name0 = outerLoopItem.Name;
-                    var name1 = innerLoopItem.Name;
-
-                    // Textures
-                    if (!ValidateTextures(outerLoopItem, name0, innerLoopItem, name1, out string textureErrorMsg))
-                        errors.Error("Texture", textureErrorMsg);
-
-                    // Vertex type
-                    if (outerLoopItem.Geometry.VertexFormat != innerLoopItem.Geometry.VertexFormat)
-                        errors.Error("VertexType", $"{name0} has a different vertex type then {name1}");
-
-                    // Alpha mode
-                    if (outerLoopItem.Material.AlphaMode != innerLoopItem.Material.AlphaMode)
-                        errors.Error("AlphaSettings mode", $"{name0} has a different AlphaSettings mode then {name1}");
-                }
-            }
-
-            return errors.Errors.Count == 0;
-        }
-
         public static bool CanCombine(Rmv2MeshNode meshA, Rmv2MeshNode meshB, out string errorMessage)
         {
             // Textures
@@ -169,11 +139,5 @@ namespace View3D.Utility
             textureErrorMsg = null;
             return true;
         }
-
-
-
-
-
-
     }
 }

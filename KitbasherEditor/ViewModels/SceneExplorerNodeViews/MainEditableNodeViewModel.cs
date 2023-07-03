@@ -20,7 +20,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
     {
         MainEditableNode _mainNode;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        AnimationControllerViewModel _animationControllerViewModel;
         PackFileService _pfs;
         IComponentManager _componentManager;
 
@@ -46,11 +45,10 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         public ObservableCollection<LodGroupNodeViewModel> LodNodes { get; set; } = new ObservableCollection<LodGroupNodeViewModel>();
 
-        public MainEditableNodeViewModel(MainEditableNode mainNode, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AnimationControllerViewModel animationControllerViewModel, PackFileService pfs, IComponentManager componentManager)
+        public MainEditableNodeViewModel(MainEditableNode mainNode, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService pfs, IComponentManager componentManager)
         {
             _mainNode = mainNode;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
-            _animationControllerViewModel = animationControllerViewModel;
             _pfs = pfs;
             _componentManager = componentManager;
             _selectedRenderFormat = _componentManager.GetComponent<RenderEngineComponent>().MainRenderFormat;
@@ -75,22 +73,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             if (!string.IsNullOrWhiteSpace(SkeletonName))
                 cleanSkeletonName = Path.GetFileNameWithoutExtension(SkeletonName);
             _mainNode.SetSkeletonFromName(cleanSkeletonName);
-            //if (_mainNode.Model != null)
-            //{
-            //    string animationFolder = "animations\\skeletons\\";
-            //    var skeletonFilePath = animationFolder + cleanSkeletonName + ".anim";
-            //    var skeletonPfs = _pfs.FindFile(skeletonFilePath);
-            //    if (skeletonPfs != null)
-            //    {
-            //        var animClip = AnimationFile.Create(skeletonPfs);
-            //        _mainNode.SkeletonNode.Skeleton = new GameSkeleton(animClip, _animationControllerViewModel.GetPlayer());
-            //    }
-            //    var header = _mainNode.Model.Header;
-            //    header.SkeletonName = cleanSkeletonName;
-            //    _mainNode.Model.Header = header;
-            //}
-            //
-            //_animationControllerViewModel.SetActiveSkeletonFromName(cleanSkeletonName);   
         }
 
         public void CopyTexturesToOutputPack()

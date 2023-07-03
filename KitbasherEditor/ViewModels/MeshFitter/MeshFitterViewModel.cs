@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using View3D.Animation;
+using View3D.Commands;
 using View3D.Commands.Object;
 using View3D.Components.Component;
 using View3D.SceneNodes;
@@ -26,6 +27,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
         GameSkeleton _fromSkeleton;
 
         IComponentManager _componentManager;
+        private readonly CommandFactory _commandFactory;
         AnimationClip _animationClip;
         AnimationPlayer _animationPlayer;
         AnimationPlayer _oldAnimationPlayer;
@@ -42,13 +44,14 @@ namespace KitbasherEditor.ViewModels.MeshFitter
         public Vector3ViewModel BonePositionOffset { get; set; } = new Vector3ViewModel(0);
         public Vector3ViewModel BoneRotationOffset { get; set; } = new Vector3ViewModel(0);
 
-        public MeshFitterViewModel(Window ownerWindow, RemappedAnimatedBoneConfiguration configuration, List<Rmv2MeshNode> meshNodes, GameSkeleton targetSkeleton, AnimationFile currentSkeletonFile, IComponentManager componentManager) : base(configuration)
+        public MeshFitterViewModel(Window ownerWindow, RemappedAnimatedBoneConfiguration configuration, List<Rmv2MeshNode> meshNodes, GameSkeleton targetSkeleton, AnimationFile currentSkeletonFile, IComponentManager componentManager, CommandFactory commandFactory) : base(configuration)
         {
             _window = ownerWindow;
 
             _meshNodes = meshNodes;
             _targetSkeleton = targetSkeleton;
             _componentManager = componentManager;
+            _commandFactory = commandFactory;
             ScaleFactor.PropertyChanged += (_0, _1) => ApplyMeshFittingTransforms();
             BoneScaleFactor.PropertyChanged+=(_0, _1) => BoneScaleUpdate((float)BoneScaleFactor.Value, MeshBones.SelectedItem);
             BonePositionOffset.OnValueChanged += (viewModel) => BonePositionUpdated(viewModel, MeshBones.SelectedItem);
@@ -75,7 +78,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             _animationPlayer.Play();
 
             var resourceLib = _componentManager.GetComponent<ResourceLibary>();
-            _currentSkeletonNode = new SkeletonNode(_componentManager, _fromSkeleton);
+            _currentSkeletonNode = new SkeletonNode(resourceLib, _fromSkeleton);
             _currentSkeletonNode.SelectedNodeColour = Color.White;
             _componentManager.GetComponent<SceneManager>().RootNode.AddObject(_currentSkeletonNode);
 
@@ -116,7 +119,9 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 BonePositionOffset.Set(MeshBones.SelectedItem.BonePosOffset.X, MeshBones.SelectedItem.BonePosOffset.Y, MeshBones.SelectedItem.BonePosOffset.Z);
 
                 _currentSkeletonNode.SelectedBoneIndex = MeshBones.SelectedItem.BoneIndex.Value;
-                _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().SkeletonNode.SelectedBoneIndex = MeshBones.SelectedItem.MappedBoneIndex.Value;
+                var sceneManager = _componentManager.GetComponent<SceneManager>();
+                var rootNode = sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+                rootNode.SkeletonNode.SelectedBoneIndex = MeshBones.SelectedItem.MappedBoneIndex.Value;
             }
             else
             {
@@ -125,7 +130,11 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 BonePositionOffset.Set(0);
 
                 _currentSkeletonNode.SelectedBoneIndex = null;
-                _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().SkeletonNode.SelectedBoneIndex = null;
+
+
+                var sceneManager = _componentManager.GetComponent<SceneManager>();
+                var rootNode = sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+                rootNode.SkeletonNode.SelectedBoneIndex = null;
             }
         }
 
@@ -268,7 +277,6 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 MeshBones.SelectedItem.BoneScaleOffset = 1;
                 OnBoneSelected();
             }
-        
         }
 
         public void CopyScaleToChildren()
@@ -296,19 +304,20 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 mesh.AnimationPlayer = _oldAnimationPlayer;
 
             // Remove the skeleton node
-            _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().SkeletonNode.SelectedBoneIndex = null; 
+            var sceneManager = _componentManager.GetComponent<SceneManager>();
+            var rootNode = sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            rootNode.SkeletonNode.SelectedBoneIndex = null; 
             _componentManager.GetComponent<SceneManager>().RootNode.RemoveObject(_currentSkeletonNode);
         }
 
         public void SaveAndClose()
         {
             var frame = AnimationSampler.Sample(0, _fromSkeleton, _animationClip);
-            var cmd = new CreateAnimatedMeshPoseCommand(_meshNodes, frame);
-            _componentManager.GetComponent<CommandExecutor>().ExecuteCommand(cmd);   
+            _commandFactory.Create<CreateAnimatedMeshPoseCommand>().Configure(x => x.Configure(_meshNodes, frame)).BuildAndExecute();
             _window.Close();
         }
 
-        public static void ShowView(List<ISelectable> meshesToFit, IComponentManager componentManager, SkeletonAnimationLookUpHelper skeletonHelper, PackFileService pfs)
+        public static void ShowView(List<ISelectable> meshesToFit, IComponentManager componentManager, SkeletonAnimationLookUpHelper skeletonHelper, PackFileService pfs, CommandFactory commandFactory)
         {
             var sceneManager = componentManager.GetComponent<SceneManager>();
             var resourceLib = componentManager.GetComponent<ResourceLibary>();
@@ -326,7 +335,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             if (allSkeltonNames.Count() != 1)
             {
                 var commaList = string.Join(",", allSkeltonNames);
-                MessageBox.Show($"Unexpected number of skeletons - {commaList}. This tool only works for one skeleton");
+                System.Windows.MessageBox.Show($"Unexpected number of skeletons - {commaList}. This tool only works for one skeleton");
                 return;
             }
 
@@ -339,7 +348,8 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 .Select(x=>(int)x)
                 .ToList();
 
-            var targetSkeleton = componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().SkeletonNode;
+            var rootNode = sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            var targetSkeleton = rootNode.SkeletonNode;
             var targetSkeletonFile = skeletonHelper.GetSkeletonFileFromName(pfs, targetSkeleton.Name);
             
             RemappedAnimatedBoneConfiguration config = new RemappedAnimatedBoneConfiguration();
@@ -354,7 +364,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             containingWindow.Title = "MeshFitter";
             containingWindow.Width = 1200;
             containingWindow.Height = 1100;
-            containingWindow.DataContext = new MeshFitterViewModel(containingWindow, config, meshNodes, targetSkeleton.Skeleton, currentSkeletonFile, componentManager);
+            containingWindow.DataContext = new MeshFitterViewModel(containingWindow, config, meshNodes, targetSkeleton.Skeleton, currentSkeletonFile, componentManager, commandFactory);
             containingWindow.Content = new MeshFitterView();
             containingWindow.Closed += ContainingWindow_Closed;
             containingWindow.Show();

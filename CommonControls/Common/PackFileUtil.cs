@@ -1,4 +1,5 @@
-﻿using CommonControls.FileTypes.PackFiles.Models;
+﻿using CommonControls.Events;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.ModelImportExport;
 using CommonControls.Services;
@@ -87,7 +88,7 @@ namespace CommonControls.Common
 
         public static PackFileService CreatePackFileService()
         {
-            var pfs = new PackFileService(new PackFileDataBase(), new SkeletonAnimationLookUpHelper(), new ApplicationSettingsService(), new GameInformationFactory());
+            var pfs = new PackFileService(new GlobalEventSender(new ScopeRepository()), new PackFileDataBase(), new SkeletonAnimationLookUpHelper(), new ApplicationSettingsService(), new GameInformationFactory());
             var container = pfs.CreateNewPackFileContainer("temp", PackFileCAType.MOD);
             pfs.SetEditablePack(container);
 

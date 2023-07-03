@@ -1,8 +1,5 @@
-﻿using MonoGame.Framework.WpfInterop;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
@@ -10,7 +7,7 @@ using View3D.Utility;
 
 namespace View3D.Commands.Object
 {
-    public class SkinWrapRiggingCommand : CommandBase<SkinWrapRiggingCommand>
+    public class SkinWrapRiggingCommand : ICommand
     {
         ISelectionState _selectionOldState;
         SelectionManager _selectionManager;
@@ -21,24 +18,21 @@ namespace View3D.Commands.Object
         List<Rmv2MeshNode> _affectedMeshes;
         List<Rmv2MeshNode> _sources;
 
-        public SkinWrapRiggingCommand(IEnumerable<Rmv2MeshNode> affectedMeshes, IEnumerable<Rmv2MeshNode> sources)
+        public string HintText { get => "Skin wrap re-rigging"; }
+        public bool IsMutation { get => true; }
+
+        public void Configure(IEnumerable<Rmv2MeshNode> affectedMeshes, IEnumerable<Rmv2MeshNode> sources)
         {
             _affectedMeshes = affectedMeshes.ToList();
             _sources = sources.ToList();
         }
 
-        public override string GetHintText()
+        public SkinWrapRiggingCommand(SelectionManager selectionManager)
         {
-            return "Skin wrap re-rigging";
+            _selectionManager = selectionManager;;
         }
 
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-            base.Initialize(componentManager);
-        }
-
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             // Create undo state
             _originalGeos = _affectedMeshes.Select(x => x.Geometry.Clone()).ToList();
@@ -46,8 +40,6 @@ namespace View3D.Commands.Object
             _selectionOldState = _selectionManager.GetStateCopy();
 
             // Update the meshes
-            var calculators = _sources.Select(x => new MeshDistanceCalculator(x.Geometry)).ToArray();
-
             foreach (var affectedMesh in _affectedMeshes)
             {
                 // Set skeleton and vertex type from first source object
@@ -60,15 +52,15 @@ namespace View3D.Commands.Object
                 for (int i = 0; i < affectedMesh.Geometry.VertexCount(); i++)
                 {
                     var currentVertex = affectedMesh.Geometry.VertexArray[i].Position3();
-                    foreach (var distanceCalculator in calculators)
+                    foreach (var source in _sources)
                     {
-                        var closestIndex = distanceCalculator.FindClosestVertexIndex(currentVertex, out float distance);
+                        var closestIndex = IntersectionMath.FindClosestVertexIndex(source.Geometry, currentVertex, out float distance);
                         if (distance < clostestDist)
                         {
 
                             clostestDist = distance;
                             closestVertexId = closestIndex;
-                            closestMesh = distanceCalculator.Mesh;
+                            closestMesh = source.Geometry;
                         }
                     }
 
@@ -80,7 +72,7 @@ namespace View3D.Commands.Object
             }
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             for (int i = 0; i < _affectedMeshes.Count; i++)
             {

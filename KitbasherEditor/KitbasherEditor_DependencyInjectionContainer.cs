@@ -1,24 +1,57 @@
-﻿using CommonControls.Common;
+﻿using _componentManager.ViewModels.MenuBarViews;
+using CommonControls.Common;
+using CommonControls.Common.MenuSystem;
 using CommonControls.Services;
+using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels;
+using KitbasherEditor.ViewModels.MenuBarViews;
+using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
+using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
+using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using Microsoft.Extensions.DependencyInjection;
+using View3D;
 
 namespace KitbasherEditor
 {
-    public class KitbasherEditor_DependencyInjectionContainer
+    public class KitbasherEditor_DependencyInjectionContainer : DependencyContainer
     {
-        public static void Register(IServiceCollection serviceCollection)
+        public override void Register(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddTransient<KitbasherView>();
-            serviceCollection.AddTransient<KitbasherViewModel>();
-            serviceCollection.AddTransient<IEditorViewModel, KitbasherViewModel>();
+            // Creators
+            serviceCollection.AddScoped<KitbashSceneCreator>();
+            serviceCollection.AddScoped<SceneNodeViewFactory>();
+
+            // View models 
+            serviceCollection.AddScoped<KitbasherView>();
+            serviceCollection.AddScoped<KitbasherViewModel>();
+            serviceCollection.AddScoped<IEditorViewModel, KitbasherViewModel>();
+            serviceCollection.AddScoped<SceneExplorerViewModel>();
+            serviceCollection.AddScoped<AnimationControllerViewModel>();
+
+            // Sub tools
+            serviceCollection.AddScoped<VertexDebuggerViewModel>();
+            serviceCollection.AddScoped<VertexDebuggerView>();
+            
+
+            // Menubar 
+            serviceCollection.AddScoped<TransformToolViewModel>();
+            serviceCollection.AddScoped<MenuBarViewModel>();
+            serviceCollection.AddScoped<GizmoActions>();
+            serviceCollection.AddScoped<VisibilityHandler>();
+            serviceCollection.AddScoped<GeneralActions>();
+            serviceCollection.AddScoped<ToolActions>();
+
+            // Misc
+            serviceCollection.AddScoped<WindowKeyboard>();
+            serviceCollection.AddScoped<KitbashViewDropHandler>();  
         }
 
-        public static void RegisterTools(IToolFactory factory)
+        public override void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterFileTool<KitbasherViewModel, KitbasherView>(new ExtentionToTool(EditorEnums.Kitbash_Editor, new[] { ".rigid_model_v2", ".wsmodel.rigid_model_v2" }/*, new[] { ".wsmodel", ".variantmeshdefinition" }*/));
+            factory.RegisterTool<KitbasherViewModel, KitbasherView>(new ExtentionToTool(EditorEnums.Kitbash_Editor, new[] { ".rigid_model_v2", ".wsmodel.rigid_model_v2" }/*, new[] { ".wsmodel", ".variantmeshdefinition" }*/));
         }
+    
     }
 
 

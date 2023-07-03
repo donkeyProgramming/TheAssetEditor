@@ -28,10 +28,8 @@ namespace View3D.Components
         public event EventHandler<EventArgs> UpdateOrderChanged;
         #endregion
 
-        protected IComponentManager ComponentManager { get; private set; }
-        public BaseComponent(IComponentManager componentManager)
+        public BaseComponent( )
         {
-            ComponentManager = componentManager;
         }
 
         #region Properties

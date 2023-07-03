@@ -1,9 +1,4 @@
-﻿using CommonControls.Common;
-using MonoGame.Framework.WpfInterop;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
@@ -12,31 +7,30 @@ using View3D.Services.MeshOptimization;
 namespace View3D.Commands.Object
 {
 
-    public class ReduceMeshCommand : CommandBase<ObjectSelectionModeCommand>
+    public class ReduceMeshCommand : ICommand
     {
-        private readonly List<Rmv2MeshNode> _meshList;
+        List<Rmv2MeshNode> _meshList;
         List<MeshObject> _originalGeometry = new List<MeshObject>();
-        private readonly float _factor;
+        float _factor;
         SelectionManager _selectionManager;
         ISelectionState _oldState;
 
-        public ReduceMeshCommand(List<Rmv2MeshNode> meshList, float factor)
+        public ReduceMeshCommand(SelectionManager selectionManager)
+        {
+            _selectionManager = selectionManager;
+        }
+
+        public void Configure(List<Rmv2MeshNode> meshList, float factor)
         {
             _meshList = meshList;
             _factor = factor;
         }
 
-        public override string GetHintText()
-        {
-            return "Reduce mesh";
-        }
+        public string HintText { get => "Reduce mesh"; }
+        public bool IsMutation { get => true; }
 
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-        }
 
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _oldState = _selectionManager.GetStateCopy();
 
@@ -49,7 +43,7 @@ namespace View3D.Commands.Object
             }
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             for (int i = 0; i < _meshList.Count; i++)
                 _meshList[i].Geometry = _originalGeometry[i];

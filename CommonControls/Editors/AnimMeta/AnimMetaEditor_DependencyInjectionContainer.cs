@@ -14,7 +14,7 @@ namespace CommonControls.Editors.AnimMeta
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterFileTool<EditorViewModel, MainEditorView>(new ExtentionToTool(EditorEnums.Meta_Editor, new[] { ".anm.meta", ".meta", ".snd.meta" }));
+            factory.RegisterTool<EditorViewModel, MainEditorView>(new ExtentionToTool(EditorEnums.Meta_Editor, new[] { ".anm.meta", ".meta", ".snd.meta" }));
         }
     }
 }

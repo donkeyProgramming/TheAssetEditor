@@ -1,9 +1,6 @@
-﻿using CommonControls.Common;
-using MonoGame.Framework.WpfInterop;
-using Serilog;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using View3D.Components.Component.Selection;
+using View3D.Components.Component;
 
 namespace View3D.Commands
 {
@@ -11,53 +8,57 @@ namespace View3D.Commands
     {
         void Undo();
         void Execute();
-        void Initialize(IComponentManager componentManager);
-        string GetHintText();
-        bool IsMutation();
+        string HintText { get; }
+        bool IsMutation { get; }
     }
 
-
-    public abstract class CommandBase<T> : ICommand
+    public class CommandBuilder<T> where T : ICommand
     {
-        protected IComponentManager _componentManager;
-        protected ILogger _logger = Logging.Create<T>();
+        private readonly CommandExecutor _commandExecutor;
+        private readonly T _command;
+        private bool _isUndoable = true;
 
-        public void Undo()
+        public CommandBuilder(CommandExecutor commandExecutor, T command)
         {
-            _logger.Here().Information($"Undoing {typeof(T).Name}");
-            try
-            {
-                UndoCommand();
-            }
-            catch (Exception e)
-            {
-                _logger.Here().Error($"Failed to Undoing command : {e}");
-            }
+            _commandExecutor = commandExecutor;
+            _command = command;
         }
 
-        public virtual void Initialize(IComponentManager componentManager) 
+        public T Build() => _command;
+
+        public void BuildAndExecute() => _commandExecutor.ExecuteCommand(_command, _isUndoable);
+
+        public CommandBuilder<T> Configure(Action<T> predicate)
         {
-            _componentManager = componentManager;
+            predicate(_command);
+            return this;
         }
 
-        public void Execute()
+        public CommandBuilder<T> IsUndoable(bool isUndoable) 
         {
-            _logger.Here().Information($"Executing {typeof(T).Name}" );
-            try
-            {
-                ExecuteCommand();
-            }
-            catch (Exception e)
-            {
-                _logger.Here().Error($"Failed to execute command : {e}");
-            }
+            _isUndoable = isUndoable;
+            return this;
+        }
+    }
+
+    public class CommandFactory
+    {
+        private readonly IServiceProvider _serviceProvider;
+        private readonly CommandExecutor _commandExecutor;
+    
+        public CommandFactory(IServiceProvider serviceProvider, CommandExecutor commandExecutor)
+        {
+            _serviceProvider = serviceProvider;
+            _commandExecutor = commandExecutor;
+        }
+
+        public CommandBuilder<T> Create<T>() where T : ICommand
+        {
+            var instance = _serviceProvider.GetRequiredService<T>();
+            return new CommandBuilder<T>(_commandExecutor, instance); ;
         }
 
 
-        protected abstract void ExecuteCommand();
-        protected abstract void UndoCommand();
-        public abstract string GetHintText();
-        public virtual bool IsMutation() => true;
     }
 }
 

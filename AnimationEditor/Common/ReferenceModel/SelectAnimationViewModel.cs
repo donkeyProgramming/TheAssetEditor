@@ -10,6 +10,7 @@ namespace AnimationEditor.Common.ReferenceModel
     public class SelectAnimationViewModel : NotifyPropertyChangedImpl
     {
         PackFileService _pfs;
+        private readonly AssetViewModelBuilder _assetViewModelEditor;
         AssetViewModel _data;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
@@ -22,8 +23,9 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public OnSeachDelegate FiterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 
-        public SelectAnimationViewModel(AssetViewModel data, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        public SelectAnimationViewModel(AssetViewModelBuilder assetViewModelEditor, AssetViewModel data, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
+            _assetViewModelEditor = assetViewModelEditor;
             _data = data;
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
@@ -49,21 +51,21 @@ namespace AnimationEditor.Common.ReferenceModel
                 if (skeletonPackFile != null)
                 {
                     AnimationsForCurrentSkeleton = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(Path.GetFileNameWithoutExtension(skeletonPackFile.Name));
-                    _data.SetSkeleton(skeletonPackFile);
+                    _assetViewModelEditor.SetSkeleton(_data, skeletonPackFile);
+                    
                     return;
                 }
             }
-
-            _data.SetSkeleton(null);
+            _assetViewModelEditor.SetSkeleton(_data, null);
             AnimationsForCurrentSkeleton = new ObservableCollection<AnimationReference>();
         }
 
         void AnimationChanged(AnimationReference animationReference)
         {
             if (animationReference != null)
-                _data.SetAnimation(animationReference);
+                _assetViewModelEditor.SetAnimation(_data, animationReference);
             else
-                _data.SetAnimation(null);
+                _assetViewModelEditor.SetAnimation(_data, null);
         }
     }
 }

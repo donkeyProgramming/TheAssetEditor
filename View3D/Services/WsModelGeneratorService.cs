@@ -12,6 +12,7 @@ using View3D.SceneNodes;
 using CommonControls.FileTypes.RigidModel.Types;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.WsModel;
+using View3D.Components.Component;
 
 namespace View3D.Services
 {
@@ -20,8 +21,7 @@ namespace View3D.Services
         ILogger _logger = Logging.Create<SceneSaverService>();
 
         private readonly PackFileService _packFileService;
-        private readonly IEditorViewModel _editorViewModel;
-        private readonly MainEditableNode _editableMeshNode;
+        private readonly ActiveFileResolver _activeFileResolver;
         private readonly List<WsModelMaterialFile> _existingMaterials;
 
 
@@ -36,16 +36,14 @@ namespace View3D.Services
             {"SPECULAR_PATH", TextureType.Specular },
         };
 
-        public WsModelGeneratorService(PackFileService packFileService, IEditorViewModel editorViewModel, MainEditableNode editableMeshNode)
+        public WsModelGeneratorService(PackFileService packFileService, ActiveFileResolver activeFileResolver)
         {
             _packFileService = packFileService;
-            _editorViewModel = editorViewModel;
-            _editableMeshNode = editableMeshNode;
-
+            _activeFileResolver = activeFileResolver;
             _existingMaterials = LoadAllExistingMaterials();
         }
 
-        public void GenerateWsModel(GameTypeEnum game = GameTypeEnum.Warhammer3)
+        public void GenerateWsModel(MainEditableNode mainNode, GameTypeEnum game = GameTypeEnum.Warhammer3)
         {
             try
             {
@@ -58,7 +56,7 @@ namespace View3D.Services
                     return;
                 }
 
-                var modelFile = _editorViewModel.MainFile;
+                var modelFile = _activeFileResolver.Get();
                 var modelFilePath = _packFileService.GetFullPath(modelFile);
                 var wsModelPath = Path.ChangeExtension(modelFilePath, ".wsmodel");
 
@@ -69,7 +67,7 @@ namespace View3D.Services
                     _ => throw new Exception("Unkown game - unable to generate ws model")
                 };
 
-                var wsModelData = CreateWsModel(game, modelFilePath, materialTemplate);
+                var wsModelData = CreateWsModel(mainNode, game, modelFilePath, materialTemplate);
                 var existingWsModelFile = _packFileService.FindFile(wsModelPath, _packFileService.GetEditablePack());
                 SaveHelper.Save(_packFileService, wsModelPath, existingWsModelFile, Encoding.UTF8.GetBytes(wsModelData));
             }
@@ -81,7 +79,7 @@ namespace View3D.Services
         }
 
 
-        string CreateWsModel(GameTypeEnum game, string modelFilePath, string materialTemplate)
+        string CreateWsModel(MainEditableNode mainNode, GameTypeEnum game, string modelFilePath, string materialTemplate)
         {
             var sb = new StringBuilder();
 
@@ -89,10 +87,11 @@ namespace View3D.Services
             sb.Append($"\t<geometry>{modelFilePath}</geometry>\n");
             sb.Append("\t\t<materials>\n");
 
-            var lodNodes = _editableMeshNode.GetLodNodes();
+            
+            var lodNodes = mainNode.GetLodNodes();
             for (int lodIndex = 0; lodIndex < lodNodes.Count; lodIndex++)
             {
-                var meshes = _editableMeshNode.GetMeshesInLod(lodIndex, false);
+                var meshes = mainNode.GetMeshesInLod(lodIndex, false);
                 var uniqueNames = GenerateUniqueNames(meshes);
                 for (int meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
                 {
@@ -187,7 +186,7 @@ namespace View3D.Services
             var fileName = uniqueName + "_" + shaderNamePart + "_alpha_" + (alphaOn ? "on" : "off") + ".xml";
             materialTemplate = materialTemplate.Replace("FILE_NAME", fileName);
 
-            var modelFile = _editorViewModel.MainFile;
+            var modelFile = _activeFileResolver.Get();
             var modelFilePath = _packFileService.GetFullPath(modelFile);
             var dir = Path.GetDirectoryName(modelFilePath);
             var fullPath = dir + "\\materials\\" + fileName + ".material";

@@ -1,14 +1,12 @@
 ﻿using MonoGame.Framework.WpfInterop;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 
 namespace View3D.Commands.Object
 {
-    public class GroupObjectsCommand : CommandBase<GroupObjectsCommand>
+    public class GroupObjectsCommand : ICommand
     {
         SelectionManager _selectionManager;
         ISelectionState _oldState;
@@ -16,23 +14,22 @@ namespace View3D.Commands.Object
         ISceneNode _parent;
         List<ISelectable> _itemsToGroup { get; set; } = new List<ISelectable>();
 
-        public GroupObjectsCommand(ISceneNode parent, List<ISelectable> itemsToGroup)
+        public void Configure (ISceneNode parent, List<ISelectable> itemsToGroup)
         {
             _itemsToGroup = itemsToGroup;
             _parent = parent;
         }
 
-        public override string GetHintText()
+        public string HintText { get => "Group Objects"; }
+        public bool IsMutation { get => true; }
+
+
+        public GroupObjectsCommand(SelectionManager selectionManager)
         {
-            return "Group Objects";
+            _selectionManager = selectionManager;
         }
 
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-        }
-
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _oldState = _selectionManager.GetStateCopy();
             var groupNode = _parent.AddObject(new GroupNode("New Group") { IsUngroupable = true, IsSelectable = true, IsLockable = true });
@@ -50,7 +47,7 @@ namespace View3D.Commands.Object
             currentState.ModifySelection(itemsToSelect, false);
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             var groupNode = _itemsToGroup.First().Parent;
 
@@ -66,7 +63,7 @@ namespace View3D.Commands.Object
         }
     }
 
-    public class UnGroupObjectsCommand : CommandBase<UnGroupObjectsCommand>
+    public class UnGroupObjectsCommand : ICommand
     {
         SelectionManager _selectionManager;
         ISelectionState _oldState;
@@ -75,24 +72,23 @@ namespace View3D.Commands.Object
         List<ISelectable> _itemsToUngroup { get; set; } = new List<ISelectable>();
         ISceneNode _oldGroupNode;
 
-        public UnGroupObjectsCommand(ISceneNode parent, List<ISelectable> itemsToUngroup, ISceneNode groupNode)
+        public void Configure(ISceneNode parent, List<ISelectable> itemsToUngroup, ISceneNode groupNode)
         {
             _itemsToUngroup = itemsToUngroup;
             _parent = parent;
             _oldGroupNode = groupNode;
         }
 
-        public override string GetHintText()
+
+        public string HintText { get => "Ungroup objects"; }
+        public bool IsMutation { get => true; }
+
+        public UnGroupObjectsCommand(SelectionManager selectionManager)
         {
-            return "Ungroup objects";
+            _selectionManager = selectionManager;
         }
 
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-        }
-
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _oldState = _selectionManager.GetStateCopy();
 
@@ -110,7 +106,7 @@ namespace View3D.Commands.Object
             currentState.ModifySelection(_itemsToUngroup, false);
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             foreach (var item in _itemsToUngroup)
             {
@@ -126,25 +122,33 @@ namespace View3D.Commands.Object
         }
     }
 
-    public class AddObjectsToGroupCommand : CommandBase<AddObjectsToGroupCommand>
+    public class AddObjectsToGroupCommand : ICommand
     {
         ISelectionState _originalSelectionState;
 
         GroupNode _groupToAddItemsTo;
+        private readonly SelectionManager _selectionManager;
+
         List<ISelectable> _itemsToAdd { get; set; } = new List<ISelectable>();
 
-        public AddObjectsToGroupCommand(GroupNode groupToAddItemsTo, List<ISelectable> itemsToAdd)
+        public void Configure(GroupNode groupToAddItemsTo, List<ISelectable> itemsToAdd)
         {
             _itemsToAdd = itemsToAdd;
             _groupToAddItemsTo = groupToAddItemsTo;
         }
 
-        public override string GetHintText() => "Add Objects to group";
-        
-        protected override void ExecuteCommand()
+        public AddObjectsToGroupCommand(SelectionManager selectionManager)
+        {
+            _selectionManager = selectionManager;
+        }
+
+        public string HintText { get => "Add Objects to group"; }
+        public bool IsMutation { get => true; }
+
+        public void Execute()
         {
             // Create undo state
-            _originalSelectionState = _componentManager.GetComponent<SelectionManager>().GetStateCopy();
+            _originalSelectionState = _selectionManager.GetStateCopy();
           
             // Add itsms to group
             foreach (var item in _itemsToAdd)
@@ -154,12 +158,12 @@ namespace View3D.Commands.Object
             }
 
             // Select the grouped items
-            var currentState = _componentManager.GetComponent<SelectionManager>().GetState<ObjectSelectionState>();
+            var currentState = _selectionManager.GetState<ObjectSelectionState>();
             currentState.Clear();
             currentState.ModifySelection(_itemsToAdd, false);
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             var rootNode = _groupToAddItemsTo.Parent;
             foreach (var item in _itemsToAdd)
@@ -168,7 +172,7 @@ namespace View3D.Commands.Object
                 rootNode.AddObject(item);
             }
 
-            _componentManager.GetComponent<SelectionManager>().SetState(_originalSelectionState);
+            _selectionManager.SetState(_originalSelectionState);
         }
     }
 }

@@ -1,29 +1,48 @@
-﻿using AnimationEditor.Common.ReferenceModel;
+﻿using AnimationEditor.Common.AnimationPlayer;
+using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
+using Common;
 using CommonControls.Common;
-using CommonControls.FileTypes.DB;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
+using MonoGame.Framework.WpfInterop;
+using View3D.Components;
+using View3D.Scene;
 
 namespace AnimationEditor.AnimationTransferTool
 {
-    public class AnimationTransferToolViewModel : BaseAnimationViewModel
+    public class AnimationTransferToolViewModel : BaseAnimationViewModel<Editor>
     {
-        public AnimationTransferToolViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService) 
-            : base(toolFactory, pfs, skeletonHelper, applicationSettingsService, "Target", "Source")
+        private readonly ReferenceModelSelectionViewModelBuilder _referenceModelSelectionViewModelBuilder;
+        private readonly AssetViewModelBuilder _assetViewModelBuilder;
+
+        public AnimationTransferToolViewModel(
+            Editor editor,
+            ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder, 
+            AnimationPlayerViewModel animationPlayerViewModel,
+            EventHub eventHub, 
+            IComponentInserter componentInserter,
+            AssetViewModelBuilder assetViewModelBuilder, 
+            MainScene scene) 
+            : base( componentInserter, animationPlayerViewModel, scene)
         {
             DisplayName.Value = "Animation transfer tool";
-            Pfs = pfs;
+            Editor = editor;
+            _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
+            _assetViewModelBuilder = assetViewModelBuilder;
+
+            eventHub.Register<SceneInitializedEvent>(Initialize);
         }
 
-        public PackFileService Pfs { get; }
-
-        public override void Initialize()
+        void Initialize(SceneInitializedEvent sceneInitializedEvent)
         {
-            ReferenceModelView.Data.IsSelectable = false;
-            var propAsset = Scene.AddComponent(new AssetViewModel(_pfs, "Generated", Color.Black, Scene, _applicationSettingsService));
-            Player.RegisterAsset(propAsset);
-            Editor = new Editor(_pfs, _skeletonHelper, MainModelView.Data, ReferenceModelView.Data, propAsset, Scene, Player);
+            MainModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(true, "Target", Color.Black, MainInput);
+            ReferenceModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(false, "Source", Color.Black, RefInput);
+
+            ReferenceModelView.Value.Data.IsSelectable = false;
+            var generatedAnimationAsset = _assetViewModelBuilder.CreateAsset("Generated", Color.Black);
+            Player.RegisterAsset(generatedAnimationAsset);
+            Editor.Create(MainModelView.Value.Data, ReferenceModelView.Value.Data, generatedAnimationAsset);
         }
     }
 
@@ -31,7 +50,7 @@ namespace AnimationEditor.AnimationTransferTool
     {
         public static void CreateDwardAndEmpArcher(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<AnimationTransferToolViewModel>();
+            var editorView = toolFactory.Create<AnimationTransferToolViewModel>();
             editorView.MainInput = new AnimationToolInput()
             {
                 //Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\wef_bladesinger.variantmeshdefinition"),
@@ -57,7 +76,7 @@ namespace AnimationEditor.AnimationTransferTool
 
         public static void CreateChaosSpawn(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<AnimationTransferToolViewModel>();
+            var editorView = toolFactory.Create<AnimationTransferToolViewModel>();
             editorView.MainInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\bst_chaos_spawn.variantmeshdefinition")
@@ -74,7 +93,7 @@ namespace AnimationEditor.AnimationTransferTool
 
         public static void CreateGreatEagle(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<AnimationTransferToolViewModel>();
+            var editorView = toolFactory.Create<AnimationTransferToolViewModel>();
             editorView.MainInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_great_eagle.variantmeshdefinition")
@@ -91,7 +110,7 @@ namespace AnimationEditor.AnimationTransferTool
 
         public static void CreateBowCentigor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<AnimationTransferToolViewModel>();
+            var editorView = toolFactory.Create<AnimationTransferToolViewModel>();
             editorView.MainInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\bst_centigors_base.variantmeshdefinition")
@@ -108,7 +127,7 @@ namespace AnimationEditor.AnimationTransferTool
 
         public static void CreateFlyingSquig(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<AnimationTransferToolViewModel>();
+            var editorView = toolFactory.Create<AnimationTransferToolViewModel>();
             editorView.MainInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\wh_variantmodels\rp2\grn\grn_squig_herd\grn_squig_herd_01_2b.rigid_model_v2"),

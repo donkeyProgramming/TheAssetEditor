@@ -1,4 +1,3 @@
-using Action = System.Action;
 using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using Audio.Utility;
@@ -7,34 +6,13 @@ using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using MoreLinq;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using static CommonControls.Common.CustomExtensions;
 using Audio.FileFormats.WWise;
-using Microsoft.Xna.Framework.Media;
-using Microsoft.WindowsAPICodePack.ApplicationServices;
-using System.Windows.Navigation;
-using Audio.FileFormats.WWise.Hirc;
-using SharpDX.Direct3D9;
-using static CommonControls.Editors.AnimationPack.Converters.AnimationBinWh3FileToXmlConverter;
-using static System.ComponentModel.Design.ObjectSelectorEditor;
-using FluentValidation.Results;
-using SharpDX.X3DAudio;
-using SharpDX.Direct3D11;
-using System.Windows.Forms.VisualStyles;
-using System.Runtime.InteropServices.WindowsRuntime;
-using SharpDX.DXGI;
-using System.Transactions;
-using System.Threading.Tasks;
-using Octokit;
 using System.Text.Json.Serialization;
 using System.Text.Json;
-using Audio.BnkCompiler;
 using System.Text;
-using SharpDX.DirectWrite;
 
 namespace AudioResearch
 {

@@ -164,8 +164,6 @@ namespace CommonControls.Editors.BoneMapping
             }
         }
 
-        
-
         public void Save()
         {
             var xmlserializer = new XmlSerializer(_configuration.GetType());

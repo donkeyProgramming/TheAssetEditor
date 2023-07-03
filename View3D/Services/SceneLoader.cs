@@ -4,12 +4,12 @@ using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.WsModel;
 using CommonControls.Services;
-using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.IO;
 using System.Linq;
 using View3D.Animation;
+using View3D.Components.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Utility;
@@ -23,15 +23,15 @@ namespace View3D.Services
         PackFileService _packFileService;
         ResourceLibary _resourceLibary;
         IGeometryGraphicsContextFactory _geometryContextFactory;
-        IComponentManager _componentManager;
+        private readonly RenderEngineComponent _renderEngineComponent;
         ApplicationSettingsService _applicationSettingsService;
 
-        public SceneLoader(ResourceLibary resourceLibary, PackFileService pfs, IGeometryGraphicsContextFactory geometryContextFactory, IComponentManager componentManager, ApplicationSettingsService applicationSettingsService)
+        public SceneLoader(ResourceLibary resourceLibary, PackFileService pfs, IGeometryGraphicsContextFactory geometryContextFactory, RenderEngineComponent renderEngineComponent, ApplicationSettingsService applicationSettingsService)
         {
-            _componentManager = componentManager;
             _packFileService = pfs;
             _resourceLibary = resourceLibary;
             _geometryContextFactory = geometryContextFactory;
+            _renderEngineComponent = renderEngineComponent;
             _applicationSettingsService = applicationSettingsService;
         }
 
@@ -141,7 +141,7 @@ namespace View3D.Services
             var modelFullPath = _packFileService.GetFullPath(file);
             var modelNode = new Rmv2ModelNode(Path.GetFileName(file.Name));
             var autoResolveTexture = isParentWsModel == false && _applicationSettingsService.CurrentSettings.AutoResolveMissingTextures;
-            modelNode.CreateModelNodesFromFile(rmvModel, _resourceLibary, player, _geometryContextFactory, modelFullPath, _componentManager, _packFileService, autoResolveTexture);
+            modelNode.CreateModelNodesFromFile(rmvModel, _resourceLibary, player, _geometryContextFactory, modelFullPath, _renderEngineComponent, _packFileService, autoResolveTexture);
 
             foreach (var mesh in modelNode.GetMeshNodes(0))
                 mesh.AttachmentPointName = attachmentPointName;

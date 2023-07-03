@@ -1,9 +1,10 @@
 ﻿using CommonControls.Common;
-using MonoGame.Framework.WpfInterop;
+using Serilog;
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Components.Component;
+using View3D.Commands.Face;
 using View3D.Components.Component.Selection;
+using View3D.Components.Rendering;
 using View3D.Rendering.Shading;
 using View3D.SceneNodes;
 using View3D.Services;
@@ -11,40 +12,38 @@ using View3D.Utility;
 
 namespace View3D.Commands.Object
 {
-    class DivideObjectIntoSubmeshesCommand : CommandBase<DivideObjectIntoSubmeshesCommand>
+    public class DivideObjectIntoSubmeshesCommand : ICommand
     {
+        ILogger _logger = Logging.Create<FaceSelectionCommand>();
+
         IEditableGeometry _objectToSplit;
         bool _combineOverlappingVertexes;
 
         List<GroupNode> _newGroupNodes = new List<GroupNode>();
-
-        IEditableMeshResolver _editableMeshResolver;
-        SceneManager _sceneManager;
+        private readonly ComponentManagerResolver _componentManagerResolver;
         SelectionManager _selectionManager;
         ISelectionState _originalSelectionState;
         ResourceLibary _resourceLib;
+        private readonly RenderEngineComponent _renderEngineComponent;
 
-        public DivideObjectIntoSubmeshesCommand(IEditableGeometry objectToSplit, bool combineOverlappingVertexes)
+        public string HintText { get => "Divide Object"; }
+        public bool IsMutation { get => true; }
+
+        public DivideObjectIntoSubmeshesCommand(ComponentManagerResolver componentManagerResolver, SelectionManager selectionManager, ResourceLibary resourceLibary, RenderEngineComponent renderEngineComponent)
+        {
+            _componentManagerResolver = componentManagerResolver;
+            _selectionManager = selectionManager;
+            _resourceLib = resourceLibary;
+            _renderEngineComponent = renderEngineComponent;
+        }
+
+        public void Configure(IEditableGeometry objectToSplit, bool combineOverlappingVertexes)
         {
             _objectToSplit = objectToSplit;
             _combineOverlappingVertexes = combineOverlappingVertexes;
         }
 
-        public override string GetHintText()
-        {
-            return "Divide Object";
-        }
-
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _componentManager = componentManager;
-            _editableMeshResolver = componentManager.GetComponent<IEditableMeshResolver>();
-            _sceneManager = componentManager.GetComponent<SceneManager>();
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-            _resourceLib = componentManager.GetComponent<ResourceLibary>();
-        }
-
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _originalSelectionState = _selectionManager.GetStateCopy();
 
@@ -82,7 +81,7 @@ namespace View3D.Commands.Object
 
                     var typedObject = _objectToSplit as Rmv2MeshNode;
                     var shader = typedObject.Effect.Clone() as PbrShader;
-                    var meshNode = new Rmv2MeshNode(typedObject.CommonHeader, mesh, typedObject.Material.Clone(), typedObject.AnimationPlayer, _componentManager, shader);
+                    var meshNode = new Rmv2MeshNode(typedObject.CommonHeader, mesh, typedObject.Material.Clone(), typedObject.AnimationPlayer, _renderEngineComponent, shader);
                     meshNode.Initialize(_resourceLib);
                     meshNode.IsVisible = true;
 
@@ -102,7 +101,7 @@ namespace View3D.Commands.Object
             }
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             foreach(var item in _newGroupNodes)       
                 item.Parent.RemoveObject(item);

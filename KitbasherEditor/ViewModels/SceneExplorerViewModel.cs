@@ -1,72 +1,52 @@
-﻿using CommonControls.Common;
-using CommonControls.Services;
+﻿using Common;
+using CommonControls.Common;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
-using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using View3D.Commands;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels
 {
-    public class SceneExplorerViewModel : NotifyPropertyChangedImpl, IEditableMeshResolver
+    public class SceneExplorerViewModel : NotifyPropertyChangedImpl
     {
-        IComponentManager _componentManager;
         SceneManager _sceneManager;
-        CommandExecutor _commandExecutor;
         SelectionManager _selectionManager;
-        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        PackFileService _packFileService;
-        ApplicationSettingsService _applicationSettingsService;
-        AnimationControllerViewModel _animationControllerViewModel;
+        private readonly SceneNodeViewFactory _sceneNodeViewFactory;
+        bool _ignoreSelectionChanges = false;
 
-        public ObservableCollection<ISceneNode> _sceneGraphRootNodes = new ObservableCollection<ISceneNode>();
-        public ObservableCollection<ISceneNode> SceneGraphRootNodes { get { return _sceneGraphRootNodes; } set { SetAndNotify(ref _sceneGraphRootNodes, value); } }
-
-        ObservableCollection<ISceneNode> _SelectedObjects = new ObservableCollection<ISceneNode>();
-        public ObservableCollection<ISceneNode> SelectedObjects { get { return _SelectedObjects; } set { SetAndNotify(ref _SelectedObjects, value); } }
+        public ObservableCollection<ISceneNode> SceneGraphRootNodes { get; private set; } = new ObservableCollection<ISceneNode>();
+        public ObservableCollection<ISceneNode> SelectedObjects { get; private set; } = new ObservableCollection<ISceneNode>();
+        public SceneExplorerContextMenuHandler ContextMenu { get; private set; }
 
         ISceneNodeViewModel _selectedNodeViewModel;
         public ISceneNodeViewModel SelectedNodeViewModel { get { return _selectedNodeViewModel; } set { SetAndNotify(ref _selectedNodeViewModel, value); } }
 
-        public SceneExplorerContextMenuHandler ContextMenu { get; set; }
-
-        MainEditableNode _editableMeshNode;
-        public MainEditableNode EditableMeshNode { get => _editableMeshNode; set { _editableMeshNode = value; ContextMenu.EditableMeshNode = value; } }
-
-
-        public SceneExplorerViewModel(IComponentManager componentManager, PackFileService packFileService, AnimationControllerViewModel animationControllerViewModel, ApplicationSettingsService applicationSettingsService)
+        public SceneExplorerViewModel(SceneNodeViewFactory sceneNodeViewFactory, CommandExecutor commandExecutor, SelectionManager selectionManager, SceneManager sceneManager, CommandFactory commandFactory, EventHub eventHub)
         {
-            _componentManager = componentManager;
-            _animationControllerViewModel = animationControllerViewModel;
-
-            _packFileService = packFileService;
-            _applicationSettingsService = applicationSettingsService;
-
-            _skeletonAnimationLookUpHelper = _componentManager.GetComponent<SkeletonAnimationLookUpHelper>();
-            _sceneManager = _componentManager.GetComponent<SceneManager>();
-            _commandExecutor = componentManager.GetComponent<CommandExecutor>();
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-            _selectionManager.SelectionChanged += SelectionChanged;
+            _sceneNodeViewFactory = sceneNodeViewFactory;
+            _sceneManager = sceneManager;
+            _selectionManager = selectionManager;
 
             SceneGraphRootNodes.Add(_sceneManager.RootNode);
 
             _sceneManager.SceneObjectAdded += (a, b) => RebuildTree();
             _sceneManager.SceneObjectRemoved += (a, b) => RebuildTree();
 
-            ContextMenu = new SceneExplorerContextMenuHandler(_commandExecutor);
+            ContextMenu = new SceneExplorerContextMenuHandler(commandExecutor, _sceneManager, commandFactory);
             ContextMenu.SelectedNodesChanged += OnSelectedNodesChanged;
 
             SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
+            eventHub.Register<SelectionChangedEvent>(Handle);
         }
 
         private void OnSelectedNodesChanged(IEnumerable<ISceneNode> selectedNodes)
         {
-
             foreach (var node in SelectedObjects.ToList())
             {
                 SelectedObjects.Remove(node);
@@ -82,7 +62,7 @@ namespace KitbasherEditor.ViewModels
             try
             {
                 SelectedObjects.CollectionChanged -= SelectedObjects_CollectionChanged;
-                _selectionManager.SelectionChanged -= SelectionChanged;
+                _ignoreSelectionChanges = true;
 
                 try
                 {
@@ -143,7 +123,7 @@ namespace KitbasherEditor.ViewModels
             finally
             {
                 SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
-                _selectionManager.SelectionChanged += SelectionChanged;
+                _ignoreSelectionChanges = false;
             }
             
             UpdateViewModelAndContextMenyBasedOnSelection();
@@ -156,7 +136,7 @@ namespace KitbasherEditor.ViewModels
 
             if (SelectedObjects.Count == 1)
             {
-                SelectedNodeViewModel = SceneNodeViewFactory.Create(SelectedObjects.First(), _skeletonAnimationLookUpHelper, _packFileService, _animationControllerViewModel, _componentManager, _applicationSettingsService);
+                SelectedNodeViewModel = _sceneNodeViewFactory.CreateEditorView(SelectedObjects.First());
                 ContextMenu.Create(SelectedObjects);
             }
             else
@@ -194,12 +174,8 @@ namespace KitbasherEditor.ViewModels
 
         private void RebuildTree()
         {
-            //var collection = new ObservableCollection<ISceneNode>(); ;
-            //collection.Add(_sceneManager.RootNode);
-
             SceneGraphRootNodes.Clear();
             SceneGraphRootNodes.Add(_sceneManager.RootNode);
-            //SceneGraphRootNodes = collection;
             UpdateLod(0);
         }
 
@@ -216,13 +192,10 @@ namespace KitbasherEditor.ViewModels
             }
         }
 
-        public void Initialize()
+        void Handle(SelectionChangedEvent notification)
         {
-        }
-
-        public MainEditableNode GeEditableMeshRootNode()
-        {
-            return EditableMeshNode;
+            if(_ignoreSelectionChanges == false)
+                SelectionChanged(notification.NewState);
         }
     }
 }

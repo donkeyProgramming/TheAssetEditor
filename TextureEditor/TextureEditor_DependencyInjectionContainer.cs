@@ -1,8 +1,5 @@
 ﻿using CommonControls.Common;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using TextureEditor.ViewModels;
 using TextureEditor.Views;
 
@@ -19,7 +16,7 @@ namespace TextureEditor
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterFileTool<TextureEditorViewModel, TexturePreviewView>(new ExtentionToTool(EditorEnums.Texture_Editor, new[] { ".dds", ".png", ".jpeg" }));
+            factory.RegisterTool<TextureEditorViewModel, TexturePreviewView>(new ExtentionToTool(EditorEnums.Texture_Editor, new[] { ".dds", ".png", ".jpeg" }));
         }
     }
 }

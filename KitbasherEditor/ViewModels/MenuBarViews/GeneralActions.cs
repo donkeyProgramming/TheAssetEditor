@@ -1,10 +1,7 @@
 ﻿using CommonControls.Common;
-using MonoGame.Framework.WpfInterop;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Components.Component;
-using View3D.Components.Component.Selection;
 using View3D.Components.Rendering;
 using View3D.SceneNodes;
 using View3D.Services;
@@ -13,34 +10,37 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 {
     public class GeneralActions : NotifyPropertyChangedImpl
     { 
-        CommandExecutor _commandExecutor;
-        FocusSelectableObjectComponent _cameraFocusComponent;
-        IEditableMeshResolver _editableMeshResolver;
-        ObjectEditor _objectEditor;
-        RenderEngineComponent _renderEngineComponent;
+        private readonly CommandExecutor _commandExecutor;
+        private readonly FocusSelectableObjectService _cameraFocusComponent;       
+        private readonly ObjectEditor _objectEditor;
+        private readonly RenderEngineComponent _renderEngineComponent;
+        private readonly SceneManager _sceneManager;
+        private readonly SceneSaverService _sceneSaverService;
+        private readonly WsModelGeneratorService _wsModelGeneratorService;
 
-        public SceneSaverService ModelSaver { get; set; }
-        public WsModelGeneratorService WsModelGeneratorService { get; set; }
-
-        public GeneralActions(IComponentManager componentManager)
+        public GeneralActions(CommandExecutor commandExecutor, FocusSelectableObjectService cameraFocusComponent,
+            ObjectEditor objectEditor, RenderEngineComponent renderEngineComponent, SceneManager sceneManager, SceneSaverService sceneSaverService, WsModelGeneratorService wsModelGeneratorService)
         {
-            _commandExecutor = componentManager.GetComponent<CommandExecutor>();
-            _cameraFocusComponent = componentManager.GetComponent<FocusSelectableObjectComponent>();
-            _editableMeshResolver = componentManager.GetComponent<IEditableMeshResolver>();
-            _objectEditor = componentManager.GetComponent<ObjectEditor>();
-            _renderEngineComponent = componentManager.GetComponent<RenderEngineComponent>();
+            _commandExecutor = commandExecutor;
+            _cameraFocusComponent = cameraFocusComponent;
+            _objectEditor = objectEditor;
+            _renderEngineComponent = renderEngineComponent;
+            _sceneManager = sceneManager;
+            _sceneSaverService = sceneSaverService;
+            _wsModelGeneratorService = wsModelGeneratorService;
         }
 
         public void SortMeshes()
         {
-            var lod0 = _editableMeshResolver.GeEditableMeshRootNode().GetLodNodes().FirstOrDefault();
+            var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            var lod0 = rootNode.GetLodNodes().FirstOrDefault();
             if (lod0 != null)
                 _objectEditor.SortMeshes(lod0);
         }
 
         public void DeleteLods()
         {
-            var rootNode = _editableMeshResolver.GeEditableMeshRootNode();
+            var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             var lods = rootNode.GetLodNodes();
 
             var firtLod = lods.First();
@@ -61,9 +61,14 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             }
         }
 
-        public void Save() => ModelSaver.Save();
-        public void SaveAs() => ModelSaver.SaveAs();
-        public void GenerateWsModelWh3() => WsModelGeneratorService.GenerateWsModel(CommonControls.Services.GameTypeEnum.Warhammer3);
+        public void Save() => _sceneSaverService.Save();
+        public void SaveAs() => _sceneSaverService.SaveAs();
+        public void GenerateWsModelWh3()
+        {
+            var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            _wsModelGeneratorService.GenerateWsModel(mainNode, CommonControls.Services.GameTypeEnum.Warhammer3);
+        }
+
         public void Undo() => _commandExecutor.Undo();
         public void FocusSelection() => _cameraFocusComponent.FocusSelection();
         public void ResetCamera() => _cameraFocusComponent.ResetCamera();
@@ -71,6 +76,10 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public void ToggleBackFaceRendering() => _renderEngineComponent.ToggelBackFaceRendering();
         public void ToggleLargeSceneRendering() => _renderEngineComponent.ToggleLargeSceneRendering();
 
-        public void GenerateWsModelForWh2() => WsModelGeneratorService.GenerateWsModel(CommonControls.Services.GameTypeEnum.Warhammer2);
+        public void GenerateWsModelForWh2()
+        {
+            var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            _wsModelGeneratorService.GenerateWsModel(mainNode, CommonControls.Services.GameTypeEnum.Warhammer2);
+        }
     }
 }

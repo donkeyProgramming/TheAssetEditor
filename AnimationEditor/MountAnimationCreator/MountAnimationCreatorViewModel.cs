@@ -1,27 +1,49 @@
-﻿using AnimationEditor.Common.ReferenceModel;
+﻿using AnimationEditor.Common.AnimationPlayer;
+using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
+using Common;
 using CommonControls.Common;
-using CommonControls.FileTypes.DB;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
+using MonoGame.Framework.WpfInterop;
+using View3D.Components;
+using View3D.Scene;
 
 namespace AnimationEditor.MountAnimationCreator
 {
-
-    public class MountAnimationCreatorViewModel : BaseAnimationViewModel
+    public class MountAnimationCreatorViewModel : BaseAnimationViewModel<Editor>
     {
-        public MountAnimationCreatorViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService)
-            : base(toolFactory, pfs, skeletonHelper, applicationSettingsService, "Rider", "Mount")
+        private readonly ReferenceModelSelectionViewModelBuilder _referenceModelSelectionViewModelBuilder;
+        private readonly AssetViewModelBuilder _assetViewModelBuilder;
+
+        public MountAnimationCreatorViewModel(Editor editor,
+            IComponentInserter componentInserter, 
+            ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder, 
+            AnimationPlayerViewModel animationPlayerViewModel, 
+            EventHub eventHub,
+            AssetViewModelBuilder assetViewModelBuilder, 
+            MainScene scene)
+            : base(componentInserter, animationPlayerViewModel, scene)
         {
             DisplayName.Value = "MountAnimCreator";
+            Editor = editor;
+            _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
+            _assetViewModelBuilder = assetViewModelBuilder;
+
+            eventHub.Register<SceneInitializedEvent>(Initialize);
         }
 
-        public override void Initialize()
+        void Initialize(SceneInitializedEvent sceneInitializedEvent)
         {
-            ReferenceModelView.Data.IsSelectable = true;
-            var propAsset = Scene.AddComponent(new AssetViewModel(_pfs, "NewAnim", Color.Red, Scene, _applicationSettingsService));
+            MainModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(true, "Rider", Color.Black, MainInput);
+            ReferenceModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(true, "Mount", Color.Black, RefInput);
+
+            ReferenceModelView.Value.Data.IsSelectable = true;
+
+            var propAsset = _assetViewModelBuilder.CreateAsset("New Anim", Color.Red);
             Player.RegisterAsset(propAsset);
-            Editor = new Editor(_pfs, _skeletonHelper, MainModelView.Data, ReferenceModelView.Data, propAsset, Scene, _applicationSettingsService);
+           
+            Editor.Create(MainModelView.Value.Data, ReferenceModelView.Value.Data, propAsset);
         }
     }
 
@@ -29,7 +51,7 @@ namespace AnimationEditor.MountAnimationCreator
     {
         public static void CreateDamselAndGrymgoreEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
 
             editorView.MainInput = new AnimationToolInput()
             {
@@ -47,7 +69,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public static void CreateKarlAndSquigEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
 
             editorView.MainInput = new AnimationToolInput()
             {
@@ -64,7 +86,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public static void CreateBroodHorrorEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
 
             editorView.MainInput = new AnimationToolInput()
             {
@@ -81,7 +103,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public static void CreateLionAndHu01b(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
 
             editorView.MainInput = new AnimationToolInput()
             {
@@ -98,7 +120,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public static void CreateLionAndHu01c(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
 
             editorView.MainInput = new AnimationToolInput()
             {
@@ -115,7 +137,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public static void CreateRaptorAndHu01b(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
 
             editorView.MainInput = new AnimationToolInput()
             {
@@ -132,7 +154,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public static void CreateRaptorAndHu01d(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
 
             editorView.MainInput = new AnimationToolInput()
             {
@@ -149,7 +171,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public static void CreateRaptorAndHu02(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
 
             editorView.MainInput = new AnimationToolInput()
             {
@@ -167,7 +189,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public static void CreateRome2WolfRider(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
 
             editorView.MainInput = new AnimationToolInput()
             {
@@ -186,7 +208,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public static void CreateRome2WolfRiderAttack(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
 
             editorView.MainInput = new AnimationToolInput()
             {

@@ -2,23 +2,24 @@
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.Common;
-using CommonControls.FileTypes.DB;
+using CommonControls.Editors.AnimMeta;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
 using System.Collections.ObjectModel;
 using System.Linq;
-using View3D.Scene;
+using View3D.Animation.MetaData;
 
 namespace AnimationEditor.SuperView
 {
     public class Editor
     {
-        SceneContainer _scene;
-        PackFileService _pfs;
-        SkeletonAnimationLookUpHelper _skeletonHelper;
-        AnimationPlayerViewModel _player;
-        IToolFactory _toolFactory;
-        ApplicationSettingsService _applicationSettingsService;
+        private readonly PackFileService _pfs;
+        private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
+        private readonly AnimationPlayerViewModel _player;
+        private readonly MetaDataFactory _metaDataFactory;
+        private readonly AssetViewModelBuilder _assetViewModelBuilder;
+        private readonly IToolFactory _toolFactory;
+        private readonly ApplicationSettingsService _applicationSettingsService;
 
         public NotifyAttr<string> PersistentMetaFilePath { get; set; } = new NotifyAttr<string>("");
         public NotifyAttr<string> PersistentMetaFilePackFileContainerName { get; set; } = new NotifyAttr<string>("");
@@ -26,37 +27,39 @@ namespace AnimationEditor.SuperView
         public NotifyAttr<string> MetaFilePath { get; set; } = new NotifyAttr<string>("");
         public NotifyAttr<string> MetaFilePackFileContainerName { get; set; } = new NotifyAttr<string>("");
 
-        public CommonControls.Editors.AnimMeta.EditorViewModel PersistentMetaEditor { get; set; }
-        public CommonControls.Editors.AnimMeta.EditorViewModel MetaEditor { get; set; }
+        public EditorViewModel PersistentMetaEditor { get; set; }
+        public EditorViewModel MetaEditor { get; set; }
 
         public ObservableCollection<ReferenceModelSelectionViewModel> Items { get; set; } = new ObservableCollection<ReferenceModelSelectionViewModel>();
 
-        public Editor(IToolFactory toolFactory, SceneContainer scene, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, AnimationPlayerViewModel player, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService)
+        public Editor(MetaDataFactory metaDataFactory, AssetViewModelBuilder assetViewModelBuilder, IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, AnimationPlayerViewModel player, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService)
         {
+            _metaDataFactory = metaDataFactory;
+            _assetViewModelBuilder = assetViewModelBuilder;
             _toolFactory = toolFactory;
-            _scene = scene;
             _pfs = pfs;
             _skeletonHelper = skeletonHelper;
             _player = player;
             _applicationSettingsService = applicationSettingsService;
 
-            PersistentMetaEditor = new CommonControls.Editors.AnimMeta.EditorViewModel(pfs, copyPasteManager);
+            PersistentMetaEditor = new EditorViewModel(pfs, copyPasteManager);
             PersistentMetaEditor.EditorSavedEvent += PersistentMetaEditor_EditorSavedEvent;
-            MetaEditor = new CommonControls.Editors.AnimMeta.EditorViewModel(pfs, copyPasteManager);
+            MetaEditor = new EditorViewModel(pfs, copyPasteManager);
             MetaEditor.EditorSavedEvent += MetaEditor_EditorSavedEvent;
         }
 
-        public void Create(AnimationToolInput input)
+        public Editor Create(AnimationToolInput input)
         {
-            var asset = _scene.AddComponent(new AssetViewModel(_pfs, "Item 0", Color.Black, _scene, _applicationSettingsService));
+            var asset = _assetViewModelBuilder.CreateAsset("Item 0", Color.Black);
             _player.RegisterAsset(asset);
-            var viewModel = new ReferenceModelSelectionViewModel(_toolFactory, _pfs, asset, "Item 0:", _scene, _skeletonHelper, _applicationSettingsService);
+            var viewModel = new ReferenceModelSelectionViewModel(_metaDataFactory, _toolFactory, _pfs, asset, "Item 0:", _assetViewModelBuilder, _skeletonHelper, _applicationSettingsService);
             viewModel.AllowMetaData.Value = true;
 
-            if(input.Mesh != null)
-                viewModel.Data.SetMesh(input.Mesh);
+            if (input.Mesh != null)
+                _assetViewModelBuilder.SetMesh(asset, input.Mesh);
+
             if (input.Animation != null)
-                viewModel.Data.SetAnimation(_skeletonHelper.FindAnimationRefFromPackFile(input.Animation, _pfs));
+                _assetViewModelBuilder.SetAnimation(viewModel.Data,_skeletonHelper.FindAnimationRefFromPackFile(input.Animation, _pfs));
 
             if (input.FragmentName != null)
             {
@@ -70,6 +73,7 @@ namespace AnimationEditor.SuperView
 
             Items.Add(viewModel);
             Asset_MetaDataChanged(asset);
+            return this;
         }
 
         private void Asset_MetaDataChanged(AssetViewModel newValue)
@@ -115,7 +119,7 @@ namespace AnimationEditor.SuperView
                 item.Refresh();
 
             foreach (var item in Items)
-                item.Data.ReApplyMeta();
+                item.Data.TriggerMeshChanged();
         }
 
     }

@@ -1,19 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using View3D.Components.Component;
 using View3D.Components.Component.Selection;
-using View3D.Components.Gizmo;
 using View3D.Rendering.Geometry;
-using View3D.SceneNodes;
 
 namespace View3D.Commands.Vertex
 {
 
-    public class TransformVertexCommand : CommandBase<TransformVertexCommand>
+    public class TransformVertexCommand : ICommand
     {
         List<MeshObject> _geometryList;
         public Vector3 PivotPoint;
@@ -23,29 +17,28 @@ namespace View3D.Commands.Vertex
         SelectionManager _selectionManager;
         ISelectionState _oldSelectionState;
 
-        public TransformVertexCommand(List<MeshObject> geometryList, Vector3 pivotPoint)
+        public void Configure(List<MeshObject> geometryList, Vector3 pivotPoint)
         {
             _geometryList = geometryList;
             PivotPoint = pivotPoint;
         }
 
-        public override string GetHintText()
+        public string HintText { get => "Transform"; }
+        public bool IsMutation { get => true; }
+
+
+        public TransformVertexCommand(SelectionManager selectionManager)
         {
-            return "Transform";
+            _selectionManager = selectionManager;
         }
 
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-        }
-
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _oldSelectionState = _selectionManager.GetStateCopy();
             // Nothing to do, vertexes already updated
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             Transform.Decompose(out var scale, out var rot, out var trans);
 

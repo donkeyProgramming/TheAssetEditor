@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using View3D.Commands;
 using View3D.Commands.Object;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
@@ -16,6 +17,9 @@ namespace KitbasherEditor.ViewModels.PinTool
     public class PinToolViewModel
     {
         IComponentManager _componentManager;
+        private readonly CommandExecutor _commandExecutor;
+        private readonly SelectionManager _selectionManager;
+        private readonly CommandFactory _commandFactory;
 
         public NotifyAttr<bool> IsPintToPointMode { get; set; } = new NotifyAttr<bool>(true);
         public NotifyAttr<bool> IsSkinwrapMode { get; set; } = new NotifyAttr<bool>(false);
@@ -30,9 +34,10 @@ namespace KitbasherEditor.ViewModels.PinTool
         public NotifyAttr<string> SelectedForStaticDescription { get; set; } = new NotifyAttr<string>($"Selected vertex count : ");
 
 
-        public PinToolViewModel(IComponentManager componentManager)
+        public PinToolViewModel(SelectionManager selectionManager, CommandFactory commandFactory)
         {
-            _componentManager = componentManager;
+            _selectionManager = selectionManager;
+            _commandFactory = commandFactory;
         }
 
         public void ClearSourcedMeshCollection() => SourceMeshCollection.Clear();
@@ -48,9 +53,7 @@ namespace KitbasherEditor.ViewModels.PinTool
             SelectedForStaticMeshName.Value = "";
             SelectedForStaticDescription.Value = $"Selected vertex count : ";
 
-            var selectionState = _componentManager
-                       .GetComponent<SelectionManager>()
-                       .GetState<VertexSelectionState>();
+            var selectionState = _selectionManager.GetState<VertexSelectionState>();
 
             if (selectionState == null || selectionState.SelectionCount() == 0)
             {
@@ -124,9 +127,7 @@ namespace KitbasherEditor.ViewModels.PinTool
                 return;
             }
 
-             var cmd = new PinMeshToVertexCommand(AffectedMeshCollection, _selectedVertexMesh, _selectedVertexList.First());
-             var commandExecutor = _componentManager.GetComponent<CommandExecutor>();
-             commandExecutor.ExecuteCommand(cmd);
+            _commandFactory.Create<PinMeshToVertexCommand>().Configure(x => x.Configure(AffectedMeshCollection, _selectedVertexMesh, _selectedVertexList.First())).BuildAndExecute();
         }
 
         void ApplySkinWrapRigging()
@@ -158,17 +159,14 @@ namespace KitbasherEditor.ViewModels.PinTool
                 }
             }
 
-
-            var cmd = new SkinWrapRiggingCommand(AffectedMeshCollection, SourceMeshCollection);
-            var commandExecutor = _componentManager.GetComponent<CommandExecutor>();
-            commandExecutor.ExecuteCommand(cmd);
+            _commandFactory.Create<SkinWrapRiggingCommand>().Configure(x => x.Configure(AffectedMeshCollection, SourceMeshCollection)).BuildAndExecute();
         }
 
-        public static void ShowWindow(IComponentManager componentManager)
+        public static void ShowWindow(SelectionManager selectionManager, CommandFactory commandFactory)
         {
             var window = new ControllerHostWindow(true)
             {
-                DataContext = new PinToolViewModel(componentManager),
+                DataContext = new PinToolViewModel(selectionManager, commandFactory),
                 Title = "Pin tool",
                 Content = new PinToolView(),
                 Width = 360,

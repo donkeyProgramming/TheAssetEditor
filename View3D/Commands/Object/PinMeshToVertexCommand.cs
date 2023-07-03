@@ -1,17 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using View3D.Animation;
 using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 
 namespace View3D.Commands.Object
 {
-    public class PinMeshToVertexCommand : CommandBase<PinMeshToVertexCommand>
+    public class PinMeshToVertexCommand : ICommand
     {
         ISelectionState _selectionOldState;
         SelectionManager _selectionManager;
@@ -24,25 +20,22 @@ namespace View3D.Commands.Object
         int _vertexId;
 
 
-        public PinMeshToVertexCommand(IEnumerable<Rmv2MeshNode> meshesToPin, Rmv2MeshNode source, int vertexId)
+        public void Configure(IEnumerable<Rmv2MeshNode> meshesToPin, Rmv2MeshNode source, int vertexId)
         {
             _meshesToPin = meshesToPin.ToList();
             _source = source;
             _vertexId = vertexId;
         }
 
-        public override string GetHintText()
+        public string HintText { get => "Pin meshes to vertex"; }
+        public bool IsMutation { get => true; }
+
+        public PinMeshToVertexCommand(SelectionManager selectionManager)
         {
-            return "Pin meshes to vertex";
+            _selectionManager = selectionManager;
         }
 
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-            base.Initialize(componentManager);
-        }
-
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             // Create undo state
             _originalGeos = _meshesToPin.Select(x => x.Geometry.Clone()).ToList();
@@ -66,7 +59,7 @@ namespace View3D.Commands.Object
             }
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             for (int i = 0; i < _meshesToPin.Count; i++)
             {

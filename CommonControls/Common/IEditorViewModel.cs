@@ -1,4 +1,5 @@
 ﻿using CommonControls.FileTypes.PackFiles.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CommonControls.Common
 {
@@ -17,7 +18,5 @@ namespace CommonControls.Common
         void CreateEmptyEditor(IEditorViewModel editorView);
     }
 
-
     public delegate void EditorSavedDelegate(PackFile newFile);
-
 }

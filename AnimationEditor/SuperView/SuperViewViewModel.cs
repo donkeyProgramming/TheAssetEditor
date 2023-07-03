@@ -1,37 +1,36 @@
-﻿using AnimationEditor.PropCreator.ViewModels;
+﻿using AnimationEditor.Common.AnimationPlayer;
+using AnimationEditor.Common.ReferenceModel;
+using AnimationEditor.PropCreator.ViewModels;
+using Common;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
-using CommonControls.FileTypes.DB;
 using CommonControls.Services;
+using MonoGame.Framework.WpfInterop;
+using View3D.Components;
+using View3D.Scene;
 
 namespace AnimationEditor.SuperView
 {
-    public class SuperViewViewModel : BaseAnimationViewModel
+    public class SuperViewViewModel : BaseAnimationViewModel<Editor>
     {
-        CopyPasteManager _copyPasteManager;
-        public SuperViewViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, CopyPasteManager copyPasteManager, ApplicationSettingsService applicationSettingsService) 
-            : base(toolFactory, pfs, skeletonHelper, applicationSettingsService, "not_in_use1", "not_in_use2", false)
+        private readonly ReferenceModelSelectionViewModelBuilder _referenceModelSelectionViewModelBuilder;
+
+        public SuperViewViewModel(ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder, Editor editor, AnimationPlayerViewModel animationPlayerViewModel, EventHub eventHub, 
+            IComponentInserter componentInserter,  MainScene scene) 
+            : base(componentInserter, animationPlayerViewModel, scene)
         {
-            _copyPasteManager = copyPasteManager;
             DisplayName.Value = "Super view";
-            Pfs = pfs;
+            _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
+            Editor = editor;
+           
+            eventHub.Register<SceneInitializedEvent>(Initialize);
         }
 
-        public PackFileService Pfs { get; }
-
-        public override void Initialize()
+        void Initialize(SceneInitializedEvent sceneInitializedEvent)
         {
-            MainModelView.IsControlVisible.Value = false;
-            ReferenceModelView.IsControlVisible.Value = false;
-            ReferenceModelView.Data.IsSelectable = false;
-
-            var typedEditor = new Editor(_toolFactory ,Scene, _pfs, _skeletonHelper, Player, _copyPasteManager, _applicationSettingsService);
-            Editor = typedEditor;
-
-            if (MainInput == null)
-                MainInput = new AnimationToolInput();
-
-            typedEditor.Create(MainInput);
+            MainModelView.Value = _referenceModelSelectionViewModelBuilder.CreateEmpty();
+            ReferenceModelView.Value = _referenceModelSelectionViewModelBuilder.CreateEmpty();
+            Editor.Create(MainInput); 
         }
     }
 
@@ -39,7 +38,7 @@ namespace AnimationEditor.SuperView
     {
         public static void CreateDamselEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<SuperViewViewModel>();
+            var editorView = toolFactory.Create<SuperViewViewModel>();
             editorView.MainInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_alarielle.variantmeshdefinition"),
@@ -64,7 +63,7 @@ namespace AnimationEditor.SuperView
 
         public static void CreateThrot(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<SuperViewViewModel>();
+            var editorView = toolFactory.Create<SuperViewViewModel>();
             editorView.MainInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_throt.variantmeshdefinition"),
@@ -78,7 +77,7 @@ namespace AnimationEditor.SuperView
 
         public static void CreatePlaguebearer(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<SuperViewViewModel>();
+            var editorView = toolFactory.Create<SuperViewViewModel>();
             editorView.MainInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\dae_plaguebearer_plagueridden.variantmeshdefinition"),

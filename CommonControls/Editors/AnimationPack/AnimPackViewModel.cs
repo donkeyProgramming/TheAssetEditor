@@ -7,6 +7,7 @@ using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,7 +17,6 @@ using System.Windows.Input;
 
 namespace CommonControls.Editors.AnimationPack
 {
-
     public class AnimPackViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
         PackFileService _pfs;

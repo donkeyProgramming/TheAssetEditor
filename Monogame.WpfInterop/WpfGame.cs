@@ -1,14 +1,13 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Common;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 
+
 namespace MonoGame.Framework.WpfInterop
 {
-    public delegate void SceneInitializedDelegate(WpfGame scene);
-
-
     public interface IComponentManager
     {
         public T GetComponent<T>() where T : IGameComponent;
@@ -16,14 +15,16 @@ namespace MonoGame.Framework.WpfInterop
         public void RemoveComponent<T>(T comp) where T : IGameComponent;
     }
 
-
+    public class SceneInitializedEvent
+    {
+    }
 
     /// <summary>
     /// The replacement for <see cref="Game"/>. Unlike <see cref="Game"/> the <see cref="WpfGame"/> is a WPF control and can be hosted inside WPF windows.
     /// </summary>
     public abstract class WpfGame : D3D11Host, IComponentManager
     {
-        public event SceneInitializedDelegate SceneInitialized;
+        private readonly EventHub _eventHub;
         private readonly string _contentDir;
 
         #region Fields
@@ -39,11 +40,11 @@ namespace MonoGame.Framework.WpfInterop
         /// <summary>
         /// Creates a new instance of a game host panel.
         /// </summary>
-        protected WpfGame(string contentDir = "ContentOutput")
+        protected WpfGame(EventHub eventHub, string contentDir = "ContentOutput")
         {
             if (string.IsNullOrEmpty(contentDir))
                 throw new ArgumentNullException(nameof(contentDir));
-
+            _eventHub = eventHub;
             _contentDir = contentDir;
 
             Focusable = true;
@@ -100,7 +101,6 @@ namespace MonoGame.Framework.WpfInterop
             Components.ComponentRemoved -= ComponentRemoved;
             Components.Clear();
 
-
             Services.RemoveService(typeof(IGraphicsDeviceService));
             Services.RemoveService(typeof(IGraphicsDeviceManager));
 
@@ -144,7 +144,7 @@ namespace MonoGame.Framework.WpfInterop
             Components.ComponentRemoved += ComponentRemoved;
 
             LoadContent();
-            SceneInitialized?.Invoke(this);
+            _eventHub.Publish(new SceneInitializedEvent());
         }
 
         /// <summary>

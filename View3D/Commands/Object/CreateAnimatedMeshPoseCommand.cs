@@ -1,15 +1,13 @@
 ﻿using CommonControls.FileTypes.RigidModel;
 using Microsoft.Xna.Framework;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using View3D.Animation;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 
 namespace View3D.Commands.Object
 {
-    public class CreateAnimatedMeshPoseCommand : CommandBase<CreateAnimatedMeshPoseCommand>
+    public class CreateAnimatedMeshPoseCommand : ICommand
     {
         List<MeshObject> _originalGeometries;
 
@@ -17,19 +15,18 @@ namespace View3D.Commands.Object
         AnimationFrame _frame;
         bool _convertToStaticFrame;
 
-        public CreateAnimatedMeshPoseCommand(List<Rmv2MeshNode> meshNodes, AnimationFrame frame, bool convertToStaticFrame = false)
+        public string HintText { get => "Created static mesh from animation"; }
+        public bool IsMutation { get => true; }
+
+        public void Configure(List<Rmv2MeshNode> meshNodes, AnimationFrame frame, bool convertToStaticFrame = false)
         {
             _meshNodes = new List<Rmv2MeshNode>(meshNodes);
             _frame = frame;
             _convertToStaticFrame = convertToStaticFrame;
         }
 
-        public override string GetHintText()
-        {
-            return "Created static mesh from animation"; 
-        }
-
-        protected override void ExecuteCommand()
+   
+        public void Execute()
         {
             _originalGeometries = new List<MeshObject>();
             foreach (var node in _meshNodes)
@@ -52,7 +49,7 @@ namespace View3D.Commands.Object
             }
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             for (int i = 0; i < _meshNodes.Count; i++)
                 _meshNodes[i].Geometry = _originalGeometries[i];

@@ -15,24 +15,6 @@ namespace CommonControls.Common
         public static string BackupFolderPath = "Backup";
         static readonly ILogger _logger = Logging.CreateStatic(typeof(SaveHelper));
 
-        public static void Save(PackFileService packFileService, PackFile inputFile)
-        {
-            var selectedEditabelPackFile = packFileService.GetEditablePack();
-            var filePackFileConainer = packFileService.GetPackFileContainer(inputFile);
-
-            if (selectedEditabelPackFile == null)
-            {
-                MessageBox.Show("No editable pack selected!");
-                return;
-            }
-
-            if (filePackFileConainer != selectedEditabelPackFile)
-            {
-                var filePath = packFileService.GetFullPath(inputFile, filePackFileConainer);
-                packFileService.CopyFileFromOtherPackFile(filePackFileConainer, filePath, selectedEditabelPackFile);
-            }
-        }
-
         static bool PrompOverrideOrNew(PackFileService packFileService, PackFile existingFile, out string newFullPath)
         {
             var owningPack = packFileService.GetPackFileContainer(existingFile);
@@ -67,14 +49,6 @@ namespace CommonControls.Common
             }
 
             return true;
-        }
-
-        public static PackFile SaveBytes(PackFileService packFileService, string fullPath, byte[] bytes, bool promptSaveOverride = true)
-        {
-            var directoryPath = Path.GetDirectoryName(fullPath);
-            var filePath = Path.GetFileNameWithoutExtension(fullPath);
-            var pf = new PackFile(filePath, new MemorySource(bytes));
-            return SavePackFile(packFileService, directoryPath, pf, promptSaveOverride);
         }
 
         public static PackFile SavePackFile(PackFileService packFileService, string folder, PackFile pf, bool promptSaveOverride = true)

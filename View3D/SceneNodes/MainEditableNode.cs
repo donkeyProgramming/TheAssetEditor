@@ -14,17 +14,15 @@ namespace View3D.SceneNodes
         private readonly PackFileService _pfs;
 
         public SkeletonNode SkeletonNode { get; private set; }
-        public PackFile MainPackFile { get; private set; }
         public RmvVersionEnum SelectedOutputFormat { get; set; }
         public TextureFileEditorService TextureFileEditorService { get; set; }
         AnimationPlayer _player;
 
-        public MainEditableNode(AnimationPlayer player, string name, SkeletonNode skeletonNode, PackFile mainFile, PackFileService pfs) : base(name)
+        public MainEditableNode(AnimationPlayer player, string name, SkeletonNode skeletonNode,  PackFileService pfs) : base(name)
         {
             _pfs = pfs;
             _player = player;
             SkeletonNode = skeletonNode;
-            MainPackFile = mainFile;
             TextureFileEditorService = new TextureFileEditorService(this, pfs);
         }
 

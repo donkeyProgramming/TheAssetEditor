@@ -1,7 +1,8 @@
-﻿using AnimationEditor.AnimationBuilder;
-using AnimationEditor.AnimationTransferTool;
+﻿using AnimationEditor.AnimationTransferTool;
 using AnimationEditor.CampaignAnimationCreator;
+using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.BaseControl;
+using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.SkeletonEditor;
 using AnimationEditor.SuperView;
@@ -14,13 +15,26 @@ namespace AnimationEditor
     {
         public static void Register(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddTransient<MountAnimationCreatorViewModel>();
-            serviceCollection.AddTransient<CampaignAnimationCreatorViewModel>();
-            serviceCollection.AddTransient<AnimationTransferToolViewModel>();
-            serviceCollection.AddTransient<SuperViewViewModel>();
-            serviceCollection.AddTransient<SkeletonEditorViewModel>();
-            serviceCollection.AddTransient<AnimationBuilderViewModel>();
-            serviceCollection.AddTransient<BaseAnimationView>();
+            serviceCollection.AddScoped<AssetViewModelBuilder>();
+            serviceCollection.AddTransient<AssetViewModel>();
+            serviceCollection.AddScoped<AnimationPlayerViewModel>();
+            serviceCollection.AddScoped<ReferenceModelSelectionViewModelBuilder>();
+            
+
+            serviceCollection.AddScoped<SuperView.Editor>();
+            serviceCollection.AddScoped<SkeletonEditor.Editor>();
+            serviceCollection.AddScoped<MountAnimationCreator.Editor>();
+            serviceCollection.AddScoped<CampaignAnimationCreator.Editor>();
+            serviceCollection.AddScoped<AnimationTransferTool.Editor>();
+
+
+            serviceCollection.AddScoped<MountAnimationCreatorViewModel>();
+            serviceCollection.AddScoped<CampaignAnimationCreatorViewModel>();
+            serviceCollection.AddScoped<AnimationTransferToolViewModel>();
+            serviceCollection.AddScoped<SuperViewViewModel>();
+            serviceCollection.AddScoped<SkeletonEditorViewModel>();
+           // serviceCollection.AddScoped<AnimationBuilderViewModel>();
+            serviceCollection.AddScoped<BaseAnimationView>();
         }
 
         public static void RegisterTools(IToolFactory factory)
@@ -30,7 +44,7 @@ namespace AnimationEditor
             factory.RegisterTool<AnimationTransferToolViewModel, BaseAnimationView>();
             factory.RegisterTool<SuperViewViewModel, BaseAnimationView>();
             factory.RegisterTool<SkeletonEditorViewModel, BaseAnimationView>();
-            factory.RegisterTool<AnimationBuilderViewModel, BaseAnimationView>();
+           // factory.RegisterTool<AnimationBuilderViewModel, BaseAnimationView>();
         }
     }
 }

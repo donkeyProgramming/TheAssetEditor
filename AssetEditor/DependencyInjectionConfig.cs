@@ -11,7 +11,6 @@ using CommonControls.Editors.CampaignAnimBin;
 using CommonControls.Editors.TextEditor;
 using CommonControls.Editors.VariantMeshDefinition;
 using CommonControls.Editors.Wtui;
-using CommonControls.FileTypes.DB;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Resources;
 using CommonControls.Services;
@@ -20,11 +19,19 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using TextureEditor;
 using View3D;
+using CommonControls.Events;
+using Common;
 
 namespace AssetEditor
 {
     public class DependencyInjectionConfig
     {
+        DependencyContainer[] dependencyContainers = new DependencyContainer[]
+        {
+            new View3D_DependencyContainer(),
+            new KitbasherEditor_DependencyInjectionContainer(),
+        };
+
         public IServiceProvider ServiceProvider { get; private set; }
         
         public DependencyInjectionConfig()
@@ -35,8 +42,8 @@ namespace AssetEditor
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
 
-            ServiceProvider = serviceCollection.BuildServiceProvider();
-            RegisterTools(ServiceProvider.GetService<ToolFactory>());
+            ServiceProvider = serviceCollection.BuildServiceProvider(validateScopes:true);
+            RegisterTools(ServiceProvider.GetService<IToolFactory>());
         }
 
         public void ConfigureResources()
@@ -47,22 +54,29 @@ namespace AssetEditor
         private void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<ApplicationSettingsService>();
-            services.AddSingleton<ToolFactory>();
+            services.AddSingleton<IToolFactory, ToolFactory>();
             services.AddSingleton<PackFileDataBase>();
             services.AddSingleton<SkeletonAnimationLookUpHelper>();
             services.AddSingleton<CopyPasteManager>();
             services.AddSingleton<GameInformationFactory>();
+            services.AddSingleton<PackFileService>();
 
-            services.AddTransient<MainWindow>();
-            services.AddTransient<MainViewModel>();
-            services.AddTransient<SettingsWindow>();
-            services.AddTransient<SettingsViewModel>();
-            services.AddTransient<MenuBarViewModel>();
-            services.AddTransient<PackFileService>();
+            services.AddSingleton<GlobalEventSender>();
+            services.AddSingleton<ScopeRepository>();
+            services.AddScoped<EventHub>();
+            services.AddScoped<SubToolWindowCreator>();
+            
+
+            services.AddScoped<MainWindow>();
+            services.AddScoped<MainViewModel>();
+            services.AddScoped<SettingsWindow>();
+            services.AddScoped<SettingsViewModel>();
+            services.AddScoped<MenuBarViewModel>();
+
+            foreach (var container in dependencyContainers)
+                container.Register(services);
 
             TextEditor_DependencyInjectionContainer.Register(services);
-            KitbasherEditor_DependencyInjectionContainer.Register(services);
-            View3D_DependencyInjectionContainer.Register(services);
             AnimMetaEditor_DependencyInjectionContainer.Register(services);
             AnimationEditors_DependencyInjectionContainer.Register(services);
             AnimationPack_DependencyInjectionContainer.Register(services);
@@ -78,9 +92,10 @@ namespace AssetEditor
 
         void RegisterTools(IToolFactory factory)
         {
+            foreach (var container in dependencyContainers)
+                container.RegisterTools(factory);
+
             TextEditor_DependencyInjectionContainer.RegisterTools(factory);
-            KitbasherEditor_DependencyInjectionContainer.RegisterTools(factory);
-            View3D_DependencyInjectionContainer.RegisterTools(factory);
             AnimMetaEditor_DependencyInjectionContainer.RegisterTools(factory);
             AnimationEditors_DependencyInjectionContainer.RegisterTools(factory);
             AnimationPack_DependencyInjectionContainer.RegisterTools(factory);
@@ -95,8 +110,9 @@ namespace AssetEditor
 
         public void ShowMainWindow()
         {
-            var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
-            mainWindow.DataContext = ServiceProvider.GetRequiredService<MainViewModel>();
+            using var scope = ServiceProvider.CreateScope();
+            var mainWindow = scope.ServiceProvider.GetRequiredService<MainWindow>();
+            mainWindow.DataContext = scope.ServiceProvider.GetRequiredService<MainViewModel>();
             mainWindow.Show();
         }
     }

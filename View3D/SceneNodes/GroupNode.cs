@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using View3D.Components.Gizmo;
 
 namespace View3D.SceneNodes
 {

@@ -2,10 +2,6 @@
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop;
 using MonoGame.Framework.WpfInterop.Input;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using View3D.Components;
 
 namespace View3D.Components.Input
 {
@@ -17,19 +13,12 @@ namespace View3D.Components.Input
 
         KeyboardState _currentKeyboardState;
         KeyboardState _lastKeyboardState;
-
         WpfKeyboard _wpfKeyboard;
 
-        public KeyboardComponent(WpfGame game) : base(game)
+        public KeyboardComponent(WpfGame game) 
         {
             _wpfKeyboard = new WpfKeyboard(game);
             UpdateOrder = (int)ComponentUpdateOrderEnum.Input;
-        }
-
-        public void Reset()
-        {
-            _currentKeyboardState = _wpfKeyboard.GetState();
-            _lastKeyboardState = _wpfKeyboard.GetState();
         }
 
         public override void Update(GameTime t)

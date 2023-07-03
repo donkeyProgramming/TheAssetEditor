@@ -59,7 +59,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         {
             var newPiv = new Vector3((float)Pivot.X.Value, (float)Pivot.Y.Value, (float)Pivot.Z.Value);
 
-            var root = _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode();
+            var scenaManager = _componentManager.GetComponent<SceneManager>();
+            var root = scenaManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             var allMeshes = root.GetMeshesInLod(0, false);
             foreach (var mesh in allMeshes)
                 mesh.UpdatePivotPoint(newPiv);

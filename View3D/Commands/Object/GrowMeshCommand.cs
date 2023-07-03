@@ -9,7 +9,7 @@ using View3D.SceneNodes;
 
 namespace View3D.Commands.Object
 {
-    public class GrowMeshCommand : CommandBase<GrowMeshCommand>
+    public class GrowMeshCommand : ICommand
     {
         Rmv2MeshNode _node;
         float _factor;
@@ -18,7 +18,7 @@ namespace View3D.Commands.Object
 
         MeshObject _backup;
 
-        public GrowMeshCommand(GameSkeleton skeleton, Rmv2MeshNode node, float factor, List<int> bonesAffectedScale)
+        public void Configure(GameSkeleton skeleton, Rmv2MeshNode node, float factor, List<int> bonesAffectedScale)
         {
             _node = node;
             _factor = factor;
@@ -26,17 +26,11 @@ namespace View3D.Commands.Object
             _bonesAffectedScale = bonesAffectedScale;
         }
 
-        public override string GetHintText()
-        {
-            return "Grow mesh";
-        }
 
-        public override void Initialize(IComponentManager componentManager)
-        {
-            //_selectionManager = componentManager.GetComponent<SelectionManager>();
-        }
+        public string HintText { get => "Grow mesh"; }
+        public bool IsMutation { get => true; }
 
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _backup = _node.Geometry.Clone();
 
@@ -87,7 +81,7 @@ namespace View3D.Commands.Object
             mesh.RebuildVertexBuffer();
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             _node.Geometry = _backup;
         }
