@@ -108,12 +108,10 @@ namespace View3D.Components.Input
             throw new NotImplementedException("trying to use a mouse button which is not added");
         }
 
-
         public Vector2 Position()
         {
             return new Vector2(_currentMouseState.X, _currentMouseState.Y);
         }
-
 
         public Vector2 DeltaPosition()
         {
