@@ -27,7 +27,6 @@ namespace TextureEditor.ViewModels
         TexturePreviewController _controller;
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>();
-        public IServiceScope ServiceScope { get; set; }
 
         public PackFile MainFile { get => _file; set => Load(value); }
         public bool HasUnsavedChanges { get => false; set { } }

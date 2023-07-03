@@ -26,7 +26,6 @@ namespace View3D.Components.Component
 
         public override void Initialize()
         {
-
             _gridMesh = new LineMeshRender(_resourceLibary);
             _gridMesh.CreateGrid();
 
@@ -41,7 +40,8 @@ namespace View3D.Components.Component
 
         public void Dispose()
         {
-            _gridMesh.Dispose();
+            if(_gridMesh != null)
+                _gridMesh.Dispose();
             _gridMesh = null;
         }
     }

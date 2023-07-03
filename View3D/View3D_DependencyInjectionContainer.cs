@@ -39,7 +39,6 @@ namespace View3D
             serviceCollection.AddScoped<ObjectEditor>();
             serviceCollection.AddScoped<MetaDataFactory>(); // Needs heavy refactorying!
             
-
             // Resolvers - sort of hacks 
             serviceCollection.AddScoped<IDeviceResolver, DeviceResolverComponent>(x => x.GetService<DeviceResolverComponent>());
             serviceCollection.AddScoped<ActiveFileResolver>();
@@ -100,7 +99,6 @@ namespace View3D
             serviceCollection.AddTransient<RemapBoneIndexesCommand>();
         }
     }
-
 
     public class DependencyContainer
     {

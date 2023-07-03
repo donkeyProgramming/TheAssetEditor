@@ -6,7 +6,6 @@ using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
-using Microsoft.Extensions.DependencyInjection;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
@@ -21,7 +20,6 @@ namespace KitbasherEditor.ViewModels
     public class KitbasherViewModel : NotifyPropertyChangedImpl, IEditorViewModel,
         IDropTarget<TreeNode>
     {
-        public IServiceScope ServiceScope { get; set; }
         ILogger _logger = Logging.Create<KitbasherViewModel>();
         private readonly PackFileService _packFileService;
         private readonly KitbashSceneCreator _kitbashSceneCreator;
@@ -39,16 +37,24 @@ namespace KitbasherEditor.ViewModels
         public PackFile MainFile { get; set; }
         private bool _hasUnsavedChanges;
 
-        public KitbasherViewModel(PackFileService packFileService, EventHub eventHub,
-            MainScene sceneContainer, MenuBarViewModel menuBarViewModel,
-            AnimationControllerViewModel animationControllerViewModel, IComponentInserter componentInserter,
-            KitbashSceneCreator kitbashSceneCreator, SceneExplorerViewModel sceneExplorerViewModel, ActiveFileResolver activeFileResolver, FocusSelectableObjectService focusSelectableObjectComponent, KitbashViewDropHandler dropHandler)
+        public KitbasherViewModel(PackFileService packFileService,
+            EventHub eventHub,
+            MainScene sceneContainer,
+            MenuBarViewModel menuBarViewModel,
+            AnimationControllerViewModel animationControllerViewModel, 
+            IComponentInserter componentInserter,
+            KitbashSceneCreator kitbashSceneCreator, 
+            SceneExplorerViewModel sceneExplorerViewModel,
+            ActiveFileResolver activeFileResolver,
+            FocusSelectableObjectService focusSelectableObjectComponent,
+            KitbashViewDropHandler dropHandler)
         {
             _packFileService = packFileService;
             _activeFileResolver = activeFileResolver;
             _kitbashSceneCreator = kitbashSceneCreator;
             _focusSelectableObjectComponent = focusSelectableObjectComponent;
             _dropHandler = dropHandler;
+           
             Scene = sceneContainer;
             Animation = animationControllerViewModel;
             SceneExplorer = sceneExplorerViewModel;
@@ -56,25 +62,14 @@ namespace KitbasherEditor.ViewModels
 
             componentInserter.Execute();
 
-            eventHub.Register<FileSavedEvent>(Handle);
-            eventHub.Register<CommandStackChangedEvent>(Handle);
-            eventHub.Register<SceneInitializedEvent>(Handle);
-            eventHub.Register<PackFileSavedEvent>(Handle);
+            eventHub.Register<FileSavedEvent>(OnFileSaved);
+            eventHub.Register<CommandStackChangedEvent>(OnCommandStackChanged);
+            eventHub.Register<SceneInitializedEvent>(OnSceneInitialized);
         }
 
         public bool Save() => true;
 
-        public void Close()
-        {
-            Scene.Dispose();
-            MenuBar = null;
-            Scene = null;
-            Scene = null;
-            SceneExplorer = null;
-            MenuBar = null;
-            Animation = null;
-            MainFile = null;
-        }
+        public void Close(){ }
 
         public bool HasUnsavedChanges
         {
@@ -89,40 +84,31 @@ namespace KitbasherEditor.ViewModels
         public bool AllowDrop(TreeNode node, TreeNode targeNode = null) => _dropHandler.AllowDrop(node, targeNode);
         public bool Drop(TreeNode node, TreeNode targeNode = null) => _dropHandler.Drop(node, targeNode);
 
-
-        void Handle(PackFileSavedEvent notification)
-        { 
-        
-        }
-
-         void Handle(FileSavedEvent notification)
+        void OnFileSaved(FileSavedEvent notification)
         {
             HasUnsavedChanges = false;
         }
 
-        public void Handle(SceneInitializedEvent notification)
+        void OnSceneInitialized(SceneInitializedEvent notification)
         {
-            _activeFileResolver.ActiveFileName = _packFileService.GetFullPath(MainFile);
-            _kitbashSceneCreator.Create(MainFile);
-
-            if (MainFile != null)
+            try
             {
-                try
-                {
-                    _kitbashSceneCreator.LoadMainEditableModel(MainFile);
-                    _focusSelectableObjectComponent.FocusScene();
-                    DisplayName.Value = MainFile.Name;
-                }
-                catch (Exception e)
-                {
-                    _logger.Here().Error($"Error loading file {MainFile?.Name} - {e}");
-                    MessageBox.Show($"Unable to load file\n+{e.Message}");
-                }
-            }
+                _activeFileResolver.ActiveFileName = _packFileService.GetFullPath(MainFile);
 
+                _kitbashSceneCreator.Create();
+                _kitbashSceneCreator.LoadMainEditableModel(MainFile);
+                _focusSelectableObjectComponent.FocusScene();
+
+                DisplayName.Value = MainFile.Name;
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error($"Error loading file {MainFile?.Name} - {e}");
+                MessageBox.Show($"Unable to load file\n+{e.Message}");
+            }
         }
 
-        public void Handle(CommandStackChangedEvent notification)
+        void OnCommandStackChanged(CommandStackChangedEvent notification)
         {
             if(notification.IsMutation)
                 HasUnsavedChanges = true;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 using TextureEditor.Views;
-using static View3D.Utility.ResourceLibary;
+using View3D.Utility;
 
 namespace TextureEditor.ViewModels
 {

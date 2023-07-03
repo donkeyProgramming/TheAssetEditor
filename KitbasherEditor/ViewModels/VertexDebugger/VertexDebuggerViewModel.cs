@@ -1,13 +1,9 @@
 ﻿using Common;
 using CommonControls.MathViews;
-using KitbasherEditor.Views.EditorViews.VertexDebugger;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.ObjectModel;
-using System.Windows;
 using View3D.Components;
 using View3D.Components.Component.Selection;
 using View3D.Components.Rendering;
@@ -21,25 +17,8 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
 {
     class VertexDebuggerViewModel : BaseComponent, IDisposable
     {
-        public class VertexInstance
-        {
-            public int Id { get; set; }
-            public Vector4 AnimIndecies { get; set; }
-            public Vector4 AnimWeights { get; set; }
-            public float TotalWeight { get; set; }
-
-            public Vector3 Normal { get; set; }
-            public float NormalLength { get; set; }
-            public Vector3 BiNormal { get; set; }
-            public float BiNormalLength { get; set; }
-            public Vector3 Tangent { get; set; }
-            public float TangentLength { get; set; }
-
-            public Vector4 Position { get; set; }
-
-        }
-
         public ObservableCollection<VertexInstance> VertexList { get; set; } = new ObservableCollection<VertexInstance>();
+       
         VertexInstance _selectedVertex;
         public VertexInstance SelectedVertex
         {
@@ -56,16 +35,23 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
 
         LineMeshRender _lineRenderer;
         Effect _lineShader;
+
         private readonly RenderEngineComponent _renderEngineComponent;
         private readonly ResourceLibary _resourceLibary;
         private readonly SelectionManager _selectionManager;
+        private readonly EventHub _eventHub;
 
-        public VertexDebuggerViewModel(RenderEngineComponent renderEngineComponent, ResourceLibary resourceLibary, SelectionManager selectionManager, EventHub eventHub) 
+        public VertexDebuggerViewModel(RenderEngineComponent renderEngineComponent, 
+            ResourceLibary resourceLibary,
+            SelectionManager selectionManager,
+            EventHub eventHub) 
         {
             _renderEngineComponent = renderEngineComponent;
             _resourceLibary = resourceLibary;
             _selectionManager = selectionManager;
-            eventHub.Register<SelectionChangedEvent>(Handle);
+            _eventHub = eventHub;
+
+            _eventHub.Register<SelectionChangedEvent>(OnSelectionChanged);
         }
 
         public override void Initialize()
@@ -144,30 +130,12 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
             }
         }
 
-        public static void Create(IServiceProvider serviceProvider, IComponentManager componentManager)
-        {
-            var renderComp = componentManager.GetComponent<RenderEngineComponent>();
-            var viewModel = serviceProvider.GetService<VertexDebuggerViewModel>();
-            componentManager.AddComponent(viewModel);
-
-            var containingWindow = new Window();
-            containingWindow.Title = "Vertex debuger";
-            containingWindow.Width = 1200;
-            containingWindow.Height = 1100;
-            containingWindow.DataContext = viewModel;
-            containingWindow.Content = new VertexDebuggerView();
-            containingWindow.Closed += (x, y) => { componentManager.RemoveComponent(viewModel); viewModel.Dispose(); };
-            containingWindow.Show();
-        }
-
         public void Dispose()
         {
+            _eventHub.UnRegister<SelectionChangedEvent>(OnSelectionChanged);
             _lineRenderer.Dispose();
         }
 
-        void Handle(SelectionChangedEvent notification)
-        {
-            Refresh();
-        }
+        void OnSelectionChanged(SelectionChangedEvent notification) => Refresh();
     }
 }

@@ -19,7 +19,6 @@ namespace CommonControls.Editors.AnimationPack
 {
     public class AnimPackViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
-        public IServiceScope ServiceScope { get; set; }
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         ITextConverter _activeConverter;

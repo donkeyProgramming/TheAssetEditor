@@ -140,14 +140,29 @@ namespace View3D.Components.Component.Selection
 
         public void Dispose()
         {
-            _wireframeEffect.Effect.Dispose();
-            _wireframeEffect = null;
-            _selectedFacesEffect.Effect.Dispose();
-            _selectedFacesEffect = null;
-            VertexRenderer.Dispose();
-            VertexRenderer = null;
-            _lineGeometry.Dispose();
-            _lineGeometry = null;
+            if (_wireframeEffect != null)
+            {
+                _wireframeEffect.Effect.Dispose();
+                _wireframeEffect = null;
+            }
+
+            if (_selectedFacesEffect != null)
+            {
+                _selectedFacesEffect.Effect.Dispose();
+                _selectedFacesEffect = null;
+            }
+
+            if (VertexRenderer != null)
+            {
+                VertexRenderer.Dispose();
+                VertexRenderer = null;
+            }
+
+            if (_lineGeometry != null)
+            {
+                _lineGeometry.Dispose();
+                _lineGeometry = null;
+            }
 
             _currentState?.Clear();
             _currentState = null;

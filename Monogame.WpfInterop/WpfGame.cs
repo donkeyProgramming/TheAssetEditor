@@ -101,7 +101,6 @@ namespace MonoGame.Framework.WpfInterop
             Components.ComponentRemoved -= ComponentRemoved;
             Components.Clear();
 
-
             Services.RemoveService(typeof(IGraphicsDeviceService));
             Services.RemoveService(typeof(IGraphicsDeviceManager));
 

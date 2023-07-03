@@ -142,7 +142,7 @@ namespace View3D.Components.Input
 
         public void Dispose()
         {
-            _wpfMouse.Dispose();
+            _wpfMouse?.Dispose();
             _wpfMouse = null;
             _mouseOwner = null;
         }

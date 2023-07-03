@@ -1,6 +1,9 @@
 ﻿using Common;
+using CommonControls.Common;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CommonControls.Events
 {
@@ -18,12 +21,20 @@ namespace CommonControls.Events
 
     public class ScopeRepository
     {
-        public List<IServiceScope> Scopes { get; private set; } = new List<IServiceScope>();
-        public void Add(IServiceScope scope) => Scopes.Add(scope);
-        public void RemoveScope(IServiceScope scope)
+        public Dictionary<IEditorViewModel, IServiceScope> Scopes { get; private set; } = new Dictionary<IEditorViewModel, IServiceScope>();
+        
+        public void Add(IEditorViewModel owner, IServiceScope scope)
         {
-            scope.Dispose();
-            Scopes.Remove(scope);
+            if (Scopes.ContainsKey(owner))
+                throw new ArgumentException("Owner already added!");
+
+            Scopes.Add(owner, scope);
+        }
+
+        public void RemoveScope(IEditorViewModel owner)
+        {
+            Scopes[owner].Dispose();
+            Scopes.Remove(owner);
         }
     }
 
@@ -38,7 +49,7 @@ namespace CommonControls.Events
 
         public void TriggerEvent<T>(T e)
         {
-            foreach (var scope in _scopeRepository.Scopes)
+            foreach (var scope in _scopeRepository.Scopes.Values)
             {
                 var handler = scope.ServiceProvider.GetService<EventHub>();
                 if (handler != null)

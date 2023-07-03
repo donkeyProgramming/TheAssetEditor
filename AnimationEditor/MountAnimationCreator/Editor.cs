@@ -83,8 +83,7 @@ namespace AnimationEditor.MountAnimationCreator
            
             AnimationSettings.SettingsChanged += () => TryReGenerateAnimation(null);
 
-            MountSkeletonChanged(_mount.Skeleton);
-            RiderSkeletonChanges(_rider.Skeleton);
+
         }
 
         internal Editor Create(AssetViewModel rider, AssetViewModel mount, AssetViewModel newAnimation)
@@ -97,6 +96,9 @@ namespace AnimationEditor.MountAnimationCreator
             _mount.AnimationChanged += TryReGenerateAnimation;
             _rider.SkeletonChanged += RiderSkeletonChanges;
             _rider.AnimationChanged += TryReGenerateAnimation;
+
+            MountSkeletonChanged(_mount.Skeleton);
+            RiderSkeletonChanges(_rider.Skeleton);
 
             MountLinkController = new MountLinkViewModel(_assetViewModelBuilder, _pfs, _skeletonAnimationLookUpHelper, rider, mount, UpdateCanSaveAndPreviewStates);
 

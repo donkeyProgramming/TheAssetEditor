@@ -210,8 +210,9 @@ namespace View3D.Components.Component
             if (SceneObjectRemoved != null)
                 foreach (var d in SceneObjectRemoved.GetInvocationList())
                     SceneObjectRemoved -= (d as SceneObjectRemovedDelegate);
-
-            DisposeNode(RootNode);
+            
+            if(RootNode != null)
+                DisposeNode(RootNode);
             RootNode = null;
         }
 

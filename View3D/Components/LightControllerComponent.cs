@@ -177,7 +177,8 @@ namespace View3D.Components.Component
 
         public void Dispose()
         {
-            _spriteBatch.Dispose();
+            if(_spriteBatch != null)
+                _spriteBatch.Dispose();
             _spriteBatch = null;
         }
     }

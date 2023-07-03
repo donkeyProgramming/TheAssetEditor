@@ -64,6 +64,8 @@ namespace AssetEditor
             services.AddSingleton<GlobalEventSender>();
             services.AddSingleton<ScopeRepository>();
             services.AddScoped<EventHub>();
+            services.AddScoped<SubToolWindowCreator>();
+            
 
             services.AddScoped<MainWindow>();
             services.AddScoped<MainViewModel>();

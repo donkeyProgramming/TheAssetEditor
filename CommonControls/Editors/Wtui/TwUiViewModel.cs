@@ -39,8 +39,6 @@ namespace CommonControls.Editors.Wtui
             }
         }
 
-        public IServiceScope ServiceScope { get; set; }
-
         public TwUiViewModel(PackFileService pfs)
         {
             _pfs = pfs;

@@ -19,6 +19,10 @@ namespace Common
             }
         }
 
+        public void UnRegister<T>(Action<T> action)
+        { 
+        }
+
         public void Register<T>(Action<T> action)
         {
             if (_callbackList.ContainsKey(typeof(T)) == false)

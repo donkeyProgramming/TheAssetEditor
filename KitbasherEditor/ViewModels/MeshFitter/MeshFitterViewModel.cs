@@ -277,7 +277,6 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 MeshBones.SelectedItem.BoneScaleOffset = 1;
                 OnBoneSelected();
             }
-        
         }
 
         public void CopyScaleToChildren()
@@ -314,11 +313,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
         public void SaveAndClose()
         {
             var frame = AnimationSampler.Sample(0, _fromSkeleton, _animationClip);
-
-
-
             _commandFactory.Create<CreateAnimatedMeshPoseCommand>().Configure(x => x.Configure(_meshNodes, frame)).BuildAndExecute();
-
             _window.Close();
         }
 

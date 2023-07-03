@@ -3,7 +3,6 @@ using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
 using KitbasherEditor.ViewModels;
-using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -23,16 +22,22 @@ namespace KitbasherEditor.Services
         private MainEditableNode MainNode { get; set; }
         public ISceneNode ReferenceMeshNode { get; private set; }
 
-        PackFileService _packFileService;
-        ResourceLibary _resourceLibary;
-        AnimationControllerViewModel _animationView;
-        SceneManager _sceneManager;
+        private readonly PackFileService _packFileService;
+        private readonly ResourceLibary _resourceLibary;
+        private readonly AnimationControllerViewModel _animationView;
+        private readonly SceneManager _sceneManager;
         private readonly RenderEngineComponent _renderEngineComponent;
-        IGeometryGraphicsContextFactory _geometryFactory;
-        ApplicationSettingsService _applicationSettingsService;
+        private readonly IGeometryGraphicsContextFactory _geometryFactory;
+        private readonly ApplicationSettingsService _applicationSettingsService;
 
-        public KitbashSceneCreator(ResourceLibary resourceLibary, SceneManager sceneManager, RenderEngineComponent renderEngineComponent,
-            PackFileService packFileService, AnimationControllerViewModel animationView, IGeometryGraphicsContextFactory geometryFactory, ApplicationSettingsService applicationSettingsService)
+        public KitbashSceneCreator(
+            ResourceLibary resourceLibary,
+            SceneManager sceneManager,
+            RenderEngineComponent renderEngineComponent,
+            PackFileService packFileService,
+            AnimationControllerViewModel animationView, 
+            IGeometryGraphicsContextFactory geometryFactory,
+            ApplicationSettingsService applicationSettingsService)
         {
             _packFileService = packFileService;
             _animationView = animationView;
@@ -44,10 +49,10 @@ namespace KitbasherEditor.Services
             _renderEngineComponent = renderEngineComponent;
         }
 
-        public void Create(PackFile mainFile)
+        public void Create()
         {
             var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(_resourceLibary, null) { IsLockable = false });
-            MainNode = _sceneManager.RootNode.AddObject(new MainEditableNode(_animationView.GetPlayer(), SpecialNodes.EditableModel, skeletonNode, mainFile, _packFileService));
+            MainNode = _sceneManager.RootNode.AddObject(new MainEditableNode(_animationView.GetPlayer(), SpecialNodes.EditableModel, skeletonNode, _packFileService));
             ReferenceMeshNode = _sceneManager.RootNode.AddObject(new GroupNode(SpecialNodes.ReferenceMeshs) { IsEditable = false, IsLockable = false });
         }
 

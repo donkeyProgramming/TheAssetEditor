@@ -1,4 +1,5 @@
-﻿using CommonControls.BaseDialogs.ToolSelector;
+﻿using Assimp.Unmanaged;
+using CommonControls.BaseDialogs.ToolSelector;
 using CommonControls.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -9,9 +10,11 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using static CommonControls.Editors.AnimationPack.Converters.AnimationBinWh3FileToXmlConverter;
 
 namespace CommonControls.Common
 {
+
     public class ExtentionToTool : IPackFileToToolSelector
     {
         string[] _validExtentionsCore;
@@ -91,6 +94,7 @@ namespace CommonControls.Common
         IEditorViewModel Create(string fullFileName, bool useDefaultTool = false);
         ViewModel Create<ViewModel>() where ViewModel : IEditorViewModel;
         Window CreateAsWindow(IEditorViewModel viewModel);
+        void DestroyEditor(IEditorViewModel instance);
         Type GetViewTypeFromViewModel(Type viewModelType);
         void RegisterTool<ViewModel, View>(IPackFileToToolSelector toolSelector = null)
             where ViewModel : IEditorViewModel
@@ -163,8 +167,7 @@ namespace CommonControls.Common
 
             var scope = _serviceProvider.CreateScope();
             var instance = scope.ServiceProvider.GetService(selectedEditor) as IEditorViewModel;
-            instance.ServiceScope = scope;
-            _scopeRepository.Add(scope);
+            _scopeRepository.Add(instance, scope);
             return instance;
         }
 
@@ -204,10 +207,13 @@ namespace CommonControls.Common
         public ViewModel Create<ViewModel>() where ViewModel : IEditorViewModel
         {
             var scope = _serviceProvider.CreateScope();
-            var instance = scope.ServiceProvider.GetService< ViewModel>();
-            instance.ServiceScope = scope;
+            var instance = scope.ServiceProvider.GetService<ViewModel>();
+            _scopeRepository.Add(instance, scope);
             return instance;
         }
+
+        public void DestroyEditor(IEditorViewModel instance) => _scopeRepository.RemoveScope(instance);
+
     }
 
     class ToolInformation

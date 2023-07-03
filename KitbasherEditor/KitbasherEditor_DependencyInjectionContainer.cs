@@ -8,6 +8,7 @@ using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
+using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using Microsoft.Extensions.DependencyInjection;
 using View3D;
 
@@ -21,13 +22,17 @@ namespace KitbasherEditor
             serviceCollection.AddScoped<KitbashSceneCreator>();
             serviceCollection.AddScoped<SceneNodeViewFactory>();
 
-            // View models
-            serviceCollection.AddScoped<VertexDebuggerViewModel>();
+            // View models 
             serviceCollection.AddScoped<KitbasherView>();
             serviceCollection.AddScoped<KitbasherViewModel>();
             serviceCollection.AddScoped<IEditorViewModel, KitbasherViewModel>();
             serviceCollection.AddScoped<SceneExplorerViewModel>();
             serviceCollection.AddScoped<AnimationControllerViewModel>();
+
+            // Sub tools
+            serviceCollection.AddScoped<VertexDebuggerViewModel>();
+            serviceCollection.AddScoped<VertexDebuggerView>();
+            
 
             // Menubar 
             serviceCollection.AddScoped<TransformToolViewModel>();

@@ -1,5 +1,4 @@
 ﻿using AssetEditor.Views.Settings;
-using CommonControls.BaseDialogs.ToolSelector;
 using CommonControls.Common;
 using CommonControls.Events;
 using CommonControls.FileTypes.MetaData;
@@ -161,7 +160,7 @@ namespace AssetEditor.ViewModels
                 //AnimMetaBatchProcessor processor = new AnimMetaBatchProcessor();
                 //processor.BatchProcess(_packfileService, schemaManager, "Warhammer");
 
-                AnimationEditor.SuperView.SuperViewViewModel_Debug.CreateThrot(this, toolFactory, packfileService);
+                //AnimationEditor.SuperView.SuperViewViewModel_Debug.CreateThrot(this, toolFactory, packfileService);
                 //CampaignAnimationCreator_Debug.CreateDamselEditor(this, toolFactory, packfileService);
 
 
@@ -200,7 +199,7 @@ namespace AssetEditor.ViewModels
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hq3\nor\nor_war_mammoth\nor_war_mammoth_warshrine_01.rigid_model_v2"));
 
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc1\tmb\tmb_warsphinx\tex\tmb_warsphinx_armour_01_base_colour.dds"));
-                //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.rigid_model_v2"));
+                OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.rigid_model_v2"));
 
 
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
@@ -311,7 +310,7 @@ namespace AssetEditor.ViewModels
 
             var index = CurrentEditorsList.IndexOf(tool);
             CurrentEditorsList.RemoveAt(index);
-            _scopeRepository.RemoveScope(tool.ServiceScope);
+            ToolsFactory.DestroyEditor(tool);
             tool.Close();
         }
 
@@ -356,10 +355,8 @@ namespace AssetEditor.ViewModels
             SelectedEditorIndex = CurrentEditorsList.Count - 1;
         }
 
-        public bool AllowDrop(IEditorViewModel node, IEditorViewModel targeNode = default, bool insertAfterTargetNode = default)
-        {
-            return true;
-        }
+        public bool AllowDrop(IEditorViewModel node, IEditorViewModel targeNode = default, bool insertAfterTargetNode = default) => true;
+
 
         public bool Drop(IEditorViewModel node, IEditorViewModel targeNode = default, bool insertAfterTargetNode = default)
         {
@@ -389,8 +386,6 @@ namespace AssetEditor.ViewModels
             SelectedEditorIndex = CurrentEditorsList.IndexOf(node);
             return true;
         }
-
-
     }
 
 }

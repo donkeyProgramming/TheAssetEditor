@@ -15,7 +15,6 @@ namespace CommonControls.Editors.AnimMeta
 {
     public class EditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
-        public IServiceScope ServiceScope { get; set; }
         public event EditorSavedDelegate EditorSavedEvent;
 
         ILogger _logger = Logging.Create<EditorViewModel>();

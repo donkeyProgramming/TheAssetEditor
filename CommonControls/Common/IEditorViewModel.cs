@@ -5,7 +5,6 @@ namespace CommonControls.Common
 {
     public interface IEditorViewModel
     {
-        IServiceScope ServiceScope { get; set; }
         NotifyAttr<string> DisplayName { get; set; }
         PackFile MainFile { get; set; }
         bool Save();

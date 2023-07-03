@@ -13,13 +13,13 @@ namespace AnimationEditor.SuperView
 {
     public class Editor
     {
-        PackFileService _pfs;
-        SkeletonAnimationLookUpHelper _skeletonHelper;
-        AnimationPlayerViewModel _player;
+        private readonly PackFileService _pfs;
+        private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
+        private readonly AnimationPlayerViewModel _player;
         private readonly MetaDataFactory _metaDataFactory;
         private readonly AssetViewModelBuilder _assetViewModelBuilder;
-        IToolFactory _toolFactory;
-        ApplicationSettingsService _applicationSettingsService;
+        private readonly IToolFactory _toolFactory;
+        private readonly ApplicationSettingsService _applicationSettingsService;
 
         public NotifyAttr<string> PersistentMetaFilePath { get; set; } = new NotifyAttr<string>("");
         public NotifyAttr<string> PersistentMetaFilePackFileContainerName { get; set; } = new NotifyAttr<string>("");
@@ -50,10 +50,6 @@ namespace AnimationEditor.SuperView
 
         public Editor Create(AnimationToolInput input)
         {
-
-
-
-
             var asset = _assetViewModelBuilder.CreateAsset("Item 0", Color.Black);
             _player.RegisterAsset(asset);
             var viewModel = new ReferenceModelSelectionViewModel(_metaDataFactory, _toolFactory, _pfs, asset, "Item 0:", _assetViewModelBuilder, _skeletonHelper, _applicationSettingsService);

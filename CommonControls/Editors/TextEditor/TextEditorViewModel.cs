@@ -16,7 +16,6 @@ namespace CommonControls.Editors.TextEditor
     public class TextEditorViewModel<TextConverter> : NotifyPropertyChangedImpl, ITextEditorViewModel, IEditorViewModel
         where TextConverter : ITextConverter
     {
-        public IServiceScope ServiceScope { get; set; }
         public ICommand SaveCommand { get; set; }
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>();

@@ -11,11 +11,8 @@ using View3D.Services;
 
 namespace AnimationEditor.PropCreator.ViewModels
 {
-
     public abstract class BaseAnimationViewModel<TEditor> : NotifyPropertyChangedImpl, IEditorViewModel
     {
-        public IServiceScope ServiceScope { get; set; }
-
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Creator");
         public PackFile MainFile { get; set; }
 
@@ -29,7 +26,6 @@ namespace AnimationEditor.PropCreator.ViewModels
 
 
         public AnimationToolInput MainInput { get; set; } = new AnimationToolInput();
-
         public AnimationToolInput RefInput { get; set; }
 
 

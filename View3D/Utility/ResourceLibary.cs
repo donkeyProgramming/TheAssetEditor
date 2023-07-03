@@ -2,7 +2,6 @@
 using CommonControls.Services;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Framework.WpfInterop;
 using Pfim;
 using Serilog;
 using System;
@@ -25,7 +24,7 @@ namespace View3D.Utility
         GeometryInstance,
     }
 
-    public partial class ResourceLibary : BaseComponent, IDisposable
+    public class ResourceLibary : BaseComponent, IDisposable
     {
         ILogger _logger = Logging.Create<ResourceLibary>();
 
@@ -243,21 +242,19 @@ namespace View3D.Utility
             _shaders.Clear();
 
 
-            //Content.Dispose();
+            Content?.Dispose();
             Content = null;
 
-            PbrDiffuse.Dispose();
+            PbrDiffuse?.Dispose();
             PbrDiffuse = null;
 
-
-            PbrSpecular.Dispose();
+            PbrSpecular?.Dispose();
             PbrSpecular = null;
 
-
-            PbrLut.Dispose();
+            PbrLut?.Dispose();
             PbrLut = null;
 
-            CommonSpriteBatch.Dispose();
+            CommonSpriteBatch?.Dispose();
             CommonSpriteBatch = null;
         }
     }

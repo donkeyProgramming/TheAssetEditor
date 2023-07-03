@@ -13,7 +13,6 @@ namespace Audio.Presentation.Compiler
 {
     public class CompilerViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
-        public IServiceScope ServiceScope { get; set; }
         private readonly PackFileService _pfs;
         private readonly CompilerService _compilerService;
 

@@ -20,7 +20,6 @@ namespace Audio.Presentation.AudioExplorer
 
     public class AudioEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
-        public IServiceScope ServiceScope { get; set; }
         public EventSelectionFilter EventFilter { get; set; }
 
         private readonly IAudioRepository _audioRepository;

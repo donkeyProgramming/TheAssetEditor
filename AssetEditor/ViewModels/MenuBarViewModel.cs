@@ -59,11 +59,9 @@ namespace AssetEditor.ViewModels
         public ICommand CreateNewPackFileCommand { get; set; }
         public ICommand OpenPackFileCommand { get; set; }
         public ICommand OpenAssetEditorFolderCommand { get; set; }
-        public ICommand OpenAnimMetaDecocderCommand { get; set; }
         public ICommand OpenMountCreatorCommand { get; set; }
         public ICommand OpenAnimationBatchExporterCommand { get; set; }
         public ICommand OpenWh2AnimpackUpdaterCommand { get; set; }
-        public ICommand OpenAnimationBuilderCommand { get; set; }
         public ICommand OpenAudioEditorCommand { get; set; }
         public ICommand CompileAudioProjectsCommand { get; set; }
         public ICommand CreateExampleAudioProjectCommand { get; set; }
@@ -81,9 +79,8 @@ namespace AssetEditor.ViewModels
         public ICommand OpenDiscordCommand { get; set; }
         public ICommand DownloadRmeCommand { get; set; }
 
-        public ICommand OpenKitbashEditorCommand { get; set; }
         public ICommand OpenCampaignAnimCreatorCommand { get; set; }
-        public ICommand OpenPropCreatorCommand { get; set; }
+
         public ICommand OpenAnimationTransferToolCommand { get; set; }
         public ICommand OpenSuperViewToolCommand { get; set; }
         public ICommand OpenTechSkeletonEditorCommand { get; set; }
@@ -120,10 +117,7 @@ namespace AssetEditor.ViewModels
             CreateAnimPackWarhammer3Command = new RelayCommand(CreateAnimationDbWarhammer3);
             CreateAnimPack3kCommand = new RelayCommand(CreateAnimationDb3k);
             OpenAssetEditorFolderCommand = new RelayCommand(OpenAssetEditorFolder);
-            OpenKitbashEditorCommand = new RelayCommand(OpenKitbasherTool);
-            OpenAnimMetaDecocderCommand = new RelayCommand(OpenAnimMetaDecocder);
             OpenMountCreatorCommand = new RelayCommand(OpenMountCreator);
-            OpenPropCreatorCommand = new RelayCommand(OpenPropCreatorEditor);
             OpenCampaignAnimCreatorCommand = new RelayCommand(OpenCampaignAnimCreatorEditor);
             OpenAnimationTransferToolCommand = new RelayCommand(OpenAnimationTransferTool);
             OpenSuperViewToolCommand = new RelayCommand(OpenSuperViewTool);
@@ -133,7 +127,6 @@ namespace AssetEditor.ViewModels
             OpenAudioEditorCommand = new RelayCommand(OpenAudioEditor);
             CompileAudioProjectsCommand = new RelayCommand(CompileAudioProjects);
             CreateExampleAudioProjectCommand = new RelayCommand(CreateExampleAudioProject);
-            OpenAnimationBuilderCommand = new RelayCommand(OpenOpenAnimationBuilder);
 
             GenerateRmv2ReportCommand = new RelayCommand(GenerateRmv2Report);
             GenerateMetaDataReportCommand = new RelayCommand(GenerateMetaDataReport);
@@ -246,24 +239,6 @@ namespace AssetEditor.ViewModels
             Process.Start("explorer.exe", path);
         }
 
-        void OpenKitbasherTool()
-        {
-         //   var editorView = _toolFactory.CreateEdtior<KitbasherEditor.ViewModels.KitbasherViewModel>();
-         //   EditorCreator.CreateEmptyEditor(editorView);
-        }
-
-        void OpenAnimMetaDecocder()
-        {
-            //var editorView = _toolFactory.CreateEditorViewModel<AnimMetaEditor.ViewModels.MainDecoderViewModel>();
-            ////
-            // editorView.ConfigureAsDecoder();
-            //EditorCreator.CreateEmptyEditor(editorView);
-        }
-        void OpenPropCreatorEditor()
-        {
-            //var editorView = _toolFactory.Create<BaseAnimationViewModel>();
-            //EditorCreator.CreateEmptyEditor(editorView);
-        }
 
         void OpenMountCreator()
         {
@@ -328,13 +303,6 @@ namespace AssetEditor.ViewModels
             _packfileService.HasEditablePackFile();
             var service = new AnimPackUpdaterService(_packfileService);
             service.Process(_packfileService.GetEditablePack());
-        }
-        
-
-        void OpenOpenAnimationBuilder()
-        {
-           // var editorView = _toolFactory.Create<AnimationBuilderViewModel>();
-           // EditorCreator.CreateEmptyEditor(editorView);
         }
 
         void GenerateRmv2Report()

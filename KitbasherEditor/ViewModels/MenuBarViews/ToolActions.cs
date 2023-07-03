@@ -11,6 +11,7 @@ using KitbasherEditor.ViewModels.MeshFitter;
 using KitbasherEditor.ViewModels.PinTool;
 using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views.EditorViews;
+using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
@@ -39,14 +40,16 @@ namespace _componentManager.ViewModels.MenuBarViews
         ViewOnlySelectedService _viewOnlySelectedComp;
         private readonly SceneManager _sceneManager;
         private readonly CommandFactory _commandFactory;
+        private readonly SubToolWindowCreator _subToolWindowCreator;
         private readonly IServiceProvider _serviceProvider;
         PackFileService _packFileService;
         SkeletonAnimationLookUpHelper _skeletonHelper;
         WindowKeyboard _keyboard;
 
-        public ToolActions(IServiceProvider serviceProvider, ComponentManagerResolver componentManagerResolver, PackFileService packFileService, WindowKeyboard keyboard, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
+        public ToolActions(SubToolWindowCreator subToolWindowCreator, IServiceProvider serviceProvider, ComponentManagerResolver componentManagerResolver, PackFileService packFileService, WindowKeyboard keyboard, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
             SelectionManager selectionManager, ObjectEditor objectEditor, FaceEditor faceEditor, ViewOnlySelectedService viewOnlySelectedComponent, SceneManager sceneManager, CommandFactory commandFactory)
         {
+            _subToolWindowCreator = subToolWindowCreator;
             _serviceProvider = serviceProvider;
             _packFileService = packFileService;
             _componentManager = componentManagerResolver.ComponentManager;
@@ -314,24 +317,25 @@ namespace _componentManager.ViewModels.MenuBarViews
 
         internal void UpdateWh2ModelAndConvert(Rmv2UpdaterService.BaseColourGenerationTechniqueEnum conversionTechnique)
         {
-            var res = MessageBox.Show("Are you sure you want to update the model? This cannot be undone!", "Attention", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-            if (res != MessageBoxResult.Yes)
-                return;
-
-            var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-            var lods = rootNode.GetLodNodes();
-            var firtLod = lods.First();
-            var meshList = firtLod.GetAllModelsGrouped(false).SelectMany(x => x.Value).ToList();
-            var filename = _packFileService.GetFullPath(rootNode.MainPackFile);
-
-            var service = new Rmv2UpdaterService(_packFileService, true);
-            service.UpdateWh2Models(filename, meshList, conversionTechnique, out var errorList);
-
-            ErrorListWindow.ShowDialog("Converter", errorList);
+            throw new NotImplementedException();
+            //var res = MessageBox.Show("Are you sure you want to update the model? This cannot be undone!", "Attention", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            //if (res != MessageBoxResult.Yes)
+            //    return;
+            //
+            //var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            //var lods = rootNode.GetLodNodes();
+            //var firtLod = lods.First();
+            //var meshList = firtLod.GetAllModelsGrouped(false).SelectMany(x => x.Value).ToList();
+            //var filename = _packFileService.GetFullPath(rootNode.MainPackFile);
+            //
+            //var service = new Rmv2UpdaterService(_packFileService, true);
+            //service.UpdateWh2Models(filename, meshList, conversionTechnique, out var errorList);
+            //
+            //ErrorListWindow.ShowDialog("Converter", errorList);
         }
         public void ShowVertexDebugInfo()
         {
-            VertexDebuggerViewModel.Create(_serviceProvider, _componentManager);
+            _subToolWindowCreator.CreateComponentWindow<VertexDebuggerView, VertexDebuggerViewModel>("Vertex debuger", 1200, 1100);
         }
     }
 }

@@ -39,7 +39,7 @@ namespace KitbasherEditor.ViewModels
             _sceneManager.SceneObjectRemoved += (a, b) => RebuildTree();
 
             ContextMenu = new SceneExplorerContextMenuHandler(commandExecutor, _sceneManager, commandFactory);
-            ContextMenu.SelectedNodesChanged += OnSelectedNodesChanged; // ToDo - MediatR
+            ContextMenu.SelectedNodesChanged += OnSelectedNodesChanged;
 
             SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
             eventHub.Register<SelectionChangedEvent>(Handle);
