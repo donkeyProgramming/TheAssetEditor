@@ -139,8 +139,8 @@
                         <Label>Insert Animation</Label>
                         <Label>Frame Count : 24</Label>
                     </StackPanel>
-                   
-                <filterdialog:CollapsableFilterControl VerticalContentAlignment="Center"
+
+                    <filterdialog:CollapsableFilterControl VerticalContentAlignment="Center"
                                     SelectedItem="{Binding AnimViewModel.SelectedAnimation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                     SearchItems="{Binding AnimViewModel.AnimationsForCurrentSkeleton, UpdateSourceTrigger=PropertyChanged}"     
                                     OnSearch="{Binding AnimViewModel.FiterByFullPath, UpdateSourceTrigger=PropertyChanged}"   
@@ -170,7 +170,7 @@
 
             <CheckBox DockPanel.Dock="Top" Content="Allow to select animroot node" IsChecked="{Binding AllowToSelectAnimRoot.Value, UpdateSourceTrigger=PropertyChanged}"  />
         </Grid>
-        
+
         <Grid DockPanel.Dock="Top" Margin="5,0,5,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -194,7 +194,7 @@
             <Button Grid.Column="0" Content="Select"  Click="{s:MethodBinding EnterSelectMode}" Margin="0,0,2,0"/>
             <Button Grid.Column="1" Content="Select previous bones"  Click="{s:MethodBinding SelectPreviousBones}" Margin="0,0,2,0"/>
             <Button Grid.Column="2" Content="Move"  Click="{s:MethodBinding EnterMoveMode}" Margin="0,0,2,0"/>
-            <Button Grid.Column="3" Content="Rotate"  Click="{s:MethodBinding EnterRotateMode}"  Margin="2,0,2,0"/>
+            <Button Grid.Column="3" Content="Rotate"  Click="{s:MethodBinding EnterRotateMode}"  Margin="2,0,2,0" />
             <Button Grid.Column="4" Content="Scale"  Click="{s:MethodBinding EnterScaleMode}" Margin="2,0,0,0"/>
         </Grid>
         <Grid DockPanel.Dock="Top" Margin="4,5,5,0">
@@ -206,12 +206,12 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            
-            <Button Grid.Column="0" Content="Copy Pose"  Click="{s:MethodBinding DeleteBoneAction}" Margin="2,0,0,0"/>
-            <Button Grid.Column="1" Content="Copy selected node"  Click="{s:MethodBinding CopyBoneAction}" Margin="2,0,0,0"/>
-            <Button Grid.Column="2" Content="Paste Pose"  Click="{s:MethodBinding CopyBoneAction}" Margin="2,0,0,0"/>
-            <Button Grid.Column="3" Content="Paste into selected node"  Click="{s:MethodBinding CopyBoneAction}" Margin="2,0,0,0"/>
-            <Button Grid.Column="4" Content="Copy n paste previous edited nodes"  Click="{s:MethodBinding CopyBoneAction}" Margin="2,0,0,0"/>
+
+            <Button Grid.Column="0" Content="Copy Pose"  Click="{s:MethodBinding CopyCurrentPose}" Margin="2,0,0,0"/>
+            <Button Grid.Column="1" Content="Copy selected node"  Click="{s:MethodBinding CopySelectedNode}" Margin="2,0,0,0" />
+            <Button Grid.Column="2" Content="Paste Pose"  Click="{s:MethodBinding PasteIntoCurrentPose}" Margin="2,0,0,0" />
+            <Button Grid.Column="3" Content="Paste into selected node"  Click="{s:MethodBinding PasteIntoSelectedCurrentNode}" Margin="2,0,0,0" />
+            <Button Grid.Column="4" Content="Copy n paste previous edited nodes"  Click="{s:MethodBinding CopyAndPastePreviousEditedNodesIntoCurrentPose}" Margin="2,0,0,0" />
         </Grid>
 
         <Button DockPanel.Dock="Top" Margin="5" Content="Save" Click="{s:MethodBinding SaveSkeletonAction}"/>

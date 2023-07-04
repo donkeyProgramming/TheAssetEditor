@@ -186,6 +186,11 @@ namespace AnimationEditor.AnimationKeyframeEditor
             MessageBox.Show("DuplicateFrame");
         }
 
+        public void ResetPose()
+        {
+            MessageBox.Show("ResetPose");
+        }
+
         private ISelectable FindSelectableObject(ISceneNode node)
         {
             if (node is ISelectable selectableNode) return selectableNode;
@@ -219,6 +224,11 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
         }
 
+        public void SelectPreviousBones()
+        {
+            MessageBox.Show("SelectPreviousBones");
+        }
+
         public void EnterMoveMode()
         {
             if(_selectionManager.GetState().Mode != GeometrySelectionMode.Bone) return;
@@ -237,5 +247,29 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _gizmoActions.Scale();
         }
 
+        public void CopyCurrentPose()
+        {
+            MessageBox.Show("CopyCurrentPose");
+        }
+
+        public void CopySelectedNode()
+        {
+            MessageBox.Show("CopySelectedNode");
+        }
+
+        public void PasteIntoCurrentPose()
+        {
+            MessageBox.Show("PasteIntoCurrentPose");
+        }
+
+        public void PasteIntoSelectedCurrentNode()
+        {
+            MessageBox.Show("PasteIntoSelectedCurrentNode");
+        }
+
+        public void CopyAndPastePreviousEditedNodesIntoCurrentPose()
+        {
+            MessageBox.Show("CopyAndPastePreviousEditedNodesIntoCurrentPose");
+        }
     }
 }
