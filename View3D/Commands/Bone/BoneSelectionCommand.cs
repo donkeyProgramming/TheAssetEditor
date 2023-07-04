@@ -10,7 +10,7 @@ using View3D.Scene;
 
 namespace View3D.Commands.Bone
 {
-    public class BoneSelectionCommand : CommandBase<BoneSelectionCommand>
+    public class BoneSelectionCommand : ICommand
     {
         SelectionManager _selectionManager;
         ISelectionState _oldState;
@@ -19,28 +19,29 @@ namespace View3D.Commands.Bone
         bool _isRemove;
         List<int> _selectedBones;
 
-        public BoneSelectionCommand(List<int> selectedBones, bool isAdd, bool isRemove)
+        public string HintText => "Select Bone";
+
+        bool ICommand.IsMutation => false;
+
+        public BoneSelectionCommand(List<int> selectedBones, bool isAdd, bool isRemove, IComponentManager component)
         {
+            _selectionManager = component.GetComponent<SelectionManager>();
             _selectedBones = selectedBones;
             _isAdd = isAdd;
             _isRemove = isRemove;
         }
 
-        public override string GetHintText()
+
+        public void Undo()
         {
-            return "Select Bone";
+            _selectionManager.SetState(_oldState);
         }
 
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-        }
-
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _oldState = _selectionManager.GetStateCopy();
             var currentState = _selectionManager.GetState() as BoneSelectionState;
-            _logger.Here().Information($"Command info - Add[{_isAdd}] Item[{currentState.RenderObject.Name}] Bones[{_selectedBones.Count}]");
+            //_logger.Here().Information($"Command info - Add[{_isAdd}] Item[{currentState.RenderObject.Name}] Bones[{_selectedBones.Count}]");
 
             if (!(_isAdd || _isRemove))
                 currentState.Clear();
@@ -49,12 +50,5 @@ namespace View3D.Commands.Bone
 
             currentState.EnsureSorted();
         }
-
-        protected override void UndoCommand()
-        {
-            _selectionManager.SetState(_oldState);
-        }
-
-        public override bool IsMutation() => false;
     }
 }

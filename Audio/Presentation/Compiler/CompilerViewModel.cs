@@ -4,6 +4,7 @@ using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
+using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using System.Linq;
 using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;

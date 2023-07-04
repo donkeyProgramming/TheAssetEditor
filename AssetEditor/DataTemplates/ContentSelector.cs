@@ -5,13 +5,12 @@ using System.Windows.Media;
 
 namespace AssetEditor.DataTemplates
 {
-
     public class EditorTemplateSelector : DataTemplateSelector
     {
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             var parent = FindParent<TabControl>(container);
-            var toolFactory = (ToolFactory)parent.GetValue(ToolFactoryParameter.ViewFactoryProperty);
+            var toolFactory = (IToolFactory)parent.GetValue(ToolFactoryParameter.ViewFactoryProperty);
             var viewType = toolFactory.GetViewTypeFromViewModel(item.GetType());
 
             FrameworkElementFactory factory = new FrameworkElementFactory(viewType);
@@ -40,14 +39,14 @@ namespace AssetEditor.DataTemplates
 
     public class ToolFactoryParameter : DependencyObject
     {
-        public static readonly DependencyProperty ViewFactoryProperty = DependencyProperty.RegisterAttached("ViewFactory", typeof(ToolFactory), typeof(ToolFactoryParameter));
+        public static readonly DependencyProperty ViewFactoryProperty = DependencyProperty.RegisterAttached("ViewFactory", typeof(IToolFactory), typeof(ToolFactoryParameter));
 
-        public static ToolFactory GetViewFactory(DependencyObject obj)
+        public static IToolFactory GetViewFactory(DependencyObject obj)
         {
-            return (ToolFactory)obj.GetValue(ViewFactoryProperty);
+            return (IToolFactory)obj.GetValue(ViewFactoryProperty);
         }
 
-        public static void SetViewFactory(DependencyObject obj, ToolFactory value)
+        public static void SetViewFactory(DependencyObject obj, IToolFactory value)
         {
             obj.SetValue(ViewFactoryProperty, value);
         }

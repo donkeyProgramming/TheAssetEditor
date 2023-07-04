@@ -3,7 +3,6 @@ using CommonControls.Common;
 using CommonControls.FileTypes.Animation;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
 using System.Linq;
 using System.Windows;
 using View3D.Animation;
@@ -15,18 +14,29 @@ namespace AnimationEditor.CampaignAnimationCreator
         public FilterCollection<SkeletonBoneNode> ModelBoneList { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
 
         AssetViewModel _selectedUnit;
+        private readonly AssetViewModelBuilder _assetViewModelEditor;
         PackFileService _pfs;
         AnimationClip _selectedAnimationClip;
 
-        public Editor(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, IComponentManager componentManager)
+        public Editor(AssetViewModelBuilder assetViewModelEditor, PackFileService pfs)
         {
+            _assetViewModelEditor = assetViewModelEditor;
             _pfs = pfs;
+        
+
+        }
+
+        public Editor Create(AssetViewModel rider)
+        {
             _selectedUnit = rider;
             _selectedUnit.SkeletonChanged += SkeletonChanged;
             _selectedUnit.AnimationChanged += AnimationChanged;
 
             SkeletonChanged(_selectedUnit.Skeleton);
             AnimationChanged(_selectedUnit.AnimationClip);
+
+            return this;
+
         }
 
         public void SaveAnimation()
@@ -60,7 +70,7 @@ namespace AnimationEditor.CampaignAnimationCreator
             }
 
             _selectedUnit.AnimationChanged -= AnimationChanged;
-            _selectedUnit.SetAnimationClip(newAnimation, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
+            _assetViewModelEditor.SetAnimationClip(_selectedUnit, newAnimation, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
             _selectedUnit.AnimationChanged += AnimationChanged;
         }
 

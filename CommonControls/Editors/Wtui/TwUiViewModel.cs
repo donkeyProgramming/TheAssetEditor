@@ -2,6 +2,7 @@
 using CommonControls.Editors.TextEditor;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -37,8 +38,6 @@ namespace CommonControls.Editors.Wtui
                 _textChanged = true;
             }
         }
-
-        
 
         public TwUiViewModel(PackFileService pfs)
         {

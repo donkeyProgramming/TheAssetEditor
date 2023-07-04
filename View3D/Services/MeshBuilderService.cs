@@ -18,7 +18,6 @@ namespace View3D.Services
             output.ChangeVertexType(ModelMaterialEnumHelper.GetToolVertexFormat(modelPart.Material.BinaryVertexFormat), skeletonName, false);
             output.VertexArray = new VertexPositionNormalTextureCustom[modelPart.Mesh.VertexList.Length];
             output.IndexArray = (ushort[])modelPart.Mesh.IndexList.Clone();
-            
 
             for (int i = 0; i < modelPart.Mesh.VertexList.Length; i++)
             {

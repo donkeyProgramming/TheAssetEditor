@@ -205,6 +205,29 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
             return material;
         }
 
+        public IMaterial CreateEmpty(ModelMaterialEnum materialId, RmvVersionEnum rmvType, VertexFormat vertexFormat)
+        {
+            var material = new WeightedMaterial()
+            {
+                MaterialId = ModelMaterialEnum.weighted,
+                BinaryVertexFormat = vertexFormat,
+                ModelName = "mesh1",
+                TextureDirectory = "variantmeshes\\mesh1",
+                OriginalTransform = new RmvTransform(),
+                Filters = new string(""),
+                PivotPoint = new Vector3(0, 0, 0),
+                StringParams = new List<String>(),
+                FloatParams = new List<float>(),
+                Vec4Params = new List<RmvVector4>(),
+                IntParams = new List<int>(),
+                AttachmentPointParams = new List<RmvAttachmentPoint>(),
+                TexturesParams = new List<RmvTexture>(),
+                AlphaMode = AlphaMode.Transparent, /// Alpha mode - assume that users want transpencey mode enabled by default
+            };                   
+
+            return material;
+        }
+
         public byte[] Save(IMaterial material)
         {
             var typedMaterial = material as WeightedMaterial;
@@ -330,7 +353,6 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
             return output;
         }
 
-
         List<float> LoadFloatParams(uint FloatParamCount, byte[] dataArray, ref int dataOffset)
         {
             var output = new List<float>();
@@ -393,7 +415,6 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
             }
             return output;
         }
-
     }
 
     struct WeightedMaterialStruct

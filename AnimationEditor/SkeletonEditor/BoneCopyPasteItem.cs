@@ -1,7 +1,4 @@
 ﻿using CommonControls.Common;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using View3D.Animation;
 
 namespace AnimationEditor.SkeletonEditor

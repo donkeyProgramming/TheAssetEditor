@@ -1,8 +1,6 @@
 ﻿using CommonControls.Common.MenuSystem;
-using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using View3D.Components.Component.Selection;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
@@ -13,9 +11,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         Dictionary<ButtonVisabilityRule, Func<bool>> _buttonVisabilityRules = new Dictionary<ButtonVisabilityRule, Func<bool>>();
 
         SelectionManager _selectionManager;
-        public VisibilityHandler(IComponentManager componentManager)
+        public VisibilityHandler(SelectionManager selectionManager)
         {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
+            _selectionManager = selectionManager;
 
             _buttonVisabilityRules[ButtonVisabilityRule.Always] = AllwaysTrueRule;
             _buttonVisabilityRules[ButtonVisabilityRule.ObjectMode] = IsObjectMode;

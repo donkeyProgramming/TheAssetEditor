@@ -11,20 +11,24 @@ using KitbasherEditor.ViewModels.MeshFitter;
 using KitbasherEditor.ViewModels.PinTool;
 using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views.EditorViews;
+using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using MonoGame.Framework.WpfInterop;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using View3D.Animation;
+using View3D.Commands;
 using View3D.Commands.Object;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 using View3D.Services;
+using View3D.Utility;
 using MessageBox = System.Windows.MessageBox;
 
-namespace KitbasherEditor.ViewModels.MenuBarViews
+namespace _componentManager.ViewModels.MenuBarViews
 {
     public class ToolActions : NotifyPropertyChangedImpl
     {
@@ -32,24 +36,32 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         SelectionManager _selectionManager;
         ObjectEditor _objectEditor;
         FaceEditor _faceEditor;
-        IEditableMeshResolver _editableMeshResolver;
-        ViewOnlySelectedComponent _viewOnlySelectedComp;
+
+        ViewOnlySelectedService _viewOnlySelectedComp;
+        private readonly SceneManager _sceneManager;
+        private readonly CommandFactory _commandFactory;
+        private readonly SubToolWindowCreator _subToolWindowCreator;
+        private readonly IServiceProvider _serviceProvider;
         PackFileService _packFileService;
         SkeletonAnimationLookUpHelper _skeletonHelper;
         WindowKeyboard _keyboard;
 
-        public ToolActions(IComponentManager componentManager, PackFileService packFileService, WindowKeyboard keyboard)
+        public ToolActions(SubToolWindowCreator subToolWindowCreator, IServiceProvider serviceProvider, ComponentManagerResolver componentManagerResolver, PackFileService packFileService, WindowKeyboard keyboard, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
+            SelectionManager selectionManager, ObjectEditor objectEditor, FaceEditor faceEditor, ViewOnlySelectedService viewOnlySelectedComponent, SceneManager sceneManager, CommandFactory commandFactory)
         {
+            _subToolWindowCreator = subToolWindowCreator;
+            _serviceProvider = serviceProvider;
             _packFileService = packFileService;
-            _componentManager = componentManager;
-            _skeletonHelper = _componentManager.GetComponent<SkeletonAnimationLookUpHelper>();
+            _componentManager = componentManagerResolver.ComponentManager;
+            _skeletonHelper = skeletonAnimationLookUpHelper;
             _keyboard = keyboard;
 
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-            _objectEditor = componentManager.GetComponent<ObjectEditor>();
-            _faceEditor = componentManager.GetComponent<FaceEditor>();
-            _editableMeshResolver = componentManager.GetComponent<IEditableMeshResolver>();
-            _viewOnlySelectedComp = componentManager.GetComponent<ViewOnlySelectedComponent>();
+            _selectionManager = selectionManager;
+            _objectEditor = objectEditor;
+            _faceEditor = faceEditor;
+            _viewOnlySelectedComp = viewOnlySelectedComponent;
+            _sceneManager = sceneManager;
+            _commandFactory = commandFactory;
         }
 
         public void DivideSubMesh()
@@ -117,7 +129,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             var res = MessageBox.Show("Are you sure to copy lod 0 to every lod slots? This cannot be undone!", "Attention", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (res != MessageBoxResult.Yes) return;
 
-            var rootNode = _editableMeshResolver.GeEditableMeshRootNode();
+            var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             var lodGenerationService = new LodGenerationService(_objectEditor);
 
             rootNode.GetLodNodes().ForEach(x =>
@@ -131,7 +143,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         }
         public void CreateLods()
         {
-            var rootNode = _editableMeshResolver.GeEditableMeshRootNode();
+            var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             var lodGenerationService = new LodGenerationService(_objectEditor);
             lodGenerationService.CreateLodsForRootNode(rootNode);
         }
@@ -160,7 +172,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
                 var window = new ControllerHostWindow(true, ResizeMode.CanResize)
                 {
-                    DataContext = new BmiViewModel(skeleton, meshNode, _componentManager),
+                    DataContext = new BmiViewModel(skeleton, meshNode, _commandFactory),
                     Title = "Bmi Tool",
                     Content = new BmiView(),
                 };
@@ -172,7 +184,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public void OpenSkeletonReshaperTool()
         {
             var state = _selectionManager.GetState<ObjectSelectionState>();
-            MeshFitterViewModel.ShowView(state.CurrentSelection(), _componentManager, _skeletonHelper, _packFileService);
+            MeshFitterViewModel.ShowView(state.CurrentSelection(), _componentManager, _skeletonHelper, _packFileService, _commandFactory);
         }
 
         public void CreateStaticMeshes()
@@ -193,7 +205,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             List<Rmv2MeshNode> meshes = new List<Rmv2MeshNode>();
 
             GroupNode groupNodeContainer = new GroupNode("staticMesh");
-            var root = _editableMeshResolver.GeEditableMeshRootNode();
+            var root = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             var lod0 = root.GetLodNodes()[0];
             lod0.AddObject(groupNodeContainer);
             foreach (var obj in selectedObjects)
@@ -206,16 +218,17 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 }
             }
 
-            var cmd = new CreateAnimatedMeshPoseCommand(meshes, frame, true);
-            var commandExecutor = _componentManager.GetComponent<CommandExecutor>();
-            commandExecutor.ExecuteCommand(cmd, false);
+            _commandFactory.Create<CreateAnimatedMeshPoseCommand>()
+                .IsUndoable(false)
+                .Configure(x=>x.Configure(meshes, frame, true))
+                .BuildAndExecute();
         }
 
-        public void PinMeshToMesh() => PinToolViewModel.ShowWindow(_componentManager);
+        public void PinMeshToMesh() => PinToolViewModel.ShowWindow(_selectionManager,_commandFactory);
 
         public void OpenReRiggingTool()
         {
-            var root = _editableMeshResolver.GeEditableMeshRootNode();
+            var root = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             var skeletonName = root.SkeletonNode.Name;
             Remap(_selectionManager.GetState<ObjectSelectionState>(), skeletonName);
         }
@@ -270,13 +283,14 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 .OrderBy(x => x.BoneIndex.Value).
                 ToList();
 
-            var config = new RemappedAnimatedBoneConfiguration();
+            var config = new RemappedAnimatedBoneConfiguration
+            {
+                MeshSkeletonName = selectedMeshSkeleton,
+                MeshBones = AnimatedBoneHelper.CreateFromSkeleton(newSkeletonFile, animatedBoneIndexes.Select(x => x.BoneIndex.Value).ToList()),
 
-            config.MeshSkeletonName = selectedMeshSkeleton;
-            config.MeshBones = AnimatedBoneHelper.CreateFromSkeleton(newSkeletonFile, animatedBoneIndexes.Select(x => x.BoneIndex.Value).ToList());
-
-            config.ParnetModelSkeletonName = targetSkeletonName;
-            config.ParentModelBones = AnimatedBoneHelper.CreateFromSkeleton(existingSkeletonFile);
+                ParnetModelSkeletonName = targetSkeletonName,
+                ParentModelBones = AnimatedBoneHelper.CreateFromSkeleton(existingSkeletonFile)
+            };
 
             if (targetSkeletonName == selectedMeshSkeleton)
                 MessageBox.Show("Trying to map to and from the same skeleton. This does not really make any sense if you are trying to make the mesh fit an other skeleton.", "Error", MessageBoxButton.OK);
@@ -287,7 +301,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             if (window.Result == true)
             {
                 var remapping = AnimatedBoneHelper.BuildRemappingList(config.MeshBones.First());
-                _componentManager.GetComponent<CommandExecutor>().ExecuteCommand(new RemapBoneIndexesCommand(selectedMeshses, remapping, config.ParnetModelSkeletonName));
+                _commandFactory.Create<RemapBoneIndexesCommand>().Configure(x => x.Configure(selectedMeshses, remapping, config.ParnetModelSkeletonName)).BuildAndExecute();
             }
         }
 
@@ -303,24 +317,25 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         internal void UpdateWh2ModelAndConvert(Rmv2UpdaterService.BaseColourGenerationTechniqueEnum conversionTechnique)
         {
-            var res = MessageBox.Show("Are you sure you want to update the model? This cannot be undone!", "Attention", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-            if (res != MessageBoxResult.Yes)
-                return;
-
-            var rootNode = _editableMeshResolver.GeEditableMeshRootNode();
-            var lods = rootNode.GetLodNodes();
-            var firtLod = lods.First();
-            var meshList = firtLod.GetAllModelsGrouped(false).SelectMany(x => x.Value).ToList();
-            var filename = _packFileService.GetFullPath(rootNode.MainPackFile);
-
-            var service = new Rmv2UpdaterService(_packFileService, true);
-            service.UpdateWh2Models(filename, meshList, conversionTechnique, out var errorList);
-
-            ErrorListWindow.ShowDialog("Converter", errorList);
+            throw new NotImplementedException();
+            //var res = MessageBox.Show("Are you sure you want to update the model? This cannot be undone!", "Attention", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            //if (res != MessageBoxResult.Yes)
+            //    return;
+            //
+            //var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            //var lods = rootNode.GetLodNodes();
+            //var firtLod = lods.First();
+            //var meshList = firtLod.GetAllModelsGrouped(false).SelectMany(x => x.Value).ToList();
+            //var filename = _packFileService.GetFullPath(rootNode.MainPackFile);
+            //
+            //var service = new Rmv2UpdaterService(_packFileService, true);
+            //service.UpdateWh2Models(filename, meshList, conversionTechnique, out var errorList);
+            //
+            //ErrorListWindow.ShowDialog("Converter", errorList);
         }
         public void ShowVertexDebugInfo()
         {
-            VertexDebuggerViewModel.Create(_componentManager);
+            _subToolWindowCreator.CreateComponentWindow<VertexDebuggerView, VertexDebuggerViewModel>("Vertex debuger", 1200, 1100);
         }
     }
 }

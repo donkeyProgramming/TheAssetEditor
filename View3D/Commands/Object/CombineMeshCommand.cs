@@ -1,15 +1,13 @@
 ﻿using CommonControls.Common;
-using MonoGame.Framework.WpfInterop;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Components.Component.Selection;
-using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Utility;
 
 namespace View3D.Commands.Object
 {
-    public class CombineMeshCommand : CommandBase<CombineMeshCommand>
+    public class CombineMeshCommand : ICommand
     {
         List<ISelectable> _objectsToCombine;
         List<Rmv2MeshNode> _combinedMeshes = new List<Rmv2MeshNode>();
@@ -17,22 +15,23 @@ namespace View3D.Commands.Object
         SelectionManager _selectionManager;
         ISelectionState _originalSelectionState;
 
-        public CombineMeshCommand(List<ISelectable> objectsToCombine)
+
+        public CombineMeshCommand(SelectionManager selectionManager)
+        {
+            _selectionManager = selectionManager;
+        }
+
+        public void Configure(List<ISelectable> objectsToCombine)
         {
             _objectsToCombine = new List<ISelectable>(objectsToCombine);
         }
 
-        public override string GetHintText()
-        {
-            return "Combine Objects";
-        }
+        public string HintText { get => "Combine Objects"; }
+        public bool IsMutation { get => true; }
 
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-        }
 
-        protected override void ExecuteCommand()
+
+        public void Execute()
         {
             _originalSelectionState = _selectionManager.GetStateCopy();
 
@@ -62,7 +61,7 @@ namespace View3D.Commands.Object
             }
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             foreach (var item in _objectsToCombine)
                 item.Parent.AddObject(item);

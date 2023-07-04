@@ -33,18 +33,6 @@ namespace AssetEditor.Views
             var fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
 
             Title = $"AssetEditor v{fvi.FileMajorPart}.{fvi.FileMinorPart}";
-            //Task.Run(async () =>
-            //{
-            //    while (true)
-            //    {
-            //        var totalMem = GC.GetTotalMemory(false) / 1_000_000;
-            //        Dispatcher.Invoke(() =>
-            //        {
-            //            lblMemoryUsage.Text = $"Memory used = {totalMem} M";
-            //        });
-            //        await Task.Delay(10 * 1000);
-            //    }
-            //});
         }
 
         private void tabItem_MouseDown(object sender, MouseButtonEventArgs e)

@@ -4,37 +4,45 @@ using View3D.Rendering.Geometry;
 
 namespace View3D.Commands.Face
 {
-    public class DeleteFaceCommand : CommandBase<DeleteFaceCommand>
+    public class DeleteFaceCommand : ICommand
     {
         FaceSelectionState _originalSelectionState;
         MeshObject _originalGeometry;
 
         List<int> _facesToDelete;
         MeshObject _geo;
+        private readonly SelectionManager _selectionManager;
 
-        public DeleteFaceCommand(MeshObject geoObject, List<int> facesToDelete)
+
+        public string HintText { get => "Delete Faces"; }
+        public bool IsMutation { get => true; }
+
+        public DeleteFaceCommand(SelectionManager selectionManager)
+        {
+            _selectionManager = selectionManager;
+        }
+
+        public void Configure(MeshObject geoObject, List<int> facesToDelete)
         {
             _facesToDelete = facesToDelete;
             _geo = geoObject;
         }
 
-        public override string GetHintText() => "Delete Faces";
-
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             // Create undo state
-            _originalSelectionState = _componentManager.GetComponent<SelectionManager>().GetStateCopy<FaceSelectionState>();
+            _originalSelectionState = _selectionManager.GetStateCopy<FaceSelectionState>();
             _originalGeometry = _geo.Clone();
 
             // Execute
             _geo.RemoveFaces(_facesToDelete);
-            _componentManager.GetComponent<SelectionManager>().GetState<FaceSelectionState>().Clear();
+            _selectionManager.GetState<FaceSelectionState>().Clear();
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             _originalSelectionState.RenderObject.Geometry = _originalGeometry;
-            _componentManager.GetComponent<SelectionManager>().SetState(_originalSelectionState);
+            _selectionManager.SetState(_originalSelectionState);
         }
     }
 }

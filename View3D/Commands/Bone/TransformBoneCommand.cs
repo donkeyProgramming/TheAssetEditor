@@ -10,13 +10,18 @@ using View3D.SceneNodes;
 
 namespace View3D.Commands.Bone
 {
-    public class TransformBoneCommand : CommandBase<TransformBoneCommand>
+    public class TransformBoneCommand : ICommand
     {
         List<int> _selectedBones;
         BoneSelectionState _boneSelectionState;
         int _currentFrame;
         AnimationClip.KeyFrame _oldFrame;
         public Matrix Transform { get; set; }
+
+        public string HintText => "Bone Transform";
+
+        public bool IsMutation => true;
+
         private Matrix _oldTransform = Matrix.Identity;
 
         ISelectionState _oldSelectionState;
@@ -28,22 +33,6 @@ namespace View3D.Commands.Bone
             _boneSelectionState = state;
             _currentFrame = state.CurrentFrame;
             _oldFrame = state.CurrentAnimation.DynamicFrames[_currentFrame].Copy();
-        }
-
-        public override string GetHintText()
-        {
-            return "Transform Bone";
-        }
-
-        public override void Initialize(IComponentManager componentManager)
-        {
-            
-        }
-
-        protected override void ExecuteCommand()
-        {
-            _oldSelectionState = _boneSelectionState;
-            _oldFrame = _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Copy();
         }
 
         public void ApplyTransformation(Matrix newPosition, GizmoMode gizmoMode)
@@ -88,12 +77,16 @@ namespace View3D.Commands.Bone
             }
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             var selectionState = _oldSelectionState as BoneSelectionState;
             selectionState.CurrentAnimation.DynamicFrames[_currentFrame] = _oldFrame;
-
         }
 
+        public void Execute()
+        {
+            _oldSelectionState = _boneSelectionState;
+            _oldFrame = _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Copy();
+        }
     }
 }

@@ -1,14 +1,12 @@
 ﻿using CommonControls.Editors.BoneMapping;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 
 namespace View3D.Commands.Object
 {
-    public class RemapBoneIndexesCommand : CommandBase<RemapBoneIndexesCommand>
+    public class RemapBoneIndexesCommand : ICommand
     {
         List<IndexRemapping> _mapping;
         string _newSkeletonName;
@@ -17,7 +15,7 @@ namespace View3D.Commands.Object
         List<MeshObject> _originalGeometry;
         string _originalSkeletonName;
 
-        public RemapBoneIndexesCommand(List<Rmv2MeshNode> meshNodeList, List<IndexRemapping> mapping, string newSkeletonName)
+        public void Configure(List<Rmv2MeshNode> meshNodeList, List<IndexRemapping> mapping, string newSkeletonName)
         {
             _meshNodeList = meshNodeList;
             _mapping = mapping;
@@ -26,12 +24,12 @@ namespace View3D.Commands.Object
             _originalSkeletonName = _meshNodeList.First().Geometry.ParentSkeletonName;
         }
 
-        public override string GetHintText()
-        {
-            return "Remap skeleton";
-        }
+        public string HintText { get => "Remap skeleton"; }
+        public bool IsMutation { get => true; }
 
-        protected override void ExecuteCommand()
+
+
+        public void Execute()
         {
             _originalGeometry = _meshNodeList.Select(x => x.Geometry.Clone()).ToList();
 
@@ -42,7 +40,7 @@ namespace View3D.Commands.Object
             }
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             for (int i = 0; i < _meshNodeList.Count; i++)
             {

@@ -1,124 +1,62 @@
-﻿using CommonControls.Common;
+﻿using _componentManager.ViewModels.MenuBarViews;
+using Common;
 using CommonControls.Common.MenuSystem;
 using CommonControls.PackFileBrowser;
 using CommonControls.Resources;
 using CommonControls.Services;
-using CommunityToolkit.Mvvm.Input;
 using KitbasherEditor.Services;
-using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
-    public enum MenuActionType
-    { 
-        Save,
-        SaveAs,
-        GenerateWsModelForWh3,
-        GenerateWsModelForWh2,
-        OpenImportReference,
-        ImportReferencePaladin,
-        ImportReferenceSlayer,
-        ImportReferenceGoblin,
-        ImportMapForDebug,
-        DeleteLods,
-        ClearConsole,
-        SortModelsByName,
-
-        Group,
-        Undo,
-        Gizmo_ScaleUp,
-        Gizmo_ScaleDown,
-        Gizmo_Arrow,
-        Gizmo_Move,
-        Gizmo_Rotate,
-        Gizmo_Scale,
-
-        SelectObject,
-        SelectFace,
-        SelectVertex,
-        SelectBone,
-        
-        ViewOnlySelected,
-        FocusSelection,
-        ResetCamera,
-        ToogleBackFaceRendering,
-        ToggleLargeSceneRendering,
-
-        DevideToSubmesh,
-        DevideToSubmesh_withoutCombining,
-        MergeSelectedMeshes,
-        DuplicateSelected,
-        DeleteSelected,
-        ConvertSelectedMeshIntoStaticAtCurrentAnimFrame,
-
-        ReduceMesh10x,
-        CreateLod,
-        OpenBmiTool,
-        OpenSkeletonResharper,
-        OpenReRiggingTool,
-        OpenPinTool,
-        OpenVertexDebuggerTool,
-
-        GrowFaceSelection,
-        ConvertFaceToVertexSelection,
-        CopyLod0ToEveryLodSlot,
-        UpdateWh2Model_Technique1,
-        UpdateWh2Model_Technique2
-    }
-
     public class MenuBarViewModel : IKeyboardHandler
     {
         public ObservableCollection<ToolbarItem> MenuItems { get; set; } = new ObservableCollection<ToolbarItem>();
         public ObservableCollection<MenuBarButton> CustomButtons { get; set; } = new ObservableCollection<MenuBarButton>();
 
-        public KitbashSceneCreator ModelLoader { get; set; }
+        public KitbashSceneCreator SceneCreator { get; private set; }
         public GizmoActions Gizmo { get; set; }
         public GeneralActions General { get; set; }
         public ToolActions Tools { get; set; }
         public TransformToolViewModel TransformTool { get; set; }
 
-        IComponentManager _componentManager;
+
         ActionHotkeyHandler _commandFactory = new ActionHotkeyHandler();
         VisibilityHandler _ruleFactory;
         WindowKeyboard _keyboard = new WindowKeyboard();
         PackFileService _packFileService;
-        SelectionManager _selectionManager;
         CommandExecutor _commandExecutor;
 
         Dictionary<MenuActionType, MenuAction> _actionList = new Dictionary<MenuActionType, MenuAction>();
 
-        public MenuBarViewModel(IComponentManager componentManager, PackFileService packFileService)
+        public MenuBarViewModel(CommandExecutor commandExecutor,  PackFileService packFileService, EventHub eventHub,
+            VisibilityHandler visibilityHandler, TransformToolViewModel transformToolViewModel, GizmoActions gizmoActions, GeneralActions generalActions, ToolActions toolActions,
+            KitbashSceneCreator kitbashSceneCreator)
         {
-            _componentManager = componentManager;
             _packFileService = packFileService;
+            _ruleFactory = visibilityHandler;
+            SceneCreator = kitbashSceneCreator;
 
-
-            _ruleFactory = new VisibilityHandler(componentManager);
-            TransformTool = new TransformToolViewModel(componentManager);
-            Gizmo = new GizmoActions(TransformTool, componentManager);
-            General = new GeneralActions(componentManager);
-            Tools = new ToolActions(componentManager, _packFileService, _keyboard);
+            TransformTool = transformToolViewModel;
+            Gizmo = gizmoActions;
+            General = generalActions;
+            Tools = toolActions;
 
             CreateActions();
             CreateButtons();
             CreateMenu();
             ProcessHotkeys();
 
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-            _selectionManager.SelectionChanged += OnSelectionChanged;
+            _commandExecutor = commandExecutor;
 
-            _commandExecutor = componentManager.GetComponent<CommandExecutor>();
-            _commandExecutor.CommandStackChanged += OnUndoStackChanged;
+            eventHub.Register<CommandStackChangedEvent>(Handle);
+            eventHub.Register<SelectionChangedEvent>(Handle);
         }
 
         void CreateActions()
@@ -150,6 +88,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _actionList[MenuActionType.SelectVertex] = new MenuAction(() => { Gizmo.UpdateSelectionMode(GeometrySelectionMode.Vertex); }) { EnableRule = ActionEnabledRule.Always, ToolTip = "Vertex Mode", Hotkey = new Hotkey(Key.F3, ModifierKeys.None) };
             _actionList[MenuActionType.SelectBone] = new MenuAction(() => { Gizmo.UpdateSelectionMode(GeometrySelectionMode.Bone); }) { EnableRule = ActionEnabledRule.Always, ToolTip = "Bone Mode", Hotkey = new Hotkey(Key.F10, ModifierKeys.None) };
 
+
             _actionList[MenuActionType.ViewOnlySelected] = new MenuAction(Tools.ToggleShowSelection) { EnableRule = ActionEnabledRule.Always, ToolTip = "View only selected", Hotkey = new Hotkey(Key.Space, ModifierKeys.None) };
             _actionList[MenuActionType.ResetCamera] = new MenuAction(General.ResetCamera) { EnableRule = ActionEnabledRule.Always, ToolTip = "Reset camera", Hotkey = new Hotkey(Key.F4, ModifierKeys.None) };
             _actionList[MenuActionType.FocusSelection] = new MenuAction(General.FocusSelection) { EnableRule = ActionEnabledRule.Always, ToolTip = "Focus camera on selected", Hotkey = new Hotkey(Key.F, ModifierKeys.Control) };
@@ -178,8 +117,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _actionList[MenuActionType.GrowFaceSelection] = new MenuAction(Tools.ExpandFaceSelection) { EnableRule = ActionEnabledRule.FaceSelected, ToolTip = "Grow selection" };
             _actionList[MenuActionType.ConvertFaceToVertexSelection] = new MenuAction(Tools.ConvertFacesToVertex) { EnableRule = ActionEnabledRule.FaceSelected, ToolTip = "Convert selected faces to vertexes" };
             _actionList[MenuActionType.OpenVertexDebuggerTool] = new MenuAction(Tools.ShowVertexDebugInfo) { EnableRule = ActionEnabledRule.ObjectOrVertexSelected, ToolTip = "Open vertex debugger" };
-
-            
         }
 
         void CreateMenu()
@@ -242,7 +179,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         void CreateSelectionButtons()
         {
             CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Arrow], "Gizmo", true) { Image = ResourceController.Gizmo_CursorIcon });
-            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Move],"Gizmo") { Image = ResourceController.Gizmo_MoveIcon });
+            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Move], "Gizmo") { Image = ResourceController.Gizmo_MoveIcon });
             CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Rotate], "Gizmo") { Image = ResourceController.Gizmo_RotateIcon});
             CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Scale],"Gizmo") {  Image = ResourceController.Gizmo_ScaleIcon });
 
@@ -301,12 +238,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             }
         }
 
-        private void OnUndoStackChanged()
-        {
-            _actionList[MenuActionType.Undo].ToolTip = _commandExecutor.GetUndoHint();
-            _actionList[MenuActionType.Undo].IsActionEnabled.Value = _commandExecutor.CanUndo();
-        }
-
         private void OnSelectionChanged(ISelectionState state)
         {
             if (state.Mode == GeometrySelectionMode.Object)
@@ -350,15 +281,27 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 browser.ViewModel.Filter.SetExtentions(new List<string>() { ".variantmeshdefinition", ".wsmodel", ".rigid_model_v2" });
                 if (browser.ShowDialog() == true && browser.SelectedFile != null)
                 {
-                    ModelLoader.LoadReference(browser.SelectedFile);
+                    SceneCreator.LoadReference(browser.SelectedFile);
                 }
             }
         }
 
-        void ImportReference_PaladinVMD() => ModelLoader.LoadReference(@"variantmeshes\variantmeshdefinitions\brt_paladin.variantmeshdefinition");
-        void ImportReference_Slayer() => ModelLoader.LoadReference(@"variantmeshes\variantmeshdefinitions\dwf_giant_slayers.variantmeshdefinition");
-        void ImportReference_Goblin() => ModelLoader.LoadReference(@"variantmeshes\variantmeshdefinitions\grn_forest_goblins_base.variantmeshdefinition");
-        void ImportDebugMap() => MapLoaderService.Load(_packFileService, _componentManager, ModelLoader);
+        void ImportReference_PaladinVMD() => SceneCreator.LoadReference(@"variantmeshes\variantmeshdefinitions\brt_paladin.variantmeshdefinition");
+        void ImportReference_Slayer() => SceneCreator.LoadReference(@"variantmeshes\variantmeshdefinitions\dwf_giant_slayers.variantmeshdefinition");
+        void ImportReference_Goblin() => SceneCreator.LoadReference(@"variantmeshes\variantmeshdefinitions\grn_forest_goblins_base.variantmeshdefinition");
+        void ImportDebugMap() => MapLoaderService.Load(_packFileService, SceneCreator);
         void ClearConsole() => Console.Clear();
+
+        public void Handle(CommandStackChangedEvent notification)
+        {
+            _actionList[MenuActionType.Undo].ToolTip = notification.HintText;
+            _actionList[MenuActionType.Undo].IsActionEnabled.Value = _commandExecutor.CanUndo();
+        }
+
+        public void Handle(SelectionChangedEvent notification)
+        {
+            OnSelectionChanged(notification.NewState);
+
+        }
     }
 }

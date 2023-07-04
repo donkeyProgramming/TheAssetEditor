@@ -14,6 +14,7 @@ using System.Linq;
 using View3D.Animation.AnimationChange;
 using View3D.Components;
 using View3D.Components.Component;
+using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.Rendering.RenderItems;
@@ -26,90 +27,93 @@ namespace View3D.Animation.MetaData
     public class MetaDataFactory
     {
         private ILogger _logger = Logging.Create<MetaDataFactory>();
-        private SceneNode _root;
-        private IComponentManager _componentManager;
-        private ISkeletonProvider _rootSkeleton;
-        private AnimationPlayer _rootPlayer;
-        private IAnimationBinGenericFormat _fragment;
-        private ApplicationSettingsService _applicationSettingsService;
 
-        public MetaDataFactory(SceneNode root, IComponentManager componentManager, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment, ApplicationSettingsService applicationSettingsService)
+        private ApplicationSettingsService _applicationSettingsService;
+        private readonly ResourceLibary _resourceLibary;
+        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly RenderEngineComponent _renderEngineComponent;
+        private readonly PackFileService _packFileService;
+        private readonly AnimationsContainerComponent _animationsContainerComponent;
+        private readonly IGeometryGraphicsContextFactory _geometryGraphicsContextFactory;
+
+        public MetaDataFactory(
+            ApplicationSettingsService applicationSettingsService,
+            ResourceLibary resourceLibary, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, RenderEngineComponent renderEngineComponent, PackFileService packFileService,
+            AnimationsContainerComponent animationsContainerComponent, IGeometryGraphicsContextFactory geometryGraphicsContextFactory)
         {
-            _root = root;
-            _componentManager = componentManager;
-            _rootSkeleton = skeleton;
-            _rootPlayer = rootPlayer;
-            _fragment = fragment;
+
             _applicationSettingsService = applicationSettingsService;
+            _resourceLibary = resourceLibary;
+            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
+            _renderEngineComponent = renderEngineComponent;
+            _packFileService = packFileService;
+            _animationsContainerComponent = animationsContainerComponent;
+            _geometryGraphicsContextFactory = geometryGraphicsContextFactory;
         }
 
-        public List<IMetaDataInstance> Create(MetaDataFile persistent, MetaDataFile metaData)
+        public List<IMetaDataInstance> Create(MetaDataFile persistent, MetaDataFile metaData, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment)
         {
             // Clear all
             var output = new List<IMetaDataInstance>();
 
             if (metaData == null || metaData.GetItemsOfType<DisablePersistant_v10>().Count == 0)
             {
-                var metaDataPersistent = ApplyMetaData(persistent);
+                var metaDataPersistent = ApplyMetaData(persistent, root, skeleton, rootPlayer, fragment);
                 output.AddRange(metaDataPersistent);
             }
 
-            var metaDataInstances = ApplyMetaData(metaData);
+            var metaDataInstances = ApplyMetaData(metaData, root, skeleton, rootPlayer, fragment);
             output.AddRange(metaDataInstances);
             return output;
         }
 
-        private IEnumerable<IMetaDataInstance> ApplyMetaData(MetaDataFile file)
+        private IEnumerable<IMetaDataInstance> ApplyMetaData(MetaDataFile file, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment)
         {
            var output = new List<IMetaDataInstance>();
            if (file == null)
                return output;
 
-           output.AddRange(file.GetItemsOfType<IAnimatedPropMeta>().Select(CreateAnimatedProp));
+           output.AddRange(file.GetItemsOfType<IAnimatedPropMeta>().Select(x => CreateAnimatedProp(x, root, skeleton)));
 
-           output.AddRange(file.GetItemsOfType<ImpactPosition_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, meteDataItem.Position, "ImpactPos")));
+           output.AddRange(file.GetItemsOfType<ImpactPosition_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, meteDataItem.Position, "ImpactPos")));
 
-           output.AddRange(file.GetItemsOfType<TargetPos_10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, meteDataItem.Position, "TargetPos")));
+           output.AddRange(file.GetItemsOfType<TargetPos_10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, meteDataItem.Position, "TargetPos")));
 
-           output.AddRange(file.GetItemsOfType<FirePos_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, meteDataItem.Position, "FirePos")));
+           output.AddRange(file.GetItemsOfType<FirePos_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, meteDataItem.Position, "FirePos")));
 
-           output.AddRange(file.GetItemsOfType<SplashAttack_v10>().Select(meteDataItem => CreateSplashAttack(meteDataItem, $"SplashAttack_{Math.Round(meteDataItem.EndTime, 2)}", 0.1f)));
+           output.AddRange(file.GetItemsOfType<SplashAttack_v10>().Select(meteDataItem => CreateSplashAttack(meteDataItem, root, $"SplashAttack_{Math.Round(meteDataItem.EndTime, 2)}", 0.1f)));
 
-           output.AddRange(file.GetItemsOfType<Effect_v11>().Select(CreateEffect));
+           output.AddRange(file.GetItemsOfType<Effect_v11>().Select(x=> CreateEffect(x, root, skeleton)));
 
            foreach (var meteDataItem in file.GetItemsOfType<DockEquipment>())
-               CreateEquipmentDock(meteDataItem);
+               CreateEquipmentDock(meteDataItem, fragment, skeleton, rootPlayer);
            
            foreach (var meteDataItem in file.GetItemsOfType<Transform_v10>())
-               CreateTransform(meteDataItem);
+               CreateTransform(meteDataItem, rootPlayer);
 
            return output;
         }
 
-        private void CreateTransform(Transform_v10 transform)
+        private void CreateTransform(Transform_v10 transform, AnimationPlayer rootPlayer)
         {
             var rule = new TransformBoneRule(transform);
-            _rootPlayer.AnimationRules.Add(rule);
+            rootPlayer.AnimationRules.Add(rule);
         }
 
-        private void CreateEquipmentDock(DockEquipment metaData)
+        private void CreateEquipmentDock(DockEquipment metaData, IAnimationBinGenericFormat fragment, ISkeletonProvider skeleton, AnimationPlayer rootPlayer)
         {
-            var resourceLib = _componentManager.GetComponent<ResourceLibary>();
-            var skeletonHelper = _componentManager.GetComponent<SkeletonAnimationLookUpHelper>();
-            var pfs = resourceLib.Pfs;
-        
-            var animPath = _fragment.Entries.FirstOrDefault(x=>x.SlotName == metaData.AnimationSlotName)?.AnimationFile ??
-                           _fragment.Entries.FirstOrDefault(x => x.SlotName  == metaData.AnimationSlotName + "_2")?.AnimationFile;
+            var animPath = fragment.Entries.FirstOrDefault(x=>x.SlotName == metaData.AnimationSlotName)?.AnimationFile ??
+                           fragment.Entries.FirstOrDefault(x => x.SlotName  == metaData.AnimationSlotName + "_2")?.AnimationFile;
             if (animPath == null)
             {
                 _logger.Here().Error($"Unable to create docking, as {metaData.AnimationSlotName} animation is missing");
                 return;
             }
-
+            
             int finalBoneIndex = -1;
             foreach (var potentialBoneName in metaData.SkeletonNameAlternatives)
             {
-                finalBoneIndex = _rootSkeleton.Skeleton.GetBoneIndexByName(potentialBoneName);
+                finalBoneIndex = skeleton.Skeleton.GetBoneIndexByName(potentialBoneName);
                 if (finalBoneIndex != -1)
                     break;
             }
@@ -120,49 +124,44 @@ namespace View3D.Animation.MetaData
                 _logger.Here().Error($"Unable to create docking, as {boneNames} bone is missing");
                 return;
             }
-
-            var pf = pfs.FindFile(animPath);
+            
+            var pf = _packFileService.FindFile(animPath);
             var animFile = AnimationFile.Create(pf);
-            var clip = new AnimationClip(animFile, _rootSkeleton.Skeleton);
-        
-            var rule = new DockEquipmentRule(finalBoneIndex, metaData.PropBoneId, clip, _rootSkeleton, metaData.StartTime, metaData.EndTime);
-            _rootPlayer.AnimationRules.Add(rule);
+            var clip = new AnimationClip(animFile, skeleton.Skeleton);
+            
+            var rule = new DockEquipmentRule(finalBoneIndex, metaData.PropBoneId, clip, skeleton, metaData.StartTime, metaData.EndTime);
+            rootPlayer.AnimationRules.Add(rule);
         }
 
-        private IMetaDataInstance CreateAnimatedProp(IAnimatedPropMeta animatedPropMeta)
+        private IMetaDataInstance CreateAnimatedProp(IAnimatedPropMeta animatedPropMeta, SceneNode root, ISkeletonProvider rootSkeleton)
         {
             var propName = "Animated_prop";
-
-            var resourceLib = _componentManager.GetComponent<ResourceLibary>();
-            var skeletonHelper = _componentManager.GetComponent<SkeletonAnimationLookUpHelper>();
-            var graphics = _componentManager.GetComponent<DeviceResolverComponent>();
-            var pfs = resourceLib.Pfs;
-
-            var meshPath = pfs.FindFile(animatedPropMeta.ModelName);
-            var animationPath = pfs.FindFile(animatedPropMeta.AnimationName);
-            var propPlayer = _componentManager.GetComponent<AnimationsContainerComponent>().RegisterAnimationPlayer(new AnimationPlayer(_componentManager), propName + Guid.NewGuid());
-
+            
+            var meshPath = _packFileService.FindFile(animatedPropMeta.ModelName);
+            var animationPath = _packFileService.FindFile(animatedPropMeta.AnimationName);
+            var propPlayer = _animationsContainerComponent.RegisterAnimationPlayer(new AnimationPlayer(), propName + Guid.NewGuid());
+            
             // Configure the mesh
-            SceneLoader loader = new SceneLoader(resourceLib, pfs, GeometryGraphicsContextFactory.CreateInstance(graphics.Device), _componentManager, _applicationSettingsService);
+            SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, _geometryGraphicsContextFactory, _renderEngineComponent, _applicationSettingsService);
             var loadedNode = loader.Load(meshPath, new GroupNode(propName), propPlayer);
-
+            
             // Configure animation
             if (animationPath != null)
             {
                 var skeletonName = SceneNodeHelper.GetSkeletonName(loadedNode);
-                var skeletonFile = skeletonHelper.GetSkeletonFileFromName(pfs, skeletonName);
+                var skeletonFile = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_packFileService, skeletonName);
                 var skeleton = new GameSkeleton(skeletonFile, propPlayer);
                 var animFile = AnimationFile.Create(animationPath);
                 var clip = new AnimationClip(animFile, skeleton);
                 propPlayer.SetAnimation(clip, skeleton);
-
+            
                 // Add the prop skeleton
-                var skeletonSceneNode = new SkeletonNode(_componentManager, skeleton);
+                var skeletonSceneNode = new SkeletonNode(_resourceLibary, skeleton);
                 skeletonSceneNode.NodeColour = Color.Yellow;
                 skeletonSceneNode.ScaleMult = animatedPropMeta.Scale;
                 loadedNode.AddObject(skeletonSceneNode);
             }
-
+            
             // Configure scale
             loadedNode.ForeachNodeRecursive((node) =>
             {
@@ -170,33 +169,33 @@ namespace View3D.Animation.MetaData
                     selectable.ScaleMult = animatedPropMeta.Scale;
             });
             loadedNode.ScaleMult = animatedPropMeta.Scale;
-
+            
             // Add the animation rules
-            var animationRule = new CopyRootTransform(_rootSkeleton, animatedPropMeta.BoneId, animatedPropMeta.Position, new Quaternion(animatedPropMeta.Orientation));
+            var animationRule = new CopyRootTransform(rootSkeleton, animatedPropMeta.BoneId, animatedPropMeta.Position, new Quaternion(animatedPropMeta.Orientation));
             propPlayer.AnimationRules.Add(animationRule);
 
             // Add to scene
-            _root.AddObject(loadedNode);
-
+            root.AddObject(loadedNode);
+            
             return new AnimatedPropInstance(loadedNode, propPlayer);
         }
 
-        private IMetaDataInstance CreateStaticLocator(DecodedMetaEntryBase metaData, Vector3 position, string displayName, float scale = 0.3f)
+        private IMetaDataInstance CreateStaticLocator(DecodedMetaEntryBase metaData, SceneNode root, Vector3 position, string displayName, float scale = 0.3f)
         {
-            var resourceLib = _componentManager.GetComponent<ResourceLibary>();
-            var lineRenderer = new LineMeshRender(resourceLib);
+
+            var lineRenderer = new LineMeshRender(_resourceLibary);
 
             SimpleDrawableNode node = new SimpleDrawableNode(displayName);
             lineRenderer.AddCircle(position, scale, Color.Red);
-            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, displayName, position));
+            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(_resourceLibary, displayName, position));
             
             node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
-            _root.AddObject(node);
+            root.AddObject(node);
 
             return new DrawableMetaInstance(metaData.StartTime, metaData.EndTime, node.Name, node);
         }
 
-        private IMetaDataInstance CreateSplashAttack(SplashAttack_v10 splashAttack, string displayName, float scale = 0.3f)
+        private IMetaDataInstance CreateSplashAttack(SplashAttack_v10 splashAttack, SceneNode root, string displayName, float scale = 0.3f)
         {
             float distance =  Vector3.Distance(splashAttack.StartPosition, splashAttack.EndPosition);
             if (MathUtil.CompareEqualFloats(distance))
@@ -204,17 +203,17 @@ namespace View3D.Animation.MetaData
                 throw new ConstraintException($"{displayName}: the distance between StartPosition {splashAttack.StartPosition} and EndPosition {splashAttack.EndPosition} is close to 0");
             }
 
-            var resourceLib = _componentManager.GetComponent<ResourceLibary>();
-            var lineRenderer = new LineMeshRender(resourceLib);
+
+            var lineRenderer = new LineMeshRender(_resourceLibary);
             Vector3 textPos = (splashAttack.EndPosition + splashAttack.StartPosition) / 2;
 
             SimpleDrawableNode node = new SimpleDrawableNode(displayName);
             
-            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, "StartPos", splashAttack.StartPosition));
+            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(_resourceLibary, "StartPos", splashAttack.StartPosition));
             lineRenderer.AddLocator(splashAttack.StartPosition, scale, Color.Red);
-            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, "EndPos", splashAttack.EndPosition));
+            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(_resourceLibary, "EndPos", splashAttack.EndPosition));
             lineRenderer.AddLocator(splashAttack.EndPosition, scale, Color.Red);
-            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, displayName, textPos));
+            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(_resourceLibary, displayName, textPos));
             lineRenderer.AddLine(splashAttack.StartPosition, splashAttack.EndPosition, Color.Red);
             
             Vector3 normal = splashAttack.EndPosition - splashAttack.StartPosition;  // corresponds to Z
@@ -256,26 +255,25 @@ namespace View3D.Animation.MetaData
             }
             
             node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
-            _root.AddObject(node);
+            root.AddObject(node);
 
             return new DrawableMetaInstance(splashAttack.StartTime, splashAttack.EndTime, node.Name, node);
         }
 
-        private IMetaDataInstance CreateEffect(Effect_v11 effect)
+        private IMetaDataInstance CreateEffect(Effect_v11 effect, SceneNode root, ISkeletonProvider skeleton)
         {
-            var resourceLib = _componentManager.GetComponent<ResourceLibary>();
-            var lineRenderer = new LineMeshRender(resourceLib);
+            var lineRenderer = new LineMeshRender(_resourceLibary);
         
             SimpleDrawableNode node = new SimpleDrawableNode("Effect:"+ effect.VfxName);
             lineRenderer.AddLocator(effect.Position, 0.3f, Color.Red);
-            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(resourceLib, effect.VfxName, effect.Position));
+            node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(_resourceLibary, effect.VfxName, effect.Position));
             
             node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
-            _root.AddObject(node);
+            root.AddObject(node);
         
             var instance = new DrawableMetaInstance(effect.StartTime, effect.EndTime, node.Name, node);
             if (effect.Tracking)
-                instance.FollowBone(_rootSkeleton, effect.NodeIndex);
+                instance.FollowBone(skeleton, effect.NodeIndex);
             return instance;
         }
     }

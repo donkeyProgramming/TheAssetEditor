@@ -13,4 +13,6 @@ namespace Audio.FileFormats.WWise.Stid
             chunk.Index += (int)chunckHeader.ChunkSize;
         }
     }
+
+
 }

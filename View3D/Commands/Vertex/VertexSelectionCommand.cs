@@ -1,17 +1,14 @@
 ﻿using CommonControls.Common;
-using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System.Collections.Generic;
-using System.Linq;
-using View3D.Components.Component;
+using View3D.Commands.Face;
 using View3D.Components.Component.Selection;
-using View3D.Rendering;
-using View3D.Scene;
 
 namespace View3D.Commands.Vertex
 {
-    public class VertexSelectionCommand : CommandBase<VertexSelectionCommand>
+    public class VertexSelectionCommand : ICommand
     {
+        ILogger _logger = Logging.Create<VertexSelectionCommand>();
         SelectionManager _selectionManager;
         ISelectionState _oldState;
 
@@ -19,24 +16,25 @@ namespace View3D.Commands.Vertex
         bool _isRemove;
         List<int> _selectedVertices;
 
-        public VertexSelectionCommand(List<int> selectedVertices, bool isAdd, bool isRemove)
+
+
+        public string HintText { get => "Select Vertex"; }
+        public bool IsMutation { get => false; }
+
+
+        public void Configure(List<int> selectedVertices, bool isAdd, bool isRemove)
         {
             _selectedVertices = selectedVertices;
             _isAdd = isAdd;
             _isRemove = isRemove;
         }
 
-        public override string GetHintText()
+        public VertexSelectionCommand(SelectionManager selectionManager)
         {
-            return "Select Vertex";
+            _selectionManager = selectionManager;
         }
 
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-        }
-
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _oldState = _selectionManager.GetStateCopy();
             var currentState = _selectionManager.GetState() as VertexSelectionState;
@@ -50,11 +48,11 @@ namespace View3D.Commands.Vertex
             currentState.EnsureSorted();
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             _selectionManager.SetState(_oldState);
         }
 
-        public override bool IsMutation() => false;
+      
     }
 }

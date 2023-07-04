@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 using TextureEditor.Views;
-using static View3D.Utility.ResourceLibary;
+using View3D.Utility;
 
 namespace TextureEditor.ViewModels
 {
@@ -13,13 +13,6 @@ namespace TextureEditor.ViewModels
         ImageInformation _information;
         public NotifyAttr<ImageSource> ActiveImage { get; set; } = new NotifyAttr<ImageSource>();
         public NotifyAttr<ImageSource> CheckBoardImage { get; set; } = new NotifyAttr<ImageSource>();
-
-
-       //
-       //    <ComboBox  HorizontalAlignment="Center" VerticalAlignment="Center" 
-       //                       SelectedValue="{Binding Path=UvChannelSelectedValue.Value, UpdateSourceTrigger=PropertyChanged}" 
-       //                       ItemsSource="{Binding Path=UvChannelPossibleValues, UpdateSourceTrigger=PropertyChanged}"/>
-       //
 
         public NotifyAttr<string> ImagePath { get; set; } = new NotifyAttr<string>();
         public NotifyAttr<string> Format { get; set; } = new NotifyAttr<string>();

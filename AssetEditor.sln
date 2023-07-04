@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.5.33516.290
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30523.141
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonControls", "CommonControls\CommonControls.csproj", "{960CCC3B-CC6D-480A-BDF8-AC540458F51B}"
 EndProject
@@ -41,9 +41,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wh3AnimPackCreator", "Wh3An
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioResearch", "AudioResearch\AudioResearch.csproj", "{F002EA23-09A0-42AE-9C5E-ADA6C1E95CC5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audio", "Audio\Audio.csproj", "{B9488B52-AC74-4AFC-B376-DBD1096585E4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimationKeyframeEditor", "AnimationEditor\AnimationKeyframeEditor\AnimationKeyframeEditor.csproj", "{3E029EFF-083E-42E0-AAED-4F83E15AB09C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audio", "Audio\Audio.csproj", "{B9488B52-AC74-4AFC-B376-DBD1096585E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -103,10 +101,6 @@ Global
 		{B9488B52-AC74-4AFC-B376-DBD1096585E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9488B52-AC74-4AFC-B376-DBD1096585E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9488B52-AC74-4AFC-B376-DBD1096585E4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3E029EFF-083E-42E0-AAED-4F83E15AB09C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3E029EFF-083E-42E0-AAED-4F83E15AB09C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3E029EFF-083E-42E0-AAED-4F83E15AB09C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3E029EFF-083E-42E0-AAED-4F83E15AB09C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -121,7 +115,6 @@ Global
 		{0FCB6133-32A4-4115-BD53-474C703E7B34} = {07AC615B-A8FC-4E1A-BDD5-BC11452429A0}
 		{3A205F23-1862-4F06-B9D8-DF82810515B3} = {FF70C4FA-A9A7-4DEC-87A3-4BF5F23EF336}
 		{F002EA23-09A0-42AE-9C5E-ADA6C1E95CC5} = {FF70C4FA-A9A7-4DEC-87A3-4BF5F23EF336}
-		{3E029EFF-083E-42E0-AAED-4F83E15AB09C} = {07AC615B-A8FC-4E1A-BDD5-BC11452429A0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AB5968F3-98ED-4AFF-98EA-0DBEDCACADF2}

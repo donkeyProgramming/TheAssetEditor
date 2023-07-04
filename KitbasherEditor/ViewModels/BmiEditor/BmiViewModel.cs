@@ -1,13 +1,12 @@
 ﻿using CommonControls.Common;
 using CommonControls.MathViews;
-using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using View3D.Animation;
+using View3D.Commands;
 using View3D.Commands.Object;
-using View3D.Components.Component;
 using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.BmiEditor
@@ -15,7 +14,7 @@ namespace KitbasherEditor.ViewModels.BmiEditor
     public class BmiViewModel : NotifyPropertyChangedImpl
     {
         Rmv2MeshNode _meshNode;
-        IComponentManager _componentManager;
+        private readonly CommandFactory _commandFactory;
         GameSkeleton _skeleton;
 
         public ObservableCollection<SkeletonBoneNode> Bones { get; set; } = new ObservableCollection<SkeletonBoneNode>();
@@ -41,9 +40,9 @@ namespace KitbasherEditor.ViewModels.BmiEditor
             set { SetAndNotify(ref _scaleFactor, value); }
         }
 
-        public BmiViewModel(GameSkeleton skeleton, Rmv2MeshNode meshNode, IComponentManager componentManager)
+        public BmiViewModel(GameSkeleton skeleton, Rmv2MeshNode meshNode,  CommandFactory commandFactory)
         {
-            _componentManager = componentManager;
+            _commandFactory = commandFactory;
             _meshNode = meshNode;
             _skeleton = skeleton;
             CreateBoneOverview(_skeleton);
@@ -61,8 +60,9 @@ namespace KitbasherEditor.ViewModels.BmiEditor
 
         public void Apply()
         {
-            var cmd = new GrowMeshCommand(_skeleton, _meshNode, (float)_scaleFactor.Value, Bones.First().GetAllCheckedChildBoneIndexes());
-            _componentManager.GetComponent<CommandExecutor>().ExecuteCommand(cmd);
+            _commandFactory.Create<GrowMeshCommand>()
+                .Configure(x => x.Configure(_skeleton, _meshNode, (float)_scaleFactor.Value, Bones.First().GetAllCheckedChildBoneIndexes()))
+                .BuildAndExecute();
         }
 
         void CreateBoneOverview(GameSkeleton skeleton)

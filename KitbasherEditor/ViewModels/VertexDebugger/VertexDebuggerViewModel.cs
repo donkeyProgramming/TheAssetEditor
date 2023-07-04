@@ -1,11 +1,9 @@
-﻿using CommonControls.MathViews;
-using KitbasherEditor.Views.EditorViews.VertexDebugger;
+﻿using Common;
+using CommonControls.MathViews;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.ObjectModel;
-using System.Windows;
 using View3D.Components;
 using View3D.Components.Component.Selection;
 using View3D.Components.Rendering;
@@ -19,25 +17,8 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
 {
     class VertexDebuggerViewModel : BaseComponent, IDisposable
     {
-        public class VertexInstance
-        {
-            public int Id { get; set; }
-            public Vector4 AnimIndecies { get; set; }
-            public Vector4 AnimWeights { get; set; }
-            public float TotalWeight { get; set; }
-
-            public Vector3 Normal { get; set; }
-            public float NormalLength { get; set; }
-            public Vector3 BiNormal { get; set; }
-            public float BiNormalLength { get; set; }
-            public Vector3 Tangent { get; set; }
-            public float TangentLength { get; set; }
-
-            public Vector4 Position { get; set; }
-
-        }
-
         public ObservableCollection<VertexInstance> VertexList { get; set; } = new ObservableCollection<VertexInstance>();
+       
         VertexInstance _selectedVertex;
         public VertexInstance SelectedVertex
         {
@@ -55,37 +36,41 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
         LineMeshRender _lineRenderer;
         Effect _lineShader;
 
-        public VertexDebuggerViewModel(IComponentManager componentManager) : base(componentManager)
-        {
+        private readonly RenderEngineComponent _renderEngineComponent;
+        private readonly ResourceLibary _resourceLibary;
+        private readonly SelectionManager _selectionManager;
+        private readonly EventHub _eventHub;
 
+        public VertexDebuggerViewModel(RenderEngineComponent renderEngineComponent, 
+            ResourceLibary resourceLibary,
+            SelectionManager selectionManager,
+            EventHub eventHub) 
+        {
+            _renderEngineComponent = renderEngineComponent;
+            _resourceLibary = resourceLibary;
+            _selectionManager = selectionManager;
+            _eventHub = eventHub;
+
+            _eventHub.Register<SelectionChangedEvent>(OnSelectionChanged);
         }
 
         public override void Initialize()
         {
-            var resourceLib = ComponentManager.GetComponent<ResourceLibary>();
-            _lineShader = resourceLib.GetStaticEffect(ShaderTypes.Line);
-            _lineRenderer = new LineMeshRender(resourceLib);
+            _lineShader = _resourceLibary.GetStaticEffect(ShaderTypes.Line);
+            _lineRenderer = new LineMeshRender(_resourceLibary);
 
-            var selectionMgr = ComponentManager.GetComponent<SelectionManager>();
-            selectionMgr.SelectionChanged += SelectionMgr_SelectionChanged;
             Refresh();
 
             base.Initialize();
         }
 
 
-        private void SelectionMgr_SelectionChanged(ISelectionState state)
-        {
-            Refresh();
-        }
-
         public void Refresh()
         {
             VertexList.Clear();
             SelectedVertex = null;
-            var selectionMgr = ComponentManager.GetComponent<SelectionManager>();
 
-            if (selectionMgr.GetState() is VertexSelectionState selection)
+            if (_selectionManager.GetState() is VertexSelectionState selection)
             {
                 var mesh = selection.GetSingleSelectedObject() as Rmv2MeshNode;
                 var vertexList = selection.SelectedVertices;
@@ -119,16 +104,15 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
         {
             _lineRenderer.Clear();
 
-            var selection = ComponentManager.GetComponent<SelectionManager>().GetState<VertexSelectionState>();
+            var selection = _selectionManager.GetState<VertexSelectionState>();
             if (selection != null)
             {
-                var renderEngine = ComponentManager.GetComponent<RenderEngineComponent>();
                 var mesh = selection.GetSingleSelectedObject() as Rmv2MeshNode;
 
                 if (SelectedVertex != null)
                 {
                     var bb = BoundingBox.CreateFromSphere(new BoundingSphere(mesh.Geometry.GetVertexById(SelectedVertex.Id), 0.05f));
-                    renderEngine.AddRenderItem(RenderBuckedId.Normal, new BoundingBoxRenderItem(_lineShader, bb, Color.White));
+                    _renderEngineComponent.AddRenderItem(RenderBuckedId.Normal, new BoundingBoxRenderItem(_lineShader, bb, Color.White));
                 }
 
                 var vertexList = selection.SelectedVertices;
@@ -142,33 +126,16 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
                     _lineRenderer.AddLine(pos, pos + vertexInfo.Tangent * scale, Color.Blue);
                 }
 
-                renderEngine.AddRenderItem(RenderBuckedId.Normal, new LineRenderItem() { LineMesh = _lineRenderer, ModelMatrix = mesh.ModelMatrix * Matrix.CreateTranslation(mesh.Material.PivotPoint) });
+                _renderEngineComponent.AddRenderItem(RenderBuckedId.Normal, new LineRenderItem() { LineMesh = _lineRenderer, ModelMatrix = mesh.ModelMatrix * Matrix.CreateTranslation(mesh.Material.PivotPoint) });
             }
-        }
-
-        public static void Create(IComponentManager componentManager)
-        {
-            var renderComp = componentManager.GetComponent<RenderEngineComponent>();
-
-            var viewModel = new VertexDebuggerViewModel(componentManager);
-            componentManager.AddComponent(viewModel);
-
-            var containingWindow = new Window();
-            containingWindow.Title = "Vertex debuger";
-            containingWindow.Width = 1200;
-            containingWindow.Height = 1100;
-            containingWindow.DataContext = viewModel;
-            containingWindow.Content = new VertexDebuggerView();
-            containingWindow.Closed += (x, y) => { componentManager.RemoveComponent(viewModel); viewModel.Dispose(); };
-            containingWindow.Show();
         }
 
         public void Dispose()
         {
-            var selectionMgr = ComponentManager.GetComponent<SelectionManager>();
-            if(selectionMgr != null)
-                selectionMgr.SelectionChanged -= SelectionMgr_SelectionChanged;
+            _eventHub.UnRegister<SelectionChangedEvent>(OnSelectionChanged);
             _lineRenderer.Dispose();
         }
+
+        void OnSelectionChanged(SelectionChangedEvent notification) => Refresh();
     }
 }

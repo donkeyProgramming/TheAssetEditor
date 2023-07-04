@@ -1,23 +1,44 @@
-﻿using AnimationEditor.PropCreator.ViewModels;
+﻿using AnimationEditor.Common.AnimationPlayer;
+using AnimationEditor.Common.ReferenceModel;
+using AnimationEditor.PropCreator.ViewModels;
+using Common;
 using CommonControls.Common;
-using CommonControls.FileTypes.DB;
 using CommonControls.Services;
+using Microsoft.Xna.Framework;
+using MonoGame.Framework.WpfInterop;
+using View3D.Components;
+using View3D.Scene;
 
 namespace AnimationEditor.CampaignAnimationCreator
 {
-    public class CampaignAnimationCreatorViewModel : BaseAnimationViewModel
+    public class CampaignAnimationCreatorViewModel : BaseAnimationViewModel<Editor>
     {
-        public CampaignAnimationCreatorViewModel(ToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService) 
-            : base(toolFactory, pfs, skeletonHelper, applicationSettingsService,"Model", "Not_in_use")
+        private readonly ReferenceModelSelectionViewModelBuilder _referenceModelSelectionViewModelBuilder;
+
+        public CampaignAnimationCreatorViewModel(Editor editor,
+            IComponentInserter componentInserter, 
+            ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder,
+            AnimationPlayerViewModel animationPlayerViewModel,
+            EventHub eventHub,
+            MainScene scene) 
+            : base(componentInserter, animationPlayerViewModel, scene)
         {
             DisplayName.Value = "Campaign Animation Creator";
+            Editor = editor;
+            _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
+
+            eventHub.Register<SceneInitializedEvent>(Initialize);
         }
 
-        public override void Initialize()
+        void Initialize(SceneInitializedEvent sceneInitializedEvent)
         {
-            ReferenceModelView.Data.IsSelectable = true;
-            ReferenceModelView.IsControlVisible.Value = false;
-            Editor = new Editor(_pfs, _skeletonHelper, MainModelView.Data, Scene);
+            MainModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(true, "model", Color.Black, MainInput);
+            ReferenceModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(false, "not_in_use2", Color.Black, RefInput);
+
+            ReferenceModelView.Value.Data.IsSelectable = true;
+            ReferenceModelView.Value.IsControlVisible.Value = false;
+
+            Editor.Create(MainModelView.Value.Data);
         }
     }
 
@@ -25,7 +46,7 @@ namespace AnimationEditor.CampaignAnimationCreator
     {
         public static void CreateDamselEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.CreateEditorViewModel<CampaignAnimationCreatorViewModel>();
+            var editorView = toolFactory.Create<CampaignAnimationCreatorViewModel>();
             editorView.MainInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_damsel_campaign_01.variantmeshdefinition"),

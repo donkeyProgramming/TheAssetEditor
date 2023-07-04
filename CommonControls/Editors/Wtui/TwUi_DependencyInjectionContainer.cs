@@ -17,7 +17,7 @@ namespace CommonControls.Editors.Wtui
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterFileTool<TwUiViewModel, TwUiMainView>(new ExtentionToTool(EditorEnums.AnimationPack_Editor, new[] { ".twui.xml" }));
+            factory.RegisterTool<TwUiViewModel, TwUiMainView>(new ExtentionToTool(EditorEnums.AnimationPack_Editor, new[] { ".twui.xml" }));
             //factory.RegisterTool<TextEditorViewModel<CampaignAnimBinToXmlConverter>, TextEditorView>(new PathToTool(".bin", @"animations\database\battle\bin"));
         }
     }

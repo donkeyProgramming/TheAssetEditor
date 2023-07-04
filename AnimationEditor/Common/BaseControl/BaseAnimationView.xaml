@@ -10,7 +10,6 @@
              xmlns:animationtransfertool="clr-namespace:AnimationEditor.AnimationTransferTool"
              xmlns:superview="clr-namespace:AnimationEditor.SuperView"
              xmlns:skeletoneditor="clr-namespace:AnimationEditor.SkeletonEditor"
-             xmlns:animationbuilder="clr-namespace:AnimationEditor.AnimationBuilder"
              xmlns:animationkeyframeeditor="clr-namespace:AnimationEditor.AnimationKeyframeEditor"
              mc:Ignorable="d" >
     <Grid>
@@ -87,10 +86,6 @@
                                 <superview:EditorView  />
                             </DataTemplate>
 
-                            <DataTemplate DataType="{ x:Type animationbuilder:Editor}">
-                                <animationbuilder:EditorView  />
-                            </DataTemplate>
-
                             <DataTemplate DataType="{ x:Type animationkeyframeeditor:Editor}">
                                 <animationkeyframeeditor:EditorView  />
                             </DataTemplate>
@@ -100,7 +95,7 @@
                 </DockPanel>
             </ScrollViewer>
         </Grid>
- 
+
 
         <animationplayer:AnimationPlayerView Grid.Row="3" Grid.Column="0" DataContext="{Binding Player, Mode=OneTime}"/>
     </Grid>

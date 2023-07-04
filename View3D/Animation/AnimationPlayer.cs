@@ -1,14 +1,10 @@
 ﻿using CommonControls.Common;
 using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Windows;
 using View3D.Animation.AnimationChange;
-using View3D.Components;
-using View3D.Components.Component.Selection;
 using View3D.Utility;
 
 namespace View3D.Animation
@@ -35,6 +31,8 @@ namespace View3D.Animation
 
         public List<BoneKeyFrame> BoneTransforms = new List<BoneKeyFrame>();
         
+
+
         public Matrix GetSkeletonAnimatedWorld(GameSkeleton gameSkeleton, int boneIndex)
         {
             Matrix output = gameSkeleton.GetWorldTransform(boneIndex) * BoneTransforms[boneIndex].WorldTransform;
@@ -52,14 +50,14 @@ namespace View3D.Animation
         public Matrix GetSkeletonAnimatedBoneFromWorld(GameSkeleton gameSkeleton, int boneIndex, Matrix objectInWorldTransform)
         {
             var parentIndex = BoneTransforms[boneIndex].ParentBoneIndex;
-            Matrix output =  objectInWorldTransform * Matrix.Invert(GetSkeletonAnimatedWorld(gameSkeleton, boneIndex));
+            Matrix output = objectInWorldTransform * Matrix.Invert(GetSkeletonAnimatedWorld(gameSkeleton, boneIndex));
             return output;
         }
     }
 
 
     public delegate void FrameChanged(int currentFrame);
-    public class AnimationPlayer : BaseComponent
+    public class AnimationPlayer
     {
         public event FrameChanged OnFrameChanged;
 
@@ -68,15 +66,10 @@ namespace View3D.Animation
         AnimationFrame _currentAnimFrame;
         AnimationClip _animationClip;
 
-        public AnimationPlayer(IComponentManager componentManager) : base(componentManager)
-        {
-        }
-
         public bool IsPlaying { get; private set; } = true;
         public bool IsEnabled { get; set; } = false;
         public bool LoopAnimation { get; set; } = true;
         public bool MarkedForRemoval { get; set; } = false;
-        public string Description { get; set; }
 
         public List<IAnimationChangeRule> AnimationRules { get; set; } = new List<IAnimationChangeRule>();
 
@@ -111,16 +104,6 @@ namespace View3D.Animation
                     OnFrameChanged?.Invoke(0);
                 }
                 Refresh();
-
-                var selection = ComponentManager.GetComponent<SelectionManager>().GetState<BoneSelectionState>();
-                if(selection != null && Description == "Rider")
-                {
-                    selection.CurrentAnimation = _animationClip;
-                    selection.Skeleton = _skeleton;
-                    selection.CurrentFrame = CurrentFrame;
-                    selection.SelectedBones.Clear();
-                }
-                
             }
         }
 

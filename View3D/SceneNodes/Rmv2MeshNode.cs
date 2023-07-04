@@ -65,16 +65,17 @@ namespace View3D.SceneNodes
 
 
         public AnimationPlayer AnimationPlayer;
+        private RenderEngineComponent _renderEngineComponent;
 
         private Rmv2MeshNode()
         { }
 
-        public Rmv2MeshNode(RmvCommonHeader commonHeader, MeshObject meshObject, IMaterial material, AnimationPlayer animationPlayer, IComponentManager componentManager, PbrShader shader = null)
+        public Rmv2MeshNode(RmvCommonHeader commonHeader, MeshObject meshObject, IMaterial material, AnimationPlayer animationPlayer, RenderEngineComponent renderEngineComponent, PbrShader shader = null)
         {
-            _componentManager = componentManager;
             CommonHeader = commonHeader;
             Material = material;
             AnimationPlayer = animationPlayer;
+            _renderEngineComponent = renderEngineComponent;
             Name = Material.ModelName;
             Geometry = meshObject;
 
@@ -83,6 +84,10 @@ namespace View3D.SceneNodes
             Orientation = Quaternion.Identity;
 
             Effect = shader;
+            if (_renderEngineComponent == null)
+            { 
+            
+            }
         }
 
         public void Initialize(ResourceLibary resourceLib)
@@ -94,7 +99,7 @@ namespace View3D.SceneNodes
 
         void CreateShader()
         {
-            if (_componentManager.GetComponent<RenderEngineComponent>().MainRenderFormat == Rendering.RenderFormats.MetalRoughness)
+            if (_renderEngineComponent.MainRenderFormat == Rendering.RenderFormats.MetalRoughness)
                 Effect = new PbrShader_MetalRoughness(_resourceLib);
             else
                 Effect = new PbrShader_SpecGloss(_resourceLib);
@@ -215,6 +220,7 @@ namespace View3D.SceneNodes
             typedTarget.Geometry = Geometry.Clone();
             typedTarget._resourceLib = _resourceLib;
             typedTarget._componentManager = _componentManager;
+            typedTarget._renderEngineComponent = _renderEngineComponent;
             //warhammer 2 compat
             if (typedTarget.Effect != null) 
             {

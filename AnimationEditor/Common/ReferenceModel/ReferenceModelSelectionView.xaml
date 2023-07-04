@@ -20,8 +20,8 @@
                 <StackPanel Orientation="Horizontal">
                     <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding IsVisible, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                     <TextBlock VerticalAlignment="Center">
-                        <Run FontSize="14" FontWeight="Bold"  Text="{Binding HeaderName, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
-                        <Run Text="{Binding SubHeaderName, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+                        <Run FontSize="14" FontWeight="Bold"  Text="{Binding HeaderName.Value, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+                        <Run Text="{Binding SubHeaderName.Value, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
                     </TextBlock>
                 </StackPanel>
             </Expander.Header>

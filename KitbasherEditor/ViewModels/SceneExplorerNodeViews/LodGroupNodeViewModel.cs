@@ -27,7 +27,9 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
                 if (value.HasValue)
                 {
-                    var lodHeaders = _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().Model.LodHeaders;
+                    var sceneManager = _componentManager.GetComponent<SceneManager>();
+                    var root = sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+                    var lodHeaders = root.Model.LodHeaders;
                     lodHeaders[_node.LodValue].LodCameraDistance = value.Value;
                 }
             }
@@ -37,12 +39,16 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         {
             get
             {
-                var lodHeaders = _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().Model.LodHeaders;
+                var sceneManager = _componentManager.GetComponent<SceneManager>();
+                var root = sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+                var lodHeaders = root.Model.LodHeaders;
                 return lodHeaders[_node.LodValue].QualityLvl;
             }
-            set 
+            set
             {
-                var lodHeaders = _componentManager.GetComponent<IEditableMeshResolver>().GeEditableMeshRootNode().Model.LodHeaders;
+                var sceneManager = _componentManager.GetComponent<SceneManager>();
+                var root = sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+                var lodHeaders = root.Model.LodHeaders; ;
                 lodHeaders[_node.LodValue].QualityLvl = value;
                 NotifyPropertyChanged();
             }

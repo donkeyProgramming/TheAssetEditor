@@ -1,10 +1,10 @@
-﻿using CommonControls.Common;
+﻿using Common;
+using CommonControls.Common;
 using CommonControls.MathViews;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
 using System.ComponentModel;
-using System.Windows.Input;
+using View3D.Commands;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Components.Gizmo;
@@ -25,8 +25,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         SelectionManager _selectionManager;
         CommandExecutor _commandExecutor;
+        private readonly CommandFactory _commandFactory;
 
-        public ICommand ApplyCommand { get; set; }
+        public System.Windows.Input.ICommand ApplyCommand { get; set; }
 
         bool _buttonEnabled = false;
         public bool ButtonEnabled { get { return _buttonEnabled; } set { SetAndNotify(ref _buttonEnabled, value); } }
@@ -46,16 +47,16 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public NotifyAttr<bool> ShowVertexFalloff { get; set; } = new NotifyAttr<bool>(false);
 
 
-        public TransformToolViewModel(IComponentManager componentManager)
+        public TransformToolViewModel(SelectionManager selectionManager, CommandExecutor commandExecutor, CommandFactory commandFactory, EventHub eventHub)
         {
             ApplyCommand = new RelayCommand(ApplyTransform);
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-            _commandExecutor = componentManager.GetComponent<CommandExecutor>();
-
-            _selectionManager.SelectionChanged += SelectionChanged;
 
             VertexMovementFalloff = new NotifyAttr<DoubleViewModel>(new DoubleViewModel());
             VertexMovementFalloff.Value.PropertyChanged += VertexMovementFalloffChanged;
+            _selectionManager = selectionManager;
+            _commandExecutor = commandExecutor;
+            _commandFactory = commandFactory;
+            eventHub.Register<SelectionChangedEvent>(Handle);
         }
 
         public void VertexMovementFalloffChanged(object sender, PropertyChangedEventArgs e)
@@ -79,10 +80,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                     ButtonEnabled = vertexSelectionState.SelectionCount() != 0;
                     ShowVertexFalloff.Value = true;
                 }
-                else if (state is BoneSelectionState boneSelectionState)
-                {
-                    ButtonEnabled = boneSelectionState.SelectionCount() != 0;
-                }
             }
         }
 
@@ -103,7 +100,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         void ApplyTransform()
         {
-            var transform = TransformGizmoWrapper.CreateFromSelectionState(_selectionManager.GetState());
+            var transform = TransformGizmoWrapper.CreateFromSelectionState(_selectionManager.GetState(), _commandFactory);
             if (transform == null || _activeMode == TransformMode.None) 
                 return;
 
@@ -138,19 +135,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 _vector3.Set(0);
         }
 
-        GizmoMode ConvertToGizmoMode(TransformMode mode)
+        void Handle(SelectionChangedEvent notification)
         {
-            switch (mode)
-            {
-                case TransformMode.Rotate:
-                    return GizmoMode.Rotate;
-                case TransformMode.Scale:
-                    return GizmoMode.NonUniformScale;
-                case TransformMode.Translate:
-                    return GizmoMode.Translate;
-                default:
-                    throw new System.Exception();
-            }
+            SelectionChanged(notification.NewState);
         }
     }
 }

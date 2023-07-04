@@ -2,7 +2,6 @@
 using CommonControls.FileTypes.PackFiles.Models;
 using Serilog;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,22 +9,22 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using CommonControls.PackFileBrowser;
+using CommonControls.Events;
 
 namespace CommonControls.Services
 {
-
     public class PackFileService
     {
         ILogger _logger = Logging.Create<PackFileService>();
-
-
+        private readonly GlobalEventSender _globalEventSender;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         public PackFileDataBase Database { get; private set; }
         private readonly ApplicationSettingsService _settingsService;
         private readonly GameInformationFactory _gameInformationFactory;
 
-        public PackFileService(PackFileDataBase database, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
+        public PackFileService(GlobalEventSender globalEventSender, PackFileDataBase database, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
+            _globalEventSender = globalEventSender;
             Database = database;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _settingsService = settingsService;
@@ -33,7 +32,6 @@ namespace CommonControls.Services
         }
 
         public bool TriggerFileUpdates { get; set; } = true;
-
 
         public PackFileContainer Load(string packFileSystemPath, bool setToMainPackIfFirst = false, bool allowLoadWithoutCaPackFiles = false) 
         {
@@ -44,7 +42,7 @@ namespace CommonControls.Services
                 {
                     MessageBox.Show("You are trying to load a packfile before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
                     
-                    if(System.Diagnostics.Debugger.IsAttached)
+                    if(System.Diagnostics.Debugger.IsAttached == false)
                         return null;
                 }
 
@@ -383,6 +381,7 @@ namespace CommonControls.Services
                 _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, container);
 
                 Database.TriggerPackFileAdded(container, new List<PackFile>() { newFile });
+                _globalEventSender.TriggerEvent(new PackFileSavedEvent());
             }
         }
 
@@ -599,6 +598,7 @@ namespace CommonControls.Services
                 throw new Exception("Can not save ca pack file");
             file.DataSource = new MemorySource(data);
             Database.TriggerPackFilesUpdated(pf, new List<PackFile>() { file });
+            _globalEventSender.TriggerEvent(new PackFileSavedEvent());
         }
 
         public void Save(PackFileContainer pf, string path, bool createBackup)

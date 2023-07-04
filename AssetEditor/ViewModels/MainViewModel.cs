@@ -1,9 +1,6 @@
 ﻿using AssetEditor.Views.Settings;
-using Audio;
-using CommonControls.BaseDialogs.ToolSelector;
 using CommonControls.Common;
-using CommonControls.FileTypes.AnimationPack;
-using CommonControls.FileTypes.DB;
+using CommonControls.Events;
 using CommonControls.FileTypes.MetaData;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
@@ -13,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -24,10 +20,12 @@ namespace AssetEditor.ViewModels
     {
         ILogger _logger = Logging.Create<MainViewModel>();
         PackFileService _packfileService;
+        private readonly ScopeRepository _scopeRepository;
+
         public PackFileBrowserViewModel FileTree { get; private set; }
         public MenuBarViewModel MenuBar { get; set; }
 
-        public ToolFactory ToolsFactory { get; set; }
+        public IToolFactory ToolsFactory { get; set; }
         public ObservableCollection<IEditorViewModel> CurrentEditorsList { get; set; } = new ObservableCollection<IEditorViewModel>();
 
         int _selectedIndex;
@@ -54,11 +52,10 @@ namespace AssetEditor.ViewModels
         public ICommand CloseToolsToRightCommand { get; set; }
         public ICommand CloseToolsToLeftCommand { get; set; }
 
-        public MainViewModel(GameInformationFactory gameInformationFactory, MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, ToolFactory toolFactory, SkeletonAnimationLookUpHelper animationLookUpHelper)
+        public MainViewModel(GameInformationFactory gameInformationFactory, MenuBarViewModel menuViewModel, IServiceProvider serviceProvider, PackFileService packfileService, ApplicationSettingsService settingsService, IToolFactory toolFactory, ScopeRepository scopeRepository)
         {
             _packfileService = packfileService;
             _packfileService.Database.BeforePackFileContainerRemoved += Database_BeforePackFileContainerRemoved;
-
             MenuBar = menuViewModel;
             MenuBar.EditorCreator = this;
             CloseToolCommand = new RelayCommand<IEditorViewModel>(CloseTool);
@@ -73,7 +70,7 @@ namespace AssetEditor.ViewModels
             FileTree.FileOpen += OpenFile;
 
             ToolsFactory = toolFactory;
-
+            _scopeRepository = scopeRepository;
             if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
             {
                 var settingsWindow = serviceProvider.GetRequiredService<SettingsWindow>();
@@ -84,17 +81,8 @@ namespace AssetEditor.ViewModels
                 settingsService.Save();
             }
 
-            //var anim3k = new BaseAnimationSlotHelper(GameTypeEnum.ThreeKingdoms).Values.Select(X => X.Value).ToList();
-            //var animWh2 = new BaseAnimationSlotHelper(GameTypeEnum.Warhammer3).Values.Select(X => X.Value).ToList();
-            //var iff = anim3k.Except(animWh2).ToList();
-            //var iff2 = animWh2.Except(animWh2).ToList();
-            //var dsfg = packfileService.Load(@"C:\Users\ole_k\Desktop\3k_animations.pack", false, true);
-            //new BaseAnimationSlotHelper(GameTypeEnum.ThreeKingdoms).ExportAnimationDebugList(packfileService, @"3kanims");
-
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
             {
-                //settingsService.CurrentSettings.CurrentGame = GameTypeEnum.Warhammer3;
-                //settingsService.CurrentSettings.SkipLoadingWemFiles = true;
                 var gamePath = settingsService.GetGamePathForCurrentGame();
                 if (gamePath != null)
                 {
@@ -111,7 +99,7 @@ namespace AssetEditor.ViewModels
             {
                 CreateTestPackFiles(packfileService);
                 //AudioTool_Debug.CreateOvnCompilerProject(packfileService);
-                AnimationEditor.MountAnimationCreator.MountAnimationCreator_Debug.CreateLionAndHu01c(this, toolFactory, packfileService);
+                //AnimationEditor.MountAnimationCreator.MountAnimationCreator_Debug.CreateLionAndHu01c(this, toolFactory, packfileService);
 
 
 
@@ -211,7 +199,7 @@ namespace AssetEditor.ViewModels
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hq3\nor\nor_war_mammoth\nor_war_mammoth_warshrine_01.rigid_model_v2"));
 
                 //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\bc1\tmb\tmb_warsphinx\tex\tmb_warsphinx_armour_01_base_colour.dds"));
-                //OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.rigid_model_v2"));
+                OpenFile(packfileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.rigid_model_v2"));
 
 
                 //AnimationPackEditor_Debug.Load(this, toolFactory, packfileService);
@@ -259,20 +247,6 @@ namespace AssetEditor.ViewModels
             //}
         }
 
-
-        void DebugCampaignBins(ApplicationSettingsService settingsService)
-        {
-            //var game = GameTypeEnum.Warhammer2;
-            //var gName = GameInformationFactory.GetGameById(game).DisplayName;
-            //var gPath = settingsService.GetGamePathForGame(game);
-            //var gRes = _packfileService.LoadAllCaFiles(gPath, gName);
-            //
-            ////var allFiles = _packfileService.FindAllFilesInDirectory(@"animations/database/campaign/bin");
-            //var allFiles = _packfileService.FindAllFilesInDirectory(@"animations/campaign/database/bin");
-            //
-            //AnimationCampaignBinHelper.BatchProcess(allFiles);
-        }
-
         private bool Database_BeforePackFileContainerRemoved(PackFileContainer container)
         {
             var openFiles = CurrentEditorsList
@@ -302,6 +276,7 @@ namespace AssetEditor.ViewModels
 
         public void OpenFile(PackFile file)
         {
+            
             if (file == null)
             {
                 _logger.Here().Error($"Attempting to open file, but file is NULL");
@@ -316,29 +291,8 @@ namespace AssetEditor.ViewModels
                 return;
             }
 
-           
-
             var fullFileName = _packfileService.GetFullPath(file );
-            var allEditors = ToolsFactory.GetAllToolViewModelFromFileName(fullFileName);
-            Type selectedEditor = null;
-            if (allEditors.Count == 0)
-            {
-                _logger.Here().Warning($"Trying to open file {file.Name}, but there are no valid tools for it.");
-                return;
-            }
-            else if (allEditors.Count == 1)
-            {
-                selectedEditor = allEditors.First().Type;
-            }
-            else
-            {
-                var selectedToolType = ToolSelectorWindow.CreateAndShow(allEditors.Select(x => x.EditorType));
-                if (selectedToolType == EditorEnums.None)
-                    return;
-                selectedEditor = allEditors.First(x => x.EditorType == selectedToolType).Type;
-            }
-
-            var editorViewModel = ToolsFactory.CreateFromType(selectedEditor);
+            var editorViewModel = ToolsFactory.Create(fullFileName);
 
             _logger.Here().Information($"Opening {file.Name} with {editorViewModel.GetType().Name}");
             editorViewModel.MainFile = file;
@@ -356,6 +310,7 @@ namespace AssetEditor.ViewModels
 
             var index = CurrentEditorsList.IndexOf(tool);
             CurrentEditorsList.RemoveAt(index);
+            ToolsFactory.DestroyEditor(tool);
             tool.Close();
         }
 
@@ -400,10 +355,8 @@ namespace AssetEditor.ViewModels
             SelectedEditorIndex = CurrentEditorsList.Count - 1;
         }
 
-        public bool AllowDrop(IEditorViewModel node, IEditorViewModel targeNode = default, bool insertAfterTargetNode = default)
-        {
-            return true;
-        }
+        public bool AllowDrop(IEditorViewModel node, IEditorViewModel targeNode = default, bool insertAfterTargetNode = default) => true;
+
 
         public bool Drop(IEditorViewModel node, IEditorViewModel targeNode = default, bool insertAfterTargetNode = default)
         {

@@ -1,5 +1,4 @@
 ﻿using CommonControls.Common;
-using MonoGame.Framework.WpfInterop;
 using System;
 using View3D.Components.Component.Selection;
 using View3D.Components.Gizmo;
@@ -12,11 +11,11 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         SelectionComponent _selectionComponent;
         TransformToolViewModel _transformToolViewModel;
 
-        public GizmoActions(TransformToolViewModel transformToolViewModel, IComponentManager componentManager)
+        public GizmoActions(TransformToolViewModel transformToolViewModel, SelectionComponent selectionComponent, GizmoComponent gizmoComponent)
         {
             _transformToolViewModel = transformToolViewModel;
-            _gizmoComponent = componentManager.GetComponent<GizmoComponent>();
-            _selectionComponent = componentManager.GetComponent<SelectionComponent>();
+            _selectionComponent = selectionComponent;
+            _gizmoComponent = gizmoComponent;
         }
 
         public void UpdateSelectionMode(GeometrySelectionMode mode)
@@ -30,8 +29,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 _selectionComponent.SetFaceSelectionMode();
             else if (mode == GeometrySelectionMode.Vertex)
                 _selectionComponent.SetVertexSelectionMode();
-            else if (mode == GeometrySelectionMode.Bone)
-                _selectionComponent.SetBoneSelectionMode();
             else
                 throw new NotImplementedException("Unkown state");
         }

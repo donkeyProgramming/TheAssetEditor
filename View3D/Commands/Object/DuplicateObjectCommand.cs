@@ -1,40 +1,37 @@
 ﻿using CommonControls.Common;
-using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using View3D.Components.Component;
+using View3D.Commands.Face;
 using View3D.Components.Component.Selection;
-using View3D.Rendering;
 using View3D.SceneNodes;
 
 namespace View3D.Commands.Object
 {
-    public class DuplicateObjectCommand : CommandBase<DuplicateObjectCommand>
+    public class DuplicateObjectCommand : ICommand
     {
+        ILogger _logger = Logging.Create<FaceSelectionCommand>();
         List<ISceneNode> _objectsToCopy;
         List<ISceneNode> _clonedObjects = new List<ISceneNode>();
         SelectionManager _selectionManager;
 
         ISelectionState _oldState;
-        public DuplicateObjectCommand(List<ISceneNode> objectsToCopy)
+
+        public string HintText { get => "Duplicate Object"; }
+        public bool IsMutation { get => true; }
+
+        public void Configure(List<ISceneNode> objectsToCopy)
         {
             _objectsToCopy = new List<ISceneNode>(objectsToCopy);
         }
 
-        public override string GetHintText()
+        public DuplicateObjectCommand(SelectionManager selectionManager)
         {
-            return "Duplicate Object";
+            _selectionManager = selectionManager;
         }
 
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-        }
-
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _logger.Here().Information($"Command info - Items[{string.Join(',', _objectsToCopy.Select(x => x.Name))}]");
 
@@ -56,7 +53,7 @@ namespace View3D.Commands.Object
             _selectionManager.SetState(objectState);
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             foreach (var item in _clonedObjects)
                 item.Parent.RemoveObject(item);

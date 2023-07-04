@@ -6,15 +6,13 @@ using Audio.Utility;
 using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
+using Microsoft.Extensions.DependencyInjection;
 using MoreLinq;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
-using static System.ComponentModel.Design.ObjectSelectorEditor;
 
 namespace Audio.Presentation.AudioExplorer
 {
@@ -109,7 +107,7 @@ namespace Audio.Presentation.AudioExplorer
             if (selectedNode.Item.Type == FileFormats.WWise.HircType.Sound)
             {
                 var findAudioParentStructureHelper = new FindAudioParentStructureHelper();
-                var parentStructs = findAudioParentStructureHelper.Compute(selectedNode.Item as CAkSound_v136, _audioRepository);
+                var parentStructs = findAudioParentStructureHelper.Compute(selectedNode.Item, _audioRepository);
 
                 SelectedNodeText.Value += "\n\nParent structure:\n";
                 foreach (var parentStruct in parentStructs)

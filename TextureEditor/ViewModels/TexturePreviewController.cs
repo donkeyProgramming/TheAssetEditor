@@ -2,6 +2,7 @@
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework.Graphics;
 using Serilog;
 using System;
@@ -18,8 +19,6 @@ using View3D.Utility;
 
 namespace TextureEditor.ViewModels
 {
-    // This really needs some cleanup
-
     public class TextureEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel, IDisposable
     {
         ILogger _logger = Logging.Create<TextureEditorViewModel>();
@@ -29,7 +28,6 @@ namespace TextureEditor.ViewModels
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>();
 
-        
         public PackFile MainFile { get => _file; set => Load(value); }
         public bool HasUnsavedChanges { get => false; set { } }
 
@@ -82,7 +80,7 @@ namespace TextureEditor.ViewModels
         TextureToTextureRenderer _textureRenderer;
         string _imagePath;
         TexturePreviewViewModel _viewModel;
-        SceneContainer _scene;
+        MainScene _scene;
         MeshObject _mesh;
 
         public class ViewModelWrapper: NotifyPropertyChangedImpl
@@ -119,7 +117,7 @@ namespace TextureEditor.ViewModels
 
             _mesh = meshObject;
 
-            _scene = new SceneContainer();
+            _scene = new MainScene(null, null);
             _scene.Components.Add(new ResourceLibary(_scene, packFileService ));
             _scene.ForceCreate();
 

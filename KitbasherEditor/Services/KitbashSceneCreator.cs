@@ -3,11 +3,11 @@ using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
 using KitbasherEditor.ViewModels;
-using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using View3D.Components.Component;
+using View3D.Components.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Services;
@@ -19,31 +19,41 @@ namespace KitbasherEditor.Services
     {
         ILogger _logger = Logging.Create<KitbashSceneCreator>();
 
-        public MainEditableNode MainNode { get; private set; }
+        private MainEditableNode MainNode { get; set; }
         public ISceneNode ReferenceMeshNode { get; private set; }
 
-        PackFileService _packFileService;
-        ResourceLibary _resourceLibary;
-        AnimationControllerViewModel _animationView;
-        SceneManager _sceneManager;
-        IGeometryGraphicsContextFactory _geometryFactory;
-        IComponentManager _componentManager;
-        ApplicationSettingsService _applicationSettingsService;
+        private readonly PackFileService _packFileService;
+        private readonly ResourceLibary _resourceLibary;
+        private readonly AnimationControllerViewModel _animationView;
+        private readonly SceneManager _sceneManager;
+        private readonly RenderEngineComponent _renderEngineComponent;
+        private readonly IGeometryGraphicsContextFactory _geometryFactory;
+        private readonly ApplicationSettingsService _applicationSettingsService;
 
-        public KitbashSceneCreator(IComponentManager componentManager, PackFileService packFileService, AnimationControllerViewModel animationView, PackFile mainFile, IGeometryGraphicsContextFactory geometryFactory, ApplicationSettingsService applicationSettingsService)
+        public KitbashSceneCreator(
+            ResourceLibary resourceLibary,
+            SceneManager sceneManager,
+            RenderEngineComponent renderEngineComponent,
+            PackFileService packFileService,
+            AnimationControllerViewModel animationView, 
+            IGeometryGraphicsContextFactory geometryFactory,
+            ApplicationSettingsService applicationSettingsService)
         {
-            _componentManager = componentManager;
             _packFileService = packFileService;
             _animationView = animationView;
             _geometryFactory = geometryFactory;
             _applicationSettingsService = applicationSettingsService;
 
-            _resourceLibary = componentManager.GetComponent<ResourceLibary>();
-            _sceneManager = componentManager.GetComponent<SceneManager>();
+            _resourceLibary = resourceLibary;
+            _sceneManager = sceneManager;
+            _renderEngineComponent = renderEngineComponent;
+        }
 
-            var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(componentManager, null) { IsLockable = false });
-            MainNode = _sceneManager.RootNode.AddObject(new MainEditableNode(_animationView.GetPlayer(), "Editable Model", skeletonNode, mainFile, packFileService));
-            ReferenceMeshNode = _sceneManager.RootNode.AddObject(new GroupNode("Reference meshs") { IsEditable = false, IsLockable = false });
+        public void Create()
+        {
+            var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(_resourceLibary, null) { IsLockable = false });
+            MainNode = _sceneManager.RootNode.AddObject(new MainEditableNode(_animationView.GetPlayer(), SpecialNodes.EditableModel, skeletonNode, _packFileService));
+            ReferenceMeshNode = _sceneManager.RootNode.AddObject(new GroupNode(SpecialNodes.ReferenceMeshs) { IsEditable = false, IsLockable = false });
         }
 
         public void LoadMainEditableModel(PackFile file)
@@ -51,7 +61,9 @@ namespace KitbasherEditor.Services
             var modelFullPath = _packFileService.GetFullPath(file);
             var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
 
-            MainNode.CreateModelNodesFromFile(rmv, _resourceLibary, _animationView.GetPlayer(), _geometryFactory, modelFullPath, _componentManager, _packFileService, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
+            MainNode.CreateModelNodesFromFile(rmv, _resourceLibary, _animationView.GetPlayer(), _geometryFactory,
+                modelFullPath, _renderEngineComponent, _packFileService, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
+
             MainNode.SelectedOutputFormat = rmv.Header.Version;
 
             int meshCount = Math.Min(MainNode.Children.Count, rmv.LodHeaders.Length);
@@ -104,7 +116,7 @@ namespace KitbasherEditor.Services
 
         SceneNode LoadModel(PackFile file)
         {
-            SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, _geometryFactory, _componentManager, _applicationSettingsService);
+            SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, _geometryFactory, _renderEngineComponent, _applicationSettingsService);
             var loadedNode = loader.Load(file, null, _animationView.GetPlayer());
 
             if (loadedNode == null)

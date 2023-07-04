@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Animation;
+using View3D.Components.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.Services;
 using View3D.Utility;
@@ -34,7 +35,8 @@ namespace View3D.SceneNodes
             UpdateDefaultLodValues();
         }
 
-        public void CreateModelNodesFromFile(RmvFile model, ResourceLibary resourceLibary, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory, string modelFullPath, IComponentManager componentManager, PackFileService pfs, bool autoResolveTexture)
+        public void CreateModelNodesFromFile(RmvFile model, ResourceLibary resourceLibary, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory, string modelFullPath,
+            RenderEngineComponent renderEngineComponent, PackFileService pfs, bool autoResolveTexture)
         {
             Model = model;
             for (int lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
@@ -51,7 +53,7 @@ namespace View3D.SceneNodes
                 {
                     var geometry = MeshBuilderService.BuildMeshFromRmvModel(model.ModelList[lodIndex][modelIndex], model.Header.SkeletonName, contextFactory.Create());
                     var rmvModel = model.ModelList[lodIndex][modelIndex];
-                    var node = new Rmv2MeshNode(rmvModel.CommonHeader, geometry, rmvModel.Material, animationPlayer, componentManager);
+                    var node = new Rmv2MeshNode(rmvModel.CommonHeader, geometry, rmvModel.Material, animationPlayer, renderEngineComponent);
                     node.Initialize(resourceLibary);
                     node.OriginalFilePath = modelFullPath;
                     node.OriginalPartIndex = modelIndex;

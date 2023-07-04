@@ -347,14 +347,15 @@ namespace View3D.Services
 
         string DetermineDefaultProjectName(MainEditableNode node)
         {
-            if (string.IsNullOrWhiteSpace(ProjectPath) == false)
-                return ProjectPath;
-
-            var path = _pfs.GetFullPath(node.MainPackFile);
-            var dirName = Path.GetDirectoryName(path);
-            dirName = dirName.Replace(@"variantmeshes\wh_variantmodels\", "", StringComparison.InvariantCultureIgnoreCase);
-            var projectDir = DirectoryHelper.Temp + "\\" + dirName;
-            return projectDir;
+            throw new NotImplementedException();
+            //if (string.IsNullOrWhiteSpace(ProjectPath) == false)
+            //    return ProjectPath;
+            //
+            //var path = _pfs.GetFullPath(node.MainPackFile);
+            //var dirName = Path.GetDirectoryName(path);
+            //dirName = dirName.Replace(@"variantmeshes\wh_variantmodels\", "", StringComparison.InvariantCultureIgnoreCase);
+            //var projectDir = DirectoryHelper.Temp + "\\" + dirName;
+            //return projectDir;
         }
 
 

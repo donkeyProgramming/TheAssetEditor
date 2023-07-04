@@ -1,12 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.WpfInterop;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using View3D.Components;
 using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
@@ -14,7 +10,6 @@ using View3D.Utility;
 
 namespace View3D.Rendering
 {
-
     [StructLayout(LayoutKind.Sequential)]
     public struct InstanceDataOrientation : IVertexType
     {
@@ -22,7 +17,6 @@ namespace View3D.Rendering
         public Vector3 instanceUp;
         public Vector3 instanceLeft;
         public Vector3 instancePosition;
-        //public float instanceTimeOrId;
 
         public static readonly VertexDeclaration VertexDeclaration;
         static InstanceDataOrientation()
@@ -72,11 +66,9 @@ namespace View3D.Rendering
         Vector3 _selectedColur = new Vector3(1, 0, 0);
         Vector3 _deselectedColur = new Vector3(1, 1, 1);
 
-        public VertexInstanceMesh(IComponentManager comonentManager)
+        public VertexInstanceMesh(DeviceResolverComponent deviceResolverComponent, ResourceLibary resourceLibary)
         {
-            var graphics = comonentManager.GetComponent<DeviceResolverComponent>();
-            var resourceLib = comonentManager.GetComponent<ResourceLibary>();
-            Initialize(graphics.Device, resourceLib);
+            Initialize(deviceResolverComponent.Device, resourceLibary);
         }
 
         void Initialize(GraphicsDevice device, ResourceLibary resourceLib)

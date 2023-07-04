@@ -4,6 +4,7 @@ using AnimationEditor.MountAnimationCreator.ViewModels;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
+using CsvHelper;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
@@ -28,8 +29,8 @@ namespace AnimationEditor.AnimationKeyframeEditor
     public class Editor : NotifyPropertyChangedImpl
     {
         ILogger _logger = Logging.Create<Editor>();
+        private AssetViewModelBuilder _assetViewModelBuilder;
         PackFileService _pfs;
-        private AssetViewModel _newAnimation;
         private ApplicationSettingsService _applicationSettings;
         private AssetViewModel _mount;
         private AssetViewModel _rider;
@@ -38,10 +39,11 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private SelectionComponent _selectionComponent;
         private TransformToolViewModel _transformToolVIewModel;
         private GizmoActions _gizmoActions;
-        private CommandExecutor _commandManager;
         private SceneManager _sceneManager;
 
         private int _currentFrameNumber = 0;
+        private GizmoComponent _gizmoComponent;
+
         public int CurrentFrameNumber { get { return _currentFrameNumber; } set { SetAndNotifyWhenChanged(ref _currentFrameNumber, value); } }
 
         public NotifyAttr<bool> AllowToSelectAnimRoot { get; set; } = new NotifyAttr<bool>(false);
@@ -55,31 +57,17 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         public AnimationSettingsViewModel AnimationSettings { get; set; } = new AnimationSettingsViewModel();
 
-
-        public Editor(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
-                     AssetViewModel rider, AssetViewModel mount, AssetViewModel newAnimation, 
-                     IComponentManager componentManager, ApplicationSettingsService applicationSettings)
+        public Editor(AssetViewModelBuilder assetViewModelBuilder, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService applicationSettings)
         {
+            _assetViewModelBuilder = assetViewModelBuilder;
             _pfs = pfs;
-            _newAnimation = newAnimation;
+
             _applicationSettings = applicationSettings;
-            _mount = mount;
-            _rider = rider;
+
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-            _commandManager = componentManager.GetComponent<CommandExecutor>();
-            _selectionComponent = componentManager.GetComponent<SelectionComponent>();
-            _sceneManager = componentManager.GetComponent<SceneManager>();
-            
-            _transformToolVIewModel = new TransformToolViewModel(componentManager);
-            _gizmoActions = new GizmoActions(_transformToolVIewModel, componentManager);
-
-
-            DisplayGeneratedSkeleton = new NotifyAttr<bool>(true, (value) => _newAnimation.ShowSkeleton.Value = value);
-            DisplayGeneratedMesh = new NotifyAttr<bool>(true, (value) => { if (_newAnimation.MainNode != null) _newAnimation.ShowMesh.Value = value; });
 
             SelectedRiderBone = new FilterCollection<SkeletonBoneNode>(null, (x) => UpdateCanSaveAndPreviewStates());
-            MountLinkController = new MountLinkViewModel(pfs, skeletonAnimationLookUpHelper, rider, mount, UpdateCanSaveAndPreviewStates);
+
 
             ActiveOutputFragment = new FilterCollection<IAnimationBinGenericFormat>(null, OutputAnimationSetSelected);
             ActiveOutputFragment.SearchFilter = (value, rx) => { return rx.Match(value.FullPath).Success; };
@@ -87,20 +75,31 @@ namespace AnimationEditor.AnimationKeyframeEditor
             ActiveFragmentSlot = new FilterCollection<AnimationBinEntryGenericFormat>(null, (x) => UpdateCanSaveAndPreviewStates());
             ActiveFragmentSlot.SearchFilter = (value, rx) => { return rx.Match(value.SlotName).Success; };
 
+
+
+            AnimationSettings.SettingsChanged += () => TryReGenerateAnimation(null);
+
+
+        }
+
+        internal Editor Create(AssetViewModel rider, AssetViewModel mount, IComponentManager componentManager)
+        {
+            _mount = mount;
+            _rider = rider;
+            _selectionManager = componentManager.GetComponent<SelectionManager>();
+
             _mount.SkeletonChanged += MountSkeletonChanged;
             _mount.AnimationChanged += TryReGenerateAnimation;
             _rider.SkeletonChanged += RiderSkeletonChanges;
             _rider.AnimationChanged += TryReGenerateAnimation;
 
-            AnimationSettings.SettingsChanged += () => TryReGenerateAnimation(null);
-
             MountSkeletonChanged(_mount.Skeleton);
             RiderSkeletonChanges(_rider.Skeleton);
 
-            _rider.Player.OnFrameChanged += OnFrameTick;
-            _selectionManager.SelectionChanged += OnSelectionChanged;
-        }
+            MountLinkController = new MountLinkViewModel(_assetViewModelBuilder, _pfs, _skeletonAnimationLookUpHelper, rider, mount, UpdateCanSaveAndPreviewStates);
 
+            return this;
+        }
         private void OnSelectionChanged(ISelectionState state)
         {
             if(state is BoneSelectionState boneSelectionState)
@@ -164,10 +163,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private void TryReGenerateAnimation(AnimationClip newValue)
         {
             UpdateCanSaveAndPreviewStates();
-            if (CanPreview.Value)
-                _newAnimation?.SetAnimation(null); //CreateMountAnimationAction();
-            else
-                _newAnimation?.SetAnimation(null);
         }
 
         private void MountSkeletonChanged(GameSkeleton newValue)
@@ -213,8 +208,8 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             if(selectableNode != null)
             {
-                var selectCommand = new ObjectSelectionCommand(new List<ISelectable> { selectableNode }, false, false);
-                _commandManager.ExecuteCommand(selectCommand);
+                var selectionState = _selectionManager.CreateSelectionSate(GeometrySelectionMode.Object, selectableNode, false);
+                var selectCommand = new ObjectSelectionCommand(_selectionManager);
                 _selectionComponent.SetBoneSelectionMode();
                 _rider.Player.Pause();
                 _rider.Player.CurrentFrame++;

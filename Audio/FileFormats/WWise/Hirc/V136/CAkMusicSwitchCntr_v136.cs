@@ -1,4 +1,5 @@
-﻿using Filetypes.ByteParsing;
+﻿using Audio.FileFormats.WWise.Hirc.Shared;
+using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
 
@@ -17,7 +18,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public ArgumentList ArgumentList { get; set; }
         public uint uTreeDataSize { get; set; }
         public byte uMode { get; set; }
-        public AkDecisionTree AkDecisionTree { get; set; }
+        public Shared.AkDecisionTree AkDecisionTree { get; set; }
 
 
         protected override void CreateSpesificData(ByteChunk chunk)
@@ -29,7 +30,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             ArgumentList = new ArgumentList(chunk, uTreeDepth);
             uTreeDataSize = chunk.ReadUInt32();
             uMode = chunk.ReadByte();
-            AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth, uTreeDataSize);
+            AkDecisionTree = new Shared.AkDecisionTree(chunk, uTreeDepth, uTreeDataSize);
         }
 
         public override void UpdateSize() => throw new NotImplementedException();

@@ -1,16 +1,13 @@
 ﻿using CommonControls.Common;
-using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System.Collections.Generic;
-using View3D.Components.Component;
 using View3D.Components.Component.Selection;
-using View3D.Rendering;
-using View3D.Scene;
 
 namespace View3D.Commands.Face
 {
-    public class FaceSelectionCommand : CommandBase<FaceSelectionCommand>
+    public class FaceSelectionCommand : ICommand
     {
+        ILogger _logger = Logging.Create<FaceSelectionCommand>();
         SelectionManager _selectionManager;
 
         ISelectionState _oldState;
@@ -18,30 +15,29 @@ namespace View3D.Commands.Face
         bool _isRemove;
         List<int> _selectedFaces;
 
-        public FaceSelectionCommand(List<int> selectedFaces, bool isAdd = false, bool removeSelection = false)
+        public string HintText { get => "Face selected"; }
+        public bool IsMutation { get => false; }
+
+        public FaceSelectionCommand(SelectionManager selectionManager)
         {
-            _selectedFaces = selectedFaces;
-            _isAdd = isAdd;
-            _isRemove = removeSelection;
+            _selectionManager = selectionManager;
         }
 
-        public FaceSelectionCommand(int selectedFace, bool isAdd = false, bool removeSelection = false)
+        public void Configure(int selectedFace, bool isAdd = false, bool removeSelection = false)
         {
             _selectedFaces = new List<int>() { selectedFace };
             _isAdd = isAdd;
             _isRemove = removeSelection;
         }
 
-        public override string GetHintText()
+        public void Configure(List<int> selectedFaces, bool isAdd = false, bool removeSelection = false)
         {
-            return "Face selected";
-        }
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
+            _selectedFaces = selectedFaces;
+            _isAdd = isAdd;
+            _isRemove = removeSelection;
         }
 
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _oldState = _selectionManager.GetStateCopy();
             var currentState = _selectionManager.GetState() as FaceSelectionState;
@@ -55,11 +51,9 @@ namespace View3D.Commands.Face
             currentState.EnsureSorted();
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             _selectionManager.SetState(_oldState);
         }
-
-        public override bool IsMutation() => false;
     }
 }

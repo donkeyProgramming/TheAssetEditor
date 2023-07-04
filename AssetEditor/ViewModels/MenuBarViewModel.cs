@@ -3,7 +3,6 @@ using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SuperView;
-using AnimationEditor.AnimationKeyframeEditor;
 using AssetEditor.Views.Settings;
 using CommonControls.BaseDialogs;
 using CommonControls.Common;
@@ -22,14 +21,13 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using AnimationEditor.SkeletonEditor;
 using AssetEditor.Report;
-using AnimationEditor.AnimationBuilder;
 using CommonControls.Editors.AnimationPack;
-using CommonControls.BaseDialogs.ErrorListDialog;
 using System.Reflection;
 using System.IO;
 using System.Text;
 using Audio.Presentation.AudioExplorer;
 using Audio.Presentation.Compiler;
+using AnimationEditor.AnimationKeyframeEditor;
 
 namespace AssetEditor.ViewModels
 {
@@ -53,7 +51,7 @@ namespace AssetEditor.ViewModels
         private readonly GameInformationFactory _gameInformationFactory;
         IServiceProvider _serviceProvider;
         PackFileService _packfileService;
-        ToolFactory _toolFactory;
+        IToolFactory _toolFactory;
         ApplicationSettingsService _settingsService;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         public IEditorCreator EditorCreator { get; set; }
@@ -62,12 +60,9 @@ namespace AssetEditor.ViewModels
         public ICommand CreateNewPackFileCommand { get; set; }
         public ICommand OpenPackFileCommand { get; set; }
         public ICommand OpenAssetEditorFolderCommand { get; set; }
-        public ICommand OpenAnimMetaDecocderCommand { get; set; }
         public ICommand OpenMountCreatorCommand { get; set; }
-        public ICommand OpenAnimationKeyframeCommand { get; set; }
         public ICommand OpenAnimationBatchExporterCommand { get; set; }
         public ICommand OpenWh2AnimpackUpdaterCommand { get; set; }
-        public ICommand OpenAnimationBuilderCommand { get; set; }
         public ICommand OpenAudioEditorCommand { get; set; }
         public ICommand CompileAudioProjectsCommand { get; set; }
         public ICommand CreateExampleAudioProjectCommand { get; set; }
@@ -85,21 +80,20 @@ namespace AssetEditor.ViewModels
         public ICommand OpenDiscordCommand { get; set; }
         public ICommand DownloadRmeCommand { get; set; }
 
-        public ICommand OpenKitbashEditorCommand { get; set; }
         public ICommand OpenCampaignAnimCreatorCommand { get; set; }
-        public ICommand OpenPropCreatorCommand { get; set; }
+
         public ICommand OpenAnimationTransferToolCommand { get; set; }
         public ICommand OpenSuperViewToolCommand { get; set; }
-        public ICommand OpenTechSkeletonEditorCommand { get; set; }        
-
-
+        public ICommand OpenTechSkeletonEditorCommand { get; set; }
+     
         public ICommand GenerateRmv2ReportCommand { get; set; }
         public ICommand GenerateMetaDataReportCommand { get; set; }
         public ICommand GenerateFileListReportCommand { get; set; }
         public ICommand GenerateMetaDataJsonsReportCommand { get; set; }
         public ICommand CreateAnimPackWarhammer3Command { get; set; }
         public ICommand CreateAnimPack3kCommand { get; set; }
-        
+        public ICommand OpenAnimationKeyframeCommand { get; set; }
+
         // Tutorials
         public ICommand OpenAnimatedPropTutorialCommand { get; set; }
         public ICommand OpenAssetEdBasic0TutorialCommand { get; set; }
@@ -110,7 +104,7 @@ namespace AssetEditor.ViewModels
         
         public ObservableCollection<RecentPackFileItem> RecentPackFiles { get; set; } = new ObservableCollection<RecentPackFileItem>();
 
-        public MenuBarViewModel(GameInformationFactory gameInformationFactory, IServiceProvider provider, PackFileService packfileService, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ToolFactory toolFactory, ApplicationSettingsService settingsService)
+        public MenuBarViewModel(GameInformationFactory gameInformationFactory, IServiceProvider provider, PackFileService packfileService, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, IToolFactory toolFactory, ApplicationSettingsService settingsService)
         {
             _gameInformationFactory = gameInformationFactory;
             _serviceProvider = provider;
@@ -125,11 +119,7 @@ namespace AssetEditor.ViewModels
             CreateAnimPackWarhammer3Command = new RelayCommand(CreateAnimationDbWarhammer3);
             CreateAnimPack3kCommand = new RelayCommand(CreateAnimationDb3k);
             OpenAssetEditorFolderCommand = new RelayCommand(OpenAssetEditorFolder);
-            OpenKitbashEditorCommand = new RelayCommand(OpenKitbasherTool);
-            OpenAnimMetaDecocderCommand = new RelayCommand(OpenAnimMetaDecocder);
             OpenMountCreatorCommand = new RelayCommand(OpenMountCreator);
-            OpenAnimationKeyframeCommand = new RelayCommand(OpenAnimationKeyframeEditor);
-            OpenPropCreatorCommand = new RelayCommand(OpenPropCreatorEditor);
             OpenCampaignAnimCreatorCommand = new RelayCommand(OpenCampaignAnimCreatorEditor);
             OpenAnimationTransferToolCommand = new RelayCommand(OpenAnimationTransferTool);
             OpenSuperViewToolCommand = new RelayCommand(OpenSuperViewTool);
@@ -139,7 +129,7 @@ namespace AssetEditor.ViewModels
             OpenAudioEditorCommand = new RelayCommand(OpenAudioEditor);
             CompileAudioProjectsCommand = new RelayCommand(CompileAudioProjects);
             CreateExampleAudioProjectCommand = new RelayCommand(CreateExampleAudioProject);
-            OpenAnimationBuilderCommand = new RelayCommand(OpenOpenAnimationBuilder);
+            OpenAnimationKeyframeCommand = new RelayCommand(OpenAnimationKeyframeEditor);
 
             GenerateRmv2ReportCommand = new RelayCommand(GenerateRmv2Report);
             GenerateMetaDataReportCommand = new RelayCommand(GenerateMetaDataReport);
@@ -170,6 +160,12 @@ namespace AssetEditor.ViewModels
             var settings = settingsService.CurrentSettings;
             settings.RecentPackFilePaths.CollectionChanged += (sender, args) => CreateRecentPackFilesItems();
             CreateRecentPackFilesItems();
+        }
+
+        private void OpenAnimationKeyframeEditor()
+        {
+            var editorView = _toolFactory.Create<AnimationKeyframeEditorViewModel>();
+            EditorCreator.CreateEmptyEditor(editorView);
         }
 
         void CreateRecentPackFilesItems()
@@ -252,64 +248,40 @@ namespace AssetEditor.ViewModels
             Process.Start("explorer.exe", path);
         }
 
-        void OpenKitbasherTool()
-        {
-         //   var editorView = _toolFactory.CreateEdtior<KitbasherEditor.ViewModels.KitbasherViewModel>();
-         //   EditorCreator.CreateEmptyEditor(editorView);
-        }
-
-        void OpenAnimMetaDecocder()
-        {
-            //var editorView = _toolFactory.CreateEditorViewModel<AnimMetaEditor.ViewModels.MainDecoderViewModel>();
-            ////
-            // editorView.ConfigureAsDecoder();
-            //EditorCreator.CreateEmptyEditor(editorView);
-        }
-        void OpenPropCreatorEditor()
-        {
-            var editorView = _toolFactory.CreateEditorViewModel<BaseAnimationViewModel>();
-            EditorCreator.CreateEmptyEditor(editorView);
-        }
 
         void OpenMountCreator()
         {
-            var editorView = _toolFactory.CreateEditorViewModel<MountAnimationCreatorViewModel>();
-            EditorCreator.CreateEmptyEditor(editorView);
-        }
-
-        void OpenAnimationKeyframeEditor()
-        {
-            var editorView = _toolFactory.CreateEditorViewModel<AnimationKeyframeEditorViewModel>();
+            var editorView = _toolFactory.Create<MountAnimationCreatorViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
 
         void OpenCampaignAnimCreatorEditor()
         {
-            var editorView = _toolFactory.CreateEditorViewModel<CampaignAnimationCreatorViewModel>();
+            var editorView = _toolFactory.Create<CampaignAnimationCreatorViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
 
         void OpenAnimationTransferTool()
         {
-            var editorView = _toolFactory.CreateEditorViewModel<AnimationTransferToolViewModel>();
+            var editorView = _toolFactory.Create<AnimationTransferToolViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
 
         void OpenSuperViewTool()
         {
-            var editorView = _toolFactory.CreateEditorViewModel<SuperViewViewModel>();
+            var editorView = _toolFactory.Create<SuperViewViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
 
         private void OpenAudioEditor()
         {
-            var editorView = _toolFactory.CreateEditorViewModel<AudioEditorViewModel>();
+            var editorView = _toolFactory.Create<AudioEditorViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
 
         private void CompileAudioProjects()
         {
-            var editorView = _toolFactory.CreateEditorViewModel<CompilerViewModel>();
+            var editorView = _toolFactory.Create<CompilerViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
 
@@ -329,7 +301,7 @@ namespace AssetEditor.ViewModels
 
         void OpenTechSkeletonEditor()
         {
-            var editorView = _toolFactory.CreateEditorViewModel<SkeletonEditorViewModel>();
+            var editorView = _toolFactory.Create<SkeletonEditorViewModel>();
             EditorCreator.CreateEmptyEditor(editorView);
         }
 
@@ -340,13 +312,6 @@ namespace AssetEditor.ViewModels
             _packfileService.HasEditablePackFile();
             var service = new AnimPackUpdaterService(_packfileService);
             service.Process(_packfileService.GetEditablePack());
-        }
-        
-
-        void OpenOpenAnimationBuilder()
-        {
-            var editorView = _toolFactory.CreateEditorViewModel<AnimationBuilderViewModel>();
-            EditorCreator.CreateEmptyEditor(editorView);
         }
 
         void GenerateRmv2Report()

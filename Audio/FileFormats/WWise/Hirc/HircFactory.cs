@@ -28,9 +28,9 @@ namespace Audio.FileFormats.WWise.Hirc
         {
             switch (version)
             {
-                case 112: return CreateFactory_v112();
+                case 112: return CreateFactory_v112();  // Atilla
                 case 122: return CreateFactory_v122();
-                case 136: return CreateFactory_v136();
+                case 136: return CreateFactory_v136();  // Wh3
             }
 
             throw new Exception($"Unkown Version {version}");

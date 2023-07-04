@@ -27,14 +27,7 @@ namespace AnimationEditor.Common.AnimationPlayer
         public int SelectedAnimationFrameCount { get { return _selectedAnimationFrameCount; } set { SetAndNotifyWhenChanged(ref _selectedAnimationFrameCount, value); } }
 
         bool _isEnabled;
-        public bool IsEnabled 
-        { 
-            get { return _isEnabled; } 
-            set 
-            { 
-                SetAndNotify(ref _isEnabled, value); OnEnableChanged(IsEnabled); 
-            } 
-        }
+        public bool IsEnabled { get { return _isEnabled; } set { SetAndNotify(ref _isEnabled, value); OnEnableChanged(IsEnabled); } }
 
         bool _loopAnimation = true;
         public bool LoopAnimation { get { return _loopAnimation; } set { SetAndNotifyWhenChanged(ref _loopAnimation, value); } }
@@ -202,7 +195,6 @@ namespace AnimationEditor.Common.AnimationPlayer
         void NextFrame(AssetViewModel item)
         {
             item.Player.Pause();
-            item.Player.Description = item.Description;
             item.Player.CurrentFrame++;
 
             foreach (var attachedItem in item.MetaDataItems)
@@ -210,7 +202,6 @@ namespace AnimationEditor.Common.AnimationPlayer
                 if (attachedItem.Player != null)
                 {
                     attachedItem.Player.Pause();
-                    attachedItem.Player.Description = item.Description;
                     attachedItem.Player.CurrentFrame = item.Player.CurrentFrame;
                 }
             }

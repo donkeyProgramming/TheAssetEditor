@@ -1,18 +1,16 @@
 ﻿using CommonControls.Common;
-using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Components.Component;
+using View3D.Commands.Face;
 using View3D.Components.Component.Selection;
-using View3D.Rendering;
-using View3D.Scene;
 using View3D.SceneNodes;
 
 namespace View3D.Commands.Object
 {
-    public class ObjectSelectionCommand : CommandBase<ObjectSelectionCommand>
+    public class ObjectSelectionCommand : ICommand
     {
+        ILogger _logger = Logging.Create<ObjectSelectionCommand>();
         SelectionManager _selectionManager;
 
         ISelectionState _oldState;
@@ -20,31 +18,29 @@ namespace View3D.Commands.Object
         bool _isRemove;
         List<ISelectable> _items { get; set; } = new List<ISelectable>();
 
-        public ObjectSelectionCommand(List<ISelectable> items, bool isModification = false, bool removeSelection = false)
+        public string HintText { get => "Object Selected"; }
+        public bool IsMutation { get => false; }
+
+        public ObjectSelectionCommand(SelectionManager selectionManager)
+        {
+            _selectionManager = selectionManager;
+        }
+
+        public void Configure(List<ISelectable> items, bool isModification = false, bool removeSelection = false)
         {
             _items = items;
             _isModification = isModification;
             _isRemove = removeSelection;
         }
 
-        public ObjectSelectionCommand(ISelectable item, bool isModification = false, bool removeSelection = false)
+        public void Configure(ISelectable item, bool isModification = false, bool removeSelection = false)
         {
             _items = new List<ISelectable>() { item };
             _isModification = isModification;
             _isRemove = removeSelection;
         }
 
-        public override string GetHintText()
-        {
-            return "Object Selected";
-        }
-
-        public override void Initialize(IComponentManager componentManager)
-        {
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
-        }
-
-        protected override void ExecuteCommand()
+        public void Execute()
         {
             _oldState = _selectionManager.GetStateCopy();
             var currentState = _selectionManager.GetState() as ObjectSelectionState;
@@ -58,12 +54,10 @@ namespace View3D.Commands.Object
             currentState.ModifySelection(_items, _isRemove);
         }
 
-        protected override void UndoCommand()
+        public void Undo()
         {
             _selectionManager.SetState(_oldState);
         }
-
-        public override bool IsMutation() => false;
     }
 }
     

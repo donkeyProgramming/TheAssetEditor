@@ -1,7 +1,6 @@
 ﻿using CommonControls.Common;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.PackFiles.Models;
-using Microsoft.Xna.Framework;
 using Serilog;
 using System;
 using System.Collections.Concurrent;
@@ -13,7 +12,7 @@ using System.Linq;
 namespace CommonControls.Services
 {
 
-    public class SkeletonAnimationLookUpHelper : IGameComponent, IAnimationFileDiscovered
+    public class SkeletonAnimationLookUpHelper : IAnimationFileDiscovered
     {
         ILogger _logger = Logging.Create<SkeletonAnimationLookUpHelper>();
         ConcurrentDictionary<string, ObservableCollection<AnimationReference>> _skeletonNameToAnimationMap = new ConcurrentDictionary<string, ObservableCollection<AnimationReference>>();
@@ -22,10 +21,6 @@ namespace CommonControls.Services
         public ObservableCollection<string> SkeletonFileNames = new ObservableCollection<string>();
 
         public SkeletonAnimationLookUpHelper()
-        {
-        }
-
-        public void Initialize()
         {
         }
 

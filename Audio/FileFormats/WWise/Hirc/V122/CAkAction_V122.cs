@@ -12,6 +12,8 @@ namespace Audio.FileFormats.WWise.Hirc.V122
         {
             ActionType = (ActionType)chunk.ReadUShort();
             SoundId = chunk.ReadUInt32();
+
+            //public AkBankSourceData AkBankSourceData { get; set; }
         }
 
         public ActionType GetActionType() => ActionType;
@@ -19,5 +21,7 @@ namespace Audio.FileFormats.WWise.Hirc.V122
 
         public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
+
+        public uint GetStateGroupId() => throw new NotImplementedException();
     }
 }

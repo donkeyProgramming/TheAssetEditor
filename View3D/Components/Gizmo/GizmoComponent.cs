@@ -1,54 +1,57 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Framework.WpfInterop;
 using System;
-using System.Linq;
-using View3D.Commands;
-using View3D.Rendering;
 using View3D.Components.Component;
-using System.Collections.Generic;
 using View3D.Components.Rendering;
 using View3D.Components.Input;
 using View3D.Components.Component.Selection;
-using View3D.Rendering.Geometry;
-using View3D.Commands.Vertex;
 using View3D.Utility;
-using View3D.SceneNodes;
+using View3D.Commands;
+using Common;
 
 namespace View3D.Components.Gizmo
 {
     public class GizmoComponent : BaseComponent, IDisposable
-    {
-        MouseComponent _mouse;
-        KeyboardComponent _keyboard;
-        SelectionManager _selectionManager;
-        CommandExecutor _commandManager;
-       
+    {   
+        private readonly MouseComponent _mouse;
+        private readonly EventHub _eventHub;
+        private readonly KeyboardComponent _keyboard;
+        private readonly SelectionManager _selectionManager;
+        private readonly CommandExecutor _commandManager;
+        private readonly ArcBallCamera _camera;
+        private readonly ResourceLibary _resourceLibary;
+        private readonly DeviceResolverComponent _deviceResolverComponent;
+        private readonly CommandFactory _commandFactory;
         Gizmo _gizmo;
         bool _isEnabled = false;
         TransformGizmoWrapper _activeTransformation;
         bool _isCtrlPressed = false;
 
-        public GizmoComponent(IComponentManager componentManager) : base(componentManager)
+
+        public GizmoComponent(EventHub eventHub,
+            KeyboardComponent keyboardComponent, MouseComponent mouseComponent, ArcBallCamera camera, CommandExecutor commandExecutor,
+            ResourceLibary resourceLibary, DeviceResolverComponent deviceResolverComponent, CommandFactory commandFactory,
+            SelectionManager selectionManager)
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.Gizmo;
             DrawOrder = (int)ComponentDrawOrderEnum.Gizmo;
+            _eventHub = eventHub;
+            _keyboard = keyboardComponent;
+            _mouse = mouseComponent;
+            _camera = camera;
+            _commandManager = commandExecutor;
+            _resourceLibary = resourceLibary;
+            _deviceResolverComponent = deviceResolverComponent;
+            _commandFactory = commandFactory;
+            _selectionManager = selectionManager;
+
+            _eventHub.Register<SelectionChangedEvent>(Handle);
         }
        
         public override void Initialize()
         {
-            _commandManager = ComponentManager.GetComponent<CommandExecutor>();
-            _selectionManager = ComponentManager.GetComponent<SelectionManager>();
-            _keyboard = ComponentManager.GetComponent<KeyboardComponent>();
-            _mouse = ComponentManager.GetComponent<MouseComponent>();
-            var camera = ComponentManager.GetComponent<ArcBallCamera>();
-            var resourceLibary = ComponentManager.GetComponent<ResourceLibary>();
-            var graphics = ComponentManager.GetComponent<DeviceResolverComponent>();
-
-            _selectionManager.SelectionChanged += OnSelectionChanged;
-
-            _gizmo = new Gizmo(camera, _mouse, graphics.Device, new SpriteBatch(graphics.Device), resourceLibary.DefaultFont);
+            _gizmo = new Gizmo(_camera, _mouse, _deviceResolverComponent.Device, new SpriteBatch(_deviceResolverComponent.Device), _resourceLibary.DefaultFont);
             _gizmo.ActivePivot = PivotType.ObjectCenter;
             _gizmo.TranslateEvent += GizmoTranslateEvent;
             _gizmo.RotateEvent += GizmoRotateEvent;
@@ -60,7 +63,7 @@ namespace View3D.Components.Gizmo
         private void OnSelectionChanged(ISelectionState state)
         {
             _gizmo.Selection.Clear();
-            _activeTransformation = TransformGizmoWrapper.CreateFromSelectionState(state);
+            _activeTransformation = TransformGizmoWrapper.CreateFromSelectionState(state, _commandFactory);
             if(_activeTransformation != null)
                 _gizmo.Selection.Add(_activeTransformation);
 
@@ -112,9 +115,7 @@ namespace View3D.Components.Gizmo
 
         public override void Update(GameTime gameTime)
         {
-            if ( !(_selectionManager.GetState().Mode == GeometrySelectionMode.Object || 
-                   _selectionManager.GetState().Mode == GeometrySelectionMode.Vertex ||
-                   _selectionManager.GetState().Mode == GeometrySelectionMode.Bone))
+            if ( !(_selectionManager.GetState().Mode == GeometrySelectionMode.Object || _selectionManager.GetState().Mode == GeometrySelectionMode.Vertex))
                 return;
 
             if (!_isEnabled)
@@ -152,9 +153,7 @@ namespace View3D.Components.Gizmo
 
         public override void Draw(GameTime gameTime)
         {
-            if (!(_selectionManager.GetState().Mode == GeometrySelectionMode.Object || 
-                  _selectionManager.GetState().Mode == GeometrySelectionMode.Vertex ||
-                  _selectionManager.GetState().Mode == GeometrySelectionMode.Bone))
+            if (!(_selectionManager.GetState().Mode == GeometrySelectionMode.Object || _selectionManager.GetState().Mode == GeometrySelectionMode.Vertex))
                 return;
             if (!_isEnabled)
                 return;
@@ -176,5 +175,7 @@ namespace View3D.Components.Gizmo
         {
             _gizmo.Dispose();
         }
+
+        public void Handle(SelectionChangedEvent notification) => OnSelectionChanged(notification.NewState);
     }
 }
