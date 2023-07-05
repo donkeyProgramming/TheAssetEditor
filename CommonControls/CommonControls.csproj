@@ -114,8 +114,7 @@
 	  <PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
 	  <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
 	  <PackageReference Include="System.Net.Primitives" Version="4.3.0" />
-	  <PackageReference Include="FluentValidation" Version="11.5.2" />	  
-	<PackageReference Include="AssimpNet" Version="5.0.0-beta1" />	
+	  <PackageReference Include="FluentValidation" Version="11.5.2" />	  	
   </ItemGroup>
 
   <ItemGroup>
@@ -358,13 +357,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="AssimpNet">
-      <HintPath>..\..\..\..\Users\45311\.nuget\packages\assimpnet\4.1.0\lib\net35\AssimpNet.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
+      
   <ItemGroup>
     <Compile Update="Editors\AnimMeta\View\MetaEntriesListView.xaml.cs">
       <SubType>Code</SubType>
