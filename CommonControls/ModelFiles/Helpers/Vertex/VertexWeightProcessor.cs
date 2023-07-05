@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CommonControls.ModelImportExport
+namespace CommonControls.ModelFiles.Helpers.Vertex
 {
     public class VertexWeightProcessor
     {
@@ -57,10 +57,10 @@ namespace CommonControls.ModelImportExport
             }
 
             float scaleFactor = 1 / weightSum;
-                        
+
             for (int weightIndex = 0; weightIndex < vertex.WeightCount; weightIndex++)
             {
-                vertex.BoneWeight[weightIndex] *= scaleFactor;                
+                vertex.BoneWeight[weightIndex] *= scaleFactor;
             }
         }
 
