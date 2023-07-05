@@ -3,7 +3,6 @@ using Audio.FileFormats.WWise.Hirc.Shared;
 using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using CommonControls.Common;
-using MoreLinq;
 using Serilog;
 using System;
 using System.Collections.Generic;

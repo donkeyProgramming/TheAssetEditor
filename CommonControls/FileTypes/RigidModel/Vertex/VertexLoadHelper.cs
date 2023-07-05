@@ -2,6 +2,7 @@
 using Filetypes.ByteParsing;
 using SharpDX;
 using System;
+using Half = SharpDX.Half;
 
 namespace CommonControls.FileTypes.RigidModel.Vertex
 {

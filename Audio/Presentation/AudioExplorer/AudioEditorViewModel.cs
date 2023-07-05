@@ -6,8 +6,6 @@ using Audio.Utility;
 using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
-using Microsoft.Extensions.DependencyInjection;
-using MoreLinq;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.Json;
@@ -16,8 +14,6 @@ using System.Windows;
 
 namespace Audio.Presentation.AudioExplorer
 {
-
-
     public class AudioEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
         public EventSelectionFilter EventFilter { get; set; }

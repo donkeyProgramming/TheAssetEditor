@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Diagnostics;
-using MoreLinq;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -42,7 +41,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
         {
             List<ActorMixer> output = new List<ActorMixer>();
 
-            var mixers = project.ActorMixers.Shuffle().ToList(); // For testing
+            var mixers = project.ActorMixers;//.Shuffle().ToList(); // For testing
 
             // Find the root
             var roots = mixers.Where(x => HasReferences(x, mixers) == false).ToList();

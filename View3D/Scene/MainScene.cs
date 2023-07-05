@@ -8,9 +8,9 @@ namespace View3D.Scene
     public class MainScene : WpfGame
     {
         private bool _disposed;
-        WpfGraphicsDeviceService _diviceService;
+        WpfGraphicsDeviceService _deviceServiceHandle;
 
-        public MainScene(EventHub eventHub, string contentDir = "ContentOutput") : base(eventHub, contentDir)
+        public MainScene(EventHub eventHub, string contentDir = "BuiltContent") : base(eventHub, contentDir)
         {
 
         }
@@ -18,7 +18,7 @@ namespace View3D.Scene
         protected override void Initialize()
         {
             _disposed = false;
-            _diviceService = new WpfGraphicsDeviceService(this);
+            _deviceServiceHandle = new WpfGraphicsDeviceService(this);
 
             base.Initialize();
         }
@@ -39,7 +39,7 @@ namespace View3D.Scene
                 return;
             _disposed = true;
 
-            _diviceService = null;
+            _deviceServiceHandle = null;
             base.Dispose(disposing);
             Components.Clear();
         }

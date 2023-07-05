@@ -1,5 +1,4 @@
 ﻿using Filetypes.ByteParsing;
-using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -72,7 +71,8 @@ namespace Audio.FileFormats.WWise.Hirc.Shared
             _maxTreeDepth = maxTreeDepth;
             var numNodes = uTreeDataSize / BinaryNode.SerializationByteSize;
             var flattenTree = new List<BinaryNode>();
-            Enumerable.Range(0, (int)numNodes).ForEach(i => flattenTree.Add(new BinaryNode(chunk)));
+            foreach (var item in Enumerable.Range(0, (int)numNodes))
+                flattenTree.Add(new BinaryNode(chunk));
 
             Root = ConvertListToGraph(flattenTree, _maxTreeDepth, 0, 0, 0);
         }

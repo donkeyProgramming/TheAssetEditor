@@ -16,6 +16,7 @@ using System.Windows;
 using View3D.Animation;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
+using View3D.Utility;
 
 namespace AnimationEditor.MountAnimationCreator
 {
@@ -57,7 +58,7 @@ namespace AnimationEditor.MountAnimationCreator
         SelectionManager _selectionManager;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
-        public Editor(AssetViewModelBuilder assetViewModelBuilder, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, IComponentManager componentManager, ApplicationSettingsService applicationSettings)
+        public Editor(AssetViewModelBuilder assetViewModelBuilder, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, SelectionManager selectionManager, ApplicationSettingsService applicationSettings)
         {
             _assetViewModelBuilder = assetViewModelBuilder;
             _pfs = pfs;
@@ -65,7 +66,7 @@ namespace AnimationEditor.MountAnimationCreator
             _applicationSettings = applicationSettings;
      
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
-            _selectionManager = componentManager.GetComponent<SelectionManager>();
+            _selectionManager = selectionManager;
 
             DisplayGeneratedSkeleton = new NotifyAttr<bool>(true, (value) => _newAnimation.ShowSkeleton.Value = value);
             DisplayGeneratedMesh = new NotifyAttr<bool>(true, (value) => { if (_newAnimation.MainNode != null) _newAnimation.ShowMesh.Value = value; });
@@ -82,8 +83,6 @@ namespace AnimationEditor.MountAnimationCreator
 
            
             AnimationSettings.SettingsChanged += () => TryReGenerateAnimation(null);
-
-
         }
 
         internal Editor Create(AssetViewModel rider, AssetViewModel mount, AssetViewModel newAnimation)
@@ -97,10 +96,10 @@ namespace AnimationEditor.MountAnimationCreator
             _rider.SkeletonChanged += RiderSkeletonChanges;
             _rider.AnimationChanged += TryReGenerateAnimation;
 
+            MountLinkController = new MountLinkViewModel(_assetViewModelBuilder, _pfs, _skeletonAnimationLookUpHelper, rider, mount, UpdateCanSaveAndPreviewStates);
+
             MountSkeletonChanged(_mount.Skeleton);
             RiderSkeletonChanges(_rider.Skeleton);
-
-            MountLinkController = new MountLinkViewModel(_assetViewModelBuilder, _pfs, _skeletonAnimationLookUpHelper, rider, mount, UpdateCanSaveAndPreviewStates);
 
             return this;
         }
