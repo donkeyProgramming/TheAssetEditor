@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Vector4 = Microsoft.Xna.Framework.Vector4;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
+using Half = SharpDX.Half;
 
 namespace Filetypes.ByteParsing
 {

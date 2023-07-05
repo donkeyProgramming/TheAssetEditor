@@ -6,7 +6,6 @@ using CommonControls.FileTypes.MetaData;
 using CommonControls.FileTypes.MetaData.Definitions;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,8 +15,6 @@ namespace Wh3AnimPackCreator
 {
     partial class Program
     {
-
-
         static void Main(string[] args)
         {
             var wh3MetaTags = LoadValidWh3MetaTags();

@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-	  <UseWPF>true</UseWPF>
-  </PropertyGroup>
+
+	<PropertyGroup>
+		<TargetFramework>net6.0-windows</TargetFramework>
+		<UseWPF>true</UseWPF>
+	</PropertyGroup>
 
   <ItemGroup>
     <None Remove="Resources\vgstream\avcodec-vgmstream-58.dll" />

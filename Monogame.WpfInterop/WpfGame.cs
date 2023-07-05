@@ -40,7 +40,7 @@ namespace MonoGame.Framework.WpfInterop
         /// <summary>
         /// Creates a new instance of a game host panel.
         /// </summary>
-        protected WpfGame(EventHub eventHub, string contentDir = "ContentOutput")
+        protected WpfGame(EventHub eventHub, string contentDir)
         {
             if (string.IsNullOrEmpty(contentDir))
                 throw new ArgumentNullException(nameof(contentDir));

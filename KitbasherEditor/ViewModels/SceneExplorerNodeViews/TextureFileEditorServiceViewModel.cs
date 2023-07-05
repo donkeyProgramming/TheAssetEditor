@@ -1,24 +1,12 @@
 ﻿using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.FileTypes.RigidModel.Types;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
-using MoreLinq;
 using Serilog;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using View3D.SceneNodes;
 using View3D.Services;
-using View3D.Utility;
-using MessageBox = System.Windows.MessageBox;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
@@ -26,9 +14,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
     {
         ILogger _logger = Logging.Create<TextureFileEditorServiceViewModel>();
 
-        MainEditableNode _mainNode;
         TextureFileEditorService _textureService;
-        PackFileService _pfs;
 
         public ICommand CreateProjectCommand { get; set; }
         public ICommand RefreshProjectCommand { get; set; }

@@ -1,13 +1,10 @@
 ﻿using Audio.FileFormats.WWise;
 using Audio.Storage;
 using CommonControls.Common;
-using CsvHelper;
-using MoreLinq;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static System.ComponentModel.Design.ObjectSelectorEditor;
 
 namespace Audio.AudioEditor
 {
@@ -17,7 +14,6 @@ namespace Audio.AudioEditor
         
         protected Dictionary<HircType, Action<HircItem, HircTreeItem>> _hircProcessChildMap = new Dictionary<HircType, Action<HircItem, HircTreeItem>>();
         protected readonly IAudioRepository _repository;
-
 
         protected readonly bool _showId;
         protected readonly bool _showOwningBnkFile;

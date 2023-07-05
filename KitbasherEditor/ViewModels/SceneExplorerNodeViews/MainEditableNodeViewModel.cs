@@ -1,13 +1,10 @@
 ﻿using CommonControls.Common;
-using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
 using MonoGame.Framework.WpfInterop;
-using MoreLinq;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using View3D.Animation;
 using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.SceneNodes;
