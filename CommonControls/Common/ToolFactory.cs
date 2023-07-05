@@ -1,5 +1,4 @@
-﻿using Assimp.Unmanaged;
-using CommonControls.BaseDialogs.ToolSelector;
+﻿using CommonControls.BaseDialogs.ToolSelector;
 using CommonControls.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;

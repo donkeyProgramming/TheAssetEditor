@@ -3,7 +3,6 @@ using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
-using CommonControls.ModelImportExport;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -149,10 +148,9 @@ namespace CommonControls.PackFileBrowser
                 MessageBox.Show("Unable to edit CA packfile");
                 return;
             }
-            
-            var parentPath = _selectedNode.GetFullPath(); // get pack path, at mouse pointer        
-            var assimpDiskService = new AssimpDiskService(_packFileService);
-            assimpDiskService.Import3dModelToPackTree(_selectedNode.FileOwner, parentPath);
+
+            MessageBox.Show("Currently Unsupported");
+            return;
         }
 
         void OnAddFilesFromDirectory()
@@ -427,7 +425,7 @@ namespace CommonControls.PackFileBrowser
                 case ContextItems.Import:
                 return new ContextMenuItem() { Name = "Import" };
                 case ContextItems.Import3DModel:
-                return new ContextMenuItem() { Name = "Import 3D Model", Command = Import3DFileCommand };
+                return new ContextMenuItem() { Name = "Import 3D Model (FBX SDK)", Command = Import3DFileCommand };
                 case ContextItems.Create:
                 return new ContextMenuItem() { Name = "Create" };
                 case ContextItems.AddFiles:
