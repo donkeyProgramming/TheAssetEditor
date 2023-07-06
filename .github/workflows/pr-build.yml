@@ -8,31 +8,12 @@ jobs:
         runs-on: windows-latest
         steps:
             - uses: actions/checkout@v3
+            - uses: ilammy/msvc-dev-cmd@v1        
             - uses: actions/setup-dotnet@v3
               with:
                 dotnet-version: '3.1.x'
-            - run: dotnet build    
-  
-      # ...
-      - name: Configure build for amd64
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: amd64
-
-      - run: build # (for amd64)
-
-      - name: Configure build for x86
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: amd64_x86
-
-      - run: build # (for x86)
-
-      - name: Configure build for ARM64
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: amd64_arm64
-
-      - run: build # (for ARM64)
-
-      # ...  
+            - run: |
+                dotnet build    
+                build # (for x86)  
+    
+      
