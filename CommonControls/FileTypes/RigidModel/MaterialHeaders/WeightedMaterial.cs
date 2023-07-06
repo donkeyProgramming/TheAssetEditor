@@ -15,7 +15,6 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 {
     public class WeightedMaterial : IMaterial
     {
-        //public UiVertexFormat VertexType { get; set; } = UiVertexFormat.Unknown;
         public VertexFormat BinaryVertexFormat { get; set; } = VertexFormat.Unknown;
 
         public Vector3 PivotPoint { get; set; }
@@ -54,8 +53,8 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                 Filters = Filters,
                 OriginalTransform = OriginalTransform,
 
-                AttachmentPointParams = AttachmentPointParams.Select(x => ObjectHelper.DeepClone(x)).ToList(),
-                TexturesParams = TexturesParams.Select(x => ObjectHelper.DeepClone(x)).ToList(),
+                AttachmentPointParams = AttachmentPointParams.Select(x => x.Clone()).ToList(),
+                TexturesParams = TexturesParams.Select(x => x.Clone()).ToList(),
                 StringParams = StringParams.Select(x => x).ToList(),
                 FloatParams = FloatParams.Select(x => x).ToList(),
                 IntParams = IntParams.Select(x => x).ToList(),
@@ -188,12 +187,12 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 
                 MaterialId = materialId,
                 BinaryVertexFormat = (VertexFormat)Header._vertexType,
-                ModelName = Util.SanatizeFixedString(Encoding.ASCII.GetString(Header._modelName)),
-                Filters = Util.SanatizeFixedString(Encoding.ASCII.GetString(Header.Filters)),
+                ModelName = StringSanitizer.FixedString(Encoding.ASCII.GetString(Header._modelName)),
+                Filters = StringSanitizer.FixedString(Encoding.ASCII.GetString(Header.Filters)),
                 MatrixIndex = Header.MatrixIndex,
                 ParentMatrixIndex = Header.ParentMatrixIndex,
                 PivotPoint = Header.Transform.Pivot.ToVector3(),
-                TextureDirectory = Util.SanatizeFixedString(Encoding.ASCII.GetString(Header._textureDir)),
+                TextureDirectory = StringSanitizer.FixedString(Encoding.ASCII.GetString(Header._textureDir)),
                 OriginalTransform = Header.Transform,
             };
 

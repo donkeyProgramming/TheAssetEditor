@@ -58,7 +58,7 @@ namespace AssetEditor.Report
             PackFile animPack = _pfs.Database.PackFiles[0].FileList["animations\\database\\battle\\bin\\animation_tables.animpack"];
             AnimationPackFile animPackFile = AnimationPackSerializer.Load(animPack, _pfs);
 
-            AnimationBinWh3FileToXmlConverter converter = new AnimationBinWh3FileToXmlConverter(new SkeletonAnimationLookUpHelper());
+            var converter = new AnimationBinWh3FileToXmlConverter(new SkeletonAnimationLookUpHelper());
             foreach (var animFile in animPackFile.Files)
             {
                 if (animFile is AnimationBinWh3)

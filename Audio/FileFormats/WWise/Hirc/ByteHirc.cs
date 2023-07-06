@@ -6,7 +6,6 @@ namespace Audio.FileFormats.WWise.Hirc
     public class ByteHirc : HircItem
     {
         public byte[] HircData { get; set; }
-        public string Type { get; private set; }
 
         protected override void CreateSpesificData(ByteChunk chunk)
         {

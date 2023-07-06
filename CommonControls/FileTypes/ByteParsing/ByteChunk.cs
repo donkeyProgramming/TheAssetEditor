@@ -257,7 +257,7 @@ namespace Filetypes.ByteParsing
             Index -= size;
 
             var str = dataCpy.ReadFixedLength(size);
-            var strClean = Util.SanatizeFixedString(str);
+            var strClean = StringSanitizer.FixedString(str);
 
             dataCpy.Reset();
             dataCpy.Index = strClean.Length;
@@ -278,7 +278,7 @@ namespace Filetypes.ByteParsing
             Index -= size;
 
             var str = dataCpy.ReadFixedLength(size);
-            var strClean = Util.SanatizeFixedString(str);
+            var strClean = StringSanitizer.FixedString(str);
 
             dataCpy.Reset();
             dataCpy.Index = strClean.Length;

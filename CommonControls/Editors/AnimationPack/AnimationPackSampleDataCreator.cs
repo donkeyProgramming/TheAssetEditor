@@ -1,23 +1,11 @@
-﻿
-using CommonControls.BaseDialogs;
+﻿using CommonControls.BaseDialogs;
 using CommonControls.Common;
-using CommonControls.Editors.AnimationBatchExporter;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using Serilog;
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
 using System.Windows;
-using System.Windows.Input;
-using CommunityToolkit.Mvvm.Input;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
-using CommonControls.FileTypes.DB;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3;
 
 namespace CommonControls.Editors.AnimationPack

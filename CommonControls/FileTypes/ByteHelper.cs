@@ -1,26 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CommonControls.FileTypes
 {
-    public static class Util
-    {
-        public static string SanatizeFixedString(string str)
-        {
-            var idx = str.IndexOf('\0');
-            if (idx != -1)
-                return str.Substring(0, idx);
-            return str;
-        }
-    }
-
-
     public class ByteHelper
     {
         public static T ByteArrayToStructure<T>(byte[] bytes, int offset) where T : struct
@@ -52,19 +35,6 @@ namespace CommonControls.FileTypes
             Marshal.Copy(ptr, arr, 0, size);
             Marshal.FreeHGlobal(ptr);
             return arr;
-        }
-
-        static public T DeepCopy<T>(T obj)
-        {
-            BinaryFormatter s = new BinaryFormatter();
-            using (MemoryStream ms = new MemoryStream())
-            {
-                s.Serialize(ms, obj);
-                ms.Position = 0;
-                T t = (T)s.Deserialize(ms);
-
-                return t;
-            }
         }
 
         static public byte[] CreateFixLengthString(string str, int maxLength)

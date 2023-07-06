@@ -39,7 +39,7 @@ namespace CommonControls.FileTypes.RigidModel.Types
                 var result = ByteParsers.String.TryDecodeFixedLength(_path, 0, 256, out string value, out _);
                 if (result == false)
                     throw new Exception();
-                return Util.SanatizeFixedString(value);
+                return StringSanitizer.FixedString(value);
             }
             set
             {
@@ -54,5 +54,7 @@ namespace CommonControls.FileTypes.RigidModel.Types
                 }
             }
         }
+
+        public RmvTexture Clone() => new RmvTexture() { TexureType = TexureType, _path = _path };
     }
 }

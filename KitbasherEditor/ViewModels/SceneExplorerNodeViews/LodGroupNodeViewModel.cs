@@ -1,6 +1,4 @@
-﻿using CommonControls.Common;
-using CommonControls.MathViews;
-using MonoGame.Framework.WpfInterop;
+﻿using MonoGame.Framework.WpfInterop;
 using System.Linq;
 using View3D.Components.Component;
 using View3D.SceneNodes;
@@ -9,7 +7,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
     public class LodGroupNodeViewModel : GroupNodeViewModel
     {
-        private new readonly Rmv2LodNode _node;
+        private readonly Rmv2LodNode _node;
         private readonly IComponentManager _componentManager;
 
         public LodGroupNodeViewModel(Rmv2LodNode node, IComponentManager componentManager) : base(node)

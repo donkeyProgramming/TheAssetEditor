@@ -1,20 +1,13 @@
 ﻿using CommonControls.Common;
 using CommonControls.Editors.TextEditor;
 using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
 
 namespace CommonControls.Editors.Wtui
 {
     public class TwUiViewModel : NotifyPropertyChangedImpl, IEditorViewModel, ITextEditorViewModel
     {
-        private readonly PackFileService _pfs;
         PackFile _mainFile;
-        List<UiTreeNode> _treNodeList = new List<UiTreeNode>();
         UiTreeNode _selectedNode;
 
         // Public attributes
@@ -26,7 +19,6 @@ namespace CommonControls.Editors.Wtui
         public bool HasUnsavedChanges { get; set; }
 
         public ITextEditor TextEditor { get; private set; }
-        bool _textChanged = false;
         string _text;
         public string Text
         {
@@ -35,13 +27,11 @@ namespace CommonControls.Editors.Wtui
             {
                 SetAndNotify(ref _text, value);
                 WriteTextToNode(value, SelectedNode);
-                _textChanged = true;
             }
         }
 
-        public TwUiViewModel(PackFileService pfs)
+        public TwUiViewModel()
         {
-            _pfs = pfs;
         }
 
         private void Load(PackFile mainFile)

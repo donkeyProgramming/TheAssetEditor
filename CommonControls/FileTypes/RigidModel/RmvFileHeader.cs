@@ -28,7 +28,7 @@ namespace CommonControls.FileTypes.RigidModel
                 var result = ByteParsers.String.TryDecodeFixedLength(_skeletonName, 0, 128, out string value, out _);
                 if (result == false)
                     throw new Exception();
-                return Util.SanatizeFixedString(value);
+                return StringSanitizer.FixedString(value);
             }
             set
             {
@@ -43,7 +43,7 @@ namespace CommonControls.FileTypes.RigidModel
                 var result = ByteParsers.String.TryDecodeFixedLength(_fileType, 0, 4, out string value, out _);
                 if (result == false)
                     throw new Exception();
-                return Util.SanatizeFixedString(value);
+                return StringSanitizer.FixedString(value);
             }
         }
 

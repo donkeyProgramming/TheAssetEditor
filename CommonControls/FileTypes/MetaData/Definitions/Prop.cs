@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using SharpDX.Mathematics.Interop;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
@@ -83,28 +85,28 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         // new field
         [MetaDataTag(8)]
         public string MetaData { get; set; } = "";
-    
+
         //override order
         [MetaDataTag(9)]
-        public Vector3 Position { get; set; }
+        public new Vector3 Position { get; set; }
     
         [MetaDataTag(10, "", MetaDataTagAttribute.DisplayType.EulerVector)]
-        public Vector4 Orientation { get; set; } = new Vector4(0, 0, 0, 1);
+        public new Vector4 Orientation { get; set; } = new Vector4(0, 0, 0, 1);
     
         [MetaDataTag(11)]
-        public int BoneId { get; set; }
+        public new int BoneId { get; set; }
     
         [MetaDataTag(12, "bind_pose (1), animation (2), zeroed (3), skinned (4)")]
-        public int AttachMethod { get; set; }
+        public new int AttachMethod { get; set; }
     
         [MetaDataTag(13, "projectile (1) ,weapon_1 (2) ,weapon_2 (3) ,weapon_3 (4) ,weapon_4 (5) ,weapon_5 (6),weapon_6 (7)")]
-        public int OverrideProp { get; set; }
+        public new int OverrideProp { get; set; }
     
         [MetaDataTag(14)]
-        public float BlendInTime { get; set; }
+        public new float BlendInTime { get; set; }
     
         [MetaDataTag(15)]
-        public float BlendOutTime { get; set; }
+        public new float BlendOutTime { get; set; }
     }
 
     [MetaData("PROP", 13)]
@@ -116,19 +118,19 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     
         // override order
         [MetaDataTag(12)]
-        public int BoneId { get; set; }
+        public new int BoneId { get; set; }
     
         [MetaDataTag(13, "bind_pose (1), animation (2), zeroed (3), skinned (4)")]
-        public int AttachMethod { get; set; }
+        public new int AttachMethod { get; set; }
     
         [MetaDataTag(14, "projectile (1) ,weapon_1 (2) ,weapon_2 (3) ,weapon_3 (4) ,weapon_4 (5) ,weapon_5 (6),weapon_6 (7)")]
-        public int OverrideProp { get; set; }
+        public new int OverrideProp { get; set; }
     
         [MetaDataTag(15)]
-        public float BlendInTime { get; set; }
+        public new float BlendInTime { get; set; }
     
         [MetaDataTag(16)]
-        public float BlendOutTime { get; set; }
+        public new float BlendOutTime { get; set; }
     }
 
     [MetaData("PROP", 14)]

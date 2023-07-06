@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using SharpDX.Mathematics.Interop;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -135,15 +136,15 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 
         // override order
         [MetaDataTag(11)]
-        public Vector3 Position { get; set; } = new Vector3();
+        public new Vector3 Position { get; set; } = new Vector3();
 
         [MetaDataTag(12, "", MetaDataTagAttribute.DisplayType.EulerVector)]
-        public Vector4 Orientation { get; set; } = new Vector4(0, 0, 0, 1);
+        public new Vector4 Orientation { get; set; } = new Vector4(0, 0, 0, 1);
 
         [MetaDataTag(13, "Bone the effect is attached to, use -1 for it to just spawn and not follow animations")]
-        public int NodeIndex { get; set; }
+        public new int NodeIndex { get; set; }
 
         [MetaDataTag(14, "Scale of the effect")]
-        public float Scale { get; set; } = 1;
+        public new float Scale { get; set; } = 1;
     }
 }

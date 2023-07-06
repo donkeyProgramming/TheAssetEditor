@@ -259,8 +259,8 @@ namespace CommonControls.Editors.AnimationPack
             //
             //    window.ShowDialog();
             //}
-
-            return true;
+            //
+            //return true;
         }
 
         public void ExportAnimationSlotsWh3Action()

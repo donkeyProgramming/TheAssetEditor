@@ -56,5 +56,7 @@ namespace CommonControls.FileTypes.RigidModel.Transforms
         {
             return new Vector3(X, Y, Z);
         }
+
+        public RmvVector4 Clone() => new RmvVector4(X, Y,Z, W);
     }
 }

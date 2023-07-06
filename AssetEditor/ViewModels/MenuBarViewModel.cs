@@ -1,7 +1,6 @@
 ﻿using AnimationEditor.AnimationTransferTool;
 using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.MountAnimationCreator;
-using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SuperView;
 using AssetEditor.Views.Settings;
 using CommonControls.BaseDialogs;

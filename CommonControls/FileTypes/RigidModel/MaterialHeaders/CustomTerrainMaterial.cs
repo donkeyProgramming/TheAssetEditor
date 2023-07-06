@@ -73,7 +73,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
             return new CustomTerrainMaterial()
             {
                 MaterialId = materialId,
-                TexturePath = Util.SanatizeFixedString(Encoding.ASCII.GetString(header.TexturePath)),
+                TexturePath = StringSanitizer.FixedString(Encoding.ASCII.GetString(header.TexturePath)),
             };
         }
 

@@ -171,7 +171,7 @@ namespace View3D.Utility
                             }
                             catch (Exception e)
                             {
-                                _logger.Here().Error($"Error loading texture ({fileName} - with format {image.Format}, tried loading as {surfaceFormat})");
+                                _logger.Here().Error($"Error loading texture ({fileName} - with format {image.Format}, tried loading as {surfaceFormat}) - {e.Message}");
                             }
                         }
                     }
@@ -179,7 +179,7 @@ namespace View3D.Utility
 
                     if(texture == null)
                     {
-                        _logger.Here().Error($"Error loading texture ({fileName} - Unkown textur format {image.Format})");
+                        _logger.Here().Error($"Error loading texture ({fileName} - Unknown texture format {image.Format})");
                         return null;
                     }
 

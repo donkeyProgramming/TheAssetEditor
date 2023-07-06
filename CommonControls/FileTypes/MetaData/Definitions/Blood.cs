@@ -69,15 +69,15 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         
         //override MetaDataTag order
         [MetaDataTag(11)]
-        public Vector3 Position { get; set; }
+        public new Vector3 Position { get; set; }
 
         [MetaDataTag(12, "", MetaDataTagAttribute.DisplayType.EulerVector)]
-        public Vector4 Orientation { get; set; }
+        public new Vector4 Orientation { get; set; }
         
         [MetaDataTag(13, "Bone the effect is attached to")]
-        public int NodeIndex { get; set; }
+        public new int NodeIndex { get; set; }
 
         [MetaDataTag(14, "Scale of the effect")]
-        public float Scale { get; set; }
+        public new float Scale { get; set; }
     }
 }

@@ -1,9 +1,7 @@
-﻿using CommonControls.FileTypes;
-using CommonControls.FileTypes.RigidModel.Transforms;
+﻿using CommonControls.FileTypes.RigidModel.Transforms;
 using Filetypes.ByteParsing;
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -14,7 +12,6 @@ namespace CommonControls.FileTypes.RigidModel.Types
     [DebuggerDisplay("RmvAttachmentPoint = {Name}")]
     public struct RmvAttachmentPoint
     {
-
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
         byte[] _name;
 
@@ -28,7 +25,7 @@ namespace CommonControls.FileTypes.RigidModel.Types
                 var result = ByteParsers.String.TryDecodeFixedLength(_name, 0, 32, out string value, out _);
                 if (result == false)
                     throw new Exception();
-                return Util.SanatizeFixedString(value);
+                return StringSanitizer.FixedString(value);
             }
             set
             {
@@ -38,8 +35,8 @@ namespace CommonControls.FileTypes.RigidModel.Types
                     _name[i] = 0;
 
                 var byteValues = Encoding.UTF8.GetBytes(value);
-                var maxLenth = Math.Clamp(byteValues.Length, 0, 32);
-                for (int i = 0; i < maxLenth; i++)
+                var maxLength = Math.Clamp(byteValues.Length, 0, 32);
+                for (int i = 0; i < maxLength; i++)
                 {
                     _name[i] = byteValues[i];
                 }
@@ -48,6 +45,14 @@ namespace CommonControls.FileTypes.RigidModel.Types
 
         public int BoneIndex { get { return _boneIndex; } set { _boneIndex = value; } }
 
-       
+        public RmvAttachmentPoint Clone()
+        {
+            return new RmvAttachmentPoint
+            {
+                _name = _name,
+                Matrix = Matrix.Clone(),
+                _boneIndex = _boneIndex,
+            };
+        }
     }
 }

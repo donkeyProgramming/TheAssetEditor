@@ -22,30 +22,30 @@ namespace AudioResearch
             new LotrDataLoading().Run();
             return;
 
-            DecisionPathHelper test = new DecisionPathHelper(null);
-            test.Write();
-
-            if (Environment.GetEnvironmentVariable("KlissanEnv") != null)
-            {
-                //TestDialogEventSerialization();
-                return;
-            }
-
-            
-
-            DataExplore();
-            //TableTest();
-            //OvnTest.GenerateProjectFromBnk(false);
-
-            // OvnTest.Compile();
-            //GeneratOvnProject();
-           // TestDialogEventSerialization();
-            // LogicalChainingTest();
-
-            var currentProjectName = $"Data\\OvnExample\\ProjectSimple.json";
-            //OvnTest.GenerateProjectFromBnk(currentProjectName);
-
-            OvnTest.Compile(currentProjectName, false, false, false);
+           //DecisionPathHelper test = new DecisionPathHelper(null);
+           //test.Write();
+           //
+           //if (Environment.GetEnvironmentVariable("KlissanEnv") != null)
+           //{
+           //    //TestDialogEventSerialization();
+           //    return;
+           //}
+           //
+           //
+           //
+           //DataExplore();
+           ////TableTest();
+           ////OvnTest.GenerateProjectFromBnk(false);
+           //
+           //// OvnTest.Compile();
+           ////GeneratOvnProject();
+           /// TestDialogEventSerialization();
+           //// LogicalChainingTest();
+           //
+           //var currentProjectName = $"Data\\OvnExample\\ProjectSimple.json";
+           ////OvnTest.GenerateProjectFromBnk(currentProjectName);
+           //
+           //OvnTest.Compile(currentProjectName, false, false, false);
         }
 
         class AudioBusTreeBuilder
@@ -421,76 +421,76 @@ namespace AudioResearch
 
 
 
-            var baseParamsProviders = audioRepo.HircObjects
-               .SelectMany(x => x.Value)
-               .Where(x => x is INodeBaseParamsAccessor)
-               //.DistinctBy(x => x.Id)
-               .ToList();
+           //var baseParamsProviders = audioRepo.HircObjects
+           //   .SelectMany(x => x.Value)
+           //   .Where(x => x is INodeBaseParamsAccessor)
+           //   //.DistinctBy(x => x.Id)
+           //   .ToList();
+           //
+           //var ulStateGroupIDs = baseParamsProviders
+           //    .SelectMany(x => (x as INodeBaseParamsAccessor).NodeBaseParams.StateChunk.StateChunks.Select(y => y.ulStateGroupID))
+           //    .Distinct()
+           //    .Select(x =>
+           //    {
+           //        var name = audioRepo.GetNameFromHash(x, out var found);
+           //        return new { Id = x, Name = name, Found = found };
+           //    })
+           //    .OrderByDescending(x => x.Found)
+           //    .ToList();
+           //
+           //
+           //var baseParams = audioRepo.HircObjects
+           // .SelectMany(x => x.Value)
+           // .Where(x=>x is INodeBaseParamsAccessor)
+           // .DistinctBy(x => x.Id)
+           // //.Cast<INodeBaseParamsAccessor>()
+           // .ToList();
+           //
+           //
+           //
+           //
+           //var handyData = baseParams
+           //    .Select(x => new
+           //    {
+           //        Id = x.Id,
+           //        BaseParamsAccessor = x as INodeBaseParamsAccessor,
+           //        AllStateProps = (x as INodeBaseParamsAccessor).NodeBaseParams.StateChunk.StateProps,
+           //        AllSateChunks = (x as INodeBaseParamsAccessor).NodeBaseParams.StateChunk.StateChunks,
+           //        AllSateChunksStates = (x as INodeBaseParamsAccessor).NodeBaseParams.StateChunk.StateChunks.SelectMany(x=>x.States).ToList(),
+           //    });
+           //
+           //
+           //var test0 = handyData.Where(x => x.AllSateChunksStates.FirstOrDefault(x => x.ulStateID == 964666289) != null).ToList();
+           //var test1 = handyData.Where(x => x.AllSateChunksStates.FirstOrDefault(x => x.ulStateID == 3501906231) != null).ToList();    // This is correct 
+           //
+           //
+           //var test2 = handyData.Where(x => x.AllSateChunksStates.FirstOrDefault(x => x.ulStateInstanceID == 964666289) != null).ToList();
+           //var test3 = handyData.Where(x => x.AllSateChunksStates.FirstOrDefault(x => x.ulStateInstanceID == 3501906231) != null).ToList();
+           //
+           ////var eventAndName = events.Select(x =>
+           ////    {
+           ////        var name = audioRepo.GetNameFromHash(x.Id, out var found);
+           ////        return new { Id = x.Id, Name = name, Found = found };
+           ////    })
+           ////    .OrderByDescending(x => x.Found)
+           ////    .ToList();
+           ////
+           ////var missingCount = eventAndName.Where(x => x.Found == false).Count();
+           ////
+           ////
+           //var t = audioRepo.GetHircObject(110788530);
+           ////var t2 = audioRepo.GetHircObject(3501906231);
 
-            var ulStateGroupIDs = baseParamsProviders
-                .SelectMany(x => (x as INodeBaseParamsAccessor).NodeBaseParams.StateChunk.StateChunks.Select(y => y.ulStateGroupID))
-                .Distinct()
-                .Select(x =>
-                {
-                    var name = audioRepo.GetNameFromHash(x, out var found);
-                    return new { Id = x, Name = name, Found = found };
-                })
-                .OrderByDescending(x => x.Found)
-                .ToList();
 
 
-            var baseParams = audioRepo.HircObjects
-             .SelectMany(x => x.Value)
-             .Where(x=>x is INodeBaseParamsAccessor)
-             .DistinctBy(x => x.Id)
-             //.Cast<INodeBaseParamsAccessor>()
-             .ToList();
-
-
-            
-
-            var handyData = baseParams
-                .Select(x => new
-                {
-                    Id = x.Id,
-                    BaseParamsAccessor = x as INodeBaseParamsAccessor,
-                    AllStateProps = (x as INodeBaseParamsAccessor).NodeBaseParams.StateChunk.StateProps,
-                    AllSateChunks = (x as INodeBaseParamsAccessor).NodeBaseParams.StateChunk.StateChunks,
-                    AllSateChunksStates = (x as INodeBaseParamsAccessor).NodeBaseParams.StateChunk.StateChunks.SelectMany(x=>x.States).ToList(),
-                });
-
-
-            var test0 = handyData.Where(x => x.AllSateChunksStates.FirstOrDefault(x => x.ulStateID == 964666289) != null).ToList();
-            var test1 = handyData.Where(x => x.AllSateChunksStates.FirstOrDefault(x => x.ulStateID == 3501906231) != null).ToList();    // This is correct 
-
-
-            var test2 = handyData.Where(x => x.AllSateChunksStates.FirstOrDefault(x => x.ulStateInstanceID == 964666289) != null).ToList();
-            var test3 = handyData.Where(x => x.AllSateChunksStates.FirstOrDefault(x => x.ulStateInstanceID == 3501906231) != null).ToList();
-
-            //var eventAndName = events.Select(x =>
-            //    {
-            //        var name = audioRepo.GetNameFromHash(x.Id, out var found);
-            //        return new { Id = x.Id, Name = name, Found = found };
-            //    })
-            //    .OrderByDescending(x => x.Found)
-            //    .ToList();
-            //
-            //var missingCount = eventAndName.Where(x => x.Found == false).Count();
-            //
-            //
-            var t = audioRepo.GetHircObject(110788530);
-            //var t2 = audioRepo.GetHircObject(3501906231);
-
-
-
-    var sounds = audioRepo.HircObjects
+ /*   var sounds = audioRepo.HircObjects
                 .SelectMany(x => x.Value)
                 .DistinctBy(x => x.Id)
                 .Where(x => x.Type == HircType.Sound)
                 .Cast<CAkSound_v136>()
                 .ToList();
 
-
+            */
         }
 
 

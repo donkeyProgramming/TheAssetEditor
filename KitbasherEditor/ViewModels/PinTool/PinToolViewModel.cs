@@ -17,7 +17,6 @@ namespace KitbasherEditor.ViewModels.PinTool
     public class PinToolViewModel
     {
         IComponentManager _componentManager;
-        private readonly CommandExecutor _commandExecutor;
         private readonly SelectionManager _selectionManager;
         private readonly CommandFactory _commandFactory;
 

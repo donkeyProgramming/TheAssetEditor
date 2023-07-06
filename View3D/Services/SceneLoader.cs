@@ -97,7 +97,7 @@ namespace View3D.Services
             {
                 _logger.Here().Error("Failed to load file : " + file.Name);
                 _logger.Here().Error("Error : " + e.ToString());
-                throw e;
+                throw;
             }
         }
 
