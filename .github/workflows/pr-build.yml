@@ -12,19 +12,16 @@ jobs:
               with:
                 dotnet-version: '3.1.x'
             - run: dotnet build
-     test:
-    # Run a job for each of the specified target architectures:
-    strategy:
-      matrix:
-        arch:          
-          - amd64_x86          
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: ${{ matrix.arch }}
-      - name: Build something requiring CL.EXE
-        run: |
-          cmake -G "NMake Makefiles" .
-          nmake
+    build:
+        name: Build Application Cpp
+        runs-on: windows-latest
+        steps:
+        - uses: actions/checkout@v2
+        - uses: ilammy/msvc-dev-cmd@v1
+            with:
+                arch: amd64-x86
+         - name: Build something requiring CL.EXE
+            run: |
+            cmake -G "NMake Makefiles" .
+            nmake
       # ...
