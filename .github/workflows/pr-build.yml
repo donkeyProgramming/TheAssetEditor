@@ -12,17 +12,7 @@ jobs:
               with:
                 dotnet-version: '3.1.x'
             - run: dotnet build
-    build:
-    name: Build Application
-    runs-on: windows-latest    
-    steps:
-      # ...
-      - name: Configure build for amd64
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: amd64
-
-      - run: build # (for amd64)
+    
 
       - name: Configure build for x86
         uses: ilammy/msvc-dev-cmd@v1
@@ -31,9 +21,4 @@ jobs:
 
       - run: build # (for x86)
 
-      - name: Configure build for ARM64
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: amd64_arm64
-
-      - run: build # (for ARM64)
+    
