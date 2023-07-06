@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="DataStructures">
+      <UniqueIdentifier>{0db0d03c-1e47-4775-be70-a68ee21096b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FBXServices">
+      <UniqueIdentifier>{b627179f-9bb1-4af2-bb6a-8882ab9f7380}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Logging">
+      <UniqueIdentifier>{5cfc298d-028e-4e0c-9fa2-8de220b09531}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helpers">
+      <UniqueIdentifier>{7e056818-0365-4a38-a419-73988c178449}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FBXSceneContainer">
+      <UniqueIdentifier>{925eb252-8a38-48a3-891a-91ab54d2c364}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DLLDefines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DataStructures\PackedMeshStructs.h">
+      <Filter>DataStructures</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Geometry\FBXMeshGeometryHelper.h">
+      <Filter>FBXServices</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Geometry\FBXNodeGeometryHelper.h">
+      <Filter>FBXServices</Filter>
+    </ClInclude>
+    <ClInclude Include="Processing\FBXSkinProcessor.h">
+      <Filter>FBXServices</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\Logging.h">
+      <Filter>Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\FBXUnitHelper.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Tools.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\MS_SimpleMath\SimpleMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Processing\FBXMeshProcessor.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="FBXScene\FBXSCeneContainer.h">
+      <Filter>FBXSceneContainer</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\VectorConverter.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\FBXHelperFileUtil.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="FBXServices\FBXSceneLoaderService.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Processing\FBXVertexCreator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Processing\FBXMeshCreator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\BaseInteropObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DataStructures\PackedMeshStructs.cpp">
+      <Filter>DataStructures</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\Geometry\FBXMeshGeometryHelper.cpp">
+      <Filter>FBXServices</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\Geometry\FBXNodeGeometryHelper.cpp">
+      <Filter>FBXServices</Filter>
+    </ClCompile>
+    <ClCompile Include="Processing\FBXSkinProcessor.cpp">
+      <Filter>FBXServices</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\Logging.cpp">
+      <Filter>Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="FBXScene\FBXSCeneContainer.cpp">
+      <Filter>FBXSceneContainer</Filter>
+    </ClCompile>
+    <ClCompile Include="Processing\FBXMeshProcessor.cpp">
+      <Filter>Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\Geometry\FBXNodeSearcher.h">
+      <Filter>Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="FBXServices\FBXSceneLoaderService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Processing\FBXVertexCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Processing\FBXMeshCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint">
+      <Filter>FBXSceneContainer</Filter>
+    </None>
+    <None Include="Helpers\MS_SimpleMath\SimpleMath.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
+</Project>
