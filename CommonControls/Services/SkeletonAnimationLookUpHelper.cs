@@ -15,10 +15,9 @@ namespace CommonControls.Services
     public class SkeletonAnimationLookUpHelper : IAnimationFileDiscovered
     {
         ILogger _logger = Logging.Create<SkeletonAnimationLookUpHelper>();
-        ConcurrentDictionary<string, ObservableCollection<AnimationReference>> _skeletonNameToAnimationMap = new ConcurrentDictionary<string, ObservableCollection<AnimationReference>>();
+        ConcurrentDictionary<string, ObservableCollection<AnimationReference>> _skeletonNameToAnimationMap = new();
         object _threadLock = new object();
-
-        public ObservableCollection<string> SkeletonFileNames = new ObservableCollection<string>();
+        public ObservableCollection<string> SkeletonFileNames { get; private set; } = new();
 
         public SkeletonAnimationLookUpHelper()
         {

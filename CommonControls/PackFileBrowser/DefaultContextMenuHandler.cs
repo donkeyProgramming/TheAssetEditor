@@ -6,7 +6,7 @@ namespace CommonControls.PackFileBrowser
 {
     public class DefaultContextMenuHandler : ContextMenuHandler
     {
-        public DefaultContextMenuHandler(PackFileService service, IToolFactory toolFactory, IEditorCreator editorCreator) : base(service, toolFactory, editorCreator)
+        public DefaultContextMenuHandler(PackFileService service, IToolFactory toolFactory) : base(service, toolFactory)
         { }
 
         public override void Create(TreeNode node)

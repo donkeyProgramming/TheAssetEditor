@@ -20,13 +20,11 @@ namespace AnimationEditor
             serviceCollection.AddScoped<AnimationPlayerViewModel>();
             serviceCollection.AddScoped<ReferenceModelSelectionViewModelBuilder>();
             
-
             serviceCollection.AddScoped<SuperView.Editor>();
             serviceCollection.AddScoped<SkeletonEditor.Editor>();
             serviceCollection.AddScoped<MountAnimationCreator.Editor>();
             serviceCollection.AddScoped<CampaignAnimationCreator.Editor>();
             serviceCollection.AddScoped<AnimationTransferTool.Editor>();
-
 
             serviceCollection.AddScoped<MountAnimationCreatorViewModel>();
             serviceCollection.AddScoped<CampaignAnimationCreatorViewModel>();

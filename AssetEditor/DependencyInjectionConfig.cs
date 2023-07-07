@@ -19,8 +19,11 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using TextureEditor;
 using View3D;
-using CommonControls.Events;
 using Common;
+using CommonControls.FileTypes.MetaData;
+using AssetEditor.UiCommands;
+using CommonControls.Events.Global;
+using CommonControls.Events.UiCommands;
 
 namespace AssetEditor
 {
@@ -32,23 +35,27 @@ namespace AssetEditor
             new KitbasherEditor_DependencyInjectionContainer(),
         };
 
-        public IServiceProvider ServiceProvider { get; private set; }
-        
         public DependencyInjectionConfig()
         {
             Logging.Configure(Serilog.Events.LogEventLevel.Information);
             DirectoryHelper.EnsureCreated();
-            
+            MetaDataTagDeSerializer.EnsureMappingTableCreated();
+        }
+
+        public IServiceProvider Build()
+        {
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
 
-            ServiceProvider = serviceCollection.BuildServiceProvider(validateScopes:true);
-            RegisterTools(ServiceProvider.GetService<IToolFactory>());
+            var _serviceProvider = serviceCollection.BuildServiceProvider(validateScopes: true);
+            RegisterTools(_serviceProvider.GetService<IToolFactory>());
+            return _serviceProvider;
         }
 
-        public void ConfigureResources()
+        public DependencyInjectionConfig ConfigureResources()
         {
             ResourceController.Load();
+            return this;
         }
 
         private void ConfigureServices(IServiceCollection services)
@@ -66,12 +73,22 @@ namespace AssetEditor
             services.AddScoped<EventHub>();
             services.AddScoped<SubToolWindowCreator>();
             
-
             services.AddScoped<MainWindow>();
             services.AddScoped<MainViewModel>();
+            services.AddScoped<IEditorCreator, EditorCreator>();
+            services.AddScoped<IUiCommandFactory, UiCommandFactory>();
+
+            services.AddTransient<OpenEditorCommand>();
+            services.AddTransient<OpenFileInEditorCommand>();
+
+
+
             services.AddScoped<SettingsWindow>();
             services.AddScoped<SettingsViewModel>();
             services.AddScoped<MenuBarViewModel>();
+
+            services.AddTransient<DevelopmentConfiguration>();
+            
 
             foreach (var container in dependencyContainers)
                 container.Register(services);
@@ -106,14 +123,6 @@ namespace AssetEditor
             TwUi_DependencyInjectionContainer.RegisterTools(factory);
             AudioEditor_DependencyInjectionContainer.RegisterTools(factory);
             // AnimMetaDecoder_DependencyInjectionContainer.RegisterTools(factory);
-        }
-
-        public void ShowMainWindow()
-        {
-            using var scope = ServiceProvider.CreateScope();
-            var mainWindow = scope.ServiceProvider.GetRequiredService<MainWindow>();
-            mainWindow.DataContext = scope.ServiceProvider.GetRequiredService<MainViewModel>();
-            mainWindow.Show();
         }
     }
 }

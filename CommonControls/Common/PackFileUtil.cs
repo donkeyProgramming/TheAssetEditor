@@ -1,4 +1,5 @@
 ﻿using CommonControls.Events;
+using CommonControls.Events.Global;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using System;

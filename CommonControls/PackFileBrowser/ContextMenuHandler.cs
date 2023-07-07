@@ -1,4 +1,4 @@
-using CommonControls.BaseDialogs;
+﻿using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
@@ -48,13 +48,11 @@ namespace CommonControls.PackFileBrowser
 
         protected TreeNode _selectedNode;
         protected IToolFactory _toolFactory;
-        protected IEditorCreator _editorCreator;
 
-        public ContextMenuHandler(PackFileService pf, IToolFactory toolFactory, IEditorCreator editorCreator)
+        public ContextMenuHandler(PackFileService pf, IToolFactory toolFactory)
         {
             _packFileService = pf;
             _toolFactory = toolFactory;
-            _editorCreator = editorCreator;
 
             RenameNodeCommand = new RelayCommand(OnRenameNode);
             AddFilesCommand = new RelayCommand(OnAddFilesCommand);
@@ -130,9 +128,7 @@ namespace CommonControls.PackFileBrowser
                 foreach (var file in files)
                 {
                     var fileName = Path.GetFileName(file);
-
                     var packFile = new PackFile(fileName, new MemorySource(File.ReadAllBytes(file)));
-
                     _packFileService.AddFileToPack(_selectedNode.FileOwner, parentPath, packFile);
                 }
             }

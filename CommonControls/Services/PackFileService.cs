@@ -10,12 +10,13 @@ using System.Threading.Tasks;
 using System.Windows;
 using CommonControls.PackFileBrowser;
 using CommonControls.Events;
+using CommonControls.Events.Global;
 
 namespace CommonControls.Services
 {
     public class PackFileService
     {
-        ILogger _logger = Logging.Create<PackFileService>();
+        private readonly ILogger _logger = Logging.Create<PackFileService>();
         private readonly GlobalEventSender _globalEventSender;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         public PackFileDataBase Database { get; private set; }
