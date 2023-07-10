@@ -98,6 +98,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);$(ProjectDir)fbxsdk\bin_dll\Debugging\libfbxsdk.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -117,6 +118,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);$(ProjectDir)fbxsdk\bin_dll\Releasing\libfbxsdk.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -135,7 +137,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);$(ProjectDir)fbxsdk\bin\vs2019\x64\debug\libfbxsdk.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);$(ProjectDir)fbxsdk\bin_dll\Debugging\libfbxsdk.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -156,14 +158,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);$(ProjectDir)fbxsdk\bin\vs2019\x64\release\libfbxsdk.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);$(ProjectDir)fbxsdk\bin_dll\Releasing\libfbxsdk.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
     <None Include="cpp.hint" />
-    <None Include="fbxsdk\bin\vs2019\x64\debug\libfbxsdk.dll" />
-    <None Include="fbxsdk\bin\vs2019\x64\release\libfbxsdk.dll" />
     <None Include="fbxsdk\bin\vs2019\x64\release\libfbxsdk.zip" />
     <None Include="fbxsdk\lib\vs2019\x64\debug\libfbxsdk.dll" />
     <None Include="fbxsdk\lib\vs2019\x64\release\libfbxsdk.dll" />
@@ -485,13 +485,7 @@
     <ClCompile Include="Logging\Logging.cpp" />
     <ClCompile Include="DataStructures\PackedMeshStructs.cpp" />
     <ClCompile Include="Helpers\Geometry\FBXNodeGeometryHelper.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="fbxsdk\bin\vs2019\x64\debug\libfbxsdk.lib" />
-    <Library Include="fbxsdk\bin\vs2019\x64\release\libfbxsdk.lib" />
-    <Library Include="fbxsdk\lib\vs2019\x64\debug\libfbxsdk.lib" />
-    <Library Include="fbxsdk\lib\vs2019\x64\release\libfbxsdk.lib" />
-  </ItemGroup>
+  </ItemGroup>  
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

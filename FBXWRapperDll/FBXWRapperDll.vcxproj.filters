@@ -976,18 +976,6 @@
     <None Include="Helpers\MS_SimpleMath\SimpleMath.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="ClassDiagram.cd" />
-    <None Include="fbxsdk\lib\vs2019\x64\debug\libfbxsdk.dll" />
-    <None Include="fbxsdk\lib\vs2019\x64\release\libfbxsdk.dll" />
-    <None Include="fbxsdk\lib\vs2019\x64\release\libfbxsdk.zip" />
-    <None Include="fbxsdk\bin\vs2019\x64\debug\libfbxsdk.dll" />
-    <None Include="fbxsdk\bin\vs2019\x64\release\libfbxsdk.dll" />
-    <None Include="fbxsdk\bin\vs2019\x64\release\libfbxsdk.zip" />
   </ItemGroup>
-  <ItemGroup>
-    <Library Include="fbxsdk\lib\vs2019\x64\debug\libfbxsdk.lib" />
-    <Library Include="fbxsdk\lib\vs2019\x64\release\libfbxsdk.lib" />
-    <Library Include="fbxsdk\bin\vs2019\x64\debug\libfbxsdk.lib" />
-    <Library Include="fbxsdk\bin\vs2019\x64\release\libfbxsdk.lib" />
-  </ItemGroup>
+
 </Project>
