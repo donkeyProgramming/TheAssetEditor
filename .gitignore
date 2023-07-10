@@ -28,8 +28,7 @@ bld/
 [Ll]og/
 
 # Exludes the FBX SDK .lib files from "ignore"
-!TheAssetEditor/FBXWRapperDll/fbxsdk/**/*
-
+!**/TheAssetEditor/FBXWRapperDll/fbxsdk/
 
 
 
