@@ -340,8 +340,3 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 
-!FBXWRapperDll\fbxsdk\bin\vs2019\x64\debug\*.lib
-!FBXWRapperDll\fbxsdk\bin\vs2019\x64\debug\*.dll
-
-!FBXWRapperDll\fbxsdk\bin\vs2019\x64\release\*.lib
-!FBXWRapperDll\fbxsdk\bin\vs2019\x64\release\*.dll
