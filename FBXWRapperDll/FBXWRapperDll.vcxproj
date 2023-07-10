@@ -135,7 +135,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);fbxsdk\lib\vs2019\x64\debug\libfbxsdk.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);$(SolutionDir)FBXWrapperDll\fbxsdk\lib\vs2019\x64\debug\libfbxsdk.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -156,7 +156,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);H:\Coding\FBX SDK\2020.1\lib\vs2017\x64\release\libfbxsdk-md.lib;H:\Coding\FBX SDK\2020.1\lib\vs2017\x64\release\libxml2-md.lib;H:\Coding\FBX SDK\2020.1\lib\vs2017\x64\release\zlib-md.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);$(SolutionDir)\FBXWRapperDll\fbxsdk\lib\vs2019\x64\release\libfbxsdk.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
