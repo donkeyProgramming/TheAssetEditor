@@ -1,0 +1,2 @@
+#define FBXWRAPPERDLL_API __declspec(dllexport)
+#define FBXWRAPPERDLL_API __declspec(dllimport)

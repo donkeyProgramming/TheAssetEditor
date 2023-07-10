@@ -14,9 +14,9 @@
 *.userprefs
 
 # Exludes the FBX SDK .lib files from "ignore" (.lib is default ignored)
-#!*.lib
+!*.lib
 !TheAsssetEditor/FBXWRapperDll/fbxsdk/lib/*
-
+!TheAssetEditor/FBXWRapperDll/fbxsdk/lib/vs2019/x64/debug/libfbxsdk.dll
 
 
 # Build results
@@ -40,7 +40,7 @@ bld/
 #wwwroot/
 
 # Visual Studio 2017 auto generated files
-Generated\ Files/
+Generated/ Files/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
