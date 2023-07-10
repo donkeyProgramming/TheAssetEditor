@@ -12,6 +12,7 @@ using System.Windows.Input;
 using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.ModelFiles.FBX;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
@@ -140,7 +141,6 @@ namespace CommonControls.PackFileBrowser
                 }
             }
         }
-
         void OnImport3DModelCommand()
         {
             if (_selectedNode.FileOwner.IsCaPackFile)
@@ -149,11 +149,33 @@ namespace CommonControls.PackFileBrowser
                 return;
             }
 
-            MessageBox.Show("Currently Unsupported");
-            return;
-        }
+            var parentPath = _selectedNode.GetFullPath(); // get pack path, at mouse pointer        
+            var dialog = new OpenFileDialog();
+            dialog.Filter = "FBX Files (*.fbx)|*.fbx|All files (*.*)|*.*\\";
+            dialog.Multiselect = false
 
-        void OnAddFilesFromDirectory()
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                var files = dialog.FileNames;
+                foreach (var file in files)
+                {
+                    // TODO: renable exceptions handling
+                    //try
+                    {
+
+
+                        var sceneContainer = MeshFileHelper.Import3dModelDiskFileToPack(_packFileService, _selectedNode.FileOwner, parentPath, file);
+                    }
+                    //catch (Exception e)
+                    //{
+                    //    MessageBox.Show($"Failed to import model/scene file {file}. Error : {e.Message}", "Error");
+                    //    _logger.Here().Error($"Failed to load file {file}. Error : {e}");
+                    //}
+                }
+
+            }
+
+            void OnAddFilesFromDirectory()
         {
             if (_selectedNode.FileOwner.IsCaPackFile)
             {
