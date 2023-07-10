@@ -1,11 +1,12 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes.RigidModel.Types;
-using Serilog;
-using System;
-using System.Collections.Generic;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System.IO;
 using System.Reflection;
-using System.Text;
+using CommonControls.Common;
+using CommonControls.FileTypes.RigidModel.Types;
+using Serilog;
 
 namespace CommonControls.Services
 {
@@ -41,7 +42,7 @@ namespace CommonControls.Services
                 _ => "-f BC7_UNORM_SRGB",
             };
 
-            var cmd =  $"{texconvArguments} -y -o \"{Path.GetDirectoryName(pngFilePath)}\" \"{pngFilePath}\"";
+            var cmd = $"{texconvArguments} -y -o \"{Path.GetDirectoryName(pngFilePath)}\" \"{pngFilePath}\"";
             RunTextConv(cmd);
         }
 
@@ -67,6 +68,6 @@ namespace CommonControls.Services
         }
     }
 
-    
+
 }
 

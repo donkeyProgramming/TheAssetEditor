@@ -2,9 +2,7 @@
 using CommonControls.FileTypes.RigidModel.Vertex;
 using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
 
@@ -73,10 +71,10 @@ namespace View3D.Services
                     BiNormal = x.BiNormal,
                     Tangent = x.Tangent,
 
-                    Colour = new Vector4(0,0,0,1),
+                    Colour = new Vector4(0, 0, 0, 1),
                     Uv = x.TextureCoordinate,
 
-                    BoneIndex = x.GetBoneIndexs().Take(geometry.WeightCount).Select(x=>(byte)x).ToArray(),
+                    BoneIndex = x.GetBoneIndexs().Take(geometry.WeightCount).Select(x => (byte)x).ToArray(),
                     BoneWeight = x.GetBoneWeights().Take(geometry.WeightCount).ToArray(),
                     WeightCount = geometry.WeightCount
                 }).ToArray();

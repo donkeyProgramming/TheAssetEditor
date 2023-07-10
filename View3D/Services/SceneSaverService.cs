@@ -1,23 +1,22 @@
-﻿using CommonControls.Common;
+﻿using Common;
+using CommonControls.BaseDialogs.ErrorListDialog;
+using CommonControls.Common;
+using CommonControls.Events.Scoped;
+using CommonControls.FileTypes.RigidModel;
+using CommonControls.FileTypes.RigidModel.LodHeader;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
+using Microsoft.Xna.Framework;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
-using View3D.SceneNodes;
-using Microsoft.Xna.Framework;
 using View3D.Animation;
-using CommonControls.FileTypes.RigidModel.LodHeader;
-using CommonControls.FileTypes.RigidModel;
-using CommonControls.BaseDialogs.ErrorListDialog;
-using View3D.Utility;
 using View3D.Components.Component;
-using CommonControls.Events;
-using Common;
-using CommonControls.Events.Scoped;
+using View3D.SceneNodes;
+using View3D.Utility;
 
 namespace View3D.Services
 {
@@ -64,7 +63,7 @@ namespace View3D.Services
             {
                 DisplayValidateDialog();
 
-                var inputFile = _activeFileResolver.Get() ;
+                var inputFile = _activeFileResolver.Get();
                 byte[] bytes = GetBytesToSave();
 
                 using (var browser = new SavePackFileWindow(_packFileService))
@@ -213,7 +212,7 @@ namespace View3D.Services
                 var activeSkeletonName = skeleton.SkeletonName;
                 var skeltonNames = meshes.Select(x => x.Geometry.ParentSkeletonName).Distinct().ToList();
 
-                if(skeltonNames.Count != 1)
+                if (skeltonNames.Count != 1)
                     errorList.Error("Skeleton", "Model contains meshes with multiple skeleton references. They will not animate well in game");
 
                 skeltonNames.Remove(activeSkeletonName);
@@ -233,7 +232,7 @@ namespace View3D.Services
             if (meshes.Count > 50)
                 errorList.Warning("Mesh Count", "Model contains a large amount of mehses, might cause performance issues");
 
-            if(ModelCombiner.HasPotentialCombineMeshes(meshes, out _))
+            if (ModelCombiner.HasPotentialCombineMeshes(meshes, out _))
                 errorList.Warning("Mesh", "Model contains multiple meshes that can be merged. Consider merging them for performance reasons");
 
             // Different pivots
@@ -243,8 +242,8 @@ namespace View3D.Services
 
             // Animation and Pivotpoint
             if (pivots.Count == 1 && skeleton != null)
-            { 
-                if( (pivots.First().X == 0 && pivots.First().Y == 0 && pivots.First().Z == 0) == false)
+            {
+                if ((pivots.First().X == 0 && pivots.First().Y == 0 && pivots.First().Z == 0) == false)
                     errorList.Warning("Pivot Point", "Model contains a non zero pivot point and animation, this is almost always not intended");
             }
 

@@ -11,7 +11,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
     {
         private readonly IEnumerable<IWWiseHircGenerator> _wwiseHircGenerators;
         private readonly HircSorter _hircSorter = new HircSorter();
-       
+
         public HichBuilder(IEnumerable<IWWiseHircGenerator> wwiseHircGenerators)
         {
             _wwiseHircGenerators = wwiseHircGenerators;
@@ -21,7 +21,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
         {
             // Build Hirc list. Order is important! 
             var hircList = ConvertProjectToHircObjects(projectFile);
-           
+
             var hircChuck = new HircChunk();
             hircChuck.SetFromHircList(hircList);
 
@@ -47,7 +47,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
         {
             var generators = _wwiseHircGenerators.Where(x => x.GameName.Equals(game, StringComparison.InvariantCultureIgnoreCase) && x.AudioProjectType == projectItem.GetType()).ToList();
             Guard.IsEqualTo(generators.Count(), 1);
-            return generators.First();  
+            return generators.First();
         }
     }
 }

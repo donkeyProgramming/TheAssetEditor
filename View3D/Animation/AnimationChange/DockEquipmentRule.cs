@@ -21,7 +21,7 @@ namespace View3D.Animation.AnimationChange
 
         public DockEquipmentRule(int dockTargetkBoneId, int equipmentSlotToDock, AnimationClip dockAnimation, ISkeletonProvider skeletonProvider, float startTime, float endTime)
         {
-            _dockTargetkBoneId = dockTargetkBoneId;           
+            _dockTargetkBoneId = dockTargetkBoneId;
             _dockAnimation = dockAnimation;
             _skeletonProvider = skeletonProvider;
             _startTime = startTime;

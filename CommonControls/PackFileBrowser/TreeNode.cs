@@ -1,14 +1,18 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using CommonControls.Common;
+using CommonControls.FileTypes.PackFiles.Models;
 
 namespace CommonControls.PackFileBrowser
 {
     public enum NodeType
-    { 
+    {
         Root,
         Directory,
         File
@@ -23,8 +27,8 @@ namespace CommonControls.PackFileBrowser
         public bool IsNodeExpanded
         {
             get => _isExpanded;
-            set 
-            {  
+            set
+            {
                 SetAndNotify(ref _isExpanded, value);
             }
         }
@@ -89,10 +93,10 @@ namespace CommonControls.PackFileBrowser
             while (nodes.Any())
             {
                 TreeNode node = nodes.Pop();
-                if(node.NodeType == NodeType.File)
+                if (node.NodeType == NodeType.File)
                     output.Add(node);
 
-                foreach (var n in node.Children) 
+                foreach (var n in node.Children)
                     nodes.Push(n);
             }
 

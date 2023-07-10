@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using View3D.Components;
 using View3D.Scene;
+using View3D.Services;
 
 namespace AnimationEditor.SkeletonEditor
 {
@@ -15,8 +16,15 @@ namespace AnimationEditor.SkeletonEditor
     {
         private readonly ReferenceModelSelectionViewModelBuilder _referenceModelSelectionViewModelBuilder;
 
-        public SkeletonEditorViewModel(Editor editor, ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder, AnimationPlayerViewModel animationPlayerViewModel, EventHub eventHub, IComponentInserter componentInserter, MainScene scene) 
-            : base(componentInserter, animationPlayerViewModel, scene)
+        public SkeletonEditorViewModel(
+            Editor editor,
+            ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder,
+            AnimationPlayerViewModel animationPlayerViewModel,
+            EventHub eventHub,
+            IComponentInserter componentInserter,
+            MainScene scene,
+            FocusSelectableObjectService focusSelectableObjectService)
+            : base(componentInserter, animationPlayerViewModel, scene, focusSelectableObjectService)
         {
             Editor = editor;
             _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
@@ -57,7 +65,7 @@ namespace AnimationEditor.SkeletonEditor
                 //    FragmentName = @"animations/animation_tables/hu17_dlc16_throt.frg",
                 //    AnimationSlot = AnimationSlotTypeHelper.GetfromValue("ATTACK_5")
                 //};
-            
+
                 //editorView.MainInput = new AnimationToolInput()
                 //{
                 //    Mesh = packfileService.FindFile(@"warmachines\engines\emp_steam_tank\emp_steam_tank01.rigid_model_v2"),
@@ -70,7 +78,7 @@ namespace AnimationEditor.SkeletonEditor
                 //    FragmentName = @"animations/animation_tables/hu1_empire_sword_crossbow.frg",
                 //    AnimationSlot = AnimationSlotTypeHelper.GetfromValue("FIRE_HIGH")
                 //};
-            
+
                 //creator.CreateEmptyEditor(editorView);
             }
         }

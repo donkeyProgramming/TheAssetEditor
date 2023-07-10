@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
 using System.Collections.Generic;
 using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;

@@ -1,9 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using View3D.Components.Rendering;
 
 namespace View3D.Rendering.RenderItems
@@ -22,7 +19,7 @@ namespace View3D.Rendering.RenderItems
             _colour = Color.Red;
         }
 
-        public BoundingBoxRenderItem(Effect shader, BoundingBox bb, Color colour )
+        public BoundingBoxRenderItem(Effect shader, BoundingBox bb, Color colour)
         {
             _shader = shader;
             _bb = bb;
@@ -65,7 +62,7 @@ namespace View3D.Rendering.RenderItems
 
             _originalVertecies[14] = new VertexPositionColor(corners[3 + offset], _colour);
             _originalVertecies[15] = new VertexPositionColor(corners[0 + offset], _colour);
-    
+
             _originalVertecies[16] = new VertexPositionColor(corners[0], _colour);
             _originalVertecies[17] = new VertexPositionColor(corners[0 + offset], _colour);
 

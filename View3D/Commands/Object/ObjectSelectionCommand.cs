@@ -2,7 +2,6 @@
 using Serilog;
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Commands.Face;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 
@@ -60,5 +59,5 @@ namespace View3D.Commands.Object
         }
     }
 }
-    
+
 

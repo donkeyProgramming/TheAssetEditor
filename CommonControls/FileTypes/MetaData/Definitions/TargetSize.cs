@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
@@ -31,12 +31,12 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     }
 
     [MetaData("MIN_TARGET_SIZE", 11)]
-    public class MinTargetSize_v11 : TargetSize 
+    public class MinTargetSize_v11 : TargetSize
     {
         [MetaDataTag(8)]
         public int UnknownInt_v11 { get; set; }
     }
-    
+
     [MetaData("MAX_TARGET_SIZE", 11, MetaDataAttributePriority.Low)]
     public class MaxTargetSize_v11_Troy : TargetSize
     {

@@ -28,7 +28,7 @@ namespace Audio.BnkCompiler
             if (string.IsNullOrWhiteSpace(compilerData.ProjectSettings.Language) == false)
                 ouputPath += $"\\{compilerData.ProjectSettings.Language}";
 
-            SaveHelper.SavePackFile(_pfs,ouputPath, compileResult.OutputBnkFile, false);
+            SaveHelper.SavePackFile(_pfs, ouputPath, compileResult.OutputBnkFile, false);
             SaveHelper.SavePackFile(_pfs, ouputPath, compileResult.OutputDatFile, false);
         }
 

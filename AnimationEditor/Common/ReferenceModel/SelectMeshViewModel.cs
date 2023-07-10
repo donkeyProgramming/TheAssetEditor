@@ -12,7 +12,7 @@ namespace AnimationEditor.Common.ReferenceModel
         AssetViewModel _data;
         private readonly AssetViewModelBuilder _assetViewModelBuilder;
 
-        public SelectMeshViewModel(PackFileService pfs, AssetViewModel data, AssetViewModelBuilder assetViewModelBuilder )
+        public SelectMeshViewModel(PackFileService pfs, AssetViewModel data, AssetViewModelBuilder assetViewModelBuilder)
         {
             _pfs = pfs;
             _data = data;

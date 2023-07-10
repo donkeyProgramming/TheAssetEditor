@@ -7,9 +7,9 @@ namespace Audio.Utility
     {
         public static void Convert(string wwiserPath, string bnkSystemFilePath, bool openFolder = false)
         {
-            var command = $"{wwiserPath} {bnkSystemFilePath}";          
+            var command = $"{wwiserPath} {bnkSystemFilePath}";
             ExecuteCommand(command);
-            if(openFolder)
+            if (openFolder)
                 DirectoryHelper.OpenFolderAndSelectFile(bnkSystemFilePath);
         }
 

@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using System;
 using System.Collections.ObjectModel;
 
 namespace CommonControls.Editors.BoneMapping
@@ -10,7 +14,7 @@ namespace CommonControls.Editors.BoneMapping
         public string MeshSkeletonName { get; set; }
 
         public ObservableCollection<AnimatedBone> ParentModelBones { get; set; }
-       
+
         public string ParnetModelSkeletonName { get; set; }
 
         [System.Xml.Serialization.XmlIgnore]

@@ -1,4 +1,8 @@
-﻿using FluentValidation.Results;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using FluentValidation.Results;
 using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 
 namespace CommonControls.Common
@@ -8,7 +12,7 @@ namespace CommonControls.Common
         public ErrorList LogItems { get; private set; }
         public bool IsSuccess { get; private set; }
         public bool Failed { get => !IsSuccess; }
-        public T Item { get; private  set; }
+        public T Item { get; private set; }
 
         public static Result<T> FromError(string errorGroup, string description)
         {

@@ -270,7 +270,7 @@ namespace View3D.Services
                 if (texture.PartOfProject)
                 {
                     AddTextureToPackFile(texture);
-            
+
                     // Determine which models use this texture and update them
                     var allMeshes = _node.GetMeshesInLod(0, false);
                     foreach (var model in allMeshes)
@@ -366,7 +366,7 @@ namespace View3D.Services
         {
             var meshes = _node.GetMeshesInLod(0, false);
             foreach (var mesh in meshes)
-                ExportUvMap(projectPath+ "\\UvMaps\\", mesh);
+                ExportUvMap(projectPath + "\\UvMaps\\", mesh);
         }
 
         private void ExportUvMap(string outputDirectory, Rmv2MeshNode mesh)

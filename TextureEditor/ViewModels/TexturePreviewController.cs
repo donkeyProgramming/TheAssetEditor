@@ -2,7 +2,6 @@
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework.Graphics;
 using Serilog;
 using System;
@@ -33,7 +32,7 @@ namespace TextureEditor.ViewModels
 
 
         TexturePreviewViewModel _viewModel;
-        public TexturePreviewViewModel ViewModel 
+        public TexturePreviewViewModel ViewModel
         {
             get => _viewModel;
             set => SetAndNotify(ref _viewModel, value);
@@ -60,7 +59,7 @@ namespace TextureEditor.ViewModels
 
         public void Close()
         {
-           
+
         }
 
         public bool Save() => false;
@@ -83,7 +82,7 @@ namespace TextureEditor.ViewModels
         MainScene _scene;
         MeshObject _mesh;
 
-        public class ViewModelWrapper: NotifyPropertyChangedImpl
+        public class ViewModelWrapper : NotifyPropertyChangedImpl
         {
             TexturePreviewViewModel _viewModel;
             public TexturePreviewViewModel ViewModel
@@ -118,7 +117,7 @@ namespace TextureEditor.ViewModels
             _mesh = meshObject;
 
             _scene = new MainScene(null, null);
-            _scene.Components.Add(new ResourceLibary(_scene, packFileService ));
+            _scene.Components.Add(new ResourceLibary(_scene, packFileService));
             _scene.ForceCreate();
 
             _resourceLib = _scene.GetComponent<ResourceLibary>();
@@ -134,7 +133,7 @@ namespace TextureEditor.ViewModels
 
             var imageGenerationSettings = new TextureToTextureRenderer.DrawSettings[5];
             imageGenerationSettings[0] = new TextureToTextureRenderer.DrawSettings();
-            imageGenerationSettings[1] = new TextureToTextureRenderer.DrawSettings() { OnlyRed = true };  
+            imageGenerationSettings[1] = new TextureToTextureRenderer.DrawSettings() { OnlyRed = true };
             imageGenerationSettings[2] = new TextureToTextureRenderer.DrawSettings() { OnlyBlue = true };
             imageGenerationSettings[3] = new TextureToTextureRenderer.DrawSettings() { OnlyGreen = true };
             imageGenerationSettings[4] = new TextureToTextureRenderer.DrawSettings() { OnlyAlpha = true };
@@ -147,7 +146,7 @@ namespace TextureEditor.ViewModels
                     {
                         using (var g = Graphics.FromImage(sourceBitmap))
                         {
-                            g.InterpolationMode = InterpolationMode.HighQualityBicubic; 
+                            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                             DrawCheckerBoard(g, texture.Width, texture.Height);
                             var bitmap = ConvertTextureToImage(renderedTexture);
                             g.DrawImage(bitmap, 0, 0);

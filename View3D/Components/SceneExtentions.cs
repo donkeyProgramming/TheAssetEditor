@@ -73,5 +73,5 @@ namespace View3D.Components.Component
         public enum GraphTraversal { DepthFirst, DepthFirstNoStackOverflow, BreadthFirst }
     }
 
-    
+
 }

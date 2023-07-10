@@ -1,9 +1,13 @@
-﻿using CommonControls.Common;
-using Serilog;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CommonControls.Common;
+using Serilog;
 
 namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 {
@@ -18,7 +22,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
         {
             // Get all the weighted materials. Different enums, but same header
             var weightedEnums = ModelMaterialEnumHelper.GetAllWeightedMaterials();
-            foreach(var enumValue in weightedEnums)
+            foreach (var enumValue in weightedEnums)
                 _materialCreators[enumValue] = new WeighterMaterialCreator();
 
             _materialCreators[ModelMaterialEnum.TerrainTiles] = new TerrainTileMaterialCreator();
@@ -34,12 +38,12 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                     var material = _materialCreators[modelTypeEnum].Create(modelTypeEnum, rmvType, data, offset);
                     var actualMaterialSize = material.ComputeSize();
 
-                    var bytesLeft = expectedMaterialSize - actualMaterialSize; 
+                    var bytesLeft = expectedMaterialSize - actualMaterialSize;
                     if (bytesLeft != 0)
                     {
                         byte[] outputArray = new byte[expectedMaterialSize - actualMaterialSize];
-                        Array.ConstrainedCopy(data,  (int)(offset + actualMaterialSize), outputArray,0, (int)(expectedMaterialSize - actualMaterialSize));
-                        File.WriteAllBytes(DirectoryHelper.Temp + "\\ExtraData_"  + modelTypeEnum  + "_Start_" + offset + actualMaterialSize + "_Size_" + (expectedMaterialSize - actualMaterialSize) + ".data", outputArray);
+                        Array.ConstrainedCopy(data, (int)(offset + actualMaterialSize), outputArray, 0, (int)(expectedMaterialSize - actualMaterialSize));
+                        File.WriteAllBytes(DirectoryHelper.Temp + "\\ExtraData_" + modelTypeEnum + "_Start_" + offset + actualMaterialSize + "_Size_" + (expectedMaterialSize - actualMaterialSize) + ".data", outputArray);
                         throw new Exception($"Part of material {modelTypeEnum} header not read - {bytesLeft} bytes left in header.");
                     }
 
@@ -59,7 +63,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                         File.WriteAllBytes(DirectoryHelper.Temp + "\\ExtraData_" + modelTypeEnum + "_Start_" + offset + actualMaterialSize + "_Size_" + (expectedMaterialSize - actualMaterialSize) + ".data", outputArray);
                         throw new Exception($"Uknown material - {modelTypeEnum} header not read. Expected Size = {expectedMaterialSize} Actual Size = {actualMaterialSize}");
                     }
-                    
+
                     return material;
                 }
             }

@@ -35,7 +35,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         Dictionary<MenuActionType, MenuAction> _actionList = new Dictionary<MenuActionType, MenuAction>();
 
-        public MenuBarViewModel(CommandExecutor commandExecutor,  PackFileService packFileService, EventHub eventHub,
+        public MenuBarViewModel(CommandExecutor commandExecutor, PackFileService packFileService, EventHub eventHub,
             VisibilityHandler visibilityHandler, TransformToolViewModel transformToolViewModel, GizmoActions gizmoActions, GeneralActions generalActions, ToolActions toolActions,
             KitbashSceneCreator kitbashSceneCreator)
         {
@@ -108,9 +108,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _actionList[MenuActionType.OpenReRiggingTool] = new MenuAction(Tools.OpenReRiggingTool) { EnableRule = ActionEnabledRule.AtleastOneObjectSelected, ToolTip = "Open the re-rigging tool" };
             _actionList[MenuActionType.OpenPinTool] = new MenuAction(Tools.PinMeshToMesh) { EnableRule = ActionEnabledRule.Always, ToolTip = "Open the pin tool" };
             _actionList[MenuActionType.CopyLod0ToEveryLodSlot] = new MenuAction(Tools.CopyLod0ToEveryLods) { EnableRule = ActionEnabledRule.Always, ToolTip = "Copy LOD 0 to every LOD slot" };
-            
+
             _actionList[MenuActionType.UpdateWh2Model_Technique1] = new MenuAction(Tools.UpdateWh2Model_ConvertAdditiveBlending) { EnableRule = ActionEnabledRule.Always, ToolTip = "Convert Wh2 model to wh3 format" };
-            _actionList[MenuActionType.UpdateWh2Model_Technique1 ] = new MenuAction(Tools.UpdateWh2Model_ConvertComparativeBlending) { EnableRule = ActionEnabledRule.Always, ToolTip = "Convert Wh2 model to wh3 format" };
+            _actionList[MenuActionType.UpdateWh2Model_Technique1] = new MenuAction(Tools.UpdateWh2Model_ConvertComparativeBlending) { EnableRule = ActionEnabledRule.Always, ToolTip = "Convert Wh2 model to wh3 format" };
 
             _actionList[MenuActionType.GrowFaceSelection] = new MenuAction(Tools.ExpandFaceSelection) { EnableRule = ActionEnabledRule.FaceSelected, ToolTip = "Grow selection" };
             _actionList[MenuActionType.ConvertFaceToVertexSelection] = new MenuAction(Tools.ConvertFacesToVertex) { EnableRule = ActionEnabledRule.FaceSelected, ToolTip = "Convert selected faces to vertexes" };
@@ -178,13 +178,13 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         {
             CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Arrow], "Gizmo", true) { Image = ResourceController.Gizmo_CursorIcon });
             CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Move], "Gizmo") { Image = ResourceController.Gizmo_MoveIcon });
-            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Rotate], "Gizmo") { Image = ResourceController.Gizmo_RotateIcon});
-            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Scale],"Gizmo") {  Image = ResourceController.Gizmo_ScaleIcon });
+            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Rotate], "Gizmo") { Image = ResourceController.Gizmo_RotateIcon });
+            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.Gizmo_Scale], "Gizmo") { Image = ResourceController.Gizmo_ScaleIcon });
 
             CustomButtons.Add(new MenuBarButton(null) { IsSeperator = true });
 
             CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.SelectObject], "SelectionMode", true) { Image = ResourceController.Selection_Object_Icon });
-            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.SelectFace], "SelectionMode") {  Image = ResourceController.Selection_Face_Icon });
+            CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.SelectFace], "SelectionMode") { Image = ResourceController.Selection_Face_Icon });
             CustomButtons.Add(new MenuBarGroupButton(_actionList[MenuActionType.SelectVertex], "SelectionMode") { Image = ResourceController.Selection_Vertex_Icon });
             CustomButtons.Add(new MenuBarButton(_actionList[MenuActionType.ViewOnlySelected]) { Image = ResourceController.ViewSelectedIcon });
 

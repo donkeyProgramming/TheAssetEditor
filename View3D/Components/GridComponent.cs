@@ -1,10 +1,5 @@
-﻿using CommonControls.Common;
-using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
-using Serilog;
+﻿using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.Rendering.RenderItems;
@@ -18,7 +13,7 @@ namespace View3D.Components.Component
         private readonly RenderEngineComponent _renderEngineComponent;
         private readonly ResourceLibary _resourceLibary;
 
-        public GridComponent(RenderEngineComponent renderEngineComponent, ResourceLibary resourceLibary) 
+        public GridComponent(RenderEngineComponent renderEngineComponent, ResourceLibary resourceLibary)
         {
             _renderEngineComponent = renderEngineComponent;
             _resourceLibary = resourceLibary;
@@ -40,7 +35,7 @@ namespace View3D.Components.Component
 
         public void Dispose()
         {
-            if(_gridMesh != null)
+            if (_gridMesh != null)
                 _gridMesh.Dispose();
             _gridMesh = null;
         }

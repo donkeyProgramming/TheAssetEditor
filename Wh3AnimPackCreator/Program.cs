@@ -1,9 +1,7 @@
 ﻿using CommonControls.Common;
-using CommonControls.Editors.AnimationPack;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.FileTypes.MetaData;
-using CommonControls.FileTypes.MetaData.Definitions;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using System;
@@ -38,7 +36,7 @@ namespace Wh3AnimPackCreator
             string onlyProcessOneAnim = null;
             //onlyProcessOneAnim = @"animations/animation_tables/ce1_myth_dlc_centaur_spear_and_shield.frg";
             //onlyProcessOneAnim = @"animations/animation_tables/cerb1_mth_dlc_cerberus.frg";
-            
+
             try
             {
                 var binsToProcess = GetAllTroyAnimationFragments(troyPfs, onlyProcessOneAnim);
@@ -81,7 +79,7 @@ namespace Wh3AnimPackCreator
             var lines = File.ReadAllLines(summaryPath);
 
             // Skip 2 first lines, csv config related
-            for(int i = 2; i < lines.Length; i++)
+            for (int i = 2; i < lines.Length; i++)
             {
                 var line = lines[i].Split('|');
                 outout.Add(line[0].Trim().ToUpper());
@@ -92,7 +90,7 @@ namespace Wh3AnimPackCreator
 
         static string[] GetAllTroyAnimationFragments(PackFileService pfs, string onlyProcessMe = null)
         {
-            if(onlyProcessMe != null)
+            if (onlyProcessMe != null)
                 return new string[] { onlyProcessMe };
 
             var gameAnimPackFile = pfs.FindFile(@"animations\animation_tables\animation_tables.animpack");

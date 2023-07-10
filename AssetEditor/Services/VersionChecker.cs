@@ -1,10 +1,8 @@
 ﻿using Octokit;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Windows;
 
 namespace AssetEditor.Services
@@ -47,7 +45,7 @@ namespace AssetEditor.Services
                                 ProcessMessage(latest, currentVersion);
                             }
                         }
-                        catch 
+                        catch
                         {
                             MessageBox.Show("Unable to contact Github to check for later version");
                         }
@@ -66,7 +64,7 @@ namespace AssetEditor.Services
             var changesIndented = changes.Replace("\n", "\n\t");
             var message = $"You are using an old version {currentVersion}, please go to\n{GitHubLink} to download {lastRelease.TagName} \n\nChanges:{changesIndented}\n\nGo to download page now?";
 
-            var messageBoxResult = MessageBox.Show(message, "Version checker",  MessageBoxButton.YesNo);
+            var messageBoxResult = MessageBox.Show(message, "Version checker", MessageBoxButton.YesNo);
             if (messageBoxResult == MessageBoxResult.Yes)
                 OpenUrl(GitHubLink);
         }

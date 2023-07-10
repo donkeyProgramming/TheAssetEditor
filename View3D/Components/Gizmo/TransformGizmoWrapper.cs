@@ -1,10 +1,8 @@
 ﻿using CommonControls.Common;
 using Microsoft.Xna.Framework;
 using Serilog;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
 using View3D.Commands;
 using View3D.Commands.Vertex;
 using View3D.Components.Component;
@@ -18,7 +16,7 @@ namespace View3D.Components.Gizmo
         protected ILogger _logger = Logging.Create<TransformGizmoWrapper>();
 
         Vector3 _pos;
-        public Vector3 Position { get=> _pos; set { _pos = value; } }
+        public Vector3 Position { get => _pos; set { _pos = value; } }
 
         Vector3 _scale = Vector3.One;
         public Vector3 Scale { get => _scale; set { _scale = value; } }
@@ -64,7 +62,7 @@ namespace View3D.Components.Gizmo
         {
             if (_activeCommand != null)
             {
-                 //   MessageBox.Show("Transform debug check - Please inform the creator of the tool that you got this message. Would also love it if you tried undoing your last command to see if that works..\n E-001");
+                //   MessageBox.Show("Transform debug check - Please inform the creator of the tool that you got this message. Would also love it if you tried undoing your last command to see if that works..\n E-001");
                 _activeCommand.InvertWindingOrder = _invertedWindingOrder;
                 _activeCommand.Transform = _totalGizomTransform;
                 _activeCommand.PivotPoint = Position;
@@ -73,7 +71,7 @@ namespace View3D.Components.Gizmo
             }
 
             _totalGizomTransform = Matrix.Identity;
-            _activeCommand = _commandFactory.Create<TransformVertexCommand>().Configure(x=>x.Configure(_effectedObjects, Position)).Build();
+            _activeCommand = _commandFactory.Create<TransformVertexCommand>().Configure(x => x.Configure(_effectedObjects, Position)).Build();
         }
 
         public void Stop(CommandExecutor commandManager)
@@ -106,7 +104,7 @@ namespace View3D.Components.Gizmo
             var realScale = scale + Vector3.One;
             var scaleMatrix = Matrix.CreateScale(scale + Vector3.One);
             ApplyTransform(scaleMatrix, pivot);
-            
+
             Scale += scale;
 
             _totalGizomTransform *= scaleMatrix;
@@ -154,7 +152,7 @@ namespace View3D.Components.Gizmo
                     for (int i = 0; i < geo.VertexCount(); i++)
                         TransformVertex(transform, geo, objCenter, i);
                 }
-                else if(_selectionState is VertexSelectionState vertSelectionState)
+                else if (_selectionState is VertexSelectionState vertSelectionState)
                 {
                     for (int i = 0; i < vertSelectionState.VertexWeights.Count; i++)
                     {
@@ -198,10 +196,10 @@ namespace View3D.Components.Gizmo
             else if (state is VertexSelectionState vertexSelectionState)
             {
                 if (vertexSelectionState.SelectedVertices.Count != 0)
-                    return new  TransformGizmoWrapper(commandFactory, new List<MeshObject>(){vertexSelectionState.RenderObject.Geometry}, vertexSelectionState);
+                    return new TransformGizmoWrapper(commandFactory, new List<MeshObject>() { vertexSelectionState.RenderObject.Geometry }, vertexSelectionState);
             }
             return null;
         }
-       
+
     }
 }

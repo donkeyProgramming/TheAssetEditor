@@ -1,6 +1,5 @@
 ﻿using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Hirc;
-using Audio.Utility;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
@@ -47,7 +46,7 @@ namespace Audio.Storage
             var parsedBnkList = new List<ParsedBnkFile>();
             var banksWithUnknowns = new List<string>();
             var failedBnks = new List<(string bnkFile, string Error)>();
-         
+
 
             var counter = 1;
             Parallel.ForEach(wantedBnkFiles, bnkFile =>

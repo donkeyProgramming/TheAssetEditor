@@ -1,15 +1,17 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes;
-using CommonControls.FileTypes.RigidModel.Transforms;
-using CommonControls.FileTypes.RigidModel.Types;
-using Filetypes.ByteParsing;
-using Microsoft.Xna.Framework;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using CommonControls.FileTypes.RigidModel.Transforms;
+using CommonControls.FileTypes.RigidModel.Types;
+using Filetypes.ByteParsing;
+using Microsoft.Xna.Framework;
 
 namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 {
@@ -92,7 +94,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                 stringParamSize +
                 // Variable + index
                 (4 * FloatParams.Count) + (4 * FloatParams.Count) +
-                (4 * IntParams.Count) + (4  * IntParams.Count) +
+                (4 * IntParams.Count) + (4 * IntParams.Count) +
                 (4 * 4 * Vec4Params.Count) + (Vec4Params.Count * 4));
 
             return headerDataSize;
@@ -222,7 +224,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                 AttachmentPointParams = new List<RmvAttachmentPoint>(),
                 TexturesParams = new List<RmvTexture>(),
                 AlphaMode = AlphaMode.Transparent, /// Alpha mode - assume that users want transpencey mode enabled by default
-            };                   
+            };
 
             return material;
         }
@@ -280,7 +282,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
             }
 
             // Update alpha value in param list
-            if(typedMaterial.IntParams.Count != 0)
+            if (typedMaterial.IntParams.Count != 0)
                 typedMaterial.IntParams[0] = (int)material.AlphaMode;
 
             for (var intIndex = 0; intIndex < typedMaterial.IntParams.Count; intIndex++)

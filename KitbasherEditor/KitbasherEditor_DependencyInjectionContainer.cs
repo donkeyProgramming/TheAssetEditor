@@ -32,7 +32,7 @@ namespace KitbasherEditor
             // Sub tools
             serviceCollection.AddScoped<VertexDebuggerViewModel>();
             serviceCollection.AddScoped<VertexDebuggerView>();
-            
+
 
             // Menubar 
             serviceCollection.AddScoped<TransformToolViewModel>();
@@ -44,14 +44,14 @@ namespace KitbasherEditor
 
             // Misc
             serviceCollection.AddScoped<WindowKeyboard>();
-            serviceCollection.AddScoped<KitbashViewDropHandler>();  
+            serviceCollection.AddScoped<KitbashViewDropHandler>();
         }
 
         public override void RegisterTools(IToolFactory factory)
         {
             factory.RegisterTool<KitbasherViewModel, KitbasherView>(new ExtentionToTool(EditorEnums.Kitbash_Editor, new[] { ".rigid_model_v2", ".wsmodel.rigid_model_v2" }/*, new[] { ".wsmodel", ".variantmeshdefinition" }*/));
         }
-    
+
     }
 
 

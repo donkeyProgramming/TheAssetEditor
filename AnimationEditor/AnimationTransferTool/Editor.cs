@@ -7,7 +7,6 @@ using CommonControls.FileTypes.Animation;
 using CommonControls.SelectionListDialog;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -53,7 +52,7 @@ namespace AnimationEditor.AnimationTransferTool
             _player = player;
 
             AnimationSettings.DisplayOffset.OnValueChanged += DisplayOffset_OnValueChanged;
-            DisplayOffset_OnValueChanged(new CommonControls.MathViews.Vector3ViewModel(0,0,2));
+            DisplayOffset_OnValueChanged(new CommonControls.MathViews.Vector3ViewModel(0, 0, 2));
         }
 
         public Editor Create(AssetViewModel copyToAsset, AssetViewModel copyFromAsset, AssetViewModel generated)
@@ -120,7 +119,7 @@ namespace AnimationEditor.AnimationTransferTool
             HightlightSelectedBones(null);
 
             var standAnim = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(newValue.SkeletonName).FirstOrDefault(x => x.AnimationFile.Contains("stand"));
-            if(standAnim != null)
+            if (standAnim != null)
                 _assetViewModelBuilder.SetAnimation(_copyFrom, standAnim);
 
             _config = null;
@@ -255,7 +254,7 @@ namespace AnimationEditor.AnimationTransferTool
 
             var items = copyFromAnims.Select(x => new SelectionListViewModel<SkeletonAnimationLookUpHelper.AnimationReference>.Item()
             {
-                IsChecked = new NotifyAttr<bool>(! (x.AnimationFile.Contains("tech", StringComparison.InvariantCultureIgnoreCase) || x.AnimationFile.Contains("skeletons", StringComparison.InvariantCultureIgnoreCase))),
+                IsChecked = new NotifyAttr<bool>(!(x.AnimationFile.Contains("tech", StringComparison.InvariantCultureIgnoreCase) || x.AnimationFile.Contains("skeletons", StringComparison.InvariantCultureIgnoreCase))),
                 DisplayName = x.AnimationFile,
                 ItemValue = x
             }).ToList();
@@ -267,7 +266,7 @@ namespace AnimationEditor.AnimationTransferTool
                 {
                     var index = 1;
                     var numItemsToProcess = items.Count(x => x.IsChecked.Value);
-                    if(numItemsToProcess > 50)
+                    if (numItemsToProcess > 50)
                     {
                         var confirm = MessageBox.Show("about to process 50 or more items! continue milord?", "sire...", MessageBoxButton.YesNo);
                         if (confirm != MessageBoxResult.Yes) return;
@@ -447,69 +446,69 @@ namespace AnimationEditor.AnimationTransferTool
         void SaveMeshWithNewSkeleton(AnimationClip newSkeletonClip, string savePostFix)
         {
             throw new NotImplementedException("Todo");
-           //var commandExecutor = _componentManager.GetComponent<CommandExecutor>();
-           //
-           //var modelNodes = SceneNodeHelper.GetChildrenOfType<Rmv2ModelNode>(Generated.MainNode, (x) => x.IsVisible)
-           //    .Where(x => x.IsVisible)
-           //    .ToList();
-           //
-           //if (modelNodes.Count == 0)
-           //{
-           //    MessageBox.Show("Can not save, as there is no mesh", "Error", MessageBoxButton.OK);
-           //    return;
-           //}
-           //
-           //// Create a skeleton from the scaled animation
-           //var newSkeletonName = Generated.Skeleton.SkeletonName + "_" + savePostFix;
-           //var skeletonAnimFile = newSkeletonClip.ConvertToFileFormat(Generated.Skeleton);
-           //skeletonAnimFile.Header.SkeletonName = newSkeletonName;
-           //
-           //AnimationSettings.UseScaledSkeletonName.Value = true;
-           //AnimationSettings.ScaledSkeletonName.Value = newSkeletonName;
-           //
-           //var skeletonBytes = AnimationFile.ConvertToBytes(skeletonAnimFile);
-           //SaveHelper.Save(_pfs, @"animations\skeletons\" + newSkeletonName + ".anim", null, skeletonBytes);
-           //
-           ////Save inv matrix file
-           //var newSkeleton = new GameSkeleton(skeletonAnimFile, null);
-           //var invMatrixFile = newSkeleton.CreateInvMatrixFile();
-           //var invMatrixBytes = invMatrixFile.GetBytes();
-           //SaveHelper.Save(_pfs, @"animations\skeletons\" + newSkeletonName + ".bone_inv_trans_mats", null, invMatrixBytes);
-           //
-           //var animationFrame = AnimationSampler.Sample(0, 0, Generated.Skeleton, newSkeletonClip);
-           //
-           //int numCommandsToUndo = 0;
-           //var originalSkeletonName = modelNodes.First().Model.Header.SkeletonName;
-           //foreach (var model in modelNodes)
-           //{
-           //    var header = model.Model.Header;
-           //    header.SkeletonName = newSkeletonName;
-           //    model.Model.Header = header;
-           //
-           //    var meshList = SceneNodeHelper.GetChildrenOfType<Rmv2MeshNode>(model);
-           //    var cmd = new CreateAnimatedMeshPoseCommand(meshList, animationFrame, false);
-           //    commandExecutor.ExecuteCommand(cmd, true);
-           //
-           //    numCommandsToUndo++;
-           //}
-           //
-           //var meshName = Path.GetFileNameWithoutExtension(_copyTo.MeshName.Value);
-           //var newMeshName = meshName + "_" + savePostFix + ".rigid_model_v2";
-           //var bytes = SceneSaverService.Save(true, modelNodes, newSkeleton, RmvVersionEnum.RMV2_V7);
-           //
-           //SaveHelper.Save(_pfs, newMeshName, null, bytes);
-           //
-           //// Undo the mesh transform
-           //for (int i = 0; i < numCommandsToUndo; i++)
-           //    commandExecutor.Undo();
-           //
-           //// Reset the skeleton
-           //foreach (var model in modelNodes)
-           //{
-           //    var header = model.Model.Header;
-           //    header.SkeletonName = originalSkeletonName;
-           //    model.Model.Header = header;
-           //}
+            //var commandExecutor = _componentManager.GetComponent<CommandExecutor>();
+            //
+            //var modelNodes = SceneNodeHelper.GetChildrenOfType<Rmv2ModelNode>(Generated.MainNode, (x) => x.IsVisible)
+            //    .Where(x => x.IsVisible)
+            //    .ToList();
+            //
+            //if (modelNodes.Count == 0)
+            //{
+            //    MessageBox.Show("Can not save, as there is no mesh", "Error", MessageBoxButton.OK);
+            //    return;
+            //}
+            //
+            //// Create a skeleton from the scaled animation
+            //var newSkeletonName = Generated.Skeleton.SkeletonName + "_" + savePostFix;
+            //var skeletonAnimFile = newSkeletonClip.ConvertToFileFormat(Generated.Skeleton);
+            //skeletonAnimFile.Header.SkeletonName = newSkeletonName;
+            //
+            //AnimationSettings.UseScaledSkeletonName.Value = true;
+            //AnimationSettings.ScaledSkeletonName.Value = newSkeletonName;
+            //
+            //var skeletonBytes = AnimationFile.ConvertToBytes(skeletonAnimFile);
+            //SaveHelper.Save(_pfs, @"animations\skeletons\" + newSkeletonName + ".anim", null, skeletonBytes);
+            //
+            ////Save inv matrix file
+            //var newSkeleton = new GameSkeleton(skeletonAnimFile, null);
+            //var invMatrixFile = newSkeleton.CreateInvMatrixFile();
+            //var invMatrixBytes = invMatrixFile.GetBytes();
+            //SaveHelper.Save(_pfs, @"animations\skeletons\" + newSkeletonName + ".bone_inv_trans_mats", null, invMatrixBytes);
+            //
+            //var animationFrame = AnimationSampler.Sample(0, 0, Generated.Skeleton, newSkeletonClip);
+            //
+            //int numCommandsToUndo = 0;
+            //var originalSkeletonName = modelNodes.First().Model.Header.SkeletonName;
+            //foreach (var model in modelNodes)
+            //{
+            //    var header = model.Model.Header;
+            //    header.SkeletonName = newSkeletonName;
+            //    model.Model.Header = header;
+            //
+            //    var meshList = SceneNodeHelper.GetChildrenOfType<Rmv2MeshNode>(model);
+            //    var cmd = new CreateAnimatedMeshPoseCommand(meshList, animationFrame, false);
+            //    commandExecutor.ExecuteCommand(cmd, true);
+            //
+            //    numCommandsToUndo++;
+            //}
+            //
+            //var meshName = Path.GetFileNameWithoutExtension(_copyTo.MeshName.Value);
+            //var newMeshName = meshName + "_" + savePostFix + ".rigid_model_v2";
+            //var bytes = SceneSaverService.Save(true, modelNodes, newSkeleton, RmvVersionEnum.RMV2_V7);
+            //
+            //SaveHelper.Save(_pfs, newMeshName, null, bytes);
+            //
+            //// Undo the mesh transform
+            //for (int i = 0; i < numCommandsToUndo; i++)
+            //    commandExecutor.Undo();
+            //
+            //// Reset the skeleton
+            //foreach (var model in modelNodes)
+            //{
+            //    var header = model.Model.Header;
+            //    header.SkeletonName = originalSkeletonName;
+            //    model.Model.Header = header;
+            //}
         }
     }
 }

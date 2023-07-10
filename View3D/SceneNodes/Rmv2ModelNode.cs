@@ -1,7 +1,6 @@
 ﻿using CommonControls.Common;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
-using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -70,13 +69,13 @@ namespace View3D.SceneNodes
                         {
                             _logger.Here().Error($"Error while trying to resolve textures from WS model while loading model, {e.Message}");
                         }
-                        
+
                     }
 
                     lodNode.AddObject(node);
                 }
             }
-        } 
+        }
 
         public List<Rmv2LodNode> GetLodNodes()
         {
@@ -139,13 +138,13 @@ namespace View3D.SceneNodes
             var lodNodes = GetLodNodes();
             if (lodNodes.Count(x => x.LodReductionFactor == -1) != 0)
             {
-                for(int i = 0; i < lodNodes.Count; i++)
+                for (int i = 0; i < lodNodes.Count; i++)
                     lodNodes[i].LodReductionFactor = SceneSaverService.GetDefaultLodReductionValue(lodNodes.Count(), i);
             }
         }
     }
 
- 
+
 }
 
 

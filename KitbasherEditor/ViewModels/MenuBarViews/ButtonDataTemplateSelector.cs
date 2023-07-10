@@ -19,7 +19,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             {
                 case MenuBarGroupButton _:
                     return RadioButtonTemplate;
-                default: 
+                default:
                     return DefaultButtonTemplate;
             }
         }

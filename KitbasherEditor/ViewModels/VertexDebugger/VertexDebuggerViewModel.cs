@@ -18,7 +18,7 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
     class VertexDebuggerViewModel : BaseComponent, IDisposable
     {
         public ObservableCollection<VertexInstance> VertexList { get; set; } = new ObservableCollection<VertexInstance>();
-       
+
         VertexInstance _selectedVertex;
         public VertexInstance SelectedVertex
         {
@@ -41,10 +41,10 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
         private readonly SelectionManager _selectionManager;
         private readonly EventHub _eventHub;
 
-        public VertexDebuggerViewModel(RenderEngineComponent renderEngineComponent, 
+        public VertexDebuggerViewModel(RenderEngineComponent renderEngineComponent,
             ResourceLibary resourceLibary,
             SelectionManager selectionManager,
-            EventHub eventHub) 
+            EventHub eventHub)
         {
             _renderEngineComponent = renderEngineComponent;
             _resourceLibary = resourceLibary;

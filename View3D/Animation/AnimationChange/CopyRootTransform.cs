@@ -24,9 +24,9 @@ namespace View3D.Animation.AnimationChange
             _offsetRot = offsetRot;
         }
 
-        public void TransformFrameLocalSpace(AnimationFrame frame, int boneId, float v)       
+        public void TransformFrameLocalSpace(AnimationFrame frame, int boneId, float v)
         {
-            if (boneId != 0 || _hasError || _boneId == -1 )
+            if (boneId != 0 || _hasError || _boneId == -1)
                 return;
 
             try

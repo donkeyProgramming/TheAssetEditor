@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
     //TODO: VERIFY OLD SPLICE META TAGS ...
-    
+
     [MetaData("SPLICE", 0)]
     public class Splice_v0 : DecodedMetaEntryBase_v0
     {
@@ -26,9 +26,9 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         [MetaDataTag(7, "true or false as text")]
         public string ProbablyAdditive { get; set; } = "false";
     }
-    
+
     [MetaData("SPLICE", 2)]
-    public class Splice_v2:  DecodedMetaEntryBase_v2
+    public class Splice_v2 : DecodedMetaEntryBase_v2
     {
         [MetaDataTag(4)]
         public string Animation { get; set; } = "";
@@ -47,9 +47,9 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         [MetaDataTag(9, "true or false as text")]
         public string ProbablyAdditive { get; set; } = "false";
     }
-    
+
     [MetaData("SPLICE", 3)]
-    public class Splice_v3: DecodedMetaEntryBase_v2
+    public class Splice_v3 : DecodedMetaEntryBase_v2
     {
         [MetaDataTag(4)]
         public string Animation { get; set; } = "";
@@ -60,7 +60,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 
         [MetaDataTag(6)]
         public float ProbablyGenericWeight { get; set; }
-        
+
         [MetaDataTag(7)]
         public float ProbablyNeckWeight { get; set; }
         [MetaDataTag(8)]
@@ -74,21 +74,21 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 
         [MetaDataTag(12, "true or false as text")]
         public string ProbablyAdditive { get; set; } = "false";
-        
+
         //new field
         [MetaDataTag(13, "true or false as text")]
         public string ProbablyWeaponPose { get; set; } = "false";
     }
-    
+
     [MetaData("SPLICE", 4)]
-    public class Splice_v4 :  Splice_v3
+    public class Splice_v4 : Splice_v3
     {
         [MetaDataTag(14, "true or false as text")]
         public string ProbablyStretch { get; set; } = "false";
     }
-    
+
     [MetaData("SPLICE", 5)]
-    public class Splice_v5 :  DecodedMetaEntryBase_v2
+    public class Splice_v5 : DecodedMetaEntryBase_v2
     {
         [MetaDataTag(4)]
         public string Animation { get; set; } = "";
@@ -123,14 +123,14 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public string WeaponPose { get; set; } = "false";
         [MetaDataTag(16, "true or false as text")]
         public string Stretch { get; set; } = "false";
-        
+
         // new field
         [MetaDataTag(17, "true or false as text")]
         public string ExcludeStripped { get; set; } = "false";
     }
-    
+
     [MetaData("SPLICE", 6)]
-    public class Splice_v6 :  DecodedMetaEntryBase_v2
+    public class Splice_v6 : DecodedMetaEntryBase_v2
     {
         [MetaDataTag(4)]
         public string Animation { get; set; } = "";
@@ -140,11 +140,11 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 
         [MetaDataTag(6, "-1 applies the whole animation? | The spliced animation applies to this bone and all of it's children. -1 seems to be the same as 0, ie. animroot, but there's probably something with the pose-type .anim files that makes it distinct.")]
         public int GenericBoneIndex { get; set; }
-        
+
         // changed filetype from float to int
         [MetaDataTag(7)]
         public int GenericBoneDepth { get; set; }
-        
+
         // As is
         [MetaDataTag(8)]
         public float GenericWeight { get; set; }
@@ -159,8 +159,8 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public float RightArmWeight { get; set; }
         [MetaDataTag(13)]
         public float LegsWeight { get; set; }
-        
-        
+
+
         // New field for v6
         [MetaDataTag(14)]
         public float BlendInTime { get; set; }
@@ -175,7 +175,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         [MetaDataTag(18, "true or false as text")]
         public string ExcludeStripped { get; set; } = "false";
     }
-    
+
     [MetaData("SPLICE", 10)]
     public class Splice_v10 : DecodedMetaEntryBase
     {

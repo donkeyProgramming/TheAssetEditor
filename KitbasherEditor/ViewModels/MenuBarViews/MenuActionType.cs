@@ -1,7 +1,7 @@
 ﻿namespace KitbasherEditor.ViewModels.MenuBarViews
 {
     public enum MenuActionType
-    { 
+    {
         Save,
         SaveAs,
         GenerateWsModelForWh3,
@@ -27,7 +27,7 @@
         SelectObject,
         SelectFace,
         SelectVertex,
-        
+
         ViewOnlySelected,
         FocusSelection,
         ResetCamera,

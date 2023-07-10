@@ -1,10 +1,10 @@
-﻿using Audio.FileFormats.WWise.Hirc.V136;
+﻿using Audio.AudioEditor;
+using Audio.FileFormats.WWise;
+using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Audio.FileFormats.WWise;
-using Audio.AudioEditor;
 
 namespace AudioResearch
 {
@@ -35,24 +35,24 @@ namespace AudioResearch
             }
 
             public class ParentStructure
-            { 
+            {
                 public string Description { get; set; }
                 public List<string> GraphItems { get; set; } = new List<string>();
             }
 
             class BusItem
-            { 
+            {
                 public string SourceDescription { get; set; }
                 public uint BusId { get; set; }
             }
 
             public void DebugPrint(List<ParentStructure> parentStructures)
             {
-                foreach(var  parentStructure in parentStructures) 
+                foreach (var parentStructure in parentStructures)
                 {
                     Console.WriteLine(parentStructure.Description);
-                    foreach(var item in  parentStructure.GraphItems)
-                        Console.WriteLine("\t"+ item);
+                    foreach (var item in parentStructure.GraphItems)
+                        Console.WriteLine("\t" + item);
                     Console.WriteLine();
                 }
             }
@@ -72,7 +72,7 @@ namespace AudioResearch
                     else if (node.Item is CAkLayerCntr_v136)
                         itemId = node.Item.Id;
 
-                    else if (node.Item is CAkSwitchCntr_v136 )
+                    else if (node.Item is CAkSwitchCntr_v136)
                         itemId = node.Item.Id;
 
 
@@ -88,8 +88,8 @@ namespace AudioResearch
                         if (found == true)
                             return eventName;
                         else
-                        { 
-                        
+                        {
+
                         }
 
                     }
@@ -224,7 +224,7 @@ namespace AudioResearch
                         output.Last().GraphItems.Add(str);
                     }
                 }
-            
+
                 return output;
             }
 
@@ -238,7 +238,7 @@ namespace AudioResearch
 
                 //DebugPrint(output);
                 return output;
-             }
+            }
         }
     }
 }

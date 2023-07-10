@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Audio.FileFormats.WWise
+﻿namespace Audio.FileFormats.WWise
 {
     public enum HircType : byte
     {

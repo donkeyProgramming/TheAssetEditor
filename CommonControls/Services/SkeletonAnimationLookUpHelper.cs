@@ -1,13 +1,17 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes.Animation;
-using CommonControls.FileTypes.PackFiles.Models;
-using Serilog;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using CommonControls.Common;
+using CommonControls.FileTypes.Animation;
+using CommonControls.FileTypes.PackFiles.Models;
+using Serilog;
 
 namespace CommonControls.Services
 {
@@ -37,7 +41,7 @@ namespace CommonControls.Services
                 try
                 {
                     var brokenAnims = new string[] { "rigidmodels\\buildings\\roman_aqueduct_straight\\roman_aqueduct_straight_piece01_destruct01_anim.anim" };
-           
+
                     if (brokenAnims.Contains(fullPath))
                     {
                         _logger.Here().Warning("Skipping loading of known broken file - " + fullPath);
@@ -171,7 +175,7 @@ namespace CommonControls.Services
 
 
 
-        
+
 
 
         // Delete this pice of shit
@@ -189,7 +193,7 @@ namespace CommonControls.Services
             public override string ToString()
             {
                 return $"[{Container?.Name}] {AnimationFile}";
-             }
+            }
         }
     }
 }

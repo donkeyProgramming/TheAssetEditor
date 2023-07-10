@@ -1,10 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 
 namespace CommonControls.FileTypes.MetaData
@@ -14,7 +14,7 @@ namespace CommonControls.FileTypes.MetaData
         public int Version { get; set; }
         public List<BaseMetaEntry> Items { get; set; } = new List<BaseMetaEntry>();
 
-        public List<T> GetItemsOfType<T>() 
+        public List<T> GetItemsOfType<T>()
         {
             return Items.Where(x => x is T).Cast<T>().ToList();
         }
@@ -24,7 +24,7 @@ namespace CommonControls.FileTypes.MetaData
     public abstract class BaseMetaEntry
     {
         public string Name { get; set; }
-        
+
         [JsonIgnore]
         public byte[] Data { get; set; }
         public virtual string Description { get; } = "";
@@ -33,25 +33,25 @@ namespace CommonControls.FileTypes.MetaData
         public int Version { get; set; }
 
         public string DisplayName { get => $"{Name}_{Version}{Description}"; }
-       
+
     }
 
     public class UnknownMetaEntry : BaseMetaEntry
     {
-        
+
     }
     public abstract class DecodedMetaEntryBase_v0 : BaseMetaEntry
     {
         [MetaDataTag(1)]
         public int UnknownIntBase_v0 { get; set; }
     }
-    
+
     public abstract class DecodedMetaEntryBase_v1 : DecodedMetaEntryBase_v0
     {
         [MetaDataTag(2)]
         public int UnknownIntBase_v1 { get; set; }
     }
-    
+
     public abstract class DecodedMetaEntryBase_v2 : BaseMetaEntry
     {
         [MetaDataTag(1, "Time in second when the Tag takes effect")]

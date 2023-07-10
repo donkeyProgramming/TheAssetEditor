@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Audio.FileFormats.WWise.Hirc;
+﻿using Audio.FileFormats.WWise.Hirc;
 using Audio.FileFormats.WWise.Hirc.Shared;
 using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 namespace Audio.Utility
 {
@@ -138,7 +136,7 @@ namespace Audio.Utility
         {
             var rootNode = new WriteNode();
             var paths = new List<WritePath>()
-            { 
+            {
                 new WritePath(){ Legs = new List<string>() {"Any","Horse", "Walking" }},
                 new WritePath(){ Legs = new List<string>() {"Any","Dog", "Walking" }},
                 new WritePath(){ Legs = new List<string>() {"Any","Dog", "Running" }},
@@ -168,8 +166,8 @@ namespace Audio.Utility
 
 
         public void CalculateCount(AkDecisionTree.Node node)
-        { 
-            foreach(var child in node.Children)
+        {
+            foreach (var child in node.Children)
                 CalculateCount(child);
 
             node.Children_uCount = (ushort)(node.Children.Count + node.Children.Sum(x => x.Children_uCount));

@@ -112,7 +112,7 @@ namespace FileTypesTests.RigidModel
         public void UpdateOffs2222et2s()
         {
 
-           
+
 
             //var meshData = GetWeaponMeshData();
             //

@@ -21,11 +21,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public ICommand RefreshTexturesCommand { get; set; }
         public ICommand OpenFolderCommand { get; set; }
         public ICommand BrowseCommand { get; set; }
- 
+
 
         public NotifyAttr<bool> IsRunning { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<string> FilePath { get; set; } = new NotifyAttr<string>("");
-        public string FilePrefix { get => _textureService.FilePreFix; set => _textureService.FilePreFix = value; } 
+        public string FilePrefix { get => _textureService.FilePreFix; set => _textureService.FilePreFix = value; }
 
         public ObservableCollection<TextureFileEditorService.TextureItem> TextureList { get; set; } = new ObservableCollection<TextureFileEditorService.TextureItem>();
 

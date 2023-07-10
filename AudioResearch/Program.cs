@@ -1,3 +1,4 @@
+using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using Audio.Utility;
@@ -8,10 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Audio.FileFormats.WWise;
-using System.Text.Json.Serialization;
-using System.Text.Json;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace AudioResearch
 {
@@ -22,30 +22,30 @@ namespace AudioResearch
             new LotrDataLoading().Run();
             return;
 
-           //DecisionPathHelper test = new DecisionPathHelper(null);
-           //test.Write();
-           //
-           //if (Environment.GetEnvironmentVariable("KlissanEnv") != null)
-           //{
-           //    //TestDialogEventSerialization();
-           //    return;
-           //}
-           //
-           //
-           //
-           //DataExplore();
-           ////TableTest();
-           ////OvnTest.GenerateProjectFromBnk(false);
-           //
-           //// OvnTest.Compile();
-           ////GeneratOvnProject();
-           /// TestDialogEventSerialization();
-           //// LogicalChainingTest();
-           //
-           //var currentProjectName = $"Data\\OvnExample\\ProjectSimple.json";
-           ////OvnTest.GenerateProjectFromBnk(currentProjectName);
-           //
-           //OvnTest.Compile(currentProjectName, false, false, false);
+            //DecisionPathHelper test = new DecisionPathHelper(null);
+            //test.Write();
+            //
+            //if (Environment.GetEnvironmentVariable("KlissanEnv") != null)
+            //{
+            //    //TestDialogEventSerialization();
+            //    return;
+            //}
+            //
+            //
+            //
+            //DataExplore();
+            ////TableTest();
+            ////OvnTest.GenerateProjectFromBnk(false);
+            //
+            //// OvnTest.Compile();
+            ////GeneratOvnProject();
+            /// TestDialogEventSerialization();
+            //// LogicalChainingTest();
+            //
+            //var currentProjectName = $"Data\\OvnExample\\ProjectSimple.json";
+            ////OvnTest.GenerateProjectFromBnk(currentProjectName);
+            //
+            //OvnTest.Compile(currentProjectName, false, false, false);
         }
 
         class AudioBusTreeBuilder
@@ -148,11 +148,11 @@ namespace AudioResearch
                     .ToList();
 
                 var eventToSoundsMap = events
-                   .Select(x => new 
-                   { 
-                       Event = x, 
-                       EventName = audioRepository.GetNameFromHash(x.Id), 
-                       Sound = ParseChildren(x.OwnerFile, x.GetActionIds(), audioRepository).Where(x=>x != null).ToList()
+                   .Select(x => new
+                   {
+                       Event = x,
+                       EventName = audioRepository.GetNameFromHash(x.Id),
+                       Sound = ParseChildren(x.OwnerFile, x.GetActionIds(), audioRepository).Where(x => x != null).ToList()
                    })
                    .ToList();
 
@@ -165,10 +165,10 @@ namespace AudioResearch
                         OverrideBusIds = x.Sound.Select(x => x.NodeBaseParams.OverrideBusId).Distinct().ToList(),
                         OverrideBusIdsEqual = x.Sound.Select(x => x.NodeBaseParams.OverrideBusId).Distinct().Count() == 1
                     })
-                    .Where(x=>x.SoundCount != 0)
+                    .Where(x => x.SoundCount != 0)
                     .ToList();
 
-                var allSameBus = eventToBus.Where(x=>x.OverrideBusIdsEqual == true).ToList();
+                var allSameBus = eventToBus.Where(x => x.OverrideBusIdsEqual == true).ToList();
                 var allNotSameBus = eventToBus.Where(x => x.OverrideBusIdsEqual == false).ToList();
 
                 var busToEventMap = eventToBus
@@ -178,19 +178,19 @@ namespace AudioResearch
 
             private List<CAkSound_v136> ParseChildren(string ownerFile, List<uint> list, IAudioRepository audioRepository)
             {
-                if(list.Count  == 0) 
+                if (list.Count == 0)
                     return new List<CAkSound_v136>();
 
                 var result = list
                     .Select(x => audioRepository.GetHircObject(x, ownerFile))
-                    .SelectMany(x=>x)
+                    .SelectMany(x => x)
                     .ToList();
 
                 if (result.Count == 0)
                     return new List<CAkSound_v136>();
 
                 var output = new List<CAkSound_v136>();
-                foreach(var item in result)
+                foreach (var item in result)
                 {
                     if (item is CAkSound_v136 sound)
                         output.Add(sound);
@@ -240,7 +240,7 @@ namespace AudioResearch
 
                 if (result.Count != 1)
                     throw new Exception("Not expected!");
-                
+
                 var instance = result.First();
                 if (instance is CAkEvent_v136 cakEvent)
                     return cakEvent;
@@ -281,7 +281,7 @@ namespace AudioResearch
             //var lines = worker.CreateLines(myDialog, audioRepo);
 
 
-            var x = audioRepo.HircObjects.SelectMany(x => x.Value).Where(x=>x.Type == HircType.State).ToList();
+            var x = audioRepo.HircObjects.SelectMany(x => x.Value).Where(x => x.Type == HircType.State).ToList();
 
             var tests = audioRepo.GetHircObject(964666289);
 
@@ -294,7 +294,7 @@ namespace AudioResearch
 
 
             var allBussesStateGroupIDs = allBusses
-                .SelectMany(x => x.StateChunk.StateChunks.Select(y=>y.ulStateGroupID))
+                .SelectMany(x => x.StateChunk.StateChunks.Select(y => y.ulStateGroupID))
                 .Distinct()
                 .Select(x =>
                 {
@@ -325,8 +325,8 @@ namespace AudioResearch
 
             var option = new JsonSerializerOptions()
             {
-                Converters = { new JsonStringEnumConverter(), new WwiseJsonNumberConverterFactory(audioRepo) }, 
-                WriteIndented = true 
+                Converters = { new JsonStringEnumConverter(), new WwiseJsonNumberConverterFactory(audioRepo) },
+                WriteIndented = true
             };
 
             var allHircs = audioRepo.HircObjects.SelectMany(x => x.Value);
@@ -360,15 +360,15 @@ namespace AudioResearch
              */
 
 
-            var objectTypes = new List<HircType> 
-            { 
-                HircType.Event, 
-                HircType.SequenceContainer, 
-                HircType.SwitchContainer, 
-                HircType.ActorMixer, 
-                HircType.Audio_Bus, 
-                HircType.LayerContainer, 
-                HircType.Music_Segment, 
+            var objectTypes = new List<HircType>
+            {
+                HircType.Event,
+                HircType.SequenceContainer,
+                HircType.SwitchContainer,
+                HircType.ActorMixer,
+                HircType.Audio_Bus,
+                HircType.LayerContainer,
+                HircType.Music_Segment,
                 HircType.Music_Track,
                 HircType.Music_Random_Sequence,
                 HircType.Music_Switch,
@@ -387,7 +387,7 @@ namespace AudioResearch
                 var itemGroup = allHircs.Where(x => x.Type == item).ToArray();
                 var hircAsString = JsonSerializer.Serialize<object[]>(itemGroup, option);
                 File.WriteAllText($"c:\\temp\\HircList\\{item}.json", hircAsString);
-                
+
                 master.AppendLine(item + " count:" + itemGroup.Count());
                 master.AppendLine(hircAsString + "\n\n");
 
@@ -421,76 +421,76 @@ namespace AudioResearch
 
 
 
-           //var baseParamsProviders = audioRepo.HircObjects
-           //   .SelectMany(x => x.Value)
-           //   .Where(x => x is INodeBaseParamsAccessor)
-           //   //.DistinctBy(x => x.Id)
-           //   .ToList();
-           //
-           //var ulStateGroupIDs = baseParamsProviders
-           //    .SelectMany(x => (x as INodeBaseParamsAccessor).NodeBaseParams.StateChunk.StateChunks.Select(y => y.ulStateGroupID))
-           //    .Distinct()
-           //    .Select(x =>
-           //    {
-           //        var name = audioRepo.GetNameFromHash(x, out var found);
-           //        return new { Id = x, Name = name, Found = found };
-           //    })
-           //    .OrderByDescending(x => x.Found)
-           //    .ToList();
-           //
-           //
-           //var baseParams = audioRepo.HircObjects
-           // .SelectMany(x => x.Value)
-           // .Where(x=>x is INodeBaseParamsAccessor)
-           // .DistinctBy(x => x.Id)
-           // //.Cast<INodeBaseParamsAccessor>()
-           // .ToList();
-           //
-           //
-           //
-           //
-           //var handyData = baseParams
-           //    .Select(x => new
-           //    {
-           //        Id = x.Id,
-           //        BaseParamsAccessor = x as INodeBaseParamsAccessor,
-           //        AllStateProps = (x as INodeBaseParamsAccessor).NodeBaseParams.StateChunk.StateProps,
-           //        AllSateChunks = (x as INodeBaseParamsAccessor).NodeBaseParams.StateChunk.StateChunks,
-           //        AllSateChunksStates = (x as INodeBaseParamsAccessor).NodeBaseParams.StateChunk.StateChunks.SelectMany(x=>x.States).ToList(),
-           //    });
-           //
-           //
-           //var test0 = handyData.Where(x => x.AllSateChunksStates.FirstOrDefault(x => x.ulStateID == 964666289) != null).ToList();
-           //var test1 = handyData.Where(x => x.AllSateChunksStates.FirstOrDefault(x => x.ulStateID == 3501906231) != null).ToList();    // This is correct 
-           //
-           //
-           //var test2 = handyData.Where(x => x.AllSateChunksStates.FirstOrDefault(x => x.ulStateInstanceID == 964666289) != null).ToList();
-           //var test3 = handyData.Where(x => x.AllSateChunksStates.FirstOrDefault(x => x.ulStateInstanceID == 3501906231) != null).ToList();
-           //
-           ////var eventAndName = events.Select(x =>
-           ////    {
-           ////        var name = audioRepo.GetNameFromHash(x.Id, out var found);
-           ////        return new { Id = x.Id, Name = name, Found = found };
-           ////    })
-           ////    .OrderByDescending(x => x.Found)
-           ////    .ToList();
-           ////
-           ////var missingCount = eventAndName.Where(x => x.Found == false).Count();
-           ////
-           ////
-           //var t = audioRepo.GetHircObject(110788530);
-           ////var t2 = audioRepo.GetHircObject(3501906231);
+            //var baseParamsProviders = audioRepo.HircObjects
+            //   .SelectMany(x => x.Value)
+            //   .Where(x => x is INodeBaseParamsAccessor)
+            //   //.DistinctBy(x => x.Id)
+            //   .ToList();
+            //
+            //var ulStateGroupIDs = baseParamsProviders
+            //    .SelectMany(x => (x as INodeBaseParamsAccessor).NodeBaseParams.StateChunk.StateChunks.Select(y => y.ulStateGroupID))
+            //    .Distinct()
+            //    .Select(x =>
+            //    {
+            //        var name = audioRepo.GetNameFromHash(x, out var found);
+            //        return new { Id = x, Name = name, Found = found };
+            //    })
+            //    .OrderByDescending(x => x.Found)
+            //    .ToList();
+            //
+            //
+            //var baseParams = audioRepo.HircObjects
+            // .SelectMany(x => x.Value)
+            // .Where(x=>x is INodeBaseParamsAccessor)
+            // .DistinctBy(x => x.Id)
+            // //.Cast<INodeBaseParamsAccessor>()
+            // .ToList();
+            //
+            //
+            //
+            //
+            //var handyData = baseParams
+            //    .Select(x => new
+            //    {
+            //        Id = x.Id,
+            //        BaseParamsAccessor = x as INodeBaseParamsAccessor,
+            //        AllStateProps = (x as INodeBaseParamsAccessor).NodeBaseParams.StateChunk.StateProps,
+            //        AllSateChunks = (x as INodeBaseParamsAccessor).NodeBaseParams.StateChunk.StateChunks,
+            //        AllSateChunksStates = (x as INodeBaseParamsAccessor).NodeBaseParams.StateChunk.StateChunks.SelectMany(x=>x.States).ToList(),
+            //    });
+            //
+            //
+            //var test0 = handyData.Where(x => x.AllSateChunksStates.FirstOrDefault(x => x.ulStateID == 964666289) != null).ToList();
+            //var test1 = handyData.Where(x => x.AllSateChunksStates.FirstOrDefault(x => x.ulStateID == 3501906231) != null).ToList();    // This is correct 
+            //
+            //
+            //var test2 = handyData.Where(x => x.AllSateChunksStates.FirstOrDefault(x => x.ulStateInstanceID == 964666289) != null).ToList();
+            //var test3 = handyData.Where(x => x.AllSateChunksStates.FirstOrDefault(x => x.ulStateInstanceID == 3501906231) != null).ToList();
+            //
+            ////var eventAndName = events.Select(x =>
+            ////    {
+            ////        var name = audioRepo.GetNameFromHash(x.Id, out var found);
+            ////        return new { Id = x.Id, Name = name, Found = found };
+            ////    })
+            ////    .OrderByDescending(x => x.Found)
+            ////    .ToList();
+            ////
+            ////var missingCount = eventAndName.Where(x => x.Found == false).Count();
+            ////
+            ////
+            //var t = audioRepo.GetHircObject(110788530);
+            ////var t2 = audioRepo.GetHircObject(3501906231);
 
 
 
- /*   var sounds = audioRepo.HircObjects
-                .SelectMany(x => x.Value)
-                .DistinctBy(x => x.Id)
-                .Where(x => x.Type == HircType.Sound)
-                .Cast<CAkSound_v136>()
-                .ToList();
+            /*   var sounds = audioRepo.HircObjects
+                           .SelectMany(x => x.Value)
+                           .DistinctBy(x => x.Id)
+                           .Where(x => x.Type == HircType.Sound)
+                           .Cast<CAkSound_v136>()
+                           .ToList();
 
-            */
+                       */
         }
 
 
@@ -499,7 +499,7 @@ namespace AudioResearch
 
 
 
-            static void TableTest()
+        static void TableTest()
         {
             using var application = new SimpleApplication();
 
@@ -547,312 +547,312 @@ namespace AudioResearch
 
 
 
-      /* static void TestDialogEventSerialization()
-        {
-            using var application = new SimpleApplication();
+        /* static void TestDialogEventSerialization()
+          {
+              using var application = new SimpleApplication();
 
-            var pfs = application.GetService<PackFileService>();
-            pfs.LoadAllCaFiles(GameTypeEnum.Warhammer3);
-            var audioRepo = application.GetService<IAudioRepository>();
+              var pfs = application.GetService<PackFileService>();
+              pfs.LoadAllCaFiles(GameTypeEnum.Warhammer3);
+              var audioRepo = application.GetService<IAudioRepository>();
 
-            Func<uint, string> unHash = audioRepo.GetNameFromHash;
-            string DEFAULT_KEYWORD = "DEFAULT";
-            Func<uint, string> unHashSpecial = h =>
-            {
-                var x = audioRepo.GetNameFromHash(h);
-                return x == "0" ? DEFAULT_KEYWORD : x;
-            };
-
-
-            var deTypes = new ArrayList();
-
-            var dialogEvents = audioRepo.GetAllOfType<CAkDialogueEvent_v136>();
+              Func<uint, string> unHash = audioRepo.GetNameFromHash;
+              string DEFAULT_KEYWORD = "DEFAULT";
+              Func<uint, string> unHashSpecial = h =>
+              {
+                  var x = audioRepo.GetNameFromHash(h);
+                  return x == "0" ? DEFAULT_KEYWORD : x;
+              };
 
 
-            var modes = dialogEvents.GroupBy(e => e.uMode);
-            Console.WriteLine($"Modes:");
-            modes.ForEach(e => Console.WriteLine($"{(e.Key, e.Count())}"));
-            modes.First(e => e.Key == 1)
-                .ForEach(e => Console.WriteLine($"\t{audioRepo.GetNameFromHash(e.Id)}, {e.AkDecisionTree.NodeCount()}"));
+              var deTypes = new ArrayList();
 
-            Console.WriteLine("uWeight != 50:");
-            dialogEvents.ForEach(
-                e =>
-                {
-                    var nodes = new List<AkDecisionTree.Node>();
-                    e.AkDecisionTree.BfsTreeTraversal(
-                        node => If(node.Content.uWeight != 50).Then(_ => nodes.Add(node))
-                    );
-                    If(nodes.Count > 0).Then(_ =>
-                        Console.WriteLine($"\t{unHash(e.Id)}: {String.Join(", ", nodes.Select(e => (unHash(e.Content.Key), e.Content.uWeight)))}")
-                    );
-                }
-            );
-
-            Console.WriteLine("uProbability != 100:");
-            dialogEvents.ForEach(
-                e =>
-                {
-                    var nodes = new List<AkDecisionTree.Node>();
-                    e.AkDecisionTree.BfsTreeTraversal(
-                        node => If(node.Content.uProbability != 100).Then(_ => nodes.Add(node))
-                    );
-                    If(nodes.Count > 0).Then(_ =>
-                        Console.WriteLine($"\t{unHash(e.Id)}: {String.Join(", ", nodes.Select(e => (unHash(e.Content.Key), e.Content.uProbability)))}")
-                    );
-                }
-            );
+              var dialogEvents = audioRepo.GetAllOfType<CAkDialogueEvent_v136>();
 
 
-            Console.WriteLine("uWeight != 50 && uProbability != 100:");
-            dialogEvents.ForEach(
-                e =>
-                {
-                    var nodes = new List<AkDecisionTree.Node>();
-                    e.AkDecisionTree.BfsTreeTraversal(
-                        node => If(node.Content.uWeight != 50 && node.Content.uProbability != 100).Then(_ => nodes.Add(node))
-                    );
-                    If(nodes.Count > 0).Then(_ =>
-                        Console.WriteLine($"\t{unHash(e.Id)}: {String.Join(", ", nodes.Select(e => (unHash(e.Content.Key), e.Content.uWeight, e.Content.uProbability)))}")
-                    );
-                }
-            );
+              var modes = dialogEvents.GroupBy(e => e.uMode);
+              Console.WriteLine($"Modes:");
+              modes.ForEach(e => Console.WriteLine($"{(e.Key, e.Count())}"));
+              modes.First(e => e.Key == 1)
+                  .ForEach(e => Console.WriteLine($"\t{audioRepo.GetNameFromHash(e.Id)}, {e.AkDecisionTree.NodeCount()}"));
 
-            Console.WriteLine("Actual depth != _maxDepth:");
-            dialogEvents.ForEach(
-                e => If(e.AkDecisionTree.Depth() != e.AkDecisionTree._maxTreeDepth)
-                    .Then(_ => Console.WriteLine($"\t{unHash(e.Id)}: {e.AkDecisionTree.Depth()}/{e.AkDecisionTree._maxTreeDepth}"))
-            );
+              Console.WriteLine("uWeight != 50:");
+              dialogEvents.ForEach(
+                  e =>
+                  {
+                      var nodes = new List<AkDecisionTree.Node>();
+                      e.AkDecisionTree.BfsTreeTraversal(
+                          node => If(node.Content.uWeight != 50).Then(_ => nodes.Add(node))
+                      );
+                      If(nodes.Count > 0).Then(_ =>
+                          Console.WriteLine($"\t{unHash(e.Id)}: {String.Join(", ", nodes.Select(e => (unHash(e.Content.Key), e.Content.uWeight)))}")
+                      );
+                  }
+              );
 
-            Console.WriteLine("Depths of the leaves:");
-            dialogEvents.ForEach(
-                e =>
-                {
-                    var values = new HashSet<int>();
-                    e.AkDecisionTree.BfsTreeTraversal(
-                        (node, depth) => If(node.Children.Count == 0 && depth != e.AkDecisionTree._maxTreeDepth)
-                            .Then(_ => values.Add(depth))
-                    );
-                    If(values.Count > 0).Then(_ =>
-                        Console.WriteLine($"\t{unHash(e.Id)}(nc={e.AkDecisionTree.NodeCount()})(d={e.AkDecisionTree._maxTreeDepth}): {String.Join(", ", values)}")
-                    );
-                }
-            );
-
+              Console.WriteLine("uProbability != 100:");
+              dialogEvents.ForEach(
+                  e =>
+                  {
+                      var nodes = new List<AkDecisionTree.Node>();
+                      e.AkDecisionTree.BfsTreeTraversal(
+                          node => If(node.Content.uProbability != 100).Then(_ => nodes.Add(node))
+                      );
+                      If(nodes.Count > 0).Then(_ =>
+                          Console.WriteLine($"\t{unHash(e.Id)}: {String.Join(", ", nodes.Select(e => (unHash(e.Content.Key), e.Content.uProbability)))}")
+                      );
+                  }
+              );
 
 
-            /////////////////////////////////////////////////////////////
-            /// CSVs
-            ///
+              Console.WriteLine("uWeight != 50 && uProbability != 100:");
+              dialogEvents.ForEach(
+                  e =>
+                  {
+                      var nodes = new List<AkDecisionTree.Node>();
+                      e.AkDecisionTree.BfsTreeTraversal(
+                          node => If(node.Content.uWeight != 50 && node.Content.uProbability != 100).Then(_ => nodes.Add(node))
+                      );
+                      If(nodes.Count > 0).Then(_ =>
+                          Console.WriteLine($"\t{unHash(e.Id)}: {String.Join(", ", nodes.Select(e => (unHash(e.Content.Key), e.Content.uWeight, e.Content.uProbability)))}")
+                      );
+                  }
+              );
 
-            var exts = new Dictionary<char, string>();
-            exts.Add(',', ".csv");
-            exts.Add('\t', ".tsv");
+              Console.WriteLine("Actual depth != _maxDepth:");
+              dialogEvents.ForEach(
+                  e => If(e.AkDecisionTree.Depth() != e.AkDecisionTree._maxTreeDepth)
+                      .Then(_ => Console.WriteLine($"\t{unHash(e.Id)}: {e.AkDecisionTree.Depth()}/{e.AkDecisionTree._maxTreeDepth}"))
+              );
 
-            var ext2sep = new Dictionary<string, char>();
-            exts.ForEach(kv => ext2sep.Add(kv.Value, kv.Key));
-
-            (string, string) DumpAsXsv(CAkDialogueEvent_v136 dialogEvent, char sep = '\t', bool dumpRoot = false, bool dumpDecisionNodesFull = false)
-            {
-                if (sep != ',' && sep != '\t')
-                {
-                    throw new ArgumentException();
-                }
-
-                int idx = dumpDecisionNodesFull ? 3 : 1;
-
-                List<string> args = null;
-                if (!dumpDecisionNodesFull)
-                {
-                    args = dialogEvent.ArgumentList.Arguments.Select(x => unHash(x.ulGroupId)).ToList();
-                }
-                else
-                {
-                    args = new List<string>();
-                    dialogEvent.ArgumentList.Arguments.ForEach(x =>
-                    {
-                        var name = unHash(x.ulGroupId);
-                        args.Add(name);
-                        args.Add($"{name}:Probability");
-                        args.Add($"{name}:Weight");
-                    });
-                }
-
-                If(!dumpRoot).Then(_ =>  //do not dump the root node
-                    args = args.GetRange(idx, args.Count - idx));
-                args.Add("AudioNode:Key");
-                args.Add("AudioNode:Probability");
-                args.Add("AudioNode:Weight");
-                args.Add("AudioNode:Id");
-                var header = string.Join(sep, args);
-                var paths = dialogEvent.AkDecisionTree.GetDecisionPaths();
-                var pathStrs = paths.Select(e =>
-                {
-                    List<string> keys = null;
-                    if (!dumpDecisionNodesFull)
-                    {
-                        keys = e.Item1.Select(n => unHashSpecial(n.Key)).ToList();
-                    }
-                    else
-                    {
-                        keys = new List<string>();
-                        e.Item1.ForEach(n =>
-                        {
-                            keys.Add(unHashSpecial(n.Key));
-                            keys.Add(n.uProbability.ToString());
-                            keys.Add(n.uWeight.ToString());
-                        });
-                    }
-                    If(!dumpRoot).Then(_ =>  //do not dump the root node
-                        keys = keys.GetRange(idx, keys.Count - idx));
-                    var audioNode = e.Item1[^1];
-                    if (!dumpDecisionNodesFull)
-                    {
-                        keys.Add(audioNode.uProbability.ToString());
-                        keys.Add(audioNode.uWeight.ToString());
-                    }
-                    keys.Add(e.Item2.ToString());
-                    return string.Join(sep, keys);
-                }).ToList();
-                pathStrs.Insert(0, header);
-                var opath = $"F:\\dump\\{unHash(dialogEvent.Id)}{exts[sep]}";
-                var contents = string.Join('\n', pathStrs);
-                File.WriteAllText(opath, contents);
-                return (opath, contents);
-            }
-
-            //TODO: checks for input values
-            AkDecisionTree ReadFromXsv(string fpath, bool hasRoot = false, bool hasDecisionNodesFull = false)
-            {
-                //TODO verify header
-                var fname = Path.GetFileNameWithoutExtension(fpath);
-                var ext = Path.GetExtension(fpath);
-                var sep = ext2sep[ext];
-                var content = File.ReadAllText(fpath).Split('\n').ToList();
-                var header = content[0];
-                content = content.GetRange(1, content.Count - 1).ToList();
-                var colNames = header.Split(sep);
-
-                var fnameHash = WWiseHash.Compute(fname);
-                var dialogEvent = dialogEvents.Find(e => e.Id == fnameHash);
-                if (dialogEvent is null)
-                {
-                    throw new ArgumentException($"Game has no dialogueEvent with the following name: {fname}");
-                }
-
-                var treeCopy = dialogEvent.AkDecisionTree.BaseCopy();
-                var nodeChainLength = treeCopy._maxTreeDepth;
-                if (hasRoot)
-                {
-                    throw new ArgumentException("Root is not supported in the import as it copied from the reference tree");
-                    // nodeChainLength += 1;    
-                }
-                content.ForEach((e, ln) =>
-                {
-                    var strings = e.Split(sep);
-                    var nodes = new List<AkDecisionTree.NodeContent>();
-                    var step = hasDecisionNodesFull ? 3 : 1;
-                    For(0, nodeChainLength * step, step, i =>
-                    {
-                        uint key = 0;
-                        try
-                        {
-                            key = uint.Parse(strings[i]);
-                            Console.WriteLine($"WARNING: File {fpath} contains numeric Key ({strings[i]}), line {ln + 1}");
-                        }
-                        catch
-                        {
-                            key = strings[i] == DEFAULT_KEYWORD ? 0 : WWiseHash.Compute(strings[i]);
-                        }
-
-                        AkDecisionTree.NodeContent node;
-                        if (hasDecisionNodesFull)
-                        {
-                            var uProbability = ushort.Parse(strings[i + 1]);
-                            var uWeight = ushort.Parse(strings[i + 2]);
-                            node = new AkDecisionTree.NodeContent(key, uWeight, uProbability);
-                        }
-                        else
-                        {
-                            if (i == nodeChainLength - step)
-                            {
-                                //the last one
-                                var uProbability = ushort.Parse(strings[^3]);
-                                var uWeight = ushort.Parse(strings[^2]);
-                                node = new AkDecisionTree.NodeContent(key, uWeight, uProbability);
-                            }
-                            else
-                            {
-                                node = new AkDecisionTree.NodeContent(key);
-                            }
-                        }
-
-                        nodes.Add(node);
-                    });
-                    var audioNodeId = uint.Parse(strings[^1]);
-                    treeCopy.AddAudioNode(nodes, audioNodeId);
-                });
-                return treeCopy;
-            }
+              Console.WriteLine("Depths of the leaves:");
+              dialogEvents.ForEach(
+                  e =>
+                  {
+                      var values = new HashSet<int>();
+                      e.AkDecisionTree.BfsTreeTraversal(
+                          (node, depth) => If(node.Children.Count == 0 && depth != e.AkDecisionTree._maxTreeDepth)
+                              .Then(_ => values.Add(depth))
+                      );
+                      If(values.Count > 0).Then(_ =>
+                          Console.WriteLine($"\t{unHash(e.Id)}(nc={e.AkDecisionTree.NodeCount()})(d={e.AkDecisionTree._maxTreeDepth}): {String.Join(", ", values)}")
+                      );
+                  }
+              );
 
 
-            // DumpAsXsv(dialogEvents[0], dumpRoot:false, dumpDecisionNodesFull:false);
-            // var tree = ReadFromXsv("F:\\dump\\Battle_Individual_Melee_Weapon_Hit.tsv");
-            // dialogEvents[0].AkDecisionTree = tree;
-            // DumpAsXsv(dialogEvents[0], dumpRoot:false, dumpDecisionNodesFull:false);
-            dialogEvents.ForEach(e =>
-            {
-                var WeirdOnes = new string[] // TODO AUTOCORRECTION FOR THESE One
-                {
-                    "battle_vo_order_guard_on",
-                    "battle_vo_order_climb",
-                    "battle_vo_order_pick_up_engine",
-                    "battle_vo_order_move_siege_tower",
-                    "battle_vo_order_change_ammo",
-                    "battle_vo_order_fire_at_will_on",
-                    "battle_vo_order_short_order",
-                    "battle_vo_order_formation_lock",
-                    "battle_vo_order_fire_at_will_off",
-                    "battle_vo_order_man_siege_tower",
-                    "battle_vo_order_move_ram",
-                    "battle_vo_order_melee_off",
-                    "battle_vo_order_attack_alternative",
-                    "battle_vo_order_melee_on",
-                    "battle_vo_order_formation_unlock"
-                };
 
-                var (path, before) = DumpAsXsv(e);
-                foreach (var wo in WeirdOnes)
-                {
-                    if (path.Contains(wo))
-                    {
-                        return;
-                    }
-                }
-                var tree = ReadFromXsv(path);
-                e.AkDecisionTree = tree;
-                var (_, after) = DumpAsXsv(e);
-                Console.WriteLine(path);
-                var beforeLines = before.Split('\n');
-                var afterLines = after.Split('\n');
-                if (beforeLines.Length != afterLines.Length)
-                {
-                    Console.WriteLine("NotEqual size!!!");
-                }
-                For(beforeLines.Length, i =>
-                {
-                    if (beforeLines[i] != afterLines[i])
-                    {
-                        Console.WriteLine($"LINE #{i}");
-                        Console.WriteLine(beforeLines[i]);
-                        Console.WriteLine(afterLines[i]);
-                    }
-                });
-                Debug.Assert(before == after);
-            });
-            return;
-          
+              /////////////////////////////////////////////////////////////
+              /// CSVs
+              ///
 
-        }*/
+              var exts = new Dictionary<char, string>();
+              exts.Add(',', ".csv");
+              exts.Add('\t', ".tsv");
+
+              var ext2sep = new Dictionary<string, char>();
+              exts.ForEach(kv => ext2sep.Add(kv.Value, kv.Key));
+
+              (string, string) DumpAsXsv(CAkDialogueEvent_v136 dialogEvent, char sep = '\t', bool dumpRoot = false, bool dumpDecisionNodesFull = false)
+              {
+                  if (sep != ',' && sep != '\t')
+                  {
+                      throw new ArgumentException();
+                  }
+
+                  int idx = dumpDecisionNodesFull ? 3 : 1;
+
+                  List<string> args = null;
+                  if (!dumpDecisionNodesFull)
+                  {
+                      args = dialogEvent.ArgumentList.Arguments.Select(x => unHash(x.ulGroupId)).ToList();
+                  }
+                  else
+                  {
+                      args = new List<string>();
+                      dialogEvent.ArgumentList.Arguments.ForEach(x =>
+                      {
+                          var name = unHash(x.ulGroupId);
+                          args.Add(name);
+                          args.Add($"{name}:Probability");
+                          args.Add($"{name}:Weight");
+                      });
+                  }
+
+                  If(!dumpRoot).Then(_ =>  //do not dump the root node
+                      args = args.GetRange(idx, args.Count - idx));
+                  args.Add("AudioNode:Key");
+                  args.Add("AudioNode:Probability");
+                  args.Add("AudioNode:Weight");
+                  args.Add("AudioNode:Id");
+                  var header = string.Join(sep, args);
+                  var paths = dialogEvent.AkDecisionTree.GetDecisionPaths();
+                  var pathStrs = paths.Select(e =>
+                  {
+                      List<string> keys = null;
+                      if (!dumpDecisionNodesFull)
+                      {
+                          keys = e.Item1.Select(n => unHashSpecial(n.Key)).ToList();
+                      }
+                      else
+                      {
+                          keys = new List<string>();
+                          e.Item1.ForEach(n =>
+                          {
+                              keys.Add(unHashSpecial(n.Key));
+                              keys.Add(n.uProbability.ToString());
+                              keys.Add(n.uWeight.ToString());
+                          });
+                      }
+                      If(!dumpRoot).Then(_ =>  //do not dump the root node
+                          keys = keys.GetRange(idx, keys.Count - idx));
+                      var audioNode = e.Item1[^1];
+                      if (!dumpDecisionNodesFull)
+                      {
+                          keys.Add(audioNode.uProbability.ToString());
+                          keys.Add(audioNode.uWeight.ToString());
+                      }
+                      keys.Add(e.Item2.ToString());
+                      return string.Join(sep, keys);
+                  }).ToList();
+                  pathStrs.Insert(0, header);
+                  var opath = $"F:\\dump\\{unHash(dialogEvent.Id)}{exts[sep]}";
+                  var contents = string.Join('\n', pathStrs);
+                  File.WriteAllText(opath, contents);
+                  return (opath, contents);
+              }
+
+              //TODO: checks for input values
+              AkDecisionTree ReadFromXsv(string fpath, bool hasRoot = false, bool hasDecisionNodesFull = false)
+              {
+                  //TODO verify header
+                  var fname = Path.GetFileNameWithoutExtension(fpath);
+                  var ext = Path.GetExtension(fpath);
+                  var sep = ext2sep[ext];
+                  var content = File.ReadAllText(fpath).Split('\n').ToList();
+                  var header = content[0];
+                  content = content.GetRange(1, content.Count - 1).ToList();
+                  var colNames = header.Split(sep);
+
+                  var fnameHash = WWiseHash.Compute(fname);
+                  var dialogEvent = dialogEvents.Find(e => e.Id == fnameHash);
+                  if (dialogEvent is null)
+                  {
+                      throw new ArgumentException($"Game has no dialogueEvent with the following name: {fname}");
+                  }
+
+                  var treeCopy = dialogEvent.AkDecisionTree.BaseCopy();
+                  var nodeChainLength = treeCopy._maxTreeDepth;
+                  if (hasRoot)
+                  {
+                      throw new ArgumentException("Root is not supported in the import as it copied from the reference tree");
+                      // nodeChainLength += 1;    
+                  }
+                  content.ForEach((e, ln) =>
+                  {
+                      var strings = e.Split(sep);
+                      var nodes = new List<AkDecisionTree.NodeContent>();
+                      var step = hasDecisionNodesFull ? 3 : 1;
+                      For(0, nodeChainLength * step, step, i =>
+                      {
+                          uint key = 0;
+                          try
+                          {
+                              key = uint.Parse(strings[i]);
+                              Console.WriteLine($"WARNING: File {fpath} contains numeric Key ({strings[i]}), line {ln + 1}");
+                          }
+                          catch
+                          {
+                              key = strings[i] == DEFAULT_KEYWORD ? 0 : WWiseHash.Compute(strings[i]);
+                          }
+
+                          AkDecisionTree.NodeContent node;
+                          if (hasDecisionNodesFull)
+                          {
+                              var uProbability = ushort.Parse(strings[i + 1]);
+                              var uWeight = ushort.Parse(strings[i + 2]);
+                              node = new AkDecisionTree.NodeContent(key, uWeight, uProbability);
+                          }
+                          else
+                          {
+                              if (i == nodeChainLength - step)
+                              {
+                                  //the last one
+                                  var uProbability = ushort.Parse(strings[^3]);
+                                  var uWeight = ushort.Parse(strings[^2]);
+                                  node = new AkDecisionTree.NodeContent(key, uWeight, uProbability);
+                              }
+                              else
+                              {
+                                  node = new AkDecisionTree.NodeContent(key);
+                              }
+                          }
+
+                          nodes.Add(node);
+                      });
+                      var audioNodeId = uint.Parse(strings[^1]);
+                      treeCopy.AddAudioNode(nodes, audioNodeId);
+                  });
+                  return treeCopy;
+              }
+
+
+              // DumpAsXsv(dialogEvents[0], dumpRoot:false, dumpDecisionNodesFull:false);
+              // var tree = ReadFromXsv("F:\\dump\\Battle_Individual_Melee_Weapon_Hit.tsv");
+              // dialogEvents[0].AkDecisionTree = tree;
+              // DumpAsXsv(dialogEvents[0], dumpRoot:false, dumpDecisionNodesFull:false);
+              dialogEvents.ForEach(e =>
+              {
+                  var WeirdOnes = new string[] // TODO AUTOCORRECTION FOR THESE One
+                  {
+                      "battle_vo_order_guard_on",
+                      "battle_vo_order_climb",
+                      "battle_vo_order_pick_up_engine",
+                      "battle_vo_order_move_siege_tower",
+                      "battle_vo_order_change_ammo",
+                      "battle_vo_order_fire_at_will_on",
+                      "battle_vo_order_short_order",
+                      "battle_vo_order_formation_lock",
+                      "battle_vo_order_fire_at_will_off",
+                      "battle_vo_order_man_siege_tower",
+                      "battle_vo_order_move_ram",
+                      "battle_vo_order_melee_off",
+                      "battle_vo_order_attack_alternative",
+                      "battle_vo_order_melee_on",
+                      "battle_vo_order_formation_unlock"
+                  };
+
+                  var (path, before) = DumpAsXsv(e);
+                  foreach (var wo in WeirdOnes)
+                  {
+                      if (path.Contains(wo))
+                      {
+                          return;
+                      }
+                  }
+                  var tree = ReadFromXsv(path);
+                  e.AkDecisionTree = tree;
+                  var (_, after) = DumpAsXsv(e);
+                  Console.WriteLine(path);
+                  var beforeLines = before.Split('\n');
+                  var afterLines = after.Split('\n');
+                  if (beforeLines.Length != afterLines.Length)
+                  {
+                      Console.WriteLine("NotEqual size!!!");
+                  }
+                  For(beforeLines.Length, i =>
+                  {
+                      if (beforeLines[i] != afterLines[i])
+                      {
+                          Console.WriteLine($"LINE #{i}");
+                          Console.WriteLine(beforeLines[i]);
+                          Console.WriteLine(afterLines[i]);
+                      }
+                  });
+                  Debug.Assert(before == after);
+              });
+              return;
+
+
+          }*/
     }
 }

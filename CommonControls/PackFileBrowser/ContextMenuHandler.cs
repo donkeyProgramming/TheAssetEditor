@@ -1,19 +1,24 @@
-﻿using CommonControls.BaseDialogs;
-using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
-using CommunityToolkit.Mvvm.Input;
-using Microsoft.Win32;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using Serilog;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
-
+using CommonControls.BaseDialogs;
+using CommonControls.Common;
+using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.Services;
+using CommunityToolkit.Mvvm.Input;
+using Serilog;
+using Clipboard = System.Windows.Clipboard;
+using MessageBox = System.Windows.MessageBox;
+using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
+using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
 
 namespace CommonControls.PackFileBrowser
 {
@@ -118,10 +123,12 @@ namespace CommonControls.PackFileBrowser
                 return;
             }
 
-            var dialog = new CommonOpenFileDialog();
-            dialog.IsFolderPicker = false;
-            dialog.Multiselect = true;
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            var dialog = new OpenFileDialog()
+            {
+                Multiselect = true,
+            };
+
+            if (dialog.ShowDialog() == DialogResult.OK)
             {
                 var parentPath = _selectedNode.GetFullPath();
                 var files = dialog.FileNames;
@@ -154,12 +161,11 @@ namespace CommonControls.PackFileBrowser
                 return;
             }
 
-            var dialog = new CommonOpenFileDialog();
-            dialog.IsFolderPicker = true;
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            var dialog = new FolderBrowserDialog();
+            if (dialog.ShowDialog() == DialogResult.OK)
             {
                 var parentPath = _selectedNode.GetFullPath();
-                _packFileService.AddFolderContent(_selectedNode.FileOwner, parentPath, dialog.FileName);
+                _packFileService.AddFolderContent(_selectedNode.FileOwner, parentPath, dialog.SelectedPath);
             }
 
         }
@@ -231,7 +237,7 @@ namespace CommonControls.PackFileBrowser
                 saveFileDialog.FileName = _selectedNode.FileOwner.Name;
                 saveFileDialog.Filter = "PackFile | *.pack";
                 saveFileDialog.DefaultExt = "pack";
-                if (saveFileDialog.ShowDialog() == false)
+                if (saveFileDialog.ShowDialog() != DialogResult.OK)
                     return;
                 systemPath = saveFileDialog.FileName;
             }
@@ -259,7 +265,7 @@ namespace CommonControls.PackFileBrowser
             saveFileDialog.FileName = _selectedNode.FileOwner.Name;
             saveFileDialog.Filter = "PackFile | *.pack";
             saveFileDialog.DefaultExt = "pack";
-            if (saveFileDialog.ShowDialog() == false)
+            if (saveFileDialog.ShowDialog() != DialogResult.OK)
                 return;
 
             using (new WaitCursor())
@@ -311,14 +317,12 @@ namespace CommonControls.PackFileBrowser
 
         void ExportToFolder()
         {
-            var dialog = new CommonOpenFileDialog();
-            dialog.IsFolderPicker = true;
-            dialog.Multiselect = false;
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            var dialog = new FolderBrowserDialog();
+            if (dialog.ShowDialog() == DialogResult.OK)
             {
                 var nodeStartDir = Path.GetDirectoryName(_selectedNode.GetFullPath());
                 int fileCounter = 0;
-                SaveSelfAndChildren(_selectedNode, dialog.FileNames.First(), nodeStartDir, ref fileCounter);
+                SaveSelfAndChildren(_selectedNode, dialog.SelectedPath, nodeStartDir, ref fileCounter);
                 MessageBox.Show($"{fileCounter} files exported!");
             }
         }
@@ -414,49 +418,49 @@ namespace CommonControls.PackFileBrowser
             switch (type)
             {
                 case ContextItems.Add:
-                return new ContextMenuItem() { Name = "Add" };
+                    return new ContextMenuItem() { Name = "Add" };
                 case ContextItems.Import:
-                return new ContextMenuItem() { Name = "Import" };
+                    return new ContextMenuItem() { Name = "Import" };
                 case ContextItems.Import3DModel:
-                return new ContextMenuItem() { Name = "Import 3D Model (FBX SDK)", Command = Import3DFileCommand };
+                    return new ContextMenuItem() { Name = "Import 3D Model (FBX SDK)", Command = Import3DFileCommand };
                 case ContextItems.Create:
-                return new ContextMenuItem() { Name = "Create" };
+                    return new ContextMenuItem() { Name = "Create" };
                 case ContextItems.AddFiles:
-                return new ContextMenuItem() { Name = "Add file", Command = AddFilesCommand }; ;
+                    return new ContextMenuItem() { Name = "Add file", Command = AddFilesCommand }; ;
                 case ContextItems.AddDirectory:
-                return new ContextMenuItem() { Name = "Add directory", Command = AddFilesFromDirectory };
+                    return new ContextMenuItem() { Name = "Add directory", Command = AddFilesFromDirectory };
                 case ContextItems.CopyToEditablePack:
-                return new ContextMenuItem() { Name = "Copy to Editable pack", Command = CopyToEditablePackCommand }; ;
+                    return new ContextMenuItem() { Name = "Copy to Editable pack", Command = CopyToEditablePackCommand }; ;
                 case ContextItems.Duplicate:
-                return new ContextMenuItem() { Name = "Duplicate", Command = DuplicateCommand }; ;
+                    return new ContextMenuItem() { Name = "Duplicate", Command = DuplicateCommand }; ;
                 case ContextItems.CreateFolder:
-                return new ContextMenuItem() { Name = "Create Folder", Command = CreateFolderCommand }; ;
+                    return new ContextMenuItem() { Name = "Create Folder", Command = CreateFolderCommand }; ;
                 case ContextItems.Expand:
-                return new ContextMenuItem() { Name = "Expand (Ctrl + double click)", Command = ExpandAllChildrenCommand }; ;
+                    return new ContextMenuItem() { Name = "Expand (Ctrl + double click)", Command = ExpandAllChildrenCommand }; ;
                 case ContextItems.Collapse:
-                return new ContextMenuItem() { Name = "Collapse", Command = CollapseAllChildrenCommand }; ;
+                    return new ContextMenuItem() { Name = "Collapse", Command = CollapseAllChildrenCommand }; ;
                 case ContextItems.CopyFullPath:
-                return new ContextMenuItem() { Name = "Copy full path", Command = CopyNodePathCommand };
+                    return new ContextMenuItem() { Name = "Copy full path", Command = CopyNodePathCommand };
                 case ContextItems.Export:
-                return new ContextMenuItem() { Name = "Export to disk", Command = ExportCommand };
+                    return new ContextMenuItem() { Name = "Export to disk", Command = ExportCommand };
                 case ContextItems.Rename:
-                return new ContextMenuItem() { Name = "Rename", Command = RenameNodeCommand }; ;
+                    return new ContextMenuItem() { Name = "Rename", Command = RenameNodeCommand }; ;
                 case ContextItems.SetAsEditabelPack:
-                return new ContextMenuItem() { Name = "Set as Editable pack", Command = SetAsEditabelPackCommand };
+                    return new ContextMenuItem() { Name = "Set as Editable pack", Command = SetAsEditabelPackCommand };
                 case ContextItems.Delete:
-                return new ContextMenuItem() { Name = "Delete", Command = DeleteCommand }; ;
+                    return new ContextMenuItem() { Name = "Delete", Command = DeleteCommand }; ;
                 case ContextItems.Close:
-                return new ContextMenuItem() { Name = "Close", Command = CloseNodeCommand }; ;
+                    return new ContextMenuItem() { Name = "Close", Command = CloseNodeCommand }; ;
                 case ContextItems.Save:
-                return new ContextMenuItem() { Name = "Save", Command = SavePackFileCommand }; ;
+                    return new ContextMenuItem() { Name = "Save", Command = SavePackFileCommand }; ;
                 case ContextItems.SaveAs:
-                return new ContextMenuItem() { Name = "Save as", Command = SavePackFileAsCommand }; ;
+                    return new ContextMenuItem() { Name = "Save as", Command = SavePackFileAsCommand }; ;
                 case ContextItems.Open:
-                return new ContextMenuItem() { Name = "Open", }; ;
+                    return new ContextMenuItem() { Name = "Open", }; ;
                 case ContextItems.OpenWithHxD:
-                return new ContextMenuItem() { Name = "HxD", Command = OpenPackFile_HxD_Command }; ;
+                    return new ContextMenuItem() { Name = "HxD", Command = OpenPackFile_HxD_Command }; ;
                 case ContextItems.OpenWithNodePadPluss:
-                return new ContextMenuItem() { Name = "Notepad++", Command = OpenPack_FileNotpadPluss_Command }; ;
+                    return new ContextMenuItem() { Name = "Notepad++", Command = OpenPack_FileNotpadPluss_Command }; ;
             }
 
             throw new Exception($"Unknown ContextItemType  {type} ");
@@ -466,7 +470,7 @@ namespace CommonControls.PackFileBrowser
         {
             Add,
             Import,
-            AddFiles,            
+            AddFiles,
             Import3DModel,
             AddDirectory,
             CopyToEditablePack,

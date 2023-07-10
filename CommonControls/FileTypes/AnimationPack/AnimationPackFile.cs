@@ -1,17 +1,21 @@
-﻿using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System.Collections.Generic;
 using System.Linq;
+using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 
 namespace CommonControls.FileTypes.AnimationPack
 {
 
     public interface IAnimationBinGenericFormat
-    { 
+    {
         public AnimationPackFile PackFileReference { get; }
         public string Name { get; }
         public string FullPath { get; }
         public string SkeletonName { get; }
-        public List<AnimationBinEntryGenericFormat> Entries { get;  }
+        public List<AnimationBinEntryGenericFormat> Entries { get; }
     }
 
     public class AnimationBinEntryGenericFormat

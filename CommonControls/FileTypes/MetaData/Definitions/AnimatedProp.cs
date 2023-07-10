@@ -1,7 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using Microsoft.Xna.Framework;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
@@ -15,7 +16,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         public int BoneId { get; set; }
         public Vector3 Position { get; set; }
         public Vector4 Orientation { get; set; }
-        public float Scale{ get; }
+        public float Scale { get; }
     }
 
     [MetaData("ANIMATED_PROP", 0)]
@@ -35,7 +36,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 
         [MetaDataTag(6)]
         public int UnknownInt_v0 { get; set; }
-    }    
+    }
 
     [MetaData("ANIMATED_PROP", 2)]
     public class AnimatedProp_v2 : DecodedMetaEntryBase_v2
@@ -54,15 +55,15 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 
         [MetaDataTag(8)]
         public int UnknownInt_v0 { get; set; }
-    }    
+    }
 
     [MetaData("ANIMATED_PROP", 3)]
     public class AnimatedProp_v3 : AnimatedProp_v2
     {
         [MetaDataTag(9)]
         public int UnknownInt0_v3 { get; set; }
-    }    
-    
+    }
+
     [MetaData("ANIMATED_PROP", 4)]
     public class AnimatedProp_v4 : AnimatedProp_v3
     {
@@ -93,21 +94,21 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     public class AnimatedProp_v13 : Prop_v13, IAnimatedPropMeta
     {
     }
-   
-    [MetaData("ANIMATED_PROP", 14)]
-   public class AnimatedProp_v14 : Prop_v14, IAnimatedPropMeta
-   {
-   }
-   
-   
-   [MetaData("ANIMATED_PROP", 12, MetaDataAttributePriority.Low)]
-   public class AnimatedProp_v12_3K : Prop_v12_3K, IAnimatedPropMeta
-   {
-   }
 
-   [MetaData("ANIMATED_PROP", 13, MetaDataAttributePriority.Low)]
-   public class AnimatedProp_v13_3K : Prop_v13_3K, IAnimatedPropMeta
-   {
-   }
+    [MetaData("ANIMATED_PROP", 14)]
+    public class AnimatedProp_v14 : Prop_v14, IAnimatedPropMeta
+    {
+    }
+
+
+    [MetaData("ANIMATED_PROP", 12, MetaDataAttributePriority.Low)]
+    public class AnimatedProp_v12_3K : Prop_v12_3K, IAnimatedPropMeta
+    {
+    }
+
+    [MetaData("ANIMATED_PROP", 13, MetaDataAttributePriority.Low)]
+    public class AnimatedProp_v13_3K : Prop_v13_3K, IAnimatedPropMeta
+    {
+    }
 
 }

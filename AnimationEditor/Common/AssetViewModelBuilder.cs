@@ -13,7 +13,6 @@ using View3D.Scene;
 using View3D.SceneNodes;
 using View3D.Services;
 using View3D.Utility;
-using static CommonControls.Editors.AnimationPack.Converters.AnimationBinFileToXmlConverter;
 using static CommonControls.Services.SkeletonAnimationLookUpHelper;
 
 namespace AnimationEditor.Common.ReferenceModel
@@ -31,7 +30,7 @@ namespace AnimationEditor.Common.ReferenceModel
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly SceneLoader _sceneLoader;
 
-        public AssetViewModelBuilder(IGeometryGraphicsContextFactory geometryGraphicsContextFactory, MainScene mainScene, 
+        public AssetViewModelBuilder(IGeometryGraphicsContextFactory geometryGraphicsContextFactory, MainScene mainScene,
             IServiceProvider serviceProvider, ResourceLibary resourceLibary, SceneManager sceneManager, PackFileService packFileService,
             AnimationsContainerComponent animationsContainerComponent, ApplicationSettingsService applicationSettingsService, SceneLoader sceneLoader)
         {
@@ -52,7 +51,7 @@ namespace AnimationEditor.Common.ReferenceModel
 
             var rootNode = _sceneManager.RootNode;
             var parentNode = rootNode.AddObject(new GroupNode(description));
-            
+
 
             // Create skeleton
             var skeletonSceneNode = new SkeletonNode(_resourceLibary, instance.Skeleton);
@@ -156,7 +155,7 @@ namespace AnimationEditor.Common.ReferenceModel
                 assetViewModel.SkeletonName.Value = "";
                 assetViewModel.Skeleton = null;
                 assetViewModel.AnimationClip = null;
-                assetViewModel.Player.SetAnimation(null, assetViewModel.Skeleton);;
+                assetViewModel.Player.SetAnimation(null, assetViewModel.Skeleton); ;
             }
 
             assetViewModel.TriggerSkeletonChanged();

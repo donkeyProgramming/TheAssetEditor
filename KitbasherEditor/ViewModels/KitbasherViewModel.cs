@@ -41,9 +41,9 @@ namespace KitbasherEditor.ViewModels
             EventHub eventHub,
             MainScene sceneContainer,
             MenuBarViewModel menuBarViewModel,
-            AnimationControllerViewModel animationControllerViewModel, 
+            AnimationControllerViewModel animationControllerViewModel,
             IComponentInserter componentInserter,
-            KitbashSceneCreator kitbashSceneCreator, 
+            KitbashSceneCreator kitbashSceneCreator,
             SceneExplorerViewModel sceneExplorerViewModel,
             ActiveFileResolver activeFileResolver,
             FocusSelectableObjectService focusSelectableObjectComponent,
@@ -54,7 +54,7 @@ namespace KitbasherEditor.ViewModels
             _kitbashSceneCreator = kitbashSceneCreator;
             _focusSelectableObjectComponent = focusSelectableObjectComponent;
             _dropHandler = dropHandler;
-           
+
             Scene = sceneContainer;
             Animation = animationControllerViewModel;
             SceneExplorer = sceneExplorerViewModel;
@@ -69,7 +69,7 @@ namespace KitbasherEditor.ViewModels
 
         public bool Save() => true;
 
-        public void Close(){ }
+        public void Close() { }
 
         public bool HasUnsavedChanges
         {
@@ -110,7 +110,7 @@ namespace KitbasherEditor.ViewModels
 
         void OnCommandStackChanged(CommandStackChangedEvent notification)
         {
-            if(notification.IsMutation)
+            if (notification.IsMutation)
                 HasUnsavedChanges = true;
         }
     }

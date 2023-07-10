@@ -35,7 +35,7 @@ namespace Audio.BnkCompiler
             _resultHandler = resultHandler;
         }
 
-        public Result<bool> Compile(string packFilePath, CompilerSettings settings) 
+        public Result<bool> Compile(string packFilePath, CompilerSettings settings)
         {
             var project = _loader.LoadProject(packFilePath, settings);
             if (project.IsSuccess == false)
@@ -46,11 +46,11 @@ namespace Audio.BnkCompiler
                 return Result<bool>.FromError(importResult.LogItems);
 
             var compilerOutput = _compiler.CompileProject(project.Item);
-            if(compilerOutput.IsSuccess == false) 
+            if (compilerOutput.IsSuccess == false)
                 return Result<bool>.FromError(compilerOutput.LogItems);
 
             var handlerResult = _resultHandler.ProcessResult(compilerOutput.Item, project.Item, settings);
-            if (handlerResult.IsSuccess == false) 
+            if (handlerResult.IsSuccess == false)
                 return Result<bool>.FromError(handlerResult.LogItems);
 
             _logger.Here().Information("Bnk file generated successfully");

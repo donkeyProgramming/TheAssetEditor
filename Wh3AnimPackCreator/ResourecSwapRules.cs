@@ -31,7 +31,7 @@ namespace Wh3AnimPackCreator
 
             if (_targetGame.GetfromValue(inputSlot) != null)
                 return inputSlot;
-                
+
             if (_animationSlots.ContainsKey(inputSlot))
             {
                 _logService.AddLogItem(LogService.LogType.Info, binName, $"Converting AnimationSlot {inputSlot} => {_animationSlots[inputSlot]}", "SLOT_CONVERTION");
@@ -76,7 +76,7 @@ namespace Wh3AnimPackCreator
                 _logService.StatsDb.ProcessedMetadataTag.Add(item.DisplayName);
 
                 var currentTagName = item.Name + "_V" + item.Version;
-                if (_supportedMetaTags.Contains(currentTagName) == false || item.Description == "_TroyOnly") 
+                if (_supportedMetaTags.Contains(currentTagName) == false || item.Description == "_TroyOnly")
                 {
                     _logService.AddLogItem(LogService.LogType.Error, binName, $"Meta tag not supported {item.Description}", "ANIMATION_META_NOT_SUPPORTED");
                     _logService.StatsDb.UnsupportedMetadataTag.Add(item.DisplayName);
@@ -110,7 +110,7 @@ namespace Wh3AnimPackCreator
 
     public class TroyResourceSwapRules : ResourecSwapRules
     {
-        public TroyResourceSwapRules(List<string> supportedMetaTags, LogService logService) 
+        public TroyResourceSwapRules(List<string> supportedMetaTags, LogService logService)
             : base(supportedMetaTags, logService, new BaseAnimationSlotHelper(GameTypeEnum.Warhammer3))
         {
             _animationSlots["SPECIAL_ABILITY_SAVAGE_ROAR"] = "CAST_SPELL_FORWARD_MEDIUM";

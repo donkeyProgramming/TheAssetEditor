@@ -23,7 +23,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
     {
         Window _window;
 
-        GameSkeleton _targetSkeleton; 
+        GameSkeleton _targetSkeleton;
         GameSkeleton _fromSkeleton;
 
         IComponentManager _componentManager;
@@ -53,7 +53,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             _componentManager = componentManager;
             _commandFactory = commandFactory;
             ScaleFactor.PropertyChanged += (_0, _1) => ApplyMeshFittingTransforms();
-            BoneScaleFactor.PropertyChanged+=(_0, _1) => BoneScaleUpdate((float)BoneScaleFactor.Value, MeshBones.SelectedItem);
+            BoneScaleFactor.PropertyChanged += (_0, _1) => BoneScaleUpdate((float)BoneScaleFactor.Value, MeshBones.SelectedItem);
             BonePositionOffset.OnValueChanged += (viewModel) => BonePositionUpdated(viewModel, MeshBones.SelectedItem);
             BoneRotationOffset.OnValueChanged += (viewModel) => BoneRotationUpdated(viewModel, MeshBones.SelectedItem);
             SkeletonDisplayOffset.OnValueChanged += (viewModel) => SkeletonDisplayOffsetUpdated(viewModel);
@@ -62,7 +62,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
 
             _animationPlayer = _componentManager.GetComponent<AnimationsContainerComponent>().RegisterAnimationPlayer(new AnimationPlayer(), "Temp animation rerig" + Guid.NewGuid());
             _fromSkeleton = new GameSkeleton(currentSkeletonFile, _animationPlayer);
-            
+
             // Build empty animation
             _animationClip = new AnimationClip();
             _animationClip.DynamicFrames.Add(new AnimationClip.KeyFrame());
@@ -235,13 +235,13 @@ namespace KitbasherEditor.ViewModels.MeshFitter
 
                 // To stop the calculations from exploding with NAN values
                 if (scale <= 0 || float.IsNaN(scale))
-                    scale = 0.00001f;   
+                    scale = 0.00001f;
 
                 var parentWorld = Matrix.Identity;
                 if (fromParentBoneIndex != -1)
                     parentWorld = _fromSkeleton.GetAnimatedWorldTranform(fromParentBoneIndex);
                 var bonePositionLocalSpace = desiredBonePosWorldWithOffsets * Matrix.Invert(parentWorld);
-                bonePositionLocalSpace.Decompose(out var _,  out var boneRotation,  out var bonePosition);
+                bonePositionLocalSpace.Decompose(out var _, out var boneRotation, out var bonePosition);
 
                 // Apply the values to the animation
                 _animationClip.DynamicFrames[0].Rotation[i] = boneRotation;
@@ -306,7 +306,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             // Remove the skeleton node
             var sceneManager = _componentManager.GetComponent<SceneManager>();
             var rootNode = sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-            rootNode.SkeletonNode.SelectedBoneIndex = null; 
+            rootNode.SkeletonNode.SelectedBoneIndex = null;
             _componentManager.GetComponent<SceneManager>().RootNode.RemoveObject(_currentSkeletonNode);
         }
 
@@ -345,16 +345,16 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             var usedBoneIndexes = meshNodes
                 .SelectMany(x => x.Geometry.GetUniqeBlendIndices())
                 .Distinct()
-                .Select(x=>(int)x)
+                .Select(x => (int)x)
                 .ToList();
 
             var rootNode = sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             var targetSkeleton = rootNode.SkeletonNode;
             var targetSkeletonFile = skeletonHelper.GetSkeletonFileFromName(pfs, targetSkeleton.Name);
-            
+
             RemappedAnimatedBoneConfiguration config = new RemappedAnimatedBoneConfiguration();
-            config.ParnetModelSkeletonName= targetSkeleton.Name;
-            config.ParentModelBones= AnimatedBoneHelper.CreateFromSkeleton(targetSkeletonFile);
+            config.ParnetModelSkeletonName = targetSkeleton.Name;
+            config.ParentModelBones = AnimatedBoneHelper.CreateFromSkeleton(targetSkeletonFile);
 
             config.MeshSkeletonName = currentSkeletonName;
             config.MeshBones = AnimatedBoneHelper.CreateFromSkeleton(currentSkeletonFile, usedBoneIndexes);

@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace Audio.FileFormats.WWise.Hirc
 {
@@ -12,8 +10,8 @@ namespace Audio.FileFormats.WWise.Hirc
         public bool UseByteFactory { get; set; } = false;
 
         public HircParser()
-        { 
-            
+        {
+
         }
 
         HircFactory GetHircFactory(uint bnkVersion)
@@ -32,7 +30,7 @@ namespace Audio.FileFormats.WWise.Hirc
 
             var failedItems = new List<uint>();
             HircFactory factory = GetHircFactory(bnkFile.Header.dwBankGeneratorVersion);
-          
+
             for (uint itemIndex = 0; itemIndex < bnkFile.HircChuck.NumHircItems; itemIndex++)
             {
                 var hircType = (HircType)chunk.PeakByte();

@@ -1,7 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using Microsoft.Xna.Framework;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
@@ -9,7 +10,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     public class Transform_v10 : DecodedMetaEntryBase
     {
         [MetaDataTag(5, "ID of the bone which you are moving or rotating.")]
-        public int TargetNode{ get; set; }
+        public int TargetNode { get; set; }
 
         [MetaDataTag(6)]
         public int SourceNode { get; set; }

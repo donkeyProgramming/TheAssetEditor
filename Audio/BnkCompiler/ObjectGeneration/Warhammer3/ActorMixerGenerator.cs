@@ -1,8 +1,8 @@
-﻿using Audio.FileFormats.WWise.Hirc.V136;
-using Audio.FileFormats.WWise;
+﻿using Audio.FileFormats.WWise;
+using Audio.FileFormats.WWise.Hirc.V136;
+using CommunityToolkit.Diagnostics;
 using System;
 using System.Linq;
-using CommunityToolkit.Diagnostics;
 
 namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
@@ -25,7 +25,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             var allChildren = allActorChildren.Concat(allSoundsChildren);
             var allChildIds = allChildren
                 .Select(x => project.GetHircItemIdFromName(x))
-                .OrderBy(x=>x)
+                .OrderBy(x => x)
                 .ToList();
 
             var wwiseActorMixer = new CAkActorMixer_v136();
@@ -51,7 +51,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             {
                 wwiseActorMixer.NodeBaseParams.DirectParentID = uint.Parse(actorMixer.RootParentId);
             }
-          
+
             wwiseActorMixer.UpdateSize();
             return wwiseActorMixer;
         }

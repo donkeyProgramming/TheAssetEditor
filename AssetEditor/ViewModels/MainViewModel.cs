@@ -51,21 +51,21 @@ namespace AssetEditor.ViewModels
         public ICommand CloseToolsToRightCommand { get; set; }
         public ICommand CloseToolsToLeftCommand { get; set; }
 
-        public MainViewModel(GameInformationFactory gameInformationFactory, 
-            MenuBarViewModel menuViewModel, 
-            IServiceProvider serviceProvider, 
-            PackFileService packfileService, 
-            ApplicationSettingsService settingsService, 
+        public MainViewModel(GameInformationFactory gameInformationFactory,
+            MenuBarViewModel menuViewModel,
+            IServiceProvider serviceProvider,
+            PackFileService packfileService,
+            ApplicationSettingsService settingsService,
             IToolFactory toolFactory,
             DevelopmentConfiguration developmentConfiguration,
-            IUiCommandFactory uiCommandFactory )
+            IUiCommandFactory uiCommandFactory)
         {
             MenuBar = menuViewModel;
             _developmentConfiguration = developmentConfiguration;
             _uiCommandFactory = uiCommandFactory;
             _packfileService = packfileService;
             _packfileService.Database.BeforePackFileContainerRemoved += Database_BeforePackFileContainerRemoved;
-           
+
             CloseToolCommand = new RelayCommand<IEditorViewModel>(CloseTool);
             CloseOtherToolsCommand = new RelayCommand<IEditorViewModel>(CloseOtherTools);
             ClosingCommand = new RelayCommand<IEditorViewModel>(Closing);
@@ -73,7 +73,7 @@ namespace AssetEditor.ViewModels
             CloseToolsToRightCommand = new RelayCommand<IEditorViewModel>(CloseToolsToRight);
             CloseToolsToLeftCommand = new RelayCommand<IEditorViewModel>(CloseToolsToLeft);
 
-            FileTree =  new PackFileBrowserViewModel(_packfileService);
+            FileTree = new PackFileBrowserViewModel(_packfileService);
             FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, toolFactory);
             FileTree.FileOpen += OpenFile;
 
@@ -81,7 +81,7 @@ namespace AssetEditor.ViewModels
             // eventHub<Database_BeforePackFileContainerRemoved>
 
             ToolsFactory = toolFactory;
-            
+
             if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
             {
                 var settingsWindow = serviceProvider.GetRequiredService<SettingsWindow>();
@@ -105,7 +105,7 @@ namespace AssetEditor.ViewModels
             }
         }
 
-        void OpenFile(PackFile file) => _uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file); 
+        void OpenFile(PackFile file) => _uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file);
 
         private void Closing(IEditorViewModel editor)
         {
@@ -117,14 +117,14 @@ namespace AssetEditor.ViewModels
 
             IsClosingWithoutPrompt = MessageBox.Show(
                 "You have unsaved changes. Do you want to quit without saving?",
-                "Quit Without Saving", 
+                "Quit Without Saving",
                 MessageBoxButton.YesNo) == MessageBoxResult.Yes;
         }
 
         private bool Database_BeforePackFileContainerRemoved(PackFileContainer container)
         {
             var openFiles = CurrentEditorsList
-                .Where(x=> x.MainFile != null && _packfileService.GetPackFileContainer(x.MainFile) == container)
+                .Where(x => x.MainFile != null && _packfileService.GetPackFileContainer(x.MainFile) == container)
                 .ToList();
 
             if (openFiles.Any())
@@ -175,7 +175,7 @@ namespace AssetEditor.ViewModels
         void CloseToolsToLeft(IEditorViewModel tool)
         {
             var index = CurrentEditorsList.IndexOf(tool);
-            for (int i = index-1; i >= 0; i--)
+            for (int i = index - 1; i >= 0; i--)
             {
                 CloseTool(CurrentEditorsList[0]);
             }
@@ -184,7 +184,7 @@ namespace AssetEditor.ViewModels
         void CloseToolsToRight(IEditorViewModel tool)
         {
             var index = CurrentEditorsList.IndexOf(tool);
-            for (int i = CurrentEditorsList.Count-1; i > index; i--)
+            for (int i = CurrentEditorsList.Count - 1; i > index; i--)
             {
                 CloseTool(CurrentEditorsList[i]);
             }

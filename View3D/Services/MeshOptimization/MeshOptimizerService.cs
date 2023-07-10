@@ -1,11 +1,9 @@
-﻿using View3D.Rendering;
+﻿using Simplygon;
 using View3D.Rendering.Geometry;
-using Simplygon;
-using System;
 
 namespace View3D.Services.MeshOptimization
 {
-    public class MeshOptimizerService 
+    public class MeshOptimizerService
     {
         public static MeshObject CreatedReducedCopy(MeshObject originalMesh, float factor)
         {

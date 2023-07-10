@@ -5,7 +5,6 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -153,7 +152,7 @@ namespace AssetEditor.Report
             {
                 using var fileWriter = new StreamWriter($"{outputFolder}\\ChangedFiles.csv", false);
                 WriteHeader(fileWriter);
-                foreach(var item in changedFiles)
+                foreach (var item in changedFiles)
                     WriteItem(fileWriter, item);
             }
 

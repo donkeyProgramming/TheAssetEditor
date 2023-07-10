@@ -103,11 +103,11 @@ namespace View3D.Commands.Object
 
         public void Undo()
         {
-            foreach(var item in _newGroupNodes)       
+            foreach (var item in _newGroupNodes)
                 item.Parent.RemoveObject(item);
 
             _objectToSplit.Parent.AddObject(_objectToSplit as SceneNode);
-            
+
             _selectionManager.SetState(_originalSelectionState);
         }
     }

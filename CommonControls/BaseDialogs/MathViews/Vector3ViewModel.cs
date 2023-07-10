@@ -1,4 +1,8 @@
-﻿using CommonControls.Common;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using CommonControls.Common;
 using Microsoft.Xna.Framework;
 
 namespace CommonControls.MathViews
@@ -29,7 +33,7 @@ namespace CommonControls.MathViews
             Z.PropertyChanged += PropertyChanged;
         }
 
-        public Vector3ViewModel(Vector3 vector) 
+        public Vector3ViewModel(Vector3 vector)
         {
             X.Value = vector.X;
             Y.Value = vector.Y;
@@ -42,7 +46,7 @@ namespace CommonControls.MathViews
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if(DisableCallbacks == false)
+            if (DisableCallbacks == false)
                 OnValueChanged?.Invoke(this);
         }
 

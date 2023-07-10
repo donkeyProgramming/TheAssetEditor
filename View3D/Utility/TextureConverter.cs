@@ -4,10 +4,8 @@ using CommonControls.FileTypes.RigidModel.Types;
 using CommonControls.Services;
 using Serilog;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 
 namespace View3D.Utility
@@ -69,7 +67,7 @@ namespace View3D.Utility
 
             using var pProcess = new System.Diagnostics.Process();
             pProcess.StartInfo.FileName = texconvPath;
-            pProcess.StartInfo.Arguments =$"-ft png -f R8G8B8A8_UNORM -y -o \"{Path.GetDirectoryName(fileToConvert)}\" \"{fileToConvert}\"";
+            pProcess.StartInfo.Arguments = $"-ft png -f R8G8B8A8_UNORM -y -o \"{Path.GetDirectoryName(fileToConvert)}\" \"{fileToConvert}\"";
             pProcess.StartInfo.UseShellExecute = false;
             pProcess.StartInfo.RedirectStandardOutput = true;
             pProcess.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;

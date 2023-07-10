@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using CommonControls.Common;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Content;
 using Serilog;
+using System;
+using System.Collections.Generic;
 using View3D.Components.Rendering;
-using CommonControls.Common;
 
 // -------------------------------------------------------------
 // -- XNA 3D Gizmo (Component)
@@ -104,7 +103,7 @@ namespace View3D.Components.Gizmo
         {
             get
             {
-                return new BoundingSphere(Vector3.Transform(_translationLineVertices[1].Position, _gizmoWorld), RADIUS * _screenScale* ScaleModifier);
+                return new BoundingSphere(Vector3.Transform(_translationLineVertices[1].Position, _gizmoWorld), RADIUS * _screenScale * ScaleModifier);
             }
         }
 
@@ -112,7 +111,7 @@ namespace View3D.Components.Gizmo
         {
             get
             {
-                return new BoundingSphere(Vector3.Transform(_translationLineVertices[7].Position, _gizmoWorld), RADIUS * _screenScale* ScaleModifier);
+                return new BoundingSphere(Vector3.Transform(_translationLineVertices[7].Position, _gizmoWorld), RADIUS * _screenScale * ScaleModifier);
             }
         }
 
@@ -120,7 +119,7 @@ namespace View3D.Components.Gizmo
         {
             get
             {
-                return new BoundingSphere(Vector3.Transform(_translationLineVertices[13].Position, _gizmoWorld), RADIUS * _screenScale* ScaleModifier);
+                return new BoundingSphere(Vector3.Transform(_translationLineVertices[13].Position, _gizmoWorld), RADIUS * _screenScale * ScaleModifier);
             }
         }
 
@@ -140,7 +139,7 @@ namespace View3D.Components.Gizmo
         public float RotationSnapValue = 30;
         private float _rotationSnapDelta;
 
-    
+
         ArcBallCamera _camera;
         Input.MouseComponent _mouse;
 
@@ -291,7 +290,7 @@ namespace View3D.Components.Gizmo
                 ActiveAxis = GizmoAxis.None;
                 return;
             }
-            
+
             // helps solve visual lag (1-frame-lag) after selecting a new entity
             if (!_isActive)
                 UpdateGizmoPosition();
@@ -307,7 +306,7 @@ namespace View3D.Components.Gizmo
 
             _localForward = Vector3.Transform(Vector3.Forward, Matrix.CreateFromQuaternion(Selection[0].Orientation)); //Selection[0].Forward;
             _localUp = Vector3.Transform(Vector3.Up, Matrix.CreateFromQuaternion(Selection[0].Orientation));  //Selection[0].Up;
-            
+
             // -- Vector Rotation (Local/World) -- //
             _localForward.Normalize();
             _localRight = Vector3.Cross(_localForward, _localUp);
@@ -353,9 +352,9 @@ namespace View3D.Components.Gizmo
 
         private void HandleTranslateAndScale(Vector2 mousePosition, out Vector3 out_transformLocal, out Vector3 out_transfromWorld)
         {
- 
 
-           
+
+
 
             Plane plane;
             switch (ActiveAxis)
@@ -447,7 +446,7 @@ namespace View3D.Components.Gizmo
             rotationMatrixLocal.Forward = SceneWorld.Forward;
             rotationMatrixLocal.Up = SceneWorld.Up;
             rotationMatrixLocal.Right = SceneWorld.Right;
-        
+
             switch (ActiveAxis)
             {
                 case GizmoAxis.X:
@@ -594,7 +593,7 @@ namespace View3D.Components.Gizmo
         #region Draw
         public void Draw()
         {
-            if (!_isActive) 
+            if (!_isActive)
                 return;
 
             _graphics.DepthStencilState = DepthStencilState.None;
@@ -611,7 +610,7 @@ namespace View3D.Components.Gizmo
             _lineEffect.CurrentTechnique.Passes[0].Apply();
             _graphics.DrawUserPrimitives(PrimitiveType.LineList, _translationLineVertices, 0, _translationLineVertices.Length / 2);
 
-        
+
             // draw the 3d meshes
             for (int i = 0; i < 3; i++) //(order: x, y, z)
             {
@@ -740,7 +739,7 @@ namespace View3D.Components.Gizmo
             _lineEffect.Dispose();
             _meshEffect.Dispose();
         }
-    
+
 
         #endregion
     }

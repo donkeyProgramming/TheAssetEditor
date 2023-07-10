@@ -33,7 +33,7 @@ namespace View3D.Utility
 
         PackFileService Pfs { get; set; }
         ContentManager Content { get; set; }
-        public SpriteBatch CommonSpriteBatch{ get; private set; }
+        public SpriteBatch CommonSpriteBatch { get; private set; }
         public SpriteFont DefaultFont { get; private set; }
 
         public TextureCube PbrDiffuse { get; private set; }
@@ -41,7 +41,7 @@ namespace View3D.Utility
         public Texture2D PbrLut { get; private set; }
 
         MainScene _scene;
-        public ResourceLibary(MainScene mainScene, PackFileService pf) 
+        public ResourceLibary(MainScene mainScene, PackFileService pf)
         {
             Pfs = pf;
             _scene = mainScene;
@@ -70,7 +70,7 @@ namespace View3D.Utility
             //PbrDiffuse  = LoadTexture(@"C:\Users\ole_k\Downloads\DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128.dds", false, true);
 
             PbrDiffuse = Content.Load<TextureCube>("textures\\phazer\\DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128");
-            PbrSpecular = Content.Load<TextureCube>("textures\\phazer\\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512");  
+            PbrSpecular = Content.Load<TextureCube>("textures\\phazer\\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512");
             PbrLut = Content.Load<Texture2D>("textures\\phazer\\Brdf_rgba32f_raw");
         }
 
@@ -177,7 +177,7 @@ namespace View3D.Utility
                     }
 #endif
 
-                    if(texture == null)
+                    if (texture == null)
                     {
                         _logger.Here().Error($"Error loading texture ({fileName} - Unknown texture format {image.Format})");
                         return null;
@@ -192,7 +192,7 @@ namespace View3D.Utility
                             if (mipmap.Width > 4)
                                 texture.SetData(i + 1, null, image.Data, mipmap.DataOffset, mipmap.DataLen);
                         }
-                        catch 
+                        catch
                         {
                             _logger.Here().Warning($"Error loading Mipmap [{i}]");
                         }

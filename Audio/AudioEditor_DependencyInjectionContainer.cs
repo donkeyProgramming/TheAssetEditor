@@ -28,7 +28,7 @@ namespace Audio
 
             serviceCollection.AddScoped<RepositoryProvider, CreateRepositoryFromAllPackFiles>();
             serviceCollection.AddScoped<IAudioRepository, AudioRepository>();
-            
+
             serviceCollection.AddTransient<WWiseBnkLoader>();
             serviceCollection.AddTransient<WWiseNameLoader>();
             serviceCollection.AddTransient<Bnkparser>();
@@ -61,7 +61,7 @@ namespace Audio
         public static void CreateOvnCompilerProject(PackFileService pfs)
         {
             PackFileUtil.LoadFilesFromDisk(pfs, new PackFileUtil.FileRef(packFilePath: @"audioprojects", systemPath: @"C:\Users\ole_k\source\repos\TheAssetEditor\AudioResearch\Data\OvnExample\ProjectSimple.json"));
-            
+
             // Load all wems
             var wemReferences = Directory.GetFiles(@"D:\Research\Audio\Working pack\audio_ovn\wwise\english(uk)")
                 .Where(x => Path.GetExtension(x) == ".wem")
@@ -71,7 +71,7 @@ namespace Audio
         }
     }
 
-        
+
 
 }
 

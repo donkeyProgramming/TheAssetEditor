@@ -15,7 +15,7 @@ namespace AnimationEditor.AnimationTransferTool
 
         public void SelectSourceSkeletonBone(int index)
         {
-            _source.SelectedBoneIndex( index);
+            _source.SelectedBoneIndex(index);
         }
 
         public void SelectTargetSkeletonBone(int index)

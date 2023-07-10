@@ -39,7 +39,7 @@ namespace View3D.Components.Component.Selection
             MouseComponent mouseComponent, KeyboardComponent keyboardComponent,
             ArcBallCamera camera, SelectionManager selectionManager,
             DeviceResolverComponent deviceResolverComponent, CommandFactory commandFactory,
-            SceneManager sceneManager ) 
+            SceneManager sceneManager)
         {
             _mouseComponent = mouseComponent;
             _keyboardComponent = keyboardComponent;
@@ -111,7 +111,7 @@ namespace View3D.Components.Component.Selection
         void SelectFromRectangle(Rectangle screenRect, bool isSelectionModification, bool removeSelection)
         {
             var unprojectedSelectionRect = _camera.UnprojectRectangle(screenRect);
-  
+
             var currentState = _selectionManager.GetState();
             if (currentState.Mode == GeometrySelectionMode.Face && currentState is FaceSelectionState faceState)
             {
@@ -148,7 +148,7 @@ namespace View3D.Components.Component.Selection
             var ray = _camera.CreateCameraRay(mousePosition);
             var currentState = _selectionManager.GetState();
             if (currentState is FaceSelectionState faceState)
-            {  
+            {
                 if (IntersectionMath.IntersectFace(ray, faceState.RenderObject.Geometry, faceState.RenderObject.RenderMatrix, out var selectedFace) != null)
                 {
                     _commandFactory.Create<FaceSelectionCommand>().Configure(x => x.Configure(selectedFace.Value, isSelectionModification, removeSelection)).BuildAndExecute();
@@ -173,7 +173,7 @@ namespace View3D.Components.Component.Selection
                 if (currentState.Mode != GeometrySelectionMode.Object || currentState.SelectionCount() != 0)
                     _commandFactory.Create<ObjectSelectionCommand>().Configure(x => x.Configure(new List<ISelectable>(), false, false)).BuildAndExecute();
             }
-            else if(selectedObject != null)
+            else if (selectedObject != null)
             {
                 _commandFactory.Create<ObjectSelectionCommand>().Configure(x => x.Configure(selectedObject, isSelectionModification, removeSelection)).BuildAndExecute();
             }
@@ -209,7 +209,7 @@ namespace View3D.Components.Component.Selection
         public bool SetVertexSelectionMode()
         {
             var selectionState = _selectionManager.GetState();
-            if ( _selectionManager.GetState().Mode != GeometrySelectionMode.Vertex)
+            if (_selectionManager.GetState().Mode != GeometrySelectionMode.Vertex)
             {
                 var selectedObject = selectionState.GetSingleSelectedObject();
                 if (selectedObject != null)

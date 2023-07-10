@@ -24,7 +24,6 @@ SOFTWARE.
 */
 #endregion
 
-using System;
 
 namespace MeshDecimator
 {
@@ -71,7 +70,8 @@ namespace MeshDecimator
         public static ILogger Logger
         {
             get { return logger; }
-            set {
+            set
+            {
                 lock (syncObj)
                 {
                     logger = value;

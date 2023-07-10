@@ -23,7 +23,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
         GameSkeleton _mountSkeleton;
 
         MeshAnimationHelper _mountVertexPositionResolver;
-        public MountAnimationGeneratorService( AnimationSettingsViewModel animationSettings, Rmv2MeshNode mountMesh, int mountVertexId, int riderBoneIndex, AssetViewModel rider, AssetViewModel mount)
+        public MountAnimationGeneratorService(AnimationSettingsViewModel animationSettings, Rmv2MeshNode mountMesh, int mountVertexId, int riderBoneIndex, AssetViewModel rider, AssetViewModel mount)
         {
             _animationSettings = animationSettings;
             _mountVertexId = mountVertexId;
@@ -54,7 +54,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
             var maxFrameCount = Math.Min(mountAnimation.DynamicFrames.Count, newRiderAnim.DynamicFrames.Count);
             for (int i = 0; i < maxFrameCount; i++)
             {
-                var mountFrame = AnimationSampler.Sample(i, 0, _mountSkeleton,  mountAnimation );
+                var mountFrame = AnimationSampler.Sample(i, 0, _mountSkeleton, mountAnimation);
                 var mountBoneWorldMatrix = _mountVertexPositionResolver.GetVertexTransformWorld(mountFrame, _mountVertexId);
                 mountBoneWorldMatrix.Decompose(out var _, out var mountVertexRot, out var mountVertexPos);
 
@@ -64,32 +64,32 @@ namespace AnimationEditor.MountAnimationCreator.Services
                     newRiderAnim.DynamicFrames[i].Position[0] = mountFrame.BoneTransforms[0].Translation;
                     newRiderAnim.DynamicFrames[i].Rotation[0] = Quaternion.Identity;
                 }
-               
-               var origianlRotation = Quaternion.Identity;
-               if (_animationSettings.KeepRiderRotation)
-               {
-                   var riderFrame = AnimationSampler.Sample(i, 0, _riderSkeleton, newRiderAnim );
-                   var riderBoneWorldmatrix = riderFrame.GetSkeletonAnimatedWorld(_riderSkeleton, _riderBoneIndex);
-                   riderBoneWorldmatrix.Decompose(out var _, out origianlRotation, out var _);
-               }
-               
-               var originalPosition = newRiderAnim.DynamicFrames[i].Position[_riderBoneIndex];
-               var originalRotation = newRiderAnim.DynamicFrames[i].Rotation[_riderBoneIndex];
-               
-               var newRiderPosition = mountVertexPos + translationOffset;
-               if(_animationSettings.IsRootNodeAnimation)
-                   newRiderPosition  = newRiderPosition - mountFrame.BoneTransforms[0].Translation;
-               var newRiderRotation = Quaternion.Multiply(Quaternion.Multiply(mountVertexRot, origianlRotation), rotationOffset); 
-               
-               var riderPositionDiff = newRiderPosition - originalPosition;
-               var riderRotationDiff = newRiderRotation * Quaternion.Inverse(originalRotation);
-               
-               newRiderAnim.DynamicFrames[i].Position[_riderBoneIndex] = newRiderPosition;
-               newRiderAnim.DynamicFrames[i].Rotation[_riderBoneIndex] = newRiderRotation;
+
+                var origianlRotation = Quaternion.Identity;
+                if (_animationSettings.KeepRiderRotation)
+                {
+                    var riderFrame = AnimationSampler.Sample(i, 0, _riderSkeleton, newRiderAnim);
+                    var riderBoneWorldmatrix = riderFrame.GetSkeletonAnimatedWorld(_riderSkeleton, _riderBoneIndex);
+                    riderBoneWorldmatrix.Decompose(out var _, out origianlRotation, out var _);
+                }
+
+                var originalPosition = newRiderAnim.DynamicFrames[i].Position[_riderBoneIndex];
+                var originalRotation = newRiderAnim.DynamicFrames[i].Rotation[_riderBoneIndex];
+
+                var newRiderPosition = mountVertexPos + translationOffset;
+                if (_animationSettings.IsRootNodeAnimation)
+                    newRiderPosition = newRiderPosition - mountFrame.BoneTransforms[0].Translation;
+                var newRiderRotation = Quaternion.Multiply(Quaternion.Multiply(mountVertexRot, origianlRotation), rotationOffset);
+
+                var riderPositionDiff = newRiderPosition - originalPosition;
+                var riderRotationDiff = newRiderRotation * Quaternion.Inverse(originalRotation);
+
+                newRiderAnim.DynamicFrames[i].Position[_riderBoneIndex] = newRiderPosition;
+                newRiderAnim.DynamicFrames[i].Rotation[_riderBoneIndex] = newRiderRotation;
 
                 // Process attachment/prop points
                 List<int> propBones = new List<int>();
-                if (_animationSettings.IsRootNodeAnimation )
+                if (_animationSettings.IsRootNodeAnimation)
                 {
                     var parentBoneIndex = _riderSkeleton.GetParentBoneIndex(_riderBoneIndex);
                     if (parentBoneIndex != -1)
@@ -100,7 +100,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
                     propBones = _riderSkeleton.GetDirectChildBones(-1);
                 }
 
-                foreach(var propBoneId in propBones)
+                foreach (var propBoneId in propBones)
                 {
                     if (propBoneId == _riderBoneIndex)
                         continue;
@@ -126,12 +126,12 @@ namespace AnimationEditor.MountAnimationCreator.Services
             string savePath = "";
             if (string.IsNullOrWhiteSpace(savePrefix) == false)
             {
-                if(ensureUniqeName)
+                if (ensureUniqeName)
                     savePath = GenerateNewAnimationName(pfs, riderAnimationName, savePrefix);
                 else
                     savePath = Path.GetDirectoryName(riderAnimationName) + "\\" + savePrefix + Path.GetFileName(riderAnimationName);
             }
-                
+
             return SaveHelper.Save(pfs, savePath, null, bytes);
         }
 

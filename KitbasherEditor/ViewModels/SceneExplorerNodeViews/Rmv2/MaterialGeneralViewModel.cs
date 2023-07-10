@@ -1,5 +1,4 @@
 ﻿using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.RigidModel.Types;
 using CommonControls.PackFileBrowser;
@@ -11,7 +10,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -90,7 +88,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                         try
                         {
                             var path = _packfileService.GetFullPath(browser.SelectedFile);
-                            UpdateTexturePath(path);  
+                            UpdateTexturePath(path);
                         }
                         catch
                         {
@@ -106,8 +104,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                     return;
 
                 var isFileFound = true;
-                
-                if(string.IsNullOrWhiteSpace(Path) == false)
+
+                if (string.IsNullOrWhiteSpace(Path) == false)
                     isFileFound = _packfileService.FindFile(Path) != null;
 
                 if (isFileFound == false && Path.Contains("test_mask.dds"))
@@ -116,7 +114,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 if (isFileFound == false)
                 {
                     var errorMessage = "Invalid Texture Path!";
-                    _errorsByPropertyName[nameof(Path)] = new List<string>() {errorMessage};
+                    _errorsByPropertyName[nameof(Path)] = new List<string>() { errorMessage };
                 }
                 else
                 {
@@ -165,34 +163,35 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 
         public ICommand ResolveTexturesCommand { get; set; }
         public ICommand DeleteMissingTexturesCommand { get; set; }
-        
+
 
         public bool UseAlpha
         {
-            get => _meshNode.Material.AlphaMode == AlphaMode.Transparent; 
-            set 
-            {   
+            get => _meshNode.Material.AlphaMode == AlphaMode.Transparent;
+            set
+            {
                 if (value)
                     _meshNode.Material.AlphaMode = AlphaMode.Transparent;
                 else
                     _meshNode.Material.AlphaMode = AlphaMode.Opaque;
                 NotifyPropertyChanged();
-            } 
+            }
         }
 
         public ObservableCollection<TextureViewModel> TextureList { get; set; } = new ObservableCollection<TextureViewModel>();
 
-        public string TextureDirectory 
+        public string TextureDirectory
         {
-            get => _meshNode.Material.TextureDirectory; 
-            set { _meshNode.Material.TextureDirectory = value; NotifyPropertyChanged(); } 
+            get => _meshNode.Material.TextureDirectory;
+            set { _meshNode.Material.TextureDirectory = value; NotifyPropertyChanged(); }
         }
 
         bool _onlyShowUsedTextures = true;
-        public bool OnlyShowUsedTextures 
-        { 
-            get => _onlyShowUsedTextures;  
-            set { SetAndNotify(ref _onlyShowUsedTextures, value); UpdateTextureListVisibility(_onlyShowUsedTextures); } }
+        public bool OnlyShowUsedTextures
+        {
+            get => _onlyShowUsedTextures;
+            set { SetAndNotify(ref _onlyShowUsedTextures, value); UpdateTextureListVisibility(_onlyShowUsedTextures); }
+        }
 
 
         public UiVertexFormat VertexType { get { return _meshNode.Geometry.VertexFormat; } set { ChangeVertexType(value); } }
@@ -233,10 +232,10 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         {
             foreach (var texture in TextureList)
             {
-                if(_applicationSettingsService.CurrentSettings.HideWh2TextureSelectors && 
+                if (_applicationSettingsService.CurrentSettings.HideWh2TextureSelectors &&
                    _applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Warhammer3)
                 {
-                    if(texture.TexureType == TextureType.Diffuse  ||
+                    if (texture.TexureType == TextureType.Diffuse ||
                        texture.TexureType == TextureType.Specular ||
                        texture.TexureType == TextureType.Gloss)
                     {
