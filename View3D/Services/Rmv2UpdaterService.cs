@@ -16,14 +16,14 @@ using MS = Microsoft.Xna.Framework;
 namespace View3D.Services
 {
     public class Rmv2UpdaterService
-    {        
+    {
         // TODO: maybe make nested inside a class, as there could be multiple options for generation the metal map too....
         public enum BaseColourGenerationTechniqueEnum
         {
             AdditiveBlending,
             ComparativeBlending,
         }
-        
+
         private readonly PackFileService _pfs;
         private readonly string _outputFolder = DirectoryHelper.Temp + "\\TextureUpdater\\";
         private readonly bool _autoGenerateMissingTextures = false;
@@ -184,7 +184,7 @@ namespace View3D.Services
             if (luminosity_Specular > 0.3f)
             {
                 return 1.0f;
-            }               
+            }
 
             if (luminosity_Diffuse < 0.1f)
             {
@@ -208,7 +208,7 @@ namespace View3D.Services
             return 0.0f;
         }
 
-                        
+
         private bool ConvertTextureAdditiveBlending(Dictionary<TextureType, Bitmap> textureDictionary, string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
         {
             var inputDiffuseTex = textureDictionary[TextureType.Diffuse];
@@ -247,7 +247,7 @@ namespace View3D.Services
 
                     outMaterialMapTex.SetPixel(x, y,
                         ColorHelper.Vector4ToColor(new MS::Vector4(metalness, roughness, 0.0f, 1.0f)));
-                    
+
                 }
             }
 
@@ -271,27 +271,27 @@ namespace View3D.Services
         /// </summary>
         private static float GetRoughnessFromPixel(Bitmap inputGlosMapTex, int y, int x)
         {
-            const float smooth_gamma_scale = 1.0f/0.90f; // rough const test roughness adjuster value
+            const float smooth_gamma_scale = 1.0f / 0.90f; // rough const test roughness adjuster value
 
             float smoothness = Math.Clamp((float)(inputGlosMapTex.GetPixel(x, y).R) / 255.0f, 0.0f, 1.0f);
             float roughness = Math.Clamp(1.0f - smoothness, 0.0f, 1.0f);
 
             roughness = (float)Math.Pow(roughness, (1.0 / 2.2) * smooth_gamma_scale);
 
-            return roughness; 
+            return roughness;
 
         }
-                
+
         private bool ConvertTexturesUsingComparativeBlending(Dictionary<TextureType, Bitmap> textureDictionary, string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
-        {   
+        {
             var inputDiffuseTex = textureDictionary[TextureType.Diffuse];
             var inputSpecularTex = textureDictionary[TextureType.Specular];
             var inputGlosMapTex = textureDictionary[TextureType.Gloss];
 
             var outBaseColourTex = new Bitmap(inputDiffuseTex.Width, inputDiffuseTex.Height);
-            var outMaterialMapTex = new Bitmap(inputDiffuseTex.Width, inputDiffuseTex.Height);                 
+            var outMaterialMapTex = new Bitmap(inputDiffuseTex.Width, inputDiffuseTex.Height);
 
-            
+
             for (int y = 0; y < inputDiffuseTex.Height; y++)
             {
                 for (int x = 0; x < inputDiffuseTex.Width; x++)
@@ -316,9 +316,9 @@ namespace View3D.Services
                     // with a slight adjustment, to include a tiny bit more diffuse
                     // this MIGHT work in most cases:               
                     const float specular_threshold_offet = 0.07f;
-                    var baseColorPixelFloat = 
+                    var baseColorPixelFloat =
                         (luminosity_Specular - specular_threshold_offet >= luminosity_Diffuse) ? specularPixelFloat : diffusePixelFloat;
-                                        
+
                     // adjust base_colour brightness
                     const float brightNess = 1.3f; // rough const test pre-gamma brightness adjusted (evil:))
                     baseColorPixelFloat = ColorHelper.linear_to_gamma_accurate(baseColorPixelFloat * brightNess);
@@ -329,13 +329,13 @@ namespace View3D.Services
                     outMaterialMapTex.SetPixel(x, y, ColorHelper.Vector4ToColor(new MS::Vector4(metalnessValue, roughness, 0.0f, 1.0f)));
 
                 }
-            }                     
+            }
 
             // Do the texture replacement operations            
             var packFilePath_Mask = model.GetTextures()[TextureType.Mask];
             var packFilePathBaseColor = model.GetTextures()[TextureType.Diffuse].Replace("_diffuse", "_base_colour");
             var packFilePath_MaterialMap = model.GetTextures()[TextureType.Gloss].Replace("_gloss_map", "_material_map");
-                        
+
             var result = SaveAndApplyBitmapAsModelTexture(outBaseColourTex, packFilePathBaseColor, TextureType.BaseColour, modelPath, model, outputList);
             if (result)
                 outputList.Ok($"{modelPath}-{model.Name}", $"Generated new 'base_colour' texture (comparitive blending)");

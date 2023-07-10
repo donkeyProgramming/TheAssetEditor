@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Framework.WpfInterop;
 using System;
 using System.Runtime.InteropServices;
 using View3D.Components;
@@ -98,7 +97,7 @@ namespace View3D.Rendering
             vertices[5].Position = new Vector3(1, -1, 1);
             vertices[6].Position = new Vector3(-1, -1, -1);
             vertices[7].Position = new Vector3(1, -1, -1);
- 
+
             vertices[8].Position = new Vector3(-1, 1, -1);
             vertices[9].Position = new Vector3(-1, 1, 1);
             vertices[10].Position = new Vector3(-1, -1, -1);
@@ -161,7 +160,7 @@ namespace View3D.Rendering
                 _instanceTransform[i].World2 = new Vector3(world[2, 0], world[2, 1], world[2, 2]);
                 _instanceTransform[i].World3 = new Vector3(world[3, 0], world[3, 1], world[3, 2]);
                 _instanceTransform[i].Colour = Vector3.Lerp(_deselectedColur, _selectedColur, selectedVertexes.VertexWeights[i]);
-            
+
             }
             _instanceBuffer.SetData(_instanceTransform, 0, Math.Min(_currentInstanceCount, _maxInstanceCount), SetDataOptions.None);
         }
@@ -172,8 +171,8 @@ namespace View3D.Rendering
 
             for (int i = 0; i < count; i++)
             {
-                Matrix world = Matrix.CreateScale((float)rnd.NextDouble() * 1) * 
-                    Matrix.CreateRotationZ((float)rnd.NextDouble())* 
+                Matrix world = Matrix.CreateScale((float)rnd.NextDouble() * 1) *
+                    Matrix.CreateRotationZ((float)rnd.NextDouble()) *
                     Matrix.CreateTranslation((float)rnd.NextDouble() * 20, (float)rnd.NextDouble() * 20, (float)rnd.NextDouble() * 20);
 
                 _instanceTransform[i].World0 = new Vector3(world[0, 0], world[0, 1], world[0, 2]);

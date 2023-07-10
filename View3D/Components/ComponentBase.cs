@@ -1,7 +1,5 @@
 ﻿using CommonControls.Common;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Framework.WpfInterop;
 using System;
 
 namespace View3D.Components
@@ -28,7 +26,7 @@ namespace View3D.Components
         public event EventHandler<EventArgs> UpdateOrderChanged;
         #endregion
 
-        public BaseComponent( )
+        public BaseComponent()
         {
         }
 

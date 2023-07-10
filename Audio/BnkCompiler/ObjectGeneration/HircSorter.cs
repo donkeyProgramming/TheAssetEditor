@@ -6,7 +6,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
 {
     public class HircSorter
     {
-        public List<IAudioProjectHircItem> Sort(CompilerData project) 
+        public List<IAudioProjectHircItem> Sort(CompilerData project)
         {
             // Sort
             var sortedProjectItems = new List<IAudioProjectHircItem>();

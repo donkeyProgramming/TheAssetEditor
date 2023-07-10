@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
+using Simplygon;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
-using Simplygon;
 
 
 namespace View3D.Services.MeshOptimization

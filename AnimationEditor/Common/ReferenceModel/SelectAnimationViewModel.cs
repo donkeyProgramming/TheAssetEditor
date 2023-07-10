@@ -47,12 +47,12 @@ namespace AnimationEditor.Common.ReferenceModel
         {
             if (!string.IsNullOrWhiteSpace(selectedSkeletonPath))
             {
-                var skeletonPackFile = _pfs.FindFile(selectedSkeletonPath) ;
+                var skeletonPackFile = _pfs.FindFile(selectedSkeletonPath);
                 if (skeletonPackFile != null)
                 {
                     AnimationsForCurrentSkeleton = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(Path.GetFileNameWithoutExtension(skeletonPackFile.Name));
                     _assetViewModelEditor.SetSkeleton(_data, skeletonPackFile);
-                    
+
                     return;
                 }
             }

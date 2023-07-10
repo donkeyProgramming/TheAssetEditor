@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace View3D.Components
+﻿namespace View3D.Components
 {
     public enum ComponentUpdateOrderEnum
     {
@@ -10,7 +6,7 @@ namespace View3D.Components
         Input,
         Camera,
         Animation,
-       
+
         Gizmo,
         SelectionComponent,
         Default,
@@ -20,7 +16,7 @@ namespace View3D.Components
     {
         ClearScreenComponent,
         Default,
-        
+
         RenderEngine,
         Gizmo,
         SelectionComponent,

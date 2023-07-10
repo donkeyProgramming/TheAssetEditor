@@ -1,8 +1,6 @@
 ﻿using CommonControls.FileTypes.Animation;
-using CommonControls.FileTypes.RigidModel.Transforms;
 using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using static View3D.Animation.AnimationClip;
 
@@ -114,7 +112,7 @@ namespace View3D.Animation
                     newKeyFrame.Scale.Add(Vector3.One);
 
                 output.DynamicFrames.Add(newKeyFrame);
-            } 
+            }
 
             output.PlayTimeInSec = playTime;// (output.DynamicFrames.Count() - 1) / 20.0f;
 
@@ -140,6 +138,6 @@ namespace View3D.Animation
             }*/
         }
 
-      
+
     }
 }

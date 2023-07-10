@@ -1,14 +1,12 @@
 ﻿using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using KitbasherEditor.Views.EditorViews.PinTool;
-using MonoGame.Framework.WpfInterop;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using View3D.Commands;
 using View3D.Commands.Object;
-using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 
@@ -16,7 +14,6 @@ namespace KitbasherEditor.ViewModels.PinTool
 {
     public class PinToolViewModel
     {
-        IComponentManager _componentManager;
         private readonly SelectionManager _selectionManager;
         private readonly CommandFactory _commandFactory;
 
@@ -40,7 +37,7 @@ namespace KitbasherEditor.ViewModels.PinTool
         }
 
         public void ClearSourcedMeshCollection() => SourceMeshCollection.Clear();
-        public void AddSelectionToSourceMeshCollection() =>  AddSelectionToList(SourceMeshCollection);
+        public void AddSelectionToSourceMeshCollection() => AddSelectionToList(SourceMeshCollection);
         public void ClearAffectedMeshCollection() => AffectedMeshCollection.Clear();
         public void AddSelectionToAffectMeshCollection() => AddSelectionToList(AffectedMeshCollection);
 
@@ -71,9 +68,7 @@ namespace KitbasherEditor.ViewModels.PinTool
 
         void AddSelectionToList(ObservableCollection<Rmv2MeshNode> itemList)
         {
-            var selectionState = _componentManager
-                   .GetComponent<SelectionManager>()
-                   .GetState<ObjectSelectionState>();
+            var selectionState = _selectionManager.GetState<ObjectSelectionState>();
 
             if (selectionState == null)
             {

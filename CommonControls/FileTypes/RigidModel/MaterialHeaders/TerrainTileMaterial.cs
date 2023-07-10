@@ -1,10 +1,12 @@
-﻿using CommonControls.FileTypes;
-using CommonControls.FileTypes.RigidModel.Types;
-using Microsoft.Xna.Framework;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
+using CommonControls.FileTypes.RigidModel.Types;
+using Microsoft.Xna.Framework;
 
 namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 {
@@ -99,6 +101,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
         }
     }
 
+#pragma warning disable CS0649 
     struct TerrainTileStruct
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
@@ -110,6 +113,6 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
         public uint Unknown3;
         public uint Unknown4;
         public uint Unknown5;
-
     }
+#pragma warning restore CS0649
 }

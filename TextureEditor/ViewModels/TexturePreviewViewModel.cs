@@ -69,7 +69,7 @@ namespace TextureEditor.ViewModels
             containingWindow.Title = "Texture Details";
             containingWindow.Width = 550;
             containingWindow.Height = 600;
-            containingWindow.Content = new TextureInformationView() { DataContext = _information.GetAsText()};
+            containingWindow.Content = new TextureInformationView() { DataContext = _information.GetAsText() };
             containingWindow.ShowDialog();
         }
 

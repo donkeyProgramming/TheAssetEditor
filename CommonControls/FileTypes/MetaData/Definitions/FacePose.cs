@@ -1,6 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using Microsoft.Xna.Framework;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
@@ -14,20 +15,20 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         [MetaDataTag(5)]
         public float Weight { get; set; }
     }
-    
+
     [MetaData("FACEFX", 2)]
     public class FaceFX_v2 : DecodedMetaEntryBase_v2
     {
-        [MetaDataTag(4)] 
+        [MetaDataTag(4)]
         public string FbxString { get; set; } = "";
-        [MetaDataTag(5)] 
+        [MetaDataTag(5)]
         public string CaString { get; set; } = "";
-        [MetaDataTag(6)] 
+        [MetaDataTag(6)]
         public string UnknownString { get; set; } = "";
         [MetaDataTag(7)]
         public Vector3 Unknown0_v10 { get; set; }
     }
-    
+
     [MetaData("FACE_POSE", 10)]
     public class FacePose : DecodedMetaEntryBase
     {

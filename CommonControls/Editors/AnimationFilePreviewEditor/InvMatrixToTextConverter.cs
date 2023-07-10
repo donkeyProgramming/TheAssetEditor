@@ -1,12 +1,14 @@
-﻿using CommonControls.Editors.TextEditor;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using System;
+using System.Text;
+using System.Windows;
+using CommonControls.Editors.TextEditor;
 using CommonControls.FileTypes.Animation;
 using CommonControls.Services;
 using Filetypes.ByteParsing;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
 
 namespace CommonControls.Editors.AnimationFilePreviewEditor
 {
@@ -19,7 +21,7 @@ namespace CommonControls.Editors.AnimationFilePreviewEditor
                 var animFile = AnimInvMatrixFile.Create(new ByteChunk(bytes));
 
                 var output = new StringBuilder();
-                
+
                 output.AppendLine($"Version:{animFile.Version}");
                 output.AppendLine($"NumBones:{animFile.MatrixList.Length}");
 

@@ -1,6 +1,10 @@
-﻿using CommonControls.Common;
-using CommonControls.Services;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System.Collections.ObjectModel;
+using CommonControls.Common;
+using CommonControls.Services;
 
 namespace CommonControls.PackFileBrowser
 {
@@ -45,8 +49,8 @@ namespace CommonControls.PackFileBrowser
                     Additem(ContextItems.CreateFolder, createMenu);
 
                     AddSeperator(newContextMenu);
-                    var importSubMenu = Additem(ContextItems.Import, newContextMenu);                    
-                    Additem(ContextItems.Import3DModel, importSubMenu);                  
+                    var importSubMenu = Additem(ContextItems.Import, newContextMenu);
+                    Additem(ContextItems.Import3DModel, importSubMenu);
                     AddSeperator(newContextMenu);
 
                     Additem(ContextItems.Expand, newContextMenu);

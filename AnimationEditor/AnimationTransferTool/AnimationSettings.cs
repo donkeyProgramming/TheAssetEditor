@@ -1,7 +1,5 @@
 ﻿using CommonControls.Common;
 using CommonControls.MathViews;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace AnimationEditor.AnimationTransferTool
 {
@@ -17,7 +15,7 @@ namespace AnimationEditor.AnimationTransferTool
         public NotifyAttr<bool> ApplyRelativeScale { get; set; } = new NotifyAttr<bool>(true);
         public NotifyAttr<string> SavePrefix { get; set; } = new NotifyAttr<string>("prefix_");
 
-        public ComboBox<uint> AnimationOutputFormat { get; set; } = new ComboBox<uint>(new uint[] {5, 6, 7}, 7);
+        public ComboBox<uint> AnimationOutputFormat { get; set; } = new ComboBox<uint>(new uint[] { 5, 6, 7 }, 7);
 
     }
 

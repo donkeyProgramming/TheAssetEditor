@@ -46,7 +46,7 @@ namespace _componentManager.ViewModels.MenuBarViews
         SkeletonAnimationLookUpHelper _skeletonHelper;
         WindowKeyboard _keyboard;
 
-        public ToolActions(SubToolWindowCreator subToolWindowCreator, IServiceProvider serviceProvider, ComponentManagerResolver componentManagerResolver, PackFileService packFileService, WindowKeyboard keyboard, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
+        public ToolActions(SubToolWindowCreator subToolWindowCreator, IServiceProvider serviceProvider, ComponentManagerResolver componentManagerResolver, PackFileService packFileService, WindowKeyboard keyboard, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             SelectionManager selectionManager, ObjectEditor objectEditor, FaceEditor faceEditor, ViewOnlySelectedService viewOnlySelectedComponent, SceneManager sceneManager, CommandFactory commandFactory)
         {
             _subToolWindowCreator = subToolWindowCreator;
@@ -220,11 +220,11 @@ namespace _componentManager.ViewModels.MenuBarViews
 
             _commandFactory.Create<CreateAnimatedMeshPoseCommand>()
                 .IsUndoable(false)
-                .Configure(x=>x.Configure(meshes, frame, true))
+                .Configure(x => x.Configure(meshes, frame, true))
                 .BuildAndExecute();
         }
 
-        public void PinMeshToMesh() => PinToolViewModel.ShowWindow(_selectionManager,_commandFactory);
+        public void PinMeshToMesh() => PinToolViewModel.ShowWindow(_selectionManager, _commandFactory);
 
         public void OpenReRiggingTool()
         {

@@ -1,7 +1,5 @@
 ﻿using Audio.FileFormats.WWise.Hirc.Shared;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Audio.FileFormats.WWise.Hirc
 {

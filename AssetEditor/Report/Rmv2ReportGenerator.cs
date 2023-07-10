@@ -1,5 +1,4 @@
 ﻿using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.RigidModel.MaterialHeaders;
 using CommonControls.Services;
@@ -9,7 +8,6 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Globalization;
 using System.IO;
-using System.Text;
 using System.Windows;
 
 namespace AssetEditor.Report

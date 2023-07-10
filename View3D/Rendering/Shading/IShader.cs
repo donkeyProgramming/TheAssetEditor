@@ -1,9 +1,6 @@
 ﻿using CommonControls.FileTypes.RigidModel.Types;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Text;
-using View3D.Utility;
 
 namespace View3D.Rendering.Shading
 {
@@ -17,7 +14,7 @@ namespace View3D.Rendering.Shading
     public interface IShaderTextures
     {
         bool UseAlpha { set; }
-         void SetTexture(Texture2D texture, TextureType type);
+        void SetTexture(Texture2D texture, TextureType type);
         void UseTexture(bool value, TextureType type);
     }
 
@@ -31,7 +28,7 @@ namespace View3D.Rendering.Shading
     public class BasicShader : IShader
     {
         public Effect Effect { get; private set; }
- 
+
         public BasicShader(GraphicsDevice device)
         {
             Effect = new BasicEffect(device);
@@ -59,5 +56,5 @@ namespace View3D.Rendering.Shading
         }
     }
 
-   
+
 }

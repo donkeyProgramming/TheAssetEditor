@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
@@ -8,7 +8,7 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     public class DisablePersistant_v2 : DecodedMetaEntryBase_v2
     {
     }
-    
+
     [MetaData("DISABLE_PERSISTENT", 10)]
     public class DisablePersistant_v10 : DecodedMetaEntryBase
     {

@@ -1,6 +1,6 @@
-﻿using Filetypes.ByteParsing;
+﻿using Audio.FileFormats.WWise.Hirc.Shared;
+using Filetypes.ByteParsing;
 using System;
-using Audio.FileFormats.WWise.Hirc.Shared;
 
 namespace Audio.FileFormats.WWise.Hirc.V136
 {
@@ -24,7 +24,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             uMode = chunk.ReadByte();
 
             AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth, uTreeDataSize);
-          
+
             AkPropBundle0 = AkPropBundle.Create(chunk);
             AkPropBundle1 = AkPropBundleMinMax.Create(chunk);
         }

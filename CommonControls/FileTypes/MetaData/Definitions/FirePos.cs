@@ -1,24 +1,25 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using Microsoft.Xna.Framework;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
     [MetaData("FIRE_POS", 0)]
     public class FirePos_v0 : DecodedMetaEntryBase_v0
     {
-      [MetaDataTag(2, "Measured from the unit's animroot bone, in meters.")]
-      public Vector3 Position { get; set; }
+        [MetaDataTag(2, "Measured from the unit's animroot bone, in meters.")]
+        public Vector3 Position { get; set; }
     }
-  
+
     [MetaData("FIRE_POS", 2)]
     public class FirePos_v2 : DecodedMetaEntryBase_v2
     {
-      [MetaDataTag(4, "Measured from the unit's animroot bone, in meters.")]
-      public Vector3 Position { get; set; }
+        [MetaDataTag(4, "Measured from the unit's animroot bone, in meters.")]
+        public Vector3 Position { get; set; }
     }
-  
+
     [MetaData("FIRE_POS", 10)]
     public class FirePos_v10 : DecodedMetaEntryBase
     {

@@ -30,10 +30,10 @@ namespace AnimationEditor.SkeletonEditor
 
         public NotifyAttr<bool> ShowBonesAsWorldTransform { get; set; } = new NotifyAttr<bool>(true);
 
-        public bool ShowSkeleton 
+        public bool ShowSkeleton
         {
             get => _techSkeletonNode.ShowSkeleton.Value;
-            set { _techSkeletonNode.ShowSkeleton.Value = value; NotifyPropertyChanged();}
+            set { _techSkeletonNode.ShowSkeleton.Value = value; NotifyPropertyChanged(); }
         }
 
         public bool ShowRefMesh
@@ -52,13 +52,13 @@ namespace AnimationEditor.SkeletonEditor
         public SkeletonBoneNode SelectedBone
         {
             get => _selectedBone;
-            set  { SetAndNotify(ref _selectedBone, value); UpdateSelectedBoneValues(value); }
+            set { SetAndNotify(ref _selectedBone, value); UpdateSelectedBoneValues(value); }
         }
 
-        public string SelectedBoneName 
+        public string SelectedBoneName
         {
             get => _selectedBone != null ? _selectedBone.BoneName : "";
-            set {  UpdateSelectedBoneName(value); NotifyPropertyChanged();}
+            set { UpdateSelectedBoneName(value); NotifyPropertyChanged(); }
         }
 
         bool _hasTeckSkeletonTransform = false;
@@ -73,7 +73,7 @@ namespace AnimationEditor.SkeletonEditor
         public Editor(PackFileService pfs, IComponentManager componentManager, CopyPasteManager copyPasteManager, AssetViewModelBuilder assetViewModelBuilder)
         {
             _pfs = pfs;
-          
+
             _componentManager = componentManager;
             _copyPasteManager = copyPasteManager;
             _assetViewModelBuilder = assetViewModelBuilder;
@@ -174,7 +174,7 @@ namespace AnimationEditor.SkeletonEditor
         }
 
         private void HandleTranslationChanged(Vector3ViewModel newValue)
-        { 
+        {
             if (_selectedBone == null)
                 return;
 
@@ -193,7 +193,7 @@ namespace AnimationEditor.SkeletonEditor
                     var rotationWorld = MathUtil.EulerDegreesToQuaternion(SelectedBoneRotationOffset.GetAsVector3());
                     var translationWorld = SelectedBoneTranslationOffset.GetAsVector3();
                     var currentMatrixWorld = Matrix.CreateFromQuaternion(rotationWorld) * Matrix.CreateTranslation(translationWorld);
-                    
+
                     var localSpaceMatrix = currentMatrixWorld * Matrix.Invert(parentTransform);
                     localSpaceMatrix.Decompose(out _, out quaternionValue, out translationValue);
                 }
@@ -215,7 +215,7 @@ namespace AnimationEditor.SkeletonEditor
         }
 
         public void BakeSkeletonAction() => _techSkeletonNode.Skeleton.BakeScaleIntoSkeleton();
-        
+
 
         public void FocusSelectedBoneAction()
         {
@@ -359,7 +359,7 @@ namespace AnimationEditor.SkeletonEditor
         {
             using (var browser = new PackFileBrowserWindow(_pfs))
             {
-                browser.ViewModel.Filter.SetExtentions(new List<string>() { ".anim"});
+                browser.ViewModel.Filter.SetExtentions(new List<string>() { ".anim" });
                 if (browser.ShowDialog() == true && browser.SelectedFile != null)
                 {
                     var file = browser.SelectedFile;

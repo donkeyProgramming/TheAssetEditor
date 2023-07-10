@@ -45,7 +45,7 @@ namespace View3D.Animation
         private long _playTimeUs = -1 * MicrosecondsPerSecond;
 
         public List<KeyFrame> DynamicFrames = new List<KeyFrame>();
-        
+
         public long PlayTimeUs => _playTimeUs;
 
         public long MicrosecondsPerFrame
@@ -62,7 +62,7 @@ namespace View3D.Animation
 
         public float PlayTimeInSec
         {
-            get => (float) _playTimeUs / MicrosecondsPerSecond;
+            get => (float)_playTimeUs / MicrosecondsPerSecond;
             set
             {
                 if (DynamicFrames.Count == 0)
@@ -72,14 +72,14 @@ namespace View3D.Animation
                 }
 
                 // make sure we have whole number of microsecond per frame
-                long framePlayTimeUs = (long) Math.Ceiling(value / DynamicFrames.Count * MicrosecondsPerSecond);
+                long framePlayTimeUs = (long)Math.Ceiling(value / DynamicFrames.Count * MicrosecondsPerSecond);
                 _playTimeUs = framePlayTimeUs * DynamicFrames.Count;
             }
         }
 
         public int AnimationBoneCount
         {
-            get 
+            get
             {
                 var dynamicBones = 0;
                 if (DynamicFrames.Count != 0)
@@ -177,12 +177,12 @@ namespace View3D.Animation
                 output.AnimationParts[0].RotationMappings.Add(new AnimationBoneMapping(i));
                 output.AnimationParts[0].TranslationMappings.Add(new AnimationBoneMapping(i));
             }
-        
 
-            for(int i = 0; i < DynamicFrames.Count; i++)
+
+            for (int i = 0; i < DynamicFrames.Count; i++)
                 output.AnimationParts[0].DynamicFrames.Add(CreateFrameFromKeyFrame(i, skeleton));
 
-            return output; 
+            return output;
         }
 
         private Frame CreateFrameFromKeyFrame(int frameIndex, GameSkeleton skeleton)
@@ -218,7 +218,7 @@ namespace View3D.Animation
             foreach (var item in DynamicFrames)
                 copy.DynamicFrames.Add(item.Clone());
             copy.PlayTimeInSec = PlayTimeInSec;
-            
+
             return copy;
         }
 

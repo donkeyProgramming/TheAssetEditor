@@ -1,20 +1,24 @@
-﻿using CommonControls.BaseDialogs.ErrorListDialog;
-using CommonControls.Editors.TextEditor;
-using CommonControls.FileTypes.AnimationPack;
-using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
-using CommonControls.FileTypes.DB;
-using CommonControls.Services;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
+using CommonControls.BaseDialogs.ErrorListDialog;
+using CommonControls.Editors.TextEditor;
+using CommonControls.FileTypes.AnimationPack;
+using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
+using CommonControls.FileTypes.DB;
+using CommonControls.Services;
 using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 
 namespace CommonControls.Editors.AnimationPack.Converters
 {
 
-    public class AnimationFragmentFileToXmlConverter 
+    public class AnimationFragmentFileToXmlConverter
         : BaseAnimConverter<AnimationFragmentFileToXmlConverter.Animation, AnimationFragmentFile>
     {
         private SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
@@ -32,8 +36,8 @@ namespace CommonControls.Editors.AnimationPack.Converters
                 return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Missing skeleton item on root" };
 
             var lastIndex = 0;
-          
-            for(int i = 0; i < xmlAnimation.AnimationFragmentEntry.Count; i++)
+
+            for (int i = 0; i < xmlAnimation.AnimationFragmentEntry.Count; i++)
             {
                 var item = xmlAnimation.AnimationFragmentEntry[i];
                 lastIndex = text.IndexOf("<AnimationFragmentEntry", lastIndex + 1, StringComparison.InvariantCultureIgnoreCase);
@@ -68,7 +72,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
             }
 
             var errorList = new ErrorList();
-            if(_skeletonAnimationLookUpHelper.GetSkeletonFileFromName(pfs, xmlAnimation.Skeleton) == null)
+            if (_skeletonAnimationLookUpHelper.GetSkeletonFileFromName(pfs, xmlAnimation.Skeleton) == null)
                 errorList.Warning("Root", $"Skeleton {xmlAnimation.Skeleton} is not found");
 
             foreach (var item in xmlAnimation.AnimationFragmentEntry)
@@ -76,7 +80,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
                 if (string.IsNullOrWhiteSpace(item.File.Value))
                     errorList.Warning(item.Slot, "Item does not have an animation");
 
-                if(pfs.FindFile(item.File.Value) == null)
+                if (pfs.FindFile(item.File.Value) == null)
                     errorList.Warning(item.Slot, $"Animation {item.File.Value} is not found");
 
                 if (item.Meta.Value != "" && pfs.FindFile(item.Meta.Value) == null)
@@ -86,7 +90,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
                     errorList.Warning(item.Slot, $"Sound {item.Sound.Value} is not found");
             }
 
-            if(errorList.Errors.Count != 0)
+            if (errorList.Errors.Count != 0)
                 ErrorListWindow.ShowDialog("Errors", errorList, false);
 
             return null;
@@ -135,7 +139,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
                     BlendInTime = item.BlendInTime.Value,
                     Ignore = false,
                     SelectionWeight = item.SelectionWeight.Value,
-                    Slot = _preferedGame == GameTypeEnum.Troy ? AnimationSlotTypeHelperTroy.GetfromValue(item.Slot) :  DefaultAnimationSlotTypeHelper.GetfromValue(item.Slot),
+                    Slot = _preferedGame == GameTypeEnum.Troy ? AnimationSlotTypeHelperTroy.GetfromValue(item.Slot) : DefaultAnimationSlotTypeHelper.GetfromValue(item.Slot),
                     Skeleton = animation.Skeleton,
                     Unknown0 = item.Unknown,
                 };
@@ -188,7 +192,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
             public BlendInTime BlendInTime { get; set; }
             [XmlElement(ElementName = "SelectionWeight")]
             public SelectionWeight SelectionWeight { get; set; }
-            
+
             [XmlElement(ElementName = "Unknown")]
             public int Unknown { get; set; }
 

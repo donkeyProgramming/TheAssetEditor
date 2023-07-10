@@ -15,13 +15,13 @@ namespace View3D.Components.Component
         string _animationText;
         GameTime _animationStart;
         bool _startAnimation;
-  
+
         private readonly ResourceLibary _resourceLibary;
         private readonly DeviceResolverComponent _deviceResolverComponent;
         private readonly KeyboardComponent _keyboardComponent;
         private readonly RenderEngineComponent _renderEngineComponent;
 
-        public LightControllerComponent(ResourceLibary resourceLibary, DeviceResolverComponent deviceResolverComponent, KeyboardComponent keyboardComponent, RenderEngineComponent renderEngineComponent) 
+        public LightControllerComponent(ResourceLibary resourceLibary, DeviceResolverComponent deviceResolverComponent, KeyboardComponent keyboardComponent, RenderEngineComponent renderEngineComponent)
         {
             _resourceLibary = resourceLibary;
             _deviceResolverComponent = deviceResolverComponent;
@@ -89,7 +89,7 @@ namespace View3D.Components.Component
             {
                 _renderEngineComponent.LightIntensityMult -= 0.05f;
                 lightIntensityChanged = true;
-            }            
+            }
             else if (_keyboardComponent.IsKeyDown(Keys.Right) && _keyboardComponent.IsKeyDown(Keys.LeftAlt))
             {
                 _renderEngineComponent.DirLightRotationDegrees_Y -= 1.0f;
@@ -139,7 +139,7 @@ namespace View3D.Components.Component
             base.Update(gameTime);
         }
 
-        
+
         public void ResetLilghtingParams()
         {
             _renderEngineComponent.LightIntensityMult = 1.0f;
@@ -177,7 +177,7 @@ namespace View3D.Components.Component
 
         public void Dispose()
         {
-            if(_spriteBatch != null)
+            if (_spriteBatch != null)
                 _spriteBatch.Dispose();
             _spriteBatch = null;
         }

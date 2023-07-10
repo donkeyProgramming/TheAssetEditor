@@ -1,12 +1,14 @@
-﻿using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
-using CommonControls.Services;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
+using CommonControls.Services;
 
 namespace CommonControls.FileTypes.AnimationPack
 {
@@ -68,7 +70,7 @@ namespace CommonControls.FileTypes.AnimationPack
 
         public AnimationSlotType TryGetFromId(int id)
         {
-            if(id >= 0 && id < Values.Count)
+            if (id >= 0 && id < Values.Count)
                 return Values[id];
             return null;
         }
@@ -93,7 +95,7 @@ namespace CommonControls.FileTypes.AnimationPack
             using (var reader = new StreamReader(stream))
             {
                 string[] result = reader.ReadToEnd().Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                for(int i = 0; i < result.Length; i++)
+                for (int i = 0; i < result.Length; i++)
                     Values.Add(new AnimationSlotType(i, result[i].Trim()));
             }
         }
@@ -202,7 +204,7 @@ namespace CommonControls.FileTypes.AnimationPack
 
         static void Create()
         {
-            if(Instance == null)
+            if (Instance == null)
                 Instance = new BaseAnimationSlotHelper(GameTypeEnum.ThreeKingdoms);
         }
 
@@ -275,7 +277,7 @@ namespace CommonControls.FileTypes.AnimationPack
 
         static void Create()
         {
-            if(Instance == null)
+            if (Instance == null)
                 Instance = new BaseAnimationSlotHelper(GameTypeEnum.Warhammer2);
         }
 

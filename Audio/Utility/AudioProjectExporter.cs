@@ -121,7 +121,7 @@ namespace Audio.Utility
                 if (mixer.NodeBaseParams.DirectParentID == 0)
                     nameDictionary.Add(mixer.Id, "RootMixer");
                 else
- 
+
                     nameDictionary.Add(mixer.Id, $"ActorMixer_{mixerCounter++}");
             }
 
@@ -132,9 +132,9 @@ namespace Audio.Utility
         }
 
         public void CreateFromRepositoryToFile(IAudioRepository repository, string bnkName, string path = "audioProject.json")
-        { 
+        {
             var project = CreateFromRepository(repository, bnkName);
-            var json = JsonSerializer.Serialize(project, new JsonSerializerOptions() { WriteIndented = true, IgnoreNullValues = true});
+            var json = JsonSerializer.Serialize(project, new JsonSerializerOptions() { WriteIndented = true, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull });
             DirectoryHelper.EnsureCreated(path);
             File.WriteAllText(path, json);
         }

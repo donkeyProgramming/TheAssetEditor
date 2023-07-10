@@ -16,7 +16,7 @@ namespace AssetEditor.DataTemplates
             FrameworkElementFactory factory = new FrameworkElementFactory(viewType);
             DataTemplate dt = new DataTemplate();
             dt.VisualTree = factory;
-            
+
             return dt;
         }
 

@@ -11,7 +11,7 @@ namespace Wh3AnimPackCreator
     public class LogService
     {
         public enum LogType
-        { 
+        {
             Error,
             Warning,
             Info,
@@ -69,8 +69,8 @@ namespace Wh3AnimPackCreator
         }
 
         public void AddBinSummary(string binName, int missingSlots, int missingEffects, int missingMetaDataTags, int missingSounds, int missingFilesRemoved)
-        { 
-        
+        {
+
         }
 
         public void Save()
@@ -122,8 +122,8 @@ namespace Wh3AnimPackCreator
         }
 
         string GetLogTypeText(LogType type)
-        { 
-            switch(type)
+        {
+            switch (type)
             {
                 case LogType.Error: return "Error";
                 case LogType.Info: return "Info";

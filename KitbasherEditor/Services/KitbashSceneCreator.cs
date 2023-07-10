@@ -35,7 +35,7 @@ namespace KitbasherEditor.Services
             SceneManager sceneManager,
             RenderEngineComponent renderEngineComponent,
             PackFileService packFileService,
-            AnimationControllerViewModel animationView, 
+            AnimationControllerViewModel animationView,
             IGeometryGraphicsContextFactory geometryFactory,
             ApplicationSettingsService applicationSettingsService)
         {
@@ -67,7 +67,7 @@ namespace KitbasherEditor.Services
             MainNode.SelectedOutputFormat = rmv.Header.Version;
 
             int meshCount = Math.Min(MainNode.Children.Count, rmv.LodHeaders.Length);
-            for(int i = 0; i < meshCount; i++)
+            for (int i = 0; i < meshCount; i++)
             {
                 if (MainNode.Children[i] is Rmv2LodNode lodNode)
                     lodNode.CameraDistance = rmv.LodHeaders[i].LodCameraDistance;
@@ -146,5 +146,5 @@ namespace KitbasherEditor.Services
             return loadedNode;
         }
     }
-        
+
 }

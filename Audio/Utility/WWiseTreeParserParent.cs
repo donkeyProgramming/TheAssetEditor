@@ -2,7 +2,6 @@
 using Audio.FileFormats.WWise.Hirc;
 using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
-using Audio.Utility;
 
 namespace Audio.AudioEditor
 {

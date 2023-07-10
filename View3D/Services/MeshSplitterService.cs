@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using View3D.Rendering.Geometry;
 
 namespace View3D.Services
@@ -25,11 +23,11 @@ namespace View3D.Services
 
         List<List<ushort>> SplitIntoSubModels(List<ushort> indexList, List<Vector3> vertextes, bool combineOverlappingVertexes)
         {
-           var selectedSubMeshes = ConverteToSubFaceObject(indexList, vertextes, combineOverlappingVertexes);
+            var selectedSubMeshes = ConverteToSubFaceObject(indexList, vertextes, combineOverlappingVertexes);
 
             var output = new List<List<ushort>>();
-           foreach (var item in selectedSubMeshes)
-           {
+            foreach (var item in selectedSubMeshes)
+            {
                 var faces = item.GetFaces();
                 var meshIndexes = new List<ushort>(faces.Count);
                 foreach (var face in faces)
@@ -41,8 +39,8 @@ namespace View3D.Services
 
                 output.Add(meshIndexes);
 
-           }
-           return output;
+            }
+            return output;
         }
 
         public List<int> GrowFaceSelection(MeshObject geometry, List<ushort> initialSelectedIndexes, bool combineOverlappingVertexes)

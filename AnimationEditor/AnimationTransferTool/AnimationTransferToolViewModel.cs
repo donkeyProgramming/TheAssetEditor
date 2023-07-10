@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using View3D.Components;
 using View3D.Scene;
+using View3D.Services;
 
 namespace AnimationEditor.AnimationTransferTool
 {
@@ -18,13 +19,14 @@ namespace AnimationEditor.AnimationTransferTool
 
         public AnimationTransferToolViewModel(
             Editor editor,
-            ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder, 
+            ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder,
             AnimationPlayerViewModel animationPlayerViewModel,
-            EventHub eventHub, 
+            EventHub eventHub,
             IComponentInserter componentInserter,
-            AssetViewModelBuilder assetViewModelBuilder, 
-            MainScene scene) 
-            : base( componentInserter, animationPlayerViewModel, scene)
+            AssetViewModelBuilder assetViewModelBuilder,
+            MainScene scene,
+            FocusSelectableObjectService focusSelectableObjectService)
+            : base(componentInserter, animationPlayerViewModel, scene, focusSelectableObjectService)
         {
             DisplayName.Value = "Animation transfer tool";
             Editor = editor;

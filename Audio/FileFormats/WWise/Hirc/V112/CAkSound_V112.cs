@@ -1,6 +1,5 @@
 ﻿using Filetypes.ByteParsing;
 using System;
-using System.Collections.Generic;
 
 namespace Audio.FileFormats.WWise.Hirc.V112
 {

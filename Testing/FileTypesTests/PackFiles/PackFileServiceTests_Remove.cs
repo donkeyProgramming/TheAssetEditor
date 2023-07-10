@@ -1,8 +1,4 @@
-﻿using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
-using NUnit.Framework;
-
-namespace FileTypesTests.PackFiles
+﻿namespace FileTypesTests.PackFiles
 {
     class PackFileServiceTests_Remove
     {

@@ -66,7 +66,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public ActionType GetActionType() => ActionType;
         public uint GetChildId() => idExt;
 
-        public uint GetStateGroupId() =>  AkSetStateParams.ulStateGroupID;
+        public uint GetStateGroupId() => AkSetStateParams.ulStateGroupID;
     }
 
     public class AkPlayActionParams

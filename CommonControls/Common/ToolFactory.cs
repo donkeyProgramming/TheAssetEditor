@@ -1,15 +1,17 @@
-﻿using CommonControls.BaseDialogs.ToolSelector;
-using CommonControls.Events.Global;
-using Microsoft.Extensions.DependencyInjection;
-using Serilog;
-using SharpDX.MediaFoundation;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using static CommonControls.Editors.AnimationPack.Converters.AnimationBinWh3FileToXmlConverter;
+using CommonControls.BaseDialogs.ToolSelector;
+using CommonControls.Events.Global;
+using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace CommonControls.Common
 {
@@ -26,7 +28,7 @@ namespace CommonControls.Common
             EditorType = editorDisplayName;
         }
 
-        public EditorEnums EditorType {get; private set;}
+        public EditorEnums EditorType { get; private set; }
 
         public PackFileToToolSelectorResult CanOpen(string fullPath)
         {
@@ -34,7 +36,7 @@ namespace CommonControls.Common
             if (extention.Contains("{") && extention.Contains("}"))
             {
                 var ext2 = Regex.Match(extention, @"\..*\.(.*)\.(.*)");
-                if(ext2.Success)
+                if (ext2.Success)
                 {
                     extention = "." + ext2.Groups[1].Value + "." + ext2.Groups[2].Value;
                 }
@@ -47,7 +49,7 @@ namespace CommonControls.Common
                 foreach (var validExt in _validExtentionsCore)
                 {
                     if (validExt == extention)
-                        return new PackFileToToolSelectorResult() { CanOpen = true, IsCoreTool = true};
+                        return new PackFileToToolSelectorResult() { CanOpen = true, IsCoreTool = true };
                 }
             }
 
@@ -100,7 +102,7 @@ namespace CommonControls.Common
             where View : Control;
     }
 
-    public class ToolFactory :IToolFactory
+    public class ToolFactory : IToolFactory
     {
         ILogger _logger = Logging.Create<IToolFactory>();
         IServiceProvider _serviceProvider;
@@ -190,7 +192,7 @@ namespace CommonControls.Common
             {
                 var result = toolLoopUp.Key.CanOpen(filename);
                 if (result.CanOpen)
-                    output.Add(new ToolInformation() { EditorType = toolLoopUp.Key .EditorType, IsCoreTool = result.IsCoreTool, Type = toolLoopUp.Value});
+                    output.Add(new ToolInformation() { EditorType = toolLoopUp.Key.EditorType, IsCoreTool = result.IsCoreTool, Type = toolLoopUp.Value });
             }
 
             if (output.Count == 0)
@@ -200,7 +202,7 @@ namespace CommonControls.Common
                 return new List<ToolInformation>();
             }
 
-            return output.OrderBy(x=>x.IsCoreTool).ToList();
+            return output.OrderBy(x => x.IsCoreTool).ToList();
         }
 
         public ViewModel Create<ViewModel>() where ViewModel : IEditorViewModel
@@ -216,7 +218,7 @@ namespace CommonControls.Common
     }
 
     class ToolInformation
-    { 
+    {
         public EditorEnums EditorType { get; set; }
         public bool IsCoreTool { get; set; } = false;
         public Type Type { get; set; }

@@ -1,7 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using Microsoft.Xna.Framework;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
@@ -9,6 +10,6 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     public class CameraShakePos : DecodedMetaEntryBase
     {
         [MetaDataTag(5)]
-        public Vector3 Position{ get; set; }
+        public Vector3 Position { get; set; }
     }
 }

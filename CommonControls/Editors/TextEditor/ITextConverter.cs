@@ -1,6 +1,9 @@
-﻿using CommonControls.Services;
-using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System.Xml.Serialization;
+using CommonControls.Services;
 
 namespace CommonControls.Editors.TextEditor
 {
@@ -9,7 +12,7 @@ namespace CommonControls.Editors.TextEditor
         public class SaveError
         {
             public string Text { get; set; }
-            public int ErrorLineNumber{ get; set; } = 1;
+            public int ErrorLineNumber { get; set; } = 1;
             public int ErrorPosition { get; set; } = 0;
             public int ErrorLength { get; set; } = 0;
         }

@@ -1,9 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using View3D.Rendering;
 using View3D.SceneNodes;
 
 namespace View3D.Components.Component.Selection
@@ -95,7 +92,7 @@ namespace View3D.Components.Component.Selection
                 if (dist < closest)
                     closest = dist;
             }
-            return closest;        
+            return closest;
         }
 
         public List<int> CurrentSelection()

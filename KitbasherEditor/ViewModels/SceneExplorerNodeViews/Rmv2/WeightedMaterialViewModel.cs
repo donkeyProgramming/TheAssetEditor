@@ -46,8 +46,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             StringParameters = new ObservableCollection<string>(_weightedMaterial.StringParams);
             FloatParameters = new ObservableCollection<float>(_weightedMaterial.FloatParams);
             IntParameters = new ObservableCollection<int>(_weightedMaterial.IntParams);
-            TextureParameters = new ObservableCollection<string>(_weightedMaterial.TexturesParams.Select(x=>x.TexureType + " - " + x.Path));
-            AttachmentPointParameters = new ObservableCollection<string>(_weightedMaterial.AttachmentPointParams.Select(x => x.BoneIndex+ " - " + x.Name + " Ident:" + x.Matrix.IsIdentity()));
+            TextureParameters = new ObservableCollection<string>(_weightedMaterial.TexturesParams.Select(x => x.TexureType + " - " + x.Path));
+            AttachmentPointParameters = new ObservableCollection<string>(_weightedMaterial.AttachmentPointParams.Select(x => x.BoneIndex + " - " + x.Name + " Ident:" + x.Matrix.IsIdentity()));
             VectorParameters = new ObservableCollection<string>(_weightedMaterial.Vec4Params.Select(x => $"[{x.X}] [{x.Y}] [{x.Z}] [{x.W}]"));
 
             SetDefaultParentMatrixIndexCommand = new RelayCommand(SetDefaultParentMatrix);

@@ -1,10 +1,14 @@
-﻿using CommonControls.FileTypes.PackFiles.Models;
-using Filetypes.ByteParsing;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using CommonControls.FileTypes.PackFiles.Models;
+using Filetypes.ByteParsing;
 
 namespace CommonControls.FormatResearch
 {
@@ -163,7 +167,8 @@ namespace CommonControls.FormatResearch
                 if (double.TryParse(allValues.First(), out _))
                 {
                     var decimals = allValues
-                        .Select(x => {
+                        .Select(x =>
+                        {
                             double? output = null;
                             if (double.TryParse(x, out var result))
                                 return result;
@@ -180,8 +185,8 @@ namespace CommonControls.FormatResearch
                     {
                         range = (decimal)(max - min);
                     }
-                  
-                    
+
+
                 }
 
                 var allValuesGrouped = allItemsOfType
@@ -322,7 +327,7 @@ namespace CommonControls.FormatResearch
 
         public string SanitizeStringBasic(string input, bool nullToSpace)
         {
-            var cpy = string.Copy(input);
+            var cpy = new string(input);
             cpy = cpy.Replace('\n', '|');
             if (nullToSpace)
                 cpy = cpy.Replace('\0', ' ');
@@ -341,7 +346,7 @@ namespace CommonControls.FormatResearch
                 Console.WriteLine($"\t{item.Type}: {item.FailedItems}[Failed] / {item.TotalItems}[Total] = {(1.0f - item.FailPercentage) * 100}[%OK] {rangeStr}");
                 Console.WriteLine($"\t--------------------------------------------------------------");
 
-               // if (item.FailPercentage < 0.10f)
+                // if (item.FailPercentage < 0.10f)
                 {
                     var longestItem = item.PossibleValues
                           .OrderByDescending(x => x.Length)
@@ -381,7 +386,7 @@ namespace CommonControls.FormatResearch
             }
         }
 
-  
+
 
 
 

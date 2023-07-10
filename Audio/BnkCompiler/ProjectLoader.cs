@@ -23,7 +23,7 @@ namespace Audio.BnkCompiler
         public Result<CompilerData> LoadProject(string path, CompilerSettings settings)
         {
             var packfile = _pfs.FindFile(path);
-            if(packfile == null)
+            if (packfile == null)
                 return Result<CompilerData>.FromError("BnkCompiler-Loader", $"Unable to find file '{path}'");
             return LoadProject(packfile, settings);
         }
@@ -35,7 +35,7 @@ namespace Audio.BnkCompiler
                 // Load the file
                 var bytes = packfile.DataSource.ReadData();
                 var str = Encoding.UTF8.GetString(bytes);
-                var projectFile = JsonConvert.DeserializeObject<CompilerInputProject>(str, new JsonSerializerSettings() { MissingMemberHandling = MissingMemberHandling.Error});
+                var projectFile = JsonConvert.DeserializeObject<CompilerInputProject>(str, new JsonSerializerSettings() { MissingMemberHandling = MissingMemberHandling.Error });
                 if (projectFile == null)
                     return Result<CompilerData>.FromError("BnkCompiler-Loader", "Unable to load file. Please validate the Json using an online validator.");
 
@@ -83,7 +83,7 @@ namespace Audio.BnkCompiler
             var result = validator.Validate(projectFile);
             if (result.IsValid == false)
                 return Result<bool>.FromError("BnkCompiler-Validation", result);
-            
+
             // Validate for name collisions and uniqe ids
 
             return Result<bool>.FromOk(true);

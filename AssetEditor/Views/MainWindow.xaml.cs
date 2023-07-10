@@ -79,7 +79,7 @@ namespace AssetEditor.Views
             {
                 var dropTargetItem = sender as TabItem;
                 var pos = e.GetPosition(dropTargetItem);
-                bool insertAfterTargetNode = pos.X-dropTargetItem.ActualWidth/2 > 0;
+                bool insertAfterTargetNode = pos.X - dropTargetItem.ActualWidth / 2 > 0;
 
                 if (DataContext is IDropTarget<IEditorViewModel, bool> dropContainer)
                 {
@@ -98,7 +98,7 @@ namespace AssetEditor.Views
                     }
                 }
             }
-            catch 
+            catch
             {
             }
         }

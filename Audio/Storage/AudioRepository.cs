@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography.Xml;
 using System.Text;
 
 namespace Audio.Storage
@@ -42,7 +41,7 @@ namespace Audio.Storage
 
         public List<HircItem> GetHircObject(uint id, string owningFileName)
         {
-            var hircs = GetHircObject(id).Where(x=>x.OwnerFile == owningFileName).ToList();
+            var hircs = GetHircObject(id).Where(x => x.OwnerFile == owningFileName).ToList();
             return hircs;
         }
 
@@ -56,10 +55,10 @@ namespace Audio.Storage
         }
 
 
-        public List<T> GetAllOfType<T>() where T : HircItem 
+        public List<T> GetAllOfType<T>() where T : HircItem
         {
             return HircObjects
-                .SelectMany(x=>x.Value)
+                .SelectMany(x => x.Value)
                 .Select(x => x as T)
                 .Where(x => x != null)
                 .ToList();

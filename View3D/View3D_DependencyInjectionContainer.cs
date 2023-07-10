@@ -1,22 +1,22 @@
 ﻿using CommonControls.Common;
 using Microsoft.Extensions.DependencyInjection;
-using View3D.Components.Component.Selection;
-using View3D.Components.Component;
-using View3D.Components.Gizmo;
-using View3D.Components.Input;
-using View3D.Components.Rendering;
-using View3D.Components;
-using View3D.Utility;
 using Microsoft.Xna.Framework;
+using MonoGame.Framework.WpfInterop;
+using View3D.Animation.MetaData;
+using View3D.Commands;
 using View3D.Commands.Face;
 using View3D.Commands.Object;
 using View3D.Commands.Vertex;
-using View3D.Commands;
-using MonoGame.Framework.WpfInterop;
+using View3D.Components;
+using View3D.Components.Component;
+using View3D.Components.Component.Selection;
+using View3D.Components.Gizmo;
+using View3D.Components.Input;
+using View3D.Components.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.Scene;
 using View3D.Services;
-using View3D.Animation.MetaData;
+using View3D.Utility;
 
 namespace View3D
 {
@@ -38,7 +38,7 @@ namespace View3D
             serviceCollection.AddScoped<FaceEditor>();
             serviceCollection.AddScoped<ObjectEditor>();
             serviceCollection.AddScoped<MetaDataFactory>(); // Needs heavy refactorying!
-            
+
             // Resolvers - sort of hacks 
             serviceCollection.AddScoped<IDeviceResolver, DeviceResolverComponent>(x => x.GetService<DeviceResolverComponent>());
             serviceCollection.AddScoped<ActiveFileResolver>();
@@ -102,9 +102,9 @@ namespace View3D
 
     public class DependencyContainer
     {
-        public virtual void Register(IServiceCollection serviceCollection){}
+        public virtual void Register(IServiceCollection serviceCollection) { }
 
-        public virtual void RegisterTools(IToolFactory factory){  }
+        public virtual void RegisterTools(IToolFactory factory) { }
 
         protected void RegisterGameComponent<T>(IServiceCollection serviceCollection) where T : class, IGameComponent
         {

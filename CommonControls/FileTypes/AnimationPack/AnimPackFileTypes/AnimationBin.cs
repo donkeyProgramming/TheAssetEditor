@@ -1,7 +1,11 @@
-﻿using CommonControls.Common;
-using Filetypes.ByteParsing;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System.Collections.Generic;
 using System.IO;
+using CommonControls.Common;
+using Filetypes.ByteParsing;
 
 namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
 {
@@ -18,7 +22,7 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
         public AnimationBin(string fileName, byte[] data = null)
         {
             FileName = fileName;
-            if(data != null)
+            if (data != null)
                 CreateFromBytes(data);
         }
 

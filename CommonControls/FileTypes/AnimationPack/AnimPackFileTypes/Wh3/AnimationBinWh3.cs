@@ -1,9 +1,12 @@
-﻿using CommonControls.Common;
-using Filetypes.ByteParsing;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using CommonControls.Common;
+using Filetypes.ByteParsing;
 
 namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
 {
@@ -36,7 +39,7 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
             using MemoryStream memStream = new MemoryStream();
 
             memStream.Write(ByteParsers.UInt32.EncodeValue(TableVersion, out _));
-            if(TableVersion == 4)
+            if (TableVersion == 4)
                 memStream.Write(ByteParsers.UInt32.EncodeValue(TableSubVersion, out _));
 
             memStream.Write(ByteParsers.String.WriteCaString(Name.ToLower()));
@@ -111,7 +114,7 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
             SkeletonName = chunk.ReadString();
             LocomotionGraph = chunk.ReadString();
             UnknownValue1 = chunk.ReadShort();
-            
+
             LoadAnimationBinEntry(chunk);
         }
 
@@ -157,10 +160,10 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
         }
 
         string IAnimationBinGenericFormat.Name { get => Name; }
-        string IAnimationBinGenericFormat.SkeletonName { get => SkeletonName;}
-        List<AnimationBinEntryGenericFormat> IAnimationBinGenericFormat.Entries 
+        string IAnimationBinGenericFormat.SkeletonName { get => SkeletonName; }
+        List<AnimationBinEntryGenericFormat> IAnimationBinGenericFormat.Entries
         {
-            get 
+            get
             {
 
                 var output = new List<AnimationBinEntryGenericFormat>();
@@ -193,7 +196,7 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
                 }
 
                 return output;
-            } 
+            }
         }
 
         string IAnimationBinGenericFormat.FullPath => FileName;
@@ -205,12 +208,12 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
     {
         public uint AnimationId { get; set; }
         public float BlendIn { get; set; }
-        public float SelectionWeight{ get; set; }
+        public float SelectionWeight { get; set; }
         public int WeaponBools { get; set; }
         public bool Unk { get; set; } = false;
         public List<AnimationRef> AnimationRefs { get; set; } = new List<AnimationRef>();
 
-        public class AnimationRef 
+        public class AnimationRef
         {
             public string AnimationFile { get; set; }
             public string AnimationMetaFile { get; set; }

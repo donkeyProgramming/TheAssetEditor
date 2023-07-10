@@ -21,7 +21,7 @@ namespace View3D.Utility
 
         public Matrix GetWorldTransformIfAnimating()
         {
-            if(_animationProvider.Skeleton != null && _animationProvider.Skeleton.AnimationPlayer.IsEnabled && _animationProvider.Skeleton.AnimationPlayer.IsPlaying && _boneIndex != -1)
+            if (_animationProvider.Skeleton != null && _animationProvider.Skeleton.AnimationPlayer.IsEnabled && _animationProvider.Skeleton.AnimationPlayer.IsPlaying && _boneIndex != -1)
                 return _animationProvider.Skeleton.GetAnimatedWorldTranform(_boneIndex);
             return Matrix.Identity;
         }

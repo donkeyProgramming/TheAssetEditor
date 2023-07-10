@@ -1,7 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace View3D.Rendering
 {
@@ -19,7 +16,7 @@ namespace View3D.Rendering
     }
 
     public enum RenderFormats
-    { 
+    {
         SpecGloss,
         MetalRoughness
     }

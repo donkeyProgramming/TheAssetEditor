@@ -12,7 +12,7 @@ namespace View3D.Components
     public class DeviceResolverComponent : BaseComponent, IDeviceResolver
     {
         MainScene _scene;
-        public DeviceResolverComponent(MainScene game) 
+        public DeviceResolverComponent(MainScene game)
         {
             _scene = game;
         }

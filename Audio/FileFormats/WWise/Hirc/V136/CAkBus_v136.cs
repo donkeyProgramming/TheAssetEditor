@@ -1,7 +1,6 @@
 ﻿using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Audio.FileFormats.WWise.Hirc.V136
 {
@@ -23,12 +22,12 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         protected override void CreateSpesificData(ByteChunk chunk)
         {
             if (Id == 2665947595)
-            { 
-            
+            {
+
             }
 
             OverrideBusId = chunk.ReadUInt32();
-            if(OverrideBusId == 0)
+            if (OverrideBusId == 0)
                 idDeviceShareset = chunk.ReadUInt32();
             BusInitialParams = BusInitialParams.Create(chunk);
             RecoveryTime = chunk.ReadSingle();
@@ -37,7 +36,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             BusInitialFxParams = BusInitialFxParams.Create(chunk);
             bOverrideAttachmentParams = chunk.ReadByte();
             InitialRTPC = InitialRTPC.Create(chunk);
-            StateChunk = StateChunk.Create(chunk);  
+            StateChunk = StateChunk.Create(chunk);
         }
 
         public override void UpdateSize() => throw new NotImplementedException();
@@ -98,8 +97,8 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             if (instance.uNumFx != 0)
                 instance.bitsFXBypass = chunk.ReadByte();
 
-            for(uint i = 0; i < instance.uNumFx; i++)
-                instance.FXChunkList.Add(FXChunk.Create(chunk));    
+            for (uint i = 0; i < instance.uNumFx; i++)
+                instance.FXChunkList.Add(FXChunk.Create(chunk));
 
             instance.fxID_0 = chunk.ReadUInt32();
             instance.bIsShareSet_0 = chunk.ReadByte();

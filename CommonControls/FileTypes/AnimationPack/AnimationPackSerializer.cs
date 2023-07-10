@@ -1,11 +1,15 @@
-﻿using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
-using Filetypes.ByteParsing;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
+using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.Services;
+using Filetypes.ByteParsing;
 
 namespace CommonControls.FileTypes.AnimationPack
 {
@@ -34,7 +38,7 @@ namespace CommonControls.FileTypes.AnimationPack
         }
     }
 
-    
+
 
     public static class AnimationPackSerializer
     {
@@ -56,7 +60,7 @@ namespace CommonControls.FileTypes.AnimationPack
                 else if (fullPath.Contains("trigger_database", StringComparison.InvariantCultureIgnoreCase))
                     return new UnknownAnimFileSerializer();
             }
-           
+
             else
             {
                 if (fullPath.Contains(".frg", StringComparison.InvariantCultureIgnoreCase))
@@ -143,7 +147,7 @@ namespace CommonControls.FileTypes.AnimationPack
 
     public class UnknownAnimFileSerializer : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data, GameTypeEnum preferedGam ) => new UnknownAnimFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data, GameTypeEnum preferedGam) => new UnknownAnimFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
     }
 
     public class AnimationSetFileSerializer : IAnimFileSerializer
@@ -214,5 +218,5 @@ namespace CommonControls.FileTypes.AnimationPack
     {
     }
 
-  
+
 }

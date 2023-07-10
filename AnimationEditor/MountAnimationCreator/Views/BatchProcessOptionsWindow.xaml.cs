@@ -15,10 +15,10 @@ namespace AnimationEditor.MountAnimationCreator
 
         public static BatchProcessOptions ShowDialog(string fragmentName, string savePrefix)
         {
-            var options = new BatchProcessOptions() { FragmentName = fragmentName,SavePrefix = savePrefix };
+            var options = new BatchProcessOptions() { FragmentName = fragmentName, SavePrefix = savePrefix };
             var window = new BatchProcessOptionsWindow();
             window.DataContext = options;
-            if(window.ShowDialog() == true)
+            if (window.ShowDialog() == true)
                 return options;
             return null;
         }

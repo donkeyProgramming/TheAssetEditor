@@ -110,10 +110,10 @@ namespace Audio.BnkCompiler
             if (_pfs.FindFile(path) != null)
             {
                 var filename = Path.GetFileNameWithoutExtension(path);
-  
+
                 // Check if file has correct naming
                 var convertResult = uint.TryParse(filename, out var _);
-                if(convertResult == false)
+                if (convertResult == false)
                     return SoundFileImportType.PackFile;
 
                 // Check if file has correct extension
@@ -124,7 +124,7 @@ namespace Audio.BnkCompiler
                 // Check if file is in correct folder
                 var filePath = Path.GetDirectoryName(path);
                 var expectedFolder = GetExpectedFolder(compilerData);
-                if(string.Compare(filePath, expectedFolder, true) != 0)
+                if (string.Compare(filePath, expectedFolder, true) != 0)
                     return SoundFileImportType.PackFile;
 
                 return SoundFileImportType.None;
@@ -145,12 +145,12 @@ namespace Audio.BnkCompiler
 
 
         enum SoundFileImportType
-        { 
+        {
             None,
             Unknown,
             Disk,
             PackFile
         }
-        
+
     }
 }

@@ -12,14 +12,14 @@ namespace Audio.BnkCompiler.Validation
         public AudioProjectXmlValidator(PackFileService pfs, CompilerData projectXml)
         {
             var allItems = GetAllItems(projectXml);
-            
+
             RuleFor(x => x).NotNull().WithMessage("Project file is missing");
 
             RuleFor(x => x.ProjectSettings).SetValidator(new SettingsValidator());
             RuleFor(x => x.GameSounds).ForEach(x => x.SetValidator(new GameSoundValidator(pfs)));
             RuleFor(x => x.Actions).ForEach(x => x.SetValidator(new ActionValidator(allItems)));
             RuleFor(x => x.Events).ForEach(x => x.SetValidator(new EventValidator(allItems)));
-            
+
             // Validate that all ids are Uniqe
             RuleFor(x => x).Custom((projectFile, context) => ValidateUniqeIds(projectXml, context));
         }
@@ -114,17 +114,17 @@ namespace Audio.BnkCompiler.Validation
                 });
         }
 
-       // private void EnsureIsValidPackFileRef(GameSound gamesound, PackFileService pfs, ValidationContext<GameSound> context)
-       // {
-       //     if (pfs.FindFile(gamesound.Path) == null)
-       //         context.AddFailure($"{gamesound.Name} - Path does not poing to a valid packfile '{gamesound.Path}'");
-       // }
-       //
-       // private void EnsureValidFileSystemRef(GameSound gamesound, ValidationContext<GameSound> context)
-       // {
-       //     if (File.Exists(gamesound.SystemFilePath) == false)
-       //         context.AddFailure($"{gamesound.Name} - SystemFilePath does not poing to a valid file on disk '{gamesound.SystemFilePath}'");
-       // }
+        // private void EnsureIsValidPackFileRef(GameSound gamesound, PackFileService pfs, ValidationContext<GameSound> context)
+        // {
+        //     if (pfs.FindFile(gamesound.Path) == null)
+        //         context.AddFailure($"{gamesound.Name} - Path does not poing to a valid packfile '{gamesound.Path}'");
+        // }
+        //
+        // private void EnsureValidFileSystemRef(GameSound gamesound, ValidationContext<GameSound> context)
+        // {
+        //     if (File.Exists(gamesound.SystemFilePath) == false)
+        //         context.AddFailure($"{gamesound.Name} - SystemFilePath does not poing to a valid file on disk '{gamesound.SystemFilePath}'");
+        // }
     }
 
     public class SettingsValidator : AbstractValidator<ProjectSettings>

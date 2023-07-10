@@ -1,9 +1,7 @@
 ﻿using CommonControls.BaseDialogs.ErrorListDialog;
 using CommonControls.FileTypes.RigidModel;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using View3D.SceneNodes;
 using View3D.Utility;
 
@@ -14,7 +12,7 @@ namespace View3D.Services
         private readonly ObjectEditor _objectEditor;
 
         public class Settings
-        { 
+        {
             public float LodRectionFactor { get; set; }
             public bool OptimizeAlpha { get; set; }
             public bool OptimizeVertex { get; set; }
@@ -81,10 +79,10 @@ namespace View3D.Services
                 {
                     foreach (var mesh in originalMeshClone)
                     {
-                        if(mesh.Geometry.VertexFormat != UiVertexFormat.Static)
+                        if (mesh.Geometry.VertexFormat != UiVertexFormat.Static)
                             mesh.Geometry.ChangeVertexType(UiVertexFormat.Weighted, mesh.Geometry.ParentSkeletonName);
 
-                        if(settings[lodIndex].OptimizeAlpha)
+                        if (settings[lodIndex].OptimizeAlpha)
                             mesh.Material.AlphaMode = AlphaMode.Opaque;
                     }
 
@@ -92,7 +90,7 @@ namespace View3D.Services
                     var errorList = new ErrorListViewModel.ErrorList();
                     var canCombine = ModelCombiner.HasPotentialCombineMeshes(originalMeshClone, out errorList);
                     if (canCombine)
-                        originalMeshClone = ModelCombiner.CombineMeshes(originalMeshClone, addPrefix:false);
+                        originalMeshClone = ModelCombiner.CombineMeshes(originalMeshClone, addPrefix: false);
                 }
 
                 // Reduce the polygon count

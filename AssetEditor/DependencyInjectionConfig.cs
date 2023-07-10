@@ -1,8 +1,10 @@
 ﻿using AnimationEditor;
+using AssetEditor.UiCommands;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
 using Audio;
+using Common;
 using CommonControls.Common;
 using CommonControls.Editors.AnimationFilePreviewEditor;
 using CommonControls.Editors.AnimationPack;
@@ -11,6 +13,9 @@ using CommonControls.Editors.CampaignAnimBin;
 using CommonControls.Editors.TextEditor;
 using CommonControls.Editors.VariantMeshDefinition;
 using CommonControls.Editors.Wtui;
+using CommonControls.Events.Global;
+using CommonControls.Events.UiCommands;
+using CommonControls.FileTypes.MetaData;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Resources;
 using CommonControls.Services;
@@ -19,11 +24,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using TextureEditor;
 using View3D;
-using Common;
-using CommonControls.FileTypes.MetaData;
-using AssetEditor.UiCommands;
-using CommonControls.Events.Global;
-using CommonControls.Events.UiCommands;
 
 namespace AssetEditor
 {
@@ -72,7 +72,7 @@ namespace AssetEditor
             services.AddSingleton<ScopeRepository>();
             services.AddScoped<EventHub>();
             services.AddScoped<SubToolWindowCreator>();
-            
+
             services.AddScoped<MainWindow>();
             services.AddScoped<MainViewModel>();
             services.AddScoped<IEditorCreator, EditorCreator>();
@@ -88,7 +88,7 @@ namespace AssetEditor
             services.AddScoped<MenuBarViewModel>();
 
             services.AddTransient<DevelopmentConfiguration>();
-            
+
 
             foreach (var container in dependencyContainers)
                 container.Register(services);

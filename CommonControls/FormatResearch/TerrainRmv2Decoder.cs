@@ -1,14 +1,16 @@
-﻿using CommonControls.FileTypes;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using CommonControls.FileTypes;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.RigidModel.Vertex;
 using CommonControls.Services;
 using Filetypes.ByteParsing;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using static CommonControls.FormatResearch.DecoderHelper;
 
 namespace CommonControls.FormatResearch
@@ -25,7 +27,7 @@ namespace CommonControls.FormatResearch
 
         static PackFileService _pfs;
 
-        static List<PackFile> GetFilesTiles(PackFileService pfs) 
+        static List<PackFile> GetFilesTiles(PackFileService pfs)
         {
             return pfs.FindAllFilesInDirectory(@"terrain\tiles\campaign")
                  .Where(x => Path.GetExtension(x.Name) == ".rigid_model_v2").ToList();
@@ -216,15 +218,15 @@ namespace CommonControls.FormatResearch
                 //var g2 = chunk.ReadFloat16();
                 //var g3 = chunk.ReadFloat16();
 
-                var d0 = VertexLoadHelper.ByteToNormal( chunk.ReadByte() );
-                var d1 = VertexLoadHelper.ByteToNormal( chunk.ReadByte() );
-                var d2 = VertexLoadHelper.ByteToNormal( chunk.ReadByte() );
+                var d0 = VertexLoadHelper.ByteToNormal(chunk.ReadByte());
+                var d1 = VertexLoadHelper.ByteToNormal(chunk.ReadByte());
+                var d2 = VertexLoadHelper.ByteToNormal(chunk.ReadByte());
 
-                var d3 = VertexLoadHelper.ByteToNormal( chunk.ReadByte() );
-                var d4 = VertexLoadHelper.ByteToNormal( chunk.ReadByte() );
-                var d5 = VertexLoadHelper.ByteToNormal( chunk.ReadByte() );
+                var d3 = VertexLoadHelper.ByteToNormal(chunk.ReadByte());
+                var d4 = VertexLoadHelper.ByteToNormal(chunk.ReadByte());
+                var d5 = VertexLoadHelper.ByteToNormal(chunk.ReadByte());
 
-                var t = chunk.PeakUnknown(36 - (4*4));
+                var t = chunk.PeakUnknown(36 - (4 * 4));
 
                 var f16 = t.SelectMany(x => x.Data.Where(y => y.Type == DbTypesEnum.Float16)).ToArray();
                 var f32 = t.SelectMany(x => x.Data.Where(y => y.Type == DbTypesEnum.Single)).ToArray();

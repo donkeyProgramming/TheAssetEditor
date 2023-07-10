@@ -1,18 +1,18 @@
-﻿using Microsoft.Xna.Framework;
-using SharpDX.Mathematics.Interop;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using Microsoft.Xna.Framework;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
     public interface IEffectMeta
-    { 
+    {
         public string VfxName { get; set; }
     }
-    
+
     [MetaData("EFFECT", 1)]
-    public class Effect_v1: DecodedMetaEntryBase_v1, IEffectMeta
+    public class Effect_v1 : DecodedMetaEntryBase_v1, IEffectMeta
     {
         [MetaDataTag(3, "Name of the VFX's .xml file in the vfx folder. Leave off the file extension. Note that for this you don't need to add custom vfx to the particles db table and they still require a \"movie\"-type .pack for them to be loaded.")]
         public string VfxName { get; set; } = "";
@@ -29,9 +29,9 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         [MetaDataTag(7, "Bone the effect is attached to, use -1 for it to just spawn and not follow animations")]
         public int NodeIndex { get; set; }
     }
-    
+
     [MetaData("EFFECT", 2)]
-    public class Effect_v2:  DecodedMetaEntryBase_v2, IEffectMeta
+    public class Effect_v2 : DecodedMetaEntryBase_v2, IEffectMeta
     {
         [MetaDataTag(4, "Name of the VFX's .xml file in the vfx folder. Leave off the file extension. Note that for this you don't need to add custom vfx to the particles db table and they still require a \"movie\"-type .pack for them to be loaded.")]
         public string VfxName { get; set; } = "";
@@ -55,9 +55,9 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         [MetaDataTag(9, "Scale of the effect")]
         public float Scale { get; set; } = 1;
     }
-    
+
     [MetaData("EFFECT", 4)]
-    public class Effect_v4: Effect_v2
+    public class Effect_v4 : Effect_v2
     {
         //TODO: exactly same ???
     }
@@ -67,13 +67,13 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     {
         //TODO: exactly same ???
     }
-    
+
     [MetaData("EFFECT", 7)]
-    public class Effect_v7:  DecodedMetaEntryBase_v2, IEffectMeta
+    public class Effect_v7 : DecodedMetaEntryBase_v2, IEffectMeta
     {
         [MetaDataTag(4, "Name of the VFX's .xml file in the vfx folder. Leave off the file extension. Note that for this you don't need to add custom vfx to the particles db table and they still require a \"movie\"-type .pack for them to be loaded.")]
         public string VfxName { get; set; } = "";
-        
+
         [MetaDataTag(5)]
         public bool Tracking { get; set; }
 

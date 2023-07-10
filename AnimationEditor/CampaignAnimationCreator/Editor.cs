@@ -22,7 +22,7 @@ namespace AnimationEditor.CampaignAnimationCreator
         {
             _assetViewModelEditor = assetViewModelEditor;
             _pfs = pfs;
-        
+
 
         }
 

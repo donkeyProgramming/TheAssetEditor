@@ -15,7 +15,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
         public override void UpdateSize()
         {
-            Size = BnkChunkHeader.HeaderByteSize + Children.GetSize() + NodeBaseParams.GetSize()-4;
+            Size = BnkChunkHeader.HeaderByteSize + Children.GetSize() + NodeBaseParams.GetSize() - 4;
         }
 
         public override byte[] GetAsByteArray()

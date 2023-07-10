@@ -1,6 +1,10 @@
-﻿using System;
-using Microsoft.Xaml.Behaviors;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using System;
 using System.Windows;
+using Microsoft.Xaml.Behaviors;
 
 namespace CommonControls.Editors.TextEditor
 {
@@ -47,16 +51,16 @@ namespace CommonControls.Editors.TextEditor
             var behavior = dependencyObject as AvalonEditBehaviour;
             if (behavior.AssociatedObject != null)
             {
-               var editor = behavior.AssociatedObject as ICSharpCode.AvalonEdit.TextEditor;
-               if (editor.Document != null && dependencyPropertyChangedEventArgs.NewValue != null)
-               {
-                   var caretOffset = editor.CaretOffset;
-                   editor.Document.Text = dependencyPropertyChangedEventArgs.NewValue.ToString();
+                var editor = behavior.AssociatedObject as ICSharpCode.AvalonEdit.TextEditor;
+                if (editor.Document != null && dependencyPropertyChangedEventArgs.NewValue != null)
+                {
+                    var caretOffset = editor.CaretOffset;
+                    editor.Document.Text = dependencyPropertyChangedEventArgs.NewValue.ToString();
 
                     if (caretOffset >= editor.Text.Length)
                         caretOffset = 0;
-                   editor.CaretOffset = caretOffset;
-               }
+                    editor.CaretOffset = caretOffset;
+                }
             }
         }
     }

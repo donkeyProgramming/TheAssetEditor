@@ -1,14 +1,18 @@
-﻿using CommonControls.Editors.TextEditor;
-using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
-using CommonControls.Services;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
+using CommonControls.Editors.TextEditor;
+using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
+using CommonControls.Services;
 
 namespace CommonControls.Editors.AnimationPack.Converters
 {
-    public class AnimationBinFileToXmlConverter : BaseAnimConverter<AnimationBinFileToXmlConverter.Bin, FileTypes.AnimationPack.AnimPackFileTypes.AnimationBin>  
+    public class AnimationBinFileToXmlConverter : BaseAnimConverter<AnimationBinFileToXmlConverter.Bin, FileTypes.AnimationPack.AnimPackFileTypes.AnimationBin>
     {
         protected override string CleanUpXml(string xmlText)
         {
@@ -17,7 +21,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
             return xmlText;
         }
 
-        protected override  Bin ConvertBytesToXmlClass(byte[] bytes)
+        protected override Bin ConvertBytesToXmlClass(byte[] bytes)
         {
             FileTypes.AnimationPack.AnimPackFileTypes.AnimationBin binFile = new FileTypes.AnimationPack.AnimPackFileTypes.AnimationBin("", bytes);
             var outputBin = new Bin();

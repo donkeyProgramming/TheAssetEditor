@@ -86,7 +86,7 @@ namespace Audio.Utility
 
             pushList.Pop();
         }
-        
+
         public void CustomExportDialogEventsToFile(CAkDialogueEvent_v136 dialogEvent, bool openFile = false)
         {
             if (dialogEvent == null)
@@ -134,7 +134,7 @@ namespace Audio.Utility
             outputList.Add($"{keyName}|{cNode.uWeight}|{cNode.uProbability}|{cNode.IsAudioNode()}|{audioNodeName}|{pId}");
             var cId = outputList.Count - 1;
             foreach (var child in cNode.Children)
-                GenerateCustomRow(child, cId, depth+1, gkeys, outputList, audioRepository);
+                GenerateCustomRow(child, cId, depth + 1, gkeys, outputList, audioRepository);
         }
 
 

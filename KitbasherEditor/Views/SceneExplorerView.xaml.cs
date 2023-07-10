@@ -1,20 +1,10 @@
-﻿using CommonControls.Behaviors;
-using KitbasherEditor.ViewModels;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using View3D.Components.Component;
 using View3D.SceneNodes;
 
 namespace KitbasherEditor.Views
@@ -62,7 +52,7 @@ namespace KitbasherEditor.Views
         {
             SelectedItemChanged += MyTreeView_SelectedItemChanged;
             Focusable = true;
-            PreviewMouseDoubleClick += MultiSelectTreeView_PreviewMouseDoubleClick;   
+            PreviewMouseDoubleClick += MultiSelectTreeView_PreviewMouseDoubleClick;
         }
 
         private void MultiSelectTreeView_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -132,8 +122,8 @@ namespace KitbasherEditor.Views
                     foreach (var item in itemsToDelete)
                     {
                         var itts = ItemContainerGenerator.ContainerFromItemRecursive(item);
-     
-                            Deselect(itts, item);
+
+                        Deselect(itts, item);
                     }
                 }
 
@@ -204,7 +194,7 @@ namespace KitbasherEditor.Views
             }
         }
 
-        bool IsShiftPressed { get =>  Keyboard.IsKeyDown(Key.LeftShift);}
+        bool IsShiftPressed { get => Keyboard.IsKeyDown(Key.LeftShift); }
     }
 
     /// <summary>
@@ -237,7 +227,7 @@ namespace KitbasherEditor.Views
             if (element != null && item != null && item is SceneNode)
             {
                 SceneNode sceneElement = item as SceneNode;
-                if(sceneElement.IsEditable)
+                if (sceneElement.IsEditable)
                     return element.FindResource("DefaultTreeNodeStyle") as HierarchicalDataTemplate;
                 else
                     return element.FindResource("ReferenceTreeNodeStyle") as HierarchicalDataTemplate;

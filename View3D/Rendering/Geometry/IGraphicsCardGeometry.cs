@@ -79,7 +79,7 @@ namespace View3D.Rendering.Geometry
     public class GeometryGraphicsContextFactory : IGeometryGraphicsContextFactory
     {
         private readonly IDeviceResolver _deviceResolverComponent;
-        
+
         public GeometryGraphicsContextFactory(IDeviceResolver deviceResolverComponent)
         {
 

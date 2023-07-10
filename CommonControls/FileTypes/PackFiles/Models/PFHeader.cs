@@ -1,4 +1,7 @@
-﻿using FileTypes.ByteParsing;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System.Collections.Generic;
 using System.IO;
 
@@ -44,12 +47,12 @@ namespace CommonControls.FileTypes.PackFiles.Models
         public static byte[] DefaultTimeStamp = new byte[] { 67, 205, 210, 95 };
 
         /// Used to specify that the header of the PackFile is extended by 20 bytes. Used in Arena.
-       
+
 
 
         public string _strVersion { get; set; }
         public PackFileVersion Version { get => PackFileVersionConverter.GetEnum(_strVersion); set => _strVersion = PackFileVersionConverter.ToString(value); }
-        
+
         public int ByteMask { get; set; }
 
         public uint ReferenceFileCount { get; set; }
@@ -67,7 +70,7 @@ namespace CommonControls.FileTypes.PackFiles.Models
         public bool HasEncryptedIndex { get => (ByteMask & PFHFlags.HAS_ENCRYPTED_INDEX) != 0; }    // Used by Arena
         public PackFileCAType PackFileType { get { return (PackFileCAType)(ByteMask & 15); } }
 
-        public  List<string> DependantFiles = new List<string>();
+        public List<string> DependantFiles = new List<string>();
 
 
         public PFHeader() { }

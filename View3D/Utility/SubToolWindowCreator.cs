@@ -18,7 +18,7 @@ namespace CommonControls.Common
 
         public void CreateComponentWindow<TUserView, TViewModel>(string header, int width, int heigh)
             where TViewModel : IGameComponent
-            where TUserView:UserControl
+            where TUserView : UserControl
         {
             var scene = _serviceProvider.GetRequiredService<MainScene>();
             var viewModel = _serviceProvider.GetRequiredService<TViewModel>();

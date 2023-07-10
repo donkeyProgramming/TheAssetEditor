@@ -1,5 +1,4 @@
 ﻿using Common;
-using CommonControls.Events;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -74,7 +73,7 @@ namespace View3D.Components.Component
         }
 
         void Handle(CommandStackChangedEvent notification) => CreateAnimation($"Command added: {notification.HintText}");
-        void Handle(CommandStackUndoEvent notification) => CreateAnimation($"Command Undone: {notification.HintText}"); 
+        void Handle(CommandStackUndoEvent notification) => CreateAnimation($"Command Undone: {notification.HintText}");
     }
 }
 

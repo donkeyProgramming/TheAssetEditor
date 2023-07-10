@@ -19,7 +19,7 @@ namespace AnimationEditor
             serviceCollection.AddTransient<AssetViewModel>();
             serviceCollection.AddScoped<AnimationPlayerViewModel>();
             serviceCollection.AddScoped<ReferenceModelSelectionViewModelBuilder>();
-            
+
             serviceCollection.AddScoped<SuperView.Editor>();
             serviceCollection.AddScoped<SkeletonEditor.Editor>();
             serviceCollection.AddScoped<MountAnimationCreator.Editor>();
@@ -31,7 +31,7 @@ namespace AnimationEditor
             serviceCollection.AddScoped<AnimationTransferToolViewModel>();
             serviceCollection.AddScoped<SuperViewViewModel>();
             serviceCollection.AddScoped<SkeletonEditorViewModel>();
-           // serviceCollection.AddScoped<AnimationBuilderViewModel>();
+            // serviceCollection.AddScoped<AnimationBuilderViewModel>();
             serviceCollection.AddScoped<BaseAnimationView>();
         }
 
@@ -42,7 +42,7 @@ namespace AnimationEditor
             factory.RegisterTool<AnimationTransferToolViewModel, BaseAnimationView>();
             factory.RegisterTool<SuperViewViewModel, BaseAnimationView>();
             factory.RegisterTool<SkeletonEditorViewModel, BaseAnimationView>();
-           // factory.RegisterTool<AnimationBuilderViewModel, BaseAnimationView>();
+            // factory.RegisterTool<AnimationBuilderViewModel, BaseAnimationView>();
         }
     }
 }
