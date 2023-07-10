@@ -13,6 +13,20 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+
+# Exludes the FBX SDK .lib files from "ignore"
+# Import cache
+.import
+
+# Exported Binaries
+.export
+
+# Don't ignore .lib folder
+!.lib
+
+
+
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -26,10 +40,6 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
-
-# Exludes the FBX SDK .lib files from "ignore"
-!**/TheAssetEditor/FBXWRapperDll/fbxsdk/
-
 
 
 # Visual Studio 2015/2017 cache/options directory
