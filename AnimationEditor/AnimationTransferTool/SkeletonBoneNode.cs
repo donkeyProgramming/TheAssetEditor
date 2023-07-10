@@ -33,7 +33,7 @@ namespace AnimationEditor.AnimationTransferTool
 
         public NotifyAttr<SkeletonBoneNode> SelectedRelativeBone { get; set; } = new NotifyAttr<SkeletonBoneNode>();
 
-       
+
         public ObservableCollection<SkeletonBoneNode> Children { get; set; } = new ObservableCollection<SkeletonBoneNode>();
     }
 }

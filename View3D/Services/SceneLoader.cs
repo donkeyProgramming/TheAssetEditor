@@ -76,11 +76,11 @@ namespace View3D.Services
                 return;
             }
 
-            Load(file, parent, player , attachmentPointName);
+            Load(file, parent, player, attachmentPointName);
         }
 
 
-        void LoadVariantMesh(PackFile file, ref SceneNode parent, AnimationPlayer player , string attachmentPointName)
+        void LoadVariantMesh(PackFile file, ref SceneNode parent, AnimationPlayer player, string attachmentPointName)
         {
             var variantMeshElement = new VariantMeshNode(file.Name);
             if (parent == null)
@@ -108,7 +108,7 @@ namespace View3D.Services
 
             // Load model
             if (string.IsNullOrWhiteSpace(mesh.ModelReference) != true)
-                 Load(mesh.ModelReference.ToLower(), root, player, attachmentPointName); 
+                Load(mesh.ModelReference.ToLower(), root, player, attachmentPointName);
 
             foreach (var slot in mesh.ChildSlots)
             {
@@ -124,7 +124,7 @@ namespace View3D.Services
                 {
                     slotNode.Children[i].IsVisible = i == 0;
                     slotNode.Children[i].IsExpanded = false;
-            
+
                     if (slotNode.Name.Contains("stump_"))
                     {
                         slotNode.IsVisible = false;
@@ -137,7 +137,7 @@ namespace View3D.Services
         Rmv2ModelNode LoadRigidMesh(PackFile file, ref SceneNode parent, AnimationPlayer player, string attachmentPointName, bool isParentWsModel)
         {
             var rmvModel = ModelFactory.Create().Load(file.DataSource.ReadData());
-            
+
             var modelFullPath = _packFileService.GetFullPath(file);
             var modelNode = new Rmv2ModelNode(Path.GetFileName(file.Name));
             var autoResolveTexture = isParentWsModel == false && _applicationSettingsService.CurrentSettings.AutoResolveMissingTextures;
@@ -165,11 +165,11 @@ namespace View3D.Services
 
             var wsMaterial = new WsMaterial(file);
             if (string.IsNullOrWhiteSpace(wsMaterial.GeometryPath) == false)
-            { 
+            {
                 var modelFile = _packFileService.FindFile(wsMaterial.GeometryPath);
                 var modelAsBase = wsModelNode as SceneNode;
-                var loadedModelNode = LoadRigidMesh(modelFile, ref modelAsBase, player , attachmentPointName, true);
-               
+                var loadedModelNode = LoadRigidMesh(modelFile, ref modelAsBase, player, attachmentPointName, true);
+
                 foreach (var materialNode in wsMaterial.MaterialList)
                 {
                     var materialFile = _packFileService.FindFile(materialNode.Material);

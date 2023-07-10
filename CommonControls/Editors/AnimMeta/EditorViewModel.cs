@@ -1,15 +1,17 @@
-﻿using CommonControls.Common;
-using CommonControls.Editors.AnimMeta.View;
-using CommonControls.FileTypes.DB;
-using CommonControls.FileTypes.MetaData;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
-using Microsoft.Extensions.DependencyInjection;
-using Serilog;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using CommonControls.Common;
+using CommonControls.Editors.AnimMeta.View;
+using CommonControls.FileTypes.MetaData;
+using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.Services;
+using Serilog;
 
 namespace CommonControls.Editors.AnimMeta
 {
@@ -52,7 +54,7 @@ namespace CommonControls.Editors.AnimMeta
             DisplayName.Value = file == null ? "" : file.Name;
 
             if (file == null)
-                return; 
+                return;
 
             var fileContent = _file.DataSource.ReadData();
 
@@ -68,7 +70,7 @@ namespace CommonControls.Editors.AnimMeta
                 else
                     throw new System.Exception();
             }
-                
+
         }
 
         public void MoveUpAction()
@@ -116,15 +118,15 @@ namespace CommonControls.Editors.AnimMeta
         {
             var dialog = new NewTagWindow();
             var allDefs = MetaDataTagDeSerializer.GetSupportedTypes();
-            
+
             NewTagWindowViewModel model = new NewTagWindowViewModel();
             model.Items = new ObservableCollection<string>(allDefs);
             dialog.DataContext = model;
-            
+
             var res = dialog.ShowDialog();
             if (res.HasValue && res.Value == true)
             {
-                var newEntry = MetaDataTagDeSerializer.CreateDefault(model.SelectedItem); 
+                var newEntry = MetaDataTagDeSerializer.CreateDefault(model.SelectedItem);
                 var newTagView = new MetaDataTagItemViewModel(newEntry);
                 Tags.Add(newTagView);
             }
@@ -142,7 +144,7 @@ namespace CommonControls.Editors.AnimMeta
                 var confirm = MessageBox.Show($"Paste {pasteObjects.Count} metadata objects?", "paste milord?", MessageBoxButton.YesNo);
                 if (confirm != MessageBoxResult.Yes) return;
 
-                foreach(var item in pasteObjects)
+                foreach (var item in pasteObjects)
                 {
                     try
                     {
@@ -205,7 +207,7 @@ namespace CommonControls.Editors.AnimMeta
             if (SelectedTag == null)
                 return;
 
-            if(_selectedTags.Count == 0)
+            if (_selectedTags.Count == 0)
             {
                 if (string.IsNullOrWhiteSpace(SelectedTag.HasError()) == false)
                 {
@@ -227,7 +229,7 @@ namespace CommonControls.Editors.AnimMeta
             }
             else
             {
-                foreach(var item in _selectedTags)
+                foreach (var item in _selectedTags)
                 {
 
                     if (string.IsNullOrWhiteSpace(item.HasError()) == false)
@@ -253,11 +255,11 @@ namespace CommonControls.Editors.AnimMeta
                     };
                     itemsToCopy.Add(copyItem);
                 }
-                
+
                 _copyPasteManager.SetCopyItems(itemsToCopy);
                 MessageBox.Show($"copied {itemsToCopy.Count} metadata tag, milord!");
             }
-            
+
         }
 
         public bool SaveAction()

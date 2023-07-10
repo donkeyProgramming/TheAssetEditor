@@ -1,7 +1,4 @@
-﻿using Filetypes.ByteParsing;
-using System.IO;
-
-namespace Audio.FileFormats.WWise.Bkhd
+﻿namespace Audio.FileFormats.WWise.Bkhd
 {
     public class BkhdHeader
     {

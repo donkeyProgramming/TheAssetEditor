@@ -9,9 +9,9 @@ using View3D.Services;
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
     public class GeneralActions : NotifyPropertyChangedImpl
-    { 
+    {
         private readonly CommandExecutor _commandExecutor;
-        private readonly FocusSelectableObjectService _cameraFocusComponent;       
+        private readonly FocusSelectableObjectService _cameraFocusComponent;
         private readonly ObjectEditor _objectEditor;
         private readonly RenderEngineComponent _renderEngineComponent;
         private readonly SceneManager _sceneManager;

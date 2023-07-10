@@ -1,19 +1,19 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Common;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using View3D.Components.Component;
-using View3D.Components.Rendering;
-using View3D.Components.Input;
-using View3D.Components.Component.Selection;
-using View3D.Utility;
 using View3D.Commands;
-using Common;
+using View3D.Components.Component;
+using View3D.Components.Component.Selection;
+using View3D.Components.Input;
+using View3D.Components.Rendering;
+using View3D.Utility;
 
 namespace View3D.Components.Gizmo
 {
     public class GizmoComponent : BaseComponent, IDisposable
-    {   
+    {
         private readonly MouseComponent _mouse;
         private readonly EventHub _eventHub;
         private readonly KeyboardComponent _keyboard;
@@ -48,7 +48,7 @@ namespace View3D.Components.Gizmo
 
             _eventHub.Register<SelectionChangedEvent>(Handle);
         }
-       
+
         public override void Initialize()
         {
             _gizmo = new Gizmo(_camera, _mouse, _deviceResolverComponent.Device, new SpriteBatch(_deviceResolverComponent.Device), _resourceLibary.DefaultFont);
@@ -64,7 +64,7 @@ namespace View3D.Components.Gizmo
         {
             _gizmo.Selection.Clear();
             _activeTransformation = TransformGizmoWrapper.CreateFromSelectionState(state, _commandFactory);
-            if(_activeTransformation != null)
+            if (_activeTransformation != null)
                 _gizmo.Selection.Add(_activeTransformation);
 
             _gizmo.ResetDeltas();
@@ -94,7 +94,7 @@ namespace View3D.Components.Gizmo
 
         private void GizmoRotateEvent(ITransformable transformable, TransformationEventArgs e)
         {
-            _activeTransformation.GizmoRotateEvent((Matrix)e.Value, e.Pivot); 
+            _activeTransformation.GizmoRotateEvent((Matrix)e.Value, e.Pivot);
         }
 
         private void GizmoScaleEvent(ITransformable transformable, TransformationEventArgs e)
@@ -102,7 +102,7 @@ namespace View3D.Components.Gizmo
             var value = (Vector3)e.Value;
             if (_isCtrlPressed)
             {
-                if(value.X != 0)
+                if (value.X != 0)
                     value = new Vector3(value.X);
                 else if (value.Y != 0)
                     value = new Vector3(value.Y);
@@ -115,7 +115,7 @@ namespace View3D.Components.Gizmo
 
         public override void Update(GameTime gameTime)
         {
-            if ( !(_selectionManager.GetState().Mode == GeometrySelectionMode.Object || _selectionManager.GetState().Mode == GeometrySelectionMode.Vertex))
+            if (!(_selectionManager.GetState().Mode == GeometrySelectionMode.Object || _selectionManager.GetState().Mode == GeometrySelectionMode.Vertex))
                 return;
 
             if (!_isEnabled)

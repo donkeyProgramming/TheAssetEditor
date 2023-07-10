@@ -1,16 +1,20 @@
-﻿using CommonControls.BaseDialogs;
-using CommonControls.BaseDialogs.ErrorListDialog;
-using CommonControls.Common;
-using CommonControls.FileTypes.Animation;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
-using Serilog;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using CommonControls.BaseDialogs;
+using CommonControls.BaseDialogs.ErrorListDialog;
+using CommonControls.Common;
+using CommonControls.FileTypes.Animation;
+using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.Services;
+using Serilog;
 using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 
 namespace CommonControls.Editors.AnimationBatchExporter
@@ -21,7 +25,7 @@ namespace CommonControls.Editors.AnimationBatchExporter
         PackFileService _pfs;
 
         public ObservableCollection<PackFileListItem> PackfileList { get; set; } = new ObservableCollection<PackFileListItem>();
-        public ObservableCollection<uint> PossibleOutputFormats { get; set; } = new ObservableCollection<uint>() { 5,6,7};
+        public ObservableCollection<uint> PossibleOutputFormats { get; set; } = new ObservableCollection<uint>() { 5, 6, 7 };
         public NotifyAttr<uint> SelectedOutputFormat { get; set; } = new NotifyAttr<uint>(7);
 
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
@@ -69,8 +73,8 @@ namespace CommonControls.Editors.AnimationBatchExporter
                     var convertedAnimFiles = ConvertAnimFiles(animFiles, SelectedOutputFormat.Value, errorList);
 
                     _logger.Here().Information($"saving animation files");
-                    _pfs.AddFilesToPack(_pfs.GetEditablePack(), 
-                        convertedAnimFiles.Select(x => x.directory).ToList(), 
+                    _pfs.AddFilesToPack(_pfs.GetEditablePack(),
+                        convertedAnimFiles.Select(x => x.directory).ToList(),
                         convertedAnimFiles.Select(x => x.file).ToList());
 
                     _logger.Here().Information($"Saving inv matix files");
@@ -102,7 +106,7 @@ namespace CommonControls.Editors.AnimationBatchExporter
 
                     output.Add((newPackFile, directoryPath));
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     var path = _pfs.GetFullPath(file);
                     errorList.Error(path, e.Message);
@@ -137,7 +141,7 @@ namespace CommonControls.Editors.AnimationBatchExporter
 
             public NotifyAttr<bool> Process { get; set; } = new NotifyAttr<bool>(true);
             public NotifyAttr<string> Name { get; set; } = new NotifyAttr<string>("");
-         
+
         }
 
     }

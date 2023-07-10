@@ -1,16 +1,11 @@
-﻿using CommonControls.Resources;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 using System.Windows.Data;
-using System.Windows.Media.Imaging;
-using View3D.Components.Component;
 using View3D.SceneNodes;
 
 namespace KitbasherEditor.ValueConverters
 {
     public enum NodeConvertionMode
-    { 
+    {
         MakeEditable,
         DeleteNode
     }
@@ -41,8 +36,8 @@ namespace KitbasherEditor.ValueConverters
                 {
                     if (node is Rmv2ModelNode)
                         return true;
-                   // if (node is Rmv2LodNode)
-                   //     return true;
+                    // if (node is Rmv2LodNode)
+                    //     return true;
                     if (node is Rmv2MeshNode)
                         return true;
 
@@ -50,12 +45,12 @@ namespace KitbasherEditor.ValueConverters
                 }
                 return false;
             }
-           // var res = Enum.TryParse
-           //     
-           //     
-           //     (typeof(NodeConvertionMode), parameter.ToString(), true, out var enumValue);
-           //
-            return true; 
+            // var res = Enum.TryParse
+            //     
+            //     
+            //     (typeof(NodeConvertionMode), parameter.ToString(), true, out var enumValue);
+            //
+            return true;
         }
 
 

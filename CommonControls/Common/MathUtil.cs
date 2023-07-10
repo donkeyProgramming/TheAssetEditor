@@ -1,13 +1,15 @@
-﻿using Microsoft.Xna.Framework;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
-using System.Collections.Generic;
-using System.Text;
+using Microsoft.Xna.Framework;
 
 namespace CommonControls.Common
 {
     public class MathUtil
     {
-        public static T EnsureRange<T>(T value, T min, T max)  where T : IComparable<T>
+        public static T EnsureRange<T>(T value, T min, T max) where T : IComparable<T>
         {
             if (value.CompareTo(max) > 0)
                 return max;
@@ -15,8 +17,8 @@ namespace CommonControls.Common
                 return min;
             return value;
         }
-        
-        public static bool CompareEqualFloats(float lhs, float rhs=0f, float tolerance=1E-6f)
+
+        public static bool CompareEqualFloats(float lhs, float rhs = 0f, float tolerance = 1E-6f)
         {
             return Math.Abs(lhs - rhs) < tolerance;
         }
@@ -143,8 +145,8 @@ namespace CommonControls.Common
             var z = MathHelper.ToRadians(angles_degrees.Z);
             return Matrix.CreateRotationX(x) * Matrix.CreateRotationY(y) * Matrix.CreateRotationZ(z);
         }
-        
-        public static Matrix CreateRotation(Vector3[] vectors, Vector3[] basis=null)
+
+        public static Matrix CreateRotation(Vector3[] vectors, Vector3[] basis = null)
         {
             if (vectors.Length != 3)
             {

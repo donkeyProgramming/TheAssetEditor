@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using View3D.Utility;
 
 namespace View3D.Components.Rendering
 {

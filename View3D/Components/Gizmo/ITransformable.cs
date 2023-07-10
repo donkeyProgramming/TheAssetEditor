@@ -17,8 +17,6 @@
 // -- uncomment the define statements below to choose your desired rotation method.
 
 using Microsoft.Xna.Framework;
-using System;
-using View3D.Rendering.Geometry;
 
 namespace View3D.Components.Gizmo
 {

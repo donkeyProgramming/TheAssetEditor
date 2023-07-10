@@ -378,7 +378,7 @@ namespace MeshDecimator.Math
         {
             return lhs.x * rhs.x + lhs.y * rhs.y;
         }
-        
+
         /// <summary>
         /// Performs a linear interpolation between two vectors.
         /// </summary>

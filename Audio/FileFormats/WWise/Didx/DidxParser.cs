@@ -7,7 +7,7 @@ namespace Audio.FileFormats.WWise.Didx
 {
     public class DidxParser : IParser
     {
-        public List<MediaHeader> MediaList{get;set;} = new List<MediaHeader>();
+        public List<MediaHeader> MediaList { get; set; } = new List<MediaHeader>();
 
         public void Parse(string fileName, ByteChunk chunk, ParsedBnkFile soundDb)
         {

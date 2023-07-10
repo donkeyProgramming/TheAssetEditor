@@ -44,7 +44,7 @@ namespace KitbasherEditor.ViewModels
 
         public OnSeachDelegate FilterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 
-        
+
 
         public AnimationPlayer GetPlayer() => _player;
 
@@ -52,7 +52,7 @@ namespace KitbasherEditor.ViewModels
         public int CurrentFrame { get { return _currentFrame; } set { SetAndNotify(ref _currentFrame, value); } }
 
         int _maxFrames = 0;
-        public int MaxFrames { get { return _maxFrames; } set { SetAndNotify(ref _maxFrames, value);  } }
+        public int MaxFrames { get { return _maxFrames; } set { SetAndNotify(ref _maxFrames, value); } }
 
 
         public ICommand PausePlayCommand { get; set; }
@@ -65,7 +65,7 @@ namespace KitbasherEditor.ViewModels
         bool _isEnabled;
         public bool IsEnabled { get { return _isEnabled; } set { SetAndNotify(ref _isEnabled, value); OnEnableChanged(IsEnabled); } }
 
-        public AnimationControllerViewModel( PackFileService pf, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
+        public AnimationControllerViewModel(PackFileService pf, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             AnimationsContainerComponent animationsContainerComponent, SceneManager sceneManager)
         {
             _packFileService = pf;
@@ -143,7 +143,7 @@ namespace KitbasherEditor.ViewModels
             AnimationsForCurrentSkeleton = new ObservableCollection<AnimationReference>();
             if (!string.IsNullOrWhiteSpace(selectedSkeletonPath))
             {
-                _skeletonPackFile = _packFileService.FindFile(selectedSkeletonPath) ;
+                _skeletonPackFile = _packFileService.FindFile(selectedSkeletonPath);
                 if (_skeletonPackFile == null)
                     HeaderText = "No skeleton";
                 else
@@ -160,11 +160,11 @@ namespace KitbasherEditor.ViewModels
         {
             Animation = null;
             if (selectedAnimation != null)
-                Animation = _packFileService.FindFile(selectedAnimation.AnimationFile, selectedAnimation.Container) ;
+                Animation = _packFileService.FindFile(selectedAnimation.AnimationFile, selectedAnimation.Container);
 
             if (Animation != null)
                 HeaderText = _skeletonPackFile.Name + " - " + Animation.Name;
-            else if(_skeletonPackFile != null)
+            else if (_skeletonPackFile != null)
                 HeaderText = _skeletonPackFile.Name + " - No Animation";
             else
                 HeaderText = "No Skeleton - No Animation";
@@ -177,7 +177,7 @@ namespace KitbasherEditor.ViewModels
                 var animClip = new AnimationClip(animFile, skeleton);
 
                 _player.SetAnimation(animClip, skeleton, true);
-                if(_player.IsPlaying && _player.IsEnabled)
+                if (_player.IsPlaying && _player.IsEnabled)
                     _player.Play();
 
                 MaxFrames = _player.FrameCount();

@@ -1,8 +1,12 @@
-﻿using Filetypes.ByteParsing;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Filetypes.ByteParsing;
 
 namespace CommonControls.FileTypes.MetaData
 {
@@ -27,8 +31,8 @@ namespace CommonControls.FileTypes.MetaData
                 where attributes != null && attributes.Length > 0
                 select new { Type = t, Attributes = attributes.Cast<MetaDataAttribute>() };
 
-            var typesWithMyAttributeList = typesWithMyAttribute.Select(x=> new { Type = x.Type, AttributeInfo = x.Attributes.First() })
-                .OrderBy(x=>x.AttributeInfo.Priority)
+            var typesWithMyAttributeList = typesWithMyAttribute.Select(x => new { Type = x.Type, AttributeInfo = x.Attributes.First() })
+                .OrderBy(x => x.AttributeInfo.Priority)
                 .ToList();
 
             foreach (var instance in typesWithMyAttributeList)
@@ -51,7 +55,7 @@ namespace CommonControls.FileTypes.MetaData
                     throw new Exception("Invalid ids");
 
                 // Ensure we have a decription
-                GetDescription(instance.AttributeInfo.Name);  
+                GetDescription(instance.AttributeInfo.Name);
             }
 
 #if DEBUG
@@ -263,7 +267,7 @@ namespace CommonControls.FileTypes.MetaData
 
             return null;
         }
-        
+
         public static List<(string Header, string Value)> DeSerializeToStrings(BaseMetaEntry entry, out string errorMessage)
         {
             var entryInfoList = GetEntryInformation(entry);
@@ -350,7 +354,7 @@ namespace CommonControls.FileTypes.MetaData
 
         public class EntryInfoResult
         {
-            public Type Type { get; set; } 
+            public Type Type { get; set; }
             public List<PropertyInfo> Properties { get; set; }
         }
     }

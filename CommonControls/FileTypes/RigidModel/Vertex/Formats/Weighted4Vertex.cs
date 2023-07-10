@@ -1,8 +1,11 @@
-﻿using CommonControls.FileTypes;
-using Microsoft.Xna.Framework;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework;
 
 namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
 {
@@ -16,7 +19,7 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
             else
                 return (uint)ByteHelper.GetSize<Data>();
         }
-   
+
         public bool ForceComputeNormals => false;
 
         public CommonVertex Read(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize)
@@ -106,7 +109,7 @@ namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
                     biNormal = VertexLoadHelper.CreateNormalVector3(vertex.BiNormal),
                     tangent = VertexLoadHelper.CreateNormalVector3(vertex.Tangent),
                 };
-                var bytes =  ByteHelper.GetBytes(typedVert);
+                var bytes = ByteHelper.GetBytes(typedVert);
                 return bytes;
             }
         }

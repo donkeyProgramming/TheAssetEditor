@@ -1,10 +1,7 @@
-﻿using CommonControls.Common;
-using Microsoft.Xna.Framework;
-using Serilog;
+﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Animation;
-using View3D.Utility;
 
 namespace View3D.Components.Component
 {
@@ -14,7 +11,7 @@ namespace View3D.Components.Component
 
         public AnimationsContainerComponent()
         {
-            UpdateOrder= (int)ComponentUpdateOrderEnum.Animation;
+            UpdateOrder = (int)ComponentUpdateOrderEnum.Animation;
         }
 
         public AnimationPlayer RegisterAnimationPlayer(AnimationPlayer player, string name)
@@ -25,7 +22,7 @@ namespace View3D.Components.Component
 
         public void Remove(AnimationPlayer player)
         {
-            var item = _playerMap.Where(x=>x.Value == player);
+            var item = _playerMap.Where(x => x.Value == player);
             if (item != null)
                 _playerMap.Remove(item.First().Key);
         }

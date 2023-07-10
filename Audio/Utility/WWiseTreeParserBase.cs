@@ -11,7 +11,7 @@ namespace Audio.AudioEditor
     public abstract class WWiseTreeParserBase
     {
         protected ILogger _logger = Logging.Create<WWiseTreeParserBase>();
-        
+
         protected Dictionary<HircType, Action<HircItem, HircTreeItem>> _hircProcessChildMap = new Dictionary<HircType, Action<HircItem, HircTreeItem>>();
         protected readonly IAudioRepository _repository;
 

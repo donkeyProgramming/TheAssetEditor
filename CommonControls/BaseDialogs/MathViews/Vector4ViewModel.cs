@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 namespace CommonControls.MathViews
 {
@@ -17,8 +15,8 @@ namespace CommonControls.MathViews
             set { SetAndNotify(ref _w, value); OnValueChanged?.Invoke(this); }
         }
 
-        public Vector4ViewModel(double x = 0, double y = 0, double z = 0, double w = 1) :base(0)
-        { 
+        public Vector4ViewModel(double x = 0, double y = 0, double z = 0, double w = 1) : base(0)
+        {
             X.Value = x;
             Y.Value = y;
             Z.Value = z;

@@ -1,10 +1,10 @@
-﻿using Keyboard = System.Windows.Input.Keyboard;
-using Microsoft.Xna.Framework.Input;
+﻿using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
+using Keyboard = System.Windows.Input.Keyboard;
 
 namespace MonoGame.Framework.WpfInterop.Input
 {

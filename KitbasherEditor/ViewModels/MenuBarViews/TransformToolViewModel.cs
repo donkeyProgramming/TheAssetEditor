@@ -14,7 +14,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
     public class TransformToolViewModel : NotifyPropertyChangedImpl
     {
         public enum TransformMode
-        { 
+        {
             None,
             Rotate,
             Scale,
@@ -92,7 +92,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 Text = "Rotate:";
             else if (_activeMode == TransformMode.Scale)
                 Text = "Scale:";
-            else if(_activeMode == TransformMode.Translate)
+            else if (_activeMode == TransformMode.Translate)
                 Text = "Translate:";
 
             SetDefaultValue();
@@ -101,7 +101,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         void ApplyTransform()
         {
             var transform = TransformGizmoWrapper.CreateFromSelectionState(_selectionManager.GetState(), _commandFactory);
-            if (transform == null || _activeMode == TransformMode.None) 
+            if (transform == null || _activeMode == TransformMode.None)
                 return;
 
             if (_activeMode == TransformMode.Rotate)
@@ -120,7 +120,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             else if (_activeMode == TransformMode.Scale)
             {
                 transform.Start(_commandExecutor);
-                transform.GizmoScaleEvent(new Vector3((float)_vector3.X.Value-1, (float)_vector3.Y.Value - 1, (float)_vector3.Z.Value - 1), PivotType.ObjectCenter);    // -1 due to weirdness inside the function
+                transform.GizmoScaleEvent(new Vector3((float)_vector3.X.Value - 1, (float)_vector3.Y.Value - 1, (float)_vector3.Z.Value - 1), PivotType.ObjectCenter);    // -1 due to weirdness inside the function
             }
 
             transform.Stop(_commandExecutor);

@@ -5,14 +5,12 @@ using CommonControls.FileTypes.MetaData;
 using CommonControls.FileTypes.MetaData.Definitions;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using View3D.Animation.AnimationChange;
-using View3D.Components;
 using View3D.Components.Component;
 using View3D.Components.Rendering;
 using View3D.Rendering;
@@ -69,29 +67,29 @@ namespace View3D.Animation.MetaData
 
         private IEnumerable<IMetaDataInstance> ApplyMetaData(MetaDataFile file, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment)
         {
-           var output = new List<IMetaDataInstance>();
-           if (file == null)
-               return output;
+            var output = new List<IMetaDataInstance>();
+            if (file == null)
+                return output;
 
-           output.AddRange(file.GetItemsOfType<IAnimatedPropMeta>().Select(x => CreateAnimatedProp(x, root, skeleton)));
+            output.AddRange(file.GetItemsOfType<IAnimatedPropMeta>().Select(x => CreateAnimatedProp(x, root, skeleton)));
 
-           output.AddRange(file.GetItemsOfType<ImpactPosition_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, meteDataItem.Position, "ImpactPos")));
+            output.AddRange(file.GetItemsOfType<ImpactPosition_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, meteDataItem.Position, "ImpactPos")));
 
-           output.AddRange(file.GetItemsOfType<TargetPos_10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, meteDataItem.Position, "TargetPos")));
+            output.AddRange(file.GetItemsOfType<TargetPos_10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, meteDataItem.Position, "TargetPos")));
 
-           output.AddRange(file.GetItemsOfType<FirePos_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, meteDataItem.Position, "FirePos")));
+            output.AddRange(file.GetItemsOfType<FirePos_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, meteDataItem.Position, "FirePos")));
 
-           output.AddRange(file.GetItemsOfType<SplashAttack_v10>().Select(meteDataItem => CreateSplashAttack(meteDataItem, root, $"SplashAttack_{Math.Round(meteDataItem.EndTime, 2)}", 0.1f)));
+            output.AddRange(file.GetItemsOfType<SplashAttack_v10>().Select(meteDataItem => CreateSplashAttack(meteDataItem, root, $"SplashAttack_{Math.Round(meteDataItem.EndTime, 2)}", 0.1f)));
 
-           output.AddRange(file.GetItemsOfType<Effect_v11>().Select(x=> CreateEffect(x, root, skeleton)));
+            output.AddRange(file.GetItemsOfType<Effect_v11>().Select(x => CreateEffect(x, root, skeleton)));
 
-           foreach (var meteDataItem in file.GetItemsOfType<DockEquipment>())
-               CreateEquipmentDock(meteDataItem, fragment, skeleton, rootPlayer);
-           
-           foreach (var meteDataItem in file.GetItemsOfType<Transform_v10>())
-               CreateTransform(meteDataItem, rootPlayer);
+            foreach (var meteDataItem in file.GetItemsOfType<DockEquipment>())
+                CreateEquipmentDock(meteDataItem, fragment, skeleton, rootPlayer);
 
-           return output;
+            foreach (var meteDataItem in file.GetItemsOfType<Transform_v10>())
+                CreateTransform(meteDataItem, rootPlayer);
+
+            return output;
         }
 
         private void CreateTransform(Transform_v10 transform, AnimationPlayer rootPlayer)
@@ -102,14 +100,14 @@ namespace View3D.Animation.MetaData
 
         private void CreateEquipmentDock(DockEquipment metaData, IAnimationBinGenericFormat fragment, ISkeletonProvider skeleton, AnimationPlayer rootPlayer)
         {
-            var animPath = fragment.Entries.FirstOrDefault(x=>x.SlotName == metaData.AnimationSlotName)?.AnimationFile ??
-                           fragment.Entries.FirstOrDefault(x => x.SlotName  == metaData.AnimationSlotName + "_2")?.AnimationFile;
+            var animPath = fragment.Entries.FirstOrDefault(x => x.SlotName == metaData.AnimationSlotName)?.AnimationFile ??
+                           fragment.Entries.FirstOrDefault(x => x.SlotName == metaData.AnimationSlotName + "_2")?.AnimationFile;
             if (animPath == null)
             {
                 _logger.Here().Error($"Unable to create docking, as {metaData.AnimationSlotName} animation is missing");
                 return;
             }
-            
+
             int finalBoneIndex = -1;
             foreach (var potentialBoneName in metaData.SkeletonNameAlternatives)
             {
@@ -117,18 +115,18 @@ namespace View3D.Animation.MetaData
                 if (finalBoneIndex != -1)
                     break;
             }
-            
+
             if (finalBoneIndex == -1)
             {
                 var boneNames = string.Join(", ", metaData.SkeletonNameAlternatives);
                 _logger.Here().Error($"Unable to create docking, as {boneNames} bone is missing");
                 return;
             }
-            
+
             var pf = _packFileService.FindFile(animPath);
             var animFile = AnimationFile.Create(pf);
             var clip = new AnimationClip(animFile, skeleton.Skeleton);
-            
+
             var rule = new DockEquipmentRule(finalBoneIndex, metaData.PropBoneId, clip, skeleton, metaData.StartTime, metaData.EndTime);
             rootPlayer.AnimationRules.Add(rule);
         }
@@ -136,15 +134,15 @@ namespace View3D.Animation.MetaData
         private IMetaDataInstance CreateAnimatedProp(IAnimatedPropMeta animatedPropMeta, SceneNode root, ISkeletonProvider rootSkeleton)
         {
             var propName = "Animated_prop";
-            
+
             var meshPath = _packFileService.FindFile(animatedPropMeta.ModelName);
             var animationPath = _packFileService.FindFile(animatedPropMeta.AnimationName);
             var propPlayer = _animationsContainerComponent.RegisterAnimationPlayer(new AnimationPlayer(), propName + Guid.NewGuid());
-            
+
             // Configure the mesh
             SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, _geometryGraphicsContextFactory, _renderEngineComponent, _applicationSettingsService);
             var loadedNode = loader.Load(meshPath, new GroupNode(propName), propPlayer);
-            
+
             // Configure animation
             if (animationPath != null)
             {
@@ -154,14 +152,14 @@ namespace View3D.Animation.MetaData
                 var animFile = AnimationFile.Create(animationPath);
                 var clip = new AnimationClip(animFile, skeleton);
                 propPlayer.SetAnimation(clip, skeleton);
-            
+
                 // Add the prop skeleton
                 var skeletonSceneNode = new SkeletonNode(_resourceLibary, skeleton);
                 skeletonSceneNode.NodeColour = Color.Yellow;
                 skeletonSceneNode.ScaleMult = animatedPropMeta.Scale;
                 loadedNode.AddObject(skeletonSceneNode);
             }
-            
+
             // Configure scale
             loadedNode.ForeachNodeRecursive((node) =>
             {
@@ -169,14 +167,14 @@ namespace View3D.Animation.MetaData
                     selectable.ScaleMult = animatedPropMeta.Scale;
             });
             loadedNode.ScaleMult = animatedPropMeta.Scale;
-            
+
             // Add the animation rules
             var animationRule = new CopyRootTransform(rootSkeleton, animatedPropMeta.BoneId, animatedPropMeta.Position, new Quaternion(animatedPropMeta.Orientation));
             propPlayer.AnimationRules.Add(animationRule);
 
             // Add to scene
             root.AddObject(loadedNode);
-            
+
             return new AnimatedPropInstance(loadedNode, propPlayer);
         }
 
@@ -188,7 +186,7 @@ namespace View3D.Animation.MetaData
             SimpleDrawableNode node = new SimpleDrawableNode(displayName);
             lineRenderer.AddCircle(position, scale, Color.Red);
             node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(_resourceLibary, displayName, position));
-            
+
             node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
             root.AddObject(node);
 
@@ -197,7 +195,7 @@ namespace View3D.Animation.MetaData
 
         private IMetaDataInstance CreateSplashAttack(SplashAttack_v10 splashAttack, SceneNode root, string displayName, float scale = 0.3f)
         {
-            float distance =  Vector3.Distance(splashAttack.StartPosition, splashAttack.EndPosition);
+            float distance = Vector3.Distance(splashAttack.StartPosition, splashAttack.EndPosition);
             if (MathUtil.CompareEqualFloats(distance))
             {
                 throw new ConstraintException($"{displayName}: the distance between StartPosition {splashAttack.StartPosition} and EndPosition {splashAttack.EndPosition} is close to 0");
@@ -208,33 +206,33 @@ namespace View3D.Animation.MetaData
             Vector3 textPos = (splashAttack.EndPosition + splashAttack.StartPosition) / 2;
 
             SimpleDrawableNode node = new SimpleDrawableNode(displayName);
-            
+
             node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(_resourceLibary, "StartPos", splashAttack.StartPosition));
             lineRenderer.AddLocator(splashAttack.StartPosition, scale, Color.Red);
             node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(_resourceLibary, "EndPos", splashAttack.EndPosition));
             lineRenderer.AddLocator(splashAttack.EndPosition, scale, Color.Red);
             node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(_resourceLibary, displayName, textPos));
             lineRenderer.AddLine(splashAttack.StartPosition, splashAttack.EndPosition, Color.Red);
-            
+
             Vector3 normal = splashAttack.EndPosition - splashAttack.StartPosition;  // corresponds to Z
             normal.Normalize();
             var random = new Random();
             Func<Random, float> RandomFloat = r => (float)(2 * r.NextDouble() - 1);
             Vector3 vectorP = new Vector3(RandomFloat(random), RandomFloat(random), RandomFloat(random));
             vectorP.Normalize();
-            
+
             Vector3 planeVectorP = Vector3.Cross(normal, Vector3.Cross(vectorP, normal)); // corresponds to X
             Vector3 planeVectorPN = Vector3.Cross(vectorP, normal); // corresponds to Y
             planeVectorP.Normalize();
             planeVectorPN.Normalize();
 
-            Matrix rotationM = MathUtil.CreateRotation(new []
+            Matrix rotationM = MathUtil.CreateRotation(new[]
             {
                 planeVectorP,
                 planeVectorPN,
                 normal
             });
-            
+
             if (splashAttack.AoeShape == 0) // Cone or Sphere
             {
                 if (MathUtil.CompareEqualFloats(splashAttack.AngleForCone / 2, tolerance: 0.1f))
@@ -253,7 +251,7 @@ namespace View3D.Animation.MetaData
                 Matrix transformationM = rotationM * Matrix.CreateScale(splashAttack.WidthForCorridor / 2) * Matrix.CreateTranslation(splashAttack.StartPosition);
                 lineRenderer.AddCorridorSplash(splashAttack.StartPosition, splashAttack.EndPosition, transformationM, Color.Red);
             }
-            
+
             node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
             root.AddObject(node);
 
@@ -263,14 +261,14 @@ namespace View3D.Animation.MetaData
         private IMetaDataInstance CreateEffect(Effect_v11 effect, SceneNode root, ISkeletonProvider skeleton)
         {
             var lineRenderer = new LineMeshRender(_resourceLibary);
-        
-            SimpleDrawableNode node = new SimpleDrawableNode("Effect:"+ effect.VfxName);
+
+            SimpleDrawableNode node = new SimpleDrawableNode("Effect:" + effect.VfxName);
             lineRenderer.AddLocator(effect.Position, 0.3f, Color.Red);
             node.AddItem(Components.Rendering.RenderBuckedId.Text, new TextRenderItem(_resourceLibary, effect.VfxName, effect.Position));
-            
+
             node.AddItem(Components.Rendering.RenderBuckedId.Line, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
             root.AddObject(node);
-        
+
             var instance = new DrawableMetaInstance(effect.StartTime, effect.EndTime, node.Name, node);
             if (effect.Tracking)
                 instance.FollowBone(skeleton, effect.NodeIndex);
@@ -326,7 +324,7 @@ namespace View3D.Animation.MetaData
 
         public void FollowBone(ISkeletonProvider skeleton, int boneIndex)
         {
-            if(boneIndex != -1)
+            if (boneIndex != -1)
                 _animationResolver = new SkeletonBoneAnimationResolver(skeleton, boneIndex);
         }
 

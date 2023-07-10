@@ -1,4 +1,7 @@
 ﻿using CommonControls.Common;
+using CommonControls.FileTypes.RigidModel;
+using CommonControls.FileTypes.RigidModel.Types;
+using CommonControls.FileTypes.WsModel;
 using CommonControls.Services;
 using Serilog;
 using System;
@@ -9,10 +12,6 @@ using System.Reflection;
 using System.Text;
 using System.Windows;
 using View3D.SceneNodes;
-using CommonControls.FileTypes.RigidModel.Types;
-using CommonControls.FileTypes.RigidModel;
-using CommonControls.FileTypes.WsModel;
-using View3D.Components.Component;
 
 namespace View3D.Services
 {
@@ -87,7 +86,7 @@ namespace View3D.Services
             sb.Append($"\t<geometry>{modelFilePath}</geometry>\n");
             sb.Append("\t\t<materials>\n");
 
-            
+
             var lodNodes = mainNode.GetLodNodes();
             for (int lodIndex = 0; lodIndex < lodNodes.Count; lodIndex++)
             {
@@ -177,7 +176,7 @@ namespace View3D.Services
                 {
                     materialTemplate = materialTemplate.Replace(replacment, texture.Value.Path);
                     Log.Write(Serilog.Events.LogEventLevel.Information, $"writing {replacment} {textureType} {texture.Value.Path}");
-                }                
+                }
                 else
                     materialTemplate.Replace(replacment, "test_mask.dds");
             }
@@ -231,7 +230,7 @@ namespace View3D.Services
                 originalTextures = tempTextureArray;
             }
 
-            foreach (var modelTexture in originalTextures) 
+            foreach (var modelTexture in originalTextures)
             {
                 if (TemplateStringToTextureTypes.ContainsValue(modelTexture.Key) == false)
                     continue;

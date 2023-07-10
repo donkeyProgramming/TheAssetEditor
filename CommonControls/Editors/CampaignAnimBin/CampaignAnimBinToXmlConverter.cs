@@ -1,16 +1,19 @@
-﻿using CommonControls.BaseDialogs.ErrorListDialog;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Windows;
+using System.Xml;
+using System.Xml.Serialization;
+using CommonControls.BaseDialogs.ErrorListDialog;
 using CommonControls.Common;
 using CommonControls.Editors.TextEditor;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
 using Filetypes.ByteParsing;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Windows;
-using System.Xml;
-using System.Xml.Serialization;
 using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 
 namespace CommonControls.Editors.CampaignAnimBin
@@ -46,7 +49,7 @@ namespace CommonControls.Editors.CampaignAnimBin
         private bool ValidateAnimationData(CampaignAnimationBin campaignAnimation, PackFileService pfs, string path)
         {
             var IsSkeletonExist = pfs.FindFile($"animations/skeletons/{campaignAnimation.SkeletonName}.anim") != null;
-            
+
             var fileName = Path.GetFileName(path).Substring(0, Path.GetFileName(path).Length - 4);
             var IsNameOk = campaignAnimation.Reference == fileName;
             var IsNotEmpty = campaignAnimation.Status.Count > 0;
@@ -56,7 +59,7 @@ namespace CommonControls.Editors.CampaignAnimBin
             var AreAllFilesOk = true;
 
             var CollectionsNotFoundAnims = new Dictionary<string, List<string>>();
-            var CollectionsNotFoundMeta  = new Dictionary<string, List<string>>();
+            var CollectionsNotFoundMeta = new Dictionary<string, List<string>>();
             var CollectionsNotFoundSound = new Dictionary<string, List<string>>();
 
             foreach (var item in campaignAnimation.Status)
@@ -107,7 +110,7 @@ namespace CommonControls.Editors.CampaignAnimBin
                     var IsAnimFound = pfs.FindFile(item2.Animation) != null;
                     if (!IsAnimFound) CollectionsNotFoundAnims["Docks"].Add(item2.Animation);
 
-                    var IsMetaFound = item2.AnimationMeta == "" ||  item2.AnimationMeta == "global" || pfs.FindFile(item2.AnimationMeta) != null;
+                    var IsMetaFound = item2.AnimationMeta == "" || item2.AnimationMeta == "global" || pfs.FindFile(item2.AnimationMeta) != null;
                     if (!IsMetaFound) CollectionsNotFoundMeta["Docks"].Add(item2.AnimationMeta);
 
                     var IsSoundFound = item2.SoundMeta == "" || pfs.FindFile(item2.SoundMeta) != null;
@@ -168,10 +171,10 @@ namespace CommonControls.Editors.CampaignAnimBin
                     if (!CollectionsNotFoundMeta.ContainsKey("PersitantMetaData")) CollectionsNotFoundMeta["PersitantMetaData"] = new List<string>();
                     if (!CollectionsNotFoundSound.ContainsKey("PersitantMetaData")) CollectionsNotFoundSound["PersitantMetaData"] = new List<string>();
 
-                    var IsAnimFound = item2.Animation == "" ||  pfs.FindFile(item2.Animation) != null;
+                    var IsAnimFound = item2.Animation == "" || pfs.FindFile(item2.Animation) != null;
                     if (!IsAnimFound) CollectionsNotFoundAnims["PersitantMetaData"].Add(item2.Animation);
 
-                    var IsMetaFound = item2.AnimationMeta == "" || item2.AnimationMeta == "global" ||  pfs.FindFile(item2.AnimationMeta) != null;
+                    var IsMetaFound = item2.AnimationMeta == "" || item2.AnimationMeta == "global" || pfs.FindFile(item2.AnimationMeta) != null;
                     if (!IsMetaFound) CollectionsNotFoundMeta["PersitantMetaData"].Add(item2.AnimationMeta);
 
                     var IsSoundFound = item2.SoundMeta == "" || pfs.FindFile(item2.SoundMeta) != null;
@@ -195,7 +198,7 @@ namespace CommonControls.Editors.CampaignAnimBin
                 }
             }
 
-            foreach(var item in CollectionsNotFoundAnims)
+            foreach (var item in CollectionsNotFoundAnims)
             {
                 AreAllFilesOk &= item.Value.Count == 0;
             }
@@ -208,10 +211,10 @@ namespace CommonControls.Editors.CampaignAnimBin
                 AreAllFilesOk &= item.Value.Count == 0;
             }
 
-            if (IsNameOk && 
+            if (IsNameOk &&
                IsDockDefined &&
                IsItemStatus_NormalFound &&
-               IsItemGlobalFound && 
+               IsItemGlobalFound &&
                IsSkeletonExist &&
                IsNotEmpty &&
                AreAllFilesOk &&
@@ -222,16 +225,16 @@ namespace CommonControls.Editors.CampaignAnimBin
 
             var errorItem = new ErrorList();
 
-            if(!IsNotEmpty)
+            if (!IsNotEmpty)
             {
                 errorItem.Error("no animation", "there's no animation data in this bin");
             }
-            
-            if(!AreAllFilesOk)
+
+            if (!AreAllFilesOk)
             {
-                foreach(var item in CollectionsNotFoundAnims)
+                foreach (var item in CollectionsNotFoundAnims)
                 {
-                    foreach(var item2 in item.Value)
+                    foreach (var item2 in item.Value)
                     {
                         errorItem.Error($"animation not found for category {item.Key}", $"cannot find {item2}");
                     }
@@ -252,21 +255,21 @@ namespace CommonControls.Editors.CampaignAnimBin
                 }
             }
 
-            if(!IsSkeletonExist)
+            if (!IsSkeletonExist)
             {
                 errorItem.Error("skeleton not found", $"this skeleton is not defined {campaignAnimation.SkeletonName}");
             }
 
-            if(!IsDockDefined)
+            if (!IsDockDefined)
             {
                 errorItem.Warning("dock animation", "dock animations appear to be never defined");
             }
 
-            if(!IsItemStatus_NormalFound)
+            if (!IsItemStatus_NormalFound)
             {
                 errorItem.Warning("t-pose ahead", "your character will tpose in campaign map");
             }
-            if(!IsNameOk)
+            if (!IsNameOk)
             {
                 errorItem.Error("reference does not match with bin filename", $"your reference is {campaignAnimation.Reference} it should've been {fileName}");
             }

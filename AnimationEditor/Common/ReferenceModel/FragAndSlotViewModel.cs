@@ -52,7 +52,7 @@ namespace AnimationEditor.Common.ReferenceModel
                 var animPack = FragmentList.SelectedItem.PackFileReference;
                 var packFile = _pfs.FindFile(animPack.FileName);
                 CommonControls.Editors.AnimationPack.AnimPackViewModel.ShowPreviewWinodow(packFile, _pfs, _skeletonAnimationLookUpHelper, FragmentList.SelectedItem.FullPath, _applicationSettings);
-           }
+            }
         }
 
         void Subscribe()
@@ -140,10 +140,10 @@ namespace AnimationEditor.Common.ReferenceModel
 
         private void FragmentSlotSelected(AnimationBinEntryGenericFormat value)
         {
-            if(value == null)
+            if (value == null)
             {
-                _assetViewModelEditor.SetAnimation(_asset,null);
-                _assetViewModelEditor.SetMetaFile(_asset,null, null);
+                _assetViewModelEditor.SetAnimation(_asset, null);
+                _assetViewModelEditor.SetMetaFile(_asset, null, null);
             }
             else
             {
@@ -151,11 +151,11 @@ namespace AnimationEditor.Common.ReferenceModel
                 {
                     var file = _pfs.FindFile(value.AnimationFile);
                     var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file, _pfs);
-                    _assetViewModelEditor.SetAnimation(_asset,animationRef);
+                    _assetViewModelEditor.SetAnimation(_asset, animationRef);
                 }
                 else
                 {
-                    _assetViewModelEditor.SetAnimation(_asset,null);
+                    _assetViewModelEditor.SetAnimation(_asset, null);
                 }
 
                 if (string.IsNullOrWhiteSpace(value.MetaFile) == false)

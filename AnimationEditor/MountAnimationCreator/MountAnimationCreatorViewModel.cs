@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using View3D.Components;
 using View3D.Scene;
+using View3D.Services;
 
 namespace AnimationEditor.MountAnimationCreator
 {
@@ -16,14 +17,16 @@ namespace AnimationEditor.MountAnimationCreator
         private readonly ReferenceModelSelectionViewModelBuilder _referenceModelSelectionViewModelBuilder;
         private readonly AssetViewModelBuilder _assetViewModelBuilder;
 
-        public MountAnimationCreatorViewModel(Editor editor,
-            IComponentInserter componentInserter, 
-            ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder, 
-            AnimationPlayerViewModel animationPlayerViewModel, 
+        public MountAnimationCreatorViewModel(
+            Editor editor,
+            IComponentInserter componentInserter,
+            ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder,
+            AnimationPlayerViewModel animationPlayerViewModel,
             EventHub eventHub,
-            AssetViewModelBuilder assetViewModelBuilder, 
-            MainScene scene)
-            : base(componentInserter, animationPlayerViewModel, scene)
+            AssetViewModelBuilder assetViewModelBuilder,
+            MainScene scene,
+            FocusSelectableObjectService focusSelectableObjectService)
+            : base(componentInserter, animationPlayerViewModel, scene, focusSelectableObjectService)
         {
             DisplayName.Value = "MountAnimCreator";
             Editor = editor;
@@ -42,7 +45,7 @@ namespace AnimationEditor.MountAnimationCreator
 
             var propAsset = _assetViewModelBuilder.CreateAsset("New Anim", Color.Red);
             Player.RegisterAsset(propAsset);
-           
+
             Editor.Create(MainModelView.Value.Data, ReferenceModelView.Value.Data, propAsset);
         }
     }
@@ -175,12 +178,12 @@ namespace AnimationEditor.MountAnimationCreator
 
             editorView.MainInput = new AnimationToolInput()
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\grn_savage_orc_base.variantmeshdefinition") ,
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\grn_savage_orc_base.variantmeshdefinition"),
             };
 
             editorView.RefInput = new AnimationToolInput()
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\def_cold_one.variantmeshdefinition") ,
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\def_cold_one.variantmeshdefinition"),
             };
 
             creator.CreateEmptyEditor(editorView);

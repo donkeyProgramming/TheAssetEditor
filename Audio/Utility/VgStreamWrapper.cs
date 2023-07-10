@@ -1,7 +1,6 @@
 ﻿using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommunityToolkit.Diagnostics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
 using Serilog;
 using System;
 using System.IO;
@@ -39,9 +38,9 @@ namespace Audio.Utility
             var wavName = $"{AudioFolderName}\\{fileNameWithoutExtention}.wav";
 
             _logger.Here().Information($"Trying to export sound '{fileNameWithoutExtention}' - {wemBytes.Length} bytes");
-   
+
             var exportResult = ExportFile(wemName, wemBytes);
-            if(exportResult.Failed)
+            if (exportResult.Failed)
                 return Result<string>.FromError(exportResult.LogItems);
 
             return ConvertFileUsingVgSteam(wemName, wavName);
@@ -59,7 +58,7 @@ namespace Audio.Utility
         public Result<string> ConvertToWem(string systemPath)
         {
             Guard.IsNotNullOrEmpty(systemPath);
-           
+
             if (File.Exists(systemPath) == false)
                 return Result<string>.FromError("VgSteam", $"File not found '{systemPath}'");
 

@@ -47,7 +47,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _gizmoComponent.SetGizmoMode(GizmoMode.Translate);
         }
 
-        public  void Rotate()
+        public void Rotate()
         {
             _gizmoComponent.ResetScale();
             _transformToolViewModel.SetMode(TransformToolViewModel.TransformMode.Rotate);
@@ -64,6 +64,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public void ScaleGizmoDown() => _gizmoComponent.ModifyGizmoScale(-0.5f);
 
         public void ScaleGizmoUp() => _gizmoComponent.ModifyGizmoScale(0.5f);
-       
+
     }
 }

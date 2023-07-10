@@ -1,7 +1,4 @@
 ﻿using MonoGame.Framework.WpfInterop;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace View3D.Utility
 {

@@ -1,5 +1,4 @@
-﻿using Audio.FileFormats.WWise.Hirc.V136;
-using Filetypes.ByteParsing;
+﻿using Filetypes.ByteParsing;
 using System;
 
 namespace Audio.FileFormats.WWise.Hirc.V112

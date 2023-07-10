@@ -1,7 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using Microsoft.Xna.Framework;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
@@ -13,23 +14,23 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 
         [MetaDataTag(5)]
         public Vector3 StartPosition { get; set; } = Vector3.Zero;
-        
+
         [MetaDataTag(6)]
         public Vector3 EndPosition { get; set; } = Vector3.Zero;
 
         [MetaDataTag(7, "Min = 0, Max = 20")]
         public float WidthForCorridor { get; set; }
-        
+
         [MetaDataTag(8, "Min = 0, Max = 360")]
         public float AngleForCone { get; set; }
-        
+
         [MetaDataTag(9, "Min = 0, Max = 10000")]
         public float ImpactMassInKg { get; set; }
-        
+
         [MetaDataTag(10, "Min = 0, Max = 100")]
         public float ImpactSpeed { get; set; }
     }
-    
+
     [MetaData("SPLASH_ATTACK", 10)]
     public class SplashAttack_v10 : DecodedMetaEntryBase
     {
@@ -38,19 +39,19 @@ namespace CommonControls.FileTypes.MetaData.Definitions
 
         [MetaDataTag(6)]
         public Vector3 StartPosition { get; set; } = Vector3.Zero;
-        
+
         [MetaDataTag(7)]
         public Vector3 EndPosition { get; set; } = Vector3.Zero;
 
         [MetaDataTag(8, "Min = 0, Max = 20")]
         public float WidthForCorridor { get; set; }
-        
+
         [MetaDataTag(9, "Min = 0, Max = 360")]
         public float AngleForCone { get; set; }
-        
+
         [MetaDataTag(10, "Min = 0, Max = 10000")]
         public float ImpactMassInKg { get; set; }
-        
+
         [MetaDataTag(11, "Min = 0, Max = 100")]
         public float ImpactSpeed { get; set; }
 

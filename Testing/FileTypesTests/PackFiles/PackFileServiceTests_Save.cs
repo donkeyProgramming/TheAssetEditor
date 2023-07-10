@@ -7,23 +7,23 @@ namespace FileTypesTests.PackFiles
         [Test]
         public void Basic()
         {
-          // PackFileService packFileService = new PackFileService(new PackFileDataBase(), null);
-          // var loadedPackFile = packFileService.Load(@"Data\CaPackFile_01.pack");
-          //
-          // Assert.NotNull(loadedPackFile);
-          // var fileCount = loadedPackFile.FileList.Count;
-          // Assert.AreEqual(4, fileCount);
-          //
-          // using (MemoryStream ms = new MemoryStream())
-          // {
-          //     using (BinaryWriter writer = new BinaryWriter(ms))
-          //         packFileService.Save(loadedPackFile, writer);
-          //
-          //     var newBytes = ms.ToArray();
-          //     var orgData = File.ReadAllBytes(@"Data\CaPackFile_01.pack");
-          //     for (int i = 0; i < newBytes.Length; i++)
-          //         Assert.AreEqual(orgData[i], newBytes[i], $"Difference at index {i}");
-          // }
+            // PackFileService packFileService = new PackFileService(new PackFileDataBase(), null);
+            // var loadedPackFile = packFileService.Load(@"Data\CaPackFile_01.pack");
+            //
+            // Assert.NotNull(loadedPackFile);
+            // var fileCount = loadedPackFile.FileList.Count;
+            // Assert.AreEqual(4, fileCount);
+            //
+            // using (MemoryStream ms = new MemoryStream())
+            // {
+            //     using (BinaryWriter writer = new BinaryWriter(ms))
+            //         packFileService.Save(loadedPackFile, writer);
+            //
+            //     var newBytes = ms.ToArray();
+            //     var orgData = File.ReadAllBytes(@"Data\CaPackFile_01.pack");
+            //     for (int i = 0; i < newBytes.Length; i++)
+            //         Assert.AreEqual(orgData[i], newBytes[i], $"Difference at index {i}");
+            // }
         }
 
         [Test]

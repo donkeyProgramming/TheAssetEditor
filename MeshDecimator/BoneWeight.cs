@@ -24,8 +24,8 @@ SOFTWARE.
 */
 #endregion
 
-using System;
 using MeshDecimator.Math;
+using System;
 
 namespace MeshDecimator
 {
@@ -140,7 +140,7 @@ namespace MeshDecimator
             {
                 boneWeight3 = (boneWeight3 + weight) * 0.5f;
             }
-            else if(boneWeight0 == 0f)
+            else if (boneWeight0 == 0f)
             {
                 boneIndex0 = boneIndex;
                 boneWeight0 = weight;

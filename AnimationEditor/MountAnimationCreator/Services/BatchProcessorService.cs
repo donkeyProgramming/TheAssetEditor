@@ -27,7 +27,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
         AnimationPackFile _outAnimPack;
         AnimationBinWh3 _riderOutputBin;
 
-        
+
         string _animPackName = "test_tables.animpack";
         string _animBinName = "test_tables.bin";
 
@@ -39,7 +39,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
             _batchProcessOptions = batchProcessOptions;
             _animationOutputFormat = animationOutputFormat;
 
-          
+
 
             if (_batchProcessOptions != null)
             {
@@ -75,7 +75,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
                 CreateAnimation(animationSlot.Item1, animationSlot.Item2, resultInfo);
         }
 
-        void CreateAnimation( string riderSlot, string mountSlot, ErrorListViewModel.ErrorList resultInfo)
+        void CreateAnimation(string riderSlot, string mountSlot, ErrorListViewModel.ErrorList resultInfo)
         {
             // Does the rider have this?
             var riderHasAnimation = _riderFragment.Entries.FirstOrDefault(x => x.SlotName == riderSlot) != null;
@@ -110,7 +110,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
                 };
 
                 _riderOutputBin.AnimationTableEntries.Add(newEntry);
-                resultInfo.Ok(mountSlot, "Matching animation found in rider ("+ riderSlot + "). New animation created");
+                resultInfo.Ok(mountSlot, "Matching animation found in rider (" + riderSlot + "). New animation created");
             }
             else
             {
@@ -119,7 +119,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
                 {
                     AnimationId = (uint)DefaultAnimationSlotTypeHelper.GetfromValue(riderSlot).Id,
                 });
-            
+
                 resultInfo.Error(mountSlot, "Expected slot missing in  rider (" + riderSlot + "), this need to be resolved!");
             }
         }
@@ -144,7 +144,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
         void CopyAnimations(string riderSlot, ErrorListViewModel.ErrorList resultInfo)
         {
-           var fragmentEntry = _riderFragment.Entries.First(x => x.SlotName == riderSlot);
+            var fragmentEntry = _riderFragment.Entries.First(x => x.SlotName == riderSlot);
             var newEntry = new CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()
             {
                 AnimationId = (uint)fragmentEntry.SlotIndex,
@@ -163,8 +163,8 @@ namespace AnimationEditor.MountAnimationCreator.Services
                 }
             };
 
-           _riderOutputBin.AnimationTableEntries.Add(newEntry);
-           resultInfo.Ok(riderSlot, "Animation copied from rider");
+            _riderOutputBin.AnimationTableEntries.Add(newEntry);
+            resultInfo.Ok(riderSlot, "Animation copied from rider");
         }
 
         List<string> GetAnimationsThatRequireNoChanges()
@@ -216,7 +216,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
         GameSkeleton LoadSkeleton(string skeletonName)
         {
-            var skeletonFile = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, skeletonName);          
+            var skeletonFile = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, skeletonName);
             return new GameSkeleton(skeletonFile, null);
         }
 
@@ -226,12 +226,12 @@ namespace AnimationEditor.MountAnimationCreator.Services
             if (numberId != 0)
                 numberPostFix = "_" + numberId;
 
-            var potentialName =  Path.GetDirectoryName(fullPath) + "\\" + prefix + numberPostFix + Path.GetFileName(fullPath);
+            var potentialName = Path.GetDirectoryName(fullPath) + "\\" + prefix + numberPostFix + Path.GetFileName(fullPath);
             var fileRef = _pfs.FindFile(potentialName);
             if (fileRef == null)
                 return potentialName;
             else
-                return GenerateNewAnimationName(fullPath, prefix, numberId+1);
+                return GenerateNewAnimationName(fullPath, prefix, numberId + 1);
         }
     }
 }

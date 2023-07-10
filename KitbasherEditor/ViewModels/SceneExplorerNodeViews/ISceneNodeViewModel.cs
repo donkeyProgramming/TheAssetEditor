@@ -1,6 +1,5 @@
 ﻿using CommonControls.Services;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2;
-using MonoGame.Framework.WpfInterop;
 using System;
 using View3D.SceneNodes;
 using View3D.Utility;
@@ -8,7 +7,7 @@ using View3D.Utility;
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
     public interface ISceneNodeViewModel : IDisposable
-    { 
+    {
     }
 
     public class SceneNodeViewFactory
@@ -18,7 +17,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         private readonly ComponentManagerResolver _componentManagerResolver;
         private readonly ApplicationSettingsService _applicationSettingsService;
 
-        public SceneNodeViewFactory(SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService packFileService, ComponentManagerResolver  componentManagerResolver, ApplicationSettingsService applicationSettingsService)
+        public SceneNodeViewFactory(SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService packFileService, ComponentManagerResolver componentManagerResolver, ApplicationSettingsService applicationSettingsService)
         {
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _packFileService = packFileService;
@@ -37,19 +36,19 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 case SkeletonNode s:
                     return new SkeletonSceneNodeViewModel(s, _packFileService, _skeletonAnimationLookUpHelper);
                 case Rmv2LodNode n:
-                {
-                    if (n.IsEditable && n.Parent != null)
-                        return new LodGroupNodeViewModel(n, _componentManagerResolver.ComponentManager);
+                    {
+                        if (n.IsEditable && n.Parent != null)
+                            return new LodGroupNodeViewModel(n, _componentManagerResolver.ComponentManager);
 
-                    return null;
-                }
+                        return null;
+                    }
                 case GroupNode n:
-                {
-                    if (n.IsEditable && n.Parent != null)
-                        return new GroupNodeViewModel(n);
+                    {
+                        if (n.IsEditable && n.Parent != null)
+                            return new GroupNodeViewModel(n);
 
-                    return null;
-                }
+                        return null;
+                    }
 
 
                 default:

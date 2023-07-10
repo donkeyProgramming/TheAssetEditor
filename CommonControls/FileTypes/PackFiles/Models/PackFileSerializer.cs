@@ -1,11 +1,15 @@
-﻿using CommonControls.Common;
-using CommonControls.Services;
-using FileTypes.ByteParsing;
-using Serilog;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CommonControls.Common;
+using CommonControls.Services;
+using FileTypes.ByteParsing;
+using Serilog;
 
 namespace CommonControls.FileTypes.PackFiles.Models
 {
@@ -24,7 +28,7 @@ namespace CommonControls.FileTypes.PackFiles.Models
             (PackFileVersion.PFH6,  "PFH6"),
         };
 
-        public static string ToString(PackFileVersion versionEnum) => _values.First(x => x.EnumValue == versionEnum).StringValue; 
+        public static string ToString(PackFileVersion versionEnum) => _values.First(x => x.EnumValue == versionEnum).StringValue;
         public static PackFileVersion GetEnum(string versionStr) => _values.First(x => x.StringValue == versionStr.ToUpper()).EnumValue;
     }
 
@@ -58,7 +62,7 @@ namespace CommonControls.FileTypes.PackFiles.Models
                     FilePath = packFileSystemPath,
                 };
 
-                long offset = output.Header.DataStart; 
+                long offset = output.Header.DataStart;
                 for (int i = 0; i < output.Header.FileCount; i++)
                 {
                     uint size = reader.ReadUInt32();
@@ -106,7 +110,7 @@ namespace CommonControls.FileTypes.PackFiles.Models
                         {
                             output.FileList.Add(fullPackedFileName, fileContent);
                         }
-                        
+
                     }
                     offset += size;
                 }
@@ -170,7 +174,7 @@ namespace CommonControls.FileTypes.PackFiles.Models
 
             for (int i = 0; i < header.ReferenceFileCount; i++)
                 header.DependantFiles.Add(IOFunctions.ReadZeroTerminatedAscii(reader, fileNameBuffer));
-            
+
             header.DataStart = 24 + (uint)header.Buffer.Length + pack_file_index_size + packed_file_index_size;
             header.FileCount = pack_file_count;
 

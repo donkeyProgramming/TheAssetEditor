@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace View3D.SceneNodes
 {
@@ -118,7 +117,7 @@ namespace View3D.SceneNodes
             while (nodeQueue.Count != 0)
             {
                 var item = nodeQueue.Dequeue();
-                foreach (var child in item.Children)  
+                foreach (var child in item.Children)
                     nodeQueue.Enqueue(child);
 
                 if (item is Rmv2ModelNode modelNode)

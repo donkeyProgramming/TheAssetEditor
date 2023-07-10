@@ -1,5 +1,7 @@
-﻿using CommonControls.Common;
-using CommunityToolkit.Mvvm.Input;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,6 +10,8 @@ using System.Data;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
+using CommonControls.Common;
+using CommunityToolkit.Mvvm.Input;
 
 namespace CommonControls.Table
 {
@@ -24,7 +28,7 @@ namespace CommonControls.Table
 
 
         public enum ColoumTypes
-        { 
+        {
             Default,
             Bool,
             SubTable,
@@ -71,7 +75,7 @@ namespace CommonControls.Table
         public List<BaseCellItem> CreateRowInstance(params object[] values)
         {
             List<BaseCellItem> output = new List<BaseCellItem>();
-            for(int i = 0; i < values.Length; i++)
+            for (int i = 0; i < values.Length; i++)
                 output.Add(CreateColumnValue(i, values[i]));
 
             return output;
@@ -80,7 +84,7 @@ namespace CommonControls.Table
         public List<BaseCellItem> CreateEmptyRowInstance()
         {
             List<BaseCellItem> output = new List<BaseCellItem>();
-            for(int i = 0; i < _coloumTypes.Count; i++)
+            for (int i = 0; i < _coloumTypes.Count; i++)
             {
                 var columnType = _coloumTypes.ElementAt(i);
                 var defaultValue = _defaultValueMap[columnType.Value];
@@ -278,7 +282,7 @@ namespace CommonControls.Table
             Data = selectedValue;
             PossibleValues = possibleValues;
             _allPossibleValues = possibleValues;
-            if(Data != null)
+            if (Data != null)
                 _SearchText = Data.ToString();
         }
 
@@ -294,7 +298,7 @@ namespace CommonControls.Table
             set
             {
                 SetAndNotify(ref _SearchText, value);
-                PossibleValues = new ObservableCollection<T> (_allPossibleValues.Where(x=>x.ToString().Contains(SearchText, StringComparison.InvariantCultureIgnoreCase)).ToList()) ;
+                PossibleValues = new ObservableCollection<T>(_allPossibleValues.Where(x => x.ToString().Contains(SearchText, StringComparison.InvariantCultureIgnoreCase)).ToList());
 
                 Data = _allPossibleValues.FirstOrDefault(x => x.ToString() == SearchText);
             }

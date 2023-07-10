@@ -2,9 +2,7 @@
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,46 +10,46 @@ using System.Linq;
 namespace Wh3AnimPackCreator
 {
 
-   /* public interface Warhammer3BinCreator
-    {
+    /* public interface Warhammer3BinCreator
+     {
 
-        AnimationBinWh3 CreateBinFromAnimationSet(string animationSet, string _filePrefix);
-        IAnimationBinGenericFormat GetAnimationSet(string animationSet);
-    }
+         AnimationBinWh3 CreateBinFromAnimationSet(string animationSet, string _filePrefix);
+         IAnimationBinGenericFormat GetAnimationSet(string animationSet);
+     }
 
-    public class Warhammer3BinCreator_FromTroy : Warhammer3BinCreator
-    {
-        AnimationPackFile _animPackFile;
-        AnimationBin _animationBin;
+     public class Warhammer3BinCreator_FromTroy : Warhammer3BinCreator
+     {
+         AnimationPackFile _animPackFile;
+         AnimationBin _animationBin;
 
-        public Warhammer3BinCreator_FromTroy(PackFileService pfs)
-        {
-            var gameAnimPackFile = pfs.FindFile(@"animations\animation_tables\animation_tables.animpack");
-            _animPackFile = AnimationPackSerializer.Load(gameAnimPackFile, pfs, GameTypeEnum.Troy);
-            _animationBin = _animPackFile.Files.First(x => x.FileName == @"animations/animation_tables/animation_tables.bin") as AnimationBin;
-        }
+         public Warhammer3BinCreator_FromTroy(PackFileService pfs)
+         {
+             var gameAnimPackFile = pfs.FindFile(@"animations\animation_tables\animation_tables.animpack");
+             _animPackFile = AnimationPackSerializer.Load(gameAnimPackFile, pfs, GameTypeEnum.Troy);
+             _animationBin = _animPackFile.Files.First(x => x.FileName == @"animations/animation_tables/animation_tables.bin") as AnimationBin;
+         }
 
-        public IAnimationBinGenericFormat GetAnimationSet(string animationSet)
-        {
-            var fragment = _animPackFile.Files.First(x => x.FileName == animationSet) as AnimationFragmentFile;
-            var groupedSlots = fragment.Fragments.GroupBy(x => x.Slot.Value).ToList();
-        }
+         public IAnimationBinGenericFormat GetAnimationSet(string animationSet)
+         {
+             var fragment = _animPackFile.Files.First(x => x.FileName == animationSet) as AnimationFragmentFile;
+             var groupedSlots = fragment.Fragments.GroupBy(x => x.Slot.Value).ToList();
+         }
 
-        public AnimationBinWh3 CreateBinFromAnimationSet(string animationSet, string _filePrefix)
-        {
-            var binInstance = _animationBin.AnimationTableEntries.First(X => X.Name.ToLower() == Path.GetFileNameWithoutExtension(animationSet).ToLower());
+         public AnimationBinWh3 CreateBinFromAnimationSet(string animationSet, string _filePrefix)
+         {
+             var binInstance = _animationBin.AnimationTableEntries.First(X => X.Name.ToLower() == Path.GetFileNameWithoutExtension(animationSet).ToLower());
 
-            var name = @"animations/database/battle/bin/" + _filePrefix + Path.GetFileNameWithoutExtension(animationSet) + ".bin";
-            return new AnimationBinWh3(name)
-            {
-                Name = _filePrefix + Path.GetFileNameWithoutExtension(animationSet),
-                SkeletonName = _filePrefix + binInstance.SkeletonName,
-                LocomotionGraph = @"animations\locomotion_graphs\entity_locomotion_graph.xml"
-            };
-        }
+             var name = @"animations/database/battle/bin/" + _filePrefix + Path.GetFileNameWithoutExtension(animationSet) + ".bin";
+             return new AnimationBinWh3(name)
+             {
+                 Name = _filePrefix + Path.GetFileNameWithoutExtension(animationSet),
+                 SkeletonName = _filePrefix + binInstance.SkeletonName,
+                 LocomotionGraph = @"animations\locomotion_graphs\entity_locomotion_graph.xml"
+             };
+         }
 
-        public void AddAnimationToBin(AnimationBinWh3)
-    }*/
+         public void AddAnimationToBin(AnimationBinWh3)
+     }*/
 
     public class AnimationTransferHelper
     {
@@ -93,9 +91,9 @@ namespace Wh3AnimPackCreator
 
                 // If no animations in group - Skip, with info
                 // TODO: If none of the files found - skip with info
-               //bool doesAnimationGroupHaveAnimations = DoesAnimationGroupHaveAnimations(groupedSlot.Key, groupedSlot.AsEnumerable(), animationSetName);
-               //if (doesAnimationGroupHaveAnimations == false)
-               //    continue;
+                //bool doesAnimationGroupHaveAnimations = DoesAnimationGroupHaveAnimations(groupedSlot.Key, groupedSlot.AsEnumerable(), animationSetName);
+                //if (doesAnimationGroupHaveAnimations == false)
+                //    continue;
 
                 foreach (var animationInstance in groupedSlot)
                 {
@@ -126,9 +124,9 @@ namespace Wh3AnimPackCreator
 
                 // If no animations in group - Skip, with info
                 // TODO: If none of the files found - skip with info
-               // bool doesAnimationGroupHaveAnimations = DoesAnimationGroupHaveAnimations(animationTableEntry.Key, animationTableEntry.AsEnumerable(), animationSetName);
-               // if (doesAnimationGroupHaveAnimations == false)
-               //     continue;
+                // bool doesAnimationGroupHaveAnimations = DoesAnimationGroupHaveAnimations(animationTableEntry.Key, animationTableEntry.AsEnumerable(), animationSetName);
+                // if (doesAnimationGroupHaveAnimations == false)
+                //     continue;
 
                 foreach (var animationInstance in animationTableEntry.AnimationRefs)
                 {
@@ -250,7 +248,7 @@ namespace Wh3AnimPackCreator
             _logService.AddLogItem(LogService.LogType.Info, currentBinName, $"SoundMeta files to copy = {distinctMetaFiles.Count()}");
             foreach (var metaFile in distinctMetaFiles)
             {
-   
+
                 var finalName = UpdateFileName(metaFile);
                 if (_outputPfs.FindFile(finalName) != null)
                     continue;
@@ -308,7 +306,7 @@ namespace Wh3AnimPackCreator
 
                 binWh3.AnimationTableEntries.Add(animationEntry);
             }
-           
+
             animationEntry.AnimationRefs.Add(new CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef()
             {
                 AnimationFile = UpdateFileName(animationFile),

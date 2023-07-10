@@ -1,13 +1,17 @@
-﻿using CommonControls.Common;
-using CommonControls.Editors.TextEditor;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.IO;
 using System.Text;
 using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
+using CommonControls.Common;
+using CommonControls.Editors.TextEditor;
+using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.Services;
 using static CommonControls.FileTypes.Vmd.VariantMeshDefinition;
 
 namespace CommonControls.Editors.VariantMeshDefinition
@@ -27,14 +31,14 @@ namespace CommonControls.Editors.VariantMeshDefinition
             }
         }
 
-        public byte[] ToBytes(string text, string filePath, PackFileService pfs,  out ITextConverter.SaveError error)
+        public byte[] ToBytes(string text, string filePath, PackFileService pfs, out ITextConverter.SaveError error)
         {
             try
             {
                 // Validate
-                var obj = Load(text);;
+                var obj = Load(text); ;
                 error = ValidateFilePaths(obj, pfs);
-               
+
                 return Encoding.UTF8.GetBytes(text);
             }
             catch (Exception e)
@@ -87,7 +91,7 @@ namespace CommonControls.Editors.VariantMeshDefinition
             var xmlserializer = new XmlSerializer(typeof(VariantMesh), xRoot);
             using var stringReader = new StringReader(fileContent);
             var reader = XmlReader.Create(stringReader);
-            
+
             object result = null;
             if (strict)
                 result = xmlserializer.Deserialize(reader, new UnkownXmlDataThrower().EventHandler);

@@ -27,7 +27,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public OnSeachDelegate FilterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 
 
-        public ObservableCollection<RmvVersionEnum> PossibleOutputFormats { get; set; } = new ObservableCollection<RmvVersionEnum>() { RmvVersionEnum.RMV2_V6, RmvVersionEnum.RMV2_V7, RmvVersionEnum.RMV2_V8};
+        public ObservableCollection<RmvVersionEnum> PossibleOutputFormats { get; set; } = new ObservableCollection<RmvVersionEnum>() { RmvVersionEnum.RMV2_V6, RmvVersionEnum.RMV2_V7, RmvVersionEnum.RMV2_V8 };
 
         RmvVersionEnum _selectedOutputFormat;
         public RmvVersionEnum SelectedOutputFormat { get => _selectedOutputFormat; set { SetAndNotify(ref _selectedOutputFormat, value); _mainNode.SelectedOutputFormat = value; } }
@@ -65,7 +65,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         void UpdateSkeletonName()
         {
-            
+
             string cleanSkeletonName = "";
             if (!string.IsNullOrWhiteSpace(SkeletonName))
                 cleanSkeletonName = Path.GetFileNameWithoutExtension(SkeletonName);
@@ -81,7 +81,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
             foreach (var tex in distinctTextures)
             {
-                var file = _pfs.FindFile(tex.Path);    
+                var file = _pfs.FindFile(tex.Path);
                 if (file != null)
                 {
                     var sourcePackContainer = _pfs.GetPackFileContainer(file);

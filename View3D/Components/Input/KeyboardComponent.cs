@@ -9,13 +9,13 @@ namespace View3D.Components.Input
 
     public class KeyboardComponent : BaseComponent
     {
-        public event KeybordButtonReleasedDelegate KeybordButtonReleased;
+        public event KeybordButtonReleasedDelegate KeyboardButtonReleased;
 
         KeyboardState _currentKeyboardState;
         KeyboardState _lastKeyboardState;
         WpfKeyboard _wpfKeyboard;
 
-        public KeyboardComponent(WpfGame game) 
+        public KeyboardComponent(WpfGame game)
         {
             _wpfKeyboard = new WpfKeyboard(game);
             UpdateOrder = (int)ComponentUpdateOrderEnum.Input;
@@ -34,7 +34,7 @@ namespace View3D.Components.Input
             foreach (var key in _lastKeyboardState.GetPressedKeys())
             {
                 if (IsKeyUp(key))
-                    KeybordButtonReleased?.Invoke(key);
+                    KeyboardButtonReleased?.Invoke(key);
             }
         }
 

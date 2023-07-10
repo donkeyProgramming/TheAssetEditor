@@ -12,7 +12,7 @@ namespace Common
             _callbackList.TryGetValue(typeof(T), out var callbackItems);
             if (callbackItems == null)
                 return;
-            foreach(var callbackItem in callbackItems)
+            foreach (var callbackItem in callbackItems)
             {
                 Action<T> action = (Action<T>)callbackItem;
                 action(instance);
@@ -20,7 +20,7 @@ namespace Common
         }
 
         public void UnRegister<T>(Action<T> action)
-        { 
+        {
         }
 
         public void Register<T>(Action<T> action)

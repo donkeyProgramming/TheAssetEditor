@@ -1,7 +1,11 @@
-﻿using CommonControls.FileTypes.Animation;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+using CommonControls.FileTypes.Animation;
 
 namespace CommonControls.Editors.BoneMapping
 {
@@ -50,7 +54,7 @@ namespace CommonControls.Editors.BoneMapping
         public static ObservableCollection<AnimatedBone> CreateFlatSkeletonList(AnimationFile file)
         {
             var output = new ObservableCollection<AnimatedBone>();
-            foreach(var boneInfo in file.Bones)
+            foreach (var boneInfo in file.Bones)
             {
                 var newNode = new AnimatedBone(boneInfo.Id, boneInfo.Name);
                 output.Add(newNode);

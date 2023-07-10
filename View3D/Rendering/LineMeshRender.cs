@@ -1,9 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CommonControls.Common;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CommonControls.Common;
 using View3D.Utility;
 
 namespace View3D.Rendering
@@ -102,18 +102,18 @@ namespace View3D.Rendering
             AddLine(corners[2], corners[3]);
             AddLine(corners[0], corners[3]);
             AddLine(corners[1], corners[2]);
-            
+
             AddLine(corners[4], corners[5]);
             AddLine(corners[6], corners[7]);
             AddLine(corners[4], corners[7]);
             AddLine(corners[5], corners[6]);
-            
+
             AddLine(corners[0], corners[4]);
             AddLine(corners[1], corners[5]);
             AddLine(corners[2], corners[6]);
             AddLine(corners[3], corners[7]);
         }
-        
+
         public void AddLocator(Vector3 pos, float size, Color color)
         {
             var vertices = new VertexPositionColor[6];
@@ -126,7 +126,7 @@ namespace View3D.Rendering
             vertices[5] = new VertexPositionColor(pos + new Vector3(0, 0, halfLength), color);
             _originalVertices.AddRange(vertices);
         }
-        
+
         private IEnumerable<(int, float, float)> CircleAnglesGenerator(int steps = 20)
         {
             var stepSize = 2 * MathF.PI / steps;
@@ -135,57 +135,57 @@ namespace View3D.Rendering
                 yield return (i, MathF.Cos(stepSize * i), MathF.Sin(stepSize * i));
             }
         }
-        
+
         private Vector3[] CreateCircle(int steps = 20)
         {
-            var vertices = new Vector3[2* (steps+1)];
+            var vertices = new Vector3[2 * (steps + 1)];
             foreach (var (i, cos, sin) in CircleAnglesGenerator())
             {
-                vertices[2*i] = new Vector3(cos, sin, 0);
-                vertices[2*i + 1] = vertices[2*i];
+                vertices[2 * i] = new Vector3(cos, sin, 0);
+                vertices[2 * i + 1] = vertices[2 * i];
             }
             // fix points to use with LineList
             for (int i = 0; i < steps; i++)
             {
-                vertices[2*i + 1] = vertices[2*i + 2];
+                vertices[2 * i + 1] = vertices[2 * i + 2];
             }
             return vertices;
         }
-        
+
         private Vector3[] CreateConeCircle(float sectorAngle, int steps = 20)
         {
-            var vertices = new Vector3[2* (steps+1)];
+            var vertices = new Vector3[2 * (steps + 1)];
             foreach (var (i, cos, sin) in CircleAnglesGenerator())
             {
-                vertices[2*i] = new Vector3( sin * MathF.Sin(sectorAngle), cos * MathF.Sin(sectorAngle), MathF.Cos(sectorAngle));
-                vertices[2*i + 1] = vertices[2*i];
+                vertices[2 * i] = new Vector3(sin * MathF.Sin(sectorAngle), cos * MathF.Sin(sectorAngle), MathF.Cos(sectorAngle));
+                vertices[2 * i + 1] = vertices[2 * i];
             }
             // fix points to use with LineList
             for (int i = 0; i < steps; i++)
             {
-                vertices[2*i + 1] = vertices[2*i + 2];
+                vertices[2 * i + 1] = vertices[2 * i + 2];
             }
             return vertices;
         }
-        
+
         public void AddCircle(Vector3 pos, float size, Color color)
         {
             const int steps = 20;
-            var vertices = new VertexPositionColor[2* (steps+1)];
+            var vertices = new VertexPositionColor[2 * (steps + 1)];
 
             // TODO: implement using matrix and CreateCircle
             foreach (var (i, cos, sin) in CircleAnglesGenerator())
             {
                 var x = pos.X + size * cos;
                 var z = pos.Z + size * sin;
-                vertices[2*i] = new VertexPositionColor(new Vector3(x, pos.Y, z), color);
-                vertices[2*i + 1] = vertices[2*i];
+                vertices[2 * i] = new VertexPositionColor(new Vector3(x, pos.Y, z), color);
+                vertices[2 * i + 1] = vertices[2 * i];
             }
-            
+
             // fix points
             for (int i = 0; i < steps; i++)
             {
-                vertices[2*i + 1] = vertices[2*i + 2];
+                vertices[2 * i + 1] = vertices[2 * i + 2];
             }
             _originalVertices.AddRange(vertices);
         }
@@ -198,23 +198,23 @@ namespace View3D.Rendering
             var startCircleVertices = circle.Select(v => new VertexPositionColor(v, color)).ToArray();
             var endCircleVertices = circle.Select(v => new VertexPositionColor(v + diffVector, color)).ToArray();
             var connectionCircleVertices = new VertexPositionColor[circle.Length];
-            var edgesVertices =  new VertexPositionColor[2*circle.Length];
-            foreach(int i in Enumerable.Range(0, circle.Length/2))
+            var edgesVertices = new VertexPositionColor[2 * circle.Length];
+            foreach (int i in Enumerable.Range(0, circle.Length / 2))
             {
-                connectionCircleVertices[2*i] = new VertexPositionColor(startCircleVertices[2*i].Position, color);
-                connectionCircleVertices[2*i+1] = new VertexPositionColor(endCircleVertices[2*i].Position, color);
-                edgesVertices[4*i] = new VertexPositionColor(startPos, color);
-                edgesVertices[4*i+1] = new VertexPositionColor(startCircleVertices[2*i].Position, color);
-                edgesVertices[4*i+2] = new VertexPositionColor(endPos, color);
-                edgesVertices[4*i+3] = new VertexPositionColor(endCircleVertices[2*i].Position, color);
+                connectionCircleVertices[2 * i] = new VertexPositionColor(startCircleVertices[2 * i].Position, color);
+                connectionCircleVertices[2 * i + 1] = new VertexPositionColor(endCircleVertices[2 * i].Position, color);
+                edgesVertices[4 * i] = new VertexPositionColor(startPos, color);
+                edgesVertices[4 * i + 1] = new VertexPositionColor(startCircleVertices[2 * i].Position, color);
+                edgesVertices[4 * i + 2] = new VertexPositionColor(endPos, color);
+                edgesVertices[4 * i + 3] = new VertexPositionColor(endCircleVertices[2 * i].Position, color);
             }
             _originalVertices.AddRange(startCircleVertices);
             _originalVertices.AddRange(endCircleVertices);
             _originalVertices.AddRange(connectionCircleVertices);
             _originalVertices.AddRange(edgesVertices);
         }
-        
-        public void AddConeSplash(Vector3 startPos, Vector3 endPos, Matrix transformationM, float coneAngleDegrees, Color color, int steps = 30, int angleSteps=60)
+
+        public void AddConeSplash(Vector3 startPos, Vector3 endPos, Matrix transformationM, float coneAngleDegrees, Color color, int steps = 30, int angleSteps = 60)
         {
             float halfAngle = MathHelper.ToRadians(coneAngleDegrees / 2);
 
@@ -231,10 +231,10 @@ namespace View3D.Rendering
                 Vector3.Transform(lastCircleVectors, ref transformationM, lastCircleVectors);
                 var lastCircle = lastCircleVectors.Select(v => new VertexPositionColor(v, color)).ToArray();
                 var rays = new VertexPositionColor[lastCircleVectors.Length];
-                foreach (int j in Enumerable.Range(0, rays.Length/2))
+                foreach (int j in Enumerable.Range(0, rays.Length / 2))
                 {
-                    rays[2*j] = new VertexPositionColor(startPos, color);
-                    rays[2*j+1] = new VertexPositionColor(lastCircle[2*j].Position, color);
+                    rays[2 * j] = new VertexPositionColor(startPos, color);
+                    rays[2 * j + 1] = new VertexPositionColor(lastCircle[2 * j].Position, color);
                 }
                 _originalVertices.AddRange(lastCircle);
                 _originalVertices.AddRange(rays);
@@ -250,7 +250,7 @@ namespace View3D.Rendering
                 {
                     circlesVectors[i * coneCircleSize + j] = circleVectors[j];
                 }
-                
+
             }
             Vector3.Transform(circlesVectors, ref transformationM, circlesVectors);
             var circles = circlesVectors.Select(v => new VertexPositionColor(v, color)).ToArray();

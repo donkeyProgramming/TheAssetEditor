@@ -1,11 +1,12 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using Microsoft.Xna.Framework;
 
 namespace CommonControls.FileTypes.MetaData.Definitions
 {
-    
+
     [MetaData("DISMEMBER", 2)]
     public class Dismember_v2 : DecodedMetaEntryBase_v2
     {
@@ -37,8 +38,8 @@ namespace CommonControls.FileTypes.MetaData.Definitions
         [MetaDataTag(8)]
         public Vector3 Rotation { get; set; }
     }
-    
-    
+
+
     [MetaData("ALLOW_LEG_DISMEMBER", 10)]
     public class AllowLegDismember_v10 : DecodedMetaEntryBase
     {
@@ -47,16 +48,16 @@ namespace CommonControls.FileTypes.MetaData.Definitions
     public class AllowFrontLegDismember_v10 : DecodedMetaEntryBase
     {
     }
-    
-    
+
+
     [MetaData("CAMPAIGN_DISMEMBER", 2)]
     public class CampaignDismember_v2 : DecodedMetaEntryBase_v2
     {
         [MetaDataTag(4)]
         public int UnknownInt0_v2 { get; set; }
-        
-        [MetaDataTag(5)] 
+
+        [MetaDataTag(5)]
         public string AnimationString { get; set; } = "";
     }
-    
+
 }

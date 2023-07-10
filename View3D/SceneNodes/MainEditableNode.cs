@@ -1,8 +1,6 @@
 ﻿using CommonControls.FileTypes.Animation;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
-using System;
 using System.IO;
 using View3D.Animation;
 using View3D.Services;
@@ -18,7 +16,7 @@ namespace View3D.SceneNodes
         public TextureFileEditorService TextureFileEditorService { get; set; }
         AnimationPlayer _player;
 
-        public MainEditableNode(AnimationPlayer player, string name, SkeletonNode skeletonNode,  PackFileService pfs) : base(name)
+        public MainEditableNode(AnimationPlayer player, string name, SkeletonNode skeletonNode, PackFileService pfs) : base(name)
         {
             _pfs = pfs;
             _player = player;
@@ -31,7 +29,7 @@ namespace View3D.SceneNodes
             string cleanSkeletonName = "";
             if (!string.IsNullOrWhiteSpace(skeletonName))
                 cleanSkeletonName = Path.GetFileNameWithoutExtension(skeletonName);
-            
+
             string animationFolder = "animations\\skeletons\\";
             var skeletonFilePath = animationFolder + cleanSkeletonName + ".anim";
             var skeletonPfs = _pfs.FindFile(skeletonFilePath);

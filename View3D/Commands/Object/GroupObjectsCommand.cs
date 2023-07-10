@@ -1,5 +1,4 @@
-﻿using MonoGame.Framework.WpfInterop;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
@@ -14,7 +13,7 @@ namespace View3D.Commands.Object
         ISceneNode _parent;
         List<ISelectable> _itemsToGroup { get; set; } = new List<ISelectable>();
 
-        public void Configure (ISceneNode parent, List<ISelectable> itemsToGroup)
+        public void Configure(ISceneNode parent, List<ISelectable> itemsToGroup)
         {
             _itemsToGroup = itemsToGroup;
             _parent = parent;
@@ -40,10 +39,10 @@ namespace View3D.Commands.Object
                 groupNode.AddObject(item);
             }
 
-            var currentState = _selectionManager.GetState< ObjectSelectionState>();
+            var currentState = _selectionManager.GetState<ObjectSelectionState>();
             currentState.Clear();
 
-            var itemsToSelect = groupNode.Children.Where(x => (x as ISelectable)?.IsSelectable == true).Select(x=>x as ISelectable).ToList();
+            var itemsToSelect = groupNode.Children.Where(x => (x as ISelectable)?.IsSelectable == true).Select(x => x as ISelectable).ToList();
             currentState.ModifySelection(itemsToSelect, false);
         }
 
@@ -101,7 +100,7 @@ namespace View3D.Commands.Object
             if (_oldGroupNode.Children.Count == 0)
                 _oldGroupNode.Parent.RemoveObject(_oldGroupNode);
 
-            var currentState = _selectionManager.GetState< ObjectSelectionState>();
+            var currentState = _selectionManager.GetState<ObjectSelectionState>();
             currentState.Clear();
             currentState.ModifySelection(_itemsToUngroup, false);
         }
@@ -149,7 +148,7 @@ namespace View3D.Commands.Object
         {
             // Create undo state
             _originalSelectionState = _selectionManager.GetStateCopy();
-          
+
             // Add itsms to group
             foreach (var item in _itemsToAdd)
             {

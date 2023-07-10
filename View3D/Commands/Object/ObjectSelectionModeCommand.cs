@@ -21,7 +21,7 @@ namespace View3D.Commands.Object
             _newMode = newMode;
         }
 
-        public void  Configure(ISelectable selectedItem, GeometrySelectionMode newMode)
+        public void Configure(ISelectable selectedItem, GeometrySelectionMode newMode)
         {
             _selectedItem = selectedItem;
             _newMode = newMode;
@@ -42,7 +42,7 @@ namespace View3D.Commands.Object
                 (newSelectionState as ObjectSelectionState).ModifySelectionSingleObject(_selectedItem, false);
             else if (newSelectionState.Mode == GeometrySelectionMode.Face)
                 (newSelectionState as FaceSelectionState).RenderObject = _selectedItem;
-            else if(newSelectionState.Mode == GeometrySelectionMode.Vertex)
+            else if (newSelectionState.Mode == GeometrySelectionMode.Vertex)
                 (newSelectionState as VertexSelectionState).RenderObject = _selectedItem;
         }
 

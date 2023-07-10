@@ -1,17 +1,17 @@
 ﻿using CommonControls.Common;
-using CommonControls.FileTypes.MetaData;
-using CommonControls.Services;
-using Serilog;
-using System;
-using System.Diagnostics;
-using System.IO;
-using Newtonsoft.Json;
-using System.Windows;
 using CommonControls.Editors.AnimationPack.Converters;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3;
+using CommonControls.FileTypes.MetaData;
 using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.Services;
+using Newtonsoft.Json;
+using Serilog;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Windows;
 
 namespace AssetEditor.Report
 {
@@ -22,7 +22,7 @@ namespace AssetEditor.Report
         ApplicationSettingsService _settingsService;
         private readonly GameInformationFactory _gameInformationFactory;
         JsonSerializerSettings _jsonOptions;
-        
+
         public AnimMetaDataJsonsGenerator(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
             _pfs = pfs;
@@ -53,7 +53,7 @@ namespace AssetEditor.Report
             if (Directory.Exists(gameOutputDir))
                 Directory.Delete(gameOutputDir, true);
             DirectoryHelper.EnsureCreated(gameOutputDir);
-            
+
             //dump animtable
             PackFile animPack = _pfs.Database.PackFiles[0].FileList["animations\\database\\battle\\bin\\animation_tables.animpack"];
             AnimationPackFile animPackFile = AnimationPackSerializer.Load(animPack, _pfs);
@@ -71,33 +71,33 @@ namespace AssetEditor.Report
             }
 
             var allMeta = _pfs.FindAllWithExtentionIncludePaths(".meta");
-            foreach (var (fileName,packFile) in allMeta)
+            foreach (var (fileName, packFile) in allMeta)
             {
                 try
                 {
-                    var data = packFile.DataSource.ReadData(); 
+                    var data = packFile.DataSource.ReadData();
                     if (data.Length == 0)
                         continue;
-            
+
                     var parser = new MetaDataFileParser();
                     var metaData = parser.ParseFile(data);
                     dumpAsJson(gameOutputDir, fileName + ".json", metaData);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     _logger.Here().Information($"Meta parsing failed {fileName} - {e.Message}");
                 }
             }
-            
+
             var allAnimations = _pfs.FindAllWithExtentionIncludePaths(".anim");
-            foreach (var (fileName,packFile) in allAnimations)
+            foreach (var (fileName, packFile) in allAnimations)
             {
                 try
                 {
                     var animationHeader = AnimationFile.GetAnimationHeader(packFile);
                     dumpAsJson(gameOutputDir, fileName + ".header.json", animationHeader);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     _logger.Here().Information($"Animation parsing failed {fileName} - {e.Message}");
                 }

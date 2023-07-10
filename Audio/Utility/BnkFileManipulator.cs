@@ -1,11 +1,6 @@
-﻿using Audio.FileFormats;
-using Audio.FileFormats.WWise;
-using Audio.FileFormats.WWise.Bkhd;
+﻿using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Hirc;
 using CommonControls.FileTypes.PackFiles.Models;
-using Filetypes.ByteParsing;
-using System;
-using System.IO;
 using System.Linq;
 
 namespace Audio.Utility
@@ -17,7 +12,7 @@ namespace Audio.Utility
             var bnkParser = new Bnkparser();
             bnkParser.UseHircByteFactory(true);
             var parsingResult = bnkParser.Parse(bnkFile, bnkFileName);
-            var wantedHirc = parsingResult.HircChuck.Hircs.FirstOrDefault(x=>x.Id == hircId);
+            var wantedHirc = parsingResult.HircChuck.Hircs.FirstOrDefault(x => x.Id == hircId);
             return wantedHirc as ByteHirc;
 
 

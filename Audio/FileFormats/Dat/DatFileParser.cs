@@ -13,7 +13,7 @@ namespace Audio.FileFormats.Dat
             var chunk = file.DataSource.ReadDataAsChunk();
 
             SoundDatFile output = new SoundDatFile();
-            
+
             var sectionZeroCount = chunk.ReadUInt32();
             for (int i = 0; i < sectionZeroCount; i++)
                 output.Event0.Add(new SoundDatFile.EventWithValue() { EventName = ReadStr32(chunk), Value = chunk.ReadSingle() });

@@ -44,9 +44,9 @@ namespace View3D.Components.Component.Selection
         }
 
 
-        public List<ISelectable> CurrentSelection() 
-        { 
-            return _selectionList; 
+        public List<ISelectable> CurrentSelection()
+        {
+            return _selectionList;
         }
 
         public void Clear()

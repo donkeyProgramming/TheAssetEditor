@@ -3,7 +3,6 @@ using AnimationEditor.Common.ReferenceModel;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.DependencyInjection;
 using System.Windows.Input;
 using View3D.Components;
 using View3D.Scene;
@@ -32,16 +31,19 @@ namespace AnimationEditor.PropCreator.ViewModels
         TEditor _editor;
         public TEditor Editor { get => _editor; set => SetAndNotify(ref _editor, value); }
 
-        FocusSelectableObjectService _focusComponent;
+        private readonly FocusSelectableObjectService _focusSelectableObjectService;
+
         public ICommand ResetCameraCommand { get; set; }
         public ICommand FocusCamerasCommand { get; set; }
 
 
         public BaseAnimationViewModel(IComponentInserter componentInserter,
             AnimationPlayerViewModel animationPlayerViewModel,
-            MainScene sceneContainer)
+            MainScene sceneContainer,
+            FocusSelectableObjectService focusSelectableObjectService)
         {
             Scene = sceneContainer;
+            _focusSelectableObjectService = focusSelectableObjectService;
             Player = animationPlayerViewModel;
 
             ResetCameraCommand = new RelayCommand(ResetCamera);
@@ -50,8 +52,8 @@ namespace AnimationEditor.PropCreator.ViewModels
             componentInserter.Execute();
         }
 
-        void ResetCamera() => _focusComponent.ResetCamera();
-        void FocusCamera() => _focusComponent.FocusSelection();
+        void ResetCamera() => _focusSelectableObjectService.ResetCamera();
+        void FocusCamera() => _focusSelectableObjectService.FocusSelection();
 
         public void Close()
         {

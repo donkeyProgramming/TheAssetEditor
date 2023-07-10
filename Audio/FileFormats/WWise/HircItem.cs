@@ -3,7 +3,6 @@ using Filetypes.ByteParsing;
 using Serilog;
 using System;
 using System.IO;
-using System.Text.Json;
 
 namespace Audio.FileFormats.WWise
 {

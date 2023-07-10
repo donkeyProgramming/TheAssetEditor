@@ -1,13 +1,16 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes;
-using CommonControls.FileTypes.RigidModel.LodHeader;
-using CommonControls.FileTypes.RigidModel.MaterialHeaders;
-using CommonControls.FileTypes.RigidModel.Vertex;
-using Serilog;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using CommonControls.Common;
+using CommonControls.FileTypes.RigidModel.LodHeader;
+using CommonControls.FileTypes.RigidModel.MaterialHeaders;
+using CommonControls.FileTypes.RigidModel.Vertex;
+using Serilog;
 
 namespace CommonControls.FileTypes.RigidModel
 {
@@ -32,7 +35,7 @@ namespace CommonControls.FileTypes.RigidModel
                 modelList[i] = LoadMeshInLod(bytes, file.LodHeaders[i], file.Header.Version);
 
             file.ModelList = modelList;
-            if(_logLoadedFile)
+            if (_logLoadedFile)
                 DumpToLog(file, bytes.Length);
 
             return file;
@@ -89,7 +92,7 @@ namespace CommonControls.FileTypes.RigidModel
 
             var vertexStart = commonHeader.VertexOffset + modelStartOffset;
             var expectedVertexSize = (commonHeader.IndexOffset - commonHeader.VertexOffset) / commonHeader.VertexCount;
-            if(vertexFactory.IsKnownVertex(binaryVertexFormat) == false)
+            if (vertexFactory.IsKnownVertex(binaryVertexFormat) == false)
                 throw new Exception($"Unknown vertex format for {commonHeader.ModelTypeFlag} - {binaryVertexFormat}. Size:{expectedVertexSize}");
 
             var vertexSize = vertexFactory.GetVertexSize(binaryVertexFormat, rmvVersionEnum);
@@ -192,7 +195,7 @@ namespace CommonControls.FileTypes.RigidModel
             if (model.CommonHeader.VertexCount != model.Mesh.VertexList.Length)
                 throw new Exception("Unexpected IndexCount");
 
-            model.UpdateModelTypeFlag(model.Material.MaterialId); 
+            model.UpdateModelTypeFlag(model.Material.MaterialId);
             binaryWriter.Write(ByteHelper.GetBytes(model.CommonHeader));
             binaryWriter.Write(MaterialFactory.Create().Save(model.CommonHeader.ModelTypeFlag, model.Material));
 
@@ -273,7 +276,7 @@ namespace CommonControls.FileTypes.RigidModel
                     var computedBB = Microsoft.Xna.Framework.BoundingBox.CreateFromPoints(vertexList);
 
                     strBuilder.AppendLine($"\t\t\t Computed BoundingBox: {computedBB.Min.X},{computedBB.Max.X} | {computedBB.Min.Y},{computedBB.Max.Y}  | {computedBB.Min.Z},{computedBB.Max.Z} ");
-                    strBuilder.AppendLine($"\t\t\t Computed BoundingBox.Width {Math.Abs( computedBB.Min.X - computedBB.Max.X)}");
+                    strBuilder.AppendLine($"\t\t\t Computed BoundingBox.Width {Math.Abs(computedBB.Min.X - computedBB.Max.X)}");
                     strBuilder.AppendLine($"\t\t\t Computed BoundingBox.Height {Math.Abs(computedBB.Min.Y - computedBB.Max.Y)}");
                     strBuilder.AppendLine($"\t\t\t Computed BoundingBox.Depth {Math.Abs(computedBB.Min.Z - computedBB.Max.Z)}");
 

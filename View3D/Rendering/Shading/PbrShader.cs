@@ -14,7 +14,7 @@ namespace View3D.Rendering.Shading
         protected Dictionary<TextureType, EffectParameter> _textures = new Dictionary<TextureType, EffectParameter>();
         protected Dictionary<TextureType, EffectParameter> _useTextures = new Dictionary<TextureType, EffectParameter>();
         protected ResourceLibary _resourceLibary;
-        
+
         public PbrShader(ResourceLibary resourceLibary, RenderFormats renderFormat)
         {
             _resourceLibary = resourceLibary;
@@ -43,10 +43,11 @@ namespace View3D.Rendering.Shading
             Effect.Parameters["View"].SetValue(commonShaderParameters.View);
             Effect.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
             Effect.Parameters["EnvMapTransform"].SetValue((Matrix.CreateRotationY(commonShaderParameters.EnvLightRotationsRadians_Y)));
-            Effect.Parameters["DirLightTransform"].SetValue(Matrix.CreateRotationY(commonShaderParameters.DirLightRotationRadians_Y) * Matrix.CreateRotationX(commonShaderParameters.DirLightRotationRadians_X));       
+            Effect.Parameters["DirLightTransform"].SetValue(Matrix.CreateRotationY(commonShaderParameters.DirLightRotationRadians_Y) * Matrix.CreateRotationX(commonShaderParameters.DirLightRotationRadians_X));
             Effect.Parameters["LightMult"].SetValue(commonShaderParameters.LightIntensityMult);
             Effect.Parameters["World"].SetValue(modelMatrix);
-            Effect.Parameters["CameraPos"].SetValue(commonShaderParameters.CameraPosition);        }
+            Effect.Parameters["CameraPos"].SetValue(commonShaderParameters.CameraPosition);
+        }
 
         public bool UseAnimation { set { Effect.Parameters["doAnimation"].SetValue(value); } }
 

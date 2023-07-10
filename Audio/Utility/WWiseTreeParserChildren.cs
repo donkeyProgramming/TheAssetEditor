@@ -36,7 +36,7 @@ namespace Audio.AudioEditor
             var dialogEventNode = new HircTreeItem() { DisplayName = $"Dialog_Event {_repository.GetNameFromHash(item.Id)} - [{paths.Header.GetAsString()}]", Item = item };
             parent.Children.Add(dialogEventNode);
 
-            foreach(var path in paths.Paths) 
+            foreach (var path in paths.Paths)
             {
                 var pathNode = new HircTreeItem() { DisplayName = path.GetAsString(), Item = item, IsExpanded = false };
                 dialogEventNode.Children.Add(pathNode);
@@ -126,7 +126,7 @@ namespace Audio.AudioEditor
             foreach (var switchCase in switchControl.SwitchList)
             {
                 var switchValue = _repository.GetNameFromHash(switchCase.SwitchId);
-                var switchValueNode = new HircTreeItem() { DisplayName = $"SwitchValue: {switchValue}", Item = item, IsMetaNode = true};
+                var switchValueNode = new HircTreeItem() { DisplayName = $"SwitchValue: {switchValue}", Item = item, IsMetaNode = true };
                 switchControlNode.Children.Add(switchValueNode);
 
                 ProcessNext(switchCase.NodeIdList, switchValueNode);
@@ -140,7 +140,7 @@ namespace Audio.AudioEditor
             parent.Children.Add(layerNode);
 
             foreach (var layer in layerContainer.Children.ChildIdList)
-                ProcessNext(layer, layerNode);           
+                ProcessNext(layer, layerNode);
         }
 
         private void ProcessSequenceContainer(HircItem item, HircTreeItem parent)

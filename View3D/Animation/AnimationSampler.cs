@@ -29,7 +29,7 @@ namespace View3D.Animation
                         InterpolateFrame(currentFrameKeys, nextFrameKeys, frameIterpolation, currentFrame);
                     }
                 }
-          
+
                 // Compute the worldspace values
                 for (int boneIndex = 0; boneIndex < currentFrame.BoneTransforms.Count(); boneIndex++)
                 {
@@ -89,7 +89,7 @@ namespace View3D.Animation
                     float clampedFrame = (float)Math.Floor(frameWithLeftover);
 
                     frameIndex = (int)(clampedFrame);
-                    frameIterpolation = frameWithLeftover - clampedFrame; 
+                    frameIterpolation = frameWithLeftover - clampedFrame;
                 }
 
                 return Sample(frameIndex, frameIterpolation, skeleton, animationClip, animationChangeRules);
