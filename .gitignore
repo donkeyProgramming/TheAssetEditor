@@ -13,12 +13,6 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
-# Exludes the FBX SDK .lib files from "ignore" (.lib is default ignored)
-!*.lib
-#!TheAsssetEditor/FBXWRapperDll/fbxsdk/lib/*
-#!TheAssetEditor/FBXWRapperDll/fbxsdk/lib/vs2019/x64/debug/libfbxsdk.dll
-
-
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
