@@ -15,7 +15,7 @@
 
 
 # Exludes the FBX SDK .lib files from "ignore" (.lib is default ignored)
-!TheAssetEditor/FBXWRapperDll/fbxsdk/lib/vs2019/x64/debug\libfbxsdk.lib
+!TheAssetEditor/FBXWRapperDll/fbxsdk/lib/vs2019/x64/debug/libfbxsdk.lib
 !TheAssetEditor/FBXWRapperDll/fbxsdk/lib/vs2019/x64/release/libfbxsdk.lib
 
 
