@@ -14,8 +14,9 @@
 *.userprefs
 
 # Exludes the FBX SDK .lib files from "ignore" (.lib is default ignored)
-!*.lib
-#!TheAsssetEditor/FBXWRapperDll/fbxsdk/lib/vs2019/x64/release/libfbxsdk.lib
+#!*.lib
+
+#!/TheAsssetEditor/FBXWRapperDll/fbxsdk/lib/vs2019/x64/release/*.lib
 
 
 # Build results
