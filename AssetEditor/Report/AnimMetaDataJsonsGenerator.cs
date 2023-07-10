@@ -37,7 +37,7 @@ namespace AssetEditor.Report
             instance.Create();
         }
 
-        void dumpAsJson(string gameOutputDir, string fileName, object? data)
+        void dumpAsJson(string gameOutputDir, string fileName, object data)
         {
             string jsonString = JsonConvert.SerializeObject(data, _jsonOptions);
             string json_filepath = Path.Join(gameOutputDir, fileName);

@@ -1,5 +1,5 @@
 ﻿using CommonControls.BaseDialogs.ToolSelector;
-using CommonControls.Events;
+using CommonControls.Events.Global;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using SharpDX.MediaFoundation;

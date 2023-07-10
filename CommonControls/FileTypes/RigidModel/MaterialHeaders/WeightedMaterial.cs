@@ -229,8 +229,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 
         public byte[] Save(IMaterial material)
         {
-            var typedMaterial = material as WeightedMaterial;
-            if (typedMaterial == null)
+            if (material is not WeightedMaterial typedMaterial)
                 throw new Exception("Incorrect material provided for WeightedMaterial::Save");
 
             // Create the header

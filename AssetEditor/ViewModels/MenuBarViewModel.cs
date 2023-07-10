@@ -26,6 +26,8 @@ using System.IO;
 using System.Text;
 using Audio.Presentation.AudioExplorer;
 using Audio.Presentation.Compiler;
+using AssetEditor.UiCommands;
+using CommonControls.Events.UiCommands;
 
 namespace AssetEditor.ViewModels
 {
@@ -49,10 +51,9 @@ namespace AssetEditor.ViewModels
         private readonly GameInformationFactory _gameInformationFactory;
         IServiceProvider _serviceProvider;
         PackFileService _packfileService;
-        IToolFactory _toolFactory;
         ApplicationSettingsService _settingsService;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        public IEditorCreator EditorCreator { get; set; }
+        private readonly IUiCommandFactory _uiCommandFactory;
 
         public ICommand OpenSettingsWindowCommand { get; set; }
         public ICommand CreateNewPackFileCommand { get; set; }
@@ -101,13 +102,19 @@ namespace AssetEditor.ViewModels
         
         public ObservableCollection<RecentPackFileItem> RecentPackFiles { get; set; } = new ObservableCollection<RecentPackFileItem>();
 
-        public MenuBarViewModel(GameInformationFactory gameInformationFactory, IServiceProvider provider, PackFileService packfileService, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, IToolFactory toolFactory, ApplicationSettingsService settingsService)
+        public MenuBarViewModel(
+            GameInformationFactory gameInformationFactory, 
+            IServiceProvider provider, 
+            PackFileService packfileService, 
+            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
+            ApplicationSettingsService settingsService,
+            IUiCommandFactory uiCommandFactory)
         {
             _gameInformationFactory = gameInformationFactory;
             _serviceProvider = provider;
             _packfileService = packfileService;
-            _toolFactory = toolFactory;
             _settingsService = settingsService;
+            _uiCommandFactory = uiCommandFactory;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
 
             OpenSettingsWindowCommand = new RelayCommand(ShowSettingsDialog);
@@ -239,41 +246,13 @@ namespace AssetEditor.ViewModels
         }
 
 
-        void OpenMountCreator()
-        {
-            var editorView = _toolFactory.Create<MountAnimationCreatorViewModel>();
-            EditorCreator.CreateEmptyEditor(editorView);
-        }
-
-        void OpenCampaignAnimCreatorEditor()
-        {
-            var editorView = _toolFactory.Create<CampaignAnimationCreatorViewModel>();
-            EditorCreator.CreateEmptyEditor(editorView);
-        }
-
-        void OpenAnimationTransferTool()
-        {
-            var editorView = _toolFactory.Create<AnimationTransferToolViewModel>();
-            EditorCreator.CreateEmptyEditor(editorView);
-        }
-
-        void OpenSuperViewTool()
-        {
-            var editorView = _toolFactory.Create<SuperViewViewModel>();
-            EditorCreator.CreateEmptyEditor(editorView);
-        }
-
-        private void OpenAudioEditor()
-        {
-            var editorView = _toolFactory.Create<AudioEditorViewModel>();
-            EditorCreator.CreateEmptyEditor(editorView);
-        }
-
-        private void CompileAudioProjects()
-        {
-            var editorView = _toolFactory.Create<CompilerViewModel>();
-            EditorCreator.CreateEmptyEditor(editorView);
-        }
+        void OpenMountCreator() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<MountAnimationCreatorViewModel>();
+        void OpenCampaignAnimCreatorEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<CampaignAnimationCreatorViewModel>();
+        void OpenAnimationTransferTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<AnimationTransferToolViewModel>();
+        void OpenSuperViewTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<SuperViewViewModel>();
+        void OpenAudioEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioEditorViewModel>();
+        void CompileAudioProjects() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<CompilerViewModel>();
+        void OpenTechSkeletonEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<SkeletonEditorViewModel>();
 
         private void CreateExampleAudioProject()
         {
@@ -289,11 +268,7 @@ namespace AssetEditor.ViewModels
             _packfileService.AddFileToPack(pack, "AudioProjects", new PackFile("AudioCompilerExample.json", new MemorySource(byteArray)));
         }
 
-        void OpenTechSkeletonEditor()
-        {
-            var editorView = _toolFactory.Create<SkeletonEditorViewModel>();
-            EditorCreator.CreateEmptyEditor(editorView);
-        }
+   
 
         void OpenAnimationBatchExporter() => AnimationBatchExportViewModel.ShowWindow(_packfileService, _skeletonAnimationLookUpHelper);
 
@@ -316,7 +291,6 @@ namespace AssetEditor.ViewModels
         void GenerateFileListReport() => FileListReportGenerator.Generate(_packfileService, _settingsService, _gameInformationFactory);
         
         void GenerateMetaDataJsonsReport() => AnimMetaDataJsonsGenerator.Generate(_packfileService, _settingsService, _gameInformationFactory);
-
 
         void Search()
         {

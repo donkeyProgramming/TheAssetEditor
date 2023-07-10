@@ -1,6 +1,6 @@
 ﻿using Common;
 using CommonControls.Common;
-using CommonControls.Events;
+using CommonControls.Events.Scoped;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;

@@ -17,6 +17,7 @@ using View3D.Utility;
 using View3D.Components.Component;
 using CommonControls.Events;
 using Common;
+using CommonControls.Events.Scoped;
 
 namespace View3D.Services
 {
