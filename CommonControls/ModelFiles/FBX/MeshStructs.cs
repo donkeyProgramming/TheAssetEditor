@@ -2,7 +2,6 @@
 using CommonControls.ModelFiles.Mesh.Native;
 using System.Runtime.InteropServices;
 
-
 namespace CommonControls.ModelFiles.Mesh
 {
     // - structs that are bit for bit compatible with types used on the C++ side

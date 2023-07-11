@@ -33,7 +33,10 @@ wrapdll::FBXSCeneContainer* wrapdll::FBXImporterService::ProcessAndFillScene()
 	for (size_t meshIndex = 0; meshIndex < fbxMeshList.size(); meshIndex++)
 	{
 		std::vector<ControlPointInfluences> vertexToControlPoint;
-		FBXSkinProcessorService::ProcessSkin(fbxMeshList[meshIndex], destPackedMeshes[meshIndex], m_animFileBoneNames, vertexToControlPoint);
+		
+		if (!m_animFileBoneNames.empty())
+			FBXSkinProcessorService::ProcessSkin(fbxMeshList[meshIndex], destPackedMeshes[meshIndex], m_animFileBoneNames, vertexToControlPoint);
+		
 		FBXMeshCreator::MakeUnindexPackedMesh(m_pFbxScene, fbxMeshList[meshIndex], destPackedMeshes[meshIndex], vertexToControlPoint);
 
 		log_action("Doing Tangents/Indexing");

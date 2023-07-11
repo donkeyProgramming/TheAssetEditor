@@ -11,7 +11,7 @@ using CommonControls.Services;
 using Microsoft.Xna.Framework;
 using CommonControls.ModelFiles.Mesh;
 using CommonControls.ModelFiles.Mesh.Native;
-using CommonControls.ModelFiles.Helpers.Vertex;
+using SharpDX.Direct3D9;
 
 namespace CommonControls.ModelFiles.FBX
 {
@@ -59,7 +59,9 @@ namespace CommonControls.ModelFiles.FBX
                         (skeletonName != "") ? ModelMaterialEnum.weighted : ModelMaterialEnum.default_type,
                         (skeletonName != "") ? FileTypes.RigidModel.VertexFormat.Cinematic : FileTypes.RigidModel.VertexFormat.Static);
 
-                    cuurentMeshRef.Mesh = ConvertPackedMeshtoRmvMesh(packedMeshes[meshIndex], skeletonName);
+
+
+                    cuurentMeshRef.Mesh = ConvertPackedMeshtoRmvMesh(cuurentMeshRef.Material.BinaryVertexFormat, packedMeshes[meshIndex], skeletonName);
 
                     cuurentMeshRef.Material.ModelName = packedMeshes[meshIndex].Name;
 
@@ -87,13 +89,14 @@ namespace CommonControls.ModelFiles.FBX
         /// <param name="diskFilePath">Input model disk file</param>
         /// <param name="diskSkeletonFile">Optional skeleton file, use instead skeleton namm-scene-lookup</param>
         public static SceneContainer Import3dModelDiskFileToPack(PackFileService pfs, PackFileContainer contaipfsner, string parentPackPath, string diskFilePath, string diskSkeletonFile = "")
-        {           
-           string skeletonName = "";
+        {
+            string skeletonName = "";
             var sceneContainer = SceneImorterService.CreateSceneFromFBX(diskFilePath, pfs, out skeletonName);
-            MeshFileHelper.AddRmv2ToPackFIle(pfs, contaipfsner, parentPackPath, diskFilePath, skeletonName, sceneContainer);
+
+            var rmv2FileName = $"{System.IO.Path.GetFileNameWithoutExtension(diskFilePath)}.rigid_model_v2";
+            MeshFileHelper.AddRmv2ToPackFIle(pfs, contaipfsner, parentPackPath, rmv2FileName, skeletonName, sceneContainer);
             return sceneContainer;
         }
-
         public static string GetOutFileName(string diskFilePath)
         {
             var fileNameNoExt = Path.GetFileNameWithoutExtension(diskFilePath);
@@ -104,6 +107,7 @@ namespace CommonControls.ModelFiles.FBX
 
         public static void AddRmv2ToPackFIle(PackFileService pfs, PackFileContainer container, string parentPackPath, string outFileName, string skeletonName, SceneContainer scene)
         {
+            
             var rmv2File = MakeRMV2File(scene.Meshes, skeletonName); ;
             var factory = ModelFactory.Create();
             var buffer = factory.Save(rmv2File);
@@ -115,13 +119,14 @@ namespace CommonControls.ModelFiles.FBX
         /// <summary>
         ///  Copy the data of "PackedMesh" into an "RmvMesh"
         /// </summary>
-        private static RmvMesh ConvertPackedMeshtoRmvMesh(PackedMesh packedInputMesh, string skeletonName)
-        {        
+        private static RmvMesh ConvertPackedMeshtoRmvMesh(FileTypes.RigidModel.VertexFormat vertexFormat, PackedMesh packedInputMesh, string skeletonName)
+        {
             RmvMesh unindexesMesh = new RmvMesh();
             unindexesMesh.IndexList = new ushort[packedInputMesh.Indices.Count];
             unindexesMesh.VertexList = new CommonVertex[packedInputMesh.Vertices.Count];
 
-            var originalVerticesPacked = MakePackedVertices(packedInputMesh, skeletonName);
+            var originalVerticesPacked = MakePackedVertices(vertexFormat, packedInputMesh, skeletonName);
+                       
 
             unindexesMesh.VertexList = originalVerticesPacked.ToArray();
             unindexesMesh.IndexList = packedInputMesh.Indices.ToArray();
@@ -132,7 +137,7 @@ namespace CommonControls.ModelFiles.FBX
         /// <summary>
         /// Make list of "CommonVertex" from the vertices in a "PackedMesh"
         /// </summary>        
-        private static List<CommonVertex> MakePackedVertices(PackedMesh packedInputMesh, string skeletonName)
+        private static List<CommonVertex> MakePackedVertices(FileTypes.RigidModel.VertexFormat vertexFormat, PackedMesh packedInputMesh, string skeletonName)
         {
             var vertices = new CommonVertex[packedInputMesh.Vertices.Count].ToList();
 
@@ -146,7 +151,7 @@ namespace CommonControls.ModelFiles.FBX
                     packedInputMesh.Vertices[vertexIndex].BiNormal,
                     skeletonName);
                 
-                MakeVertexWeights(packedInputMesh.Vertices[vertexIndex], vertices[vertexIndex]);                
+                MakeVertexWeights(vertexFormat, packedInputMesh.Vertices[vertexIndex], vertices[vertexIndex]);                
             }
 
             return vertices;
@@ -155,11 +160,16 @@ namespace CommonControls.ModelFiles.FBX
         /// <summary>
         /// Copies the vertex influences from a "PackedCommonVertex" to a "CommonVertex"
         /// </summary>        
-        private static void MakeVertexWeights(PackedCommonVertex packedInputVertex, CommonVertex outVertex)
+        private static void MakeVertexWeights(FileTypes.RigidModel.VertexFormat vertexFormat, PackedCommonVertex packedInputVertex, CommonVertex outVertex)
         {
-            outVertex.WeightCount = 4;
-            outVertex.BoneIndex = new byte[4];
-            outVertex.BoneWeight = new float[4];
+            if (vertexFormat == FileTypes.RigidModel.VertexFormat.Static)
+            {
+                outVertex.WeightCount = 0;
+                outVertex.BoneIndex = new byte[0];
+                outVertex.BoneWeight = new float[0];
+
+                return;
+            }
 
             for (int influenceIndex = 0; influenceIndex < 4; influenceIndex++)
             {

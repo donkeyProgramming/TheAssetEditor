@@ -1,17 +1,24 @@
 ﻿using System;
+using Serilog;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using CommonControls.Services;
 using CommonControls.FileTypes.Animation;
 using CommonControls.ModelFiles.Mesh;
 using CommonControls.ModelFiles.Mesh.Native;
+using CommonControls.Common;
 
 namespace CommonControls.ModelFiles.FBX
 {
     public class SceneImorterService
     {
+        static private ILogger _logger = Logging.Create<SceneImorterService>();
+
         public static SceneContainer CreateSceneFromFBX(string fileName, PackFileService pfs, out string skeletonName)
         {
+
+            //var DLL = Assembly.LoadFile("FBXWrapperNative.dll");
+
             var newScene = new SceneContainer();
             var fbxSceneLoader = FBXSeneLoaderServiceDLL.CreateSceneFBX(fileName); // inits the FBX, no vertex proecsssing yet
 
@@ -30,11 +37,11 @@ namespace CommonControls.ModelFiles.FBX
 
         private static void SetSkeletonBoneNames(PackFileService pfs, IntPtr fbxSceneLoader, out string outSkeletonName)
         {
-            var skeletonNamePtr = FBXSeneLoaderServiceDLL.GetSkeletonNameFromScene(fbxSceneLoader);
+                var skeletonNamePtr = FBXSeneLoaderServiceDLL.GetSkeletonNameFromScene(fbxSceneLoader);
 
             outSkeletonName = "";
 
-            if (skeletonNamePtr != null)
+            if (skeletonNamePtr != IntPtr.Zero)
             {
                 string skeletonName = Marshal.PtrToStringUTF8(skeletonNamePtr);
                 if (skeletonName == null)
@@ -51,7 +58,9 @@ namespace CommonControls.ModelFiles.FBX
 
                 if (packFile == null)
                 {
-                    throw new Exception("packFile==null when loading skeleton");
+                    outSkeletonName = "";
+                    _logger.Warning("MODEL IMPORT ERROR: could not find skeleton .ANIM file, make sure you have the correct game selected");
+                    return;
                 }
 
                 var animFile = AnimationFile.Create(packFile.DataSource.ReadDataAsChunk());
@@ -70,19 +79,15 @@ namespace CommonControls.ModelFiles.FBX
     }
     public class SceneMarshaller
     {
+     
         public static void ToManaged(IntPtr ptrFbxSceneContainer, SceneContainer destScene)
         {
             destScene.Meshes = GetAllPackedMeshes(ptrFbxSceneContainer);
             /*
-            destScene.Bones = GetAllBones();
-            destScene.Animations = GetAllBones();
-            
+            - destScene.Bones = GetAllBones();
+            - destScene.Animations = GetAllBones();
+            - etc, comming soon
             */
-        }
-
-        public void AddSkeletonFromFile(string path)
-        {
-
         }
 
         public static PackedCommonVertex[]? GetPackesVertices(IntPtr fbxContainer, int meshIndex)
@@ -166,34 +171,34 @@ namespace CommonControls.ModelFiles.FBX
     // TODO: move to scene.cs
     public class FBXSCeneContainerDll
     {
-        [DllImport(@"FBXWrapperNative.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("FBXWrapperNative.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern bool GetPackedVertices(IntPtr ptrInstances, int meshIndex, out IntPtr vertices, out int itemCount);
 
-        [DllImport(@"FBXWrapperNative.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("FBXWrapperNative.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern bool GetIndices(IntPtr ptrInstances, int meshIndex, out IntPtr vertices, out int itemCount);
 
-        [DllImport(@"FBXWrapperNative.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("FBXWrapperNative.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int GetMeshCount(IntPtr ptrInstances);
 
-        [DllImport(@"FBXWrapperNative.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("FBXWrapperNative.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr GetMeshName(IntPtr ptrInstances, int meshIndex);
     }
 
     public class FBXSeneLoaderServiceDLL
     {
-        [DllImport(@"FBXWrapperNative.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("FBXWrapperNative.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void DeleteBaseObj(IntPtr ptrInstances);
 
-        [DllImport(@"FBXWrapperNative.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("FBXWrapperNative.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr ProcessAndFillScene(IntPtr ptrFBXSceneLoaderService);
 
-        [DllImport(@"FBXWrapperNative.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("FBXWrapperNative.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr CreateSceneFBX(string path);
 
-        [DllImport(@"FBXWrapperNative.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("FBXWrapperNative.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr CreateFBXSceneImporterService();
 
-        [DllImport(@"FBXWrapperNative.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("FBXWrapperNative.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr CreateFBXContainer();
 
         [DllImport("FBXWrapperNative.dll", CallingConvention = CallingConvention.Cdecl)]

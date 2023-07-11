@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CommonControls.FileTypes.RigidModel.Vertex;
 
-namespace CommonControls.ModelFiles.Helpers.Vertex
+namespace CommonControls.ModelFiles.FBX
 {
     public class VertexWeightProcessor
     {
@@ -37,8 +37,8 @@ namespace CommonControls.ModelFiles.Helpers.Vertex
             vertex.WeightCount = 4;
             const double weightErrorTolerance = 0.1;
 
-            float weightSum = 0.0f;
-            for (int weightIndex = 0; weightIndex < vertex.WeightCount; weightIndex++)
+            var weightSum = 0.0f;
+            for (var weightIndex = 0; weightIndex < vertex.WeightCount; weightIndex++)
             {
                 weightSum += vertex.BoneWeight[weightIndex];
             }
@@ -54,15 +54,15 @@ namespace CommonControls.ModelFiles.Helpers.Vertex
         /// </summary>        
         public static void NormalizeVertexWeights(CommonVertex vertex)
         {
-            float weightSum = 0.0f;
-            for (int weightIndex = 0; weightIndex < vertex.WeightCount; weightIndex++)
+            var weightSum = 0.0f;
+            for (var weightIndex = 0; weightIndex < vertex.WeightCount; weightIndex++)
             {
                 weightSum += vertex.BoneWeight[weightIndex];
             }
 
-            float scaleFactor = 1 / weightSum;
+            var scaleFactor = 1 / weightSum;
 
-            for (int weightIndex = 0; weightIndex < vertex.WeightCount; weightIndex++)
+            for (var weightIndex = 0; weightIndex < vertex.WeightCount; weightIndex++)
             {
                 vertex.BoneWeight[weightIndex] *= scaleFactor;
             }
@@ -78,7 +78,7 @@ namespace CommonControls.ModelFiles.Helpers.Vertex
         /// </summary>        
         public static void SortVertexWeights(CommonVertex vertex)
         {
-            List<VertexInfluence> influences = new List<VertexInfluence>(4)
+            var influences = new List<VertexInfluence>(4)
                 {
                     new VertexInfluence(),
                     new VertexInfluence(),
@@ -86,7 +86,7 @@ namespace CommonControls.ModelFiles.Helpers.Vertex
                     new VertexInfluence(),
                 };
 
-            for (int weightIndex = 0; weightIndex < vertex.WeightCount; weightIndex++)
+            for (var weightIndex = 0; weightIndex < vertex.WeightCount; weightIndex++)
             {
                 influences[weightIndex].index = vertex.BoneIndex[weightIndex];
                 influences[weightIndex].weight = vertex.BoneWeight[weightIndex];
@@ -94,7 +94,7 @@ namespace CommonControls.ModelFiles.Helpers.Vertex
 
             influences = influences.OrderByDescending(influence => influence.weight).ToList();
 
-            for (int weightIndex = 0; weightIndex < vertex.WeightCount; weightIndex++)
+            for (var weightIndex = 0; weightIndex < vertex.WeightCount; weightIndex++)
             {
                 vertex.BoneIndex[weightIndex] = (byte)influences[weightIndex].index;
                 vertex.BoneWeight[weightIndex] = influences[weightIndex].weight;
