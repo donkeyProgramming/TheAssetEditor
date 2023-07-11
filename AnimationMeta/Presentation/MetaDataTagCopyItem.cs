@@ -5,7 +5,7 @@
 using CommonControls.Common;
 using CommonControls.FileTypes.MetaData;
 
-namespace CommonControls.Editors.AnimMeta
+namespace AnimationMeta.Presentation
 {
     public class MetaDataTagCopyItem : ICopyPastItem
     {

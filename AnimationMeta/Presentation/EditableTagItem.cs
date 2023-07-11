@@ -8,7 +8,7 @@ using Filetypes.ByteParsing;
 using Microsoft.Xna.Framework;
 using Serilog;
 
-namespace CommonControls.Editors.AnimMeta
+namespace AnimationMeta.Presentation
 {
     public class EditableTagItem : NotifyPropertyChangedImpl
     {

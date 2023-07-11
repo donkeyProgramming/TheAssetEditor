@@ -4,14 +4,14 @@
 
 using System.Windows.Controls;
 
-namespace CommonControls.Editors.AnimMeta.View
+namespace AnimationMeta.Presentation.View
 {
     /// <summary>
-    /// Interaction logic for MainEditorView.xaml
+    /// Interaction logic for EditorValueEditor.xaml
     /// </summary>
-    public partial class MainEditorView : UserControl
+    public partial class EditorValueEditor : UserControl
     {
-        public MainEditorView()
+        public EditorValueEditor()
         {
             InitializeComponent();
         }

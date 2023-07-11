@@ -315,7 +315,7 @@ namespace CommonControls.FileTypes.MetaData
             return output;
         }
 
-        internal static BaseMetaEntry CreateDefault(string itemName)
+        public static BaseMetaEntry CreateDefault(string itemName)
         {
             if (_typeTable.ContainsKey(itemName) == false)
                 throw new Exception("Unkown metadata item " + itemName);
