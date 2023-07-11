@@ -3,6 +3,7 @@ using AssetEditor.UiCommands;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
+using AssetManagement;
 using Audio;
 using Common;
 using CommonControls.Common;
@@ -33,6 +34,7 @@ namespace AssetEditor
         {
             new View3D_DependencyContainer(),
             new KitbasherEditor_DependencyInjectionContainer(),
+            new AssetManagement_DependencyInjectionContainer()
         };
 
         public DependencyInjectionConfig()
@@ -78,6 +80,7 @@ namespace AssetEditor
             services.AddScoped<IEditorCreator, EditorCreator>();
             services.AddScoped<IUiCommandFactory, UiCommandFactory>();
 
+            services.AddTransient<ImportAssetCommand>();
             services.AddTransient<OpenEditorCommand>();
             services.AddTransient<OpenFileInEditorCommand>();
 

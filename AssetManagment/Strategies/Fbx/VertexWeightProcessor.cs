@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CommonControls.FileTypes.RigidModel.Vertex;
 
-namespace CommonControls.ModelFiles.FBX
+namespace AssetManagement.Strategies.Fbx
 {
     public class VertexWeightProcessor
     {

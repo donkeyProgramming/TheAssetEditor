@@ -4,13 +4,14 @@
 
 using System.Collections.ObjectModel;
 using CommonControls.Common;
+using CommonControls.Events.UiCommands;
 using CommonControls.Services;
 
 namespace CommonControls.PackFileBrowser
 {
     public class DefaultContextMenuHandler : ContextMenuHandler
     {
-        public DefaultContextMenuHandler(PackFileService service, IToolFactory toolFactory) : base(service, toolFactory)
+        public DefaultContextMenuHandler(PackFileService service, IToolFactory toolFactory, IUiCommandFactory uiCommandFactory) : base(service, toolFactory, uiCommandFactory)
         { }
 
         public override void Create(TreeNode node)
