@@ -5,13 +5,15 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
 using System.Windows;
 using System.Windows.Forms;
+using System.IO;
 using System.Windows.Input;
+using System.Windows.Shapes;
 using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.ModelFiles.FBX;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
@@ -134,13 +136,12 @@ namespace CommonControls.PackFileBrowser
                 var files = dialog.FileNames;
                 foreach (var file in files)
                 {
-                    var fileName = Path.GetFileName(file);
+                    var fileName = System.IO.Path.GetFileName(file);
                     var packFile = new PackFile(fileName, new MemorySource(File.ReadAllBytes(file)));
                     _packFileService.AddFileToPack(_selectedNode.FileOwner, parentPath, packFile);
                 }
             }
         }
-
         void OnImport3DModelCommand()
         {
             if (_selectedNode.FileOwner.IsCaPackFile)
@@ -149,8 +150,28 @@ namespace CommonControls.PackFileBrowser
                 return;
             }
 
-            MessageBox.Show("Currently Unsupported");
-            return;
+            var parentPath = _selectedNode.GetFullPath(); // get pack path, at mouse pointer        
+
+            var dialog = new OpenFileDialog();
+            dialog.Filter = "FBX Files (*.fbx)|*.fbx|All files (*.*)|*.*\\";
+            dialog.Multiselect = false;
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                var files = dialog.FileNames;
+                foreach (var file in files)
+                {                    
+                    try
+                    {
+                        MeshFileHelper.Import3dModelDiskFileToPack(_packFileService, _selectedNode.FileOwner, parentPath, file);
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show($"Failed to import model/scene file {file}. Error : {e.Message}", "Error");
+                        _logger.Here().Error($"Failed to load file {file}. Error : {e}");
+                    }
+                }
+            }
         }
 
         void OnAddFilesFromDirectory()
@@ -172,15 +193,15 @@ namespace CommonControls.PackFileBrowser
 
         void DuplicateNode()
         {
-            var fileName = Path.GetFileNameWithoutExtension(_selectedNode.Name);
-            var extention = Path.GetExtension(_selectedNode.Name);
+            var fileName = System.IO.Path.GetFileNameWithoutExtension(_selectedNode.Name);
+            var extention = System.IO.Path.GetExtension(_selectedNode.Name);
             var newName = fileName + "_copy" + extention;
 
             var bytes = (_selectedNode.Item).DataSource.ReadData();
             var packFile = new PackFile(newName, new MemorySource(bytes));
 
             var parentPath = _selectedNode.GetFullPath();
-            var path = Path.GetDirectoryName(parentPath);
+            var path = System.IO.Path.GetDirectoryName(parentPath);
 
             _packFileService.AddFileToPack(_selectedNode.FileOwner, path, packFile);
         }
@@ -320,7 +341,7 @@ namespace CommonControls.PackFileBrowser
             var dialog = new FolderBrowserDialog();
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                var nodeStartDir = Path.GetDirectoryName(_selectedNode.GetFullPath());
+                var nodeStartDir = System.IO.Path.GetDirectoryName(_selectedNode.GetFullPath());
                 int fileCounter = 0;
                 SaveSelfAndChildren(_selectedNode, dialog.SelectedPath, nodeStartDir, ref fileCounter);
                 MessageBox.Show($"{fileCounter} files exported!");
@@ -347,7 +368,7 @@ namespace CommonControls.PackFileBrowser
 
                 var fileOutputPath = outputDirectory + nodePathWithoutRoot;
 
-                var fileOutputDir = Path.GetDirectoryName(fileOutputPath);
+                var fileOutputDir = System.IO.Path.GetDirectoryName(fileOutputPath);
                 DirectoryHelper.EnsureCreated(fileOutputDir);
 
                 var packFile = node.Item;
@@ -367,7 +388,7 @@ namespace CommonControls.PackFileBrowser
                 return;
             }
 
-            var tempFolder = Path.GetTempPath();
+            var tempFolder = System.IO.Path.GetTempPath();
             var fileName = string.Format(@"{0}_", DateTime.Now.Ticks) + packFile.Name;
 
             var path = tempFolder + "\\" + fileName;
