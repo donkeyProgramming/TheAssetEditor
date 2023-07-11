@@ -1,5 +1,4 @@
-﻿using _componentManager.ViewModels.MenuBarViews;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using CommonControls.Common.MenuSystem;
 using CommonControls.Services;
 using KitbasherEditor.Services;

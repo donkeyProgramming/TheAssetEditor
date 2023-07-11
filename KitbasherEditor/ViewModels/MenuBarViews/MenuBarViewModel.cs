@@ -1,10 +1,10 @@
-﻿using _componentManager.ViewModels.MenuBarViews;
-using Common;
+﻿using Common;
 using CommonControls.Common.MenuSystem;
 using CommonControls.PackFileBrowser;
 using CommonControls.Resources;
 using CommonControls.Services;
 using KitbasherEditor.Services;
+using KitbasherEditor.ViewModels.UiCommands;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -61,6 +61,11 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         void CreateActions()
         {
+
+            _actionList[MenuActionType.Save] = new MenuAction(General.Save) { EnableRule = ActionEnabledRule.Always, ToolTip = "Save" };
+
+
+
             _actionList[MenuActionType.Save] = new MenuAction(General.Save) { EnableRule = ActionEnabledRule.Always, ToolTip = "Save" };
             _actionList[MenuActionType.SaveAs] = new MenuAction(General.SaveAs) { EnableRule = ActionEnabledRule.Always, ToolTip = "Save as" };
             _actionList[MenuActionType.GenerateWsModelForWh3] = new MenuAction(General.GenerateWsModelWh3) { EnableRule = ActionEnabledRule.Always, ToolTip = "Generate ws model (Wh3)" };
@@ -96,7 +101,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _actionList[MenuActionType.DevideToSubmesh] = new MenuAction(Tools.DivideSubMesh) { EnableRule = ActionEnabledRule.OneObjectSelected, ToolTip = "Split mesh into logical parts" };
             //_actionList[MenuActionType.DevideToSubmesh_withoutCombining] = new MenuAction(Tools.DivideSubMesh) { EnableRule = ActionEnabledRule.Always, ToolTip = "Split mesh into logical parts without combining" };
             _actionList[MenuActionType.MergeSelectedMeshes] = new MenuAction(Tools.MergeObjects) { EnableRule = ActionEnabledRule.TwoOrMoreObjectsSelected, ToolTip = "Merge selected meshes", Hotkey = new Hotkey(Key.M, ModifierKeys.Control) };
-            _actionList[MenuActionType.DuplicateSelected] = new MenuAction(Tools.DubplicateObject) { EnableRule = ActionEnabledRule.ObjectOrFaceSelected, ToolTip = "Duplicate selection", Hotkey = new Hotkey(Key.D, ModifierKeys.Control) };
+            _actionList[MenuActionType.DuplicateSelected] = new MenuAction(Tools.DuplicateObject) { EnableRule = ActionEnabledRule.ObjectOrFaceSelected, ToolTip = "Duplicate selection", Hotkey = new Hotkey(Key.D, ModifierKeys.Control) };
             _actionList[MenuActionType.DeleteSelected] = new MenuAction(Tools.DeleteObject) { EnableRule = ActionEnabledRule.ObjectOrFaceSelected, ToolTip = "Delete selected", Hotkey = new Hotkey(Key.Delete, ModifierKeys.None) };
             _actionList[MenuActionType.ConvertSelectedMeshIntoStaticAtCurrentAnimFrame] = new MenuAction(Tools.CreateStaticMeshes) { EnableRule = ActionEnabledRule.AtleastOneObjectSelected, ToolTip = "Convert the selected mesh at at the given animation frame into a static mesh" };
 
@@ -297,7 +302,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public void Handle(SelectionChangedEvent notification)
         {
             OnSelectionChanged(notification.NewState);
-
         }
     }
 }

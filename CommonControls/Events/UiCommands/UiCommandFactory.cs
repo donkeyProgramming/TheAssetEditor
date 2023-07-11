@@ -11,6 +11,11 @@ namespace CommonControls.Events.UiCommands
     {
     }
 
+    public interface IExecutableUiCommand : IUiCommand
+    { 
+        public void Execute();
+    }
+
     public interface IUiCommandFactory
     {
         T Create<T>(Action<T> configure = null) where T : IUiCommand;
@@ -30,6 +35,9 @@ namespace CommonControls.Events.UiCommands
             var instance = _serviceProvider.GetRequiredService<T>();
             if (configure != null)
                 configure(instance);
+
+            if (instance is IExecutableUiCommand executable)
+                executable.Execute();
             return instance;
         }
     }
