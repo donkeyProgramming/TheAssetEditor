@@ -1,9 +1,9 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes.MetaData;
+﻿using AnimationMeta.FileTypes.Parsing;
+using AnimationMeta.Visualisation;
+using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using View3D.Animation;
-using View3D.Animation.MetaData;
 
 namespace AnimationEditor.Common.ReferenceModel
 {

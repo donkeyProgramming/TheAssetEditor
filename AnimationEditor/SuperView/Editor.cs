@@ -2,12 +2,12 @@
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
 using AnimationMeta.Presentation;
+using AnimationMeta.Visualisation;
 using CommonControls.Common;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
 using System.Collections.ObjectModel;
 using System.Linq;
-using View3D.Animation.MetaData;
 
 namespace AnimationEditor.SuperView
 {

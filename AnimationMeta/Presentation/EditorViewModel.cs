@@ -2,9 +2,9 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using AnimationMeta.FileTypes.Parsing;
 using AnimationMeta.Presentation.View;
 using CommonControls.Common;
-using CommonControls.FileTypes.MetaData;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using Serilog;

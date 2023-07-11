@@ -1,9 +1,9 @@
-﻿using CommonControls.Common;
+﻿using AnimationMeta.FileTypes.Parsing;
+using CommonControls.Common;
 using CommonControls.Editors.AnimationPack.Converters;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3;
-using CommonControls.FileTypes.MetaData;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using Newtonsoft.Json;

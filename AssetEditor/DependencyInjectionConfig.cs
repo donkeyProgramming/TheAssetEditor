@@ -1,4 +1,6 @@
 ﻿using AnimationEditor;
+using AnimationMeta;
+using AnimationMeta.FileTypes.Parsing;
 using AssetEditor.UiCommands;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
@@ -15,7 +17,6 @@ using CommonControls.Editors.VariantMeshDefinition;
 using CommonControls.Editors.Wtui;
 using CommonControls.Events.Global;
 using CommonControls.Events.UiCommands;
-using CommonControls.FileTypes.MetaData;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Resources;
 using CommonControls.Services;
@@ -33,7 +34,8 @@ namespace AssetEditor
         {
             new View3D_DependencyContainer(),
             new KitbasherEditor_DependencyInjectionContainer(),
-            new AssetManagement_DependencyInjectionContainer()
+            new AssetManagement_DependencyInjectionContainer(),
+            new AnimationMeta_DependencyInjectionContainer()
         };
 
         public DependencyInjectionConfig()
@@ -82,8 +84,6 @@ namespace AssetEditor
             services.AddTransient<ImportAssetCommand>();
             services.AddTransient<OpenEditorCommand>();
             services.AddTransient<OpenFileInEditorCommand>();
-
-
 
             services.AddScoped<SettingsWindow>();
             services.AddScoped<SettingsViewModel>();

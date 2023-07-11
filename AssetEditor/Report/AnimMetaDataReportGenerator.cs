@@ -1,5 +1,5 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes.MetaData;
+﻿using AnimationMeta.FileTypes.Parsing;
+using CommonControls.Common;
 using CommonControls.Services;
 using CsvHelper;
 using Serilog;

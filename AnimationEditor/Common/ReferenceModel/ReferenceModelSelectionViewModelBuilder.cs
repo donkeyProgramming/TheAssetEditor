@@ -1,10 +1,10 @@
 ﻿using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.PropCreator.ViewModels;
+using AnimationMeta.Visualisation;
 using CommonControls.Common;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
 using System;
-using View3D.Animation.MetaData;
 
 namespace AnimationEditor.Common.ReferenceModel
 {

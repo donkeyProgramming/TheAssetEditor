@@ -3,13 +3,14 @@
 // See the LICENSE file in the project root for more information.
 
 using AnimationMeta.FileTypes.Parsing;
-using CommonControls.Common;
+using Microsoft.Xna.Framework;
 
-namespace AnimationMeta.Presentation
+namespace AnimationMeta.FileTypes.Definitions
 {
-    public class MetaDataTagCopyItem : ICopyPastItem
+    [MetaData("CAMERA_SHAKE_POS", 10)]
+    public class CameraShakePos : DecodedMetaEntryBase
     {
-        public string Description { get; set; } = "Copy object for MetaDataTag";
-        public UnknownMetaEntry Data { get; set; }
+        [MetaDataTag(5)]
+        public Vector3 Position { get; set; }
     }
 }
