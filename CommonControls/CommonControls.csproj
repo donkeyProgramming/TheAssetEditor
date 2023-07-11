@@ -357,8 +357,4 @@
     <None Include="C:\Users\ole_k\source\repos\TheAssetEditor\CommonControls\.editorconfig" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Editors\AnimMeta\View\" />
-  </ItemGroup>
-
 </Project>

@@ -1,8 +1,8 @@
 ﻿using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
+using AnimationMeta.Presentation;
 using CommonControls.Common;
-using CommonControls.Editors.AnimMeta;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
 using System.Collections.ObjectModel;

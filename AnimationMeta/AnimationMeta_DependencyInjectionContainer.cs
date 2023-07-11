@@ -1,5 +1,5 @@
-﻿using AnimationMeta.AnimMeta;
-using AnimationMeta.AnimMeta.View;
+﻿using AnimationMeta.Presentation;
+using AnimationMeta.Presentation.View;
 using CommonControls.Common;
 using Microsoft.Extensions.DependencyInjection;
 

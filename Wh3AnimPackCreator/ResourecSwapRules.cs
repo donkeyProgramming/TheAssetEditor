@@ -1,5 +1,4 @@
-﻿using CommonControls.Editors.AnimMeta;
-using CommonControls.FileTypes.AnimationPack;
+﻿using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.MetaData;
 using CommonControls.FileTypes.MetaData.Definitions;
 using CommonControls.FileTypes.PackFiles.Models;
@@ -97,9 +96,9 @@ namespace Wh3AnimPackCreator
 
                 if (keepMetaTag)
                 {
-                    var t = new MetaDataTagItemViewModel(item);
-                    var tagData = t.GetAsData();
-                    metaDataList.Add(tagData);
+                    //var t = new MetaDataTagItemViewModel(item);
+                    //var tagData = t.GetAsData();
+                    //metaDataList.Add(tagData);
                 }
             }
 

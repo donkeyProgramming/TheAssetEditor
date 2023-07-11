@@ -9,7 +9,6 @@ using Common;
 using CommonControls.Common;
 using CommonControls.Editors.AnimationFilePreviewEditor;
 using CommonControls.Editors.AnimationPack;
-using CommonControls.Editors.AnimMeta;
 using CommonControls.Editors.CampaignAnimBin;
 using CommonControls.Editors.TextEditor;
 using CommonControls.Editors.VariantMeshDefinition;
@@ -92,12 +91,11 @@ namespace AssetEditor
 
             services.AddTransient<DevelopmentConfiguration>();
 
-
             foreach (var container in dependencyContainers)
                 container.Register(services);
 
             TextEditor_DependencyInjectionContainer.Register(services);
-            AnimMetaEditor_DependencyInjectionContainer.Register(services);
+            //AnimMetaEditor_DependencyInjectionContainer.Register(services);
             AnimationEditors_DependencyInjectionContainer.Register(services);
             AnimationPack_DependencyInjectionContainer.Register(services);
             CampaignAnimBin_DependencyInjectionContainer.Register(services);
@@ -116,7 +114,7 @@ namespace AssetEditor
                 container.RegisterTools(factory);
 
             TextEditor_DependencyInjectionContainer.RegisterTools(factory);
-            AnimMetaEditor_DependencyInjectionContainer.RegisterTools(factory);
+            //AnimMetaEditor_DependencyInjectionContainer.RegisterTools(factory);
             AnimationEditors_DependencyInjectionContainer.RegisterTools(factory);
             AnimationPack_DependencyInjectionContainer.RegisterTools(factory);
             CampaignAnimBin_DependencyInjectionContainer.RegisterTools(factory);
