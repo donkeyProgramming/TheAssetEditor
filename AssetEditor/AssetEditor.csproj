@@ -37,6 +37,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\AnimationEditor\AnimationEditor.csproj" />
+		<ProjectReference Include="..\AssetManagment\AssetManagement.csproj" />
 		<ProjectReference Include="..\Audio\Audio.csproj" />
 		<ProjectReference Include="..\CommonControls\CommonControls.csproj" />
 		<ProjectReference Include="..\KitbasherEditor\KitbasherEditor.csproj" />

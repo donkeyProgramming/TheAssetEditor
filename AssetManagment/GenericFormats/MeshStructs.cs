@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using CommonControls.ModelFiles.Mesh.Native;
+﻿using AssetManagement.GenericFormats.Native;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace CommonControls.ModelFiles.Mesh
+namespace AssetManagement.GenericFormats
 {
     // - structs that are bit for bit compatible with types used on the C++ side
     namespace Native

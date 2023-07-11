@@ -1,19 +1,14 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Forms;
-using System.IO;
 using System.Windows.Input;
-using System.Windows.Shapes;
 using CommonControls.BaseDialogs;
 using CommonControls.Common;
+using CommonControls.Events.UiCommands;
 using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.ModelFiles.FBX;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
@@ -55,12 +50,13 @@ namespace CommonControls.PackFileBrowser
 
         protected TreeNode _selectedNode;
         protected IToolFactory _toolFactory;
+        private readonly IUiCommandFactory _uiCommandFactory;
 
-        public ContextMenuHandler(PackFileService pf, IToolFactory toolFactory)
+        public ContextMenuHandler(PackFileService pf, IToolFactory toolFactory, IUiCommandFactory uiCommandFactory)
         {
             _packFileService = pf;
             _toolFactory = toolFactory;
-
+            _uiCommandFactory = uiCommandFactory;
             RenameNodeCommand = new RelayCommand(OnRenameNode);
             AddFilesCommand = new RelayCommand(OnAddFilesCommand);
             Import3DFileCommand = new RelayCommand(OnImport3DModelCommand);
@@ -144,34 +140,7 @@ namespace CommonControls.PackFileBrowser
         }
         void OnImport3DModelCommand()
         {
-            if (_selectedNode.FileOwner.IsCaPackFile)
-            {
-                MessageBox.Show("Unable to edit CA packfile");
-                return;
-            }
-
-            var parentPath = _selectedNode.GetFullPath(); // get pack path, at mouse pointer        
-
-            var dialog = new OpenFileDialog();
-            dialog.Filter = "FBX Files (*.fbx)|*.fbx|All files (*.*)|*.*\\";
-            dialog.Multiselect = false;
-
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                var files = dialog.FileNames;
-                foreach (var file in files)
-                {                    
-                    try
-                    {
-                        MeshFileHelper.Import3dModelDiskFileToPack(_packFileService, _selectedNode.FileOwner, parentPath, file);
-                    }
-                    catch (Exception e)
-                    {
-                        MessageBox.Show($"Failed to import model/scene file {file}. Error : {e.Message}", "Error");
-                        _logger.Here().Error($"Failed to load file {file}. Error : {e}");
-                    }
-                }
-            }
+            _uiCommandFactory.Create<ImportAssetCommand>().Execute(_selectedNode.FileOwner, _selectedNode.GetFullPath());
         }
 
         void OnAddFilesFromDirectory()

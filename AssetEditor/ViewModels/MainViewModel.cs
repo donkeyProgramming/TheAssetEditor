@@ -74,7 +74,7 @@ namespace AssetEditor.ViewModels
             CloseToolsToLeftCommand = new RelayCommand<IEditorViewModel>(CloseToolsToLeft);
 
             FileTree = new PackFileBrowserViewModel(_packfileService);
-            FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, toolFactory);
+            FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, toolFactory, uiCommandFactory);
             FileTree.FileOpen += OpenFile;
 
             // eventHub<FileOpened>
