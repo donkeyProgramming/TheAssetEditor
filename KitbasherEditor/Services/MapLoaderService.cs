@@ -26,7 +26,6 @@ namespace KitbasherEditor.Services
             {
                 try
                 {
-
                     modelLoaderService.LoadModelIntoMainScene(item);
                 }
                 catch

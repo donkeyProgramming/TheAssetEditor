@@ -141,7 +141,7 @@ namespace AnimationMeta.Visualisation
             var propPlayer = _animationsContainerComponent.RegisterAnimationPlayer(new AnimationPlayer(), propName + Guid.NewGuid());
 
             // Configure the mesh
-            SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, _geometryGraphicsContextFactory, _renderEngineComponent, _applicationSettingsService);
+            ComplexMeshLoader loader = new ComplexMeshLoader(_resourceLibary, _packFileService, _geometryGraphicsContextFactory, _renderEngineComponent, _applicationSettingsService);
             var loadedNode = loader.Load(meshPath, new GroupNode(propName), propPlayer);
 
             // Configure animation

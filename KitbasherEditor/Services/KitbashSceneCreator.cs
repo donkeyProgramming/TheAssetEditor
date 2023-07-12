@@ -7,8 +7,6 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using View3D.Components.Component;
-using View3D.Components.Rendering;
-using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Services;
 using View3D.Utility;
@@ -23,30 +21,26 @@ namespace KitbasherEditor.Services
         public ISceneNode ReferenceMeshNode { get; private set; }
 
         private readonly PackFileService _packFileService;
+        private readonly ComplexMeshLoader _complexMeshLoader;
         private readonly ResourceLibary _resourceLibary;
         private readonly AnimationControllerViewModel _animationView;
         private readonly SceneManager _sceneManager;
-        private readonly RenderEngineComponent _renderEngineComponent;
-        private readonly IGeometryGraphicsContextFactory _geometryFactory;
-        private readonly ApplicationSettingsService _applicationSettingsService;
+        private readonly Rmv2ModelNodeLoader _rmv2ModelNodeLoader;
 
         public KitbashSceneCreator(
+            ComplexMeshLoader complexMeshLoader,
             ResourceLibary resourceLibary,
             SceneManager sceneManager,
-            RenderEngineComponent renderEngineComponent,
             PackFileService packFileService,
             AnimationControllerViewModel animationView,
-            IGeometryGraphicsContextFactory geometryFactory,
-            ApplicationSettingsService applicationSettingsService)
+            Rmv2ModelNodeLoader rmv2ModelNodeLoader)
         {
             _packFileService = packFileService;
             _animationView = animationView;
-            _geometryFactory = geometryFactory;
-            _applicationSettingsService = applicationSettingsService;
-
+            _complexMeshLoader = complexMeshLoader;
             _resourceLibary = resourceLibary;
             _sceneManager = sceneManager;
-            _renderEngineComponent = renderEngineComponent;
+            _rmv2ModelNodeLoader = rmv2ModelNodeLoader;
         }
 
         public void Create()
@@ -61,9 +55,7 @@ namespace KitbasherEditor.Services
             var modelFullPath = _packFileService.GetFullPath(file);
             var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
 
-            MainNode.CreateModelNodesFromFile(rmv, _resourceLibary, _animationView.GetPlayer(), _geometryFactory,
-                modelFullPath, _renderEngineComponent, _packFileService, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
-
+            _rmv2ModelNodeLoader.CreateModelNodesFromFile(MainNode, rmv, _animationView.GetPlayer(), modelFullPath);
             MainNode.SelectedOutputFormat = rmv.Header.Version;
 
             int meshCount = Math.Min(MainNode.Children.Count, rmv.LodHeaders.Length);
@@ -75,20 +67,6 @@ namespace KitbasherEditor.Services
 
             MainNode.SetSkeletonFromName(rmv.Header.SkeletonName);
             _animationView.SetActiveSkeletonFromName(rmv.Header.SkeletonName);
-        }
-
-        public void LoadReference(string path)
-        {
-            _logger.Here().Information($"Loading reference model from path - {path}");
-
-            var refereneceMesh = _packFileService.FindFile(path);
-            if (refereneceMesh == null)
-            {
-                _logger.Here().Error("Unable to find file");
-                return;
-            }
-
-            LoadReference(refereneceMesh);
         }
 
         public void LoadModelIntoMainScene(PackFile file)
@@ -116,9 +94,7 @@ namespace KitbasherEditor.Services
 
         SceneNode LoadModel(PackFile file)
         {
-            SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, _geometryFactory, _renderEngineComponent, _applicationSettingsService);
-            var loadedNode = loader.Load(file, null, _animationView.GetPlayer());
-
+            var loadedNode = _complexMeshLoader.Load(file, _animationView.GetPlayer());
             if (loadedNode == null)
             {
                 _logger.Here().Error("Unable to load model");
@@ -129,9 +105,7 @@ namespace KitbasherEditor.Services
             {
                 node.IsEditable = false;
                 if (node is ISelectable selectable)
-                {
                     selectable.IsSelectable = false;
-                }
 
                 if (node is Rmv2MeshNode mesh && string.IsNullOrWhiteSpace(mesh.AttachmentPointName) == false)
                 {

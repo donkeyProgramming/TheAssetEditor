@@ -14,6 +14,7 @@ using View3D.Components.Input;
 using View3D.Components.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.Scene;
+using View3D.SceneNodes;
 using View3D.Services;
 using View3D.Utility;
 
@@ -32,11 +33,11 @@ namespace View3D
             serviceCollection.AddScoped<ViewOnlySelectedService>();
             serviceCollection.AddScoped<FocusSelectableObjectService>();
             serviceCollection.AddScoped<SceneSaverService>();
-            serviceCollection.AddScoped<SceneLoader>();
+            serviceCollection.AddScoped<ComplexMeshLoader>();
             serviceCollection.AddScoped<WsModelGeneratorService>();
             serviceCollection.AddScoped<FaceEditor>();
             serviceCollection.AddScoped<ObjectEditor>();
-         
+            serviceCollection.AddScoped<Rmv2ModelNodeLoader>();
 
             // Resolvers - sort of hacks 
             serviceCollection.AddScoped<IDeviceResolver, DeviceResolverComponent>(x => x.GetService<DeviceResolverComponent>());

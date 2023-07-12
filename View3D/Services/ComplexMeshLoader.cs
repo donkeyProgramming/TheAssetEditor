@@ -17,18 +17,18 @@ using static CommonControls.FileTypes.Vmd.VariantMeshDefinition;
 
 namespace View3D.Services
 {
-    public class SceneLoader
+    public class ComplexMeshLoader
     {
-        ILogger _logger = Logging.Create<SceneLoader>();
+        ILogger _logger = Logging.Create<ComplexMeshLoader>();
         PackFileService _packFileService;
         ResourceLibary _resourceLibary;
         IGeometryGraphicsContextFactory _geometryContextFactory;
         private readonly RenderEngineComponent _renderEngineComponent;
         ApplicationSettingsService _applicationSettingsService;
 
-        public SceneLoader(ResourceLibary resourceLibary, PackFileService pfs, IGeometryGraphicsContextFactory geometryContextFactory, RenderEngineComponent renderEngineComponent, ApplicationSettingsService applicationSettingsService)
+        public ComplexMeshLoader(ResourceLibary resourceLibary, PackFileService packFileService, IGeometryGraphicsContextFactory geometryContextFactory, RenderEngineComponent renderEngineComponent, ApplicationSettingsService applicationSettingsService)
         {
-            _packFileService = pfs;
+            _packFileService = packFileService;
             _resourceLibary = resourceLibary;
             _geometryContextFactory = geometryContextFactory;
             _renderEngineComponent = renderEngineComponent;
@@ -38,6 +38,11 @@ namespace View3D.Services
         public SceneNode Load(PackFile file, SceneNode parent, AnimationPlayer player)
         {
             return Load(file, parent, player, null);
+        }
+
+        public SceneNode Load(PackFile file, AnimationPlayer player)
+        {
+            return Load(file, null, player, null);
         }
 
         SceneNode Load(PackFile file, SceneNode parent, AnimationPlayer player, string attachmentPointName)
