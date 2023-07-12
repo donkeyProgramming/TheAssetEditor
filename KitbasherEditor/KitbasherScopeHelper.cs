@@ -12,6 +12,7 @@ namespace KitbasherEditor
         public void ResolveGlobalServices(IServiceProvider serviceProvider)
         {
             serviceProvider.GetRequiredService<SceneInitializedHandler>();
+            serviceProvider.GetRequiredService<SkeletonChangedHandler>();
 
             var inserter = serviceProvider.GetRequiredService<IComponentInserter>();
             inserter.Execute();

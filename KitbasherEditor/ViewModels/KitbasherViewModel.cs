@@ -3,12 +3,10 @@ using CommonControls.Common;
 using CommonControls.Events.Scoped;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
-using KitbasherEditor.Events;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using System;
 using System.IO;
 using View3D.Components.Component;
-using View3D.SceneNodes;
 using View3D.Services;
 
 namespace KitbasherEditor.ViewModels
@@ -17,10 +15,7 @@ namespace KitbasherEditor.ViewModels
         IDropTarget<TreeNode>
     {
         private readonly KitbasherRootScene _kitbasherRootScene;
-
         private readonly KitbashViewDropHandler _dropHandler;
-        private readonly SceneManager _sceneManager;
-
 
         public Type GetScopeResolverType { get => typeof(IScopeHelper<KitbasherViewModel>); }
 
@@ -41,13 +36,10 @@ namespace KitbasherEditor.ViewModels
             MenuBarViewModel menuBarViewModel,
             AnimationControllerViewModel animationControllerViewModel,
             SceneExplorerViewModel sceneExplorerViewModel,
-            KitbashViewDropHandler dropHandler,
-            SceneManager sceneManager)
+            KitbashViewDropHandler dropHandler)
         {
-
             _kitbasherRootScene = kitbasherRootScene;
             _dropHandler = dropHandler;
-            _sceneManager = sceneManager;
 
             Scene = gameWorld;
             Animation = animationControllerViewModel;
@@ -56,7 +48,6 @@ namespace KitbasherEditor.ViewModels
 
             eventHub.Register<FileSavedEvent>(OnFileSaved);
             eventHub.Register<CommandStackChangedEvent>(OnCommandStackChanged);
-            eventHub.Register<KitbasherSkeletonChangedEvent>(OnSkeletonChanged);
         }
 
         public bool Save() => true;
@@ -86,12 +77,6 @@ namespace KitbasherEditor.ViewModels
         {
             if (notification.IsMutation)
                 HasUnsavedChanges = true;
-        }
-
-        private void OnSkeletonChanged(KitbasherSkeletonChangedEvent e)
-        {
-            Animation.SetActiveSkeletonFromName(e.SkeletonName);
-            _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel).SkeletonNode.Skeleton = e.Skeleton;
         }
     }
 }

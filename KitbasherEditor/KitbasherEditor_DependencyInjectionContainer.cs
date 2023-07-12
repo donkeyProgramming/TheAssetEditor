@@ -50,11 +50,12 @@ namespace KitbasherEditor
 
             // Event handlers
             serviceCollection.AddScoped<SceneInitializedHandler>();
-
+            serviceCollection.AddScoped<SkeletonChangedHandler>();
+            
             serviceCollection.AddScoped<IScopeHelper<KitbasherViewModel>, KitbasherScopeHelper>();
 
 
-            // Get all implementations of IRule and add them to the DI
+            // Register all ui commands
             var rules = Assembly.GetExecutingAssembly().GetTypes()
                 .Where(x => !x.IsAbstract && x.IsClass && x.GetInterface(nameof(IKitbasherUiCommand)) == typeof(IKitbasherUiCommand));
 
@@ -66,8 +67,6 @@ namespace KitbasherEditor
         {
             factory.RegisterTool<KitbasherViewModel, KitbasherView>(new ExtentionToTool(EditorEnums.Kitbash_Editor, new[] { ".rigid_model_v2", ".wsmodel.rigid_model_v2" }/*, new[] { ".wsmodel", ".variantmeshdefinition" }*/));
         }
-
-  
     }
 
 
