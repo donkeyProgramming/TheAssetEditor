@@ -12,6 +12,7 @@ using CommonControls.BaseDialogs.ToolSelector;
 using CommonControls.Events.Global;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using static CommonControls.Editors.AnimationPack.Converters.AnimationBinWh3FileToXmlConverter;
 
 namespace CommonControls.Common
 {
@@ -166,12 +167,25 @@ namespace CommonControls.Common
                 selectedEditor = allEditors.First(x => x.EditorType == selectedToolType).Type;
             }
 
-            var scope = _serviceProvider.CreateScope();
-            var instance = scope.ServiceProvider.GetService(selectedEditor) as IEditorViewModel;
-            _scopeRepository.Add(instance, scope);
-            return instance;
+            return CreateEditorInternal(selectedEditor);
         }
 
+        IEditorViewModel CreateEditorInternal(Type editorType)
+        {
+            var scope = _serviceProvider.CreateScope();
+            var instance = scope.ServiceProvider.GetService(editorType) as IEditorViewModel;
+
+            var scopeResolverHint = instance as IEditorScopeResolverHint;
+            if (scopeResolverHint != null)
+            {
+                var solver = scope.ServiceProvider.GetService(scopeResolverHint.GetScopeResolverType) as IScopeHelper;
+                solver.ResolveGlobalServices(scope.ServiceProvider);
+            }
+
+            _scopeRepository.Add(instance, scope);
+
+            return instance;
+        }
 
         public Window CreateAsWindow(IEditorViewModel viewModel)
         {
@@ -205,12 +219,11 @@ namespace CommonControls.Common
             return output.OrderBy(x => x.IsCoreTool).ToList();
         }
 
-        public ViewModel Create<ViewModel>() where ViewModel : IEditorViewModel
+        public ViewModel Create<ViewModel>() 
+            where ViewModel : IEditorViewModel
         {
-            var scope = _serviceProvider.CreateScope();
-            var instance = scope.ServiceProvider.GetService<ViewModel>();
-            _scopeRepository.Add(instance, scope);
-            return instance;
+            return (ViewModel)CreateEditorInternal(typeof(ViewModel));
+
         }
 
         public void DestroyEditor(IEditorViewModel instance) => _scopeRepository.RemoveScope(instance);
@@ -234,5 +247,16 @@ namespace CommonControls.Common
     {
         PackFileToToolSelectorResult CanOpen(string fullPath);
         EditorEnums EditorType { get; }
+    }
+
+
+    public interface IScopeHelper
+    {
+        void ResolveGlobalServices(IServiceProvider serviceProvider);
+    }
+
+    public interface IScopeHelper<T> : IScopeHelper
+    {
+       
     }
 }

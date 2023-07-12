@@ -12,9 +12,6 @@ namespace CommonControls.Events.UiCommands
         public void Execute();
     }
 
-
-
-
     public interface IUiCommandFactory
     {
         T Create<T>(Action<T> configure = null) where T : IUiCommand;

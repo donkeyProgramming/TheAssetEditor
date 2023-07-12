@@ -1,6 +1,7 @@
 ﻿using CommonControls.Common;
 using CommonControls.Common.MenuSystem;
 using CommonControls.Services;
+using KitbasherEditor.EventHandlers;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels;
 using KitbasherEditor.ViewModels.MenuBarViews;
@@ -9,6 +10,7 @@ using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
 using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Linq;
 using System.Reflection;
 using View3D;
@@ -35,7 +37,6 @@ namespace KitbasherEditor
             serviceCollection.AddScoped<VertexDebuggerViewModel>();
             serviceCollection.AddScoped<VertexDebuggerView>();
 
-
             // Menubar 
             serviceCollection.AddScoped<TransformToolViewModel>();
             serviceCollection.AddScoped<MenuBarViewModel>();
@@ -46,8 +47,11 @@ namespace KitbasherEditor
             serviceCollection.AddScoped<KitbashViewDropHandler>();
             serviceCollection.AddScoped<KitbasherRootScene>();
             serviceCollection.AddScoped<IActiveFileResolver, KitbasherRootScene>(x=>x.GetRequiredService<KitbasherRootScene>());
-            
 
+            // Event handlers
+            serviceCollection.AddScoped<SceneInitializedHandler>();
+
+            serviceCollection.AddScoped<IScopeHelper<KitbasherViewModel>, KitbasherScopeHelper>();
 
 
             // Get all implementations of IRule and add them to the DI
@@ -56,7 +60,6 @@ namespace KitbasherEditor
 
             foreach (var rule in rules)
                 serviceCollection.Add(new ServiceDescriptor(rule.UnderlyingSystemType, rule, ServiceLifetime.Transient));
-
         }
 
         public override void RegisterTools(IToolFactory factory)
@@ -64,6 +67,7 @@ namespace KitbasherEditor
             factory.RegisterTool<KitbasherViewModel, KitbasherView>(new ExtentionToTool(EditorEnums.Kitbash_Editor, new[] { ".rigid_model_v2", ".wsmodel.rigid_model_v2" }/*, new[] { ".wsmodel", ".variantmeshdefinition" }*/));
         }
 
+  
     }
 
 
