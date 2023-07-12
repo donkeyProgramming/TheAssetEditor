@@ -24,9 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CommonControls\CommonControls.csproj" />
-    <ProjectReference Include="..\Testing\TestCommon\TestCommon.csproj" />
-    <ProjectReference Include="..\View3D\View3D.csproj" />
+    <ProjectReference Include="..\TestCommon\TestCommon.csproj" />
   </ItemGroup>
 
 </Project>
