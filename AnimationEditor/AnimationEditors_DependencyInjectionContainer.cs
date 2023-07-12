@@ -6,7 +6,7 @@ using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.SkeletonEditor;
 using AnimationEditor.SuperView;
-using CommonControls.Common;
+using CommonControls.Services.ToolCreation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AnimationEditor

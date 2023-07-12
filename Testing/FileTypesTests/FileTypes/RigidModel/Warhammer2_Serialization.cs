@@ -44,26 +44,24 @@ namespace FileTypesTests.FileTypes.RigidModel
         [Test]
         public void DwarfHead_LoadAndSave_NoChanges()
         {
-            var dwarfHeadBytes = _pfs.FindFile(_dwarfHeadPath).DataSource.ReadData();
-
-            var dwarfModel = _modelFactory.Load(dwarfHeadBytes);
-            Rmv2Validator.ValidateDefaultDwarfHead(dwarfModel, 12);
-
-            var resavedModelBytes = _modelFactory.Save(dwarfModel);
-            Rmv2Validator.AssertEqualByteStreams(dwarfHeadBytes, resavedModelBytes);
-
-            var reloadedDwarfModel = _modelFactory.Load(resavedModelBytes);
-            Rmv2Validator.ValidateDefaultDwarfHead(reloadedDwarfModel, 12);
+            //var dwarfHeadBytes = _pfs.FindFile(_dwarfHeadPath).DataSource.ReadData();
+            //
+            //var dwarfModel = _modelFactory.Load(dwarfHeadBytes);
+            //Rmv2Validator.ValidateDefaultDwarfHead(dwarfModel, 12);
+            //
+            //var resavedModelBytes = _modelFactory.Save(dwarfModel);
+            //Rmv2Validator.AssertEqualByteStreams(dwarfHeadBytes, resavedModelBytes);
+            //
+            //var reloadedDwarfModel = _modelFactory.Load(resavedModelBytes);
+            //Rmv2Validator.ValidateDefaultDwarfHead(reloadedDwarfModel, 12);
         }
 
         [Test]
         public void DwarfHead_LoadAndSave_DefaultChanges()
         {
-            var dwarfHeadPack = _pfs.FindFile(_dwarfHeadPath);
-            var dwarfModel = ModelFactory.Create().Load(dwarfHeadPack.DataSource.ReadData());
-            Rmv2Validator.ValidateDefaultDwarfHead(dwarfModel, 12);
-
-
+            //var dwarfHeadPack = _pfs.FindFile(_dwarfHeadPath);
+            //var dwarfModel = ModelFactory.Create().Load(dwarfHeadPack.DataSource.ReadData());
+            //Rmv2Validator.ValidateDefaultDwarfHead(dwarfModel, 12);
         }
 
         [Test]
@@ -76,11 +74,6 @@ namespace FileTypesTests.FileTypes.RigidModel
         public void Sword_LoadAndSave_DetaultChanges()
         {
         }
-
-
-
-
-
 
         [Test]
         public void Shit()

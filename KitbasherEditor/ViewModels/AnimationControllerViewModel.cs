@@ -3,13 +3,13 @@ using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
+using KitbasherEditor.Events;
+using Monogame.WpfInterop.Common;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
 using View3D.Animation;
-using View3D.Components.Component;
-using View3D.SceneNodes;
 using static CommonControls.FilterDialog.FilterUserControl;
 using static CommonControls.Services.SkeletonAnimationLookUpHelper;
 
@@ -23,7 +23,7 @@ namespace KitbasherEditor.ViewModels
         PackFile Animation;
 
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        private readonly SceneManager _sceneManager;
+        private readonly KitbasherRootScene _kitbasherRootScene;
         AnimationPlayer _player;
 
         string _headerText = "No animation selected";
@@ -45,9 +45,6 @@ namespace KitbasherEditor.ViewModels
         public OnSeachDelegate FilterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 
 
-
-        public AnimationPlayer GetPlayer() => _player;
-
         int _currentFrame = 0;
         public int CurrentFrame { get { return _currentFrame; } set { SetAndNotify(ref _currentFrame, value); } }
 
@@ -65,16 +62,17 @@ namespace KitbasherEditor.ViewModels
         bool _isEnabled;
         public bool IsEnabled { get { return _isEnabled; } set { SetAndNotify(ref _isEnabled, value); OnEnableChanged(IsEnabled); } }
 
-        public AnimationControllerViewModel(PackFileService pf, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
-            AnimationsContainerComponent animationsContainerComponent, SceneManager sceneManager)
+        public AnimationControllerViewModel(PackFileService pf, 
+            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
+            EventHub eventHub,
+            KitbasherRootScene kitbasherRootScene)
         {
             _packFileService = pf;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
-            _sceneManager = sceneManager;
+            _kitbasherRootScene = kitbasherRootScene;
             SkeletonList = _skeletonAnimationLookUpHelper.SkeletonFileNames;
 
-            var animCollection = animationsContainerComponent;
-            _player = animCollection.RegisterAnimationPlayer(new AnimationPlayer(), "MainPlayer");
+            _player = _kitbasherRootScene.Player;
             _player.OnFrameChanged += (currentFrame) => CurrentFrame = currentFrame + 1;
 
             PausePlayCommand = new RelayCommand(OnPlayPause);
@@ -85,6 +83,7 @@ namespace KitbasherEditor.ViewModels
             LastFrameCommand = new RelayCommand(OnLastFrame);
 
             IsEnabled = false;
+            eventHub.Register<KitbasherSkeletonChangedEvent>(OnSkeletonChanged);
         }
 
         void OnPlayPause()
@@ -120,10 +119,10 @@ namespace KitbasherEditor.ViewModels
             _player.CurrentFrame = _player.FrameCount();
         }
 
-        public void SetActiveSkeletonFromName(string skeletonName)
+        private void OnSkeletonChanged(KitbasherSkeletonChangedEvent e)
         {
             string animationFolder = "animations\\skeletons\\";
-            var skeletonFilePath = animationFolder + skeletonName + ".anim";
+            var skeletonFilePath = animationFolder + e.SkeletonName + ".anim";
             if (SelectedSkeleton != skeletonFilePath)
             {
                 SelectedSkeleton = skeletonFilePath;
@@ -169,7 +168,7 @@ namespace KitbasherEditor.ViewModels
             else
                 HeaderText = "No Skeleton - No Animation";
 
-            var skeleton = GetModelSkeleton();
+            var skeleton = _kitbasherRootScene.Skeleton;
             var isAnimationDataPresent = Animation != null && skeleton != null;
             if (isAnimationDataPresent)
             {
@@ -187,7 +186,7 @@ namespace KitbasherEditor.ViewModels
 
         private void OnEnableChanged(bool isEnabled)
         {
-            var skeleton = GetModelSkeleton();
+            var skeleton = _kitbasherRootScene.Skeleton;
             var isAnimationDataPresent = Animation != null && skeleton != null;
             if (isEnabled && isAnimationDataPresent)
             {
@@ -205,16 +204,6 @@ namespace KitbasherEditor.ViewModels
             }
 
             _player.IsEnabled = isEnabled;
-        }
-
-        GameSkeleton GetModelSkeleton()
-        {
-            var node = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-            if (node == null)
-                return null;
-
-            var skeleton = node?.SkeletonNode?.Skeleton;
-            return skeleton;
         }
     }
 }

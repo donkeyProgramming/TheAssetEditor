@@ -5,6 +5,7 @@ using CommonControls.Events.UiCommands;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
+using CommonControls.Services.ToolCreation;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -109,7 +110,14 @@ namespace AssetEditor.ViewModels
 
         private void Closing(IEditorViewModel editor)
         {
-            if (!CurrentEditorsList.Any(editor => editor.HasUnsavedChanges) && !FileTree.Files.Any(node => node.UnsavedChanged))
+            var hasUnsavedEditorChanges = CurrentEditorsList
+                .Where(x => x is ISaveableEditor)
+                .Cast<ISaveableEditor>()
+                .Any(x => x.HasUnsavedChanges);
+
+            var hasUnsavedPackFiles = FileTree.Files.Any(node => node.UnsavedChanged);
+
+            if ( !(hasUnsavedPackFiles || hasUnsavedEditorChanges) )
             {
                 IsClosingWithoutPrompt = true;
                 return;
@@ -144,7 +152,7 @@ namespace AssetEditor.ViewModels
 
         void CloseTool(IEditorViewModel tool)
         {
-            if (tool.HasUnsavedChanges)
+            if (tool is ISaveableEditor saveableEditor && saveableEditor.HasUnsavedChanges)
             {
                 if (MessageBox.Show("Unsaved changed - Are you sure?", "Close", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
                     return;

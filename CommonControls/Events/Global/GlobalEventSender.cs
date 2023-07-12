@@ -3,8 +3,9 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using Common;
+using CommonControls.Services.ToolCreation;
 using Microsoft.Extensions.DependencyInjection;
+using Monogame.WpfInterop.Common;
 
 namespace CommonControls.Events.Global
 {

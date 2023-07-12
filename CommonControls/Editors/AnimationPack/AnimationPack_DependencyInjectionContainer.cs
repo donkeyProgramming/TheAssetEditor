@@ -4,6 +4,7 @@
 
 using CommonControls.Common;
 using CommonControls.Services;
+using CommonControls.Services.ToolCreation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CommonControls.Editors.AnimationPack
@@ -18,7 +19,7 @@ namespace CommonControls.Editors.AnimationPack
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<AnimPackViewModel, AnimationPackView>(new ExtentionToTool(EditorEnums.AnimationPack_Editor, new[] { ".animpack" }));
+            factory.RegisterTool<AnimPackViewModel, AnimationPackView>(new ExtensionToTool(EditorEnums.AnimationPack_Editor, new[] { ".animpack" }));
             //factory.RegisterTool<TextEditorViewModel<CampaignAnimBinToXmlConverter>, TextEditorView>(new PathToTool(".bin", @"animations\database\battle\bin"));
         }
     }

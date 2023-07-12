@@ -20,7 +20,7 @@ namespace View3D.Services
         ILogger _logger = Logging.Create<SceneSaverService>();
 
         private readonly PackFileService _packFileService;
-        private readonly ActiveFileResolver _activeFileResolver;
+        private readonly IActiveFileResolver _activeFileResolver;
         private readonly List<WsModelMaterialFile> _existingMaterials;
 
 
@@ -35,7 +35,7 @@ namespace View3D.Services
             {"SPECULAR_PATH", TextureType.Specular },
         };
 
-        public WsModelGeneratorService(PackFileService packFileService, ActiveFileResolver activeFileResolver)
+        public WsModelGeneratorService(PackFileService packFileService, IActiveFileResolver activeFileResolver)
         {
             _packFileService = packFileService;
             _activeFileResolver = activeFileResolver;

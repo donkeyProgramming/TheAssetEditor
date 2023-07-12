@@ -1,7 +1,6 @@
-﻿using Common;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
+using Monogame.WpfInterop.Common;
 using View3D.Utility;
 
 namespace View3D.Components.Component
@@ -13,17 +12,20 @@ namespace View3D.Components.Component
         GameTime _animationStart;
         bool _startAnimation;
         private readonly ResourceLibary _resourceLibary;
-        private readonly DeviceResolverComponent _deviceResolverComponent;
         private readonly EventHub _eventHub;
 
-        public CommandStackRenderer(ResourceLibary resourceLibary, DeviceResolverComponent deviceResolverComponent, EventHub eventHub)
+        public CommandStackRenderer(ResourceLibary resourceLibary, EventHub eventHub)
         {
             _resourceLibary = resourceLibary;
-            _deviceResolverComponent = deviceResolverComponent;
             _eventHub = eventHub;
 
             _eventHub.Register<CommandStackUndoEvent>(Handle);
             _eventHub.Register<CommandStackChangedEvent>(Handle);
+        }
+
+        public override void Initialize()
+        {
+            _spriteBatch = _resourceLibary.CreateSpriteBatch();
         }
 
         public void Dispose()
@@ -56,10 +58,7 @@ namespace View3D.Components.Component
             _startAnimation = true;
         }
 
-        public override void Initialize()
-        {
-            _spriteBatch = new SpriteBatch(_deviceResolverComponent.Device);
-        }
+
 
         public override void Update(GameTime gameTime)
         {

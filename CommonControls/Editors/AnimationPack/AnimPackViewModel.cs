@@ -20,7 +20,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace CommonControls.Editors.AnimationPack
 {
-    public class AnimPackViewModel : NotifyPropertyChangedImpl, IEditorViewModel
+    public class AnimPackViewModel : NotifyPropertyChangedImpl, IEditorViewModel, ISaveableEditor
     {
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;

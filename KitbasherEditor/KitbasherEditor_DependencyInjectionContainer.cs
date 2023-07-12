@@ -1,7 +1,9 @@
-﻿using _componentManager.ViewModels.MenuBarViews;
+﻿using CommonControls;
 using CommonControls.Common;
 using CommonControls.Common.MenuSystem;
 using CommonControls.Services;
+using CommonControls.Services.ToolCreation;
+using KitbasherEditor.EventHandlers;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels;
 using KitbasherEditor.ViewModels.MenuBarViews;
@@ -10,7 +12,11 @@ using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
 using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Linq;
+using System.Reflection;
 using View3D;
+using View3D.Services;
 
 namespace KitbasherEditor
 {
@@ -33,25 +39,36 @@ namespace KitbasherEditor
             serviceCollection.AddScoped<VertexDebuggerViewModel>();
             serviceCollection.AddScoped<VertexDebuggerView>();
 
-
             // Menubar 
             serviceCollection.AddScoped<TransformToolViewModel>();
             serviceCollection.AddScoped<MenuBarViewModel>();
-            serviceCollection.AddScoped<GizmoActions>();
-            serviceCollection.AddScoped<VisibilityHandler>();
-            serviceCollection.AddScoped<GeneralActions>();
-            serviceCollection.AddScoped<ToolActions>();
+            serviceCollection.AddScoped<MenuItemVisibilityRuleEngine>();
 
             // Misc
             serviceCollection.AddScoped<WindowKeyboard>();
             serviceCollection.AddScoped<KitbashViewDropHandler>();
+            serviceCollection.AddScoped<KitbasherRootScene>();
+            serviceCollection.AddScoped<IActiveFileResolver, KitbasherRootScene>(x=>x.GetRequiredService<KitbasherRootScene>());
+
+            // Event handlers
+            serviceCollection.AddScoped<SceneInitializedHandler>();
+            serviceCollection.AddScoped<SkeletonChangedHandler>();
+            
+            serviceCollection.AddScoped<IScopeHelper<KitbasherViewModel>, KitbasherScopeHelper>();
+
+
+            // Register all ui commands
+            var rules = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(x => !x.IsAbstract && x.IsClass && x.GetInterface(nameof(IKitbasherUiCommand)) == typeof(IKitbasherUiCommand));
+
+            foreach (var rule in rules)
+                serviceCollection.Add(new ServiceDescriptor(rule.UnderlyingSystemType, rule, ServiceLifetime.Transient));
         }
 
         public override void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<KitbasherViewModel, KitbasherView>(new ExtentionToTool(EditorEnums.Kitbash_Editor, new[] { ".rigid_model_v2", ".wsmodel.rigid_model_v2" }/*, new[] { ".wsmodel", ".variantmeshdefinition" }*/));
+            factory.RegisterTool<KitbasherViewModel, KitbasherView>(new ExtensionToTool(EditorEnums.Kitbash_Editor, new[] { ".rigid_model_v2", ".wsmodel.rigid_model_v2" }/*, new[] { ".wsmodel", ".variantmeshdefinition" }*/));
         }
-
     }
 
 

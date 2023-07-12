@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop.Input;
 using Serilog;
 using System;
-using View3D.Scene;
+using View3D.Services;
 
 namespace View3D.Components.Input
 {
@@ -42,7 +42,7 @@ namespace View3D.Components.Input
             }
         }
 
-        public MouseComponent(MainScene game)
+        public MouseComponent(GameWorld game)
         {
             _wpfMouse = new WpfMouse(game);
             _wpfMouse.CaptureMouseWithin = true;

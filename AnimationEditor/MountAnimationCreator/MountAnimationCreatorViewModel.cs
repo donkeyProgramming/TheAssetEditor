@@ -1,13 +1,13 @@
 ﻿using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
-using Common;
 using CommonControls.Common;
 using CommonControls.Services;
+using CommonControls.Services.ToolCreation;
 using Microsoft.Xna.Framework;
+using Monogame.WpfInterop.Common;
 using MonoGame.Framework.WpfInterop;
 using View3D.Components;
-using View3D.Scene;
 using View3D.Services;
 
 namespace AnimationEditor.MountAnimationCreator
@@ -24,7 +24,7 @@ namespace AnimationEditor.MountAnimationCreator
             AnimationPlayerViewModel animationPlayerViewModel,
             EventHub eventHub,
             AssetViewModelBuilder assetViewModelBuilder,
-            MainScene scene,
+            GameWorld scene,
             FocusSelectableObjectService focusSelectableObjectService)
             : base(componentInserter, animationPlayerViewModel, scene, focusSelectableObjectService)
         {

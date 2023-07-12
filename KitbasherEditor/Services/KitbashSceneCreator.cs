@@ -7,8 +7,6 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using View3D.Components.Component;
-using View3D.Components.Rendering;
-using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Services;
 using View3D.Utility;
@@ -23,36 +21,32 @@ namespace KitbasherEditor.Services
         public ISceneNode ReferenceMeshNode { get; private set; }
 
         private readonly PackFileService _packFileService;
+        private readonly KitbasherRootScene _kitbasherRootScene;
+        private readonly ComplexMeshLoader _complexMeshLoader;
         private readonly ResourceLibary _resourceLibary;
-        private readonly AnimationControllerViewModel _animationView;
         private readonly SceneManager _sceneManager;
-        private readonly RenderEngineComponent _renderEngineComponent;
-        private readonly IGeometryGraphicsContextFactory _geometryFactory;
-        private readonly ApplicationSettingsService _applicationSettingsService;
+        private readonly Rmv2ModelNodeLoader _rmv2ModelNodeLoader;
 
         public KitbashSceneCreator(
+            KitbasherRootScene kitbasherRootScene,
+            ComplexMeshLoader complexMeshLoader,
             ResourceLibary resourceLibary,
             SceneManager sceneManager,
-            RenderEngineComponent renderEngineComponent,
             PackFileService packFileService,
-            AnimationControllerViewModel animationView,
-            IGeometryGraphicsContextFactory geometryFactory,
-            ApplicationSettingsService applicationSettingsService)
+            Rmv2ModelNodeLoader rmv2ModelNodeLoader)
         {
             _packFileService = packFileService;
-            _animationView = animationView;
-            _geometryFactory = geometryFactory;
-            _applicationSettingsService = applicationSettingsService;
-
+            _kitbasherRootScene = kitbasherRootScene;
+            _complexMeshLoader = complexMeshLoader;
             _resourceLibary = resourceLibary;
             _sceneManager = sceneManager;
-            _renderEngineComponent = renderEngineComponent;
+            _rmv2ModelNodeLoader = rmv2ModelNodeLoader;
         }
 
         public void Create()
         {
             var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(_resourceLibary, null) { IsLockable = false });
-            MainNode = _sceneManager.RootNode.AddObject(new MainEditableNode(_animationView.GetPlayer(), SpecialNodes.EditableModel, skeletonNode, _packFileService));
+            MainNode = _sceneManager.RootNode.AddObject(new MainEditableNode(SpecialNodes.EditableModel, skeletonNode, _packFileService));
             ReferenceMeshNode = _sceneManager.RootNode.AddObject(new GroupNode(SpecialNodes.ReferenceMeshs) { IsEditable = false, IsLockable = false });
         }
 
@@ -61,10 +55,8 @@ namespace KitbasherEditor.Services
             var modelFullPath = _packFileService.GetFullPath(file);
             var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
 
-            MainNode.CreateModelNodesFromFile(rmv, _resourceLibary, _animationView.GetPlayer(), _geometryFactory,
-                modelFullPath, _renderEngineComponent, _packFileService, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
-
-            MainNode.SelectedOutputFormat = rmv.Header.Version;
+            _rmv2ModelNodeLoader.CreateModelNodesFromFile(MainNode, rmv, _kitbasherRootScene.Player, modelFullPath);
+            
 
             int meshCount = Math.Min(MainNode.Children.Count, rmv.LodHeaders.Length);
             for (int i = 0; i < meshCount; i++)
@@ -73,22 +65,8 @@ namespace KitbasherEditor.Services
                     lodNode.CameraDistance = rmv.LodHeaders[i].LodCameraDistance;
             }
 
-            MainNode.SetSkeletonFromName(rmv.Header.SkeletonName);
-            _animationView.SetActiveSkeletonFromName(rmv.Header.SkeletonName);
-        }
-
-        public void LoadReference(string path)
-        {
-            _logger.Here().Information($"Loading reference model from path - {path}");
-
-            var refereneceMesh = _packFileService.FindFile(path);
-            if (refereneceMesh == null)
-            {
-                _logger.Here().Error("Unable to find file");
-                return;
-            }
-
-            LoadReference(refereneceMesh);
+            _kitbasherRootScene.SelectedOutputFormat = rmv.Header.Version;
+            _kitbasherRootScene.SetSkeletonFromName(rmv.Header.SkeletonName);
         }
 
         public void LoadModelIntoMainScene(PackFile file)
@@ -116,9 +94,7 @@ namespace KitbasherEditor.Services
 
         SceneNode LoadModel(PackFile file)
         {
-            SceneLoader loader = new SceneLoader(_resourceLibary, _packFileService, _geometryFactory, _renderEngineComponent, _applicationSettingsService);
-            var loadedNode = loader.Load(file, null, _animationView.GetPlayer());
-
+            var loadedNode = _complexMeshLoader.Load(file, _kitbasherRootScene.Player);
             if (loadedNode == null)
             {
                 _logger.Here().Error("Unable to load model");
@@ -129,16 +105,14 @@ namespace KitbasherEditor.Services
             {
                 node.IsEditable = false;
                 if (node is ISelectable selectable)
-                {
                     selectable.IsSelectable = false;
-                }
 
                 if (node is Rmv2MeshNode mesh && string.IsNullOrWhiteSpace(mesh.AttachmentPointName) == false)
                 {
-                    if (MainNode.SkeletonNode.Skeleton != null)
+                    if (_kitbasherRootScene.Skeleton != null)
                     {
-                        int boneIndex = MainNode.SkeletonNode.Skeleton.GetBoneIndexByName(mesh.AttachmentPointName);
-                        mesh.AttachmentBoneResolver = new SkeletonBoneAnimationResolver(MainNode.SkeletonNode, boneIndex);
+                        int boneIndex = _kitbasherRootScene.Skeleton.GetBoneIndexByName(mesh.AttachmentPointName);
+                        mesh.AttachmentBoneResolver = new SkeletonBoneAnimationResolver(_kitbasherRootScene, boneIndex);
                     }
                 }
             });

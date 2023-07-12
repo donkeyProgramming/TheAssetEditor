@@ -12,7 +12,7 @@ namespace CommonControls.Common.MenuSystem
         public NotifyAttr<bool> IsVisible { get; set; } = new NotifyAttr<bool>(true);
         public BitmapImage Image { get; set; }
         public MenuAction Action { get; set; }
-        public ButtonVisabilityRule ShowRule { get; set; } = ButtonVisabilityRule.Always;
+        public ButtonVisibilityRule ShowRule { get; set; } = ButtonVisibilityRule.Always;
         public bool IsSeperator { get; set; } = false;
 
         public MenuBarButton(MenuAction action)
