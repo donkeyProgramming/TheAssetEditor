@@ -1,9 +1,9 @@
-﻿using CommonControls.Common;
+﻿using AnimationMeta.Visualisation;
+using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using View3D.Animation;
-using View3D.Animation.MetaData;
 using View3D.Components;
 using View3D.SceneNodes;
 using static CommonControls.Services.SkeletonAnimationLookUpHelper;

@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
-using View3D.Animation.MetaData;
 using View3D.Commands;
 using View3D.Commands.Face;
 using View3D.Commands.Object;
@@ -37,7 +36,7 @@ namespace View3D
             serviceCollection.AddScoped<WsModelGeneratorService>();
             serviceCollection.AddScoped<FaceEditor>();
             serviceCollection.AddScoped<ObjectEditor>();
-            serviceCollection.AddScoped<MetaDataFactory>(); // Needs heavy refactorying!
+         
 
             // Resolvers - sort of hacks 
             serviceCollection.AddScoped<IDeviceResolver, DeviceResolverComponent>(x => x.GetService<DeviceResolverComponent>());

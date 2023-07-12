@@ -1,4 +1,6 @@
 ﻿using AnimationEditor;
+using AnimationMeta;
+using AnimationMeta.FileTypes.Parsing;
 using AssetEditor.UiCommands;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
@@ -9,14 +11,12 @@ using Common;
 using CommonControls.Common;
 using CommonControls.Editors.AnimationFilePreviewEditor;
 using CommonControls.Editors.AnimationPack;
-using CommonControls.Editors.AnimMeta;
 using CommonControls.Editors.CampaignAnimBin;
 using CommonControls.Editors.TextEditor;
 using CommonControls.Editors.VariantMeshDefinition;
 using CommonControls.Editors.Wtui;
 using CommonControls.Events.Global;
 using CommonControls.Events.UiCommands;
-using CommonControls.FileTypes.MetaData;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Resources;
 using CommonControls.Services;
@@ -34,7 +34,8 @@ namespace AssetEditor
         {
             new View3D_DependencyContainer(),
             new KitbasherEditor_DependencyInjectionContainer(),
-            new AssetManagement_DependencyInjectionContainer()
+            new AssetManagement_DependencyInjectionContainer(),
+            new AnimationMeta_DependencyInjectionContainer()
         };
 
         public DependencyInjectionConfig()
@@ -84,20 +85,17 @@ namespace AssetEditor
             services.AddTransient<OpenEditorCommand>();
             services.AddTransient<OpenFileInEditorCommand>();
 
-
-
             services.AddScoped<SettingsWindow>();
             services.AddScoped<SettingsViewModel>();
             services.AddScoped<MenuBarViewModel>();
 
             services.AddTransient<DevelopmentConfiguration>();
 
-
             foreach (var container in dependencyContainers)
                 container.Register(services);
 
             TextEditor_DependencyInjectionContainer.Register(services);
-            AnimMetaEditor_DependencyInjectionContainer.Register(services);
+            //AnimMetaEditor_DependencyInjectionContainer.Register(services);
             AnimationEditors_DependencyInjectionContainer.Register(services);
             AnimationPack_DependencyInjectionContainer.Register(services);
             CampaignAnimBin_DependencyInjectionContainer.Register(services);
@@ -116,7 +114,7 @@ namespace AssetEditor
                 container.RegisterTools(factory);
 
             TextEditor_DependencyInjectionContainer.RegisterTools(factory);
-            AnimMetaEditor_DependencyInjectionContainer.RegisterTools(factory);
+            //AnimMetaEditor_DependencyInjectionContainer.RegisterTools(factory);
             AnimationEditors_DependencyInjectionContainer.RegisterTools(factory);
             AnimationPack_DependencyInjectionContainer.RegisterTools(factory);
             CampaignAnimBin_DependencyInjectionContainer.RegisterTools(factory);

@@ -32,7 +32,6 @@ namespace View3D.Animation
         public List<BoneKeyFrame> BoneTransforms = new List<BoneKeyFrame>();
 
 
-
         public Matrix GetSkeletonAnimatedWorld(GameSkeleton gameSkeleton, int boneIndex)
         {
             Matrix output = gameSkeleton.GetWorldTransform(boneIndex) * BoneTransforms[boneIndex].WorldTransform;

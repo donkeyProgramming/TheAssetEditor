@@ -1,8 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System;
+﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CommonControls.Events.UiCommands
@@ -10,6 +6,14 @@ namespace CommonControls.Events.UiCommands
     public interface IUiCommand
     {
     }
+
+    public interface IExecutableUiCommand : IUiCommand
+    { 
+        public void Execute();
+    }
+
+
+
 
     public interface IUiCommandFactory
     {
@@ -30,6 +34,9 @@ namespace CommonControls.Events.UiCommands
             var instance = _serviceProvider.GetRequiredService<T>();
             if (configure != null)
                 configure(instance);
+
+            if (instance is IExecutableUiCommand executable)
+                executable.Execute();
             return instance;
         }
     }

@@ -16,7 +16,6 @@ namespace CommonControls.Common.MenuSystem
             _actions.Add(action);
         }
 
-
         public bool TriggerCommand(Key key, ModifierKeys modifierKeys)
         {
             bool isHandled = false;

@@ -19,7 +19,7 @@ namespace CommonControls.Common.MenuSystem
         Custom
     }
 
-    public enum ButtonVisabilityRule
+    public enum ButtonVisibilityRule
     {
         Always,
         ObjectMode,
