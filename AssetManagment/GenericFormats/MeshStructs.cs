@@ -1,6 +1,7 @@
 ﻿using AssetManagement.GenericFormats.Native;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System;
 
 namespace AssetManagement.GenericFormats
 {
@@ -77,6 +78,19 @@ namespace AssetManagement.GenericFormats
         public string Name { set; get; }
         public List<PackedCommonVertex> Vertices { set; get; }
         public List<ushort> Indices { set; get; }
+        public List<VertexWeight> VertexWeights { set; get; }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct NtPackedMesh
+    {
+        public string Name { set; get; }
+        
+        public IntPtr Vertices;
+
+        public IntPtr Indices;
+
+        public IntPtr VertexWeights;
     }
 };
 

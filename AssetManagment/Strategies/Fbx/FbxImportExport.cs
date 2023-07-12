@@ -3,6 +3,12 @@ using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Interfaces.AssetManagement;
 using System.IO;
+using View3D.Commands;
+using View3D.Components.Component.Selection;
+using System.Windows;
+using AssetManagement.Strategies.Fbx.ViewModels;
+using AssetManagement.Strategies.Fbx.Views.FBXSettings;
+using CommonControls.BaseDialogs;
 
 namespace AssetManagement.Strategies.Fbx
 {
@@ -11,8 +17,8 @@ namespace AssetManagement.Strategies.Fbx
         public string[] Formats => new string[] { ".fbx" };
 
         public PackFile ImportAsset(string diskFilePath)
-        {
-            var sceneContainer = SceneLoader.LoadScene(diskFilePath);
+        {            
+            var sceneContainer = SceneLoader.LoadScene(diskFilePath);            
 
             var rmv2File = RmvFileBuilder.ConvertToRmv2(sceneContainer.Meshes, "");
 
