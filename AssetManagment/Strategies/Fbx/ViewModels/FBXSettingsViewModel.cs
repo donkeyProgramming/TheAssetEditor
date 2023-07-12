@@ -16,6 +16,7 @@ namespace AssetManagement.Strategies.Fbx.ViewModels
     {
         public FBXImportSettings ImportSettings { get; set; }
 
+
         public FBXSettingsViewModel(FBXImportSettings fbxIportSettings)
         {
             ImportSettings = fbxIportSettings;
@@ -36,7 +37,7 @@ namespace AssetManagement.Strategies.Fbx.ViewModels
         {
             var window = new ControllerHostWindow(true)
             {
-                DataContext = new FBXSettingsViewModel(),
+                DataContext = this,
                 Title = "Stuff",
                 Content = new FBXSetttingsView(),
                 Width = 360,

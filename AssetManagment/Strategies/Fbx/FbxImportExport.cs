@@ -9,6 +9,7 @@ using System.Windows;
 using AssetManagement.Strategies.Fbx.ViewModels;
 using AssetManagement.Strategies.Fbx.Views.FBXSettings;
 using CommonControls.BaseDialogs;
+using SharpDX.MediaFoundation;
 
 namespace AssetManagement.Strategies.Fbx
 {
@@ -18,7 +19,9 @@ namespace AssetManagement.Strategies.Fbx
 
         public PackFile ImportAsset(string diskFilePath)
         {            
-            var sceneContainer = SceneLoader.LoadScene(diskFilePath);            
+            var sceneContainer = SceneLoader.LoadScene(diskFilePath);
+
+            var stuff = serviceProvider.GetRequiredService<FBXSettingsViewModel>();
 
             var rmv2File = RmvFileBuilder.ConvertToRmv2(sceneContainer.Meshes, "");
 
