@@ -1,4 +1,6 @@
-﻿using CommonControls.Events.UiCommands;
+﻿using CommonControls.Common.MenuSystem;
+using CommonControls.Events.UiCommands;
+using KitbasherEditor.ViewModels.MenuBarViews;
 using System.Windows;
 using View3D.Components.Component;
 using View3D.SceneNodes;
@@ -7,8 +9,12 @@ using MessageBox = System.Windows.MessageBox;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
-    public class CopyRootLodCommand : IExecutableUiCommand
+    public class CopyRootLodCommand : IKitbasherUiCommand
     {
+        public string ToolTip { get; set; } = "Copy LOD 0 to every LOD slot";
+        public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
+        public Hotkey HotKey { get; } = null;
+
         ObjectEditor _objectEditor;
         SceneManager _sceneManager;
 

@@ -1,7 +1,9 @@
 ﻿using CommonControls.BaseDialogs;
+using CommonControls.Common.MenuSystem;
 using CommonControls.Events.UiCommands;
 using CommonControls.Services;
 using KitbasherEditor.ViewModels.BmiEditor;
+using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.Views.EditorViews;
 using System.Windows;
 using View3D.Animation;
@@ -11,8 +13,12 @@ using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
-    public class OpenBmiToolCommand : IExecutableUiCommand
+    public class OpenBmiToolCommand : IKitbasherUiCommand
     {
+        public string ToolTip { get; set; } = "Open the Bmi tool";
+        public ActionEnabledRule EnabledRule => ActionEnabledRule.OneObjectSelected;
+        public Hotkey HotKey { get; } = null;
+
         PackFileService _packFileService;
         SkeletonAnimationLookUpHelper _skeletonHelper;
         SelectionManager _selectionManager;

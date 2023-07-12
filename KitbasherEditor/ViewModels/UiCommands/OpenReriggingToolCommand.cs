@@ -1,12 +1,15 @@
-﻿using CommonControls.Editors.BoneMapping;
+﻿using CommonControls.Common.MenuSystem;
+using CommonControls.Editors.BoneMapping;
 using CommonControls.Editors.BoneMapping.View;
 using CommonControls.Events.UiCommands;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
+using KitbasherEditor.ViewModels.MenuBarViews;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using View3D.Commands;
 using View3D.Commands.Object;
 using View3D.Components.Component;
@@ -16,8 +19,12 @@ using MessageBox = System.Windows.MessageBox;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
-    public class OpenReriggingToolCommand : IExecutableUiCommand
+    public class OpenReriggingToolCommand : IKitbasherUiCommand
     {
+        public string ToolTip { get; set; } = "Open the re-rigging tool";
+        public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;
+        public Hotkey HotKey { get; } = null;
+
         SelectionManager _selectionManager;
         private readonly SceneManager _sceneManager;
         private readonly CommandFactory _commandFactory;

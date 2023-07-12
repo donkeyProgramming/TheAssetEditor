@@ -1,10 +1,16 @@
-﻿using CommonControls.Events.UiCommands;
+﻿using CommonControls.Common.MenuSystem;
+using KitbasherEditor.ViewModels.MenuBarViews;
 using View3D.Components.Component;
+using System.Windows.Input;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
-    public class UndoCommand : IExecutableUiCommand
+    public class UndoCommand : IKitbasherUiCommand
     {
+        public string ToolTip { get; set; } = "Undo Last item";
+        public ActionEnabledRule EnabledRule => ActionEnabledRule.Custom;
+        public Hotkey HotKey { get; } = new Hotkey(Key.Z, ModifierKeys.Control);
+
         private readonly CommandExecutor _commandExecutor;
 
         public UndoCommand(CommandExecutor commandExecutor)

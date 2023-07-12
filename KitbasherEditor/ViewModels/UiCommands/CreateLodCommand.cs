@@ -1,12 +1,17 @@
-﻿using CommonControls.Events.UiCommands;
+﻿using CommonControls.Common.MenuSystem;
+using KitbasherEditor.ViewModels.MenuBarViews;
 using View3D.Components.Component;
 using View3D.SceneNodes;
 using View3D.Services;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
-    public class CreateLodCommand : IExecutableUiCommand
+    public class CreateLodCommand : IKitbasherUiCommand
     {
+        public string ToolTip { get; set; } = "Auto generate lods for models";
+        public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
+        public Hotkey HotKey { get; } = null;
+
         ObjectEditor _objectEditor;
         SceneManager _sceneManager;
 

@@ -1,4 +1,5 @@
-﻿using CommonControls.Events.UiCommands;
+﻿using CommonControls.Common.MenuSystem;
+using KitbasherEditor.ViewModels.MenuBarViews;
 using System.Linq;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
@@ -6,8 +7,12 @@ using View3D.Services;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
-    public class ReduceMeshCommand : IExecutableUiCommand
+    public class ReduceMeshCommand : IKitbasherUiCommand
     {
+        public string ToolTip { get; set; } = "Reduce the mesh polygon count by 10%";
+        public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;
+        public Hotkey HotKey { get; } = null;
+
         SelectionManager _selectionManager;
         ObjectEditor _objectEditor;
 

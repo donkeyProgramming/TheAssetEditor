@@ -1,13 +1,17 @@
 ﻿using CommonControls.Common.MenuSystem;
-using CommonControls.Events.UiCommands;
+using KitbasherEditor.ViewModels.MenuBarViews;
 using System.Windows.Input;
 using View3D.Components.Component.Selection;
 using View3D.Services;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
-    public class DivideSubMeshCommand : IExecutableUiCommand
+    public class DivideSubMeshCommand : IKitbasherUiCommand
     {
+        public string ToolTip { get; set; } = "Split mesh into logical parts. Hold leftAlt to not combine logical sub-parts";
+        public ActionEnabledRule EnabledRule => ActionEnabledRule.OneObjectSelected;
+        public Hotkey HotKey { get; } = new Hotkey(Key.Add, ModifierKeys.None);
+
         SelectionManager _selectionManager;
         ObjectEditor _objectEditor;
         FaceEditor _faceEditor;

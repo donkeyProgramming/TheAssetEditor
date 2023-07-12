@@ -5,20 +5,20 @@ using View3D.Components.Component.Selection;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
-    public class VisibilityHandler
+    public class MenuItemVisibilityRuleEngine
     {
         Dictionary<ActionEnabledRule, Func<bool>> _actionEnabledRules = new Dictionary<ActionEnabledRule, Func<bool>>();
-        Dictionary<ButtonVisabilityRule, Func<bool>> _buttonVisabilityRules = new Dictionary<ButtonVisabilityRule, Func<bool>>();
+        Dictionary<ButtonVisibilityRule, Func<bool>> _buttonVisabilityRules = new Dictionary<ButtonVisibilityRule, Func<bool>>();
 
         SelectionManager _selectionManager;
-        public VisibilityHandler(SelectionManager selectionManager)
+        public MenuItemVisibilityRuleEngine(SelectionManager selectionManager)
         {
             _selectionManager = selectionManager;
 
-            _buttonVisabilityRules[ButtonVisabilityRule.Always] = AllwaysTrueRule;
-            _buttonVisabilityRules[ButtonVisabilityRule.ObjectMode] = IsObjectMode;
-            _buttonVisabilityRules[ButtonVisabilityRule.FaceMode] = IsFaceMode;
-            _buttonVisabilityRules[ButtonVisabilityRule.VertexMode] = IsVertexMode;
+            _buttonVisabilityRules[ButtonVisibilityRule.Always] = AllwaysTrueRule;
+            _buttonVisabilityRules[ButtonVisibilityRule.ObjectMode] = IsObjectMode;
+            _buttonVisabilityRules[ButtonVisibilityRule.FaceMode] = IsFaceMode;
+            _buttonVisabilityRules[ButtonVisibilityRule.VertexMode] = IsVertexMode;
 
             _actionEnabledRules[ActionEnabledRule.Always] = AllwaysTrueRule;
             _actionEnabledRules[ActionEnabledRule.OneObjectSelected] = OneObjectSelectedRule;

@@ -1,5 +1,5 @@
-﻿using CommonControls.Events.UiCommands;
-using MonoGame.Framework.WpfInterop;
+﻿using CommonControls.Common.MenuSystem;
+using KitbasherEditor.ViewModels.MenuBarViews;
 using System.Collections.Generic;
 using View3D.Commands;
 using View3D.Commands.Object;
@@ -10,16 +10,20 @@ using MessageBox = System.Windows.MessageBox;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
-    public class CreateStaticMeshCommand : IExecutableUiCommand
+    public class CreateStaticMeshCommand : IKitbasherUiCommand
     {
-        IComponentManager _componentManager;
-        SelectionManager _selectionManager;
+        public string ToolTip { get; set; } = "Convert the selected mesh at at the given animation frame into a static mesh";
+        public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;
+        public Hotkey HotKey { get; } = null;
+
+        private readonly AnimationsContainerComponent _animationsContainerComponent;
+        private readonly SelectionManager _selectionManager;
         private readonly CommandFactory _commandFactory;
         private readonly SceneManager _sceneManager;
 
-        public CreateStaticMeshCommand(IComponentManager componentManager, SelectionManager selectionManager, CommandFactory commandFactory, SceneManager sceneManager)
+        public CreateStaticMeshCommand(AnimationsContainerComponent animationsContainerComponent, SelectionManager selectionManager, CommandFactory commandFactory, SceneManager sceneManager)
         {
-            _componentManager = componentManager;
+            _animationsContainerComponent = animationsContainerComponent;
             _selectionManager = selectionManager;
             _commandFactory = commandFactory;
             _sceneManager = sceneManager;
@@ -28,7 +32,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public void Execute()
         {
             // Get the frame
-            var animationPlayers = _componentManager.GetComponent<AnimationsContainerComponent>();
+            var animationPlayers = _animationsContainerComponent;
             var mainPlayer = animationPlayers.Get("MainPlayer");
 
             var frame = mainPlayer.GetCurrentAnimationFrame();

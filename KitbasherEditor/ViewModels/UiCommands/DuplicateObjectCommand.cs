@@ -1,11 +1,17 @@
-﻿using CommonControls.Events.UiCommands;
+﻿using CommonControls.Common.MenuSystem;
+using KitbasherEditor.ViewModels.MenuBarViews;
+using System.Windows.Input;
 using View3D.Components.Component.Selection;
 using View3D.Services;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
-    public class DuplicateObjectCommand : IExecutableUiCommand
+    public class DuplicateObjectCommand : IKitbasherUiCommand
     {
+        public string ToolTip { get; set; } = "Duplicate selection";
+        public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;
+        public Hotkey HotKey { get; } = new Hotkey(Key.D, ModifierKeys.Control);
+
         SelectionManager _selectionManager;
         ObjectEditor _objectEditor;
         FaceEditor _faceEditor;

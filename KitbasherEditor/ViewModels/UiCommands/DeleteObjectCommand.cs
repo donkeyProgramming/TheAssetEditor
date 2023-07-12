@@ -1,11 +1,18 @@
-﻿using CommonControls.Events.UiCommands;
+﻿using CommonControls.Common.MenuSystem;
+using KitbasherEditor.ViewModels.MenuBarViews;
+using System.Windows.Input;
 using View3D.Components.Component.Selection;
 using View3D.Services;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
-    public class DeleteObjectCommand : IExecutableUiCommand
+    public class DeleteObjectCommand : IKitbasherUiCommand
     {
+        public string ToolTip { get; set; } = "Delete";
+        public ActionEnabledRule EnabledRule => ActionEnabledRule.ObjectOrFaceSelected;
+        public Hotkey HotKey { get; } = new Hotkey(Key.Delete, ModifierKeys.None);
+
+
         SelectionManager _selectionManager;
         ObjectEditor _objectEditor;
         FaceEditor _faceEditor;

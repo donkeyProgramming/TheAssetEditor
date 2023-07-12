@@ -9,6 +9,8 @@ using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
 using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
+using System.Reflection;
 using View3D;
 
 namespace KitbasherEditor
@@ -36,14 +38,20 @@ namespace KitbasherEditor
             // Menubar 
             serviceCollection.AddScoped<TransformToolViewModel>();
             serviceCollection.AddScoped<MenuBarViewModel>();
-            serviceCollection.AddScoped<GizmoActions>();
-            serviceCollection.AddScoped<VisibilityHandler>();
-            serviceCollection.AddScoped<GeneralActions>();
-            serviceCollection.AddScoped<ToolActions>();
+            serviceCollection.AddScoped<MenuItemVisibilityRuleEngine>();
 
             // Misc
             serviceCollection.AddScoped<WindowKeyboard>();
             serviceCollection.AddScoped<KitbashViewDropHandler>();
+
+
+            // Get all implementations of IRule and add them to the DI
+            var rules = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(x => !x.IsAbstract && x.IsClass && x.GetInterface(nameof(IKitbasherUiCommand)) == typeof(IKitbasherUiCommand));
+
+            foreach (var rule in rules)
+                serviceCollection.Add(new ServiceDescriptor(rule.UnderlyingSystemType, rule, ServiceLifetime.Transient));
+
         }
 
         public override void RegisterTools(IToolFactory factory)

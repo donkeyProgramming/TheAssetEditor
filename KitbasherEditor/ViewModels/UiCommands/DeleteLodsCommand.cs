@@ -1,4 +1,5 @@
-﻿using CommonControls.Events.UiCommands;
+﻿using CommonControls.Common.MenuSystem;
+using KitbasherEditor.ViewModels.MenuBarViews;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Components.Component;
@@ -6,8 +7,13 @@ using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
-    public class DeleteLodsCommand : IExecutableUiCommand
+    public class DeleteLodsCommand : IKitbasherUiCommand
     {
+        public string ToolTip { get; set; } = "Delete all but first lod";
+        public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
+        public Hotkey HotKey { get; } = null;
+
+
         SceneManager _sceneManager;
 
         public DeleteLodsCommand(SceneManager sceneManager)
