@@ -12,7 +12,7 @@ using View3D.Services;
 
 namespace KitbasherEditor.ViewModels
 {
-    public class KitbasherViewModel : NotifyPropertyChangedImpl, IEditorViewModel, IEditorScopeResolverHint,
+    public class KitbasherViewModel : NotifyPropertyChangedImpl, IEditorViewModel, IEditorScopeResolverHint, ISaveableEditor,
         IDropTarget<TreeNode>
     {
         private readonly KitbasherRootScene _kitbasherRootScene;

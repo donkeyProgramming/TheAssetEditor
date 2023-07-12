@@ -5,6 +5,7 @@ namespace Monogame.WpfInterop.Common
 {
     public class EventHub : IDisposable
     {
+        public bool IsDisposed { get; private set; }
         Dictionary<Type, List<Delegate>> _callbackList = new Dictionary<Type, List<Delegate>>();
 
         public void Publish<T>(T instance)
@@ -33,6 +34,7 @@ namespace Monogame.WpfInterop.Common
 
         public void Dispose()
         {
+            IsDisposed = true;
             _callbackList.Clear();
             _callbackList = null;
         }

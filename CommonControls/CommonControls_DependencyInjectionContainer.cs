@@ -18,11 +18,21 @@ namespace CommonControls
 {
     public class CommonControls_DependencyInjectionContainer : DependencyContainer
     {
+        private readonly bool _loadResource;
+
+        public CommonControls_DependencyInjectionContainer(bool loadResource = true)
+        {
+            _loadResource = loadResource;
+        }
+
         public override void Register(IServiceCollection services)
         {
             Logging.Configure(Serilog.Events.LogEventLevel.Information);
-            ResourceController.Load();
-            DirectoryHelper.EnsureCreated();
+            if (_loadResource) 
+            { 
+                ResourceController.Load();
+                DirectoryHelper.EnsureCreated();
+            }
 
             services.AddSingleton<ApplicationSettingsService>();
             services.AddSingleton<IToolFactory, ToolFactory>();

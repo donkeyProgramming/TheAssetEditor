@@ -14,26 +14,27 @@ namespace AssetEditor
 {
     public class DependencyInjectionConfig
     {
-        DependencyContainer[] dependencyContainers = new DependencyContainer[]
+        private readonly DependencyContainer[] dependencyContainers;
+
+
+        public DependencyInjectionConfig(bool loadResources = true)
         {
-            // Core
-            new CommonControls_DependencyInjectionContainer(),
-            new View3D_DependencyContainer(),
+            dependencyContainers = new DependencyContainer[]
+            {
+                // Core
+                new CommonControls_DependencyInjectionContainer(loadResources),
+                new View3D_DependencyContainer(),
 
-            // Editors
-            new KitbasherEditor_DependencyInjectionContainer(),
-            new AssetManagement_DependencyInjectionContainer(),
-            new AnimationMeta_DependencyInjectionContainer(),
-            new AudioEditor_DependencyInjectionContainer(),
-            new TextureEditor_DependencyInjectionContainer(),
+                // Editors
+                new KitbasherEditor_DependencyInjectionContainer(),
+                new AssetManagement_DependencyInjectionContainer(),
+                new AnimationMeta_DependencyInjectionContainer(),
+                new AudioEditor_DependencyInjectionContainer(),
+                new TextureEditor_DependencyInjectionContainer(),
 
-            // Host application
-            new AssetEditor_DependencyInjectionContainer(),
-        };
-
-        public DependencyInjectionConfig()
-        {
-            
+                // Host application
+                new AssetEditor_DependencyInjectionContainer(),
+            };
         }
 
         public IServiceProvider Build()

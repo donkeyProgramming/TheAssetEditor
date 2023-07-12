@@ -11,7 +11,7 @@ using Serilog;
 
 namespace AnimationMeta.Presentation
 {
-    public class EditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel
+    public class EditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel, ISaveableEditor
     {
         public event EditorSavedDelegate EditorSavedEvent;
 

@@ -1,15 +1,10 @@
 ﻿using AssetEditor.UiCommands;
 using AssetEditor.ViewModels;
-using AssetEditor.Views.Settings;
 using AssetEditor.Views;
+using AssetEditor.Views.Settings;
 using CommonControls;
 using CommonControls.Common;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AssetEditor
 {
