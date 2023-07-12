@@ -19,9 +19,7 @@ namespace AssetManagement.Strategies.Fbx
 
         public PackFile ImportAsset(string diskFilePath)
         {            
-            var sceneContainer = SceneLoader.LoadScene(diskFilePath);
-
-            var stuff = serviceProvider.GetRequiredService<FBXSettingsViewModel>();
+            var sceneContainer = SceneLoader.LoadScene(diskFilePath);                     
 
             var rmv2File = RmvFileBuilder.ConvertToRmv2(sceneContainer.Meshes, "");
 
