@@ -13,7 +13,7 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using TextureEditor.Views;
 using View3D.Rendering.Geometry;
-using View3D.Scene;
+using View3D.Services;
 using View3D.Utility;
 
 namespace TextureEditor.ViewModels
@@ -79,7 +79,7 @@ namespace TextureEditor.ViewModels
         TextureToTextureRenderer _textureRenderer;
         string _imagePath;
         TexturePreviewViewModel _viewModel;
-        MainScene _scene;
+        GameWorld _scene;
         MeshObject _mesh;
 
         public class ViewModelWrapper : NotifyPropertyChangedImpl
@@ -116,7 +116,7 @@ namespace TextureEditor.ViewModels
 
             _mesh = meshObject;
 
-            _scene = new MainScene(null, null);
+            _scene = new GameWorld(null, null);
             _scene.Components.Add(new ResourceLibary(_scene, packFileService));
             _scene.ForceCreate();
 

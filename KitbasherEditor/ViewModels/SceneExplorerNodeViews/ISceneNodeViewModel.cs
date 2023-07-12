@@ -12,13 +12,15 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
     public class SceneNodeViewFactory
     {
+        private readonly KitbasherRootScene _kitbasherRootScene;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly PackFileService _packFileService;
         private readonly ComponentManagerResolver _componentManagerResolver;
         private readonly ApplicationSettingsService _applicationSettingsService;
 
-        public SceneNodeViewFactory(SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService packFileService, ComponentManagerResolver componentManagerResolver, ApplicationSettingsService applicationSettingsService)
+        public SceneNodeViewFactory(KitbasherRootScene kitbasherRootScene, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService packFileService, ComponentManagerResolver componentManagerResolver, ApplicationSettingsService applicationSettingsService)
         {
+            _kitbasherRootScene = kitbasherRootScene;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _packFileService = packFileService;
             _componentManagerResolver = componentManagerResolver;
@@ -30,9 +32,9 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             switch (node)
             {
                 case MainEditableNode mainNode:
-                    return new MainEditableNodeViewModel(mainNode, _skeletonAnimationLookUpHelper, _packFileService, _componentManagerResolver.ComponentManager);
+                    return new MainEditableNodeViewModel(_kitbasherRootScene, mainNode, _skeletonAnimationLookUpHelper, _packFileService, _componentManagerResolver.ComponentManager);
                 case Rmv2MeshNode m:
-                    return new MeshEditorViewModel(m, _packFileService, _skeletonAnimationLookUpHelper, _componentManagerResolver.ComponentManager, _applicationSettingsService);
+                    return new MeshEditorViewModel(_kitbasherRootScene, m, _packFileService, _skeletonAnimationLookUpHelper, _componentManagerResolver.ComponentManager, _applicationSettingsService);
                 case SkeletonNode s:
                     return new SkeletonSceneNodeViewModel(s, _packFileService, _skeletonAnimationLookUpHelper);
                 case Rmv2LodNode n:

@@ -11,12 +11,14 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public Hotkey HotKey { get; } = null;
 
         private readonly SceneSaverService _sceneSaverService;
+        private readonly KitbasherRootScene _kitbasherRootScene;
 
-        public SaveCommand(SceneSaverService sceneSaverService)
+        public SaveCommand(SceneSaverService sceneSaverService, KitbasherRootScene kitbasherRootScene)
         {
             _sceneSaverService = sceneSaverService;
+            _kitbasherRootScene = kitbasherRootScene;
         }
 
-        public void Execute() => _sceneSaverService.Save();
+        public void Execute() => _sceneSaverService.Save(_kitbasherRootScene.SelectedOutputFormat);
     }
 }

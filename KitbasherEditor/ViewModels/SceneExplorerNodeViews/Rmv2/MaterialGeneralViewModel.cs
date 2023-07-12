@@ -156,6 +156,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             }
         }
 
+        private readonly KitbasherRootScene _kitbasherRootScene;
         Rmv2MeshNode _meshNode;
         IComponentManager _componentManager;
         PackFileService _pfs;
@@ -197,9 +198,10 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         public UiVertexFormat VertexType { get { return _meshNode.Geometry.VertexFormat; } set { ChangeVertexType(value); } }
         public IEnumerable<UiVertexFormat> PossibleVertexTypes { get; set; }
 
-        public MaterialGeneralViewModel(Rmv2MeshNode meshNode, PackFileService pfs, IComponentManager componentManager, ApplicationSettingsService applicationSettings)
+        public MaterialGeneralViewModel(KitbasherRootScene kitbasherRootScene, Rmv2MeshNode meshNode, PackFileService pfs, IComponentManager componentManager, ApplicationSettingsService applicationSettings)
         {
             _componentManager = componentManager;
+            _kitbasherRootScene = kitbasherRootScene;
             _meshNode = meshNode;
             _pfs = pfs;
             _applicationSettingsService = applicationSettings;
@@ -253,9 +255,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         void ChangeVertexType(UiVertexFormat newFormat)
         {
             var scenaManager = _componentManager.GetComponent<SceneManager>();
-            var root = scenaManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-
-            var skeletonName = root?.SkeletonNode.Name;
+            var skeletonName = _kitbasherRootScene.Skeleton.SkeletonName;
             _meshNode.Geometry.ChangeVertexType(newFormat, skeletonName);
             NotifyPropertyChanged(nameof(VertexType));
         }

@@ -13,7 +13,6 @@ using View3D.Components.Gizmo;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
 using View3D.Rendering.Geometry;
-using View3D.Scene;
 using View3D.SceneNodes;
 using View3D.Services;
 using View3D.Utility;
@@ -25,8 +24,8 @@ namespace View3D
         public override void Register(IServiceCollection serviceCollection)
         {
             // Graphics scene
-            serviceCollection.AddScoped<MainScene>();
-            serviceCollection.AddScoped<WpfGame>(x => x.GetService<MainScene>());
+            serviceCollection.AddScoped<GameWorld>();
+            serviceCollection.AddScoped<WpfGame>(x => x.GetService<GameWorld>());
             serviceCollection.AddScoped<IGeometryGraphicsContextFactory, GeometryGraphicsContextFactory>();
 
             // Services
@@ -41,7 +40,6 @@ namespace View3D
 
             // Resolvers - sort of hacks 
             serviceCollection.AddScoped<IDeviceResolver, DeviceResolverComponent>(x => x.GetService<DeviceResolverComponent>());
-            serviceCollection.AddScoped<ActiveFileResolver>();
             serviceCollection.AddScoped<ComponentManagerResolver>();
 
             // Components

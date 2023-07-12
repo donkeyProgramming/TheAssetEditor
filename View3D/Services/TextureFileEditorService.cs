@@ -62,6 +62,7 @@ namespace View3D.Services
 
         public void UpdateStatus()
         {
+            return;
             TextureList.Clear();
 
             // Check if there is a project file there

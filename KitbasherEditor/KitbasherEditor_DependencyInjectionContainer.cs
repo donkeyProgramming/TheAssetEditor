@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using System.Reflection;
 using View3D;
+using View3D.Services;
 
 namespace KitbasherEditor
 {
@@ -43,6 +44,10 @@ namespace KitbasherEditor
             // Misc
             serviceCollection.AddScoped<WindowKeyboard>();
             serviceCollection.AddScoped<KitbashViewDropHandler>();
+            serviceCollection.AddScoped<KitbasherRootScene>();
+            serviceCollection.AddScoped<IActiveFileResolver, KitbasherRootScene>(x=>x.GetRequiredService<KitbasherRootScene>());
+            
+
 
 
             // Get all implementations of IRule and add them to the DI

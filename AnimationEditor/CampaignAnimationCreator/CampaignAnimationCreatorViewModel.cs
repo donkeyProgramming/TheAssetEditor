@@ -7,7 +7,6 @@ using CommonControls.Services;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using View3D.Components;
-using View3D.Scene;
 using View3D.Services;
 
 namespace AnimationEditor.CampaignAnimationCreator
@@ -22,7 +21,7 @@ namespace AnimationEditor.CampaignAnimationCreator
             ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder,
             AnimationPlayerViewModel animationPlayerViewModel,
             EventHub eventHub,
-            MainScene scene,
+            GameWorld scene,
             FocusSelectableObjectService focusSelectableObjectService)
             : base(componentInserter, animationPlayerViewModel, scene, focusSelectableObjectService)
         {

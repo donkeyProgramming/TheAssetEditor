@@ -25,11 +25,11 @@ namespace View3D.Services
         ILogger _logger = Logging.Create<SceneSaverService>();
         private readonly EventHub _eventHub;
         private readonly PackFileService _packFileService;
-        private readonly ActiveFileResolver _activeFileResolver;
+        private readonly IActiveFileResolver _activeFileResolver;
         private readonly SceneManager _sceneManager;
         private readonly ApplicationSettingsService _applicationSettingsService;
 
-        public SceneSaverService(EventHub eventHub, PackFileService packFileService, ActiveFileResolver activeFileResolver, SceneManager sceneManager, ApplicationSettingsService applicationSettingsService)
+        public SceneSaverService(EventHub eventHub, PackFileService packFileService, IActiveFileResolver activeFileResolver, SceneManager sceneManager, ApplicationSettingsService applicationSettingsService)
         {
             _eventHub = eventHub;
             _packFileService = packFileService;
@@ -38,14 +38,14 @@ namespace View3D.Services
             _applicationSettingsService = applicationSettingsService;
         }
 
-        public void Save()
+        public void Save(RmvVersionEnum rmvVersionEnum)
         {
             try
             {
                 DisplayValidateDialog();
 
                 var inputFile = _activeFileResolver.Get();
-                byte[] bytes = GetBytesToSave();
+                byte[] bytes = GetBytesToSave(rmvVersionEnum);
                 var path = _packFileService.GetFullPath(inputFile);
                 var res = SaveHelper.Save(_packFileService, path, inputFile, bytes);
                 _eventHub.Publish(new FileSavedEvent());
@@ -57,14 +57,14 @@ namespace View3D.Services
             }
         }
 
-        public void SaveAs()
+        public void SaveAs(RmvVersionEnum rmvVersionEnum)
         {
             try
             {
                 DisplayValidateDialog();
 
                 var inputFile = _activeFileResolver.Get();
-                byte[] bytes = GetBytesToSave();
+                byte[] bytes = GetBytesToSave(rmvVersionEnum);
 
                 using (var browser = new SavePackFileWindow(_packFileService))
                 {
@@ -87,7 +87,7 @@ namespace View3D.Services
             }
         }
 
-        private byte[] GetBytesToSave()
+        private byte[] GetBytesToSave(RmvVersionEnum rmvVersionEnum)
         {
             var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             var isAllVisible = SceneNodeHelper.AreAllNodesVisible(mainNode);
@@ -98,7 +98,7 @@ namespace View3D.Services
                     onlySaveVisible = true;
             }
 
-            var bytes = Save(onlySaveVisible, new List<Rmv2ModelNode>() { mainNode }, mainNode.SkeletonNode.Skeleton, mainNode.SelectedOutputFormat, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
+            var bytes = Save(onlySaveVisible, new List<Rmv2ModelNode>() { mainNode }, mainNode.SkeletonNode.Skeleton, rmvVersionEnum, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
             return bytes;
         }
 

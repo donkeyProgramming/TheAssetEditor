@@ -13,18 +13,16 @@ namespace View3D.Components.Component
         private int _liveFrames;
         private TimeSpan _timeElapsed;
         private readonly ResourceLibary _resourceLibary;
-        private readonly DeviceResolverComponent _deviceResolverComponent;
 
-        public FpsComponent(ResourceLibary resourceLibary, DeviceResolverComponent deviceResolverComponent)
+        public FpsComponent(ResourceLibary resourceLibary)
         {
             _resourceLibary = resourceLibary;
-            _deviceResolverComponent = deviceResolverComponent;
         }
 
         protected override void LoadContent()
         {
             _font = _resourceLibary.DefaultFont;
-            _spriteBatch = new SpriteBatch(_deviceResolverComponent.Device);
+            _spriteBatch = _resourceLibary.CreateSpriteBatch();
         }
 
         public override void Update(GameTime gameTime)

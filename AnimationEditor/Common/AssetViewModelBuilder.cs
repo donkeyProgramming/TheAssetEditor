@@ -8,7 +8,6 @@ using Serilog;
 using System;
 using View3D.Animation;
 using View3D.Components.Component;
-using View3D.Scene;
 using View3D.SceneNodes;
 using View3D.Services;
 using View3D.Utility;
@@ -19,7 +18,7 @@ namespace AnimationEditor.Common.ReferenceModel
     public class AssetViewModelBuilder
     {
         ILogger _logger = Logging.Create<AssetViewModelBuilder>();
-        private readonly MainScene _mainScene;
+        private readonly GameWorld _mainScene;
         private readonly IServiceProvider _serviceProvider;
         private readonly ResourceLibary _resourceLibary;
         private readonly SceneManager _sceneManager;
@@ -27,7 +26,7 @@ namespace AnimationEditor.Common.ReferenceModel
         private readonly AnimationsContainerComponent _animationsContainerComponent;
         private readonly ComplexMeshLoader _complexMeshLoader;
 
-        public AssetViewModelBuilder(MainScene mainScene,
+        public AssetViewModelBuilder(GameWorld mainScene,
             IServiceProvider serviceProvider, ResourceLibary resourceLibary, SceneManager sceneManager, PackFileService packFileService,
             AnimationsContainerComponent animationsContainerComponent, ComplexMeshLoader complexMeshLoader)
         {

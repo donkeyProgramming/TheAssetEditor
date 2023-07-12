@@ -3,14 +3,14 @@ using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 
 
-namespace View3D.Scene
+namespace View3D.Services
 {
-    public class MainScene : WpfGame
+    public class GameWorld : WpfGame
     {
         private bool _disposed;
         WpfGraphicsDeviceService _deviceServiceHandle;
 
-        public MainScene(EventHub eventHub, string contentDir = "BuiltContent") : base(eventHub, contentDir)
+        public GameWorld(EventHub eventHub, string contentDir = "BuiltContent") : base(eventHub, contentDir)
         {
 
         }

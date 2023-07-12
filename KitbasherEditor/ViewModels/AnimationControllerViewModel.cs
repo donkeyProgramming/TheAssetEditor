@@ -23,7 +23,7 @@ namespace KitbasherEditor.ViewModels
         PackFile Animation;
 
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        private readonly SceneManager _sceneManager;
+        private readonly KitbasherRootScene _kitbasherRootScene;
         AnimationPlayer _player;
 
         string _headerText = "No animation selected";
@@ -45,9 +45,6 @@ namespace KitbasherEditor.ViewModels
         public OnSeachDelegate FilterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 
 
-
-        public AnimationPlayer GetPlayer() => _player;
-
         int _currentFrame = 0;
         public int CurrentFrame { get { return _currentFrame; } set { SetAndNotify(ref _currentFrame, value); } }
 
@@ -65,16 +62,16 @@ namespace KitbasherEditor.ViewModels
         bool _isEnabled;
         public bool IsEnabled { get { return _isEnabled; } set { SetAndNotify(ref _isEnabled, value); OnEnableChanged(IsEnabled); } }
 
-        public AnimationControllerViewModel(PackFileService pf, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
-            AnimationsContainerComponent animationsContainerComponent, SceneManager sceneManager)
+        public AnimationControllerViewModel(PackFileService pf, 
+            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
+            KitbasherRootScene kitbasherRootScene)
         {
             _packFileService = pf;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
-            _sceneManager = sceneManager;
+            _kitbasherRootScene = kitbasherRootScene;
             SkeletonList = _skeletonAnimationLookUpHelper.SkeletonFileNames;
 
-            var animCollection = animationsContainerComponent;
-            _player = animCollection.RegisterAnimationPlayer(new AnimationPlayer(), "MainPlayer");
+            _player = _kitbasherRootScene.Player;
             _player.OnFrameChanged += (currentFrame) => CurrentFrame = currentFrame + 1;
 
             PausePlayCommand = new RelayCommand(OnPlayPause);
@@ -207,14 +204,6 @@ namespace KitbasherEditor.ViewModels
             _player.IsEnabled = isEnabled;
         }
 
-        GameSkeleton GetModelSkeleton()
-        {
-            var node = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-            if (node == null)
-                return null;
-
-            var skeleton = node?.SkeletonNode?.Skeleton;
-            return skeleton;
-        }
+        GameSkeleton GetModelSkeleton() => _kitbasherRootScene.Skeleton;
     }
 }

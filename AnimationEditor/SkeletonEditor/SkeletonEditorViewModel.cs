@@ -7,7 +7,6 @@ using CommonControls.Services;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using View3D.Components;
-using View3D.Scene;
 using View3D.Services;
 
 namespace AnimationEditor.SkeletonEditor
@@ -22,7 +21,7 @@ namespace AnimationEditor.SkeletonEditor
             AnimationPlayerViewModel animationPlayerViewModel,
             EventHub eventHub,
             IComponentInserter componentInserter,
-            MainScene scene,
+            GameWorld scene,
             FocusSelectableObjectService focusSelectableObjectService)
             : base(componentInserter, animationPlayerViewModel, scene, focusSelectableObjectService)
         {

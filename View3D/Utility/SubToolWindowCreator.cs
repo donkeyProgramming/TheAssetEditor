@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using View3D.Scene;
+using View3D.Services;
 
 namespace CommonControls.Common
 {
@@ -20,7 +20,7 @@ namespace CommonControls.Common
             where TViewModel : IGameComponent
             where TUserView : UserControl
         {
-            var scene = _serviceProvider.GetRequiredService<MainScene>();
+            var scene = _serviceProvider.GetRequiredService<GameWorld>();
             var viewModel = _serviceProvider.GetRequiredService<TViewModel>();
             scene.AddComponent(viewModel);
 
@@ -37,7 +37,7 @@ namespace CommonControls.Common
 
         void OnComponentRemoved(IGameComponent component)
         {
-            var scene = _serviceProvider.GetRequiredService<MainScene>();
+            var scene = _serviceProvider.GetRequiredService<GameWorld>();
             scene.RemoveComponent(component);
 
             if (component is IDisposable disposable)

@@ -7,7 +7,6 @@ using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
 using MonoGame.Framework.WpfInterop;
 using View3D.Components;
-using View3D.Scene;
 using View3D.Services;
 
 namespace AnimationEditor.SuperView
@@ -22,9 +21,9 @@ namespace AnimationEditor.SuperView
             AnimationPlayerViewModel animationPlayerViewModel,
             EventHub eventHub,
             IComponentInserter componentInserter,
-            MainScene scene,
+            GameWorld gameWorld,
             FocusSelectableObjectService focusSelectableObjectService)
-            : base(componentInserter, animationPlayerViewModel, scene, focusSelectableObjectService)
+            : base(componentInserter, animationPlayerViewModel, gameWorld, focusSelectableObjectService)
         {
             DisplayName.Value = "Super view";
             _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;

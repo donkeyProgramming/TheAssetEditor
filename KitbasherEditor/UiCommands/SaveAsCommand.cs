@@ -1,5 +1,4 @@
 ﻿using CommonControls.Common.MenuSystem;
-using CommonControls.Events.UiCommands;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using View3D.Services;
 
@@ -12,12 +11,17 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public Hotkey HotKey { get; } = null;
 
         private readonly SceneSaverService _sceneSaverService;
+        private readonly KitbasherRootScene _kitbasherRootScene;
 
-        public SaveAsCommand(SceneSaverService sceneSaverService)
+        public SaveAsCommand(SceneSaverService sceneSaverService, KitbasherRootScene kitbasherRootScene)
         {
             _sceneSaverService = sceneSaverService;
+            _kitbasherRootScene = kitbasherRootScene;
         }
 
-        public void Execute() => _sceneSaverService.SaveAs();
+        public void Execute()
+        {
+            _sceneSaverService.SaveAs(_kitbasherRootScene.SelectedOutputFormat);
+        }
     }
 }

@@ -8,6 +8,7 @@ using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
+using View3D.Services;
 using View3D.Utility;
 
 namespace View3D.Components.Gizmo
@@ -16,6 +17,7 @@ namespace View3D.Components.Gizmo
     {
         private readonly MouseComponent _mouse;
         private readonly EventHub _eventHub;
+
         private readonly KeyboardComponent _keyboard;
         private readonly SelectionManager _selectionManager;
         private readonly CommandExecutor _commandManager;
@@ -51,7 +53,7 @@ namespace View3D.Components.Gizmo
 
         public override void Initialize()
         {
-            _gizmo = new Gizmo(_camera, _mouse, _deviceResolverComponent.Device, new SpriteBatch(_deviceResolverComponent.Device), _resourceLibary.DefaultFont);
+            _gizmo = new Gizmo(_camera, _mouse, _deviceResolverComponent.Device, _resourceLibary.CreateSpriteBatch(), _resourceLibary.DefaultFont);
             _gizmo.ActivePivot = PivotType.ObjectCenter;
             _gizmo.TranslateEvent += GizmoTranslateEvent;
             _gizmo.RotateEvent += GizmoRotateEvent;

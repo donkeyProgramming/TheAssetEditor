@@ -7,7 +7,6 @@ using CommonControls.Services;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using View3D.Components;
-using View3D.Scene;
 using View3D.Services;
 
 namespace AnimationEditor.AnimationTransferTool
@@ -24,7 +23,7 @@ namespace AnimationEditor.AnimationTransferTool
             EventHub eventHub,
             IComponentInserter componentInserter,
             AssetViewModelBuilder assetViewModelBuilder,
-            MainScene scene,
+            GameWorld scene,
             FocusSelectableObjectService focusSelectableObjectService)
             : base(componentInserter, animationPlayerViewModel, scene, focusSelectableObjectService)
         {

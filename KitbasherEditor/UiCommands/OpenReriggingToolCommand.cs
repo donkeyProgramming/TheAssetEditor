@@ -25,16 +25,24 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;
         public Hotkey HotKey { get; } = null;
 
-        SelectionManager _selectionManager;
-        private readonly SceneManager _sceneManager;
+        private readonly KitbasherRootScene _kitbasherRootScene;
+        private readonly SelectionManager _selectionManager;
         private readonly CommandFactory _commandFactory;
-        PackFileService _packFileService;
-        SkeletonAnimationLookUpHelper _skeletonHelper;
+        private readonly PackFileService _packFileService;
+        private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
+
+        public OpenReriggingToolCommand(KitbasherRootScene kitbasherRootScene, SelectionManager selectionManager, CommandFactory commandFactory, PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper)
+        {
+            _kitbasherRootScene = kitbasherRootScene;
+            _selectionManager = selectionManager;
+            _commandFactory = commandFactory;
+            _packFileService = packFileService;
+            _skeletonHelper = skeletonHelper;
+        }
 
         public void Execute()
         {
-            var root = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-            var skeletonName = root.SkeletonNode.Name;
+            var skeletonName = _kitbasherRootScene.Skeleton.SkeletonName;
             Remap(_selectionManager.GetState<ObjectSelectionState>(), skeletonName);
         }
 
