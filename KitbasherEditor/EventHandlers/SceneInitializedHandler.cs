@@ -14,6 +14,7 @@ namespace KitbasherEditor.EventHandlers
     public class SceneInitializedHandler
     {
         ILogger _logger = Logging.Create<SceneInitializedHandler>();
+
         private readonly KitbasherViewModel _kitbasherViewModel;
         private readonly PackFileService _packFileService;
         private readonly KitbasherRootScene _kitbasherRootScene;

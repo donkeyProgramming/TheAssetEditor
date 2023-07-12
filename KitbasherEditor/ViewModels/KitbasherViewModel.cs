@@ -3,6 +3,7 @@ using CommonControls.Common;
 using CommonControls.Events.Scoped;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
+using CommonControls.Services.ToolCreation;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using System;
 using System.IO;

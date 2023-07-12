@@ -5,6 +5,7 @@ using Common;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
+using CommonControls.Services.ToolCreation;
 using MonoGame.Framework.WpfInterop;
 using View3D.Components;
 using View3D.Services;

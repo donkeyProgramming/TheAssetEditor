@@ -4,6 +4,7 @@
 
 using CommonControls.Common;
 using CommonControls.Services;
+using CommonControls.Services.ToolCreation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CommonControls.Editors.Wtui
@@ -18,7 +19,7 @@ namespace CommonControls.Editors.Wtui
 
         public static void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<TwUiViewModel, TwUiMainView>(new ExtentionToTool(EditorEnums.AnimationPack_Editor, new[] { ".twui.xml" }));
+            factory.RegisterTool<TwUiViewModel, TwUiMainView>(new ExtensionToTool(EditorEnums.AnimationPack_Editor, new[] { ".twui.xml" }));
             //factory.RegisterTool<TextEditorViewModel<CampaignAnimBinToXmlConverter>, TextEditorView>(new PathToTool(".bin", @"animations\database\battle\bin"));
         }
     }

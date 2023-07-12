@@ -5,6 +5,7 @@ using AnimationMeta.Presentation;
 using AnimationMeta.Visualisation;
 using CommonControls.Common;
 using CommonControls.Services;
+using CommonControls.Services.ToolCreation;
 using Microsoft.Xna.Framework;
 using System.Collections.ObjectModel;
 using System.Linq;

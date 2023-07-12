@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using CommonControls.Common;
+using CommonControls.Services.ToolCreation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CommonControls.Editors.TextEditor
@@ -19,7 +20,7 @@ namespace CommonControls.Editors.TextEditor
         public static void RegisterTools(IToolFactory factory)
         {
             factory.RegisterTool<TextEditorViewModel<DefaultTextConverter>, TextEditorView>(
-                new ExtentionToTool(
+                new ExtensionToTool(
                     EditorEnums.XML_Editor,
                     new[] { ".json", ".xml", ".txt", ".wsmodel", ".xml.material", ".anim.meta.xml", ".anm.meta.xml", ".snd.meta.xml", ".bmd.xml", ".csv", ".bnk.xml" }));
         }

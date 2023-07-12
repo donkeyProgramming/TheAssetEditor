@@ -5,6 +5,7 @@ using CommonControls.Events.UiCommands;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
+using CommonControls.Services.ToolCreation;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;

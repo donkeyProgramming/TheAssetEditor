@@ -20,6 +20,7 @@ using CommonControls.Events.UiCommands;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Resources;
 using CommonControls.Services;
+using CommonControls.Services.ToolCreation;
 using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
 using System;

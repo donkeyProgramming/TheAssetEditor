@@ -4,6 +4,7 @@ using AnimationEditor.PropCreator.ViewModels;
 using Common;
 using CommonControls.Common;
 using CommonControls.Services;
+using CommonControls.Services.ToolCreation;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using View3D.Components;

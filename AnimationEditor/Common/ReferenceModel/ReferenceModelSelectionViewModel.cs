@@ -3,6 +3,7 @@ using AnimationMeta.Visualisation;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
+using CommonControls.Services.ToolCreation;
 using View3D.Animation;
 
 namespace AnimationEditor.Common.ReferenceModel

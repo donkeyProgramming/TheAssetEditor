@@ -10,6 +10,7 @@ using CommonControls.Common;
 using CommonControls.Events.UiCommands;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
+using CommonControls.Services.ToolCreation;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
 using Clipboard = System.Windows.Clipboard;

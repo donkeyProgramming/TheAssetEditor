@@ -2,6 +2,7 @@
 using AnimationMeta.Presentation.View;
 using AnimationMeta.Visualisation;
 using CommonControls.Common;
+using CommonControls.Services.ToolCreation;
 using Microsoft.Extensions.DependencyInjection;
 using View3D;
 
@@ -20,7 +21,7 @@ namespace AnimationMeta
 
         public override void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<EditorViewModel, MainEditorView>(new ExtentionToTool(EditorEnums.Meta_Editor, new[] { ".anm.meta", ".meta", ".snd.meta" }));
+            factory.RegisterTool<EditorViewModel, MainEditorView>(new ExtensionToTool(EditorEnums.Meta_Editor, new[] { ".anm.meta", ".meta", ".snd.meta" }));
         }
     }
 }
