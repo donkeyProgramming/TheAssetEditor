@@ -6,6 +6,7 @@ using Audio.Presentation.AudioExplorer;
 using Audio.Presentation.Compiler;
 using Audio.Storage;
 using Audio.Utility;
+using CommonControls;
 using CommonControls.Common;
 using CommonControls.Services;
 using CommonControls.Services.ToolCreation;
@@ -15,9 +16,9 @@ using System.Linq;
 
 namespace Audio
 {
-    public class AudioEditor_DependencyInjectionContainer
+    public class AudioEditor_DependencyInjectionContainer : DependencyContainer
     {
-        public static void Register(IServiceCollection serviceCollection)
+        public override void Register(IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<VgStreamWrapper>();
 
@@ -50,7 +51,7 @@ namespace Audio
             serviceCollection.AddScoped<ResultHandler>();
         }
 
-        public static void RegisterTools(IToolFactory factory)
+        public override void RegisterTools(IToolFactory factory)
         {
             factory.RegisterTool<AudioEditorViewModel, AudioEditorMainView>();
             factory.RegisterTool<CompilerViewModel, CompilerView>();// ( new ExtentionToTool( EditorEnums.AudioCompiler_Editor,  new[] { ".audio_json"}));

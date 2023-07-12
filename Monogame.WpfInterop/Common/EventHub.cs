@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Common
+namespace Monogame.WpfInterop.Common
 {
     public class EventHub : IDisposable
     {

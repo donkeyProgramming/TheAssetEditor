@@ -62,8 +62,6 @@ namespace FileTypesTests.FileTypes.RigidModel
             var dwarfHeadPack = _pfs.FindFile(_dwarfHeadPath);
             var dwarfModel = ModelFactory.Create().Load(dwarfHeadPack.DataSource.ReadData());
             Rmv2Validator.ValidateDefaultDwarfHead(dwarfModel, 12);
-
-
         }
 
         [Test]

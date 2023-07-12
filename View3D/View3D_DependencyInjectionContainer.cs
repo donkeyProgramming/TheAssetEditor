@@ -1,4 +1,4 @@
-﻿using CommonControls.Services.ToolCreation;
+﻿using CommonControls;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
@@ -37,6 +37,7 @@ namespace View3D
             serviceCollection.AddScoped<FaceEditor>();
             serviceCollection.AddScoped<ObjectEditor>();
             serviceCollection.AddScoped<Rmv2ModelNodeLoader>();
+            serviceCollection.AddScoped<SubToolWindowCreator>(); // Try to get this into common or remove the need for it
 
             // Resolvers - sort of hacks 
             serviceCollection.AddScoped<IDeviceResolver, DeviceResolverComponent>(x => x.GetService<DeviceResolverComponent>());
@@ -96,18 +97,12 @@ namespace View3D
             serviceCollection.AddTransient<PinMeshToVertexCommand>();
             serviceCollection.AddTransient<RemapBoneIndexesCommand>();
         }
-    }
-
-    public class DependencyContainer
-    {
-        public virtual void Register(IServiceCollection serviceCollection) { }
-
-        public virtual void RegisterTools(IToolFactory factory) { }
-
         protected void RegisterGameComponent<T>(IServiceCollection serviceCollection) where T : class, IGameComponent
         {
             serviceCollection.AddScoped<T>();
             serviceCollection.AddScoped<IGameComponent, T>(x => x.GetService<T>());
         }
     }
+
+
 }

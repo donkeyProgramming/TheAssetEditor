@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using View3D.Services;
 
-namespace CommonControls.Common
+namespace View3D.Utility
 {
     public class SubToolWindowCreator
     {

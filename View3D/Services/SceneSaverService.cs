@@ -1,5 +1,4 @@
-﻿using Common;
-using CommonControls.BaseDialogs.ErrorListDialog;
+﻿using CommonControls.BaseDialogs.ErrorListDialog;
 using CommonControls.Common;
 using CommonControls.Events.Scoped;
 using CommonControls.FileTypes.RigidModel;
@@ -7,6 +6,7 @@ using CommonControls.FileTypes.RigidModel.LodHeader;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
+using Monogame.WpfInterop.Common;
 using Serilog;
 using System;
 using System.Collections.Generic;

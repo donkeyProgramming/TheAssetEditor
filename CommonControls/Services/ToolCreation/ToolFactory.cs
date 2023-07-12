@@ -14,14 +14,14 @@ namespace CommonControls.Services.ToolCreation
     {
         ILogger _logger = Logging.Create<IToolFactory>();
 
-        private readonly IServiceProvider _rootProivder;
+        private readonly IServiceProvider _rootProvider;
         private readonly ScopeRepository _scopeRepository;
         private readonly Dictionary<Type, Type> _viewModelToViewMap = new();
         private readonly Dictionary<IPackFileToToolSelector, Type> _extensionToToolMap = new();
 
         public ToolFactory(IServiceProvider serviceProvider, ScopeRepository scopeRepository)
         {
-            _rootProivder = serviceProvider;
+            _rootProvider = serviceProvider;
             _scopeRepository = scopeRepository;
         }
 
@@ -85,7 +85,7 @@ namespace CommonControls.Services.ToolCreation
 
         IEditorViewModel CreateEditorInternal(Type editorType)
         {
-            var scope = _rootProivder.CreateScope();
+            var scope = _rootProvider.CreateScope();
             var instance = scope.ServiceProvider.GetService(editorType) as IEditorViewModel;
 
             var scopeResolverHint = instance as IEditorScopeResolverHint;

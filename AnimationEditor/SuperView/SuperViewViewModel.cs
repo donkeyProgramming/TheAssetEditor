@@ -1,11 +1,11 @@
 ﻿using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
-using Common;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
 using CommonControls.Services.ToolCreation;
+using Monogame.WpfInterop.Common;
 using MonoGame.Framework.WpfInterop;
 using View3D.Components;
 using View3D.Services;

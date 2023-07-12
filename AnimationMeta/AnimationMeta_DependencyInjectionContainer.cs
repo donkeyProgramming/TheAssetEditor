@@ -1,10 +1,11 @@
-﻿using AnimationMeta.Presentation;
+﻿using AnimationMeta.FileTypes.Parsing;
+using AnimationMeta.Presentation;
 using AnimationMeta.Presentation.View;
 using AnimationMeta.Visualisation;
+using CommonControls;
 using CommonControls.Common;
 using CommonControls.Services.ToolCreation;
 using Microsoft.Extensions.DependencyInjection;
-using View3D;
 
 namespace AnimationMeta
 {
@@ -12,9 +13,10 @@ namespace AnimationMeta
     {
         public override void Register(IServiceCollection serviceCollection)
         {
+            MetaDataTagDeSerializer.EnsureMappingTableCreated();
+
             serviceCollection.AddTransient<MainEditorView>();
             serviceCollection.AddTransient<EditorViewModel>();
-
 
             serviceCollection.AddScoped<MetaDataFactory>(); // Needs heavy refactorying!
         }

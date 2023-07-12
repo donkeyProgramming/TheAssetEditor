@@ -13,7 +13,6 @@ namespace AudioResearch
         public SimpleApplication(bool loadAllCaFiles = true)
         {
             var serviceProvider = new DependencyInjectionConfig()
-                  .ConfigureResources()
                   .Build();
             _serviceScope = serviceProvider.CreateScope();
 

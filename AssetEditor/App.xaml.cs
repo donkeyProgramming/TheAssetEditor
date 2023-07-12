@@ -24,7 +24,6 @@ namespace AssetEditor
             Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(DispatcherUnhandledExceptionHandler);
 
             _serviceProvider = new DependencyInjectionConfig()
-                .ConfigureResources()
                 .Build();
             _rootScope = _serviceProvider.CreateScope();
             ShowMainWindow();

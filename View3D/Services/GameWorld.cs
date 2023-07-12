@@ -1,5 +1,5 @@
-﻿using Common;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using Monogame.WpfInterop.Common;
 using MonoGame.Framework.WpfInterop;
 
 
