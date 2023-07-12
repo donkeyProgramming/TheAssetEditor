@@ -16,7 +16,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
     {
         ObservableCollection<ContextMenuItem> _contextMenu;
         public ObservableCollection<ContextMenuItem> Items { get => _contextMenu; set => SetAndNotify(ref _contextMenu, value); }
-        CommandExecutor CommandExecutor { get; }
 
         ISceneNode _activeNode;
         IEnumerable<ISceneNode> _activeNodes;
@@ -27,7 +26,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         public SceneExplorerContextMenuHandler(CommandExecutor commandExecutor, SceneManager sceneManager, CommandFactory commandFactory)
         {
-            CommandExecutor = commandExecutor;
             _sceneManager = sceneManager;
             _commandFactory = commandFactory;
         }

@@ -24,14 +24,15 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         private readonly CommandExecutor _commandExecutor;
         private readonly MenuItemVisibilityRuleEngine _menuItemVisibilityRuleEngine;
         private readonly ActionHotkeyHandler _hotKeyHandler = new ActionHotkeyHandler();
-        private readonly WindowKeyboard _keyboard = new WindowKeyboard();
+        private readonly WindowKeyboard _keyboard;
         private readonly Dictionary<Type, MenuAction> _uiCommands = new();
 
-        public MenuBarViewModel(CommandExecutor commandExecutor, EventHub eventHub, MenuItemVisibilityRuleEngine menuItemVisibilityRuleEngine, TransformToolViewModel transformToolViewModel,IUiCommandFactory uiCommandFactory)
+        public MenuBarViewModel(CommandExecutor commandExecutor, EventHub eventHub, MenuItemVisibilityRuleEngine menuItemVisibilityRuleEngine, TransformToolViewModel transformToolViewModel,IUiCommandFactory uiCommandFactory, WindowKeyboard windowKeyboard)
         {
             _commandExecutor = commandExecutor;
             _menuItemVisibilityRuleEngine = menuItemVisibilityRuleEngine;
             _uiCommandFactory = uiCommandFactory;
+            _keyboard = windowKeyboard;
             TransformTool = transformToolViewModel;
 
             RegisterActions();

@@ -56,7 +56,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             if (_mainNode.Model != null)
             {
                 SkeletonName = SkeletonNameList.FirstOrDefault(x => Path.GetFileNameWithoutExtension(x).ToLower() == _mainNode.Model.Header.SkeletonName.ToLower());
-                UpdateSkeletonName();
             }
 
             SelectedOutputFormat = _kitbasherRootScene.SelectedOutputFormat;

@@ -97,49 +97,6 @@ namespace View3D.SceneNodes
             UpdateDefaultLodValues();
         }
 
-        public void CreateModelNodesFromFile(RmvFile model, ResourceLibary resourceLibary, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory, string modelFullPath,
-            RenderEngineComponent renderEngineComponent, PackFileService pfs, bool autoResolveTexture)
-        {
-            Model = model;
-            for (int lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
-            {
-                if (lodIndex >= Children.Count)
-                {
-                    var cameraDistance = model.LodHeaders[lodIndex]?.LodCameraDistance;
-                    AddObject(new Rmv2LodNode("Lod " + lodIndex, lodIndex, cameraDistance));
-                    UpdateDefaultLodValues();
-                }
-
-                var lodNode = Children[lodIndex];
-                for (int modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
-                {
-                    var geometry = MeshBuilderService.BuildMeshFromRmvModel(model.ModelList[lodIndex][modelIndex], model.Header.SkeletonName, contextFactory.Create());
-                    var rmvModel = model.ModelList[lodIndex][modelIndex];
-                    var node = new Rmv2MeshNode(rmvModel.CommonHeader, geometry, rmvModel.Material, animationPlayer, renderEngineComponent);
-                    node.Initialize(resourceLibary);
-                    node.OriginalFilePath = modelFullPath;
-                    node.OriginalPartIndex = modelIndex;
-                    node.LodIndex = lodIndex;
-
-                    if (autoResolveTexture)
-                    {
-                        try
-                        {
-                            MissingTextureResolver missingTextureResolver = new MissingTextureResolver();
-                            missingTextureResolver.ResolveMissingTextures(node, pfs);
-                        }
-                        catch (Exception e)
-                        {
-                            _logger.Here().Error($"Error while trying to resolve textures from WS model while loading model, {e.Message}");
-                        }
-
-                    }
-
-                    lodNode.AddObject(node);
-                }
-            }
-        }
-
         public List<Rmv2LodNode> GetLodNodes()
         {
             return Children
@@ -147,7 +104,6 @@ namespace View3D.SceneNodes
                 .Select(x => x as Rmv2LodNode)
                 .ToList();
         }
-
 
         public Rmv2MeshNode GetMeshNode(int lod, int modelIndex)
         {

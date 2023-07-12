@@ -17,7 +17,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         {
             Mesh = new MeshViewModel(node, componentManager);
             Animation = new AnimationViewModel(kitbasherRootScene, node, pfs, animLookUp);
-            MaterialGeneral = new MaterialGeneralViewModel(kitbasherRootScene, node, pfs, componentManager, applicationSettings);
+            MaterialGeneral = new MaterialGeneralViewModel(kitbasherRootScene, node, pfs, applicationSettings);
 
             if (node.Material is WeightedMaterial)
                 Material = new WeightedMaterialViewModel(node);

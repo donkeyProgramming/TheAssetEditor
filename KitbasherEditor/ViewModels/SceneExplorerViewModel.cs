@@ -13,6 +13,13 @@ using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels
 {
+
+
+    // Explorer
+    // Child view container
+    // Context menu
+
+
     public class SceneExplorerViewModel : NotifyPropertyChangedImpl
     {
         SceneManager _sceneManager;

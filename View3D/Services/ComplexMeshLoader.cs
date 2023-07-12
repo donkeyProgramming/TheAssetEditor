@@ -9,10 +9,7 @@ using System;
 using System.IO;
 using System.Linq;
 using View3D.Animation;
-using View3D.Components.Rendering;
-using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
-using View3D.Utility;
 using static CommonControls.FileTypes.Vmd.VariantMeshDefinition;
 
 namespace View3D.Services
@@ -20,18 +17,14 @@ namespace View3D.Services
     public class ComplexMeshLoader
     {
         ILogger _logger = Logging.Create<ComplexMeshLoader>();
-        PackFileService _packFileService;
-        ResourceLibary _resourceLibary;
-        IGeometryGraphicsContextFactory _geometryContextFactory;
-        private readonly RenderEngineComponent _renderEngineComponent;
-        ApplicationSettingsService _applicationSettingsService;
+        private readonly PackFileService _packFileService;
+        private readonly Rmv2ModelNodeLoader _rmv2ModelNodeLoader;
+        private readonly ApplicationSettingsService _applicationSettingsService;
 
-        public ComplexMeshLoader(ResourceLibary resourceLibary, PackFileService packFileService, IGeometryGraphicsContextFactory geometryContextFactory, RenderEngineComponent renderEngineComponent, ApplicationSettingsService applicationSettingsService)
+        public ComplexMeshLoader(Rmv2ModelNodeLoader rmv2ModelNodeLoader, PackFileService packFileService, ApplicationSettingsService applicationSettingsService)
         {
             _packFileService = packFileService;
-            _resourceLibary = resourceLibary;
-            _geometryContextFactory = geometryContextFactory;
-            _renderEngineComponent = renderEngineComponent;
+            _rmv2ModelNodeLoader = rmv2ModelNodeLoader;
             _applicationSettingsService = applicationSettingsService;
         }
 
@@ -146,7 +139,7 @@ namespace View3D.Services
             var modelFullPath = _packFileService.GetFullPath(file);
             var modelNode = new Rmv2ModelNode(Path.GetFileName(file.Name));
             var autoResolveTexture = isParentWsModel == false && _applicationSettingsService.CurrentSettings.AutoResolveMissingTextures;
-            modelNode.CreateModelNodesFromFile(rmvModel, _resourceLibary, player, _geometryContextFactory, modelFullPath, _renderEngineComponent, _packFileService, autoResolveTexture);
+            _rmv2ModelNodeLoader.CreateModelNodesFromFile(modelNode, rmvModel, player, modelFullPath);
 
             foreach (var mesh in modelNode.GetMeshNodes(0))
                 mesh.AttachmentPointName = attachmentPointName;

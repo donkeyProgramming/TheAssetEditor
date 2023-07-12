@@ -1,4 +1,5 @@
-﻿using Audio.BnkCompiler;
+﻿using AssetEditor;
+using Audio.BnkCompiler;
 using Audio.Storage;
 using Audio.Utility;
 using CommonControls.Common;

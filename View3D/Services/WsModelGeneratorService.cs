@@ -17,7 +17,7 @@ namespace View3D.Services
 {
     public class WsModelGeneratorService
     {
-        ILogger _logger = Logging.Create<SceneSaverService>();
+        ILogger _logger = Logging.Create<WsModelGeneratorService>();
 
         private readonly PackFileService _packFileService;
         private readonly IActiveFileResolver _activeFileResolver;

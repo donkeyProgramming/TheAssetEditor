@@ -1,3 +1,4 @@
+using AssetEditor;
 using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;

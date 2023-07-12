@@ -61,7 +61,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             AttachableBones.SelectedItemChanged += ModelBoneList_SelectedItemChanged;
             AttachableBones.SearchFilter = (value, rx) => { return rx.Match(value.Name.Value).Success; };
             AttachableBones.SelectedItem = AttachableBones.PossibleValues.FirstOrDefault(x => x.Name.Value == _meshNode.AttachmentPointName);
-
         }
 
         private void ModelBoneList_SelectedItemChanged(AnimatedBone newValue)

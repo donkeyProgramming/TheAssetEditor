@@ -1,9 +1,8 @@
-﻿using AssetEditor;
-using CommonControls.Services;
+﻿using CommonControls.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace AudioResearch
+namespace AssetEditor
 {
     public class SimpleApplication : IDisposable
     {

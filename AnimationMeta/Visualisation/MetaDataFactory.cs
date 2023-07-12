@@ -15,7 +15,6 @@ using View3D.Animation;
 using View3D.Components.Component;
 using View3D.Components.Rendering;
 using View3D.Rendering;
-using View3D.Rendering.Geometry;
 using View3D.Rendering.RenderItems;
 using View3D.SceneNodes;
 using View3D.Services;
@@ -27,27 +26,23 @@ namespace AnimationMeta.Visualisation
     {
         private ILogger _logger = Logging.Create<MetaDataFactory>();
 
-        private ApplicationSettingsService _applicationSettingsService;
+        private readonly ComplexMeshLoader _complexMeshLoader;
         private readonly ResourceLibary _resourceLibary;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        private readonly RenderEngineComponent _renderEngineComponent;
         private readonly PackFileService _packFileService;
         private readonly AnimationsContainerComponent _animationsContainerComponent;
-        private readonly IGeometryGraphicsContextFactory _geometryGraphicsContextFactory;
 
-        public MetaDataFactory(
-            ApplicationSettingsService applicationSettingsService,
-            ResourceLibary resourceLibary, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, RenderEngineComponent renderEngineComponent, PackFileService packFileService,
-            AnimationsContainerComponent animationsContainerComponent, IGeometryGraphicsContextFactory geometryGraphicsContextFactory)
+        public MetaDataFactory(ComplexMeshLoader complexMeshLoader,
+            ResourceLibary resourceLibary, 
+            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
+            PackFileService packFileService,
+            AnimationsContainerComponent animationsContainerComponent)
         {
-
-            _applicationSettingsService = applicationSettingsService;
+            _complexMeshLoader = complexMeshLoader;
             _resourceLibary = resourceLibary;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
-            _renderEngineComponent = renderEngineComponent;
             _packFileService = packFileService;
             _animationsContainerComponent = animationsContainerComponent;
-            _geometryGraphicsContextFactory = geometryGraphicsContextFactory;
         }
 
         public List<IMetaDataInstance> Create(MetaDataFile persistent, MetaDataFile metaData, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment)
@@ -141,8 +136,7 @@ namespace AnimationMeta.Visualisation
             var propPlayer = _animationsContainerComponent.RegisterAnimationPlayer(new AnimationPlayer(), propName + Guid.NewGuid());
 
             // Configure the mesh
-            ComplexMeshLoader loader = new ComplexMeshLoader(_resourceLibary, _packFileService, _geometryGraphicsContextFactory, _renderEngineComponent, _applicationSettingsService);
-            var loadedNode = loader.Load(meshPath, new GroupNode(propName), propPlayer);
+            var loadedNode = _complexMeshLoader.Load(meshPath, new GroupNode(propName), propPlayer);
 
             // Configure animation
             if (animationPath != null)
