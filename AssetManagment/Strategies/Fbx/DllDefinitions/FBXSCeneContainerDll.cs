@@ -5,8 +5,8 @@ namespace AssetManagement.Strategies.Fbx.DllDefinitions
 {
     public class FBXSCeneContainerDll
     {
-
         const String dllFileName = "FBXWrapperNative.dll";
+
 
         [DllImport(dllFileName, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool GetPackedVertices(IntPtr ptrInstances, int meshIndex, out IntPtr vertices, out int itemCount);

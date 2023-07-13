@@ -7,12 +7,18 @@ namespace AssetManagement.Strategies.Fbx.Views.FBXSettings
     /// <summary>
     /// Interaction logic for d.xaml
     /// </summary>
-    public partial class FBXSetttingsView : UserControl
+    public partial class FBXSetttingsView : Window
     {
         public FBXSetttingsView()
-        {
-            //Owner = System.Windows.Application.Current.MainWindow;
+        {            
             InitializeComponent();
+        }
+
+        private void ImportButton_Click(object sender, RoutedEventArgs e) 
+        {
+            
+            DialogResult = true;
+            Close();
         }
     }
 }

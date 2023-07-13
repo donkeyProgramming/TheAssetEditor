@@ -1,17 +1,17 @@
-﻿<UserControl x:Class="AssetManagement.Strategies.Fbx.Views.FBXSettings.FBXSetttingsView"
+﻿<Window x:Class="AssetManagement.Strategies.Fbx.Views.FBXSettings.FBXSetttingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:s="http://schemas.singulink.com/xaml"
-             mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="400">
+            SizeToContent="WidthAndHeight"
+             mc:Ignorable="d">
 
 
     <Grid Margin="0">
-        <Border BorderBrush="Green" BorderThickness="3"></Border>
+        <!--<Border BorderBrush="Green" BorderThickness="3"></Border>-->
         <Grid Margin="0,0,10,37">
-            <Border BorderBrush="Red" BorderThickness="3"></Border>
+            <!--<Border BorderBrush="Red" BorderThickness="3"></Border>-->
             <GroupBox x:Name="groupBox" Header="FBX File Info" Margin="5">
                 <StackPanel Orientation="Vertical">
                     <StackPanel>
@@ -26,20 +26,20 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
 
-                            <Label Content="FileInfo" Grid.Column="0" Grid.Row="0"/>
-                            <TextBox x:Name="FileInfoTextBox" Height="25" Width="Auto"  Grid.Column="1" Grid.Row="0" Text="{Binding SelectedForStaticDescription.Value}"/>
+                            <Label Content="File Name:" Grid.Column="0" Grid.Row="0"/>
+                            <TextBox Height="25" Width="Auto"  Grid.Column="1" Grid.Row="0" Text="{Binding FileNameTextBox.Value}"/>
 
-                            <Label Content="Units" Grid.Column="0" Grid.Row="1"/>
-                            <TextBox x:Name="UnitsTextBox" Height="25" Width="Auto" Grid.Column="1" Grid.Row="1"/>
+                            <Label Content="Units: " Grid.Column="0" Grid.Row="1"/>
+                            <TextBox Height="25" Width="Auto" Grid.Column="1" Grid.Row="1" Text="{Binding UnitNameTextBox.Value}"/>
 
-                            <Label x:Name ="StuffLabel"  Content="Stuff"  Grid.Column="0" Grid.Row="2"/>
-                            <TextBox x:Name="StuffTextBox" Height="25" Width="Auto"   Grid.Column="1" Grid.Row="2"/>
+                            <Label Content="Coord System: "  Grid.Column="0" Grid.Row="2"/>
+                            <TextBox Height="25" Width="Auto"  Grid.Column="1" Grid.Row="2" Text="{Binding CoordSystemTextBox.Value}"/>
                         </Grid>
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
-        </Grid>    
-    
+        </Grid>
+
         <Button
             Name="ImportButton"
             Content="Import&#xD;&#xA;"
@@ -49,8 +49,8 @@
             VerticalAlignment="Bottom" 
             Width="75"             
             IsDefault="True"            
-            Click="{s:MethodBinding ImportButtonClicked}"
-            />
+            Click="ImportButton_Click"/>
+
         <Button
             Name="CancelButton"
             Content="Cancel" 
@@ -60,76 +60,5 @@
             VerticalAlignment="Bottom"
             Width="75" 
             IsCancel="True" />
-
     </Grid>
-    
-
-
-    <!--<Grid>
-        <StackPanel Name="Stuffy">
-            <GroupBox x:Name="groupBox" Height="230" Header="FBX File Info" Margin="5">
-                <StackPanel Orientation="Vertical">
-
-                    <StackPanel>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="100"></ColumnDefinition>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-
-                            <Label Content="FileInfo" Grid.Column="0" Grid.Row="0"/>
-                            <TextBox x:Name="FileInfoTextBox" Height="25" Width="Auto"  Grid.Column="1" Grid.Row="0"/>
-
-                            <Label Content="Units" Grid.Column="0" Grid.Row="1"/>
-                            <TextBox x:Name="UnitsTextBox" Height="25" Width="Auto" Grid.Column="1" Grid.Row="1"/>
-
-                            <Label Content="Stuff"  Grid.Column="0" Grid.Row="2"/>
-                            <TextBox x:Name="StuffTextBox" Height="25" Width="Auto"   Grid.Column="1" Grid.Row="2"/>
-                        </Grid>
-                    </StackPanel>
-                    
-
-                </StackPanel>
-
-            </GroupBox>
-
-            <WrapPanel x:Name="wp" Grid.Row="1" HorizontalAlignment="Stretch" Orientation="Horizontal">
-
-                <StackPanel>
-                    <Slider x:Name="slider" Width="120"/>
-                    <Button x:Name="button" Content="Button"/>
-                </StackPanel>
-            </WrapPanel>
-        </StackPanel>
-        </Grid>-->
-    <!--<Grid Height="343" VerticalAlignment="Bottom">
-            <Button
-            Name="ImportButton"
-            Content="Import&#xD;&#xA;"
-            Height="23"
-            HorizontalAlignment="Right" 
-            Margin="0,0,26,13"
-            VerticalAlignment="Bottom" 
-            Width="75" 
-            Click="ImportButton_Click"
-            IsDefault="True"
-            Command="{Binding OKButtonCommand}" />
-
-            <Button
-            Name="CancelButton"
-            Content="Cancel" 
-            Height="23" 
-            HorizontalAlignment="Right" 
-            Margin="0,0,126,13"            
-            VerticalAlignment="Bottom"
-            Width="75" 
-            IsCancel="True" />
-
-        </Grid>-->
-    
-</UserControl>
+</Window>

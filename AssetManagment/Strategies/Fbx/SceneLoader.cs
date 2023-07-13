@@ -15,7 +15,7 @@ namespace AssetManagement.Strategies.Fbx
             IntPtr fbxSceneLoader = IntPtr.Zero;
             try
             {
-                fbxSceneLoader = FBXSeneLoaderServiceDLL.CreateSceneFBX(fileName);       
+                fbxSceneLoader = FBXSeneLoaderServiceDLL.CreateSceneFBX(fileName);
                 var ptrNativeScene = FBXSeneLoaderServiceDLL.ProcessAndFillScene(fbxSceneLoader);
                 var newScene = SceneMarshallerToManaged.ToManaged(ptrNativeScene);
                 return newScene;

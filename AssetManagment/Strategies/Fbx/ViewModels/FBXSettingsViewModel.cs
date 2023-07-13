@@ -4,47 +4,68 @@ using System.Linq;
 using System.Security.RightsManagement;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Forms;
+using System.Windows.Media.TextFormatting;
 using AssetManagement.Strategies.Fbx.Views.FBXSettings;
 using CommonControls.BaseDialogs;
 using CommonControls.Common;
 
+using CommonControls.Editors.ModelImportSettings;
+
 namespace AssetManagement.Strategies.Fbx.ViewModels
 {
-    
-
     public class FBXSettingsViewModel
     {
-        public FBXImportSettings ImportSettings { get; set; }
+        public FBXImportExportSettings ImportSettings { get; set; }
 
-
-        public FBXSettingsViewModel(FBXImportSettings fbxIportSettings)
+        public FBXSettingsViewModel(FBXImportExportSettings fbxIportSettings)
         {
             ImportSettings = fbxIportSettings;
         }
 
-        public void ImportButtonClicked() => DoStuff();
+        public void ImportButtonClicked() => OnImportButtonClicked();
 
-        public NotifyAttr<string> SelectedForStaticDescription { get; set; } = new NotifyAttr<string>($"You have not yet clicked!");
-
-        public void DoStuff()
+        public void OnImportButtonClicked()
         {
-            SelectedForStaticDescription.Value = "Now You Have Clicked 'IMPORT'";
-             var DEBUG_BREAK = 1;
+            FetchControlData();
         }
 
+        public NotifyAttr<string> FileNameTextBox { get; set; } = new NotifyAttr<string>($"empty.fbx");
+        public NotifyAttr<string> UnitNameTextBox { get; set; } = new NotifyAttr<string>($"Inches");
+        public NotifyAttr<string> CoordSystemTextBox { get; set; } = new NotifyAttr<string>($"Y-Up");
 
-        public void ShowWindow()
+        /// <summary>
+        /// moves data from storeage class into UI controls
+        /// </summary>
+        private void UpdataControlData()
         {
-            var window = new ControllerHostWindow(true)
-            {
-                DataContext = this,
-                Title = "Stuff",
-                Content = new FBXSetttingsView(),
-                Width = 360,
-                Height = 415,
-            };
-            window.ShowDialog();
+            FileNameTextBox.Value = ImportSettings.fileName;
         }
 
+        /// <summary>
+        /// moves data from UI control into storeage class
+        /// </summary>
+        private void FetchControlData()
+        {
+            ImportSettings.fileName = FileNameTextBox.Value;
+        }
+
+        /// <summary>
+        /// Static helper, essentially taken from "PinToolViewModel"
+        /// </summary>        
+        static public bool ShowImportDialog(FBXImportExportSettings fbxIportSettings)
+        {
+            var dialog = new FBXSetttingsView();
+            var model = new FBXSettingsViewModel(fbxIportSettings);
+
+            dialog.DataContext = model;
+            model.UpdataControlData();
+
+            var result = dialog.ShowDialog().Value;
+            model.FetchControlData();
+
+            return result;
+        }
     }
 }

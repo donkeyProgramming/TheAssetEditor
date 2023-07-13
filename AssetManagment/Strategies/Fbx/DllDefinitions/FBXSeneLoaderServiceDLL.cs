@@ -8,6 +8,9 @@ namespace AssetManagement.Strategies.Fbx.DllDefinitions
         const String dllFileName = "FBXWrapperNative.dll";
 
         [DllImport(dllFileName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool GetFileInfo(IntPtr ptrInstance, IntPtr fbxFileInfo);
+
+        [DllImport(dllFileName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void DeleteBaseObj(IntPtr ptrInstances);
                     
         [DllImport(dllFileName, CallingConvention = CallingConvention.Cdecl)]

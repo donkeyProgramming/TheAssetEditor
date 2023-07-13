@@ -19,6 +19,12 @@ namespace AssetManagement.Strategies.Fbx
 
         public PackFile ImportAsset(string diskFilePath)
         {            
+            FBXImportExportSettings settings = new FBXImportExportSettings(); // just open the dialog with filename field set
+            settings.fileName = diskFilePath;            
+            
+            if (!FBXSettingsViewModel.ShowImportDialog(settings)) // just for show atm
+                return null;
+
             var sceneContainer = SceneLoader.LoadScene(diskFilePath);                     
 
             var rmv2File = RmvFileBuilder.ConvertToRmv2(sceneContainer.Meshes, "");
