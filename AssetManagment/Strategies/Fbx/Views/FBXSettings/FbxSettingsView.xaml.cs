@@ -10,12 +10,13 @@ namespace AssetManagement.Strategies.Fbx.Views.FBXSettings
     public partial class FBXSetttingsView : Window
     {
         public FBXSetttingsView()
-        {            
+        {
             InitializeComponent();
+
+            ImportButton.Click += ImportButton_Click;
         }
 
-        private void ImportButton_Click(object sender, RoutedEventArgs e) 
-        {
+        private void ImportButton_Click(object sender, RoutedEventArgs e)         {
             
             DialogResult = true;
             Close();

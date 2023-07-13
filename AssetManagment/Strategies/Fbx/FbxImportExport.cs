@@ -9,7 +9,7 @@ using System.Windows;
 using AssetManagement.Strategies.Fbx.ViewModels;
 using AssetManagement.Strategies.Fbx.Views.FBXSettings;
 using CommonControls.BaseDialogs;
-using SharpDX.MediaFoundation;
+using AssetManagement.GenericFormats.Unmanaged;
 
 namespace AssetManagement.Strategies.Fbx
 {
@@ -18,12 +18,15 @@ namespace AssetManagement.Strategies.Fbx
         public string[] Formats => new string[] { ".fbx" };
 
         public PackFile ImportAsset(string diskFilePath)
-        {            
+        {   
+            // enable once skeleton stuff in dialog is done
+            /*         
             FBXImportExportSettings settings = new FBXImportExportSettings(); // just open the dialog with filename field set
             settings.fileName = diskFilePath;            
             
             if (!FBXSettingsViewModel.ShowImportDialog(settings)) // just for show atm
                 return null;
+                */
 
             var sceneContainer = SceneLoader.LoadScene(diskFilePath);                     
 

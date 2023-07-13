@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.RightsManagement;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.InteropServices;
 
-namespace AssetManagement.Strategies.Fbx
+namespace AssetManagement.GenericFormats.Unmanaged
 {
+    [StructLayout(LayoutKind.Sequential)]
     public struct FBXSDKVersion
     {
         public int x;
@@ -14,29 +10,36 @@ namespace AssetManagement.Strategies.Fbx
         public int z;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
     public struct FBXFileInfo
     {
         public FBXSDKVersion sdkVersion; // SDK version file is saved with;
         public bool isASCII; // FBX can be saves as binary or json/xml like ASCII text
     }
+
+    [StructLayout(LayoutKind.Sequential)]
     public struct FBXUnitFileInfo
     {
         public string unitNameString;
         public float globalScale;
         public float SsaleToMeters;
     }
-    public struct FBXAnimTimingInfo
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct FBXAnimInfo
     {
+        public string skeletonName;
         public float animFPS;
         public float animTiem;
         public int animFrame;
-    }
+    }        
 
+    [StructLayout(LayoutKind.Sequential)]
     public class FBXImportExportSettings
     {
         public string fileName;
         public FBXFileInfo fileinfo;
         public FBXUnitFileInfo unitInfo;
-        public FBXAnimTimingInfo animTimingINfo;
+        public FBXAnimInfo animTimingINfo;
     }
 }

@@ -4,6 +4,8 @@ using Vector3 = Microsoft.Xna.Framework.Vector3;
 using Quaternion = Microsoft.Xna.Framework.Quaternion;
 using System;
 using System.Runtime.InteropServices;
+using AssetManagement.GenericFormats.Managed;
+using AssetManagement.GenericFormats.Unmanaged;
 
 namespace AssetManagement.GenericFormats
 {
@@ -13,8 +15,7 @@ namespace AssetManagement.GenericFormats
         public List<BoneInfo> Bones { get; set; } = new List<BoneInfo>();
         public List<AnimationClip> Animations { get; set; } = new List<AnimationClip>();
         public Node RootNode { get; set; }
-
-        private List<VertexWeight> m_weights;
+        public String SkeletonName { get; set; }
     }
 
     public class Node
@@ -22,12 +23,10 @@ namespace AssetManagement.GenericFormats
         public string Name { get; set; }
         public List<Node> Children { get; set; }
         public Node Parent { get; set; }
-        public Matrix Transform { get; set; }
-
-        
+        public Matrix Transform { get; set; }        
     }
 
-    public struct BoneInfo
+    public class BoneInfo
     {
         public List<VertexWeight> VertexWeights { get; set; }
         public string Name { get; set; }
@@ -38,7 +37,7 @@ namespace AssetManagement.GenericFormats
         public Matrix InverseBindPoseMatrix { get; set; }
     }
 
-    public struct AnimationKey
+    public class AnimationKey
     {
         public Quaternion LocalRotation { get; set; }
         public Vector3 localTranslations { get; set; }
@@ -64,14 +63,5 @@ namespace AssetManagement.GenericFormats
                 // TODO: reprocess timestamps in keys                
             }
         }
-    }
-    
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-    public struct VertexWeight
-    {
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
-        public string boneName;
-        public int vertexIndex;
-        public float vertexWeight;
     }
 };

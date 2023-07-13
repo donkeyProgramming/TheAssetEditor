@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:s="http://schemas.singulink.com/xaml"
+             xmlns:s="http://schemas.singulink.com/xaml"            
             SizeToContent="WidthAndHeight"
              mc:Ignorable="d">
 
@@ -49,7 +49,7 @@
             VerticalAlignment="Bottom" 
             Width="75"             
             IsDefault="True"            
-            Click="ImportButton_Click"/>
+            Click="{s:MethodBinding ImportButtonClicked}"/>
 
         <Button
             Name="CancelButton"

@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.RightsManagement;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Forms;
-using System.Windows.Media.TextFormatting;
+﻿using AssetManagement.GenericFormats.Unmanaged;
 using AssetManagement.Strategies.Fbx.Views.FBXSettings;
-using CommonControls.BaseDialogs;
 using CommonControls.Common;
-
-using CommonControls.Editors.ModelImportSettings;
 
 namespace AssetManagement.Strategies.Fbx.ViewModels
 {
