@@ -41,9 +41,14 @@ namespace wrapdll
 
 		void GetIndices(int meshindex, uint16_t** ppVertices, int* itemCount)
 		{
-
 			*itemCount = static_cast<int>(m_packedMeshes[meshindex].indices.size());
 			*ppVertices = m_packedMeshes[meshindex].indices.data();
+		};
+
+		void GetVertexWeights(int meshindex, VertexWeight** ppVertices, int* itemCount)
+		{
+			*itemCount = static_cast<int>(m_packedMeshes[meshindex].vertexWeights.size());
+			*ppVertices = m_packedMeshes[meshindex].vertexWeights.data();
 		};
 
 		std::vector <PackedMesh>& GetMeshes()

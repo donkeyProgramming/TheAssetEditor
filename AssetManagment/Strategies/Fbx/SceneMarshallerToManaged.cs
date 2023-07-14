@@ -1,13 +1,15 @@
 ﻿using AssetManagement.GenericFormats;
-using AssetManagement.GenericFormats.Native;
+using AssetManagement.GenericFormats.Managed;
+using AssetManagement.GenericFormats.Unmanaged;
 using AssetManagement.Strategies.Fbx.DllDefinitions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace AssetManagement.Strategies.Fbx
 {
-    public class SceneMarshaller
+    public class SceneMarshallerToManaged
     {
         public static SceneContainer ToManaged(IntPtr ptrFbxSceneContainer)
         {
@@ -79,8 +81,33 @@ namespace AssetManagement.Strategies.Fbx
             packedMesh.Vertices.AddRange(vertices);
             packedMesh.Indices.AddRange(indices);
             packedMesh.Name = tempName;
+            packedMesh.VertexWeights = GetVertexWeights(fbxContainer, meshIndex).ToList();
 
             return packedMesh;
+        }
+
+        public static VertexWeight[] GetVertexWeights(IntPtr fbxContainer, int meshIndex)
+        {
+            FBXSCeneContainerDll.GetVertexWeights(fbxContainer, meshIndex, out var vertexWeightsPtr, out var length);
+
+            if (vertexWeightsPtr == IntPtr.Zero || length == 0)
+            {
+                throw new Exception("Fatal Error: vertexWeightsPtr/length, NULL/0");
+            }
+
+            VertexWeight[] data = new VertexWeight[length];
+            for (int weightIndex = 0; weightIndex < length; weightIndex++)
+            {
+                var ptr = Marshal.PtrToStructure(vertexWeightsPtr + weightIndex * Marshal.SizeOf(typeof(VertexWeight)), typeof(VertexWeight));
+
+                if (ptr == null)
+                {
+                    throw new Exception("Fatal Error: ptr == null");
+                }
+                data[weightIndex] = (VertexWeight)ptr;
+            }
+
+            return data;
         }
 
         static public List<PackedMesh> GetAllPackedMeshes(IntPtr fbxSceneContainer)
@@ -92,7 +119,6 @@ namespace AssetManagement.Strategies.Fbx
             {
                 meshList.Add(GetPackedMesh(fbxSceneContainer, i));
             }
-
             return meshList;
         }
 

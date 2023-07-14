@@ -6,9 +6,10 @@ using System.Text;
 using CommonControls.FileTypes.RigidModel.Vertex;
 using System.Linq;
 using Microsoft.Xna.Framework;
-using AssetManagement.GenericFormats.Native;
+using AssetManagement.GenericFormats.Unmanaged;
 using CommonControls.FileTypes.RigidModel.Types;
 using AssetManagement.Strategies.Fbx;
+using AssetManagement.GenericFormats.Managed;
 
 namespace AssetManagement.GenericFormats
 {

@@ -141,6 +141,7 @@ namespace CommonControls.PackFileBrowser
         }
         void OnImport3DModelCommand()
         {
+        
             _uiCommandFactory.Create<ImportAssetCommand>().Execute(_selectedNode.FileOwner, _selectedNode.GetFullPath());
         }
 
