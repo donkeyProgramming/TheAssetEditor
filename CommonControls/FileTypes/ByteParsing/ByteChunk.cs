@@ -1,10 +1,14 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes;
-using SharpDX;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CommonControls.Common;
+using CommonControls.FileTypes;
+using Half = SharpDX.Half;
 
 namespace Filetypes.ByteParsing
 {
@@ -16,8 +20,8 @@ namespace Filetypes.ByteParsing
         int _currentIndex = 0;
         public int CurrentIndex
         {
-            get => _currentIndex; 
-            private set 
+            get => _currentIndex;
+            private set
             {
                 _currentIndex = value;
                 if (_currentIndex < 0)
@@ -51,7 +55,7 @@ namespace Filetypes.ByteParsing
         }
 
         public int BytesLeft => _buffer.Length - CurrentIndex;
-        public int Index { get { return CurrentIndex; } set { CurrentIndex = value;} }
+        public int Index { get { return CurrentIndex; } set { CurrentIndex = value; } }
 
         public byte[] Buffer { get { return _buffer; } }
 
@@ -82,7 +86,7 @@ namespace Filetypes.ByteParsing
 
             CurrentIndex += bytesRead;
             return value;
-            
+
         }
 
         T Peak<T>(SpesificByteParser<T> parser)
@@ -121,7 +125,7 @@ namespace Filetypes.ByteParsing
         {
             byte[] destination = new byte[count];
             Array.Copy(_buffer, start, destination, 0, count);
-            
+
             return destination;
         }
 
@@ -132,7 +136,7 @@ namespace Filetypes.ByteParsing
 
         public void Read(IByteParser parser, out string value, out string error)
         {
-            if (!parser.TryDecode(_buffer, CurrentIndex, out  value, out int bytesRead, out error))
+            if (!parser.TryDecode(_buffer, CurrentIndex, out value, out int bytesRead, out error))
                 throw new Exception("Unable to parse :" + error);
 
             CurrentIndex += bytesRead;
@@ -172,7 +176,7 @@ namespace Filetypes.ByteParsing
             {
                 var result = parser.TryDecode(_buffer, CurrentIndex, out string value, out int bytesRead, out string error);
                 var item = new UnknownParseResult.Item()
-                { 
+                {
                     Result = result,
                     ErrorMessage = error,
                     Value = value,
@@ -182,7 +186,7 @@ namespace Filetypes.ByteParsing
                 output.Add(item);
             }
 
-            return new UnknownParseResult() { Data = output.ToArray()};
+            return new UnknownParseResult() { Data = output.ToArray() };
         }
 
         public UnknownParseResult[] PeakUnknown(int numBytes)
@@ -224,11 +228,11 @@ namespace Filetypes.ByteParsing
             public Item[] Data { get; set; }
             public override string ToString()
             {
-                return string.Join(" \n", Data.Select(x=>x.DisplayStr()));
+                return string.Join(" \n", Data.Select(x => x.DisplayStr()));
             }
 
             public class Item
-            { 
+            {
                 public bool Result { get; set; }
                 public string Value { get; set; } = "";
                 public string ErrorMessage { get; set; } = "";
@@ -236,7 +240,7 @@ namespace Filetypes.ByteParsing
 
                 public string DisplayStr()
                 {
-                    if(!Result)
+                    if (!Result)
                         return $"{Type} - Failed:{ErrorMessage}";
                     else
                         return $"{Type} - {Value}";
@@ -249,14 +253,14 @@ namespace Filetypes.ByteParsing
             }
         }
 
-       
+
         public byte[] Debug_LookForDataAfterFixedStr(int size)
         {
             var dataCpy = new ByteChunk(ReadBytes(size));
             Index -= size;
 
             var str = dataCpy.ReadFixedLength(size);
-            var strClean = Util.SanatizeFixedString(str);
+            var strClean = StringSanitizer.FixedString(str);
 
             dataCpy.Reset();
             dataCpy.Index = strClean.Length;
@@ -277,7 +281,7 @@ namespace Filetypes.ByteParsing
             Index -= size;
 
             var str = dataCpy.ReadFixedLength(size);
-            var strClean = Util.SanatizeFixedString(str);
+            var strClean = StringSanitizer.FixedString(str);
 
             dataCpy.Reset();
             dataCpy.Index = strClean.Length;

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Common
+namespace Monogame.WpfInterop.Common
 {
     public class EventHub : IDisposable
     {
+        public bool IsDisposed { get; private set; }
         Dictionary<Type, List<Delegate>> _callbackList = new Dictionary<Type, List<Delegate>>();
 
         public void Publish<T>(T instance)
@@ -12,7 +13,7 @@ namespace Common
             _callbackList.TryGetValue(typeof(T), out var callbackItems);
             if (callbackItems == null)
                 return;
-            foreach(var callbackItem in callbackItems)
+            foreach (var callbackItem in callbackItems)
             {
                 Action<T> action = (Action<T>)callbackItem;
                 action(instance);
@@ -20,7 +21,7 @@ namespace Common
         }
 
         public void UnRegister<T>(Action<T> action)
-        { 
+        {
         }
 
         public void Register<T>(Action<T> action)
@@ -33,6 +34,7 @@ namespace Common
 
         public void Dispose()
         {
+            IsDisposed = true;
             _callbackList.Clear();
             _callbackList = null;
         }

@@ -4,7 +4,6 @@ using Audio.FileFormats.WWise.Hirc;
 using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using CommunityToolkit.Diagnostics;
-using MoreLinq;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,7 +17,7 @@ namespace Audio.Utility
             public List<GraphItem> GraphItems { get; set; } = new List<GraphItem>();
 
             public class GraphItem
-            { 
+            {
                 public string Description { get; set; }
                 public HircType Type { get; set; }
                 public uint Id { get; set; }
@@ -59,7 +58,7 @@ namespace Audio.Utility
             foreach (var node in nodes)
             {
                 var busInfo = "";
-          
+
                 if (node.Item is CAkActorMixer_v136 mixerInstance && mixerInstance.NodeBaseParams.OverrideBusId != 0)
                 {
                     busInfo = $" - With AudioBus [{mixerInstance.NodeBaseParams.OverrideBusId}]";
@@ -127,7 +126,7 @@ namespace Audio.Utility
                     var name = audioRepository.GetNameFromHash(item.Id, out var found);
                     if (found == false)
                         name = "";
-            
+
                     var graphItem = new ParentStructure.GraphItem()
                     {
                         Description = $"{name}[{item.Id}]",

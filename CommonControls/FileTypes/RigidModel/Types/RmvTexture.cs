@@ -1,14 +1,18 @@
-﻿using Filetypes.ByteParsing;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
+using Filetypes.ByteParsing;
 
 namespace CommonControls.FileTypes.RigidModel.Types
 {
 
     public enum TextureType
     {
-        Diffuse = 0,   
+        Diffuse = 0,
         Normal = 1,
         Mask = 3,
         Ambient_occlusion = 5,
@@ -39,7 +43,7 @@ namespace CommonControls.FileTypes.RigidModel.Types
                 var result = ByteParsers.String.TryDecodeFixedLength(_path, 0, 256, out string value, out _);
                 if (result == false)
                     throw new Exception();
-                return Util.SanatizeFixedString(value);
+                return StringSanitizer.FixedString(value);
             }
             set
             {
@@ -54,5 +58,7 @@ namespace CommonControls.FileTypes.RigidModel.Types
                 }
             }
         }
+
+        public RmvTexture Clone() => new RmvTexture() { TexureType = TexureType, _path = _path };
     }
 }

@@ -11,14 +11,16 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 {
     public class AnimationViewModel : NotifyPropertyChangedImpl
     {
+        private readonly KitbasherRootScene _kitbasherRootScene;
         Rmv2MeshNode _meshNode;
 
         public NotifyAttr<string> SkeletonName { get; set; } = new NotifyAttr<string>("");
         public List<AnimatedBone> AnimatedBones { get; set; }
         public FilterCollection<AnimatedBone> AttachableBones { get; set; } = new FilterCollection<AnimatedBone>(null);
 
-        public AnimationViewModel(Rmv2MeshNode meshNode, PackFileService pfs, SkeletonAnimationLookUpHelper animLookUp)
+        public AnimationViewModel(KitbasherRootScene kitbasherRootScene, Rmv2MeshNode meshNode, PackFileService pfs, SkeletonAnimationLookUpHelper animLookUp)
         {
+            _kitbasherRootScene = kitbasherRootScene;
             _meshNode = meshNode;
 
             SkeletonName.Value = _meshNode.Geometry.ParentSkeletonName;
@@ -59,7 +61,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             AttachableBones.SelectedItemChanged += ModelBoneList_SelectedItemChanged;
             AttachableBones.SearchFilter = (value, rx) => { return rx.Match(value.Name.Value).Success; };
             AttachableBones.SelectedItem = AttachableBones.PossibleValues.FirstOrDefault(x => x.Name.Value == _meshNode.AttachmentPointName);
-
         }
 
         private void ModelBoneList_SelectedItemChanged(AnimatedBone newValue)
@@ -71,7 +72,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             if (newValue != null && newValue.BoneIndex.Value != -1)
             {
                 _meshNode.AttachmentPointName = newValue.Name.Value;
-                _meshNode.AttachmentBoneResolver = new SkeletonBoneAnimationResolver(mainNode.SkeletonNode, newValue.BoneIndex.Value);
+                _meshNode.AttachmentBoneResolver = new SkeletonBoneAnimationResolver(_kitbasherRootScene, newValue.BoneIndex.Value);
             }
             else
             {

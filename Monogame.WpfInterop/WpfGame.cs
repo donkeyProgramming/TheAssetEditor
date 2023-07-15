@@ -1,7 +1,7 @@
-﻿using Common;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Monogame.WpfInterop.Common;
 using System;
 using System.Collections.Generic;
 
@@ -40,7 +40,7 @@ namespace MonoGame.Framework.WpfInterop
         /// <summary>
         /// Creates a new instance of a game host panel.
         /// </summary>
-        protected WpfGame(EventHub eventHub, string contentDir = "ContentOutput")
+        protected WpfGame(EventHub eventHub, string contentDir)
         {
             if (string.IsNullOrEmpty(contentDir))
                 throw new ArgumentNullException(nameof(contentDir));
@@ -229,7 +229,7 @@ namespace MonoGame.Framework.WpfInterop
             {
                 if (comp.GetType() == type)
                     return (T)comp;
-                if(type.IsAssignableFrom(comp.GetType()))
+                if (type.IsAssignableFrom(comp.GetType()))
                     return (T)comp;
             }
 

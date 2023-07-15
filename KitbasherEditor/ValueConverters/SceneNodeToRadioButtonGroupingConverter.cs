@@ -18,10 +18,10 @@ namespace KitbasherEditor.ValueConverters
             if (sceneNode is Rmv2LodNode)
                 return sceneNode.Parent.Id;
 
-            if(sceneNode is SlotNode)
+            if (sceneNode is SlotNode)
                 return Guid.NewGuid().ToString();
 
-            if(sceneNode is WsModelGroup)
+            if (sceneNode is WsModelGroup)
                 return sceneNode.Parent.Id;
 
             return Guid.NewGuid().ToString();

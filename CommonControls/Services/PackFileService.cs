@@ -1,21 +1,21 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
-using Serilog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using CommonControls.Common;
+using CommonControls.Events.Global;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
-using CommonControls.Events;
+using Serilog;
 
 namespace CommonControls.Services
 {
     public class PackFileService
     {
-        ILogger _logger = Logging.Create<PackFileService>();
+        private readonly ILogger _logger = Logging.Create<PackFileService>();
         private readonly GlobalEventSender _globalEventSender;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         public PackFileDataBase Database { get; private set; }
@@ -33,7 +33,7 @@ namespace CommonControls.Services
 
         public bool TriggerFileUpdates { get; set; } = true;
 
-        public PackFileContainer Load(string packFileSystemPath, bool setToMainPackIfFirst = false, bool allowLoadWithoutCaPackFiles = false) 
+        public PackFileContainer Load(string packFileSystemPath, bool setToMainPackIfFirst = false, bool allowLoadWithoutCaPackFiles = false)
         {
             try
             {
@@ -41,8 +41,8 @@ namespace CommonControls.Services
                 if (caPacksLoaded == 0 && allowLoadWithoutCaPackFiles != true)
                 {
                     MessageBox.Show("You are trying to load a packfile before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
-                    
-                    if(System.Diagnostics.Debugger.IsAttached == false)
+
+                    if (System.Diagnostics.Debugger.IsAttached == false)
                         return null;
                 }
 
@@ -81,7 +81,7 @@ namespace CommonControls.Services
             {
                 foreach (var file in pf.FileList)
                 {
-                    if(file.Key.Contains(partOfFileName, StringComparison.InvariantCultureIgnoreCase))
+                    if (file.Key.Contains(partOfFileName, StringComparison.InvariantCultureIgnoreCase))
                         output.Add(file.Key);
                 }
             }
@@ -116,7 +116,7 @@ namespace CommonControls.Services
                     {
                         var fileExtention = Path.GetExtension(file.Key);
                         if (fileExtention == extention)
-                            output.Add(new ValueTuple<string, PackFile>(file.Key, file.Value ));
+                            output.Add(new ValueTuple<string, PackFile>(file.Key, file.Value));
                     }
                 }
             }
@@ -126,7 +126,7 @@ namespace CommonControls.Services
                 {
                     var fileExtention = Path.GetExtension(file.Key);
                     if (fileExtention == extention)
-                        output.Add(new ValueTuple<string, PackFile>(file.Key, file.Value ));
+                        output.Add(new ValueTuple<string, PackFile>(file.Key, file.Value));
                 }
             }
 
@@ -138,17 +138,17 @@ namespace CommonControls.Services
 
             _logger.Here().Information($"Searching for : '{searchStr}'");
 
-            var filesWithResult = new List<KeyValuePair<string,string>>();
-            var files = Database.PackFiles.SelectMany(x => x.FileList.Select(x=>((x.Value ).DataSource as PackedFileSource).Parent.FilePath)).Distinct().ToList();
+            var filesWithResult = new List<KeyValuePair<string, string>>();
+            var files = Database.PackFiles.SelectMany(x => x.FileList.Select(x => ((x.Value).DataSource as PackedFileSource).Parent.FilePath)).Distinct().ToList();
 
             var indexLock = new object();
             int currentPackFileIndex = 0;
 
             Parallel.For(0, files.Count,
-              index => 
+              index =>
               {
                   int currentIndex = 0;
-              
+
                   lock (indexLock)
                   {
                       currentIndex = currentPackFileIndex;
@@ -172,7 +172,7 @@ namespace CommonControls.Services
 
                               foreach (var packFile in pfc.FileList.Values)
                               {
-                                  var pf = packFile ;
+                                  var pf = packFile;
                                   var ds = pf.DataSource as PackedFileSource;
                                   var bytes = ds.ReadDataForFastSearch(fileStram);
                                   var str = Encoding.ASCII.GetString(bytes);
@@ -197,14 +197,14 @@ namespace CommonControls.Services
             foreach (var item in filesWithResult)
                 _logger.Here().Information($"\t\t'{item.Key}' in '{item.Value}'");
 
-            return filesWithResult.Select(x=>x.Value).ToList();
+            return filesWithResult.Select(x => x.Value).ToList();
         }
 
         public List<PackFile> FindAllFilesInDirectory(string dir, bool includeSubFolders = true)
         {
             dir = dir.Replace('/', '\\').ToLower();
             List<PackFile> output = new List<PackFile>();
-            
+
             foreach (var pf in Database.PackFiles)
             {
                 foreach (var file in pf.FileList)
@@ -221,12 +221,12 @@ namespace CommonControls.Services
                         if (compareResult == 0)
                             includeFile = true;
                     }
-                            
+
                     if (includeFile)
-                        output.Add(file.Value );
+                        output.Add(file.Value);
                 }
             }
-            
+
 
             return output;
         }
@@ -248,7 +248,7 @@ namespace CommonControls.Services
                 if (string.IsNullOrWhiteSpace(res) == false)
                     return res;
             }
-             throw new Exception("Unknown path for " + file.Name);
+            throw new Exception("Unknown path for " + file.Name);
         }
 
         public PackFileContainer Load(BinaryReader binaryReader, string packFileSystemPath)
@@ -307,7 +307,7 @@ namespace CommonControls.Services
                 }
 
                 Database.AddPackFile(caPackFileContainer);
-                
+
             }
             catch (Exception e)
             {
@@ -337,7 +337,7 @@ namespace CommonControls.Services
             {
                 var files = Directory.GetFiles(gameDataFolder)
                     .Where(x => Path.GetExtension(x) == ".pack")
-                    .Select(x=>Path.GetFileName(x))
+                    .Select(x => Path.GetFileName(x))
                     .ToList();
                 return files;
             }
@@ -353,10 +353,10 @@ namespace CommonControls.Services
             var newPackFile = new PackFileContainer(name)
             {
                 Header = new PFHeader("PFH5", type),
-                
+
             };
             Database.AddPackFile(newPackFile);
-            if(setEditablePack)
+            if (setEditablePack)
                 SetEditablePack(newPackFile);
             return newPackFile;
         }
@@ -393,7 +393,7 @@ namespace CommonControls.Services
             if (directoryPaths.Count != newFiles.Count)
                 throw new Exception("Different number of directories and files");
 
-            for(int i = 0; i < directoryPaths.Count; i++)
+            for (int i = 0; i < directoryPaths.Count; i++)
             {
                 var path = directoryPaths[i];
                 if (!string.IsNullOrWhiteSpace(path))
@@ -413,11 +413,11 @@ namespace CommonControls.Services
             var lowerPath = path.Replace('/', '\\').ToLower().Trim();
             if (source.FileList.ContainsKey(lowerPath))
             {
-                var file = source.FileList[lowerPath] ;
+                var file = source.FileList[lowerPath];
                 var newFile = new PackFile(file.Name, file.DataSource);
                 target.FileList[lowerPath] = newFile;
 
-                Database.TriggerPackFileAdded(target, new List<PackFile>() { newFile  });
+                Database.TriggerPackFileAdded(target, new List<PackFile>() { newFile });
             }
         }
 
@@ -520,7 +520,7 @@ namespace CommonControls.Services
             var key = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
             _logger.Here().Information($"Deleting file {key}");
 
-            Database.TriggerPackFileRemoved(pf, new List<PackFile>() { file  });
+            Database.TriggerPackFileRemoved(pf, new List<PackFile>() { file });
             pf.FileList.Remove(key);
         }
 
@@ -608,7 +608,7 @@ namespace CommonControls.Services
                 throw new IOException($"Cannot access {path} because another process has locked it, most likely the game.");
             }
 
-            if(pf.IsCaPackFile)
+            if (pf.IsCaPackFile)
                 throw new Exception("Can not save ca pack file");
             if (createBackup)
                 SaveHelper.CreateFileBackup(path);
@@ -625,7 +625,7 @@ namespace CommonControls.Services
             _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, pf);
 
             pf.SystemFilePath = path;
-            using (var memoryStream = new FileStream(path+"_temp", FileMode.OpenOrCreate))
+            using (var memoryStream = new FileStream(path + "_temp", FileMode.OpenOrCreate))
             {
                 using (var writer = new BinaryWriter(memoryStream))
                     pf.SaveToByteArray(writer);
@@ -639,14 +639,14 @@ namespace CommonControls.Services
         }
 
 
-        public PackFile FindFile(string path) 
+        public PackFile FindFile(string path)
         {
             var lowerPath = path.Replace('/', '\\').ToLower().Trim();
             for (var i = Database.PackFiles.Count - 1; i >= 0; i--)
             {
                 if (Database.PackFiles[i].FileList.ContainsKey(lowerPath))
                 {
-                    return Database.PackFiles[i].FileList[lowerPath] ;
+                    return Database.PackFiles[i].FileList[lowerPath];
                 }
             }
             _logger.Here().Warning($"File not found");
@@ -661,7 +661,7 @@ namespace CommonControls.Services
             if (container.FileList.ContainsKey(lowerPath))
             {
                 _logger.Here().Information($"File found");
-                return container.FileList[lowerPath] ;
+                return container.FileList[lowerPath];
             }
 
             _logger.Here().Warning($"File not found");

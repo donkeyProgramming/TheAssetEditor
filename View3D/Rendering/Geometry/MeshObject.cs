@@ -9,7 +9,7 @@ using View3D.Rendering.Shading;
 
 namespace View3D.Rendering.Geometry
 {
-    public class MeshObject 
+    public class MeshObject
     {
         protected IGraphicsCardGeometry Context;
         public VertexPositionNormalTextureCustom[] VertexArray; // Vector3 for pos at some point
@@ -161,7 +161,7 @@ namespace View3D.Rendering.Geometry
                 }
 
                 var totalBlendWeight = VertexArray[i].BlendWeights.X + VertexArray[i].BlendWeights.Y + VertexArray[i].BlendWeights.Z + VertexArray[i].BlendWeights.W;
-                if ( (1 - totalBlendWeight) >= float.Epsilon || (1 - totalBlendWeight) <= float.Epsilon )
+                if ((1 - totalBlendWeight) >= float.Epsilon || (1 - totalBlendWeight) <= float.Epsilon)
                 {
                     var factor = 1 / totalBlendWeight;
                     VertexArray[i].BlendWeights.X *= factor;

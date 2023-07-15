@@ -1,12 +1,10 @@
 ﻿using AssetEditor.Services;
+using AssetEditor.ViewModels;
+using AssetEditor.Views;
 using CommonControls.Common;
+using CommonControls.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -17,16 +15,33 @@ namespace AssetEditor
     /// </summary>
     public partial class App : Application
     {
-        DependencyInjectionConfig _config;
+        IServiceProvider _serviceProvider;
+        IServiceScope _rootScope;
 
         protected override void OnStartup(StartupEventArgs e)
         {
             VersionChecker.CheckVersion();
             Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(DispatcherUnhandledExceptionHandler);
 
-            _config = new DependencyInjectionConfig();
-            _config.ConfigureResources();
-            _config.ShowMainWindow();
+            _serviceProvider = new DependencyInjectionConfig()
+                .Build();
+            _rootScope = _serviceProvider.CreateScope();
+            ShowMainWindow();
+
+            var settingsService = _rootScope.ServiceProvider.GetRequiredService<ApplicationSettingsService>();
+            if (settingsService.CurrentSettings.IsDeveloperRun)
+            {
+                var devConfig = _rootScope.ServiceProvider.GetRequiredService<DevelopmentConfiguration>();
+                devConfig.CreateTestPackFiles();
+                devConfig.OpenFileOnLoad();
+            }
+        }
+
+        void ShowMainWindow()
+        {
+            var mainWindow = _rootScope.ServiceProvider.GetRequiredService<MainWindow>();
+            mainWindow.DataContext = _rootScope.ServiceProvider.GetRequiredService<MainViewModel>();
+            mainWindow.Show();
         }
 
         void DispatcherUnhandledExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs args)

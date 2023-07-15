@@ -1,4 +1,4 @@
-﻿using CommonControls.Common;
+﻿using CommonControls.Services.ToolCreation;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -16,7 +16,7 @@ namespace AssetEditor.DataTemplates
             FrameworkElementFactory factory = new FrameworkElementFactory(viewType);
             DataTemplate dt = new DataTemplate();
             dt.VisualTree = factory;
-            
+
             return dt;
         }
 

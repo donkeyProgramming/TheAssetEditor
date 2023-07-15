@@ -1,6 +1,4 @@
-﻿using CommonControls.Common;
-using CommonControls.MathViews;
-using MonoGame.Framework.WpfInterop;
+﻿using MonoGame.Framework.WpfInterop;
 using System.Linq;
 using View3D.Components.Component;
 using View3D.SceneNodes;
@@ -9,7 +7,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
     public class LodGroupNodeViewModel : GroupNodeViewModel
     {
-        private new readonly Rmv2LodNode _node;
+        private readonly Rmv2LodNode _node;
         private readonly IComponentManager _componentManager;
 
         public LodGroupNodeViewModel(Rmv2LodNode node, IComponentManager componentManager) : base(node)
@@ -21,7 +19,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public float? CameraDistance
         {
             get => _node.CameraDistance;
-            set {
+            set
+            {
                 _node.CameraDistance = value;
                 NotifyPropertyChanged();
 
@@ -67,7 +66,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public int LodIndex { get => _node.LodValue; }
         public bool OptimizeLod_Alpha { get => _node.OptimizeLod_Alpha; set => _node.OptimizeLod_Alpha = value; }
         public bool OptimizeLod_Vertex { get => _node.OptimizeLod_Vertex; set => _node.OptimizeLod_Vertex = value; }
-        public int PolygonCount { get => _node.GetAllModels(false).Sum(x=>x.Geometry.VertexCount() / 3); }
+        public int PolygonCount { get => _node.GetAllModels(false).Sum(x => x.Geometry.VertexCount() / 3); }
         public int TextureCount { get => _node.GetAllModels(false).SelectMany(x => x.Material.GetAllTextures().Select(x => x.Path)).Distinct().Count(); }
         public int MeshCount { get => _node.GetAllModels(false).Count(); }
     }

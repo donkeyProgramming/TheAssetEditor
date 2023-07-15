@@ -1,7 +1,7 @@
-﻿using Audio.FileFormats.WWise.Hirc.V136;
-using Audio.FileFormats.WWise;
-using System;
+﻿using Audio.FileFormats.WWise;
+using Audio.FileFormats.WWise.Hirc.V136;
 using CommunityToolkit.Diagnostics;
+using System;
 
 namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
@@ -10,7 +10,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
         public string GameName => CompilerConstants.Game_Warhammer3;
         public Type AudioProjectType => typeof(Action);
 
-        public HircItem ConvertToWWise(IAudioProjectHircItem projectItem, CompilerData project )
+        public HircItem ConvertToWWise(IAudioProjectHircItem projectItem, CompilerData project)
         {
             var typedProjectItem = projectItem as Action;
             Guard.IsNotNull(typedProjectItem);

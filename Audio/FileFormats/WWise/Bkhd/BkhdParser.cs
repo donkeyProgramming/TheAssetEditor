@@ -1,8 +1,5 @@
 ﻿using Filetypes.ByteParsing;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace Audio.FileFormats.WWise.Bkhd
 {

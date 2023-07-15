@@ -1,16 +1,14 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes.MetaData;
+﻿using AnimationMeta.FileTypes.Parsing;
+using CommonControls.Common;
 using CommonControls.Services;
 using CsvHelper;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Dynamic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows;
 
 namespace AssetEditor.Report
@@ -24,7 +22,7 @@ namespace AssetEditor.Report
             //public string MetaType { get; set; }
             public List<List<string>> FailedFiles { get; set; } = new List<List<string>>();
             public List<List<string>> CompletedFiles { get; set; } = new List<List<string>>();
-            public List<string> Headers { get; set; } = new List<string>() { "FileName", "Error"};
+            public List<string> Headers { get; set; } = new List<string>() { "FileName", "Error" };
         }
 
         PackFileService _pfs;
@@ -56,7 +54,7 @@ namespace AssetEditor.Report
             DirectoryHelper.EnsureCreated(gameOutputDirFailed);
 
             var output = new Dictionary<string, FileReport>();
-            
+
             var fileList = _pfs.FindAllWithExtentionIncludePaths(".meta");
             var failedFiles = new List<string>();
 
@@ -76,7 +74,7 @@ namespace AssetEditor.Report
 
                     var parser = new MetaDataFileParser();
                     var metaData = parser.ParseFile(data);
-                    metaTable.Add( (fileName, metaData) );
+                    metaTable.Add((fileName, metaData));
 
                     var completedTags = 0;
                     foreach (var item in metaData.Items)
@@ -112,7 +110,7 @@ namespace AssetEditor.Report
                                 output[tagName].FailedFiles.Add(variableValues);
                             }
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
                             var variableValues = new List<string>() { fileName, e.Message, item.Data.Length.ToString() };
                             output[tagName].FailedFiles.Add(variableValues);
@@ -159,11 +157,11 @@ namespace AssetEditor.Report
             var summaryContent = new StringWriter();
             summaryContent.WriteLine("sep=|");
             summaryContent.WriteLine("Tag|Completed|Failed|Ratio");
-            foreach (var item in output.OrderBy(x=>x.Key))
+            foreach (var item in output.OrderBy(x => x.Key))
             {
                 var str = $"{item.Key}| {item.Value.CompletedFiles.Count}| {item.Value.FailedFiles.Count} |{item.Value.FailedFiles.Count}/{item.Value.CompletedFiles.Count + item.Value.FailedFiles.Count}";
                 _logger.Here().Information(str);
-                summaryContent.WriteLine(str); 
+                summaryContent.WriteLine(str);
             }
             var summaryFileName = gameOutputDir + "Summary.csv";
             File.WriteAllText(summaryFileName, summaryContent.ToString());

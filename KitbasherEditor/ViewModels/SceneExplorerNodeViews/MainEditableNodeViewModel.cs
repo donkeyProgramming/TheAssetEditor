@@ -1,13 +1,10 @@
 ﻿using CommonControls.Common;
-using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
 using MonoGame.Framework.WpfInterop;
-using MoreLinq;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using View3D.Animation;
 using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.SceneNodes;
@@ -18,6 +15,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
     public class MainEditableNodeViewModel : NotifyPropertyChangedImpl, ISceneNodeViewModel
     {
+        private readonly KitbasherRootScene _kitbasherRootScene;
         MainEditableNode _mainNode;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         PackFileService _pfs;
@@ -30,10 +28,10 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public OnSeachDelegate FilterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 
 
-        public ObservableCollection<RmvVersionEnum> PossibleOutputFormats { get; set; } = new ObservableCollection<RmvVersionEnum>() { RmvVersionEnum.RMV2_V6, RmvVersionEnum.RMV2_V7, RmvVersionEnum.RMV2_V8};
+        public ObservableCollection<RmvVersionEnum> PossibleOutputFormats { get; set; } = new ObservableCollection<RmvVersionEnum>() { RmvVersionEnum.RMV2_V6, RmvVersionEnum.RMV2_V7, RmvVersionEnum.RMV2_V8 };
 
         RmvVersionEnum _selectedOutputFormat;
-        public RmvVersionEnum SelectedOutputFormat { get => _selectedOutputFormat; set { SetAndNotify(ref _selectedOutputFormat, value); _mainNode.SelectedOutputFormat = value; } }
+        public RmvVersionEnum SelectedOutputFormat { get => _selectedOutputFormat; set { SetAndNotify(ref _selectedOutputFormat, value); _kitbasherRootScene.SelectedOutputFormat = value; } }
 
 
         public ObservableCollection<RenderFormats> PossibleRenderFormats { get; set; } = new ObservableCollection<RenderFormats>() { RenderFormats.MetalRoughness, RenderFormats.SpecGloss };
@@ -45,8 +43,9 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         public ObservableCollection<LodGroupNodeViewModel> LodNodes { get; set; } = new ObservableCollection<LodGroupNodeViewModel>();
 
-        public MainEditableNodeViewModel(MainEditableNode mainNode, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService pfs, IComponentManager componentManager)
+        public MainEditableNodeViewModel(KitbasherRootScene kitbasherRootScene, MainEditableNode mainNode, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService pfs, IComponentManager componentManager)
         {
+            _kitbasherRootScene = kitbasherRootScene;
             _mainNode = mainNode;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _pfs = pfs;
@@ -57,10 +56,9 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             if (_mainNode.Model != null)
             {
                 SkeletonName = SkeletonNameList.FirstOrDefault(x => Path.GetFileNameWithoutExtension(x).ToLower() == _mainNode.Model.Header.SkeletonName.ToLower());
-                UpdateSkeletonName();
             }
 
-            SelectedOutputFormat = _mainNode.SelectedOutputFormat;
+            SelectedOutputFormat = _kitbasherRootScene.SelectedOutputFormat;
             TextureFileEditorServiceViewModel = new TextureFileEditorServiceViewModel(mainNode, pfs);
 
             UpdateLodInformationAction();
@@ -68,11 +66,10 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         void UpdateSkeletonName()
         {
-            
             string cleanSkeletonName = "";
             if (!string.IsNullOrWhiteSpace(SkeletonName))
                 cleanSkeletonName = Path.GetFileNameWithoutExtension(SkeletonName);
-            _mainNode.SetSkeletonFromName(cleanSkeletonName);
+            _kitbasherRootScene.SetSkeletonFromName(cleanSkeletonName);
         }
 
         public void CopyTexturesToOutputPack()
@@ -84,7 +81,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
             foreach (var tex in distinctTextures)
             {
-                var file = _pfs.FindFile(tex.Path);    
+                var file = _pfs.FindFile(tex.Path);
                 if (file != null)
                 {
                     var sourcePackContainer = _pfs.GetPackFileContainer(file);

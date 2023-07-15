@@ -1,26 +1,25 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
+using MonoGame.Framework.WpfInterop;
 using System.Collections.Generic;
-using System.Text;
 using View3D.Utility;
 
 namespace View3D.Components
 {
     public class ComponentInserter : IComponentInserter
     {
-        private readonly ComponentManagerResolver _componentManagerResolver;
+        private readonly WpfGame _wpfGame;
         private readonly IEnumerable<IGameComponent> _components;
 
-        public ComponentInserter(ComponentManagerResolver componentManagerResolver, IEnumerable<IGameComponent> components)
+        public ComponentInserter(WpfGame wpfGame, IEnumerable<IGameComponent> components)
         {
-            _componentManagerResolver = componentManagerResolver;
+            _wpfGame = wpfGame;
             _components = components;
         }
 
         public void Execute()
         {
             foreach (var component in _components)
-                _componentManagerResolver.ComponentManager.AddComponent(component);
+                _wpfGame.AddComponent(component);
         }
     }
 

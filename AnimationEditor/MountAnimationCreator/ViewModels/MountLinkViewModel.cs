@@ -33,13 +33,13 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
             _rider = rider;
             _mount = mount;
             _validateAction = validate;
-       
+
             AnimationSetForMount = new FilterCollection<IAnimationBinGenericFormat>(null, (value) => UpdateAnimationSet(value, SelectedMountTag, _mount.SkeletonName.Value));
             AnimationSetForRider = new FilterCollection<IAnimationBinGenericFormat>(null, (value) => UpdateAnimationSet(value, SelectedRiderTag, _rider.SkeletonName.Value));
             SelectedMountTag = new FilterCollection<AnimationBinEntryGenericFormat>(null, MountTagSeleted);
             SelectedRiderTag = new FilterCollection<AnimationBinEntryGenericFormat>(null, RiderTagSelected);
 
-            SelectedMountTag.SearchFilter = (value, rx) => { return rx.Match(value.SlotName).Success    ; };
+            SelectedMountTag.SearchFilter = (value, rx) => { return rx.Match(value.SlotName).Success; };
             SelectedRiderTag.SearchFilter = (value, rx) => { return rx.Match(value.SlotName).Success; };
             AnimationSetForMount.SearchFilter = (value, rx) => { return rx.Match(value.FullPath).Success; };
             AnimationSetForRider.SearchFilter = (value, rx) => { return rx.Match(value.FullPath).Success; };
@@ -65,9 +65,9 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
                 AnimationSetForRider.UpdatePossibleValues(allPossibleRider);
                 if (selectedRider != null)
                     AnimationSetForRider.SelectedItem = AnimationSetForRider.Values.FirstOrDefault(x => x.Name == selectedRider);
-                
+
                 if (selectedSlotId != null)
-                    SelectedRiderTag.SelectedItem = SelectedRiderTag.Values.FirstOrDefault(x => x.SlotIndex== selectedSlotId.Value);
+                    SelectedRiderTag.SelectedItem = SelectedRiderTag.Values.FirstOrDefault(x => x.SlotIndex == selectedSlotId.Value);
             }
         }
 

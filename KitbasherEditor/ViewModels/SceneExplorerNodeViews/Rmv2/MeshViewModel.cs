@@ -5,7 +5,6 @@ using CommonControls.MathViews;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
-using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
@@ -22,7 +21,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         public string ModelName { get { return _meshNode.Material.ModelName; } set { _meshNode.Material.ModelName = value; NotifyPropertyChanged(); } }
         public string ShaderName { get => _meshNode.CommonHeader.ShaderParams.ShaderName; }
         public int VertexCount { get => _meshNode.Geometry.VertexCount(); }
-        public int IndexCount { get => _meshNode.Geometry.GetIndexCount(); }  
+        public int IndexCount { get => _meshNode.Geometry.GetIndexCount(); }
 
         public bool DrawBoundingBox { get { return _meshNode.DisplayBoundingBox; } set { _meshNode.DisplayBoundingBox = value; NotifyPropertyChanged(); } }
         public bool DrawPivotPoint { get { return _meshNode.DisplayPivotPoint; } set { _meshNode.DisplayPivotPoint = value; NotifyPropertyChanged(); } }

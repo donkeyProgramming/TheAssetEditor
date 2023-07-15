@@ -35,7 +35,7 @@ namespace Audio.Utility
             var hash = Compute(name);
 
             var numBits = 30;
-            var mask = ((1 << numBits)-1);
+            var mask = ((1 << numBits) - 1);
             var final = ((hash >> numBits)) ^ (hash & mask);
             Guard.IsLessThan(final, 1073741824);
             return (uint)final;

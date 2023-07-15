@@ -1,9 +1,13 @@
-﻿using SharpDX;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Linq;
 using System.Text;
-using Vector4 = Microsoft.Xna.Framework.Vector4;
+using Half = SharpDX.Half;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
+using Vector4 = Microsoft.Xna.Framework.Vector4;
 
 namespace Filetypes.ByteParsing
 {
@@ -209,7 +213,7 @@ namespace Filetypes.ByteParsing
         public override byte[] EncodeValue(byte value, out string error)
         {
             error = null;
-            return new byte[] { value};
+            return new byte[] { value };
         }
 
         public override byte[] Encode(string value, out string error)
@@ -336,16 +340,16 @@ namespace Filetypes.ByteParsing
 
         public bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string error)
         {
-            var result =  TryDecodeValue(buffer, index, out var typedValue, out bytesRead, out error);
+            var result = TryDecodeValue(buffer, index, out var typedValue, out bytesRead, out error);
             value = $"{typedValue.X},{typedValue.Y},{typedValue.Z}";
             return result;
         }
 
         public bool TryDecodeValue(byte[] buffer, int index, out Vector3 value, out int bytesRead, out string error)
         {
-            var x = ByteParsers.Single.TryDecodeValue(buffer, index+0, out var xValue, out bytesRead, out error);
-            var y = ByteParsers.Single.TryDecodeValue(buffer, index+4, out var yValue, out bytesRead, out error);
-            var z = ByteParsers.Single.TryDecodeValue(buffer, index+8, out var zValue, out bytesRead, out error);
+            var x = ByteParsers.Single.TryDecodeValue(buffer, index + 0, out var xValue, out bytesRead, out error);
+            var y = ByteParsers.Single.TryDecodeValue(buffer, index + 4, out var yValue, out bytesRead, out error);
+            var z = ByteParsers.Single.TryDecodeValue(buffer, index + 8, out var zValue, out bytesRead, out error);
             bytesRead = 12;
             value = new Vector3(xValue, yValue, zValue);
             return x && y && z;
@@ -484,7 +488,7 @@ namespace Filetypes.ByteParsing
 
         public override byte[] Encode(string value, out string error)
         {
-           
+
             if (!float.TryParse(value, out var spesificValue))
             {
                 error = "Unable to convert string to value";
@@ -758,7 +762,7 @@ namespace Filetypes.ByteParsing
                 else
                     value = "";
             }
-           
+
 
             return result;
         }
@@ -791,12 +795,12 @@ namespace Filetypes.ByteParsing
                     return BitConverter.GetBytes((Int16)0);
             }
 
-            
+
 
             var byteLength = BitConverter.GetBytes((Int16)value.Length);
             var byteStr = StringEncoding.GetBytes(value);
 
-            var stringWithCountAtFront =  byteLength.Concat(byteStr).ToArray();
+            var stringWithCountAtFront = byteLength.Concat(byteStr).ToArray();
 
             if (IsOptStr)
             {
@@ -890,7 +894,7 @@ namespace Filetypes.ByteParsing
             }
 
             var value = Decode(buffer, index);
-            var hasInvalidChars =  FilePathHasInvalidChars(value);
+            var hasInvalidChars = FilePathHasInvalidChars(value);
             if (hasInvalidChars)
                 _error = "Contains invalid chars for path : " + value;
 
@@ -907,7 +911,7 @@ namespace Filetypes.ByteParsing
 
     public class FixedStringParser : NumberParser<string>
     {
-        public override string TypeName { get { return "FixedString[" + FieldSize/2 + "]"; } }
+        public override string TypeName { get { return "FixedString[" + FieldSize / 2 + "]"; } }
         public override DbTypesEnum Type => DbTypesEnum.FixedString;
 
         protected override int FieldSize => _stringLength * 2;
@@ -978,6 +982,6 @@ namespace Filetypes.ByteParsing
         public static OptionalStringAsciiParser OptStringAscii { get; set; } = new OptionalStringAsciiParser();
         public static StringAsciiParser StringAscii { get; set; } = new StringAsciiParser();
 
-        public static IByteParser[] GetAllParsers() {  return new IByteParser[]{ Byte , Int32 , Int64 , UInt32, Single, Float16, Short, UShort, Bool, OptString, String, OptStringAscii, StringAscii, new FixedAciiStringParser(1), new FixedStringParser(1) }; }
+        public static IByteParser[] GetAllParsers() { return new IByteParser[] { Byte, Int32, Int64, UInt32, Single, Float16, Short, UShort, Bool, OptString, String, OptStringAscii, StringAscii, new FixedAciiStringParser(1), new FixedStringParser(1) }; }
     }
 }

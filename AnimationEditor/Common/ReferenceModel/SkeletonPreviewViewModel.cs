@@ -73,7 +73,7 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public override string ToString()
         {
-            return BoneName + "[" + BoneIndex +"]";
+            return BoneName + "[" + BoneIndex + "]";
         }
 
         public ObservableCollection<SkeletonBoneNode> Children { get; set; } = new ObservableCollection<SkeletonBoneNode>();

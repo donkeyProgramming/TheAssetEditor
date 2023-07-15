@@ -1,12 +1,14 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace CommonControls.Common
 {
-    public class FilterCollection<T> : NotifyPropertyChangedImpl where T:class
+    public class FilterCollection<T> : NotifyPropertyChangedImpl where T : class
     {
         public event ValueChangedDelegate<T> SelectedItemChanged;
         public event BeforeValueChangedDelegate<T> BeforeSelectedItemChanged;
@@ -93,7 +95,7 @@ namespace CommonControls.Common
 
                 if (SearchFilterExtended != null)
                 {
-                     SearchFilterExtended.Invoke(this, rx);
+                    SearchFilterExtended.Invoke(this, rx);
                     //Values = new ObservableCollection<T>(returnVals);
                 }
                 else

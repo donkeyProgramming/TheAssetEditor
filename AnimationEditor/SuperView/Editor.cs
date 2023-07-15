@@ -1,13 +1,14 @@
 ﻿using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
+using AnimationMeta.Presentation;
+using AnimationMeta.Visualisation;
 using CommonControls.Common;
-using CommonControls.Editors.AnimMeta;
 using CommonControls.Services;
+using CommonControls.Services.ToolCreation;
 using Microsoft.Xna.Framework;
 using System.Collections.ObjectModel;
 using System.Linq;
-using View3D.Animation.MetaData;
 
 namespace AnimationEditor.SuperView
 {
@@ -59,7 +60,7 @@ namespace AnimationEditor.SuperView
                 _assetViewModelBuilder.SetMesh(asset, input.Mesh);
 
             if (input.Animation != null)
-                _assetViewModelBuilder.SetAnimation(viewModel.Data,_skeletonHelper.FindAnimationRefFromPackFile(input.Animation, _pfs));
+                _assetViewModelBuilder.SetAnimation(viewModel.Data, _skeletonHelper.FindAnimationRefFromPackFile(input.Animation, _pfs));
 
             if (input.FragmentName != null)
             {
@@ -89,7 +90,7 @@ namespace AnimationEditor.SuperView
                 PersistentMetaFilePath.Value = "";
                 PersistentMetaFilePackFileContainerName.Value = "";
             }
-            
+
             MetaEditor.MainFile = newValue.MetaData;
             if (MetaEditor.MainFile != null)
             {

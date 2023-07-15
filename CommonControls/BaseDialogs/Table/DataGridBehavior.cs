@@ -1,7 +1,10 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -42,8 +45,8 @@ namespace CommonControls.Table
                     }
                     var veiw = dataGrid.ItemsSource as DataView;
                     var row = ea.Row.DataContext as DataRowView;
-                    
-                    var index =veiw.Table.Rows.IndexOf(row.Row);
+
+                    var index = veiw.Table.Rows.IndexOf(row.Row);
                     //var t = veiw.Table.Rows.IndexOf(ea.Row.Item as DataRowView);
                     ea.Row.Header = index;// ea.Row.GetIndex();
                 };
@@ -58,11 +61,11 @@ namespace CommonControls.Table
                         return;
                     }
                     GetVisualChildCollection<DataGridRow>(dataGrid).
-                        ForEach(d => 
+                        ForEach(d =>
                         {
 
                             var veiw = dataGrid.ItemsSource as DataView;
-                           // var row = d.DataContext
+                            // var row = d.DataContext
 
                             //var index = veiw.Table.Rows.IndexOf(row.Row);
 

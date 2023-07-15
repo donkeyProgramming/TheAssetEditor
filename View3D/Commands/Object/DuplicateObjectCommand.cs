@@ -46,7 +46,7 @@ namespace View3D.Commands.Object
                 clonedItem.Id = Guid.NewGuid().ToString();
                 _clonedObjects.Add(clonedItem);
                 item.Parent.AddObject(clonedItem);
-                if(clonedItem is ISelectable selectableNode)
+                if (clonedItem is ISelectable selectableNode)
                     objectState.ModifySelectionSingleObject(selectableNode, false);
             }
 

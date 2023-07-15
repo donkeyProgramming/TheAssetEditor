@@ -35,14 +35,14 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public SkeletonBoneNode SelectedBone
         {
             get { return _selectedBone; }
-            set 
-            { 
+            set
+            {
                 SetAndNotify(ref _selectedBone, value);
                 if (_selectedBone == null)
                     _meshNode.SelectedBoneIndex = null;
                 else
                     _meshNode.SelectedBoneIndex = _selectedBone.BoneIndex;
-              }
+            }
         }
 
 

@@ -1,15 +1,17 @@
-﻿using CommonControls.BaseDialogs.ErrorListDialog;
-using CommonControls.Editors.TextEditor;
-using CommonControls.FileTypes.AnimationPack;
-using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
+using CommonControls.BaseDialogs.ErrorListDialog;
+using CommonControls.Editors.TextEditor;
+using CommonControls.FileTypes.AnimationPack;
+using CommonControls.Services;
 using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 
 namespace CommonControls.Editors.AnimationPack.Converters
@@ -34,13 +36,13 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
         protected override XmlFormat ConvertBytesToXmlClass(byte[] bytes)
         {
-            
+
             var binFile = new FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3("", bytes);
             var outputBin = new XmlFormat();
 
             var slotHelper = binFile.TableVersion == 4 ? AnimationSlotTypeHelperWh3.GetInstance() : AnimationSlotTypeHelper3k.GetInstance();
             outputBin.Version = binFile.TableVersion == 4 ? "Wh3" : "ThreeKingdom";
-            
+
             outputBin.Data = new GeneralBinData()
             {
                 TableVersion = binFile.TableVersion,
@@ -99,8 +101,8 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
             foreach (var animationEntry in xmlBin.Animations)
             {
-                binFile.AnimationTableEntries.Add(new FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry() 
-                { 
+                binFile.AnimationTableEntries.Add(new FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()
+                {
                     AnimationId = (uint)slotHelper.GetfromValue(animationEntry.Slot).Id,
                     BlendIn = animationEntry.BlendId,
                     SelectionWeight = animationEntry.BlendOut,
@@ -168,7 +170,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
                 else
                 {
                     var filename = Path.GetFileNameWithoutExtension(filepath).ToLowerInvariant();
-                    if(filename != type.Data.Name.ToLowerInvariant())
+                    if (filename != type.Data.Name.ToLowerInvariant())
                         errorList.Error("Name", $"The name of the bin file has to be the same as the provided name. {filename} vs {type.Data.Name}");
                 }
 
@@ -185,7 +187,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
                     {
                         if (pfs.FindFile(animationRef.File) == null)
                             errorList.Warning(animation.Slot, $"Animation file {animationRef.File} is not found");
-                        else if(!IsAnimFile(animationRef.File, pfs))
+                        else if (!IsAnimFile(animationRef.File, pfs))
                             errorList.Error(animation.Slot, $"Animation file {animationRef.File} does not appears to be a valid animation file");
 
                         if (pfs.FindFile(animationRef.Meta) == null)

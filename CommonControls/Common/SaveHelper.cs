@@ -1,12 +1,15 @@
-﻿using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.PackFileBrowser;
-using CommonControls.Services;
-using Serilog;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Windows;
+using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.PackFileBrowser;
+using CommonControls.Services;
+using Serilog;
 
 namespace CommonControls.Common
 {
@@ -97,7 +100,7 @@ namespace CommonControls.Common
             var existingFile = packFileService.FindFile(filename, selectedEditabelPackFile);
             if (existingFile != null && promptSaveOverride)
             {
-                var fullPath = packFileService.GetFullPath(existingFile , selectedEditabelPackFile);
+                var fullPath = packFileService.GetFullPath(existingFile, selectedEditabelPackFile);
                 if (MessageBox.Show($"Replace existing file?\n{fullPath} \nin packfile:{selectedEditabelPackFile.Name}", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
                 {
                     var extention = Path.GetExtension(fullPath);
@@ -138,8 +141,8 @@ namespace CommonControls.Common
             {
                 if (updatedData == null)
                     throw new Exception("Trying to update an existing file, but no data is provided");
-                packFileService.SaveFile(existingFile , updatedData);
-                return existingFile ;
+                packFileService.SaveFile(existingFile, updatedData);
+                return existingFile;
             }
         }
 

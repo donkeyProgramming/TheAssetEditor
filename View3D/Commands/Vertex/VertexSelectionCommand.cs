@@ -1,7 +1,6 @@
 ﻿using CommonControls.Common;
 using Serilog;
 using System.Collections.Generic;
-using View3D.Commands.Face;
 using View3D.Components.Component.Selection;
 
 namespace View3D.Commands.Vertex
@@ -53,6 +52,6 @@ namespace View3D.Commands.Vertex
             _selectionManager.SetState(_oldState);
         }
 
-      
+
     }
 }

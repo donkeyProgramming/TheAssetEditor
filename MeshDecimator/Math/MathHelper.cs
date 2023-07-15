@@ -24,7 +24,6 @@ SOFTWARE.
 */
 #endregion
 
-using System;
 
 namespace MeshDecimator.Math
 {

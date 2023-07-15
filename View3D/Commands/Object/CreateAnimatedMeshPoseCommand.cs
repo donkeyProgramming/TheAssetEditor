@@ -25,7 +25,7 @@ namespace View3D.Commands.Object
             _convertToStaticFrame = convertToStaticFrame;
         }
 
-   
+
         public void Execute()
         {
             _originalGeometries = new List<MeshObject>();

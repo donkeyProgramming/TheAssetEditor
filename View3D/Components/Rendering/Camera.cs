@@ -12,7 +12,7 @@ namespace View3D.Components.Rendering
         MouseComponent _mouse;
         KeyboardComponent _keyboard;
 
-        public ArcBallCamera( DeviceResolverComponent deviceResolverComponent, KeyboardComponent keyboardComponent, MouseComponent mouseComponent) 
+        public ArcBallCamera(DeviceResolverComponent deviceResolverComponent, KeyboardComponent keyboardComponent, MouseComponent mouseComponent)
         {
             Zoom = 10;
             Yaw = 0.8f;
@@ -225,7 +225,7 @@ namespace View3D.Components.Rendering
                 }
                 if (mouse.IsMouseButtonDown(MouseButton.Right))
                 {
-                    MoveCameraRight(deltaMouseX * 0.01f* Zoom * .1f);
+                    MoveCameraRight(deltaMouseX * 0.01f * Zoom * .1f);
                     MoveCameraUp(-deltaMouseY * 0.01f * Zoom * .1f);
                 }
                 else if (deltaMouseWheel != 0)
@@ -234,7 +234,7 @@ namespace View3D.Components.Rendering
                         deltaMouseWheel = 250 * Math.Sign(deltaMouseWheel);
 
                     var oldZoom = (Zoom / 10);
-                    Zoom += ( deltaMouseWheel * 0.005f)  * oldZoom;
+                    Zoom += (deltaMouseWheel * 0.005f) * oldZoom;
                     //_logger.Here().Information($"Setting zoom {Zoom} - {deltaMouseWheel} - {oldZoom}");
                 }
             }
@@ -247,7 +247,7 @@ namespace View3D.Components.Rendering
                 MathHelper.ToRadians(45), // 45 degree angle
                 (float)_graphicsDevice.Viewport.Width /
                 (float)_graphicsDevice.Viewport.Height,
-                .01f, 25000) * Matrix.CreateScale(-1, 1,1);
+                .01f, 25000) * Matrix.CreateScale(-1, 1, 1);
         }
 
         public Ray CreateCameraRay(Vector2 mouseLocation)

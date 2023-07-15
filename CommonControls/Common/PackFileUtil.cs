@@ -1,13 +1,15 @@
-﻿using CommonControls.Events;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.FileTypes.RigidModel;
-using CommonControls.ModelImportExport;
-using CommonControls.Services;
-using MoreLinq;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CommonControls.Events.Global;
+using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.Services;
+using CommonControls.Services.ToolCreation;
 
 namespace CommonControls.Common
 {
@@ -42,7 +44,7 @@ namespace CommonControls.Common
         public static Dictionary<string, PackFile> FilterUnvantedFiles(Dictionary<string, PackFile> files, string[] removeFilters, out string[] removedFiles)
         {
             var tempRemoveFiles = new List<string>();
-            var fileList = files.ToDictionary();  // Create a copy
+            var fileList = files.ToDictionary(entry => entry.Key, entry => entry.Value); ;  // Create a copy
 
             foreach (var file in files)
             {

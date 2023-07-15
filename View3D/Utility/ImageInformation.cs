@@ -38,7 +38,7 @@ namespace View3D.Utility
             Format = image.Format;
             Width = image.Width;
             Height = image.Height;
-                
+
             BitsPerPixel = image.BitsPerPixel;
             Compressed = image.Compressed;
 
@@ -57,7 +57,7 @@ namespace View3D.Utility
                     Header_Caps3 = ddsImage.Header.Caps3;
                     Header_Caps4 = ddsImage.Header.Caps4;
                 }
-                    
+
                 if (ddsImage.Header10 != null)
                 {
                     Header10_DxgiFormat = ddsImage.Header10.DxgiFormat;

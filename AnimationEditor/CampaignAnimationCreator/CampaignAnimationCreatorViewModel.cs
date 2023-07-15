@@ -1,13 +1,14 @@
 ﻿using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
-using Common;
 using CommonControls.Common;
 using CommonControls.Services;
+using CommonControls.Services.ToolCreation;
 using Microsoft.Xna.Framework;
+using Monogame.WpfInterop.Common;
 using MonoGame.Framework.WpfInterop;
 using View3D.Components;
-using View3D.Scene;
+using View3D.Services;
 
 namespace AnimationEditor.CampaignAnimationCreator
 {
@@ -15,13 +16,15 @@ namespace AnimationEditor.CampaignAnimationCreator
     {
         private readonly ReferenceModelSelectionViewModelBuilder _referenceModelSelectionViewModelBuilder;
 
-        public CampaignAnimationCreatorViewModel(Editor editor,
-            IComponentInserter componentInserter, 
+        public CampaignAnimationCreatorViewModel(
+            Editor editor,
+            IComponentInserter componentInserter,
             ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder,
             AnimationPlayerViewModel animationPlayerViewModel,
             EventHub eventHub,
-            MainScene scene) 
-            : base(componentInserter, animationPlayerViewModel, scene)
+            GameWorld scene,
+            FocusSelectableObjectService focusSelectableObjectService)
+            : base(componentInserter, animationPlayerViewModel, scene, focusSelectableObjectService)
         {
             DisplayName.Value = "Campaign Animation Creator";
             Editor = editor;
@@ -52,9 +55,9 @@ namespace AnimationEditor.CampaignAnimationCreator
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_damsel_campaign_01.variantmeshdefinition"),
                 Animation = packfileService.FindFile(@"animations\battle\humanoid01b\staff_and_sword\arch_mage\locomotion\hu1b_stsw_mage_combat_walk_01.anim")
             };
-       
+
             creator.CreateEmptyEditor(editorView);
         }
-       
+
     }
 }

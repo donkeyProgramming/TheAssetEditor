@@ -1,5 +1,6 @@
 ﻿using CommonControls.Common;
 using CommonControls.Editors.TextEditor;
+using CommonControls.Services.ToolCreation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CommonControls.Editors.CampaignAnimBin

@@ -2,7 +2,6 @@
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel.Types;
 using CommonControls.Services;
-using MoreLinq;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -10,7 +9,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
@@ -64,6 +62,7 @@ namespace View3D.Services
 
         public void UpdateStatus()
         {
+            return;
             TextureList.Clear();
 
             // Check if there is a project file there
@@ -272,7 +271,7 @@ namespace View3D.Services
                 if (texture.PartOfProject)
                 {
                     AddTextureToPackFile(texture);
-            
+
                     // Determine which models use this texture and update them
                     var allMeshes = _node.GetMeshesInLod(0, false);
                     foreach (var model in allMeshes)
@@ -368,7 +367,7 @@ namespace View3D.Services
         {
             var meshes = _node.GetMeshesInLod(0, false);
             foreach (var mesh in meshes)
-                ExportUvMap(projectPath+ "\\UvMaps\\", mesh);
+                ExportUvMap(projectPath + "\\UvMaps\\", mesh);
         }
 
         private void ExportUvMap(string outputDirectory, Rmv2MeshNode mesh)

@@ -1,9 +1,5 @@
 ﻿using CommonControls.Services;
-using MonoGame.Framework.WpfInterop;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace KitbasherEditor.Services
 {
@@ -11,15 +7,15 @@ namespace KitbasherEditor.Services
     {
         public static void Load(PackFileService pfs, KitbashSceneCreator modelLoaderService)
         {
-           //var allFiles = pfs.FindAllFilesInDirectory(@"terrain\campaigns\wh2_main_great_vortex_map_1\global_meshes");
-           //var landMeshes = allFiles.Where(x => x.Extention == ".rigid_model_v2" && x.Name.Contains("land_mesh", StringComparison.InvariantCultureIgnoreCase));
-           //var seaMeshes = allFiles.Where(x => x.Extention == ".rigid_model_v2" && x.Name.Contains("sea_mesh", StringComparison.InvariantCultureIgnoreCase));
-           //
-           //foreach(var item in landMeshes)
-           //    modelLoaderService.LoadModelIntoMainScene(item);
-           //
-           //foreach (var item in seaMeshes)
-           //    modelLoaderService.LoadModelIntoMainScene(item);
+            //var allFiles = pfs.FindAllFilesInDirectory(@"terrain\campaigns\wh2_main_great_vortex_map_1\global_meshes");
+            //var landMeshes = allFiles.Where(x => x.Extention == ".rigid_model_v2" && x.Name.Contains("land_mesh", StringComparison.InvariantCultureIgnoreCase));
+            //var seaMeshes = allFiles.Where(x => x.Extention == ".rigid_model_v2" && x.Name.Contains("sea_mesh", StringComparison.InvariantCultureIgnoreCase));
+            //
+            //foreach(var item in landMeshes)
+            //    modelLoaderService.LoadModelIntoMainScene(item);
+            //
+            //foreach (var item in seaMeshes)
+            //    modelLoaderService.LoadModelIntoMainScene(item);
 
 
             var allTils = pfs.FindAllFilesInDirectory(@"terrain\tiles\campaign");
@@ -30,7 +26,6 @@ namespace KitbasherEditor.Services
             {
                 try
                 {
-
                     modelLoaderService.LoadModelIntoMainScene(item);
                 }
                 catch

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
 using System;
 using View3D.Animation;
 using View3D.Components.Rendering;
@@ -10,8 +9,8 @@ using View3D.Utility;
 namespace View3D.SceneNodes
 {
     public interface ISkeletonProvider
-    { 
-        GameSkeleton Skeleton { get;  }
+    {
+        GameSkeleton Skeleton { get; }
     }
 
     public class SkeletonNode : GroupNode, ISkeletonProvider, IDrawableItem, IDisposable
@@ -44,7 +43,7 @@ namespace View3D.SceneNodes
 
             if (IsVisible && Skeleton != null)
             {
-                _lineRenderer.Clear(); 
+                _lineRenderer.Clear();
                 for (int i = 0; i < Skeleton.BoneCount; i++)
                 {
                     float scale = SkeletonScale;
@@ -57,7 +56,7 @@ namespace View3D.SceneNodes
 
                     var boneMatrix = Skeleton.GetAnimatedWorldTranform(i);
                     _lineRenderer.AddCube(Matrix.CreateScale(scale) * Matrix.CreateScale(0.05f) * boneMatrix * Matrix.CreateScale(ScaleMult) * parentWorld, drawColour);
-                    
+
                     var parentIndex = Skeleton.GetParentBoneIndex(i);
                     if (parentIndex != -1)
                     {

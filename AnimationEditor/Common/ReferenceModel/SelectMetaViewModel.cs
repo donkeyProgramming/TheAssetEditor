@@ -21,7 +21,7 @@ namespace AnimationEditor.Common.ReferenceModel
         public PackFile SelectedMetaFile { get => _selectedMetaFiles; set { SetAndNotify(ref _selectedMetaFiles, value); _assetViewModelEditor.SetMetaFile(_data, _selectedMetaFiles, _selectedPersistMeta); } }
 
         PackFile _selectedPersistMeta;
-        public PackFile SelectedPersistMetaFile { get => _selectedPersistMeta; set { SetAndNotify(ref _selectedPersistMeta, value); _assetViewModelEditor.SetMetaFile(_data,_selectedMetaFiles, _selectedPersistMeta); } } 
+        public PackFile SelectedPersistMetaFile { get => _selectedPersistMeta; set { SetAndNotify(ref _selectedPersistMeta, value); _assetViewModelEditor.SetMetaFile(_data, _selectedMetaFiles, _selectedPersistMeta); } }
 
 
         public OnSeachDelegate FiterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }

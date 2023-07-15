@@ -1,6 +1,7 @@
-﻿using CommonControls.Common;
-using CommonControls.Editors.TextEditor;
-using CommonControls.Services;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections;
 using System.IO;
@@ -8,6 +9,9 @@ using System.Linq;
 using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
+using CommonControls.Common;
+using CommonControls.Editors.TextEditor;
+using CommonControls.Services;
 
 namespace CommonControls.Editors.AnimationPack.Converters
 {
@@ -140,7 +144,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
             int[] array = new int[1];
             b.CopyTo(array, 0);
-            return  array[0];
+            return array[0];
         }
     }
 }

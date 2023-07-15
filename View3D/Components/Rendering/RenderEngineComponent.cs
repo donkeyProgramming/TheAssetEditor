@@ -1,17 +1,15 @@
 ﻿using CommonControls.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using View3D.Rendering;
 using View3D.Utility;
 
 namespace View3D.Components.Rendering
 {
     public enum RenderBuckedId
-    { 
+    {
         Normal,
         Wireframe,
         Selection,
@@ -53,7 +51,7 @@ namespace View3D.Components.Rendering
 
         public RenderFormats MainRenderFormat { get; set; } = RenderFormats.SpecGloss;
 
-        public RenderEngineComponent(ArcBallCamera camera, ResourceLibary resourceLib, DeviceResolverComponent deviceResolverComponent, ApplicationSettingsService applicationSettingsService) 
+        public RenderEngineComponent(ArcBallCamera camera, ResourceLibary resourceLib, DeviceResolverComponent deviceResolverComponent, ApplicationSettingsService applicationSettingsService)
         {
             _camera = camera;
             _resourceLib = resourceLib;
@@ -153,7 +151,7 @@ namespace View3D.Components.Rendering
                 View = _camera.ViewMatrix,
                 CameraPosition = _camera.Position,
                 CameraLookAt = _camera.LookAt,
-                EnvLightRotationsRadians_Y = MathHelper.ToRadians(EnvLightRotationDegrees_Y),                
+                EnvLightRotationsRadians_Y = MathHelper.ToRadians(EnvLightRotationDegrees_Y),
                 DirLightRotationRadians_X = MathHelper.ToRadians(DirLightRotationDegrees_X),
                 DirLightRotationRadians_Y = MathHelper.ToRadians(DirLightRotationDegrees_Y),
                 LightIntensityMult = LightIntensityMult

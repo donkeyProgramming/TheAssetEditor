@@ -84,13 +84,13 @@ namespace MonoGame.Framework.WpfInterop.Input
 
         private void HandleMouse(object sender, MouseEventArgs e)
         {
-     
+
             if (e.Handled)
                 return;
 
             if (e.LeftButton == MouseButtonState.Pressed)
-            { 
-            
+            {
+
             }
 
             var pos = e.GetPosition(_focusElement);
@@ -108,7 +108,7 @@ namespace MonoGame.Framework.WpfInterop.Input
 
                     //finally check if user wants us to focus already on mouse over
                     //if (_focusElement.FocusOnMouseOver)
-                    if(e.LeftButton == MouseButtonState.Pressed)
+                    if (e.LeftButton == MouseButtonState.Pressed)
                     {
                         var res = LogicalTreeHelperEx.FindParent<Grid>(_focusElement);
                         HitTestResult result = VisualTreeHelper.HitTest(res, pos);
@@ -156,12 +156,12 @@ namespace MonoGame.Framework.WpfInterop.Input
                 if (result?.VisualHit == _focusElement)
                     hit = true;
 
-               
 
-                    // IsMouseDirectlyOver always returns true if the mouse is captured, so we need to do our own hit testing if the Mouse is captured to find out whether it is actually over the control or not
+
+                // IsMouseDirectlyOver always returns true if the mouse is captured, so we need to do our own hit testing if the Mouse is captured to find out whether it is actually over the control or not
                 if (hit)
                 {
-                    
+
                     //{
                     //    // outside the hitbox
                     //
@@ -188,15 +188,15 @@ namespace MonoGame.Framework.WpfInterop.Input
                     if (_focusElement.IsMouseCaptured)
                     {
 
-                            _mouseState = new MouseState(_mouseState.X, _mouseState.Y, _mouseState.ScrollWheelValue,
-                                (ButtonState) e.LeftButton, (ButtonState) e.MiddleButton, (ButtonState) e.RightButton, (ButtonState) e.XButton1,
-                                (ButtonState) e.XButton2);
-                            // only release if LeftMouse is up
-                            if (e.LeftButton == MouseButtonState.Released)
-                            {
-                                _focusElement.ReleaseMouseCapture();
-                            }
-                            e.Handled = true;
+                        _mouseState = new MouseState(_mouseState.X, _mouseState.Y, _mouseState.ScrollWheelValue,
+                            (ButtonState)e.LeftButton, (ButtonState)e.MiddleButton, (ButtonState)e.RightButton, (ButtonState)e.XButton1,
+                            (ButtonState)e.XButton2);
+                        // only release if LeftMouse is up
+                        if (e.LeftButton == MouseButtonState.Released)
+                        {
+                            _focusElement.ReleaseMouseCapture();
+                        }
+                        e.Handled = true;
                     }
 
                     // mouse is outside the control and not captured, so don't update the mouse state
@@ -215,27 +215,28 @@ namespace MonoGame.Framework.WpfInterop.Input
                     {
                         // however, only focus if we are the active window, otherwise the window will become active while remaining in the background
                         //
-                        if(e.LeftButton == MouseButtonState.Pressed)
+                        if (e.LeftButton == MouseButtonState.Pressed)
                             _focusElement.CaptureMouse();
                     }
-                   //else
-                   //{
-                   //    // don't update mouse events if we are just hovering over different window
-                   //    return;
-                   //}
+                    //else
+                    //{
+                    //    // don't update mouse events if we are just hovering over different window
+                    //    return;
+                    //}
                 }
             }
             else
             {
                 if (_focusElement.IsFocused && !WindowHelper.IsControlOnActiveWindow(_focusElement))
-            {
-                // don't update mouse events if we are just hovering over different window
-                return;
-            }}
+                {
+                    // don't update mouse events if we are just hovering over different window
+                    return;
+                }
+            }
             e.Handled = true;
             var m = _mouseState;
             var w = e as MouseWheelEventArgs;
-            _mouseState = new MouseState((int) pos.X, (int) pos.Y, m.ScrollWheelValue + (w?.Delta ?? 0), (ButtonState) e.LeftButton, (ButtonState) e.MiddleButton, (ButtonState) e.RightButton, (ButtonState) e.XButton1, (ButtonState) e.XButton2);
+            _mouseState = new MouseState((int)pos.X, (int)pos.Y, m.ScrollWheelValue + (w?.Delta ?? 0), (ButtonState)e.LeftButton, (ButtonState)e.MiddleButton, (ButtonState)e.RightButton, (ButtonState)e.XButton1, (ButtonState)e.XButton2);
         }
 
         private static double Clamp(double v, int min, double max)

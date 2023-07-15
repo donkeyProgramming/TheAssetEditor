@@ -3,9 +3,9 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using View3D.Scene;
+using View3D.Services;
 
-namespace CommonControls.Common
+namespace View3D.Utility
 {
     public class SubToolWindowCreator
     {
@@ -18,9 +18,9 @@ namespace CommonControls.Common
 
         public void CreateComponentWindow<TUserView, TViewModel>(string header, int width, int heigh)
             where TViewModel : IGameComponent
-            where TUserView:UserControl
+            where TUserView : UserControl
         {
-            var scene = _serviceProvider.GetRequiredService<MainScene>();
+            var scene = _serviceProvider.GetRequiredService<GameWorld>();
             var viewModel = _serviceProvider.GetRequiredService<TViewModel>();
             scene.AddComponent(viewModel);
 
@@ -37,7 +37,7 @@ namespace CommonControls.Common
 
         void OnComponentRemoved(IGameComponent component)
         {
-            var scene = _serviceProvider.GetRequiredService<MainScene>();
+            var scene = _serviceProvider.GetRequiredService<GameWorld>();
             scene.RemoveComponent(component);
 
             if (component is IDisposable disposable)

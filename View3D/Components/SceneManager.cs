@@ -17,7 +17,7 @@ namespace View3D.Components.Component
 
     public static class SpecialNodes
     {
-        public static  string Root { get => "Root"; }
+        public static string Root { get => "Root"; }
         public static string EditableModel { get => "Editable Model"; }
         public static string ReferenceMeshs { get => "Reference meshs"; }
     }
@@ -33,7 +33,7 @@ namespace View3D.Components.Component
 
         private readonly RenderEngineComponent _renderEngineComponent;
 
-        public SceneManager(RenderEngineComponent renderEngineComponent) 
+        public SceneManager(RenderEngineComponent renderEngineComponent)
         {
             _renderEngineComponent = renderEngineComponent;
 
@@ -51,7 +51,7 @@ namespace View3D.Components.Component
         {
             return RootNode.Search(i => i.Children, condition, SceneExtentions.GraphTraversal.BreadthFirst);
         }
-      
+
         public void TriggerAddObjectEvent(ISceneNode parent, ISceneNode added)
         {
             SceneObjectAdded?.Invoke(parent, added);
@@ -118,7 +118,7 @@ namespace View3D.Components.Component
 
         void SelectObjectsHirarchy(ISceneNode root, Ray ray, ref ISelectable output_selectedNode, ref float bestDistance)
         {
-            if(root.IsVisible)
+            if (root.IsVisible)
             {
                 if (root is ISelectable selectableNode && selectableNode.IsSelectable)
                 {
@@ -135,7 +135,7 @@ namespace View3D.Components.Component
                             output_selectedNode = selectableNode;
                         }
                     }
-                
+
                 }
 
                 bool isUnselectableGroup = root is GroupNode groupNode && groupNode.IsLockable == true && groupNode.IsSelectable == false;
@@ -171,7 +171,7 @@ namespace View3D.Components.Component
             base.Draw(gameTime);
         }
 
-        void DrawBasicSceneHirarchy(ISceneNode root,  Matrix parentMatrix)
+        void DrawBasicSceneHirarchy(ISceneNode root, Matrix parentMatrix)
         {
             if (root.IsVisible)
             {
@@ -210,8 +210,8 @@ namespace View3D.Components.Component
             if (SceneObjectRemoved != null)
                 foreach (var d in SceneObjectRemoved.GetInvocationList())
                     SceneObjectRemoved -= (d as SceneObjectRemovedDelegate);
-            
-            if(RootNode != null)
+
+            if (RootNode != null)
                 DisposeNode(RootNode);
             RootNode = null;
         }

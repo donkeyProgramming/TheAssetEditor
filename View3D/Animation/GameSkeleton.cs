@@ -13,7 +13,7 @@ namespace View3D.Animation
         List<int> _parentBoneIds { get; set; }
 
         public List<Vector3> Translation { get; private set; }
-        public List<Quaternion>Rotation { get; private set; }
+        public List<Quaternion> Rotation { get; private set; }
         public List<float> Scale { get; private set; }
         public List<string> BoneNames { get; private set; }
         public int BoneCount { get => BoneNames.Count; }
@@ -45,7 +45,7 @@ namespace View3D.Animation
                     skeletonFile.AnimationParts[0].DynamicFrames[skeletonAnimFrameIndex].Quaternion[i].W);
 
                 Translation[i] = new Vector3(
-                    skeletonFile.AnimationParts[0].DynamicFrames[skeletonAnimFrameIndex].Transforms[i].X ,
+                    skeletonFile.AnimationParts[0].DynamicFrames[skeletonAnimFrameIndex].Transforms[i].X,
                     skeletonFile.AnimationParts[0].DynamicFrames[skeletonAnimFrameIndex].Transforms[i].Y,
                     skeletonFile.AnimationParts[0].DynamicFrames[skeletonAnimFrameIndex].Transforms[i].Z);
 
@@ -127,7 +127,7 @@ namespace View3D.Animation
         {
             return _worldTransform[boneIndex];
         }
- 
+
         public Matrix GetAnimatedWorldTranform(int boneIndex)
         {
             if (_frame != null)
@@ -224,7 +224,7 @@ namespace View3D.Animation
             boneGraph.DeleteBone(boneIndex);
             boneGraph.FlattenInto(this);
 
-            if(rebuildMatrix)
+            if (rebuildMatrix)
                 RebuildSkeletonMatrix();
         }
 
@@ -309,7 +309,7 @@ namespace View3D.Animation
                     if (child.BoneId == id)
                         return child;
 
-                    var result =  child.GetBone(id);
+                    var result = child.GetBone(id);
                     if (result != null)
                         return result;
                 }
@@ -341,9 +341,9 @@ namespace View3D.Animation
                 gameSkeleton.Scale = scale;
             }
 
-            public void Flatten(ref List<string> boneNames, ref List<int> parentBones, ref List<Vector3> translation, ref List<Quaternion> rotations, ref List<float> scale )
+            public void Flatten(ref List<string> boneNames, ref List<int> parentBones, ref List<Vector3> translation, ref List<Quaternion> rotations, ref List<float> scale)
             {
-                if(Parent == null)
+                if (Parent == null)
                     parentBones.Add(-1);
                 else
                     parentBones.Add(Parent.UpdatedBoneId);

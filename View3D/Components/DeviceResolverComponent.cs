@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using View3D.Scene;
+using View3D.Services;
 
 namespace View3D.Components
 {
@@ -11,8 +11,8 @@ namespace View3D.Components
 
     public class DeviceResolverComponent : BaseComponent, IDeviceResolver
     {
-        MainScene _scene;
-        public DeviceResolverComponent(MainScene game) 
+        GameWorld _scene;
+        public DeviceResolverComponent(GameWorld game)
         {
             _scene = game;
         }

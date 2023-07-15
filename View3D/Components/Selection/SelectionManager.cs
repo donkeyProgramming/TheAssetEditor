@@ -1,6 +1,5 @@
-﻿using Common;
-using CommonControls.Events;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using Monogame.WpfInterop.Common;
 using System;
 using View3D.Components.Rendering;
 using View3D.Rendering;
@@ -42,7 +41,7 @@ namespace View3D.Components.Component.Selection
         {
             CreateSelectionSate(GeometrySelectionMode.Object, null, false);
 
-             _lineGeometry = new LineMeshRender(_resourceLib);
+            _lineGeometry = new LineMeshRender(_resourceLib);
             VertexRenderer = new VertexInstanceMesh(_deviceResolverComponent, _resourceLib);
 
             _wireframeEffect = new BasicShader(_deviceResolverComponent.Device);
@@ -88,7 +87,7 @@ namespace View3D.Components.Component.Selection
         }
 
         public ISelectionState GetState() => _currentState;
-        public State GetState<State>() where State: class, ISelectionState => _currentState as State;
+        public State GetState<State>() where State : class, ISelectionState => _currentState as State;
         public ISelectionState GetStateCopy() => _currentState.Clone();
         public State GetStateCopy<State>() where State : class, ISelectionState => GetState<State>().Clone() as State;
 
@@ -125,7 +124,7 @@ namespace View3D.Components.Component.Selection
             if (selectionState is FaceSelectionState selectionFaceState && selectionFaceState.RenderObject is Rmv2MeshNode meshNode)
             {
                 _renderEngine.AddRenderItem(RenderBuckedId.Selection, new GeoRenderItem() { ModelMatrix = meshNode.RenderMatrix, Geometry = meshNode.Geometry, Shader = _selectedFacesEffect, Faces = selectionFaceState.SelectedFaces });
-                _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeoRenderItem() { ModelMatrix = meshNode.RenderMatrix, Geometry = meshNode.Geometry, Shader = _wireframeEffect});
+                _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeoRenderItem() { ModelMatrix = meshNode.RenderMatrix, Geometry = meshNode.Geometry, Shader = _wireframeEffect });
             }
 
             if (selectionState is VertexSelectionState selectionVertexState && selectionVertexState.RenderObject != null)

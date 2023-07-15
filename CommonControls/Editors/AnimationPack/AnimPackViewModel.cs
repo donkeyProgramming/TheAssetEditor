@@ -1,4 +1,14 @@
-﻿using CommonControls.BaseDialogs;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Windows;
+using System.Windows.Input;
+using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using CommonControls.Editors.AnimationPack.Converters;
 using CommonControls.Editors.TextEditor;
@@ -7,17 +17,10 @@ using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Input;
 
 namespace CommonControls.Editors.AnimationPack
 {
-    public class AnimPackViewModel : NotifyPropertyChangedImpl, IEditorViewModel
+    public class AnimPackViewModel : NotifyPropertyChangedImpl, IEditorViewModel, ISaveableEditor
     {
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
@@ -85,7 +88,7 @@ namespace CommonControls.Editors.AnimationPack
         {
             var animPack = AnimationPackSerializer.Load(_packFile, _pfs);
             var itemNames = animPack.Files.ToList();
-            AnimationPackItems.UpdatePossibleValues(itemNames); 
+            AnimationPackItems.UpdatePossibleValues(itemNames);
             DisplayName.Value = animPack.FileName;
         }
 
@@ -259,8 +262,8 @@ namespace CommonControls.Editors.AnimationPack
             //
             //    window.ShowDialog();
             //}
-
-            return true;
+            //
+            //return true;
         }
 
         public void ExportAnimationSlotsWh3Action()

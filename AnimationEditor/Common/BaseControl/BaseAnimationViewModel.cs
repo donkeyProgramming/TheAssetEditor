@@ -3,10 +3,8 @@ using AnimationEditor.Common.ReferenceModel;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.DependencyInjection;
 using System.Windows.Input;
 using View3D.Components;
-using View3D.Scene;
 using View3D.Services;
 
 namespace AnimationEditor.PropCreator.ViewModels
@@ -16,9 +14,8 @@ namespace AnimationEditor.PropCreator.ViewModels
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Creator");
         public PackFile MainFile { get; set; }
 
-
-        MainScene _scene;
-        public MainScene Scene { get => _scene; set => SetAndNotify(ref _scene, value); }
+        GameWorld _gameWorld;
+        public GameWorld Scene { get => _gameWorld; set => SetAndNotify(ref _gameWorld, value); }
 
         public NotifyAttr<ReferenceModelSelectionViewModel> MainModelView { get; set; } = new NotifyAttr<ReferenceModelSelectionViewModel>();
         public NotifyAttr<ReferenceModelSelectionViewModel> ReferenceModelView { get; set; } = new NotifyAttr<ReferenceModelSelectionViewModel>();
@@ -32,17 +29,22 @@ namespace AnimationEditor.PropCreator.ViewModels
         TEditor _editor;
         public TEditor Editor { get => _editor; set => SetAndNotify(ref _editor, value); }
 
-        FocusSelectableObjectService _focusComponent;
+        private readonly FocusSelectableObjectService _focusSelectableObjectService;
+
         public ICommand ResetCameraCommand { get; set; }
         public ICommand FocusCamerasCommand { get; set; }
 
 
-        public BaseAnimationViewModel(IComponentInserter componentInserter,
+        public BaseAnimationViewModel(
+            IComponentInserter componentInserter,
             AnimationPlayerViewModel animationPlayerViewModel,
-            MainScene sceneContainer)
+            GameWorld gameWorld,
+            FocusSelectableObjectService focusSelectableObjectService)
         {
-            Scene = sceneContainer;
+            Scene = gameWorld;
             Player = animationPlayerViewModel;
+
+            _focusSelectableObjectService = focusSelectableObjectService;
 
             ResetCameraCommand = new RelayCommand(ResetCamera);
             FocusCamerasCommand = new RelayCommand(FocusCamera);
@@ -50,8 +52,8 @@ namespace AnimationEditor.PropCreator.ViewModels
             componentInserter.Execute();
         }
 
-        void ResetCamera() => _focusComponent.ResetCamera();
-        void FocusCamera() => _focusComponent.FocusSelection();
+        void ResetCamera() => _focusSelectableObjectService.ResetCamera();
+        void FocusCamera() => _focusSelectableObjectService.FocusSelection();
 
         public void Close()
         {

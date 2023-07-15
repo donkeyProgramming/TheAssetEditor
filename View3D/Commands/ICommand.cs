@@ -34,7 +34,7 @@ namespace View3D.Commands
             return this;
         }
 
-        public CommandBuilder<T> IsUndoable(bool isUndoable) 
+        public CommandBuilder<T> IsUndoable(bool isUndoable)
         {
             _isUndoable = isUndoable;
             return this;
@@ -45,7 +45,7 @@ namespace View3D.Commands
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly CommandExecutor _commandExecutor;
-    
+
         public CommandFactory(IServiceProvider serviceProvider, CommandExecutor commandExecutor)
         {
             _serviceProvider = serviceProvider;

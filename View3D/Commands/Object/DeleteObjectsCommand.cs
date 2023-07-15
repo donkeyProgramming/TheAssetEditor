@@ -2,7 +2,6 @@
 using Serilog;
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Commands.Face;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 
@@ -25,7 +24,7 @@ namespace View3D.Commands.Object
 
         public void Configure(List<ISelectable> itemsToDelete)
         {
-            _itemsToDelete = new List<SceneNode>(itemsToDelete.Select(x=>x as SceneNode));
+            _itemsToDelete = new List<SceneNode>(itemsToDelete.Select(x => x as SceneNode));
         }
 
         public void Configure(SceneNode itemToDelete)
@@ -37,7 +36,7 @@ namespace View3D.Commands.Object
         {
             _oldState = _selectionManager.GetStateCopy();
 
-           _logger.Here().Information($"Command info - Items[{string.Join(',', _itemsToDelete.Select(x => x.Name))}]");
+            _logger.Here().Information($"Command info - Items[{string.Join(',', _itemsToDelete.Select(x => x.Name))}]");
             foreach (var item in _itemsToDelete)
                 item.Parent.RemoveObject(item);
 

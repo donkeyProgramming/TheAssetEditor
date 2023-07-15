@@ -1,7 +1,6 @@
 ﻿using CommonControls.Common;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
-using MonoGame.Framework.WpfInterop;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -14,6 +13,69 @@ using View3D.Utility;
 
 namespace View3D.SceneNodes
 {
+    public class Rmv2ModelNodeLoader
+    {
+        private readonly ILogger _logger = Logging.Create<Rmv2ModelNodeLoader>();
+
+        private readonly ResourceLibary _resourceLibary;
+        private readonly IGeometryGraphicsContextFactory _contextFactory;
+        private readonly PackFileService _packFileService;
+        private readonly RenderEngineComponent _renderEngineComponent;
+        private readonly ApplicationSettingsService _applicationSettingsService;
+
+        public Rmv2ModelNodeLoader(ResourceLibary resourceLibary, IGeometryGraphicsContextFactory contextFactory, PackFileService packFileService, RenderEngineComponent renderEngineComponent, ApplicationSettingsService applicationSettingsService)
+        {
+            _resourceLibary = resourceLibary;
+            _contextFactory = contextFactory;
+            _packFileService = packFileService;
+            _renderEngineComponent = renderEngineComponent;
+            _applicationSettingsService = applicationSettingsService;
+        }
+
+        public void CreateModelNodesFromFile(Rmv2ModelNode outputNode, RmvFile model, AnimationPlayer animationPlayer, string modelFullPath)
+        {
+            outputNode.Model = model;
+            for (int lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
+            {
+                if (lodIndex >= outputNode.Children.Count)
+                {
+                    var cameraDistance = model.LodHeaders[lodIndex]?.LodCameraDistance;
+                    outputNode.AddObject(new Rmv2LodNode("Lod " + lodIndex, lodIndex, cameraDistance));
+                    outputNode.UpdateDefaultLodValues();
+                }
+
+                var lodNode = outputNode.Children[lodIndex];
+                for (int modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
+                {
+                    var geometry = MeshBuilderService.BuildMeshFromRmvModel(model.ModelList[lodIndex][modelIndex], model.Header.SkeletonName, _contextFactory.Create());
+                    var rmvModel = model.ModelList[lodIndex][modelIndex];
+                    var node = new Rmv2MeshNode(rmvModel.CommonHeader, geometry, rmvModel.Material, animationPlayer, _renderEngineComponent);
+                    node.Initialize(_resourceLibary);
+                    node.OriginalFilePath = modelFullPath;
+                    node.OriginalPartIndex = modelIndex;
+                    node.LodIndex = lodIndex;
+
+                    if (_applicationSettingsService.CurrentSettings.AutoResolveMissingTextures)
+                    {
+                        try
+                        {
+                            MissingTextureResolver missingTextureResolver = new MissingTextureResolver();
+                            missingTextureResolver.ResolveMissingTextures(node, _packFileService);
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.Here().Error($"Error while trying to resolve textures from WS model while loading model, {e.Message}");
+                        }
+
+                    }
+
+                    lodNode.AddObject(node);
+                }
+            }
+        }
+    }
+
+
     public class Rmv2ModelNode : GroupNode
     {
         private readonly ILogger _logger = Logging.Create<Rmv2ModelNode>();
@@ -35,49 +97,6 @@ namespace View3D.SceneNodes
             UpdateDefaultLodValues();
         }
 
-        public void CreateModelNodesFromFile(RmvFile model, ResourceLibary resourceLibary, AnimationPlayer animationPlayer, IGeometryGraphicsContextFactory contextFactory, string modelFullPath,
-            RenderEngineComponent renderEngineComponent, PackFileService pfs, bool autoResolveTexture)
-        {
-            Model = model;
-            for (int lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
-            {
-                if (lodIndex >= Children.Count)
-                {
-                    var cameraDistance = model.LodHeaders[lodIndex]?.LodCameraDistance;
-                    AddObject(new Rmv2LodNode("Lod " + lodIndex, lodIndex, cameraDistance));
-                    UpdateDefaultLodValues();
-                }
-
-                var lodNode = Children[lodIndex];
-                for (int modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
-                {
-                    var geometry = MeshBuilderService.BuildMeshFromRmvModel(model.ModelList[lodIndex][modelIndex], model.Header.SkeletonName, contextFactory.Create());
-                    var rmvModel = model.ModelList[lodIndex][modelIndex];
-                    var node = new Rmv2MeshNode(rmvModel.CommonHeader, geometry, rmvModel.Material, animationPlayer, renderEngineComponent);
-                    node.Initialize(resourceLibary);
-                    node.OriginalFilePath = modelFullPath;
-                    node.OriginalPartIndex = modelIndex;
-                    node.LodIndex = lodIndex;
-
-                    if (autoResolveTexture)
-                    {
-                        try
-                        {
-                            MissingTextureResolver missingTextureResolver = new MissingTextureResolver();
-                            missingTextureResolver.ResolveMissingTextures(node, pfs);
-                        }
-                        catch (Exception e)
-                        {
-                            _logger.Here().Error($"Error while trying to resolve textures from WS model while loading model, {e.Message}");
-                        }
-                        
-                    }
-
-                    lodNode.AddObject(node);
-                }
-            }
-        } 
-
         public List<Rmv2LodNode> GetLodNodes()
         {
             return Children
@@ -85,7 +104,6 @@ namespace View3D.SceneNodes
                 .Select(x => x as Rmv2LodNode)
                 .ToList();
         }
-
 
         public Rmv2MeshNode GetMeshNode(int lod, int modelIndex)
         {
@@ -134,18 +152,16 @@ namespace View3D.SceneNodes
         }
 
 
-        void UpdateDefaultLodValues()
+        public void UpdateDefaultLodValues()
         {
             var lodNodes = GetLodNodes();
             if (lodNodes.Count(x => x.LodReductionFactor == -1) != 0)
             {
-                for(int i = 0; i < lodNodes.Count; i++)
+                for (int i = 0; i < lodNodes.Count; i++)
                     lodNodes[i].LodReductionFactor = SceneSaverService.GetDefaultLodReductionValue(lodNodes.Count(), i);
             }
         }
     }
-
- 
 }
 
 

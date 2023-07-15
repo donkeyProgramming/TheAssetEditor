@@ -1,5 +1,4 @@
 ﻿using Audio.FileFormats.WWise;
-using CommonControls.Common;
 using System.Collections.Generic;
 
 namespace Audio.Storage

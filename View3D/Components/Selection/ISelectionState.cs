@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using View3D.Rendering;
+﻿using System.Collections.Generic;
 using View3D.SceneNodes;
 
 namespace View3D.Components.Component.Selection

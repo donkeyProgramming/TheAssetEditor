@@ -1,7 +1,7 @@
-﻿using CommonControls.Common;
-using Microsoft.Win32;
-using Newtonsoft.Json;
-using Serilog;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -10,6 +10,10 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
+using CommonControls.Common;
+using Microsoft.Win32;
+using Newtonsoft.Json;
+using Serilog;
 
 namespace CommonControls.Editors.BoneMapping
 {
@@ -21,7 +25,7 @@ namespace CommonControls.Editors.BoneMapping
         public FilterCollection<AnimatedBone> MeshBones { get; set; }
         public FilterCollection<AnimatedBone> ParentModelBones { get; set; }
 
-        public NotifyAttr<string> CurrentConfigPath { get; set; } 
+        public NotifyAttr<string> CurrentConfigPath { get; set; }
 
         public ObservableCollection<string> AllConfigPaths { get; set; }
 
@@ -158,7 +162,7 @@ namespace CommonControls.Editors.BoneMapping
                 else
                 {
                     _configuration.SkeletonBoneHighlighter.SelectSourceSkeletonBone(bone.BoneIndex.Value);
-                    if(bone.MappedBoneIndex.Value != -1)
+                    if (bone.MappedBoneIndex.Value != -1)
                         _configuration.SkeletonBoneHighlighter.SelectTargetSkeletonBone(bone.MappedBoneIndex.Value);
                 }
             }

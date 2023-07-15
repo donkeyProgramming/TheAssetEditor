@@ -1,8 +1,11 @@
-﻿using CommonControls.FileTypes;
-using Filetypes.ByteParsing;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
+using Filetypes.ByteParsing;
 
 namespace CommonControls.FileTypes.RigidModel
 {
@@ -28,7 +31,7 @@ namespace CommonControls.FileTypes.RigidModel
                 var result = ByteParsers.String.TryDecodeFixedLength(_skeletonName, 0, 128, out string value, out _);
                 if (result == false)
                     throw new Exception();
-                return Util.SanatizeFixedString(value);
+                return StringSanitizer.FixedString(value);
             }
             set
             {
@@ -43,7 +46,7 @@ namespace CommonControls.FileTypes.RigidModel
                 var result = ByteParsers.String.TryDecodeFixedLength(_fileType, 0, 4, out string value, out _);
                 if (result == false)
                     throw new Exception();
-                return Util.SanatizeFixedString(value);
+                return StringSanitizer.FixedString(value);
             }
         }
 

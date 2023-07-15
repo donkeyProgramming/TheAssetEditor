@@ -1,9 +1,13 @@
-﻿using CommonControls.Common;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Windows.Threading;
+using CommonControls.Common;
 
 namespace CommonControls.PackFileBrowser
 {
@@ -24,7 +28,7 @@ namespace CommonControls.PackFileBrowser
         }
 
 
-        bool _hasRegExError =false;
+        bool _hasRegExError = false;
         public bool HasRegExError
         {
             get => _hasRegExError;
@@ -99,8 +103,8 @@ namespace CommonControls.PackFileBrowser
 
             var count = 0;
             foreach (var child in file.Children)
-                count += CountVisibleNodes(child); 
-            
+                count += CountVisibleNodes(child);
+
             return count;
         }
 
@@ -128,7 +132,7 @@ namespace CommonControls.PackFileBrowser
                     {
                         if (file.Name.Contains(extention))
                         {
-                            hasValidExtention = true; 
+                            hasValidExtention = true;
                             continue;
                         }
                     }
@@ -136,7 +140,7 @@ namespace CommonControls.PackFileBrowser
 
                 if (hasValidExtention)
                 {
-                    if(expression.IsMatch(file.Name))
+                    if (expression.IsMatch(file.Name))
                     {
                         file.IsVisible = true;
                         return true;
@@ -148,7 +152,7 @@ namespace CommonControls.PackFileBrowser
             foreach (var child in file.Children)
             {
                 if (HasChildWithFilterMatch(child, expression))
-                    hasChildMatch = true; 
+                    hasChildMatch = true;
             }
 
             file.IsVisible = hasChildMatch;

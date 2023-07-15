@@ -5,7 +5,6 @@ using Audio.FileFormats.WWise.Bkhd;
 using Audio.FileFormats.WWise.Hirc;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
 using CommunityToolkit.Diagnostics;
 using System.IO;
 using System.Linq;

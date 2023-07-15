@@ -1,21 +1,22 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes;
-using CommonControls.FileTypes.RigidModel.Transforms;
-using CommonControls.FileTypes.RigidModel.Types;
-using Filetypes.ByteParsing;
-using Microsoft.Xna.Framework;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using CommonControls.FileTypes.RigidModel.Transforms;
+using CommonControls.FileTypes.RigidModel.Types;
+using Filetypes.ByteParsing;
+using Microsoft.Xna.Framework;
 
 namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 {
     public class WeightedMaterial : IMaterial
     {
-        //public UiVertexFormat VertexType { get; set; } = UiVertexFormat.Unknown;
         public VertexFormat BinaryVertexFormat { get; set; } = VertexFormat.Unknown;
 
         public Vector3 PivotPoint { get; set; }
@@ -54,8 +55,8 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                 Filters = Filters,
                 OriginalTransform = OriginalTransform,
 
-                AttachmentPointParams = AttachmentPointParams.Select(x => ObjectHelper.DeepClone(x)).ToList(),
-                TexturesParams = TexturesParams.Select(x => ObjectHelper.DeepClone(x)).ToList(),
+                AttachmentPointParams = AttachmentPointParams.Select(x => x.Clone()).ToList(),
+                TexturesParams = TexturesParams.Select(x => x.Clone()).ToList(),
                 StringParams = StringParams.Select(x => x).ToList(),
                 FloatParams = FloatParams.Select(x => x).ToList(),
                 IntParams = IntParams.Select(x => x).ToList(),
@@ -93,7 +94,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                 stringParamSize +
                 // Variable + index
                 (4 * FloatParams.Count) + (4 * FloatParams.Count) +
-                (4 * IntParams.Count) + (4  * IntParams.Count) +
+                (4 * IntParams.Count) + (4 * IntParams.Count) +
                 (4 * 4 * Vec4Params.Count) + (Vec4Params.Count * 4));
 
             return headerDataSize;
@@ -188,12 +189,12 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 
                 MaterialId = materialId,
                 BinaryVertexFormat = (VertexFormat)Header._vertexType,
-                ModelName = Util.SanatizeFixedString(Encoding.ASCII.GetString(Header._modelName)),
-                Filters = Util.SanatizeFixedString(Encoding.ASCII.GetString(Header.Filters)),
+                ModelName = StringSanitizer.FixedString(Encoding.ASCII.GetString(Header._modelName)),
+                Filters = StringSanitizer.FixedString(Encoding.ASCII.GetString(Header.Filters)),
                 MatrixIndex = Header.MatrixIndex,
                 ParentMatrixIndex = Header.ParentMatrixIndex,
                 PivotPoint = Header.Transform.Pivot.ToVector3(),
-                TextureDirectory = Util.SanatizeFixedString(Encoding.ASCII.GetString(Header._textureDir)),
+                TextureDirectory = StringSanitizer.FixedString(Encoding.ASCII.GetString(Header._textureDir)),
                 OriginalTransform = Header.Transform,
             };
 
@@ -223,15 +224,14 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
                 AttachmentPointParams = new List<RmvAttachmentPoint>(),
                 TexturesParams = new List<RmvTexture>(),
                 AlphaMode = AlphaMode.Transparent, /// Alpha mode - assume that users want transpencey mode enabled by default
-            };                   
+            };
 
             return material;
         }
 
         public byte[] Save(IMaterial material)
         {
-            var typedMaterial = material as WeightedMaterial;
-            if (typedMaterial == null)
+            if (material is not WeightedMaterial typedMaterial)
                 throw new Exception("Incorrect material provided for WeightedMaterial::Save");
 
             // Create the header
@@ -282,7 +282,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
             }
 
             // Update alpha value in param list
-            if(typedMaterial.IntParams.Count != 0)
+            if (typedMaterial.IntParams.Count != 0)
                 typedMaterial.IntParams[0] = (int)material.AlphaMode;
 
             for (var intIndex = 0; intIndex < typedMaterial.IntParams.Count; intIndex++)

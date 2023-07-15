@@ -1,11 +1,11 @@
-﻿using Audio.FileFormats.WWise.Hirc.V136;
-using Audio.FileFormats.WWise;
+﻿using Audio.FileFormats.WWise;
+using Audio.FileFormats.WWise.Hirc.V136;
 using CommonControls.Services;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
 using CommunityToolkit.Diagnostics;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
@@ -13,7 +13,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
     {
         public string GameName => CompilerConstants.Game_Warhammer3;
         public Type AudioProjectType => typeof(GameSound);
- 
+
         private readonly PackFileService _pfs;
 
         public SoundGenerator(PackFileService pfs)

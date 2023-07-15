@@ -6,17 +6,19 @@ using Audio.Presentation.AudioExplorer;
 using Audio.Presentation.Compiler;
 using Audio.Storage;
 using Audio.Utility;
+using CommonControls;
 using CommonControls.Common;
 using CommonControls.Services;
+using CommonControls.Services.ToolCreation;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using System.Linq;
 
 namespace Audio
 {
-    public class AudioEditor_DependencyInjectionContainer
+    public class AudioEditor_DependencyInjectionContainer : DependencyContainer
     {
-        public static void Register(IServiceCollection serviceCollection)
+        public override void Register(IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<VgStreamWrapper>();
 
@@ -28,7 +30,7 @@ namespace Audio
 
             serviceCollection.AddScoped<RepositoryProvider, CreateRepositoryFromAllPackFiles>();
             serviceCollection.AddScoped<IAudioRepository, AudioRepository>();
-            
+
             serviceCollection.AddTransient<WWiseBnkLoader>();
             serviceCollection.AddTransient<WWiseNameLoader>();
             serviceCollection.AddTransient<Bnkparser>();
@@ -49,7 +51,7 @@ namespace Audio
             serviceCollection.AddScoped<ResultHandler>();
         }
 
-        public static void RegisterTools(IToolFactory factory)
+        public override void RegisterTools(IToolFactory factory)
         {
             factory.RegisterTool<AudioEditorViewModel, AudioEditorMainView>();
             factory.RegisterTool<CompilerViewModel, CompilerView>();// ( new ExtentionToTool( EditorEnums.AudioCompiler_Editor,  new[] { ".audio_json"}));
@@ -61,7 +63,7 @@ namespace Audio
         public static void CreateOvnCompilerProject(PackFileService pfs)
         {
             PackFileUtil.LoadFilesFromDisk(pfs, new PackFileUtil.FileRef(packFilePath: @"audioprojects", systemPath: @"C:\Users\ole_k\source\repos\TheAssetEditor\AudioResearch\Data\OvnExample\ProjectSimple.json"));
-            
+
             // Load all wems
             var wemReferences = Directory.GetFiles(@"D:\Research\Audio\Working pack\audio_ovn\wwise\english(uk)")
                 .Where(x => Path.GetExtension(x) == ".wem")
@@ -71,7 +73,7 @@ namespace Audio
         }
     }
 
-        
+
 
 }
 

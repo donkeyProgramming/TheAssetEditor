@@ -1,6 +1,5 @@
-﻿using Common;
-using CommonControls.Common;
-using CommonControls.Events;
+﻿using CommonControls.Common;
+using Monogame.WpfInterop.Common;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -14,7 +13,7 @@ namespace View3D.Components.Component
         public bool IsMutation { get; internal set; }
     }
 
-    public class CommandStackUndoEvent 
+    public class CommandStackUndoEvent
     {
         public string HintText { get; set; }
     }
@@ -25,7 +24,7 @@ namespace View3D.Components.Component
         private readonly Stack<ICommand> _commands = new Stack<ICommand>();
         private readonly EventHub _eventHub;
 
-        public CommandExecutor(EventHub eventHub) 
+        public CommandExecutor(EventHub eventHub)
         {
             _eventHub = eventHub;
         }
@@ -34,9 +33,9 @@ namespace View3D.Components.Component
         {
             if (command == null)
                 throw new ArgumentNullException("Command is null");
-            if(isUndoable)
+            if (isUndoable)
                 _commands.Push(command);
- 
+
             _logger.Here().Information($"Executing {command.GetType().Name}");
             try
             {
@@ -49,7 +48,7 @@ namespace View3D.Components.Component
 
             if (isUndoable)
             {
-                _eventHub.Publish(new CommandStackChangedEvent() 
+                _eventHub.Publish(new CommandStackChangedEvent()
                 {
                     HintText = command.HintText,
                     IsMutation = command.IsMutation,

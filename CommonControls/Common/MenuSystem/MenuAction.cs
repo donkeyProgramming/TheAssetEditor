@@ -1,9 +1,11 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using System;
+﻿using System;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 
 namespace CommonControls.Common.MenuSystem
 {
+
+
     public class MenuAction
     {
         public Hotkey Hotkey { get; set; }
@@ -16,20 +18,24 @@ namespace CommonControls.Common.MenuSystem
         {
             if (ActionTriggeredCallback != null)
                 ActionTriggeredCallback();
-
-            _func();
+            TriggerInternal();
+     
         }
 
-        public Action ActionTriggeredCallback { get; set; }
-        Action _func { get; set; }
+        public virtual void TriggerInternal()
+        { }
 
-        public MenuAction(Action function)
+        public Action ActionTriggeredCallback { get; set; }
+
+
+        public MenuAction()
         {
-            _func = function;
             Command = new RelayCommand(TriggerAction);
         }
 
         public string _toopTipText;
+
+
         public string ToolTip
         {
             set

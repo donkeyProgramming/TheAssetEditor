@@ -1,12 +1,10 @@
 ﻿using CommonControls.Common;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Framework.WpfInterop;
 using MonoGame.Framework.WpfInterop.Input;
 using Serilog;
 using System;
-using View3D.Scene;
-using View3D.Utility;
+using View3D.Services;
 
 namespace View3D.Components.Input
 {
@@ -25,10 +23,10 @@ namespace View3D.Components.Input
         WpfMouse _wpfMouse;
 
         IGameComponent _mouseOwner;
-        public IGameComponent MouseOwner 
-        { 
-            get { return _mouseOwner; } 
-            set 
+        public IGameComponent MouseOwner
+        {
+            get { return _mouseOwner; }
+            set
             {
                 if (_mouseOwner != value)
                 {
@@ -41,10 +39,10 @@ namespace View3D.Components.Input
 
                     _mouseOwner = value;
                 }
-            } 
+            }
         }
 
-        public MouseComponent(MainScene game) 
+        public MouseComponent(GameWorld game)
         {
             _wpfMouse = new WpfMouse(game);
             _wpfMouse.CaptureMouseWithin = true;
@@ -102,7 +100,7 @@ namespace View3D.Components.Input
                 case MouseButton.Left:
                     return _currentMouseState.LeftButton == ButtonState.Pressed && _lastMousesState.LeftButton == ButtonState.Released;
                 case MouseButton.Right:
-                    return _currentMouseState.RightButton == ButtonState.Pressed && _lastMousesState.RightButton == ButtonState.Released; 
+                    return _currentMouseState.RightButton == ButtonState.Pressed && _lastMousesState.RightButton == ButtonState.Released;
             }
 
             throw new NotImplementedException("trying to use a mouse button which is not added");

@@ -68,7 +68,7 @@ namespace Audio.Storage
             foreach (var item in wwiseIdFiles)
             {
                 var data = Encoding.UTF8.GetString(item.DataSource.ReadData());
-                data =data.Replace("\r", "");
+                data = data.Replace("\r", "");
                 var splitData = data.Split("\n");
                 AddNames(splitData);
             }
@@ -107,7 +107,7 @@ namespace Audio.Storage
             {
                 return DatFileParser.Parse(datFile, false);
             }
-            catch 
+            catch
             {
                 return DatFileParser.Parse(datFile, true);
             }

@@ -1,19 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CommonControls.Common;
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using CommonControls.Common;
-using KitbasherEditor.ViewModels;
 
 namespace AssetEditor.Views
 {
@@ -52,7 +41,7 @@ namespace AssetEditor.Views
                     draggedItem = item.DataContext as IEditorViewModel;
                 }
             }
-            catch (Exception)
+            catch
             {
             }
         }
@@ -79,7 +68,7 @@ namespace AssetEditor.Views
                     draggedItem = null;
                 }
             }
-            catch (Exception)
+            catch
             {
             }
         }
@@ -90,7 +79,7 @@ namespace AssetEditor.Views
             {
                 var dropTargetItem = sender as TabItem;
                 var pos = e.GetPosition(dropTargetItem);
-                bool insertAfterTargetNode = pos.X-dropTargetItem.ActualWidth/2 > 0;
+                bool insertAfterTargetNode = pos.X - dropTargetItem.ActualWidth / 2 > 0;
 
                 if (DataContext is IDropTarget<IEditorViewModel, bool> dropContainer)
                 {
@@ -109,7 +98,7 @@ namespace AssetEditor.Views
                     }
                 }
             }
-            catch (Exception exception)
+            catch
             {
             }
         }

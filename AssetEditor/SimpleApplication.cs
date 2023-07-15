@@ -1,9 +1,8 @@
-﻿using AssetEditor;
-using CommonControls.Services;
+﻿using CommonControls.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace AudioResearch
+namespace AssetEditor
 {
     public class SimpleApplication : IDisposable
     {
@@ -12,8 +11,9 @@ namespace AudioResearch
 
         public SimpleApplication(bool loadAllCaFiles = true)
         {
-            var applicationBuilder = new DependencyInjectionConfig();
-            _serviceScope = applicationBuilder.ServiceProvider.CreateScope();
+            var serviceProvider = new DependencyInjectionConfig()
+                  .Build();
+            _serviceScope = serviceProvider.CreateScope();
 
             // Configure based on settings
             var settingsService = _serviceScope.ServiceProvider.GetService<ApplicationSettingsService>();

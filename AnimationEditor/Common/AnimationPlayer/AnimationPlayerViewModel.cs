@@ -9,7 +9,7 @@ namespace AnimationEditor.Common.AnimationPlayer
 {
     public class AnimationPlayerViewModel : NotifyPropertyChangedImpl
     {
-     
+
         ILogger _logger = Logging.Create<AnimationPlayerViewModel>();
 
         float _selectedAnimationCurrentTime = 0;
@@ -65,7 +65,7 @@ namespace AnimationEditor.Common.AnimationPlayer
                 if (item.Player.IsPlaying)
                     Pause(item);
                 else
-                    Play(item);  
+                    Play(item);
             }
         }
 
@@ -108,8 +108,8 @@ namespace AnimationEditor.Common.AnimationPlayer
         {
             SelectedAnimationFrameCount = SelectedMainAnimation.Asset.Player.FrameCount();
             SelectedAnimationCurrentFrame = currentFrame;
-            SelectedAnimationCurrentTime = (float) SelectedMainAnimation.Asset.Player.GetTimeUs() / 1_000_000;
-            SelectedAnimationMaxTime = (float) SelectedMainAnimation.Asset.Player.GetAnimationLengthUs() / 1_000_000;
+            SelectedAnimationCurrentTime = (float)SelectedMainAnimation.Asset.Player.GetTimeUs() / 1_000_000;
+            SelectedAnimationMaxTime = (float)SelectedMainAnimation.Asset.Player.GetAnimationLengthUs() / 1_000_000;
             SelectedAnimationFps = SelectedMainAnimation.Asset.Player.GetFps();
             if (SelectedAnimationCurrentFrame == SelectedMainAnimation.Asset.Player.FrameCount())
             {

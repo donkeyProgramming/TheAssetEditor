@@ -1,24 +1,16 @@
-﻿
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using System.Collections.Generic;
+using System.Windows;
 using CommonControls.BaseDialogs;
 using CommonControls.Common;
-using CommonControls.Editors.AnimationBatchExporter;
 using CommonControls.FileTypes.AnimationPack;
+using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
+using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Windows;
-using System.Windows.Input;
-using CommunityToolkit.Mvvm.Input;
-using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
-using CommonControls.FileTypes.DB;
-using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3;
 
 namespace CommonControls.Editors.AnimationPack
 {
@@ -98,9 +90,9 @@ namespace CommonControls.Editors.AnimationPack
                 Unk = false,
 
                 AnimationRefs = new List<FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef>()
-                { 
+                {
                     new FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef()
-                    { 
+                    {
                         AnimationFile = @"animations/battle/humanoid01/sword_and_shield/stand/hu1_sws_stand_01.anim",
                         AnimationMetaFile = @"",
                         AnimationSoundMetaFile = @"" ,

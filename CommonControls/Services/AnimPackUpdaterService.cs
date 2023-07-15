@@ -1,15 +1,17 @@
-﻿using CommonControls.BaseDialogs.ErrorListDialog;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using System;
+using System.IO;
+using System.Linq;
+using CommonControls.BaseDialogs.ErrorListDialog;
 using CommonControls.Common;
 using CommonControls.Editors.AnimationPack;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.FileTypes.PackFiles.Models;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace CommonControls.Services
 {
@@ -29,7 +31,7 @@ namespace CommonControls.Services
 
             if (outputFormat != GameTypeEnum.Warhammer3)
                 throw new Exception($"{outputFormat} selected as output, only Warhammer 3 is currently supported");
-            
+
             if (existingPackVersion != GameTypeEnum.Warhammer2)
                 throw new Exception($"{outputFormat} selected as input, only Warhammer 2 is currently supported");
 
@@ -38,7 +40,7 @@ namespace CommonControls.Services
 
             if (animPacks.Length == 0)
                 throw new Exception("No animation packs found in the packfile");
-            
+
             foreach (var animPack in animPacks)
             {
                 var outputWh3AnimPack = new AnimationPackFile();

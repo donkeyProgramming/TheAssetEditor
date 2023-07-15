@@ -50,14 +50,14 @@ namespace View3D.Commands.Object
                     item.Parent.RemoveObject(item);
 
                 // Add all
-                foreach(var item in _combinedMeshes)
+                foreach (var item in _combinedMeshes)
                     item.Parent.AddObject(item);
 
                 // Select all new 
                 var currentState = _selectionManager.GetState() as ObjectSelectionState;
                 currentState.Clear();
                 currentState.ModifySelection(_combinedMeshes.Cast<ISelectable>(), false);
-                
+
             }
         }
 
@@ -66,7 +66,7 @@ namespace View3D.Commands.Object
             foreach (var item in _objectsToCombine)
                 item.Parent.AddObject(item);
 
-            foreach(var item in _combinedMeshes)
+            foreach (var item in _combinedMeshes)
                 item.Parent.RemoveObject(item);
 
             _selectionManager.SetState(_originalSelectionState);

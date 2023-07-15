@@ -1,13 +1,14 @@
 ﻿using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
-using Common;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
+using CommonControls.Services.ToolCreation;
+using Monogame.WpfInterop.Common;
 using MonoGame.Framework.WpfInterop;
 using View3D.Components;
-using View3D.Scene;
+using View3D.Services;
 
 namespace AnimationEditor.SuperView
 {
@@ -15,14 +16,20 @@ namespace AnimationEditor.SuperView
     {
         private readonly ReferenceModelSelectionViewModelBuilder _referenceModelSelectionViewModelBuilder;
 
-        public SuperViewViewModel(ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder, Editor editor, AnimationPlayerViewModel animationPlayerViewModel, EventHub eventHub, 
-            IComponentInserter componentInserter,  MainScene scene) 
-            : base(componentInserter, animationPlayerViewModel, scene)
+        public SuperViewViewModel(
+            ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder,
+            Editor editor,
+            AnimationPlayerViewModel animationPlayerViewModel,
+            EventHub eventHub,
+            IComponentInserter componentInserter,
+            GameWorld gameWorld,
+            FocusSelectableObjectService focusSelectableObjectService)
+            : base(componentInserter, animationPlayerViewModel, gameWorld, focusSelectableObjectService)
         {
             DisplayName.Value = "Super view";
             _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
             Editor = editor;
-           
+
             eventHub.Register<SceneInitializedEvent>(Initialize);
         }
 
@@ -30,7 +37,7 @@ namespace AnimationEditor.SuperView
         {
             MainModelView.Value = _referenceModelSelectionViewModelBuilder.CreateEmpty();
             ReferenceModelView.Value = _referenceModelSelectionViewModelBuilder.CreateEmpty();
-            Editor.Create(MainInput); 
+            Editor.Create(MainInput);
         }
     }
 
@@ -45,18 +52,18 @@ namespace AnimationEditor.SuperView
                 FragmentName = @"animations/animation_tables/hu1b_alarielle_staff_and_sword.frg",
                 AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("STAND")
             };
-        //editorView.MainInput = new AnimationToolInput()
-        //{
-        //    Mesh = packfileService.FindFile(@"warmachines\engines\emp_steam_tank\emp_steam_tank01.rigid_model_v2"),
-        //    FragmentName = @"animations/animation_tables/wm_steam_tank01.frg",
-        //    AnimationSlot = AnimationSlotTypeHelper.GetfromValue("STAND")
-        //};
-           //editorView.MainInput = new AnimationToolInput()
-           //{
-           //    Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\emp_state_troops_crossbowmen_ror.variantmeshdefinition"),
-           //    FragmentName = @"animations/animation_tables/hu1_empire_sword_crossbow.frg",
-           //    AnimationSlot = AnimationSlotTypeHelper.GetfromValue("FIRE_HIGH")
-           //};
+            //editorView.MainInput = new AnimationToolInput()
+            //{
+            //    Mesh = packfileService.FindFile(@"warmachines\engines\emp_steam_tank\emp_steam_tank01.rigid_model_v2"),
+            //    FragmentName = @"animations/animation_tables/wm_steam_tank01.frg",
+            //    AnimationSlot = AnimationSlotTypeHelper.GetfromValue("STAND")
+            //};
+            //editorView.MainInput = new AnimationToolInput()
+            //{
+            //    Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\emp_state_troops_crossbowmen_ror.variantmeshdefinition"),
+            //    FragmentName = @"animations/animation_tables/hu1_empire_sword_crossbow.frg",
+            //    AnimationSlot = AnimationSlotTypeHelper.GetfromValue("FIRE_HIGH")
+            //};
 
             creator.CreateEmptyEditor(editorView);
         }

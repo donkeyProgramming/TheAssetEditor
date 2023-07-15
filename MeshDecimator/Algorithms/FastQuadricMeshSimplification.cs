@@ -37,10 +37,10 @@ SOFTWARE.
 //https://github.com/sp4cerat/Fast-Quadric-Mesh-Simplification
 #endregion
 
-using System;
-using System.Collections.Generic;
 using MeshDecimator.Collections;
 using MeshDecimator.Math;
+using System;
+using System.Collections.Generic;
 
 namespace MeshDecimator.Algorithms
 {
@@ -351,8 +351,8 @@ namespace MeshDecimator.Algorithms
         #region Calculate Error
         private double VertexError(ref SymmetricMatrix q, double x, double y, double z)
         {
-            return  q.m0*x*x + 2*q.m1*x*y + 2*q.m2*x*z + 2*q.m3*x + q.m4*y*y
-                + 2*q.m5*y*z + 2*q.m6*y +     q.m7*z*z + 2*q.m8*z + q.m9;
+            return q.m0 * x * x + 2 * q.m1 * x * y + 2 * q.m2 * x * z + 2 * q.m3 * x + q.m4 * y * y
+                + 2 * q.m5 * y * z + 2 * q.m6 * y + q.m7 * z * z + 2 * q.m8 * z + q.m9;
         }
 
         private double CalculateError(ref Vertex vert0, ref Vertex vert1, out Vector3d result, out int resultIndex)

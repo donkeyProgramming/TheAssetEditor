@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MeshDecimator.Collections
+﻿namespace MeshDecimator.Collections
 {
     /// <summary>
     /// A collection of UV channels.

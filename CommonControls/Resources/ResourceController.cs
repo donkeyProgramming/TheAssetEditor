@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Text;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using System;
 using System.Windows.Media.Imaging;
 
 namespace CommonControls.Resources
@@ -60,21 +60,21 @@ namespace CommonControls.Resources
         {
             FolderIcon = BitmapToImageSource("icons8-folder-48.png");
             FileIcon = BitmapToImageSource("icons8-file-48.png");
-            CollectionIcon = BitmapToImageSource( "icons8-collectibles-48.png");
-            LockIcon = BitmapToImageSource( "icons8-lock-50.png");
-            
-            VmdIcon = BitmapToImageSource( "icons8-man-50.png");
-            Rmv2ModelIcon = BitmapToImageSource( "icons8-orthogonal-view-50.png");
-            MeshIcon = BitmapToImageSource( "icons8-mesh-50.png");
-            GroupIcon = BitmapToImageSource( "icons8-folder-50.png");
-            SkeletonIcon = BitmapToImageSource( "icons8-animated-skeleton-50.png");
+            CollectionIcon = BitmapToImageSource("icons8-collectibles-48.png");
+            LockIcon = BitmapToImageSource("icons8-lock-50.png");
+
+            VmdIcon = BitmapToImageSource("icons8-man-50.png");
+            Rmv2ModelIcon = BitmapToImageSource("icons8-orthogonal-view-50.png");
+            MeshIcon = BitmapToImageSource("icons8-mesh-50.png");
+            GroupIcon = BitmapToImageSource("icons8-folder-50.png");
+            SkeletonIcon = BitmapToImageSource("icons8-animated-skeleton-50.png");
         }
 
         static BitmapImage BitmapToImageSource(string path)
         {
             string iconsFolder = @"pack://application:,,,/CommonControls;component/Resources/Icons/";
             var totalPath = iconsFolder + path;
-            var img =  new BitmapImage(new Uri(totalPath));
+            var img = new BitmapImage(new Uri(totalPath));
             //if (img == null)
             //    throw new Exception("Unable to load image");
             return img;

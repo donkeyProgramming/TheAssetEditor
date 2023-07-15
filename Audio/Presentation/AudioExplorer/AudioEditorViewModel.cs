@@ -6,8 +6,6 @@ using Audio.Utility;
 using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
-using Microsoft.Extensions.DependencyInjection;
-using MoreLinq;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.Json;
@@ -16,8 +14,6 @@ using System.Windows;
 
 namespace Audio.Presentation.AudioExplorer
 {
-
-
     public class AudioEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
         public EventSelectionFilter EventFilter { get; set; }
@@ -43,7 +39,7 @@ namespace Audio.Presentation.AudioExplorer
         public NotifyAttr<bool> CanExportCurrrentDialogEventAsCsvAction { get; set; } = new NotifyAttr<bool>(false);
 
 
-        
+
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Explorer");
         public NotifyAttr<string> SelectedNodeText { get; set; } = new NotifyAttr<string>("");
@@ -97,10 +93,10 @@ namespace Audio.Presentation.AudioExplorer
             CanExportCurrrentDialogEventAsCsvAction.Value = _selectedNode?.Item is CAkDialogueEvent_v136;
 
             SelectedNodeText.Value = "";
-             
+
             if (selectedNode == null || selectedNode.Item == null)
                 return;
-             
+
             var hircAsString = JsonSerializer.Serialize((object)selectedNode.Item, new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter(), new WwiseJsonNumberConverterFactory(_audioRepository) }, WriteIndented = true });
             SelectedNodeText.Value = hircAsString;
 
@@ -112,8 +108,8 @@ namespace Audio.Presentation.AudioExplorer
                 SelectedNodeText.Value += "\n\nParent structure:\n";
                 foreach (var parentStruct in parentStructs)
                 {
-                    SelectedNodeText.Value += "\t"+parentStruct.Description + "\n";
-                    foreach(var graphItem in parentStruct.GraphItems) 
+                    SelectedNodeText.Value += "\t" + parentStruct.Description + "\n";
+                    foreach (var graphItem in parentStruct.GraphItems)
                         SelectedNodeText.Value += "\t\t" + graphItem.Description + "\n";
 
                     SelectedNodeText.Value += "\n";
@@ -155,7 +151,7 @@ namespace Audio.Presentation.AudioExplorer
         }
     }
 
-   
+
 
 
 }

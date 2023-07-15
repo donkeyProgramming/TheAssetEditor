@@ -1,6 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System.Windows.Media.Imaging;
 
 namespace CommonControls.Common.MenuSystem
@@ -11,7 +12,7 @@ namespace CommonControls.Common.MenuSystem
         public NotifyAttr<bool> IsVisible { get; set; } = new NotifyAttr<bool>(true);
         public BitmapImage Image { get; set; }
         public MenuAction Action { get; set; }
-        public ButtonVisabilityRule ShowRule { get; set; } = ButtonVisabilityRule.Always;
+        public ButtonVisibilityRule ShowRule { get; set; } = ButtonVisibilityRule.Always;
         public bool IsSeperator { get; set; } = false;
 
         public MenuBarButton(MenuAction action)

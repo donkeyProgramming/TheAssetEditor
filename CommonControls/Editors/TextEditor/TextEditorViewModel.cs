@@ -1,10 +1,13 @@
-﻿using CommonControls.Common;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using System.Windows;
+using System.Windows.Input;
+using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.DependencyInjection;
-using System.Windows;
-using System.Windows.Input;
 
 namespace CommonControls.Editors.TextEditor
 {
@@ -56,7 +59,7 @@ namespace CommonControls.Editors.TextEditor
 
         void SetCurrentPackFile(PackFile packedFile)
         {
-            PackFile file = packedFile ;
+            PackFile file = packedFile;
             DisplayName.Value = file.Name;
 
             byte[] data = file.DataSource.ReadData();
@@ -65,7 +68,7 @@ namespace CommonControls.Editors.TextEditor
 
         public bool Save()
         {
-            var path = _pf.GetFullPath(MainFile );
+            var path = _pf.GetFullPath(MainFile);
 
             var bytes = _converter.ToBytes(Text, path, _pf, out var error);
             if (bytes == null || error != null)
@@ -84,7 +87,7 @@ namespace CommonControls.Editors.TextEditor
                 }
             }
 
-            var res = SaveHelper.Save(_pf, path, MainFile , bytes);
+            var res = SaveHelper.Save(_pf, path, MainFile, bytes);
             if (res != null)
                 MainFile = res;
             return false;
@@ -104,11 +107,11 @@ namespace CommonControls.Editors.TextEditor
         public ICommand SaveCommand { get => _saveCommand; set => SetAndNotify(ref _saveCommand, value); }
 
         string _text;
-        public string Text 
-        { 
-            get => _text; 
-            set 
-            { 
+        public string Text
+        {
+            get => _text;
+            set
+            {
                 SetAndNotify(ref _text, value);
                 _textChanged = true;
             }
@@ -128,7 +131,7 @@ namespace CommonControls.Editors.TextEditor
         {
             TextEditor = theEditor;
             TextEditor.ClearUndoStack();
-        }   
+        }
 
         public bool HasUnsavedChanges()
         {
@@ -138,7 +141,7 @@ namespace CommonControls.Editors.TextEditor
         public void ResetChangeLog()
         {
             _textChanged = false;
-               TextEditor?.ClearUndoStack();
+            TextEditor?.ClearUndoStack();
         }
     }
 }

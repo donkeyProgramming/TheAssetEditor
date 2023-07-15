@@ -5,12 +5,12 @@ namespace View3D.Utility
     public class TimeSpanExtension
     {
         public TimeSpan TimeSpan { get; set; } = TimeSpan.Zero;
-        
+
         public const long TicksPerMicrosecond = 10;
-        
+
         internal const long MaxMicroSeconds = long.MaxValue / TicksPerMicrosecond;
         internal const long MinMicroSeconds = long.MinValue / TicksPerMicrosecond;
-        
+
         public TimeSpanExtension()
         {
         }
@@ -18,7 +18,7 @@ namespace View3D.Utility
         {
             TimeSpan = timeSpan;
         }
-        
+
         public int Microseconds => (int)((TimeSpan.Ticks / TicksPerMicrosecond) % 1000);
 
 
@@ -35,16 +35,16 @@ namespace View3D.Utility
                 // if (temp < MinMicroSeconds)
                 //     throw new OverflowException("");
 
-                return TimeSpan.Ticks / TicksPerMicrosecond + (long) Math.Round(TimeSpan.Ticks % TicksPerMicrosecond / (float) TicksPerMicrosecond);
+                return TimeSpan.Ticks / TicksPerMicrosecond + (long)Math.Round(TimeSpan.Ticks % TicksPerMicrosecond / (float)TicksPerMicrosecond);
             }
         }
-        
+
         //might be unsafe but animation clips shouldn't be too long..
         public static TimeSpanExtension FromMicroseconds(long value)
         {
             return new TimeSpanExtension(new TimeSpan(value * TicksPerMicrosecond));
         }
-        
+
 
     }
 }

@@ -1,16 +1,6 @@
-﻿using Serilog;
-using System;
-using System.Collections.Generic;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json;
-using System.Linq;
-using System.IO;
-using System.Windows;
-using System.Reflection;
-using System.Collections;
-using Microsoft.Xna.Framework;
-using CommonControls.Common;
-using CommonControls.Services;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 namespace CommonControls.FileTypes.DB
 {

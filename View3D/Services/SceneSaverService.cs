@@ -1,22 +1,22 @@
-﻿using CommonControls.Common;
+﻿using CommonControls.BaseDialogs.ErrorListDialog;
+using CommonControls.Common;
+using CommonControls.Events.Scoped;
+using CommonControls.FileTypes.RigidModel;
+using CommonControls.FileTypes.RigidModel.LodHeader;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
+using Microsoft.Xna.Framework;
+using Monogame.WpfInterop.Common;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
-using View3D.SceneNodes;
-using Microsoft.Xna.Framework;
 using View3D.Animation;
-using CommonControls.FileTypes.RigidModel.LodHeader;
-using CommonControls.FileTypes.RigidModel;
-using CommonControls.BaseDialogs.ErrorListDialog;
-using View3D.Utility;
 using View3D.Components.Component;
-using CommonControls.Events;
-using Common;
+using View3D.SceneNodes;
+using View3D.Utility;
 
 namespace View3D.Services
 {
@@ -25,11 +25,11 @@ namespace View3D.Services
         ILogger _logger = Logging.Create<SceneSaverService>();
         private readonly EventHub _eventHub;
         private readonly PackFileService _packFileService;
-        private readonly ActiveFileResolver _activeFileResolver;
+        private readonly IActiveFileResolver _activeFileResolver;
         private readonly SceneManager _sceneManager;
         private readonly ApplicationSettingsService _applicationSettingsService;
 
-        public SceneSaverService(EventHub eventHub, PackFileService packFileService, ActiveFileResolver activeFileResolver, SceneManager sceneManager, ApplicationSettingsService applicationSettingsService)
+        public SceneSaverService(EventHub eventHub, PackFileService packFileService, IActiveFileResolver activeFileResolver, SceneManager sceneManager, ApplicationSettingsService applicationSettingsService)
         {
             _eventHub = eventHub;
             _packFileService = packFileService;
@@ -38,14 +38,14 @@ namespace View3D.Services
             _applicationSettingsService = applicationSettingsService;
         }
 
-        public void Save()
+        public void Save(RmvVersionEnum rmvVersionEnum)
         {
             try
             {
                 DisplayValidateDialog();
 
                 var inputFile = _activeFileResolver.Get();
-                byte[] bytes = GetBytesToSave();
+                byte[] bytes = GetBytesToSave(rmvVersionEnum);
                 var path = _packFileService.GetFullPath(inputFile);
                 var res = SaveHelper.Save(_packFileService, path, inputFile, bytes);
                 _eventHub.Publish(new FileSavedEvent());
@@ -57,14 +57,14 @@ namespace View3D.Services
             }
         }
 
-        public void SaveAs()
+        public void SaveAs(RmvVersionEnum rmvVersionEnum)
         {
             try
             {
                 DisplayValidateDialog();
 
-                var inputFile = _activeFileResolver.Get() ;
-                byte[] bytes = GetBytesToSave();
+                var inputFile = _activeFileResolver.Get();
+                byte[] bytes = GetBytesToSave(rmvVersionEnum);
 
                 using (var browser = new SavePackFileWindow(_packFileService))
                 {
@@ -87,7 +87,7 @@ namespace View3D.Services
             }
         }
 
-        private byte[] GetBytesToSave()
+        private byte[] GetBytesToSave(RmvVersionEnum rmvVersionEnum)
         {
             var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             var isAllVisible = SceneNodeHelper.AreAllNodesVisible(mainNode);
@@ -98,7 +98,7 @@ namespace View3D.Services
                     onlySaveVisible = true;
             }
 
-            var bytes = Save(onlySaveVisible, new List<Rmv2ModelNode>() { mainNode }, mainNode.SkeletonNode.Skeleton, mainNode.SelectedOutputFormat, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
+            var bytes = Save(onlySaveVisible, new List<Rmv2ModelNode>() { mainNode }, mainNode.SkeletonNode.Skeleton, rmvVersionEnum, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
             return bytes;
         }
 
@@ -212,7 +212,7 @@ namespace View3D.Services
                 var activeSkeletonName = skeleton.SkeletonName;
                 var skeltonNames = meshes.Select(x => x.Geometry.ParentSkeletonName).Distinct().ToList();
 
-                if(skeltonNames.Count != 1)
+                if (skeltonNames.Count != 1)
                     errorList.Error("Skeleton", "Model contains meshes with multiple skeleton references. They will not animate well in game");
 
                 skeltonNames.Remove(activeSkeletonName);
@@ -232,7 +232,7 @@ namespace View3D.Services
             if (meshes.Count > 50)
                 errorList.Warning("Mesh Count", "Model contains a large amount of mehses, might cause performance issues");
 
-            if(ModelCombiner.HasPotentialCombineMeshes(meshes, out _))
+            if (ModelCombiner.HasPotentialCombineMeshes(meshes, out _))
                 errorList.Warning("Mesh", "Model contains multiple meshes that can be merged. Consider merging them for performance reasons");
 
             // Different pivots
@@ -242,8 +242,8 @@ namespace View3D.Services
 
             // Animation and Pivotpoint
             if (pivots.Count == 1 && skeleton != null)
-            { 
-                if( (pivots.First().X == 0 && pivots.First().Y == 0 && pivots.First().Z == 0) == false)
+            {
+                if ((pivots.First().X == 0 && pivots.First().Y == 0 && pivots.First().Z == 0) == false)
                     errorList.Warning("Pivot Point", "Model contains a non zero pivot point and animation, this is almost always not intended");
             }
 

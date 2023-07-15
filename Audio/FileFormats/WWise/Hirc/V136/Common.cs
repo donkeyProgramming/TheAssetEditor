@@ -29,7 +29,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             using var memStream = new MemoryStream();
             memStream.Write(ByteParsers.UInt32.EncodeValue((uint)ChildIdList.Count, out _));
 
-            foreach(var child in ChildIdList)
+            foreach (var child in ChildIdList)
                 memStream.Write(ByteParsers.UInt32.EncodeValue(child, out _));
 
             var byteArray = memStream.ToArray();
@@ -136,7 +136,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             {
                 AkPropBundle0 = new AkPropBundle()
                 {
-                    Values = new List<AkPropBundle.AkPropBundleInstance>() 
+                    Values = new List<AkPropBundle.AkPropBundleInstance>()
                     {
                         new AkPropBundle.AkPropBundleInstance(){Type = AkPropBundleType.StatePropNum_Priority, Value = 100},
                         new AkPropBundle.AkPropBundleInstance(){Type = AkPropBundleType.UserAuxSendVolume0, Value = -96},

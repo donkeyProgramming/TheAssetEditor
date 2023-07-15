@@ -1,32 +1,32 @@
 ﻿using AnimationEditor.AnimationTransferTool;
 using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.MountAnimationCreator;
-using AnimationEditor.PropCreator.ViewModels;
+using AnimationEditor.SkeletonEditor;
 using AnimationEditor.SuperView;
+using AssetEditor.Report;
+using AssetEditor.UiCommands;
 using AssetEditor.Views.Settings;
+using Audio.Presentation.AudioExplorer;
+using Audio.Presentation.Compiler;
 using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using CommonControls.Editors.AnimationBatchExporter;
+using CommonControls.Editors.AnimationPack;
+using CommonControls.Events.UiCommands;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.WindowsAPICodePack.Dialogs;
 using Serilog;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Windows;
-using System.Windows.Input;
-using CommunityToolkit.Mvvm.Input;
-using AnimationEditor.SkeletonEditor;
-using AssetEditor.Report;
-using CommonControls.Editors.AnimationPack;
-using System.Reflection;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
-using Audio.Presentation.AudioExplorer;
-using Audio.Presentation.Compiler;
+using System.Windows.Forms;
+using System.Windows.Input;
 using AnimationEditor.AnimationKeyframeEditor;
 
 namespace AssetEditor.ViewModels
@@ -51,10 +51,9 @@ namespace AssetEditor.ViewModels
         private readonly GameInformationFactory _gameInformationFactory;
         IServiceProvider _serviceProvider;
         PackFileService _packfileService;
-        IToolFactory _toolFactory;
         ApplicationSettingsService _settingsService;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        public IEditorCreator EditorCreator { get; set; }
+        private readonly IUiCommandFactory _uiCommandFactory;
 
         public ICommand OpenSettingsWindowCommand { get; set; }
         public ICommand CreateNewPackFileCommand { get; set; }
@@ -85,7 +84,7 @@ namespace AssetEditor.ViewModels
         public ICommand OpenAnimationTransferToolCommand { get; set; }
         public ICommand OpenSuperViewToolCommand { get; set; }
         public ICommand OpenTechSkeletonEditorCommand { get; set; }
-     
+
         public ICommand GenerateRmv2ReportCommand { get; set; }
         public ICommand GenerateMetaDataReportCommand { get; set; }
         public ICommand GenerateFileListReportCommand { get; set; }
@@ -101,16 +100,22 @@ namespace AssetEditor.ViewModels
         public ICommand OpenSkragTutorialCommand { get; set; }
         public ICommand OpenTzarGuardTutorialCommand { get; set; }
         public ICommand OpenKostalynTutorialCommand { get; set; }
-        
+
         public ObservableCollection<RecentPackFileItem> RecentPackFiles { get; set; } = new ObservableCollection<RecentPackFileItem>();
 
-        public MenuBarViewModel(GameInformationFactory gameInformationFactory, IServiceProvider provider, PackFileService packfileService, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, IToolFactory toolFactory, ApplicationSettingsService settingsService)
+        public MenuBarViewModel(
+            GameInformationFactory gameInformationFactory,
+            IServiceProvider provider,
+            PackFileService packfileService,
+            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
+            ApplicationSettingsService settingsService,
+            IUiCommandFactory uiCommandFactory)
         {
             _gameInformationFactory = gameInformationFactory;
             _serviceProvider = provider;
             _packfileService = packfileService;
-            _toolFactory = toolFactory;
             _settingsService = settingsService;
+            _uiCommandFactory = uiCommandFactory;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
 
             OpenSettingsWindowCommand = new RelayCommand(ShowSettingsDialog);
@@ -135,7 +140,7 @@ namespace AssetEditor.ViewModels
             GenerateMetaDataReportCommand = new RelayCommand(GenerateMetaDataReport);
             GenerateFileListReportCommand = new RelayCommand(GenerateFileListReport);
             GenerateMetaDataJsonsReportCommand = new RelayCommand(GenerateMetaDataJsonsReport);
-            
+
             SearchCommand = new RelayCommand(Search);
 
             OpenAttilaPacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Attila));
@@ -145,7 +150,7 @@ namespace AssetEditor.ViewModels
             OpenWarhammer3PacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Warhammer3));
             OpenTroyPacksCommand = new RelayCommand(() => OpenGamePacks(GameTypeEnum.Troy));
 
-            OpenAnimatedPropTutorialCommand =  new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://www.youtube.com/watch?v=b68hSHZ5raY") { CreateNoWindow = true }));
+            OpenAnimatedPropTutorialCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://www.youtube.com/watch?v=b68hSHZ5raY") { CreateNoWindow = true }));
             OpenAssetEdBasic0TutorialCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://www.youtube.com/watch?v=iVjAVEn8jYc") { CreateNoWindow = true }));
             OpenAssetEdBasic1TutorialCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://www.youtube.com/watch?v=7HN4oA2LsFM") { CreateNoWindow = true }));
             OpenSkragTutorialCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://www.youtube.com/watch?v=MhvbZfNp8Qw") { CreateNoWindow = true }));
@@ -178,7 +183,7 @@ namespace AssetEditor.ViewModels
                 () =>
                 {
                     if (_packfileService.Load(path, true) == null)
-                        MessageBox.Show($"Unable to load packfiles {path}");
+                        System.Windows.MessageBox.Show($"Unable to load packfiles {path}");
                 }
             ));
             foreach (var menuItem in menuItemViewModels.Reverse())
@@ -189,13 +194,16 @@ namespace AssetEditor.ViewModels
 
         void OpenPackFile()
         {
-            var dialog = new CommonOpenFileDialog();
-            dialog.Filters.Add(new CommonFileDialogFilter("Pack", ".pack"));
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            var dialog = new OpenFileDialog()
+            {
+                Filter = "Pack files (*.pack)|*.pack|All files (*.*)|*.*"
+            };
+
+            if (dialog.ShowDialog() == DialogResult.OK)
             {
                 _logger.Here().Information($"Loading pack file {dialog.FileName}");
-                 if( _packfileService.Load(dialog.FileName, true) == null)
-                    MessageBox.Show($"Unable to load packfiles {dialog.FileName}");
+                if (_packfileService.Load(dialog.FileName, true) == null)
+                    System.Windows.MessageBox.Show($"Unable to load packfiles {dialog.FileName}");
             }
         }
 
@@ -206,7 +214,7 @@ namespace AssetEditor.ViewModels
             var gamePath = settings.GameDirectories.FirstOrDefault(x => x.Game == game);
             if (gamePath == null || string.IsNullOrWhiteSpace(gamePath.Path))
             {
-                MessageBox.Show("No path provided for game");
+                System.Windows.MessageBox.Show("No path provided for game");
                 return;
             }
             using (new WaitCursor())
@@ -249,41 +257,13 @@ namespace AssetEditor.ViewModels
         }
 
 
-        void OpenMountCreator()
-        {
-            var editorView = _toolFactory.Create<MountAnimationCreatorViewModel>();
-            EditorCreator.CreateEmptyEditor(editorView);
-        }
-
-        void OpenCampaignAnimCreatorEditor()
-        {
-            var editorView = _toolFactory.Create<CampaignAnimationCreatorViewModel>();
-            EditorCreator.CreateEmptyEditor(editorView);
-        }
-
-        void OpenAnimationTransferTool()
-        {
-            var editorView = _toolFactory.Create<AnimationTransferToolViewModel>();
-            EditorCreator.CreateEmptyEditor(editorView);
-        }
-
-        void OpenSuperViewTool()
-        {
-            var editorView = _toolFactory.Create<SuperViewViewModel>();
-            EditorCreator.CreateEmptyEditor(editorView);
-        }
-
-        private void OpenAudioEditor()
-        {
-            var editorView = _toolFactory.Create<AudioEditorViewModel>();
-            EditorCreator.CreateEmptyEditor(editorView);
-        }
-
-        private void CompileAudioProjects()
-        {
-            var editorView = _toolFactory.Create<CompilerViewModel>();
-            EditorCreator.CreateEmptyEditor(editorView);
-        }
+        void OpenMountCreator() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<MountAnimationCreatorViewModel>();
+        void OpenCampaignAnimCreatorEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<CampaignAnimationCreatorViewModel>();
+        void OpenAnimationTransferTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<AnimationTransferToolViewModel>();
+        void OpenSuperViewTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<SuperViewViewModel>();
+        void OpenAudioEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioEditorViewModel>();
+        void CompileAudioProjects() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<CompilerViewModel>();
+        void OpenTechSkeletonEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<SkeletonEditorViewModel>();
 
         private void CreateExampleAudioProject()
         {
@@ -299,11 +279,7 @@ namespace AssetEditor.ViewModels
             _packfileService.AddFileToPack(pack, "AudioProjects", new PackFile("AudioCompilerExample.json", new MemorySource(byteArray)));
         }
 
-        void OpenTechSkeletonEditor()
-        {
-            var editorView = _toolFactory.Create<SkeletonEditorViewModel>();
-            EditorCreator.CreateEmptyEditor(editorView);
-        }
+
 
         void OpenAnimationBatchExporter() => AnimationBatchExportViewModel.ShowWindow(_packfileService, _skeletonAnimationLookUpHelper);
 
@@ -324,9 +300,8 @@ namespace AssetEditor.ViewModels
         void GenerateMetaDataReport() => AnimMetaDataReportGenerator.Generate(_packfileService, _settingsService, _gameInformationFactory);
 
         void GenerateFileListReport() => FileListReportGenerator.Generate(_packfileService, _settingsService, _gameInformationFactory);
-        
-        void GenerateMetaDataJsonsReport() => AnimMetaDataJsonsGenerator.Generate(_packfileService, _settingsService, _gameInformationFactory);
 
+        void GenerateMetaDataJsonsReport() => AnimMetaDataJsonsGenerator.Generate(_packfileService, _settingsService, _gameInformationFactory);
 
         void Search()
         {
@@ -335,7 +310,7 @@ namespace AssetEditor.ViewModels
             {
                 if (string.IsNullOrWhiteSpace(window.TextValue))
                 {
-                    MessageBox.Show("Invalid input");
+                    System.Windows.MessageBox.Show("Invalid input");
                     return;
                 }
                 _packfileService.DeepSearch(window.TextValue, false);

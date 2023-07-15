@@ -1,13 +1,17 @@
-using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
-using CommunityToolkit.Mvvm.Input;
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
+using CommonControls.Common;
+using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.Services;
+using CommunityToolkit.Mvvm.Input;
 
 namespace CommonControls.PackFileBrowser
 {
@@ -63,7 +67,7 @@ namespace CommonControls.PackFileBrowser
                 if (ignoreCaFiles)
                     loadFile = !item.IsCaPackFile;
 
-                if(loadFile)
+                if (loadFile)
                     ReloadTree(item);
             }
         }
@@ -125,7 +129,7 @@ namespace CommonControls.PackFileBrowser
             Filter.FilterText = "";
         }
 
-        protected virtual void OnDoubleClick(TreeNode node) 
+        protected virtual void OnDoubleClick(TreeNode node)
         {
             // using command parmeter to get node causes memory leaks, using selected node for now
             if (SelectedItem != null)
@@ -172,7 +176,7 @@ namespace CommonControls.PackFileBrowser
                 else
                 {
                     var directory = fullPath.Substring(0, directoryEnd);
-                    var folder = GetNodeFromPath(root, container,directory);
+                    var folder = GetNodeFromPath(root, container, directory);
                     newNode = new TreeNode(fileName, NodeType.File, container, folder, item);
 
                     // remove any existing files with same name
@@ -260,13 +264,13 @@ namespace CommonControls.PackFileBrowser
         private void ReloadTree(PackFileContainer container)
         {
             var existingNode = Files.FirstOrDefault(x => x.FileOwner == container);
-            if(existingNode != null)
+            if (existingNode != null)
                 Files.Remove(existingNode);
 
             var root = new TreeNode(container.Name, NodeType.Root, container, null);
             root.IsMainEditabelPack = _packFileService.GetEditablePack() == container;
             var directoryMap = new Dictionary<string, TreeNode>();
-           
+
             foreach (var item in container.FileList)
             {
                 var fullPath = item.Key;

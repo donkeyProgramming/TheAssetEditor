@@ -30,7 +30,6 @@ namespace View3D.Animation
         }
 
         public List<BoneKeyFrame> BoneTransforms = new List<BoneKeyFrame>();
-        
 
 
         public Matrix GetSkeletonAnimatedWorld(GameSkeleton gameSkeleton, int boneIndex)
@@ -78,10 +77,10 @@ namespace View3D.Animation
             int frame = (int)(timeUs / _animationClip.MicrosecondsPerFrame);
             return MathUtil.EnsureRange(frame, 0, FrameCount() - 1);
         }
-        
+
         private long FrameToStartTimeUs(int frame)
         {
-            return _animationClip.MicrosecondsPerFrame <= 0 ? 0 : MathUtil.EnsureRange( _animationClip.MicrosecondsPerFrame * frame, 0L, GetAnimationLengthUs() - _animationClip.MicrosecondsPerFrame);
+            return _animationClip.MicrosecondsPerFrame <= 0 ? 0 : MathUtil.EnsureRange(_animationClip.MicrosecondsPerFrame * frame, 0L, GetAnimationLengthUs() - _animationClip.MicrosecondsPerFrame);
         }
 
         public int CurrentFrame
@@ -94,7 +93,7 @@ namespace View3D.Animation
 
                 if (_animationClip != null)
                 {
-                    int frameIndex = MathUtil.EnsureRange(value, 0, FrameCount() -1);
+                    int frameIndex = MathUtil.EnsureRange(value, 0, FrameCount() - 1);
                     long timeInUs = FrameToStartTimeUs(frameIndex);
                     _timeSinceStart = TimeSpanExtension.FromMicroseconds(timeInUs);
                     OnFrameChanged?.Invoke(CurrentFrame);
@@ -110,7 +109,7 @@ namespace View3D.Animation
         public void SetAnimation(AnimationClip animation, GameSkeleton skeleton, bool allowAnimationsFromDifferentSkeletons = false)
         {
             if (allowAnimationsFromDifferentSkeletons == false && (animation != null && _skeleton != null))
-            { 
+            {
                 if (animation.AnimationBoneCount != skeleton.BoneCount)
                     throw new Exception("This animation does not work for this skeleton!");
             }
@@ -162,7 +161,7 @@ namespace View3D.Animation
                 float sampleT = 0;
                 long animationLengthUs = GetAnimationLengthUs();
                 if (animationLengthUs != 0)
-                    sampleT = (float) _timeSinceStart.TotalMicrosecondsAsLong / animationLengthUs;
+                    sampleT = (float)_timeSinceStart.TotalMicrosecondsAsLong / animationLengthUs;
                 _currentAnimFrame = AnimationSampler.Sample(sampleT, _skeleton, _animationClip, AnimationRules);
                 _skeleton?.Update();
             }
@@ -176,8 +175,8 @@ namespace View3D.Animation
         public void Play() { IsPlaying = true; IsEnabled = true; }
 
         public void Pause() { IsPlaying = false; }
-        public void Stop() 
-        { 
+        public void Stop()
+        {
             IsPlaying = false;
             _currentAnimFrame = null;
             IsEnabled = false;

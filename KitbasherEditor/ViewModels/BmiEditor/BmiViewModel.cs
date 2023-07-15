@@ -40,7 +40,7 @@ namespace KitbasherEditor.ViewModels.BmiEditor
             set { SetAndNotify(ref _scaleFactor, value); }
         }
 
-        public BmiViewModel(GameSkeleton skeleton, Rmv2MeshNode meshNode,  CommandFactory commandFactory)
+        public BmiViewModel(GameSkeleton skeleton, Rmv2MeshNode meshNode, CommandFactory commandFactory)
         {
             _commandFactory = commandFactory;
             _meshNode = meshNode;
@@ -232,7 +232,7 @@ namespace KitbasherEditor.ViewModels.BmiEditor
 
         static void RecusrivlyBuildMappingList(SkeletonBoneNode bone, List<int> output)
         {
-            if(bone.IsChecked)
+            if (bone.IsChecked)
                 output.Add(bone.BoneIndex);
             foreach (var child in bone.Children)
                 RecusrivlyBuildMappingList(child, output);

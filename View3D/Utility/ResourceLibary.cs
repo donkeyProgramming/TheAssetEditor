@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using View3D.Components;
-using View3D.Scene;
+using View3D.Services;
 
 namespace View3D.Utility
 {
@@ -33,18 +33,18 @@ namespace View3D.Utility
 
         PackFileService Pfs { get; set; }
         ContentManager Content { get; set; }
-        public SpriteBatch CommonSpriteBatch{ get; private set; }
+        public SpriteBatch CommonSpriteBatch { get; private set; }
         public SpriteFont DefaultFont { get; private set; }
 
         public TextureCube PbrDiffuse { get; private set; }
         public TextureCube PbrSpecular { get; private set; }
         public Texture2D PbrLut { get; private set; }
 
-        MainScene _scene;
-        public ResourceLibary(MainScene mainScene, PackFileService pf) 
+        GameWorld _gameWorld;
+        public ResourceLibary(GameWorld mainScene, PackFileService pf)
         {
             Pfs = pf;
-            _scene = mainScene;
+            _gameWorld = mainScene;
         }
 
         public SpriteFont LoadFont(string path)
@@ -54,7 +54,7 @@ namespace View3D.Utility
 
         public override void Initialize()
         {
-            Content = _scene.Content;
+            Content = _gameWorld.Content;
 
             // Load default shaders
             LoadEffect("Shaders\\Phazer\\MetalRoughness_main", ShaderTypes.Pbs_MetalRough);
@@ -64,13 +64,13 @@ namespace View3D.Utility
             LoadEffect("Shaders\\LineShader", ShaderTypes.Line);
 
             DefaultFont = LoadFont("Fonts//DefaultFont");
-            CommonSpriteBatch = new SpriteBatch(_scene.GraphicsDevice);
+            CommonSpriteBatch = new SpriteBatch(_gameWorld.GraphicsDevice);
 
             //PbrSpecular= LoadTexture(@"C:\Users\ole_k\Downloads\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512.dds", false, true);
             //PbrDiffuse  = LoadTexture(@"C:\Users\ole_k\Downloads\DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128.dds", false, true);
 
             PbrDiffuse = Content.Load<TextureCube>("textures\\phazer\\DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128");
-            PbrSpecular = Content.Load<TextureCube>("textures\\phazer\\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512");  
+            PbrSpecular = Content.Load<TextureCube>("textures\\phazer\\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512");
             PbrLut = Content.Load<Texture2D>("textures\\phazer\\Brdf_rgba32f_raw");
         }
 
@@ -83,7 +83,7 @@ namespace View3D.Utility
                     return _textureMap[fileName];
             }
 
-            var texture = LoadTextureAsTexture2d(fileName, _scene.GraphicsDevice, new ImageInformation(), fromFile);
+            var texture = LoadTextureAsTexture2d(fileName, _gameWorld.GraphicsDevice, new ImageInformation(), fromFile);
             if (texture != null)
                 _textureMap[fileName] = texture;
             return texture;
@@ -92,7 +92,7 @@ namespace View3D.Utility
         public Texture2D ForceLoadImage(string fileName, out ImageInformation imageInfo, bool fromFile = false)
         {
             imageInfo = new ImageInformation();
-            return LoadTextureAsTexture2d(fileName, _scene.GraphicsDevice, imageInfo, fromFile);
+            return LoadTextureAsTexture2d(fileName, _gameWorld.GraphicsDevice, imageInfo, fromFile);
         }
 
         public void SaveTexture(Texture2D texture, string path)
@@ -171,15 +171,15 @@ namespace View3D.Utility
                             }
                             catch (Exception e)
                             {
-                                _logger.Here().Error($"Error loading texture ({fileName} - with format {image.Format}, tried loading as {surfaceFormat})");
+                                _logger.Here().Error($"Error loading texture ({fileName} - with format {image.Format}, tried loading as {surfaceFormat}) - {e.Message}");
                             }
                         }
                     }
 #endif
 
-                    if(texture == null)
+                    if (texture == null)
                     {
-                        _logger.Here().Error($"Error loading texture ({fileName} - Unkown textur format {image.Format})");
+                        _logger.Here().Error($"Error loading texture ({fileName} - Unknown texture format {image.Format})");
                         return null;
                     }
 
@@ -192,7 +192,7 @@ namespace View3D.Utility
                             if (mipmap.Width > 4)
                                 texture.SetData(i + 1, null, image.Data, mipmap.DataOffset, mipmap.DataLen);
                         }
-                        catch 
+                        catch
                         {
                             _logger.Here().Warning($"Error loading Mipmap [{i}]");
                         }
@@ -257,5 +257,7 @@ namespace View3D.Utility
             CommonSpriteBatch?.Dispose();
             CommonSpriteBatch = null;
         }
+
+        public SpriteBatch CreateSpriteBatch() => new SpriteBatch(_gameWorld.GraphicsDevice);
     }
 }

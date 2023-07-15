@@ -1,9 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Components.Rendering;
 using View3D.SceneNodes;

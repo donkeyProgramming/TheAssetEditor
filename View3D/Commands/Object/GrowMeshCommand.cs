@@ -1,8 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using View3D.Animation;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;

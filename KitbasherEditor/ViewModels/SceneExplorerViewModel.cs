@@ -1,6 +1,6 @@
-﻿using Common;
-using CommonControls.Common;
+﻿using CommonControls.Common;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
+using Monogame.WpfInterop.Common;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,6 +13,13 @@ using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels
 {
+
+
+    // Explorer
+    // Child view container
+    // Context menu
+
+
     public class SceneExplorerViewModel : NotifyPropertyChangedImpl
     {
         SceneManager _sceneManager;
@@ -70,27 +77,28 @@ namespace KitbasherEditor.ViewModels
                     {
                         var newItem = e.NewItems[0] as ISceneNode;
                         var newItemIndex = newItem.Parent.Children.IndexOf(newItem);
-                        var selectedWithoutNewItem = SelectedObjects.Except(new List<ISceneNode>(){newItem});
+                        var selectedWithoutNewItem = SelectedObjects.Except(new List<ISceneNode>() { newItem });
 
                         if (selectedWithoutNewItem.Any())
                         {
                             var existingSelectionIndex = selectedWithoutNewItem
                                 .Select(obj => newItem.Parent.Children.IndexOf(obj))
-                                .OrderBy(index => Math.Abs(index-newItemIndex))
+                                .OrderBy(index => Math.Abs(index - newItemIndex))
                                 .First();
 
                             var isAscending = newItemIndex < existingSelectionIndex;
                             var min = isAscending ? newItemIndex : existingSelectionIndex;
                             var max = isAscending ? existingSelectionIndex : newItemIndex;
 
-                            for (int i=min; i<max; i++)
+                            for (int i = min; i < max; i++)
                             {
                                 var element = newItem.Parent.Children.ElementAt(i);
                                 SelectedObjects.Add(element);
                             }
                         }
                     }
-                } catch {}
+                }
+                catch { }
 
                 var objectState = new ObjectSelectionState();
                 foreach (var item in SelectedObjects)
@@ -125,7 +133,7 @@ namespace KitbasherEditor.ViewModels
                 SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
                 _ignoreSelectionChanges = false;
             }
-            
+
             UpdateViewModelAndContextMenyBasedOnSelection();
         }
 
@@ -194,7 +202,7 @@ namespace KitbasherEditor.ViewModels
 
         void Handle(SelectionChangedEvent notification)
         {
-            if(_ignoreSelectionChanges == false)
+            if (_ignoreSelectionChanges == false)
                 SelectionChanged(notification.NewState);
         }
     }

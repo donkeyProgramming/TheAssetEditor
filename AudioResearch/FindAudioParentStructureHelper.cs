@@ -1,11 +1,10 @@
-﻿using Audio.FileFormats.WWise.Hirc.V136;
+﻿using Audio.AudioEditor;
+using Audio.FileFormats.WWise;
+using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
-using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Audio.FileFormats.WWise;
-using Audio.AudioEditor;
 
 namespace AudioResearch
 {
@@ -36,24 +35,24 @@ namespace AudioResearch
             }
 
             public class ParentStructure
-            { 
+            {
                 public string Description { get; set; }
                 public List<string> GraphItems { get; set; } = new List<string>();
             }
 
             class BusItem
-            { 
+            {
                 public string SourceDescription { get; set; }
                 public uint BusId { get; set; }
             }
 
             public void DebugPrint(List<ParentStructure> parentStructures)
             {
-                foreach(var  parentStructure in parentStructures) 
+                foreach (var parentStructure in parentStructures)
                 {
                     Console.WriteLine(parentStructure.Description);
-                    foreach(var item in  parentStructure.GraphItems)
-                        Console.WriteLine("\t"+ item);
+                    foreach (var item in parentStructure.GraphItems)
+                        Console.WriteLine("\t" + item);
                     Console.WriteLine();
                 }
             }
@@ -73,7 +72,7 @@ namespace AudioResearch
                     else if (node.Item is CAkLayerCntr_v136)
                         itemId = node.Item.Id;
 
-                    else if (node.Item is CAkSwitchCntr_v136 )
+                    else if (node.Item is CAkSwitchCntr_v136)
                         itemId = node.Item.Id;
 
 
@@ -89,8 +88,8 @@ namespace AudioResearch
                         if (found == true)
                             return eventName;
                         else
-                        { 
-                        
+                        {
+
                         }
 
                     }
@@ -153,46 +152,46 @@ namespace AudioResearch
 
                 GetEventNameForSound(nodes, audioRepository);
                 return output;
-                nodes.Reverse();
-
-                foreach (var node in nodes)
-                {
-                    var busInfo = "";
-                    if (node.Item is CAkActorMixer_v136 mixerInstance && mixerInstance.NodeBaseParams.OverrideBusId != 0)
-                    {
-                        busInfo = $" - With AudioBus [{mixerInstance.NodeBaseParams.OverrideBusId}]";
-                        busses.Add(new BusItem() { SourceDescription = $"{node.Item.Type}[{node.Item.Id}]", BusId = mixerInstance.NodeBaseParams.OverrideBusId });
-                    }
-
-                    else if (node.Item is CAkSound_v136 soundInstance && soundInstance.NodeBaseParams.OverrideBusId != 0)
-                    {
-                        busInfo = $" - With AudioBus [{soundInstance.NodeBaseParams.OverrideBusId}]";
-                        busses.Add(new BusItem() { SourceDescription = $"{node.Item.Type}[{node.Item.Id}]", BusId = soundInstance.NodeBaseParams.OverrideBusId });
-                    }
-
-                    else if (node.Item is CAkRanSeqCntr_v136 randInstance && randInstance.NodeBaseParams.OverrideBusId != 0)
-                    {
-                        busInfo = $" - With AudioBus [{randInstance.NodeBaseParams.OverrideBusId}]";
-                        busses.Add(new BusItem() { SourceDescription = $"{node.Item.Type}[{node.Item.Id}]", BusId = randInstance.NodeBaseParams.OverrideBusId });
-                    }
-
-                    else if (node.Item is CAkLayerCntr_v136 layerInstance && layerInstance.NodeBaseParams.OverrideBusId != 0)
-                    {
-                        busInfo = $" - With AudioBus [{layerInstance.NodeBaseParams.OverrideBusId}]";
-                        busses.Add(new BusItem() { SourceDescription = $"{node.Item.Type}[{node.Item.Id}]", BusId = layerInstance.NodeBaseParams.OverrideBusId });
-                    }
-
-                    else if (node.Item is CAkSwitchCntr_v136 switchInstance && switchInstance.NodeBaseParams.OverrideBusId != 0)
-                    {
-                        busInfo = $" - With AudioBus [{switchInstance.NodeBaseParams.OverrideBusId}]";
-                        busses.Add(new BusItem() { SourceDescription = $"{node.Item.Type}[{node.Item.Id}]", BusId = switchInstance.NodeBaseParams.OverrideBusId });
-                    }
-
-                    var str = $"{node.Item.Type}[{node.Item.Id}]{busInfo}";
-                    output.GraphItems.Add(str);
-                }
-
-                return output;
+                //nodes.Reverse();
+                //
+                //foreach (var node in nodes)
+                //{
+                //    var busInfo = "";
+                //    if (node.Item is CAkActorMixer_v136 mixerInstance && mixerInstance.NodeBaseParams.OverrideBusId != 0)
+                //    {
+                //        busInfo = $" - With AudioBus [{mixerInstance.NodeBaseParams.OverrideBusId}]";
+                //        busses.Add(new BusItem() { SourceDescription = $"{node.Item.Type}[{node.Item.Id}]", BusId = mixerInstance.NodeBaseParams.OverrideBusId });
+                //    }
+                //
+                //    else if (node.Item is CAkSound_v136 soundInstance && soundInstance.NodeBaseParams.OverrideBusId != 0)
+                //    {
+                //        busInfo = $" - With AudioBus [{soundInstance.NodeBaseParams.OverrideBusId}]";
+                //        busses.Add(new BusItem() { SourceDescription = $"{node.Item.Type}[{node.Item.Id}]", BusId = soundInstance.NodeBaseParams.OverrideBusId });
+                //    }
+                //
+                //    else if (node.Item is CAkRanSeqCntr_v136 randInstance && randInstance.NodeBaseParams.OverrideBusId != 0)
+                //    {
+                //        busInfo = $" - With AudioBus [{randInstance.NodeBaseParams.OverrideBusId}]";
+                //        busses.Add(new BusItem() { SourceDescription = $"{node.Item.Type}[{node.Item.Id}]", BusId = randInstance.NodeBaseParams.OverrideBusId });
+                //    }
+                //
+                //    else if (node.Item is CAkLayerCntr_v136 layerInstance && layerInstance.NodeBaseParams.OverrideBusId != 0)
+                //    {
+                //        busInfo = $" - With AudioBus [{layerInstance.NodeBaseParams.OverrideBusId}]";
+                //        busses.Add(new BusItem() { SourceDescription = $"{node.Item.Type}[{node.Item.Id}]", BusId = layerInstance.NodeBaseParams.OverrideBusId });
+                //    }
+                //
+                //    else if (node.Item is CAkSwitchCntr_v136 switchInstance && switchInstance.NodeBaseParams.OverrideBusId != 0)
+                //    {
+                //        busInfo = $" - With AudioBus [{switchInstance.NodeBaseParams.OverrideBusId}]";
+                //        busses.Add(new BusItem() { SourceDescription = $"{node.Item.Type}[{node.Item.Id}]", BusId = switchInstance.NodeBaseParams.OverrideBusId });
+                //    }
+                //
+                //    var str = $"{node.Item.Type}[{node.Item.Id}]{busInfo}";
+                //    output.GraphItems.Add(str);
+                //}
+                //
+                //return output;
 
 
             }
@@ -225,7 +224,7 @@ namespace AudioResearch
                         output.Last().GraphItems.Add(str);
                     }
                 }
-            
+
                 return output;
             }
 
@@ -239,7 +238,7 @@ namespace AudioResearch
 
                 //DebugPrint(output);
                 return output;
-             }
+            }
         }
     }
 }

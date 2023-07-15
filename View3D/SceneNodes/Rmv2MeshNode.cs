@@ -14,7 +14,6 @@ using View3D.Components.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.Rendering.RenderItems;
 using View3D.Rendering.Shading;
-using View3D.Services;
 using View3D.Utility;
 
 namespace View3D.SceneNodes
@@ -23,7 +22,7 @@ namespace View3D.SceneNodes
     {
         public IMaterial Material { get; set; }
         public MeshObject Geometry { get; set; }
-        public RmvCommonHeader CommonHeader{ get; set; }
+        public RmvCommonHeader CommonHeader { get; set; }
 
         Quaternion _orientation = Quaternion.Identity;
         Vector3 _position = Vector3.Zero;
@@ -45,12 +44,12 @@ namespace View3D.SceneNodes
         public override Matrix ModelMatrix { get => base.ModelMatrix; set => UpdateModelMatrix(value); }
         public PbrShader Effect { get; private set; }
         public int LodIndex { get; set; } = -1;
-        
+
 
         bool _isSelectable = true;
         public bool IsSelectable { get => _isSelectable; set => SetAndNotifyWhenChanged(ref _isSelectable, value); }
         public bool ReduceMeshOnLodGeneration { get; set; } = true;
-     
+
 
         private void UpdateModelMatrix(Matrix value)
         {
@@ -85,8 +84,8 @@ namespace View3D.SceneNodes
 
             Effect = shader;
             if (_renderEngineComponent == null)
-            { 
-            
+            {
+
             }
         }
 
@@ -184,8 +183,8 @@ namespace View3D.SceneNodes
             Effect.SetAnimationParameters(data, Geometry.WeightCount);
             Effect.SetScaleMult(ScaleMult);
             Effect.UseAnimation = AnimationPlayer.IsEnabled;
-            
-            if(AttachmentBoneResolver != null)
+
+            if (AttachmentBoneResolver != null)
                 parentWorld = parentWorld * AttachmentBoneResolver.GetWorldTransformIfAnimating();
 
             Effect.UseAlpha = Material.AlphaMode == AlphaMode.Transparent;
@@ -222,7 +221,7 @@ namespace View3D.SceneNodes
             typedTarget._componentManager = _componentManager;
             typedTarget._renderEngineComponent = _renderEngineComponent;
             //warhammer 2 compat
-            if (typedTarget.Effect != null) 
+            if (typedTarget.Effect != null)
             {
                 typedTarget.Effect = Effect.Clone() as PbrShader_MetalRoughness;
             }

@@ -1,6 +1,5 @@
 ﻿using CommonControls.Common;
 using CommonControls.Editors.BoneMapping;
-using CommonControls.FileTypes.Animation;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,7 +45,7 @@ namespace AnimationEditor.AnimationTransferTool
             ApplyAnimationScale(newAnimation, copyToSkeleton);
             ApplyBoneLengthMult(newAnimation, copyToSkeleton);
 
-           return newAnimation;
+            return newAnimation;
         }
 
 
@@ -57,8 +56,8 @@ namespace AnimationEditor.AnimationTransferTool
             {
                 for (int i = 0; i < copyToSkeleton.BoneCount; i++)
                 {
-                    var currentCopyToFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton,  newAnimation);
-                    var copyFromFrame = AnimationSampler.Sample(frameIndex, 0, copyFromSkeleton, animationToCopy );
+                    var currentCopyToFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton, newAnimation);
+                    var copyFromFrame = AnimationSampler.Sample(frameIndex, 0, copyFromSkeleton, animationToCopy);
 
                     var desiredBonePosWorld = currentCopyToFrame.GetSkeletonAnimatedWorld(copyToSkeleton, i);
 
@@ -84,7 +83,7 @@ namespace AnimationEditor.AnimationTransferTool
                         newAnimation.DynamicFrames[frameIndex].Rotation[i] = boneRotation;
                     if (boneSettings.ApplyTranslation.Value == true)
                         newAnimation.DynamicFrames[frameIndex].Position[i] = bonePosition;
-                   
+
                 }
             }
         }
@@ -134,11 +133,11 @@ namespace AnimationEditor.AnimationTransferTool
             var frameCount = animationToScale.DynamicFrames.Count;
             for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
-                var copyFromFrame = AnimationSampler.Sample(frameIndex, 0, copyFromSkeleton,  animationToCopy );
+                var copyFromFrame = AnimationSampler.Sample(frameIndex, 0, copyFromSkeleton, animationToCopy);
 
                 for (int i = 0; i < copyToSkeleton.BoneCount; i++)
                 {
-                    var currentFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton,  animationToScale );
+                    var currentFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton, animationToScale);
 
                     var boneSettings = BoneHelper.GetBoneFromId(_bones, i);
                     if (boneSettings.ForceSnapToWorld.Value == false)
@@ -174,7 +173,7 @@ namespace AnimationEditor.AnimationTransferTool
             {
                 for (int i = 0; i < copyToSkeleton.BoneCount; i++)
                 {
-                    var currentFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton, animationToScale );
+                    var currentFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton, animationToScale);
 
                     var fromParentBoneIndex = copyToSkeleton.GetParentBoneIndex(i);
                     if (fromParentBoneIndex == -1)
@@ -218,8 +217,8 @@ namespace AnimationEditor.AnimationTransferTool
 
                     var targetBoneIndex = mappedIndex.NewValue;
 
-                    var currentCopyToFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton,animationToFix );
-                    var copyFromFrame = AnimationSampler.Sample(frameIndex, 0, copyFromSkeleton,  animationToCopy );
+                    var currentCopyToFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton, animationToFix);
+                    var copyFromFrame = AnimationSampler.Sample(frameIndex, 0, copyFromSkeleton, animationToCopy);
 
 
                     // self attach - The attachment point to move | copyToSkeleton -> boneIndex i
@@ -276,7 +275,7 @@ namespace AnimationEditor.AnimationTransferTool
             var frameCount = animation.DynamicFrames.Count;
             for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
-                 animation.DynamicFrames[frameIndex].Scale[0] = new Vector3((float) _settings.Scale.Value);
+                animation.DynamicFrames[frameIndex].Scale[0] = new Vector3((float)_settings.Scale.Value);
             }
 
 
@@ -326,7 +325,7 @@ namespace AnimationEditor.AnimationTransferTool
                         }
                     }
 
-                    
+
                 }
             }
         }
@@ -351,7 +350,7 @@ namespace AnimationEditor.AnimationTransferTool
 
             for (int i = 0; i < skeleton.BoneCount; i++)
             {
-                if(newAnimation.DynamicFrames.Count != 0)
+                if (newAnimation.DynamicFrames.Count != 0)
                     newAnimation.DynamicFrames[0].Scale[0] = Vector3.One;
             }
             return newAnimation;

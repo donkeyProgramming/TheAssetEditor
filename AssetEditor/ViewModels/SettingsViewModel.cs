@@ -1,11 +1,10 @@
 ﻿using CommonControls.Common;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 
 namespace AssetEditor.ViewModels
@@ -19,7 +18,7 @@ namespace AssetEditor.ViewModels
 
         bool _UseTextEditorForUnknownFiles;
         public bool UseTextEditorForUnknownFiles { get => _UseTextEditorForUnknownFiles; set => SetAndNotify(ref _UseTextEditorForUnknownFiles, value); }
-        
+
         bool _loadCaPacksByDefault;
         public bool LoadCaPacksByDefault { get => _loadCaPacksByDefault; set => SetAndNotify(ref _loadCaPacksByDefault, value); }
 
@@ -85,7 +84,7 @@ namespace AssetEditor.ViewModels
 
     class GamePathItem : NotifyPropertyChangedImpl
     {
-        public GameTypeEnum GameType{ get; set; }
+        public GameTypeEnum GameType { get; set; }
 
         string _gameName;
         public string GameName { get => _gameName; set => SetAndNotify(ref _gameName, value); }
@@ -93,7 +92,7 @@ namespace AssetEditor.ViewModels
         string _path;
         public string Path { get => _path; set => SetAndNotify(ref _path, value); }
 
-        public ICommand BrowseCommand { get; set; } 
+        public ICommand BrowseCommand { get; set; }
 
         public GamePathItem()
         {
@@ -102,17 +101,16 @@ namespace AssetEditor.ViewModels
 
         void OnBrowse()
         {
-            var dialog = new CommonOpenFileDialog();
-            dialog.IsFolderPicker = true;
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            var dialog = new FolderBrowserDialog();
+            if (dialog.ShowDialog() == DialogResult.OK)
             {
-                Path = dialog.FileName;
+                Path = dialog.SelectedPath;
                 var files = Directory.GetFiles(Path);
                 var packFiles = files.Count(x => System.IO.Path.GetExtension(x) == ".pack");
                 var manifest = files.Count(x => x.Contains("manifest.txt"));
 
                 if (packFiles == 0 || manifest == 0)
-                    MessageBox.Show($"The selected directory contains {packFiles} packfiles and {manifest} manifest files. It is probably not a game directory");
+                    System.Windows.MessageBox.Show($"The selected directory contains {packFiles} packfiles and {manifest} manifest files. It is probably not a game directory");
             }
         }
     }

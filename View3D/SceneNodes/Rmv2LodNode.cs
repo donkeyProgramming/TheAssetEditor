@@ -1,7 +1,4 @@
-﻿using CommonControls.FileTypes.RigidModel.LodHeader;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 namespace View3D.SceneNodes
 {
@@ -14,7 +11,7 @@ namespace View3D.SceneNodes
         public bool OptimizeLod_Alpha { get; set; } = false;
         public bool OptimizeLod_Vertex { get; set; } = false;
 
-        public Rmv2LodNode(string name, int lodIndex, float? cameraDistance=null) : base(name)
+        public Rmv2LodNode(string name, int lodIndex, float? cameraDistance = null) : base(name)
         {
             LodValue = lodIndex;
             CameraDistance = cameraDistance;
@@ -39,7 +36,7 @@ namespace View3D.SceneNodes
                 }
                 else if (child is GroupNode groupNode)
                 {
-                    if ( !(onlyVisible && groupNode.IsVisible == false) )
+                    if (!(onlyVisible && groupNode.IsVisible == false))
                     {
                         foreach (var groupChild in child.Children)
                         {
@@ -108,5 +105,5 @@ namespace View3D.SceneNodes
         }
     }
 
- 
+
 }

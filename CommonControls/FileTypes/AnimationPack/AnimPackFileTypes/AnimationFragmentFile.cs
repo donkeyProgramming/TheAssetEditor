@@ -1,13 +1,17 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes.DB;
-using CommonControls.Services;
-using Filetypes.ByteParsing;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using CommonControls.Common;
+using CommonControls.FileTypes.DB;
+using CommonControls.Services;
+using Filetypes.ByteParsing;
 
 namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
 {
@@ -26,13 +30,13 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
         public int MaxSlotId { get; set; }
         public List<AnimationSetEntry> Fragments { get; set; } = new List<AnimationSetEntry>();
 
-       
+
 
         public AnimationFragmentFile() { }
         public AnimationFragmentFile(string fileName, byte[] bytes, GameTypeEnum preferedGame)
         {
             FileName = fileName;
-            if(bytes != null)
+            if (bytes != null)
                 CreateFromBytes(bytes);
         }
 
@@ -105,7 +109,7 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
             _id = data.ReadInt32();
             _slot = data.ReadInt32();
 
-            if(preferedGame == GameTypeEnum.Troy)
+            if (preferedGame == GameTypeEnum.Troy)
                 Slot = DefaultAnimationSlotTypeHelper.GetFromId(_slot);
             else
                 Slot = AnimationSlotTypeHelperTroy.GetFromId(_slot);

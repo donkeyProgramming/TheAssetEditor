@@ -29,7 +29,7 @@ namespace View3D.Commands.Object
 
         public SkinWrapRiggingCommand(SelectionManager selectionManager)
         {
-            _selectionManager = selectionManager;;
+            _selectionManager = selectionManager; ;
         }
 
         public void Execute()

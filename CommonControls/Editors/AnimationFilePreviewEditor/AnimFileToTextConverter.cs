@@ -1,12 +1,14 @@
-﻿using CommonControls.Editors.TextEditor;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using System;
+using System.Text;
+using System.Windows;
+using CommonControls.Editors.TextEditor;
 using CommonControls.FileTypes.Animation;
 using CommonControls.Services;
 using Filetypes.ByteParsing;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
 
 namespace CommonControls.Editors.AnimationFilePreviewEditor
 {
@@ -18,7 +20,7 @@ namespace CommonControls.Editors.AnimationFilePreviewEditor
             {
                 var animFile = AnimationFile.Create(new ByteChunk(bytes));
                 var output = new StringBuilder();
-                
+
                 output.AppendLine($"Header:");
                 output.AppendLine($"\t Version:{animFile.Header.Version}");
                 output.AppendLine($"\t Unknown0_alwaysOne:{animFile.Header.Unknown0_alwaysOne}");
@@ -26,14 +28,14 @@ namespace CommonControls.Editors.AnimationFilePreviewEditor
                 output.AppendLine($"\t SkeletonName:{animFile.Header.SkeletonName}");
                 output.AppendLine($"\t Unkown_V8_AlwaysSix:{animFile.Header.UnkownValue_v8}");
                 output.AppendLine($"\t FlagCount:{animFile.Header.FlagCount}");
-                for(int i = 0; i < animFile.Header.FlagVariables.Count; i++)
+                for (int i = 0; i < animFile.Header.FlagVariables.Count; i++)
                     output.AppendLine($"\t\t FlagValue[{i}]:{animFile.Header.FlagVariables[i]}");
 
                 output.AppendLine($"\t AnimationTotalPlayTimeInSec:{animFile.Header.AnimationTotalPlayTimeInSec}");
-               
+
                 output.AppendLine("");
                 output.AppendLine($"Bones:{animFile.Bones.Length}");
-                for(int i = 0; i < animFile.Bones.Length; i++)
+                for (int i = 0; i < animFile.Bones.Length; i++)
                     output.AppendLine($"\t [{i}]:{animFile.Bones[i].Name} id:{animFile.Bones[i].Id} parentId:{animFile.Bones[i].ParentId}");
 
                 output.AppendLine($"NumAnimationParts:{animFile.AnimationParts.Count}");

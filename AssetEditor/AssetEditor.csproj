@@ -1,8 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+	  <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>hnet.com-image (1).ico</ApplicationIcon>
     <AssemblyName>AssetEditor v0.45</AssemblyName>
@@ -38,6 +37,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\AnimationEditor\AnimationEditor.csproj" />
+		<ProjectReference Include="..\AssetManagment\AssetManagement.csproj" />
 		<ProjectReference Include="..\Audio\Audio.csproj" />
 		<ProjectReference Include="..\CommonControls\CommonControls.csproj" />
 		<ProjectReference Include="..\KitbasherEditor\KitbasherEditor.csproj" />

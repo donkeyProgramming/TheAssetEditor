@@ -96,7 +96,7 @@ namespace View3D.Utility
                 {
                     var combinedMesh = SceneNodeHelper.CloneNode(currentGroup.First());
                     combinedMesh.Name = currentGroup.First().Name;
-                    if(addPrefix)
+                    if (addPrefix)
                         combinedMesh.Name += "_Combined";
 
                     var newModel = currentGroup.First().Geometry.Clone();
