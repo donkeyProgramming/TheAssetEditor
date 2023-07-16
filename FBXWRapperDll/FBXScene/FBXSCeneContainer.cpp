@@ -20,6 +20,12 @@ extern "C" // not really needed but block looks nice/readable:)
 	};
 
 	FBXWRAPPERDLL_API
+	extern void GetVertexWeights(wrapdll::FBXSCeneContainer* pInstance, int meshindex, VertexWeight** VertexWeight, int* itemCount)
+	{
+		pInstance->GetVertexWeights(meshindex, VertexWeight, itemCount);
+	};
+
+	FBXWRAPPERDLL_API
 		extern char* GetMeshName(wrapdll::FBXSCeneContainer* pInstance, int meshindex)
 	{
 		return (char*)pInstance->GetMeshes()[meshindex].meshName.c_str();

@@ -35,9 +35,18 @@ struct PackedCommonVertex
 	int weightCount = 0;
 };
 
+struct VertexWeight
+{	
+	// TODO: REMOVE DEBUG VALUE(S):
+	char boneName[255] = "Unnamed_BONE\0";
+	int vertexIndex = 0;
+	float vertexWeight = 0.0f;
+};
+
 struct PackedMesh
-{
-	std::string meshName = "Unnamed_Mesh";
+{	
+	std::string meshName = "Unnamed_Mesh\0";
 	std::vector<PackedCommonVertex> vertices;
-	std::vector<uint16_t> indices;
+	std::vector<uint16_t> indices;		
+	std::vector<VertexWeight> vertexWeights;
 };
