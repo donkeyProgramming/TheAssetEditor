@@ -23,11 +23,11 @@ namespace AssetManagement.Strategies.Fbx
             */
         }
 
-        public static PackedCommonVertex[] GetPackesVertices(IntPtr fbxContainer, int meshIndex)
+        public static PackedCommonVertex[] GetPackedVertices(IntPtr fbxContainer, int meshIndex)
         {
             IntPtr pVerticesPtr = IntPtr.Zero;
             int length = 0;
-            FBXSCeneContainerDll.GetPackedVertices(fbxContainer, meshIndex, out pVerticesPtr, out length);
+            FBXSCeneContainerGetterDll.GetPackedVertices(fbxContainer, meshIndex, out pVerticesPtr, out length);
 
             if (pVerticesPtr == IntPtr.Zero || length == 0)
             {
@@ -50,7 +50,7 @@ namespace AssetManagement.Strategies.Fbx
         {
             IntPtr pIndices = IntPtr.Zero;
             int length = 0;
-            FBXSCeneContainerDll.GetIndices(fbxContainer, meshIndex, out pIndices, out length);
+            FBXSCeneContainerGetterDll.GetIndices(fbxContainer, meshIndex, out pIndices, out length);
 
             if (pIndices == IntPtr.Zero || length == 0)
                 return null;
@@ -67,9 +67,9 @@ namespace AssetManagement.Strategies.Fbx
         public static PackedMesh GetPackedMesh(IntPtr fbxContainer, int meshIndex)
         {
             var indices = GetIndices(fbxContainer, meshIndex);
-            var vertices = GetPackesVertices(fbxContainer, meshIndex);
+            var vertices = GetPackedVertices(fbxContainer, meshIndex);
 
-            IntPtr namePtr = FBXSCeneContainerDll.GetMeshName(fbxContainer, meshIndex);
+            IntPtr namePtr = FBXSCeneContainerGetterDll.GetMeshName(fbxContainer, meshIndex);
             var tempName = Marshal.PtrToStringUTF8(namePtr);
 
             if (vertices == null || indices == null || tempName == null)
@@ -88,7 +88,7 @@ namespace AssetManagement.Strategies.Fbx
 
         public static VertexWeight[] GetVertexWeights(IntPtr fbxContainer, int meshIndex)
         {
-            FBXSCeneContainerDll.GetVertexWeights(fbxContainer, meshIndex, out var vertexWeightsPtr, out var length);
+            FBXSCeneContainerGetterDll.GetVertexWeights(fbxContainer, meshIndex, out var vertexWeightsPtr, out var length);
 
             if (vertexWeightsPtr == IntPtr.Zero || length == 0)
             {
@@ -113,7 +113,7 @@ namespace AssetManagement.Strategies.Fbx
         static public List<PackedMesh> GetAllPackedMeshes(IntPtr fbxSceneContainer)
         {
             List<PackedMesh> meshList = new List<PackedMesh>();
-            var meshCount = FBXSCeneContainerDll.GetMeshCount(fbxSceneContainer);
+            var meshCount = FBXSCeneContainerGetterDll.GetMeshCount(fbxSceneContainer);
 
             for (int i = 0; i < meshCount; i++)
             {
@@ -121,6 +121,24 @@ namespace AssetManagement.Strategies.Fbx
             }
             return meshList;
         }
+
+        static public string GetSkeletonNameFromScene(IntPtr fbxSceneLoader)
+        {
+            var skeletonNamePtr = FBXSeneLoaderServiceDLL.GetSkeletonNameFromScene(fbxSceneLoader);
+
+            if (skeletonNamePtr == IntPtr.Zero)
+                return "";
+
+            string skeletonName = Marshal.PtrToStringUTF8(skeletonNamePtr);
+
+            if (skeletonName == null)
+                return "";
+
+            return skeletonName;
+
+        }
+
+
 
     }
 }

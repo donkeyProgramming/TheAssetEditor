@@ -16,10 +16,12 @@ namespace AssetManagement.Strategies.Fbx.Views.FBXSettings
             ImportButton.Click += ImportButton_Click;
         }
 
-        private void ImportButton_Click(object sender, RoutedEventArgs e)         {
+        private void ImportButton_Click(object sender, RoutedEventArgs e)     
+        {
             
             DialogResult = true;
             Close();
         }
+
     }
 }

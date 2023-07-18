@@ -1,58 +1,97 @@
 ﻿using AssetManagement.GenericFormats.Unmanaged;
 using AssetManagement.Strategies.Fbx.Views.FBXSettings;
 using CommonControls.Common;
+using AssetManagement.Strategies.Fbx.Models;
+using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace AssetManagement.Strategies.Fbx.ViewModels
 {
-    public class FBXSettingsViewModel
+    public class FBXSettingsViewModel : NotifyPropertyChangedImpl
     {
-        public FBXImportExportSettings ImportSettings { get; set; }
+        public FbxSettingsModel ImportSettings { get; set; }
 
-        public FBXSettingsViewModel(FBXImportExportSettings fbxIportSettings)
+        public FBXSettingsViewModel(FbxSettingsModel fbxImportSettingsModel)
         {
-            ImportSettings = fbxIportSettings;
+            ImportSettings = fbxImportSettingsModel;
+            SetViewData();
         }
 
         public void ImportButtonClicked() => OnImportButtonClicked();
 
         public void OnImportButtonClicked()
         {
-            FetchControlData();
+            GetViewData();
         }
 
-        public NotifyAttr<string> FileNameTextBox { get; set; } = new NotifyAttr<string>($"empty.fbx");
-        public NotifyAttr<string> UnitNameTextBox { get; set; } = new NotifyAttr<string>($"Inches");
-        public NotifyAttr<string> CoordSystemTextBox { get; set; } = new NotifyAttr<string>($"Y-Up");
+
+        public void BrowseButtonClicked() => OnBrowseButtonClicked();
+        public void OnBrowseButtonClicked()
+        {
+            // TODO: use SelectionListWindow.ShowDialog() instead
+            var dialog = new OpenFileDialog
+            {
+                Filter = "ANIM Files (*.anim)|*.anim|All files (*.*)|*.*\\",   // Clean this up so its correct based on the assetManagementFactory data
+                Multiselect = false,
+                Title = "Select .ANIM Skeleton File"
+            };
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                SkeletonFileName.Value = dialog.FileName;
+            }
+        }
+
+        public NotifyAttr<string> SkeletonName { get; set; } = new NotifyAttr<string>();
+        public NotifyAttr<string> SkeletonFileName { get; set; } = new NotifyAttr<string>();
+        public NotifyAttr<bool> AutoRigCheckBox { get; set; } = new NotifyAttr<bool>();
+
+
+        //private bool? _autoRigCheckBox = false;
+        //public bool AutoRigCheckBox
+        //{
+        //    get { return (_autoRigCheckBox != null) ? _autoRigCheckBox.Value : false; } 
+
+        //    set { _autoRigCheckBox = value; }
+        //}
 
         /// <summary>
         /// moves data from storeage class into UI controls
         /// </summary>
-        private void UpdataControlData()
+        private void SetViewData()
         {
-            FileNameTextBox.Value = ImportSettings.fileName;
+            SkeletonFileName.Value = ImportSettings.SkeletonFileName;
+            SkeletonName.Value = ImportSettings.SkeletonName;
+
+            if (ImportSettings.SkeletonName != "")
+            {
+                AutoRigCheckBox.Value = true;
+            }
         }
 
         /// <summary>
         /// moves data from UI control into storeage class
         /// </summary>
-        private void FetchControlData()
+        private void GetViewData()
         {
-            ImportSettings.fileName = FileNameTextBox.Value;
+            ImportSettings.SkeletonFileName = SkeletonFileName.Value;
+            ImportSettings.SkeletonName = SkeletonFileName.Value;
+            ImportSettings.UseAutoRigging = AutoRigCheckBox.Value;
         }
 
         /// <summary>
         /// Static helper, essentially taken from "PinToolViewModel"
         /// </summary>        
-        static public bool ShowImportDialog(FBXImportExportSettings fbxIportSettings)
+        static public bool ShowImportDialog(FbxSettingsModel fbxImportSettingsModel)
         {
             var dialog = new FBXSetttingsView();
-            var model = new FBXSettingsViewModel(fbxIportSettings);
+            var modelView = new FBXSettingsViewModel(fbxImportSettingsModel);
 
-            dialog.DataContext = model;
-            model.UpdataControlData();
+            dialog.DataContext = modelView;
+            modelView.SetViewData();
 
             var result = dialog.ShowDialog().Value;
-            model.FetchControlData();
+            modelView.GetViewData();
 
             return result;
         }
