@@ -1,4 +1,5 @@
-﻿using AssetEditor.Services;
+﻿using AssetEditor.DevelopmentConfiguration;
+using AssetEditor.Services;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using CommonControls.Common;
@@ -26,15 +27,18 @@ namespace AssetEditor
             _serviceProvider = new DependencyInjectionConfig()
                 .Build();
             _rootScope = _serviceProvider.CreateScope();
-            ShowMainWindow();
+       
 
             var settingsService = _rootScope.ServiceProvider.GetRequiredService<ApplicationSettingsService>();
             if (settingsService.CurrentSettings.IsDeveloperRun)
             {
-                var devConfig = _rootScope.ServiceProvider.GetRequiredService<DevelopmentConfiguration>();
+                var devConfig = _rootScope.ServiceProvider.GetRequiredService<DevelopmentConfigurationManager>();
+                devConfig.OverrideSettings();
                 devConfig.CreateTestPackFiles();
                 devConfig.OpenFileOnLoad();
             }
+
+            ShowMainWindow();
         }
 
         void ShowMainWindow()

@@ -56,14 +56,10 @@ namespace KitbasherEditor
             
             serviceCollection.AddScoped<IScopeHelper<KitbasherViewModel>, KitbasherScopeHelper>();
 
-
-            // Register all ui commands
-            var rules = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(x => !x.IsAbstract && x.IsClass && x.GetInterface(nameof(IKitbasherUiCommand)) == typeof(IKitbasherUiCommand));
-
-            foreach (var rule in rules)
-                serviceCollection.Add(new ServiceDescriptor(rule.UnderlyingSystemType, rule, ServiceLifetime.Transient));
+            RegisterAllAsOriginalType<IKitbasherUiCommand>(serviceCollection, ServiceLifetime.Transient);
         }
+
+
 
         public override void RegisterTools(IToolFactory factory)
         {
