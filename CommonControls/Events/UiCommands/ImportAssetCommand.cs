@@ -45,6 +45,9 @@ namespace CommonControls.Events.UiCommands
                     var importer = _assetManagementFactory.GetImporter(extension);  // Add some validation here! 
                     var packFile = importer.ImportAsset(filename);
 
+                    if (packFile == null)
+                        return;
+
                     _packFileService.AddFileToPack(container, parentPath, packFile);
                 }
                 catch (Exception e)

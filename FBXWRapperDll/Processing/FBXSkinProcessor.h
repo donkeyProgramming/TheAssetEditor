@@ -23,6 +23,16 @@ namespace wrapdll
 			PackedMesh& destPackedMesh,
 			const std::vector < std::string >& boneTable,
 			std::vector<ControlPointInfluences>& controlPointInfluences);
+		
+		/// <summary>
+		/// Process each FBXMesh's SKIN, and store rigging data in mesh structure
+		/// </summary>
+		/// <param name="_poSourceFbxMesh"></param>
+		/// <param name="destPackedMesh"></param>
+		/// <returns></returns>
+		static bool ProcessSkin(
+			FbxMesh* _poSourceFbxMesh,
+			PackedMesh& destPackedMesh);
 
 	private:
 		static bool GetInfluencesFromSkin(

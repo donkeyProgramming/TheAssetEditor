@@ -1,8 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using CommonControls.FileTypes.RigidModel.Vertex;
@@ -12,7 +8,7 @@ namespace AssetManagement.Strategies.Fbx
     public class VertexWeightProcessor
     {
         /// <summary>
-        /// Add 1 weight to the vertex
+        /// Add 1 weight to the vertex, does "boundary" check
         /// </summary>        
         /// <exception cref="Exception">If vertex already has 4 weights</exception>
         public static void AddWeightToVertex(CommonVertex vertex, int boneIndex, float weight)
