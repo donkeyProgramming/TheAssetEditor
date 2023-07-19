@@ -1,69 +1,73 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-	  <TargetFramework>net6.0-windows</TargetFramework>
-    <UseWPF>true</UseWPF>
-    <ApplicationIcon>hnet.com-image (1).ico</ApplicationIcon>
-    <AssemblyName>AssetEditor v0.45</AssemblyName>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net6.0-windows</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <ApplicationIcon>hnet.com-image (1).ico</ApplicationIcon>
+        <AssemblyName>AssetEditor v0.45</AssemblyName>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<Optimize>false</Optimize>
-		<PlatformTarget>x64</PlatformTarget>
-		<SignAssembly>false</SignAssembly>
-	</PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <Optimize>false</Optimize>
+        <PlatformTarget>x64</PlatformTarget>
+        <SignAssembly>false</SignAssembly>
+        <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<SignAssembly>true</SignAssembly>
-	</PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <SignAssembly>true</SignAssembly>
+        <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    </PropertyGroup>
 
-	<ItemGroup>
-	  <None Remove="Resources\AudioCompilerExample.json" />
-	  <None Remove="Resources\Schemas\ExampleAudioProject.xml" />
-	</ItemGroup>
+    <ItemGroup>
+        <None Remove="Resources\AudioCompilerExample.json" />
+        <None Remove="Resources\Schemas\ExampleAudioProject.xml" />
+    </ItemGroup>
 
-	<ItemGroup>
-		<EmbeddedResource Include="Resources\AudioCompilerExample.json" />
-		<Resource Include="Resources\Schemas\warhammer2_AnimMetaDataSchema.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Resource>
-	</ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="Resources\AudioCompilerExample.json" />
+        <Resource Include="Resources\Schemas\warhammer2_AnimMetaDataSchema.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Resource>
+    </ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="CsvHelper" Version="27.0.3" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-		<PackageReference Include="Octokit" Version="0.50.0" />
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="CsvHelper" Version="27.0.3" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+        <PackageReference Include="Octokit" Version="0.50.0" />
+    </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\AnimationEditor\AnimationEditor.csproj" />
-		<ProjectReference Include="..\AssetManagment\AssetManagement.csproj" />
-		<ProjectReference Include="..\Audio\Audio.csproj" />
-		<ProjectReference Include="..\CommonControls\CommonControls.csproj" />
-		<ProjectReference Include="..\KitbasherEditor\KitbasherEditor.csproj" />
-		<ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
-		<ProjectReference Include="..\View3D\View3D.csproj" />
-	</ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\AnimationEditor\AnimationEditor.csproj" />
+        <ProjectReference Include="..\AssetManagment\AssetManagement.csproj" />
+        <ProjectReference Include="..\Audio\Audio.csproj" />
+        <ProjectReference Include="..\CommonControls\CommonControls.csproj" />
+        <ProjectReference Include="..\KitbasherEditor\KitbasherEditor.csproj" />
+        <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
+        <ProjectReference Include="..\View3D\View3D.csproj" />
+    </ItemGroup>
 
-	<PropertyGroup>
-		<DebugType>embedded</DebugType>
-		<Authors>AssetEdCommunity</Authors>
-		<Company>Private</Company>
-		<Product>AssetEditor</Product>
-		<PackageProjectUrl>https://github.com/donkeyProgramming/TheAssetEditor</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/donkeyProgramming/TheAssetEditor</RepositoryUrl>
-		<RepositoryType>GIT</RepositoryType>
-		<AssemblyVersion>0.45.0.0</AssemblyVersion>
-		<FileVersion>0.45.0.0</FileVersion>
-		<PackageId>AssetEditor v0.45</PackageId>
-	</PropertyGroup>
+    <PropertyGroup>
+        <DebugType>embedded</DebugType>
+        <Authors>AssetEdCommunity</Authors>
+        <Company>Private</Company>
+        <Product>AssetEditor</Product>
+        <PackageProjectUrl>https://github.com/donkeyProgramming/TheAssetEditor</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/donkeyProgramming/TheAssetEditor</RepositoryUrl>
+        <RepositoryType>GIT</RepositoryType>
+        <AssemblyVersion>0.45.0.0</AssemblyVersion>
+        <FileVersion>0.45.0.0</FileVersion>
+        <PackageId>AssetEditor v0.45</PackageId>
+    </PropertyGroup>
 
-	<ItemGroup>
-	  <EditorConfigFiles Remove="..\.editorconfig" />
-	</ItemGroup>
+    <ItemGroup>
+        <EditorConfigFiles Remove="..\.editorconfig" />
+    </ItemGroup>
 
-	<ItemGroup>
-	  <None Include="..\.editorconfig" />
-	</ItemGroup>
+    <ItemGroup>
+        <None Include="..\.editorconfig" />
+    </ItemGroup>
 
 </Project>

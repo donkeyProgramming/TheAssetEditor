@@ -3,7 +3,6 @@ using CommonControls.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace AssetEditor.DevelopmentConfiguration
 {
@@ -20,15 +19,22 @@ namespace AssetEditor.DevelopmentConfiguration
             _settingsService = settingsService;
         }
 
-        public void CreateTestPackFiles()
+        public void Execute()
+        {
+            OverrideSettings();
+            CreateTestPackFiles();
+            OpenFileOnLoad();
+        }
+
+        void CreateTestPackFiles()
         {
             var newPackFile = _packFileService.CreateNewPackFileContainer("CustomPackFile", PackFileCAType.MOD);
             _packFileService.SetEditablePack(newPackFile);
         }
 
-        internal void OpenFileOnLoad() => GetCurrentConfig()?.OpenFileOnLoad();
+        void OpenFileOnLoad() => GetCurrentConfig()?.OpenFileOnLoad();
 
-        internal void OverrideSettings() => GetCurrentConfig()?.OverrideSettings(_settingsService.CurrentSettings);
+        void OverrideSettings() => GetCurrentConfig()?.OverrideSettings(_settingsService.CurrentSettings);
 
         IDeveloperConfiguration GetCurrentConfig()
         {

@@ -41,12 +41,7 @@ namespace AssetEditor
             }
 
             if (settingsService.CurrentSettings.IsDeveloperRun)
-            {
-                var devConfig = _rootScope.ServiceProvider.GetRequiredService<DevelopmentConfigurationManager>();
-                devConfig.OverrideSettings();
-                devConfig.CreateTestPackFiles();
-                devConfig.OpenFileOnLoad();
-            }
+                _rootScope.ServiceProvider.GetRequiredService<DevelopmentConfigurationManager>().Execute();
 
             // Load all packfiles
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
