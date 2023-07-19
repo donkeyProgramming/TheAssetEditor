@@ -1,6 +1,5 @@
 ﻿using AnimationEditor.Common.ReferenceModel;
 using CommonControls.Common;
-using Serilog;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -9,9 +8,6 @@ namespace AnimationEditor.Common.AnimationPlayer
 {
     public class AnimationPlayerViewModel : NotifyPropertyChangedImpl
     {
-
-        ILogger _logger = Logging.Create<AnimationPlayerViewModel>();
-
         float _selectedAnimationCurrentTime = 0;
         public float SelectedAnimationCurrentTime { get { return _selectedAnimationCurrentTime; } set { SetAndNotifyWhenChanged(ref _selectedAnimationCurrentTime, value); } }
 

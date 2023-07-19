@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using AnimationMeta.FileTypes.Parsing;
-using AnimationMeta.Presentation;
 using CommonControls.Common;
 using Filetypes.ByteParsing;
 using Microsoft.Xna.Framework;
@@ -28,7 +27,6 @@ namespace AnimationMeta.Presentation
 
     public class UnkMetaDataTagItemViewModel : MetaTagViewBase
     {
-        ILogger _logger = Logging.Create<MetaDataTagItemViewModel>();
         UnknownMetaEntry _input;
 
         public UnkMetaDataTagItemViewModel(UnknownMetaEntry unknownMeta)

@@ -4,7 +4,6 @@ using AnimationEditor.MountAnimationCreator.ViewModels;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,8 +18,6 @@ namespace AnimationEditor.MountAnimationCreator
 {
     public class Editor : NotifyPropertyChangedImpl
     {
-        ILogger _logger = Logging.Create<Editor>();
-
         public FilterCollection<SkeletonBoneNode> SelectedRiderBone { get; set; }
 
         public NotifyAttr<bool> CanPreview { get; set; } = new NotifyAttr<bool>(false);
@@ -236,9 +233,9 @@ namespace AnimationEditor.MountAnimationCreator
 
         public void ViewMountFragmentAction() => ViewAnimationSet(MountLinkController.AnimationSetForMount.SelectedItem);
         public void ViewRiderFragmentAction() => ViewAnimationSet(MountLinkController.AnimationSetForRider.SelectedItem);
-        public void ViewOutputFragmentAction() => ViewAnimationSet(ActiveOutputFragment.SelectedItem, true);
+        public void ViewOutputFragmentAction() => ViewAnimationSet(ActiveOutputFragment.SelectedItem);
 
-        void ViewAnimationSet(IAnimationBinGenericFormat animationSet, bool canEdit = false)
+        void ViewAnimationSet(IAnimationBinGenericFormat animationSet)
         {
             if (animationSet != null)
             {

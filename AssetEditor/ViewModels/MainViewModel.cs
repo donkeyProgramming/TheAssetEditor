@@ -16,7 +16,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
-
 namespace AssetEditor.ViewModels
 {
     public class MainViewModel : NotifyPropertyChangedImpl, IDropTarget<IEditorViewModel, bool>

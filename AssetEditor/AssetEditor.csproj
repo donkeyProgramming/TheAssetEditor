@@ -58,4 +58,12 @@
 		<PackageId>AssetEditor v0.45</PackageId>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <EditorConfigFiles Remove="..\.editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\.editorconfig" />
+	</ItemGroup>
+
 </Project>

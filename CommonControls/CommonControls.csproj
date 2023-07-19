@@ -349,12 +349,4 @@
     <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <EditorConfigFiles Remove="C:\Users\ole_k\source\repos\TheAssetEditor\CommonControls\.editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="C:\Users\ole_k\source\repos\TheAssetEditor\CommonControls\.editorconfig" />
-  </ItemGroup>
-
 </Project>
