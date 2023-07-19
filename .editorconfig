@@ -250,7 +250,7 @@ csharp_preserve_single_line_statements = true
 
 dotnet_diagnostic.IDE0005.severity = error
 # IDE0060: Remove unused parameter
-dotnet_diagnostic.IDE0060.severity = error
+dotnet_diagnostic.IDE0060.severity = none
 csharp_using_directive_placement = outside_namespace:silent
 csharp_prefer_simple_using_statement = true:suggestion
 csharp_style_namespace_declarations = block_scoped:silent

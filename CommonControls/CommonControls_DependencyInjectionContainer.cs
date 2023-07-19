@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
 using CommonControls.Common;
 using CommonControls.Editors.AnimationFilePreviewEditor;
@@ -77,8 +76,6 @@ namespace CommonControls
         public virtual void Register(IServiceCollection serviceCollection) { }
 
         public virtual void RegisterTools(IToolFactory factory) { }
-
-
 
         protected void RegisterAllAsOriginalType<T>(IServiceCollection serviceCollection, ServiceLifetime scope)
         {
