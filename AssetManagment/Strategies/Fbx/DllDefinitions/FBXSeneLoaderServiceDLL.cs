@@ -26,8 +26,8 @@ namespace AssetManagement.Strategies.Fbx.DllDefinitions
         public static extern IntPtr CreateFBXContainer();
 
         [DllImport(dllFileName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr GetSkeletonNameFromScene(IntPtr ptrSceneLoader);
-
+        public static extern IntPtr GetSkeletonNameFromSceneLoader(IntPtr ptrSceneLoader);
+        
         [DllImport(dllFileName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void AddBoneName(IntPtr ptrInstances, string boneName, int len);
 

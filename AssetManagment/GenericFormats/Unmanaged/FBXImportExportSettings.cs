@@ -35,9 +35,8 @@ namespace AssetManagement.GenericFormats.Unmanaged
     }        
 
     [StructLayout(LayoutKind.Sequential)]
-    public class FBXImportExportSettings
-    {
-        public string fileName;
+    public struct FBXImportExportSettings    
+    {     
         public FBXFileInfo fileinfo;
         public FBXUnitFileInfo unitInfo;
         public FBXAnimInfo animTimingINfo;

@@ -23,7 +23,7 @@
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{15aae76d-0b83-45a2-b8ab-fd7bf38bddc3}</ProjectGuid>
     <RootNamespace>FBXWRapperDll</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.22000.0</WindowsTargetPlatformVersion>
     <ProjectName>FBXWrapperNativeDll</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -73,7 +73,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>FBXWrapperNative</TargetName>
-    <OutDir>$(SolutionDir)AssetEditor\bin\Debug\net6.0-windows</OutDir>
+    <OutDir>$(SolutionDir)AssetEditor\bin\Debug\net6.0-windows\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>FBXWRapperDll</TargetName>
@@ -125,14 +125,16 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>FBXSDK_SHARED;__DEBUG;FBXWRAPPERDLL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>Default</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>fbxsdk\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <TreatWarningAsError>false</TreatWarningAsError>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <PreprocessorDefinitions>FBXSDK_SHARED;__DEBUG;FBXWRAPPERDLL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BuildStlModules>false</BuildStlModules>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -163,10 +165,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
+    <None Include="FBXScene\FBXSceneContainerGetters.inl" />
     <None Include="fbxsdk\bin\vs2019\x64\release\libfbxsdk.zip" />
     <None Include="fbxsdk\lib\vs2019\x64\debug\libfbxsdk.dll" />
     <None Include="fbxsdk\lib\vs2019\x64\release\libfbxsdk.dll" />
     <None Include="fbxsdk\lib\vs2019\x64\release\libfbxsdk.zip" />
+    <None Include="FBXServices\FbxSceneLoaderService.inl" />
     <None Include="Helpers\MS_SimpleMath\SimpleMath.inl" />
   </ItemGroup>
   <ItemGroup>

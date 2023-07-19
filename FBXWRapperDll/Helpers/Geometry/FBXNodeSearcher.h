@@ -3,14 +3,12 @@
 #include "../../Helpers/Tools.h"
 #include "../../Helpers/Geometry/FBXMeshGeometryHelper.h"
  
-
 namespace wrapdll
 {
 	class FBXNodeSearcher
 	{
 	public:
 		static std::string FetchSkeletonNameFromScene(fbxsdk::FbxScene* pScene)
-
 		{
 			std::string tempSkeletonString = "";
 			auto parent = pScene->GetRootNode();
@@ -64,7 +62,7 @@ namespace wrapdll
 
 				std::string nodeName = currentChildNode->GetName();
 
-				if (std::tolower(nodeName).find(nodeTag) == 0)
+				if (tolower(nodeName).find(nodeTag) == 0)
 				{
 					skeletonString = nodeName.erase(0, nodeTag.length());
 

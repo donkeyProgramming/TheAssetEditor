@@ -13,13 +13,21 @@ struct BoneAnimKey
 
 struct VertexInfluence
 {
-	uint32_t boneIndex = 0; 
+	uint32_t boneIndex = 0;
 	float weight = 0.0f;
 };
 
-struct ControlPointInfluences
+struct VertexInfluenceExt
 {
-	VertexInfluence influences[4];
+	std::string boneName = "";
+	uint32_t boneIndex = 0;
+	float weight = 0.0f;
+};
+
+
+struct ControlPointInfluenceExt
+{	
+	VertexInfluenceExt influences[4];
 	int weightCount = 0;
 };
 
@@ -36,7 +44,7 @@ struct PackedCommonVertex
 };
 
 struct VertexWeight
-{	
+{
 	// TODO: REMOVE DEBUG VALUE(S):
 	char boneName[255] = "Unnamed_BONE\0";
 	int vertexIndex = 0;
@@ -44,9 +52,10 @@ struct VertexWeight
 };
 
 struct PackedMesh
-{	
+{
 	std::string meshName = "Unnamed_Mesh\0";
 	std::vector<PackedCommonVertex> vertices;
-	std::vector<uint16_t> indices;		
+	std::vector<uint16_t> indices;
 	std::vector<VertexWeight> vertexWeights;
 };
+

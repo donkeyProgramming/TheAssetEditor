@@ -4,7 +4,7 @@
 #include "..\Processing\FBXMeshProcessor.h"
 #include "..\Processing\FBXSkinProcessor.h"
 #include "..\Processing\FBXMeshCreator.h"
-
+#include "..\DLLDefines.h"
 
 wrapdll::FBXImporterService* wrapdll::FBXImporterService::CreateFromDiskFile(const std::string& path)
 {
@@ -27,15 +27,14 @@ wrapdll::FBXSCeneContainer* wrapdll::FBXImporterService::ProcessAndFillScene()
 
 	std::vector<fbxsdk::FbxMesh*> fbxMeshList;
 	FBXNodeSearcher::FindMeshesInScene(m_pFbxScene, fbxMeshList);	
+	m_sceneContainer.GetSkeletonName() = FBXNodeSearcher::FetchSkeletonNameFromScene(m_pFbxScene);
 
 	destPackedMeshes.clear();
 	destPackedMeshes.resize(fbxMeshList.size());
 	for (size_t meshIndex = 0; meshIndex < fbxMeshList.size(); meshIndex++)
 	{
-		std::vector<ControlPointInfluences> vertexToControlPoint;
-		
-		if (!m_animFileBoneNames.empty())
-			FBXSkinProcessorService::ProcessSkin(fbxMeshList[meshIndex], destPackedMeshes[meshIndex], m_animFileBoneNames, vertexToControlPoint);
+		std::vector<ControlPointInfluenceExt> vertexToControlPoint;
+		FBXSkinProcessorService::ProcessSkin(fbxMeshList[meshIndex], destPackedMeshes[meshIndex], m_animFileBoneNames, vertexToControlPoint);		
 		
 		FBXMeshCreator::MakeUnindexPackedMesh(m_pFbxScene, fbxMeshList[meshIndex], destPackedMeshes[meshIndex], vertexToControlPoint);
 
@@ -47,48 +46,4 @@ wrapdll::FBXSCeneContainer* wrapdll::FBXImporterService::ProcessAndFillScene()
 	return &m_sceneContainer;
 }
 
-extern "C"
-{
-	FBXWRAPPERDLL_API_EXT
-	wrapdll::FBXImporterService* CreateSceneFBX(char* path)	{
-		
-		return wrapdll::FBXImporterService::CreateFromDiskFile(path);
-	};
-
-	FBXWRAPPERDLL_API_EXT
-		wrapdll::FBXSCeneContainer* ProcessAndFillScene(wrapdll::FBXImporterService* pInstance)
-	{
-		pInstance->ProcessAndFillScene();
-
-		return &pInstance->GetSceneContainer();
-	};
-
-	FBXWRAPPERDLL_API_EXT
-		char* GetSkeletonNameFromScene(wrapdll::FBXImporterService* pInstance, int meshindex)
-	{
-		return (char*)pInstance->GetSkeletonNameFromSceneNodes();
-	};
-
-	FBXWRAPPERDLL_API_EXT
-		void AddBoneName(wrapdll::FBXImporterService* pInstance, char* boneName, int len)
-	{
-		std::string tempBoneName(boneName, len);
-		pInstance->GetBoneNames().push_back(tempBoneName);
-	};
-
-	FBXWRAPPERDLL_API_EXT
-		void ClearBoneNames(wrapdll::FBXImporterService* pInstance)
-	{
-		pInstance->GetBoneNames().clear();
-	};
-
-	FBXWRAPPERDLL_API_EXT
-	void DeleteBaseObj(wrapdll::BaseInteropObject* pInstance)
-	{
-		if (pInstance != nullptr)
-		{
-			delete pInstance;
-			pInstance = nullptr;
-		}
-	};
-}
+#include "FbxSceneLoaderService.inl"

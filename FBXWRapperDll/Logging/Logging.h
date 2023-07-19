@@ -7,6 +7,7 @@
 #include <fstream>
 #include <locale>
 #include <codecvt>
+#include "..\Helpers\Tools.h"
 
 static void WriteToLogFile(const std::string& logString)
 {
@@ -15,21 +16,31 @@ static void WriteToLogFile(const std::string& logString)
 	oOutFile.close();
 }
 
-static std::wstring WidenStr(const std::string& str)
-{
-	using convert_typeX = std::codecvt_utf8<wchar_t>;
-	std::wstring_convert<convert_typeX, wchar_t> converterX;
+//static std::wstring WidenStr(const std::string& str)
+//{
+//	using convert_typeX = std::codecvt_utf8<wchar_t>;
+//	std::wstring_convert<convert_typeX, wchar_t> converterX;
+//
+//	return converterX.from_bytes(str);
+//};
 
-	return converterX.from_bytes(str);
-}
-
-static std::string NarrowStr(const std::wstring& wstr)
+/*static std::string NarrowStr(const std::wstring& wstr)
 {
-	using convert_typeX = std::codecvt_utf8<wchar_t>;
+	using convert_typeX = std::cty::<wchar_t>;
 	std::wstring_convert<convert_typeX, wchar_t> converterX;
 
 	return converterX.to_bytes(wstr);
-}
+}*/
+
+//static std::wstring NarrowStr(const std::string& as)
+//{
+//	wchar_t* buf = new wchar_t[as.size() * 2 + 2];
+//	swprintf(buf, L"%S", as.c_str());
+//	std::wstring rval = buf;
+//	delete[] buf;
+//	return rval;
+//}
+
 
 namespace ConsoleForeground
 {
