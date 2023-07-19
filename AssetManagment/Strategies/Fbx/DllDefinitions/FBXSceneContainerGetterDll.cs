@@ -12,7 +12,7 @@ namespace AssetManagement.Strategies.Fbx.DllDefinitions
 
         [DllImport(dllFileName, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool GetIndices(IntPtr ptrSceneContainer, int meshIndex, out IntPtr vertices, out int itemCount);
-        
+
         [DllImport(dllFileName, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool GetVertexWeights(IntPtr ptrSceneContainer, int meshIndex, out IntPtr vertices, out int itemCount);
 
@@ -21,5 +21,9 @@ namespace AssetManagement.Strategies.Fbx.DllDefinitions
 
         [DllImport(dllFileName, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr GetMeshName(IntPtr ptrSceneContainer, int meshIndex);
+
+        [DllImport(dllFileName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr GetSkeletonName(IntPtr ptrSceneContainer);       
+        
     }
 }

@@ -15,6 +15,7 @@ namespace AssetManagement.Strategies.Fbx
         {
             var newScene = new SceneContainer();
             newScene.Meshes = GetAllPackedMeshes(ptrFbxSceneContainer);
+            newScene.SkeletonName = GetSkeletonNameFromSceneContainer(ptrFbxSceneContainer);
             return newScene;
             /*
             - destScene.Bones = GetAllBones();
@@ -39,8 +40,8 @@ namespace AssetManagement.Strategies.Fbx
             {
                 var ptr = Marshal.PtrToStructure(pVerticesPtr + vertexIndex * Marshal.SizeOf(typeof(PackedCommonVertex)), typeof(PackedCommonVertex));
 
-                if (ptr != null)
-                    data[vertexIndex] = (PackedCommonVertex)ptr;
+                if (ptr != null)                
+                    data[vertexIndex] = (PackedCommonVertex)ptr;                                    
             }
 
             return data;
@@ -92,7 +93,7 @@ namespace AssetManagement.Strategies.Fbx
 
             if (vertexWeightsPtr == IntPtr.Zero || length == 0)
             {
-                throw new Exception("Fatal Error: vertexWeightsPtr/length, NULL/0");
+                return new VertexWeight[0];
             }
 
             VertexWeight[] data = new VertexWeight[length];
@@ -122,9 +123,9 @@ namespace AssetManagement.Strategies.Fbx
             return meshList;
         }
 
-        static public string GetSkeletonNameFromScene(IntPtr fbxSceneLoader)
+        static public string GetSkeletonNameFromSceneLoader(IntPtr ptrFbxScenLoader)
         {
-            var skeletonNamePtr = FBXSeneLoaderServiceDLL.GetSkeletonNameFromScene(fbxSceneLoader);
+            var skeletonNamePtr = FBXSeneLoaderServiceDLL.GetSkeletonNameFromSceneLoader(ptrFbxScenLoader);
 
             if (skeletonNamePtr == IntPtr.Zero)
                 return "";
@@ -135,10 +136,20 @@ namespace AssetManagement.Strategies.Fbx
                 return "";
 
             return skeletonName;
-
         }
+        static public string GetSkeletonNameFromSceneContainer(IntPtr ptrFbxSceneContainer)
+        {
+            var skeletonNamePtr = FBXSCeneContainerGetterDll.GetSkeletonName(ptrFbxSceneContainer);
 
+            if (skeletonNamePtr == IntPtr.Zero)
+                return "";
 
+            string skeletonName = Marshal.PtrToStringUTF8(skeletonNamePtr);
 
+            if (skeletonName == null)
+                return "";
+
+            return skeletonName;
+        }
     }
 }

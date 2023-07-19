@@ -59,8 +59,7 @@ namespace AssetManagement.GenericFormats
             get { return _framesPerSecond; }
             set
             {
-                FramesPerSecond = value;
-                // TODO: reprocess timestamps in keys                
+                FramesPerSecond = value;                
             }
         }
     }

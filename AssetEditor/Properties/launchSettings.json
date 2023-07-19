@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AssetEditor": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

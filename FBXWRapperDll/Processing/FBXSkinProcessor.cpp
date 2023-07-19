@@ -16,7 +16,7 @@ bool FBXSkinProcessorService::ProcessSkin(
 	FbxMesh* _poSourceFbxMesh,
 	PackedMesh& destPackedMesh,
 	const std::vector <std::string>& boneTable,
-	std::vector<ControlPointInfluences>& controlPointInfluences)
+	std::vector<ControlPointInfluenceExt>& controlPointInfluences)
 {
 	log_action("Processing Skin for mesh: " + std::string(_poSourceFbxMesh->GetName()));
 
@@ -63,7 +63,7 @@ bool wrapdll::FBXSkinProcessorService::ProcessSkin(FbxMesh* _poSourceFbxMesh, Pa
 	// check if there is no rigging data for this skin
 	if (cluster_count < 1)
 	{
-		return log_action_warning(std::string(poFbxMesh->GetName()) + ": no weighting data found for skin: " + std::string(poSkin->GetName()) + " !");
+		return log_action_warning(std::string(_poSourceFbxMesh->GetName()) + ": no weighting data found for skin: " + std::string(poSkin->GetName()) + " !");
 	}
 
 	// -- Rund through all clusters (1 cluster = 1 bone, kinda)
@@ -78,7 +78,7 @@ bool wrapdll::FBXSkinProcessorService::ProcessSkin(FbxMesh* _poSourceFbxMesh, Pa
 		fbxsdk::FbxNode* pBoneNode = pCluster->GetLink();
 
 		// get the bone ID for this bone name
-		std::string strBoneName = std::tolower(pBoneNode->GetName());		
+		std::string strBoneName = tolower(std::string(pBoneNode->GetName()));		
 
 		// get the number of control point that this "bone" is affecting
 		int controlPointIndexCount = pCluster->GetControlPointIndicesCount();
@@ -106,12 +106,10 @@ bool wrapdll::FBXSkinProcessorService::ProcessSkin(FbxMesh* _poSourceFbxMesh, Pa
 
 			// get weight associated with vertex
 			double boneWeight = pControlPointWeights[influenceIndex];
-
-
-
 		};
 	}
 
+	return true;
 }
 
 bool FBXSkinProcessorService::GetInfluencesFromSkin(
@@ -119,7 +117,7 @@ bool FBXSkinProcessorService::GetInfluencesFromSkin(
 	poSkin, fbxsdk::FbxMesh* poFbxMesh,
 	PackedMesh& destPackedMesh,
 	const std::vector<std::string>& boneTable,
-	std::vector<ControlPointInfluences>& controlPointInfluences
+	std::vector<ControlPointInfluenceExt>& controlPointInfluences
 )
 {
 	// -- reset the control point influence container
@@ -147,19 +145,8 @@ bool FBXSkinProcessorService::GetInfluencesFromSkin(
 
 			// Get the "bone = the node which is affecting this FbxCluster
 			fbxsdk::FbxNode* pBoneNode = pCluster->GetLink();
-
-			// get the bone ID for this bone name
-			std::string strBoneName = std::tolower(pBoneNode->GetName());
-
-			log_action("Bone Table Size: " + std::to_string(boneTable.size()));
-
-			int boneIndexValue = tools::GetIndexOf(strBoneName, boneTable);
-			if (boneIndexValue == -1)
-				return log_action_error("Bone in FBX File: '" + strBoneName + "' is not found in skeleton ANIM file!");
-
-			log_action("Processing weighting for bone: '" + strBoneName + ", ID: " + std::to_string(boneIndexValue));
-
-			// get the number of control point that this "bone" is affecting
+			std::string boneName = pBoneNode->GetName();							
+			
 			int controlPointIndexCount = pCluster->GetControlPointIndicesCount();
 
 			if (controlPointIndexCount < 1)
@@ -189,8 +176,9 @@ bool FBXSkinProcessorService::GetInfluencesFromSkin(
 				controlPointInfluences[controlPointIndex].weightCount++;
 				auto currentWeightIndex = controlPointInfluences[controlPointIndex].weightCount;
 
-				controlPointInfluences[controlPointIndex].influences[currentWeightIndex - 1].boneIndex = boneIndexValue;
-				controlPointInfluences[controlPointIndex].influences[currentWeightIndex - 1].weight = static_cast<float>(boneWeight);
+				controlPointInfluences[controlPointIndex].influences[currentWeightIndex - 1].boneName = boneName;
+				controlPointInfluences[controlPointIndex].influences[currentWeightIndex - 1].boneIndex = clusterIndex;
+				controlPointInfluences[controlPointIndex].influences[currentWeightIndex - 1].weight = static_cast<float>(boneWeight);			
 			};
 		}
 

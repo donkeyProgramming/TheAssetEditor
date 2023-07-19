@@ -10,11 +10,20 @@ using AssetManagement.GenericFormats.Unmanaged;
 using CommonControls.FileTypes.RigidModel.Types;
 using AssetManagement.Strategies.Fbx;
 using AssetManagement.GenericFormats.Managed;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using SharpDX.Direct3D9;
+using VertexFormat = CommonControls.FileTypes.RigidModel.VertexFormat;
 
 namespace AssetManagement.GenericFormats
 {
     public class RmvFileBuilder
     {
+        /// <summary>
+        /// Converts "native structs" meshes to AE internal RMV2 
+        /// </summary>
+        /// <param name="packedMeshes">Input "native meshes"</param>
+        /// <param name="skeletonName">Skeleton name string to put in RMV2, if RMV2 with be "static"</param>        
+        /// <returns>Internal RMV2 file class</returns>
         public static RmvFile ConvertToRmv2(List<PackedMesh> packedMeshes, string skeletonName)
         {
             MaterialFactory materialFactory = MaterialFactory.Create();
@@ -47,22 +56,7 @@ namespace AssetManagement.GenericFormats
                 for (int meshIndex = 0; meshIndex < packedMeshes.Count; meshIndex++)
                 {
                     var currentMesh = new RmvModel();
-                    outputFile.ModelList[lodIndex][meshIndex] = currentMesh;
-
-                    currentMesh.Material = materialFactory.CreateMaterial(
-                        outputFile.Header.Version,
-                        skeletonName != "" ? ModelMaterialEnum.weighted : ModelMaterialEnum.default_type,
-                        skeletonName != "" ? VertexFormat.Cinematic : VertexFormat.Static);
-
-                    currentMesh.Material.ModelName = packedMeshes[meshIndex].Name;
-                    currentMesh.Mesh = ConvertPackedMeshToRmvMesh(currentMesh.Material.BinaryVertexFormat, packedMeshes[meshIndex], skeletonName);
-
-                    currentMesh.Material.SetTexture(TextureType.BaseColour, @"commontextures\default_base_colour.dds");
-                    currentMesh.Material.SetTexture(TextureType.Normal, @"commontextures\default_normal.dds");
-                    currentMesh.Material.SetTexture(TextureType.MaterialMap, @"commontextures\default_material_mat.dds");
-                    currentMesh.Material.SetTexture(TextureType.Diffuse, @"commontextures\default_metal_material_map.dds");
-                    currentMesh.Material.SetTexture(TextureType.Specular, @"commontextures\default_metal_material_map.dds");
-                    currentMesh.Material.SetTexture(TextureType.Gloss, @"commontextures\default_metal_material_map.dds");
+                    outputFile.ModelList[lodIndex][meshIndex] = ConvertPackedMeshToRmvModel(skeletonName, materialFactory, outputFile, packedMeshes[meshIndex]);                     
                 };
             }
 
@@ -71,6 +65,31 @@ namespace AssetManagement.GenericFormats
             return outputFile;
         }
 
+        private static RmvModel ConvertPackedMeshToRmvModel(string skeletonName, MaterialFactory materialFactory, RmvFile outputFile, PackedMesh packMesh)
+        {
+            var currentMesh = new RmvModel();
+            currentMesh.Material = materialFactory.CreateMaterial(
+                outputFile.Header.Version,
+                skeletonName != "" ? ModelMaterialEnum.weighted : ModelMaterialEnum.default_type,
+                skeletonName != "" ? VertexFormat.Cinematic : VertexFormat.Static);
+
+            currentMesh.Material.ModelName = packMesh.Name;
+            currentMesh.Mesh = ConvertPackedMeshToRmvMesh(currentMesh.Material.BinaryVertexFormat, packMesh, skeletonName);
+
+            SetRmvModelDefaultTextures(currentMesh);
+
+            return currentMesh;
+        }
+
+        private static void SetRmvModelDefaultTextures(RmvModel currentMesh)
+        {
+            currentMesh.Material.SetTexture(TextureType.BaseColour, @"commontextures\default_base_colour.dds");
+            currentMesh.Material.SetTexture(TextureType.Normal, @"commontextures\default_normal.dds");
+            currentMesh.Material.SetTexture(TextureType.MaterialMap, @"commontextures\default_material_mat.dds");
+            currentMesh.Material.SetTexture(TextureType.Diffuse, @"commontextures\default_metal_material_map.dds");
+            currentMesh.Material.SetTexture(TextureType.Specular, @"commontextures\default_metal_material_map.dds");
+            currentMesh.Material.SetTexture(TextureType.Gloss, @"commontextures\default_metal_material_map.dds");
+        }
 
         private static RmvMesh ConvertPackedMeshToRmvMesh(VertexFormat vertexFormat, PackedMesh packedInputMesh, string skeletonName)
         {

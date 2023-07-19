@@ -19,8 +19,16 @@ namespace AssetManagement.Strategies.Fbx
             if (sceneContainer == null)
                 return null;
 
-            var rmv2File = RmvFileBuilder.ConvertToRmv2(sceneContainer.Meshes, "");
+            var fbxSettings = new FbxSettingsModel();
+            fbxSettings.SkeletonName = sceneContainer.SkeletonName;
+            
+            if (!FBXSettingsViewModel.ShowImportDialog(fbxSettings))
+                return null;
 
+            // -- if auto-rigging is off, imported model will be "static"
+            var skeletonName = (fbxSettings.UseAutoRigging) ? sceneContainer.SkeletonName : "";
+            
+            var rmv2File = RmvFileBuilder.ConvertToRmv2(sceneContainer.Meshes, skeletonName);
             var factory = ModelFactory.Create();
             var buffer = factory.Save(rmv2File);
 

@@ -1,34 +1,23 @@
-﻿using AssetManagement.GenericFormats.Unmanaged;
-using AssetManagement.Strategies.Fbx.Views.FBXSettings;
+﻿using AssetManagement.Strategies.Fbx.Views.FBXSettings;
 using CommonControls.Common;
 using AssetManagement.Strategies.Fbx.Models;
 using System.Windows.Forms;
-using System.ComponentModel;
 
 namespace AssetManagement.Strategies.Fbx.ViewModels
 {
     public class FBXSettingsViewModel : NotifyPropertyChangedImpl
-    {
-        public FbxSettingsModel ImportSettings { get; set; }
-
-        public FBXSettingsViewModel(FbxSettingsModel fbxImportSettingsModel)
-        {
-            ImportSettings = fbxImportSettingsModel;
-            SetViewData();
+    {        
+        public NotifyAttr<string> SkeletonName { get; set; } = new NotifyAttr<string>();
+        public NotifyAttr<string> SkeletonFileName { get; set; } = new NotifyAttr<string>();
+        public NotifyAttr<bool> UseAutoRigging { get; set; } = new NotifyAttr<bool>();      
+        
+        public void ImportButtonClicked()
+        {            
+            // not needed anymore...?            
         }
-
-        public void ImportButtonClicked() => OnImportButtonClicked();
-
-        public void OnImportButtonClicked()
+        public void BrowseButtonClicked()
         {
-            GetViewData();
-        }
-
-
-        public void BrowseButtonClicked() => OnBrowseButtonClicked();
-        public void OnBrowseButtonClicked()
-        {
-            // TODO: use SelectionListWindow.ShowDialog() instead
+            // TODO: use (animation) SelectionListWindow.ShowDialog() instead
             var dialog = new OpenFileDialog
             {
                 Filter = "ANIM Files (*.anim)|*.anim|All files (*.*)|*.*\\",   // Clean this up so its correct based on the assetManagementFactory data
@@ -40,43 +29,30 @@ namespace AssetManagement.Strategies.Fbx.ViewModels
             {
                 SkeletonFileName.Value = dialog.FileName;
             }
-        }
-
-        public NotifyAttr<string> SkeletonName { get; set; } = new NotifyAttr<string>();
-        public NotifyAttr<string> SkeletonFileName { get; set; } = new NotifyAttr<string>();
-        public NotifyAttr<bool> AutoRigCheckBox { get; set; } = new NotifyAttr<bool>();
-
-
-        //private bool? _autoRigCheckBox = false;
-        //public bool AutoRigCheckBox
-        //{
-        //    get { return (_autoRigCheckBox != null) ? _autoRigCheckBox.Value : false; } 
-
-        //    set { _autoRigCheckBox = value; }
-        //}
-
+        }        
+                
         /// <summary>
         /// moves data from storeage class into UI controls
         /// </summary>
-        private void SetViewData()
-        {
-            SkeletonFileName.Value = ImportSettings.SkeletonFileName;
-            SkeletonName.Value = ImportSettings.SkeletonName;
-
-            if (ImportSettings.SkeletonName != "")
-            {
-                AutoRigCheckBox.Value = true;
-            }
+        private void SetViewData(FbxSettingsModel inSettingsModel)
+        {            
+            SkeletonFileName.Value = inSettingsModel.SkeletonFileName;
+            SkeletonName.Value = inSettingsModel.SkeletonName;
+            UseAutoRigging.Value = inSettingsModel.UseAutoRigging;
         }
 
         /// <summary>
         /// moves data from UI control into storeage class
         /// </summary>
-        private void GetViewData()
+        private FbxSettingsModel GetViewData()
         {
-            ImportSettings.SkeletonFileName = SkeletonFileName.Value;
-            ImportSettings.SkeletonName = SkeletonFileName.Value;
-            ImportSettings.UseAutoRigging = AutoRigCheckBox.Value;
+            FbxSettingsModel outSettingsModel = new FbxSettingsModel();
+
+            outSettingsModel.SkeletonFileName = SkeletonFileName.Value;
+            outSettingsModel.SkeletonName = SkeletonFileName.Value;
+            outSettingsModel.UseAutoRigging = UseAutoRigging.Value;
+
+            return outSettingsModel;
         }
 
         /// <summary>
@@ -85,13 +61,13 @@ namespace AssetManagement.Strategies.Fbx.ViewModels
         static public bool ShowImportDialog(FbxSettingsModel fbxImportSettingsModel)
         {
             var dialog = new FBXSetttingsView();
-            var modelView = new FBXSettingsViewModel(fbxImportSettingsModel);
+            var modelView = new FBXSettingsViewModel();
 
             dialog.DataContext = modelView;
-            modelView.SetViewData();
+            modelView.SetViewData(fbxImportSettingsModel);
 
             var result = dialog.ShowDialog().Value;
-            modelView.GetViewData();
+            fbxImportSettingsModel = modelView.GetViewData();
 
             return result;
         }

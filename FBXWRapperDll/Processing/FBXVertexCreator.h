@@ -8,40 +8,40 @@ namespace wrapdll{
 	class FBXVertexhCreator
 	{
 	public:
-		static constexpr PackedCommonVertex MakePackedVertex(
+		static PackedCommonVertex MakePackedVertex(
 			const FbxVector4& vControlPoint,
 			const FbxVector4& vNormalVector,
 			const FbxVector2& UVmap1,
-			const ControlPointInfluences* ctrlPointInfluences,
+			const ControlPointInfluenceExt* ctrlPointInfluences,
 			double scaleFactor)
 		{
-			PackedCommonVertex destVertexRef;
+			PackedCommonVertex outVertex;
 
-			destVertexRef.position.x = static_cast<float>(vControlPoint.mData[0] * scaleFactor);
-			destVertexRef.position.y = static_cast<float>(vControlPoint.mData[1] * scaleFactor);
-			destVertexRef.position.z = static_cast<float>(vControlPoint.mData[2] * scaleFactor);
+			outVertex.position.x = static_cast<float>(vControlPoint.mData[0] * scaleFactor);
+			outVertex.position.y = static_cast<float>(vControlPoint.mData[1] * scaleFactor);
+			outVertex.position.z = static_cast<float>(vControlPoint.mData[2] * scaleFactor);
 
-			destVertexRef.normal.x = static_cast<float>(vNormalVector.mData[0]);
-			destVertexRef.normal.y = static_cast<float>(vNormalVector.mData[1]);
-			destVertexRef.normal.z = static_cast<float>(vNormalVector.mData[2]);
+			outVertex.normal.x = static_cast<float>(vNormalVector.mData[0]);
+			outVertex.normal.y = static_cast<float>(vNormalVector.mData[1]);
+			outVertex.normal.z = static_cast<float>(vNormalVector.mData[2]);
 
-			destVertexRef.uv.x = static_cast<float>(UVmap1.mData[0]);
-			destVertexRef.uv.y = static_cast <float>(UVmap1.mData[1]);
+			outVertex.uv.x = static_cast<float>(UVmap1.mData[0]);
+			outVertex.uv.y = static_cast <float>(UVmap1.mData[1]);
 
 			if (ctrlPointInfluences)
 			{
-				destVertexRef.weightCount = ctrlPointInfluences->weightCount;
+				outVertex.weightCount = ctrlPointInfluences->weightCount;
 
-				for (size_t i = 0; i < destVertexRef.weightCount; i++)
+				for (size_t i = 0; i < outVertex.weightCount; i++)
 				{
-					destVertexRef.influences[i].boneIndex = ctrlPointInfluences->influences[i].boneIndex;
-					destVertexRef.influences[i].weight = ctrlPointInfluences->influences[i].weight;
+					outVertex.influences[i].boneIndex = ctrlPointInfluences->influences[i].boneIndex;
+					outVertex.influences[i].weight = ctrlPointInfluences->influences[i].weight;
 				}
 			}
 			else
-				destVertexRef.weightCount = 0;
+				outVertex.weightCount = 0;
 
-			return destVertexRef;
+			return outVertex;
 		};
 	};
 }

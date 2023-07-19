@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 
 namespace AssetManagement.GenericFormats.Unmanaged
-{     
+{
     [StructLayout(LayoutKind.Sequential)]
     public struct BoneKey
     {

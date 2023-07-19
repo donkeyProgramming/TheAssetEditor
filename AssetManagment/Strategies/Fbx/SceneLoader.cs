@@ -15,20 +15,14 @@ namespace AssetManagement.Strategies.Fbx
         public static SceneContainer LoadScene(string fileName)
         {
             IntPtr fbxSceneLoader = IntPtr.Zero;
+            
             try
             {
                 fbxSceneLoader = FBXSeneLoaderServiceDLL.CreateSceneFBX(fileName);
 
-                var fbxSettings = new FbxSettingsModel();
-                fbxSettings.SkeletonName = SceneMarshallerToManaged.GetSkeletonNameFromScene(fbxSceneLoader);
-
-                if (!FBXSettingsViewModel.ShowImportDialog(fbxSettings))
-                    return null;
-
-                // TODO: fvar ptrNativeScene = FBXSeneLoaderServiceDLL.ProcessAndFillScene(fbxSceneLoader, fbxSettings.UseAutoRigging);
                 var ptrNativeScene = FBXSeneLoaderServiceDLL.ProcessAndFillScene(fbxSceneLoader);
-                var newScene = SceneMarshallerToManaged.ToManaged(ptrNativeScene);
-                return newScene;
+                var managedScene = SceneMarshallerToManaged.ToManaged(ptrNativeScene);
+                return managedScene;
             }
             finally
             {
