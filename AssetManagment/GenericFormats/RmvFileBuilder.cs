@@ -10,8 +10,6 @@ using AssetManagement.GenericFormats.Unmanaged;
 using CommonControls.FileTypes.RigidModel.Types;
 using AssetManagement.Strategies.Fbx;
 using AssetManagement.GenericFormats.Managed;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using SharpDX.Direct3D9;
 using VertexFormat = CommonControls.FileTypes.RigidModel.VertexFormat;
 
 namespace AssetManagement.GenericFormats

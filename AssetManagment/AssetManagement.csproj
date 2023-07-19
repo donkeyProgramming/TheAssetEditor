@@ -5,7 +5,6 @@
 	</PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AnimationMeta\AnimationMeta.csproj" />
     <ProjectReference Include="..\CommonControls\CommonControls.csproj" />
     <ProjectReference Include="..\View3D\View3D.csproj" />
   </ItemGroup>

@@ -11,7 +11,7 @@ namespace AssetManagement.GenericFormats.Unmanaged
     };
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct NtVertexInfluence
+    public struct VertexInfluence
     {
         public uint boneIndex;
         public float weight;
@@ -28,7 +28,7 @@ namespace AssetManagement.GenericFormats.Unmanaged
         public XMFLOAT4 Color;
 
         [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.Struct, SizeConst = 4)]
-        public NtVertexInfluence[]? influences; // fixed array length 4        
+        public VertexInfluence[]? influences; // fixed array length 4        
 
         public int WeightCount;
     };
