@@ -115,7 +115,7 @@ namespace KitbasherEditor.ViewModels.PinTool
                 return;
             }
 
-            if (AffectedMeshCollection.Count(x => x == _selectedVertexMesh) != 0)
+            if (AffectedMeshCollection.Any(x => x == _selectedVertexMesh))
             {
                 MessageBox.Show("Source mesh is also in the list of target meshes", "Error");
                 return;

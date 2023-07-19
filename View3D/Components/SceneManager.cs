@@ -1,5 +1,6 @@
 ﻿using CommonControls.Common;
 using Microsoft.Xna.Framework;
+using Monogame.WpfInterop.Common;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -11,35 +12,41 @@ using View3D.Utility;
 
 namespace View3D.Components.Component
 {
-    public delegate void SceneObjectAddedDelegate(ISceneNode parent, ISceneNode added);
-    public delegate void SceneObjectRemovedDelegate(ISceneNode parent, ISceneNode toRemove);
-
-
     public static class SpecialNodes
     {
         public static string Root { get => "Root"; }
         public static string EditableModel { get => "Editable Model"; }
-        public static string ReferenceMeshs { get => "Reference meshs"; }
+        public static string ReferenceMeshs { get => "Reference meshes"; }
+    }
+
+    public class SceneObjectAddedEvent
+    {
+        public ISceneNode Parent { get; init; }
+        public ISceneNode Added { get; init; }
+    }
+
+    public class SceneObjectRemovedEvent
+    {
+        public ISceneNode Parent { get; init; }
+        public ISceneNode ToRemove { get; init; }
     }
 
     public class SceneManager : BaseComponent, IDisposable
     {
-        public event SceneObjectAddedDelegate SceneObjectAdded;
-        public event SceneObjectRemovedDelegate SceneObjectRemoved;
-
         ILogger _logger = Logging.Create<SceneManager>();
         public ISceneNode RootNode { get; private set; }
 
 
         private readonly RenderEngineComponent _renderEngineComponent;
+        private readonly EventHub _eventHub;
 
-        public SceneManager(RenderEngineComponent renderEngineComponent)
+        public SceneManager(RenderEngineComponent renderEngineComponent, EventHub eventHub)
         {
             _renderEngineComponent = renderEngineComponent;
-
+            _eventHub = eventHub;
             RootNode = new GroupNode(SpecialNodes.Root) { SceneManager = this, IsEditable = true, IsLockable = false };
+            
         }
-
 
         public T GetNodeByName<T>(string name) where T : class, ISceneNode
         {
@@ -54,12 +61,12 @@ namespace View3D.Components.Component
 
         public void TriggerAddObjectEvent(ISceneNode parent, ISceneNode added)
         {
-            SceneObjectAdded?.Invoke(parent, added);
+            _eventHub.Publish(new SceneObjectAddedEvent() { Parent = parent, Added = added });
         }
 
         public void TriggerRemoveObjectEvent(ISceneNode parent, ISceneNode toRemove)
         {
-            SceneObjectRemoved?.Invoke(parent, toRemove);
+            _eventHub.Publish(new SceneObjectRemovedEvent() { Parent = parent, ToRemove = toRemove });
         }
 
         public Matrix GetWorldPosition(ISceneNode node)
@@ -203,14 +210,6 @@ namespace View3D.Components.Component
 
         public void Dispose()
         {
-            if (SceneObjectAdded != null)
-                foreach (var d in SceneObjectAdded.GetInvocationList())
-                    SceneObjectAdded -= (d as SceneObjectAddedDelegate);
-
-            if (SceneObjectRemoved != null)
-                foreach (var d in SceneObjectRemoved.GetInvocationList())
-                    SceneObjectRemoved -= (d as SceneObjectRemovedDelegate);
-
             if (RootNode != null)
                 DisposeNode(RootNode);
             RootNode = null;
