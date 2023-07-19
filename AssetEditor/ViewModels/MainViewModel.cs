@@ -1,5 +1,4 @@
-﻿using AssetEditor.DevelopmentConfiguration;
-using AssetEditor.UiCommands;
+﻿using AssetEditor.UiCommands;
 using AssetEditor.Views.Settings;
 using CommonControls.Common;
 using CommonControls.Events.UiCommands;
@@ -21,7 +20,6 @@ namespace AssetEditor.ViewModels
     public class MainViewModel : NotifyPropertyChangedImpl, IDropTarget<IEditorViewModel, bool>
     {
         private readonly PackFileService _packfileService;
-        private readonly DevelopmentConfigurationManager _developmentConfiguration;
         private readonly IUiCommandFactory _uiCommandFactory;
 
         public PackFileBrowserViewModel FileTree { get; private set; }
@@ -58,11 +56,9 @@ namespace AssetEditor.ViewModels
             PackFileService packfileService,
             ApplicationSettingsService settingsService,
             IToolFactory toolFactory,
-            DevelopmentConfigurationManager developmentConfiguration,
             IUiCommandFactory uiCommandFactory)
         {
             MenuBar = menuViewModel;
-            _developmentConfiguration = developmentConfiguration;
             _uiCommandFactory = uiCommandFactory;
             _packfileService = packfileService;
             _packfileService.Database.BeforePackFileContainerRemoved += Database_BeforePackFileContainerRemoved;
