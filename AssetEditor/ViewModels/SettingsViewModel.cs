@@ -37,7 +37,8 @@ namespace AssetEditor.ViewModels
 
         public ICommand SaveCommand { get; set; }
 
-        ApplicationSettingsService _settingsService;
+        private readonly ApplicationSettingsService _settingsService;
+
         public SettingsViewModel(ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
             _settingsService = settingsService;

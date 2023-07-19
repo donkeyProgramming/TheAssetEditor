@@ -46,12 +46,12 @@ namespace AssetEditor.ViewModels
 
     public class MenuBarViewModel
     {
-        ILogger _logger = Logging.Create<MainViewModel>();
+        private readonly ILogger _logger = Logging.Create<MainViewModel>();
         private readonly GameInformationFactory _gameInformationFactory;
-        IServiceProvider _serviceProvider;
-        PackFileService _packfileService;
-        ApplicationSettingsService _settingsService;
-        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly PackFileService _packfileService;
+        private readonly ApplicationSettingsService _settingsService;
+        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly IUiCommandFactory _uiCommandFactory;
 
         public ICommand OpenSettingsWindowCommand { get; set; }
