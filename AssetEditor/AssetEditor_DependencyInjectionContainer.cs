@@ -1,4 +1,5 @@
-﻿using AssetEditor.UiCommands;
+﻿using AssetEditor.DevelopmentConfiguration;
+using AssetEditor.UiCommands;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
@@ -23,7 +24,8 @@ namespace AssetEditor
             serviceCollection.AddScoped<SettingsViewModel>();
             serviceCollection.AddScoped<MenuBarViewModel>();
 
-            serviceCollection.AddTransient<DevelopmentConfiguration>();
+            serviceCollection.AddTransient<DevelopmentConfigurationManager>();
+            RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Scoped);
         }
     }
 }
