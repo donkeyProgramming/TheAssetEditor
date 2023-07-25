@@ -28,8 +28,7 @@ namespace AssetManagement.Strategies.Fbx
         /// </summary>
         /// <exception cref="Exception">Throw on invalid weight sum</exception>
         public static void CheckVertexWeights(CommonVertex vertex, float errorTolerance = 1e-1f)
-        {
-            // TODO: SUM should be 1.0f or close, if more than "X" different, throw exception            
+        {            
             vertex.WeightCount = 4;
             const double weightErrorTolerance = 0.1;
 

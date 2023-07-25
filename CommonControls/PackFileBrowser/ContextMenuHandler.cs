@@ -414,7 +414,7 @@ namespace CommonControls.PackFileBrowser
                 case ContextItems.Import:
                     return new ContextMenuItem() { Name = "Import" };
                 case ContextItems.Import3DModel:
-                    return new ContextMenuItem() { Name = "Import 3D Model (FBX SDK)", Command = Import3DFileCommand };
+                    return new ContextMenuItem() { Name = "Import 3D Model File (Experimental)", Command = Import3DFileCommand };
                 case ContextItems.Create:
                     return new ContextMenuItem() { Name = "Create" };
                 case ContextItems.AddFiles:

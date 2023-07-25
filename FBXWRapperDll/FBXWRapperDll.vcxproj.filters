@@ -980,5 +980,11 @@
     <None Include="fbxsdk\lib\vs2019\x64\debug\libfbxsdk.dll" />
     <None Include="fbxsdk\lib\vs2019\x64\release\libfbxsdk.dll" />
     <None Include="fbxsdk\lib\vs2019\x64\release\libfbxsdk.zip" />
+    <None Include="FBXScene\FBXSceneContainerGetters.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="FBXServices\FbxSceneLoaderService.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

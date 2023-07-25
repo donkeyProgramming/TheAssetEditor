@@ -101,10 +101,10 @@ bool logfunc::impl_log_action_warning(const std::string& _strMsg)
 	return false;
 }
 
-bool logfunc::impl_log_action_warning(const std::wstring& _wstrMsg)
-{
-	return logfunc::impl_log_action_warning(NarrowStr(_wstrMsg));
-}
+//bool logfunc::impl_log_action_warning(const std::wstring& _wstrMsg)
+//{
+//	return logfunc::impl_log_action_warning(NarrowStr(_wstrMsg));
+//}
 
 void logfunc::impl_log_write(const std::string& _strMsg)
 {

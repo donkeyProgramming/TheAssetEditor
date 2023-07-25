@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 
 namespace AssetManagement.GenericFormats.Unmanaged
-{     
+{
     [StructLayout(LayoutKind.Sequential)]
     public struct BoneKey
     {
@@ -32,7 +32,6 @@ namespace AssetManagement.GenericFormats.Unmanaged
 
         public int WeightCount;
     };
-
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     public struct VertexWeight

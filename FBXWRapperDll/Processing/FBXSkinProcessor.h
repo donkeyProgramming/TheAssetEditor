@@ -22,7 +22,7 @@ namespace wrapdll
 			FbxMesh* _poSourceFbxMesh,
 			PackedMesh& destPackedMesh,
 			const std::vector < std::string >& boneTable,
-			std::vector<ControlPointInfluences>& controlPointInfluences);
+			std::vector<ControlPointInfluenceExt>& controlPointInfluences);
 		
 		/// <summary>
 		/// Process each FBXMesh's SKIN, and store rigging data in mesh structure
@@ -40,7 +40,7 @@ namespace wrapdll
 			fbxsdk::FbxMesh* poFbxMeshNode,
 			PackedMesh& destPackedMesh,
 			const std::vector<std::string>& boneTable,
-			std::vector<ControlPointInfluences>& controlPointInfluences);
+			std::vector<ControlPointInfluenceExt>& controlPointInfluences);
 	};
 
 }
