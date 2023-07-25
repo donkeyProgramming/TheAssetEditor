@@ -1,5 +1,6 @@
-﻿using Audio.FileFormats.WWise;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Audio.FileFormats.WWise;
+using Audio.FileFormats.WWise.Didx;
 
 namespace Audio.Storage
 {
@@ -10,8 +11,9 @@ namespace Audio.Storage
 
     public class AudioData
     {
-        public Dictionary<uint, string> NameLookUpTable { get; set; }
-        public Dictionary<uint, List<HircItem>> HircObjects { get; set; }
+        public Dictionary<uint, string> NameLookUpTable { get; internal set; }
+        public Dictionary<uint, List<HircItem>> HircObjects { get; internal set; }
+        public Dictionary<uint, List<DidxAudio>> DidxAudioObject { get; internal set; }
     }
 
     public class CreateRepositoryFromAllPackFiles : RepositoryProvider
@@ -28,14 +30,14 @@ namespace Audio.Storage
         public AudioData Load()
         {
             var nameList = _wwiseNameLoader.BuildNameHelper();
-            var bnkList = _wwiseDataLoader.LoadBnkFiles();
+            var loadResult = _wwiseDataLoader.LoadBnkFiles();
 
             return new AudioData()
             {
                 NameLookUpTable = nameList,
-                HircObjects = bnkList
+                HircObjects = loadResult.HircList,
+                DidxAudioObject = loadResult.DidxAudioList
             };
         }
     }
-
 }

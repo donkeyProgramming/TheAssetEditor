@@ -15,7 +15,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public AkPropBundle AkPropBundle0 { get; set; }
         public AkPropBundleMinMax AkPropBundle1 { get; set; }
 
-        protected override void CreateSpesificData(ByteChunk chunk)
+        protected override void CreateSpecificData(ByteChunk chunk)
         {
             uProbability = chunk.ReadByte();
             uTreeDepth = chunk.ReadUInt32();

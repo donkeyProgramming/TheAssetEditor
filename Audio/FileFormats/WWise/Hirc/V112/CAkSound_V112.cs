@@ -8,7 +8,7 @@ namespace Audio.FileFormats.WWise.Hirc.V112
         public AkBankSourceData AkBankSourceData { get; set; }
         public NodeBaseParams NodeBaseParams { get; set; }
 
-        protected override void CreateSpesificData(ByteChunk chunk)
+        protected override void CreateSpecificData(ByteChunk chunk)
         {
             AkBankSourceData = AkBankSourceData.Create(chunk);
             NodeBaseParams = NodeBaseParams.Create(chunk);

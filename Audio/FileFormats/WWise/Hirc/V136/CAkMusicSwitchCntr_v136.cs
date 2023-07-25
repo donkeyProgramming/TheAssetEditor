@@ -20,7 +20,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public Shared.AkDecisionTree AkDecisionTree { get; set; }
 
 
-        protected override void CreateSpesificData(ByteChunk chunk)
+        protected override void CreateSpecificData(ByteChunk chunk)
         {
             MusicTransNodeParams = MusicTransNodeParams.Create(chunk);
             bIsContinuePlayback = chunk.ReadByte();

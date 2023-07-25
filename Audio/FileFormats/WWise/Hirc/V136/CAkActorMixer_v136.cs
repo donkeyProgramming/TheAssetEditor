@@ -1,13 +1,14 @@
-﻿using Filetypes.ByteParsing;
+﻿using System.Collections.Generic;
+using Filetypes.ByteParsing;
 
 namespace Audio.FileFormats.WWise.Hirc.V136
 {
-    public class CAkActorMixer_v136 : HircItem, INodeBaseParamsAccessor
+    public class CAkActorMixer_v136 : HircItem, INodeBaseParamsAccessor, ICAkActorMixer
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public Children Children { get; set; }
 
-        protected override void CreateSpesificData(ByteChunk chunk)
+        protected override void CreateSpecificData(ByteChunk chunk)
         {
             NodeBaseParams = NodeBaseParams.Create(chunk);
             Children = Children.Create(chunk);
@@ -31,6 +32,8 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
             return byteArray;
         }
+
+        public List<uint> GetChildren() => Children.ChildIdList;
     }
 }
 

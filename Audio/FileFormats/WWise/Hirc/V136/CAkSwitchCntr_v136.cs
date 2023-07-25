@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Audio.FileFormats.WWise.Hirc.V136
 {
 
-    public class CAkSwitchCntr_v136 : HircItem, INodeBaseParamsAccessor
+    public class CAkSwitchCntr_v136 : HircItem, INodeBaseParamsAccessor, ICAkSwitchCntr
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public AkGroupType eGroupType { get; set; }
@@ -13,10 +13,11 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public uint ulDefaultSwitch { get; set; }    // Default value name
         public byte bIsContinuousValidation { get; set; }
         public Children Children { get; set; }
-        public List<CAkSwitchPackage> SwitchList { get; set; } = new List<CAkSwitchPackage>();
-        public List<AkSwitchNodeParams> Parameters { get; set; } = new List<AkSwitchNodeParams>();
+        public List<ICAkSwitchCntr.ICAkSwitchPackage> SwitchList { get; set; } = new();
+        public List<AkSwitchNodeParams> Parameters { get; set; } = new();
 
-        protected override void CreateSpesificData(ByteChunk chunk)
+
+        protected override void CreateSpecificData(ByteChunk chunk)
         {
             NodeBaseParams = NodeBaseParams.Create(chunk);
             eGroupType = (AkGroupType)chunk.ReadByte();
@@ -36,5 +37,8 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
         public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
+
+        public uint GroupId { get => ulGroupID; }
+        public uint DefaultSwitch { get => ulDefaultSwitch; }
     }
 }

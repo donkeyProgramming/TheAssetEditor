@@ -19,7 +19,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public InitialRTPC InitialRTPC { get; set; }
         public StateChunk StateChunk { get; set; }
 
-        protected override void CreateSpesificData(ByteChunk chunk)
+        protected override void CreateSpecificData(ByteChunk chunk)
         {
             if (Id == 2665947595)
             {

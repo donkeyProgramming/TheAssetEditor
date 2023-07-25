@@ -19,22 +19,15 @@ namespace AssetEditor.DevelopmentConfiguration
             _settingsService = settingsService;
         }
 
-        public void Execute()
-        {
-            OverrideSettings();
-            CreateTestPackFiles();
-            OpenFileOnLoad();
-        }
-
-        void CreateTestPackFiles()
+        public void CreateTestPackFiles()
         {
             var newPackFile = _packFileService.CreateNewPackFileContainer("CustomPackFile", PackFileCAType.MOD);
             _packFileService.SetEditablePack(newPackFile);
         }
 
-        void OpenFileOnLoad() => GetCurrentConfig()?.OpenFileOnLoad();
+        public void OpenFileOnLoad() => GetCurrentConfig()?.OpenFileOnLoad();
 
-        void OverrideSettings() => GetCurrentConfig()?.OverrideSettings(_settingsService.CurrentSettings);
+        public void OverrideSettings() => GetCurrentConfig()?.OverrideSettings(_settingsService.CurrentSettings);
 
         IDeveloperConfiguration GetCurrentConfig()
         {

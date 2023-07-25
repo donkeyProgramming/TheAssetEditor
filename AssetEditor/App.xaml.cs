@@ -40,8 +40,11 @@ namespace AssetEditor
                 settingsService.Save();
             }
 
+            DevelopmentConfigurationManager devConfigManager = null;
             if (settingsService.CurrentSettings.IsDeveloperRun)
-                _rootScope.ServiceProvider.GetRequiredService<DevelopmentConfigurationManager>().Execute();
+                devConfigManager = _rootScope.ServiceProvider.GetRequiredService<DevelopmentConfigurationManager>();
+
+            devConfigManager?.OverrideSettings();        
 
             // Load all packfiles
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
@@ -57,6 +60,9 @@ namespace AssetEditor
                         MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
                 }
             }
+
+            devConfigManager?.CreateTestPackFiles();
+            devConfigManager?.OpenFileOnLoad();
 
             ShowMainWindow();
         }

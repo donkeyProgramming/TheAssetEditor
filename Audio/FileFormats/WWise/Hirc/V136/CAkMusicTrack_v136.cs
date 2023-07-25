@@ -1,10 +1,13 @@
 ﻿using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Audio.FileFormats.WWise.Hirc.V136
 {
-    public class CAkMusicTrack_v136 : HircItem, INodeBaseParamsAccessor
+
+
+    public class CAkMusicTrack_v136 : HircItem, INodeBaseParamsAccessor, ICAkMusicTrack
     {
 
         public byte uFlags { get; set; }
@@ -23,7 +26,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public int iLookAheadTime { get; set; }
 
 
-        protected override void CreateSpesificData(ByteChunk chunk)
+        protected override void CreateSpecificData(ByteChunk chunk)
         {
             uFlags = chunk.ReadByte();
 
@@ -51,6 +54,8 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
         public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
+
+        public List<uint> GetChildren() => pSourceList.Select(x=>x.akMediaInformation.SourceId).ToList();
     }
 
     public class AkTrackSrcInfo

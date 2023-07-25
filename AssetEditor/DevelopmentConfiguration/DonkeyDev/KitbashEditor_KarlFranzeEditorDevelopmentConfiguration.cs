@@ -4,12 +4,12 @@ using CommonControls.Services;
 
 namespace AssetEditor.DevelopmentConfiguration.DonkeyDev
 {
-    internal class LoadKarlFranzInKitbashEditorDevelopmentConfiguration : IDeveloperConfiguration
+    internal class KitbashEditor_KarlFranzeEditorDevelopmentConfiguration : IDeveloperConfiguration
     {
         private readonly PackFileService _packFileService;
         private readonly IUiCommandFactory _uiCommandFactory;
 
-        public LoadKarlFranzInKitbashEditorDevelopmentConfiguration(PackFileService packFileService, IUiCommandFactory uiCommandFactory)
+        public KitbashEditor_KarlFranzeEditorDevelopmentConfiguration(PackFileService packFileService, IUiCommandFactory uiCommandFactory)
         {
             _packFileService = packFileService;
             _uiCommandFactory = uiCommandFactory;

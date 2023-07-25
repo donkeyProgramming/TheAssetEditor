@@ -1,38 +1,45 @@
-﻿using Audio.FileFormats.WWise;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Audio.FileFormats.WWise;
+using Audio.FileFormats.WWise.Didx;
 using Audio.FileFormats.WWise.Hirc;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Audio.Storage
 {
     public class WWiseBnkLoader
     {
-        private readonly PackFileService _pfs;
-        private readonly Bnkparser _bnkparser;
-        ILogger _logger = Logging.Create<WWiseBnkLoader>();
+        public class LoadResult
+        {
+            public Dictionary<uint, List<HircItem>> HircList { get; internal set; } = new();
+            public Dictionary<uint, List<DidxAudio>> DidxAudioList { get; internal set; } = new();
+        }
 
-        public WWiseBnkLoader(PackFileService pfs, Bnkparser bnkparser)
+        private readonly PackFileService _pfs;
+        private readonly BnkParser _bnkParser;
+        readonly ILogger _logger = Logging.Create<WWiseBnkLoader>();
+
+        public WWiseBnkLoader(PackFileService pfs, BnkParser bnkParser)
         {
             _pfs = pfs;
-            _bnkparser = bnkparser;
+            _bnkParser = bnkParser;
         }
 
         public ParsedBnkFile LoadBnkFile(PackFile bnkFile, string bnkFileName, bool printData = false)
         {
-            var soundDb = _bnkparser.Parse(bnkFile, bnkFileName);
+            var soundDb = _bnkParser.Parse(bnkFile, bnkFileName);
             if (printData)
                 PrintHircList(soundDb.HircChuck.Hircs, bnkFileName);
             return soundDb;
         }
 
-        public Dictionary<uint, List<HircItem>> LoadBnkFiles(bool onlyEnglish = true)
+        public LoadResult LoadBnkFiles(bool onlyEnglish = true)
         {
             var bankFiles = _pfs.FindAllWithExtentionIncludePaths(".bnk");
             var bankFilesAsDictionary = bankFiles.ToDictionary(x => x.FileName, x => x.Pack);
@@ -47,13 +54,13 @@ namespace Audio.Storage
             var banksWithUnknowns = new List<string>();
             var failedBnks = new List<(string bnkFile, string Error)>();
 
-
             var counter = 1;
+            //foreach(var bnkFile in wantedBnkFiles)
             Parallel.ForEach(wantedBnkFiles, bnkFile =>
             {
                 var name = bnkFile.Key;
                 var file = bnkFile.Value;
-                _logger.Here().Information($"{counter++}/{wantedBnkFiles.Count()} - {name}");
+                _logger.Here().Information($"{counter++}/{wantedBnkFiles.Count} - {name}");
 
                 try
                 {
@@ -69,17 +76,35 @@ namespace Audio.Storage
                 }
             });
 
+            var output = new LoadResult();
 
             // Combine the data
-            var mergedHircList = new Dictionary<uint, List<HircItem>>();
             foreach (var parsedBnk in parsedBnkList)
             {
+                // Build Audio Hircs from DIDX and DATA
+                if (parsedBnk.DataChunk is not null && parsedBnk.DidxChunk is not null)
+                {
+                    foreach (var didx in parsedBnk.DidxChunk.MediaList)
+                    {
+                        var didxAudio = new DidxAudio()
+                        {
+                            Id = didx.Id,
+                            ByteArray = parsedBnk.DataChunk.GetBytesFromBuffer((int)didx.Offset, (int)didx.Size),
+                            OwnerFile = parsedBnk.Header.OwnerFileName,
+                        };
+
+                        if (output.DidxAudioList.ContainsKey(didx.Id) is false)
+                            output.DidxAudioList[didx.Id] = new List<DidxAudio>();
+                        output.DidxAudioList[didx.Id].Add(didxAudio);
+                    }
+                }
+
                 foreach (var item in parsedBnk.HircChuck.Hircs)
                 {
-                    if (mergedHircList.ContainsKey(item.Id) == false)
-                        mergedHircList[item.Id] = new List<HircItem>();
+                    if (output.HircList.ContainsKey(item.Id) == false)
+                        output.HircList[item.Id] = new List<HircItem>();
 
-                    mergedHircList[item.Id].Add(item);
+                    output.HircList[item.Id].Add(item);
                 }
             }
 
@@ -90,7 +115,7 @@ namespace Audio.Storage
             if (failedBnks.Any())
                 _logger.Here().Error($"{failedBnks.Count} banks failed: {string.Join("\n", failedBnks)}");
 
-            return mergedHircList;
+            return output;
         }
 
         void PrintHircList(IEnumerable<HircItem> hircItems, string header)

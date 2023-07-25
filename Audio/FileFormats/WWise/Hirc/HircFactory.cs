@@ -33,7 +33,7 @@ namespace Audio.FileFormats.WWise.Hirc
                 case 136: return CreateFactory_v136();  // Wh3
             }
 
-            throw new Exception($"Unkown Version {version}");
+            throw new Exception($"Unknown Version {version}");
         }
 
         static HircFactory CreateFactory_v122()

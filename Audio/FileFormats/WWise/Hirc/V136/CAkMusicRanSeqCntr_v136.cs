@@ -10,7 +10,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public List<AkMusicRanSeqPlaylistItem> pPlayList { get; set; } = new List<AkMusicRanSeqPlaylistItem>();
 
 
-        protected override void CreateSpesificData(ByteChunk chunk)
+        protected override void CreateSpecificData(ByteChunk chunk)
         {
             MusicTransNodeParams = MusicTransNodeParams.Create(chunk);
 

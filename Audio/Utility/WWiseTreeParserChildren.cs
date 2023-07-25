@@ -108,18 +108,18 @@ namespace Audio.AudioEditor
 
         private void ProcessActorMixer(HircItem item, HircTreeItem parent)
         {
-            var actorMixer = GetAsType<CAkActorMixer_v136>(item);
+            var actorMixer = GetAsType<ICAkActorMixer>(item);
             var actorMixerNode = new HircTreeItem() { DisplayName = $"ActorMixer {_repository.GetNameFromHash(item.Id)}", Item = item };
             parent.Children.Add(actorMixerNode);
 
-            ProcessNext(actorMixer.Children.ChildIdList, actorMixerNode);
+            ProcessNext(actorMixer.GetChildren(), actorMixerNode);
         }
 
         void ProcessSwitchControl(HircItem item, HircTreeItem parent)
         {
-            var switchControl = GetAsType<CAkSwitchCntr_v136>(item);
-            var switchType = _repository.GetNameFromHash(switchControl.ulGroupID);
-            var defaultValue = _repository.GetNameFromHash(switchControl.ulDefaultSwitch);
+            var switchControl = GetAsType<ICAkSwitchCntr>(item);
+            var switchType = _repository.GetNameFromHash(switchControl.GroupId);
+            var defaultValue = _repository.GetNameFromHash(switchControl.DefaultSwitch);
             var switchControlNode = new HircTreeItem() { DisplayName = $"Switch {switchType} DefaultValue: {defaultValue}", Item = item };
             parent.Children.Add(switchControlNode);
 
@@ -135,11 +135,11 @@ namespace Audio.AudioEditor
 
         private void ProcessLayerContainer(HircItem item, HircTreeItem parent)
         {
-            var layerContainer = GetAsType<CAkLayerCntr_v136>(item);
+            var layerContainer = GetAsType<ICAkLayerCntr>(item);
             var layerNode = new HircTreeItem() { DisplayName = $"Layer Container", Item = item };
             parent.Children.Add(layerNode);
 
-            foreach (var layer in layerContainer.Children.ChildIdList)
+            foreach (var layer in layerContainer.GetChildren())
                 ProcessNext(layer, layerNode);
         }
 
@@ -154,12 +154,12 @@ namespace Audio.AudioEditor
 
         private void ProcessMusicTrack(HircItem item, HircTreeItem parent)
         {
-            var hirc = GetAsType<CAkMusicTrack_v136>(item);
+            var hirc = GetAsType<ICAkMusicTrack>(item);
             var node = new HircTreeItem() { DisplayName = $"Music Track", Item = item };
             parent.Children.Add(node);
 
-            foreach (var sourceItem in hirc.pSourceList)
-                ProcessNext(sourceItem.akMediaInformation.SourceId, node);
+            foreach (var sourceItem in hirc.GetChildren())
+                ProcessNext(sourceItem, node);
         }
 
         private void ProcessMusicSegment(HircItem item, HircTreeItem parent)
@@ -189,7 +189,6 @@ namespace Audio.AudioEditor
                 ProcessNext(path.ChildNodeId, pathNode);
             }
         }
-
 
         private void ProcessRandMusicContainer(HircItem item, HircTreeItem parent)
         {
