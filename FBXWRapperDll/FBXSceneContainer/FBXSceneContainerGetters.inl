@@ -32,9 +32,15 @@ extern "C" // not really needed but block looks nice/readable:)
 	};
 
 	FBXWRAPPERDLL_API
-		extern char* GetSkeletonName(wrapdll::FBXSCeneContainer* pInstance, int meshindex)
+	extern char* GetSkeletonName(wrapdll::FBXSCeneContainer* pInstance, int meshindex)
 	{
 		return (char*)pInstance->GetSkeletonName().c_str();
+	};
+
+	FBXWRAPPERDLL_API
+	extern FileInfoStruct* GetFileInfo(wrapdll::FBXSCeneContainer* pInstance)
+	{
+        return &pInstance->GetFileInfo();
 	};
 
 }

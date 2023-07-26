@@ -13,6 +13,7 @@ struct BoneAnimKey
 
 struct VertexInfluence
 {
+    char boneName[255] = "";
 	uint32_t boneIndex = 0;
 	float weight = 0.0f;
 };

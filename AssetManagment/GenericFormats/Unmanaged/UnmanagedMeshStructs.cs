@@ -2,7 +2,7 @@
 
 namespace AssetManagement.GenericFormats.Unmanaged
 {
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Size = 32)]
     public struct BoneKey
     {
         public XMFLOAT3 translation;
@@ -10,15 +10,17 @@ namespace AssetManagement.GenericFormats.Unmanaged
         public double timeStampe;
     };
 
-    [StructLayout(LayoutKind.Sequential)]
-    public struct VertexInfluence
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Size = 263)]
+    public struct ExtVertexInfluence
     {
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
+        public string boneName;
         public uint boneIndex;
         public float weight;
     };
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct PackedCommonVertex
+    public struct ExtPackedCommonVertex
     {
         public XMFLOAT4 Position;
         public XMFLOAT3 Normal;
@@ -28,9 +30,9 @@ namespace AssetManagement.GenericFormats.Unmanaged
         public XMFLOAT4 Color;
 
         [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.Struct, SizeConst = 4)]
-        public VertexInfluence[]? influences; // fixed array length 4        
+        public ExtVertexInfluence[] influences; // fixed array length 4        
 
-        public int WeightCount;
+        public int weightCount;
     };
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]

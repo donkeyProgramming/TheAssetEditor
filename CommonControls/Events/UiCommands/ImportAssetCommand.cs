@@ -39,7 +39,8 @@ namespace CommonControls.Events.UiCommands
                 if (string.IsNullOrWhiteSpace(filename))
                     return;
 
-                try
+                // TODO: RE-ENABLE!!!
+                //try
                 {
                     var extension = Path.GetExtension(filename);
                     var importer = _assetManagementFactory.GetImporter(extension);  // Add some validation here! 
@@ -50,10 +51,10 @@ namespace CommonControls.Events.UiCommands
 
                     _packFileService.AddFileToPack(container, parentPath, packFile);
                 }
-                catch (Exception e)
-                {
-                    MessageBox.Show($"Failed to import model/scene file {filename}. Error : {e.Message}", "Error");
-                }
+                //catch (Exception e)
+                //{
+                //    MessageBox.Show($"Failed to import model/scene file {filename}. Error : {e.Message}", "Error");
+                //}
             }
         }
     }

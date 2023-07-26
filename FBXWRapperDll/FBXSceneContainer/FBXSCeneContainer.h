@@ -11,13 +11,15 @@
 #include <d3d.h>
 #include <Vector>
 #include <memory>
+#include <string.h>
 
 #include "..\Base\BaseInteropObject.h"
 
-#include "../Logging/Logging.h"
-#include "../DataStructures/PackedMeshStructs.h"
-#include "../Helpers/FBXHelperFileUtil.h"
-#include "../Helpers/Geometry/FBXNodeSearcher.h"
+#include "..\Logging\Logging.h"
+#include "..\DataStructures\PackedMeshStructs.h"
+#include "..\Helpers\FBXHelperFileUtil.h"
+#include "..\Helpers\Geometry\FBXNodeSearcher.h"
+#include "..\DataStructures\FileInfoStruct.h"
 
 #include "..\DLLDefines.h"
 
@@ -61,7 +63,16 @@ namespace wrapdll
 			return m_skeletonName;
 		};
 
+		FileInfoStruct& GetFileInfo()
+		{
+            
+            // TODO: file out rest and display in "GileInfoView"
+
+			return m_fileInfoStruct;
+		};
+
 	private:
+        FileInfoStruct m_fileInfoStruct;
 		std::string m_skeletonName = "";
 		std::vector<PackedMesh> m_packedMeshes;
 		std::vector<std::string> m_animFileBoneNames; // ordered as the .ANIM file, so can be used for bonename -> index lookups

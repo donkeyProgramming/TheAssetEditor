@@ -91,7 +91,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;FBXWRAPPERDLL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
@@ -109,7 +108,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;FBXWRAPPERDLL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
@@ -126,7 +124,6 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>Default</ConformanceMode>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>fbxsdk\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -150,7 +147,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;FBXWRAPPERDLL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>H:\Coding\FBX SDK\2020.1;H:\Coding\FBX SDK\2020.1\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -165,7 +161,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
-    <None Include="FBXScene\FBXSceneContainerGetters.inl" />
+    <None Include="FBXSceneContainer\FBXSceneContainerGetters.inl" />
     <None Include="fbxsdk\bin\vs2019\x64\release\libfbxsdk.zip" />
     <None Include="fbxsdk\lib\vs2019\x64\debug\libfbxsdk.dll" />
     <None Include="fbxsdk\lib\vs2019\x64\release\libfbxsdk.dll" />
@@ -459,13 +455,14 @@
     <ClInclude Include="fbxsdk\include\libxml2\libxml\xpath.h" />
     <ClInclude Include="fbxsdk\include\libxml2\libxml\xpathInternals.h" />
     <ClInclude Include="fbxsdk\include\libxml2\libxml\xpointer.h" />
+    <ClInclude Include="DataStructures\FileInfoStruct.h" />
     <ClInclude Include="Processing\FBXMeshCreator.h" />
     <ClInclude Include="Processing\FBXVertexCreator.h" />
     <ClInclude Include="FBXServices\FBXSceneLoaderService.h" />
     <ClInclude Include="Helpers\Geometry\FBXMeshGeometryHelper.h" />
     <ClInclude Include="Processing\FBXMeshProcessor.h" />
     <ClInclude Include="Helpers\Geometry\FBXNodeGeometryHelper.h" />
-    <ClInclude Include="FBXScene\FBXSCeneContainer.h" />
+    <ClInclude Include="FBXSceneContainer\FBXSCeneContainer.h" />
     <ClInclude Include="Processing\FBXSkinProcessor.h" />
     <ClInclude Include="Helpers\VectorConverter.h" />
     <ClInclude Include="Helpers\FBXHelperFileUtil.h" />
@@ -477,11 +474,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="DataStructures\FileInfoStruct.cpp" />
     <ClCompile Include="Processing\FBXMeshCreator.cpp" />
     <ClCompile Include="Processing\FBXVertexCreator.cpp" />
     <ClCompile Include="FBXServices\FBXSceneLoaderService.cpp" />
     <ClCompile Include="Helpers\Geometry\FBXMeshGeometryHelper.cpp" />
-    <ClCompile Include="FBXScene\FBXSCeneContainer.cpp" />
+    <ClCompile Include="FBXSceneContainer\FBXSCeneContainer.cpp" />
     <ClCompile Include="Processing\FBXMeshProcessor.cpp" />
     <ClCompile Include="Helpers\Geometry\FBXNodeSearcher.h" />
     <ClCompile Include="Processing\FBXSkinProcessor.cpp" />

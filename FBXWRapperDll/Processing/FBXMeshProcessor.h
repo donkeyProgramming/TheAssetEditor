@@ -4,6 +4,8 @@
 
 #include <vector>
 #include <map>
+#include <string.h> 
+#include <string> 
 
 #include "..\DataStructures\PackedMeshStructs.h"
 #include "..\Helpers\FBXUnitHelper.h"
@@ -19,22 +21,27 @@ namespace wrapdll
 {
 	class FbxMeshProcessor
 	{
-
+        struct BoneName4
+        {
+            std::string n1, n2, n3, n4;
+        };
 	public:
 		static void doTangentAndIndexing(PackedMesh& destMesh) {
 
 			using namespace std;
 			using namespace DirectX;
 
+            // -- input
 			vector<DirectX::SimpleMath::Vector3> vertices;
 			vector<DirectX::SimpleMath::Vector2> uvs;
 			vector<DirectX::SimpleMath::Vector3> normals;
 			vector<DirectX::SimpleMath::Vector3> tangents;
 			vector<DirectX::SimpleMath::Vector3> bitangents;
-
 			vector<XMFLOAT4> bone_weights;
 			vector<XMUINT4> bone_indices;
+			vector<BoneName4> bone_names;
 
+            // -- output
 			vector<DirectX::SimpleMath::Vector3> out_vertices;
 			vector<DirectX::SimpleMath::Vector2> out_uvs;
 			vector<DirectX::SimpleMath::Vector3> out_normals;
@@ -43,6 +50,7 @@ namespace wrapdll
 
 			vector<DirectX::XMFLOAT4> out_bone_weights;
 			vector<DirectX::XMUINT4> out_bone_indices;
+            vector<BoneName4> out_bone_names;
 
 			vector<uint16_t> out_indices;
 
@@ -55,6 +63,7 @@ namespace wrapdll
 				normals.push_back(v.normal);
 				bone_indices.push_back({ v.influences[0].boneIndex, v.influences[1].boneIndex, v.influences[2].boneIndex, v.influences[3].boneIndex });
 				bone_weights.push_back({ v.influences[0].weight, v.influences[1].weight, v.influences[2].weight, v.influences[3].weight });
+				bone_names.push_back({ v.influences[0].boneName, v.influences[1].boneName, v.influences[2].boneName, v.influences[3].boneName });
 			};
 
 			computeTangentBasis_Unindexed(
@@ -67,7 +76,7 @@ namespace wrapdll
 
 			// do indexing (clean up mesh), and average tangents
 			indexVBO_TBN_Fast(
-				vertices, uvs, normals, tangents, bitangents, bone_weights, bone_indices,
+				vertices, uvs, normals, tangents, bitangents, bone_weights, bone_indices, bone_names,
 				
 				out_indices,
 				out_vertices,
@@ -76,41 +85,47 @@ namespace wrapdll
 				out_tangents,
 				out_bitangents,				
 				out_bone_weights,
-				out_bone_indices
+				out_bone_indices,
+                out_bone_names
 			);
 			
 			destMesh.vertices.clear();
 			destMesh.vertices.resize(out_vertices.size());
 
 			// copy the processed mesh data back into the mesh
-			for (size_t i = 0; i < out_vertices.size(); i++)
-			{
-				auto& v = destMesh.vertices[i];
-				auto& v_src = destMesh.vertices[i];
-				//v.position = out_vertices[i];
-				v.position = XMFLOAT4(out_vertices[i].x, out_vertices[i].y, out_vertices[i].z, 0);
+            for (size_t i = 0; i < out_vertices.size(); i++)
+            {
+                auto& v = destMesh.vertices[i];
+                auto& v_src = destMesh.vertices[i];
+                //v.position = out_vertices[i];
+                v.position = XMFLOAT4(out_vertices[i].x, out_vertices[i].y, out_vertices[i].z, 0);
 
-				out_normals[i].Normalize();
-				v.normal = out_normals[i];
+                out_normals[i].Normalize();
+                v.normal = out_normals[i];
 
-				out_tangents[i].Normalize();
-				out_bitangents[i].Normalize();
+                out_tangents[i].Normalize();
+                out_bitangents[i].Normalize();
 
-				v.tangent = out_tangents[i];
-				v.bitangent = out_bitangents[i];
+                v.tangent = out_tangents[i];
+                v.bitangent = out_bitangents[i];
 
-				v.uv = out_uvs[i];
+                v.uv = out_uvs[i];
 
-				v.influences[0].boneIndex = out_bone_indices[i].x;
-				v.influences[1].boneIndex = out_bone_indices[i].y;
-				v.influences[2].boneIndex = out_bone_indices[i].z;
-				v.influences[3].boneIndex = out_bone_indices[i].w;
+                v.influences[0].boneIndex = out_bone_indices[i].x;
+                v.influences[1].boneIndex = out_bone_indices[i].y;
+                v.influences[2].boneIndex = out_bone_indices[i].z;
+                v.influences[3].boneIndex = out_bone_indices[i].w;
 
-				v.influences[0].weight = out_bone_weights[i].x;
-				v.influences[1].weight = out_bone_weights[i].y;
-				v.influences[2].weight = out_bone_weights[i].z;
-				v.influences[3].weight = out_bone_weights[i].w;
-			}
+                v.influences[0].weight = out_bone_weights[i].x;
+                v.influences[1].weight = out_bone_weights[i].y;
+                v.influences[2].weight = out_bone_weights[i].z;
+                v.influences[3].weight = out_bone_weights[i].w;
+
+                strcpy_s<255>(v.influences[0].boneName, out_bone_names[i].n1.c_str());
+                strcpy_s<255>(v.influences[1].boneName, out_bone_names[i].n2.c_str());
+                strcpy_s<255>(v.influences[2].boneName, out_bone_names[i].n3.c_str());
+                strcpy_s<255>(v.influences[3].boneName, out_bone_names[i].n4.c_str());
+            }
 			
 			destMesh.indices = out_indices;
 		}
@@ -160,15 +175,16 @@ namespace wrapdll
 			return;
 		};
 
-		static inline void indexVBO_TBN_Fast(
-			const std::vector<DirectX::SimpleMath::Vector3>& in_vertices,
-			const std::vector<DirectX::SimpleMath::Vector2>& in_uvs,
-			const std::vector<DirectX::SimpleMath::Vector3>& in_normals,
-			const std::vector<DirectX::SimpleMath::Vector3>& in_tangents,
-			const std::vector<DirectX::SimpleMath::Vector3>& in_bitangents,
+        static inline void indexVBO_TBN_Fast(
+            const std::vector<DirectX::SimpleMath::Vector3>& in_vertices,
+            const std::vector<DirectX::SimpleMath::Vector2>& in_uvs,
+            const std::vector<DirectX::SimpleMath::Vector3>& in_normals,
+            const std::vector<DirectX::SimpleMath::Vector3>& in_tangents,
+            const std::vector<DirectX::SimpleMath::Vector3>& in_bitangents,
 
-			const std::vector<DirectX::XMFLOAT4>& in_bone_weights,
-			const std::vector<DirectX::XMUINT4>& in_bone_indices,
+            const std::vector<DirectX::XMFLOAT4>& in_bone_weights,
+            const std::vector<DirectX::XMUINT4>& in_bone_indices,
+            const std::vector<BoneName4> & in_bone_names,
 
 			//std::vector<uint16_t>& out_vertex_remap,
 			std::vector<uint16_t>& out_indices,
@@ -179,8 +195,8 @@ namespace wrapdll
 			std::vector<DirectX::SimpleMath::Vector3>& out_bitangents,
 
 			std::vector<DirectX::XMFLOAT4>& out_bone_weights,
-			std::vector<DirectX::XMUINT4>& out_bone_indices
-
+			std::vector<DirectX::XMUINT4>& out_bone_indices,
+            std::vector<BoneName4>& out_bone_names
 		) {
 			//std::map<PackedCommonVertex, unsigned short> VertexToOutIndex;
 
@@ -216,6 +232,7 @@ namespace wrapdll
 
 					out_bone_weights.push_back(in_bone_weights[i]);
 					out_bone_indices.push_back(in_bone_indices[i]);
+					out_bone_names.push_back(in_bone_names[i]);
 
 					uint16_t newindex = (uint16_t)out_vertices.size() - 1;
 

@@ -5,7 +5,8 @@ using CommonControls.Interfaces.AssetManagement;
 using System.IO;
 using AssetManagement.Strategies.Fbx.ViewModels;
 using AssetManagement.Strategies.Fbx.Models;
-
+using CommonControls.Services;
+using CommonControls.FileTypes.Animation;
 
 namespace AssetManagement.Strategies.Fbx
 {
@@ -13,22 +14,25 @@ namespace AssetManagement.Strategies.Fbx
     {
         public string[] Formats => new string[] { ".fbx" };
 
-        public PackFile ImportAsset(string diskFilePath)
+        private readonly PackFileService _packFileService;
+
+        public FbxImportExport(PackFileService pfs)
         {
+            _packFileService = pfs;            
+        }
+
+        public PackFile ImportAsset(string diskFilePath)
+        {        
             var sceneContainer = SceneLoader.LoadScene(diskFilePath);
             if (sceneContainer == null)
                 return null;
 
-            var fbxSettings = new FbxSettingsModel();
-            fbxSettings.SkeletonName = sceneContainer.SkeletonName;
-            
-            if (!FBXSettingsViewModel.ShowImportDialog(fbxSettings))
+            var fbxSettings = new FbxSettingsModel() { SkeletonName = sceneContainer.SkeletonName };            
+
+            if (!FBXSettingsViewModel.ShowImportDialog(_packFileService, fbxSettings))
                 return null;
 
-            // -- if auto-rigging is off, imported model will be "static"
-            var skeletonName = (fbxSettings.UseAutoRigging) ? sceneContainer.SkeletonName : "";
-            
-            var rmv2File = RmvFileBuilder.ConvertToRmv2(sceneContainer.Meshes, skeletonName);
+            var rmv2File = RmvFileBuilder.ConvertToRmv2(sceneContainer.Meshes, fbxSettings.SkeletonFile);
             var factory = ModelFactory.Create();
             var buffer = factory.Save(rmv2File);
 

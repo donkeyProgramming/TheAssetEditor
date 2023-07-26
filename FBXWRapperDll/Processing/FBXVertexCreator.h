@@ -34,6 +34,7 @@ namespace wrapdll{
 
 				for (size_t i = 0; i < outVertex.weightCount; i++)
 				{
+					strcpy_s<255>(outVertex.influences[i].boneName, ctrlPointInfluences->influences[i].boneName.c_str());
 					outVertex.influences[i].boneIndex = ctrlPointInfluences->influences[i].boneIndex;
 					outVertex.influences[i].weight = ctrlPointInfluences->influences[i].weight;
 				}

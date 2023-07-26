@@ -1,5 +1,8 @@
 ﻿using AssetManagement.GenericFormats;
 using AssetManagement.Strategies.Fbx.DllDefinitions;
+using AssetManagement.Strategies.Fbx.Models;
+using AssetManagement.Strategies.Fbx.ViewModels;
+using CommonControls.Services;
 using System;
 
 namespace AssetManagement.Strategies.Fbx
@@ -9,14 +12,17 @@ namespace AssetManagement.Strategies.Fbx
         public static SceneContainer LoadScene(string fileName)
         {
             IntPtr fbxSceneLoader = IntPtr.Zero;
-            try
+            
+            // TODO: RE-ENABLE execption handling
+            //try
             {
                 fbxSceneLoader = FBXSeneLoaderServiceDLL.CreateSceneFBX(fileName);
                 var ptrNativeScene = FBXSeneLoaderServiceDLL.ProcessAndFillScene(fbxSceneLoader);
-                var newScene = SceneMarshallerToManaged.ToManaged(ptrNativeScene);
-                return newScene;
+                var newSceneContainter = SceneMarshallerToManaged.ToManaged(ptrNativeScene);                  
+
+                return newSceneContainter;
             }
-            finally
+            //finally
             {
                 if (fbxSceneLoader != IntPtr.Zero)
                     FBXSeneLoaderServiceDLL.DeleteBaseObj(fbxSceneLoader);

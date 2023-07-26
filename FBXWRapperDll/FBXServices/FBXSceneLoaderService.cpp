@@ -8,42 +8,46 @@
 
 wrapdll::FBXImporterService* wrapdll::FBXImporterService::CreateFromDiskFile(const std::string& path)
 {
-	auto pInstance = new wrapdll::FBXImporterService();
-	pInstance->m_pSDKManager = FBXHelperFileUtil::InitializeSdkManager(); // for creation/cleanup
-	pInstance->m_pFbxScene = FBXHelperFileUtil::InitScene(pInstance->m_pSDKManager, path);
+    auto pInstance = new wrapdll::FBXImporterService();
+    pInstance->m_pSDKManager = FBXHelperFileUtil::InitializeSdkManager(); // for creation/cleanup
+    pInstance->m_pFbxScene = FBXHelperFileUtil::InitScene(pInstance->m_pSDKManager, path);
 
-	if (!pInstance->m_pFbxScene)
-	{
-		log_action_error("Scene Creation Failed!!");
-		return nullptr;
-	}
+    if (!pInstance->m_pFbxScene)
+    {
+        log_action_error("Scene Creation Failed!!");
+        return nullptr;
+    }
 
-	return pInstance;
+    return pInstance;
 }
 
 wrapdll::FBXSCeneContainer* wrapdll::FBXImporterService::ProcessAndFillScene()
-{
-	auto& destPackedMeshes = m_sceneContainer.GetMeshes();
+{    
+    ::strcpy_s<255>(m_sceneContainer.GetFileInfo().units, m_pFbxScene->GetGlobalSettings().GetSystemUnit().GetScaleFactorAsString_Plurial());
+    m_sceneContainer.GetFileInfo().scaleFatorToMeters = static_cast<float>(m_pFbxScene->GetGlobalSettings().GetSystemUnit().GetConversionFactorTo(fbxsdk::FbxSystemUnit::m));
+    m_sceneContainer.GetFileInfo().elementCount = m_pFbxScene->GetNodeCount();
 
-	std::vector<fbxsdk::FbxMesh*> fbxMeshList;
-	FBXNodeSearcher::FindMeshesInScene(m_pFbxScene, fbxMeshList);	
-	m_sceneContainer.GetSkeletonName() = FBXNodeSearcher::FetchSkeletonNameFromScene(m_pFbxScene);
+    auto& destPackedMeshes = m_sceneContainer.GetMeshes();
 
-	destPackedMeshes.clear();
-	destPackedMeshes.resize(fbxMeshList.size());
-	for (size_t meshIndex = 0; meshIndex < fbxMeshList.size(); meshIndex++)
-	{
-		std::vector<ControlPointInfluenceExt> vertexToControlPoint;
-		FBXSkinProcessorService::ProcessSkin(fbxMeshList[meshIndex], destPackedMeshes[meshIndex], m_animFileBoneNames, vertexToControlPoint);		
-		
-		FBXMeshCreator::MakeUnindexPackedMesh(m_pFbxScene, fbxMeshList[meshIndex], destPackedMeshes[meshIndex], vertexToControlPoint);
+    std::vector<fbxsdk::FbxMesh*> fbxMeshList;
+    FBXNodeSearcher::FindMeshesInScene(m_pFbxScene, fbxMeshList);
+    m_sceneContainer.GetSkeletonName() = FBXNodeSearcher::FetchSkeletonNameFromScene(m_pFbxScene);
 
-		log_action("Doing Tangents/Indexing");
-		FbxMeshProcessor::doTangentAndIndexing(destPackedMeshes[meshIndex]);
-		log_action("Done Tangents/Indexing");
-	}	
+    destPackedMeshes.clear();
+    destPackedMeshes.resize(fbxMeshList.size());
+    for (size_t meshIndex = 0; meshIndex < fbxMeshList.size(); meshIndex++)
+    {
+        std::vector<ControlPointInfluenceExt> vertexToControlPoint;
+        FBXSkinProcessorService::ProcessSkin(fbxMeshList[meshIndex], destPackedMeshes[meshIndex], m_animFileBoneNames, vertexToControlPoint);
 
-	return &m_sceneContainer;
+        FBXMeshCreator::MakeUnindexPackedMesh(m_pFbxScene, fbxMeshList[meshIndex], destPackedMeshes[meshIndex], vertexToControlPoint);
+
+        log_action("Doing Tangents/Indexing");
+        FbxMeshProcessor::doTangentAndIndexing(destPackedMeshes[meshIndex]);
+        log_action("Done Tangents/Indexing");
+    }
+
+    return &m_sceneContainer;
 }
 
 #include "FbxSceneLoaderService.inl"

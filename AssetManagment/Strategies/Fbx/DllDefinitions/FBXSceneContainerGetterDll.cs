@@ -23,7 +23,9 @@ namespace AssetManagement.Strategies.Fbx.DllDefinitions
         public static extern IntPtr GetMeshName(IntPtr ptrSceneContainer, int meshIndex);
 
         [DllImport(dllFileName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr GetSkeletonName(IntPtr ptrSceneContainer);       
-        
+        public static extern IntPtr GetSkeletonName(IntPtr ptrSceneContainer);
+
+        [DllImport(dllFileName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr GetFileInfo(IntPtr ptrSceneContainer);
     }
 }

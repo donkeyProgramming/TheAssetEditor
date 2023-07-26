@@ -1,7 +1,7 @@
 #pragma once
 
 #include <algorithm>
-#include "..\FBXScene\FBXSCeneContainer.h"
+#include "..\FBXSceneContainer\FBXSCeneContainer.h"
 
 namespace wrapdll
 {

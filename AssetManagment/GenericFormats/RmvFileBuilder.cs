@@ -11,6 +11,8 @@ using CommonControls.FileTypes.RigidModel.Types;
 using AssetManagement.Strategies.Fbx;
 using AssetManagement.GenericFormats.Managed;
 using VertexFormat = CommonControls.FileTypes.RigidModel.VertexFormat;
+using CommonControls.FileTypes.Animation;
+
 
 namespace AssetManagement.GenericFormats
 {
@@ -22,7 +24,7 @@ namespace AssetManagement.GenericFormats
         /// <param name="packedMeshes">Input "native meshes"</param>
         /// <param name="skeletonName">Skeleton name string to put in RMV2, if RMV2 with be "static"</param>        
         /// <returns>Internal RMV2 file class</returns>
-        public static RmvFile ConvertToRmv2(List<PackedMesh> packedMeshes, string skeletonName)
+        public static RmvFile ConvertToRmv2(List<PackedMesh> packedMeshes, AnimationFile skeletonFile)
         {
             MaterialFactory materialFactory = MaterialFactory.Create();
 
@@ -33,7 +35,7 @@ namespace AssetManagement.GenericFormats
                 Header = new RmvFileHeader()
                 {
                     _fileType = Encoding.ASCII.GetBytes("RMV2"),
-                    SkeletonName = skeletonName,
+                    SkeletonName = (skeletonFile != null) ? skeletonFile.Header.SkeletonName : "",
                     Version = RmvVersionEnum.RMV2_V6,
                     LodCount = (uint)lodCount,
                 },
@@ -54,7 +56,7 @@ namespace AssetManagement.GenericFormats
                 for (int meshIndex = 0; meshIndex < packedMeshes.Count; meshIndex++)
                 {
                     var currentMesh = new RmvModel();
-                    outputFile.ModelList[lodIndex][meshIndex] = ConvertPackedMeshToRmvModel(skeletonName, materialFactory, outputFile, packedMeshes[meshIndex]);                     
+                    outputFile.ModelList[lodIndex][meshIndex] = ConvertPackedMeshToRmvModel(materialFactory, outputFile, packedMeshes[meshIndex], skeletonFile);
                 };
             }
 
@@ -63,16 +65,31 @@ namespace AssetManagement.GenericFormats
             return outputFile;
         }
 
-        private static RmvModel ConvertPackedMeshToRmvModel(string skeletonName, MaterialFactory materialFactory, RmvFile outputFile, PackedMesh packMesh)
+        private static void CopyMeshWeights(RmvMesh rmv2DestMesh, PackedMesh srcMesh, AnimationFile skeletonFile)
+        {
+            if (skeletonFile == null)
+                return;
+
+            for (int vertexIndex = 0; vertexIndex < srcMesh.Vertices.Count; vertexIndex++)
+            {
+                foreach (var influence in srcMesh.Vertices[vertexIndex].influences)
+                {
+                    int boneIndex = skeletonFile.GetIdFromBoneName(influence.boneName);
+                    CommonWeightProcessor.AddWeightToVertex(rmv2DestMesh.VertexList[vertexIndex], boneIndex, influence.weight);
+                }
+            }
+        }
+
+        private static RmvModel ConvertPackedMeshToRmvModel(MaterialFactory materialFactory, RmvFile outputFile, PackedMesh packMesh, AnimationFile skeletonFile)
         {
             var currentMesh = new RmvModel();
             currentMesh.Material = materialFactory.CreateMaterial(
                 outputFile.Header.Version,
-                skeletonName != "" ? ModelMaterialEnum.weighted : ModelMaterialEnum.default_type,
-                skeletonName != "" ? VertexFormat.Cinematic : VertexFormat.Static);
+                skeletonFile != null ? ModelMaterialEnum.weighted : ModelMaterialEnum.default_type,
+                skeletonFile != null ? VertexFormat.Cinematic : VertexFormat.Static);
 
             currentMesh.Material.ModelName = packMesh.Name;
-            currentMesh.Mesh = ConvertPackedMeshToRmvMesh(currentMesh.Material.BinaryVertexFormat, packMesh, skeletonName);
+            currentMesh.Mesh = ConvertPackedMeshToRmvMesh(currentMesh.Material.BinaryVertexFormat, packMesh, skeletonFile);
 
             SetRmvModelDefaultTextures(currentMesh);
 
@@ -89,21 +106,23 @@ namespace AssetManagement.GenericFormats
             currentMesh.Material.SetTexture(TextureType.Gloss, @"commontextures\default_metal_material_map.dds");
         }
 
-        private static RmvMesh ConvertPackedMeshToRmvMesh(VertexFormat vertexFormat, PackedMesh packedInputMesh, string skeletonName)
+        private static RmvMesh ConvertPackedMeshToRmvMesh(VertexFormat vertexFormat, PackedMesh packedInputMesh, AnimationFile skeletonFile)
         {
-            RmvMesh unindexesMesh = new RmvMesh();
-            unindexesMesh.IndexList = new ushort[packedInputMesh.Indices.Count];
-            unindexesMesh.VertexList = new CommonVertex[packedInputMesh.Vertices.Count];
+            RmvMesh rmv2Mesh = new RmvMesh();
+            rmv2Mesh.IndexList = new ushort[packedInputMesh.Indices.Count];
+            rmv2Mesh.VertexList = new CommonVertex[packedInputMesh.Vertices.Count];
 
-            var originalVerticesPacked = MakePackedVertices(vertexFormat, packedInputMesh, skeletonName);
+            var originalVerticesPacked = MakePackedVertices(vertexFormat, packedInputMesh, skeletonFile);
 
-            unindexesMesh.VertexList = originalVerticesPacked.ToArray();
-            unindexesMesh.IndexList = packedInputMesh.Indices.ToArray();
+            rmv2Mesh.VertexList = originalVerticesPacked.ToArray();
+            rmv2Mesh.IndexList = packedInputMesh.Indices.ToArray();
 
-            return unindexesMesh;
+            CopyMeshWeights(rmv2Mesh, packedInputMesh, skeletonFile);
+
+            return rmv2Mesh;
         }
 
-        private static List<CommonVertex> MakePackedVertices(VertexFormat vertexFormat, PackedMesh packedInputMesh, string skeletonName)
+        private static List<CommonVertex> MakePackedVertices(VertexFormat vertexFormat, PackedMesh packedInputMesh, AnimationFile skeletonFile)
         {
             var vertices = new CommonVertex[packedInputMesh.Vertices.Count].ToList();
 
@@ -115,15 +134,16 @@ namespace AssetManagement.GenericFormats
                    packedInputMesh.Vertices[vertexIndex].Uv,
                    packedInputMesh.Vertices[vertexIndex].Tangent,
                    packedInputMesh.Vertices[vertexIndex].BiNormal,
-                   skeletonName);
+                   skeletonFile);
 
-                MakeVertexWeights(vertexFormat, packedInputMesh.Vertices[vertexIndex], vertices[vertexIndex]);
+                // TODO: remove?
+                //MakeVertexWeights(vertexFormat, packedInputMesh.Vertices[vertexIndex], vertices[vertexIndex]);
             }
 
             return vertices;
         }
 
-        private static void MakeVertexWeights(VertexFormat vertexFormat, PackedCommonVertex packedInputVertex, CommonVertex outVertex)
+        private static void MakeVertexWeights(VertexFormat vertexFormat, ExtPackedCommonVertex packedInputVertex, CommonVertex outVertex)
         {
             if (vertexFormat == VertexFormat.Static)
             {
@@ -139,8 +159,8 @@ namespace AssetManagement.GenericFormats
                 outVertex.BoneWeight[influenceIndex] = packedInputVertex.influences[influenceIndex].weight;
             }
 
-            VertexWeightProcessor.SortVertexWeights(outVertex);
-            VertexWeightProcessor.NormalizeVertexWeights(outVertex);
+            CommonWeightProcessor.SortVertexWeights(outVertex);
+            CommonWeightProcessor.NormalizeVertexWeights(outVertex);
         }
 
         private static CommonVertex MakePackedVertex(
@@ -149,7 +169,7 @@ namespace AssetManagement.GenericFormats
             XMFLOAT2 textureCoords,
             XMFLOAT3 tangent,
             XMFLOAT3 bitangent,
-            string skeletonName)
+            AnimationFile skeletonFile)
         {
             var normalizedNormal = new Vector3(normal.x, normal.y, normal.z);
             normalizedNormal.Normalize();
@@ -172,11 +192,13 @@ namespace AssetManagement.GenericFormats
 
             vertex.WeightCount = 0;
 
-            if (skeletonName != "")
+            if (skeletonFile != null)
                 vertex.WeightCount = 4;
 
             vertex.BoneIndex = new byte[vertex.WeightCount];
             vertex.BoneWeight = new float[vertex.WeightCount];
+
+            vertex.WeightCount = 0;
 
             return vertex;
         }

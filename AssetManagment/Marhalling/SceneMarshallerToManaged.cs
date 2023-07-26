@@ -10,10 +10,14 @@ using System.Runtime.InteropServices;
 namespace AssetManagement.Strategies.Fbx
 {
     public class SceneMarshallerToManaged
-    {
+    {        
         public static SceneContainer ToManaged(IntPtr ptrFbxSceneContainer)
         {
+            var fileInfo = FBXSCeneContainerGetterDll.GetFileInfo(ptrFbxSceneContainer);
+            var info = Marshal.PtrToStructure<ExtFileInfoStruct>(fileInfo);
+
             var newScene = new SceneContainer();
+
             newScene.Meshes = GetAllPackedMeshes(ptrFbxSceneContainer);
             newScene.SkeletonName = GetSkeletonNameFromSceneContainer(ptrFbxSceneContainer);
             return newScene;
@@ -24,7 +28,7 @@ namespace AssetManagement.Strategies.Fbx
             */
         }
 
-        public static PackedCommonVertex[] GetPackedVertices(IntPtr fbxContainer, int meshIndex)
+        public static ExtPackedCommonVertex[] GetPackedVertices(IntPtr fbxContainer, int meshIndex)
         {
             IntPtr pVerticesPtr = IntPtr.Zero;
             int length = 0;
@@ -35,13 +39,13 @@ namespace AssetManagement.Strategies.Fbx
                 return null;
             }
 
-            PackedCommonVertex[] data = new PackedCommonVertex[length];
+            ExtPackedCommonVertex[] data = new ExtPackedCommonVertex[length];
             for (int vertexIndex = 0; vertexIndex < length; vertexIndex++)
             {
-                var ptr = Marshal.PtrToStructure(pVerticesPtr + vertexIndex * Marshal.SizeOf(typeof(PackedCommonVertex)), typeof(PackedCommonVertex));
+                var ptr = Marshal.PtrToStructure(pVerticesPtr + vertexIndex * Marshal.SizeOf(typeof(ExtPackedCommonVertex)), typeof(ExtPackedCommonVertex));
 
                 if (ptr != null)                
-                    data[vertexIndex] = (PackedCommonVertex)ptr;                                    
+                    data[vertexIndex] = (ExtPackedCommonVertex)ptr;                                    
             }
 
             return data;
@@ -77,7 +81,7 @@ namespace AssetManagement.Strategies.Fbx
                 throw new Exception("Params/Input Data Invalid: Vertices, Indices or Name == null");
 
             PackedMesh packedMesh = new PackedMesh();
-            packedMesh.Vertices = new List<PackedCommonVertex>();
+            packedMesh.Vertices = new List<ExtPackedCommonVertex>();
             packedMesh.Indices = new List<ushort>();
             packedMesh.Vertices.AddRange(vertices);
             packedMesh.Indices.AddRange(indices);

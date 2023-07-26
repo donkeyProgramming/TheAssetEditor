@@ -9,13 +9,7 @@ namespace AssetManagement.GenericFormats.Unmanaged
         public int y;
         public int z;
     }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct FBXFileInfo
-    {
-        public FBXSDKVersion sdkVersion; // SDK version file is saved with;
-        public bool isASCII; // FBX can be saves as binary or json/xml like ASCII text
-    }
+    
 
     [StructLayout(LayoutKind.Sequential)]
     public struct FBXUnitFileInfo
@@ -32,13 +26,28 @@ namespace AssetManagement.GenericFormats.Unmanaged
         public float animFPS;
         public float animTiem;
         public int animFrame;
-    }        
+    }
+
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct FBXImportExportSettings    
-    {     
-        public FBXFileInfo fileinfo;
+    public struct ExtFileInfoStruct
+    {
+        public XMINT3 sdkVersionUsed;
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+        public string units;
+        public float scaleFatorToMeters;
+        public int elementCount;
+        public int meshCount;
+    };
+
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct FBXImportExportSettings
+    {
+        public ExtFileInfoStruct fileinfo;
         public FBXUnitFileInfo unitInfo;
         public FBXAnimInfo animTimingINfo;
     }
+
 }

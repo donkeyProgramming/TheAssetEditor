@@ -5,7 +5,7 @@ using CommonControls.FileTypes.RigidModel.Vertex;
 
 namespace AssetManagement.Strategies.Fbx
 {
-    public class VertexWeightProcessor
+    public class CommonWeightProcessor
     {
         /// <summary>
         /// Add 1 weight to the vertex, does "boundary" check

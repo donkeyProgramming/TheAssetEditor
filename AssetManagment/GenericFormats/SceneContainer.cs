@@ -9,14 +9,15 @@ using AssetManagement.GenericFormats.Unmanaged;
 
 namespace AssetManagement.GenericFormats
 {
-    public class SceneContainer
-    {
-        public List<PackedMesh> Meshes { get; set; } = new List<PackedMesh>();
-        public List<BoneInfo> Bones { get; set; } = new List<BoneInfo>();
-        public List<AnimationClip> Animations { get; set; } = new List<AnimationClip>();
-        public Node RootNode { get; set; }
-        public String SkeletonName { get; set; }
-    }
+public class SceneContainer
+{
+    public List<PackedMesh> Meshes { get; set; } = new List<PackedMesh>();
+    public List<BoneInfo> Bones { get; set; } = new List<BoneInfo>();
+    public List<AnimationClip> Animations { get; set; } = new List<AnimationClip>();
+    public Node RootNode { get; set; }
+    public String SkeletonName { get; set; }
+    public FileInfo FileInfoData { get; set; }
+}
 
     public class Node
     {
