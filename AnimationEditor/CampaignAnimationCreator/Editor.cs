@@ -13,20 +13,18 @@ namespace AnimationEditor.CampaignAnimationCreator
     {
         public FilterCollection<SkeletonBoneNode> ModelBoneList { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
 
-        AssetViewModel _selectedUnit;
-        private readonly AssetViewModelBuilder _assetViewModelEditor;
-        PackFileService _pfs;
-        AnimationClip _selectedAnimationClip;
+        SceneObject _selectedUnit;
+        private readonly SceneObjectBuilder _assetViewModelEditor;
+        private readonly PackFileService _pfs;
+        private readonly AnimationClip _selectedAnimationClip;
 
-        public Editor(AssetViewModelBuilder assetViewModelEditor, PackFileService pfs)
+        public Editor(SceneObjectBuilder assetViewModelEditor, PackFileService pfs)
         {
             _assetViewModelEditor = assetViewModelEditor;
             _pfs = pfs;
-
-
         }
 
-        public Editor Create(AssetViewModel rider)
+        public Editor Create(SceneObject rider)
         {
             _selectedUnit = rider;
             _selectedUnit.SkeletonChanged += SkeletonChanged;

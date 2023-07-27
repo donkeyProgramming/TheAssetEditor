@@ -6,19 +6,20 @@ using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.SkeletonEditor;
 using AnimationEditor.SuperView;
+using CommonControls;
 using CommonControls.Services.ToolCreation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AnimationEditor
 {
-    public class AnimationEditors_DependencyInjectionContainer
+    public class AnimationEditors_DependencyInjectionContainer : DependencyContainer
     {
-        public static void Register(IServiceCollection serviceCollection)
+        public override void Register(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddScoped<AssetViewModelBuilder>();
-            serviceCollection.AddTransient<AssetViewModel>();
+            serviceCollection.AddScoped<SceneObjectBuilder>();
+            serviceCollection.AddTransient<SceneObject>();
             serviceCollection.AddScoped<AnimationPlayerViewModel>();
-            serviceCollection.AddScoped<ReferenceModelSelectionViewModelBuilder>();
+            serviceCollection.AddScoped<SceneObjectViewModelBuilder>();
 
             serviceCollection.AddScoped<SuperView.Editor>();
             serviceCollection.AddScoped<SkeletonEditor.Editor>();
@@ -31,18 +32,16 @@ namespace AnimationEditor
             serviceCollection.AddScoped<AnimationTransferToolViewModel>();
             serviceCollection.AddScoped<SuperViewViewModel>();
             serviceCollection.AddScoped<SkeletonEditorViewModel>();
-            // serviceCollection.AddScoped<AnimationBuilderViewModel>();
             serviceCollection.AddScoped<BaseAnimationView>();
         }
 
-        public static void RegisterTools(IToolFactory factory)
+        public override void RegisterTools(IToolFactory factory)
         {
             factory.RegisterTool<MountAnimationCreatorViewModel, BaseAnimationView>();
             factory.RegisterTool<CampaignAnimationCreatorViewModel, BaseAnimationView>();
             factory.RegisterTool<AnimationTransferToolViewModel, BaseAnimationView>();
             factory.RegisterTool<SuperViewViewModel, BaseAnimationView>();
             factory.RegisterTool<SkeletonEditorViewModel, BaseAnimationView>();
-            // factory.RegisterTool<AnimationBuilderViewModel, BaseAnimationView>();
         }
     }
 }

@@ -35,7 +35,7 @@
             </MenuItem>
         </Menu>
 
-        <ContentControl Grid.Row="2" Grid.Column="0" Content="{Binding Scene, Mode=OneTime}"/>
+        <ContentControl Grid.Row="2" Grid.Column="0" Content="{Binding GameWorld.Value, Mode=OneTime}"/>
 
         <GridSplitter Grid.Row="1" Grid.RowSpan="3" Grid.Column="1"  HorizontalAlignment="Stretch">
             <GridSplitter.Template>
@@ -57,8 +57,20 @@
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <referencemodel:ReferenceModelSelectionView Grid.Row="0" DataContext="{Binding MainModelView.Value, Mode=TwoWay}"  Visibility="{Binding IsControlVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}"/>
-            <referencemodel:ReferenceModelSelectionView Grid.Row="1" DataContext="{Binding ReferenceModelView.Value, Mode=TwoWay}" Visibility="{Binding IsControlVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}"/>
+
+            <ListView Grid.Row="1" ItemsSource="{Binding SceneObjects, UpdateSourceTrigger=PropertyChanged}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate >
+                    <DataTemplate>
+                        <referencemodel:ReferenceModelSelectionView />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
             <Rectangle Grid.Row="2" Fill="LightGray" Height="3" Margin="2,2,2,2"/>
 
             <ScrollViewer  Grid.Row="3" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto">

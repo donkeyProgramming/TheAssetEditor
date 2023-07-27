@@ -2,8 +2,6 @@
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.Common;
-using CommonControls.Services;
-using CommonControls.Services.ToolCreation;
 using Microsoft.Xna.Framework;
 using Monogame.WpfInterop.Common;
 using MonoGame.Framework.WpfInterop;
@@ -14,43 +12,55 @@ namespace AnimationEditor.MountAnimationCreator
 {
     public class MountAnimationCreatorViewModel : BaseAnimationViewModel<Editor>
     {
-        private readonly ReferenceModelSelectionViewModelBuilder _referenceModelSelectionViewModelBuilder;
-        private readonly AssetViewModelBuilder _assetViewModelBuilder;
+        private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
+        private readonly SceneObjectBuilder _sceneObjectBuilder;
+
+        AnimationToolInput _inputRiderData;
+        AnimationToolInput _inputMountData;
+
+        public override NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Mount Animation Creator");
 
         public MountAnimationCreatorViewModel(
             Editor editor,
             IComponentInserter componentInserter,
-            ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder,
+            SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
             AnimationPlayerViewModel animationPlayerViewModel,
             EventHub eventHub,
-            AssetViewModelBuilder assetViewModelBuilder,
+            SceneObjectBuilder sceneObjectBuilder,
             GameWorld scene,
             FocusSelectableObjectService focusSelectableObjectService)
             : base(componentInserter, animationPlayerViewModel, scene, focusSelectableObjectService)
         {
-            DisplayName.Value = "MountAnimCreator";
             Editor = editor;
-            _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
-            _assetViewModelBuilder = assetViewModelBuilder;
+            _sceneObjectViewModelBuilder = sceneObjectViewModelBuilder;
+            _sceneObjectBuilder = sceneObjectBuilder;
 
             eventHub.Register<SceneInitializedEvent>(Initialize);
         }
 
+
+        public void SetDebugInputParameters(AnimationToolInput rider, AnimationToolInput mount)
+        {
+            _inputRiderData = rider;
+            _inputMountData = mount;
+        }
+
         void Initialize(SceneInitializedEvent sceneInitializedEvent)
         {
-            MainModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(true, "Rider", Color.Black, MainInput);
-            ReferenceModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(true, "Mount", Color.Black, RefInput);
+            var riderItem = _sceneObjectViewModelBuilder.CreateAsset(true, "Rider", Color.Black, _inputRiderData);
+            var mountItem = _sceneObjectViewModelBuilder.CreateAsset(true, "Mount", Color.Black, _inputMountData);
+            mountItem.Data.IsSelectable = true;
 
-            ReferenceModelView.Value.Data.IsSelectable = true;
-
-            var propAsset = _assetViewModelBuilder.CreateAsset("New Anim", Color.Red);
+            var propAsset = _sceneObjectBuilder.CreateAsset("New Anim", Color.Red);
             Player.RegisterAsset(propAsset);
 
-            Editor.Create(MainModelView.Value.Data, ReferenceModelView.Value.Data, propAsset);
+            Editor.Create(riderItem.Data, mountItem.Data, propAsset);
+            SceneObjects.Add(riderItem);
+            SceneObjects.Add(mountItem);
         }
     }
 
-    public static class MountAnimationCreator_Debug
+  /*  public static class MountAnimationCreator_Debug
     {
         public static void CreateDamselAndGrymgoreEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
@@ -229,7 +239,7 @@ namespace AnimationEditor.MountAnimationCreator
         }
 
 
-    }
+    }*/
 }
 
 

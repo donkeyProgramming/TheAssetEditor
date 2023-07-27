@@ -3,6 +3,7 @@ using AnimationEditor.Common.ReferenceModel;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommunityToolkit.Mvvm.Input;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 using View3D.Components;
 using View3D.Services;
@@ -11,19 +12,14 @@ namespace AnimationEditor.PropCreator.ViewModels
 {
     public abstract class BaseAnimationViewModel<TEditor> : NotifyPropertyChangedImpl, IEditorViewModel
     {
-        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Creator");
+        public abstract NotifyAttr<string> DisplayName { get; set; }
         public PackFile MainFile { get; set; }
 
-        GameWorld _gameWorld;
-        public GameWorld Scene { get => _gameWorld; set => SetAndNotify(ref _gameWorld, value); }
+        public NotifyAttr<GameWorld> GameWorld { get; private set; } = new NotifyAttr<GameWorld>();
+        public ObservableCollection<SceneObjectViewModel> SceneObjects { get; set; } = new ObservableCollection<SceneObjectViewModel>();
 
-        public NotifyAttr<ReferenceModelSelectionViewModel> MainModelView { get; set; } = new NotifyAttr<ReferenceModelSelectionViewModel>();
-        public NotifyAttr<ReferenceModelSelectionViewModel> ReferenceModelView { get; set; } = new NotifyAttr<ReferenceModelSelectionViewModel>();
+
         public AnimationPlayerViewModel Player { get; set; }
-
-
-        public AnimationToolInput MainInput { get; set; } = new AnimationToolInput();
-        public AnimationToolInput RefInput { get; set; }
 
 
         TEditor _editor;
@@ -31,7 +27,7 @@ namespace AnimationEditor.PropCreator.ViewModels
 
         private readonly FocusSelectableObjectService _focusSelectableObjectService;
 
-        public ICommand ResetCameraCommand { get; set; }
+        public ICommand ResetCameraCommand { get; set; } 
         public ICommand FocusCamerasCommand { get; set; }
 
 
@@ -41,7 +37,7 @@ namespace AnimationEditor.PropCreator.ViewModels
             GameWorld gameWorld,
             FocusSelectableObjectService focusSelectableObjectService)
         {
-            Scene = gameWorld;
+            GameWorld.Value = gameWorld;
             Player = animationPlayerViewModel;
 
             _focusSelectableObjectService = focusSelectableObjectService;
@@ -57,7 +53,7 @@ namespace AnimationEditor.PropCreator.ViewModels
 
         public void Close()
         {
-            Scene = null;
+            GameWorld = null;
         }
 
         public bool HasUnsavedChanges { get; set; }

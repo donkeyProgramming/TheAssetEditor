@@ -18,14 +18,14 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
         public FilterCollection<AnimationBinEntryGenericFormat> SelectedMountTag { get; set; }
         public FilterCollection<AnimationBinEntryGenericFormat> SelectedRiderTag { get; set; }
 
-        AssetViewModel _rider;
-        AssetViewModel _mount;
-        private readonly AssetViewModelBuilder _assetViewModelEditor;
+        SceneObject _rider;
+        SceneObject _mount;
+        private readonly SceneObjectBuilder _assetViewModelEditor;
         PackFileService _pfs;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         Action _validateAction;
 
-        public MountLinkViewModel(AssetViewModelBuilder assetViewModelEditor, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, AssetViewModel mount, Action validate)
+        public MountLinkViewModel(SceneObjectBuilder assetViewModelEditor, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, SceneObject rider, SceneObject mount, Action validate)
         {
             _assetViewModelEditor = assetViewModelEditor;
             _pfs = pfs;

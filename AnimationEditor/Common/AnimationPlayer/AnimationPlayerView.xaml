@@ -13,7 +13,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <ToggleButton Grid.Row="0" Content="Animation" Click="ToggleButton_Click" IsChecked="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="10,1,10,1"/>
+        <ToggleButton Grid.Row="0" Content="Animation" Click="ToggleButton_Click" IsChecked="{Binding IsEnabled.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="10,1,10,1"/>
         <Grid Grid.Row="1" Margin="0,1,0,10" x:Name="AnimationContent">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width=".1*"/>
@@ -34,21 +34,21 @@
                     <Label Content="Main animation:" DockPanel.Dock="Left"/>
                     <ComboBox DisplayMemberPath="SlotName" ItemsSource="{Binding PlayerItems, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" SelectedItem="{Binding SelectedMainAnimation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"   DockPanel.Dock="Right"/>
                 </DockPanel>
-                
+                 
                 <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="Frame "/>
-                        <TextBlock Text="{Binding SelectedAnimationCurrentFrame, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding SelectedAnimationCurrentFrame.Value, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Text=" / "/>
-                        <TextBlock Text="{Binding SelectedAnimationFrameCount, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding SelectedAnimationFrameCount.Value, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="Time["/>
-                        <TextBlock Text="{Binding SelectedAnimationFps, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding SelectedAnimationFps.Value, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Text=" fps]"/>
-                        <TextBlock Text="{Binding SelectedAnimationCurrentTime, StringFormat=N2, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding SelectedAnimationCurrentTime.Value, StringFormat=N2, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Text=" / "/>
-                        <TextBlock Text="{Binding SelectedAnimationMaxTime, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding SelectedAnimationMaxTime.Value, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
                 </StackPanel>
 
@@ -57,12 +57,12 @@
                 <StackPanel Grid.Row="3" Orientation="Horizontal"  HorizontalAlignment="Center" Margin="2,2,2,2" >
                     <Button Click="{s:MethodBinding SetAnimationFirstFrame}" FontSize="20">⏮︎</Button>
                     <Button Click="{s:MethodBinding SetAnimationPrivFrame}" FontSize="20">⏪</Button>
-                    <ToggleButton Click="{s:MethodBinding TogleAnimationPausePlay}" FontSize="20">⏯︎</ToggleButton>
+                    <ToggleButton Click="{s:MethodBinding ToggleAnimationPausePlay}" FontSize="20">⏯︎</ToggleButton>
                     <Button Click="{s:MethodBinding SetAnimationNextFrame}" FontSize="20">⏩</Button>
                     <Button Click="{s:MethodBinding SetAnimationLastFrame}" FontSize="20">⏭</Button>
                 </StackPanel>
 
-                <CheckBox IsChecked="{Binding LoopAnimation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Grid.Row="4" Content="Loop" HorizontalAlignment="Center"/>
+                <CheckBox IsChecked="{Binding LoopAnimation.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Grid.Row="4" Content="Loop" HorizontalAlignment="Center"/>
             </Grid>
 
             <ListView  Grid.Column="2" ItemsSource="{Binding PlayerItems, UpdateSourceTrigger=PropertyChanged}">
@@ -71,21 +71,21 @@
                         <GridViewColumn Header="Player" Width="auto">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Label Content="{Binding SlotName, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <Label Content="{Binding SlotName.Value, UpdateSourceTrigger=PropertyChanged}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn Header="Frames" Width="auto">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Label Content="{Binding MaxFrames, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <Label Content="{Binding MaxFrames.Value, UpdateSourceTrigger=PropertyChanged}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn Header="Animation" Width="auto">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Label Content="{Binding AnimationName, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <Label Content="{Binding AnimationName.Value, UpdateSourceTrigger=PropertyChanged}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>

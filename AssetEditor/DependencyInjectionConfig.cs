@@ -1,11 +1,12 @@
-﻿using AnimationMeta;
+﻿using System;
+using AnimationEditor;
+using AnimationMeta;
 using AssetManagement;
 using Audio;
 using CommonControls;
 using CommonControls.Services.ToolCreation;
 using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using TextureEditor;
 using View3D;
 
@@ -14,12 +15,11 @@ namespace AssetEditor
 {
     public class DependencyInjectionConfig
     {
-        private readonly DependencyContainer[] dependencyContainers;
-
+        private readonly DependencyContainer[] _dependencyContainers;
 
         public DependencyInjectionConfig(bool loadResources = true)
         {
-            dependencyContainers = new DependencyContainer[]
+            _dependencyContainers = new DependencyContainer[]
             {
                 // Core
                 new CommonControls_DependencyInjectionContainer(loadResources),
@@ -31,6 +31,7 @@ namespace AssetEditor
                 new AnimationMeta_DependencyInjectionContainer(),
                 new AudioEditor_DependencyInjectionContainer(),
                 new TextureEditor_DependencyInjectionContainer(),
+                new AnimationEditors_DependencyInjectionContainer(),
 
                 // Host application
                 new AssetEditor_DependencyInjectionContainer(),
@@ -49,13 +50,13 @@ namespace AssetEditor
 
         private void ConfigureServices(IServiceCollection services)
         {
-            foreach (var container in dependencyContainers)
+            foreach (var container in _dependencyContainers)
                 container.Register(services);
         }
 
         void RegisterTools(IToolFactory factory)
         {
-            foreach (var container in dependencyContainers)
+            foreach (var container in _dependencyContainers)
                 container.RegisterTools(factory);
         }
     }

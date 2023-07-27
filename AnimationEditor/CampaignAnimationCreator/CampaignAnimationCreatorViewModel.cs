@@ -2,8 +2,6 @@
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.Common;
-using CommonControls.Services;
-using CommonControls.Services.ToolCreation;
 using Microsoft.Xna.Framework;
 using Monogame.WpfInterop.Common;
 using MonoGame.Framework.WpfInterop;
@@ -14,38 +12,40 @@ namespace AnimationEditor.CampaignAnimationCreator
 {
     public class CampaignAnimationCreatorViewModel : BaseAnimationViewModel<Editor>
     {
-        private readonly ReferenceModelSelectionViewModelBuilder _referenceModelSelectionViewModelBuilder;
+        AnimationToolInput _debugDataToLoad;
 
+        private readonly SceneObjectViewModelBuilder _referenceModelSelectionViewModelBuilder;
+        public override NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Campaign Animation Creator");
         public CampaignAnimationCreatorViewModel(
             Editor editor,
             IComponentInserter componentInserter,
-            ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder,
+            SceneObjectViewModelBuilder referenceModelSelectionViewModelBuilder,
             AnimationPlayerViewModel animationPlayerViewModel,
             EventHub eventHub,
             GameWorld scene,
             FocusSelectableObjectService focusSelectableObjectService)
             : base(componentInserter, animationPlayerViewModel, scene, focusSelectableObjectService)
         {
-            DisplayName.Value = "Campaign Animation Creator";
             Editor = editor;
             _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
 
             eventHub.Register<SceneInitializedEvent>(Initialize);
         }
 
+        public void SetDebugInputParameters(AnimationToolInput debugDataToLoad)
+        {
+            _debugDataToLoad = debugDataToLoad;
+        }
+
         void Initialize(SceneInitializedEvent sceneInitializedEvent)
         {
-            MainModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(true, "model", Color.Black, MainInput);
-            ReferenceModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(false, "not_in_use2", Color.Black, RefInput);
-
-            ReferenceModelView.Value.Data.IsSelectable = true;
-            ReferenceModelView.Value.IsControlVisible.Value = false;
-
-            Editor.Create(MainModelView.Value.Data);
+            var item = _referenceModelSelectionViewModelBuilder.CreateAsset(true, "model", Color.Black, _debugDataToLoad);
+            Editor.Create(item.Data);
+            SceneObjects.Add(item);
         }
     }
 
-    public static class CampaignAnimationCreator_Debug
+   /* public static class CampaignAnimationCreator_Debug
     {
         public static void CreateDamselEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
@@ -59,5 +59,5 @@ namespace AnimationEditor.CampaignAnimationCreator
             creator.CreateEmptyEditor(editorView);
         }
 
-    }
+    }*/
 }

@@ -1,7 +1,7 @@
-﻿using CommonControls.Common;
-using CommonControls.Services;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO;
+using CommonControls.Common;
+using CommonControls.Services;
 using static CommonControls.FilterDialog.FilterUserControl;
 using static CommonControls.Services.SkeletonAnimationLookUpHelper;
 
@@ -9,12 +9,12 @@ namespace AnimationEditor.Common.ReferenceModel
 {
     public class SelectAnimationViewModel : NotifyPropertyChangedImpl
     {
-        PackFileService _pfs;
-        private readonly AssetViewModelBuilder _assetViewModelEditor;
-        AssetViewModel _data;
-        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly PackFileService _pfs;
+        private readonly SceneObjectBuilder _assetViewModelEditor;
+        private readonly SceneObject _data;
+        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
-        ObservableCollection<AnimationReference> _animationList = new ObservableCollection<AnimationReference>();
+        ObservableCollection<AnimationReference> _animationList = new();
         public ObservableCollection<AnimationReference> AnimationsForCurrentSkeleton { get { return _animationList; } set { SetAndNotify(ref _animationList, value); } }
 
 
@@ -23,7 +23,7 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public OnSeachDelegate FiterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 
-        public SelectAnimationViewModel(AssetViewModelBuilder assetViewModelEditor, AssetViewModel data, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        public SelectAnimationViewModel(SceneObjectBuilder assetViewModelEditor, SceneObject data, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             _assetViewModelEditor = assetViewModelEditor;
             _data = data;

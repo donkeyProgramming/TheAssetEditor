@@ -1,4 +1,10 @@
-﻿using AnimationEditor.Common.AnimationPlayer;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
+using System.Windows;
+using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
 using CommonControls.Common;
 using CommonControls.Editors.BoneMapping;
@@ -8,26 +14,22 @@ using CommonControls.SelectionListDialog;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Windows;
 using View3D.Animation;
 
 namespace AnimationEditor.AnimationTransferTool
 {
     public class Editor : NotifyPropertyChangedImpl
     {
-        ILogger _logger = Logging.Create<Editor>();
-        private readonly AssetViewModelBuilder _assetViewModelBuilder;
-        PackFileService _pfs;
-        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        AssetViewModel _copyTo;
-        AssetViewModel _copyFrom;
-        AnimationPlayerViewModel _player;
-        public AssetViewModel Generated { get; set; }
+        private readonly ILogger _logger = Logging.Create<Editor>();
+        private readonly SceneObjectBuilder _assetViewModelBuilder;
+        private readonly PackFileService _pfs;
+        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+
+        private readonly AnimationPlayerViewModel _player;
+
+        private SceneObject _copyTo;
+        private SceneObject _copyFrom;
+        public SceneObject Generated { get; set; }
         List<IndexRemapping> _remappingInformaton;
         RemappedAnimatedBoneConfiguration _config;
         BoneMappingWindow _activeBoneMappingWindow;
@@ -44,18 +46,15 @@ namespace AnimationEditor.AnimationTransferTool
             set { SetAndNotify(ref _selectedBone, value); HightlightSelectedBones(value); }
         }
 
-        public Editor(AssetViewModelBuilder assetViewModelBuilder, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AnimationPlayerViewModel player)
+        public Editor(SceneObjectBuilder assetViewModelBuilder, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AnimationPlayerViewModel player)
         {
             _assetViewModelBuilder = assetViewModelBuilder;
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _player = player;
-
-            AnimationSettings.DisplayOffset.OnValueChanged += DisplayOffset_OnValueChanged;
-            DisplayOffset_OnValueChanged(new CommonControls.MathViews.Vector3ViewModel(0, 0, 2));
         }
 
-        public Editor Create(AssetViewModel copyToAsset, AssetViewModel copyFromAsset, AssetViewModel generated)
+        public Editor Create(SceneObject copyToAsset, SceneObject copyFromAsset, SceneObject generated)
         {
             _copyTo = copyToAsset;
             _copyFrom = copyFromAsset;
@@ -69,7 +68,8 @@ namespace AnimationEditor.AnimationTransferTool
 
             if (_copyFrom.Skeleton != null)
                 CopyFromSkeletonChanged(_copyFrom.Skeleton);
-
+            AnimationSettings.DisplayOffset.OnValueChanged += DisplayOffset_OnValueChanged;
+            DisplayOffset_OnValueChanged(new CommonControls.MathViews.Vector3ViewModel(0, 0, 2));
             return this;
         }
 
@@ -98,7 +98,7 @@ namespace AnimationEditor.AnimationTransferTool
             }
         }
 
-        private void CopyToMeshChanged(AssetViewModel newValue)
+        private void CopyToMeshChanged(SceneObject newValue)
         {
             _assetViewModelBuilder.CopyMeshFromOther(Generated, newValue);
             CreateBoneOverview(newValue.Skeleton);

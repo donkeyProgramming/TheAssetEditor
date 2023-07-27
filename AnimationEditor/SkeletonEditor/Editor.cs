@@ -19,10 +19,10 @@ namespace AnimationEditor.SkeletonEditor
     public class Editor : NotifyPropertyChangedImpl
     {
         PackFileService _pfs;
-        AssetViewModel _techSkeletonNode;
+        SceneObject _techSkeletonNode;
         IComponentManager _componentManager;
         CopyPasteManager _copyPasteManager;
-        private readonly AssetViewModelBuilder _assetViewModelBuilder;
+        private readonly SceneObjectBuilder _assetViewModelBuilder;
 
         public NotifyAttr<string> SkeletonName { get; set; } = new NotifyAttr<string>("");
         public NotifyAttr<string> RefMeshName { get; set; } = new NotifyAttr<string>("");
@@ -70,7 +70,7 @@ namespace AnimationEditor.SkeletonEditor
 
         public DoubleViewModel BoneScale { get; set; } = new DoubleViewModel(1);
 
-        public Editor(PackFileService pfs, IComponentManager componentManager, CopyPasteManager copyPasteManager, AssetViewModelBuilder assetViewModelBuilder)
+        public Editor(PackFileService pfs, IComponentManager componentManager, CopyPasteManager copyPasteManager, SceneObjectBuilder assetViewModelBuilder)
         {
             _pfs = pfs;
 
@@ -84,7 +84,7 @@ namespace AnimationEditor.SkeletonEditor
             BoneScale.PropertyChanged += HandleScaleChanged;
         }
 
-        public Editor CreateEditor(AssetViewModel techSkeletonNode, string skeletonPath)
+        public Editor CreateEditor(SceneObject techSkeletonNode, string skeletonPath)
         {
             try
             {

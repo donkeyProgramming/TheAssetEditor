@@ -10,20 +10,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel>
-        <ListView DockPanel.Dock="Top" ItemsSource="{Binding Items, UpdateSourceTrigger=PropertyChanged}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                </Style>
-            </ListView.ItemContainerStyle>
-            <ListView.ItemTemplate >
-                <DataTemplate>
-                    <referencemodel:ReferenceModelSelectionView />
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
         <Button Content="Refresh" Click="{s:MethodBinding RefreshAction}" DockPanel.Dock="Top"/>
-
 
         <TabControl DockPanel.Dock="Top">
             <TabItem Header="Persistent">

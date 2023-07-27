@@ -1,11 +1,11 @@
-﻿using CommonControls.Common;
+﻿using System;
+using CommonControls.Common;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Serilog;
-using System;
 using View3D.Animation;
 using View3D.Components.Component;
 using View3D.SceneNodes;
@@ -15,40 +15,38 @@ using static CommonControls.Services.SkeletonAnimationLookUpHelper;
 
 namespace AnimationEditor.Common.ReferenceModel
 {
-    public class AssetViewModelBuilder
+    public class SceneObjectBuilder
     {
-        ILogger _logger = Logging.Create<AssetViewModelBuilder>();
+        private readonly ILogger _logger = Logging.Create<SceneObjectBuilder>();
         private readonly GameWorld _mainScene;
         private readonly IServiceProvider _serviceProvider;
-        private readonly ResourceLibary _resourceLibary;
+        private readonly ResourceLibary _resourceLibrary;
         private readonly SceneManager _sceneManager;
         private readonly PackFileService _packFileService;
         private readonly AnimationsContainerComponent _animationsContainerComponent;
         private readonly ComplexMeshLoader _complexMeshLoader;
 
-        public AssetViewModelBuilder(GameWorld mainScene,
+        public SceneObjectBuilder(GameWorld mainScene,
             IServiceProvider serviceProvider, ResourceLibary resourceLibary, SceneManager sceneManager, PackFileService packFileService,
-            AnimationsContainerComponent animationsContainerComponent, ComplexMeshLoader complexMeshLoader)
+            AnimationsContainerComponent animationsContainerComponent, ComplexMeshLoader complexMeshLoader )
         {
             _mainScene = mainScene;
             _serviceProvider = serviceProvider;
-            _resourceLibary = resourceLibary;
+            _resourceLibrary = resourceLibary;
             _sceneManager = sceneManager;
             _packFileService = packFileService;
             _animationsContainerComponent = animationsContainerComponent;
             _complexMeshLoader = complexMeshLoader;
         }
 
-        public AssetViewModel CreateAsset(string description, Color skeletonColour)
+        public SceneObject CreateAsset(string description, Color skeletonColour)
         {
-            var instance = _serviceProvider.GetRequiredService<AssetViewModel>();
-
+            var instance = _serviceProvider.GetRequiredService<SceneObject>();
             var rootNode = _sceneManager.RootNode;
             var parentNode = rootNode.AddObject(new GroupNode(description));
 
-
             // Create skeleton
-            var skeletonSceneNode = new SkeletonNode(_resourceLibary, instance.Skeleton);
+            var skeletonSceneNode = new SkeletonNode(_resourceLibrary, instance.Skeleton);
             skeletonSceneNode.NodeColour = skeletonColour;
             parentNode.AddObject(skeletonSceneNode);
 
@@ -58,10 +56,9 @@ namespace AnimationEditor.Common.ReferenceModel
             instance.SkeletonSceneNode = skeletonSceneNode;
 
             return _mainScene.AddComponent(instance);
-
         }
 
-        public void SetMesh(AssetViewModel assetViewModel, PackFile file)
+        public void SetMesh(SceneObject assetViewModel, PackFile file)
         {
             _logger.Here().Information($"Loading reference model - {_packFileService.GetFullPath(file)}");
 
@@ -100,7 +97,7 @@ namespace AnimationEditor.Common.ReferenceModel
             assetViewModel.TriggerMeshChanged();
         }
 
-        public void CopyMeshFromOther(AssetViewModel assetViewModel, AssetViewModel other)
+        public void CopyMeshFromOther(SceneObject assetViewModel, SceneObject other)
         {
             if (assetViewModel.ModelNode != null)
                 assetViewModel.ParentNode.RemoveObject(assetViewModel.ModelNode);
@@ -125,7 +122,7 @@ namespace AnimationEditor.Common.ReferenceModel
             assetViewModel.TriggerMeshChanged();
         }
 
-        public void SetSkeleton(AssetViewModel assetViewModel, PackFile skeletonPackFile)
+        public void SetSkeleton(SceneObject assetViewModel, PackFile skeletonPackFile)
         {
             if (skeletonPackFile != null)
             {
@@ -155,7 +152,7 @@ namespace AnimationEditor.Common.ReferenceModel
             assetViewModel.TriggerSkeletonChanged();
         }
 
-        public void SetSkeleton(AssetViewModel assetViewModel, AnimationFile animFile, string skeletonName)
+        public void SetSkeleton(SceneObject assetViewModel, AnimationFile animFile, string skeletonName)
         {
             assetViewModel.SkeletonName.Value = skeletonName;
             assetViewModel.Skeleton = new GameSkeleton(animFile, assetViewModel.Player);
@@ -167,14 +164,14 @@ namespace AnimationEditor.Common.ReferenceModel
             assetViewModel.TriggerSkeletonChanged();
         }
 
-        public void SetMetaFile(AssetViewModel assetViewModel, PackFile metaFile, PackFile persistantFile)
+        public void SetMetaFile(SceneObject assetViewModel, PackFile metaFile, PackFile persistantFile)
         {
             assetViewModel.MetaData = metaFile;
             assetViewModel.PersistMetaData = persistantFile;
             assetViewModel.TriggerMetaDataChanged();
         }
 
-        public void SetAnimation(AssetViewModel assetViewModel, AnimationReference animationReference)
+        public void SetAnimation(SceneObject assetViewModel, AnimationReference animationReference)
         {
             if (animationReference != null)
             {
@@ -189,7 +186,7 @@ namespace AnimationEditor.Common.ReferenceModel
             }
         }
 
-        public void SetAnimationClip(AssetViewModel assetViewModel, AnimationClip clip, AnimationReference animationReference)
+        public void SetAnimationClip(SceneObject assetViewModel, AnimationClip clip, AnimationReference animationReference)
         {
             if (assetViewModel.AnimationClip == null && clip == null && animationReference == null)
                 return;

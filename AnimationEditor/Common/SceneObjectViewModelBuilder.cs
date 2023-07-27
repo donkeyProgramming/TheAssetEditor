@@ -5,20 +5,21 @@ using CommonControls.Services;
 using CommonControls.Services.ToolCreation;
 using Microsoft.Xna.Framework;
 using System;
+using System.Linq;
 
 namespace AnimationEditor.Common.ReferenceModel
 {
-    public class ReferenceModelSelectionViewModelBuilder
+    public class SceneObjectViewModelBuilder
     {
         private readonly AnimationPlayerViewModel _animationPlayerViewModel;
         private readonly MetaDataFactory _metaDataFactory;
-        private readonly AssetViewModelBuilder _assetViewModelBuilder;
+        private readonly SceneObjectBuilder _assetViewModelBuilder;
         private readonly IToolFactory _toolFactory;
         private readonly PackFileService _pfs;
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly ApplicationSettingsService _applicationSettingsService;
 
-        public ReferenceModelSelectionViewModelBuilder(AnimationPlayerViewModel animationPlayerViewModel, MetaDataFactory metaDataFactory, AssetViewModelBuilder assetViewModelBuilder,
+        public SceneObjectViewModelBuilder(AnimationPlayerViewModel animationPlayerViewModel, MetaDataFactory metaDataFactory, SceneObjectBuilder assetViewModelBuilder,
             IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService)
         {
             _animationPlayerViewModel = animationPlayerViewModel;
@@ -30,19 +31,20 @@ namespace AnimationEditor.Common.ReferenceModel
             _applicationSettingsService = applicationSettingsService;
         }
 
-        public ReferenceModelSelectionViewModel CreateEmpty()
+        public SceneObjectViewModel CreateEmpty()
         {
             var mainAsset = _assetViewModelBuilder.CreateAsset("Not in use" + Guid.NewGuid(), Color.Purple);
-            var returnObj = new ReferenceModelSelectionViewModel(_metaDataFactory, _toolFactory, _pfs, mainAsset, "Not in use", _assetViewModelBuilder, _skeletonHelper, _applicationSettingsService);
+            var returnObj = new SceneObjectViewModel(_metaDataFactory, _toolFactory, _pfs, mainAsset, "Not in use", _assetViewModelBuilder, _skeletonHelper, _applicationSettingsService);
             returnObj.IsControlVisible.Value = false;
             returnObj.Data.IsSelectable = false;
             return returnObj;
         }
 
-        public ReferenceModelSelectionViewModel CreateAsset(bool createByDefault, string header, Color skeletonColour, AnimationToolInput input)
+        public SceneObjectViewModel CreateAsset(bool createByDefault, string header, Color skeletonColour, AnimationToolInput input, bool allowMetaData = false)
         {
             var mainAsset = _assetViewModelBuilder.CreateAsset(header, skeletonColour);
-            var returnObj = new ReferenceModelSelectionViewModel(_metaDataFactory, _toolFactory, _pfs, mainAsset, header + ":", _assetViewModelBuilder, _skeletonHelper, _applicationSettingsService);
+            var returnObj = new SceneObjectViewModel(_metaDataFactory, _toolFactory, _pfs, mainAsset, header + ":", _assetViewModelBuilder, _skeletonHelper, _applicationSettingsService);
+            returnObj.AllowMetaData.Value = allowMetaData;
 
             if (createByDefault)
             {
@@ -50,9 +52,19 @@ namespace AnimationEditor.Common.ReferenceModel
 
                 if (input != null)
                 {
-                    _assetViewModelBuilder.SetMesh(mainAsset, input.Mesh);
+                    if (input.Mesh != null)
+                        _assetViewModelBuilder.SetMesh(mainAsset, input.Mesh);
+
                     if (input.Animation != null)
-                        _assetViewModelBuilder.SetAnimation(returnObj.Data, _skeletonHelper.FindAnimationRefFromPackFile(input.Animation, _pfs));
+                        _assetViewModelBuilder.SetAnimation(mainAsset, _skeletonHelper.FindAnimationRefFromPackFile(input.Animation, _pfs));
+
+                    if (input.FragmentName != null)
+                    {
+                        returnObj.FragAndSlotSelection.FragmentList.SelectedItem = returnObj.FragAndSlotSelection.FragmentList.PossibleValues.FirstOrDefault(x => x.FullPath == input.FragmentName);
+
+                        if (input.AnimationSlot != null)
+                            returnObj.FragAndSlotSelection.FragmentSlotList.SelectedItem = returnObj.FragAndSlotSelection.FragmentSlotList.PossibleValues.FirstOrDefault(x => x.SlotName == input.AnimationSlot.Value);
+                    }
                 }
             }
             return returnObj;

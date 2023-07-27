@@ -41,18 +41,18 @@ namespace AnimationEditor.MountAnimationCreator
         public AnimationSettingsViewModel AnimationSettings { get; set; } = new AnimationSettingsViewModel();
         public MountLinkViewModel MountLinkController { get; set; }
 
-        AssetViewModel _mount;
-        AssetViewModel _rider;
-        AssetViewModel _newAnimation;
+        SceneObject _mount;
+        SceneObject _rider;
+        SceneObject _newAnimation;
         private readonly ApplicationSettingsService _applicationSettings;
         List<int> _mountVertexes = new List<int>();
         Rmv2MeshNode _mountVertexOwner;
-        private readonly AssetViewModelBuilder _assetViewModelBuilder;
+        private readonly SceneObjectBuilder _assetViewModelBuilder;
         PackFileService _pfs;
         SelectionManager _selectionManager;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
-        public Editor(AssetViewModelBuilder assetViewModelBuilder, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, SelectionManager selectionManager, ApplicationSettingsService applicationSettings)
+        public Editor(SceneObjectBuilder assetViewModelBuilder, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, SelectionManager selectionManager, ApplicationSettingsService applicationSettings)
         {
             _assetViewModelBuilder = assetViewModelBuilder;
             _pfs = pfs;
@@ -79,7 +79,7 @@ namespace AnimationEditor.MountAnimationCreator
             AnimationSettings.SettingsChanged += () => TryReGenerateAnimation(null);
         }
 
-        internal Editor Create(AssetViewModel rider, AssetViewModel mount, AssetViewModel newAnimation)
+        internal Editor Create(SceneObject rider, SceneObject mount, SceneObject newAnimation)
         {
             _newAnimation = newAnimation;
             _mount = mount;

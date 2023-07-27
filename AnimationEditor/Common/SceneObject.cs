@@ -10,12 +10,12 @@ using static CommonControls.Services.SkeletonAnimationLookUpHelper;
 
 namespace AnimationEditor.Common.ReferenceModel
 {
-    public class AssetViewModel : BaseComponent, ISkeletonProvider
+    public class SceneObject : BaseComponent, ISkeletonProvider
     {
         public event ValueChangedDelegate<GameSkeleton> SkeletonChanged;
         public event ValueChangedDelegate<AnimationClip> AnimationChanged;
-        public event ValueChangedDelegate<AssetViewModel> MeshChanged;
-        public event ValueChangedDelegate<AssetViewModel> MetaDataChanged;
+        public event ValueChangedDelegate<SceneObject> MeshChanged;
+        public event ValueChangedDelegate<SceneObject> MetaDataChanged;
 
         public void TriggerMeshChanged() => MeshChanged?.Invoke(this);
         public void TriggerSkeletonChanged() => SkeletonChanged?.Invoke(Skeleton);
@@ -55,7 +55,7 @@ namespace AnimationEditor.Common.ReferenceModel
         public NotifyAttr<bool> ShowSkeleton { get; set; }
 
 
-        public AssetViewModel() : base()
+        public SceneObject() : base()
         {
             ShowMesh = new NotifyAttr<bool>(true, (x) => SetMeshVisability(x));
             ShowSkeleton = new NotifyAttr<bool>(true, (x) => SkeletonSceneNode.IsVisible = ShowSkeleton.Value);

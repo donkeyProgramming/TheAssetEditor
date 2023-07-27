@@ -2,9 +2,7 @@
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.Common;
-using CommonControls.FileTypes.AnimationPack;
-using CommonControls.Services;
-using CommonControls.Services.ToolCreation;
+using Microsoft.Xna.Framework;
 using Monogame.WpfInterop.Common;
 using MonoGame.Framework.WpfInterop;
 using View3D.Components;
@@ -14,10 +12,12 @@ namespace AnimationEditor.SuperView
 {
     public class SuperViewViewModel : BaseAnimationViewModel<Editor>
     {
-        private readonly ReferenceModelSelectionViewModelBuilder _referenceModelSelectionViewModelBuilder;
+        private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
+        AnimationToolInput _debugDataToLoad;
+        public override NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Super View");
 
         public SuperViewViewModel(
-            ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder,
+            SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
             Editor editor,
             AnimationPlayerViewModel animationPlayerViewModel,
             EventHub eventHub,
@@ -26,73 +26,23 @@ namespace AnimationEditor.SuperView
             FocusSelectableObjectService focusSelectableObjectService)
             : base(componentInserter, animationPlayerViewModel, gameWorld, focusSelectableObjectService)
         {
-            DisplayName.Value = "Super view";
-            _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
             Editor = editor;
 
             eventHub.Register<SceneInitializedEvent>(Initialize);
+            _sceneObjectViewModelBuilder = sceneObjectViewModelBuilder;
+        }
+
+        public void SetDebugInputParameters(AnimationToolInput debugDataToLoad)
+        {
+            _debugDataToLoad = debugDataToLoad;
         }
 
         void Initialize(SceneInitializedEvent sceneInitializedEvent)
         {
-            MainModelView.Value = _referenceModelSelectionViewModelBuilder.CreateEmpty();
-            ReferenceModelView.Value = _referenceModelSelectionViewModelBuilder.CreateEmpty();
-            Editor.Create(MainInput);
-        }
-    }
-
-    public static class SuperViewViewModel_Debug
-    {
-        public static void CreateDamselEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
-        {
-            var editorView = toolFactory.Create<SuperViewViewModel>();
-            editorView.MainInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_alarielle.variantmeshdefinition"),
-                FragmentName = @"animations/animation_tables/hu1b_alarielle_staff_and_sword.frg",
-                AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("STAND")
-            };
-            //editorView.MainInput = new AnimationToolInput()
-            //{
-            //    Mesh = packfileService.FindFile(@"warmachines\engines\emp_steam_tank\emp_steam_tank01.rigid_model_v2"),
-            //    FragmentName = @"animations/animation_tables/wm_steam_tank01.frg",
-            //    AnimationSlot = AnimationSlotTypeHelper.GetfromValue("STAND")
-            //};
-            //editorView.MainInput = new AnimationToolInput()
-            //{
-            //    Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\emp_state_troops_crossbowmen_ror.variantmeshdefinition"),
-            //    FragmentName = @"animations/animation_tables/hu1_empire_sword_crossbow.frg",
-            //    AnimationSlot = AnimationSlotTypeHelper.GetfromValue("FIRE_HIGH")
-            //};
-
-            creator.CreateEmptyEditor(editorView);
-        }
-
-        public static void CreateThrot(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
-        {
-            var editorView = toolFactory.Create<SuperViewViewModel>();
-            editorView.MainInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_throt.variantmeshdefinition"),
-                FragmentName = @"animations/database/battle/bin/hu17_dlc16_throt.bin",
-                AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("ATTACK_5")
-            };
-
-            creator.CreateEmptyEditor(editorView);
-        }
-
-
-        public static void CreatePlaguebearer(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
-        {
-            var editorView = toolFactory.Create<SuperViewViewModel>();
-            editorView.MainInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\dae_plaguebearer_plagueridden.variantmeshdefinition"),
-                FragmentName = @"animations/database/battle/bin/hu4d_wh3_nurgle_sword_on_palanquin.bin",
-                AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("STAND_IDLE_2")
-            };
-
-            creator.CreateEmptyEditor(editorView);
+            var assetViewModel = _sceneObjectViewModelBuilder.CreateAsset(true, "Root", Color.Black, _debugDataToLoad, true);
+         
+            Editor.Create(assetViewModel.Data);
+            SceneObjects.Add(assetViewModel);
         }
     }
 }
