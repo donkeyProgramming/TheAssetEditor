@@ -6,7 +6,6 @@ using System.Linq;
 using System.Windows;
 using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
-using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.Common;
 using CommonControls.Editors.BoneMapping;
@@ -28,7 +27,7 @@ namespace AnimationEditor.AnimationTransferTool
         private readonly SceneObjectViewModelBuilder _referenceModelSelectionViewModelBuilder;
         private readonly SceneObjectBuilder _assetViewModelBuilder;
 
-        private readonly ILogger _logger = Logging.Create<Editor>();
+        private readonly ILogger _logger = Logging.Create<AnimationTransferToolViewModel>();
         private readonly PackFileService _pfs;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 

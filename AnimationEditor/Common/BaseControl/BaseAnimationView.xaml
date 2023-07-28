@@ -77,7 +77,7 @@
                 <DockPanel  DockPanel.Dock="Top">
                     <ContentControl Content="{Binding Editor, UpdateSourceTrigger=PropertyChanged}" >
                         <ContentControl.Resources>
-                            <DataTemplate DataType="{ x:Type mountcreator:Editor}">
+                            <DataTemplate DataType="{ x:Type mountcreator:MountAnimationCreatorViewModel}">
                                 <mountcreator:EditorView  />
                             </DataTemplate>
 
