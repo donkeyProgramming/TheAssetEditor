@@ -250,7 +250,7 @@ namespace AssetEditor.ViewModels
 
         void OpenMountCreator() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<MountAnimationCreatorViewModel>();
         void OpenCampaignAnimCreatorEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<CampaignAnimationCreatorViewModel>>();
-        void OpenAnimationTransferTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<AnimationTransferToolViewModel>();
+        void OpenAnimationTransferTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<AnimationTransferToolViewModel>>();
         void OpenSuperViewTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<SuperViewViewModel>>();
         void OpenAudioEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioEditorViewModel>();
         void CompileAudioProjects() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<CompilerViewModel>();

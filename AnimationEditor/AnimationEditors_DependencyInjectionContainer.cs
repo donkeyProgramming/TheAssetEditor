@@ -23,10 +23,8 @@ namespace AnimationEditor
             serviceCollection.AddScoped<SceneObjectViewModelBuilder>();
 
             serviceCollection.AddScoped<MountAnimationCreator.Editor>();
-            serviceCollection.AddScoped<AnimationTransferTool.Editor>();
 
             serviceCollection.AddScoped<MountAnimationCreatorViewModel>();
-            serviceCollection.AddScoped<AnimationTransferToolViewModel>();
           
             serviceCollection.AddScoped<SkeletonEditorViewModel>();
             serviceCollection.AddScoped<BaseAnimationView>();
@@ -40,12 +38,15 @@ namespace AnimationEditor
 
             serviceCollection.AddScoped<EditorHost<CampaignAnimationCreatorViewModel>>();
             serviceCollection.AddScoped<CampaignAnimationCreatorViewModel>();
+
+            serviceCollection.AddScoped<EditorHost<AnimationTransferToolViewModel>>();
+            serviceCollection.AddScoped<AnimationTransferToolViewModel>();
         }
 
         public override void RegisterTools(IToolFactory factory)
         {
             factory.RegisterTool<MountAnimationCreatorViewModel, BaseAnimationView>();
-            factory.RegisterTool<AnimationTransferToolViewModel, BaseAnimationView>();
+            factory.RegisterTool<EditorHost<AnimationTransferToolViewModel>, BaseAnimationView>();
             factory.RegisterTool<EditorHost<SuperViewViewModel>, BaseAnimationView>();
             factory.RegisterTool<EditorHost<SkeletonEditorViewModel>, BaseAnimationView>();
             factory.RegisterTool<EditorHost<CampaignAnimationCreatorViewModel>, BaseAnimationView>();

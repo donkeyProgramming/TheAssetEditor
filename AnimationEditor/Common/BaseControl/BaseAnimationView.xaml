@@ -85,7 +85,7 @@
                                 <campaignanimationcreator:EditorView  />
                             </DataTemplate>
 
-                            <DataTemplate DataType="{ x:Type animationtransfertool:Editor}">
+                            <DataTemplate DataType="{ x:Type animationtransfertool:AnimationTransferToolViewModel}">
                                 <animationtransfertool:EditorView  />
                             </DataTemplate>
 

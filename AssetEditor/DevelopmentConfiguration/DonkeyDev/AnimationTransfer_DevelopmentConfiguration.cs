@@ -20,7 +20,7 @@ namespace AssetEditor.DevelopmentConfiguration.DonkeyDev
         }
 
         public string[] MachineNames => DonkeyMachineNameProvider.MachineNames;
-        public bool IsEnabled => false;
+        public bool IsEnabled => true;
         public void OverrideSettings(ApplicationSettings currentSettings)
         {
             currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
@@ -34,7 +34,7 @@ namespace AssetEditor.DevelopmentConfiguration.DonkeyDev
 
         static void CreateDwardAndEmpArcher(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.Create<AnimationTransferToolViewModel>();
+            var editorView = toolFactory.Create<EditorHost<AnimationTransferToolViewModel>>();
             var targetInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\dwf_giant_slayers.variantmeshdefinition")
@@ -45,7 +45,7 @@ namespace AssetEditor.DevelopmentConfiguration.DonkeyDev
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\emp_archer_ror.variantmeshdefinition"),
                 Animation = packfileService.FindFile(@"animations\battle\humanoid01\sword_and_pistol\missile_attacks\hu1_swp_missile_attack_aim_to_shootready_01.anim")
             };
-            editorView.SetDebugInputParameters(targetInput, sourceInput);
+            editorView.Editor.SetDebugInputParameters(targetInput, sourceInput);
             creator.CreateEmptyEditor(editorView);
         }
     }
