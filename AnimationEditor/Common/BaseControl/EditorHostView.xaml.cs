@@ -5,9 +5,9 @@ namespace AnimationEditor.Common.BaseControl
     /// <summary>
     /// Interaction logic for MainPropCreatorView.xaml
     /// </summary>
-    public partial class BaseAnimationView : UserControl
+    public partial class EditorHostView : UserControl
     {
-        public BaseAnimationView()
+        public EditorHostView()
         {
             InitializeComponent();
         }

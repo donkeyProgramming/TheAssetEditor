@@ -4,11 +4,10 @@ using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using CommonControls.Services.ToolCreation;
-using View3D.Animation;
 
 namespace AnimationEditor.Common.ReferenceModel
 {
-    public class ReferenceModelSelectionViewModel : NotifyPropertyChangedImpl
+    public class SceneObjectViewModel : NotifyPropertyChangedImpl
     {
         private readonly PackFileService _pfs;
         private readonly MetaDataFactory _metaDataFactory;
@@ -18,8 +17,8 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public NotifyAttr<string> SubHeaderName { get; set; } = new NotifyAttr<string>();
 
-        AssetViewModel _data;
-        public AssetViewModel Data { get => _data; set => SetAndNotify(ref _data, value); }
+        SceneObject _data;
+        public SceneObject Data { get => _data; set => SetAndNotify(ref _data, value); }
 
         public SelectMeshViewModel MeshViewModel { get; set; }
         public SelectAnimationViewModel AnimViewModel { get; set; }
@@ -40,39 +39,41 @@ namespace AnimationEditor.Common.ReferenceModel
             }
         }
 
-        public NotifyAttr<bool> IsControlVisible { get; set; } = new NotifyAttr<bool>(true);
-        public NotifyAttr<bool> AllowMetaData { get; set; } = new NotifyAttr<bool>(false);
+        public NotifyAttr<bool> IsControlVisible { get; set; } = new(true);
+        public NotifyAttr<bool> AllowMetaData { get; set; } = new();
 
-        public ReferenceModelSelectionViewModel(MetaDataFactory metaDataFactory, IToolFactory toolFactory, PackFileService pf, AssetViewModel data, string headerName, AssetViewModelBuilder assetViewModelEditor,
-            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService applicationSettingsService)
+        public SceneObjectViewModel(MetaDataFactory metaDataFactory, 
+            IToolFactory toolFactory,
+            PackFileService packFileService, 
+            SceneObject data,
+            string headerName, 
+            SceneObjectBuilder sceneObjectBuilder,
+            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
+            ApplicationSettingsService applicationSettingsService)
         {
             _metaDataFactory = metaDataFactory;
             _toolFactory = toolFactory;
-            _pfs = pf;
+            _pfs = packFileService;
             HeaderName.Value = headerName;
             Data = data;
 
-            MeshViewModel = new SelectMeshViewModel(_pfs, Data, assetViewModelEditor);
-            AnimViewModel = new SelectAnimationViewModel(assetViewModelEditor, Data, _pfs, skeletonAnimationLookUpHelper);
+            MeshViewModel = new SelectMeshViewModel(_pfs, Data, sceneObjectBuilder);
+            AnimViewModel = new SelectAnimationViewModel(sceneObjectBuilder, Data, _pfs, skeletonAnimationLookUpHelper);
             SkeletonInformation = new SkeletonPreviewViewModel(Data);
-            MetaFileInformation = new SelectMetaViewModel(assetViewModelEditor, Data, _pfs);
-            FragAndSlotSelection = new SelectFragAndSlotViewModel(assetViewModelEditor, _pfs, skeletonAnimationLookUpHelper, Data, MetaFileInformation, applicationSettingsService);
+            MetaFileInformation = new SelectMetaViewModel(sceneObjectBuilder, Data, _pfs);
+            FragAndSlotSelection = new SelectFragAndSlotViewModel(sceneObjectBuilder, _pfs, skeletonAnimationLookUpHelper, Data, MetaFileInformation, applicationSettingsService);
 
-            Data.AnimationChanged += Data_AnimationChanged;
-            Data.SkeletonChanged += Data_SkeletonChanged;
-            Data.MetaDataChanged += MetaDataChanged;
+            Data.AnimationChanged += (x) => OnSceneObjectChanged();
+            Data.SkeletonChanged += (x) => OnSceneObjectChanged();
+            Data.MetaDataChanged += RecreateMetaDataInformation;
         }
-
-        private void Data_SkeletonChanged(GameSkeleton newValue) => OnPropertyChanged();
-        private void Data_AnimationChanged(AnimationClip newValue) => OnPropertyChanged();
 
         public void BrowseMesh() => MeshViewModel.BrowseMesh();
         public void ViewFragment() => FragAndSlotSelection.PreviewSelectedSlot();
         public void ViewSelectedMeta() => ViewMetaDataFile(_data.MetaData, "Meta file - ");
         public void ViewSelectedPersistMeta() => ViewMetaDataFile(_data.PersistMetaData, "Persistent meta file - ");
-        public void Refresh() => MetaFileInformation.Refresh();
 
-        private void OnPropertyChanged()
+        private void OnSceneObjectChanged()
         {
             SubHeaderName.Value = "";
 
@@ -83,7 +84,7 @@ namespace AnimationEditor.Common.ReferenceModel
                 SubHeaderName.Value += " - " + Data.AnimationName.Value;
         }
 
-        void MetaDataChanged(AssetViewModel model)
+        void RecreateMetaDataInformation(SceneObject model)
         {
             if (AllowMetaData.Value == false)
                 return;

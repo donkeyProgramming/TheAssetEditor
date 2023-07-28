@@ -1,9 +1,9 @@
-﻿using CommonControls.Common;
-using Microsoft.Xna.Framework;
-using Serilog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommonControls.Common;
+using Microsoft.Xna.Framework;
+using Serilog;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Components.Rendering;
@@ -13,8 +13,7 @@ namespace View3D.Services
 {
     public class FocusSelectableObjectService
     {
-        ILogger _logger = Logging.Create<FocusSelectableObjectService>();
-
+        private readonly  ILogger _logger = Logging.Create<FocusSelectableObjectService>();
         private readonly SelectionManager _selectionManager;
         private readonly ArcBallCamera _arcBallCamera;
         private readonly SceneManager _sceneManager;
@@ -26,11 +25,10 @@ namespace View3D.Services
             _sceneManager = sceneManager;
         }
 
-        public void FocusSelection()
-        {
-            Focus(_selectionManager.GetState());
-        }
+        public void LookAt(Vector3 position) => _arcBallCamera.LookAt = position;
 
+        public void FocusSelection() => Focus(_selectionManager.GetState());
+        
         public void FocusScene()
         {
             var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
@@ -121,11 +119,6 @@ namespace View3D.Services
         {
             _arcBallCamera.LookAt = Vector3.Zero;
             _arcBallCamera.Zoom = 10;
-        }
-
-        public void Dispose()
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -5,9 +5,9 @@ namespace AnimationEditor.AnimationTransferTool
 {
     class SkeletonBoneHighlighter : ISkeletonBoneHighlighter
     {
-        AssetViewModel _source;
-        AssetViewModel _target;
-        public SkeletonBoneHighlighter(AssetViewModel source, AssetViewModel target)
+        SceneObject _source;
+        SceneObject _target;
+        public SkeletonBoneHighlighter(SceneObject source, SceneObject target)
         {
             _source = source;
             _target = target;

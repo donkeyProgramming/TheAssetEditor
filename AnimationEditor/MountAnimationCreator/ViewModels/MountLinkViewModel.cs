@@ -1,12 +1,12 @@
-﻿using AnimationEditor.Common.ReferenceModel;
-using CommonControls.Common;
-using CommonControls.FileTypes.AnimationPack;
-using CommonControls.Services;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using AnimationEditor.Common.ReferenceModel;
+using CommonControls.Common;
+using CommonControls.FileTypes.AnimationPack;
+using CommonControls.Services;
 
 namespace AnimationEditor.MountAnimationCreator.ViewModels
 {
@@ -18,14 +18,14 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
         public FilterCollection<AnimationBinEntryGenericFormat> SelectedMountTag { get; set; }
         public FilterCollection<AnimationBinEntryGenericFormat> SelectedRiderTag { get; set; }
 
-        AssetViewModel _rider;
-        AssetViewModel _mount;
-        private readonly AssetViewModelBuilder _assetViewModelEditor;
-        PackFileService _pfs;
-        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        Action _validateAction;
+        private readonly SceneObject _rider;
+        private readonly SceneObject _mount;
+        private readonly SceneObjectBuilder _assetViewModelEditor;
+        private readonly PackFileService _pfs;
+        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly Action _validateAction;
 
-        public MountLinkViewModel(AssetViewModelBuilder assetViewModelEditor, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel rider, AssetViewModel mount, Action validate)
+        public MountLinkViewModel(SceneObjectBuilder assetViewModelEditor, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, SceneObject rider, SceneObject mount, Action validate)
         {
             _assetViewModelEditor = assetViewModelEditor;
             _pfs = pfs;

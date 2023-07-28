@@ -10,12 +10,12 @@
              xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors" 
              mc:Ignorable="d" d:DesignWidth="800">
-    
+
     <UserControl.Resources>
         <System:Double x:Key="labelWidth">100</System:Double>
     </UserControl.Resources>
-    <GroupBox>
-        <Expander >
+    <GroupBox  Visibility="{Binding IsControlVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
+        <Expander IsExpanded="true" >
             <Expander.Header>
                 <StackPanel Orientation="Horizontal">
                     <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding IsVisible, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
@@ -63,7 +63,7 @@
                         </TreeView>
                     </Expander>
                 </DockPanel>
-                
+
                 <Rectangle  Fill="LightGray" Height="1" Margin="2,2,2,2"/>
 
                 <DockPanel >
@@ -99,7 +99,7 @@
                 <Rectangle  Fill="LightGray" Height="1" Margin="2,2,2,2"/>
 
 
-                <DockPanel>
+                <DockPanel Width="Auto">
                     <CheckBox Visibility="Hidden"/>
                     <Label  Width ="{StaticResource labelWidth}" Content="Animation"/>
                     <Label  Content=":"/>
@@ -124,7 +124,7 @@
                     <filterdialog:CollapsableFilterControl VerticalContentAlignment="Center" DockPanel.Dock="Right"
                                     SelectedItem="{Binding MetaFileInformation.SelectedPersistMetaFile, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                     SearchItems="{Binding MetaFileInformation.MetaFiles, UpdateSourceTrigger=PropertyChanged}"     
-                                    OnSearch="{Binding MetaFileInformation.FiterByFullPath, UpdateSourceTrigger=PropertyChanged}"   
+                                    OnSearch="{Binding MetaFileInformation.FilterByFullPath, UpdateSourceTrigger=PropertyChanged}"   
                                     IsManipulationEnabled="False"
                                     LabelTotalWidth="0"   
                                     MaxHeight="400"
@@ -153,7 +153,7 @@
             </StackPanel>
 
 
-           
+
         </Expander>
     </GroupBox>
 </UserControl>

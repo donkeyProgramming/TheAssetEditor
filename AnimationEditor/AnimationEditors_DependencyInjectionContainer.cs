@@ -4,45 +4,48 @@ using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.BaseControl;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.MountAnimationCreator;
+using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SkeletonEditor;
 using AnimationEditor.SuperView;
+using CommonControls;
 using CommonControls.Services.ToolCreation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AnimationEditor
 {
-    public class AnimationEditors_DependencyInjectionContainer
+    public class AnimationEditors_DependencyInjectionContainer : DependencyContainer
     {
-        public static void Register(IServiceCollection serviceCollection)
+        public override void Register(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddScoped<AssetViewModelBuilder>();
-            serviceCollection.AddTransient<AssetViewModel>();
+            serviceCollection.AddScoped<SceneObjectBuilder>();
+            serviceCollection.AddTransient<SceneObject>();
             serviceCollection.AddScoped<AnimationPlayerViewModel>();
-            serviceCollection.AddScoped<ReferenceModelSelectionViewModelBuilder>();
+            serviceCollection.AddScoped<SceneObjectViewModelBuilder>();
+            serviceCollection.AddScoped<EditorHostView>();
 
-            serviceCollection.AddScoped<SuperView.Editor>();
-            serviceCollection.AddScoped<SkeletonEditor.Editor>();
-            serviceCollection.AddScoped<MountAnimationCreator.Editor>();
-            serviceCollection.AddScoped<CampaignAnimationCreator.Editor>();
-            serviceCollection.AddScoped<AnimationTransferTool.Editor>();
-
-            serviceCollection.AddScoped<MountAnimationCreatorViewModel>();
-            serviceCollection.AddScoped<CampaignAnimationCreatorViewModel>();
-            serviceCollection.AddScoped<AnimationTransferToolViewModel>();
+            serviceCollection.AddScoped<EditorHost<SuperViewViewModel>>();
             serviceCollection.AddScoped<SuperViewViewModel>();
+
+            serviceCollection.AddScoped<EditorHost<SkeletonEditorViewModel>>();
             serviceCollection.AddScoped<SkeletonEditorViewModel>();
-            // serviceCollection.AddScoped<AnimationBuilderViewModel>();
-            serviceCollection.AddScoped<BaseAnimationView>();
+
+            serviceCollection.AddScoped<EditorHost<CampaignAnimationCreatorViewModel>>();
+            serviceCollection.AddScoped<CampaignAnimationCreatorViewModel>();
+
+            serviceCollection.AddScoped<EditorHost<AnimationTransferToolViewModel>>();
+            serviceCollection.AddScoped<AnimationTransferToolViewModel>();
+
+            serviceCollection.AddScoped<EditorHost<MountAnimationCreatorViewModel>>();
+            serviceCollection.AddScoped<MountAnimationCreatorViewModel>();
         }
 
-        public static void RegisterTools(IToolFactory factory)
+        public override void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<MountAnimationCreatorViewModel, BaseAnimationView>();
-            factory.RegisterTool<CampaignAnimationCreatorViewModel, BaseAnimationView>();
-            factory.RegisterTool<AnimationTransferToolViewModel, BaseAnimationView>();
-            factory.RegisterTool<SuperViewViewModel, BaseAnimationView>();
-            factory.RegisterTool<SkeletonEditorViewModel, BaseAnimationView>();
-            // factory.RegisterTool<AnimationBuilderViewModel, BaseAnimationView>();
+            factory.RegisterTool<EditorHost<MountAnimationCreatorViewModel>, EditorHostView>();
+            factory.RegisterTool<EditorHost<AnimationTransferToolViewModel>, EditorHostView>();
+            factory.RegisterTool<EditorHost<SuperViewViewModel>, EditorHostView>();
+            factory.RegisterTool<EditorHost<SkeletonEditorViewModel>, EditorHostView>();
+            factory.RegisterTool<EditorHost<CampaignAnimationCreatorViewModel>, EditorHostView>();
         }
     }
 }
