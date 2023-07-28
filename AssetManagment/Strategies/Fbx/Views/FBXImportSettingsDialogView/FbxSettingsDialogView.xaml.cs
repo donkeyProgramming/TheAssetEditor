@@ -33,10 +33,6 @@ namespace AssetManagement.Strategies.Fbx.Views.FBXImportSettingsDialogView
             ImportButton.Click += ImportButton_Click;
 
             this.DataContext = this;
-
-
-
-
         }
 
         private void ImportButton_Click(object sender, RoutedEventArgs e)     
@@ -44,11 +40,6 @@ namespace AssetManagement.Strategies.Fbx.Views.FBXImportSettingsDialogView
             
             DialogResult = true;
             Close();
-        }
-
-        private void SkeletonBrowseButton_Click(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }

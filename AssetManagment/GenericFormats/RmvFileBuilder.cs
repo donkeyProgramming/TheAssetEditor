@@ -8,11 +8,11 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using AssetManagement.GenericFormats.Unmanaged;
 using CommonControls.FileTypes.RigidModel.Types;
-using AssetManagement.Strategies.Fbx;
 using AssetManagement.GenericFormats.Managed;
 using VertexFormat = CommonControls.FileTypes.RigidModel.VertexFormat;
 using CommonControls.FileTypes.Animation;
-
+using AssetManagement.MeshHandling;
+using System.Runtime.CompilerServices;
 
 namespace AssetManagement.GenericFormats
 {
@@ -74,8 +74,7 @@ namespace AssetManagement.GenericFormats
             {
                 foreach (var influence in srcMesh.Vertices[vertexIndex].influences)
                 {
-                    int boneIndex = skeletonFile.GetIdFromBoneName(influence.boneName);
-                    CommonWeightProcessor.AddWeightToVertex(rmv2DestMesh.VertexList[vertexIndex], boneIndex, influence.weight);
+                    CommonWeightProcessor.AddWeightToVertexByBoneName(skeletonFile, rmv2DestMesh.VertexList[vertexIndex], influence.boneName, influence.weight);
                 }
             }
         }

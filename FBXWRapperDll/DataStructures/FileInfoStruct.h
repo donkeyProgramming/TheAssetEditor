@@ -3,10 +3,13 @@
 
 struct FileInfoStruct
 {
-    DirectX::XMINT3 sdkVersionUsed = { 1,2,3 };
-    char units[255] = "my ass units";
-    float scaleFatorToMeters = 0.1234f;
-    int elementCount = 200;
-    int meshCount = 4;
+    DirectX::XMINT3 sdkVersionUsed = { 0,0,0 };
+    char fileName[255] = "";
+    char skeletonName[255] = "";
+    char units[255] = "";
+    float scaleFatorToMeters = 0.0;
+    int elementCount = 0;
+    int meshCount = 0;
+    int materialCount = 0;
 };
 

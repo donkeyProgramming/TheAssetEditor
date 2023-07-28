@@ -16,11 +16,11 @@ extern "C"
 		return &pInstance->GetSceneContainer();
 	};
 
-	FBXWRAPPERDLL_API_EXT
-		char* GetSkeletonNameFromScene(wrapdll::FBXImporterService* pInstance, int meshindex)
-	{
-		return (char*)pInstance->GetSkeletonNameFromSceneNodes();
-	};
+	//FBXWRAPPERDLL_API_EXT
+	//	char* GetSkeletonNameFromScene(wrapdll::FBXImporterService* pInstance, int meshindex)
+	//{
+	//	return (char*)pInstance->GetSkeletonNameFromSceneNodes();
+	//};
 
 	FBXWRAPPERDLL_API_EXT
 		void AddBoneName(wrapdll::FBXImporterService* pInstance, char* boneName, int len)

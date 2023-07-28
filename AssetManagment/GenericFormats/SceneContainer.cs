@@ -16,7 +16,7 @@ public class SceneContainer
     public List<AnimationClip> Animations { get; set; } = new List<AnimationClip>();
     public Node RootNode { get; set; }
     public String SkeletonName { get; set; }
-    public FileInfo FileInfoData { get; set; }
+    public FileInfoData FileInfoData { get; set; } = new FileInfoData();
 }
 
     public class Node

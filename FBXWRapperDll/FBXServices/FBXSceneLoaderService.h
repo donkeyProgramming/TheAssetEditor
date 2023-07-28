@@ -25,16 +25,18 @@ namespace wrapdll
 
 		FBXSCeneContainer* ProcessAndFillScene();
 
+        void FillFileInfo();
+
 		void FillBoneNames(const std::vector<std::string>& boneNames)
 		{
 			m_animFileBoneNames = boneNames;
 		}
-
-		const char* GetSkeletonNameFromSceneNodes()
+        // TODO: remove?
+		/*const char* GetSkeletonNameFromSceneNodes()
 		{			
 			m_skeletonName = FBXNodeSearcher::FetchSkeletonNameFromScene(m_pFbxScene);
 			return m_skeletonName.c_str();
-		}
+		}*/
 
 		std::vector<std::string>& GetBoneNames()
 		{
@@ -47,7 +49,6 @@ namespace wrapdll
 		}
 
 	private:
-		std::string m_skeletonName = "";
 		std::vector<std::string> m_animFileBoneNames; // ordered as the .ANIM file, so can be used for bonename -> index lookups
 		
 		FBXSCeneContainer m_sceneContainer; // the container of mesh, anim, etc, that is copied to/from C#

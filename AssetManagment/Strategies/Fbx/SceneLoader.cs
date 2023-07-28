@@ -15,13 +15,13 @@ namespace AssetManagement.Strategies.Fbx
             
             // TODO: RE-ENABLE execption handling
             //try
-            {
+            //{
                 fbxSceneLoader = FBXSeneLoaderServiceDLL.CreateSceneFBX(fileName);
                 var ptrNativeScene = FBXSeneLoaderServiceDLL.ProcessAndFillScene(fbxSceneLoader);
                 var newSceneContainter = SceneMarshallerToManaged.ToManaged(ptrNativeScene);                  
 
                 return newSceneContainter;
-            }
+            //}
             //finally
             {
                 if (fbxSceneLoader != IntPtr.Zero)

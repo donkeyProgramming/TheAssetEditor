@@ -6,53 +6,48 @@
     xmlns:s="http://schemas.singulink.com/xaml"                  
     xmlns:local="clr-namespace:AssetManagement.Strategies.Fbx.Views.FBXImportSettingsDialogView"      
     x:Class="AssetManagement.Strategies.Fbx.Views.FBXImportSettingsDialogView.FBXSetttingsView"                        
-    SizeToContent="WidthAndHeight"
-    mc:Ignorable="d" d:DesignHeight="245" d:DesignWidth="770"    
-    >
-
-
-
+    
+    ResizeMode="NoResize" Height="380" Width="370"
+    mc:Ignorable="d" >
 
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <local:FileInfoView x:Name="FileInfoGrid" Grid.Row="0"/>
-        <local:FBXAnimationSettingsPanel x:Name="SkeletonComboBox" Grid.Row="1"/>
+        
+        
 
 
-        <StackPanel Orientation="Horizontal" Width="auto" HorizontalAlignment="Right" Grid.Row="2">
+        <DockPanel>
+            <local:FileInfoView x:Name="FileInfoGrid" Grid.Row="0" DockPanel.Dock="Top"/>        
+            <local:FBXAnimationSettingsPanel x:Name="SkeletonComboBox" Grid.Row="1" DockPanel.Dock="Top"/>
+ 
+
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="2" DockPanel.Dock="Top">
             <Button
                 x:Name="ImportButton"
                 Content="Import&#xA;"
                 Height="23"
-                HorizontalAlignment="Right" 
-                Margin="0,20,26,0"
+                
+                Margin="0,20,6,5"
                 VerticalAlignment="Bottom" 
-                Width="75"             
+                Width="175"             
                 IsDefault="True"            
-                Click="{s:MethodBinding ImportButtonClicked}" Grid.ColumnSpan="2"/>
+                Click="{s:MethodBinding ImportButtonClicked}"/>
 
             <Button
                 x:Name="CancelButton"
                 Content="Cancel" 
                 Height="23" 
-                Margin="0,20,0,0"            
+                Margin="0,20,0,5"            
                 VerticalAlignment="Bottom"
-                Width="75" 
+                Width="175" 
                 IsCancel="True" HorizontalAlignment="Left"/>
 
 
         </StackPanel>
+        
+        </DockPanel>
+        
+
     </Grid>
-
-
 </Window>
     

@@ -27,7 +27,8 @@ namespace AssetManagement.Strategies.Fbx
             if (sceneContainer == null)
                 return null;
 
-            var fbxSettings = new FbxSettingsModel() { SkeletonName = sceneContainer.SkeletonName };            
+            // TODO: check in th C++ that "skeletonName" is only set once and in the proper place
+            var fbxSettings = new FbxSettingsModel() { SkeletonName = sceneContainer.SkeletonName, FileInfoData = sceneContainer.FileInfoData };            
 
             if (!FBXSettingsViewModel.ShowImportDialog(_packFileService, fbxSettings))
                 return null;

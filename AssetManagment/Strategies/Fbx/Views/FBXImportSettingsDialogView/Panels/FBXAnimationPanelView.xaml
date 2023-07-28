@@ -8,52 +8,119 @@
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="500">
 
-    
-        
-        <StackPanel Orientation="Vertical">
-            <Expander Name="AnimationPanel" 
-                      BorderThickness="3"    
-                      BorderBrush="Gray"
-                             Header="Animation" 
-                            ExpandDirection="Down" IsExpanded="True" Height="auto" Width="auto">
 
-                <Grid ShowGridLines="true" HorizontalAlignment="Center">
-                    <Grid.ColumnDefinitions >
-                        <ColumnDefinition Width="auto" />                        
-                        <ColumnDefinition Width="auto"/>                        
+
+
+    <Expander Name="myExpander"                             
+
+            Header="Animations Info" 
+                      ExpandDirection="Down" 
+                      IsExpanded="True"                      
+                      
+                      >
+        <GroupBox>
+
+            <DockPanel LastChildFill="False" >
+                <!--CheckBox for ""Apply Weighting"-->
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
+                    <Label Width ="100" DockPanel.Dock="Left" Content="Apply Weighting"/>
+                    <Label>:</Label>
+                    <CheckBox 
+                        Grid.Row="0" Grid.Column="1"
+                        IsChecked="True"  
+                        HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalAlignment="Center">
+                    </CheckBox>
+                </StackPanel>
+
+                <!--ComboxBox For skeletoton-->
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
+                    <Label Width ="100" DockPanel.Dock="Left" Content="Skeleton"/>
+                    <Label>:</Label>
+                    <ComboBox Width="150"                                        
+                        DisplayMemberPath="Name"                           
+                        Text="{Binding BTextSkeletonCombox}"
+                        ItemsSource="{Binding BSkeketonComboBox}"    
+                        SelectedItem="{Binding Path=BSelectedSkeleton, Mode=TwoWay}">
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
+                    <Label Width ="100" DockPanel.Dock="Left" Content="Skeleton"/>
+                    <Label>:</Label>
+                    <Button x:Name="SkeletonBrowseButton" 
+                        Grid.Row="2" Grid.Column="1"
+                        Content="Browse..." 
+                        Width="150" 
+                        Click="{s:MethodBinding SkeletonFileBrowseButton}">                        
+                    </Button>                            
+                </StackPanel>
+
+            </DockPanel>
+
+
+
+
+            <!--<Grid HorizontalAlignment="Left">
+                    <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>                        
+
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!--CheckBox for ""Apply Weighting"-->
-                    <CheckBox Content="ApplyWeighting; "                               
-                              IsChecked="True" Grid.Row="0" 
-                              Grid.Column="0" HorizontalContentAlignment="Center" 
-                              HorizontalAlignment="Center"/>
 
-                    <!--ComboxBox For skeletoton-->
-                    <ComboBox Grid.Row="1" Grid.Column="0" Width="150"                        
-                              DisplayMemberPath="Name"
-                        Margin="7,1,7,1" 
-                               Text="{Binding BTextSkeletonCombox}"
+
+                    
+                        <Label Content="Apply Riggin To Meshes: "
+                               Grid.Row="0" Grid.Column="0"
+                               />
+                    -->
+            <!--CheckBox for ""Apply Weighting"-->
+            <!--
+                        <CheckBox 
+                            Grid.Row="0" Grid.Column="1"
+                              IsChecked="True"  
+                              HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalAlignment="Center"/>
+                    
+                    -->
+            <!--ComboxBox For skeletoton-->
+            <!--
+                    
+                        <Label Content="Skeleton: "
+                               Grid.Row="1" Grid.Column="0"
+                               />
+                        <ComboBox  Width="150"          
+                              Grid.Row="1" Grid.Column="1"
+                              DisplayMemberPath="Name"   
+                        
+                              Text="{Binding BTextSkeletonCombox}"
                               ItemsSource="{Binding BSkeketonComboBox}"    
                               SelectedItem="{Binding Path=BSelectedSkeleton, Mode=TwoWay}"  
                               />
-
-                    <!--Button for browsing the disk for skeleton files-->
-                    <Button x:Name="SkeletonBrowseButton" 
-                            Margin="7,1,7,1" 
-                            Content="Browse Skeleton From Disk..." 
-                            Grid.Row="1" Grid.Column="1"  Width="auto" 
+                    
+                    -->
+            <!--Button for browsing the disk for skeleton files-->
+            <!--
+                    
+                        <Label Content="Browse For Skeleton On Disk: "
+                               Grid.Row="2" Grid.Column="0"
+                               />
+                        <Button x:Name="SkeletonBrowseButton" 
+                            Grid.Row="2" Grid.Column="1"
+                            Content="Browse..." 
+                            Width="150" 
                             Click="{s:MethodBinding SkeletonFileBrowseButton}"
                             />
+                    
 
+                </Grid>-->
+        </GroupBox>
 
-                </Grid>
+    </Expander>
 
-            </Expander>
-        </StackPanel>
 
 </UserControl>

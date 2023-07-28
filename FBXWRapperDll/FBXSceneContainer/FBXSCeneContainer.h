@@ -72,9 +72,11 @@ namespace wrapdll
 		};
 
 	private:
+        
         FileInfoStruct m_fileInfoStruct;
+                
 		std::string m_skeletonName = "";
-		std::vector<PackedMesh> m_packedMeshes;
+		std::vector<PackedMesh> m_packedMeshes;		
 		std::vector<std::string> m_animFileBoneNames; // ordered as the .ANIM file, so can be used for bonename -> index lookups
 		fbxsdk::FbxScene* m_pFbxScene = nullptr;
 	};

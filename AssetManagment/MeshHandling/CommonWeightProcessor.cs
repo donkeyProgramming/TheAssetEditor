@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using CommonControls.FileTypes.RigidModel.Vertex;
+using CommonControls.FileTypes.Animation;
 
-namespace AssetManagement.Strategies.Fbx
+namespace AssetManagement.MeshHandling
 {
     public class CommonWeightProcessor
     {
@@ -22,13 +23,25 @@ namespace AssetManagement.Strategies.Fbx
             vertex.BoneIndex[vertex.WeightCount - 1] = (byte)boneIndex;
             vertex.BoneWeight[vertex.WeightCount - 1] = weight;
         }
+        public static void AddWeightToVertexByBoneName(AnimationFile skeletonFile,  CommonVertex vertex, string boneName, float weight)
+        {
+            if (boneName.Any()) // don't add empty influences (boneName == "")
+            {
+                int boneIndex = skeletonFile.GetIdFromBoneName(boneName);
+                CommonWeightProcessor.AddWeightToVertex(vertex, boneIndex, weight);
+            }
+            else // add empty influences, so the influece count for "cinematic" vertex will be 4, line Vanilla
+            {
+                CommonWeightProcessor.AddWeightToVertex(vertex, 0, 0.0f);                
+            }
+        }
 
         /// <summary>
         /// Check the vertex weights have the SUM = 1.0 within a certain tolerance
         /// </summary>
         /// <exception cref="Exception">Throw on invalid weight sum</exception>
         public static void CheckVertexWeights(CommonVertex vertex, float errorTolerance = 1e-1f)
-        {            
+        {
             vertex.WeightCount = 4;
             const double weightErrorTolerance = 0.1;
 

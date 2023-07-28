@@ -14,12 +14,13 @@ namespace AssetManagement.Strategies.Fbx
         public static SceneContainer ToManaged(IntPtr ptrFbxSceneContainer)
         {
             var fileInfo = FBXSCeneContainerGetterDll.GetFileInfo(ptrFbxSceneContainer);
-            var info = Marshal.PtrToStructure<ExtFileInfoStruct>(fileInfo);
+            var fileInfoStruct = Marshal.PtrToStructure<ExtFileInfoStruct>(fileInfo);
 
             var newScene = new SceneContainer();
-
+            newScene.FileInfoData.FillFromStruct(in fileInfoStruct);
             newScene.Meshes = GetAllPackedMeshes(ptrFbxSceneContainer);
             newScene.SkeletonName = GetSkeletonNameFromSceneContainer(ptrFbxSceneContainer);
+            
             return newScene;
             /*
             - destScene.Bones = GetAllBones();
@@ -127,20 +128,20 @@ namespace AssetManagement.Strategies.Fbx
             return meshList;
         }
 
-        static public string GetSkeletonNameFromSceneLoader(IntPtr ptrFbxScenLoader)
-        {
-            var skeletonNamePtr = FBXSeneLoaderServiceDLL.GetSkeletonNameFromSceneLoader(ptrFbxScenLoader);
+        //static public string GetSkeletonNameFromSceneLoader(IntPtr ptrFbxScenLoader)
+        //{
+        //    var skeletonNamePtr = FBXSeneLoaderServiceDLL.GetSkeletonNameFromSceneLoader(ptrFbxScenLoader);
 
-            if (skeletonNamePtr == IntPtr.Zero)
-                return "";
+        //    if (skeletonNamePtr == IntPtr.Zero)
+        //        return "";
 
-            string skeletonName = Marshal.PtrToStringUTF8(skeletonNamePtr);
+        //    string skeletonName = Marshal.PtrToStringUTF8(skeletonNamePtr);
 
-            if (skeletonName == null)
-                return "";
+        //    if (skeletonName == null)
+        //        return "";
 
-            return skeletonName;
-        }
+        //    return skeletonName;
+        //}
         static public string GetSkeletonNameFromSceneContainer(IntPtr ptrFbxSceneContainer)
         {
             var skeletonNamePtr = FBXSCeneContainerGetterDll.GetSkeletonName(ptrFbxSceneContainer);

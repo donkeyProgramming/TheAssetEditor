@@ -9,7 +9,7 @@ namespace wrapdll
 	class FBXHelperFileUtil
 	{
 	public:
-		static fbxsdk::FbxScene* InitScene(fbxsdk::FbxManager* pSdkManager, const std::string path)
+        static fbxsdk::FbxScene* InitScene(fbxsdk::FbxManager* pSdkManager, const std::string path, DirectX::XMINT3* pFileSdkVersion = nullptr)
 		{			
 			// create an empty scene
 			auto pfbxScene = fbxsdk::FbxScene::Create(pSdkManager, "");
@@ -38,8 +38,15 @@ namespace wrapdll
 				return nullptr;
 			}
 
+            
 			int x=0, y=0, z=0;
 			poImporter->GetFileVersion(x, y, z);
+
+            if (pFileSdkVersion)
+            {
+                *pFileSdkVersion = { x,y,z };
+            }
+
 			log_action("File uses FBX Version " + std::to_string(x) + "." + std::to_string(y) + "." + std::to_string(z));
 
 			// -- imports the loaded file into the scene!!

@@ -27,18 +27,26 @@ namespace AssetManagement.GenericFormats.Unmanaged
         public float animTiem;
         public int animFrame;
     }
-
+     
 
     [StructLayout(LayoutKind.Sequential)]
     public struct ExtFileInfoStruct
     {
         public XMINT3 sdkVersionUsed;
 
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
+        public string fileName;
+        
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
+        public string skeletonName;
+        
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
         public string units;
+
         public float scaleFatorToMeters;
         public int elementCount;
         public int meshCount;
+        public int materialCount;
     };
 
 

@@ -78,24 +78,33 @@ namespace tools
 
 	class SystemClock
 	{
+        typedef std::chrono::high_resolution_clock Time;        
 	public:
-		double GetSeconds()
-		{
-			typedef std::chrono::high_resolution_clock Time;
-			typedef std::chrono::duration<float> fsec;
-			
-			double ticks = static_cast<double>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
-			double period = std::chrono::high_resolution_clock::period::den;
+        SystemClock()
+        {
+            ResetLocalTime();
+        }
 
-			double seconds = ticks / period;			
+		double GetSeconds()
+        {				
+			double ticks = static_cast<double>(Time::now().time_since_epoch().count());
+			double ticksPerSeconds = std::chrono::high_resolution_clock::period::den;
+
+			double seconds = ticks / ticksPerSeconds;			
 
 			return seconds;			
 		}
 
+        void ResetLocalTime()
+        {
+            m_startTime = GetSeconds();
+        }
+
 		double GetLocalTime() 
 		{
 			double timeElapsed = GetSeconds() - m_startTime; // +m_start_at;
-			return timeElapsed;
+			
+            return timeElapsed;
 		}
 
 	private:
