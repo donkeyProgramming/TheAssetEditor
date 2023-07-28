@@ -10,7 +10,7 @@ using View3D.Services;
 
 namespace AnimationEditor.AnimationTransferTool
 {
-    public class AnimationTransferToolViewModel : BaseAnimationViewModel<Editor>
+    public class AnimationTransferToolViewModel : EditorHost<Editor>
     {
         AnimationToolInput _inputTargetData;
         AnimationToolInput _inputSourceData;
@@ -18,7 +18,7 @@ namespace AnimationEditor.AnimationTransferTool
         private readonly SceneObjectViewModelBuilder _referenceModelSelectionViewModelBuilder;
         private readonly SceneObjectBuilder _assetViewModelBuilder;
 
-        public override NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Animation transfer tool");
+        public new NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Animation transfer tool");
 
         public AnimationTransferToolViewModel(
             Editor editor,
@@ -29,7 +29,7 @@ namespace AnimationEditor.AnimationTransferTool
             SceneObjectBuilder assetViewModelBuilder,
             GameWorld scene,
             FocusSelectableObjectService focusSelectableObjectService)
-            : base(componentInserter, animationPlayerViewModel, scene, focusSelectableObjectService)
+            : base(componentInserter, animationPlayerViewModel, scene, focusSelectableObjectService, editor, eventHub)
         {
             Editor = editor;
             _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;

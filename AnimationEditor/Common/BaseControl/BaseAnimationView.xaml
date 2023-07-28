@@ -81,7 +81,7 @@
                                 <mountcreator:EditorView  />
                             </DataTemplate>
 
-                            <DataTemplate DataType="{ x:Type campaignanimationcreator:Editor}">
+                            <DataTemplate DataType="{ x:Type campaignanimationcreator:CampaignAnimationCreatorViewModel}">
                                 <campaignanimationcreator:EditorView  />
                             </DataTemplate>
 
@@ -89,12 +89,12 @@
                                 <animationtransfertool:EditorView  />
                             </DataTemplate>
 
-                            <DataTemplate DataType="{ x:Type skeletoneditor:Editor}">
+                            <DataTemplate DataType="{ x:Type skeletoneditor:SkeletonEditorViewModel}">
                                 <skeletoneditor:EditorView  />
                             </DataTemplate>
 
-                            <DataTemplate DataType="{ x:Type superview:Editor}">
-                                <superview:EditorView  />
+                            <DataTemplate DataType="{ x:Type superview:SuperViewViewModel}">
+                                <superview:EditorView />
                             </DataTemplate>
 
                         </ContentControl.Resources>

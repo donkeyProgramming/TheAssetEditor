@@ -35,15 +35,14 @@ namespace AssetEditor.DevelopmentConfiguration.DonkeyDev
 
         static void CreateThrot(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
-            var editorView = toolFactory.Create<SuperViewViewModel>();
+            var editorView = toolFactory.Create<EditorHost<SuperViewViewModel>>();
             var debugInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_throt.variantmeshdefinition"),
                 FragmentName = @"animations/database/battle/bin/hu17_dlc16_throt.bin",
                 AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("ATTACK_5")
             };
-
-            editorView.SetDebugInputParameters(debugInput);
+            editorView.Editor.SetDebugInputParameters(debugInput);
             creator.CreateEmptyEditor(editorView);
         }
     }

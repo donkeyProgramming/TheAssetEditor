@@ -16,9 +16,7 @@
             <TabItem Header="Persistent">
                 <DockPanel>
                     <TextBlock  DockPanel.Dock="Top">
-                        <Run Text="FilePath: ["/>
-                        <Run Text="{Binding PersistentMetaFilePackFileContainerName.Value, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Run Text="]"/>
+                        <Run Text="FilePath: "/>
                          <Run Text="{Binding PersistentMetaFilePath.Value, UpdateSourceTrigger=PropertyChanged}"/>
                     </TextBlock>
                     <view:MainEditorView DataContext="{Binding PersistentMetaEditor}" DockPanel.Dock="Top"/>
@@ -27,9 +25,7 @@
             <TabItem Header="Animation">
                 <DockPanel>
                     <TextBlock  DockPanel.Dock="Top">
-                        <Run Text="FilePath: ["/>
-                        <Run Text="{Binding MetaFilePackFileContainerName.Value, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Run Text="]"/>
+                        <Run Text="FilePath: "/>
                          <Run Text="{Binding MetaFilePath.Value, UpdateSourceTrigger=PropertyChanged}"/>
                     </TextBlock>
 

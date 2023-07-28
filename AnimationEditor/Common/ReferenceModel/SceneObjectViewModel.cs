@@ -65,7 +65,7 @@ namespace AnimationEditor.Common.ReferenceModel
 
             Data.AnimationChanged += (x) => OnSceneObjectChanged();
             Data.SkeletonChanged += (x) => OnSceneObjectChanged();
-            Data.MetaDataChanged += MetaDataChanged;
+            Data.MetaDataChanged += RecreateMetaDataInformation;
         }
 
         public void BrowseMesh() => MeshViewModel.BrowseMesh();
@@ -84,7 +84,7 @@ namespace AnimationEditor.Common.ReferenceModel
                 SubHeaderName.Value += " - " + Data.AnimationName.Value;
         }
 
-        void MetaDataChanged(SceneObject model)
+        void RecreateMetaDataInformation(SceneObject model)
         {
             if (AllowMetaData.Value == false)
                 return;

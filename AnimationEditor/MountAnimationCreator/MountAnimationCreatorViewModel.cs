@@ -10,7 +10,7 @@ using View3D.Services;
 
 namespace AnimationEditor.MountAnimationCreator
 {
-    public class MountAnimationCreatorViewModel : BaseAnimationViewModel<Editor>
+    public class MountAnimationCreatorViewModel : EditorHost<Editor>
     {
         private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
         private readonly SceneObjectBuilder _sceneObjectBuilder;
@@ -18,7 +18,7 @@ namespace AnimationEditor.MountAnimationCreator
         AnimationToolInput _inputRiderData;
         AnimationToolInput _inputMountData;
 
-        public override NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Mount Animation Creator");
+        public new NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Mount Animation Creator");
 
         public MountAnimationCreatorViewModel(
             Editor editor,
@@ -29,7 +29,7 @@ namespace AnimationEditor.MountAnimationCreator
             SceneObjectBuilder sceneObjectBuilder,
             GameWorld scene,
             FocusSelectableObjectService focusSelectableObjectService)
-            : base(componentInserter, animationPlayerViewModel, scene, focusSelectableObjectService)
+            : base(componentInserter, animationPlayerViewModel, scene, focusSelectableObjectService, editor, eventHub)
         {
             Editor = editor;
             _sceneObjectViewModelBuilder = sceneObjectViewModelBuilder;

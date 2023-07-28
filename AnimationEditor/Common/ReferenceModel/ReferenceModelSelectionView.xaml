@@ -14,7 +14,7 @@
     <UserControl.Resources>
         <System:Double x:Key="labelWidth">100</System:Double>
     </UserControl.Resources>
-    <GroupBox>
+    <GroupBox  Visibility="{Binding IsControlVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
         <Expander IsExpanded="true" >
             <Expander.Header>
                 <StackPanel Orientation="Horizontal">
