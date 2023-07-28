@@ -85,9 +85,6 @@ namespace AnimationEditor.SuperView
             _sceneObjectBuilder.SetMetaFile(_asset, _asset.MetaData, newFile);
         }
 
-        public void RefreshAction()
-        {
-            _asset.TriggerMeshChanged();
-        }
+        public void RefreshAction() => _asset.TriggerMeshChanged();
     }
 }

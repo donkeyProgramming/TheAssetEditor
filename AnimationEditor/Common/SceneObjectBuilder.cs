@@ -54,6 +54,7 @@ namespace AnimationEditor.Common.ReferenceModel
             instance.Player = animationPlayer;
             instance.ParentNode = parentNode;
             instance.SkeletonSceneNode = skeletonSceneNode;
+            instance.Description = description;
 
             return _mainScene.AddComponent(instance);
         }

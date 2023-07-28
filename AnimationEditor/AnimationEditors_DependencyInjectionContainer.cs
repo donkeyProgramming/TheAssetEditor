@@ -21,13 +21,10 @@ namespace AnimationEditor
             serviceCollection.AddTransient<SceneObject>();
             serviceCollection.AddScoped<AnimationPlayerViewModel>();
             serviceCollection.AddScoped<SceneObjectViewModelBuilder>();
-
-            serviceCollection.AddScoped<SkeletonEditorViewModel>();
-            serviceCollection.AddScoped<BaseAnimationView>();
+            serviceCollection.AddScoped<EditorHostView>();
 
             serviceCollection.AddScoped<EditorHost<SuperViewViewModel>>();
             serviceCollection.AddScoped<SuperViewViewModel>();
-
 
             serviceCollection.AddScoped<EditorHost<SkeletonEditorViewModel>>();
             serviceCollection.AddScoped<SkeletonEditorViewModel>();
@@ -44,11 +41,11 @@ namespace AnimationEditor
 
         public override void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<EditorHost<MountAnimationCreatorViewModel>, BaseAnimationView>();
-            factory.RegisterTool<EditorHost<AnimationTransferToolViewModel>, BaseAnimationView>();
-            factory.RegisterTool<EditorHost<SuperViewViewModel>, BaseAnimationView>();
-            factory.RegisterTool<EditorHost<SkeletonEditorViewModel>, BaseAnimationView>();
-            factory.RegisterTool<EditorHost<CampaignAnimationCreatorViewModel>, BaseAnimationView>();
+            factory.RegisterTool<EditorHost<MountAnimationCreatorViewModel>, EditorHostView>();
+            factory.RegisterTool<EditorHost<AnimationTransferToolViewModel>, EditorHostView>();
+            factory.RegisterTool<EditorHost<SuperViewViewModel>, EditorHostView>();
+            factory.RegisterTool<EditorHost<SkeletonEditorViewModel>, EditorHostView>();
+            factory.RegisterTool<EditorHost<CampaignAnimationCreatorViewModel>, EditorHostView>();
         }
     }
 }

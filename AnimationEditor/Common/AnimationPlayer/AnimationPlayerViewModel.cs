@@ -73,7 +73,6 @@ namespace AnimationEditor.Common.AnimationPlayer
         public void SetAnimationPrivFrame() => _assetList.ForEach(x => PrivFrame(x));
         public void SetAnimationFirstFrame() => _assetList.ForEach(x => SetFrame(x, 0));
 
-
         public void SetAnimationLastFrame()
         {
             LoopAnimation.Value = false;

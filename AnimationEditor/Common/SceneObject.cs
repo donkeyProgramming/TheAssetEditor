@@ -1,4 +1,4 @@
-﻿using AnimationMeta.Visualisation;
+﻿using AnimationMeta.Visualisation.Instances;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;

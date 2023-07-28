@@ -1,11 +1,10 @@
-﻿using AnimationEditor.Common.AnimationPlayer;
+﻿using System.Linq;
+using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.PropCreator.ViewModels;
 using AnimationMeta.Visualisation;
 using CommonControls.Services;
 using CommonControls.Services.ToolCreation;
 using Microsoft.Xna.Framework;
-using System;
-using System.Linq;
 
 namespace AnimationEditor.Common.ReferenceModel
 {
@@ -29,15 +28,6 @@ namespace AnimationEditor.Common.ReferenceModel
             _pfs = pfs;
             _skeletonHelper = skeletonHelper;
             _applicationSettingsService = applicationSettingsService;
-        }
-
-        public SceneObjectViewModel CreateEmpty()
-        {
-            var mainAsset = _assetViewModelBuilder.CreateAsset("Not in use" + Guid.NewGuid(), Color.Purple);
-            var returnObj = new SceneObjectViewModel(_metaDataFactory, _toolFactory, _pfs, mainAsset, "Not in use", _assetViewModelBuilder, _skeletonHelper, _applicationSettingsService);
-            returnObj.IsControlVisible.Value = false;
-            returnObj.Data.IsSelectable = false;
-            return returnObj;
         }
 
         public SceneObjectViewModel CreateAsset(bool createByDefault, string header, Color skeletonColour, AnimationToolInput input, bool allowMetaData = false)
