@@ -11,6 +11,7 @@ namespace KitbasherEditor
     {
         public void ResolveGlobalServices(IServiceProvider serviceProvider)
         {
+            // Force the services to initialize. This is needed to make them subscribe to events
             serviceProvider.GetRequiredService<SceneInitializedHandler>();
             serviceProvider.GetRequiredService<SkeletonChangedHandler>();
 

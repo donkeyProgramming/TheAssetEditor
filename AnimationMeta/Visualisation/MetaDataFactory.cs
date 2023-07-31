@@ -1,5 +1,6 @@
 ﻿using AnimationMeta.FileTypes.Definitions;
 using AnimationMeta.FileTypes.Parsing;
+using AnimationMeta.Visualisation.Instances;
 using AnimationMeta.Visualisation.Rules;
 using CommonControls.Common;
 using CommonControls.FileTypes.Animation;
@@ -24,10 +25,9 @@ namespace AnimationMeta.Visualisation
 {
     public class MetaDataFactory
     {
-        private ILogger _logger = Logging.Create<MetaDataFactory>();
-
+        private readonly ILogger _logger = Logging.Create<MetaDataFactory>();
         private readonly ComplexMeshLoader _complexMeshLoader;
-        private readonly ResourceLibary _resourceLibary;
+        private readonly ResourceLibary _resourceLibrary;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly PackFileService _packFileService;
         private readonly AnimationsContainerComponent _animationsContainerComponent;
@@ -39,7 +39,7 @@ namespace AnimationMeta.Visualisation
             AnimationsContainerComponent animationsContainerComponent)
         {
             _complexMeshLoader = complexMeshLoader;
-            _resourceLibary = resourceLibary;
+            _resourceLibrary = resourceLibary;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _packFileService = packFileService;
             _animationsContainerComponent = animationsContainerComponent;
@@ -149,7 +149,7 @@ namespace AnimationMeta.Visualisation
                 propPlayer.SetAnimation(clip, skeleton);
 
                 // Add the prop skeleton
-                var skeletonSceneNode = new SkeletonNode(_resourceLibary, skeleton);
+                var skeletonSceneNode = new SkeletonNode(_resourceLibrary, skeleton);
                 skeletonSceneNode.NodeColour = Color.Yellow;
                 skeletonSceneNode.ScaleMult = animatedPropMeta.Scale;
                 loadedNode.AddObject(skeletonSceneNode);
@@ -176,11 +176,11 @@ namespace AnimationMeta.Visualisation
         private IMetaDataInstance CreateStaticLocator(DecodedMetaEntryBase metaData, SceneNode root, Vector3 position, string displayName, float scale = 0.3f)
         {
 
-            var lineRenderer = new LineMeshRender(_resourceLibary);
+            var lineRenderer = new LineMeshRender(_resourceLibrary);
 
             SimpleDrawableNode node = new SimpleDrawableNode(displayName);
             lineRenderer.AddCircle(position, scale, Color.Red);
-            node.AddItem(RenderBuckedId.Text, new TextRenderItem(_resourceLibary, displayName, position));
+            node.AddItem(RenderBuckedId.Text, new TextRenderItem(_resourceLibrary, displayName, position));
 
             node.AddItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
             root.AddObject(node);
@@ -197,16 +197,16 @@ namespace AnimationMeta.Visualisation
             }
 
 
-            var lineRenderer = new LineMeshRender(_resourceLibary);
+            var lineRenderer = new LineMeshRender(_resourceLibrary);
             Vector3 textPos = (splashAttack.EndPosition + splashAttack.StartPosition) / 2;
 
             SimpleDrawableNode node = new SimpleDrawableNode(displayName);
 
-            node.AddItem(RenderBuckedId.Text, new TextRenderItem(_resourceLibary, "StartPos", splashAttack.StartPosition));
+            node.AddItem(RenderBuckedId.Text, new TextRenderItem(_resourceLibrary, "StartPos", splashAttack.StartPosition));
             lineRenderer.AddLocator(splashAttack.StartPosition, scale, Color.Red);
-            node.AddItem(RenderBuckedId.Text, new TextRenderItem(_resourceLibary, "EndPos", splashAttack.EndPosition));
+            node.AddItem(RenderBuckedId.Text, new TextRenderItem(_resourceLibrary, "EndPos", splashAttack.EndPosition));
             lineRenderer.AddLocator(splashAttack.EndPosition, scale, Color.Red);
-            node.AddItem(RenderBuckedId.Text, new TextRenderItem(_resourceLibary, displayName, textPos));
+            node.AddItem(RenderBuckedId.Text, new TextRenderItem(_resourceLibrary, displayName, textPos));
             lineRenderer.AddLine(splashAttack.StartPosition, splashAttack.EndPosition, Color.Red);
 
             Vector3 normal = splashAttack.EndPosition - splashAttack.StartPosition;  // corresponds to Z
@@ -255,11 +255,11 @@ namespace AnimationMeta.Visualisation
 
         private IMetaDataInstance CreateEffect(Effect_v11 effect, SceneNode root, ISkeletonProvider skeleton)
         {
-            var lineRenderer = new LineMeshRender(_resourceLibary);
+            var lineRenderer = new LineMeshRender(_resourceLibrary);
 
             SimpleDrawableNode node = new SimpleDrawableNode("Effect:" + effect.VfxName);
             lineRenderer.AddLocator(effect.Position, 0.3f, Color.Red);
-            node.AddItem(RenderBuckedId.Text, new TextRenderItem(_resourceLibary, effect.VfxName, effect.Position));
+            node.AddItem(RenderBuckedId.Text, new TextRenderItem(_resourceLibrary, effect.VfxName, effect.Position));
 
             node.AddItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
             root.AddObject(node);
@@ -268,81 +268,6 @@ namespace AnimationMeta.Visualisation
             if (effect.Tracking)
                 instance.FollowBone(skeleton, effect.NodeIndex);
             return instance;
-        }
-    }
-
-    public interface IMetaDataInstance
-    {
-        void CleanUp();
-        void Update(float currentTime);
-        AnimationPlayer Player { get; }
-    }
-
-    public class AnimatedPropInstance : IMetaDataInstance
-    {
-        private SceneNode _node;
-
-        public AnimationPlayer Player { get; private set; }
-
-        public AnimatedPropInstance(SceneNode node, AnimationPlayer player)
-        {
-            _node = node;
-            Player = player;
-        }
-
-        public void Update(float currentTime)
-        { }
-
-        public void CleanUp()
-        {
-            _node.Parent.RemoveObject(_node);
-            Player.MarkedForRemoval = true;
-        }
-    }
-
-    public class DrawableMetaInstance : IMetaDataInstance
-    {
-        private ILogger _logger = Logging.Create<MetaDataFactory>();
-        private bool _hasError = false;
-
-        private SceneNode _node;
-        private string _description;
-        public AnimationPlayer Player => null;
-
-        private SkeletonBoneAnimationResolver _animationResolver;
-
-        public DrawableMetaInstance(float startTime, float endTime, string description, SceneNode node)
-        {
-            _description = description;
-            _node = node;
-        }
-
-        public void FollowBone(ISkeletonProvider skeleton, int boneIndex)
-        {
-            if (boneIndex != -1)
-                _animationResolver = new SkeletonBoneAnimationResolver(skeleton, boneIndex);
-        }
-
-        public void Update(float currentTime)
-        {
-            if (_hasError)
-                return;
-
-            try
-            {
-                if (_animationResolver != null)
-                    _node.ModelMatrix = _animationResolver.GetWorldTransform();
-            }
-            catch (Exception e)
-            {
-                _logger.Here().Error($"Error in {nameof(DrawableMetaInstance)} - {e.Message}");
-                _hasError = true;
-            }
-        }
-
-        public void CleanUp()
-        {
-            _node.Parent.RemoveObject(_node);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="AnimationEditor.Common.BaseControl.BaseAnimationView"
+﻿<UserControl x:Class="AnimationEditor.Common.BaseControl.EditorHostView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -35,7 +35,7 @@
             </MenuItem>
         </Menu>
 
-        <ContentControl Grid.Row="2" Grid.Column="0" Content="{Binding Scene, Mode=OneTime}"/>
+        <ContentControl Grid.Row="2" Grid.Column="0" Content="{Binding GameWorld.Value, Mode=OneTime}"/>
 
         <GridSplitter Grid.Row="1" Grid.RowSpan="3" Grid.Column="1"  HorizontalAlignment="Stretch">
             <GridSplitter.Template>
@@ -57,32 +57,44 @@
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <referencemodel:ReferenceModelSelectionView Grid.Row="0" DataContext="{Binding MainModelView.Value, Mode=TwoWay}"  Visibility="{Binding IsControlVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}"/>
-            <referencemodel:ReferenceModelSelectionView Grid.Row="1" DataContext="{Binding ReferenceModelView.Value, Mode=TwoWay}" Visibility="{Binding IsControlVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}"/>
+
+            <ListView Grid.Row="1" ItemsSource="{Binding SceneObjects, UpdateSourceTrigger=PropertyChanged}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate >
+                    <DataTemplate>
+                        <referencemodel:ReferenceModelSelectionView />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
             <Rectangle Grid.Row="2" Fill="LightGray" Height="3" Margin="2,2,2,2"/>
 
             <ScrollViewer  Grid.Row="3" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto">
                 <DockPanel  DockPanel.Dock="Top">
                     <ContentControl Content="{Binding Editor, UpdateSourceTrigger=PropertyChanged}" >
                         <ContentControl.Resources>
-                            <DataTemplate DataType="{ x:Type mountcreator:Editor}">
+                            <DataTemplate DataType="{ x:Type mountcreator:MountAnimationCreatorViewModel}">
                                 <mountcreator:EditorView  />
                             </DataTemplate>
 
-                            <DataTemplate DataType="{ x:Type campaignanimationcreator:Editor}">
+                            <DataTemplate DataType="{ x:Type campaignanimationcreator:CampaignAnimationCreatorViewModel}">
                                 <campaignanimationcreator:EditorView  />
                             </DataTemplate>
 
-                            <DataTemplate DataType="{ x:Type animationtransfertool:Editor}">
+                            <DataTemplate DataType="{ x:Type animationtransfertool:AnimationTransferToolViewModel}">
                                 <animationtransfertool:EditorView  />
                             </DataTemplate>
 
-                            <DataTemplate DataType="{ x:Type skeletoneditor:Editor}">
+                            <DataTemplate DataType="{ x:Type skeletoneditor:SkeletonEditorViewModel}">
                                 <skeletoneditor:EditorView  />
                             </DataTemplate>
 
-                            <DataTemplate DataType="{ x:Type superview:Editor}">
-                                <superview:EditorView  />
+                            <DataTemplate DataType="{ x:Type superview:SuperViewViewModel}">
+                                <superview:EditorView />
                             </DataTemplate>
 
                         </ContentControl.Resources>

@@ -9,39 +9,46 @@ namespace AnimationEditor.Common.ReferenceModel
 {
     public class SelectMetaViewModel : NotifyPropertyChangedImpl
     {
-        PackFileService _pfs;
-        private readonly AssetViewModelBuilder _assetViewModelEditor;
-        AssetViewModel _data;
+        private readonly PackFileService _pfs;
+        private readonly SceneObjectBuilder _assetViewModelEditor;
+        private readonly SceneObject _data;
 
-        ObservableCollection<PackFile> _metaList = new ObservableCollection<PackFile>();
+        ObservableCollection<PackFile> _metaList = new();
         public ObservableCollection<PackFile> MetaFiles { get { return _metaList; } set { SetAndNotify(ref _metaList, value); } }
 
+        public PackFile SelectedMetaFile 
+        {
+            get => _data.MetaData; 
+            set { _assetViewModelEditor.SetMetaFile(_data, value, _data.PersistMetaData); RefreshMetaDataElements(); } 
+        }
 
-        PackFile _selectedMetaFiles;
-        public PackFile SelectedMetaFile { get => _selectedMetaFiles; set { SetAndNotify(ref _selectedMetaFiles, value); _assetViewModelEditor.SetMetaFile(_data, _selectedMetaFiles, _selectedPersistMeta); } }
+        public PackFile SelectedPersistMetaFile 
+        { 
+            get => _data.PersistMetaData; 
+            set { _assetViewModelEditor.SetMetaFile(_data, _data.MetaData, value); RefreshMetaDataElements(); }
+        }
 
-        PackFile _selectedPersistMeta;
-        public PackFile SelectedPersistMetaFile { get => _selectedPersistMeta; set { SetAndNotify(ref _selectedPersistMeta, value); _assetViewModelEditor.SetMetaFile(_data, _selectedMetaFiles, _selectedPersistMeta); } }
+        public OnSeachDelegate FilterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 
-
-        public OnSeachDelegate FiterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
-
-
-        public SelectMetaViewModel(AssetViewModelBuilder assetViewModelEditor, AssetViewModel data, PackFileService pfs)
+        public SelectMetaViewModel(SceneObjectBuilder assetViewModelEditor, SceneObject data, PackFileService pfs)
         {
             _assetViewModelEditor = assetViewModelEditor;
+            
             _data = data;
             _pfs = pfs;
 
-            // One skeleton change and anim chaange, clear
-            Refresh();
-        }
+            _data.MetaDataChanged += (x) => RefreshMetaDataElements();
 
-        public void Refresh()
-        {
-            // usually they end with .anim.meta but a few are just .meta, skip sound files (.snd.meta)
+            
             var files = _pfs.FindAllWithExtention(".meta").Where(x => !x.Name.Contains(".snd."));
             MetaFiles = new ObservableCollection<PackFile>(files);
         }
+
+        void RefreshMetaDataElements()
+        {
+            NotifyPropertyChanged(nameof(SelectedMetaFile));
+            NotifyPropertyChanged(nameof(SelectedPersistMetaFile));
+        }
+
     }
 }

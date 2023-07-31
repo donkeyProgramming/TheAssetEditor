@@ -1,6 +1,7 @@
 ﻿using AnimationEditor.AnimationTransferTool;
 using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.MountAnimationCreator;
+using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SkeletonEditor;
 using AnimationEditor.SuperView;
 using AssetEditor.Report;
@@ -247,14 +248,13 @@ namespace AssetEditor.ViewModels
             Process.Start("explorer.exe", path);
         }
 
-
-        void OpenMountCreator() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<MountAnimationCreatorViewModel>();
-        void OpenCampaignAnimCreatorEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<CampaignAnimationCreatorViewModel>();
-        void OpenAnimationTransferTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<AnimationTransferToolViewModel>();
-        void OpenSuperViewTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<SuperViewViewModel>();
+        void OpenMountCreator() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<MountAnimationCreatorViewModel>>();
+        void OpenCampaignAnimCreatorEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<CampaignAnimationCreatorViewModel>>();
+        void OpenAnimationTransferTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<AnimationTransferToolViewModel>>();
+        void OpenSuperViewTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<SuperViewViewModel>>();
         void OpenAudioEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioEditorViewModel>();
         void CompileAudioProjects() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<CompilerViewModel>();
-        void OpenTechSkeletonEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<SkeletonEditorViewModel>();
+        void OpenTechSkeletonEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<SkeletonEditorViewModel>>();
 
         private void CreateExampleAudioProject()
         {

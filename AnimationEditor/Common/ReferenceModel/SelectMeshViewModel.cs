@@ -1,18 +1,17 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
+﻿using System.Collections.Generic;
+using CommonControls.Common;
 using CommonControls.PackFileBrowser;
 using CommonControls.Services;
-using System.Collections.Generic;
 
 namespace AnimationEditor.Common.ReferenceModel
 {
     public class SelectMeshViewModel : NotifyPropertyChangedImpl
     {
-        PackFileService _pfs;
-        AssetViewModel _data;
-        private readonly AssetViewModelBuilder _assetViewModelBuilder;
+        private readonly PackFileService _pfs;
+        private readonly SceneObject _data;
+        private readonly SceneObjectBuilder _assetViewModelBuilder;
 
-        public SelectMeshViewModel(PackFileService pfs, AssetViewModel data, AssetViewModelBuilder assetViewModelBuilder)
+        public SelectMeshViewModel(PackFileService pfs, SceneObject data, SceneObjectBuilder assetViewModelBuilder)
         {
             _pfs = pfs;
             _data = data;
@@ -21,22 +20,13 @@ namespace AnimationEditor.Common.ReferenceModel
 
         public void BrowseMesh()
         {
-            using (var browser = new PackFileBrowserWindow(_pfs))
+            using var browser = new PackFileBrowserWindow(_pfs);
+            browser.ViewModel.Filter.SetExtentions(new List<string>() { ".variantmeshdefinition", ".wsmodel", ".rigid_model_v2" });
+            if (browser.ShowDialog() == true && browser.SelectedFile != null)
             {
-                browser.ViewModel.Filter.SetExtentions(new List<string>() { ".variantmeshdefinition", ".wsmodel", ".rigid_model_v2" });
-                if (browser.ShowDialog() == true && browser.SelectedFile != null)
-                {
-                    var file = browser.SelectedFile;
-                    SetMesh(file);
-                }
+                var file = browser.SelectedFile;
+                _assetViewModelBuilder.SetMesh(_data, file);
             }
         }
-
-        public void SetMesh(PackFile meshPackFile)
-        {
-            _assetViewModelBuilder.SetMesh(_data, meshPackFile);
-        }
     }
-
-
 }

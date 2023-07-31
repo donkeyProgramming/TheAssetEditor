@@ -1,98 +1,90 @@
-﻿using AnimationEditor.Common.AnimationPlayer;
-using AnimationEditor.Common.ReferenceModel;
+﻿using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
+using AnimationMeta.Presentation;
 using CommonControls.Common;
-using CommonControls.FileTypes.AnimationPack;
+using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using CommonControls.Services.ToolCreation;
-using Monogame.WpfInterop.Common;
-using MonoGame.Framework.WpfInterop;
-using View3D.Components;
-using View3D.Services;
+using Microsoft.Xna.Framework;
 
 namespace AnimationEditor.SuperView
 {
-    public class SuperViewViewModel : BaseAnimationViewModel<Editor>
+    public class SuperViewViewModel : IHostedEditor<SuperViewViewModel>
     {
-        private readonly ReferenceModelSelectionViewModelBuilder _referenceModelSelectionViewModelBuilder;
+        SceneObject _asset;
+        AnimationToolInput _debugDataToLoad;
 
-        public SuperViewViewModel(
-            ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder,
-            Editor editor,
-            AnimationPlayerViewModel animationPlayerViewModel,
-            EventHub eventHub,
-            IComponentInserter componentInserter,
-            GameWorld gameWorld,
-            FocusSelectableObjectService focusSelectableObjectService)
-            : base(componentInserter, animationPlayerViewModel, gameWorld, focusSelectableObjectService)
+        private readonly SceneObjectBuilder _sceneObjectBuilder;
+        private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
+        private readonly PackFileService _packFileService;
+
+        public NotifyAttr<string> PersistentMetaFilePath { get; set; } = new NotifyAttr<string>("");
+        public NotifyAttr<string> MetaFilePath { get; set; } = new NotifyAttr<string>("");
+
+        public EditorViewModel PersistentMetaEditor { get; private set; }
+        public EditorViewModel MetaEditor { get; private set; }
+
+        public string EditorName { get; } = "Super View";
+
+        public SuperViewViewModel(SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
+            PackFileService packFileService, 
+            SceneObjectBuilder sceneObjectBuilder, 
+            CopyPasteManager copyPasteManager)
         {
-            DisplayName.Value = "Super view";
-            _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
-            Editor = editor;
+            _sceneObjectViewModelBuilder = sceneObjectViewModelBuilder;
+            _packFileService = packFileService;
+            _sceneObjectBuilder = sceneObjectBuilder;
 
-            eventHub.Register<SceneInitializedEvent>(Initialize);
+            PersistentMetaEditor = new EditorViewModel(_packFileService, copyPasteManager);
+            PersistentMetaEditor.EditorSavedEvent += PersistentMetaEditor_EditorSavedEvent;
+
+            MetaEditor = new EditorViewModel(_packFileService, copyPasteManager);
+            MetaEditor.EditorSavedEvent += MetaEditor_EditorSavedEvent;
         }
 
-        void Initialize(SceneInitializedEvent sceneInitializedEvent)
+        public void SetDebugInputParameters(AnimationToolInput debugDataToLoad)
         {
-            MainModelView.Value = _referenceModelSelectionViewModelBuilder.CreateEmpty();
-            ReferenceModelView.Value = _referenceModelSelectionViewModelBuilder.CreateEmpty();
-            Editor.Create(MainInput);
-        }
-    }
-
-    public static class SuperViewViewModel_Debug
-    {
-        public static void CreateDamselEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
-        {
-            var editorView = toolFactory.Create<SuperViewViewModel>();
-            editorView.MainInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_alarielle.variantmeshdefinition"),
-                FragmentName = @"animations/animation_tables/hu1b_alarielle_staff_and_sword.frg",
-                AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("STAND")
-            };
-            //editorView.MainInput = new AnimationToolInput()
-            //{
-            //    Mesh = packfileService.FindFile(@"warmachines\engines\emp_steam_tank\emp_steam_tank01.rigid_model_v2"),
-            //    FragmentName = @"animations/animation_tables/wm_steam_tank01.frg",
-            //    AnimationSlot = AnimationSlotTypeHelper.GetfromValue("STAND")
-            //};
-            //editorView.MainInput = new AnimationToolInput()
-            //{
-            //    Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\emp_state_troops_crossbowmen_ror.variantmeshdefinition"),
-            //    FragmentName = @"animations/animation_tables/hu1_empire_sword_crossbow.frg",
-            //    AnimationSlot = AnimationSlotTypeHelper.GetfromValue("FIRE_HIGH")
-            //};
-
-            creator.CreateEmptyEditor(editorView);
+            _debugDataToLoad = debugDataToLoad;
         }
 
-        public static void CreateThrot(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        public void Initialize(EditorHost<SuperViewViewModel> editorOwner)
         {
-            var editorView = toolFactory.Create<SuperViewViewModel>();
-            editorView.MainInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_throt.variantmeshdefinition"),
-                FragmentName = @"animations/database/battle/bin/hu17_dlc16_throt.bin",
-                AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("ATTACK_5")
-            };
+            var assetViewModel = _sceneObjectViewModelBuilder.CreateAsset(true, "Root", Color.Black, _debugDataToLoad, true);
+            editorOwner.SceneObjects.Add(assetViewModel);
 
-            creator.CreateEmptyEditor(editorView);
+            _asset = assetViewModel.Data;
+            _asset.MetaDataChanged += UpdateMetaDataInfoFromAsset;
+            UpdateMetaDataInfoFromAsset(_asset);
         }
 
-
-        public static void CreatePlaguebearer(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        private void UpdateMetaDataInfoFromAsset(SceneObject asset)
         {
-            var editorView = toolFactory.Create<SuperViewViewModel>();
-            editorView.MainInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\dae_plaguebearer_plagueridden.variantmeshdefinition"),
-                FragmentName = @"animations/database/battle/bin/hu4d_wh3_nurgle_sword_on_palanquin.bin",
-                AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("STAND_IDLE_2")
-            };
+            PersistentMetaEditor.MainFile = asset.PersistMetaData;
+            PersistentMetaFilePath.Value = BuildMetaDataName(asset.PersistMetaData);
 
-            creator.CreateEmptyEditor(editorView);
+            MetaEditor.MainFile = asset.MetaData;
+            MetaFilePath.Value = BuildMetaDataName(asset.MetaData);
         }
+
+        string BuildMetaDataName(PackFile file)
+        {
+            if (file == null)
+                return "";
+
+            var containerName = _packFileService.GetPackFileContainer(PersistentMetaEditor.MainFile).Name;
+            var filePath = PersistentMetaFilePath.Value = _packFileService.GetFullPath(PersistentMetaEditor.MainFile);
+            return $"[{containerName}]{filePath}";
+        }
+
+        private void MetaEditor_EditorSavedEvent(PackFile newFile)
+        {
+            _sceneObjectBuilder.SetMetaFile(_asset, newFile, _asset.PersistMetaData);
+        }
+
+        private void PersistentMetaEditor_EditorSavedEvent(PackFile newFile)
+        {
+            _sceneObjectBuilder.SetMetaFile(_asset, _asset.MetaData, newFile);
+        }
+
+        public void RefreshAction() => _asset.TriggerMeshChanged();
     }
 }

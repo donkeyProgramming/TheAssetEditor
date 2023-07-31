@@ -10,28 +10,13 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel>
-        <ListView DockPanel.Dock="Top" ItemsSource="{Binding Items, UpdateSourceTrigger=PropertyChanged}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                </Style>
-            </ListView.ItemContainerStyle>
-            <ListView.ItemTemplate >
-                <DataTemplate>
-                    <referencemodel:ReferenceModelSelectionView />
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
         <Button Content="Refresh" Click="{s:MethodBinding RefreshAction}" DockPanel.Dock="Top"/>
-
 
         <TabControl DockPanel.Dock="Top">
             <TabItem Header="Persistent">
                 <DockPanel>
                     <TextBlock  DockPanel.Dock="Top">
-                        <Run Text="FilePath: ["/>
-                        <Run Text="{Binding PersistentMetaFilePackFileContainerName.Value, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Run Text="]"/>
+                        <Run Text="FilePath: "/>
                          <Run Text="{Binding PersistentMetaFilePath.Value, UpdateSourceTrigger=PropertyChanged}"/>
                     </TextBlock>
                     <view:MainEditorView DataContext="{Binding PersistentMetaEditor}" DockPanel.Dock="Top"/>
@@ -40,9 +25,7 @@
             <TabItem Header="Animation">
                 <DockPanel>
                     <TextBlock  DockPanel.Dock="Top">
-                        <Run Text="FilePath: ["/>
-                        <Run Text="{Binding MetaFilePackFileContainerName.Value, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Run Text="]"/>
+                        <Run Text="FilePath: "/>
                          <Run Text="{Binding MetaFilePath.Value, UpdateSourceTrigger=PropertyChanged}"/>
                     </TextBlock>
 
