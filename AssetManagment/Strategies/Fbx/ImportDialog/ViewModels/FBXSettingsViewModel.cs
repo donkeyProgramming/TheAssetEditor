@@ -2,30 +2,18 @@
 using AssetManagement.Strategies.Fbx.Models;
 using System.Windows.Forms;
 using System.Collections.ObjectModel;
-using AssetManagement.Strategies.Fbx.Views.FBXImportSettingsDialogView;
+using AssetManagement.Strategies.Fbx.ImportDialog.Views.FBXImportSettingsDialogView;
 using CommonControls.Services;
-using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
-using Serilog;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Windows;
 using CommonControls.FileTypes.Animation;
-using System.Drawing;
-using AssetManagement.GenericFormats.Managed;
-using AssetManagement.GenericFormats.Unmanaged;
 // TODO: clean "using"s (EVERYWHERE, not just here)
 
 
 // finish "rationaliztion" this ModelView, around the concep of "FileInfoData" as input
-namespace AssetManagement.Strategies.Fbx.ViewModels
+namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels
 {
 
     // TODO: not needed anymore, when the DataGrid is not longer used
@@ -51,13 +39,13 @@ namespace AssetManagement.Strategies.Fbx.ViewModels
         {
             get
             {
-                return (SkeletonPackFile != null) ? SkeletonPackFile.Name : "";
+                return SkeletonPackFile != null ? SkeletonPackFile.Name : "";
             }
 
             set { }
         }
 
-        public string Value { get; set; } = "Test Value";
+        public string Value { get; set; } = null;
         public PackFile SkeletonPackFile { get; set; }
     }
 
@@ -74,15 +62,21 @@ namespace AssetManagement.Strategies.Fbx.ViewModels
 
         //private string _filename = "test Binding...";
         //public string FileName { get { return _filename; } set { _filename = value; NotifyPropertyChanged(); } }
-        
+
         public string FileName { get { return _fbxSettings.FileInfoData.FileName; } set { _fbxSettings.FileInfoData.FileName = value; NotifyPropertyChanged(); } }
         public string SdkVersion
         {
             get { return $"{_fbxSettings.FileInfoData.SdkVersionUsed.X}.{_fbxSettings.FileInfoData.SdkVersionUsed.Y}.{_fbxSettings.FileInfoData.SdkVersionUsed.Z}"; }
-            set {/* _fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } // TODO is "set" needed when it is ONLY for one way info
+            set {; }
         }
+        public string SkeletonNodeName { get { return _fbxSettings.FileInfoData.SkeletonName; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
+        public string Units { get { return _fbxSettings.FileInfoData.Units; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
+        public string MeshCount { get { return $"{_fbxSettings.FileInfoData.MeshCount}"; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
+        public string NodeCount { get { return $"{_fbxSettings.FileInfoData.ElementCount}"; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
+        public string MaterialCount { get { return $"{_fbxSettings.FileInfoData.MaterialCount}"; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
+        public string AnimationCount { get { return $"Num{_fbxSettings.FileInfoData.AnimationsCount}"; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
+        public string BoneCount { get { return $"Num{_fbxSettings.FileInfoData.BoneCount}"; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
 
-        public string SkeletonName { get { return _fbxSettings.FileInfoData.SkeletonName; } set { _fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged(); } }
 
 
         public NotifyAttr<string> SkeletonFileName { get; set; } = new NotifyAttr<string>();
@@ -136,7 +130,11 @@ namespace AssetManagement.Strategies.Fbx.ViewModels
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                SkeletonFileName.Value = dialog.FileName;
+                var diskFile = new SkeletonElement();
+                diskFile.SkeletonPackFile = new PackFile(dialog.FileName, new FileSystemSource(dialog.FileName));
+                BSkeketonComboBox.Insert(0, diskFile);
+
+                BSelectedSkeleton = diskFile;
             }
         }
 
@@ -150,7 +148,7 @@ namespace AssetManagement.Strategies.Fbx.ViewModels
             //SkeletonName.Value = inSettingsModel.SkeletonName;
             //UseAutoRigging.Value = inSettingsModel.UseAutoRigging;
 
-            
+
 
             const string skeletonFolder = @"animations\skeletons\";
             const string animExtension = ".anim";
@@ -170,7 +168,7 @@ namespace AssetManagement.Strategies.Fbx.ViewModels
             BSelectedSkeleton = new SkeletonElement();
 
             if (_fbxSettings.FileInfoData.SkeletonName.Any())
-                SetSkeletonFromName(_fbxSettings.FileInfoData.SkeletonName);                        
+                SetSkeletonFromName(_fbxSettings.FileInfoData.SkeletonName);
         }
 
         /// <summary>
@@ -181,7 +179,7 @@ namespace AssetManagement.Strategies.Fbx.ViewModels
             outSettingsModel.SkeletonFileName = SkeletonFileName.Value;
             outSettingsModel.SkeletonName = SkeletonFileName.Value;
             outSettingsModel.UseAutoRigging = UseAutoRigging.Value;
-            outSettingsModel.SkeletonFile = GetSkeletonFileFromView();            
+            outSettingsModel.SkeletonFile = GetSkeletonFileFromView();
         }
 
         private void SetSkeletonFromName(string skeletonName)

@@ -47,6 +47,8 @@ namespace AssetManagement.GenericFormats.Unmanaged
         public int elementCount;
         public int meshCount;
         public int materialCount;
+        public int animationsCount;
+        public int boneCount;
     };
 
 

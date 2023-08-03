@@ -85,30 +85,33 @@ namespace tools
             ResetLocalTime();
         }
 
-		double GetSeconds()
-        {				
-			double ticks = static_cast<double>(Time::now().time_since_epoch().count());
-			double ticksPerSeconds = std::chrono::high_resolution_clock::period::den;
+		//double GetSeconds()
+  //      {				
+		//	//auto ticks = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now());
 
-			double seconds = ticks / ticksPerSeconds;			
+		//	/*double ticksPerSeconds = std::chrono::high_resolution_clock::period::den;
 
-			return seconds;			
-		}
+		//	double seconds = ticks / ticksPerSeconds;			*/
+
+		//	return seconds;			
+		//}
 
         void ResetLocalTime()
         {
-            m_startTime = GetSeconds();
+            m_startTime = std::chrono::steady_clock::now();
         }
 
 		double GetLocalTime() 
 		{
-			double timeElapsed = GetSeconds() - m_startTime; // +m_start_at;
-			
-            return timeElapsed;
+            std::chrono::duration<double> timeElapsed = std::chrono::steady_clock::now() - m_startTime;                       
+
+            double secondsElapsed =timeElapsed.count();
+            return secondsElapsed;
 		}
 
 	private:
-		double m_startTime = 0;
+        std::chrono::time_point<std::chrono::steady_clock> m_startTime;
+		
 	};
 
 }

@@ -3,10 +3,9 @@ using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Interfaces.AssetManagement;
 using System.IO;
-using AssetManagement.Strategies.Fbx.ViewModels;
 using AssetManagement.Strategies.Fbx.Models;
 using CommonControls.Services;
-using CommonControls.FileTypes.Animation;
+using AssetManagement.Strategies.Fbx.ImportDialog.ViewModels;
 
 namespace AssetManagement.Strategies.Fbx
 {
@@ -28,11 +27,15 @@ namespace AssetManagement.Strategies.Fbx
                 return null;
 
             // TODO: check in th C++ that "skeletonName" is only set once and in the proper place
-            var fbxSettings = new FbxSettingsModel() { SkeletonName = sceneContainer.SkeletonName, FileInfoData = sceneContainer.FileInfoData };            
+            var fbxSettings = new FbxSettingsModel()
+            {
+                SkeletonName = sceneContainer.SkeletonName,
+                FileInfoData = sceneContainer.FileInfoData
+            };
 
             if (!FBXSettingsViewModel.ShowImportDialog(_packFileService, fbxSettings))
                 return null;
-
+                            
             var rmv2File = RmvFileBuilder.ConvertToRmv2(sceneContainer.Meshes, fbxSettings.SkeletonFile);
             var factory = ModelFactory.Create();
             var buffer = factory.Save(rmv2File);

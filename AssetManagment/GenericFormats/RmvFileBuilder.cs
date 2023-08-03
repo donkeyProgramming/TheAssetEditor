@@ -1,19 +1,17 @@
-﻿using CommonControls.FileTypes.RigidModel.LodHeader;
-using CommonControls.FileTypes.RigidModel.MaterialHeaders;
-using CommonControls.FileTypes.RigidModel;
-using System.Collections.Generic;
-using System.Text;
-using CommonControls.FileTypes.RigidModel.Vertex;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xna.Framework;
-using AssetManagement.GenericFormats.Unmanaged;
-using CommonControls.FileTypes.RigidModel.Types;
+using System.Text;
 using AssetManagement.GenericFormats.Managed;
-using VertexFormat = CommonControls.FileTypes.RigidModel.VertexFormat;
-using CommonControls.FileTypes.Animation;
+using AssetManagement.GenericFormats.Unmanaged;
 using AssetManagement.MeshHandling;
-using System.Runtime.CompilerServices;
-
+using CommonControls.FileTypes.Animation;
+using CommonControls.FileTypes.RigidModel;
+using CommonControls.FileTypes.RigidModel.LodHeader;
+using CommonControls.FileTypes.RigidModel.MaterialHeaders;
+using CommonControls.FileTypes.RigidModel.Types;
+using CommonControls.FileTypes.RigidModel.Vertex;
+using Microsoft.Xna.Framework;
+using VertexFormat = CommonControls.FileTypes.RigidModel.VertexFormat;
 namespace AssetManagement.GenericFormats
 {
     public class RmvFileBuilder
@@ -82,13 +80,16 @@ namespace AssetManagement.GenericFormats
         private static RmvModel ConvertPackedMeshToRmvModel(MaterialFactory materialFactory, RmvFile outputFile, PackedMesh packMesh, AnimationFile skeletonFile)
         {
             var currentMesh = new RmvModel();
-            currentMesh.Material = materialFactory.CreateMaterial(
-                outputFile.Header.Version,
-                skeletonFile != null ? ModelMaterialEnum.weighted : ModelMaterialEnum.default_type,
-                skeletonFile != null ? VertexFormat.Cinematic : VertexFormat.Static);
+
+            var materialCreator = new WeighterMaterialCreator();
+            
+            currentMesh.Material = materialCreator.CreateEmpty(
+                skeletonFile != null ? ModelMaterialEnum.weighted : ModelMaterialEnum.default_type,         
+                outputFile.Header.Version,                
+                skeletonFile != null ? VertexFormat.Cinematic : VertexFormat.Static); 
 
             currentMesh.Material.ModelName = packMesh.Name;
-            currentMesh.Mesh = ConvertPackedMeshToRmvMesh(currentMesh.Material.BinaryVertexFormat, packMesh, skeletonFile);
+            currentMesh.Mesh = ConvertPackedMeshToRmvMesh(materialFactory, currentMesh.Material.BinaryVertexFormat, packMesh, skeletonFile);
 
             SetRmvModelDefaultTextures(currentMesh);
 
@@ -105,7 +106,7 @@ namespace AssetManagement.GenericFormats
             currentMesh.Material.SetTexture(TextureType.Gloss, @"commontextures\default_metal_material_map.dds");
         }
 
-        private static RmvMesh ConvertPackedMeshToRmvMesh(VertexFormat vertexFormat, PackedMesh packedInputMesh, AnimationFile skeletonFile)
+        private static RmvMesh ConvertPackedMeshToRmvMesh(MaterialFactory materialFactory, VertexFormat vertexFormat, PackedMesh packedInputMesh, AnimationFile skeletonFile)
         {
             RmvMesh rmv2Mesh = new RmvMesh();
             rmv2Mesh.IndexList = new ushort[packedInputMesh.Indices.Count];

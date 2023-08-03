@@ -9,7 +9,7 @@ namespace AssetManagement.GenericFormats.Managed
         public int Y { set; get; }
         public int Z { set; get; }
     }
-   
+
     /// <summary>
     /// So far only class that uses the "copy from temp interop struct to proper classs" interface
     /// </summary>
@@ -22,9 +22,11 @@ namespace AssetManagement.GenericFormats.Managed
         public float ScaleFatorToMeters { set; get; }
         public int ElementCount { set; get; }
         public int MeshCount { set; get; }
+        public int BoneCount { set; get; }
         public int MaterialCount { set; get; }
+        public int AnimationsCount { set; get; }
 
-        public void FillStruct(out ExtFileInfoStruct destStruct)        
+        public void FillStruct(out ExtFileInfoStruct destStruct)
         {
             destStruct.sdkVersionUsed.x = SdkVersionUsed.X;
             destStruct.sdkVersionUsed.y = SdkVersionUsed.Y;
@@ -36,6 +38,8 @@ namespace AssetManagement.GenericFormats.Managed
             destStruct.elementCount = ElementCount;
             destStruct.meshCount = MeshCount;
             destStruct.materialCount = MaterialCount;
+            destStruct.animationsCount = AnimationsCount;
+            destStruct.boneCount = BoneCount;
         }
 
         public void FillFromStruct(in ExtFileInfoStruct srcStruct)
@@ -50,7 +54,8 @@ namespace AssetManagement.GenericFormats.Managed
             ElementCount = srcStruct.elementCount;
             MeshCount = srcStruct.meshCount;
             MaterialCount = srcStruct.materialCount;
+            AnimationsCount = srcStruct.animationsCount;
+            BoneCount = srcStruct.boneCount;
         }
     }
-
-}
+ }

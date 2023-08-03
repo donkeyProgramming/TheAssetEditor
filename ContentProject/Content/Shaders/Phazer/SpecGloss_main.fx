@@ -401,6 +401,9 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
     PixelInputType input;
     input = _input;
 
+    //TODO: REMOVE DEBUGGIN CODE!!
+    return float4(input.tangent.rgb, 1);
+    
 	/*   if (bIsFrontFace)
 	  {
 			input.normal *= -1;

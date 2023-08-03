@@ -1,7 +1,7 @@
 #include "FBXSceneLoaderService.h"
 
 #include "..\Helpers\Geometry\FBXNodeSearcher.h"
-#include "..\Processing\FBXMeshProcessor.h"
+#include "..\Processing\MeshProcessor.h"
 #include "..\Processing\FBXSkinProcessor.h"
 #include "..\Processing\FBXMeshCreator.h"
 #include "..\DLLDefines.h"
@@ -43,10 +43,10 @@ wrapdll::FBXSCeneContainer* wrapdll::FBXImporterService::ProcessAndFillScene()
 
         FBXMeshCreator::MakeUnindexPackedMesh(m_pFbxScene, fbxMeshList[meshIndex], destPackedMeshes[meshIndex], vertexToControlPoint);
 
-        tools::SystemClock clock;
-        log_action("Doing Tangents/Indexing");
-        FbxMeshProcessor::doTangentAndIndexing(destPackedMeshes[meshIndex]);
-        log_action("Done Tangents/Indexing. Time: " + std::to_string(clock.GetLocalTime()) );
+        tools::SystemClock clock;        
+        log_action_color("Doing Tangents/Indexing");
+        MeshProcessor::DoFinalMeshProcessing(destPackedMeshes[meshIndex]);        
+        log_action_color("Done Tangents/Indexing. Time: " + std::to_string(clock.GetLocalTime()) + " seconds.");
     }
 
     return &m_sceneContainer;
@@ -56,14 +56,26 @@ void wrapdll::FBXImporterService::FillFileInfo()
 {
     auto& fileInfo = m_sceneContainer.GetFileInfo();
     
-    ::strcpy_s<255>(fileInfo.units, m_pFbxScene->GetGlobalSettings().GetSystemUnit().GetScaleFactorAsString_Plurial());    
-    ::strcpy_s<255>(fileInfo.skeletonName, m_sceneContainer.GetSkeletonName().c_str());    
+    strcpy_s<255>(fileInfo.units, m_pFbxScene->GetGlobalSettings().GetSystemUnit().GetScaleFactorAsString_Plurial());    
+    strcpy_s<255>(fileInfo.skeletonName, m_sceneContainer.GetSkeletonName().c_str());    
 
+    
+	// use the recursive node search to get the count of differetn node types
+    std::vector<fbxsdk::FbxNode*> fbxallNodes;
+    FBXNodeSearcher::FindAllNodes(m_pFbxScene->GetRootNode(), fbxallNodes);
+    
     std::vector<fbxsdk::FbxNode*> fbxMeshes;
     FBXNodeSearcher::FindFbxNodesByType(fbxsdk::FbxNodeAttribute::EType::eMesh, m_pFbxScene, fbxMeshes);
-    
-    fileInfo.meshCount = static_cast<int>(fbxMeshes.size());
 
+    std::vector<fbxsdk::FbxNode*> fbxBoneNodes;
+    FBXNodeSearcher::FindFbxNodesByType(fbxsdk::FbxNodeAttribute::EType::eSkeleton, m_pFbxScene, fbxBoneNodes);
+    
+    fileInfo.elementCount = static_cast<int>(fbxMeshes.size());
+    fileInfo.meshCount = static_cast<int>(fbxMeshes.size());
+    fileInfo.boneCount = static_cast<int>(fbxBoneNodes.size());
+    fileInfo.animationsCount = m_pFbxScene->GetSrcObjectCount<FbxAnimStack>();    
+
+    // search for materaial for each mesh
     fileInfo.materialCount = 0;
     for (auto& mesh : fbxMeshes)
     {

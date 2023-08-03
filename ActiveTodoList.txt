@@ -34,6 +34,13 @@ Major ideas:
 	Search window 
 
 Bugs:
+    PHAZER: .pack corruption too easy from UI .pack "empty folder". 
+    Empty folders ofc cannot exist in the .pack format, (only in the UI), but something should prevent the corruption, 
+    Solution Suggestions
+      - like RPFM, remove a folder when its last file is removed
+      - not allow user to save a .pack with empty folders, display Box "folder {name} empty, not allowed, delete or place file in folder."
+      - put a dummy (like "empty.txt") file in any empty folders, if .pack is being saved with "empty folders".
+
 	corruption detector - 	File changed outside of ass
 
 

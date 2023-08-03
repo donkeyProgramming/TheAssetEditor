@@ -44,6 +44,19 @@ void logfunc::impl_log_action(const std::string& _strMsg)
 	WriteToLogFile(logString.str());
 }
 
+void logfunc::impl_log_action_color(const std::string& _strMsg)
+{
+	WinConcole::Print(L"FBX SDK ACTION:", ConsoleBackground::MAGENTA | ConsoleForeground::WHITE);
+	WinConcole::Print(L" ");
+	WinConcole::Print(WidenStr(_strMsg));
+	WinConcole::Print(L"\r\n");
+
+	std::stringstream logString;
+	logString << std::endl << "ACTION: " << (_strMsg).c_str();
+
+	WriteToLogFile(logString.str());
+}
+
 void logfunc::LogInfo(const std::string& _strMsg)
 {	
 	WinConcole::Print(L"FBX SDK INFO:", ConsoleBackground::DARKCYAN | ConsoleForeground::WHITE);

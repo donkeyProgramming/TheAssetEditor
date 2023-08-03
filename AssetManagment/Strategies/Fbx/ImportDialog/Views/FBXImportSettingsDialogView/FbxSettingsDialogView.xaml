@@ -4,24 +4,21 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"     
     xmlns:s="http://schemas.singulink.com/xaml"                  
-    xmlns:local="clr-namespace:AssetManagement.Strategies.Fbx.Views.FBXImportSettingsDialogView"      
-    x:Class="AssetManagement.Strategies.Fbx.Views.FBXImportSettingsDialogView.FBXSetttingsView"                        
-    
-    ResizeMode="NoResize" Height="380" Width="370"
-    mc:Ignorable="d" >
-
+    xmlns:local="clr-namespace:AssetManagement.Strategies.Fbx.ImportDialog.Views.FBXImportSettingsDialogView"      
+    x:Class="AssetManagement.Strategies.Fbx.ImportDialog.Views.FBXImportSettingsDialogView.FBXSetttingsView"                        
+      mc:Ignorable="d" d:DesignWidth="380"   
+   ResizeMode="NoResize"
+    Width="400"
+       >
     <Grid>
-        
-        
-
-
+        <!--<DockPanel>-->
         <DockPanel>
-            <local:FileInfoView x:Name="FileInfoGrid" Grid.Row="0" DockPanel.Dock="Top"/>        
-            <local:FBXAnimationSettingsPanel x:Name="SkeletonComboBox" Grid.Row="1" DockPanel.Dock="Top"/>
- 
+        <local:FileInfoView Grid.Row="0" DockPanel.Dock="Top"   />
+        <local:FBXAnimationSettingsPanel  Grid.Row="1" DockPanel.Dock="Top"/>
 
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="2" DockPanel.Dock="Top">
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" DockPanel.Dock="Top">
             <Button
                 x:Name="ImportButton"
                 Content="Import&#xA;"
@@ -39,15 +36,12 @@
                 Height="23" 
                 Margin="0,20,0,5"            
                 VerticalAlignment="Bottom"
-                Width="175" 
+                Width="199" 
                 IsCancel="True" HorizontalAlignment="Left"/>
-
-
         </StackPanel>
-        
+
         </DockPanel>
         
-
-    </Grid>
+        </Grid>
 </Window>
     

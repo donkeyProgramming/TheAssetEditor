@@ -1,6 +1,6 @@
 #include "FBXSceneContainer.h"
 #include "..\DataStructures\PackedMeshStructs.h"
-#include "..\Processing\FBXMeshProcessor.h"
+#include "..\Processing\MeshProcessor.h"
 #include "..\Processing\FBXSkinProcessor.h"
 #include "..\Helpers\FBXHelperFileUtil.h"
 #include "..\Helpers\Geometry\FBXNodeSearcher.h"

@@ -13,6 +13,16 @@ struct BoneAnimKey
 
 struct VertexInfluence
 {
+public:
+    VertexInfluence() {};
+
+    VertexInfluence(const VertexInfluence& v)
+    {
+        strcpy_s<255>(boneName, v.boneName);
+        boneIndex = v.boneIndex;
+        weight = v.weight;
+    }
+
     char boneName[255] = "";
 	uint32_t boneIndex = 0;
 	float weight = 0.0f;
@@ -34,6 +44,13 @@ struct ControlPointInfluenceExt
 
 struct PackedCommonVertex
 {
+
+    //PackedCommonVertex() {};
+    //PackedCommonVertex(PackedCommonVertex& v)
+    //{
+    //    *this = v;
+    //}
+
 	DirectX::XMFLOAT4 position = { 0, 0, 0, 0 };
 	DirectX::XMFLOAT3 normal = { 0, 0, 0 };
 	DirectX::XMFLOAT3 bitangent = { 0, 0, 0 };
@@ -54,6 +71,9 @@ struct VertexWeight
 
 struct PackedMesh
 {
+
+
+
 	std::string meshName = "Unnamed_Mesh\0";
 	std::vector<PackedCommonVertex> vertices;
 	std::vector<uint16_t> indices;

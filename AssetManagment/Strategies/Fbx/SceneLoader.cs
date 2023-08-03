@@ -1,8 +1,5 @@
 ﻿using AssetManagement.GenericFormats;
 using AssetManagement.Strategies.Fbx.DllDefinitions;
-using AssetManagement.Strategies.Fbx.Models;
-using AssetManagement.Strategies.Fbx.ViewModels;
-using CommonControls.Services;
 using System;
 
 namespace AssetManagement.Strategies.Fbx

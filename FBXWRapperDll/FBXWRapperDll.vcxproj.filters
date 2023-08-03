@@ -57,7 +57,7 @@
     <ClInclude Include="Helpers\MS_SimpleMath\SimpleMath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Processing\FBXMeshProcessor.h">
+    <ClInclude Include="Processing\MeshProcessor.h">
       <Filter>Helpers</Filter>
     </ClInclude>
     <ClInclude Include="FBXSceneContainer\FBXSCeneContainer.h">
@@ -69,7 +69,7 @@
     <ClInclude Include="Helpers\FBXHelperFileUtil.h">
       <Filter>Helpers</Filter>
     </ClInclude>
-    <ClInclude Include="FBXServices\FBXSceneLoaderService.h">
+    <ClInclude Include="Services\FBXSceneLoaderService.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Processing\FBXVertexCreator.h">
@@ -956,13 +956,13 @@
     <ClCompile Include="FBXSceneContainer\FBXSCeneContainer.cpp">
       <Filter>FBXSceneContainer</Filter>
     </ClCompile>
-    <ClCompile Include="Processing\FBXMeshProcessor.cpp">
+    <ClCompile Include="Processing\MeshProcessor.cpp">
       <Filter>Helpers</Filter>
     </ClCompile>
     <ClCompile Include="Helpers\Geometry\FBXNodeSearcher.h">
       <Filter>Helpers</Filter>
     </ClCompile>
-    <ClCompile Include="FBXServices\FBXSceneLoaderService.cpp">
+    <ClCompile Include="Services\FBXSceneLoaderService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Processing\FBXVertexCreator.cpp">
@@ -989,7 +989,7 @@
     <None Include="FBXSceneContainer\FBXSceneContainerGetters.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="FBXServices\FbxSceneLoaderService.inl">
+    <None Include="Services\FbxSceneLoaderService.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

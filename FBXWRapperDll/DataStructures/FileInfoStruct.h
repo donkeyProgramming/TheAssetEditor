@@ -10,6 +10,9 @@ struct FileInfoStruct
     float scaleFatorToMeters = 0.0;
     int elementCount = 0;
     int meshCount = 0;
-    int materialCount = 0;
+    int materialCount = 0;    
+    int animationsCount = 0;
+    int boneCount = 0;
+
 };
 

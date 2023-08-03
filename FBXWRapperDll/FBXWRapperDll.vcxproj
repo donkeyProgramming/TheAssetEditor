@@ -166,7 +166,7 @@
     <None Include="fbxsdk\lib\vs2019\x64\debug\libfbxsdk.dll" />
     <None Include="fbxsdk\lib\vs2019\x64\release\libfbxsdk.dll" />
     <None Include="fbxsdk\lib\vs2019\x64\release\libfbxsdk.zip" />
-    <None Include="FBXServices\FbxSceneLoaderService.inl" />
+    <None Include="Services\FbxSceneLoaderService.inl" />
     <None Include="Helpers\MS_SimpleMath\SimpleMath.inl" />
   </ItemGroup>
   <ItemGroup>
@@ -458,9 +458,9 @@
     <ClInclude Include="DataStructures\FileInfoStruct.h" />
     <ClInclude Include="Processing\FBXMeshCreator.h" />
     <ClInclude Include="Processing\FBXVertexCreator.h" />
-    <ClInclude Include="FBXServices\FBXSceneLoaderService.h" />
+    <ClInclude Include="Services\FBXSceneLoaderService.h" />
     <ClInclude Include="Helpers\Geometry\FBXMeshGeometryHelper.h" />
-    <ClInclude Include="Processing\FBXMeshProcessor.h" />
+    <ClInclude Include="Processing\MeshProcessor.h" />
     <ClInclude Include="Helpers\Geometry\FBXNodeGeometryHelper.h" />
     <ClInclude Include="FBXSceneContainer\FBXSCeneContainer.h" />
     <ClInclude Include="Processing\FBXSkinProcessor.h" />
@@ -477,10 +477,10 @@
     <ClCompile Include="DataStructures\FileInfoStruct.cpp" />
     <ClCompile Include="Processing\FBXMeshCreator.cpp" />
     <ClCompile Include="Processing\FBXVertexCreator.cpp" />
-    <ClCompile Include="FBXServices\FBXSceneLoaderService.cpp" />
+    <ClCompile Include="Services\FBXSceneLoaderService.cpp" />
     <ClCompile Include="Helpers\Geometry\FBXMeshGeometryHelper.cpp" />
     <ClCompile Include="FBXSceneContainer\FBXSCeneContainer.cpp" />
-    <ClCompile Include="Processing\FBXMeshProcessor.cpp" />
+    <ClCompile Include="Processing\MeshProcessor.cpp" />
     <ClCompile Include="Helpers\Geometry\FBXNodeSearcher.h" />
     <ClCompile Include="Processing\FBXSkinProcessor.cpp" />
     <ClCompile Include="Logging\Logging.cpp" />

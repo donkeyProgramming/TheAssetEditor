@@ -1,7 +1,7 @@
 ﻿
 using System.Windows.Controls;
 
-namespace AssetManagement.Strategies.Fbx.Views.FBXImportSettingsDialogView
+namespace AssetManagement.Strategies.Fbx.ImportDialog.Views.FBXImportSettingsDialogView
 {
     /// <summary>
     /// Interaction logic for FBXAnimationSettingsPanel.xaml
@@ -15,3 +15,4 @@ namespace AssetManagement.Strategies.Fbx.Views.FBXImportSettingsDialogView
         }
     }
 }
+

@@ -11,7 +11,7 @@ namespace wrapdll
 		virtual ~FBXImporterService()
 		{			
 			m_pSDKManager->Destroy();
-			log_info("FBX SDK Manager object deallocated.");
+			log_info("FBX SDK Manager object deallocated corretcly.");
 		};
 
 		/// <summary>
@@ -51,7 +51,7 @@ namespace wrapdll
 	private:
 		std::vector<std::string> m_animFileBoneNames; // ordered as the .ANIM file, so can be used for bonename -> index lookups
 		
-		FBXSCeneContainer m_sceneContainer; // the container of mesh, anim, etc, that is copied to/from C#
+		FBXSCeneContainer m_sceneContainer; // the container of mesh, anim, etc, that is copied to/from C#, stored here, so no extra pointer cleanup needed
 
 		fbxsdk::FbxScene* m_pFbxScene = nullptr;
 		fbxsdk::FbxManager* m_pSDKManager = nullptr;

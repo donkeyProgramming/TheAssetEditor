@@ -97,6 +97,9 @@ namespace ConsoleBackground
 #define log_action(_MSG)  logfunc::impl_log_action( \
 	std::string(__func__) +  std::string(": Line: ") + std::to_string(__LINE__) + ": " + _MSG);\
 
+#define log_action_color(_MSG)  logfunc::impl_log_action_color( \
+	std::string(__func__) +  std::string(": Line: ") + std::to_string(__LINE__) + ": " + _MSG);\
+
 #define _log_function_call() logfunc::impl_log_action( \
 	std::string(__func__) +  std::string(": Line: ") + std::to_string(__LINE__));\
 
@@ -109,6 +112,7 @@ namespace logfunc
 {
 	extern void LogInfo(const std::string& _strMsg);
 	extern void impl_log_action(const std::string& _strMsg);
+	extern void impl_log_action_color(const std::string& _strMsg);
 	extern void impl_log_action_success(const std::string& _strMsg);
 	extern bool impllog_action_error(const std::string& _strMsg);
 	extern bool impl_log_action_warning(const std::string& _strMsg);
