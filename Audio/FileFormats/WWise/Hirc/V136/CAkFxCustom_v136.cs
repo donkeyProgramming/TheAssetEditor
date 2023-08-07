@@ -13,7 +13,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public StateChunk StateChunk { get; set; }
         public List<PluginPropertyValue> propertyValuesList { get; set; } = new List<PluginPropertyValue>();
 
-        protected override void CreateSpesificData(ByteChunk chunk)
+        protected override void CreateSpecificData(ByteChunk chunk)
         {
             //contains the plugin type and company id (CA doesn't have one apparently)
             plugin_id = chunk.ReadUInt32();

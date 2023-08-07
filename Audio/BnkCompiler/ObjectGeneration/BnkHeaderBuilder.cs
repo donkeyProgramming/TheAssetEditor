@@ -1,4 +1,5 @@
-﻿using Audio.FileFormats.WWise.Bkhd;
+﻿using System;
+using Audio.FileFormats.WWise.Bkhd;
 using Audio.Utility;
 
 namespace Audio.BnkCompiler.ObjectGeneration
@@ -7,6 +8,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
     {
         public BkhdHeader Generate(CompilerData projectFile)
         {
+            throw new System.Exception();
             var bnkName = projectFile.ProjectSettings.BnkName;
             var soundBankId = WWiseHash.Compute(bnkName);
             var header = new BkhdHeader()
@@ -16,7 +18,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
                 dwLanguageID = 550298558, // English(UK)
                 bFeedbackInBank = 0x10,
                 dwProjectID = 2361,
-                padding = 0x04,
+                padding = BitConverter.GetBytes(0x04)
             };
 
             return header;

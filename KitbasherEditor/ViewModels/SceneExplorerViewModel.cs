@@ -13,12 +13,7 @@ using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels
 {
-
-
-    // Explorer
-    // Child view container
-    // Context menu
-
+    // Improve using this: https://stackoverflow.com/questions/63110566/multi-select-with-multiple-level-in-wpf-treeview
 
     public class SceneExplorerViewModel : NotifyPropertyChangedImpl
     {
@@ -42,39 +37,38 @@ namespace KitbasherEditor.ViewModels
 
             SceneGraphRootNodes.Add(_sceneManager.RootNode);
 
-            _sceneManager.SceneObjectAdded += (a, b) => RebuildTree();
-            _sceneManager.SceneObjectRemoved += (a, b) => RebuildTree();
-
             ContextMenu = new SceneExplorerContextMenuHandler(commandExecutor, _sceneManager, commandFactory);
-            ContextMenu.SelectedNodesChanged += OnSelectedNodesChanged;
+            ContextMenu.SelectedNodesChanged += OnContextMenuActionChangingSelection;
 
-            SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
-            eventHub.Register<SelectionChangedEvent>(Handle);
+            SelectedObjects.CollectionChanged += OnSceneExplorerSelectionChanged;
+            
+            eventHub.Register<SelectionChangedEvent>(OnSceneSelectionChanged);
+            eventHub.Register<SceneObjectAddedEvent>(x=> RebuildTree());
+            eventHub.Register<SceneObjectRemovedEvent>(x => RebuildTree());
         }
 
-        private void OnSelectedNodesChanged(IEnumerable<ISceneNode> selectedNodes)
+        private void OnContextMenuActionChangingSelection(IEnumerable<ISceneNode> selectedNodes)
         {
+            // Clear works in a strange way on multiselect observable lists. Loop over and remove one by one
             foreach (var node in SelectedObjects.ToList())
-            {
                 SelectedObjects.Remove(node);
-            }
+
             foreach (var node in selectedNodes)
-            {
                 SelectedObjects.Add(node);
-            }
         }
 
-        private void SelectedObjects_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void OnSceneExplorerSelectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             try
             {
-                SelectedObjects.CollectionChanged -= SelectedObjects_CollectionChanged;
+                SelectedObjects.CollectionChanged -= OnSceneExplorerSelectionChanged;
                 _ignoreSelectionChanges = true;
 
                 try
                 {
-                    if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add && Keyboard.IsKeyDown(Key.LeftCtrl))
+                    if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add && Keyboard.IsKeyDown(Key.LeftShift))
                     {
+                        // This is to handle selecting items inbetween others while holding LeftShift
                         var newItem = e.NewItems[0] as ISceneNode;
                         var newItemIndex = newItem.Parent.Children.IndexOf(newItem);
                         var selectedWithoutNewItem = SelectedObjects.Except(new List<ISceneNode>() { newItem });
@@ -100,6 +94,7 @@ namespace KitbasherEditor.ViewModels
                 }
                 catch { }
 
+                // Select the objects in the game world
                 var objectState = new ObjectSelectionState();
                 foreach (var item in SelectedObjects)
                 {
@@ -130,7 +125,7 @@ namespace KitbasherEditor.ViewModels
             }
             finally
             {
-                SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
+                SelectedObjects.CollectionChanged += OnSceneExplorerSelectionChanged;
                 _ignoreSelectionChanges = false;
             }
 
@@ -143,52 +138,20 @@ namespace KitbasherEditor.ViewModels
                 SelectedNodeViewModel.Dispose();
 
             if (SelectedObjects.Count == 1)
-            {
                 SelectedNodeViewModel = _sceneNodeViewFactory.CreateEditorView(SelectedObjects.First());
-                ContextMenu.Create(SelectedObjects);
-            }
             else
-            {
                 SelectedNodeViewModel = null;
-                ContextMenu.Create(SelectedObjects);
-            }
-        }
 
-        private void SelectionChanged(ISelectionState state)
-        {
-            try
-            {
-                SelectedObjects.CollectionChanged -= SelectedObjects_CollectionChanged;
-
-                if (state is ObjectSelectionState objectSelection)
-                {
-                    if (SelectedObjects.Count != 0)
-                    {
-                        while (SelectedObjects.Count > 0)
-                            SelectedObjects.RemoveAt(SelectedObjects.Count - 1);
-                    }
-                    var objects = objectSelection.SelectedObjects();
-                    foreach (var obj in objects)
-                        SelectedObjects.Add(obj);
-                }
-            }
-            finally
-            {
-                SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
-            }
-
-            UpdateViewModelAndContextMenyBasedOnSelection();
+            ContextMenu.Create(SelectedObjects);
         }
 
         private void RebuildTree()
         {
             SceneGraphRootNodes.Clear();
             SceneGraphRootNodes.Add(_sceneManager.RootNode);
-            UpdateLod(0);
-        }
 
-        void UpdateLod(int newLodLevel)
-        {
+            // Update visibility
+            var newLodLevel = 0;
             var allModelNodes = _sceneManager.GetEnumeratorConditional(x => x is Rmv2ModelNode);
             foreach (var item in allModelNodes)
             {
@@ -200,10 +163,34 @@ namespace KitbasherEditor.ViewModels
             }
         }
 
-        void Handle(SelectionChangedEvent notification)
+        void OnSceneSelectionChanged(SelectionChangedEvent notification)
         {
-            if (_ignoreSelectionChanges == false)
-                SelectionChanged(notification.NewState);
+            if (_ignoreSelectionChanges)
+                return;
+
+            if (notification.NewState is not ObjectSelectionState objectSelection)
+                return;
+
+            try
+            {
+                SelectedObjects.CollectionChanged -= OnSceneExplorerSelectionChanged;
+
+                if (SelectedObjects.Count != 0)
+                {
+                    while (SelectedObjects.Count > 0)
+                        SelectedObjects.RemoveAt(SelectedObjects.Count - 1);
+                }
+                var objects = objectSelection.SelectedObjects();
+                foreach (var obj in objects)
+                    SelectedObjects.Add(obj);
+                
+            }
+            finally
+            {
+                SelectedObjects.CollectionChanged += OnSceneExplorerSelectionChanged;
+            }
+
+            UpdateViewModelAndContextMenyBasedOnSelection();
         }
     }
 }

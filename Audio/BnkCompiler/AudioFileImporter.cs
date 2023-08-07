@@ -2,7 +2,6 @@
 using CommonControls.Common;
 using CommonControls.Services;
 using CommunityToolkit.Diagnostics;
-using Serilog;
 using System.IO;
 using System.Linq;
 
@@ -10,8 +9,6 @@ namespace Audio.BnkCompiler
 {
     public class AudioFileImporter
     {
-        ILogger _logger = Logging.Create<AudioFileImporter>();
-
         private readonly PackFileService _pfs;
         private readonly VgStreamWrapper _vgStreamWrapper;
 

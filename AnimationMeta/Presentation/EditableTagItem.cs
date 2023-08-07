@@ -14,7 +14,6 @@ namespace AnimationMeta.Presentation
     {
         ILogger _logger = Logging.Create<EditableTagItem>();
 
-        byte[] _originalByteValue;
         IByteParser _parser { get; set; }
 
         public EditableTagItem(IByteParser parser, object value)

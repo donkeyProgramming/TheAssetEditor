@@ -86,12 +86,12 @@ namespace CommonControls.Services.ToolCreation
         IEditorViewModel CreateEditorInternal(Type editorType)
         {
             var scope = _rootProvider.CreateScope();
-            var instance = scope.ServiceProvider.GetService(editorType) as IEditorViewModel;
+            var instance = scope.ServiceProvider.GetRequiredService(editorType) as IEditorViewModel;
 
             var scopeResolverHint = instance as IEditorScopeResolverHint;
             if (scopeResolverHint != null)
             {
-                var solver = scope.ServiceProvider.GetService(scopeResolverHint.GetScopeResolverType) as IScopeHelper;
+                var solver = scope.ServiceProvider.GetRequiredService(scopeResolverHint.GetScopeResolverType) as IScopeHelper;
                 solver.ResolveGlobalServices(scope.ServiceProvider);
             }
 

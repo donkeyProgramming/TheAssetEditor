@@ -19,7 +19,7 @@ namespace wrapdll
 			fbxsdk::FbxScene* poFbxScene,
 			fbxsdk::FbxMesh* poFbxMesh,
 			PackedMesh& destMesh,
-			std::vector<ControlPointInfluences> controlPointerInfluences)
+			std::vector<ControlPointInfluenceExt> controlPointerInfluences)
 		{
 			if (!poFbxScene || !poFbxMesh)
 				return log_action_error("Mesh processing Failed scene/mesh == nullptr!")
@@ -32,25 +32,26 @@ namespace wrapdll
 			auto fmGloabalTransForm = FBXNodeGeometryHelper::GetNodeWorldTransform(poFbxMesh->GetNode());
 			auto fmGloabalTransForm_Normals = FBXNodeGeometryHelper::GetNodeWorldTransform_Normals(poFbxMesh->GetNode());
 
-			// Total "face corners"
+			// -- Total "face corners"
 			int polygonVertexCount = poFbxMesh->GetPolygonVertexCount();
 
-			// PolygonCount = triangle count, as model is triangulated on init
+			// -- PolygonCount = triangle count, as model is triangulated on init
 			int triangleCount = poFbxMesh->GetPolygonCount();
 			log_action("Polygon Count: " + std::to_string(triangleCount));
 
-			// Array of "math verticec" {x,y,z(,w)}
+			// -- Array of "math verticec" {x,y,z(,w)}
 			FbxVector4* pControlPoints = poFbxMesh->GetControlPoints();
 			int controlPointCount = poFbxMesh->GetControlPointsCount();
 
-			// "PolygonVertices" = Polygon "corners", equivalent to "mesh indices"
+			// -- "PolygonVertices" = Polygon "corners", equivalent to "mesh indices"
 			int* pPolyggonVertices = poFbxMesh->GetPolygonVertices();
 
+			
 			const int faceIndexCount = 3; // face = harcoded to "triangle" (file is triangulated on FBX init)
 			destMesh.indices.resize(triangleCount * faceIndexCount);
 			destMesh.vertices.resize(triangleCount * faceIndexCount);
 
-			//poFbxMesh->GenerateTangentsDataForAllUVSets(); // not "pretty" once converted to "INDEXED packed vertex", recalc for perfection
+			//poFbxMesh->GenerateTangentsDataForAllUVSets(); // FBX SDK tangent calc; not "pretty"/proper once converted to "INDEXED packed vertex", recalc for perfection
 
 			FbxGeometryElementNormal::EMappingMode NormalMappingMode;
 
@@ -99,10 +100,24 @@ namespace wrapdll
 						return log_action_error("No UV Maps founds!");
 					}
 
-					ControlPointInfluences* pControlPointInfluences = nullptr;
+					ControlPointInfluenceExt* pControlPointInfluences = nullptr;
 					if (controlPointerInfluences.size() == controlPointCount) // influences from FbxSkin, correst size check
 					{
 						pControlPointInfluences = &controlPointerInfluences[controlPointIndex];
+
+						for (auto& i : pControlPointInfluences->influences) // fill "VertexWeights" with "per vertex" weighting data
+						{
+							VertexWeight newVertexWeight;
+							strcpy_s<255>(newVertexWeight.boneName, i.boneName.c_str());
+							newVertexWeight.vertexIndex = vertexIndex;
+							newVertexWeight.vertexWeight = i.weight;
+
+							destMesh.vertexWeights.push_back(newVertexWeight);
+						}						
+					}
+					else
+					{
+						log_action_warning("Control point influence map SIZE != number of mesh control points");
 					}
 
 					destMesh.vertices[vertexIndex] = FBXVertexhCreator::MakePackedVertex(v4ControlPoint, vNormalVector, uvMap1, pControlPointInfluences, factorToMeters);

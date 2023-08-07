@@ -19,7 +19,6 @@ namespace CommonControls.Table
     public class CellFactory
     {
         List<Func<object, BaseCellItem>> _createMap = new List<Func<object, BaseCellItem>>();
-        List<string> _columnNames = new List<string>();
         Dictionary<string, ColoumTypes> _coloumTypes = new Dictionary<string, ColoumTypes>();
         Dictionary<ColoumTypes, string> _resourceMap = new Dictionary<ColoumTypes, string>();
         Dictionary<ColoumTypes, object> _defaultValueMap = new Dictionary<ColoumTypes, object>();

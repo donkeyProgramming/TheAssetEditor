@@ -1,6 +1,7 @@
 ﻿using AnimationEditor.AnimationTransferTool;
 using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.MountAnimationCreator;
+using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SkeletonEditor;
 using AnimationEditor.SuperView;
 using AssetEditor.Report;
@@ -47,12 +48,12 @@ namespace AssetEditor.ViewModels
 
     public class MenuBarViewModel
     {
-        ILogger _logger = Logging.Create<MainViewModel>();
+        private readonly ILogger _logger = Logging.Create<MainViewModel>();
         private readonly GameInformationFactory _gameInformationFactory;
-        IServiceProvider _serviceProvider;
-        PackFileService _packfileService;
-        ApplicationSettingsService _settingsService;
-        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly PackFileService _packfileService;
+        private readonly ApplicationSettingsService _settingsService;
+        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly IUiCommandFactory _uiCommandFactory;
 
         public ICommand OpenSettingsWindowCommand { get; set; }
@@ -256,14 +257,13 @@ namespace AssetEditor.ViewModels
             Process.Start("explorer.exe", path);
         }
 
-
-        void OpenMountCreator() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<MountAnimationCreatorViewModel>();
-        void OpenCampaignAnimCreatorEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<CampaignAnimationCreatorViewModel>();
-        void OpenAnimationTransferTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<AnimationTransferToolViewModel>();
-        void OpenSuperViewTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<SuperViewViewModel>();
+        void OpenMountCreator() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<MountAnimationCreatorViewModel>>();
+        void OpenCampaignAnimCreatorEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<CampaignAnimationCreatorViewModel>>();
+        void OpenAnimationTransferTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<AnimationTransferToolViewModel>>();
+        void OpenSuperViewTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<SuperViewViewModel>>();
         void OpenAudioEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioEditorViewModel>();
         void CompileAudioProjects() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<CompilerViewModel>();
-        void OpenTechSkeletonEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<SkeletonEditorViewModel>();
+        void OpenTechSkeletonEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<SkeletonEditorViewModel>>();
 
         private void CreateExampleAudioProject()
         {

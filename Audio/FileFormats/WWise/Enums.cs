@@ -1,5 +1,15 @@
 ﻿namespace Audio.FileFormats.WWise
 {
+
+    public static class WWiseObjectHeaders
+    {
+        public const string BKHD = "BKHD";
+        public const string HIRC = "HIRC";
+        public const string STID = "STID";
+        public const string DIDX = "DIDX";
+        public const string DATA = "DATA";
+    }
+
     public enum HircType : byte
     {
         State = 0x01,
@@ -26,6 +36,8 @@
         Envelope = 0x14,
         AudioDevice = 0x15,
         TimeMod = 0x16,
+
+        Didx_Audio = 0x17
     }
 
     public enum ActionType : ushort

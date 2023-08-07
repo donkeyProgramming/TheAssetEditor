@@ -23,7 +23,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
         GameSkeleton _mountSkeleton;
 
         MeshAnimationHelper _mountVertexPositionResolver;
-        public MountAnimationGeneratorService(AnimationSettingsViewModel animationSettings, Rmv2MeshNode mountMesh, int mountVertexId, int riderBoneIndex, AssetViewModel rider, AssetViewModel mount)
+        public MountAnimationGeneratorService(AnimationSettingsViewModel animationSettings, Rmv2MeshNode mountMesh, int mountVertexId, int riderBoneIndex, SceneObject rider, SceneObject mount)
         {
             _animationSettings = animationSettings;
             _mountVertexId = mountVertexId;

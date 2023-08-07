@@ -9,8 +9,8 @@ namespace Audio.Utility
     {
         public ByteHirc FindHirc(PackFile bnkFile, string bnkFileName, uint hircId)
         {
-            var bnkParser = new Bnkparser();
-            bnkParser.UseHircByteFactory(true);
+            var bnkParser = new BnkParser();
+            //bnkParser.UseHircByteFactory(true);
             var parsingResult = bnkParser.Parse(bnkFile, bnkFileName);
             var wantedHirc = parsingResult.HircChuck.Hircs.FirstOrDefault(x => x.Id == hircId);
             return wantedHirc as ByteHirc;

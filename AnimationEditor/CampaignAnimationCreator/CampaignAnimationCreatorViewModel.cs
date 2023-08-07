@@ -1,63 +1,107 @@
-﻿using AnimationEditor.Common.AnimationPlayer;
+﻿using System.Linq;
+using System.Windows;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.Common;
+using CommonControls.FileTypes.Animation;
 using CommonControls.Services;
-using CommonControls.Services.ToolCreation;
 using Microsoft.Xna.Framework;
-using Monogame.WpfInterop.Common;
-using MonoGame.Framework.WpfInterop;
-using View3D.Components;
-using View3D.Services;
+using View3D.Animation;
 
 namespace AnimationEditor.CampaignAnimationCreator
 {
-    public class CampaignAnimationCreatorViewModel : BaseAnimationViewModel<Editor>
+    public class CampaignAnimationCreatorViewModel : NotifyPropertyChangedImpl, IHostedEditor<CampaignAnimationCreatorViewModel>
     {
-        private readonly ReferenceModelSelectionViewModelBuilder _referenceModelSelectionViewModelBuilder;
+        AnimationToolInput _debugDataToLoad;
+        SceneObject _selectedUnit;
+        AnimationClip _selectedAnimationClip;
 
-        public CampaignAnimationCreatorViewModel(
-            Editor editor,
-            IComponentInserter componentInserter,
-            ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder,
-            AnimationPlayerViewModel animationPlayerViewModel,
-            EventHub eventHub,
-            GameWorld scene,
-            FocusSelectableObjectService focusSelectableObjectService)
-            : base(componentInserter, animationPlayerViewModel, scene, focusSelectableObjectService)
+        private readonly SceneObjectBuilder _assetViewModelEditor;
+        private readonly PackFileService _packFileService;
+        private readonly SceneObjectViewModelBuilder _referenceModelSelectionViewModelBuilder;
+
+        public FilterCollection<SkeletonBoneNode> ModelBoneList { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
+        public string EditorName => "Campaign Animation Creator";
+
+        public CampaignAnimationCreatorViewModel(SceneObjectBuilder assetViewModelEditor, PackFileService pfs,  SceneObjectViewModelBuilder referenceModelSelectionViewModelBuilder)
         {
-            DisplayName.Value = "Campaign Animation Creator";
-            Editor = editor;
+            _assetViewModelEditor = assetViewModelEditor;
+            _packFileService = pfs;
             _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
-
-            eventHub.Register<SceneInitializedEvent>(Initialize);
         }
 
-        void Initialize(SceneInitializedEvent sceneInitializedEvent)
+        public void SetDebugInputParameters(AnimationToolInput debugDataToLoad)
         {
-            MainModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(true, "model", Color.Black, MainInput);
-            ReferenceModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(false, "not_in_use2", Color.Black, RefInput);
-
-            ReferenceModelView.Value.Data.IsSelectable = true;
-            ReferenceModelView.Value.IsControlVisible.Value = false;
-
-            Editor.Create(MainModelView.Value.Data);
+            _debugDataToLoad = debugDataToLoad;
         }
-    }
 
-    public static class CampaignAnimationCreator_Debug
-    {
-        public static void CreateDamselEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        public void Initialize(EditorHost<CampaignAnimationCreatorViewModel> owner)
         {
-            var editorView = toolFactory.Create<CampaignAnimationCreatorViewModel>();
-            editorView.MainInput = new AnimationToolInput()
+            var item = _referenceModelSelectionViewModelBuilder.CreateAsset(true, "model", Color.Black, _debugDataToLoad);
+            Create(item.Data);
+            owner.SceneObjects.Add(item);
+        }
+
+        void Create(SceneObject rider)
+        {
+            _selectedUnit = rider;
+            _selectedUnit.SkeletonChanged += SkeletonChanged;
+            _selectedUnit.AnimationChanged += AnimationChanged;
+
+            SkeletonChanged(_selectedUnit.Skeleton);
+            AnimationChanged(_selectedUnit.AnimationClip);
+        }
+
+        public void SaveAnimation()
+        {
+            var animFile = _selectedUnit.AnimationClip.ConvertToFileFormat(_selectedUnit.Skeleton);
+            var bytes = AnimationFile.ConvertToBytes(animFile);
+            SaveHelper.SaveAs(_packFileService, bytes, ".anim");
+        }
+
+        public void Convert()
+        {
+            if (_selectedAnimationClip == null)
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_damsel_campaign_01.variantmeshdefinition"),
-                Animation = packfileService.FindFile(@"animations\battle\humanoid01b\staff_and_sword\arch_mage\locomotion\hu1b_stsw_mage_combat_walk_01.anim")
-            };
+                MessageBox.Show("No animation selected");
+                return;
+            }
 
-            creator.CreateEmptyEditor(editorView);
+            if (ModelBoneList.SelectedItem == null)
+            {
+                MessageBox.Show("No root bone selected");
+                return;
+            }
+
+            var newAnimation = _selectedAnimationClip.Clone();
+            for (var frameIndex = 0; frameIndex < newAnimation.DynamicFrames.Count; frameIndex++)
+            {
+                var frame = newAnimation.DynamicFrames[frameIndex];
+                frame.Position[ModelBoneList.SelectedItem.BoneIndex] = Vector3.Zero;
+                frame.Rotation[ModelBoneList.SelectedItem.BoneIndex] = Quaternion.Identity;
+            }
+
+            _selectedUnit.AnimationChanged -= AnimationChanged;
+            _assetViewModelEditor.SetAnimationClip(_selectedUnit, newAnimation, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
+            _selectedUnit.AnimationChanged += AnimationChanged;
         }
 
+        private void AnimationChanged(AnimationClip newValue)
+        {
+            _selectedAnimationClip = newValue;
+        }
+
+        private void SkeletonChanged(GameSkeleton newValue)
+        {
+            if (newValue == null)
+            {
+                ModelBoneList.UpdatePossibleValues(null);
+            }
+            else
+            {
+                ModelBoneList.UpdatePossibleValues(SkeletonBoneNodeHelper.CreateFlatSkeletonList(newValue));
+                ModelBoneList.SelectedItem = ModelBoneList.PossibleValues.FirstOrDefault(x => x.BoneName.ToLower() == "animroot");
+            }
+        }
     }
 }

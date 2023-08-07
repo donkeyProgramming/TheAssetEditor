@@ -7,12 +7,11 @@ namespace AssetEditor
     public class SimpleApplication : IDisposable
     {
         public bool SkipLoadingWemFiles { get; set; } = true;
-        IServiceScope _serviceScope;
+        private readonly IServiceScope _serviceScope;
 
         public SimpleApplication(bool loadAllCaFiles = true)
         {
-            var serviceProvider = new DependencyInjectionConfig()
-                  .Build();
+            var serviceProvider = new DependencyInjectionConfig().Build();
             _serviceScope = serviceProvider.CreateScope();
 
             // Configure based on settings

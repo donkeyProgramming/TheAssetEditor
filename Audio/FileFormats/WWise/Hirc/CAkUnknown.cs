@@ -8,7 +8,7 @@ namespace Audio.FileFormats.WWise.Hirc
         public string ErrorMsg { get; set; }
 
 
-        protected override void CreateSpesificData(ByteChunk chunk)
+        protected override void CreateSpecificData(ByteChunk chunk)
         {
             chunk.ReadBytes((int)Size - 4);
         }

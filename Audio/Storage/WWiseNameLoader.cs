@@ -14,12 +14,14 @@ namespace Audio.Storage
     public class WWiseNameLoader
     {
         private readonly PackFileService _pfs;
+        private readonly ApplicationSettingsService _applicationSettingsService;
 
         private Dictionary<uint, string> _nameLookUp { get; set; } = new Dictionary<uint, string>();
 
-        public WWiseNameLoader(PackFileService pfs)
+        public WWiseNameLoader(PackFileService pfs, ApplicationSettingsService applicationSettingsService)
         {
             _pfs = pfs;
+            _applicationSettingsService = applicationSettingsService;
         }
 
         public Dictionary<uint, string> BuildNameHelper()
@@ -103,14 +105,10 @@ namespace Audio.Storage
 
         SoundDatFile LoadDatFile(PackFile datFile)
         {
-            try
-            {
-                return DatFileParser.Parse(datFile, false);
-            }
-            catch
-            {
+            if(_applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Attila)
                 return DatFileParser.Parse(datFile, true);
-            }
+            else
+                return DatFileParser.Parse(datFile, false);
         }
 
 

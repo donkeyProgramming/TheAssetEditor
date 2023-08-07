@@ -78,7 +78,6 @@ namespace View3D.SceneNodes
 
     public class Rmv2ModelNode : GroupNode
     {
-        private readonly ILogger _logger = Logging.Create<Rmv2ModelNode>();
         public RmvFile Model { get; set; }
 
         public Rmv2ModelNode(string name, int lodCount = 4)

@@ -2,12 +2,13 @@
 
 namespace Audio.FileFormats.WWise.Stid
 {
-    public class StidParser : IParser
+    public class StidParser
     {
-        public void Parse(string fileName, ByteChunk chunk, ParsedBnkFile soundDb)
+        public BnkChunkHeader Parse(string fileName, ByteChunk chunk, ParsedBnkFile soundDb)
         {
             var chunckHeader = BnkChunkHeader.CreateFromBytes(chunk);
             chunk.Index += (int)chunckHeader.ChunkSize;
+            return chunckHeader;
         }
     }
 

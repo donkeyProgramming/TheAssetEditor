@@ -33,7 +33,7 @@ namespace Audio
 
             serviceCollection.AddTransient<WWiseBnkLoader>();
             serviceCollection.AddTransient<WWiseNameLoader>();
-            serviceCollection.AddTransient<Bnkparser>();
+            serviceCollection.AddTransient<BnkParser>();
 
             serviceCollection.AddTransient<SoundPlayer>();
             serviceCollection.AddTransient<AudioResearchHelper>();

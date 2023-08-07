@@ -1,4 +1,5 @@
 ﻿using CommonControls.Common;
+using CommonControls.Editors.AnimationPack;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
 using System.Collections.Generic;
@@ -11,19 +12,18 @@ namespace AnimationEditor.Common.ReferenceModel
     public class SelectFragAndSlotViewModel : NotifyPropertyChangedImpl
     {
         string _currentSkeletonName = "";
-        AssetViewModel _asset;
+        private readonly SceneObject _asset;
+        private readonly SceneObjectBuilder _assetViewModelEditor;
+        private readonly PackFileService _pfs;
+        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly SelectMetaViewModel _metaViewModel;
+        private readonly ApplicationSettingsService _applicationSettings;
 
         public FilterCollection<IAnimationBinGenericFormat> FragmentList { get; set; }
 
         public FilterCollection<AnimationBinEntryGenericFormat> FragmentSlotList { get; set; }
 
-        private readonly AssetViewModelBuilder _assetViewModelEditor;
-        PackFileService _pfs;
-        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        SelectMetaViewModel _metaViewModel;
-        private readonly ApplicationSettingsService _applicationSettings;
-
-        public SelectFragAndSlotViewModel(AssetViewModelBuilder assetViewModelEditor, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, AssetViewModel asset, SelectMetaViewModel metaViewModel, ApplicationSettingsService applicationSettings)
+        public SelectFragAndSlotViewModel(SceneObjectBuilder assetViewModelEditor, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, SceneObject asset, SelectMetaViewModel metaViewModel, ApplicationSettingsService applicationSettings)
         {
             _assetViewModelEditor = assetViewModelEditor;
             _pfs = pfs;
@@ -31,6 +31,7 @@ namespace AnimationEditor.Common.ReferenceModel
             _asset = asset;
             _metaViewModel = metaViewModel;
             _applicationSettings = applicationSettings;
+
             FragmentList = new FilterCollection<IAnimationBinGenericFormat>(null, (value) => FragmentSelected(value, FragmentSlotList, _asset.SkeletonName.Value))
             {
                 SearchFilter = (value, rx) => { return rx.Match(value.FullPath).Success; }
@@ -44,20 +45,18 @@ namespace AnimationEditor.Common.ReferenceModel
             Subscribe();
         }
 
-
         public void PreviewSelectedSlot()
         {
             if (FragmentList.SelectedItem != null && FragmentList.SelectedItem != null)
             {
                 var animPack = FragmentList.SelectedItem.PackFileReference;
                 var packFile = _pfs.FindFile(animPack.FileName);
-                CommonControls.Editors.AnimationPack.AnimPackViewModel.ShowPreviewWinodow(packFile, _pfs, _skeletonAnimationLookUpHelper, FragmentList.SelectedItem.FullPath, _applicationSettings);
+                AnimPackViewModel.ShowPreviewWinodow(packFile, _pfs, _skeletonAnimationLookUpHelper, FragmentList.SelectedItem.FullPath, _applicationSettings);
             }
         }
 
         void Subscribe()
         {
-            _asset.AnimationChanged += OnAnimationChange;
             _asset.SkeletonChanged += OnSkeletonChange;
         }
 
@@ -88,14 +87,9 @@ namespace AnimationEditor.Common.ReferenceModel
             Subscribe();
         }
 
-        private void OnAnimationChange(View3D.Animation.AnimationClip newValue)
-        {
-            //throw new NotImplementedException();
-        }
 
         void Unsubscribe()
         {
-            _asset.AnimationChanged += OnAnimationChange;
             _asset.SkeletonChanged += OnSkeletonChange;
         }
 

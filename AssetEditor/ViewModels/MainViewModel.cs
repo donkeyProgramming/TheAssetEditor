@@ -1,5 +1,9 @@
-﻿using AssetEditor.UiCommands;
-using AssetEditor.Views.Settings;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows;
+using System.Windows.Input;
+using AssetEditor.UiCommands;
 using CommonControls.Common;
 using CommonControls.Events.UiCommands;
 using CommonControls.FileTypes.PackFiles.Models;
@@ -7,21 +11,13 @@ using CommonControls.PackFileBrowser;
 using CommonControls.Services;
 using CommonControls.Services.ToolCreation;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows;
-using System.Windows.Input;
-
 
 namespace AssetEditor.ViewModels
 {
     public class MainViewModel : NotifyPropertyChangedImpl, IDropTarget<IEditorViewModel, bool>
     {
         private readonly PackFileService _packfileService;
-        private readonly DevelopmentConfiguration _developmentConfiguration;
         private readonly IUiCommandFactory _uiCommandFactory;
 
         public PackFileBrowserViewModel FileTree { get; private set; }
@@ -52,17 +48,12 @@ namespace AssetEditor.ViewModels
         public ICommand CloseToolsToRightCommand { get; set; }
         public ICommand CloseToolsToLeftCommand { get; set; }
 
-        public MainViewModel(GameInformationFactory gameInformationFactory,
-            MenuBarViewModel menuViewModel,
-            IServiceProvider serviceProvider,
+        public MainViewModel( MenuBarViewModel menuViewModel,
             PackFileService packfileService,
-            ApplicationSettingsService settingsService,
             IToolFactory toolFactory,
-            DevelopmentConfiguration developmentConfiguration,
             IUiCommandFactory uiCommandFactory)
         {
             MenuBar = menuViewModel;
-            _developmentConfiguration = developmentConfiguration;
             _uiCommandFactory = uiCommandFactory;
             _packfileService = packfileService;
             _packfileService.Database.BeforePackFileContainerRemoved += Database_BeforePackFileContainerRemoved;
@@ -78,32 +69,7 @@ namespace AssetEditor.ViewModels
             FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, toolFactory, uiCommandFactory);
             FileTree.FileOpen += OpenFile;
 
-            // eventHub<FileOpened>
-            // eventHub<Database_BeforePackFileContainerRemoved>
-
             ToolsFactory = toolFactory;
-
-            if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
-            {
-                var settingsWindow = serviceProvider.GetRequiredService<SettingsWindow>();
-                settingsWindow.DataContext = serviceProvider.GetRequiredService<SettingsViewModel>();
-                settingsWindow.ShowDialog();
-
-                settingsService.CurrentSettings.IsFirstTimeStartingApplication = false;
-                settingsService.Save();
-            }
-
-            if (settingsService.CurrentSettings.LoadCaPacksByDefault)
-            {
-                var gamePath = settingsService.GetGamePathForCurrentGame();
-                if (gamePath != null)
-                {
-                    var gameName = gameInformationFactory.GetGameById(settingsService.CurrentSettings.CurrentGame).DisplayName;
-                    var loadRes = _packfileService.LoadAllCaFiles(gamePath, gameName);
-                    if (!loadRes)
-                        MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
-                }
-            }
         }
 
         void OpenFile(PackFile file) => _uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file);

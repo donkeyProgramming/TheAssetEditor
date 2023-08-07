@@ -8,7 +8,7 @@ namespace Audio.FileFormats.WWise.Hirc.V112
         public ActionType ActionType { get; set; }
         public uint SoundId { get; set; }
 
-        protected override void CreateSpesificData(ByteChunk chunk)
+        protected override void CreateSpecificData(ByteChunk chunk)
         {
             ActionType = (ActionType)chunk.ReadUShort();
             SoundId = chunk.ReadUInt32();

@@ -1,7 +1,5 @@
 ﻿using CommonControls.Common;
-using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
-using Serilog;
 using System.Collections.ObjectModel;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -12,8 +10,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
     public class TextureFileEditorServiceViewModel
     {
-        ILogger _logger = Logging.Create<TextureFileEditorServiceViewModel>();
-
         TextureFileEditorService _textureService;
 
         public ICommand CreateProjectCommand { get; set; }
@@ -29,7 +25,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         public ObservableCollection<TextureFileEditorService.TextureItem> TextureList { get; set; } = new ObservableCollection<TextureFileEditorService.TextureItem>();
 
-        public TextureFileEditorServiceViewModel(MainEditableNode mainNode, PackFileService pfs)
+        public TextureFileEditorServiceViewModel(MainEditableNode mainNode)
         {
             CreateProjectCommand = new RelayCommand(() => _textureService.CreateProject());
             RefreshProjectCommand = new RelayCommand(() => _textureService.RefreshProject());

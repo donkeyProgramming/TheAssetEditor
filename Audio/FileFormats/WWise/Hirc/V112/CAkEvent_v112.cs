@@ -14,7 +14,7 @@ namespace Audio.FileFormats.WWise.Hirc.V112
 
         public List<Action> Actions { get; set; } = new List<Action>();
 
-        protected override void CreateSpesificData(ByteChunk chunk)
+        protected override void CreateSpecificData(ByteChunk chunk)
         {
             var actionCount = chunk.ReadUInt32();
             for (int i = 0; i < actionCount; i++)

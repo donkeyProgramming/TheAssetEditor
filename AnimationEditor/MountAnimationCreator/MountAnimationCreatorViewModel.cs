@@ -1,234 +1,315 @@
-﻿using AnimationEditor.Common.AnimationPlayer;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
+using System.Windows;
+using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
+using AnimationEditor.MountAnimationCreator.Services;
+using AnimationEditor.MountAnimationCreator.ViewModels;
 using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.Common;
+using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
-using CommonControls.Services.ToolCreation;
 using Microsoft.Xna.Framework;
-using Monogame.WpfInterop.Common;
-using MonoGame.Framework.WpfInterop;
-using View3D.Components;
-using View3D.Services;
+using View3D.Animation;
+using View3D.Components.Component.Selection;
+using View3D.SceneNodes;
+
 
 namespace AnimationEditor.MountAnimationCreator
 {
-    public class MountAnimationCreatorViewModel : BaseAnimationViewModel<Editor>
+    public class MountAnimationCreatorViewModel : NotifyPropertyChangedImpl, IHostedEditor<MountAnimationCreatorViewModel>
     {
-        private readonly ReferenceModelSelectionViewModelBuilder _referenceModelSelectionViewModelBuilder;
-        private readonly AssetViewModelBuilder _assetViewModelBuilder;
+        private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
+        private readonly SceneObjectBuilder _sceneObjectBuilder;
+        private readonly AnimationPlayerViewModel _animationPlayerViewModel;
+        private readonly ApplicationSettingsService _applicationSettings;
+        private readonly PackFileService _pfs;
+        private readonly SelectionManager _selectionManager;
+        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
-        public MountAnimationCreatorViewModel(
-            Editor editor,
-            IComponentInserter componentInserter,
-            ReferenceModelSelectionViewModelBuilder referenceModelSelectionViewModelBuilder,
+        SceneObject _mount;
+        SceneObject _rider;
+        SceneObject _newAnimation;
+  
+        List<int> _mountVertexes = new();
+        Rmv2MeshNode _mountVertexOwner;
+
+        AnimationToolInput _inputRiderData;
+        AnimationToolInput _inputMountData;
+
+        public AnimationSettingsViewModel AnimationSettings { get; set; } = new AnimationSettingsViewModel();
+        public MountLinkViewModel MountLinkController { get; set; }
+        public string EditorName => "Mount Animation Creator";
+
+        public FilterCollection<SkeletonBoneNode> SelectedRiderBone { get; set; }
+
+        public NotifyAttr<bool> CanPreview { get; set; } = new NotifyAttr<bool>(false);
+        public NotifyAttr<bool> CanBatchProcess { get; set; } = new NotifyAttr<bool>(false);
+        public NotifyAttr<bool> CanSave { get; set; } = new NotifyAttr<bool>(false);
+        public NotifyAttr<bool> CanAddToFragment { get; set; } = new NotifyAttr<bool>(false);
+
+        public NotifyAttr<bool> DisplayGeneratedSkeleton { get; set; }
+        public NotifyAttr<bool> DisplayGeneratedMesh { get; set; }
+
+        public NotifyAttr<string> SelectedVertexesText { get; set; } = new NotifyAttr<string>("");
+        public NotifyAttr<string> SavePrefixText { get; set; } = new NotifyAttr<string>("new_");
+        public ObservableCollection<uint> AnimationOutputFormats { get; set; } = new ObservableCollection<uint>() { 5, 6, 7 };
+        public NotifyAttr<uint> SelectedAnimationOutputFormat { get; set; } = new NotifyAttr<uint>(7);
+        public NotifyAttr<bool> EnsureUniqeFileName { get; set; } = new NotifyAttr<bool>(true);
+
+        public FilterCollection<IAnimationBinGenericFormat> ActiveOutputFragment { get; set; }
+        public FilterCollection<AnimationBinEntryGenericFormat> ActiveFragmentSlot { get; set; }
+
+
+
+        public MountAnimationCreatorViewModel( PackFileService pfs, 
+            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
+            SelectionManager selectionManager, 
+            ApplicationSettingsService applicationSettings,
+            SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
             AnimationPlayerViewModel animationPlayerViewModel,
-            EventHub eventHub,
-            AssetViewModelBuilder assetViewModelBuilder,
-            GameWorld scene,
-            FocusSelectableObjectService focusSelectableObjectService)
-            : base(componentInserter, animationPlayerViewModel, scene, focusSelectableObjectService)
+            SceneObjectBuilder sceneObjectBuilder)
         {
-            DisplayName.Value = "MountAnimCreator";
-            Editor = editor;
-            _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
-            _assetViewModelBuilder = assetViewModelBuilder;
+            _sceneObjectViewModelBuilder = sceneObjectViewModelBuilder;
+            _animationPlayerViewModel = animationPlayerViewModel;
+            _sceneObjectBuilder = sceneObjectBuilder;
+            _pfs = pfs;
 
-            eventHub.Register<SceneInitializedEvent>(Initialize);
+            _applicationSettings = applicationSettings;
+
+            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
+            _selectionManager = selectionManager;
+
+            DisplayGeneratedSkeleton = new NotifyAttr<bool>(true, (value) => _newAnimation.ShowSkeleton.Value = value);
+            DisplayGeneratedMesh = new NotifyAttr<bool>(true, (value) => { if (_newAnimation.MainNode != null) _newAnimation.ShowMesh.Value = value; });
+
+            SelectedRiderBone = new FilterCollection<SkeletonBoneNode>(null, (x) => UpdateCanSaveAndPreviewStates());
+
+
+            ActiveOutputFragment = new FilterCollection<IAnimationBinGenericFormat>(null, OutputAnimationSetSelected);
+            ActiveOutputFragment.SearchFilter = (value, rx) => { return rx.Match(value.FullPath).Success; };
+
+            ActiveFragmentSlot = new FilterCollection<AnimationBinEntryGenericFormat>(null, (x) => UpdateCanSaveAndPreviewStates());
+            ActiveFragmentSlot.SearchFilter = (value, rx) => { return rx.Match(value.SlotName).Success; };
+
+            AnimationSettings.SettingsChanged += () => TryReGenerateAnimation(null);
         }
 
-        void Initialize(SceneInitializedEvent sceneInitializedEvent)
+        public void SetDebugInputParameters(AnimationToolInput rider, AnimationToolInput mount)
         {
-            MainModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(true, "Rider", Color.Black, MainInput);
-            ReferenceModelView.Value = _referenceModelSelectionViewModelBuilder.CreateAsset(true, "Mount", Color.Black, RefInput);
-
-            ReferenceModelView.Value.Data.IsSelectable = true;
-
-            var propAsset = _assetViewModelBuilder.CreateAsset("New Anim", Color.Red);
-            Player.RegisterAsset(propAsset);
-
-            Editor.Create(MainModelView.Value.Data, ReferenceModelView.Value.Data, propAsset);
-        }
-    }
-
-    public static class MountAnimationCreator_Debug
-    {
-        public static void CreateDamselAndGrymgoreEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
-        {
-            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
-
-            editorView.MainInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\brt_damsel_campaign_01.variantmeshdefinition")
-            };
-
-            editorView.RefInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\lzd_carnosaur_grymloq.variantmeshdefinition")
-            };
-
-            creator.CreateEmptyEditor(editorView);
+            _inputRiderData = rider;
+            _inputMountData = mount;
         }
 
-
-        public static void CreateKarlAndSquigEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        public void Initialize(EditorHost<MountAnimationCreatorViewModel> owner)
         {
-            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
+            var riderItem = _sceneObjectViewModelBuilder.CreateAsset(true, "Rider", Color.Black, _inputRiderData);
+            var mountItem = _sceneObjectViewModelBuilder.CreateAsset(true, "Mount", Color.Black, _inputMountData);
+            mountItem.Data.IsSelectable = true;
 
-            editorView.MainInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\emp_ch_karl.variantmeshdefinition")
-            };
+            var propAsset = _sceneObjectBuilder.CreateAsset("New Anim", Color.Red);
+            _animationPlayerViewModel.RegisterAsset(propAsset);
 
-            editorView.RefInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\grn_great_cave_squig.variantmeshdefinition")
-            };
-
-            creator.CreateEmptyEditor(editorView);
+            Create(riderItem.Data, mountItem.Data, propAsset);
+            owner.SceneObjects.Add(riderItem);
+            owner.SceneObjects.Add(mountItem);
         }
 
-        public static void CreateBroodHorrorEditor(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        internal void Create(SceneObject rider, SceneObject mount, SceneObject newAnimation)
         {
-            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
+            _newAnimation = newAnimation;
+            _mount = mount;
+            _rider = rider;
 
-            editorView.MainInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_plague_priest.variantmeshdefinition")
-            };
+            _mount.SkeletonChanged += MountSkeletonChanged;
+            _mount.AnimationChanged += TryReGenerateAnimation;
+            _rider.SkeletonChanged += RiderSkeletonChanges;
+            _rider.AnimationChanged += TryReGenerateAnimation;
 
-            editorView.RefInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_brood_horror.variantmeshdefinition")
-            };
+            MountLinkController = new MountLinkViewModel(_sceneObjectBuilder, _pfs, _skeletonAnimationLookUpHelper, rider, mount, UpdateCanSaveAndPreviewStates);
 
-            creator.CreateEmptyEditor(editorView);
+            MountSkeletonChanged(_mount.Skeleton);
+            RiderSkeletonChanges(_rider.Skeleton);
         }
 
-        public static void CreateLionAndHu01b(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        private void TryReGenerateAnimation(AnimationClip newValue = null)
         {
-            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
-
-            editorView.MainInput = new AnimationToolInput()
+            UpdateCanSaveAndPreviewStates();
+            if (CanPreview.Value)
+                CreateMountAnimationAction();
+            else
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_princess_campaign_01.variantmeshdefinition")
-            };
-
-            editorView.RefInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_war_lion.variantmeshdefinition")
-            };
-
-            creator.CreateEmptyEditor(editorView);
+                if (_newAnimation != null)
+                    _sceneObjectBuilder.SetAnimation(_newAnimation, null);
+            }
         }
 
-        public static void CreateLionAndHu01c(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        private void MountSkeletonChanged(GameSkeleton newValue)
         {
-            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
-
-            editorView.MainInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\chs_marauder_horsemen.variantmeshdefinition")
-            };
-
-            editorView.RefInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_war_lion.variantmeshdefinition")
-            };
-
-            creator.CreateEmptyEditor(editorView);
+            UpdateCanSaveAndPreviewStates();
+            MountLinkController.ReloadFragments(false, true);
         }
 
-        public static void CreateRaptorAndHu01b(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        private void RiderSkeletonChanges(GameSkeleton newValue)
         {
-            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
-
-            editorView.MainInput = new AnimationToolInput()
+            if (newValue == null)
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_princess_campaign_01.variantmeshdefinition")
-            };
-
-            editorView.RefInput = new AnimationToolInput()
+                // ActiveOutputFragment.UpdatePossibleValues(null);
+                SelectedRiderBone.UpdatePossibleValues(null);
+            }
+            else
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\def_cold_one.variantmeshdefinition")
-            };
+                //  ActiveOutputFragment.UpdatePossibleValues(MountLinkController.LoadFragmentsForSkeleton(newValue.SkeletonName, true));
+                SelectedRiderBone.UpdatePossibleValues(SkeletonBoneNodeHelper.CreateFlatSkeletonList(newValue));
+            }
 
-            creator.CreateEmptyEditor(editorView);
+            // Try setting using root bone
+            SelectedRiderBone.SelectedItem = SelectedRiderBone.PossibleValues.FirstOrDefault(x => string.Equals("root", x.BoneName, StringComparison.OrdinalIgnoreCase));
+            AnimationSettings.IsRootNodeAnimation = SelectedRiderBone.SelectedItem != null;
+
+            // Try setting using hip bone
+            if (AnimationSettings.IsRootNodeAnimation == false)
+                SelectedRiderBone.SelectedItem = SelectedRiderBone.PossibleValues.FirstOrDefault(x => string.Equals("bn_hips", x.BoneName, StringComparison.OrdinalIgnoreCase));
+
+            MountLinkController.ReloadFragments(true, false);
+            UpdateCanSaveAndPreviewStates();
         }
 
-        public static void CreateRaptorAndHu01d(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        void OutputAnimationSetSelected(IAnimationBinGenericFormat animationSet)
         {
-            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
-
-            editorView.MainInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_archer_armoured.variantmeshdefinition"),
-            };
-
-            editorView.RefInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\def_cold_one.variantmeshdefinition"),
-            };
-
-            creator.CreateEmptyEditor(editorView);
+            if (animationSet == null)
+                ActiveFragmentSlot.UpdatePossibleValues(null);
+            else
+                ActiveFragmentSlot.UpdatePossibleValues(animationSet.Entries);
+            UpdateCanSaveAndPreviewStates();
         }
 
-        public static void CreateRaptorAndHu02(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        void UpdateCanSaveAndPreviewStates()
         {
-            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
-
-            editorView.MainInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\grn_savage_orc_base.variantmeshdefinition"),
-            };
-
-            editorView.RefInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\def_cold_one.variantmeshdefinition"),
-            };
-
-            creator.CreateEmptyEditor(editorView);
+            var mountConnectionOk = SelectedRiderBone.SelectedItem != null && _mountVertexes.Count != 0;
+            var mountOK = _mount != null && _mount.AnimationClip != null && _mount.Skeleton != null;
+            var riderOK = _rider != null && _rider.AnimationClip != null && _rider.Skeleton != null;
+            CanPreview.Value = mountConnectionOk && _mountVertexes.Count != 0 && mountOK && riderOK;
+            CanBatchProcess.Value = MountLinkController?.AnimationSetForMount?.SelectedItem != null && MountLinkController?.AnimationSetForRider?.SelectedItem != null && mountConnectionOk;
+            CanAddToFragment.Value = ActiveOutputFragment?.SelectedItem != null && ActiveFragmentSlot?.SelectedItem != null;
+            CanSave.Value = mountConnectionOk && _mountVertexes.Count != 0 && mountOK && riderOK;
         }
 
-
-        public static void CreateRome2WolfRider(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        public void SetMountVertex()
         {
-            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
-
-            editorView.MainInput = new AnimationToolInput()
+            var state = _selectionManager.GetState<VertexSelectionState>();
+            if (state == null || state.CurrentSelection().Count == 0)
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\_variantmodels\man\skin\barb_base_full.rigid_model_v2"),
-                Animation = packfileService.FindFile(@"animations\rome2\riders\horse_rider\cycles\rider\horse_rider_walk.anim"),
-            };
-
-            editorView.RefInput = new AnimationToolInput()
+                SelectedVertexesText.Value = "No vertex selected";
+                _mountVertexes.Clear();
+                _mountVertexOwner = null;
+                MessageBox.Show(SelectedVertexesText.Value);
+            }
+            else
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\wh_variantmodels\wf1\grn\grn_giant_wolf\grn_giant_wolf_1.rigid_model_v2"),
-                Animation = packfileService.FindFile(@"animations\battle\wolf01\locomotion\wf1_walk_01.anim")
-            };
+                SelectedVertexesText.Value = $"{state.CurrentSelection().Count} vertexes selected";
+                _mountVertexOwner = state.RenderObject as Rmv2MeshNode;
+                _mountVertexes = new List<int>(state.CurrentSelection());
+            }
 
-            creator.CreateEmptyEditor(editorView);
+            UpdateCanSaveAndPreviewStates();
         }
 
-        public static void CreateRome2WolfRiderAttack(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        public void CreateMountAnimationAction()
         {
-            var editorView = toolFactory.Create<MountAnimationCreatorViewModel>();
+            var newRiderAnim = CreateAnimationGenerator().GenerateMountAnimation(_mount.AnimationClip, _rider.AnimationClip);
 
-            editorView.MainInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\_variantmodels\man\skin\barb_base_full.rigid_model_v2"),
-                Animation = packfileService.FindFile(@"animations\rome2\riders\horse_rider\attack\rider\sws_rider_attack_01.anim"),
-            };
-
-            editorView.RefInput = new AnimationToolInput()
-            {
-                Mesh = packfileService.FindFile(@"variantmeshes\wh_variantmodels\wf1\grn\grn_giant_wolf\grn_giant_wolf_1.rigid_model_v2"),
-                Animation = packfileService.FindFile(@"animations\battle\wolf01\attacks\wf1_attack_01.anim")
-            };
-
-            creator.CreateEmptyEditor(editorView);
+            // Apply
+            _sceneObjectBuilder.CopyMeshFromOther(_newAnimation, _rider);
+            _sceneObjectBuilder.SetAnimationClip(_newAnimation, newRiderAnim, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
+            _newAnimation.ShowSkeleton.Value = DisplayGeneratedSkeleton.Value;
+            _newAnimation.ShowMesh.Value = DisplayGeneratedMesh.Value;
+            UpdateCanSaveAndPreviewStates();
         }
 
+        MountAnimationGeneratorService CreateAnimationGenerator()
+        {
+            return new MountAnimationGeneratorService(AnimationSettings, _mountVertexOwner, _mountVertexes.First(), SelectedRiderBone.SelectedItem.BoneIndex, _rider, _mount);
+        }
 
+        public void AddAnimationToFragment()
+        {
+            // Find stuff in active slot.
+            //var selectedAnimationSlot = MountLinkController.SelectedRiderTag.SelectedItem;
+            //
+            //AnimationClip newRiderClip = null;
+            //if (MountAnimationGeneratorService.IsCopyOnlyAnimation(selectedAnimationSlot.SlotName))
+            //    newRiderClip = _rider.AnimationClip;
+            //else
+            //    newRiderClip = CreateAnimationGenerator().GenerateMountAnimation(_mount.AnimationClip, _rider.AnimationClip);
+            //
+            //var fileResult = MountAnimationGeneratorService.SaveAnimation(_pfs, _rider.AnimationName.Value.AnimationFile, SavePrefixText.Value, EnsureUniqeFileName.Value, newRiderClip, _newAnimation.Skeleton);
+            //if (fileResult == null)
+            //    return;
+            //
+            //var newAnimSlot = selectedAnimationSlot.Entry.Value.Clone();
+            //newAnimSlot.AnimationFile = _pfs.GetFullPath(fileResult);
+            //newAnimSlot.Slot = ActiveFragmentSlot.SelectedItem.Entry.Value.Slot.Clone();
+            //
+            //var toRemove = ActiveOutputFragment.SelectedItem.Fragments.FirstOrDefault(x => x.Slot.Id == ActiveFragmentSlot.SelectedItem.Entry.Value.Slot.Id);
+            //ActiveOutputFragment.SelectedItem.Fragments.Remove(toRemove);
+            //
+            //ActiveOutputFragment.SelectedItem.Fragments.Add(newAnimSlot);
+            //
+            //var bytes = AnimationPackSerializer.ConvertToBytes(ActiveOutputFragment.SelectedItem.Parent);
+            //SaveHelper.Save(_pfs, "animations\\animation_tables\\" + ActiveOutputFragment.SelectedItem.Parent.FileName, null, bytes, false);
+            //
+            //// Update status for the slot thing 
+            //var possibleValues = ActiveOutputFragment.SelectedItem.Fragments.Select(x => new FragmentStatusSlotItem(x));
+            //ActiveFragmentSlot.UpdatePossibleValues(possibleValues);
+            //MountLinkController.ReloadFragments(true, false);
+        }
+
+        public void ViewMountFragmentAction() => ViewAnimationSet(MountLinkController.AnimationSetForMount.SelectedItem);
+        public void ViewRiderFragmentAction() => ViewAnimationSet(MountLinkController.AnimationSetForRider.SelectedItem);
+        public void ViewOutputFragmentAction() => ViewAnimationSet(ActiveOutputFragment.SelectedItem);
+
+        void ViewAnimationSet(IAnimationBinGenericFormat animationSet)
+        {
+            if (animationSet != null)
+            {
+                var animpackFileName = animationSet.PackFileReference.FileName;
+                var packFile = _pfs.FindFile(animpackFileName);
+                CommonControls.Editors.AnimationPack.AnimPackViewModel.ShowPreviewWinodow(packFile, _pfs, _skeletonAnimationLookUpHelper, animpackFileName, _applicationSettings);
+            }
+        }
+
+        public void RefreshViewAction()
+        {
+            MountLinkController.ReloadFragments();
+            ActiveOutputFragment.UpdatePossibleValues(MountLinkController.LoadAnimationSetForSkeleton(_rider.SkeletonName.Value, true));
+        }
+
+        public void SaveCurrentAnimationAction()
+        {
+            var service = new BatchProcessorService(_pfs, _skeletonAnimationLookUpHelper, CreateAnimationGenerator(), new BatchProcessOptions { SavePrefix = SavePrefixText.Value }, SelectedAnimationOutputFormat.Value);
+            service.SaveSingleAnim(_mount.AnimationClip, _rider.AnimationClip, _rider.AnimationName.Value.AnimationFile);
+        }
+
+        public void BatchProcessUsingFragmentsAction()
+        {
+            var mountFrag = MountLinkController.AnimationSetForMount.SelectedItem;
+            var riderFrag = MountLinkController.AnimationSetForRider.SelectedItem;
+
+            var newFileName = SavePrefixText.Value + Path.GetFileNameWithoutExtension(riderFrag.FullPath);
+            var batchSettings = BatchProcessOptionsWindow.ShowDialog(newFileName, SavePrefixText.Value);
+            if (batchSettings != null)
+            {
+                var service = new BatchProcessorService(_pfs, _skeletonAnimationLookUpHelper, CreateAnimationGenerator(), batchSettings, SelectedAnimationOutputFormat.Value);
+                service.Process(mountFrag, riderFrag);
+                MountLinkController.ReloadFragments(true, false);
+
+                ActiveOutputFragment.UpdatePossibleValues(MountLinkController.LoadAnimationSetForSkeleton(_rider.Skeleton.SkeletonName, true));
+            }
+        }
     }
 }
 

@@ -13,7 +13,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
         public NodeBaseParams NodeBaseParams => MusicNodeParams.NodeBaseParams;
 
-        protected override void CreateSpesificData(ByteChunk chunk)
+        protected override void CreateSpecificData(ByteChunk chunk)
         {
             MusicNodeParams = MusicNodeParams.Create(chunk);
 

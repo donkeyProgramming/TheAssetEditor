@@ -1,6 +1,8 @@
-﻿using AssetEditor.Services;
+﻿using AssetEditor.DevelopmentConfiguration;
+using AssetEditor.Services;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
+using AssetEditor.Views.Settings;
 using CommonControls.Common;
 using CommonControls.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,18 +25,46 @@ namespace AssetEditor
             VersionChecker.CheckVersion();
             Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(DispatcherUnhandledExceptionHandler);
 
-            _serviceProvider = new DependencyInjectionConfig()
-                .Build();
+            _serviceProvider = new DependencyInjectionConfig().Build();
             _rootScope = _serviceProvider.CreateScope();
-            ShowMainWindow();
 
+            // Show the settings window if its the first time the tool is ran
             var settingsService = _rootScope.ServiceProvider.GetRequiredService<ApplicationSettingsService>();
-            if (settingsService.CurrentSettings.IsDeveloperRun)
+            if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
             {
-                var devConfig = _rootScope.ServiceProvider.GetRequiredService<DevelopmentConfiguration>();
-                devConfig.CreateTestPackFiles();
-                devConfig.OpenFileOnLoad();
+                var settingsWindow = _rootScope.ServiceProvider.GetRequiredService<SettingsWindow>();
+                settingsWindow.DataContext = _rootScope.ServiceProvider.GetRequiredService<SettingsViewModel>();
+                settingsWindow.ShowDialog();
+
+                settingsService.CurrentSettings.IsFirstTimeStartingApplication = false;
+                settingsService.Save();
             }
+
+            DevelopmentConfigurationManager devConfigManager = null;
+            if (settingsService.CurrentSettings.IsDeveloperRun)
+                devConfigManager = _rootScope.ServiceProvider.GetRequiredService<DevelopmentConfigurationManager>();
+
+            devConfigManager?.OverrideSettings();        
+
+            // Load all packfiles
+            if (settingsService.CurrentSettings.LoadCaPacksByDefault)
+            {
+                var gamePath = settingsService.GetGamePathForCurrentGame();
+                if (gamePath != null)
+                {
+                    var gameInformationFactory = _rootScope.ServiceProvider.GetRequiredService<GameInformationFactory>();
+                    var packfileService = _rootScope.ServiceProvider.GetRequiredService<PackFileService>();
+                    var gameName = gameInformationFactory.GetGameById(settingsService.CurrentSettings.CurrentGame).DisplayName;
+                    var loadRes = packfileService.LoadAllCaFiles(gamePath, gameName);
+                    if (!loadRes)
+                        MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
+                }
+            }
+
+            devConfigManager?.CreateTestPackFiles();
+            devConfigManager?.OpenFileOnLoad();
+
+            ShowMainWindow();
         }
 
         void ShowMainWindow()

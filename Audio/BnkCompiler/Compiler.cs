@@ -76,7 +76,7 @@ namespace Audio.BnkCompiler
 
             // Convert to output and parse for sanity
             var bnkPackFile = new PackFile(outputFile, new MemorySource(bytes));
-            var parser = new Bnkparser();
+            var parser = new BnkParser();
             var result = parser.Parse(bnkPackFile, "test\\fakefilename.bnk");
 
             return bnkPackFile;

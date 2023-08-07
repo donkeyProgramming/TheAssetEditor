@@ -14,7 +14,7 @@ namespace Audio.FileFormats.WWise.Hirc.V122
         public byte uMode { get; set; }
         public AkDecisionTree AkDecisionTree { get; set; }
 
-        protected override void CreateSpesificData(ByteChunk chunk)
+        protected override void CreateSpecificData(ByteChunk chunk)
         {
             uProbability = chunk.ReadByte();
             uTreeDepth = chunk.ReadUInt32();

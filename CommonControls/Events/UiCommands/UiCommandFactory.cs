@@ -29,8 +29,7 @@ namespace CommonControls.Events.UiCommands
         public T Create<T>(Action<T> configure = null) where T : IUiCommand
         {
             var instance = _serviceProvider.GetRequiredService<T>();
-            if (configure != null)
-                configure(instance);
+            configure?.Invoke(instance);
 
             if (instance is IExecutableUiCommand executable)
                 executable.Execute();

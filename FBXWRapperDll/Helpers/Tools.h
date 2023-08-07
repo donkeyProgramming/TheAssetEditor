@@ -11,13 +11,15 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <chrono>
+#include <codecvt>
 
 /// <summary>
 /// Overloads std::tolower()/toupper() to std::string (only works single char in STL)
 /// </summary>
 namespace std
 {
-	static string tolower(const std::string& _strInput)
+	static std::string tolower(const std::string& _strInput)
 	{
 		std::string strOut = _strInput;
 
@@ -26,7 +28,7 @@ namespace std
 		return strOut;
 	}
 
-	static string toupper(const std::string& _strInput)
+	static std::string toupper(const std::string& _strInput)
 	{
 		std::string strOut = _strInput;
 
@@ -36,11 +38,22 @@ namespace std
 	}
 }
 
+static std::wstring WidenStr(const std::string& str)
+{
+	using convert_typeX = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+	return converterX.from_bytes(str);
+}
+
 /// <summary>
 /// Various misc functions
 /// </summary>
 namespace tools
 {
+	
+
+
 	/*template <typename T>
 	static int GetIndexOf(const T& value, const std::vector<T>& items)
 	{
@@ -56,10 +69,37 @@ namespace tools
 	{
 		for (int itemIndex = 0; itemIndex < items.size(); itemIndex++)
 		{
-			if (std::tolower(items[itemIndex]) == std::tolower(value))
+			if (tolower(items[itemIndex]) == tolower(value))
 				return itemIndex;
 		}
 
 		return -1;
 	}
+
+	class SystemClock
+	{
+	public:
+		double GetSeconds()
+		{
+			typedef std::chrono::high_resolution_clock Time;
+			typedef std::chrono::duration<float> fsec;
+			
+			double ticks = static_cast<double>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+			double period = std::chrono::high_resolution_clock::period::den;
+
+			double seconds = ticks / period;			
+
+			return seconds;			
+		}
+
+		double GetLocalTime() 
+		{
+			double timeElapsed = GetSeconds() - m_startTime; // +m_start_at;
+			return timeElapsed;
+		}
+
+	private:
+		double m_startTime = 0;
+	};
+
 }

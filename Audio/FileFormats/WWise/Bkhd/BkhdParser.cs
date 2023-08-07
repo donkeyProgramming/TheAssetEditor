@@ -3,27 +3,13 @@ using System.IO;
 
 namespace Audio.FileFormats.WWise.Bkhd
 {
-    public class BkhdParser : IParser
+    public class BkhdParser
     {
-        public void Parse(string fileName, ByteChunk chunk, ParsedBnkFile soundDb)
-        {
-            var bkdh = ReadHeader(chunk);
-            bkdh.OwnerFileName = fileName;
-
-            if (bkdh.dwBankGeneratorVersion == 2147483770)
-                bkdh.dwBankGeneratorVersion = 122;
-
-            if (bkdh.dwBankGeneratorVersion == 2147483784)
-                bkdh.dwBankGeneratorVersion = 136;
-
-            soundDb.Header = bkdh;
-        }
-
-        public BkhdHeader ReadHeader(ByteChunk chunk)
+        public BkhdHeader Parse(string fileName, ByteChunk chunk)
         {
             var bkdh = new BkhdHeader()
             {
-                OwnerFileName = "Not Provided",
+                OwnerFileName = fileName,
                 ChunkHeader = BnkChunkHeader.CreateFromBytes(chunk),
 
                 dwBankGeneratorVersion = chunk.ReadUInt32(),
@@ -31,9 +17,16 @@ namespace Audio.FileFormats.WWise.Bkhd
                 dwLanguageID = chunk.ReadUInt32(),
                 bFeedbackInBank = chunk.ReadUInt32(),
                 dwProjectID = chunk.ReadUInt32(),
-                padding = chunk.ReadUInt32(),
             };
 
+            // Read the padding
+            var headerDiff = (int)bkdh.ChunkHeader.ChunkSize - 20;
+            if (headerDiff > 0)
+                bkdh.padding = chunk.ReadBytes(headerDiff);
+
+            // Sometimes the version number is strange, probably because CA has their own compiled 
+            // version of WWISE. Their version is based on an official version, so we map it to the
+            // closest known ID
             if (bkdh.dwBankGeneratorVersion == 2147483770)
                 bkdh.dwBankGeneratorVersion = 122;
 
@@ -52,15 +45,14 @@ namespace Audio.FileFormats.WWise.Bkhd
             memStream.Write(ByteParsers.UInt32.EncodeValue(header.dwLanguageID, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(header.bFeedbackInBank, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(header.dwProjectID, out _));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(header.padding, out _));
+            memStream.Write(header.padding);
             var byteArray = memStream.ToArray();
 
             // Reload the object to ensure sanity
             var parser = new BkhdParser();
-            parser.Parse("name", new ByteChunk(byteArray), new ParsedBnkFile());
+            parser.Parse("name", new ByteChunk(byteArray));
 
             return byteArray;
         }
     }
-
 }

@@ -39,7 +39,9 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         }
     }
 
-    public class CAkSwitchPackage
+
+
+    public class CAkSwitchPackage : ICAkSwitchCntr.ICAkSwitchPackage
     {
         public uint SwitchId { get; set; }  // ID/Name of the switch case
         public List<uint> NodeIdList { get; set; } = new List<uint>(); // Probably the name of something, or at least a reference to something interesting

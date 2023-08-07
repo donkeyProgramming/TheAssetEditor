@@ -1,8 +1,6 @@
-﻿using CommonControls.Common;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using View3D.Components.Rendering;
@@ -28,8 +26,6 @@ namespace View3D.Components.Gizmo
 {
     public class Gizmo : IDisposable
     {
-        ILogger _logger = Logging.Create<Gizmo>();
-
         /// <summary>
         /// only active if atleast one entity is selected.
         /// </summary>
@@ -268,7 +264,7 @@ namespace View3D.Components.Gizmo
                         if (ActiveMode == GizmoMode.Translate)
                         {
                             foreach (var entity in Selection)
-                                OnTranslateEvent(entity, translateScaleWorld, translateScaleLocal);
+                                OnTranslateEvent(entity, translateScaleWorld);
                         }
                         else
                         {
@@ -279,7 +275,7 @@ namespace View3D.Components.Gizmo
                     if (rotationWorld != Matrix.Identity)
                     {
                         foreach (var entity in Selection)
-                            OnRotateEvent(entity, rotationWorld, rotationLocal);
+                            OnRotateEvent(entity, rotationWorld);
                     }
                 }
             }
@@ -710,12 +706,12 @@ namespace View3D.Components.Gizmo
         public event TransformationStartDelegate StartEvent;
         public event TransformationStopDelegate StopEvent;
 
-        private void OnTranslateEvent(ITransformable transformable, Vector3 delta, Vector3 delta2)
+        private void OnTranslateEvent(ITransformable transformable, Vector3 delta)
         {
             TranslateEvent?.Invoke(transformable, new TransformationEventArgs(delta, ActivePivot));
         }
 
-        private void OnRotateEvent(ITransformable transformable, Matrix delta, Matrix deleta2)
+        private void OnRotateEvent(ITransformable transformable, Matrix delta)
         {
             RotateEvent?.Invoke(transformable, new TransformationEventArgs(delta, ActivePivot));
         }

@@ -1,14 +1,14 @@
-﻿using CommonControls.Common;
+﻿using System;
+using System.IO;
+using CommonControls.Common;
 using Filetypes.ByteParsing;
 using Serilog;
-using System;
-using System.IO;
 
 namespace Audio.FileFormats.WWise
 {
     public abstract class HircItem
     {
-        ILogger _logger = Logging.Create<HircItem>();
+        readonly ILogger _logger = Logging.Create<HircItem>();
 
         public static readonly uint HircHeaderSize = 4; // 2x uint. Type is not included for some reason
         public string OwnerFile { get; set; } = "OwnerFile Not Set";
@@ -30,7 +30,7 @@ namespace Audio.FileFormats.WWise
                 Type = (HircType)chunk.ReadByte();
                 Size = chunk.ReadUInt32();
                 Id = chunk.ReadUInt32();
-                CreateSpesificData(chunk);
+                CreateSpecificData(chunk);
                 var currentIndex = chunk.Index;
                 var computedIndex = (int)(objectStartIndex + 5 + Size);
 
@@ -54,7 +54,7 @@ namespace Audio.FileFormats.WWise
             return memStream;
         }
 
-        protected abstract void CreateSpesificData(ByteChunk chunk);
+        protected abstract void CreateSpecificData(ByteChunk chunk);
         public abstract void UpdateSize();
         public abstract byte[] GetAsByteArray();
 

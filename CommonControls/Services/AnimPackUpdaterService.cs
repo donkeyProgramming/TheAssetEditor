@@ -1,8 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using CommonControls.BaseDialogs.ErrorListDialog;
@@ -11,14 +7,12 @@ using CommonControls.Editors.AnimationPack;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.FileTypes.PackFiles.Models;
-using Serilog;
 
 namespace CommonControls.Services
 {
     public class AnimPackUpdaterService
     {
         private readonly PackFileService _pfs;
-        private readonly ILogger _logger = Logging.Create<AnimPackUpdaterService>();
 
         public AnimPackUpdaterService(PackFileService pfs)
         {
@@ -45,9 +39,9 @@ namespace CommonControls.Services
             {
                 var outputWh3AnimPack = new AnimationPackFile();
 
-                var unkownFilesCount = animPack.Files.Count(x => x is IMatchedCombatBin || x is UnknownAnimFile);
-                if (unkownFilesCount != 0)
-                    throw new Exception($"AnimPack {animPack.FileName} contains {unkownFilesCount} unkown files");
+                var unknownFilesCount = animPack.Files.Count(x => x is IMatchedCombatBin || x is UnknownAnimFile);
+                if (unknownFilesCount != 0)
+                    throw new Exception($"AnimPack {animPack.FileName} contains {unknownFilesCount} unknown files");
 
                 var animFrags = animPack.Files.Where(x => x is AnimationFragmentFile).Cast<AnimationFragmentFile>();
                 var animBins = animPack.Files.Where(x => x is AnimationBin).Cast<AnimationBin>();

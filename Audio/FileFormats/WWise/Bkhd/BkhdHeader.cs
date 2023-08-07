@@ -11,7 +11,7 @@
         public uint dwLanguageID { get; set; }      // Enum 11 - English
         public uint bFeedbackInBank { get; set; }
         public uint dwProjectID { get; set; }
-        public uint padding { get; set; }
+        public byte[] padding { get; set; }
     }
 
 }

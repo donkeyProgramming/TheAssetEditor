@@ -3,7 +3,6 @@ using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using Microsoft.Xna.Framework.Graphics;
-using Serilog;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -20,7 +19,6 @@ namespace TextureEditor.ViewModels
 {
     public class TextureEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel, IDisposable
     {
-        ILogger _logger = Logging.Create<TextureEditorViewModel>();
         PackFileService _pfs;
         PackFile _file;
         TexturePreviewController _controller;

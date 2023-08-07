@@ -59,7 +59,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             }
 
             SelectedOutputFormat = _kitbasherRootScene.SelectedOutputFormat;
-            TextureFileEditorServiceViewModel = new TextureFileEditorServiceViewModel(mainNode, pfs);
+            TextureFileEditorServiceViewModel = new TextureFileEditorServiceViewModel(mainNode);
 
             UpdateLodInformationAction();
         }

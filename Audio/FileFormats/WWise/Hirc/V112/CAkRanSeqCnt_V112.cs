@@ -25,7 +25,7 @@ namespace Audio.FileFormats.WWise.Hirc.V112
         public Children Children { get; set; }
         public List<AkPlaylistItem> AkPlaylist { get; set; } = new List<AkPlaylistItem>();
 
-        protected override void CreateSpesificData(ByteChunk chunk)
+        protected override void CreateSpecificData(ByteChunk chunk)
         {
             NodeBaseParams = NodeBaseParams.Create(chunk);
 

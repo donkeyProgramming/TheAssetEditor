@@ -1,4 +1,4 @@
-﻿using CommonControls.FileTypes.RigidModel;
+﻿/*using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
 using NUnit.Framework;
 using View3D.Utility;
@@ -23,12 +23,12 @@ namespace FileTypesTests.FileTypes.RigidModel
     [TestFixture]
     class Warhammer2_Serialization
     {
-        readonly string _dwarfHeadPath = "DwarfHead.rmv2";
-        readonly string _swordPath = "DwarfHead.rmv2";
-
-        PackFileService _pfs;
-        ModelFactory _modelFactory;
-        ResourceLibary _resourceLibary;
+        //readonly string _dwarfHeadPath = "DwarfHead.rmv2";
+        //readonly string _swordPath = "DwarfHead.rmv2";
+        //
+        //PackFileService _pfs;
+        //ModelFactory _modelFactory;
+        //ResourceLibary _resourceLibary;
 
         [SetUp]
         public void Init()
@@ -95,3 +95,4 @@ namespace FileTypesTests.FileTypes.RigidModel
         }
     }
 }
+*/

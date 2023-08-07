@@ -4,14 +4,14 @@ using System.Collections.Generic;
 
 namespace Audio.FileFormats.WWise.Hirc.V136
 {
-    public class CAkLayerCntr_v136 : HircItem, INodeBaseParamsAccessor
+    public class CAkLayerCntr_v136 : HircItem, INodeBaseParamsAccessor, ICAkLayerCntr
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public Children Children { get; set; }
         public List<CAkLayer> LayerList { get; set; } = new List<CAkLayer>();
         public byte bIsContinuousValidation { get; set; }
 
-        protected override void CreateSpesificData(ByteChunk chunk)
+        protected override void CreateSpecificData(ByteChunk chunk)
         {
             NodeBaseParams = NodeBaseParams.Create(chunk);
             Children = Children.Create(chunk);
@@ -25,6 +25,8 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
         public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
+
+        public List<uint> GetChildren() => Children.ChildIdList;
     }
 
     public class CAkLayer

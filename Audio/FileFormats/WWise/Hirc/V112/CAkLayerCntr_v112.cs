@@ -1,14 +1,10 @@
 ﻿using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Audio.FileFormats.WWise.Hirc.V112
 {
-
-
-
-    public class CAkLayerCntr_v112 : CAkLayerCntr
+    public class CAkLayerCntr_v112 : HircItem, ICAkLayerCntr
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public Children Children { get; set; }
@@ -17,7 +13,7 @@ namespace Audio.FileFormats.WWise.Hirc.V112
 
 
 
-        protected override void CreateSpesificData(ByteChunk chunk)
+        protected override void CreateSpecificData(ByteChunk chunk)
         {
             NodeBaseParams = NodeBaseParams.Create(chunk);
             Children = Children.Create(chunk);
@@ -29,17 +25,10 @@ namespace Audio.FileFormats.WWise.Hirc.V112
             bIsContinuousValidation = chunk.ReadByte();
         }
 
-        public override uint ParentId => NodeBaseParams.DirectParentID;
-
-        public override List<Layer> Layers => LayerList.Select(x => new Layer()
-        {
-            LayerId = x.ulLayerID,
-            RtpcID = x.rtpcID,
-            AssociatedChildDataListIds = x.CAssociatedChildDataList.Select(y => y.ulAssociatedChildID).ToList()
-        }).ToList();
-
         public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
+
+        public List<uint> GetChildren() => Children.ChildIdList;
     }
 
     public class CAkLayer

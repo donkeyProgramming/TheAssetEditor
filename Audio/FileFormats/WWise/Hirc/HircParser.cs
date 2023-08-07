@@ -5,13 +5,12 @@ using System.IO;
 
 namespace Audio.FileFormats.WWise.Hirc
 {
-    public class HircParser : IParser
+    public class HircParser
     {
         public bool UseByteFactory { get; set; } = false;
 
         public HircParser()
         {
-
         }
 
         HircFactory GetHircFactory(uint bnkVersion)
@@ -22,16 +21,18 @@ namespace Audio.FileFormats.WWise.Hirc
             return HircFactory.CreateFactory(bnkVersion);
         }
 
-        public void Parse(string fileName, ByteChunk chunk, ParsedBnkFile bnkFile)
+        public HircChunk Parse(string fileName, ByteChunk chunk, uint bnkVersion)
         {
-            bnkFile.HircChuck = new HircChunk();
-            bnkFile.HircChuck.ChunkHeader = BnkChunkHeader.CreateFromBytes(chunk);
-            bnkFile.HircChuck.NumHircItems = chunk.ReadUInt32();
+            var hircChuck = new HircChunk
+            {
+                ChunkHeader = BnkChunkHeader.CreateFromBytes(chunk),
+                NumHircItems = chunk.ReadUInt32()
+            };
 
             var failedItems = new List<uint>();
-            HircFactory factory = GetHircFactory(bnkFile.Header.dwBankGeneratorVersion);
+            HircFactory factory = GetHircFactory(bnkVersion);
 
-            for (uint itemIndex = 0; itemIndex < bnkFile.HircChuck.NumHircItems; itemIndex++)
+            for (uint itemIndex = 0; itemIndex < hircChuck.NumHircItems; itemIndex++)
             {
                 var hircType = (HircType)chunk.PeakByte();
 
@@ -43,7 +44,7 @@ namespace Audio.FileFormats.WWise.Hirc
                     hircItem.ByteIndexInFile = itemIndex;
                     hircItem.OwnerFile = fileName;
                     hircItem.Parse(chunk);
-                    bnkFile.HircChuck.Hircs.Add(hircItem);
+                    hircChuck.Hircs.Add(hircItem);
                 }
                 catch (Exception e)
                 {
@@ -52,9 +53,11 @@ namespace Audio.FileFormats.WWise.Hirc
 
                     var unkInstance = new CAkUnknown() { ErrorMsg = e.Message, ByteIndexInFile = itemIndex, OwnerFile = fileName };
                     unkInstance.Parse(chunk);
-                    bnkFile.HircChuck.Hircs.Add(unkInstance);
+                    hircChuck.Hircs.Add(unkInstance);
                 }
             }
+
+            return hircChuck;
         }
 
         public byte[] GetAsBytes(HircChunk hircChunk)
@@ -72,7 +75,7 @@ namespace Audio.FileFormats.WWise.Hirc
             var byteArray = memStream.ToArray();
 
             // For sanity, read back
-            Parse("name", new ByteChunk(byteArray), new ParsedBnkFile() { Header = new Bkhd.BkhdHeader() { dwBankGeneratorVersion = 136 } });
+            Parse("name", new ByteChunk(byteArray), 136);
 
             return byteArray;
         }
