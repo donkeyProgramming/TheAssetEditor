@@ -35,7 +35,6 @@ namespace KitbasherEditor
             serviceCollection.AddScoped<SceneExplorerViewModel>();
             serviceCollection.AddScoped<AnimationControllerViewModel>();
 
-
             // Sub tools
             serviceCollection.AddScoped<VertexDebuggerViewModel>();
             serviceCollection.AddScoped<VertexDebuggerView>();
