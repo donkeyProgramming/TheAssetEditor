@@ -1,4 +1,5 @@
-﻿using AnimationEditor.AnimationTransferTool;
+﻿using AnimationEditor.AnimationKeyframeEditor;
+using AnimationEditor.AnimationTransferTool;
 using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.PropCreator.ViewModels;
@@ -28,7 +29,6 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Input;
-using AnimationEditor.AnimationKeyframeEditor;
 
 namespace AssetEditor.ViewModels
 {
@@ -135,7 +135,7 @@ namespace AssetEditor.ViewModels
             OpenAudioEditorCommand = new RelayCommand(OpenAudioEditor);
             CompileAudioProjectsCommand = new RelayCommand(CompileAudioProjects);
             CreateExampleAudioProjectCommand = new RelayCommand(CreateExampleAudioProject);
-            OpenAnimationKeyframeCommand = new RelayCommand(OpenAnimationKeyframeEditor);
+            OpenAnimationKeyframeCommand = new RelayCommand(OpenAnimationKeyframe);
 
             GenerateRmv2ReportCommand = new RelayCommand(GenerateRmv2Report);
             GenerateMetaDataReportCommand = new RelayCommand(GenerateMetaDataReport);
@@ -166,12 +166,6 @@ namespace AssetEditor.ViewModels
             var settings = settingsService.CurrentSettings;
             settings.RecentPackFilePaths.CollectionChanged += (sender, args) => CreateRecentPackFilesItems();
             CreateRecentPackFilesItems();
-        }
-
-        private void OpenAnimationKeyframeEditor()
-        {
-            var editorView = _toolFactory.Create<AnimationKeyframeEditorViewModel>();
-            EditorCreator.CreateEmptyEditor(editorView);
         }
 
         void CreateRecentPackFilesItems()
@@ -257,6 +251,7 @@ namespace AssetEditor.ViewModels
             Process.Start("explorer.exe", path);
         }
 
+        void OpenAnimationKeyframe() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<AnimationKeyframeEditorViewModel>>();
         void OpenMountCreator() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<MountAnimationCreatorViewModel>>();
         void OpenCampaignAnimCreatorEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<CampaignAnimationCreatorViewModel>>();
         void OpenAnimationTransferTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<AnimationTransferToolViewModel>>();

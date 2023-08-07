@@ -1,4 +1,5 @@
-﻿using AnimationEditor.AnimationTransferTool;
+﻿using AnimationEditor.AnimationKeyframeEditor;
+using AnimationEditor.AnimationTransferTool;
 using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.BaseControl;
@@ -37,6 +38,9 @@ namespace AnimationEditor
 
             serviceCollection.AddScoped<EditorHost<MountAnimationCreatorViewModel>>();
             serviceCollection.AddScoped<MountAnimationCreatorViewModel>();
+
+            serviceCollection.AddScoped<EditorHost<AnimationKeyframeEditorViewModel>>();
+            serviceCollection.AddScoped<AnimationKeyframeEditorViewModel>();
         }
 
         public override void RegisterTools(IToolFactory factory)
@@ -46,6 +50,7 @@ namespace AnimationEditor
             factory.RegisterTool<EditorHost<SuperViewViewModel>, EditorHostView>();
             factory.RegisterTool<EditorHost<SkeletonEditorViewModel>, EditorHostView>();
             factory.RegisterTool<EditorHost<CampaignAnimationCreatorViewModel>, EditorHostView>();
+            factory.RegisterTool<EditorHost<AnimationKeyframeEditorViewModel>, EditorHostView>();
         }
     }
 }
