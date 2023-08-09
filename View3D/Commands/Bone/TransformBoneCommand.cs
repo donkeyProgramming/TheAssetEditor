@@ -1,8 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using Microsoft.Xna.Framework;
 using View3D.Animation;
 using View3D.Components.Component.Selection;
 using View3D.Components.Gizmo;

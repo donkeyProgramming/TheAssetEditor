@@ -1,12 +1,5 @@
-﻿using CommonControls.Common;
-using MonoGame.Framework.WpfInterop;
-using Serilog;
-using System.Collections.Generic;
-using System.Linq;
-using View3D.Components.Component;
+﻿using System.Collections.Generic;
 using View3D.Components.Component.Selection;
-using View3D.Rendering;
-using View3D.Scene;
 
 namespace View3D.Commands.Bone
 {
@@ -19,18 +12,21 @@ namespace View3D.Commands.Bone
         bool _isRemove;
         List<int> _selectedBones;
 
-        public string HintText => "Select Bone";
+        public string HintText => "Select Bones";
 
         bool ICommand.IsMutation => false;
 
-        public BoneSelectionCommand(List<int> selectedBones, bool isAdd, bool isRemove, IComponentManager component)
+        public void Configure(List<int> selectedBones, bool isAdd, bool isRemove)
         {
-            _selectionManager = component.GetComponent<SelectionManager>();
             _selectedBones = selectedBones;
             _isAdd = isAdd;
             _isRemove = isRemove;
         }
 
+        public BoneSelectionCommand(SelectionManager selectionManager)
+        {
+            _selectionManager = selectionManager;
+        }
 
         public void Undo()
         {

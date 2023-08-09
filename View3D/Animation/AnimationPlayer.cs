@@ -64,6 +64,8 @@ namespace View3D.Animation
         TimeSpanExtension _timeSinceStart;
         AnimationFrame _currentAnimFrame;
         AnimationClip _animationClip;
+        public GameSkeleton Skeleton { get { return _skeleton; } }
+        public AnimationClip AnimationClip { get { return _animationClip; } }
 
         public bool IsPlaying { get; private set; } = true;
         public bool IsEnabled { get; set; } = false;

@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using View3D.Commands;
+using View3D.Commands.Bone;
 using View3D.Commands.Face;
 using View3D.Commands.Object;
 using View3D.Commands.Vertex;
@@ -96,6 +97,7 @@ namespace View3D
             serviceCollection.AddTransient<ObjectSelectionModeCommand>();
             serviceCollection.AddTransient<PinMeshToVertexCommand>();
             serviceCollection.AddTransient<RemapBoneIndexesCommand>();
+            serviceCollection.AddTransient<BoneSelectionCommand>();
         }
         protected void RegisterGameComponent<T>(IServiceCollection serviceCollection) where T : class, IGameComponent
         {
