@@ -39,6 +39,9 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private SceneObject _newAnimation;
         private SceneObject _mount;
         private SceneObject _rider;
+
+        public NotifyAttr<bool> AllowToSelectAnimRoot { get; set; } = new NotifyAttr<bool>(false);
+
         public AnimationSettingsViewModel AnimationSettings { get; set; } = new AnimationSettingsViewModel();
         public FilterCollection<SkeletonBoneNode> SelectedRiderBone { get; set; }
         public FilterCollection<IAnimationBinGenericFormat> ActiveOutputFragment { get; set;  }
@@ -78,7 +81,17 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             ActiveFragmentSlot = new FilterCollection<AnimationBinEntryGenericFormat>(null, (x) => UpdateCanSaveAndPreviewStates());
             ActiveFragmentSlot.SearchFilter = (value, rx) => { return rx.Match(value.SlotName).Success; };
+        }
 
+        private void OnSelectionChanged(ISelectionState state, bool sendEvent)
+        {
+            if (state is BoneSelectionState boneSelectionState)
+            {
+                if (!AllowToSelectAnimRoot.Value)
+                {
+                    boneSelectionState.DeselectAnimRootNode();
+                }
+            }
         }
 
         private void UpdateCanSaveAndPreviewStates()
@@ -199,8 +212,9 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 _rider.Player.CurrentFrame++;
                 if (_rider.Player.CurrentFrame + 1 == _rider.Player.FrameCount()) return;
                 _rider.Player.CurrentFrame--;
-
             }
+
+            _selectionManager.GetState().SelectionChanged += OnSelectionChanged;
         }
 
         public void EnterMoveMode()
