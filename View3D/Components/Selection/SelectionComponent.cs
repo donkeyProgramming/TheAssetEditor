@@ -148,9 +148,9 @@ namespace View3D.Components.Component.Selection
                 var vertexObject = boneState.RenderObject as Rmv2MeshNode;
                 if (IntersectionMath.IntersectBones(unprojectedSelectionRect, vertexObject, boneState.Skeleton, vertexObject.RenderMatrix, out var bones))
                 {
-                    foreach (var bone in boneState.SelectedBones)
+                    foreach (var bone in bones)
                     {
-                        Debug.WriteLine($"bone id: {bone}");
+                        Console.WriteLine($"bone id: {bone}");
                     }
                     _commandFactory.Create<BoneSelectionCommand>().Configure(x => x.Configure(bones, isSelectionModification, removeSelection)).BuildAndExecute();
                     return;

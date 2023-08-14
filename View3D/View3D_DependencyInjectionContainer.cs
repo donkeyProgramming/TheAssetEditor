@@ -98,6 +98,7 @@ namespace View3D
             serviceCollection.AddTransient<PinMeshToVertexCommand>();
             serviceCollection.AddTransient<RemapBoneIndexesCommand>();
             serviceCollection.AddTransient<BoneSelectionCommand>();
+            serviceCollection.AddTransient<TransformBoneCommand>();
         }
         protected void RegisterGameComponent<T>(IServiceCollection serviceCollection) where T : class, IGameComponent
         {

@@ -107,6 +107,7 @@ namespace View3D.Components.Gizmo
 
         public void Start(CommandExecutor commandManager)
         {
+
             if(_activeCommand is TransformVertexCommand transformVertexCommand)
             {
                 //   MessageBox.Show("Transform debug check - Please inform the creator of the tool that you got this message. Would also love it if you tried undoing your last command to see if that works..\n E-001");
@@ -115,10 +116,6 @@ namespace View3D.Components.Gizmo
                 transformVertexCommand.PivotPoint = Position;
                 commandManager.ExecuteCommand(_activeCommand);
                 _activeCommand = null;
-
-                _totalGizomTransform = Matrix.Identity;
-                _activeCommand = _commandFactory.Create<TransformVertexCommand>().Configure(x => x.Configure(_effectedObjects, Position)).Build();
-                return;
             }
 
             if(_activeCommand is TransformBoneCommand transformBoneCommand)
@@ -128,10 +125,19 @@ namespace View3D.Components.Gizmo
                 transformBoneCommand.Transform = matrix;
                 commandManager.ExecuteCommand(_activeCommand);
                 _activeCommand = null;
-                _totalGizomTransform = Matrix.Identity;
-                _activeCommand = _commandFactory.Create<TransformBoneCommand>().Configure(x => x.Configure(_selectedBones, (BoneSelectionState) _selectionState)).Build();
-                return;
             }
+
+            if(_selectionState is BoneSelectionState)
+            {
+                _totalGizomTransform = Matrix.Identity;
+                _activeCommand = _commandFactory.Create<TransformBoneCommand>().Configure(x => x.Configure(_selectedBones, (BoneSelectionState)_selectionState)).Build();
+            }
+            else
+            {
+                _totalGizomTransform = Matrix.Identity;
+                _activeCommand = _commandFactory.Create<TransformVertexCommand>().Configure(x => x.Configure(_effectedObjects, Position)).Build();
+            }
+
         }
 
         public void Stop(CommandExecutor commandManager)
@@ -157,45 +163,23 @@ namespace View3D.Components.Gizmo
             }
         }
 
-        Vector3 ToEulerAngles(Quaternion quaternion)
+        Matrix FixRotationAxis2(Matrix transform)
         {
-            Vector3 eulerAngles;
+            // Decompose the transform matrix into its scale, rotation, and translation components
+            transform.Decompose(out Vector3 scale, out Quaternion rotation, out Vector3 translation);
 
-            // Extract the pitch (x-axis rotation)
-            float sinPitch = 2.0f * (quaternion.W * quaternion.X + quaternion.Y * quaternion.Z);
-            float cosPitch = 1.0f - 2.0f * (quaternion.X * quaternion.X + quaternion.Y * quaternion.Y);
-            eulerAngles.X = (float)Math.Atan2(sinPitch, cosPitch);
+            // Create a quaternion representing a 180-degree rotation around the X axis
+            Quaternion flipQuaternion = Quaternion.CreateFromAxisAngle(Vector3.UnitX, MathHelper.Pi);
 
-            // Extract the yaw (y-axis rotation)
-            float sinYaw = 2.0f * (quaternion.W * quaternion.Y - quaternion.Z * quaternion.X);
-            if (Math.Abs(sinYaw) >= 1)
-                eulerAngles.Y = (float)Math.CopySign(Math.PI / 2, sinYaw); // Use 90 degrees if out of range
-            else
-                eulerAngles.Y = (float)Math.Asin(sinYaw);
+            // Apply the rotation to the quaternion to correct the axis alignment
+            Quaternion correctedQuaternion = flipQuaternion * rotation;
 
-            // Extract the roll (z-axis rotation)
-            float sinRoll = 2.0f * (quaternion.W * quaternion.Z + quaternion.X * quaternion.Y);
-            float cosRoll = 1.0f - 2.0f * (quaternion.Y * quaternion.Y + quaternion.Z * quaternion.Z);
-            eulerAngles.Z = (float)Math.Atan2(sinRoll, cosRoll);
+            // Recompose the transform matrix with the corrected rotation
+            Matrix fixedTransform = Matrix.CreateScale(scale) * Matrix.CreateFromQuaternion(correctedQuaternion) * Matrix.CreateTranslation(translation);
 
-            return eulerAngles;
-        }
-
-        Matrix FixRotationAxis(Matrix transform)
-        {
-            Vector3 scale;
-            Quaternion rotation;
-            Vector3 translation;
-            transform.Decompose(out scale, out rotation, out translation);
-
-            // Swap the X and Y rotations
-            Vector3 euler = ToEulerAngles(rotation);
-            rotation = Quaternion.CreateFromYawPitchRoll(euler.Y, euler.X, euler.Z);
-
-            // Recompose the transform with the fixed rotation
-            Matrix fixedTransform = Matrix.CreateScale(scale) * Matrix.CreateFromQuaternion(rotation) * Matrix.CreateTranslation(translation);
             return fixedTransform;
         }
+
 
         public void GizmoTranslateEvent(Vector3 translation, PivotType pivot)
         {
@@ -209,7 +193,7 @@ namespace View3D.Components.Gizmo
             ApplyTransform(rotation, pivot, GizmoMode.Rotate);
             _totalGizomTransform *= rotation;
 
-            var fixedTransform = FixRotationAxis(_totalGizomTransform);
+            var fixedTransform = FixRotationAxis2(_totalGizomTransform);
             fixedTransform.Decompose(out var _, out var quat, out var _);
             Orientation = quat;
         }
@@ -255,6 +239,8 @@ namespace View3D.Components.Gizmo
         void ApplyTransform(Matrix transform, PivotType pivotType, GizmoMode gizmoMode)
         {
             transform.Decompose(out var scale, out var rot, out var trans);
+
+            Console.WriteLine($"gizmo position {Position}");
 
             if (_selectionState is BoneSelectionState boneSelectionState)
             {
@@ -303,8 +289,7 @@ namespace View3D.Components.Gizmo
         {
             if (_activeCommand is TransformBoneCommand transformBoneCommand)
             {
-                var m = Matrix.CreateTranslation(-objCenter) * transform * Matrix.CreateTranslation(objCenter);
-                transformBoneCommand.ApplyTransformation(m, gizmoMode);
+                transformBoneCommand.ApplyTransformation(transform, gizmoMode);
             }
         }
 
